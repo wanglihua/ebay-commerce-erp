@@ -1,0 +1,279 @@
+{%header "Paypal账号" .%}
+<div id="page">
+   <div class="breadcrumbs" id="breadcrumbs">
+       <ul class="breadcrumb">
+           <li>
+               <a href='{%url "Home.Index"%}'><i class="ace-icon fa fa-home home-icon"></i></a>
+           </li>
+           <li class="parent" data-menu="xtpz-menu">系统配置</li>
+           <li class="active" data-menu="xtpz-paypalaccount-menu">Paypal账号</li>
+       </ul>
+   </div>
+   <div class="page-content">
+       <div class="row">
+           <div class="col-xs-12" style="padding: 0;">
+               <div class="gridToolBar clearfix">
+                   <button class="btn btn-primary btn-sm" @click="reloadList('#paypalAccountList')">
+                       <i class="ace-icon fa fa-refresh"></i>
+                       刷新
+                   </button>
+                   <button class="btn btn-success btn-sm" @click="showPaypalAccountDetail(0)">
+                       <i class="ace-icon fa fa-plus"></i>
+                       新增
+                   </button>
+                   <button class="btn btn-danger btn-sm" @click="deletePaypalAccount()">
+                       <i class="ace-icon fa fa-trash-o"></i>
+                       删除
+                   </button>
+               </div>
+               <div>
+                   <table id="paypalAccountList" class="table table-striped table-bordered table-hover"></table>
+               </div>
+           </div>
+       </div>
+   </div>
+    <div class="modal fade" id="paypalAccountDetailDialog">
+        <div class="modal-dialog" style="width: 680px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="True">&times;</button>
+                    <h4 class="modal-title">Paypal账号详细</h4>
+                </div>
+                <div class="modal-body clearfix">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <form class="form-horizontal" role="form" id="paypalAccountDetailForm">
+                                <input id="paypal_account_id" name="detail.paypal_account.id" type="hidden" v-model.number="detail.paypal_account.id"/>
+                                <input id="paypal_account_version" name="detail.paypal_account.version" type="hidden" v-model.number="detail.paypal_account.version"/>
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="paypal_account" class="col-xs-2 control-label no-padding-right">Paypal账号</label>
+                                            <div class="col-xs-10">
+                                                <input id="paypal_account" name="detail.paypal_account.paypal_account" type="text" class="input-sm form-control" v-model="detail.paypal_account.paypal_account"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="api_account" class="col-xs-2 control-label no-padding-right">API账号</label>
+                                            <div class="col-xs-10">
+                                                <input id="api_account" name="detail.paypal_account.api_account" type="text" class="input-sm form-control" v-model="detail.paypal_account.api_account"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="api_token" class="col-xs-2 control-label no-padding-right">API令牌</label>
+                                            <div class="col-xs-10">
+                                                <input id="api_token" name="detail.paypal_account.api_token" type="text" class="input-sm form-control" v-model="detail.paypal_account.api_token"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="balance" class="col-xs-2 control-label no-padding-right">余额</label>
+                                            <div class="col-xs-10">
+                                                <input id="balance" name="detail.paypal_account.balance" type="text" class="input-sm form-control" v-model.number="detail.paypal_account.balance"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="desc" class="col-xs-2 control-label no-padding-right">描述</label>
+                                            <div class="col-xs-10">
+                                                <input id="desc" name="detail.paypal_account.desc" type="text" class="input-sm form-control" v-model="detail.paypal_account.desc"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="status_id" class="col-xs-2 control-label no-padding-right">状态</label>
+                                            <div class="col-xs-10">
+                                                <input id="status_id" name="detail.paypal_account.status_id" type="text" class="input-sm form-control" v-model.number="detail.paypal_account.status_id"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success btn-sm" @click="savePaypalAccount()">
+                        <i class="ace-icon fa fa-floppy-o"></i>保存
+                    </button>
+                    <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">
+                        <i class="ace-icon fa fa-times"></i>关闭
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    var vm = new Vue({
+        el: "#page",
+        data: {
+            "detail": {
+                "paypal_account": {}
+            }
+        },
+        mounted: function () {
+            initDataTable(
+                    '#paypalAccountList',
+                    {
+                        "sAjaxSource": '{%url "ErpPaypalAccount.ListData"%}',
+                        "aaSorting": [[1, "asc"]],
+                        "aoColumns": [
+                            {
+                                "mDataProp": "id", "bSearchable": false, "orderable": false, "sClass": "center", "width": 50,
+                                "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
+                                "render": function (data, type, row) {
+                                    return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
+                                }
+                            },
+                            {"mDataProp": "paypal_account", "title": "Paypal账号", "bSearchable": true },
+                            {"mDataProp": "api_account", "title": "API账号", "bSearchable": true },
+                            {"mDataProp": "api_token", "title": "API令牌", "bSearchable": true },
+                            {"mDataProp": "balance", "title": "余额", "bSearchable": false },
+                            {"mDataProp": "desc", "title": "描述", "bSearchable": true },
+                            {"mDataProp": "status_id", "title": "状态", "bSearchable": false },
+                            {"mDataProp": "create_time", "title": "创建时间", "bSearchable": false, "width": 120 },
+                            {"mDataProp": "update_time", "title": "修改时间", "bSearchable": false, "width": 120 }
+                        ]
+                   }
+            );
+
+            $('#paypalAccountList tbody').on('dblclick', 'tr', function () {
+                var id = $(this).find('td:first-child input:checkbox').val();
+                vm.showPaypalAccountDetail(id);
+            });
+        },
+        methods: {
+            reloadList: function () {
+                reloadList('#paypalAccountList');
+            },
+            showPaypalAccountDetail: function (id) {
+                showMask("加载中...");
+                $("#paypalAccountDetailForm").clearValidation();
+                $.ajax({
+                           url: '{%url "ErpPaypalAccount.DetailData" %}',
+                           type: "POST",
+                           data: {
+                               "id": id
+                           },
+                           success: function (result) {
+                               hideMask();
+                               if (result.success == false) {
+                                   $.msg.error(result.message);
+                                   return;
+                               }
+                               vm.detail = result;
+                               $('#paypalAccountDetailDialog').modal(modalOptions);
+                           }
+                       }
+                );
+            },
+            savePaypalAccount: function () {
+                showMask("提交中...");
+                var form = $("#paypalAccountDetailForm");
+                var valid = validate(form, {  
+                    'detail.paypal_account.paypal_account': {
+                        required: true, minlength: 2, maxlength: 100
+                    },
+                    'detail.paypal_account.api_account': {
+                        required: true, minlength: 2, maxlength: 100
+                    },
+                    'detail.paypal_account.api_token': {
+                        required: true, minlength: 2, maxlength: 100
+                    },
+                    'detail.paypal_account.balance': {
+                        required: false, number: true
+                    },
+                    'detail.paypal_account.desc': {
+                        required: false, maxlength: 500
+                    },
+                    'detail.paypal_account.status_id': {
+                        required: true, digits: true
+                    }
+                });
+
+                if (!valid) {
+                    hideMask();
+                } else {
+                    $.ajax({
+                               url: '{%url "ErpPaypalAccount.Save"%}',
+                               type: "POST",
+                               processData: false,
+                               contentType: 'application/json',
+                               data: JSON.stringify(vm.detail),
+                               success: function (data) {
+                                   hideMask();
+                                   if (data.success == false) {
+                                       $.msg.error(data.message);
+                                       //return;
+                                   }
+                                   else {
+                                       $.msg.show(data.message);
+                                       $('#paypalAccountDetailDialog').modal('hide');
+                                       vm.reloadList();
+                                       //return;
+                                   }
+                               }
+                           }
+                    );
+                }
+            },
+            deletePaypalAccount: function () {
+                var id_list = [];
+                $('#paypalAccountList tbody tr>td:first-child input:checkbox').each(function () {
+                    if (this.checked) {
+                        id_list.push($(this).val());
+                    }
+                });
+
+                if (id_list.length == 0) {
+                    $.msg.alert("请选择数据！");
+                    return;
+                }
+
+                $.msg.confirm("确认要删除吗？", function () {
+                    $.ajax({
+                               url: '{%url "ErpPaypalAccount.Delete"%}',
+                               type: "POST",
+                               data: {"id_list": id_list},
+                               success: function (data) {
+                                   if (data.success == false) {
+                                       $.msg.error(data.message);
+                                       return;
+                                   }
+                                   else {
+                                       $.msg.show(data.message);
+                                   }
+                                   vm.reloadList();
+                               }
+                           });
+                });
+            }
+        }
+    });
+</script>
+{%footer%}
+

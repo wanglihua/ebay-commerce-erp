@@ -48,3 +48,16 @@ POST /erp/product/cate/delete               ErpProductCate.Delete
 
 GET  /erp/login/log                         ErpLoginLog.Index
 POST /erp/login/log/data/list               ErpLoginLog.ListData
+
+
+GET  /erp/shop/account                      ErpShopAccount.Index
+POST /erp/shop/account/data/list            ErpShopAccount.ListData
+POST /erp/shop/account/data/detail          ErpShopAccount.DetailData
+POST /erp/shop/account/save                 ErpShopAccount.Save
+POST /erp/shop/account/delete               ErpShopAccount.Delete
+
+GET  /erp/paypal/account                    ErpPaypalAccount.Index
+POST /erp/paypal/account/data/list          ErpPaypalAccount.ListData
+POST /erp/paypal/account/data/detail        ErpPaypalAccount.DetailData
+POST /erp/paypal/account/save               ErpPaypalAccount.Save
+POST /erp/paypal/account/delete             ErpPaypalAccount.Delete

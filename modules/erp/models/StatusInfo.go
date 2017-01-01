@@ -8,10 +8,12 @@ import (
 const (
 	//状态类型 begin
 
-	STATUS_TYPE_STOCK         = 100 //仓库状态
-	STATUS_TYPE_EXCHANGE_RATE = 200 //仓库状态
-	STATUS_TYPE_PRODUCT_CATE  = 300 //商品目录状态
-	STATUS_TYPE_PRODUCT       = 400 //商品状态
+	STATUS_TYPE_STOCK          = 100 //仓库状态
+	STATUS_TYPE_EXCHANGE_RATE  = 200 //仓库状态
+	STATUS_TYPE_PRODUCT_CATE   = 300 //商品目录状态
+	STATUS_TYPE_PRODUCT        = 400 //商品状态
+	STATUS_TYPE_SHOP_ACCOUNT   = 500 //店铺账号状态
+	STATUS_TYPE_PAYPAL_ACCOUNT = 600 //Paypal账号状态
 
 	//状态类型 end
 
@@ -37,6 +39,14 @@ const (
 	PRODUCT_STATUS_TC   = 1100
 	PRODUCT_STATUS_ZDCJ = 1200
 	PRODUCT_STATUS_ZTXC = 1300
+
+	// 店铺账号状态 正常 停用
+	SHOP_ACCOUNT_STATUS_ENABLED  = 1400
+	SHOP_ACCOUNT_STATUS_DISABLED = 1500
+
+	// Paypal账号状态 正常 停用
+	PAYPAL_ACCOUNT_STATUS_ENABLED  = 1500
+	PAYPAL_ACCOUNT_STATUS_DISABLED = 1600
 
 	//状态 id end
 )
@@ -157,5 +167,36 @@ func (e StatusInfo) InitData(db_session *xorm.Session) {
 	status.Type = STATUS_TYPE_PRODUCT
 	status.Name = "暂停销售"
 	status.Desc = core.NewNullString("商品状态 暂停销售", true)
+	db_session.Insert(status)
+
+	//店铺账号状态
+	status = new(StatusInfo)
+	status.Id = SHOP_ACCOUNT_STATUS_ENABLED
+	status.Type = STATUS_TYPE_SHOP_ACCOUNT
+	status.Name = "正常"
+	status.Desc = core.NewNullString("店铺账号状态 正常", true)
+	db_session.Insert(status)
+
+	status = new(StatusInfo)
+	status.Id = SHOP_ACCOUNT_STATUS_DISABLED
+	status.Type = STATUS_TYPE_SHOP_ACCOUNT
+	status.Name = "停用"
+	status.Desc = core.NewNullString("店铺账号状态 停用", true)
+	db_session.Insert(status)
+
+	//Paypal账号状态
+
+	status = new(StatusInfo)
+	status.Id = PAYPAL_ACCOUNT_STATUS_ENABLED
+	status.Type = STATUS_TYPE_PAYPAL_ACCOUNT
+	status.Name = "正常"
+	status.Desc = core.NewNullString("Paypal账号状态 正常", true)
+	db_session.Insert(status)
+
+	status = new(StatusInfo)
+	status.Id = PAYPAL_ACCOUNT_STATUS_DISABLED
+	status.Type = STATUS_TYPE_PAYPAL_ACCOUNT
+	status.Name = "停用"
+	status.Desc = core.NewNullString("Paypal账号状态 停用", true)
 	db_session.Insert(status)
 }

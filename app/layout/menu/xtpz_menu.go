@@ -23,6 +23,22 @@ func GetXtpzMenu(db_session *xorm.Session, web_session revel.Session) string {
     <b class="arrow"></b>
     <ul class="submenu">
 
+        <li id="xtpz-shopaccount-menu" class="">
+            <a href="/erp/shop/account">
+                <i class="menu-icon fa fa-caret-right"></i>
+                店铺账号
+            </a>
+            <b class="arrow"></b>
+        </li>
+
+        <li id="xtpz-paypalaccount-menu" class="">
+            <a href="/erp/paypal/account">
+                <i class="menu-icon fa fa-caret-right"></i>
+                Paypal账号
+            </a>
+            <b class="arrow"></b>
+        </li>
+
         <li id="xtpz-exchangerate-menu" class="">
             <a href="/erp/exchange/rate">
                 <i class="menu-icon fa fa-caret-right"></i>

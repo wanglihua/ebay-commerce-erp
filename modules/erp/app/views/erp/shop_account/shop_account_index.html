@@ -1,0 +1,279 @@
+{%header "店铺账号" .%}
+<div id="page">
+   <div class="breadcrumbs" id="breadcrumbs">
+       <ul class="breadcrumb">
+           <li>
+               <a href='{%url "Home.Index"%}'><i class="ace-icon fa fa-home home-icon"></i></a>
+           </li>
+           <li class="parent" data-menu="xtpz-menu">系统配置</li>
+           <li class="active" data-menu="xtpz-shopaccount-menu">店铺账号</li>
+       </ul>
+   </div>
+   <div class="page-content">
+       <div class="row">
+           <div class="col-xs-12" style="padding: 0;">
+               <div class="gridToolBar clearfix">
+                   <button class="btn btn-primary btn-sm" @click="reloadList('#shopAccountList')">
+                       <i class="ace-icon fa fa-refresh"></i>
+                       刷新
+                   </button>
+                   <button class="btn btn-success btn-sm" @click="showShopAccountDetail(0)">
+                       <i class="ace-icon fa fa-plus"></i>
+                       新增
+                   </button>
+                   <button class="btn btn-danger btn-sm" @click="deleteShopAccount()">
+                       <i class="ace-icon fa fa-trash-o"></i>
+                       删除
+                   </button>
+               </div>
+               <div>
+                   <table id="shopAccountList" class="table table-striped table-bordered table-hover"></table>
+               </div>
+           </div>
+       </div>
+   </div>
+    <div class="modal fade" id="shopAccountDetailDialog">
+        <div class="modal-dialog" style="width: 680px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="True">&times;</button>
+                    <h4 class="modal-title">店铺账号详细</h4>
+                </div>
+                <div class="modal-body clearfix">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <form class="form-horizontal" role="form" id="shopAccountDetailForm">
+                                <input id="shop_account_id" name="detail.shop_account.id" type="hidden" v-model.number="detail.shop_account.id"/>
+                                <input id="shop_account_version" name="detail.shop_account.version" type="hidden" v-model.number="detail.shop_account.version"/>
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="account" class="col-xs-2 control-label no-padding-right">账号</label>
+                                            <div class="col-xs-10">
+                                                <input id="account" name="detail.shop_account.account" type="text" class="input-sm form-control" v-model="detail.shop_account.account"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="platform" class="col-xs-2 control-label no-padding-right">平台</label>
+                                            <div class="col-xs-10">
+                                                <input id="platform" name="detail.shop_account.platform" type="text" class="input-sm form-control" v-model="detail.shop_account.platform"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="desc" class="col-xs-2 control-label no-padding-right">描述</label>
+                                            <div class="col-xs-10">
+                                                <input id="desc" name="detail.shop_account.desc" type="text" class="input-sm form-control" v-model="detail.shop_account.desc"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="manager" class="col-xs-2 control-label no-padding-right">负责人</label>
+                                            <div class="col-xs-10">
+                                                <input id="manager" name="detail.shop_account.manager" type="text" class="input-sm form-control" v-model="detail.shop_account.manager"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="token_result" class="col-xs-2 control-label no-padding-right">Token验证结果</label>
+                                            <div class="col-xs-10">
+                                                <input id="token_result" name="detail.shop_account.token_result" type="text" class="input-sm form-control" v-model="detail.shop_account.token_result"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="status_id" class="col-xs-2 control-label no-padding-right">状态</label>
+                                            <div class="col-xs-10">
+                                                <input id="status_id" name="detail.shop_account.status_id" type="text" class="input-sm form-control" v-model.number="detail.shop_account.status_id"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success btn-sm" @click="saveShopAccount()">
+                        <i class="ace-icon fa fa-floppy-o"></i>保存
+                    </button>
+                    <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">
+                        <i class="ace-icon fa fa-times"></i>关闭
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    var vm = new Vue({
+        el: "#page",
+        data: {
+            "detail": {
+                "shop_account": {}
+            }
+        },
+        mounted: function () {
+            initDataTable(
+                    '#shopAccountList',
+                    {
+                        "sAjaxSource": '{%url "ErpShopAccount.ListData"%}',
+                        "aaSorting": [[1, "asc"]],
+                        "aoColumns": [
+                            {
+                                "mDataProp": "id", "bSearchable": false, "orderable": false, "sClass": "center", "width": 50,
+                                "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
+                                "render": function (data, type, row) {
+                                    return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
+                                }
+                            },
+                            {"mDataProp": "account", "title": "账号", "bSearchable": true },
+                            {"mDataProp": "platform", "title": "平台", "bSearchable": true },
+                            {"mDataProp": "desc", "title": "描述", "bSearchable": true },
+                            {"mDataProp": "manager", "title": "负责人", "bSearchable": true },
+                            {"mDataProp": "token_result", "title": "Token验证结果", "bSearchable": true },
+                            {"mDataProp": "status_id", "title": "状态", "bSearchable": false },
+                            {"mDataProp": "create_time", "title": "创建时间", "bSearchable": false, "width": 120 },
+                            {"mDataProp": "update_time", "title": "修改时间", "bSearchable": false, "width": 120 }
+                        ]
+                   }
+            );
+
+            $('#shopAccountList tbody').on('dblclick', 'tr', function () {
+                var id = $(this).find('td:first-child input:checkbox').val();
+                vm.showShopAccountDetail(id);
+            });
+        },
+        methods: {
+            reloadList: function () {
+                reloadList('#shopAccountList');
+            },
+            showShopAccountDetail: function (id) {
+                showMask("加载中...");
+                $("#shopAccountDetailForm").clearValidation();
+                $.ajax({
+                           url: '{%url "ErpShopAccount.DetailData" %}',
+                           type: "POST",
+                           data: {
+                               "id": id
+                           },
+                           success: function (result) {
+                               hideMask();
+                               if (result.success == false) {
+                                   $.msg.error(result.message);
+                                   return;
+                               }
+                               vm.detail = result;
+                               $('#shopAccountDetailDialog').modal(modalOptions);
+                           }
+                       }
+                );
+            },
+            saveShopAccount: function () {
+                showMask("提交中...");
+                var form = $("#shopAccountDetailForm");
+                var valid = validate(form, {  
+                    'detail.shop_account.account': {
+                        required: true, minlength: 2, maxlength: 100
+                    },
+                    'detail.shop_account.platform': {
+                        required: true, minlength: 2, maxlength: 100
+                    },
+                    'detail.shop_account.desc': {
+                        required: false, maxlength: 500
+                    },
+                    'detail.shop_account.manager': {
+                        required: false, maxlength: 30
+                    },
+                    'detail.shop_account.token_result': {
+                        required: false
+                    },
+                    'detail.shop_account.status_id': {
+                        required: true, digits: true
+                    }
+                });
+
+                if (!valid) {
+                    hideMask();
+                } else {
+                    $.ajax({
+                               url: '{%url "ErpShopAccount.Save"%}',
+                               type: "POST",
+                               processData: false,
+                               contentType: 'application/json',
+                               data: JSON.stringify(vm.detail),
+                               success: function (data) {
+                                   hideMask();
+                                   if (data.success == false) {
+                                       $.msg.error(data.message);
+                                       //return;
+                                   }
+                                   else {
+                                       $.msg.show(data.message);
+                                       $('#shopAccountDetailDialog').modal('hide');
+                                       vm.reloadList();
+                                       //return;
+                                   }
+                               }
+                           }
+                    );
+                }
+            },
+            deleteShopAccount: function () {
+                var id_list = [];
+                $('#shopAccountList tbody tr>td:first-child input:checkbox').each(function () {
+                    if (this.checked) {
+                        id_list.push($(this).val());
+                    }
+                });
+
+                if (id_list.length == 0) {
+                    $.msg.alert("请选择数据！");
+                    return;
+                }
+
+                $.msg.confirm("确认要删除吗？", function () {
+                    $.ajax({
+                               url: '{%url "ErpShopAccount.Delete"%}',
+                               type: "POST",
+                               data: {"id_list": id_list},
+                               success: function (data) {
+                                   if (data.success == false) {
+                                       $.msg.error(data.message);
+                                       return;
+                                   }
+                                   else {
+                                       $.msg.show(data.message);
+                                   }
+                                   vm.reloadList();
+                               }
+                           });
+                });
+            }
+        }
+    });
+</script>
+{%footer%}
+
