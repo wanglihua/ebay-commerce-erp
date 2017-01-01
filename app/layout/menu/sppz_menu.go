@@ -31,6 +31,14 @@ func GetSppzMenu(db_session *xorm.Session, web_session revel.Session) string {
             <b class="arrow"></b>
         </li>
 
+        <li id="sppz-product-batch-menu" class="">
+            <a href="/erp/product/batch/edit">
+                <i class="menu-icon fa fa-caret-right"></i>
+                产品批量修改
+            </a>
+            <b class="arrow"></b>
+        </li>
+
         <li id="sppz-stock-menu" class="">
             <a href="/erp/stock">
                 <i class="menu-icon fa fa-caret-right"></i>
@@ -51,6 +59,14 @@ func GetSppzMenu(db_session *xorm.Session, web_session revel.Session) string {
             <a href="/erp/product/cate">
                 <i class="menu-icon fa fa-caret-right"></i>
                 商品目录
+            </a>
+            <b class="arrow"></b>
+        </li>
+
+        <li id="sppz-psl-batch-menu" class="">
+            <a href="/erp/product/storage/loc/batch/edit">
+                <i class="menu-icon fa fa-caret-right"></i>
+                批量修改仓位
             </a>
             <b class="arrow"></b>
         </li>

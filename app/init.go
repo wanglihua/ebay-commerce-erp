@@ -7,7 +7,7 @@ import (
 	"github.com/revel/revel"
 )
 
-var AppName string = "matrix"
+var AppName string = "ozoerp"
 
 var green_paint, blue_paint func(v ...interface{}) string
 
