@@ -6,6 +6,7 @@ import (
 	"matrix/core"
 	"matrix/modules/auth/forms"
 	"matrix/modules/auth/models"
+	"strings"
 )
 
 type Login struct {
@@ -67,4 +68,9 @@ func (c Login) Logout() revel.Result {
 
 func (c Login) makePreviousSessionExpire() {
 	delete(c.Session, revel.SESSION_ID_KEY)
+}
+
+
+func get_request_client_ip(request revel.Request) string {
+	return strings.Split(request.RemoteAddr,":")[0]
 }

@@ -26,7 +26,7 @@ func GetXtpzMenu(db_session *xorm.Session, web_session revel.Session) string {
         <li id="xtpz-exchangerate-menu" class="">
             <a href="/erp/exchange/rate">
                 <i class="menu-icon fa fa-caret-right"></i>
-                货币汇率
+                汇率设置
             </a>
             <b class="arrow"></b>
         </li>
@@ -47,6 +47,13 @@ func GetXtpzMenu(db_session *xorm.Session, web_session revel.Session) string {
             <b class="arrow"></b>
         </li>
 
+        <li id="xtpz-loginlog-menu" class="">
+            <a href="/erp/login/log">
+                <i class="menu-icon fa fa-caret-right"></i>
+                系统日志
+            </a>
+            <b class="arrow"></b>
+        </li>
     </ul>
 </li>
 `)
