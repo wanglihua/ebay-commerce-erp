@@ -1,0 +1,22 @@
+# *    /testrunner     module:testrunner
+module:testrunner
+module:auth
+module:erp
+module:jobs
+module:pprof
+
+GET  /favicon.ico               Static.Serve("static","images/favicon.png")
+GET  /static/*filepath          Static.Serve("static")
+
+GET  /                          Home.Index
+GET  /syncdb                    Home.SyncDb
+POST /syncdb/post               Home.SyncDbPost
+
+GET  /login                     Login.Index
+POST /login                     Login.Login
+POST /logout                    Login.Logout
+
+GET  /code/generate             CodeGenerate.Index
+POST /code/generate/query       CodeGenerate.CodeQuery
+
+*    /:controller/:action       :controller.:action

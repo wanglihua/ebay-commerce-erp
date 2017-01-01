@@ -1,0 +1,90 @@
+<div class="modal fade" id="userDetailDialog">
+    <div class="modal-dialog" style="width: 580px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="True">&times;</button>
+                <h4 class="modal-title">用户详细</h4>
+            </div>
+            <div class="modal-body clearfix">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <form class="form-horizontal" role="form" id="userDetailForm" onsubmit="saveUser();return false;">
+                            <input id="user_id" name="form.User.Id" type="hidden" value="{%.form_User_Id%}"/>
+                            <input id="user_version" name="form.User.Version" type="hidden" value="{%.form_User_Version%}"/>
+                            <div class="form-group">
+                                <label for="user_login_name" class="col-xs-2 control-label no-padding-right">登录名</label>
+                                <div class="col-xs-10">
+                                    <input id="user_login_name" name="form.User.LoginName" type="text" class="input-sm form-control" value="{%.form_User_LoginName%}"/>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="user_nick_name" class="col-xs-2 control-label no-padding-right">用户名</label>
+                                <div class="col-xs-10">
+                                    <input id="user_nick_name" name="form.User.NickName" type="text" class="input-sm form-control" value="{%.form_User_NickName%}"/>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="user_sex" class="col-xs-2 control-label no-padding-right">性别</label>
+                                <div class="col-xs-10">
+                                    <select id="user_sex" name="form.User.Sex" class="input-sm form-control">
+                                        <option value="男">男</option>
+                                        <option value="女">女</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="user_phone" class="col-xs-2 control-label no-padding-right">联系电话</label>
+                                <div class="col-xs-10">
+                                    <input id="user_phone" name="form.User.Phone" type="text" class="input-sm form-control" value="{%.form_User_Phone%}"/>
+                                </div>
+                            </div>
+                           <div class="form-group">
+                                <label for="user_weixin_id" class="col-xs-2 control-label no-padding-right">微信企业号Id</label>
+                                <div class="col-xs-10">
+                                    <input id="user_weixin_id" name="form.User.WeixinId" type="text" class="input-sm form-control" value="{%.form_User_WeixinId%}"/>
+                                </div>
+                            </div>
+                            {%if .is_create%}
+                            <div class="form-group">
+                                <label for="user_password" class="col-xs-2 control-label no-padding-right">密码</label>
+                                <div class="col-xs-10">
+                                    <input id="user_password" name="form.User.Password" type="password" class="input-sm form-control" value=""/>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="password_again" class="col-xs-2 control-label no-padding-right">密码重输</label>
+                                <div class="col-xs-10">
+                                    <input id="password_again" name="form.PasswordAgain" type="password" class="input-sm form-control" value=""/>
+                                </div>
+                            </div>
+                            {%else%}
+                            <div class="form-group">
+                                <label for="new_password" class="col-xs-2 control-label no-padding-right">新密码</label>
+                                <div class="col-xs-10">
+                                    <input id="new_password" name="form.NewPassword" type="password" class="input-sm form-control" value=""/>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="new_password_again" class="col-xs-2 control-label no-padding-right">密码重输</label>
+                                <div class="col-xs-10">
+                                    <input id="new_password_again" name="form.NewPasswordAgain" type="password" class="input-sm form-control" value=""/>
+                                </div>
+                            </div>
+                            <input id="user_password_old" name="form.User.Password" type="hidden" class="input-sm form-control" value="{%.form_User_Password%}"/>
+                            {%end%}
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success btn-sm" onclick="saveUser()">
+                    <i class="ace-icon fa fa-floppy-o"></i>保存
+                </button>
+                <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">
+                    <i class="ace-icon fa fa-times"></i>关闭
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{%template "auth/user/user_detail_save.func" .%}

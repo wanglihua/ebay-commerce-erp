@@ -1,0 +1,15 @@
+*.exe
+!nssm.exe
+*.exe~
+.idea
+.svn
+.vscode
+test-results/
+/log
+/main.go
+/app/routes/routes.go
+/*.db
+/matrix
+/smith/smith
+\#*\#
+*~

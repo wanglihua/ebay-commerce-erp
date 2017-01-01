@@ -1,0 +1,110 @@
+{%header "用户管理" .%}
+
+<div class="breadcrumbs" id="breadcrumbs">
+    <ul class="breadcrumb">
+        <li>
+            <a href='{%url "Home.Index"%}'><i class="ace-icon fa fa-home home-icon"></i></a>
+        </li>
+        <li class="parent" data-menu="auth-menu">权限管理</li>
+        <li class="active" data-menu="auth-admin-menu">管理员组</li>
+    </ul>
+</div>
+<div class="page-content">
+    <div class="row">
+        <div class="col-xs-12" style="padding: 0;">
+            <div class="gridToolBar clearfix">
+                <button class="btn btn-primary btn-sm" onclick="reloadList('#adminList')">
+                    <i class="ace-icon fa fa-refresh"></i>
+                    刷新
+                </button>
+                <button class="btn btn-success btn-sm" onclick="showAdminAdd()">
+                    <i class="ace-icon fa fa-plus"></i>
+                    添加
+                </button>
+                <button class="btn btn-danger btn-sm" onclick="removeAdmin()">
+                    <i class="ace-icon fa fa-trash-o"></i>
+                    移除
+                </button>
+            </div>
+            <div>
+                <table id="adminList" class="table table-striped table-bordered table-hover"></table>
+            </div>
+            <div id="adminAddDialogWrapper"></div>
+            <script type="text/javascript">
+                function showAdminAdd() {
+                    $.ajax({
+                               url: '{%url "AuthAdmin.Add" %}',
+                               type: "POST",
+                               success: function (result) {
+                                   if (result.success == false) {
+                                       $.msg.error(result.message);
+                                       return;
+                                   }
+                                   $("#adminAddDialogWrapper").html(result);
+                                   $('#adminAddDialog').modal(modalOptions);
+                               }
+                           }
+                    );
+                }
+
+                function removeAdmin() {
+                    var id_list = [];
+                    $('#adminList tbody tr>td:first-child input:checkbox').each(function () {
+                        if (this.checked) {
+                            id_list.push($(this).val());
+                        }
+                    });
+
+                    if (id_list.length == 0) {
+                        $.msg.alert("请选择数据！");
+                        return;
+                    }
+
+                    $.msg.confirm("确认要删除吗？", function () {
+                        $.ajax({
+                                   url: '{%url "AuthAdmin.Remove"%}',
+                                   type: "POST",
+                                   data: {"id_list": id_list},
+                                   success: function (data) {
+                                       if (data.success == false) {
+                                           $.msg.error(data.message);
+                                           return;
+                                       }
+                                       else {
+                                           $.msg.show(data.message);
+                                       }
+                                       reloadList('#adminList');
+                                   }
+                               });
+                    });
+                }
+
+                $(function () {
+                    initDataTable(
+                            '#adminList',
+                            {
+                                "sAjaxSource": '{%url "AuthAdmin.ListData"%}',
+                                "aaSorting": [[1, "asc"]],
+                                "aoColumns": [
+                                    {
+                                        "mDataProp": "a.id", "bSearchable": false, "orderable": false, "sClass": "center", "width": 50,
+                                        "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
+                                        "render": function (data, type, row) {
+                                            return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
+                                        }
+                                    },
+                                    {"mDataProp": "u.login_name", "title": "登录名", "bSearchable": true},
+                                    {"mDataProp": "u.nick_name", "title": "用户名", "bSearchable": true},
+                                    {"mDataProp": "u.sex", "title": "性别", "bSearchable": true, "width": 70},
+                                    {"mDataProp": "u.phone", "title": "联系电话", "bSearchable": true, "width": 140},
+                                    {"mDataProp": "a.add_time", "title": "添加时间", "bSearchable": false, "width": 120}
+                                ]
+                            }
+                    );
+                });
+            </script>
+
+        </div>
+    </div>
+</div>
+{%footer%}
