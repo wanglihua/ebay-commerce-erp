@@ -38,11 +38,12 @@
                 '#loginLogList',
                 {
                     "sAjaxSource": '{%url "ErpLoginLog.ListData"%}',
-                    "aaSorting": [[2, "asc"]],
+                    "aaSorting": [[2, "desc"]],
                     "aoColumns": [
                         {"mDataProp": "login_name", "title": "工号", "bSearchable": true, "width": 150},
                         {"mDataProp": "ip_address", "title": "IP", "bSearchable": true, "width": 150},
                         {"mDataProp": "create_time", "title": "操作时间", "bSearchable": false, "width": 120},
+                        {"mDataProp": "content", "title": "内容", "bSearchable": true, "width": 200},
                         {"mDataProp": "desc", "title": "描述", "bSearchable": true}
                     ]
                 }

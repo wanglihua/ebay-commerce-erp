@@ -6,6 +6,7 @@ import (
 	"matrix/core"
 	"matrix/modules/auth/forms"
 	"matrix/modules/auth/models"
+	erp_models "matrix/modules/erp/models"
 	"strings"
 )
 
@@ -19,7 +20,7 @@ func (c Login) Index() revel.Result {
 }
 
 func (c Login) Login() revel.Result {
-	session := c.DbSession
+	db_session := c.DbSession
 
 	c.makePreviousSessionExpire()
 
@@ -31,7 +32,7 @@ func (c Login) Login() revel.Result {
 	}
 
 	user := new(models.UserInfo)
-	has, err := session.Where("login_name = ?", form.LoginName).Get(user)
+	has, err := db_session.Where("login_name = ?", form.LoginName).Get(user)
 	core.HandleError(err)
 
 	if has == false {
@@ -48,7 +49,7 @@ func (c Login) Login() revel.Result {
 	loginUser.LoginName = user.LoginName
 	loginUser.NickName = user.NickName
 
-	admin_count, err := session.Where("user_id = ?", user.Id).Count(new(models.AdminInfo))
+	admin_count, err := db_session.Where("user_id = ?", user.Id).Count(new(models.AdminInfo))
 	core.HandleError(err)
 	loginUser.IsAdmin = false
 	if admin_count != 0 {
@@ -56,6 +57,13 @@ func (c Login) Login() revel.Result {
 	}
 
 	core.PutLoginUserToSession(c.Session, loginUser)
+
+	//login log
+	var login_log  erp_models.LoginLogInfo
+	login_log.LoginName = user.LoginName
+	login_log.IpAddress = get_request_client_ip(c.Request)
+	login_log.Content = "员工登录"
+	db_session.Insert(login_log)
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: "登陆成功！"})
 }
@@ -70,7 +78,6 @@ func (c Login) makePreviousSessionExpire() {
 	delete(c.Session, revel.SESSION_ID_KEY)
 }
 
-
-func get_request_client_ip(request revel.Request) string {
-	return strings.Split(request.RemoteAddr,":")[0]
+func get_request_client_ip(request *revel.Request) string {
+	return strings.Split(request.RemoteAddr, ":")[0]
 }
