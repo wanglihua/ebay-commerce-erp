@@ -33,17 +33,17 @@
             <script type="text/javascript">
                 function showAdminAdd() {
                     $.ajax({
-                               url: '{%url "AuthAdmin.Add" %}',
-                               type: "POST",
-                               success: function (result) {
-                                   if (result.success == false) {
-                                       $.msg.error(result.message);
-                                       return;
-                                   }
-                                   $("#adminAddDialogWrapper").html(result);
-                                   $('#adminAddDialog').modal(modalOptions);
-                               }
-                           }
+                            url: '{%url "AuthAdmin.Add" %}',
+                            type: "POST",
+                            success: function (result) {
+                                if (result.success == false) {
+                                    $.msg.error(result.message);
+                                    return;
+                                }
+                                $("#adminAddDialogWrapper").html(result);
+                                $('#adminAddDialog').modal(modalOptions);
+                            }
+                        }
                     );
                 }
 
@@ -62,44 +62,48 @@
 
                     $.msg.confirm("确认要删除吗？", function () {
                         $.ajax({
-                                   url: '{%url "AuthAdmin.Remove"%}',
-                                   type: "POST",
-                                   data: {"id_list": id_list},
-                                   success: function (data) {
-                                       if (data.success == false) {
-                                           $.msg.error(data.message);
-                                           return;
-                                       }
-                                       else {
-                                           $.msg.show(data.message);
-                                       }
-                                       reloadList('#adminList');
-                                   }
-                               });
+                            url: '{%url "AuthAdmin.Remove"%}',
+                            type: "POST",
+                            data: {"id_list": id_list},
+                            success: function (data) {
+                                if (data.success == false) {
+                                    $.msg.error(data.message);
+                                    return;
+                                }
+                                else {
+                                    $.msg.show(data.message);
+                                }
+                                reloadList('#adminList');
+                            }
+                        });
                     });
                 }
 
                 $(function () {
                     initDataTable(
-                            '#adminList',
-                            {
-                                "sAjaxSource": '{%url "AuthAdmin.ListData"%}',
-                                "aaSorting": [[1, "asc"]],
-                                "aoColumns": [
-                                    {
-                                        "mDataProp": "a.id", "bSearchable": false, "orderable": false, "sClass": "center", "width": 50,
-                                        "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
-                                        "render": function (data, type, row) {
-                                            return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
-                                        }
-                                    },
-                                    {"mDataProp": "u.login_name", "title": "工号", "bSearchable": true},
-                                    {"mDataProp": "u.nick_name", "title": "姓名", "bSearchable": true},
-                                    {"mDataProp": "u.sex", "title": "性别", "bSearchable": true, "width": 70},
-                                    {"mDataProp": "u.phone", "title": "联系电话", "bSearchable": true, "width": 140},
-                                    {"mDataProp": "a.add_time", "title": "添加时间", "bSearchable": false, "width": 120}
-                                ]
-                            }
+                        '#adminList',
+                        {
+                            "sAjaxSource": '{%url "AuthAdmin.ListData"%}',
+                            "aaSorting": [[1, "asc"]],
+                            "aoColumns": [
+                                {
+                                    "mDataProp": "a.id",
+                                    "bSearchable": false,
+                                    "orderable": false,
+                                    "sClass": "center",
+                                    "width": 50,
+                                    "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
+                                    "render": function (data, type, row) {
+                                        return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
+                                    }
+                                },
+                                {"mDataProp": "u.login_name", "title": "工号", "bSearchable": true, "width": 120},
+                                {"mDataProp": "u.nick_name", "title": "姓名", "bSearchable": true, "width": 120},
+                                {"mDataProp": "u.sex", "title": "性别", "bSearchable": true, "width": 70},
+                                {"mDataProp": "u.phone", "title": "联系电话", "bSearchable": true},
+                                {"mDataProp": "a.add_time", "title": "添加时间", "bSearchable": false, "width": 120}
+                            ]
+                        }
                     );
                 });
             </script>
