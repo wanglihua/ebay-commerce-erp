@@ -1,4 +1,3 @@
-
 package controllers
 
 import (
@@ -8,6 +7,7 @@ import (
 
 	"matrix/core"
 	"matrix/modules/erp/models"
+	"matrix/modules/erp/service/status_service"
 )
 
 type ErpPaypalAccount struct {
@@ -18,11 +18,26 @@ func (c ErpPaypalAccount) Index() revel.Result {
 	return c.RenderTemplate("erp/paypal_account/paypal_account_index.html")
 }
 
+type ErpPaypalAccountViewItem struct {
+	models.PaypalAccountInfo  `xorm:"extends" json:"a"`
+	models.StatusInfo         `xorm:"extends" json:"s"`
+}
+
 func (c ErpPaypalAccount) ListData() revel.Result {
 	db_session := c.DbSession
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
-	query := db_session.Where(filter)
+
+	/*
+		SELECT a.*, s.* FROM erp_paypal_account a
+		    INNER JOIN erp_status s ON a.status_id = s.id
+	 */
+
+	query := db_session.
+		Select("a.*, s.*").
+			Table("erp_paypal_account").Alias("a").
+			Join("INNER", []string{"erp_status", "s"}, "a.status_id = s.id").
+			Where(filter)
 
 	//query extra filter here
 
@@ -30,15 +45,15 @@ func (c ErpPaypalAccount) ListData() revel.Result {
 	if order != "" {
 		data_query = *data_query.OrderBy(order)
 	} else {
-		data_query = *data_query.Asc("id")
+		data_query = *data_query.Asc("a.id")
 	}
 
-	paypal_account_list := make([]models.PaypalAccountInfo, 0, limit)
+	paypal_account_list := make([]ErpPaypalAccountViewItem, 0, limit)
 	err := data_query.Limit(limit, offset).Find(&paypal_account_list)
 	core.HandleError(err)
 
 	count_query := *query
-	count, err := count_query.Count(new(models.PaypalAccountInfo))
+	count, err := count_query.Count(new(ErpPaypalAccountViewItem))
 	core.HandleError(err)
 
 	return c.RenderJson(core.GridResult{
@@ -49,13 +64,14 @@ func (c ErpPaypalAccount) ListData() revel.Result {
 
 type PaypalAccountDetailForm struct {
 	PaypalAccount models.PaypalAccountInfo `json:"paypal_account"`
+	StatusList    []models.StatusInfo      `json:"status_list"`
 }
 
 func (f *PaypalAccountDetailForm) IsCreate() bool {
 	return f.PaypalAccount.Id == 0
 }
 
-func (f *PaypalAccountDetailForm) Valid(validation *revel.Validation) bool { 
+func (f *PaypalAccountDetailForm) Valid(validation *revel.Validation) bool {
 	validation.Required(f.PaypalAccount.PaypalAccount).Message("Paypal账号不能为空！")
 	if f.PaypalAccount.PaypalAccount != "" {
 		validation.MinSize(f.PaypalAccount.PaypalAccount, 2).Message("Paypal账号长度不能小于2！")
@@ -79,7 +95,6 @@ func (f *PaypalAccountDetailForm) Valid(validation *revel.Validation) bool {
 	if f.PaypalAccount.ApiToken != "" {
 		validation.MaxSize(f.PaypalAccount.ApiToken, 100).Message("API令牌长度不能大于100！")
 	}
-
 
 	if f.PaypalAccount.Desc.Valid == true {
 		validation.MaxSize(f.PaypalAccount.Desc.String, 500).Message("描述长度不能大于500！")
@@ -105,8 +120,11 @@ func (c ErpPaypalAccount) DetailData() revel.Result {
 		}
 	}
 
+	status_list := status_service.GetStatusList(db_session, models.STATUS_TYPE_PAYPAL_ACCOUNT)
+
 	var detail_form PaypalAccountDetailForm
 	detail_form.PaypalAccount = paypal_account
+	detail_form.StatusList = status_list
 
 	return c.RenderJson(detail_form)
 }
@@ -125,10 +143,10 @@ func (c ErpPaypalAccount) Save() revel.Result {
 	paypal_account := detail_form.PaypalAccount
 
 	var affected int64
-	if detail_form.IsCreate() { 
+	if detail_form.IsCreate() {
 		affected, err = db_session.Insert(&paypal_account)
 		core.HandleError(err)
-	} else { 
+	} else {
 		affected, err = db_session.Id(paypal_account.Id).Update(&paypal_account)
 		core.HandleError(err)
 
@@ -151,4 +169,3 @@ func (c ErpPaypalAccount) Delete() revel.Result {
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})
 }
-
