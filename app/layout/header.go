@@ -195,6 +195,7 @@ func GetHeader(title string, db_session *xorm.Session, web_session revel.Session
 
 	header_buffer.WriteString(menu.GetSppzMenu(db_session, web_session))
 	header_buffer.WriteString(menu.GetAuthMenu(db_session, web_session))
+	header_buffer.WriteString(menu.GetXtpzMenu(db_session, web_session))
 
 	header_buffer.WriteString(`
         <div class="sidebar-toggle sidebar-collapse" id="sidebar-collapse">
