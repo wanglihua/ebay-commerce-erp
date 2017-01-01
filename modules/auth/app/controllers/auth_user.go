@@ -87,7 +87,7 @@ func (c AuthUser) Save() revel.Result {
 		count, err := session.Where("login_name = ?", user.LoginName).Count(new(models.UserInfo))
 		core.HandleError(err)
 		if count != 0 {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，登录名已存在！"})
+			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，工号已存在！"})
 		}
 
 		user.Password = core.EncryptPassword(user.Password)
@@ -98,7 +98,7 @@ func (c AuthUser) Save() revel.Result {
 		count, err := session.Where("id <> ? and login_name = ?", user.Id, user.LoginName).Count(new(models.UserInfo))
 		core.HandleError(err)
 		if count != 0 {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，登录名已存在！"})
+			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，工号已存在！"})
 		}
 
 		if strings.TrimSpace(form.NewPassword) != "" {
@@ -136,5 +136,3 @@ func (c AuthUser) Delete() revel.Result {
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})
 }
-
-//从微信企业号同步用户的功能

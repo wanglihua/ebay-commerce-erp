@@ -34,7 +34,7 @@ func (c Login) Login() revel.Result {
 	core.HandleError(err)
 
 	if has == false {
-		return c.RenderJson(core.JsonResult{Success: false, Message: "登录名不存在！"})
+		return c.RenderJson(core.JsonResult{Success: false, Message: "工号不存在！"})
 	}
 
 	if core.CompareHashAndPassword(user.Password, form.Password) == false {

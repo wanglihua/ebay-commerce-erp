@@ -19,13 +19,13 @@ func (f *UserDetailForm) IsCreate() bool {
 }
 
 func (f *UserDetailForm) Valid(validation *revel.Validation) bool {
-	validation.Required(f.User.LoginName).Message("登录名不能为空！")
-	validation.MinSize(f.User.LoginName, 3).Message("登录名长度不能小于3！")
-	validation.MaxSize(f.User.LoginName, 10).Message("登录名长度不能大于10！")
+	validation.Required(f.User.LoginName).Message("工号不能为空！")
+	validation.MinSize(f.User.LoginName, 3).Message("工号长度不能小于3！")
+	validation.MaxSize(f.User.LoginName, 10).Message("工号长度不能大于10！")
 
-	validation.Required(f.User.NickName).Message("用户名不能为空！")
-	validation.MinSize(f.User.NickName, 3).Message("用户名长度不能小于3！")
-	validation.MaxSize(f.User.NickName, 10).Message("用户名长度不能大于10！")
+	validation.Required(f.User.NickName).Message("姓名不能为空！")
+	validation.MinSize(f.User.NickName, 3).Message("姓名长度不能小于3！")
+	validation.MaxSize(f.User.NickName, 10).Message("姓名长度不能大于10！")
 
 	if f.IsCreate() {
 		validation.Required(f.User.Password).Message("密码不能为空！")
@@ -64,9 +64,9 @@ type LoginForm struct {
 }
 
 func (f *LoginForm) Valid(validation *revel.Validation) bool {
-	validation.Required(f.LoginName).Message("登录名不能为空！")
-	validation.MinSize(f.LoginName, 3).Message("登录名长度不能小于3！")
-	validation.MaxSize(f.LoginName, 10).Message("登录名长度不能大于10！")
+	validation.Required(f.LoginName).Message("工号不能为空！")
+	validation.MinSize(f.LoginName, 3).Message("工号长度不能小于3！")
+	validation.MaxSize(f.LoginName, 10).Message("工号长度不能大于10！")
 
 	validation.Required(f.Password).Message("密码不能为空！")
 	validation.MinSize(f.Password, 6).Message("密码长度不能小于6！")

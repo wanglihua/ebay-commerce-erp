@@ -33,20 +33,20 @@
             <script type="text/javascript">
                 function showUserDetail(id) {
                     $.ajax({
-                               url: '{%url "AuthUser.Detail" %}',
-                               type: "POST",
-                               data: {
-                                   "id": id
-                               },
-                               success: function (result) {
-                                   if (result.success == false) {
-                                       $.msg.error(result.message);
-                                       return;
-                                   }
-                                   $("#userDetailDialogWrapper").html(result);
-                                   $('#userDetailDialog').modal(modalOptions);
-                               }
-                           }
+                            url: '{%url "AuthUser.Detail" %}',
+                            type: "POST",
+                            data: {
+                                "id": id
+                            },
+                            success: function (result) {
+                                if (result.success == false) {
+                                    $.msg.error(result.message);
+                                    return;
+                                }
+                                $("#userDetailDialogWrapper").html(result);
+                                $('#userDetailDialog').modal(modalOptions);
+                            }
+                        }
                     );
                 }
 
@@ -65,46 +65,49 @@
 
                     $.msg.confirm("确认要删除吗？", function () {
                         $.ajax({
-                                   url: '{%url "AuthUser.Delete"%}',
-                                   type: "POST",
-                                   data: {"id_list": id_list},
-                                   success: function (data) {
-                                       if (data.success == false) {
-                                           $.msg.error(data.message);
-                                           return;
-                                       }
-                                       else {
-                                           $.msg.show(data.message);
-                                       }
-                                       reloadList('#userList');
-                                   }
-                               });
+                            url: '{%url "AuthUser.Delete"%}',
+                            type: "POST",
+                            data: {"id_list": id_list},
+                            success: function (data) {
+                                if (data.success == false) {
+                                    $.msg.error(data.message);
+                                    return;
+                                }
+                                else {
+                                    $.msg.show(data.message);
+                                }
+                                reloadList('#userList');
+                            }
+                        });
                     });
                 }
 
                 $(function () {
                     initDataTable(
-                            '#userList',
-                            {
-                                "sAjaxSource": '{%url "AuthUser.ListData"%}',
-                                "aaSorting": [[1, "asc"]],
-                                "aoColumns": [
-                                    {
-                                        "mDataProp": "id", "bSearchable": false, "orderable": false, "sClass": "center", "width": 50,
-                                        "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
-                                        "render": function (data, type, row) {
-                                            return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
-                                        }
-                                    },
-                                    {"mDataProp": "login_name", "title": "登录名", "bSearchable": true},
-                                    {"mDataProp": "nick_name", "title": "用户名", "bSearchable": true, "width": 120},
-                                    {"mDataProp": "sex", "title": "性别", "bSearchable": true, "width": 70},
-                                    {"mDataProp": "phone", "title": "联系电话", "bSearchable": true, "width": 140},
-                                    {"mDataProp": "weixin_id", "title": "微信企业号Id", "bSearchable": true},
-                                    {"mDataProp": "create_time", "title": "创建时间", "bSearchable": false, "width": 120},
-                                    {"mDataProp": "update_time", "title": "修改时间", "bSearchable": false, "width": 120}
-                                ]
-                            }
+                        '#userList',
+                        {
+                            "sAjaxSource": '{%url "AuthUser.ListData"%}',
+                            "aaSorting": [[1, "asc"]],
+                            "aoColumns": [
+                                {
+                                    "mDataProp": "id",
+                                    "bSearchable": false,
+                                    "orderable": false,
+                                    "sClass": "center",
+                                    "width": 50,
+                                    "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
+                                    "render": function (data, type, row) {
+                                        return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
+                                    }
+                                },
+                                {"mDataProp": "login_name", "title": "工号", "bSearchable": true, "width": 120},
+                                {"mDataProp": "nick_name", "title": "姓名", "bSearchable": true, "width": 120},
+                                {"mDataProp": "sex", "title": "性别", "bSearchable": true, "width": 70},
+                                {"mDataProp": "phone", "title": "联系电话", "bSearchable": true},
+                                {"mDataProp": "create_time", "title": "创建时间", "bSearchable": false, "width": 120},
+                                {"mDataProp": "update_time", "title": "修改时间", "bSearchable": false, "width": 120}
+                            ]
+                        }
                     );
 
                     $('#userList tbody').on('dblclick', 'tr', function () {

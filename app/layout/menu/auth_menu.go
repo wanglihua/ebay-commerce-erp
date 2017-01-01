@@ -8,7 +8,7 @@ import (
 )
 
 func GetAuthMenu(db_session *xorm.Session, web_session revel.Session) string {
-	if _, found := revel.ModuleByName("oa"); found == false {
+	if _, found := revel.ModuleByName("auth"); found == false {
 		return ""
 	}
 
