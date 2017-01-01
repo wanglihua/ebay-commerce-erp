@@ -1,37 +1,38 @@
 {%header "Paypal账号" .%}
 <div id="page">
-   <div class="breadcrumbs" id="breadcrumbs">
-       <ul class="breadcrumb">
-           <li>
-               <a href='{%url "Home.Index"%}'><i class="ace-icon fa fa-home home-icon"></i></a>
-           </li>
-           <li class="parent" data-menu="xtpz-menu">系统配置</li>
-           <li class="active" data-menu="xtpz-paypalaccount-menu">Paypal账号</li>
-       </ul>
-   </div>
-   <div class="page-content">
-       <div class="row">
-           <div class="col-xs-12" style="padding: 0;">
-               <div class="gridToolBar clearfix">
-                   <button class="btn btn-primary btn-sm" @click="reloadList('#paypalAccountList')">
-                       <i class="ace-icon fa fa-refresh"></i>
-                       刷新
-                   </button>
-                   <button class="btn btn-success btn-sm" @click="showPaypalAccountDetail(0)">
-                       <i class="ace-icon fa fa-plus"></i>
-                       新增
-                   </button>
-                   <button class="btn btn-danger btn-sm" @click="deletePaypalAccount()">
-                       <i class="ace-icon fa fa-trash-o"></i>
-                       删除
-                   </button>
-               </div>
-               <div>
-                   <table id="paypalAccountList" class="table table-striped table-bordered table-hover"></table>
-               </div>
-           </div>
-       </div>
-   </div>
+    <div class="breadcrumbs" id="breadcrumbs">
+        <ul class="breadcrumb">
+            <li>
+                <a href='{%url "Home.Index"%}'><i class="ace-icon fa fa-home home-icon"></i></a>
+            </li>
+            <li class="parent" data-menu="xtpz-menu">系统配置</li>
+            <li class="active" data-menu="xtpz-paypalaccount-menu">Paypal账号</li>
+        </ul>
+    </div>
+    <div class="page-content">
+        <div class="row">
+            <div class="col-xs-12" style="padding: 0;">
+                <div class="gridToolBar clearfix">
+                    <button class="btn btn-primary btn-sm" @click="reloadList('#paypalAccountList')">
+                        <i class="ace-icon fa fa-refresh"></i>
+                        刷新
+                    </button>
+                    <button class="btn btn-success btn-sm" @click="showPaypalAccountDetail(0)">
+                        <i class="ace-icon fa fa-plus"></i>
+                        新增
+                    </button>
+                    <button class="btn btn-danger btn-sm" @click="deletePaypalAccount()">
+                        <i class="ace-icon fa fa-trash-o"></i>
+                        删除
+                    </button>
+                </div>
+                <div>
+                    <table id="paypalAccountList" class="table table-striped table-bordered table-hover"></table>
+                    <div class="todo">操作日志</div>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="modal fade" id="paypalAccountDetailDialog">
         <div class="modal-dialog" style="width: 680px;">
             <div class="modal-content">
@@ -137,28 +138,32 @@
         },
         mounted: function () {
             initDataTable(
-                    '#paypalAccountList',
-                    {
-                        "sAjaxSource": '{%url "ErpPaypalAccount.ListData"%}',
-                        "aaSorting": [[1, "asc"]],
-                        "aoColumns": [
-                            {
-                                "mDataProp": "id", "bSearchable": false, "orderable": false, "sClass": "center", "width": 50,
-                                "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
-                                "render": function (data, type, row) {
-                                    return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
-                                }
-                            },
-                            {"mDataProp": "paypal_account", "title": "Paypal账号", "bSearchable": true },
-                            {"mDataProp": "api_account", "title": "API账号", "bSearchable": true },
-                            {"mDataProp": "api_token", "title": "API令牌", "bSearchable": true },
-                            {"mDataProp": "balance", "title": "余额", "bSearchable": false },
-                            {"mDataProp": "desc", "title": "描述", "bSearchable": true },
-                            {"mDataProp": "status_id", "title": "状态", "bSearchable": false },
-                            {"mDataProp": "create_time", "title": "创建时间", "bSearchable": false, "width": 120 },
-                            {"mDataProp": "update_time", "title": "修改时间", "bSearchable": false, "width": 120 }
-                        ]
-                   }
+                '#paypalAccountList',
+                {
+                    "sAjaxSource": '{%url "ErpPaypalAccount.ListData"%}',
+                    "aaSorting": [[1, "asc"]],
+                    "aoColumns": [
+                        {
+                            "mDataProp": "id",
+                            "bSearchable": false,
+                            "orderable": false,
+                            "sClass": "center",
+                            "width": 50,
+                            "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
+                            "render": function (data, type, row) {
+                                return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
+                            }
+                        },
+                        {"mDataProp": "paypal_account", "title": "Paypal账号", "bSearchable": true, "width": 150},
+                        {"mDataProp": "api_account", "title": "API账号", "bSearchable": true, "width": 150},
+                        {"mDataProp": "api_token", "title": "API令牌", "bSearchable": true, "width": 150},
+                        {"mDataProp": "balance", "title": "余额", "bSearchable": false, "width": 150},
+                        {"mDataProp": "desc", "title": "描述", "bSearchable": true},
+                        {"mDataProp": "status_id", "title": "状态", "bSearchable": false, "width": 80},
+                        {"mDataProp": "create_time", "title": "创建时间", "bSearchable": false, "width": 120},
+                        {"mDataProp": "update_time", "title": "修改时间", "bSearchable": false, "width": 120}
+                    ]
+                }
             );
 
             $('#paypalAccountList tbody').on('dblclick', 'tr', function () {
@@ -174,27 +179,27 @@
                 showMask("加载中...");
                 $("#paypalAccountDetailForm").clearValidation();
                 $.ajax({
-                           url: '{%url "ErpPaypalAccount.DetailData" %}',
-                           type: "POST",
-                           data: {
-                               "id": id
-                           },
-                           success: function (result) {
-                               hideMask();
-                               if (result.success == false) {
-                                   $.msg.error(result.message);
-                                   return;
-                               }
-                               vm.detail = result;
-                               $('#paypalAccountDetailDialog').modal(modalOptions);
-                           }
-                       }
+                        url: '{%url "ErpPaypalAccount.DetailData" %}',
+                        type: "POST",
+                        data: {
+                            "id": id
+                        },
+                        success: function (result) {
+                            hideMask();
+                            if (result.success == false) {
+                                $.msg.error(result.message);
+                                return;
+                            }
+                            vm.detail = result;
+                            $('#paypalAccountDetailDialog').modal(modalOptions);
+                        }
+                    }
                 );
             },
             savePaypalAccount: function () {
                 showMask("提交中...");
                 var form = $("#paypalAccountDetailForm");
-                var valid = validate(form, {  
+                var valid = validate(form, {
                     'detail.paypal_account.paypal_account': {
                         required: true, minlength: 2, maxlength: 100
                     },
@@ -219,25 +224,25 @@
                     hideMask();
                 } else {
                     $.ajax({
-                               url: '{%url "ErpPaypalAccount.Save"%}',
-                               type: "POST",
-                               processData: false,
-                               contentType: 'application/json',
-                               data: JSON.stringify(vm.detail),
-                               success: function (data) {
-                                   hideMask();
-                                   if (data.success == false) {
-                                       $.msg.error(data.message);
-                                       //return;
-                                   }
-                                   else {
-                                       $.msg.show(data.message);
-                                       $('#paypalAccountDetailDialog').modal('hide');
-                                       vm.reloadList();
-                                       //return;
-                                   }
-                               }
-                           }
+                            url: '{%url "ErpPaypalAccount.Save"%}',
+                            type: "POST",
+                            processData: false,
+                            contentType: 'application/json',
+                            data: JSON.stringify(vm.detail),
+                            success: function (data) {
+                                hideMask();
+                                if (data.success == false) {
+                                    $.msg.error(data.message);
+                                    //return;
+                                }
+                                else {
+                                    $.msg.show(data.message);
+                                    $('#paypalAccountDetailDialog').modal('hide');
+                                    vm.reloadList();
+                                    //return;
+                                }
+                            }
+                        }
                     );
                 }
             },
@@ -256,20 +261,20 @@
 
                 $.msg.confirm("确认要删除吗？", function () {
                     $.ajax({
-                               url: '{%url "ErpPaypalAccount.Delete"%}',
-                               type: "POST",
-                               data: {"id_list": id_list},
-                               success: function (data) {
-                                   if (data.success == false) {
-                                       $.msg.error(data.message);
-                                       return;
-                                   }
-                                   else {
-                                       $.msg.show(data.message);
-                                   }
-                                   vm.reloadList();
-                               }
-                           });
+                        url: '{%url "ErpPaypalAccount.Delete"%}',
+                        type: "POST",
+                        data: {"id_list": id_list},
+                        success: function (data) {
+                            if (data.success == false) {
+                                $.msg.error(data.message);
+                                return;
+                            }
+                            else {
+                                $.msg.show(data.message);
+                            }
+                            vm.reloadList();
+                        }
+                    });
                 });
             }
         }
