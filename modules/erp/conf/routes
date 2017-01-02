@@ -79,3 +79,7 @@ POST /erp/product/data/list                    ErpProduct.ListData
 POST /erp/product/data/detail                  ErpProduct.DetailData
 POST /erp/product/save                         ErpProduct.Save
 POST /erp/product/delete                       ErpProduct.Delete
+
+GET  /erp/product/export                       ErpProductExport.Index
+POST /erp/product/export/data/list             ErpProductExport.ListData
+POST /erp/product/export                       ErpProductExport.Export

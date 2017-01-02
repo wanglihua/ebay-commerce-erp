@@ -1,0 +1,115 @@
+{%header "产品导出" .%}
+<div id="page">
+    <div class="breadcrumbs" id="breadcrumbs">
+        <ul class="breadcrumb">
+            <li>
+                <a href='{%url "Home.Index"%}'><i class="ace-icon fa fa-home home-icon"></i></a>
+            </li>
+            <li class="parent" data-menu="kcgl-menu">库存管理</li>
+            <li class="active" data-menu="kcgl-product-export-menu">产品导出</li>
+        </ul>
+    </div>
+    <div class="page-content">
+        <div class="row">
+            <div class="col-xs-12" style="padding: 0;">
+                <div class="gridToolBar clearfix">
+                    <button class="btn btn-primary btn-sm" @click="reloadList('#productList')">
+                        <i class="ace-icon fa fa-refresh"></i>
+                        刷新
+                    </button>
+                    <button class="btn btn-success btn-sm" @click="showProductDetail(0)">
+                        <i class="ace-icon fa fa-plus"></i>
+                        新增
+                    </button>
+                </div>
+                <div>
+                    <table id="productList" class="table table-striped table-bordered table-hover"></table>
+                    <div class="todo">只是做个例子，后续确定查询条件和导出字段</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    var vm = new Vue({
+        el: "#page",
+        data: {
+            "detail": {
+                "product": {}
+            }
+        },
+        mounted: function () {
+            initDataTable(
+                '#productList',
+                {
+                    "sAjaxSource": '{%url "ErpProductExport.ListData"%}',
+                    "aaSorting": [[0, "asc"]],
+                    "aoColumns": [
+                        {
+                            "mDataProp": "id",
+                            "bSortable": false,
+                            "orderable": false,
+                            "sClass": "center",
+                            "width": 50,
+                            "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
+                            "render": function (data, type, row) {
+                                return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
+                            }
+                        },
+                        {"mDataProp": "sku", "title": "SKU", "bSortable": false},
+                        {"mDataProp": "name", "title": "名称", "bSortable": false},
+                        {"mDataProp": "english_name", "title": "英文名称", "bSortable": false},
+                        {"mDataProp": "stock_name", "title": "库存名称", "bSortable": false},
+                        {"mDataProp": "brand_id", "title": "品牌", "bSortable": false},
+                        {"mDataProp": "cate_id", "title": "商品目录", "bSortable": false},
+                        {"mDataProp": "retail_price", "title": "零售价", "bSortable": false},
+                        {"mDataProp": "cost_price", "title": "成本价", "bSortable": false},
+                        {"mDataProp": "quantity", "title": "库存", "bSortable": false},
+                        {"mDataProp": "weight", "title": "重量", "bSortable": false},
+                        {"mDataProp": "stock_id", "title": "仓库", "bSortable": false},
+                        {"mDataProp": "storage_loc_id", "title": "仓位", "bSortable": false},
+                        {"mDataProp": "supplier_id", "title": "默认供应商", "bSortable": false},
+                        {"mDataProp": "supplier_price", "title": "供应商报价", "bSortable": false},
+                        {"mDataProp": "producing_area", "title": "产地", "bSortable": false},
+                        {"mDataProp": "status_id", "title": "状态", "bSortable": false},
+                        {"mDataProp": "zxcgl", "title": "最小采购量", "bSortable": false},
+                        {"mDataProp": "kcjjts", "title": "库存警戒天数", "bSortable": false},
+                        {"mDataProp": "cgts", "title": "采购天数", "bSortable": false},
+                        {"mDataProp": "cgsx", "title": "采购上限", "bSortable": false},
+                        {"mDataProp": "cgy_id", "title": "采购员", "bSortable": false},
+                        {"mDataProp": "xsy_id", "title": "销售员", "bSortable": false},
+                        {"mDataProp": "phy_id", "title": "配货员", "bSortable": false}
+                    ]
+                }
+            );
+        },
+        methods: {
+            reloadList: function () {
+                reloadList('#productList');
+            },
+            exportProduct: function () {
+                showMask("提交中...");
+
+                $.ajax({
+                        url: '{%url "ErpProductExport.Export"%}',
+                        type: "POST",
+                        processData: false,
+                        contentType: 'application/json',
+                        success: function (data) {
+                            hideMask();
+                            if (data.success == false) {
+                                $.msg.error(data.message);
+                                //return;
+                            }
+                            else {
+                                $.msg.show(data.message);
+                                //return;
+                            }
+                        }
+                    }
+                );
+            }
+        }
+    });
+</script>
+{%footer%}

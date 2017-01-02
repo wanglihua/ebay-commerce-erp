@@ -158,6 +158,10 @@ table.dataDetail td.data {
     min-width: 100px;
 }
 
+.dataTable>thead>tr>th[class=sorting_disabled] {
+    color: #707070;
+}
+
 .btn-inline {
     border: 0;
     padding: 1px 5px;
