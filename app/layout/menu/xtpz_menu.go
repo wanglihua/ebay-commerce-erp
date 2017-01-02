@@ -47,6 +47,21 @@ func GetXtpzMenu(db_session *xorm.Session, web_session revel.Session) string {
             <b class="arrow"></b>
         </li>
 
+        <li id="xtpz-loginlog-menu" class="">
+            <a href="/erp/login/log">
+                <i class="menu-icon fa fa-caret-right"></i>
+                系统日志
+            </a>
+            <b class="arrow"></b>
+        </li>
+    </ul>
+</li>
+`)
+
+	return buffer.String()
+}
+
+/*
         <li id="xtpz-eubgoodstype-menu" class="">
             <a href="/erp/eub/goods/type">
                 <i class="menu-icon fa fa-caret-right"></i>
@@ -63,16 +78,4 @@ func GetXtpzMenu(db_session *xorm.Session, web_session revel.Session) string {
             <b class="arrow"></b>
         </li>
 
-        <li id="xtpz-loginlog-menu" class="">
-            <a href="/erp/login/log">
-                <i class="menu-icon fa fa-caret-right"></i>
-                系统日志
-            </a>
-            <b class="arrow"></b>
-        </li>
-    </ul>
-</li>
-`)
-
-	return buffer.String()
-}
+ */
