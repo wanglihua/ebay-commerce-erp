@@ -67,3 +67,9 @@ POST /erp/product/batch/edit/save              ErpProductBatchEdit.Save
 
 GET  /erp/product/storage/loc/batch/edit       ErpProductStorageLocBatchEdit.Index
 POST /erp/product/storage/loc/batch/edit/save  ErpProductStorageLocBatchEdit.Save
+
+GET  /erp/logistics/mode                       ErpLogisticsMode.Index
+POST /erp/logistics/mode/data/list             ErpLogisticsMode.ListData
+POST /erp/logistics/mode/data/detail           ErpLogisticsMode.DetailData
+POST /erp/logistics/mode/save                  ErpLogisticsMode.Save
+POST /erp/logistics/mode/delete                ErpLogisticsMode.Delete
