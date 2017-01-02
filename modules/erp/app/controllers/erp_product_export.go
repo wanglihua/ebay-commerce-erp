@@ -48,6 +48,8 @@ func (c ErpProductExport) ListData() revel.Result {
 	})
 }
 
+//todo: 做个QueryForm来接收查询参数? ListData() 和 Export() 里面
+
 func (c ErpProductExport) Export() revel.Result {
 	db_session := c.DbSession
 
