@@ -22,6 +22,10 @@ type ProductInfo struct {
 	SupplierPrice float64               `xorm:"float notnull 'supplier_price'" json:"supplier_price" smith:"verbose_name=供应商报价,min=0"`
 	ProducingArea core.NullString       `xorm:"nvarchar(200) 'producing_area'" json:"producing_area" smith:"verbose_name=产地,max=100"`
 	StatusId      int64                 `xorm:"bigint notnull index 'status_id'" json:"status_id" smith:"verbose_name=状态"`
+	Zxcgl         core.NullInt          `xorm:"bigint 'zxcgl'" json:"zxcgl" smith:"verbose_name=最小采购量"`
+	Kcjjts        core.NullInt          `xorm:"bigint 'kcjjts'" json:"kcjjts" smith:"verbose_name=库存警戒天数"`
+	Cgts          core.NullInt          `xorm:"bigint 'cgts'" json:"cgts" smith:"verbose_name=采购天数"`
+	Cgsx          core.NullInt          `xorm:"bigint 'cgsx'" json:"cgsx" smith:"verbose_name=采购上限"`
 	CgyId         core.NullInt          `xorm:"bigint index 'cgy_id'" json:"cgy_id" smith:"verbose_name=采购员"`
 	XsyId         core.NullInt          `xorm:"bigint index 'xsy_id'" json:"xsy_id" smith:"verbose_name=销售员"`
 	PhyId         core.NullInt          `xorm:"bigint index 'phy_id'" json:"phy_id" smith:"verbose_name=配货员"`
