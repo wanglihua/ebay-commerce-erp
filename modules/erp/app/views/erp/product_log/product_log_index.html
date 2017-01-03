@@ -1,0 +1,61 @@
+{%header "商品修改日志" .%}
+<div id="page">
+    <div class="breadcrumbs" id="breadcrumbs">
+        <ul class="breadcrumb">
+            <li>
+                <a href='{%url "Home.Index"%}'><i class="ace-icon fa fa-home home-icon"></i></a>
+            </li>
+            <li class="parent" data-menu="sppz-menu">ERP</li>
+            <li class="active" data-menu="sppz-productlog-menu">商品修改日志</li>
+        </ul>
+    </div>
+    <div class="page-content">
+        <div class="row">
+            <div class="col-xs-12" style="padding: 0;">
+                <div class="gridToolBar clearfix">
+                    <button class="btn btn-primary btn-sm" @click="reloadList('#productLogList')">
+                        <i class="ace-icon fa fa-refresh"></i>
+                        刷新
+                    </button>
+                </div>
+                <div>
+                    <table id="productLogList" class="table table-striped table-bordered table-hover"></table>
+                    <div class="todo">1、添加时间段查询， 商品编号查询，操作员查询；2、在商品修改时记录修改</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    var vm = new Vue({
+        el: "#page",
+        data: {
+            "detail": {
+                "product_log": {}
+            }
+        },
+        mounted: function () {
+            initDataTable(
+                '#productLogList',
+                {
+                    "sAjaxSource": '{%url "ErpProductLog.ListData"%}',
+                    "aaSorting": [[0, "asc"]],
+                    "aoColumns": [
+                        {"mDataProp": "id", "title": "记录编号", "bSearchable": false, "width": 80},
+                        {"mDataProp": "product_code", "title": "商品编号", "bSearchable": true, "width": 150},
+                        {"mDataProp": "create_time", "title": "操作时间", "bSearchable": false, "width": 120},
+                        {"mDataProp": "login_name", "title": "操作员", "bSearchable": true, "width": 120},
+                        {"mDataProp": "operation", "title": "操作", "bSearchable": true}
+                    ]
+                }
+            );
+        },
+        methods: {
+            reloadList: function () {
+                reloadList('#productLogList');
+            }
+        }
+    });
+</script>
+{%footer%}
+

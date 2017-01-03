@@ -83,3 +83,7 @@ POST /erp/product/delete                       ErpProduct.Delete
 GET  /erp/product/export                       ErpProductExport.Index
 POST /erp/product/export/data/list             ErpProductExport.ListData
 POST /erp/product/export                       ErpProductExport.Export
+
+
+GET  /erp/product/log                          ErpProductLog.Index
+POST /erp/product/log/data/list                ErpProductLog.ListData
