@@ -31,6 +31,14 @@ func GetDdpzMenu(db_session *xorm.Session, web_session revel.Session) string {
             <b class="arrow"></b>
         </li>
 
+        <li id="ddpz-orderlog-menu" class="">
+            <a href="/erp/order/log">
+                <i class="menu-icon fa fa-caret-right"></i>
+                订单修改日志
+            </a>
+            <b class="arrow"></b>
+        </li>
+
     </ul>
 </li>
 `)
