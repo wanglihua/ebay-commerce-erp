@@ -29,7 +29,6 @@ func PreventSQLInjection(sqlStr string) string {
 	sqlStr = strings.Replace(sqlStr, "\n", "", -1)
 	sqlStr = strings.Replace(sqlStr, "\r", "", -1)
 	sqlStr = strings.Replace(sqlStr, "''", "", -1)
-	sqlStr = strings.Replace(sqlStr, "\"", "", -1)
 
 	return sqlStr
 }
