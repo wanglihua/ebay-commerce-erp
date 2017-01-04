@@ -39,6 +39,14 @@ func GetSppzMenu(db_session *xorm.Session, web_session revel.Session) string {
             <b class="arrow"></b>
         </li>
 
+        <li id="sppz-packagematerial-menu" class="">
+            <a href="/erp/package/material">
+                <i class="menu-icon fa fa-caret-right"></i>
+                包材类型
+            </a>
+            <b class="arrow"></b>
+        </li>
+
         <li id="sppz-stock-menu" class="">
             <a href="/erp/stock">
                 <i class="menu-icon fa fa-caret-right"></i>

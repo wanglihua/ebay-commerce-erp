@@ -98,9 +98,14 @@ POST /erp/product/image/type/data/detail       ErpProductImageType.DetailData
 POST /erp/product/image/type/save              ErpProductImageType.Save
 POST /erp/product/image/type/delete            ErpProductImageType.Delete
 
-
 GET  /erp/product/image                        ErpProductImage.Index
 POST /erp/product/image/data/list              ErpProductImage.ListData
 POST /erp/product/image/data/detail            ErpProductImage.DetailData
 POST /erp/product/image/save                   ErpProductImage.Save
 POST /erp/product/image/delete                 ErpProductImage.Delete
+
+GET  /erp/package/material                     ErpPackageMaterial.Index
+POST /erp/package/material/data/list           ErpPackageMaterial.ListData
+POST /erp/package/material/data/detail         ErpPackageMaterial.DetailData
+POST /erp/package/material/save                ErpPackageMaterial.Save
+POST /erp/package/material/delete              ErpPackageMaterial.Delete
