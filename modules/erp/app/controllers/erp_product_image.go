@@ -17,11 +17,29 @@ func (c ErpProductImage) Index() revel.Result {
 	return c.RenderTemplate("erp/product_image/product_image_index.html")
 }
 
+type ErpProductImageViewItem struct {
+	models.ProductImageInfo      `xorm:"extends" json:"image"`
+	models.ProductImageTypeInfo  `xorm:"extends" json:"type"`
+	models.ECommercePlatformInfo `xorm:"extends" json:"platform"`
+}
+
 func (c ErpProductImage) ListData() revel.Result {
 	db_session := c.DbSession
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
-	query := db_session.Where(filter)
+
+	/*
+		SELECT img.*, type.*, platform.* FROM erp_product_image img
+		    INNER JOIN erp_product_image_type type ON img.type_id = type.id
+		    INNER JOIN erp_ecommerce_platform platform ON img.platform_id = platform.id
+	 */
+
+	query := db_session.
+	Select("img.*, type.*, platform.*").
+		Table("erp_product_image").Alias("img").
+		Join("INNER", []string{"erp_product_image_type", "type"}, "img.type_id = type.id").
+		Join("INNER", []string{"erp_ecommerce_platform", "platform"}, "img.platform_id = platform.id").
+		Where(filter)
 
 	//query extra filter here
 
@@ -29,15 +47,15 @@ func (c ErpProductImage) ListData() revel.Result {
 	if order != "" {
 		data_query = *data_query.OrderBy(order)
 	} else {
-		data_query = *data_query.Asc("id")
+		data_query = *data_query.Asc("img.id")
 	}
 
-	product_image_list := make([]models.ProductImageInfo, 0, limit)
+	product_image_list := make([]ErpProductImageViewItem, 0, limit)
 	err := data_query.Limit(limit, offset).Find(&product_image_list)
 	core.HandleError(err)
 
 	count_query := *query
-	count, err := count_query.Count(new(models.ProductImageInfo))
+	count, err := count_query.Count(new(ErpProductImageViewItem))
 	core.HandleError(err)
 
 	return c.RenderJson(core.GridResult{
