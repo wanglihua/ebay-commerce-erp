@@ -1,0 +1,266 @@
+{%header "商品图片" .%}
+<div id="page">
+    <div class="breadcrumbs" id="breadcrumbs">
+        <ul class="breadcrumb">
+            <li>
+                <a href='{%url "Home.Index"%}'><i class="ace-icon fa fa-home home-icon"></i></a>
+            </li>
+            <li class="parent" data-menu="xsgl-menu">销售管理</li>
+            <li class="active" data-menu="xsgl-productimage-menu">商品图片</li>
+        </ul>
+    </div>
+    <div class="page-content">
+        <div class="row">
+            <div class="col-xs-12" style="padding: 0;">
+                <div class="gridToolBar clearfix">
+                    <button class="btn btn-primary btn-sm" @click="reloadList('#productImageList')">
+                        <i class="ace-icon fa fa-refresh"></i>
+                        刷新
+                    </button>
+                    <button class="btn btn-success btn-sm" @click="showProductImageDetail(0)">
+                        <i class="ace-icon fa fa-plus"></i>
+                        新增
+                    </button>
+                    <button class="btn btn-danger btn-sm" @click="deleteProductImage()">
+                        <i class="ace-icon fa fa-trash-o"></i>
+                        删除
+                    </button>
+                </div>
+                <div>
+                    <table id="productImageList" class="table table-striped table-bordered table-hover"></table>
+                    <div class="todo">上传图片而不是直接给地址</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="productImageDetailDialog">
+        <div class="modal-dialog" style="width: 580px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="True">&times;</button>
+                    <h4 class="modal-title">商品图片详细</h4>
+                </div>
+                <div class="modal-body clearfix">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <form class="form-horizontal" role="form" id="productImageDetailForm">
+                                <input id="product_image_id" name="detail.product_image.id" type="hidden" v-model.number="detail.product_image.id"/>
+                                <input id="product_image_version" name="detail.product_image.version" type="hidden" v-model.number="detail.product_image.version"/>
+
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <label for="product_code" class="col-xs-2 control-label no-padding-right">商品编码</label>
+                                            <div class="col-xs-10">
+                                                <input id="product_code" name="detail.product_image.product_code" type="text" class="input-sm form-control" v-model="detail.product_image.product_code"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <label for="url" class="col-xs-2 control-label no-padding-right">图片链接</label>
+                                            <div class="col-xs-10">
+                                                <input id="url" name="detail.product_image.url" type="text" class="input-sm form-control" v-model="detail.product_image.url"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <label for="type_id" class="col-xs-2 control-label no-padding-right">图片属性</label>
+                                            <div class="col-xs-10">
+                                                <select id="type_id" name="detail.product_image.type_id" class="input-sm form-control" v-model.number="detail.product_image.type_id">
+                                                    <template v-for="product_image_type in detail.product_image_type_list">
+                                                        <option :value="product_image_type.id">{{product_image_type.name}}</option>
+                                                    </template>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <label for="platform_id" class="col-xs-2 control-label no-padding-right">所属平台</label>
+                                            <div class="col-xs-10">
+                                                <select id="platform_id" name="detail.product_image.platform_id" class="input-sm form-control" v-model.number="detail.product_image.platform_id">
+                                                    <template v-for="platform in detail.platform_list">
+                                                        <option :value="platform.id">{{platform.name}}</option>
+                                                    </template>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success btn-sm" @click="saveProductImage()">
+                        <i class="ace-icon fa fa-floppy-o"></i>保存
+                    </button>
+                    <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">
+                        <i class="ace-icon fa fa-times"></i>关闭
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    var vm = new Vue({
+        el: "#page",
+        data: {
+            "detail": {
+                "product_image": {},
+                "product_image_type_list": [],
+                "platform_list": []
+            }
+        },
+        mounted: function () {
+            initDataTable(
+                '#productImageList',
+                {
+                    "sAjaxSource": '{%url "ErpProductImage.ListData"%}',
+                    "aaSorting": [[1, "asc"]],
+                    "aoColumns": [
+                        {
+                            "mDataProp": "id",
+                            "bSearchable": false,
+                            "orderable": false,
+                            "sClass": "center",
+                            "width": 50,
+                            "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
+                            "render": function (data, type, row) {
+                                return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
+                            }
+                        },
+                        {"mDataProp": "product_code", "title": "商品编码", "bSearchable": true, "width": 120},
+                        {"mDataProp": "url", "title": "图片链接", "bSearchable": true},
+                        {"mDataProp": "type_id", "title": "图片属性", "bSearchable": true, "width": 150},
+                        {"mDataProp": "platform_id", "title": "所属平台", "bSearchable": true, "width": 120},
+                        {"mDataProp": "create_time", "title": "创建时间", "bSearchable": false, "width": 120},
+                        {"mDataProp": "update_time", "title": "修改时间", "bSearchable": false, "width": 120}
+                    ]
+                }
+            );
+
+            $('#productImageList tbody').on('dblclick', 'tr', function () {
+                var id = $(this).find('td:first-child input:checkbox').val();
+                vm.showProductImageDetail(id);
+            });
+        },
+        methods: {
+            reloadList: function () {
+                reloadList('#productImageList');
+            },
+            showProductImageDetail: function (id) {
+                showMask("加载中...");
+                $("#productImageDetailForm").clearValidation();
+                $.ajax({
+                        url: '{%url "ErpProductImage.DetailData" %}',
+                        type: "POST",
+                        data: {
+                            "id": id
+                        },
+                        success: function (result) {
+                            hideMask();
+                            if (result.success == false) {
+                                $.msg.error(result.message);
+                                return;
+                            }
+                            vm.detail = result;
+                            $('#productImageDetailDialog').modal(modalOptions);
+                        }
+                    }
+                );
+            },
+            saveProductImage: function () {
+                showMask("提交中...");
+                var form = $("#productImageDetailForm");
+                var valid = validate(form, {
+                    'detail.product_image.product_code': {
+                        required: true, minlength: 2, maxlength: 100
+                    },
+                    'detail.product_image.type_id': {
+                        required: true, digits: true
+                    },
+                    'detail.product_image.platform_id': {
+                        required: true, digits: true
+                    },
+                    'detail.product_image.url': {
+                        required: true, minlength: 2, maxlength: 300
+                    }
+                });
+
+                if (!valid) {
+                    hideMask();
+                } else {
+                    $.ajax({
+                            url: '{%url "ErpProductImage.Save"%}',
+                            type: "POST",
+                            processData: false,
+                            contentType: 'application/json',
+                            data: JSON.stringify(vm.detail),
+                            success: function (data) {
+                                hideMask();
+                                if (data.success == false) {
+                                    $.msg.error(data.message);
+                                    //return;
+                                }
+                                else {
+                                    $.msg.show(data.message);
+                                    $('#productImageDetailDialog').modal('hide');
+                                    vm.reloadList();
+                                    //return;
+                                }
+                            }
+                        }
+                    );
+                }
+            },
+            deleteProductImage: function () {
+                var id_list = [];
+                $('#productImageList tbody tr>td:first-child input:checkbox').each(function () {
+                    if (this.checked) {
+                        id_list.push($(this).val());
+                    }
+                });
+
+                if (id_list.length == 0) {
+                    $.msg.alert("请选择数据！");
+                    return;
+                }
+
+                $.msg.confirm("确认要删除吗？", function () {
+                    $.ajax({
+                        url: '{%url "ErpProductImage.Delete"%}',
+                        type: "POST",
+                        data: {"id_list": id_list},
+                        success: function (data) {
+                            if (data.success == false) {
+                                $.msg.error(data.message);
+                                return;
+                            }
+                            else {
+                                $.msg.show(data.message);
+                            }
+                            vm.reloadList();
+                        }
+                    });
+                });
+            }
+        }
+    });
+</script>
+{%footer%}
+

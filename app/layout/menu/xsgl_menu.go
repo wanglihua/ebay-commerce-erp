@@ -23,6 +23,14 @@ func GetXsglMenu(db_session *xorm.Session, web_session revel.Session) string {
     <b class="arrow"></b>
     <ul class="submenu">
 
+        <li id="xsgl-productimage-menu" class="">
+            <a href="/erp/product/image">
+                <i class="menu-icon fa fa-caret-right"></i>
+                商品图片
+            </a>
+            <b class="arrow"></b>
+        </li>
+
         <li id="xsgl-productimagetype-menu" class="">
             <a href="/erp/product/image/type">
                 <i class="menu-icon fa fa-caret-right"></i>

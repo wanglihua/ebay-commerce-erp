@@ -92,8 +92,15 @@ POST /erp/order/log/data/list                  ErpOrderLog.ListData
 
 GET  /erp/logistics/dialy/report               ErpLogisticsDialyReport.Index
 
-GET  /erp/product/image/type                    ErpProductImageType.Index
-POST /erp/product/image/type/data/list          ErpProductImageType.ListData
-POST /erp/product/image/type/data/detail        ErpProductImageType.DetailData
-POST /erp/product/image/type/save               ErpProductImageType.Save
-POST /erp/product/image/type/delete             ErpProductImageType.Delete
+GET  /erp/product/image/type                   ErpProductImageType.Index
+POST /erp/product/image/type/data/list         ErpProductImageType.ListData
+POST /erp/product/image/type/data/detail       ErpProductImageType.DetailData
+POST /erp/product/image/type/save              ErpProductImageType.Save
+POST /erp/product/image/type/delete            ErpProductImageType.Delete
+
+
+GET  /erp/product/image                        ErpProductImage.Index
+POST /erp/product/image/data/list              ErpProductImage.ListData
+POST /erp/product/image/data/detail            ErpProductImage.DetailData
+POST /erp/product/image/save                   ErpProductImage.Save
+POST /erp/product/image/delete                 ErpProductImage.Delete

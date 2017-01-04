@@ -37,6 +37,15 @@ func (e ProductImageTypeInfo) ModelDesc() string {
 }
 
 func (e ProductImageTypeInfo) InitData(db_session *xorm.Session) {
+	var product_image_type_list []ProductImageTypeInfo
+	err := db_session.In(ProductImageTypeCols.Id, []int64{
+		PRODUCT_IMAGE_TYPE_CCTP,
+		PRODUCT_IMAGE_TYPE_NRTP,
+		PRODUCT_IMAGE_TYPE_KCTP,
+		PRODUCT_IMAGE_TYPE_ZJTP}).
+		Find(&product_image_type_list)
+	core.HandleError(err)
+
 	product_image_type := new(ProductImageTypeInfo)
 	//product_image_type.Id = PRODUCT_IMAGE_TYPE_CCTP
 	product_image_type.Name = "橱窗图片"
