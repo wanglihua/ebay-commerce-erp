@@ -6,11 +6,21 @@ import (
 )
 
 const (
-	PRODUCT_IMAGE_TYPE_BIG_ID = 100
+	//橱窗图片
+	PRODUCT_IMAGE_TYPE_CCTP = 1
+
+	//内容图片
+	PRODUCT_IMAGE_TYPE_NRTP = 2
+
+	//库存图片
+	PRODUCT_IMAGE_TYPE_KCTP = 3
+
+	//质检图片
+	PRODUCT_IMAGE_TYPE_ZJTP = 4
 )
 
 type ProductImageTypeInfo struct {
-	Id         int64                 `xorm:"bigint notnull pk 'id'" json:"id"`
+	Id         int64                 `xorm:"bigint notnull pk autoincr 'id'" json:"id"`
 	Name       string                `xorm:"nvarchar(200) notnull index 'name'" json:"name" smith:"verbose_name=名称,min=2,max=100"`
 	Desc       core.NullString       `xorm:"nvarchar(500) 'desc'" json:"desc" smith:"verbose_name=描述,min=2,max=400"`
 	CreateTime core.Time             `xorm:"created notnull 'create_time'" json:"create_time"`
@@ -27,11 +37,27 @@ func (e ProductImageTypeInfo) ModelDesc() string {
 }
 
 func (e ProductImageTypeInfo) InitData(db_session *xorm.Session) {
-	//商品图片类型
-
 	product_image_type := new(ProductImageTypeInfo)
-	product_image_type.Id = PRODUCT_IMAGE_TYPE_BIG_ID
-	product_image_type.Name = "大图"
-	product_image_type.Desc = core.NewNullString("图片类型 大图", true)
+	//product_image_type.Id = PRODUCT_IMAGE_TYPE_CCTP
+	product_image_type.Name = "橱窗图片"
+	product_image_type.Desc = core.NewNullString("橱窗图片 上传", true)
+	db_session.Insert(product_image_type)
+
+	product_image_type = new(ProductImageTypeInfo)
+	//product_image_type.Id = PRODUCT_IMAGE_TYPE_NRTP
+	product_image_type.Name = "内容图片"
+	product_image_type.Desc = core.NewNullString("内容图片 上传", true)
+	db_session.Insert(product_image_type)
+
+	product_image_type = new(ProductImageTypeInfo)
+	//product_image_type.Id = PRODUCT_IMAGE_TYPE_KCTP
+	product_image_type.Name = "库存图片"
+	product_image_type.Desc = core.NewNullString("库存图片", true)
+	db_session.Insert(product_image_type)
+
+	product_image_type = new(ProductImageTypeInfo)
+	//product_image_type.Id = PRODUCT_IMAGE_TYPE_ZJTP
+	product_image_type.Name = "质检图片"
+	product_image_type.Desc = core.NewNullString("质检图片", true)
 	db_session.Insert(product_image_type)
 }
