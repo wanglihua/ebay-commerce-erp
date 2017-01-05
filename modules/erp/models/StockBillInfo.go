@@ -6,6 +6,8 @@ import (
 
 type StockBillInfo struct {
 	Id         int64                 `xorm:"bigint notnull pk autoincr 'id'" json:"id"`
+	SrcStockId int64                 `xorm:"bigint notnull index 'src_stock_id'" json:"src_stock_id" smith:"verbose_name=调入仓库"`
+	DstStockId int64                 `xorm:"bigint notnull index 'dst_stock_id'" json:"dst_stock_id" smith:"verbose_name=调出仓库"`
 	CreateTime core.Time             `xorm:"created notnull 'create_time'" json:"create_time"`
 	UpdateTime core.Time             `xorm:"updated notnull 'update_time'" json:"update_time"`
 	Version    int                   `xorm:"version notnull 'version'" json:"version"`

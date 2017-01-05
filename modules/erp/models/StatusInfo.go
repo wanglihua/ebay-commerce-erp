@@ -8,13 +8,14 @@ import (
 const (
 	//状态类型 begin
 
-	STATUS_TYPE_STOCK          = 100 //仓库状态
-	STATUS_TYPE_EXCHANGE_RATE  = 200 //仓库状态
-	STATUS_TYPE_PRODUCT_CATE   = 300 //商品目录状态
-	STATUS_TYPE_PRODUCT        = 400 //商品状态
-	STATUS_TYPE_SHOP_ACCOUNT   = 500 //店铺账号状态
-	STATUS_TYPE_PAYPAL_ACCOUNT = 600 //Paypal账号状态
-	STATUS_TYPE_PACKAGE        = 700 //包材 状态
+	STATUS_TYPE_STOCK           = 100 //仓库状态
+	STATUS_TYPE_EXCHANGE_RATE   = 200 //仓库状态
+	STATUS_TYPE_PRODUCT_CATE    = 300 //商品目录状态
+	STATUS_TYPE_PRODUCT         = 400 //商品状态
+	STATUS_TYPE_SHOP_ACCOUNT    = 500 //店铺账号状态
+	STATUS_TYPE_PAYPAL_ACCOUNT  = 600 //Paypal账号状态
+	STATUS_TYPE_PACKAGE         = 700 //包材 状态
+	STATUS_TYPE_INVENTORY_CHECK = 800 //库存盘点单状态
 
 	//状态类型 end
 
@@ -32,7 +33,7 @@ const (
 	PRODUCT_CATE_STATUS_ENABLED  = 500
 	PRODUCT_CATE_STATUS_DISABLED = 600
 
-	//商品状态 重点维护 待开发 正常 清仓 停产 自动创建 暂停销售
+	// 商品状态 重点维护 待开发 正常 清仓 停产 自动创建 暂停销售
 	PRODUCT_STATUS_ZDWH = 700
 	PRODUCT_STATUS_DKF  = 800
 	PRODUCT_STATUS_ZC   = 900
@@ -52,6 +53,11 @@ const (
 	// 包材状态 正常 停用
 	PACKAGE_STATUS_ENABLED  = 1800
 	PACKAGE_STATUS_DISABLED = 1900
+
+	// 盘点单状态 未通过 审核中 已完成
+	INVENTORY_CHECK_STATUS_WTG = 2000
+	INVENTORY_CHECK_STATUS_SPZ = 2100
+	INVENTORY_CHECK_STATUS_YWC = 2200
 
 	//状态 id end
 )
@@ -219,5 +225,27 @@ func (e StatusInfo) InitData(db_session *xorm.Session) {
 	status.Type = STATUS_TYPE_PACKAGE
 	status.Name = "停用"
 	status.Desc = core.NewNullString("包材状态 停用", true)
+	db_session.Insert(status)
+
+	// 盘点单状态
+	status = new(StatusInfo)
+	status.Id = INVENTORY_CHECK_STATUS_WTG
+	status.Type = STATUS_TYPE_INVENTORY_CHECK
+	status.Name = "未通过"
+	status.Desc = core.NewNullString("盘点单状态 未通过", true)
+	db_session.Insert(status)
+
+	status = new(StatusInfo)
+	status.Id = INVENTORY_CHECK_STATUS_SPZ
+	status.Type = STATUS_TYPE_INVENTORY_CHECK
+	status.Name = "审核中"
+	status.Desc = core.NewNullString("盘点单状态 审核中", true)
+	db_session.Insert(status)
+
+	status = new(StatusInfo)
+	status.Id = INVENTORY_CHECK_STATUS_YWC
+	status.Type = STATUS_TYPE_INVENTORY_CHECK
+	status.Name = "已完成"
+	status.Desc = core.NewNullString("盘点单状态 已完成", true)
 	db_session.Insert(status)
 }
