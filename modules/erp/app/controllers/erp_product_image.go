@@ -7,6 +7,7 @@ import (
 
 	"matrix/core"
 	"matrix/modules/erp/models"
+	"fmt"
 )
 
 type ErpProductImage struct {
@@ -141,6 +142,17 @@ func (c ErpProductImage) Save() revel.Result {
 	}
 
 	product_image := detail_form.ProductImage
+
+	var product models.ProductInfo
+	product_cols := models.ProductCols
+	found, err := db_session.Where(fmt.Sprintf("%s = ?", product_cols.Sku), product_image.ProductCode).Get(&product)
+	core.HandleError(err)
+
+	if found == false {
+		return c.RenderJson(core.JsonResult{Success: false, Message: "商品编号不存在，请重试！" })
+	}
+
+	product_image.ProductId = product.Id
 
 	var affected int64
 	if detail_form.IsCreate() {
