@@ -31,6 +31,14 @@ func GetKcglMenu(db_session *xorm.Session, web_session revel.Session) string {
             <b class="arrow"></b>
         </li>
 
+        <li id="kcgl-product-import-menu" class="">
+            <a href="/erp/product/import">
+                <i class="menu-icon fa fa-caret-right"></i>
+                商品导入
+            </a>
+            <b class="arrow"></b>
+        </li>
+
         <li id="kcgl-product-export-menu" class="">
             <a href="/erp/product/export">
                 <i class="menu-icon fa fa-caret-right"></i>

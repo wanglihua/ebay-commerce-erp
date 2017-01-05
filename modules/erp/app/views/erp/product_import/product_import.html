@@ -1,0 +1,39 @@
+{%header "商品导出" .%}
+<div id="page">
+    <div class="breadcrumbs" id="breadcrumbs">
+        <ul class="breadcrumb">
+            <li>
+                <a href='{%url "Home.Index"%}'><i class="ace-icon fa fa-home home-icon"></i></a>
+            </li>
+            <li class="parent" data-menu="kcgl-menu">库存管理</li>
+            <li class="active" data-menu="kcgl-product-import-menu">商品导入</li>
+        </ul>
+    </div>
+    <div class="page-content">
+        <div class="row">
+            <div class="col-xs-12" style="padding: 0;">
+                <div class="gridToolBar clearfix">
+                    <button class="btn btn-success btn-sm" @click="importProduct()">
+                        <i class="ace-icon fa fa-file-excel-o"></i>
+                        导入
+                    </button>
+                </div>
+                <div class="todo">通过Excel模板导入商品，可以先导入一个临时的表中，等确认后再导入正式的商品列表</div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    var vm = new Vue({
+        el: "#page",
+        data: {},
+        mounted: function () {
+        },
+        methods: {
+            importProduct: function () {
+
+            }
+        }
+    });
+</script>
+{%footer%}

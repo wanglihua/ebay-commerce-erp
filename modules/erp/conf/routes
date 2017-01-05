@@ -80,6 +80,8 @@ POST /erp/product/data/detail                  ErpProduct.DetailData
 POST /erp/product/save                         ErpProduct.Save
 POST /erp/product/delete                       ErpProduct.Delete
 
+GET  /erp/product/import                       ErpProductImport.Index
+
 GET  /erp/product/export                       ErpProductExport.Index
 POST /erp/product/export/data/list             ErpProductExport.ListData
 POST /erp/product/export                       ErpProductExport.Export
@@ -109,7 +111,6 @@ POST /erp/package/material/data/list           ErpPackageMaterial.ListData
 POST /erp/package/material/data/detail         ErpPackageMaterial.DetailData
 POST /erp/package/material/save                ErpPackageMaterial.Save
 POST /erp/package/material/delete              ErpPackageMaterial.Delete
-
 
 GET  /erp/inventory                            ErpInventory.Index
 POST /erp/inventory/data/list                  ErpInventory.ListData
