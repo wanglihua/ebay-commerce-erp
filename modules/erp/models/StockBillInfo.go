@@ -5,12 +5,15 @@ import (
 )
 
 type StockBillInfo struct {
-	Id         int64                 `xorm:"bigint notnull pk autoincr 'id'" json:"id"`
-	SrcStockId int64                 `xorm:"bigint notnull index 'src_stock_id'" json:"src_stock_id" smith:"verbose_name=调入仓库"`
-	DstStockId int64                 `xorm:"bigint notnull index 'dst_stock_id'" json:"dst_stock_id" smith:"verbose_name=调出仓库"`
-	CreateTime core.Time             `xorm:"created notnull 'create_time'" json:"create_time"`
-	UpdateTime core.Time             `xorm:"updated notnull 'update_time'" json:"update_time"`
-	Version    int                   `xorm:"version notnull 'version'" json:"version"`
+	Id         int64           `xorm:"bigint notnull pk autoincr 'id'" json:"id"`
+	Code       string          `xorm:"nvarchar(100) index 'code'" json:"code" smith:"verbose_name=批次号"`
+	StockId    int64           `xorm:"bigint notnull index 'stock_id'" json:"stock_id" smith:"verbose_name=仓库"`
+	Desc       core.NullString `xorm:"nvarchar(500) 'desc'" json:"desc" smith:"verbose_name=备注,min=2,max=400"`
+	Date       core.Date       `xorm:"datetime notnull 'date'" json:"date" smith:"verbose_name=日期"`
+	UserId     int64           `xorm:"bigint notnull 'check_user_id'" json:"check_user_id" smith:"verbose_name=操作人"`
+	CreateTime core.Time       `xorm:"created notnull 'create_time'" json:"create_time"`
+	UpdateTime core.Time       `xorm:"updated notnull 'update_time'" json:"update_time"`
+	Version    int             `xorm:"version notnull 'version'" json:"version"`
 }
 
 func (e StockBillInfo) TableName() string {
