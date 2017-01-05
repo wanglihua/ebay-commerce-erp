@@ -60,7 +60,6 @@ func GetGridRequestParam(request *revel.Request) (filter string, order string, o
 					//不能识别为 desc 的排序，均视为 asc
 					gridOrderList = append(gridOrderList, db.Engine.Quote(gridCol.ColName)+" asc")
 				}
-				revel.TRACE.Println("db.Engine.QuoteStr():" + db.Engine.QuoteStr())
 			}
 		}
 	}
