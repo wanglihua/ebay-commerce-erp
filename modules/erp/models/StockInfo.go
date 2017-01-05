@@ -1,7 +1,7 @@
 package models
 
 import (
-	"matrix/core"
+"matrix/core"
 )
 
 type StockInfo struct {

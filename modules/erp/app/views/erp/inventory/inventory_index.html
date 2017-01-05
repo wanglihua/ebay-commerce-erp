@@ -1,0 +1,250 @@
+{%header "商品库存" .%}
+<div id="page">
+   <div class="breadcrumbs" id="breadcrumbs">
+       <ul class="breadcrumb">
+           <li>
+               <a href='{%url "Home.Index"%}'><i class="ace-icon fa fa-home home-icon"></i></a>
+           </li>
+           <li class="parent" data-menu="kcgl-menu">库存管理</li>
+           <li class="active" data-menu="kcgl-inventory-menu">商品库存</li>
+       </ul>
+   </div>
+   <div class="page-content">
+       <div class="row">
+           <div class="col-xs-12" style="padding: 0;">
+               <div class="gridToolBar clearfix">
+                   <button class="btn btn-primary btn-sm" @click="reloadList('#inventoryList')">
+                       <i class="ace-icon fa fa-refresh"></i>
+                       刷新
+                   </button>
+                   <button class="btn btn-success btn-sm" @click="showInventoryDetail(0)">
+                       <i class="ace-icon fa fa-plus"></i>
+                       新增
+                   </button>
+                   <button class="btn btn-danger btn-sm" @click="deleteInventory()">
+                       <i class="ace-icon fa fa-trash-o"></i>
+                       删除
+                   </button>
+               </div>
+               <div>
+                   <table id="inventoryList" class="table table-striped table-bordered table-hover"></table>
+                   <div class="todo">不同的仓库管理员，只能看到有权限的仓库内的商品库存</div>
+               </div>
+           </div>
+       </div>
+   </div>
+    <div class="modal fade" id="inventoryDetailDialog">
+        <div class="modal-dialog" style="width: 680px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="True">&times;</button>
+                    <h4 class="modal-title">商品库存详细</h4>
+                </div>
+                <div class="modal-body clearfix">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <form class="form-horizontal" role="form" id="inventoryDetailForm">
+                                <input id="inventory_id" name="detail.inventory.id" type="hidden" v-model.number="detail.inventory.id"/>
+                                <input id="inventory_version" name="detail.inventory.version" type="hidden" v-model.number="detail.inventory.version"/>
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="stock_id" class="col-xs-2 control-label no-padding-right">仓库</label>
+                                            <div class="col-xs-10">
+                                                <input id="stock_id" name="detail.inventory.stock_id" type="text" class="input-sm form-control" v-model.number="detail.inventory.stock_id"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="storage_loc_id" class="col-xs-2 control-label no-padding-right">库位</label>
+                                            <div class="col-xs-10">
+                                                <input id="storage_loc_id" name="detail.inventory.storage_loc_id" type="text" class="input-sm form-control" v-model.number="detail.inventory.storage_loc_id"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="product_id" class="col-xs-2 control-label no-padding-right">商品</label>
+                                            <div class="col-xs-10">
+                                                <input id="product_id" name="detail.inventory.product_id" type="text" class="input-sm form-control" v-model.number="detail.inventory.product_id"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="qty" class="col-xs-2 control-label no-padding-right">数量</label>
+                                            <div class="col-xs-10">
+                                                <input id="qty" name="detail.inventory.qty" type="text" class="input-sm form-control" v-model.number="detail.inventory.qty"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success btn-sm" @click="saveInventory()">
+                        <i class="ace-icon fa fa-floppy-o"></i>保存
+                    </button>
+                    <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">
+                        <i class="ace-icon fa fa-times"></i>关闭
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    var vm = new Vue({
+        el: "#page",
+        data: {
+            "detail": {
+                "inventory": {}
+            }
+        },
+        mounted: function () {
+            initDataTable(
+                    '#inventoryList',
+                    {
+                        "sAjaxSource": '{%url "ErpInventory.ListData"%}',
+                        "aaSorting": [[1, "asc"]],
+                        "aoColumns": [
+                            {
+                                "mDataProp": "id", "bSearchable": false, "orderable": false, "sClass": "center", "width": 50,
+                                "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
+                                "render": function (data, type, row) {
+                                    return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
+                                }
+                            },
+                            {"mDataProp": "stock_id", "title": "仓库", "bSearchable": false , "width": 180 },
+                            {"mDataProp": "storage_loc_id", "title": "库位", "bSearchable": false , "width": 180 },
+                            {"mDataProp": "product_id", "title": "商品", "bSearchable": false },
+                            {"mDataProp": "qty", "title": "数量", "bSearchable": false , "width": 120 },
+                            {"mDataProp": "create_time", "title": "创建时间", "bSearchable": false, "width": 120 },
+                            {"mDataProp": "update_time", "title": "修改时间", "bSearchable": false, "width": 120 }
+                        ]
+                   }
+            );
+
+            $('#inventoryList tbody').on('dblclick', 'tr', function () {
+                var id = $(this).find('td:first-child input:checkbox').val();
+                vm.showInventoryDetail(id);
+            });
+        },
+        methods: {
+            reloadList: function () {
+                reloadList('#inventoryList');
+            },
+            showInventoryDetail: function (id) {
+                showMask("加载中...");
+                $("#inventoryDetailForm").clearValidation();
+                $.ajax({
+                           url: '{%url "ErpInventory.DetailData" %}',
+                           type: "POST",
+                           data: {
+                               "id": id
+                           },
+                           success: function (result) {
+                               hideMask();
+                               if (result.success == false) {
+                                   $.msg.error(result.message);
+                                   return;
+                               }
+                               vm.detail = result;
+                               $('#inventoryDetailDialog').modal(modalOptions);
+                           }
+                       }
+                );
+            },
+            saveInventory: function () {
+                showMask("提交中...");
+                var form = $("#inventoryDetailForm");
+                var valid = validate(form, {  
+                    'detail.inventory.stock_id': {
+                        required: true, digits: true
+                    },
+                    'detail.inventory.storage_loc_id': {
+                        required: true, digits: true
+                    },
+                    'detail.inventory.product_id': {
+                        required: true, digits: true
+                    },
+                    'detail.inventory.qty': {
+                        required: true, digits: true
+                    }
+                });
+
+                if (!valid) {
+                    hideMask();
+                } else {
+                    $.ajax({
+                               url: '{%url "ErpInventory.Save"%}',
+                               type: "POST",
+                               processData: false,
+                               contentType: 'application/json',
+                               data: JSON.stringify(vm.detail),
+                               success: function (data) {
+                                   hideMask();
+                                   if (data.success == false) {
+                                       $.msg.error(data.message);
+                                       //return;
+                                   }
+                                   else {
+                                       $.msg.show(data.message);
+                                       $('#inventoryDetailDialog').modal('hide');
+                                       vm.reloadList();
+                                       //return;
+                                   }
+                               }
+                           }
+                    );
+                }
+            },
+            deleteInventory: function () {
+                var id_list = [];
+                $('#inventoryList tbody tr>td:first-child input:checkbox').each(function () {
+                    if (this.checked) {
+                        id_list.push($(this).val());
+                    }
+                });
+
+                if (id_list.length == 0) {
+                    $.msg.alert("请选择数据！");
+                    return;
+                }
+
+                $.msg.confirm("确认要删除吗？", function () {
+                    $.ajax({
+                               url: '{%url "ErpInventory.Delete"%}',
+                               type: "POST",
+                               data: {"id_list": id_list},
+                               success: function (data) {
+                                   if (data.success == false) {
+                                       $.msg.error(data.message);
+                                       return;
+                                   }
+                                   else {
+                                       $.msg.show(data.message);
+                                   }
+                                   vm.reloadList();
+                               }
+                           });
+                });
+            }
+        }
+    });
+</script>
+{%footer%}
+

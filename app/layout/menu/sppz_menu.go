@@ -34,7 +34,7 @@ func GetSppzMenu(db_session *xorm.Session, web_session revel.Session) string {
         <li id="sppz-product-batch-menu" class="">
             <a href="/erp/product/batch/edit">
                 <i class="menu-icon fa fa-caret-right"></i>
-                产品批量修改
+                商品批量修改
             </a>
             <b class="arrow"></b>
         </li>

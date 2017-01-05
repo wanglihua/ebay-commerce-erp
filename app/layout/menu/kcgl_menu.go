@@ -26,7 +26,7 @@ func GetKcglMenu(db_session *xorm.Session, web_session revel.Session) string {
         <li id="kcgl-product-menu" class="">
             <a href="/erp/product">
                 <i class="menu-icon fa fa-caret-right"></i>
-                产品列表
+                商品列表
             </a>
             <b class="arrow"></b>
         </li>
@@ -34,7 +34,15 @@ func GetKcglMenu(db_session *xorm.Session, web_session revel.Session) string {
         <li id="kcgl-product-export-menu" class="">
             <a href="/erp/product/export">
                 <i class="menu-icon fa fa-caret-right"></i>
-                产品导出
+                商品导出
+            </a>
+            <b class="arrow"></b>
+        </li>
+
+        <li id="kcgl-inventory-menu" class="">
+            <a href="/erp/inventory">
+                <i class="menu-icon fa fa-caret-right"></i>
+                商品库存
             </a>
             <b class="arrow"></b>
         </li>
