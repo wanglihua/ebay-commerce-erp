@@ -8,6 +8,7 @@ import (
 	"matrix/core"
 	"matrix/modules/erp/models"
 	auth_models "matrix/modules/auth/models"
+	"time"
 )
 
 type ErpInventoryCheck struct {
@@ -36,7 +37,7 @@ func (c ErpInventoryCheck) ListData() revel.Result {
 		FROM erp_inventory_check ic.
 		    INNER JOIN erp_stock st ON ic.stock_id = st.id
 		    INNER JOIN auth_user cu ON ic.check_user_id = cu.id
-		    INNER JOIN auth_user au ON ic.approve_user_id = au.id
+		    LEFT JOIN auth_user au ON ic.approve_user_id = au.id
 		    INNER JOIN erp_status ss ON ic.status_id = ss.id
 	*/
 
@@ -45,7 +46,7 @@ func (c ErpInventoryCheck) ListData() revel.Result {
 		Table("erp_inventory_check").Alias("ic").
 		Join("INNER", []string{"erp_stock", "st"}, "ic.stock_id = st.id").
 		Join("INNER", []string{"auth_user", "cu"}, "ic.check_user_id = cu.id").
-		Join("INNER", []string{"auth_user", "au"}, "ic.approve_user_id = au.id").
+		Join("LEFT", []string{"auth_user", "au"}, "ic.approve_user_id = au.id").
 		Join("INNER", []string{"erp_status", "ss"}, "ic.status_id = ss.id").
 		Where(filter)
 
@@ -74,6 +75,7 @@ func (c ErpInventoryCheck) ListData() revel.Result {
 
 type InventoryCheckDetailForm struct {
 	InventoryCheck models.InventoryCheckInfo `json:"inventory_check"`
+	StockList      []models.StockInfo        `json:"stock_list"`
 }
 
 func (f *InventoryCheckDetailForm) IsCreate() bool {
@@ -113,10 +115,19 @@ func (c ErpInventoryCheck) DetailData() revel.Result {
 		if has == false {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "指定的库存盘点不存在！"})
 		}
+	} else {
+		loginuser := core.GetLoginUser(c.Session)
+		inventory_check.CheckUserId = loginuser.UserId
+		inventory_check.CheckDate = core.Date(time.Now())
 	}
+
+	var stock_list []models.StockInfo
+	err := db_session.Find(&stock_list)
+	core.HandleError(err)
 
 	var detail_form InventoryCheckDetailForm
 	detail_form.InventoryCheck = inventory_check
+	detail_form.StockList = stock_list
 
 	return c.RenderJson(detail_form)
 }
@@ -136,10 +147,12 @@ func (c ErpInventoryCheck) Save() revel.Result {
 
 	var affected int64
 	if detail_form.IsCreate() {
+		inventory_check.StatusId = models.INVENTORY_CHECK_STATUS_WTG
 		affected, err = db_session.Insert(&inventory_check)
 		core.HandleError(err)
 	} else {
-		affected, err = db_session.Id(inventory_check.Id).Update(&inventory_check)
+		ic_cols := models.InventoryCheckCols
+		affected, err = db_session.Id(inventory_check.Id).Cols(ic_cols.Code, ic_cols.StockId, ic_cols.Desc, ic_cols.CheckDate).Update(&inventory_check)
 		core.HandleError(err)
 
 		if affected == 0 {

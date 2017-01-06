@@ -28,6 +28,7 @@
                 </div>
                 <div>
                     <table id="inventoryCheckList" class="table table-striped table-bordered table-hover"></table>
+                    <div class="todo">1、需求明确，待实现；2、盘点明细等。</div>
                 </div>
             </div>
         </div>
@@ -61,18 +62,11 @@
                                         <div class="form-group">
                                             <label for="stock_id" class="col-xs-2 control-label no-padding-right">仓库</label>
                                             <div class="col-xs-10">
-                                                <input id="stock_id" name="detail.inventory_check.stock_id" type="text" class="input-sm form-control" v-model.number="detail.inventory_check.stock_id"/>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-xs-12">
-                                        <div class="form-group">
-                                            <label for="desc" class="col-xs-2 control-label no-padding-right">备注</label>
-                                            <div class="col-xs-10">
-                                                <textarea id="desc" name="detail.inventory_check.desc" rows="2" class="input-sm form-control" v-model="detail.inventory_check.desc"></textarea>
+                                                <select id="stock_id" name="detail.inventory_check.stock_id" class="input-sm form-control" v-model.number="detail.inventory_check.stock_id">
+                                                    <template v-for="stock in detail.stock_list">
+                                                        <option :value="stock.id">{{stock.name}}</option>
+                                                    </template>
+                                                </select>
                                             </div>
                                         </div>
                                     </div>
@@ -92,9 +86,9 @@
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
-                                            <label for="status_id" class="col-xs-2 control-label no-padding-right">状态</label>
+                                            <label for="desc" class="col-xs-2 control-label no-padding-right">备注</label>
                                             <div class="col-xs-10">
-                                                <input id="status_id" name="detail.inventory_check.status_id" type="text" class="input-sm form-control" v-model.number="detail.inventory_check.status_id"/>
+                                                <textarea id="desc" name="detail.inventory_check.desc" rows="2" class="input-sm form-control" v-model="detail.inventory_check.desc"></textarea>
                                             </div>
                                         </div>
                                     </div>
