@@ -130,6 +130,12 @@ POST /erp/stock/bill/checkout/data/detail      ErpStockBillCheckout.DetailData
 POST /erp/stock/bill/checkout/save             ErpStockBillCheckout.Save
 POST /erp/stock/bill/checkout/delete           ErpStockBillCheckout.Delete
 
+GET  /erp/stock/bill/transfer                  ErpStockBillTransfer.Index
+POST /erp/stock/bill/transfer/data/list        ErpStockBillTransfer.ListData
+POST /erp/stock/bill/transfer/data/detail      ErpStockBillTransfer.DetailData
+POST /erp/stock/bill/transfer/save             ErpStockBillTransfer.Save
+POST /erp/stock/bill/transfer/delete           ErpStockBillTransfer.Delete
+
 GET  /erp/stock/bill/entry                     ErpStockBillEntry.Index
 POST /erp/stock/bill/entry/data/list           ErpStockBillEntry.ListData
 POST /erp/stock/bill/entry/data/detail         ErpStockBillEntry.DetailData

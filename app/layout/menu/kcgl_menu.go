@@ -71,6 +71,14 @@ func GetKcglMenu(db_session *xorm.Session, web_session revel.Session) string {
             <b class="arrow"></b>
         </li>
 
+        <li id="kcgl-stockbill-transfer-menu" class="">
+            <a href="/erp/stock/bill/transfer">
+                <i class="menu-icon fa fa-caret-right"></i>
+                分仓调拨
+            </a>
+            <b class="arrow"></b>
+        </li>
+
         <li id="kcgl-stockbill-checkin-menu" class="">
             <a href="/erp/stock/bill/checkin">
                 <i class="menu-icon fa fa-caret-right"></i>

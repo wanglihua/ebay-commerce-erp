@@ -1,0 +1,278 @@
+{%header "分仓调拨" .%}
+<div id="page">
+    <div class="breadcrumbs" id="breadcrumbs">
+        <ul class="breadcrumb">
+            <li>
+                <a href='{%url "Home.Index"%}'><i class="ace-icon fa fa-home home-icon"></i></a>
+            </li>
+            <li class="parent" data-menu="kcgl-menu">库存管理</li>
+            <li class="active" data-menu="kcgl-stockbill-transfer-menu">分仓调拨</li>
+        </ul>
+    </div>
+    <div class="page-content">
+        <div class="row">
+            <div class="col-xs-12" style="padding: 0;">
+                <div class="gridToolBar clearfix">
+                    <button class="btn btn-primary btn-sm" @click="reloadList('#stockBillList')">
+                        <i class="ace-icon fa fa-refresh"></i>
+                        刷新
+                    </button>
+                    <button class="btn btn-success btn-sm" @click="showStockBillDetail(0)">
+                        <i class="ace-icon fa fa-plus"></i>
+                        新增
+                    </button>
+                    <button class="btn btn-danger btn-sm" @click="deleteStockBill()">
+                        <i class="ace-icon fa fa-trash-o"></i>
+                        删除
+                    </button>
+                </div>
+                <div>
+                    <table id="stockBillList" class="table table-striped table-bordered table-hover"></table>
+                    <div class="todo">1、批次号生成规则；2、其它需求明确，待实现；3、调拨单明细等。</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="stockBillDetailDialog">
+        <div class="modal-dialog" style="width: 480px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="True">&times;</button>
+                    <h4 class="modal-title">分仓调拨单详细</h4>
+                </div>
+                <div class="modal-body clearfix">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <form class="form-horizontal" role="form" id="stockBillDetailForm">
+                                <input id="stock_bill_id" name="detail.stock_bill.id" type="hidden" v-model.number="detail.stock_bill.id"/>
+                                <input id="stock_bill_version" name="detail.stock_bill.version" type="hidden" v-model.number="detail.stock_bill.version"/>
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <label for="code" class="col-xs-2 control-label no-padding-right">批次号</label>
+                                            <div class="col-xs-10">
+                                                <input id="code" name="detail.stock_bill.code" type="text" class="input-sm form-control" v-model="detail.stock_bill.code"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <label for="src_stock_id" class="col-xs-2 control-label no-padding-right">调出仓库</label>
+                                            <div class="col-xs-10">
+                                                <select id="src_stock_id" name="detail.stock_bill.src_stock_id" class="input-sm form-control" v-model.number="detail.stock_bill.src_stock_id">
+                                                    <template v-for="stock in detail.stock_list">
+                                                        <option :value="stock.id">{{stock.name}}</option>
+                                                    </template>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <label for="stock_id" class="col-xs-2 control-label no-padding-right">调入仓库</label>
+                                            <div class="col-xs-10">
+                                                <select id="stock_id" name="detail.stock_bill.stock_id" class="input-sm form-control" v-model.number="detail.stock_bill.stock_id">
+                                                    <template v-for="stock in detail.stock_list">
+                                                        <option :value="stock.id">{{stock.name}}</option>
+                                                    </template>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <label for="desc" class="col-xs-2 control-label no-padding-right">备注</label>
+                                            <div class="col-xs-10">
+                                                <textarea id="desc" name="detail.stock_bill.desc" rows="2" class="input-sm form-control" v-model="detail.stock_bill.desc"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <label for="date" class="col-xs-2 control-label no-padding-right">日期</label>
+                                            <div class="col-xs-10">
+                                                <input id="date" name="detail.stock_bill.date" type="text" class="input-sm form-control" v-model="detail.stock_bill.date"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success btn-sm" @click="saveStockBill()">
+                        <i class="ace-icon fa fa-floppy-o"></i>保存
+                    </button>
+                    <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">
+                        <i class="ace-icon fa fa-times"></i>关闭
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    var vm = new Vue({
+        el: "#page",
+        data: {
+            "detail": {
+                "stock_bill": {}
+            }
+        },
+        mounted: function () {
+            initDataTable(
+                '#stockBillList',
+                {
+                    "sAjaxSource": '{%url "ErpStockBillTransfer.ListData"%}',
+                    "aaSorting": [[1, "asc"]],
+                    "aoColumns": [
+                        {
+                            "mDataProp": "sb.id",
+                            "bSearchable": false,
+                            "orderable": false,
+                            "sClass": "center",
+                            "width": 50,
+                            "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
+                            "render": function (data, type, row) {
+                                return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
+                            }
+                        },
+                        {"mDataProp": "sb.code", "title": "批次号", "bSearchable": true, "width": 160},
+                        {"mDataProp": "sc.name", "title": "调出仓库", "bSearchable": true, "width": 160},
+                        {"mDataProp": "dc.name", "title": "调入仓库", "bSearchable": true, "width": 160},
+                        {"mDataProp": "sb.desc", "title": "备注", "bSearchable": true},
+                        {"mDataProp": "sb.date", "title": "日期", "bSearchable": false, "width": 85},
+                        {"mDataProp": "u.nick_name", "title": "操作人", "bSearchable": true, "width": 75},
+                        {"mDataProp": "sb.create_time", "title": "创建时间", "bSearchable": false, "width": 120},
+                        {"mDataProp": "sb.update_time", "title": "修改时间", "bSearchable": false, "width": 120}
+                    ]
+                }
+            );
+
+            $('#stockBillList tbody').on('dblclick', 'tr', function () {
+                var id = $(this).find('td:first-child input:checkbox').val();
+                vm.showStockBillDetail(id);
+            });
+        },
+        methods: {
+            reloadList: function () {
+                reloadList('#stockBillList');
+            },
+            showStockBillDetail: function (id) {
+                showMask("加载中...");
+                $("#stockBillDetailForm").clearValidation();
+                $.ajax({
+                        url: '{%url "ErpStockBillTransfer.DetailData" %}',
+                        type: "POST",
+                        data: {
+                            "id": id
+                        },
+                        success: function (result) {
+                            hideMask();
+                            if (result.success == false) {
+                                $.msg.error(result.message);
+                                return;
+                            }
+                            vm.detail = result;
+                            $('#stockBillDetailDialog').modal(modalOptions);
+                        }
+                    }
+                );
+            },
+            saveStockBill: function () {
+                showMask("提交中...");
+                var form = $("#stockBillDetailForm");
+                var valid = validate(form, {
+                    'detail.stock_bill.code': {
+                        required: false
+                    },
+                    'detail.stock_bill.src_stock_id': {
+                        required: true, digits: true
+                    },
+                    'detail.stock_bill.stock_id': {
+                        required: true, digits: true
+                    },
+                    'detail.stock_bill.desc': {
+                        required: false, minlength: 2, maxlength: 400
+                    },
+                    'detail.stock_bill.date': {
+                        required: true
+                    }
+                });
+
+                if (!valid) {
+                    hideMask();
+                } else {
+                    $.ajax({
+                            url: '{%url "ErpStockBillTransfer.Save"%}',
+                            type: "POST",
+                            processData: false,
+                            contentType: 'application/json',
+                            data: JSON.stringify(vm.detail),
+                            success: function (data) {
+                                hideMask();
+                                if (data.success == false) {
+                                    $.msg.error(data.message);
+                                    //return;
+                                }
+                                else {
+                                    $.msg.show(data.message);
+                                    $('#stockBillDetailDialog').modal('hide');
+                                    vm.reloadList();
+                                    //return;
+                                }
+                            }
+                        }
+                    );
+                }
+            },
+            deleteStockBill: function () {
+                var id_list = [];
+                $('#stockBillList tbody tr>td:first-child input:checkbox').each(function () {
+                    if (this.checked) {
+                        id_list.push($(this).val());
+                    }
+                });
+
+                if (id_list.length == 0) {
+                    $.msg.alert("请选择数据！");
+                    return;
+                }
+
+                $.msg.confirm("确认要删除吗？", function () {
+                    $.ajax({
+                        url: '{%url "ErpStockBillTransfer.Delete"%}',
+                        type: "POST",
+                        data: {"id_list": id_list},
+                        success: function (data) {
+                            if (data.success == false) {
+                                $.msg.error(data.message);
+                                return;
+                            }
+                            else {
+                                $.msg.show(data.message);
+                            }
+                            vm.reloadList();
+                        }
+                    });
+                });
+            }
+        }
+    });
+</script>
+{%footer%}
+
