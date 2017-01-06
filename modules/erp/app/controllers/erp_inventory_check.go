@@ -1,4 +1,3 @@
-
 package controllers
 
 import (
@@ -8,6 +7,7 @@ import (
 
 	"matrix/core"
 	"matrix/modules/erp/models"
+	auth_models "matrix/modules/auth/models"
 )
 
 type ErpInventoryCheck struct {
@@ -18,11 +18,36 @@ func (c ErpInventoryCheck) Index() revel.Result {
 	return c.RenderTemplate("erp/inventory_check/inventory_check_index.html")
 }
 
+type ErpInventoryCheckViewItem struct {
+	models.InventoryCheckInfo         `xorm:"extends" json:"ic"`
+	models.StockInfo                  `xorm:"extends" json:"st"`
+	CheckUser   auth_models.UserInfo  `xorm:"extends" json:"cu"`
+	ApproveUser auth_models.UserInfo  `xorm:"extends" json:"au"`
+	models.StatusInfo                 `xorm:"extends" json:"ss"`
+}
+
 func (c ErpInventoryCheck) ListData() revel.Result {
 	db_session := c.DbSession
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
-	query := db_session.Where(filter)
+
+	/*
+		SELECT ic.*, st.*, cu.*, au.*, ss.*
+		FROM erp_inventory_check ic.
+		    INNER JOIN erp_stock st ON ic.stock_id = st.id
+		    INNER JOIN auth_user cu ON ic.check_user_id = cu.id
+		    INNER JOIN auth_user au ON ic.approve_user_id = au.id
+		    INNER JOIN erp_status ss ON ic.status_id = ss.id
+	*/
+
+	query := db_session.
+	Select("ic.*, st.*, cu.*, au.*, ss.*").
+		Table("erp_inventory_check").Alias("ic").
+		Join("INNER", []string{"erp_stock", "st"}, "ic.stock_id = st.id").
+		Join("INNER", []string{"auth_user", "cu"}, "ic.check_user_id = cu.id").
+		Join("INNER", []string{"auth_user", "au"}, "ic.approve_user_id = au.id").
+		Join("INNER", []string{"erp_status", "ss"}, "ic.status_id = ss.id").
+		Where(filter)
 
 	//query extra filter here
 
@@ -30,15 +55,15 @@ func (c ErpInventoryCheck) ListData() revel.Result {
 	if order != "" {
 		data_query = *data_query.OrderBy(order)
 	} else {
-		data_query = *data_query.Asc("id")
+		data_query = *data_query.Asc("ic.id")
 	}
 
-	inventory_check_list := make([]models.InventoryCheckInfo, 0, limit)
+	inventory_check_list := make([]ErpInventoryCheckViewItem, 0, limit)
 	err := data_query.Limit(limit, offset).Find(&inventory_check_list)
 	core.HandleError(err)
 
 	count_query := *query
-	count, err := count_query.Count(new(models.InventoryCheckInfo))
+	count, err := count_query.Count(new(ErpInventoryCheckViewItem))
 	core.HandleError(err)
 
 	return c.RenderJson(core.GridResult{
@@ -55,7 +80,7 @@ func (f *InventoryCheckDetailForm) IsCreate() bool {
 	return f.InventoryCheck.Id == 0
 }
 
-func (f *InventoryCheckDetailForm) Valid(validation *revel.Validation) bool { 
+func (f *InventoryCheckDetailForm) Valid(validation *revel.Validation) bool {
 
 	validation.Required(f.InventoryCheck.StockId).Message("仓库不能为空！")
 
@@ -69,7 +94,6 @@ func (f *InventoryCheckDetailForm) Valid(validation *revel.Validation) bool {
 	validation.Required(f.InventoryCheck.CheckDate).Message("盘点日期不能为空！")
 
 	validation.Required(f.InventoryCheck.CheckUserId).Message("盘点人不能为空！")
-
 
 	validation.Required(f.InventoryCheck.StatusId).Message("状态不能为空！")
 
@@ -111,10 +135,10 @@ func (c ErpInventoryCheck) Save() revel.Result {
 	inventory_check := detail_form.InventoryCheck
 
 	var affected int64
-	if detail_form.IsCreate() { 
+	if detail_form.IsCreate() {
 		affected, err = db_session.Insert(&inventory_check)
 		core.HandleError(err)
-	} else { 
+	} else {
 		affected, err = db_session.Id(inventory_check.Id).Update(&inventory_check)
 		core.HandleError(err)
 
@@ -137,4 +161,3 @@ func (c ErpInventoryCheck) Delete() revel.Result {
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})
 }
-

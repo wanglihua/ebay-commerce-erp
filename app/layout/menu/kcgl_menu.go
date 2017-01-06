@@ -55,6 +55,14 @@ func GetKcglMenu(db_session *xorm.Session, web_session revel.Session) string {
             <b class="arrow"></b>
         </li>
 
+        <li id="kcgl-inventorycheck-menu" class="">
+            <a href="/erp/inventory/check">
+                <i class="menu-icon fa fa-caret-right"></i>
+                库存盘点
+            </a>
+            <b class="arrow"></b>
+        </li>
+
     </ul>
 </li>
 `)
