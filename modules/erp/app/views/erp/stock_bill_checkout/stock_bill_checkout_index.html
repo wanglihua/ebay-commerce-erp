@@ -34,7 +34,7 @@
        </div>
    </div>
     <div class="modal fade" id="stockBillDetailDialog">
-        <div class="modal-dialog" style="width: 680px;">
+        <div class="modal-dialog" style="width: 480px;">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="True">&times;</button>
@@ -47,7 +47,7 @@
                                 <input id="stock_bill_id" name="detail.stock_bill.id" type="hidden" v-model.number="detail.stock_bill.id"/>
                                 <input id="stock_bill_version" name="detail.stock_bill.version" type="hidden" v-model.number="detail.stock_bill.version"/>
                                 <div class="row">
-                                    <div class="col-xs-6">
+                                    <div class="col-xs-12">
                                         <div class="form-group">
                                             <label for="code" class="col-xs-2 control-label no-padding-right">批次号</label>
                                             <div class="col-xs-10">
@@ -58,44 +58,37 @@
                                 </div>
 
                                 <div class="row">
-                                    <div class="col-xs-6">
+                                    <div class="col-xs-12">
                                         <div class="form-group">
                                             <label for="stock_id" class="col-xs-2 control-label no-padding-right">仓库</label>
                                             <div class="col-xs-10">
-                                                <input id="stock_id" name="detail.stock_bill.stock_id" type="text" class="input-sm form-control" v-model.number="detail.stock_bill.stock_id"/>
+                                                <select id="stock_id" name="detail.stock_bill.stock_id" class="input-sm form-control" v-model.number="detail.stock_bill.stock_id">
+                                                    <template v-for="stock in detail.stock_list">
+                                                        <option :value="stock.id">{{stock.name}}</option>
+                                                    </template>
+                                                </select>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
 
                                 <div class="row">
-                                    <div class="col-xs-6">
+                                    <div class="col-xs-12">
                                         <div class="form-group">
                                             <label for="desc" class="col-xs-2 control-label no-padding-right">备注</label>
                                             <div class="col-xs-10">
-                                                <input id="desc" name="detail.stock_bill.desc" type="text" class="input-sm form-control" v-model="detail.stock_bill.desc"/>
+                                                <textarea id="desc" name="detail.stock_bill.desc" rows="2" class="input-sm form-control" v-model="detail.stock_bill.desc"></textarea>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
 
                                 <div class="row">
-                                    <div class="col-xs-6">
+                                    <div class="col-xs-12">
                                         <div class="form-group">
                                             <label for="date" class="col-xs-2 control-label no-padding-right">日期</label>
                                             <div class="col-xs-10">
                                                 <input id="date" name="detail.stock_bill.date" type="text" class="input-sm form-control" v-model="detail.stock_bill.date"/>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-xs-6">
-                                        <div class="form-group">
-                                            <label for="check_user_id" class="col-xs-2 control-label no-padding-right">操作人</label>
-                                            <div class="col-xs-10">
-                                                <input id="check_user_id" name="detail.stock_bill.check_user_id" type="text" class="input-sm form-control" v-model.number="detail.stock_bill.check_user_id"/>
                                             </div>
                                         </div>
                                     </div>

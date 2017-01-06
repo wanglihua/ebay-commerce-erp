@@ -1,4 +1,3 @@
-
 package controllers
 
 import (
@@ -8,6 +7,7 @@ import (
 
 	"matrix/core"
 	"matrix/modules/erp/models"
+	"time"
 )
 
 type ErpStockBillCheckin struct {
@@ -49,6 +49,7 @@ func (c ErpStockBillCheckin) ListData() revel.Result {
 
 type StockBillCheckinDetailForm struct {
 	StockBill models.StockBillInfo `json:"stock_bill"`
+	StockList []models.StockInfo   `json:"stock_list"`
 }
 
 func (f *StockBillCheckinDetailForm) IsCreate() bool {
@@ -86,10 +87,17 @@ func (c ErpStockBillCheckin) DetailData() revel.Result {
 		if has == false {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "指定的出入库单不存在！"})
 		}
+	} else {
+		stock_bill.Date = core.Date(time.Now())
 	}
+
+	var stock_list []models.StockInfo
+	err := db_session.Find(&stock_list)
+	core.HandleError(err)
 
 	var detail_form StockBillCheckinDetailForm
 	detail_form.StockBill = stock_bill
+	detail_form.StockList = stock_list
 
 	return c.RenderJson(detail_form)
 }
@@ -108,11 +116,14 @@ func (c ErpStockBillCheckin) Save() revel.Result {
 	stock_bill := detail_form.StockBill
 
 	var affected int64
-	if detail_form.IsCreate() { 
+	if detail_form.IsCreate() {
+		loginuser := core.GetLoginUser(c.Session)
+		stock_bill.UserId = loginuser.UserId
 		affected, err = db_session.Insert(&stock_bill)
 		core.HandleError(err)
-	} else { 
-		affected, err = db_session.Id(stock_bill.Id).Update(&stock_bill)
+	} else {
+		sb_cols := models.StockBillCols
+		affected, err = db_session.Id(stock_bill.Id).Cols(sb_cols.Code, sb_cols.StockId, sb_cols.Desc, sb_cols.Date).Update(&stock_bill)
 		core.HandleError(err)
 
 		if affected == 0 {
@@ -134,4 +145,3 @@ func (c ErpStockBillCheckin) Delete() revel.Result {
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})
 }
-

@@ -116,8 +116,6 @@ func (c ErpInventoryCheck) DetailData() revel.Result {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "指定的库存盘点不存在！"})
 		}
 	} else {
-		loginuser := core.GetLoginUser(c.Session)
-		inventory_check.CheckUserId = loginuser.UserId
 		inventory_check.CheckDate = core.Date(time.Now())
 	}
 
@@ -147,6 +145,8 @@ func (c ErpInventoryCheck) Save() revel.Result {
 
 	var affected int64
 	if detail_form.IsCreate() {
+		loginuser := core.GetLoginUser(c.Session)
+		inventory_check.CheckUserId = loginuser.UserId
 		inventory_check.StatusId = models.INVENTORY_CHECK_STATUS_WTG
 		affected, err = db_session.Insert(&inventory_check)
 		core.HandleError(err)
