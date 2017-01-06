@@ -117,3 +117,28 @@ POST /erp/inventory/data/list                  ErpInventory.ListData
 POST /erp/inventory/data/detail                ErpInventory.DetailData
 POST /erp/inventory/save                       ErpInventory.Save
 POST /erp/inventory/delete                     ErpInventory.Delete
+
+GET  /erp/stock/bill                           ErpStockBill.Index
+POST /erp/stock/bill/data/list                 ErpStockBill.ListData
+POST /erp/stock/bill/data/detail               ErpStockBill.DetailData
+POST /erp/stock/bill/save                      ErpStockBill.Save
+POST /erp/stock/bill/delete                    ErpStockBill.Delete
+
+GET  /erp/stock/bill/entry                     ErpStockBillEntry.Index
+POST /erp/stock/bill/entry/data/list           ErpStockBillEntry.ListData
+POST /erp/stock/bill/entry/data/detail         ErpStockBillEntry.DetailData
+POST /erp/stock/bill/entry/save                ErpStockBillEntry.Save
+POST /erp/stock/bill/entry/delete              ErpStockBillEntry.Delete
+
+
+GET  /erp/inventory/check                      ErpInventoryCheck.Index
+POST /erp/inventory/check/data/list            ErpInventoryCheck.ListData
+POST /erp/inventory/check/data/detail          ErpInventoryCheck.DetailData
+POST /erp/inventory/check/save                 ErpInventoryCheck.Save
+POST /erp/inventory/check/delete               ErpInventoryCheck.Delete
+
+GET  /erp/inventory/check/entry                ErpInventoryCheckEntry.Index
+POST /erp/inventory/check/entry/data/list      ErpInventoryCheckEntry.ListData
+POST /erp/inventory/check/entry/data/detail    ErpInventoryCheckEntry.DetailData
+POST /erp/inventory/check/entry/save           ErpInventoryCheckEntry.Save
+POST /erp/inventory/check/entry/delete         ErpInventoryCheckEntry.Delete

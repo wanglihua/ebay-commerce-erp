@@ -38,17 +38,17 @@ func (e StockBillTypeInfo) InitData(db_session *xorm.Session) {
 	bill_type.Id = STOCK_BILL_TYPE_CHECKIN
 	bill_type.Name = "入库单"
 	bill_type.Desc = core.NewNullString("入库单", true)
-	db_session.Insert(&bill_type)
+	db_session.Insert(bill_type)
 
 	bill_type = new(StockBillTypeInfo)
 	bill_type.Id = STOCK_BILL_TYPE_CHECKOUT
 	bill_type.Name = "出库单"
 	bill_type.Desc = core.NewNullString("出库单", true)
-	db_session.Insert(&bill_type)
+	db_session.Insert(bill_type)
 
 	bill_type = new(StockBillTypeInfo)
 	bill_type.Id = STOCK_BILL_TYPE_TRANSFER
 	bill_type.Name = "调拨单"
 	bill_type.Desc = core.NewNullString("调拨单", true)
-	db_session.Insert(&bill_type)
+	db_session.Insert(bill_type)
 }
