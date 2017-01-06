@@ -143,7 +143,7 @@
                             }
                         },
                         {"mDataProp": "ic.code", "title": "批次号", "bSearchable": true, "width": 160},
-                        {"mDataProp": "st.name", "title": "仓库", "bSearchable": false, "width": 160},
+                        {"mDataProp": "st.name", "title": "仓库", "bSearchable": true, "width": 160},
                         {"mDataProp": "ic.desc", "title": "备注", "bSearchable": true},
                         {"mDataProp": "ic.check_date", "title": "盘点日期", "bSearchable": false, "width": 85},
                         {"mDataProp": "cu.nick_name", "title": "盘点人", "bSearchable": true, "width": 75},
@@ -200,12 +200,6 @@
                     },
                     'detail.inventory_check.check_date': {
                         required: true
-                    },
-                    'detail.inventory_check.check_user_id': {
-                        required: true, digits: true
-                    },
-                    'detail.inventory_check.approve_user_id': {
-                        required: false, digits: true
                     },
                     'detail.inventory_check.status_id': {
                         required: true, digits: true

@@ -126,7 +126,7 @@
                     "aaSorting": [[1, "asc"]],
                     "aoColumns": [
                         {
-                            "mDataProp": "id",
+                            "mDataProp": "sb.id",
                             "bSearchable": false,
                             "orderable": false,
                             "sClass": "center",
@@ -136,13 +136,13 @@
                                 return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
                             }
                         },
-                        {"mDataProp": "code", "title": "批次号", "bSearchable": true},
-                        {"mDataProp": "stock_id", "title": "仓库", "bSearchable": false},
-                        {"mDataProp": "desc", "title": "备注", "bSearchable": true},
-                        {"mDataProp": "date", "title": "日期", "bSearchable": false},
-                        {"mDataProp": "check_user_id", "title": "操作人", "bSearchable": false},
-                        {"mDataProp": "create_time", "title": "创建时间", "bSearchable": false, "width": 120},
-                        {"mDataProp": "update_time", "title": "修改时间", "bSearchable": false, "width": 120}
+                        {"mDataProp": "sb.code", "title": "批次号", "bSearchable": true, "width": 160},
+                        {"mDataProp": "s.name", "title": "仓库", "bSearchable": true, "width": 160},
+                        {"mDataProp": "sb.desc", "title": "备注", "bSearchable": true},
+                        {"mDataProp": "sb.date", "title": "日期", "bSearchable": false, "width": 85},
+                        {"mDataProp": "u.nick_name", "title": "操作人", "bSearchable": true, "width": 75},
+                        {"mDataProp": "sb.create_time", "title": "创建时间", "bSearchable": false, "width": 120},
+                        {"mDataProp": "sb.update_time", "title": "修改时间", "bSearchable": false, "width": 120}
                     ]
                 }
             );
@@ -192,9 +192,6 @@
                     },
                     'detail.stock_bill.date': {
                         required: true
-                    },
-                    'detail.stock_bill.check_user_id': {
-                        required: true, digits: true
                     }
                 });
 

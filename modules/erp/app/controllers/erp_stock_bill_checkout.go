@@ -7,6 +7,7 @@ import (
 
 	"matrix/core"
 	"matrix/modules/erp/models"
+	auth_models "matrix/modules/auth/models"
 	"time"
 )
 
@@ -18,11 +19,32 @@ func (c ErpStockBillCheckout) Index() revel.Result {
 	return c.RenderTemplate("erp/stock_bill_checkout/stock_bill_checkout_index.html")
 }
 
+type ErpStockBillCheckoutViewItem struct {
+	models.StockBillInfo  `xorm:"extends" json:"sb"`
+	models.StockInfo      `xorm:"extends" json:"s"`
+	auth_models.UserInfo  `xorm:"extends" json:"u"`
+}
+
 func (c ErpStockBillCheckout) ListData() revel.Result {
 	db_session := c.DbSession
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
-	query := db_session.Where(filter)
+
+	/*
+		SELECT sb.*, s.*, u.*
+		FROM erp_stock_bill sb
+		    INNER JOIN erp_stock s ON sb.stock_id = s.id
+		    INNER JOIN auth_user u ON sb.user_id = u.id
+		WHERE sb.type_id = 200
+	 */
+
+	query := db_session.
+	Select("sb.*, s.*, u.*").
+		Table("erp_stock_bill").Alias("sb").
+		Join("INNER", []string{"erp_stock", "s"}, "sb.stock_id = s.id").
+		Join("INNER", []string{"auth_user", "u"}, "sb.user_id = u.id").
+		Where("sb.type_id = ?", models.STOCK_BILL_TYPE_CHECKOUT).
+		Where(filter)
 
 	//query extra filter here
 
@@ -30,15 +52,15 @@ func (c ErpStockBillCheckout) ListData() revel.Result {
 	if order != "" {
 		data_query = *data_query.OrderBy(order)
 	} else {
-		data_query = *data_query.Asc("id")
+		data_query = *data_query.Asc("sb.id")
 	}
 
-	stock_bill_list := make([]models.StockBillInfo, 0, limit)
+	stock_bill_list := make([]ErpStockBillCheckoutViewItem, 0, limit)
 	err := data_query.Limit(limit, offset).Find(&stock_bill_list)
 	core.HandleError(err)
 
 	count_query := *query
-	count, err := count_query.Count(new(models.StockBillInfo))
+	count, err := count_query.Count(new(ErpStockBillCheckoutViewItem))
 	core.HandleError(err)
 
 	return c.RenderJson(core.GridResult{
@@ -117,6 +139,9 @@ func (c ErpStockBillCheckout) Save() revel.Result {
 
 	var affected int64
 	if detail_form.IsCreate() {
+		loginuser := core.GetLoginUser(c.Session)
+		stock_bill.UserId = loginuser.UserId
+		stock_bill.TypeId = models.STOCK_BILL_TYPE_CHECKOUT
 		affected, err = db_session.Insert(&stock_bill)
 		core.HandleError(err)
 	} else {
