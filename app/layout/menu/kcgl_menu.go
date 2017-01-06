@@ -63,6 +63,30 @@ func GetKcglMenu(db_session *xorm.Session, web_session revel.Session) string {
             <b class="arrow"></b>
         </li>
 
+        <li id="kcgl-inventorycheck-approve-menu" class="">
+            <a href="/erp/inventory/check/approve">
+                <i class="menu-icon fa fa-caret-right"></i>
+                盘点审批
+            </a>
+            <b class="arrow"></b>
+        </li>
+
+        <li id="kcgl-stockbill-checkin-menu" class="">
+            <a href="/erp/stock/bill/checkin">
+                <i class="menu-icon fa fa-caret-right"></i>
+                手工入库
+            </a>
+            <b class="arrow"></b>
+        </li>
+
+        <li id="kcgl-stockbill-checkout-menu" class="">
+            <a href="/erp/stock/bill/checkout">
+                <i class="menu-icon fa fa-caret-right"></i>
+                手工出库
+            </a>
+            <b class="arrow"></b>
+        </li>
+
     </ul>
 </li>
 `)

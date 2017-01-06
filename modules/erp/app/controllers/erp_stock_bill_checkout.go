@@ -10,15 +10,15 @@ import (
 	"matrix/modules/erp/models"
 )
 
-type ErpStockBill struct {
+type ErpStockBillCheckout struct {
 	*revel.Controller
 }
 
-func (c ErpStockBill) Index() revel.Result {
-	return c.RenderTemplate("erp/stock_bill/stock_bill_index.html")
+func (c ErpStockBillCheckout) Index() revel.Result {
+	return c.RenderTemplate("erp/stock_bill_checkout/stock_bill_checkout_index.html")
 }
 
-func (c ErpStockBill) ListData() revel.Result {
+func (c ErpStockBillCheckout) ListData() revel.Result {
 	db_session := c.DbSession
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
@@ -47,15 +47,15 @@ func (c ErpStockBill) ListData() revel.Result {
 	})
 }
 
-type StockBillDetailForm struct {
+type StockBillCheckoutDetailForm struct {
 	StockBill models.StockBillInfo `json:"stock_bill"`
 }
 
-func (f *StockBillDetailForm) IsCreate() bool {
+func (f *StockBillCheckoutDetailForm) IsCreate() bool {
 	return f.StockBill.Id == 0
 }
 
-func (f *StockBillDetailForm) Valid(validation *revel.Validation) bool { 
+func (f *StockBillCheckoutDetailForm) Valid(validation *revel.Validation) bool {
 
 	validation.Required(f.StockBill.StockId).Message("仓库不能为空！")
 
@@ -73,7 +73,7 @@ func (f *StockBillDetailForm) Valid(validation *revel.Validation) bool {
 	return validation.HasErrors() == false
 }
 
-func (c ErpStockBill) DetailData() revel.Result {
+func (c ErpStockBillCheckout) DetailData() revel.Result {
 	db_session := c.DbSession
 
 	var stock_bill_id int64
@@ -88,16 +88,16 @@ func (c ErpStockBill) DetailData() revel.Result {
 		}
 	}
 
-	var detail_form StockBillDetailForm
+	var detail_form StockBillCheckoutDetailForm
 	detail_form.StockBill = stock_bill
 
 	return c.RenderJson(detail_form)
 }
 
-func (c ErpStockBill) Save() revel.Result {
+func (c ErpStockBillCheckout) Save() revel.Result {
 	db_session := c.DbSession
 
-	var detail_form StockBillDetailForm
+	var detail_form StockBillCheckoutDetailForm
 	err := json.Unmarshal(c.GetRequestBody(), &detail_form)
 	core.HandleError(err)
 
@@ -123,7 +123,7 @@ func (c ErpStockBill) Save() revel.Result {
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据保存成功!"})
 }
 
-func (c ErpStockBill) Delete() revel.Result {
+func (c ErpStockBillCheckout) Delete() revel.Result {
 	db_session := c.DbSession
 
 	stock_bill_id_list := make([]int64, 0)

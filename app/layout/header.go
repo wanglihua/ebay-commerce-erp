@@ -38,7 +38,7 @@ func GetHeader(title string, db_session *xorm.Session, web_session revel.Session
     <!--[if lte IE 9]>
     <link type="text/css" rel="stylesheet" href="/static/ace/css/ace-ie.min.css"/>
     <![endif]-->
-    <link type="text/css" rel="stylesheet" href="/static/site.css"/>`)
+    <link type="text/css" rel="stylesheet" href="/static/site.css?201701062100"/>`)
 
 	if revel.DevMode {
 		header_buffer.WriteString(`<script type="text/javascript" src="/static/js/vue.js"></script>`)

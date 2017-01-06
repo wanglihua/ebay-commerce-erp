@@ -182,4 +182,5 @@ div.todo:before {
     content: "TODO:";
     padding-right: 10px;
     font-weight: bold;
+    line-height: 38px;
 }
