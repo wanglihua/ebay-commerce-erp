@@ -19,7 +19,7 @@ func (c ErpProductImage) Index() revel.Result {
 }
 
 type ErpProductImageViewItem struct {
-	models.ProductImageInfo      `xorm:"extends" json:"image"`
+	models.ProductImageInfo      `xorm:"extends" json:"img"`
 	models.ProductImageTypeInfo  `xorm:"extends" json:"type"`
 	models.ECommercePlatformInfo `xorm:"extends" json:"platform"`
 }

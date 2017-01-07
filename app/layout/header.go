@@ -38,7 +38,7 @@ func GetHeader(title string, db_session *xorm.Session, web_session revel.Session
     <!--[if lte IE 9]>
     <link type="text/css" rel="stylesheet" href="/static/ace/css/ace-ie.min.css"/>
     <![endif]-->
-    <link type="text/css" rel="stylesheet" href="/static/site.css?201701062100"/>`)
+    <link type="text/css" rel="stylesheet" href="/static/site.css?201701072100"/>`)
 
 	if revel.DevMode {
 		header_buffer.WriteString(`<script type="text/javascript" src="/static/js/vue.js"></script>`)
@@ -200,6 +200,7 @@ func GetHeader(title string, db_session *xorm.Session, web_session revel.Session
 	header_buffer.WriteString(menu.GetSppzMenu(db_session, web_session))
 	header_buffer.WriteString(menu.GetCgglMenu(db_session, web_session))
 	header_buffer.WriteString(menu.GetXsglMenu(db_session, web_session))
+	header_buffer.WriteString(menu.GetXsbbMenu(db_session, web_session))
 	header_buffer.WriteString(menu.GetAuthMenu(db_session, web_session))
 	header_buffer.WriteString(menu.GetXtpzMenu(db_session, web_session))
 

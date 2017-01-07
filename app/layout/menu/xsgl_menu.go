@@ -23,6 +23,38 @@ func GetXsglMenu(db_session *xorm.Session, web_session revel.Session) string {
     <b class="arrow"></b>
     <ul class="submenu">
 
+        <li id="xsgl-xmgl-menu" class="">
+            <a href="#">
+                <i class="menu-icon fa fa-caret-right"></i>
+                项目管理
+            </a>
+            <b class="arrow"></b>
+        </li>
+
+        <li id="xsgl-ebay-zhgl-menu" class="">
+            <a href="#">
+                <i class="menu-icon fa fa-caret-right"></i>
+                EBAY账号管理
+            </a>
+            <b class="arrow"></b>
+        </li>
+
+        <li id="xsgl-sku-xsbg-menu" class="">
+            <a href="#">
+                <i class="menu-icon fa fa-caret-right"></i>
+                SKU销售报告
+            </a>
+            <b class="arrow"></b>
+        </li>
+
+        <li id="xsgl-cpgjz-menu" class="">
+            <a href="#">
+                <i class="menu-icon fa fa-caret-right"></i>
+                产品关键字
+            </a>
+            <b class="arrow"></b>
+        </li>
+
         <li id="xsgl-productimage-menu" class="">
             <a href="/erp/product/image">
                 <i class="menu-icon fa fa-caret-right"></i>

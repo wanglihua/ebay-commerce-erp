@@ -158,7 +158,7 @@ table.dataDetail td.data {
     min-width: 100px;
 }
 
-.dataTable>thead>tr>th[class=sorting_disabled] {
+.dataTable > thead > tr > th[class=sorting_disabled] {
     color: #707070;
 }
 
@@ -176,6 +176,7 @@ div.todo {
     padding: 10px;
     color: blue;
     background-color: yellow;
+    line-height: 38px;
 }
 
 div.todo:before {

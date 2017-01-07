@@ -50,14 +50,6 @@ func GetCgglMenu(db_session *xorm.Session, web_session revel.Session) string {
             </a>
             <b class="arrow"></b>
         </li>
-
-        <li id="cggl-student-menu" class="">
-            <a href="/erp/student">
-                <i class="menu-icon fa fa-caret-right"></i>
-                学生
-            </a>
-            <b class="arrow"></b>
-        </li>
     </ul>
 </li>
 `)
