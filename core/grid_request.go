@@ -62,6 +62,7 @@ func GetGridRequestParam(request *revel.Request) (filter string, order string, o
 				}
 			}
 		}
+		order_str = strings.Join(gridOrderList, ",")
 	}
 
 	filter = PreventSQLInjection(condition) // return
