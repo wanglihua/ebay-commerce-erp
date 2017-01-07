@@ -106,6 +106,8 @@ POST /erp/product/image/data/detail            ErpProductImage.DetailData
 POST /erp/product/image/save                   ErpProductImage.Save
 POST /erp/product/image/delete                 ErpProductImage.Delete
 
+GET  /erp/product/quality/feedback             ErpProductQualityFeedback.Index
+
 GET  /erp/package/material                     ErpPackageMaterial.Index
 POST /erp/package/material/data/list           ErpPackageMaterial.ListData
 POST /erp/package/material/data/detail         ErpPackageMaterial.DetailData
