@@ -16,7 +16,7 @@ func GetDdpzMenu(db_session *xorm.Session, web_session revel.Session) string {
 	buffer.WriteString(`
 <li id="ddpz-menu" class="">
     <a href="#" class="dropdown-toggle">
-        <i class="menu-icon fa fa-car"></i>
+        <i class="menu-icon fa fa-gear"></i>
         <span class="menu-text">订单配置</span>
         <b class="arrow fa fa-angle-down"></b>
     </a>

@@ -16,7 +16,7 @@ func GetDdlcMenu(db_session *xorm.Session, web_session revel.Session) string {
 	buffer.WriteString(`
 <li id="ddlc-menu" class="">
     <a href="#" class="dropdown-toggle">
-        <i class="menu-icon fa fa-car"></i>
+        <i class="menu-icon fa fa-random"></i>
         <span class="menu-text">订单流程</span>
         <b class="arrow fa fa-angle-down"></b>
     </a>

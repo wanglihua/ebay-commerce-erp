@@ -16,7 +16,7 @@ func GetCgglMenu(db_session *xorm.Session, web_session revel.Session) string {
 	buffer.WriteString(`
 <li id="cggl-menu" class="">
     <a href="#" class="dropdown-toggle">
-        <i class="menu-icon fa fa-car"></i>
+        <i class="menu-icon fa fa-shopping-cart"></i>
         <span class="menu-text">采购管理</span>
         <b class="arrow fa fa-angle-down"></b>
     </a>

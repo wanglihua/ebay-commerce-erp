@@ -16,7 +16,7 @@ func GetXsglMenu(db_session *xorm.Session, web_session revel.Session) string {
 	buffer.WriteString(`
 <li id="xsgl-menu" class="">
     <a href="#" class="dropdown-toggle">
-        <i class="menu-icon fa fa-car"></i>
+        <i class="menu-icon fa fa-tags"></i>
         <span class="menu-text">销售管理</span>
         <b class="arrow fa fa-angle-down"></b>
     </a>

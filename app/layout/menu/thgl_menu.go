@@ -16,7 +16,7 @@ func GetThglMenu(db_session *xorm.Session, web_session revel.Session) string {
 	buffer.WriteString(`
 <li id="thgl-menu" class="">
     <a href="#" class="dropdown-toggle">
-        <i class="menu-icon fa fa-car"></i>
+        <i class="menu-icon fa fa-rotate-left"></i>
         <span class="menu-text">退货管理</span>
         <b class="arrow fa fa-angle-down"></b>
     </a>

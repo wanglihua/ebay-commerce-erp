@@ -16,7 +16,7 @@ func GetSppzMenu(db_session *xorm.Session, web_session revel.Session) string {
 	buffer.WriteString(`
 <li id="sppz-menu" class="">
     <a href="#" class="dropdown-toggle">
-        <i class="menu-icon fa fa-bar-chart-o"></i>
+        <i class="menu-icon fa fa-gear"></i>
         <span class="menu-text">商品配置</span>
         <b class="arrow fa fa-angle-down"></b>
     </a>
