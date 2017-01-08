@@ -11,10 +11,6 @@ func GetCgglMenu(db_session *xorm.Session, web_session revel.Session) string {
 		return ""
 	}
 
-	//采购管理
-	//入库管理
-	//异常采购单
-
 	var buffer bytes.Buffer
 
 	buffer.WriteString(`
