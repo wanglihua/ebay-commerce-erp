@@ -1,4 +1,3 @@
-
 package controllers
 
 import (
@@ -18,11 +17,27 @@ func (c ErpOrderCustomType) Index() revel.Result {
 	return c.RenderTemplate("erp/ddpz/order_custom_type/order_custom_type_index.html")
 }
 
+type ErpOrderCustomTypeViewItem struct {
+	models.OrderCustomTypeInfo  `xorm:"extends" json:"t"`
+	models.StatusInfo           `xorm:"extends" json:"s"`
+}
+
 func (c ErpOrderCustomType) ListData() revel.Result {
 	db_session := c.DbSession
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
-	query := db_session.Where(filter)
+
+	/*
+		SELECT t.*, s.*
+		FROM erp_order_custom_type t
+		    INNER JOIN erp_status s ON t.status_id = s.id
+	 */
+
+	query := db_session.
+	Select("t.*, s.*").
+		Table("erp_order_custom_type").Alias("t").
+		Join("INNER", []string{"erp_status", "s"}, "t.status_id = s.id").
+		Where(filter)
 
 	//query extra filter here
 
@@ -33,12 +48,12 @@ func (c ErpOrderCustomType) ListData() revel.Result {
 		data_query = *data_query.Asc("id")
 	}
 
-	order_custom_type_list := make([]models.OrderCustomTypeInfo, 0, limit)
+	order_custom_type_list := make([]ErpOrderCustomTypeViewItem, 0, limit)
 	err := data_query.Limit(limit, offset).Find(&order_custom_type_list)
 	core.HandleError(err)
 
 	count_query := *query
-	count, err := count_query.Count(new(models.OrderCustomTypeInfo))
+	count, err := count_query.Count(new(ErpOrderCustomTypeViewItem))
 	core.HandleError(err)
 
 	return c.RenderJson(core.GridResult{
@@ -55,7 +70,7 @@ func (f *OrderCustomTypeDetailForm) IsCreate() bool {
 	return f.OrderCustomType.Id == 0
 }
 
-func (f *OrderCustomTypeDetailForm) Valid(validation *revel.Validation) bool { 
+func (f *OrderCustomTypeDetailForm) Valid(validation *revel.Validation) bool {
 	validation.Required(f.OrderCustomType.Code).Message("编号不能为空！")
 
 	validation.Required(f.OrderCustomType.Name).Message("名称不能为空！")
@@ -106,10 +121,10 @@ func (c ErpOrderCustomType) Save() revel.Result {
 	order_custom_type := detail_form.OrderCustomType
 
 	var affected int64
-	if detail_form.IsCreate() { 
+	if detail_form.IsCreate() {
 		affected, err = db_session.Insert(&order_custom_type)
 		core.HandleError(err)
-	} else { 
+	} else {
 		affected, err = db_session.Id(order_custom_type.Id).Update(&order_custom_type)
 		core.HandleError(err)
 
@@ -132,4 +147,3 @@ func (c ErpOrderCustomType) Delete() revel.Result {
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})
 }
-

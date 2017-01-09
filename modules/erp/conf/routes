@@ -162,13 +162,12 @@ POST /erp/inventory/check/entry/data/detail    ErpInventoryCheckEntry.DetailData
 POST /erp/inventory/check/entry/save           ErpInventoryCheckEntry.Save
 POST /erp/inventory/check/entry/delete         ErpInventoryCheckEntry.Delete
 
-
 GET  /erp/paypal/recon                         ErpPaypalRecon.Index
 POST /erp/paypal/recon/data/list               ErpPaypalRecon.ListData
-
 
 GET  /erp/order/custom/type                    ErpOrderCustomType.Index
 POST /erp/order/custom/type/data/list          ErpOrderCustomType.ListData
 POST /erp/order/custom/type/data/detail        ErpOrderCustomType.DetailData
 POST /erp/order/custom/type/save               ErpOrderCustomType.Save
 POST /erp/order/custom/type/delete             ErpOrderCustomType.Delete
+
