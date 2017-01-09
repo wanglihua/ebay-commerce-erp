@@ -7,6 +7,7 @@ import (
 
 	"matrix/core"
 	"matrix/modules/erp/models"
+	"matrix/modules/erp/service/status_service"
 )
 
 type ErpOrderCustomType struct {
@@ -64,6 +65,7 @@ func (c ErpOrderCustomType) ListData() revel.Result {
 
 type OrderCustomTypeDetailForm struct {
 	OrderCustomType models.OrderCustomTypeInfo `json:"order_type"`
+	StatusList      []models.StatusInfo        `json:"status_list"`
 }
 
 func (f *OrderCustomTypeDetailForm) IsCreate() bool {
@@ -101,8 +103,11 @@ func (c ErpOrderCustomType) DetailData() revel.Result {
 		}
 	}
 
+	status_list := status_service.GetStatusList(db_session, models.STATUS_TYPE_ORDER_CUSTOM_TYPE)
+
 	var detail_form OrderCustomTypeDetailForm
 	detail_form.OrderCustomType = order_custom_type
+	detail_form.StatusList = status_list
 
 	return c.RenderJson(detail_form)
 }
