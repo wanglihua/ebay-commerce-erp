@@ -161,3 +161,7 @@ POST /erp/inventory/check/entry/data/list      ErpInventoryCheckEntry.ListData
 POST /erp/inventory/check/entry/data/detail    ErpInventoryCheckEntry.DetailData
 POST /erp/inventory/check/entry/save           ErpInventoryCheckEntry.Save
 POST /erp/inventory/check/entry/delete         ErpInventoryCheckEntry.Delete
+
+
+GET  /erp/paypal/recon                         ErpPaypalRecon.Index
+POST /erp/paypal/recon/data/list               ErpPaypalRecon.ListData

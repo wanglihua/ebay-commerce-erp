@@ -1,0 +1,75 @@
+{%header "Paypal对账" .%}
+<div id="page">
+    <div class="breadcrumbs" id="breadcrumbs">
+        <ul class="breadcrumb">
+            <li>
+                <a href='{%url "Home.Index"%}'><i class="ace-icon fa fa-home home-icon"></i></a>
+            </li>
+            <li class="parent" data-menu="ppgl-menu">Paypal管理</li>
+            <li class="active" data-menu="ppgl-paypalrecon-menu">Paypal对账</li>
+        </ul>
+    </div>
+    <div class="page-content">
+        <div class="row">
+            <div class="col-xs-12" style="padding: 0;">
+                <div class="gridToolBar clearfix">
+                    <button class="btn btn-primary btn-sm" @click="reloadList('#paypalReconList')">
+                        <i class="ace-icon fa fa-refresh"></i>
+                        刷新
+                    </button>
+                </div>
+                <div>
+                    <table id="paypalReconList" class="table table-striped table-bordered table-hover"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    var vm = new Vue({
+        el: "#page",
+        data: {
+            "detail": {
+                "paypal_recon": {}
+            }
+        },
+        mounted: function () {
+            initDataTable(
+                '#paypalReconList',
+                {
+                    "sAjaxSource": '{%url "ErpPaypalRecon.ListData"%}',
+                    "aaSorting": [[0, "asc"]],
+                    "aoColumns": [
+                        {"mDataProp": "r.id", "title": "编号", "bSearchable": false, "width": 100},
+                        {"mDataProp": "r.code", "title": "单号", "bSearchable": true, "width": 180},
+                        {
+                            "mDataProp": "r.fee", "title": "交易费", "bSearchable": false, "sClass": "dtRight", "width": 120,
+                            "render": function (data, type, row) {
+                                return dtFormatFloat4(data);
+                            }
+                        },
+                        {
+                            "mDataProp": "r.amount",
+                            "title": "金额",
+                            "bSearchable": false,
+                            "sClass": "dtRight",
+                            "width": 120,
+                            "render": function (data, type, row) {
+                                return dtFormatFloat4(data);
+                            }
+                        },
+                        {"mDataProp": "r.time", "title": "时间", "bSearchable": false, "width": 120},
+                        {"mDataProp": "s.name", "title": "匹配结果", "bSearchable": false}
+                    ]
+                }
+            );
+        },
+        methods: {
+            reloadList: function () {
+                reloadList('#paypalReconList');
+            }
+        }
+    });
+</script>
+{%footer%}
+

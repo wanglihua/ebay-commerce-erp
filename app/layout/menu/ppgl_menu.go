@@ -14,7 +14,7 @@ func GetPpglMenu(db_session *xorm.Session, web_session revel.Session) string {
 	var buffer bytes.Buffer
 
 	buffer.WriteString(`
-<li id="cggl-menu" class="">
+<li id="ppgl-menu" class="">
     <a href="#" class="dropdown-toggle">
         <i class="menu-icon fa fa-cc-paypal"></i>
         <span class="menu-text">PayPal管理</span>
@@ -23,10 +23,10 @@ func GetPpglMenu(db_session *xorm.Session, web_session revel.Session) string {
     <b class="arrow"></b>
     <ul class="submenu">
 
-        <li id="cggl-aaaa-menu" class="">
-            <a href="#">
+        <li id="ppgl-paypalrecon-menu" class="">
+            <a href="/erp/paypal/recon">
                 <i class="menu-icon fa fa-caret-right"></i>
-                PayPal对账
+                Paypal对账
             </a>
             <b class="arrow"></b>
         </li>

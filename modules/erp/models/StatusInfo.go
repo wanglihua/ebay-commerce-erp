@@ -16,6 +16,7 @@ const (
 	STATUS_TYPE_PAYPAL_ACCOUNT  = 600 //Paypal账号状态
 	STATUS_TYPE_PACKAGE         = 700 //包材 状态
 	STATUS_TYPE_INVENTORY_CHECK = 800 //库存盘点单状态
+	STATUS_TYPE_PAYPAL_RECON    = 900 //Paypal对账结果
 
 	//状态类型 end
 
@@ -58,6 +59,10 @@ const (
 	INVENTORY_CHECK_STATUS_WTG = 2000
 	INVENTORY_CHECK_STATUS_SPZ = 2100
 	INVENTORY_CHECK_STATUS_YWC = 2200
+
+	// Paypal对账 成功 失败
+	PAYPAL_RECON_SUCCESS = 2300
+	PAYPAL_RECON_FAILED  = 2400
 
 	//状态 id end
 )
@@ -247,5 +252,20 @@ func (e StatusInfo) InitData(db_session *xorm.Session) {
 	status.Type = STATUS_TYPE_INVENTORY_CHECK
 	status.Name = "已完成"
 	status.Desc = core.NewNullString("盘点单状态 已完成", true)
+	db_session.Insert(status)
+
+	// Paypal对账结果
+	status = new(StatusInfo)
+	status.Id = PAYPAL_RECON_SUCCESS
+	status.Type = STATUS_TYPE_PAYPAL_RECON
+	status.Name = "匹配成功"
+	status.Desc = core.NewNullString("Paypal对账结果 匹配成功", true)
+	db_session.Insert(status)
+
+	status = new(StatusInfo)
+	status.Id = PAYPAL_RECON_FAILED
+	status.Type = STATUS_TYPE_PAYPAL_RECON
+	status.Name = "匹配失败"
+	status.Desc = core.NewNullString("Paypal对账结果 匹配失败", true)
 	db_session.Insert(status)
 }
