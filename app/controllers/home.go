@@ -61,8 +61,10 @@ func (c Home) SyncDbPost() revel.Result {
 	model_list = append(model_list, &erp_models.StockBillEntryInfo{})
 
 	model_list = append(model_list, &erp_models.ECommercePlatformInfo{})
-
 	model_list = append(model_list, &erp_models.PaypalReconInfo{})
+	model_list = append(model_list, &erp_models.OrderCustomTypeInfo{})
+
+	//ErpOrderCustomType
 
 
 	err := db.Engine.Sync2(model_list...)

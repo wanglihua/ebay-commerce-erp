@@ -5,7 +5,7 @@ import (
 )
 
 type OrderLogInfo struct {
-	Id         int64            `xorm:"bigint notnull pk 'id'" json:"id"`
+	Id         int64            `xorm:"bigint notnull pk autoincr 'id'" json:"id"`
 	OrderId    int64            `xorm:"bigint notnull index 'order_id'" json:"order_id" smith:"verbose_name=订单Id"`
 	OrderCode  string           `xorm:"nvarchar(100) notnull index 'order_code'" json:"order_code" smith:"verbose_name=订单编号"`
 	TransCode  string           `xorm:"nvarchar(100) notnull index 'trans_code'" json:"trans_code" smith:"verbose_name=交易单号"`

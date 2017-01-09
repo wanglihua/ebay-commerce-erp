@@ -8,15 +8,16 @@ import (
 const (
 	//状态类型 begin
 
-	STATUS_TYPE_STOCK           = 100 //仓库状态
-	STATUS_TYPE_EXCHANGE_RATE   = 200 //仓库状态
-	STATUS_TYPE_PRODUCT_CATE    = 300 //商品目录状态
-	STATUS_TYPE_PRODUCT         = 400 //商品状态
-	STATUS_TYPE_SHOP_ACCOUNT    = 500 //店铺账号状态
-	STATUS_TYPE_PAYPAL_ACCOUNT  = 600 //Paypal账号状态
-	STATUS_TYPE_PACKAGE         = 700 //包材 状态
-	STATUS_TYPE_INVENTORY_CHECK = 800 //库存盘点单状态
-	STATUS_TYPE_PAYPAL_RECON    = 900 //Paypal对账结果
+	STATUS_TYPE_STOCK             = 100  //仓库状态
+	STATUS_TYPE_EXCHANGE_RATE     = 200  //仓库状态
+	STATUS_TYPE_PRODUCT_CATE      = 300  //商品目录状态
+	STATUS_TYPE_PRODUCT           = 400  //商品状态
+	STATUS_TYPE_SHOP_ACCOUNT      = 500  //店铺账号状态
+	STATUS_TYPE_PAYPAL_ACCOUNT    = 600  //Paypal账号状态
+	STATUS_TYPE_PACKAGE           = 700  //包材 状态
+	STATUS_TYPE_INVENTORY_CHECK   = 800  //库存盘点单状态
+	STATUS_TYPE_PAYPAL_RECON      = 900  //Paypal对账结果
+	STATUS_TYPE_ORDER_CUSTOM_TYPE = 1000 //订单自定义类型
 
 	//状态类型 end
 
@@ -63,6 +64,10 @@ const (
 	// Paypal对账 成功 失败
 	PAYPAL_RECON_SUCCESS = 2300
 	PAYPAL_RECON_FAILED  = 2400
+
+	// 订单自定义类型 正常 停用
+	ORDER_CUSTOM_TYPE_ENABLED = 2500
+	ORDER_CUSTOM_TYPE_DISABLED = 2600
 
 	//状态 id end
 )
@@ -267,5 +272,20 @@ func (e StatusInfo) InitData(db_session *xorm.Session) {
 	status.Type = STATUS_TYPE_PAYPAL_RECON
 	status.Name = "匹配失败"
 	status.Desc = core.NewNullString("Paypal对账结果 匹配失败", true)
+	db_session.Insert(status)
+
+	// 订单自定义类型
+	status = new(StatusInfo)
+	status.Id = ORDER_CUSTOM_TYPE_ENABLED
+	status.Type = STATUS_TYPE_ORDER_CUSTOM_TYPE
+	status.Name = "正常"
+	status.Desc = core.NewNullString("订单自定义类型 正常", true)
+	db_session.Insert(status)
+
+	status = new(StatusInfo)
+	status.Id = ORDER_CUSTOM_TYPE_DISABLED
+	status.Type = STATUS_TYPE_ORDER_CUSTOM_TYPE
+	status.Name = "停用"
+	status.Desc = core.NewNullString("订单自定义类型 停用", true)
 	db_session.Insert(status)
 }

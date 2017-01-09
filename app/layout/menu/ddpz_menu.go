@@ -39,8 +39,8 @@ func GetDdpzMenu(db_session *xorm.Session, web_session revel.Session) string {
             <b class="arrow"></b>
         </li>
 
-        <li id="ddpz-bbb" class="">
-            <a href="#">
+        <li id="ddpz-ordercustomtype-menu" class="">
+            <a href="/erp/order/custom/type">
                 <i class="menu-icon fa fa-caret-right"></i>
                 订单自定义类型
             </a>
