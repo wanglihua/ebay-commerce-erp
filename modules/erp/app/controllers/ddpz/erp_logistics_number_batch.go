@@ -1,4 +1,3 @@
-
 package controllers
 
 import (
@@ -8,6 +7,7 @@ import (
 
 	"matrix/core"
 	"matrix/modules/erp/models"
+	"matrix/modules/erp/service/status_service"
 )
 
 type ErpLogisticsNumberBatch struct {
@@ -18,11 +18,30 @@ func (c ErpLogisticsNumberBatch) Index() revel.Result {
 	return c.RenderTemplate("erp/ddpz/logistics_number_batch/logistics_number_batch_index.html")
 }
 
+type ErpLogisticsNumberBatchViewItem struct {
+	models.LogisticsNumberBatchInfo `xorm:"extends" json:"b"`
+	models.LogisticsModeInfo        `xorm:"extends" json:"m"`
+	models.StatusInfo               `xorm:"extends" json:"s"`
+}
+
 func (c ErpLogisticsNumberBatch) ListData() revel.Result {
 	db_session := c.DbSession
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
-	query := db_session.Where(filter)
+
+	/*
+		SELECT b.*, m.*, s.*
+		FROM erp_logistics_number_batch b
+		    INNER JOIN erp_logistics_mode m ON b.mode_id = m.id
+		    INNER JOIN erp_status s ON b.status_id = s.id
+	*/
+
+	query := db_session.
+	Select(" b.*, m.*, s.*").
+		Table("erp_logistics_number_batch").Alias("b").
+		Join("INNER", []string{"erp_logistics_mode", "m"}, "b.mode_id = m.id").
+		Join("INNER", []string{"erp_status", "s"}, "b.status_id = s.id").
+		Where(filter)
 
 	//query extra filter here
 
@@ -30,15 +49,15 @@ func (c ErpLogisticsNumberBatch) ListData() revel.Result {
 	if order != "" {
 		data_query = *data_query.OrderBy(order)
 	} else {
-		data_query = *data_query.Asc("id")
+		data_query = *data_query.Asc("b.id")
 	}
 
-	logistics_number_batch_list := make([]models.LogisticsNumberBatchInfo, 0, limit)
+	logistics_number_batch_list := make([]ErpLogisticsNumberBatchViewItem, 0, limit)
 	err := data_query.Limit(limit, offset).Find(&logistics_number_batch_list)
 	core.HandleError(err)
 
 	count_query := *query
-	count, err := count_query.Count(new(models.LogisticsNumberBatchInfo))
+	count, err := count_query.Count(new(ErpLogisticsNumberBatchViewItem))
 	core.HandleError(err)
 
 	return c.RenderJson(core.GridResult{
@@ -49,13 +68,15 @@ func (c ErpLogisticsNumberBatch) ListData() revel.Result {
 
 type LogisticsNumberBatchDetailForm struct {
 	LogisticsNumberBatch models.LogisticsNumberBatchInfo `json:"number_batch"`
+	LogisticsModeList    []models.LogisticsModeInfo      `json:"logistics_mode_list"`
+	StatusList           []models.StatusInfo             `json:"status_list"`
 }
 
 func (f *LogisticsNumberBatchDetailForm) IsCreate() bool {
 	return f.LogisticsNumberBatch.Id == 0
 }
 
-func (f *LogisticsNumberBatchDetailForm) Valid(validation *revel.Validation) bool { 
+func (f *LogisticsNumberBatchDetailForm) Valid(validation *revel.Validation) bool {
 	validation.Required(f.LogisticsNumberBatch.ModeId).Message("物流方式不能为空！")
 
 	validation.Required(f.LogisticsNumberBatch.Prefix).Message("单号前缀不能为空！")
@@ -90,8 +111,16 @@ func (c ErpLogisticsNumberBatch) DetailData() revel.Result {
 		}
 	}
 
+	var logistics_mode_list = make([]models.LogisticsModeInfo, 0)
+	err := db_session.Find(&logistics_mode_list)
+	core.HandleError(err)
+
+	status_list := status_service.GetStatusList(db_session, models.STATUS_TYPE_LOGISTICS_NUMBER_BATCH)
+
 	var detail_form LogisticsNumberBatchDetailForm
 	detail_form.LogisticsNumberBatch = logistics_number_batch
+	detail_form.LogisticsModeList = logistics_mode_list
+	detail_form.StatusList = status_list
 
 	return c.RenderJson(detail_form)
 }
@@ -109,11 +138,13 @@ func (c ErpLogisticsNumberBatch) Save() revel.Result {
 
 	logistics_number_batch := detail_form.LogisticsNumberBatch
 
+	logistics_number_batch.Remind = logistics_number_batch.EndNum - logistics_number_batch.BeginNum + 1
+
 	var affected int64
-	if detail_form.IsCreate() { 
+	if detail_form.IsCreate() {
 		affected, err = db_session.Insert(&logistics_number_batch)
 		core.HandleError(err)
-	} else { 
+	} else {
 		affected, err = db_session.Id(logistics_number_batch.Id).Update(&logistics_number_batch)
 		core.HandleError(err)
 
@@ -136,4 +167,3 @@ func (c ErpLogisticsNumberBatch) Delete() revel.Result {
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})
 }
-

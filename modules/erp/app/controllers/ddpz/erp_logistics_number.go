@@ -1,4 +1,3 @@
-
 package controllers
 
 import (
@@ -8,6 +7,7 @@ import (
 
 	"matrix/core"
 	"matrix/modules/erp/models"
+	"matrix/modules/erp/service/status_service"
 )
 
 type ErpLogisticsNumber struct {
@@ -18,11 +18,30 @@ func (c ErpLogisticsNumber) Index() revel.Result {
 	return c.RenderTemplate("erp/ddpz/logistics_number/logistics_number_index.html")
 }
 
+type ErpLogisticsNumberViewItem struct {
+	models.LogisticsNumberInfo      `xorm:"extends" json:"n"`
+	models.LogisticsModeInfo        `xorm:"extends" json:"m"`
+	models.StatusInfo               `xorm:"extends" json:"s"`
+}
+
 func (c ErpLogisticsNumber) ListData() revel.Result {
 	db_session := c.DbSession
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
-	query := db_session.Where(filter)
+
+	/*
+		SELECT n.*, m.*, s.*
+		FROM erp_logistics_number n
+		    INNER JOIN erp_logistics_mode m ON n.mode_id = m.id
+		    INNER JOIN erp_status s ON n.status_id = s.id
+	*/
+
+	query := db_session.
+	Select(" n.*, m.*, s.*").
+		Table("erp_logistics_number").Alias("n").
+		Join("INNER", []string{"erp_logistics_mode", "m"}, "n.mode_id = m.id").
+		Join("INNER", []string{"erp_status", "s"}, "n.status_id = s.id").
+		Where(filter)
 
 	//query extra filter here
 
@@ -30,15 +49,15 @@ func (c ErpLogisticsNumber) ListData() revel.Result {
 	if order != "" {
 		data_query = *data_query.OrderBy(order)
 	} else {
-		data_query = *data_query.Asc("id")
+		data_query = *data_query.Asc("n.id")
 	}
 
-	logistics_number_list := make([]models.LogisticsNumberInfo, 0, limit)
+	logistics_number_list := make([]ErpLogisticsNumberViewItem, 0, limit)
 	err := data_query.Limit(limit, offset).Find(&logistics_number_list)
 	core.HandleError(err)
 
 	count_query := *query
-	count, err := count_query.Count(new(models.LogisticsNumberInfo))
+	count, err := count_query.Count(new(ErpLogisticsNumberViewItem))
 	core.HandleError(err)
 
 	return c.RenderJson(core.GridResult{
@@ -48,15 +67,18 @@ func (c ErpLogisticsNumber) ListData() revel.Result {
 }
 
 type LogisticsNumberDetailForm struct {
-	LogisticsNumber models.LogisticsNumberInfo `json:"logistics_number"`
+	LogisticsNumber   models.LogisticsNumberInfo      `json:"logistics_number"`
+	LogisticsModeList []models.LogisticsModeInfo      `json:"logistics_mode_list"`
+	StatusList        []models.StatusInfo             `json:"status_list"`
 }
 
 func (f *LogisticsNumberDetailForm) IsCreate() bool {
 	return f.LogisticsNumber.Id == 0
 }
 
-func (f *LogisticsNumberDetailForm) Valid(validation *revel.Validation) bool { 
+func (f *LogisticsNumberDetailForm) Valid(validation *revel.Validation) bool {
 	validation.Required(f.LogisticsNumber.Num).Message("物流单号不能为空！")
+	validation.MaxSize(f.LogisticsNumber.Num, 100).Message("物流单号长度不能大于100！")
 
 	validation.Required(f.LogisticsNumber.ModeId).Message("物流方式不能为空！")
 
@@ -84,8 +106,16 @@ func (c ErpLogisticsNumber) DetailData() revel.Result {
 		}
 	}
 
+	var logistics_mode_list = make([]models.LogisticsModeInfo, 0)
+	err := db_session.Find(&logistics_mode_list)
+	core.HandleError(err)
+
+	status_list := status_service.GetStatusList(db_session, models.STATUS_TYPE_LOGISTICS_NUMBER_BATCH)
+
 	var detail_form LogisticsNumberDetailForm
 	detail_form.LogisticsNumber = logistics_number
+	detail_form.LogisticsModeList = logistics_mode_list
+	detail_form.StatusList = status_list
 
 	return c.RenderJson(detail_form)
 }
@@ -104,10 +134,10 @@ func (c ErpLogisticsNumber) Save() revel.Result {
 	logistics_number := detail_form.LogisticsNumber
 
 	var affected int64
-	if detail_form.IsCreate() { 
+	if detail_form.IsCreate() {
 		affected, err = db_session.Insert(&logistics_number)
 		core.HandleError(err)
-	} else { 
+	} else {
 		affected, err = db_session.Id(logistics_number.Id).Update(&logistics_number)
 		core.HandleError(err)
 
@@ -130,4 +160,3 @@ func (c ErpLogisticsNumber) Delete() revel.Result {
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})
 }
-

@@ -1,39 +1,40 @@
 {%header "运单号不规则号段" .%}
 <div id="page">
-   <div class="breadcrumbs" id="breadcrumbs">
-       <ul class="breadcrumb">
-           <li>
-               <a href='{%url "Home.Index"%}'><i class="ace-icon fa fa-home home-icon"></i></a>
-           </li>
-           <li class="parent" data-menu="ddpz-menu">订单配置</li>
-           <li class="active" data-menu="ddpz-logisticsnumber-menu">运单号不规则号段</li>
-       </ul>
-   </div>
-   <div class="page-content">
-       <div class="row">
-           <div class="col-xs-12" style="padding: 0;">
-               <div class="gridToolBar clearfix">
-                   <button class="btn btn-primary btn-sm" @click="reloadList('#logisticsNumberList')">
-                       <i class="ace-icon fa fa-refresh"></i>
-                       刷新
-                   </button>
-                   <button class="btn btn-success btn-sm" @click="showLogisticsNumberDetail(0)">
-                       <i class="ace-icon fa fa-plus"></i>
-                       新增
-                   </button>
-                   <button class="btn btn-danger btn-sm" @click="deleteLogisticsNumber()">
-                       <i class="ace-icon fa fa-trash-o"></i>
-                       删除
-                   </button>
-               </div>
-               <div>
-                   <table id="logisticsNumberList" class="table table-striped table-bordered table-hover"></table>
-               </div>
-           </div>
-       </div>
-   </div>
+    <div class="breadcrumbs" id="breadcrumbs">
+        <ul class="breadcrumb">
+            <li>
+                <a href='{%url "Home.Index"%}'><i class="ace-icon fa fa-home home-icon"></i></a>
+            </li>
+            <li class="parent" data-menu="ddpz-menu">订单配置</li>
+            <li class="active" data-menu="ddpz-logisticsnumber-menu">运单号不规则号段</li>
+        </ul>
+    </div>
+    <div class="page-content">
+        <div class="row">
+            <div class="col-xs-12" style="padding: 0;">
+                <div class="gridToolBar clearfix">
+                    <button class="btn btn-primary btn-sm" @click="reloadList('#logisticsNumberList')">
+                        <i class="ace-icon fa fa-refresh"></i>
+                        刷新
+                    </button>
+                    <button class="btn btn-success btn-sm" @click="showLogisticsNumberDetail(0)">
+                        <i class="ace-icon fa fa-plus"></i>
+                        新增
+                    </button>
+                    <button class="btn btn-danger btn-sm" @click="deleteLogisticsNumber()">
+                        <i class="ace-icon fa fa-trash-o"></i>
+                        删除
+                    </button>
+                </div>
+                <div>
+                    <table id="logisticsNumberList" class="table table-striped table-bordered table-hover"></table>
+                    <div class="todo">1、如何使用这些号码；2、操作日志。</div>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="modal fade" id="logisticsNumberDetailDialog">
-        <div class="modal-dialog" style="width: 680px;">
+        <div class="modal-dialog" style="width: 480px;">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="True">&times;</button>
@@ -45,30 +46,35 @@
                             <form class="form-horizontal" role="form" id="logisticsNumberDetailForm">
                                 <input id="logistics_number_id" name="detail.logistics_number.id" type="hidden" v-model.number="detail.logistics_number.id"/>
                                 <input id="logistics_number_version" name="detail.logistics_number.version" type="hidden" v-model.number="detail.logistics_number.version"/>
-                                <div class="row">
-                                    <div class="col-xs-6">
-                                        <div class="form-group">
-                                            <label for="num" class="col-xs-2 control-label no-padding-right">物流单号</label>
-                                            <div class="col-xs-10">
-                                                <input id="num" name="detail.logistics_number.num" type="text" class="input-sm form-control" v-model.number="detail.logistics_number.num"/>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
 
                                 <div class="row">
-                                    <div class="col-xs-6">
+                                    <div class="col-xs-12">
                                         <div class="form-group">
                                             <label for="mode_id" class="col-xs-2 control-label no-padding-right">物流方式</label>
                                             <div class="col-xs-10">
-                                                <input id="mode_id" name="detail.logistics_number.mode_id" type="text" class="input-sm form-control" v-model.number="detail.logistics_number.mode_id"/>
+                                                <select id="mode_id" name="detail.logistics_number.mode_id" class="input-sm form-control" v-model.number="detail.logistics_number.mode_id">
+                                                    <template v-for="mode in detail.logistics_mode_list">
+                                                        <option :value="mode.id">{{mode.name}}</option>
+                                                    </template>
+                                                </select>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
 
                                 <div class="row">
-                                    <div class="col-xs-6">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <label for="num" class="col-xs-2 control-label no-padding-right">物流单号</label>
+                                            <div class="col-xs-10">
+                                                <input id="num" name="detail.logistics_number.num" type="text" class="input-sm form-control" v-model="detail.logistics_number.num"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-12">
                                         <div class="form-group">
                                             <label for="desc" class="col-xs-2 control-label no-padding-right">详情</label>
                                             <div class="col-xs-10">
@@ -79,11 +85,15 @@
                                 </div>
 
                                 <div class="row">
-                                    <div class="col-xs-6">
+                                    <div class="col-xs-12">
                                         <div class="form-group">
                                             <label for="status_id" class="col-xs-2 control-label no-padding-right">状态</label>
                                             <div class="col-xs-10">
-                                                <input id="status_id" name="detail.logistics_number.status_id" type="text" class="input-sm form-control" v-model.number="detail.logistics_number.status_id"/>
+                                                <select id="status_id" name="detail.logistics_number.status_id" class="input-sm form-control" v-model.number="detail.logistics_number.status_id">
+                                                    <template v-for="status in detail.status_list">
+                                                        <option :value="status.id">{{status.name}}</option>
+                                                    </template>
+                                                </select>
                                             </div>
                                         </div>
                                     </div>
@@ -115,26 +125,30 @@
         },
         mounted: function () {
             initDataTable(
-                    '#logisticsNumberList',
-                    {
-                        "sAjaxSource": '{%url "ErpLogisticsNumber.ListData"%}',
-                        "aaSorting": [[1, "asc"]],
-                        "aoColumns": [
-                            {
-                                "mDataProp": "id", "bSearchable": false, "orderable": false, "sClass": "center", "width": 50,
-                                "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
-                                "render": function (data, type, row) {
-                                    return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
-                                }
-                            },
-                            {"mDataProp": "num", "title": "物流单号", "bSearchable": false },
-                            {"mDataProp": "mode_id", "title": "物流方式", "bSearchable": false },
-                            {"mDataProp": "desc", "title": "详情", "bSearchable": true },
-                            {"mDataProp": "status_id", "title": "状态", "bSearchable": false },
-                            {"mDataProp": "create_time", "title": "创建时间", "bSearchable": false, "width": 120 },
-                            {"mDataProp": "update_time", "title": "修改时间", "bSearchable": false, "width": 120 }
-                        ]
-                   }
+                '#logisticsNumberList',
+                {
+                    "sAjaxSource": '{%url "ErpLogisticsNumber.ListData"%}',
+                    "aaSorting": [[1, "asc"]],
+                    "aoColumns": [
+                        {
+                            "mDataProp": "n.id",
+                            "bSearchable": false,
+                            "orderable": false,
+                            "sClass": "center",
+                            "width": 50,
+                            "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
+                            "render": function (data, type, row) {
+                                return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
+                            }
+                        },
+                        {"mDataProp": "m.name", "title": "物流方式", "bSearchable": true, "width": 200},
+                        {"mDataProp": "n.num", "title": "物流单号", "bSearchable": true, "width": 200},
+                        {"mDataProp": "n.desc", "title": "详情", "bSearchable": true},
+                        {"mDataProp": "s.name", "title": "状态", "bSearchable": true, "width": 80},
+                        {"mDataProp": "n.create_time", "title": "创建时间", "bSearchable": false, "width": 120},
+                        {"mDataProp": "n.update_time", "title": "修改时间", "bSearchable": false, "width": 120}
+                    ]
+                }
             );
 
             $('#logisticsNumberList tbody').on('dblclick', 'tr', function () {
@@ -150,29 +164,29 @@
                 showMask("加载中...");
                 $("#logisticsNumberDetailForm").clearValidation();
                 $.ajax({
-                           url: '{%url "ErpLogisticsNumber.DetailData" %}',
-                           type: "POST",
-                           data: {
-                               "id": id
-                           },
-                           success: function (result) {
-                               hideMask();
-                               if (result.success == false) {
-                                   $.msg.error(result.message);
-                                   return;
-                               }
-                               vm.detail = result;
-                               $('#logisticsNumberDetailDialog').modal(modalOptions);
-                           }
-                       }
+                        url: '{%url "ErpLogisticsNumber.DetailData" %}',
+                        type: "POST",
+                        data: {
+                            "id": id
+                        },
+                        success: function (result) {
+                            hideMask();
+                            if (result.success == false) {
+                                $.msg.error(result.message);
+                                return;
+                            }
+                            vm.detail = result;
+                            $('#logisticsNumberDetailDialog').modal(modalOptions);
+                        }
+                    }
                 );
             },
             saveLogisticsNumber: function () {
                 showMask("提交中...");
                 var form = $("#logisticsNumberDetailForm");
-                var valid = validate(form, {  
+                var valid = validate(form, {
                     'detail.logistics_number.num': {
-                        required: true, digits: true
+                        required: true, maxlength: 100
                     },
                     'detail.logistics_number.mode_id': {
                         required: true, digits: true
@@ -189,25 +203,25 @@
                     hideMask();
                 } else {
                     $.ajax({
-                               url: '{%url "ErpLogisticsNumber.Save"%}',
-                               type: "POST",
-                               processData: false,
-                               contentType: 'application/json',
-                               data: JSON.stringify(vm.detail),
-                               success: function (data) {
-                                   hideMask();
-                                   if (data.success == false) {
-                                       $.msg.error(data.message);
-                                       //return;
-                                   }
-                                   else {
-                                       $.msg.show(data.message);
-                                       $('#logisticsNumberDetailDialog').modal('hide');
-                                       vm.reloadList();
-                                       //return;
-                                   }
-                               }
-                           }
+                            url: '{%url "ErpLogisticsNumber.Save"%}',
+                            type: "POST",
+                            processData: false,
+                            contentType: 'application/json',
+                            data: JSON.stringify(vm.detail),
+                            success: function (data) {
+                                hideMask();
+                                if (data.success == false) {
+                                    $.msg.error(data.message);
+                                    //return;
+                                }
+                                else {
+                                    $.msg.show(data.message);
+                                    $('#logisticsNumberDetailDialog').modal('hide');
+                                    vm.reloadList();
+                                    //return;
+                                }
+                            }
+                        }
                     );
                 }
             },
@@ -226,20 +240,20 @@
 
                 $.msg.confirm("确认要删除吗？", function () {
                     $.ajax({
-                               url: '{%url "ErpLogisticsNumber.Delete"%}',
-                               type: "POST",
-                               data: {"id_list": id_list},
-                               success: function (data) {
-                                   if (data.success == false) {
-                                       $.msg.error(data.message);
-                                       return;
-                                   }
-                                   else {
-                                       $.msg.show(data.message);
-                                   }
-                                   vm.reloadList();
-                               }
-                           });
+                        url: '{%url "ErpLogisticsNumber.Delete"%}',
+                        type: "POST",
+                        data: {"id_list": id_list},
+                        success: function (data) {
+                            if (data.success == false) {
+                                $.msg.error(data.message);
+                                return;
+                            }
+                            else {
+                                $.msg.show(data.message);
+                            }
+                            vm.reloadList();
+                        }
+                    });
                 });
             }
         }

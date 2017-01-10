@@ -6,7 +6,7 @@ import (
 
 type LogisticsNumberInfo struct {
 	Id         int64                 `xorm:"bigint notnull pk autoincr 'id'" json:"id"`
-	Num        int64                 `xorm:"bigint notnull 'num'" json:"num" smith:"verbose_name=物流单号,min=0"`
+	Num        string                `xorm:"nvarchar(100) notnull 'num'" json:"num" smith:"verbose_name=物流单号,min=0, max=100"`
 	ModeId     int64                 `xorm:"bigint notnull index 'mode_id'" json:"mode_id" smith:"verbose_name=物流方式"`
 	Desc       core.NullString       `xorm:"nvarchar(500) 'desc'" json:"desc" smith:"verbose_name=详情,max=500"`
 	StatusId   int64                 `xorm:"bigint notnull index 'status_id'" json:"status_id" smith:"verbose_name=状态"`

@@ -8,17 +8,18 @@ import (
 const (
 	//状态类型 begin
 
-	STATUS_TYPE_STOCK             = 100  //仓库状态
-	STATUS_TYPE_EXCHANGE_RATE     = 200  //仓库状态
-	STATUS_TYPE_PRODUCT_CATE      = 300  //商品目录状态
-	STATUS_TYPE_PRODUCT           = 400  //商品状态
-	STATUS_TYPE_SHOP_ACCOUNT      = 500  //店铺账号状态
-	STATUS_TYPE_PAYPAL_ACCOUNT    = 600  //Paypal账号状态
-	STATUS_TYPE_PACKAGE           = 700  //包材 状态
-	STATUS_TYPE_INVENTORY_CHECK   = 800  //库存盘点单状态
-	STATUS_TYPE_PAYPAL_RECON      = 900  //Paypal对账结果
-	STATUS_TYPE_ORDER_CUSTOM_TYPE = 1000 //订单自定义类型
-	STATUS_TYPE_LOGISTICS_NUMBER  = 1100 //订单运单号类型
+	STATUS_TYPE_STOCK                  = 100  //仓库状态
+	STATUS_TYPE_EXCHANGE_RATE          = 200  //仓库状态
+	STATUS_TYPE_PRODUCT_CATE           = 300  //商品目录状态
+	STATUS_TYPE_PRODUCT                = 400  //商品状态
+	STATUS_TYPE_SHOP_ACCOUNT           = 500  //店铺账号状态
+	STATUS_TYPE_PAYPAL_ACCOUNT         = 600  //Paypal账号状态
+	STATUS_TYPE_PACKAGE                = 700  //包材 状态
+	STATUS_TYPE_INVENTORY_CHECK        = 800  //库存盘点单状态
+	STATUS_TYPE_PAYPAL_RECON           = 900  //Paypal对账结果
+	STATUS_TYPE_ORDER_CUSTOM_TYPE      = 1000 //订单自定义类型
+	STATUS_TYPE_LOGISTICS_NUMBER       = 1100 //不规则订单运单号类型
+	STATUS_TYPE_LOGISTICS_NUMBER_BATCH = 1200 //不规则订单运单号类型
 
 	//状态类型 end
 
@@ -73,6 +74,9 @@ const (
 	// 订单运单号 已使用 未使用
 	LOGISTICS_NUMBER_USED     = 2700
 	LOGISTICS_NUMBER_NOT_USED = 2800
+
+	LOGISTICS_NUMBER_BATCH_ENABLED = 2900
+	LOGISTICS_NUMBER_BATCH_DISABLED = 3000
 
 	//状态 id end
 )
@@ -294,7 +298,23 @@ func (e StatusInfo) InitData(db_session *xorm.Session) {
 	status.Desc = core.NewNullString("订单自定义类型 停用", true)
 	db_session.Insert(status)
 
-	//订单运单号类型
+	//规则订单运单号状态
+	status = new(StatusInfo)
+	status.Id = LOGISTICS_NUMBER_BATCH_ENABLED
+	status.Type = STATUS_TYPE_LOGISTICS_NUMBER_BATCH
+	status.Name = "正常"
+	status.Desc = core.NewNullString("订单运单号 正常", true)
+	db_session.Insert(status)
+
+	status = new(StatusInfo)
+	status.Id = LOGISTICS_NUMBER_BATCH_DISABLED
+	status.Type = STATUS_TYPE_LOGISTICS_NUMBER_BATCH
+	status.Name = "停用"
+	status.Desc = core.NewNullString("订单运单号 停用", true)
+	db_session.Insert(status)
+
+
+	//不规则订单运单号状态
 	status = new(StatusInfo)
 	status.Id = LOGISTICS_NUMBER_NOT_USED
 	status.Type = STATUS_TYPE_LOGISTICS_NUMBER
@@ -303,7 +323,7 @@ func (e StatusInfo) InitData(db_session *xorm.Session) {
 	db_session.Insert(status)
 
 	status = new(StatusInfo)
-	status.Id = LOGISTICS_NUMBER_USED
+	status.Id = LOGISTICS_NUMBER_BATCH_DISABLED
 	status.Type = STATUS_TYPE_LOGISTICS_NUMBER
 	status.Name = "已使用"
 	status.Desc = core.NewNullString("订单运单号 已使用", true)
