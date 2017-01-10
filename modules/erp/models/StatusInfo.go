@@ -18,6 +18,7 @@ const (
 	STATUS_TYPE_INVENTORY_CHECK   = 800  //库存盘点单状态
 	STATUS_TYPE_PAYPAL_RECON      = 900  //Paypal对账结果
 	STATUS_TYPE_ORDER_CUSTOM_TYPE = 1000 //订单自定义类型
+	STATUS_TYPE_LOGISTICS_NUMBER  = 1100 //订单运单号类型
 
 	//状态类型 end
 
@@ -66,8 +67,12 @@ const (
 	PAYPAL_RECON_FAILED  = 2400
 
 	// 订单自定义类型 正常 停用
-	ORDER_CUSTOM_TYPE_ENABLED = 2500
+	ORDER_CUSTOM_TYPE_ENABLED  = 2500
 	ORDER_CUSTOM_TYPE_DISABLED = 2600
+
+	// 订单运单号 已使用 未使用
+	LOGISTICS_NUMBER_USED     = 2700
+	LOGISTICS_NUMBER_NOT_USED = 2800
 
 	//状态 id end
 )
@@ -287,5 +292,20 @@ func (e StatusInfo) InitData(db_session *xorm.Session) {
 	status.Type = STATUS_TYPE_ORDER_CUSTOM_TYPE
 	status.Name = "停用"
 	status.Desc = core.NewNullString("订单自定义类型 停用", true)
+	db_session.Insert(status)
+
+	//订单运单号类型
+	status = new(StatusInfo)
+	status.Id = LOGISTICS_NUMBER_NOT_USED
+	status.Type = STATUS_TYPE_LOGISTICS_NUMBER
+	status.Name = "未使用"
+	status.Desc = core.NewNullString("订单运单号 未使用", true)
+	db_session.Insert(status)
+
+	status = new(StatusInfo)
+	status.Id = LOGISTICS_NUMBER_USED
+	status.Type = STATUS_TYPE_LOGISTICS_NUMBER
+	status.Name = "已使用"
+	status.Desc = core.NewNullString("订单运单号 已使用", true)
 	db_session.Insert(status)
 }
