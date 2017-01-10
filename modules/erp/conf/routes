@@ -188,3 +188,9 @@ POST /erp/logistics/number/log/data/list       ErpLogisticsNumberLog.ListData
 POST /erp/logistics/number/log/data/detail     ErpLogisticsNumberLog.DetailData
 POST /erp/logistics/number/log/save            ErpLogisticsNumberLog.Save
 POST /erp/logistics/number/log/delete          ErpLogisticsNumberLog.Delete
+
+GET  /erp/product/bind                         ErpProductBind.Index
+POST /erp/product/bind/data/list               ErpProductBind.ListData
+POST /erp/product/bind/data/detail             ErpProductBind.DetailData
+POST /erp/product/bind/save                    ErpProductBind.Save
+POST /erp/product/bind/delete                  ErpProductBind.Delete
