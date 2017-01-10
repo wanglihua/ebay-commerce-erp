@@ -1,0 +1,279 @@
+{%header "运单号操作日志" .%}
+<div id="page">
+   <div class="breadcrumbs" id="breadcrumbs">
+       <ul class="breadcrumb">
+           <li>
+               <a href='{%url "Home.Index"%}'><i class="ace-icon fa fa-home home-icon"></i></a>
+           </li>
+           <li class="parent" data-menu="ddpz-menu">订单配置</li>
+           <li class="active" data-menu="ddpz-logisticsnumberlog-menu">运单号操作日志</li>
+       </ul>
+   </div>
+   <div class="page-content">
+       <div class="row">
+           <div class="col-xs-12" style="padding: 0;">
+               <div class="gridToolBar clearfix">
+                   <button class="btn btn-primary btn-sm" @click="reloadList('#logisticsNumberLogList')">
+                       <i class="ace-icon fa fa-refresh"></i>
+                       刷新
+                   </button>
+                   <button class="btn btn-success btn-sm" @click="showLogisticsNumberLogDetail(0)">
+                       <i class="ace-icon fa fa-plus"></i>
+                       新增
+                   </button>
+                   <button class="btn btn-danger btn-sm" @click="deleteLogisticsNumberLog()">
+                       <i class="ace-icon fa fa-trash-o"></i>
+                       删除
+                   </button>
+               </div>
+               <div>
+                   <table id="logisticsNumberLogList" class="table table-striped table-bordered table-hover"></table>
+               </div>
+           </div>
+       </div>
+   </div>
+    <div class="modal fade" id="logisticsNumberLogDetailDialog">
+        <div class="modal-dialog" style="width: 680px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="True">&times;</button>
+                    <h4 class="modal-title">运单号操作日志详细</h4>
+                </div>
+                <div class="modal-body clearfix">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <form class="form-horizontal" role="form" id="logisticsNumberLogDetailForm">
+                                <input id="logistics_number_log_id" name="detail.number_log.id" type="hidden" v-model.number="detail.number_log.id"/>
+                                <input id="logistics_number_log_version" name="detail.number_log.version" type="hidden" v-model.number="detail.number_log.version"/>
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="num_id" class="col-xs-2 control-label no-padding-right">运单号Id</label>
+                                            <div class="col-xs-10">
+                                                <input id="num_id" name="detail.number_log.num_id" type="text" class="input-sm form-control" v-model.number="detail.number_log.num_id"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="mode_name" class="col-xs-2 control-label no-padding-right">货运方式</label>
+                                            <div class="col-xs-10">
+                                                <input id="mode_name" name="detail.number_log.mode_name" type="text" class="input-sm form-control" v-model="detail.number_log.mode_name"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="num_range" class="col-xs-2 control-label no-padding-right">号段</label>
+                                            <div class="col-xs-10">
+                                                <input id="num_range" name="detail.number_log.num_range" type="text" class="input-sm form-control" v-model="detail.number_log.num_range"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="desc" class="col-xs-2 control-label no-padding-right">描述</label>
+                                            <div class="col-xs-10">
+                                                <input id="desc" name="detail.number_log.desc" type="text" class="input-sm form-control" v-model="detail.number_log.desc"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="user_id" class="col-xs-2 control-label no-padding-right">用户Id</label>
+                                            <div class="col-xs-10">
+                                                <input id="user_id" name="detail.number_log.user_id" type="text" class="input-sm form-control" v-model.number="detail.number_log.user_id"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="login_name" class="col-xs-2 control-label no-padding-right">用户工号</label>
+                                            <div class="col-xs-10">
+                                                <input id="login_name" name="detail.number_log.login_name" type="text" class="input-sm form-control" v-model="detail.number_log.login_name"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success btn-sm" @click="saveLogisticsNumberLog()">
+                        <i class="ace-icon fa fa-floppy-o"></i>保存
+                    </button>
+                    <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">
+                        <i class="ace-icon fa fa-times"></i>关闭
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    var vm = new Vue({
+        el: "#page",
+        data: {
+            "detail": {
+                "number_log": {}
+            }
+        },
+        mounted: function () {
+            initDataTable(
+                    '#logisticsNumberLogList',
+                    {
+                        "sAjaxSource": '{%url "ErpLogisticsNumberLog.ListData"%}',
+                        "aaSorting": [[1, "asc"]],
+                        "aoColumns": [
+                            {
+                                "mDataProp": "id", "bSearchable": false, "orderable": false, "sClass": "center", "width": 50,
+                                "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
+                                "render": function (data, type, row) {
+                                    return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
+                                }
+                            },
+                            {"mDataProp": "num_id", "title": "运单号Id", "bSearchable": false },
+                            {"mDataProp": "mode_name", "title": "货运方式", "bSearchable": true },
+                            {"mDataProp": "num_range", "title": "号段", "bSearchable": true },
+                            {"mDataProp": "desc", "title": "描述", "bSearchable": true },
+                            {"mDataProp": "user_id", "title": "用户Id", "bSearchable": false },
+                            {"mDataProp": "login_name", "title": "用户工号", "bSearchable": true },
+                            {"mDataProp": "create_time", "title": "创建时间", "bSearchable": false, "width": 120 },
+                            {"mDataProp": "update_time", "title": "修改时间", "bSearchable": false, "width": 120 }
+                        ]
+                   }
+            );
+
+            $('#logisticsNumberLogList tbody').on('dblclick', 'tr', function () {
+                var id = $(this).find('td:first-child input:checkbox').val();
+                vm.showLogisticsNumberLogDetail(id);
+            });
+        },
+        methods: {
+            reloadList: function () {
+                reloadList('#logisticsNumberLogList');
+            },
+            showLogisticsNumberLogDetail: function (id) {
+                showMask("加载中...");
+                $("#logisticsNumberLogDetailForm").clearValidation();
+                $.ajax({
+                           url: '{%url "ErpLogisticsNumberLog.DetailData" %}',
+                           type: "POST",
+                           data: {
+                               "id": id
+                           },
+                           success: function (result) {
+                               hideMask();
+                               if (result.success == false) {
+                                   $.msg.error(result.message);
+                                   return;
+                               }
+                               vm.detail = result;
+                               $('#logisticsNumberLogDetailDialog').modal(modalOptions);
+                           }
+                       }
+                );
+            },
+            saveLogisticsNumberLog: function () {
+                showMask("提交中...");
+                var form = $("#logisticsNumberLogDetailForm");
+                var valid = validate(form, {  
+                    'detail.number_log.num_id': {
+                        required: true, digits: true
+                    },
+                    'detail.number_log.mode_name': {
+                        required: true
+                    },
+                    'detail.number_log.num_range': {
+                        required: true
+                    },
+                    'detail.number_log.desc': {
+                        required: false, maxlength: 500
+                    },
+                    'detail.number_log.user_id': {
+                        required: true, digits: true
+                    },
+                    'detail.number_log.login_name': {
+                        required: true
+                    }
+                });
+
+                if (!valid) {
+                    hideMask();
+                } else {
+                    $.ajax({
+                               url: '{%url "ErpLogisticsNumberLog.Save"%}',
+                               type: "POST",
+                               processData: false,
+                               contentType: 'application/json',
+                               data: JSON.stringify(vm.detail),
+                               success: function (data) {
+                                   hideMask();
+                                   if (data.success == false) {
+                                       $.msg.error(data.message);
+                                       //return;
+                                   }
+                                   else {
+                                       $.msg.show(data.message);
+                                       $('#logisticsNumberLogDetailDialog').modal('hide');
+                                       vm.reloadList();
+                                       //return;
+                                   }
+                               }
+                           }
+                    );
+                }
+            },
+            deleteLogisticsNumberLog: function () {
+                var id_list = [];
+                $('#logisticsNumberLogList tbody tr>td:first-child input:checkbox').each(function () {
+                    if (this.checked) {
+                        id_list.push($(this).val());
+                    }
+                });
+
+                if (id_list.length == 0) {
+                    $.msg.alert("请选择数据！");
+                    return;
+                }
+
+                $.msg.confirm("确认要删除吗？", function () {
+                    $.ajax({
+                               url: '{%url "ErpLogisticsNumberLog.Delete"%}',
+                               type: "POST",
+                               data: {"id_list": id_list},
+                               success: function (data) {
+                                   if (data.success == false) {
+                                       $.msg.error(data.message);
+                                       return;
+                                   }
+                                   else {
+                                       $.msg.show(data.message);
+                                   }
+                                   vm.reloadList();
+                               }
+                           });
+                });
+            }
+        }
+    });
+</script>
+{%footer%}
+

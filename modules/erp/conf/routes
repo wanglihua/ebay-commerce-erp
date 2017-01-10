@@ -171,3 +171,20 @@ POST /erp/order/custom/type/data/detail        ErpOrderCustomType.DetailData
 POST /erp/order/custom/type/save               ErpOrderCustomType.Save
 POST /erp/order/custom/type/delete             ErpOrderCustomType.Delete
 
+GET  /erp/logistics/number                     ErpLogisticsNumber.Index
+POST /erp/logistics/number/data/list           ErpLogisticsNumber.ListData
+POST /erp/logistics/number/data/detail         ErpLogisticsNumber.DetailData
+POST /erp/logistics/number/save                ErpLogisticsNumber.Save
+POST /erp/logistics/number/delete              ErpLogisticsNumber.Delete
+
+GET  /erp/logistics/number/batch               ErpLogisticsNumberBatch.Index
+POST /erp/logistics/number/batch/data/list     ErpLogisticsNumberBatch.ListData
+POST /erp/logistics/number/batch/data/detail   ErpLogisticsNumberBatch.DetailData
+POST /erp/logistics/number/batch/save          ErpLogisticsNumberBatch.Save
+POST /erp/logistics/number/batch/delete        ErpLogisticsNumberBatch.Delete
+
+GET  /erp/logistics/number/log                 ErpLogisticsNumberLog.Index
+POST /erp/logistics/number/log/data/list       ErpLogisticsNumberLog.ListData
+POST /erp/logistics/number/log/data/detail     ErpLogisticsNumberLog.DetailData
+POST /erp/logistics/number/log/save            ErpLogisticsNumberLog.Save
+POST /erp/logistics/number/log/delete          ErpLogisticsNumberLog.Delete
