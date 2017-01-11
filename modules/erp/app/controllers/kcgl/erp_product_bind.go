@@ -1,4 +1,3 @@
-
 package controllers
 
 import (
@@ -8,6 +7,7 @@ import (
 
 	"matrix/core"
 	"matrix/modules/erp/models"
+	"matrix/modules/erp/service/status_service"
 )
 
 type ErpProductBind struct {
@@ -18,11 +18,30 @@ func (c ErpProductBind) Index() revel.Result {
 	return c.RenderTemplate("erp/kcgl/product_bind/product_bind_index.html")
 }
 
+type ErpProductBindViewItem struct {
+	models.ProductBindInfo      `xorm:"extends" json:"b"`
+	models.PackageMaterialInfo  `xorm:"extends" json:"m"`
+	models.StatusInfo           `xorm:"extends" json:"s"`
+}
+
 func (c ErpProductBind) ListData() revel.Result {
 	db_session := c.DbSession
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
-	query := db_session.Where(filter)
+
+	/*
+		SELECT b.*, m.*, s.*
+		FROM erp_product_bind b
+		    INNER JOIN erp_package_material m ON b.pkg_mtrl_id = m.id
+		    INNER JOIN erp_status s ON b.status_id = s.id
+	 */
+
+	query := db_session.
+	Select("b.*, m.*, s.*").
+		Table("erp_product_bind").Alias("b").
+		Join("INNER", []string{"erp_package_material", "m"}, "b.pkg_mtrl_id = m.id").
+		Join("INNER", []string{"erp_status", "s"}, "b.status_id = s.id").
+		Where(filter)
 
 	//query extra filter here
 
@@ -33,12 +52,12 @@ func (c ErpProductBind) ListData() revel.Result {
 		data_query = *data_query.Asc("id")
 	}
 
-	product_bind_list := make([]models.ProductBindInfo, 0, limit)
+	product_bind_list := make([]ErpProductBindViewItem, 0, limit)
 	err := data_query.Limit(limit, offset).Find(&product_bind_list)
 	core.HandleError(err)
 
 	count_query := *query
-	count, err := count_query.Count(new(models.ProductBindInfo))
+	count, err := count_query.Count(new(ErpProductBindViewItem))
 	core.HandleError(err)
 
 	return c.RenderJson(core.GridResult{
@@ -48,14 +67,16 @@ func (c ErpProductBind) ListData() revel.Result {
 }
 
 type ProductBindDetailForm struct {
-	ProductBind models.ProductBindInfo `json:"product_bind"`
+	ProductBind         models.ProductBindInfo       `json:"product_bind"`
+	PackageMaterialList []models.PackageMaterialInfo `json:"package_material_list"`
+	StatusList          []models.StatusInfo          `json:"status_list"`
 }
 
 func (f *ProductBindDetailForm) IsCreate() bool {
 	return f.ProductBind.Id == 0
 }
 
-func (f *ProductBindDetailForm) Valid(validation *revel.Validation) bool { 
+func (f *ProductBindDetailForm) Valid(validation *revel.Validation) bool {
 	validation.Required(f.ProductBind.Code).Message("商品编号不能为空！")
 	if f.ProductBind.Code != "" {
 		validation.MinSize(f.ProductBind.Code, 2).Message("商品编号长度不能小于2！")
@@ -102,8 +123,16 @@ func (c ErpProductBind) DetailData() revel.Result {
 		}
 	}
 
+	var package_material_list []models.PackageMaterialInfo
+	err := db_session.Find(&package_material_list)
+	core.HandleError(err)
+
+	status_list := status_service.GetStatusList(db_session, models.STATUS_TYPE_PRODUCT_BIND)
+
 	var detail_form ProductBindDetailForm
 	detail_form.ProductBind = product_bind
+	detail_form.PackageMaterialList = package_material_list
+	detail_form.StatusList = status_list
 
 	return c.RenderJson(detail_form)
 }
@@ -122,10 +151,10 @@ func (c ErpProductBind) Save() revel.Result {
 	product_bind := detail_form.ProductBind
 
 	var affected int64
-	if detail_form.IsCreate() { 
+	if detail_form.IsCreate() {
 		affected, err = db_session.Insert(&product_bind)
 		core.HandleError(err)
-	} else { 
+	} else {
 		affected, err = db_session.Id(product_bind.Id).Update(&product_bind)
 		core.HandleError(err)
 
@@ -148,4 +177,3 @@ func (c ErpProductBind) Delete() revel.Result {
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})
 }
-

@@ -20,6 +20,7 @@ const (
 	STATUS_TYPE_ORDER_CUSTOM_TYPE      = 1000 //订单自定义类型
 	STATUS_TYPE_LOGISTICS_NUMBER       = 1100 //不规则订单运单号类型
 	STATUS_TYPE_LOGISTICS_NUMBER_BATCH = 1200 //不规则订单运单号类型
+	STATUS_TYPE_PRODUCT_BIND           = 1300 //绑定商品状态
 
 	//状态类型 end
 
@@ -71,12 +72,17 @@ const (
 	ORDER_CUSTOM_TYPE_ENABLED  = 2500
 	ORDER_CUSTOM_TYPE_DISABLED = 2600
 
-	// 订单运单号 已使用 未使用
+	// 不规则订单运单号 已使用 未使用
 	LOGISTICS_NUMBER_USED     = 2700
 	LOGISTICS_NUMBER_NOT_USED = 2800
 
-	LOGISTICS_NUMBER_BATCH_ENABLED = 2900
+	// 订单运单号 正常 停用
+	LOGISTICS_NUMBER_BATCH_ENABLED  = 2900
 	LOGISTICS_NUMBER_BATCH_DISABLED = 3000
+
+	// 绑定商品状态 正常 停产
+	PRODUCT_BIND_NORMAL  = 3100
+	PRODUCT_BIND_STOPPED = 3200
 
 	//状态 id end
 )
@@ -313,7 +319,6 @@ func (e StatusInfo) InitData(db_session *xorm.Session) {
 	status.Desc = core.NewNullString("订单运单号 停用", true)
 	db_session.Insert(status)
 
-
 	//不规则订单运单号状态
 	status = new(StatusInfo)
 	status.Id = LOGISTICS_NUMBER_NOT_USED
@@ -323,9 +328,26 @@ func (e StatusInfo) InitData(db_session *xorm.Session) {
 	db_session.Insert(status)
 
 	status = new(StatusInfo)
-	status.Id = LOGISTICS_NUMBER_BATCH_DISABLED
+	status.Id = LOGISTICS_NUMBER_USED
 	status.Type = STATUS_TYPE_LOGISTICS_NUMBER
 	status.Name = "已使用"
 	status.Desc = core.NewNullString("订单运单号 已使用", true)
+	db_session.Insert(status)
+
+	//STATUS_TYPE_PRODUCT_BIND
+
+	// 绑定商品状态 正常 停产
+	status = new(StatusInfo)
+	status.Id = PRODUCT_BIND_NORMAL
+	status.Type = STATUS_TYPE_PRODUCT_BIND
+	status.Name = "正常"
+	status.Desc = core.NewNullString("绑定商品状态 正常", true)
+	db_session.Insert(status)
+
+	status = new(StatusInfo)
+	status.Id = PRODUCT_BIND_STOPPED
+	status.Type = STATUS_TYPE_PRODUCT_BIND
+	status.Name = "停产"
+	status.Desc = core.NewNullString("绑定商品状态 停产", true)
 	db_session.Insert(status)
 }
