@@ -23,15 +23,15 @@ func GetXsbbMenu(db_session *xorm.Session, web_session revel.Session) string {
     <b class="arrow"></b>
     <ul class="submenu">
 
-        <li id="xsbb-a-menu" class="">
-            <a href="#">
+        <li id="xsbb-diary-income-report-menu" class="">
+            <a href="/erp/diary/income/report">
                 <i class="menu-icon fa fa-caret-right"></i>
                 日收入报表
             </a>
             <b class="arrow"></b>
         </li>
 
-        <li id="xsbb-b-menu" class="">
+        <li id="xsbb-diary-sales-report-menu" class="">
             <a href="#">
                 <i class="menu-icon fa fa-caret-right"></i>
                 日销售报表
@@ -39,7 +39,7 @@ func GetXsbbMenu(db_session *xorm.Session, web_session revel.Session) string {
             <b class="arrow"></b>
         </li>
 
-        <li id="xsbb-c-menu" class="">
+        <li id="xsbb-month-sales-amount-report-menu" class="">
             <a href="#">
                 <i class="menu-icon fa fa-caret-right"></i>
                 月销售额报表
@@ -47,7 +47,7 @@ func GetXsbbMenu(db_session *xorm.Session, web_session revel.Session) string {
             <b class="arrow"></b>
         </li>
 
-        <li id="xsbb-d-menu" class="">
+        <li id="xsbb-hot-sales-product-rank-menu" class="">
             <a href="#">
                 <i class="menu-icon fa fa-caret-right"></i>
                 热销商品排名
