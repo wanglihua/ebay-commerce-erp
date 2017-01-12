@@ -32,7 +32,7 @@ func GetXsbbMenu(db_session *xorm.Session, web_session revel.Session) string {
         </li>
 
         <li id="xsbb-diary-sales-report-menu" class="">
-            <a href="#">
+            <a href="/epr/diary/sales/report">
                 <i class="menu-icon fa fa-caret-right"></i>
                 日销售报表
             </a>
@@ -40,7 +40,7 @@ func GetXsbbMenu(db_session *xorm.Session, web_session revel.Session) string {
         </li>
 
         <li id="xsbb-month-sales-amount-report-menu" class="">
-            <a href="#">
+            <a href="/erp/month/sales/amount/report">
                 <i class="menu-icon fa fa-caret-right"></i>
                 月销售额报表
             </a>
@@ -48,47 +48,47 @@ func GetXsbbMenu(db_session *xorm.Session, web_session revel.Session) string {
         </li>
 
         <li id="xsbb-hot-sales-product-rank-menu" class="">
-            <a href="#">
+            <a href="/erp/hot/sales/product/rank">
                 <i class="menu-icon fa fa-caret-right"></i>
                 热销商品排名
             </a>
             <b class="arrow"></b>
         </li>
 
-        <li id="xsbb-e-menu" class="">
-            <a href="#">
+        <li id="xsbb-hot-sales-store-rank-menu" class="">
+            <a href="/erp/hot/sales/store/rank">
                 <i class="menu-icon fa fa-caret-right"></i>
                 热销店铺排名
             </a>
             <b class="arrow"></b>
         </li>
 
-        <li id="xsbb-f-menu" class="">
-            <a href="#">
+        <li id="xsbb-area-sales-amount-report-menu" class="">
+            <a href="/erp/area/sales/amount/report">
                 <i class="menu-icon fa fa-caret-right"></i>
                 按地区销售额报表
             </a>
             <b class="arrow"></b>
         </li>
 
-        <li id="xsbb-g-menu" class="">
-            <a href="#">
+        <li id="xsbb-product-feed-report-menu" class="">
+            <a href="/erp/product/feed/report">
                 <i class="menu-icon fa fa-caret-right"></i>
                 商品反馈报表
             </a>
             <b class="arrow"></b>
         </li>
 
-        <li id="xsbb-h-menu" class="">
-            <a href="#">
+        <li id="xsbb-single-product-sales-query-menu" class="">
+            <a href="/erp/single/product/sales/query">
                 <i class="menu-icon fa fa-caret-right"></i>
                 单商品销售查询
             </a>
             <b class="arrow"></b>
         </li>
 
-        <li id="xsbb-i-menu" class="">
-            <a href="#">
+        <li id="xsbb-person-sales-report-menu" class="">
+            <a href="/erp/person/sales/report">
                 <i class="menu-icon fa fa-caret-right"></i>
                 人员营业报表
             </a>

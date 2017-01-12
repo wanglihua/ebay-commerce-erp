@@ -9,5 +9,5 @@ type ErpDiaryIncomeReport struct {
 }
 
 func (c ErpDiaryIncomeReport) Index() revel.Result {
-	return c.RenderTemplate("erp/sppz/brand/brand_index.html")
+	return c.RenderTemplate("erp/xsbb/diary_income_report/diary_income_report_index.html")
 }
