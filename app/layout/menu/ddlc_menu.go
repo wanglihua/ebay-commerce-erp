@@ -24,7 +24,7 @@ func GetDdlcMenu(db_session *xorm.Session, web_session revel.Session) string {
     <ul class="submenu">
 
         <li id="ddlc-order-all-menu" class="">
-            <a href="#">
+            <a href="/erp/order/all">
                 <i class="menu-icon fa fa-caret-right"></i>
                 所有订单
             </a>
@@ -32,7 +32,7 @@ func GetDdlcMenu(db_session *xorm.Session, web_session revel.Session) string {
         </li>
 
         <li id="ddlc-order-yzf-menu" class="">
-            <a href="#">
+            <a href="/erp/order/yzf">
                 <i class="menu-icon fa fa-caret-right"></i>
                 已支付
             </a>
@@ -40,7 +40,7 @@ func GetDdlcMenu(db_session *xorm.Session, web_session revel.Session) string {
         </li>
 
         <li id="ddlc-order-dph-menu" class="">
-            <a href="#">
+            <a href="/erp/order/dph">
                 <i class="menu-icon fa fa-caret-right"></i>
                 待配货
             </a>
@@ -48,7 +48,7 @@ func GetDdlcMenu(db_session *xorm.Session, web_session revel.Session) string {
         </li>
 
         <li id="ddlc-order-phz-menu" class="">
-            <a href="#">
+            <a href="/erp/order/phz">
                 <i class="menu-icon fa fa-caret-right"></i>
                 配货中
             </a>
@@ -56,7 +56,7 @@ func GetDdlcMenu(db_session *xorm.Session, web_session revel.Session) string {
         </li>
 
         <li id="ddlc-order-yfh-menu" class="">
-            <a href="#">
+            <a href="/erp/order/yfh">
                 <i class="menu-icon fa fa-caret-right"></i>
                 已发货
             </a>
@@ -64,7 +64,7 @@ func GetDdlcMenu(db_session *xorm.Session, web_session revel.Session) string {
         </li>
 
         <li id="ddlc-order-ywc-menu" class="">
-            <a href="#">
+            <a href="/erp/order/ywc">
                 <i class="menu-icon fa fa-caret-right"></i>
                 已完成
             </a>
@@ -72,7 +72,7 @@ func GetDdlcMenu(db_session *xorm.Session, web_session revel.Session) string {
         </li>
 
         <li id="ddlc-order-khb-menu" class="">
-            <a href="#">
+            <a href="/erp/order/khb">
                 <i class="menu-icon fa fa-caret-right"></i>
                 可合并的订单
             </a>

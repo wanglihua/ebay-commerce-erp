@@ -204,3 +204,11 @@ GET  /erp/area/sales/amount/report             ErpAreaSalesAmountReport.Index
 GET  /erp/product/feed/report                  ErpProductFeedReport.Index
 GET  /erp/single/product/sales/query           ErpSingleProductSalesQuery.Index
 GET  /erp/person/sales/report                  ErpPersonSalesReport.Index
+
+GET  /erp/order/all                            ErpOrderAll.Index
+GET  /erp/order/yzf                            ErpOrderYzf.Index
+GET  /erp/order/dph                            ErpOrderDph.Index
+GET  /erp/order/phz                            ErpOrderPhz.Index
+GET  /erp/order/yfh                            ErpOrderYfh.Index
+GET  /erp/order/ywc                            ErpOrderYwc.Index
+GET  /erp/order/khb                            ErpOrderKhb.Index
