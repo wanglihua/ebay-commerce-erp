@@ -194,3 +194,13 @@ POST /erp/product/bind/data/list               ErpProductBind.ListData
 POST /erp/product/bind/data/detail             ErpProductBind.DetailData
 POST /erp/product/bind/save                    ErpProductBind.Save
 POST /erp/product/bind/delete                  ErpProductBind.Delete
+
+GET  /erp/diary/income/report                  ErpDiaryIncomeReport.Index
+GET  /erp/diary/sales/report                   ErpDiarySalesReport.Index
+GET  /erp/month/sales/amount/report            ErpMonthSalesAmountReport.Index
+GET  /erp/hot/sales/product/rank               ErpHotSalesProductRank.Index
+GET  /erp/hot/sales/store/rank                 ErpHotSalesStoreRank.Index
+GET  /erp/area/sales/amount/report             ErpAreaSalesAmountReport.Index
+GET  /erp/product/feed/report                  ErpProductFeedReport.Index
+GET  /erp/single/product/sales/query           ErpSingleProductSalesQuery.Index
+GET  /erp/person/sales/report                  ErpPersonSalesReport.Index

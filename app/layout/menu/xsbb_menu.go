@@ -32,7 +32,7 @@ func GetXsbbMenu(db_session *xorm.Session, web_session revel.Session) string {
         </li>
 
         <li id="xsbb-diary-sales-report-menu" class="">
-            <a href="/epr/diary/sales/report">
+            <a href="/erp/diary/sales/report">
                 <i class="menu-icon fa fa-caret-right"></i>
                 日销售报表
             </a>
