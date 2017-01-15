@@ -14,6 +14,8 @@ func registerTags() {
 	revel.TemplateFuncs["footer"] = footerTemplateFunc
 
 	revel.TemplateFuncs["IntToStr"] = intToStrTemplateFunc
+
+	revel.TemplateFuncs["static_version"] = getStaticVersion
 }
 
 func testTemplateFunc(renderArgs map[string]interface{}) template.HTML {
@@ -38,4 +40,8 @@ func footerTemplateFunc() template.HTML {
 
 func intToStrTemplateFunc(val interface{}) string {
 	return fmt.Sprintf("%d", val)
+}
+
+func getStaticVersion() string {
+	return "201701150850"
 }
