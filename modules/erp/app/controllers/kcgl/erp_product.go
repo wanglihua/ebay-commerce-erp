@@ -80,32 +80,13 @@ func (f *ProductDetailForm) Valid(validation *revel.Validation) bool {
 		validation.MaxSize(f.Product.EnglishName, 100).Message("英文名称长度不能大于100！")
 	}
 
-	validation.Required(f.Product.StockName).Message("库存名称不能为空！")
-	if f.Product.StockName != "" {
-		validation.MinSize(f.Product.StockName, 2).Message("库存名称长度不能小于2！")
-	}
-	if f.Product.StockName != "" {
-		validation.MaxSize(f.Product.StockName, 100).Message("库存名称长度不能大于100！")
-	}
-
-
-
-	validation.Required(f.Product.RetailPrice).Message("零售价不能为空！")
-
 	validation.Required(f.Product.CostPrice).Message("成本价不能为空！")
 
 	validation.Required(f.Product.Quantity).Message("库存不能为空！")
 
 	validation.Required(f.Product.Weight).Message("重量不能为空！")
 
-
-
-
 	validation.Required(f.Product.SupplierPrice).Message("供应商报价不能为空！")
-
-	if f.Product.ProducingArea.Valid == true {
-		validation.MaxSize(f.Product.ProducingArea.String, 100).Message("产地长度不能大于100！")
-	}
 
 	validation.Required(f.Product.StatusId).Message("状态不能为空！")
 

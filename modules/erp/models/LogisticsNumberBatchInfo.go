@@ -4,6 +4,7 @@ import (
 	"matrix/core"
 )
 
+// 这个客户不需要
 type LogisticsNumberBatchInfo struct {
 	Id         int64                 `xorm:"bigint notnull pk autoincr 'id'" json:"id"`
 	ModeId     int64                 `xorm:"bigint notnull index 'mode_id'" json:"mode_id" smith:"verbose_name=物流方式"`

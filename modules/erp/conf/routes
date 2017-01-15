@@ -1,8 +1,8 @@
-GET  /erp/brand                                ErpBrand.Index
-POST /erp/brand/data/list                      ErpBrand.ListData
-POST /erp/brand/data/detail                    ErpBrand.DetailData
-POST /erp/brand/save                           ErpBrand.Save
-POST /erp/brand/delete                         ErpBrand.Delete
+# GET  /erp/brand                                ErpBrand.Index
+# POST /erp/brand/data/list                      ErpBrand.ListData
+# POST /erp/brand/data/detail                    ErpBrand.DetailData
+# POST /erp/brand/save                           ErpBrand.Save
+# POST /erp/brand/delete                         ErpBrand.Delete
 
 GET  /erp/stock                                ErpStock.Index
 POST /erp/stock/data/list                      ErpStock.ListData
@@ -28,17 +28,17 @@ POST /erp/exchange/rate/data/detail            ErpExchangeRate.DetailData
 POST /erp/exchange/rate/save                   ErpExchangeRate.Save
 POST /erp/exchange/rate/delete                 ErpExchangeRate.Delete
 
-GET  /erp/eub/goods/type                       ErpEubGoodsType.Index
-POST /erp/eub/goods/type/data/list             ErpEubGoodsType.ListData
-POST /erp/eub/goods/type/data/detail           ErpEubGoodsType.DetailData
-POST /erp/eub/goods/type/save                  ErpEubGoodsType.Save
-POST /erp/eub/goods/type/delete                ErpEubGoodsType.Delete
+# GET  /erp/eub/goods/type                       ErpEubGoodsType.Index
+# POST /erp/eub/goods/type/data/list             ErpEubGoodsType.ListData
+# POST /erp/eub/goods/type/data/detail           ErpEubGoodsType.DetailData
+# POST /erp/eub/goods/type/save                  ErpEubGoodsType.Save
+# POST /erp/eub/goods/type/delete                ErpEubGoodsType.Delete
 
-GET  /erp/eub/insurance/type                   ErpEubInsuranceType.Index
-POST /erp/eub/insurance/type/data/list         ErpEubInsuranceType.ListData
-POST /erp/eub/insurance/type/data/detail       ErpEubInsuranceType.DetailData
-POST /erp/eub/insurance/type/save              ErpEubInsuranceType.Save
-POST /erp/eub/insurance/type/delete            ErpEubInsuranceType.Delete
+# GET  /erp/eub/insurance/type                   ErpEubInsuranceType.Index
+# POST /erp/eub/insurance/type/data/list         ErpEubInsuranceType.ListData
+# POST /erp/eub/insurance/type/data/detail       ErpEubInsuranceType.DetailData
+# POST /erp/eub/insurance/type/save              ErpEubInsuranceType.Save
+# POST /erp/eub/insurance/type/delete            ErpEubInsuranceType.Delete
 
 GET  /erp/product/cate                         ErpProductCate.Index
 POST /erp/product/cate/data/list               ErpProductCate.ListData
@@ -48,7 +48,6 @@ POST /erp/product/cate/delete                  ErpProductCate.Delete
 
 GET  /erp/login/log                            ErpLoginLog.Index
 POST /erp/login/log/data/list                  ErpLoginLog.ListData
-
 
 GET  /erp/shop/account                         ErpShopAccount.Index
 POST /erp/shop/account/data/list               ErpShopAccount.ListData
@@ -171,23 +170,23 @@ POST /erp/order/custom/type/data/detail        ErpOrderCustomType.DetailData
 POST /erp/order/custom/type/save               ErpOrderCustomType.Save
 POST /erp/order/custom/type/delete             ErpOrderCustomType.Delete
 
-GET  /erp/logistics/number                     ErpLogisticsNumber.Index
-POST /erp/logistics/number/data/list           ErpLogisticsNumber.ListData
-POST /erp/logistics/number/data/detail         ErpLogisticsNumber.DetailData
-POST /erp/logistics/number/save                ErpLogisticsNumber.Save
-POST /erp/logistics/number/delete              ErpLogisticsNumber.Delete
+# GET  /erp/logistics/number                     ErpLogisticsNumber.Index
+# POST /erp/logistics/number/data/list           ErpLogisticsNumber.ListData
+# POST /erp/logistics/number/data/detail         ErpLogisticsNumber.DetailData
+# POST /erp/logistics/number/save                ErpLogisticsNumber.Save
+# POST /erp/logistics/number/delete              ErpLogisticsNumber.Delete
 
-GET  /erp/logistics/number/batch               ErpLogisticsNumberBatch.Index
-POST /erp/logistics/number/batch/data/list     ErpLogisticsNumberBatch.ListData
-POST /erp/logistics/number/batch/data/detail   ErpLogisticsNumberBatch.DetailData
-POST /erp/logistics/number/batch/save          ErpLogisticsNumberBatch.Save
-POST /erp/logistics/number/batch/delete        ErpLogisticsNumberBatch.Delete
+# GET  /erp/logistics/number/batch               ErpLogisticsNumberBatch.Index
+# POST /erp/logistics/number/batch/data/list     ErpLogisticsNumberBatch.ListData
+# POST /erp/logistics/number/batch/data/detail   ErpLogisticsNumberBatch.DetailData
+# POST /erp/logistics/number/batch/save          ErpLogisticsNumberBatch.Save
+# POST /erp/logistics/number/batch/delete        ErpLogisticsNumberBatch.Delete
 
-GET  /erp/logistics/number/log                 ErpLogisticsNumberLog.Index
-POST /erp/logistics/number/log/data/list       ErpLogisticsNumberLog.ListData
-POST /erp/logistics/number/log/data/detail     ErpLogisticsNumberLog.DetailData
-POST /erp/logistics/number/log/save            ErpLogisticsNumberLog.Save
-POST /erp/logistics/number/log/delete          ErpLogisticsNumberLog.Delete
+# GET  /erp/logistics/number/log                 ErpLogisticsNumberLog.Index
+# POST /erp/logistics/number/log/data/list       ErpLogisticsNumberLog.ListData
+# POST /erp/logistics/number/log/data/detail     ErpLogisticsNumberLog.DetailData
+# POST /erp/logistics/number/log/save            ErpLogisticsNumberLog.Save
+# POST /erp/logistics/number/log/delete          ErpLogisticsNumberLog.Delete
 
 GET  /erp/product/bind                         ErpProductBind.Index
 POST /erp/product/bind/data/list               ErpProductBind.ListData
