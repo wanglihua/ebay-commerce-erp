@@ -80,6 +80,9 @@ POST /erp/product/save                         ErpProduct.Save
 POST /erp/product/delete                       ErpProduct.Delete
 
 GET  /erp/product/import                       ErpProductImport.Index
+POST /erp/product/import/data/list             ErpProductImport.ListData
+POST /erp/product/import/confirm               ErpProductImport.Confirm
+POST /erp/product/import/clear                 ErpProductImport.Clear
 
 GET  /erp/product/export                       ErpProductExport.Index
 POST /erp/product/export/data/list             ErpProductExport.ListData

@@ -10,14 +10,15 @@ import (
 )
 
 //var output_base_dir = "/home/wanglihua/gopath/src/matrix"
-var output_base_dir = "z:/GoPath/src/matrix"
+//var output_base_dir = "z:/GoPath/src/matrix"
+var output_base_dir = "z:/code_gen"
 var import_path = "matrix"
 var module_title_name = models.ModuleTitleName
 var module_lower_case = models.ModuleLowerCase
 var module_chinese = models.ModuleChinese
 var table_prefix = models.TablePrefix
 var model_list = []interface{}{
-	models.ProductBindInfo{},
+	models.ProductImportInfo{},
 	//models.StockBillEntryInfo{},
 	//models.InventoryCheckInfo{},
 	//models.InventoryCheckEntryInfo{},

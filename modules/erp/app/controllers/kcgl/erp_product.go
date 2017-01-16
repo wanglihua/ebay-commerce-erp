@@ -86,22 +86,6 @@ func (f *ProductDetailForm) Valid(validation *revel.Validation) bool {
 
 	validation.Required(f.Product.StatusId).Message("状态不能为空！")
 
-	if f.Product.Xsxx.Valid == true {
-		validation.MaxSize(f.Product.Xsxx.String, 500).Message("销售信息长度不能大于500！")
-	}
-
-	if f.Product.Ywmjl.Valid == true {
-		validation.MaxSize(f.Product.Ywmjl.String, 500).Message("英文名记录长度不能大于500！")
-	}
-
-	if f.Product.Zjbz.Valid == true {
-		validation.MaxSize(f.Product.Zjbz.String, 500).Message("质检标准长度不能大于500！")
-	}
-
-	if f.Product.Bzxx.Valid == true {
-		validation.MaxSize(f.Product.Bzxx.String, 500).Message("备注信息长度不能大于500！")
-	}
-
 	return validation.HasErrors() == false
 }
 
