@@ -82,11 +82,7 @@ func (f *ProductDetailForm) Valid(validation *revel.Validation) bool {
 
 	validation.Required(f.Product.CostPrice).Message("成本价不能为空！")
 
-	validation.Required(f.Product.Quantity).Message("库存不能为空！")
-
 	validation.Required(f.Product.Weight).Message("重量不能为空！")
-
-	validation.Required(f.Product.SupplierPrice).Message("供应商报价不能为空！")
 
 	validation.Required(f.Product.StatusId).Message("状态不能为空！")
 
