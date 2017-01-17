@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"matrix/core"
 	"matrix/modules/erp/models"
+	"github.com/tealeg/xlsx"
 )
 
 type ErpProductImport struct {
@@ -46,6 +47,40 @@ func (c ErpProductImport) ListData() revel.Result {
 }
 
 func (c ErpProductImport) Import() revel.Result {
+	excel_file_bytes := make([]byte, 0)
+	c.Params.Bind(&excel_file_bytes, "excel_file")
+
+	c.Validation.Required(excel_file_bytes).Message("指定文件内容未成功上传！")
+
+	if c.Validation.HasErrors() {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": c.GetValidationErrorMessage(),
+		})
+	}
+
+	xlsx_file, err := xlsx.OpenBinary(excel_file_bytes)
+	core.HandleError(err)
+
+	sheet_count := len(xlsx_file.Sheets)
+	revel.TRACE.Printf("sheet_count: %d\n", sheet_count)
+	for sheet_index := 0; sheet_index < sheet_count; sheet_index ++ {
+		sheet := xlsx_file.Sheets[sheet_index]
+		max_row := sheet.MaxRow
+		revel.TRACE.Printf("max_row: %d\n", max_row)
+		for row_index := 0; row_index < max_row; row_index ++ {
+			row := sheet.Rows[row_index]
+			cell := row.Cells[0]
+			cell_val, _ := cell.String()
+			revel.TRACE.Println(cell_val)
+		}
+	}
+
+	return c.RenderJson(map[string]interface{}{
+		"success":  true,
+		"message":  "文件上传成功！",
+	})
+
 	return c.RenderJson(core.JsonResult{Success: true, Message: "Excel数据上传成功!"})
 }
 
@@ -60,7 +95,7 @@ func (c ErpProductImport) Clear() revel.Result {
 	login_user_id := login_user.UserId
 
 	_, err := db_session.
-		Where(fmt.Sprintf("%s = ?", models.ProductImportCols.UserId), login_user_id).
+	Where(fmt.Sprintf("%s = ?", models.ProductImportCols.UserId), login_user_id).
 		Delete(new(models.ProductImportInfo))
 	core.HandleError(err)
 
