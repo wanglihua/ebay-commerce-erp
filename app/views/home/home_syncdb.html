@@ -22,19 +22,20 @@
                 function syncdb() {
                     $.msg.confirm("确认要同步数据库吗？", function () {
                         $.ajax({
-                                   url: '{%url "Home.SyncDbPost"%}',
-                                   type: "POST",
-                                   success: function (data) {
-                                       if (data.success == false) {
-                                           $.msg.error(data.message);
-                                           return;
-                                       }
-                                       else {
-                                           $.msg.show(data.message);
-                                           return;
-                                       }
-                                   }
-                               });
+                            url: '{%url "Home.SyncDbPost"%}',
+                            type: "POST",
+                            timeout: 120 * 1000, //120秒
+                            success: function (data) {
+                                if (data.success == false) {
+                                    $.msg.error(data.message);
+                                    return;
+                                }
+                                else {
+                                    $.msg.show(data.message);
+                                    return;
+                                }
+                            }
+                        });
                     });
                 }
             </script>
