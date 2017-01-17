@@ -12,6 +12,8 @@ GET  /                          Home.Index
 GET  /syncdb                    Home.SyncDb
 POST /syncdb/post               Home.SyncDbPost
 
+GET  /captcha/image             Captcha.Image
+
 GET  /login                     Login.Index
 POST /login                     Login.Login
 POST /logout                    Login.Logout
