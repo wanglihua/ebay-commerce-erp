@@ -161,22 +161,17 @@ func (c ErpProductImport) Confirm() revel.Result {
 	db_session := c.DbSession
 
 	sql := `
-DELIMITER //
-CREATE PROCEDURE erp_trans_import_product(IN login_user_id INT)
-    BEGIN
-        INSERT INTO erp_product (sku, name, english_name, cost_price, weight, create_time, update_time, version)
-            SELECT pi.sku, pi.name, pi.english_name, pi.cost_price, pi.weight, pi.import_time, pi.import_time, 1
-            FROM erp_product_import pi
-            WHERE pi.user_id = login_user_id;
-        DELETE FROM erp_product_import WHERE user_id = login_user_id;
-    END
-//
-DELIMITER ;
+INSERT INTO erp_product (sku, name, english_name, cost_price, weight, status_id, create_time, update_time, version)
+    SELECT pi.sku, pi.name, pi.english_name, pi.cost_price, pi.weight, %d, pi.import_time, pi.import_time, 1
+    FROM erp_product_import pi
+    WHERE pi.user_id = %d;
+DELETE FROM erp_product_import WHERE user_id = %d;
 	`
-	//login_user := core.GetLoginUser(c.Session)
-	//login_user_id := login_user.UserId
+	login_user := core.GetLoginUser(c.Session)
+	login_user_id := login_user.UserId
 
-	//_, err := db_session.Exec(sql, login_user_id, login_user_id)
+	sql = fmt.Sprintf(sql, models.PRODUCT_STATUS_ZC, login_user_id, login_user_id)
+
 	_, err := db_session.Exec(sql)
 	core.HandleError(err)
 
