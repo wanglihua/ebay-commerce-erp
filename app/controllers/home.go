@@ -4,8 +4,8 @@ import (
 	"matrix/app/models"
 	"matrix/core"
 	"matrix/db"
-	erp_models "matrix/modules/erp/models"
 	auth_models "matrix/modules/auth/models"
+	erp_models "matrix/modules/erp/models"
 
 	"github.com/revel/revel"
 )

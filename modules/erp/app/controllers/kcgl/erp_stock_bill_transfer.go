@@ -2,12 +2,12 @@ package controllers
 
 import (
 	"encoding/json"
-	"strconv"
 	"github.com/revel/revel"
+	"strconv"
 
 	"matrix/core"
-	"matrix/modules/erp/models"
 	auth_models "matrix/modules/auth/models"
+	"matrix/modules/erp/models"
 	"time"
 )
 
@@ -20,10 +20,10 @@ func (c ErpStockBillTransfer) Index() revel.Result {
 }
 
 type ErpStockBillTransferViewItem struct {
-	models.StockBillInfo            `xorm:"extends" json:"sb"`
-	SrcStock  models.StockInfo      `xorm:"extends" json:"sc"`
-	DestStock models.StockInfo      `xorm:"extends" json:"dc"`
-	auth_models.UserInfo            `xorm:"extends" json:"u"`
+	models.StockBillInfo `xorm:"extends" json:"sb"`
+	SrcStock             models.StockInfo `xorm:"extends" json:"sc"`
+	DestStock            models.StockInfo `xorm:"extends" json:"dc"`
+	auth_models.UserInfo `xorm:"extends" json:"u"`
 }
 
 func (c ErpStockBillTransfer) ListData() revel.Result {
@@ -38,10 +38,10 @@ func (c ErpStockBillTransfer) ListData() revel.Result {
 		    INNER JOIN erp_stock dc ON sb.stock_id = dc.id
 		    INNER JOIN auth_user u ON sb.user_id = u.id
 		WHERE sb.type_id = 300
-	 */
+	*/
 
 	query := db_session.
-	Select("sb.*, sc.*, dc.*, u.*").
+		Select("sb.*, sc.*, dc.*, u.*").
 		Table("erp_stock_bill").Alias("sb").
 		Join("LEFT", []string{"erp_stock", "sc"}, "sb.src_stock_id = sc.id").
 		Join("INNER", []string{"erp_stock", "dc"}, "sb.stock_id = dc.id").
@@ -157,7 +157,7 @@ func (c ErpStockBillTransfer) Save() revel.Result {
 		core.HandleError(err)
 
 		if affected == 0 {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！" })
+			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！"})
 		}
 	}
 

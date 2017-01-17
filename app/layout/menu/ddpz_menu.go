@@ -54,29 +54,28 @@ func GetDdpzMenu(db_session *xorm.Session, web_session revel.Session) string {
 	return buffer.String()
 }
 
-
 /*
-    <li id="ddpz-logisticsnumberbatch-menu" class="">
-        <a href="/erp/logistics/number/batch">
-            <i class="menu-icon fa fa-caret-right"></i>
-            订单运单号
-        </a>
-        <b class="arrow"></b>
-    </li>
+   <li id="ddpz-logisticsnumberbatch-menu" class="">
+       <a href="/erp/logistics/number/batch">
+           <i class="menu-icon fa fa-caret-right"></i>
+           订单运单号
+       </a>
+       <b class="arrow"></b>
+   </li>
 
-    <li id="ddpz-logisticsnumber-menu" class="">
-        <a href="/erp/logistics/number">
-            <i class="menu-icon fa fa-caret-right"></i>
-            运单号不规则号段
-        </a>
-        <b class="arrow"></b>
-    </li>
+   <li id="ddpz-logisticsnumber-menu" class="">
+       <a href="/erp/logistics/number">
+           <i class="menu-icon fa fa-caret-right"></i>
+           运单号不规则号段
+       </a>
+       <b class="arrow"></b>
+   </li>
 
-    <li id="ddpz-logisticsnumberlog-menu" class="">
-        <a href="/erp/logistics/number/log">
-            <i class="menu-icon fa fa-caret-right"></i>
-            运单号操作日志
-        </a>
-        <b class="arrow"></b>
-    </li>
- */
+   <li id="ddpz-logisticsnumberlog-menu" class="">
+       <a href="/erp/logistics/number/log">
+           <i class="menu-icon fa fa-caret-right"></i>
+           运单号操作日志
+       </a>
+       <b class="arrow"></b>
+   </li>
+*/

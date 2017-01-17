@@ -2,8 +2,8 @@ package controllers
 
 import (
 	"encoding/json"
-	"strconv"
 	"github.com/revel/revel"
+	"strconv"
 
 	"matrix/core"
 	"matrix/modules/erp/models"
@@ -19,8 +19,8 @@ func (c ErpPaypalAccount) Index() revel.Result {
 }
 
 type ErpPaypalAccountViewItem struct {
-	models.PaypalAccountInfo  `xorm:"extends" json:"a"`
-	models.StatusInfo         `xorm:"extends" json:"s"`
+	models.PaypalAccountInfo `xorm:"extends" json:"a"`
+	models.StatusInfo        `xorm:"extends" json:"s"`
 }
 
 func (c ErpPaypalAccount) ListData() revel.Result {
@@ -31,13 +31,13 @@ func (c ErpPaypalAccount) ListData() revel.Result {
 	/*
 		SELECT a.*, s.* FROM erp_paypal_account a
 		    INNER JOIN erp_status s ON a.status_id = s.id
-	 */
+	*/
 
 	query := db_session.
 		Select("a.*, s.*").
-			Table("erp_paypal_account").Alias("a").
-			Join("INNER", []string{"erp_status", "s"}, "a.status_id = s.id").
-			Where(filter)
+		Table("erp_paypal_account").Alias("a").
+		Join("INNER", []string{"erp_status", "s"}, "a.status_id = s.id").
+		Where(filter)
 
 	//query extra filter here
 
@@ -151,7 +151,7 @@ func (c ErpPaypalAccount) Save() revel.Result {
 		core.HandleError(err)
 
 		if affected == 0 {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！" })
+			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！"})
 		}
 	}
 

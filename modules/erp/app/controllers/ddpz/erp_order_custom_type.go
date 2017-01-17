@@ -2,8 +2,8 @@ package controllers
 
 import (
 	"encoding/json"
-	"strconv"
 	"github.com/revel/revel"
+	"strconv"
 
 	"matrix/core"
 	"matrix/modules/erp/models"
@@ -19,8 +19,8 @@ func (c ErpOrderCustomType) Index() revel.Result {
 }
 
 type ErpOrderCustomTypeViewItem struct {
-	models.OrderCustomTypeInfo  `xorm:"extends" json:"t"`
-	models.StatusInfo           `xorm:"extends" json:"s"`
+	models.OrderCustomTypeInfo `xorm:"extends" json:"t"`
+	models.StatusInfo          `xorm:"extends" json:"s"`
 }
 
 func (c ErpOrderCustomType) ListData() revel.Result {
@@ -32,10 +32,10 @@ func (c ErpOrderCustomType) ListData() revel.Result {
 		SELECT t.*, s.*
 		FROM erp_order_custom_type t
 		    INNER JOIN erp_status s ON t.status_id = s.id
-	 */
+	*/
 
 	query := db_session.
-	Select("t.*, s.*").
+		Select("t.*, s.*").
 		Table("erp_order_custom_type").Alias("t").
 		Join("INNER", []string{"erp_status", "s"}, "t.status_id = s.id").
 		Where(filter)
@@ -134,7 +134,7 @@ func (c ErpOrderCustomType) Save() revel.Result {
 		core.HandleError(err)
 
 		if affected == 0 {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！" })
+			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！"})
 		}
 	}
 

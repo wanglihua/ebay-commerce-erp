@@ -2,8 +2,8 @@ package controllers
 
 import (
 	"encoding/json"
-	"strconv"
 	"github.com/revel/revel"
+	"strconv"
 
 	"matrix/core"
 	"matrix/modules/erp/models"
@@ -19,8 +19,8 @@ func (c ErpPackageMaterial) Index() revel.Result {
 }
 
 type ErpPackageMaterialViewItem struct {
-	models.PackageMaterialInfo      `xorm:"extends" json:"p"`
-	models.StatusInfo               `xorm:"extends" json:"s"`
+	models.PackageMaterialInfo `xorm:"extends" json:"p"`
+	models.StatusInfo          `xorm:"extends" json:"s"`
 }
 
 func (c ErpPackageMaterial) ListData() revel.Result {
@@ -31,10 +31,10 @@ func (c ErpPackageMaterial) ListData() revel.Result {
 	/*
 		SELECT p.*, s.* FROM erp_package_material p
 		    INNER JOIN erp_status s ON p.status_id = s.id
-	 */
+	*/
 
 	query := db_session.
-	Select("p.*, s.*").
+		Select("p.*, s.*").
 		Table("erp_package_material").Alias("p").
 		Join("INNER", []string{"erp_status", "s"}, "p.status_id = s.id").
 		Where(filter)
@@ -63,8 +63,8 @@ func (c ErpPackageMaterial) ListData() revel.Result {
 }
 
 type PackageMaterialDetailForm struct {
-	PackageMaterial models.PackageMaterialInfo  `json:"package_material"`
-	StatusList      []models.StatusInfo         `json:"status_list"`
+	PackageMaterial models.PackageMaterialInfo `json:"package_material"`
+	StatusList      []models.StatusInfo        `json:"status_list"`
 }
 
 func (f *PackageMaterialDetailForm) IsCreate() bool {
@@ -147,7 +147,7 @@ func (c ErpPackageMaterial) Save() revel.Result {
 		core.HandleError(err)
 
 		if affected == 0 {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！" })
+			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！"})
 		}
 	}
 

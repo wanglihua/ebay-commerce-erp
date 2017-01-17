@@ -20,6 +20,8 @@ func (c Login) Index() revel.Result {
 }
 
 func (c Login) Login() revel.Result {
+	//当用户名和密码错误的时候，应该让原来的验证码失效
+
 	db_session := c.DbSession
 
 	c.makePreviousSessionExpire()
@@ -59,7 +61,7 @@ func (c Login) Login() revel.Result {
 	core.PutLoginUserToSession(c.Session, loginUser)
 
 	//login log
-	var login_log  erp_models.LoginLogInfo
+	var login_log erp_models.LoginLogInfo
 	login_log.LoginName = user.LoginName
 	login_log.IpAddress = get_request_client_ip(c.Request)
 	login_log.Content = "员工登录"

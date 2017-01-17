@@ -3,8 +3,8 @@ package captcha
 import (
 	"image"
 	"image/color"
-	"io"
 	"image/png"
+	"io"
 	"math/rand"
 )
 
@@ -22,10 +22,10 @@ func new_image(digits []byte, width, height int) *Image {
 	img.NRGBA = image.NewNRGBA(r)
 
 	img.color = &color.NRGBA{
-		R:uint8(rand.Intn(129)),
-		G:uint8(rand.Intn(129)),
-		B:uint8(rand.Intn(129)),
-		A:0xFF,
+		R: uint8(rand.Intn(129)),
+		G: uint8(rand.Intn(129)),
+		B: uint8(rand.Intn(129)),
+		A: 0xFF,
 	}
 	// Draw background (10 random circles of random brightness)
 	img.calculate_sizes(width, height, len(digits))
@@ -159,7 +159,7 @@ func (img *Image) draw_digit(digit []byte, x, y int) {
 	y += rnd(-minr, minr)
 	for yy := 0; yy < font_height; yy++ {
 		for xx := 0; xx < font_width; xx++ {
-			if digit[yy*font_width + xx] != black_char {
+			if digit[yy*font_width+xx] != black_char {
 				continue
 			}
 			// Introduce random variations.

@@ -2,8 +2,8 @@ package controllers
 
 import (
 	"encoding/json"
-	"strconv"
 	"github.com/revel/revel"
+	"strconv"
 
 	"matrix/core"
 	"matrix/modules/erp/models"
@@ -19,9 +19,9 @@ func (c ErpLogisticsNumber) Index() revel.Result {
 }
 
 type ErpLogisticsNumberViewItem struct {
-	models.LogisticsNumberInfo      `xorm:"extends" json:"n"`
-	models.LogisticsModeInfo        `xorm:"extends" json:"m"`
-	models.StatusInfo               `xorm:"extends" json:"s"`
+	models.LogisticsNumberInfo `xorm:"extends" json:"n"`
+	models.LogisticsModeInfo   `xorm:"extends" json:"m"`
+	models.StatusInfo          `xorm:"extends" json:"s"`
 }
 
 func (c ErpLogisticsNumber) ListData() revel.Result {
@@ -37,7 +37,7 @@ func (c ErpLogisticsNumber) ListData() revel.Result {
 	*/
 
 	query := db_session.
-	Select(" n.*, m.*, s.*").
+		Select(" n.*, m.*, s.*").
 		Table("erp_logistics_number").Alias("n").
 		Join("INNER", []string{"erp_logistics_mode", "m"}, "n.mode_id = m.id").
 		Join("INNER", []string{"erp_status", "s"}, "n.status_id = s.id").
@@ -67,9 +67,9 @@ func (c ErpLogisticsNumber) ListData() revel.Result {
 }
 
 type LogisticsNumberDetailForm struct {
-	LogisticsNumber   models.LogisticsNumberInfo      `json:"logistics_number"`
-	LogisticsModeList []models.LogisticsModeInfo      `json:"logistics_mode_list"`
-	StatusList        []models.StatusInfo             `json:"status_list"`
+	LogisticsNumber   models.LogisticsNumberInfo `json:"logistics_number"`
+	LogisticsModeList []models.LogisticsModeInfo `json:"logistics_mode_list"`
+	StatusList        []models.StatusInfo        `json:"status_list"`
 }
 
 func (f *LogisticsNumberDetailForm) IsCreate() bool {
@@ -142,7 +142,7 @@ func (c ErpLogisticsNumber) Save() revel.Result {
 		core.HandleError(err)
 
 		if affected == 0 {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！" })
+			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！"})
 		}
 	}
 

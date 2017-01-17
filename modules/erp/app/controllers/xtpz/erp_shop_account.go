@@ -2,8 +2,8 @@ package controllers
 
 import (
 	"encoding/json"
-	"strconv"
 	"github.com/revel/revel"
+	"strconv"
 
 	"matrix/core"
 	"matrix/modules/erp/models"
@@ -19,8 +19,8 @@ func (c ErpShopAccount) Index() revel.Result {
 }
 
 type ErpShopAccountViewItem struct {
-	models.ShopAccountInfo  `xorm:"extends" json:"a"`
-	models.StatusInfo       `xorm:"extends" json:"s"`
+	models.ShopAccountInfo `xorm:"extends" json:"a"`
+	models.StatusInfo      `xorm:"extends" json:"s"`
 }
 
 func (c ErpShopAccount) ListData() revel.Result {
@@ -31,10 +31,10 @@ func (c ErpShopAccount) ListData() revel.Result {
 	/*
 		SELECT a.*, s.* FROM erp_shop_account a
 		    INNER JOIN erp_status s ON a.status_id = s.id
-	 */
+	*/
 
 	query := db_session.
-	Select("a.*, s.*").
+		Select("a.*, s.*").
 		Table("erp_shop_account").Alias("a").
 		Join("INNER", []string{"erp_status", "s"}, "a.status_id = s.id").
 		Where(filter)
@@ -147,7 +147,7 @@ func (c ErpShopAccount) Save() revel.Result {
 		core.HandleError(err)
 
 		if affected == 0 {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！" })
+			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！"})
 		}
 	}
 

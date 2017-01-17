@@ -16,8 +16,8 @@ func (c ErpPaypalRecon) Index() revel.Result {
 }
 
 type ErpPaypalReconViewItem struct {
-	models.PaypalReconInfo  `xorm:"extends" json:"r"`
-	models.StatusInfo       `xorm:"extends" json:"s"`
+	models.PaypalReconInfo `xorm:"extends" json:"r"`
+	models.StatusInfo      `xorm:"extends" json:"s"`
 }
 
 func (c ErpPaypalRecon) ListData() revel.Result {
@@ -29,10 +29,10 @@ func (c ErpPaypalRecon) ListData() revel.Result {
 		SELECT r.*, s.*
 		FROM erp_paypal_recon r
 		    LEFT JOIN erp_status s ON r.result_id = s.id
-	 */
+	*/
 
 	query := db_session.
-	Select("r.*, s.*").
+		Select("r.*, s.*").
 		Table("erp_paypal_recon").Alias("r").
 		Join("LEFT", []string{"erp_status", "s"}, "r.result_id = s.id").
 		Where(filter)

@@ -1,10 +1,9 @@
-
 package controllers
 
 import (
 	"encoding/json"
-	"strconv"
 	"github.com/revel/revel"
+	"strconv"
 
 	"matrix/core"
 	"matrix/modules/erp/models"
@@ -55,7 +54,7 @@ func (f *LogisticsNumberLogDetailForm) IsCreate() bool {
 	return f.LogisticsNumberLog.Id == 0
 }
 
-func (f *LogisticsNumberLogDetailForm) Valid(validation *revel.Validation) bool { 
+func (f *LogisticsNumberLogDetailForm) Valid(validation *revel.Validation) bool {
 	validation.Required(f.LogisticsNumberLog.NumId).Message("运单号Id不能为空！")
 
 	validation.Required(f.LogisticsNumberLog.ModeName).Message("货运方式不能为空！")
@@ -108,15 +107,15 @@ func (c ErpLogisticsNumberLog) Save() revel.Result {
 	logistics_number_log := detail_form.LogisticsNumberLog
 
 	var affected int64
-	if detail_form.IsCreate() { 
+	if detail_form.IsCreate() {
 		affected, err = db_session.Insert(&logistics_number_log)
 		core.HandleError(err)
-	} else { 
+	} else {
 		affected, err = db_session.Id(logistics_number_log.Id).Update(&logistics_number_log)
 		core.HandleError(err)
 
 		if affected == 0 {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！" })
+			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！"})
 		}
 	}
 
@@ -134,4 +133,3 @@ func (c ErpLogisticsNumberLog) Delete() revel.Result {
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})
 }
-

@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"matrix/core"
 	"github.com/revel/revel"
+	"matrix/core"
 )
 
 type ErpProductBatchEdit struct {

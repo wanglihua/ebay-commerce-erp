@@ -2,8 +2,8 @@ package controllers
 
 import (
 	"encoding/json"
-	"strconv"
 	"github.com/revel/revel"
+	"strconv"
 
 	"matrix/core"
 	"matrix/modules/erp/models"
@@ -54,7 +54,7 @@ func (f *LogisticsModeDetailForm) IsCreate() bool {
 	return f.LogisticsMode.Id == 0
 }
 
-func (f *LogisticsModeDetailForm) Valid(validation *revel.Validation) bool { 
+func (f *LogisticsModeDetailForm) Valid(validation *revel.Validation) bool {
 	validation.Required(f.LogisticsMode.Name).Message("名称不能为空！")
 	if f.LogisticsMode.Name != "" {
 		validation.MinSize(f.LogisticsMode.Name, 2).Message("名称长度不能小于2！")
@@ -105,27 +105,27 @@ func (c ErpLogisticsMode) Save() revel.Result {
 	logistics_mode := detail_form.LogisticsMode
 
 	var affected int64
-	if detail_form.IsCreate() { 
+	if detail_form.IsCreate() {
 		name_count, err := db_session.Where("name = ?", logistics_mode.Name).Count(&logistics_mode)
 		core.HandleError(err)
 		if name_count != 0 {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，名称已存在！" })
+			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，名称已存在！"})
 		}
 
 		affected, err = db_session.Insert(&logistics_mode)
 		core.HandleError(err)
-	} else { 
+	} else {
 		name_count, err := db_session.Where("id <> ? and name = ?", logistics_mode.Id, logistics_mode.Name).Count(&logistics_mode)
 		core.HandleError(err)
 		if name_count != 0 {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，名称已存在！" })
+			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，名称已存在！"})
 		}
 
 		affected, err = db_session.Id(logistics_mode.Id).Update(&logistics_mode)
 		core.HandleError(err)
 
 		if affected == 0 {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！" })
+			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！"})
 		}
 	}
 
@@ -143,4 +143,3 @@ func (c ErpLogisticsMode) Delete() revel.Result {
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})
 }
-

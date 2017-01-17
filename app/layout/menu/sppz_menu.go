@@ -95,11 +95,11 @@ func GetSppzMenu(db_session *xorm.Session, web_session revel.Session) string {
 }
 
 /*
-    <li id="sppz-brand-menu" class="">
-        <a href="/erp/brand">
-            <i class="menu-icon fa fa-caret-right"></i>
-            品牌
-        </a>
-        <b class="arrow"></b>
-    </li>
- */
+   <li id="sppz-brand-menu" class="">
+       <a href="/erp/brand">
+           <i class="menu-icon fa fa-caret-right"></i>
+           品牌
+       </a>
+       <b class="arrow"></b>
+   </li>
+*/

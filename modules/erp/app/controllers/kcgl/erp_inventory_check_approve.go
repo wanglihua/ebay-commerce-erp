@@ -2,12 +2,12 @@ package controllers
 
 import (
 	"encoding/json"
-	"strconv"
 	"github.com/revel/revel"
+	"strconv"
 
 	"matrix/core"
-	"matrix/modules/erp/models"
 	auth_models "matrix/modules/auth/models"
+	"matrix/modules/erp/models"
 	"time"
 )
 
@@ -20,11 +20,11 @@ func (c ErpInventoryCheckApprove) Index() revel.Result {
 }
 
 type ErpInventoryCheckApproveViewItem struct {
-	models.InventoryCheckInfo         `xorm:"extends" json:"ic"`
-	models.StockInfo                  `xorm:"extends" json:"st"`
-	CheckUser   auth_models.UserInfo  `xorm:"extends" json:"cu"`
-	ApproveUser auth_models.UserInfo  `xorm:"extends" json:"au"`
-	models.StatusInfo                 `xorm:"extends" json:"ss"`
+	models.InventoryCheckInfo `xorm:"extends" json:"ic"`
+	models.StockInfo          `xorm:"extends" json:"st"`
+	CheckUser                 auth_models.UserInfo `xorm:"extends" json:"cu"`
+	ApproveUser               auth_models.UserInfo `xorm:"extends" json:"au"`
+	models.StatusInfo         `xorm:"extends" json:"ss"`
 }
 
 func (c ErpInventoryCheckApprove) ListData() revel.Result {
@@ -42,7 +42,7 @@ func (c ErpInventoryCheckApprove) ListData() revel.Result {
 	*/
 
 	query := db_session.
-	Select("ic.*, st.*, cu.*, au.*, ss.*").
+		Select("ic.*, st.*, cu.*, au.*, ss.*").
 		Table("erp_inventory_check").Alias("ic").
 		Join("INNER", []string{"erp_stock", "st"}, "ic.stock_id = st.id").
 		Join("INNER", []string{"auth_user", "cu"}, "ic.check_user_id = cu.id").
@@ -156,7 +156,7 @@ func (c ErpInventoryCheckApprove) Save() revel.Result {
 		core.HandleError(err)
 
 		if affected == 0 {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！" })
+			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！"})
 		}
 	}
 

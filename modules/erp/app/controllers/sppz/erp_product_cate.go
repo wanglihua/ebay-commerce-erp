@@ -2,13 +2,13 @@ package controllers
 
 import (
 	"encoding/json"
-	"strconv"
 	"github.com/revel/revel"
+	"strconv"
 
+	"fmt"
 	"matrix/core"
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/status_service"
-	"fmt"
 )
 
 type ErpProductCate struct {
@@ -20,9 +20,9 @@ func (c ErpProductCate) Index() revel.Result {
 }
 
 type ErpProductCateViewItem struct {
-	models.ProductCateInfo          `xorm:"extends" json:"c"`
-	Parent models.ProductCateInfo   `xorm:"extends" json:"p"`
-	models.StatusInfo               `xorm:"extends" json:"s"`
+	models.ProductCateInfo `xorm:"extends" json:"c"`
+	Parent                 models.ProductCateInfo `xorm:"extends" json:"p"`
+	models.StatusInfo      `xorm:"extends" json:"s"`
 }
 
 func (c ErpProductCate) ListData() revel.Result {
@@ -35,10 +35,10 @@ func (c ErpProductCate) ListData() revel.Result {
 		FROM erp_product_cate c
 		    INNER JOIN erp_product_cate p ON c.parent_id = p.id
 		    INNER JOIN erp_status s ON c.status_id = s.id
-	 */
+	*/
 
 	query := db_session.
-	Select("c.*, p.*, s.*").
+		Select("c.*, p.*, s.*").
 		Table("erp_product_cate").Alias("c").
 		Join("LEFT", []string{"erp_product_cate", "p"}, "c.parent_id = p.id").
 		Join("INNER", []string{"erp_status", "s"}, "c.status_id = s.id").
@@ -132,7 +132,7 @@ func (c ErpProductCate) DetailData() revel.Result {
 		core.HandleError(err)
 	} else {
 		err := db_session.
-		Where(fmt.Sprintf("(%[1]s is null or %[1]s = 0) and (%[2]s <> %[3]d)", parent_cate_cols.ParentId, parent_cate_cols.Id, product_cate_id)).
+			Where(fmt.Sprintf("(%[1]s is null or %[1]s = 0) and (%[2]s <> %[3]d)", parent_cate_cols.ParentId, parent_cate_cols.Id, product_cate_id)).
 			Find(&parent_cate_list)
 		core.HandleError(err)
 	}
@@ -169,7 +169,7 @@ func (c ErpProductCate) Save() revel.Result {
 		core.HandleError(err)
 
 		if affected == 0 {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！" })
+			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！"})
 		}
 	}
 

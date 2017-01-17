@@ -1,10 +1,9 @@
-
 package controllers
 
 import (
 	"encoding/json"
-	"strconv"
 	"github.com/revel/revel"
+	"strconv"
 
 	"matrix/core"
 	"matrix/modules/erp/models"
@@ -55,7 +54,7 @@ func (f *StockBillEntryDetailForm) IsCreate() bool {
 	return f.StockBillEntry.Id == 0
 }
 
-func (f *StockBillEntryDetailForm) Valid(validation *revel.Validation) bool { 
+func (f *StockBillEntryDetailForm) Valid(validation *revel.Validation) bool {
 	validation.Required(f.StockBillEntry.BillId).Message("批次不能为空！")
 
 	validation.Required(f.StockBillEntry.StorageLocId).Message("仓位不能为空！")
@@ -65,8 +64,6 @@ func (f *StockBillEntryDetailForm) Valid(validation *revel.Validation) bool {
 	validation.Required(f.StockBillEntry.PreQty).Message("当前库存不能为空！")
 
 	validation.Required(f.StockBillEntry.Qty).Message("出入库数量不能为空！")
-
-
 
 	return validation.HasErrors() == false
 }
@@ -106,15 +103,15 @@ func (c ErpStockBillEntry) Save() revel.Result {
 	stock_bill_entry := detail_form.StockBillEntry
 
 	var affected int64
-	if detail_form.IsCreate() { 
+	if detail_form.IsCreate() {
 		affected, err = db_session.Insert(&stock_bill_entry)
 		core.HandleError(err)
-	} else { 
+	} else {
 		affected, err = db_session.Id(stock_bill_entry.Id).Update(&stock_bill_entry)
 		core.HandleError(err)
 
 		if affected == 0 {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！" })
+			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！"})
 		}
 	}
 
@@ -132,4 +129,3 @@ func (c ErpStockBillEntry) Delete() revel.Result {
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})
 }
-

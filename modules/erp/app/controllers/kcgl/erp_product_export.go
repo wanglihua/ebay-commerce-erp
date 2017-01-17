@@ -3,11 +3,11 @@ package controllers
 import (
 	"github.com/revel/revel"
 
-	"matrix/core"
-	"matrix/modules/erp/models"
+	"bytes"
 	"github.com/go-xorm/xorm"
 	"github.com/tealeg/xlsx"
-	"bytes"
+	"matrix/core"
+	"matrix/modules/erp/models"
 	"time"
 )
 
@@ -78,7 +78,7 @@ func (c ErpProductExport) export_product_list_to_excel(db_session *xorm.Session,
 	set_head_cell_style := func(cell *xlsx.Cell) {
 		style := xlsx.NewStyle()
 
-		font := * xlsx.NewFont(9, "微软雅黑")
+		font := *xlsx.NewFont(9, "微软雅黑")
 		font.Bold = true
 		font.Italic = false
 		font.Underline = false
@@ -107,7 +107,7 @@ func (c ErpProductExport) export_product_list_to_excel(db_session *xorm.Session,
 	set_text_cell_style := func(cell *xlsx.Cell, horizontal_align string) {
 		style := xlsx.NewStyle()
 
-		font := * xlsx.NewFont(9, "微软雅黑")
+		font := *xlsx.NewFont(9, "微软雅黑")
 		font.Bold = false
 		font.Italic = false
 		font.Underline = false
@@ -152,7 +152,7 @@ func (c ErpProductExport) export_product_list_to_excel(db_session *xorm.Session,
 	sheet.SetColWidth(col_index, col_index, 10)
 	set_head_cell_style(cell)
 	cell.Value = "商品名称"
-	col_index ++
+	col_index++
 
 	for _, product := range product_list {
 		row = sheet.AddRow()

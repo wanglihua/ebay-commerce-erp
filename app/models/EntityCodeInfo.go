@@ -1,8 +1,8 @@
 package models
 
 type EntityCodeInfo struct {
-	Entity string    `xorm:"nvarchar(200) notnull pk 'entity'" json:"entity" smith:"verbose_name=实体名称"`
-	Serial int64     `xorm:"bigint notnull 'serial'" json:"serial" smith:"verbose_name=序列号"`
+	Entity string `xorm:"nvarchar(200) notnull pk 'entity'" json:"entity" smith:"verbose_name=实体名称"`
+	Serial int64  `xorm:"bigint notnull 'serial'" json:"serial" smith:"verbose_name=序列号"`
 }
 
 func (e EntityCodeInfo) TableName() string {

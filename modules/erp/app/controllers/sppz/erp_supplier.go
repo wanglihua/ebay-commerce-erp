@@ -1,10 +1,9 @@
-
 package controllers
 
 import (
 	"encoding/json"
-	"strconv"
 	"github.com/revel/revel"
+	"strconv"
 
 	"matrix/core"
 	"matrix/modules/erp/models"
@@ -55,7 +54,7 @@ func (f *SupplierDetailForm) IsCreate() bool {
 	return f.Supplier.Id == 0
 }
 
-func (f *SupplierDetailForm) Valid(validation *revel.Validation) bool { 
+func (f *SupplierDetailForm) Valid(validation *revel.Validation) bool {
 	validation.Required(f.Supplier.Name).Message("名称不能为空！")
 	if f.Supplier.Name != "" {
 		validation.MinSize(f.Supplier.Name, 2).Message("名称长度不能小于2！")
@@ -131,15 +130,15 @@ func (c ErpSupplier) Save() revel.Result {
 	supplier := detail_form.Supplier
 
 	var affected int64
-	if detail_form.IsCreate() { 
+	if detail_form.IsCreate() {
 		affected, err = db_session.Insert(&supplier)
 		core.HandleError(err)
-	} else { 
+	} else {
 		affected, err = db_session.Id(supplier.Id).Update(&supplier)
 		core.HandleError(err)
 
 		if affected == 0 {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！" })
+			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！"})
 		}
 	}
 
@@ -157,4 +156,3 @@ func (c ErpSupplier) Delete() revel.Result {
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})
 }
-

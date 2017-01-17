@@ -1,8 +1,8 @@
 package models
 
 import (
-	"matrix/core"
 	"github.com/go-xorm/xorm"
+	"matrix/core"
 )
 
 type UserInfo struct {

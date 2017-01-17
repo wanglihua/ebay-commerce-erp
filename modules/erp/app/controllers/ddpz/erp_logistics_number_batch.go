@@ -2,8 +2,8 @@ package controllers
 
 import (
 	"encoding/json"
-	"strconv"
 	"github.com/revel/revel"
+	"strconv"
 
 	"matrix/core"
 	"matrix/modules/erp/models"
@@ -37,7 +37,7 @@ func (c ErpLogisticsNumberBatch) ListData() revel.Result {
 	*/
 
 	query := db_session.
-	Select(" b.*, m.*, s.*").
+		Select(" b.*, m.*, s.*").
 		Table("erp_logistics_number_batch").Alias("b").
 		Join("INNER", []string{"erp_logistics_mode", "m"}, "b.mode_id = m.id").
 		Join("INNER", []string{"erp_status", "s"}, "b.status_id = s.id").
@@ -149,7 +149,7 @@ func (c ErpLogisticsNumberBatch) Save() revel.Result {
 		core.HandleError(err)
 
 		if affected == 0 {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！" })
+			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！"})
 		}
 	}
 

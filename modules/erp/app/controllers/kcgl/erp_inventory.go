@@ -2,8 +2,8 @@ package controllers
 
 import (
 	"encoding/json"
-	"strconv"
 	"github.com/revel/revel"
+	"strconv"
 
 	"matrix/core"
 	"matrix/modules/erp/models"
@@ -35,10 +35,10 @@ func (c ErpInventory) ListData() revel.Result {
 		    INNER JOIN erp_stock st ON ivt.stock_id = st.id
 		    INNER JOIN erp_storage_loc loc ON ivt.storage_loc_id = loc.id
 		    INNER JOIN erp_product prd ON ivt.product_id = prd.id
-	 */
+	*/
 
 	query := db_session.
-	Select("ivt.*, st.*, loc.*, prd.*").
+		Select("ivt.*, st.*, loc.*, prd.*").
 		Table("erp_inventory").Alias("ivt").
 		Join("INNER", []string{"erp_stock", "st"}, "ivt.stock_id = st.id").
 		Join("INNER", []string{"erp_storage_loc", "loc"}, "ivt.storage_loc_id = loc.id").
@@ -131,7 +131,7 @@ func (c ErpInventory) Save() revel.Result {
 		core.HandleError(err)
 
 		if affected == 0 {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！" })
+			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！"})
 		}
 	}
 

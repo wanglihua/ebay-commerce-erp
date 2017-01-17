@@ -2,8 +2,8 @@ package controllers
 
 import (
 	"encoding/json"
-	"strconv"
 	"github.com/revel/revel"
+	"strconv"
 
 	"matrix/core"
 	"matrix/modules/erp/models"
@@ -19,9 +19,9 @@ func (c ErpProductBind) Index() revel.Result {
 }
 
 type ErpProductBindViewItem struct {
-	models.ProductBindInfo      `xorm:"extends" json:"b"`
-	models.PackageMaterialInfo  `xorm:"extends" json:"m"`
-	models.StatusInfo           `xorm:"extends" json:"s"`
+	models.ProductBindInfo     `xorm:"extends" json:"b"`
+	models.PackageMaterialInfo `xorm:"extends" json:"m"`
+	models.StatusInfo          `xorm:"extends" json:"s"`
 }
 
 func (c ErpProductBind) ListData() revel.Result {
@@ -34,10 +34,10 @@ func (c ErpProductBind) ListData() revel.Result {
 		FROM erp_product_bind b
 		    INNER JOIN erp_package_material m ON b.pkg_mtrl_id = m.id
 		    INNER JOIN erp_status s ON b.status_id = s.id
-	 */
+	*/
 
 	query := db_session.
-	Select("b.*, m.*, s.*").
+		Select("b.*, m.*, s.*").
 		Table("erp_product_bind").Alias("b").
 		Join("INNER", []string{"erp_package_material", "m"}, "b.pkg_mtrl_id = m.id").
 		Join("INNER", []string{"erp_status", "s"}, "b.status_id = s.id").
@@ -159,7 +159,7 @@ func (c ErpProductBind) Save() revel.Result {
 		core.HandleError(err)
 
 		if affected == 0 {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！" })
+			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！"})
 		}
 	}
 

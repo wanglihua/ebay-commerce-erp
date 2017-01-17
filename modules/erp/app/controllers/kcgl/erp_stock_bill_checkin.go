@@ -2,12 +2,12 @@ package controllers
 
 import (
 	"encoding/json"
-	"strconv"
 	"github.com/revel/revel"
+	"strconv"
 
 	"matrix/core"
-	"matrix/modules/erp/models"
 	auth_models "matrix/modules/auth/models"
+	"matrix/modules/erp/models"
 	"time"
 )
 
@@ -20,9 +20,9 @@ func (c ErpStockBillCheckin) Index() revel.Result {
 }
 
 type ErpStockBillCheckinViewItem struct {
-	models.StockBillInfo  `xorm:"extends" json:"sb"`
-	models.StockInfo      `xorm:"extends" json:"s"`
-	auth_models.UserInfo  `xorm:"extends" json:"u"`
+	models.StockBillInfo `xorm:"extends" json:"sb"`
+	models.StockInfo     `xorm:"extends" json:"s"`
+	auth_models.UserInfo `xorm:"extends" json:"u"`
 }
 
 func (c ErpStockBillCheckin) ListData() revel.Result {
@@ -36,10 +36,10 @@ func (c ErpStockBillCheckin) ListData() revel.Result {
 		    INNER JOIN erp_stock s ON sb.stock_id = s.id
 		    INNER JOIN auth_user u ON sb.user_id = u.id
 		WHERE sb.type_id = 100
-	 */
+	*/
 
 	query := db_session.
-	Select("sb.*, s.*, u.*").
+		Select("sb.*, s.*, u.*").
 		Table("erp_stock_bill").Alias("sb").
 		Join("INNER", []string{"erp_stock", "s"}, "sb.stock_id = s.id").
 		Join("INNER", []string{"auth_user", "u"}, "sb.user_id = u.id").
@@ -150,7 +150,7 @@ func (c ErpStockBillCheckin) Save() revel.Result {
 		core.HandleError(err)
 
 		if affected == 0 {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！" })
+			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！"})
 		}
 	}
 

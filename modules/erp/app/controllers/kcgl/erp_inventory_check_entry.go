@@ -1,10 +1,9 @@
-
 package controllers
 
 import (
 	"encoding/json"
-	"strconv"
 	"github.com/revel/revel"
+	"strconv"
 
 	"matrix/core"
 	"matrix/modules/erp/models"
@@ -55,7 +54,7 @@ func (f *InventoryCheckEntryDetailForm) IsCreate() bool {
 	return f.InventoryCheckEntry.Id == 0
 }
 
-func (f *InventoryCheckEntryDetailForm) Valid(validation *revel.Validation) bool { 
+func (f *InventoryCheckEntryDetailForm) Valid(validation *revel.Validation) bool {
 	validation.Required(f.InventoryCheckEntry.CheckId).Message("盘点批次不能为空！")
 
 	validation.Required(f.InventoryCheckEntry.StorageLocId).Message("库位不能为空！")
@@ -106,15 +105,15 @@ func (c ErpInventoryCheckEntry) Save() revel.Result {
 	inventory_check_entry := detail_form.InventoryCheckEntry
 
 	var affected int64
-	if detail_form.IsCreate() { 
+	if detail_form.IsCreate() {
 		affected, err = db_session.Insert(&inventory_check_entry)
 		core.HandleError(err)
-	} else { 
+	} else {
 		affected, err = db_session.Id(inventory_check_entry.Id).Update(&inventory_check_entry)
 		core.HandleError(err)
 
 		if affected == 0 {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！" })
+			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！"})
 		}
 	}
 
@@ -132,4 +131,3 @@ func (c ErpInventoryCheckEntry) Delete() revel.Result {
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})
 }
-

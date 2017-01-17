@@ -2,9 +2,9 @@ package core
 
 import (
 	"github.com/revel/revel"
+	"matrix/db"
 	"strconv"
 	"strings"
-	"matrix/db"
 )
 
 func GetGridRequestParam(request *revel.Request) (filter string, order string, offset int, limit int) {
@@ -24,9 +24,9 @@ func GetGridRequestParam(request *revel.Request) (filter string, order string, o
 	if len(request.Form["sSearch"]) != 0 {
 		searchValue := request.Form["sSearch"][0]
 		for colIndex := 0; colIndex < colCount; colIndex++ {
-			colName := request.Form["mDataProp_" + strconv.Itoa(colIndex)][0]
-			colSearchable := request.Form["bSearchable_" + strconv.Itoa(colIndex)][0]
-			colSortable := request.Form["bSortable_" + strconv.Itoa(colIndex)][0]
+			colName := request.Form["mDataProp_"+strconv.Itoa(colIndex)][0]
+			colSearchable := request.Form["bSearchable_"+strconv.Itoa(colIndex)][0]
+			colSortable := request.Form["bSortable_"+strconv.Itoa(colIndex)][0]
 			gridCol := gridColumn{
 				ColName:       colName,
 				ColSearchable: colSearchable,
@@ -49,8 +49,8 @@ func GetGridRequestParam(request *revel.Request) (filter string, order string, o
 		orderCount, _ := strconv.Atoi(request.Form["iSortingCols"][0])
 		gridOrderList := make([]string, 0, orderCount)
 		for orderIndex := 0; orderIndex < orderCount; orderIndex++ {
-			orderColIndex, _ := strconv.Atoi(request.Form["iSortCol_" + strconv.Itoa(orderIndex)][0])
-			orderDir := strings.ToLower(request.Form["sSortDir_" + strconv.Itoa(orderIndex)][0])
+			orderColIndex, _ := strconv.Atoi(request.Form["iSortCol_"+strconv.Itoa(orderIndex)][0])
+			orderDir := strings.ToLower(request.Form["sSortDir_"+strconv.Itoa(orderIndex)][0])
 
 			gridCol := gridColumnList[orderColIndex]
 			if gridCol.ColSortable == "true" {

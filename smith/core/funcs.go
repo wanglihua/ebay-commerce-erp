@@ -112,7 +112,7 @@ func GetFieldXormColumn(model_field reflect.StructField) (xorm_column *xorm_core
 	var err error
 	if orm_tag_str != "" {
 		xorm_column = &xorm_core.Column{FieldName: model_field.Name, Nullable: true, IsPrimaryKey: false,
-			IsAutoIncrement:                       false, MapType: xorm_core.TWOSIDES, Indexes: make(map[string]int)}
+			IsAutoIncrement: false, MapType: xorm_core.TWOSIDES, Indexes: make(map[string]int)}
 		tags := split_tag(orm_tag_str)
 
 		if len(tags) > 0 {
@@ -135,7 +135,7 @@ func GetFieldXormColumn(model_field reflect.StructField) (xorm_column *xorm_core
 					//do nothing
 					return nil, unique
 				default:
-				//do nothing
+					//do nothing
 				}
 			}
 
@@ -154,12 +154,12 @@ func GetFieldXormColumn(model_field reflect.StructField) (xorm_column *xorm_core
 					if j == 0 {
 						xorm_column.Nullable = true
 					} else {
-						xorm_column.Nullable = (strings.ToUpper(tags[j - 1]) != "NOT")
+						xorm_column.Nullable = (strings.ToUpper(tags[j-1]) != "NOT")
 					}
 				case k == "AUTOINCR":
 					xorm_column.IsAutoIncrement = true
 				case k == "DEFAULT":
-					xorm_column.Default = tags[j + 1]
+					xorm_column.Default = tags[j+1]
 				case k == "CREATED":
 					xorm_column.IsCreated = true
 				case k == "VERSION":
@@ -170,7 +170,7 @@ func GetFieldXormColumn(model_field reflect.StructField) (xorm_column *xorm_core
 				case k == "LOCAL":
 					xorm_column.TimeZone = time.Local
 				case strings.HasPrefix(k, "LOCALE(") && strings.HasSuffix(k, ")"):
-					location := k[len("INDEX") + 1: len(k) - 1]
+					location := k[len("INDEX")+1 : len(k)-1]
 					xorm_column.TimeZone, err = time.LoadLocation(location)
 					matrix_core.HandleError(err)
 				case k == "UPDATED":
@@ -182,7 +182,7 @@ func GetFieldXormColumn(model_field reflect.StructField) (xorm_column *xorm_core
 				case k == "INDEX":
 				//do nothing
 				case strings.HasPrefix(k, "UNIQUE(") && strings.HasSuffix(k, ")"):
-					unique = k[len("UNIQUE") + 1: len(k) - 1]
+					unique = k[len("UNIQUE")+1 : len(k)-1]
 				case k == "UNIQUE":
 					if unique == "false" {
 						unique = "true"
@@ -198,7 +198,7 @@ func GetFieldXormColumn(model_field reflect.StructField) (xorm_column *xorm_core
 					if strings.HasPrefix(k, "'") && strings.HasSuffix(k, "'") {
 						if preKey != "DEFAULT" {
 							//xorm_column.Name = key[1 : len(key) - 1]
-							xorm_column.FieldName = key[1: len(key) - 1]
+							xorm_column.FieldName = key[1 : len(key)-1]
 						}
 					} else if strings.Contains(k, "(") && strings.HasSuffix(k, ")") {
 						fs := strings.Split(k, "(")
@@ -210,7 +210,7 @@ func GetFieldXormColumn(model_field reflect.StructField) (xorm_column *xorm_core
 						xorm_column.SQLType = xorm_core.SQLType{fs[0], 0, 0}
 						if fs[0] == xorm_core.Enum && fs[1][0] == '\'' {
 							//enum
-							options := strings.Split(fs[1][0:len(fs[1]) - 1], ",")
+							options := strings.Split(fs[1][0:len(fs[1])-1], ",")
 							xorm_column.EnumOptions = make(map[string]int)
 							for k, v := range options {
 								v = strings.TrimSpace(v)
@@ -219,7 +219,7 @@ func GetFieldXormColumn(model_field reflect.StructField) (xorm_column *xorm_core
 							}
 						} else if fs[0] == xorm_core.Set && fs[1][0] == '\'' {
 							//set
-							options := strings.Split(fs[1][0:len(fs[1]) - 1], ",")
+							options := strings.Split(fs[1][0:len(fs[1])-1], ",")
 							xorm_column.SetOptions = make(map[string]int)
 							for k, v := range options {
 								v = strings.TrimSpace(v)
@@ -227,7 +227,7 @@ func GetFieldXormColumn(model_field reflect.StructField) (xorm_column *xorm_core
 								xorm_column.SetOptions[v] = k
 							}
 						} else {
-							fs2 := strings.Split(fs[1][0:len(fs[1]) - 1], ",")
+							fs2 := strings.Split(fs[1][0:len(fs[1])-1], ",")
 							if len(fs2) == 2 {
 								xorm_column.Length, err = strconv.Atoi(fs2[0])
 								matrix_core.HandleError(err)

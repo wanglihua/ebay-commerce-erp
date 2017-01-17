@@ -2,12 +2,12 @@ package controllers
 
 import (
 	"encoding/json"
-	"strconv"
 	"github.com/revel/revel"
+	"strconv"
 
+	"fmt"
 	"matrix/core"
 	"matrix/modules/erp/models"
-	"fmt"
 )
 
 type ErpProductImage struct {
@@ -33,10 +33,10 @@ func (c ErpProductImage) ListData() revel.Result {
 		SELECT img.*, type.*, platform.* FROM erp_product_image img
 		    INNER JOIN erp_product_image_type type ON img.type_id = type.id
 		    INNER JOIN erp_ecommerce_platform platform ON img.platform_id = platform.id
-	 */
+	*/
 
 	query := db_session.
-	Select("img.*, type.*, platform.*").
+		Select("img.*, type.*, platform.*").
 		Table("erp_product_image").Alias("img").
 		Join("INNER", []string{"erp_product_image_type", "type"}, "img.type_id = type.id").
 		Join("INNER", []string{"erp_ecommerce_platform", "platform"}, "img.platform_id = platform.id").
@@ -149,7 +149,7 @@ func (c ErpProductImage) Save() revel.Result {
 	core.HandleError(err)
 
 	if found == false {
-		return c.RenderJson(core.JsonResult{Success: false, Message: "商品编号不存在，请重试！" })
+		return c.RenderJson(core.JsonResult{Success: false, Message: "商品编号不存在，请重试！"})
 	}
 
 	product_image.ProductId = product.Id
@@ -163,7 +163,7 @@ func (c ErpProductImage) Save() revel.Result {
 		core.HandleError(err)
 
 		if affected == 0 {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！" })
+			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！"})
 		}
 	}
 
