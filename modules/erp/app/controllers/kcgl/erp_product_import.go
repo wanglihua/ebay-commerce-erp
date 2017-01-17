@@ -45,6 +45,10 @@ func (c ErpProductImport) ListData() revel.Result {
 	})
 }
 
+func (c ErpProductImport) Import() revel.Result {
+	return c.RenderJson(core.JsonResult{Success: true, Message:  "Excel数据上传成功!"})
+}
+
 func (c ErpProductImport) Confirm() revel.Result {
 	return c.RenderJson(core.JsonResult{Success: true, Message:  "商品数据导入成功!"})
 }
