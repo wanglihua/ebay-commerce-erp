@@ -16,9 +16,9 @@ type Image struct {
 	dotsize int
 }
 
-func NewImage(digits []byte, width, height int) *Image {
+func new_image(digits []byte, width, height int) *Image {
 	img := new(Image)
-	r := image.Rect(img.width, img.height, STD_WIDTH, STD_HEIGHT)
+	r := image.Rect(img.width, img.height, std_width, std_height)
 	img.NRGBA = image.NewNRGBA(r)
 
 	img.color = &color.NRGBA{
@@ -66,9 +66,9 @@ func (img *Image) calculate_sizes(width, height, ncount int) {
 	h := float64(height - border*2) //48
 	// fw takes into account 1-dot spacing between digits.
 
-	fw := float64(FONT_WIDTH) + 1 //6
+	fw := float64(font_width) + 1 //6
 
-	fh := float64(FONT_HEIGHT) //8
+	fh := float64(font_height) //8
 	nc := float64(ncount)      //7
 
 	// Calculate the width of a single digit taking into account only the
@@ -97,9 +97,9 @@ func (img *Image) fill_with_circles(n, maxradius int) {
 	maxx := img.Bounds().Max.X
 	maxy := img.Bounds().Max.Y
 	for i := 0; i < n; i++ {
-		setRandomBrightness(img_color, 255)
+		set_random_brightness(img_color, 255)
 		r := rnd(1, maxradius)
-		img.drawCircle(img_color, rnd(r, maxx-r), rnd(r, maxy-r), r)
+		img.draw_circle(img_color, rnd(r, maxx-r), rnd(r, maxy-r), r)
 	}
 }
 
@@ -109,7 +109,7 @@ func (img *Image) draw_horiz_line(color color.Color, fromX, toX, y int) {
 	}
 }
 
-func (img *Image) drawCircle(color color.Color, x, y, radius int) {
+func (img *Image) draw_circle(color color.Color, x, y, radius int) {
 	f := 1 - radius
 	dfx := 1
 	dfy := -2 * radius
@@ -147,19 +147,19 @@ func (img *Image) strike_through() {
 		if y <= 0 || y >= maxy {
 			y = rnd(maxy/3, maxy-maxy/3)
 		}
-		img.drawCircle(img.color, x, y, r)
+		img.draw_circle(img.color, x, y, r)
 	}
 }
 
 func (img *Image) draw_digit(digit []byte, x, y int) {
-	skf := rand.Float64() * float64(rnd(-MAX_SKEW, MAX_SKEW))
+	skf := rand.Float64() * float64(rnd(-max_skew, max_skew))
 	xs := float64(x)
 	minr := img.dotsize / 2               // minumum radius
 	maxr := img.dotsize/2 + img.dotsize/4 // maximum radius
 	y += rnd(-minr, minr)
-	for yy := 0; yy < FONT_HEIGHT; yy++ {
-		for xx := 0; xx < FONT_WIDTH; xx++ {
-			if digit[yy*FONT_WIDTH + xx] != BLACK_CHAR {
+	for yy := 0; yy < font_height; yy++ {
+		for xx := 0; xx < font_width; xx++ {
+			if digit[yy*font_width + xx] != black_char {
 				continue
 			}
 			// Introduce random variations.
@@ -167,7 +167,7 @@ func (img *Image) draw_digit(digit []byte, x, y int) {
 			ox := x + (xx * img.dotsize) + rnd(0, or/2)
 			oy := y + (yy * img.dotsize) + rnd(0, or/2)
 
-			img.drawCircle(img.color, ox, oy, or)
+			img.draw_circle(img.color, ox, oy, or)
 		}
 		xs += skf
 		x = int(xs)

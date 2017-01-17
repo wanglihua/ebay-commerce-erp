@@ -1,23 +1,27 @@
 package captcha
 
 import (
+	"matrix/core"
 	"io"
 	"image/color"
 	"time"
 	"math/rand"
 	crand "crypto/rand"
+	"strconv"
+	"github.com/revel/revel"
+	"github.com/revel/revel/cache"
 )
 
 const (
-	STD_WIDTH  = 100
-	STD_HEIGHT = 40
-	MAX_SKEW   = 2
+	std_width  = 100
+	std_height = 40
+	max_skew   = 2
 )
 
 const (
-	FONT_WIDTH  = 5
-	FONT_HEIGHT = 8
-	BLACK_CHAR  = 1
+	font_width  = 5
+	font_height = 8
+	black_char  = 1
 )
 
 var font = [][]byte{
@@ -127,9 +131,7 @@ func init() {
 	rand.Seed(int64(time.Second))
 }
 
-
-
-func setRandomBrightness(c *color.NRGBA, max uint8) {
+func set_random_brightness(c *color.NRGBA, max uint8) {
 	minc := min3(c.R, c.G, c.B)
 	maxc := max3(c.R, c.G, c.B)
 	if maxc > max {
@@ -170,17 +172,17 @@ func rnd(from, to int) int {
 }
 
 // Standard characters allowed in uniuri string.
-var StdChars = []byte("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789")
+var std_chars = []byte("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789")
 
 // NewLen returns a new random string of the provided length, consisting of
 // standard characters.
-func NewLen(length int) string {
-	return NewLenChars(length, StdChars)
+func new_len(length int) string {
+	return new_len_chars(length, std_chars)
 }
 
 // NewLenChars returns a new random string of the provided length, consisting
 // of the provided byte slice of allowed characters (maximum 256).
-func NewLenChars(length int, chars []byte) string {
+func new_len_chars(length int, chars []byte) string {
 	b := make([]byte, length)
 	r := make([]byte, length + (length / 4)) // storage for random bytes.
 	clen := byte(len(chars))
@@ -205,36 +207,30 @@ func NewLenChars(length int, chars []byte) string {
 	panic("unreachable")
 }
 
-/*
-func pic(w http.ResponseWriter, req *http.Request) {
+const cache_key = "CAPTCHA_XXWWWDD12"
+
+func Generate(width int, height int, web_session revel.Session) *Image {
 	d := make([]byte, 4)
-	s := NewLen(4)
-	ss := ""
+	s := new_len(4)
 	d = []byte(s)
+	text := ""
 	for v := range d {
 		d[v] %= 10
-		ss += strconv.FormatInt(int64(d[v]), 32)
+		text += strconv.FormatInt(int64(d[v]), 32)
 	}
-	w.Header().Set("Content-Type", "image/png")
-	NewImage(d, 100, 40).WriteTo(w)
-	fmt.Println(ss)
+
+	cache.Set(web_session.Id()+cache_key, text, core.GetSessionExpire())
+
+	return new_image(d, width, height);
 }
 
-func index(w http.ResponseWriter, req *http.Request) {
-	str := "<meta charset=\"utf-8\"><h3>golang 图片验证码例子</h3><img border=\"1\" src=\"/pic\" alt=\"图片验证码\" onclick=\"this.src='/pic'\" />"
-	w.Header().Set("Content-Type", "text/html")
-	w.Write([]byte(str))
-}
+func IsCorrect(captcha string, web_session revel.Session) bool {
+	var session_val string
+	cache.Get(web_session.Id()+cache_key, &session_val)
 
-func main() {
-	http.HandleFunc("/pic", pic)
-	http.HandleFunc("/", index)
-	s := &http.Server{
-		Addr: 		 	":8080",
-		ReadTimeout: 	30*time.Second,
-		WriteTimeout: 	30*time.Second,
-		MaxHeaderBytes: 1 << 20,
+	if session_val == captcha {
+		return true
+	} else {
+		return false
 	}
-	s.ListenAndServe()
 }
-*/
