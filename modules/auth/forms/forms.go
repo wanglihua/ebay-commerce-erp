@@ -61,6 +61,7 @@ func (f *UserDetailForm) Valid(validation *revel.Validation) bool {
 type LoginForm struct {
 	LoginName string
 	Password  string
+	Captcha   string
 }
 
 func (f *LoginForm) Valid(validation *revel.Validation) bool {

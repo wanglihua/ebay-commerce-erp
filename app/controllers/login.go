@@ -8,6 +8,7 @@ import (
 	"matrix/modules/auth/models"
 	erp_models "matrix/modules/erp/models"
 	"strings"
+	"matrix/core/captcha"
 )
 
 type Login struct {
@@ -20,11 +21,7 @@ func (c Login) Index() revel.Result {
 }
 
 func (c Login) Login() revel.Result {
-	//当用户名和密码错误的时候，应该让原来的验证码失效
-
 	db_session := c.DbSession
-
-	c.makePreviousSessionExpire()
 
 	form := new(forms.LoginForm)
 	c.Params.Bind(form, "form")
@@ -38,12 +35,22 @@ func (c Login) Login() revel.Result {
 	core.HandleError(err)
 
 	if has == false {
+		//当用户名和密码错误的时候，应该让原来的验证码失效
+		captcha.MakeCurrentExpire(c.Session)
 		return c.RenderJson(core.JsonResult{Success: false, Message: "工号不存在！"})
 	}
 
 	if core.CompareHashAndPassword(user.Password, form.Password) == false {
+		//当用户名和密码错误的时候，应该让原来的验证码失效
+		captcha.MakeCurrentExpire(c.Session)
 		return c.RenderJson(core.JsonResult{Success: false, Message: "密码错误！"})
 	}
+
+	if captcha.IsCorrect(form.Captcha, c.Session) == false {
+		return c.RenderJson(core.JsonResult{Success: false, Message: "验证码错误！"})
+	}
+
+	c.makePreviousSessionExpire()
 
 	//将当前登录用户信息放入Session中
 	var loginUser core.LoginUser
@@ -72,7 +79,7 @@ func (c Login) Login() revel.Result {
 
 func (c Login) Logout() revel.Result {
 	core.RemoveLoginUserInSession(c.Session)
-	c.makePreviousSessionExpire()
+	//c.makePreviousSessionExpire()
 	return c.RenderJson(core.JsonResult{Success: true, Message: "注销成功！"})
 }
 

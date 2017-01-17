@@ -70,28 +70,32 @@
                 <div class="form-group">
                     <label for="loginName" class="col-xs-3 control-label no-padding-right" style="line-height: 30px;">姓名：</label>
                     <div class="col-xs-8">
-                            <span class="block input-icon input-icon-left">
-                             <i class="ace-icon fa fa-user" style="line-height: 40px;"></i>
-                             <input id="loginName" name="form.LoginName" type="text" class="form-control" placeholder="请输入您的姓名" style="height: 40px;"/>
-                            </span>
+                        <span class="block input-icon input-icon-left">
+                         <i class="ace-icon fa fa-user" style="line-height: 40px;"></i>
+                         <input id="loginName" name="form.LoginName" type="text" class="form-control" placeholder="请输入您的姓名" onkeydown="inputOnKeyDown(event)" style="height: 40px;"/>
+                        </span>
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="password" class="col-xs-3 control-label no-padding-right" style="line-height: 30px;">密码：</label>
                     <div class="col-xs-8">
-                            <span class="block input-icon input-icon-left">
-                             <i class="ace-icon fa fa-asterisk" style="line-height: 40px;"></i>
-                             <input id="password" name="form.Password" type="password" class="form-control" placeholder="请输入您的密码" onkeydown="passwordOnKeyDown(event)" style="height: 40px;"/>
-                            </span>
+                        <span class="block input-icon input-icon-left">
+                         <i class="ace-icon fa fa-key" style="line-height: 40px;"></i>
+                         <input id="password" name="form.Password" type="password" class="form-control" placeholder="请输入您的密码" onkeydown="inputOnKeyDown(event)" style="height: 40px;"/>
+                        </span>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="password" class="col-xs-3 control-label no-padding-right" style="line-height: 30px;">密码：</label>
-                    <div class="col-xs-8">
-                            <span class="block input-icon input-icon-left">
-                             <i class="ace-icon fa fa-asterisk" style="line-height: 40px;"></i>
-                             <input id="captcha" name="form.Password" type="password" class="form-control" placeholder="请输入您的密码" onkeydown="passwordOnKeyDown(event)" style="height: 40px;"/>
-                            </span>
+                    <label for="captcha" class="col-xs-3 control-label no-padding-right" style="line-height: 30px;">验证码：</label>
+                    <div class="col-xs-4">
+                        <span class="block input-icon input-icon-left">
+                         <i class="ace-icon fa fa-asterisk" style="line-height: 40px;"></i>
+                         <input id="captcha" name="form.Captcha" type="text" class="form-control" placeholder="请输入您的验证码" onkeydown="inputOnKeyDown(event)" style="height: 40px;"/>
+                        </span>
+                    </div>
+                    <div class="col-xs-4" onclick="refreshCaptcha();" style="cursor: pointer;">
+                        <img id="imgCaptcha" alt="验证码" src="" style="height: 40px;"/>
+                        <span style="padding-left: 10px;line-height: 40px;color:lightgray;">点击刷新</span>
                     </div>
                 </div>
             </form>
@@ -106,7 +110,17 @@
                     重置
                 </button>
                 <script type="text/javascript">
-                    function passwordOnKeyDown(e) {
+
+                    $(function () {
+                        refreshCaptcha();
+                    });
+
+                    function refreshCaptcha() {
+                        var timestamp = new Date().getTime();
+                        $("#imgCaptcha").attr("src", "/captcha/image?" + timestamp);
+                    }
+
+                    function inputOnKeyDown(e) {
                         var ev = window.event || e;
                         if (ev.keyCode == 13) {
                             submitLogin();
@@ -116,40 +130,46 @@
                     function submitLogin() {
                         var form = $("#loginForm");
                         var valid = validate(
-                                form,
-                                {
-                                    'form.LoginName': {
-                                        required: true,
-                                        minlength: 3,
-                                        maxlength: 10
-                                    },
-                                    'form.Password': {
-                                        required: true,
-                                        minlength: 6,
-                                        maxlength: 12
-                                    }
+                            form,
+                            {
+                                'form.LoginName': {
+                                    required: true,
+                                    minlength: 3,
+                                    maxlength: 10
                                 },
-                                function (error, element) {
-                                    error.appendTo(element.parent("span"));
+                                'form.Password': {
+                                    required: true,
+                                    minlength: 6,
+                                    maxlength: 12
+                                },
+                                'form.Captcha': {
+                                    required: true,
+                                    digits: true,
+                                    minlength: 4,
+                                    maxlength: 4
                                 }
+                            },
+                            function (error, element) {
+                                error.appendTo(element.parent("span"));
+                            }
                         );
 
                         if (valid) {
                             $.ajax({
-                                       url: '{%url "Login.Login"%}',
-                                       type: "POST",
-                                       data: form.serialize(),
-                                       success: function (data) {
-                                           if (data.success == true) {
-                                               window.location.href = '{%url "Home.Index"%}';
-                                               //return;
-                                           }
-                                           else {
-                                               $.msg.error(data.message);
-                                               //return;
-                                           }
-                                       }
-                                   }
+                                    url: '{%url "Login.Login"%}',
+                                    type: "POST",
+                                    data: form.serialize(),
+                                    success: function (data) {
+                                        if (data.success == true) {
+                                            window.location.href = '{%url "Home.Index"%}';
+                                            //return;
+                                        }
+                                        else {
+                                            $.msg.error(data.message);
+                                            //return;
+                                        }
+                                    }
+                                }
                             );
                         }
                     }
