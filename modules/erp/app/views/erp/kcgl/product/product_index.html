@@ -1,40 +1,40 @@
 {%header "商品列表" .%}
 <div id="page">
-   <div class="breadcrumbs" id="breadcrumbs">
-       <ul class="breadcrumb">
-           <li>
-               <a href='{%url "Home.Index"%}'><i class="ace-icon fa fa-home home-icon"></i></a>
-           </li>
-           <li class="parent" data-menu="kcgl-menu">库存管理</li>
-           <li class="active" data-menu="kcgl-product-menu">商品列表</li>
-       </ul>
-   </div>
-   <div class="page-content">
-       <div class="row">
-           <div class="col-xs-12" style="padding: 0;">
-               <div class="gridToolBar clearfix">
-                   <button class="btn btn-primary btn-sm" @click="reloadList('#productList')">
-                       <i class="ace-icon fa fa-refresh"></i>
-                       刷新
-                   </button>
-                   <button class="btn btn-success btn-sm" @click="showProductDetail(0)">
-                       <i class="ace-icon fa fa-plus"></i>
-                       新增
-                   </button>
-                   <button class="btn btn-danger btn-sm" @click="deleteProduct()">
-                       <i class="ace-icon fa fa-trash-o"></i>
-                       删除
-                   </button>
-               </div>
-               <div>
-                   <table id="productList" class="table table-striped table-bordered table-hover"></table>
-                   <div class="todo">1、只是初步的；2、不同权限的人员只能看到自己的信息，比如有的不能看到成本价等</div>
-               </div>
-           </div>
-       </div>
-   </div>
+    <div class="breadcrumbs" id="breadcrumbs">
+        <ul class="breadcrumb">
+            <li>
+                <a href='{%url "Home.Index"%}'><i class="ace-icon fa fa-home home-icon"></i></a>
+            </li>
+            <li class="parent" data-menu="kcgl-menu">库存管理</li>
+            <li class="active" data-menu="kcgl-product-menu">商品列表</li>
+        </ul>
+    </div>
+    <div class="page-content">
+        <div class="row">
+            <div class="col-xs-12" style="padding: 0;">
+                <div class="gridToolBar clearfix">
+                    <button class="btn btn-primary btn-sm" @click="reloadList('#productList')">
+                        <i class="ace-icon fa fa-refresh"></i>
+                        刷新
+                    </button>
+                    <button class="btn btn-success btn-sm" @click="showProductDetail(0)">
+                        <i class="ace-icon fa fa-plus"></i>
+                        新增
+                    </button>
+                    <button class="btn btn-danger btn-sm" @click="deleteProduct()">
+                        <i class="ace-icon fa fa-trash-o"></i>
+                        删除
+                    </button>
+                </div>
+                <div>
+                    <table id="productList" class="table table-striped table-bordered table-hover"></table>
+                    <div class="todo">1、只是初步的；2、不同权限的人员只能看到自己的信息，比如有的不能看到成本价等；3、目录名称里面显示完整的目录。</div>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="modal fade" id="productDetailDialog">
-        <div class="modal-dialog" style="width: 680px;">
+        <div class="modal-dialog" style="width: 520px;">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="True">&times;</button>
@@ -47,7 +47,7 @@
                                 <input id="product_id" name="detail.product.id" type="hidden" v-model.number="detail.product.id"/>
                                 <input id="product_version" name="detail.product.version" type="hidden" v-model.number="detail.product.version"/>
                                 <div class="row">
-                                    <div class="col-xs-6">
+                                    <div class="col-xs-12">
                                         <div class="form-group">
                                             <label for="sku" class="col-xs-2 control-label no-padding-right">SKU</label>
                                             <div class="col-xs-10">
@@ -58,7 +58,7 @@
                                 </div>
 
                                 <div class="row">
-                                    <div class="col-xs-6">
+                                    <div class="col-xs-12">
                                         <div class="form-group">
                                             <label for="name" class="col-xs-2 control-label no-padding-right">名称</label>
                                             <div class="col-xs-10">
@@ -69,7 +69,7 @@
                                 </div>
 
                                 <div class="row">
-                                    <div class="col-xs-6">
+                                    <div class="col-xs-12">
                                         <div class="form-group">
                                             <label for="english_name" class="col-xs-2 control-label no-padding-right">英文名称</label>
                                             <div class="col-xs-10">
@@ -80,18 +80,24 @@
                                 </div>
 
                                 <div class="row">
-                                    <div class="col-xs-6">
+                                    <div class="col-xs-12">
                                         <div class="form-group">
                                             <label for="cate_id" class="col-xs-2 control-label no-padding-right">商品目录</label>
                                             <div class="col-xs-10">
-                                                <input id="cate_id" name="detail.product.cate_id" type="text" class="input-sm form-control" v-model.number="detail.product.cate_id"/>
+                                                <select id="cate_id" name="detail.product.cate_id" class="input-sm form-control" v-model.number="detail.product.cate_id">
+                                                    <template v-for="product_cate in detail.product_cate_list">
+                                                        <option :value="product_cate.cate_id">
+                                                            {{product_cate.cate_name}}
+                                                        </option>
+                                                    </template>
+                                                </select>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
 
                                 <div class="row">
-                                    <div class="col-xs-6">
+                                    <div class="col-xs-12">
                                         <div class="form-group">
                                             <label for="cost_price" class="col-xs-2 control-label no-padding-right">成本价</label>
                                             <div class="col-xs-10">
@@ -102,18 +108,7 @@
                                 </div>
 
                                 <div class="row">
-                                    <div class="col-xs-6">
-                                        <div class="form-group">
-                                            <label for="quantity" class="col-xs-2 control-label no-padding-right">库存</label>
-                                            <div class="col-xs-10">
-                                                <input id="quantity" name="detail.product.quantity" type="text" class="input-sm form-control" v-model.number="detail.product.quantity"/>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-xs-6">
+                                    <div class="col-xs-12">
                                         <div class="form-group">
                                             <label for="weight" class="col-xs-2 control-label no-padding-right">重量</label>
                                             <div class="col-xs-10">
@@ -124,110 +119,41 @@
                                 </div>
 
                                 <div class="row">
-                                    <div class="col-xs-6">
+                                    <div class="col-xs-12">
                                         <div class="form-group">
-                                            <label for="stock_id" class="col-xs-2 control-label no-padding-right">仓库</label>
+                                            <label for="supplier_id" class="col-xs-2 control-label no-padding-right">供应商</label>
                                             <div class="col-xs-10">
-                                                <input id="stock_id" name="detail.product.stock_id" type="text" class="input-sm form-control" v-model.number="detail.product.stock_id"/>
+                                                <select id="supplier_id" name="detail.product.supplier_id" class="input-sm form-control" v-model.number="detail.product.supplier_id">
+                                                    <template v-for="supplier in detail.supplier_list">
+                                                        <option :value="supplier.id">{{supplier.name}}</option>
+                                                    </template>
+                                                </select>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
 
                                 <div class="row">
-                                    <div class="col-xs-6">
+                                    <div class="col-xs-12">
                                         <div class="form-group">
-                                            <label for="storage_loc_id" class="col-xs-2 control-label no-padding-right">仓位</label>
+                                            <label for="desc" class="col-xs-2 control-label no-padding-right">备注</label>
                                             <div class="col-xs-10">
-                                                <input id="storage_loc_id" name="detail.product.storage_loc_id" type="text" class="input-sm form-control" v-model.number="detail.product.storage_loc_id"/>
+                                                <textarea id="desc" name="detail.product.desc" rows="2" class="input-sm form-control" v-model="detail.product.desc"></textarea>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
 
                                 <div class="row">
-                                    <div class="col-xs-6">
-                                        <div class="form-group">
-                                            <label for="supplier_id" class="col-xs-2 control-label no-padding-right">默认供应商</label>
-                                            <div class="col-xs-10">
-                                                <input id="supplier_id" name="detail.product.supplier_id" type="text" class="input-sm form-control" v-model.number="detail.product.supplier_id"/>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-xs-6">
-                                        <div class="form-group">
-                                            <label for="supplier_price" class="col-xs-2 control-label no-padding-right">供应商报价</label>
-                                            <div class="col-xs-10">
-                                                <input id="supplier_price" name="detail.product.supplier_price" type="text" class="input-sm form-control" v-model.number="detail.product.supplier_price"/>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-xs-6">
+                                    <div class="col-xs-12">
                                         <div class="form-group">
                                             <label for="status_id" class="col-xs-2 control-label no-padding-right">状态</label>
                                             <div class="col-xs-10">
-                                                <input id="status_id" name="detail.product.status_id" type="text" class="input-sm form-control" v-model.number="detail.product.status_id"/>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-xs-6">
-                                        <div class="form-group">
-                                            <label for="xsy_id" class="col-xs-2 control-label no-padding-right">销售员</label>
-                                            <div class="col-xs-10">
-                                                <input id="xsy_id" name="detail.product.xsy_id" type="text" class="input-sm form-control" v-model.number="detail.product.xsy_id"/>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-xs-6">
-                                        <div class="form-group">
-                                            <label for="xsxx" class="col-xs-2 control-label no-padding-right">销售信息</label>
-                                            <div class="col-xs-10">
-                                                <input id="xsxx" name="detail.product.xsxx" type="text" class="input-sm form-control" v-model="detail.product.xsxx"/>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-xs-6">
-                                        <div class="form-group">
-                                            <label for="ywmjl" class="col-xs-2 control-label no-padding-right">英文名记录</label>
-                                            <div class="col-xs-10">
-                                                <input id="ywmjl" name="detail.product.ywmjl" type="text" class="input-sm form-control" v-model="detail.product.ywmjl"/>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-xs-6">
-                                        <div class="form-group">
-                                            <label for="zjbz" class="col-xs-2 control-label no-padding-right">质检标准</label>
-                                            <div class="col-xs-10">
-                                                <input id="zjbz" name="detail.product.zjbz" type="text" class="input-sm form-control" v-model="detail.product.zjbz"/>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-xs-6">
-                                        <div class="form-group">
-                                            <label for="bzxx" class="col-xs-2 control-label no-padding-right">备注信息</label>
-                                            <div class="col-xs-10">
-                                                <input id="bzxx" name="detail.product.bzxx" type="text" class="input-sm form-control" v-model="detail.product.bzxx"/>
+                                                <select id="status_id" name="detail.product.status_id" class="input-sm form-control" v-model.number="detail.product.status_id">
+                                                    <template v-for="status in detail.status_list">
+                                                        <option :value="status.id">{{status.name}}</option>
+                                                    </template>
+                                                </select>
                                             </div>
                                         </div>
                                     </div>
@@ -259,47 +185,35 @@
         },
         mounted: function () {
             initDataTable(
-                    '#productList',
-                    {
-                        "sAjaxSource": '{%url "ErpProduct.ListData"%}',
-                        "aaSorting": [[1, "asc"]],
-                        "aoColumns": [
-                            {
-                                "mDataProp": "id", "bSearchable": false, "orderable": false, "sClass": "center", "width": 50,
-                                "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
-                                "render": function (data, type, row) {
-                                    return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
-                                }
-                            },
-                            {"mDataProp": "sku", "title": "SKU", "bSearchable": true },
-                            {"mDataProp": "name", "title": "名称", "bSearchable": true },
-                            {"mDataProp": "english_name", "title": "英文名称", "bSearchable": true },
-                            {"mDataProp": "brand_id", "title": "品牌", "bSearchable": false },
-                            {"mDataProp": "cate_id", "title": "商品目录", "bSearchable": false },
-                            {"mDataProp": "cost_price", "title": "成本价", "bSearchable": false },
-                            {"mDataProp": "quantity", "title": "库存", "bSearchable": false },
-                            {"mDataProp": "weight", "title": "重量", "bSearchable": false },
-                            {"mDataProp": "stock_id", "title": "仓库", "bSearchable": false },
-                            {"mDataProp": "storage_loc_id", "title": "仓位", "bSearchable": false },
-                            {"mDataProp": "supplier_id", "title": "默认供应商", "bSearchable": false },
-                            {"mDataProp": "supplier_price", "title": "供应商报价", "bSearchable": false },
-                            {"mDataProp": "producing_area", "title": "产地", "bSearchable": true },
-                            {"mDataProp": "status_id", "title": "状态", "bSearchable": false },
-                            {"mDataProp": "zxcgl", "title": "最小采购量", "bSearchable": false },
-                            {"mDataProp": "kcjjts", "title": "库存警戒天数", "bSearchable": false },
-                            {"mDataProp": "cgts", "title": "采购天数", "bSearchable": false },
-                            {"mDataProp": "cgsx", "title": "采购上限", "bSearchable": false },
-                            {"mDataProp": "cgy_id", "title": "采购员", "bSearchable": false },
-                            {"mDataProp": "xsy_id", "title": "销售员", "bSearchable": false },
-                            {"mDataProp": "phy_id", "title": "配货员", "bSearchable": false },
-                            {"mDataProp": "xsxx", "title": "销售信息", "bSearchable": true },
-                            {"mDataProp": "ywmjl", "title": "英文名记录", "bSearchable": true },
-                            {"mDataProp": "zjbz", "title": "质检标准", "bSearchable": true },
-                            {"mDataProp": "bzxx", "title": "备注信息", "bSearchable": true },
-                            {"mDataProp": "create_time", "title": "创建时间", "bSearchable": false, "width": 120 },
-                            {"mDataProp": "update_time", "title": "修改时间", "bSearchable": false, "width": 120 }
-                        ]
-                   }
+                '#productList',
+                {
+                    "sAjaxSource": '{%url "ErpProduct.ListData"%}',
+                    "aaSorting": [[1, "asc"]],
+                    "aoColumns": [
+                        {
+                            "mDataProp": "prd.id",
+                            "bSearchable": false,
+                            "orderable": false,
+                            "sClass": "center",
+                            "width": 50,
+                            "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
+                            "render": function (data, type, row) {
+                                return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
+                            }
+                        },
+                        {"mDataProp": "prd.sku", "title": "SKU", "bSearchable": true},
+                        {"mDataProp": "prd.name", "title": "名称", "bSearchable": true},
+                        {"mDataProp": "prd.english_name", "title": "英文名称", "bSearchable": true},
+                        {"mDataProp": "cate.name", "title": "商品目录", "bSearchable": false},
+                        {"mDataProp": "prd.cost_price", "title": "成本价", "bSearchable": false},
+                        {"mDataProp": "prd.weight", "title": "重量", "bSearchable": false},
+                        {"mDataProp": "sup.name", "title": "供应商", "bSearchable": false},
+                        {"mDataProp": "prd.desc", "title": "备注", "bSearchable": true},
+                        {"mDataProp": "st.name", "title": "状态", "bSearchable": false},
+                        {"mDataProp": "prd.create_time", "title": "创建时间", "bSearchable": false, "width": 120},
+                        {"mDataProp": "prd.update_time", "title": "修改时间", "bSearchable": false, "width": 120}
+                    ]
+                }
             );
 
             $('#productList tbody').on('dblclick', 'tr', function () {
@@ -315,27 +229,27 @@
                 showMask("加载中...");
                 $("#productDetailForm").clearValidation();
                 $.ajax({
-                           url: '{%url "ErpProduct.DetailData" %}',
-                           type: "POST",
-                           data: {
-                               "id": id
-                           },
-                           success: function (result) {
-                               hideMask();
-                               if (result.success == false) {
-                                   $.msg.error(result.message);
-                                   return;
-                               }
-                               vm.detail = result;
-                               $('#productDetailDialog').modal(modalOptions);
-                           }
-                       }
+                        url: '{%url "ErpProduct.DetailData" %}',
+                        type: "POST",
+                        data: {
+                            "id": id
+                        },
+                        success: function (result) {
+                            hideMask();
+                            if (result.success == false) {
+                                $.msg.error(result.message);
+                                return;
+                            }
+                            vm.detail = result;
+                            $('#productDetailDialog').modal(modalOptions);
+                        }
+                    }
                 );
             },
             saveProduct: function () {
                 showMask("提交中...");
                 var form = $("#productDetailForm");
-                var valid = validate(form, {  
+                var valid = validate(form, {
                     'detail.product.sku': {
                         required: true, minlength: 2, maxlength: 100
                     },
@@ -423,25 +337,25 @@
                     hideMask();
                 } else {
                     $.ajax({
-                               url: '{%url "ErpProduct.Save"%}',
-                               type: "POST",
-                               processData: false,
-                               contentType: 'application/json',
-                               data: JSON.stringify(vm.detail),
-                               success: function (data) {
-                                   hideMask();
-                                   if (data.success == false) {
-                                       $.msg.error(data.message);
-                                       //return;
-                                   }
-                                   else {
-                                       $.msg.show(data.message);
-                                       $('#productDetailDialog').modal('hide');
-                                       vm.reloadList();
-                                       //return;
-                                   }
-                               }
-                           }
+                            url: '{%url "ErpProduct.Save"%}',
+                            type: "POST",
+                            processData: false,
+                            contentType: 'application/json',
+                            data: JSON.stringify(vm.detail),
+                            success: function (data) {
+                                hideMask();
+                                if (data.success == false) {
+                                    $.msg.error(data.message);
+                                    //return;
+                                }
+                                else {
+                                    $.msg.show(data.message);
+                                    $('#productDetailDialog').modal('hide');
+                                    vm.reloadList();
+                                    //return;
+                                }
+                            }
+                        }
                     );
                 }
             },
@@ -460,20 +374,20 @@
 
                 $.msg.confirm("确认要删除吗？", function () {
                     $.ajax({
-                               url: '{%url "ErpProduct.Delete"%}',
-                               type: "POST",
-                               data: {"id_list": id_list},
-                               success: function (data) {
-                                   if (data.success == false) {
-                                       $.msg.error(data.message);
-                                       return;
-                                   }
-                                   else {
-                                       $.msg.show(data.message);
-                                   }
-                                   vm.reloadList();
-                               }
-                           });
+                        url: '{%url "ErpProduct.Delete"%}',
+                        type: "POST",
+                        data: {"id_list": id_list},
+                        success: function (data) {
+                            if (data.success == false) {
+                                $.msg.error(data.message);
+                                return;
+                            }
+                            else {
+                                $.msg.show(data.message);
+                            }
+                            vm.reloadList();
+                        }
+                    });
                 });
             }
         }

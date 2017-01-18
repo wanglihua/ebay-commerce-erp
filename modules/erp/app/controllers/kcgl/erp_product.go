@@ -7,6 +7,8 @@ import (
 
 	"matrix/core"
 	"matrix/modules/erp/models"
+	"matrix/modules/erp/service/status_service"
+	"matrix/modules/erp/service/product_cate_service"
 )
 
 type ErpProduct struct {
@@ -17,11 +19,33 @@ func (c ErpProduct) Index() revel.Result {
 	return c.RenderTemplate("erp/kcgl/product/product_index.html")
 }
 
+type ErpProductViewItem struct {
+	models.ProductInfo       `xorm:"extends" json:"prd"`
+	models.ProductCateInfo   `xorm:"extends" json:"cate"`
+	models.SupplierInfo      `xorm:"extends" json:"sup"`
+	models.StatusInfo        `xorm:"extends" json:"st"`
+}
+
 func (c ErpProduct) ListData() revel.Result {
 	db_session := c.DbSession
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
-	query := db_session.Where(filter)
+
+	/*
+		SELECT prd.*, cate.*, sup.*, st.*
+		FROM erp_product prd
+		    LEFT JOIN erp_product_cate cate ON prd.cate_id = cate.id
+		    LEFT JOIN erp_supplier sup ON prd.supplier_id = sup.id
+		    INNER JOIN erp_status st ON prd.status_id = st.id
+	*/
+
+	query := db_session.
+	Select("prd.*, cate.*, sup.*, st.*").
+		Table("erp_product").Alias("prd").
+		Join("LEFT", []string{"erp_product_cate", "cate"}, "prd.cate_id = cate.id").
+		Join("LEFT", []string{"erp_supplier", "sup"}, "prd.supplier_id = sup.id").
+		Join("INNER", []string{"erp_status", "st"}, "prd.status_id = st.id").
+		Where(filter)
 
 	//query extra filter here
 
@@ -29,15 +53,15 @@ func (c ErpProduct) ListData() revel.Result {
 	if order != "" {
 		data_query = *data_query.OrderBy(order)
 	} else {
-		data_query = *data_query.Asc("id")
+		data_query = *data_query.Asc("prd.id")
 	}
 
-	product_list := make([]models.ProductInfo, 0, limit)
+	product_list := make([]ErpProductViewItem, 0, limit)
 	err := data_query.Limit(limit, offset).Find(&product_list)
 	core.HandleError(err)
 
 	count_query := *query
-	count, err := count_query.Count(new(models.ProductInfo))
+	count, err := count_query.Count(new(ErpProductViewItem))
 	core.HandleError(err)
 
 	return c.RenderJson(core.GridResult{
@@ -47,7 +71,10 @@ func (c ErpProduct) ListData() revel.Result {
 }
 
 type ProductDetailForm struct {
-	Product models.ProductInfo `json:"product"`
+	Product                   models.ProductInfo                           `json:"product"`
+	SupplierList              []models.SupplierInfo                        `json:"supplier_list"`
+	ProductCateSelectItemList []product_cate_service.ProductCateSelectItem `json:"product_cate_list"`
+	StatusList                []models.StatusInfo                          `json:"status_list"`
 }
 
 func (f *ProductDetailForm) IsCreate() bool {
@@ -103,8 +130,19 @@ func (c ErpProduct) DetailData() revel.Result {
 		}
 	}
 
+	var supplier_list []models.SupplierInfo
+	err := db_session.Asc(models.SupplierCols.Name).Find(&supplier_list)
+	core.HandleError(err)
+
+	var product_cate_list = product_cate_service.GetProductCateSelectItemList(db_session)
+
+	status_list := status_service.GetStatusList(db_session, models.STATUS_TYPE_PRODUCT)
+
 	var detail_form ProductDetailForm
 	detail_form.Product = product
+	detail_form.SupplierList = supplier_list
+	detail_form.ProductCateSelectItemList = product_cate_list
+	detail_form.StatusList = status_list
 
 	return c.RenderJson(detail_form)
 }
@@ -124,9 +162,45 @@ func (c ErpProduct) Save() revel.Result {
 
 	var affected int64
 	if detail_form.IsCreate() {
+		sku_count, err := db_session.Where("sku = ?", product.Sku).Count(&product)
+		core.HandleError(err)
+		if sku_count != 0 {
+			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，SKU已存在！" })
+		}
+
+		name_count, err := db_session.Where("name = ?", product.Name).Count(&product)
+		core.HandleError(err)
+		if name_count != 0 {
+			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，名称已存在！" })
+		}
+
+		englishName_count, err := db_session.Where("english_name = ?", product.EnglishName).Count(&product)
+		core.HandleError(err)
+		if englishName_count != 0 {
+			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，英文名称已存在！" })
+		}
+
 		affected, err = db_session.Insert(&product)
 		core.HandleError(err)
 	} else {
+		sku_count, err := db_session.Where("id <> ? and sku = ?", product.Id, product.Sku).Count(&product)
+		core.HandleError(err)
+		if sku_count != 0 {
+			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，SKU已存在！" })
+		}
+
+		name_count, err := db_session.Where("id <> ? and name = ?", product.Id, product.Name).Count(&product)
+		core.HandleError(err)
+		if name_count != 0 {
+			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，名称已存在！" })
+		}
+
+		englishName_count, err := db_session.Where("id <> ? and english_name = ?", product.Id, product.EnglishName).Count(&product)
+		core.HandleError(err)
+		if englishName_count != 0 {
+			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，英文名称已存在！" })
+		}
+
 		affected, err = db_session.Id(product.Id).Update(&product)
 		core.HandleError(err)
 
