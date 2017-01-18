@@ -378,14 +378,13 @@ func TemplateFuncCheckUniqueCreate(entity Entity, field Field) string {
 				checkedUniqueCreateFields[compositeUniquekey] = true
 			}
 
-			where := fieldsCompare + ", " + fieldsValue
+			where := `"` + fieldsCompare + `"` + ", " + fieldsValue
 
-			template := `	{{.fieldCamelCase}}_count, err := db_session.Where({{.where}}).Count(&{{Underscore .entity.EntityCamelCase}})
+			template := `		{{.fieldCamelCase}}_count, err := db_session.Where({{.where}}).Count(&{{Underscore .entity.EntityCamelCase}})
 		core.HandleError(err)
 		if {{.fieldCamelCase}}_count != 0 {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，{{.chineseNames}}组合必须唯一！" })
-		}
-`
+			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，{{.chineseNames}}已存在！" })
+		}`
 			checkUniqueCode := RenderCodeTemplate("check_unique_create", template, map[string]interface{}{
 				"entity":         entity,
 				"field":          field,
@@ -443,7 +442,7 @@ func TemplateFuncCheckUniqueUpdate(entity Entity, field Field) string {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，{{.field.VerboseName}}已存在！" })
 		}
 `
-			checkUniqueCode := RenderCodeTemplate("check_unique_create", template, map[string]interface{}{
+			checkUniqueCode := RenderCodeTemplate("check_unique_update", template, map[string]interface{}{
 				"entity":         entity,
 				"field":          field,
 				"fieldCamelCase": strings.ToLower(field.Name[0:1]) + field.Name[1:],
@@ -475,15 +474,14 @@ func TemplateFuncCheckUniqueUpdate(entity Entity, field Field) string {
 				checkedUniqueUpdateFields[compositeUniquekey] = true
 			}
 
-			where := fieldsCompare + ", " + fieldsValue
+			where := `"` + fieldsCompare + `"` + ", " + fieldsValue
 
-			template := `	{{.fieldCamelCase}}_count, err := db_session.Where({{.where}}).Count(&{{Underscore .entity.EntityCamelCase}})
+			template := `		{{.fieldCamelCase}}_count, err := db_session.Where({{.where}}).Count(&{{Underscore .entity.EntityCamelCase}})
 		core.HandleError(err)
 		if {{.fieldCamelCase}}_count != 0 {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，{{.chineseNames}}已存在！" })
-		}
-`
-			checkUniqueCode := RenderCodeTemplate("check_unique_create", template, map[string]interface{}{
+		}`
+			checkUniqueCode := RenderCodeTemplate("check_unique_update", template, map[string]interface{}{
 				"entity":         entity,
 				"field":          field,
 				"fieldCamelCase": strings.ToLower(field.Name[0:1]) + field.Name[1:],

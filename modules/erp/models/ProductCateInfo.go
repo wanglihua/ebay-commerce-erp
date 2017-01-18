@@ -6,7 +6,7 @@ import (
 
 type ProductCateInfo struct {
 	Id          int64           `xorm:"bigint notnull pk autoincr 'id'" json:"id"`
-	Name        string          `xorm:"nvarchar(200) notnull index 'name'" json:"name" smith:"verbose_name=名称,min=2,max=100"`
+	Name        string          `xorm:"nvarchar(200) notnull index unique 'name'" json:"name" smith:"verbose_name=名称,min=2,max=100"`
 	EnglishName string          `xorm:"nvarchar(200) notnull index 'english_name'" json:"english_name" smith:"verbose_name=英文名,min=2,max=100"`
 	Desc        core.NullString `xorm:"nvarchar(500) 'desc'" json:"desc" smith:"verbose_name=描述,max=500"`
 	HsCode      core.NullString `xorm:"nvarchar(20) 'hs_code'" json:"hs_code" smith:"verbose_name=报关编码,min=2,max=20"`

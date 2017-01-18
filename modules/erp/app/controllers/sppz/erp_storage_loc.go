@@ -140,9 +140,21 @@ func (c ErpStorageLoc) Save() revel.Result {
 
 	var affected int64
 	if detail_form.IsCreate() {
+		stockId_count, err := db_session.Where("stock_id = ? and name = ?", storage_loc.StockId, storage_loc.Name).Count(&storage_loc)
+		core.HandleError(err)
+		if stockId_count != 0 {
+			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，仓库、名称已存在！" })
+		}
+
 		affected, err = db_session.Insert(&storage_loc)
 		core.HandleError(err)
 	} else {
+		stockId_count, err := db_session.Where("id <> ? and stock_id = ? and name = ?", storage_loc.Id, storage_loc.StockId, storage_loc.Name).Count(&storage_loc)
+		core.HandleError(err)
+		if stockId_count != 0 {
+			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，仓库、名称已存在！" })
+		}
+
 		affected, err = db_session.Id(storage_loc.Id).Update(&storage_loc)
 		core.HandleError(err)
 

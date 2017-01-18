@@ -131,9 +131,21 @@ func (c ErpSupplier) Save() revel.Result {
 
 	var affected int64
 	if detail_form.IsCreate() {
+		name_count, err := db_session.Where("name = ?", supplier.Name).Count(&supplier)
+		core.HandleError(err)
+		if name_count != 0 {
+			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，名称已存在！" })
+		}
+
 		affected, err = db_session.Insert(&supplier)
 		core.HandleError(err)
 	} else {
+		name_count, err := db_session.Where("id <> ? and name = ?", supplier.Id, supplier.Name).Count(&supplier)
+		core.HandleError(err)
+		if name_count != 0 {
+			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，名称已存在！" })
+		}
+
 		affected, err = db_session.Id(supplier.Id).Update(&supplier)
 		core.HandleError(err)
 

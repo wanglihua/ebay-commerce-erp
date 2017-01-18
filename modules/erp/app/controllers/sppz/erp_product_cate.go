@@ -20,9 +20,9 @@ func (c ErpProductCate) Index() revel.Result {
 }
 
 type ErpProductCateViewItem struct {
-	models.ProductCateInfo `xorm:"extends" json:"c"`
-	Parent                 models.ProductCateInfo `xorm:"extends" json:"p"`
-	models.StatusInfo      `xorm:"extends" json:"s"`
+	models.ProductCateInfo         `xorm:"extends" json:"c"`
+	Parent models.ProductCateInfo  `xorm:"extends" json:"p"`
+	models.StatusInfo              `xorm:"extends" json:"s"`
 }
 
 func (c ErpProductCate) ListData() revel.Result {
@@ -38,7 +38,7 @@ func (c ErpProductCate) ListData() revel.Result {
 	*/
 
 	query := db_session.
-		Select("c.*, p.*, s.*").
+	Select("c.*, p.*, s.*").
 		Table("erp_product_cate").Alias("c").
 		Join("LEFT", []string{"erp_product_cate", "p"}, "c.parent_id = p.id").
 		Join("INNER", []string{"erp_status", "s"}, "c.status_id = s.id").
@@ -132,7 +132,7 @@ func (c ErpProductCate) DetailData() revel.Result {
 		core.HandleError(err)
 	} else {
 		err := db_session.
-			Where(fmt.Sprintf("(%[1]s is null or %[1]s = 0) and (%[2]s <> %[3]d)", parent_cate_cols.ParentId, parent_cate_cols.Id, product_cate_id)).
+		Where(fmt.Sprintf("(%[1]s is null or %[1]s = 0) and (%[2]s <> %[3]d)", parent_cate_cols.ParentId, parent_cate_cols.Id, product_cate_id)).
 			Find(&parent_cate_list)
 		core.HandleError(err)
 	}
@@ -162,9 +162,21 @@ func (c ErpProductCate) Save() revel.Result {
 
 	var affected int64
 	if detail_form.IsCreate() {
+		name_count, err := db_session.Where("name = ?", product_cate.Name).Count(&product_cate)
+		core.HandleError(err)
+		if name_count != 0 {
+			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，名称已存在！" })
+		}
+
 		affected, err = db_session.Insert(&product_cate)
 		core.HandleError(err)
 	} else {
+		name_count, err := db_session.Where("id <> ? and name = ?", product_cate.Id, product_cate.Name).Count(&product_cate)
+		core.HandleError(err)
+		if name_count != 0 {
+			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，名称已存在！" })
+		}
+
 		affected, err = db_session.Id(product_cate.Id).Update(&product_cate)
 		core.HandleError(err)
 
