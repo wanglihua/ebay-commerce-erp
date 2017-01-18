@@ -172,8 +172,13 @@ DELETE FROM erp_product_import WHERE user_id = %d;
 
 	sql = fmt.Sprintf(sql, models.PRODUCT_STATUS_ZC, login_user_id, login_user_id)
 
-	_, err := db_session.Exec(sql)
+	result, err := db_session.Exec(sql)
 	core.HandleError(err)
+
+	rows_affected, _ := result.RowsAffected()
+	if rows_affected == 0 {
+		return c.RenderJson(core.JsonResult{Success: false, Message: "没有商品导入数据!"})
+	}
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: "商品数据导入成功!"})
 }
