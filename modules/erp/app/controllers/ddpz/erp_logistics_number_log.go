@@ -9,6 +9,8 @@ import (
 	"matrix/modules/erp/models"
 )
 
+// 弃用
+
 type ErpLogisticsNumberLog struct {
 	*revel.Controller
 }

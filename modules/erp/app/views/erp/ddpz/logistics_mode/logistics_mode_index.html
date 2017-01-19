@@ -34,7 +34,7 @@
         </div>
     </div>
     <div class="modal fade" id="logisticsModeDetailDialog">
-        <div class="modal-dialog" style="width: 480px;">
+        <div class="modal-dialog" style="width: 580px;">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="True">&times;</button>
@@ -46,12 +46,28 @@
                             <form class="form-horizontal" role="form" id="logisticsModeDetailForm">
                                 <input id="logistics_mode_id" name="detail.logistics_mode.id" type="hidden" v-model.number="detail.logistics_mode.id"/>
                                 <input id="logistics_mode_version" name="detail.logistics_mode.version" type="hidden" v-model.number="detail.logistics_mode.version"/>
+
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
                                             <label for="name" class="col-xs-2 control-label no-padding-right">名称</label>
                                             <div class="col-xs-10">
                                                 <input id="name" name="detail.logistics_mode.name" type="text" class="input-sm form-control" v-model="detail.logistics_mode.name"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <label for="ebay_mode_id" class="col-xs-2 control-label no-padding-right">EBay物流方式</label>
+                                            <div class="col-xs-10">
+                                                <select id="ebay_mode_id" name="detail.logistics_mode.ebay_mode_id" class="input-sm form-control" v-model.number="detail.logistics_mode.ebay_mode_id">
+                                                    <template v-for="mode in detail.ebay_logistics_mode_list">
+                                                        <option :value="mode.id">{{mode.name}}</option>
+                                                    </template>
+                                                </select>
                                             </div>
                                         </div>
                                     </div>
@@ -100,7 +116,7 @@
                     "aaSorting": [[1, "asc"]],
                     "aoColumns": [
                         {
-                            "mDataProp": "id",
+                            "mDataProp": "m.id",
                             "bSearchable": false,
                             "orderable": false,
                             "sClass": "center",
@@ -110,10 +126,11 @@
                                 return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
                             }
                         },
-                        {"mDataProp": "name", "title": "名称", "bSearchable": true, "width": 220},
-                        {"mDataProp": "desc", "title": "描述", "bSearchable": true},
-                        {"mDataProp": "create_time", "title": "创建时间", "bSearchable": false, "width": 120},
-                        {"mDataProp": "update_time", "title": "修改时间", "bSearchable": false, "width": 120}
+                        {"mDataProp": "m.name", "title": "名称", "bSearchable": true, "width": 220},
+                        {"mDataProp": "pm.name", "title": "EBay物流方式", "bSearchable": true, "width": 220},
+                        {"mDataProp": "m.desc", "title": "描述", "bSearchable": true},
+                        {"mDataProp": "m.create_time", "title": "创建时间", "bSearchable": false, "width": 120},
+                        {"mDataProp": "m.update_time", "title": "修改时间", "bSearchable": false, "width": 120}
                     ]
                 }
             );
@@ -152,6 +169,9 @@
                 showMask("提交中...");
                 var form = $("#logisticsModeDetailForm");
                 var valid = validate(form, {
+                    'detail.logistics_mode.ebay_mode_id': {
+                        required: true, digits: true
+                    },
                     'detail.logistics_mode.name': {
                         required: true, minlength: 2, maxlength: 100
                     },

@@ -10,6 +10,8 @@ import (
 	"matrix/modules/erp/service/status_service"
 )
 
+// 弃用
+
 type ErpLogisticsNumberBatch struct {
 	*revel.Controller
 }
