@@ -160,6 +160,7 @@ func (c ErpProductImport) Import() revel.Result {
 func (c ErpProductImport) Confirm() revel.Result {
 	db_session := c.DbSession
 
+	//todo: 改成存储过程
 	sql := `
 INSERT INTO erp_product (sku, name, english_name, cost_price, weight, status_id, create_time, update_time, version)
     SELECT pi.sku, pi.name, pi.english_name, pi.cost_price, pi.weight, %d, pi.import_time, pi.import_time, 1
