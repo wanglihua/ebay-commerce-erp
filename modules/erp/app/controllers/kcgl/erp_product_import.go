@@ -160,20 +160,23 @@ func (c ErpProductImport) Import() revel.Result {
 func (c ErpProductImport) Confirm() revel.Result {
 	db_session := c.DbSession
 
-	//todo: 改成存储过程
-	sql := `
-INSERT INTO erp_product (sku, name, english_name, cost_price, weight, status_id, create_time, update_time, version)
-    SELECT pi.sku, pi.name, pi.english_name, pi.cost_price, pi.weight, %d, pi.import_time, pi.import_time, 1
-    FROM erp_product_import pi
-    WHERE pi.user_id = %d;
-DELETE FROM erp_product_import WHERE user_id = %d;
+	proc_sql := `
+CREATE PROCEDURE erp_product_import_trans_v0001(p_user_id INT, p_product_status_id INT)
+    BEGIN
+        INSERT INTO erp_product (sku, name, english_name, cost_price, weight, status_id, create_time, update_time, version)
+            SELECT pi.sku, pi.name, pi.english_name, pi.cost_price, pi.weight, p_product_status_id, pi.import_time,
+                pi.import_time, 1
+            FROM erp_product_import pi
+            WHERE pi.user_id = p_user_id;
+        DELETE FROM erp_product_import WHERE user_id = p_user_id;
+    END;
 	`
+
+	core.CreateProc("erp_product_import_trans_v0001", proc_sql, db_session)
+
 	login_user := core.GetLoginUser(c.Session)
 	login_user_id := login_user.UserId
-
-	sql = fmt.Sprintf(sql, models.PRODUCT_STATUS_ZC, login_user_id, login_user_id)
-
-	result, err := db_session.Exec(sql)
+	result, err := db_session.Exec("CALL erp_product_import_trans_v0001(?, ?);", login_user_id, models.PRODUCT_STATUS_ZC)
 	core.HandleError(err)
 
 	rows_affected, _ := result.RowsAffected()
