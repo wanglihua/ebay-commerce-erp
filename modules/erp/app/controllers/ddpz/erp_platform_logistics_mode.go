@@ -1,4 +1,3 @@
-
 package controllers
 
 import (
@@ -18,11 +17,27 @@ func (c ErpPlatformLogisticsMode) Index() revel.Result {
 	return c.RenderTemplate("erp/ddpz/platform_logistics_mode/platform_logistics_mode_index.html")
 }
 
+type ErpPlatformLogisticsViewItem struct {
+	models.PlatformLogisticsModeInfo        `xorm:"extends" json:"m"`
+	models.ECommercePlatformInfo            `xorm:"extends" json:"p"`
+}
+
 func (c ErpPlatformLogisticsMode) ListData() revel.Result {
 	db_session := c.DbSession
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
-	query := db_session.Where(filter)
+
+	/*
+	SELECT m.*, p.*
+	FROM erp_platform_logistics_mode m
+	    INNER JOIN erp_ecommerce_platform p ON m.platform_id = p.id
+	*/
+
+	query := db_session.
+	Select("m.*, p.*").
+		Table("erp_platform_logistics_mode").Alias("m").
+		Join("INNER", []string{"erp_ecommerce_platform", "p"}, "m.platform_id = p.id").
+		Where(filter)
 
 	//query extra filter here
 
@@ -30,15 +45,15 @@ func (c ErpPlatformLogisticsMode) ListData() revel.Result {
 	if order != "" {
 		data_query = *data_query.OrderBy(order)
 	} else {
-		data_query = *data_query.Asc("id")
+		data_query = *data_query.Asc("m.id")
 	}
 
-	platform_logistics_mode_list := make([]models.PlatformLogisticsModeInfo, 0, limit)
+	platform_logistics_mode_list := make([]ErpPlatformLogisticsViewItem, 0, limit)
 	err := data_query.Limit(limit, offset).Find(&platform_logistics_mode_list)
 	core.HandleError(err)
 
 	count_query := *query
-	count, err := count_query.Count(new(models.PlatformLogisticsModeInfo))
+	count, err := count_query.Count(new(ErpPlatformLogisticsViewItem))
 	core.HandleError(err)
 
 	return c.RenderJson(core.GridResult{
@@ -48,14 +63,15 @@ func (c ErpPlatformLogisticsMode) ListData() revel.Result {
 }
 
 type PlatformLogisticsModeDetailForm struct {
-	PlatformLogisticsMode models.PlatformLogisticsModeInfo `json:"platform_logistics_mode"`
+	PlatformLogisticsMode models.PlatformLogisticsModeInfo  `json:"platform_logistics_mode"`
+	PlatformList          []models.ECommercePlatformInfo    `json:"platform_list"`
 }
 
 func (f *PlatformLogisticsModeDetailForm) IsCreate() bool {
 	return f.PlatformLogisticsMode.Id == 0
 }
 
-func (f *PlatformLogisticsModeDetailForm) Valid(validation *revel.Validation) bool { 
+func (f *PlatformLogisticsModeDetailForm) Valid(validation *revel.Validation) bool {
 	validation.Required(f.PlatformLogisticsMode.PlatformId).Message("电商平台不能为空！")
 
 	validation.Required(f.PlatformLogisticsMode.Name).Message("名称不能为空！")
@@ -88,8 +104,13 @@ func (c ErpPlatformLogisticsMode) DetailData() revel.Result {
 		}
 	}
 
+	var platform_list = make([]models.ECommercePlatformInfo, 0)
+	err := db_session.Find(&platform_list)
+	core.HandleError(err)
+
 	var detail_form PlatformLogisticsModeDetailForm
 	detail_form.PlatformLogisticsMode = platform_logistics_mode
+	detail_form.PlatformList = platform_list
 
 	return c.RenderJson(detail_form)
 }
@@ -108,7 +129,7 @@ func (c ErpPlatformLogisticsMode) Save() revel.Result {
 	platform_logistics_mode := detail_form.PlatformLogisticsMode
 
 	var affected int64
-	if detail_form.IsCreate() { 
+	if detail_form.IsCreate() {
 		name_count, err := db_session.Where("name = ?", platform_logistics_mode.Name).Count(&platform_logistics_mode)
 		core.HandleError(err)
 		if name_count != 0 {
@@ -117,7 +138,7 @@ func (c ErpPlatformLogisticsMode) Save() revel.Result {
 
 		affected, err = db_session.Insert(&platform_logistics_mode)
 		core.HandleError(err)
-	} else { 
+	} else {
 		name_count, err := db_session.Where("id <> ? and name = ?", platform_logistics_mode.Id, platform_logistics_mode.Name).Count(&platform_logistics_mode)
 		core.HandleError(err)
 		if name_count != 0 {
@@ -146,4 +167,3 @@ func (c ErpPlatformLogisticsMode) Delete() revel.Result {
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})
 }
-

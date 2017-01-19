@@ -31,6 +31,14 @@ func GetDdpzMenu(db_session *xorm.Session, web_session revel.Session) string {
             <b class="arrow"></b>
         </li>
 
+        <li id="ddpz-platformlogisticsmode-menu" class="">
+            <a href="/erp/platform/logistics/mode">
+                <i class="menu-icon fa fa-caret-right"></i>
+                电商平台物流方式
+            </a>
+            <b class="arrow"></b>
+        </li>
+
         <li id="ddpz-ordercustomtype-menu" class="">
             <a href="/erp/order/custom/type">
                 <i class="menu-icon fa fa-caret-right"></i>
