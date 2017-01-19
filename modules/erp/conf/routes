@@ -215,3 +215,16 @@ GET  /erp/order/phz                            ErpOrderPhz.Index
 GET  /erp/order/yfh                            ErpOrderYfh.Index
 GET  /erp/order/ywc                            ErpOrderYwc.Index
 GET  /erp/order/khb                            ErpOrderKhb.Index
+
+GET  /erp/ecommerce/platform                   ErpECommercePlatform.Index
+POST /erp/ecommerce/platform/data/list         ErpECommercePlatform.ListData
+POST /erp/ecommerce/platform/data/detail       ErpECommercePlatform.DetailData
+POST /erp/ecommerce/platform/save              ErpECommercePlatform.Save
+POST /erp/ecommerce/platform/delete            ErpECommercePlatform.Delete
+
+GET  /erp/platform/logistics/mode              ErpPlatformLogisticsMode.Index
+POST /erp/platform/logistics/mode/data/list    ErpPlatformLogisticsMode.ListData
+POST /erp/platform/logistics/mode/data/detail  ErpPlatformLogisticsMode.DetailData
+POST /erp/platform/logistics/mode/save         ErpPlatformLogisticsMode.Save
+POST /erp/platform/logistics/mode/delete       ErpPlatformLogisticsMode.Delete
+
