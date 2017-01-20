@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"matrix/core"
 	"matrix/modules/auth/models"
+	"strings"
 )
 
 type AuthAdmin struct {
@@ -26,8 +27,8 @@ func (c AuthAdmin) ListData() revel.Result {
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 	query := session.
-		Select("a.*, u.*").
-		Table(models.TablePrefix+"user").Alias("u").
+	Select("a.*, u.*").
+		Table(models.TablePrefix + "user").Alias("u").
 		Join("inner", []string{models.TablePrefix + "admin", "a"}, "u.id = a.user_id").
 		Where(filter)
 
@@ -110,18 +111,54 @@ func (c AuthAdmin) AddSave() revel.Result {
 }
 
 func (c AuthAdmin) Remove() revel.Result {
-	session := c.DbSession
+	db_session := c.DbSession
 
 	adminIdList := make([]int, 0)
 	c.Params.Bind(&adminIdList, "id_list")
 
+	admin_id_str_list := make([]string, 0)
+	for _, admin_id := range adminIdList {
+		admin_id_str_list = append(admin_id_str_list, fmt.Sprintf("%d", admin_id))
+	}
+
+	admin_id_strs := strings.Join(admin_id_str_list, ",")
+
+	/*
+		SELECT count(*) AS count
+		FROM auth_admin a
+		    INNER JOIN auth_user u ON a.user_id = u.id
+		WHERE a.id IN (1, 2, 3) AND u.login_name = '0000';
+	*/
+
+	sql := `
+SELECT count(*) AS count
+FROM auth_admin a
+    INNER JOIN auth_user u ON a.user_id = u.id
+WHERE a.id IN (%s) AND u.login_name = '0000';
+	`
+	sql = fmt.Sprintf(sql, admin_id_strs)
+
+	var admin_count struct {
+		Count int64 `xorm:"'count'" json:"count"`
+	}
+
+	_, err := db_session.Sql(sql).Get(&admin_count)
+	core.HandleError(err)
+
+	if admin_count.Count != 0 {
+		return c.RenderJson(core.JsonResult{Success: false, Message: "移除失败，内置管理员不能移除!"})
+	}
+
+	/*
 	admin := new(models.AdminInfo)
-	count, err := session.Count(admin)
+	count, err := db_session.Count(admin)
 	if int64(len(adminIdList)) == count {
 		return c.RenderJson(core.JsonResult{Success: false, Message: "移除失败，管理员不能全部移除!"})
 	}
-
-	_, err = session.In("id", adminIdList).Delete(admin)
+	*/
+	
+	admin := new(models.AdminInfo)
+	_, err = db_session.In("id", adminIdList).Delete(admin)
 	core.HandleError(err)
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: "移除成功!"})
