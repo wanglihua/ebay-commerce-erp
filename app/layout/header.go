@@ -111,7 +111,7 @@ func GetHeader(title string, db_session *xorm.Session, web_session revel.Session
                                 <span class="user-info">`)
 
 	if login_user_login_name != "" {
-		header_buffer.WriteString(fmt.Sprintf("工号：%s &nbsp;&nbsp;&nbsp;&nbsp;姓名：%s", login_user.LoginName, login_user_nick_name))
+		header_buffer.WriteString(fmt.Sprintf("工号：%s &nbsp;&nbsp;&nbsp;&nbsp;姓名：%s", login_user_login_name, login_user_nick_name))
 	} else {
 		header_buffer.WriteString("未登录")
 	}
