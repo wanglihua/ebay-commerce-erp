@@ -10,6 +10,7 @@ function saveUser() {
     var valid = validate(form, {
         'form.User.LoginName': {
             required: true,
+            digits: true,
             minlength: 3,
             maxlength: 10
         },

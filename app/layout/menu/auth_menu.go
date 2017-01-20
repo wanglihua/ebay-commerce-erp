@@ -30,6 +30,7 @@ func GetAuthMenu(db_session *xorm.Session, web_session revel.Session) string {
     </a>
     <b class="arrow"></b>
     <ul class="submenu">
+
         <li id="auth-user-menu" class="">
             <a href="/auth/user">
                 <i class="menu-icon fa fa-caret-right"></i>
@@ -37,6 +38,7 @@ func GetAuthMenu(db_session *xorm.Session, web_session revel.Session) string {
             </a>
             <b class="arrow"></b>
         </li>
+
         <li id="auth-admin-menu" class="">
             <a href="/auth/admin">
                 <i class="menu-icon fa fa-caret-right"></i>
@@ -44,16 +46,22 @@ func GetAuthMenu(db_session *xorm.Session, web_session revel.Session) string {
             </a>
             <b class="arrow"></b>
         </li>
-        <li id="auth-group-menu" class="">
-            <a href="/auth/group">
-                <i class="menu-icon fa fa-caret-right"></i>
-                群组管理
-            </a>
-            <b class="arrow"></b>
-        </li>
+
     </ul>
 </li>
 `)
 	}
 	return buffer.String()
 }
+
+/*
+
+<li id="auth-group-menu" class="">
+    <a href="/auth/group">
+        <i class="menu-icon fa fa-caret-right"></i>
+        群组管理
+    </a>
+    <b class="arrow"></b>
+</li>
+
+*/

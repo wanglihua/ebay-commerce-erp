@@ -4,6 +4,7 @@ import (
 	"github.com/revel/revel"
 	"matrix/modules/auth/models"
 	"strings"
+	"strconv"
 )
 
 type UserDetailForm struct {
@@ -20,6 +21,12 @@ func (f *UserDetailForm) IsCreate() bool {
 
 func (f *UserDetailForm) Valid(validation *revel.Validation) bool {
 	validation.Required(f.User.LoginName).Message("工号不能为空！")
+
+	_, err := strconv.ParseUint(f.User.LoginName, 10, 64)
+	if err != nil {
+		validation.Error("LoginName", "工号只能是数字！")
+	}
+
 	validation.MinSize(f.User.LoginName, 3).Message("工号长度不能小于3！")
 	validation.MaxSize(f.User.LoginName, 10).Message("工号长度不能大于10！")
 

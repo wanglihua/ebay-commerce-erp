@@ -15,6 +15,11 @@ func UserHasPass(res_id int, web_session revel.Session, db_session *xorm.Session
 	login_user := core.GetLoginUser(web_session)
 	login_user_id := login_user.UserId
 
+	// 管理员有任何权限
+	if login_user.IsAdmin == true {
+		return true
+	}
+
 	type UserResCount struct {
 		Count int64 `xorm:"'count'" json:"count"`
 	}
@@ -36,6 +41,13 @@ SELECT count(*) AS count FROM erp_pass_user_res WHERE user_id = ? AND res_id = ?
 // 检查当前登录用户是否有 res_id 的操作权限
 func CheckUserPass(res_id int, web_session revel.Session, db_session *xorm.Session) {
 	if UserHasPass(res_id, web_session, db_session) == false {
+		panic("对不起，您没有当前操作的权限！")
+	}
+}
+
+func AdminOnly(web_session revel.Session) {
+	login_user := core.GetLoginUser(web_session)
+	if login_user.IsAdmin == false {
 		panic("对不起，您没有当前操作的权限！")
 	}
 }

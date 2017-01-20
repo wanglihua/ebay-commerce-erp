@@ -2,6 +2,11 @@ package models
 
 import (
 	"matrix/core"
+	"github.com/go-xorm/xorm"
+)
+
+const (
+	PASS_RES_USER = 10001 // 用户管理
 )
 
 type PassResInfo struct {
@@ -20,4 +25,8 @@ func (e PassResInfo) TableName() string {
 
 func (e PassResInfo) ModelDesc() string {
 	return "verbose_name=权限,entity_json=pass_res,route=pass/res"
+}
+
+func (e PassResInfo) InitData(db_session *xorm.Session) {
+
 }

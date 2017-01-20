@@ -6,14 +6,17 @@ import (
 	"github.com/revel/revel"
 	"matrix/app/layout/menu"
 	"matrix/core"
+	"fmt"
 )
 
 func GetHeader(title string, db_session *xorm.Session, web_session revel.Session) string {
 	sys_name := GetSysName(db_session)
 
 	login_user := core.GetLoginUser(web_session)
-	login_user_nick_name := "未登录"
+	login_user_login_name := ""
+	login_user_nick_name := ""
 	if login_user != nil {
+		login_user_login_name = login_user.LoginName
 		login_user_nick_name = login_user.NickName
 	}
 
@@ -31,44 +34,44 @@ func GetHeader(title string, db_session *xorm.Session, web_session revel.Session
 
 	header_buffer.WriteString(`</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
-    <link type="text/css" rel="stylesheet" href="/static/ace/css/all.css?{% static_version %}" class="ace-main-stylesheet" id="main-ace-style" />
+    <link type="text/css" rel="stylesheet" href="/static/ace/css/all.css?201701202000" class="ace-main-stylesheet" id="main-ace-style" />
     <!--[if lte IE 9]>
-    <link type="text/css" rel="stylesheet" href="/static/ace/css/ace-part2.min.css?{% static_version %}" class="ace-main-stylesheet"/>
+    <link type="text/css" rel="stylesheet" href="/static/ace/css/ace-part2.min.css?201701202000" class="ace-main-stylesheet"/>
     <![endif]-->
     <!--[if lte IE 9]>
-    <link type="text/css" rel="stylesheet" href="/static/ace/css/ace-ie.min.css?{% static_version %}"/>
+    <link type="text/css" rel="stylesheet" href="/static/ace/css/ace-ie.min.css?201701202000"/>
     <![endif]-->
-    <link type="text/css" rel="stylesheet" href="/static/site.css?{% static_version %}"/>`)
+    <link type="text/css" rel="stylesheet" href="/static/site.css?201701202000"/>`)
 
 	if revel.DevMode {
-		header_buffer.WriteString(`<script type="text/javascript" src="/static/js/vue.js?{% static_version %}"></script>`)
+		header_buffer.WriteString(`<script type="text/javascript" src="/static/js/vue.js?201701202000"></script>`)
 	} else {
-		header_buffer.WriteString(`<script type="text/javascript" src="/static/js/vue.min.js?{% static_version %}"></script>`)
+		header_buffer.WriteString(`<script type="text/javascript" src="/static/js/vue.min.js?201701202000"></script>`)
 	}
 
 	header_buffer.WriteString(`<!--[if !IE]> -->
     <script type="text/javascript">
-        window.jQuery || document.write("<script type='text/javascript' src='/static/ace/js/jquery.min.js?{% static_version %}'>" + "<" + "/script>");
+        window.jQuery || document.write("<script type='text/javascript' src='/static/ace/js/jquery.min.js?201701202000'>" + "<" + "/script>");
     </script>
     <!-- <![endif]-->
     <!--[if IE]>
     <script type="text/javascript">
-        window.jQuery || document.write("<script type='text/javascript' src='/static/ace/js/jquery1x.min.js?{% static_version %}'>" + "<" + "/script>");
+        window.jQuery || document.write("<script type='text/javascript' src='/static/ace/js/jquery1x.min.js?201701202000'>" + "<" + "/script>");
     </script>
     <![endif]-->
     <script type="text/javascript">
-        if ('ontouchstart' in document.documentElement) document.write("<script type='text/javascript' src='/static/ace/js/jquery.mobile.custom.min.js?{% static_version %}'>" + "<" + "/script>");
+        if ('ontouchstart' in document.documentElement) document.write("<script type='text/javascript' src='/static/ace/js/jquery.mobile.custom.min.js?201701202000'>" + "<" + "/script>");
     </script>`)
 
 	header_buffer.WriteString(`
-        <script type="text/javascript" src="/static/ace/js/all1.js?{% static_version %}"></script>
+        <script type="text/javascript" src="/static/ace/js/all1.js?201701202000"></script>
         <!--[if lte IE 8]>
-        <script type="text/javascript" src="/static/ace/js/html5shiv.min.js?{% static_version %}"></script>
-        <script type="text/javascript" src="/static/ace/js/respond.min.js?{% static_version %}"></script>
+        <script type="text/javascript" src="/static/ace/js/html5shiv.min.js?201701202000"></script>
+        <script type="text/javascript" src="/static/ace/js/respond.min.js?201701202000"></script>
         <![endif]-->
-        <script type="text/javascript" src="/static/ace/js/all2.js?{% static_version %}"></script>
-        <script type="text/javascript" src="/static/js/js.cookie.js?{% static_version %}"></script>
-        <script type="text/javascript" src="/static/site.js?{% static_version %}"></script>`)
+        <script type="text/javascript" src="/static/ace/js/all2.js?201701202000"></script>
+        <script type="text/javascript" src="/static/js/js.cookie.js?201701202000"></script>
+        <script type="text/javascript" src="/static/site.js?201701202000"></script>`)
 
 	header_buffer.WriteString(`
 </head>
@@ -105,10 +108,13 @@ func GetHeader(title string, db_session *xorm.Session, web_session revel.Session
             <ul class="nav ace-nav">
                 <li class="light-blue">
                     <a data-toggle="dropdown" href="#" class="dropdown-toggle">
-                        <img class="nav-user-photo" src="/static/ace/avatars/user3.jpg" alt="user photo"/>
-                                <span class="user-info"><small>欢迎！</small>`)
+                                <span class="user-info">`)
 
-	header_buffer.WriteString(login_user_nick_name)
+	if login_user_login_name != "" {
+		header_buffer.WriteString(fmt.Sprintf("工号：%s &nbsp;&nbsp;&nbsp;&nbsp;姓名：%s", login_user.LoginName, login_user_nick_name))
+	} else {
+		header_buffer.WriteString("未登录")
+	}
 
 	header_buffer.WriteString(`</span>
                         <i class="ace-icon fa fa-caret-down"></i>

@@ -171,6 +171,16 @@ div.div-err {
 
 }
 
+#navbar-container > div.navbar-buttons.navbar-header.pull-right > ul > li > a {
+    background-color: #438EB9 !important;
+}
+
+#navbar-container > div.navbar-buttons.navbar-header.pull-right > ul > li > a > span {
+    top: 0;
+    vertical-align: middle;
+    max-width: 200px;
+}
+
 div.todo {
     margin: 10px 5px;
     padding: 10px;
