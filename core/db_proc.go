@@ -17,7 +17,7 @@ func CreateProc(proc_name string, create_proc_sql string, db_session *xorm.Sessi
 	}
 
 	//判断该版本的存储过程在数据库中是否存在，如果存在就直接返回
-	count_sql := `SELECT count(*) AS proc_count FROM mysql.proc WHERE name = ?;`
+	count_sql := `SELECT count(*) AS proc_count FROM mysql.proc WHERE db = SCHEMA() AND name = ?;`
 
 	var proc_count struct {
 		ProcCount int `xorm:"'proc_count'"`
