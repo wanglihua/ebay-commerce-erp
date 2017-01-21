@@ -53,7 +53,7 @@ func AdminOnly(web_session revel.Session) {
 }
 
 // 获取登录用户 授权资源类别列表
-func GetLoginUserPassResCateList(web_session revel.Session, db_session *xorm.Session) []int64 {
+func GetLoginUserPassResCateList(db_session *xorm.Session, web_session revel.Session) []int64 {
 	type UserPassResCateId struct {
 		ResCateId int64 `xorm:"'res_cate_id'" json:"res_cate_id"`
 	}
@@ -73,11 +73,40 @@ WHERE ur.user_id = ?;`
 	err := db_session.Sql(sql, login_user_id).Find(&user_pass_res_cate_id_list)
 	core.HandleError(err)
 
-	var pass_res_cate_id_list = make([]int64, 0)
+	var res_cate_id_list = make([]int64, 0)
 
 	for _, user_pass_res_cate_id := range user_pass_res_cate_id_list {
-		pass_res_cate_id_list = append(pass_res_cate_id_list, user_pass_res_cate_id.ResCateId)
+		res_cate_id_list = append(res_cate_id_list, user_pass_res_cate_id.ResCateId)
 	}
 
-	return pass_res_cate_id_list
+	return res_cate_id_list
+}
+
+// 获取登录用户 授权资源列表
+func GetLoginUserPassResList(db_session *xorm.Session, web_session revel.Session) []int64 {
+	type UserPassResId struct {
+		ResId int64 `xorm:"'res_id'" json:"res_id"`
+	}
+
+	var user_pass_res_id_list = make([]UserPassResId,0)
+	sql := `
+SELECT DISTINCT r.id AS res_id
+FROM erp_pass_user_res ur
+    INNER JOIN erp_pass_res r ON ur.res_id = r.id
+WHERE ur.user_id = ?;`
+
+	//获得当前登录用户的Id
+	login_user := core.GetLoginUser(web_session)
+	login_user_id := login_user.UserId
+
+	err := db_session.Sql(sql, login_user_id).Find(&user_pass_res_id_list)
+	core.HandleError(err)
+
+	var res_id_list = make([]int64, 0)
+
+	for _, user_pass_res_cate_id := range user_pass_res_id_list {
+		res_id_list = append(res_id_list, user_pass_res_cate_id.ResId)
+	}
+
+	return res_id_list
 }

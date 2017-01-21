@@ -6,7 +6,7 @@ import (
 	"github.com/revel/revel"
 )
 
-func GetDdpzMenu(db_session *xorm.Session, web_session revel.Session) string {
+func GetDdpzMenu(res_id_map map[int64]bool, db_session *xorm.Session, web_session revel.Session) string {
 	if _, found := revel.ModuleByName("erp"); found == false {
 		return ""
 	}

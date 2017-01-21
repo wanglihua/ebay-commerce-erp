@@ -6,7 +6,7 @@ import (
 	"github.com/revel/revel"
 )
 
-func GetPpglMenu(db_session *xorm.Session, web_session revel.Session) string {
+func GetPpglMenu(res_id_map map[int64]bool, db_session *xorm.Session, web_session revel.Session) string {
 	if _, found := revel.ModuleByName("erp"); found == false {
 		return ""
 	}

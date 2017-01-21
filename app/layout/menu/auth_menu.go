@@ -7,7 +7,7 @@ import (
 	"matrix/core"
 )
 
-func GetAuthMenu(db_session *xorm.Session, web_session revel.Session) string {
+func GetAuthMenu(res_id_map map[int64]bool, db_session *xorm.Session, web_session revel.Session) string {
 	if _, found := revel.ModuleByName("auth"); found == false {
 		return ""
 	}

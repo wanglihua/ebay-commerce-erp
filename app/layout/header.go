@@ -7,6 +7,8 @@ import (
 	"matrix/app/layout/menu"
 	"matrix/core"
 	"fmt"
+	"matrix/core/pass"
+	"matrix/modules/erp/models"
 )
 
 func GetHeader(title string, db_session *xorm.Session, web_session revel.Session) string {
@@ -199,22 +201,78 @@ func GetHeader(title string, db_session *xorm.Session, web_session revel.Session
         <ul class="nav nav-list">
 `)
 
-	//var res_cate_id_map = make(map[int]bool)
+	is_admin := login_user.IsAdmin
 
-	header_buffer.WriteString(menu.GetDdlcMenu(db_session, web_session))
-	header_buffer.WriteString(menu.GetPpglMenu(db_session, web_session))
-	header_buffer.WriteString(menu.GetThglMenu(db_session, web_session))
-	header_buffer.WriteString(menu.GetDdpzMenu(db_session, web_session))
-	header_buffer.WriteString(menu.GetDdbbMenu(db_session, web_session))
-	header_buffer.WriteString(menu.GetKcglMenu(db_session, web_session))
-	header_buffer.WriteString(menu.GetSppzMenu(db_session, web_session))
-	header_buffer.WriteString(menu.GetSpbbMenu(db_session, web_session))
-	header_buffer.WriteString(menu.GetCgglMenu(db_session, web_session))
-	header_buffer.WriteString(menu.GetDbglMenu(db_session, web_session))
-	header_buffer.WriteString(menu.GetXsglMenu(db_session, web_session))
-	header_buffer.WriteString(menu.GetXsbbMenu(db_session, web_session))
-	header_buffer.WriteString(menu.GetAuthMenu(db_session, web_session))
-	header_buffer.WriteString(menu.GetXtpzMenu(db_session, web_session))
+	var res_cate_id_map = make(map[int64]bool)
+	var res_id_map = make(map[int64]bool)
+
+	if is_admin == false {
+		res_cate_id_list := pass.GetLoginUserPassResCateList(db_session, web_session)
+		for _, res_cate_id := range res_cate_id_list {
+			res_cate_id_map[res_cate_id] = true
+		}
+
+		res_id_list := pass.GetLoginUserPassResList(db_session, web_session)
+		for _, res_id := range res_id_list {
+			res_id_map[res_id] = true
+		}
+	}
+
+	if v, ok := res_cate_id_map[models.PASS_RES_CATE_DDLC]; is_admin == true || (v == true && ok == true) {
+		header_buffer.WriteString(menu.GetDdlcMenu(res_id_map, db_session, web_session))
+	}
+
+	if v, ok := res_cate_id_map[models.PASS_RES_CATE_PPGL]; is_admin == true || (v == true && ok == true) {
+		header_buffer.WriteString(menu.GetPpglMenu(res_id_map, db_session, web_session))
+	}
+
+	if v, ok := res_cate_id_map[models.PASS_RES_CATE_THGL]; is_admin == true || (v == true && ok == true) {
+		header_buffer.WriteString(menu.GetThglMenu(res_id_map, db_session, web_session))
+	}
+
+	if v, ok := res_cate_id_map[models.PASS_RES_CATE_DDPZ]; is_admin == true || (v == true && ok == true) {
+		header_buffer.WriteString(menu.GetDdpzMenu(res_id_map, db_session, web_session))
+	}
+
+	if v, ok := res_cate_id_map[models.PASS_RES_CATE_DDBB]; is_admin == true || (v == true && ok == true) {
+		header_buffer.WriteString(menu.GetDdbbMenu(res_id_map, db_session, web_session))
+	}
+
+	if v, ok := res_cate_id_map[models.PASS_RES_CATE_KCGL]; is_admin == true || (v == true && ok == true) {
+		header_buffer.WriteString(menu.GetKcglMenu(res_id_map, db_session, web_session))
+	}
+
+	if v, ok := res_cate_id_map[models.PASS_RES_CATE_SPPZ]; is_admin == true || (v == true && ok == true) {
+		header_buffer.WriteString(menu.GetSppzMenu(res_id_map, db_session, web_session))
+	}
+
+	if v, ok := res_cate_id_map[models.PASS_RES_CATE_SPBB]; is_admin == true || (v == true && ok == true) {
+		header_buffer.WriteString(menu.GetSpbbMenu(res_id_map, db_session, web_session))
+	}
+
+	if v, ok := res_cate_id_map[models.PASS_RES_CATE_CGGL]; is_admin == true || (v == true && ok == true) {
+		header_buffer.WriteString(menu.GetCgglMenu(res_id_map, db_session, web_session))
+	}
+
+	if v, ok := res_cate_id_map[models.PASS_RES_CATE_DBGL]; is_admin == true || (v == true && ok == true) {
+		header_buffer.WriteString(menu.GetDbglMenu(res_id_map, db_session, web_session))
+	}
+
+	if v, ok := res_cate_id_map[models.PASS_RES_CATE_XSGL]; is_admin == true || (v == true && ok == true) {
+		header_buffer.WriteString(menu.GetXsglMenu(res_id_map, db_session, web_session))
+	}
+
+	if v, ok := res_cate_id_map[models.PASS_RES_CATE_XSBB]; is_admin == true || (v == true && ok == true) {
+		header_buffer.WriteString(menu.GetXsbbMenu(res_id_map, db_session, web_session))
+	}
+
+	if v, ok := res_cate_id_map[models.PASS_RES_CATE_AUTH]; is_admin == true || (v == true && ok == true) {
+		header_buffer.WriteString(menu.GetAuthMenu(res_id_map, db_session, web_session))
+	}
+
+	if v, ok := res_cate_id_map[models.PASS_RES_CATE_XTPZ]; is_admin == true || (v == true && ok == true) {
+		header_buffer.WriteString(menu.GetXtpzMenu(res_id_map, db_session, web_session))
+	}
 
 	header_buffer.WriteString(`
         <div class="sidebar-toggle sidebar-collapse" id="sidebar-collapse">
