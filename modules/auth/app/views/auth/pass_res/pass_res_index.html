@@ -102,11 +102,11 @@
                                 if (data == 0) {
                                     return '<i class="fa fa-remove red" aria-hidden="true"></i>';
                                 }
-                                else if (data > 0) {
+                                else if (data == user_id_list.length) {
                                     return '<i class="fa fa-check green" aria-hidden="true"></i>';
                                 }
-                                else {
-                                    return data;
+                                else if (data < user_id_list.length) {
+                                    return '<i class="fa fa-check" aria-hidden="true"></i>';
                                 }
                             }
                         },
@@ -116,19 +116,39 @@
                             "bSortable": false,
                             "bSearchable": false,
                             "sClass": "center",
-                            "width": 100,
+                            "width": 180,
                             "render": function (data, type, row) {
                                 if (row.is_auth == 0) {
                                     return '<button style="border: 0;" onclick="grant(' + data + ')"><i class="ace-icon fa fa-check"></i>&nbsp;授权</button>';
                                 }
-                                else if (row.is_auth > 0) {
+                                else if (row.is_auth == user_id_list.length) {
                                     return '<button style="border: 0;" onclick="revoke(' + data + ')"><i class="ace-icon fa fa-remove"></i>&nbsp;收权</button>';
+                                }
+                                else if (row.is_auth < user_id_list.length) {
+                                    return '<button style="border: 0;" onclick="grant(' + data + ')"><i class="ace-icon fa fa-check"></i>&nbsp;授权</button>&nbsp;&nbsp;&nbsp;&nbsp;<button style="border: 0;" onclick="revoke(' + data + ')"><i class="ace-icon fa fa-remove"></i>&nbsp;收权</button>';
                                 }
 
                                 return "";
                             }
                         }
-                    ]
+                    ],
+                    "fnServerData": function (sSource, aoData, fnCallback) {
+                        aoData.push({'name': 'user_id_list', 'value': user_id_list});
+
+                        $.ajax({
+                            "dataType": 'json',
+                            "url": sSource,
+                            "data": aoData,
+                            "success": function (data) {
+                                if(data.success == false) {
+                                    $.msg.error(data.message);
+                                    return;
+                                }
+
+                                fnCallback(data);
+                            }
+                        });
+                    }
                 }
             );
         },

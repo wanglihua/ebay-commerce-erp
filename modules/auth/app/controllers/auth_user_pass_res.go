@@ -30,6 +30,19 @@ type AuthUserPassResViewItem struct {
 func (c AuthUserPassRes) ListData() revel.Result {
 	db_session := c.DbSession
 
+	/*
+	var user_id_list = make([]int64, 0)
+	c.Params.Bind(&user_id_list, "user_id_list")
+
+	var user_id_str_list = make([]string, 0)
+	for _, user_id := range user_id_list {
+		user_id_str_list = append(user_id_str_list, fmt.Sprint(user_id))
+	}
+	*/
+
+	var user_ids_str string
+	c.Params.Bind(&user_ids_str, "user_id_list")
+
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
 	/*
@@ -40,7 +53,7 @@ func (c AuthUserPassRes) ListData() revel.Result {
 	*/
 
 	query := db_session.
-	Select(fmt.Sprintf("r.*, rc.*, (SELECT count(*) FROM auth_pass_user_res ur WHERE ur.res_id = r.id AND ur.user_id IN (%s)) AS is_auth", "1,2")).
+	Select(fmt.Sprintf("r.*, rc.*, (SELECT count(*) FROM auth_pass_user_res ur WHERE ur.res_id = r.id AND ur.user_id IN (%s)) AS is_auth", user_ids_str)).
 		Table("auth_pass_res").Alias("r").
 		Join("INNER", []string{"auth_pass_res_cate", "rc"}, "r.cate_id = rc.id").
 		Where(filter)
