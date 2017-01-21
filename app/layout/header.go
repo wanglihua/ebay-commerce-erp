@@ -8,7 +8,7 @@ import (
 	"matrix/core"
 	"fmt"
 	"matrix/core/pass"
-	"matrix/modules/erp/models"
+	"matrix/modules/auth/models"
 )
 
 func GetHeader(title string, db_session *xorm.Session, web_session revel.Session) string {

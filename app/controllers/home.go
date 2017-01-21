@@ -32,6 +32,9 @@ func (c Home) SyncDbPost() revel.Result {
 	model_list = append(model_list, &auth_models.AdminInfo{})
 	model_list = append(model_list, &auth_models.GroupInfo{})
 	model_list = append(model_list, &auth_models.GroupUserInfo{})
+	model_list = append(model_list, &auth_models.PassResCateInfo{})
+	model_list = append(model_list, &auth_models.PassResInfo{})
+	model_list = append(model_list, &auth_models.PassUserResInfo{})
 
 	model_list = append(model_list, &erp_models.StatusInfo{})
 	model_list = append(model_list, &erp_models.BrandInfo{})
@@ -69,10 +72,6 @@ func (c Home) SyncDbPost() revel.Result {
 	model_list = append(model_list, &erp_models.LogisticsNumberLogInfo{})
 	model_list = append(model_list, &erp_models.ProductBindInfo{})
 	model_list = append(model_list, &erp_models.ProductImportInfo{})
-
-	model_list = append(model_list, &erp_models.PassResCateInfo{})
-	model_list = append(model_list, &erp_models.PassResInfo{})
-	model_list = append(model_list, &erp_models.PassUserResInfo{})
 
 	err := db.Engine.Sync2(model_list...)
 	core.HandleError(err)

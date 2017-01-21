@@ -195,3 +195,11 @@ div.todo:before {
     font-weight: bold;
     line-height: 38px;
 }
+
+.red {
+    color: red;
+}
+
+.green {
+    color: green;
+}

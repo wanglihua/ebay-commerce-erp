@@ -26,7 +26,7 @@ func UserHasPass(res_id int, web_session revel.Session, db_session *xorm.Session
 
 	var user_res_count UserResCount
 	sql := `
-SELECT count(*) AS count FROM erp_pass_user_res WHERE user_id = ? AND res_id = ?;
+SELECT count(*) AS count FROM auth_pass_user_res WHERE user_id = ? AND res_id = ?;
 	`
 	_, err := db_session.Sql(sql, login_user_id, res_id).Get(&user_res_count)
 	core.HandleError(err)
@@ -61,9 +61,9 @@ func GetLoginUserPassResCateList(db_session *xorm.Session, web_session revel.Ses
 	var user_pass_res_cate_id_list = make([]UserPassResCateId, 0)
 	sql := `
 SELECT DISTINCT rc.id as res_cate_id
-FROM erp_pass_user_res ur
-    INNER JOIN erp_pass_res r ON ur.res_id = r.id
-    INNER JOIN erp_pass_res_cate rc ON r.cate_id = rc.id
+FROM auth_pass_user_res ur
+    INNER JOIN auth_pass_res r ON ur.res_id = r.id
+    INNER JOIN auth_pass_res_cate rc ON r.cate_id = rc.id
 WHERE ur.user_id = ?;`
 
 	//获得当前登录用户的Id
@@ -91,8 +91,8 @@ func GetLoginUserPassResList(db_session *xorm.Session, web_session revel.Session
 	var user_pass_res_id_list = make([]UserPassResId,0)
 	sql := `
 SELECT DISTINCT r.id AS res_id
-FROM erp_pass_user_res ur
-    INNER JOIN erp_pass_res r ON ur.res_id = r.id
+FROM auth_pass_user_res ur
+    INNER JOIN auth_pass_res r ON ur.res_id = r.id
 WHERE ur.user_id = ?;`
 
 	//获得当前登录用户的Id

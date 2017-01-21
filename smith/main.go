@@ -3,7 +3,8 @@ package main
 import (
 	"fmt"
 	"matrix/core"
-	"matrix/modules/erp/models"
+	//"matrix/modules/erp/models"
+	"matrix/modules/auth/models"
 	smith_core "matrix/smith/core"
 	"matrix/smith/core/template"
 	"os"
@@ -18,7 +19,7 @@ var module_lower_case = models.ModuleLowerCase
 var module_chinese = models.ModuleChinese
 var table_prefix = models.TablePrefix
 var model_list = []interface{}{
-	models.LogisticsModeInfo{},
+	models.PassResInfo{},
 	//models.StockBillEntryInfo{},
 	//models.InventoryCheckInfo{},
 	//models.InventoryCheckEntryInfo{},
