@@ -3,9 +3,9 @@ package controllers
 import (
 	"github.com/revel/revel"
 
+	"fmt"
 	"matrix/core"
 	"matrix/modules/auth/models"
-	"fmt"
 	"strings"
 )
 
@@ -14,13 +14,17 @@ type AuthUserPassRes struct {
 }
 
 func (c AuthUserPassRes) Index() revel.Result {
+	var user_id_list = make([]int64, 0)
+	c.Params.Bind(&user_id_list, "user")
+
+	c.RenderArgs["user_id_list"] = user_id_list
 	return c.RenderTemplate("auth/pass_res/pass_res_index.html")
 }
 
 type AuthUserPassResViewItem struct {
-	models.PassResInfo         `xorm:"extends" json:"r"`
-	models.PassResCateInfo     `xorm:"extends" json:"rc"`
-	IsAuth core.NullInt        `xorm:"'is_auth'" json:"is_auth"`
+	models.PassResInfo     `xorm:"extends" json:"r"`
+	models.PassResCateInfo `xorm:"extends" json:"rc"`
+	IsAuth core.NullInt    `xorm:"'is_auth'" json:"is_auth"`
 }
 
 func (c AuthUserPassRes) ListData() revel.Result {
@@ -75,7 +79,7 @@ func (c AuthUserPassRes) Grant() revel.Result {
 
 	/*
 		INSERT INTO auth_pass_user_res (user_id, res_id, create_time) VALUES (1, 1, now()), (2, 1, now());
-	 */
+	*/
 
 	sql := `INSERT INTO auth_pass_user_res (user_id, res_id, create_time) VALUES %s;`
 
@@ -108,7 +112,7 @@ func (c AuthUserPassRes) Revoke() revel.Result {
 
 	/*
 		DELETE FROM auth_pass_user_res WHERE user_id IN (1, 2) AND res_id = 1;
-	 */
+	*/
 	sql := `DELETE FROM auth_pass_user_res WHERE user_id IN (%s) AND res_id = %d;`
 	sql = fmt.Sprintf(sql, strings.Join(user_id_str_list, ","), res_id)
 	_, err := db_session.Exec(sql)

@@ -25,11 +25,10 @@
         </div>
     </div>
 </div>
+{%template "auth/pass_res/user_id_list.var" .%}
 <script type="text/javascript">
 
     function grant(res_id) {
-        var user_id_list = [1, 2];
-
         $.ajax({
             url: '{%url "AuthUserPassRes.Grant"%}',
             type: "POST",
@@ -50,8 +49,6 @@
     }
 
     function revoke(res_id) {
-        var user_id_list = [1, 2];
-
         $.ajax({
             url: '{%url "AuthUserPassRes.Revoke"%}',
             type: "POST",

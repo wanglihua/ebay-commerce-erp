@@ -40,7 +40,7 @@ func GetAuthMenu(res_id_map map[int64]bool, db_session *xorm.Session, web_sessio
         </li>
 
         <li id="auth-passres-menu" class="">
-            <a href="/auth/pass/res">
+            <a href="/auth/user/pass/res">
                 <i class="menu-icon fa fa-caret-right"></i>
                 用户权限
             </a>
