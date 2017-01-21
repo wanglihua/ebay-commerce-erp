@@ -51,3 +51,33 @@ func AdminOnly(web_session revel.Session) {
 		panic("对不起，您没有当前操作的权限！")
 	}
 }
+
+// 获取登录用户 授权资源类别列表
+func GetLoginUserPassResCateList(web_session revel.Session, db_session *xorm.Session) []int64 {
+	type UserPassResCateId struct {
+		ResCateId int64 `xorm:"'res_cate_id'" json:"res_cate_id"`
+	}
+
+	var user_pass_res_cate_id_list = make([]UserPassResCateId, 0)
+	sql := `
+SELECT DISTINCT rc.id as res_cate_id
+FROM erp_pass_user_res ur
+    INNER JOIN erp_pass_res r ON ur.res_id = r.id
+    INNER JOIN erp_pass_res_cate rc ON r.cate_id = rc.id
+WHERE ur.user_id = ?;`
+
+	//获得当前登录用户的Id
+	login_user := core.GetLoginUser(web_session)
+	login_user_id := login_user.UserId
+
+	err := db_session.Sql(sql, login_user_id).Find(&user_pass_res_cate_id_list)
+	core.HandleError(err)
+
+	var pass_res_cate_id_list = make([]int64, 0)
+
+	for _, user_pass_res_cate_id := range user_pass_res_cate_id_list {
+		pass_res_cate_id_list = append(pass_res_cate_id_list, user_pass_res_cate_id.ResCateId)
+	}
+
+	return pass_res_cate_id_list
+}

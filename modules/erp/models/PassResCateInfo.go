@@ -6,11 +6,24 @@ import (
 )
 
 const (
-	PASS_RES_CATE_PASS = 10001 //
+	PASS_RES_CATE_AUTH = 10001 // 权限管理
+	PASS_RES_CATE_CGGL = 10002 // 采购管理
+	PASS_RES_CATE_DBGL = 10003 // 调拨管理
+	PASS_RES_CATE_DDBB = 10004 // 订单报表
+	PASS_RES_CATE_DDLC = 10005 // 订单流程
+	PASS_RES_CATE_DDPZ = 10006 // 订单配置
+	PASS_RES_CATE_KCGL = 10007 // 库存管理
+	PASS_RES_CATE_PPGL = 10008 // PayPal管理
+	PASS_RES_CATE_SPBB = 10009 // 商品报表
+	PASS_RES_CATE_SPPZ = 10010 // 商品配置
+	PASS_RES_CATE_THGL = 10011 // 退货管理
+	PASS_RES_CATE_XSBB = 10012 // 销售报表
+	PASS_RES_CATE_XSGL = 10013 // 销售管理
+	PASS_RES_CATE_XTPZ = 10014 // 系统配置
 )
 
 type PassResCateInfo struct {
-	Id         int64           `xorm:"bigint notnull pk autoincr 'id'" json:"id"`
+	Id         int64           `xorm:"bigint notnull pk 'id'" json:"id"`
 	Name       string          `xorm:"nvarchar(200) notnull index 'name'" json:"name" smith:"verbose_name=名称,min=2,max=100"`
 	Desc       core.NullString `xorm:"nvarchar(500) 'desc'" json:"desc" smith:"verbose_name=描述,max=500"`
 	CreateTime core.Time       `xorm:"created notnull 'create_time'" json:"create_time"`
@@ -26,7 +39,89 @@ func (e PassResCateInfo) ModelDesc() string {
 	return "verbose_name=权限类别,entity_json=pass_res_cate,route=pass/res/cate"
 }
 
-
 func (e PassResCateInfo) InitData(db_session *xorm.Session) {
 
+	pass_res_cate := new(PassResCateInfo)
+	pass_res_cate.Id = PASS_RES_CATE_AUTH
+	pass_res_cate.Name = "权限管理"
+	pass_res_cate.Desc = core.NewNullString("权限管理", true)
+	db_session.Insert(pass_res_cate)
+
+	pass_res_cate = new(PassResCateInfo)
+	pass_res_cate.Id = PASS_RES_CATE_CGGL
+	pass_res_cate.Name = "采购管理"
+	pass_res_cate.Desc = core.NewNullString("采购管理", true)
+	db_session.Insert(pass_res_cate)
+
+	pass_res_cate = new(PassResCateInfo)
+	pass_res_cate.Id = PASS_RES_CATE_DBGL
+	pass_res_cate.Name = "调拨管理"
+	pass_res_cate.Desc = core.NewNullString("调拨管理", true)
+	db_session.Insert(pass_res_cate)
+
+	pass_res_cate = new(PassResCateInfo)
+	pass_res_cate.Id = PASS_RES_CATE_DDBB
+	pass_res_cate.Name = "订单报表"
+	pass_res_cate.Desc = core.NewNullString("订单报表", true)
+	db_session.Insert(pass_res_cate)
+
+	pass_res_cate = new(PassResCateInfo)
+	pass_res_cate.Id = PASS_RES_CATE_DDLC
+	pass_res_cate.Name = "订单流程"
+	pass_res_cate.Desc = core.NewNullString("订单流程", true)
+	db_session.Insert(pass_res_cate)
+
+	pass_res_cate = new(PassResCateInfo)
+	pass_res_cate.Id = PASS_RES_CATE_DDPZ
+	pass_res_cate.Name = "订单配置"
+	pass_res_cate.Desc = core.NewNullString("订单配置", true)
+	db_session.Insert(pass_res_cate)
+
+	pass_res_cate = new(PassResCateInfo)
+	pass_res_cate.Id = PASS_RES_CATE_KCGL
+	pass_res_cate.Name = "库存管理"
+	pass_res_cate.Desc = core.NewNullString("库存管理", true)
+	db_session.Insert(pass_res_cate)
+
+	pass_res_cate = new(PassResCateInfo)
+	pass_res_cate.Id = PASS_RES_CATE_PPGL
+	pass_res_cate.Name = "PayPal管理"
+	pass_res_cate.Desc = core.NewNullString("PayPal管理", true)
+	db_session.Insert(pass_res_cate)
+
+	pass_res_cate = new(PassResCateInfo)
+	pass_res_cate.Id = PASS_RES_CATE_SPBB
+	pass_res_cate.Name = "商品报表"
+	pass_res_cate.Desc = core.NewNullString("商品报表", true)
+	db_session.Insert(pass_res_cate)
+
+	pass_res_cate = new(PassResCateInfo)
+	pass_res_cate.Id = PASS_RES_CATE_SPPZ
+	pass_res_cate.Name = "商品配置"
+	pass_res_cate.Desc = core.NewNullString("商品配置", true)
+	db_session.Insert(pass_res_cate)
+
+	pass_res_cate = new(PassResCateInfo)
+	pass_res_cate.Id = PASS_RES_CATE_THGL
+	pass_res_cate.Name = "退货管理"
+	pass_res_cate.Desc = core.NewNullString("退货管理", true)
+	db_session.Insert(pass_res_cate)
+
+	pass_res_cate = new(PassResCateInfo)
+	pass_res_cate.Id = PASS_RES_CATE_XSBB
+	pass_res_cate.Name = "销售报表"
+	pass_res_cate.Desc = core.NewNullString("销售报表", true)
+	db_session.Insert(pass_res_cate)
+
+	pass_res_cate = new(PassResCateInfo)
+	pass_res_cate.Id = PASS_RES_CATE_XSGL
+	pass_res_cate.Name = "销售管理"
+	pass_res_cate.Desc = core.NewNullString("销售管理", true)
+	db_session.Insert(pass_res_cate)
+
+	pass_res_cate = new(PassResCateInfo)
+	pass_res_cate.Id = PASS_RES_CATE_XTPZ
+	pass_res_cate.Name = "系统配置"
+	pass_res_cate.Desc = core.NewNullString("系统配置", true)
+	db_session.Insert(pass_res_cate)
 }

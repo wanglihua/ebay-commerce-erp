@@ -156,7 +156,7 @@ WHERE a.id IN (%s) AND u.login_name = '0000';
 		return c.RenderJson(core.JsonResult{Success: false, Message: "移除失败，管理员不能全部移除!"})
 	}
 	*/
-	
+
 	admin := new(models.AdminInfo)
 	_, err = db_session.In("id", adminIdList).Delete(admin)
 	core.HandleError(err)

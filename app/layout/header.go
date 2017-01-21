@@ -199,6 +199,8 @@ func GetHeader(title string, db_session *xorm.Session, web_session revel.Session
         <ul class="nav nav-list">
 `)
 
+	//var res_cate_id_map = make(map[int]bool)
+
 	header_buffer.WriteString(menu.GetDdlcMenu(db_session, web_session))
 	header_buffer.WriteString(menu.GetPpglMenu(db_session, web_session))
 	header_buffer.WriteString(menu.GetThglMenu(db_session, web_session))
