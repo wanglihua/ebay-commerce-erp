@@ -91,19 +91,27 @@ func (c AuthUserPassRes) Grant() revel.Result {
 	c.Params.Bind(&res_id, "res_id")
 
 	/*
+		DELETE FROM auth_pass_user_res WHERE user_id IN (1, 2) AND res_id = 2;
 		INSERT INTO auth_pass_user_res (user_id, res_id, create_time) VALUES (1, 1, now()), (2, 1, now());
 	*/
+	// 删除原来的
+	user_id_str_list := make([]string, 0)
+	for _, user_id := range user_id_list {
+		user_id_str_list = append(user_id_str_list, fmt.Sprint(user_id))
+	}
+	sql := `DELETE FROM auth_pass_user_res WHERE user_id IN (%s) AND res_id = %d;`
+	sql = fmt.Sprintf(sql, strings.Join(user_id_str_list, ","), res_id)
+	_, err := db_session.Exec(sql)
+	core.HandleError(err)
 
-	sql := `INSERT INTO auth_pass_user_res (user_id, res_id, create_time) VALUES %s;`
-
+	//
+	sql = `INSERT INTO auth_pass_user_res (user_id, res_id, create_time) VALUES %s;`
 	value_list := make([]string, 0)
 	for _, user_id := range user_id_list {
 		value_list = append(value_list, fmt.Sprintf("(%d, %d, now())", user_id, res_id))
 	}
-
 	sql = fmt.Sprintf(sql, strings.Join(value_list, ","))
-
-	_, err := db_session.Exec(sql)
+	_, err = db_session.Exec(sql)
 	core.HandleError(err)
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: "授权成功！"})
