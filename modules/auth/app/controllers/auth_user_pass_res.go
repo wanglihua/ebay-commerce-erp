@@ -17,6 +17,11 @@ func (c AuthUserPassRes) Index() revel.Result {
 	var user_id_list = make([]int64, 0)
 	c.Params.Bind(&user_id_list, "user")
 
+	if len(user_id_list) == 0 {
+		//return c.RenderJson(core.JsonResult{Success: false, Message: "用户列表不能为空，请选择用户！"})
+		panic("用户列表不能为空，请选择用户！")
+	}
+
 	c.RenderArgs["user_id_list"] = user_id_list
 	return c.RenderTemplate("auth/pass_res/pass_res_index.html")
 }
@@ -42,6 +47,10 @@ func (c AuthUserPassRes) ListData() revel.Result {
 
 	var user_ids_str string
 	c.Params.Bind(&user_ids_str, "user_id_list")
+
+	if len(user_ids_str) == 0 {
+		return c.RenderJson(core.JsonResult{Success: false, Message: "用户列表不能为空，请选择用户！"})
+	}
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
@@ -87,6 +96,10 @@ func (c AuthUserPassRes) Grant() revel.Result {
 	user_id_list := make([]int64, 0)
 	c.Params.Bind(&user_id_list, "user_id_list")
 
+	if len(user_id_list) == 0 {
+		return c.RenderJson(core.JsonResult{Success: false, Message: "用户列表不能为空，请选择用户！"})
+	}
+
 	var res_id int64
 	c.Params.Bind(&res_id, "res_id")
 
@@ -104,12 +117,12 @@ func (c AuthUserPassRes) Grant() revel.Result {
 	_, err := db_session.Exec(sql)
 	core.HandleError(err)
 
-	//
-	sql = `INSERT INTO auth_pass_user_res (user_id, res_id, create_time) VALUES %s;`
+	// 插入新的数据
 	value_list := make([]string, 0)
 	for _, user_id := range user_id_list {
 		value_list = append(value_list, fmt.Sprintf("(%d, %d, now())", user_id, res_id))
 	}
+	sql = `INSERT INTO auth_pass_user_res (user_id, res_id, create_time) VALUES %s;`
 	sql = fmt.Sprintf(sql, strings.Join(value_list, ","))
 	_, err = db_session.Exec(sql)
 	core.HandleError(err)
@@ -122,6 +135,10 @@ func (c AuthUserPassRes) Revoke() revel.Result {
 
 	user_id_list := make([]int64, 0)
 	c.Params.Bind(&user_id_list, "user_id_list")
+
+	if len(user_id_list) == 0 {
+		return c.RenderJson(core.JsonResult{Success: false, Message: "用户列表不能为空，请选择用户！"})
+	}
 
 	user_id_str_list := make([]string, 0)
 	for _, user_id := range user_id_list {

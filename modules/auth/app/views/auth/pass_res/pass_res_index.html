@@ -1,4 +1,4 @@
-{%header "权限" .%}
+{%header "用户权限" .%}
 <div id="page">
     <div class="breadcrumbs" id="breadcrumbs">
         <ul class="breadcrumb">
@@ -6,7 +6,8 @@
                 <a href='{%url "Home.Index"%}'><i class="ace-icon fa fa-home home-icon"></i></a>
             </li>
             <li class="parent" data-menu="auth-menu">权限管理</li>
-            <li class="active" data-menu="auth-passres-menu">权限</li>
+            <li class="active" data-menu="auth-user-menu"><a href='{%url "AuthUser.Index"%}'>用户管理</a></li>
+            <li data-menu="auth-passres-menu">用户权限</li>
         </ul>
     </div>
     <div class="page-content">
@@ -44,8 +45,6 @@
                 reloadList('#passResList');
             }
         });
-
-        return false;
     }
 
     function revoke(res_id) {
@@ -64,8 +63,6 @@
                 reloadList('#passResList');
             }
         });
-
-        return false;
     }
 
     var vm = new Vue({

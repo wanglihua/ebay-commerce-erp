@@ -21,6 +21,10 @@
                     <i class="ace-icon fa fa-plus"></i>
                     新增
                 </button>
+                <button class="btn btn-purple btn-sm" onclick="showUserPassRes()">
+                    <i class="ace-icon fa fa-plus"></i>
+                    权限
+                </button>
                 <button class="btn btn-danger btn-sm" onclick="deleteUser()">
                     <i class="ace-icon fa fa-trash-o"></i>
                     删除
@@ -50,9 +54,30 @@
                     );
                 }
 
+                function showUserPassRes() {
+                    var user_list = [];
+                    $('#userList').find('tbody tr>td:first-child input:checkbox').each(function () {
+                        if (this.checked) {
+                            //user_list.push($(this).val());
+                            user_list.push("user[]=" + $(this).val());
+                        }
+                    });
+
+                    if (user_list.length == 0) {
+                        $.msg.alert("请选择数据！");
+                        return;
+                    }
+
+                    //AuthUserPassRes.Index
+                    var url = '{%url "AuthUserPassRes.Index" %}?';
+                    url = url + user_list.join("&");
+                    //window.location.href = url;
+                    window.open(url, "_blank");
+                }
+
                 function deleteUser() {
                     var id_list = [];
-                    $('#userList tbody tr>td:first-child input:checkbox').each(function () {
+                    $('#userList').find('tbody tr>td:first-child input:checkbox').each(function () {
                         if (this.checked) {
                             id_list.push($(this).val());
                         }
