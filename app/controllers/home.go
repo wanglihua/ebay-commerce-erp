@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"matrix/app/models"
 	"matrix/core"
 	"matrix/db"
 	auth_models "matrix/modules/auth/models"
@@ -26,8 +25,6 @@ func (c Home) SyncDbPost() revel.Result {
 
 	model_list := make([]interface{}, 0)
 
-	model_list = append(model_list, &models.EntityCodeInfo{})
-
 	model_list = append(model_list, &auth_models.UserInfo{})
 	model_list = append(model_list, &auth_models.AdminInfo{})
 	model_list = append(model_list, &auth_models.GroupInfo{})
@@ -36,6 +33,7 @@ func (c Home) SyncDbPost() revel.Result {
 	model_list = append(model_list, &auth_models.PassResInfo{})
 	model_list = append(model_list, &auth_models.PassUserResInfo{})
 
+	model_list = append(model_list, &erp_models.EntityCodeInfo{})
 	model_list = append(model_list, &erp_models.StatusInfo{})
 	model_list = append(model_list, &erp_models.BrandInfo{})
 	model_list = append(model_list, &erp_models.StockInfo{})
