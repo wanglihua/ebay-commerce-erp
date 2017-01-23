@@ -107,247 +107,263 @@ func (e StatusInfo) ModelDesc() string {
 
 func (e StatusInfo) InitData(db_session *xorm.Session) {
 	//仓库状态
+	{
+		status := new(StatusInfo)
+		status.Id = STOCK_STATUS_ENABLED
+		status.Type = STATUS_TYPE_STOCK
+		status.Name = "正常"
+		status.Desc = core.NewNullString("仓库状态 正常", true)
+		db_session.Insert(status)
 
-	status := new(StatusInfo)
-	status.Id = STOCK_STATUS_ENABLED
-	status.Type = STATUS_TYPE_STOCK
-	status.Name = "正常"
-	status.Desc = core.NewNullString("仓库状态 正常", true)
-	db_session.Insert(status)
-
-	status = new(StatusInfo)
-	status.Id = STOCK_STATUS_DISABLED
-	status.Type = STATUS_TYPE_STOCK
-	status.Name = "停用"
-	status.Desc = core.NewNullString("仓库状态 停用", true)
-	db_session.Insert(status)
+		status = new(StatusInfo)
+		status.Id = STOCK_STATUS_DISABLED
+		status.Type = STATUS_TYPE_STOCK
+		status.Name = "停用"
+		status.Desc = core.NewNullString("仓库状态 停用", true)
+		db_session.Insert(status)
+	}
 
 	//货币汇率状态
+	{
+		status := new(StatusInfo)
+		status.Id = EXCHANGE_RATE_STATUS_ENABLED
+		status.Type = STATUS_TYPE_EXCHANGE_RATE
+		status.Name = "正常"
+		status.Desc = core.NewNullString("货币汇率状态 正常", true)
+		db_session.Insert(status)
 
-	status = new(StatusInfo)
-	status.Id = EXCHANGE_RATE_STATUS_ENABLED
-	status.Type = STATUS_TYPE_EXCHANGE_RATE
-	status.Name = "正常"
-	status.Desc = core.NewNullString("货币汇率状态 正常", true)
-	db_session.Insert(status)
-
-	status = new(StatusInfo)
-	status.Id = EXCHANGE_RATE_STATUS_DISABLED
-	status.Type = STATUS_TYPE_EXCHANGE_RATE
-	status.Name = "停用"
-	status.Desc = core.NewNullString("货币汇率状态 停用", true)
-	db_session.Insert(status)
+		status = new(StatusInfo)
+		status.Id = EXCHANGE_RATE_STATUS_DISABLED
+		status.Type = STATUS_TYPE_EXCHANGE_RATE
+		status.Name = "停用"
+		status.Desc = core.NewNullString("货币汇率状态 停用", true)
+		db_session.Insert(status)
+	}
 
 	//商品目录状态
+	{
+		status := new(StatusInfo)
+		status.Id = PRODUCT_CATE_STATUS_ENABLED
+		status.Type = STATUS_TYPE_PRODUCT_CATE
+		status.Name = "正常"
+		status.Desc = core.NewNullString("商品目录状态 正常", true)
+		db_session.Insert(status)
 
-	status = new(StatusInfo)
-	status.Id = PRODUCT_CATE_STATUS_ENABLED
-	status.Type = STATUS_TYPE_PRODUCT_CATE
-	status.Name = "正常"
-	status.Desc = core.NewNullString("商品目录状态 正常", true)
-	db_session.Insert(status)
-
-	status = new(StatusInfo)
-	status.Id = PRODUCT_CATE_STATUS_DISABLED
-	status.Type = STATUS_TYPE_PRODUCT_CATE
-	status.Name = "停用"
-	status.Desc = core.NewNullString("商品目录状态 停用", true)
-	db_session.Insert(status)
+		status = new(StatusInfo)
+		status.Id = PRODUCT_CATE_STATUS_DISABLED
+		status.Type = STATUS_TYPE_PRODUCT_CATE
+		status.Name = "停用"
+		status.Desc = core.NewNullString("商品目录状态 停用", true)
+		db_session.Insert(status)
+	}
 
 	//商品状态
 
-	status = new(StatusInfo)
-	status.Id = PRODUCT_STATUS_ZDWH
-	status.Type = STATUS_TYPE_PRODUCT
-	status.Name = "重点维护"
-	status.Desc = core.NewNullString("商品状态 重点维护", true)
-	db_session.Insert(status)
+	{
+		status := new(StatusInfo)
+		status.Id = PRODUCT_STATUS_ZDWH
+		status.Type = STATUS_TYPE_PRODUCT
+		status.Name = "重点维护"
+		status.Desc = core.NewNullString("商品状态 重点维护", true)
+		db_session.Insert(status)
 
-	status = new(StatusInfo)
-	status.Id = PRODUCT_STATUS_DKF
-	status.Type = STATUS_TYPE_PRODUCT
-	status.Name = "待开发"
-	status.Desc = core.NewNullString("商品状态 待开发", true)
-	db_session.Insert(status)
+		status = new(StatusInfo)
+		status.Id = PRODUCT_STATUS_DKF
+		status.Type = STATUS_TYPE_PRODUCT
+		status.Name = "待开发"
+		status.Desc = core.NewNullString("商品状态 待开发", true)
+		db_session.Insert(status)
 
-	status = new(StatusInfo)
-	status.Id = PRODUCT_STATUS_ZC
-	status.Type = STATUS_TYPE_PRODUCT
-	status.Name = "正常"
-	status.Desc = core.NewNullString("商品状态 正常", true)
-	db_session.Insert(status)
+		status = new(StatusInfo)
+		status.Id = PRODUCT_STATUS_ZC
+		status.Type = STATUS_TYPE_PRODUCT
+		status.Name = "正常"
+		status.Desc = core.NewNullString("商品状态 正常", true)
+		db_session.Insert(status)
 
-	status = new(StatusInfo)
-	status.Id = PRODUCT_STATUS_QC
-	status.Type = STATUS_TYPE_PRODUCT
-	status.Name = "清仓"
-	status.Desc = core.NewNullString("商品状态 清仓", true)
-	db_session.Insert(status)
+		status = new(StatusInfo)
+		status.Id = PRODUCT_STATUS_QC
+		status.Type = STATUS_TYPE_PRODUCT
+		status.Name = "清仓"
+		status.Desc = core.NewNullString("商品状态 清仓", true)
+		db_session.Insert(status)
 
-	status = new(StatusInfo)
-	status.Id = PRODUCT_STATUS_TC
-	status.Type = STATUS_TYPE_PRODUCT
-	status.Name = "停产"
-	status.Desc = core.NewNullString("商品状态 停产", true)
-	db_session.Insert(status)
+		status = new(StatusInfo)
+		status.Id = PRODUCT_STATUS_TC
+		status.Type = STATUS_TYPE_PRODUCT
+		status.Name = "停产"
+		status.Desc = core.NewNullString("商品状态 停产", true)
+		db_session.Insert(status)
 
-	status = new(StatusInfo)
-	status.Id = PRODUCT_STATUS_ZDCJ
-	status.Type = STATUS_TYPE_PRODUCT
-	status.Name = "自动创建"
-	status.Desc = core.NewNullString("商品状态 自动创建", true)
-	db_session.Insert(status)
+		status = new(StatusInfo)
+		status.Id = PRODUCT_STATUS_ZDCJ
+		status.Type = STATUS_TYPE_PRODUCT
+		status.Name = "自动创建"
+		status.Desc = core.NewNullString("商品状态 自动创建", true)
+		db_session.Insert(status)
 
-	status = new(StatusInfo)
-	status.Id = PRODUCT_STATUS_ZTXC
-	status.Type = STATUS_TYPE_PRODUCT
-	status.Name = "暂停销售"
-	status.Desc = core.NewNullString("商品状态 暂停销售", true)
-	db_session.Insert(status)
+		status = new(StatusInfo)
+		status.Id = PRODUCT_STATUS_ZTXC
+		status.Type = STATUS_TYPE_PRODUCT
+		status.Name = "暂停销售"
+		status.Desc = core.NewNullString("商品状态 暂停销售", true)
+		db_session.Insert(status)
+	}
 
 	//店铺账号状态
-	status = new(StatusInfo)
-	status.Id = SHOP_ACCOUNT_STATUS_ENABLED
-	status.Type = STATUS_TYPE_SHOP_ACCOUNT
-	status.Name = "正常"
-	status.Desc = core.NewNullString("店铺账号状态 正常", true)
-	db_session.Insert(status)
+	{
+		status := new(StatusInfo)
+		status.Id = SHOP_ACCOUNT_STATUS_ENABLED
+		status.Type = STATUS_TYPE_SHOP_ACCOUNT
+		status.Name = "正常"
+		status.Desc = core.NewNullString("店铺账号状态 正常", true)
+		db_session.Insert(status)
 
-	status = new(StatusInfo)
-	status.Id = SHOP_ACCOUNT_STATUS_DISABLED
-	status.Type = STATUS_TYPE_SHOP_ACCOUNT
-	status.Name = "停用"
-	status.Desc = core.NewNullString("店铺账号状态 停用", true)
-	db_session.Insert(status)
+		status = new(StatusInfo)
+		status.Id = SHOP_ACCOUNT_STATUS_DISABLED
+		status.Type = STATUS_TYPE_SHOP_ACCOUNT
+		status.Name = "停用"
+		status.Desc = core.NewNullString("店铺账号状态 停用", true)
+		db_session.Insert(status)
+	}
 
 	//Paypal账号状态
 
-	status = new(StatusInfo)
-	status.Id = PAYPAL_ACCOUNT_STATUS_ENABLED
-	status.Type = STATUS_TYPE_PAYPAL_ACCOUNT
-	status.Name = "正常"
-	status.Desc = core.NewNullString("Paypal账号状态 正常", true)
-	db_session.Insert(status)
+	{
+		status := new(StatusInfo)
+		status.Id = PAYPAL_ACCOUNT_STATUS_ENABLED
+		status.Type = STATUS_TYPE_PAYPAL_ACCOUNT
+		status.Name = "正常"
+		status.Desc = core.NewNullString("Paypal账号状态 正常", true)
+		db_session.Insert(status)
 
-	status = new(StatusInfo)
-	status.Id = PAYPAL_ACCOUNT_STATUS_DISABLED
-	status.Type = STATUS_TYPE_PAYPAL_ACCOUNT
-	status.Name = "停用"
-	status.Desc = core.NewNullString("Paypal账号状态 停用", true)
-	db_session.Insert(status)
+		status = new(StatusInfo)
+		status.Id = PAYPAL_ACCOUNT_STATUS_DISABLED
+		status.Type = STATUS_TYPE_PAYPAL_ACCOUNT
+		status.Name = "停用"
+		status.Desc = core.NewNullString("Paypal账号状态 停用", true)
+		db_session.Insert(status)
+	}
 
 	//包材状态
+	{
+		status := new(StatusInfo)
+		status.Id = PACKAGE_STATUS_ENABLED
+		status.Type = STATUS_TYPE_PACKAGE
+		status.Name = "正常"
+		status.Desc = core.NewNullString("包材状态 正常", true)
+		db_session.Insert(status)
 
-	status = new(StatusInfo)
-	status.Id = PACKAGE_STATUS_ENABLED
-	status.Type = STATUS_TYPE_PACKAGE
-	status.Name = "正常"
-	status.Desc = core.NewNullString("包材状态 正常", true)
-	db_session.Insert(status)
-
-	status = new(StatusInfo)
-	status.Id = PACKAGE_STATUS_DISABLED
-	status.Type = STATUS_TYPE_PACKAGE
-	status.Name = "停用"
-	status.Desc = core.NewNullString("包材状态 停用", true)
-	db_session.Insert(status)
+		status = new(StatusInfo)
+		status.Id = PACKAGE_STATUS_DISABLED
+		status.Type = STATUS_TYPE_PACKAGE
+		status.Name = "停用"
+		status.Desc = core.NewNullString("包材状态 停用", true)
+		db_session.Insert(status)
+	}
 
 	// 盘点单状态
-	status = new(StatusInfo)
-	status.Id = INVENTORY_CHECK_STATUS_WTG
-	status.Type = STATUS_TYPE_INVENTORY_CHECK
-	status.Name = "未通过"
-	status.Desc = core.NewNullString("盘点单状态 未通过", true)
-	db_session.Insert(status)
+	{
+		status := new(StatusInfo)
+		status.Id = INVENTORY_CHECK_STATUS_WTG
+		status.Type = STATUS_TYPE_INVENTORY_CHECK
+		status.Name = "未通过"
+		status.Desc = core.NewNullString("盘点单状态 未通过", true)
+		db_session.Insert(status)
 
-	status = new(StatusInfo)
-	status.Id = INVENTORY_CHECK_STATUS_SPZ
-	status.Type = STATUS_TYPE_INVENTORY_CHECK
-	status.Name = "审核中"
-	status.Desc = core.NewNullString("盘点单状态 审核中", true)
-	db_session.Insert(status)
+		status = new(StatusInfo)
+		status.Id = INVENTORY_CHECK_STATUS_SPZ
+		status.Type = STATUS_TYPE_INVENTORY_CHECK
+		status.Name = "审核中"
+		status.Desc = core.NewNullString("盘点单状态 审核中", true)
+		db_session.Insert(status)
 
-	status = new(StatusInfo)
-	status.Id = INVENTORY_CHECK_STATUS_YWC
-	status.Type = STATUS_TYPE_INVENTORY_CHECK
-	status.Name = "已完成"
-	status.Desc = core.NewNullString("盘点单状态 已完成", true)
-	db_session.Insert(status)
+		status = new(StatusInfo)
+		status.Id = INVENTORY_CHECK_STATUS_YWC
+		status.Type = STATUS_TYPE_INVENTORY_CHECK
+		status.Name = "已完成"
+		status.Desc = core.NewNullString("盘点单状态 已完成", true)
+		db_session.Insert(status)
 
-	// Paypal对账结果
-	status = new(StatusInfo)
-	status.Id = PAYPAL_RECON_SUCCESS
-	status.Type = STATUS_TYPE_PAYPAL_RECON
-	status.Name = "匹配成功"
-	status.Desc = core.NewNullString("Paypal对账结果 匹配成功", true)
-	db_session.Insert(status)
+		// Paypal对账结果
+		status = new(StatusInfo)
+		status.Id = PAYPAL_RECON_SUCCESS
+		status.Type = STATUS_TYPE_PAYPAL_RECON
+		status.Name = "匹配成功"
+		status.Desc = core.NewNullString("Paypal对账结果 匹配成功", true)
+		db_session.Insert(status)
 
-	status = new(StatusInfo)
-	status.Id = PAYPAL_RECON_FAILED
-	status.Type = STATUS_TYPE_PAYPAL_RECON
-	status.Name = "匹配失败"
-	status.Desc = core.NewNullString("Paypal对账结果 匹配失败", true)
-	db_session.Insert(status)
+		status = new(StatusInfo)
+		status.Id = PAYPAL_RECON_FAILED
+		status.Type = STATUS_TYPE_PAYPAL_RECON
+		status.Name = "匹配失败"
+		status.Desc = core.NewNullString("Paypal对账结果 匹配失败", true)
+		db_session.Insert(status)
+	}
 
 	// 订单自定义类型
-	status = new(StatusInfo)
-	status.Id = ORDER_CUSTOM_TYPE_ENABLED
-	status.Type = STATUS_TYPE_ORDER_CUSTOM_TYPE
-	status.Name = "正常"
-	status.Desc = core.NewNullString("订单自定义类型 正常", true)
-	db_session.Insert(status)
+	{
+		status := new(StatusInfo)
+		status.Id = ORDER_CUSTOM_TYPE_ENABLED
+		status.Type = STATUS_TYPE_ORDER_CUSTOM_TYPE
+		status.Name = "正常"
+		status.Desc = core.NewNullString("订单自定义类型 正常", true)
+		db_session.Insert(status)
 
-	status = new(StatusInfo)
-	status.Id = ORDER_CUSTOM_TYPE_DISABLED
-	status.Type = STATUS_TYPE_ORDER_CUSTOM_TYPE
-	status.Name = "停用"
-	status.Desc = core.NewNullString("订单自定义类型 停用", true)
-	db_session.Insert(status)
+		status = new(StatusInfo)
+		status.Id = ORDER_CUSTOM_TYPE_DISABLED
+		status.Type = STATUS_TYPE_ORDER_CUSTOM_TYPE
+		status.Name = "停用"
+		status.Desc = core.NewNullString("订单自定义类型 停用", true)
+		db_session.Insert(status)
 
-	//规则订单运单号状态
-	status = new(StatusInfo)
-	status.Id = LOGISTICS_NUMBER_BATCH_ENABLED
-	status.Type = STATUS_TYPE_LOGISTICS_NUMBER_BATCH
-	status.Name = "正常"
-	status.Desc = core.NewNullString("订单运单号 正常", true)
-	db_session.Insert(status)
+		//规则订单运单号状态
+		status = new(StatusInfo)
+		status.Id = LOGISTICS_NUMBER_BATCH_ENABLED
+		status.Type = STATUS_TYPE_LOGISTICS_NUMBER_BATCH
+		status.Name = "正常"
+		status.Desc = core.NewNullString("订单运单号 正常", true)
+		db_session.Insert(status)
 
-	status = new(StatusInfo)
-	status.Id = LOGISTICS_NUMBER_BATCH_DISABLED
-	status.Type = STATUS_TYPE_LOGISTICS_NUMBER_BATCH
-	status.Name = "停用"
-	status.Desc = core.NewNullString("订单运单号 停用", true)
-	db_session.Insert(status)
+		status = new(StatusInfo)
+		status.Id = LOGISTICS_NUMBER_BATCH_DISABLED
+		status.Type = STATUS_TYPE_LOGISTICS_NUMBER_BATCH
+		status.Name = "停用"
+		status.Desc = core.NewNullString("订单运单号 停用", true)
+		db_session.Insert(status)
+	}
 
 	//不规则订单运单号状态
-	status = new(StatusInfo)
-	status.Id = LOGISTICS_NUMBER_NOT_USED
-	status.Type = STATUS_TYPE_LOGISTICS_NUMBER
-	status.Name = "未使用"
-	status.Desc = core.NewNullString("订单运单号 未使用", true)
-	db_session.Insert(status)
+	{
+		status := new(StatusInfo)
+		status.Id = LOGISTICS_NUMBER_NOT_USED
+		status.Type = STATUS_TYPE_LOGISTICS_NUMBER
+		status.Name = "未使用"
+		status.Desc = core.NewNullString("订单运单号 未使用", true)
+		db_session.Insert(status)
 
-	status = new(StatusInfo)
-	status.Id = LOGISTICS_NUMBER_USED
-	status.Type = STATUS_TYPE_LOGISTICS_NUMBER
-	status.Name = "已使用"
-	status.Desc = core.NewNullString("订单运单号 已使用", true)
-	db_session.Insert(status)
-
-	//STATUS_TYPE_PRODUCT_BIND
+		status = new(StatusInfo)
+		status.Id = LOGISTICS_NUMBER_USED
+		status.Type = STATUS_TYPE_LOGISTICS_NUMBER
+		status.Name = "已使用"
+		status.Desc = core.NewNullString("订单运单号 已使用", true)
+		db_session.Insert(status)
+	}
 
 	// 绑定商品状态 正常 停产
-	status = new(StatusInfo)
-	status.Id = PRODUCT_BIND_NORMAL
-	status.Type = STATUS_TYPE_PRODUCT_BIND
-	status.Name = "正常"
-	status.Desc = core.NewNullString("绑定商品状态 正常", true)
-	db_session.Insert(status)
+	{
+		status := new(StatusInfo)
+		status.Id = PRODUCT_BIND_NORMAL
+		status.Type = STATUS_TYPE_PRODUCT_BIND
+		status.Name = "正常"
+		status.Desc = core.NewNullString("绑定商品状态 正常", true)
+		db_session.Insert(status)
 
-	status = new(StatusInfo)
-	status.Id = PRODUCT_BIND_STOPPED
-	status.Type = STATUS_TYPE_PRODUCT_BIND
-	status.Name = "停产"
-	status.Desc = core.NewNullString("绑定商品状态 停产", true)
-	db_session.Insert(status)
+		status = new(StatusInfo)
+		status.Id = PRODUCT_BIND_STOPPED
+		status.Type = STATUS_TYPE_PRODUCT_BIND
+		status.Name = "停产"
+		status.Desc = core.NewNullString("绑定商品状态 停产", true)
+		db_session.Insert(status)
+	}
 }
