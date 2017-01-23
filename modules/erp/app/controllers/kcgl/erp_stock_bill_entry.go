@@ -13,11 +13,11 @@ type ErpStockBillEntry struct {
 	*revel.Controller
 }
 
-func (c ErpStockBillEntry) Index() revel.Result {
+func (c ErpStockBillEntry) Index(bill_id int64) revel.Result {
 	return c.RenderTemplate("erp/kcgl/stock_bill_entry/stock_bill_entry_index.html")
 }
 
-func (c ErpStockBillEntry) ListData() revel.Result {
+func (c ErpStockBillEntry) ListData(bill_id int64) revel.Result {
 	db_session := c.DbSession
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)

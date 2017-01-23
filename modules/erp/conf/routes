@@ -141,8 +141,8 @@ POST /erp/stock/bill/transfer/data/detail      ErpStockBillTransfer.DetailData
 POST /erp/stock/bill/transfer/save             ErpStockBillTransfer.Save
 POST /erp/stock/bill/transfer/delete           ErpStockBillTransfer.Delete
 
-GET  /erp/stock/bill/entry                     ErpStockBillEntry.Index
-POST /erp/stock/bill/entry/data/list           ErpStockBillEntry.ListData
+GET  /erp/stock/bill/:bill_id/entry            ErpStockBillEntry.Index
+POST /erp/stock/bill/:bill_id/entry/data/list  ErpStockBillEntry.ListData
 POST /erp/stock/bill/entry/data/detail         ErpStockBillEntry.DetailData
 POST /erp/stock/bill/entry/save                ErpStockBillEntry.Save
 POST /erp/stock/bill/entry/delete              ErpStockBillEntry.Delete

@@ -102,6 +102,9 @@
                     <button type="button" class="btn btn-success btn-sm" @click="saveStockBill()">
                         <i class="ace-icon fa fa-floppy-o"></i>保存
                     </button>
+                    <button type="button" class="btn btn-purple btn-sm" @click="saveStockBillAndViewEntries()">
+                        <i class="ace-icon fa fa-floppy-o"></i>保存并查看明细
+                    </button>
                     <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">
                         <i class="ace-icon fa fa-times"></i>关闭
                     </button>
@@ -179,21 +182,7 @@
             },
             saveStockBill: function () {
                 showMask("提交中...");
-                var form = $("#stockBillDetailForm");
-                var valid = validate(form, {
-                    'detail.stock_bill.code': {
-                        required: false
-                    },
-                    'detail.stock_bill.stock_id': {
-                        required: true, digits: true
-                    },
-                    'detail.stock_bill.desc': {
-                        required: false, minlength: 2, maxlength: 400
-                    },
-                    'detail.stock_bill.date': {
-                        required: true
-                    }
-                });
+                var valid = vm.validateBillDetailForm();
 
                 if (!valid) {
                     hideMask();
@@ -220,6 +209,54 @@
                         }
                     );
                 }
+            },
+            saveStockBillAndViewEntries: function () {
+                showMask("提交中...");
+                var form = $("#stockBillDetailForm");
+                var valid = vm.validateBillDetailForm();
+
+                if (!valid) {
+                    hideMask();
+                } else {
+                    $.ajax({
+                            url: '{%url "ErpStockBillCheckin.Save"%}',
+                            type: "POST",
+                            processData: false,
+                            contentType: 'application/json',
+                            data: JSON.stringify(vm.detail),
+                            success: function (data) {
+                                hideMask();
+                                if (data.success == false) {
+                                    $.msg.error(data.message);
+                                    //return;
+                                }
+                                else {
+                                    $.msg.show(data.message);
+                                    $('#stockBillDetailDialog').modal('hide');
+                                    vm.reloadList();
+                                    //return;
+                                }
+                            }
+                        }
+                    );
+                }
+            },
+            validateBillDetailForm: function () {
+                var form = $("#stockBillDetailForm");
+                return validate(form, {
+                    'detail.stock_bill.code': {
+                        required: false
+                    },
+                    'detail.stock_bill.stock_id': {
+                        required: true, digits: true
+                    },
+                    'detail.stock_bill.desc': {
+                        required: false, minlength: 2, maxlength: 400
+                    },
+                    'detail.stock_bill.date': {
+                        required: true
+                    }
+                });
             },
             deleteStockBill: function () {
                 var id_list = [];
