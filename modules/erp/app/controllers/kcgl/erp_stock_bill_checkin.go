@@ -9,6 +9,7 @@ import (
 	auth_models "matrix/modules/auth/models"
 	"matrix/modules/erp/models"
 	"time"
+	"matrix/modules/erp/service/bill_service"
 )
 
 type ErpStockBillCheckin struct {
@@ -110,6 +111,7 @@ func (c ErpStockBillCheckin) DetailData() revel.Result {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "指定的出入库单不存在！"})
 		}
 	} else {
+		stock_bill.Code = bill_service.GetNextBillNo(db_session)
 		stock_bill.Date = core.Date(time.Now())
 	}
 
@@ -165,6 +167,8 @@ func (c ErpStockBillCheckin) Delete() revel.Result {
 
 	affected, err := db_session.In("id", stock_bill_id_list).Delete(new(models.StockBillInfo))
 	core.HandleError(err)
+
+	//todo: 同时删除关联明细
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})
 }

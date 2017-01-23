@@ -40,5 +40,5 @@ CREATE PROCEDURE erp_get_next_bill_serial_v0001()
 	_, err := db_session.Sql(sql).Get(&bill_next_serial)
 	core.HandleError(err)
 
-	return fmt.Sprintf("%s%04d", time.Now().Format("2006-01-02"), bill_next_serial.NextSerial)
+	return fmt.Sprintf("%s%04d", time.Now().Format("20060102"), bill_next_serial.NextSerial)
 }
