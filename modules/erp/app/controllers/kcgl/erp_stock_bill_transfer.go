@@ -9,6 +9,7 @@ import (
 	auth_models "matrix/modules/auth/models"
 	"matrix/modules/erp/models"
 	"time"
+	"fmt"
 )
 
 type ErpStockBillTransfer struct {
@@ -171,6 +172,21 @@ func (c ErpStockBillTransfer) Delete() revel.Result {
 	c.Params.Bind(&stock_bill_id_list, "id_list")
 
 	affected, err := db_session.In("id", stock_bill_id_list).Delete(new(models.StockBillInfo))
+	core.HandleError(err)
+
+	//同时删除关联明细
+	/*
+		DELETE FROM erp_stock_bill_entry WHERE bill_id IN (123, 456, 789);
+	 */
+
+	stock_bill_id_str_list := make([]string, 0)
+	for _, stock_bill_id := range stock_bill_id_list {
+		stock_bill_id_str_list = append(stock_bill_id_str_list, fmt.Sprint(stock_bill_id))
+	}
+
+	sql := `DELETE FROM erp_stock_bill_entry WHERE bill_id IN (%s);`
+	sql = fmt.Sprintf(sql, stock_bill_id_str_list)
+	_, err = db_session.Exec(sql)
 	core.HandleError(err)
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})

@@ -5,8 +5,9 @@
             <li>
                 <a href='{%url "Home.Index"%}'><i class="ace-icon fa fa-home home-icon"></i></a>
             </li>
-            <li class="parent" data-menu="erp-menu">ERP</li>
-            <li class="active" data-menu="erp-stockbillentry-menu">出入库单明细</li>
+            <li class="parent" data-menu="kcgl-menu">库存管理</li>
+            {% .breadcrumb_nav %}
+            <li>{% .bill_type %}明细（批次号：{% .stock_bill.Code %}）</li>
         </ul>
     </div>
     <div class="page-content">
@@ -150,7 +151,7 @@
             initDataTable(
                 '#stockBillEntryList',
                 {
-                    "sAjaxSource": '{%url "ErpStockBillEntry.ListData" .bill_id %}',
+                    "sAjaxSource": '{%url "ErpStockBillEntry.ListData" .stock_bill.Id %}',
                     "aaSorting": [[1, "asc"]],
                     "aoColumns": [
                         {

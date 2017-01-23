@@ -139,7 +139,12 @@
                                 return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
                             }
                         },
-                        {"mDataProp": "sb.code", "title": "批次号", "bSearchable": true, "width": 160},
+                        {
+                            "mDataProp": "sb.code", "title": "批次号", "bSearchable": true, "width": 160,
+                            "render": function (data, type, row) {
+                                return '<a href="/erp/stock/bill/' + row.sb.id + '/entry" target="_blank">' + data + '</a>';
+                            }
+                        },
                         {"mDataProp": "s.name", "title": "仓库", "bSearchable": true, "width": 160},
                         {"mDataProp": "sb.desc", "title": "备注", "bSearchable": true},
                         {"mDataProp": "sb.date", "title": "日期", "bSearchable": false, "width": 85},

@@ -192,6 +192,7 @@ function initDataTable(table, options) {
 
     $(table + '_wrapper').on('click', 'div.dataTables_scroll div.dataTables_scrollHead thead th input.checkall', checkAll);
 
+    /*
     htmlTable.on('click', 'tbody tr', function () {
         var tableRow = $(this);
         var checkbox = tableRow.find('td:first-child input:checkbox')[0];
@@ -204,6 +205,7 @@ function initDataTable(table, options) {
             }
         }
     });
+    */
 
     htmlTable.on('click', 'tbody td:first-child input:checkbox', function (event) {
         event.stopPropagation();
@@ -223,6 +225,7 @@ function initSingleSelectDataTable(table, options) {
     var htmlTable = $(table);
     htmlTable.dataTable(options);
 
+    /*
     htmlTable.on('click', 'tbody tr', function () {
         var tableRow = $(this);
         var checkbox = tableRow.find('td:first-child input:checkbox')[0];
@@ -234,6 +237,7 @@ function initSingleSelectDataTable(table, options) {
             }
         }
     });
+    */
 
     htmlTable.on('click', 'tbody td:first-child input:checkbox', function (event) {
         event.stopPropagation();
