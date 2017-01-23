@@ -215,6 +215,8 @@
                 var form = $("#stockBillDetailForm");
                 var valid = vm.validateBillDetailForm();
 
+                var bill_entry_window = window.open('/loading', "_blank");
+
                 if (!valid) {
                     hideMask();
                 } else {
@@ -234,6 +236,7 @@
                                     $.msg.show(data.message);
                                     $('#stockBillDetailDialog').modal('hide');
                                     vm.reloadList();
+                                    bill_entry_window.location.href = '/erp/stock/bill/' + data.bill_id + '/entry';
                                     //return;
                                 }
                             }

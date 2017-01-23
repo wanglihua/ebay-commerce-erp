@@ -40,7 +40,7 @@ func (c ErpStockBillCheckin) ListData() revel.Result {
 	*/
 
 	query := db_session.
-		Select("sb.*, s.*, u.*").
+	Select("sb.*, s.*, u.*").
 		Table("erp_stock_bill").Alias("sb").
 		Join("INNER", []string{"erp_stock", "s"}, "sb.stock_id = s.id").
 		Join("INNER", []string{"auth_user", "u"}, "sb.user_id = u.id").
@@ -156,7 +156,11 @@ func (c ErpStockBillCheckin) Save() revel.Result {
 		}
 	}
 
-	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据保存成功!"})
+	return c.RenderJson(map[string]interface{}{
+		"success": true,
+		"bill_id": stock_bill.Id,
+		"message": strconv.FormatInt(affected, 10) + "条数据保存成功!",
+	})
 }
 
 func (c ErpStockBillCheckin) Delete() revel.Result {

@@ -14,6 +14,7 @@ type ErpStockBillEntry struct {
 }
 
 func (c ErpStockBillEntry) Index(bill_id int64) revel.Result {
+	c.RenderArgs["bill_id"] = bill_id
 	return c.RenderTemplate("erp/kcgl/stock_bill_entry/stock_bill_entry_index.html")
 }
 
