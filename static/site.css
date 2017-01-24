@@ -158,8 +158,16 @@ table.dataDetail td.data {
     min-width: 100px;
 }
 
-.dataTable > thead > tr > th[class=sorting_disabled] {
+div.dataTables_wrapper table > thead > tr > th[class=sorting_disabled] {
     color: #707070;
+}
+
+div.dataTables_wrapper div.dataTables_filter label {
+    display: none;
+}
+
+div.dataTables_wrapper div.dataTables_filter label.dataTable-custom-search {
+    display: inline !important;
 }
 
 .btn-inline {

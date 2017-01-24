@@ -110,6 +110,7 @@ $.ajaxSetup(
 
 //扩展dataTable默认值
 $.extend($.fn.dataTable.defaults, {
+    //"sDom": "<'row'<'col-xs-6'l><'col-xs-6'f>r><'row'<'col-xs-12't>><'row'<'col-xs-6'i><'col-xs-6'p>>",
     "sDom": "<'row'<'col-xs-6'l><'col-xs-6'f>r><'row'<'col-xs-12't>><'row'<'col-xs-6'i><'col-xs-6'p>>",
     //"bAutoWidth": true,
     //"sScrollX": "100%",
@@ -164,6 +165,21 @@ $.extend($.fn.dataTable.defaults, {
                         return;
                     }
                     fnCallback(data);
+                }
+            });
+    },
+    "initComplete": function(settings) {
+        console.log(this);
+        var dataTable = this;
+        var searchHTML = '<label class="dataTable-custom-search"><span>搜索:</span><input type="search" class="form-control input-sm" placeholder="输入搜索内容按回车" aria-controls="'+ dataTable.selector.substring(1) +'"></label>';
+        //快捷操作的HTML DOM
+        $(dataTable.selector + '_wrapper .dataTables_filter').append(searchHTML);
+
+        //重写搜索事件
+        $(dataTable.selector + '_wrapper .dataTables_filter input').bind('keyup',
+            function(e) {
+                if (e.keyCode == 13 || (e.keyCode == 8 && (this.value.length == 0))) {
+                    dataTable.api().search(this.value).draw();
                 }
             });
     }
