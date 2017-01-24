@@ -24,6 +24,10 @@ cause firefox display dataTables incorrect, remove the th
     border-right-color: #dddddd !important;
 }
 
+div.dataTables_wrapper .table > tbody > tr > td {
+    vertical-align: middle;
+}
+
 div.dataTables_wrapper div.dataTables_info {
     line-height: 32px;
 }
@@ -34,6 +38,40 @@ div.dataTables_wrapper div.dataTables_paginate ul.pagination {
 
 div.dataTables_wrapper div.dataTables_filter input {
     margin-right: 0 !important;
+}
+
+.dataTable > thead > tr > th > div > th[class*=sorting_] {
+    color: #307ECC;
+}
+
+.dataTable > thead > tr > th > div > th[class*=sort] {
+    cursor: pointer;
+}
+
+.dataTable > thead > tr > th > div > th[class*=sort]:hover {
+    color: #547EA8;
+}
+
+.dataTable > thead > tr > th > div > th[class*=sort]:after {
+    float: right;
+    display: inline;
+    content: "\f0dc";
+    font-family: FontAwesome;
+    font-size: 12px;
+    font-weight: 400;
+    color: #555;
+}
+
+.dataTable > thead > tr > th > div > th.sorting_asc:after {
+    content: "\f0de";
+    top: 4px;
+    color: #307ECC;
+}
+
+.dataTable > thead > tr > th > div > th.sorting_desc:after {
+    content: "\f0dd";
+    top: -6px;
+    color: #307ECC;
 }
 
 .dtRight {
