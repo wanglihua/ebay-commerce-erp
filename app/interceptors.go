@@ -93,6 +93,10 @@ func userAuth(c *revel.Controller) revel.Result {
 		return nil
 	}
 
+	if c.Action == "Test.Index" {
+		return nil
+	}
+
 	if strings.HasPrefix(c.Name, "Wechat") {
 		return nil //暂时先 return true
 	}

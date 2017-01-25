@@ -220,11 +220,11 @@
                 var form = $("#stockBillDetailForm");
                 var valid = vm.validateBillDetailForm();
 
-                var bill_entry_window = window.open('/loading', "_blank");
-
                 if (!valid) {
                     hideMask();
                 } else {
+                    var bill_entry_window = window.open('/loading', "_blank");
+
                     $.ajax({
                             url: '{%url "ErpStockBillCheckin.Save"%}',
                             type: "POST",

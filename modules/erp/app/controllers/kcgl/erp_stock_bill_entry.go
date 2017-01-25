@@ -25,6 +25,10 @@ func (c ErpStockBillEntry) Index(bill_id int64) revel.Result {
 		panic("指定的批次号不存在！")
 	}
 
+	var stock models.StockInfo
+	_, err = db_session.Id(stock_bill.StockId).Get(&stock)
+	core.HandleError(err)
+
 	breadcrumb_nav := template.HTML("")
 	bill_type := ""
 	if stock_bill.TypeId == models.STOCK_BILL_TYPE_CHECKIN {
@@ -41,13 +45,14 @@ func (c ErpStockBillEntry) Index(bill_id int64) revel.Result {
 	c.RenderArgs["breadcrumb_nav"] = breadcrumb_nav
 	c.RenderArgs["bill_type"] = bill_type
 	c.RenderArgs["stock_bill"] = stock_bill
+	c.RenderArgs["stock_name"] = stock.Name
 	return c.RenderTemplate("erp/kcgl/stock_bill_entry/stock_bill_entry_index.html")
 }
 
 func (c ErpStockBillEntry) ListData(bill_id int64) revel.Result {
 	db_session := c.DbSession
 
-	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
+	filter, order, _, _ := core.GetGridRequestParam(c.Request)
 	query := db_session.Where(filter)
 
 	//query extra filter here
@@ -59,8 +64,8 @@ func (c ErpStockBillEntry) ListData(bill_id int64) revel.Result {
 		data_query = *data_query.Asc("id")
 	}
 
-	stock_bill_entry_list := make([]models.StockBillEntryInfo, 0, limit)
-	err := data_query.Limit(limit, offset).Find(&stock_bill_entry_list)
+	stock_bill_entry_list := make([]models.StockBillEntryInfo, 0)
+	err := data_query.Find(&stock_bill_entry_list)
 	core.HandleError(err)
 
 	count_query := *query

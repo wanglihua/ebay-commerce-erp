@@ -13,6 +13,8 @@ GET  /loading                   Home.Loading
 GET  /syncdb                    Home.SyncDb
 POST /syncdb/post               Home.SyncDbPost
 
+GET  /test                      Test.Index
+
 GET  /captcha/image             Captcha.Image
 
 GET  /login                     Login.Index
