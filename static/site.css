@@ -74,6 +74,11 @@ div.dataTables_wrapper div.dataTables_filter input {
     color: #307ECC;
 }
 
+form.form-horizontal label.control-label {
+    text-align: center !important;
+    padding-top: 0 !important;
+}
+
 .dtRight {
     text-align: right;
 }
