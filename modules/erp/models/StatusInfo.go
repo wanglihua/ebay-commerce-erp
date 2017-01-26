@@ -8,19 +8,22 @@ import (
 const (
 	//状态类型 begin
 
-	STATUS_TYPE_STOCK                  = 100  //仓库状态
-	STATUS_TYPE_EXCHANGE_RATE          = 200  //仓库状态
-	STATUS_TYPE_PRODUCT_CATE           = 300  //商品目录状态
-	STATUS_TYPE_PRODUCT                = 400  //商品状态
-	STATUS_TYPE_SHOP_ACCOUNT           = 500  //店铺账号状态
-	STATUS_TYPE_PAYPAL_ACCOUNT         = 600  //Paypal账号状态
-	STATUS_TYPE_PACKAGE                = 700  //包材 状态
-	STATUS_TYPE_INVENTORY_CHECK        = 800  //库存盘点单状态
-	STATUS_TYPE_PAYPAL_RECON           = 900  //Paypal对账结果
-	STATUS_TYPE_ORDER_CUSTOM_TYPE      = 1000 //订单自定义类型
-	STATUS_TYPE_LOGISTICS_NUMBER       = 1100 //不规则订单运单号类型
-	STATUS_TYPE_LOGISTICS_NUMBER_BATCH = 1200 //不规则订单运单号类型
-	STATUS_TYPE_PRODUCT_BIND           = 1300 //绑定商品状态
+	STATUS_TYPE_STOCK                  = 100  // 仓库状态
+	STATUS_TYPE_EXCHANGE_RATE          = 200  // 仓库状态
+	STATUS_TYPE_PRODUCT_CATE           = 300  // 商品目录状态
+	STATUS_TYPE_PRODUCT                = 400  // 商品状态
+	STATUS_TYPE_SHOP_ACCOUNT           = 500  // 店铺账号状态
+	STATUS_TYPE_PAYPAL_ACCOUNT         = 600  // Paypal账号状态
+	STATUS_TYPE_PACKAGE                = 700  // 包材 状态
+	STATUS_TYPE_INVENTORY_CHECK        = 800  // 库存盘点单状态
+	STATUS_TYPE_PAYPAL_RECON           = 900  // Paypal对账结果
+	STATUS_TYPE_ORDER_CUSTOM_TYPE      = 1000 // 订单自定义类型
+	STATUS_TYPE_LOGISTICS_NUMBER       = 1100 // 不规则订单运单号类型
+	STATUS_TYPE_LOGISTICS_NUMBER_BATCH = 1200 // 不规则订单运单号类型
+	STATUS_TYPE_PRODUCT_BIND           = 1300 // 绑定商品状态
+	STATUS_TYPE_STOCK_BILL_CHECKIN     = 1400 // 入库单状态
+	STATUS_TYPE_STOCK_BILL_CHECKOUT    = 1500 // 出库单状态
+	STATUS_TYPE_STOCK_BILL_TRANSFER    = 1600 // 调拨单状态
 
 	//状态类型 end
 
@@ -83,6 +86,18 @@ const (
 	// 绑定商品状态 正常 停产
 	PRODUCT_BIND_NORMAL  = 3100
 	PRODUCT_BIND_STOPPED = 3200
+
+	// 入库单状态  暂存 提交
+	STOCK_BILL_CHECKIN_SAVE   = 3300
+	STOCK_BILL_CHECKIN_SUBMIT = 3400
+
+	// 出库单状态  暂存 提交
+	STOCK_BILL_CHECKOUT_SAVE   = 3500
+	STOCK_BILL_CHECKOUT_SUBMIT = 3600
+
+	// 调拨单状态  暂存 提交
+	STOCK_BILL_TRANSFER_SAVE   = 3700
+	STOCK_BILL_TRANSFER_SUBMIT = 3800
 
 	//状态 id end
 )
@@ -364,6 +379,57 @@ func (e StatusInfo) InitData(db_session *xorm.Session) {
 		status.Type = STATUS_TYPE_PRODUCT_BIND
 		status.Name = "停产"
 		status.Desc = core.NewNullString("绑定商品状态 停产", true)
+		db_session.Insert(status)
+	}
+
+	// 入库单状态  暂存 提交
+	{
+		status := new(StatusInfo)
+		status.Id = STOCK_BILL_CHECKIN_SAVE
+		status.Type = STATUS_TYPE_STOCK_BILL_CHECKIN
+		status.Name = "暂存"
+		status.Desc = core.NewNullString("入库单状态 暂存", true)
+		db_session.Insert(status)
+
+		status = new(StatusInfo)
+		status.Id = STOCK_BILL_CHECKIN_SUBMIT
+		status.Type = STATUS_TYPE_STOCK_BILL_CHECKIN
+		status.Name = "已提交"
+		status.Desc = core.NewNullString("入库单状态 已提交", true)
+		db_session.Insert(status)
+	}
+
+	// 出库单状态  暂存 提交
+	{
+		status := new(StatusInfo)
+		status.Id = STOCK_BILL_CHECKOUT_SAVE
+		status.Type = STATUS_TYPE_STOCK_BILL_CHECKOUT
+		status.Name = "暂存"
+		status.Desc = core.NewNullString("出库单状态 暂存", true)
+		db_session.Insert(status)
+
+		status = new(StatusInfo)
+		status.Id = STOCK_BILL_CHECKOUT_SUBMIT
+		status.Type = STATUS_TYPE_STOCK_BILL_CHECKOUT
+		status.Name = "已提交"
+		status.Desc = core.NewNullString("出库单状态 已提交", true)
+		db_session.Insert(status)
+	}
+
+	// 调拨单状态  暂存 提交
+	{
+		status := new(StatusInfo)
+		status.Id = STOCK_BILL_TRANSFER_SAVE
+		status.Type = STATUS_TYPE_STOCK_BILL_TRANSFER
+		status.Name = "暂存"
+		status.Desc = core.NewNullString("调拨单状态 暂存", true)
+		db_session.Insert(status)
+
+		status = new(StatusInfo)
+		status.Id = STOCK_BILL_TRANSFER_SUBMIT
+		status.Type = STATUS_TYPE_STOCK_BILL_TRANSFER
+		status.Name = "已提交"
+		status.Desc = core.NewNullString("调拨单状态 已提交", true)
 		db_session.Insert(status)
 	}
 }

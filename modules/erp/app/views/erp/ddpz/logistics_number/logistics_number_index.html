@@ -50,7 +50,7 @@
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
-                                            <label for="mode_id" class="col-xs-2 control-label no-padding-right">物流方式</label>
+                                            <label for="mode_id" class="col-xs-2 control-label">物流方式</label>
                                             <div class="col-xs-10">
                                                 <select id="mode_id" name="detail.logistics_number.mode_id" class="input-sm form-control" v-model.number="detail.logistics_number.mode_id">
                                                     <template v-for="mode in detail.logistics_mode_list">
@@ -65,7 +65,7 @@
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
-                                            <label for="num" class="col-xs-2 control-label no-padding-right">物流单号</label>
+                                            <label for="num" class="col-xs-2 control-label">物流单号</label>
                                             <div class="col-xs-10">
                                                 <input id="num" name="detail.logistics_number.num" type="text" class="input-sm form-control" v-model="detail.logistics_number.num"/>
                                             </div>
@@ -76,7 +76,7 @@
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
-                                            <label for="desc" class="col-xs-2 control-label no-padding-right">详情</label>
+                                            <label for="desc" class="col-xs-2 control-label">详情</label>
                                             <div class="col-xs-10">
                                                 <input id="desc" name="detail.logistics_number.desc" type="text" class="input-sm form-control" v-model="detail.logistics_number.desc"/>
                                             </div>
@@ -87,7 +87,7 @@
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
-                                            <label for="status_id" class="col-xs-2 control-label no-padding-right">状态</label>
+                                            <label for="status_id" class="col-xs-2 control-label">状态</label>
                                             <div class="col-xs-10">
                                                 <select id="status_id" name="detail.logistics_number.status_id" class="input-sm form-control" v-model.number="detail.logistics_number.status_id">
                                                     <template v-for="status in detail.status_list">

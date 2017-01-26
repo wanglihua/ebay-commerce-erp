@@ -12,7 +12,7 @@
                             <input id="user_id" name="form.User.Id" type="hidden" value="{%.form_User_Id%}"/>
                             <input id="user_version" name="form.User.Version" type="hidden" value="{%.form_User_Version%}"/>
                             <div class="form-group">
-                                <label for="user_login_name" class="col-xs-2 control-label no-padding-right">工号</label>
+                                <label for="user_login_name" class="col-xs-2 control-label">工号</label>
                                 <div class="col-xs-10">
                                     {%if eq .form_User_LoginName "0000" %}
                                     <input name="form.User.LoginName" type="hidden" value="{%.form_User_LoginName%}"/>
@@ -23,13 +23,13 @@
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="user_nick_name" class="col-xs-2 control-label no-padding-right">姓名</label>
+                                <label for="user_nick_name" class="col-xs-2 control-label">姓名</label>
                                 <div class="col-xs-10">
                                     <input id="user_nick_name" name="form.User.NickName" type="text" class="input-sm form-control" value="{%.form_User_NickName%}"/>
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="user_sex" class="col-xs-2 control-label no-padding-right">性别</label>
+                                <label for="user_sex" class="col-xs-2 control-label">性别</label>
                                 <div class="col-xs-10">
                                     <select id="user_sex" name="form.User.Sex" class="input-sm form-control">
                                         <option value="男">男</option>
@@ -38,33 +38,33 @@
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="user_phone" class="col-xs-2 control-label no-padding-right">联系电话</label>
+                                <label for="user_phone" class="col-xs-2 control-label">联系电话</label>
                                 <div class="col-xs-10">
                                     <input id="user_phone" name="form.User.Phone" type="text" class="input-sm form-control" value="{%.form_User_Phone%}"/>
                                 </div>
                             </div>
                             {%if .is_create%}
                             <div class="form-group">
-                                <label for="user_password" class="col-xs-2 control-label no-padding-right">密码</label>
+                                <label for="user_password" class="col-xs-2 control-label">密码</label>
                                 <div class="col-xs-10">
                                     <input id="user_password" name="form.User.Password" type="password" class="input-sm form-control" value=""/>
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="password_again" class="col-xs-2 control-label no-padding-right">密码重输</label>
+                                <label for="password_again" class="col-xs-2 control-label">密码重输</label>
                                 <div class="col-xs-10">
                                     <input id="password_again" name="form.PasswordAgain" type="password" class="input-sm form-control" value=""/>
                                 </div>
                             </div>
                             {%else%}
                             <div class="form-group">
-                                <label for="new_password" class="col-xs-2 control-label no-padding-right">新密码</label>
+                                <label for="new_password" class="col-xs-2 control-label">新密码</label>
                                 <div class="col-xs-10">
                                     <input id="new_password" name="form.NewPassword" type="password" class="input-sm form-control" value=""/>
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="new_password_again" class="col-xs-2 control-label no-padding-right">密码重输</label>
+                                <label for="new_password_again" class="col-xs-2 control-label">密码重输</label>
                                 <div class="col-xs-10">
                                     <input id="new_password_again" name="form.NewPasswordAgain" type="password" class="input-sm form-control" value=""/>
                                 </div>

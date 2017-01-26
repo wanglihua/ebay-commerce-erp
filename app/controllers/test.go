@@ -20,7 +20,6 @@ func (c Test) Index() revel.Result {
 	sql_builder.Where("id > 1")
 	sql_builder.OrderBy("login_name asc, id asc")
 	sql_builder.Limit(1, 2);
-
 	var user_list = make([]models.UserInfo, 0)
 	err := db_session.Sql(sql_builder.SqlList()).Find(&user_list)
 	core.HandleError(err)

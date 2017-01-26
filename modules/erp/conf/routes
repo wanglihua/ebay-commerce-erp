@@ -141,11 +141,23 @@ POST /erp/stock/bill/transfer/data/detail      ErpStockBillTransfer.DetailData
 POST /erp/stock/bill/transfer/save             ErpStockBillTransfer.Save
 POST /erp/stock/bill/transfer/delete           ErpStockBillTransfer.Delete
 
-GET  /erp/stock/bill/:bill_id/entry            ErpStockBillEntry.Index
-POST /erp/stock/bill/:bill_id/entry/data/list  ErpStockBillEntry.ListData
-POST /erp/stock/bill/entry/data/detail         ErpStockBillEntry.DetailData
-POST /erp/stock/bill/entry/save                ErpStockBillEntry.Save
-POST /erp/stock/bill/entry/delete              ErpStockBillEntry.Delete
+GET  /erp/stock/bill/checkin/:bill_id/entry             ErpStockBillCheckinEntry.Index
+POST /erp/stock/bill/checkin/:bill_id/entry/data/list   ErpStockBillCheckinEntry.ListData
+POST /erp/stock/bill/checkin/entry/data/detail          ErpStockBillCheckinEntry.DetailData
+POST /erp/stock/bill/checkin/entry/save                 ErpStockBillCheckinEntry.Save
+POST /erp/stock/bill/checkin/entry/delete               ErpStockBillCheckinEntry.Delete
+
+GET  /erp/stock/bill/checkout/:bill_id/entry            ErpStockBillCheckoutEntry.Index
+POST /erp/stock/bill/checkout/:bill_id/entry/data/list  ErpStockBillCheckoutEntry.ListData
+POST /erp/stock/bill/checkout/entry/data/detail         ErpStockBillCheckoutEntry.DetailData
+POST /erp/stock/bill/checkout/entry/save                ErpStockBillCheckoutEntry.Save
+POST /erp/stock/bill/checkout/entry/delete              ErpStockBillCheckoutEntry.Delete
+
+GET  /erp/stock/bill/transfer/:bill_id/entry            ErpStockBillTransferEntry.Index
+POST /erp/stock/bill/transfer/:bill_id/entry/data/list  ErpStockBillTransferEntry.ListData
+POST /erp/stock/bill/transfer/entry/data/detail         ErpStockBillTransferEntry.DetailData
+POST /erp/stock/bill/transfer/entry/save                ErpStockBillTransferEntry.Save
+POST /erp/stock/bill/transfer/entry/delete              ErpStockBillTransferEntry.Delete
 
 GET  /erp/inventory/check                      ErpInventoryCheck.Index
 POST /erp/inventory/check/data/list            ErpInventoryCheck.ListData

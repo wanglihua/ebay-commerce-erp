@@ -16,25 +16,25 @@
                     <div class="widget-main">
                         <form class="form-horizontal" id="profileForm" style="margin: 20px 0 30px 0;" onsubmit="saveProfile();return false;">
                             <div class="form-group">
-                                <label for="loginName" class="col-xs-3 control-label no-padding-right">工号：</label>
+                                <label for="loginName" class="col-xs-3 control-label">工号：</label>
                                 <div class="col-xs-8">
                                     <input id="loginName" name="login_name" type="text" class="form-control input-sm" readonly="readonly" value="{% .user_LoginName %}"/>
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="nickName" class="col-xs-3 control-label no-padding-right">姓名：</label>
+                                <label for="nickName" class="col-xs-3 control-label">姓名：</label>
                                 <div class="col-xs-8">
                                     <input id="nickName" name="nick_name" type="text" class="form-control input-sm" readonly="readonly" value="{% .user_NickName %}"/>
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="password" class="col-xs-3 control-label no-padding-right">密码：</label>
+                                <label for="password" class="col-xs-3 control-label">密码：</label>
                                 <div class="col-xs-8">
                                     <input id="password" name="form.Password" type="password" class="form-control input-sm" placeholder="如需更改密码，请输入您的新密码！"/>
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="password_again" class="col-xs-3 control-label no-padding-right">密码重输：</label>
+                                <label for="password_again" class="col-xs-3 control-label">密码重输：</label>
                                 <div class="col-xs-8">
                                     <input id="password_again" name="form.PasswordAgain" type="password" class="form-control input-sm" placeholder="密码重输！"/>
                                 </div>

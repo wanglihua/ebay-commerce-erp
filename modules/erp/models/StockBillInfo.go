@@ -13,6 +13,7 @@ type StockBillInfo struct {
 	Date       core.Date       `xorm:"datetime notnull 'date'" json:"date" smith:"verbose_name=日期"`
 	UserId     int64           `xorm:"bigint notnull 'user_id'" json:"user_id" smith:"verbose_name=操作人"`
 	TypeId     int64           `xorm:"bigint notnull 'type_id'" json:"type_id" smith:"verbose_name=类型"`
+	StatusId   int64           `xorm:"bigint notnull index 'status_id'" json:"status_id" smith:"verbose_name=状态"`
 	CreateTime core.Time       `xorm:"created notnull 'create_time'" json:"create_time"`
 	UpdateTime core.Time       `xorm:"updated notnull 'update_time'" json:"update_time"`
 	Version    int             `xorm:"version notnull 'version'" json:"version"`

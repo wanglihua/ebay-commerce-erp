@@ -50,7 +50,7 @@
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
-                                            <label for="name" class="col-xs-2 control-label no-padding-right">名称</label>
+                                            <label for="name" class="col-xs-2 control-label">名称</label>
                                             <div class="col-xs-10">
                                                 <input id="name" name="detail.logistics_mode.name" type="text" class="input-sm form-control" v-model="detail.logistics_mode.name"/>
                                             </div>
@@ -61,7 +61,7 @@
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
-                                            <label for="ebay_mode_id" class="col-xs-2 control-label no-padding-right">EBay物流方式</label>
+                                            <label for="ebay_mode_id" class="col-xs-2 control-label">EBay物流方式</label>
                                             <div class="col-xs-10">
                                                 <select id="ebay_mode_id" name="detail.logistics_mode.ebay_mode_id" class="input-sm form-control" v-model.number="detail.logistics_mode.ebay_mode_id">
                                                     <template v-for="mode in detail.ebay_logistics_mode_list">
@@ -76,7 +76,7 @@
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
-                                            <label for="desc" class="col-xs-2 control-label no-padding-right">描述</label>
+                                            <label for="desc" class="col-xs-2 control-label">描述</label>
                                             <div class="col-xs-10">
                                                 <textarea id="desc" name="detail.logistics_mode.desc" rows="2" class="input-sm form-control" v-model="detail.logistics_mode.desc"></textarea>
                                             </div>

@@ -49,7 +49,7 @@
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
-                                            <label for="account" class="col-xs-2 control-label no-padding-right">账号</label>
+                                            <label for="account" class="col-xs-2 control-label">账号</label>
                                             <div class="col-xs-10">
                                                 <input id="account" name="detail.shop_account.account" type="text" class="input-sm form-control" v-model="detail.shop_account.account"/>
                                             </div>
@@ -60,7 +60,7 @@
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
-                                            <label for="platform" class="col-xs-2 control-label no-padding-right">平台</label>
+                                            <label for="platform" class="col-xs-2 control-label">平台</label>
                                             <div class="col-xs-10">
                                                 <select id="platform" name="detail.shop_account.platform" class="input-sm form-control" v-model="detail.shop_account.platform">
                                                     <option value="ebay">ebay</option>
@@ -73,7 +73,7 @@
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
-                                            <label for="desc" class="col-xs-2 control-label no-padding-right">描述</label>
+                                            <label for="desc" class="col-xs-2 control-label">描述</label>
                                             <div class="col-xs-10">
                                                 <textarea id="desc" name="detail.shop_account.desc" rows="2" class="input-sm form-control" v-model="detail.shop_account.desc"></textarea>
                                             </div>
@@ -84,7 +84,7 @@
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
-                                            <label for="manager" class="col-xs-2 control-label no-padding-right">负责人</label>
+                                            <label for="manager" class="col-xs-2 control-label">负责人</label>
                                             <div class="col-xs-10">
                                                 <input id="manager" name="detail.shop_account.manager" type="text" class="input-sm form-control" v-model="detail.shop_account.manager"/>
                                             </div>
@@ -95,7 +95,7 @@
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
-                                            <label for="token_result" class="col-xs-2 control-label no-padding-right">Token验证结果</label>
+                                            <label for="token_result" class="col-xs-2 control-label">Token验证结果</label>
                                             <div class="col-xs-10">
                                                 <input id="token_result" name="detail.shop_account.token_result" type="text" class="input-sm form-control" v-model="detail.shop_account.token_result"/>
                                             </div>
@@ -106,7 +106,7 @@
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
-                                            <label for="status_id" class="col-xs-2 control-label no-padding-right">状态</label>
+                                            <label for="status_id" class="col-xs-2 control-label">状态</label>
                                             <div class="col-xs-10">
                                                 <select id="status_id" name="detail.shop_account.status_id" class="input-sm form-control" v-model.number="detail.shop_account.status_id">
                                                     <template v-for="status in detail.status_list">

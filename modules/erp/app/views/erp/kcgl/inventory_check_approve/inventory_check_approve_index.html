@@ -49,7 +49,7 @@
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
-                                            <label for="code" class="col-xs-2 control-label no-padding-right">批次号</label>
+                                            <label for="code" class="col-xs-2 control-label">批次号</label>
                                             <div class="col-xs-10">
                                                 <input id="code" name="detail.inventory_check.code" type="text" class="input-sm form-control" v-model="detail.inventory_check.code"/>
                                             </div>
@@ -60,7 +60,7 @@
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
-                                            <label for="stock_id" class="col-xs-2 control-label no-padding-right">仓库</label>
+                                            <label for="stock_id" class="col-xs-2 control-label">仓库</label>
                                             <div class="col-xs-10">
                                                 <select id="stock_id" name="detail.inventory_check.stock_id" class="input-sm form-control" v-model.number="detail.inventory_check.stock_id">
                                                     <template v-for="stock in detail.stock_list">
@@ -75,7 +75,7 @@
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
-                                            <label for="check_date" class="col-xs-2 control-label no-padding-right">盘点日期</label>
+                                            <label for="check_date" class="col-xs-2 control-label">盘点日期</label>
                                             <div class="col-xs-10">
                                                 <input id="check_date" name="detail.inventory_check.check_date" type="text" class="input-sm form-control" v-model="detail.inventory_check.check_date"/>
                                             </div>
@@ -86,7 +86,7 @@
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
-                                            <label for="desc" class="col-xs-2 control-label no-padding-right">备注</label>
+                                            <label for="desc" class="col-xs-2 control-label">备注</label>
                                             <div class="col-xs-10">
                                                 <textarea id="desc" name="detail.inventory_check.desc" rows="2" class="input-sm form-control" v-model="detail.inventory_check.desc"></textarea>
                                             </div>

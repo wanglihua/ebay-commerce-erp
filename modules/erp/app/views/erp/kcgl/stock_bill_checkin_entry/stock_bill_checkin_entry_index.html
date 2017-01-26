@@ -35,46 +35,95 @@
                     </button>
                 </div>
                 <div class="row" style="margin-top: 20px;margin-bottom: 20px;">
-                    <div id="query" class="col-xs-12" style="line-height: 28px;">
+                    <div class="col-xs-12" style="line-height: 28px;">
                         <fieldset>
                             <legend style="font-size: 14px;">
-                                {% .bill_type %}&nbsp;<span style="color: #A5A5A5;">（批次号：{% .stock_bill.Code %}，日期：{% .stock_bill.Date %}，仓库：{% .stock_name %}）</span>
+                                {% .bill_type %}基本信息
+                            </legend>
+
+                            <div class="col-xs-12">
+                                <form class="form-horizontal" role="form" id="stockBillForm">
+                                    <div class="row">
+                                        <div class="col-xs-3">
+                                            <div class="form-group">
+                                                <label for="stock_bill_code" class="col-xs-3 control-label">批次号</label>
+                                                <div class="col-xs-9">
+                                                    <input id="stock_bill_code" name="stock_bill.Code" type="text" class="input-sm form-control" disabled="disabled" value="{% .stock_bill.Code %}"/>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-xs-3">
+                                            <div class="form-group">
+                                                <label for="stock_bill_date" class="col-xs-3 control-label">日期</label>
+                                                <div class="col-xs-9">
+                                                    <input id="stock_bill_date" name="stock_bill.Date" type="text" class="input-sm form-control" disabled="disabled" value="{% .stock_bill.Date %}"/>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-xs-3">
+                                            <div class="form-group">
+                                                <label for="stock_bill_stock_name" class="col-xs-3 control-label">仓库</label>
+                                                <div class="col-xs-9">
+                                                    <input id="stock_bill_stock_name" name="stock_bill.StockName" type="text" class="input-sm form-control" disabled="disabled" value="{% .stock_name %}"/>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-xs-3">
+                                            <div class="form-group">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </form>
+                            </div>
+
+                        </fieldset>
+                    </div>
+                </div>
+                <div class="row" style="margin-top: 20px;margin-bottom: 20px;">
+                    <div class="col-xs-12" style="line-height: 28px;">
+                        <fieldset>
+                            <legend style="font-size: 14px;">
+                                {% .bill_type %}商品清单
                             </legend>
                             <div class="col-xs-12">
                                 <form class="form-horizontal" role="form" id="stockBillEntryAddForm">
                                     <div class="row">
                                         <div class="col-xs-3">
                                             <div class="form-group">
-                                                <label for="storage_loc_name" class="col-xs-2 control-label no-padding-right">仓位</label>
-                                                <div class="col-xs-10">
-                                                    <input id="storage_loc_name" name="bill_entry_add.storage_loc_name" type="text" class="input-sm form-control" placeholder="输入新增商品仓库{%.stock_name%}的仓位" v-model.number="bill_entry_add.storage_loc_name"/>
+                                                <label for="storage_loc_name" class="col-xs-3 control-label">仓位</label>
+                                                <div class="col-xs-9">
+                                                    <input id="storage_loc_name" name="entry_detail.storage_loc_name" type="text" class="input-sm form-control" placeholder="输入商品仓位" v-model.number="entry_detail.storage_loc_name"/>
                                                 </div>
                                             </div>
                                         </div>
 
                                         <div class="col-xs-3">
                                             <div class="form-group">
-                                                <label for="product_sku" class="col-xs-2 control-label no-padding-right">SKU</label>
-                                                <div class="col-xs-10">
-                                                    <input id="product_sku" name="bill_entry_add.product_sku" type="text" class="input-sm form-control" placeholder="输入新增商品SKU" v-model.number="bill_entry_add.product_sku"/>
+                                                <label for="product_sku" class="col-xs-3 control-label">SKU</label>
+                                                <div class="col-xs-9">
+                                                    <input id="product_sku" name="entry_detail.product_sku" type="text" class="input-sm form-control" placeholder="输入商品SKU" v-model.number="entry_detail.product_sku"/>
                                                 </div>
                                             </div>
                                         </div>
 
                                         <div class="col-xs-3">
                                             <div class="form-group">
-                                                <label for="add_qty" class="col-xs-2 control-label no-padding-right">数量</label>
-                                                <div class="col-xs-10">
-                                                    <input id="add_qty" name="bill_entry_add.qty" type="text" class="input-sm form-control" placeholder="输入新增商品数量" v-model.number="bill_entry_add.qty"/>
+                                                <label for="add_qty" class="col-xs-3 control-label">数量</label>
+                                                <div class="col-xs-9">
+                                                    <input id="add_qty" name="entry_detail.qty" type="text" class="input-sm form-control" placeholder="输入商品数量" v-model.number="entry_detail.qty"/>
                                                 </div>
                                             </div>
                                         </div>
 
                                         <div class="col-xs-3">
                                             <div class="form-group">
-                                                <label for="add_price" class="col-xs-2 control-label no-padding-right">单价</label>
-                                                <div class="col-xs-10">
-                                                    <input id="add_price" name="bill_entry_add.price" type="text" class="input-sm form-control" placeholder="输入新增商品单价（可选）" v-model.number="bill_entry_add.price"/>
+                                                <label for="add_price" class="col-xs-3 control-label">单价</label>
+                                                <div class="col-xs-9">
+                                                    <input id="add_price" name="entry_detail.price" type="text" class="input-sm form-control" placeholder="输入商品单价（可选）" v-model.number="entry_detail.price"/>
                                                 </div>
                                             </div>
                                         </div>
@@ -93,7 +142,7 @@
         </div>
     </div>
     <div class="modal fade" id="stockBillEntryDetailDialog">
-        <div class="modal-dialog" style="width: 520px;">
+        <div class="modal-dialog" style="width: 420px;">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="True">&times;</button>
@@ -109,9 +158,9 @@
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
-                                            <label for="storage_loc_id" class="col-xs-2 control-label no-padding-right">仓位</label>
-                                            <div class="col-xs-10">
-                                                <input id="storage_loc_id" name="detail.bill_entry_add.storage_loc_id" type="text" class="input-sm form-control" v-model.number="detail.bill_entry.storage_loc_id"/>
+                                            <label for="storage_loc_id" class="col-xs-3 control-label">仓位</label>
+                                            <div class="col-xs-9">
+                                                <input id="storage_loc_id" name="detail.bill_entry.storage_loc_id" type="text" class="input-sm form-control" v-model.number="detail.bill_entry.storage_loc_id"/>
                                             </div>
                                         </div>
                                     </div>
@@ -120,8 +169,8 @@
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
-                                            <label for="product_id" class="col-xs-2 control-label no-padding-right">商品</label>
-                                            <div class="col-xs-10">
+                                            <label for="product_id" class="col-xs-3 control-label">商品</label>
+                                            <div class="col-xs-9">
                                                 <input id="product_id" name="detail.bill_entry.product_id" type="text" class="input-sm form-control" v-model.number="detail.bill_entry.product_id"/>
                                             </div>
                                         </div>
@@ -131,8 +180,8 @@
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
-                                            <label for="qty" class="col-xs-2 control-label no-padding-right">出入库数量</label>
-                                            <div class="col-xs-10">
+                                            <label for="qty" class="col-xs-3 control-label">数量</label>
+                                            <div class="col-xs-9">
                                                 <input id="qty" name="detail.bill_entry.qty" type="text" class="input-sm form-control" v-model.number="detail.bill_entry.qty"/>
                                             </div>
                                         </div>
@@ -142,8 +191,8 @@
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
-                                            <label for="price" class="col-xs-2 control-label no-padding-right">单价</label>
-                                            <div class="col-xs-10">
+                                            <label for="price" class="col-xs-3 control-label">单价</label>
+                                            <div class="col-xs-9">
                                                 <input id="price" name="detail.bill_entry.price" type="text" class="input-sm form-control" v-model.number="detail.bill_entry.price"/>
                                             </div>
                                         </div>
@@ -170,10 +219,7 @@
     var vm = new Vue({
         el: "#page",
         data: {
-            "detail": {
-                "bill_entry": {}
-            },
-            "bill_entry_add": {}
+            "entry_detail": {}
         },
         mounted: function () {
             initDataTable(
@@ -201,9 +247,7 @@
                         {"mDataProp": "pre_qty", "title": "当前库存", "bSearchable": false},
                         {"mDataProp": "qty", "title": "出入库数量", "bSearchable": false},
                         {"mDataProp": "price", "title": "单价", "bSearchable": false},
-                        {"mDataProp": "amount", "title": "金额", "bSearchable": false},
-                        {"mDataProp": "create_time", "title": "创建时间", "bSearchable": false, "width": 120},
-                        {"mDataProp": "update_time", "title": "修改时间", "bSearchable": false, "width": 120}
+                        {"mDataProp": "amount", "title": "金额", "bSearchable": false}
                     ]
                 }
             );

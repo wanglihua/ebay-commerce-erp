@@ -50,7 +50,7 @@
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
-                                            <label for="product_code" class="col-xs-2 control-label no-padding-right">商品编码</label>
+                                            <label for="product_code" class="col-xs-2 control-label">商品编码</label>
                                             <div class="col-xs-10">
                                                 <input id="product_code" name="detail.product_image.product_code" type="text" class="input-sm form-control" v-model="detail.product_image.product_code"/>
                                             </div>
@@ -61,7 +61,7 @@
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
-                                            <label for="url" class="col-xs-2 control-label no-padding-right">图片链接</label>
+                                            <label for="url" class="col-xs-2 control-label">图片链接</label>
                                             <div class="col-xs-10">
                                                 <input id="url" name="detail.product_image.url" type="text" class="input-sm form-control" v-model="detail.product_image.url"/>
                                             </div>
@@ -72,7 +72,7 @@
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
-                                            <label for="type_id" class="col-xs-2 control-label no-padding-right">图片属性</label>
+                                            <label for="type_id" class="col-xs-2 control-label">图片属性</label>
                                             <div class="col-xs-10">
                                                 <select id="type_id" name="detail.product_image.type_id" class="input-sm form-control" v-model.number="detail.product_image.type_id">
                                                     <template v-for="product_image_type in detail.product_image_type_list">
@@ -87,7 +87,7 @@
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
-                                            <label for="platform_id" class="col-xs-2 control-label no-padding-right">所属平台</label>
+                                            <label for="platform_id" class="col-xs-2 control-label">所属平台</label>
                                             <div class="col-xs-10">
                                                 <select id="platform_id" name="detail.product_image.platform_id" class="input-sm form-control" v-model.number="detail.product_image.platform_id">
                                                     <template v-for="platform in detail.platform_list">

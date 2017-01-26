@@ -50,7 +50,7 @@
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
-                                            <label for="code" class="col-xs-2 control-label no-padding-right">符号</label>
+                                            <label for="code" class="col-xs-2 control-label">符号</label>
                                             <div class="col-xs-10">
                                                 <input id="code" name="detail.exchange_rate.code" type="text" class="input-sm form-control" v-model="detail.exchange_rate.code"/>
                                             </div>
@@ -61,7 +61,7 @@
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
-                                            <label for="name" class="col-xs-2 control-label no-padding-right">名称</label>
+                                            <label for="name" class="col-xs-2 control-label">名称</label>
                                             <div class="col-xs-10">
                                                 <input id="name" name="detail.exchange_rate.name" type="text" class="input-sm form-control" v-model="detail.exchange_rate.name"/>
                                             </div>
@@ -72,7 +72,7 @@
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
-                                            <label for="rate" class="col-xs-2 control-label no-padding-right">汇率</label>
+                                            <label for="rate" class="col-xs-2 control-label">汇率</label>
                                             <div class="col-xs-10">
                                                 <input id="rate" name="detail.exchange_rate.rate" type="text" class="input-sm form-control" v-model.number="detail.exchange_rate.rate"/>
                                             </div>
@@ -83,7 +83,7 @@
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
-                                            <label for="status_id" class="col-xs-2 control-label no-padding-right">状态</label>
+                                            <label for="status_id" class="col-xs-2 control-label">状态</label>
                                             <div class="col-xs-10">
                                                 <select id="status_id" name="detail.exchange_rate.status_id" class="input-sm form-control" v-model.number="detail.exchange_rate.status_id">
                                                     <template v-for="status in detail.status_list">

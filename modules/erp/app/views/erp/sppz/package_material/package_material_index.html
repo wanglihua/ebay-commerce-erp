@@ -49,7 +49,7 @@
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
-                                            <label for="name" class="col-xs-1 control-label no-padding-right">名称</label>
+                                            <label for="name" class="col-xs-1 control-label">名称</label>
                                             <div class="col-xs-11">
                                                 <input id="name" name="detail.package_material.name" type="text" class="input-sm form-control" v-model="detail.package_material.name"/>
                                             </div>
@@ -60,7 +60,7 @@
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
-                                            <label for="desc" class="col-xs-1 control-label no-padding-right">描述</label>
+                                            <label for="desc" class="col-xs-1 control-label">描述</label>
                                             <div class="col-xs-11">
                                                 <textarea id="desc" name="detail.package_material.desc" rows="2" class="input-sm form-control" v-model="detail.package_material.desc"></textarea>
                                             </div>
@@ -71,7 +71,7 @@
                                 <div class="row">
                                     <div class="col-xs-6">
                                         <div class="form-group">
-                                            <label for="level" class="col-xs-2 control-label no-padding-right">级别</label>
+                                            <label for="level" class="col-xs-2 control-label">级别</label>
                                             <div class="col-xs-10">
                                                 <select id="level" name="detail.package_material.level" class="input-sm form-control" v-model.number="detail.package_material.level">
                                                     <option :value="1">1</option>
@@ -84,7 +84,7 @@
                                     </div>
                                     <div class="col-xs-6">
                                         <div class="form-group">
-                                            <label for="length" class="col-xs-2 control-label no-padding-right">长(cm)</label>
+                                            <label for="length" class="col-xs-2 control-label">长(cm)</label>
                                             <div class="col-xs-10">
                                                 <input id="length" name="detail.package_material.length" type="text" class="input-sm form-control" v-model.number="detail.package_material.length"/>
                                             </div>
@@ -95,7 +95,7 @@
                                 <div class="row">
                                     <div class="col-xs-6">
                                         <div class="form-group">
-                                            <label for="width" class="col-xs-2 control-label no-padding-right">宽(cm)</label>
+                                            <label for="width" class="col-xs-2 control-label">宽(cm)</label>
                                             <div class="col-xs-10">
                                                 <input id="width" name="detail.package_material.width" type="text" class="input-sm form-control" v-model.number="detail.package_material.width"/>
                                             </div>
@@ -103,7 +103,7 @@
                                     </div>
                                     <div class="col-xs-6">
                                         <div class="form-group">
-                                            <label for="height" class="col-xs-2 control-label no-padding-right">高(cm)</label>
+                                            <label for="height" class="col-xs-2 control-label">高(cm)</label>
                                             <div class="col-xs-10">
                                                 <input id="height" name="detail.package_material.height" type="text" class="input-sm form-control" v-model.number="detail.package_material.height"/>
                                             </div>
@@ -114,7 +114,7 @@
                                 <div class="row">
                                     <div class="col-xs-6">
                                         <div class="form-group">
-                                            <label for="weight" class="col-xs-2 control-label no-padding-right">重量(克)</label>
+                                            <label for="weight" class="col-xs-2 control-label">重量(克)</label>
                                             <div class="col-xs-10">
                                                 <input id="weight" name="detail.package_material.weight" type="text" class="input-sm form-control" v-model.number="detail.package_material.weight"/>
                                             </div>
@@ -122,7 +122,7 @@
                                     </div>
                                     <div class="col-xs-6">
                                         <div class="form-group">
-                                            <label for="price" class="col-xs-2 control-label no-padding-right">价格(元)</label>
+                                            <label for="price" class="col-xs-2 control-label">价格(元)</label>
                                             <div class="col-xs-10">
                                                 <input id="price" name="detail.package_material.price" type="text" class="input-sm form-control" v-model.number="detail.package_material.price"/>
                                             </div>
@@ -133,7 +133,7 @@
                                 <div class="row">
                                     <div class="col-xs-6">
                                         <div class="form-group">
-                                            <label for="status_id" class="col-xs-2 control-label no-padding-right">状态</label>
+                                            <label for="status_id" class="col-xs-2 control-label">状态</label>
                                             <div class="col-xs-10">
                                                 <select id="status_id" name="detail.package_material.status_id" class="input-sm form-control" v-model.number="detail.package_material.status_id">
                                                     <template v-for="status in detail.status_list">

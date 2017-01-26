@@ -49,7 +49,7 @@
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
-                                            <label for="paypal_account" class="col-xs-2 control-label no-padding-right">Paypal账号</label>
+                                            <label for="paypal_account" class="col-xs-2 control-label">Paypal账号</label>
                                             <div class="col-xs-10">
                                                 <input id="paypal_account" name="detail.paypal_account.paypal_account" type="text" class="input-sm form-control" v-model="detail.paypal_account.paypal_account"/>
                                             </div>
@@ -60,7 +60,7 @@
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
-                                            <label for="api_account" class="col-xs-2 control-label no-padding-right">API账号</label>
+                                            <label for="api_account" class="col-xs-2 control-label">API账号</label>
                                             <div class="col-xs-10">
                                                 <input id="api_account" name="detail.paypal_account.api_account" type="text" class="input-sm form-control" v-model="detail.paypal_account.api_account"/>
                                             </div>
@@ -71,7 +71,7 @@
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
-                                            <label for="api_token" class="col-xs-2 control-label no-padding-right">API令牌</label>
+                                            <label for="api_token" class="col-xs-2 control-label">API令牌</label>
                                             <div class="col-xs-10">
                                                 <input id="api_token" name="detail.paypal_account.api_token" type="text" class="input-sm form-control" v-model="detail.paypal_account.api_token"/>
                                             </div>
@@ -82,7 +82,7 @@
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
-                                            <label for="balance" class="col-xs-2 control-label no-padding-right">余额</label>
+                                            <label for="balance" class="col-xs-2 control-label">余额</label>
                                             <div class="col-xs-10">
                                                 <input id="balance" name="detail.paypal_account.balance" type="text" class="input-sm form-control" v-model.number="detail.paypal_account.balance"/>
                                             </div>
@@ -93,7 +93,7 @@
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
-                                            <label for="desc" class="col-xs-2 control-label no-padding-right">描述</label>
+                                            <label for="desc" class="col-xs-2 control-label">描述</label>
                                             <div class="col-xs-10">
                                                 <textarea id="desc" name="detail.paypal_account.desc" rows="2" class="input-sm form-control" v-model="detail.paypal_account.desc"></textarea>
                                             </div>
@@ -104,7 +104,7 @@
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
-                                            <label for="status_id" class="col-xs-2 control-label no-padding-right">状态</label>
+                                            <label for="status_id" class="col-xs-2 control-label">状态</label>
                                             <div class="col-xs-10">
                                                 <select id="status_id" name="detail.paypal_account.status_id" class="input-sm form-control" v-model.number="detail.paypal_account.status_id">
                                                     <template v-for="status in detail.status_list">

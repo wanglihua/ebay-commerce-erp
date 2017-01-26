@@ -48,7 +48,7 @@
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
-                                            <label for="name" class="col-xs-2 control-label no-padding-right">名称</label>
+                                            <label for="name" class="col-xs-2 control-label">名称</label>
                                             <div class="col-xs-10">
                                                 <input id="name" name="detail.product_cate.name" type="text" class="input-sm form-control" v-model="detail.product_cate.name"/>
                                             </div>
@@ -59,7 +59,7 @@
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
-                                            <label for="english_name" class="col-xs-2 control-label no-padding-right">英文名</label>
+                                            <label for="english_name" class="col-xs-2 control-label">英文名</label>
                                             <div class="col-xs-10">
                                                 <input id="english_name" name="detail.product_cate.english_name" type="text" class="input-sm form-control" v-model="detail.product_cate.english_name"/>
                                             </div>
@@ -70,7 +70,7 @@
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
-                                            <label for="desc" class="col-xs-2 control-label no-padding-right">描述</label>
+                                            <label for="desc" class="col-xs-2 control-label">描述</label>
                                             <div class="col-xs-10">
                                                 <textarea id="desc" name="detail.product_cate.desc" rows="2" class="input-sm form-control" v-model="detail.product_cate.desc"></textarea>
                                             </div>
@@ -81,7 +81,7 @@
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
-                                            <label for="hs_code" class="col-xs-2 control-label no-padding-right">报关编码</label>
+                                            <label for="hs_code" class="col-xs-2 control-label">报关编码</label>
                                             <div class="col-xs-10">
                                                 <input id="hs_code" name="detail.product_cate.hs_code" type="text" class="input-sm form-control" v-model="detail.product_cate.hs_code"/>
                                             </div>
@@ -92,7 +92,7 @@
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
-                                            <label for="parent_id" class="col-xs-2 control-label no-padding-right">父目录</label>
+                                            <label for="parent_id" class="col-xs-2 control-label">父目录</label>
                                             <div class="col-xs-10">
                                                 <select id="parent_id" name="detail.product_cate.parent_id" class="input-sm form-control" v-model.number="detail.product_cate.parent_id">
                                                     <option value=""></option>
@@ -108,7 +108,7 @@
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
-                                            <label for="status_id" class="col-xs-2 control-label no-padding-right">状态</label>
+                                            <label for="status_id" class="col-xs-2 control-label">状态</label>
                                             <div class="col-xs-10">
                                                 <select id="status_id" name="detail.product_cate.status_id" class="input-sm form-control" v-model.number="detail.product_cate.status_id">
                                                     <template v-for="status in detail.status_list">
