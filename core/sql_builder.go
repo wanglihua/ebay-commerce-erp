@@ -6,15 +6,17 @@ import (
 )
 
 type SqlBuilder struct {
-	select_from_clause string
-	where_clause       string
-	limit_clause       string
-	order_by_clause    string
+	select_clause   string
+	from_clause     string
+	where_clause    string
+	order_by_clause string
+	limit_clause    string
 }
 
 func NewSqlBuilder() *SqlBuilder {
 	builder := new(SqlBuilder)
-	builder.select_from_clause = ""
+	builder.select_clause = ""
+	builder.from_clause = ""
 	builder.where_clause = ""
 	builder.limit_clause = ""
 	builder.order_by_clause = ""
@@ -22,48 +24,68 @@ func NewSqlBuilder() *SqlBuilder {
 	return builder
 }
 
-// .SelectFrom("SELECT * FROM table1")
-func (builder *SqlBuilder) SelectFrom(select_from string) *SqlBuilder {
-	builder.select_from_clause = select_from
+// .Select("*")
+func (builder *SqlBuilder) Select(sql_select string) *SqlBuilder {
+	//开始和结束都是换行符
+	sql := `
+SELECT %s
+`
+	builder.select_clause = fmt.Sprintf(sql, sql_select)
+	return builder
+}
+
+// .From("table1")
+func (builder *SqlBuilder) From(from string) *SqlBuilder {
+	//开始和结束都是换行符
+	sql := `
+FROM %s
+`
+	builder.from_clause = fmt.Sprintf(sql, from)
 	return builder
 }
 
 // .Where("id = 1")
 func (builder *SqlBuilder) Where(condition string) *SqlBuilder {
 	//开始和结束都是换行符
-	where := `
+	sql := `
 WHERE %s
 `
-	builder.where_clause = fmt.Sprintf(where, condition)
+	builder.where_clause = fmt.Sprintf(sql, condition)
 	return builder
 }
 
 // .OrderBy("id ASC")
 func (builder *SqlBuilder) OrderBy(order string) *SqlBuilder {
 	//开始和结束都是换行符
-	order_by := `
+	sql := `
 ORDER BY %s
 `
-	builder.order_by_clause = fmt.Sprintf(order_by, order)
+	builder.order_by_clause = fmt.Sprintf(sql, order)
 	return builder
 }
 
 func (builder *SqlBuilder) Limit(skip int64, take int64) *SqlBuilder {
 	//开始和结束都是换行符
-	limit := `
+	sql := `
 LIMIT %d, %d
 `
-	builder.limit_clause = fmt.Sprintf(limit, skip, take)
+	builder.limit_clause = fmt.Sprintf(sql, skip, take)
 	return builder
 }
 
 func (builder *SqlBuilder) ToSql() string {
 	var buffer bytes.Buffer
 
-	if builder.select_from_clause == "" {
-		panic("sql select from 语句不能为空！")
+	if builder.select_clause == "" {
+		panic("sql select 语句不能为空！")
 	} else {
-		buffer.WriteString(builder.select_from_clause)
+		buffer.WriteString(builder.select_clause)
+	}
+
+	if builder.from_clause == "" {
+		panic("sql from 语句不能为空！")
+	} else {
+		buffer.WriteString(builder.from_clause)
 	}
 
 	if builder.where_clause != "" {
