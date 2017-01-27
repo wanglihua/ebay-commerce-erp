@@ -10,6 +10,7 @@ import (
 	"matrix/modules/erp/models"
 	"time"
 	"fmt"
+	"matrix/modules/erp/service/bill_service"
 )
 
 type ErpStockBillCheckout struct {
@@ -111,6 +112,7 @@ func (c ErpStockBillCheckout) DetailData() revel.Result {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "指定的出入库单不存在！"})
 		}
 	} else {
+		stock_bill.Code = bill_service.GetNextBillNo(db_session)
 		stock_bill.Date = core.Date(time.Now())
 	}
 

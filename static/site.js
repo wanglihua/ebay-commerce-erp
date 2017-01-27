@@ -168,7 +168,6 @@ $.extend($.fn.dataTable.defaults, {
             });
     },
     "initComplete": function(settings) {
-        console.log(this);
         var dataTable = this;
         var searchHTML = '<label class="dataTable-custom-search"><span>搜索:</span><input type="search" class="form-control input-sm" placeholder="输入搜索内容按回车" aria-controls="'+ dataTable.selector.substring(1) +'"></label>';
         //快捷操作的HTML DOM

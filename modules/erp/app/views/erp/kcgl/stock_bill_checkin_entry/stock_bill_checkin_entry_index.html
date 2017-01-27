@@ -1,4 +1,4 @@
-{%header "出入库单明细" .%}
+{%header "入库单明细" .%}
 <style type="text/css">
     .dataTables_wrapper {
         margin-top: 15px;
@@ -13,8 +13,8 @@
                 <a href='{%url "Home.Index"%}'><i class="ace-icon fa fa-home home-icon"></i></a>
             </li>
             <li class="parent" data-menu="kcgl-menu">库存管理</li>
-            {% .breadcrumb_nav %}
-            <li>{% .bill_type %}明细（批次号：{% .stock_bill.Code %}）</li>
+            <li class="active" data-menu="kcgl-stockbill-checkin-menu"><a href="/erp/stock/bill/checkin">手工入库</a></li>
+            <li>入库单明细（批次号：{% .stock_bill.Code %}）</li>
         </ul>
     </div>
     <div class="page-content">
@@ -38,7 +38,7 @@
                     <div class="col-xs-12" style="line-height: 28px;">
                         <fieldset>
                             <legend style="font-size: 14px;">
-                                {% .bill_type %}基本信息
+                                入库单基本信息
                             </legend>
 
                             <div class="col-xs-12">
@@ -87,25 +87,25 @@
                     <div class="col-xs-12" style="line-height: 28px;">
                         <fieldset>
                             <legend style="font-size: 14px;">
-                                {% .bill_type %}商品清单
+                                入库单商品清单
                             </legend>
                             <div class="col-xs-12">
                                 <form class="form-horizontal" role="form" id="stockBillEntryAddForm">
                                     <div class="row">
                                         <div class="col-xs-3">
                                             <div class="form-group">
-                                                <label for="storage_loc_name" class="col-xs-3 control-label">仓位</label>
+                                                <label for="add_storage_loc_name" class="col-xs-3 control-label">仓位</label>
                                                 <div class="col-xs-9">
-                                                    <input id="storage_loc_name" name="entry_detail.storage_loc_name" type="text" class="input-sm form-control" placeholder="输入商品仓位" v-model.number="entry_detail.storage_loc_name"/>
+                                                    <input id="add_storage_loc_name" name="add_detail.storage_loc_name" type="text" class="input-sm form-control" placeholder="输入商品仓位" v-model.number="add_detail.storage_loc_name"/>
                                                 </div>
                                             </div>
                                         </div>
 
                                         <div class="col-xs-3">
                                             <div class="form-group">
-                                                <label for="product_sku" class="col-xs-3 control-label">SKU</label>
+                                                <label for="add_product_sku" class="col-xs-3 control-label">SKU</label>
                                                 <div class="col-xs-9">
-                                                    <input id="product_sku" name="entry_detail.product_sku" type="text" class="input-sm form-control" placeholder="输入商品SKU" v-model.number="entry_detail.product_sku"/>
+                                                    <input id="add_product_sku" name="add_detail.product_sku" type="text" class="input-sm form-control" placeholder="输入商品SKU" v-model.number="add_detail.product_sku"/>
                                                 </div>
                                             </div>
                                         </div>
@@ -114,7 +114,7 @@
                                             <div class="form-group">
                                                 <label for="add_qty" class="col-xs-3 control-label">数量</label>
                                                 <div class="col-xs-9">
-                                                    <input id="add_qty" name="entry_detail.qty" type="text" class="input-sm form-control" placeholder="输入商品数量" v-model.number="entry_detail.qty"/>
+                                                    <input id="add_qty" name="add_detail.qty" type="text" class="input-sm form-control" placeholder="输入商品数量" v-model.number="add_detail.qty"/>
                                                 </div>
                                             </div>
                                         </div>
@@ -123,7 +123,7 @@
                                             <div class="form-group">
                                                 <label for="add_price" class="col-xs-3 control-label">单价</label>
                                                 <div class="col-xs-9">
-                                                    <input id="add_price" name="entry_detail.price" type="text" class="input-sm form-control" placeholder="输入商品单价（可选）" v-model.number="entry_detail.price"/>
+                                                    <input id="add_price" name="add_detail.price" type="text" class="input-sm form-control" placeholder="输入商品单价（可选）" v-model.number="add_detail.price"/>
                                                 </div>
                                             </div>
                                         </div>
@@ -146,21 +146,20 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="True">&times;</button>
-                    <h4 class="modal-title">{% .bill_type %}明细详细</h4>
+                    <h4 class="modal-title">入库单明细详细</h4>
                 </div>
                 <div class="modal-body clearfix">
                     <div class="row">
                         <div class="col-xs-12">
                             <form class="form-horizontal" role="form" id="stockBillEntryDetailForm">
-                                <input id="stock_bill_entry_id" name="detail.bill_entry.id" type="hidden" v-model.number="detail.bill_entry.id"/>
-                                <input id="stock_bill_entry_version" name="detail.bill_entry.version" type="hidden" v-model.number="detail.bill_entry.version"/>
+                                <input id="stock_bill_entry_id" name="detail.id" type="hidden" v-model.number="detail.id"/>
 
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
                                             <label for="storage_loc_id" class="col-xs-3 control-label">仓位</label>
                                             <div class="col-xs-9">
-                                                <input id="storage_loc_id" name="detail.bill_entry.storage_loc_id" type="text" class="input-sm form-control" v-model.number="detail.bill_entry.storage_loc_id"/>
+                                                <input id="storage_loc_id" name="detail.storage_loc_id" type="text" class="input-sm form-control" v-model.number="detail.storage_loc_id"/>
                                             </div>
                                         </div>
                                     </div>
@@ -171,7 +170,7 @@
                                         <div class="form-group">
                                             <label for="product_id" class="col-xs-3 control-label">商品</label>
                                             <div class="col-xs-9">
-                                                <input id="product_id" name="detail.bill_entry.product_id" type="text" class="input-sm form-control" v-model.number="detail.bill_entry.product_id"/>
+                                                <input id="product_id" name="detail.product_id" type="text" class="input-sm form-control" v-model.number="detail.product_id"/>
                                             </div>
                                         </div>
                                     </div>
@@ -182,7 +181,7 @@
                                         <div class="form-group">
                                             <label for="qty" class="col-xs-3 control-label">数量</label>
                                             <div class="col-xs-9">
-                                                <input id="qty" name="detail.bill_entry.qty" type="text" class="input-sm form-control" v-model.number="detail.bill_entry.qty"/>
+                                                <input id="qty" name="detail.qty" type="text" class="input-sm form-control" v-model.number="detail.qty"/>
                                             </div>
                                         </div>
                                     </div>
@@ -193,7 +192,7 @@
                                         <div class="form-group">
                                             <label for="price" class="col-xs-3 control-label">单价</label>
                                             <div class="col-xs-9">
-                                                <input id="price" name="detail.bill_entry.price" type="text" class="input-sm form-control" v-model.number="detail.bill_entry.price"/>
+                                                <input id="price" name="detail.price" type="text" class="input-sm form-control" v-model.number="detail.price"/>
                                             </div>
                                         </div>
                                     </div>
@@ -219,14 +218,15 @@
     var vm = new Vue({
         el: "#page",
         data: {
-            "entry_detail": {}
+            "add_detail": {},
+            "detail": {}
         },
         mounted: function () {
             initDataTable(
                 '#stockBillEntryList',
                 {
                     "sDom": "<'row'<'col-xs-12't>>",
-                    "sAjaxSource": '{%url "ErpStockBillEntry.ListData" .stock_bill.Id %}',
+                    "sAjaxSource": '{%url "ErpStockBillCheckinEntry.ListData" .stock_bill.Id %}',
                     "aaSorting": [[1, "asc"]],
                     "bPaginate": false,
                     "aoColumns": [
@@ -265,7 +265,7 @@
                 showMask("加载中...");
                 $("#stockBillEntryDetailForm").clearValidation();
                 $.ajax({
-                        url: '{%url "ErpStockBillEntry.DetailData" %}',
+                        url: '{%url "ErpStockBillCheckinEntry.DetailData" %}',
                         type: "POST",
                         data: {
                             "id": id
@@ -286,25 +286,25 @@
                 showMask("提交中...");
                 var form = $("#stockBillEntryDetailForm");
                 var valid = validate(form, {
-                    'detail.bill_entry.bill_id': {
+                    'detail.bill_id': {
                         required: true, digits: true
                     },
-                    'detail.bill_entry.storage_loc_id': {
+                    'detail.storage_loc_id': {
                         required: true, digits: true
                     },
-                    'detail.bill_entry.product_id': {
+                    'detail.product_id': {
                         required: true, digits: true
                     },
-                    'detail.bill_entry.pre_qty': {
+                    'detail.pre_qty': {
                         required: true, digits: true
                     },
-                    'detail.bill_entry.qty': {
+                    'detail.qty': {
                         required: true, digits: true
                     },
-                    'detail.bill_entry.price': {
+                    'detail.price': {
                         required: false, digits: true
                     },
-                    'detail.bill_entry.amount': {
+                    'detail.amount': {
                         required: false, digits: true
                     }
                 });
@@ -313,7 +313,7 @@
                     hideMask();
                 } else {
                     $.ajax({
-                            url: '{%url "ErpStockBillEntry.Save"%}',
+                            url: '{%url "ErpStockBillCheckinEntry.Save"%}',
                             type: "POST",
                             processData: false,
                             contentType: 'application/json',
@@ -350,7 +350,7 @@
 
                 $.msg.confirm("确认要删除吗？", function () {
                     $.ajax({
-                        url: '{%url "ErpStockBillEntry.Delete"%}',
+                        url: '{%url "ErpStockBillCheckinEntry.Delete"%}',
                         type: "POST",
                         data: {"id_list": id_list},
                         success: function (data) {

@@ -7,7 +7,6 @@ import (
 
 	"matrix/core"
 	"matrix/modules/erp/models"
-	"html/template"
 )
 
 type ErpStockBillTransferEntry struct {
@@ -29,21 +28,6 @@ func (c ErpStockBillTransferEntry) Index(bill_id int64) revel.Result {
 	_, err = db_session.Id(stock_bill.StockId).Get(&stock)
 	core.HandleError(err)
 
-	breadcrumb_nav := template.HTML("")
-	bill_type := ""
-	if stock_bill.TypeId == models.STOCK_BILL_TYPE_CHECKIN {
-		bill_type = "入库单"
-		breadcrumb_nav = template.HTML("<li class='active' data-menu='kcgl-stockbill-checkin-menu'><a href='/erp/stock/bill/checkin'>手工入库</a></li>")
-	} else if stock_bill.TypeId == models.STOCK_BILL_TYPE_CHECKOUT {
-		bill_type = "出库单"
-		breadcrumb_nav = template.HTML("<li class='active' data-menu='kcgl-stockbill-checkout-menu'><a href='/erp/stock/bill/checkout'>手工出库</a></li>")
-	} else if stock_bill.TypeId == models.STOCK_BILL_TYPE_TRANSFER {
-		bill_type = "调拨单"
-		breadcrumb_nav = template.HTML("<li class='active' data-menu='kcgl-stockbill-transfer-menu'><a href='/erp/stock/bill/transfer'>分仓调拨</a></li>")
-	}
-
-	c.RenderArgs["breadcrumb_nav"] = breadcrumb_nav
-	c.RenderArgs["bill_type"] = bill_type
 	c.RenderArgs["stock_bill"] = stock_bill
 	c.RenderArgs["stock_name"] = stock.Name
 	return c.RenderTemplate("erp/kcgl/stock_bill_transfer_entry/stock_bill_transfer_entry_index.html")
