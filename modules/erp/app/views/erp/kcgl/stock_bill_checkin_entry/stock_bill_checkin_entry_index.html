@@ -233,7 +233,7 @@
                     "bPaginate": false,
                     "aoColumns": [
                         {
-                            "mDataProp": "id",
+                            "mDataProp": "sbe.id",
                             "bSearchable": false,
                             "orderable": false,
                             "sClass": "center",
@@ -243,13 +243,14 @@
                                 return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
                             }
                         },
-                        {"mDataProp": "bill_id", "title": "批次", "bSearchable": false},
-                        {"mDataProp": "storage_loc_id", "title": "仓位", "bSearchable": false},
-                        {"mDataProp": "product_id", "title": "商品", "bSearchable": false},
-                        {"mDataProp": "pre_qty", "title": "当前库存", "bSearchable": false},
-                        {"mDataProp": "qty", "title": "入库数量", "bSearchable": false},
-                        {"mDataProp": "price", "title": "单价", "bSearchable": false},
-                        {"mDataProp": "amount", "title": "金额", "bSearchable": false}
+                        {"mDataProp": "sb.code", "title": "批次", "bSearchable": false},
+                        {"mDataProp": "sl.name", "title": "仓位", "bSearchable": false},
+                        {"mDataProp": "p.sku", "title": "SKU", "bSearchable": false},
+                        {"mDataProp": "p.name", "title": "商品名称", "bSearchable": false},
+                        {"mDataProp": "sbe.pre_qty", "title": "当前库存", "bSearchable": false},
+                        {"mDataProp": "sbe.qty", "title": "入库数量", "bSearchable": false},
+                        {"mDataProp": "sbe.price", "title": "单价", "bSearchable": false},
+                        {"mDataProp": "sbe.amount", "title": "金额", "bSearchable": false}
                     ]
                 }
             );

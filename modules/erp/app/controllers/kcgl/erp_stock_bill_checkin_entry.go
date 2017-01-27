@@ -7,6 +7,7 @@ import (
 
 	"matrix/core"
 	"matrix/modules/erp/models"
+	"fmt"
 )
 
 type ErpStockBillCheckinEntry struct {
@@ -33,33 +34,55 @@ func (c ErpStockBillCheckinEntry) Index(bill_id int64) revel.Result {
 	return c.RenderTemplate("erp/kcgl/stock_bill_checkin_entry/stock_bill_checkin_entry_index.html")
 }
 
+type ErpStockBillCheckinEntryViewItem struct {
+	models.StockBillEntryInfo `xorm:"extends" json:"sbe"`
+	models.StockBillInfo      `xorm:"extends" json:"sb"`
+	models.StorageLocInfo     `xorm:"extends" json:"sl"`
+	models.ProductInfo        `xorm:"extends" json:"p"`
+}
+
 func (c ErpStockBillCheckinEntry) ListData(bill_id int64) revel.Result {
 	db_session := c.DbSession
 
 	filter, order, _, _ := core.GetGridRequestParam(c.Request)
-	query := db_session.Where(filter)
+
+	/*
+		SELECT sbe.*, sb.*, sl.*, p.*
+		FROM erp_stock_bill_entry sbe
+		    INNER JOIN erp_stock_bill sb ON sbe.bill_id = sb.id
+		    INNER JOIN erp_storage_loc sl ON sbe.storage_loc_id = sl.id
+		    INNER JOIN erp_product p ON sbe.product_id = p.id
+	 */
+	sb := core.NewSqlBuilder()
+	sb.Select(`sbe.*, sb.*, sl.*, p.*`)
+	sb.Count("count(*) AS entry_count")
+	sb.From(`erp_stock_bill_entry sbe
+		    INNER JOIN erp_stock_bill sb ON sbe.bill_id = sb.id
+		    INNER JOIN erp_storage_loc sl ON sbe.storage_loc_id = sl.id
+		    INNER JOIN erp_product p ON sbe.product_id = p.id`)
+	sb.Where(core.SqlAnd(filter, fmt.Sprintf("bill_id = %d", bill_id)))
 
 	//query extra filter here
-	query = query.Where("bill_id = ?", bill_id)
 
-	data_query := *query
 	if order != "" {
-		data_query = *data_query.OrderBy(order)
+		sb.OrderBy(order)
 	} else {
-		data_query = *data_query.Asc("id")
+		sb.OrderBy("sbe.id ASC")
 	}
 
-	stock_bill_entry_list := make([]models.StockBillEntryInfo, 0)
-	err := data_query.Find(&stock_bill_entry_list)
+	stock_bill_entry_list := make([]ErpStockBillCheckinEntryViewItem, 0)
+	err := db_session.Sql(sb.SqlList()).Find(&stock_bill_entry_list)
 	core.HandleError(err)
 
-	count_query := *query
-	count, err := count_query.Count(new(models.StockBillEntryInfo))
+	var entry_count struct {
+		Count int64 `xorm:"'entry_count'" json:"entry_count"`
+	}
+	_, err = db_session.Sql(sb.SqlCount()).Get(&entry_count)
 	core.HandleError(err)
 
 	return c.RenderJson(core.GridResult{
 		Data:  stock_bill_entry_list,
-		Total: count,
+		Total: entry_count.Count,
 	})
 }
 
