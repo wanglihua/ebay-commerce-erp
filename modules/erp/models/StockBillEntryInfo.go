@@ -13,7 +13,9 @@ type StockBillEntryInfo struct {
 	Qty          int64          `xorm:"bigint notnull 'qty'" json:"qty" smith:"verbose_name=数量"`
 	Price        core.NullFloat `xorm:"decimal(18,4) null 'price'" json:"price" smith:"verbose_name=单价"`
 	Amount       core.NullFloat `xorm:"decimal(18,4) null 'amount'" json:"amount" smith:"verbose_name=金额"`
-	AddTime      core.Time      `xorm:"created notnull 'add_time'" json:"add_time"`
+	CreateTime   core.Time      `xorm:"created notnull 'create_time'" json:"create_time"`
+	UpdateTime   core.Time      `xorm:"updated notnull 'update_time'" json:"update_time"`
+	Version      int            `xorm:"version notnull 'version'" json:"version"`
 }
 
 func (e StockBillEntryInfo) TableName() string {

@@ -1,0 +1,3 @@
+<script type="text/javascript">
+    var bill_id = {% .stock_bill.Id %};
+</script>

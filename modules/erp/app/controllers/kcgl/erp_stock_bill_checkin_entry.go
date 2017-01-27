@@ -64,12 +64,12 @@ func (c ErpStockBillCheckinEntry) ListData(bill_id int64) revel.Result {
 }
 
 type StockBillEntryCheckinDetailForm struct {
-	Id             int64   `xorm:"'id'" json:"id"`
-	BillId         int64   `xorm:"'bill_id'" json:"bill_id"`
-	StorageLocName string  `xorm:"'storage_loc_name'" json:"storage_loc_name"`
-	ProductSku     string  `xorm:"'product_sku'" json:"product_sku"`
-	Qty            int64   `xorm:"'qty'" json:"qty"`
-	Price          float64 `xorm:"'price'" json:"price"`
+	Id             int64            `xorm:"'id'" json:"id"`
+	BillId         int64            `xorm:"'bill_id'" json:"bill_id"`
+	StorageLocName string           `xorm:"'storage_loc_name'" json:"storage_loc_name"`
+	ProductSku     string           `xorm:"'product_sku'" json:"product_sku"`
+	Qty            int64            `xorm:"'qty'" json:"qty"`
+	Price          core.NullFloat   `xorm:"'price'" json:"price"`
 }
 
 func (f *StockBillEntryCheckinDetailForm) IsCreate() bool {
@@ -77,6 +77,7 @@ func (f *StockBillEntryCheckinDetailForm) IsCreate() bool {
 }
 
 func (f *StockBillEntryCheckinDetailForm) Valid(validation *revel.Validation) bool {
+	validation.Required(f.BillId).Message("入库单不能为空！")
 	validation.Required(f.StorageLocName).Message("库位不能为空！")
 	validation.Required(f.ProductSku).Message("商品SKU不能为空！")
 	validation.Required(f.Qty).Message("数量不能为空！")
@@ -180,11 +181,24 @@ WHERE v.storage_loc_id = ? AND v.product_id = ?
 
 	var affected int64
 	if detail_form.IsCreate() {
-		stock_bill_entry.Qty = product_storage_loc_qty
+		stock_bill_entry.BillId = detail_form.BillId
+		stock_bill_entry.StorageLocId = storage_loc_id.StorageLocId.Int64
+		stock_bill_entry.ProductId = product_id.ProductId.Int64
+		stock_bill_entry.PreQty = product_storage_loc_qty
+		stock_bill_entry.Qty = detail_form.Qty
+		stock_bill_entry.Price = detail_form.Price
+
+		if detail_form.Price.Valid == true && detail_form.Price.Float64 != 0 {
+			stock_bill_entry.Amount = core.NewNullFloat(detail_form.Price.Float64*float64(detail_form.Qty), true)
+		} else {
+			stock_bill_entry.Price = core.NewNullFloat(0, false)
+			stock_bill_entry.Amount = core.NewNullFloat(0, false)
+		}
 		affected, err = db_session.Insert(&stock_bill_entry)
 		core.HandleError(err)
 	} else {
-		affected, err = db_session.Id(stock_bill_entry.Id).Cols("").Update(&stock_bill_entry)
+		cols := models.StockBillEntryCols
+		affected, err = db_session.Id(stock_bill_entry.Id).Cols(cols.StorageLocId, cols.ProductId, cols.Qty, cols.Price).Update(&stock_bill_entry)
 		core.HandleError(err)
 
 		if affected == 0 {

@@ -23,15 +23,7 @@
                 <div class="gridToolBar clearfix">
                     <button class="btn btn-primary btn-sm" @click="reloadList('#stockBillEntryList')">
                         <i class="ace-icon fa fa-refresh"></i>
-                        刷新
-                    </button>
-                    <button class="btn btn-success btn-sm" @click="showStockBillEntryDetail(0)">
-                        <i class="ace-icon fa fa-plus"></i>
-                        新增
-                    </button>
-                    <button class="btn btn-danger btn-sm" @click="deleteStockBillEntry()">
-                        <i class="ace-icon fa fa-trash-o"></i>
-                        删除
+                        提交入库
                     </button>
                 </div>
                 <div class="row" style="margin-top: 20px;margin-bottom: 20px;">
@@ -128,8 +120,13 @@
                                             </div>
                                         </div>
                                     </div>
-
                                 </form>
+                                <div class="row">
+                                    <button class="btn btn-success btn-sm pull-right" @click="addStockBillEntry()">
+                                        <i class="ace-icon fa fa-plus"></i>
+                                        添加
+                                    </button>
+                                </div>
                             </div>
 
                         </fieldset>
@@ -179,7 +176,7 @@
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
-                                            <label for="qty" class="col-xs-3 control-label">数量</label>
+                                            <label for="qty" class="col-xs-3 control-label">入库数量</label>
                                             <div class="col-xs-9">
                                                 <input id="qty" name="detail.qty" type="text" class="input-sm form-control" v-model.number="detail.qty"/>
                                             </div>
@@ -214,12 +211,17 @@
         </div>
     </div>
 </div>
+{% template "erp/kcgl/stock_bill_checkin_entry/stock_bill_checkin_entry_index.var" .%}
 <script type="text/javascript">
     var vm = new Vue({
         el: "#page",
         data: {
-            "add_detail": {},
-            "detail": {}
+            "add_detail": {
+                "bill_id": bill_id
+            },
+            "detail": {
+                "bill_id": bill_id
+            }
         },
         mounted: function () {
             initDataTable(
@@ -245,7 +247,7 @@
                         {"mDataProp": "storage_loc_id", "title": "仓位", "bSearchable": false},
                         {"mDataProp": "product_id", "title": "商品", "bSearchable": false},
                         {"mDataProp": "pre_qty", "title": "当前库存", "bSearchable": false},
-                        {"mDataProp": "qty", "title": "出入库数量", "bSearchable": false},
+                        {"mDataProp": "qty", "title": "入库数量", "bSearchable": false},
                         {"mDataProp": "price", "title": "单价", "bSearchable": false},
                         {"mDataProp": "amount", "title": "金额", "bSearchable": false}
                     ]
@@ -282,6 +284,53 @@
                     }
                 );
             },
+            addStockBillEntry: function () {
+                showMask("提交中...");
+                var form = $("#stockBillEntryAddForm");
+                var valid = validate(form, {
+                    'add_detail.bill_id': {
+                        required: true, digits: true
+                    },
+                    'add_detail.storage_loc_name': {
+                        required: true
+                    },
+                    'add_detail.product_sku': {
+                        required: true
+                    },
+                    'add_detail.qty': {
+                        required: true, digits: true
+                    },
+                    'add_detail.price': {
+                        required: false, number: true
+                    }
+                });
+
+                if (!valid) {
+                    hideMask();
+                } else {
+                    $.ajax({
+                            url: '{%url "ErpStockBillCheckinEntry.Save"%}',
+                            type: "POST",
+                            processData: false,
+                            contentType: 'application/json',
+                            data: JSON.stringify(vm.add_detail),
+                            success: function (data) {
+                                hideMask();
+                                if (data.success == false) {
+                                    $.msg.error(data.message);
+                                    //return;
+                                }
+                                else {
+                                    $.msg.show(data.message);
+                                    vm.detail = {};
+                                    vm.reloadList();
+                                    //return;
+                                }
+                            }
+                        }
+                    );
+                }
+            },
             saveStockBillEntry: function () {
                 showMask("提交中...");
                 var form = $("#stockBillEntryDetailForm");
@@ -289,23 +338,17 @@
                     'detail.bill_id': {
                         required: true, digits: true
                     },
-                    'detail.storage_loc_id': {
-                        required: true, digits: true
+                    'detail.storage_loc_name': {
+                        required: true
                     },
-                    'detail.product_id': {
-                        required: true, digits: true
-                    },
-                    'detail.pre_qty': {
-                        required: true, digits: true
+                    'detail.product_sku': {
+                        required: true
                     },
                     'detail.qty': {
                         required: true, digits: true
                     },
                     'detail.price': {
-                        required: false, digits: true
-                    },
-                    'detail.amount': {
-                        required: false, digits: true
+                        required: false, number: true
                     }
                 });
 
