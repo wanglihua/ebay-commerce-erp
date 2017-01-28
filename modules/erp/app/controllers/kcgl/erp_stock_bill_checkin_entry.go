@@ -117,15 +117,17 @@ func (c ErpStockBillCheckinEntry) DetailData() revel.Result {
 	var detail_form StockBillEntryCheckinDetailForm
 	if stock_bill_entry_id != 0 {
 		/*
-			SELECT sbe.id AS id, sl.name AS storage_loc_name, p.sku AS product_sku, sbe.qty AS qty, sbe.price AS price
+			SELECT sbe.id AS id, sb.id AS bill_id, sl.name AS storage_loc_name, p.sku AS product_sku, sbe.qty AS qty, sbe.price AS price
 			FROM erp_stock_bill_entry sbe
+			    INNER JOIN erp_stock_bill sb ON sbe.bill_id = sb.id
 			    INNER JOIN erp_storage_loc sl ON sbe.storage_loc_id = sl.id
 			    INNER JOIN erp_product p ON sbe.product_id = p.id
 			WHERE sbe.id = 1
 		*/
 		sql := `
-SELECT sbe.id AS id, sl.name AS storage_loc_name, p.sku AS product_sku, sbe.qty AS qty, sbe.price AS price
+SELECT sbe.id AS id, sb.id AS bill_id, sl.name AS storage_loc_name, p.sku AS product_sku, sbe.qty AS qty, sbe.price AS price
 FROM erp_stock_bill_entry sbe
+    INNER JOIN erp_stock_bill sb ON sbe.bill_id = sb.id
     INNER JOIN erp_storage_loc sl ON sbe.storage_loc_id = sl.id
     INNER JOIN erp_product p ON sbe.product_id = p.id
 WHERE sbe.id = ?
@@ -201,16 +203,15 @@ WHERE v.storage_loc_id = ? AND v.product_id = ?
 	}
 
 	var stock_bill_entry models.StockBillEntryInfo
+	stock_bill_entry.BillId = detail_form.BillId
+	stock_bill_entry.StorageLocId = storage_loc_id.StorageLocId.Int64
+	stock_bill_entry.ProductId = product_id.ProductId.Int64
+	stock_bill_entry.PreQty = product_storage_loc_qty
+	stock_bill_entry.Qty = detail_form.Qty
+	stock_bill_entry.Price = detail_form.Price
 
 	var affected int64
 	if detail_form.IsCreate() {
-		stock_bill_entry.BillId = detail_form.BillId
-		stock_bill_entry.StorageLocId = storage_loc_id.StorageLocId.Int64
-		stock_bill_entry.ProductId = product_id.ProductId.Int64
-		stock_bill_entry.PreQty = product_storage_loc_qty
-		stock_bill_entry.Qty = detail_form.Qty
-		stock_bill_entry.Price = detail_form.Price
-
 		if detail_form.Price.Valid == true && detail_form.Price.Float64 != 0 {
 			stock_bill_entry.Amount = core.NewNullFloat(detail_form.Price.Float64*float64(detail_form.Qty), true)
 		} else {
@@ -220,6 +221,7 @@ WHERE v.storage_loc_id = ? AND v.product_id = ?
 		affected, err = db_session.Insert(&stock_bill_entry)
 		core.HandleError(err)
 	} else {
+		stock_bill_entry.Id = detail_form.Id
 		cols := models.StockBillEntryCols
 		affected, err = db_session.Id(stock_bill_entry.Id).Cols(cols.StorageLocId, cols.ProductId, cols.Qty, cols.Price).Update(&stock_bill_entry)
 		core.HandleError(err)
