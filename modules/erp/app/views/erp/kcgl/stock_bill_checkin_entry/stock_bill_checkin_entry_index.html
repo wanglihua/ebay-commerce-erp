@@ -21,8 +21,8 @@
         <div class="row">
             <div class="col-xs-12" style="padding: 0;">
                 <div class="gridToolBar clearfix">
-                    <button class="btn btn-primary btn-sm" @click="reloadList('#stockBillEntryList')">
-                        <i class="ace-icon fa fa-refresh"></i>
+                    <button class="btn btn-primary btn-sm" @click="submitStockBillEntry()">
+                        <i class="ace-icon fa fa-arrow-up"></i>
                         提交入库
                     </button>
                 </div>
@@ -229,7 +229,7 @@
                 {
                     "sDom": "<'row'<'col-xs-12't>>",
                     "sAjaxSource": '{%url "ErpStockBillCheckinEntry.ListData" .stock_bill.Id %}',
-                    "aaSorting": [[1, "asc"]],
+                    "aaSorting": [[1, "desc"]],
                     "bPaginate": false,
                     "aoColumns": [
                         {
@@ -250,7 +250,13 @@
                         {"mDataProp": "sbe.pre_qty", "title": "当前库存", "bSearchable": false},
                         {"mDataProp": "sbe.qty", "title": "入库数量", "bSearchable": false},
                         {"mDataProp": "sbe.price", "title": "单价", "bSearchable": false},
-                        {"mDataProp": "sbe.amount", "title": "金额", "bSearchable": false}
+                        {"mDataProp": "sbe.amount", "title": "金额", "bSearchable": false},
+                        {
+                            "mDataProp": "sbe.id", "title": "操作", "bSearchable": false,
+                            "render": function (data, type, row) {
+                                return '<button class="btn-danger" onclick="deleteStockBillEntry(' + data + ')">移除</button>';
+                            }
+                        }
                     ]
                 }
             );
@@ -379,39 +385,48 @@
                     );
                 }
             },
-            deleteStockBillEntry: function () {
-                var id_list = [];
-                $('#stockBillEntryList tbody tr>td:first-child input:checkbox').each(function () {
-                    if (this.checked) {
-                        id_list.push($(this).val());
-                    }
-                });
-
-                if (id_list.length == 0) {
-                    $.msg.alert("请选择数据！");
-                    return;
-                }
-
-                $.msg.confirm("确认要删除吗？", function () {
-                    $.ajax({
-                        url: '{%url "ErpStockBillCheckinEntry.Delete"%}',
+            submitStockBillEntry: function () {
+                showMask("提交中...");
+                $.ajax({
+                        url: '{%url "ErpStockBillCheckin.Submit"%}',
                         type: "POST",
-                        data: {"id_list": id_list},
+                        data: {"bill_id": bill_id},
                         success: function (data) {
+                            hideMask();
                             if (data.success == false) {
                                 $.msg.error(data.message);
-                                return;
+                                //return;
                             }
                             else {
                                 $.msg.show(data.message);
+                                vm.reloadList();
+                                //return;
                             }
-                            vm.reloadList();
                         }
-                    });
-                });
+                    }
+                );
             }
         }
     });
+
+    function deleteStockBillEntry(entry_id) {
+        $.msg.confirm("确认要移除吗？", function () {
+            $.ajax({
+                url: '{%url "ErpStockBillCheckinEntry.Delete"%}',
+                type: "POST",
+                data: {"entry_id": entry_id},
+                success: function (data) {
+                    if (data.success == false) {
+                        $.msg.error(data.message);
+                        return;
+                    }
+                    else {
+                        $.msg.show(data.message);
+                    }
+                    vm.reloadList();
+                }
+            });
+        });
+    }
 </script>
 {%footer%}
-

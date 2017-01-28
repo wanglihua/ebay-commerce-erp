@@ -144,23 +144,32 @@ func (c ErpStockBillCheckin) Save() revel.Result {
 	err := json.Unmarshal(c.GetRequestBody(), &detail_form)
 	core.HandleError(err)
 
+	var stock_bill_in_db models.StockBillInfo
+	_, err = db_session.Id(detail_form.StockBill.Id).Get(&stock_bill_in_db)
+	core.HandleError(err)
+
+	if stock_bill_in_db.StatusId == models.STOCK_BILL_CHECKIN_SUBMIT {
+		return c.RenderJson(core.JsonResult{Success: false, Message: "入库单已提交，不能更改！"})
+	}
+
 	if detail_form.Valid(c.Validation) == false {
 		return c.RenderJson(core.JsonResult{Success: false, Message: c.GetValidationErrorMessage()})
 	}
 
-	stock_bill := detail_form.StockBill
+	stock_bill_in_ui := detail_form.StockBill
 
 	var affected int64
 	if detail_form.IsCreate() {
 		loginuser := core.GetLoginUser(c.Session)
-		stock_bill.UserId = loginuser.UserId
-		stock_bill.TypeId = models.STOCK_BILL_TYPE_CHECKIN
-		stock_bill.StatusId = models.STOCK_BILL_CHECKIN_SAVE
-		affected, err = db_session.Insert(&stock_bill)
+		stock_bill_in_ui.UserId = loginuser.UserId
+		stock_bill_in_ui.TypeId = models.STOCK_BILL_TYPE_CHECKIN
+		stock_bill_in_ui.StatusId = models.STOCK_BILL_CHECKIN_SAVE
+
+		affected, err = db_session.Insert(&stock_bill_in_ui)
 		core.HandleError(err)
 	} else {
 		sb_cols := models.StockBillCols
-		affected, err = db_session.Id(stock_bill.Id).Cols(sb_cols.Code, sb_cols.StockId, sb_cols.Desc, sb_cols.Date).Update(&stock_bill)
+		affected, err = db_session.Id(stock_bill_in_ui.Id).Cols(sb_cols.Code, sb_cols.StockId, sb_cols.Desc, sb_cols.Date).Update(&stock_bill_in_ui)
 		core.HandleError(err)
 
 		if affected == 0 {
@@ -170,9 +179,38 @@ func (c ErpStockBillCheckin) Save() revel.Result {
 
 	return c.RenderJson(map[string]interface{}{
 		"success": true,
-		"bill_id": stock_bill.Id,
+		"bill_id": stock_bill_in_ui.Id,
 		"message": strconv.FormatInt(affected, 10) + "条数据保存成功!",
 	})
+}
+
+func (c ErpStockBillCheckin) Submit() revel.Result {
+	db_session := c.DbSession
+
+	var bill_id int64
+	c.Params.Bind(&bill_id, "bill_id")
+
+	var stock_bill models.StockBillInfo
+	has, err := db_session.Id(bill_id).Get(&stock_bill)
+	core.HandleError(err)
+
+	if has == false {
+		return c.RenderJson(core.JsonResult{Success: false, Message: "入库单Id不存在!"})
+	}
+
+	if stock_bill.StatusId == models.STOCK_BILL_CHECKIN_SUBMIT {
+		return c.RenderJson(core.JsonResult{Success: false, Message: "入库失败，该入库单已入库!"})
+	}
+
+	stock_bill.StatusId = models.STOCK_BILL_CHECKIN_SUBMIT
+
+	cols := models.StockBillCols
+	_, err = db_session.Id(bill_id).Cols(cols.StatusId).Update(&stock_bill)
+	core.HandleError(err)
+
+	//todo: 更新商品库存
+
+	return c.RenderJson(core.JsonResult{Success: true, Message: "入库成功!"})
 }
 
 func (c ErpStockBillCheckin) Delete() revel.Result {

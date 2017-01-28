@@ -149,6 +149,14 @@ func (c ErpStockBillCheckinEntry) Save() revel.Result {
 	err := json.Unmarshal(c.GetRequestBody(), &detail_form)
 	core.HandleError(err)
 
+	var stock_bill models.StockBillInfo
+	has, err := db_session.Id(detail_form.BillId).Get(&stock_bill)
+	core.HandleError(err)
+
+	if stock_bill.StatusId == models.STOCK_BILL_CHECKIN_SUBMIT {
+		return c.RenderJson(core.JsonResult{Success: false, Message: "入库单已提交，不能更改！"})
+	}
+
 	if detail_form.Valid(c.Validation) == false {
 		return c.RenderJson(core.JsonResult{Success: false, Message: c.GetValidationErrorMessage()})
 	}
@@ -163,7 +171,7 @@ WHERE name = ?;
 		StorageLocId core.NullInt `xorm:"'storage_loc_id'"`
 	}
 
-	has, err := db_session.Sql(sql, detail_form.StorageLocName).Get(&storage_loc_id)
+	has, err = db_session.Sql(sql, detail_form.StorageLocName).Get(&storage_loc_id)
 	core.HandleError(err)
 	if has == false {
 		return c.RenderJson(core.JsonResult{Success: false, Message: "输入的仓位不存在！"})
@@ -218,6 +226,25 @@ WHERE v.storage_loc_id = ? AND v.product_id = ?
 			stock_bill_entry.Price = core.NewNullFloat(0, false)
 			stock_bill_entry.Amount = core.NewNullFloat(0, false)
 		}
+
+		//unique check
+		sql := `
+SELECT count(1) AS entry_count
+FROM erp_stock_bill_entry sbe
+WHERE sbe.bill_id = %d AND sbe.storage_loc_id = %d AND sbe.product_id = %d
+`
+		sql = fmt.Sprintf(sql, stock_bill_entry.BillId, stock_bill_entry.StorageLocId, stock_bill_entry.ProductId)
+		var entry_count struct {
+			Count int64 `xorm:"'entry_count'"`
+		}
+
+		_, err := db_session.Sql(sql).Get(&entry_count)
+		core.HandleError(err)
+
+		if entry_count.Count != 0 {
+			return  c.RenderJson(core.JsonResult{Success: false, Message: "该入库单中指定仓位已存在该商品！"})
+		}
+
 		affected, err = db_session.Insert(&stock_bill_entry)
 		core.HandleError(err)
 	} else {
@@ -237,11 +264,30 @@ WHERE v.storage_loc_id = ? AND v.product_id = ?
 func (c ErpStockBillCheckinEntry) Delete() revel.Result {
 	db_session := c.DbSession
 
-	stock_bill_entry_id_list := make([]int64, 0)
-	c.Params.Bind(&stock_bill_entry_id_list, "id_list")
+	var entry_id int64
+	c.Params.Bind(&entry_id, "entry_id")
 
-	affected, err := db_session.In("id", stock_bill_entry_id_list).Delete(new(models.StockBillEntryInfo))
+	sql := `
+SELECT sb.status_id AS status_id
+FROM erp_stock_bill_entry sbe
+    INNER JOIN erp_stock_bill sb ON sbe.bill_id = sb.id
+WHERE sbe.id = %d
+`
+	sql = fmt.Sprintf(sql, entry_id)
+
+	var status_id struct {
+		StatusId int64 `xorm:"'status_id'"`
+	}
+
+	_, err := db_session.Sql(sql).Get(&status_id)
 	core.HandleError(err)
 
-	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})
+	if status_id.StatusId == models.STOCK_BILL_CHECKIN_SUBMIT {
+		return c.RenderJson(core.JsonResult{Success: false, Message: "入库单已提交，不能更改！"})
+	}
+
+	_, err = db_session.Id(entry_id).Delete(new(models.StockBillEntryInfo))
+	core.HandleError(err)
+
+	return c.RenderJson(core.JsonResult{Success: true, Message: "入库单明细移除成功!"})
 }
