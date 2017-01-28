@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-func GetGridRequestParam(request *revel.Request) (filter string, order string, offset int, limit int) {
+func GetGridRequestParam(request *revel.Request) (filter string, order string, offset int64, limit int64) {
 	filter = "" // return
 	order = ""  // return
 	offset = 0  // return
@@ -24,9 +24,9 @@ func GetGridRequestParam(request *revel.Request) (filter string, order string, o
 	if len(request.Form["sSearch"]) != 0 {
 		searchValue := request.Form["sSearch"][0]
 		for colIndex := 0; colIndex < colCount; colIndex++ {
-			colName := request.Form["mDataProp_"+strconv.Itoa(colIndex)][0]
-			colSearchable := request.Form["bSearchable_"+strconv.Itoa(colIndex)][0]
-			colSortable := request.Form["bSortable_"+strconv.Itoa(colIndex)][0]
+			colName := request.Form["mDataProp_" + strconv.Itoa(colIndex)][0]
+			colSearchable := request.Form["bSearchable_" + strconv.Itoa(colIndex)][0]
+			colSortable := request.Form["bSortable_" + strconv.Itoa(colIndex)][0]
 			gridCol := gridColumn{
 				ColName:       colName,
 				ColSearchable: colSearchable,
@@ -49,8 +49,8 @@ func GetGridRequestParam(request *revel.Request) (filter string, order string, o
 		orderCount, _ := strconv.Atoi(request.Form["iSortingCols"][0])
 		gridOrderList := make([]string, 0, orderCount)
 		for orderIndex := 0; orderIndex < orderCount; orderIndex++ {
-			orderColIndex, _ := strconv.Atoi(request.Form["iSortCol_"+strconv.Itoa(orderIndex)][0])
-			orderDir := strings.ToLower(request.Form["sSortDir_"+strconv.Itoa(orderIndex)][0])
+			orderColIndex, _ := strconv.Atoi(request.Form["iSortCol_" + strconv.Itoa(orderIndex)][0])
+			orderDir := strings.ToLower(request.Form["sSortDir_" + strconv.Itoa(orderIndex)][0])
 
 			gridCol := gridColumnList[orderColIndex]
 			if gridCol.ColSortable == "true" {
@@ -68,10 +68,10 @@ func GetGridRequestParam(request *revel.Request) (filter string, order string, o
 	filter = PreventSQLInjection(condition) // return
 	order = PreventSQLInjection(order_str)  // return
 	if len(request.Form["iDisplayStart"]) != 0 {
-		offset, _ = strconv.Atoi(request.Form["iDisplayStart"][0]) // return
+		offset, _ = strconv.ParseInt(request.Form["iDisplayStart"][0], 10, 64) // return
 	}
 	if len(request.Form["iDisplayLength"]) != 0 {
-		limit, _ = strconv.Atoi(request.Form["iDisplayLength"][0]) // return
+		limit, _ = strconv.ParseInt(request.Form["iDisplayLength"][0], 10, 64) // return
 	}
 
 	return
