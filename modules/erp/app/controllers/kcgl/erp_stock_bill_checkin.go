@@ -208,7 +208,46 @@ func (c ErpStockBillCheckin) Submit() revel.Result {
 	_, err = db_session.Id(bill_id).Cols(cols.StatusId).Update(&stock_bill)
 	core.HandleError(err)
 
-	//todo: 更新商品库存
+	// 更新商品库存
+	sql_proc := `
+CREATE PROCEDURE erp_stock_bill_checkin_to_inventory_v0001(p_bill_id BIGINT)
+    BEGIN
+        DECLARE v_stock_id BIGINT;
+        DECLARE v_storage_loc_id BIGINT;
+        DECLARE v_product_id BIGINT;
+        DECLARE v_qty BIGINT;
+        DECLARE v_inventory_id BIGINT;
+        DECLARE v_done INT;
+
+        DECLARE cur_stock_bill_entry CURSOR FOR
+            SELECT storage_loc_id, product_id, qty
+            FROM erp_stock_bill_entry
+            WHERE bill_id = p_bill_id;
+        DECLARE CONTINUE HANDLER FOR SQLSTATE '02000' SET v_done = 1;
+
+        SELECT stock_id INTO v_stock_id FROM erp_stock_bill WHERE id = p_bill_id;
+
+        OPEN cur_stock_bill_entry;
+        REPEAT
+            FETCH cur_stock_bill_entry INTO v_storage_loc_id, v_product_id, v_qty;
+
+            SELECT id INTO v_inventory_id
+            FROM erp_inventory
+            WHERE stock_id = v_stock_id AND storage_loc_id = v_storage_loc_id AND product_id = v_product_id;
+
+            IF v_inventory_id IS NULL THEN
+                INSERT INTO erp_inventory (stock_id, storage_loc_id, product_id, qty, create_time, update_time)
+                VALUES (v_stock_id, v_storage_loc_id, v_product_id, v_qty, now(), now());
+            ELSE
+                UPDATE erp_inventory SET qty = qty + v_qty, update_time = now(), version = version + 1 WHERE id = v_inventory_id;
+            END IF;
+        UNTIL v_done END REPEAT;
+        CLOSE cur_stock_bill_entry;
+    END;
+`
+	core.CreateProc("erp_stock_bill_checkin_to_inventory_v0001", sql_proc, db_session)
+
+	db_session.Exec(fmt.Sprintf("CALL erp_stock_bill_checkin_to_inventory_v0001(%d);", bill_id))
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: "入库成功!"})
 }
