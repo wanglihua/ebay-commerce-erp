@@ -1,15 +1,14 @@
 package app
 
 import (
-	//"fmt"
 	"github.com/revel/revel"
 	//"time"
 	//"matrix/modules/jobs/app/jobs"
+	//"matrix/modules/jobs/tasks"
 )
 
 func init() {
 	revel.OnAppStart(func() {
-		//fmt.Println("jobs module start!")
 
 		/*
 		   jobs.Schedule("0 0 0 * * ?",  TestTask{})
@@ -20,12 +19,6 @@ func init() {
 
 		//cron.test = * * * * * ?
 		//jobs.Schedule("cron.test", TestTask{}) //测试
+		//jobs.Schedule("cron.ebay_download_order", tasks.EBayOrderDownloadTask{})
 	})
-}
-
-type TestTask struct {
-}
-
-func (e TestTask) Run() {
-	revel.TRACE.Println("这是一个定时任务的测试！")
 }
