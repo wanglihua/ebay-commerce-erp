@@ -213,6 +213,49 @@
 </div>
 {% template "erp/kcgl/stock_bill_checkin_entry/stock_bill_checkin_entry_index.var" .%}
 <script type="text/javascript">
+
+    function deleteStockBillEntry(entry_id) {
+        $.msg.confirm("确认要移除吗？", function () {
+            $.ajax({
+                url: '{%url "ErpStockBillCheckinEntry.Delete"%}',
+                type: "POST",
+                data: {"entry_id": entry_id},
+                success: function (data) {
+                    if (data.success == false) {
+                        $.msg.error(data.message);
+                        return;
+                    }
+                    else {
+                        $.msg.show(data.message);
+                    }
+                    vm.reloadList();
+                }
+            });
+        });
+    }
+
+    function showStockBillEntryDetail(id) {
+        showMask("加载中...");
+        $("#stockBillEntryDetailForm").clearValidation();
+        $.ajax({
+                url: '{%url "ErpStockBillCheckinEntry.DetailData" %}',
+                type: "POST",
+                data: {
+                    "id": id
+                },
+                success: function (result) {
+                    hideMask();
+                    if (result.success == false) {
+                        $.msg.error(result.message);
+                        return;
+                    }
+                    vm.detail = result;
+                    $('#stockBillEntryDetailDialog').modal(modalOptions);
+                }
+            }
+        );
+    }
+
     var vm = new Vue({
         el: "#page",
         data: {
@@ -252,9 +295,11 @@
                         {"mDataProp": "sbe.price", "title": "单价", "bSearchable": false},
                         {"mDataProp": "sbe.amount", "title": "金额", "bSearchable": false},
                         {
-                            "mDataProp": "sbe.id", "title": "操作", "bSearchable": false,
+                            "mDataProp": "sbe.id", "title": "操作", "bSearchable": false, "sClass": "center",
                             "render": function (data, type, row) {
-                                return '<button class="btn-danger" onclick="deleteStockBillEntry(' + data + ')">移除</button>';
+                                var html = '<button class="btn-primary" onclick="showStockBillEntryDetail(' + data + ')">编辑</button>&nbsp;&nbsp;' +
+                                    '<button class="btn-danger" onclick="deleteStockBillEntry(' + data + ')">移除</button>';
+                                return html;
                             }
                         }
                     ]
@@ -271,25 +316,7 @@
                 reloadList('#stockBillEntryList');
             },
             showStockBillEntryDetail: function (id) {
-                showMask("加载中...");
-                $("#stockBillEntryDetailForm").clearValidation();
-                $.ajax({
-                        url: '{%url "ErpStockBillCheckinEntry.DetailData" %}',
-                        type: "POST",
-                        data: {
-                            "id": id
-                        },
-                        success: function (result) {
-                            hideMask();
-                            if (result.success == false) {
-                                $.msg.error(result.message);
-                                return;
-                            }
-                            vm.detail = result;
-                            $('#stockBillEntryDetailDialog').modal(modalOptions);
-                        }
-                    }
-                );
+                showStockBillEntryDetail(id);
             },
             addStockBillEntry: function () {
                 showMask("提交中...");
@@ -409,24 +436,5 @@
         }
     });
 
-    function deleteStockBillEntry(entry_id) {
-        $.msg.confirm("确认要移除吗？", function () {
-            $.ajax({
-                url: '{%url "ErpStockBillCheckinEntry.Delete"%}',
-                type: "POST",
-                data: {"entry_id": entry_id},
-                success: function (data) {
-                    if (data.success == false) {
-                        $.msg.error(data.message);
-                        return;
-                    }
-                    else {
-                        $.msg.show(data.message);
-                    }
-                    vm.reloadList();
-                }
-            });
-        });
-    }
 </script>
 {%footer%}
