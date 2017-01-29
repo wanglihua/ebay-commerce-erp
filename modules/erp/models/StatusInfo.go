@@ -387,15 +387,15 @@ func (e StatusInfo) InitData(db_session *xorm.Session) {
 		status := new(StatusInfo)
 		status.Id = STOCK_BILL_CHECKIN_SAVE
 		status.Type = STATUS_TYPE_STOCK_BILL_CHECKIN
-		status.Name = "暂存"
-		status.Desc = core.NewNullString("入库单状态 暂存", true)
+		status.Name = "临时保存"
+		status.Desc = core.NewNullString("入库单状态 临时保存", true)
 		db_session.Insert(status)
 
 		status = new(StatusInfo)
 		status.Id = STOCK_BILL_CHECKIN_SUBMIT
 		status.Type = STATUS_TYPE_STOCK_BILL_CHECKIN
-		status.Name = "已提交"
-		status.Desc = core.NewNullString("入库单状态 已提交", true)
+		status.Name = "已提交入库"
+		status.Desc = core.NewNullString("入库单状态 已提交入库", true)
 		db_session.Insert(status)
 	}
 
@@ -404,15 +404,15 @@ func (e StatusInfo) InitData(db_session *xorm.Session) {
 		status := new(StatusInfo)
 		status.Id = STOCK_BILL_CHECKOUT_SAVE
 		status.Type = STATUS_TYPE_STOCK_BILL_CHECKOUT
-		status.Name = "暂存"
-		status.Desc = core.NewNullString("出库单状态 暂存", true)
+		status.Name = "临时保存"
+		status.Desc = core.NewNullString("出库单状态 临时保存", true)
 		db_session.Insert(status)
 
 		status = new(StatusInfo)
 		status.Id = STOCK_BILL_CHECKOUT_SUBMIT
 		status.Type = STATUS_TYPE_STOCK_BILL_CHECKOUT
-		status.Name = "已提交"
-		status.Desc = core.NewNullString("出库单状态 已提交", true)
+		status.Name = "已提交出库"
+		status.Desc = core.NewNullString("出库单状态 已提交出库", true)
 		db_session.Insert(status)
 	}
 
@@ -421,15 +421,15 @@ func (e StatusInfo) InitData(db_session *xorm.Session) {
 		status := new(StatusInfo)
 		status.Id = STOCK_BILL_TRANSFER_SAVE
 		status.Type = STATUS_TYPE_STOCK_BILL_TRANSFER
-		status.Name = "暂存"
-		status.Desc = core.NewNullString("调拨单状态 暂存", true)
+		status.Name = "临时保存"
+		status.Desc = core.NewNullString("调拨单状态 临时保存", true)
 		db_session.Insert(status)
 
 		status = new(StatusInfo)
 		status.Id = STOCK_BILL_TRANSFER_SUBMIT
 		status.Type = STATUS_TYPE_STOCK_BILL_TRANSFER
-		status.Name = "已提交"
-		status.Desc = core.NewNullString("调拨单状态 已提交", true)
+		status.Name = "已提交调拨"
+		status.Desc = core.NewNullString("调拨单状态 已提交调拨", true)
 		db_session.Insert(status)
 	}
 }
