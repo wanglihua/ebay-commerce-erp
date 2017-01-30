@@ -25,12 +25,18 @@ func (c ErpStockBillCheckinEntry) Index(bill_id int64) revel.Result {
 		panic("指定的批次号不存在！")
 	}
 
+	var bill_status models.StatusInfo
+	_, err = db_session.Id(stock_bill.StatusId).Get(&bill_status)
+	core.HandleError(err)
+
 	var stock models.StockInfo
 	_, err = db_session.Id(stock_bill.StockId).Get(&stock)
 	core.HandleError(err)
 
 	c.RenderArgs["stock_bill"] = stock_bill
 	c.RenderArgs["stock_name"] = stock.Name
+	c.RenderArgs["is_submit"] = stock_bill.StatusId == models.STOCK_BILL_CHECKIN_SUBMIT
+	c.RenderArgs["status_name"] = bill_status.Name;
 	return c.RenderTemplate("erp/kcgl/stock_bill_checkin_entry/stock_bill_checkin_entry_index.html")
 }
 
@@ -242,7 +248,7 @@ WHERE sbe.bill_id = %d AND sbe.storage_loc_id = %d AND sbe.product_id = %d
 		core.HandleError(err)
 
 		if entry_count.Count != 0 {
-			return  c.RenderJson(core.JsonResult{Success: false, Message: "该入库单中指定仓位已存在该商品！"})
+			return c.RenderJson(core.JsonResult{Success: false, Message: "该入库单中指定仓位已存在该商品！"})
 		}
 
 		affected, err = db_session.Insert(&stock_bill_entry)

@@ -14,17 +14,24 @@
             </li>
             <li class="parent" data-menu="kcgl-menu">库存管理</li>
             <li class="active" data-menu="kcgl-stockbill-checkin-menu"><a href="/erp/stock/bill/checkin">手工入库</a></li>
-            <li>入库单明细（批次号：{% .stock_bill.Code %}）</li>
+            <li>入库单明细（批次号：{% .stock_bill.Code %}，状态：{% .status_name %}）</li>
         </ul>
     </div>
     <div class="page-content">
         <div class="row">
             <div class="col-xs-12" style="padding: 0;">
                 <div class="gridToolBar clearfix">
+                    {% if eq .is_submit false %}
                     <button class="btn btn-primary btn-sm" @click="submitStockBillEntry()">
                         <i class="ace-icon fa fa-arrow-up"></i>
                         提交入库
                     </button>
+                    {% else %}
+                    <button class="btn btn-primary btn-sm" disabled="disabled">
+                        <i class="ace-icon fa fa-arrow-up"></i>
+                        提交入库
+                    </button>
+                    {% end %}
                 </div>
                 <div class="row" style="margin-top: 20px;margin-bottom: 20px;">
                     <div class="col-xs-12" style="line-height: 28px;">
@@ -122,10 +129,17 @@
                                     </div>
                                 </form>
                                 <div class="row">
+                                    {% if eq .is_submit false %}
                                     <button class="btn btn-success btn-sm pull-right" @click="addStockBillEntry()">
                                         <i class="ace-icon fa fa-plus"></i>
                                         添加
                                     </button>
+                                    {% else %}
+                                    <button class="btn btn-success btn-sm pull-right" disabled="disabled">
+                                        <i class="ace-icon fa fa-plus"></i>
+                                        添加
+                                    </button>
+                                    {% end %}
                                 </div>
                             </div>
 
@@ -297,19 +311,28 @@
                         {
                             "mDataProp": "sbe.id", "title": "操作", "bSearchable": false, "sClass": "center",
                             "render": function (data, type, row) {
-                                var html = '<button class="btn-primary" onclick="showStockBillEntryDetail(' + data + ')">编辑</button>&nbsp;&nbsp;' +
-                                    '<button class="btn-danger" onclick="deleteStockBillEntry(' + data + ')">移除</button>';
-                                return html;
+                                if (is_submit == false) {
+                                    var html = '<button class="btn-primary" onclick="showStockBillEntryDetail(' + data + ')">编辑</button>&nbsp;&nbsp;' +
+                                        '<button class="btn-danger" onclick="deleteStockBillEntry(' + data + ')">移除</button>';
+                                    return html;
+                                }
+                                else {
+                                    var html = '<button class="btn-primary" disabled="disabled">编辑</button>&nbsp;&nbsp;' +
+                                        '<button class="btn-danger" disabled="disabled">移除</button>';
+                                    return html;
+                                }
                             }
                         }
                     ]
                 }
             );
 
-            $('#stockBillEntryList tbody').on('dblclick', 'tr', function () {
-                var id = $(this).find('td:first-child input:checkbox').val();
-                vm.showStockBillEntryDetail(id);
-            });
+            if (is_submit == false) {
+                $('#stockBillEntryList tbody').on('dblclick', 'tr', function () {
+                    var id = $(this).find('td:first-child input:checkbox').val();
+                    vm.showStockBillEntryDetail(id);
+                });
+            }
         },
         methods: {
             reloadList: function () {

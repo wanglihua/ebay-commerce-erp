@@ -1,3 +1,4 @@
 <script type="text/javascript">
     var bill_id = {% .stock_bill.Id %};
+    var is_submit = {% .is_submit %};
 </script>
