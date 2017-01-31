@@ -3,8 +3,8 @@ package app
 import (
 	"github.com/revel/revel"
 	//"time"
-	//"matrix/modules/jobs/app/jobs"
-	//"matrix/modules/jobs/tasks"
+	"matrix/modules/jobs/app/jobs"
+	"matrix/modules/jobs/tasks"
 )
 
 func init() {
@@ -19,7 +19,7 @@ func init() {
 
 		//cron.test = * * * * * ?
 		//jobs.Schedule("cron.test", TestTask{}) //测试
-		//jobs.Schedule("cron.ebay_download_order", tasks.EBayOrderDownloadTask{})
+		jobs.Schedule("cron.ebay_download_order", tasks.EBayOrderDownloadTask{})
 		//jobs.Schedule("cron.ebay_download_message", tasks.EBayMessageDownloadTask{})
 	})
 }
