@@ -202,7 +202,15 @@ func (c ErpStockBillCheckout) Submit() revel.Result {
 		return c.RenderJson(core.JsonResult{Success: false, Message: "出库失败，该出库单已出库!"})
 	}
 
-	//todo: 检查明细是不是空的
+	entry_cols := models.StockBillEntryCols
+
+	// 检查明细是不是空的
+	entry_count ,err := db_session.Where(fmt.Sprintf("%s = %d", entry_cols.BillId, bill_id)).Count(new(models.StockBillEntryInfo))
+	core.HandleError(err)
+
+	if entry_count == 0 {
+		return c.RenderJson(core.JsonResult{Success: false, Message: "出库失败，该出库单没有明细数据!"})
+	}
 
 	stock_bill.StatusId = models.STOCK_BILL_CHECKOUT_SUBMIT
 
@@ -230,8 +238,12 @@ CREATE PROCEDURE erp_stock_bill_checkout_to_inventory_v0001(p_bill_id BIGINT)
         SELECT stock_id INTO v_stock_id FROM erp_stock_bill WHERE id = p_bill_id;
 
         OPEN cur_stock_bill_entry;
-        REPEAT
+        repeat_start: REPEAT
             FETCH cur_stock_bill_entry INTO v_storage_loc_id, v_product_id, v_qty;
+
+            IF v_done = 1 THEN
+                LEAVE repeat_start;
+            END IF;
 
             SELECT id INTO v_inventory_id
             FROM erp_inventory
