@@ -109,7 +109,6 @@ func (t EBayOrderDownloadTask) fetch_orders(config ebay.Config) ebay.GetOrdersRe
 		Uri:         config.EndPoint,
 		Body:        req_body,
 		ContentType: "application/xml; charset=utf-8",
-		UserAgent:   "go-ebay-fetch-orders",
 		ShowDebug:   false,
 	}
 
@@ -121,7 +120,7 @@ func (t EBayOrderDownloadTask) fetch_orders(config ebay.Config) ebay.GetOrdersRe
 	req.AddHeader("X-EBAY-API-COMPATIBILITY-LEVEL", config.Version)
 	req.AddHeader("X-EBAY-API-REQUEST-ENCODING", "XML")
 	req.AddHeader("X-EBAY-API-RESPONSE-ENCODING", "XML")
-	req.AddHeader("X-EBAY-API-SITEID", "0") //todo: 这个要改成 澳洲的 Site Id
+	req.AddHeader("X-EBAY-API-SITEID", config.SiteId)
 	req.AddHeader("Accept", "application/xml,application/xhtml+xml")
 
 	res, err := req.Do()

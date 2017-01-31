@@ -47,11 +47,10 @@ func (t EBayMessageDownloadTask) Run() {
 
 	req := goreq.Request{
 		Method:      "POST",
-		//Uri:         "https://api.ebay.com/ws/api.dll",
 		Uri:         config.EndPoint,
 		Body:        body,
 		ContentType: "application/xml; charset=utf-8",
-		UserAgent:   "go-ebay-fetch-orders",
+		//UserAgent:   "go-ebay-fetch-orders",
 		ShowDebug:   false,
 	}
 
@@ -63,12 +62,8 @@ func (t EBayMessageDownloadTask) Run() {
 	req.AddHeader("X-EBAY-API-COMPATIBILITY-LEVEL", ebay.Version)
 	req.AddHeader("X-EBAY-API-REQUEST-ENCODING", "XML")
 	req.AddHeader("X-EBAY-API-RESPONSE-ENCODING", "XML")
-	req.AddHeader("X-EBAY-API-SITEID", "0")
-	//req.AddHeader("X-EBAY-API-COMPATIBILITY-LEVEL HTTP", EbayApiVersion)
-
+	req.AddHeader("X-EBAY-API-SITEID", config.SiteId)
 	req.AddHeader("Accept", "application/xml,application/xhtml+xml")
-	//req.AddHeader("X-Powered-By", "go-ebay (https://goo.gl/Zi7RMK)")
-	//req.AddHeader("X-Author", "Jason Clark (mithereal@gmail.com)")
 
 	res, err := req.Do()
 
