@@ -9,8 +9,8 @@ import (
 	auth_models "matrix/modules/auth/models"
 	"matrix/modules/erp/models"
 	"time"
-	"fmt"
 	"matrix/modules/erp/service/bill_service"
+	"fmt"
 )
 
 type ErpStockBillCheckout struct {
@@ -25,6 +25,7 @@ type ErpStockBillCheckoutViewItem struct {
 	models.StockBillInfo `xorm:"extends" json:"sb"`
 	models.StockInfo     `xorm:"extends" json:"s"`
 	auth_models.UserInfo `xorm:"extends" json:"u"`
+	models.StatusInfo    `xorm:"extends" json:"st"`
 }
 
 func (c ErpStockBillCheckout) ListData() revel.Result {
@@ -33,41 +34,50 @@ func (c ErpStockBillCheckout) ListData() revel.Result {
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
 	/*
-		SELECT sb.*, s.*, u.*
-		FROM erp_stock_bill sb
-		    INNER JOIN erp_stock s ON sb.stock_id = s.id
-		    INNER JOIN auth_user u ON sb.user_id = u.id
-		WHERE sb.type_id = 200
+SELECT sb.*, s.*, u.*, st.*
+FROM erp_stock_bill sb
+    INNER JOIN erp_stock s ON sb.stock_id = s.id
+    INNER JOIN auth_user u ON sb.user_id = u.id
+    INNER JOIN erp_status st ON sb.status_id = st.id
+WHERE sb.type_id = 100;
 	*/
 
-	query := db_session.
-		Select("sb.*, s.*, u.*").
-		Table("erp_stock_bill").Alias("sb").
-		Join("INNER", []string{"erp_stock", "s"}, "sb.stock_id = s.id").
-		Join("INNER", []string{"auth_user", "u"}, "sb.user_id = u.id").
-		Where("sb.type_id = ?", models.STOCK_BILL_TYPE_CHECKOUT).
-		Where(filter)
+	sb := core.NewSqlBuilder()
+	sb.Select("sb.*, s.*, u.*, st.*")
+	sb.Count("count(sb.id) AS bill_count")
+	sb.From(`
+		erp_stock_bill sb
+		    INNER JOIN erp_stock s ON sb.stock_id = s.id
+		    INNER JOIN auth_user u ON sb.user_id = u.id
+		    INNER JOIN erp_status st ON sb.status_id = st.id
+    `)
+
+	sb.Where(core.SqlAnd(filter, fmt.Sprintf("sb.type_id = %d", models.STOCK_BILL_TYPE_CHECKOUT)))
 
 	//query extra filter here
 
-	data_query := *query
 	if order != "" {
-		data_query = *data_query.OrderBy(order)
+		sb.OrderBy(order)
 	} else {
-		data_query = *data_query.Asc("sb.id")
+		sb.OrderBy("sb.id ASC")
 	}
 
+	sb.Limit(offset, limit)
+
 	stock_bill_list := make([]ErpStockBillCheckoutViewItem, 0, limit)
-	err := data_query.Limit(limit, offset).Find(&stock_bill_list)
+	err := db_session.Sql(sb.SqlList()).Find(&stock_bill_list)
 	core.HandleError(err)
 
-	count_query := *query
-	count, err := count_query.Count(new(ErpStockBillCheckoutViewItem))
+	var bill_count struct {
+		Count int64 `xorm:"'bill_count'"`
+	}
+	_, err = db_session.Sql(sb.SqlCount()).Get(&bill_count)
+
 	core.HandleError(err)
 
 	return c.RenderJson(core.GridResult{
 		Data:  stock_bill_list,
-		Total: count,
+		Total: bill_count.Count,
 	})
 }
 
@@ -109,7 +119,7 @@ func (c ErpStockBillCheckout) DetailData() revel.Result {
 		has, err := db_session.Id(stock_bill_id).Get(&stock_bill)
 		core.HandleError(err)
 		if has == false {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "指定的出入库单不存在！"})
+			return c.RenderJson(core.JsonResult{Success: false, Message: "指定的出库单不存在！"})
 		}
 	} else {
 		stock_bill.Code = bill_service.GetNextBillNo(db_session)
@@ -134,22 +144,32 @@ func (c ErpStockBillCheckout) Save() revel.Result {
 	err := json.Unmarshal(c.GetRequestBody(), &detail_form)
 	core.HandleError(err)
 
+	var stock_bill_in_db models.StockBillInfo
+	_, err = db_session.Id(detail_form.StockBill.Id).Get(&stock_bill_in_db)
+	core.HandleError(err)
+
+	if stock_bill_in_db.StatusId == models.STOCK_BILL_CHECKOUT_SUBMIT {
+		return c.RenderJson(core.JsonResult{Success: false, Message: "出库单已提交，不能更改！"})
+	}
+
 	if detail_form.Valid(c.Validation) == false {
 		return c.RenderJson(core.JsonResult{Success: false, Message: c.GetValidationErrorMessage()})
 	}
 
-	stock_bill := detail_form.StockBill
+	stock_bill_in_ui := detail_form.StockBill
 
 	var affected int64
 	if detail_form.IsCreate() {
 		loginuser := core.GetLoginUser(c.Session)
-		stock_bill.UserId = loginuser.UserId
-		stock_bill.TypeId = models.STOCK_BILL_TYPE_CHECKOUT
-		affected, err = db_session.Insert(&stock_bill)
+		stock_bill_in_ui.UserId = loginuser.UserId
+		stock_bill_in_ui.TypeId = models.STOCK_BILL_TYPE_CHECKOUT
+		stock_bill_in_ui.StatusId = models.STOCK_BILL_CHECKOUT_SAVE
+
+		affected, err = db_session.Insert(&stock_bill_in_ui)
 		core.HandleError(err)
 	} else {
 		sb_cols := models.StockBillCols
-		affected, err = db_session.Id(stock_bill.Id).Cols(sb_cols.Code, sb_cols.StockId, sb_cols.Desc, sb_cols.Date).Update(&stock_bill)
+		affected, err = db_session.Id(stock_bill_in_ui.Id).Cols(sb_cols.Code, sb_cols.StockId, sb_cols.Desc, sb_cols.Date).Update(&stock_bill_in_ui)
 		core.HandleError(err)
 
 		if affected == 0 {
@@ -157,7 +177,81 @@ func (c ErpStockBillCheckout) Save() revel.Result {
 		}
 	}
 
-	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据保存成功!"})
+	return c.RenderJson(map[string]interface{}{
+		"success": true,
+		"bill_id": stock_bill_in_ui.Id,
+		"message": strconv.FormatInt(affected, 10) + "条数据保存成功!",
+	})
+}
+
+func (c ErpStockBillCheckout) Submit() revel.Result {
+	db_session := c.DbSession
+
+	var bill_id int64
+	c.Params.Bind(&bill_id, "bill_id")
+
+	var stock_bill models.StockBillInfo
+	has, err := db_session.Id(bill_id).Get(&stock_bill)
+	core.HandleError(err)
+
+	if has == false {
+		return c.RenderJson(core.JsonResult{Success: false, Message: "出库单Id不存在!"})
+	}
+
+	if stock_bill.StatusId == models.STOCK_BILL_CHECKOUT_SUBMIT {
+		return c.RenderJson(core.JsonResult{Success: false, Message: "出库失败，该出库单已出库!"})
+	}
+
+	//todo: 检查明细是不是空的
+
+	stock_bill.StatusId = models.STOCK_BILL_CHECKOUT_SUBMIT
+
+	cols := models.StockBillCols
+	_, err = db_session.Id(bill_id).Cols(cols.StatusId).Update(&stock_bill)
+	core.HandleError(err)
+
+	// 更新商品库存
+	sql_proc := `
+CREATE PROCEDURE erp_stock_bill_checkout_to_inventory_v0001(p_bill_id BIGINT)
+    BEGIN
+        DECLARE v_stock_id BIGINT;
+        DECLARE v_storage_loc_id BIGINT;
+        DECLARE v_product_id BIGINT;
+        DECLARE v_qty BIGINT;
+        DECLARE v_inventory_id BIGINT;
+        DECLARE v_done INT;
+
+        DECLARE cur_stock_bill_entry CURSOR FOR
+            SELECT storage_loc_id, product_id, qty
+            FROM erp_stock_bill_entry
+            WHERE bill_id = p_bill_id;
+        DECLARE CONTINUE HANDLER FOR SQLSTATE '02000' SET v_done = 1;
+
+        SELECT stock_id INTO v_stock_id FROM erp_stock_bill WHERE id = p_bill_id;
+
+        OPEN cur_stock_bill_entry;
+        REPEAT
+            FETCH cur_stock_bill_entry INTO v_storage_loc_id, v_product_id, v_qty;
+
+            SELECT id INTO v_inventory_id
+            FROM erp_inventory
+            WHERE stock_id = v_stock_id AND storage_loc_id = v_storage_loc_id AND product_id = v_product_id;
+
+            IF v_inventory_id IS NULL THEN
+                INSERT INTO erp_inventory (stock_id, storage_loc_id, product_id, qty, create_time, update_time)
+                VALUES (v_stock_id, v_storage_loc_id, v_product_id, -v_qty, now(), now());
+            ELSE
+                UPDATE erp_inventory SET qty = qty - v_qty, update_time = now(), version = version + 1 WHERE id = v_inventory_id;
+            END IF;
+        UNTIL v_done END REPEAT;
+        CLOSE cur_stock_bill_entry;
+    END;
+`
+	core.CreateProc("erp_stock_bill_checkout_to_inventory_v0001", sql_proc, db_session)
+
+	db_session.Exec(fmt.Sprintf("CALL erp_stock_bill_checkout_to_inventory_v0001(%d);", bill_id))
+
+	return c.RenderJson(core.JsonResult{Success: true, Message: "出库成功!"})
 }
 
 func (c ErpStockBillCheckout) Delete() revel.Result {

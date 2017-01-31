@@ -7,6 +7,7 @@ import (
 
 	"matrix/core"
 	"matrix/modules/erp/models"
+	"fmt"
 )
 
 type ErpStockBillCheckoutEntry struct {
@@ -24,52 +25,80 @@ func (c ErpStockBillCheckoutEntry) Index(bill_id int64) revel.Result {
 		panic("指定的批次号不存在！")
 	}
 
+	var bill_status models.StatusInfo
+	_, err = db_session.Id(stock_bill.StatusId).Get(&bill_status)
+	core.HandleError(err)
+
 	var stock models.StockInfo
 	_, err = db_session.Id(stock_bill.StockId).Get(&stock)
 	core.HandleError(err)
 
 	c.RenderArgs["stock_bill"] = stock_bill
 	c.RenderArgs["stock_name"] = stock.Name
+	c.RenderArgs["is_submit"] = stock_bill.StatusId == models.STOCK_BILL_CHECKOUT_SUBMIT
+	c.RenderArgs["status_name"] = bill_status.Name;
 	return c.RenderTemplate("erp/kcgl/stock_bill_checkout_entry/stock_bill_checkout_entry_index.html")
+}
+
+type ErpStockBillCheckoutEntryViewItem struct {
+	models.StockBillEntryInfo `xorm:"extends" json:"sbe"`
+	models.StockBillInfo      `xorm:"extends" json:"sb"`
+	models.StorageLocInfo     `xorm:"extends" json:"sl"`
+	models.ProductInfo        `xorm:"extends" json:"p"`
 }
 
 func (c ErpStockBillCheckoutEntry) ListData(bill_id int64) revel.Result {
 	db_session := c.DbSession
 
 	filter, order, _, _ := core.GetGridRequestParam(c.Request)
-	query := db_session.Where(filter)
+
+	/*
+		SELECT sbe.*, sb.*, sl.*, p.*
+		FROM erp_stock_bill_entry sbe
+		    INNER JOIN erp_stock_bill sb ON sbe.bill_id = sb.id
+		    INNER JOIN erp_storage_loc sl ON sbe.storage_loc_id = sl.id
+		    INNER JOIN erp_product p ON sbe.product_id = p.id
+	 */
+	sb := core.NewSqlBuilder()
+	sb.Select(`sbe.*, sb.*, sl.*, p.*`)
+	sb.Count("count(*) AS entry_count")
+	sb.From(`erp_stock_bill_entry sbe
+		    INNER JOIN erp_stock_bill sb ON sbe.bill_id = sb.id
+		    INNER JOIN erp_storage_loc sl ON sbe.storage_loc_id = sl.id
+		    INNER JOIN erp_product p ON sbe.product_id = p.id`)
+	sb.Where(core.SqlAnd(filter, fmt.Sprintf("bill_id = %d", bill_id)))
 
 	//query extra filter here
-	query = query.Where("bill_id = ?", bill_id)
 
-	data_query := *query
 	if order != "" {
-		data_query = *data_query.OrderBy(order)
+		sb.OrderBy(order)
 	} else {
-		data_query = *data_query.Asc("id")
+		sb.OrderBy("sbe.id ASC")
 	}
 
-	stock_bill_entry_list := make([]models.StockBillEntryInfo, 0)
-	err := data_query.Find(&stock_bill_entry_list)
+	stock_bill_entry_list := make([]ErpStockBillCheckoutEntryViewItem, 0)
+	err := db_session.Sql(sb.SqlList()).Find(&stock_bill_entry_list)
 	core.HandleError(err)
 
-	count_query := *query
-	count, err := count_query.Count(new(models.StockBillEntryInfo))
+	var entry_count struct {
+		Count int64 `xorm:"'entry_count'" json:"entry_count"`
+	}
+	_, err = db_session.Sql(sb.SqlCount()).Get(&entry_count)
 	core.HandleError(err)
 
 	return c.RenderJson(core.GridResult{
 		Data:  stock_bill_entry_list,
-		Total: count,
+		Total: entry_count.Count,
 	})
 }
 
 type StockBillEntryCheckoutDetailForm struct {
-	Id             int64   `xorm:"'id'" json:"id"`
-	BillId         int64   `xorm:"'bill_id'" json:"bill_id"`
-	StorageLocName string  `xorm:"'storage_loc_name'" json:"storage_loc_name"`
-	ProductSku     string  `xorm:"'product_sku'" json:"product_sku"`
-	Qty            int64   `xorm:"'qty'" json:"qty"`
-	Price          float64 `xorm:"'price'" json:"price"`
+	Id             int64            `xorm:"'id'" json:"id"`
+	BillId         int64            `xorm:"'bill_id'" json:"bill_id"`
+	StorageLocName string           `xorm:"'storage_loc_name'" json:"storage_loc_name"`
+	ProductSku     string           `xorm:"'product_sku'" json:"product_sku"`
+	Qty            int64            `xorm:"'qty'" json:"qty"`
+	Price          core.NullFloat   `xorm:"'price'" json:"price"`
 }
 
 func (f *StockBillEntryCheckoutDetailForm) IsCreate() bool {
@@ -77,6 +106,7 @@ func (f *StockBillEntryCheckoutDetailForm) IsCreate() bool {
 }
 
 func (f *StockBillEntryCheckoutDetailForm) Valid(validation *revel.Validation) bool {
+	validation.Required(f.BillId).Message("出库单不能为空！")
 	validation.Required(f.StorageLocName).Message("库位不能为空！")
 	validation.Required(f.ProductSku).Message("商品SKU不能为空！")
 	validation.Required(f.Qty).Message("数量不能为空！")
@@ -93,15 +123,17 @@ func (c ErpStockBillCheckoutEntry) DetailData() revel.Result {
 	var detail_form StockBillEntryCheckoutDetailForm
 	if stock_bill_entry_id != 0 {
 		/*
-			SELECT sbe.id AS id, sl.name AS storage_loc_name, p.sku AS product_sku, sbe.qty AS qty, sbe.price AS price
+			SELECT sbe.id AS id, sb.id AS bill_id, sl.name AS storage_loc_name, p.sku AS product_sku, sbe.qty AS qty, sbe.price AS price
 			FROM erp_stock_bill_entry sbe
+			    INNER JOIN erp_stock_bill sb ON sbe.bill_id = sb.id
 			    INNER JOIN erp_storage_loc sl ON sbe.storage_loc_id = sl.id
 			    INNER JOIN erp_product p ON sbe.product_id = p.id
 			WHERE sbe.id = 1
 		*/
 		sql := `
-SELECT sbe.id AS id, sl.name AS storage_loc_name, p.sku AS product_sku, sbe.qty AS qty, sbe.price AS price
+SELECT sbe.id AS id, sb.id AS bill_id, sl.name AS storage_loc_name, p.sku AS product_sku, sbe.qty AS qty, sbe.price AS price
 FROM erp_stock_bill_entry sbe
+    INNER JOIN erp_stock_bill sb ON sbe.bill_id = sb.id
     INNER JOIN erp_storage_loc sl ON sbe.storage_loc_id = sl.id
     INNER JOIN erp_product p ON sbe.product_id = p.id
 WHERE sbe.id = ?
@@ -123,6 +155,14 @@ func (c ErpStockBillCheckoutEntry) Save() revel.Result {
 	err := json.Unmarshal(c.GetRequestBody(), &detail_form)
 	core.HandleError(err)
 
+	var stock_bill models.StockBillInfo
+	has, err := db_session.Id(detail_form.BillId).Get(&stock_bill)
+	core.HandleError(err)
+
+	if stock_bill.StatusId == models.STOCK_BILL_CHECKOUT_SUBMIT {
+		return c.RenderJson(core.JsonResult{Success: false, Message: "出库单已提交，不能更改！"})
+	}
+
 	if detail_form.Valid(c.Validation) == false {
 		return c.RenderJson(core.JsonResult{Success: false, Message: c.GetValidationErrorMessage()})
 	}
@@ -137,7 +177,7 @@ WHERE name = ?;
 		StorageLocId core.NullInt `xorm:"'storage_loc_id'"`
 	}
 
-	has, err := db_session.Sql(sql, detail_form.StorageLocName).Get(&storage_loc_id)
+	has, err = db_session.Sql(sql, detail_form.StorageLocName).Get(&storage_loc_id)
 	core.HandleError(err)
 	if has == false {
 		return c.RenderJson(core.JsonResult{Success: false, Message: "输入的仓位不存在！"})
@@ -177,14 +217,46 @@ WHERE v.storage_loc_id = ? AND v.product_id = ?
 	}
 
 	var stock_bill_entry models.StockBillEntryInfo
+	stock_bill_entry.BillId = detail_form.BillId
+	stock_bill_entry.StorageLocId = storage_loc_id.StorageLocId.Int64
+	stock_bill_entry.ProductId = product_id.ProductId.Int64
+	stock_bill_entry.PreQty = product_storage_loc_qty
+	stock_bill_entry.Qty = detail_form.Qty
+	stock_bill_entry.Price = detail_form.Price
 
 	var affected int64
 	if detail_form.IsCreate() {
-		stock_bill_entry.Qty = product_storage_loc_qty
+		if detail_form.Price.Valid == true && detail_form.Price.Float64 != 0 {
+			stock_bill_entry.Amount = core.NewNullFloat(detail_form.Price.Float64*float64(detail_form.Qty), true)
+		} else {
+			stock_bill_entry.Price = core.NewNullFloat(0, false)
+			stock_bill_entry.Amount = core.NewNullFloat(0, false)
+		}
+
+		//unique check
+		sql := `
+SELECT count(1) AS entry_count
+FROM erp_stock_bill_entry sbe
+WHERE sbe.bill_id = %d AND sbe.storage_loc_id = %d AND sbe.product_id = %d
+`
+		sql = fmt.Sprintf(sql, stock_bill_entry.BillId, stock_bill_entry.StorageLocId, stock_bill_entry.ProductId)
+		var entry_count struct {
+			Count int64 `xorm:"'entry_count'"`
+		}
+
+		_, err := db_session.Sql(sql).Get(&entry_count)
+		core.HandleError(err)
+
+		if entry_count.Count != 0 {
+			return c.RenderJson(core.JsonResult{Success: false, Message: "该出库单中指定仓位已存在该商品！"})
+		}
+
 		affected, err = db_session.Insert(&stock_bill_entry)
 		core.HandleError(err)
 	} else {
-		affected, err = db_session.Id(stock_bill_entry.Id).Cols("").Update(&stock_bill_entry)
+		stock_bill_entry.Id = detail_form.Id
+		cols := models.StockBillEntryCols
+		affected, err = db_session.Id(stock_bill_entry.Id).Cols(cols.StorageLocId, cols.ProductId, cols.Qty, cols.Price).Update(&stock_bill_entry)
 		core.HandleError(err)
 
 		if affected == 0 {
@@ -198,11 +270,30 @@ WHERE v.storage_loc_id = ? AND v.product_id = ?
 func (c ErpStockBillCheckoutEntry) Delete() revel.Result {
 	db_session := c.DbSession
 
-	stock_bill_entry_id_list := make([]int64, 0)
-	c.Params.Bind(&stock_bill_entry_id_list, "id_list")
+	var entry_id int64
+	c.Params.Bind(&entry_id, "entry_id")
 
-	affected, err := db_session.In("id", stock_bill_entry_id_list).Delete(new(models.StockBillEntryInfo))
+	sql := `
+SELECT sb.status_id AS status_id
+FROM erp_stock_bill_entry sbe
+    INNER JOIN erp_stock_bill sb ON sbe.bill_id = sb.id
+WHERE sbe.id = %d
+`
+	sql = fmt.Sprintf(sql, entry_id)
+
+	var status_id struct {
+		StatusId int64 `xorm:"'status_id'"`
+	}
+
+	_, err := db_session.Sql(sql).Get(&status_id)
 	core.HandleError(err)
 
-	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})
+	if status_id.StatusId == models.STOCK_BILL_CHECKOUT_SUBMIT {
+		return c.RenderJson(core.JsonResult{Success: false, Message: "出库单已提交，不能更改！"})
+	}
+
+	_, err = db_session.Id(entry_id).Delete(new(models.StockBillEntryInfo))
+	core.HandleError(err)
+
+	return c.RenderJson(core.JsonResult{Success: true, Message: "出库单明细移除成功!"})
 }

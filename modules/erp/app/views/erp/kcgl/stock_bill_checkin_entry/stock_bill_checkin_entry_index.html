@@ -22,7 +22,7 @@
             <div class="col-xs-12" style="padding: 0;">
                 <div class="gridToolBar clearfix">
                     {% if eq .is_submit false %}
-                    <button class="btn btn-primary btn-sm" @click="submitStockBillEntry()">
+                    <button class="btn btn-primary btn-sm" @click="submitStockBill()">
                         <i class="ace-icon fa fa-arrow-up"></i>
                         提交入库
                     </button>
@@ -435,26 +435,29 @@
                     );
                 }
             },
-            submitStockBillEntry: function () {
-                showMask("提交中...");
-                $.ajax({
-                        url: '{%url "ErpStockBillCheckin.Submit"%}',
-                        type: "POST",
-                        data: {"bill_id": bill_id},
-                        success: function (data) {
-                            hideMask();
-                            if (data.success == false) {
-                                $.msg.error(data.message);
-                                //return;
-                            }
-                            else {
-                                $.msg.show(data.message);
-                                vm.reloadList();
-                                //return;
+            submitStockBill: function () {
+                $.msg.confirm("确认要提交入库吗？", function () {
+                    showMask("提交中...");
+                    $.ajax({
+                            url: '{%url "ErpStockBillCheckin.Submit"%}',
+                            type: "POST",
+                            data: {"bill_id": bill_id},
+                            success: function (data) {
+                                hideMask();
+                                if (data.success == false) {
+                                    $.msg.error(data.message);
+                                    //return;
+                                }
+                                else {
+                                    $.msg.show(data.message);
+                                    //vm.reloadList();
+                                    window.location.reload();
+                                    //return;
+                                }
                             }
                         }
-                    }
-                );
+                    );
+                });
             }
         }
     });

@@ -202,6 +202,8 @@ func (c ErpStockBillCheckin) Submit() revel.Result {
 		return c.RenderJson(core.JsonResult{Success: false, Message: "入库失败，该入库单已入库!"})
 	}
 
+	//todo: 检查明细是不是空的
+
 	stock_bill.StatusId = models.STOCK_BILL_CHECKIN_SUBMIT
 
 	cols := models.StockBillCols
