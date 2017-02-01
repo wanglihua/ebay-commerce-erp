@@ -10,6 +10,7 @@ import (
 )
 
 /*
+
 get orders document:
 http://developer.ebay.com/devzone/xml/docs/Reference/eBay/GetOrders.html
 
@@ -44,22 +45,22 @@ request body:
 
 response body:
 <?xml version="1.0" encoding="UTF-8"?>
-<GetOrdersResponse
-  xmlns="urn:ebay:apis:eBLBaseComponents">
-  <Timestamp>2017-01-31T12:57:53.266Z</Timestamp>
-  <Ack>Success</Ack>
-  <Version>989</Version>
-  <Build>E989_CORE_API_18131074_R1</Build>
-  <PaginationResult>
-    <TotalNumberOfPages>0</TotalNumberOfPages>
-    <TotalNumberOfEntries>0</TotalNumberOfEntries>
-  </PaginationResult>
-  <HasMoreOrders>false</HasMoreOrders>
-  <OrderArray/>
-  <OrdersPerPage>100</OrdersPerPage>
-  <PageNumber>1</PageNumber>
-  <ReturnedOrderCountActual>0</ReturnedOrderCountActual>
+<GetOrdersResponse xmlns="urn:ebay:apis:eBLBaseComponents">
+	<Timestamp>2017-01-31T12:57:53.266Z</Timestamp>
+	<Ack>Success</Ack>
+	<Version>989</Version>
+	<Build>E989_CORE_API_18131074_R1</Build>
+	<PaginationResult>
+		<TotalNumberOfPages>0</TotalNumberOfPages>
+		<TotalNumberOfEntries>0</TotalNumberOfEntries>
+	</PaginationResult>
+	<HasMoreOrders>false</HasMoreOrders>
+	<OrderArray/>
+	<OrdersPerPage>100</OrdersPerPage>
+	<PageNumber>1</PageNumber>
+	<ReturnedOrderCountActual>0</ReturnedOrderCountActual>
 </GetOrdersResponse>
+
  */
 
 type EBayOrderDownloadTask struct {
