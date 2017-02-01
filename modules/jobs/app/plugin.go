@@ -20,6 +20,7 @@ func init() {
 		//cron.test = * * * * * ?
 		//jobs.Schedule("cron.test", TestTask{}) //测试
 		//jobs.Schedule("cron.ebay_download_order", tasks.EBayOrderDownloadTask{})
-		jobs.Schedule("cron.ebay_download_message", tasks.EBayMessageDownloadTask{})
+		//jobs.Schedule("cron.ebay_download_message", tasks.EBayMessageDownloadTask{})
+		jobs.Schedule("cron.paypal_download", tasks.PaypalDownloadTask{})
 	})
 }
