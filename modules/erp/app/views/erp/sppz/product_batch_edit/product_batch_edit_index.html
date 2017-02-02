@@ -32,9 +32,10 @@
                                             <div class="form-group">
                                                 <label for="edit_attr" class="col-xs-3 control-label">修改的元素</label>
                                                 <div class="col-xs-9">
-                                                    <select id="edit_attr" name=" detail.edit_attr" class="input-sm form-control" v-model.number="detail.edit_attr">
+                                                    <select id="edit_attr" name="detail.edit_attr" class="input-sm form-control" v-model.number="detail.edit_attr">
                                                         <template v-for="edit_attr in edit_attr_list">
-                                                            <option :value="edit_attr.attr_id">{{edit_attr.attr_name}}
+                                                            <option :value="edit_attr.attr_id">
+                                                                {{edit_attr.attr_name}}
                                                             </option>
                                                         </template>
                                                     </select>
@@ -48,7 +49,7 @@
                                             <div class="form-group">
                                                 <label for="edit_attr_values" class="col-xs-3 control-label">修改的值</label>
                                                 <div class="col-xs-9">
-                                                    <textarea id="edit_attr_values" name=" detail.edit_attr_values" rows="20" class="input-sm form-control" placeholder="格式：商品编号，修改值，例如:S00001,10"></textarea>
+                                                    <textarea id="edit_attr_values" name="detail.edit_attr_values" rows="20" class="input-sm form-control" v-model="detail.edit_attr_values" placeholder="格式：商品编号，修改值，例如:S00001,10"></textarea>
                                                 </div>
                                             </div>
                                         </div>

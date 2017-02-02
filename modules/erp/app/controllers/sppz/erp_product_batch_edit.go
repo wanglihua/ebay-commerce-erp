@@ -4,6 +4,8 @@ import (
 	"github.com/revel/revel"
 	"matrix/core"
 	"encoding/json"
+	"strings"
+	"fmt"
 )
 
 type ErpProductBatchEdit struct {
@@ -47,12 +49,11 @@ func (f *BatchEditProductDetailForm) Valid(validation *revel.Validation) bool {
 	validation.Required(f.EditAttr).Message("修改的元素不能为空！")
 	validation.Required(f.EditAttrValues).Message("修改的值不能为空！")
 
-
 	return validation.HasErrors() == false
 }
 
 func (c ErpProductBatchEdit) Save() revel.Result {
-	//db_session := c.DbSession
+	db_session := c.DbSession
 
 	var detail_form BatchEditProductDetailForm
 	err := json.Unmarshal(c.GetRequestBody(), &detail_form)
@@ -62,8 +63,94 @@ func (c ErpProductBatchEdit) Save() revel.Result {
 		return c.RenderJson(core.JsonResult{Success: false, Message: c.GetValidationErrorMessage()})
 	}
 
-	revel.TRACE.Println("EditAttr: ", detail_form.EditAttr)
-	revel.TRACE.Println("EditAttrValues: ", detail_form.EditAttrValues)
+	attr_value_lines := strings.Split(detail_form.EditAttrValues, "\n")
 
-	return c.RenderJson(core.JsonResult{Success: false, Message: "功能未实现！"})
+	type sku_attr_value_type struct {
+		sku        string
+		attr_value string
+	}
+
+	sku_attr_value_list := make([]sku_attr_value_type, 0)
+	for _, attr_value_line := range attr_value_lines {
+		if strings.TrimSpace(attr_value_line) != "" {
+			attr_value_line_splits := strings.Split(attr_value_line, ",")
+			if len(attr_value_line_splits) != 2 {
+				return c.RenderJson(core.JsonResult{Success: false, Message: "请将SKU和修改的元素值用逗号分开！"})
+			}
+			var sku_attr_value sku_attr_value_type
+			sku_attr_value.sku = strings.TrimSpace(attr_value_line_splits[0])
+			sku_attr_value.attr_value = strings.TrimSpace(attr_value_line_splits[1])
+			sku_attr_value_list = append(sku_attr_value_list, sku_attr_value)
+		}
+	}
+
+	// 检查SKU是否存在
+
+	type product_count struct {
+		ProductCount int64 `json:"product_count"`
+	}
+
+	for _, sku_attr_value := range sku_attr_value_list {
+		sku := sku_attr_value.sku
+
+		sql_get_sku_product_count := `
+SELECT count(*) AS product_count FROM erp_product WHERE sku = '%s'
+`
+		sql_get_sku_product_count = fmt.Sprintf(sql_get_sku_product_count, sku)
+
+		var product_count product_count
+		_, err := db_session.Sql(sql_get_sku_product_count).Get(&product_count)
+		core.HandleError(err)
+
+		if product_count.ProductCount == 0 {
+			return c.RenderJson(core.JsonResult{Success: false, Message: fmt.Sprintf("SKU: %s 不存在！", sku)})
+		}
+	}
+
+	if detail_form.EditAttr == EDIT_ATTR_NAME {
+		for _, sku_attr_value := range sku_attr_value_list {
+			sku := sku_attr_value.sku
+			attr_value := sku_attr_value.attr_value
+
+			sql_update_name := `
+UPDATE erp_product SET name = '%s' WHERE sku = '%s';
+`
+			sql_update_name = fmt.Sprintf(sql_update_name, attr_value, sku)
+
+			_, err := db_session.Exec(sql_update_name)
+			core.HandleError(err)
+		}
+	}
+
+	if detail_form.EditAttr == EDIT_ATTR_COST_PRICE {
+		for _, sku_attr_value := range sku_attr_value_list {
+			sku := sku_attr_value.sku
+			attr_value := sku_attr_value.attr_value
+
+			sql_update_cost_price := `
+UPDATE erp_product SET cost_price = %s WHERE sku = '%s';
+`
+			sql_update_cost_price = fmt.Sprintf(sql_update_cost_price, attr_value, sku)
+
+			_, err := db_session.Exec(sql_update_cost_price)
+			core.HandleError(err)
+		}
+	}
+
+	if detail_form.EditAttr == EDIT_ATTR_WEIGHT {
+		for _, sku_attr_value := range sku_attr_value_list {
+			sku := sku_attr_value.sku
+			attr_value := sku_attr_value.attr_value
+
+			sql_update_cost_price := `
+UPDATE erp_product SET weight = %s WHERE sku = '%s';
+`
+			sql_update_cost_price = fmt.Sprintf(sql_update_cost_price, attr_value, sku)
+
+			_, err := db_session.Exec(sql_update_cost_price)
+			core.HandleError(err)
+		}
+	}
+
+	return c.RenderJson(core.JsonResult{Success: true, Message: "批量更新成功！"})
 }
