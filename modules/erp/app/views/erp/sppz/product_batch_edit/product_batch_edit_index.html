@@ -12,9 +12,122 @@
     <div class="page-content">
         <div class="row">
             <div class="col-xs-12" style="padding: 0;">
-                <div class="todo">功能未实现，需求明确，操作交互方式可探讨</div>
+                <div class="gridToolBar clearfix">
+                    <button class="btn btn-primary btn-sm" @click="submitBatchEdit()">
+                        <i class="ace-icon fa fa-arrow-up"></i>
+                        提交批量修改
+                    </button>
+                </div>
+                <div class="row" style="margin-top: 10px;">
+                    <div class="col-xs-12" style="line-height: 28px;">
+                        <fieldset>
+                            <legend style="font-size: 14px;">
+                                产品非通用元素批量修改
+                            </legend>
+
+                            <div class="col-xs-12">
+                                <form class="form-horizontal" role="form" id="batchEditProductForm">
+                                    <div class="row">
+                                        <div class="col-xs-4">
+                                            <div class="form-group">
+                                                <label for="edit_attr" class="col-xs-3 control-label">修改的元素</label>
+                                                <div class="col-xs-9">
+                                                    <select id="edit_attr" name=" detail.edit_attr" class="input-sm form-control" v-model.number="detail.edit_attr">
+                                                        <template v-for="edit_attr in edit_attr_list">
+                                                            <option :value="edit_attr.attr_id">{{edit_attr.attr_name}}
+                                                            </option>
+                                                        </template>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-xs-4">
+                                            <div class="form-group">
+                                                <label for="edit_attr_values" class="col-xs-3 control-label">修改的值</label>
+                                                <div class="col-xs-9">
+                                                    <textarea id="edit_attr_values" name=" detail.edit_attr_values" rows="20" class="input-sm form-control" placeholder="格式：商品编号，修改值，例如:S00001,10"></textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+
+                        </fieldset>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
+<script type="text/javascript">
+    var vm = new Vue({
+        el: "#page",
+        data: {
+            "detail": {},
+            "edit_attr_list": []
+        },
+        mounted: function () {
+            this.getEditAttrList();
+        },
+        methods: {
+            getEditAttrList: function () {
+                showMask("加载中...");
+                $.ajax({
+                        url: '{%url "ErpProductBatchEdit.EditAttrList" %}',
+                        type: "POST",
+                        data: {},
+                        success: function (result) {
+                            hideMask();
+                            if (result.success == false) {
+                                $.msg.error(result.message);
+                                return;
+                            }
+                            vm.edit_attr_list = result;
+                        }
+                    }
+                );
+            },
+            submitBatchEdit: function () {
+                showMask("加载中...");
+                var form = $("#batchEditProductForm");
+                var valid = validate(form, {
+                    'detail.edit_attr': {
+                        required: true, digits: true
+                    },
+                    'detail.edit_attr_values': {
+                        required: true
+                    }
+                });
+
+                if (!valid) {
+                    hideMask();
+                } else {
+                    $.ajax({
+                            url: '{%url "ErpProductBatchEdit.Save" %}',
+                            type: "POST",
+                            processData: false,
+                            contentType: 'application/json',
+                            data: JSON.stringify(vm.detail),
+                            success: function (result) {
+                                hideMask();
+                                if (result.success == false) {
+                                    $.msg.error(result.message);
+                                    return;
+                                }
+                                else {
+                                    $.msg.show(result.message);
+                                    return;
+                                }
+                            }
+                        }
+                    );
+                }
+            }
+        }
+    });
+</script>
 {%footer%}

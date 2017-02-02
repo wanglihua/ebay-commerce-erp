@@ -62,6 +62,7 @@ POST /erp/paypal/account/save                  ErpPaypalAccount.Save
 POST /erp/paypal/account/delete                ErpPaypalAccount.Delete
 
 GET  /erp/product/batch/edit                   ErpProductBatchEdit.Index
+POST /erp/product/batch/edit/attr/list         ErpProductBatchEdit.EditAttrList
 POST /erp/product/batch/edit/save              ErpProductBatchEdit.Save
 
 GET  /erp/product/storage/loc/batch/edit       ErpProductStorageLocBatchEdit.Index
