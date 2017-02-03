@@ -5,6 +5,8 @@ import (
 
 	"matrix/core"
 	"matrix/modules/erp/models"
+	"strings"
+	"fmt"
 )
 
 type ErpLoginLog struct {
@@ -18,10 +20,29 @@ func (c ErpLoginLog) Index() revel.Result {
 func (c ErpLoginLog) ListData() revel.Result {
 	db_session := c.DbSession
 
+	var login_name_query string
+	var begin_time_query core.NullLongTime
+	var end_time_query core.NullLongTime
+
+	c.Params.Bind(&login_name_query, "login_name_query")
+	c.Params.Bind(&begin_time_query, "begin_time_query")
+	c.Params.Bind(&end_time_query, "end_time_query")
+
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 	query := db_session.Where(filter)
 
 	//query extra filter here
+	if strings.TrimSpace(login_name_query) != "" {
+		query = query.Where(fmt.Sprintf("login_name like '%%%s%%'", login_name_query))
+	}
+
+	if begin_time_query.Valid == true {
+		query = query.Where(fmt.Sprintf("create_time >= '%s'", begin_time_query.Time.Format("2006-01-02 15:04:05")))
+	}
+
+	if end_time_query.Valid == true {
+		query = query.Where(fmt.Sprintf("create_time <= '%s'", end_time_query.Time.Format("2006-01-02 15:04:05")))
+	}
 
 	data_query := *query
 	if order != "" {
