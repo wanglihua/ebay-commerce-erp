@@ -37,6 +37,10 @@ var (
 			if err == nil {
 				return reflect.ValueOf(Time(r))
 			}
+			r, err = time.ParseInLocation("2006-01-02", val, time.Local)
+			if err == nil {
+				return reflect.ValueOf(Time(r))
+			}
 			parseError := errors.New(val + "不是有效的时间格式！")
 			if strings.TrimSpace(val) == "" {
 				parseError = errors.New("时间不能为空字符串！")
@@ -53,6 +57,14 @@ var (
 	LongTimeBinder = revel.Binder{
 		Bind: revel.ValueBinder(func(val string, typ reflect.Type) reflect.Value {
 			r, err := time.ParseInLocation("2006-01-02 15:04:05", val, time.Local)
+			if err == nil {
+				return reflect.ValueOf(LongTime(r))
+			}
+			r, err = time.ParseInLocation("2006-01-02 15:04", val, time.Local)
+			if err == nil {
+				return reflect.ValueOf(LongTime(r))
+			}
+			r, err = time.ParseInLocation("2006-01-02", val, time.Local)
 			if err == nil {
 				return reflect.ValueOf(LongTime(r))
 			}
@@ -101,6 +113,10 @@ var (
 			if err == nil {
 				return reflect.ValueOf(NewNullTime(r, true))
 			}
+			r, err = time.ParseInLocation("2006-01-02", val, time.Local)
+			if err == nil {
+				return reflect.ValueOf(NewNullTime(r, true))
+			}
 			parseError := errors.New(val + "不是有效的时间格式！")
 			HandleError(parseError)
 			return reflect.Zero(typ)
@@ -121,6 +137,14 @@ var (
 				return reflect.ValueOf(NewNullLongTime(time.Time{}, false))
 			}
 			r, err := time.ParseInLocation("2006-01-02 15:04:05", val, time.Local)
+			if err == nil {
+				return reflect.ValueOf(NewNullLongTime(r, true))
+			}
+			r, err = time.ParseInLocation("2006-01-02 15:04", val, time.Local)
+			if err == nil {
+				return reflect.ValueOf(NewNullLongTime(r, true))
+			}
+			r, err = time.ParseInLocation("2006-01-02", val, time.Local)
 			if err == nil {
 				return reflect.ValueOf(NewNullLongTime(r, true))
 			}
