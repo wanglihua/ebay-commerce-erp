@@ -78,6 +78,7 @@ func (t EBayOrderDownloadTask) Run() {
 
 	// do something with the orders
 
+
 	switch response.Ack {
 	case "Success":
 		revel.TRACE.Printf("eBay GetOrders Response: " + response.Ack + "\n")
@@ -103,7 +104,7 @@ func (t EBayOrderDownloadTask) fetch_orders(config ebay.Config) ebay.GetOrdersRe
 	<OrderStatus>Active</OrderStatus>
 </GetOrdersRequest>
 `
-	req_body = fmt.Sprintf(req_body, config.Token, "2017-01-01T00:00:00", "2017-02-01T23:59:59")
+	req_body = fmt.Sprintf(req_body, config.Token, "2017-01-01T00:00:00", "2017-02-28T23:59:59")
 
 	req := goreq.Request{
 		Method:      "POST",
@@ -132,6 +133,8 @@ func (t EBayOrderDownloadTask) fetch_orders(config ebay.Config) ebay.GetOrdersRe
 	}
 
 	data, err := ioutil.ReadAll(res.Body)
+
+	revel.TRACE.Println(string(data))
 
 	if err != nil {
 		revel.ERROR.Println("eBay GetOrders ERROR - ioutil.ReadAll : " + err.Error())

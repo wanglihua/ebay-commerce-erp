@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GetOrdersResponse xmlns="urn:ebay:apis:eBLBaseComponents">
+    <Timestamp>2017-02-05T23:20:16.636Z</Timestamp>
+    <Ack>Success</Ack>
+    <Version>989</Version>
+    <Build>E989_INTL_API_18131002_R1</Build>
+    <PaginationResult>
+        <TotalNumberOfPages>1</TotalNumberOfPages>
+        <TotalNumberOfEntries>1</TotalNumberOfEntries>
+    </PaginationResult>
+    <HasMoreOrders>false</HasMoreOrders>
+    <OrderArray>
+        <Order>
+            <OrderID>110189803105-0</OrderID>
+            <OrderStatus>Active</OrderStatus>
+            <AdjustmentAmount currencyID="USD">0.0</AdjustmentAmount>
+            <AmountPaid currencyID="USD">0.0</AmountPaid>
+            <AmountSaved currencyID="USD">0.0</AmountSaved>
+            <CheckoutStatus>
+                <eBayPaymentStatus>NoPaymentFailure</eBayPaymentStatus>
+                <LastModifiedTime>2017-02-05T23:14:46.000Z</LastModifiedTime>
+                <PaymentMethod>None</PaymentMethod>
+                <Status>Incomplete</Status>
+                <IntegratedMerchantCreditCardEnabled>false
+                </IntegratedMerchantCreditCardEnabled>
+            </CheckoutStatus>
+            <ShippingDetails>
+                <SalesTax>
+                    <SalesTaxPercent>0.0</SalesTaxPercent>
+                    <SalesTaxState></SalesTaxState>
+                    <ShippingIncludedInTax>false</ShippingIncludedInTax>
+                    <SalesTaxAmount currencyID="USD">0.0</SalesTaxAmount>
+                </SalesTax>
+                <ShippingServiceOptions>
+                    <ShippingService>ExpeditedShippingFromOutsideUS</ShippingService>
+                    <ShippingServiceCost currencyID="USD">0.0</ShippingServiceCost>
+                    <ShippingServicePriority>1</ShippingServicePriority>
+                    <ExpeditedService>false</ExpeditedService>
+                    <ShippingTimeMin>1</ShippingTimeMin>
+                    <ShippingTimeMax>4</ShippingTimeMax>
+                </ShippingServiceOptions>
+                <SellingManagerSalesRecordNumber>100</SellingManagerSalesRecordNumber>
+                <GetItFast>false</GetItFast>
+            </ShippingDetails>
+            <CreatedTime>2017-02-05T23:14:46.000Z</CreatedTime>
+            <PaymentMethods>PayPal</PaymentMethods>
+            <SellerEmail>***REMOVED***</SellerEmail>
+            <ShippingAddress>
+                <Name></Name>
+                <Street1></Street1>
+                <Street2></Street2>
+                <CityName></CityName>
+                <StateOrProvince></StateOrProvince>
+                <CountryName></CountryName>
+                <Phone></Phone>
+                <PostalCode></PostalCode>
+                <ExternalAddressID></ExternalAddressID>
+            </ShippingAddress>
+            <ShippingServiceSelected>
+                <ShippingService>ExpeditedShippingFromOutsideUS</ShippingService>
+                <ShippingServiceCost currencyID="USD">0.0</ShippingServiceCost>
+            </ShippingServiceSelected>
+            <Subtotal currencyID="USD">1.0</Subtotal>
+            <Total currencyID="USD">1.0</Total>
+            <TransactionArray>
+                <Transaction>
+                    <Buyer>
+                        <Email>***REMOVED***</Email>
+                        <UserFirstName>lihua</UserFirstName>
+                        <UserLastName>wang</UserLastName>
+                    </Buyer>
+                    <ShippingDetails>
+                        <SellingManagerSalesRecordNumber>100
+                        </SellingManagerSalesRecordNumber>
+                    </ShippingDetails>
+                    <CreatedDate>2017-02-05T23:14:46.000Z</CreatedDate>
+                    <Item>
+                        <ItemID>110189803105</ItemID>
+                        <Site>US</Site>
+                        <Title>huadu erp</Title>
+                        <ConditionID>1000</ConditionID>
+                        <ConditionDisplayName>Brand New</ConditionDisplayName>
+                    </Item>
+                    <QuantityPurchased>1</QuantityPurchased>
+                    <Status>
+                        <PaymentHoldStatus>None</PaymentHoldStatus>
+                        <InquiryStatus>NotApplicable</InquiryStatus>
+                        <ReturnStatus>NotApplicable</ReturnStatus>
+                    </Status>
+                    <TransactionID>0</TransactionID>
+                    <TransactionPrice currencyID="USD">1.0</TransactionPrice>
+                    <TransactionSiteID>US</TransactionSiteID>
+                    <Platform>eBay</Platform>
+                    <Taxes>
+                        <TotalTaxAmount currencyID="USD">0.0</TotalTaxAmount>
+                        <TaxDetails>
+                            <Imposition>SalesTax</Imposition>
+                            <TaxDescription>SalesTax</TaxDescription>
+                            <TaxAmount currencyID="USD">0.0</TaxAmount>
+                            <TaxOnSubtotalAmount currencyID="USD">0.0</TaxOnSubtotalAmount>
+                            <TaxOnShippingAmount currencyID="USD">0.0</TaxOnShippingAmount>
+                            <TaxOnHandlingAmount currencyID="USD">0.0</TaxOnHandlingAmount>
+                        </TaxDetails>
+                        <TaxDetails>
+                            <Imposition>WasteRecyclingFee</Imposition>
+                            <TaxDescription>ElectronicWasteRecyclingFee
+                            </TaxDescription>
+                            <TaxAmount currencyID="USD">0.0</TaxAmount>
+                        </TaxDetails>
+                    </Taxes>
+                    <OrderLineItemID>110189803105-0</OrderLineItemID>
+                    <eBayPlusTransaction>false</eBayPlusTransaction>
+                    <GuaranteedShipping>false</GuaranteedShipping>
+                </Transaction>
+            </TransactionArray>
+            <BuyerUserID>testuser_alphahuadu</BuyerUserID>
+            <IntegratedMerchantCreditCardEnabled>false</IntegratedMerchantCreditCardEnabled>
+            <EIASToken>nY+sHZ2PrBmdj6wVnY+sEZ2PrA2dj6wFk4GiD5eEqAudj6x9nY+seQ==</EIASToken>
+            <PaymentHoldStatus>None
+            </PaymentHoldStatus>
+            <IsMultiLegShipping>false</IsMultiLegShipping>
+            <SellerUserID>testuser_wanglihua</SellerUserID>
+            <SellerEIASToken>nY+sHZ2PrBmdj6wVnY+sEZ2PrA2dj6wFk4GiD5aDpAydj6x9nY+seQ==</SellerEIASToken>
+            <CancelStatus>NotApplicable</CancelStatus>
+            <ContainseBayPlusTransaction>false</ContainseBayPlusTransaction>
+        </Order>
+    </OrderArray>
+    <OrdersPerPage>100</OrdersPerPage>
+    <PageNumber>1</PageNumber>
+    <ReturnedOrderCountActual>1</ReturnedOrderCountActual>
+</GetOrdersResponse>

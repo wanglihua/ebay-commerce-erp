@@ -36,7 +36,7 @@ request body:
 	</RequesterCredentials>
 	<ErrorLanguage>zh_CN</ErrorLanguage>
 	<WarningLevel>High</WarningLevel>
-	<MailMessageType>AskSellerQuestion</MailMessageType>
+	<MailMessageType>All</MailMessageType>
 	<MessageStatus>Unanswered</MessageStatus>
 	<StartCreationTime>2017-01-01T00:00:00</StartCreationTime>
 	<EndCreationTime>2017-01-31T23:59:59</EndCreationTime>
@@ -89,8 +89,8 @@ func (t EBayMessageDownloadTask) fetch_messages(config ebay.Config) ebay.GetMemb
 	</RequesterCredentials>
 	<ErrorLanguage>zh_CN</ErrorLanguage>
 	<WarningLevel>High</WarningLevel>
-	<MailMessageType>AskSellerQuestion</MailMessageType>
-	<MessageStatus>Unanswered</MessageStatus>
+	<MailMessageType>All</MailMessageType>
+	<MessageStatus>Answered</MessageStatus>
 	<StartCreationTime>%s</StartCreationTime>
 	<EndCreationTime>%s</EndCreationTime>
 	<Pagination>

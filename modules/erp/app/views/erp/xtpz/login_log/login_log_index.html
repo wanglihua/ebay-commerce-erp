@@ -72,6 +72,7 @@
     }
 
     $(function () {
+        /*
         $('#begin_time_query').datetimepicker({
             locale: "zh-cn"
         }).on("dp.change", function (e) {
@@ -82,6 +83,14 @@
             locale: "zh-cn"
         }).on("dp.change", function (e) {
             reloadLoginLogList();
+        });
+        */
+        $('#begin_time_query').datetimepicker({
+            locale: "zh-cn"
+        });
+
+        $('#end_time_query').datetimepicker({
+            locale: "zh-cn"
         });
     });
 
