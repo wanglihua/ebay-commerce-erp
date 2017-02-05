@@ -35,7 +35,7 @@
                                 <div class="form-group">
                                     <label class="col-xs-3 control-label no-padding-right" for="begin_time_query">开始时间</label>
                                     <div class="col-xs-8">
-                                        <input class="input-sm form-control" id="begin_time_query" onkeydown="queryOnKeyDown(event);" onchange="reloadLoginLogList();" name="begin_time_query" placeholder="时间格式2018-08-08 08:08:08" type="text" />
+                                        <input class="input-sm form-control" id="begin_time_query" onkeydown="queryOnKeyDown(event);" onchange="reloadLoginLogList();" name="begin_time_query" placeholder="时间格式2018-08-08 08:08:08" type="text"/>
                                     </div>
                                 </div>
                             </div>
@@ -43,7 +43,7 @@
                                 <div class="form-group">
                                     <label class="col-xs-3 control-label no-padding-right" for="end_time_query">结束时间</label>
                                     <div class="col-xs-8">
-                                        <input class="input-sm form-control" id="end_time_query" onkeydown="queryOnKeyDown(event);" onchange="reloadLoginLogList();" name="end_time_query" placeholder="时间格式2018-08-28 08:28:28" type="text" />
+                                        <input class="input-sm form-control" id="end_time_query" onkeydown="queryOnKeyDown(event);" onchange="reloadLoginLogList();" name="end_time_query" placeholder="时间格式2018-08-28 08:28:28" type="text"/>
                                     </div>
                                 </div>
                             </div>
@@ -70,6 +70,20 @@
     function reloadLoginLogList() {
         reloadList('#loginLogList');
     }
+
+    $(function () {
+        $('#begin_time_query').datetimepicker({
+            locale: "zh-cn"
+        }).on("dp.change", function (e) {
+            reloadLoginLogList();
+        });
+
+        $('#end_time_query').datetimepicker({
+            locale: "zh-cn"
+        }).on("dp.change", function (e) {
+            reloadLoginLogList();
+        });
+    });
 
     var vm = new Vue({
         el: "#page",
@@ -112,7 +126,6 @@
                         });
                     }
                 }
-
             );
         },
         methods: {
