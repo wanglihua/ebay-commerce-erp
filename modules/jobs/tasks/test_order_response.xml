@@ -116,8 +116,7 @@
             <BuyerUserID>testuser_alphahuadu</BuyerUserID>
             <IntegratedMerchantCreditCardEnabled>false</IntegratedMerchantCreditCardEnabled>
             <EIASToken>nY+sHZ2PrBmdj6wVnY+sEZ2PrA2dj6wFk4GiD5eEqAudj6x9nY+seQ==</EIASToken>
-            <PaymentHoldStatus>None
-            </PaymentHoldStatus>
+            <PaymentHoldStatus>None</PaymentHoldStatus>
             <IsMultiLegShipping>false</IsMultiLegShipping>
             <SellerUserID>testuser_wanglihua</SellerUserID>
             <SellerEIASToken>nY+sHZ2PrBmdj6wVnY+sEZ2PrA2dj6wFk4GiD5aDpAydj6x9nY+seQ==</SellerEIASToken>
