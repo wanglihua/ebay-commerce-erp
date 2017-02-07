@@ -10,6 +10,7 @@ GET  /static/*filepath          Static.Serve("static")
 
 GET  /                          Home.Index
 GET  /loading                   Home.Loading
+GET  /hotload                   Home.Hotload
 GET  /syncdb                    Home.SyncDb
 POST /syncdb/post               Home.SyncDbPost
 

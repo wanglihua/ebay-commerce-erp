@@ -21,6 +21,10 @@ func (c Home) Loading() revel.Result {
 	return c.RenderTemplate("home/home_loading.html")
 }
 
+func (c Home)Hotload() revel.Result {
+	return c.RenderTemplate("home/home_hotload.html")
+}
+
 func (c Home) SyncDb() revel.Result {
 	return c.RenderTemplate("home/home_syncdb.html")
 }

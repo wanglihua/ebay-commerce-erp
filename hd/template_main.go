@@ -18,6 +18,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"net/http"
 )
 
 var (
@@ -170,6 +171,10 @@ func run_web() {
 			fmt.Println("请打开浏览器访问 http://localhost:" + strconv.Itoa(revel.HttpPort))
 		}
 	}
+
+	go func() {
+		http.Get("http://localhost:" + strconv.Itoa(revel.HttpPort) + "/hotload")
+	}()
 
 	revel.Run(port)
 }

@@ -85,6 +85,10 @@ func userAuth(c *revel.Controller) revel.Result {
 		return nil
 	}
 
+	if c.Action == "Home.Hotload" {
+		return nil
+	}
+
 	if c.Action == "Home.SyncDb" || c.Action == "Home.SyncDbPost" {
 		return nil
 	}
