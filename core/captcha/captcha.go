@@ -236,8 +236,8 @@ func IsCorrect(captcha string, web_session revel.Session) bool {
 	var session_val string
 	cache.Get(web_session.Id()+cache_key, &session_val)
 
-	revel.TRACE.Println("session_val: " + session_val)
-	revel.TRACE.Println("captcha: " + captcha)
+	//revel.TRACE.Println("session_val: " + session_val)
+	//revel.TRACE.Println("captcha: " + captcha)
 
 	if session_val == captcha {
 		return true
