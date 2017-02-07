@@ -120,12 +120,14 @@ func run_web() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	lic_file_path := currentDir + string(os.PathSeparator) + "app.lic"
+
+	lic_file_path := ""
 
 	if runMode == "prod" {
-		importPath = "{{.ImportPath}}"
 		srcPath = currentDir
-		lic_file_path = currentDir + string(os.PathSeparator) + "{{.ImportPath}}" + string(os.PathSeparator) + "app.lic"
+		lic_file_path = currentDir + string(os.PathSeparator) + importPath + string(os.PathSeparator) + "app.lic"
+	} else {
+		lic_file_path = os.Getenv("GOPATH") + string(os.PathSeparator) + "src" + string(os.PathSeparator) + importPath + string(os.PathSeparator) + "app.lic"
 	}
 
 	lic.ValidAppLic(app.AppName, lic_file_path)
