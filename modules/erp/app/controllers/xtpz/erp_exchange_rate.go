@@ -8,6 +8,7 @@ import (
 	"matrix/core"
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/status_service"
+	"fmt"
 )
 
 type ErpExchangeRate struct {
@@ -20,6 +21,7 @@ func (c ErpExchangeRate) Index() revel.Result {
 
 type ErpExchangeRateViewItem struct {
 	models.ExchangeRateInfo `xorm:"extends" json:"r"`
+	models.CurrencyInfo     `xorm:"extends" json:"c"`
 	models.StatusInfo       `xorm:"extends" json:"s"`
 }
 
@@ -29,43 +31,50 @@ func (c ErpExchangeRate) ListData() revel.Result {
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
 	/*
-		SELECT r.*, s.*
-		FROM erp_exchange_rate r
-		    INNER JOIN erp_status s ON r.status_id = s.id
+SELECT r.*, c.*, s.*
+FROM erp_exchange_rate r
+    INNER JOIN erp_currency c ON r.currency_id = c.id
+    INNER JOIN erp_status s ON r.status_id = s.id
 	*/
 
-	query := db_session.
-		Select("r.*, s.*").
-		Table("erp_exchange_rate").Alias("r").
-		Join("INNER", []string{"erp_status", "s"}, "r.status_id = s.id").
-		Where(filter)
+	sql_builder := core.NewSqlBuilder()
 
-	//query extra filter here
+	sql_builder.Select("r.*, c.*, s.*")
+	sql_builder.Count("count(r.id) as rate_count")
+	sql_builder.From(`erp_exchange_rate r
+    INNER JOIN erp_currency c ON r.currency_id = c.id
+    INNER JOIN erp_status s ON r.status_id = s.id`)
+	sql_builder.Where(filter)
 
-	data_query := *query
 	if order != "" {
-		data_query = *data_query.OrderBy(order)
+		sql_builder.OrderBy(order)
 	} else {
-		data_query = *data_query.Asc("r.id")
+		sql_builder.OrderBy("r.id ASC")
 	}
 
-	exchange_rate_list := make([]ErpExchangeRateViewItem, 0, limit)
-	err := data_query.Limit(limit, offset).Find(&exchange_rate_list)
+	sql_builder.Limit(offset, limit)
+
+	exchange_rate_list := make([]ErpExchangeRateViewItem, 0)
+	err := db_session.Sql(sql_builder.SqlList()).Find(&exchange_rate_list)
 	core.HandleError(err)
 
-	count_query := *query
-	count, err := count_query.Count(new(ErpExchangeRateViewItem))
+	var rate_count struct {
+		Count int64 `xorm:"'rate_count'"`
+	}
+
+	_, err = db_session.Sql(sql_builder.SqlCount()).Get(&rate_count)
 	core.HandleError(err)
 
 	return c.RenderJson(core.GridResult{
 		Data:  exchange_rate_list,
-		Total: count,
+		Total: rate_count.Count,
 	})
 }
 
 type ExchangeRateDetailForm struct {
 	ExchangeRate models.ExchangeRateInfo `json:"exchange_rate"`
 	StatusList   []models.StatusInfo     `json:"status_list"`
+	CurrencyList []models.CurrencyInfo   `json:"currency_list"`
 }
 
 func (f *ExchangeRateDetailForm) IsCreate() bool {
@@ -73,24 +82,8 @@ func (f *ExchangeRateDetailForm) IsCreate() bool {
 }
 
 func (f *ExchangeRateDetailForm) Valid(validation *revel.Validation) bool {
-	validation.Required(f.ExchangeRate.Code).Message("符号不能为空！")
-	if f.ExchangeRate.Code != "" {
-		validation.MinSize(f.ExchangeRate.Code, 1).Message("符号长度不能小于1！")
-	}
-	if f.ExchangeRate.Code != "" {
-		validation.MaxSize(f.ExchangeRate.Code, 10).Message("符号长度不能大于10！")
-	}
-
-	validation.Required(f.ExchangeRate.Name).Message("名称不能为空！")
-	if f.ExchangeRate.Name != "" {
-		validation.MinSize(f.ExchangeRate.Name, 1).Message("名称长度不能小于1！")
-	}
-	if f.ExchangeRate.Name != "" {
-		validation.MaxSize(f.ExchangeRate.Name, 20).Message("名称长度不能大于20！")
-	}
-
+	validation.Required(f.ExchangeRate.CurrencyId).Message("货币不能为空！")
 	validation.Required(f.ExchangeRate.Rate).Message("汇率不能为空！")
-
 	validation.Required(f.ExchangeRate.StatusId).Message("状态不能为空！")
 
 	return validation.HasErrors() == false
@@ -113,8 +106,13 @@ func (c ErpExchangeRate) DetailData() revel.Result {
 
 	status_list := status_service.GetStatusList(db_session, models.STATUS_TYPE_EXCHANGE_RATE)
 
+	currency_list := make([]models.CurrencyInfo, 0)
+	err := db_session.Sql(fmt.Sprintf("SELECT * FROM erp_currency WHERE id <> %d", models.CURRENCY_RMB)).Find(&currency_list)
+	core.HandleError(err)
+
 	var detail_form ExchangeRateDetailForm
 	detail_form.ExchangeRate = exchange_rate
+	detail_form.CurrencyList = currency_list
 	detail_form.StatusList = status_list
 
 	return c.RenderJson(detail_form)
@@ -135,9 +133,21 @@ func (c ErpExchangeRate) Save() revel.Result {
 
 	var affected int64
 	if detail_form.IsCreate() {
+		currency_rate_count, err := db_session.Where("currency_id = ?", exchange_rate.CurrencyId).Count(&exchange_rate)
+		core.HandleError(err)
+		if currency_rate_count != 0 {
+			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，货币汇率已存在！" })
+		}
+
 		affected, err = db_session.Insert(&exchange_rate)
 		core.HandleError(err)
 	} else {
+		currency_rate_count, err := db_session.Where("id <> ? and currency_id = ?", exchange_rate.Id, exchange_rate.CurrencyId).Count(&exchange_rate)
+		core.HandleError(err)
+		if currency_rate_count != 0 {
+			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，货币汇率已存在！" })
+		}
+
 		affected, err = db_session.Id(exchange_rate.Id).Update(&exchange_rate)
 		core.HandleError(err)
 
