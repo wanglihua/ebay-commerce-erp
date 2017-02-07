@@ -21,7 +21,7 @@ func (c Home) Loading() revel.Result {
 	return c.RenderTemplate("home/home_loading.html")
 }
 
-func (c Home)Hotload() revel.Result {
+func (c Home) Hotload() revel.Result {
 	return c.RenderTemplate("home/home_hotload.html")
 }
 
@@ -78,6 +78,9 @@ func (c Home) SyncDbPost() revel.Result {
 	model_list = append(model_list, &erp_models.LogisticsNumberLogInfo{})
 	model_list = append(model_list, &erp_models.ProductBindInfo{})
 	model_list = append(model_list, &erp_models.ProductImportInfo{})
+	model_list = append(model_list, &erp_models.OrderTypeInfo{})
+	model_list = append(model_list, &erp_models.OrderInfo{})
+	model_list = append(model_list, &erp_models.OrderItemInfo{})
 
 	err := db.Engine.Sync2(model_list...)
 	core.HandleError(err)

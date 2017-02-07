@@ -70,8 +70,7 @@
                         <UserLastName>wang</UserLastName>
                     </Buyer>
                     <ShippingDetails>
-                        <SellingManagerSalesRecordNumber>100
-                        </SellingManagerSalesRecordNumber>
+                        <SellingManagerSalesRecordNumber>100</SellingManagerSalesRecordNumber>
                     </ShippingDetails>
                     <CreatedDate>2017-02-05T23:14:46.000Z</CreatedDate>
                     <Item>
@@ -103,8 +102,7 @@
                         </TaxDetails>
                         <TaxDetails>
                             <Imposition>WasteRecyclingFee</Imposition>
-                            <TaxDescription>ElectronicWasteRecyclingFee
-                            </TaxDescription>
+                            <TaxDescription>ElectronicWasteRecyclingFee</TaxDescription>
                             <TaxAmount currencyID="USD">0.0</TaxAmount>
                         </TaxDetails>
                     </Taxes>

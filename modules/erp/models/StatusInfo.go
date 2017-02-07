@@ -24,6 +24,7 @@ const (
 	STATUS_TYPE_STOCK_BILL_CHECKIN     = 1400 // 入库单状态
 	STATUS_TYPE_STOCK_BILL_CHECKOUT    = 1500 // 出库单状态
 	STATUS_TYPE_STOCK_BILL_TRANSFER    = 1600 // 调拨单状态
+	STATUS_TYPE_ORDER                  = 1700 // 订单状态
 
 	//状态类型 end
 
@@ -98,6 +99,13 @@ const (
 	// 调拨单状态  暂存 提交
 	STOCK_BILL_TRANSFER_SAVE   = 3700
 	STOCK_BILL_TRANSFER_SUBMIT = 3800
+
+	// 订单状态 已支付 待配货 配货中 已发货 已完成
+	ORDER_YZF = 3900
+	ORDER_DPH = 4000
+	ORDER_PHZ = 4100
+	ORDER_YFH = 4200
+	ORDER_YWC = 4300
 
 	//状态 id end
 )
@@ -430,6 +438,44 @@ func (e StatusInfo) InitData(db_session *xorm.Session) {
 		status.Type = STATUS_TYPE_STOCK_BILL_TRANSFER
 		status.Name = "已提交调拨"
 		status.Desc = core.NewNullString("调拨单状态 已提交调拨", true)
+		db_session.Insert(status)
+	}
+
+	// 订单状态 已支付 待配货 配货中 已发货 已完成
+	{
+		status := new(StatusInfo)
+		status.Id = ORDER_YZF
+		status.Type = STATUS_TYPE_ORDER
+		status.Name = "已支付"
+		status.Desc = core.NewNullString("订单状态 已支付", true)
+		db_session.Insert(status)
+
+		status = new(StatusInfo)
+		status.Id = ORDER_DPH
+		status.Type = STATUS_TYPE_ORDER
+		status.Name = "待配货"
+		status.Desc = core.NewNullString("订单状态 待配货", true)
+		db_session.Insert(status)
+
+		status = new(StatusInfo)
+		status.Id = ORDER_PHZ
+		status.Type = STATUS_TYPE_ORDER
+		status.Name = "配货中"
+		status.Desc = core.NewNullString("订单状态 配货中", true)
+		db_session.Insert(status)
+
+		status = new(StatusInfo)
+		status.Id = ORDER_YFH
+		status.Type = STATUS_TYPE_ORDER
+		status.Name = "已发货"
+		status.Desc = core.NewNullString("订单状态 已发货", true)
+		db_session.Insert(status)
+
+		status = new(StatusInfo)
+		status.Id = ORDER_YWC
+		status.Type = STATUS_TYPE_ORDER
+		status.Name = "已完成"
+		status.Desc = core.NewNullString("订单状态 已完成", true)
 		db_session.Insert(status)
 	}
 }
