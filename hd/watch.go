@@ -57,9 +57,11 @@ func NewWatcher(paths []string, files []string) {
 					continue
 				}
 
+				/*
 				if checkSkipFiles(e.Name) {
 					continue
 				}
+				*/
 
 				mt := getFileModTime(e.Name)
 				if t := eventTime[e.Name]; mt == t {
@@ -169,7 +171,7 @@ func Autobuild(files []string) {
 	os.Chdir(path)
 
 	// 编译之前重新生成 main.go routes.go
-	generateRouteForImportPath(appname)
+	//generateRouteForImportPath(appname)
 
 	cmdName := "go"
 
