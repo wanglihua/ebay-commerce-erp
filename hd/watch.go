@@ -52,7 +52,12 @@ func NewWatcher(paths []string, files []string) {
 				if checkTMPFile(e.Name) {
 					continue
 				}
+
 				if !checkIfWatchExt(e.Name) {
+					continue
+				}
+
+				if checkSkipFiles(e.Name) {
 					continue
 				}
 
@@ -67,10 +72,8 @@ func NewWatcher(paths []string, files []string) {
 				if isbuild {
 					ColorLog("[EVEN] %s\n", e)
 					go func() {
-						// Wait 1s before autobuild util there is no file change.
-						//是不是要去掉这个延迟
-						/*
-						   scheduleTime = time.Now().Add(1 * time.Second)
+						// Wait before autobuild util there is no file change.
+						   scheduleTime = time.Now().Add(300 * time.Millisecond)
 
 						   for {
 						       time.Sleep(scheduleTime.Sub(time.Now()))
@@ -79,7 +82,6 @@ func NewWatcher(paths []string, files []string) {
 						       }
 						       return
 						   }
-						*/
 
 						Autobuild(files)
 					}()
@@ -165,6 +167,9 @@ func Autobuild(files []string) {
 
 	path, _ := os.Getwd()
 	os.Chdir(path)
+
+	// 编译之前重新生成 main.go routes.go
+	generateRouteForImportPath(appname)
 
 	cmdName := "go"
 
@@ -266,5 +271,18 @@ func checkIfWatchExt(name string) bool {
 			return true
 		}
 	}
+	return false
+}
+
+
+func checkSkipFiles(name string ) bool {
+	if strings.Contains(strings.ToLower(name), "main.go") {
+		return true
+	}
+
+	if strings.Contains(strings.ToLower(name), "routes.go") {
+		return true
+	}
+
 	return false
 }

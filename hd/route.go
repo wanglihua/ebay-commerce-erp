@@ -49,6 +49,12 @@ func generateRoute(cmd *Command, args []string) int {
 	cur_path_list := strings.Split(currentDir, string(os.PathSeparator))
 	import_path := cur_path_list[len(cur_path_list)-1]
 
+	generateRouteForImportPath(import_path)
+
+	return 0
+}
+
+func generateRouteForImportPath(import_path string) {
 	if !revel.Initialized {
 		revel.Init("dev", import_path, "")
 	}
@@ -121,8 +127,6 @@ func generateRoute(cmd *Command, args []string) int {
 	}
 
 	fmt.Println("Generate main.go routes.go success!")
-
-	return 0
 }
 
 func cleanDir(dir string) {
