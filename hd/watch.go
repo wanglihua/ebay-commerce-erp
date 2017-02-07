@@ -75,15 +75,15 @@ func NewWatcher(paths []string, files []string) {
 					ColorLog("[EVEN] %s\n", e)
 					go func() {
 						// Wait before autobuild util there is no file change.
-						   scheduleTime = time.Now().Add(300 * time.Millisecond)
+						scheduleTime = time.Now().Add(300 * time.Millisecond)
 
-						   for {
-						       time.Sleep(scheduleTime.Sub(time.Now()))
-						       if time.Now().After(scheduleTime) {
-						           break
-						       }
-						       return
-						   }
+						for {
+							time.Sleep(scheduleTime.Sub(time.Now()))
+							if time.Now().After(scheduleTime) {
+								break
+							}
+							return
+						}
 
 						Autobuild(files)
 					}()
@@ -276,8 +276,7 @@ func checkIfWatchExt(name string) bool {
 	return false
 }
 
-
-func checkSkipFiles(name string ) bool {
+func checkSkipFiles(name string) bool {
 	if strings.Contains(strings.ToLower(name), "main.go") {
 		return true
 	}
