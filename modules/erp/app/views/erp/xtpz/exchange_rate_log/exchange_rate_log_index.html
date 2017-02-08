@@ -99,7 +99,7 @@
                 '#exchangeRateLogList',
                 {
                     "sAjaxSource": '{%url "ErpExchangeRateLog.ListData"%}',
-                    "aaSorting": [[1, "asc"]],
+                    "aaSorting": [[4, "desc"]],
                     "aoColumns": [
                         {
                             "mDataProp": "id",
@@ -112,11 +112,10 @@
                                 return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
                             }
                         },
-                        {"mDataProp": "name", "title": "名称", "bSearchable": true},
+                        {"mDataProp": "name", "title": "名称", "bSearchable": true, "width": 180},
                         {"mDataProp": "desc", "title": "操作", "bSearchable": true},
-                        {"mDataProp": "login_name", "title": "工号", "bSearchable": true},
-                        {"mDataProp": "create_time", "title": "创建时间", "bSearchable": false, "width": 120},
-                        {"mDataProp": "update_time", "title": "修改时间", "bSearchable": false, "width": 120}
+                        {"mDataProp": "login_name", "title": "工号", "bSearchable": true, "width": 120},
+                        {"mDataProp": "create_time", "title": "操作时间", "bSearchable": false, "width": 120}
                     ]
                 }
             );

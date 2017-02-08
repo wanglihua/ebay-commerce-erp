@@ -9,6 +9,7 @@ import (
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/status_service"
 	"fmt"
+	"github.com/go-xorm/xorm"
 )
 
 type ErpExchangeRate struct {
@@ -141,6 +142,19 @@ func (c ErpExchangeRate) Save() revel.Result {
 
 		affected, err = db_session.Insert(&exchange_rate)
 		core.HandleError(err)
+
+		var currency models.CurrencyInfo
+		_, err = db_session.Id(exchange_rate.CurrencyId).Get(&currency)
+		core.HandleError(err)
+
+		var exchange_rate_log models.ExchangeRateLogInfo
+		exchange_rate_log.Name = fmt.Sprintf("%s(%s)", currency.Name, currency.Code)
+		exchange_rate_log.Desc = "新增数据"
+		exchange_rate_log.LoginName = core.GetLoginUser(c.Session).LoginName
+
+		_, err = db_session.Insert(&exchange_rate_log)
+		core.HandleError(err)
+
 	} else {
 		currency_rate_count, err := db_session.Where("id <> ? and currency_id = ?", exchange_rate.Id, exchange_rate.CurrencyId).Count(&exchange_rate)
 		core.HandleError(err)
@@ -154,6 +168,18 @@ func (c ErpExchangeRate) Save() revel.Result {
 		if affected == 0 {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！"})
 		}
+
+		var currency models.CurrencyInfo
+		_, err = db_session.Id(exchange_rate.CurrencyId).Get(&currency)
+		core.HandleError(err)
+
+		var exchange_rate_log models.ExchangeRateLogInfo
+		exchange_rate_log.Name = fmt.Sprintf("%s(%s)", currency.Name, currency.Code)
+		exchange_rate_log.Desc = "编辑数据"
+		exchange_rate_log.LoginName = core.GetLoginUser(c.Session).LoginName
+
+		_, err = db_session.Insert(&exchange_rate_log)
+		core.HandleError(err)
 	}
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据保存成功!"})
@@ -165,8 +191,41 @@ func (c ErpExchangeRate) Delete() revel.Result {
 	exchange_rate_id_list := make([]int64, 0)
 	c.Params.Bind(&exchange_rate_id_list, "id_list")
 
+	for _, exchange_rate_id := range exchange_rate_id_list {
+		var exchange_rate models.ExchangeRateInfo
+		has, err := db_session.Id(exchange_rate_id).Get(&exchange_rate)
+		core.HandleError(err)
+
+		if has {
+			var exchange_rate_log models.ExchangeRateLogInfo
+			currency := c.get_exchange_rate_currency(exchange_rate_id, db_session)
+			exchange_rate_log.Name = fmt.Sprintf("%s(%s)", currency.Name, currency.Code)
+			exchange_rate_log.Desc = "删除数据"
+			exchange_rate_log.LoginName = core.GetLoginUser(c.Session).LoginName
+
+			_, err := db_session.Insert(&exchange_rate_log)
+			core.HandleError(err)
+		}
+	}
+
 	affected, err := db_session.In("id", exchange_rate_id_list).Delete(new(models.ExchangeRateInfo))
 	core.HandleError(err)
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})
+}
+
+func (c ErpExchangeRate) get_exchange_rate_currency(exchange_rate_id int64, db_session *xorm.Session) models.CurrencyInfo {
+	sql := `
+SELECT c.*
+FROM erp_exchange_rate r
+    INNER JOIN erp_currency c ON r.currency_id = c.id
+WHERE r.id = %d
+`
+	sql = fmt.Sprintf(sql, exchange_rate_id)
+
+	var currency models.CurrencyInfo
+	_, err := db_session.Sql(sql).Get(&currency)
+	core.HandleError(err)
+
+	return currency
 }

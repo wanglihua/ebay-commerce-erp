@@ -15,18 +15,13 @@ type LoginUser struct {
 	IsAdmin   bool
 }
 
-func GetLoginUser(session revel.Session) *LoginUser {
-	var loginUser = new(LoginUser)
-	err := cache.Get(session.Id()+LOGIN_USER_CACHE_KEY, loginUser)
+func GetLoginUser(session revel.Session) LoginUser {
+	var loginUser LoginUser
+	err := cache.Get(session.Id()+LOGIN_USER_CACHE_KEY, &loginUser)
 	if err != nil {
 		revel.WARN.Println(err.Error())
 	}
-
-	if err != nil || loginUser.UserId == 0 {
-		return nil
-	} else {
-		return loginUser
-	}
+	return loginUser
 }
 
 func PutLoginUserToSession(session revel.Session, user LoginUser) {

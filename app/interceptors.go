@@ -108,8 +108,8 @@ func userAuth(c *revel.Controller) revel.Result {
 	loginuser := core.GetLoginUser(c.Session)
 	//revel.TRACE.Println("userAuth session id: " + c.Session.Id())
 
-	if loginuser == nil {
-		revel.TRACE.Println("loginuser == nil")
+	if loginuser.UserId == 0 {
+		revel.TRACE.Println("loginuser.UserId == 0")
 
 		if core.IsAjaxRequest(c.Request) {
 			//c.Result = c.RenderJson(JsonResult{Success: false, Message: "操作失败，未登陆或没相应权限！"})

@@ -17,7 +17,7 @@ func GetHeader(title string, db_session *xorm.Session, web_session revel.Session
 	login_user := core.GetLoginUser(web_session)
 	login_user_login_name := ""
 	login_user_nick_name := ""
-	if login_user != nil {
+	if login_user.UserId == 0 {
 		login_user_login_name = login_user.LoginName
 		login_user_nick_name = login_user.NickName
 	}

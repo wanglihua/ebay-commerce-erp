@@ -173,6 +173,12 @@
                                 return;
                             }
                             vm.detail = result;
+                            if (result.exchange_rate.currency_id == 0) {
+                                $("#currency_id").removeAttr("disabled")
+                            }
+                            else {
+                                $("#currency_id").attr("disabled", "disabled");
+                            }
                             $('#exchangeRateDetailDialog').modal(modalOptions);
                         }
                     }
@@ -220,7 +226,7 @@
                 }
             },
             showExchangeRateLog: function () {
-                window.open('/erp/exchange/rate/log', "exchange_rate_log");
+                window.open('/erp/exchange/rate/log', "_blank");
             },
             deleteExchangeRate: function () {
                 var id_list = [];
