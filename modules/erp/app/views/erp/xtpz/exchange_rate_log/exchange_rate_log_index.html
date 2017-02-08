@@ -1,0 +1,137 @@
+{%header "货币汇率操作日志" .%}
+<div id="page">
+    <div class="breadcrumbs" id="breadcrumbs">
+        <ul class="breadcrumb">
+            <li>
+                <a href='{%url "Home.Index"%}'><i class="ace-icon fa fa-home home-icon"></i></a>
+            </li>
+            <li class="parent" data-menu="xtpz-menu">系统配置</li>
+            <li class="active" data-menu="xtpz-exchangerate-menu">货币汇率操作日志</li>
+        </ul>
+    </div>
+    <div class="page-content">
+        <div class="row">
+            <div class="col-xs-12" style="padding: 0;">
+                <div class="gridToolBar clearfix">
+                    <button class="btn btn-primary btn-sm" @click="reloadList('#exchangeRateLogList')">
+                        <i class="ace-icon fa fa-refresh"></i>
+                        刷新
+                    </button>
+                </div>
+                <div>
+                    <table id="exchangeRateLogList" class="table table-striped table-bordered table-hover"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="exchangeRateLogDetailDialog">
+        <div class="modal-dialog" style="width: 680px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="True">&times;</button>
+                    <h4 class="modal-title">货币汇率操作日志详细</h4>
+                </div>
+                <div class="modal-body clearfix">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <form class="form-horizontal" role="form" id="exchangeRateLogDetailForm">
+                                <input id="exchange_rate_log_id" name="detail.rate_log.id" type="hidden" v-model.number="detail.rate_log.id"/>
+                                <input id="exchange_rate_log_version" name="detail.rate_log.version" type="hidden" v-model.number="detail.rate_log.version"/>
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="name" class="col-xs-2 control-label">名称</label>
+                                            <div class="col-xs-10">
+                                                <input id="name" name="detail.rate_log.name" type="text" class="input-sm form-control" v-model="detail.rate_log.name"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="desc" class="col-xs-2 control-label">操作</label>
+                                            <div class="col-xs-10">
+                                                <input id="desc" name="detail.rate_log.desc" type="text" class="input-sm form-control" v-model="detail.rate_log.desc"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="login_name" class="col-xs-2 control-label">工号</label>
+                                            <div class="col-xs-10">
+                                                <input id="login_name" name="detail.rate_log.login_name" type="text" class="input-sm form-control" v-model="detail.rate_log.login_name"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success btn-sm" @click="saveExchangeRateLog()">
+                        <i class="ace-icon fa fa-floppy-o"></i>保存
+                    </button>
+                    <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">
+                        <i class="ace-icon fa fa-times"></i>关闭
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    var vm = new Vue({
+        el: "#page",
+        data: {
+            "detail": {
+                "rate_log": {}
+            }
+        },
+        mounted: function () {
+            initDataTable(
+                '#exchangeRateLogList',
+                {
+                    "sAjaxSource": '{%url "ErpExchangeRateLog.ListData"%}',
+                    "aaSorting": [[1, "asc"]],
+                    "aoColumns": [
+                        {
+                            "mDataProp": "id",
+                            "bSearchable": false,
+                            "orderable": false,
+                            "sClass": "center",
+                            "width": 50,
+                            "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
+                            "render": function (data, type, row) {
+                                return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
+                            }
+                        },
+                        {"mDataProp": "name", "title": "名称", "bSearchable": true},
+                        {"mDataProp": "desc", "title": "操作", "bSearchable": true},
+                        {"mDataProp": "login_name", "title": "工号", "bSearchable": true},
+                        {"mDataProp": "create_time", "title": "创建时间", "bSearchable": false, "width": 120},
+                        {"mDataProp": "update_time", "title": "修改时间", "bSearchable": false, "width": 120}
+                    ]
+                }
+            );
+
+            $('#exchangeRateLogList tbody').on('dblclick', 'tr', function () {
+                var id = $(this).find('td:first-child input:checkbox').val();
+                vm.showExchangeRateLogDetail(id);
+            });
+        },
+        methods: {
+            reloadList: function () {
+                reloadList('#exchangeRateLogList');
+            }
+        }
+    });
+</script>
+{%footer%}
+
