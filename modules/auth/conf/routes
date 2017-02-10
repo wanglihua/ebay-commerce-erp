@@ -27,7 +27,7 @@ POST /auth/groupuser/add/listdata     AuthGroupUser.AddListData
 POST /auth/groupuser/add/save         AuthGroupUser.AddSave
 POST /auth/groupuser/remove           AuthGroupUser.Remove
 
-GET  /auth/user/pass/res                   AuthUserPassRes.Index
-POST /auth/user/pass/res/data/list         AuthUserPassRes.ListData
-POST /auth/user/pass/res/grant             AuthUserPassRes.Grant
-POST /auth/user/pass/res/revoke            AuthUserPassRes.Revoke
+GET  /auth/user/pass/res              AuthUserPassRes.Index
+POST /auth/user/pass/res/data/list    AuthUserPassRes.ListData
+POST /auth/user/pass/res/grant        AuthUserPassRes.Grant
+POST /auth/user/pass/res/revoke       AuthUserPassRes.Revoke

@@ -14,7 +14,7 @@ func GetAuthMenu(res_id_map map[int64]bool, db_session *xorm.Session, web_sessio
 
 	login_user := core.GetLoginUser(web_session)
 	is_admin := false
-	if login_user.UserId == 0 {
+	if login_user.UserId != 0 {
 		is_admin = login_user.IsAdmin
 	}
 
@@ -39,14 +39,6 @@ func GetAuthMenu(res_id_map map[int64]bool, db_session *xorm.Session, web_sessio
             <b class="arrow"></b>
         </li>
 
-        <li id="auth-passres-menu" class="">
-            <a href="/auth/user/pass/res">
-                <i class="menu-icon fa fa-caret-right"></i>
-                用户权限
-            </a>
-            <b class="arrow"></b>
-        </li>
-
         <li id="auth-admin-menu" class="">
             <a href="/auth/admin">
                 <i class="menu-icon fa fa-caret-right"></i>
@@ -63,6 +55,14 @@ func GetAuthMenu(res_id_map map[int64]bool, db_session *xorm.Session, web_sessio
 }
 
 /*
+
+<li id="auth-passres-menu" class="">
+    <a href="/auth/user/pass/res">
+        <i class="menu-icon fa fa-caret-right"></i>
+        用户权限
+    </a>
+    <b class="arrow"></b>
+</li>
 
 <li id="auth-group-menu" class="">
     <a href="/auth/group">
