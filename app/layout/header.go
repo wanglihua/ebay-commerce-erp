@@ -17,7 +17,7 @@ func GetHeader(title string, db_session *xorm.Session, web_session revel.Session
 	login_user := core.GetLoginUser(web_session)
 	login_user_login_name := ""
 	login_user_nick_name := ""
-	if login_user.UserId == 0 {
+	if login_user.UserId != 0 {
 		login_user_login_name = login_user.LoginName
 		login_user_nick_name = login_user.NickName
 	}
@@ -34,46 +34,46 @@ func GetHeader(title string, db_session *xorm.Session, web_session revel.Session
 	header_buffer.WriteString("-")
 	header_buffer.WriteString(sys_name)
 
-	header_buffer.WriteString(`</title>
+	header_buffer.WriteString(fmt.Sprintf(`</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
-    <link type="text/css" rel="stylesheet" href="/static/ace/css/all.css?201701202000" class="ace-main-stylesheet" id="main-ace-style" />
+    <link type="text/css" rel="stylesheet" href="/static/ace/css/all.css?%[1]s" class="ace-main-stylesheet" id="main-ace-style" />
     <!--[if lte IE 9]>
-    <link type="text/css" rel="stylesheet" href="/static/ace/css/ace-part2.min.css?201701202000" class="ace-main-stylesheet"/>
+    <link type="text/css" rel="stylesheet" href="/static/ace/css/ace-part2.min.css?%[1]s" class="ace-main-stylesheet"/>
     <![endif]-->
     <!--[if lte IE 9]>
-    <link type="text/css" rel="stylesheet" href="/static/ace/css/ace-ie.min.css?201701202000"/>
+    <link type="text/css" rel="stylesheet" href="/static/ace/css/ace-ie.min.css?%[1]s"/>
     <![endif]-->
-    <link type="text/css" rel="stylesheet" href="/static/site.css?201701202000"/>`)
+    <link type="text/css" rel="stylesheet" href="/static/site.css?%[1]s"/>`, core.GetStaticVersion()))
 
 	if revel.DevMode {
-		header_buffer.WriteString(`<script type="text/javascript" src="/static/js/vue.js?201701202000"></script>`)
+		header_buffer.WriteString(fmt.Sprintf(`<script type="text/javascript" src="/static/js/vue.js?%[1]s"></script>`, core.GetStaticVersion()))
 	} else {
-		header_buffer.WriteString(`<script type="text/javascript" src="/static/js/vue.min.js?201701202000"></script>`)
+		header_buffer.WriteString(fmt.Sprintf(`<script type="text/javascript" src="/static/js/vue.min.js?%[1]s"></script>`, core.GetStaticVersion()))
 	}
 
-	header_buffer.WriteString(`<!--[if !IE]> -->
+	header_buffer.WriteString(fmt.Sprintf(`<!--[if !IE]> -->
     <script type="text/javascript">
-        window.jQuery || document.write("<script type='text/javascript' src='/static/ace/js/jquery.min.js?201701202000'>" + "<" + "/script>");
+        window.jQuery || document.write("<script type='text/javascript' src='/static/ace/js/jquery.min.js?%[1]s'>" + "<" + "/script>");
     </script>
     <!-- <![endif]-->
     <!--[if IE]>
     <script type="text/javascript">
-        window.jQuery || document.write("<script type='text/javascript' src='/static/ace/js/jquery1x.min.js?201701202000'>" + "<" + "/script>");
+        window.jQuery || document.write("<script type='text/javascript' src='/static/ace/js/jquery1x.min.js?%[1]s'>" + "<" + "/script>");
     </script>
     <![endif]-->
     <script type="text/javascript">
-        if ('ontouchstart' in document.documentElement) document.write("<script type='text/javascript' src='/static/ace/js/jquery.mobile.custom.min.js?201701202000'>" + "<" + "/script>");
-    </script>`)
+        if ('ontouchstart' in document.documentElement) document.write("<script type='text/javascript' src='/static/ace/js/jquery.mobile.custom.min.js?%[1]s'>" + "<" + "/script>");
+    </script>`, core.GetStaticVersion()))
 
-	header_buffer.WriteString(`
-        <script type="text/javascript" src="/static/ace/js/all1.js?201701202000"></script>
+	header_buffer.WriteString(fmt.Sprintf(`
+        <script type="text/javascript" src="/static/ace/js/all1.js?%[1]s"></script>
         <!--[if lte IE 8]>
-        <script type="text/javascript" src="/static/ace/js/html5shiv.min.js?201701202000"></script>
-        <script type="text/javascript" src="/static/ace/js/respond.min.js?201701202000"></script>
+        <script type="text/javascript" src="/static/ace/js/html5shiv.min.js?%[1]s"></script>
+        <script type="text/javascript" src="/static/ace/js/respond.min.js?%[1]s"></script>
         <![endif]-->
-        <script type="text/javascript" src="/static/ace/js/all2.js?201701202000"></script>
-        <script type="text/javascript" src="/static/js/js.cookie.js?201701202000"></script>
-        <script type="text/javascript" src="/static/site.js?201701202000"></script>`)
+        <script type="text/javascript" src="/static/ace/js/all2.js?%[1]s"></script>
+        <script type="text/javascript" src="/static/js/js.cookie.js?%[1]s"></script>
+        <script type="text/javascript" src="/static/site.js?%[1]s"></script>`, core.GetStaticVersion()))
 
 	header_buffer.WriteString(`
 </head>

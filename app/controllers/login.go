@@ -17,6 +17,7 @@ type Login struct {
 
 func (c Login) Index() revel.Result {
 	c.RenderArgs["sys_name"] = layout.GetSysName(c.DbSession)
+	c.RenderArgs["static_version"] = core.GetStaticVersion()
 	return c.RenderTemplate("login/login_index.html")
 }
 
