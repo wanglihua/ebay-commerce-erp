@@ -25,6 +25,7 @@ const (
 	STATUS_TYPE_STOCK_BILL_CHECKOUT    = 1500 // 出库单状态
 	STATUS_TYPE_STOCK_BILL_TRANSFER    = 1600 // 调拨单状态
 	STATUS_TYPE_ORDER                  = 1700 // 订单状态
+	STATUS_TYPE_PURCHASE_BILL          = 1800 // 采购单状态
 
 	//状态类型 end
 
@@ -106,6 +107,13 @@ const (
 	ORDER_PHZ = 4100
 	ORDER_YFH = 4200
 	ORDER_YWC = 4300
+
+	// 采购单状态 已创建，已下单，采购中，已入库
+	PURCHASE_BILL_YCJ = 4400
+	PURCHASE_BILL_YXD = 4500
+	PURCHASE_BILL_CGZ = 4600
+	PURCHASE_BILL_YRK = 4700
+
 
 	//状态 id end
 )
@@ -476,6 +484,37 @@ func (e StatusInfo) InitData(db_session *xorm.Session) {
 		status.Type = STATUS_TYPE_ORDER
 		status.Name = "已完成"
 		status.Desc = core.NewNullString("订单状态 已完成", true)
+		db_session.Insert(status)
+	}
+
+	// 采购单状态 已创建，已下单，采购中，已入库
+	{
+		status := new(StatusInfo)
+		status.Id = PURCHASE_BILL_YCJ
+		status.Type = STATUS_TYPE_PURCHASE_BILL
+		status.Name = "已创建"
+		status.Desc = core.NewNullString("采购单状态 已创建", true)
+		db_session.Insert(status)
+
+		status = new(StatusInfo)
+		status.Id = PURCHASE_BILL_YXD
+		status.Type = STATUS_TYPE_PURCHASE_BILL
+		status.Name = "已下单"
+		status.Desc = core.NewNullString("采购单状态 已下单", true)
+		db_session.Insert(status)
+
+		status = new(StatusInfo)
+		status.Id = PURCHASE_BILL_CGZ
+		status.Type = STATUS_TYPE_PURCHASE_BILL
+		status.Name = "采购中"
+		status.Desc = core.NewNullString("采购单状态 采购中", true)
+		db_session.Insert(status)
+
+		status = new(StatusInfo)
+		status.Id = PURCHASE_BILL_YRK
+		status.Type = STATUS_TYPE_PURCHASE_BILL
+		status.Name = "已入库"
+		status.Desc = core.NewNullString("采购单状态 已入库", true)
 		db_session.Insert(status)
 	}
 }
