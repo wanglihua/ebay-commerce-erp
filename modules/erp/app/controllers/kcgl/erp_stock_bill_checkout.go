@@ -52,7 +52,7 @@ WHERE sb.type_id = 100;
 		    INNER JOIN erp_status st ON sb.status_id = st.id
     `)
 
-	sb.Where(core.SqlAnd(filter, fmt.Sprintf("sb.type_id = %d", models.STOCK_BILL_TYPE_CHECKOUT)))
+	sb.Where(core.SqlAnd(filter, fmt.Sprintf("sb.type_id = %d", models.STOCK_BILL_TYPE_MANUAL_CHECKOUT)))
 
 	//query extra filter here
 
@@ -162,7 +162,7 @@ func (c ErpStockBillCheckout) Save() revel.Result {
 	if detail_form.IsCreate() {
 		loginuser := core.GetLoginUser(c.Session)
 		stock_bill_in_ui.UserId = loginuser.UserId
-		stock_bill_in_ui.TypeId = models.STOCK_BILL_TYPE_CHECKOUT
+		stock_bill_in_ui.TypeId = models.STOCK_BILL_TYPE_MANUAL_CHECKOUT
 		stock_bill_in_ui.StatusId = models.STOCK_BILL_CHECKOUT_SAVE
 
 		affected, err = db_session.Insert(&stock_bill_in_ui)
