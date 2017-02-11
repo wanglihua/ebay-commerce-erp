@@ -78,7 +78,6 @@ func (t EBayOrderDownloadTask) Run() {
 
 	// do something with the orders
 
-
 	switch response.Ack {
 	case "Success":
 		revel.TRACE.Printf("eBay GetOrders Response: " + response.Ack + "\n")

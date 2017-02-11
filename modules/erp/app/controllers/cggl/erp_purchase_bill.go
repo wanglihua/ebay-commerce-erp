@@ -2,12 +2,12 @@ package controllers
 
 import (
 	"encoding/json"
-	"strconv"
 	"github.com/revel/revel"
-
 	"matrix/core"
+	auth_models "matrix/modules/auth/models"
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/bill_service"
+	"strconv"
 	"time"
 )
 
@@ -19,32 +19,55 @@ func (c ErpPurchaseBill) Index() revel.Result {
 	return c.RenderTemplate("erp/cggl/purchase_bill/purchase_bill_index.html")
 }
 
+type ErpPurchaseBillViewItem struct {
+	models.PurchaseBillInfo `xorm:"extends" json:"pb"`
+	auth_models.UserInfo    `xorm:"extends" json:"u"`
+	models.StatusInfo       `xorm:"extends" json:"s"`
+}
+
 func (c ErpPurchaseBill) ListData() revel.Result {
 	db_session := c.DbSession
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
-	query := db_session.Where(filter)
 
-	//query extra filter here
+	/*
+	SELECT pb.*, u.*, s.*
+	FROM erp_purchase_bill pb
+	    INNER JOIN auth_user u ON pb.user_id = u.id
+	    INNER JOIN erp_status s ON pb.status_id = s.id
+	*/
 
-	data_query := *query
+	sql_builder := core.NewSqlBuilder()
+	sql_builder.Select("pb.*, u.*, s.*")
+	sql_builder.Count("count(pb.id) as bill_count")
+	sql_builder.From(`erp_purchase_bill pb
+    INNER JOIN auth_user u ON pb.user_id = u.id
+    INNER JOIN erp_status s ON pb.status_id = s.id`)
+
+	sql_builder.Where(filter)
+
 	if order != "" {
-		data_query = *data_query.OrderBy(order)
+		sql_builder.OrderBy(order)
 	} else {
-		data_query = *data_query.Asc("id")
+		sql_builder.OrderBy("pb.id ASC")
 	}
 
-	purchase_bill_list := make([]models.PurchaseBillInfo, 0, limit)
-	err := data_query.Limit(limit, offset).Find(&purchase_bill_list)
+	sql_builder.Limit(offset, limit)
+
+	purchase_bill_list := make([]ErpPurchaseBillViewItem, 0)
+	err := db_session.Sql(sql_builder.SqlList()).Find(&purchase_bill_list)
 	core.HandleError(err)
 
-	count_query := *query
-	count, err := count_query.Count(new(models.PurchaseBillInfo))
+	var bill_count struct {
+		Count int64 `xorm:"'bill_count'"`
+	}
+
+	_, err = db_session.Sql(sql_builder.SqlCount()).Get(&bill_count)
 	core.HandleError(err)
 
 	return c.RenderJson(core.GridResult{
 		Data:  purchase_bill_list,
-		Total: count,
+		Total: bill_count.Count,
 	})
 }
 
@@ -126,7 +149,7 @@ func (c ErpPurchaseBill) Save() revel.Result {
 		core.HandleError(err)
 
 		if affected == 0 {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！" })
+			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！"})
 		}
 	}
 
