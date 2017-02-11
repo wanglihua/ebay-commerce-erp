@@ -156,20 +156,20 @@ func (c ErpStockBillCheckin) Save() revel.Result {
 		return c.RenderJson(core.JsonResult{Success: false, Message: c.GetValidationErrorMessage()})
 	}
 
-	stock_bill_in_ui := detail_form.StockBill
+	stock_bill := detail_form.StockBill
 
 	var affected int64
 	if detail_form.IsCreate() {
 		loginuser := core.GetLoginUser(c.Session)
-		stock_bill_in_ui.UserId = loginuser.UserId
-		stock_bill_in_ui.TypeId = models.STOCK_BILL_TYPE_MANUAL_CHECKIN
-		stock_bill_in_ui.StatusId = models.STOCK_BILL_CHECKIN_SAVE
+		stock_bill.UserId = loginuser.UserId
+		stock_bill.TypeId = models.STOCK_BILL_TYPE_MANUAL_CHECKIN
+		stock_bill.StatusId = models.STOCK_BILL_CHECKIN_SAVE
 
-		affected, err = db_session.Insert(&stock_bill_in_ui)
+		affected, err = db_session.Insert(&stock_bill)
 		core.HandleError(err)
 	} else {
 		sb_cols := models.StockBillCols
-		affected, err = db_session.Id(stock_bill_in_ui.Id).Cols(sb_cols.Code, sb_cols.StockId, sb_cols.Desc, sb_cols.Date).Update(&stock_bill_in_ui)
+		affected, err = db_session.Id(stock_bill.Id).Cols(sb_cols.StockId, sb_cols.Desc, sb_cols.Date).Update(&stock_bill)
 		core.HandleError(err)
 
 		if affected == 0 {
@@ -179,7 +179,7 @@ func (c ErpStockBillCheckin) Save() revel.Result {
 
 	return c.RenderJson(map[string]interface{}{
 		"success": true,
-		"bill_id": stock_bill_in_ui.Id,
+		"bill_id": stock_bill.Id,
 		"message": strconv.FormatInt(affected, 10) + "条数据保存成功!",
 	})
 }

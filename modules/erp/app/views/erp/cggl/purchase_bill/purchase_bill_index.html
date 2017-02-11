@@ -1,0 +1,261 @@
+{%header "采购单" .%}
+<div id="page">
+    <div class="breadcrumbs" id="breadcrumbs">
+        <ul class="breadcrumb">
+            <li>
+                <a href='{%url "Home.Index"%}'><i class="ace-icon fa fa-home home-icon"></i></a>
+            </li>
+            <li class="parent" data-menu="cggl-menu">采购管理</li>
+            <li class="active" data-menu="cggl-purchasebill-menu">采购单</li>
+        </ul>
+    </div>
+    <div class="page-content">
+        <div class="row">
+            <div class="col-xs-12" style="padding: 0;">
+                <div class="gridToolBar clearfix">
+                    <button class="btn btn-primary btn-sm" @click="reloadList('#purchaseBillList')">
+                        <i class="ace-icon fa fa-refresh"></i>
+                        刷新
+                    </button>
+                    <button class="btn btn-success btn-sm" @click="showPurchaseBillDetail(0)">
+                        <i class="ace-icon fa fa-plus"></i>
+                        新增
+                    </button>
+                    <button class="btn btn-danger btn-sm" @click="deletePurchaseBill()">
+                        <i class="ace-icon fa fa-trash-o"></i>
+                        删除
+                    </button>
+                </div>
+                <div>
+                    <table id="purchaseBillList" class="table table-striped table-bordered table-hover"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="purchaseBillDetailDialog">
+        <div class="modal-dialog" style="width: 480px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="True">&times;</button>
+                    <h4 class="modal-title">采购单详细</h4>
+                </div>
+                <div class="modal-body clearfix">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <form class="form-horizontal" role="form" id="purchaseBillDetailForm">
+                                <input id="purchase_bill_id" name="detail.purchase_bill.id" type="hidden" v-model.number="detail.purchase_bill.id"/>
+                                <input id="purchase_bill_version" name="detail.purchase_bill.version" type="hidden" v-model.number="detail.purchase_bill.version"/>
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <label for="code" class="col-xs-2 control-label">批次号</label>
+                                            <div class="col-xs-10">
+                                                <input id="code" name="detail.purchase_bill.code" type="text" class="input-sm form-control" disabled="disabled" v-model="detail.purchase_bill.code"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <label for="desc" class="col-xs-2 control-label">备注</label>
+                                            <div class="col-xs-10">
+                                                <textarea id="desc" name="detail.purchase_bill.desc" rows="2" class="input-sm form-control" v-model="detail.purchase_bill.desc"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <label for="date" class="col-xs-2 control-label">日期</label>
+                                            <div class="col-xs-10">
+                                                <input id="date" name="detail.purchase_bill.date" type="text" class="input-sm form-control" disabled="disabled" v-model="detail.purchase_bill.date"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <label for="trans_expenses" class="col-xs-2 control-label">运费</label>
+                                            <div class="col-xs-10">
+                                                <input id="trans_expenses" name="detail.purchase_bill.trans_expenses" type="text" class="input-sm form-control" v-model.number="detail.purchase_bill.trans_expenses"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success btn-sm" @click="savePurchaseBill()">
+                        <i class="ace-icon fa fa-floppy-o"></i>保存
+                    </button>
+                    <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">
+                        <i class="ace-icon fa fa-times"></i>关闭
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    var vm = new Vue({
+        el: "#page",
+        data: {
+            "detail": {
+                "purchase_bill": {}
+            }
+        },
+        mounted: function () {
+            initDataTable(
+                '#purchaseBillList',
+                {
+                    "sAjaxSource": '{%url "ErpPurchaseBill.ListData"%}',
+                    "aaSorting": [[1, "asc"]],
+                    "aoColumns": [
+                        {
+                            "mDataProp": "id",
+                            "bSearchable": false,
+                            "orderable": false,
+                            "sClass": "center",
+                            "width": 50,
+                            "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
+                            "render": function (data, type, row) {
+                                return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
+                            }
+                        },
+                        {"mDataProp": "code", "title": "批次号", "bSearchable": true, "width": 160},
+                        {"mDataProp": "desc", "title": "备注", "bSearchable": true},
+                        {"mDataProp": "date", "title": "日期", "bSearchable": false, "width": 85},
+                        {"mDataProp": "user_id", "title": "操作人", "bSearchable": false, "width": 75},
+                        {"mDataProp": "trans_expenses", "title": "运费", "bSearchable": false, "width": 75},
+                        {"mDataProp": "status_id", "title": "状态", "bSearchable": false, "width": 90},
+                        {"mDataProp": "create_time", "title": "创建时间", "bSearchable": false, "width": 120},
+                        {"mDataProp": "update_time", "title": "修改时间", "bSearchable": false, "width": 120}
+                    ]
+                }
+            );
+
+            $('#purchaseBillList tbody').on('dblclick', 'tr', function () {
+                var id = $(this).find('td:first-child input:checkbox').val();
+                vm.showPurchaseBillDetail(id);
+            });
+        },
+        methods: {
+            reloadList: function () {
+                reloadList('#purchaseBillList');
+            },
+            showPurchaseBillDetail: function (id) {
+                showMask("加载中...");
+                $("#purchaseBillDetailForm").clearValidation();
+                $.ajax({
+                        url: '{%url "ErpPurchaseBill.DetailData" %}',
+                        type: "POST",
+                        data: {
+                            "id": id
+                        },
+                        success: function (result) {
+                            hideMask();
+                            if (result.success == false) {
+                                $.msg.error(result.message);
+                                return;
+                            }
+                            vm.detail = result;
+                            $('#purchaseBillDetailDialog').modal(modalOptions);
+                        }
+                    }
+                );
+            },
+            savePurchaseBill: function () {
+                showMask("提交中...");
+                var form = $("#purchaseBillDetailForm");
+                var valid = validate(form, {
+                    'detail.purchase_bill.code': {
+                        required: false
+                    },
+                    'detail.purchase_bill.desc': {
+                        required: false, minlength: 2, maxlength: 400
+                    },
+                    'detail.purchase_bill.date': {
+                        required: true
+                    },
+                    'detail.purchase_bill.user_id': {
+                        required: true, digits: true
+                    },
+                    'detail.purchase_bill.trans_expenses': {
+                        required: true, number: true
+                    },
+                    'detail.purchase_bill.status_id': {
+                        required: true, digits: true
+                    }
+                });
+
+                if (!valid) {
+                    hideMask();
+                } else {
+                    $.ajax({
+                            url: '{%url "ErpPurchaseBill.Save"%}',
+                            type: "POST",
+                            processData: false,
+                            contentType: 'application/json',
+                            data: JSON.stringify(vm.detail),
+                            success: function (data) {
+                                hideMask();
+                                if (data.success == false) {
+                                    $.msg.error(data.message);
+                                    //return;
+                                }
+                                else {
+                                    $.msg.show(data.message);
+                                    $('#purchaseBillDetailDialog').modal('hide');
+                                    vm.reloadList();
+                                    //return;
+                                }
+                            }
+                        }
+                    );
+                }
+            },
+            deletePurchaseBill: function () {
+                var id_list = [];
+                $('#purchaseBillList tbody tr>td:first-child input:checkbox').each(function () {
+                    if (this.checked) {
+                        id_list.push($(this).val());
+                    }
+                });
+
+                if (id_list.length == 0) {
+                    $.msg.alert("请选择数据！");
+                    return;
+                }
+
+                $.msg.confirm("确认要删除吗？", function () {
+                    $.ajax({
+                        url: '{%url "ErpPurchaseBill.Delete"%}',
+                        type: "POST",
+                        data: {"id_list": id_list},
+                        success: function (data) {
+                            if (data.success == false) {
+                                $.msg.error(data.message);
+                                return;
+                            }
+                            else {
+                                $.msg.show(data.message);
+                            }
+                            vm.reloadList();
+                        }
+                    });
+                });
+            }
+        }
+    });
+</script>
+{%footer%}
+

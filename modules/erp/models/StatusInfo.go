@@ -8,112 +8,158 @@ import (
 const (
 	//状态类型 begin
 
-	STATUS_TYPE_STOCK                  = 100  // 仓库状态
-	STATUS_TYPE_EXCHANGE_RATE          = 200  // 仓库状态
-	STATUS_TYPE_PRODUCT_CATE           = 300  // 商品目录状态
-	STATUS_TYPE_PRODUCT                = 400  // 商品状态
-	STATUS_TYPE_SHOP_ACCOUNT           = 500  // 店铺账号状态
-	STATUS_TYPE_PAYPAL_ACCOUNT         = 600  // Paypal账号状态
-	STATUS_TYPE_PACKAGE                = 700  // 包材 状态
-	STATUS_TYPE_INVENTORY_CHECK        = 800  // 库存盘点单状态
-	STATUS_TYPE_PAYPAL_RECON           = 900  // Paypal对账结果
-	STATUS_TYPE_ORDER_CUSTOM_TYPE      = 1000 // 订单自定义类型
-	STATUS_TYPE_LOGISTICS_NUMBER       = 1100 // 不规则订单运单号类型
-	STATUS_TYPE_LOGISTICS_NUMBER_BATCH = 1200 // 不规则订单运单号类型
-	STATUS_TYPE_PRODUCT_BIND           = 1300 // 绑定商品状态
-	STATUS_TYPE_STOCK_BILL_CHECKIN     = 1400 // 入库单状态
-	STATUS_TYPE_STOCK_BILL_CHECKOUT    = 1500 // 出库单状态
-	STATUS_TYPE_STOCK_BILL_TRANSFER    = 1600 // 调拨单状态
-	STATUS_TYPE_ORDER                  = 1700 // 订单状态
-	STATUS_TYPE_PURCHASE_BILL          = 1800 // 采购单状态
+	// 仓库状态
+	STATUS_TYPE_STOCK = 100
+	// 仓库状态
+	STATUS_TYPE_EXCHANGE_RATE = 200
+	// 商品目录状态
+	STATUS_TYPE_PRODUCT_CATE = 300
+	// 商品状态
+	STATUS_TYPE_PRODUCT = 400
+	// 店铺账号状态
+	STATUS_TYPE_SHOP_ACCOUNT = 500
+	// Paypal账号状态
+	STATUS_TYPE_PAYPAL_ACCOUNT = 600
+	// 包材 状态
+	STATUS_TYPE_PACKAGE = 700
+	// 库存盘点单状态
+	STATUS_TYPE_INVENTORY_CHECK = 800
+	// Paypal对账结果
+	STATUS_TYPE_PAYPAL_RECON = 900
+	// 订单自定义类型
+	STATUS_TYPE_ORDER_CUSTOM_TYPE = 1000
+	// 不规则订单运单号类型
+	STATUS_TYPE_LOGISTICS_NUMBER = 1100
+	// 不规则订单运单号类型
+	STATUS_TYPE_LOGISTICS_NUMBER_BATCH = 1200
+	// 绑定商品状态
+	STATUS_TYPE_PRODUCT_BIND = 1300
+	// 入库单状态
+	STATUS_TYPE_STOCK_BILL_CHECKIN = 1400
+	// 出库单状态
+	STATUS_TYPE_STOCK_BILL_CHECKOUT = 1500
+	// 调拨单状态
+	STATUS_TYPE_STOCK_BILL_TRANSFER = 1600
+	// 订单状态
+	STATUS_TYPE_ORDER = 1700
+	// 采购单状态
+	STATUS_TYPE_PURCHASE_BILL = 1800
 
 	//状态类型 end
 
 	//状态 id begin
 
-	// 仓库状态 正常 停用
-	STOCK_STATUS_ENABLED  = 100
+	// 仓库状态 正常
+	STOCK_STATUS_ENABLED = 100
+	// 仓库状态 停用
 	STOCK_STATUS_DISABLED = 200
 
-	// 货币汇率状态 正常 停用
-	EXCHANGE_RATE_STATUS_ENABLED  = 300
+	// 货币汇率状态 正常
+	EXCHANGE_RATE_STATUS_ENABLED = 300
+	// 货币汇率状态 停用
 	EXCHANGE_RATE_STATUS_DISABLED = 400
 
-	// 商品目录状态 正常 停用
-	PRODUCT_CATE_STATUS_ENABLED  = 500
+	// 商品目录状态 正常
+	PRODUCT_CATE_STATUS_ENABLED = 500
+	// 商品目录状态 停用
 	PRODUCT_CATE_STATUS_DISABLED = 600
 
-	// 商品状态 重点维护 待开发 正常 清仓 停产 自动创建 暂停销售
+	// 商品状态 重点维护
 	PRODUCT_STATUS_ZDWH = 700
-	PRODUCT_STATUS_DKF  = 800
-	PRODUCT_STATUS_ZC   = 900
-	PRODUCT_STATUS_QC   = 1000
-	PRODUCT_STATUS_TC   = 1100
+	// 商品状态 待开发
+	PRODUCT_STATUS_DKF = 800
+	// 商品状态 正常
+	PRODUCT_STATUS_ZC = 900
+	// 商品状态 清仓
+	PRODUCT_STATUS_QC = 1000
+	// 商品状态 停产
+	PRODUCT_STATUS_TC = 1100
+	// 商品状态 自动创建
 	PRODUCT_STATUS_ZDCJ = 1200
+	// 商品状态 暂停销售
 	PRODUCT_STATUS_ZTXC = 1300
 
-	// 店铺账号状态 正常 停用
-	SHOP_ACCOUNT_STATUS_ENABLED  = 1400
+	// 店铺账号状态 正常
+	SHOP_ACCOUNT_STATUS_ENABLED = 1400
+	// 店铺账号状态 停用
 	SHOP_ACCOUNT_STATUS_DISABLED = 1500
 
-	// Paypal账号状态 正常 停用
-	PAYPAL_ACCOUNT_STATUS_ENABLED  = 1600
+	// Paypal账号状态 正常
+	PAYPAL_ACCOUNT_STATUS_ENABLED = 1600
+	// Paypal账号状态 停用
 	PAYPAL_ACCOUNT_STATUS_DISABLED = 1700
 
-	// 包材状态 正常 停用
-	PACKAGE_STATUS_ENABLED  = 1800
+	// 包材状态 正常
+	PACKAGE_STATUS_ENABLED = 1800
+	// 包材状态 停用
 	PACKAGE_STATUS_DISABLED = 1900
 
-	// 盘点单状态 未通过 审核中 已完成
+	// 盘点单状态 未通过
 	INVENTORY_CHECK_STATUS_WTG = 2000
+	// 盘点单状态 审核中
 	INVENTORY_CHECK_STATUS_SPZ = 2100
+	// 盘点单状态 已完成
 	INVENTORY_CHECK_STATUS_YWC = 2200
 
-	// Paypal对账 成功 失败
+	// Paypal对账 成功
 	PAYPAL_RECON_SUCCESS = 2300
-	PAYPAL_RECON_FAILED  = 2400
+	// Paypal对账 失败
+	PAYPAL_RECON_FAILED = 2400
 
-	// 订单自定义类型 正常 停用
-	ORDER_CUSTOM_TYPE_ENABLED  = 2500
+	// 订单自定义类型 正常
+	ORDER_CUSTOM_TYPE_ENABLED = 2500
+	// 订单自定义类型 停用
 	ORDER_CUSTOM_TYPE_DISABLED = 2600
 
-	// 不规则订单运单号 已使用 未使用
-	LOGISTICS_NUMBER_USED     = 2700
+	// 不规则订单运单号 已使用
+	LOGISTICS_NUMBER_USED = 2700
+	// 不规则订单运单号 未使用
 	LOGISTICS_NUMBER_NOT_USED = 2800
 
-	// 订单运单号 正常 停用
-	LOGISTICS_NUMBER_BATCH_ENABLED  = 2900
+	// 订单运单号 正常
+	LOGISTICS_NUMBER_BATCH_ENABLED = 2900
+	// 订单运单号 停用
 	LOGISTICS_NUMBER_BATCH_DISABLED = 3000
 
-	// 绑定商品状态 正常 停产
-	PRODUCT_BIND_NORMAL  = 3100
+	// 绑定商品状态 正常
+	PRODUCT_BIND_NORMAL = 3100
+	// 绑定商品状态 停产
 	PRODUCT_BIND_STOPPED = 3200
 
-	// 入库单状态  暂存 提交
-	STOCK_BILL_CHECKIN_SAVE   = 3300
+	// 入库单状态 暂存
+	STOCK_BILL_CHECKIN_SAVE = 3300
+	// 入库单状态 提交
 	STOCK_BILL_CHECKIN_SUBMIT = 3400
 
-	// 出库单状态  暂存 提交
-	STOCK_BILL_CHECKOUT_SAVE   = 3500
+	// 出库单状态 暂存
+	STOCK_BILL_CHECKOUT_SAVE = 3500
+	// 出库单状态 提交
 	STOCK_BILL_CHECKOUT_SUBMIT = 3600
 
-	// 调拨单状态  暂存 提交
-	STOCK_BILL_TRANSFER_SAVE   = 3700
+	// 调拨单状态 暂存
+	STOCK_BILL_TRANSFER_SAVE = 3700
+	// 调拨单状态 提交
 	STOCK_BILL_TRANSFER_SUBMIT = 3800
 
-	// 订单状态 已支付 待配货 配货中 已发货 已完成
+	// 订单状态 已支付
 	ORDER_YZF = 3900
+	// 订单状态 待配货
 	ORDER_DPH = 4000
+	// 订单状态 配货中
 	ORDER_PHZ = 4100
+	// 订单状态 已发货
 	ORDER_YFH = 4200
+	// 订单状态 已完成
 	ORDER_YWC = 4300
 
-	// 采购单状态 已创建，已下单，采购中，已入库
+	// 采购单状态 已创建
 	PURCHASE_BILL_YCJ = 4400
+	// 采购单状态 已下单
 	PURCHASE_BILL_YXD = 4500
+	// 采购单状态 采购中
 	PURCHASE_BILL_CGZ = 4600
+	// 采购单状态 已入库
 	PURCHASE_BILL_YRK = 4700
-
 
 	//状态 id end
 )

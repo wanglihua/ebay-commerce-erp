@@ -19,7 +19,8 @@ var module_lower_case = models.ModuleLowerCase
 var module_chinese = models.ModuleChinese
 var table_prefix = models.TablePrefix
 var model_list = []interface{}{
-	models.ExchangeRateLogInfo{},
+	models.PurchaseBillInfo{},
+	models.PurchaseBillEntryInfo{},
 	//models.StockBillEntryInfo{},
 	//models.InventoryCheckInfo{},
 	//models.InventoryCheckEntryInfo{},

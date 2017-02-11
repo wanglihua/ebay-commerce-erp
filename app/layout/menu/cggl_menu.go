@@ -23,8 +23,8 @@ func GetCgglMenu(res_id_map map[int64]bool, db_session *xorm.Session, web_sessio
     <b class="arrow"></b>
     <ul class="submenu">
 
-        <li id="cggl-aaaa-menu" class="">
-            <a href="#">
+        <li id="cggl-purchasebill-menu" class="">
+            <a href="/erp/purchase/bill">
                 <i class="menu-icon fa fa-caret-right"></i>
                 采购管理
             </a>
