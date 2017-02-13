@@ -81,17 +81,6 @@
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
-                                            <label for="hs_code" class="col-xs-2 control-label">报关编码</label>
-                                            <div class="col-xs-10">
-                                                <input id="hs_code" name="detail.product_cate.hs_code" type="text" class="input-sm form-control" v-model="detail.product_cate.hs_code"/>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-xs-12">
-                                        <div class="form-group">
                                             <label for="parent_id" class="col-xs-2 control-label">父目录</label>
                                             <div class="col-xs-10">
                                                 <select id="parent_id" name="detail.product_cate.parent_id" class="input-sm form-control" v-model.number="detail.product_cate.parent_id">
@@ -164,10 +153,10 @@
                                 return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
                             }
                         },
+                        {"mDataProp": "c.full_name", "title": "全称", "bSearchable": true, "width": 200},
                         {"mDataProp": "c.name", "title": "名称", "bSearchable": true, "width": 130},
                         {"mDataProp": "c.english_name", "title": "英文名", "bSearchable": true, "width": 130},
                         {"mDataProp": "p.name", "title": "父目录", "bSearchable": true, "width": 130},
-                        {"mDataProp": "c.hs_code", "title": "报关编码", "bSearchable": true, "width": 130},
                         {"mDataProp": "c.desc", "title": "描述", "bSearchable": true},
                         {"mDataProp": "s.name", "title": "状态", "bSearchable": true, "width": 80},
                         {"mDataProp": "c.create_time", "title": "创建时间", "bSearchable": false, "width": 120},

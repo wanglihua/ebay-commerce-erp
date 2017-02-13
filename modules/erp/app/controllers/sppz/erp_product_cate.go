@@ -9,6 +9,7 @@ import (
 	"matrix/core"
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/status_service"
+	"github.com/go-xorm/xorm"
 )
 
 type ErpProductCate struct {
@@ -98,13 +99,6 @@ func (f *ProductCateDetailForm) Valid(validation *revel.Validation) bool {
 		validation.MaxSize(f.ProductCate.Desc.String, 500).Message("描述长度不能大于500！")
 	}
 
-	if f.ProductCate.HsCode.Valid == true {
-		validation.MinSize(f.ProductCate.HsCode.String, 2).Message("报关编码长度不能小于2！")
-	}
-	if f.ProductCate.HsCode.Valid == true {
-		validation.MaxSize(f.ProductCate.HsCode.String, 20).Message("报关编码长度不能大于20！")
-	}
-
 	validation.Required(f.ProductCate.StatusId).Message("状态不能为空！")
 
 	return validation.HasErrors() == false
@@ -128,9 +122,12 @@ func (c ErpProductCate) DetailData() revel.Result {
 	var parent_cate_list []models.ProductCateInfo
 	parent_cate_cols := models.ProductCateCols
 	if product_cate_id == 0 {
+		// 新的商品类别的默认状态
+		product_cate.StatusId = models.PRODUCT_CATE_STATUS_ENABLED
 		err := db_session.Where(fmt.Sprintf("%[1]s is null or %[1]s = 0", parent_cate_cols.ParentId)).Find(&parent_cate_list)
 		core.HandleError(err)
 	} else {
+		// 编辑是的父类别不应该和自己类别是一样的
 		err := db_session.
 		Where(fmt.Sprintf("(%[1]s is null or %[1]s = 0) and (%[2]s <> %[3]d)", parent_cate_cols.ParentId, parent_cate_cols.Id, product_cate_id)).
 			Find(&parent_cate_list)
@@ -168,6 +165,8 @@ func (c ErpProductCate) Save() revel.Result {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，名称已存在！" })
 		}
 
+		product_cate.FullName = c.calculate_product_cate_full_name(product_cate, db_session)
+
 		affected, err = db_session.Insert(&product_cate)
 		core.HandleError(err)
 	} else {
@@ -176,6 +175,8 @@ func (c ErpProductCate) Save() revel.Result {
 		if name_count != 0 {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，名称已存在！" })
 		}
+
+		product_cate.FullName = c.calculate_product_cate_full_name(product_cate, db_session)
 
 		affected, err = db_session.Id(product_cate.Id).Update(&product_cate)
 		core.HandleError(err)
@@ -186,6 +187,19 @@ func (c ErpProductCate) Save() revel.Result {
 	}
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据保存成功!"})
+}
+
+func (c ErpProductCate) calculate_product_cate_full_name(product_cate models.ProductCateInfo, db_session *xorm.Session) string {
+	if product_cate.ParentId.Valid == false || product_cate.ParentId.Int64 == 0 {
+		return product_cate.Name
+	}
+
+	parent_cate_id := product_cate.ParentId.Int64
+	var parent_cate models.ProductCateInfo
+	_, err := db_session.Id(parent_cate_id).Get(&parent_cate)
+	core.HandleError(err)
+
+	return fmt.Sprintf("%s-%s", parent_cate.Name, product_cate.Name)
 }
 
 func (c ErpProductCate) Delete() revel.Result {
