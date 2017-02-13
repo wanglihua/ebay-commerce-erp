@@ -98,14 +98,6 @@ func (f *ProductDetailForm) Valid(validation *revel.Validation) bool {
 		validation.MaxSize(f.Product.Name, 100).Message("名称长度不能大于100！")
 	}
 
-	validation.Required(f.Product.EnglishName).Message("英文名称不能为空！")
-	if f.Product.EnglishName != "" {
-		validation.MinSize(f.Product.EnglishName, 2).Message("英文名称长度不能小于2！")
-	}
-	if f.Product.EnglishName != "" {
-		validation.MaxSize(f.Product.EnglishName, 100).Message("英文名称长度不能大于100！")
-	}
-
 	validation.Required(f.Product.CostPrice).Message("成本价不能为空！")
 
 	validation.Required(f.Product.Weight).Message("重量不能为空！")
@@ -174,12 +166,6 @@ func (c ErpProduct) Save() revel.Result {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，名称已存在！" })
 		}
 
-		englishName_count, err := db_session.Where("english_name = ?", product.EnglishName).Count(&product)
-		core.HandleError(err)
-		if englishName_count != 0 {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，英文名称已存在！" })
-		}
-
 		affected, err = db_session.Insert(&product)
 		core.HandleError(err)
 	} else {
@@ -193,12 +179,6 @@ func (c ErpProduct) Save() revel.Result {
 		core.HandleError(err)
 		if name_count != 0 {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，名称已存在！" })
-		}
-
-		englishName_count, err := db_session.Where("id <> ? and english_name = ?", product.Id, product.EnglishName).Count(&product)
-		core.HandleError(err)
-		if englishName_count != 0 {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，英文名称已存在！" })
 		}
 
 		affected, err = db_session.Id(product.Id).Update(&product)

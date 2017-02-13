@@ -28,7 +28,7 @@
                 </div>
                 <div>
                     <table id="productList" class="table table-striped table-bordered table-hover"></table>
-                    <div class="todo">1、只是初步的；2、不同权限的人员只能看到自己的信息，比如有的不能看到成本价等；3、目录名称里面显示完整的目录。</div>
+                    <div class="todo">不同权限的人员只能看到自己的信息，比如有的不能看到成本价等。</div>
                 </div>
             </div>
         </div>
@@ -63,17 +63,6 @@
                                             <label for="name" class="col-xs-2 control-label">名称</label>
                                             <div class="col-xs-10">
                                                 <input id="name" name="detail.product.name" type="text" class="input-sm form-control" v-model="detail.product.name"/>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-xs-12">
-                                        <div class="form-group">
-                                            <label for="english_name" class="col-xs-2 control-label">英文名称</label>
-                                            <div class="col-xs-10">
-                                                <input id="english_name" name="detail.product.english_name" type="text" class="input-sm form-control" v-model="detail.product.english_name"/>
                                             </div>
                                         </div>
                                     </div>
@@ -203,8 +192,7 @@
                         },
                         {"mDataProp": "prd.sku", "title": "SKU", "bSearchable": true},
                         {"mDataProp": "prd.name", "title": "名称", "bSearchable": true},
-                        {"mDataProp": "prd.english_name", "title": "英文名称", "bSearchable": true},
-                        {"mDataProp": "cate.name", "title": "商品目录", "bSearchable": false},
+                        {"mDataProp": "cate.full_name", "title": "商品目录", "bSearchable": false},
                         {"mDataProp": "prd.cost_price", "title": "成本价", "bSearchable": false},
                         {"mDataProp": "prd.weight", "title": "重量", "bSearchable": false},
                         {"mDataProp": "sup.name", "title": "供应商", "bSearchable": false},

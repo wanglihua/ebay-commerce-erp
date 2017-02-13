@@ -87,14 +87,6 @@ func (f *ProductCateDetailForm) Valid(validation *revel.Validation) bool {
 		validation.MaxSize(f.ProductCate.Name, 100).Message("名称长度不能大于100！")
 	}
 
-	validation.Required(f.ProductCate.EnglishName).Message("英文名不能为空！")
-	if f.ProductCate.EnglishName != "" {
-		validation.MinSize(f.ProductCate.EnglishName, 2).Message("英文名长度不能小于2！")
-	}
-	if f.ProductCate.EnglishName != "" {
-		validation.MaxSize(f.ProductCate.EnglishName, 100).Message("英文名长度不能大于100！")
-	}
-
 	if f.ProductCate.Desc.Valid == true {
 		validation.MaxSize(f.ProductCate.Desc.String, 500).Message("描述长度不能大于500！")
 	}
