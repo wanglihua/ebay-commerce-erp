@@ -2,9 +2,9 @@ package app
 
 import (
 	"github.com/revel/revel"
-	//"time"
 	"matrix/modules/jobs/app/jobs"
 	"matrix/modules/jobs/tasks"
+	"time"
 )
 
 func init() {
@@ -34,5 +34,7 @@ func init() {
 		if found {
 			jobs.Schedule("cron.paypal_download", tasks.PaypalDownloadTask{})
 		}
+
+		jobs.Every(10*time.Minute, tasks.SiteKeepHotTask{})
 	})
 }
