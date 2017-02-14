@@ -9,30 +9,6 @@
             <li class="active" data-menu="kcgl-product-menu">商品列表</li>
         </ul>
     </div>
-    <div class="page-content">
-        <div class="row">
-            <div class="col-xs-12" style="padding: 0;">
-                <div class="gridToolBar clearfix">
-                    <button class="btn btn-primary btn-sm" @click="reloadList('#productList')">
-                        <i class="ace-icon fa fa-refresh"></i>
-                        刷新
-                    </button>
-                    <button class="btn btn-success btn-sm" @click="showProductDetail(0)">
-                        <i class="ace-icon fa fa-plus"></i>
-                        新增
-                    </button>
-                    <button class="btn btn-danger btn-sm" @click="deleteProduct()">
-                        <i class="ace-icon fa fa-trash-o"></i>
-                        删除
-                    </button>
-                </div>
-                <div>
-                    <table id="productList" class="table table-striped table-bordered table-hover"></table>
-                    <div class="todo">1、不同权限的人员只能看到自己的信息，比如有的不能看到成本价等；2、重量的单位，价格的币种；3、图片的展示。</div>
-                </div>
-            </div>
-        </div>
-    </div>
     <div class="modal fade" id="productDetailDialog">
         <div class="modal-dialog" style="width: 520px;">
             <div class="modal-content">
@@ -125,6 +101,22 @@
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
+                                            <label for="supplier_id" class="col-xs-2 control-label">包材类型</label>
+                                            <div class="col-xs-10">
+                                                <select id="package_material_id" name="detail.product.pkg_mtrl_id" class="input-sm form-control" v-model.number="detail.product.pkg_mtrl_id">
+                                                    <template v-for="package_material in detail.package_material_list">
+                                                        <option :value="package_material.id">{{package_material.name}}
+                                                        </option>
+                                                    </template>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
                                             <label for="desc" class="col-xs-2 control-label">备注</label>
                                             <div class="col-xs-10">
                                                 <textarea id="desc" name="detail.product.desc" rows="2" class="input-sm form-control" v-model="detail.product.desc"></textarea>
@@ -163,6 +155,60 @@
             </div>
         </div>
     </div>
+    <div class="page-content">
+        <div class="row">
+            <div class="col-xs-12" style="padding: 0;">
+                <div class="gridToolBar clearfix">
+                    <button class="btn btn-primary btn-sm" @click="reloadList('#productList')">
+                        <i class="ace-icon fa fa-refresh"></i>
+                        刷新
+                    </button>
+                    <button class="btn btn-success btn-sm" @click="showProductDetail(0)">
+                        <i class="ace-icon fa fa-plus"></i>
+                        新增
+                    </button>
+                    <button class="btn btn-danger btn-sm" @click="deleteProduct()">
+                        <i class="ace-icon fa fa-trash-o"></i>
+                        删除
+                    </button>
+                </div>
+                <div>
+                    <table id="productList" class="table table-striped table-bordered table-hover">
+                        <!--SKU	名称	商品目录	成本价(RMB)	重量(kg)	供应商	包材	备注	状态	创建时间	修改时间-->
+                        <thead>
+                        <tr>
+                            <th rowspan="2"></th>
+                            <th id="thSkuNameSup" colspan="3">
+                                <div id="headerSku"></div>
+                                <div id="headerName"></div>
+                                <div id="headerSupplier"></div>
+                            </th>
+                            <th rowspan="2">商品目录</th>
+                            <th rowspan="2">成本价(RMB)</th>
+                            <th rowspan="2">重量(kg)</th>
+                            <th rowspan="2">包材</th>
+                            <th rowspan="2">备注</th>
+                            <th rowspan="2">状态</th>
+                            <th id="thTime" colspan="2">
+                                <div id="headerCreateTime"></div>
+                                <div id="headerModifyTime"></div>
+                            </th>
+                        </tr>
+                        <tr>
+                            <th id="thSku">SKU</th>
+                            <th id="thProductName">商品名称</th>
+                            <th id="thSupplier">供应商</th>
+                            <th id="thCreateTime">创建时间</th>
+                            <th id="thModifyTime">修改时间</th>
+                        </tr>
+                        </thead>
+
+                    </table>
+                    <div class="todo">1、不同权限的人员只能看到自己的信息，比如有的不能看到成本价等；2、图片的展示。</div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 <script type="text/javascript">
     var vm = new Vue({
@@ -190,19 +236,76 @@
                                 return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
                             }
                         },
-                        {"mDataProp": "prd.sku", "title": "SKU", "bSearchable": true},
-                        {"mDataProp": "prd.name", "title": "名称", "bSearchable": true},
+                        {
+                            "mDataProp": "prd.sku", "title": "SKU", "bSearchable": true,
+                            "render": function (data, type, row) {
+                                return '<div class="tdSkuNameSup">' + row.prd.sku + '</div><div>' + row.prd.name + '</div><div>' + row.sup.name + '</div>';
+                            }
+                        },
+                        {
+                            "mDataProp": "prd.name", "title": "商品名称", "bSearchable": true,
+                            "render": function (data, type, row) {
+                                return '<span class="spanProductName"></span>';
+                            }
+                        },
+                        {
+                            "mDataProp": "sup.name", "title": "供应商", "bSearchable": false,
+                            "render": function (data, type, row) {
+                                return '<span class="spanSupName"></span>';
+                            }
+                        },
                         {"mDataProp": "cate.full_name", "title": "商品目录", "bSearchable": false},
                         {"mDataProp": "prd.cost_price", "title": "成本价(RMB)", "bSearchable": false},
                         {"mDataProp": "prd.weight", "title": "重量(kg)", "bSearchable": false},
-                        {"mDataProp": "sup.name", "title": "供应商", "bSearchable": false},
+                        {"mDataProp": "pm.name", "title": "包材", "bSearchable": false},
                         {"mDataProp": "prd.desc", "title": "备注", "bSearchable": true},
                         {"mDataProp": "st.name", "title": "状态", "bSearchable": false},
-                        {"mDataProp": "prd.create_time", "title": "创建时间", "bSearchable": false, "width": 120},
-                        {"mDataProp": "prd.update_time", "title": "修改时间", "bSearchable": false, "width": 120}
-                    ]
+                        {
+                            "mDataProp": "prd.create_time", "title": "创建时间", "bSearchable": false,
+                            "render": function (data, type, row) {
+                                return '<div class="tdCreateTime">' + row.prd.create_time + '</div><div>' + row.prd.update_time + '</div>';
+                            }
+                        },
+                        {
+                            "mDataProp": "prd.update_time", "title": "修改时间", "bSearchable": false,
+                            "render": function (data, type, row) {
+                                return '<span class="spanUpdateTime"></span>';
+                            }
+                        }
+                    ],
+                    "fnServerData": function (sSource, aoData, fnCallback) {
+                        showMask("数据加载中，请稍候");
+                        $.ajax(
+                            {
+                                "dataType": 'json',
+                                "url": sSource,
+                                "data": aoData,
+                                "success": function (data) {
+                                    hideMask();
+                                    if (data.success == false) {
+                                        $.msg.error(data.message);
+                                        return;
+                                    }
+                                    fnCallback(data);
+
+                                    $(".spanProductName").parent().html("").css("width", "0").css("padding", "0").css("border-style", "none");
+                                    $(".spanSupName").parent().html("").css("width", "0").css("padding", "0").css("border-style", "none");
+                                    $(".tdSkuNameSup").parent().css("width", "200px");
+
+                                    $(".spanUpdateTime").parent().css("display", "none");
+                                    $(".tdCreateTime").parent().css("width", "120px");
+                                }
+                            });
+                    }
                 }
             );
+
+            $("#headerSku").append($("#thSku"));
+            $("#headerName").append($("#thProductName"));
+            $("#headerSupplier").append($("#thSupplier"));
+
+            $("#headerCreateTime").append($("#thCreateTime"));
+            $("#headerModifyTime").append($("#thModifyTime"));
 
             $('#productList tbody').on('dblclick', 'tr', function () {
                 var id = $(this).find('td:first-child input:checkbox').val();
@@ -244,80 +347,23 @@
                     'detail.product.name': {
                         required: true, minlength: 2, maxlength: 100
                     },
-                    'detail.product.english_name': {
-                        required: true, minlength: 2, maxlength: 100
-                    },
-                    'detail.product.stock_name': {
-                        required: true, minlength: 2, maxlength: 100
-                    },
-                    'detail.product.brand_id': {
-                        required: false, digits: true
-                    },
                     'detail.product.cate_id': {
                         required: false, digits: true
-                    },
-                    'detail.product.retail_price': {
-                        required: true, number: true
                     },
                     'detail.product.cost_price': {
                         required: true, number: true
                     },
-                    'detail.product.quantity': {
-                        required: true, digits: true
-                    },
                     'detail.product.weight': {
                         required: true, number: true
-                    },
-                    'detail.product.stock_id': {
-                        required: false, digits: true
-                    },
-                    'detail.product.storage_loc_id': {
-                        required: false, digits: true
                     },
                     'detail.product.supplier_id': {
                         required: false, digits: true
                     },
-                    'detail.product.supplier_price': {
-                        required: true, number: true
-                    },
-                    'detail.product.producing_area': {
-                        required: false, maxlength: 100
+                    'detail.product.pkg_mtrl_id': {
+                        required: false, digits: true
                     },
                     'detail.product.status_id': {
                         required: true, digits: true
-                    },
-                    'detail.product.zxcgl': {
-                        required: false, digits: true
-                    },
-                    'detail.product.kcjjts': {
-                        required: false, digits: true
-                    },
-                    'detail.product.cgts': {
-                        required: false, digits: true
-                    },
-                    'detail.product.cgsx': {
-                        required: false, digits: true
-                    },
-                    'detail.product.cgy_id': {
-                        required: false, digits: true
-                    },
-                    'detail.product.xsy_id': {
-                        required: false, digits: true
-                    },
-                    'detail.product.phy_id': {
-                        required: false, digits: true
-                    },
-                    'detail.product.xsxx': {
-                        required: false, maxlength: 500
-                    },
-                    'detail.product.ywmjl': {
-                        required: false, maxlength: 500
-                    },
-                    'detail.product.zjbz': {
-                        required: false, maxlength: 500
-                    },
-                    'detail.product.bzxx': {
-                        required: false, maxlength: 500
                     }
                 });
 

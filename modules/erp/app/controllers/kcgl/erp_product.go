@@ -20,10 +20,11 @@ func (c ErpProduct) Index() revel.Result {
 }
 
 type ErpProductViewItem struct {
-	models.ProductInfo       `xorm:"extends" json:"prd"`
-	models.ProductCateInfo   `xorm:"extends" json:"cate"`
-	models.SupplierInfo      `xorm:"extends" json:"sup"`
-	models.StatusInfo        `xorm:"extends" json:"st"`
+	models.ProductInfo          `xorm:"extends" json:"prd"`
+	models.ProductCateInfo      `xorm:"extends" json:"cate"`
+	models.SupplierInfo         `xorm:"extends" json:"sup"`
+	models.PackageMaterialInfo  `xorm:"extends" json:"pm"`
+	models.StatusInfo           `xorm:"extends" json:"st"`
 }
 
 func (c ErpProduct) ListData() revel.Result {
@@ -32,41 +33,48 @@ func (c ErpProduct) ListData() revel.Result {
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
 	/*
-		SELECT prd.*, cate.*, sup.*, st.*
-		FROM erp_product prd
-		    LEFT JOIN erp_product_cate cate ON prd.cate_id = cate.id
-		    LEFT JOIN erp_supplier sup ON prd.supplier_id = sup.id
-		    INNER JOIN erp_status st ON prd.status_id = st.id
+SELECT prd.*, cate.*, sup.*, pm.*, st.*
+FROM erp_product prd
+    LEFT JOIN erp_product_cate cate ON prd.cate_id = cate.id
+    LEFT JOIN erp_supplier sup ON prd.supplier_id = sup.id
+    LEFT JOIN erp_package_material pm ON prd.pkg_mtrl_id = pm.id
+    INNER JOIN erp_status st ON prd.status_id = st.id
 	*/
 
-	query := db_session.
-	Select("prd.*, cate.*, sup.*, st.*").
-		Table("erp_product").Alias("prd").
-		Join("LEFT", []string{"erp_product_cate", "cate"}, "prd.cate_id = cate.id").
-		Join("LEFT", []string{"erp_supplier", "sup"}, "prd.supplier_id = sup.id").
-		Join("INNER", []string{"erp_status", "st"}, "prd.status_id = st.id").
-		Where(filter)
+	sql_builder := core.NewSqlBuilder()
+	sql_builder.Select("prd.*, cate.*, sup.*, pm.*, st.*")
+	sql_builder.Count("count(prd.id) as product_count")
+	sql_builder.From(`erp_product prd
+    LEFT JOIN erp_product_cate cate ON prd.cate_id = cate.id
+    LEFT JOIN erp_supplier sup ON prd.supplier_id = sup.id
+    LEFT JOIN erp_package_material pm ON prd.pkg_mtrl_id = pm.id
+    INNER JOIN erp_status st ON prd.status_id = st.id`)
+
+	sql_builder.Where(filter)
 
 	//query extra filter here
 
-	data_query := *query
 	if order != "" {
-		data_query = *data_query.OrderBy(order)
+		sql_builder.OrderBy(order)
 	} else {
-		data_query = *data_query.Asc("prd.id")
+		sql_builder.OrderBy("prd.id ASC")
 	}
 
+	sql_builder.Limit(offset, limit)
+
 	product_list := make([]ErpProductViewItem, 0, limit)
-	err := data_query.Limit(limit, offset).Find(&product_list)
+	err := db_session.Sql(sql_builder.SqlList()).Find(&product_list)
 	core.HandleError(err)
 
-	count_query := *query
-	count, err := count_query.Count(new(ErpProductViewItem))
+	var product_count struct {
+		Count int64 `xorm:"'product_count'"`
+	}
+	_, err = db_session.Sql(sql_builder.SqlCount()).Get(&product_count)
 	core.HandleError(err)
 
 	return c.RenderJson(core.GridResult{
 		Data:  product_list,
-		Total: count,
+		Total: product_count.Count,
 	})
 }
 
@@ -74,6 +82,7 @@ type ProductDetailForm struct {
 	Product                   models.ProductInfo                           `json:"product"`
 	SupplierList              []models.SupplierInfo                        `json:"supplier_list"`
 	ProductCateSelectItemList []product_cate_service.ProductCateSelectItem `json:"product_cate_list"`
+	PackageMaterialList       [] models.PackageMaterialInfo                `json:"package_material_list"`
 	StatusList                []models.StatusInfo                          `json:"status_list"`
 }
 
@@ -132,12 +141,17 @@ func (c ErpProduct) DetailData() revel.Result {
 
 	var product_cate_list = product_cate_service.GetProductCateSelectItemList(db_session)
 
+	var package_material_list [] models.PackageMaterialInfo
+	err = db_session.Asc(models.PackageMaterialCols.Name).Find(&package_material_list)
+	core.HandleError(err)
+
 	status_list := status_service.GetStatusList(db_session, models.STATUS_TYPE_PRODUCT)
 
 	var detail_form ProductDetailForm
 	detail_form.Product = product
 	detail_form.SupplierList = supplier_list
 	detail_form.ProductCateSelectItemList = product_cate_list
+	detail_form.PackageMaterialList = package_material_list
 	detail_form.StatusList = status_list
 
 	return c.RenderJson(detail_form)
