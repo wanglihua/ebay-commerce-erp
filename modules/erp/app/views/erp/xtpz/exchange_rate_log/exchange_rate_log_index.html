@@ -26,67 +26,6 @@
             </div>
         </div>
     </div>
-    <div class="modal fade" id="exchangeRateLogDetailDialog">
-        <div class="modal-dialog" style="width: 680px;">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="True">&times;</button>
-                    <h4 class="modal-title">货币汇率操作日志详细</h4>
-                </div>
-                <div class="modal-body clearfix">
-                    <div class="row">
-                        <div class="col-xs-12">
-                            <form class="form-horizontal" role="form" id="exchangeRateLogDetailForm">
-                                <input id="exchange_rate_log_id" name="detail.rate_log.id" type="hidden" v-model.number="detail.rate_log.id"/>
-                                <input id="exchange_rate_log_version" name="detail.rate_log.version" type="hidden" v-model.number="detail.rate_log.version"/>
-                                <div class="row">
-                                    <div class="col-xs-6">
-                                        <div class="form-group">
-                                            <label for="name" class="col-xs-2 control-label">名称</label>
-                                            <div class="col-xs-10">
-                                                <input id="name" name="detail.rate_log.name" type="text" class="input-sm form-control" v-model="detail.rate_log.name"/>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-xs-6">
-                                        <div class="form-group">
-                                            <label for="desc" class="col-xs-2 control-label">操作</label>
-                                            <div class="col-xs-10">
-                                                <input id="desc" name="detail.rate_log.desc" type="text" class="input-sm form-control" v-model="detail.rate_log.desc"/>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-xs-6">
-                                        <div class="form-group">
-                                            <label for="login_name" class="col-xs-2 control-label">工号</label>
-                                            <div class="col-xs-10">
-                                                <input id="login_name" name="detail.rate_log.login_name" type="text" class="input-sm form-control" v-model="detail.rate_log.login_name"/>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                            </form>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-success btn-sm" @click="saveExchangeRateLog()">
-                        <i class="ace-icon fa fa-floppy-o"></i>保存
-                    </button>
-                    <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">
-                        <i class="ace-icon fa fa-times"></i>关闭
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
 </div>
 <script type="text/javascript">
     var vm = new Vue({

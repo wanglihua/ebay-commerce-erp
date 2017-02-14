@@ -49,6 +49,9 @@ POST /erp/product/cate/data/detail             ErpProductCate.DetailData
 POST /erp/product/cate/save                    ErpProductCate.Save
 POST /erp/product/cate/delete                  ErpProductCate.Delete
 
+GET  /erp/product/cate/log                     ErpProductCateLog.Index
+POST /erp/product/cate/log/data/list           ErpProductCateLog.ListData
+
 GET  /erp/login/log                            ErpLoginLog.Index
 POST /erp/login/log/data/list                  ErpLoginLog.ListData
 
