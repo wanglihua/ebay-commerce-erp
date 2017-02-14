@@ -5,8 +5,9 @@
             <li>
                 <a href='{%url "Home.Index"%}'><i class="ace-icon fa fa-home home-icon"></i></a>
             </li>
-            <li class="parent" data-menu="sppz-menu">ERP</li>
-            <li class="active" data-menu="sppz-productcatelog-menu">商品目录操作日志</li>
+            <li class="parent" data-menu="sppz-menu">商品配置</li>
+            <li class="parent" data-menu="sppz-menu"><a href='{% url "ErpProductCate.Index" %}'>商品目录</a></li>
+            <li class="active" data-menu="sppz-productcatelog-menu">操作日志</li>
         </ul>
     </div>
     <div class="page-content">
