@@ -6,7 +6,8 @@
                 <a href='{%url "Home.Index"%}'><i class="ace-icon fa fa-home home-icon"></i></a>
             </li>
             <li class="parent" data-menu="xtpz-menu">系统配置</li>
-            <li class="active" data-menu="xtpz-exchangerate-menu"><a href='{%url "ErpExchangeRate.Index"%}'>货币汇率</a></li>
+            <li class="active" data-menu="xtpz-exchangerate-menu"><a href='{%url "ErpExchangeRate.Index"%}'>货币汇率</a>
+            </li>
             <li>操作日志</li>
         </ul>
     </div>
@@ -102,17 +103,7 @@
                     "sAjaxSource": '{%url "ErpExchangeRateLog.ListData"%}',
                     "aaSorting": [[4, "desc"]],
                     "aoColumns": [
-                        {
-                            "mDataProp": "id",
-                            "bSearchable": false,
-                            "orderable": false,
-                            "sClass": "center",
-                            "width": 50,
-                            "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
-                            "render": function (data, type, row) {
-                                return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
-                            }
-                        },
+                        {"mDataProp": "id", "title": '编号', "bSearchable": false, "sClass": "center", "width": 50},
                         {"mDataProp": "name", "title": "名称", "bSearchable": true, "width": 180},
                         {"mDataProp": "desc", "title": "操作", "bSearchable": true},
                         {"mDataProp": "login_name", "title": "工号", "bSearchable": true, "width": 120},
