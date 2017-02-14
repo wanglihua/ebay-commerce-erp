@@ -19,7 +19,8 @@ func (c AuthUserPassRes) Index() revel.Result {
 
 	if len(user_id_list) == 0 {
 		//return c.RenderJson(core.JsonResult{Success: false, Message: "用户列表不能为空，请选择用户！"})
-		panic("用户列表不能为空，请选择用户！")
+		//panic("用户列表不能为空，请选择用户！")
+		return c.RenderText("用户列表不能为空，请选择用户！")
 	}
 
 	c.RenderArgs["user_id_list"] = user_id_list

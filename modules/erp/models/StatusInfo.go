@@ -21,7 +21,7 @@ const (
 	// Paypal账号状态
 	STATUS_TYPE_PAYPAL_ACCOUNT = 600
 	// 包材 状态
-	STATUS_TYPE_PACKAGE = 700
+	STATUS_TYPE_PACKAGE_MTRL = 700
 	// 库存盘点单状态
 	STATUS_TYPE_INVENTORY_CHECK = 800
 	// Paypal对账结果
@@ -90,9 +90,9 @@ const (
 	PAYPAL_ACCOUNT_STATUS_DISABLED = 1700
 
 	// 包材状态 正常
-	PACKAGE_STATUS_ENABLED = 1800
+	PACKAGE_MTRL_STATUS_ENABLED = 1800
 	// 包材状态 停用
-	PACKAGE_STATUS_DISABLED = 1900
+	PACKAGE_MTRL_STATUS_DISABLED = 1900
 
 	// 盘点单状态 未通过
 	INVENTORY_CHECK_STATUS_WTG = 2000
@@ -325,15 +325,15 @@ func (e StatusInfo) InitData(db_session *xorm.Session) {
 	//包材状态
 	{
 		status := new(StatusInfo)
-		status.Id = PACKAGE_STATUS_ENABLED
-		status.Type = STATUS_TYPE_PACKAGE
+		status.Id = PACKAGE_MTRL_STATUS_ENABLED
+		status.Type = STATUS_TYPE_PACKAGE_MTRL
 		status.Name = "正常"
 		status.Desc = core.NewNullString("包材状态 正常", true)
 		db_session.Insert(status)
 
 		status = new(StatusInfo)
-		status.Id = PACKAGE_STATUS_DISABLED
-		status.Type = STATUS_TYPE_PACKAGE
+		status.Id = PACKAGE_MTRL_STATUS_DISABLED
+		status.Type = STATUS_TYPE_PACKAGE_MTRL
 		status.Name = "停用"
 		status.Desc = core.NewNullString("包材状态 停用", true)
 		db_session.Insert(status)

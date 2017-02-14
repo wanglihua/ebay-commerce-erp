@@ -116,7 +116,11 @@ func (c ErpPackageMaterial) DetailData() revel.Result {
 		}
 	}
 
-	status_list := status_service.GetStatusList(db_session, models.STATUS_TYPE_PACKAGE)
+	if package_material.Id == 0 {
+		package_material.StatusId = models.PACKAGE_MTRL_STATUS_ENABLED
+	}
+
+	status_list := status_service.GetStatusList(db_session, models.STATUS_TYPE_PACKAGE_MTRL)
 
 	var detail_form PackageMaterialDetailForm
 	detail_form.PackageMaterial = package_material
