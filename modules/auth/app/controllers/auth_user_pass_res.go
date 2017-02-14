@@ -30,20 +30,20 @@ func (c AuthUserPassRes) Index() revel.Result {
 type AuthUserPassResViewItem struct {
 	models.PassResInfo     `xorm:"extends" json:"r"`
 	models.PassResCateInfo `xorm:"extends" json:"rc"`
-	IsAuth core.NullInt    `xorm:"'is_auth'" json:"is_auth"`
+	IsAuth core.NullInt `xorm:"'is_auth'" json:"is_auth"`
 }
 
 func (c AuthUserPassRes) ListData() revel.Result {
 	db_session := c.DbSession
 
 	/*
-	var user_id_list = make([]int64, 0)
-	c.Params.Bind(&user_id_list, "user_id_list")
+		var user_id_list = make([]int64, 0)
+		c.Params.Bind(&user_id_list, "user_id_list")
 
-	var user_id_str_list = make([]string, 0)
-	for _, user_id := range user_id_list {
-		user_id_str_list = append(user_id_str_list, fmt.Sprint(user_id))
-	}
+		var user_id_str_list = make([]string, 0)
+		for _, user_id := range user_id_list {
+			user_id_str_list = append(user_id_str_list, fmt.Sprint(user_id))
+		}
 	*/
 
 	var user_ids_str string
