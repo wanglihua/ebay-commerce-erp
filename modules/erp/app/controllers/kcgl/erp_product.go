@@ -122,6 +122,10 @@ func (c ErpProduct) DetailData() revel.Result {
 		}
 	}
 
+	if product.Id == 0 {
+		product.StatusId = models.PRODUCT_STATUS_ZC
+	}
+
 	var supplier_list []models.SupplierInfo
 	err := db_session.Asc(models.SupplierCols.Name).Find(&supplier_list)
 	core.HandleError(err)

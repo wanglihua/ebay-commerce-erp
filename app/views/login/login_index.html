@@ -118,6 +118,7 @@
                     function refreshCaptcha() {
                         var timestamp = new Date().getTime();
                         $("#imgCaptcha").attr("src", "/captcha/image?" + timestamp);
+                        $("#captcha").val("");
                     }
 
                     function inputOnKeyDown(e) {

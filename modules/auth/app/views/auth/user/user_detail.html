@@ -14,7 +14,7 @@
                             <div class="form-group">
                                 <label for="user_login_name" class="col-xs-2 control-label">工号</label>
                                 <div class="col-xs-10">
-                                    {%if eq .form_User_LoginName "0000" %}
+                                    {%if eq .form_User_LoginName "admin" %}
                                     <input name="form.User.LoginName" type="hidden" value="{%.form_User_LoginName%}"/>
                                     <input id='{%"user_login_name"%}' name="form.User.LoginName" type="text" disabled="disabled" class="input-sm form-control" value="{%.form_User_LoginName%}"/>
                                     {%else%}

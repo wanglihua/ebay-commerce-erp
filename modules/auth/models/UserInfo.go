@@ -23,7 +23,7 @@ func (e UserInfo) TableName() string {
 
 func (e UserInfo) InitData(db_session *xorm.Session) {
 	user := new(UserInfo)
-	user.LoginName = "0000"
+	user.LoginName = "admin"
 	user.NickName = "管理员"
 	user.Password = core.EncryptPassword("111111")
 	db_session.Insert(user)
