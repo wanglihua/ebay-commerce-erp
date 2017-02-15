@@ -161,6 +161,9 @@ func (c ErpProductCate) Save() revel.Result {
 
 		affected, err = db_session.Insert(&product_cate)
 		core.HandleError(err)
+
+		// 插入操作日志
+		c.insert_product_cate_log(&product_cate, "插入数据", c.DbSession, c.Session)
 	} else {
 		name_count, err := db_session.Where("id <> ? and name = ?", product_cate.Id, product_cate.Name).Count(&product_cate)
 		core.HandleError(err)
@@ -172,6 +175,9 @@ func (c ErpProductCate) Save() revel.Result {
 
 		affected, err = db_session.Id(product_cate.Id).Update(&product_cate)
 		core.HandleError(err)
+
+		// 插入操作日志
+		c.insert_product_cate_log(&product_cate, "编辑数据", c.DbSession, c.Session)
 
 		if affected == 0 {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！"})
@@ -200,8 +206,29 @@ func (c ErpProductCate) Delete() revel.Result {
 	product_cate_id_list := make([]int64, 0)
 	c.Params.Bind(&product_cate_id_list, "id_list")
 
+	// 插入删除日志
+	for _, product_cate_id := range product_cate_id_list {
+		var product_cate models.ProductCateInfo
+		has, err := db_session.Id(product_cate_id).Get(&product_cate)
+		core.HandleError(err)
+
+		if has {
+			c.insert_product_cate_log(&product_cate, "删除数据", c.DbSession, c.Session)
+		}
+	}
+
 	affected, err := db_session.In("id", product_cate_id_list).Delete(new(models.ProductCateInfo))
 	core.HandleError(err)
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})
+}
+
+func (c ErpProductCate) insert_product_cate_log(product_cate *models.ProductCateInfo, log_desc string, db_session *xorm.Session, web_session revel.Session) {
+	var product_cate_log models.ProductCateLogInfo
+	product_cate_log.Name = product_cate.FullName
+	product_cate_log.Desc = log_desc
+	product_cate_log.LoginName = core.GetLoginUser(c.Session).LoginName
+
+	_, err := db_session.Insert(&product_cate_log)
+	core.HandleError(err)
 }
