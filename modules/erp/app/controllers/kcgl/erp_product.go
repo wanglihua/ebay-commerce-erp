@@ -9,6 +9,8 @@ import (
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/status_service"
 	"matrix/modules/erp/service/product_cate_service"
+	"github.com/go-xorm/xorm"
+	"fmt"
 )
 
 type ErpProduct struct {
@@ -168,39 +170,47 @@ func (c ErpProduct) Save() revel.Result {
 		return c.RenderJson(core.JsonResult{Success: false, Message: c.GetValidationErrorMessage()})
 	}
 
-	product := detail_form.Product
+	product_from_ui := detail_form.Product
 
 	var affected int64
 	if detail_form.IsCreate() {
-		sku_count, err := db_session.Where("sku = ?", product.Sku).Count(&product)
+		sku_count, err := db_session.Where("sku = ?", product_from_ui.Sku).Count(&product_from_ui)
 		core.HandleError(err)
 		if sku_count != 0 {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，SKU已存在！" })
 		}
 
-		name_count, err := db_session.Where("name = ?", product.Name).Count(&product)
+		name_count, err := db_session.Where("name = ?", product_from_ui.Name).Count(&product_from_ui)
 		core.HandleError(err)
 		if name_count != 0 {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，名称已存在！" })
 		}
 
-		affected, err = db_session.Insert(&product)
+		affected, err = db_session.Insert(&product_from_ui)
 		core.HandleError(err)
+
+		c.insert_product_log(nil, &product_from_ui, product_operation_type.insert, db_session, c.Session)
 	} else {
-		sku_count, err := db_session.Where("id <> ? and sku = ?", product.Id, product.Sku).Count(&product)
+		sku_count, err := db_session.Where("id <> ? and sku = ?", product_from_ui.Id, product_from_ui.Sku).Count(&product_from_ui)
 		core.HandleError(err)
 		if sku_count != 0 {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，SKU已存在！" })
 		}
 
-		name_count, err := db_session.Where("id <> ? and name = ?", product.Id, product.Name).Count(&product)
+		name_count, err := db_session.Where("id <> ? and name = ?", product_from_ui.Id, product_from_ui.Name).Count(&product_from_ui)
 		core.HandleError(err)
 		if name_count != 0 {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，名称已存在！" })
 		}
 
-		affected, err = db_session.Id(product.Id).Update(&product)
+		var product_in_db models.ProductInfo
+		_, err = db_session.Id(product_from_ui.Id).Get(&product_in_db)
 		core.HandleError(err)
+
+		affected, err = db_session.Id(product_from_ui.Id).Update(&product_from_ui)
+		core.HandleError(err)
+
+		c.insert_product_log(&product_from_ui, &product_in_db, product_operation_type.update, db_session, c.Session)
 
 		if affected == 0 {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！"})
@@ -216,8 +226,56 @@ func (c ErpProduct) Delete() revel.Result {
 	product_id_list := make([]int64, 0)
 	c.Params.Bind(&product_id_list, "id_list")
 
+	for _, product_id := range product_id_list {
+		var product models.ProductInfo
+		has, err := db_session.Id(product_id).Get(&product)
+		core.HandleError(err)
+
+		if has {
+			c.insert_product_log(nil, &product, product_operation_type.delete, db_session, c.Session)
+		}
+	}
+
 	affected, err := db_session.In("id", product_id_list).Delete(new(models.ProductInfo))
 	core.HandleError(err)
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})
+}
+
+var product_operation_type = struct {
+	insert int64
+	update int64
+	delete int64
+}{
+	insert: 1,
+	update: 2,
+	delete: 3,
+}
+
+// 插入商品日志
+func (c ErpProduct) insert_product_log(product_from_ui *models.ProductInfo /*更新操作时使用*/ , product_in_db *models.ProductInfo, operation_type int64, db_session *xorm.Session, web_session revel.Session) {
+	var product_log models.ProductLogInfo
+
+	product_log.ProductId = product_in_db.Id
+	product_log.ProductCode = product_in_db.Sku
+
+	login_user := core.GetLoginUser(c.Session)
+	product_log.UserId = login_user.UserId
+	product_log.LoginName = login_user.LoginName
+
+	if operation_type == product_operation_type.delete {
+		product_log.Operation = "删除数据"
+	} else if operation_type == product_operation_type.insert {
+		//获得详细的插入数据
+		product_log.Operation = "插入数据"
+	} else if operation_type == product_operation_type.update {
+		//获得详细的字段修改数据
+		product_log.Operation = "更新数据。"
+		product_log.Operation += fmt.Sprintf(" SKU: %s => %s", product_in_db.Sku, product_from_ui.Sku)
+		product_log.Operation += fmt.Sprintf(" 名称: %s => %s", product_in_db.Name, product_from_ui.Name)
+		product_log.Operation += fmt.Sprintf(" 描述: %s => %s", product_in_db.Desc.String, product_from_ui.Desc.String)
+	}
+
+	_, err := db_session.Insert(&product_log)
+	core.HandleError(err)
 }

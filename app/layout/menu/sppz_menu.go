@@ -71,14 +71,6 @@ func GetSppzMenu(res_id_map map[int64]bool, db_session *xorm.Session, web_sessio
             <b class="arrow"></b>
         </li>
 
-        <li id="sppz-productlog-menu" class="">
-            <a href="/erp/product/log">
-                <i class="menu-icon fa fa-caret-right"></i>
-                商品修改日志
-            </a>
-            <b class="arrow"></b>
-        </li>
-
         <li id="sppz-supplier-menu" class="">
             <a href="/erp/supplier">
                 <i class="menu-icon fa fa-caret-right"></i>
