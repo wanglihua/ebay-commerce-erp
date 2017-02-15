@@ -183,32 +183,20 @@
                         <!--SKU	名称	商品目录	成本价(RMB)	重量(kg)	供应商	包材	备注	状态	创建时间	修改时间-->
                         <thead>
                         <tr>
-                            <th rowspan="2"></th>
-                            <th id="thSkuNameSup" colspan="3">
-                                <div id="headerSku"></div>
-                                <div id="headerName"></div>
-                                <div id="headerSupplier"></div>
-                            </th>
-                            <th rowspan="2">商品目录</th>
-                            <th rowspan="2">成本价(RMB)</th>
-                            <th rowspan="2">重量(kg)</th>
-                            <th rowspan="2">包材</th>
-                            <th rowspan="2">备注</th>
-                            <th rowspan="2">状态</th>
-                            <th id="thTime" colspan="2">
-                                <div id="headerCreateTime"></div>
-                                <div id="headerModifyTime"></div>
-                            </th>
-                        </tr>
-                        <tr>
+                            <th></th>
                             <th id="thSku">SKU</th>
-                            <th id="thProductName">商品名称</th>
-                            <th id="thSupplier">供应商</th>
+                            <th id="thProductName" style="display: none;">商品名称</th>
+                            <th id="thSupplier" style="display: none;">供应商</th>
+                            <th>商品目录</th>
+                            <th>成本价(RMB)</th>
+                            <th>重量(kg)</th>
+                            <th>包材</th>
+                            <th>备注</th>
+                            <th>状态</th>
                             <th id="thCreateTime">创建时间</th>
-                            <th id="thModifyTime">修改时间</th>
+                            <th id="thModifyTime" style="display: none;">修改时间</th>
                         </tr>
                         </thead>
-
                     </table>
                     <div class="todo">1、不同权限的人员只能看到自己的信息，比如有的不能看到成本价等；2、图片的展示。</div>
                 </div>
@@ -298,8 +286,8 @@
                                     }
                                     fnCallback(data);
 
-                                    $(".spanProductName").parent().html("").css("width", "0").css("padding", "0").css("border-style", "none");
-                                    $(".spanSupName").parent().html("").css("width", "0").css("padding", "0").css("border-style", "none");
+                                    $(".spanProductName").parent().css("display", "none");
+                                    $(".spanSupName").parent().css("display", "none");
                                     $(".tdSkuNameSup").parent().css("width", "200px");
 
                                     $(".spanUpdateTime").parent().css("display", "none");
@@ -310,9 +298,15 @@
                 }
             );
 
-            $("#headerSku").append($("#thSku"));
-            $("#headerName").append($("#thProductName"));
-            $("#headerSupplier").append($("#thSupplier"));
+            var thSku = $("#thSku");
+
+            $("#thSku").append($("<div>"));
+            $("#thSku").append($("#thProductName"));
+            $("#thSku").append($("</div>"));
+
+            $("#thSku").append($("<div>"));
+            $("#thSku").append($("#thSupplier"));
+            $("#thSku").append($("</div>"));
 
             $("#headerCreateTime").append($("#thCreateTime"));
             $("#headerModifyTime").append($("#thModifyTime"));
