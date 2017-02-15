@@ -4,7 +4,6 @@ var ProductImportCols = struct {
 	Id          string
 	Sku         string
 	Name        string
-	EnglishName string
 	CostPrice   string
 	Weight      string
 	UserId      string
@@ -13,7 +12,6 @@ var ProductImportCols = struct {
 	Id:          "id",
 	Sku:         "sku",
 	Name:        "name",
-	EnglishName: "english_name",
 	CostPrice:   "cost_price",
 	Weight:      "weight",
 	UserId:      "user_id",

@@ -103,14 +103,6 @@ func (c ErpProductImport) Import() revel.Result {
 			product_import.Name = cell_val
 			col_index++
 
-			//英文名
-			cell = row.Cells[col_index]
-			cell_val, err = cell.String()
-			core.HandleError(err)
-			//revel.TRACE.Println(cell_val)
-			product_import.EnglishName = cell_val
-			col_index++
-
 			//成本价(元)
 			cell = row.Cells[col_index]
 			cell_val, err = cell.String()
@@ -163,8 +155,8 @@ func (c ErpProductImport) Confirm() revel.Result {
 	proc_sql := `
 CREATE PROCEDURE erp_product_import_trans_v0001(p_user_id INT, p_product_status_id INT)
     BEGIN
-        INSERT INTO erp_product (sku, name, english_name, cost_price, weight, status_id, create_time, update_time, version)
-            SELECT pi.sku, pi.name, pi.english_name, pi.cost_price, pi.weight, p_product_status_id, pi.import_time,
+        INSERT INTO erp_product (sku, name, cost_price, weight, status_id, create_time, update_time, version)
+            SELECT pi.sku, pi.name, pi.cost_price, pi.weight, p_product_status_id, pi.import_time,
                 pi.import_time, 1
             FROM erp_product_import pi
             WHERE pi.user_id = p_user_id;
