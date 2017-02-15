@@ -89,6 +89,7 @@
                                             <label for="supplier_id" class="col-xs-2 control-label">供应商</label>
                                             <div class="col-xs-10">
                                                 <select id="supplier_id" name="detail.product.supplier_id" class="input-sm form-control" v-model.number="detail.product.supplier_id">
+                                                    <option value=""></option>
                                                     <template v-for="supplier in detail.supplier_list">
                                                         <option :value="supplier.id">{{supplier.name}}</option>
                                                     </template>
@@ -104,6 +105,7 @@
                                             <label for="supplier_id" class="col-xs-2 control-label">包材类型</label>
                                             <div class="col-xs-10">
                                                 <select id="package_material_id" name="detail.product.pkg_mtrl_id" class="input-sm form-control" v-model.number="detail.product.pkg_mtrl_id">
+                                                    <option value=""></option>
                                                     <template v-for="package_material in detail.package_material_list">
                                                         <option :value="package_material.id">{{package_material.name}}
                                                         </option>
@@ -239,7 +241,11 @@
                         {
                             "mDataProp": "prd.sku", "title": "SKU", "bSearchable": true,
                             "render": function (data, type, row) {
-                                return '<div class="tdSkuNameSup">' + row.prd.sku + '</div><div>' + row.prd.name + '</div><div>' + row.sup.name + '</div>';
+                                var sup_name = "暂无供应商";
+                                if (row.sup.name != "") {
+                                    sup_name = row.sup.name;
+                                }
+                                return '<div class="tdSkuNameSup">' + row.prd.sku + '</div><div>' + row.prd.name + '</div><div>' + sup_name + '</div>';
                             }
                         },
                         {
