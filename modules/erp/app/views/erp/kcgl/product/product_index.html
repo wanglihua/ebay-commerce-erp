@@ -194,7 +194,7 @@
                             <th>备注</th>
                             <th>状态</th>
                             <th id="thCreateTime">创建时间</th>
-                            <th id="thModifyTime" style="display: none;">修改时间</th>
+                            <th id="thUpdateTime">修改时间</th>
                         </tr>
                         </thead>
                     </table>
@@ -308,8 +308,11 @@
             thSkuNameSup.append($("#divProductName"));
             thSkuNameSup.append($("#divSupplier"));
 
-            $("#headerCreateTime").append($("#thCreateTime"));
-            $("#headerModifyTime").append($("#thModifyTime"));
+            $("#thCreateTime").before("<th id='thCreateUpdateTime'></th>");
+            $("#thCreateTime").wrap("<div id='divCreateTime'></div>");
+            $("#thUpdateTime").wrap("<div id='divUpdateTime'></div>");
+
+            $("#thCreateUpdateTime").append($("#divCreateTime")).append($("#divUpdateTime"));
 
             $('#productList tbody').on('dblclick', 'tr', function () {
                 var id = $(this).find('td:first-child input:checkbox').val();
