@@ -185,8 +185,8 @@
                         <tr>
                             <th></th>
                             <th id="thSku">SKU</th>
-                            <th id="thProductName" style="display: none;">商品名称</th>
-                            <th id="thSupplier" style="display: none;">供应商</th>
+                            <th id="thProductName">商品名称</th>
+                            <th id="thSupplier">供应商</th>
                             <th>商品目录</th>
                             <th>成本价(RMB)</th>
                             <th>重量(kg)</th>
@@ -298,15 +298,15 @@
                 }
             );
 
-            var thSku = $("#thSku");
+            $("#thSku").before("<th id='thSkuNameSup'></th>");
+            $("#thSku").wrap("<div id='divSku'></div>");
+            $("#thProductName").wrap("<div id='divProductName'></div>");
+            $("#thSupplier").wrap("<div id='divSupplier'></div>");
 
-            $("#thSku").append($("<div>"));
-            $("#thSku").append($("#thProductName"));
-            $("#thSku").append($("</div>"));
-
-            $("#thSku").append($("<div>"));
-            $("#thSku").append($("#thSupplier"));
-            $("#thSku").append($("</div>"));
+            var thSkuNameSup = $("#thSkuNameSup");
+            thSkuNameSup.append($("#divSku"));
+            thSkuNameSup.append($("#divProductName"));
+            thSkuNameSup.append($("#divSupplier"));
 
             $("#headerCreateTime").append($("#thCreateTime"));
             $("#headerModifyTime").append($("#thModifyTime"));
