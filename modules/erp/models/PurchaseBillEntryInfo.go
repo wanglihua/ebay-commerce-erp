@@ -14,6 +14,7 @@ type PurchaseBillEntryInfo struct {
 	PurchaseDate core.NullDate   `xorm:"datetime null 'purchase_date'" json:"purchase_date" smith:"verbose_name=采购日期"`
 	CheckinDate  core.NullDate   `xorm:"datetime null 'checkin_date'" json:"checkin_date" smith:"verbose_name=入库日期"`
 	Desc         core.NullString `xorm:"nvarchar(500) 'desc'" json:"desc" smith:"verbose_name=备注,min=2,max=400"`
+	StatusId     int64           `xorm:"bigint notnull index 'status_id'" json:"status_id" smith:"verbose_name=状态"`
 	CreateTime   core.Time       `xorm:"created notnull 'create_time'" json:"create_time"`
 	UpdateTime   core.Time       `xorm:"updated notnull 'update_time'" json:"update_time"`
 }
