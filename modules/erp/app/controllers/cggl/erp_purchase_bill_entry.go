@@ -8,6 +8,7 @@ import (
 
 	"matrix/core"
 	"matrix/modules/erp/models"
+	"fmt"
 )
 
 type ErpPurchaseBillEntry struct {
@@ -21,10 +22,14 @@ func (c ErpPurchaseBillEntry) Index() revel.Result {
 func (c ErpPurchaseBillEntry) ListData() revel.Result {
 	db_session := c.DbSession
 
+	var purchase_bill_id int64
+	c.Params.Bind(&purchase_bill_id, "purchase_bill_id")
+
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 	query := db_session.Where(filter)
 
 	//query extra filter here
+	query = query.Where(fmt.Sprintf("bill_id = %d", purchase_bill_id))
 
 	data_query := *query
 	if order != "" {
