@@ -1,4 +1,3 @@
-
 package controllers
 
 import (
@@ -53,6 +52,7 @@ func (c ErpPurchaseBillEntry) ListData() revel.Result {
 }
 
 type PurchaseBillEntryDetailForm struct {
+	PurchaseBill      models.PurchaseBillInfo      `json:"purchase_bill"`
 	PurchaseBillEntry models.PurchaseBillEntryInfo `json:"purchase_bill_entry"`
 }
 
@@ -60,7 +60,7 @@ func (f *PurchaseBillEntryDetailForm) IsCreate() bool {
 	return f.PurchaseBillEntry.Id == 0
 }
 
-func (f *PurchaseBillEntryDetailForm) Valid(validation *revel.Validation) bool { 
+func (f *PurchaseBillEntryDetailForm) Valid(validation *revel.Validation) bool {
 	validation.Required(f.PurchaseBillEntry.BillId).Message("批次不能为空！")
 
 	validation.Required(f.PurchaseBillEntry.ProductId).Message("商品不能为空！")
@@ -70,8 +70,6 @@ func (f *PurchaseBillEntryDetailForm) Valid(validation *revel.Validation) bool {
 	validation.Required(f.PurchaseBillEntry.Price).Message("单价不能为空！")
 
 	validation.Required(f.PurchaseBillEntry.Amount).Message("金额不能为空！")
-
-
 
 	if f.PurchaseBillEntry.Desc.Valid == true {
 		validation.MinSize(f.PurchaseBillEntry.Desc.String, 2).Message("备注长度不能小于2！")
@@ -86,6 +84,20 @@ func (f *PurchaseBillEntryDetailForm) Valid(validation *revel.Validation) bool {
 func (c ErpPurchaseBillEntry) DetailData() revel.Result {
 	db_session := c.DbSession
 
+	var purchase_bill_id int64
+	c.Params.Bind(&purchase_bill_id, "purchase_bill_id")
+
+	if purchase_bill_id == 0 {
+		return c.RenderJson(core.JsonResult{Success: false, Message: "请先选择采购单！"})
+	}
+
+	var purchase_bill models.PurchaseBillInfo
+	has, err := db_session.Id(purchase_bill_id).Get(&purchase_bill)
+	core.HandleError(err)
+	if has == false {
+		return c.RenderJson(core.JsonResult{Success: false, Message: "指定的采购单不存在！"})
+	}
+
 	var purchase_bill_entry_id int64
 	c.Params.Bind(&purchase_bill_entry_id, "id")
 
@@ -94,11 +106,12 @@ func (c ErpPurchaseBillEntry) DetailData() revel.Result {
 		has, err := db_session.Id(purchase_bill_entry_id).Get(&purchase_bill_entry)
 		core.HandleError(err)
 		if has == false {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "指定的采购单不存在！"})
+			return c.RenderJson(core.JsonResult{Success: false, Message: "指定的采购单明细不存在！"})
 		}
 	}
 
 	var detail_form PurchaseBillEntryDetailForm
+	detail_form.PurchaseBill = purchase_bill
 	detail_form.PurchaseBillEntry = purchase_bill_entry
 
 	return c.RenderJson(detail_form)
@@ -116,9 +129,12 @@ func (c ErpPurchaseBillEntry) Save() revel.Result {
 	}
 
 	purchase_bill_entry := detail_form.PurchaseBillEntry
+	purchase_bill_entry.BillId = detail_form.PurchaseBill.Id
+
+	purchase_bill_entry.Amount = purchase_bill_entry.Price * float64(purchase_bill_entry.Qty)
 
 	var affected int64
-	if detail_form.IsCreate() { 
+	if detail_form.IsCreate() {
 		billId_count, err := db_session.Where("bill_id = ? and product_id = ?", purchase_bill_entry.BillId, purchase_bill_entry.ProductId).Count(&purchase_bill_entry)
 		core.HandleError(err)
 		if billId_count != 0 {
@@ -127,7 +143,7 @@ func (c ErpPurchaseBillEntry) Save() revel.Result {
 
 		affected, err = db_session.Insert(&purchase_bill_entry)
 		core.HandleError(err)
-	} else { 
+	} else {
 		billId_count, err := db_session.Where("id <> ? and bill_id = ? and product_id = ?", purchase_bill_entry.Id, purchase_bill_entry.BillId, purchase_bill_entry.ProductId).Count(&purchase_bill_entry)
 		core.HandleError(err)
 		if billId_count != 0 {
@@ -156,4 +172,3 @@ func (c ErpPurchaseBillEntry) Delete() revel.Result {
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})
 }
-

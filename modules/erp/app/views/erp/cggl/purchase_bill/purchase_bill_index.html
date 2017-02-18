@@ -148,7 +148,7 @@
         </div>
     </div>
     <div class="modal fade" id="purchaseBillEntryDetailDialog">
-        <div class="modal-dialog" style="width: 680px;">
+        <div class="modal-dialog" style="width: 480px;">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="True">&times;</button>
@@ -165,7 +165,8 @@
                                         <div class="form-group">
                                             <label for="bill_id" class="col-xs-2 control-label">批次</label>
                                             <div class="col-xs-10">
-                                                <input id="bill_id" name="purchase_bill_entry_detail.purchase_bill_entry.bill_id" type="text" class="input-sm form-control" v-model.number="purchase_bill_entry_detail.purchase_bill_entry.bill_id"/>
+                                                <input id="bill_id" name="purchase_bill_entry_detail.purchase_bill.id" type="hidden" class="input-sm form-control" v-model.number="purchase_bill_entry_detail.purchase_bill.id"/>
+                                                <input id="bill_code" name="purchase_bill_entry_detail.purchase_bill.code" type="text" class="input-sm form-control" readonly="readonly" v-model.number="purchase_bill_entry_detail.purchase_bill.code"/>
                                             </div>
                                         </div>
                                     </div>
@@ -185,17 +186,6 @@
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
-                                            <label for="qty" class="col-xs-2 control-label">数量</label>
-                                            <div class="col-xs-10">
-                                                <input id="qty" name="purchase_bill_entry_detail.purchase_bill_entry.qty" type="text" class="input-sm form-control" v-model.number="purchase_bill_entry_detail.purchase_bill_entry.qty"/>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-xs-12">
-                                        <div class="form-group">
                                             <label for="price" class="col-xs-2 control-label">单价</label>
                                             <div class="col-xs-10">
                                                 <input id="price" name="purchase_bill_entry_detail.purchase_bill_entry.price" type="text" class="input-sm form-control" v-model.number="purchase_bill_entry_detail.purchase_bill_entry.price"/>
@@ -207,9 +197,9 @@
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
-                                            <label for="amount" class="col-xs-2 control-label">金额</label>
+                                            <label for="qty" class="col-xs-2 control-label">数量</label>
                                             <div class="col-xs-10">
-                                                <input id="amount" name="purchase_bill_entry_detail.purchase_bill_entry.amount" type="text" class="input-sm form-control" v-model.number="purchase_bill_entry_detail.purchase_bill_entry.amount"/>
+                                                <input id="qty" name="purchase_bill_entry_detail.purchase_bill_entry.qty" type="text" class="input-sm form-control" v-model.number="purchase_bill_entry_detail.purchase_bill_entry.qty"/>
                                             </div>
                                         </div>
                                     </div>
@@ -220,7 +210,7 @@
                                         <div class="form-group">
                                             <label for="purchase_bill_entry_desc" class="col-xs-2 control-label">备注</label>
                                             <div class="col-xs-10">
-                                                <input id="purchase_bill_entry_desc" name="purchase_bill_entry_detail.purchase_bill_entry.desc" type="text" class="input-sm form-control" v-model="purchase_bill_entry_detail.purchase_bill_entry.desc"/>
+                                                <textarea id="purchase_bill_entry_desc" name="purchase_bill_entry_detail.purchase_bill_entry.desc" rows="2" class="input-sm form-control" v-model="purchase_bill_entry_detail.purchase_bill_entry.desc"></textarea>
                                             </div>
                                         </div>
                                     </div>
@@ -251,6 +241,7 @@
                 "purchase_bill": {}
             },
             "purchase_bill_entry_detail": {
+                "purchase_bill": {},
                 "purchase_bill_entry": {}
             }
         },
@@ -331,8 +322,8 @@
                         },
                         {"mDataProp": "bill_id", "title": "批次", "bSearchable": false},
                         {"mDataProp": "product_id", "title": "商品", "bSearchable": false},
-                        {"mDataProp": "qty", "title": "数量", "bSearchable": false},
                         {"mDataProp": "price", "title": "单价", "bSearchable": false},
+                        {"mDataProp": "qty", "title": "数量", "bSearchable": false},
                         {"mDataProp": "amount", "title": "金额", "bSearchable": false},
                         {"mDataProp": "purchase_date", "title": "采购日期", "bSearchable": false},
                         {"mDataProp": "checkin_date", "title": "入库日期", "bSearchable": false},
@@ -427,7 +418,7 @@
                             type: "POST",
                             processData: false,
                             contentType: 'application/json',
-                            data: JSON.stringify(vm.detail),
+                            data: JSON.stringify(vm.purchase_bill_detail),
                             success: function (data) {
                                 hideMask();
                                 if (data.success == false) {
@@ -488,7 +479,8 @@
                         url: '{%url "ErpPurchaseBillEntry.DetailData" %}',
                         type: "POST",
                         data: {
-                            "id": id
+                            "id": id,
+                            "purchase_bill_id": vm.purchase_bill_id
                         },
                         success: function (result) {
                             hideMask();
@@ -540,7 +532,7 @@
                             type: "POST",
                             processData: false,
                             contentType: 'application/json',
-                            data: JSON.stringify(vm.detail),
+                            data: JSON.stringify(vm.purchase_bill_entry_detail),
                             success: function (data) {
                                 hideMask();
                                 if (data.success == false) {
