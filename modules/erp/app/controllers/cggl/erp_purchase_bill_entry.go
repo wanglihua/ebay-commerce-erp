@@ -18,6 +18,12 @@ func (c ErpPurchaseBillEntry) Index() revel.Result {
 	return c.RenderTemplate("erp/cggl/purchase_bill_entry/purchase_bill_entry_index.html")
 }
 
+type ErpPurchaseBillEntryViewItem struct {
+	models.PurchaseBillEntryInfo `xorm:"extends" json:"pbe"`
+	models.ProductInfo           `xorm:"extends" json:"p"`
+	models.StatusInfo            `xorm:"extends" json:"s"`
+}
+
 func (c ErpPurchaseBillEntry) ListData() revel.Result {
 	db_session := c.DbSession
 
@@ -35,24 +41,40 @@ func (c ErpPurchaseBillEntry) ListData() revel.Result {
 	}
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
-	query := db_session.Where(filter)
 
-	//query extra filter here
-	query = query.Where(fmt.Sprintf("bill_id = %d", purchase_bill_id))
+	/*
+SELECT pbe.*, p.*, s.*
+FROM erp_purchase_bill_entry pbe
+    INNER JOIN erp_product p ON pbe.product_id = p.id
+    INNER JOIN erp_status s ON pbe.status_id = s.id
+	 */
 
-	data_query := *query
+	sb := core.NewSqlBuilder()
+	sb.Select("pbe.*, p.*, s.*")
+	sb.Count("count(*) as entry_count")
+	sb.From(`erp_purchase_bill_entry pbe
+    INNER JOIN erp_product p ON pbe.product_id = p.id
+    INNER JOIN erp_status s ON pbe.status_id = s.id	`)
+
+	sb.Where(core.SqlAnd(filter, fmt.Sprintf("bill_id = %d", purchase_bill_id)))
+
 	if order != "" {
-		data_query = *data_query.OrderBy(order)
+		sb.OrderBy(order)
 	} else {
-		data_query = *data_query.Asc("id")
+		sb.OrderBy("pbe.id ASC")
 	}
 
-	purchase_bill_entry_list := make([]models.PurchaseBillEntryInfo, 0, limit)
-	err := data_query.Limit(limit, offset).Find(&purchase_bill_entry_list)
+	sb.Limit(offset, limit)
+
+	purchase_bill_entry_list := make([]ErpPurchaseBillEntryViewItem, 0, limit)
+	err := db_session.Sql(sb.SqlList()).Find(&purchase_bill_entry_list)
 	core.HandleError(err)
 
-	count_query := *query
-	count, err := count_query.Count(new(models.PurchaseBillEntryInfo))
+	var purchase_bill_entry_count struct {
+		Count int64 `xorm:"'entry_count'"`
+	}
+
+	_, err = db_session.Sql(sb.SqlCount()).Get(&purchase_bill_entry_count)
 	core.HandleError(err)
 
 	return c.RenderJson(map[string]interface{}{
@@ -64,7 +86,7 @@ func (c ErpPurchaseBillEntry) ListData() revel.Result {
 		}(),
 		"list_data": core.GridResult{
 			Data:  purchase_bill_entry_list,
-			Total: count,
+			Total: purchase_bill_entry_count.Count,
 		},
 	})
 }
