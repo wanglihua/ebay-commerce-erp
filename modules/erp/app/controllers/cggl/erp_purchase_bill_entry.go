@@ -24,6 +24,16 @@ func (c ErpPurchaseBillEntry) ListData() revel.Result {
 	var purchase_bill_id int64
 	c.Params.Bind(&purchase_bill_id, "purchase_bill_id")
 
+	var purchase_bill models.PurchaseBillInfo
+	if purchase_bill_id != 0 {
+		has, err := db_session.Id(purchase_bill_id).Get(&purchase_bill)
+		core.HandleError(err)
+
+		if has == false {
+			return c.RenderJson(core.JsonResult{Success: false, Message: "指定的采购单不存在！"})
+		}
+	}
+
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 	query := db_session.Where(filter)
 
@@ -45,9 +55,17 @@ func (c ErpPurchaseBillEntry) ListData() revel.Result {
 	count, err := count_query.Count(new(models.PurchaseBillEntryInfo))
 	core.HandleError(err)
 
-	return c.RenderJson(core.GridResult{
-		Data:  purchase_bill_entry_list,
-		Total: count,
+	return c.RenderJson(map[string]interface{}{
+		"purchase_bill_code": func() string {
+			if purchase_bill.Code == "" {
+				return "请先选择采购单"
+			}
+			return purchase_bill.Code
+		}(),
+		"list_data": core.GridResult{
+			Data:  purchase_bill_entry_list,
+			Total: count,
+		},
 	})
 }
 
@@ -140,6 +158,8 @@ func (c ErpPurchaseBillEntry) Save() revel.Result {
 		if billId_count != 0 {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，批次、商品已存在！" })
 		}
+
+		purchase_bill_entry.StatusId = models.PURCHASE_BILL_YCJ
 
 		affected, err = db_session.Insert(&purchase_bill_entry)
 		core.HandleError(err)

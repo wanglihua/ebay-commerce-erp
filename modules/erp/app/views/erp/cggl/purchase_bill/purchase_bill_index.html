@@ -50,7 +50,7 @@
             <div class="col-xs-12" style="margin-top: 30px;">
                 <fieldset>
                     <legend style="font-size: 14px;line-height: 28px;">
-                        采购单明细
+                        采购单明细（批次号： {{purchase_bill_code}}）
                     </legend>
                 </fieldset>
             </div>
@@ -237,6 +237,7 @@
         el: "#page",
         data: {
             "purchase_bill_id": 0,
+            "purchase_bill_code": "abcdef",
             "purchase_bill_detail": {
                 "purchase_bill": {}
             },
@@ -320,7 +321,6 @@
                                 return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
                             }
                         },
-                        {"mDataProp": "bill_id", "title": "批次", "bSearchable": false},
                         {"mDataProp": "product_id", "title": "商品", "bSearchable": false},
                         {"mDataProp": "price", "title": "单价", "bSearchable": false},
                         {"mDataProp": "qty", "title": "数量", "bSearchable": false},
@@ -348,7 +348,9 @@
                                         $.msg.error(data.message);
                                         return;
                                     }
-                                    fnCallback(data);
+                                    fnCallback(data.list_data);
+
+                                    vm.purchase_bill_code = data.purchase_bill_code
                                 }
                             });
                     }
