@@ -1,8 +1,6 @@
 package core
 
 import (
-	//"strconv"
-	"fmt"
 	"github.com/revel/revel"
 	"strings"
 	"time"
@@ -33,21 +31,21 @@ func PreventSQLInjection(sqlStr string) string {
 	return sqlStr
 }
 
-var expireAfterDuration time.Duration = -1
+var expire_after_duration time.Duration = -1 // -1 表示还没获取过过期时间
 
 func GetSessionExpire() time.Duration {
-	if expireAfterDuration == -1 {
-		var err error
-		if expiresString, ok := revel.Config.String("session.expires"); !ok {
-			expireAfterDuration = 30 * 24 * time.Hour
-		} else if expiresString == "session" {
-			expireAfterDuration = 0
-		} else if expireAfterDuration, err = time.ParseDuration(expiresString); err != nil {
-			panic(fmt.Errorf("session.expires invalid: %s", err))
+	if expire_after_duration == -1 { // -1 表示还没获取过过期时间
+		expire_after_duration = 30 * 24 * time.Hour // 如果没有配置时的默认值
+		if expires_string, ok := revel.Config.String("session.expires"); ok == true {
+			expire_after_duration_paresed, err := time.ParseDuration(expires_string)
+			if err != nil {
+				expire_after_duration = expire_after_duration_paresed //如果配置了，并且值也正确，就设置为获得的值
+			}
+
 		}
 	}
 
-	return expireAfterDuration
+	return expire_after_duration
 }
 
 func IsAjaxRequest(request *revel.Request) bool {
