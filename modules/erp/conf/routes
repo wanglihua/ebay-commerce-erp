@@ -85,6 +85,7 @@ POST /erp/product/data/list                    ErpProduct.ListData
 POST /erp/product/data/detail                  ErpProduct.DetailData
 POST /erp/product/save                         ErpProduct.Save
 POST /erp/product/delete                       ErpProduct.Delete
+POST /erp/product/get/info                     ErpProduct.GetProductInfo
 
 GET  /erp/product/import                       ErpProductImport.Index
 POST /erp/product/import/data/list             ErpProductImport.ListData

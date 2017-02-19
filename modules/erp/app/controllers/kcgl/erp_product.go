@@ -279,3 +279,18 @@ func (c ErpProduct) insert_product_log(product_from_ui *models.ProductInfo /*更
 	_, err := db_session.Insert(&product_log)
 	core.HandleError(err)
 }
+
+func (c ErpProduct) GetProductInfo() revel.Result {
+	db_session := c.DbSession
+
+	var product_id int64
+	c.Params.Bind(&product_id, "product_id")
+
+	var product models.ProductInfo
+	_, err := db_session.Id(product_id).Get(&product)
+	core.HandleError(err)
+
+	return c.RenderJson(map[string]interface{}{
+		"product": product,
+	})
+}

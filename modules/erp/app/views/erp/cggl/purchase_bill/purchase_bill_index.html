@@ -255,6 +255,7 @@
         </div>
     </div>
 </div>
+<div class="todo">1、新建时默认选中采购单；2、明细列表，sku和名称合并，数量和价格、金额合并等。</div>
 <script type="text/javascript">
     var vm = new Vue({
         el: "#page",
@@ -671,8 +672,17 @@
                     return;
                 }
 
-                vm.purchase_bill_entry_detail.purchase_bill_entry.product_id = parseInt(id_list[0]);
-                vm.purchase_bill_entry_detail.product_name = ";sdfafa";
+                var product_id = parseInt(id_list[0]);
+                vm.purchase_bill_entry_detail.purchase_bill_entry.product_id = product_id;
+
+                $.ajax({
+                    url: '{%url "ErpProduct.GetProductInfo"%}',
+                    type: "POST",
+                    data: {"product_id": product_id},
+                    success: function (data) {
+                        vm.purchase_bill_entry_detail.product_name = data.product.sku + "  " + data.product.name;
+                    }
+                });
 
                 $('#productSelectDialog').modal('hide');
             }
