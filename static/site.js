@@ -239,7 +239,6 @@ function initSingleSelectDataTable(table, options) {
     var htmlTable = $(table);
     htmlTable.dataTable(options);
 
-    /*
     htmlTable.on('click', 'tbody tr', function () {
         var tableRow = $(this);
         var checkbox = tableRow.find('td:first-child input:checkbox')[0];
@@ -251,7 +250,6 @@ function initSingleSelectDataTable(table, options) {
             }
         }
     });
-    */
 
     htmlTable.on('click', 'tbody td:first-child input:checkbox', function (event) {
         event.stopPropagation();

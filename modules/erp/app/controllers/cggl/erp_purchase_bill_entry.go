@@ -80,7 +80,7 @@ FROM erp_purchase_bill_entry pbe
 	return c.RenderJson(map[string]interface{}{
 		"purchase_bill_code": func() string {
 			if purchase_bill.Code == "" {
-				return "请先选择采购单"
+				return "请先单击采购单行"
 			}
 			return purchase_bill.Code
 		}(),
@@ -94,6 +94,7 @@ FROM erp_purchase_bill_entry pbe
 type PurchaseBillEntryDetailForm struct {
 	PurchaseBill      models.PurchaseBillInfo      `json:"purchase_bill"`
 	PurchaseBillEntry models.PurchaseBillEntryInfo `json:"purchase_bill_entry"`
+	ProductName       string                       `json:"product_name"`
 }
 
 func (f *PurchaseBillEntryDetailForm) IsCreate() bool {
@@ -142,17 +143,25 @@ func (c ErpPurchaseBillEntry) DetailData() revel.Result {
 	c.Params.Bind(&purchase_bill_entry_id, "id")
 
 	var purchase_bill_entry models.PurchaseBillEntryInfo
+	var product_name string
 	if purchase_bill_entry_id != 0 {
 		has, err := db_session.Id(purchase_bill_entry_id).Get(&purchase_bill_entry)
 		core.HandleError(err)
 		if has == false {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "指定的采购单明细不存在！"})
 		}
+
+		var product models.ProductInfo
+		product_id := purchase_bill_entry.ProductId
+		_, err = db_session.Id(product_id).Get(&product)
+		core.HandleError(err)
+		product_name = product.Name
 	}
 
 	var detail_form PurchaseBillEntryDetailForm
 	detail_form.PurchaseBill = purchase_bill
 	detail_form.PurchaseBillEntry = purchase_bill_entry
+	detail_form.ProductName = product_name
 
 	return c.RenderJson(detail_form)
 }
@@ -213,4 +222,63 @@ func (c ErpPurchaseBillEntry) Delete() revel.Result {
 	core.HandleError(err)
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})
+}
+
+func (c ErpPurchaseBillEntry) ProductSelectListData() revel.Result {
+	db_session := c.DbSession
+
+	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
+
+	type ErpProductViewItem struct {
+		models.ProductInfo          `xorm:"extends" json:"prd"`
+		models.ProductCateInfo      `xorm:"extends" json:"cate"`
+		models.SupplierInfo         `xorm:"extends" json:"sup"`
+		models.PackageMaterialInfo  `xorm:"extends" json:"pm"`
+		models.StatusInfo           `xorm:"extends" json:"st"`
+	}
+
+	/*
+SELECT prd.*, cate.*, sup.*, pm.*, st.*
+FROM erp_product prd
+    LEFT JOIN erp_product_cate cate ON prd.cate_id = cate.id
+    LEFT JOIN erp_supplier sup ON prd.supplier_id = sup.id
+    LEFT JOIN erp_package_material pm ON prd.pkg_mtrl_id = pm.id
+    INNER JOIN erp_status st ON prd.status_id = st.id
+	*/
+
+	sql_builder := core.NewSqlBuilder()
+	sql_builder.Select("prd.*, cate.*, sup.*, pm.*, st.*")
+	sql_builder.Count("count(prd.id) as product_count")
+	sql_builder.From(`erp_product prd
+    LEFT JOIN erp_product_cate cate ON prd.cate_id = cate.id
+    LEFT JOIN erp_supplier sup ON prd.supplier_id = sup.id
+    LEFT JOIN erp_package_material pm ON prd.pkg_mtrl_id = pm.id
+    INNER JOIN erp_status st ON prd.status_id = st.id`)
+
+	sql_builder.Where(filter)
+
+	//query extra filter here
+
+	if order != "" {
+		sql_builder.OrderBy(order)
+	} else {
+		sql_builder.OrderBy("prd.id ASC")
+	}
+
+	sql_builder.Limit(offset, limit)
+
+	product_list := make([]ErpProductViewItem, 0, limit)
+	err := db_session.Sql(sql_builder.SqlList()).Find(&product_list)
+	core.HandleError(err)
+
+	var product_count struct {
+		Count int64 `xorm:"'product_count'"`
+	}
+	_, err = db_session.Sql(sql_builder.SqlCount()).Get(&product_count)
+	core.HandleError(err)
+
+	return c.RenderJson(core.GridResult{
+		Data:  product_list,
+		Total: product_count.Count,
+	})
 }

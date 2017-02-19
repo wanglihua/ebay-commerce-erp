@@ -170,13 +170,21 @@ form.form-horizontal label.control-label {
     background-color: #d0d0d0 !important;
 }
 
+.dataTable>tbody>tr.selected>td {
+    background-color: #dff0d8;
+}
+
+.dataTable>tbody>tr.hilight>td {
+    background-color: #5fcfee;
+}
+
 .gridToolBar {
     margin-bottom: 5px;
 }
 
 div.form-group div.input-group span.input-group-btn button.btn-sm {
     border-width: 2px !important;
-    padding: 4px 9px 5px 9px;
+    padding: 4px 9px 4px 9px !important;
 }
 
 table.dataDetail {

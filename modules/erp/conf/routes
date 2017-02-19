@@ -259,4 +259,5 @@ POST /erp/purchase/bill/entry/data/list        ErpPurchaseBillEntry.ListData
 POST /erp/purchase/bill/entry/data/detail      ErpPurchaseBillEntry.DetailData
 POST /erp/purchase/bill/entry/save             ErpPurchaseBillEntry.Save
 POST /erp/purchase/bill/entry/delete           ErpPurchaseBillEntry.Delete
+POST /erp/purchase/bill/entry/product/select/data/list      ErpPurchaseBillEntry.ProductSelectListData
 
