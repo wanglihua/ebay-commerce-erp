@@ -72,8 +72,10 @@ func (c ErpSalesManager) ListData() revel.Result {
 }
 
 type SalesManagerDetailForm struct {
-	SalesManager models.SalesManagerInfo `json:"sales_manager"`
-	ProductName  string                  `json:"product_name"`
+	SalesManager    models.SalesManagerInfo `json:"sales_manager"`
+	ShopAccountName string                  `json:"shop_account_name"`
+	ProductName     string                  `json:"product_name"`
+	UserName        string                  `json:"user_name"`
 }
 
 func (f *SalesManagerDetailForm) IsCreate() bool {
@@ -96,7 +98,9 @@ func (c ErpSalesManager) DetailData() revel.Result {
 	var sales_manager_id int64
 	c.Params.Bind(&sales_manager_id, "id")
 
+	var shop_account models.ShopAccountInfo
 	var product models.ProductInfo
+	var user auth_models.UserInfo
 	var sales_manager models.SalesManagerInfo
 	if sales_manager_id != 0 {
 		has, err := db_session.Id(sales_manager_id).Get(&sales_manager)
@@ -105,12 +109,17 @@ func (c ErpSalesManager) DetailData() revel.Result {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "指定的销售负责人不存在！"})
 		}
 
+		_, err = db_session.Id(sales_manager.ShopId).Get(&shop_account)
+		core.HandleError(err)
 		_, err = db_session.Id(sales_manager.ProductId).Get(&product)
+		core.HandleError(err)
+		_, err = db_session.Id(sales_manager.UserId).Get(&user)
 		core.HandleError(err)
 	}
 
 	var detail_form SalesManagerDetailForm
 	detail_form.SalesManager = sales_manager
+	detail_form.ShopAccountName = shop_account.Name
 	detail_form.ProductName = product.Name
 
 	return c.RenderJson(detail_form)
