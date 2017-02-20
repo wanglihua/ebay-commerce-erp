@@ -72,12 +72,12 @@ func (f *ShopAccountDetailForm) IsCreate() bool {
 }
 
 func (f *ShopAccountDetailForm) Valid(validation *revel.Validation) bool {
-	validation.Required(f.ShopAccount.Account).Message("账号不能为空！")
-	if f.ShopAccount.Account != "" {
-		validation.MinSize(f.ShopAccount.Account, 2).Message("账号长度不能小于2！")
+	validation.Required(f.ShopAccount.Name).Message("账号不能为空！")
+	if f.ShopAccount.Name != "" {
+		validation.MinSize(f.ShopAccount.Name, 2).Message("账号长度不能小于2！")
 	}
-	if f.ShopAccount.Account != "" {
-		validation.MaxSize(f.ShopAccount.Account, 100).Message("账号长度不能大于100！")
+	if f.ShopAccount.Name != "" {
+		validation.MaxSize(f.ShopAccount.Name, 100).Message("账号长度不能大于100！")
 	}
 
 	validation.Required(f.ShopAccount.Platform).Message("平台不能为空！")
@@ -168,4 +168,19 @@ func (c ErpShopAccount) Delete() revel.Result {
 	core.HandleError(err)
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})
+}
+
+func (c ErpShopAccount) GetShopAccountInfo() revel.Result {
+	db_session := c.DbSession
+
+	var shop_account_id int64
+	c.Params.Bind(&shop_account_id, "shop_account_id")
+
+	var shop_account models.ShopAccountInfo
+	_, err := db_session.Id(shop_account_id).Get(&shop_account)
+	core.HandleError(err)
+
+	return c.RenderJson(map[string]interface{}{
+		"shop_account": shop_account,
+	})
 }

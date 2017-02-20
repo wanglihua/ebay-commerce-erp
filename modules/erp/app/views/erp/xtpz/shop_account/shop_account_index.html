@@ -49,9 +49,9 @@
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
-                                            <label for="account" class="col-xs-2 control-label">账号</label>
+                                            <label for="name" class="col-xs-2 control-label">名称</label>
                                             <div class="col-xs-10">
-                                                <input id="account" name="detail.shop_account.account" type="text" class="input-sm form-control" v-model="detail.shop_account.account"/>
+                                                <input id="name" name="detail.shop_account.name" type="text" class="input-sm form-control" v-model="detail.shop_account.name"/>
                                             </div>
                                         </div>
                                     </div>
@@ -171,7 +171,7 @@
                                 return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
                             }
                         },
-                        {"mDataProp": "a.account", "title": "账号", "bSearchable": true, "width": 150},
+                        {"mDataProp": "a.name", "title": "名称", "bSearchable": true, "width": 150},
                         {"mDataProp": "a.platform", "title": "平台", "bSearchable": true, "width": 150},
                         {"mDataProp": "a.desc", "title": "描述", "bSearchable": true},
                         {"mDataProp": "a.manager", "title": "负责人", "bSearchable": true, "width": 150},
@@ -217,7 +217,7 @@
                 showMask("提交中...");
                 var form = $("#shopAccountDetailForm");
                 var valid = validate(form, {
-                    'detail.shop_account.account': {
+                    'detail.shop_account.name': {
                         required: true, minlength: 2, maxlength: 100
                     },
                     'detail.shop_account.platform': {

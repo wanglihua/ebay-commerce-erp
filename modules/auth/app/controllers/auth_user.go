@@ -136,3 +136,18 @@ func (c AuthUser) Delete() revel.Result {
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})
 }
+
+func (c AuthUser) GetUserInfo() revel.Result {
+	db_session := c.DbSession
+
+	var user_id int64
+	c.Params.Bind(&user_id, "user_id")
+
+	var user models.UserInfo
+	_, err := db_session.Id(user_id).Get(&user)
+	core.HandleError(err)
+
+	return c.RenderJson(map[string]interface{}{
+		"user": user,
+	})
+}

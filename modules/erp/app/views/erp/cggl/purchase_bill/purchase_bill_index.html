@@ -61,6 +61,7 @@
                 </div>
                 <div>
                     <table id="purchaseBillEntryList" class="table table-striped table-bordered table-hover"></table>
+                    <div class="todo">1、新建时默认选中采购单；2、明细列表，sku和名称合并，数量和价格、金额合并等。</div>
                 </div>
             </div>
         </div>
@@ -169,7 +170,7 @@
                                             <div class="col-xs-10">
                                                 <div class="input-group">
                                                     <input id="product_id" name="purchase_bill_entry_detail.purchase_bill_entry.product_id" type="hidden" class="input-sm form-control" v-model.number="purchase_bill_entry_detail.purchase_bill_entry.product_id"/>
-                                                    <input id="product_name" name="purchase_bill_entry_detail.product_name" type="text" class="input-sm form-control" readonly="readonly" v-model.number="purchase_bill_entry_detail.product_name"/>
+                                                    <input id="product_name" name="purchase_bill_entry_detail.product_name" type="text" class="input-sm form-control" readonly="readonly" v-model="purchase_bill_entry_detail.product_name"/>
                                                     <span class="input-group-btn">
                                                         <button type="button" class="btn btn-purple btn-sm" @click="showProductSelect()">
                                                             <span class="ace-icon fa fa-search icon-on-right"></span>&nbsp;选择
@@ -255,7 +256,6 @@
         </div>
     </div>
 </div>
-<div class="todo">1、新建时默认选中采购单；2、明细列表，sku和名称合并，数量和价格、金额合并等。</div>
 <script type="text/javascript">
     var vm = new Vue({
         el: "#page",

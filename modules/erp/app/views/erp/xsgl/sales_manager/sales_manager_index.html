@@ -1,0 +1,364 @@
+{%header "销售负责人" .%}
+<div id="page">
+    <div class="breadcrumbs" id="breadcrumbs">
+        <ul class="breadcrumb">
+            <li>
+                <a href='{%url "Home.Index"%}'><i class="ace-icon fa fa-home home-icon"></i></a>
+            </li>
+            <li class="parent" data-menu="xsgl-menu">销售管理</li>
+            <li class="active" data-menu="erp-salesmanager-menu">销售负责人</li>
+        </ul>
+    </div>
+    <div class="page-content">
+        <div class="row">
+            <div class="col-xs-12" style="padding: 0;">
+                <div class="gridToolBar clearfix">
+                    <button class="btn btn-primary btn-sm" @click="reloadList('#salesManagerList')">
+                        <i class="ace-icon fa fa-refresh"></i>
+                        刷新
+                    </button>
+                    <button class="btn btn-success btn-sm" @click="showSalesManagerDetail(0)">
+                        <i class="ace-icon fa fa-plus"></i>
+                        新增
+                    </button>
+                    <button class="btn btn-danger btn-sm" @click="deleteSalesManager()">
+                        <i class="ace-icon fa fa-trash-o"></i>
+                        删除
+                    </button>
+                </div>
+                <div>
+                    <table id="salesManagerList" class="table table-striped table-bordered table-hover"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="salesManagerDetailDialog">
+        <div class="modal-dialog" style="width: 480px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="True">&times;</button>
+                    <h4 class="modal-title">销售负责人详细</h4>
+                </div>
+                <div class="modal-body clearfix">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <form class="form-horizontal" role="form" id="salesManagerDetailForm">
+                                <input id="sales_manager_id" name="detail.sales_manager.id" type="hidden" v-model.number="detail.sales_manager.id"/>
+                                <input id="sales_manager_version" name="detail.sales_manager.version" type="hidden" v-model.number="detail.sales_manager.version"/>
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <label for="shop_id" class="col-xs-2 control-label">店铺</label>
+                                            <div class="col-xs-10">
+                                                <div class="input-group">
+                                                    <input id="shop_id" name="detail.sales_manager.shop_id" type="text" class="input-sm form-control" v-model.number="detail.sales_manager.shop_id"/>
+                                                    <span class="input-group-btn">
+                                                        <button type="button" class="btn btn-purple btn-sm">
+                                                            <span class="ace-icon fa fa-search icon-on-right"></span>&nbsp;选择
+                                                        </button>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <label for="product_name" class="col-xs-2 control-label">商品</label>
+                                            <div class="col-xs-10">
+                                                <div class="input-group">
+                                                    <input id="product_id" name="detail.sales_manager.product_id" type="hidden" v-model.number="detail.sales_manager.product_id"/>
+                                                    <input id="product_name" name="detail.product_name" type="text" readonly="readonly" class="input-sm form-control" v-model="detail.product_name"/>
+                                                    <span class="input-group-btn">
+                                                        <button type="button" class="btn btn-purple btn-sm" @click="showProductSelect()">
+                                                            <span class="ace-icon fa fa-search icon-on-right"></span>&nbsp;选择
+                                                        </button>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <label for="user_id" class="col-xs-2 control-label">销售</label>
+                                            <div class="col-xs-10">
+                                                <div class="input-group">
+                                                    <input id="user_id" name="detail.sales_manager.user_id" type="text" class="input-sm form-control" v-model.number="detail.sales_manager.user_id"/>
+                                                    <span class="input-group-btn">
+                                                        <button type="button" class="btn btn-purple btn-sm">
+                                                            <span class="ace-icon fa fa-search icon-on-right"></span>&nbsp;选择
+                                                        </button>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success btn-sm" @click="saveSalesManager()">
+                        <i class="ace-icon fa fa-floppy-o"></i>保存
+                    </button>
+                    <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">
+                        <i class="ace-icon fa fa-times"></i>关闭
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="productSelectDialog">
+        <div class="modal-dialog" style="width: 680px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="True">&times;</button>
+                    <h4 class="modal-title">产品选择</h4>
+                </div>
+                <div class="modal-body clearfix">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <table id="productList" class="table table-striped table-bordered table-hover"></table>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success btn-sm" @click="acceptProductSelect()">
+                        <i class="ace-icon fa fa-floppy-o"></i>选择
+                    </button>
+                    <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">
+                        <i class="ace-icon fa fa-times"></i>关闭
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    var vm = new Vue({
+        el: "#page",
+        data: {
+            "detail": {
+                "sales_manager": {},
+                "shop_account_name": "",
+                "product_name": "",
+                "user_name": ""
+
+            }
+        },
+        mounted: function () {
+            initDataTable(
+                '#salesManagerList',
+                {
+                    "sAjaxSource": '{%url "ErpSalesManager.ListData"%}',
+                    "aaSorting": [[1, "asc"]],
+                    "aoColumns": [
+                        {
+                            "mDataProp": "sm.id",
+                            "bSearchable": false,
+                            "orderable": false,
+                            "sClass": "center",
+                            "width": 50,
+                            "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
+                            "render": function (data, type, row) {
+                                return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
+                            }
+                        },
+                        {"mDataProp": "sa.name", "title": "店铺", "bSearchable": false},
+                        {"mDataProp": "p.sku", "title": "SKU", "bSearchable": false},
+                        {"mDataProp": "p.name", "title": "商品", "bSearchable": false},
+                        {"mDataProp": "u.name", "title": "销售", "bSearchable": false},
+                        {"mDataProp": "sm.create_time", "title": "创建时间", "bSearchable": false, "width": 120},
+                        {"mDataProp": "sm.update_time", "title": "修改时间", "bSearchable": false, "width": 120}
+                    ]
+                }
+            );
+
+            $('#salesManagerList tbody').on('dblclick', 'tr', function () {
+                var id = $(this).find('td:first-child input:checkbox').val();
+                vm.showSalesManagerDetail(id);
+            });
+
+            // Product
+            initSingleSelectDataTable(
+                '#productList',
+                {
+                    "sAjaxSource": '{%url "ErpSalesManager.ProductSelectListData"%}',
+                    "aaSorting": [[1, "asc"]],
+                    "aoColumns": [
+                        {
+                            "mDataProp": "prd.id",
+                            "bSearchable": false,
+                            "orderable": false,
+                            "sClass": "center",
+                            "width": 50,
+                            "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
+                            "render": function (data, type, row) {
+                                return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
+                            }
+                        },
+                        {"mDataProp": "prd.sku", "title": "SKU", "bSearchable": true},
+                        {"mDataProp": "prd.name", "title": "商品名称", "bSearchable": true},
+                        {"mDataProp": "prd.desc", "title": "备注", "bSearchable": true},
+                        {"mDataProp": "st.name", "title": "状态", "bSearchable": false, "width": 60}
+                    ],
+                    "fnServerData": function (sSource, aoData, fnCallback) {
+                        showMask("数据加载中，请稍候");
+                        $.ajax(
+                            {
+                                "dataType": 'json',
+                                "url": sSource,
+                                "data": aoData,
+                                "success": function (data) {
+                                    hideMask();
+                                    if (data.success == false) {
+                                        $.msg.error(data.message);
+                                        return;
+                                    }
+                                    fnCallback(data);
+                                }
+                            }
+                        );
+                    }
+                }
+            );
+        },
+        methods: {
+            reloadList: function () {
+                reloadList('#salesManagerList');
+            },
+            showSalesManagerDetail: function (id) {
+                showMask("加载中...");
+                $("#salesManagerDetailForm").clearValidation();
+                $.ajax({
+                        url: '{%url "ErpSalesManager.DetailData" %}',
+                        type: "POST",
+                        data: {
+                            "id": id
+                        },
+                        success: function (result) {
+                            hideMask();
+                            if (result.success == false) {
+                                $.msg.error(result.message);
+                                return;
+                            }
+                            vm.detail = result;
+                            $('#salesManagerDetailDialog').modal(modalOptions);
+                        }
+                    }
+                );
+            },
+            saveSalesManager: function () {
+                showMask("提交中...");
+                var form = $("#salesManagerDetailForm");
+                var valid = validate(form, {
+                    'detail.sales_manager.shop_id': {
+                        required: true, digits: true
+                    },
+                    'detail.sales_manager.product_id': {
+                        required: true, digits: true
+                    },
+                    'detail.sales_manager.user_id': {
+                        required: true, digits: true
+                    }
+                });
+
+                if (!valid) {
+                    hideMask();
+                } else {
+                    $.ajax({
+                            url: '{%url "ErpSalesManager.Save"%}',
+                            type: "POST",
+                            processData: false,
+                            contentType: 'application/json',
+                            data: JSON.stringify(vm.detail),
+                            success: function (data) {
+                                hideMask();
+                                if (data.success == false) {
+                                    $.msg.error(data.message);
+                                    //return;
+                                }
+                                else {
+                                    $.msg.show(data.message);
+                                    $('#salesManagerDetailDialog').modal('hide');
+                                    vm.reloadList();
+                                    //return;
+                                }
+                            }
+                        }
+                    );
+                }
+            },
+            deleteSalesManager: function () {
+                var id_list = [];
+                $('#salesManagerList tbody tr>td:first-child input:checkbox').each(function () {
+                    if (this.checked) {
+                        id_list.push($(this).val());
+                    }
+                });
+
+                if (id_list.length == 0) {
+                    $.msg.alert("请选择数据！");
+                    return;
+                }
+
+                $.msg.confirm("确认要删除吗？", function () {
+                    $.ajax({
+                        url: '{%url "ErpSalesManager.Delete"%}',
+                        type: "POST",
+                        data: {"id_list": id_list},
+                        success: function (data) {
+                            if (data.success == false) {
+                                $.msg.error(data.message);
+                                return;
+                            }
+                            else {
+                                $.msg.show(data.message);
+                            }
+                            vm.reloadList();
+                        }
+                    });
+                });
+            },
+            showProductSelect: function () {
+                $('#productSelectDialog').modal(modalOptions);
+            },
+            acceptProductSelect: function () {
+                var id_list = [];
+                $('#productList tbody tr>td:first-child input:checkbox').each(function () {
+                    if (this.checked) {
+                        id_list.push($(this).val());
+                    }
+                });
+
+                if (id_list.length == 0 || id_list.length > 1) {
+                    $.msg.alert("请选择一行数据！");
+                    return;
+                }
+
+                var product_id = parseInt(id_list[0]);
+                vm.detail.sales_manager.product_id = product_id;
+
+                $.ajax({
+                    url: '{%url "ErpProduct.GetProductInfo"%}',
+                    type: "POST",
+                    data: {"product_id": product_id},
+                    success: function (data) {
+                        vm.detail.product_name = data.product.sku + "  " + data.product.name;
+                    }
+                });
+
+                $('#productSelectDialog').modal('hide');
+            }
+        }
+    });
+</script>
+{%footer%}
+

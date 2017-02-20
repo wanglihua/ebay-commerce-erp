@@ -60,6 +60,7 @@ POST /erp/shop/account/data/list               ErpShopAccount.ListData
 POST /erp/shop/account/data/detail             ErpShopAccount.DetailData
 POST /erp/shop/account/save                    ErpShopAccount.Save
 POST /erp/shop/account/delete                  ErpShopAccount.Delete
+POST /erp/shop/account/get/info                ErpShopAccount.GetShopAccountInfo
 
 GET  /erp/paypal/account                       ErpPaypalAccount.Index
 POST /erp/paypal/account/data/list             ErpPaypalAccount.ListData
@@ -262,3 +263,11 @@ POST /erp/purchase/bill/entry/save             ErpPurchaseBillEntry.Save
 POST /erp/purchase/bill/entry/delete           ErpPurchaseBillEntry.Delete
 POST /erp/purchase/bill/entry/product/select/data/list      ErpPurchaseBillEntry.ProductSelectListData
 
+GET  /erp/sales/manager                    ErpSalesManager.Index
+POST /erp/sales/manager/data/list          ErpSalesManager.ListData
+POST /erp/sales/manager/data/detail        ErpSalesManager.DetailData
+POST /erp/sales/manager/save               ErpSalesManager.Save
+POST /erp/sales/manager/delete             ErpSalesManager.Delete
+POST /erp/sales/manager/shop/account/select/data/list      ErpSalesManager.ShopAccountSelectListData
+POST /erp/sales/manager/product/select/data/list           ErpSalesManager.ProductSelectListData
+POST /erp/sales/manager/user/select/data/list              ErpSalesManager.UserSelectListData

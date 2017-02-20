@@ -6,7 +6,7 @@ import (
 
 type ShopAccountInfo struct {
 	Id            int64           `xorm:"bigint notnull pk autoincr 'id'" json:"id"`
-	Account       string          `xorm:"nvarchar(200) notnull index 'account'" json:"account" smith:"verbose_name=账号,min=2,max=100"`
+	Name          string          `xorm:"nvarchar(200) notnull index 'name'" json:"name" smith:"verbose_name=名称,min=2,max=100"`
 	Platform      string          `xorm:"nvarchar(200) notnull 'platform'" json:"platform" smith:"verbose_name=平台,min=2,max=100"`
 	Desc          core.NullString `xorm:"nvarchar(500) 'desc'" json:"desc" smith:"verbose_name=描述,max=500"`
 	PaypalAccount string          `xorm:"nvarchar(500) null 'paypal_account'" json:"paypal_account" smith:"verbose_name=Paypal账号,max=400"`

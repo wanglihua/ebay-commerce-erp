@@ -23,6 +23,14 @@ func GetXsglMenu(res_id_map map[int64]bool, db_session *xorm.Session, web_sessio
     <b class="arrow"></b>
     <ul class="submenu">
 
+        <li id="xsgl-salesmanager-menu" class="">
+            <a href="/erp/sales/manager">
+                <i class="menu-icon fa fa-caret-right"></i>
+                销售负责人
+            </a>
+            <b class="arrow"></b>
+        </li>
+
         <li id="xsgl-xmgl-menu" class="">
             <a href="#">
                 <i class="menu-icon fa fa-caret-right"></i>
