@@ -84,6 +84,17 @@
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
+                                            <label for="paypal_account" class="col-xs-2 control-label">Paypal账号</label>
+                                            <div class="col-xs-10">
+                                                <textarea id="paypal_account" name="detail.shop_account.paypal_account" rows="2" class="input-sm form-control" placeholder='Paypal账号,多账号以逗号","隔开' v-model="detail.shop_account.paypal_account"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
                                             <label for="manager" class="col-xs-2 control-label">负责人</label>
                                             <div class="col-xs-10">
                                                 <input id="manager" name="detail.shop_account.manager" type="text" class="input-sm form-control" v-model="detail.shop_account.manager"/>

@@ -34,7 +34,7 @@ func (c ErpShopAccount) ListData() revel.Result {
 	*/
 
 	query := db_session.
-		Select("a.*, s.*").
+	Select("a.*, s.*").
 		Table("erp_shop_account").Alias("a").
 		Join("INNER", []string{"erp_status", "s"}, "a.status_id = s.id").
 		Where(filter)
@@ -114,6 +114,10 @@ func (c ErpShopAccount) DetailData() revel.Result {
 		if has == false {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "指定的店铺账号不存在！"})
 		}
+	}
+
+	if shop_account_id == 0 {
+		shop_account.StatusId = models.SHOP_ACCOUNT_STATUS_ENABLED
 	}
 
 	status_list := status_service.GetStatusList(db_session, models.STATUS_TYPE_SHOP_ACCOUNT)
