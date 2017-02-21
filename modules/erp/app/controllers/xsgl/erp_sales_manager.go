@@ -8,6 +8,7 @@ import (
 	"matrix/core"
 	"matrix/modules/erp/models"
 	auth_models "matrix/modules/auth/models"
+	"fmt"
 )
 
 type ErpSalesManager struct {
@@ -26,11 +27,12 @@ func (c ErpSalesManager) ListData() revel.Result {
 	type ErpSalesManagerListViewItem struct {
 		models.SalesManagerInfo `xorm:"extends" json:"sm"`
 		models.ShopAccountInfo  `xorm:"extends" json:"sa"`
+		models.ProductInfo      `xorm:"extends" json:"p"`
 		auth_models.UserInfo    `xorm:"extends" json:"u"`
 	}
 
 	/*
-	SELECT sm.*, sa.*, u.*
+	SELECT sm.*, sa.*, p.*, u.*
 	FROM erp_sales_manager sm
 		INNER JOIN erp_shop_account sa ON sm.shop_id = sa.id
 		INNER JOIN erp_product p ON sm.product_id = p.id
@@ -38,7 +40,7 @@ func (c ErpSalesManager) ListData() revel.Result {
 	*/
 
 	sb := core.NewSqlBuilder()
-	sb.Select("sm.*, sa.*, u.*")
+	sb.Select("sm.*, sa.*, p.*, u.*")
 	sb.Count("count(sm.id) as sales_manager_count")
 	sb.From(`erp_sales_manager sm
 		INNER JOIN erp_shop_account sa ON sm.shop_id = sa.id
@@ -54,7 +56,7 @@ func (c ErpSalesManager) ListData() revel.Result {
 
 	sb.Limit(offset, limit)
 
-	sales_manager_list := make([]models.SalesManagerInfo, 0, limit)
+	sales_manager_list := make([]ErpSalesManagerListViewItem, 0, limit)
 	err := db_session.Sql(sb.SqlList()).Find(&sales_manager_list)
 	core.HandleError(err)
 
@@ -119,8 +121,9 @@ func (c ErpSalesManager) DetailData() revel.Result {
 
 	var detail_form SalesManagerDetailForm
 	detail_form.SalesManager = sales_manager
-	detail_form.ShopAccountName = shop_account.Name
-	detail_form.ProductName = product.Name
+	detail_form.ShopAccountName = fmt.Sprintf("%s %s", shop_account.Platform, shop_account.Name)
+	detail_form.ProductName = fmt.Sprintf("%s %s", product.Sku, product.Name)
+	detail_form.UserName = fmt.Sprintf("%s %s", user.LoginName, user.NickName)
 
 	return c.RenderJson(detail_form)
 }

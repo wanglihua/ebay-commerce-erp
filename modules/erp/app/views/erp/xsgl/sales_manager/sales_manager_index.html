@@ -51,9 +51,10 @@
                                             <label for="shop_id" class="col-xs-2 control-label">店铺</label>
                                             <div class="col-xs-10">
                                                 <div class="input-group">
-                                                    <input id="shop_id" name="detail.sales_manager.shop_id" type="text" class="input-sm form-control" v-model.number="detail.sales_manager.shop_id"/>
+                                                    <input id="shop_id" name="detail.sales_manager.shop_id" type="hidden" class="input-sm form-control" v-model.number="detail.sales_manager.shop_id"/>
+                                                    <input id="shop_shop_name" name="detail.shop_name" type="text" class="input-sm form-control" readonly="readonly" v-model="detail.shop_account_name"/>
                                                     <span class="input-group-btn">
-                                                        <button type="button" class="btn btn-purple btn-sm">
+                                                        <button type="button" class="btn btn-purple btn-sm" @click="showShopSelect()">
                                                             <span class="ace-icon fa fa-search icon-on-right"></span>&nbsp;选择
                                                         </button>
                                                     </span>
@@ -88,9 +89,10 @@
                                             <label for="user_id" class="col-xs-2 control-label">销售</label>
                                             <div class="col-xs-10">
                                                 <div class="input-group">
-                                                    <input id="user_id" name="detail.sales_manager.user_id" type="text" class="input-sm form-control" v-model.number="detail.sales_manager.user_id"/>
+                                                    <input id="user_id" name="detail.sales_manager.user_id" type="hidden" class="input-sm form-control" v-model.number="detail.sales_manager.user_id"/>
+                                                    <input id="user_name" name="detail.user_name" type="text" class="input-sm form-control" readonly="readonly" v-model="detail.user_name"/>
                                                     <span class="input-group-btn">
-                                                        <button type="button" class="btn btn-purple btn-sm">
+                                                        <button type="button" class="btn btn-purple btn-sm" @click="showUserSelect()">
                                                             <span class="ace-icon fa fa-search icon-on-right"></span>&nbsp;选择
                                                         </button>
                                                     </span>
@@ -141,7 +143,7 @@
         </div>
     </div>
     <div class="modal fade" id="shopSelectDialog">
-        <div class="modal-dialog" style="width: 680px;">
+        <div class="modal-dialog" style="width: 780px;">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="True">&times;</button>
@@ -155,7 +157,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-success btn-sm" @click="acceptProductSelect()">
+                    <button type="button" class="btn btn-success btn-sm" @click="acceptShopSelect()">
                         <i class="ace-icon fa fa-floppy-o"></i>选择
                     </button>
                     <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">
@@ -180,7 +182,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-success btn-sm" @click="acceptProductSelect()">
+                    <button type="button" class="btn btn-success btn-sm" @click="acceptUserSelect()">
                         <i class="ace-icon fa fa-floppy-o"></i>选择
                     </button>
                     <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">
@@ -189,6 +191,7 @@
                 </div>
             </div>
         </div>
+    </div>
 </div>
 <script type="text/javascript">
     var vm = new Vue({
@@ -203,6 +206,7 @@
             }
         },
         mounted: function () {
+            // sales manager
             initDataTable(
                 '#salesManagerList',
                 {
@@ -223,7 +227,7 @@
                         {"mDataProp": "sa.name", "title": "店铺", "bSearchable": false},
                         {"mDataProp": "p.sku", "title": "SKU", "bSearchable": false},
                         {"mDataProp": "p.name", "title": "商品", "bSearchable": false},
-                        {"mDataProp": "u.name", "title": "销售", "bSearchable": false},
+                        {"mDataProp": "u.nick_name", "title": "销售", "bSearchable": false},
                         {"mDataProp": "sm.create_time", "title": "创建时间", "bSearchable": false, "width": 120},
                         {"mDataProp": "sm.update_time", "title": "修改时间", "bSearchable": false, "width": 120}
                     ]
@@ -235,7 +239,35 @@
                 vm.showSalesManagerDetail(id);
             });
 
-            // Product
+            // shop account
+            initSingleSelectDataTable(
+                '#shopAccountList',
+                {
+                    "sAjaxSource": '{%url "ErpSalesManager.ShopAccountSelectListData"%}',
+                    "aaSorting": [[1, "asc"]],
+                    "aoColumns": [
+                        {
+                            "mDataProp": "a.id",
+                            "bSearchable": false,
+                            "orderable": false,
+                            "sClass": "center",
+                            "width": 50,
+                            "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
+                            "render": function (data, type, row) {
+                                return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
+                            }
+                        },
+                        {"mDataProp": "a.name", "title": "名称", "bSearchable": true, "width": 150},
+                        {"mDataProp": "a.platform", "title": "平台", "bSearchable": true, "width": 150},
+                        {"mDataProp": "a.desc", "title": "描述", "bSearchable": true},
+                        {"mDataProp": "s.name", "title": "状态", "bSearchable": true, "width": 80},
+                        {"mDataProp": "a.create_time", "title": "创建时间", "bSearchable": false, "width": 120},
+                        {"mDataProp": "a.update_time", "title": "修改时间", "bSearchable": false, "width": 120}
+                    ]
+                }
+            );
+
+            // product
             initSingleSelectDataTable(
                 '#productList',
                 {
@@ -278,6 +310,34 @@
                     }
                 }
             );
+
+            // user
+            initSingleSelectDataTable(
+                '#userList',
+                {
+                    "sAjaxSource": '{%url "ErpSalesManager.UserSelectListData"%}',
+                    "aaSorting": [[1, "asc"]],
+                    "aoColumns": [
+                        {
+                            "mDataProp": "id",
+                            "bSearchable": false,
+                            "orderable": false,
+                            "sClass": "center",
+                            "width": 50,
+                            "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
+                            "render": function (data, type, row) {
+                                return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
+                            }
+                        },
+                        {"mDataProp": "login_name", "title": "工号", "bSearchable": true, "width": 120},
+                        {"mDataProp": "nick_name", "title": "姓名", "bSearchable": true, "width": 120},
+                        {"mDataProp": "sex", "title": "性别", "bSearchable": true, "width": 70},
+                        {"mDataProp": "create_time", "title": "创建时间", "bSearchable": false, "width": 120},
+                        {"mDataProp": "update_time", "title": "修改时间", "bSearchable": false, "width": 120}
+                    ]
+                }
+            );
+
         },
         methods: {
             reloadList: function () {
@@ -376,6 +436,36 @@
                     });
                 });
             },
+            showShopSelect: function () {
+                $('#shopSelectDialog').modal(modalOptions);
+            },
+            acceptShopSelect: function () {
+                var id_list = [];
+                $('#shopAccountList tbody tr>td:first-child input:checkbox').each(function () {
+                    if (this.checked) {
+                        id_list.push($(this).val());
+                    }
+                });
+
+                if (id_list.length == 0 || id_list.length > 1) {
+                    $.msg.alert("请选择一行数据！");
+                    return;
+                }
+
+                var shop_account_id = parseInt(id_list[0]);
+                vm.detail.sales_manager.shop_id = shop_account_id;
+
+                $.ajax({
+                    url: '{%url "ErpShopAccount.GetShopAccountInfo"%}',
+                    type: "POST",
+                    data: {"shop_account_id": shop_account_id},
+                    success: function (data) {
+                        vm.detail.shop_account_name = data.shop_account.platform + " " + data.shop_account.name;
+                    }
+                });
+
+                $('#shopSelectDialog').modal('hide');
+            },
             showProductSelect: function () {
                 $('#productSelectDialog').modal(modalOptions);
             },
@@ -405,6 +495,36 @@
                 });
 
                 $('#productSelectDialog').modal('hide');
+            },
+            showUserSelect: function () {
+                $('#userSelectDialog').modal(modalOptions);
+            },
+            acceptUserSelect: function () {
+                var id_list = [];
+                $('#userList tbody tr>td:first-child input:checkbox').each(function () {
+                    if (this.checked) {
+                        id_list.push($(this).val());
+                    }
+                });
+
+                if (id_list.length == 0 || id_list.length > 1) {
+                    $.msg.alert("请选择一行数据！");
+                    return;
+                }
+
+                var user_id = parseInt(id_list[0]);
+                vm.detail.sales_manager.user_id = user_id;
+
+                $.ajax({
+                    url: '{%url "AuthUser.GetUserInfo"%}',
+                    type: "POST",
+                    data: {"user_id": user_id},
+                    success: function (data) {
+                        vm.detail.user_name = data.user.login_name + " " + data.user.nick_name;
+                    }
+                });
+
+                $('#userSelectDialog').modal('hide');
             }
         }
     });
