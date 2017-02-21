@@ -268,6 +268,9 @@ POST /erp/sales/manager/data/list          ErpSalesManager.ListData
 POST /erp/sales/manager/data/detail        ErpSalesManager.DetailData
 POST /erp/sales/manager/save               ErpSalesManager.Save
 POST /erp/sales/manager/delete             ErpSalesManager.Delete
+POST /erp/sales/manager/shop/account/select/show           ErpSalesManager.ShowShopAccountSelect
 POST /erp/sales/manager/shop/account/select/data/list      ErpSalesManager.ShopAccountSelectListData
+POST /erp/sales/manager/product/select/show                ErpSalesManager.ShowProductSelect
 POST /erp/sales/manager/product/select/data/list           ErpSalesManager.ProductSelectListData
+POST /erp/sales/manager/user/select/show                   ErpSalesManager.ShowUserSelect
 POST /erp/sales/manager/user/select/data/list              ErpSalesManager.UserSelectListData

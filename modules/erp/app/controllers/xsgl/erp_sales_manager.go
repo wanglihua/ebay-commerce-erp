@@ -181,6 +181,10 @@ func (c ErpSalesManager) Delete() revel.Result {
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})
 }
 
+func (c ErpSalesManager) ShowShopAccountSelect() revel.Result {
+	return c.RenderTemplate("erp/xsgl/sales_manager/sales_manager_shop_account_select.html")
+}
+
 func (c ErpSalesManager) ShopAccountSelectListData() revel.Result {
 	db_session := c.DbSession
 
@@ -223,6 +227,10 @@ func (c ErpSalesManager) ShopAccountSelectListData() revel.Result {
 		Data:  shop_account_list,
 		Total: count,
 	})
+}
+
+func (c ErpSalesManager) ShowProductSelect() revel.Result {
+	return c.RenderTemplate("erp/xsgl/sales_manager/sales_manager_product_select.html")
 }
 
 func (c ErpSalesManager) ProductSelectListData() revel.Result {
@@ -282,6 +290,10 @@ FROM erp_product prd
 		Data:  product_list,
 		Total: product_count.Count,
 	})
+}
+
+func (c ErpSalesManager) ShowUserSelect() revel.Result {
+	return c.RenderTemplate("erp/xsgl/sales_manager/sales_manager_user_select.html")
 }
 
 func (c ErpSalesManager) UserSelectListData() revel.Result {
