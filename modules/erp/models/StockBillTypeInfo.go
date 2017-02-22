@@ -17,6 +17,9 @@ const (
 
 	// STOCK_BILL_TYPE_TRANSFER 调拨单
 	STOCK_BILL_TYPE_TRANSFER = 300
+
+	// STOCK_BILL_TYPE_TRANSFER_ZT 调拨单 在途
+	STOCK_BILL_TYPE_TRANSFER_ZT = 400
 )
 
 type StockBillTypeInfo struct {
@@ -53,5 +56,11 @@ func (e StockBillTypeInfo) InitData(db_session *xorm.Session) {
 	bill_type.Id = STOCK_BILL_TYPE_TRANSFER
 	bill_type.Name = "调拨单"
 	bill_type.Desc = core.NewNullString("调拨单", true)
+	db_session.Insert(bill_type)
+
+	bill_type = new(StockBillTypeInfo)
+	bill_type.Id = STOCK_BILL_TYPE_TRANSFER_ZT
+	bill_type.Name = "调拨单在途"
+	bill_type.Desc = core.NewNullString("调拨单 在途", true)
 	db_session.Insert(bill_type)
 }
