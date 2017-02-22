@@ -7,6 +7,7 @@ import (
 
 	"matrix/core"
 	"matrix/modules/erp/models"
+	"fmt"
 )
 
 type ErpInventoryCheckEntry struct {
@@ -20,10 +21,24 @@ func (c ErpInventoryCheckEntry) Index() revel.Result {
 func (c ErpInventoryCheckEntry) ListData() revel.Result {
 	db_session := c.DbSession
 
+	var bill_id int64
+	c.Params.Bind(&bill_id, "bill_id")
+
+	var inventory_check_bill models.InventoryCheckInfo
+	if bill_id != 0 {
+		has, err := db_session.Id(bill_id).Get(&inventory_check_bill)
+		core.HandleError(err)
+
+		if has == false {
+			return c.RenderJson(core.JsonResult{Success: false, Message: "指定的盘点单不存在！"})
+		}
+	}
+
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 	query := db_session.Where(filter)
 
 	//query extra filter here
+	query = query.Where(fmt.Sprintf("check_id = %d", bill_id))
 
 	data_query := *query
 	if order != "" {
@@ -40,9 +55,17 @@ func (c ErpInventoryCheckEntry) ListData() revel.Result {
 	count, err := count_query.Count(new(models.InventoryCheckEntryInfo))
 	core.HandleError(err)
 
-	return c.RenderJson(core.GridResult{
-		Data:  inventory_check_entry_list,
-		Total: count,
+	return c.RenderJson(map[string]interface{}{
+		"bill_code": func() string {
+			if inventory_check_bill.Code == "" {
+				return "请先单击盘点单行"
+			}
+			return inventory_check_bill.Code
+		}(),
+		"list_data": core.GridResult{
+			Data:  inventory_check_entry_list,
+			Total: count,
+		},
 	})
 }
 
