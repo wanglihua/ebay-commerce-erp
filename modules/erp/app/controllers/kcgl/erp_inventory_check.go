@@ -9,6 +9,7 @@ import (
 	auth_models "matrix/modules/auth/models"
 	"matrix/modules/erp/models"
 	"time"
+	"matrix/modules/erp/service/bill_service"
 )
 
 type ErpInventoryCheck struct {
@@ -22,8 +23,8 @@ func (c ErpInventoryCheck) Index() revel.Result {
 type ErpInventoryCheckViewItem struct {
 	models.InventoryCheckInfo `xorm:"extends" json:"ic"`
 	models.StockInfo          `xorm:"extends" json:"st"`
-	CheckUser                 auth_models.UserInfo `xorm:"extends" json:"cu"`
-	ApproveUser               auth_models.UserInfo `xorm:"extends" json:"au"`
+	CheckUser   auth_models.UserInfo `xorm:"extends" json:"cu"`
+	ApproveUser auth_models.UserInfo `xorm:"extends" json:"au"`
 	models.StatusInfo         `xorm:"extends" json:"ss"`
 }
 
@@ -42,7 +43,7 @@ func (c ErpInventoryCheck) ListData() revel.Result {
 	*/
 
 	query := db_session.
-		Select("ic.*, st.*, cu.*, au.*, ss.*").
+	Select("ic.*, st.*, cu.*, au.*, ss.*").
 		Table("erp_inventory_check").Alias("ic").
 		Join("INNER", []string{"erp_stock", "st"}, "ic.stock_id = st.id").
 		Join("INNER", []string{"auth_user", "cu"}, "ic.check_user_id = cu.id").
@@ -116,6 +117,7 @@ func (c ErpInventoryCheck) DetailData() revel.Result {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "指定的库存盘点不存在！"})
 		}
 	} else {
+		inventory_check.Code = bill_service.GetNextBillNo(db_session)
 		inventory_check.CheckDate = core.Date(time.Now())
 	}
 
