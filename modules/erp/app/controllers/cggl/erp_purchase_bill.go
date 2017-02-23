@@ -162,8 +162,11 @@ func (c ErpPurchaseBill) Delete() revel.Result {
 	purchase_bill_id_list := make([]int64, 0)
 	c.Params.Bind(&purchase_bill_id_list, "id_list")
 
-	affected, err := db_session.In("id", purchase_bill_id_list).Delete(new(models.PurchaseBillInfo))
+	_, err := db_session.In("bill_id", purchase_bill_id_list).Delete(new(models.PurchaseBillEntryInfo))
 	core.HandleError(err)
 
-	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})
+	_, err = db_session.In("id", purchase_bill_id_list).Delete(new(models.PurchaseBillInfo))
+	core.HandleError(err)
+
+	return c.RenderJson(core.JsonResult{Success: true, Message: "数据删除成功!"})
 }

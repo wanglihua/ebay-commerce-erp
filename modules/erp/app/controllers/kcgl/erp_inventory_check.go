@@ -171,8 +171,11 @@ func (c ErpInventoryCheck) Delete() revel.Result {
 	inventory_check_id_list := make([]int64, 0)
 	c.Params.Bind(&inventory_check_id_list, "id_list")
 
-	affected, err := db_session.In("id", inventory_check_id_list).Delete(new(models.InventoryCheckInfo))
+	_, err := db_session.In("check_id", inventory_check_id_list).Delete(new(models.InventoryCheckEntryInfo))
 	core.HandleError(err)
 
-	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})
+	_, err = db_session.In("id", inventory_check_id_list).Delete(new(models.InventoryCheckInfo))
+	core.HandleError(err)
+
+	return c.RenderJson(core.JsonResult{Success: true, Message: "数据删除成功!"})
 }
