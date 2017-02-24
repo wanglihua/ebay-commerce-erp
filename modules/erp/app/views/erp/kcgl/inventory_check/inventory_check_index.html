@@ -369,7 +369,7 @@
                     "aaSorting": [[1, "asc"]],
                     "aoColumns": [
                         {
-                            "mDataProp": "id",
+                            "mDataProp": "ice.id",
                             "bSearchable": false,
                             "orderable": false,
                             "sClass": "center",
@@ -379,14 +379,14 @@
                                 return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
                             }
                         },
-                        {"mDataProp": "check_id", "title": "盘点批次", "bSearchable": false},
-                        {"mDataProp": "storage_loc_id", "title": "库位", "bSearchable": false},
-                        {"mDataProp": "product_id", "title": "商品", "bSearchable": false},
-                        {"mDataProp": "pre_qty", "title": "盘点前库存", "bSearchable": false},
-                        {"mDataProp": "check_qty", "title": "盘点库存", "bSearchable": false},
-                        {"mDataProp": "qty_diff", "title": "库存差值", "bSearchable": false},
-                        {"mDataProp": "create_time", "title": "创建时间", "bSearchable": false, "width": 120},
-                        {"mDataProp": "update_time", "title": "修改时间", "bSearchable": false, "width": 120}
+                        {"mDataProp": "sl.name", "title": "库位", "bSearchable": false, width: 120},
+                        {"mDataProp": "p.sku", "title": "SKU", "bSearchable": false, width: 120},
+                        {"mDataProp": "p.name", "title": "商品", "bSearchable": false},
+                        {"mDataProp": "ice.pre_qty", "title": "盘点前库存", "bSearchable": false, width: 100},
+                        {"mDataProp": "ice.check_qty", "title": "盘点库存", "bSearchable": false, width: 100},
+                        {"mDataProp": "ice.qty_diff", "title": "库存差值", "bSearchable": false, width: 100},
+                        {"mDataProp": "ice.create_time", "title": "创建时间", "bSearchable": false, "width": 120},
+                        {"mDataProp": "ice.update_time", "title": "修改时间", "bSearchable": false, "width": 120}
                     ],
                     "fnServerData": function (sSource, aoData, fnCallback) {
                         showMask("数据加载中，请稍候");

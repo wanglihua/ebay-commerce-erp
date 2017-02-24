@@ -35,24 +35,48 @@ func (c ErpInventoryCheckEntry) ListData() revel.Result {
 	}
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
-	query := db_session.Where(filter)
 
-	//query extra filter here
-	query = query.Where(fmt.Sprintf("check_id = %d", bill_id))
-
-	data_query := *query
-	if order != "" {
-		data_query = *data_query.OrderBy(order)
-	} else {
-		data_query = *data_query.Asc("id")
+	type ErpInventoryCheckEntryViewItem struct {
+		models.InventoryCheckEntryInfo `xorm:"extends" json:"ice"`
+		models.InventoryCheckInfo      `xorm:"extends" json:"ic"`
+		models.StorageLocInfo          `xorm:"extends" json:"sl"`
+		models.ProductInfo             `xorm:"extends" json:"p"`
 	}
 
-	inventory_check_entry_list := make([]models.InventoryCheckEntryInfo, 0, limit)
-	err := data_query.Limit(limit, offset).Find(&inventory_check_entry_list)
+	/*
+	SELECT ice.*, ic.*, sl.*, p.*
+	FROM erp_inventory_check_entry ice
+		INNER JOIN erp_inventory_check ic ON ice.check_id = ic.id
+		INNER JOIN erp_storage_loc sl ON ice.storage_loc_id = sl.id
+		INNER JOIN erp_product p ON ice.product_id = p.id
+	*/
+
+	sb := core.NewSqlBuilder()
+	sb.Select("ice.*, ic.*, sl.*, p.*")
+	sb.Count("count(*) as entry_count")
+	sb.From(`erp_inventory_check_entry ice
+		INNER JOIN erp_inventory_check ic ON ice.check_id = ic.id
+		INNER JOIN erp_storage_loc sl ON ice.storage_loc_id = sl.id
+		INNER JOIN erp_product p ON ice.product_id = p.id`)
+
+	sb.Where(core.SqlAnd(filter, fmt.Sprintf("ice.check_id = %d", bill_id)))
+
+	if order != "" {
+		sb.OrderBy(order)
+	} else {
+		sb.OrderBy("ice.id ASC")
+	}
+
+	sb.Limit(offset, limit)
+
+	inventory_check_entry_list := make([]ErpInventoryCheckEntryViewItem, 0, limit)
+	err := db_session.Sql(sb.SqlList()).Find(&inventory_check_entry_list)
 	core.HandleError(err)
 
-	count_query := *query
-	count, err := count_query.Count(new(models.InventoryCheckEntryInfo))
+	var entry_count struct {
+		Count int64 `xorm:"'entry_count'"`
+	}
+	_, err = db_session.Sql(sb.SqlCount()).Get(&entry_count)
 	core.HandleError(err)
 
 	return c.RenderJson(map[string]interface{}{
@@ -64,7 +88,7 @@ func (c ErpInventoryCheckEntry) ListData() revel.Result {
 		}(),
 		"list_data": core.GridResult{
 			Data:  inventory_check_entry_list,
-			Total: count,
+			Total: entry_count.Count,
 		},
 	})
 }
