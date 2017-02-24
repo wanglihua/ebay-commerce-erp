@@ -182,7 +182,11 @@
                                         <div class="form-group">
                                             <label for="storage_loc_id" class="col-xs-2 control-label">库位</label>
                                             <div class="col-xs-10">
-                                                <input id="storage_loc_id" name="entry_detail.check_entry.storage_loc_id" type="text" class="input-sm form-control" v-model.number="entry_detail.check_entry.storage_loc_id"/>
+                                                <select id="storage_loc_id" name="entry_detail.check_entry.storage_loc_id" class="input-sm form-control" v-model.number="entry_detail.check_entry.storage_loc_id">
+                                                    <template v-for="storage_loc in entry_detail.storage_loc_list">
+                                                        <option :value="storage_loc.id">{{storage_loc.name}}</option>
+                                                    </template>
+                                                </select>
                                             </div>
                                         </div>
                                     </div>

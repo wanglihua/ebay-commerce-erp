@@ -74,6 +74,7 @@ type InventoryCheckEntryDetailForm struct {
 	InventoryCheckEntry models.InventoryCheckEntryInfo `json:"check_entry"`
 	ProductName         string                         `json:"product_name"`
 	StockName           string                         `json:"stock_name"`
+	StorageLocList      []models.StorageLocInfo        `json:"storage_loc_list"`
 }
 
 func (f *InventoryCheckEntryDetailForm) IsCreate() bool {
@@ -116,6 +117,10 @@ func (c ErpInventoryCheckEntry) DetailData() revel.Result {
 	var stock models.StockInfo
 	_, err = db_session.Id(inventory_check.StockId).Get(&stock)
 
+	storage_loc_list := make([]models.StorageLocInfo, 0)
+	err = db_session.Where(fmt.Sprintf("stock_id = %d", inventory_check.StockId)).OrderBy("name asc").Find(&storage_loc_list)
+	core.HandleError(err)
+
 	var inventory_check_entry_id int64
 	c.Params.Bind(&inventory_check_entry_id, "id")
 
@@ -140,6 +145,7 @@ func (c ErpInventoryCheckEntry) DetailData() revel.Result {
 	detail_form.InventoryCheckEntry = inventory_check_entry
 	detail_form.ProductName = product_name
 	detail_form.StockName = stock.Name
+	detail_form.StorageLocList = storage_loc_list
 
 	return c.RenderJson(detail_form)
 }
