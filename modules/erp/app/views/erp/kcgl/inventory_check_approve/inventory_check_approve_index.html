@@ -19,7 +19,11 @@
                     </button>
                     <button class="btn btn-success btn-sm" @click="approveInventoryCheck()">
                         <i class="ace-icon fa fa-check"></i>
-                        审核
+                        核准
+                    </button>
+                    <button class="btn btn-yellow btn-sm" @click="backInventoryCheck()">
+                        <i class="ace-icon fa fa-reply"></i>
+                        驳回
                     </button>
                 </div>
                 <div>
@@ -85,6 +89,42 @@
                 showMask("提交中...");
                 $.ajax({
                         url: '{%url "ErpInventoryCheckApprove.Approve"%}',
+                        type: "POST",
+                        contentType: 'application/json',
+                        data: {
+                            "check_id": id_list[0]
+                        },
+                        success: function (data) {
+                            hideMask();
+                            if (data.success == false) {
+                                $.msg.error(data.message);
+                                //return;
+                            }
+                            else {
+                                $.msg.show(data.message);
+                                vm.reloadList();
+                                //return;
+                            }
+                        }
+                    }
+                );
+            },
+            backInventoryCheck: function () {
+                var id_list = [];
+                $('#inventoryCheckList tbody tr>td:first-child input:checkbox').each(function () {
+                    if (this.checked) {
+                        id_list.push($(this).val());
+                    }
+                });
+
+                if (id_list.length != 1) {
+                    $.msg.alert("请选择一行数据！");
+                    return;
+                }
+
+                showMask("提交中...");
+                $.ajax({
+                        url: '{%url "ErpInventoryCheckApprove.Back"%}',
                         type: "POST",
                         contentType: 'application/json',
                         data: {

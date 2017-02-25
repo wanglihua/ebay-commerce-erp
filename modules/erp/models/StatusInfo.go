@@ -94,8 +94,10 @@ const (
 	// 包材状态 停用
 	PACKAGE_MTRL_STATUS_DISABLED = 1900
 
+	// 盘点单状态 已创建
+	INVENTORY_CHECK_STATUS_YCJ = 2000
 	// 盘点单状态 未通过
-	INVENTORY_CHECK_STATUS_WTG = 2000
+	INVENTORY_CHECK_STATUS_WTG = 2050
 	// 盘点单状态 审核中
 	INVENTORY_CHECK_STATUS_SPZ = 2100
 	// 盘点单状态 已完成
@@ -342,6 +344,14 @@ func (e StatusInfo) InitData(db_session *xorm.Session) {
 	// 盘点单状态
 	{
 		status := new(StatusInfo)
+		status.Id = INVENTORY_CHECK_STATUS_YCJ
+		status.Type = STATUS_TYPE_INVENTORY_CHECK
+		status.Name = "已创建"
+		status.Desc = core.NewNullString("盘点单状态 已创建", true)
+		db_session.Insert(status)
+
+
+		status = new(StatusInfo)
 		status.Id = INVENTORY_CHECK_STATUS_WTG
 		status.Type = STATUS_TYPE_INVENTORY_CHECK
 		status.Name = "未通过"

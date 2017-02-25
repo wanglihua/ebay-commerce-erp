@@ -49,6 +49,7 @@ func (c ErpInventoryCheckApprove) ListData() revel.Result {
 		Where(filter)
 
 	//query extra filter here
+	query = query.Where("status_id = ?", models.INVENTORY_CHECK_STATUS_SPZ)
 
 	data_query := *query
 	if order != "" {
@@ -117,6 +118,27 @@ func (c ErpInventoryCheckApprove) Approve() revel.Result {
 
 	return c.RenderJson(core.JsonResult{
 		Success: true,
-		Message: "审批成功",
+		Message: "审批成功！",
+	})
+}
+
+func (c ErpInventoryCheckApprove) Back() revel.Result {
+	db_session := c.DbSession
+
+	var check_id int64
+	c.Params.Bind(&check_id, "check_id")
+
+	var inventory_check models.InventoryCheckInfo
+	_, err := db_session.Id(check_id).Get(&inventory_check)
+	core.HandleError(err)
+
+	//修改状态
+	inventory_check.StatusId = models.INVENTORY_CHECK_STATUS_WTG
+	_, err = db_session.Id(check_id).Cols("status_id").Update(&inventory_check)
+	core.HandleError(err)
+
+	return c.RenderJson(core.JsonResult{
+		Success: true,
+		Message: "回退成功！",
 	})
 }
