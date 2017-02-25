@@ -149,7 +149,7 @@ func (c ErpInventoryCheck) Save() revel.Result {
 	if detail_form.IsCreate() {
 		loginuser := core.GetLoginUser(c.Session)
 		inventory_check.CheckUserId = loginuser.UserId
-		inventory_check.StatusId = models.INVENTORY_CHECK_STATUS_WTG
+		inventory_check.StatusId = models.INVENTORY_CHECK_STATUS_SPZ
 		affected, err = db_session.Insert(&inventory_check)
 		core.HandleError(err)
 	} else {

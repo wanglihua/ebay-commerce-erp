@@ -177,9 +177,7 @@ POST /erp/inventory/check/delete               ErpInventoryCheck.Delete
 
 GET  /erp/inventory/check/approve              ErpInventoryCheckApprove.Index
 POST /erp/inventory/check/approve/data/list    ErpInventoryCheckApprove.ListData
-POST /erp/inventory/check/approve/data/detail  ErpInventoryCheckApprove.DetailData
-POST /erp/inventory/check/approve/save         ErpInventoryCheckApprove.Save
-POST /erp/inventory/check/approve/delete       ErpInventoryCheckApprove.Delete
+POST /erp/inventory/check/approve/do           ErpInventoryCheckApprove.Approve
 
 GET  /erp/inventory/check/entry                ErpInventoryCheckEntry.Index
 POST /erp/inventory/check/entry/data/list      ErpInventoryCheckEntry.ListData

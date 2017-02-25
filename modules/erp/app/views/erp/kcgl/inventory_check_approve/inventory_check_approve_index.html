@@ -17,94 +17,14 @@
                         <i class="ace-icon fa fa-refresh"></i>
                         刷新
                     </button>
-                    <button class="btn btn-success btn-sm" @click="showInventoryCheckDetail(0)">
-                        <i class="ace-icon fa fa-plus"></i>
-                        新增
-                    </button>
-                    <button class="btn btn-danger btn-sm" @click="deleteInventoryCheck()">
-                        <i class="ace-icon fa fa-trash-o"></i>
-                        删除
+                    <button class="btn btn-success btn-sm" @click="approveInventoryCheck()">
+                        <i class="ace-icon fa fa-check"></i>
+                        审核
                     </button>
                 </div>
                 <div>
                     <table id="inventoryCheckList" class="table table-striped table-bordered table-hover"></table>
-                    <div class="todo">1、需求明确，功能待实现；2、盘点单明细查看；3、审批通过，并自动更新库存。</div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="modal fade" id="inventoryCheckDetailDialog">
-        <div class="modal-dialog" style="width: 480px;">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="True">&times;</button>
-                    <h4 class="modal-title">库存盘点详细</h4>
-                </div>
-                <div class="modal-body clearfix">
-                    <div class="row">
-                        <div class="col-xs-12">
-                            <form class="form-horizontal" role="form" id="inventoryCheckDetailForm">
-                                <input id="inventory_check_id" name="detail.inventory_check.id" type="hidden" v-model.number="detail.inventory_check.id"/>
-                                <input id="inventory_check_version" name="detail.inventory_check.version" type="hidden" v-model.number="detail.inventory_check.version"/>
-                                <div class="row">
-                                    <div class="col-xs-12">
-                                        <div class="form-group">
-                                            <label for="code" class="col-xs-2 control-label">批次号</label>
-                                            <div class="col-xs-10">
-                                                <input id="code" name="detail.inventory_check.code" type="text" class="input-sm form-control" v-model="detail.inventory_check.code"/>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-xs-12">
-                                        <div class="form-group">
-                                            <label for="stock_id" class="col-xs-2 control-label">仓库</label>
-                                            <div class="col-xs-10">
-                                                <select id="stock_id" name="detail.inventory_check.stock_id" class="input-sm form-control" v-model.number="detail.inventory_check.stock_id">
-                                                    <template v-for="stock in detail.stock_list">
-                                                        <option :value="stock.id">{{stock.name}}</option>
-                                                    </template>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-xs-12">
-                                        <div class="form-group">
-                                            <label for="check_date" class="col-xs-2 control-label">盘点日期</label>
-                                            <div class="col-xs-10">
-                                                <input id="check_date" name="detail.inventory_check.check_date" type="text" class="input-sm form-control" v-model="detail.inventory_check.check_date"/>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-xs-12">
-                                        <div class="form-group">
-                                            <label for="desc" class="col-xs-2 control-label">备注</label>
-                                            <div class="col-xs-10">
-                                                <textarea id="desc" name="detail.inventory_check.desc" rows="2" class="input-sm form-control" v-model="detail.inventory_check.desc"></textarea>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                            </form>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-success btn-sm" @click="saveInventoryCheck()">
-                        <i class="ace-icon fa fa-floppy-o"></i>保存
-                    </button>
-                    <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">
-                        <i class="ace-icon fa fa-times"></i>关闭
-                    </button>
+                    <div class="todo">1、盘点单明细查看；2、记录库存变更历史。</div>
                 </div>
             </div>
         </div>
@@ -113,11 +33,7 @@
 <script type="text/javascript">
     var vm = new Vue({
         el: "#page",
-        data: {
-            "detail": {
-                "inventory_check": {}
-            }
-        },
+        data: {},
         mounted: function () {
             initDataTable(
                 '#inventoryCheckList',
@@ -148,85 +64,12 @@
                     ]
                 }
             );
-
-            $('#inventoryCheckList tbody').on('dblclick', 'tr', function () {
-                var id = $(this).find('td:first-child input:checkbox').val();
-                vm.showInventoryCheckDetail(id);
-            });
         },
         methods: {
             reloadList: function () {
                 reloadList('#inventoryCheckList');
             },
-            showInventoryCheckDetail: function (id) {
-                showMask("加载中...");
-                $("#inventoryCheckDetailForm").clearValidation();
-                $.ajax({
-                        url: '{%url "ErpInventoryCheckApprove.DetailData" %}',
-                        type: "POST",
-                        data: {
-                            "id": id
-                        },
-                        success: function (result) {
-                            hideMask();
-                            if (result.success == false) {
-                                $.msg.error(result.message);
-                                return;
-                            }
-                            vm.detail = result;
-                            $('#inventoryCheckDetailDialog').modal(modalOptions);
-                        }
-                    }
-                );
-            },
-            saveInventoryCheck: function () {
-                showMask("提交中...");
-                var form = $("#inventoryCheckDetailForm");
-                var valid = validate(form, {
-                    'detail.inventory_check.code': {
-                        required: false
-                    },
-                    'detail.inventory_check.stock_id': {
-                        required: true, digits: true
-                    },
-                    'detail.inventory_check.desc': {
-                        required: false, minlength: 2, maxlength: 400
-                    },
-                    'detail.inventory_check.check_date': {
-                        required: true
-                    },
-                    'detail.inventory_check.status_id': {
-                        required: true, digits: true
-                    }
-                });
-
-                if (!valid) {
-                    hideMask();
-                } else {
-                    $.ajax({
-                            url: '{%url "ErpInventoryCheckApprove.Save"%}',
-                            type: "POST",
-                            processData: false,
-                            contentType: 'application/json',
-                            data: JSON.stringify(vm.detail),
-                            success: function (data) {
-                                hideMask();
-                                if (data.success == false) {
-                                    $.msg.error(data.message);
-                                    //return;
-                                }
-                                else {
-                                    $.msg.show(data.message);
-                                    $('#inventoryCheckDetailDialog').modal('hide');
-                                    vm.reloadList();
-                                    //return;
-                                }
-                            }
-                        }
-                    );
-                }
-            },
-            deleteInventoryCheck: function () {
+            approveInventoryCheck: function () {
                 var id_list = [];
                 $('#inventoryCheckList tbody tr>td:first-child input:checkbox').each(function () {
                     if (this.checked) {
@@ -234,28 +77,33 @@
                     }
                 });
 
-                if (id_list.length == 0) {
-                    $.msg.alert("请选择数据！");
+                if (id_list.length != 1) {
+                    $.msg.alert("请选择一行数据！");
                     return;
                 }
 
-                $.msg.confirm("确认要删除吗？", function () {
-                    $.ajax({
-                        url: '{%url "ErpInventoryCheckApprove.Delete"%}',
+                showMask("提交中...");
+                $.ajax({
+                        url: '{%url "ErpInventoryCheckApprove.Approve"%}',
                         type: "POST",
-                        data: {"id_list": id_list},
+                        contentType: 'application/json',
+                        data: {
+                            "check_id": id_list[0]
+                        },
                         success: function (data) {
+                            hideMask();
                             if (data.success == false) {
                                 $.msg.error(data.message);
-                                return;
+                                //return;
                             }
                             else {
                                 $.msg.show(data.message);
+                                vm.reloadList();
+                                //return;
                             }
-                            vm.reloadList();
                         }
-                    });
-                });
+                    }
+                );
             }
         }
     });

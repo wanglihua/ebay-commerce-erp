@@ -1,14 +1,12 @@
 package controllers
 
 import (
-	"encoding/json"
 	"github.com/revel/revel"
-	"strconv"
 
 	"matrix/core"
 	auth_models "matrix/modules/auth/models"
 	"matrix/modules/erp/models"
-	"time"
+	"fmt"
 )
 
 type ErpInventoryCheckApprove struct {
@@ -22,8 +20,8 @@ func (c ErpInventoryCheckApprove) Index() revel.Result {
 type ErpInventoryCheckApproveViewItem struct {
 	models.InventoryCheckInfo `xorm:"extends" json:"ic"`
 	models.StockInfo          `xorm:"extends" json:"st"`
-	CheckUser                 auth_models.UserInfo `xorm:"extends" json:"cu"`
-	ApproveUser               auth_models.UserInfo `xorm:"extends" json:"au"`
+	CheckUser   auth_models.UserInfo `xorm:"extends" json:"cu"`
+	ApproveUser auth_models.UserInfo `xorm:"extends" json:"au"`
 	models.StatusInfo         `xorm:"extends" json:"ss"`
 }
 
@@ -42,7 +40,7 @@ func (c ErpInventoryCheckApprove) ListData() revel.Result {
 	*/
 
 	query := db_session.
-		Select("ic.*, st.*, cu.*, au.*, ss.*").
+	Select("ic.*, st.*, cu.*, au.*, ss.*").
 		Table("erp_inventory_check").Alias("ic").
 		Join("INNER", []string{"erp_stock", "st"}, "ic.stock_id = st.id").
 		Join("INNER", []string{"auth_user", "cu"}, "ic.check_user_id = cu.id").
@@ -73,104 +71,52 @@ func (c ErpInventoryCheckApprove) ListData() revel.Result {
 	})
 }
 
-type InventoryCheckDetailApproveForm struct {
-	InventoryCheck models.InventoryCheckInfo `json:"inventory_check"`
-	StockList      []models.StockInfo        `json:"stock_list"`
-}
-
-func (f *InventoryCheckDetailApproveForm) IsCreate() bool {
-	return f.InventoryCheck.Id == 0
-}
-
-func (f *InventoryCheckDetailApproveForm) Valid(validation *revel.Validation) bool {
-
-	validation.Required(f.InventoryCheck.StockId).Message("仓库不能为空！")
-
-	if f.InventoryCheck.Desc.Valid == true {
-		validation.MinSize(f.InventoryCheck.Desc.String, 2).Message("备注长度不能小于2！")
-	}
-	if f.InventoryCheck.Desc.Valid == true {
-		validation.MaxSize(f.InventoryCheck.Desc.String, 400).Message("备注长度不能大于400！")
-	}
-
-	validation.Required(f.InventoryCheck.CheckDate).Message("盘点日期不能为空！")
-
-	validation.Required(f.InventoryCheck.CheckUserId).Message("盘点人不能为空！")
-
-	validation.Required(f.InventoryCheck.StatusId).Message("状态不能为空！")
-
-	return validation.HasErrors() == false
-}
-
-func (c ErpInventoryCheckApprove) DetailData() revel.Result {
+func (c ErpInventoryCheckApprove) Approve() revel.Result {
 	db_session := c.DbSession
 
-	var inventory_check_id int64
-	c.Params.Bind(&inventory_check_id, "id")
+	var check_id int64
+	c.Params.Bind(&check_id, "check_id")
 
 	var inventory_check models.InventoryCheckInfo
-	if inventory_check_id != 0 {
-		has, err := db_session.Id(inventory_check_id).Get(&inventory_check)
-		core.HandleError(err)
-		if has == false {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "指定的库存盘点不存在！"})
-		}
-	} else {
-		loginuser := core.GetLoginUser(c.Session)
-		inventory_check.CheckUserId = loginuser.UserId
-		inventory_check.CheckDate = core.Date(time.Now())
-	}
-
-	var stock_list []models.StockInfo
-	err := db_session.Find(&stock_list)
+	_, err := db_session.Id(check_id).Get(&inventory_check)
 	core.HandleError(err)
 
-	var detail_form InventoryCheckDetailApproveForm
-	detail_form.InventoryCheck = inventory_check
-	detail_form.StockList = stock_list
-
-	return c.RenderJson(detail_form)
-}
-
-func (c ErpInventoryCheckApprove) Save() revel.Result {
-	db_session := c.DbSession
-
-	var detail_form InventoryCheckDetailApproveForm
-	err := json.Unmarshal(c.GetRequestBody(), &detail_form)
+	//修改状态
+	inventory_check.StatusId = models.INVENTORY_CHECK_STATUS_YWC
+	_, err = db_session.Id(check_id).Cols("status_id").Update(&inventory_check)
 	core.HandleError(err)
 
-	if detail_form.Valid(c.Validation) == false {
-		return c.RenderJson(core.JsonResult{Success: false, Message: c.GetValidationErrorMessage()})
-	}
+	//更新库存
+	inventory_check_entry_list := make([]models.InventoryCheckEntryInfo, 0)
+	err = db_session.Sql(fmt.Sprintf("SELECT * FROM erp_inventory_check_entry WHERE check_id = %d", check_id)).Find(&inventory_check_entry_list)
+	core.HandleError(err)
 
-	inventory_check := detail_form.InventoryCheck
-
-	var affected int64
-	if detail_form.IsCreate() {
-		inventory_check.StatusId = models.INVENTORY_CHECK_STATUS_WTG
-		affected, err = db_session.Insert(&inventory_check)
-		core.HandleError(err)
-	} else {
-		ic_cols := models.InventoryCheckCols
-		affected, err = db_session.Id(inventory_check.Id).Cols(ic_cols.Code, ic_cols.StockId, ic_cols.Desc, ic_cols.CheckDate).Update(&inventory_check)
+	inventory_table := new(models.InventoryInfo)
+	for _, inventory_check_entry := range inventory_check_entry_list {
+		affected, err := db_session.Table(inventory_table).
+			Where("storage_loc_id = ? AND product_id = ?", inventory_check_entry.StorageLocId, inventory_check_entry.ProductId).
+			Update(map[string]interface{}{
+			"qty": inventory_check_entry.CheckQty,
+		})
 		core.HandleError(err)
 
+		// 如果不存在相对应的库存记录
 		if affected == 0 {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！"})
+			var inventory models.InventoryInfo
+			inventory.StockId = inventory_check.StockId
+			inventory.StorageLocId = inventory_check_entry.StorageLocId
+			inventory.ProductId = inventory_check_entry.ProductId
+			inventory.Qty = inventory_check_entry.CheckQty
+
+			_, err = db_session.Insert(&inventory)
+			core.HandleError(err)
 		}
 	}
 
-	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据保存成功!"})
-}
+	//记录库存变更
 
-func (c ErpInventoryCheckApprove) Delete() revel.Result {
-	db_session := c.DbSession
-
-	inventory_check_id_list := make([]int64, 0)
-	c.Params.Bind(&inventory_check_id_list, "id_list")
-
-	affected, err := db_session.In("id", inventory_check_id_list).Delete(new(models.InventoryCheckInfo))
-	core.HandleError(err)
-
-	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})
+	return c.RenderJson(core.JsonResult{
+		Success: true,
+		Message: "审批成功",
+	})
 }
