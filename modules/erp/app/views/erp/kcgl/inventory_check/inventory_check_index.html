@@ -28,6 +28,14 @@
                         <i class="ace-icon fa fa-plus"></i>
                         新增
                     </button>
+                    <button class="btn btn-purple btn-sm" @click="submitInventoryCheck()">
+                        <i class="ace-icon fa fa-rotate-right"></i>
+                        提交
+                    </button>
+                    <button class="btn btn-yellow btn-sm" @click="backInventoryCheck()">
+                        <i class="ace-icon fa fa-rotate-left"></i>
+                        回退
+                    </button>
                     <button class="btn btn-danger btn-sm" @click="deleteInventoryCheck()">
                         <i class="ace-icon fa fa-trash-o"></i>
                         删除
@@ -704,6 +712,82 @@
                 });
 
                 $('#productSelectDialog').modal('hide');
+            },
+            submitInventoryCheck: function () {
+                var id_list = [];
+                $('#inventoryCheckList tbody tr>td:first-child input:checkbox').each(function () {
+                    if (this.checked) {
+                        id_list.push($(this).val());
+                    }
+                });
+
+                if (id_list.length == 0 || id_list.length > 1) {
+                    $.msg.alert("请选择一行数据！");
+                    return;
+                }
+
+                $.msg.confirm("确认要提交吗？", function () {
+                    $.ajax({
+                            url: '{%url "ErpInventoryCheck.Submit"%}',
+                            type: "POST",
+                            data: {
+                                "check_id": id_list[0]
+                            },
+                            success: function (data) {
+                                hideMask();
+                                if (data.success == false) {
+                                    $.msg.error(data.message);
+                                    //return;
+                                }
+                                else {
+                                    $.msg.show(data.message);
+                                    vm.bill_code = "请先单击盘点单行";
+                                    vm.reloadList();
+                                    vm.reloadEntryList();
+                                    //return;
+                                }
+                            }
+                        }
+                    );
+                });
+            },
+            backInventoryCheck: function () {
+                var id_list = [];
+                $('#inventoryCheckList tbody tr>td:first-child input:checkbox').each(function () {
+                    if (this.checked) {
+                        id_list.push($(this).val());
+                    }
+                });
+
+                if (id_list.length == 0 || id_list.length > 1) {
+                    $.msg.alert("请选择一行数据！");
+                    return;
+                }
+
+                $.msg.confirm("确认要回退吗？", function () {
+                    $.ajax({
+                            url: '{%url "ErpInventoryCheck.Back"%}',
+                            type: "POST",
+                            data: {
+                                "check_id": id_list[0]
+                            },
+                            success: function (data) {
+                                hideMask();
+                                if (data.success == false) {
+                                    $.msg.error(data.message);
+                                    //return;
+                                }
+                                else {
+                                    $.msg.show(data.message);
+                                    vm.bill_code = "请先单击盘点单行";
+                                    vm.reloadList();
+                                    vm.reloadEntryList();
+                                    //return;
+                                }
+                            }
+                        }
+                    );
+                });
             }
         }
     });

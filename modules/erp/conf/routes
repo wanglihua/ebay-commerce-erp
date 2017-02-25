@@ -174,11 +174,13 @@ POST /erp/inventory/check/data/list            ErpInventoryCheck.ListData
 POST /erp/inventory/check/data/detail          ErpInventoryCheck.DetailData
 POST /erp/inventory/check/save                 ErpInventoryCheck.Save
 POST /erp/inventory/check/delete               ErpInventoryCheck.Delete
+POST /erp/inventory/check/submit               ErpInventoryCheck.Submit
+POST /erp/inventory/check/back                 ErpInventoryCheck.Back
 
 GET  /erp/inventory/check/approve              ErpInventoryCheckApprove.Index
 POST /erp/inventory/check/approve/data/list    ErpInventoryCheckApprove.ListData
 POST /erp/inventory/check/approve/do           ErpInventoryCheckApprove.Approve
-POST /erp/inventory/check/back                 ErpInventoryCheckApprove.Back
+POST /erp/inventory/check/approve/back         ErpInventoryCheckApprove.Back
 
 GET  /erp/inventory/check/entry                ErpInventoryCheckEntry.Index
 POST /erp/inventory/check/entry/data/list      ErpInventoryCheckEntry.ListData

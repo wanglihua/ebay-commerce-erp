@@ -72,6 +72,7 @@ func (c ErpInventoryCheckApprove) ListData() revel.Result {
 	})
 }
 
+// 这里是不是要加个信号量，让检查状态和更新库存的操作互斥
 func (c ErpInventoryCheckApprove) Approve() revel.Result {
 	db_session := c.DbSession
 
@@ -81,6 +82,10 @@ func (c ErpInventoryCheckApprove) Approve() revel.Result {
 	var inventory_check models.InventoryCheckInfo
 	_, err := db_session.Id(check_id).Get(&inventory_check)
 	core.HandleError(err)
+
+	if inventory_check.StatusId != models.INVENTORY_CHECK_STATUS_SPZ {
+		return c.RenderJson(core.JsonResult{Success: false, Message: "当前盘点单状态不是审核中！"})
+	}
 
 	//修改状态
 	inventory_check.StatusId = models.INVENTORY_CHECK_STATUS_YWC
@@ -92,13 +97,14 @@ func (c ErpInventoryCheckApprove) Approve() revel.Result {
 	err = db_session.Sql(fmt.Sprintf("SELECT * FROM erp_inventory_check_entry WHERE check_id = %d", check_id)).Find(&inventory_check_entry_list)
 	core.HandleError(err)
 
-	inventory_table := new(models.InventoryInfo)
 	for _, inventory_check_entry := range inventory_check_entry_list {
-		affected, err := db_session.Table(inventory_table).
-			Where("storage_loc_id = ? AND product_id = ?", inventory_check_entry.StorageLocId, inventory_check_entry.ProductId).
-			Update(map[string]interface{}{
-			"qty": inventory_check_entry.CheckQty,
-		})
+		inventory := new(models.InventoryInfo)
+		inventory.Qty = inventory_check_entry.CheckQty
+
+		affected, err := db_session.
+		Where("storage_loc_id = ? AND product_id = ?", inventory_check_entry.StorageLocId, inventory_check_entry.ProductId).
+			Cols("qty").
+			Update(inventory)
 		core.HandleError(err)
 
 		// 如果不存在相对应的库存记录
@@ -131,6 +137,10 @@ func (c ErpInventoryCheckApprove) Back() revel.Result {
 	var inventory_check models.InventoryCheckInfo
 	_, err := db_session.Id(check_id).Get(&inventory_check)
 	core.HandleError(err)
+
+	if inventory_check.StatusId != models.INVENTORY_CHECK_STATUS_SPZ {
+		return c.RenderJson(core.JsonResult{Success: false, Message: "当前盘点单状态不是审核中！"})
+	}
 
 	//修改状态
 	inventory_check.StatusId = models.INVENTORY_CHECK_STATUS_WTG

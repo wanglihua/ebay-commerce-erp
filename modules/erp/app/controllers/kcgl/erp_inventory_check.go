@@ -179,3 +179,53 @@ func (c ErpInventoryCheck) Delete() revel.Result {
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: "数据删除成功!"})
 }
+
+func (c ErpInventoryCheck) Submit() revel.Result {
+	db_session := c.DbSession
+
+	var check_id int64
+	c.Params.Bind(&check_id, "check_id")
+
+	var inventory_check models.InventoryCheckInfo
+	has, err := db_session.Id(check_id).Get(&inventory_check)
+	core.HandleError(err)
+	if has == false {
+		return c.RenderJson(core.JsonResult{Success: false, Message: "指定的盘点单不存在!"})
+	}
+
+	if inventory_check.StatusId != models.INVENTORY_CHECK_STATUS_YCJ && inventory_check.StatusId != models.INVENTORY_CHECK_STATUS_WTG {
+		return c.RenderJson(core.JsonResult{Success: false, Message: "当前盘点单状态不是已创建或未通过，不能提交!"})
+	}
+
+	inventory_check.StatusId = models.INVENTORY_CHECK_STATUS_SPZ
+
+	_, err = db_session.Id(check_id).Cols("status_id").Update(&inventory_check)
+	core.HandleError(err)
+
+	return c.RenderJson(core.JsonResult{Success: true, Message: "数据提交成功!"})
+}
+
+func (c ErpInventoryCheck) Back() revel.Result {
+	db_session := c.DbSession
+
+	var check_id int64
+	c.Params.Bind(&check_id, "check_id")
+
+	var inventory_check models.InventoryCheckInfo
+	has, err := db_session.Id(check_id).Get(&inventory_check)
+	core.HandleError(err)
+	if has == false {
+		return c.RenderJson(core.JsonResult{Success: false, Message: "指定的盘点单不存在!"})
+	}
+
+	if inventory_check.StatusId != models.INVENTORY_CHECK_STATUS_SPZ {
+		return c.RenderJson(core.JsonResult{Success: false, Message: "当前盘点单状态不是审批中，不能提交!"})
+	}
+
+	inventory_check.StatusId = models.INVENTORY_CHECK_STATUS_YCJ
+
+	_, err = db_session.Id(check_id).Cols("status_id").Update(&inventory_check)
+	core.HandleError(err)
+
+	return c.RenderJson(core.JsonResult{Success: true, Message: "数据回退成功!"})
+}

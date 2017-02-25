@@ -24,7 +24,7 @@
                         <i class="ace-icon fa fa-refresh"></i>
                         刷新
                     </button>
-                    <button class="btn btn-success btn-sm" @click="approveInventoryCheck()">
+                    <button class="btn btn-purple btn-sm" @click="approveInventoryCheck()">
                         <i class="ace-icon fa fa-check"></i>
                         核准
                     </button>
@@ -35,7 +35,6 @@
                 </div>
                 <div>
                     <table id="inventoryCheckList" class="table table-striped table-bordered table-hover"></table>
-                    <div class="todo">1、盘点单明细查看；2、记录库存变更历史。</div>
                 </div>
             </div>
             <div class="col-xs-12" style="margin-top: 30px;">
@@ -54,6 +53,7 @@
                 </div>
                 <div>
                     <table id="inventoryCheckEntryList" class="table table-striped table-bordered table-hover"></table>
+                    <div class="todo">1、记录库存变更历史。</div>
                 </div>
             </div>
         </div>
@@ -195,28 +195,31 @@
                     return;
                 }
 
-                showMask("提交中...");
-                $.ajax({
-                        url: '{%url "ErpInventoryCheckApprove.Approve"%}',
-                        type: "POST",
-                        contentType: 'application/json',
-                        data: {
-                            "check_id": id_list[0]
-                        },
-                        success: function (data) {
-                            hideMask();
-                            if (data.success == false) {
-                                $.msg.error(data.message);
-                                //return;
-                            }
-                            else {
-                                $.msg.show(data.message);
-                                vm.reloadList();
-                                //return;
+                $.msg.confirm("确认要核准吗？", function () {
+                    showMask("提交中...");
+                    $.ajax({
+                            url: '{%url "ErpInventoryCheckApprove.Approve"%}',
+                            type: "POST",
+                            data: {
+                                "check_id": id_list[0]
+                            },
+                            success: function (data) {
+                                hideMask();
+                                if (data.success == false) {
+                                    $.msg.error(data.message);
+                                    //return;
+                                }
+                                else {
+                                    $.msg.show(data.message);
+                                    vm.bill_code = "请先单击盘点单行";
+                                    vm.reloadList();
+                                    vm.reloadEntryList();
+                                    //return;
+                                }
                             }
                         }
-                    }
-                );
+                    );
+                });
             },
             backInventoryCheck: function () {
                 var id_list = [];
@@ -231,28 +234,31 @@
                     return;
                 }
 
-                showMask("提交中...");
-                $.ajax({
-                        url: '{%url "ErpInventoryCheckApprove.Back"%}',
-                        type: "POST",
-                        contentType: 'application/json',
-                        data: {
-                            "check_id": id_list[0]
-                        },
-                        success: function (data) {
-                            hideMask();
-                            if (data.success == false) {
-                                $.msg.error(data.message);
-                                //return;
-                            }
-                            else {
-                                $.msg.show(data.message);
-                                vm.reloadList();
-                                //return;
+                $.msg.confirm("确认要驳回吗？", function () {
+                    showMask("提交中...");
+                    $.ajax({
+                            url: '{%url "ErpInventoryCheckApprove.Back"%}',
+                            type: "POST",
+                            data: {
+                                "check_id": id_list[0]
+                            },
+                            success: function (data) {
+                                hideMask();
+                                if (data.success == false) {
+                                    $.msg.error(data.message);
+                                    //return;
+                                }
+                                else {
+                                    $.msg.show(data.message);
+                                    vm.bill_code = "请先单击盘点单行";
+                                    vm.reloadList();
+                                    vm.reloadEntryList();
+                                    //return;
+                                }
                             }
                         }
-                    }
-                );
+                    );
+                });
             }
         }
     });
