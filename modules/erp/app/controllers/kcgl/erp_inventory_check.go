@@ -149,10 +149,14 @@ func (c ErpInventoryCheck) Save() revel.Result {
 	if detail_form.IsCreate() {
 		loginuser := core.GetLoginUser(c.Session)
 		inventory_check.CheckUserId = loginuser.UserId
-		inventory_check.StatusId = models.INVENTORY_CHECK_STATUS_SPZ
+		inventory_check.StatusId = models.INVENTORY_CHECK_STATUS_YCJ
 		affected, err = db_session.Insert(&inventory_check)
 		core.HandleError(err)
 	} else {
+		if inventory_check.StatusId != models.INVENTORY_CHECK_STATUS_YCJ && inventory_check.StatusId != models.INVENTORY_CHECK_STATUS_WTG {
+			return c.RenderJson(core.JsonResult{Success: false, Message: "当前盘点单不是已创建或未通过状态，信息不能修改！"})
+		}
+
 		ic_cols := models.InventoryCheckCols
 		affected, err = db_session.Id(inventory_check.Id).Cols(ic_cols.Code, ic_cols.StockId, ic_cols.Desc, ic_cols.CheckDate).Update(&inventory_check)
 		core.HandleError(err)
