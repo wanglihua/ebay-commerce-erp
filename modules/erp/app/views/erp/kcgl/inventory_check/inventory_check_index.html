@@ -347,18 +347,22 @@
                 $("#inventoryCheckList").find('tbody tr').each(function () {
                     var tableRow = $(this).closest('tr');
                     var checkbox = tableRow.find('td:first-child input:checkbox')[0];
-                    checkbox.checked = false;
-                    tableRow.removeClass('hilight');
+                    if (checkbox) {
+                        checkbox.checked = false;
+                        tableRow.removeClass('hilight');
+                    }
                 });
 
                 var tableRow = $(this);
                 var checkbox = tableRow.find('td:first-child input:checkbox')[0];
-                checkbox.checked = true;
-                tableRow.addClass('hilight');
+                if (checkbox) {
+                    checkbox.checked = true;
+                    tableRow.addClass('hilight');
 
-                var id = $(this).find('td:first-child input:checkbox').val();
-                vm.bill_id = id;
-                vm.reloadEntryList();
+                    var id = $(this).find('td:first-child input:checkbox').val();
+                    vm.bill_id = id;
+                    vm.reloadEntryList();
+                }
             });
 
             // inventory check entry

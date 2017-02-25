@@ -49,7 +49,7 @@ func (c ErpInventoryCheckApprove) ListData() revel.Result {
 		Where(filter)
 
 	//query extra filter here
-	query = query.Where("status_id = ?", models.INVENTORY_CHECK_STATUS_SPZ)
+	query = query.Where("ic.status_id = ?", models.INVENTORY_CHECK_STATUS_SPZ)
 
 	data_query := *query
 	if order != "" {
