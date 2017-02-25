@@ -175,7 +175,17 @@ func (c ErpInventoryCheck) Delete() revel.Result {
 	inventory_check_id_list := make([]int64, 0)
 	c.Params.Bind(&inventory_check_id_list, "id_list")
 
-	_, err := db_session.In("check_id", inventory_check_id_list).Delete(new(models.InventoryCheckEntryInfo))
+	inventory_check_list := make([]models.InventoryCheckInfo, 0)
+	err := db_session.In("check_id", inventory_check_id_list).Find(&inventory_check_list)
+	core.HandleError(err)
+
+	for _, inventory_check := range inventory_check_list {
+		if inventory_check.StatusId != models.INVENTORY_CHECK_STATUS_YCJ && inventory_check.StatusId != models.INVENTORY_CHECK_STATUS_WTG {
+			return c.RenderJson(core.JsonResult{Success: false, Message: "当前盘点单不是已创建或未通过状态，信息不能修改！"})
+		}
+	}
+
+	_, err = db_session.In("check_id", inventory_check_id_list).Delete(new(models.InventoryCheckEntryInfo))
 	core.HandleError(err)
 
 	_, err = db_session.In("id", inventory_check_id_list).Delete(new(models.InventoryCheckInfo))

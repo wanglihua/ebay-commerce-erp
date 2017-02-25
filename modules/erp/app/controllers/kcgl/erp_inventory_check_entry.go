@@ -8,6 +8,7 @@ import (
 	"matrix/core"
 	"matrix/modules/erp/models"
 	"fmt"
+	"strings"
 )
 
 type ErpInventoryCheckEntry struct {
@@ -218,6 +219,31 @@ func (c ErpInventoryCheckEntry) Delete() revel.Result {
 
 	inventory_check_entry_id_list := make([]int64, 0)
 	c.Params.Bind(&inventory_check_entry_id_list, "id_list")
+
+	var check_id_list = make([]struct {
+		CheckId int64 `xorm:"'check_id'" json:"check_id"`
+	}, 0)
+
+	entry_id_str_list := make([]string, 0)
+	for _, entry_id_int := range entry_id_str_list {
+		entry_id_str_list = append(entry_id_str_list, entry_id_int)
+	}
+
+	err := db_session.Sql(fmt.Sprintf(`SELECT check_id FROM erp_inventory_check_entry WHERE id IN (%s)`, strings.Join(entry_id_str_list, ","))).Find(&check_id_list)
+	core.HandleError(err)
+
+	if len(check_id_list) != 1 {
+		return c.RenderJson(core.JsonResult{Success: true, Message: "请选择一个盘点单下的数据进行删除!"})
+	}
+
+	check_id := check_id_list[0]
+	var inventory_check models.InventoryCheckInfo
+	_, err = db_session.Id(check_id).Get(&inventory_check)
+	core.HandleError(err)
+
+	if inventory_check.StatusId != models.INVENTORY_CHECK_STATUS_YCJ && inventory_check.StatusId != models.INVENTORY_CHECK_STATUS_WTG {
+		return c.RenderJson(core.JsonResult{Success: false, Message: "当前盘点单不是已创建或未通过状态，明细信息不能删除！"})
+	}
 
 	affected, err := db_session.In("id", inventory_check_entry_id_list).Delete(new(models.InventoryCheckEntryInfo))
 	core.HandleError(err)
