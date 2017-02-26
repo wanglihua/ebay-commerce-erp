@@ -34,7 +34,7 @@ func (c ErpStock) ListData() revel.Result {
 		  INNER JOIN erp_status status ON stock.status_id = status.id
 	*/
 	query := db_session.
-		Select("stock.*, status.*").
+	Select("stock.*, status.*").
 		Table("erp_stock").Alias("stock").
 		Join("INNER", []string{"erp_status", "status"}, "stock.status_id = status.id").
 		Where(filter)
@@ -63,8 +63,10 @@ func (c ErpStock) ListData() revel.Result {
 }
 
 type StockDetailForm struct {
-	Stock      models.StockInfo    `json:"stock"`
-	StatusList []models.StatusInfo `json:"status_list"`
+	Stock           models.StockInfo       `json:"stock"`
+	StockTypeList   []models.StockTypeInfo `json:"stock_type_list"`
+	TargetStockList []models.StockInfo     `json:"target_stock_list"`
+	StatusList      []models.StatusInfo    `json:"status_list"`
 }
 
 func (f *StockDetailForm) IsCreate() bool {
@@ -126,12 +128,26 @@ func (c ErpStock) DetailData() revel.Result {
 		if has == false {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "指定的仓库不存在！"})
 		}
+	} else {
+		stock.StatusId = models.STOCK_STATUS_ENABLED
+		stock.StockTypeId = models.STOCK_TYPE_COMMON
 	}
 
 	status_list := status_service.GetStatusList(db_session, models.STATUS_TYPE_STOCK)
 
+	var target_stock_list = make([]models.StockInfo, 0)
+	if stock_id != 0 {
+		err := db_session.Where("id != ?", stock_id).Find(&target_stock_list)
+		core.HandleError(err)
+	} else {
+		err := db_session.Find(&target_stock_list)
+		core.HandleError(err)
+	}
+
 	var detail_form StockDetailForm
 	detail_form.Stock = stock
+	detail_form.StockTypeList = models.GetStockTypeList()
+	detail_form.TargetStockList = target_stock_list
 	detail_form.StatusList = status_list
 
 	return c.RenderJson(detail_form)
@@ -149,6 +165,10 @@ func (c ErpStock) Save() revel.Result {
 	}
 
 	stock := detail_form.Stock
+
+	if stock.StockTypeId == models.STOCK_TYPE_COMMON && (stock.TargetStockId.Valid == true && stock.TargetStockId.Int64 != 0) {
+		return c.RenderJson(core.JsonResult{Success: false, Message: "普通仓库不应该有目的仓库！" })
+	}
 
 	var affected int64
 	if detail_form.IsCreate() {
