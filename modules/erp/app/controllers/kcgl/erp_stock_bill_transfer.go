@@ -10,6 +10,7 @@ import (
 	"matrix/modules/erp/models"
 	"time"
 	"fmt"
+	"matrix/modules/erp/service/bill_service"
 )
 
 type ErpStockBillTransfer struct {
@@ -22,8 +23,8 @@ func (c ErpStockBillTransfer) Index() revel.Result {
 
 type ErpStockBillTransferViewItem struct {
 	models.StockBillInfo `xorm:"extends" json:"sb"`
-	SrcStock             models.StockInfo `xorm:"extends" json:"sc"`
-	DestStock            models.StockInfo `xorm:"extends" json:"dc"`
+	SrcStock  models.StockInfo `xorm:"extends" json:"sc"`
+	DestStock models.StockInfo `xorm:"extends" json:"dc"`
 	auth_models.UserInfo `xorm:"extends" json:"u"`
 }
 
@@ -38,16 +39,16 @@ func (c ErpStockBillTransfer) ListData() revel.Result {
 		    LEFT JOIN erp_stock sc ON sb.src_stock_id = sc.id
 		    INNER JOIN erp_stock dc ON sb.stock_id = dc.id
 		    INNER JOIN auth_user u ON sb.user_id = u.id
-		WHERE sb.type_id = 300
+		WHERE (sb.type_id = 300 OR sb.type_id = 400)
 	*/
 
 	query := db_session.
-		Select("sb.*, sc.*, dc.*, u.*").
+	Select("sb.*, sc.*, dc.*, u.*").
 		Table("erp_stock_bill").Alias("sb").
 		Join("LEFT", []string{"erp_stock", "sc"}, "sb.src_stock_id = sc.id").
 		Join("INNER", []string{"erp_stock", "dc"}, "sb.stock_id = dc.id").
 		Join("INNER", []string{"auth_user", "u"}, "sb.user_id = u.id").
-		Where("sb.type_id = ?", models.STOCK_BILL_TYPE_TRANSFER).
+		Where("(sb.type_id = ? OR sb.type_id = ?)", models.STOCK_BILL_TYPE_TRANSFER, models.STOCK_BILL_TYPE_TRANSFER_ZT).
 		Where(filter)
 
 	//query extra filter here
@@ -118,6 +119,7 @@ func (c ErpStockBillTransfer) DetailData() revel.Result {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "指定的出入库单不存在！"})
 		}
 	} else {
+		stock_bill.Code = bill_service.GetNextBillNo(db_session)
 		stock_bill.Date = core.Date(time.Now())
 	}
 
@@ -145,11 +147,26 @@ func (c ErpStockBillTransfer) Save() revel.Result {
 
 	stock_bill := detail_form.StockBill
 
+	if stock_bill.SrcStockId.Valid == true && (stock_bill.SrcStockId.Int64 == stock_bill.StockId) {
+		return c.RenderJson(core.JsonResult{Success: false, Message: "调拨单的调出仓库和调入仓库不能相同！"})
+	}
+
 	var affected int64
 	if detail_form.IsCreate() {
 		loginuser := core.GetLoginUser(c.Session)
 		stock_bill.UserId = loginuser.UserId
-		stock_bill.TypeId = models.STOCK_BILL_TYPE_TRANSFER
+
+		// 检查是不是在途调拨单
+		var stock models.StockInfo
+		_, err := db_session.Id(stock_bill.StockId).Get(&stock)
+		core.HandleError(err)
+
+		if stock.StockTypeId == models.STOCK_TYPE_ZAITU {
+			stock_bill.TypeId = models.STOCK_BILL_TYPE_TRANSFER_ZT
+		} else {
+			stock_bill.TypeId = models.STOCK_BILL_TYPE_TRANSFER
+		}
+
 		affected, err = db_session.Insert(&stock_bill)
 		core.HandleError(err)
 	} else {

@@ -73,7 +73,7 @@ func (t EBayMessageDownloadTask) Run() {
 	switch response.Ack {
 	case "Success":
 		revel.TRACE.Printf("eBay GetMemberMessages Response: " + response.Ack + "\n")
-		revel.TRACE.Printf("eBay GetMemberMessages Response HasMoreItems: %t", response.HasMoreMessages)
+		revel.TRACE.Printf("eBay GetMemberMessages Response HasMoreItems: %t", response.HasMoreItems)
 	case "Failure":
 		revel.ERROR.Printf("eBay GetMemberMessages Response: " + response.Ack + "\n")
 	default:
@@ -108,7 +108,7 @@ func (t EBayMessageDownloadTask) fetch_messages(config ebay.Config) ebay.GetMemb
 		Body:        req_body,
 		ContentType: "application/xml; charset=utf-8",
 		//UserAgent:   "go-ebay-fetch-orders",
-		ShowDebug:   false,
+		ShowDebug: false,
 	}
 
 	req.AddHeader("X-EBAY-API-CALL-NAME", "GetMemberMessages")
@@ -132,6 +132,8 @@ func (t EBayMessageDownloadTask) fetch_messages(config ebay.Config) ebay.GetMemb
 	}
 
 	data, err := ioutil.ReadAll(res.Body)
+
+	revel.TRACE.Println(string(data))
 
 	if err != nil {
 		revel.ERROR.Println("ERROR - ioutil.ReadAll : " + err.Error())

@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GetMemberMessagesResponse xmlns="urn:ebay:apis:eBLBaseComponents">
+    <Timestamp>2017-02-27T12:06:53.410Z</Timestamp>
+    <Ack>Success</Ack>
+    <Version>963</Version>
+    <Build>E963_INTL_APIMSG_17909222_R1</Build>
+    <MemberMessage>
+        <MemberMessageExchange>
+            <Item>
+                <ItemID>282274483833</ItemID>
+                <ListingDetails>
+                    <StartTime>2016-11-30T06:17:35.000Z</StartTime>
+                    <EndTime>2017-02-28T06:17:35.000Z</EndTime>
+                    <ViewItemURL>
+                        http://www.ebay.co.uk/itm/Universal-Car-Roof-Top-Rack-Bag-Cargo-Carrier-Luggage-Travel-Camping-Storage-AU-/282274483833
+                    </ViewItemURL>
+                </ListingDetails>
+                <Seller>
+                    <UserID>ozmart.living</UserID>
+                </Seller>
+                <SellingStatus>
+                    <CurrentPrice currencyID="AUD">58.79</CurrentPrice>
+                </SellingStatus>
+                <TimeLeft>PT18H10M53S</TimeLeft>
+                <Title>Universal Car Roof Top Rack Bag Cargo Carrier Luggage Travel Camping Storage AU</Title>
+                <ConditionID>1000</ConditionID>
+                <ConditionDisplayName>Brand New</ConditionDisplayName>
+            </Item>
+            <Question>
+                <MessageType>ResponseToASQQuestion</MessageType>
+                <QuestionType>General</QuestionType>
+                <DisplayToPublic>false</DisplayToPublic>
+                <SenderID>agro_000</SenderID>
+                <SenderEmail>agro00_my6259rao@members.ebay.com.au</SenderEmail>
+                <RecipientID>ozmart.living</RecipientID>
+                <Subject>agro_000 has sent a question about item #282274483833, ending on 29-Jan-17 17:17:35 AEDST -
+                    Universal Car Roof Top Rack Bag Cargo Carrier Luggage Travel Waterproof Camping
+                </Subject>
+                <Body>Excellent. I will pick up tomorrow but will message first</Body>
+                <MessageID>1427809512012</MessageID>
+            </Question>
+            <MessageStatus>Answered</MessageStatus>
+            <CreationDate>2017-01-09T00:41:21.000Z</CreationDate>
+            <LastModifiedDate>2017-01-09T11:44:07.000Z</LastModifiedDate>
+        </MemberMessageExchange>
+        <MemberMessageExchange>
+            <Item>
+                <ItemID>282292177704</ItemID>
+                <ListingDetails>
+                    <StartTime>2016-12-15T08:58:41.000Z</StartTime>
+                    <EndTime>2017-03-15T08:58:41.000Z</EndTime>
+                    <ViewItemURL>
+                        http://www.ebay.co.uk/itm/355mm-Metal-Cut-Off-Drop-Saw-Electric-Saw-Demolition-Industrial-Cutting-Machine-/282292177704
+                    </ViewItemURL>
+                </ListingDetails>
+                <Seller>
+                    <UserID>ozmart.living</UserID>
+                </Seller>
+                <SellingStatus>
+                    <CurrentPrice currencyID="AUD">116.99</CurrentPrice>
+                </SellingStatus>
+                <TimeLeft>P15DT20H51M59S</TimeLeft>
+                <Title>355mm Metal Cut Off Drop Saw Electric Saw Demolition Industrial Cutting Machine</Title>
+                <ConditionID>1000</ConditionID>
+                <ConditionDisplayName>Brand New</ConditionDisplayName>
+            </Item>
+            <Question>
+                <MessageType>AskSellerQuestion</MessageType>
+                <QuestionType>General</QuestionType>
+                <DisplayToPublic>false</DisplayToPublic>
+                <SenderID>ossiemichael</SenderID>
+                <SenderEmail>ossiem_kxdb6355lg@members.ebay.com.au</SenderEmail>
+                <RecipientID>ozmart.living</RecipientID>
+                <Subject>ossiemichael has sent a question about item #282292177704, ending on 13-Feb-17 19:58:41 AEDST -
+                    355mm Metal Cut Off Drop Saw Electric Saw Demolition Industrial Cutting Machine
+                </Subject>
+                <Body>Hi.
+                    This item was missing 1 rubber foot. Can you send a replacement please
+                </Body>
+                <MessageID>1434820408014</MessageID>
+            </Question>
+            <MessageStatus>Answered</MessageStatus>
+            <CreationDate>2017-01-15T10:07:30.000Z</CreationDate>
+            <LastModifiedDate>2017-01-15T11:58:57.000Z</LastModifiedDate>
+        </MemberMessageExchange>
+        <MemberMessageExchange>
+            <Item>
+                <ItemID>282306879057</ItemID>
+                <ListingDetails>
+                    <StartTime>2016-12-29T08:07:10.000Z</StartTime>
+                    <EndTime>2017-03-29T08:07:10.000Z</EndTime>
+                    <ViewItemURL>
+                        http://www.ebay.co.uk/itm/Hot-Shaper-Belt-Belly-Waist-Trimmer-Fat-Burn-Sweat-Shape-Fit-Slim-Body-Shaper-/282306879057
+                    </ViewItemURL>
+                </ListingDetails>
+                <Seller>
+                    <UserID>ozmart.living</UserID>
+                </Seller>
+                <SellingStatus>
+                    <CurrentPrice currencyID="AUD">8.3</CurrentPrice>
+                </SellingStatus>
+                <TimeLeft>P29DT20H27S</TimeLeft>
+                <Title>Hot Shaper Belt Belly Waist Trimmer Fat Burn Sweat Shape Fit Slim Body Shaper</Title>
+                <ConditionID>1000</ConditionID>
+                <ConditionDisplayName>New</ConditionDisplayName>
+            </Item>
+            <Question>
+                <MessageType>AskSellerQuestion</MessageType>
+                <QuestionType>General</QuestionType>
+                <DisplayToPublic>false</DisplayToPublic>
+                <SenderID>eb_lacey</SenderID>
+                <SenderEmail>eblace_fsw2108sgj@members.ebay.com.au</SenderEmail>
+                <RecipientID>ozmart.living</RecipientID>
+                <Subject>eb_lacey has sent a question about item #282306879057, ending on 28-Jan-17 19:07:10 AEDST - Hot
+                    Shaper Belt
+                    Belly Waist Trimmer Fat Burn Sweat Shape Fit Slim Body Shaper
+                </Subject>
+                <Body>Hi - this was expected to arrive today however did not?</Body>
+                <MessageID>1436834712014</MessageID>
+            </Question>
+            <MessageStatus>Answered</MessageStatus>
+            <CreationDate>2017-01-18T11:05:18.000Z</CreationDate>
+            <LastModifiedDate>2017-01-19T00:48:23.000Z</LastModifiedDate>
+        </MemberMessageExchange>
+        <MemberMessageExchange>
+            <Item>
+                <ItemID>282317607830</ItemID>
+                <ListingDetails>
+                    <StartTime>2017-01-07T01:26:49.000Z</StartTime>
+                    <EndTime>2017-03-08T01:26:49.000Z</EndTime>
+                    <ViewItemURL>
+                        http://www.ebay.co.uk/itm/Kids-Children-Play-Tent-Castle-Princess-Playhouse-Toy-Party-Blue-Home-Outdoor-/282317607830
+                    </ViewItemURL>
+                </ListingDetails>
+                <Seller>
+                    <UserID>ozmart.living</UserID>
+                </Seller>
+                <SellingStatus>
+                    <CurrentPrice currencyID="AUD">23.55</CurrentPrice>
+                </SellingStatus>
+                <TimeLeft>P8DT13H20M6S</TimeLeft>
+                <Title>Kids Children Play Tent Castle Princess Playhouse Toy Party Blue Home Outdoor</Title>
+                <ConditionID>1000</ConditionID>
+                <ConditionDisplayName>New</ConditionDisplayName>
+            </Item>
+            <Question>
+                <MessageType>AskSellerQuestion</MessageType>
+                <QuestionType>General</QuestionType>
+                <DisplayToPublic>false</DisplayToPublic>
+                <SenderID>venuscarine</SenderID>
+                <SenderEmail>venusc_kz6109sfz@members.ebay.com.au</SenderEmail>
+                <RecipientID>ozmart.living</RecipientID>
+                <Subject>venuscarine has sent a question about item #282317607830, ending on 06-Feb-17 12:26:49 AEDST -
+                    Kids Children Play Tent Castle Princess Playhouse Toy Party Blue Home Outdoor
+                </Subject>
+                <Body>Hi there, can u tell me the height of this tent please?
+
+                    Best regards
+                    Carine
+                </Body>
+                <MessageID>1442730888010</MessageID>
+            </Question>
+            <MessageStatus>Answered</MessageStatus>
+            <CreationDate>2017-01-13T15:09:43.000Z</CreationDate>
+            <LastModifiedDate>2017-01-14T01:30:06.000Z</LastModifiedDate>
+        </MemberMessageExchange>
+        <MemberMessageExchange>
+            <Item>
+                <ItemID>282306879057</ItemID>
+                <ListingDetails>
+                    <StartTime>2016-12-29T08:07:10.000Z</StartTime>
+                    <EndTime>2017-03-29T08:07:10.000Z</EndTime>
+                    <ViewItemURL>
+                        http://www.ebay.co.uk/itm/Hot-Shaper-Belt-Belly-Waist-Trimmer-Fat-Burn-Sweat-Shape-Fit-Slim-Body-Shaper-/282306879057
+                    </ViewItemURL>
+                </ListingDetails>
+                <Seller>
+                    <UserID>ozmart.living</UserID>
+                </Seller>
+                <SellingStatus>
+                    <CurrentPrice currencyID="AUD">8.3</CurrentPrice>
+                </SellingStatus>
+                <TimeLeft>P29DT20H27S</TimeLeft>
+                <Title>Hot Shaper Belt Belly Waist Trimmer Fat Burn Sweat Shape Fit Slim Body Shaper</Title>
+                <ConditionID>1000</ConditionID>
+                <ConditionDisplayName>New</ConditionDisplayName>
+            </Item>
+            <Question>
+                <MessageType>AskSellerQuestion</MessageType>
+                <QuestionType>General</QuestionType>
+                <DisplayToPublic>false</DisplayToPublic>
+                <SenderID>eb_lacey</SenderID>
+                <SenderEmail>eblace_fsw2108sgj@members.ebay.com.au</SenderEmail>
+                <RecipientID>ozmart.living</RecipientID>
+                <Subject>eb_lacey has sent a question about item #282306879057, ending on 27-Feb-17 19:07:10 AEDST - Hot
+                    Shaper Belt Belly Waist Trimmer Fat Burn Sweat Shape Fit Slim Body Shaper
+                </Subject>
+                <Body>Hello
+                    This is still yet to Arrive?
+                    Can you please issue a refund
+                    Much appreciated
+                </Body>
+                <MessageID>1444164973014</MessageID>
+            </Question>
+            <MessageStatus>Answered</MessageStatus>
+            <CreationDate>2017-01-30T21:18:29.000Z</CreationDate>
+            <LastModifiedDate>2017-01-31T04:49:20.000Z</LastModifiedDate>
+        </MemberMessageExchange>
+    </MemberMessage>
+    <PaginationResult>
+        <TotalNumberOfPages>15</TotalNumberOfPages>
+        <TotalNumberOfEntries>75</TotalNumberOfEntries>
+    </PaginationResult>
+    <HasMoreItems>true</HasMoreItems>
+</GetMemberMessagesResponse>
