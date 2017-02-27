@@ -23,6 +23,16 @@ func (c ErpStockBillTransferEntry) ListData() revel.Result {
 	var bill_id int64
 	c.Params.Bind(&bill_id, "bill_id")
 
+	var stock_bill models.StockBillInfo
+	if bill_id != 0 {
+		has, err := db_session.Id(bill_id).Get(&stock_bill)
+		core.HandleError(err)
+
+		if has == false {
+			return c.RenderJson(core.JsonResult{Success: false, Message: "指定的调拨单不存在！"})
+		}
+	}
+
 	filter, order, _, _ := core.GetGridRequestParam(c.Request)
 	query := db_session.Where(filter)
 
@@ -44,29 +54,37 @@ func (c ErpStockBillTransferEntry) ListData() revel.Result {
 	count, err := count_query.Count(new(models.StockBillEntryInfo))
 	core.HandleError(err)
 
-	return c.RenderJson(core.GridResult{
-		Data:  stock_bill_entry_list,
-		Total: count,
+	return c.RenderJson(map[string]interface{}{
+		"bill_code": func() string {
+			if stock_bill.Code == "" {
+				return "请先单击调拨单行"
+			}
+			return stock_bill.Code
+		}(),
+		"list_data": core.GridResult{
+			Data:  stock_bill_entry_list,
+			Total: count,
+		},
 	})
 }
 
 type StockBillEntryTransferDetailForm struct {
-	Id             int64   `xorm:"'id'" json:"id"`
-	BillId         int64   `xorm:"'bill_id'" json:"bill_id"`
-	StorageLocName string  `xorm:"'storage_loc_name'" json:"storage_loc_name"`
-	ProductSku     string  `xorm:"'product_sku'" json:"product_sku"`
-	Qty            int64   `xorm:"'qty'" json:"qty"`
-	Price          float64 `xorm:"'price'" json:"price"`
+	StockBill      models.StockBillInfo        `json:"stock_bill"`
+	StockBillEntry models.StockBillEntryInfo   `json:"bill_entry"`
+	ProductName    string                      `json:"product_name"`
+	//StockName      string                      `json:"stock_name"`
+	//StorageLocList []models.StorageLocInfo     `json:"storage_loc_list"`
 }
 
 func (f *StockBillEntryTransferDetailForm) IsCreate() bool {
-	return f.Id == 0
+	return f.StockBill.Id == 0
 }
 
 func (f *StockBillEntryTransferDetailForm) Valid(validation *revel.Validation) bool {
-	validation.Required(f.StorageLocName).Message("库位不能为空！")
-	validation.Required(f.ProductSku).Message("商品SKU不能为空！")
-	validation.Required(f.Qty).Message("数量不能为空！")
+	validation.Required(f.StockBillEntry.BillId).Message("盘点批次不能为空！")
+	//validation.Required(f.StockBillEntry.StorageLocId).Message("库位不能为空！")
+	validation.Required(f.StockBillEntry.ProductId).Message("商品不能为空！")
+	validation.Required(f.StockBillEntry.Qty).Message("盘点库存不能为空！")
 
 	return validation.HasErrors() == false
 }
@@ -74,31 +92,54 @@ func (f *StockBillEntryTransferDetailForm) Valid(validation *revel.Validation) b
 func (c ErpStockBillTransferEntry) DetailData() revel.Result {
 	db_session := c.DbSession
 
-	var stock_bill_entry_id int64
-	c.Params.Bind(&stock_bill_entry_id, "id")
+	var bill_id int64
+	c.Params.Bind(&bill_id, "bill_id")
 
-	var detail_form StockBillEntryTransferDetailForm
-	if stock_bill_entry_id != 0 {
-		/*
-			SELECT sbe.id AS id, sl.name AS storage_loc_name, p.sku AS product_sku, sbe.qty AS qty, sbe.price AS price
-			FROM erp_stock_bill_entry sbe
-			    INNER JOIN erp_storage_loc sl ON sbe.storage_loc_id = sl.id
-			    INNER JOIN erp_product p ON sbe.product_id = p.id
-			WHERE sbe.id = 1
-		*/
-		sql := `
-SELECT sbe.id AS id, sl.name AS storage_loc_name, p.sku AS product_sku, sbe.qty AS qty, sbe.price AS price
-FROM erp_stock_bill_entry sbe
-    INNER JOIN erp_storage_loc sl ON sbe.storage_loc_id = sl.id
-    INNER JOIN erp_product p ON sbe.product_id = p.id
-WHERE sbe.id = ?
-`
-		has, err := db_session.Sql(sql, stock_bill_entry_id).Get(&detail_form)
+	if bill_id == 0 {
+		return c.RenderJson(core.JsonResult{Success: false, Message: "请先选择盘点单！"})
+	}
+
+	var stock_bill models.StockBillInfo
+	has, err := db_session.Id(bill_id).Get(&stock_bill)
+	core.HandleError(err)
+	if has == false {
+		return c.RenderJson(core.JsonResult{Success: false, Message: "指定的盘点单不存在！"})
+	}
+
+	/*
+	var stock models.StockInfo
+	_, err = db_session.Id(stock_bill.StockId).Get(&stock)
+
+	storage_loc_list := make([]models.StorageLocInfo, 0)
+	err = db_session.Where(fmt.Sprintf("stock_id = %d", stock_bill.StockId)).OrderBy("name asc").Find(&storage_loc_list)
+	core.HandleError(err)
+	*/
+
+	var bill_entry_id int64
+	c.Params.Bind(&bill_entry_id, "id")
+
+	var stock_bill_entry models.StockBillEntryInfo
+	var product_name string
+	if bill_entry_id != 0 {
+		has, err := db_session.Id(bill_entry_id).Get(&stock_bill_entry)
 		core.HandleError(err)
 		if has == false {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "指定的明细信息不存在！"})
+			return c.RenderJson(core.JsonResult{Success: false, Message: "指定的库存盘点明细不存在！"})
 		}
+
+		var product models.ProductInfo
+		product_id := stock_bill_entry.ProductId
+		_, err = db_session.Id(product_id).Get(&product)
+		core.HandleError(err)
+		product_name = product.Name
 	}
+
+	var detail_form StockBillEntryTransferDetailForm
+	detail_form.StockBill = stock_bill
+	detail_form.StockBillEntry = stock_bill_entry
+	detail_form.ProductName = product_name
+	//detail_form.StockName = stock.Name
+	//detail_form.StorageLocList = storage_loc_list
 
 	return c.RenderJson(detail_form)
 }
@@ -114,64 +155,22 @@ func (c ErpStockBillTransferEntry) Save() revel.Result {
 		return c.RenderJson(core.JsonResult{Success: false, Message: c.GetValidationErrorMessage()})
 	}
 
-	// 获取仓位 id
-	sql := `
-SELECT id AS storage_loc_id
-FROM erp_storage_loc
-WHERE name = ?;
-`
-	var storage_loc_id struct {
-		StorageLocId core.NullInt `xorm:"'storage_loc_id'"`
-	}
+	stock_bill_entry := detail_form.StockBillEntry
+	stock_bill_entry.BillId = detail_form.StockBill.Id
 
-	has, err := db_session.Sql(sql, detail_form.StorageLocName).Get(&storage_loc_id)
-	core.HandleError(err)
-	if has == false {
-		return c.RenderJson(core.JsonResult{Success: false, Message: "输入的仓位不存在！"})
-	}
-
-	// 获取商品 id
-	sql = `
-SELECT id AS product_id
-FROM erp_product
-WHERE sku = ?;
-`
-	var product_id struct {
-		ProductId core.NullInt `xorm:"'product_id'"`
-	}
-
-	has, err = db_session.Sql(sql, detail_form.ProductSku).Get(&product_id)
-	core.HandleError(err)
-	if has == false {
-		return c.RenderJson(core.JsonResult{Success: false, Message: "输入的商品SKU不存在！"})
-	}
-
-	sql = `
-SELECT v.qty AS qty
-FROM erp_inventory v
-WHERE v.storage_loc_id = ? AND v.product_id = ?
-`
-	var qty struct {
-		Qty core.NullInt `xorm:"'qty'"`
-	}
-
-	_, err = db_session.Sql(sql, storage_loc_id.StorageLocId.Int64, product_id.ProductId.Int64).Get(&qty)
+	bill_id := detail_form.StockBill.Id
+	var stock_bill models.StockBillInfo
+	_, err = db_session.Id(bill_id).Get(&stock_bill)
 	core.HandleError(err)
 
-	var product_storage_loc_qty int64 = 0
-	if qty.Qty.Valid == true {
-		product_storage_loc_qty = qty.Qty.Int64
-	}
-
-	var stock_bill_entry models.StockBillEntryInfo
+	//需要判断某些状态下，信息已不能修改
 
 	var affected int64
 	if detail_form.IsCreate() {
-		stock_bill_entry.Qty = product_storage_loc_qty
 		affected, err = db_session.Insert(&stock_bill_entry)
 		core.HandleError(err)
 	} else {
-		affected, err = db_session.Id(stock_bill_entry.Id).Cols("").Update(&stock_bill_entry)
+		affected, err = db_session.Id(stock_bill_entry.Id).Update(&stock_bill_entry)
 		core.HandleError(err)
 
 		if affected == 0 {
@@ -192,4 +191,63 @@ func (c ErpStockBillTransferEntry) Delete() revel.Result {
 	core.HandleError(err)
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})
+}
+
+func (c ErpStockBillTransferEntry) ProductSelectListData() revel.Result {
+	db_session := c.DbSession
+
+	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
+
+	type ErpProductViewItem struct {
+		models.ProductInfo          `xorm:"extends" json:"prd"`
+		models.ProductCateInfo      `xorm:"extends" json:"cate"`
+		models.SupplierInfo         `xorm:"extends" json:"sup"`
+		models.PackageMaterialInfo  `xorm:"extends" json:"pm"`
+		models.StatusInfo           `xorm:"extends" json:"st"`
+	}
+
+	/*
+SELECT prd.*, cate.*, sup.*, pm.*, st.*
+FROM erp_product prd
+    LEFT JOIN erp_product_cate cate ON prd.cate_id = cate.id
+    LEFT JOIN erp_supplier sup ON prd.supplier_id = sup.id
+    LEFT JOIN erp_package_material pm ON prd.pkg_mtrl_id = pm.id
+    INNER JOIN erp_status st ON prd.status_id = st.id
+	*/
+
+	sql_builder := core.NewSqlBuilder()
+	sql_builder.Select("prd.*, cate.*, sup.*, pm.*, st.*")
+	sql_builder.Count("count(prd.id) as product_count")
+	sql_builder.From(`erp_product prd
+    LEFT JOIN erp_product_cate cate ON prd.cate_id = cate.id
+    LEFT JOIN erp_supplier sup ON prd.supplier_id = sup.id
+    LEFT JOIN erp_package_material pm ON prd.pkg_mtrl_id = pm.id
+    INNER JOIN erp_status st ON prd.status_id = st.id`)
+
+	sql_builder.Where(filter)
+
+	//query extra filter here
+
+	if order != "" {
+		sql_builder.OrderBy(order)
+	} else {
+		sql_builder.OrderBy("prd.id ASC")
+	}
+
+	sql_builder.Limit(offset, limit)
+
+	product_list := make([]ErpProductViewItem, 0, limit)
+	err := db_session.Sql(sql_builder.SqlList()).Find(&product_list)
+	core.HandleError(err)
+
+	var product_count struct {
+		Count int64 `xorm:"'product_count'"`
+	}
+	_, err = db_session.Sql(sql_builder.SqlCount()).Get(&product_count)
+	core.HandleError(err)
+
+	return c.RenderJson(core.GridResult{
+		Data:  product_list,
+		Total: product_count.Count,
+	})
 }

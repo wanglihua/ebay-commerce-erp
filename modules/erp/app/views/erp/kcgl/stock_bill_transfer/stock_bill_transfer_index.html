@@ -40,7 +40,7 @@
             <div class="col-xs-12" style="margin-top: 30px;">
                 <fieldset>
                     <legend style="font-size: 14px;line-height: 28px;">
-                        调拨单明细（批次号：）
+                        调拨单明细（批次号：{{bill_code}}）
                     </legend>
                 </fieldset>
             </div>
@@ -251,6 +251,8 @@
             }
         },
         mounted: function () {
+            var this_vm = this;
+
             // stock bill
             initDataTable(
                 '#stockBillList',
@@ -286,6 +288,29 @@
                 vm.showStockBillDetail(id);
             });
 
+            $('#stockBillList').on('click', 'tbody tr', function () {
+
+                $("#stockBillList").find('tbody tr').each(function () {
+                    var tableRow = $(this).closest('tr');
+                    var checkbox = tableRow.find('td:first-child input:checkbox')[0];
+                    if (checkbox) {
+                        checkbox.checked = false;
+                        tableRow.removeClass('hilight');
+                    }
+                });
+
+                var tableRow = $(this);
+                var checkbox = tableRow.find('td:first-child input:checkbox')[0];
+                if (checkbox) {
+                    checkbox.checked = true;
+                    tableRow.addClass('hilight');
+
+                    var id = $(this).find('td:first-child input:checkbox').val();
+                    vm.bill_id = id;
+                    vm.reloadEntryList();
+                }
+            });
+
             // stock bill entry
             initDataTable(
                 '#stockBillEntryList',
@@ -313,36 +338,35 @@
                         {"mDataProp": "qty", "title": "调拨数量", "bSearchable": false},
                         {"mDataProp": "price", "title": "单价", "bSearchable": false},
                         {"mDataProp": "amount", "title": "金额", "bSearchable": false}
-                    ]
+                    ],
+                    "fnServerData": function (sSource, aoData, fnCallback) {
+                        showMask("数据加载中，请稍候");
+
+                        aoData.push({'name': 'bill_id', 'value': this_vm.bill_id});
+
+                        $.ajax(
+                            {
+                                "dataType": 'json',
+                                "url": sSource,
+                                "data": aoData,
+                                "success": function (data) {
+                                    hideMask();
+                                    if (data.success == false) {
+                                        $.msg.error(data.message);
+                                        return;
+                                    }
+                                    fnCallback(data.list_data);
+
+                                    vm.bill_code = data.bill_code
+                                }
+                            });
+                    }
                 }
             );
 
             $('#stockBillEntryList tbody').on('dblclick', 'tr', function () {
                 var id = $(this).find('td:first-child input:checkbox').val();
                 vm.showStockBillEntryDetail(id);
-            });
-
-            $('#stockBillEntryList').on('click', 'tbody tr', function () {
-
-                $("#stockBillEntryList").find('tbody tr').each(function () {
-                    var tableRow = $(this).closest('tr');
-                    var checkbox = tableRow.find('td:first-child input:checkbox')[0];
-                    if (checkbox) {
-                        checkbox.checked = false;
-                        tableRow.removeClass('hilight');
-                    }
-                });
-
-                var tableRow = $(this);
-                var checkbox = tableRow.find('td:first-child input:checkbox')[0];
-                if (checkbox) {
-                    checkbox.checked = true;
-                    tableRow.addClass('hilight');
-
-                    var id = $(this).find('td:first-child input:checkbox').val();
-                    vm.bill_id = id;
-                    vm.reloadEntryList();
-                }
             });
         },
         methods: {
