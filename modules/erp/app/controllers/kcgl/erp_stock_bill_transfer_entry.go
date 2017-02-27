@@ -96,14 +96,14 @@ func (c ErpStockBillTransferEntry) DetailData() revel.Result {
 	c.Params.Bind(&bill_id, "bill_id")
 
 	if bill_id == 0 {
-		return c.RenderJson(core.JsonResult{Success: false, Message: "请先选择盘点单！"})
+		return c.RenderJson(core.JsonResult{Success: false, Message: "请先选择调拨单！"})
 	}
 
 	var stock_bill models.StockBillInfo
 	has, err := db_session.Id(bill_id).Get(&stock_bill)
 	core.HandleError(err)
 	if has == false {
-		return c.RenderJson(core.JsonResult{Success: false, Message: "指定的盘点单不存在！"})
+		return c.RenderJson(core.JsonResult{Success: false, Message: "指定的调拨单不存在！"})
 	}
 
 	/*
@@ -124,7 +124,7 @@ func (c ErpStockBillTransferEntry) DetailData() revel.Result {
 		has, err := db_session.Id(bill_entry_id).Get(&stock_bill_entry)
 		core.HandleError(err)
 		if has == false {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "指定的库存盘点明细不存在！"})
+			return c.RenderJson(core.JsonResult{Success: false, Message: "指定的调拨单明细不存在！"})
 		}
 
 		var product models.ProductInfo

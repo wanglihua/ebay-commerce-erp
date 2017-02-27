@@ -171,14 +171,14 @@
                     <div class="row">
                         <div class="col-xs-12">
                             <form class="form-horizontal" role="form" id="stockBillEntryDetailForm">
-                                <input id="stock_bill_entry_id" name="entry_detail.id" type="hidden" v-model.number="entry_detail.id"/>
+                                <input id="stock_bill_entry_id" name="entry_detail.bill_entry.id" type="hidden" v-model.number="entry_detail.bill_entry.id"/>
 
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
                                             <label for="storage_loc_id" class="col-xs-3 control-label">仓位</label>
                                             <div class="col-xs-9">
-                                                <input id="storage_loc_id" name="entry_detail.storage_loc_id" type="text" class="input-sm form-control" v-model.number="entry_detail.storage_loc_id"/>
+                                                <input id="storage_loc_id" name="entry_detail.bill_entry.storage_loc_id" type="text" class="input-sm form-control" v-model.number="entry_detail.bill_entry.storage_loc_id"/>
                                             </div>
                                         </div>
                                     </div>
@@ -189,7 +189,7 @@
                                         <div class="form-group">
                                             <label for="product_id" class="col-xs-3 control-label">商品</label>
                                             <div class="col-xs-9">
-                                                <input id="product_id" name="entry_detail.product_id" type="text" class="input-sm form-control" v-model.number="entry_detail.product_id"/>
+                                                <input id="product_id" name="entry_detail.bill_entry.product_id" type="text" class="input-sm form-control" v-model.number="entry_detail.bill_entry.product_id"/>
                                             </div>
                                         </div>
                                     </div>
@@ -200,7 +200,7 @@
                                         <div class="form-group">
                                             <label for="qty" class="col-xs-3 control-label">调拨数量</label>
                                             <div class="col-xs-9">
-                                                <input id="qty" name="entry_detail.qty" type="text" class="input-sm form-control" v-model.number="entry_detail.qty"/>
+                                                <input id="qty" name="entry_detail.bill_entry.qty" type="text" class="input-sm form-control" v-model.number="entry_detail.bill_entry.qty"/>
                                             </div>
                                         </div>
                                     </div>
@@ -211,7 +211,7 @@
                                         <div class="form-group">
                                             <label for="price" class="col-xs-3 control-label">单价</label>
                                             <div class="col-xs-9">
-                                                <input id="price" name="entry_detail.price" type="text" class="input-sm form-control" v-model.number="entry_detail.price"/>
+                                                <input id="price" name="entry_detail.bill_entry.price" type="text" class="input-sm form-control" v-model.number="entry_detail.bill_entry.price"/>
                                             </div>
                                         </div>
                                     </div>
@@ -243,7 +243,7 @@
                 "stock_bill": {}
             },
             "entry_detail": {
-                "bill": {},
+                "stock_bill": {},
                 "bill_entry": {
                     "product_id": 0
                 },
@@ -482,6 +482,7 @@
                         url: '{%url "ErpStockBillTransferEntry.DetailData" %}',
                         type: "POST",
                         data: {
+                            "bill_id": vm.bill_id,
                             "id": id
                         },
                         success: function (result) {
@@ -490,7 +491,7 @@
                                 $.msg.error(result.message);
                                 return;
                             }
-                            vm.detail = result;
+                            vm.entry_detail = result;
                             $('#stockBillEntryDetailDialog').modal(modalOptions);
                         }
                     }
@@ -500,25 +501,25 @@
                 showMask("提交中...");
                 var form = $("#stockBillEntryDetailForm");
                 var valid = validate(form, {
-                    'entry_detail.bill_id': {
+                    'entry_detail.bill_entry.bill_id': {
                         required: true, digits: true
                     },
-                    'entry_detail.storage_loc_id': {
+                    'entry_detail.bill_entry.storage_loc_id': {
                         required: true, digits: true
                     },
-                    'entry_detail.product_id': {
+                    'entry_detail.bill_entry.product_id': {
                         required: true, digits: true
                     },
-                    'entry_detail.pre_qty': {
+                    'entry_detail.bill_entry.pre_qty': {
                         required: true, digits: true
                     },
-                    'entry_detail.qty': {
+                    'entry_detail.bill_entry.qty': {
                         required: true, digits: true
                     },
-                    'entry_detail.price': {
+                    'entry_detail.bill_entry.price': {
                         required: false, digits: true
                     },
-                    'entry_detail.amount': {
+                    'entry_detail.bill_entry.amount': {
                         required: false, digits: true
                     }
                 });
@@ -531,7 +532,7 @@
                             type: "POST",
                             processData: false,
                             contentType: 'application/json',
-                            data: JSON.stringify(vm.detail),
+                            data: JSON.stringify(vm.entry_detail),
                             success: function (data) {
                                 hideMask();
                                 if (data.success == false) {
