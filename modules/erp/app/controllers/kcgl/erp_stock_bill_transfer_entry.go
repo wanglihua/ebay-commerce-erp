@@ -13,28 +13,15 @@ type ErpStockBillTransferEntry struct {
 	*revel.Controller
 }
 
-func (c ErpStockBillTransferEntry) Index(bill_id int64) revel.Result {
-	db_session := c.DbSession
-
-	var stock_bill models.StockBillInfo
-	has, err := db_session.Id(bill_id).Get(&stock_bill)
-	core.HandleError(err)
-
-	if has == false {
-		panic("指定的批次号不存在！")
-	}
-
-	var stock models.StockInfo
-	_, err = db_session.Id(stock_bill.StockId).Get(&stock)
-	core.HandleError(err)
-
-	c.RenderArgs["stock_bill"] = stock_bill
-	c.RenderArgs["stock_name"] = stock.Name
+func (c ErpStockBillTransferEntry) Index() revel.Result {
 	return c.RenderTemplate("erp/kcgl/stock_bill_transfer_entry/stock_bill_transfer_entry_index.html")
 }
 
-func (c ErpStockBillTransferEntry) ListData(bill_id int64) revel.Result {
+func (c ErpStockBillTransferEntry) ListData() revel.Result {
 	db_session := c.DbSession
+
+	var bill_id int64
+	c.Params.Bind(&bill_id, "bill_id")
 
 	filter, order, _, _ := core.GetGridRequestParam(c.Request)
 	query := db_session.Where(filter)
