@@ -168,6 +168,7 @@ POST /erp/stock/bill/transfer/entry/data/list     ErpStockBillTransferEntry.List
 POST /erp/stock/bill/transfer/entry/data/detail   ErpStockBillTransferEntry.DetailData
 POST /erp/stock/bill/transfer/entry/save          ErpStockBillTransferEntry.Save
 POST /erp/stock/bill/transfer/entry/delete        ErpStockBillTransferEntry.Delete
+POST /erp/stock/bill/transfer/entry/product/select/data/list        ErpStockBillTransferEntry.ProductSelectListData
 
 GET  /erp/inventory/check                      ErpInventoryCheck.Index
 POST /erp/inventory/check/data/list            ErpInventoryCheck.ListData
