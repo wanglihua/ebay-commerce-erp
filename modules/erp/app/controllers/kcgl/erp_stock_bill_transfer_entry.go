@@ -77,7 +77,7 @@ type StockBillEntryTransferDetailForm struct {
 }
 
 func (f *StockBillEntryTransferDetailForm) IsCreate() bool {
-	return f.StockBill.Id == 0
+	return f.StockBillEntry.Id == 0
 }
 
 func (f *StockBillEntryTransferDetailForm) Valid(validation *revel.Validation) bool {

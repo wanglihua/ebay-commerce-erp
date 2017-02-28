@@ -11,6 +11,7 @@ import (
 	"time"
 	"fmt"
 	"matrix/modules/erp/service/bill_service"
+	"strings"
 )
 
 type ErpStockBillTransfer struct {
@@ -202,7 +203,7 @@ func (c ErpStockBillTransfer) Delete() revel.Result {
 	}
 
 	sql := `DELETE FROM erp_stock_bill_entry WHERE bill_id IN (%s);`
-	sql = fmt.Sprintf(sql, stock_bill_id_str_list)
+	sql = fmt.Sprintf(sql, strings.Join(stock_bill_id_str_list, ","))
 	_, err = db_session.Exec(sql)
 	core.HandleError(err)
 
