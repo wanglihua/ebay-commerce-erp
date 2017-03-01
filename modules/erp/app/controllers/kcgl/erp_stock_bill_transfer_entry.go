@@ -35,24 +35,50 @@ func (c ErpStockBillTransferEntry) ListData() revel.Result {
 	}
 
 	filter, order, _, _ := core.GetGridRequestParam(c.Request)
-	query := db_session.Where(filter)
 
-	//query extra filter here
-	query = query.Where("bill_id = ?", bill_id)
+	/*
+SELECT sbe.*, sb.*, s.*, sl.*
+FROM erp_stock_bill_entry sbe
+    INNER JOIN erp_stock_bill sb ON sb.id = sbe.bill_id
+    INNER JOIN erp_stock s ON s.id = sb.stock_id
+    INNER JOIN erp_storage_loc sl ON sl.id = sbe.storage_loc_id
+    INNER JOIN erp_product p ON p.id = sbe.product_id
+WHERE sbe.bill_id = 0;
+	 */
 
-	data_query := *query
-	if order != "" {
-		data_query = *data_query.OrderBy(order)
-	} else {
-		data_query = *data_query.Asc("id")
+	type StockBillTransferViewItem struct {
+		models.StockBillEntryInfo `xorm:"extends" json:"sbe"`
+		models.StockBillInfo      `xorm:"extends" json:"sb"`
+		models.StockInfo          `xorm:"extends" json:"s"`
+		models.StorageLocInfo     `xorm:"extends" json:"sl"`
+		models.ProductInfo        `xorm:"extends" json:"p"`
 	}
 
-	stock_bill_entry_list := make([]models.StockBillEntryInfo, 0)
-	err := data_query.Find(&stock_bill_entry_list)
+	sb := core.NewSqlBuilder()
+	sb.Select("sbe.*, sb.*, s.*, sl.*, p.*")
+	sb.Count("count(sbe.id) as entry_count")
+	sb.From(`erp_stock_bill_entry sbe
+    INNER JOIN erp_stock_bill sb ON sb.id = sbe.bill_id
+    INNER JOIN erp_stock s ON s.id = sb.stock_id
+    INNER JOIN erp_storage_loc sl ON sl.id = sbe.storage_loc_id
+    INNER JOIN erp_product p ON p.id = sbe.product_id`)
+	sb.Where(core.SqlAnd(filter, fmt.Sprintf("sbe.bill_id = %d", bill_id)))
+
+	if order != "" {
+		sb.OrderBy(order)
+	} else {
+		sb.OrderBy("sbe.id ASC")
+	}
+
+	stock_bill_entry_list := make([]StockBillTransferViewItem, 0)
+	err := db_session.Sql(sb.SqlList()).Find(&stock_bill_entry_list)
 	core.HandleError(err)
 
-	count_query := *query
-	count, err := count_query.Count(new(models.StockBillEntryInfo))
+	var entry_count struct {
+		Count int64 `xorm:"'entry_count'"`
+	}
+
+	_, err = db_session.Sql(sb.SqlCount()).Get(&entry_count)
 	core.HandleError(err)
 
 	return c.RenderJson(map[string]interface{}{
@@ -64,7 +90,7 @@ func (c ErpStockBillTransferEntry) ListData() revel.Result {
 		}(),
 		"list_data": core.GridResult{
 			Data:  stock_bill_entry_list,
-			Total: count,
+			Total: entry_count.Count,
 		},
 	})
 }
