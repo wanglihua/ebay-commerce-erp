@@ -320,6 +320,7 @@
                 {
                     "sAjaxSource": '{%url "ErpStockBillTransfer.ListData"%}',
                     "aaSorting": [[1, "asc"]],
+                    "iDisplayLength": 5,
                     "aoColumns": [
                         {
                             "mDataProp": "sb.id",
@@ -376,10 +377,8 @@
             initDataTable(
                 '#stockBillEntryList',
                 {
-                    "sDom": "<'row'<'col-xs-12't>>",
                     "sAjaxSource": '{%url "ErpStockBillTransferEntry.ListData"%}',
                     "aaSorting": [[1, "asc"]],
-                    "bPaginate": false,
                     "aoColumns": [
                         {
                             "mDataProp": "id",
