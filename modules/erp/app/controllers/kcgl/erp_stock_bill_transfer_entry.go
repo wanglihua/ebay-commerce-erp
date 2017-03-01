@@ -7,6 +7,7 @@ import (
 
 	"matrix/core"
 	"matrix/modules/erp/models"
+	"fmt"
 )
 
 type ErpStockBillTransferEntry struct {
@@ -72,8 +73,8 @@ type StockBillEntryTransferDetailForm struct {
 	StockBill      models.StockBillInfo        `json:"stock_bill"`
 	StockBillEntry models.StockBillEntryInfo   `json:"bill_entry"`
 	ProductName    string                      `json:"product_name"`
-	//StockName      string                      `json:"stock_name"`
-	//StorageLocList []models.StorageLocInfo     `json:"storage_loc_list"`
+	StockName      string                      `json:"stock_name"`
+	StorageLocList []models.StorageLocInfo     `json:"storage_loc_list"`
 }
 
 func (f *StockBillEntryTransferDetailForm) IsCreate() bool {
@@ -106,14 +107,12 @@ func (c ErpStockBillTransferEntry) DetailData() revel.Result {
 		return c.RenderJson(core.JsonResult{Success: false, Message: "指定的调拨单不存在！"})
 	}
 
-	/*
 	var stock models.StockInfo
 	_, err = db_session.Id(stock_bill.StockId).Get(&stock)
 
 	storage_loc_list := make([]models.StorageLocInfo, 0)
 	err = db_session.Where(fmt.Sprintf("stock_id = %d", stock_bill.StockId)).OrderBy("name asc").Find(&storage_loc_list)
 	core.HandleError(err)
-	*/
 
 	var bill_entry_id int64
 	c.Params.Bind(&bill_entry_id, "id")
@@ -138,8 +137,8 @@ func (c ErpStockBillTransferEntry) DetailData() revel.Result {
 	detail_form.StockBill = stock_bill
 	detail_form.StockBillEntry = stock_bill_entry
 	detail_form.ProductName = product_name
-	//detail_form.StockName = stock.Name
-	//detail_form.StorageLocList = storage_loc_list
+	detail_form.StockName = stock.Name
+	detail_form.StorageLocList = storage_loc_list
 
 	return c.RenderJson(detail_form)
 }
