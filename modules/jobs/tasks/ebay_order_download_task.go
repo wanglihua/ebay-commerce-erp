@@ -11,6 +11,7 @@ import (
 	"time"
 	"matrix/modules/erp/models"
 	"matrix/core"
+	"os"
 )
 
 /*
@@ -73,7 +74,17 @@ type EBayOrderDownloadTask struct {
 }
 
 func (t EBayOrderDownloadTask) Run() {
+	job_time_begin := time.Now()
+
 	// get db driver and db url
+
+	if t.db_driver == "" {
+		t.db_driver, _ = revel.Config.String("db.driver")
+	}
+
+	if t.db_url == "" {
+		t.db_url, _ = revel.Config.String("db.url")
+	}
 
 	db_engine, err := xorm.NewEngine(t.db_driver, t.db_url)
 	if err != nil {
@@ -100,6 +111,7 @@ func (t EBayOrderDownloadTask) Run() {
 		response := t.fetch_orders(config, page_number)
 
 		order_list := response.OrdersArray.Orders
+
 		for _, order_download := range order_list {
 			order_code := order_download.OrderID
 
@@ -107,15 +119,44 @@ func (t EBayOrderDownloadTask) Run() {
 			has, err := db_session.Where("code = ?", order_code).Get(&order_in_db)
 			core.HandleError(err)
 
+			revel.TRACE.Println("OrderStatus: ", order_download.OrderStatus)
+
+			order_in_db.TypeId = models.ORDER_TYPE_XZDD
+			order_in_db.EBayStatus = order_download.OrderStatus
+			order_in_db.StatusId = models.ORDER_STATUS_YZF
+
+			update_col_list := make([]string, 0)
+			update_col_list = append(update_col_list, "type_id")
+			update_col_list = append(update_col_list, "ebay_status")
+			update_col_list = append(update_col_list, "status_id")
+
+			if order_download.CreatedTime != "" {
+				order_in_db.CreatedTime = core.NewNullString(order_download.CreatedTime, true)
+				update_col_list = append(update_col_list, "created_time")
+			}
+
+			if order_download.ModifiedTime != "" {
+				order_in_db.ModifiedTime = core.NewNullString(order_download.ModifiedTime, true)
+				update_col_list = append(update_col_list, "modified_time")
+			}
+
+			if order_download.PaidTime != "" {
+				order_in_db.PaidTime = core.NewNullString(order_download.PaidTime, true)
+				update_col_list = append(update_col_list, "paid_time")
+			}
+
+			if order_download.ShippedTime != "" {
+				order_in_db.ShippedTime = core.NewNullString(order_download.ShippedTime, true)
+				update_col_list = append(update_col_list, "shipped_time")
+			}
+
 			if has == true {
 				// update order
-				_, err = db_session.Id(order_in_db.Id).Cols("type_id").Update(&order_in_db)
+				_, err = db_session.Id(order_in_db.Id).Cols(update_col_list...).Update(&order_in_db)
 				core.HandleError(err)
 			} else {
 				// insert order
 				order_in_db.Code = order_code
-				order_in_db.TypeId = models.ORDER_TYPE_XZDD
-				order_in_db.StatusId = models.ORDER_STATUS_YZF
 
 				_, err = db_session.Insert(&order_in_db)
 				core.HandleError(err)
@@ -123,12 +164,6 @@ func (t EBayOrderDownloadTask) Run() {
 
 			_ = order_code
 		}
-
-		//todo: 进行订单数据库操作等
-
-		//todo: 可以把返回的 时间戳 存入数据库，作为下一次订单下载请求的开始时间，或者是这个时间的稍微前面一点点
-
-		// do something with the orders
 
 		switch response.Ack {
 		case "Success":
@@ -143,6 +178,10 @@ func (t EBayOrderDownloadTask) Run() {
 		has_more_orders = response.HasMoreOrders
 		page_number += 1
 	}
+
+	job_duration := time.Since(job_time_begin)
+
+	revel.TRACE.Println("sync order time duration: ", job_duration.Seconds(), "seconds")
 }
 
 func (t EBayOrderDownloadTask) fetch_orders(config ebay.Config, page_number int) ebay.GetOrdersRequestResponse {
@@ -155,7 +194,7 @@ func (t EBayOrderDownloadTask) fetch_orders(config ebay.Config, page_number int)
 	<WarningLevel>High</WarningLevel>
 	<NumberOfDays>1</NumberOfDays>
 	<OrderRole>Seller</OrderRole>
-	<OrderStatus>Active</OrderStatus>
+	<OrderStatus>All</OrderStatus>
 	<Pagination>
 		<EntriesPerPage>100</EntriesPerPage>
 		<PageNumber>%d</PageNumber>
@@ -192,7 +231,8 @@ func (t EBayOrderDownloadTask) fetch_orders(config ebay.Config, page_number int)
 
 	data, err := ioutil.ReadAll(res.Body)
 
-	revel.TRACE.Println(string(data))
+	//revel.TRACE.Println(string(data))
+	//t.force_write_to_file(`Z:\GoPath\src\matrix\modules\jobs\tasks\test_order_response.xml`, string(data))
 
 	if err != nil {
 		revel.ERROR.Println("eBay GetOrders ERROR - ioutil.ReadAll : " + err.Error())
@@ -202,11 +242,6 @@ func (t EBayOrderDownloadTask) fetch_orders(config ebay.Config, page_number int)
 	response := ebay.GetOrdersRequestResponse{}
 	xml.Unmarshal(data, &response)
 
-	orders := ebay.OrderArray{}
-	xml.Unmarshal(data, &orders)
-
-	response.OrdersArray = orders
-
 	e := response.Errors
 
 	if e.ShortMessage != "" {
@@ -215,4 +250,32 @@ func (t EBayOrderDownloadTask) fetch_orders(config ebay.Config, page_number int)
 	}
 
 	return response
+}
+
+func (t EBayOrderDownloadTask) force_write_to_file(file_name string, content string) {
+
+	is_file_exist := func(file_name string) bool {
+		var exist = true
+		if _, err := os.Stat(file_name); os.IsNotExist(err) {
+			exist = false
+		}
+		return exist
+	}
+
+	if is_file_exist(file_name) {
+		err := os.Remove(file_name)
+		core.HandleError(err)
+	}
+
+	var file *os.File
+	var err error
+
+	file, err = os.Create(file_name) //创建文件
+	core.HandleError(err)
+
+	_, err = file.WriteString(content)
+	core.HandleError(err)
+
+	file.Sync()
+	file.Close()
 }
