@@ -190,7 +190,7 @@ func (c ErpPurchaseBillEntry) Save() revel.Result {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，批次、商品已存在！" })
 		}
 
-		purchase_bill_entry.StatusId = models.PURCHASE_BILL_YCJ
+		purchase_bill_entry.StatusId = models.PURCHASE_BILL_STATUS_YCJ
 
 		affected, err = db_session.Insert(&purchase_bill_entry)
 		core.HandleError(err)

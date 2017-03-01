@@ -7,6 +7,10 @@ import (
 	"encoding/xml"
 	"github.com/franela/goreq"
 	"fmt"
+	"github.com/go-xorm/xorm"
+	"time"
+	"matrix/modules/erp/models"
+	"matrix/core"
 )
 
 /*
@@ -64,32 +68,84 @@ response body:
  */
 
 type EBayOrderDownloadTask struct {
+	db_driver string //mysql
+	db_url    string //root:root@tcp(localhost:3306)/iot?charset=utf8
 }
 
 func (t EBayOrderDownloadTask) Run() {
+	// get db driver and db url
+
+	db_engine, err := xorm.NewEngine(t.db_driver, t.db_url)
+	if err != nil {
+		revel.ERROR.Println(err)
+		return
+	}
+
+	db_engine.TZLocation = time.Local
+	db_engine.SetMaxIdleConns(3)
+	db_engine.SetMaxOpenConns(100)
+
+	db_session := db_engine.NewSession()
+	db_session = db_session.NoAutoCondition(true)
+
+	defer func() {
+		db_session.Close()
+	}()
+
 	config := GetEBayConfig()
-	response := t.fetch_orders(config)
 
-	//response.OrdersArray
+	has_more_orders := true
+	page_number := 1
+	for has_more_orders == true {
+		response := t.fetch_orders(config, page_number)
 
-	//todo: 进行订单数据库操作等
+		order_list := response.OrdersArray.Orders
+		for _, order_download := range order_list {
+			order_code := order_download.OrderID
 
-	//todo: 可以把返回的 时间戳 存入数据库，作为下一次订单下载请求的开始时间，或者是这个时间的稍微前面一点点
+			var order_in_db models.OrderInfo
+			has, err := db_session.Where("code = ?", order_code).Get(&order_in_db)
+			core.HandleError(err)
 
-	// do something with the orders
+			if has == true {
+				// update order
+				_, err = db_session.Id(order_in_db.Id).Cols("type_id").Update(&order_in_db)
+				core.HandleError(err)
+			} else {
+				// insert order
+				order_in_db.Code = order_code
+				order_in_db.TypeId = models.ORDER_TYPE_XZDD
+				order_in_db.StatusId = models.ORDER_STATUS_YZF
 
-	switch response.Ack {
-	case "Success":
-		revel.TRACE.Printf("eBay GetOrders Response: " + response.Ack + "\n")
-		revel.TRACE.Printf("eBay GetOrders actual fetched orders count: %d", response.ReturnedOrderCountActual)
-	case "Failure":
-		revel.ERROR.Printf("eBay GetOrders Response: " + response.Ack + "\n")
-	default:
-		revel.ERROR.Printf("eBay GetOrders Response: " + response.Ack + "\n")
+				_, err = db_session.Insert(&order_in_db)
+				core.HandleError(err)
+			}
+
+			_ = order_code
+		}
+
+		//todo: 进行订单数据库操作等
+
+		//todo: 可以把返回的 时间戳 存入数据库，作为下一次订单下载请求的开始时间，或者是这个时间的稍微前面一点点
+
+		// do something with the orders
+
+		switch response.Ack {
+		case "Success":
+			revel.TRACE.Printf("eBay GetOrders Response: " + response.Ack + "\n")
+			revel.TRACE.Printf("eBay GetOrders actual fetched orders count: %d", response.ReturnedOrderCountActual)
+		case "Failure":
+			revel.ERROR.Printf("eBay GetOrders Response: " + response.Ack + "\n")
+		default:
+			revel.ERROR.Printf("eBay GetOrders Response: " + response.Ack + "\n")
+		}
+
+		has_more_orders = response.HasMoreOrders
+		page_number += 1
 	}
 }
 
-func (t EBayOrderDownloadTask) fetch_orders(config ebay.Config) ebay.GetOrdersRequestResponse {
+func (t EBayOrderDownloadTask) fetch_orders(config ebay.Config, page_number int) ebay.GetOrdersRequestResponse {
 	req_body := `<?xml version="1.0" encoding="utf-8"?>
 <GetOrdersRequest xmlns="urn:ebay:apis:eBLBaseComponents">
 	<RequesterCredentials>
@@ -97,13 +153,16 @@ func (t EBayOrderDownloadTask) fetch_orders(config ebay.Config) ebay.GetOrdersRe
 	</RequesterCredentials>
 	<ErrorLanguage>zh_CN</ErrorLanguage>
 	<WarningLevel>High</WarningLevel>
-	<CreateTimeFrom>%s</CreateTimeFrom>
-	<CreateTimeTo>%s</CreateTimeTo>
+	<NumberOfDays>1</NumberOfDays>
 	<OrderRole>Seller</OrderRole>
 	<OrderStatus>Active</OrderStatus>
+	<Pagination>
+		<EntriesPerPage>100</EntriesPerPage>
+		<PageNumber>%d</PageNumber>
+	</Pagination>
 </GetOrdersRequest>
 `
-	req_body = fmt.Sprintf(req_body, config.Token, "2017-01-01T00:00:00", "2017-02-28T23:59:59")
+	req_body = fmt.Sprintf(req_body, config.Token, page_number)
 
 	req := goreq.Request{
 		Method:      "POST",

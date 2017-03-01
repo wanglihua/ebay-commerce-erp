@@ -35,7 +35,7 @@ func (c ErpStockBillCheckinEntry) Index(bill_id int64) revel.Result {
 
 	c.RenderArgs["stock_bill"] = stock_bill
 	c.RenderArgs["stock_name"] = stock.Name
-	c.RenderArgs["is_submit"] = stock_bill.StatusId == models.STOCK_BILL_CHECKIN_SUBMIT
+	c.RenderArgs["is_submit"] = stock_bill.StatusId == models.STOCK_BILL_CHECKIN_STATUS_SUBMIT
 	c.RenderArgs["status_name"] = bill_status.Name;
 	return c.RenderTemplate("erp/kcgl/stock_bill_checkin_entry/stock_bill_checkin_entry_index.html")
 }
@@ -159,7 +159,7 @@ func (c ErpStockBillCheckinEntry) Save() revel.Result {
 	has, err := db_session.Id(detail_form.BillId).Get(&stock_bill)
 	core.HandleError(err)
 
-	if stock_bill.StatusId == models.STOCK_BILL_CHECKIN_SUBMIT {
+	if stock_bill.StatusId == models.STOCK_BILL_CHECKIN_STATUS_SUBMIT {
 		return c.RenderJson(core.JsonResult{Success: false, Message: "入库单已提交，不能更改！"})
 	}
 
@@ -288,7 +288,7 @@ WHERE sbe.id = %d
 	_, err := db_session.Sql(sql).Get(&status_id)
 	core.HandleError(err)
 
-	if status_id.StatusId == models.STOCK_BILL_CHECKIN_SUBMIT {
+	if status_id.StatusId == models.STOCK_BILL_CHECKIN_STATUS_SUBMIT {
 		return c.RenderJson(core.JsonResult{Success: false, Message: "入库单已提交，不能更改！"})
 	}
 

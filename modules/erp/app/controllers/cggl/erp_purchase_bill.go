@@ -140,7 +140,7 @@ func (c ErpPurchaseBill) Save() revel.Result {
 	if detail_form.IsCreate() {
 		loginuser := core.GetLoginUser(c.Session)
 		purchase_bill.UserId = loginuser.UserId
-		purchase_bill.StatusId = models.PURCHASE_BILL_YCJ
+		purchase_bill.StatusId = models.PURCHASE_BILL_STATUS_YCJ
 
 		affected, err = db_session.Insert(&purchase_bill)
 		core.HandleError(err)

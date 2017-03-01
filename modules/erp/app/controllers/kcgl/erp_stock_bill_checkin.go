@@ -148,7 +148,7 @@ func (c ErpStockBillCheckin) Save() revel.Result {
 	_, err = db_session.Id(detail_form.StockBill.Id).Get(&stock_bill_in_db)
 	core.HandleError(err)
 
-	if stock_bill_in_db.StatusId == models.STOCK_BILL_CHECKIN_SUBMIT {
+	if stock_bill_in_db.StatusId == models.STOCK_BILL_CHECKIN_STATUS_SUBMIT {
 		return c.RenderJson(core.JsonResult{Success: false, Message: "入库单已提交，不能更改！"})
 	}
 
@@ -163,7 +163,7 @@ func (c ErpStockBillCheckin) Save() revel.Result {
 		loginuser := core.GetLoginUser(c.Session)
 		stock_bill.UserId = loginuser.UserId
 		stock_bill.TypeId = models.STOCK_BILL_TYPE_MANUAL_CHECKIN
-		stock_bill.StatusId = models.STOCK_BILL_CHECKIN_SAVE
+		stock_bill.StatusId = models.STOCK_BILL_CHECKIN_STATUS_SAVE
 
 		affected, err = db_session.Insert(&stock_bill)
 		core.HandleError(err)
@@ -198,7 +198,7 @@ func (c ErpStockBillCheckin) Submit() revel.Result {
 		return c.RenderJson(core.JsonResult{Success: false, Message: "入库单Id不存在!"})
 	}
 
-	if stock_bill.StatusId == models.STOCK_BILL_CHECKIN_SUBMIT {
+	if stock_bill.StatusId == models.STOCK_BILL_CHECKIN_STATUS_SUBMIT {
 		return c.RenderJson(core.JsonResult{Success: false, Message: "入库失败，该入库单已入库!"})
 	}
 
@@ -213,7 +213,7 @@ func (c ErpStockBillCheckin) Submit() revel.Result {
 	}
 
 	bill_cols := models.StockBillCols
-	stock_bill.StatusId = models.STOCK_BILL_CHECKIN_SUBMIT
+	stock_bill.StatusId = models.STOCK_BILL_CHECKIN_STATUS_SUBMIT
 
 	_, err = db_session.Id(bill_id).Cols(bill_cols.StatusId).Update(&stock_bill)
 	core.HandleError(err)

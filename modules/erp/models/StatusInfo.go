@@ -104,64 +104,64 @@ const (
 	INVENTORY_CHECK_STATUS_YWC = 2200
 
 	// Paypal对账 成功
-	PAYPAL_RECON_SUCCESS = 2300
+	PAYPAL_RECON_STATUS_SUCCESS = 2300
 	// Paypal对账 失败
-	PAYPAL_RECON_FAILED = 2400
+	PAYPAL_RECON_STATUS_FAILED = 2400
 
 	// 订单自定义类型 正常
-	ORDER_CUSTOM_TYPE_ENABLED = 2500
+	ORDER_CUSTOM_TYPE_STATUS_ENABLED = 2500
 	// 订单自定义类型 停用
-	ORDER_CUSTOM_TYPE_DISABLED = 2600
+	ORDER_CUSTOM_TYPE_STATUS_DISABLED = 2600
 
 	// 不规则订单运单号 已使用
-	LOGISTICS_NUMBER_USED = 2700
+	LOGISTICS_NUMBER_STATUS_USED = 2700
 	// 不规则订单运单号 未使用
-	LOGISTICS_NUMBER_NOT_USED = 2800
+	LOGISTICS_NUMBER_STATUS_NOT_USED = 2800
 
 	// 订单运单号 正常
-	LOGISTICS_NUMBER_BATCH_ENABLED = 2900
+	LOGISTICS_NUMBER_BATCH_STATUS_ENABLED = 2900
 	// 订单运单号 停用
-	LOGISTICS_NUMBER_BATCH_DISABLED = 3000
+	LOGISTICS_NUMBER_BATCH_STATUS_DISABLED = 3000
 
 	// 绑定商品状态 正常
-	PRODUCT_BIND_NORMAL = 3100
+	PRODUCT_BIND_STATUS_NORMAL = 3100
 	// 绑定商品状态 停产
-	PRODUCT_BIND_STOPPED = 3200
+	PRODUCT_BIND_STATUS_STOPPED = 3200
 
 	// 入库单状态 暂存
-	STOCK_BILL_CHECKIN_SAVE = 3300
+	STOCK_BILL_CHECKIN_STATUS_SAVE = 3300
 	// 入库单状态 提交
-	STOCK_BILL_CHECKIN_SUBMIT = 3400
+	STOCK_BILL_CHECKIN_STATUS_SUBMIT = 3400
 
 	// 出库单状态 暂存
-	STOCK_BILL_CHECKOUT_SAVE = 3500
+	STOCK_BILL_CHECKOUT_STATUS_SAVE = 3500
 	// 出库单状态 提交
-	STOCK_BILL_CHECKOUT_SUBMIT = 3600
+	STOCK_BILL_CHECKOUT_STATUS_SUBMIT = 3600
 
 	// 调拨单状态 暂存
-	STOCK_BILL_TRANSFER_SAVE = 3700
+	STOCK_BILL_TRANSFER_STATUS_SAVE = 3700
 	// 调拨单状态 提交
-	STOCK_BILL_TRANSFER_SUBMIT = 3800
+	STOCK_BILL_TRANSFER_STATUS_SUBMIT = 3800
 
 	// 订单状态 已支付
-	ORDER_YZF = 3900
+	ORDER_STATUS_YZF = 3900
 	// 订单状态 待配货
-	ORDER_DPH = 4000
+	ORDER_STATUS_DPH = 4000
 	// 订单状态 配货中
-	ORDER_PHZ = 4100
+	ORDER_STATUS_PHZ = 4100
 	// 订单状态 已发货
-	ORDER_YFH = 4200
+	ORDER_STATUS_YFH = 4200
 	// 订单状态 已完成
-	ORDER_YWC = 4300
+	ORDER_STATUS_YWC = 4300
 
 	// 采购单状态 已创建
-	PURCHASE_BILL_YCJ = 4400
+	PURCHASE_BILL_STATUS_YCJ = 4400
 	// 采购单状态 已下单
-	PURCHASE_BILL_YXD = 4500
+	PURCHASE_BILL_STATUS_YXD = 4500
 	// 采购单状态 采购中
-	PURCHASE_BILL_CGZ = 4600
+	PURCHASE_BILL_STATUS_CGZ = 4600
 	// 采购单状态 已入库
-	PURCHASE_BILL_YRK = 4700
+	PURCHASE_BILL_STATUS_YRK = 4700
 
 	//状态 id end
 )
@@ -374,14 +374,14 @@ func (e StatusInfo) InitData(db_session *xorm.Session) {
 
 		// Paypal对账结果
 		status = new(StatusInfo)
-		status.Id = PAYPAL_RECON_SUCCESS
+		status.Id = PAYPAL_RECON_STATUS_SUCCESS
 		status.Type = STATUS_TYPE_PAYPAL_RECON
 		status.Name = "匹配成功"
 		status.Desc = core.NewNullString("Paypal对账结果 匹配成功", true)
 		db_session.Insert(status)
 
 		status = new(StatusInfo)
-		status.Id = PAYPAL_RECON_FAILED
+		status.Id = PAYPAL_RECON_STATUS_FAILED
 		status.Type = STATUS_TYPE_PAYPAL_RECON
 		status.Name = "匹配失败"
 		status.Desc = core.NewNullString("Paypal对账结果 匹配失败", true)
@@ -391,14 +391,14 @@ func (e StatusInfo) InitData(db_session *xorm.Session) {
 	// 订单自定义类型
 	{
 		status := new(StatusInfo)
-		status.Id = ORDER_CUSTOM_TYPE_ENABLED
+		status.Id = ORDER_CUSTOM_TYPE_STATUS_ENABLED
 		status.Type = STATUS_TYPE_ORDER_CUSTOM_TYPE
 		status.Name = "正常"
 		status.Desc = core.NewNullString("订单自定义类型 正常", true)
 		db_session.Insert(status)
 
 		status = new(StatusInfo)
-		status.Id = ORDER_CUSTOM_TYPE_DISABLED
+		status.Id = ORDER_CUSTOM_TYPE_STATUS_DISABLED
 		status.Type = STATUS_TYPE_ORDER_CUSTOM_TYPE
 		status.Name = "停用"
 		status.Desc = core.NewNullString("订单自定义类型 停用", true)
@@ -406,14 +406,14 @@ func (e StatusInfo) InitData(db_session *xorm.Session) {
 
 		//规则订单运单号状态
 		status = new(StatusInfo)
-		status.Id = LOGISTICS_NUMBER_BATCH_ENABLED
+		status.Id = LOGISTICS_NUMBER_BATCH_STATUS_ENABLED
 		status.Type = STATUS_TYPE_LOGISTICS_NUMBER_BATCH
 		status.Name = "正常"
 		status.Desc = core.NewNullString("订单运单号 正常", true)
 		db_session.Insert(status)
 
 		status = new(StatusInfo)
-		status.Id = LOGISTICS_NUMBER_BATCH_DISABLED
+		status.Id = LOGISTICS_NUMBER_BATCH_STATUS_DISABLED
 		status.Type = STATUS_TYPE_LOGISTICS_NUMBER_BATCH
 		status.Name = "停用"
 		status.Desc = core.NewNullString("订单运单号 停用", true)
@@ -423,14 +423,14 @@ func (e StatusInfo) InitData(db_session *xorm.Session) {
 	//不规则订单运单号状态
 	{
 		status := new(StatusInfo)
-		status.Id = LOGISTICS_NUMBER_NOT_USED
+		status.Id = LOGISTICS_NUMBER_STATUS_NOT_USED
 		status.Type = STATUS_TYPE_LOGISTICS_NUMBER
 		status.Name = "未使用"
 		status.Desc = core.NewNullString("订单运单号 未使用", true)
 		db_session.Insert(status)
 
 		status = new(StatusInfo)
-		status.Id = LOGISTICS_NUMBER_USED
+		status.Id = LOGISTICS_NUMBER_STATUS_USED
 		status.Type = STATUS_TYPE_LOGISTICS_NUMBER
 		status.Name = "已使用"
 		status.Desc = core.NewNullString("订单运单号 已使用", true)
@@ -440,14 +440,14 @@ func (e StatusInfo) InitData(db_session *xorm.Session) {
 	// 绑定商品状态 正常 停产
 	{
 		status := new(StatusInfo)
-		status.Id = PRODUCT_BIND_NORMAL
+		status.Id = PRODUCT_BIND_STATUS_NORMAL
 		status.Type = STATUS_TYPE_PRODUCT_BIND
 		status.Name = "正常"
 		status.Desc = core.NewNullString("绑定商品状态 正常", true)
 		db_session.Insert(status)
 
 		status = new(StatusInfo)
-		status.Id = PRODUCT_BIND_STOPPED
+		status.Id = PRODUCT_BIND_STATUS_STOPPED
 		status.Type = STATUS_TYPE_PRODUCT_BIND
 		status.Name = "停产"
 		status.Desc = core.NewNullString("绑定商品状态 停产", true)
@@ -457,14 +457,14 @@ func (e StatusInfo) InitData(db_session *xorm.Session) {
 	// 入库单状态  暂存 提交
 	{
 		status := new(StatusInfo)
-		status.Id = STOCK_BILL_CHECKIN_SAVE
+		status.Id = STOCK_BILL_CHECKIN_STATUS_SAVE
 		status.Type = STATUS_TYPE_STOCK_BILL_CHECKIN
 		status.Name = "临时保存"
 		status.Desc = core.NewNullString("入库单状态 临时保存", true)
 		db_session.Insert(status)
 
 		status = new(StatusInfo)
-		status.Id = STOCK_BILL_CHECKIN_SUBMIT
+		status.Id = STOCK_BILL_CHECKIN_STATUS_SUBMIT
 		status.Type = STATUS_TYPE_STOCK_BILL_CHECKIN
 		status.Name = "已提交入库"
 		status.Desc = core.NewNullString("入库单状态 已提交入库", true)
@@ -474,14 +474,14 @@ func (e StatusInfo) InitData(db_session *xorm.Session) {
 	// 出库单状态  暂存 提交
 	{
 		status := new(StatusInfo)
-		status.Id = STOCK_BILL_CHECKOUT_SAVE
+		status.Id = STOCK_BILL_CHECKOUT_STATUS_SAVE
 		status.Type = STATUS_TYPE_STOCK_BILL_CHECKOUT
 		status.Name = "临时保存"
 		status.Desc = core.NewNullString("出库单状态 临时保存", true)
 		db_session.Insert(status)
 
 		status = new(StatusInfo)
-		status.Id = STOCK_BILL_CHECKOUT_SUBMIT
+		status.Id = STOCK_BILL_CHECKOUT_STATUS_SUBMIT
 		status.Type = STATUS_TYPE_STOCK_BILL_CHECKOUT
 		status.Name = "已提交出库"
 		status.Desc = core.NewNullString("出库单状态 已提交出库", true)
@@ -491,14 +491,14 @@ func (e StatusInfo) InitData(db_session *xorm.Session) {
 	// 调拨单状态  暂存 提交
 	{
 		status := new(StatusInfo)
-		status.Id = STOCK_BILL_TRANSFER_SAVE
+		status.Id = STOCK_BILL_TRANSFER_STATUS_SAVE
 		status.Type = STATUS_TYPE_STOCK_BILL_TRANSFER
 		status.Name = "临时保存"
 		status.Desc = core.NewNullString("调拨单状态 临时保存", true)
 		db_session.Insert(status)
 
 		status = new(StatusInfo)
-		status.Id = STOCK_BILL_TRANSFER_SUBMIT
+		status.Id = STOCK_BILL_TRANSFER_STATUS_SUBMIT
 		status.Type = STATUS_TYPE_STOCK_BILL_TRANSFER
 		status.Name = "已提交调拨"
 		status.Desc = core.NewNullString("调拨单状态 已提交调拨", true)
@@ -508,35 +508,35 @@ func (e StatusInfo) InitData(db_session *xorm.Session) {
 	// 订单状态 已支付 待配货 配货中 已发货 已完成
 	{
 		status := new(StatusInfo)
-		status.Id = ORDER_YZF
+		status.Id = ORDER_STATUS_YZF
 		status.Type = STATUS_TYPE_ORDER
 		status.Name = "已支付"
 		status.Desc = core.NewNullString("订单状态 已支付", true)
 		db_session.Insert(status)
 
 		status = new(StatusInfo)
-		status.Id = ORDER_DPH
+		status.Id = ORDER_STATUS_DPH
 		status.Type = STATUS_TYPE_ORDER
 		status.Name = "待配货"
 		status.Desc = core.NewNullString("订单状态 待配货", true)
 		db_session.Insert(status)
 
 		status = new(StatusInfo)
-		status.Id = ORDER_PHZ
+		status.Id = ORDER_STATUS_PHZ
 		status.Type = STATUS_TYPE_ORDER
 		status.Name = "配货中"
 		status.Desc = core.NewNullString("订单状态 配货中", true)
 		db_session.Insert(status)
 
 		status = new(StatusInfo)
-		status.Id = ORDER_YFH
+		status.Id = ORDER_STATUS_YFH
 		status.Type = STATUS_TYPE_ORDER
 		status.Name = "已发货"
 		status.Desc = core.NewNullString("订单状态 已发货", true)
 		db_session.Insert(status)
 
 		status = new(StatusInfo)
-		status.Id = ORDER_YWC
+		status.Id = ORDER_STATUS_YWC
 		status.Type = STATUS_TYPE_ORDER
 		status.Name = "已完成"
 		status.Desc = core.NewNullString("订单状态 已完成", true)
@@ -546,28 +546,28 @@ func (e StatusInfo) InitData(db_session *xorm.Session) {
 	// 采购单状态 已创建，已下单，采购中，已入库
 	{
 		status := new(StatusInfo)
-		status.Id = PURCHASE_BILL_YCJ
+		status.Id = PURCHASE_BILL_STATUS_YCJ
 		status.Type = STATUS_TYPE_PURCHASE_BILL
 		status.Name = "已创建"
 		status.Desc = core.NewNullString("采购单状态 已创建", true)
 		db_session.Insert(status)
 
 		status = new(StatusInfo)
-		status.Id = PURCHASE_BILL_YXD
+		status.Id = PURCHASE_BILL_STATUS_YXD
 		status.Type = STATUS_TYPE_PURCHASE_BILL
 		status.Name = "已下单"
 		status.Desc = core.NewNullString("采购单状态 已下单", true)
 		db_session.Insert(status)
 
 		status = new(StatusInfo)
-		status.Id = PURCHASE_BILL_CGZ
+		status.Id = PURCHASE_BILL_STATUS_CGZ
 		status.Type = STATUS_TYPE_PURCHASE_BILL
 		status.Name = "采购中"
 		status.Desc = core.NewNullString("采购单状态 采购中", true)
 		db_session.Insert(status)
 
 		status = new(StatusInfo)
-		status.Id = PURCHASE_BILL_YRK
+		status.Id = PURCHASE_BILL_STATUS_YRK
 		status.Type = STATUS_TYPE_PURCHASE_BILL
 		status.Name = "已入库"
 		status.Desc = core.NewNullString("采购单状态 已入库", true)

@@ -148,7 +148,7 @@ func (c ErpStockBillCheckout) Save() revel.Result {
 	_, err = db_session.Id(detail_form.StockBill.Id).Get(&stock_bill_in_db)
 	core.HandleError(err)
 
-	if stock_bill_in_db.StatusId == models.STOCK_BILL_CHECKOUT_SUBMIT {
+	if stock_bill_in_db.StatusId == models.STOCK_BILL_CHECKOUT_STATUS_SUBMIT {
 		return c.RenderJson(core.JsonResult{Success: false, Message: "出库单已提交，不能更改！"})
 	}
 
@@ -163,7 +163,7 @@ func (c ErpStockBillCheckout) Save() revel.Result {
 		loginuser := core.GetLoginUser(c.Session)
 		stock_bill_in_ui.UserId = loginuser.UserId
 		stock_bill_in_ui.TypeId = models.STOCK_BILL_TYPE_MANUAL_CHECKOUT
-		stock_bill_in_ui.StatusId = models.STOCK_BILL_CHECKOUT_SAVE
+		stock_bill_in_ui.StatusId = models.STOCK_BILL_CHECKOUT_STATUS_SAVE
 
 		affected, err = db_session.Insert(&stock_bill_in_ui)
 		core.HandleError(err)
@@ -198,7 +198,7 @@ func (c ErpStockBillCheckout) Submit() revel.Result {
 		return c.RenderJson(core.JsonResult{Success: false, Message: "出库单Id不存在!"})
 	}
 
-	if stock_bill.StatusId == models.STOCK_BILL_CHECKOUT_SUBMIT {
+	if stock_bill.StatusId == models.STOCK_BILL_CHECKOUT_STATUS_SUBMIT {
 		return c.RenderJson(core.JsonResult{Success: false, Message: "出库失败，该出库单已出库!"})
 	}
 
@@ -212,7 +212,7 @@ func (c ErpStockBillCheckout) Submit() revel.Result {
 		return c.RenderJson(core.JsonResult{Success: false, Message: "出库失败，该出库单没有明细数据!"})
 	}
 
-	stock_bill.StatusId = models.STOCK_BILL_CHECKOUT_SUBMIT
+	stock_bill.StatusId = models.STOCK_BILL_CHECKOUT_STATUS_SUBMIT
 
 	cols := models.StockBillCols
 	_, err = db_session.Id(bill_id).Cols(cols.StatusId).Update(&stock_bill)
