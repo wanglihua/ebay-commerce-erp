@@ -12,6 +12,7 @@ import (
 	"matrix/modules/erp/models"
 	"matrix/core"
 	"os"
+	"strconv"
 )
 
 /*
@@ -117,7 +118,9 @@ func (t EBayOrderDownloadTask) Run() {
 
 			var order_in_db models.OrderInfo
 			has, err := db_session.Where("code = ?", order_code).Get(&order_in_db)
-			core.HandleError(err)
+			if err != nil {
+				revel.ERROR.Println(err)
+			}
 
 			revel.TRACE.Println("OrderStatus: ", order_download.OrderStatus)
 
@@ -131,35 +134,79 @@ func (t EBayOrderDownloadTask) Run() {
 			update_col_list = append(update_col_list, "status_id")
 
 			if order_download.CreatedTime != "" {
-				order_in_db.CreatedTime = core.NewNullString(order_download.CreatedTime, true)
+				created_time, err := time.Parse("2006-01-02T15:04:05.000Z", order_download.CreatedTime)
+				if err != nil {
+					revel.ERROR.Println(err)
+				}
+				order_in_db.CreatedTime = core.NewNullLongTime(created_time, true)
 				update_col_list = append(update_col_list, "created_time")
 			}
 
 			if order_download.ModifiedTime != "" {
-				order_in_db.ModifiedTime = core.NewNullString(order_download.ModifiedTime, true)
+				modified_time, err := time.Parse("2006-01-02T15:04:05.000Z", order_download.ModifiedTime)
+				if err != nil {
+					revel.ERROR.Println(err)
+				}
+				order_in_db.ModifiedTime = core.NewNullLongTime(modified_time, true)
 				update_col_list = append(update_col_list, "modified_time")
 			}
 
 			if order_download.PaidTime != "" {
-				order_in_db.PaidTime = core.NewNullString(order_download.PaidTime, true)
+				paid_time, err := time.Parse("2006-01-02T15:04:05.000Z", order_download.PaidTime)
+				if err != nil {
+					revel.ERROR.Println(err)
+				}
+				order_in_db.PaidTime = core.NewNullLongTime(paid_time, true)
 				update_col_list = append(update_col_list, "paid_time")
 			}
 
 			if order_download.ShippedTime != "" {
-				order_in_db.ShippedTime = core.NewNullString(order_download.ShippedTime, true)
+				shipped_time, err := time.Parse("2006-01-02T15:04:05.000Z", order_download.ShippedTime)
+				if err != nil {
+					revel.ERROR.Println(err)
+				}
+				order_in_db.ShippedTime = core.NewNullLongTime(shipped_time, true)
 				update_col_list = append(update_col_list, "shipped_time")
 			}
+
+			order_in_db.AdjustmentAmountCurrency = order_download.AdjustmentAmount.Currency
+			update_col_list = append(update_col_list, "adjustment_amount_currency")
+			order_in_db.AdjustmentAmount, err = strconv.ParseFloat(order_download.AdjustmentAmount.Value, 64)
+			if err != nil {
+				revel.ERROR.Println(err)
+			}
+			update_col_list = append(update_col_list, "adjustment_amount")
+
+			order_in_db.AmountPaidCurrency = order_download.AmountPaid.Currency
+			update_col_list = append(update_col_list, "amount_paid_currency")
+			order_in_db.AmountPaid, err = strconv.ParseFloat(order_download.AmountPaid.Value, 64)
+			if err != nil {
+				revel.ERROR.Println(err)
+			}
+			update_col_list = append(update_col_list, "amount_paid")
+
+			order_in_db.AmountSavedCurrency = order_download.AmountSaved.Currency
+			update_col_list = append(update_col_list, "amount_saved_currency")
+			order_in_db.AmountSaved, err = strconv.ParseFloat(order_download.AmountSaved.Value, 64)
+			if err != nil {
+				revel.ERROR.Println(err)
+			}
+			update_col_list = append(update_col_list, "amount_saved")
 
 			if has == true {
 				// update order
 				_, err = db_session.Id(order_in_db.Id).Cols(update_col_list...).Update(&order_in_db)
-				core.HandleError(err)
+				if err != nil {
+					revel.ERROR.Println(err)
+				}
 			} else {
 				// insert order
 				order_in_db.Code = order_code
 
 				_, err = db_session.Insert(&order_in_db)
-				core.HandleError(err)
+				if err != nil {
+					revel.ERROR.Println(err)
+				}
 			}
 
 			_ = order_code
@@ -232,7 +279,7 @@ func (t EBayOrderDownloadTask) fetch_orders(config ebay.Config, page_number int)
 	data, err := ioutil.ReadAll(res.Body)
 
 	//revel.TRACE.Println(string(data))
-	//t.force_write_to_file(`Z:\GoPath\src\matrix\modules\jobs\tasks\test_order_response.xml`, string(data))
+	t.force_write_to_file(fmt.Sprintf(`z:\test_order_response\%s.xml`, time.Now().Format("20060102150405")), string(data))
 
 	if err != nil {
 		revel.ERROR.Println("eBay GetOrders ERROR - ioutil.ReadAll : " + err.Error())
@@ -271,10 +318,14 @@ func (t EBayOrderDownloadTask) force_write_to_file(file_name string, content str
 	var err error
 
 	file, err = os.Create(file_name) //创建文件
-	core.HandleError(err)
+	if err != nil {
+		revel.ERROR.Println(err)
+	}
 
 	_, err = file.WriteString(content)
-	core.HandleError(err)
+	if err != nil {
+		revel.ERROR.Println(err)
+	}
 
 	file.Sync()
 	file.Close()
