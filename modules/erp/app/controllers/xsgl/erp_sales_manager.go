@@ -25,25 +25,28 @@ func (c ErpSalesManager) ListData() revel.Result {
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
 	type ErpSalesManagerListViewItem struct {
-		models.SalesManagerInfo `xorm:"extends" json:"sm"`
-		models.ShopAccountInfo  `xorm:"extends" json:"sa"`
-		models.ProductInfo      `xorm:"extends" json:"p"`
-		auth_models.UserInfo    `xorm:"extends" json:"u"`
+		models.SalesManagerInfo       `xorm:"extends" json:"sm"`
+		models.ShopAccountInfo        `xorm:"extends" json:"sa"`
+		models.ECommercePlatformInfo  `xorm:"extends" json:"ep"`
+		models.ProductInfo            `xorm:"extends" json:"p"`
+		auth_models.UserInfo          `xorm:"extends" json:"u"`
 	}
 
 	/*
-	SELECT sm.*, sa.*, p.*, u.*
-	FROM erp_sales_manager sm
-		INNER JOIN erp_shop_account sa ON sm.shop_id = sa.id
-		INNER JOIN erp_product p ON sm.product_id = p.id
-		INNER JOIN auth_user u ON sm.user_id = u.id
+SELECT sm.*, sa.*, ep.*, p.*, u.*
+FROM erp_sales_manager sm
+    INNER JOIN erp_shop_account sa ON sm.shop_id = sa.id
+    INNER JOIN erp_ecommerce_platform ep ON sa.platform_id = ep.id
+    INNER JOIN erp_product p ON sm.product_id = p.id
+    INNER JOIN auth_user u ON sm.user_id = u.id
 	*/
 
 	sb := core.NewSqlBuilder()
-	sb.Select("sm.*, sa.*, p.*, u.*")
+	sb.Select("sm.*, sa.*, ep.*, p.*, u.*")
 	sb.Count("count(sm.id) as sales_manager_count")
 	sb.From(`erp_sales_manager sm
 		INNER JOIN erp_shop_account sa ON sm.shop_id = sa.id
+		INNER JOIN erp_ecommerce_platform ep ON sa.platform_id = ep.id
 		INNER JOIN erp_product p ON sm.product_id = p.id
 		INNER JOIN auth_user u ON sm.user_id = u.id`)
 	sb.Where(filter)
@@ -100,6 +103,7 @@ func (c ErpSalesManager) DetailData() revel.Result {
 	var sales_manager_id int64
 	c.Params.Bind(&sales_manager_id, "id")
 
+	var platform models.ECommercePlatformInfo
 	var shop_account models.ShopAccountInfo
 	var product models.ProductInfo
 	var user auth_models.UserInfo
@@ -113,6 +117,8 @@ func (c ErpSalesManager) DetailData() revel.Result {
 
 		_, err = db_session.Id(sales_manager.ShopId).Get(&shop_account)
 		core.HandleError(err)
+		_, err = db_session.Id(shop_account.PlatformId).Get(&platform)
+		core.HandleError(err)
 		_, err = db_session.Id(sales_manager.ProductId).Get(&product)
 		core.HandleError(err)
 		_, err = db_session.Id(sales_manager.UserId).Get(&user)
@@ -121,7 +127,7 @@ func (c ErpSalesManager) DetailData() revel.Result {
 
 	var detail_form SalesManagerDetailForm
 	detail_form.SalesManager = sales_manager
-	detail_form.ShopAccountName = fmt.Sprintf("%s %s", shop_account.Platform, shop_account.Name)
+	detail_form.ShopAccountName = fmt.Sprintf("%s %s", platform.Name, shop_account.Name)
 	detail_form.ProductName = fmt.Sprintf("%s %s", product.Sku, product.Name)
 	detail_form.UserName = fmt.Sprintf("%s %s", user.LoginName, user.NickName)
 
@@ -190,19 +196,23 @@ func (c ErpSalesManager) ShopAccountSelectListData() revel.Result {
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
-	type ErpShopAccountViewItem struct {
-		models.ShopAccountInfo `xorm:"extends" json:"a"`
-		models.StatusInfo      `xorm:"extends" json:"s"`
+	type ShopAccountViewItem struct {
+		models.ShopAccountInfo        `xorm:"extends" json:"a"`
+		models.ECommercePlatformInfo  `xorm:"extends" json:"p"`
+		models.StatusInfo             `xorm:"extends" json:"s"`
 	}
 
 	/*
-		SELECT a.*, s.* FROM erp_shop_account a
-		    INNER JOIN erp_status s ON a.status_id = s.id
+SELECT a.*, p.*, s.*
+FROM erp_shop_account a
+    INNER JOIN erp_ecommerce_platform p ON a.platform_id = p.id
+    INNER JOIN erp_status s ON a.status_id = s.id
 	*/
 
 	query := db_session.
-	Select("a.*, s.*").
+	Select("a.*, p.*, s.*").
 		Table("erp_shop_account").Alias("a").
+		Join("INNER", []string{"erp_ecommerce_platform", "p"}, "a.platform_id = p.id").
 		Join("INNER", []string{"erp_status", "s"}, "a.status_id = s.id").
 		Where(filter)
 
@@ -215,12 +225,12 @@ func (c ErpSalesManager) ShopAccountSelectListData() revel.Result {
 		data_query = *data_query.Asc("a.id")
 	}
 
-	shop_account_list := make([]ErpShopAccountViewItem, 0, limit)
+	shop_account_list := make([]ShopAccountViewItem, 0, limit)
 	err := data_query.Limit(limit, offset).Find(&shop_account_list)
 	core.HandleError(err)
 
 	count_query := *query
-	count, err := count_query.Count(new(ErpShopAccountViewItem))
+	count, err := count_query.Count(new(ShopAccountViewItem))
 	core.HandleError(err)
 
 	return c.RenderJson(core.GridResult{

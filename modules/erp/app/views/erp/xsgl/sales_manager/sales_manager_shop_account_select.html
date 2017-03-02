@@ -43,7 +43,7 @@
                         }
                     },
                     {"mDataProp": "a.name", "title": "名称", "bSearchable": true, "width": 150},
-                    {"mDataProp": "a.platform", "title": "平台", "bSearchable": true, "width": 150},
+                    {"mDataProp": "p.name", "title": "平台", "bSearchable": true, "width": 150},
                     {"mDataProp": "a.desc", "title": "描述", "bSearchable": true},
                     {"mDataProp": "s.name", "title": "状态", "bSearchable": true, "width": 80},
                     {"mDataProp": "a.create_time", "title": "创建时间", "bSearchable": false, "width": 120},
@@ -74,7 +74,7 @@
             type: "POST",
             data: {"shop_account_id": shop_account_id},
             success: function (data) {
-                vm.detail.shop_account_name = data.shop_account.platform + " " + data.shop_account.name;
+                vm.detail.shop_account_name = data.platform.name + " " + data.shop_account.name;
             }
         });
 

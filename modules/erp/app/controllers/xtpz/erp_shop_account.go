@@ -19,8 +19,9 @@ func (c ErpShopAccount) Index() revel.Result {
 }
 
 type ErpShopAccountViewItem struct {
-	models.ShopAccountInfo `xorm:"extends" json:"a"`
-	models.StatusInfo      `xorm:"extends" json:"s"`
+	models.ShopAccountInfo        `xorm:"extends" json:"a"`
+	models.ECommercePlatformInfo  `xorm:"extends" json:"p"`
+	models.StatusInfo             `xorm:"extends" json:"s"`
 }
 
 func (c ErpShopAccount) ListData() revel.Result {
@@ -29,13 +30,16 @@ func (c ErpShopAccount) ListData() revel.Result {
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
 	/*
-		SELECT a.*, s.* FROM erp_shop_account a
-		    INNER JOIN erp_status s ON a.status_id = s.id
+SELECT a.*, p.*, s.*
+FROM erp_shop_account a
+    INNER JOIN erp_ecommerce_platform p ON a.platform_id = p.id
+    INNER JOIN erp_status s ON a.status_id = s.id
 	*/
 
 	query := db_session.
-	Select("a.*, s.*").
+	Select("a.*, p.*, s.*").
 		Table("erp_shop_account").Alias("a").
+		Join("INNER", []string{"erp_ecommerce_platform", "p"}, "a.platform_id = p.id").
 		Join("INNER", []string{"erp_status", "s"}, "a.status_id = s.id").
 		Where(filter)
 
@@ -63,8 +67,9 @@ func (c ErpShopAccount) ListData() revel.Result {
 }
 
 type ShopAccountDetailForm struct {
-	ShopAccount models.ShopAccountInfo `json:"shop_account"`
-	StatusList  []models.StatusInfo    `json:"status_list"`
+	ShopAccount  models.ShopAccountInfo         `json:"shop_account"`
+	StatusList   []models.StatusInfo            `json:"status_list"`
+	PlatformList []models.ECommercePlatformInfo `json:"platform_list"`
 }
 
 func (f *ShopAccountDetailForm) IsCreate() bool {
@@ -80,13 +85,7 @@ func (f *ShopAccountDetailForm) Valid(validation *revel.Validation) bool {
 		validation.MaxSize(f.ShopAccount.Name, 100).Message("账号长度不能大于100！")
 	}
 
-	validation.Required(f.ShopAccount.Platform).Message("平台不能为空！")
-	if f.ShopAccount.Platform != "" {
-		validation.MinSize(f.ShopAccount.Platform, 2).Message("平台长度不能小于2！")
-	}
-	if f.ShopAccount.Platform != "" {
-		validation.MaxSize(f.ShopAccount.Platform, 100).Message("平台长度不能大于100！")
-	}
+	validation.Required(f.ShopAccount.PlatformId).Message("平台不能为空！")
 
 	if f.ShopAccount.Desc.Valid == true {
 		validation.MaxSize(f.ShopAccount.Desc.String, 500).Message("描述长度不能大于500！")
@@ -122,9 +121,14 @@ func (c ErpShopAccount) DetailData() revel.Result {
 
 	status_list := status_service.GetStatusList(db_session, models.STATUS_TYPE_SHOP_ACCOUNT)
 
+	platform_list := make([]models.ECommercePlatformInfo, 0)
+	err := db_session.Find(&platform_list)
+	core.HandleError(err)
+
 	var detail_form ShopAccountDetailForm
 	detail_form.ShopAccount = shop_account
 	detail_form.StatusList = status_list
+	detail_form.PlatformList = platform_list
 
 	return c.RenderJson(detail_form)
 }
@@ -147,7 +151,8 @@ func (c ErpShopAccount) Save() revel.Result {
 		affected, err = db_session.Insert(&shop_account)
 		core.HandleError(err)
 	} else {
-		affected, err = db_session.Id(shop_account.Id).Update(&shop_account)
+		update_col_list := []string{"name", "platform_id", "desc", "paypal_account", "manager", "status_id"}
+		affected, err = db_session.Id(shop_account.Id).Cols(update_col_list...).Update(&shop_account)
 		core.HandleError(err)
 
 		if affected == 0 {
@@ -180,7 +185,12 @@ func (c ErpShopAccount) GetShopAccountInfo() revel.Result {
 	_, err := db_session.Id(shop_account_id).Get(&shop_account)
 	core.HandleError(err)
 
+	var platform models.ECommercePlatformInfo
+	_, err = db_session.Id(shop_account.PlatformId).Get(&platform)
+	core.HandleError(err)
+
 	return c.RenderJson(map[string]interface{}{
 		"shop_account": shop_account,
+		"platform":     platform,
 	})
 }

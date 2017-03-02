@@ -150,6 +150,7 @@
                                 return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
                             }
                         },
+                        {"mDataProp": "ep.name", "title": "平台", "bSearchable": false, "width": 100},
                         {"mDataProp": "sa.name", "title": "店铺", "bSearchable": false},
                         {"mDataProp": "p.sku", "title": "SKU", "bSearchable": false},
                         {"mDataProp": "p.name", "title": "商品", "bSearchable": false},
@@ -264,7 +265,6 @@
                 });
             },
             showShopSelect: function () {
-                $('#shopSelectDialog').modal(modalOptions);
                 $.ajax({
                     url: '{%url "ErpSalesManager.ShowShopAccountSelect"%}',
                     type: "POST",
