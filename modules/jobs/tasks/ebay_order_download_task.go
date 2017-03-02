@@ -138,6 +138,8 @@ func (t EBayOrderDownloadTask) Run() {
 				if err != nil {
 					revel.ERROR.Println(err)
 				}
+				// 转成北京时间
+				created_time = created_time.Add(8 * time.Hour)
 				order_in_db.CreatedTime = core.NewNullLongTime(created_time, true)
 				update_col_list = append(update_col_list, "created_time")
 			}
@@ -147,6 +149,8 @@ func (t EBayOrderDownloadTask) Run() {
 				if err != nil {
 					revel.ERROR.Println(err)
 				}
+				// 转成北京时间
+				modified_time = modified_time.Add(8 * time.Hour)
 				order_in_db.ModifiedTime = core.NewNullLongTime(modified_time, true)
 				update_col_list = append(update_col_list, "modified_time")
 			}
@@ -156,6 +160,8 @@ func (t EBayOrderDownloadTask) Run() {
 				if err != nil {
 					revel.ERROR.Println(err)
 				}
+				// 转成北京时间
+				paid_time = paid_time.Add(8 * time.Hour)
 				order_in_db.PaidTime = core.NewNullLongTime(paid_time, true)
 				update_col_list = append(update_col_list, "paid_time")
 			}
@@ -165,6 +171,8 @@ func (t EBayOrderDownloadTask) Run() {
 				if err != nil {
 					revel.ERROR.Println(err)
 				}
+				// 转成北京时间
+				shipped_time = shipped_time.Add(8 * time.Hour)
 				order_in_db.ShippedTime = core.NewNullLongTime(shipped_time, true)
 				update_col_list = append(update_col_list, "shipped_time")
 			}
