@@ -352,7 +352,6 @@ func (e StatusInfo) InitData(db_session *xorm.Session) {
 		status.Desc = core.NewNullString("盘点单状态 已创建", true)
 		db_session.Insert(status)
 
-
 		status = new(StatusInfo)
 		status.Id = INVENTORY_CHECK_STATUS_WTG
 		status.Type = STATUS_TYPE_INVENTORY_CHECK
@@ -507,7 +506,7 @@ func (e StatusInfo) InitData(db_session *xorm.Session) {
 		db_session.Insert(status)
 	}
 
-	// 订单状态 已支付 待配货 配货中 已发货 已完成
+	// 订单状态 已创建 已支付 待配货 配货中 已发货 已完成
 	{
 		status := new(StatusInfo)
 		status.Id = ORDER_STATUS_YCJ

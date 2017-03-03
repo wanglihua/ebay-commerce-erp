@@ -163,7 +163,7 @@ func (t EBayOrderDownloadTask) Run() {
 				// 状态？
 				revel.TRACE.Println("OrderStatus: ", order_download.OrderStatus)
 
-				order_in_db.TypeId = models.ORDER_TYPE_XZDD //下载订单
+				order_in_db.TypeId = models.ORDER_TYPE_XZDD //订单类型为下载订单
 
 				update_col_list := []string{"type_id", "ebay_status", "status_id"}
 
@@ -286,15 +286,15 @@ func (t EBayOrderDownloadTask) Run() {
 
 				// 如果是新的订单，一般是新增的订单，系统数据库中还没有的订单
 				if order_status_id < models.ORDER_STATUS_YCJ && order_in_db.PaidTime.Valid == false { //前面小于号的判断要不要加呢
-					order_in_db.StatusId = models.ORDER_STATUS_YCJ
+					order_in_db.StatusId = models.ORDER_STATUS_YCJ // 这个状态，有可能会被接下来的状态逻辑所修改，可能会，更进一步改成 “已支付”, “已完成”
 				}
 
 				// 有可能是新增的订单（最有可能），或者是原来 已创建 的状态过来的。这时支付时间不为空
 				if order_status_id < models.ORDER_STATUS_YZF && order_in_db.PaidTime.Valid == true {
-					order_in_db.StatusId = models.ORDER_STATUS_YZF
+					order_in_db.StatusId = models.ORDER_STATUS_YZF // 这个状态，有可能会被接下来的状态逻辑所修改，可能会，更进一步改成 “已完成”
 				}
 
-				//如果订单处于 待配货 配货中 一般状态不会被修改，除非系统中没有操作，直接在网店里面操作了
+				// 同步逻辑要保证中间的 待配货，配货中，已发货 等的状态在同步时不被前面的状态覆盖，只有后面的“已完成”可以覆盖这些状态
 
 				// 如果 下载订单里面的 OrderStatus 是 Completed， 且订单的发货时间不为空，订单状态就为 已完成
 				if strings.ToLower(order_status) == strings.ToLower("Completed") && order_in_db.ShippedTime.Valid == true {
