@@ -143,6 +143,8 @@ const (
 	// 调拨单状态 提交
 	STOCK_BILL_TRANSFER_STATUS_SUBMIT = 3800
 
+	// 订单状态 已创建
+	ORDER_STATUS_YCJ = 3850
 	// 订单状态 已支付
 	ORDER_STATUS_YZF = 3900
 	// 订单状态 待配货
@@ -350,7 +352,6 @@ func (e StatusInfo) InitData(db_session *xorm.Session) {
 		status.Desc = core.NewNullString("盘点单状态 已创建", true)
 		db_session.Insert(status)
 
-
 		status = new(StatusInfo)
 		status.Id = INVENTORY_CHECK_STATUS_WTG
 		status.Type = STATUS_TYPE_INVENTORY_CHECK
@@ -505,9 +506,16 @@ func (e StatusInfo) InitData(db_session *xorm.Session) {
 		db_session.Insert(status)
 	}
 
-	// 订单状态 已支付 待配货 配货中 已发货 已完成
+	// 订单状态 已创建 已支付 待配货 配货中 已发货 已完成
 	{
 		status := new(StatusInfo)
+		status.Id = ORDER_STATUS_YCJ
+		status.Type = STATUS_TYPE_ORDER
+		status.Name = "已创建"
+		status.Desc = core.NewNullString("订单状态 已创建", true)
+		db_session.Insert(status)
+
+		status = new(StatusInfo)
 		status.Id = ORDER_STATUS_YZF
 		status.Type = STATUS_TYPE_ORDER
 		status.Name = "已支付"

@@ -1,19 +1,20 @@
 package tasks
 
 import (
-	"github.com/revel/revel"
-	"github.com/mithereal/go-ebay"
-	"io/ioutil"
 	"encoding/xml"
-	"github.com/franela/goreq"
 	"fmt"
-	"github.com/go-xorm/xorm"
-	"time"
-	"matrix/modules/erp/models"
-	"matrix/core"
+	"io/ioutil"
 	"os"
 	"strconv"
 	"strings"
+	"time"
+
+	"github.com/franela/goreq"
+	"github.com/go-xorm/xorm"
+	"github.com/mithereal/go-ebay"
+	"github.com/revel/revel"
+	"matrix/core"
+	"matrix/modules/erp/models"
 )
 
 /*
@@ -162,9 +163,7 @@ func (t EBayOrderDownloadTask) Run() {
 				// 状态？
 				revel.TRACE.Println("OrderStatus: ", order_download.OrderStatus)
 
-				order_in_db.TypeId = models.ORDER_TYPE_XZDD
-				order_in_db.EBayStatus = order_download.OrderStatus
-				order_in_db.StatusId = models.ORDER_STATUS_YZF
+				order_in_db.TypeId = models.ORDER_TYPE_XZDD //订单类型为下载订单
 
 				update_col_list := []string{"type_id", "ebay_status", "status_id"}
 
@@ -260,6 +259,45 @@ func (t EBayOrderDownloadTask) Run() {
 				order_in_db.SellerEmail = order_download.SellerEmail
 				order_in_db.SellerUserId = order_download.SellerUserID
 
+				order_in_db.BuyerUserId = order_download.BuyerUserID
+				order_in_db.BuyerCheckoutMessage = order_download.BuyerCheckoutMessage
+
+				// 订单状态，这部分逻辑还可以继续探讨
+				order_status := order_download.OrderStatus
+				order_in_db.EBayStatus = order_status
+
+				/*
+					// 订单状态 已创建
+					ORDER_STATUS_YCJ = 3850
+					// 订单状态 已支付
+					ORDER_STATUS_YZF = 3900
+					// 订单状态 待配货
+					ORDER_STATUS_DPH = 4000
+					// 订单状态 配货中
+					ORDER_STATUS_PHZ = 4100
+					// 订单状态 已发货
+					ORDER_STATUS_YFH = 4200
+					// 订单状态 已完成
+					ORDER_STATUS_YWC = 4300
+				 */
+
+				// 应该是订单状态还没设置过, 就是 order_in_db.StatusId == 0 吧，一般是新增的订单
+				if order_in_db.StatusId < models.ORDER_STATUS_YCJ {
+					order_in_db.StatusId = models.ORDER_STATUS_YCJ // 这个状态，有可能会被接下来的状态逻辑所修改，可能会，更进一步改成 “已支付”, “已完成”
+				}
+
+				// 如果支付时间不为空，订单状态就是 “已支付”
+				if order_in_db.StatusId < models.ORDER_STATUS_YCJ && order_in_db.PaidTime.Valid == true {
+					order_in_db.StatusId = models.ORDER_STATUS_YZF // 这个状态，有可能会被接下来的状态逻辑所修改，可能会，更进一步改成 “已完成”
+				}
+
+				// 同步逻辑要保证中间的 待配货，配货中，已发货 等的状态在同步时不被前面的状态覆盖，只有后面的“已完成”可以覆盖这些状态
+
+				//如果发货时间不为空，并且 ebay状态 OrderStatus 为 Completed，那么订单状态就为 “已完成”
+				if order_in_db.ShippedTime.Valid == true && strings.ToLower(order_status) == strings.ToLower("Completed") {
+					order_in_db.StatusId = models.ORDER_STATUS_YWC //已完成状态
+				}
+
 				if has_order == true {
 					// update order
 					_, err = db_session.Id(order_in_db.Id).Cols(update_col_list...).Update(&order_in_db)
@@ -275,9 +313,7 @@ func (t EBayOrderDownloadTask) Run() {
 						revel.ERROR.Println(err)
 					}
 				}
-
-				_ = order_code
-			}
+			} // for _, order_download := range order_list
 
 			switch response.Ack {
 			case "Success":
@@ -291,8 +327,8 @@ func (t EBayOrderDownloadTask) Run() {
 
 			has_more_orders = response.HasMoreOrders
 			page_number += 1
-		}
-	}
+		} // for has_more_orders == true
+	} // for _, config := range ebay_api_config_list
 
 	job_duration := time.Since(job_time_begin)
 
