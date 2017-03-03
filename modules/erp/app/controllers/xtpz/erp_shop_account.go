@@ -169,10 +169,15 @@ func (c ErpShopAccount) Delete() revel.Result {
 	shop_account_id_list := make([]int64, 0)
 	c.Params.Bind(&shop_account_id_list, "id_list")
 
-	affected, err := db_session.In("id", shop_account_id_list).Delete(new(models.ShopAccountInfo))
+	// 删除关联的 eBay API 配置
+	_, err := db_session.In("shop_id", shop_account_id_list).Delete(new(models.EBayAPIConfigInfo))
 	core.HandleError(err)
 
-	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})
+	// 删除店铺信息
+	_, err = db_session.In("id", shop_account_id_list).Delete(new(models.ShopAccountInfo))
+	core.HandleError(err)
+
+	return c.RenderJson(core.JsonResult{Success: true, Message: "删除成功!"})
 }
 
 func (c ErpShopAccount) GetShopAccountInfo() revel.Result {

@@ -104,134 +104,135 @@ func (t EBayOrderDownloadTask) Run() {
 		db_session.Close()
 	}()
 
-	config := GetEBayConfig()
+	ebay_api_config_list := make([]models.EBayAPIConfigInfo, 0)
+	err = db_session.Find(&ebay_api_config_list)
+	core.HandleError(err)
 
-	has_more_orders := true
-	page_number := 1
-	for has_more_orders == true {
-		response := t.fetch_orders(config, page_number)
+	for _, config := range ebay_api_config_list {
+		has_more_orders := true
+		page_number := 1
+		for has_more_orders == true {
+			response := t.fetch_orders(config, page_number)
 
-		order_list := response.OrdersArray.Orders
+			order_list := response.OrdersArray.Orders
 
-		for _, order_download := range order_list {
-			order_code := order_download.OrderID
+			for _, order_download := range order_list {
+				order_code := order_download.OrderID
 
-			var order_in_db models.OrderInfo
-			has, err := db_session.Where("code = ?", order_code).Get(&order_in_db)
-			if err != nil {
-				revel.ERROR.Println(err)
-			}
-
-			revel.TRACE.Println("OrderStatus: ", order_download.OrderStatus)
-
-			order_in_db.TypeId = models.ORDER_TYPE_XZDD
-			order_in_db.EBayStatus = order_download.OrderStatus
-			order_in_db.StatusId = models.ORDER_STATUS_YZF
-
-			update_col_list := make([]string, 0)
-			update_col_list = append(update_col_list, "type_id")
-			update_col_list = append(update_col_list, "ebay_status")
-			update_col_list = append(update_col_list, "status_id")
-
-			if order_download.CreatedTime != "" {
-				created_time, err := time.Parse("2006-01-02T15:04:05.000Z", order_download.CreatedTime)
+				var order_in_db models.OrderInfo
+				has, err := db_session.Where("code = ?", order_code).Get(&order_in_db)
 				if err != nil {
 					revel.ERROR.Println(err)
 				}
-				// 转成北京时间
-				created_time = created_time.Add(8 * time.Hour)
-				order_in_db.CreatedTime = core.NewNullLongTime(created_time, true)
-				update_col_list = append(update_col_list, "created_time")
-			}
 
-			if order_download.ModifiedTime != "" {
-				modified_time, err := time.Parse("2006-01-02T15:04:05.000Z", order_download.ModifiedTime)
+				revel.TRACE.Println("OrderStatus: ", order_download.OrderStatus)
+
+				order_in_db.TypeId = models.ORDER_TYPE_XZDD
+				order_in_db.EBayStatus = order_download.OrderStatus
+				order_in_db.StatusId = models.ORDER_STATUS_YZF
+
+				update_col_list := []string{"type_id", "ebay_status", "status_id"}
+
+				if order_download.CreatedTime != "" {
+					created_time, err := time.Parse("2006-01-02T15:04:05.000Z", order_download.CreatedTime)
+					if err != nil {
+						revel.ERROR.Println(err)
+					}
+					// 转成北京时间
+					created_time = created_time.Add(8 * time.Hour)
+					order_in_db.CreatedTime = core.NewNullLongTime(created_time, true)
+					update_col_list = append(update_col_list, "created_time")
+				}
+
+				if order_download.ModifiedTime != "" {
+					modified_time, err := time.Parse("2006-01-02T15:04:05.000Z", order_download.ModifiedTime)
+					if err != nil {
+						revel.ERROR.Println(err)
+					}
+					// 转成北京时间
+					modified_time = modified_time.Add(8 * time.Hour)
+					order_in_db.ModifiedTime = core.NewNullLongTime(modified_time, true)
+					update_col_list = append(update_col_list, "modified_time")
+				}
+
+				if order_download.PaidTime != "" {
+					paid_time, err := time.Parse("2006-01-02T15:04:05.000Z", order_download.PaidTime)
+					if err != nil {
+						revel.ERROR.Println(err)
+					}
+					// 转成北京时间
+					paid_time = paid_time.Add(8 * time.Hour)
+					order_in_db.PaidTime = core.NewNullLongTime(paid_time, true)
+					update_col_list = append(update_col_list, "paid_time")
+				}
+
+				if order_download.ShippedTime != "" {
+					shipped_time, err := time.Parse("2006-01-02T15:04:05.000Z", order_download.ShippedTime)
+					if err != nil {
+						revel.ERROR.Println(err)
+					}
+					// 转成北京时间
+					shipped_time = shipped_time.Add(8 * time.Hour)
+					order_in_db.ShippedTime = core.NewNullLongTime(shipped_time, true)
+					update_col_list = append(update_col_list, "shipped_time")
+				}
+
+				order_in_db.AdjustmentAmountCurrency = order_download.AdjustmentAmount.Currency
+				update_col_list = append(update_col_list, "adjustment_amount_currency")
+				order_in_db.AdjustmentAmount, err = strconv.ParseFloat(order_download.AdjustmentAmount.Value, 64)
 				if err != nil {
 					revel.ERROR.Println(err)
 				}
-				// 转成北京时间
-				modified_time = modified_time.Add(8 * time.Hour)
-				order_in_db.ModifiedTime = core.NewNullLongTime(modified_time, true)
-				update_col_list = append(update_col_list, "modified_time")
-			}
+				update_col_list = append(update_col_list, "adjustment_amount")
 
-			if order_download.PaidTime != "" {
-				paid_time, err := time.Parse("2006-01-02T15:04:05.000Z", order_download.PaidTime)
+				order_in_db.AmountPaidCurrency = order_download.AmountPaid.Currency
+				update_col_list = append(update_col_list, "amount_paid_currency")
+				order_in_db.AmountPaid, err = strconv.ParseFloat(order_download.AmountPaid.Value, 64)
 				if err != nil {
 					revel.ERROR.Println(err)
 				}
-				// 转成北京时间
-				paid_time = paid_time.Add(8 * time.Hour)
-				order_in_db.PaidTime = core.NewNullLongTime(paid_time, true)
-				update_col_list = append(update_col_list, "paid_time")
-			}
+				update_col_list = append(update_col_list, "amount_paid")
 
-			if order_download.ShippedTime != "" {
-				shipped_time, err := time.Parse("2006-01-02T15:04:05.000Z", order_download.ShippedTime)
+				order_in_db.AmountSavedCurrency = order_download.AmountSaved.Currency
+				update_col_list = append(update_col_list, "amount_saved_currency")
+				order_in_db.AmountSaved, err = strconv.ParseFloat(order_download.AmountSaved.Value, 64)
 				if err != nil {
 					revel.ERROR.Println(err)
 				}
-				// 转成北京时间
-				shipped_time = shipped_time.Add(8 * time.Hour)
-				order_in_db.ShippedTime = core.NewNullLongTime(shipped_time, true)
-				update_col_list = append(update_col_list, "shipped_time")
-			}
+				update_col_list = append(update_col_list, "amount_saved")
 
-			order_in_db.AdjustmentAmountCurrency = order_download.AdjustmentAmount.Currency
-			update_col_list = append(update_col_list, "adjustment_amount_currency")
-			order_in_db.AdjustmentAmount, err = strconv.ParseFloat(order_download.AdjustmentAmount.Value, 64)
-			if err != nil {
-				revel.ERROR.Println(err)
-			}
-			update_col_list = append(update_col_list, "adjustment_amount")
+				if has == true {
+					// update order
+					_, err = db_session.Id(order_in_db.Id).Cols(update_col_list...).Update(&order_in_db)
+					if err != nil {
+						revel.ERROR.Println(err)
+					}
+				} else {
+					// insert order
+					order_in_db.Code = order_code
 
-			order_in_db.AmountPaidCurrency = order_download.AmountPaid.Currency
-			update_col_list = append(update_col_list, "amount_paid_currency")
-			order_in_db.AmountPaid, err = strconv.ParseFloat(order_download.AmountPaid.Value, 64)
-			if err != nil {
-				revel.ERROR.Println(err)
-			}
-			update_col_list = append(update_col_list, "amount_paid")
-
-			order_in_db.AmountSavedCurrency = order_download.AmountSaved.Currency
-			update_col_list = append(update_col_list, "amount_saved_currency")
-			order_in_db.AmountSaved, err = strconv.ParseFloat(order_download.AmountSaved.Value, 64)
-			if err != nil {
-				revel.ERROR.Println(err)
-			}
-			update_col_list = append(update_col_list, "amount_saved")
-
-			if has == true {
-				// update order
-				_, err = db_session.Id(order_in_db.Id).Cols(update_col_list...).Update(&order_in_db)
-				if err != nil {
-					revel.ERROR.Println(err)
+					_, err = db_session.Insert(&order_in_db)
+					if err != nil {
+						revel.ERROR.Println(err)
+					}
 				}
-			} else {
-				// insert order
-				order_in_db.Code = order_code
 
-				_, err = db_session.Insert(&order_in_db)
-				if err != nil {
-					revel.ERROR.Println(err)
-				}
+				_ = order_code
 			}
 
-			_ = order_code
+			switch response.Ack {
+			case "Success":
+				revel.TRACE.Printf("eBay GetOrders Response: " + response.Ack + "\n")
+				revel.TRACE.Printf("eBay GetOrders actual fetched orders count: %d", response.ReturnedOrderCountActual)
+			case "Failure":
+				revel.ERROR.Printf("eBay GetOrders Response: " + response.Ack + "\n")
+			default:
+				revel.ERROR.Printf("eBay GetOrders Response: " + response.Ack + "\n")
+			}
+
+			has_more_orders = response.HasMoreOrders
+			page_number += 1
 		}
-
-		switch response.Ack {
-		case "Success":
-			revel.TRACE.Printf("eBay GetOrders Response: " + response.Ack + "\n")
-			revel.TRACE.Printf("eBay GetOrders actual fetched orders count: %d", response.ReturnedOrderCountActual)
-		case "Failure":
-			revel.ERROR.Printf("eBay GetOrders Response: " + response.Ack + "\n")
-		default:
-			revel.ERROR.Printf("eBay GetOrders Response: " + response.Ack + "\n")
-		}
-
-		has_more_orders = response.HasMoreOrders
-		page_number += 1
 	}
 
 	job_duration := time.Since(job_time_begin)
@@ -239,7 +240,7 @@ func (t EBayOrderDownloadTask) Run() {
 	revel.TRACE.Println("sync order time duration: ", job_duration.Seconds(), "seconds")
 }
 
-func (t EBayOrderDownloadTask) fetch_orders(config ebay.Config, page_number int) ebay.GetOrdersRequestResponse {
+func (t EBayOrderDownloadTask) fetch_orders(config models.EBayAPIConfigInfo, page_number int) ebay.GetOrdersRequestResponse {
 	req_body := `<?xml version="1.0" encoding="utf-8"?>
 <GetOrdersRequest xmlns="urn:ebay:apis:eBLBaseComponents">
 	<RequesterCredentials>
@@ -260,21 +261,21 @@ func (t EBayOrderDownloadTask) fetch_orders(config ebay.Config, page_number int)
 
 	req := goreq.Request{
 		Method:      "POST",
-		Uri:         config.EndPoint,
+		Uri:         config.GetEndPoint(),
 		Body:        req_body,
 		ContentType: "application/xml; charset=utf-8",
 		ShowDebug:   false,
 	}
 
 	req.AddHeader("X-EBAY-API-CALL-NAME", "GetOrders")
-	req.AddHeader("X-EBAY-API-DEV-NAME", config.DevID)
-	req.AddHeader("X-EBAY-API-CERT-NAME", config.CertID)
-	req.AddHeader("X-EBAY-API-APP-NAME", config.AppID)
-	req.AddHeader("X-EBAY-API-VERSION", config.Version)
-	req.AddHeader("X-EBAY-API-COMPATIBILITY-LEVEL", config.Version)
+	req.AddHeader("X-EBAY-API-DEV-NAME", config.DevId)
+	req.AddHeader("X-EBAY-API-CERT-NAME", config.CertId)
+	req.AddHeader("X-EBAY-API-APP-NAME", config.AppId)
+	req.AddHeader("X-EBAY-API-VERSION", config.GetApiVersion())
+	req.AddHeader("X-EBAY-API-COMPATIBILITY-LEVEL", config.GetApiVersion())
 	req.AddHeader("X-EBAY-API-REQUEST-ENCODING", "XML")
 	req.AddHeader("X-EBAY-API-RESPONSE-ENCODING", "XML")
-	req.AddHeader("X-EBAY-API-SITEID", config.SiteId)
+	req.AddHeader("X-EBAY-API-SITEID", config.GetSiteId())
 	req.AddHeader("Accept", "application/xml,application/xhtml+xml")
 
 	res, err := req.Do()

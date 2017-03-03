@@ -21,6 +21,7 @@ type OrderInfo struct {
 	ModifiedTime             core.NullLongTime   `xorm:"datetime 'modified_time'" json:"modified_time" smith:"verbose_name=修改时间"`
 	PaidTime                 core.NullLongTime   `xorm:"datetime 'paid_time'" json:"paid_time" smith:"verbose_name=支付时间"`
 	ShippedTime              core.NullLongTime   `xorm:"datetime 'shipped_time'" json:"shipped_time" smith:"verbose_name=创建时间"`
+	HoldTypeId               core.NullInt        `xorm:"bigint null index 'hold_type_id'" json:"hold_type_id" smith:"verbose_name=Hold类型"`
 	CreateTime               core.Time           `xorm:"created notnull 'create_time'" json:"create_time"`
 	UpdateTime               core.Time           `xorm:"updated notnull 'update_time'" json:"update_time"`
 	Version                  int                 `xorm:"version notnull 'version'" json:"version"`
