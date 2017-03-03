@@ -1,19 +1,20 @@
 package tasks
 
 import (
-	"github.com/revel/revel"
-	"github.com/mithereal/go-ebay"
-	"io/ioutil"
 	"encoding/xml"
-	"github.com/franela/goreq"
 	"fmt"
-	"github.com/go-xorm/xorm"
-	"time"
-	"matrix/modules/erp/models"
-	"matrix/core"
+	"io/ioutil"
 	"os"
 	"strconv"
 	"strings"
+	"time"
+
+	"github.com/franela/goreq"
+	"github.com/go-xorm/xorm"
+	"github.com/mithereal/go-ebay"
+	"github.com/revel/revel"
+	"matrix/core"
+	"matrix/modules/erp/models"
 )
 
 /*
@@ -162,9 +163,7 @@ func (t EBayOrderDownloadTask) Run() {
 				// 状态？
 				revel.TRACE.Println("OrderStatus: ", order_download.OrderStatus)
 
-				order_in_db.TypeId = models.ORDER_TYPE_XZDD
-				order_in_db.EBayStatus = order_download.OrderStatus
-				order_in_db.StatusId = models.ORDER_STATUS_YZF
+				order_in_db.TypeId = models.ORDER_TYPE_XZDD //下载订单
 
 				update_col_list := []string{"type_id", "ebay_status", "status_id"}
 
@@ -260,6 +259,16 @@ func (t EBayOrderDownloadTask) Run() {
 				order_in_db.SellerEmail = order_download.SellerEmail
 				order_in_db.SellerUserId = order_download.SellerUserID
 
+				order_in_db.BuyerUserId = order_download.BuyerUserID
+				order_in_db.BuyerCheckoutMessage = order_download.BuyerCheckoutMessage
+
+				// 订单状态，这部分逻辑还可以继续探讨
+				order_status := order_download.OrderStatus
+				order_in_db.EBayStatus = order_status
+
+				//Completed
+				order_in_db.StatusId = models.ORDER_STATUS_YZF
+
 				if has_order == true {
 					// update order
 					_, err = db_session.Id(order_in_db.Id).Cols(update_col_list...).Update(&order_in_db)
@@ -275,9 +284,7 @@ func (t EBayOrderDownloadTask) Run() {
 						revel.ERROR.Println(err)
 					}
 				}
-
-				_ = order_code
-			}
+			} // for _, order_download := range order_list
 
 			switch response.Ack {
 			case "Success":
@@ -291,8 +298,8 @@ func (t EBayOrderDownloadTask) Run() {
 
 			has_more_orders = response.HasMoreOrders
 			page_number += 1
-		}
-	}
+		} // for has_more_orders == true
+	} // for _, config := range ebay_api_config_list
 
 	job_duration := time.Since(job_time_begin)
 
