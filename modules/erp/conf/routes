@@ -277,3 +277,7 @@ POST /erp/sales/manager/product/select/show                ErpSalesManager.ShowP
 POST /erp/sales/manager/product/select/data/list           ErpSalesManager.ProductSelectListData
 POST /erp/sales/manager/user/select/show                   ErpSalesManager.ShowUserSelect
 POST /erp/sales/manager/user/select/data/list              ErpSalesManager.UserSelectListData
+
+POST /erp/ebay/api/config/data/detail        ErpEBayAPIConfig.DetailData
+POST /erp/ebay/api/config/save               ErpEBayAPIConfig.Save
+POST /erp/ebay/api/config/delete             ErpEBayAPIConfig.Delete

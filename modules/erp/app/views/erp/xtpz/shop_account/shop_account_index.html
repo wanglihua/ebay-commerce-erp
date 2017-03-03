@@ -21,6 +21,10 @@
                         <i class="ace-icon fa fa-plus"></i>
                         新增
                     </button>
+                    <button class="btn btn-purple btn-sm" @click="showEBayAPIConfigDetail()">
+                        <i class="ace-icon fa fa-list-ul"></i>
+                        API 配置
+                    </button>
                     <button class="btn btn-danger btn-sm" @click="deleteShopAccount()">
                         <i class="ace-icon fa fa-trash-o"></i>
                         删除
@@ -135,6 +139,95 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" id="eBayAPIConfigDetailDialog">
+        <div class="modal-dialog" style="width: 680px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="True">&times;</button>
+                    <h4 class="modal-title">店铺 ebay API 配置详细</h4>
+                </div>
+                <div class="modal-body clearfix">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <form class="form-horizontal" role="form" id="eBayAPIConfigDetailForm">
+                                <input id="ebay_api_config_id" name="config_detail.api_config.id" type="hidden" v-model.number="config_detail.api_config.id"/>
+                                <input id="ebay_api_config_version" name="config_detail.api_config.version" type="hidden" v-model.number="config_detail.api_config.version"/>
+
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <label for="ebay_api_shop_name" class="col-xs-2 control-label">店铺</label>
+                                            <div class="col-xs-10">
+                                                <input id="ebay_api_shop_id" name="config_detail.api_config.shop_id" type="hidden" v-model="config_detail.api_config.shop_id"/>
+                                                <input id="ebay_api_shop_name" name="config_detail.shop_name" type="text" disabled="disabled" class="input-sm form-control" v-model="config_detail.shop_name"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <label for="ebay_api_app_id" class="col-xs-2 control-label">AppID</label>
+                                            <div class="col-xs-10">
+                                                <input id="ebay_api_app_id" name="config_detail.api_config.app_id" type="text" class="input-sm form-control" v-model="config_detail.api_config.app_id"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <label for="ebay_api_cert_id" class="col-xs-2 control-label">CertID</label>
+                                            <div class="col-xs-10">
+                                                <input id="ebay_api_cert_id" name="config_detail.api_config.cert_id" type="text" class="input-sm form-control" v-model="config_detail.api_config.cert_id"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <label for="ebay_api_dev_id" class="col-xs-2 control-label">DevID</label>
+                                            <div class="col-xs-10">
+                                                <input id="ebay_api_dev_id" name="config_detail.api_config.dev_id" type="text" class="input-sm form-control" v-model="config_detail.api_config.dev_id"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <label for="ebay_api_token" class="col-xs-2 control-label">Token</label>
+                                            <div class="col-xs-10">
+                                                <textarea id="ebay_api_token" name="config_detail.api_config.token" rows="6" class="input-sm form-control" v-model="config_detail.api_config.token"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger btn-sm" :disabled="config_detail.api_config.id == 0"  @click="deleteEBayAPIConfig()">
+                        <i class="ace-icon fa fa-floppy-o"></i>删除配置
+                    </button>
+                    <button type="button" class="btn btn-success btn-sm" @click="saveEBayAPIConfig()">
+                        <i class="ace-icon fa fa-floppy-o"></i>保存
+                    </button>
+                    <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">
+                        <i class="ace-icon fa fa-times"></i>关闭
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
 <script type="text/javascript">
     var vm = new Vue({
@@ -144,6 +237,10 @@
                 "shop_account": {},
                 "platform_list": [],
                 "status_list": []
+            },
+            "config_detail": {
+                "api_config": {},
+                "shop_name": ""
             }
         },
         mounted: function () {
@@ -283,6 +380,109 @@
                                 $.msg.show(data.message);
                             }
                             vm.reloadList();
+                        }
+                    });
+                });
+            },
+            showEBayAPIConfigDetail: function () {
+                var id_list = [];
+                $('#shopAccountList tbody tr>td:first-child input:checkbox').each(function () {
+                    if (this.checked) {
+                        id_list.push($(this).val());
+                    }
+                });
+
+                if (id_list.length != 1) {
+                    $.msg.alert("请选择一行数据！");
+                    return;
+                }
+
+                var shop_id = id_list[0];
+
+                showMask("加载中...");
+                $("#eBayAPIConfigDetailForm").clearValidation();
+                $.ajax({
+                        url: '{%url "ErpEBayAPIConfig.DetailData" %}',
+                        type: "POST",
+                        data: {
+                            "shop_id": shop_id
+                        },
+                        success: function (result) {
+                            hideMask();
+                            if (result.success == false) {
+                                $.msg.error(result.message);
+                                return;
+                            }
+                            vm.config_detail = result;
+                            $('#eBayAPIConfigDetailDialog').modal(modalOptions);
+                        }
+                    }
+                );
+            },
+            saveEBayAPIConfig: function () {
+                showMask("提交中...");
+                var form = $("#eBayAPIConfigDetailForm");
+                var valid = validate(form, {
+                    'config_detail.api_config.shop_id': {
+                        required: true
+                    },
+                    'config_detail.api_config.app_id': {
+                        required: true
+                    },
+                    'config_detail.api_config.cert_id': {
+                        required: true
+                    },
+                    'config_detail.api_config.dev_id': {
+                        required: true
+                    },
+                    'config_detail.api_config.token': {
+                        required: true
+                    }
+                });
+
+                if (!valid) {
+                    hideMask();
+                } else {
+                    $.ajax({
+                            url: '{%url "ErpEBayAPIConfig.Save"%}',
+                            type: "POST",
+                            processData: false,
+                            contentType: 'application/json',
+                            data: JSON.stringify(vm.config_detail),
+                            success: function (data) {
+                                hideMask();
+                                if (data.success == false) {
+                                    $.msg.error(data.message);
+                                    //return;
+                                }
+                                else {
+                                    $.msg.show(data.message);
+                                    $('#eBayAPIConfigDetailDialog').modal('hide');
+                                    vm.reloadList();
+                                    //return;
+                                }
+                            }
+                        }
+                    );
+                }
+            },
+            deleteEBayAPIConfig: function () {
+                var id = vm.config_detail.api_config.id;
+                $.msg.confirm("确认要删除该店铺的API配置吗？", function () {
+                    $.ajax({
+                        url: '{%url "ErpEBayAPIConfig.Delete"%}',
+                        type: "POST",
+                        data: {"id": id},
+                        success: function (data) {
+                            if (data.success == false) {
+                                $.msg.error(data.message);
+                                //return;
+                            }
+                            else {
+                                $.msg.show(data.message);
+                                $('#eBayAPIConfigDetailDialog').modal('hide');
+                                //return;
+                            }
                         }
                     });
                 });
