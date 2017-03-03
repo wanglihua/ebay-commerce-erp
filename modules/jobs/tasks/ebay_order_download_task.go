@@ -123,14 +123,15 @@ func (t EBayOrderDownloadTask) Run() {
 			for _, order_download := range order_list {
 				order_code := order_download.OrderID
 
-				revel.TRACE.Println("begin fetch single order")
 				var order_in_db models.OrderInfo
 				has, err := db_session.Where("code = ?", order_code).Get(&order_in_db)
 				if err != nil {
 					revel.ERROR.Println(err)
 				}
-				revel.TRACE.Println("end fetch single order")
 
+				order_in_db.ShopId = config.ShopId
+
+				// 状态？
 				revel.TRACE.Println("OrderStatus: ", order_download.OrderStatus)
 
 				order_in_db.TypeId = models.ORDER_TYPE_XZDD
@@ -206,6 +207,30 @@ func (t EBayOrderDownloadTask) Run() {
 					revel.ERROR.Println(err)
 				}
 				update_col_list = append(update_col_list, "amount_saved")
+
+				//Total
+				order_in_db.TotalAmountCurrency = order_download.Total.Currency
+				update_col_list = append(update_col_list, "total_amount_currency")
+
+				order_in_db.TotalAmount, err = strconv.ParseFloat(order_download.Total.Value, 64)
+				if err != nil {
+					revel.ERROR.Println(err)
+				}
+				update_col_list = append(update_col_list, "total_amount")
+
+				//SubTotal
+				order_in_db.SubTotalAmountCurrency = order_download.Subtotal.Currency
+				update_col_list = append(update_col_list, "subtotal_amount_currency")
+
+				order_in_db.SubTotalAmount, err = strconv.ParseFloat(order_download.Subtotal.Value, 64)
+				if err != nil {
+					revel.ERROR.Println(err)
+				}
+				update_col_list = append(update_col_list, "subtotal_amount")
+
+				order_in_db.PaymentMethods = order_download.PaymentMethods
+				order_in_db.SellerEmail = order_download.SellerEmail
+				order_in_db.SellerUserId = order_download.SellerUserID
 
 				if has == true {
 					// update order

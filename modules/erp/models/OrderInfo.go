@@ -6,6 +6,7 @@ import (
 
 type OrderInfo struct {
 	Id                       int64               `xorm:"bigint notnull pk autoincr 'id'" json:"id"`
+	ShopId                   int64               `xorm:"bigint notnull index 'shop_id'" json:"shop_id" smith:"verbose_name=店铺"`
 	Code                     string              `xorm:"nvarchar(200) notnull index unique 'code'" json:"code" smith:"verbose_name=编码"`
 	Desc                     core.NullString     `xorm:"nvarchar(500) 'desc'" json:"desc" smith:"verbose_name=备注"`
 	TypeId                   int64               `xorm:"bigint notnull index 'type_id'" json:"type_id" smith:"verbose_name=类型"`
@@ -17,6 +18,13 @@ type OrderInfo struct {
 	AmountPaid               float64             `xorm:"decimal(18,6) notnull 'amount_paid'" json:"amount_paid" smith:"verbose_name=支付金额"`
 	AmountSavedCurrency      string              `xorm:"nvarchar(10) notnull 'amount_saved_currency'" json:"amount_saved_currency" smith:"verbose_name=节省金额货种"`
 	AmountSaved              float64             `xorm:"decimal(18,6) notnull 'amount_saved'" json:"amount_saved" smith:"verbose_name=节省金额"`
+	TotalAmountCurrency      string              `xorm:"nvarchar(10) notnull 'total_amount_currency'" json:"total_amount_currency" smith:"verbose_name=总计金额币种"`
+	TotalAmount              float64             `xorm:"decimal(18,6) notnull 'total_amount'" json:"total_amount" smith:"verbose_name=总计金额"`
+	SubTotalAmountCurrency   string              `xorm:"nvarchar(10) notnull 'subtotal_amount_currency'" json:"subtotal_amount_currency" smith:"verbose_name=小计金额币种"`
+	SubTotalAmount           float64             `xorm:"decimal(18,6) notnull 'subtotal_amount'" json:"subtotal_amount" smith:"verbose_name=小计金额"`
+	PaymentMethods           string              `xorm:"nvarchar(50) notnull 'payment_methods'" json:"payment_methods" smith:"verbose_name=支付方式"`
+	SellerEmail              string              `xorm:"nvarchar(200) notnull 'seller_email'" json:"seller_email" smith:"verbose_name=卖家邮件"`
+	SellerUserId             string              `xorm:"nvarchar(50) notnull 'seller_user_id'" json:"seller_user_id" smith:"verbose_name=卖家用户id"`
 	CreatedTime              core.NullLongTime   `xorm:"datetime 'created_time'" json:"created_time" smith:"verbose_name=创建时间"`
 	ModifiedTime             core.NullLongTime   `xorm:"datetime 'modified_time'" json:"modified_time" smith:"verbose_name=修改时间"`
 	PaidTime                 core.NullLongTime   `xorm:"datetime 'paid_time'" json:"paid_time" smith:"verbose_name=支付时间"`
@@ -34,3 +42,9 @@ func (e OrderInfo) TableName() string {
 func (e OrderInfo) ModelDesc() string {
 	return "verbose_name=订单,entity_json=order,route=order"
 }
+
+/*
+	order.PaymentMethods:  PayPal
+	order.SellerEmail:  support@ozoestore.com.au
+	order.SellerUserID:  ozmart.living
+ */
