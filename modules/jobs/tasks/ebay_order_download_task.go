@@ -263,11 +263,45 @@ func (t EBayOrderDownloadTask) Run() {
 				order_in_db.BuyerCheckoutMessage = order_download.BuyerCheckoutMessage
 
 				// 订单状态，这部分逻辑还可以继续探讨
+
+				// 订单状态 设置 开始
 				order_status := order_download.OrderStatus
 				order_in_db.EBayStatus = order_status
+				order_status_id := order_in_db.StatusId
 
-				//Completed
-				order_in_db.StatusId = models.ORDER_STATUS_YZF
+				/*
+				// 订单状态 已创建
+				ORDER_STATUS_YCJ = 3850
+				// 订单状态 已支付
+				ORDER_STATUS_YZF = 3900
+				// 订单状态 待配货
+				ORDER_STATUS_DPH = 4000
+				// 订单状态 配货中
+				ORDER_STATUS_PHZ = 4100
+				// 订单状态 已发货
+				ORDER_STATUS_YFH = 4200
+				// 订单状态 已完成
+				ORDER_STATUS_YWC = 4300
+				*/
+
+				// 如果是新的订单，一般是新增的订单，系统数据库中还没有的订单
+				if order_status_id < models.ORDER_STATUS_YCJ && order_in_db.PaidTime.Valid == false { //前面小于号的判断要不要加呢
+					order_in_db.StatusId = models.ORDER_STATUS_YCJ
+				}
+
+				// 有可能是新增的订单（最有可能），或者是原来 已创建 的状态过来的。这时支付时间不为空
+				if order_status_id < models.ORDER_STATUS_YZF && order_in_db.PaidTime.Valid == true {
+					order_in_db.StatusId = models.ORDER_STATUS_YZF
+				}
+
+				//如果订单处于 待配货 配货中 一般状态不会被修改，除非系统中没有操作，直接在网店里面操作了
+
+				// 如果 下载订单里面的 OrderStatus 是 Completed， 且订单的发货时间不为空，订单状态就为 已完成
+				if strings.ToLower(order_status) == strings.ToLower("Completed") && order_in_db.ShippedTime.Valid == true {
+					order_in_db.StatusId = models.ORDER_STATUS_YWC
+				}
+
+				//订单状态 设置 结束
 
 				if has_order == true {
 					// update order
