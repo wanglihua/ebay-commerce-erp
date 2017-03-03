@@ -18,18 +18,35 @@ type NullDate struct {
 }
 
 func (t *NullDate) Scan(value interface{}) error {
-	var err error
-	switch x := value.(type) {
+	switch s := value.(type) {
 	case time.Time:
+		t.Time = s
+		t.Valid = true
+		return nil
+	case string:
+		x, err := time.Parse("2006-01-02 15:04:05", s)
+		if err != nil {
+			return err
+		}
 		t.Time = x
+		t.Valid = true
+		return nil
+	case []uint8:
+		x, err := time.Parse("2006-01-02 15:04:05", string(s))
+		if err != nil {
+			return err
+		}
+		t.Time = x
+		t.Valid = true
+		return nil
 	case nil:
 		t.Valid = false
 		return nil
 	default:
-		err = fmt.Errorf("null: cannot scan type %T into NullDate: %v", value, value)
+		return fmt.Errorf("null: cannot scan type %T into NullLongTime: %v", value, value)
 	}
-	t.Valid = err == nil
-	return err
+
+	return nil
 }
 
 func (t NullDate) Value() (driver.Value, error) {
@@ -136,18 +153,35 @@ type NullTime struct {
 }
 
 func (t *NullTime) Scan(value interface{}) error {
-	var err error
-	switch x := value.(type) {
+	switch s := value.(type) {
 	case time.Time:
+		t.Time = s
+		t.Valid = true
+		return nil
+	case string:
+		x, err := time.Parse("2006-01-02 15:04:05", s)
+		if err != nil {
+			return err
+		}
 		t.Time = x
+		t.Valid = true
+		return nil
+	case []uint8:
+		x, err := time.Parse("2006-01-02 15:04:05", string(s))
+		if err != nil {
+			return err
+		}
+		t.Time = x
+		t.Valid = true
+		return nil
 	case nil:
 		t.Valid = false
 		return nil
 	default:
-		err = fmt.Errorf("null: cannot scan type %T into NullTime: %v", value, value)
+		return fmt.Errorf("null: cannot scan type %T into NullLongTime: %v", value, value)
 	}
-	t.Valid = err == nil
-	return err
+
+	return nil
 }
 
 func (t NullTime) Value() (driver.Value, error) {
@@ -254,18 +288,35 @@ type NullLongTime struct {
 }
 
 func (t *NullLongTime) Scan(value interface{}) error {
-	var err error
-	switch x := value.(type) {
+	switch s := value.(type) {
 	case time.Time:
+		t.Time = s
+		t.Valid = true
+		return nil
+	case string:
+		x, err := time.Parse("2006-01-02 15:04:05", s)
+		if err != nil {
+			return err
+		}
 		t.Time = x
+		t.Valid = true
+		return nil
+	case []uint8:
+		x, err := time.Parse("2006-01-02 15:04:05", string(s))
+		if err != nil {
+			return err
+		}
+		t.Time = x
+		t.Valid = true
+		return nil
 	case nil:
 		t.Valid = false
 		return nil
 	default:
-		err = fmt.Errorf("null: cannot scan type %T into NullLongTime: %v", value, value)
+		return fmt.Errorf("null: cannot scan type %T into NullLongTime: %v", value, value)
 	}
-	t.Valid = err == nil
-	return err
+
+	return nil
 }
 
 func (t NullLongTime) Value() (driver.Value, error) {

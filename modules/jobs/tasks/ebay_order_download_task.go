@@ -105,7 +105,11 @@ func (t EBayOrderDownloadTask) Run() {
 	}()
 
 	ebay_api_config_list := make([]models.EBayAPIConfigInfo, 0)
-	err = db_session.Find(&ebay_api_config_list)
+
+	/*
+	SELECT cfg.* FROM erp_ebay_api_config cfg INNER JOIN erp_shop_account sa ON cfg.shop_id = sa.id
+	*/
+	err = db_session.Sql("SELECT cfg.* FROM erp_ebay_api_config cfg INNER JOIN erp_shop_account sa ON cfg.shop_id = sa.id").Find(&ebay_api_config_list)
 	core.HandleError(err)
 
 	for _, config := range ebay_api_config_list {
@@ -119,11 +123,13 @@ func (t EBayOrderDownloadTask) Run() {
 			for _, order_download := range order_list {
 				order_code := order_download.OrderID
 
+				revel.TRACE.Println("begin fetch single order")
 				var order_in_db models.OrderInfo
 				has, err := db_session.Where("code = ?", order_code).Get(&order_in_db)
 				if err != nil {
 					revel.ERROR.Println(err)
 				}
+				revel.TRACE.Println("end fetch single order")
 
 				revel.TRACE.Println("OrderStatus: ", order_download.OrderStatus)
 
