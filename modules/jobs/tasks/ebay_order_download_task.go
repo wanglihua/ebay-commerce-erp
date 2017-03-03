@@ -13,6 +13,7 @@ import (
 	"matrix/core"
 	"os"
 	"strconv"
+	"strings"
 )
 
 /*
@@ -124,12 +125,39 @@ func (t EBayOrderDownloadTask) Run() {
 				order_code := order_download.OrderID
 
 				var order_in_db models.OrderInfo
-				has, err := db_session.Where("code = ?", order_code).Get(&order_in_db)
+				has_order, err := db_session.Where("code = ?", order_code).Get(&order_in_db)
 				if err != nil {
 					revel.ERROR.Println(err)
 				}
 
+				order_in_db.Code = order_code
 				order_in_db.ShopId = config.ShopId
+
+				var shop models.ShopAccountInfo
+				_, err = db_session.Id(config.ShopId).Get(&shop)
+				if err != nil {
+					revel.ERROR.Println(err)
+				}
+
+				// 老鼠仓的判断
+				// 如果是通过PayPal支付的，而且店铺设置里面也设置了PayPal列表的
+				if strings.ToLower(order_download.PaymentMethods) == strings.ToLower("PayPal") && shop.PaypalAccount != "" {
+					shop_paypal_email_list := strings.Split(shop.PaypalAccount, ",")
+
+					seller_email := order_download.SellerEmail //是用SellerEmail来判断老鼠仓吗？
+
+					seller_email_in_list := false
+					for _, shop_paypal_email := range shop_paypal_email_list {
+						if strings.ToLower(seller_email) == strings.ToLower(shop_paypal_email) {
+							seller_email_in_list = true
+						}
+					}
+
+					// 设置的账户里面和卖家账户匹配的，就设置成为Hold订单
+					if seller_email_in_list == false {
+						order_in_db.HoldTypeId = core.NewNullInt(models.ORDER_HOLD_TYPE_SELLER_PAYPAL_MISMATCH, true)
+					}
+				}
 
 				// 状态？
 				revel.TRACE.Println("OrderStatus: ", order_download.OrderStatus)
@@ -232,7 +260,7 @@ func (t EBayOrderDownloadTask) Run() {
 				order_in_db.SellerEmail = order_download.SellerEmail
 				order_in_db.SellerUserId = order_download.SellerUserID
 
-				if has == true {
+				if has_order == true {
 					// update order
 					_, err = db_session.Id(order_in_db.Id).Cols(update_col_list...).Update(&order_in_db)
 					if err != nil {

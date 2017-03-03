@@ -23,7 +23,7 @@ func (e OrderHoldTypeInfo) ModelDesc() string {
 }
 
 const (
-	ORDER_HOLD_TYPE_SELLER_PAYPAL_MISMATCH = 10000
+	ORDER_HOLD_TYPE_SELLER_PAYPAL_MISMATCH int64 = 10000
 )
 
 func (e OrderHoldTypeInfo) InitData(db_session *xorm.Session) {
