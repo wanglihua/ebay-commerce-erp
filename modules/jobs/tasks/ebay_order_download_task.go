@@ -341,6 +341,9 @@ func (t EBayOrderDownloadTask) Run() {
 }
 
 func (t EBayOrderDownloadTask) fetch_orders(config models.EBayAPIConfigInfo, page_number int) ebay.GetOrdersRequestResponse {
+
+	number_of_days := 1
+
 	req_body := `<?xml version="1.0" encoding="utf-8"?>
 <GetOrdersRequest xmlns="urn:ebay:apis:eBLBaseComponents">
 	<RequesterCredentials>
@@ -348,7 +351,7 @@ func (t EBayOrderDownloadTask) fetch_orders(config models.EBayAPIConfigInfo, pag
 	</RequesterCredentials>
 	<ErrorLanguage>zh_CN</ErrorLanguage>
 	<WarningLevel>High</WarningLevel>
-	<NumberOfDays>1</NumberOfDays>
+	<NumberOfDays>%d</NumberOfDays>
 	<OrderRole>Seller</OrderRole>
 	<OrderStatus>All</OrderStatus>
 	<Pagination>
@@ -357,14 +360,14 @@ func (t EBayOrderDownloadTask) fetch_orders(config models.EBayAPIConfigInfo, pag
 	</Pagination>
 </GetOrdersRequest>
 `
-	req_body = fmt.Sprintf(req_body, config.Token, page_number)
+	req_body = fmt.Sprintf(req_body, config.Token, number_of_days, page_number)
 
 	req := goreq.Request{
 		Method:      "POST",
 		Uri:         config.GetEndPoint(),
 		Body:        req_body,
 		ContentType: "application/xml; charset=utf-8",
-		ShowDebug:   false,
+		ShowDebug:   revel.DevMode,
 	}
 
 	req.AddHeader("X-EBAY-API-CALL-NAME", "GetOrders")
@@ -387,8 +390,9 @@ func (t EBayOrderDownloadTask) fetch_orders(config models.EBayAPIConfigInfo, pag
 
 	data, err := ioutil.ReadAll(res.Body)
 
-	//revel.TRACE.Println(string(data))
-	t.force_write_to_file(fmt.Sprintf(`z:\test_order_response\%s.xml`, time.Now().Format("20060102150405")), string(data))
+	if revel.DevMode {
+		t.force_write_to_file(fmt.Sprintf(`z:\test_order_response\%s.xml`, time.Now().Format("20060102150405")), string(data))
+	}
 
 	if err != nil {
 		revel.ERROR.Println("eBay GetOrders ERROR - ioutil.ReadAll : " + err.Error())

@@ -1,16 +1,17 @@
 package tasks
 
 import (
-	"github.com/revel/revel"
-	"github.com/mithereal/go-ebay"
 	"encoding/xml"
-	"github.com/franela/goreq"
-	"io/ioutil"
 	"fmt"
+	"io/ioutil"
 	"time"
+
+	"github.com/franela/goreq"
 	"github.com/go-xorm/xorm"
-	"matrix/modules/erp/models"
+	"github.com/mithereal/go-ebay"
+	"github.com/revel/revel"
 	"matrix/core"
+	"matrix/modules/erp/models"
 )
 
 /*
@@ -109,27 +110,36 @@ func (t EBayMessageDownloadTask) Run() {
 	err = db_session.Sql("SELECT cfg.* FROM erp_ebay_api_config cfg INNER JOIN erp_shop_account sa ON cfg.shop_id = sa.id").Find(&ebay_api_config_list)
 	core.HandleError(err)
 
+	for _, config := range ebay_api_config_list {
+		has_more_orders := true
+		page_number := 1
+		for has_more_orders == true {
 
-	config := GetEBayConfig()
+			response := t.fetch_messages(config, page_number)
 
-	response := t.fetch_messages(config)
+			switch response.Ack {
+			case "Success":
+				revel.TRACE.Printf("eBay GetMemberMessages Response: " + response.Ack + "\n")
+				revel.TRACE.Printf("eBay GetMemberMessages Response HasMoreItems: %t", response.HasMoreItems)
+			case "Failure":
+				revel.ERROR.Printf("eBay GetMemberMessages Response: " + response.Ack + "\n")
+			default:
+				revel.ERROR.Printf("eBay GetMemberMessages Response: " + response.Ack + "\n")
+			}
 
-	switch response.Ack {
-	case "Success":
-		revel.TRACE.Printf("eBay GetMemberMessages Response: " + response.Ack + "\n")
-		revel.TRACE.Printf("eBay GetMemberMessages Response HasMoreItems: %t", response.HasMoreItems)
-	case "Failure":
-		revel.ERROR.Printf("eBay GetMemberMessages Response: " + response.Ack + "\n")
-	default:
-		revel.ERROR.Printf("eBay GetMemberMessages Response: " + response.Ack + "\n")
-	}
+			has_more_orders = response.HasMoreItems
+			page_number += 1
+		} // for has_more_orders == true
+	} //for _, config := range ebay_api_config_list
 
 	job_duration := time.Since(job_time_begin)
 
 	revel.TRACE.Println("sync message time duration: ", job_duration.Seconds(), "seconds")
 }
 
-func (t EBayMessageDownloadTask) fetch_messages(config ebay.Config) ebay.GetMemberMessagesRequestResponse {
+func (t EBayMessageDownloadTask) fetch_messages(config models.EBayAPIConfigInfo, page_number int) ebay.GetMemberMessagesRequestResponse {
+	/*
+
 	req_body := `<?xml version="1.0" encoding="utf-8"?>
 <GetMemberMessagesRequest xmlns="urn:ebay:apis:eBLBaseComponents">
 	<RequesterCredentials>
@@ -143,31 +153,53 @@ func (t EBayMessageDownloadTask) fetch_messages(config ebay.Config) ebay.GetMemb
 	<EndCreationTime>%s</EndCreationTime>
 	<Pagination>
 		<EntriesPerPage>5</EntriesPerPage>
-		<PageNumber>1</PageNumber>
+		<PageNumber>%d</PageNumber>
 	</Pagination>
 </GetMemberMessagesRequest>
 `
+	req_body = fmt.Sprintf(req_body, config.Token, "2017-01-01T00:00:00", "2017-01-31T23:59:59", page_number)
+	*/
 
-	req_body = fmt.Sprintf(req_body, config.Token, "2017-01-01T00:00:00", "2017-01-31T23:59:59")
+	number_of_days := 1
+
+	req_body := `<?xml version="1.0" encoding="utf-8"?>
+<GetMemberMessagesRequest xmlns="urn:ebay:apis:eBLBaseComponents">
+	<RequesterCredentials>
+		<eBayAuthToken>%s</eBayAuthToken>
+	</RequesterCredentials>
+	<ErrorLanguage>zh_CN</ErrorLanguage>
+	<WarningLevel>High</WarningLevel>
+	<MailMessageType>All</MailMessageType>
+	<StartCreationTime>%s</StartCreationTime>
+	<EndCreationTime>%s</EndCreationTime>
+	<Pagination>
+		<EntriesPerPage>200</EntriesPerPage>
+		<PageNumber>%d</PageNumber>
+	</Pagination>
+</GetMemberMessagesRequest>
+`
+	time_range_end := time.Now().UTC()
+	time_range_begin := time_range_end.Add(- time.Duration(number_of_days) * 24 * time.Hour)
+
+	req_body = fmt.Sprintf(req_body, config.Token, time_range_begin.Format("2006-01-02T15:04:05"), time_range_end.Format("2006-01-02T15:04:05"), page_number)
 
 	req := goreq.Request{
 		Method:      "POST",
-		Uri:         config.EndPoint,
+		Uri:         config.GetEndPoint(),
 		Body:        req_body,
 		ContentType: "application/xml; charset=utf-8",
-		//UserAgent:   "go-ebay-fetch-orders",
-		ShowDebug: false,
+		ShowDebug:   revel.DevMode,
 	}
 
 	req.AddHeader("X-EBAY-API-CALL-NAME", "GetMemberMessages")
-	req.AddHeader("X-EBAY-API-DEV-NAME", config.DevID)
-	req.AddHeader("X-EBAY-API-CERT-NAME", config.CertID)
-	req.AddHeader("X-EBAY-API-APP-NAME", config.AppID)
+	req.AddHeader("X-EBAY-API-DEV-NAME", config.DevId)
+	req.AddHeader("X-EBAY-API-CERT-NAME", config.CertId)
+	req.AddHeader("X-EBAY-API-APP-NAME", config.AppId)
 	req.AddHeader("X-EBAY-API-VERSION", ebay.Version)
 	req.AddHeader("X-EBAY-API-COMPATIBILITY-LEVEL", ebay.Version)
 	req.AddHeader("X-EBAY-API-REQUEST-ENCODING", "XML")
 	req.AddHeader("X-EBAY-API-RESPONSE-ENCODING", "XML")
-	req.AddHeader("X-EBAY-API-SITEID", config.SiteId)
+	req.AddHeader("X-EBAY-API-SITEID", config.GetSiteId())
 	req.AddHeader("Accept", "application/xml,application/xhtml+xml")
 
 	res, err := req.Do()
@@ -175,7 +207,7 @@ func (t EBayMessageDownloadTask) fetch_messages(config ebay.Config) ebay.GetMemb
 	var response ebay.GetMemberMessagesRequestResponse
 
 	if err != nil {
-		revel.ERROR.Println("ERROR - processUrl -> req.Do: " + err.Error())
+		revel.ERROR.Println("eBay GetMemberMessages ERROR - processUrl -> req.Do: " + err.Error())
 		return response
 	}
 
