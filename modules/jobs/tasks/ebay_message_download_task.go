@@ -7,6 +7,10 @@ import (
 	"github.com/franela/goreq"
 	"io/ioutil"
 	"fmt"
+	"time"
+	"github.com/go-xorm/xorm"
+	"matrix/modules/erp/models"
+	"matrix/core"
 )
 
 /*
@@ -63,9 +67,49 @@ response body:
  */
 
 type EBayMessageDownloadTask struct {
+	db_driver string //mysql
+	db_url    string //root:root@tcp(localhost:3306)/iot?charset=utf8
 }
 
 func (t EBayMessageDownloadTask) Run() {
+	job_time_begin := time.Now()
+
+	// get db driver and db url
+
+	if t.db_driver == "" {
+		t.db_driver, _ = revel.Config.String("db.driver")
+	}
+
+	if t.db_url == "" {
+		t.db_url, _ = revel.Config.String("db.url")
+	}
+
+	db_engine, err := xorm.NewEngine(t.db_driver, t.db_url)
+	if err != nil {
+		revel.ERROR.Println(err)
+		return
+	}
+
+	db_engine.TZLocation = time.Local
+	db_engine.SetMaxIdleConns(3)
+	db_engine.SetMaxOpenConns(100)
+
+	db_session := db_engine.NewSession()
+	db_session = db_session.NoAutoCondition(true)
+
+	defer func() {
+		db_session.Close()
+	}()
+
+	ebay_api_config_list := make([]models.EBayAPIConfigInfo, 0)
+
+	/*
+	SELECT cfg.* FROM erp_ebay_api_config cfg INNER JOIN erp_shop_account sa ON cfg.shop_id = sa.id
+	*/
+	err = db_session.Sql("SELECT cfg.* FROM erp_ebay_api_config cfg INNER JOIN erp_shop_account sa ON cfg.shop_id = sa.id").Find(&ebay_api_config_list)
+	core.HandleError(err)
+
+
 	config := GetEBayConfig()
 
 	response := t.fetch_messages(config)
@@ -79,6 +123,10 @@ func (t EBayMessageDownloadTask) Run() {
 	default:
 		revel.ERROR.Printf("eBay GetMemberMessages Response: " + response.Ack + "\n")
 	}
+
+	job_duration := time.Since(job_time_begin)
+
+	revel.TRACE.Println("sync message time duration: ", job_duration.Seconds(), "seconds")
 }
 
 func (t EBayMessageDownloadTask) fetch_messages(config ebay.Config) ebay.GetMemberMessagesRequestResponse {
