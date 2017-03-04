@@ -195,8 +195,8 @@ func (t EBayMessageDownloadTask) fetch_messages(config models.EBayAPIConfigInfo,
 	req.AddHeader("X-EBAY-API-DEV-NAME", config.DevId)
 	req.AddHeader("X-EBAY-API-CERT-NAME", config.CertId)
 	req.AddHeader("X-EBAY-API-APP-NAME", config.AppId)
-	req.AddHeader("X-EBAY-API-VERSION", ebay.Version)
-	req.AddHeader("X-EBAY-API-COMPATIBILITY-LEVEL", ebay.Version)
+	req.AddHeader("X-EBAY-API-VERSION", config.GetApiVersion())
+	req.AddHeader("X-EBAY-API-COMPATIBILITY-LEVEL", config.GetApiVersion())
 	req.AddHeader("X-EBAY-API-REQUEST-ENCODING", "XML")
 	req.AddHeader("X-EBAY-API-RESPONSE-ENCODING", "XML")
 	req.AddHeader("X-EBAY-API-SITEID", config.GetSiteId())
@@ -213,10 +213,12 @@ func (t EBayMessageDownloadTask) fetch_messages(config models.EBayAPIConfigInfo,
 
 	data, err := ioutil.ReadAll(res.Body)
 
-	revel.TRACE.Println(string(data))
+	if revel.DevMode {
+		core.Force_write_to_file(fmt.Sprintf(`z:\test_message_response\%s.xml`, time.Now().Format("20060102150405")), string(data))
+	}
 
 	if err != nil {
-		revel.ERROR.Println("ERROR - ioutil.ReadAll : " + err.Error())
+		revel.ERROR.Println("eBay GetMemberMessages ERROR - ioutil.ReadAll : " + err.Error())
 		return response
 	}
 
@@ -225,7 +227,7 @@ func (t EBayMessageDownloadTask) fetch_messages(config models.EBayAPIConfigInfo,
 	e := response.Errors
 
 	if e.ShortMessage != "" {
-		revel.ERROR.Println("ERROR - " + e.ErrorCode + " : " + e.LongMessage)
+		revel.ERROR.Println("eBay GetMemberMessages ERROR - " + e.ErrorCode + " : " + e.LongMessage)
 		return response
 	}
 

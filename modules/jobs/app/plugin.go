@@ -32,7 +32,7 @@ func init() {
 			jobs.Schedule("cron.ebay_download_message", tasks.EBayMessageDownloadTask{})
 		}
 
-		//jobs.Now(tasks.EBayMessageDownloadTask{}) // just for test
+		jobs.Now(tasks.EBayMessageDownloadTask{}) // just for test
 
 		_, found = revel.Config.String("cron.paypal_download")
 		if found {

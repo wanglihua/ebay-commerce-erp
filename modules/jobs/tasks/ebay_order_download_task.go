@@ -4,7 +4,6 @@ import (
 	"encoding/xml"
 	"fmt"
 	"io/ioutil"
-	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -395,7 +394,7 @@ func (t EBayOrderDownloadTask) fetch_orders(config models.EBayAPIConfigInfo, pag
 	data, err := ioutil.ReadAll(res.Body)
 
 	if revel.DevMode {
-		t.force_write_to_file(fmt.Sprintf(`z:\test_order_response\%s.xml`, time.Now().Format("20060102150405")), string(data))
+		core.Force_write_to_file(fmt.Sprintf(`z:\test_order_response\%s.xml`, time.Now().Format("20060102150405")), string(data))
 	}
 
 	if err != nil {
@@ -414,36 +413,4 @@ func (t EBayOrderDownloadTask) fetch_orders(config models.EBayAPIConfigInfo, pag
 	}
 
 	return response
-}
-
-func (t EBayOrderDownloadTask) force_write_to_file(file_name string, content string) {
-
-	is_file_exist := func(file_name string) bool {
-		var exist = true
-		if _, err := os.Stat(file_name); os.IsNotExist(err) {
-			exist = false
-		}
-		return exist
-	}
-
-	if is_file_exist(file_name) {
-		err := os.Remove(file_name)
-		core.HandleError(err)
-	}
-
-	var file *os.File
-	var err error
-
-	file, err = os.Create(file_name) //创建文件
-	if err != nil {
-		revel.ERROR.Println(err)
-	}
-
-	_, err = file.WriteString(content)
-	if err != nil {
-		revel.ERROR.Println(err)
-	}
-
-	file.Sync()
-	file.Close()
 }
