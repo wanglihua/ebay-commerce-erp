@@ -222,7 +222,10 @@ func (t EBayMessageDownloadTask) fetch_messages(config models.EBayAPIConfigInfo,
 		return response
 	}
 
-	xml.Unmarshal(data, &response)
+	err = xml.Unmarshal(data, &response)
+	if err != nil {
+		revel.ERROR.Println(err)
+	}
 
 	e := response.Errors
 

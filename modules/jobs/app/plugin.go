@@ -1,10 +1,11 @@
 package app
 
 import (
+	"time"
+
 	"github.com/revel/revel"
 	"matrix/modules/jobs/app/jobs"
 	"matrix/modules/jobs/tasks"
-	"time"
 )
 
 func init() {
@@ -25,14 +26,14 @@ func init() {
 			jobs.Schedule("cron.ebay_download_order", tasks.EBayOrderDownloadTask{})
 		}
 
-		//jobs.Now(tasks.EBayOrderDownloadTask{}) // just for test
+		// jobs.Now(tasks.EBayOrderDownloadTask{}) // just for test
 
 		_, found = revel.Config.String("cron.ebay_download_message")
 		if found {
 			jobs.Schedule("cron.ebay_download_message", tasks.EBayMessageDownloadTask{})
 		}
 
-		jobs.Now(tasks.EBayMessageDownloadTask{}) // just for test
+		// jobs.Now(tasks.EBayMessageDownloadTask{}) // just for test
 
 		_, found = revel.Config.String("cron.paypal_download")
 		if found {

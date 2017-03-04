@@ -403,7 +403,10 @@ func (t EBayOrderDownloadTask) fetch_orders(config models.EBayAPIConfigInfo, pag
 	}
 
 	response := ebay.GetOrdersRequestResponse{}
-	xml.Unmarshal(data, &response)
+	err = xml.Unmarshal(data, &response)
+	if err != nil {
+		revel.ERROR.Println(err)
+	}
 
 	e := response.Errors
 
