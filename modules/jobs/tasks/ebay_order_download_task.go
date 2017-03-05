@@ -110,7 +110,9 @@ func (t EBayOrderDownloadTask) Run() {
 	SELECT cfg.* FROM erp_ebay_api_config cfg INNER JOIN erp_shop_account sa ON cfg.shop_id = sa.id
 	*/
 	err = db_session.Sql("SELECT cfg.* FROM erp_ebay_api_config cfg INNER JOIN erp_shop_account sa ON cfg.shop_id = sa.id").Find(&ebay_api_config_list)
-	core.HandleError(err)
+	if err != nil {
+		revel.ERROR.Println(err)
+	}
 
 	for _, config := range ebay_api_config_list {
 		has_more_orders := true
@@ -303,6 +305,43 @@ func (t EBayOrderDownloadTask) Run() {
 						revel.ERROR.Println(err)
 					}
 				}
+
+				order_id := order_in_db.Id
+
+				//新增或更新送货地址
+				var order_shipping_address models.OrderShippingAddressInfo
+				has_order_shipping_address, err := db_session.Where("order_id = ?", order_id).Get(&order_shipping_address)
+
+				//设置每个字段的值，存在的每个字段都要设置，不能漏，否则更新和新增的时候会出问题
+				order_shipping_address.OrderId = order_id
+				order_shipping_address.Name = order_download.ShippingAddress.Name
+				order_shipping_address.Street1 = order_download.ShippingAddress.Street1
+				order_shipping_address.Street2 = order_download.ShippingAddress.Street2
+				order_shipping_address.CityName = order_download.ShippingAddress.CityName
+				order_shipping_address.Province = order_download.ShippingAddress.StateOrProvince
+				order_shipping_address.Country = order_download.ShippingAddress.Country
+				order_shipping_address.CountryName = order_download.ShippingAddress.CountryName
+				order_shipping_address.PostalCode = order_download.ShippingAddress.PostalCode
+				order_shipping_address.AddressId = order_download.ShippingAddress.AddressID
+				order_shipping_address.AddressOwner = order_download.ShippingAddress.AddressOwner
+				order_shipping_address.ExternalAddressId = order_download.ShippingAddress.ExternalAddressID
+
+				if has_order_shipping_address == true {
+					// do update
+					_, err = db_session.Id(order_shipping_address.Id).Update(&order_shipping_address)
+					if err != nil {
+						revel.ERROR.Println(err)
+					}
+				} else {
+					// do insert
+					_, err = db_session.Insert(&order_shipping_address)
+					if err != nil {
+						revel.ERROR.Println(err)
+					}
+				}
+
+				// Order Item
+
 			} // for _, order_download := range order_list
 
 			switch response.Ack {
