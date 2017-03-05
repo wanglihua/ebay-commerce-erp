@@ -7,6 +7,8 @@ import (
 	"reflect"
 	"strings"
 	"time"
+
+	"github.com/revel/revel"
 )
 
 // NullDate
@@ -43,7 +45,8 @@ func (t *NullDate) Scan(value interface{}) error {
 		t.Valid = false
 		return nil
 	default:
-		return fmt.Errorf("null: cannot scan type %T into NullLongTime: %v", value, value)
+		revel.ERROR.Printf("null: cannot scan type %T into NullLongTime: %v\n", value, value)
+		return fmt.Errorf("null: cannot scan type %T into NullLongTime: %v\n", value, value)
 	}
 
 	return nil
@@ -97,7 +100,8 @@ func (t *NullDate) UnmarshalJSON(data []byte) error {
 		ti, tiOK := x["Time"].(string)
 		valid, validOK := x["Valid"].(bool)
 		if !tiOK || !validOK {
-			return fmt.Errorf(`json: unmarshalling object into Go value of type NullDate requires key "Time" to be of type string and key "Valid" to be of type bool; found %T and %T, respectively`, x["Time"], x["Valid"])
+			revel.ERROR.Printf(`json: unmarshalling object into Go value of type NullDate requires key "Time" to be of type string and key "Valid" to be of type bool; found %T and %T, respectively\n`, x["Time"], x["Valid"])
+			return fmt.Errorf(`json: unmarshalling object into Go value of type NullDate requires key "Time" to be of type string and key "Valid" to be of type bool; found %T and %T, respectively\n`, x["Time"], x["Valid"])
 		}
 		err = t.Time.UnmarshalText([]byte(ti))
 		t.Valid = valid
@@ -106,7 +110,8 @@ func (t *NullDate) UnmarshalJSON(data []byte) error {
 		t.Valid = false
 		return nil
 	default:
-		err = fmt.Errorf("json: cannot unmarshal %v into Go value of type null.Time", reflect.TypeOf(v).Name())
+		revel.ERROR.Printf("json: cannot unmarshal %v into Go value of type null.Time\n", reflect.TypeOf(v).Name())
+		err = fmt.Errorf("json: cannot unmarshal %v into Go value of type null.Time\n", reflect.TypeOf(v).Name())
 	}
 	t.Valid = err == nil
 	return err
@@ -178,7 +183,8 @@ func (t *NullTime) Scan(value interface{}) error {
 		t.Valid = false
 		return nil
 	default:
-		return fmt.Errorf("null: cannot scan type %T into NullLongTime: %v", value, value)
+		revel.ERROR.Printf("null: cannot scan type %T into NullLongTime: %v\n", value, value)
+		return fmt.Errorf("null: cannot scan type %T into NullLongTime: %v\n", value, value)
 	}
 
 	return nil
@@ -232,7 +238,8 @@ func (t *NullTime) UnmarshalJSON(data []byte) error {
 		ti, tiOK := x["Time"].(string)
 		valid, validOK := x["Valid"].(bool)
 		if !tiOK || !validOK {
-			return fmt.Errorf(`json: unmarshalling object into Go value of type NullTime requires key "Time" to be of type string and key "Valid" to be of type bool; found %T and %T, respectively`, x["Time"], x["Valid"])
+			revel.ERROR.Printf(`json: unmarshalling object into Go value of type NullTime requires key "Time" to be of type string and key "Valid" to be of type bool; found %T and %T, respectively\n`, x["Time"], x["Valid"])
+			return fmt.Errorf(`json: unmarshalling object into Go value of type NullTime requires key "Time" to be of type string and key "Valid" to be of type bool; found %T and %T, respectively\n`, x["Time"], x["Valid"])
 		}
 		err = t.Time.UnmarshalText([]byte(ti))
 		t.Valid = valid
@@ -241,7 +248,8 @@ func (t *NullTime) UnmarshalJSON(data []byte) error {
 		t.Valid = false
 		return nil
 	default:
-		err = fmt.Errorf("json: cannot unmarshal %v into Go value of type null.Time", reflect.TypeOf(v).Name())
+		revel.ERROR.Printf("json: cannot unmarshal %v into Go value of type null.Time\n", reflect.TypeOf(v).Name())
+		err = fmt.Errorf("json: cannot unmarshal %v into Go value of type null.Time\n", reflect.TypeOf(v).Name())
 	}
 	t.Valid = err == nil
 	return err
@@ -313,7 +321,8 @@ func (t *NullLongTime) Scan(value interface{}) error {
 		t.Valid = false
 		return nil
 	default:
-		return fmt.Errorf("null: cannot scan type %T into NullLongTime: %v", value, value)
+		revel.ERROR.Printf("null: cannot scan type %T into NullLongTime: %v\n", value, value)
+		return fmt.Errorf("null: cannot scan type %T into NullLongTime: %v\n", value, value)
 	}
 
 	return nil
@@ -367,7 +376,8 @@ func (t *NullLongTime) UnmarshalJSON(data []byte) error {
 		ti, tiOK := x["Time"].(string)
 		valid, validOK := x["Valid"].(bool)
 		if !tiOK || !validOK {
-			return fmt.Errorf(`json: unmarshalling object into Go value of type NullLongTime requires key "Time" to be of type string and key "Valid" to be of type bool; found %T and %T, respectively`, x["Time"], x["Valid"])
+			revel.ERROR.Printf(`json: unmarshalling object into Go value of type NullLongTime requires key "Time" to be of type string and key "Valid" to be of type bool; found %T and %T, respectively\n`, x["Time"], x["Valid"])
+			return fmt.Errorf(`json: unmarshalling object into Go value of type NullLongTime requires key "Time" to be of type string and key "Valid" to be of type bool; found %T and %T, respectively\n`, x["Time"], x["Valid"])
 		}
 		err = t.Time.UnmarshalText([]byte(ti))
 		t.Valid = valid
@@ -376,7 +386,8 @@ func (t *NullLongTime) UnmarshalJSON(data []byte) error {
 		t.Valid = false
 		return nil
 	default:
-		err = fmt.Errorf("json: cannot unmarshal %v into Go value of type null.Time", reflect.TypeOf(v).Name())
+		revel.ERROR.Printf("json: cannot unmarshal %v into Go value of type null.Time\n", reflect.TypeOf(v).Name())
+		err = fmt.Errorf("json: cannot unmarshal %v into Go value of type null.Time\n", reflect.TypeOf(v).Name())
 	}
 	t.Valid = err == nil
 	return err
