@@ -4,7 +4,6 @@ import (
 	"encoding/xml"
 	"fmt"
 	"io/ioutil"
-	"strconv"
 	"strings"
 	"time"
 
@@ -216,46 +215,29 @@ func (t EBayOrderDownloadTask) Run() {
 
 				order_in_db.AdjustmentAmountCurrency = order_download.AdjustmentAmount.Currency
 				update_col_list = append(update_col_list, "adjustment_amount_currency")
-				order_in_db.AdjustmentAmount, err = strconv.ParseFloat(order_download.AdjustmentAmount.Value, 64)
-				if err != nil {
-					revel.ERROR.Println(err)
-				}
+				order_in_db.AdjustmentAmount = order_download.AdjustmentAmount.Value
 				update_col_list = append(update_col_list, "adjustment_amount")
 
 				order_in_db.AmountPaidCurrency = order_download.AmountPaid.Currency
 				update_col_list = append(update_col_list, "amount_paid_currency")
-				order_in_db.AmountPaid, err = strconv.ParseFloat(order_download.AmountPaid.Value, 64)
-				if err != nil {
-					revel.ERROR.Println(err)
-				}
+				order_in_db.AmountPaid = order_download.AmountPaid.Value
 				update_col_list = append(update_col_list, "amount_paid")
 
 				order_in_db.AmountSavedCurrency = order_download.AmountSaved.Currency
 				update_col_list = append(update_col_list, "amount_saved_currency")
-				order_in_db.AmountSaved, err = strconv.ParseFloat(order_download.AmountSaved.Value, 64)
-				if err != nil {
-					revel.ERROR.Println(err)
-				}
+				order_in_db.AmountSaved = order_download.AmountSaved.Value
 				update_col_list = append(update_col_list, "amount_saved")
 
 				//Total
 				order_in_db.TotalAmountCurrency = order_download.Total.Currency
 				update_col_list = append(update_col_list, "total_amount_currency")
-
-				order_in_db.TotalAmount, err = strconv.ParseFloat(order_download.Total.Value, 64)
-				if err != nil {
-					revel.ERROR.Println(err)
-				}
+				order_in_db.TotalAmount = order_download.Total.Value
 				update_col_list = append(update_col_list, "total_amount")
 
 				//SubTotal
 				order_in_db.SubTotalAmountCurrency = order_download.Subtotal.Currency
 				update_col_list = append(update_col_list, "subtotal_amount_currency")
-
-				order_in_db.SubTotalAmount, err = strconv.ParseFloat(order_download.Subtotal.Value, 64)
-				if err != nil {
-					revel.ERROR.Println(err)
-				}
+				order_in_db.SubTotalAmount = order_download.Subtotal.Value
 				update_col_list = append(update_col_list, "subtotal_amount")
 
 				order_in_db.PaymentMethods = order_download.PaymentMethods
@@ -417,7 +399,6 @@ func (t EBayOrderDownloadTask) fetch_orders(config models.EBayAPIConfigInfo, pag
 
 	return response
 }
-
 
 /*
 
