@@ -417,3 +417,27 @@ func (t EBayOrderDownloadTask) fetch_orders(config models.EBayAPIConfigInfo, pag
 
 	return response
 }
+
+
+/*
+
+<ShippingAddress>
+	<Name>Som Chanthasenh</Name>
+	<Street1>23 Graziers Way</Street1>
+	<Street2/>
+	<CityName>Carnes Hill</CityName>
+	<StateOrProvince>New South Wales</StateOrProvince>
+	<Country>AU</Country>
+	<CountryName>Australia</CountryName>
+	<Phone>04 19292611</Phone>
+	<PostalCode>2171</PostalCode>
+	<AddressID>1255435139019</AddressID>
+	<AddressOwner>eBay</AddressOwner>
+	<ExternalAddressID/>
+</ShippingAddress>
+<ShippingServiceSelected>
+	<ShippingService>AU_Regular</ShippingService>
+	<ShippingServiceCost currencyID="AUD">0.0</ShippingServiceCost>
+</ShippingServiceSelected>
+
+ */
