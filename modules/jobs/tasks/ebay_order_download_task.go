@@ -494,7 +494,8 @@ func (t EBayOrderDownloadTask) fetch_orders(config models.EBayAPIConfigInfo, pag
 	}
 
 	if revel.DevMode {
-		core.Force_write_to_file(fmt.Sprintf(`z:\test_order_response\%s.xml`, time.Now().Format("20060102150405")), string(data))
+		//core.Force_write_to_file(fmt.Sprintf(`z:\test_order_response\%s.xml`, time.Now().Format("20060102150405")), string(data))
+		core.Force_write_to_file(fmt.Sprintf(`/home/wanglihua/ebay_sync/test_order_response/%s.xml`, time.Now().Format("20060102150405")), string(data))
 	}
 
 	response := ebay.GetOrdersResponse{}

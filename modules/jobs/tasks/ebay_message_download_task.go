@@ -214,7 +214,8 @@ func (t EBayMessageDownloadTask) fetch_messages(config models.EBayAPIConfigInfo,
 	data, err := ioutil.ReadAll(res.Body)
 
 	if revel.DevMode {
-		core.Force_write_to_file(fmt.Sprintf(`z:\test_message_response\%s.xml`, time.Now().Format("20060102150405")), string(data))
+		//core.Force_write_to_file(fmt.Sprintf(`z:\test_message_response\%s.xml`, time.Now().Format("20060102150405")), string(data))
+		core.Force_write_to_file(fmt.Sprintf(`/home/wanglihua/ebay_sync/test_message_response/%s.xml`, time.Now().Format("20060102150405")), string(data))
 	}
 
 	if err != nil {
