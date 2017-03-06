@@ -4,7 +4,7 @@ import (
 	"encoding/xml"
 )
 
-type GetOrdersRequestResponse struct {
+type GetOrdersResponse struct {
 	Xmlns                    string                 `xml:"xmlns,attr"`
 	Timestamp                string                 `xml:"Timestamp"`
 	Ack                      string                 `xml:"Ack"`

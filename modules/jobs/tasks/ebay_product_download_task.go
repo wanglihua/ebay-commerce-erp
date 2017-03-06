@@ -102,7 +102,7 @@ func (t EBayProductDownloadTask) Run() {
 		page_number := 1
 		for has_more_orders == true {
 
-			response := t.fetch_products(config, page_number)
+			response := t.fetch_product_list(config, page_number)
 
 			switch response.Ack {
 			case "Success":
@@ -124,7 +124,7 @@ func (t EBayProductDownloadTask) Run() {
 	revel.TRACE.Println("sync message time duration: ", job_duration.Seconds(), "seconds")
 }
 
-func (t EBayProductDownloadTask) fetch_products(config models.EBayAPIConfigInfo, page_number int) ebay.GetMemberMessagesRequestResponse {
+func (t EBayProductDownloadTask) fetch_product_list(config models.EBayAPIConfigInfo, page_number int) ebay.GetMemberMessagesResponse {
 
 	number_of_days := 120 - 1
 
@@ -169,7 +169,7 @@ func (t EBayProductDownloadTask) fetch_products(config models.EBayAPIConfigInfo,
 
 	res, err := req.Do()
 
-	var response ebay.GetMemberMessagesRequestResponse
+	var response ebay.GetMemberMessagesResponse
 
 	if err != nil {
 		revel.ERROR.Println("eBay GetSellerList ERROR - processUrl -> req.Do: " + err.Error())
@@ -200,4 +200,8 @@ func (t EBayProductDownloadTask) fetch_products(config models.EBayAPIConfigInfo,
 	}
 
 	return response
+}
+
+func (t EBayProductDownloadTask) fetch_product_item(config models.EBayAPIConfigInfo, page_number int) *models.ProductInfo {
+	return nil
 }

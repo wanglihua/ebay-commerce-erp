@@ -4,7 +4,7 @@ import (
 	"encoding/xml"
 )
 
-type GetMemberMessagesRequestResponse struct {
+type GetMemberMessagesResponse struct {
 	Xmlns                 string                            `xml:"xmlns,attr"`
 	Timestamp             string
 	Ack                   string

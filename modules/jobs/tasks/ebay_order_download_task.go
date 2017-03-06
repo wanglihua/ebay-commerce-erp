@@ -438,7 +438,7 @@ func (t EBayOrderDownloadTask) Run() {
 	revel.TRACE.Println("sync order time duration: ", job_duration.Seconds(), "seconds")
 }
 
-func (t EBayOrderDownloadTask) fetch_orders(config models.EBayAPIConfigInfo, page_number int) ebay.GetOrdersRequestResponse {
+func (t EBayOrderDownloadTask) fetch_orders(config models.EBayAPIConfigInfo, page_number int) ebay.GetOrdersResponse {
 
 	number_of_days := 1
 
@@ -483,21 +483,21 @@ func (t EBayOrderDownloadTask) fetch_orders(config models.EBayAPIConfigInfo, pag
 
 	if err != nil {
 		revel.ERROR.Println("eBay GetOrders ERROR - processUrl -> req.Do: " + err.Error())
-		return ebay.GetOrdersRequestResponse{}
+		return ebay.GetOrdersResponse{}
 	}
 
 	data, err := ioutil.ReadAll(res.Body)
 
 	if err != nil {
 		revel.ERROR.Println("eBay GetOrders ERROR - ioutil.ReadAll : " + err.Error())
-		return ebay.GetOrdersRequestResponse{}
+		return ebay.GetOrdersResponse{}
 	}
 
 	if revel.DevMode {
 		core.Force_write_to_file(fmt.Sprintf(`z:\test_order_response\%s.xml`, time.Now().Format("20060102150405")), string(data))
 	}
 
-	response := ebay.GetOrdersRequestResponse{}
+	response := ebay.GetOrdersResponse{}
 	err = xml.Unmarshal(data, &response)
 	if err != nil {
 		revel.ERROR.Println(err)
@@ -507,7 +507,7 @@ func (t EBayOrderDownloadTask) fetch_orders(config models.EBayAPIConfigInfo, pag
 
 	if e.ShortMessage != "" {
 		revel.ERROR.Println("eBay GetOrders ERROR - " + e.ErrorCode + " : " + e.LongMessage)
-		return ebay.GetOrdersRequestResponse{}
+		return ebay.GetOrdersResponse{}
 	}
 
 	return response

@@ -137,7 +137,7 @@ func (t EBayMessageDownloadTask) Run() {
 	revel.TRACE.Println("sync message time duration: ", job_duration.Seconds(), "seconds")
 }
 
-func (t EBayMessageDownloadTask) fetch_messages(config models.EBayAPIConfigInfo, page_number int) ebay.GetMemberMessagesRequestResponse {
+func (t EBayMessageDownloadTask) fetch_messages(config models.EBayAPIConfigInfo, page_number int) ebay.GetMemberMessagesResponse {
 	/*
 
 	req_body := `<?xml version="1.0" encoding="utf-8"?>
@@ -204,7 +204,7 @@ func (t EBayMessageDownloadTask) fetch_messages(config models.EBayAPIConfigInfo,
 
 	res, err := req.Do()
 
-	var response ebay.GetMemberMessagesRequestResponse
+	var response ebay.GetMemberMessagesResponse
 
 	if err != nil {
 		revel.ERROR.Println("eBay GetMemberMessages ERROR - processUrl -> req.Do: " + err.Error())
