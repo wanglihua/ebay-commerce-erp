@@ -9,9 +9,9 @@ import (
 
 	"github.com/franela/goreq"
 	"github.com/go-xorm/xorm"
-	"github.com/mithereal/go-ebay"
 	"github.com/revel/revel"
 	"matrix/core"
+	"matrix/ebay"
 	"matrix/modules/erp/models"
 )
 
@@ -308,7 +308,79 @@ func (t EBayOrderDownloadTask) Run() {
 
 				order_id := order_in_db.Id
 
-				//
+				//订单明细信息
+				/*
+					Id                       int64           `xorm:"bigint notnull pk autoincr 'id'" json:"id"`
+					OrderId                  int64           `xorm:"bigint notnull index 'order_id'" json:"order_id"`
+					OrderLineItemId          string          `xorm:"nvarchar(200) notnull 'order_line_item_id'" json:"order_line_item_id"`
+					Quantity                 int             `xorm:"int notnull 'quantity'" json:"quantity"`
+					TransactionId            string          `xorm:"nvarchar(200) notnull 'transaction_id'" json:"transaction_id"`
+					TransactionPriceCurrency string          `xorm:"nvarchar(50) notnull 'transaction_price_currency'" json:"transaction_price_currency"`
+					TransactionPrice         float64         `xorm:"decimal(18,6) notnull 'transaction_price'" json:"transaction_price"`
+					ItemId                   string          `xorm:"nvarchar(200) notnull 'item_id'" json:"item_id"`
+					ItemProductId            int64           `xorm:"bigint notnull index 'item_product_id'" json:"item_product_id"`
+					ItemSku                  string          `xorm:"nvarchar(100) notnull index 'item_sku'" json:"item_sku"`
+					ItemTitle                string          `xorm:"nvarchar(200) notnull 'item_title'" json:"item_title"`
+					ItemConditionId          string          `xorm:"nvarchar(50) notnull 'item_condition_id'" json:"item_condition_id"`
+					ItemConditionDisplayName string          `xorm:"nvarchar(100) notnull 'item_condition_display_name'" json:"item_condition_display_name"`
+					CreatedDate              core.LongTime   `xorm:"datetime notnull 'created_date'" json:"created_date"`
+					Desc                     core.NullString `xorm:"nvarchar(500) 'desc'" json:"desc" smith:"verbose_name=备注"`
+				 */
+
+				for _, transaction := range order_download.TransactionArray.Transactions {
+					// 获取并检查明细是否存在，根据 order_id 和 item_sku
+					var order_item models.OrderItemInfo
+					item_sku := transaction.Item.SKU
+					has_order_item, err := db_session.Where(fmt.Sprintf("order_id = %d and item_sku = '%s'", order_id, item_sku)).Get(&order_item)
+					if err != nil {
+						revel.ERROR.Println(err)
+					}
+
+					// 设置明细字段
+					order_item.OrderId = order_id
+					order_item.OrderLineItemId = transaction.OrderLineItemID
+					order_item.Quantity = transaction.QuantityPurchased
+					order_item.TransactionId = transaction.TransactionID
+					order_item.TransactionPriceCurrency = transaction.TransactionPrice.Currency
+					order_item.TransactionPrice = transaction.TransactionPrice.Value
+					order_item.ItemId = transaction.Item.ItemID
+
+					//order_item.ItemProductId 如果这时产品不存在会怎样，下载产品
+					var product_id struct {
+						ProductId int64 `xorm:"'product_id'"`
+					}
+					_, err = db_session.Sql(fmt.Sprintf("SELECT p.id AS product_id FROM erp_product p WHERE p.sku = '%s'", transaction.Item.SKU)).Get(&product_id)
+					if err != nil {
+						revel.ERROR.Println(err)
+					}
+
+					order_item.ItemSku = transaction.Item.SKU
+					order_item.ItemTitle = transaction.Item.Title
+					order_item.ItemConditionId = transaction.Item.ConditionID
+					order_item.ItemConditionDisplayName = transaction.Item.ConditionDisplayName
+
+					transaction_created_date, err := time.Parse("2006-01-02T15:04:05.000Z", transaction.CreatedDate)
+					if err != nil {
+						revel.ERROR.Println(err)
+					}
+					transaction_created_date = transaction_created_date.Local()
+					order_item.CreatedDate = core.LongTime(transaction_created_date)
+
+					// 新增或更新明细
+					if has_order_item == false {
+						//新增
+						_, err = db_session.Insert(&order_item)
+						if err != nil {
+							revel.ERROR.Println(err)
+						}
+					} else {
+						//更新
+						_, err = db_session.Id(order_item.Id).Update(&order_item)
+						if err != nil {
+							revel.ERROR.Println(err)
+						}
+					}
+				}
 
 				//新增或更新送货地址
 				var order_shipping_address models.OrderShippingAddressInfo

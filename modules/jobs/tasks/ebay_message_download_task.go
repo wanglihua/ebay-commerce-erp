@@ -8,9 +8,9 @@ import (
 
 	"github.com/franela/goreq"
 	"github.com/go-xorm/xorm"
-	"github.com/mithereal/go-ebay"
 	"github.com/revel/revel"
 	"matrix/core"
+	"matrix/ebay"
 	"matrix/modules/erp/models"
 )
 

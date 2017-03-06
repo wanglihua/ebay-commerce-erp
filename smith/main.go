@@ -2,12 +2,12 @@ package main
 
 import (
 	"fmt"
+	"os"
+
 	"matrix/core"
 	"matrix/modules/erp/models"
-	//"matrix/modules/auth/models"
 	smith_core "matrix/smith/core"
 	"matrix/smith/core/template"
-	"os"
 )
 
 //var output_base_dir = "/home/wanglihua/gopath/src/matrix"
@@ -19,7 +19,8 @@ var module_lower_case = models.ModuleLowerCase
 var module_chinese = models.ModuleChinese
 var table_prefix = models.TablePrefix
 var model_list = []interface{}{
-	models.EBayAPIConfigInfo{},
+	models.OrderInfo{},
+	models.OrderItemInfo{},
 }
 
 /*

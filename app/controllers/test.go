@@ -2,8 +2,8 @@ package controllers
 
 import (
 	"github.com/revel/revel"
-	"matrix/modules/auth/models"
 	"matrix/core"
+	"matrix/modules/auth/models"
 )
 
 type Test struct {
