@@ -6,7 +6,7 @@ import (
 
 type OrderItemInfo struct {
 	Id                       int64           `xorm:"bigint notnull pk autoincr 'id'" json:"id"`
-	OrderId                  int64           `xorm:"bigint notnull index 'order_id'" json:"order_id" smith:"verbose_name=订单"`
+	OrderId                  int64           `xorm:"bigint notnull index 'order_id'" json:"order_id"`
 	OrderLineItemId          string          `xorm:"nvarchar(200) notnull 'order_line_item_id'" json:"order_line_item_id"`
 	Quantity                 int             `xorm:"int notnull 'quantity'" json:"quantity"`
 	TransactionId            string          `xorm:"nvarchar(200) notnull 'transaction_id'" json:"transaction_id"`
