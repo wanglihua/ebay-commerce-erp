@@ -488,13 +488,13 @@ func (t EBayOrderDownloadTask) fetch_orders(config models.EBayAPIConfigInfo, pag
 
 	data, err := ioutil.ReadAll(res.Body)
 
-	if revel.DevMode {
-		core.Force_write_to_file(fmt.Sprintf(`z:\test_order_response\%s.xml`, time.Now().Format("20060102150405")), string(data))
-	}
-
 	if err != nil {
 		revel.ERROR.Println("eBay GetOrders ERROR - ioutil.ReadAll : " + err.Error())
 		return ebay.GetOrdersRequestResponse{}
+	}
+
+	if revel.DevMode {
+		core.Force_write_to_file(fmt.Sprintf(`z:\test_order_response\%s.xml`, time.Now().Format("20060102150405")), string(data))
 	}
 
 	response := ebay.GetOrdersRequestResponse{}

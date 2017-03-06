@@ -16,7 +16,7 @@ import (
 
 /*
 get member messages document:
-http://developer.ebay.com/Devzone/XML/docs/Reference/eBay/GetMemberMessages.html
+http://developer.ebay.com/Devzone/XML/docs/Reference/eBay/GetSellerList.html#GetSellerList
 
 test tools:
 http://developer.ebay.com/DevZone/build-test/test-tool/?index=0&api=trading&call=GetMemberMessages&variation=xml#
@@ -34,58 +34,22 @@ X-EBAY-API-SITEID:0
 Accept:application/xml,application/xhtml+xml
 
 request body:
+
 <?xml version="1.0" encoding="utf-8"?>
-<GetMemberMessagesRequest xmlns="urn:ebay:apis:eBLBaseComponents">
+<GetSellerListRequest xmlns="urn:ebay:apis:eBLBaseComponents">
 	<RequesterCredentials>
 		<eBayAuthToken>AgAAAA**AQAAAA**aAAAAA**uVWPWA**nY+sHZ2PrBmdj6wVnY+sEZ2PrA2dj6wFk4GiD5aDpAydj6x9nY+seQ**pRMEAA**AAMAAA**VrbSv0o7iGoYiFvprWmTAsvp1TYnEDq74jjQOsqLWlwk5eS1y2Uyrq9aYWuWdWvRuM7/L0nUP1IFac3aBTY2aanmI+37H8fN0mUrSY7gFIwEdGx1pneZFwweLzc3l0yZcV1m22tWrSqRMQ6g+A31y8vxtjGHkSZkbeMJQJhMHLo5gMOjo2veZNacluDlzL2hKrs+Z7iIPuqxqwYEz2hDGe36BeXdBY5sDUvbZBdRVV4ws4Ta5L5Bal5tJO8tH/8WO0fXu5OKlw/BIGpgtbQc8Xe5MmhotfbznjfnIgrzxoSbsky6HZqpQ7AQh3UBZ/T7i2H5BdD9Rr3sMeXas6x7E8V0xsDqfQL1N8qAfKCOhDVP8Vxg/AOxP3dVMQaqaX0gBRp8CTnMIlYvHJKzW9URZ5vipjAJ+Fcx/IW5sHdiJFGHawHlfi0yPS3cYecLcPBUAKYqr1fBYqEZAQGsqId/PMVue8hwbl/gzaLus3WAOUPME4hFXMu2n9ADkYturlMa2TYRyHufNJmziHHUUb68bALZpTMhwH6QuG4ILSIluVDz9YcM7GuRGtQzBDhbTRdim6WGcjO7dkogo665c8QqSBIW2kT1+TTT24gXs8dUkv6Zea3Ihiko/bgh6mm2vCJ+LtMNqk+/vFHhL4nMhToDGX+0fFxu2U43aq3FJGo5GEYbn6MowwY/JzRHFKDkN2wzVKo7DJ2c1+faulxDGyVGhOMeEmfdZgL3iEd24JPm0mcvT1xA/UXpDYyCdhRb6I7+</eBayAuthToken>
 	</RequesterCredentials>
 	<ErrorLanguage>zh_CN</ErrorLanguage>
 	<WarningLevel>High</WarningLevel>
-	<MailMessageType>All</MailMessageType>
-	<MessageStatus>Unanswered</MessageStatus>
-	<StartCreationTime>2017-01-01T00:00:00</StartCreationTime>
-	<EndCreationTime>2017-01-31T23:59:59</EndCreationTime>
+	<StartTimeFrom>dateTime</StartTimeFrom>
+	<StartTimeTo>dateTime</StartTimeTo>
+	<EndTimeFrom>dateTime</EndTimeFrom>
+	<EndTimeTo>dateTime</EndTimeTo>
 	<Pagination>
-		<EntriesPerPage>5</EntriesPerPage>
+		<EntriesPerPage>200</EntriesPerPage>
 		<PageNumber>1</PageNumber>
 	</Pagination>
-</GetMemberMessagesRequest>
-
-<?xml version="1.0" encoding="utf-8"?>
-<GetSellerListRequest xmlns="urn:ebay:apis:eBLBaseComponents">
-  <!-- Call-specific Input Fields -->
-  <AdminEndedItemsOnly> boolean </AdminEndedItemsOnly>
-  <CategoryID> int </CategoryID>
-  <EndTimeFrom> dateTime </EndTimeFrom>
-  <EndTimeTo> dateTime </EndTimeTo>
-  <GranularityLevel> GranularityLevelCodeType </GranularityLevel>
-  <IncludeVariations> boolean </IncludeVariations>
-  <IncludeWatchCount> boolean </IncludeWatchCount>
-  <MotorsDealerUsers> UserIDArrayType
-    <UserID> UserIDType (string) </UserID>
-    <!-- ... more UserID values allowed here ... -->
-  </MotorsDealerUsers>
-  <Pagination> PaginationType
-    <EntriesPerPage> int </EntriesPerPage>
-    <PageNumber> int </PageNumber>
-  </Pagination>
-  <SKUArray> SKUArrayType
-    <SKU> SKUType (string) </SKU>
-    <!-- ... more SKU values allowed here ... -->
-  </SKUArray>
-  <Sort> int </Sort>
-  <StartTimeFrom> dateTime </StartTimeFrom>
-  <StartTimeTo> dateTime </StartTimeTo>
-  <UserID> UserIDType (string) </UserID>
-  <!-- Standard Input Fields -->
-  <DetailLevel> DetailLevelCodeType </DetailLevel>
-  <!-- ... more DetailLevel values allowed here ... -->
-  <ErrorLanguage> string </ErrorLanguage>
-  <MessageID> string </MessageID>
-  <OutputSelector> string </OutputSelector>
-  <!-- ... more OutputSelector values allowed here ... -->
-  <Version> string </Version>
-  <WarningLevel> WarningLevelCodeType </WarningLevel>
 </GetSellerListRequest>
 
  */
@@ -138,16 +102,16 @@ func (t EBayProductDownloadTask) Run() {
 		page_number := 1
 		for has_more_orders == true {
 
-			response := t.fetch_productss(config, page_number)
+			response := t.fetch_products(config, page_number)
 
 			switch response.Ack {
 			case "Success":
-				revel.TRACE.Printf("eBay GetMemberMessages Response: " + response.Ack + "\n")
-				revel.TRACE.Printf("eBay GetMemberMessages Response HasMoreItems: %t", response.HasMoreItems)
+				revel.TRACE.Printf("eBay GetSellerList Response: " + response.Ack + "\n")
+				revel.TRACE.Printf("eBay GetSellerList Response HasMoreItems: %t", response.HasMoreItems)
 			case "Failure":
-				revel.ERROR.Printf("eBay GetMemberMessages Response: " + response.Ack + "\n")
+				revel.ERROR.Printf("eBay GetSellerList Response: " + response.Ack + "\n")
 			default:
-				revel.ERROR.Printf("eBay GetMemberMessages Response: " + response.Ack + "\n")
+				revel.ERROR.Printf("eBay GetSellerList Response: " + response.Ack + "\n")
 			}
 
 			has_more_orders = response.HasMoreItems
@@ -160,47 +124,25 @@ func (t EBayProductDownloadTask) Run() {
 	revel.TRACE.Println("sync message time duration: ", job_duration.Seconds(), "seconds")
 }
 
-func (t EBayProductDownloadTask) fetch_productss(config models.EBayAPIConfigInfo, page_number int) ebay.GetMemberMessagesRequestResponse {
-	/*
+func (t EBayProductDownloadTask) fetch_products(config models.EBayAPIConfigInfo, page_number int) ebay.GetMemberMessagesRequestResponse {
+
+	number_of_days := 120 - 1
 
 	req_body := `<?xml version="1.0" encoding="utf-8"?>
-<GetMemberMessagesRequest xmlns="urn:ebay:apis:eBLBaseComponents">
+<GetSellerListRequest xmlns="urn:ebay:apis:eBLBaseComponents">
 	<RequesterCredentials>
 		<eBayAuthToken>%s</eBayAuthToken>
 	</RequesterCredentials>
 	<ErrorLanguage>zh_CN</ErrorLanguage>
 	<WarningLevel>High</WarningLevel>
-	<MailMessageType>All</MailMessageType>
-	<MessageStatus>Answered</MessageStatus>
-	<StartCreationTime>%s</StartCreationTime>
-	<EndCreationTime>%s</EndCreationTime>
-	<Pagination>
-		<EntriesPerPage>5</EntriesPerPage>
-		<PageNumber>%d</PageNumber>
-	</Pagination>
-</GetMemberMessagesRequest>
-`
-	req_body = fmt.Sprintf(req_body, config.Token, "2017-01-01T00:00:00", "2017-01-31T23:59:59", page_number)
-	*/
-
-	number_of_days := 1
-
-	req_body := `<?xml version="1.0" encoding="utf-8"?>
-<GetMemberMessagesRequest xmlns="urn:ebay:apis:eBLBaseComponents">
-	<RequesterCredentials>
-		<eBayAuthToken>%s</eBayAuthToken>
-	</RequesterCredentials>
-	<ErrorLanguage>zh_CN</ErrorLanguage>
-	<WarningLevel>High</WarningLevel>
-	<MailMessageType>All</MailMessageType>
-	<StartCreationTime>%s</StartCreationTime>
-	<EndCreationTime>%s</EndCreationTime>
+	<StartTimeFrom>%s</StartTimeFrom>
+	<StartTimeTo>%s</StartTimeTo>
 	<Pagination>
 		<EntriesPerPage>200</EntriesPerPage>
 		<PageNumber>%d</PageNumber>
 	</Pagination>
-</GetMemberMessagesRequest>
-`
+</GetSellerListRequest>`
+
 	time_range_end := time.Now().UTC()
 	time_range_begin := time_range_end.Add(- time.Duration(number_of_days) * 24 * time.Hour)
 
@@ -214,7 +156,7 @@ func (t EBayProductDownloadTask) fetch_productss(config models.EBayAPIConfigInfo
 		ShowDebug:   revel.DevMode,
 	}
 
-	req.AddHeader("X-EBAY-API-CALL-NAME", "GetMemberMessages")
+	req.AddHeader("X-EBAY-API-CALL-NAME", "GetSellerList")
 	req.AddHeader("X-EBAY-API-DEV-NAME", config.DevId)
 	req.AddHeader("X-EBAY-API-CERT-NAME", config.CertId)
 	req.AddHeader("X-EBAY-API-APP-NAME", config.AppId)
@@ -230,19 +172,19 @@ func (t EBayProductDownloadTask) fetch_productss(config models.EBayAPIConfigInfo
 	var response ebay.GetMemberMessagesRequestResponse
 
 	if err != nil {
-		revel.ERROR.Println("eBay GetMemberMessages ERROR - processUrl -> req.Do: " + err.Error())
+		revel.ERROR.Println("eBay GetSellerList ERROR - processUrl -> req.Do: " + err.Error())
 		return response
 	}
 
 	data, err := ioutil.ReadAll(res.Body)
 
-	if revel.DevMode {
-		core.Force_write_to_file(fmt.Sprintf(`z:\test_message_response\%s.xml`, time.Now().Format("20060102150405")), string(data))
+	if err != nil {
+		revel.ERROR.Println("eBay GetSellerList ERROR - ioutil.ReadAll : " + err.Error())
+		return response
 	}
 
-	if err != nil {
-		revel.ERROR.Println("eBay GetMemberMessages ERROR - ioutil.ReadAll : " + err.Error())
-		return response
+	if revel.DevMode {
+		core.Force_write_to_file(fmt.Sprintf(`z:\test_product_response\%s.xml`, time.Now().Format("20060102150405")), string(data))
 	}
 
 	err = xml.Unmarshal(data, &response)
@@ -253,7 +195,7 @@ func (t EBayProductDownloadTask) fetch_productss(config models.EBayAPIConfigInfo
 	e := response.Errors
 
 	if e.ShortMessage != "" {
-		revel.ERROR.Println("eBay GetMemberMessages ERROR - " + e.ErrorCode + " : " + e.LongMessage)
+		revel.ERROR.Println("eBay GetSellerList ERROR - " + e.ErrorCode + " : " + e.LongMessage)
 		return response
 	}
 
