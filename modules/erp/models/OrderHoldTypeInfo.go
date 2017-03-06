@@ -32,6 +32,5 @@ func (e OrderHoldTypeInfo) InitData(db_session *xorm.Session) {
 	order_hold_type.Name = "卖家paypal不匹配"
 	order_hold_type.Desc = core.NewNullString("店铺配置的paypal账号和订单中卖家的paypal账号不匹配", true)
 
-	_, err := db_session.Insert(order_hold_type)
-	core.HandleError(err)
+	db_session.Insert(order_hold_type)
 }

@@ -308,6 +308,8 @@ func (t EBayOrderDownloadTask) Run() {
 
 				order_id := order_in_db.Id
 
+				//
+
 				//新增或更新送货地址
 				var order_shipping_address models.OrderShippingAddressInfo
 				has_order_shipping_address, err := db_session.Where("order_id = ?", order_id).Get(&order_shipping_address)

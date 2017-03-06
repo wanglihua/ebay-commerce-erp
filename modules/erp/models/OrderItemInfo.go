@@ -14,7 +14,7 @@ type OrderItemInfo struct {
 	TransactionPrice         float64         `xorm:"decimal(18,6) notnull 'transaction_price'" json:"transaction_price"`
 	ItemId                   string          `xorm:"nvarchar(200) notnull 'item_id'" json:"item_id"`
 	ItemProductId            int64           `xorm:"bigint notnull index 'item_product_id'" json:"item_product_id"`
-	ItemSku                  string          `xorm:"nvarchar(100) notnull 'item_sku'" json:"item_sku"`
+	ItemSku                  string          `xorm:"nvarchar(100) notnull index 'item_sku'" json:"item_sku"`
 	ItemTitle                string          `xorm:"nvarchar(200) notnull 'item_title'" json:"item_title"`
 	ItemConditionId          string          `xorm:"nvarchar(50) notnull 'item_condition_id'" json:"item_condition_id"`
 	ItemConditionDisplayName string          `xorm:"nvarchar(100) notnull 'item_condition_display_name'" json:"item_condition_display_name"`

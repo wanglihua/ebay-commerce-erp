@@ -35,19 +35,23 @@ func (e OrderTypeInfo) InitData(db_session *xorm.Session) {
 	order_type.Id = ORDER_TYPE_SGCJ
 	order_type.Name = "手工创建"
 	order_type.Desc = core.NewNullString("订单类型 手工创建", true)
+	db_session.Insert(order_type)
 
 	order_type = new(OrderTypeInfo)
 	order_type.Id = ORDER_TYPE_XZDD
 	order_type.Name = "下载订单"
 	order_type.Desc = core.NewNullString("订单类型 下载订单", true)
+	db_session.Insert(order_type)
 
 	order_type = new(OrderTypeInfo)
 	order_type.Id = ORDER_TYPE_CFDD
 	order_type.Name = "拆分订单"
 	order_type.Desc = core.NewNullString("订单类型 拆分订单", true)
+	db_session.Insert(order_type)
 
 	order_type = new(OrderTypeInfo)
 	order_type.Id = ORDER_TYPE_HBDD
 	order_type.Name = "合并订单"
 	order_type.Desc = core.NewNullString("订单类型 合并订单", true)
+	db_session.Insert(order_type)
 }
