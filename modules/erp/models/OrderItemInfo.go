@@ -7,18 +7,18 @@ import (
 type OrderItemInfo struct {
 	Id                       int64           `xorm:"bigint notnull pk autoincr 'id'" json:"id"`
 	OrderId                  int64           `xorm:"bigint notnull index 'order_id'" json:"order_id" smith:"verbose_name=订单"`
-	ProductId                int64           `xorm:"bigint notnull index 'product_id'" json:"product_id" smith:"verbose_name=产品"`
-	OrderLineItemId          string
-	Quantity                 int //QuantityPurchased
-	TransactionId            string
-	TransactionPriceCurrency string
-	TransactionPrice         float64
-	ItemId                   string
-	ItemSku                  string          `xorm:"nvarchar(200) notnull index unique 'sku'" json:"sku" smith:"verbose_name=SKU"`
-	ItemTitle                string
-	ItemConditionId          string
-	ItemConditionDisplayName string
-	CreatedDate              core.LongTime
+	OrderLineItemId          string          `xorm:"nvarchar(200) notnull 'order_line_item_id'" json:"order_line_item_id"`
+	Quantity                 int             `xorm:"int notnull 'quantity'" json:"quantity"`
+	TransactionId            string          `xorm:"nvarchar(200) notnull 'transaction_id'" json:"transaction_id"`
+	TransactionPriceCurrency string          `xorm:"nvarchar(50) notnull 'transaction_price_currency'" json:"transaction_price_currency"`
+	TransactionPrice         float64         `xorm:"decimal(18,6) notnull 'transaction_price'" json:"transaction_price"`
+	ItemId                   string          `xorm:"nvarchar(200) notnull 'item_id'" json:"item_id"`
+	ItemProductId            int64           `xorm:"bigint notnull index 'item_product_id'" json:"item_product_id"`
+	ItemSku                  string          `xorm:"nvarchar(100) notnull 'item_sku'" json:"item_sku"`
+	ItemTitle                string          `xorm:"nvarchar(200) notnull 'item_title'" json:"item_title"`
+	ItemConditionId          string          `xorm:"nvarchar(50) notnull 'item_condition_id'" json:"item_condition_id"`
+	ItemConditionDisplayName string          `xorm:"nvarchar(100) notnull 'item_condition_display_name'" json:"item_condition_display_name"`
+	CreatedDate              core.LongTime   `xorm:"datetime notnull 'created_date'" json:"created_date"`
 	Desc                     core.NullString `xorm:"nvarchar(500) 'desc'" json:"desc" smith:"verbose_name=备注"`
 	CreateTime               core.Time       `xorm:"created notnull 'create_time'" json:"create_time"`
 	UpdateTime               core.Time       `xorm:"updated notnull 'update_time'" json:"update_time"`
