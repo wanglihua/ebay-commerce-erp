@@ -15,9 +15,9 @@
 package main
 
 import (
-	//"fmt"
 	"os"
 	"os/exec"
+	"path"
 	"runtime"
 	"strings"
 	"sync"
@@ -234,15 +234,8 @@ func Restart(appname string) {
 func Start(appname string) {
 	ColorLog("[INFO] Restarting %s ...\n", appname)
 
-	/*
-	if strings.Index(appname, "./") == -1 {
-		appname = "./" + appname
-	}
-	*/
-
 	appname = strings.TrimLeft(appname, "./")
-
-	appname = os.Getenv("GOPATH") + "bin" + string(os.PathSeparator) + appname
+	appname = path.Join(os.Getenv("GOPATH"), "bin", appname)
 
 	cmd = exec.Command(appname)
 	cmd.Stdout = os.Stdout
@@ -253,7 +246,6 @@ func Start(appname string) {
 	ColorLog("[INFO] %s is running...\n", appname)
 
 	notify_show_success()
-	//started <- true
 }
 
 // checkTMPFile returns true if the event was for TMP files.

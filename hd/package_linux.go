@@ -4,14 +4,17 @@ import (
 	"archive/tar"
 	"compress/gzip"
 	"fmt"
-	"github.com/revel/revel"
 	"io"
 	"log"
-	"matrix/hd/homedir"
 	"os"
+	"os/exec"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"time"
+
+	"github.com/revel/revel"
+	"matrix/hd/homedir"
 )
 
 var cmdPackage = &Command{
