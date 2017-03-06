@@ -16,7 +16,7 @@ import (
 
 /*
 get member messages document:
-http://developer.ebay.com/Devzone/XML/docs/Reference/eBay/GetSellerList.html#GetSellerList
+http://developer.ebay.com/Devzone/XML/docs/Reference/eBay/GetSellerList.html
 
 test tools:
 http://developer.ebay.com/DevZone/build-test/test-tool/?index=0&api=trading&call=GetMemberMessages&variation=xml#
@@ -116,6 +116,13 @@ func (t EBayProductDownloadTask) Run() {
 
 			has_more_orders = response.HasMoreItems
 			page_number += 1
+
+			//获取产品的详细信息
+			for _, item := range response.ItemArray.Items {
+				fmt.Println(item.ItemId)
+				t.fetch_product_item(config, item.ItemId)
+			}
+
 		} // for has_more_orders == true
 	} //for _, config := range ebay_api_config_list
 
@@ -124,7 +131,7 @@ func (t EBayProductDownloadTask) Run() {
 	revel.TRACE.Println("sync message time duration: ", job_duration.Seconds(), "seconds")
 }
 
-func (t EBayProductDownloadTask) fetch_product_list(config models.EBayAPIConfigInfo, page_number int) ebay.GetMemberMessagesResponse {
+func (t EBayProductDownloadTask) fetch_product_list(config models.EBayAPIConfigInfo, page_number int) ebay.GetSellerListResponse {
 
 	number_of_days := 120 - 1
 
@@ -169,7 +176,7 @@ func (t EBayProductDownloadTask) fetch_product_list(config models.EBayAPIConfigI
 
 	res, err := req.Do()
 
-	var response ebay.GetMemberMessagesResponse
+	var response ebay.GetSellerListResponse
 
 	if err != nil {
 		revel.ERROR.Println("eBay GetSellerList ERROR - processUrl -> req.Do: " + err.Error())
@@ -203,6 +210,74 @@ func (t EBayProductDownloadTask) fetch_product_list(config models.EBayAPIConfigI
 	return response
 }
 
-func (t EBayProductDownloadTask) fetch_product_item(config models.EBayAPIConfigInfo, page_number int) *models.ProductInfo {
+func (t EBayProductDownloadTask) fetch_product_item(config models.EBayAPIConfigInfo, item_id string) *models.ProductInfo {
+
+	req_body := `<?xml version="1.0" encoding="utf-8"?>
+<GetItemRequest xmlns="urn:ebay:apis:eBLBaseComponents">
+	<RequesterCredentials>
+		<eBayAuthToken>%s</eBayAuthToken>
+	</RequesterCredentials>
+	<ErrorLanguage>zh_CN</ErrorLanguage>
+	<WarningLevel>High</WarningLevel>
+	<ItemID>%s</ItemID>
+</GetItemRequest>`
+
+	req_body = fmt.Sprintf(req_body, config.Token, item_id)
+
+	req := goreq.Request{
+		Method:      "POST",
+		Uri:         config.GetEndPoint(),
+		Body:        req_body,
+		ContentType: "application/xml; charset=utf-8",
+		ShowDebug:   revel.DevMode,
+	}
+
+	req.AddHeader("X-EBAY-API-CALL-NAME", "GetItem")
+	req.AddHeader("X-EBAY-API-DEV-NAME", config.DevId)
+	req.AddHeader("X-EBAY-API-CERT-NAME", config.CertId)
+	req.AddHeader("X-EBAY-API-APP-NAME", config.AppId)
+	req.AddHeader("X-EBAY-API-VERSION", config.GetApiVersion())
+	req.AddHeader("X-EBAY-API-COMPATIBILITY-LEVEL", config.GetApiVersion())
+	req.AddHeader("X-EBAY-API-REQUEST-ENCODING", "XML")
+	req.AddHeader("X-EBAY-API-RESPONSE-ENCODING", "XML")
+	req.AddHeader("X-EBAY-API-SITEID", config.GetSiteId())
+	req.AddHeader("Accept", "application/xml,application/xhtml+xml")
+
+	res, err := req.Do()
+
+	var product models.ProductInfo
+
+	if err != nil {
+		revel.ERROR.Println("eBay GetItem ERROR - processUrl -> req.Do: " + err.Error())
+		return &product
+	}
+
+	data, err := ioutil.ReadAll(res.Body)
+
+	if err != nil {
+		revel.ERROR.Println("eBay GetItem ERROR - ioutil.ReadAll : " + err.Error())
+		return &product
+	}
+
+	if revel.DevMode {
+		//core.Force_write_to_file(fmt.Sprintf(`z:\test_product_response\%s.xml`, time.Now().Format("20060102150405")), string(data))
+		core.Force_write_to_file(fmt.Sprintf(`/home/wanglihua/ebay_sync/test_product_response/item_%s.xml`, item_id), string(data))
+	}
+
+	var response string
+	err = xml.Unmarshal(data, &response)
+	if err != nil {
+		revel.ERROR.Println(err)
+	}
+
+	/*
+	e := response.Errors
+
+	if e.ShortMessage != "" {
+		revel.ERROR.Println("eBay GetSellerList ERROR - " + e.ErrorCode + " : " + e.LongMessage)
+		return response
+	}
+	*/
+
 	return nil
 }

@@ -1,15 +1,11 @@
 package db
 
 import (
-	"github.com/go-xorm/xorm"
-	//_ "github.com/mattn/go-sqlite3"
-	//_ "github.com/denisenkom/go-mssqldb"
-	_ "github.com/go-sql-driver/mysql"
-	//_ "github.com/ziutek/mymysql/godrv"
-	//_ "github.com/lib/pq"
-	"github.com/revel/revel"
-	//"github.com/go-xorm/core"
 	"time"
+
+	_ "github.com/go-sql-driver/mysql"
+	"github.com/go-xorm/xorm"
+	"github.com/revel/revel"
 )
 
 var Engine *xorm.Engine = nil
