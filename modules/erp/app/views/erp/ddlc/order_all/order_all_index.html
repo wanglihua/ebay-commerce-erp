@@ -72,7 +72,7 @@
             var this_vm = this;
             //请求页面数据
             $.ajax({
-                    url: '{%url "ErpOrderAll.PageData" %}',
+                    url: '{%url "ErpOrder.PageData" %}',
                     type: "POST",
                     success: function (result) {
                         if (result.success == false) {
@@ -87,7 +87,7 @@
             initDataTable(
                 '#orderList',
                 {
-                    "sAjaxSource": '{%url "ErpOrderAll.ListData"%}',
+                    "sAjaxSource": '{%url "ErpOrder.ListData"%}',
                     "aaSorting": [[1, "asc"]],
                     "aoColumns": [
                         {
