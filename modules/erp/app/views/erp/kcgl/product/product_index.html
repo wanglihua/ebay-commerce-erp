@@ -183,6 +183,7 @@
                         <thead>
                         <tr>
                             <th></th>
+                            <th></th>
                             <th id="thSku">SKU</th>
                             <th id="thProductName">商品名称</th>
                             <th id="thSupplier">供应商</th>
@@ -227,6 +228,16 @@
                             "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
                             "render": function (data, type, row) {
                                 return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
+                            }
+                        },
+                        {
+                            "mDataProp": "prd.image_url",
+                            "title": "图片",
+                            "bSearchable": false,
+                            "width": 80,
+                            "bSortable": false,
+                            "render": function (data, type, row) {
+                                return '<img style="width:60px;height:60px;" src="' + data + '" alt="" />';
                             }
                         },
                         {
