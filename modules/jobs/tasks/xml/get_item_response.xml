@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GetItemResponse xmlns="urn:ebay:apis:eBLBaseComponents">
+    <Timestamp>2017-03-06T22:44:37.850Z</Timestamp>
+    <Ack>Success</Ack>
+    <Version>983</Version>
+    <Build>E983_INTL_API_18074235_R1</Build>
+    <Item>
+        <ApplicationData>ic6d9i84269874904131328318e7</ApplicationData>
+        <AutoPay>false</AutoPay>
+        <BuyerProtection>ItemIneligible</BuyerProtection>
+        <BuyItNowPrice currencyID="GBP">0.0</BuyItNowPrice>
+        <Country>AU</Country>
+        <Currency>AUD</Currency>
+        <GiftIcon>0</GiftIcon>
+        <HitCounter>NoHitCounter</HitCounter>
+        <ItemID>282307939082</ItemID>
+        <ListingDetails>
+            <Adult>false</Adult>
+            <BindingAuction>false</BindingAuction>
+            <CheckoutEnabled>true</CheckoutEnabled>
+            <ConvertedBuyItNowPrice currencyID="GBP">0.0</ConvertedBuyItNowPrice>
+            <ConvertedStartPrice currencyID="GBP">21.52</ConvertedStartPrice>
+            <ConvertedReservePrice currencyID="GBP">0.0</ConvertedReservePrice>
+            <HasReservePrice>false</HasReservePrice>
+            <StartTime>2016-12-30T05:27:11.000Z</StartTime>
+            <EndTime>2017-03-30T05:27:11.000Z</EndTime>
+            <ViewItemURL>
+                http://www.ebay.co.uk/itm/2-Person-Beach-Instant-Pop-Up-Tent-Sun-Shade-Shelter-UV-Protection-Protable-Camp-/282307939082
+            </ViewItemURL>
+            <HasUnansweredQuestions>true</HasUnansweredQuestions>
+            <HasPublicMessages>false</HasPublicMessages>
+            <ViewItemURLForNaturalSearch>
+                http://www.ebay.co.uk/itm/2-Person-Beach-Instant-Pop-Up-Tent-Sun-Shade-Shelter-UV-Protection-Protable-Camp-/282307939082
+            </ViewItemURLForNaturalSearch>
+        </ListingDetails>
+        <ListingDuration>GTC</ListingDuration>
+        <ListingType>FixedPriceItem</ListingType>
+        <Location>Melbourne</Location>
+        <PaymentMethods>PayPal</PaymentMethods>
+        <PayPalEmailAddress>support@ozoestore.com.au</PayPalEmailAddress>
+        <PrimaryCategory>
+            <CategoryID>179010</CategoryID>
+            <CategoryName>Sporting Goods:Camping, Hiking:Tents &amp; Canopies:Tents</CategoryName>
+        </PrimaryCategory>
+        <PrivateListing>true</PrivateListing>
+        <Quantity>32</Quantity>
+        <ReservePrice currencyID="GBP">0.0</ReservePrice>
+        <ReviseStatus>
+            <ItemRevised>true</ItemRevised>
+        </ReviseStatus>
+        <SecondaryCategory>
+            <CategoryID>31774</CategoryID>
+            <CategoryName>Health &amp; Beauty:Sun Protection &amp; Tanning:Sunscreen</CategoryName>
+        </SecondaryCategory>
+        <Seller>
+            <AboutMePage>false</AboutMePage>
+            <Email>support@ozoestore.com.au</Email>
+            <FeedbackScore>346</FeedbackScore>
+            <PositiveFeedbackPercent>100.0</PositiveFeedbackPercent>
+            <FeedbackPrivate>false</FeedbackPrivate>
+            <FeedbackRatingStar>Turquoise</FeedbackRatingStar>
+            <IDVerified>false</IDVerified>
+            <eBayGoodStanding>true</eBayGoodStanding>
+            <NewUser>false</NewUser>
+            <RegistrationDate>2014-09-08T06:39:03.000Z</RegistrationDate>
+            <Site>Australia</Site>
+            <Status>Confirmed</Status>
+            <UserID>ozmart.living</UserID>
+            <UserIDChanged>false</UserIDChanged>
+            <UserIDLastChanged>2016-10-21T06:44:04.000Z</UserIDLastChanged>
+            <VATStatus>NoVATTax</VATStatus>
+            <SellerInfo>
+                <AllowPaymentEdit>true</AllowPaymentEdit>
+                <CheckoutEnabled>true</CheckoutEnabled>
+                <CIPBankAccountStored>false</CIPBankAccountStored>
+                <GoodStanding>true</GoodStanding>
+                <LiveAuctionAuthorized>false</LiveAuctionAuthorized>
+                <MerchandizingPref>OptIn</MerchandizingPref>
+                <QualifiesForB2BVAT>false</QualifiesForB2BVAT>
+                <StoreOwner>true</StoreOwner>
+                <StoreURL>http://www.stores.ebay.com.au/id=1280704315</StoreURL>
+                <SellerBusinessType>Commercial</SellerBusinessType>
+                <SafePaymentExempt>false</SafePaymentExempt>
+            </SellerInfo>
+            <MotorsDealer>false</MotorsDealer>
+        </Seller>
+        <SellingStatus>
+            <BidCount>0</BidCount>
+            <BidIncrement currencyID="AUD">0.0</BidIncrement>
+            <ConvertedCurrentPrice currencyID="GBP">21.52</ConvertedCurrentPrice>
+            <CurrentPrice currencyID="AUD">34.88</CurrentPrice>
+            <LeadCount>0</LeadCount>
+            <MinimumToBid currencyID="AUD">34.88</MinimumToBid>
+            <QuantitySold>32</QuantitySold>
+            <ReserveMet>true</ReserveMet>
+            <SecondChanceEligible>false</SecondChanceEligible>
+            <ListingStatus>Active</ListingStatus>
+            <QuantitySoldByPickupInStore>0</QuantitySoldByPickupInStore>
+        </SellingStatus>
+        <ShippingDetails>
+            <ApplyShippingDiscount>false</ApplyShippingDiscount>
+            <CalculatedShippingRate>
+                <WeightMajor measurementSystem="Metric" unit="kg">0</WeightMajor>
+                <WeightMinor measurementSystem="Metric" unit="gm">0</WeightMinor>
+            </CalculatedShippingRate>
+            <PaymentInstructions>We accept all major credit cards through PayPal.
+
+                Please contact us if you need local pick up.
+
+                Please pay to our following bank account if you need bank deposit.
+
+                OZO E-STORE PTY LTD
+
+                BANK: westpac bank
+
+                Complete account: 033 084 438261
+
+                BSB is 033 084
+
+                Account is 438261
+
+                ABN: 55 601 676 555
+            </PaymentInstructions>
+            <SalesTax>
+                <SalesTaxPercent>0.0</SalesTaxPercent>
+                <ShippingIncludedInTax>false</ShippingIncludedInTax>
+            </SalesTax>
+            <ShippingServiceOptions>
+                <ShippingService>AU_Regular</ShippingService>
+                <ShippingServiceCost currencyID="AUD">0.0</ShippingServiceCost>
+                <ShippingServiceAdditionalCost currencyID="AUD">0.0</ShippingServiceAdditionalCost>
+                <ShippingServicePriority>1</ShippingServicePriority>
+                <ExpeditedService>false</ExpeditedService>
+                <ShippingTimeMin>2</ShippingTimeMin>
+                <ShippingTimeMax>6</ShippingTimeMax>
+                <FreeShipping>true</FreeShipping>
+            </ShippingServiceOptions>
+            <ShippingServiceOptions>
+                <ShippingService>AU_RegularParcelWithTracking</ShippingService>
+                <ShippingServiceCost currencyID="AUD">2.0</ShippingServiceCost>
+                <ShippingServiceAdditionalCost currencyID="AUD">0.0</ShippingServiceAdditionalCost>
+                <ShippingServicePriority>2</ShippingServicePriority>
+                <ExpeditedService>false</ExpeditedService>
+                <ShippingTimeMin>2</ShippingTimeMin>
+                <ShippingTimeMax>6</ShippingTimeMax>
+            </ShippingServiceOptions>
+            <ShippingServiceOptions>
+                <ShippingService>AU_Express</ShippingService>
+                <ShippingServiceCost currencyID="AUD">50.0</ShippingServiceCost>
+                <ShippingServiceAdditionalCost currencyID="AUD">0.0</ShippingServiceAdditionalCost>
+                <ShippingServicePriority>3</ShippingServicePriority>
+                <ExpeditedService>true</ExpeditedService>
+                <ShippingTimeMin>1</ShippingTimeMin>
+                <ShippingTimeMax>3</ShippingTimeMax>
+            </ShippingServiceOptions>
+            <InternationalShippingServiceOption>
+                <ShippingService>AU_AirMailInternational</ShippingService>
+                <ShippingServiceCost currencyID="AUD">5.0</ShippingServiceCost>
+                <ShippingServiceAdditionalCost currencyID="AUD">4.0</ShippingServiceAdditionalCost>
+                <ShippingServicePriority>1</ShippingServicePriority>
+                <ShipToLocation>NZ</ShipToLocation>
+            </InternationalShippingServiceOption>
+            <ShippingType>Flat</ShippingType>
+            <ThirdPartyCheckout>false</ThirdPartyCheckout>
+            <ShippingDiscountProfileID>0</ShippingDiscountProfileID>
+            <InternationalShippingDiscountProfileID>0</InternationalShippingDiscountProfileID>
+            <ExcludeShipToLocation>Africa</ExcludeShipToLocation>
+            <ExcludeShipToLocation>Asia</ExcludeShipToLocation>
+            <ExcludeShipToLocation>Central America and Caribbean</ExcludeShipToLocation>
+            <ExcludeShipToLocation>Europe</ExcludeShipToLocation>
+            <ExcludeShipToLocation>Middle East</ExcludeShipToLocation>
+            <ExcludeShipToLocation>North America</ExcludeShipToLocation>
+            <ExcludeShipToLocation>Southeast Asia</ExcludeShipToLocation>
+            <ExcludeShipToLocation>South America</ExcludeShipToLocation>
+            <ExcludeShipToLocation>AS</ExcludeShipToLocation>
+            <ExcludeShipToLocation>CK</ExcludeShipToLocation>
+            <ExcludeShipToLocation>FJ</ExcludeShipToLocation>
+            <ExcludeShipToLocation>PF</ExcludeShipToLocation>
+            <ExcludeShipToLocation>GU</ExcludeShipToLocation>
+            <ExcludeShipToLocation>KI</ExcludeShipToLocation>
+            <ExcludeShipToLocation>MH</ExcludeShipToLocation>
+            <ExcludeShipToLocation>FM</ExcludeShipToLocation>
+            <ExcludeShipToLocation>NR</ExcludeShipToLocation>
+            <ExcludeShipToLocation>NC</ExcludeShipToLocation>
+            <ExcludeShipToLocation>NU</ExcludeShipToLocation>
+            <ExcludeShipToLocation>PW</ExcludeShipToLocation>
+            <ExcludeShipToLocation>PG</ExcludeShipToLocation>
+            <ExcludeShipToLocation>SB</ExcludeShipToLocation>
+            <ExcludeShipToLocation>TO</ExcludeShipToLocation>
+            <ExcludeShipToLocation>TV</ExcludeShipToLocation>
+            <ExcludeShipToLocation>VU</ExcludeShipToLocation>
+            <ExcludeShipToLocation>WF</ExcludeShipToLocation>
+            <ExcludeShipToLocation>WS</ExcludeShipToLocation>
+            <SellerExcludeShipToLocationsPreference>false</SellerExcludeShipToLocationsPreference>
+        </ShippingDetails>
+        <ShipToLocations>AU</ShipToLocations>
+        <ShipToLocations>NZ</ShipToLocations>
+        <Site>Australia</Site>
+        <StartPrice currencyID="AUD">34.88</StartPrice>
+        <Storefront>
+            <StoreCategoryID>11194802015</StoreCategoryID>
+            <StoreCategory2ID>0</StoreCategory2ID>
+            <StoreURL>http://www.stores.ebay.com.au/id=1280704315</StoreURL>
+        </Storefront>
+        <TimeLeft>P23DT6H42M34S</TimeLeft>
+        <Title>2 Person Beach Instant Pop Up Tent Sun Shade Shelter UV Protection Protable Camp</Title>
+        <UUID>851382B29AC34940B842267D8B0D7215</UUID>
+        <HitCount>1134</HitCount>
+        <BestOfferDetails>
+            <BestOfferCount>8</BestOfferCount>
+            <BestOfferEnabled>true</BestOfferEnabled>
+            <NewBestOffer>false</NewBestOffer>
+        </BestOfferDetails>
+        <SKU>EAZ0161LB8AU</SKU>
+        <PictureDetails>
+            <GalleryType>Plus</GalleryType>
+            <GalleryURL>http://i.ebayimg.com/00/s/MTAwMFgxMDAw/z/i7kAAOSwtfhYonls/$_12.JPG?set_id=880000500F
+            </GalleryURL>
+            <PhotoDisplay>PicturePack</PhotoDisplay>
+            <PictureURL>http://i.ebayimg.com/00/s/MTAwMFgxMDAw/z/i7kAAOSwtfhYonls/$_12.JPG?set_id=880000500F
+            </PictureURL>
+            <PictureURL>http://i.ebayimg.com/00/s/ODEwWDgxMA==/z/QR4AAOSwjDZYZfA8/$_1.JPG?set_id=880000500F</PictureURL>
+            <PictureURL>http://i.ebayimg.com/00/s/ODAwWDgwMA==/z/zdkAAOSw9GhYZfA-/$_1.JPG?set_id=880000500F</PictureURL>
+            <PictureURL>http://i.ebayimg.com/00/s/ODAwWDgwMA==/z/RdgAAOSwUKxYZfA-/$_1.JPG?set_id=880000500F</PictureURL>
+            <PictureURL>http://i.ebayimg.com/00/s/ODAwWDgwMA==/z/17kAAOSwt5hYZfA-/$_1.JPG?set_id=880000500F</PictureURL>
+            <PictureURL>http://i.ebayimg.com/00/s/ODAwWDgwMA==/z/188AAOSwt5hYZfA~/$_1.JPG?set_id=880000500F</PictureURL>
+            <PictureURL>http://i.ebayimg.com/00/s/ODAwWDgwMA==/z/yj0AAOSwImRYZfA-/$_1.JPG?set_id=880000500F</PictureURL>
+            <PictureURL>http://i.ebayimg.com/00/s/ODAwWDgwMA==/z/N7IAAOSw2xRYZfA9/$_1.JPG?set_id=880000500F</PictureURL>
+            <PictureURL>http://i.ebayimg.com/00/s/ODAwWDgwMA==/z/YOUAAOSw5cNYZfA~/$_1.JPG?set_id=880000500F</PictureURL>
+            <PictureURL>http://i.ebayimg.com/00/s/ODAwWDgwMA==/z/itkAAOSwnHZYZfA9/$_1.JPG?set_id=880000500F</PictureURL>
+            <PictureURL>http://i.ebayimg.com/00/s/ODAwWDgwMA==/z/RecAAOSwUKxYZfA~/$_1.JPG?set_id=880000500F</PictureURL>
+        </PictureDetails>
+        <DispatchTimeMax>1</DispatchTimeMax>
+        <ProxyItem>false</ProxyItem>
+        <BuyerGuaranteePrice currencyID="GBP">20000.0</BuyerGuaranteePrice>
+        <BuyerRequirementDetails>
+            <ShipToRegistrationCountry>true</ShipToRegistrationCountry>
+            <MinimumFeedbackScore>-1</MinimumFeedbackScore>
+            <MaximumUnpaidItemStrikesInfo>
+                <Count>3</Count>
+                <Period>Days_30</Period>
+            </MaximumUnpaidItemStrikesInfo>
+            <MaximumBuyerPolicyViolations>
+                <Count>4</Count>
+                <Period>Days_30</Period>
+            </MaximumBuyerPolicyViolations>
+        </BuyerRequirementDetails>
+        <ReturnPolicy>
+            <RefundOption>MoneyBack</RefundOption>
+            <Refund>Money Back</Refund>
+            <ReturnsWithinOption>Days_60</ReturnsWithinOption>
+            <ReturnsWithin>60 Days</ReturnsWithin>
+            <ReturnsAcceptedOption>ReturnsAccepted</ReturnsAcceptedOption>
+            <ReturnsAccepted>Returns Accepted</ReturnsAccepted>
+            <Description>We offer 60 days warranty.
+
+                Buyers can return the items. After receiving the item, buyers can return the item within 30 days.
+
+                Please write down your eBay ID and item No when you send back the package.
+
+                Buyers pay for return shipping charges.
+            </Description>
+            <ShippingCostPaidByOption>Buyer</ShippingCostPaidByOption>
+            <ShippingCostPaidBy>Buyer</ShippingCostPaidBy>
+            <RestockingFeeValue>20%</RestockingFeeValue>
+            <RestockingFeeValueOption>Percent_20</RestockingFeeValueOption>
+        </ReturnPolicy>
+        <ConditionID>1000</ConditionID>
+        <ConditionDisplayName>New</ConditionDisplayName>
+        <PostCheckoutExperienceEnabled>false</PostCheckoutExperienceEnabled>
+        <SellerProfiles>
+            <SellerShippingProfile>
+                <ShippingProfileID>88470504025</ShippingProfileID>
+                <ShippingProfileName>Flat:Australia Post(Free),Australia Post/Flat</ShippingProfileName>
+            </SellerShippingProfile>
+            <SellerReturnProfile>
+                <ReturnProfileID>88470499025</ReturnProfileID>
+                <ReturnProfileName>Returns Accepted,Buyer,60 Days,Money Back</ReturnProfileName>
+            </SellerReturnProfile>
+            <SellerPaymentProfile>
+                <PaymentProfileID>88470907025</PaymentProfileID>
+                <PaymentProfileName>PayPal</PaymentProfileName>
+            </SellerPaymentProfile>
+        </SellerProfiles>
+        <ShippingPackageDetails>
+            <ShippingIrregular>false</ShippingIrregular>
+            <ShippingPackage>None</ShippingPackage>
+            <WeightMajor measurementSystem="Metric" unit="kg">0</WeightMajor>
+            <WeightMinor measurementSystem="Metric" unit="gm">0</WeightMinor>
+        </ShippingPackageDetails>
+        <HideFromSearch>true</HideFromSearch>
+        <ReasonHideFromSearch>OutOfStock</ReasonHideFromSearch>
+        <OutOfStockControl>true</OutOfStockControl>
+        <eBayPlus>false</eBayPlus>
+        <eBayPlusEligible>false</eBayPlusEligible>
+    </Item>
+</GetItemResponse>
