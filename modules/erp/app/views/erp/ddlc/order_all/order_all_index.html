@@ -49,7 +49,7 @@
                     "aaSorting": [[1, "asc"]],
                     "aoColumns": [
                         {
-                            "mDataProp": "id",
+                            "mDataProp": "o.id",
                             "bSearchable": false,
                             "orderable": false,
                             "sClass": "center",
@@ -59,34 +59,22 @@
                                 return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
                             }
                         },
-                        {"mDataProp": "shop_id", "title": "店铺", "bSearchable": false},
-                        {"mDataProp": "code", "title": "编码", "bSearchable": true},
-                        {"mDataProp": "desc", "title": "备注", "bSearchable": true},
-                        {"mDataProp": "type_id", "title": "类型", "bSearchable": false},
-                        {"mDataProp": "ebay_status", "title": "ebay状态", "bSearchable": true},
-                        {"mDataProp": "status_id", "title": "状态", "bSearchable": false},
-                        {"mDataProp": "adjustment_amount_currency", "title": "调整金额货种", "bSearchable": true},
-                        {"mDataProp": "adjustment_amount", "title": "调整金额", "bSearchable": false},
-                        {"mDataProp": "amount_paid_currency", "title": "支付金额货种", "bSearchable": true},
-                        {"mDataProp": "amount_paid", "title": "支付金额", "bSearchable": false},
-                        {"mDataProp": "amount_saved_currency", "title": "节省金额货种", "bSearchable": true},
-                        {"mDataProp": "amount_saved", "title": "节省金额", "bSearchable": false},
-                        {"mDataProp": "total_amount_currency", "title": "总计金额币种", "bSearchable": true},
-                        {"mDataProp": "total_amount", "title": "总计金额", "bSearchable": false},
-                        {"mDataProp": "subtotal_amount_currency", "title": "小计金额币种", "bSearchable": true},
-                        {"mDataProp": "subtotal_amount", "title": "小计金额", "bSearchable": false},
-                        {"mDataProp": "payment_methods", "title": "支付方式", "bSearchable": true},
-                        {"mDataProp": "seller_email", "title": "卖家邮件", "bSearchable": true},
-                        {"mDataProp": "seller_user_id", "title": "卖家用户id", "bSearchable": true},
-                        {"mDataProp": "buyer_user_id", "title": "买家用户id", "bSearchable": true},
-                        {"mDataProp": "buyer_checkout_message", "title": "买家留言", "bSearchable": true},
-                        {"mDataProp": "created_time", "title": "创建时间", "bSearchable": false},
-                        {"mDataProp": "modified_time", "title": "修改时间", "bSearchable": false},
-                        {"mDataProp": "paid_time", "title": "支付时间", "bSearchable": false},
-                        {"mDataProp": "shipped_time", "title": "创建时间", "bSearchable": false},
-                        {"mDataProp": "hold_type_id", "title": "Hold类型", "bSearchable": false},
-                        {"mDataProp": "create_time", "title": "创建时间", "bSearchable": false, "width": 120},
-                        {"mDataProp": "update_time", "title": "修改时间", "bSearchable": false, "width": 120}
+
+                        {"mDataProp": "o.code", "title": "订单编号", "bSearchable": true, "width": 180},
+
+                        {"mDataProp": "o.type_id", "title": "类型", "bSearchable": false},
+                        {"mDataProp": "o.status_id", "title": "状态", "bSearchable": false},
+                        {"mDataProp": "o.shop_id", "title": "店铺", "bSearchable": false},
+                        {"mDataProp": "o.buyer_user_id", "title": "买家用户id", "bSearchable": true},
+
+                        {"mDataProp": "o.amount_paid_currency", "title": "支付金额货种", "bSearchable": true},
+                        {"mDataProp": "o.amount_paid", "title": "支付金额", "bSearchable": false},
+                        {"mDataProp": "o.total_amount_currency", "title": "总计金额币种", "bSearchable": true},
+                        {"mDataProp": "o.total_amount", "title": "总计金额", "bSearchable": false},
+                        {"mDataProp": "o.payment_methods", "title": "支付方式", "bSearchable": true},
+
+                        {"mDataProp": "o.created_time", "title": "建单时间", "bSearchable": false, "width": 135},
+                        {"mDataProp": "o.shipped_time", "title": "发货时间", "bSearchable": false, "width": 135}
                     ]
                 }
             );

@@ -8,7 +8,7 @@ import (
 
 const (
 	ORDER_TYPE_SGCJ = 1010 // 手工创建
-	ORDER_TYPE_XZDD = 1020 // 下载订单
+	ORDER_TYPE_ZCDD = 1020 // 正常下载订单
 	ORDER_TYPE_CFDD = 1030 // 拆分订单
 	ORDER_TYPE_HBDD = 1040 // 合并订单
 )
@@ -38,9 +38,9 @@ func (e OrderTypeInfo) InitData(db_session *xorm.Session) {
 	db_session.Insert(order_type)
 
 	order_type = new(OrderTypeInfo)
-	order_type.Id = ORDER_TYPE_XZDD
-	order_type.Name = "下载订单"
-	order_type.Desc = core.NewNullString("订单类型 下载订单", true)
+	order_type.Id = ORDER_TYPE_ZCDD
+	order_type.Name = "正常订单"
+	order_type.Desc = core.NewNullString("订单类型 正常下载订单", true)
 	db_session.Insert(order_type)
 
 	order_type = new(OrderTypeInfo)
