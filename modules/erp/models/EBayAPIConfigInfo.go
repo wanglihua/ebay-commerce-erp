@@ -34,7 +34,8 @@ func (e EBayAPIConfigInfo) GetSiteId() string {
 }
 
 func (e EBayAPIConfigInfo) GetApiVersion() string {
-	return "967" // API 版本
+	//return "967" // API 版本
+	return "995" // API 版本
 }
 
 /*

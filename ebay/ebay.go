@@ -36,6 +36,7 @@ type EBay struct {
 	ApplicationId string
 }
 
+/*
 type Item struct {
 	ItemITitleD string
 	ItemID      string
@@ -51,6 +52,7 @@ type ListingDetails struct {
 type SellingStatus struct {
 	CurrentPrice string
 }
+*/
 
 type Pagination struct {
 	EntriesPerPage       string
