@@ -234,6 +234,7 @@ GET  /erp/single/product/sales/query           ErpSingleProductSalesQuery.Index
 GET  /erp/person/sales/report                  ErpPersonSalesReport.Index
 
 GET  /erp/order/all                            ErpOrderAll.Index
+POST /erp/order/all/data/list                  ErpOrderAll.ListData
 GET  /erp/order/yzf                            ErpOrderYzf.Index
 GET  /erp/order/dph                            ErpOrderDph.Index
 GET  /erp/order/phz                            ErpOrderPhz.Index
