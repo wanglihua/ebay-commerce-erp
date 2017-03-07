@@ -343,17 +343,25 @@ func (t EBayOrderDownloadTask) Run() {
 					order_item.TransactionId = transaction.TransactionID
 					order_item.TransactionPriceCurrency = transaction.TransactionPrice.Currency
 					order_item.TransactionPrice = transaction.TransactionPrice.Value
-					order_item.ItemId = transaction.Item.ItemID
+					product_item_id := transaction.Item.ItemID
+					order_item.ItemId = product_item_id
 
 					//order_item.ItemProductId 如果这时产品不存在会怎样，下载产品
-					var product_id struct {
+					var product_id_result struct {
 						ProductId int64 `xorm:"'product_id'"`
 					}
-					_, err = db_session.Sql(fmt.Sprintf("SELECT p.id AS product_id FROM erp_product p WHERE p.sku = '%s'", transaction.Item.SKU)).Get(&product_id)
+					has_item_product, err := db_session.Sql(fmt.Sprintf("SELECT p.id AS product_id FROM erp_product p WHERE p.sku = '%s'", transaction.Item.SKU)).Get(&product_id_result)
 					if err != nil {
 						revel.ERROR.Println(err)
 					}
 
+					product_id := product_id_result.ProductId
+					if has_item_product == false {
+						//download product
+						product_id = fetch_product_item_to_db(config, db_session, product_item_id)
+					}
+
+					order_item.ItemProductId = product_id
 					order_item.ItemSku = transaction.Item.SKU
 					order_item.ItemTitle = transaction.Item.Title
 					order_item.ItemConditionId = transaction.Item.ConditionID
