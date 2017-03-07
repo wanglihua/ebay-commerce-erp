@@ -39,6 +39,14 @@ func GetDdlcMenu(res_id_map map[int64]bool, db_session *xorm.Session, web_sessio
             <b class="arrow"></b>
         </li>
 
+        <li id="ddlc-order-hold-menu" class="">
+            <a href="/erp/order/hold">
+                <i class="menu-icon fa fa-caret-right"></i>
+                Hold
+            </a>
+            <b class="arrow"></b>
+        </li>
+
         <li id="ddlc-order-dph-menu" class="">
             <a href="/erp/order/dph">
                 <i class="menu-icon fa fa-caret-right"></i>

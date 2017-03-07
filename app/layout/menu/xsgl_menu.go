@@ -39,14 +39,6 @@ func GetXsglMenu(res_id_map map[int64]bool, db_session *xorm.Session, web_sessio
             <b class="arrow"></b>
         </li>
 
-        <li id="xsgl-ebay-zhgl-menu" class="">
-            <a href="#">
-                <i class="menu-icon fa fa-caret-right"></i>
-                EBAY账号管理
-            </a>
-            <b class="arrow"></b>
-        </li>
-
         <li id="xsgl-sku-xsbg-menu" class="">
             <a href="#">
                 <i class="menu-icon fa fa-caret-right"></i>

@@ -66,3 +66,28 @@ erp_order o
 
 	return order_list, order_count.Count
 }
+
+type shop_select_item_t struct {
+	Id   int64     `xorm:"'shop_id'" json:"id"`
+	Name string    `xorm:"'shop_name'" json:"name"`
+}
+
+func get_shop_select_item_list(db_session *xorm.Session) []shop_select_item_t {
+
+	/*
+SELECT sa.id AS shop_id, concat(ep.name, ' ', sa.name) AS shop_name
+FROM erp_shop_account sa
+    INNER JOIN erp_ecommerce_platform ep ON ep.id = sa.platform_id
+	 */
+
+	sql := `
+SELECT sa.id AS shop_id, concat(ep.name, ' ', sa.name) AS shop_name
+FROM erp_shop_account sa
+    INNER JOIN erp_ecommerce_platform ep ON ep.id = sa.platform_id`
+
+	shop_list := make([]shop_select_item_t, 0)
+	err := db_session.Sql(sql).Find(&shop_list)
+	core.HandleError(err)
+
+	return shop_list
+}
