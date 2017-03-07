@@ -161,7 +161,7 @@ func (t EBayOrderDownloadTask) Run() {
 				}
 
 				// 状态？
-				revel.TRACE.Println("OrderStatus: ", order_download.OrderStatus)
+				//revel.TRACE.Println("OrderStatus: ", order_download.OrderStatus)
 
 				order_in_db.TypeId = models.ORDER_TYPE_XZDD //订单类型为下载订单
 
