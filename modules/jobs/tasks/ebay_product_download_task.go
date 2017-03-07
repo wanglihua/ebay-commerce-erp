@@ -102,27 +102,55 @@ func (t EBayProductDownloadTask) Run() {
 		page_number := 1
 		for has_more_orders == true {
 
-			response := t.fetch_product_list(config, page_number)
+			list_response := t.fetch_product_list(config, page_number)
 
-			switch response.Ack {
+			switch list_response.Ack {
 			case "Success":
-				revel.TRACE.Printf("eBay GetSellerList Response: " + response.Ack + "\n")
-				revel.TRACE.Printf("eBay GetSellerList Response HasMoreItems: %t", response.HasMoreItems)
+				revel.TRACE.Printf("eBay GetSellerList Response: " + list_response.Ack + "\n")
+				revel.TRACE.Printf("eBay GetSellerList Response HasMoreItems: %t", list_response.HasMoreItems)
 			case "Failure":
-				revel.ERROR.Printf("eBay GetSellerList Response: " + response.Ack + "\n")
+				revel.ERROR.Printf("eBay GetSellerList Response: " + list_response.Ack + "\n")
 			default:
-				revel.ERROR.Printf("eBay GetSellerList Response: " + response.Ack + "\n")
+				revel.ERROR.Printf("eBay GetSellerList Response: " + list_response.Ack + "\n")
 			}
 
-			has_more_orders = response.HasMoreItems
+			has_more_orders = list_response.HasMoreItems
 			page_number += 1
 
 			//获取产品的详细信息
-			for _, item := range response.ItemArray.Items {
-				fmt.Println(item.ItemId)
-				t.fetch_product_item(config, item.ItemId)
-			}
+			for _, list_item := range list_response.ItemArray.Items {
+				item_response := t.fetch_product_item(config, list_item.ItemId)
+				item_sku := item_response.Item.Sku
+				var product models.ProductInfo
+				has_product, err := db_session.Where(fmt.Sprintf("sku = '%s'", item_sku)).Get(&product)
+				if err != nil {
+					revel.ERROR.Println(err)
+				}
 
+				product.ItemId = item_response.Item.ItemId
+				product.Sku = item_response.Item.Sku
+				product.Name = item_response.Item.Title
+				product.ImageUrl = core.NewNullString(item_response.Item.PictureDetails.GalleryUrl, true)
+
+				if product.StatusId == 0 {
+					product.StatusId = models.PRODUCT_STATUS_ZC
+				}
+
+				if has_product == false {
+					// do insert
+					_, err = db_session.Insert(&product)
+					if err != nil {
+						revel.ERROR.Println(err)
+					}
+				} else {
+					// do update
+					update_col_list := []string{"item_id", "sku", "name", "image_url"}
+					_, err = db_session.Id(product.Id).Cols(update_col_list...).Update(&product)
+					if err != nil {
+						revel.ERROR.Println(err)
+					}
+				}
+			}
 		} // for has_more_orders == true
 	} //for _, config := range ebay_api_config_list
 
@@ -190,10 +218,12 @@ func (t EBayProductDownloadTask) fetch_product_list(config models.EBayAPIConfigI
 		return response
 	}
 
+	/*
 	if revel.DevMode {
 		//core.Force_write_to_file(fmt.Sprintf(`z:\test_product_response\%s.xml`, time.Now().Format("20060102150405")), string(data))
 		core.Force_write_to_file(fmt.Sprintf(`/home/wanglihua/ebay_sync/test_product_response/%s.xml`, time.Now().Format("20060102150405")), string(data))
 	}
+	*/
 
 	err = xml.Unmarshal(data, &response)
 	if err != nil {
@@ -210,7 +240,7 @@ func (t EBayProductDownloadTask) fetch_product_list(config models.EBayAPIConfigI
 	return response
 }
 
-func (t EBayProductDownloadTask) fetch_product_item(config models.EBayAPIConfigInfo, item_id string) *models.ProductInfo {
+func (t EBayProductDownloadTask) fetch_product_item(config models.EBayAPIConfigInfo, item_id string) ebay.GetItemResponse {
 
 	req_body := `<?xml version="1.0" encoding="utf-8"?>
 <GetItemRequest xmlns="urn:ebay:apis:eBLBaseComponents">
@@ -245,18 +275,18 @@ func (t EBayProductDownloadTask) fetch_product_item(config models.EBayAPIConfigI
 
 	res, err := req.Do()
 
-	var product models.ProductInfo
+	var response ebay.GetItemResponse
 
 	if err != nil {
 		revel.ERROR.Println("eBay GetItem ERROR - processUrl -> req.Do: " + err.Error())
-		return &product
+		return response
 	}
 
 	data, err := ioutil.ReadAll(res.Body)
 
 	if err != nil {
 		revel.ERROR.Println("eBay GetItem ERROR - ioutil.ReadAll : " + err.Error())
-		return &product
+		return response
 	}
 
 	if revel.DevMode {
@@ -264,23 +294,48 @@ func (t EBayProductDownloadTask) fetch_product_item(config models.EBayAPIConfigI
 		core.Force_write_to_file(fmt.Sprintf(`/home/wanglihua/ebay_sync/test_product_response/item_%s.xml`, item_id), string(data))
 	}
 
-	var response string
 	err = xml.Unmarshal(data, &response)
 	if err != nil {
 		revel.ERROR.Println(err)
 	}
 
-	/*
 	e := response.Errors
 
 	if e.ShortMessage != "" {
-		revel.ERROR.Println("eBay GetSellerList ERROR - " + e.ErrorCode + " : " + e.LongMessage)
+		revel.ERROR.Println("eBay GetItem ERROR - " + e.ErrorCode + " : " + e.LongMessage)
 		return response
 	}
-	*/
 
-	return nil
+	return response
 }
+
+/*
+type GetItemResponse struct {
+	Xmlns     string                 `xml:"xmlns,attr"`
+	Timestamp string                 `xml:"Timestamp"`
+	Ack       string                 `xml:"Ack"`
+	Build     string                 `xml:"Build"`
+	Errors    Errors                 `xml:"Errors"`
+	Item      Item                   `xml:"Item"`
+}
+
+type Item struct {
+	XMLName        xml.Name           `xml:"Item"`
+	ItemId         string             `xml:"ItemID"`
+	Title          string             `xml:"Title"`
+	Sku            string             `xml:"SKU"`
+	PictureDetails ItemPictureDetails `xml:"PictureDetails"`
+}
+
+type ItemPictureDetails struct {
+	XMLName      xml.Name     `xml:"PictureDetails"`
+	GalleryType  string       `xml:"GalleryType"`
+	GalleryUrl   string       `xml:"GalleryURL"`
+	PhotoDisplay string       `xml:"PhotoDisplay"`
+	PictureUrls  []string     `xml:"PictureURL"`
+}
+
+ */
 
 /*
 <?xml version="1.0" encoding="UTF-8"?>
