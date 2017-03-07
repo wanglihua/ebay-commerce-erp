@@ -4,7 +4,6 @@ import (
 	"encoding/xml"
 	"fmt"
 	"io/ioutil"
-
 	"github.com/franela/goreq"
 	"github.com/go-xorm/xorm"
 	"github.com/revel/revel"
@@ -12,6 +11,8 @@ import (
 	"matrix/ebay"
 	"matrix/modules/erp/models"
 )
+
+const log_response_xml_to_file = false
 
 func fetch_product_item(config models.EBayAPIConfigInfo, item_id string) ebay.GetItemResponse {
 
@@ -62,9 +63,9 @@ func fetch_product_item(config models.EBayAPIConfigInfo, item_id string) ebay.Ge
 		return response
 	}
 
-	if revel.DevMode {
-		//core.Force_write_to_file(fmt.Sprintf(`z:\test_product_response\%s.xml`, time.Now().Format("20060102150405")), string(data))
-		core.Force_write_to_file(fmt.Sprintf(`/home/wanglihua/ebay_sync/test_product_response/item_%s.xml`, item_id), string(data))
+	if revel.DevMode && log_response_xml_to_file {
+		core.Force_write_to_file(fmt.Sprintf(`z:\test_product_response\item_%s.xml`, item_id), string(data))
+		//core.Force_write_to_file(fmt.Sprintf(`/home/wanglihua/ebay_sync/test_product_response/item_%s.xml`, item_id), string(data))
 	}
 
 	err = xml.Unmarshal(data, &response)
