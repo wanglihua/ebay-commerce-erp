@@ -264,6 +264,10 @@ div.todo:before {
     color: green;
 }
 
+.form-control[disabled], fieldset[disabled] .form-control {
+    cursor: text !important;
+}
+
 div#order_detail div.widget-box {
     margin-top: 8px;
     margin-bottom: 15px;
@@ -276,4 +280,9 @@ div#order_detail div.widget-main > div.row > div {
 
 div#order_detail div.widget-main div.form-group > label {
     line-height: 28px;
+    text-align: right;
+}
+
+div#order_detail table#order_item_list td {
+    vertical-align: middle;
 }
