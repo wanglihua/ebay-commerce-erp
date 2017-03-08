@@ -236,14 +236,16 @@ GET  /erp/person/sales/report                  ErpPersonSalesReport.Index
 POST /erp/order/data/page                      ErpOrder.PageData
 POST /erp/order/data/list                      ErpOrder.ListData
 
-GET  /erp/order/all                            ErpOrderAll.Index
-GET  /erp/order/yzf                            ErpOrderYzf.Index
-GET  /erp/order/hold                           ErpOrderHold.Index
-GET  /erp/order/dph                            ErpOrderDph.Index
-GET  /erp/order/phz                            ErpOrderPhz.Index
-GET  /erp/order/yfh                            ErpOrderYfh.Index
-GET  /erp/order/ywc                            ErpOrderYwc.Index
 GET  /erp/order/khb                            ErpOrderKhb.Index
+GET  /erp/order/hold                           ErpOrderHold.Index
+GET  /erp/order/:status                        ErpOrder.Index
+# GET  /erp/order/all                            ErpOrderAll.Index
+# GET  /erp/order/yzf                            ErpOrderYzf.Index
+# GET  /erp/order/dph                            ErpOrderDph.Index
+# GET  /erp/order/phz                            ErpOrderPhz.Index
+# GET  /erp/order/yfh                            ErpOrderYfh.Index
+# GET  /erp/order/ywc                            ErpOrderYwc.Index
+# GET  /erp/order/khb                            ErpOrderKhb.Index
 
 GET  /erp/ecommerce/platform                   ErpECommercePlatform.Index
 POST /erp/ecommerce/platform/data/list         ErpECommercePlatform.ListData

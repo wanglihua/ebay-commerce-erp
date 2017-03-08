@@ -1,70 +1,81 @@
 package main
 
 import (
-	"github.com/lxn/walk"
 	"log"
+
+	"github.com/lxn/walk"
 )
+
+var notify_enabled = false
 
 var notify_icon *walk.NotifyIcon
 
 func notify_setup() {
-	var err error
-	//mw, err := walk.NewMainWindow()
-	//if err != nil {
-	//	log.Fatal(err)
-	//}
+	if notify_enabled == true {
+		var err error
+		//mw, err := walk.NewMainWindow()
+		//if err != nil {
+		//	log.Fatal(err)
+		//}
 
-	icon := walk.IconApplication()
+		icon := walk.IconApplication()
 
-	notify_icon, err = walk.NewNotifyIcon()
-	if err != nil {
-		log.Fatal(err)
+		notify_icon, err = walk.NewNotifyIcon()
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		if err := notify_icon.SetIcon(icon); err != nil {
+			log.Fatal(err)
+		}
+
+		if err := notify_icon.SetToolTip("hd build notify"); err != nil {
+			log.Fatal(err)
+		}
+
+		if err := notify_icon.SetVisible(true); err != nil {
+			log.Fatal(err)
+		}
+
+		//mw.Run()
 	}
-
-	if err := notify_icon.SetIcon(icon); err != nil {
-		log.Fatal(err)
-	}
-
-	if err := notify_icon.SetToolTip("hd build notify"); err != nil {
-		log.Fatal(err)
-	}
-
-	if err := notify_icon.SetVisible(true); err != nil {
-		log.Fatal(err)
-	}
-
-	//mw.Run()
 }
 
 func notify_dispose() {
-	if notify_icon == nil {
-		return
-	}
+	if notify_enabled == true {
+		if notify_icon == nil {
+			return
+		}
 
-	err := notify_icon.Dispose()
-	if err != nil {
-		log.Fatal(err)
+		err := notify_icon.Dispose()
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 }
 
 func notify_show_success() {
-	icon := walk.IconWinLogo()
-	if err := notify_icon.SetIcon(icon); err != nil {
-		log.Fatal(err)
-	}
+	if notify_enabled == true {
+		icon := walk.IconWinLogo()
+		if err := notify_icon.SetIcon(icon); err != nil {
+			log.Fatal(err)
+		}
 
-	if err := notify_icon.ShowInfo("Success", "Build Success and Running!"); err != nil {
-		log.Fatal(err)
+		if err := notify_icon.ShowInfo("Success", "Build Success and Running!"); err != nil {
+			log.Fatal(err)
+		}
 	}
 }
 
 func notify_show_error() {
-	icon := walk.IconError()
-	if err := notify_icon.SetIcon(icon); err != nil {
-		log.Fatal(err)
-	}
+	if notify_enabled == true {
+		icon := walk.IconError()
+		if err := notify_icon.SetIcon(icon); err != nil {
+			log.Fatal(err)
+		}
 
-	if err := notify_icon.ShowError("Error", "Stopped and Build Error!"); err != nil {
-		log.Fatal(err)
+		if err := notify_icon.ShowError("Error", "Stopped and Build Error!"); err != nil {
+			log.Fatal(err)
+		}
 	}
 }

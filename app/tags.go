@@ -2,9 +2,10 @@ package app
 
 import (
 	"fmt"
+	"html/template"
+
 	"github.com/go-xorm/xorm"
 	"github.com/revel/revel"
-	"html/template"
 	"matrix/app/layout"
 )
 
