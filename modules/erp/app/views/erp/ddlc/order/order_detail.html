@@ -288,7 +288,7 @@
                                                 {{order_item.p.name}}
                                             </div>
                                             <div>
-                                                <a href="/erp/product/detail/{{order_item.p.id}}" target="_blank">
+                                                <a :href="'/erp/product/detail/' + order_item.p.id" target="_blank">
                                                     {{order_item.p.sku}}
                                                 </a>
                                             </div>
