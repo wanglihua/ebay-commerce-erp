@@ -119,11 +119,11 @@ func (c ErpOrder) Detail(order_id int64) revel.Result {
 func (c ErpOrder) DetailData() revel.Result {
 	db_session := c.DbSession
 
-	var id int64
-	c.Params.Bind(&id, "id")
+	var order_id int64
+	c.Params.Bind(&order_id, "id")
 
 	var order models.OrderInfo
-	has_order, err := db_session.Id(id).Get(&order)
+	has_order, err := db_session.Id(order_id).Get(&order)
 	core.HandleError(err)
 	if has_order == false {
 		return c.RenderJson(map[string]interface{}{
@@ -132,7 +132,44 @@ func (c ErpOrder) DetailData() revel.Result {
 		})
 	}
 
+	var status models.StatusInfo
+	_, err = db_session.Id(order.StatusId).Get(&status)
+	core.HandleError(err)
+
+	var shop models.ShopAccountInfo
+	_, err = db_session.Id(order.ShopId).Get(&shop)
+	core.HandleError(err)
+
+	var order_type models.OrderTypeInfo
+	_, err = db_session.Id(order.TypeId).Get(&order_type)
+	core.HandleError(err)
+
+	var order_hold_type models.OrderHoldTypeInfo
+	_, err = db_session.Id(order.HoldTypeId).Get(&order_hold_type)
+	core.HandleError(err)
+
+	type order_item_view_t struct {
+		OrderItem models.OrderItemInfo `xorm:"extends" json:"oi"`
+		Product   models.ProductInfo   `xorm:"extends" json:"p"`
+	}
+
+	sql := `
+	SELECT oi.*, p.*
+FROM erp_order_item oi
+    INNER JOIN erp_product p ON p.id = oi.item_product_id
+WHERE oi.order_id = %d`
+	sql = fmt.Sprintf(sql, order_id)
+
+	order_item_list := make([]order_item_view_t, 0)
+	err = db_session.Sql(sql).Find(&order_item_list)
+	core.HandleError(err)
+
 	return c.RenderJson(map[string]interface{}{
-		"order": order,
+		"order":           order,
+		"status":          status,
+		"shop":            shop,
+		"order_type":      order_type,
+		"order_hold_type": order_hold_type,
+		"order_item_list": order_item_list,
 	})
 }

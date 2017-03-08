@@ -240,6 +240,7 @@ GET  /erp/order/khb                            ErpOrderKhb.Index
 GET  /erp/order/hold                           ErpOrderHold.Index
 GET  /erp/order/:status                        ErpOrder.Index
 GET  /erp/order/detail/:order_id               ErpOrder.Detail
+POST /erp/order/data/detail                    ErpOrder.DetailData
 # GET  /erp/order/all                            ErpOrderAll.Index
 # GET  /erp/order/yzf                            ErpOrderYzf.Index
 # GET  /erp/order/dph                            ErpOrderDph.Index
