@@ -148,6 +148,10 @@ func (c ErpOrder) DetailData() revel.Result {
 	_, err = db_session.Id(order.HoldTypeId).Get(&order_hold_type)
 	core.HandleError(err)
 
+	var shipping_address models.OrderShippingAddressInfo
+	_, err = db_session.Where(fmt.Sprintf("order_id = %d", order_id)).Get(&shipping_address)
+	core.HandleError(err)
+
 	type order_item_view_t struct {
 		OrderItem models.OrderItemInfo `xorm:"extends" json:"oi"`
 		Product   models.ProductInfo   `xorm:"extends" json:"p"`
@@ -165,11 +169,12 @@ WHERE oi.order_id = %d`
 	core.HandleError(err)
 
 	return c.RenderJson(map[string]interface{}{
-		"order":           order,
-		"status":          status,
-		"shop":            shop,
-		"order_type":      order_type,
-		"order_hold_type": order_hold_type,
-		"order_item_list": order_item_list,
+		"order":            order,
+		"status":           status,
+		"shop":             shop,
+		"order_type":       order_type,
+		"shipping_address": shipping_address,
+		"order_hold_type":  order_hold_type,
+		"order_item_list":  order_item_list,
 	})
 }

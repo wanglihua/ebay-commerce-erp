@@ -115,15 +115,15 @@
                             <div class="form-group">
                                 <label for="buyer_user_name" class="col-xs-4 control-label">客户姓名：</label>
                                 <div class="col-xs-8">
-                                    <input id="buyer_user_name" name="detail.order.buyer_user_name" type="text" class="input-sm form-control" disabled="disabled" value="未获取值"/>
+                                    <input id="buyer_user_name" name="detail.order.buyer_user_name" type="text" class="input-sm form-control" disabled="disabled" v-model="detail.shipping_address.name"/>
                                 </div>
                             </div>
                         </div>
                         <div class="col-xs-3">
                             <div class="form-group">
-                                <label for="country_name" class="col-xs-4 control-label">中文国家：</label>
+                                <label for="country_name" class="col-xs-4 control-label">国家：</label>
                                 <div class="col-xs-8">
-                                    <input id="country_name" name="detail.order.country_name" type="text" class="input-sm form-control" disabled="disabled" value="未获取值"/>
+                                    <input id="country_name" name="detail.order.country_name" type="text" class="input-sm form-control" disabled="disabled" v-model="detail.shipping_address.country_name"/>
                                 </div>
                             </div>
                         </div>
@@ -131,7 +131,7 @@
                             <div class="form-group">
                                 <label for="phone" class="col-xs-4 control-label">联系电话：</label>
                                 <div class="col-xs-8">
-                                    <input id="phone" name="detail.order.country_name" type="text" class="input-sm form-control" disabled="disabled" value="未获取值"/>
+                                    <input id="phone" name="detail.order.country_name" type="text" class="input-sm form-control" disabled="disabled" v-model="detail.shipping_address.phone" />
                                 </div>
                             </div>
                         </div>
@@ -140,7 +140,42 @@
                             <div class="form-group">
                                 <label for="ebay_address" class="col-xs-2 control-label">平台地址：</label>
                                 <div class="col-xs-10">
-                                    <textarea id="ebay_address" name="detail.order.address" class="input-sm form-control" rows="5" disabled="disabled">未获取值</textarea>
+                                    <div id="ebay_address" class="address-box">
+                                        <div>
+                                            <label for="ebay_address_name">Name:</label>
+                                            <input id="ebay_address_name" type="text" v-model="detail.shipping_address.name"/>
+                                        </div>
+                                        <div>
+                                            <label for="ebay_address_street1">Address:</label>
+                                            <input id="ebay_address_street1" type="text" v-model="detail.shipping_address.street1"/>
+                                            <input id="ebay_address_street2" type="text" v-model="detail.shipping_address.street2"/>
+                                        </div>
+                                        <div>
+                                            <label for="ebay_address_city">City:</label>
+                                            <input id="ebay_address_city" type="text" v-model="detail.shipping_address.city_name" />
+                                        </div>
+                                        <div>
+                                            <label for="ebay_address_state">State:</label>
+                                            <input id="ebay_address_state" type="text" v-model="detail.shipping_address.province"/>
+                                        </div>
+                                        <div>
+                                            <label for="ebay_address_country">Country:</label>
+                                            <input id="ebay_address_country" type="text" v-model="detail.shipping_address.country"/>
+                                        </div>
+                                        <div>
+                                            <label for="ebay_address_country_name">Country Name:</label>
+                                            <input id="ebay_address_country_name" type="text" v-model="detail.shipping_address.country_name"/>
+                                        </div>
+                                        <div>
+                                            <label for="ebay_address_postal_code">Post Code:</label>
+                                            <input id="ebay_address_postal_code" type="text" v-model="detail.shipping_address.postal_code"/>
+                                        </div>
+                                        <div>
+                                            <label for="ebay_address_phone">Phone:</label>
+                                            <input id="ebay_address_phone" type="text" v-model="detail.shipping_address.phone"/>
+                                        </div>
+                                    </div>
+
                                 </div>
                             </div>
                         </div>
@@ -148,7 +183,41 @@
                             <div class="form-group">
                                 <label for="paypal_address" class="col-xs-2 control-label">PayPal<br/>地址：</label>
                                 <div class="col-xs-10">
-                                    <textarea id="paypal_address" name="detail.order.paypal_address" class="input-sm form-control" rows="5" disabled="disabled">未获取值</textarea>
+                                    <div id="paypal_address" class="address-box">
+                                        <div>
+                                            <label for="paypal_address_name">Name:</label>
+                                            <input id="paypal_address_name" type="text" value=""/>
+                                        </div>
+                                        <div>
+                                            <label for="paypal_address_street1">Address:</label>
+                                            <input id="paypal_address_street1" type="text" value=""/>
+                                            <input id="paypal_address_street2" type="text" value=""/>
+                                        </div>
+                                        <div>
+                                            <label for="paypal_address_city">City:</label>
+                                            <input id="paypal_address_city" type="text" value=""/>
+                                        </div>
+                                        <div>
+                                            <label for="paypal_address_state">State:</label>
+                                            <input id="paypal_address_state" type="text" value=""/>
+                                        </div>
+                                        <div>
+                                            <label for="paypal_address_country">Country:</label>
+                                            <input id="paypal_address_country" type="text" value=""/>
+                                        </div>
+                                        <div>
+                                            <label for="paypal_address_country_name">Country Name:</label>
+                                            <input id="paypal_address_country_name" type="text" value=""/>
+                                        </div>
+                                        <div>
+                                            <label for="paypal_address_postal_code">Post Code:</label>
+                                            <input id="paypal_address_postal_code" type="text" value=""/>
+                                        </div>
+                                        <div>
+                                            <label for="paypal_address_phone">Phone:</label>
+                                            <input id="paypal_address_phone" type="text" value=""/>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -191,12 +260,12 @@
                                 <thead>
                                 <tr>
                                     <th class="center" style="width: 50px;">选择</th>
-                                    <th style="width: 60px;">商品图片</th>
+                                    <th class="center" style="width: 60px;">商品图片</th>
                                     <th style="width: 120px;">商品名称</th>
-                                    <th>售价</th>
-                                    <th>成本</th>
-                                    <th style="width: 80px;">原始售价</th>
-                                    <th>毛利</th>
+                                    <th class="center" style="width: 100px;">售价</th>
+                                    <th class="center" style="width: 100px;">成本</th>
+                                    <th class="center" style="width: 80px;">原始售价</th>
+                                    <th class="center" style="width: 80px;">毛利</th>
                                     <th>留言</th>
                                 </tr>
                                 </thead>
@@ -209,7 +278,7 @@
                                                 <span class="lbl"></span>
                                             </label>
                                         </td>
-                                        <td>
+                                        <td class="center">
                                             <img :src="order_item.p.image_url" alt="" style="width: 60px;height: 60px;"/>
                                         </td>
                                         <td>
@@ -219,7 +288,14 @@
                                             <div>{{order_item.p.sku}}</div>
                                             <div>{{order_item.item_id}}</div>
                                         </td>
-                                        <td>3,330</td>
+                                        <td class="center">
+                                            <div>{{order_item.oi.transaction_price_currency}}&nbsp;{{order_item.oi.transaction_price}}
+                                                × {{order_item.oi.quantity}}
+                                            </div>
+                                            <div>={{order_item.oi.transaction_price_currency}}&nbsp;{{order_item.oi.transaction_price
+                                                * order_item.oi.quantity}}
+                                            </div>
+                                        </td>
                                         <td></td>
                                         <td class="center">{{order_item.oi.transaction_price_currency}}&nbsp;{{order_item.oi.transaction_price}}</td>
                                         <td>
@@ -269,6 +345,7 @@
                 "shop": {},
                 "order_type": {},
                 "order_hold_type": {},
+                "shipping_address": {},
                 "order_item_list": []
             }
         },

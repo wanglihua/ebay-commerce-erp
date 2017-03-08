@@ -286,3 +286,14 @@ div#order_detail div.widget-main div.form-group > label {
 div#order_detail table#order_item_list td {
     vertical-align: middle;
 }
+
+div#order_detail div.address-box {
+    border: solid lightgray 1px;
+    padding: 8px;
+}
+
+div#order_detail div.address-box input {
+    color: #393939;
+    border-style: none;
+    background-color: transparent;
+}
