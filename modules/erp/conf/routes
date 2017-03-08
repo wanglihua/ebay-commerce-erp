@@ -83,6 +83,7 @@ POST /erp/logistics/mode/delete                ErpLogisticsMode.Delete
 
 GET  /erp/product                              ErpProduct.Index
 POST /erp/product/data/list                    ErpProduct.ListData
+POST /erp/product/detail/:product_id           ErpProduct.Detail
 POST /erp/product/data/detail                  ErpProduct.DetailData
 POST /erp/product/save                         ErpProduct.Save
 POST /erp/product/delete                       ErpProduct.Delete

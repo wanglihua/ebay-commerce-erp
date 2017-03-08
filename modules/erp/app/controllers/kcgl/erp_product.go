@@ -2,15 +2,15 @@ package controllers
 
 import (
 	"encoding/json"
-	"github.com/revel/revel"
+	"fmt"
 	"strconv"
 
+	"github.com/go-xorm/xorm"
+	"github.com/revel/revel"
 	"matrix/core"
 	"matrix/modules/erp/models"
-	"matrix/modules/erp/service/status_service"
 	"matrix/modules/erp/service/product_cate_service"
-	"github.com/go-xorm/xorm"
-	"fmt"
+	"matrix/modules/erp/service/status_service"
 )
 
 type ErpProduct struct {
@@ -116,6 +116,10 @@ func (f *ProductDetailForm) Valid(validation *revel.Validation) bool {
 	validation.Required(f.Product.StatusId).Message("状态不能为空！")
 
 	return validation.HasErrors() == false
+}
+
+func (c ErpProduct) Detail(product_id int64) revel.Result {
+	return c.RenderText(fmt.Sprintf("product_id %d", product_id))
 }
 
 func (c ErpProduct) DetailData() revel.Result {

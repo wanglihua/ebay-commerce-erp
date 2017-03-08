@@ -287,7 +287,11 @@
                                             <div :title="order_item.p.name" style="width: 120px; overflow: hidden; text-overflow: ellipsis;white-space: nowrap;">
                                                 {{order_item.p.name}}
                                             </div>
-                                            <div>{{order_item.p.sku}}</div>
+                                            <div>
+                                                <a href="/erp/product/detail/{{order_item.p.id}}" target="_blank">
+                                                    {{order_item.p.sku}}
+                                                </a>
+                                            </div>
                                             <div>
                                                 <a :href="order_item.p.view_item_url" target="_blank">
                                                     {{order_item.p.item_id}}
