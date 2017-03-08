@@ -155,6 +155,7 @@ func fetch_product_item_to_db(config models.EBayAPIConfigInfo, db_session *xorm.
 	product.Sku = item_response.Item.Sku
 	product.Name = item_response.Item.Title
 	product.ImageUrl = core.NewNullString(item_response.Item.PictureDetails.GalleryUrl, true)
+	product.ViewItemUrl = core.NewNullString(item_response.Item.ListingDetails.ViewItemUrl, true)
 
 	if product.StatusId == 0 {
 		product.StatusId = models.PRODUCT_STATUS_ZC

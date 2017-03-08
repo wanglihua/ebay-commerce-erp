@@ -43,7 +43,13 @@ type Item struct {
 	ItemId         string             `xml:"ItemID"`
 	Title          string             `xml:"Title"`
 	Sku            string             `xml:"SKU"`
+	ListingDetails ItemListingDetails `xml:"ListingDetails"`
 	PictureDetails ItemPictureDetails `xml:"PictureDetails"`
+}
+
+type ItemListingDetails struct {
+	XMLName     xml.Name       `xml:"ListingDetails"`
+	ViewItemUrl string         `xml:"ViewItemURL"`
 }
 
 type ItemPictureDetails struct {
@@ -65,6 +71,9 @@ type ItemPictureDetails struct {
         <ItemID>282307939082</ItemID>
         <Title>2 Person Beach Instant Pop Up Tent Sun Shade Shelter UV Protection Protable Camp</Title>
         <SKU>EAZ0161LB8AU</SKU>
+	    <ListingDetails>
+	      <ViewItemURL> anyURI </ViewItemURL>
+	    </ListingDetails>
         <PictureDetails>
             <GalleryType>Plus</GalleryType>
             <GalleryURL>http://i.ebayimg.com/00/s/MTAwMFgxMDAw/z/i7kAAOSwtfhYonls/$_12.JPG?set_id=880000500F</GalleryURL>

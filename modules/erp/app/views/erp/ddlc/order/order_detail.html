@@ -131,7 +131,7 @@
                             <div class="form-group">
                                 <label for="phone" class="col-xs-4 control-label">联系电话：</label>
                                 <div class="col-xs-8">
-                                    <input id="phone" name="detail.order.country_name" type="text" class="input-sm form-control" disabled="disabled" v-model="detail.shipping_address.phone" />
+                                    <input id="phone" name="detail.order.country_name" type="text" class="input-sm form-control" disabled="disabled" v-model="detail.shipping_address.phone"/>
                                 </div>
                             </div>
                         </div>
@@ -152,7 +152,7 @@
                                         </div>
                                         <div>
                                             <label for="ebay_address_city">City:</label>
-                                            <input id="ebay_address_city" type="text" v-model="detail.shipping_address.city_name" />
+                                            <input id="ebay_address_city" type="text" v-model="detail.shipping_address.city_name"/>
                                         </div>
                                         <div>
                                             <label for="ebay_address_state">State:</label>
@@ -279,14 +279,20 @@
                                             </label>
                                         </td>
                                         <td class="center">
-                                            <img :src="order_item.p.image_url" alt="" style="width: 60px;height: 60px;"/>
+                                            <a :href="order_item.p.view_item_url" target="_blank">
+                                                <img :src="order_item.p.image_url" alt="" style="width: 60px;height: 60px;"/>
+                                            </a>
                                         </td>
                                         <td>
                                             <div :title="order_item.p.name" style="width: 120px; overflow: hidden; text-overflow: ellipsis;white-space: nowrap;">
                                                 {{order_item.p.name}}
                                             </div>
                                             <div>{{order_item.p.sku}}</div>
-                                            <div>{{order_item.item_id}}</div>
+                                            <div>
+                                                <a :href="order_item.p.view_item_url" target="_blank">
+                                                    {{order_item.p.item_id}}
+                                                </a>
+                                            </div>
                                         </td>
                                         <td class="center">
                                             <div>{{order_item.oi.transaction_price_currency}}&nbsp;{{order_item.oi.transaction_price}}
@@ -335,6 +341,7 @@
         </div>
     </div>
 </div>
+{%template "erp/ddlc/order/order_detail.var" .%}
 <script type="text/javascript">
     var vm = new Vue({
         el: "#order_detail",
@@ -357,7 +364,7 @@
                     "dataType": 'json',
                     "url": '{% url "ErpOrder.DetailData"%}',
                     "data": {
-                        "id": 141
+                        "id": order_id
                     },
                     "success": function (data) {
                         if (data.success == false) {

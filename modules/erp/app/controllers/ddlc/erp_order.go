@@ -122,6 +122,8 @@ func (c ErpOrder) DetailData() revel.Result {
 	var order_id int64
 	c.Params.Bind(&order_id, "id")
 
+	revel.TRACE.Println("order_id:", order_id)
+
 	var order models.OrderInfo
 	has_order, err := db_session.Id(order_id).Get(&order)
 	core.HandleError(err)
