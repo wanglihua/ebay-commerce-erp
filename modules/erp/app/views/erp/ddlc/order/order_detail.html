@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+    <meta charset="utf-8"/>
+    <title>订单详情-OZO ERP</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+    <link type="text/css" rel="stylesheet" href="/static/ace/css/all.css?{% .static_version %}" class="ace-main-stylesheet" id="main-ace-style"/>
+    <!--[if lte IE 9]>
+    <link type="text/css" rel="stylesheet" href="/static/ace/css/ace-part2.min.css?{% .static_version %}" class="ace-main-stylesheet"/>
+    <![endif]-->
+    <!--[if lte IE 9]>
+    <link type="text/css" rel="stylesheet" href="/static/ace/css/ace-ie.min.css?{% .static_version %}"/>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="/static/site.css?{% .static_version %}"/>
+    <script type="text/javascript" src="/static/js/vue.js?{% .static_version %}"></script>
+    <!--[if !IE]> -->
+    <script type="text/javascript">
+        window.jQuery || document.write("<script type='text/javascript' src='/static/ace/js/jquery.min.js?{% .static_version %}'>" + "<" + "/script>");
+    </script>
+    <!-- <![endif]-->
+    <!--[if IE]>
+    <script type="text/javascript">
+        window.jQuery || document.write("<script type='text/javascript' src='/static/ace/js/jquery1x.min.js?{% .static_version %}'>" + "<" + "/script>");
+    </script>
+    <![endif]-->
+    <script type="text/javascript">
+        if ('ontouchstart' in document.documentElement) document.write("<script type='text/javascript' src='/static/ace/js/jquery.mobile.custom.min.js?{% .static_version %}'>" + "<" + "/script>");
+    </script>
+    <script type="text/javascript" src="/static/ace/js/all1.js?{% .static_version %}"></script>
+    <!--[if lte IE 8]>
+    <script type="text/javascript" src="/static/ace/js/html5shiv.min.js?{% .static_version %}"></script>
+    <script type="text/javascript" src="/static/ace/js/respond.min.js?{% .static_version %}"></script>
+    <![endif]-->
+    <script type="text/javascript" src="/static/ace/js/all2.js?{% .static_version %}"></script>
+    <script type="text/javascript" src="/static/js/js.cookie.js?{% .static_version %}"></script>
+    <script type="text/javascript" src="/static/site.js?{% .static_version %}"></script>
+</head>
+
+<body class="no-skin">
+<div id="huaduCover" class="huaduCover" style="display: none;">
+    <div class="huaduBg" id="huaduBg">&nbsp;</div>
+    <div class="huaduProgressBar" id="huaduProgressBar"></div>
+</div>
+<div class="main-container" id="main-container">
+    <div id="order_detail" style="width: 1024px;margin-left: auto;margin-right: auto;">
+        <div class="widget-box">
+            <div class="widget-header">
+                <h4 class="smaller">基本信息</h4>
+            </div>
+            <div class="widget-body">
+                <div class="widget-main">
+                    <div class="row">
+                        <div class="col-xs-4">
+                            <div class="form-group">
+                                <label for="stock_id" class="col-xs-3 control-label">订单编号：</label>
+                                <div class="col-xs-9">
+                                    <input id="stock_id" name="detail.inventory.stock_id" type="text" class="input-sm form-control" value=""/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-4">
+                            <div class="form-group">
+                                <label for="stock_id" class="col-xs-3 control-label">建单时间：</label>
+                                <div class="col-xs-9">
+                                    <input id="stock_id" name="detail.inventory.stock_id" type="text" class="input-sm form-control" value=""/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="widget-box">
+            <div class="widget-header">
+                <h4 class="smaller">客户信息</h4>
+            </div>
+            <div class="widget-body">
+                <div class="widget-main">
+                    <p>
+                        <span class="btn btn-sm" data-rel="popover" title="" data-content="Heads up! This alert needs your attention, but it's not super important." data-original-title="Default">Default</span>
+                        <span class="btn btn-success btn-sm popover-success" data-rel="popover" data-placement="right" title="" data-content="Well done! You successfully read this important alert message." data-original-title="<i class='ace-icon fa fa-check green'></i> Right Success">Right</span>
+                        <span class="btn btn-warning btn-sm popover-warning" data-rel="popover" data-placement="left" title="" data-content="Warning! Best check yo self, you're not looking too good." data-original-title="<i class='ace-icon fa fa-exclamation-triangle orange'></i> Left Warning">Left</span>
+                    </p>
+
+                    <p>
+                        <span class="btn btn-danger btn-sm popover-error" data-rel="popover" data-placement="top" data-original-title="<i class='ace-icon fa fa-bolt red'></i> Top Danger" data-content="Oh snap! Change a few things up and try submitting again.">Top</span>
+                        <span class="btn btn-info btn-sm popover-info" data-rel="popover" data-placement="bottom" title="" data-content="Heads up! This alert needs your attention, but it's not super important." data-original-title="Some Info">Bottom</span>
+                        <span class="btn btn-inverse btn-sm popover-notitle" data-rel="popover" data-placement="bottom" data-content="Popover without a title!" data-original-title="" title="">No Title</span>
+                    </p>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="widget-box">
+            <div class="widget-header">
+                <h4 class="smaller">订单信息</h4>
+            </div>
+            <div class="widget-body">
+                <div class="widget-main">
+                    <p>
+                        <span class="btn btn-sm" data-rel="popover" title="" data-content="Heads up! This alert needs your attention, but it's not super important." data-original-title="Default">Default</span>
+                        <span class="btn btn-success btn-sm popover-success" data-rel="popover" data-placement="right" title="" data-content="Well done! You successfully read this important alert message." data-original-title="<i class='ace-icon fa fa-check green'></i> Right Success">Right</span>
+                        <span class="btn btn-warning btn-sm popover-warning" data-rel="popover" data-placement="left" title="" data-content="Warning! Best check yo self, you're not looking too good." data-original-title="<i class='ace-icon fa fa-exclamation-triangle orange'></i> Left Warning">Left</span>
+                    </p>
+
+                    <p>
+                        <span class="btn btn-danger btn-sm popover-error" data-rel="popover" data-placement="top" data-original-title="<i class='ace-icon fa fa-bolt red'></i> Top Danger" data-content="Oh snap! Change a few things up and try submitting again.">Top</span>
+                        <span class="btn btn-info btn-sm popover-info" data-rel="popover" data-placement="bottom" title="" data-content="Heads up! This alert needs your attention, but it's not super important." data-original-title="Some Info">Bottom</span>
+                        <span class="btn btn-inverse btn-sm popover-notitle" data-rel="popover" data-placement="bottom" data-content="Popover without a title!" data-original-title="" title="">No Title</span>
+                    </p>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="widget-box">
+            <div class="widget-header">
+                <h4 class="smaller">订单报表</h4>
+            </div>
+            <div class="widget-body">
+                <div class="widget-main">
+                    <p>
+                        <span class="btn btn-sm" data-rel="popover" title="" data-content="Heads up! This alert needs your attention, but it's not super important." data-original-title="Default">Default</span>
+                        <span class="btn btn-success btn-sm popover-success" data-rel="popover" data-placement="right" title="" data-content="Well done! You successfully read this important alert message." data-original-title="<i class='ace-icon fa fa-check green'></i> Right Success">Right</span>
+                        <span class="btn btn-warning btn-sm popover-warning" data-rel="popover" data-placement="left" title="" data-content="Warning! Best check yo self, you're not looking too good." data-original-title="<i class='ace-icon fa fa-exclamation-triangle orange'></i> Left Warning">Left</span>
+                    </p>
+
+                    <p>
+                        <span class="btn btn-danger btn-sm popover-error" data-rel="popover" data-placement="top" data-original-title="<i class='ace-icon fa fa-bolt red'></i> Top Danger" data-content="Oh snap! Change a few things up and try submitting again.">Top</span>
+                        <span class="btn btn-info btn-sm popover-info" data-rel="popover" data-placement="bottom" title="" data-content="Heads up! This alert needs your attention, but it's not super important." data-original-title="Some Info">Bottom</span>
+                        <span class="btn btn-inverse btn-sm popover-notitle" data-rel="popover" data-placement="bottom" data-content="Popover without a title!" data-original-title="" title="">No Title</span>
+                    </p>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="widget-box">
+            <div class="widget-header">
+                <h4 class="smaller">订单详情</h4>
+            </div>
+            <div class="widget-body">
+                <div class="widget-main">
+                    <p>
+                        <span class="btn btn-sm" data-rel="popover" title="" data-content="Heads up! This alert needs your attention, but it's not super important." data-original-title="Default">Default</span>
+                        <span class="btn btn-success btn-sm popover-success" data-rel="popover" data-placement="right" title="" data-content="Well done! You successfully read this important alert message." data-original-title="<i class='ace-icon fa fa-check green'></i> Right Success">Right</span>
+                        <span class="btn btn-warning btn-sm popover-warning" data-rel="popover" data-placement="left" title="" data-content="Warning! Best check yo self, you're not looking too good." data-original-title="<i class='ace-icon fa fa-exclamation-triangle orange'></i> Left Warning">Left</span>
+                    </p>
+
+                    <p>
+                        <span class="btn btn-danger btn-sm popover-error" data-rel="popover" data-placement="top" data-original-title="<i class='ace-icon fa fa-bolt red'></i> Top Danger" data-content="Oh snap! Change a few things up and try submitting again.">Top</span>
+                        <span class="btn btn-info btn-sm popover-info" data-rel="popover" data-placement="bottom" title="" data-content="Heads up! This alert needs your attention, but it's not super important." data-original-title="Some Info">Bottom</span>
+                        <span class="btn btn-inverse btn-sm popover-notitle" data-rel="popover" data-placement="bottom" data-content="Popover without a title!" data-original-title="" title="">No Title</span>
+                    </p>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+

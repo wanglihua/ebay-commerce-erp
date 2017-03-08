@@ -170,11 +170,11 @@ form.form-horizontal label.control-label {
     background-color: #d0d0d0 !important;
 }
 
-.dataTable>tbody>tr.selected>td {
+.dataTable > tbody > tr.selected > td {
     background-color: #dff0d8;
 }
 
-.dataTable>tbody>tr.hilight>td {
+.dataTable > tbody > tr.hilight > td {
     background-color: #5fcfee;
 }
 
@@ -262,4 +262,18 @@ div.todo:before {
 
 .green {
     color: green;
+}
+
+div#order_detail div.widget-box {
+    margin-top: 8px;
+    margin-bottom: 15px;
+}
+
+div#order_detail div.widget-main > div.row > div {
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+div#order_detail div.widget-main div.form-group > label {
+    line-height: 28px;
 }

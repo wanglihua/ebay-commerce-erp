@@ -110,6 +110,12 @@ func (c ErpOrder) ListData() revel.Result {
 	})
 }
 
+func (c ErpOrder) Detail(order_id int64) revel.Result {
+	c.RenderArgs["static_version"] = core.GetStaticVersion()
+	c.RenderArgs["order_id"] = order_id
+	return c.RenderTemplate("erp/ddlc/order/order_detail.html")
+}
+
 func (c ErpOrder) DetailData() revel.Result {
 	db_session := c.DbSession
 
