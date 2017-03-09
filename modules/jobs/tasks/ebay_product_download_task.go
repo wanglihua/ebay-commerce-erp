@@ -114,6 +114,12 @@ func (t EBayProductDownloadTask) Run() {
 				revel.ERROR.Printf("eBay GetSellerList Response: " + list_response.Ack + "\n")
 			}
 
+			e := list_response.Errors
+
+			if e.ShortMessage != "" {
+				revel.ERROR.Println("eBay GetSellerList ERROR - " + e.ErrorCode + " : " + e.LongMessage)
+			}
+
 			has_more_orders = list_response.HasMoreItems
 			page_number += 1
 

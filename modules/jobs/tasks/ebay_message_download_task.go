@@ -230,6 +230,15 @@ func (t EBayMessageDownloadTask) fetch_messages(config models.EBayAPIConfigInfo,
 		revel.ERROR.Println(err)
 	}
 
+	switch response.Ack {
+	case "Success":
+		revel.TRACE.Printf("eBay GetMemberMessages Response: " + response.Ack + "\n")
+	case "Failure":
+		revel.ERROR.Printf("eBay GetMemberMessages Response: " + response.Ack + "\n")
+	default:
+		revel.ERROR.Printf("eBay GetMemberMessages Response: " + response.Ack + "\n")
+	}
+
 	e := response.Errors
 
 	if e.ShortMessage != "" {

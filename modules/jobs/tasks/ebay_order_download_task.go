@@ -436,6 +436,12 @@ func (t EBayOrderDownloadTask) Run() {
 				revel.ERROR.Printf("eBay GetOrders Response: " + response.Ack + "\n")
 			}
 
+			e := response.Errors
+
+			if e.ShortMessage != "" {
+				revel.ERROR.Println("eBay GetOrders ERROR - " + e.ErrorCode + " : " + e.LongMessage)
+			}
+
 			has_more_orders = response.HasMoreOrders
 			page_number += 1
 		} // for has_more_orders == true
