@@ -39,20 +39,20 @@ type GetItemResponse struct {
 }
 
 type ProductItem struct {
-	XMLName        xml.Name           `xml:"Item"`
-	ItemId         string             `xml:"ItemID"`
-	Title          string             `xml:"Title"`
-	Sku            string             `xml:"SKU"`
-	ListingDetails ItemListingDetails `xml:"ListingDetails"`
-	PictureDetails ItemPictureDetails `xml:"PictureDetails"`
+	XMLName        xml.Name                  `xml:"Item"`
+	ItemId         string                    `xml:"ItemID"`
+	Title          string                    `xml:"Title"`
+	Sku            string                    `xml:"SKU"`
+	ListingDetails ProductItemListingDetails `xml:"ListingDetails"`
+	PictureDetails ProductItemPictureDetails `xml:"PictureDetails"`
 }
 
-type ItemListingDetails struct {
+type ProductItemListingDetails struct {
 	XMLName     xml.Name       `xml:"ListingDetails"`
 	ViewItemUrl string         `xml:"ViewItemURL"`
 }
 
-type ItemPictureDetails struct {
+type ProductItemPictureDetails struct {
 	XMLName      xml.Name     `xml:"PictureDetails"`
 	GalleryType  string       `xml:"GalleryType"`
 	GalleryUrl   string       `xml:"GalleryURL"`

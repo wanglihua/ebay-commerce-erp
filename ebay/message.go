@@ -25,13 +25,34 @@ type MemberMessageArray struct {
 
 type MemberMessageExchange struct {
 	XMLName          xml.Name         `xml:"MemberMessageExchange"`
-	Item             ProductItem
+	Item             MsgPrdItem
 	CreationDate     string
 	LastModifiedDate string
 	MessageStatus    string
 	Response         string
 	MessageMedia     MessageMedia     `xml:"MessageMedia"` //这里也不知道有问题不，是不是应该是个数组
 	Question         Question
+}
+
+type MsgPrdItem struct {
+	XMLName        xml.Name                  `xml:"Item"`
+	ItemId         string                    `xml:"ItemID"`
+	Title          string                    `xml:"Title"`
+	ListingDetails MsgPrdItemListingDetails `xml:"ListingDetails"`
+	PictureDetails MsgPrdItemPictureDetails `xml:"PictureDetails"`
+}
+
+type MsgPrdItemListingDetails struct {
+	XMLName     xml.Name       `xml:"ListingDetails"`
+	ViewItemUrl string         `xml:"ViewItemURL"`
+}
+
+type MsgPrdItemPictureDetails struct {
+	XMLName      xml.Name     `xml:"PictureDetails"`
+	GalleryType  string       `xml:"GalleryType"`
+	GalleryUrl   string       `xml:"GalleryURL"`
+	PhotoDisplay string       `xml:"PhotoDisplay"`
+	PictureUrls  []string     `xml:"PictureURL"`
 }
 
 type MessageMedia struct {

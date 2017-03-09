@@ -125,7 +125,7 @@ func (t EBayMessageDownloadTask) Run() {
 				message_id := message_download.Question.MessageId
 
 				var message_in_db models.MessageInfo
-				has_message, err := db_session.Where(fmt.Sprintf("message_id = %d", message_id)).Get(&message_in_db)
+				has_message, err := db_session.Where(fmt.Sprintf("message_id = '%s'", message_id)).Get(&message_in_db)
 				if err != nil {
 					revel.ERROR.Println(err)
 				}
@@ -135,7 +135,7 @@ func (t EBayMessageDownloadTask) Run() {
 				var product_id_result struct {
 					ProductId int64 `xorm:"'product_id'"`
 				}
-				has_item_product, err := db_session.Sql(fmt.Sprintf("SELECT p.id AS product_id FROM erp_product p WHERE p.sku = '%s'", message_download.Item.Sku)).Get(&product_id_result)
+				has_item_product, err := db_session.Sql(fmt.Sprintf("SELECT p.id AS product_id FROM erp_product p WHERE p.item_id = '%s'", message_download.Item.ItemId)).Get(&product_id_result)
 				if err != nil {
 					revel.ERROR.Println(err)
 				}
@@ -148,7 +148,6 @@ func (t EBayMessageDownloadTask) Run() {
 
 				message_in_db.ProductId = product_id
 				message_in_db.ItemId = message_download.Item.ItemId
-				message_in_db.Sku = message_download.Item.Sku
 
 				if message_download.CreationDate != "" {
 					creation_date, err := time.Parse("2006-01-02T15:04:05.000Z", message_download.CreationDate)

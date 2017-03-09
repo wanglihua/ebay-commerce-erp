@@ -9,7 +9,7 @@ type MessageInfo struct {
 	MessageId        string            `xorm:"nvarchar(50) notnull index 'message_id'" json:"message_id"`
 	ProductId        int64             `xorm:"bigint notnull index 'product_id'" json:"product_id"`
 	ItemId           string            `xorm:"nvarchar(50) notnull index 'item_id'" json:"item_id"` // ebay系统的 ItemId，这个是产品的 item_id ??
-	Sku              string            `xorm:"nvarchar(200) notnull index 'sku'" json:"sku" smith:"verbose_name=SKU,min=2,max=100"`
+	Sku              string            `xorm:"nvarchar(200) notnull index 'sku'" json:"sku"`
 	CreationDate     core.NullLongTime `xorm:"datetime null 'creation_date'" json:"creation_date"`
 	LastModifiedDate core.NullLongTime `xorm:"datetime null 'last_modified_date'" json:"last_modified_date"`
 	MessageStatus    string            `xorm:"nvarchar(50) notnull 'message_status'" json:"message_status"`   // Answered Unanswered

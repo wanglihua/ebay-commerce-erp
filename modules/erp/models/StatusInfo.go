@@ -596,13 +596,13 @@ func (e StatusInfo) InitData(db_session *xorm.Session) {
 		status.Type = STATUS_TYPE_MESSAGE
 		status.Name = "已回复"
 		status.Desc = core.NewNullString("消息状态 已回复", true)
-		db_session.Insert(&status)
+		db_session.Insert(status)
 
 		status = new(StatusInfo)
 		status.Id = MESSAGE_STATUS_UNANSWERED
 		status.Type = STATUS_TYPE_MESSAGE
 		status.Name = "未回复"
 		status.Desc = core.NewNullString("消息状态 未回复", true)
-		db_session.Insert(&status)
+		db_session.Insert(status)
 	}
 }
