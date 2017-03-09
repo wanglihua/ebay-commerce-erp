@@ -126,7 +126,7 @@ func (t EBayProductDownloadTask) Run() {
 
 	job_duration := time.Since(job_time_begin)
 
-	revel.TRACE.Println("sync message time duration: ", job_duration.Seconds(), "seconds")
+	revel.TRACE.Println("eBay GetSellerList time duration: ", job_duration.Seconds(), "seconds")
 }
 
 func (t EBayProductDownloadTask) fetch_product_list(config models.EBayAPIConfigInfo, page_number int) ebay.GetSellerListResponse {

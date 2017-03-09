@@ -219,7 +219,7 @@ func (t EBayMessageDownloadTask) Run() {
 
 	job_duration := time.Since(job_time_begin)
 
-	revel.TRACE.Println("sync message time duration: ", job_duration.Seconds(), "seconds")
+	revel.TRACE.Println("eBay GetMemberMessages time duration: ", job_duration.Seconds(), "seconds")
 }
 
 func (t EBayMessageDownloadTask) fetch_messages(config models.EBayAPIConfigInfo, page_number int) ebay.GetMemberMessagesResponse {

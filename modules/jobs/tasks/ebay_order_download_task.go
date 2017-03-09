@@ -443,7 +443,7 @@ func (t EBayOrderDownloadTask) Run() {
 
 	job_duration := time.Since(job_time_begin)
 
-	revel.TRACE.Println("sync order time duration: ", job_duration.Seconds(), "seconds")
+	revel.TRACE.Println("eBay GetOrders time duration: ", job_duration.Seconds(), "seconds")
 }
 
 func (t EBayOrderDownloadTask) fetch_orders(config models.EBayAPIConfigInfo, page_number int) ebay.GetOrdersResponse {
