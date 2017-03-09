@@ -1,0 +1,444 @@
+{%header "消息" .%}
+<div id="page">
+   <div class="breadcrumbs" id="breadcrumbs">
+       <ul class="breadcrumb">
+           <li>
+               <a href='{%url "Home.Index"%}'><i class="ace-icon fa fa-home home-icon"></i></a>
+           </li>
+           <li class="parent" data-menu="erp-menu">ERP</li>
+           <li class="active" data-menu="erp-message-menu">消息</li>
+       </ul>
+   </div>
+   <div class="page-content">
+       <div class="row">
+           <div class="col-xs-12" style="padding: 0;">
+               <div class="gridToolBar clearfix">
+                   <button class="btn btn-primary btn-sm" @click="reloadList('#messageList')">
+                       <i class="ace-icon fa fa-refresh"></i>
+                       刷新
+                   </button>
+                   <button class="btn btn-success btn-sm" @click="showMessageDetail(0)">
+                       <i class="ace-icon fa fa-plus"></i>
+                       新增
+                   </button>
+                   <button class="btn btn-danger btn-sm" @click="deleteMessage()">
+                       <i class="ace-icon fa fa-trash-o"></i>
+                       删除
+                   </button>
+               </div>
+               <div>
+                   <table id="messageList" class="table table-striped table-bordered table-hover"></table>
+               </div>
+           </div>
+       </div>
+   </div>
+    <div class="modal fade" id="messageDetailDialog">
+        <div class="modal-dialog" style="width: 680px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="True">&times;</button>
+                    <h4 class="modal-title">消息详细</h4>
+                </div>
+                <div class="modal-body clearfix">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <form class="form-horizontal" role="form" id="messageDetailForm">
+                                <input id="message_id" name="detail.message.id" type="hidden" v-model.number="detail.message.id"/>
+                                <input id="message_version" name="detail.message.version" type="hidden" v-model.number="detail.message.version"/>
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="shop_id" class="col-xs-2 control-label">ShopId</label>
+                                            <div class="col-xs-10">
+                                                <input id="shop_id" name="detail.message.shop_id" type="text" class="input-sm form-control" v-model.number="detail.message.shop_id"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="message_id" class="col-xs-2 control-label">MessageId</label>
+                                            <div class="col-xs-10">
+                                                <input id="message_id" name="detail.message.message_id" type="text" class="input-sm form-control" v-model="detail.message.message_id"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="product_id" class="col-xs-2 control-label">ProductId</label>
+                                            <div class="col-xs-10">
+                                                <input id="product_id" name="detail.message.product_id" type="text" class="input-sm form-control" v-model.number="detail.message.product_id"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="item_id" class="col-xs-2 control-label">ItemId</label>
+                                            <div class="col-xs-10">
+                                                <input id="item_id" name="detail.message.item_id" type="text" class="input-sm form-control" v-model="detail.message.item_id"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="sku" class="col-xs-2 control-label">Sku</label>
+                                            <div class="col-xs-10">
+                                                <input id="sku" name="detail.message.sku" type="text" class="input-sm form-control" v-model="detail.message.sku"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="creation_date" class="col-xs-2 control-label">CreationDate</label>
+                                            <div class="col-xs-10">
+                                                <input id="creation_date" name="detail.message.creation_date" type="text" class="input-sm form-control" v-model="detail.message.creation_date"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="last_modified_date" class="col-xs-2 control-label">LastModifiedDate</label>
+                                            <div class="col-xs-10">
+                                                <input id="last_modified_date" name="detail.message.last_modified_date" type="text" class="input-sm form-control" v-model="detail.message.last_modified_date"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="message_status" class="col-xs-2 control-label">MessageStatus</label>
+                                            <div class="col-xs-10">
+                                                <input id="message_status" name="detail.message.message_status" type="text" class="input-sm form-control" v-model="detail.message.message_status"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="display_to_public" class="col-xs-2 control-label">DisplayToPublic</label>
+                                            <div class="col-xs-10">
+                                                <input id="display_to_public" name="detail.message.display_to_public" type="text" class="input-sm form-control" v-model="detail.message.display_to_public"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="message_type" class="col-xs-2 control-label">MessageType</label>
+                                            <div class="col-xs-10">
+                                                <input id="message_type" name="detail.message.message_type" type="text" class="input-sm form-control" v-model="detail.message.message_type"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="question_type" class="col-xs-2 control-label">QuestionType</label>
+                                            <div class="col-xs-10">
+                                                <input id="question_type" name="detail.message.question_type" type="text" class="input-sm form-control" v-model="detail.message.question_type"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="recipient_id" class="col-xs-2 control-label">RecipientId</label>
+                                            <div class="col-xs-10">
+                                                <input id="recipient_id" name="detail.message.recipient_id" type="text" class="input-sm form-control" v-model="detail.message.recipient_id"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="sender_email" class="col-xs-2 control-label">SenderEmail</label>
+                                            <div class="col-xs-10">
+                                                <input id="sender_email" name="detail.message.sender_email" type="text" class="input-sm form-control" v-model="detail.message.sender_email"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="sender_id" class="col-xs-2 control-label">SenderId</label>
+                                            <div class="col-xs-10">
+                                                <input id="sender_id" name="detail.message.sender_id" type="text" class="input-sm form-control" v-model="detail.message.sender_id"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="subject" class="col-xs-2 control-label">Subject</label>
+                                            <div class="col-xs-10">
+                                                <input id="subject" name="detail.message.subject" type="text" class="input-sm form-control" v-model="detail.message.subject"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="body" class="col-xs-2 control-label">Body</label>
+                                            <div class="col-xs-10">
+                                                <input id="body" name="detail.message.body" type="text" class="input-sm form-control" v-model="detail.message.body"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="status_id" class="col-xs-2 control-label">StatusId</label>
+                                            <div class="col-xs-10">
+                                                <input id="status_id" name="detail.message.status_id" type="text" class="input-sm form-control" v-model.number="detail.message.status_id"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success btn-sm" @click="saveMessage()">
+                        <i class="ace-icon fa fa-floppy-o"></i>保存
+                    </button>
+                    <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">
+                        <i class="ace-icon fa fa-times"></i>关闭
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    var vm = new Vue({
+        el: "#page",
+        data: {
+            "detail": {
+                "message": {}
+            }
+        },
+        mounted: function () {
+            initDataTable(
+                    '#messageList',
+                    {
+                        "sAjaxSource": '{%url "ErpMessage.ListData"%}',
+                        "aaSorting": [[1, "asc"]],
+                        "aoColumns": [
+                            {
+                                "mDataProp": "id", "bSearchable": false, "orderable": false, "sClass": "center", "width": 50,
+                                "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
+                                "render": function (data, type, row) {
+                                    return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
+                                }
+                            },
+                            {"mDataProp": "shop_id", "title": "ShopId", "bSearchable": false },
+                            {"mDataProp": "message_id", "title": "MessageId", "bSearchable": true },
+                            {"mDataProp": "product_id", "title": "ProductId", "bSearchable": false },
+                            {"mDataProp": "item_id", "title": "ItemId", "bSearchable": true },
+                            {"mDataProp": "sku", "title": "Sku", "bSearchable": true },
+                            {"mDataProp": "creation_date", "title": "CreationDate", "bSearchable": false },
+                            {"mDataProp": "last_modified_date", "title": "LastModifiedDate", "bSearchable": false },
+                            {"mDataProp": "message_status", "title": "MessageStatus", "bSearchable": true },
+                            {"mDataProp": "display_to_public", "title": "DisplayToPublic", "bSearchable": false },
+                            {"mDataProp": "message_type", "title": "MessageType", "bSearchable": true },
+                            {"mDataProp": "question_type", "title": "QuestionType", "bSearchable": true },
+                            {"mDataProp": "recipient_id", "title": "RecipientId", "bSearchable": true },
+                            {"mDataProp": "sender_email", "title": "SenderEmail", "bSearchable": true },
+                            {"mDataProp": "sender_id", "title": "SenderId", "bSearchable": true },
+                            {"mDataProp": "subject", "title": "Subject", "bSearchable": true },
+                            {"mDataProp": "body", "title": "Body", "bSearchable": true },
+                            {"mDataProp": "status_id", "title": "StatusId", "bSearchable": false },
+                            {"mDataProp": "create_time", "title": "创建时间", "bSearchable": false, "width": 120 },
+                            {"mDataProp": "update_time", "title": "修改时间", "bSearchable": false, "width": 120 }
+                        ]
+                   }
+            );
+
+            $('#messageList tbody').on('dblclick', 'tr', function () {
+                var id = $(this).find('td:first-child input:checkbox').val();
+                vm.showMessageDetail(id);
+            });
+        },
+        methods: {
+            reloadList: function () {
+                reloadList('#messageList');
+            },
+            showMessageDetail: function (id) {
+                showMask("加载中...");
+                $("#messageDetailForm").clearValidation();
+                $.ajax({
+                           url: '{%url "ErpMessage.DetailData" %}',
+                           type: "POST",
+                           data: {
+                               "id": id
+                           },
+                           success: function (result) {
+                               hideMask();
+                               if (result.success == false) {
+                                   $.msg.error(result.message);
+                                   return;
+                               }
+                               vm.detail = result;
+                               $('#messageDetailDialog').modal(modalOptions);
+                           }
+                       }
+                );
+            },
+            saveMessage: function () {
+                showMask("提交中...");
+                var form = $("#messageDetailForm");
+                var valid = validate(form, {  
+                    'detail.message.shop_id': {
+                        required: true, digits: true
+                    },
+                    'detail.message.message_id': {
+                        required: true
+                    },
+                    'detail.message.product_id': {
+                        required: true, digits: true
+                    },
+                    'detail.message.item_id': {
+                        required: true
+                    },
+                    'detail.message.sku': {
+                        required: true
+                    },
+                    'detail.message.creation_date': {
+                        required: false
+                    },
+                    'detail.message.last_modified_date': {
+                        required: false
+                    },
+                    'detail.message.message_status': {
+                        required: true
+                    },
+                    'detail.message.display_to_public': {
+                        required: true
+                    },
+                    'detail.message.message_type': {
+                        required: true
+                    },
+                    'detail.message.question_type': {
+                        required: true
+                    },
+                    'detail.message.recipient_id': {
+                        required: true
+                    },
+                    'detail.message.sender_email': {
+                        required: true
+                    },
+                    'detail.message.sender_id': {
+                        required: true
+                    },
+                    'detail.message.subject': {
+                        required: true
+                    },
+                    'detail.message.body': {
+                        required: true
+                    },
+                    'detail.message.status_id': {
+                        required: true, digits: true
+                    }
+                });
+
+                if (!valid) {
+                    hideMask();
+                } else {
+                    $.ajax({
+                               url: '{%url "ErpMessage.Save"%}',
+                               type: "POST",
+                               processData: false,
+                               contentType: 'application/json',
+                               data: JSON.stringify(vm.detail),
+                               success: function (data) {
+                                   hideMask();
+                                   if (data.success == false) {
+                                       $.msg.error(data.message);
+                                       //return;
+                                   }
+                                   else {
+                                       $.msg.show(data.message);
+                                       $('#messageDetailDialog').modal('hide');
+                                       vm.reloadList();
+                                       //return;
+                                   }
+                               }
+                           }
+                    );
+                }
+            },
+            deleteMessage: function () {
+                var id_list = [];
+                $('#messageList tbody tr>td:first-child input:checkbox').each(function () {
+                    if (this.checked) {
+                        id_list.push($(this).val());
+                    }
+                });
+
+                if (id_list.length == 0) {
+                    $.msg.alert("请选择数据！");
+                    return;
+                }
+
+                $.msg.confirm("确认要删除吗？", function () {
+                    $.ajax({
+                               url: '{%url "ErpMessage.Delete"%}',
+                               type: "POST",
+                               data: {"id_list": id_list},
+                               success: function (data) {
+                                   if (data.success == false) {
+                                       $.msg.error(data.message);
+                                       return;
+                                   }
+                                   else {
+                                       $.msg.show(data.message);
+                                   }
+                                   vm.reloadList();
+                               }
+                           });
+                });
+            }
+        }
+    });
+</script>
+{%footer%}
+

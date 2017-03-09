@@ -125,6 +125,8 @@ func (t EBayMessageDownloadTask) Run() {
 				message_id := message_download.Question.MessageId
 
 				var message_in_db models.MessageInfo
+				message_in_db.ShopId = config.ShopId
+
 				has_message, err := db_session.Where(fmt.Sprintf("message_id = '%s'", message_id)).Get(&message_in_db)
 				if err != nil {
 					revel.ERROR.Println(err)
