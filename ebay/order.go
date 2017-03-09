@@ -78,7 +78,7 @@ type Order struct {
 	PaidTime                            string
 	PaymentHoldDetailss                 PaymentHoldDetails `xml:"PaymentHoldDetails"`
 	PaymentHoldStatus                   string
-	PaymentMethods                      string
+	PaymentMethods                      []string `xml:"PaymentMethods"`
 	PickupDetailss                      PickupDetails `xml:"PickupDetails"`
 	PickupMethodSelected
 	RefundArrays                        RefundArray `xml:"RefundArray"`

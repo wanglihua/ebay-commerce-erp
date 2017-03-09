@@ -142,7 +142,8 @@ func (t EBayOrderDownloadTask) Run() {
 
 				// 老鼠仓的判断
 				// 如果是通过PayPal支付的，而且店铺设置里面也设置了PayPal列表的
-				if strings.ToLower(order_download.PaymentMethods) == strings.ToLower("PayPal") && shop.PaypalAccount != "" {
+				payment_methods := strings.Join(order_download.PaymentMethods, ",")
+				if strings.ToLower(payment_methods) == strings.ToLower("PayPal") && shop.PaypalAccount != "" {
 					shop_paypal_email_list := strings.Split(shop.PaypalAccount, ",")
 
 					seller_email := order_download.SellerEmail //是用SellerEmail来判断老鼠仓吗？
@@ -242,7 +243,7 @@ func (t EBayOrderDownloadTask) Run() {
 				order_in_db.SubTotalAmount = order_download.Subtotal.Value
 				update_col_list = append(update_col_list, "subtotal_amount")
 
-				order_in_db.PaymentMethods = order_download.PaymentMethods
+				order_in_db.PaymentMethods = strings.Join(order_download.PaymentMethods, ",")
 				order_in_db.SellerEmail = order_download.SellerEmail
 				order_in_db.SellerUserId = order_download.SellerUserID
 
