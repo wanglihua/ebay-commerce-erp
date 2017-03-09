@@ -2,11 +2,12 @@ package layout
 
 import (
 	"bytes"
+	"fmt"
+
 	"github.com/go-xorm/xorm"
 	"github.com/revel/revel"
 	"matrix/app/layout/menu"
 	"matrix/core"
-	"fmt"
 	"matrix/core/pass"
 	"matrix/modules/auth/models"
 )
@@ -220,6 +221,10 @@ func GetHeader(title string, db_session *xorm.Session, web_session revel.Session
 
 	if v, ok := res_cate_id_map[models.PASS_RES_CATE_DDLC]; is_admin == true || (v == true && ok == true) {
 		header_buffer.WriteString(menu.GetDdlcMenu(res_id_map, db_session, web_session))
+	}
+
+	if v, ok := res_cate_id_map[models.PASS_RES_CATE_XXGL]; is_admin == true || (v == true && ok == true) {
+		header_buffer.WriteString(menu.GetXxglMenu(res_id_map, db_session, web_session))
 	}
 
 	if v, ok := res_cate_id_map[models.PASS_RES_CATE_PPGL]; is_admin == true || (v == true && ok == true) {

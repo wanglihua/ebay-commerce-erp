@@ -132,21 +132,24 @@ func (t EBayMessageDownloadTask) Run() {
 				message_in_db.MessageId = message_id
 
 				// 如果这时产品不存在会怎样，下载产品
-				var product_id_result struct {
-					ProductId int64 `xorm:"'product_id'"`
+				var product_result struct {
+					ProductId  int64 `xorm:"'product_id'"`
+					ProductSku string `xorm:"'product_sku'"`
 				}
-				has_item_product, err := db_session.Sql(fmt.Sprintf("SELECT p.id AS product_id FROM erp_product p WHERE p.item_id = '%s'", message_download.Item.ItemId)).Get(&product_id_result)
+				has_item_product, err := db_session.Sql(fmt.Sprintf("SELECT p.id AS product_id, p.sku AS product_sku FROM erp_product p WHERE p.item_id = '%s'", message_download.Item.ItemId)).Get(&product_result)
 				if err != nil {
 					revel.ERROR.Println(err)
 				}
 
-				product_id := product_id_result.ProductId
+				product_id := product_result.ProductId
+				product_sku := product_result.ProductSku
 				if has_item_product == false {
 					// download product
-					product_id = fetch_product_item_to_db(config, db_session, message_download.Item.ItemId)
+					product_id, product_sku = fetch_product_item_to_db(config, db_session, message_download.Item.ItemId)
 				}
 
 				message_in_db.ProductId = product_id
+				message_in_db.Sku = product_sku
 				message_in_db.ItemId = message_download.Item.ItemId
 
 				if message_download.CreationDate != "" {

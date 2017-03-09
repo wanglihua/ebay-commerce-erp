@@ -142,7 +142,7 @@ type ItemPictureDetails struct {
 </GetItemResponse>
  */
 
-func fetch_product_item_to_db(config models.EBayAPIConfigInfo, db_session *xorm.Session, item_id string) int64 {
+func fetch_product_item_to_db(config models.EBayAPIConfigInfo, db_session *xorm.Session, item_id string) (product_id int64, product_sku string) {
 	item_response := fetch_product_item(config, item_id)
 	item_sku := item_response.Item.Sku
 	var product models.ProductInfo
@@ -176,5 +176,5 @@ func fetch_product_item_to_db(config models.EBayAPIConfigInfo, db_session *xorm.
 		}
 	}
 
-	return product.Id
+	return product.Id, product.Sku
 }

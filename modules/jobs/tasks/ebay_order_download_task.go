@@ -359,7 +359,7 @@ func (t EBayOrderDownloadTask) Run() {
 					product_id := product_id_result.ProductId
 					if has_item_product == false {
 						//download product
-						product_id = fetch_product_item_to_db(config, db_session, product_item_id)
+						product_id, _ = fetch_product_item_to_db(config, db_session, product_item_id)
 					}
 
 					order_item.ItemProductId = product_id

@@ -27,15 +27,21 @@ func new_image(digits []byte, width, height int) *Image {
 		B: uint8(rand.Intn(129)),
 		A: 0xFF,
 	}
-	// Draw background (10 random circles of random brightness)
+
 	img.calculate_sizes(width, height, len(digits))
+
+	// Draw background (10 random circles of random brightness)
+	/*
+	先禁用，否则看起来太不清楚
 	img.fill_with_circles(10, img.dotsize)
+	*/
 
 	maxx := width - (img.width+img.dotsize)*len(digits) - img.dotsize
 	maxy := height - img.height - img.dotsize*2
 
 	x := rnd(img.dotsize*2, maxx)
 	y := rnd(img.dotsize*2, maxy)
+
 
 	// Draw digits.
 	for _, n := range digits {
@@ -44,7 +50,8 @@ func new_image(digits []byte, width, height int) *Image {
 	}
 
 	// Draw strike-through line.
-	img.strike_through()
+	//img.strike_through() // 先禁用，否则看起来太不清楚
+
 	return img
 }
 

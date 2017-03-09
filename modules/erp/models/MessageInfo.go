@@ -6,13 +6,14 @@ import (
 
 type MessageInfo struct {
 	Id               int64             `xorm:"bigint notnull pk autoincr 'id'" json:"id"`
+	ShopId           int64             `xorm:"bigint notnull index 'shop_id'" json:"shop_id"`
 	MessageId        string            `xorm:"nvarchar(50) notnull index 'message_id'" json:"message_id"`
 	ProductId        int64             `xorm:"bigint notnull index 'product_id'" json:"product_id"`
 	ItemId           string            `xorm:"nvarchar(50) notnull index 'item_id'" json:"item_id"` // ebay系统的 ItemId，这个是产品的 item_id ??
 	Sku              string            `xorm:"nvarchar(200) notnull index 'sku'" json:"sku"`
 	CreationDate     core.NullLongTime `xorm:"datetime null 'creation_date'" json:"creation_date"`
 	LastModifiedDate core.NullLongTime `xorm:"datetime null 'last_modified_date'" json:"last_modified_date"`
-	MessageStatus    string            `xorm:"nvarchar(50) notnull 'message_status'" json:"message_status"`   // Answered Unanswered
+	MessageStatus    string            `xorm:"nvarchar(50) notnull 'message_status'" json:"message_status"` // Answered Unanswered
 	DisplayToPublic  bool              `xorm:"bool notnull 'display_to_public'" json:"display_to_public"`
 	MessageType      string            `xorm:"nvarchar(50) notnull 'message_type'" json:"message_type"`
 	QuestionType     string            `xorm:"nvarchar(50) notnull 'question_type'" json:"question_type"`
@@ -113,4 +114,3 @@ Unanswered	The question has not yet been answered.
 </GetMemberMessagesResponse>
 
  */
-

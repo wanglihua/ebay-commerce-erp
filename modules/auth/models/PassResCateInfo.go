@@ -1,8 +1,8 @@
 package models
 
 import (
-	"matrix/core"
 	"github.com/go-xorm/xorm"
+	"matrix/core"
 )
 
 const (
@@ -19,7 +19,8 @@ const (
 	PASS_RES_CATE_THGL = 11100 // 退货管理
 	PASS_RES_CATE_XSBB = 11200 // 销售报表
 	PASS_RES_CATE_XSGL = 11300 // 销售管理
-	PASS_RES_CATE_XTPZ = 11400 // 系统配置
+	PASS_RES_CATE_XXGL = 11400 // 消息管理
+	PASS_RES_CATE_XTPZ = 11500 // 系统配置
 )
 
 type PassResCateInfo struct {
@@ -117,6 +118,12 @@ func (e PassResCateInfo) InitData(db_session *xorm.Session) {
 	pass_res_cate.Id = PASS_RES_CATE_XSGL
 	pass_res_cate.Name = "销售管理"
 	pass_res_cate.Desc = core.NewNullString("销售管理", true)
+	db_session.Insert(pass_res_cate)
+
+	pass_res_cate = new(PassResCateInfo)
+	pass_res_cate.Id = PASS_RES_CATE_XXGL
+	pass_res_cate.Name = "消息管理"
+	pass_res_cate.Desc = core.NewNullString("消息管理", true)
 	db_session.Insert(pass_res_cate)
 
 	pass_res_cate = new(PassResCateInfo)
