@@ -44,6 +44,8 @@ const (
 	STATUS_TYPE_ORDER = 1700
 	// 采购单状态
 	STATUS_TYPE_PURCHASE_BILL = 1800
+	// 消息状态
+	STATUS_TYPE_MESSAGE = 1900
 
 	//状态类型 end
 
@@ -164,6 +166,11 @@ const (
 	PURCHASE_BILL_STATUS_CGZ = 4600
 	// 采购单状态 已入库
 	PURCHASE_BILL_STATUS_YRK = 4700
+
+	// 消息状态 已回复
+	MESSAGE_STATUS_ANSWERED = 4800
+	// 消息状态 未回复
+	MESSAGE_STATUS_UNANSWERED = 4900
 
 	//状态 id end
 )
@@ -580,5 +587,22 @@ func (e StatusInfo) InitData(db_session *xorm.Session) {
 		status.Name = "已入库"
 		status.Desc = core.NewNullString("采购单状态 已入库", true)
 		db_session.Insert(status)
+	}
+
+	// 消息状态 已回复 未回复
+	{
+		status := new(StatusInfo)
+		status.Id = MESSAGE_STATUS_ANSWERED
+		status.Type = STATUS_TYPE_MESSAGE
+		status.Name = "已回复"
+		status.Desc = core.NewNullString("消息状态 已回复", true)
+		db_session.Insert(&status)
+
+		status = new(StatusInfo)
+		status.Id = MESSAGE_STATUS_UNANSWERED
+		status.Type = STATUS_TYPE_MESSAGE
+		status.Name = "未回复"
+		status.Desc = core.NewNullString("消息状态 未回复", true)
+		db_session.Insert(&status)
 	}
 }

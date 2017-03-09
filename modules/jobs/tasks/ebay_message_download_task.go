@@ -4,6 +4,7 @@ import (
 	"encoding/xml"
 	"fmt"
 	"io/ioutil"
+	"strings"
 	"time"
 
 	"github.com/franela/goreq"
@@ -118,6 +119,88 @@ func (t EBayMessageDownloadTask) Run() {
 			response := t.fetch_messages(config, page_number)
 
 			// insert into database
+			message_download_list := response.MemberMessagesArray.MemberMessageExchanges
+			for _, message_download := range message_download_list {
+
+				message_id := message_download.Question.MessageId
+
+				var message_in_db models.MessageInfo
+				has_message, err := db_session.Where(fmt.Sprintf("message_id = %d", message_id)).Get(&message_in_db)
+				if err != nil {
+					revel.ERROR.Println(err)
+				}
+				message_in_db.MessageId = message_id
+
+				// 如果这时产品不存在会怎样，下载产品
+				var product_id_result struct {
+					ProductId int64 `xorm:"'product_id'"`
+				}
+				has_item_product, err := db_session.Sql(fmt.Sprintf("SELECT p.id AS product_id FROM erp_product p WHERE p.sku = '%s'", message_download.Item.Sku)).Get(&product_id_result)
+				if err != nil {
+					revel.ERROR.Println(err)
+				}
+
+				product_id := product_id_result.ProductId
+				if has_item_product == false {
+					// download product
+					product_id = fetch_product_item_to_db(config, db_session, message_download.Item.ItemId)
+				}
+
+				message_in_db.ProductId = product_id
+				message_in_db.ItemId = message_download.Item.ItemId
+				message_in_db.Sku = message_download.Item.Sku
+
+				if message_download.CreationDate != "" {
+					creation_date, err := time.Parse("2006-01-02T15:04:05.000Z", message_download.CreationDate)
+					if err != nil {
+						revel.ERROR.Println(err)
+					}
+					// 转成北京时间
+					// modified_time = modified_time.Add(8 * time.Hour)
+					creation_date = creation_date.Local()
+					message_in_db.CreationDate = core.NewNullLongTime(creation_date, true)
+				}
+
+				if message_download.LastModifiedDate != "" {
+					last_modified_date, err := time.Parse("2006-01-02T15:04:05.000Z", message_download.LastModifiedDate)
+					if err != nil {
+						revel.ERROR.Println(err)
+					}
+					// 转成北京时间
+					last_modified_date = last_modified_date.Local()
+					message_in_db.LastModifiedDate = core.NewNullLongTime(last_modified_date, true)
+				}
+
+				message_in_db.MessageStatus = message_download.MessageStatus // Answered Unanswered
+				if strings.ToLower(message_download.MessageStatus) == strings.ToLower("Answered") {
+					message_in_db.StatusId = models.MESSAGE_STATUS_ANSWERED
+				} else if strings.ToLower(message_download.MessageStatus) == strings.ToLower("Unanswered") {
+					message_in_db.StatusId = models.MESSAGE_STATUS_UNANSWERED
+				}
+
+				message_in_db.DisplayToPublic = message_download.Question.DisplayToPublic
+				message_in_db.MessageType = message_download.Question.MessageType
+				message_in_db.QuestionType = message_download.Question.QuestionType
+				message_in_db.RecipientId = message_download.Question.RecipientId
+				message_in_db.SenderEmail = message_download.Question.SenderEmail
+				message_in_db.SenderId = message_download.Question.SenderId
+				message_in_db.Subject = message_download.Question.Subject
+				message_in_db.Body = message_download.Question.Body
+
+				if has_message == true {
+					// do update
+					_, err = db_session.Id(message_in_db.Id).Update(&message_in_db)
+					if err != nil {
+						revel.ERROR.Println(err)
+					}
+				} else {
+					// do insert
+					_, err = db_session.Insert(&message_in_db)
+					if err != nil {
+						revel.ERROR.Println(err)
+					}
+				}
+			}
 
 			switch response.Ack {
 			case "Success":
@@ -239,7 +322,6 @@ func (t EBayMessageDownloadTask) fetch_messages(config models.EBayAPIConfigInfo,
 
 	return response
 }
-
 
 /*
 

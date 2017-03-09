@@ -41,7 +41,7 @@ type MessageMedia struct {
 }
 
 type Question struct {
-	DisplayToPublic string
+	DisplayToPublic bool
 	MessageId       string           `xml:"MessageID"`
 	MessageMedia    MessageMedia     `xml:"MessageMedia"` //这里也不知道有问题不，是不是应该是个数组
 	MessageType     string
