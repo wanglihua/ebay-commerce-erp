@@ -24,7 +24,7 @@ func GetXxglMenu(res_id_map map[int64]bool, db_session *xorm.Session, web_sessio
     <ul class="submenu">
 
         <li id="xxgl-all-message-menu" class="">
-            <a href="#">
+            <a href="/erp/message">
                 <i class="menu-icon fa fa-caret-right"></i>
                 所有消息
             </a>
