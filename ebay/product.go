@@ -35,10 +35,10 @@ type GetItemResponse struct {
 	Ack       string                 `xml:"Ack"`
 	Build     string                 `xml:"Build"`
 	Errors    Errors                 `xml:"Errors"`
-	Item      Item                   `xml:"Item"`
+	Item      ProductItem            `xml:"Item"`
 }
 
-type Item struct {
+type ProductItem struct {
 	XMLName        xml.Name           `xml:"Item"`
 	ItemId         string             `xml:"ItemID"`
 	Title          string             `xml:"Title"`
