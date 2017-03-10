@@ -1,8 +1,8 @@
 package tasks
 
 import (
-	"github.com/revel/revel"
 	"github.com/logpacker/PayPal-Go-SDK"
+	"github.com/revel/revel"
 )
 
 type PaypalDownloadTask struct {

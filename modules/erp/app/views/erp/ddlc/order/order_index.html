@@ -103,7 +103,12 @@
                             }
                         },
 
-                        {"mDataProp": "o.code", "title": "订单编号", "bSearchable": true, "width": 180},
+                        {
+                            "mDataProp": "o.code", "title": "订单编号", "bSearchable": true, "width": 180,
+                            "render": function (data, type, row) {
+                                return "<a href='/erp/order/detail/" + row.o.id + "'>" + data + "</a>";
+                            }
+                        },
                         {"mDataProp": "ot.name", "title": "类型", "bSearchable": true},
                         {"mDataProp": "s.name", "title": "状态", "bSearchable": true},
                         {"mDataProp": "sa.name", "title": "店铺", "bSearchable": true},
