@@ -3,6 +3,9 @@ package tasks
 import "github.com/logpacker/PayPal-Go-SDK"
 
 /*
+
+https://developer.paypal.com/docs/classic/lifecycle/sdks/
+
 https://www.sandbox.paypal.com/
 
 注册 paypal sandbox 用户
@@ -13,6 +16,10 @@ https://www.sandbox.paypal.com/signup/account
 https://www.sandbox.paypal.com/c2/merchantsignup/create
 ***REMOVED***
 alpha_142536
+
+
+https://developer.paypal.com/developer/applications
+Create a PayPal app
 
 */
 

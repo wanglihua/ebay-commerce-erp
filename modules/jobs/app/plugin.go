@@ -47,6 +47,8 @@ func init() {
 			jobs.Schedule("cron.paypal_download", tasks.PaypalDownloadTask{})
 		}
 
+		jobs.Now(tasks.PaypalDownloadTask{})
+
 		jobs.Every(10*time.Minute, tasks.SiteKeepHotTask{})
 	})
 }
