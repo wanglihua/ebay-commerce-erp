@@ -23,6 +23,7 @@ Create a PayPal app
 
 */
 
+/*
 type PaypalConfig struct {
 	ClientID string
 	Secret   string
@@ -36,3 +37,6 @@ func GetPaypalConfig() PaypalConfig {
 		APIBase:  paypalsdk.APIBaseSandBox,
 	}
 }
+*/
+
+var paypal_api_base = paypalsdk.APIBaseSandBox //paypalsdk.APIBaseLive

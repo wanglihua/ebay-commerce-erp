@@ -2,9 +2,10 @@ package controllers
 
 import (
 	"encoding/json"
-	"github.com/revel/revel"
+	"fmt"
 	"strconv"
 
+	"github.com/revel/revel"
 	"matrix/core"
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/status_service"
@@ -34,7 +35,7 @@ func (c ErpPaypalAccount) ListData() revel.Result {
 	*/
 
 	query := db_session.
-		Select("a.*, s.*").
+	Select("a.*, s.*").
 		Table("erp_paypal_account").Alias("a").
 		Join("INNER", []string{"erp_status", "s"}, "a.status_id = s.id").
 		Where(filter)
@@ -144,9 +145,19 @@ func (c ErpPaypalAccount) Save() revel.Result {
 
 	var affected int64
 	if detail_form.IsCreate() {
+		paypal_account_count, err := db_session.Where(fmt.Sprintf("paypal_account = '%s'", paypal_account.PaypalAccount)).Count(&paypal_account)
+		if paypal_account_count != 0 {
+			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，账号已存在！"})
+		}
+
 		affected, err = db_session.Insert(&paypal_account)
 		core.HandleError(err)
 	} else {
+		paypal_account_count, err := db_session.Where(fmt.Sprintf("id <> %d AND paypal_account = '%s'", paypal_account.Id, paypal_account.PaypalAccount)).Count(&paypal_account)
+		if paypal_account_count != 0 {
+			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，账号已存在！"})
+		}
+
 		affected, err = db_session.Id(paypal_account.Id).Update(&paypal_account)
 		core.HandleError(err)
 

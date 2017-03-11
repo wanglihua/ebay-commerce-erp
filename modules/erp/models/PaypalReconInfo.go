@@ -24,3 +24,7 @@ func (e PaypalReconInfo) TableName() string {
 func (e PaypalReconInfo) ModelDesc() string {
 	return "verbose_name=Paypal对账,entity_json=paypal_recon,route=paypal/recon"
 }
+
+/*
+这个表，还需要重新设计，比如说加入 paypal账号 （PaypalAccountInfo）的 id
+ */
