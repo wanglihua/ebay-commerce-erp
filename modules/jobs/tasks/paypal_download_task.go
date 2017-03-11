@@ -7,9 +7,10 @@ import (
 	"github.com/revel/revel"
 )
 
+var paypal_access_token string
+var paypal_access_token_expired time.Time
+
 type PaypalDownloadTask struct {
-	access_token         string
-	access_token_expired time.Time
 }
 
 func (t PaypalDownloadTask) Run() {
@@ -27,15 +28,15 @@ func (t PaypalDownloadTask) Run() {
 func (t PaypalDownloadTask) check_paypal_client_token(client *paypalsdk.Client) {
 	time_now := time.Now()
 
-	if t.access_token == "" || time_now.After(t.access_token_expired) {
+	if paypal_access_token == "" || time_now.After(paypal_access_token_expired) {
 		token_response, err := client.GetAccessToken()
 		if err != nil {
 			revel.ERROR.Println("paypalsdk client.GetAccessToken() error:", err.Error())
 		}
 
-		t.access_token = token_response.Token
-		t.access_token_expired = time_now.Add(time.Duration(token_response.ExpiresIn-180) * time.Second)
+		paypal_access_token = token_response.Token
+		paypal_access_token_expired = time_now.Add(time.Duration(token_response.ExpiresIn-180) * time.Second)
 	} else {
-		client.SetAccessToken(t.access_token)
+		client.SetAccessToken(paypal_access_token)
 	}
 }
