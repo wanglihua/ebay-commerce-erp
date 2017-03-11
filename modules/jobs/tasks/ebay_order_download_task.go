@@ -70,8 +70,6 @@ response body:
  */
 
 type EBayOrderDownloadTask struct {
-	db_driver string //mysql
-	db_url    string //root:root@tcp(localhost:3306)/iot?charset=utf8
 }
 
 func (t EBayOrderDownloadTask) Run() {
@@ -79,15 +77,15 @@ func (t EBayOrderDownloadTask) Run() {
 
 	// get db driver and db url
 
-	if t.db_driver == "" {
-		t.db_driver, _ = revel.Config.String("db.driver")
+	if task_db_driver == "" {
+		task_db_driver, _ = revel.Config.String("db.driver")
 	}
 
-	if t.db_url == "" {
-		t.db_url, _ = revel.Config.String("db.url")
+	if task_db_url == "" {
+		task_db_url, _ = revel.Config.String("db.url")
 	}
 
-	db_engine, err := xorm.NewEngine(t.db_driver, t.db_url)
+	db_engine, err := xorm.NewEngine(task_db_driver, task_db_url)
 	if err != nil {
 		revel.ERROR.Println(err)
 		return

@@ -40,3 +40,21 @@ func (t PaypalDownloadTask) check_paypal_client_token(client *paypalsdk.Client) 
 		client.SetAccessToken(paypal_access_token)
 	}
 }
+
+
+/*
+paypal api 文档 链接：
+
+1、
+http://www.cnblogs.com/see7di/archive/2012/10/21/2732825.html
+
+2、
+http://blog.csdn.net/hipihi_0/article/details/7967767
+TransactionSearch和GetTransactionDetails
+
+3、
+http://www.cnblogs.com/charje/archive/2011/12/01/paypal_ipn.html
+
+
+
+ */
