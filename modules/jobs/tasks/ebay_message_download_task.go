@@ -265,7 +265,7 @@ func (t EBayMessageDownloadTask) fetch_messages(config models.EBayAPIConfigInfo,
 	</Pagination>
 </GetMemberMessagesRequest>
 `
-	time_range_end := time.Now().UTC()
+	time_range_end := time.Now().UTC() //用的是 UTC 时间
 	time_range_begin := time_range_end.Add(- time.Duration(number_of_days) * 24 * time.Hour)
 
 	req_body = fmt.Sprintf(req_body, config.Token, time_range_begin.Format("2006-01-02T15:04:05"), time_range_end.Format("2006-01-02T15:04:05"), page_number)

@@ -1,6 +1,9 @@
 package tasks
 
 import (
+	"fmt"
+	"net/http"
+	"net/url"
 	"os"
 	"strings"
 	"time"
@@ -69,12 +72,22 @@ func (t PaypalDownloadTask) Run() {
 
 		t.check_paypal_client_token(client, paypal_account.PaypalAccount)
 
+		/*
 		payment_list, err := client.GetPayments()
 		if err != nil {
 			revel.ERROR.Println("paypalsdk client.GetPayments() error:", err.Error())
 		}
+		*/
+
+		payment_list, err := t.get_payment_list(client)
+		if err != nil {
+			revel.ERROR.Println("PaypalDownloadTask.get_payment_list error:", err.Error())
+		}
 
 		revel.TRACE.Println("payment_list:", payment_list)
+
+		//todo: insert payment_list to database
+
 	}
 
 	job_duration := time.Since(job_time_begin)
@@ -100,6 +113,103 @@ func (t PaypalDownloadTask) check_paypal_client_token(client *paypalsdk.Client, 
 	} else {
 		client.SetAccessToken(cache_item.paypal_access_token)
 	}
+}
+
+func (t PaypalDownloadTask) get_payment_list(client *paypalsdk.Client) (payment_list []paypalsdk.Payment, err error) {
+	/*
+		request:
+
+		count query_string integer
+		The number of items to list in the response.
+		Default: 10.
+
+		start_id query_string string
+		The ID of the starting resource in the response. When results are paged, you can use the next_id value as the start_id to continue with the next set of results.
+
+		start_index query_string integer
+		The start index of the payments to list. Typically, you use the start_index to jump to a specific position in the resource history based on its cart. For example, to start at the second item in a list of results, specify ?start_index=2.
+
+		start_time query_string string
+		The start date and time for the range to show in the response, in Internet date and time format. For example, start_time=2016-03-06T11:00:00Z.
+		Format: date-time.
+
+		end_time query_string string
+		The end date and time for the range to show in the response, in Internet date and time format. For example, start_time=2016-03-06T11:00:00Z.
+		Format: date-time.
+
+		payee_id query_string string
+		Filters the response by a PayPal-assigned merchant ID that identifies the payee.
+
+		sort_by query_string enum
+		Sorts the response by the create time or update time.
+		Possible values: create_time, update_time.
+
+		sort_order query_string enum
+		Sorts the response in ascending or descending order.
+		Possible values: asc, desc.
+    */
+
+	number_of_days := 1 //从当前算起一天时间
+
+	end_time := time.Now().UTC()
+	start_time := end_time.Add(time.Duration(-number_of_days * 24 * int(time.Hour)))
+
+	payment_list = make([]paypalsdk.Payment, 0)
+
+	next_payment_id := ""
+	is_first_call := true
+
+	for is_first_call == true || next_payment_id != "" { // 首次调用的时候，next_payment_id是为空的
+		var query_params = make(url.Values)
+		query_params.Add("count", "10")
+		query_params.Add("start_time", start_time.Format("2006-01-02T15:04:05.00Z"))
+		query_params.Add("end_time", end_time.Format("2006-01-02T15:04:05.00Z"))
+		query_params.Add("sort_by", "create_time")
+		query_params.Add("sort_order", "desc")
+
+		if next_payment_id != "" {
+			query_params.Add("start_id", next_payment_id)
+		}
+
+		request_url := fmt.Sprintf("%s%s?%s", client.APIBase, "/v1/payments/payment/", query_params.Encode())
+		var response ListPaymentsResponse
+		request, err := http.NewRequest("GET", request_url, nil)
+		if err != nil {
+			return response.Payments, err
+		}
+
+		err = client.SendWithAuth(request, &response)
+		if err != nil {
+			return response.Payments, err
+		}
+
+		next_payment_id = response.NextId
+		is_first_call = false
+		payment_list = append(payment_list, response.Payments...)
+	}
+
+	return payment_list, nil
+}
+
+/*
+response:
+
+payments array (contains the payment object)
+A payment. Use this object to create, process, and manage payments.
+
+count see description
+The number of items returned in each range of results. Note that the last results range might have fewer items than the requested number of items. The maximum value is 20.
+Possible types: integer
+
+next_id string
+The ID of the next element. Use to get the next range of results.
+Read only.
+ */
+
+type ListPaymentsResponse struct {
+	Payments []paypalsdk.Payment `json:"payments"`
+	Count    int64               `json:"count"`
+	NextId   string              `json:"next_id"`
 }
 
 /*
