@@ -178,8 +178,54 @@ func fetch_product_item_to_db(config models.EBayAPIConfigInfo, db_session *xorm.
 		}
 	}
 
+	// 同步商品图片 begin
+
 	// 插入商品图片，注意有时是更新图片不是插入图片
-	// 如果这个商品的这个图片URL（MD5）已经存在，就不做插入了
+	// 如果这个商品的这个图片URL已经存在，就不做插入了
+
+	// 获得这个商品的所有图片
+	var product_image_list_in_db = make([]models.ProductImageInfo, 0)
+	err = db_session.Where(fmt.Sprintf("product_id = %d", product.Id)).Find(&product_image_list_in_db)
+	if err != nil {
+		revel.ERROR.Println(err)
+	}
+
+	// 插入数据库中没有的图片
+	var product_image_url_map_in_db = make(map[string]int)
+	for _, product_image_in_db := range product_image_list_in_db {
+		product_image_url_map_in_db[product_image_in_db.Url] = 1
+	}
+
+	for _, product_image_url_download := range item_response.Item.PictureDetails.PictureUrls {
+		if _, found := product_image_url_map_in_db[product_image_url_download]; found == false {
+
+			var product_image models.ProductImageInfo
+			product_image.ProductId = product.Id
+			product_image.ProductCode = product.Sku
+			product_image.TypeId = models.PRODUCT_IMAGE_TYPE_CCTP
+			product_image.ShopId = config.ShopId
+			product_image.Url = product_image_url_download
+
+			_, err := db_session.Insert(product_image)
+			if err != nil {
+				revel.ERROR.Println(err)
+			}
+		}
+	}
+
+	// 删除数据库中多余的图片
+	var product_image_url_map_download = make(map[string]int)
+	for _, product_image_url_download := range item_response.Item.PictureDetails.PictureUrls {
+		product_image_url_map_download[product_image_url_download] = 1
+	}
+
+	for _, product_image_in_db := range product_image_list_in_db {
+		if _, found := product_image_url_map_download[product_image_in_db.Url]; found == false {
+			db_session.Id(product_image_in_db.Id).Delete(new(models.ProductImageInfo))
+		}
+	}
+
+	// 同步商品图片 end
 
 	return product.Id, product.Sku
 }
