@@ -119,7 +119,8 @@ func (f *ProductDetailForm) Valid(validation *revel.Validation) bool {
 }
 
 func (c ErpProduct) Detail(product_id int64) revel.Result {
-	return c.RenderText(fmt.Sprintf("product_id %d", product_id))
+	//return c.RenderText(fmt.Sprintf("product_id %d", product_id))
+	return c.RenderTemplate("erp/kcgl/product/product_detail.html")
 }
 
 func (c ErpProduct) DetailData() revel.Result {
