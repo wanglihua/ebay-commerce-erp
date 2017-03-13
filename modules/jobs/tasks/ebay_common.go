@@ -143,7 +143,9 @@ type ItemPictureDetails struct {
  */
 
 func fetch_product_item_to_db(config models.EBayAPIConfigInfo, db_session *xorm.Session, item_id string) (product_id int64, product_sku string) {
+
 	item_response := fetch_product_item(config, item_id)
+
 	item_sku := item_response.Item.Sku
 	var product models.ProductInfo
 	has_product, err := db_session.Where(fmt.Sprintf("sku = '%s'", item_sku)).Get(&product)
@@ -175,6 +177,9 @@ func fetch_product_item_to_db(config models.EBayAPIConfigInfo, db_session *xorm.
 			revel.ERROR.Println(err)
 		}
 	}
+
+	// 插入商品图片，注意有时是更新图片不是插入图片
+	// 如果这个商品的这个图片URL（MD5）已经存在，就不做插入了
 
 	return product.Id, product.Sku
 }
