@@ -21,3 +21,13 @@ func GetFooter() string {
 `)
 	return footer_buffer.String()
 }
+
+func GetSiteFooter() string {
+	var footer_buffer bytes.Buffer
+
+	footer_buffer.WriteString(`
+</body>
+</html>
+`)
+	return footer_buffer.String()
+}
