@@ -28,7 +28,6 @@
                 </div>
                 <div>
                     <table id="productImageList" class="table table-striped table-bordered table-hover"></table>
-                    <div class="todo">1、上传图片而不是直接给地址；2、这里的商品编号应该指的就是SKU?</div>
                 </div>
             </div>
         </div>
@@ -87,18 +86,17 @@
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
-                                            <label for="platform_id" class="col-xs-2 control-label">所属平台</label>
+                                            <label for="shop_id" class="col-xs-2 control-label">店铺</label>
                                             <div class="col-xs-10">
-                                                <select id="platform_id" name="detail.product_image.platform_id" class="input-sm form-control" v-model.number="detail.product_image.platform_id">
-                                                    <template v-for="platform in detail.platform_list">
-                                                        <option :value="platform.id">{{platform.name}}</option>
+                                                <select id="shop_id" name="detail.product_image.shop_id" class="input-sm form-control" v-model.number="detail.product_image.shop_id">
+                                                    <template v-for="shop in detail.shop_list">
+                                                        <option :value="shop.shop_id">{{shop.shop_name}}</option>
                                                     </template>
                                                 </select>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-
 
                             </form>
                         </div>
@@ -123,7 +121,7 @@
             "detail": {
                 "product_image": {},
                 "product_image_type_list": [],
-                "platform_list": []
+                "shop_list": []
             }
         },
         mounted: function () {
@@ -134,7 +132,7 @@
                     "aaSorting": [[1, "asc"]],
                     "aoColumns": [
                         {
-                            "mDataProp": "img.id",
+                            "mDataProp": "id",
                             "bSearchable": false,
                             "orderable": false,
                             "sClass": "center",
@@ -144,12 +142,12 @@
                                 return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
                             }
                         },
-                        {"mDataProp": "img.product_code", "title": "商品编码", "bSearchable": true, "width": 120},
-                        {"mDataProp": "img.url", "title": "图片链接", "bSearchable": true},
-                        {"mDataProp": "type.name", "title": "图片属性", "bSearchable": true, "width": 150},
-                        {"mDataProp": "platform.name", "title": "所属平台", "bSearchable": true, "width": 120},
-                        {"mDataProp": "img.create_time", "title": "创建时间", "bSearchable": false, "width": 120},
-                        {"mDataProp": "img.update_time", "title": "修改时间", "bSearchable": false, "width": 120}
+                        {"mDataProp": "sku", "title": "商品编码", "bSearchable": true, "width": 120},
+                        {"mDataProp": "img_url", "title": "图片链接", "bSearchable": true},
+                        {"mDataProp": "type_name", "title": "图片属性", "bSearchable": true, "width": 150},
+                        {"mDataProp": "shop_name", "title": "店铺", "bSearchable": true, "width": 120},
+                        {"mDataProp": "create_time", "title": "创建时间", "bSearchable": false, "width": 120},
+                        {"mDataProp": "update_time", "title": "修改时间", "bSearchable": false, "width": 120}
                     ]
                 }
             );
@@ -194,7 +192,7 @@
                     'detail.product_image.type_id': {
                         required: true, digits: true
                     },
-                    'detail.product_image.platform_id': {
+                    'detail.product_image.shop_id': {
                         required: true, digits: true
                     },
                     'detail.product_image.url': {

@@ -2,10 +2,10 @@ package controllers
 
 import (
 	"encoding/json"
-	"github.com/revel/revel"
+	"fmt"
 	"strconv"
 
-	"fmt"
+	"github.com/revel/revel"
 	"matrix/core"
 	"matrix/modules/erp/models"
 )
@@ -18,57 +18,80 @@ func (c ErpProductImage) Index() revel.Result {
 	return c.RenderTemplate("erp/xsgl/product_image/product_image_index.html")
 }
 
-type ErpProductImageViewItem struct {
-	models.ProductImageInfo      `xorm:"extends" json:"img"`
-	models.ProductImageTypeInfo  `xorm:"extends" json:"type"`
-	models.ECommercePlatformInfo `xorm:"extends" json:"platform"`
-}
-
 func (c ErpProductImage) ListData() revel.Result {
 	db_session := c.DbSession
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
+	type product_image_view_item_t struct {
+		Id         string    `xorm:"'id'" json:"id"`
+		Sku        string    `xorm:"'sku'" json:"sku"`
+		ImgUrl     string    `xorm:"'img_url'" json:"img_url"`
+		TypeName   string    `xorm:"'type_name'" json:"type_name"`
+		ShopName   string    `xorm:"'shop_name'" json:"shop_name"`
+		CreateTime core.Time `xorm:"'create_time'" json:"create_time"`
+		UpdateTime core.Time `xorm:"'update_time'" json:"update_time"`
+	}
+
 	/*
-		SELECT img.*, type.*, platform.* FROM erp_product_image img
-		    INNER JOIN erp_product_image_type type ON img.type_id = type.id
-		    INNER JOIN erp_ecommerce_platform platform ON img.platform_id = platform.id
+		SELECT *
+		FROM (
+		         SELECT img.id AS id, img.product_code AS sku, img.url AS img_url, type.name AS type_name, concat(platform.name, ' ', sa.name) AS shop_name, img.create_time, img.update_time
+		         FROM erp_product_image img
+		             INNER JOIN erp_product_image_type type ON img.type_id = type.id
+		             INNER JOIN erp_shop_account sa ON img.shop_id = sa.id
+		             INNER JOIN erp_ecommerce_platform platform ON sa.platform_id = platform.id
+		     ) AS product_image_view
 	*/
 
-	query := db_session.
-		Select("img.*, type.*, platform.*").
-		Table("erp_product_image").Alias("img").
-		Join("INNER", []string{"erp_product_image_type", "type"}, "img.type_id = type.id").
-		Join("INNER", []string{"erp_ecommerce_platform", "platform"}, "img.platform_id = platform.id").
-		Where(filter)
+	sb := core.NewSqlBuilder()
+	sb.Select("*")
+	sb.Count("count(id) AS img_count")
+	sb.From(`
+	     (
+	         SELECT img.id AS id, img.product_code AS sku, img.url AS img_url, type.name AS type_name, concat(platform.name, ' ', sa.name) AS shop_name, img.create_time, img.update_time
+	         FROM erp_product_image img
+	             INNER JOIN erp_product_image_type type ON img.type_id = type.id
+	             INNER JOIN erp_shop_account sa ON img.shop_id = sa.id
+	             INNER JOIN erp_ecommerce_platform platform ON sa.platform_id = platform.id
+	     ) AS product_image_view`)
+	sb.Where(filter)
 
 	//query extra filter here
 
-	data_query := *query
 	if order != "" {
-		data_query = *data_query.OrderBy(order)
+		sb.OrderBy("id ASC")
 	} else {
-		data_query = *data_query.Asc("img.id")
+		sb.OrderBy(order)
 	}
 
-	product_image_list := make([]ErpProductImageViewItem, 0, limit)
-	err := data_query.Limit(limit, offset).Find(&product_image_list)
+	sb.Limit(offset, limit)
+
+	product_image_list := make([]product_image_view_item_t, 0, limit)
+	err := db_session.Sql(sb.SqlList()).Find(&product_image_list)
 	core.HandleError(err)
 
-	count_query := *query
-	count, err := count_query.Count(new(ErpProductImageViewItem))
+	var img_count struct {
+		Count int64 `xorm:"'img_count'"`
+	}
+	_, err = db_session.Sql(sb.SqlCount()).Get(&img_count)
 	core.HandleError(err)
 
 	return c.RenderJson(core.GridResult{
 		Data:  product_image_list,
-		Total: count,
+		Total: img_count.Count,
 	})
+}
+
+type shop_select_item_t struct {
+	Id   int64  `xorm:"'shop_id'" json:"shop_id"`
+	Name string `xorm:"'shop_name'" json:"shop_name"`
 }
 
 type ProductImageDetailForm struct {
 	ProductImage         models.ProductImageInfo        `json:"product_image"`
 	ProductImageTypeList []models.ProductImageTypeInfo  `json:"product_image_type_list"`
-	PlatformList         []models.ECommercePlatformInfo `json:"platform_list"`
+	ShopList             []shop_select_item_t           `json:"shop_list"`
 }
 
 func (f *ProductImageDetailForm) IsCreate() bool {
@@ -86,7 +109,7 @@ func (f *ProductImageDetailForm) Valid(validation *revel.Validation) bool {
 
 	validation.Required(f.ProductImage.TypeId).Message("图片属性不能为空！")
 
-	validation.Required(f.ProductImage.PlatformId).Message("所属平台不能为空！")
+	validation.Required(f.ProductImage.ShopId).Message("店铺不能为空！")
 
 	validation.Required(f.ProductImage.Url).Message("图片链接不能为空！")
 	if f.ProductImage.Url != "" {
@@ -118,14 +141,18 @@ func (c ErpProductImage) DetailData() revel.Result {
 	err := db_session.Find(&product_image_type_list)
 	core.HandleError(err)
 
-	var platform_list []models.ECommercePlatformInfo
-	err = db_session.Find(&platform_list)
+	shop_list_sql := `SELECT sa.id AS shop_id, concat(pf.name, ' ', sa.name) AS shop_name
+FROM erp_shop_account sa
+    INNER JOIN erp_ecommerce_platform pf ON pf.id = sa.platform_id`
+
+	var shop_list []shop_select_item_t
+	err = db_session.Sql(shop_list_sql).Find(&shop_list)
 	core.HandleError(err)
 
 	var detail_form ProductImageDetailForm
 	detail_form.ProductImage = product_image
 	detail_form.ProductImageTypeList = product_image_type_list
-	detail_form.PlatformList = platform_list
+	detail_form.ShopList = shop_list
 
 	return c.RenderJson(detail_form)
 }
