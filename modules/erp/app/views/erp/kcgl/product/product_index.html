@@ -9,154 +9,6 @@
             <li class="active" data-menu="kcgl-product-menu">商品列表</li>
         </ul>
     </div>
-    <div class="modal fade" id="productDetailDialog">
-        <div class="modal-dialog" style="width: 520px;">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="True">&times;</button>
-                    <h4 class="modal-title">商品详细</h4>
-                </div>
-                <div class="modal-body clearfix">
-                    <div class="row">
-                        <div class="col-xs-12">
-                            <form class="form-horizontal" role="form" id="productDetailForm">
-                                <input id="product_id" name="detail.product.id" type="hidden" v-model.number="detail.product.id"/>
-                                <input id="product_version" name="detail.product.version" type="hidden" v-model.number="detail.product.version"/>
-                                <div class="row">
-                                    <div class="col-xs-12">
-                                        <div class="form-group">
-                                            <label for="sku" class="col-xs-2 control-label">SKU</label>
-                                            <div class="col-xs-10">
-                                                <input id="sku" name="detail.product.sku" type="text" class="input-sm form-control" v-model="detail.product.sku"/>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-xs-12">
-                                        <div class="form-group">
-                                            <label for="name" class="col-xs-2 control-label">名称</label>
-                                            <div class="col-xs-10">
-                                                <input id="name" name="detail.product.name" type="text" class="input-sm form-control" v-model="detail.product.name"/>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-xs-12">
-                                        <div class="form-group">
-                                            <label for="cate_id" class="col-xs-2 control-label">商品目录</label>
-                                            <div class="col-xs-10">
-                                                <select id="cate_id" name="detail.product.cate_id" class="input-sm form-control" v-model.number="detail.product.cate_id">
-                                                    <template v-for="product_cate in detail.product_cate_list">
-                                                        <option :value="product_cate.cate_id">
-                                                            {{product_cate.cate_name}}
-                                                        </option>
-                                                    </template>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-xs-12">
-                                        <div class="form-group">
-                                            <label for="cost_price" class="col-xs-2 control-label">成本价(RMB)</label>
-                                            <div class="col-xs-10">
-                                                <input id="cost_price" name="detail.product.cost_price" type="text" class="input-sm form-control" v-model.number="detail.product.cost_price"/>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-xs-12">
-                                        <div class="form-group">
-                                            <label for="weight" class="col-xs-2 control-label">重量(kg)</label>
-                                            <div class="col-xs-10">
-                                                <input id="weight" name="detail.product.weight" type="text" class="input-sm form-control" v-model.number="detail.product.weight"/>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-xs-12">
-                                        <div class="form-group">
-                                            <label for="supplier_id" class="col-xs-2 control-label">供应商</label>
-                                            <div class="col-xs-10">
-                                                <select id="supplier_id" name="detail.product.supplier_id" class="input-sm form-control" v-model.number="detail.product.supplier_id">
-                                                    <option value=""></option>
-                                                    <template v-for="supplier in detail.supplier_list">
-                                                        <option :value="supplier.id">{{supplier.name}}</option>
-                                                    </template>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-xs-12">
-                                        <div class="form-group">
-                                            <label for="supplier_id" class="col-xs-2 control-label">包材类型</label>
-                                            <div class="col-xs-10">
-                                                <select id="package_material_id" name="detail.product.pkg_mtrl_id" class="input-sm form-control" v-model.number="detail.product.pkg_mtrl_id">
-                                                    <option value=""></option>
-                                                    <template v-for="package_material in detail.package_material_list">
-                                                        <option :value="package_material.id">{{package_material.name}}
-                                                        </option>
-                                                    </template>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-xs-12">
-                                        <div class="form-group">
-                                            <label for="desc" class="col-xs-2 control-label">备注</label>
-                                            <div class="col-xs-10">
-                                                <textarea id="desc" name="detail.product.desc" rows="2" class="input-sm form-control" v-model="detail.product.desc"></textarea>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-xs-12">
-                                        <div class="form-group">
-                                            <label for="status_id" class="col-xs-2 control-label">状态</label>
-                                            <div class="col-xs-10">
-                                                <select id="status_id" name="detail.product.status_id" class="input-sm form-control" v-model.number="detail.product.status_id">
-                                                    <template v-for="status in detail.status_list">
-                                                        <option :value="status.id">{{status.name}}</option>
-                                                    </template>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                            </form>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-success btn-sm" @click="saveProduct()">
-                        <i class="ace-icon fa fa-floppy-o"></i>保存
-                    </button>
-                    <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">
-                        <i class="ace-icon fa fa-times"></i>关闭
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
     <div class="page-content">
         <div class="row">
             <div class="col-xs-12" style="padding: 0;">
@@ -198,7 +50,7 @@
                         </tr>
                         </thead>
                     </table>
-                    <div class="todo">1、不同权限的人员只能看到自己的信息，比如有的不能看到成本价等.</div>
+                    <div class="todo">1、不同权限的人员只能看到自己的信息，比如有的不能看到成本价等. 2、商品库存等</div>
                 </div>
             </div>
         </div>
@@ -237,7 +89,7 @@
                             "width": 80,
                             "bSortable": false,
                             "render": function (data, type, row) {
-                                return '<img style="width:60px;height:60px;" src="' + data + '" alt="" />';
+                                return '<a href="' + data + '" target="_blank"><img style="width:60px;height:60px;" src="' + data + '" alt="" /></a>';
                             }
                         },
                         {
@@ -247,7 +99,7 @@
                                 if (row.sup.name != "") {
                                     sup_name = row.sup.name;
                                 }
-                                return '<div class="tdSkuNameSup">' + row.prd.sku + '</div><div>' + row.prd.name + '</div><div>' + sup_name + '</div>';
+                                return '<div class="tdSkuNameSup"><a href="/erp/product/detail/' + row.prd.id + '" target="_blank">' + row.prd.sku + '</a></div><div>' + row.prd.name + '</div><div>' + sup_name + '</div>';
                             }
                         },
                         {
@@ -323,36 +175,10 @@
             $("#thUpdateTime").wrap("<div id='divUpdateTime'></div>");
 
             $("#thCreateUpdateTime").append($("#divCreateTime")).append($("#divUpdateTime"));
-
-            $('#productList tbody').on('dblclick', 'tr', function () {
-                var id = $(this).find('td:first-child input:checkbox').val();
-                vm.showProductDetail(id);
-            });
         },
         methods: {
             reloadList: function () {
                 reloadList('#productList');
-            },
-            showProductDetail: function (id) {
-                showMask("加载中...");
-                $("#productDetailForm").clearValidation();
-                $.ajax({
-                        url: '{%url "ErpProduct.DetailData" %}',
-                        type: "POST",
-                        data: {
-                            "id": id
-                        },
-                        success: function (result) {
-                            hideMask();
-                            if (result.success == false) {
-                                $.msg.error(result.message);
-                                return;
-                            }
-                            vm.detail = result;
-                            $('#productDetailDialog').modal(modalOptions);
-                        }
-                    }
-                );
             },
             showProductLog: function () {
                 window.location.href = "/erp/product/log";
