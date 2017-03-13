@@ -1,44 +1,17 @@
 {% site_header "商品详情" . %}
 <div class="main-container" id="main-container">
-    <div id="order_detail" style="width: 1024px;margin-left: auto;margin-right: auto;">
+    <div id="product_detail" style="width: 1024px;margin-left: auto;margin-right: auto;">
         <div class="widget-box">
             <div class="widget-header">
-                <h4 class="smaller">基本信息</h4>
+                <h4 class="smaller">图片信息</h4>
             </div>
             <div class="widget-body">
                 <div class="widget-main">
-                    <div class="row">
-                        <div class="col-xs-3">
-                            <div class="form-group">
-                                <label for="order_code" class="col-xs-4 control-label">订单编号：</label>
-                                <div class="col-xs-8">
-                                    <input id="order_code" name="detail.inventory.stock_id" type="text" class="input-sm form-control" disabled="disabled" v-model="detail.order.code"/>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-xs-3">
-                            <div class="form-group">
-                                <label for="created_time" class="col-xs-4 control-label">建单时间：</label>
-                                <div class="col-xs-8">
-                                    <input id="created_time" name="detail.inventory.stock_id" type="text" class="input-sm form-control" disabled="disabled" v-model="detail.order.created_time"/>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-xs-3">
-                            <div class="form-group">
-                                <label for="status_name" class="col-xs-4 control-label">状态：</label>
-                                <div class="col-xs-8">
-                                    <input id="status_name" name="detail.inventory.stock_id" type="text" class="input-sm form-control" disabled="disabled" v-model="detail.status.name"/>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-xs-3">
-                            <div class="form-group">
-                                <label for="order_type_name" class="col-xs-4 control-label">订单属性：</label>
-                                <div class="col-xs-8">
-                                    <input id="order_type_name" name="detail.inventory.stock_id" type="text" class="input-sm form-control" disabled="disabled" v-model="detail.order_type.name"/>
-                                </div>
-                            </div>
+                    <div id="product_image_list" class="row">
+                        <div class="col-xs-12">
+                            <template v-for="product_image in detail.product_image_list">
+                                <a :href="product_image.url" target="_blank"><img :src="product_image.url" alt="" style="width:80px;height:80px;"/></a>
+                            </template>
                         </div>
                     </div>
                 </div>
@@ -47,249 +20,63 @@
 
         <div class="widget-box">
             <div class="widget-header">
-                <h4 class="smaller">客户信息</h4>
+                <h4 class="smaller">商品信息</h4>
             </div>
             <div class="widget-body">
                 <div class="widget-main">
                     <div class="row">
+
                         <div class="col-xs-3">
                             <div class="form-group">
-                                <label for="shop_name" class="col-xs-4 control-label">客户来源：</label>
+                                <label for="product_sku" class="col-xs-4 control-label">SKU：</label>
                                 <div class="col-xs-8">
-                                    <input id="shop_name" name="detail.shop.name" type="text" class="input-sm form-control" disabled="disabled" v-model="detail.shop.name"/>
+                                    <input id="product_sku" name="detail.product.sku" type="text" class="input-sm form-control" v-model="detail.product.sku"/>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-xs-3">
-                            <div class="form-group">
-                                <label for="buyer_user_id" class="col-xs-4 control-label">买家帐号：</label>
-                                <div class="col-xs-8">
-                                    <input id="buyer_user_id" name="detail.order.buyer_user_id" type="text" class="input-sm form-control" disabled="disabled" v-model="detail.order.buyer_user_id"/>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-xs-3">
-                            <div class="form-group">
-                                <label for="buyer_user_name" class="col-xs-4 control-label">客户姓名：</label>
-                                <div class="col-xs-8">
-                                    <input id="buyer_user_name" name="detail.order.buyer_user_name" type="text" class="input-sm form-control" disabled="disabled" v-model="detail.shipping_address.name"/>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-xs-3">
-                            <div class="form-group">
-                                <label for="country_name" class="col-xs-4 control-label">国家：</label>
-                                <div class="col-xs-8">
-                                    <input id="country_name" name="detail.order.country_name" type="text" class="input-sm form-control" disabled="disabled" v-model="detail.shipping_address.country_name"/>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-xs-3">
-                            <div class="form-group">
-                                <label for="phone" class="col-xs-4 control-label">联系电话：</label>
-                                <div class="col-xs-8">
-                                    <input id="phone" name="detail.order.country_name" type="text" class="input-sm form-control" disabled="disabled" v-model="detail.shipping_address.phone"/>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-xs-9" style="height: 32px;"></div>
+
                         <div class="col-xs-6">
                             <div class="form-group">
-                                <label for="ebay_address" class="col-xs-2 control-label">平台地址：</label>
+                                <label for="product_english_name" class="col-xs-2 control-label">英文名称：</label>
                                 <div class="col-xs-10">
-                                    <div id="ebay_address" class="address-box">
-                                        <div>
-                                            <label for="ebay_address_name">Name:</label>
-                                            <input id="ebay_address_name" type="text" v-model="detail.shipping_address.name"/>
-                                        </div>
-                                        <div>
-                                            <label for="ebay_address_street1">Address:</label>
-                                            <input id="ebay_address_street1" type="text" v-model="detail.shipping_address.street1"/>
-                                            <input id="ebay_address_street2" type="text" v-model="detail.shipping_address.street2"/>
-                                        </div>
-                                        <div>
-                                            <label for="ebay_address_city">City:</label>
-                                            <input id="ebay_address_city" type="text" v-model="detail.shipping_address.city_name"/>
-                                        </div>
-                                        <div>
-                                            <label for="ebay_address_state">State:</label>
-                                            <input id="ebay_address_state" type="text" v-model="detail.shipping_address.province"/>
-                                        </div>
-                                        <div>
-                                            <label for="ebay_address_country">Country:</label>
-                                            <input id="ebay_address_country" type="text" v-model="detail.shipping_address.country"/>
-                                        </div>
-                                        <div>
-                                            <label for="ebay_address_country_name">Country Name:</label>
-                                            <input id="ebay_address_country_name" type="text" v-model="detail.shipping_address.country_name"/>
-                                        </div>
-                                        <div>
-                                            <label for="ebay_address_postal_code">Post Code:</label>
-                                            <input id="ebay_address_postal_code" type="text" v-model="detail.shipping_address.postal_code"/>
-                                        </div>
-                                        <div>
-                                            <label for="ebay_address_phone">Phone:</label>
-                                            <input id="ebay_address_phone" type="text" v-model="detail.shipping_address.phone"/>
-                                        </div>
-                                    </div>
-
+                                    <input id="product_english_name" name="detail.product.name" type="text" class="input-sm form-control" v-model="detail.product.name"/>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-xs-6">
+
+                        <div class="col-xs-3">
                             <div class="form-group">
-                                <label for="paypal_address" class="col-xs-2 control-label">PayPal<br/>地址：</label>
-                                <div class="col-xs-10">
-                                    <div id="paypal_address" class="address-box">
-                                        <div>
-                                            <label for="paypal_address_name">Name:</label>
-                                            <input id="paypal_address_name" type="text" value=""/>
-                                        </div>
-                                        <div>
-                                            <label for="paypal_address_street1">Address:</label>
-                                            <input id="paypal_address_street1" type="text" value=""/>
-                                            <input id="paypal_address_street2" type="text" value=""/>
-                                        </div>
-                                        <div>
-                                            <label for="paypal_address_city">City:</label>
-                                            <input id="paypal_address_city" type="text" value=""/>
-                                        </div>
-                                        <div>
-                                            <label for="paypal_address_state">State:</label>
-                                            <input id="paypal_address_state" type="text" value=""/>
-                                        </div>
-                                        <div>
-                                            <label for="paypal_address_country">Country:</label>
-                                            <input id="paypal_address_country" type="text" value=""/>
-                                        </div>
-                                        <div>
-                                            <label for="paypal_address_country_name">Country Name:</label>
-                                            <input id="paypal_address_country_name" type="text" value=""/>
-                                        </div>
-                                        <div>
-                                            <label for="paypal_address_postal_code">Post Code:</label>
-                                            <input id="paypal_address_postal_code" type="text" value=""/>
-                                        </div>
-                                        <div>
-                                            <label for="paypal_address_phone">Phone:</label>
-                                            <input id="paypal_address_phone" type="text" value=""/>
-                                        </div>
-                                    </div>
+                                <label for="product_status_id" class="col-xs-4 control-label">状态：</label>
+                                <div class="col-xs-8">
+                                    <select id="product_status_id" name="detail.product.status_id" class="input-sm form-control" v-model.number="detail.product.status_id">
+                                        <template v-for="status in detail.status_list">
+                                            <option :value="status.id">{{status.name}}</option>
+                                        </template>
+                                    </select>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-            </div>
-        </div>
 
-        <div class="widget-box">
-            <div class="widget-header">
-                <h4 class="smaller">订单信息</h4>
-            </div>
-            <div class="widget-body">
-                <div class="widget-main">
-
-                </div>
-            </div>
-        </div>
-
-        <div class="widget-box">
-            <div class="widget-header">
-                <h4 class="smaller">订单报表</h4>
-            </div>
-            <div class="widget-body">
-                <div class="widget-main">
-
-                </div>
-            </div>
-        </div>
-
-        <div class="widget-box">
-            <div class="widget-header">
-                <h4 class="smaller">订单详情</h4>
-            </div>
-            <div class="widget-body">
-                <div class="widget-main">
-                    <div class="row">
-                        <div class="col-xs-12">
-                            <table id="order_item_list" class="table table-striped table-bordered">
-                                <thead>
-                                <tr>
-                                    <th class="center" style="width: 50px;">选择</th>
-                                    <th class="center" style="width: 60px;">商品图片</th>
-                                    <th style="width: 120px;">商品名称</th>
-                                    <th class="center" style="width: 100px;">售价</th>
-                                    <th class="center" style="width: 100px;">成本</th>
-                                    <th class="center" style="width: 80px;">原始售价</th>
-                                    <th class="center" style="width: 80px;">毛利</th>
-                                    <th>留言</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <template v-for="order_item in detail.order_item_list">
-                                    <tr>
-                                        <td class="center">
-                                            <label class="pos-rel">
-                                                <input type="checkbox" class="ace" :value="order_item.oi.id"/>
-                                                <span class="lbl"></span>
-                                            </label>
-                                        </td>
-                                        <td class="center">
-                                            <a :href="order_item.p.view_item_url" target="_blank">
-                                                <img :src="order_item.p.image_url" alt="" style="width: 60px;height: 60px;"/>
-                                            </a>
-                                        </td>
-                                        <td>
-                                            <div :title="order_item.p.name" style="width: 120px; overflow: hidden; text-overflow: ellipsis;white-space: nowrap;">
-                                                {{order_item.p.name}}
-                                            </div>
-                                            <div>
-                                                <a :href="'/erp/product/detail/' + order_item.p.id" target="_blank">
-                                                    {{order_item.p.sku}}
-                                                </a>
-                                            </div>
-                                            <div>
-                                                <a :href="order_item.p.view_item_url" target="_blank">
-                                                    {{order_item.p.item_id}}
-                                                </a>
-                                            </div>
-                                        </td>
-                                        <td class="center">
-                                            <div>{{order_item.oi.transaction_price_currency}}&nbsp;{{order_item.oi.transaction_price}}
-                                                × {{order_item.oi.quantity}}
-                                            </div>
-                                            <div>={{order_item.oi.transaction_price_currency}}&nbsp;{{order_item.oi.transaction_price
-                                                * order_item.oi.quantity}}
-                                            </div>
-                                        </td>
-                                        <td></td>
-                                        <td class="center">{{order_item.oi.transaction_price_currency}}&nbsp;{{order_item.oi.transaction_price}}</td>
-                                        <td>
-                                        </td>
-                                        <td></td>
-                                    </tr>
-                                </template>
-                                </tbody>
-                                <tfoot>
-                                <tr>
-                                    <td colspan="8">
-                                        Hello World!
-                                    </td>
-                                </tr>
-                                </tfoot>
-                            </table>
+                        <div class="col-xs-3">
+                            <div class="form-group">
+                                <label for="product_supplier_id" class="col-xs-4 control-label">供应商：</label>
+                                <div class="col-xs-8">
+                                    <select id="product_supplier_id" name="detail.product.supplier_id" class="input-sm form-control" v-model.number="detail.product.supplier_id">
+                                        <option id=""></option>
+                                        <template v-for="supplier in detail.supplier_list">
+                                            <option :value="supplier.id">{{supplier.name}}</option>
+                                        </template>
+                                    </select>
+                                </div>
+                            </div>
                         </div>
+
                     </div>
-                    <hr/>
-                    <div class="row">
-                        <div class="col-xs-12">
-                            <button class="btn btn-xs btn-info">添加</button>
-                        </div>
-                    </div>
+
                 </div>
             </div>
         </div>
+
         <div class="widget-box">
             <div class="widget-header">
                 <h4 class="smaller">操作日志</h4>
@@ -302,19 +89,14 @@
         </div>
     </div>
 </div>
-{%template "erp/ddlc/order/order_detail.var" .%}
+{%template "erp/kcgl/product/product_detail.var" .%}
 <script type="text/javascript">
     var vm = new Vue({
-        el: "#order_detail",
+        el: "#product_detail",
         data: {
             "detail": {
-                "order": {},
-                "status": {},
-                "shop": {},
-                "order_type": {},
-                "order_hold_type": {},
-                "shipping_address": {},
-                "order_item_list": []
+                "product_image_list": [],
+                "product": {}
             }
         },
         mounted: function () {
@@ -323,9 +105,9 @@
             $.ajax(
                 {
                     "dataType": 'json',
-                    "url": '{% url "ErpOrder.DetailData"%}',
+                    "url": '{% url "ErpProduct.DetailData"%}',
                     "data": {
-                        "id": order_id
+                        "id": product_id
                     },
                     "success": function (data) {
                         if (data.success == false) {

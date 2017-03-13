@@ -297,3 +297,23 @@ div#order_detail div.address-box input {
     border-style: none;
     background-color: transparent;
 }
+
+div#product_detail div.widget-box {
+    margin-top: 8px;
+    margin-bottom: 15px;
+}
+
+div#product_detail div.widget-main > div.row > div {
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+div#product_detail div.widget-main div.form-group > label {
+    line-height: 28px;
+    text-align: right;
+}
+
+div#product_detail div#product_image_list img {
+    margin-right: 3px;
+    margin-bottom: 3px;
+}

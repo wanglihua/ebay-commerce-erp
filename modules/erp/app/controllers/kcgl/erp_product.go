@@ -82,9 +82,10 @@ FROM erp_product prd
 
 type ProductDetailForm struct {
 	Product                   models.ProductInfo                           `json:"product"`
+	ProductImageList          []models.ProductImageInfo                    `json:"product_image_list"`
 	SupplierList              []models.SupplierInfo                        `json:"supplier_list"`
 	ProductCateSelectItemList []product_cate_service.ProductCateSelectItem `json:"product_cate_list"`
-	PackageMaterialList       [] models.PackageMaterialInfo                `json:"package_material_list"`
+	PackageMaterialList       []models.PackageMaterialInfo                 `json:"package_material_list"`
 	StatusList                []models.StatusInfo                          `json:"status_list"`
 }
 
@@ -120,6 +121,7 @@ func (f *ProductDetailForm) Valid(validation *revel.Validation) bool {
 
 func (c ErpProduct) Detail(product_id int64) revel.Result {
 	//return c.RenderText(fmt.Sprintf("product_id %d", product_id))
+	c.RenderArgs["product_id"] = product_id
 	return c.RenderTemplate("erp/kcgl/product/product_detail.html")
 }
 
@@ -142,8 +144,12 @@ func (c ErpProduct) DetailData() revel.Result {
 		product.StatusId = models.PRODUCT_STATUS_ZC
 	}
 
+	var product_image_list = make([]models.ProductImageInfo, 0)
+	err := db_session.Where(fmt.Sprintf("product_id = %d", product_id)).Find(&product_image_list)
+	core.HandleError(err)
+
 	var supplier_list []models.SupplierInfo
-	err := db_session.Asc(models.SupplierCols.Name).Find(&supplier_list)
+	err = db_session.Asc(models.SupplierCols.Name).Find(&supplier_list)
 	core.HandleError(err)
 
 	var product_cate_list = product_cate_service.GetProductCateSelectItemList(db_session)
@@ -156,6 +162,7 @@ func (c ErpProduct) DetailData() revel.Result {
 
 	var detail_form ProductDetailForm
 	detail_form.Product = product
+	detail_form.ProductImageList = product_image_list
 	detail_form.SupplierList = supplier_list
 	detail_form.ProductCateSelectItemList = product_cate_list
 	detail_form.PackageMaterialList = package_material_list
