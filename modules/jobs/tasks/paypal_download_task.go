@@ -87,7 +87,6 @@ func (t PaypalDownloadTask) Run() {
 		revel.TRACE.Println("payment_list:", payment_list)
 
 		//todo: insert payment_list to database
-
 	}
 
 	job_duration := time.Since(job_time_begin)
