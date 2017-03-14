@@ -290,25 +290,39 @@ func (c ErpProduct) GetProductInfo() revel.Result {
 }
 
 func (c ErpProduct) ProductOrderList(product_id int64) revel.Result {
-	return c.RenderEmpty()
+	return c.RenderTemplate("erp/kcgl/product/product_order_list.html")
 }
 
 func (c ErpProduct) ProductOrderListData(product_id int64) revel.Result {
-	return c.RenderEmpty()
+	db_session := c.DbSession
+	order_item_list := order_service.Get_order_item_data_list_by_product_id(db_session, product_id)
+	return c.RenderJson(map[string]interface{}{
+		"order_item_list": order_item_list,
+	})
 }
 
 func (c ErpProduct) ProductMessageList(product_id int64) revel.Result {
-	return c.RenderEmpty()
+	return c.RenderTemplate("erp/kcgl/product/product_message_list.html")
 }
 
 func (c ErpProduct) ProductMessageListData(product_id int64) revel.Result {
-	return c.RenderEmpty()
+	db_session := c.DbSession
+	message_list := message_service.Get_message_list_data_by_product_id(db_session, product_id)
+	return c.RenderJson(map[string]interface{}{
+		"message_list": message_list,
+	})
 }
 
 func (c ErpProduct) ProductLogList(product_id int64) revel.Result {
-	return c.RenderEmpty()
+	return c.RenderTemplate("erp/kcgl/product/product_log_list.html")
 }
 
 func (c ErpProduct) ProductLogListData(product_id int64) revel.Result {
-	return c.RenderEmpty()
+	db_session := c.DbSession
+	var product_log_list = make([]models.ProductLogInfo, 0)
+	err := db_session.Where(fmt.Sprintf("product_id = %d", product_id)).Find(&product_log_list)
+	core.HandleError(err)
+	return c.RenderJson(map[string]interface{}{
+		"product_log_list": product_log_list,
+	})
 }
