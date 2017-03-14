@@ -87,6 +87,7 @@ type ProductDetailForm struct {
 	ProductCateSelectItemList []product_cate_service.ProductCateSelectItem `json:"product_cate_list"`
 	PackageMaterialList       []models.PackageMaterialInfo                 `json:"package_material_list"`
 	StatusList                []models.StatusInfo                          `json:"status_list"`
+	InventoryList             []product_inventory_view_item_t              `json:"inventory_list"`
 }
 
 func (f *ProductDetailForm) IsCreate() bool {
@@ -160,6 +161,8 @@ func (c ErpProduct) DetailData() revel.Result {
 
 	status_list := status_service.GetStatusList(db_session, models.STATUS_TYPE_PRODUCT)
 
+	inventory_list := c.get_product_inventory_list(db_session, product_id)
+
 	var detail_form ProductDetailForm
 	detail_form.Product = product
 	detail_form.ProductImageList = product_image_list
@@ -167,8 +170,34 @@ func (c ErpProduct) DetailData() revel.Result {
 	detail_form.ProductCateSelectItemList = product_cate_list
 	detail_form.PackageMaterialList = package_material_list
 	detail_form.StatusList = status_list
+	detail_form.InventoryList = inventory_list
 
 	return c.RenderJson(detail_form)
+}
+
+type product_inventory_view_item_t struct {
+	models.InventoryInfo   `xorm:"extends" json:"nvt"`
+	models.ProductInfo     `xorm:"extends" json:"p"`
+	models.StockInfo       `xorm:"extends" json:"st"`
+	models.StorageLocInfo  `xorm:"extends" json:"sl"`
+}
+
+var product_inventory_sql = `SELECT nvt.*, p.*, st.*, sl.*
+FROM erp_inventory nvt
+    INNER JOIN erp_product p ON p.id = nvt.product_id
+    INNER JOIN erp_stock st ON st.id = nvt.stock_id
+    INNER JOIN erp_storage_loc sl ON sl.id = nvt.storage_loc_id
+WHERE nvt.product_id = %d`
+
+func (c ErpProduct) get_product_inventory_list(db_session *xorm.Session, product_id int64) []product_inventory_view_item_t {
+
+	product_inventory_sql = fmt.Sprintf(product_inventory_sql, product_id)
+
+	var product_inventory_list = make([]product_inventory_view_item_t, 0)
+	err := db_session.Sql(product_inventory_sql).Find(&product_inventory_list)
+	core.HandleError(err)
+
+	return product_inventory_list
 }
 
 func (c ErpProduct) Save() revel.Result {
