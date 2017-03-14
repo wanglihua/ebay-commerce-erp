@@ -4,6 +4,7 @@ import (
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
+	xorm_core "github.com/go-xorm/core"
 	"github.com/go-xorm/xorm"
 	"github.com/revel/revel"
 )
@@ -41,6 +42,7 @@ func InitDatabase() {
 		if revel.DevMode == true {
 			Engine.ShowSQL()
 			Engine.ShowExecTime()
+			xorm_core.LogQuerySql = true
 		}
 
 		//实体定义时明确指明了表名和列名，下面这些定义就不起作用了
