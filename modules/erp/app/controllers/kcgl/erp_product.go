@@ -182,6 +182,7 @@ type product_inventory_view_item_t struct {
 	models.StorageLocInfo  `xorm:"extends" json:"sl"`
 }
 
+// 这是一个静态变量，对他的修改会被保留下来
 var product_inventory_sql = `SELECT nvt.*, p.*, st.*, sl.*
 FROM erp_inventory nvt
     INNER JOIN erp_product p ON p.id = nvt.product_id
@@ -191,10 +192,10 @@ WHERE nvt.product_id = %d`
 
 func (c ErpProduct) get_product_inventory_list(db_session *xorm.Session, product_id int64) []product_inventory_view_item_t {
 
-	product_inventory_sql = fmt.Sprintf(product_inventory_sql, product_id)
+	sql := fmt.Sprintf(product_inventory_sql, product_id)
 
 	var product_inventory_list = make([]product_inventory_view_item_t, 0)
-	err := db_session.Sql(product_inventory_sql).Find(&product_inventory_list)
+	err := db_session.Sql(sql).Find(&product_inventory_list)
 	core.HandleError(err)
 
 	return product_inventory_list

@@ -88,68 +88,34 @@
                             <table id="order_item_list" class="table table-striped table-bordered">
                                 <thead>
                                 <tr>
-                                    <th class="center" style="width: 50px;">选择</th>
-                                    <th class="center" style="width: 60px;">商品图片</th>
-                                    <th style="width: 120px;">商品名称</th>
-                                    <th class="center" style="width: 100px;">售价</th>
-                                    <th class="center" style="width: 100px;">成本</th>
-                                    <th class="center" style="width: 80px;">原始售价</th>
-                                    <th class="center" style="width: 80px;">毛利</th>
-                                    <th>留言</th>
+                                    <th class="center" style="width: 100px;">SKU</th>
+                                    <th class="center">商品名称</th>
+                                    <th class="center" style="width: 120px;">仓库</th>
+                                    <th class="center" style="width: 120px;">库位</th>
+                                    <th class="center" style="width: 100px;">库存</th>
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <template v-for="order_item in detail.order_item_list">
+                                <template v-for="inventory in detail.inventory_list">
                                     <tr>
                                         <td class="center">
-                                            <label class="pos-rel">
-                                                <input type="checkbox" class="ace" :value="order_item.oi.id"/>
-                                                <span class="lbl"></span>
-                                            </label>
-                                        </td>
-                                        <td class="center">
-                                            <a :href="order_item.p.view_item_url" target="_blank">
-                                                <img :src="order_item.p.image_url" alt="" style="width: 60px;height: 60px;"/>
-                                            </a>
+                                            {{inventory.p.sku}}
                                         </td>
                                         <td>
-                                            <div :title="order_item.p.name" style="width: 120px; overflow: hidden; text-overflow: ellipsis;white-space: nowrap;">
-                                                {{order_item.p.name}}
-                                            </div>
-                                            <div>
-                                                <a :href="'/erp/product/detail/' + order_item.p.id" target="_blank">
-                                                    {{order_item.p.sku}}
-                                                </a>
-                                            </div>
-                                            <div>
-                                                <a :href="order_item.p.view_item_url" target="_blank">
-                                                    {{order_item.p.item_id}}
-                                                </a>
-                                            </div>
+                                            {{inventory.p.name}}
                                         </td>
                                         <td class="center">
-                                            <div>{{order_item.oi.transaction_price_currency}}&nbsp;{{order_item.oi.transaction_price}}
-                                                × {{order_item.oi.quantity}}
-                                            </div>
-                                            <div>={{order_item.oi.transaction_price_currency}}&nbsp;{{order_item.oi.transaction_price
-                                                * order_item.oi.quantity}}
-                                            </div>
+                                            {{inventory.st.name}}
                                         </td>
-                                        <td></td>
-                                        <td class="center">{{order_item.oi.transaction_price_currency}}&nbsp;{{order_item.oi.transaction_price}}</td>
-                                        <td>
+                                        <td class="center">
+                                            {{inventory.sl.name}}
                                         </td>
-                                        <td></td>
+                                        <td class="center">
+                                            {{inventory.nvt.qty}}
+                                        </td>
                                     </tr>
                                 </template>
                                 </tbody>
-                                <tfoot>
-                                <tr>
-                                    <td colspan="8">
-                                        Hello World!
-                                    </td>
-                                </tr>
-                                </tfoot>
                             </table>
                         </div>
                     </div>
