@@ -8,6 +8,7 @@ import (
 	"github.com/revel/revel"
 	"matrix/core"
 	"matrix/modules/erp/models"
+	"matrix/modules/erp/service/message_service"
 	"matrix/modules/erp/service/order_service"
 	"matrix/modules/erp/service/product_cate_service"
 	"matrix/modules/erp/service/product_inventory_service"
@@ -91,6 +92,8 @@ type ProductDetailForm struct {
 	StatusList                []models.StatusInfo                                         `json:"status_list"`
 	InventoryList             []product_inventory_service.Product_inventory_view_item_t   `json:"inventory_list"`
 	OrderItemList             []order_service.Order_item_view_item_t                      `json:"order_item_list"`
+	ProductLogList            []models.ProductLogInfo                                     `json:"product_log_list"`
+	MessageList               []message_service.Message_view_item_t                       `json:"message_list"`
 }
 
 func (f *ProductDetailForm) IsCreate() bool {
@@ -167,6 +170,12 @@ func (c ErpProduct) DetailData() revel.Result {
 	inventory_list := product_inventory_service.Get_product_inventory_list(db_session, product_id)
 	order_item_list := order_service.Get_order_item_data_list_by_product_id(db_session, product_id)
 
+	var product_log_list = make([]models.ProductLogInfo, 0)
+	err = db_session.Where(fmt.Sprintf("product_id = %d", product_id)).Find(&product_log_list)
+	core.HandleError(err)
+
+	message_list := message_service.Get_message_list_data_by_product_id(db_session, product_id)
+
 	var detail_form ProductDetailForm
 	detail_form.Product = product
 	detail_form.ProductImageList = product_image_list
@@ -176,6 +185,8 @@ func (c ErpProduct) DetailData() revel.Result {
 	detail_form.StatusList = status_list
 	detail_form.InventoryList = inventory_list
 	detail_form.OrderItemList = order_item_list
+	detail_form.ProductLogList = product_log_list
+	detail_form.MessageList = message_list
 
 	return c.RenderJson(detail_form)
 }
