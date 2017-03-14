@@ -162,7 +162,7 @@ func (c ErpOrder) DetailData() revel.Result {
 	}
 
 	sql := `
-	SELECT oi.*, p.*
+SELECT oi.*, p.*
 FROM erp_order_item oi
     INNER JOIN erp_product p ON p.id = oi.item_product_id
 WHERE oi.order_id = %d`

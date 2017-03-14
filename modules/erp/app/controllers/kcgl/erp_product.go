@@ -5,11 +5,13 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/go-xorm/xorm"
 	"github.com/revel/revel"
 	"matrix/core"
 	"matrix/modules/erp/models"
+	"matrix/modules/erp/service/order_service"
 	"matrix/modules/erp/service/product_cate_service"
+	"matrix/modules/erp/service/product_inventory_service"
+	"matrix/modules/erp/service/product_log_service"
 	"matrix/modules/erp/service/status_service"
 )
 
@@ -81,13 +83,14 @@ FROM erp_product prd
 }
 
 type ProductDetailForm struct {
-	Product                   models.ProductInfo                           `json:"product"`
-	ProductImageList          []models.ProductImageInfo                    `json:"product_image_list"`
-	SupplierList              []models.SupplierInfo                        `json:"supplier_list"`
-	ProductCateSelectItemList []product_cate_service.ProductCateSelectItem `json:"product_cate_list"`
-	PackageMaterialList       []models.PackageMaterialInfo                 `json:"package_material_list"`
-	StatusList                []models.StatusInfo                          `json:"status_list"`
-	InventoryList             []product_inventory_view_item_t              `json:"inventory_list"`
+	Product                   models.ProductInfo                                          `json:"product"`
+	ProductImageList          []models.ProductImageInfo                                   `json:"product_image_list"`
+	SupplierList              []models.SupplierInfo                                       `json:"supplier_list"`
+	ProductCateSelectItemList []product_cate_service.ProductCateSelectItem                `json:"product_cate_list"`
+	PackageMaterialList       []models.PackageMaterialInfo                                `json:"package_material_list"`
+	StatusList                []models.StatusInfo                                         `json:"status_list"`
+	InventoryList             []product_inventory_service.Product_inventory_view_item_t   `json:"inventory_list"`
+	OrderItemList             []order_service.Order_item_view_item_t                      `json:"order_item_list"`
 }
 
 func (f *ProductDetailForm) IsCreate() bool {
@@ -161,7 +164,8 @@ func (c ErpProduct) DetailData() revel.Result {
 
 	status_list := status_service.GetStatusList(db_session, models.STATUS_TYPE_PRODUCT)
 
-	inventory_list := c.get_product_inventory_list(db_session, product_id)
+	inventory_list := product_inventory_service.Get_product_inventory_list(db_session, product_id)
+	order_item_list := order_service.Get_order_item_data_list_by_product_id(db_session, product_id)
 
 	var detail_form ProductDetailForm
 	detail_form.Product = product
@@ -171,34 +175,9 @@ func (c ErpProduct) DetailData() revel.Result {
 	detail_form.PackageMaterialList = package_material_list
 	detail_form.StatusList = status_list
 	detail_form.InventoryList = inventory_list
+	detail_form.OrderItemList = order_item_list
 
 	return c.RenderJson(detail_form)
-}
-
-type product_inventory_view_item_t struct {
-	models.InventoryInfo   `xorm:"extends" json:"nvt"`
-	models.ProductInfo     `xorm:"extends" json:"p"`
-	models.StockInfo       `xorm:"extends" json:"st"`
-	models.StorageLocInfo  `xorm:"extends" json:"sl"`
-}
-
-// 这是一个静态变量，对他的修改会被保留下来
-var product_inventory_sql = `SELECT nvt.*, p.*, st.*, sl.*
-FROM erp_inventory nvt
-    INNER JOIN erp_product p ON p.id = nvt.product_id
-    INNER JOIN erp_stock st ON st.id = nvt.stock_id
-    INNER JOIN erp_storage_loc sl ON sl.id = nvt.storage_loc_id
-WHERE nvt.product_id = %d`
-
-func (c ErpProduct) get_product_inventory_list(db_session *xorm.Session, product_id int64) []product_inventory_view_item_t {
-
-	sql := fmt.Sprintf(product_inventory_sql, product_id)
-
-	var product_inventory_list = make([]product_inventory_view_item_t, 0)
-	err := db_session.Sql(sql).Find(&product_inventory_list)
-	core.HandleError(err)
-
-	return product_inventory_list
 }
 
 func (c ErpProduct) Save() revel.Result {
@@ -231,7 +210,7 @@ func (c ErpProduct) Save() revel.Result {
 		affected, err = db_session.Insert(&product_from_ui)
 		core.HandleError(err)
 
-		c.insert_product_log(nil, &product_from_ui, product_operation_type.insert, db_session, c.Session)
+		product_log_service.Insert_product_log(nil, &product_from_ui, product_log_service.Product_operation_type.Insert, db_session, c.Session)
 	} else {
 		sku_count, err := db_session.Where("id <> ? and sku = ?", product_from_ui.Id, product_from_ui.Sku).Count(&product_from_ui)
 		core.HandleError(err)
@@ -252,7 +231,7 @@ func (c ErpProduct) Save() revel.Result {
 		affected, err = db_session.Id(product_from_ui.Id).Update(&product_from_ui)
 		core.HandleError(err)
 
-		c.insert_product_log(&product_from_ui, &product_in_db, product_operation_type.update, db_session, c.Session)
+		product_log_service.Insert_product_log(&product_from_ui, &product_in_db, product_log_service.Product_operation_type.Update, db_session, c.Session)
 
 		if affected == 0 {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！"})
@@ -274,7 +253,7 @@ func (c ErpProduct) Delete() revel.Result {
 		core.HandleError(err)
 
 		if has {
-			c.insert_product_log(nil, &product, product_operation_type.delete, db_session, c.Session)
+			product_log_service.Insert_product_log(nil, &product, product_log_service.Product_operation_type.Delete, db_session, c.Session)
 		}
 	}
 
@@ -282,44 +261,6 @@ func (c ErpProduct) Delete() revel.Result {
 	core.HandleError(err)
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})
-}
-
-var product_operation_type = struct {
-	insert int64
-	update int64
-	delete int64
-}{
-	insert: 1,
-	update: 2,
-	delete: 3,
-}
-
-// 插入商品日志
-func (c ErpProduct) insert_product_log(product_from_ui *models.ProductInfo /*更新操作时使用*/ , product_in_db *models.ProductInfo, operation_type int64, db_session *xorm.Session, web_session revel.Session) {
-	var product_log models.ProductLogInfo
-
-	product_log.ProductId = product_in_db.Id
-	product_log.ProductCode = product_in_db.Sku
-
-	login_user := core.GetLoginUser(c.Session)
-	product_log.UserId = login_user.UserId
-	product_log.LoginName = login_user.LoginName
-
-	if operation_type == product_operation_type.delete {
-		product_log.Operation = "删除数据"
-	} else if operation_type == product_operation_type.insert {
-		//获得详细的插入数据
-		product_log.Operation = "插入数据"
-	} else if operation_type == product_operation_type.update {
-		//获得详细的字段修改数据
-		product_log.Operation = "更新数据。"
-		product_log.Operation += fmt.Sprintf(" SKU: %s => %s", product_in_db.Sku, product_from_ui.Sku)
-		product_log.Operation += fmt.Sprintf(" 名称: %s => %s", product_in_db.Name, product_from_ui.Name)
-		product_log.Operation += fmt.Sprintf(" 描述: %s => %s", product_in_db.Desc.String, product_from_ui.Desc.String)
-	}
-
-	_, err := db_session.Insert(&product_log)
-	core.HandleError(err)
 }
 
 func (c ErpProduct) GetProductInfo() revel.Result {

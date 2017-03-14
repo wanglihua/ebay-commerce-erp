@@ -1,0 +1,49 @@
+package product_log_service
+
+import (
+	"fmt"
+
+	"github.com/go-xorm/xorm"
+	"github.com/revel/revel"
+	"matrix/core"
+	"matrix/modules/erp/models"
+)
+
+var Product_operation_type = struct {
+	Insert int64
+	Update int64
+	Delete int64
+}{
+	Insert: 1,
+	Update: 2,
+	Delete: 3,
+}
+
+// 插入商品日志
+func Insert_product_log(product_from_ui *models.ProductInfo /*更新操作时使用*/ , product_in_db *models.ProductInfo, operation_type int64, db_session *xorm.Session, web_session revel.Session) {
+	var product_log models.ProductLogInfo
+
+	product_log.ProductId = product_in_db.Id
+	product_log.ProductCode = product_in_db.Sku
+
+	login_user := core.GetLoginUser(web_session)
+	product_log.UserId = login_user.UserId
+	product_log.LoginName = login_user.LoginName
+
+	if operation_type == Product_operation_type.Delete {
+		product_log.Operation = "删除数据"
+	} else if operation_type == Product_operation_type.Insert {
+		//获得详细的插入数据
+		product_log.Operation = "插入数据"
+	} else if operation_type == Product_operation_type.Update {
+		//获得详细的字段修改数据
+		product_log.Operation = "更新数据。"
+		product_log.Operation += fmt.Sprintf(" SKU: %s => %s", product_in_db.Sku, product_from_ui.Sku)
+		product_log.Operation += fmt.Sprintf(" 名称: %s => %s", product_in_db.Name, product_from_ui.Name)
+		product_log.Operation += fmt.Sprintf(" 描述: %s => %s", product_in_db.Desc.String, product_from_ui.Desc.String)
+		//todo: 可以继续补充
+	}
+
+	_, err := db_session.Insert(&product_log)
+	core.HandleError(err)
+}
