@@ -1,4 +1,4 @@
-package controllers
+package order_service
 
 import (
 	"github.com/go-xorm/xorm"
@@ -6,15 +6,7 @@ import (
 	"matrix/modules/erp/models"
 )
 
-/*
-type ErpPurchaseBillViewItem struct {
-	models.PurchaseBillInfo `xorm:"extends" json:"pb"`
-	auth_models.UserInfo    `xorm:"extends" json:"u"`
-	models.StatusInfo       `xorm:"extends" json:"s"`
-}
- */
-
-type order_view_item_t struct {
+type Order_view_item_t struct {
 	models.OrderInfo           `xorm:"extends" json:"o"`
 	models.OrderTypeInfo       `xorm:"extends" json:"ot"`
 	models.OrderHoldTypeInfo   `xorm:"extends" json:"ht"`
@@ -22,7 +14,7 @@ type order_view_item_t struct {
 	models.StatusInfo          `xorm:"extends" json:"s"`
 }
 
-func get_order_data_list(db_session *xorm.Session, filter string, order string, offset int64, limit int64) ([]order_view_item_t, int64) {
+func Get_order_data_list(db_session *xorm.Session, filter string, order string, offset int64, limit int64) ([]Order_view_item_t, int64) {
 
 	/*
 SELECT o.*, ot.*, ht.*, sa.*, s.* FROM erp_order o
@@ -54,7 +46,7 @@ erp_order o
 
 	sql_builder.Limit(offset, limit)
 
-	order_list := make([]order_view_item_t, 0)
+	order_list := make([]Order_view_item_t, 0)
 	err := db_session.Sql(sql_builder.SqlList()).Find(&order_list)
 	core.HandleError(err)
 
@@ -67,27 +59,3 @@ erp_order o
 	return order_list, order_count.Count
 }
 
-type shop_select_item_t struct {
-	Id   int64     `xorm:"'shop_id'" json:"id"`
-	Name string    `xorm:"'shop_name'" json:"name"`
-}
-
-func get_shop_select_item_list(db_session *xorm.Session) []shop_select_item_t {
-
-	/*
-SELECT sa.id AS shop_id, concat(ep.name, ' ', sa.name) AS shop_name
-FROM erp_shop_account sa
-    INNER JOIN erp_ecommerce_platform ep ON ep.id = sa.platform_id
-	 */
-
-	sql := `
-SELECT sa.id AS shop_id, concat(ep.name, ' ', sa.name) AS shop_name
-FROM erp_shop_account sa
-    INNER JOIN erp_ecommerce_platform ep ON ep.id = sa.platform_id`
-
-	shop_list := make([]shop_select_item_t, 0)
-	err := db_session.Sql(sql).Find(&shop_list)
-	core.HandleError(err)
-
-	return shop_list
-}

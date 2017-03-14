@@ -3,6 +3,7 @@ package controllers
 import (
 	"github.com/revel/revel"
 	"matrix/core"
+	"matrix/modules/erp/service/order_service"
 )
 
 type ErpOrderHold struct {
@@ -17,7 +18,7 @@ func (c ErpOrderHold) ListData() revel.Result {
 	db_session := c.DbSession
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
-	order_list, count := get_order_data_list(db_session, filter, order, offset, limit)
+	order_list, count := order_service.Get_order_data_list(db_session, filter, order, offset, limit)
 
 	return c.RenderJson(core.GridResult{
 		Data:  order_list,

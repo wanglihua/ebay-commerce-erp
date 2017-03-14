@@ -8,6 +8,8 @@ import (
 	"github.com/revel/revel"
 	"matrix/core"
 	"matrix/modules/erp/models"
+	"matrix/modules/erp/service/order_service"
+	"matrix/modules/erp/service/shop_service"
 )
 
 type ErpOrder struct {
@@ -48,8 +50,8 @@ func (c ErpOrder) Index(status string) revel.Result {
 func (c ErpOrder) PageData() revel.Result {
 	db_session := c.DbSession
 
-	shop_list := get_shop_select_item_list(db_session)
-	shop_list = append([]shop_select_item_t{shop_select_item_t{Id: 0, Name: ""}}, shop_list...)
+	shop_list := shop_service.Get_shop_select_item_list(db_session)
+	shop_list = append([]shop_service.Shop_select_item_t{shop_service.Shop_select_item_t{Id: 0, Name: ""}}, shop_list...)
 
 	return c.RenderJson(map[string]interface{}{
 		"shop_list": shop_list,
@@ -102,7 +104,7 @@ func (c ErpOrder) ListData() revel.Result {
 		filter = core.SqlAnd(filter, fmt.Sprintf("o.status_id = %d", status_id))
 	}
 
-	order_list, count := get_order_data_list(db_session, filter, order, offset, limit)
+	order_list, count := order_service.Get_order_data_list(db_session, filter, order, offset, limit)
 
 	return c.RenderJson(core.GridResult{
 		Data:  order_list,

@@ -8,6 +8,7 @@ import (
 	"github.com/revel/revel"
 	"matrix/core"
 	"matrix/modules/erp/models"
+	"matrix/modules/erp/service/shop_service"
 )
 
 type ErpProductImage struct {
@@ -89,9 +90,9 @@ type shop_select_item_t struct {
 }
 
 type ProductImageDetailForm struct {
-	ProductImage         models.ProductImageInfo        `json:"product_image"`
-	ProductImageTypeList []models.ProductImageTypeInfo  `json:"product_image_type_list"`
-	ShopList             []shop_select_item_t           `json:"shop_list"`
+	ProductImage         models.ProductImageInfo            `json:"product_image"`
+	ProductImageTypeList []models.ProductImageTypeInfo      `json:"product_image_type_list"`
+	ShopList             []shop_service.Shop_select_item_t  `json:"shop_list"`
 }
 
 func (f *ProductImageDetailForm) IsCreate() bool {
@@ -141,13 +142,7 @@ func (c ErpProductImage) DetailData() revel.Result {
 	err := db_session.Find(&product_image_type_list)
 	core.HandleError(err)
 
-	shop_list_sql := `SELECT sa.id AS shop_id, concat(pf.name, ' ', sa.name) AS shop_name
-FROM erp_shop_account sa
-    INNER JOIN erp_ecommerce_platform pf ON pf.id = sa.platform_id`
-
-	var shop_list []shop_select_item_t
-	err = db_session.Sql(shop_list_sql).Find(&shop_list)
-	core.HandleError(err)
+	var shop_list = shop_service.Get_shop_select_item_list(db_session)
 
 	var detail_form ProductImageDetailForm
 	detail_form.ProductImage = product_image
