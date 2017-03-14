@@ -317,3 +317,7 @@ div#product_detail div#product_image_list img {
     margin-right: 3px;
     margin-bottom: 3px;
 }
+
+div#product_detail table#message_list td {
+    vertical-align: middle;
+}
