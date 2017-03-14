@@ -277,3 +277,27 @@ func (c ErpProduct) GetProductInfo() revel.Result {
 		"product": product,
 	})
 }
+
+func (c ErpProduct) ProductOrderList(product_id int64) revel.Result {
+	return c.RenderEmpty()
+}
+
+func (c ErpProduct) ProductOrderListData(product_id int64) revel.Result {
+	return c.RenderEmpty()
+}
+
+func (c ErpProduct) ProductMessageList(product_id int64) revel.Result {
+	return c.RenderEmpty()
+}
+
+func (c ErpProduct) ProductMessageListData(product_id int64) revel.Result {
+	return c.RenderEmpty()
+}
+
+func (c ErpProduct) ProductLogList(product_id int64) revel.Result {
+	return c.RenderEmpty()
+}
+
+func (c ErpProduct) ProductLogListData(product_id int64) revel.Result {
+	return c.RenderEmpty()
+}

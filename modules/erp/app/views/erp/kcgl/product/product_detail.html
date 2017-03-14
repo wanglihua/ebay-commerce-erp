@@ -134,7 +134,14 @@
 
         <div class="widget-box">
             <div class="widget-header">
-                <h4 class="smaller">订单记录</h4>
+                <h4 class="smaller widget-title">订单记录</h4>
+                <div class="widget-toolbar">
+                    <label>
+                        <small>
+                            <a href='{% url "ErpProduct.ProductOrderList" .product_id %}' target="_blank">MORE++</a>
+                        </small>
+                    </label>
+                </div>
             </div>
             <div class="widget-body">
                 <div class="widget-main">
@@ -178,7 +185,32 @@
 
         <div class="widget-box">
             <div class="widget-header">
-                <h4 class="smaller">操作日志</h4>
+                <h4 class="smaller widget-title">消息记录</h4>
+                <div class="widget-toolbar">
+                    <label>
+                        <small>
+                            <a href='{% url "ErpProduct.ProductMessageList" .product_id %}' target="_blank">MORE++</a>
+                        </small>
+                    </label>
+                </div>
+            </div>
+            <div class="widget-body">
+                <div class="widget-main">
+
+                </div>
+            </div>
+        </div>
+
+        <div class="widget-box">
+            <div class="widget-header">
+                <h4 class="smaller widget-title">操作日志</h4>
+                <div class="widget-toolbar">
+                    <label>
+                        <small>
+                            <a href='{% url "ErpProduct.ProductLogList" .product_id %}' target="_blank">MORE++</a>
+                        </small>
+                    </label>
+                </div>
             </div>
             <div class="widget-body">
                 <div class="widget-main">
