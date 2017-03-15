@@ -41,6 +41,8 @@ erp_message msg
     INNER JOIN erp_product p ON p.id = msg.product_id
     INNER JOIN erp_status s ON s.id = msg.status_id`)
 
+	sb.OrderBy("msg.id DESC")
+
 	return sb
 }
 
@@ -73,6 +75,18 @@ func Get_message_list_data(db_session *xorm.Session, request *revel.Request) (me
 func Get_message_list_data_by_product_id(db_session *xorm.Session, product_id int64) []Message_view_item_t {
 	sb := get_message_list_sql_builder()
 	sb.Where(fmt.Sprintf("msg.product_id = %d", product_id))
+
+	var message_list = make([]Message_view_item_t, 0)
+	err := db_session.Sql(sb.SqlList()).Find(&message_list)
+	core.HandleError(err)
+
+	return message_list
+}
+
+func Get_message_list_data_by_product_id_top_n(db_session *xorm.Session, product_id int64, top_n int64) []Message_view_item_t {
+	sb := get_message_list_sql_builder()
+	sb.Where(fmt.Sprintf("msg.product_id = %d", product_id))
+	sb.Limit(0, top_n)
 
 	var message_list = make([]Message_view_item_t, 0)
 	err := db_session.Sql(sb.SqlList()).Find(&message_list)

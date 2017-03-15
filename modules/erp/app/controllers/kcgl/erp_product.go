@@ -168,13 +168,13 @@ func (c ErpProduct) DetailData() revel.Result {
 	status_list := status_service.GetStatusList(db_session, models.STATUS_TYPE_PRODUCT)
 
 	inventory_list := product_inventory_service.Get_product_inventory_list(db_session, product_id)
-	order_item_list := order_service.Get_order_item_data_list_by_product_id(db_session, product_id)
+	order_item_list := order_service.Get_order_item_data_list_by_product_id_top_n(db_session, product_id, 10)
 
 	var product_log_list = make([]models.ProductLogInfo, 0)
-	err = db_session.Where(fmt.Sprintf("product_id = %d", product_id)).Find(&product_log_list)
+	err = db_session.Where(fmt.Sprintf("product_id = %d", product_id)).OrderBy("id DESC").Limit(10, 0).Find(&product_log_list)
 	core.HandleError(err)
 
-	message_list := message_service.Get_message_list_data_by_product_id(db_session, product_id)
+	message_list := message_service.Get_message_list_data_by_product_id_top_n(db_session, product_id, 10)
 
 	var detail_form ProductDetailForm
 	detail_form.Product = product
@@ -349,7 +349,7 @@ func (c ErpProduct) ProductLogListData() revel.Result {
 	core.HandleError(err)
 
 	var product_log_list = make([]models.ProductLogInfo, 0)
-	err = db_session.Where(fmt.Sprintf("product_id = %d", product_id)).Find(&product_log_list)
+	err = db_session.Where(fmt.Sprintf("product_id = %d", product_id)).OrderBy("id DESC").Find(&product_log_list)
 	core.HandleError(err)
 	return c.RenderJson(map[string]interface{}{
 		"product":          product,

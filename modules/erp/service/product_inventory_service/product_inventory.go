@@ -14,8 +14,8 @@ type Product_inventory_view_item_t struct {
 	models.StorageLocInfo  `xorm:"extends" json:"sl"`
 }
 
-// 这是一个静态变量，对他的修改会被保留下来
-var product_inventory_sql = `SELECT nvt.*, p.*, st.*, sl.*
+// 这是一个常量，不能修改
+const product_inventory_sql = `SELECT nvt.*, p.*, st.*, sl.*
 FROM erp_inventory nvt
     INNER JOIN erp_product p ON p.id = nvt.product_id
     INNER JOIN erp_stock st ON st.id = nvt.stock_id
