@@ -41,6 +41,7 @@
                             <th id="thSupplier">供应商</th>
                             <th>商品目录</th>
                             <th>成本价(RMB)</th>
+                            <th>库存</th>
                             <th>重量(kg)</th>
                             <th>包材</th>
                             <th>备注</th>
@@ -116,6 +117,26 @@
                         },
                         {"mDataProp": "cate.full_name", "title": "商品目录", "bSearchable": false, "width": 150},
                         {"mDataProp": "prd.cost_price", "title": "成本价(RMB)", "bSearchable": false, "width": 100},
+                        {
+                            "mDataProp": "prd.id",
+                            "title": "库存",
+                            "bSearchable": false,
+                            "bSortable": false,
+                            "width": 100,
+                            "render": function (data, type, row) {
+                                var inventory_list = row.inventory_list;
+                                if (inventory_list.length == 0) {
+                                    return "";
+                                }
+
+                                var inventory_desc = "";
+                                for (var index in inventory_list) {
+                                    var inventory = inventory_list[index];
+                                    inventory_desc += inventory.st.name + " " + inventory.sl.name + " " + inventory.nvt.qty + "<br/>";
+                                }
+                                return inventory_desc;
+                            }
+                        },
                         {"mDataProp": "prd.weight", "title": "重量(kg)", "bSearchable": false, "width": 80},
                         {"mDataProp": "pm.name", "title": "包材", "bSearchable": false, "width": 150},
                         {"mDataProp": "prd.desc", "title": "备注", "bSearchable": true},

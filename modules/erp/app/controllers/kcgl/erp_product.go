@@ -25,11 +25,12 @@ func (c ErpProduct) Index() revel.Result {
 }
 
 type ErpProductViewItem struct {
-	models.ProductInfo          `xorm:"extends" json:"prd"`
-	models.ProductCateInfo      `xorm:"extends" json:"cate"`
-	models.SupplierInfo         `xorm:"extends" json:"sup"`
-	models.PackageMaterialInfo  `xorm:"extends" json:"pm"`
-	models.StatusInfo           `xorm:"extends" json:"st"`
+	Product         models.ProductInfo           `xorm:"extends" json:"prd"`
+	ProductCate     models.ProductCateInfo       `xorm:"extends" json:"cate"`
+	Supplier        models.SupplierInfo          `xorm:"extends" json:"sup"`
+	PackageMaterial models.PackageMaterialInfo   `xorm:"extends" json:"pm"`
+	Status          models.StatusInfo            `xorm:"extends" json:"st"`
+	InventoryList   []product_inventory_service.Product_inventory_view_item_t `xorm:"-" json:"inventory_list"`
 }
 
 func (c ErpProduct) ListData() revel.Result {
@@ -70,6 +71,24 @@ FROM erp_product prd
 	product_list := make([]ErpProductViewItem, 0, limit)
 	err := db_session.Sql(sql_builder.SqlList()).Find(&product_list)
 	core.HandleError(err)
+
+	var product_id_list = make([]int64, 0)
+	for _, product := range product_list {
+		product_id_list = append(product_id_list, product.Product.Id)
+	}
+
+	inventory_list_product_list := product_inventory_service.Get_inventory_by_product_list(db_session, product_id_list)
+
+	for index, _ := range product_list {
+		inventory_list_product := make([]product_inventory_service.Product_inventory_view_item_t, 0)
+		for _, inventory := range inventory_list_product_list {
+			if inventory.ProductId == product_list[index].Product.Id {
+				inventory_list_product = append(inventory_list_product, inventory)
+			}
+		}
+
+		product_list[index].InventoryList = inventory_list_product
+	}
 
 	var product_count struct {
 		Count int64 `xorm:"'product_count'"`

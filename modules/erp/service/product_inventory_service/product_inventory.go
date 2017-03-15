@@ -1,10 +1,12 @@
 package product_inventory_service
 
 import (
-	"github.com/go-xorm/xorm"
 	"fmt"
-	"matrix/modules/erp/models"
+	"strings"
+
+	"github.com/go-xorm/xorm"
 	"matrix/core"
+	"matrix/modules/erp/models"
 )
 
 type Product_inventory_view_item_t struct {
@@ -14,20 +16,45 @@ type Product_inventory_view_item_t struct {
 	models.StorageLocInfo  `xorm:"extends" json:"sl"`
 }
 
-// 这是一个常量，不能修改
-const product_inventory_sql = `SELECT nvt.*, p.*, st.*, sl.*
-FROM erp_inventory nvt
+func get_inventory_list_sql_builder() *core.SqlBuilder {
+	sb := core.NewSqlBuilder()
+	sb.Select("nvt.*, p.*, st.*, sl.*")
+	sb.From(`erp_inventory nvt
     INNER JOIN erp_product p ON p.id = nvt.product_id
     INNER JOIN erp_stock st ON st.id = nvt.stock_id
-    INNER JOIN erp_storage_loc sl ON sl.id = nvt.storage_loc_id
-WHERE nvt.product_id = %d`
+    INNER JOIN erp_storage_loc sl ON sl.id = nvt.storage_loc_id`)
+
+	return sb
+}
 
 func Get_product_inventory_list(db_session *xorm.Session, product_id int64) []Product_inventory_view_item_t {
-
-	sql := fmt.Sprintf(product_inventory_sql, product_id)
+	sb := get_inventory_list_sql_builder()
+	sb.Where(fmt.Sprintf("nvt.product_id = %d", product_id))
 
 	var product_inventory_list = make([]Product_inventory_view_item_t, 0)
-	err := db_session.Sql(sql).Find(&product_inventory_list)
+	err := db_session.Sql(sb.SqlList()).Find(&product_inventory_list)
+	core.HandleError(err)
+
+	return product_inventory_list
+}
+
+func Get_inventory_by_product_list(db_session *xorm.Session, product_id_list []int64) []Product_inventory_view_item_t {
+	sb := get_inventory_list_sql_builder()
+
+	if len(product_id_list) == 0 {
+		sb.Where("1=0")
+	} else {
+		var product_id_str_list = make([]string, 0, len(product_id_list))
+		for _, product_id := range product_id_list {
+			product_id_str_list = append(product_id_str_list, fmt.Sprint(product_id))
+		}
+		sb.Where(fmt.Sprintf("nvt.product_id IN (%s)", strings.Join(product_id_str_list, ",")))
+	}
+
+	sb.OrderBy("st.id ASC, sl.id ASC")
+
+	var product_inventory_list = make([]Product_inventory_view_item_t, 0)
+	err := db_session.Sql(sb.SqlList()).Find(&product_inventory_list)
 	core.HandleError(err)
 
 	return product_inventory_list
