@@ -13,6 +13,7 @@ import (
 	"matrix/core"
 	"matrix/ebay"
 	"matrix/modules/erp/models"
+	"matrix/modules/erp/service/exchange_rate_service"
 )
 
 /*
@@ -214,32 +215,60 @@ func (t EBayOrderDownloadTask) Run() {
 					update_col_list = append(update_col_list, "shipped_time")
 				}
 
+				// 获取当前的汇率设置
+				var exchange_rate_list = exchange_rate_service.Get_exchange_rate_list(db_session)
+
+				var exchange_rate_map = make(map[string]models.ExchangeRateInfo)
+				for _, exchange_rate := range exchange_rate_list {
+					exchange_rate_map[exchange_rate.Currency.Code] = exchange_rate.ExchangeRate
+				}
+
 				order_in_db.AdjustmentAmountCurrency = order_download.AdjustmentAmount.Currency
 				update_col_list = append(update_col_list, "adjustment_amount_currency")
 				order_in_db.AdjustmentAmount = order_download.AdjustmentAmount.Value
 				update_col_list = append(update_col_list, "adjustment_amount")
+				if exchange_rate, found := exchange_rate_map[order_download.AdjustmentAmount.Currency]; found == true {
+					order_in_db.AdjustmentAmountRmb = order_download.AdjustmentAmount.Value * exchange_rate.Rate
+					update_col_list = append(update_col_list, "adjustment_amount_rmb")
+				}
 
 				order_in_db.AmountPaidCurrency = order_download.AmountPaid.Currency
 				update_col_list = append(update_col_list, "amount_paid_currency")
 				order_in_db.AmountPaid = order_download.AmountPaid.Value
 				update_col_list = append(update_col_list, "amount_paid")
+				if exchange_rate, found := exchange_rate_map[order_download.AmountPaid.Currency]; found == true {
+					order_in_db.AmountPaidRmb = order_download.AmountPaid.Value * exchange_rate.Rate
+					update_col_list = append(update_col_list, "amount_paid_rmb")
+				}
 
 				order_in_db.AmountSavedCurrency = order_download.AmountSaved.Currency
 				update_col_list = append(update_col_list, "amount_saved_currency")
 				order_in_db.AmountSaved = order_download.AmountSaved.Value
 				update_col_list = append(update_col_list, "amount_saved")
+				if exchange_rate, found := exchange_rate_map[order_download.AmountSaved.Currency]; found == true {
+					order_in_db.AmountSavedRmb = order_download.AmountSaved.Value * exchange_rate.Rate
+					update_col_list = append(update_col_list, "amount_saved_rmb")
+				}
 
 				//Total
 				order_in_db.TotalAmountCurrency = order_download.Total.Currency
 				update_col_list = append(update_col_list, "total_amount_currency")
 				order_in_db.TotalAmount = order_download.Total.Value
 				update_col_list = append(update_col_list, "total_amount")
+				if exchange_rate, found := exchange_rate_map[order_download.Total.Currency]; found == true {
+					order_in_db.TotalAmountRmb = order_download.Total.Value * exchange_rate.Rate
+					update_col_list = append(update_col_list, "total_amount_rmb")
+				}
 
 				//SubTotal
 				order_in_db.SubTotalAmountCurrency = order_download.Subtotal.Currency
 				update_col_list = append(update_col_list, "subtotal_amount_currency")
 				order_in_db.SubTotalAmount = order_download.Subtotal.Value
 				update_col_list = append(update_col_list, "subtotal_amount")
+				if exchange_rate, found := exchange_rate_map[order_download.Subtotal.Currency]; found == true {
+					order_in_db.SubTotalAmountRmb = order_download.Subtotal.Value * exchange_rate.Rate
+					update_col_list = append(update_col_list, "subtotal_amount_rmb")
+				}
 
 				order_in_db.PaymentMethods = strings.Join(order_download.PaymentMethods, ",")
 				order_in_db.SellerEmail = order_download.SellerEmail
