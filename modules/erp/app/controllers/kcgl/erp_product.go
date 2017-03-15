@@ -214,7 +214,7 @@ func (c ErpProduct) Save() revel.Result {
 	db_session := c.DbSession
 
 	var detail_form ProductDetailForm
-	err := json.Unmarshal(c.GetRequestBody(), &detail_form)
+	err := json.Unmarshal(c.GetRequestBody(), &(detail_form.Product))
 	core.HandleError(err)
 
 	if detail_form.Valid(c.Validation) == false {
@@ -258,7 +258,8 @@ func (c ErpProduct) Save() revel.Result {
 		_, err = db_session.Id(product_from_ui.Id).Get(&product_in_db)
 		core.HandleError(err)
 
-		affected, err = db_session.Id(product_from_ui.Id).Update(&product_from_ui)
+		update_cols := []string{"sku", "cn_name", "name", "cate_id", "supplier_id", "pkg_mtrl_id", "cost_price", "status_id", "desc" }
+		affected, err = db_session.Id(product_from_ui.Id).Cols(update_cols...).Update(&product_from_ui)
 		core.HandleError(err)
 
 		product_log_service.Insert_product_log(&product_from_ui, &product_in_db, product_log_service.Product_operation_type.Update, db_session, c.Session)
@@ -268,7 +269,7 @@ func (c ErpProduct) Save() revel.Result {
 		}
 	}
 
-	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据保存成功!"})
+	return c.RenderJson(core.JsonResult{Success: true, Message: "数据保存成功!"})
 }
 
 func (c ErpProduct) Delete() revel.Result {
