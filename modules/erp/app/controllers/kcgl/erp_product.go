@@ -290,39 +290,69 @@ func (c ErpProduct) GetProductInfo() revel.Result {
 }
 
 func (c ErpProduct) ProductOrderList(product_id int64) revel.Result {
+	c.RenderArgs["product_id"] = product_id
 	return c.RenderTemplate("erp/kcgl/product/product_order_list.html")
 }
 
-func (c ErpProduct) ProductOrderListData(product_id int64) revel.Result {
+func (c ErpProduct) ProductOrderListData() revel.Result {
 	db_session := c.DbSession
+
+	var product_id int64
+	c.Params.Bind(&product_id, "id")
+
+	var product models.ProductInfo
+	_, err := db_session.Id(product_id).Get(&product)
+	core.HandleError(err)
+
 	order_item_list := order_service.Get_order_item_data_list_by_product_id(db_session, product_id)
 	return c.RenderJson(map[string]interface{}{
+		"product":         product,
 		"order_item_list": order_item_list,
 	})
 }
 
 func (c ErpProduct) ProductMessageList(product_id int64) revel.Result {
+	c.RenderArgs["product_id"] = product_id
 	return c.RenderTemplate("erp/kcgl/product/product_message_list.html")
 }
 
-func (c ErpProduct) ProductMessageListData(product_id int64) revel.Result {
+func (c ErpProduct) ProductMessageListData() revel.Result {
 	db_session := c.DbSession
+
+	var product_id int64
+	c.Params.Bind(&product_id, "id")
+
+	var product models.ProductInfo
+	_, err := db_session.Id(product_id).Get(&product)
+	core.HandleError(err)
+
 	message_list := message_service.Get_message_list_data_by_product_id(db_session, product_id)
 	return c.RenderJson(map[string]interface{}{
+		"product":      product,
 		"message_list": message_list,
 	})
 }
 
 func (c ErpProduct) ProductLogList(product_id int64) revel.Result {
+	c.RenderArgs["product_id"] = product_id
 	return c.RenderTemplate("erp/kcgl/product/product_log_list.html")
 }
 
-func (c ErpProduct) ProductLogListData(product_id int64) revel.Result {
+func (c ErpProduct) ProductLogListData() revel.Result {
 	db_session := c.DbSession
+
+	var product_id int64
+	c.Params.Bind(&product_id, "id")
+
+	var product models.ProductInfo
+	_, err := db_session.Id(product_id).Get(&product)
+	core.HandleError(err)
+
 	var product_log_list = make([]models.ProductLogInfo, 0)
-	err := db_session.Where(fmt.Sprintf("product_id = %d", product_id)).Find(&product_log_list)
+	err = db_session.Where(fmt.Sprintf("product_id = %d", product_id)).Find(&product_log_list)
 	core.HandleError(err)
 	return c.RenderJson(map[string]interface{}{
+		"product":          product,
 		"product_log_list": product_log_list,
 	})
 }

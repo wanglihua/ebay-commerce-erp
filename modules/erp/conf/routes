@@ -88,12 +88,12 @@ POST /erp/product/data/detail                  ErpProduct.DetailData
 POST /erp/product/save                         ErpProduct.Save
 POST /erp/product/delete                       ErpProduct.Delete
 POST /erp/product/get/info                     ErpProduct.GetProductInfo
-GET  /erp/product/order/list/:product_id         ErpProduct.ProductOrderList
-GET  /erp/product/order/list/data/:product_id    ErpProduct.ProductOrderListData
-GET  /erp/product/message/list/:product_id       ErpProduct.ProductMessageList
-GET  /erp/product/message/list/data/:product_id  ErpProduct.ProductMessageListData
-GET  /erp/product/log/list/:product_id           ErpProduct.ProductLogList
-GET  /erp/product/log/list/data/:product_id      ErpProduct.ProductLogListData
+GET  /erp/product/order/list/:product_id       ErpProduct.ProductOrderList
+POST /erp/product/order/list/data              ErpProduct.ProductOrderListData
+GET  /erp/product/message/list/:product_id     ErpProduct.ProductMessageList
+POST /erp/product/message/list/data            ErpProduct.ProductMessageListData
+GET  /erp/product/log/list/:product_id         ErpProduct.ProductLogList
+POST /erp/product/log/list/data                ErpProduct.ProductLogListData
 
 GET  /erp/product/import                       ErpProductImport.Index
 POST /erp/product/import/data/list             ErpProductImport.ListData

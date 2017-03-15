@@ -321,3 +321,7 @@ div#product_detail div#product_image_list img {
 div#product_detail table#message_list td {
     vertical-align: middle;
 }
+
+div#product_message table#message_list td {
+    vertical-align: middle;
+}

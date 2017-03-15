@@ -1,0 +1,79 @@
+{% site_header "商品消息记录" . %}
+<div class="main-container" id="main-container">
+    <div id="product_message" style="width: 1024px;margin-left: auto;margin-right: auto;">
+
+        <div class="widget-box">
+            <div class="widget-header">
+                <h4 class="smaller widget-title">消息记录（{{ page.product.sku }}，{{ page.product.cn_name }}）</h4>
+            </div>
+            <div class="widget-body">
+                <div class="widget-main">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <table id="message_list" class="table table-striped table-bordered">
+                                <thead>
+                                <tr>
+                                    <th class="center" style="width:50px;">编号</th>
+                                    <th class="center" style="width:120px;">时间</th>
+                                    <th>内容</th>
+                                    <th class="center" style="width:60px;">状态</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <template v-for="(message, index) in page.message_list">
+                                    <tr>
+                                        <td class="center">{{index + 1}}</td>
+                                        <td class="center">{{message.msg.creation_date}}</td>
+                                        <td>
+                                            <div style="min-width: 280px;white-space:normal; word-break: break-all; word-wrap:break-word;">
+                                                {{message.msg.subject}}<br/><br/>
+                                                {{message.msg.body}}
+                                            </div>
+                                        </td>
+                                        <td class="center">{{message.s.name}}</td>
+                                    </tr>
+                                </template>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{%template "erp/kcgl/product/product_detail.var" .%}
+<script type="text/javascript">
+    var vm = new Vue({
+        el: "#product_message",
+        data: {
+            "page": {
+                "product": {},
+                "product_message_list": []
+            }
+        },
+        mounted: function () {
+            var this_vm = this;
+
+            $.ajax(
+                {
+                    "type": "POST",
+                    "dataType": 'json',
+                    "url": '{% url "ErpProduct.ProductMessageListData" %}',
+                    "data": {
+                        "id": product_id
+                    },
+                    "success": function (data) {
+                        if (data.success == false) {
+                            $.msg.error(data.message);
+                            return;
+                        }
+                        this_vm.page = data;
+                    }
+                });
+        },
+        methods: {}
+    });
+</script>
+{% site_footer %}
+
