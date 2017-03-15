@@ -256,15 +256,18 @@
                                             </div>
                                         </td>
                                         <td class="center">
-                                            <div>{{order_item.oi.transaction_price_currency}}&nbsp;{{order_item.oi.transaction_price}}
-                                                × {{order_item.oi.quantity}}
+                                            <div>RMB
+                                                {{order_item.oi.transaction_price_rmb}} × {{order_item.oi.quantity}}
                                             </div>
-                                            <div>={{order_item.oi.transaction_price_currency}}&nbsp;{{order_item.oi.transaction_price
-                                                * order_item.oi.quantity}}
+                                            <div>=RMB
+                                                {{order_item.oi.transaction_price_rmb * order_item.oi.quantity}}
                                             </div>
                                         </td>
                                         <td></td>
-                                        <td class="center">{{order_item.oi.transaction_price_currency}}&nbsp;{{order_item.oi.transaction_price}}</td>
+                                        <td class="center">
+                                            {{order_item.oi.transaction_price_currency}}
+                                            {{order_item.oi.transaction_price * order_item.oi.quantity}}
+                                        </td>
                                         <td>
                                         </td>
                                         <td></td>

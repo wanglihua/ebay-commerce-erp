@@ -113,10 +113,18 @@
                         {"mDataProp": "s.name", "title": "状态", "bSearchable": true},
                         {"mDataProp": "sa.name", "title": "店铺", "bSearchable": true},
                         {"mDataProp": "o.buyer_user_id", "title": "买家用户id", "bSearchable": true},
-                        {"mDataProp": "o.amount_paid_currency", "title": "支付金额货种", "bSearchable": true},
-                        {"mDataProp": "o.amount_paid", "title": "支付金额", "bSearchable": false},
-                        {"mDataProp": "o.total_amount_currency", "title": "总计金额币种", "bSearchable": true},
-                        {"mDataProp": "o.total_amount", "title": "总计金额", "bSearchable": false},
+                        {
+                            "mDataProp": "o.amount_paid_rmb", "title": "支付金额", "bSearchable": false,
+                            "render": function (data, type, row) {
+                                return "RMB " + data;
+                            }
+                        },
+                        {
+                            "mDataProp": "o.total_amount_rmb", "title": "总计金额", "bSearchable": false,
+                            "render": function (data, type, row) {
+                                return "RMB " + data;
+                            }
+                        },
                         {"mDataProp": "o.payment_methods", "title": "支付方式", "bSearchable": true},
                         {"mDataProp": "o.created_time", "title": "建单时间", "bSearchable": false, "width": 135},
                         {"mDataProp": "o.shipped_time", "title": "发货时间", "bSearchable": false, "width": 135}

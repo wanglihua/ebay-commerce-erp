@@ -371,6 +371,9 @@ func (t EBayOrderDownloadTask) Run() {
 					order_item.TransactionId = transaction.TransactionID
 					order_item.TransactionPriceCurrency = transaction.TransactionPrice.Currency
 					order_item.TransactionPrice = transaction.TransactionPrice.Value
+					if exchange_rate, found := exchange_rate_map[transaction.TransactionPrice.Currency]; found == true {
+						order_item.TransactionPriceRmb = transaction.TransactionPrice.Value * exchange_rate.Rate
+					}
 					product_item_id := transaction.Item.ItemID
 					order_item.ItemId = product_item_id
 
