@@ -67,11 +67,11 @@
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
-                                            <label for="product_name" class="col-xs-2 control-label">商品</label>
+                                            <label for="product_skus" class="col-xs-2 control-label">商品</label>
                                             <div class="col-xs-10">
                                                 <div class="input-group">
-                                                    <input id="product_id" name="detail.sales_manager.product_id" type="hidden" v-model.number="detail.sales_manager.product_id"/>
-                                                    <input id="product_name" name="detail.product_name" type="text" readonly="readonly" class="input-sm form-control" v-model="detail.product_name"/>
+                                                    <input id="product_id" name="detail.sales_manager.product_id" type="hidden" v-model.number="detail.sales_manager.product_id"/><!--这个没用了的-->
+                                                    <input id="product_skus" name="detail.product_skus" type="text" readonly="readonly" class="input-sm form-control" v-model="detail.product_skus"/>
                                                     <span class="input-group-btn">
                                                         <button type="button" class="btn btn-purple btn-sm" @click="showProductSelect()">
                                                             <span class="ace-icon fa fa-search icon-on-right"></span>&nbsp;选择
@@ -128,8 +128,9 @@
             "detail": {
                 "sales_manager": {},
                 "shop_account_name": "",
-                "product_name": "",
-                "user_name": ""
+                "user_name": "",
+                "product_id_list": [],
+                "product_skus": ""
             }
         },
         mounted: function () {
@@ -151,21 +152,15 @@
                             }
                         },
                         {"mDataProp": "ep.name", "title": "平台", "bSearchable": false, "width": 100},
-                        {"mDataProp": "sa.name", "title": "店铺", "bSearchable": false},
-                        {"mDataProp": "p.sku", "title": "SKU", "bSearchable": false},
-                        {"mDataProp": "p.name", "title": "商品", "bSearchable": false},
-                        {"mDataProp": "u.nick_name", "title": "销售", "bSearchable": false},
+                        {"mDataProp": "sa.name", "title": "店铺", "bSearchable": false, "width": 180},
+                        {"mDataProp": "p.sku", "title": "SKU", "bSearchable": false, "width": 150},
+                        {"mDataProp": "p.cn_name", "title": "商品名称", "bSearchable": false},
+                        {"mDataProp": "u.nick_name", "title": "销售", "bSearchable": false, "width": 100},
                         {"mDataProp": "sm.create_time", "title": "创建时间", "bSearchable": false, "width": 120},
                         {"mDataProp": "sm.update_time", "title": "修改时间", "bSearchable": false, "width": 120}
                     ]
                 }
             );
-
-            $('#salesManagerList tbody').on('dblclick', 'tr', function () {
-                var id = $(this).find('td:first-child input:checkbox').val();
-                vm.showSalesManagerDetail(id);
-            });
-
         },
         methods: {
             reloadList: function () {

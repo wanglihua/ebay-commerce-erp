@@ -2,13 +2,14 @@ package controllers
 
 import (
 	"encoding/json"
-	"strconv"
-	"github.com/revel/revel"
-
-	"matrix/core"
-	"matrix/modules/erp/models"
-	auth_models "matrix/modules/auth/models"
+	"errors"
 	"fmt"
+	"strconv"
+
+	"github.com/revel/revel"
+	"matrix/core"
+	auth_models "matrix/modules/auth/models"
+	"matrix/modules/erp/models"
 )
 
 type ErpSalesManager struct {
@@ -79,7 +80,7 @@ FROM erp_sales_manager sm
 type SalesManagerDetailForm struct {
 	SalesManager    models.SalesManagerInfo `json:"sales_manager"`
 	ShopAccountName string                  `json:"shop_account_name"`
-	ProductName     string                  `json:"product_name"`
+	ProductIdList   []int64                 `json:"product_id_list"`
 	UserName        string                  `json:"user_name"`
 }
 
@@ -98,16 +99,19 @@ func (f *SalesManagerDetailForm) Valid(validation *revel.Validation) bool {
 }
 
 func (c ErpSalesManager) DetailData() revel.Result {
-	db_session := c.DbSession
+	// 只是在新增的时候, 显示数据, 因为没有更新, 所以也就没有已经插入的数据的详细展示
+
+	// db_session := c.DbSession
 
 	var sales_manager_id int64
 	c.Params.Bind(&sales_manager_id, "id")
 
 	var platform models.ECommercePlatformInfo
 	var shop_account models.ShopAccountInfo
-	var product models.ProductInfo
+	//var product models.ProductInfo
 	var user auth_models.UserInfo
 	var sales_manager models.SalesManagerInfo
+	/*
 	if sales_manager_id != 0 {
 		has, err := db_session.Id(sales_manager_id).Get(&sales_manager)
 		core.HandleError(err)
@@ -124,11 +128,11 @@ func (c ErpSalesManager) DetailData() revel.Result {
 		_, err = db_session.Id(sales_manager.UserId).Get(&user)
 		core.HandleError(err)
 	}
+	*/
 
 	var detail_form SalesManagerDetailForm
 	detail_form.SalesManager = sales_manager
 	detail_form.ShopAccountName = fmt.Sprintf("%s %s", platform.Name, shop_account.Name)
-	detail_form.ProductName = fmt.Sprintf("%s %s", product.Sku, product.Name)
 	detail_form.UserName = fmt.Sprintf("%s %s", user.LoginName, user.NickName)
 
 	return c.RenderJson(detail_form)
@@ -149,15 +153,24 @@ func (c ErpSalesManager) Save() revel.Result {
 
 	var affected int64
 	if detail_form.IsCreate() {
-		shopId_count, err := db_session.Where("shop_id = ? and product_id = ? and user_id = ?", sales_manager.ShopId, sales_manager.ProductId, sales_manager.UserId).Count(&sales_manager)
-		core.HandleError(err)
-		if shopId_count != 0 {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，店铺、商品、销售已存在！" })
-		}
+		for _, product_id := range detail_form.ProductIdList {
+			sales_manager_entry_count, err := db_session.Where("shop_id = ? and product_id = ? and user_id = ?", sales_manager.ShopId, product_id, sales_manager.UserId).Count(&sales_manager)
+			core.HandleError(err)
+			if sales_manager_entry_count != 0 {
+				panic(errors.New("保存失败，店铺、商品、销售已存在！")) // 用 panic 而不是用下面的原来的return json success false的方式,是因为这样可以让事务回滚, 让前面插入的数据取消
+				//return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，店铺、商品、销售已存在！" })
+			}
 
-		affected, err = db_session.Insert(&sales_manager)
-		core.HandleError(err)
+			var new_sales_manager models.SalesManagerInfo
+			new_sales_manager = sales_manager
+			new_sales_manager.Id = 0
+			new_sales_manager.ProductId = product_id
+
+			affected, err = db_session.Insert(&new_sales_manager)
+			core.HandleError(err)
+		}
 	} else {
+		// 不能更新, 只能插入和删除数据, 所以这里的更新实体的代码没用了
 		shopId_count, err := db_session.Where("id <> ? and shop_id = ? and product_id = ? and user_id = ?", sales_manager.Id, sales_manager.ShopId, sales_manager.ProductId, sales_manager.UserId).Count(&sales_manager)
 		core.HandleError(err)
 		if shopId_count != 0 {

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/revel/revel"
 	"matrix/core"
@@ -310,21 +311,6 @@ func (c ErpProduct) Delete() revel.Result {
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})
 }
 
-func (c ErpProduct) GetProductInfo() revel.Result {
-	db_session := c.DbSession
-
-	var product_id int64
-	c.Params.Bind(&product_id, "product_id")
-
-	var product models.ProductInfo
-	_, err := db_session.Id(product_id).Get(&product)
-	core.HandleError(err)
-
-	return c.RenderJson(map[string]interface{}{
-		"product": product,
-	})
-}
-
 func (c ErpProduct) ProductOrderList(product_id int64) revel.Result {
 	c.RenderArgs["product_id"] = product_id
 	return c.RenderTemplate("erp/kcgl/product/product_order_list.html")
@@ -390,5 +376,49 @@ func (c ErpProduct) ProductLogListData() revel.Result {
 	return c.RenderJson(map[string]interface{}{
 		"product":          product,
 		"product_log_list": product_log_list,
+	})
+}
+
+func (c ErpProduct) GetProductInfo() revel.Result {
+	db_session := c.DbSession
+
+	var product_id int64
+	c.Params.Bind(&product_id, "product_id")
+
+	var product models.ProductInfo
+	_, err := db_session.Id(product_id).Get(&product)
+	core.HandleError(err)
+
+	return c.RenderJson(map[string]interface{}{
+		"product": product,
+	})
+}
+
+func (c ErpProduct) GetProductListSkus() revel.Result {
+	db_session := c.DbSession
+
+	var product_id_list = make([]int64, 0)
+	c.Params.Bind(&product_id_list, "product_id_list")
+
+	var product_id_str_list = make([]string, 0)
+	for _, product_id := range product_id_list {
+		product_id_str_list = append(product_id_str_list, fmt.Sprint(product_id))
+	}
+
+	type product_sku_t struct {
+		Sku string `xorm:"'product_sku'"`
+	}
+
+	var product_sku_struct_list = make([]product_sku_t, 0)
+	err := db_session.Sql(fmt.Sprintf("SELECT p.sku AS product_sku FROM erp_product p WHERE p.id IN (%s)", strings.Join(product_id_str_list, ","))).Find(&product_sku_struct_list)
+	core.HandleError(err)
+
+	var product_sku_list = make([]string, 0)
+	for _, product_sku_struct := range product_sku_struct_list {
+		product_sku_list = append(product_sku_list, product_sku_struct.Sku)
+	}
+
+	return c.RenderJson(map[string]interface{}{
+		"product_skus": strings.Join(product_sku_list, ","),
 	})
 }

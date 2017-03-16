@@ -88,6 +88,7 @@ POST /erp/product/data/detail                  ErpProduct.DetailData
 POST /erp/product/save                         ErpProduct.Save
 POST /erp/product/delete                       ErpProduct.Delete
 POST /erp/product/get/info                     ErpProduct.GetProductInfo
+POST /erp/product/get/list/skus                ErpProduct.GetProductListSkus
 GET  /erp/product/order/list/:product_id       ErpProduct.ProductOrderList
 POST /erp/product/order/list/data              ErpProduct.ProductOrderListData
 GET  /erp/product/message/list/:product_id     ErpProduct.ProductMessageList

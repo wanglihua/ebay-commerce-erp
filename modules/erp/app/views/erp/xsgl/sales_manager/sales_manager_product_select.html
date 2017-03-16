@@ -26,7 +26,7 @@
 <script type="text/javascript">
     $(function () {
         // product
-        initSingleSelectDataTable(
+        initDataTable(
             '#productList',
             {
                 "sAjaxSource": '{%url "ErpSalesManager.ProductSelectListData"%}',
@@ -58,27 +58,32 @@
     });
 
     function acceptProductSelect() {
-        var id_list = [];
+        var id_str_list = [];
         $('#productList tbody tr>td:first-child input:checkbox').each(function () {
             if (this.checked) {
-                id_list.push($(this).val());
+                id_str_list.push($(this).val());
             }
         });
 
-        if (id_list.length == 0 || id_list.length > 1) {
-            $.msg.alert("请选择一行数据！");
+        if (id_str_list.length == 0) {
+            $.msg.alert("请选择一行或多行数据！");
             return;
         }
 
-        var product_id = parseInt(id_list[0]);
-        vm.detail.sales_manager.product_id = product_id;
+        var product_id_list = []; //parseInt(id_str_list[0]);
+        for(var index in id_str_list){
+            product_id_list.push(parseInt(id_str_list[index]));
+        }
+        vm.detail.product_id_list = product_id_list;
 
         $.ajax({
-            url: '{%url "ErpProduct.GetProductInfo"%}',
+            url: '{%url "ErpProduct.GetProductListSkus"%}',
             type: "POST",
-            data: {"product_id": product_id},
+            data: {"product_id_list": product_id_list},
             success: function (data) {
-                vm.detail.product_name = data.product.sku + "  " + data.product.cn_name;
+                console.log(data.product_skus);
+                vm.detail.product_skus = data.product_skus;
+                console.log(vm.detail.product_skus);
             }
         });
 
