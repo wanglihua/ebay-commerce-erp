@@ -127,7 +127,12 @@
                         {"mDataProp": "product_code", "title": "商品编号", "bSearchable": true, "width": 150},
                         {"mDataProp": "create_time", "title": "操作时间", "bSearchable": false, "width": 120},
                         {"mDataProp": "login_name", "title": "操作员", "bSearchable": true, "width": 120},
-                        {"mDataProp": "operation", "title": "操作", "bSearchable": true}
+                        {
+                            "mDataProp": "operation", "title": "操作", "bSearchable": true,
+                            "render": function (data, type, row) {
+                                return "<div style='min-width: 280px;white-space:normal; word-break: break-all; word-wrap:break-word;'>" + data + "</div>";
+                            }
+                        }
                     ],
                     "fnServerData": function (sSource, aoData, fnCallback) {
                         aoData.push({'name': 'product_code_query', 'value': $('#product_code_query').val()});

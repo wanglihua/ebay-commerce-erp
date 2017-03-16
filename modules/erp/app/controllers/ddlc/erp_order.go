@@ -9,6 +9,7 @@ import (
 	"matrix/core"
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/order_service"
+	"matrix/modules/erp/service/paypal_service"
 	"matrix/modules/erp/service/shop_service"
 )
 
@@ -180,5 +181,18 @@ WHERE oi.order_id = %d`
 		"shipping_address": shipping_address,
 		"order_hold_type":  order_hold_type,
 		"order_item_list":  order_item_list,
+	})
+}
+
+func (c ErpOrder) GetPaypalShippingAddress() revel.Result {
+	db_session := c.DbSession
+
+	var order_id int64
+	c.Params.Bind(&order_id, "order_id")
+
+	shipping_address := paypal_service.Get_order_paypal_shipping_address(db_session, order_id)
+
+	return c.RenderJson(map[string]interface{}{
+		"shipping_address": shipping_address,
 	})
 }

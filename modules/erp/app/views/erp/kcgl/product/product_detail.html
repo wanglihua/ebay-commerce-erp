@@ -312,7 +312,11 @@
                                 <template v-for="(product_log, index) in detail.product_log_list">
                                     <tr>
                                         <td class="center">{{index + 1}}</td>
-                                        <td>{{product_log.operation}}</td>
+                                        <td>
+                                            <div style="min-width: 280px;white-space:normal;word-break: break-all;word-wrap:break-word;">
+                                                {{product_log.operation}}
+                                            </div>
+                                        </td>
                                         <td class="center">{{product_log.login_name}}</td>
                                         <td class="center">{{product_log.create_time}}</td>
                                     </tr>
