@@ -413,7 +413,11 @@
                                     //return;
                                 }
                                 else {
+                                    vm.detail.product = data.product;
                                     $.msg.show(data.message);
+                                    if (data.is_create == true) {
+                                        setTimeout("window.location.href='/erp/product/detail/" + data.product.id + "'", 1000) //重新打开已保存好的商品的详细页面
+                                    }
                                     //return;
                                 }
                             }

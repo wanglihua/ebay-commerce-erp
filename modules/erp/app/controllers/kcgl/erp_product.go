@@ -224,7 +224,9 @@ func (c ErpProduct) Save() revel.Result {
 	product_from_ui := detail_form.Product
 
 	var affected int64
-	if detail_form.IsCreate() {
+	is_create := detail_form.IsCreate()
+	var product_id int64 = product_from_ui.Id
+	if is_create {
 		sku_count, err := db_session.Where("sku = ?", product_from_ui.Sku).Count(&product_from_ui)
 		core.HandleError(err)
 		if sku_count != 0 {
@@ -239,6 +241,8 @@ func (c ErpProduct) Save() revel.Result {
 
 		affected, err = db_session.Insert(&product_from_ui)
 		core.HandleError(err)
+
+		product_id = product_from_ui.Id // 这是数据库保存后得到得到新生成的 id
 
 		product_log_service.Insert_product_log(nil, &product_from_ui, product_log_service.Product_operation_type.Insert, db_session, c.Session)
 	} else {
@@ -262,14 +266,26 @@ func (c ErpProduct) Save() revel.Result {
 		affected, err = db_session.Id(product_from_ui.Id).Cols(update_cols...).Update(&product_from_ui)
 		core.HandleError(err)
 
-		product_log_service.Insert_product_log(&product_from_ui, &product_in_db, product_log_service.Product_operation_type.Update, db_session, c.Session)
-
 		if affected == 0 {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！"})
 		}
+
+		product_id = product_in_db.Id //就是原来的 id, 这一句赋值其实是可以省掉的
+
+		product_log_service.Insert_product_log(&product_from_ui, &product_in_db, product_log_service.Product_operation_type.Update, db_session, c.Session)
 	}
 
-	return c.RenderJson(core.JsonResult{Success: true, Message: "数据保存成功!"})
+	// 重新获得新增或者更新的product,用于返回
+	var product models.ProductInfo
+	_, err = db_session.Id(product_id).Get(&product)
+	core.HandleError(err)
+
+	return c.RenderJson(map[string]interface{}{
+		"success":   true,
+		"is_create": is_create,
+		"product":   product,
+		"message":   "数据保存成功",
+	})
 }
 
 func (c ErpProduct) Delete() revel.Result {

@@ -6,7 +6,7 @@ import (
 
 type ProductInfo struct {
 	Id          int64           `xorm:"bigint notnull pk autoincr 'id'" json:"id"`
-	ItemId      string          `xorm:"nvarchar(50) notnull index unique 'item_id'" json:"item_id"` // ebay系统的 ItemId 方便信息同步
+	ItemId      string          `xorm:"nvarchar(50) notnull index 'item_id'" json:"item_id"` // ebay系统的 ItemId 方便信息同步
 	Sku         string          `xorm:"nvarchar(200) notnull index unique 'sku'" json:"sku" smith:"verbose_name=SKU,min=2,max=100"`
 	CnName      string          `xorm:"nvarchar(200) notnull index unique 'cn_name'" json:"cn_name" smith:"verbose_name=名称,min=2,max=100"`
 	Name        string          `xorm:"nvarchar(400) notnull index unique 'name'" json:"name" smith:"verbose_name=名称,min=2,max=100"`
