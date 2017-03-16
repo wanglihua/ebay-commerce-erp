@@ -4,6 +4,7 @@ module:auth
 module:erp
 module:jobs
 module:pprof
+module:cpa
 
 GET  /favicon.ico               Static.Serve("static","images/favicon.png")
 GET  /static/*filepath          Static.Serve("static")
