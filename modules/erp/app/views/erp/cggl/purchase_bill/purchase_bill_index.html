@@ -409,29 +409,16 @@
                                 return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
                             }
                         },
-                        {"mDataProp": "prd.sku", "title": "SKU", "bSearchable": true},
-                        {"mDataProp": "prd.name", "title": "商品名称", "bSearchable": true},
-                        {"mDataProp": "prd.desc", "title": "备注", "bSearchable": true},
-                        {"mDataProp": "st.name", "title": "状态", "bSearchable": false, "width": 60}
-                    ],
-                    "fnServerData": function (sSource, aoData, fnCallback) {
-                        showMask("数据加载中，请稍候");
-                        $.ajax(
-                            {
-                                "dataType": 'json',
-                                "url": sSource,
-                                "data": aoData,
-                                "success": function (data) {
-                                    hideMask();
-                                    if (data.success == false) {
-                                        $.msg.error(data.message);
-                                        return;
-                                    }
-                                    fnCallback(data);
-                                }
+                        {"mDataProp": "prd.sku", "title": "SKU", "bSearchable": true, "width": 150},
+                        {
+                            "mDataProp": "prd.cn_name", "title": "商品名称", "bSearchable": true,
+                            "render": function (data, type, row) {
+                                return data;
+                                //return "<div style='min-width: 280px;white-space:normal; word-break: break-all; word-wrap:break-word;'>" + row.prd.cn_name + "<br/>" + row.prd.name + "</div>";
                             }
-                        );
-                    }
+                        },
+                        {"mDataProp": "st.name", "title": "状态", "bSearchable": false, "width": 80}
+                    ]
                 }
             );
 
@@ -681,7 +668,7 @@
                     type: "POST",
                     data: {"product_id": product_id},
                     success: function (data) {
-                        vm.purchase_bill_entry_detail.product_name = data.product.sku + "  " + data.product.name;
+                        vm.purchase_bill_entry_detail.product_name = data.product.sku + "  " + data.product.cn_name;
                     }
                 });
 
