@@ -135,47 +135,6 @@ func (t EBayOrderDownloadTask) Run() {
 					revel.ERROR.Println(err)
 				}
 
-				// 订单状态，这部分逻辑还可以继续探讨
-
-				// 订单状态 设置 开始
-				order_status := order_download.OrderStatus
-				order_in_db.EBayStatus = order_status
-				order_status_id := order_in_db.StatusId
-
-				/*
-				// 订单状态 已创建
-				ORDER_STATUS_YCJ = 3850
-				// 订单状态 已支付
-				ORDER_STATUS_YZF = 3900
-				// 订单状态 待配货
-				ORDER_STATUS_DPH = 4000
-				// 订单状态 配货中
-				ORDER_STATUS_PHZ = 4100
-				// 订单状态 已发货
-				ORDER_STATUS_YFH = 4200
-				// 订单状态 已完成
-				ORDER_STATUS_YWC = 4300
-				*/
-
-				// 如果是新的订单，一般是新增的订单，系统数据库中还没有的订单
-				if order_status_id < models.ORDER_STATUS_YCJ && order_in_db.PaidTime.Valid == false { //前面小于号的判断要不要加呢
-					order_in_db.StatusId = models.ORDER_STATUS_YCJ // 这个状态，有可能会被接下来的状态逻辑所修改，可能会，更进一步改成 “已支付”, “已完成”
-				}
-
-				// 有可能是新增的订单（最有可能），或者是原来 已创建 的状态过来的。这时支付时间不为空
-				if order_status_id < models.ORDER_STATUS_YZF && order_in_db.PaidTime.Valid == true {
-					order_in_db.StatusId = models.ORDER_STATUS_YZF // 这个状态，有可能会被接下来的状态逻辑所修改，可能会，更进一步改成 “已完成”
-				}
-
-				// 同步逻辑要保证中间的 待配货，配货中，已发货 等的状态在同步时不被前面的状态覆盖，只有后面的“已完成”可以覆盖这些状态
-
-				// 如果 下载订单里面的 OrderStatus 是 Completed， 且订单的发货时间不为空，订单状态就为 已完成
-				if strings.ToLower(order_status) == strings.ToLower("Completed") && order_in_db.ShippedTime.Valid == true {
-					order_in_db.StatusId = models.ORDER_STATUS_YWC
-				}
-
-				//订单状态 设置 结束
-
 				order_in_db.Code = order_code
 				order_in_db.ShopId = config.ShopId
 
@@ -183,31 +142,6 @@ func (t EBayOrderDownloadTask) Run() {
 				_, err = db_session.Id(config.ShopId).Get(&shop)
 				if err != nil {
 					revel.ERROR.Println(err)
-				}
-
-				// 老鼠仓的判断
-				// 如果是通过PayPal支付的，而且店铺设置里面也设置了PayPal列表的
-				payment_methods := strings.Join(order_download.PaymentMethods, ",")
-				if order_in_db.StatusId < models.ORDER_STATUS_YZF {
-					payment_methods = ""
-				}
-
-				if strings.ToLower(payment_methods) == strings.ToLower("PayPal") && shop.PaypalAccount != "" {
-					shop_paypal_email_list := strings.Split(shop.PaypalAccount, ",")
-
-					seller_email := order_download.SellerEmail //是用SellerEmail来判断老鼠仓吗？
-
-					seller_email_in_list := false
-					for _, shop_paypal_email := range shop_paypal_email_list {
-						if strings.ToLower(seller_email) == strings.ToLower(shop_paypal_email) {
-							seller_email_in_list = true
-						}
-					}
-
-					// 设置的账户里面和卖家账户匹配的，就设置成为Hold订单
-					if seller_email_in_list == false {
-						order_in_db.HoldTypeId = core.NewNullInt(models.ORDER_HOLD_TYPE_SELLER_PAYPAL_MISMATCH, true)
-					}
 				}
 
 				order_in_db.TypeId = models.ORDER_TYPE_ZCDD //订单类型为正常下载订单
@@ -317,12 +251,80 @@ func (t EBayOrderDownloadTask) Run() {
 					update_col_list = append(update_col_list, "subtotal_amount_rmb")
 				}
 
-				order_in_db.PaymentMethods = strings.Join(order_download.PaymentMethods, ",")
 				order_in_db.SellerEmail = order_download.SellerEmail
 				order_in_db.SellerUserId = order_download.SellerUserID
 
 				order_in_db.BuyerUserId = order_download.BuyerUserID
 				order_in_db.BuyerCheckoutMessage = order_download.BuyerCheckoutMessage
+
+				// 订单状态，这部分逻辑还可以继续探讨，判断状态的时候用到了前面已经设置的 order_in_db的状态，所以这段代码不能放到前面去的
+
+				// 订单状态 设置 开始
+				order_status := order_download.OrderStatus
+				order_in_db.EBayStatus = order_status
+				order_status_id := order_in_db.StatusId
+
+				/*
+				// 订单状态 已创建
+				ORDER_STATUS_YCJ = 3850
+				// 订单状态 已支付
+				ORDER_STATUS_YZF = 3900
+				// 订单状态 待配货
+				ORDER_STATUS_DPH = 4000
+				// 订单状态 配货中
+				ORDER_STATUS_PHZ = 4100
+				// 订单状态 已发货
+				ORDER_STATUS_YFH = 4200
+				// 订单状态 已完成
+				ORDER_STATUS_YWC = 4300
+				*/
+
+				// 如果是新的订单，一般是新增的订单，系统数据库中还没有的订单
+				if order_status_id < models.ORDER_STATUS_YCJ && order_in_db.PaidTime.Valid == false { //前面小于号的判断要不要加呢
+					order_in_db.StatusId = models.ORDER_STATUS_YCJ // 这个状态，有可能会被接下来的状态逻辑所修改，可能会，更进一步改成 “已支付”, “已完成”
+				}
+
+				// 有可能是新增的订单（最有可能），或者是原来 已创建 的状态过来的。这时支付时间不为空
+				if order_status_id < models.ORDER_STATUS_YZF && order_in_db.PaidTime.Valid == true {
+					order_in_db.StatusId = models.ORDER_STATUS_YZF // 这个状态，有可能会被接下来的状态逻辑所修改，可能会，更进一步改成 “已完成”
+				}
+
+				// 同步逻辑要保证中间的 待配货，配货中，已发货 等的状态在同步时不被前面的状态覆盖，只有后面的“已完成”可以覆盖这些状态
+
+				// 如果 下载订单里面的 OrderStatus 是 Completed， 且订单的发货时间不为空，订单状态就为 已完成
+				if strings.ToLower(order_status) == strings.ToLower("Completed") && order_in_db.ShippedTime.Valid == true {
+					order_in_db.StatusId = models.ORDER_STATUS_YWC
+				}
+
+				//订单状态 设置 结束
+
+				// 支付方式的设置，这段代码依赖于前面代码设置的 order_in_db.StatusId
+				payment_methods := strings.Join(order_download.PaymentMethods, ",")
+				//if order_in_db.StatusId < models.ORDER_STATUS_YZF {
+				if strings.Index(payment_methods, ",") != -1 {
+					payment_methods = ""
+				}
+				order_in_db.PaymentMethods = payment_methods
+
+				// 老鼠仓的判断
+				// 如果是通过PayPal支付的，而且店铺设置里面也设置了PayPal列表的
+				if strings.ToLower(payment_methods) == strings.ToLower("PayPal") && shop.PaypalAccount != "" {
+					shop_paypal_email_list := strings.Split(shop.PaypalAccount, ",")
+
+					seller_email := order_download.SellerEmail //是用SellerEmail来判断老鼠仓吗？
+
+					seller_email_in_list := false
+					for _, shop_paypal_email := range shop_paypal_email_list {
+						if strings.ToLower(seller_email) == strings.ToLower(shop_paypal_email) {
+							seller_email_in_list = true
+						}
+					}
+
+					// 设置的账户里面和卖家账户匹配的，就设置成为Hold订单
+					if seller_email_in_list == false {
+						order_in_db.HoldTypeId = core.NewNullInt(models.ORDER_HOLD_TYPE_SELLER_PAYPAL_MISMATCH, true)
+					}
+				}
 
 				if has_order == true {
 					// update order
