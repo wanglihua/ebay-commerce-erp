@@ -1,4 +1,4 @@
-package main
+package service
 
 import (
 	"fmt"
@@ -7,7 +7,7 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
-func main() {
+func get_store_item_list() {
 
 	doc, err := goquery.NewDocument("http://stores.ebay.com.au/aishang2012")
 	if err != nil {
