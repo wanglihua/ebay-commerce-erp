@@ -176,6 +176,14 @@
                                         </div>
                                     </div>
                                 </div>
+                                <div class="col-xs-12" style="padding-top:5px;">
+                                    <div class="col-xs-9"></div>
+                                    <div class="col-xs-3" style="text-align: right;">
+                                        <button class="btn btn-minier btn-white btn-purple" @click="get_payal_address()">
+                                            获取PayPal地址
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -339,7 +347,22 @@
                     }
                 });
         },
-        methods: {}
+        methods: {
+            get_payal_address: function () {
+                $.ajax(
+                    {
+                        "dataType": 'json',
+                        "url": '{% url "ErpOrder.GetPaypalShippingAddress"%}',
+                        "data": {
+                            "order_id": order_id
+                        },
+                        "success": function (data) {
+                            console.log(data);
+                            alert(data);
+                        }
+                    });
+            }
+        }
     });
 </script>
 {% site_footer %}
