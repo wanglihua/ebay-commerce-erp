@@ -201,6 +201,10 @@
             reloadList: function () {
                 reloadList('#productList');
             },
+            showProductDetail: function (product_id) {
+                var url = '{% url "ErpProduct.Detail" 0 %}';
+                window.open(url, "_blank");
+            },
             showProductLog: function () {
                 window.location.href = "/erp/product/log";
             },

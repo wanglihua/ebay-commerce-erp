@@ -158,7 +158,7 @@ func (c ErpProduct) DetailData() revel.Result {
 	c.Params.Bind(&product_id, "id")
 
 	var product models.ProductInfo
-	if product_id != 0 {
+	if product_id != 0 { // 如果是不为零的时候，才会有这样的判断
 		has, err := db_session.Id(product_id).Get(&product)
 		core.HandleError(err)
 		if has == false {

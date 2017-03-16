@@ -26,7 +26,7 @@ func init() {
 			jobs.Schedule("cron.ebay_download_order", tasks.EBayOrderDownloadTask{})
 		}
 
-		// jobs.Now(tasks.EBayOrderDownloadTask{}) // just for test
+		//jobs.Now(tasks.EBayOrderDownloadTask{}) // just for test
 
 		_, found = revel.Config.String("cron.ebay_download_message")
 		if found {

@@ -21,10 +21,6 @@
                         <i class="ace-icon fa fa-plus"></i>
                         新增
                     </button>
-                    <button class="btn btn-danger btn-sm" @click="deleteOrder()">
-                        <i class="ace-icon fa fa-trash-o"></i>
-                        删除
-                    </button>
                 </div>
                 <div class="row" style="margin-top: 20px;margin-bottom: 20px;">
                     <div id="query" class="col-xs-12" style="line-height: 28px;">
@@ -104,7 +100,7 @@
                         },
 
                         {
-                            "mDataProp": "o.code", "title": "订单编号", "bSearchable": true, "width": 180,
+                            "mDataProp": "o.code", "title": "订单编号", "bSearchable": true, "width": 130,
                             "render": function (data, type, row) {
                                 return "<a href='/erp/order/detail/" + row.o.id + "' target='_blank'>" + data + "</a>";
                             }

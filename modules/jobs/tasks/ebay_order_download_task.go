@@ -122,13 +122,59 @@ func (t EBayOrderDownloadTask) Run() {
 			order_list := response.OrdersArray.Orders
 
 			for _, order_download := range order_list {
-				order_code := order_download.OrderID
+				order_code := order_download.OrderID // 已付款的 282359220529-1651978360018, 未付款的 282387576804-0
+				order_code_split_str_list := strings.Split(order_code, "-")
+				order_code_min_length := 13
+				if len(order_code_split_str_list) > 1 && len(order_code_split_str_list[1]) >= order_code_min_length {
+					order_code = order_code_split_str_list[1]
+				}
 
 				var order_in_db models.OrderInfo
 				has_order, err := db_session.Where("code = ?", order_code).Get(&order_in_db)
 				if err != nil {
 					revel.ERROR.Println(err)
 				}
+
+				// 订单状态，这部分逻辑还可以继续探讨
+
+				// 订单状态 设置 开始
+				order_status := order_download.OrderStatus
+				order_in_db.EBayStatus = order_status
+				order_status_id := order_in_db.StatusId
+
+				/*
+				// 订单状态 已创建
+				ORDER_STATUS_YCJ = 3850
+				// 订单状态 已支付
+				ORDER_STATUS_YZF = 3900
+				// 订单状态 待配货
+				ORDER_STATUS_DPH = 4000
+				// 订单状态 配货中
+				ORDER_STATUS_PHZ = 4100
+				// 订单状态 已发货
+				ORDER_STATUS_YFH = 4200
+				// 订单状态 已完成
+				ORDER_STATUS_YWC = 4300
+				*/
+
+				// 如果是新的订单，一般是新增的订单，系统数据库中还没有的订单
+				if order_status_id < models.ORDER_STATUS_YCJ && order_in_db.PaidTime.Valid == false { //前面小于号的判断要不要加呢
+					order_in_db.StatusId = models.ORDER_STATUS_YCJ // 这个状态，有可能会被接下来的状态逻辑所修改，可能会，更进一步改成 “已支付”, “已完成”
+				}
+
+				// 有可能是新增的订单（最有可能），或者是原来 已创建 的状态过来的。这时支付时间不为空
+				if order_status_id < models.ORDER_STATUS_YZF && order_in_db.PaidTime.Valid == true {
+					order_in_db.StatusId = models.ORDER_STATUS_YZF // 这个状态，有可能会被接下来的状态逻辑所修改，可能会，更进一步改成 “已完成”
+				}
+
+				// 同步逻辑要保证中间的 待配货，配货中，已发货 等的状态在同步时不被前面的状态覆盖，只有后面的“已完成”可以覆盖这些状态
+
+				// 如果 下载订单里面的 OrderStatus 是 Completed， 且订单的发货时间不为空，订单状态就为 已完成
+				if strings.ToLower(order_status) == strings.ToLower("Completed") && order_in_db.ShippedTime.Valid == true {
+					order_in_db.StatusId = models.ORDER_STATUS_YWC
+				}
+
+				//订单状态 设置 结束
 
 				order_in_db.Code = order_code
 				order_in_db.ShopId = config.ShopId
@@ -142,6 +188,10 @@ func (t EBayOrderDownloadTask) Run() {
 				// 老鼠仓的判断
 				// 如果是通过PayPal支付的，而且店铺设置里面也设置了PayPal列表的
 				payment_methods := strings.Join(order_download.PaymentMethods, ",")
+				if order_in_db.StatusId < models.ORDER_STATUS_YZF {
+					payment_methods = ""
+				}
+
 				if strings.ToLower(payment_methods) == strings.ToLower("PayPal") && shop.PaypalAccount != "" {
 					shop_paypal_email_list := strings.Split(shop.PaypalAccount, ",")
 
@@ -159,9 +209,6 @@ func (t EBayOrderDownloadTask) Run() {
 						order_in_db.HoldTypeId = core.NewNullInt(models.ORDER_HOLD_TYPE_SELLER_PAYPAL_MISMATCH, true)
 					}
 				}
-
-				// 状态？
-				//revel.TRACE.Println("OrderStatus: ", order_download.OrderStatus)
 
 				order_in_db.TypeId = models.ORDER_TYPE_ZCDD //订单类型为正常下载订单
 
@@ -276,47 +323,6 @@ func (t EBayOrderDownloadTask) Run() {
 
 				order_in_db.BuyerUserId = order_download.BuyerUserID
 				order_in_db.BuyerCheckoutMessage = order_download.BuyerCheckoutMessage
-
-				// 订单状态，这部分逻辑还可以继续探讨
-
-				// 订单状态 设置 开始
-				order_status := order_download.OrderStatus
-				order_in_db.EBayStatus = order_status
-				order_status_id := order_in_db.StatusId
-
-				/*
-				// 订单状态 已创建
-				ORDER_STATUS_YCJ = 3850
-				// 订单状态 已支付
-				ORDER_STATUS_YZF = 3900
-				// 订单状态 待配货
-				ORDER_STATUS_DPH = 4000
-				// 订单状态 配货中
-				ORDER_STATUS_PHZ = 4100
-				// 订单状态 已发货
-				ORDER_STATUS_YFH = 4200
-				// 订单状态 已完成
-				ORDER_STATUS_YWC = 4300
-				*/
-
-				// 如果是新的订单，一般是新增的订单，系统数据库中还没有的订单
-				if order_status_id < models.ORDER_STATUS_YCJ && order_in_db.PaidTime.Valid == false { //前面小于号的判断要不要加呢
-					order_in_db.StatusId = models.ORDER_STATUS_YCJ // 这个状态，有可能会被接下来的状态逻辑所修改，可能会，更进一步改成 “已支付”, “已完成”
-				}
-
-				// 有可能是新增的订单（最有可能），或者是原来 已创建 的状态过来的。这时支付时间不为空
-				if order_status_id < models.ORDER_STATUS_YZF && order_in_db.PaidTime.Valid == true {
-					order_in_db.StatusId = models.ORDER_STATUS_YZF // 这个状态，有可能会被接下来的状态逻辑所修改，可能会，更进一步改成 “已完成”
-				}
-
-				// 同步逻辑要保证中间的 待配货，配货中，已发货 等的状态在同步时不被前面的状态覆盖，只有后面的“已完成”可以覆盖这些状态
-
-				// 如果 下载订单里面的 OrderStatus 是 Completed， 且订单的发货时间不为空，订单状态就为 已完成
-				if strings.ToLower(order_status) == strings.ToLower("Completed") && order_in_db.ShippedTime.Valid == true {
-					order_in_db.StatusId = models.ORDER_STATUS_YWC
-				}
-
-				//订单状态 设置 结束
 
 				if has_order == true {
 					// update order
