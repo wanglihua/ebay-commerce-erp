@@ -70,7 +70,7 @@
                                             <label for="product_skus" class="col-xs-2 control-label">商品</label>
                                             <div class="col-xs-10">
                                                 <div class="input-group">
-                                                    <input id="product_id" name="detail.sales_manager.product_id" type="hidden" v-model.number="detail.sales_manager.product_id"/><!--这个没用了的-->
+                                                    <input id="product_id_list" name="detail.product_id_list" type="hidden" v-model="detail.product_id_list"/>
                                                     <input id="product_skus" name="detail.product_skus" type="text" readonly="readonly" class="input-sm form-control" v-model="detail.product_skus"/>
                                                     <span class="input-group-btn">
                                                         <button type="button" class="btn btn-purple btn-sm" @click="showProductSelect()">
@@ -129,8 +129,8 @@
                 "sales_manager": {},
                 "shop_account_name": "",
                 "user_name": "",
-                "product_id_list": [],
-                "product_skus": ""
+                "product_skus": "",
+                "product_id_list": []
             }
         },
         mounted: function () {

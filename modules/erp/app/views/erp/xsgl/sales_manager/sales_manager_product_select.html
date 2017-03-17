@@ -70,20 +70,21 @@
             return;
         }
 
-        var product_id_list = []; //parseInt(id_str_list[0]);
-        for(var index in id_str_list){
-            product_id_list.push(parseInt(id_str_list[index]));
-        }
-        vm.detail.product_id_list = product_id_list;
+         var product_id_list = []; //parseInt(id_str_list[0]);
+         for (var index in id_str_list) {
+         product_id_list.push(parseInt(id_str_list[index]));
+         }
+
+         vm.detail.product_id_list = product_id_list;
 
         $.ajax({
             url: '{%url "ErpProduct.GetProductListSkus"%}',
             type: "POST",
             data: {"product_id_list": product_id_list},
             success: function (data) {
-                console.log(data.product_skus);
                 vm.detail.product_skus = data.product_skus;
-                console.log(vm.detail.product_skus);
+                //todo: 为什么一定要下面的用户名修改了之后,这个设值的效果才能看到
+                vm.detail.user_name = vm.detail.user_name + " ";
             }
         });
 
