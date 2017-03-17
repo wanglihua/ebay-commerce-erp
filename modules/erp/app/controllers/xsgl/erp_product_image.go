@@ -60,7 +60,7 @@ func (c ErpProductImage) ListData() revel.Result {
 
 	//query extra filter here
 
-	if order != "" {
+	if order == "" {
 		sb.OrderBy("id ASC")
 	} else {
 		sb.OrderBy(order)
