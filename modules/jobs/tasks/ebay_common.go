@@ -149,7 +149,7 @@ type ItemPictureDetails struct {
 http://developer.ebay.com/devzone/xml/docs/Reference/eBay/GetItem.html
 
  */
-func fetch_product_item_to_db(config models.EBayAPIConfigInfo, db_session *xorm.Session, item_id string) (product_id int64, product_sku string, product_store_item_id int64) {
+func fetch_product_item_to_db(config models.EBayAPIConfigInfo, db_session *xorm.Session, item_id string) (product_id_return int64, product_sku_return string, product_store_item_id_return int64) {
 
 	item_response := fetch_product_item(config, item_id)
 
@@ -170,6 +170,7 @@ func fetch_product_item_to_db(config models.EBayAPIConfigInfo, db_session *xorm.
 
 	if has_product == false {
 		// do insert
+		product.CnName = product.Sku
 		_, err = db_session.Insert(&product)
 		if err != nil {
 			revel.ERROR.Println(err)
@@ -191,13 +192,13 @@ func fetch_product_item_to_db(config models.EBayAPIConfigInfo, db_session *xorm.
 		revel.ERROR.Println(err)
 	}
 
-	product_store_item.ProductId = product_id
+	product_store_item.ProductId = product.Id
 	product_store_item.ShopId = config.ShopId
 	product_store_item.ItemId = item_response.Item.ItemId
 	product_store_item.ViewItemUrl = item_response.Item.ListingDetails.ViewItemUrl
 
 	if has_product_store_item == false {
-		_, err = db_session.Insert(product_store_item)
+		_, err = db_session.Insert(&product_store_item)
 		if err != nil {
 			revel.ERROR.Print(err)
 		}

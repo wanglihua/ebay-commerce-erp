@@ -384,8 +384,7 @@ func (t EBayOrderDownloadTask) Run() {
 					if exchange_rate, found := exchange_rate_map[transaction.TransactionPrice.Currency]; found == true {
 						order_item.TransactionPriceRmb = transaction.TransactionPrice.Value * exchange_rate.Rate
 					}
-					product_item_id := transaction.Item.ItemID
-					order_item.ItemId = product_item_id
+					order_item.ItemId = transaction.Item.ItemID
 
 					//order_item.ItemProductId 如果这时产品不存在会怎样，下载产品
 					var product_store_item_query_result struct {
@@ -401,7 +400,7 @@ func (t EBayOrderDownloadTask) Run() {
 					product_store_item_id := product_store_item_query_result.ProductStoreItemId
 					if has_product_store_item == false {
 						//download product
-						product_id, _, product_store_item_id = fetch_product_item_to_db(config, db_session, product_item_id)
+						product_id, _, product_store_item_id = fetch_product_item_to_db(config, db_session, transaction.Item.ItemID)
 					}
 
 					order_item.ItemProductId = product_id

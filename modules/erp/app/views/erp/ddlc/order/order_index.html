@@ -107,7 +107,12 @@
                         },
                         {"mDataProp": "ot.name", "title": "类型", "bSearchable": true},
                         {"mDataProp": "s.name", "title": "状态", "bSearchable": true},
-                        {"mDataProp": "sa.name", "title": "店铺", "bSearchable": true},
+                        {
+                            "mDataProp": "sa.name", "title": "店铺", "bSearchable": true,
+                            "render": function (data, type, row) {
+                                return row.pf.name + " " + data;
+                            }
+                        },
                         {"mDataProp": "o.buyer_user_id", "title": "买家用户id", "bSearchable": true},
                         {
                             "mDataProp": "o.amount_paid_rmb", "title": "支付金额", "bSearchable": false,
