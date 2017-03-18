@@ -13,8 +13,9 @@ type OrderItemInfo struct {
 	TransactionPriceCurrency string          `xorm:"nvarchar(50) notnull 'transaction_price_currency'" json:"transaction_price_currency"`
 	TransactionPrice         float64         `xorm:"decimal(18,6) notnull 'transaction_price'" json:"transaction_price"`
 	TransactionPriceRmb      float64         `xorm:"decimal(18,6) notnull 'transaction_price_rmb'" json:"transaction_price_rmb"`
-	ItemId                   string          `xorm:"nvarchar(50) notnull 'item_id'" json:"item_id"`
-	ItemProductId            int64           `xorm:"bigint notnull index 'item_product_id'" json:"item_product_id"`
+	ProductStoreItemId       int64           `xorm:"bigint notnull index 'product_store_item_id'" json:"product_store_item_id"` // 对应的 ProductItemInfo对象的数据库id
+	ItemId                   string          `xorm:"nvarchar(50) notnull 'item_id'" json:"item_id"`                             // item 对应的在 ebay系统里面的id
+	ItemProductId            int64           `xorm:"bigint notnull index 'item_product_id'" json:"item_product_id"`             // item 对应的 ProductInfo 对象的数据库id
 	ItemSku                  string          `xorm:"nvarchar(100) notnull index 'item_sku'" json:"item_sku"`
 	ItemTitle                string          `xorm:"nvarchar(200) notnull 'item_title'" json:"item_title"`
 	ItemConditionId          string          `xorm:"nvarchar(50) notnull 'item_condition_id'" json:"item_condition_id"`

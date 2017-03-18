@@ -6,7 +6,7 @@ import (
 
 type ProductInfo struct {
 	Id          int64           `xorm:"bigint notnull pk autoincr 'id'" json:"id"`
-	ItemId      string          `xorm:"nvarchar(50) notnull index 'item_id'" json:"item_id"` // ebay系统的 ItemId 方便信息同步
+	ItemId      string          `xorm:"nvarchar(50) notnull index 'item_id'" json:"item_id"` // ebay系统的 ItemId 方便信息同步，一个sku会有多个item id的？
 	Sku         string          `xorm:"nvarchar(200) notnull index unique 'sku'" json:"sku" smith:"verbose_name=SKU,min=2,max=100"`
 	CnName      string          `xorm:"nvarchar(200) notnull index unique 'cn_name'" json:"cn_name" smith:"verbose_name=名称,min=2,max=100"`
 	Name        string          `xorm:"nvarchar(400) notnull index unique 'name'" json:"name" smith:"verbose_name=名称,min=2,max=100"`
@@ -15,8 +15,8 @@ type ProductInfo struct {
 	Weight      float64         `xorm:"float notnull 'weight'" json:"weight" smith:"verbose_name=重量,min=0"`
 	SupplierId  core.NullInt    `xorm:"bigint index 'supplier_id'" json:"supplier_id" smith:"verbose_name=供应商"`
 	PkgMtrlId   core.NullInt    `xorm:"bigint index 'pkg_mtrl_id'" json:"pkg_mtrl_id" smith:"verbose_name=包材"`
-	ImageUrl    core.NullString `xorm:"nvarchar(500) 'image_url'" json:"image_url" smith:"verbose_name=图片地址"`
-	ViewItemUrl core.NullString `xorm:"nvarchar(500) 'view_item_url'" json:"view_item_url" smith:"verbose_name=查看地址"`
+	ImageUrl    core.NullString `xorm:"nvarchar(500) 'image_url'" json:"image_url" smith:"verbose_name=图片地址"` // 许多图片中的一个图片，用于商品列表中的图片显示，存储的是某个店铺的图片地址
+	ViewItemUrl core.NullString `xorm:"nvarchar(500) 'view_item_url'" json:"view_item_url" smith:"verbose_name=查看地址"` //这个地址会不会一个店铺一个的？所以这样存储还是有点问题的？
 	Desc        core.NullString `xorm:"nvarchar(500) 'desc'" json:"desc" smith:"verbose_name=备注,max=500"`
 	StatusId    int64           `xorm:"bigint notnull index 'status_id'" json:"status_id" smith:"verbose_name=状态"`
 	CreateTime  core.Time       `xorm:"created notnull 'create_time'" json:"create_time"`

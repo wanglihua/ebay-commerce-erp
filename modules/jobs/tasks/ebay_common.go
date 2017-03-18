@@ -142,6 +142,13 @@ type ItemPictureDetails struct {
 </GetItemResponse>
  */
 
+/*
+通过API获得 item_id 对应的商品的 sku，查询数据库中SKU对应的商品是不是存在。如果存在就更新，不存在就插入新的数据
+通过一个 item_id， 是不是只能获得一个 sku，还是一个 item_id 可以对应多个 sku ?
+
+http://developer.ebay.com/devzone/xml/docs/Reference/eBay/GetItem.html
+
+ */
 func fetch_product_item_to_db(config models.EBayAPIConfigInfo, db_session *xorm.Session, item_id string) (product_id int64, product_sku string) {
 
 	item_response := fetch_product_item(config, item_id)

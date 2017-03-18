@@ -48,6 +48,7 @@ func (c ErpOrder) Index(status string) revel.Result {
 	return c.RenderTemplate("erp/ddlc/order/order_index.html")
 }
 
+// index page data
 func (c ErpOrder) PageData() revel.Result {
 	db_session := c.DbSession
 
