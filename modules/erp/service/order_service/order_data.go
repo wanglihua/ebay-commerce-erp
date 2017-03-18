@@ -40,7 +40,7 @@ erp_order o
 	`)
 	sql_builder.Where(filter)
 
-	if order != "" {
+	if order == "" {
 		sql_builder.OrderBy("o.id DESC")
 	} else {
 		sql_builder.OrderBy(order)
