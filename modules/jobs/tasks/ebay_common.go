@@ -149,7 +149,7 @@ type ItemPictureDetails struct {
 http://developer.ebay.com/devzone/xml/docs/Reference/eBay/GetItem.html
 
  */
-func fetch_product_item_to_db(config models.EBayAPIConfigInfo, db_session *xorm.Session, item_id string) (product_id int64, product_sku string) {
+func fetch_product_item_to_db(config models.EBayAPIConfigInfo, db_session *xorm.Session, item_id string) (product_id int64, product_sku string, product_store_item_id int64) {
 
 	item_response := fetch_product_item(config, item_id)
 
@@ -160,11 +160,9 @@ func fetch_product_item_to_db(config models.EBayAPIConfigInfo, db_session *xorm.
 		revel.ERROR.Println(err)
 	}
 
-	product.ItemId = item_response.Item.ItemId
 	product.Sku = item_response.Item.Sku
 	product.Name = item_response.Item.Title
 	product.ImageUrl = core.NewNullString(item_response.Item.PictureDetails.GalleryUrl, true)
-	product.ViewItemUrl = core.NewNullString(item_response.Item.ListingDetails.ViewItemUrl, true)
 
 	if product.StatusId == 0 {
 		product.StatusId = models.PRODUCT_STATUS_ZC
@@ -178,12 +176,40 @@ func fetch_product_item_to_db(config models.EBayAPIConfigInfo, db_session *xorm.
 		}
 	} else {
 		// do update
-		update_col_list := []string{"item_id", "sku", "name", "image_url"}
+		update_col_list := []string{"sku", "name", "image_url"}
 		_, err = db_session.Id(product.Id).Cols(update_col_list...).Update(&product)
 		if err != nil {
 			revel.ERROR.Println(err)
 		}
 	}
+
+	// product store item begin
+
+	var product_store_item models.ProductStoreItemInfo
+	has_product_store_item, err := db_session.Where(fmt.Sprintf("shop_id = %d AND item_id = '%s'", config.ShopId, item_response.Item.ItemId)).Get(&product_store_item)
+	if err != nil {
+		revel.ERROR.Println(err)
+	}
+
+	product_store_item.ProductId = product_id
+	product_store_item.ShopId = config.ShopId
+	product_store_item.ItemId = item_response.Item.ItemId
+	product_store_item.ViewItemUrl = item_response.Item.ListingDetails.ViewItemUrl
+
+	if has_product_store_item == false {
+		_, err = db_session.Insert(product_store_item)
+		if err != nil {
+			revel.ERROR.Print(err)
+		}
+	} else {
+		update_col_list := []string{"view_item_url"}
+		_, err = db_session.Id(product_store_item.Id).Cols(update_col_list...).Update(&product_store_item)
+		if err != nil {
+			revel.ERROR.Println(err)
+		}
+	}
+
+	// product store item end
 
 	// 同步商品图片 begin
 
@@ -234,5 +260,5 @@ func fetch_product_item_to_db(config models.EBayAPIConfigInfo, db_session *xorm.
 
 	// 同步商品图片 end
 
-	return product.Id, product.Sku
+	return product.Id, product.Sku, product_store_item.Id
 }

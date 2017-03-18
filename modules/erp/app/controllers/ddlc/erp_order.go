@@ -159,15 +159,17 @@ func (c ErpOrder) DetailData() revel.Result {
 	core.HandleError(err)
 
 	type order_item_view_t struct {
-		OrderItem models.OrderItemInfo `xorm:"extends" json:"oi"`
-		Product   models.ProductInfo   `xorm:"extends" json:"p"`
+		OrderItem         models.OrderItemInfo          `xorm:"extends" json:"oi"`
+		Product           models.ProductInfo            `xorm:"extends" json:"p"`
+		ProductSotoreItem models.ProductStoreItemInfo   `xorm:"extends" json:"psi"`
 	}
 
 	sql := `
-SELECT oi.*, p.*
+SELECT oi.*, p.*, psi.*
 FROM erp_order_item oi
     INNER JOIN erp_product p ON p.id = oi.item_product_id
-WHERE oi.order_id = %d`
+    INNER JOIN erp_product_store_item psi ON psi.id = oi.product_store_item_id
+WHERE oi.order_id = %d;`
 	sql = fmt.Sprintf(sql, order_id)
 
 	order_item_list := make([]order_item_view_t, 0)

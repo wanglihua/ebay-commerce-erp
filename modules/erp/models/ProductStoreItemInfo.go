@@ -6,8 +6,10 @@ import (
 
 type ProductStoreItemInfo struct {
 	Id          int64           `xorm:"bigint notnull pk autoincr 'id'" json:"id"`
-	ItemId      string          `xorm:"nvarchar(50) notnull index 'item_id'" json:"item_id"` // ebay系统的 ItemId
-	ViewItemUrl string          `xorm:"nvarchar(500) 'view_item_url'" json:"view_item_url"`  // ebay系统的 查看商品的 url
+	ProductId   int64           `xorm:"bigint notnull index 'product_id'" json:"product_id"`
+	ShopId      int64           `xorm:"bigint notnull index 'shop_id'" json:"shop_id"`
+	ItemId      string          `xorm:"nvarchar(50) notnull index 'item_id'" json:"item_id"`        // ebay系统的 ItemId
+	ViewItemUrl string          `xorm:"nvarchar(500) notnull 'view_item_url'" json:"view_item_url"` // ebay系统的 查看商品的 url
 	CreateTime  core.Time       `xorm:"created notnull 'create_time'" json:"create_time"`
 	UpdateTime  core.Time       `xorm:"updated notnull 'update_time'" json:"update_time"`
 	Version     int             `xorm:"version notnull 'version'" json:"version"`

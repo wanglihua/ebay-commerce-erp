@@ -145,7 +145,7 @@ func (t EBayMessageDownloadTask) Run() {
 				product_sku := product_result.ProductSku
 				if has_item_product == false {
 					// download product
-					product_id, product_sku = fetch_product_item_to_db(config, db_session, message_download.Item.ItemId)
+					product_id, product_sku, _ = fetch_product_item_to_db(config, db_session, message_download.Item.ItemId)
 				}
 
 				message_in_db.ProductId = product_id

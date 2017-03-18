@@ -353,8 +353,10 @@ func (t EBayOrderDownloadTask) Run() {
 					TransactionId            string          `xorm:"nvarchar(200) notnull 'transaction_id'" json:"transaction_id"`
 					TransactionPriceCurrency string          `xorm:"nvarchar(50) notnull 'transaction_price_currency'" json:"transaction_price_currency"`
 					TransactionPrice         float64         `xorm:"decimal(18,6) notnull 'transaction_price'" json:"transaction_price"`
-					ItemId                   string          `xorm:"nvarchar(200) notnull 'item_id'" json:"item_id"`
-					ItemProductId            int64           `xorm:"bigint notnull index 'item_product_id'" json:"item_product_id"`
+					TransactionPriceRmb      float64         `xorm:"decimal(18,6) notnull 'transaction_price_rmb'" json:"transaction_price_rmb"`
+					ProductStoreItemId       int64           `xorm:"bigint notnull index 'product_store_item_id'" json:"product_store_item_id"` // 对应的 ProductItemInfo对象的数据库id
+					ItemId                   string          `xorm:"nvarchar(50) notnull 'item_id'" json:"item_id"`                             // item 对应的在 ebay系统里面的id
+					ItemProductId            int64           `xorm:"bigint notnull index 'item_product_id'" json:"item_product_id"`             // item 对应的 ProductInfo 对象的数据库id
 					ItemSku                  string          `xorm:"nvarchar(100) notnull index 'item_sku'" json:"item_sku"`
 					ItemTitle                string          `xorm:"nvarchar(200) notnull 'item_title'" json:"item_title"`
 					ItemConditionId          string          `xorm:"nvarchar(50) notnull 'item_condition_id'" json:"item_condition_id"`
@@ -386,21 +388,24 @@ func (t EBayOrderDownloadTask) Run() {
 					order_item.ItemId = product_item_id
 
 					//order_item.ItemProductId 如果这时产品不存在会怎样，下载产品
-					var product_id_result struct {
-						ProductId int64 `xorm:"'product_id'"`
+					var product_store_item_query_result struct {
+						ProductId          int64 `xorm:"'product_id'"`
+						ProductStoreItemId int64 `xorm:"'product_store_item_id'"`
 					}
-					has_item_product, err := db_session.Sql(fmt.Sprintf("SELECT p.id AS product_id FROM erp_product p WHERE p.sku = '%s'", transaction.Item.SKU)).Get(&product_id_result)
+					has_product_store_item, err := db_session.Sql(fmt.Sprintf("SELECT product_id, id AS product_store_item_id FROM erp_product_store_item psi WHERE item_id = '%s';", transaction.Item.ItemID)).Get(&product_store_item_query_result)
 					if err != nil {
 						revel.ERROR.Println(err)
 					}
 
-					product_id := product_id_result.ProductId
-					if has_item_product == false {
+					product_id := product_store_item_query_result.ProductId
+					product_store_item_id := product_store_item_query_result.ProductStoreItemId
+					if has_product_store_item == false {
 						//download product
-						product_id, _ = fetch_product_item_to_db(config, db_session, product_item_id)
+						product_id, _, product_store_item_id = fetch_product_item_to_db(config, db_session, product_item_id)
 					}
 
 					order_item.ItemProductId = product_id
+					order_item.ProductStoreItemId = product_store_item_id
 					order_item.ItemSku = transaction.Item.SKU
 					order_item.ItemTitle = transaction.Item.Title
 					order_item.ItemConditionId = transaction.Item.ConditionID
