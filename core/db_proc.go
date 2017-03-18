@@ -1,9 +1,10 @@
 package core
 
 import (
-	"github.com/go-xorm/xorm"
-	"strconv"
 	"fmt"
+	"strconv"
+
+	"github.com/go-xorm/xorm"
 )
 
 // 约定 proc_name 以版本号 _v0001 等结尾
@@ -30,9 +31,9 @@ func CreateProc(proc_name string, create_proc_sql string, db_session *xorm.Sessi
 	}
 
 	//创建之前先删除以前的版本
-	proc_name_without_version := string(([]rune(proc_name))[0:proc_name_full_len - proc_version_len]) // proc_name
+	proc_name_without_version := string(([]rune(proc_name))[0:proc_name_full_len-proc_version_len]) // proc_name
 
-	proc_version_str := ([]rune(proc_name))[proc_name_full_len - proc_version_len + 2: proc_name_full_len] // 0001
+	proc_version_str := ([]rune(proc_name))[proc_name_full_len-proc_version_len+2: proc_name_full_len] // 0001
 	proc_version, err := strconv.Atoi(string(proc_version_str))
 	HandleError(err)
 

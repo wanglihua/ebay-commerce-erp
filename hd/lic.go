@@ -3,10 +3,11 @@ package main
 import (
 	"fmt"
 	"log"
-	"matrix/core/lic"
 	"os"
 	"path/filepath"
 	"unicode/utf8"
+
+	"matrix/core/lic"
 )
 
 var cmdLic = &Command{
