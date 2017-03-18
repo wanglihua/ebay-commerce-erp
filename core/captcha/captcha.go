@@ -2,14 +2,15 @@ package captcha
 
 import (
 	crand "crypto/rand"
-	"github.com/revel/revel"
-	"github.com/revel/revel/cache"
 	"image/color"
 	"io"
 	"math/rand"
-	"matrix/core"
 	"strconv"
 	"time"
+
+	"github.com/revel/revel"
+	"github.com/revel/revel/cache"
+	"matrix/core"
 )
 
 const (
@@ -137,7 +138,7 @@ func set_random_brightness(c *color.NRGBA, max uint8) {
 	if maxc > max {
 		return
 	}
-	n := rand.Intn(int(max - maxc)) - int(minc)
+	n := rand.Intn(int(max-maxc)) - int(minc)
 	c.R = uint8(int(c.R) + n)
 	c.G = uint8(int(c.G) + n)
 	c.B = uint8(int(c.B) + n)
@@ -168,7 +169,7 @@ func max3(x, y, z uint8) (o uint8) {
 // rnd returns a random number in range [from, to].
 func rnd(from, to int) int {
 	//println(to+1-from)
-	return rand.Intn(to + 1 - from) + from
+	return rand.Intn(to+1-from) + from
 }
 
 // Standard characters allowed in uniuri string.
@@ -184,7 +185,7 @@ func new_len(length int) string {
 // of the provided byte slice of allowed characters (maximum 256).
 func new_len_chars(length int, chars []byte) string {
 	b := make([]byte, length)
-	r := make([]byte, length + (length / 4)) // storage for random bytes.
+	r := make([]byte, length+(length/4)) // storage for random bytes.
 	clen := byte(len(chars))
 	maxrb := byte(256 - (256 % len(chars)))
 	i := 0
@@ -197,7 +198,7 @@ func new_len_chars(length int, chars []byte) string {
 				// Skip this number to avoid modulo bias.
 				continue
 			}
-			b[i] = chars[c % clen]
+			b[i] = chars[c%clen]
 			i++
 			if i == length {
 				return string(b)

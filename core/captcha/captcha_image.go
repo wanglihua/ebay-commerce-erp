@@ -42,7 +42,6 @@ func new_image(digits []byte, width, height int) *Image {
 	x := rnd(img.dotsize*2, maxx)
 	y := rnd(img.dotsize*2, maxy)
 
-
 	// Draw digits.
 	for _, n := range digits {
 		img.draw_digit(font[n], x, y)
