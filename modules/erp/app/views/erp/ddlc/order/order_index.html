@@ -51,10 +51,10 @@
                         <tr>
                             <th>id</th>
                             <th>订单编号</th>
-                            <th id="th_status_name">状态</th>
-                            <th id="th_type_name">类型</th>
-                            <th>店铺</th>
-                            <th>买家用户id</th>
+                            <th id="th_status_name">订单状态</th>
+                            <th id="th_type_name">订单类型</th>
+                            <th id="th_store_name">店铺</th>
+                            <th id="th_buyer_user">客户id</th>
                             <th id="th_total_amount">原金额</th>
                             <th id="th_total_amount_rmb">金额</th>
                             <th id="th_amount_paid_rmb">支付金额</th>
@@ -123,13 +123,13 @@
                             }
                         },
                         {
-                            "mDataProp": "s.name", "title": "状态", "bSearchable": true,
+                            "mDataProp": "s.name", "title": "订单状态", "bSearchable": true,
                             "render": function (data, type, row) {
                                 return "<div class='div_status_name'>" + row.s.name + "</div><div>" + row.ot.name + "</div>";
                             }
                         },
                         {
-                            "mDataProp": "ot.name", "title": "类型", "bSearchable": true,
+                            "mDataProp": "ot.name", "title": "订单类型", "bSearchable": true,
                             "render": function (data, type, row) {
                                 return "<div class='div_type_name'></div>";
                             }
@@ -138,10 +138,15 @@
                         {
                             "mDataProp": "sa.name", "title": "店铺", "bSearchable": true,
                             "render": function (data, type, row) {
-                                return row.pf.name + " " + data;
+                                return "<div class='div_store_name'>" + row.pf.name + " " + row.sa.name + "</div><div>" + row.o.buyer_user_id + "</div>";
                             }
                         },
-                        {"mDataProp": "o.buyer_user_id", "title": "买家用户id", "bSearchable": true},
+                        {
+                            "mDataProp": "o.buyer_user_id", "title": "客户id", "bSearchable": true,
+                            "render": function (data, type, row) {
+                                return "<div class='div_buyer_user'></div>";
+                            }
+                        },
                         {
                             "mDataProp": "o.total_amount", "title": "原金额", "bSearchable": false, "width": 100,
                             "render": function (data, type, row) {
@@ -197,6 +202,9 @@
 
                                 fnCallback(data);
 
+                                $("#orderList div.div_store_name").parent().css("width", "135px");
+                                $("#orderList div.div_buyer_user").parent().css("display", "none");
+
                                 $("#orderList div.div_status_name").parent().css("width", "80px");
                                 $("#orderList div.div_type_name").parent().css("display", "none");
 
@@ -211,6 +219,11 @@
                     }
                 }
             );
+
+            $("#th_store_name").before("<th id='th_store_name_buyer_user'></th>");
+            $("#th_store_name").wrap("<div id='div_store_name'></div>");
+            $("#th_buyer_user").wrap("<div id='div_buyer_user'></div>");
+            $("#th_store_name_buyer_user").append($("#div_store_name")).append($("#div_buyer_user"));
 
             $("#th_status_name").before("<th id='th_status_type_name'></th>");
             $("#th_status_name").wrap("<div id='div_status_name'></div>");
