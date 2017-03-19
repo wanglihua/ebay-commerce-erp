@@ -53,10 +53,16 @@ func (c ErpOrder) PageData() revel.Result {
 	db_session := c.DbSession
 
 	shop_list := shop_service.Get_shop_select_item_list(db_session)
-	shop_list = append([]shop_service.Shop_select_item_t{shop_service.Shop_select_item_t{Id: 0, Name: ""}}, shop_list...)
+
+	var order_type_list = make([]models.OrderTypeInfo, 0)
+	err := db_session.Find(&order_type_list)
+	core.HandleError(err)
 
 	return c.RenderJson(map[string]interface{}{
-		"shop_list": shop_list,
+		"shop_id":         0,
+		"shop_list":       shop_list,
+		"order_type_id":   0,
+		"order_type_list": order_type_list,
 	})
 }
 
