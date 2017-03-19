@@ -55,8 +55,9 @@
                             <th>状态</th>
                             <th>店铺</th>
                             <th>买家用户id</th>
-                            <th>支付金额</th>
-                            <th>总计金额</th>
+                            <th id="th_total_amount">原金额</th>
+                            <th id="th_total_amount_rmb">金额</th>
+                            <th id="th_amount_paid_rmb">支付金额</th>
                             <th>支付方式</th>
                             <th id="th_created_time">建单时间</th>
                             <th id="th_shipped_time">发货时间</th>
@@ -131,25 +132,34 @@
                         },
                         {"mDataProp": "o.buyer_user_id", "title": "买家用户id", "bSearchable": true},
                         {
-                            "mDataProp": "o.amount_paid_rmb", "title": "支付金额", "bSearchable": false,
+                            "mDataProp": "o.total_amount", "title": "原金额", "bSearchable": false, "width": 100,
                             "render": function (data, type, row) {
-                                return "RMB " + data;
+                                return "<div class='div_total_amount'>" + row.o.total_amount_currency + " " + row.o.total_amount + "</div><div>RMB " + row.o.total_amount_rmb + "</div><div>RMB " + row.o.amount_paid_rmb + "</div>";
                             }
                         },
                         {
-                            "mDataProp": "o.total_amount_rmb", "title": "总计金额", "bSearchable": false,
+                            "mDataProp": "o.total_amount_rmb", "title": "金额", "bSearchable": false,
                             "render": function (data, type, row) {
-                                return "RMB " + data;
+                                //return "RMB " + data;
+                                return "<div class='div_total_amount_rmb'></div>";
                             }
                         },
+                        {
+                            "mDataProp": "o.amount_paid_rmb", "title": "支付金额", "bSearchable": false,
+                            "render": function (data, type, row) {
+                                //return "RMB " + data;
+                                return "<div class='div_amount_paid_rmb'></div>";
+                            }
+                        },
+
                         {"mDataProp": "o.payment_methods", "title": "支付方式", "bSearchable": true},
                         {
                             "mDataProp": "o.created_time", "title": "建单时间", "bSearchable": false, "width": 135,
                             "render": function (data, type, row) {
-                                if(row.o.shipped_time) {
+                                if (row.o.shipped_time) {
                                     return '<div class="div_created_time">' + row.o.created_time + '</div><div>' + row.o.shipped_time + '</div>';
-                                }else{
-                                    return '<div class="div_created_time">' + row.o.created_time + '</div><div>&nbsp;</div>';
+                                } else {
+                                    return '<div class="div_created_time">' + row.o.created_time + '</div><div>----------</div>';
                                 }
                             }
                         },
@@ -176,8 +186,12 @@
 
                                 fnCallback(data);
 
-                                $(".div_created_time").parent().css("width", "135px");
-                                $(".div_shipped_time").parent().css("display", "none");
+                                $("#orderList div.div_created_time").parent().css("width", "135px");
+                                $("#orderList div.div_shipped_time").parent().css("display", "none");
+
+                                $("#orderList div.div_total_amount").parent().css("width", "100px");
+                                $("#orderList div.div_total_amount_rmb").parent().css("display", "none");
+                                $("#orderList div.div_amount_paid_rmb").parent().css("display", "none");
                             }
                         });
                     }
@@ -188,6 +202,12 @@
             $("#th_created_time").wrap("<div id='div_created_time'></div>");
             $("#th_shipped_time").wrap("<div id='div_shipped_time'></div>");
             $("#th_created_time_shipped_time").append($("#div_created_time")).append($("#div_shipped_time"));
+
+            $("#th_total_amount").before("<th id='th_total_paid_amount'></th>");
+            $("#th_total_amount").wrap("<div id='div_total_amount'></div>");
+            $("#th_total_amount_rmb").wrap("<div id='div_total_amount_rmb'></div>");
+            $("#th_amount_paid_rmb").wrap("<div id='div_amount_paid_rmb'></div>");
+            $("#th_total_paid_amount").append($("#div_total_amount")).append($("#div_total_amount_rmb")).append($("#div_amount_paid_rmb"));
         },
         methods: {
             reloadList: function () {
