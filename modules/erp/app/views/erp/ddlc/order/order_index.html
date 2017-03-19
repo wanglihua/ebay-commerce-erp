@@ -26,7 +26,7 @@
                     <div id="query" class="col-xs-12" style="line-height: 28px;">
                         <fieldset>
                             <legend style="font-size: 14px;">
-                                查询条件&nbsp;<span style="color: #D5D5D5;">(输入查询条件后点击 查询 按钮)</span>
+                                查询条件&nbsp;<span style="color: #D5D5D5;">(输入查询条件后点击 刷新 按钮)</span>
                             </legend>
                             <div class="col-xs-12">
                                 <select id="shop_id" name="page.shop_id" v-model.number="page.shop_id" style="width: 120px;">
@@ -39,6 +39,12 @@
                                     <option value="0">-订单类型-</option>
                                     <template v-for="order_type in page.order_type_list">
                                         <option :value="order_type.id">{{order_type.name}}</option>
+                                    </template>
+                                </select>
+                                <select id="status_id" name="page.status_id" v-model.number="page.status_id" style="width:120px;">
+                                    <option value="0">-订单状态-</option>
+                                    <template v-for="status in page.status_list">
+                                        <option :value="status.id">{{status.name}}</option>
                                     </template>
                                 </select>
                             </div>
@@ -103,8 +109,10 @@
             initDataTable(
                 '#orderList',
                 {
+                    "sDom": "<'row'<'col-xs-12't>><'row'<'col-xs-6'i><'col-xs-6'p>>",
                     "sAjaxSource": '{%url "ErpOrder.ListData"%}',
                     "aaSorting": [[1, "asc"]],
+                    "iDisplayLength": 50,
                     "aoColumns": [
                         {
                             "mDataProp": "o.id",
@@ -150,7 +158,7 @@
                             }
                         },
                         {
-                            "mDataProp": "o.total_amount", "title": "原金额", "bSearchable": false, "width": 100,
+                            "mDataProp": "o.total_amount", "title": "原金额", "bSearchable": false,
                             "render": function (data, type, row) {
                                 return "<div class='div_total_amount'>" + row.o.total_amount_currency + " " + row.o.total_amount + "</div><div>RMB " + row.o.total_amount_rmb + "</div><div>RMB " + row.o.amount_paid_rmb + "</div>";
                             }

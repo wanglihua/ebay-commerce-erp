@@ -58,11 +58,17 @@ func (c ErpOrder) PageData() revel.Result {
 	err := db_session.Find(&order_type_list)
 	core.HandleError(err)
 
+	var status_list = make([]models.StatusInfo, 0)
+	err = db_session.Where(fmt.Sprintf("type = %d", models.STATUS_TYPE_ORDER)).Find(&status_list)
+	core.HandleError(err)
+
 	return c.RenderJson(map[string]interface{}{
 		"shop_id":         0,
 		"shop_list":       shop_list,
 		"order_type_id":   0,
 		"order_type_list": order_type_list,
+		"status_id":       0,
+		"status_list":     status_list,
 	})
 }
 
