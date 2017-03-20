@@ -53,7 +53,7 @@
                                         <option :value="criteria.id">{{criteria.name}}</option>
                                     </template>
                                 </select>
-                                <input id="query_criteria_value" name="query_criteria_value" v-model="page.query_criteria_value" style="width: 120px;"/>
+                                <input id="query_criteria_value" name="query_criteria_value" v-model="page.query_criteria_value" style="width: 120px;height:30px;"/>
                                 <button class="btn btn-mini btn-primary" style="margin-bottom:3px;" @click="search()">
                                     &nbsp;<i class="ace-icon fa fa-search"></i>查&nbsp;询&nbsp;
                                 </button>
@@ -217,6 +217,9 @@
                         aoData.push({'name': 'order_type_id', 'value': this_vm.page.order_type_id});
                         aoData.push({'name': 'status_id', 'value': this_vm.page.status_id});
                         aoData.push({'name': 'query_criteria_id', 'value': this_vm.page.query_criteria_id});
+                        aoData.push({'name': 'query_criteria_value', 'value': this_vm.page.query_criteria_value});
+
+                        //query_criteria_value
 
                         $.ajax({
                             "dataType": 'json',

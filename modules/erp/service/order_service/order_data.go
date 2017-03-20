@@ -1,6 +1,8 @@
 package order_service
 
 import (
+	"fmt"
+
 	"github.com/go-xorm/xorm"
 	"matrix/core"
 	"matrix/modules/erp/models"
@@ -59,4 +61,50 @@ erp_order o
 	core.HandleError(err)
 
 	return order_list, order_count.Count
+}
+
+func Get_order_id_list_by_product_sku_query(db_session *xorm.Session, product_sku_query string) []int64 {
+	sql := `SELECT oi.order_id
+FROM erp_order_item oi
+    INNER JOIN erp_product p ON p.id = oi.item_product_id
+WHERE p.sku like '%%%s%%'`
+	sql = fmt.Sprintf(sql, product_sku_query)
+
+	type order_id_result_t struct {
+		OrderId int64 `json:"order_id"`
+	}
+
+	var order_id_result_list = make([]order_id_result_t, 0)
+	err := db_session.Sql(sql).Find(&order_id_result_list)
+	core.HandleError(err)
+
+	var order_id_list = make([]int64, 0)
+	for _, order_id_result := range order_id_result_list {
+		order_id_list = append(order_id_list, order_id_result.OrderId)
+	}
+
+	return order_id_list
+}
+
+func Get_order_id_list_by_product_name_query(db_session *xorm.Session, product_name_query string) []int64 {
+	sql := `SELECT oi.order_id
+FROM erp_order_item oi
+    INNER JOIN erp_product p ON p.id = oi.item_product_id
+WHERE p.name like '%%%s%%'`
+	sql = fmt.Sprintf(sql, product_name_query)
+
+	type order_id_result_t struct {
+		OrderId int64 `json:"order_id"`
+	}
+
+	var order_id_result_list = make([]order_id_result_t, 0)
+	err := db_session.Sql(sql).Find(&order_id_result_list)
+	core.HandleError(err)
+
+	var order_id_list = make([]int64, 0)
+	for _, order_id_result := range order_id_result_list {
+		order_id_list = append(order_id_list, order_id_result.OrderId)
+	}
+
+	return order_id_list
 }

@@ -147,14 +147,19 @@ func (c ErpOrder) ListData() revel.Result {
 		if query_criteria_id == order_query_criteria_order_code {
 			filter = core.SqlAnd(filter, fmt.Sprintf("o.code like '%%%s%%'", query_criteria_value))
 		} else if query_criteria_id == order_query_criteria_product_sku {
-			filter = core.SqlAnd(filter, fmt.Sprintf("o.code like '%%%s%%'", query_criteria_value)) //todo
+			order_id_list := order_service.Get_order_id_list_by_product_sku_query(db_session, query_criteria_value)
+			order_id_str_list := core.Int_list_to_str_list(order_id_list)
+			filter = core.SqlAnd(filter, fmt.Sprintf("o.id IN (%s)", strings.Join(order_id_str_list, ",")))
 		} else if query_criteria_id == order_query_criteria_product_name {
-			filter = core.SqlAnd(filter, fmt.Sprintf("o.code like '%%%s%%'", query_criteria_value)) //todo
+			order_id_list := order_service.Get_order_id_list_by_product_name_query(db_session, query_criteria_value)
+			order_id_str_list := core.Int_list_to_str_list(order_id_list)
+			filter = core.SqlAnd(filter, fmt.Sprintf("o.id IN (%s)", strings.Join(order_id_str_list, ",")))
 		} else if query_criteria_id == order_query_criteria_buyer_user_id {
 			filter = core.SqlAnd(filter, fmt.Sprintf("o.buyer_user_id like '%%%s%%'", query_criteria_value))
 		}
 	}
 
+	// todo: hold 订单是不是也应该可以看成是一个状态，状态中再加一个hold状态
 	if hold_type_id == 0 { //取不是hold的订单
 		filter = core.SqlAnd(filter, "o.hold_type_id IS NULL")
 	} else if hold_type_id == -1 { //取hold的所有订单
