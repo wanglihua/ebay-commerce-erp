@@ -53,6 +53,9 @@
                                         <option :value="criteria.id">{{criteria.name}}</option>
                                     </template>
                                 </select>
+                                <button class="btn btn-mini btn-primary" style="margin-bottom:3px;" @click="search()">
+                                    &nbsp;<i class="ace-icon fa fa-search"></i>查&nbsp;询&nbsp;
+                                </button>
                             </div>
                         </fieldset>
                     </div>
@@ -260,6 +263,10 @@
         methods: {
             reloadList: function () {
                 reloadList('#orderList');
+            },
+            search: function () {
+                var tables = $("#orderList").dataTable().api();
+                tables.draw(true);
             }
         }
     });
