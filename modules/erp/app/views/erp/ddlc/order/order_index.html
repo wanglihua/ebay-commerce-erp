@@ -53,6 +53,7 @@
                                         <option :value="criteria.id">{{criteria.name}}</option>
                                     </template>
                                 </select>
+                                <input id="query_criteria_value" name="query_criteria_value" v-model="page.query_criteria_value" style="width: 120px;"/>
                                 <button class="btn btn-mini btn-primary" style="margin-bottom:3px;" @click="search()">
                                     &nbsp;<i class="ace-icon fa fa-search"></i>查&nbsp;询&nbsp;
                                 </button>
@@ -93,7 +94,12 @@
                 "shop_id": 0,
                 "shop_list": [],
                 "order_type_id": 0,
-                "order_type_list": []
+                "order_type_list": [],
+                "status_id": 0,
+                "status_list": [],
+                "query_criteria_id": 0,
+                "query_criteria_list": [],
+                "query_criteria_value": ""
             },
             "detail": {
                 "order": {}
@@ -206,8 +212,11 @@
                         }
                     ],
                     "fnServerData": function (sSource, aoData, fnCallback) {
-                        aoData.push({'name': 'shop_id', 'value': this_vm.page.shop_id});
                         aoData.push({'name': 'status', 'value': status});
+                        aoData.push({'name': 'shop_id', 'value': this_vm.page.shop_id});
+                        aoData.push({'name': 'order_type_id', 'value': this_vm.page.order_type_id});
+                        aoData.push({'name': 'status_id', 'value': this_vm.page.status_id});
+                        aoData.push({'name': 'query_criteria_id', 'value': this_vm.page.query_criteria_id});
 
                         $.ajax({
                             "dataType": 'json',

@@ -125,10 +125,34 @@ func (c ErpOrder) ListData() revel.Result {
 		status_id = models.ORDER_STATUS_YWC
 	}
 
+	c.Params.Bind(&status_id, "status_id") //查询条件的status_id，比url里面换算过来的status_id更为优先
+
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
 	if shop_id != 0 {
 		filter = core.SqlAnd(filter, fmt.Sprintf("o.shop_id = %d", shop_id))
+	}
+
+	var order_type_id int64 = 0
+	c.Params.Bind(&order_type_id, "order_type_id")
+	if order_type_id != 0 {
+		filter = core.SqlAnd(filter, fmt.Sprintf("type_id = %d", order_type_id))
+	}
+
+	var query_criteria_id int64 = 0
+	c.Params.Bind(&query_criteria_id, "query_criteria_id")
+	var query_criteria_value string = ""
+	c.Params.Bind(&query_criteria_value, "query_criteria_value")
+	if query_criteria_id != 0 {
+		if query_criteria_id == order_query_criteria_order_code {
+			filter = core.SqlAnd(filter, fmt.Sprintf("o.code like '%%%s%%'", query_criteria_value))
+		} else if query_criteria_id == order_query_criteria_product_sku {
+			filter = core.SqlAnd(filter, fmt.Sprintf("o.code like '%%%s%%'", query_criteria_value)) //todo
+		} else if query_criteria_id == order_query_criteria_product_name {
+			filter = core.SqlAnd(filter, fmt.Sprintf("o.code like '%%%s%%'", query_criteria_value)) //todo
+		} else if query_criteria_id == order_query_criteria_buyer_user_id {
+			filter = core.SqlAnd(filter, fmt.Sprintf("o.buyer_user_id like '%%%s%%'", query_criteria_value))
+		}
 	}
 
 	if hold_type_id == 0 { //取不是hold的订单
