@@ -48,6 +48,29 @@ func (c ErpOrder) Index(status string) revel.Result {
 	return c.RenderTemplate("erp/ddlc/order/order_index.html")
 }
 
+const (
+	order_query_criteria_order_code    int64 = 1000
+	order_query_criteria_product_sku   int64 = 2000
+	order_query_criteria_product_name  int64 = 3000
+	order_query_criteria_buyer_user_id int64 = 4000
+)
+
+type order_query_criteria struct {
+	Id   int64  `json:"id"`
+	Name string `json:"name"`
+}
+
+func (c ErpOrder) get_order_query_criteria_list() []order_query_criteria {
+	var order_query_criteria_list = make([]order_query_criteria, 0)
+
+	order_query_criteria_list = append(order_query_criteria_list, order_query_criteria{Id: order_query_criteria_order_code, Name: "订单编号"})
+	order_query_criteria_list = append(order_query_criteria_list, order_query_criteria{Id: order_query_criteria_product_sku, Name: "商品编号"})
+	order_query_criteria_list = append(order_query_criteria_list, order_query_criteria{Id: order_query_criteria_product_name, Name: "商品名称"})
+	order_query_criteria_list = append(order_query_criteria_list, order_query_criteria{Id: order_query_criteria_buyer_user_id, Name: "买家账号"})
+
+	return order_query_criteria_list
+}
+
 // index page data
 func (c ErpOrder) PageData() revel.Result {
 	db_session := c.DbSession
@@ -62,15 +85,15 @@ func (c ErpOrder) PageData() revel.Result {
 	err = db_session.Where(fmt.Sprintf("type = %d", models.STATUS_TYPE_ORDER)).Find(&status_list)
 	core.HandleError(err)
 
-
-
 	return c.RenderJson(map[string]interface{}{
-		"shop_id":         0,
-		"shop_list":       shop_list,
-		"order_type_id":   0,
-		"order_type_list": order_type_list,
-		"status_id":       0,
-		"status_list":     status_list,
+		"shop_id":             0,
+		"shop_list":           shop_list,
+		"order_type_id":       0,
+		"order_type_list":     order_type_list,
+		"status_id":           0,
+		"status_list":         status_list,
+		"query_criteria_id":   0,
+		"query_criteria_list": c.get_order_query_criteria_list(),
 	})
 }
 

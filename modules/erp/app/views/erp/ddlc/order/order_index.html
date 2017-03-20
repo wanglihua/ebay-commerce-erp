@@ -47,6 +47,12 @@
                                         <option :value="status.id">{{status.name}}</option>
                                     </template>
                                 </select>
+                                <select id="query_criteria_id" name="page.query_criteria_id" v-model.number="page.query_criteria_id" style="width:120px;">
+                                    <option value="0">-查询条件-</option>
+                                    <template v-for="criteria in page.query_criteria_list">
+                                        <option :value="criteria.id">{{criteria.name}}</option>
+                                    </template>
+                                </select>
                             </div>
                         </fieldset>
                     </div>
