@@ -259,7 +259,6 @@ func (t EBayOrderDownloadTask) Run() {
 				order_in_db.BuyerUserId = order_download.BuyerUserID
 				order_in_db.BuyerCheckoutMessage = order_download.BuyerCheckoutMessage
 
-
 				// 订单状态，这部分逻辑还可以继续探讨，判断状态的时候用到了前面已经设置的 order_in_db的状态，所以这段代码不能放到前面去的
 
 				// 订单状态 设置 开始
@@ -505,7 +504,32 @@ func (t EBayOrderDownloadTask) fetch_orders(config models.EBayAPIConfigInfo, pag
 
 	number_of_days := 1
 
+	/*
+		The field is used to retrieve orders that are in a specific state. If this field is used with a date filter, only orders that satisfy both the date range and the OrderStatus value are retrieved.
+
+		For eBay orders, this field's value can be set to 'Active', 'Completed', 'Canceled' or 'Inactive' to retrieve orders in these states. The 'Shipped' value is only applicable for Half.com orders.
+	 */
+
+	// 正式环境下，只获取已支付的订单
 	req_body := `<?xml version="1.0" encoding="utf-8"?>
+<GetOrdersRequest xmlns="urn:ebay:apis:eBLBaseComponents">
+	<RequesterCredentials>
+		<eBayAuthToken>%s</eBayAuthToken>
+	</RequesterCredentials>
+	<ErrorLanguage>zh_CN</ErrorLanguage>
+	<WarningLevel>High</WarningLevel>
+	<NumberOfDays>%d</NumberOfDays>
+	<OrderRole>Seller</OrderRole>
+	<OrderStatus>Inactive</OrderStatus>
+	<Pagination>
+		<EntriesPerPage>100</EntriesPerPage>
+		<PageNumber>%d</PageNumber>
+	</Pagination>
+</GetOrdersRequest>
+`
+
+	if revel.DevMode == true { //如果是调试模式就获取所有订单
+		req_body = `<?xml version="1.0" encoding="utf-8"?>
 <GetOrdersRequest xmlns="urn:ebay:apis:eBLBaseComponents">
 	<RequesterCredentials>
 		<eBayAuthToken>%s</eBayAuthToken>
@@ -521,6 +545,8 @@ func (t EBayOrderDownloadTask) fetch_orders(config models.EBayAPIConfigInfo, pag
 	</Pagination>
 </GetOrdersRequest>
 `
+	}
+
 	req_body = fmt.Sprintf(req_body, config.Token, number_of_days, page_number)
 
 	req := goreq.Request{
