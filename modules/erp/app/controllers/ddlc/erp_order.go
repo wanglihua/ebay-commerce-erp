@@ -60,6 +60,7 @@ type order_query_criteria struct {
 	Name string `json:"name"`
 }
 
+// 查询条件的列表
 func (c ErpOrder) get_order_query_criteria_list() []order_query_criteria {
 	var order_query_criteria_list = make([]order_query_criteria, 0)
 

@@ -99,7 +99,8 @@ func (c ErpInventoryCheckApprove) Approve() revel.Result {
 
 	for _, inventory_check_entry := range inventory_check_entry_list {
 		inventory := new(models.InventoryInfo)
-		inventory.Qty = inventory_check_entry.CheckQty
+		// inventory.Qty = inventory_check_entry.CheckQty
+		inventory.Qty = inventory.Qty + inventory_check_entry.QtyDiff //利用库存差异来做应该更合理一些
 
 		affected, err := db_session.
 		Where("storage_loc_id = ? AND product_id = ?", inventory_check_entry.StorageLocId, inventory_check_entry.ProductId).
