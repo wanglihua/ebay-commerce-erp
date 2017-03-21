@@ -218,6 +218,8 @@ func (t EBayOrderDownloadTask) Run() {
 				order_in_db.AmountPaid = order_download.AmountPaid.Value
 				update_col_list = append(update_col_list, "amount_paid")
 				if exchange_rate, found := exchange_rate_map[order_download.AmountPaid.Currency]; found == true {
+					order_in_db.ExchangeRate = exchange_rate.Rate //把 amount_paid 的汇率设置成 订单的汇率记录
+					update_col_list = append(update_col_list, "exchange_rate")
 					order_in_db.AmountPaidRmb = order_download.AmountPaid.Value * exchange_rate.Rate
 					update_col_list = append(update_col_list, "amount_paid_rmb")
 				}
@@ -256,6 +258,7 @@ func (t EBayOrderDownloadTask) Run() {
 
 				order_in_db.BuyerUserId = order_download.BuyerUserID
 				order_in_db.BuyerCheckoutMessage = order_download.BuyerCheckoutMessage
+
 
 				// 订单状态，这部分逻辑还可以继续探讨，判断状态的时候用到了前面已经设置的 order_in_db的状态，所以这段代码不能放到前面去的
 
@@ -409,6 +412,15 @@ func (t EBayOrderDownloadTask) Run() {
 					order_item.ItemTitle = transaction.Item.Title
 					order_item.ItemConditionId = transaction.Item.ConditionID
 					order_item.ItemConditionDisplayName = transaction.Item.ConditionDisplayName
+
+					//获得商品的成本价，如果这时产品是刚刚下载的，成本价是零，之后如何更新订单的明细里面的成本价格。
+					var product models.ProductInfo
+					_, err = db_session.Id(product_id).Get(&product)
+					if err != nil {
+						revel.ERROR.Println(err)
+					}
+
+					order_item.ProductCostPrice = product.CostPrice
 
 					transaction_created_date, err := time.Parse("2006-01-02T15:04:05.000Z", transaction.CreatedDate)
 					if err != nil {
