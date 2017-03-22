@@ -295,6 +295,8 @@ func (c ErpProduct) Delete() revel.Result {
 	product_id_list := make([]int64, 0)
 	c.Params.Bind(&product_id_list, "id_list")
 
+	//todo: InventoryCheckEntryInfo ProductId
+
 	for _, product_id := range product_id_list {
 		var product models.ProductInfo
 		has, err := db_session.Id(product_id).Get(&product)

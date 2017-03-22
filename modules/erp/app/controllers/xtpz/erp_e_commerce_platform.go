@@ -1,9 +1,8 @@
-
 package controllers
 
 import (
-	"encoding/json"
-	"strconv"
+	//"encoding/json"
+	//"strconv"
 	"github.com/revel/revel"
 
 	"matrix/core"
@@ -46,6 +45,8 @@ func (c ErpECommercePlatform) ListData() revel.Result {
 		Total: count,
 	})
 }
+
+/*
 
 type ECommercePlatformDetailForm struct {
 	ECommercePlatform models.ECommercePlatformInfo `json:"platform"`
@@ -133,3 +134,4 @@ func (c ErpECommercePlatform) Delete() revel.Result {
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})
 }
 
+*/
