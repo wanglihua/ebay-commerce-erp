@@ -7,17 +7,35 @@
             </li>
             <li class="parent" data-menu="auth-menu">权限管理</li>
             <li class="active" data-menu="auth-user-menu"><a href='{%url "AuthUser.Index"%}'>用户管理</a></li>
-            <li data-menu="auth-passres-menu">用户权限</li>
+            <li data-menu="auth-passres-menu">用户权限(&nbsp;{%.user_names%}&nbsp;)</li>
         </ul>
     </div>
     <div class="page-content">
         <div class="row">
             <div class="col-xs-12" style="padding: 0;">
+                {%/*
                 <div class="gridToolBar clearfix">
                     <button class="btn btn-primary btn-sm" @click="reloadList('#passResList')">
                         <i class="ace-icon fa fa-refresh"></i>
                         刷新
                     </button>
+                </div>
+                */%}
+                <div class="row" style="margin-top: 5px;margin-bottom: 5px;">
+                    <div id="query" class="col-xs-12 query">
+                        <label class="control-label no-padding-right" for="pass_res_cate_query">类别</label>
+                        <select id="pass_res_cate_query" class="input-sm" name="login_name_query" style="width: 120px;">
+                            <option value="0">-类别-</option>
+                            {% range .pass_res_cate_list %}
+                            <option value="{%.Id%}">{%.Name%}</option>
+                            {% end %}
+                        </select>
+                        <label class="control-label no-padding-right" for="pass_res_name_query">名称</label>
+                        <input id="pass_res_name_query" class="input-sm" name="login_name_query" placeholder="名称" type="text" style="width: 120px;"/>
+                        <button class="btn btn-mini btn-primary" @click="reloadList()" style="margin-bottom: 2px;">
+                            &nbsp;<i class="ace-icon fa fa-search"></i>查&nbsp;询&nbsp;
+                        </button>
+                    </div>
                 </div>
                 <div>
                     <table id="passResList" class="table table-striped table-bordered table-hover"></table>
@@ -26,7 +44,7 @@
         </div>
     </div>
 </div>
-{%template "auth/pass_res/user_id_list.var" .%}
+{%template "auth/pass_res/pass_res_index.var" .%}
 <script type="text/javascript">
 
     function grant(res_id) {
@@ -94,7 +112,11 @@
                         {"mDataProp": "r.name", "title": "名称", "bSearchable": true, "width": 180},
                         {"mDataProp": "r.desc", "title": "描述", "bSearchable": true},
                         {
-                            "mDataProp": "is_auth", "title": "授权", "bSearchable": true, "sClass": "center", "width": 65,
+                            "mDataProp": "is_auth",
+                            "title": "授权状态",
+                            "bSearchable": true,
+                            "sClass": "center",
+                            "width": 80,
                             "render": function (data, type, row) {
                                 if (data == 0) {
                                     return '<i class="fa fa-remove red" aria-hidden="true"></i>';
@@ -133,13 +155,15 @@
                     ],
                     "fnServerData": function (sSource, aoData, fnCallback) {
                         aoData.push({'name': 'user_id_list', 'value': user_id_list});
+                        aoData.push({'name': 'pass_res_cate_id_query', 'value': $("#pass_res_cate_query").val()});
+                        aoData.push({'name': 'pass_res_cate_name_query', 'value': $("#pass_res_name_query").val()});
 
                         $.ajax({
                             "dataType": 'json',
                             "url": sSource,
                             "data": aoData,
                             "success": function (data) {
-                                if(data.success == false) {
+                                if (data.success == false) {
                                     $.msg.error(data.message);
                                     return;
                                 }

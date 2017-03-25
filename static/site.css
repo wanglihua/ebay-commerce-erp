@@ -332,16 +332,16 @@ div#product_message table#message_list td {
     vertical-align: middle;
 }
 
-div#query {
-
+div.query {
+    line-height: 28px;
 }
 
-div#query input {
+div.query input, div.query select {
     height: 30px;
     margin-right: 10px;
 }
 
-div#query button {
+div.query button {
     margin-bottom: 3px;
     height: 30px;
 }

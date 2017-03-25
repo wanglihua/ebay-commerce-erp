@@ -1,0 +1,3 @@
+<script type="text/javascript">
+    var user_id_list = {%.user_id_list %};
+</script>

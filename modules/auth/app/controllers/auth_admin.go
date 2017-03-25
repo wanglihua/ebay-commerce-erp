@@ -127,14 +127,14 @@ func (c AuthAdmin) Remove() revel.Result {
 		SELECT count(*) AS count
 		FROM auth_admin a
 		    INNER JOIN auth_user u ON a.user_id = u.id
-		WHERE a.id IN (1, 2, 3) AND u.login_name = '0000';
+		WHERE a.id IN (1, 2, 3) AND u.login_name = 'admin';
 	*/
 
 	sql := `
 SELECT count(*) AS count
 FROM auth_admin a
     INNER JOIN auth_user u ON a.user_id = u.id
-WHERE a.id IN (%s) AND u.login_name = '0000';
+WHERE a.id IN (%s) AND u.login_name = 'admin';
 	`
 	sql = fmt.Sprintf(sql, admin_id_strs)
 
