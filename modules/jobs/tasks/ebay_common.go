@@ -14,6 +14,28 @@ import (
 
 const log_response_xml_to_file = false
 
+func get_ebay_api_config_list(db_session *xorm.Session) []models.EBayAPIConfigInfo {
+	ebay_api_config_list := make([]models.EBayAPIConfigInfo, 0)
+
+	/*
+SELECT cfg.*
+FROM erp_ebay_api_config cfg
+    INNER JOIN erp_shop_account sa ON cfg.shop_id = sa.id
+WHERE sa.status_id = 1400
+	*/
+	sql := `
+SELECT cfg.*
+FROM erp_ebay_api_config cfg
+    INNER JOIN erp_shop_account sa ON cfg.shop_id = sa.id
+WHERE sa.status_id = %d`
+	err := db_session.Sql(fmt.Sprintf(sql, models.SHOP_ACCOUNT_STATUS_ENABLED)).Find(&ebay_api_config_list)
+	if err != nil {
+		revel.ERROR.Println(err)
+	}
+
+	return ebay_api_config_list
+}
+
 func fetch_product_item(config models.EBayAPIConfigInfo, item_id string) ebay.GetItemResponse {
 
 	req_body := `<?xml version="1.0" encoding="utf-8"?>

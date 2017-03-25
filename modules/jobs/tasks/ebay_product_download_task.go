@@ -89,13 +89,7 @@ func (t EBayProductDownloadTask) Run() {
 		db_session.Close()
 	}()
 
-	ebay_api_config_list := make([]models.EBayAPIConfigInfo, 0)
-
-	/*
-	SELECT cfg.* FROM erp_ebay_api_config cfg INNER JOIN erp_shop_account sa ON cfg.shop_id = sa.id
-	*/
-	err = db_session.Sql("SELECT cfg.* FROM erp_ebay_api_config cfg INNER JOIN erp_shop_account sa ON cfg.shop_id = sa.id").Find(&ebay_api_config_list)
-	core.HandleError(err)
+	ebay_api_config_list := get_ebay_api_config_list(db_session)
 
 	for _, config := range ebay_api_config_list {
 		has_more_orders := true

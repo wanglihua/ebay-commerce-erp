@@ -31,7 +31,7 @@ func (e ECommercePlatformInfo) ModelDesc() string {
 func (e ECommercePlatformInfo) InitData(db_session *xorm.Session) {
 	platform := new(ECommercePlatformInfo)
 	platform.Id = PLATFORM_ID_EBAY
-	platform.Name = "ebay"
-	platform.Desc = core.NewNullString("ebay", true)
+	platform.Name = "eBay"
+	platform.Desc = core.NewNullString("eBay", true)
 	db_session.Insert(platform)
 }

@@ -29,6 +29,10 @@
                         <i class="ace-icon fa fa-trash-o"></i>
                         删除
                     </button>
+                    <button class="btn btn-info btn-sm">
+                        <i class="ace-icon fa fa-book"></i>
+                        操作日志
+                    </button>
                 </div>
                 <div>
                     <table id="shopAccountList" class="table table-striped table-bordered table-hover"></table>
@@ -215,7 +219,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-danger btn-sm" :disabled="config_detail.api_config.id == 0"  @click="deleteEBayAPIConfig()">
+                    <button type="button" class="btn btn-danger btn-sm" :disabled="config_detail.api_config.id == 0" @click="deleteEBayAPIConfig()">
                         <i class="ace-icon fa fa-floppy-o"></i>删除配置
                     </button>
                     <button type="button" class="btn btn-success btn-sm" @click="saveEBayAPIConfig()">
