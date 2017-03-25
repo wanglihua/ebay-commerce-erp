@@ -103,6 +103,9 @@ func (c ErpExchangeRate) DetailData() revel.Result {
 		if has == false {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "指定的货币汇率不存在！"})
 		}
+	} else {
+		//如果是新增，就给个初始的汇率状态
+		exchange_rate.StatusId = models.EXCHANGE_RATE_STATUS_ENABLED
 	}
 
 	status_list := status_service.GetStatusList(db_session, models.STATUS_TYPE_EXCHANGE_RATE)
@@ -130,39 +133,43 @@ func (c ErpExchangeRate) Save() revel.Result {
 		return c.RenderJson(core.JsonResult{Success: false, Message: c.GetValidationErrorMessage()})
 	}
 
-	exchange_rate := detail_form.ExchangeRate
+	exchange_rate_from_ui := detail_form.ExchangeRate
 
 	var affected int64
 	if detail_form.IsCreate() {
-		currency_rate_count, err := db_session.Where("currency_id = ?", exchange_rate.CurrencyId).Count(&exchange_rate)
+		currency_rate_count, err := db_session.Where("currency_id = ?", exchange_rate_from_ui.CurrencyId).Count(&exchange_rate_from_ui)
 		core.HandleError(err)
 		if currency_rate_count != 0 {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，货币汇率已存在！" })
 		}
 
-		affected, err = db_session.Insert(&exchange_rate)
+		affected, err = db_session.Insert(&exchange_rate_from_ui)
 		core.HandleError(err)
 
 		var currency models.CurrencyInfo
-		_, err = db_session.Id(exchange_rate.CurrencyId).Get(&currency)
+		_, err = db_session.Id(exchange_rate_from_ui.CurrencyId).Get(&currency)
 		core.HandleError(err)
 
 		var exchange_rate_log models.ExchangeRateLogInfo
 		exchange_rate_log.Name = fmt.Sprintf("%s(%s)", currency.Name, currency.Code)
-		exchange_rate_log.Desc = "新增数据"
+		exchange_rate_log.Desc = fmt.Sprintf("新增数据 %.4f", exchange_rate_from_ui.Rate)
 		exchange_rate_log.LoginName = core.GetLoginUser(c.Session).LoginName
 
 		_, err = db_session.Insert(&exchange_rate_log)
 		core.HandleError(err)
 
 	} else {
-		currency_rate_count, err := db_session.Where("id <> ? and currency_id = ?", exchange_rate.Id, exchange_rate.CurrencyId).Count(&exchange_rate)
+		currency_rate_count, err := db_session.Where("id <> ? and currency_id = ?", exchange_rate_from_ui.Id, exchange_rate_from_ui.CurrencyId).Count(&exchange_rate_from_ui)
 		core.HandleError(err)
 		if currency_rate_count != 0 {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，货币汇率已存在！" })
 		}
 
-		affected, err = db_session.Id(exchange_rate.Id).Update(&exchange_rate)
+		var exchange_rate_in_db models.ExchangeRateInfo
+		_, err = db_session.Id(exchange_rate_from_ui.Id).Get(&exchange_rate_in_db)
+		core.HandleError(err)
+
+		affected, err = db_session.Id(exchange_rate_from_ui.Id).Update(&exchange_rate_from_ui)
 		core.HandleError(err)
 
 		if affected == 0 {
@@ -170,12 +177,12 @@ func (c ErpExchangeRate) Save() revel.Result {
 		}
 
 		var currency models.CurrencyInfo
-		_, err = db_session.Id(exchange_rate.CurrencyId).Get(&currency)
+		_, err = db_session.Id(exchange_rate_from_ui.CurrencyId).Get(&currency)
 		core.HandleError(err)
 
 		var exchange_rate_log models.ExchangeRateLogInfo
 		exchange_rate_log.Name = fmt.Sprintf("%s(%s)", currency.Name, currency.Code)
-		exchange_rate_log.Desc = "编辑数据"
+		exchange_rate_log.Desc = fmt.Sprintf("编辑数据 %.4f=>%.4f", exchange_rate_in_db.Rate, exchange_rate_from_ui.Rate)
 		exchange_rate_log.LoginName = core.GetLoginUser(c.Session).LoginName
 
 		_, err = db_session.Insert(&exchange_rate_log)
