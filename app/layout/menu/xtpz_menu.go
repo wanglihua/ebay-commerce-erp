@@ -42,7 +42,7 @@ func GetXtpzMenu(res_id_map map[int64]bool, db_session *xorm.Session, web_sessio
         <li id="xtpz-paypalaccount-menu" class="">
             <a href="/erp/paypal/account">
                 <i class="menu-icon fa fa-caret-right"></i>
-                Paypal账号
+                PayPal账号
             </a>
             <b class="arrow"></b>
         </li>

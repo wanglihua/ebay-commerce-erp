@@ -74,6 +74,12 @@ div.dataTables_wrapper div.dataTables_filter input {
     color: #307ECC;
 }
 
+.dataTables_wrapper {
+    margin-top: 15px !important;
+    border-top-style: none !important;
+    border-bottom-style: none !important;
+}
+
 form.form-horizontal label.control-label {
     text-align: right !important;
     padding-top: 0 !important;
@@ -324,4 +330,18 @@ div#product_detail table#message_list td {
 
 div#product_message table#message_list td {
     vertical-align: middle;
+}
+
+div#query {
+
+}
+
+div#query input {
+    height: 30px;
+    margin-right: 10px;
+}
+
+div#query button {
+    margin-bottom: 3px;
+    height: 30px;
 }
