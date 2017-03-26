@@ -18,9 +18,6 @@ func init() {
 		   jobs.Every(24 * time.Hour,    TestTask{})
 		*/
 
-		//cron.test = * * * * * ?
-		//jobs.Schedule("cron.test", TestTask{}) //测试
-
 		_, found := revel.Config.String("cron.ebay_download_order")
 		if found {
 			jobs.Schedule("cron.ebay_download_order", tasks.EBayOrderDownloadTask{})

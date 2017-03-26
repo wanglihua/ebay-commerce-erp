@@ -19,7 +19,7 @@ func GetLoginUser(session revel.Session) LoginUser {
 	var loginUser LoginUser
 	err := cache.Get(session.Id()+LOGIN_USER_CACHE_KEY, &loginUser)
 	if err != nil {
-		revel.WARN.Println(err.Error())
+		revel.TRACE.Println(err.Error())
 	}
 	return loginUser
 }
