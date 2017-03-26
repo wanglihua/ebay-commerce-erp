@@ -14,6 +14,7 @@ func registerTags() {
 	revel.TemplateFuncs["header"] = header_template_func
 	revel.TemplateFuncs["footer"] = footer_template_func
 	revel.TemplateFuncs["site_header"] = site_header_template_func
+	revel.TemplateFuncs["login_header"] = login_header_template_func
 	revel.TemplateFuncs["site_footer"] = site_footer_template_func
 
 	revel.TemplateFuncs["IntToStr"] = int_to_str_template_func
@@ -43,6 +44,12 @@ func site_header_template_func(title string, renderArgs map[string]interface{}) 
 	db_session := renderArgs["dbsession"].(*xorm.Session)
 	web_session := renderArgs["session"].(revel.Session)
 	return template.HTML(layout.GetSiteHeader(title, db_session, web_session))
+}
+
+func login_header_template_func(renderArgs map[string]interface{}) template.HTML {
+	db_session := renderArgs["dbsession"].(*xorm.Session)
+	web_session := renderArgs["session"].(revel.Session)
+	return template.HTML(layout.GetLoginHeader(db_session, web_session))
 }
 
 func site_footer_template_func() template.HTML {
