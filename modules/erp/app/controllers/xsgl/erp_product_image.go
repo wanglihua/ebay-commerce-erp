@@ -171,7 +171,7 @@ func (c ErpProductImage) Save() revel.Result {
 	core.HandleError(err)
 
 	if found == false {
-		return c.RenderJson(core.JsonResult{Success: false, Message: "商品编号不存在，请重试！"})
+		return c.RenderJson(core.JsonResult{Success: false, Message: "商品SKU编号不存在，请重试！"})
 	}
 
 	product_image.ProductId = product.Id
