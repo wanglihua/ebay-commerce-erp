@@ -18,30 +18,30 @@ func init() {
 		   jobs.Every(24 * time.Hour,    TestTask{})
 		*/
 
-		_, found := revel.Config.String("cron.ebay_download_order")
+		cron_ebay_download_order, found := revel.Config.String("cron.ebay_download_order")
 		if found {
-			jobs.Schedule("cron.ebay_download_order", tasks.EBayOrderDownloadTask{})
+			jobs.Schedule(cron_ebay_download_order, tasks.EBayOrderDownloadTask{})
 		}
 
 		//jobs.Now(tasks.EBayOrderDownloadTask{}) // just for test
 
-		_, found = revel.Config.String("cron.ebay_download_message")
+		cron_ebay_download_message, found := revel.Config.String("cron.ebay_download_message")
 		if found {
-			jobs.Schedule("cron.ebay_download_message", tasks.EBayMessageDownloadTask{})
+			jobs.Schedule(cron_ebay_download_message, tasks.EBayMessageDownloadTask{})
 		}
 
 		//jobs.Now(tasks.EBayMessageDownloadTask{}) // just for test
 
-		_, found = revel.Config.String("cron.ebay_download_product")
+		cron_ebay_download_product, found := revel.Config.String("cron.ebay_download_product")
 		if found {
-			jobs.Schedule("cron.ebay_download_product", tasks.EBayProductDownloadTask{})
+			jobs.Schedule(cron_ebay_download_product, tasks.EBayProductDownloadTask{})
 		}
 
 		//jobs.Now(tasks.EBayProductDownloadTask{})
 
-		_, found = revel.Config.String("cron.paypal_download")
+		cron_paypal_download, found := revel.Config.String("cron.paypal_download")
 		if found {
-			jobs.Schedule("cron.paypal_download", tasks.PaypalDownloadTask{})
+			jobs.Schedule(cron_paypal_download, tasks.PaypalDownloadTask{})
 		}
 
 		// jobs.Now(tasks.PaypalDownloadTask{})

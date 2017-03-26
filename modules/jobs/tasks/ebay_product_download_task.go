@@ -113,7 +113,25 @@ func (t EBayProductDownloadTask) Run() {
 
 			//获取产品的详细信息
 			for _, list_item := range list_response.ItemArray.Items {
-				fetch_product_item_to_db(config, db_session, list_item.ItemId)
+
+				/*
+				SELECT count(psi.id) AS product_item_count FROM erp_product_store_item psi WHERE psi.shop_id = 1 AND psi.item_id = '123'
+				 */
+				sql := `SELECT count(psi.id) AS product_item_count FROM erp_product_store_item psi WHERE psi.shop_id = %d AND psi.item_id = '%s'`
+				sql = fmt.Sprintf(sql, config.ShopId, list_item.ItemId)
+
+				var product_item_count struct {
+					Count int64 `xorm:"'product_item_count'"`
+				}
+
+				_, err := db_session.Sql(sql).Get(&product_item_count)
+				if err != nil {
+					revel.ERROR.Println(err)
+				}
+
+				if product_item_count.Count == 0 {
+					fetch_product_item_to_db(config, db_session, list_item.ItemId)
+				}
 			}
 		} // for has_more_orders == true
 	} //for _, config := range ebay_api_config_list
