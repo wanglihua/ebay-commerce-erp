@@ -1,6 +1,7 @@
 package app
 
 import (
+	"strings"
 	"time"
 
 	"github.com/revel/revel"
@@ -10,6 +11,11 @@ import (
 
 func init() {
 	revel.OnAppStart(func() {
+		defer func() {
+			if err := recover(); err != nil {
+				revel.ERROR.Println(err)
+			}
+		}()
 
 		/*
 		   jobs.Schedule("0 0 0 * * ?",  TestTask{})
@@ -20,6 +26,7 @@ func init() {
 
 		cron_ebay_download_order, found := revel.Config.String("cron.ebay_download_order")
 		if found {
+			check_cron_support(cron_ebay_download_order)
 			jobs.Schedule(cron_ebay_download_order, tasks.EBayOrderDownloadTask{})
 		}
 
@@ -27,6 +34,7 @@ func init() {
 
 		cron_ebay_download_message, found := revel.Config.String("cron.ebay_download_message")
 		if found {
+			check_cron_support(cron_ebay_download_message)
 			jobs.Schedule(cron_ebay_download_message, tasks.EBayMessageDownloadTask{})
 		}
 
@@ -34,6 +42,7 @@ func init() {
 
 		cron_ebay_download_product, found := revel.Config.String("cron.ebay_download_product")
 		if found {
+			check_cron_support(cron_ebay_download_product)
 			jobs.Schedule(cron_ebay_download_product, tasks.EBayProductDownloadTask{})
 		}
 
@@ -41,6 +50,7 @@ func init() {
 
 		cron_paypal_download, found := revel.Config.String("cron.paypal_download")
 		if found {
+			check_cron_support(cron_paypal_download)
 			jobs.Schedule(cron_paypal_download, tasks.PaypalDownloadTask{})
 		}
 
@@ -48,4 +58,14 @@ func init() {
 
 		jobs.Every(10*time.Minute, tasks.SiteKeepHotTask{})
 	})
+}
+
+// 检查 cron 表达式是否支持
+func check_cron_support(cron string) {
+	// Split on whitespace.  We require 5 or 6 fields.
+	// (second) (minute) (hour) (day of month) (month) (day of week, optional)
+	cron_fields := strings.Fields(cron)
+	if len(cron_fields) != 5 && len(cron_fields) != 6 {
+		revel.ERROR.Printf("Expected 5 or 6 fields, found %d: %s\n", len(cron_fields), cron)
+	}
 }
