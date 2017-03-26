@@ -72,6 +72,12 @@ type EBayMessageDownloadTask struct {
 }
 
 func (t EBayMessageDownloadTask) Run() {
+	defer func() {
+		if err := recover(); err != nil {
+			revel.ERROR.Println(err)
+		}
+	}()
+
 	job_time_begin := time.Now()
 
 	// get db driver and db url
