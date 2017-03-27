@@ -512,7 +512,7 @@ func (t EBayOrderDownloadTask) fetch_orders(config models.EBayAPIConfigInfo, pag
 		For eBay orders, this field's value can be set to 'Active', 'Completed', 'Canceled' or 'Inactive' to retrieve orders in these states. The 'Shipped' value is only applicable for Half.com orders.
 	 */
 
-	// 正式环境下，只获取已支付的订单
+	// 正式环境下，只获取已支付的订单, 但不知道为什么用 Inactive 好像会有问题。
 	req_body := `<?xml version="1.0" encoding="utf-8"?>
 <GetOrdersRequest xmlns="urn:ebay:apis:eBLBaseComponents">
 	<RequesterCredentials>
@@ -522,7 +522,7 @@ func (t EBayOrderDownloadTask) fetch_orders(config models.EBayAPIConfigInfo, pag
 	<WarningLevel>High</WarningLevel>
 	<NumberOfDays>%d</NumberOfDays>
 	<OrderRole>Seller</OrderRole>
-	<OrderStatus>Inactive</OrderStatus>
+	<OrderStatus>All</OrderStatus>
 	<Pagination>
 		<EntriesPerPage>100</EntriesPerPage>
 		<PageNumber>%d</PageNumber>
