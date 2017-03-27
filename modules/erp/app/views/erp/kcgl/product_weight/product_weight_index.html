@@ -28,6 +28,101 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" id="productDetailDialog">
+        <div class="modal-dialog" style="width: 480px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="True">&times;</button>
+                    <h4 class="modal-title">商品长宽高重量详细</h4>
+                </div>
+                <div class="modal-body clearfix">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <form class="form-horizontal" role="form" id="productDetailForm">
+                                <input id="product_id" name="detail.product.id" type="hidden" v-model.number="detail.product.id"/>
+                                <input id="product_version" name="detail.product.version" type="hidden" v-model.number="detail.product.version"/>
+
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <label for="sku" class="col-xs-2 control-label">商品SKU</label>
+                                            <div class="col-xs-10">
+                                                <input id="sku" name="detail.product.sku" type="text" class="input-sm form-control" disabled="disabled" v-model.number="detail.product.sku"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <label for="cn_name" class="col-xs-2 control-label">商品名称</label>
+                                            <div class="col-xs-10">
+                                                <input id="cn_name" name="detail.product.cn_name" type="text" class="input-sm form-control" disabled="disabled" v-model.number="detail.product.cn_name"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <label for="length" class="col-xs-2 control-label">长</label>
+                                            <div class="col-xs-10">
+                                                <input id="length" name="detail.product.length" type="text" class="input-sm form-control" v-model.number="detail.product.length"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <label for="width" class="col-xs-2 control-label">宽</label>
+                                            <div class="col-xs-10">
+                                                <input id="width" name="detail.product.width" type="text" class="input-sm form-control" v-model.number="detail.product.width"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <label for="height" class="col-xs-2 control-label">高</label>
+                                            <div class="col-xs-10">
+                                                <input id="height" name="detail.product.height" type="text" class="input-sm form-control" v-model.number="detail.product.height"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <label for="weight" class="col-xs-2 control-label">重量</label>
+                                            <div class="col-xs-10">
+                                                <input id="weight" name="detail.product.weight" type="text" class="input-sm form-control" v-model.number="detail.product.weight"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success btn-sm" @click="saveProductWeight()">
+                        <i class="ace-icon fa fa-floppy-o"></i>保存
+                    </button>
+                    <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">
+                        <i class="ace-icon fa fa-times"></i>关闭
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 <script type="text/javascript">
     var vm = new Vue({
@@ -64,43 +159,50 @@
                         {"mDataProp": "s.name", "title": "状态", "bSearchable": true, "width": 80},
                         {"mDataProp": "p.create_time", "title": "创建时间", "bSearchable": false, "width": 120},
                         {"mDataProp": "p.update_time", "title": "修改时间", "bSearchable": false, "width": 120}
-                    ],
-                    "fnServerData": function (sSource, aoData, fnCallback) {
-                        showMask("数据加载中，请稍候");
-                        $.ajax(
-                            {
-                                "dataType": 'json',
-                                "url": sSource,
-                                "data": aoData,
-                                "success": function (data) {
-                                    hideMask();
-                                    if (data.success == false) {
-                                        $.msg.error(data.message);
-                                        return;
-                                    }
-                                    fnCallback(data);
-                                }
-                            });
-                    }
+                    ]
                 }
             );
+
+            $('#productList tbody').on('dblclick', 'tr', function () {
+                var id = $(this).find('td:first-child input:checkbox').val();
+                vm.showProductDetail(id);
+            });
         },
         methods: {
             reloadList: function () {
                 reloadList('#productList');
             },
             showProductDetail: function (product_id) {
+                showMask("加载中...");
+                $("#exchangeRateDetailForm").clearValidation();
+                $.ajax({
+                        url: '{%url "ErpProductWeight.DetailData" %}',
+                        type: "POST",
+                        data: {
+                            "id": product_id
+                        },
+                        success: function (result) {
+                            hideMask();
+                            if (result.success == false) {
+                                $.msg.error(result.message);
+                                return;
+                            }
+                            vm.detail = result;
 
+                            $('#productDetailDialog').modal(modalOptions);
+                        }
+                    }
+                );
             },
-            saveProduct: function () {
+            saveProductWeight: function () {
                 showMask("提交中...");
                 var form = $("#productDetailForm");
                 var valid = validate(form, {
                     'detail.product.length': {
-                        required: true, number: true
+                        required: false, number: true
                     },
                     'detail.product.width': {
-                        required: true, number: true
+                        required: false, number: true
                     },
                     'detail.product.height': {
                         required: false, number: true
