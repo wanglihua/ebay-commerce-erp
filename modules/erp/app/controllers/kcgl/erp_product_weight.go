@@ -20,26 +20,46 @@ func (c ErpProductWeight) ListData() revel.Result {
 	db_session := c.DbSession
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
-	query := db_session.Where(filter)
-
-	data_query := *query
-	if order != "" {
-		data_query = *data_query.OrderBy(order)
-	} else {
-		data_query = *data_query.Asc("id")
+	type product_weight_view_item_t struct {
+		Product models.ProductInfo `xorm:"extends" json:"p"`
+		Status  models.StatusInfo  `xorm:"extends" json:"s"`
 	}
 
-	var product_list = make([]models.ProductInfo, 0, limit)
-	err := data_query.Limit(limit, offset).Find(&product_list)
+	/*
+		SELECT p.*, s.*
+		FROM erp_product p
+		    INNER JOIN erp_status s ON s.id = p.status_id
+	 */
+
+	sb := core.NewSqlBuilder()
+	sb.Select("p.*, s.*")
+	sb.Count("count(p.id) AS product_count")
+	sb.From(`erp_product p
+		    INNER JOIN erp_status s ON s.id = p.status_id`)
+	sb.Where(filter)
+
+	if order != "" {
+		sb.OrderBy(order)
+	} else {
+		sb.OrderBy("p.id ASC")
+	}
+
+	sb.Limit(offset, limit)
+
+	var product_list = make([]product_weight_view_item_t, 0, limit)
+	err := db_session.Sql(sb.SqlList()).Find(&product_list)
 	core.HandleError(err)
 
-	count_query := *query
-	count, err := count_query.Count(new(models.ProductInfo))
+	type product_count_t struct {
+		Count int64 `xorm:"'product_count'"`
+	}
+	var product_count product_count_t
+	_, err = db_session.Sql(sb.SqlCount()).Get(&product_count)
 	core.HandleError(err)
 
 	return c.RenderJson(core.GridResult{
 		Data:  product_list,
-		Total: count,
+		Total: product_count.Count,
 	})
 }
 

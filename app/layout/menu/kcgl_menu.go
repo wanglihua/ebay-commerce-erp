@@ -31,6 +31,14 @@ func GetKcglMenu(res_id_map map[int64]bool, db_session *xorm.Session, web_sessio
             <b class="arrow"></b>
         </li>
 
+        <li id="kcgl-product-weight-menu" class="">
+            <a href="/erp/product/weight">
+                <i class="menu-icon fa fa-caret-right"></i>
+                商品长宽高重量
+            </a>
+            <b class="arrow"></b>
+        </li>
+
         <li id="kcgl-productbind-menu" class="">
             <a href="/erp/product/bind">
                 <i class="menu-icon fa fa-caret-right"></i>
