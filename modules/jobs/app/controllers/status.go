@@ -4,6 +4,7 @@ import (
 	"github.com/revel/cron"
 	"github.com/revel/revel"
 	"matrix/modules/jobs/app/jobs"
+	"matrix/modules/jobs/tasks"
 )
 
 type Jobs struct {
@@ -25,12 +26,23 @@ func (c Jobs) Status() revel.Result {
 	*/
 
 	entries := jobs.MainCron.Entries()
-	c.RenderArgs["entries"] = entries
+
+	filtered_entries := make([]*cron.Entry, 0)
+	for _, job_entry := range entries {
+		job := cast_job(job_entry.Job)
+		if job.Name != tasks.Site_keep_hot_task_name {
+			filtered_entries = append(filtered_entries, job_entry)
+		}
+	}
+
+	c.RenderArgs["entries"] = filtered_entries
 	return c.RenderTemplate("jobs/status.html")
 }
 
 func init() {
-	revel.TemplateFuncs["castjob"] = func(job cron.Job) *jobs.Job {
-		return job.(*jobs.Job)
-	}
+	revel.TemplateFuncs["cast_job"] = cast_job
+}
+
+func cast_job(job cron.Job) *jobs.Job {
+	return job.(*jobs.Job)
 }

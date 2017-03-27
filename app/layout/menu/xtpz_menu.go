@@ -62,6 +62,14 @@ func GetXtpzMenu(res_id_map map[int64]bool, db_session *xorm.Session, web_sessio
             </a>
             <b class="arrow"></b>
         </li>
+
+        <li id="xtpz-schedule-task-menu" class="">
+            <a href="/erp/schedule/task">
+                <i class="menu-icon fa fa-caret-right"></i>
+                定时任务
+            </a>
+            <b class="arrow"></b>
+        </li>
     </ul>
 </li>
 `)

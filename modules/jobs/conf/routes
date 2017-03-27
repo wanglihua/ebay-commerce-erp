@@ -1,1 +1,1 @@
-GET     /@jobs      Jobs.Status
+GET     /schedule/job/list      Jobs.Status

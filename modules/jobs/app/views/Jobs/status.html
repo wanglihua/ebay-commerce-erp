@@ -1,51 +1,40 @@
-<html>
-<head>
-    <style type="text/css">
-        body {
-            font-size: 11px;
-            font-family: sans-serif;
-        }
+{%header "定时任务" .%}
 
-        table {
-            font-size: 10px;
-            border-collapse: collapse;
-            border: 1px solid lightgray;
-        }
-
-        table td, table th {
-            padding: 4px 10px;
-            border: 1px solid lightgray;
-        }
-
-        table tr:nth-child(odd) {
-            background-color: #f0f0f0;
-        }
-
-        th {
-            text-align: left;
-            border: 1px solid lightgray;
-            padding: 4px 10px;
-        }
-    </style>
-</head>
-<body>
-
-<h1>Scheduled Jobs</h1>
-
-<table>
-    <tr>
-        <th style="width: 280px;">Name</th>
-        <th style="width: 50px;">Status</th>
-        <th style="width: 120px;">Last run</th>
-        <th style="width: 120px;">Next run</th>
-    </tr>
-    {%range .entries%}
-    {%$job := castjob .Job%}
-    <tr>
-        <td>{%$job.Name%}</td>
-        <td>{%$job.Status%}</td>
-        <td>{%if not .Prev.IsZero%}{%.Prev.Format "2006-01-02 15:04:05"%}{%end%}</td>
-        <td>{%if not .Next.IsZero%}{%.Next.Format "2006-01-02 15:04:05"%}{%end%}</td>
-    </tr>
-    {%end%}
-</table>
+<div class="breadcrumbs" id="breadcrumbs">
+    <ul class="breadcrumb">
+        <li>
+            <a href='{%url "Home.Index"%}'><i class="ace-icon fa fa-home home-icon"></i></a>
+        </li>
+        <li class="parent" data-menu="xtpz-menu">系统配置</li>
+        <li class="active" data-menu="xtpz-schedule-task-menu">定时任务</li>
+    </ul>
+</div>
+<div class="page-content">
+    <div class="row">
+        <div class="col-xs-12" style="padding: 0;">
+            <h3 style="font-size: 16px;">当前任务</h3>
+            <table class="table table-bordered table-striped">
+                <thead>
+                <tr>
+                    <th style="width: 280px;">任务名称</th>
+                    <th style="width: 50px;">任务状态</th>
+                    <th style="width: 120px;">上一次运行</th>
+                    <th style="width: 120px;">下一次运行</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% range .entries %}
+                {% $job := cast_job .Job %}
+                <tr>
+                    <td>{% $job.Name %}</td>
+                    <td>{% $job.Status %}</td>
+                    <td>{% if not .Prev.IsZero %}{% .Prev.Format "2006-01-02 15:04:05" %}{% end %}</td>
+                    <td>{% if not .Next.IsZero %}{% .Next.Format "2006-01-02 15:04:05" %}{% end %}</td>
+                </tr>
+                {%end%}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{%footer%}

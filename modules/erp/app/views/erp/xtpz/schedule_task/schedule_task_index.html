@@ -1,0 +1,93 @@
+{%header "定时任务" .%}
+<div id="page">
+    <div class="breadcrumbs" id="breadcrumbs">
+        <ul class="breadcrumb">
+            <li>
+                <a href='{%url "Home.Index"%}'><i class="ace-icon fa fa-home home-icon"></i></a>
+            </li>
+            <li class="parent" data-menu="xtpz-menu">系统配置</li>
+            <li class="active" data-menu="xtpz-schedule-task-menu">定时任务</li>
+        </ul>
+    </div>
+    <div class="page-content">
+        <div class="row">
+            <div class="col-xs-12" style="padding: 0;">
+                <div class="row">
+                    <h3 style="margin-left: 6px; font-size: 16px; float: left;">当前任务</h3>
+                    <div style="margin-top: 15px;margin-right: 5px;float: right;">
+                        <button class="btn btn-primary btn-mini" @click="reload_task_data">
+                            <i class="ace-icon fa fa-refresh"></i>
+                            刷新数据
+                        </button>
+                    </div>
+                </div>
+                <table class="table table-bordered table-striped">
+                    <thead>
+                    <tr>
+                        <th style="width: 280px;">任务名称</th>
+                        <th style="width: 50px;">任务状态</th>
+                        <th style="width: 120px;">上一次运行</th>
+                        <th style="width: 120px;">下一次运行</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <template v-for="task in page.task_list">
+                        <tr>
+                            <td>{{ task.name }}</td>
+                            <td>{{ task.status }}</td>
+                            <td>{{ task.pre_time }}</td>
+                            <td>{{ task.next_time }}</td>
+                        </tr>
+                    </template>
+                    </tbody>
+                </table>
+                <div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    var vm = new Vue({
+        el: "#page",
+        data: {
+            "page": {
+                "task_list": {}
+            }
+        },
+        mounted: function () {
+            var this_vm = this;
+            this.reload_task_data(this_vm);
+        },
+        methods: {
+            reload_task_data: function (this_vm) {
+                showMask("加载中...");
+                $.ajax({
+                        url: '{%url "ErpScheduleTask.TaskData" %}',
+                        type: "POST",
+                        success: function (result) {
+                            hideMask();
+                            if (result.success == false) {
+                                $.msg.error(result.message);
+                                return;
+                            }
+                            if (this_vm === void(0) || this_vm.page === void(0)) {
+                                vm.page.task_list = result.task_list;
+                            }
+                            else {
+                                this_vm.page.task_list = result.task_list;
+                            }
+                        }
+                    }
+                );
+            },
+            reload_history_data: function () {
+                reloadList('#exchangeRateList');
+            }
+        }
+    });
+
+
+</script>
+{%footer%}

@@ -9,8 +9,10 @@ import (
 type SiteKeepHotTask struct {
 }
 
+const Site_keep_hot_task_name = "网站预热"
+
 func (t SiteKeepHotTask) Name() string {
-	return "网站预热"
+	return Site_keep_hot_task_name
 }
 
 func (t SiteKeepHotTask) Run() {
