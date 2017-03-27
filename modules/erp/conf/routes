@@ -96,6 +96,12 @@ POST /erp/product/message/list/data            ErpProduct.ProductMessageListData
 GET  /erp/product/log/list/:product_id         ErpProduct.ProductLogList
 POST /erp/product/log/list/data                ErpProduct.ProductLogListData
 
+GET  /erp/product/weight                       ErpProductWeight.Index
+POST /erp/product/weight/data/list             ErpProductWeight.ListData
+POST /erp/product/weight/data/detail           ErpProductWeight.DetailData
+POST /erp/product/weight/save                  ErpProductWeight.Save
+POST /erp/product/import                       ErpProductWeight.Import
+
 GET  /erp/product/import                       ErpProductImport.Index
 POST /erp/product/import/data/list             ErpProductImport.ListData
 POST /erp/product/import/import                ErpProductImport.Import
