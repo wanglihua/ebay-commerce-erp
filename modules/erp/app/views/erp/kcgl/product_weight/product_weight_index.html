@@ -17,10 +17,13 @@
                         <i class="ace-icon fa fa-refresh"></i>
                         刷新
                     </button>
-                    <button class="btn btn-success btn-sm">
+                    <button id="btnImport" class="btn btn-success btn-sm">
                         <i class="ace-icon fa fa-plus"></i>
                         导入
                     </button>
+                    <div style="margin-top: 10px;">
+                        <a href="/static/excel-template/product_length_width_height_weight_import.xlsx">下载Excel模板</a>
+                    </div>
                 </div>
                 <div>
                     <table id="productList" class="table table-striped table-bordered table-hover"></table>
@@ -67,7 +70,7 @@
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
-                                            <label for="length" class="col-xs-2 control-label">长</label>
+                                            <label for="length" class="col-xs-2 control-label">长(cm)</label>
                                             <div class="col-xs-10">
                                                 <input id="length" name="detail.product.length" type="text" class="input-sm form-control" v-model.number="detail.product.length"/>
                                             </div>
@@ -78,7 +81,7 @@
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
-                                            <label for="width" class="col-xs-2 control-label">宽</label>
+                                            <label for="width" class="col-xs-2 control-label">宽(cm)</label>
                                             <div class="col-xs-10">
                                                 <input id="width" name="detail.product.width" type="text" class="input-sm form-control" v-model.number="detail.product.width"/>
                                             </div>
@@ -89,7 +92,7 @@
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
-                                            <label for="height" class="col-xs-2 control-label">高</label>
+                                            <label for="height" class="col-xs-2 control-label">高(cm)</label>
                                             <div class="col-xs-10">
                                                 <input id="height" name="detail.product.height" type="text" class="input-sm form-control" v-model.number="detail.product.height"/>
                                             </div>
@@ -100,7 +103,7 @@
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
-                                            <label for="weight" class="col-xs-2 control-label">重量</label>
+                                            <label for="weight" class="col-xs-2 control-label">重量(kg)</label>
                                             <div class="col-xs-10">
                                                 <input id="weight" name="detail.product.weight" type="text" class="input-sm form-control" v-model.number="detail.product.weight"/>
                                             </div>
@@ -124,7 +127,51 @@
         </div>
     </div>
 </div>
+<script type="text/javascript" src="/static/lib/plupload/moxie.min.js"></script>
+<script type="text/javascript" src="/static/lib/plupload/plupload.min.js"></script>
+<script type="text/javascript" src="/static/lib/plupload/zh_CN.js"></script>
+
 <script type="text/javascript">
+
+    function init_uploader() {
+        var uploader = new plupload.Uploader({
+            runtimes: 'html5,flash,html4',
+            multi_selection: false,
+
+            browse_button: 'btnImport',
+            file_data_name: "excel_file",
+
+            url: '{%url "ErpProductWeight.Import"%}',
+            max_file_size: '10000kb',
+
+            filters: [
+                {title: "Excel文件", extensions: "xlsx"}
+            ],
+
+            flash_swf_url: '/plupload/js/Moxie.swf',
+
+            init: {
+                FilesAdded: function () {
+                    uploader.start();
+                },
+                FileUploaded: function (up, file, response) {
+                    var result = JSON.parse(response.response);
+                    if (result.success != true) {
+                        $.msg.error(result.message);
+                    } else {
+                        reloadList('#productList');
+                        $.msg.show(result.message);
+                    }
+                },
+                Error: function (up, err) {
+                    $.msg.error("上传发生错误：" + err.code + ", " + err.message);
+                }
+            }
+        });
+
+        uploader.init();
+    }
+
     var vm = new Vue({
         el: "#page",
         data: {
@@ -167,6 +214,8 @@
                 var id = $(this).find('td:first-child input:checkbox').val();
                 vm.showProductDetail(id);
             });
+
+            init_uploader();
         },
         methods: {
             reloadList: function () {

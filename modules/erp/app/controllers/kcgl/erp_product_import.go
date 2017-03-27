@@ -1,13 +1,13 @@
 package controllers
 
 import (
-	"github.com/revel/revel"
-
 	"fmt"
+	"strconv"
+
+	"github.com/revel/revel"
+	"github.com/tealeg/xlsx"
 	"matrix/core"
 	"matrix/modules/erp/models"
-	"github.com/tealeg/xlsx"
-	"strconv"
 )
 
 type ErpProductImport struct {
@@ -129,8 +129,8 @@ func (c ErpProductImport) Import() revel.Result {
 
 	if len(product_import_list) == 0 {
 		return c.RenderJson(map[string]interface{}{
-			"success":  false,
-			"message":  "Excel文件中导入商品列表为空！",
+			"success": false,
+			"message": "Excel文件中导入商品列表为空！",
 		})
 	}
 
@@ -144,8 +144,8 @@ func (c ErpProductImport) Import() revel.Result {
 	}
 
 	return c.RenderJson(map[string]interface{}{
-		"success":  true,
-		"message":  "Excel数据上传成功！",
+		"success": true,
+		"message": "Excel数据上传成功！",
 	})
 }
 

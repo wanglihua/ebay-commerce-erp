@@ -2,8 +2,11 @@ package controllers
 
 import (
 	"encoding/json"
+	"fmt"
+	"strconv"
 
 	"github.com/revel/revel"
+	"github.com/tealeg/xlsx"
 	"matrix/core"
 	"matrix/modules/erp/models"
 )
@@ -125,9 +128,152 @@ func (c ErpProductWeight) Save() revel.Result {
 }
 
 func (c ErpProductWeight) Import() revel.Result {
+	db_session := c.DbSession
+
+	excel_file_bytes := make([]byte, 0)
+	c.Params.Bind(&excel_file_bytes, "excel_file")
+
+	c.Validation.Required(excel_file_bytes).Message("指定文件内容未成功上传！")
+
+	if c.Validation.HasErrors() {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": c.GetValidationErrorMessage(),
+		})
+	}
+
+	type product_weight_t struct {
+		sku    string
+		length float64
+		width  float64
+		height float64
+		weight float64
+	}
+
+	product_weight_list := make([]product_weight_t, 0)
+
+	xlsx_file, err := xlsx.OpenBinary(excel_file_bytes)
+	core.HandleError(err)
+
+	sheet_count := len(xlsx_file.Sheets)
+	//revel.TRACE.Printf("sheet_count: %d\n", sheet_count)
+	for sheet_index := 0; sheet_index < sheet_count; sheet_index ++ {
+		sheet := xlsx_file.Sheets[sheet_index]
+		max_row := sheet.MaxRow
+		//revel.TRACE.Printf("max_row: %d\n", max_row)
+		//略过标题行
+		for row_index := 1; row_index < max_row; row_index ++ {
+			row := sheet.Rows[row_index]
+
+			var cell *xlsx.Cell
+			var cell_val string
+			var err error
+
+			var product_weight product_weight_t
+
+			col_index := 1 //从第二列开始导入，略去第一列的编号
+
+			//SKU
+			cell = row.Cells[col_index]
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			//revel.TRACE.Println(cell_val)
+			product_weight.sku = cell_val
+			col_index++
+
+			// length
+			cell = row.Cells[col_index]
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			//revel.TRACE.Println(cell_val)
+			product_length, err := strconv.ParseFloat(cell_val, 64)
+			core.HandleError(err)
+			product_weight.length = product_length
+			col_index++
+
+			// width
+			cell = row.Cells[col_index]
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			//revel.TRACE.Println(cell_val)
+			product_width, err := strconv.ParseFloat(cell_val, 64)
+			core.HandleError(err)
+			product_weight.width = product_width
+			col_index++
+
+			// height
+			cell = row.Cells[col_index]
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			//revel.TRACE.Println(cell_val)
+			product_height, err := strconv.ParseFloat(cell_val, 64)
+			core.HandleError(err)
+			product_weight.height = product_height
+			col_index++
+
+			// weight
+			cell = row.Cells[col_index]
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			//revel.TRACE.Println(cell_val)
+			weight, err := strconv.ParseFloat(cell_val, 64)
+			core.HandleError(err)
+			product_weight.weight = weight
+			col_index++
+
+			product_weight_list = append(product_weight_list, product_weight)
+		}
+	}
+
+	if len(product_weight_list) == 0 {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "Excel文件中导入商品列表为空！",
+		})
+	}
+
+	has_zero_data := false
+	for _, product_weight := range product_weight_list {
+		revel.TRACE.Println(product_weight)
+
+		var product models.ProductInfo
+		has, err := db_session.Where(fmt.Sprintf("sku = '%s'", product_weight.sku)).Get(&product)
+		core.HandleError(err)
+
+		product.Sku = product_weight.sku
+		product.Length = product_weight.length
+		product.Width = product_weight.width
+		product.Height = product_weight.height
+		product.Weight = product_weight.weight
+
+		if product_weight.length == 0 || product_weight.width == 0 || product_weight.height == 0 || product_weight.weight == 0 {
+			has_zero_data = true
+		}
+
+		if has == true {
+			update_col_list := []string{"length", "width", "height", "weight"}
+			_, err = db_session.Id(product.Id).Cols(update_col_list...).Update(&product)
+			core.HandleError(err)
+		} else {
+			product.CnName = product.Sku
+			product.Name = product.Sku
+			product.StatusId = models.PRODUCT_STATUS_ZC
+			affected, err := db_session.Insert(&product)
+			core.HandleError(err)
+
+			if affected == 0 {
+				panic("数据插入失败！")
+			}
+		}
+	}
+
+	message := "数据导入成功！"
+	if has_zero_data == true {
+		message = "数据导入成功, 部分长宽高数据为零！"
+	}
 
 	return c.RenderJson(map[string]interface{}{
 		"success": true,
-		"message": "数据导入成功！",
+		"message": message,
 	})
 }
