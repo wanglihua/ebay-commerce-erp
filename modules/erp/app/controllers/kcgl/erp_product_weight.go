@@ -258,12 +258,8 @@ func (c ErpProductWeight) Import() revel.Result {
 			product.CnName = product.Sku
 			product.Name = product.Sku
 			product.StatusId = models.PRODUCT_STATUS_ZC
-			affected, err := db_session.Insert(&product)
+			_, err = db_session.Insert(&product)
 			core.HandleError(err)
-
-			if affected == 0 {
-				panic("数据插入失败！")
-			}
 		}
 	}
 
