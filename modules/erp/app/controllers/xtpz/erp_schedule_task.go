@@ -36,8 +36,18 @@ func (c ErpScheduleTask) TaskData() revel.Result {
 			var schedule_task schedule_task_view_item_t
 			schedule_task.Name = job.Name
 			schedule_task.Status = job.Status()
-			schedule_task.PrevTime = job_entry.Prev.Format("2006-01-02 15:04:05")
-			schedule_task.NextTime = job_entry.Next.Format("2006-01-02 15:04:05")
+
+			if job_entry.Prev.IsZero() == false {
+				schedule_task.PrevTime = job_entry.Prev.Format("2006-01-02 15:04:05")
+			} else {
+				schedule_task.PrevTime = ""
+			}
+
+			if job_entry.Next.IsZero() == false {
+				schedule_task.NextTime = job_entry.Next.Format("2006-01-02 15:04:05")
+			} else {
+				schedule_task.NextTime = ""
+			}
 
 			schedule_task_list = append(schedule_task_list, schedule_task)
 		}
