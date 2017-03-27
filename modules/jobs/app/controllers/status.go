@@ -1,8 +1,6 @@
 package controllers
 
 import (
-	"strings"
-
 	"github.com/revel/cron"
 	"github.com/revel/revel"
 	"matrix/modules/jobs/app/jobs"
@@ -13,8 +11,8 @@ type Jobs struct {
 }
 
 func (c Jobs) Status() revel.Result {
+	/* 远程也能查看
 	remoteAddress := c.Request.RemoteAddr
-	//revel.TRACE.Println(remoteAddress)
 	if revel.Config.BoolDefault("jobs.acceptproxyaddress", false) {
 		if proxiedAddress, isProxied := c.Request.Header["X-Forwarded-For"]; isProxied {
 			remoteAddress = proxiedAddress[0]
@@ -24,6 +22,7 @@ func (c Jobs) Status() revel.Result {
 		!strings.HasPrefix(remoteAddress, "[127.0.0.1]") && !strings.HasPrefix(remoteAddress, "[::1]") {
 		return c.Forbidden("%s is not local", remoteAddress)
 	}
+	*/
 
 	entries := jobs.MainCron.Entries()
 	c.RenderArgs["entries"] = entries

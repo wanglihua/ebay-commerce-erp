@@ -17,10 +17,14 @@ import (
 type PaypalDownloadTask struct {
 }
 
+func (t PaypalDownloadTask) Name() string {
+	return "PayPal下载"
+}
+
 func (t PaypalDownloadTask) Run() {
 	defer func() {
 		if err := recover(); err != nil {
-			revel.ERROR.Println(err)
+			revel.ERROR.Printf("下载PayPal账单出现错误： %s\n", err)
 		}
 	}()
 

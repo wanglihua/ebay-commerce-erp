@@ -59,10 +59,14 @@ type EBayProductDownloadTask struct {
 	db_url    string //root:root@tcp(localhost:3306)/iot?charset=utf8
 }
 
+func (t EBayProductDownloadTask) Name() string {
+	return "商品下载"
+}
+
 func (t EBayProductDownloadTask) Run() {
 	defer func() {
 		if err := recover(); err != nil {
-			revel.ERROR.Println(err)
+			revel.ERROR.Printf("下载商品出现错误： %s\n", err)
 		}
 	}()
 

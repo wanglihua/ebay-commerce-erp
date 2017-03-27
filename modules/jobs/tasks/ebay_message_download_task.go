@@ -71,10 +71,14 @@ response body:
 type EBayMessageDownloadTask struct {
 }
 
+func (t EBayMessageDownloadTask) Name() string {
+	return "消息下载"
+}
+
 func (t EBayMessageDownloadTask) Run() {
 	defer func() {
 		if err := recover(); err != nil {
-			revel.ERROR.Println(err)
+			revel.ERROR.Printf("下载消息出现错误： %s\n", err)
 		}
 	}()
 

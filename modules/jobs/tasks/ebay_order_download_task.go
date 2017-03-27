@@ -73,10 +73,14 @@ response body:
 type EBayOrderDownloadTask struct {
 }
 
+func (t EBayOrderDownloadTask) Name() string {
+	return "订单下载"
+}
+
 func (t EBayOrderDownloadTask) Run() {
 	defer func() {
 		if err := recover(); err != nil {
-			revel.ERROR.Println(err)
+			revel.ERROR.Printf("下载订单出现错误： %s\n", err)
 		}
 	}()
 
