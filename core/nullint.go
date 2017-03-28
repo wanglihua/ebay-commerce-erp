@@ -13,7 +13,7 @@ type NullInt struct {
 	sql.NullInt64
 }
 
-func NewNullInt(i int64, valid bool) NullInt {
+func MakeNullInt(i int64, valid bool) NullInt {
 	return NullInt{
 		NullInt64: sql.NullInt64{
 			Int64: i,
@@ -23,14 +23,14 @@ func NewNullInt(i int64, valid bool) NullInt {
 }
 
 func NullIntFrom(i int64) NullInt {
-	return NewNullInt(i, true)
+	return MakeNullInt(i, true)
 }
 
 func NullIntFromPtr(i *int64) NullInt {
 	if i == nil {
-		return NewNullInt(0, false)
+		return MakeNullInt(0, false)
 	}
-	return NewNullInt(*i, true)
+	return MakeNullInt(*i, true)
 }
 
 func (i *NullInt) UnmarshalJSON(data []byte) error {

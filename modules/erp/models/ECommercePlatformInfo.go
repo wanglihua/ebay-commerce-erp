@@ -32,6 +32,6 @@ func (e ECommercePlatformInfo) InitData(db_session *xorm.Session) {
 	platform := new(ECommercePlatformInfo)
 	platform.Id = PLATFORM_ID_EBAY
 	platform.Name = "eBay"
-	platform.Desc = core.NewNullString("eBay", true)
+	platform.Desc = core.MakeNullString("eBay", true)
 	db_session.Insert(platform)
 }

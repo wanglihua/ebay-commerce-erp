@@ -13,7 +13,7 @@ type NullBool struct {
 	sql.NullBool
 }
 
-func NewNullBool(b bool, valid bool) NullBool {
+func MakeNullBool(b bool, valid bool) NullBool {
 	return NullBool{
 		NullBool: sql.NullBool{
 			Bool:  b,
@@ -23,14 +23,14 @@ func NewNullBool(b bool, valid bool) NullBool {
 }
 
 func NullBoolFrom(b bool) NullBool {
-	return NewNullBool(b, true)
+	return MakeNullBool(b, true)
 }
 
 func NullBoolFromPtr(b *bool) NullBool {
 	if b == nil {
-		return NewNullBool(false, false)
+		return MakeNullBool(false, false)
 	}
-	return NewNullBool(*b, true)
+	return MakeNullBool(*b, true)
 }
 
 func (b *NullBool) UnmarshalJSON(data []byte) error {

@@ -45,90 +45,90 @@ func (e PassResCateInfo) InitData(db_session *xorm.Session) {
 	pass_res_cate := new(PassResCateInfo)
 	pass_res_cate.Id = PASS_RES_CATE_AUTH
 	pass_res_cate.Name = "权限管理"
-	pass_res_cate.Desc = core.NewNullString("权限管理", true)
+	pass_res_cate.Desc = core.MakeNullString("权限管理", true)
 	db_session.Insert(pass_res_cate)
 
 	pass_res_cate = new(PassResCateInfo)
 	pass_res_cate.Id = PASS_RES_CATE_CGGL
 	pass_res_cate.Name = "采购管理"
-	pass_res_cate.Desc = core.NewNullString("采购管理", true)
+	pass_res_cate.Desc = core.MakeNullString("采购管理", true)
 	db_session.Insert(pass_res_cate)
 
 	pass_res_cate = new(PassResCateInfo)
 	pass_res_cate.Id = PASS_RES_CATE_DBGL
 	pass_res_cate.Name = "调拨管理"
-	pass_res_cate.Desc = core.NewNullString("调拨管理", true)
+	pass_res_cate.Desc = core.MakeNullString("调拨管理", true)
 	db_session.Insert(pass_res_cate)
 
 	pass_res_cate = new(PassResCateInfo)
 	pass_res_cate.Id = PASS_RES_CATE_DDBB
 	pass_res_cate.Name = "订单报表"
-	pass_res_cate.Desc = core.NewNullString("订单报表", true)
+	pass_res_cate.Desc = core.MakeNullString("订单报表", true)
 	db_session.Insert(pass_res_cate)
 
 	pass_res_cate = new(PassResCateInfo)
 	pass_res_cate.Id = PASS_RES_CATE_DDLC
 	pass_res_cate.Name = "订单流程"
-	pass_res_cate.Desc = core.NewNullString("订单流程", true)
+	pass_res_cate.Desc = core.MakeNullString("订单流程", true)
 	db_session.Insert(pass_res_cate)
 
 	pass_res_cate = new(PassResCateInfo)
 	pass_res_cate.Id = PASS_RES_CATE_DDPZ
 	pass_res_cate.Name = "订单配置"
-	pass_res_cate.Desc = core.NewNullString("订单配置", true)
+	pass_res_cate.Desc = core.MakeNullString("订单配置", true)
 	db_session.Insert(pass_res_cate)
 
 	pass_res_cate = new(PassResCateInfo)
 	pass_res_cate.Id = PASS_RES_CATE_KCGL
 	pass_res_cate.Name = "库存管理"
-	pass_res_cate.Desc = core.NewNullString("库存管理", true)
+	pass_res_cate.Desc = core.MakeNullString("库存管理", true)
 	db_session.Insert(pass_res_cate)
 
 	pass_res_cate = new(PassResCateInfo)
 	pass_res_cate.Id = PASS_RES_CATE_PPGL
 	pass_res_cate.Name = "PayPal管理"
-	pass_res_cate.Desc = core.NewNullString("PayPal管理", true)
+	pass_res_cate.Desc = core.MakeNullString("PayPal管理", true)
 	db_session.Insert(pass_res_cate)
 
 	pass_res_cate = new(PassResCateInfo)
 	pass_res_cate.Id = PASS_RES_CATE_SPBB
 	pass_res_cate.Name = "商品报表"
-	pass_res_cate.Desc = core.NewNullString("商品报表", true)
+	pass_res_cate.Desc = core.MakeNullString("商品报表", true)
 	db_session.Insert(pass_res_cate)
 
 	pass_res_cate = new(PassResCateInfo)
 	pass_res_cate.Id = PASS_RES_CATE_SPPZ
 	pass_res_cate.Name = "商品配置"
-	pass_res_cate.Desc = core.NewNullString("商品配置", true)
+	pass_res_cate.Desc = core.MakeNullString("商品配置", true)
 	db_session.Insert(pass_res_cate)
 
 	pass_res_cate = new(PassResCateInfo)
 	pass_res_cate.Id = PASS_RES_CATE_THGL
 	pass_res_cate.Name = "退货管理"
-	pass_res_cate.Desc = core.NewNullString("退货管理", true)
+	pass_res_cate.Desc = core.MakeNullString("退货管理", true)
 	db_session.Insert(pass_res_cate)
 
 	pass_res_cate = new(PassResCateInfo)
 	pass_res_cate.Id = PASS_RES_CATE_XSBB
 	pass_res_cate.Name = "销售报表"
-	pass_res_cate.Desc = core.NewNullString("销售报表", true)
+	pass_res_cate.Desc = core.MakeNullString("销售报表", true)
 	db_session.Insert(pass_res_cate)
 
 	pass_res_cate = new(PassResCateInfo)
 	pass_res_cate.Id = PASS_RES_CATE_XSGL
 	pass_res_cate.Name = "销售管理"
-	pass_res_cate.Desc = core.NewNullString("销售管理", true)
+	pass_res_cate.Desc = core.MakeNullString("销售管理", true)
 	db_session.Insert(pass_res_cate)
 
 	pass_res_cate = new(PassResCateInfo)
 	pass_res_cate.Id = PASS_RES_CATE_XXGL
 	pass_res_cate.Name = "消息管理"
-	pass_res_cate.Desc = core.NewNullString("消息管理", true)
+	pass_res_cate.Desc = core.MakeNullString("消息管理", true)
 	db_session.Insert(pass_res_cate)
 
 	pass_res_cate = new(PassResCateInfo)
 	pass_res_cate.Id = PASS_RES_CATE_XTPZ
 	pass_res_cate.Name = "系统配置"
-	pass_res_cate.Desc = core.NewNullString("系统配置", true)
+	pass_res_cate.Desc = core.MakeNullString("系统配置", true)
 	db_session.Insert(pass_res_cate)
 }

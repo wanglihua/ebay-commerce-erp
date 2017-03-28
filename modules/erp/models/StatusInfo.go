@@ -200,14 +200,14 @@ func (e StatusInfo) InitData(db_session *xorm.Session) {
 		status.Id = STOCK_STATUS_ENABLED
 		status.Type = STATUS_TYPE_STOCK
 		status.Name = "正常"
-		status.Desc = core.NewNullString("仓库状态 正常", true)
+		status.Desc = core.MakeNullString("仓库状态 正常", true)
 		db_session.Insert(status)
 
 		status = new(StatusInfo)
 		status.Id = STOCK_STATUS_DISABLED
 		status.Type = STATUS_TYPE_STOCK
 		status.Name = "停用"
-		status.Desc = core.NewNullString("仓库状态 停用", true)
+		status.Desc = core.MakeNullString("仓库状态 停用", true)
 		db_session.Insert(status)
 	}
 
@@ -217,14 +217,14 @@ func (e StatusInfo) InitData(db_session *xorm.Session) {
 		status.Id = EXCHANGE_RATE_STATUS_ENABLED
 		status.Type = STATUS_TYPE_EXCHANGE_RATE
 		status.Name = "正常"
-		status.Desc = core.NewNullString("货币汇率状态 正常", true)
+		status.Desc = core.MakeNullString("货币汇率状态 正常", true)
 		db_session.Insert(status)
 
 		status = new(StatusInfo)
 		status.Id = EXCHANGE_RATE_STATUS_DISABLED
 		status.Type = STATUS_TYPE_EXCHANGE_RATE
 		status.Name = "停用"
-		status.Desc = core.NewNullString("货币汇率状态 停用", true)
+		status.Desc = core.MakeNullString("货币汇率状态 停用", true)
 		db_session.Insert(status)
 	}
 
@@ -234,14 +234,14 @@ func (e StatusInfo) InitData(db_session *xorm.Session) {
 		status.Id = PRODUCT_CATE_STATUS_ENABLED
 		status.Type = STATUS_TYPE_PRODUCT_CATE
 		status.Name = "正常"
-		status.Desc = core.NewNullString("商品目录状态 正常", true)
+		status.Desc = core.MakeNullString("商品目录状态 正常", true)
 		db_session.Insert(status)
 
 		status = new(StatusInfo)
 		status.Id = PRODUCT_CATE_STATUS_DISABLED
 		status.Type = STATUS_TYPE_PRODUCT_CATE
 		status.Name = "停用"
-		status.Desc = core.NewNullString("商品目录状态 停用", true)
+		status.Desc = core.MakeNullString("商品目录状态 停用", true)
 		db_session.Insert(status)
 	}
 
@@ -252,49 +252,49 @@ func (e StatusInfo) InitData(db_session *xorm.Session) {
 		status.Id = PRODUCT_STATUS_ZDWH
 		status.Type = STATUS_TYPE_PRODUCT
 		status.Name = "重点维护"
-		status.Desc = core.NewNullString("商品状态 重点维护", true)
+		status.Desc = core.MakeNullString("商品状态 重点维护", true)
 		db_session.Insert(status)
 
 		status = new(StatusInfo)
 		status.Id = PRODUCT_STATUS_DKF
 		status.Type = STATUS_TYPE_PRODUCT
 		status.Name = "待开发"
-		status.Desc = core.NewNullString("商品状态 待开发", true)
+		status.Desc = core.MakeNullString("商品状态 待开发", true)
 		db_session.Insert(status)
 
 		status = new(StatusInfo)
 		status.Id = PRODUCT_STATUS_ZC
 		status.Type = STATUS_TYPE_PRODUCT
 		status.Name = "正常"
-		status.Desc = core.NewNullString("商品状态 正常", true)
+		status.Desc = core.MakeNullString("商品状态 正常", true)
 		db_session.Insert(status)
 
 		status = new(StatusInfo)
 		status.Id = PRODUCT_STATUS_QC
 		status.Type = STATUS_TYPE_PRODUCT
 		status.Name = "清仓"
-		status.Desc = core.NewNullString("商品状态 清仓", true)
+		status.Desc = core.MakeNullString("商品状态 清仓", true)
 		db_session.Insert(status)
 
 		status = new(StatusInfo)
 		status.Id = PRODUCT_STATUS_TC
 		status.Type = STATUS_TYPE_PRODUCT
 		status.Name = "停产"
-		status.Desc = core.NewNullString("商品状态 停产", true)
+		status.Desc = core.MakeNullString("商品状态 停产", true)
 		db_session.Insert(status)
 
 		status = new(StatusInfo)
 		status.Id = PRODUCT_STATUS_ZDCJ
 		status.Type = STATUS_TYPE_PRODUCT
 		status.Name = "自动创建"
-		status.Desc = core.NewNullString("商品状态 自动创建", true)
+		status.Desc = core.MakeNullString("商品状态 自动创建", true)
 		db_session.Insert(status)
 
 		status = new(StatusInfo)
 		status.Id = PRODUCT_STATUS_ZTXC
 		status.Type = STATUS_TYPE_PRODUCT
 		status.Name = "暂停销售"
-		status.Desc = core.NewNullString("商品状态 暂停销售", true)
+		status.Desc = core.MakeNullString("商品状态 暂停销售", true)
 		db_session.Insert(status)
 	}
 
@@ -304,14 +304,14 @@ func (e StatusInfo) InitData(db_session *xorm.Session) {
 		status.Id = SHOP_ACCOUNT_STATUS_ENABLED
 		status.Type = STATUS_TYPE_SHOP_ACCOUNT
 		status.Name = "正常"
-		status.Desc = core.NewNullString("店铺账号状态 正常", true)
+		status.Desc = core.MakeNullString("店铺账号状态 正常", true)
 		db_session.Insert(status)
 
 		status = new(StatusInfo)
 		status.Id = SHOP_ACCOUNT_STATUS_DISABLED
 		status.Type = STATUS_TYPE_SHOP_ACCOUNT
 		status.Name = "停用"
-		status.Desc = core.NewNullString("店铺账号状态 停用", true)
+		status.Desc = core.MakeNullString("店铺账号状态 停用", true)
 		db_session.Insert(status)
 	}
 
@@ -322,14 +322,14 @@ func (e StatusInfo) InitData(db_session *xorm.Session) {
 		status.Id = PAYPAL_ACCOUNT_STATUS_ENABLED
 		status.Type = STATUS_TYPE_PAYPAL_ACCOUNT
 		status.Name = "正常"
-		status.Desc = core.NewNullString("Paypal账号状态 正常", true)
+		status.Desc = core.MakeNullString("Paypal账号状态 正常", true)
 		db_session.Insert(status)
 
 		status = new(StatusInfo)
 		status.Id = PAYPAL_ACCOUNT_STATUS_DISABLED
 		status.Type = STATUS_TYPE_PAYPAL_ACCOUNT
 		status.Name = "停用"
-		status.Desc = core.NewNullString("Paypal账号状态 停用", true)
+		status.Desc = core.MakeNullString("Paypal账号状态 停用", true)
 		db_session.Insert(status)
 	}
 
@@ -339,14 +339,14 @@ func (e StatusInfo) InitData(db_session *xorm.Session) {
 		status.Id = PACKAGE_MTRL_STATUS_ENABLED
 		status.Type = STATUS_TYPE_PACKAGE_MTRL
 		status.Name = "正常"
-		status.Desc = core.NewNullString("包材状态 正常", true)
+		status.Desc = core.MakeNullString("包材状态 正常", true)
 		db_session.Insert(status)
 
 		status = new(StatusInfo)
 		status.Id = PACKAGE_MTRL_STATUS_DISABLED
 		status.Type = STATUS_TYPE_PACKAGE_MTRL
 		status.Name = "停用"
-		status.Desc = core.NewNullString("包材状态 停用", true)
+		status.Desc = core.MakeNullString("包材状态 停用", true)
 		db_session.Insert(status)
 	}
 
@@ -356,28 +356,28 @@ func (e StatusInfo) InitData(db_session *xorm.Session) {
 		status.Id = INVENTORY_CHECK_STATUS_YCJ
 		status.Type = STATUS_TYPE_INVENTORY_CHECK
 		status.Name = "已创建"
-		status.Desc = core.NewNullString("盘点单状态 已创建", true)
+		status.Desc = core.MakeNullString("盘点单状态 已创建", true)
 		db_session.Insert(status)
 
 		status = new(StatusInfo)
 		status.Id = INVENTORY_CHECK_STATUS_WTG
 		status.Type = STATUS_TYPE_INVENTORY_CHECK
 		status.Name = "未通过"
-		status.Desc = core.NewNullString("盘点单状态 未通过", true)
+		status.Desc = core.MakeNullString("盘点单状态 未通过", true)
 		db_session.Insert(status)
 
 		status = new(StatusInfo)
 		status.Id = INVENTORY_CHECK_STATUS_SPZ
 		status.Type = STATUS_TYPE_INVENTORY_CHECK
 		status.Name = "审核中"
-		status.Desc = core.NewNullString("盘点单状态 审核中", true)
+		status.Desc = core.MakeNullString("盘点单状态 审核中", true)
 		db_session.Insert(status)
 
 		status = new(StatusInfo)
 		status.Id = INVENTORY_CHECK_STATUS_YWC
 		status.Type = STATUS_TYPE_INVENTORY_CHECK
 		status.Name = "已完成"
-		status.Desc = core.NewNullString("盘点单状态 已完成", true)
+		status.Desc = core.MakeNullString("盘点单状态 已完成", true)
 		db_session.Insert(status)
 
 		// Paypal对账结果
@@ -385,14 +385,14 @@ func (e StatusInfo) InitData(db_session *xorm.Session) {
 		status.Id = PAYPAL_RECON_STATUS_SUCCESS
 		status.Type = STATUS_TYPE_PAYPAL_RECON
 		status.Name = "匹配成功"
-		status.Desc = core.NewNullString("Paypal对账结果 匹配成功", true)
+		status.Desc = core.MakeNullString("Paypal对账结果 匹配成功", true)
 		db_session.Insert(status)
 
 		status = new(StatusInfo)
 		status.Id = PAYPAL_RECON_STATUS_FAILED
 		status.Type = STATUS_TYPE_PAYPAL_RECON
 		status.Name = "匹配失败"
-		status.Desc = core.NewNullString("Paypal对账结果 匹配失败", true)
+		status.Desc = core.MakeNullString("Paypal对账结果 匹配失败", true)
 		db_session.Insert(status)
 	}
 
@@ -402,14 +402,14 @@ func (e StatusInfo) InitData(db_session *xorm.Session) {
 		status.Id = ORDER_CUSTOM_TYPE_STATUS_ENABLED
 		status.Type = STATUS_TYPE_ORDER_CUSTOM_TYPE
 		status.Name = "正常"
-		status.Desc = core.NewNullString("订单自定义类型 正常", true)
+		status.Desc = core.MakeNullString("订单自定义类型 正常", true)
 		db_session.Insert(status)
 
 		status = new(StatusInfo)
 		status.Id = ORDER_CUSTOM_TYPE_STATUS_DISABLED
 		status.Type = STATUS_TYPE_ORDER_CUSTOM_TYPE
 		status.Name = "停用"
-		status.Desc = core.NewNullString("订单自定义类型 停用", true)
+		status.Desc = core.MakeNullString("订单自定义类型 停用", true)
 		db_session.Insert(status)
 
 		//规则订单运单号状态
@@ -417,14 +417,14 @@ func (e StatusInfo) InitData(db_session *xorm.Session) {
 		status.Id = LOGISTICS_NUMBER_BATCH_STATUS_ENABLED
 		status.Type = STATUS_TYPE_LOGISTICS_NUMBER_BATCH
 		status.Name = "正常"
-		status.Desc = core.NewNullString("订单运单号 正常", true)
+		status.Desc = core.MakeNullString("订单运单号 正常", true)
 		db_session.Insert(status)
 
 		status = new(StatusInfo)
 		status.Id = LOGISTICS_NUMBER_BATCH_STATUS_DISABLED
 		status.Type = STATUS_TYPE_LOGISTICS_NUMBER_BATCH
 		status.Name = "停用"
-		status.Desc = core.NewNullString("订单运单号 停用", true)
+		status.Desc = core.MakeNullString("订单运单号 停用", true)
 		db_session.Insert(status)
 	}
 
@@ -434,14 +434,14 @@ func (e StatusInfo) InitData(db_session *xorm.Session) {
 		status.Id = LOGISTICS_NUMBER_STATUS_NOT_USED
 		status.Type = STATUS_TYPE_LOGISTICS_NUMBER
 		status.Name = "未使用"
-		status.Desc = core.NewNullString("订单运单号 未使用", true)
+		status.Desc = core.MakeNullString("订单运单号 未使用", true)
 		db_session.Insert(status)
 
 		status = new(StatusInfo)
 		status.Id = LOGISTICS_NUMBER_STATUS_USED
 		status.Type = STATUS_TYPE_LOGISTICS_NUMBER
 		status.Name = "已使用"
-		status.Desc = core.NewNullString("订单运单号 已使用", true)
+		status.Desc = core.MakeNullString("订单运单号 已使用", true)
 		db_session.Insert(status)
 	}
 
@@ -451,14 +451,14 @@ func (e StatusInfo) InitData(db_session *xorm.Session) {
 		status.Id = PRODUCT_BIND_STATUS_NORMAL
 		status.Type = STATUS_TYPE_PRODUCT_BIND
 		status.Name = "正常"
-		status.Desc = core.NewNullString("绑定商品状态 正常", true)
+		status.Desc = core.MakeNullString("绑定商品状态 正常", true)
 		db_session.Insert(status)
 
 		status = new(StatusInfo)
 		status.Id = PRODUCT_BIND_STATUS_STOPPED
 		status.Type = STATUS_TYPE_PRODUCT_BIND
 		status.Name = "停产"
-		status.Desc = core.NewNullString("绑定商品状态 停产", true)
+		status.Desc = core.MakeNullString("绑定商品状态 停产", true)
 		db_session.Insert(status)
 	}
 
@@ -468,14 +468,14 @@ func (e StatusInfo) InitData(db_session *xorm.Session) {
 		status.Id = STOCK_BILL_CHECKIN_STATUS_SAVE
 		status.Type = STATUS_TYPE_STOCK_BILL_CHECKIN
 		status.Name = "临时保存"
-		status.Desc = core.NewNullString("入库单状态 临时保存", true)
+		status.Desc = core.MakeNullString("入库单状态 临时保存", true)
 		db_session.Insert(status)
 
 		status = new(StatusInfo)
 		status.Id = STOCK_BILL_CHECKIN_STATUS_SUBMIT
 		status.Type = STATUS_TYPE_STOCK_BILL_CHECKIN
 		status.Name = "已提交入库"
-		status.Desc = core.NewNullString("入库单状态 已提交入库", true)
+		status.Desc = core.MakeNullString("入库单状态 已提交入库", true)
 		db_session.Insert(status)
 	}
 
@@ -485,14 +485,14 @@ func (e StatusInfo) InitData(db_session *xorm.Session) {
 		status.Id = STOCK_BILL_CHECKOUT_STATUS_SAVE
 		status.Type = STATUS_TYPE_STOCK_BILL_CHECKOUT
 		status.Name = "临时保存"
-		status.Desc = core.NewNullString("出库单状态 临时保存", true)
+		status.Desc = core.MakeNullString("出库单状态 临时保存", true)
 		db_session.Insert(status)
 
 		status = new(StatusInfo)
 		status.Id = STOCK_BILL_CHECKOUT_STATUS_SUBMIT
 		status.Type = STATUS_TYPE_STOCK_BILL_CHECKOUT
 		status.Name = "已提交出库"
-		status.Desc = core.NewNullString("出库单状态 已提交出库", true)
+		status.Desc = core.MakeNullString("出库单状态 已提交出库", true)
 		db_session.Insert(status)
 	}
 
@@ -502,14 +502,14 @@ func (e StatusInfo) InitData(db_session *xorm.Session) {
 		status.Id = STOCK_BILL_TRANSFER_STATUS_SAVE
 		status.Type = STATUS_TYPE_STOCK_BILL_TRANSFER
 		status.Name = "临时保存"
-		status.Desc = core.NewNullString("调拨单状态 临时保存", true)
+		status.Desc = core.MakeNullString("调拨单状态 临时保存", true)
 		db_session.Insert(status)
 
 		status = new(StatusInfo)
 		status.Id = STOCK_BILL_TRANSFER_STATUS_SUBMIT
 		status.Type = STATUS_TYPE_STOCK_BILL_TRANSFER
 		status.Name = "已提交调拨"
-		status.Desc = core.NewNullString("调拨单状态 已提交调拨", true)
+		status.Desc = core.MakeNullString("调拨单状态 已提交调拨", true)
 		db_session.Insert(status)
 	}
 
@@ -519,42 +519,42 @@ func (e StatusInfo) InitData(db_session *xorm.Session) {
 		status.Id = ORDER_STATUS_YCJ
 		status.Type = STATUS_TYPE_ORDER
 		status.Name = "已创建"
-		status.Desc = core.NewNullString("订单状态 已创建", true)
+		status.Desc = core.MakeNullString("订单状态 已创建", true)
 		db_session.Insert(status)
 
 		status = new(StatusInfo)
 		status.Id = ORDER_STATUS_YZF
 		status.Type = STATUS_TYPE_ORDER
 		status.Name = "已支付"
-		status.Desc = core.NewNullString("订单状态 已支付", true)
+		status.Desc = core.MakeNullString("订单状态 已支付", true)
 		db_session.Insert(status)
 
 		status = new(StatusInfo)
 		status.Id = ORDER_STATUS_DPH
 		status.Type = STATUS_TYPE_ORDER
 		status.Name = "待配货"
-		status.Desc = core.NewNullString("订单状态 待配货", true)
+		status.Desc = core.MakeNullString("订单状态 待配货", true)
 		db_session.Insert(status)
 
 		status = new(StatusInfo)
 		status.Id = ORDER_STATUS_PHZ
 		status.Type = STATUS_TYPE_ORDER
 		status.Name = "配货中"
-		status.Desc = core.NewNullString("订单状态 配货中", true)
+		status.Desc = core.MakeNullString("订单状态 配货中", true)
 		db_session.Insert(status)
 
 		status = new(StatusInfo)
 		status.Id = ORDER_STATUS_YFH
 		status.Type = STATUS_TYPE_ORDER
 		status.Name = "已发货"
-		status.Desc = core.NewNullString("订单状态 已发货", true)
+		status.Desc = core.MakeNullString("订单状态 已发货", true)
 		db_session.Insert(status)
 
 		status = new(StatusInfo)
 		status.Id = ORDER_STATUS_YWC
 		status.Type = STATUS_TYPE_ORDER
 		status.Name = "已完成"
-		status.Desc = core.NewNullString("订单状态 已完成", true)
+		status.Desc = core.MakeNullString("订单状态 已完成", true)
 		db_session.Insert(status)
 	}
 
@@ -564,28 +564,28 @@ func (e StatusInfo) InitData(db_session *xorm.Session) {
 		status.Id = PURCHASE_BILL_STATUS_YCJ
 		status.Type = STATUS_TYPE_PURCHASE_BILL
 		status.Name = "已创建"
-		status.Desc = core.NewNullString("采购单状态 已创建", true)
+		status.Desc = core.MakeNullString("采购单状态 已创建", true)
 		db_session.Insert(status)
 
 		status = new(StatusInfo)
 		status.Id = PURCHASE_BILL_STATUS_YXD
 		status.Type = STATUS_TYPE_PURCHASE_BILL
 		status.Name = "已下单"
-		status.Desc = core.NewNullString("采购单状态 已下单", true)
+		status.Desc = core.MakeNullString("采购单状态 已下单", true)
 		db_session.Insert(status)
 
 		status = new(StatusInfo)
 		status.Id = PURCHASE_BILL_STATUS_CGZ
 		status.Type = STATUS_TYPE_PURCHASE_BILL
 		status.Name = "采购中"
-		status.Desc = core.NewNullString("采购单状态 采购中", true)
+		status.Desc = core.MakeNullString("采购单状态 采购中", true)
 		db_session.Insert(status)
 
 		status = new(StatusInfo)
 		status.Id = PURCHASE_BILL_STATUS_YRK
 		status.Type = STATUS_TYPE_PURCHASE_BILL
 		status.Name = "已入库"
-		status.Desc = core.NewNullString("采购单状态 已入库", true)
+		status.Desc = core.MakeNullString("采购单状态 已入库", true)
 		db_session.Insert(status)
 	}
 
@@ -595,14 +595,14 @@ func (e StatusInfo) InitData(db_session *xorm.Session) {
 		status.Id = MESSAGE_STATUS_ANSWERED
 		status.Type = STATUS_TYPE_MESSAGE
 		status.Name = "已回复"
-		status.Desc = core.NewNullString("消息状态 已回复", true)
+		status.Desc = core.MakeNullString("消息状态 已回复", true)
 		db_session.Insert(status)
 
 		status = new(StatusInfo)
 		status.Id = MESSAGE_STATUS_UNANSWERED
 		status.Type = STATUS_TYPE_MESSAGE
 		status.Name = "未回复"
-		status.Desc = core.NewNullString("消息状态 未回复", true)
+		status.Desc = core.MakeNullString("消息状态 未回复", true)
 		db_session.Insert(status)
 	}
 }

@@ -59,7 +59,7 @@ func (t NullDate) Value() (driver.Value, error) {
 	return t.Time, nil
 }
 
-func NewNullDate(t time.Time, valid bool) NullDate {
+func MakeNullDate(t time.Time, valid bool) NullDate {
 	return NullDate{
 		Time:  t,
 		Valid: valid,
@@ -67,14 +67,14 @@ func NewNullDate(t time.Time, valid bool) NullDate {
 }
 
 func NullDateFrom(t time.Time) NullDate {
-	return NewNullDate(t, true)
+	return MakeNullDate(t, true)
 }
 
 func NullDateFromPtr(t *time.Time) NullDate {
 	if t == nil {
-		return NewNullDate(time.Time{}, false)
+		return MakeNullDate(time.Time{}, false)
 	}
-	return NewNullDate(*t, true)
+	return MakeNullDate(*t, true)
 }
 
 func (t NullDate) MarshalJSON() ([]byte, error) {
@@ -197,7 +197,7 @@ func (t NullTime) Value() (driver.Value, error) {
 	return t.Time, nil
 }
 
-func NewNullTime(t time.Time, valid bool) NullTime {
+func MakeNullTime(t time.Time, valid bool) NullTime {
 	return NullTime{
 		Time:  t,
 		Valid: valid,
@@ -205,14 +205,14 @@ func NewNullTime(t time.Time, valid bool) NullTime {
 }
 
 func NullTimeFrom(t time.Time) NullTime {
-	return NewNullTime(t, true)
+	return MakeNullTime(t, true)
 }
 
 func NullTimeFromPtr(t *time.Time) NullTime {
 	if t == nil {
-		return NewNullTime(time.Time{}, false)
+		return MakeNullTime(time.Time{}, false)
 	}
-	return NewNullTime(*t, true)
+	return MakeNullTime(*t, true)
 }
 
 func (t NullTime) MarshalJSON() ([]byte, error) {
@@ -335,7 +335,7 @@ func (t NullLongTime) Value() (driver.Value, error) {
 	return t.Time, nil
 }
 
-func NewNullLongTime(t time.Time, valid bool) NullLongTime {
+func MakeNullLongTime(t time.Time, valid bool) NullLongTime {
 	return NullLongTime{
 		Time:  t,
 		Valid: valid,
@@ -343,14 +343,14 @@ func NewNullLongTime(t time.Time, valid bool) NullLongTime {
 }
 
 func NullLongTimeFrom(t time.Time) NullLongTime {
-	return NewNullLongTime(t, true)
+	return MakeNullLongTime(t, true)
 }
 
 func NullLongTimeFromPtr(t *time.Time) NullLongTime {
 	if t == nil {
-		return NewNullLongTime(time.Time{}, false)
+		return MakeNullLongTime(time.Time{}, false)
 	}
-	return NewNullLongTime(*t, true)
+	return MakeNullLongTime(*t, true)
 }
 
 func (t NullLongTime) MarshalJSON() ([]byte, error) {

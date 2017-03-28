@@ -84,11 +84,11 @@ var (
 	NullDateBinder = revel.Binder{
 		Bind: revel.ValueBinder(func(val string, typ reflect.Type) reflect.Value {
 			if strings.TrimSpace(val) == "" {
-				return reflect.ValueOf(NewNullDate(time.Time{}, false))
+				return reflect.ValueOf(MakeNullDate(time.Time{}, false))
 			}
 			r, err := time.ParseInLocation("2006-01-02", val, time.Local)
 			if err == nil {
-				return reflect.ValueOf(NewNullDate(r, true))
+				return reflect.ValueOf(MakeNullDate(r, true))
 			}
 			parseError := errors.New(val + "不是有效的日期格式！")
 			HandleError(parseError)
@@ -107,15 +107,15 @@ var (
 	NullTimeBinder = revel.Binder{
 		Bind: revel.ValueBinder(func(val string, typ reflect.Type) reflect.Value {
 			if strings.TrimSpace(val) == "" {
-				return reflect.ValueOf(NewNullTime(time.Time{}, false))
+				return reflect.ValueOf(MakeNullTime(time.Time{}, false))
 			}
 			r, err := time.ParseInLocation("2006-01-02 15:04", val, time.Local)
 			if err == nil {
-				return reflect.ValueOf(NewNullTime(r, true))
+				return reflect.ValueOf(MakeNullTime(r, true))
 			}
 			r, err = time.ParseInLocation("2006-01-02", val, time.Local)
 			if err == nil {
-				return reflect.ValueOf(NewNullTime(r, true))
+				return reflect.ValueOf(MakeNullTime(r, true))
 			}
 			parseError := errors.New(val + "不是有效的时间格式！")
 			HandleError(parseError)
@@ -134,19 +134,19 @@ var (
 	NullLongTimeBinder = revel.Binder{
 		Bind: revel.ValueBinder(func(val string, typ reflect.Type) reflect.Value {
 			if strings.TrimSpace(val) == "" {
-				return reflect.ValueOf(NewNullLongTime(time.Time{}, false))
+				return reflect.ValueOf(MakeNullLongTime(time.Time{}, false))
 			}
 			r, err := time.ParseInLocation("2006-01-02 15:04:05", val, time.Local)
 			if err == nil {
-				return reflect.ValueOf(NewNullLongTime(r, true))
+				return reflect.ValueOf(MakeNullLongTime(r, true))
 			}
 			r, err = time.ParseInLocation("2006-01-02 15:04", val, time.Local)
 			if err == nil {
-				return reflect.ValueOf(NewNullLongTime(r, true))
+				return reflect.ValueOf(MakeNullLongTime(r, true))
 			}
 			r, err = time.ParseInLocation("2006-01-02", val, time.Local)
 			if err == nil {
-				return reflect.ValueOf(NewNullLongTime(r, true))
+				return reflect.ValueOf(MakeNullLongTime(r, true))
 			}
 			parseError := errors.New(val + "不是有效的时间格式！")
 			HandleError(parseError)
@@ -170,17 +170,17 @@ var (
 		Bind: revel.ValueBinder(func(val string, typ reflect.Type) reflect.Value {
 			v := strings.TrimSpace(strings.ToLower(val))
 			if v == "" {
-				return reflect.ValueOf(NewNullBool(false, false))
+				return reflect.ValueOf(MakeNullBool(false, false))
 			}
 			switch v {
 			case "true", "on", "1":
-				return reflect.ValueOf(NewNullBool(true, true))
+				return reflect.ValueOf(MakeNullBool(true, true))
 			case "false", "off", "0":
-				return reflect.ValueOf(NewNullBool(false, true))
+				return reflect.ValueOf(MakeNullBool(false, true))
 			}
 			parseError := errors.New(val + "不是有效的布尔值格式！")
 			HandleError(parseError)
-			return reflect.ValueOf(NewNullBool(false, false))
+			return reflect.ValueOf(MakeNullBool(false, false))
 		}),
 		Unbind: func(output map[string]string, name string, val interface{}) {
 			t := val.(NullBool)
@@ -195,14 +195,14 @@ var (
 	NullIntBinder = revel.Binder{
 		Bind: revel.ValueBinder(func(val string, typ reflect.Type) reflect.Value {
 			if strings.TrimSpace(val) == "" {
-				return reflect.ValueOf(NewNullInt(0, false))
+				return reflect.ValueOf(MakeNullInt(0, false))
 			}
 			intValue, err := strconv.ParseInt(val, 10, 64)
 			if err != nil {
 				HandleError(err)
-				return reflect.ValueOf(NewNullInt(0, false))
+				return reflect.ValueOf(MakeNullInt(0, false))
 			}
-			return reflect.ValueOf(NewNullInt(intValue, true))
+			return reflect.ValueOf(MakeNullInt(intValue, true))
 		}),
 		Unbind: func(output map[string]string, name string, val interface{}) {
 			t := val.(NullInt)
@@ -217,14 +217,14 @@ var (
 	NullFloatBinder = revel.Binder{
 		Bind: revel.ValueBinder(func(val string, typ reflect.Type) reflect.Value {
 			if strings.TrimSpace(val) == "" {
-				return reflect.ValueOf(NewNullFloat(0.0, false))
+				return reflect.ValueOf(MakeNullFloat(0.0, false))
 			}
 			floatValue, err := strconv.ParseFloat(val, 64)
 			if err != nil {
 				HandleError(err)
-				return reflect.ValueOf(NewNullFloat(0.0, false))
+				return reflect.ValueOf(MakeNullFloat(0.0, false))
 			}
-			return reflect.ValueOf(NewNullFloat(floatValue, true))
+			return reflect.ValueOf(MakeNullFloat(floatValue, true))
 		}),
 		Unbind: func(output map[string]string, name string, val interface{}) {
 			t := val.(NullFloat)
@@ -239,9 +239,9 @@ var (
 	NullStringBinder = revel.Binder{
 		Bind: revel.ValueBinder(func(val string, typ reflect.Type) reflect.Value {
 			if strings.TrimSpace(val) == "" {
-				return reflect.ValueOf(NewNullString("", false))
+				return reflect.ValueOf(MakeNullString("", false))
 			}
-			return reflect.ValueOf(NewNullString(val, true))
+			return reflect.ValueOf(MakeNullString(val, true))
 		}),
 		Unbind: func(output map[string]string, name string, val interface{}) {
 			t := val.(NullString)

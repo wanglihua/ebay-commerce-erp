@@ -13,7 +13,7 @@ type NullFloat struct {
 	sql.NullFloat64
 }
 
-func NewNullFloat(f float64, valid bool) NullFloat {
+func MakeNullFloat(f float64, valid bool) NullFloat {
 	return NullFloat{
 		NullFloat64: sql.NullFloat64{
 			Float64: f,
@@ -23,14 +23,14 @@ func NewNullFloat(f float64, valid bool) NullFloat {
 }
 
 func NullFloatFrom(f float64) NullFloat {
-	return NewNullFloat(f, true)
+	return MakeNullFloat(f, true)
 }
 
 func NullFloatFromPtr(f *float64) NullFloat {
 	if f == nil {
-		return NewNullFloat(0, false)
+		return MakeNullFloat(0, false)
 	}
-	return NewNullFloat(*f, true)
+	return MakeNullFloat(*f, true)
 }
 
 func (f *NullFloat) UnmarshalJSON(data []byte) error {

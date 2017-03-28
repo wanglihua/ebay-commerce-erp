@@ -164,7 +164,7 @@ func (t EBayMessageDownloadTask) Run() {
 					// 转成北京时间
 					// modified_time = modified_time.Add(8 * time.Hour)
 					creation_date = creation_date.Local()
-					message_in_db.CreationDate = core.NewNullLongTime(creation_date, true)
+					message_in_db.CreationDate = core.MakeNullLongTime(creation_date, true)
 				}
 
 				if message_download.LastModifiedDate != "" {
@@ -174,7 +174,7 @@ func (t EBayMessageDownloadTask) Run() {
 					}
 					// 转成北京时间
 					last_modified_date = last_modified_date.Local()
-					message_in_db.LastModifiedDate = core.NewNullLongTime(last_modified_date, true)
+					message_in_db.LastModifiedDate = core.MakeNullLongTime(last_modified_date, true)
 				}
 
 				message_in_db.MessageStatus = message_download.MessageStatus // Answered Unanswered

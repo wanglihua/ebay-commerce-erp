@@ -31,20 +31,20 @@ func (e CurrencyInfo) InitData(db_session *xorm.Session) {
 	currency.Id = CURRENCY_RMB
 	currency.Code = "RMB"
 	currency.Name = "人民币"
-	currency.Desc = core.NewNullString("人民币", true)
+	currency.Desc = core.MakeNullString("人民币", true)
 	db_session.Insert(currency)
 
 	currency = new(CurrencyInfo)
 	currency.Id = CURRENCY_USD
 	currency.Code = "USD"
 	currency.Name = "美元"
-	currency.Desc = core.NewNullString("美元", true)
+	currency.Desc = core.MakeNullString("美元", true)
 	db_session.Insert(currency)
 
 	currency = new(CurrencyInfo)
 	currency.Id = CURRENCY_AUD
 	currency.Code = "AUD"
 	currency.Name = "澳元"
-	currency.Desc = core.NewNullString("澳元", true)
+	currency.Desc = core.MakeNullString("澳元", true)
 	db_session.Insert(currency)
 }

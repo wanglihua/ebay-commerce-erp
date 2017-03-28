@@ -54,25 +54,25 @@ func (e ProductImageTypeInfo) InitData(db_session *xorm.Session) {
 		product_image_type := new(ProductImageTypeInfo)
 		//product_image_type.Id = PRODUCT_IMAGE_TYPE_CCTP
 		product_image_type.Name = "橱窗图片"
-		product_image_type.Desc = core.NewNullString("橱窗图片 上传", true)
+		product_image_type.Desc = core.MakeNullString("橱窗图片 上传", true)
 		db_session.Insert(product_image_type)
 
 		product_image_type = new(ProductImageTypeInfo)
 		//product_image_type.Id = PRODUCT_IMAGE_TYPE_NRTP
 		product_image_type.Name = "内容图片"
-		product_image_type.Desc = core.NewNullString("内容图片 上传", true)
+		product_image_type.Desc = core.MakeNullString("内容图片 上传", true)
 		db_session.Insert(product_image_type)
 
 		product_image_type = new(ProductImageTypeInfo)
 		//product_image_type.Id = PRODUCT_IMAGE_TYPE_KCTP
 		product_image_type.Name = "库存图片"
-		product_image_type.Desc = core.NewNullString("库存图片", true)
+		product_image_type.Desc = core.MakeNullString("库存图片", true)
 		db_session.Insert(product_image_type)
 
 		product_image_type = new(ProductImageTypeInfo)
 		//product_image_type.Id = PRODUCT_IMAGE_TYPE_ZJTP
 		product_image_type.Name = "质检图片"
-		product_image_type.Desc = core.NewNullString("质检图片", true)
+		product_image_type.Desc = core.MakeNullString("质检图片", true)
 		db_session.Insert(product_image_type)
 	}
 }

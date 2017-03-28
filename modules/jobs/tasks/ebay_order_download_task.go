@@ -158,7 +158,7 @@ func (t EBayOrderDownloadTask) Run() {
 					// 转成北京时间
 					//created_time = created_time.Add(8 * time.Hour)
 					created_time = created_time.Local()
-					order_in_db.CreatedTime = core.NewNullLongTime(created_time, true)
+					order_in_db.CreatedTime = core.MakeNullLongTime(created_time, true)
 					update_col_list = append(update_col_list, "created_time")
 				}
 
@@ -170,7 +170,7 @@ func (t EBayOrderDownloadTask) Run() {
 					// 转成北京时间
 					// modified_time = modified_time.Add(8 * time.Hour)
 					modified_time = modified_time.Local()
-					order_in_db.ModifiedTime = core.NewNullLongTime(modified_time, true)
+					order_in_db.ModifiedTime = core.MakeNullLongTime(modified_time, true)
 					update_col_list = append(update_col_list, "modified_time")
 				}
 
@@ -182,7 +182,7 @@ func (t EBayOrderDownloadTask) Run() {
 					// 转成北京时间
 					// paid_time = paid_time.Add(8 * time.Hour)\
 					paid_time = paid_time.Local()
-					order_in_db.PaidTime = core.NewNullLongTime(paid_time, true)
+					order_in_db.PaidTime = core.MakeNullLongTime(paid_time, true)
 					update_col_list = append(update_col_list, "paid_time")
 				}
 
@@ -194,7 +194,7 @@ func (t EBayOrderDownloadTask) Run() {
 					// 转成北京时间
 					// shipped_time = shipped_time.Add(8 * time.Hour)
 					shipped_time = shipped_time.Local()
-					order_in_db.ShippedTime = core.NewNullLongTime(shipped_time, true)
+					order_in_db.ShippedTime = core.MakeNullLongTime(shipped_time, true)
 					update_col_list = append(update_col_list, "shipped_time")
 				}
 
@@ -326,7 +326,7 @@ func (t EBayOrderDownloadTask) Run() {
 
 					// 设置的账户里面和卖家账户匹配的，就设置成为Hold订单
 					if seller_email_in_list == false {
-						order_in_db.HoldTypeId = core.NewNullInt(models.ORDER_HOLD_TYPE_SELLER_PAYPAL_MISMATCH, true)
+						order_in_db.HoldTypeId = core.MakeNullInt(models.ORDER_HOLD_TYPE_SELLER_PAYPAL_MISMATCH, true)
 					}
 				}
 

@@ -43,24 +43,24 @@ func (e StockBillTypeInfo) InitData(db_session *xorm.Session) {
 	bill_type := new(StockBillTypeInfo)
 	bill_type.Id = STOCK_BILL_TYPE_MANUAL_CHECKIN
 	bill_type.Name = "手工入库单"
-	bill_type.Desc = core.NewNullString("手工入库单", true)
+	bill_type.Desc = core.MakeNullString("手工入库单", true)
 	db_session.Insert(bill_type)
 
 	bill_type = new(StockBillTypeInfo)
 	bill_type.Id = STOCK_BILL_TYPE_MANUAL_CHECKOUT
 	bill_type.Name = "手工出库单"
-	bill_type.Desc = core.NewNullString("手工出库单", true)
+	bill_type.Desc = core.MakeNullString("手工出库单", true)
 	db_session.Insert(bill_type)
 
 	bill_type = new(StockBillTypeInfo)
 	bill_type.Id = STOCK_BILL_TYPE_TRANSFER
 	bill_type.Name = "调拨单"
-	bill_type.Desc = core.NewNullString("调拨单", true)
+	bill_type.Desc = core.MakeNullString("调拨单", true)
 	db_session.Insert(bill_type)
 
 	bill_type = new(StockBillTypeInfo)
 	bill_type.Id = STOCK_BILL_TYPE_TRANSFER_ZT
 	bill_type.Name = "调拨单在途"
-	bill_type.Desc = core.NewNullString("调拨单 在途", true)
+	bill_type.Desc = core.MakeNullString("调拨单 在途", true)
 	db_session.Insert(bill_type)
 }

@@ -227,10 +227,10 @@ WHERE v.storage_loc_id = ? AND v.product_id = ?
 	var affected int64
 	if detail_form.IsCreate() {
 		if detail_form.Price.Valid == true && detail_form.Price.Float64 != 0 {
-			stock_bill_entry.Amount = core.NewNullFloat(detail_form.Price.Float64*float64(detail_form.Qty), true)
+			stock_bill_entry.Amount = core.MakeNullFloat(detail_form.Price.Float64*float64(detail_form.Qty), true)
 		} else {
-			stock_bill_entry.Price = core.NewNullFloat(0, false)
-			stock_bill_entry.Amount = core.NewNullFloat(0, false)
+			stock_bill_entry.Price = core.MakeNullFloat(0, false)
+			stock_bill_entry.Amount = core.MakeNullFloat(0, false)
 		}
 
 		//unique check

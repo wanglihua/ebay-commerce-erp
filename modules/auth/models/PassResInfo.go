@@ -72,14 +72,14 @@ func (e PassResInfo) InitData(db_session *xorm.Session) {
 		pass_res.Id = PASS_RES_AUTH_USER
 		pass_res.CateId = PASS_RES_CATE_AUTH
 		pass_res.Name = "用户管理"
-		pass_res.Desc = core.NewNullString("用户管理", true)
+		pass_res.Desc = core.MakeNullString("用户管理", true)
 		db_session.Insert(pass_res)
 
 		pass_res = new(PassResInfo)
 		pass_res.Id = PASS_RES_AUTH_ADMIN
 		pass_res.CateId = PASS_RES_CATE_AUTH
 		pass_res.Name = "管理员组"
-		pass_res.Desc = core.NewNullString("管理员组", true)
+		pass_res.Desc = core.MakeNullString("管理员组", true)
 		db_session.Insert(pass_res)
 	}
 
@@ -89,49 +89,49 @@ func (e PassResInfo) InitData(db_session *xorm.Session) {
 		pass_res.Id = PASS_RES_DDLC_ORDER_ALL
 		pass_res.CateId = PASS_RES_CATE_DDLC
 		pass_res.Name = "所有订单"
-		pass_res.Desc = core.NewNullString("所有订单", true)
+		pass_res.Desc = core.MakeNullString("所有订单", true)
 		db_session.Insert(pass_res)
 
 		pass_res = new(PassResInfo)
 		pass_res.Id = PASS_RES_DDLC_ORDER_YZF
 		pass_res.CateId = PASS_RES_CATE_DDLC
 		pass_res.Name = "已支付"
-		pass_res.Desc = core.NewNullString("已支付", true)
+		pass_res.Desc = core.MakeNullString("已支付", true)
 		db_session.Insert(pass_res)
 
 		pass_res = new(PassResInfo)
 		pass_res.Id = PASS_RES_DDLC_ORDER_DPH
 		pass_res.CateId = PASS_RES_CATE_DDLC
 		pass_res.Name = "待配货"
-		pass_res.Desc = core.NewNullString("待配货", true)
+		pass_res.Desc = core.MakeNullString("待配货", true)
 		db_session.Insert(pass_res)
 
 		pass_res = new(PassResInfo)
 		pass_res.Id = PASS_RES_DDLC_ORDER_PHZ
 		pass_res.CateId = PASS_RES_CATE_DDLC
 		pass_res.Name = "配货中"
-		pass_res.Desc = core.NewNullString("配货中", true)
+		pass_res.Desc = core.MakeNullString("配货中", true)
 		db_session.Insert(pass_res)
 
 		pass_res = new(PassResInfo)
 		pass_res.Id = PASS_RES_DDLC_ORDER_YFH
 		pass_res.CateId = PASS_RES_CATE_DDLC
 		pass_res.Name = "已发货"
-		pass_res.Desc = core.NewNullString("已发货", true)
+		pass_res.Desc = core.MakeNullString("已发货", true)
 		db_session.Insert(pass_res)
 
 		pass_res = new(PassResInfo)
 		pass_res.Id = PASS_RES_DDLC_ORDER_YWC
 		pass_res.CateId = PASS_RES_CATE_DDLC
 		pass_res.Name = "已完成"
-		pass_res.Desc = core.NewNullString("已完成", true)
+		pass_res.Desc = core.MakeNullString("已完成", true)
 		db_session.Insert(pass_res)
 
 		pass_res = new(PassResInfo)
 		pass_res.Id = PASS_RES_DDLC_ORDER_KHB
 		pass_res.CateId = PASS_RES_CATE_DDLC
 		pass_res.Name = "可合并的订单"
-		pass_res.Desc = core.NewNullString("可合并的订单", true)
+		pass_res.Desc = core.MakeNullString("可合并的订单", true)
 		db_session.Insert(pass_res)
 	}
 
@@ -141,28 +141,28 @@ func (e PassResInfo) InitData(db_session *xorm.Session) {
 		pass_res.Id = PASS_RES_DDPZ_LOGISTICS_MODE
 		pass_res.CateId = PASS_RES_CATE_DDPZ
 		pass_res.Name = "货运方式"
-		pass_res.Desc = core.NewNullString("货运方式", true)
+		pass_res.Desc = core.MakeNullString("货运方式", true)
 		db_session.Insert(pass_res)
 
 		pass_res = new(PassResInfo)
 		pass_res.Id = PASS_RES_DDPZ_PLATFORM_LOGISTICS_MODE
 		pass_res.CateId = PASS_RES_CATE_DDPZ
 		pass_res.Name = "电商平台物流方式"
-		pass_res.Desc = core.NewNullString("电商平台物流方式", true)
+		pass_res.Desc = core.MakeNullString("电商平台物流方式", true)
 		db_session.Insert(pass_res)
 
 		pass_res = new(PassResInfo)
 		pass_res.Id = PASS_RES_DDPZ_ORDER_CUSTOM_TYPE
 		pass_res.CateId = PASS_RES_CATE_DDPZ
 		pass_res.Name = "订单自定义类型"
-		pass_res.Desc = core.NewNullString("订单自定义类型", true)
+		pass_res.Desc = core.MakeNullString("订单自定义类型", true)
 		db_session.Insert(pass_res)
 
 		pass_res = new(PassResInfo)
 		pass_res.Id = PASS_RES_DDPZ_ORDER_LOG
 		pass_res.CateId = PASS_RES_CATE_DDPZ
 		pass_res.Name = "订单修改日志"
-		pass_res.Desc = core.NewNullString("订单修改日志", true)
+		pass_res.Desc = core.MakeNullString("订单修改日志", true)
 		db_session.Insert(pass_res)
 	}
 
@@ -172,77 +172,77 @@ func (e PassResInfo) InitData(db_session *xorm.Session) {
 		pass_res.Id = PASS_RES_KCGL_PRODUCT
 		pass_res.CateId = PASS_RES_CATE_KCGL
 		pass_res.Name = "商品列表"
-		pass_res.Desc = core.NewNullString("商品列表", true)
+		pass_res.Desc = core.MakeNullString("商品列表", true)
 		db_session.Insert(pass_res)
 
 		pass_res = new(PassResInfo)
 		pass_res.Id = PASS_RES_KCGL_PRODUCT_BIND
 		pass_res.CateId = PASS_RES_CATE_KCGL
 		pass_res.Name = "绑定商品"
-		pass_res.Desc = core.NewNullString("绑定商品", true)
+		pass_res.Desc = core.MakeNullString("绑定商品", true)
 		db_session.Insert(pass_res)
 
 		pass_res = new(PassResInfo)
 		pass_res.Id = PASS_RES_KCGL_PRODUCT_IMPORT
 		pass_res.CateId = PASS_RES_CATE_KCGL
 		pass_res.Name = "商品导入"
-		pass_res.Desc = core.NewNullString("商品导入", true)
+		pass_res.Desc = core.MakeNullString("商品导入", true)
 		db_session.Insert(pass_res)
 
 		pass_res = new(PassResInfo)
 		pass_res.Id = PASS_RES_KCGL_PRODUCT_EXPORT
 		pass_res.CateId = PASS_RES_CATE_KCGL
 		pass_res.Name = "商品导出"
-		pass_res.Desc = core.NewNullString("商品导出", true)
+		pass_res.Desc = core.MakeNullString("商品导出", true)
 		db_session.Insert(pass_res)
 
 		pass_res = new(PassResInfo)
 		pass_res.Id = PASS_RES_KCGL_INVENTORY
 		pass_res.CateId = PASS_RES_CATE_KCGL
 		pass_res.Name = "商品库存"
-		pass_res.Desc = core.NewNullString("商品库存", true)
+		pass_res.Desc = core.MakeNullString("商品库存", true)
 		db_session.Insert(pass_res)
 
 		pass_res = new(PassResInfo)
 		pass_res.Id = PASS_RES_KCGL_INVENTORY_CHECK
 		pass_res.CateId = PASS_RES_CATE_KCGL
 		pass_res.Name = "库存盘点"
-		pass_res.Desc = core.NewNullString("库存盘点", true)
+		pass_res.Desc = core.MakeNullString("库存盘点", true)
 		db_session.Insert(pass_res)
 
 		pass_res = new(PassResInfo)
 		pass_res.Id = PASS_RES_KCGL_INVENTORY_CHECK_APPROVE
 		pass_res.CateId = PASS_RES_CATE_KCGL
 		pass_res.Name = "盘点审批"
-		pass_res.Desc = core.NewNullString("盘点审批", true)
+		pass_res.Desc = core.MakeNullString("盘点审批", true)
 		db_session.Insert(pass_res)
 
 		pass_res = new(PassResInfo)
 		pass_res.Id = PASS_RES_KCGL_STOCKBILL_TRANSFER
 		pass_res.CateId = PASS_RES_CATE_KCGL
 		pass_res.Name = "分仓调拨"
-		pass_res.Desc = core.NewNullString("分仓调拨", true)
+		pass_res.Desc = core.MakeNullString("分仓调拨", true)
 		db_session.Insert(pass_res)
 
 		pass_res = new(PassResInfo)
 		pass_res.Id = PASS_RES_KCGL_PRODUCT_QUALITY_FEEDBACK
 		pass_res.CateId = PASS_RES_CATE_KCGL
 		pass_res.Name = "商品质量反馈"
-		pass_res.Desc = core.NewNullString("商品质量反馈", true)
+		pass_res.Desc = core.MakeNullString("商品质量反馈", true)
 		db_session.Insert(pass_res)
 
 		pass_res = new(PassResInfo)
 		pass_res.Id = PASS_RES_KCGL_STOCKBILL_CHECKIN
 		pass_res.CateId = PASS_RES_CATE_KCGL
 		pass_res.Name = "手工入库"
-		pass_res.Desc = core.NewNullString("手工入库", true)
+		pass_res.Desc = core.MakeNullString("手工入库", true)
 		db_session.Insert(pass_res)
 
 		pass_res = new(PassResInfo)
 		pass_res.Id = PASS_RES_KCGL_STOCKBILL_CHECKOUT
 		pass_res.CateId = PASS_RES_CATE_KCGL
 		pass_res.Name = "手工出库"
-		pass_res.Desc = core.NewNullString("手工出库", true)
+		pass_res.Desc = core.MakeNullString("手工出库", true)
 		db_session.Insert(pass_res)
 	}
 }

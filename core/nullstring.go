@@ -12,17 +12,17 @@ type NullString struct {
 }
 
 func NullStringFrom(s string) NullString {
-	return NewNullString(s, true)
+	return MakeNullString(s, true)
 }
 
 func NullStringFromPtr(s *string) NullString {
 	if s == nil {
-		return NewNullString("", false)
+		return MakeNullString("", false)
 	}
-	return NewNullString(*s, true)
+	return MakeNullString(*s, true)
 }
 
-func NewNullString(s string, valid bool) NullString {
+func MakeNullString(s string, valid bool) NullString {
 	return NullString{
 		NullString: sql.NullString{
 			String: s,
