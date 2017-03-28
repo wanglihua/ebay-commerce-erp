@@ -23,10 +23,18 @@ func GetDdpzMenu(res_id_map map[int64]bool, db_session *xorm.Session, web_sessio
     <b class="arrow"></b>
     <ul class="submenu">
 
+        <li id="ddpz-logisticscompany-menu" class="">
+            <a href="/erp/logistics/company">
+                <i class="menu-icon fa fa-caret-right"></i>
+                物流公司
+            </a>
+            <b class="arrow"></b>
+        </li>
+
         <li id="ddpz-logisticsmode-menu" class="">
             <a href="/erp/logistics/mode">
                 <i class="menu-icon fa fa-caret-right"></i>
-                货运方式
+                物流方式
             </a>
             <b class="arrow"></b>
         </li>

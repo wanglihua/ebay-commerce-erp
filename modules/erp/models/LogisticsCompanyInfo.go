@@ -24,21 +24,31 @@ func (e LogisticsCompanyInfo) ModelDesc() string {
 
 func (e LogisticsCompanyInfo) InitData(db_session *xorm.Session) {
 
-	var logistics_company LogisticsCompanyInfo
+	{
+		var logistics_company LogisticsCompanyInfo
+		logistics_company.Name = "EP"
+		logistics_company.Desc = core.MakeNullString("EP", true)
+		db_session.Insert(&logistics_company)
+	}
 
-	logistics_company.Name = "EP"
-	logistics_company.Desc = core.MakeNullString("EP", true)
-	db_session.Insert(&logistics_company)
+	{
+		var logistics_company LogisticsCompanyInfo
+		logistics_company.Name = "HUNTER"
+		logistics_company.Desc = core.MakeNullString("HUNTER", true)
+		db_session.Insert(&logistics_company)
+	}
 
-	logistics_company.Name = "HUNTER"
-	logistics_company.Desc = core.MakeNullString("HUNTER", true)
-	db_session.Insert(&logistics_company)
+	{
+		var logistics_company LogisticsCompanyInfo
+		logistics_company.Name = "TOLL"
+		logistics_company.Desc = core.MakeNullString("TOLL", true)
+		db_session.Insert(&logistics_company)
+	}
 
-	logistics_company.Name = "TOLL"
-	logistics_company.Desc = core.MakeNullString("TOLL", true)
-	db_session.Insert(&logistics_company)
-
-	logistics_company.Name = "FASTWAY"
-	logistics_company.Desc = core.MakeNullString("FASTWAY", true)
-	db_session.Insert(&logistics_company)
+	{
+		var logistics_company LogisticsCompanyInfo
+		logistics_company.Name = "FASTWAY"
+		logistics_company.Desc = core.MakeNullString("FASTWAY", true)
+		db_session.Insert(&logistics_company)
+	}
 }
