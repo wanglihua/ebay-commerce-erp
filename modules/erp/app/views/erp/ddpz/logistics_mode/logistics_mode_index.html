@@ -27,13 +27,14 @@
                     </button>
                 </div>
                 <div>
+                    <div style="margin-top:10px;">双击列表项查看更多详细物流参数</div>
                     <table id="logisticsModeList" class="table table-striped table-bordered table-hover"></table>
                 </div>
             </div>
         </div>
     </div>
     <div class="modal fade" id="logisticsModeDetailDialog">
-        <div class="modal-dialog" style="width: 580px;">
+        <div class="modal-dialog" style="width: 760px;">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="True">&times;</button>
@@ -47,10 +48,23 @@
                                 <input id="logistics_mode_version" name="detail.logistics_mode.version" type="hidden" v-model.number="detail.logistics_mode.version"/>
 
                                 <div class="row">
-                                    <div class="col-xs-12">
+                                    <div class="col-xs-6">
                                         <div class="form-group">
-                                            <label for="name" class="col-xs-2 control-label">名称</label>
-                                            <div class="col-xs-10">
+                                            <label for="company_id" class="col-xs-6 control-label">物流公司</label>
+                                            <div class="col-xs-6">
+                                                <select id="company_id" name="detail.logistics_mode.company_id" class="input-sm form-control" v-model.number="detail.logistics_mode.company_id">
+                                                    <template v-for="company in detail.logistics_company_list">
+                                                        <option :value="company.id">{{company.name}}</option>
+                                                    </template>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="name" class="col-xs-6 control-label">物流方式名称</label>
+                                            <div class="col-xs-6">
                                                 <input id="name" name="detail.logistics_mode.name" type="text" class="input-sm form-control" v-model="detail.logistics_mode.name"/>
                                             </div>
                                         </div>
@@ -58,14 +72,91 @@
                                 </div>
 
                                 <div class="row">
-                                    <div class="col-xs-12">
+                                    <div class="col-xs-6">
                                         <div class="form-group">
-                                            <label for="ebay_mode_id" class="col-xs-2 control-label">EBay物流方式</label>
-                                            <div class="col-xs-10">
-                                                <select id="ebay_mode_id" name="detail.logistics_mode.ebay_mode_id" class="input-sm form-control" v-model.number="detail.logistics_mode.ebay_mode_id">
-                                                    <template v-for="mode in detail.ebay_logistics_mode_list">
-                                                        <option :value="mode.id">{{mode.name}}</option>
-                                                    </template>
+                                            <label for="sfkltjz" class="col-xs-6 control-label">是否考虑体积重</label>
+                                            <div class="col-xs-6">
+                                                <select id="sfkltjz" name="detail.logistics_mode.sfkltjz" class="input-sm form-control" v-model="detail.logistics_mode.sfkltjz">
+                                                    <option value="1">是</option>
+                                                    <option value="0">否</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="tjzgs" class="col-xs-6 control-label">体积重公式</label>
+                                            <div class="col-xs-6">
+                                                <input id="tjzgs" name="detail.logistics_mode.tjzgs" type="text" class="input-sm form-control" v-model.number="detail.logistics_mode.tjzgs"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="tjzxs" class="col-xs-6 control-label">体积重系数</label>
+                                            <div class="col-xs-6">
+                                                <input id="tjzxs" name="detail.logistics_mode.tjzxs" type="text" class="input-sm form-control" v-model.number="detail.logistics_mode.tjzxs"/>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="tjzysjzqx" class="col-xs-6 control-label">体积重与实际重取向</label>
+                                            <div class="col-xs-6">
+                                                <input id="tjzysjzqx" name="detail.logistics_mode.tjzysjzqx" type="text" class="input-sm form-control" v-model.number="detail.logistics_mode.tjzysjzqx"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="zlsfybzyq" class="col-xs-6 control-label">体积重与实际重是否有比值要求</label>
+                                            <div class="col-xs-6">
+                                                <select id="zlsfybzyq" name="detail.logistics_mode.zlsfybzyq" class="input-sm form-control" v-model="detail.logistics_mode.zlsfybzyq">
+                                                    <option value="1">是</option>
+                                                    <option value="0">否</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="tjzsjzbz" class="col-xs-6 control-label">体积重/实际重比值</label>
+                                            <div class="col-xs-6">
+                                                <input id="tjzsjzbz" name="detail.logistics_mode.tjzsjzbz" type="text" class="input-sm form-control" v-model.number="detail.logistics_mode.tjzsjzbz"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="zcbsfyxz" class="col-xs-6 control-label">最长边是否有限制</label>
+                                            <div class="col-xs-6">
+                                                <select id="zcbsfyxz" name="detail.logistics_mode.zcbsfyxz" class="input-sm form-control" v-model="detail.logistics_mode.zcbsfyxz">
+                                                    <option value="1">是</option>
+                                                    <option value="0">否</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="zlsfyxz" class="col-xs-6 control-label">重量是否有限制</label>
+                                            <div class="col-xs-6">
+                                                <select id="zlsfyxz" name="detail.logistics_mode.zlsfyxz" class="input-sm form-control" v-model="detail.logistics_mode.zlsfyxz">
+                                                    <option value="1">是</option>
+                                                    <option value="0">否</option>
                                                 </select>
                                             </div>
                                         </div>
@@ -73,10 +164,68 @@
                                 </div>
 
                                 <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="zlbncg" class="col-xs-6 control-label">重量不能超过（Kg)</label>
+                                            <div class="col-xs-6">
+                                                <input id="zlbncg" name="detail.logistics_mode.zlbncg" type="text" class="input-sm form-control" v-model.number="detail.logistics_mode.zlbncg"/>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="sfyxcc" class="col-xs-6 control-label">是否允许超长</label>
+                                            <div class="col-xs-6">
+                                                <select id="sfyxcc" name="detail.logistics_mode.sfyxcc" class="input-sm form-control" v-model="detail.logistics_mode.sfyxcc">
+                                                    <option value="1">是</option>
+                                                    <option value="0">否</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="ccjsyf" class="col-xs-6 control-label">超长加收多少运费（澳币）</label>
+                                            <div class="col-xs-6">
+                                                <input id="ccjsyf" name="detail.logistics_mode.ccjsyf" type="text" class="input-sm form-control" v-model.number="detail.logistics_mode.ccjsyf"/>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="sfyxcz" class="col-xs-6 control-label">是否允许超重</label>
+                                            <div class="col-xs-6">
+                                                <select id="sfyxcz" name="detail.logistics_mode.sfyxcz" class="input-sm form-control" v-model="detail.logistics_mode.sfyxcz">
+                                                    <option value="1">是</option>
+                                                    <option value="0">否</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="czjsyf" class="col-xs-6 control-label">超重加收多少运费（澳币）</label>
+                                            <div class="col-xs-6">
+                                                <input id="czjsyf" name="detail.logistics_mode.czjsyf" type="text" class="input-sm form-control" v-model.number="detail.logistics_mode.czjsyf"/>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
-                                            <label for="desc" class="col-xs-2 control-label">描述</label>
-                                            <div class="col-xs-10">
+                                            <label for="desc" class="col-xs-3 control-label">描述</label>
+                                            <div class="col-xs-9">
                                                 <textarea id="desc" name="detail.logistics_mode.desc" rows="2" class="input-sm form-control" v-model="detail.logistics_mode.desc"></textarea>
                                             </div>
                                         </div>
@@ -104,14 +253,14 @@
         el: "#page",
         data: {
             "detail": {
-                "logistics_mode": {}
+                "logistics_mode": {},
+                "logistics_company_list": []
             }
         },
         mounted: function () {
             initDataTable(
                 '#logisticsModeList',
                 {
-                    "scrollX": true,
                     "sAjaxSource": '{%url "ErpLogisticsMode.ListData"%}',
                     "aaSorting": [[1, "asc"]],
                     "aoColumns": [
@@ -126,9 +275,76 @@
                                 return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
                             }
                         },
-                        {"mDataProp": "m.name", "title": "名称", "bSearchable": true, "width": 220},
-                        {"mDataProp": "pm.name", "title": "EBay物流方式", "bSearchable": true, "width": 220},
-                        {"mDataProp": "m.desc", "title": "描述", "bSearchable": true, "width": 400},
+                        {"mDataProp": "c.name", "title": "物流公司", "bSearchable": true, "width": 160},
+                        {"mDataProp": "m.name", "title": "物流方式名称", "bSearchable": true},
+                        {
+                            "mDataProp": "m.sfkltjz", "title": "考虑体积重", "bSearchable": false, "width": 120,
+                            "render": function (data, type, row) {
+                                if (data == 0) {
+                                    return "否";
+                                }
+                                else {
+                                    return "是";
+                                }
+                            }
+                        },
+                        {
+                            "mDataProp": "m.zcbsfyxz", "title": "最长边是否有限制", "bSearchable": false, "width": 130,
+                            "render": function (data, type, row) {
+                                if (data == 0) {
+                                    return "否";
+                                }
+                                else {
+                                    return "是";
+                                }
+                            }
+                        },
+                        {
+                            "mDataProp": "m.zlsfyxz", "title": "重量是否有限制", "bSearchable": false, "width": 120,
+                            "render": function (data, type, row) {
+                                if (data == 0) {
+                                    return "否";
+                                }
+                                else {
+                                    return "是";
+                                }
+                            }
+                        },
+                        {
+                            "mDataProp": "m.sfyxcc", "title": "是否允许超长", "bSearchable": false, "width": 120,
+                            "render": function (data, type, row) {
+                                if (data == 0) {
+                                    return "否";
+                                }
+                                else {
+                                    return "是";
+                                }
+                            }
+                        },
+                        {
+                            "mDataProp": "m.sfyxcz", "title": "是否允许超重", "bSearchable": false, "width": 120,
+                            "render": function (data, type, row) {
+                                if (data == 0) {
+                                    return "否";
+                                }
+                                else {
+                                    return "是";
+                                }
+                            }
+                        },
+
+                        /*
+                         {"mDataProp": "m.tjzgs", "title": "体积重公式", "bSearchable": false },
+                         {"mDataProp": "m.tjzxs", "title": "体积重系数", "bSearchable": false },
+                         {"mDataProp": "m.tjzysjzqx", "title": "体积重与实际重取向", "bSearchable": false },
+                         {"mDataProp": "m.sfkltjz", "title": "体积重与实际重是否有比值要求", "bSearchable": false },
+                         {"mDataProp": "m.tjzsjzbz", "title": "体积重/实际重比值", "bSearchable": false },
+                         {"mDataProp": "m.zlbncg", "title": "重量不能超过（Kg)", "bSearchable": false },
+                         {"mDataProp": "m.ccjsyf", "title": "超长加收多少运费（澳币）", "bSearchable": false },
+                         {"mDataProp": "m.czjsyf", "title": "超重加收多少运费（澳币）", "bSearchable": false },
+                         {"mDataProp": "m.desc", "title": "描述", "bSearchable": true},
+                         */
+
                         {"mDataProp": "m.create_time", "title": "创建时间", "bSearchable": false, "width": 120},
                         {"mDataProp": "m.update_time", "title": "修改时间", "bSearchable": false, "width": 120}
                     ]
@@ -169,11 +385,50 @@
                 showMask("提交中...");
                 var form = $("#logisticsModeDetailForm");
                 var valid = validate(form, {
-                    'detail.logistics_mode.ebay_mode_id': {
+                    'detail.logistics_mode.company_id': {
                         required: true, digits: true
                     },
                     'detail.logistics_mode.name': {
                         required: true, minlength: 2, maxlength: 100
+                    },
+                    'detail.logistics_mode.sfkltjz': {
+                        required: true, number: true
+                    },
+                    'detail.logistics_mode.tjzgs': {
+                        required: true, number: true
+                    },
+                    'detail.logistics_mode.tjzxs': {
+                        required: true, number: true
+                    },
+                    'detail.logistics_mode.tjzysjzqx': {
+                        required: true, digits: true
+                    },
+                    'detail.logistics_mode.zlsfybzyq': {
+                        required: true, number: true
+                    },
+                    'detail.logistics_mode.tjzsjzbz': {
+                        required: true, number: true
+                    },
+                    'detail.logistics_mode.zcbsfyxz': {
+                        required: true, number: true
+                    },
+                    'detail.logistics_mode.zlsfyxz': {
+                        required: true, number: true
+                    },
+                    'detail.logistics_mode.zlbncg': {
+                        required: true, number: true
+                    },
+                    'detail.logistics_mode.sfyxcc': {
+                        required: true, number: true
+                    },
+                    'detail.logistics_mode.ccjsyf': {
+                        required: true, number: true
+                    },
+                    'detail.logistics_mode.sfyxcz': {
+                        required: true, number: true
+                    },
+                    'detail.logistics_mode.czjsyf': {
+                        required: true, number: true
                     },
                     'detail.logistics_mode.desc': {
                         required: false, maxlength: 500

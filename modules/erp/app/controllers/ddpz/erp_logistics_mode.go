@@ -2,12 +2,12 @@ package controllers
 
 import (
 	"encoding/json"
-	"github.com/revel/revel"
+	"fmt"
 	"strconv"
 
+	"github.com/revel/revel"
 	"matrix/core"
 	"matrix/modules/erp/models"
-	"fmt"
 )
 
 type ErpLogisticsMode struct {
@@ -18,54 +18,61 @@ func (c ErpLogisticsMode) Index() revel.Result {
 	return c.RenderTemplate("erp/ddpz/logistics_mode/logistics_mode_index.html")
 }
 
-type ErpLogisticsModeViewItem struct {
-	models.LogisticsModeInfo               `xorm:"extends" json:"m"`
-	models.PlatformLogisticsModeInfo       `xorm:"extends" json:"pm"`
-}
-
 func (c ErpLogisticsMode) ListData() revel.Result {
 	db_session := c.DbSession
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
+	type logistics_mode_view_item_t struct {
+		models.LogisticsModeInfo          `xorm:"extends" json:"m"`
+		models.LogisticsCompanyInfo       `xorm:"extends" json:"c"`
+	}
+
 	/*
-		SELECT m.*, pm.*
+		SELECT m.*, c.*
 		FROM erp_logistics_mode m
-		    INNER JOIN erp_platform_logistics_mode pm ON m.ebay_mode_id = pm.id
+		    INNER JOIN erp_logistics_company c ON c.id = m.company_id
 	*/
 
-	query := db_session.
-	Select("m.*, pm.*").
-		Table("erp_logistics_mode").Alias("m").
-		Join("INNER", []string{"erp_platform_logistics_mode", "pm"}, "m.ebay_mode_id = pm.id").
-		Where(filter)
+	sb := core.NewSqlBuilder()
+	sb.Select("m.*, c.*")
+	sb.Count("count(m.id) as mode_count")
+	sb.From(`erp_logistics_mode m
+		    INNER JOIN erp_logistics_company c ON c.id = m.company_id`)
+
+	sb.Where(filter)
 
 	//query extra filter here
 
-	data_query := *query
 	if order != "" {
-		data_query = *data_query.OrderBy(order)
+		sb.OrderBy(order)
 	} else {
-		data_query = *data_query.Asc("m.id")
+		sb.OrderBy("m.id ASC")
 	}
 
-	logistics_mode_list := make([]ErpLogisticsModeViewItem, 0, limit)
-	err := data_query.Limit(limit, offset).Find(&logistics_mode_list)
+	sb.Limit(offset, limit)
+
+	logistics_mode_list := make([]logistics_mode_view_item_t, 0, limit)
+	err := db_session.Sql(sb.SqlList()).Find(&logistics_mode_list)
 	core.HandleError(err)
 
-	count_query := *query
-	count, err := count_query.Count(new(ErpLogisticsModeViewItem))
+	type mode_count_t struct {
+		Count int64 `xorm:"'mode_count'"`
+	}
+
+	var mode_count mode_count_t
+	_, err = db_session.Sql(sb.SqlCount()).Get(&mode_count)
 	core.HandleError(err)
 
 	return c.RenderJson(core.GridResult{
 		Data:  logistics_mode_list,
-		Total: count,
+		Total: mode_count.Count,
 	})
 }
 
 type LogisticsModeDetailForm struct {
-	LogisticsMode         models.LogisticsModeInfo            `json:"logistics_mode"`
-	EbayLogisticsModeList []models.PlatformLogisticsModeInfo  `json:"ebay_logistics_mode_list"`
+	LogisticsMode        models.LogisticsModeInfo       `json:"logistics_mode"`
+	LogisticsCompanyList []models.LogisticsCompanyInfo  `json:"logistics_company_list"`
 }
 
 func (f *LogisticsModeDetailForm) IsCreate() bool {
@@ -73,8 +80,6 @@ func (f *LogisticsModeDetailForm) IsCreate() bool {
 }
 
 func (f *LogisticsModeDetailForm) Valid(validation *revel.Validation) bool {
-	validation.Required(f.LogisticsMode.EbayModeId).Message("EBay物流方式不能为空！")
-
 	validation.Required(f.LogisticsMode.Name).Message("名称不能为空！")
 	if f.LogisticsMode.Name != "" {
 		validation.MinSize(f.LogisticsMode.Name, 2).Message("名称长度不能小于2！")
@@ -105,20 +110,13 @@ func (c ErpLogisticsMode) DetailData() revel.Result {
 		}
 	}
 
-	sql := `
-SELECT pm.*
-FROM erp_platform_logistics_mode pm
-WHERE pm.platform_id = %d
-ORDER BY pm.id ASC;
-	`
-	sql = fmt.Sprintf(sql, models.PLATFORM_ID_EBAY) // models.PLATFORM_ID_EBAY == 100
-	var ebay_logistics_mode_list = make([]models.PlatformLogisticsModeInfo, 0)
-	err := db_session.Sql(sql).Find(&ebay_logistics_mode_list)
+	var logistics_company_list = make([]models.LogisticsCompanyInfo, 0)
+	err := db_session.Find(&logistics_company_list)
 	core.HandleError(err)
 
 	var detail_form LogisticsModeDetailForm
 	detail_form.LogisticsMode = logistics_mode
-	detail_form.EbayLogisticsModeList = ebay_logistics_mode_list
+	detail_form.LogisticsCompanyList = logistics_company_list
 
 	return c.RenderJson(detail_form)
 }
@@ -138,7 +136,7 @@ func (c ErpLogisticsMode) Save() revel.Result {
 
 	var affected int64
 	if detail_form.IsCreate() {
-		name_count, err := db_session.Where("name = ?", logistics_mode.Name).Count(&logistics_mode)
+		name_count, err := db_session.Where(fmt.Sprintf("company_id = %d AND name = '%s'", logistics_mode.CompanyId, logistics_mode.Name)).Count(&logistics_mode)
 		core.HandleError(err)
 		if name_count != 0 {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，名称已存在！" })
@@ -147,7 +145,7 @@ func (c ErpLogisticsMode) Save() revel.Result {
 		affected, err = db_session.Insert(&logistics_mode)
 		core.HandleError(err)
 	} else {
-		name_count, err := db_session.Where("id <> ? and name = ?", logistics_mode.Id, logistics_mode.Name).Count(&logistics_mode)
+		name_count, err := db_session.Where(fmt.Sprintf("id <> %d AND company_id = %d AND name = '%s'", logistics_mode.Id, logistics_mode.CompanyId, logistics_mode.Name)).Count(&logistics_mode)
 		core.HandleError(err)
 		if name_count != 0 {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，名称已存在！" })
