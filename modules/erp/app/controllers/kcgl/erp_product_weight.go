@@ -23,6 +23,9 @@ func (c ErpProductWeight) ListData() revel.Result {
 	db_session := c.DbSession
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
+	var filter_type int64
+	c.Params.Bind(&filter_type, "filter_type")
+
 	type product_weight_view_item_t struct {
 		Product models.ProductInfo `xorm:"extends" json:"p"`
 		Status  models.StatusInfo  `xorm:"extends" json:"s"`
@@ -39,6 +42,12 @@ func (c ErpProductWeight) ListData() revel.Result {
 	sb.Count("count(p.id) AS product_count")
 	sb.From(`erp_product p
 		    INNER JOIN erp_status s ON s.id = p.status_id`)
+
+	if filter_type == 1 { //有零值数据的记录
+		filter_has_zero_data := core.SqlOr("length = 0", "width = 0", "height = 0", "weight = 0")
+		filter = core.SqlAnd(filter, filter_has_zero_data)
+	}
+
 	sb.Where(filter)
 
 	if order != "" {

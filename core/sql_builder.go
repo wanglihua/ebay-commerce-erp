@@ -3,6 +3,7 @@ package core
 import (
 	"bytes"
 	"fmt"
+	"strings"
 )
 
 type SqlBuilder struct {
@@ -144,12 +145,22 @@ func (builder *SqlBuilder) SqlCount() string {
 	return builder.to_sql(sql_type_count)
 }
 
-func SqlAnd(exp1, exp2 string) string {
+func SqlAnd(exps ...string) string {
 	//前后表达式都需要 ( )
-	return fmt.Sprintf("(%s) AND (%s)", exp1, exp2)
+	exp_list := make([]string, 0, len(exps))
+	for _, exp := range exps {
+		exp_list = append(exp_list, fmt.Sprintf("(%s)", exp))
+	}
+
+	return strings.Join(exp_list, " AND ")
 }
 
-func SqlOr(exp1, exp2 string) string {
+func SqlOr(exps ...string) string {
 	//前后表达式都需要 ( )
-	return fmt.Sprintf("(%s) OR (%s)", exp1, exp2)
+	exp_list := make([]string, 0, len(exps))
+	for _, exp := range exps {
+		exp_list = append(exp_list, fmt.Sprintf("(%s)", exp))
+	}
+
+	return strings.Join(exp_list, " OR ")
 }

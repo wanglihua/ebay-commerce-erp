@@ -2,12 +2,12 @@ package app
 
 import (
 	"fmt"
-	"matrix/app/routes"
-	"matrix/core"
-	"matrix/db"
 	"strings"
 
 	"github.com/revel/revel"
+	"matrix/app/routes"
+	"matrix/core"
+	"matrix/db"
 )
 
 func BeforeInterceptor(c *revel.Controller) revel.Result {

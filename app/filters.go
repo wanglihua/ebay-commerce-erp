@@ -2,9 +2,10 @@ package app
 
 import (
 	"fmt"
+	"runtime/debug"
+
 	"github.com/revel/revel"
 	"matrix/core"
-	"runtime/debug"
 )
 
 //捕获和处理整站异常
