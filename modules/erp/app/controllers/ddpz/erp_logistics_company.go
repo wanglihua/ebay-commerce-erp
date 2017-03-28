@@ -141,7 +141,7 @@ func (c ErpLogisticsCompany) Delete() revel.Result {
 	affected, err := db_session.In("id", logistics_company_id_list).Delete(new(models.LogisticsCompanyInfo))
 	core.HandleError(err)
 
-	// 删除时要考虑别的关联
+	//todo: 删除时要考虑别的关联
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})
 }
