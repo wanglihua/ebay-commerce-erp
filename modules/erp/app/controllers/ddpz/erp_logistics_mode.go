@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"github.com/revel/revel"
+	"github.com/tealeg/xlsx"
 	"matrix/core"
 	"matrix/modules/erp/models"
 )
@@ -172,4 +173,79 @@ func (c ErpLogisticsMode) Delete() revel.Result {
 	core.HandleError(err)
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})
+}
+
+func (c ErpLogisticsMode) Import() revel.Result {
+	db_session := c.DbSession
+
+	excel_file_bytes := make([]byte, 0)
+	c.Params.Bind(&excel_file_bytes, "excel_file")
+
+	c.Validation.Required(excel_file_bytes).Message("指定文件内容未成功上传！")
+
+	if c.Validation.HasErrors() {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": c.GetValidationErrorMessage(),
+		})
+	}
+
+	type logistics_mode_t struct {
+		CompanyName   string
+		LogisticsMode models.LogisticsModeInfo
+	}
+
+	logistics_mode_list := make([]logistics_mode_t, 0)
+
+	xlsx_file, err := xlsx.OpenBinary(excel_file_bytes)
+	core.HandleError(err)
+
+	// 会导入所有 sheets
+	sheet_count := len(xlsx_file.Sheets)
+	for sheet_index := 0; sheet_index < sheet_count; sheet_index ++ {
+		sheet := xlsx_file.Sheets[sheet_index]
+		max_row := sheet.MaxRow
+		//略过标题行
+		for row_index := 1; row_index < max_row; row_index ++ {
+			row := sheet.Rows[row_index]
+
+			var cell *xlsx.Cell
+			var cell_val string
+			var err error
+
+			var logistics_mode logistics_mode_t
+
+			col_index := 0
+
+			//物流公司名称
+			cell = row.Cells[col_index]
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			logistics_mode.CompanyName = cell_val
+			col_index++
+
+			logistics_mode_list = append(logistics_mode_list, logistics_mode)
+		}
+	}
+
+	if len(logistics_mode_list) == 0 {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "Excel文件中导入商品列表为空！",
+		})
+	}
+
+	for _, logistics_mode_import := range logistics_mode_list {
+
+		var logistics_mode= logistics_mode_import.LogisticsMode
+
+		_, err = db_session.Insert(&logistics_mode)
+		core.HandleError(err)
+
+	}
+
+	return c.RenderJson(map[string]interface{}{
+		"success": true,
+		"message": "数据导入成功！",
+	})
 }

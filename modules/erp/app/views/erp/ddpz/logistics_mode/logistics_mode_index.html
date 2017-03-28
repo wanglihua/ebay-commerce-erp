@@ -25,6 +25,13 @@
                         <i class="ace-icon fa fa-trash-o"></i>
                         删除
                     </button>
+                    <button id="btnImport" class="btn btn-success btn-sm">
+                        <i class="ace-icon fa fa-plus"></i>
+                        导入
+                    </button>
+                    <div style="margin-top: 10px;">
+                        <a href="/static/excel-template/logistics_mode_import.xlsx">下载Excel模板</a>
+                    </div>
                 </div>
                 <div>
                     <div style="margin-top:10px;">双击列表项查看更多详细物流参数</div>
@@ -249,6 +256,46 @@
     </div>
 </div>
 <script type="text/javascript">
+
+    function init_uploader() {
+        var uploader = new plupload.Uploader({
+            runtimes: 'html5,flash,html4',
+            multi_selection: false,
+
+            browse_button: 'btnImport',
+            file_data_name: "excel_file",
+
+            url: '{%url "ErpLogisticsMode.Import"%}',
+            max_file_size: '10000kb',
+
+            filters: [
+                {title: "Excel文件", extensions: "xlsx"}
+            ],
+
+            flash_swf_url: '/plupload/js/Moxie.swf',
+
+            init: {
+                FilesAdded: function () {
+                    uploader.start();
+                },
+                FileUploaded: function (up, file, response) {
+                    var result = JSON.parse(response.response);
+                    if (result.success != true) {
+                        $.msg.error(result.message);
+                    } else {
+                        reloadList('#productList');
+                        $.msg.show(result.message);
+                    }
+                },
+                Error: function (up, err) {
+                    $.msg.error("上传发生错误：" + err.code + ", " + err.message);
+                }
+            }
+        });
+
+        uploader.init();
+    }
+
     var vm = new Vue({
         el: "#page",
         data: {

@@ -164,6 +164,7 @@ func (c ErpProductWeight) Import() revel.Result {
 	xlsx_file, err := xlsx.OpenBinary(excel_file_bytes)
 	core.HandleError(err)
 
+	// 会导入所有 sheets
 	sheet_count := len(xlsx_file.Sheets)
 	//revel.TRACE.Printf("sheet_count: %d\n", sheet_count)
 	for sheet_index := 0; sheet_index < sheet_count; sheet_index ++ {
@@ -243,8 +244,6 @@ func (c ErpProductWeight) Import() revel.Result {
 
 	has_zero_data := false
 	for _, product_weight := range product_weight_list {
-		revel.TRACE.Println(product_weight)
-
 		var product models.ProductInfo
 		has, err := db_session.Where(fmt.Sprintf("sku = '%s'", product_weight.sku)).Get(&product)
 		core.HandleError(err)
