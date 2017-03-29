@@ -4,8 +4,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/revel/revel"
+	"github.com/tealeg/xlsx"
 	"matrix/core"
 	"matrix/modules/erp/models"
 )
@@ -135,7 +137,7 @@ func (c ErpLogisticsFeeRate) DetailData() revel.Result {
 
 	if logistics_fee_rate_id == 0 {
 		if len(logistics_company_list) != 0 {
-			var selected_company_id = logistics_company_list[0].Id;
+			var selected_company_id = logistics_company_list[0].Id
 			var logistics_mode_list = make([]models.LogisticsModeInfo, 0)
 			err = db_session.Where(fmt.Sprintf("company_id = %d", selected_company_id)).Find(&logistics_mode_list)
 			core.HandleError(err)
@@ -207,7 +209,241 @@ func (c ErpLogisticsFeeRate) Delete() revel.Result {
 }
 
 func (c ErpLogisticsFeeRate) Import() revel.Result {
-	return c.RenderEmpty()
+	db_session := c.DbSession
+
+	excel_file_bytes := make([]byte, 0)
+	c.Params.Bind(&excel_file_bytes, "excel_file")
+
+	c.Validation.Required(excel_file_bytes).Message("指定文件内容未成功上传！")
+
+	if c.Validation.HasErrors() {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": c.GetValidationErrorMessage(),
+		})
+	}
+
+	type logistics_mode_t struct {
+		CompanyName   string
+		LogisticsMode models.LogisticsModeInfo
+	}
+
+	logistics_mode_list := make([]logistics_mode_t, 0)
+
+	xlsx_file, err := xlsx.OpenBinary(excel_file_bytes)
+	core.HandleError(err)
+
+	// 会导入所有 sheets
+	sheet_count := len(xlsx_file.Sheets)
+	for sheet_index := 0; sheet_index < sheet_count; sheet_index ++ {
+		sheet := xlsx_file.Sheets[sheet_index]
+		max_row := sheet.MaxRow
+		//略过标题行
+		for row_index := 1; row_index < max_row; row_index ++ {
+			row := sheet.Rows[row_index]
+
+			var cell *xlsx.Cell
+			var cell_val string
+			var err error
+
+			var logistics_mode logistics_mode_t
+
+			col_index := 0
+
+			// 物流公司名称
+			cell = row.Cells[col_index]
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
+			logistics_mode.CompanyName = cell_val
+			col_index++
+
+			// 物流方式名称
+			cell = row.Cells[col_index]
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
+			logistics_mode.LogisticsMode.Name = cell_val
+			col_index++
+
+			// 是否考虑 体积重
+			cell = row.Cells[col_index]
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
+			if strings.TrimSpace(cell_val) == "是" {
+				logistics_mode.LogisticsMode.Sfkltjz = 1
+			} else {
+				logistics_mode.LogisticsMode.Sfkltjz = 0
+			}
+			col_index++
+
+			// 体积重公式 ( 长X宽X高/250) 250
+			cell = row.Cells[col_index]
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
+			logistics_mode.LogisticsMode.Tjzgs, _ = strconv.ParseFloat(cell_val, 64)
+			col_index++
+
+			// 体积重 系数
+			cell = row.Cells[col_index]
+			cell_val, err = cell.String()
+			cell_val = strings.TrimSpace(cell_val)
+			core.HandleError(err)
+			logistics_mode.LogisticsMode.Tjzxs, _ = strconv.ParseFloat(cell_val, 64)
+			col_index++
+
+			// 体积重与 实际重取向 （取大 or 取小） 取大(1) or 取小(2)
+			cell = row.Cells[col_index]
+			cell_val, err = cell.String()
+			cell_val = strings.TrimSpace(cell_val)
+			core.HandleError(err)
+			if strings.TrimSpace(cell_val) == "取大" {
+				logistics_mode.LogisticsMode.Tjzysjzqx = 1
+			} else if strings.TrimSpace(cell_val) == "取小" {
+				logistics_mode.LogisticsMode.Tjzysjzqx = 2
+			}
+			col_index++
+
+			// 体积重与实际重 是否有比值要求
+			cell = row.Cells[col_index]
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
+			if strings.TrimSpace(cell_val) == "是" {
+				logistics_mode.LogisticsMode.Zlsfybzyq = 1
+			} else {
+				logistics_mode.LogisticsMode.Zlsfybzyq = 0
+			}
+			col_index++
+
+			// 体积重/实际重 比值
+			cell = row.Cells[col_index]
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
+			logistics_mode.LogisticsMode.Tjzsjzbz, _ = strconv.ParseFloat(cell_val, 64)
+			col_index++
+
+			// 最长边是否 有限制
+			cell = row.Cells[col_index]
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
+			if strings.TrimSpace(cell_val) == "是" {
+				logistics_mode.LogisticsMode.Zcbsfyxz = 1
+			} else {
+				logistics_mode.LogisticsMode.Zcbsfyxz = 0
+			}
+			col_index++
+
+			// 最长边限制 长度（cm）
+			cell = row.Cells[col_index]
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
+			logistics_mode.LogisticsMode.Zcbxzcd, _ = strconv.ParseFloat(cell_val, 64)
+			col_index++
+
+			// 重量是否 有限制
+			cell = row.Cells[col_index]
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
+			if strings.TrimSpace(cell_val) == "是" {
+				logistics_mode.LogisticsMode.Zlsfyxz = 1
+			} else {
+				logistics_mode.LogisticsMode.Zlsfyxz = 0
+			}
+			col_index++
+
+			// 重量不能 超过（Kg)
+			cell = row.Cells[col_index]
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
+			logistics_mode.LogisticsMode.Zlbncg, _ = strconv.ParseFloat(cell_val, 64)
+			col_index++
+
+			// 是否允许 超长
+			cell = row.Cells[col_index]
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
+			if strings.TrimSpace(cell_val) == "是" {
+				logistics_mode.LogisticsMode.Sfyxcc = 1
+			} else {
+				logistics_mode.LogisticsMode.Sfyxcc = 0
+			}
+			col_index++
+
+			// 超长加收多少 运费（澳币）
+			cell = row.Cells[col_index]
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
+			logistics_mode.LogisticsMode.Ccjsyf, _ = strconv.ParseFloat(cell_val, 64)
+			col_index++
+
+			// 是否 允许超重
+			cell = row.Cells[col_index]
+			core.HandleError(err)
+			cell_val, err = cell.String()
+			if strings.TrimSpace(cell_val) == "是" {
+				logistics_mode.LogisticsMode.Sfyxcz = 1
+			} else {
+				logistics_mode.LogisticsMode.Sfyxcz = 0
+			}
+			col_index++
+
+			// 超重加收多少 运费（澳币）
+			cell = row.Cells[col_index]
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
+			logistics_mode.LogisticsMode.Czjsyf, _ = strconv.ParseFloat(cell_val, 64)
+			col_index++
+
+			logistics_mode_list = append(logistics_mode_list, logistics_mode)
+		}
+	}
+
+	if len(logistics_mode_list) == 0 {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "Excel文件中导入商品列表为空！",
+		})
+	}
+
+	for _, logistics_mode_import := range logistics_mode_list {
+
+		var logistics_mode = logistics_mode_import.LogisticsMode
+
+		// 物流公司
+		var logistics_company models.LogisticsCompanyInfo
+		has, err := db_session.Where(fmt.Sprintf("name = '%s'", logistics_mode_import.CompanyName)).Get(&logistics_company)
+		core.HandleError(err)
+
+		if has == false {
+			logistics_company.Name = logistics_mode_import.CompanyName
+			logistics_company.Desc = core.NullStringFrom(logistics_mode_import.CompanyName)
+
+			_, err := db_session.Insert(&logistics_company)
+			core.HandleError(err)
+		}
+
+		logistics_mode.CompanyId = logistics_company.Id
+
+		_, err = db_session.Insert(&logistics_mode)
+		core.HandleError(err)
+
+	}
+
+	return c.RenderJson(map[string]interface{}{
+		"success": true,
+		"message": "数据导入成功！",
+	})
 }
 
 func (c ErpLogisticsFeeRate) GetLogisticsModeListByCompanyId() revel.Result {
