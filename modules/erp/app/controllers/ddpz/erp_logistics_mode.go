@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/revel/revel"
 	"github.com/tealeg/xlsx"
@@ -217,11 +218,137 @@ func (c ErpLogisticsMode) Import() revel.Result {
 
 			col_index := 0
 
-			//物流公司名称
+			// 物流公司名称
 			cell = row.Cells[col_index]
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			logistics_mode.CompanyName = cell_val
+			col_index++
+
+			// 是否考虑 体积重
+			cell = row.Cells[col_index]
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			if strings.TrimSpace(cell_val) == "是" {
+				logistics_mode.LogisticsMode.Sfkltjz = 1
+			} else {
+				logistics_mode.LogisticsMode.Sfkltjz = 0
+			}
+			col_index++
+
+			// 体积重公式 ( 长X宽X高/250) 250
+			cell = row.Cells[col_index]
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			logistics_mode.LogisticsMode.Tjzgs, _ = strconv.ParseFloat(cell_val, 64)
+			col_index++
+
+			// 体积重 系数
+			cell = row.Cells[col_index]
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			logistics_mode.LogisticsMode.Tjzxs, _ = strconv.ParseFloat(cell_val, 64)
+			col_index++
+
+			// 体积重与 实际重取向 （取大 or 取小） 取大(1) or 取小(2)
+			cell = row.Cells[col_index]
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			if strings.TrimSpace(cell_val) == "取大" {
+				logistics_mode.LogisticsMode.Tjzysjzqx = 1
+			} else if strings.TrimSpace(cell_val) == "取小" {
+				logistics_mode.LogisticsMode.Tjzysjzqx = 2
+			}
+			col_index++
+
+			// 体积重与实际重 是否有比值要求
+			cell = row.Cells[col_index]
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			if strings.TrimSpace(cell_val) == "是" {
+				logistics_mode.LogisticsMode.Zlsfybzyq = 1
+			} else {
+				logistics_mode.LogisticsMode.Zlsfybzyq = 0
+			}
+			col_index++
+
+			// 体积重/实际重 比值
+			cell = row.Cells[col_index]
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			logistics_mode.LogisticsMode.Tjzsjzbz, _ = strconv.ParseFloat(cell_val, 64)
+			col_index++
+
+			// 最长边是否 有限制
+			cell = row.Cells[col_index]
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			if strings.TrimSpace(cell_val) == "是" {
+				logistics_mode.LogisticsMode.Zcbsfyxz = 1
+			} else {
+				logistics_mode.LogisticsMode.Zcbsfyxz = 0
+			}
+			col_index++
+
+			// 最长边限制 长度（cm）
+			cell = row.Cells[col_index]
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			logistics_mode.LogisticsMode.Zcbxzcd, _ = strconv.ParseFloat(cell_val, 64)
+			col_index++
+
+			// 重量是否 有限制
+			cell = row.Cells[col_index]
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			if strings.TrimSpace(cell_val) == "是" {
+				logistics_mode.LogisticsMode.Zlsfyxz = 1
+			} else {
+				logistics_mode.LogisticsMode.Zlsfyxz = 0
+			}
+			col_index++
+
+			// 重量不能 超过（Kg)
+			cell = row.Cells[col_index]
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			logistics_mode.LogisticsMode.Zlbncg, _ = strconv.ParseFloat(cell_val, 64)
+			col_index++
+
+			// 是否允许 超长
+			cell = row.Cells[col_index]
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			if strings.TrimSpace(cell_val) == "是" {
+				logistics_mode.LogisticsMode.Sfyxcc = 1
+			} else {
+				logistics_mode.LogisticsMode.Sfyxcc = 0
+			}
+			col_index++
+
+			// 超长加收多少 运费（澳币）
+			cell = row.Cells[col_index]
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			logistics_mode.LogisticsMode.Ccjsyf, _ = strconv.ParseFloat(cell_val, 64)
+			col_index++
+
+			// 是否 允许超重
+			cell = row.Cells[col_index]
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			if strings.TrimSpace(cell_val) == "是" {
+				logistics_mode.LogisticsMode.Sfyxcz = 1
+			} else {
+				logistics_mode.LogisticsMode.Sfyxcz = 0
+			}
+			col_index++
+
+			// 超重加收多少 运费（澳币）
+			cell = row.Cells[col_index]
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			logistics_mode.LogisticsMode.Czjsyf, _ = strconv.ParseFloat(cell_val, 64)
 			col_index++
 
 			logistics_mode_list = append(logistics_mode_list, logistics_mode)
@@ -237,7 +364,9 @@ func (c ErpLogisticsMode) Import() revel.Result {
 
 	for _, logistics_mode_import := range logistics_mode_list {
 
-		var logistics_mode= logistics_mode_import.LogisticsMode
+		var logistics_mode = logistics_mode_import.LogisticsMode
+
+		//todo:  检查物流公司
 
 		_, err = db_session.Insert(&logistics_mode)
 		core.HandleError(err)
