@@ -170,6 +170,22 @@ func (c ErpLogisticsMode) Delete() revel.Result {
 	logistics_mode_id_list := make([]int64, 0)
 	c.Params.Bind(&logistics_mode_id_list, "id_list")
 
+	// 如果数据在使用的就不用被删除
+	var fee_rate_count struct {
+		Count int64 `xorm:"'fee_rate_count'"`
+	}
+	sql := "SELECT count(fr.id) AS fee_rate_count FROM erp_logistics_fee_rate fr WHERE fr.mode_id IN (%s)"
+	mode_id_str_list := core.Int_list_to_str_list(logistics_mode_id_list)
+	sql = fmt.Sprintf(sql, strings.Join(mode_id_str_list, ","))
+	_, err := db_session.Sql(sql).Get(&fee_rate_count)
+	core.HandleError(err)
+	if fee_rate_count.Count != 0 {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "数据在别处被引用，不能删除！",
+		})
+	}
+
 	affected, err := db_session.In("id", logistics_mode_id_list).Delete(new(models.LogisticsModeInfo))
 	core.HandleError(err)
 

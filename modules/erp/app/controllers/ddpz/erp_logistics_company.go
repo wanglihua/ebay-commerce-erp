@@ -2,9 +2,11 @@ package controllers
 
 import (
 	"encoding/json"
+	"fmt"
 	"strconv"
-	"github.com/revel/revel"
+	"strings"
 
+	"github.com/revel/revel"
 	"matrix/core"
 	"matrix/modules/erp/models"
 )
@@ -54,7 +56,7 @@ func (f *LogisticsCompanyDetailForm) IsCreate() bool {
 	return f.LogisticsCompany.Id == 0
 }
 
-func (f *LogisticsCompanyDetailForm) Valid(validation *revel.Validation) bool { 
+func (f *LogisticsCompanyDetailForm) Valid(validation *revel.Validation) bool {
 	validation.Required(f.LogisticsCompany.Name).Message("名称不能为空！")
 	if f.LogisticsCompany.Name != "" {
 		validation.MinSize(f.LogisticsCompany.Name, 2).Message("名称长度不能小于2！")
@@ -105,7 +107,7 @@ func (c ErpLogisticsCompany) Save() revel.Result {
 	logistics_company := detail_form.LogisticsCompany
 
 	var affected int64
-	if detail_form.IsCreate() { 
+	if detail_form.IsCreate() {
 		name_count, err := db_session.Where("name = ?", logistics_company.Name).Count(&logistics_company)
 		core.HandleError(err)
 		if name_count != 0 {
@@ -114,7 +116,7 @@ func (c ErpLogisticsCompany) Save() revel.Result {
 
 		affected, err = db_session.Insert(&logistics_company)
 		core.HandleError(err)
-	} else { 
+	} else {
 		name_count, err := db_session.Where("id <> ? and name = ?", logistics_company.Id, logistics_company.Name).Count(&logistics_company)
 		core.HandleError(err)
 		if name_count != 0 {
@@ -138,6 +140,22 @@ func (c ErpLogisticsCompany) Delete() revel.Result {
 	logistics_company_id_list := make([]int64, 0)
 	c.Params.Bind(&logistics_company_id_list, "id_list")
 
+	var mode_count struct {
+		Count int64 `xorm:"'mode_count'"`
+	}
+	sql := "SELECT count(lm.id) AS mode_count FROM erp_logistics_mode lm WHERE lm.company_id IN (%s)"
+	company_id_str_list := core.Int_list_to_str_list(logistics_company_id_list)
+	sql = fmt.Sprintf(sql, strings.Join(company_id_str_list, ","))
+	_, err := db_session.Sql(sql).Get(&mode_count)
+	core.HandleError(err)
+
+	if mode_count.Count != 0 {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "数据在别处被引用，不能删除！",
+		})
+	}
+
 	affected, err := db_session.In("id", logistics_company_id_list).Delete(new(models.LogisticsCompanyInfo))
 	core.HandleError(err)
 
@@ -145,4 +163,3 @@ func (c ErpLogisticsCompany) Delete() revel.Result {
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})
 }
-
