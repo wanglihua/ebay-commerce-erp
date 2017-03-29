@@ -24,7 +24,7 @@ func (c Home) Loading() revel.Result {
 
 func (c Home) Hotload() revel.Result {
 	db_session := c.DbSession
-	
+
 	sql := `SELECT now() AS time_now`
 	var time_now struct {
 		Now time.Time `xorm:"'time_now'"`
@@ -64,6 +64,7 @@ func (c Home) SyncDbPost() revel.Result {
 	model_list = append(model_list, &erp_models.InventoryCheckInfo{})
 	model_list = append(model_list, &erp_models.LoginLogInfo{})
 	model_list = append(model_list, &erp_models.LogisticsCompanyInfo{})
+	model_list = append(model_list, &erp_models.LogisticsFeeRateInfo{})
 	model_list = append(model_list, &erp_models.LogisticsModeInfo{})
 	model_list = append(model_list, &erp_models.LogisticsNumberBatchInfo{})
 	model_list = append(model_list, &erp_models.LogisticsNumberInfo{})
