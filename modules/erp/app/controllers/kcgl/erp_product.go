@@ -176,13 +176,13 @@ func (c ErpProduct) DetailData() revel.Result {
 	core.HandleError(err)
 
 	var supplier_list []models.SupplierInfo
-	err = db_session.Asc(models.SupplierCols.Name).Find(&supplier_list)
+	err = db_session.Asc("name").Find(&supplier_list)
 	core.HandleError(err)
 
 	var product_cate_list = product_cate_service.GetProductCateSelectItemList(db_session)
 
 	var package_material_list [] models.PackageMaterialInfo
-	err = db_session.Asc(models.PackageMaterialCols.Name).Find(&package_material_list)
+	err = db_session.Asc("name").Find(&package_material_list)
 	core.HandleError(err)
 
 	status_list := status_service.GetStatusList(db_session, models.STATUS_TYPE_PRODUCT)

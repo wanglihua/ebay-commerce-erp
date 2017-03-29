@@ -157,8 +157,7 @@ func (c ErpInventoryCheck) Save() revel.Result {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "当前盘点单不是已创建或未通过状态，信息不能修改！"})
 		}
 
-		ic_cols := models.InventoryCheckCols
-		affected, err = db_session.Id(inventory_check.Id).Cols(ic_cols.Code, ic_cols.StockId, ic_cols.Desc, ic_cols.CheckDate).Update(&inventory_check)
+		affected, err = db_session.Id(inventory_check.Id).Cols("code", "stock_id", "desc", "check_date").Update(&inventory_check)
 		core.HandleError(err)
 
 		if affected == 0 {

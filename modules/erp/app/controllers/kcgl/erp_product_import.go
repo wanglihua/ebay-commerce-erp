@@ -27,7 +27,7 @@ func (c ErpProductImport) ListData() revel.Result {
 	//query extra filter here
 	login_user := core.GetLoginUser(c.Session)
 	login_user_id := login_user.UserId
-	query = query.Where(fmt.Sprintf("%s = ?", models.ProductImportCols.UserId), login_user_id)
+	query = query.Where(fmt.Sprintf("user_id = %d", login_user_id))
 
 	data_query := *query
 	if order != "" {
@@ -186,7 +186,7 @@ func (c ErpProductImport) Clear() revel.Result {
 	login_user_id := login_user.UserId
 
 	_, err := db_session.
-	Where(fmt.Sprintf("%s = ?", models.ProductImportCols.UserId), login_user_id).
+	Where(fmt.Sprintf("user_id = %d", login_user_id)).
 		Delete(new(models.ProductImportInfo))
 	core.HandleError(err)
 

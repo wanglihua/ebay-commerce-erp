@@ -112,16 +112,15 @@ func (c ErpProductCate) DetailData() revel.Result {
 	}
 
 	var parent_cate_list []models.ProductCateInfo
-	parent_cate_cols := models.ProductCateCols
 	if product_cate_id == 0 {
 		// 新的商品类别的默认状态
 		product_cate.StatusId = models.PRODUCT_CATE_STATUS_ENABLED
-		err := db_session.Where(fmt.Sprintf("%[1]s is null or %[1]s = 0", parent_cate_cols.ParentId)).Find(&parent_cate_list)
+		err := db_session.Where(fmt.Sprintf("%[1]s is null or %[1]s = 0", "parent_id")).Find(&parent_cate_list)
 		core.HandleError(err)
 	} else {
 		// 编辑是的父类别不应该和自己类别是一样的
 		err := db_session.
-		Where(fmt.Sprintf("(%[1]s is null or %[1]s = 0) and (%[2]s <> %[3]d)", parent_cate_cols.ParentId, parent_cate_cols.Id, product_cate_id)).
+		Where(fmt.Sprintf("(%[1]s is null or %[1]s = 0) and (%[2]s <> %[3]d)", "parent_id", "id", product_cate_id)).
 			Find(&parent_cate_list)
 		core.HandleError(err)
 	}

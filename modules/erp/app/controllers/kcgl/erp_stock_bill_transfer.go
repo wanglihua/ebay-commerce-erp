@@ -2,16 +2,16 @@ package controllers
 
 import (
 	"encoding/json"
-	"github.com/revel/revel"
+	"fmt"
 	"strconv"
+	"strings"
+	"time"
 
+	"github.com/revel/revel"
 	"matrix/core"
 	auth_models "matrix/modules/auth/models"
 	"matrix/modules/erp/models"
-	"time"
-	"fmt"
 	"matrix/modules/erp/service/bill_service"
-	"strings"
 )
 
 type ErpStockBillTransfer struct {
@@ -171,8 +171,7 @@ func (c ErpStockBillTransfer) Save() revel.Result {
 		affected, err = db_session.Insert(&stock_bill)
 		core.HandleError(err)
 	} else {
-		sb_cols := models.StockBillCols
-		affected, err = db_session.Id(stock_bill.Id).Cols(sb_cols.Code, sb_cols.SrcStockId, sb_cols.StockId, sb_cols.Desc, sb_cols.Date).Update(&stock_bill)
+		affected, err = db_session.Id(stock_bill.Id).Cols("code", "src_stock_id", "stock_id", "desc", "date").Update(&stock_bill)
 		core.HandleError(err)
 
 		if affected == 0 {

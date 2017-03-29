@@ -2,15 +2,15 @@ package controllers
 
 import (
 	"encoding/json"
-	"github.com/revel/revel"
+	"fmt"
 	"strconv"
+	"time"
 
+	"github.com/revel/revel"
 	"matrix/core"
 	auth_models "matrix/modules/auth/models"
 	"matrix/modules/erp/models"
-	"time"
 	"matrix/modules/erp/service/bill_service"
-	"fmt"
 )
 
 type ErpStockBillCheckout struct {
@@ -168,8 +168,7 @@ func (c ErpStockBillCheckout) Save() revel.Result {
 		affected, err = db_session.Insert(&stock_bill_in_ui)
 		core.HandleError(err)
 	} else {
-		sb_cols := models.StockBillCols
-		affected, err = db_session.Id(stock_bill_in_ui.Id).Cols(sb_cols.Code, sb_cols.StockId, sb_cols.Desc, sb_cols.Date).Update(&stock_bill_in_ui)
+		affected, err = db_session.Id(stock_bill_in_ui.Id).Cols("code", "stock_id", "desc", "date").Update(&stock_bill_in_ui)
 		core.HandleError(err)
 
 		if affected == 0 {
@@ -202,10 +201,8 @@ func (c ErpStockBillCheckout) Submit() revel.Result {
 		return c.RenderJson(core.JsonResult{Success: false, Message: "出库失败，该出库单已出库!"})
 	}
 
-	entry_cols := models.StockBillEntryCols
-
 	// 检查明细是不是空的
-	entry_count ,err := db_session.Where(fmt.Sprintf("%s = %d", entry_cols.BillId, bill_id)).Count(new(models.StockBillEntryInfo))
+	entry_count, err := db_session.Where(fmt.Sprintf("bill_id = %d", bill_id)).Count(new(models.StockBillEntryInfo))
 	core.HandleError(err)
 
 	if entry_count == 0 {
@@ -214,8 +211,7 @@ func (c ErpStockBillCheckout) Submit() revel.Result {
 
 	stock_bill.StatusId = models.STOCK_BILL_CHECKOUT_STATUS_SUBMIT
 
-	cols := models.StockBillCols
-	_, err = db_session.Id(bill_id).Cols(cols.StatusId).Update(&stock_bill)
+	_, err = db_session.Id(bill_id).Cols("status_id").Update(&stock_bill)
 	core.HandleError(err)
 
 	// 更新商品库存

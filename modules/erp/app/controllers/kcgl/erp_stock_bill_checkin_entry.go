@@ -2,12 +2,12 @@ package controllers
 
 import (
 	"encoding/json"
-	"github.com/revel/revel"
+	"fmt"
 	"strconv"
 
+	"github.com/revel/revel"
 	"matrix/core"
 	"matrix/modules/erp/models"
-	"fmt"
 )
 
 type ErpStockBillCheckinEntry struct {
@@ -255,8 +255,7 @@ WHERE sbe.bill_id = %d AND sbe.storage_loc_id = %d AND sbe.product_id = %d
 		core.HandleError(err)
 	} else {
 		stock_bill_entry.Id = detail_form.Id
-		cols := models.StockBillEntryCols
-		affected, err = db_session.Id(stock_bill_entry.Id).Cols(cols.StorageLocId, cols.ProductId, cols.Qty, cols.Price).Update(&stock_bill_entry)
+		affected, err = db_session.Id(stock_bill_entry.Id).Cols("storage_loc_id", "product_id", "qty", "price").Update(&stock_bill_entry)
 		core.HandleError(err)
 
 		if affected == 0 {

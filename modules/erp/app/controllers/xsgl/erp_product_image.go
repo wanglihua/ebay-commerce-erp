@@ -166,8 +166,7 @@ func (c ErpProductImage) Save() revel.Result {
 	product_image := detail_form.ProductImage
 
 	var product models.ProductInfo
-	product_cols := models.ProductCols
-	found, err := db_session.Where(fmt.Sprintf("%s = ?", product_cols.Sku), product_image.ProductCode).Get(&product)
+	found, err := db_session.Where(fmt.Sprintf("sku = '%s'", product_image.ProductCode)).Get(&product)
 	core.HandleError(err)
 
 	if found == false {

@@ -46,7 +46,7 @@ func (e ProductImageTypeInfo) InitData(db_session *xorm.Session) {
 	}
 
 	var product_image_type_list []ProductImageTypeInfo
-	err := db_session.In(ProductImageTypeCols.Id, product_image_type_id_list).
+	err := db_session.In("id", product_image_type_id_list).
 		Find(&product_image_type_list)
 	core.HandleError(err)
 
