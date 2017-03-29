@@ -57,12 +57,12 @@ func (f *LogisticsFeeRateDetailForm) IsCreate() bool {
 func (f *LogisticsFeeRateDetailForm) Valid(validation *revel.Validation) bool {
 	validation.Required(f.LogisticsFeeRate.ModeId).Message("物流公司不能为空！")
 
-	validation.Required(f.LogisticsFeeRate.PostCode).Message("邮编不能为空！")
-	if f.LogisticsFeeRate.PostCode != "" {
-		validation.MinSize(f.LogisticsFeeRate.PostCode, 2).Message("邮编长度不能小于2！")
+	validation.Required(f.LogisticsFeeRate.Postcode).Message("邮编不能为空！")
+	if f.LogisticsFeeRate.Postcode != "" {
+		validation.MinSize(f.LogisticsFeeRate.Postcode, 2).Message("邮编长度不能小于2！")
 	}
-	if f.LogisticsFeeRate.PostCode != "" {
-		validation.MaxSize(f.LogisticsFeeRate.PostCode, 100).Message("邮编长度不能大于100！")
+	if f.LogisticsFeeRate.Postcode != "" {
+		validation.MaxSize(f.LogisticsFeeRate.Postcode, 100).Message("邮编长度不能大于100！")
 	}
 
 	validation.Required(f.LogisticsFeeRate.Qbj).Message("起步价不能为空！")
@@ -74,8 +74,6 @@ func (f *LogisticsFeeRateDetailForm) Valid(validation *revel.Validation) bool {
 	validation.Required(f.LogisticsFeeRate.Xzjt).Message("续重阶梯不能为空！")
 
 	validation.Required(f.LogisticsFeeRate.Xzjtsf).Message("续重阶梯收费不能为空！")
-
-	validation.Required(f.LogisticsFeeRate.Sfpydq).Message("是否为偏远地区不能为空！")
 
 	validation.Required(f.LogisticsFeeRate.Pydqjsyf).Message("偏远地区加收运费不能为空！")
 
@@ -113,6 +111,8 @@ func (c ErpLogisticsFeeRate) Save() revel.Result {
 	var detail_form LogisticsFeeRateDetailForm
 	err := json.Unmarshal(c.GetRequestBody(), &detail_form)
 	core.HandleError(err)
+
+	revel.TRACE.Println("postcode", detail_form.LogisticsFeeRate.Postcode)
 
 	if detail_form.Valid(c.Validation) == false {
 		return c.RenderJson(core.JsonResult{Success: false, Message: c.GetValidationErrorMessage()})

@@ -39,7 +39,7 @@ func GetDdpzMenu(res_id_map map[int64]bool, db_session *xorm.Session, web_sessio
             <b class="arrow"></b>
         </li>
 
-        <li id="erp-logisticsfeerate-menu" class="">
+        <li id="ddpz-logisticsfeerate-menu" class="">
             <a href="/erp/logistics/fee/rate">
                 <i class="menu-icon fa fa-caret-right"></i>
                 物流费率
