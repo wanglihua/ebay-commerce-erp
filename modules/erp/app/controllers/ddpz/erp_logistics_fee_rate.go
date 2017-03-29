@@ -2,9 +2,10 @@ package controllers
 
 import (
 	"encoding/json"
+	"fmt"
 	"strconv"
-	"github.com/revel/revel"
 
+	"github.com/revel/revel"
 	"matrix/core"
 	"matrix/modules/erp/models"
 )
@@ -47,7 +48,10 @@ func (c ErpLogisticsFeeRate) ListData() revel.Result {
 }
 
 type LogisticsFeeRateDetailForm struct {
-	LogisticsFeeRate models.LogisticsFeeRateInfo `json:"logistics_fee_rate"`
+	LogisticsFeeRate     models.LogisticsFeeRateInfo   `json:"logistics_fee_rate"`
+	LogisticsCompanyList []models.LogisticsCompanyInfo `json:"logistics_company_list"`
+	LogisticsModeList    []models.LogisticsModeInfo    `json:"logistics_mode_list"`
+	CompanyId            int64                         `json:"company_id"`
 }
 
 func (f *LogisticsFeeRateDetailForm) IsCreate() bool {
@@ -102,6 +106,38 @@ func (c ErpLogisticsFeeRate) DetailData() revel.Result {
 	var detail_form LogisticsFeeRateDetailForm
 	detail_form.LogisticsFeeRate = logistics_fee_rate
 
+	var logistics_company_list = make([]models.LogisticsCompanyInfo, 0)
+	err := db_session.Find(&logistics_company_list)
+	core.HandleError(err)
+	detail_form.LogisticsCompanyList = logistics_company_list
+
+	if logistics_fee_rate_id == 0 {
+		if len(logistics_company_list) != 0 {
+			var selected_company_id = logistics_company_list[0].Id;
+			var logistics_mode_list = make([]models.LogisticsModeInfo, 0)
+			err = db_session.Where(fmt.Sprintf("company_id = %d", selected_company_id)).Find(&logistics_mode_list)
+			core.HandleError(err)
+
+			detail_form.CompanyId = selected_company_id
+			detail_form.LogisticsModeList = logistics_mode_list
+		}
+	} else {
+		//get company id from database
+		var mode_id = logistics_fee_rate.ModeId
+		var logistics_mode models.LogisticsModeInfo
+		_, err = db_session.Id(mode_id).Get(&logistics_mode)
+		core.HandleError(err)
+		var company_id = logistics_mode.CompanyId
+
+		//get mode list from database
+		var logistics_mode_list = make([]models.LogisticsModeInfo, 0)
+		err = db_session.Where(fmt.Sprintf("company_id = %d", company_id)).Find(&logistics_mode_list)
+		core.HandleError(err)
+
+		detail_form.CompanyId = company_id
+		detail_form.LogisticsModeList = logistics_mode_list
+	}
+
 	return c.RenderJson(detail_form)
 }
 
@@ -150,4 +186,19 @@ func (c ErpLogisticsFeeRate) Delete() revel.Result {
 
 func (c ErpLogisticsFeeRate) Import() revel.Result {
 	return c.RenderEmpty()
+}
+
+func (c ErpLogisticsFeeRate) GetLogisticsModeListByCompanyId() revel.Result {
+	db_session := c.DbSession
+
+	var company_id int64
+	c.Params.Bind(&company_id, "company_id")
+
+	var logistics_mode_list = make([]models.LogisticsModeInfo, 0)
+	err := db_session.Where(fmt.Sprintf("company_id = %d", company_id)).Find(&logistics_mode_list)
+	core.HandleError(err)
+
+	return c.RenderJson(map[string]interface{}{
+		"mode_list": logistics_mode_list,
+	})
 }

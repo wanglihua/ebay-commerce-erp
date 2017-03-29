@@ -94,6 +94,7 @@ POST /erp/logistics/fee/rate/data/detail        ErpLogisticsFeeRate.DetailData
 POST /erp/logistics/fee/rate/save               ErpLogisticsFeeRate.Save
 POST /erp/logistics/fee/rate/delete             ErpLogisticsFeeRate.Delete
 POST /erp/logistics/fee/rate/import             ErpLogisticsFeeRate.Import
+POST /erp/logistics/fee/rate/mode/list/by/company  ErpLogisticsFeeRate.GetLogisticsModeListByCompanyId
 
 GET  /erp/product                              ErpProduct.Index
 POST /erp/product/data/list                    ErpProduct.ListData
