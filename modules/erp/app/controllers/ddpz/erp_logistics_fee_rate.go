@@ -25,6 +25,20 @@ func (c ErpLogisticsFeeRate) ListData() revel.Result {
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
+	/*
+		aoData.push({'name': 'logistics_company_query', 'value': $('#logistics_company_query').val()});
+		aoData.push({'name': 'logistics_mode_query', 'value': $('#logistics_mode_query').val()});
+		aoData.push({'name': 'postcode_query', 'value': $('#postcode_query').val()});
+	 */
+
+	var logistics_company_query string
+	var logistics_mode_query string
+	var postcode_query string
+
+	c.Params.Bind(&logistics_company_query, "logistics_company_query")
+	c.Params.Bind(&logistics_mode_query, "logistics_mode_query")
+	c.Params.Bind(&postcode_query, "postcode_query")
+
 	type logistics_fee_rate_view_item_t struct {
 		models.LogisticsFeeRateInfo  `xorm:"extends" json:"fr"`
 		models.LogisticsModeInfo     `xorm:"extends" json:"lm"`
@@ -36,6 +50,7 @@ func (c ErpLogisticsFeeRate) ListData() revel.Result {
 		FROM erp_logistics_fee_rate fr
 		    INNER JOIN erp_logistics_mode lm ON lm.id = fr.mode_id
 		    INNER JOIN erp_logistics_company lc ON lc.id = lm.company_id
+		WHERE lc.name LIKE '%abc%' AND lm.name LIKE '%bcd%' AND fr.postcode LIKE '%123%'
 	 */
 
 	sb := core.NewSqlBuilder()
@@ -44,6 +59,19 @@ func (c ErpLogisticsFeeRate) ListData() revel.Result {
 	sb.From(`erp_logistics_fee_rate fr
     INNER JOIN erp_logistics_mode lm ON lm.id = fr.mode_id
     INNER JOIN erp_logistics_company lc ON lc.id = lm.company_id`)
+
+	if strings.TrimSpace(logistics_company_query) != "" {
+		filter = core.SqlAnd(filter, fmt.Sprintf("lc.name LIKE '%%%s%%'", logistics_company_query))
+	}
+
+	if strings.TrimSpace(logistics_mode_query) != "" {
+		filter = core.SqlAnd(filter, fmt.Sprintf("lm.name LIKE '%%%s%%'", logistics_mode_query))
+	}
+
+	if strings.TrimSpace(postcode_query) != "" {
+		filter = core.SqlAnd(filter, fmt.Sprintf("fr.postcode LIKE '%%%s%%'", postcode_query))
+	}
+
 	sb.Where(filter)
 
 	if order != "" {

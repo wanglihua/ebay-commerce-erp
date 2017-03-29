@@ -33,6 +33,19 @@
                 <div style="margin-top: 10px;">
                     <a href="/static/excel-template/logistics_fee_rate_import.xlsx">下载Excel模板</a>
                 </div>
+                <div class="row" style="margin-top: 15px;margin-bottom: 5px;">
+                    <div id="query" class="col-xs-12 query">
+                        <label class="control-label no-padding-right" for="logistics_company_query">物流公司</label>
+                        <input id="logistics_company_query" class="input-sm" name="logistics_company_query" placeholder="物流公司查询" type="text" style="width: 100px;"/>
+                        <label class="control-label no-padding-right" for="logistics_mode_query">物流方式</label>
+                        <input class="input-sm" id="logistics_mode_query" name="logistics_mode_query" placeholder="物流方式查询" type="text" style="width: 130px;"/>
+                        <label class="control-label no-padding-right" for="postcode_query">邮政编码</label>
+                        <input class="input-sm" id="postcode_query" name="postcode_query" placeholder="邮政编码查询" type="text" style="width: 130px;"/>
+                        <button class="btn btn-mini btn-primary" @click="reloadList()">
+                            &nbsp;<i class="ace-icon fa fa-search"></i>查&nbsp;询&nbsp;
+                        </button>
+                    </div>
+                </div>
                 <div>
                     <table id="logisticsFeeRateList" class="table table-striped table-bordered table-hover"></table>
                     <div class="todo">1、按物流公司，物流方式，邮政编码 查询；2、还缺个仓库，放在物流方式里面，还是放在物流费率里面好？</div>
@@ -352,7 +365,26 @@
                         },
                         {"mDataProp": "fr.create_time", "title": "创建时间", "bSearchable": false, "width": 120},
                         {"mDataProp": "fr.update_time", "title": "修改时间", "bSearchable": false, "width": 120}
-                    ]
+                    ],
+                    "fnServerData": function (sSource, aoData, fnCallback) {
+                        aoData.push({'name': 'logistics_company_query', 'value': $('#logistics_company_query').val()});
+                        aoData.push({'name': 'logistics_mode_query', 'value': $('#logistics_mode_query').val()});
+                        aoData.push({'name': 'postcode_query', 'value': $('#postcode_query').val()});
+
+                        $.ajax({
+                            "dataType": 'json',
+                            "url": sSource,
+                            "data": aoData,
+                            "success": function (data) {
+                                if (data.success == false) {
+                                    $.msg.error(data.message);
+                                    return;
+                                }
+
+                                fnCallback(data);
+                            }
+                        });
+                    }
                 }
             );
 
