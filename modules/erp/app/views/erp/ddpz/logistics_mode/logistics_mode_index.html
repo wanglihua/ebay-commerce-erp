@@ -93,9 +93,9 @@
 
                                     <div class="col-xs-6">
                                         <div class="form-group">
-                                            <label for="tjzgs" class="col-xs-6 control-label">体积重公式</label>
+                                            <label for="tjzgs" class="col-xs-6 control-label">体积重公式分母</label>
                                             <div class="col-xs-6">
-                                                <input id="tjzgs" name="detail.logistics_mode.tjzgs" type="text" class="input-sm form-control" v-model.number="detail.logistics_mode.tjzgs"/>
+                                                <input id="tjzgs" name="detail.logistics_mode.tjzgs" type="text" class="input-sm form-control" v-model.number="detail.logistics_mode.tjzgs" placeholder="x*y*z/250 就填 250" />
                                             </div>
                                         </div>
                                     </div>
@@ -159,6 +159,18 @@
 
                                     <div class="col-xs-6">
                                         <div class="form-group">
+                                            <label for="zcbxzcd" class="col-xs-6 control-label">最长边限制长度</label>
+                                            <div class="col-xs-6">
+                                                <input id="zcbxzcd" name="detail.logistics_mode.zcbxzcd" type="text" class="input-sm form-control" v-model.number="detail.logistics_mode.zcbxzcd"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
                                             <label for="zlsfyxz" class="col-xs-6 control-label">重量是否有限制</label>
                                             <div class="col-xs-6">
                                                 <select id="zlsfyxz" name="detail.logistics_mode.zlsfyxz" class="input-sm form-control" v-model="detail.logistics_mode.zlsfyxz">
@@ -168,9 +180,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                </div>
 
-                                <div class="row">
                                     <div class="col-xs-6">
                                         <div class="form-group">
                                             <label for="zlbncg" class="col-xs-6 control-label">重量不能超过（Kg)</label>
@@ -180,6 +190,9 @@
                                         </div>
                                     </div>
 
+                                </div>
+
+                                <div class="row">
                                     <div class="col-xs-6">
                                         <div class="form-group">
                                             <label for="sfyxcc" class="col-xs-6 control-label">是否允许超长</label>
@@ -191,9 +204,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                </div>
 
-                                <div class="row">
                                     <div class="col-xs-6">
                                         <div class="form-group">
                                             <label for="ccjsyf" class="col-xs-6 control-label">超长加收多少运费（澳币）</label>
@@ -202,7 +213,9 @@
                                             </div>
                                         </div>
                                     </div>
+                                </div>
 
+                                <div class="row">
                                     <div class="col-xs-6">
                                         <div class="form-group">
                                             <label for="sfyxcz" class="col-xs-6 control-label">是否允许超重</label>
@@ -214,9 +227,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                </div>
 
-                                <div class="row">
                                     <div class="col-xs-6">
                                         <div class="form-group">
                                             <label for="czjsyf" class="col-xs-6 control-label">超重加收多少运费（澳币）</label>
