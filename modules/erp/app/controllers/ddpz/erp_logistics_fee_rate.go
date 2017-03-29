@@ -223,12 +223,13 @@ func (c ErpLogisticsFeeRate) Import() revel.Result {
 		})
 	}
 
-	type logistics_mode_t struct {
-		CompanyName   string
-		LogisticsMode models.LogisticsModeInfo
+	type logistics_fee_rate_import_t struct {
+		CompanyName      string
+		ModeName         string
+		LogisticsFeeRate models.LogisticsFeeRateInfo
 	}
 
-	logistics_mode_list := make([]logistics_mode_t, 0)
+	logistics_fee_rate_list := make([]logistics_fee_rate_import_t, 0)
 
 	xlsx_file, err := xlsx.OpenBinary(excel_file_bytes)
 	core.HandleError(err)
@@ -246,7 +247,7 @@ func (c ErpLogisticsFeeRate) Import() revel.Result {
 			var cell_val string
 			var err error
 
-			var logistics_mode logistics_mode_t
+			var logistics_fee_rate logistics_fee_rate_import_t
 
 			col_index := 0
 
@@ -255,7 +256,7 @@ func (c ErpLogisticsFeeRate) Import() revel.Result {
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
-			logistics_mode.CompanyName = cell_val
+			logistics_fee_rate.CompanyName = cell_val
 			col_index++
 
 			// 物流方式名称
@@ -263,179 +264,119 @@ func (c ErpLogisticsFeeRate) Import() revel.Result {
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
-			logistics_mode.LogisticsMode.Name = cell_val
+			logistics_fee_rate.ModeName = cell_val
 			col_index++
 
-			// 是否考虑 体积重
+			// 邮编
 			cell = row.Cells[col_index]
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
-			if strings.TrimSpace(cell_val) == "是" {
-				logistics_mode.LogisticsMode.Sfkltjz = 1
-			} else {
-				logistics_mode.LogisticsMode.Sfkltjz = 0
-			}
+			logistics_fee_rate.LogisticsFeeRate.Postcode = cell_val
 			col_index++
 
-			// 体积重公式 ( 长X宽X高/250) 250
+			// 起步价(澳币)
 			cell = row.Cells[col_index]
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
-			logistics_mode.LogisticsMode.Tjzgs, _ = strconv.ParseFloat(cell_val, 64)
+			logistics_fee_rate.LogisticsFeeRate.Qbj, _ = strconv.ParseFloat(cell_val, 64)
 			col_index++
 
-			// 体积重 系数
-			cell = row.Cells[col_index]
-			cell_val, err = cell.String()
-			cell_val = strings.TrimSpace(cell_val)
-			core.HandleError(err)
-			logistics_mode.LogisticsMode.Tjzxs, _ = strconv.ParseFloat(cell_val, 64)
-			col_index++
-
-			// 体积重与 实际重取向 （取大 or 取小） 取大(1) or 取小(2)
-			cell = row.Cells[col_index]
-			cell_val, err = cell.String()
-			cell_val = strings.TrimSpace(cell_val)
-			core.HandleError(err)
-			if strings.TrimSpace(cell_val) == "取大" {
-				logistics_mode.LogisticsMode.Tjzysjzqx = 1
-			} else if strings.TrimSpace(cell_val) == "取小" {
-				logistics_mode.LogisticsMode.Tjzysjzqx = 2
-			}
-			col_index++
-
-			// 体积重与实际重 是否有比值要求
+			// 起步价重量(Kg)
 			cell = row.Cells[col_index]
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
-			if strings.TrimSpace(cell_val) == "是" {
-				logistics_mode.LogisticsMode.Zlsfybzyq = 1
-			} else {
-				logistics_mode.LogisticsMode.Zlsfybzyq = 0
-			}
+			logistics_fee_rate.LogisticsFeeRate.Qbjzl, _ = strconv.ParseFloat(cell_val, 64)
 			col_index++
 
-			// 体积重/实际重 比值
+			// 最低收费(澳币)
 			cell = row.Cells[col_index]
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
-			logistics_mode.LogisticsMode.Tjzsjzbz, _ = strconv.ParseFloat(cell_val, 64)
+			logistics_fee_rate.LogisticsFeeRate.Zdsf, _ = strconv.ParseFloat(cell_val, 64)
 			col_index++
 
-			// 最长边是否 有限制
+			// 续重阶梯(Kg)
 			cell = row.Cells[col_index]
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
-			if strings.TrimSpace(cell_val) == "是" {
-				logistics_mode.LogisticsMode.Zcbsfyxz = 1
-			} else {
-				logistics_mode.LogisticsMode.Zcbsfyxz = 0
-			}
+			logistics_fee_rate.LogisticsFeeRate.Xzjt, _ = strconv.ParseFloat(cell_val, 64)
 			col_index++
 
-			// 最长边限制 长度（cm）
+			// 续重阶梯收费(澳币)
 			cell = row.Cells[col_index]
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
-			logistics_mode.LogisticsMode.Zcbxzcd, _ = strconv.ParseFloat(cell_val, 64)
+			logistics_fee_rate.LogisticsFeeRate.Xzjtsf, _ = strconv.ParseFloat(cell_val, 64)
 			col_index++
 
-			// 重量是否 有限制
-			cell = row.Cells[col_index]
-			cell_val, err = cell.String()
-			core.HandleError(err)
-			cell_val = strings.TrimSpace(cell_val)
-			if strings.TrimSpace(cell_val) == "是" {
-				logistics_mode.LogisticsMode.Zlsfyxz = 1
-			} else {
-				logistics_mode.LogisticsMode.Zlsfyxz = 0
-			}
-			col_index++
-
-			// 重量不能 超过（Kg)
-			cell = row.Cells[col_index]
-			cell_val, err = cell.String()
-			core.HandleError(err)
-			cell_val = strings.TrimSpace(cell_val)
-			logistics_mode.LogisticsMode.Zlbncg, _ = strconv.ParseFloat(cell_val, 64)
-			col_index++
-
-			// 是否允许 超长
-			cell = row.Cells[col_index]
-			cell_val, err = cell.String()
-			core.HandleError(err)
-			cell_val = strings.TrimSpace(cell_val)
-			if strings.TrimSpace(cell_val) == "是" {
-				logistics_mode.LogisticsMode.Sfyxcc = 1
-			} else {
-				logistics_mode.LogisticsMode.Sfyxcc = 0
-			}
-			col_index++
-
-			// 超长加收多少 运费（澳币）
-			cell = row.Cells[col_index]
-			cell_val, err = cell.String()
-			core.HandleError(err)
-			cell_val = strings.TrimSpace(cell_val)
-			logistics_mode.LogisticsMode.Ccjsyf, _ = strconv.ParseFloat(cell_val, 64)
-			col_index++
-
-			// 是否 允许超重
+			// 是否为偏远地区
 			cell = row.Cells[col_index]
 			core.HandleError(err)
 			cell_val, err = cell.String()
 			if strings.TrimSpace(cell_val) == "是" {
-				logistics_mode.LogisticsMode.Sfyxcz = 1
+				logistics_fee_rate.LogisticsFeeRate.Sfpydq = 1
 			} else {
-				logistics_mode.LogisticsMode.Sfyxcz = 0
+				logistics_fee_rate.LogisticsFeeRate.Sfpydq = 0
 			}
 			col_index++
 
-			// 超重加收多少 运费（澳币）
+			// 偏远地区加收运费(澳币)
 			cell = row.Cells[col_index]
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
-			logistics_mode.LogisticsMode.Czjsyf, _ = strconv.ParseFloat(cell_val, 64)
+			logistics_fee_rate.LogisticsFeeRate.Pydqjsyf, _ = strconv.ParseFloat(cell_val, 64)
 			col_index++
 
-			logistics_mode_list = append(logistics_mode_list, logistics_mode)
+			logistics_fee_rate_list = append(logistics_fee_rate_list, logistics_fee_rate)
 		}
 	}
 
-	if len(logistics_mode_list) == 0 {
+	if len(logistics_fee_rate_list) == 0 {
 		return c.RenderJson(map[string]interface{}{
 			"success": false,
 			"message": "Excel文件中导入商品列表为空！",
 		})
 	}
 
-	for _, logistics_mode_import := range logistics_mode_list {
+	for _, logistics_fee_rate_import := range logistics_fee_rate_list {
 
-		var logistics_mode = logistics_mode_import.LogisticsMode
+		var logistics_fee_rate = logistics_fee_rate_import.LogisticsFeeRate
 
-		// 物流公司
-		var logistics_company models.LogisticsCompanyInfo
-		has, err := db_session.Where(fmt.Sprintf("name = '%s'", logistics_mode_import.CompanyName)).Get(&logistics_company)
+		// 物流方式
+		/*
+SELECT lm.id AS mode_id
+FROM erp_logistics_mode lm
+    INNER JOIN erp_logistics_company lc ON lc.id = lm.company_id
+WHERE lc.name = 'company_name' AND lm.name = 'mode_name'
+		 */
+
+		var mode_id struct {
+			ModeId int64 `xorm:"'mode_id'"`
+		}
+		sql := `SELECT lm.id AS mode_id
+FROM erp_logistics_mode lm
+    INNER JOIN erp_logistics_company lc ON lc.id = lm.company_id
+WHERE lc.name = '%s' AND lm.name = '%s'`
+		sql = fmt.Sprintf(sql, logistics_fee_rate_import.CompanyName, logistics_fee_rate_import.ModeName)
+		has, err := db_session.Sql(sql).Get(&mode_id)
 		core.HandleError(err)
-
 		if has == false {
-			logistics_company.Name = logistics_mode_import.CompanyName
-			logistics_company.Desc = core.NullStringFrom(logistics_mode_import.CompanyName)
-
-			_, err := db_session.Insert(&logistics_company)
-			core.HandleError(err)
+			return c.RenderJson(map[string]interface{}{
+				"success": false,
+				"message": "导入文件中的物流公司和物流方式不存在！",
+			})
 		}
 
-		logistics_mode.CompanyId = logistics_company.Id
+		logistics_fee_rate.ModeId = mode_id.ModeId
 
-		_, err = db_session.Insert(&logistics_mode)
+		_, err = db_session.Insert(&logistics_fee_rate)
 		core.HandleError(err)
 
 	}
