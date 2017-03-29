@@ -255,6 +255,11 @@
         </div>
     </div>
 </div>
+
+<script type="text/javascript" src="/static/lib/plupload/moxie.min.js"></script>
+<script type="text/javascript" src="/static/lib/plupload/plupload.min.js"></script>
+<script type="text/javascript" src="/static/lib/plupload/zh_CN.js"></script>
+
 <script type="text/javascript">
 
     function init_uploader() {
@@ -283,7 +288,7 @@
                     if (result.success != true) {
                         $.msg.error(result.message);
                     } else {
-                        reloadList('#productList');
+                        reloadList('#logisticsModeList');
                         $.msg.show(result.message);
                     }
                 },
@@ -402,6 +407,8 @@
                 var id = $(this).find('td:first-child input:checkbox').val();
                 vm.showLogisticsModeDetail(id);
             });
+
+            init_uploader();
         },
         methods: {
             reloadList: function () {

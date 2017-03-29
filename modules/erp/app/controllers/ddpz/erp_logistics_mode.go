@@ -221,16 +221,24 @@ func (c ErpLogisticsMode) Import() revel.Result {
 			// 物流公司名称
 			cell = row.Cells[col_index]
 			cell_val, err = cell.String()
-			cell_val = strings.TrimSpace(cell_val)
 			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
 			logistics_mode.CompanyName = cell_val
+			col_index++
+
+			// 物流方式名称
+			cell = row.Cells[col_index]
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
+			logistics_mode.LogisticsMode.Name = cell_val
 			col_index++
 
 			// 是否考虑 体积重
 			cell = row.Cells[col_index]
 			cell_val, err = cell.String()
-			cell_val = strings.TrimSpace(cell_val)
 			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
 			if strings.TrimSpace(cell_val) == "是" {
 				logistics_mode.LogisticsMode.Sfkltjz = 1
 			} else {
@@ -241,8 +249,8 @@ func (c ErpLogisticsMode) Import() revel.Result {
 			// 体积重公式 ( 长X宽X高/250) 250
 			cell = row.Cells[col_index]
 			cell_val, err = cell.String()
-			cell_val = strings.TrimSpace(cell_val)
 			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
 			logistics_mode.LogisticsMode.Tjzgs, _ = strconv.ParseFloat(cell_val, 64)
 			col_index++
 
@@ -269,8 +277,8 @@ func (c ErpLogisticsMode) Import() revel.Result {
 			// 体积重与实际重 是否有比值要求
 			cell = row.Cells[col_index]
 			cell_val, err = cell.String()
-			cell_val = strings.TrimSpace(cell_val)
 			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
 			if strings.TrimSpace(cell_val) == "是" {
 				logistics_mode.LogisticsMode.Zlsfybzyq = 1
 			} else {
@@ -281,16 +289,16 @@ func (c ErpLogisticsMode) Import() revel.Result {
 			// 体积重/实际重 比值
 			cell = row.Cells[col_index]
 			cell_val, err = cell.String()
-			cell_val = strings.TrimSpace(cell_val)
 			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
 			logistics_mode.LogisticsMode.Tjzsjzbz, _ = strconv.ParseFloat(cell_val, 64)
 			col_index++
 
 			// 最长边是否 有限制
 			cell = row.Cells[col_index]
 			cell_val, err = cell.String()
-			cell_val = strings.TrimSpace(cell_val)
 			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
 			if strings.TrimSpace(cell_val) == "是" {
 				logistics_mode.LogisticsMode.Zcbsfyxz = 1
 			} else {
@@ -301,16 +309,16 @@ func (c ErpLogisticsMode) Import() revel.Result {
 			// 最长边限制 长度（cm）
 			cell = row.Cells[col_index]
 			cell_val, err = cell.String()
-			cell_val = strings.TrimSpace(cell_val)
 			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
 			logistics_mode.LogisticsMode.Zcbxzcd, _ = strconv.ParseFloat(cell_val, 64)
 			col_index++
 
 			// 重量是否 有限制
 			cell = row.Cells[col_index]
 			cell_val, err = cell.String()
-			cell_val = strings.TrimSpace(cell_val)
 			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
 			if strings.TrimSpace(cell_val) == "是" {
 				logistics_mode.LogisticsMode.Zlsfyxz = 1
 			} else {
@@ -321,16 +329,16 @@ func (c ErpLogisticsMode) Import() revel.Result {
 			// 重量不能 超过（Kg)
 			cell = row.Cells[col_index]
 			cell_val, err = cell.String()
-			cell_val = strings.TrimSpace(cell_val)
 			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
 			logistics_mode.LogisticsMode.Zlbncg, _ = strconv.ParseFloat(cell_val, 64)
 			col_index++
 
 			// 是否允许 超长
 			cell = row.Cells[col_index]
 			cell_val, err = cell.String()
-			cell_val = strings.TrimSpace(cell_val)
 			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
 			if strings.TrimSpace(cell_val) == "是" {
 				logistics_mode.LogisticsMode.Sfyxcc = 1
 			} else {
@@ -341,15 +349,15 @@ func (c ErpLogisticsMode) Import() revel.Result {
 			// 超长加收多少 运费（澳币）
 			cell = row.Cells[col_index]
 			cell_val, err = cell.String()
-			cell_val = strings.TrimSpace(cell_val)
 			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
 			logistics_mode.LogisticsMode.Ccjsyf, _ = strconv.ParseFloat(cell_val, 64)
 			col_index++
 
 			// 是否 允许超重
 			cell = row.Cells[col_index]
-			cell_val, err = cell.String()
 			core.HandleError(err)
+			cell_val, err = cell.String()
 			if strings.TrimSpace(cell_val) == "是" {
 				logistics_mode.LogisticsMode.Sfyxcz = 1
 			} else {
@@ -360,8 +368,8 @@ func (c ErpLogisticsMode) Import() revel.Result {
 			// 超重加收多少 运费（澳币）
 			cell = row.Cells[col_index]
 			cell_val, err = cell.String()
-			cell_val = strings.TrimSpace(cell_val)
 			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
 			logistics_mode.LogisticsMode.Czjsyf, _ = strconv.ParseFloat(cell_val, 64)
 			col_index++
 

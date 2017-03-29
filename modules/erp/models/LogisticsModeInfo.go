@@ -7,7 +7,7 @@ import (
 type LogisticsModeInfo struct {
 	Id         int64           `xorm:"bigint notnull pk autoincr 'id'" json:"id"`
 	CompanyId  int64           `xorm:"bigint notnull 'company_id'" json:"company_id" smith:"verbose_name=物流公司"`
-	Name       string          `xorm:"nvarchar(200) notnull index unique 'name'" json:"name" smith:"verbose_name=物流方式名称,min=2,max=100"`
+	Name       string          `xorm:"nvarchar(200) notnull index 'name'" json:"name" smith:"verbose_name=物流方式名称,min=2,max=100"`
 	Sfkltjz    int             `xorm:"int notnull 'sfkltjz'" json:"sfkltjz" smith:"verbose_name=是否考虑体积重"`     // 0 否， 1 是
 	Tjzgs      float64         `xorm:"decimal(18,6) notnull 'tjzgs'" json:"tjzgs" smith:"verbose_name=体积重公式"` // 如果公式是:长X宽X高, 这里就取值 250
 	Tjzxs      float64         `xorm:"decimal(18,6) notnull 'tjzxs'" json:"tjzxs" smith:"verbose_name=体积重系数"`
