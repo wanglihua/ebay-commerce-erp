@@ -201,7 +201,7 @@
                     "aaSorting": [[1, "asc"]],
                     "aoColumns": [
                         {
-                            "mDataProp": "id",
+                            "mDataProp": "fr.id",
                             "bSearchable": false,
                             "orderable": false,
                             "sClass": "center",
@@ -211,10 +211,11 @@
                                 return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
                             }
                         },
-                        {"mDataProp": "mode_id", "title": "物流方式", "bSearchable": false, "width": 120},
-                        {"mDataProp": "postcode", "title": "邮编", "bSearchable": true, "width": 90},
+                        {"mDataProp": "lc.name", "title": "物流公司", "bSearchable": true, "width": 120},
+                        {"mDataProp": "lm.name", "title": "物流方式", "bSearchable": true},
+                        {"mDataProp": "fr.postcode", "title": "邮编", "bSearchable": true, "width": 90},
                         {
-                            "mDataProp": "qbj", "title": "起步价", "bSearchable": false, "width": 70,
+                            "mDataProp": "fr.qbj", "title": "起步价", "bSearchable": false, "width": 70,
                             "render": function (data, type, row) {
                                 if (data != "" && data == 0) {
                                     return "AU " + data;
@@ -225,7 +226,7 @@
                             }
                         },
                         {
-                            "mDataProp": "qbjzl", "title": "起步价重量", "bSearchable": false, "width": 70,
+                            "mDataProp": "fr.qbjzl", "title": "起步价重量", "bSearchable": false, "width": 90,
                             "render": function (data, type, row) {
                                 if (data != "" && data == 0) {
                                     return data + " kg";
@@ -236,7 +237,7 @@
                             }
                         },
                         {
-                            "mDataProp": "zdsf", "title": "最低收费", "bSearchable": false, "width": 70,
+                            "mDataProp": "fr.zdsf", "title": "最低收费", "bSearchable": false, "width": 80,
                             "render": function (data, type, row) {
                                 if (data != "" && data == 0) {
                                     return "AU " + data;
@@ -247,7 +248,7 @@
                             }
                         },
                         {
-                            "mDataProp": "xzjt", "title": "续重阶梯", "bSearchable": false, "width": 70,
+                            "mDataProp": "fr.xzjt", "title": "续重阶梯", "bSearchable": false, "width": 80,
                             "render": function (data, type, row) {
                                 if (data != "" && data == 0) {
                                     return data + " kg";
@@ -258,7 +259,7 @@
                             }
                         },
                         {
-                            "mDataProp": "xzjtsf", "title": "续重阶梯收费", "bSearchable": false, "width": 90,
+                            "mDataProp": "fr.xzjtsf", "title": "续重阶梯收费", "bSearchable": false, "width": 100,
                             "render": function (data, type, row) {
                                 if (data != "" && data == 0) {
                                     return "AU " + data;
@@ -269,7 +270,7 @@
                             }
                         },
                         {
-                            "mDataProp": "sfpydq", "title": "是否为偏远地区", "bSearchable": false, "width": 100,
+                            "mDataProp": "fr.sfpydq", "title": "是否为偏远地区", "bSearchable": false, "width": 120,
                             "render": function (data, type, row) {
                                 if (data == 0) {
                                     return "否";
@@ -283,10 +284,10 @@
                             }
                         },
                         {
-                            "mDataProp": "pydqjsyf",
+                            "mDataProp": "fr.pydqjsyf",
                             "title": "偏远地区加收运费",
                             "bSearchable": false,
-                            "width": 110,
+                            "width": 130,
                             "render": function (data, type, row) {
                                 if (data != "" && data == 0) {
                                     return "AU " + data;
@@ -296,8 +297,8 @@
                                 }
                             }
                         },
-                        {"mDataProp": "create_time", "title": "创建时间", "bSearchable": false, "width": 120},
-                        {"mDataProp": "update_time", "title": "修改时间", "bSearchable": false, "width": 120}
+                        {"mDataProp": "fr.create_time", "title": "创建时间", "bSearchable": false, "width": 120},
+                        {"mDataProp": "fr.update_time", "title": "修改时间", "bSearchable": false, "width": 120}
                     ]
                 }
             );

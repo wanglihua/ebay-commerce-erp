@@ -22,28 +22,50 @@ func (c ErpLogisticsFeeRate) ListData() revel.Result {
 	db_session := c.DbSession
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
-	query := db_session.Where(filter)
 
-	//query extra filter here
-
-	data_query := *query
-	if order != "" {
-		data_query = *data_query.OrderBy(order)
-	} else {
-		data_query = *data_query.Asc("id")
+	type logistics_fee_rate_view_item_t struct {
+		models.LogisticsFeeRateInfo  `xorm:"extends" json:"fr"`
+		models.LogisticsModeInfo     `xorm:"extends" json:"lm"`
+		models.LogisticsCompanyInfo  `xorm:"extends" json:"lc"`
 	}
 
-	logistics_fee_rate_list := make([]models.LogisticsFeeRateInfo, 0, limit)
-	err := data_query.Limit(limit, offset).Find(&logistics_fee_rate_list)
+	/*
+		SELECT fr.*, lm.*, lc.*
+		FROM erp_logistics_fee_rate fr
+		    INNER JOIN erp_logistics_mode lm ON lm.id = fr.mode_id
+		    INNER JOIN erp_logistics_company lc ON lc.id = lm.company_id
+	 */
+
+	sb := core.NewSqlBuilder()
+	sb.Select("fr.*, lm.*, lc.*")
+	sb.Count("count(fr.id) AS fee_rate_count")
+	sb.From(`erp_logistics_fee_rate fr
+    INNER JOIN erp_logistics_mode lm ON lm.id = fr.mode_id
+    INNER JOIN erp_logistics_company lc ON lc.id = lm.company_id`)
+	sb.Where(filter)
+
+	if order != "" {
+		sb.OrderBy(order)
+	} else {
+		sb.OrderBy("fr.id ASC")
+	}
+
+	sb.Limit(offset, limit)
+
+	logistics_fee_rate_list := make([]logistics_fee_rate_view_item_t, 0, limit)
+	err := db_session.Sql(sb.SqlList()).Find(&logistics_fee_rate_list)
 	core.HandleError(err)
 
-	count_query := *query
-	count, err := count_query.Count(new(models.LogisticsFeeRateInfo))
+	var fee_rate_count struct {
+		Count int64 `xorm:"'fee_rate_count'"`
+	}
+
+	_, err = db_session.Sql(sb.SqlCount()).Get(&fee_rate_count)
 	core.HandleError(err)
 
 	return c.RenderJson(core.GridResult{
 		Data:  logistics_fee_rate_list,
-		Total: count,
+		Total: fee_rate_count.Count,
 	})
 }
 
