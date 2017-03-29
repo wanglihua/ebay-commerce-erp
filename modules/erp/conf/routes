@@ -88,6 +88,13 @@ POST /erp/logistics/mode/save                  ErpLogisticsMode.Save
 POST /erp/logistics/mode/delete                ErpLogisticsMode.Delete
 POST /erp/logistics/mode/import                ErpLogisticsMode.Import
 
+GET  /erp/logistics/fee/rate                    ErpLogisticsFeeRate.Index
+POST /erp/logistics/fee/rate/data/list          ErpLogisticsFeeRate.ListData
+POST /erp/logistics/fee/rate/data/detail        ErpLogisticsFeeRate.DetailData
+POST /erp/logistics/fee/rate/save               ErpLogisticsFeeRate.Save
+POST /erp/logistics/fee/rate/delete             ErpLogisticsFeeRate.Delete
+POST /erp/logistics/fee/rate/import             ErpLogisticsFeeRate.Import
+
 GET  /erp/product                              ErpProduct.Index
 POST /erp/product/data/list                    ErpProduct.ListData
 GET  /erp/product/detail/:product_id           ErpProduct.Detail

@@ -4,7 +4,7 @@ import "matrix/core"
 
 type LogisticsFeeRateInfo struct {
 	Id         int64           `xorm:"bigint notnull pk autoincr 'id'" json:"id"`
-	ModeId     int64           `xorm:"bigint notnull 'mode_id'" json:"mode_id" smith:"verbose_name=物流公司"`
+	ModeId     int64           `xorm:"bigint notnull 'mode_id'" json:"mode_id" smith:"verbose_name=物流方式"`
 	PostCode   string          `xorm:"nvarchar(200) notnull index 'postcode'" json:"name" smith:"verbose_name=邮编,min=2,max=100"`
 	Qbj        float64         `xorm:"decimal(18,6) notnull 'qbj'" json:"qbj" smith:"verbose_name=起步价"`
 	Qbjzl      float64         `xorm:"decimal(18,6) notnull 'qbjzl'" json:"qbjzl" smith:"verbose_name=起步价重量"`
