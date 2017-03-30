@@ -14,6 +14,8 @@ import (
 	"matrix/ebay"
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/exchange_rate_service"
+	"matrix/modules/erp/service/product_service"
+	"matrix/modules/erp/service/product_store_item_service"
 )
 
 /*
@@ -373,6 +375,9 @@ func (t EBayOrderDownloadTask) Run() {
 					// 获取并检查明细是否存在，根据 order_id 和 item_sku
 					var order_item models.OrderItemInfo
 					item_sku := transaction.Item.SKU
+
+					//todo: 要考虑是不是绑定商品的情况
+
 					has_order_item, err := db_session.Where(fmt.Sprintf("order_id = %d and item_sku = '%s'", order_id, item_sku)).Get(&order_item)
 					if err != nil {
 						revel.ERROR.Println(err)
@@ -391,17 +396,7 @@ func (t EBayOrderDownloadTask) Run() {
 					order_item.ItemId = transaction.Item.ItemID
 
 					//order_item.ItemProductId 如果这时产品不存在会怎样，下载产品
-					var product_store_item_query_result struct {
-						ProductId          int64 `xorm:"'product_id'"`
-						ProductStoreItemId int64 `xorm:"'product_store_item_id'"`
-					}
-					has_product_store_item, err := db_session.Sql(fmt.Sprintf("SELECT product_id, id AS product_store_item_id FROM erp_product_store_item psi WHERE item_id = '%s';", transaction.Item.ItemID)).Get(&product_store_item_query_result)
-					if err != nil {
-						revel.ERROR.Println(err)
-					}
-
-					product_id := product_store_item_query_result.ProductId
-					product_store_item_id := product_store_item_query_result.ProductStoreItemId
+					has_product_store_item, product_id, product_store_item_id := product_store_item_service.Query_product_store_item(transaction.Item.ItemID, db_session)
 					if has_product_store_item == false {
 						//download product
 						product_id, _, product_store_item_id = fetch_product_item_to_db(config, db_session, transaction.Item.ItemID)
@@ -414,14 +409,8 @@ func (t EBayOrderDownloadTask) Run() {
 					order_item.ItemConditionId = transaction.Item.ConditionID
 					order_item.ItemConditionDisplayName = transaction.Item.ConditionDisplayName
 
-					//获得商品的成本价，如果这时产品是刚刚下载的，成本价是零，之后如何更新订单的明细里面的成本价格。
-					var product models.ProductInfo
-					_, err = db_session.Id(product_id).Get(&product)
-					if err != nil {
-						revel.ERROR.Println(err)
-					}
-
-					order_item.ProductCostPrice = product.CostPrice
+					//todo: 获得商品的成本价，如果这时产品是刚刚下载的，成本价是零，之后如何更新订单的明细里面的成本价格。
+					order_item.ProductCostPrice = product_service.Get_product_cost_price(product_id, db_session)
 
 					transaction_created_date, err := time.Parse("2006-01-02T15:04:05.000Z", transaction.CreatedDate)
 					if err != nil {
