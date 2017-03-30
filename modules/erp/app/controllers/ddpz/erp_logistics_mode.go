@@ -28,19 +28,22 @@ func (c ErpLogisticsMode) ListData() revel.Result {
 	type logistics_mode_view_item_t struct {
 		models.LogisticsModeInfo          `xorm:"extends" json:"m"`
 		models.LogisticsCompanyInfo       `xorm:"extends" json:"c"`
+		models.StockInfo                  `xorm:"extends" json:"s"`
 	}
 
 	/*
-		SELECT m.*, c.*
+		SELECT m.*, c.*, s.*
 		FROM erp_logistics_mode m
 		    INNER JOIN erp_logistics_company c ON c.id = m.company_id
+		    INNER JOIN erp_stock s ON s.id = m.stock_id
 	*/
 
 	sb := core.NewSqlBuilder()
-	sb.Select("m.*, c.*")
+	sb.Select("m.*, c.*, s.*")
 	sb.Count("count(m.id) as mode_count")
 	sb.From(`erp_logistics_mode m
-		    INNER JOIN erp_logistics_company c ON c.id = m.company_id`)
+		    INNER JOIN erp_logistics_company c ON c.id = m.company_id
+		    INNER JOIN erp_stock s ON s.id = m.stock_id`)
 
 	sb.Where(filter)
 
@@ -75,6 +78,7 @@ func (c ErpLogisticsMode) ListData() revel.Result {
 type LogisticsModeDetailForm struct {
 	LogisticsMode        models.LogisticsModeInfo       `json:"logistics_mode"`
 	LogisticsCompanyList []models.LogisticsCompanyInfo  `json:"logistics_company_list"`
+	StockList            []models.StockInfo             `json:"stock_list"`
 }
 
 func (f *LogisticsModeDetailForm) IsCreate() bool {
@@ -116,9 +120,14 @@ func (c ErpLogisticsMode) DetailData() revel.Result {
 	err := db_session.Find(&logistics_company_list)
 	core.HandleError(err)
 
+	var stock_list = make([]models.StockInfo, 0)
+	err = db_session.Find(&stock_list)
+	core.HandleError(err)
+
 	var detail_form LogisticsModeDetailForm
 	detail_form.LogisticsMode = logistics_mode
 	detail_form.LogisticsCompanyList = logistics_company_list
+	detail_form.StockList = stock_list
 
 	return c.RenderJson(detail_form)
 }

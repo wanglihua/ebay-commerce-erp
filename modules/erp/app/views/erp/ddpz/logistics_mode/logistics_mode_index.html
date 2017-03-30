@@ -70,8 +70,23 @@
 
                                     <div class="col-xs-6">
                                         <div class="form-group">
-                                            <label for="name" class="col-xs-6 control-label">物流方式名称</label>
+                                            <label for="stock_id" class="col-xs-6 control-label">仓库</label>
                                             <div class="col-xs-6">
+                                                <select id="stock_id" name="detail.logistics_mode.stock_id" class="input-sm form-control" v-model.number="detail.logistics_mode.stock_id">
+                                                    <template v-for="stock in detail.stock_list">
+                                                        <option :value="stock.id">{{stock.name}}</option>
+                                                    </template>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <label for="name" class="col-xs-3 control-label">物流方式名称</label>
+                                            <div class="col-xs-9">
                                                 <input id="name" name="detail.logistics_mode.name" type="text" class="input-sm form-control" v-model="detail.logistics_mode.name"/>
                                             </div>
                                         </div>
@@ -95,7 +110,7 @@
                                         <div class="form-group">
                                             <label for="tjzgs" class="col-xs-6 control-label">体积重公式分母</label>
                                             <div class="col-xs-6">
-                                                <input id="tjzgs" name="detail.logistics_mode.tjzgs" type="text" class="input-sm form-control" v-model.number="detail.logistics_mode.tjzgs" placeholder="x*y*z/250 就填 250" />
+                                                <input id="tjzgs" name="detail.logistics_mode.tjzgs" type="text" class="input-sm form-control" v-model.number="detail.logistics_mode.tjzgs" placeholder="x*y*z/250 就填 250"/>
                                             </div>
                                         </div>
                                     </div>
@@ -339,6 +354,7 @@
                             }
                         },
                         {"mDataProp": "c.name", "title": "物流公司", "bSearchable": true, "width": 160},
+                        {"mDataProp": "s.name", "title": "仓库", "bSearchable": true, "width": 160},
                         {"mDataProp": "m.name", "title": "物流方式名称", "bSearchable": true},
                         {
                             "mDataProp": "m.sfkltjz", "title": "考虑体积重", "bSearchable": false, "width": 120,
