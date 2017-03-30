@@ -64,12 +64,21 @@ type Product_bind_sku_t struct {
 	Count int64
 }
 
-// bind_produt_list: bind_product_expression
-// 假定 bind_product_list 就是 绑定商品的表达式是正确无误的
-func Get_product_bind_skus(bind_product_list string, db_session *xorm.Session) []Product_bind_sku_t {
+// product_bind_code 就是绑定商品的虚拟 sku
+func Get_product_bind_skus(product_bind_code string, db_session *xorm.Session) []Product_bind_sku_t {
+	sql := `SELECT pb.bind_list FROM erp_product_bind pb WHERE pb.code = '%s'`
+	sql = fmt.Sprint(sql, product_bind_code)
+
+	var product_bind_list struct {
+		BindList string  `xorm:"'bind_list'"`
+	}
+
+	_, err := db_session.Sql(sql).Get(&product_bind_list)
+	core.HandleError(err)
+
 	var product_bind_sku_list = make([]Product_bind_sku_t, 0)
 
-	product_sku_with_number_list := strings.Split(bind_product_list, ",")
+	product_sku_with_number_list := strings.Split(product_bind_list.BindList, ",")
 	for _, product_sku_with_number := range product_sku_with_number_list {
 		product_sku_number_slice := strings.Split(product_sku_with_number, "*")
 

@@ -21,3 +21,16 @@ func Get_product_cost_price(product_id int64, db_session *xorm.Session) float64 
 
 	return product_cost_price.Price
 }
+
+func Get_product_id_by_sku(sku string, db_session *xorm.Session) int64 {
+	sql := `SELECT p.id AS product_id FROM erp_product p WHERE p.sku = '%s'`
+	sql = fmt.Sprintf(sql, sku)
+
+	var product_id struct {
+		ProductId int64 `xorm:"'product_id'"`
+	}
+	_, err := db_session.Sql(sql).Get(&product_id)
+	core.HandleError(err)
+
+	return product_id.ProductId
+}
