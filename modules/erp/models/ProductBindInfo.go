@@ -9,7 +9,7 @@ type ProductBindInfo struct {
 	Code       string    `xorm:"nvarchar(100) notnull index 'code'" json:"code" smith:"verbose_name=商品编号,min=2,max=100"`
 	Name       string    `xorm:"nvarchar(200) notnull index 'name'" json:"name" smith:"verbose_name=名称,min=2,max=200"`
 	BindList   string    `xorm:"nvarchar(500) notnull 'bind_list'" json:"bind_list" smith:"verbose_name=捆绑商品列表,min=1,max=500"`
-	PkgMtrlId  int64     `xorm:"bigint notnull index 'pkg_mtrl_id'" json:"pkg_mtrl_id" smith:"verbose_name=包材"`
+	Desc       string    `xorm:"nvarchar(500) notnull index 'desc'" json:"desc" smith:"verbose_name=描述,min=2,max=200"`
 	StatusId   int64     `xorm:"bigint notnull index 'status_id'" json:"status_id" smith:"verbose_name=状态"`
 	CreateTime core.Time `xorm:"created notnull 'create_time'" json:"create_time"`
 	UpdateTime core.Time `xorm:"updated notnull 'update_time'" json:"update_time"`

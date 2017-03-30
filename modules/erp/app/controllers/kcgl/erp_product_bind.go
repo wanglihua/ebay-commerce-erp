@@ -24,7 +24,6 @@ func (c ErpProductBind) Index() revel.Result {
 
 type ErpProductBindViewItem struct {
 	models.ProductBindInfo     `xorm:"extends" json:"b"`
-	models.PackageMaterialInfo `xorm:"extends" json:"m"`
 	models.StatusInfo          `xorm:"extends" json:"s"`
 }
 
@@ -41,9 +40,8 @@ func (c ErpProductBind) ListData() revel.Result {
 	*/
 
 	query := db_session.
-	Select("b.*, m.*, s.*").
+	Select("b.*, s.*").
 		Table("erp_product_bind").Alias("b").
-		Join("INNER", []string{"erp_package_material", "m"}, "b.pkg_mtrl_id = m.id").
 		Join("INNER", []string{"erp_status", "s"}, "b.status_id = s.id").
 		Where(filter)
 
@@ -71,9 +69,8 @@ func (c ErpProductBind) ListData() revel.Result {
 }
 
 type ProductBindDetailForm struct {
-	ProductBind         models.ProductBindInfo       `json:"product_bind"`
-	PackageMaterialList []models.PackageMaterialInfo `json:"package_material_list"`
-	StatusList          []models.StatusInfo          `json:"status_list"`
+	ProductBind models.ProductBindInfo       `json:"product_bind"`
+	StatusList  []models.StatusInfo          `json:"status_list"`
 }
 
 func (f *ProductBindDetailForm) IsCreate() bool {
@@ -105,8 +102,6 @@ func (f *ProductBindDetailForm) Valid(validation *revel.Validation) bool {
 		validation.MaxSize(f.ProductBind.BindList, 500).Message("捆绑商品列表长度不能大于500！")
 	}
 
-	validation.Required(f.ProductBind.PkgMtrlId).Message("包材不能为空！")
-
 	validation.Required(f.ProductBind.StatusId).Message("状态不能为空！")
 
 	return validation.HasErrors() == false
@@ -129,15 +124,10 @@ func (c ErpProductBind) DetailData() revel.Result {
 		product_bind.StatusId = models.PRODUCT_BIND_STATUS_NORMAL
 	}
 
-	var package_material_list []models.PackageMaterialInfo
-	err := db_session.Find(&package_material_list)
-	core.HandleError(err)
-
 	status_list := status_service.GetStatusList(db_session, models.STATUS_TYPE_PRODUCT_BIND)
 
 	var detail_form ProductBindDetailForm
 	detail_form.ProductBind = product_bind
-	detail_form.PackageMaterialList = package_material_list
 	detail_form.StatusList = status_list
 
 	return c.RenderJson(detail_form)
@@ -159,8 +149,8 @@ func (c ErpProductBind) Save() revel.Result {
 	valid, err := check_product_bind_valid(product_bind.BindList, db_session)
 	if valid == false {
 		return c.RenderJson(map[string]interface{}{
-			"success":  false,
-			"messsage": err.Error(),
+			"success": false,
+			"message": err.Error(),
 		})
 	}
 
@@ -169,7 +159,7 @@ func (c ErpProductBind) Save() revel.Result {
 		affected, err = db_session.Insert(&product_bind)
 		core.HandleError(err)
 	} else {
-		update_cols := []string{"code", "name", "bind_list", "status_id"}
+		update_cols := []string{"code", "name", "bind_list", "desc", "status_id"}
 		affected, err = db_session.Id(product_bind.Id).Cols(update_cols...).Update(&product_bind)
 		core.HandleError(err)
 
@@ -207,7 +197,7 @@ func check_product_bind_valid(bind_product_list string, db_session *xorm.Session
 			return false, errors.New("请用 SKU*数量 表示商品的数量，单个数量就用 *1 的方式！")
 		}
 
-		product_sku := product_sku_number_slice[0];
+		product_sku := strings.TrimSpace(product_sku_number_slice[0]);
 		// 检查SKU的正确性
 		sql := `SELECT count(p.id) AS product_count FROM erp_product p WHERE p.sku = '%s'`
 		sql = fmt.Sprintf(sql, product_sku)
@@ -221,7 +211,7 @@ func check_product_bind_valid(bind_product_list string, db_session *xorm.Session
 			return false, errors.New("请用 SKU*数量 表示商品的数量，商品SKU不存在！")
 		}
 
-		product_number_str := product_sku_number_slice[1];
+		product_number_str := strings.TrimSpace(product_sku_number_slice[1]);
 		// 检查数量的格式
 		_, err = strconv.ParseInt(product_number_str, 10, 64)
 		if err != nil {
