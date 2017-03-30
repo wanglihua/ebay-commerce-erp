@@ -74,11 +74,15 @@
                                             <label for="bind_list" class="col-xs-2 control-label">捆绑商品列表</label>
                                             <div class="col-xs-10">
                                                 <textarea id="bind_list" name="detail.product_bind.bind_list" rows="2" class="input-sm form-control" v-model="detail.product_bind.bind_list"></textarea>
+                                                <div class="help-block">
+                                                    *多个商品，以逗号为间隔,如果某个商品有多个写成*数量，如果只有一个也要写*1。例：xxx*1,xxx*3,xxx*4 (后面的*数字为必需加上的)
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
 
+                                {%/*
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
@@ -93,6 +97,7 @@
                                         </div>
                                     </div>
                                 </div>
+                                */%}
 
                                 <div class="row">
                                     <div class="col-xs-12">
@@ -154,7 +159,7 @@
                         {"mDataProp": "b.code", "title": "商品编号", "bSearchable": true, "width": 120},
                         {"mDataProp": "b.name", "title": "名称", "bSearchable": true, "width": 250},
                         {"mDataProp": "b.bind_list", "title": "捆绑商品列表", "bSearchable": true},
-                        {"mDataProp": "m.name", "title": "包材", "bSearchable": true, "width": 200},
+                        //{"mDataProp": "m.name", "title": "包材", "bSearchable": true, "width": 200},
                         {"mDataProp": "s.name", "title": "状态", "bSearchable": true, "width": 80},
                         {"mDataProp": "b.create_time", "title": "创建时间", "bSearchable": false, "width": 120},
                         {"mDataProp": "b.update_time", "title": "修改时间", "bSearchable": false, "width": 120}

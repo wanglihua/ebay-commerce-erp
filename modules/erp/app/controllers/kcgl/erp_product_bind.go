@@ -2,9 +2,12 @@ package controllers
 
 import (
 	"encoding/json"
-	"github.com/revel/revel"
+	"errors"
 	"strconv"
+	"strings"
 
+	"github.com/go-xorm/xorm"
+	"github.com/revel/revel"
 	"matrix/core"
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/status_service"
@@ -37,7 +40,7 @@ func (c ErpProductBind) ListData() revel.Result {
 	*/
 
 	query := db_session.
-		Select("b.*, m.*, s.*").
+	Select("b.*, m.*, s.*").
 		Table("erp_product_bind").Alias("b").
 		Join("INNER", []string{"erp_package_material", "m"}, "b.pkg_mtrl_id = m.id").
 		Join("INNER", []string{"erp_status", "s"}, "b.status_id = s.id").
@@ -121,6 +124,8 @@ func (c ErpProductBind) DetailData() revel.Result {
 		if has == false {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "指定的绑定商品不存在！"})
 		}
+	} else {
+		product_bind.StatusId = models.PRODUCT_BIND_STATUS_NORMAL
 	}
 
 	var package_material_list []models.PackageMaterialInfo
@@ -155,7 +160,8 @@ func (c ErpProductBind) Save() revel.Result {
 		affected, err = db_session.Insert(&product_bind)
 		core.HandleError(err)
 	} else {
-		affected, err = db_session.Id(product_bind.Id).Update(&product_bind)
+		update_cols := []string{"code", "name", "bind_list", "status_id"}
+		affected, err = db_session.Id(product_bind.Id).Cols(update_cols...).Update(&product_bind)
 		core.HandleError(err)
 
 		if affected == 0 {
@@ -176,4 +182,17 @@ func (c ErpProductBind) Delete() revel.Result {
 	core.HandleError(err)
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})
+}
+
+// 暂时先写在这里
+// bind_produt_list: bind_product_expression
+func check_product_bind_valid(bind_product_list string, db_session *xorm.Session) (result bool, err error) {
+	if strings.Index(bind_product_list, "，") != -1 { //中文的逗号，看看有没有输入错误
+		return false, errors.New("多个商品时不能用中文的逗号（，）分割。")
+	}
+
+	product_sku_with_number_list := strings.Split(bind_product_list, ",")
+	_ = product_sku_with_number_list
+
+	return true, nil
 }
