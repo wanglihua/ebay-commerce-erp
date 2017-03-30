@@ -1,14 +1,15 @@
 package controllers
 
 import (
+	"strings"
+
 	"github.com/revel/revel"
 	"matrix/app/layout"
 	"matrix/core"
+	"matrix/core/captcha"
 	"matrix/modules/auth/forms"
 	"matrix/modules/auth/models"
 	erp_models "matrix/modules/erp/models"
-	"strings"
-	"matrix/core/captcha"
 )
 
 type Login struct {

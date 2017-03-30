@@ -32,21 +32,21 @@ func PreventSQLInjection(sqlStr string) string {
 	return sqlStr
 }
 
-var expire_after_duration time.Duration = -1 // -1 表示还没获取过过期时间
+var SESSION_EXPIRE_AFTER_DURATION time.Duration = -1 // -1 表示还没获取过过期时间
 
 func GetSessionExpire() time.Duration {
-	if expire_after_duration == -1 { // -1 表示还没获取过过期时间
-		expire_after_duration = 30 * 24 * time.Hour // 如果没有配置时的默认值
+	if SESSION_EXPIRE_AFTER_DURATION == -1 { // -1 表示还没获取过过期时间
+		SESSION_EXPIRE_AFTER_DURATION = 30 * 24 * time.Hour // 如果没有配置时的默认值
 		if expires_string, ok := revel.Config.String("session.expires"); ok == true {
 			expire_after_duration_paresed, err := time.ParseDuration(expires_string)
 			if err != nil {
-				expire_after_duration = expire_after_duration_paresed //如果配置了，并且值也正确，就设置为获得的值
+				SESSION_EXPIRE_AFTER_DURATION = expire_after_duration_paresed //如果配置了，并且值也正确，就设置为获得的值
 			}
 
 		}
 	}
 
-	return expire_after_duration
+	return SESSION_EXPIRE_AFTER_DURATION
 }
 
 func IsAjaxRequest(request *revel.Request) bool {
