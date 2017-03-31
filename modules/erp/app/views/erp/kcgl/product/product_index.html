@@ -88,7 +88,12 @@
                             "width": 80,
                             "bSortable": false,
                             "render": function (data, type, row) {
-                                return '<a href="' + data + '" target="_blank"><img style="width:60px;height:60px;" src="' + data + '" alt="" /></a>';
+                                if(data != null) {
+                                    return '<a href="' + data + '" target="_blank"><img style="width:60px;height:60px;" src="' + data + '" alt="" /></a>';
+                                }
+                                else {
+                                    return '<img style="width:60px;height:60px;" src="/static/images/no_img.jpg" alt="no image" />';
+                                }
                             }
                         },
                         {

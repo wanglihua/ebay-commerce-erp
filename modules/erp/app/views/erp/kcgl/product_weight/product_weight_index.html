@@ -224,10 +224,50 @@
                         },
                         {"mDataProp": "p.sku", "title": "商品SKU", "bSearchable": true, "width": 150},
                         {"mDataProp": "p.cn_name", "title": "商品名称", "bSearchable": true},
-                        {"mDataProp": "p.length", "title": "长度", "bSearchable": false, "width": 80},
-                        {"mDataProp": "p.width", "title": "宽度", "bSearchable": false, "width": 80},
-                        {"mDataProp": "p.height", "title": "高度", "bSearchable": false, "width": 80},
-                        {"mDataProp": "p.weight", "title": "重量", "bSearchable": false, "width": 80},
+                        {
+                            "mDataProp": "p.length", "title": "长度", "bSearchable": false, "width": 80,
+                            "render": function (data, type, row) {
+                                if (data != 0) {
+                                    return data + " cm";
+                                }
+                                else {
+                                    return "";
+                                }
+                            }
+                        },
+                        {
+                            "mDataProp": "p.width", "title": "宽度", "bSearchable": false, "width": 80,
+                            "render": function (data, type, row) {
+                                if (data != 0) {
+                                    return data + " cm";
+                                }
+                                else {
+                                    return "";
+                                }
+                            }
+                        },
+                        {
+                            "mDataProp": "p.height", "title": "高度", "bSearchable": false, "width": 80,
+                            "render": function (data, type, row) {
+                                if (data != 0) {
+                                    return data + " cm";
+                                }
+                                else {
+                                    return "";
+                                }
+                            }
+                        },
+                        {
+                            "mDataProp": "p.weight", "title": "重量", "bSearchable": false, "width": 80,
+                            "render": function (data, type, row) {
+                                if (data != 0) {
+                                    return data + " kg";
+                                }
+                                else {
+                                    return "";
+                                }
+                            }
+                        },
                         {"mDataProp": "s.name", "title": "状态", "bSearchable": true, "width": 80},
                         {"mDataProp": "p.create_time", "title": "创建时间", "bSearchable": false, "width": 120},
                         {"mDataProp": "p.update_time", "title": "修改时间", "bSearchable": false, "width": 120}

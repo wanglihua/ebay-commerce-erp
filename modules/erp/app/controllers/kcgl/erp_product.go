@@ -172,11 +172,13 @@ func (c ErpProduct) DetailData() revel.Result {
 	}
 
 	var product_image_list = make([]models.ProductImageInfo, 0)
-	err := db_session.Where(fmt.Sprintf("product_id = %d", product_id)).Find(&product_image_list)
-	core.HandleError(err)
+	if product_id != 0 {
+		err := db_session.Where(fmt.Sprintf("product_id = %d", product_id)).Find(&product_image_list)
+		core.HandleError(err)
+	}
 
 	var supplier_list []models.SupplierInfo
-	err = db_session.Asc("name").Find(&supplier_list)
+	err := db_session.Asc("name").Find(&supplier_list)
 	core.HandleError(err)
 
 	var product_cate_list = product_cate_service.GetProductCateSelectItemList(db_session)
@@ -191,8 +193,10 @@ func (c ErpProduct) DetailData() revel.Result {
 	order_item_list := order_service.Get_order_item_data_list_by_product_id_top_n(db_session, product_id, 10)
 
 	var product_log_list = make([]models.ProductLogInfo, 0)
-	err = db_session.Where(fmt.Sprintf("product_id = %d", product_id)).OrderBy("id DESC").Limit(10, 0).Find(&product_log_list)
-	core.HandleError(err)
+	if product_id != 0 {
+		err = db_session.Where(fmt.Sprintf("product_id = %d", product_id)).OrderBy("id DESC").Limit(10, 0).Find(&product_log_list)
+		core.HandleError(err)
+	}
 
 	message_list := message_service.Get_message_list_data_by_product_id_top_n(db_session, product_id, 10)
 
