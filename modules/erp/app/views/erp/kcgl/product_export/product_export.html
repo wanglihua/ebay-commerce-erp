@@ -12,39 +12,20 @@
     <div class="page-content">
         <div class="row">
             <div class="col-xs-12" style="padding: 0;">
-                <div class="gridToolBar clearfix">
-                    <button class="btn btn-primary btn-sm" @click="queryProduct()">
-                        <i class="ace-icon fa fa-search"></i>
-                        查询
-                    </button>
-                    <button class="btn btn-success btn-sm" @click="exportProduct()">
-                        <i class="ace-icon fa fa-file-excel-o"></i>
-                        导出
-                    </button>
-                </div>
-                <div class="row" style="margin-top: 20px;margin-bottom: 20px;">
-                    <div id="query" class="col-xs-12" style="line-height: 28px;">
-                        <fieldset>
-                            <legend style="font-size: 14px;">
-                                查询条件&nbsp;<span style="color: #D5D5D5;">(输入查询条件后点击 查询 按钮)</span>
-                            </legend>
-                            <div class="col-xs-3">
-                                <div class="form-group">
-                                    <label for="code_query" class="col-xs-3 control-label">商品编号</label>
-                                    <div class="col-xs-9">
-                                        <input id="code_query" type="text" class="input-sm form-control" placeholder="商品编号查询"/>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-xs-3">
-                                <div class="form-group">
-                                    <label for="storage_loc_query" class="col-xs-3 control-label">仓位</label>
-                                    <div class="col-xs-9">
-                                        <input id="storage_loc_query" type="text" class="input-sm form-control" placeholder="仓位查询"/>
-                                    </div>
-                                </div>
-                            </div>
-                        </fieldset>
+                <div class="row" style="margin-top: 15px;margin-bottom: 5px;">
+                    <div id="query" class="col-xs-12 query">
+                        <label for="code_query" class="control-label no-padding-right">商品编号</label>
+                        <input id="code_query" type="text" class="input-sm" placeholder="商品编号查询" style="width: 130px;"/>
+                        <label for="storage_loc_query" class="control-label">仓位</label>
+                        <input id="storage_loc_query" type="text" class="input-sm" placeholder="仓位查询" style="width: 130px;"/>
+                        <button class="btn btn-mini btn-primary" @click="queryProduct()">
+                            <i class="ace-icon fa fa-search"></i>
+                            查询
+                        </button>
+                        <button class="btn btn-success btn-sm" @click="exportProduct()">
+                            <i class="ace-icon fa fa-file-excel-o"></i>
+                            导出
+                        </button>
                     </div>
                 </div>
                 <div>
@@ -94,7 +75,7 @@
         },
         methods: {
             queryProduct: function () {
-                reloadList('#productList');
+                refreshList('#productList');
             },
             exportProduct: function () {
                 var params = $.param({"param1": "value1"});

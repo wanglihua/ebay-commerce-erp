@@ -13,56 +13,24 @@
     <div class="page-content">
         <div class="row">
             <div class="col-xs-12" style="padding: 0;">
-                <div class="gridToolBar clearfix">
-                    <button class="btn btn-primary btn-sm" @click="reloadList('#productLogList')">
-                        <i class="ace-icon fa fa-refresh"></i>
-                        刷新
-                    </button>
-                </div>
-                <div class="row" style="margin-top: 20px;margin-bottom: 20px;">
-                    <div id="query" class="col-xs-12" style="line-height: 28px;">
-                        <fieldset>
-                            <legend style="font-size: 14px;">
-                                查询&nbsp;<span style="color: #D5D5D5;">(输入查询条件后点击 刷新 按钮)</span>
-                            </legend>
+                <div class="row" style="margin-top: 15px;margin-bottom: 5px;">
+                    <div id="query" class="col-xs-12 query">
+                        <label class="control-label no-padding-right" for="product_code_query">商品编号</label>
+                        <input class="input-sm" id="product_code_query" name="product_code_query" placeholder="商品编号查询" type="text" style="width: 130px;"/>
 
-                            <div class="col-xs-3">
-                                <div class="form-group">
-                                    <label class="col-xs-3 control-label no-padding-right" for="product_code_query">商品编号</label>
-                                    <div class="col-xs-8">
-                                        <input class="input-sm form-control" id="product_code_query" onkeydown="queryOnKeyDown(event);" onchange="reloadProductLogList();" name="product_code_query" placeholder="商品编号查询" type="text">
-                                    </div>
-                                </div>
-                            </div>
+                        <label class="control-label no-padding-right" for="login_name_query">操作员</label>
+                        <input class="input-sm" id="login_name_query" name="login_name_query" placeholder="操作员工号查询" type="text" style="width: 130px;"/>
 
-                            <div class="col-xs-3">
-                                <div class="form-group">
-                                    <label class="col-xs-3 control-label no-padding-right" for="login_name_query">操作员</label>
-                                    <div class="col-xs-8">
-                                        <input class="input-sm form-control" id="login_name_query" onkeydown="queryOnKeyDown(event);" onchange="reloadProductLogList();" name="login_name_query" placeholder="操作员工号查询" type="text">
-                                    </div>
-                                </div>
-                            </div>
+                        <label class="control-label no-padding-right" for="begin_time_query">开始时间</label>
+                        <input class="input-sm" id="begin_time_query" name="begin_time_query" placeholder="时间格式2018-08-08 08:08:08" type="text" style="width: 180px;"/>
 
-                            <div class="col-xs-3">
-                                <div class="form-group">
-                                    <label class="col-xs-3 control-label no-padding-right" for="begin_time_query">开始时间</label>
-                                    <div class="col-xs-8">
-                                        <input class="input-sm form-control" id="begin_time_query" onkeydown="queryOnKeyDown(event);" onchange="reloadProductLogList();" name="begin_time_query" placeholder="时间格式2018-08-08 08:08:08" type="text"/>
-                                    </div>
-                                </div>
-                            </div>
+                        <label class="control-label no-padding-right" for="end_time_query">结束时间</label>
+                        <input class="input-sm" id="end_time_query" name="end_time_query" placeholder="时间格式2018-08-28 08:28:28" type="text" style="width: 180px;"/>
 
-                            <div class="col-xs-3">
-                                <div class="form-group">
-                                    <label class="col-xs-3 control-label no-padding-right" for="end_time_query">结束时间</label>
-                                    <div class="col-xs-8">
-                                        <input class="input-sm form-control" id="end_time_query" onkeydown="queryOnKeyDown(event);" onchange="reloadProductLogList();" name="end_time_query" placeholder="时间格式2018-08-28 08:28:28" type="text"/>
-                                    </div>
-                                </div>
-                            </div>
-
-                        </fieldset>
+                        <button class="btn btn-primary btn-sm" @click="refreshList()">
+                            <i class="ace-icon fa fa-search"></i>
+                            查询
+                        </button>
                     </div>
                 </div>
                 <div>
@@ -74,17 +42,6 @@
     </div>
 </div>
 <script type="text/javascript">
-
-    function queryOnKeyDown(e) {
-        var ev = window.event || e;
-        if (ev.keyCode == 13) {
-            reloadProductLogList();
-        }
-    }
-
-    function reloadProductLogList() {
-        reloadList('#productLogList');
-    }
 
     $(function () {
         /*
@@ -160,6 +117,9 @@
         methods: {
             reloadList: function () {
                 reloadList('#productLogList');
+            },
+            refreshList: function () {
+                refreshList("#productLogList");
             }
         }
     });

@@ -24,41 +24,36 @@
                 </div>
                 <div class="row" style="margin-top: 20px;margin-bottom: 20px;">
                     <div id="query" class="col-xs-12" style="line-height: 28px;">
-                        <fieldset>
-                            <legend style="font-size: 14px;">
-                                查询条件&nbsp;<span style="color: #D5D5D5;">(输入查询条件后点击 刷新 按钮)</span>
-                            </legend>
-                            <div class="col-xs-12">
-                                <select id="shop_id" name="page.shop_id" v-model.number="page.shop_id" style="width: 120px;">
-                                    <option value="0">-平台/店铺-</option>
-                                    <template v-for="shop in page.shop_list">
-                                        <option :value="shop.id">{{shop.name}}</option>
-                                    </template>
-                                </select>
-                                <select id="order_type_id" name="page.order_type_id" v-model.number="page.order_type_id" style="width:120px;">
-                                    <option value="0">-订单类型-</option>
-                                    <template v-for="order_type in page.order_type_list">
-                                        <option :value="order_type.id">{{order_type.name}}</option>
-                                    </template>
-                                </select>
-                                <select id="status_id" name="page.status_id" v-model.number="page.status_id" style="width:120px;">
-                                    <option value="0">-订单状态-</option>
-                                    <template v-for="status in page.status_list">
-                                        <option :value="status.id">{{status.name}}</option>
-                                    </template>
-                                </select>
-                                <select id="query_criteria_id" name="page.query_criteria_id" v-model.number="page.query_criteria_id" style="width:120px;">
-                                    <option value="0">-查询条件-</option>
-                                    <template v-for="criteria in page.query_criteria_list">
-                                        <option :value="criteria.id">{{criteria.name}}</option>
-                                    </template>
-                                </select>
-                                <input id="query_criteria_value" name="query_criteria_value" v-model="page.query_criteria_value" style="width: 120px;height:30px;"/>
-                                <button class="btn btn-mini btn-primary" style="margin-bottom:3px;height: 30px;" @click="search()">
-                                    &nbsp;<i class="ace-icon fa fa-search"></i>查&nbsp;询&nbsp;
-                                </button>
-                            </div>
-                        </fieldset>
+                        <div class="col-xs-12">
+                            <select id="shop_id" name="page.shop_id" v-model.number="page.shop_id" style="width: 120px;">
+                                <option value="0">-平台/店铺-</option>
+                                <template v-for="shop in page.shop_list">
+                                    <option :value="shop.id">{{shop.name}}</option>
+                                </template>
+                            </select>
+                            <select id="order_type_id" name="page.order_type_id" v-model.number="page.order_type_id" style="width:120px;">
+                                <option value="0">-订单类型-</option>
+                                <template v-for="order_type in page.order_type_list">
+                                    <option :value="order_type.id">{{order_type.name}}</option>
+                                </template>
+                            </select>
+                            <select id="status_id" name="page.status_id" v-model.number="page.status_id" style="width:120px;">
+                                <option value="0">-订单状态-</option>
+                                <template v-for="status in page.status_list">
+                                    <option :value="status.id">{{status.name}}</option>
+                                </template>
+                            </select>
+                            <select id="query_criteria_id" name="page.query_criteria_id" v-model.number="page.query_criteria_id" style="width:120px;">
+                                <option value="0">-查询条件-</option>
+                                <template v-for="criteria in page.query_criteria_list">
+                                    <option :value="criteria.id">{{criteria.name}}</option>
+                                </template>
+                            </select>
+                            <input id="query_criteria_value" name="query_criteria_value" v-model="page.query_criteria_value" style="width: 120px;height:30px;"/>
+                            <button class="btn btn-mini btn-primary" style="margin-bottom:3px;height: 30px;" @click="search()">
+                                &nbsp;<i class="ace-icon fa fa-search"></i>查&nbsp;询&nbsp;
+                            </button>
+                        </div>
                     </div>
                 </div>
                 <div>
@@ -276,7 +271,7 @@
             reloadList: function () {
                 reloadList('#orderList');
             },
-            refreshList:function () {
+            refreshList: function () {
                 reloadList("#orderList");
             },
             search: function () {
