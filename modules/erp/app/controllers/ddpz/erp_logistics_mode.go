@@ -218,6 +218,7 @@ func (c ErpLogisticsMode) Import() revel.Result {
 
 	type logistics_mode_t struct {
 		CompanyName   string
+		StockName     string
 		LogisticsMode models.LogisticsModeInfo
 	}
 
@@ -249,6 +250,14 @@ func (c ErpLogisticsMode) Import() revel.Result {
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
 			logistics_mode.CompanyName = cell_val
+			col_index++
+
+			// 仓库名称
+			cell = row.Cells[col_index]
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
+			logistics_mode.StockName = cell_val
 			col_index++
 
 			// 物流方式名称
@@ -427,6 +436,17 @@ func (c ErpLogisticsMode) Import() revel.Result {
 		}
 
 		logistics_mode.CompanyId = logistics_company.Id
+
+		// 仓库
+		var stock models.StockInfo
+		has, err = db_session.Where(fmt.Sprintf("name = '%s'", logistics_mode_import.StockName)).Get(&stock)
+		core.HandleError(err)
+		if has == false {
+			return c.RenderJson(map[string]interface{}{
+				"success": false,
+				"message": fmt.Sprintf("仓库名称 %s 不存在！", logistics_mode_import.StockName),
+			})
+		}
 
 		_, err = db_session.Insert(&logistics_mode)
 		core.HandleError(err)
