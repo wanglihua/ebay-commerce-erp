@@ -276,6 +276,9 @@
             reloadList: function () {
                 reloadList('#orderList');
             },
+            refreshList:function () {
+                reloadList("#orderList");
+            },
             search: function () {
                 var tables = $("#orderList").dataTable().api();
                 tables.draw(true);

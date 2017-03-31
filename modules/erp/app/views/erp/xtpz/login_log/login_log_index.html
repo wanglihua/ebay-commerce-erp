@@ -28,7 +28,7 @@
                         <input class="input-sm" id="begin_time_query" onkeydown="queryOnKeyDown(event);" onchange="reloadLoginLogList();" name="begin_time_query" placeholder="开始时间查询" type="text" style="width: 130px;"/>
                         <label class="control-label no-padding-right" for="end_time_query">结束时间</label>
                         <input class="input-sm" id="end_time_query" onkeydown="queryOnKeyDown(event);" onchange="reloadLoginLogList();" name="end_time_query" placeholder="结束时间查询" type="text" style="width: 130px;"/>
-                        <button class="btn btn-mini btn-primary" @click="reloadList()">
+                        <button class="btn btn-mini btn-primary" @click="refreshList()">
                             &nbsp;<i class="ace-icon fa fa-search"></i>查&nbsp;询&nbsp;
                         </button>
                     </div>
@@ -121,6 +121,9 @@
         methods: {
             reloadList: function () {
                 reloadLoginLogList();
+            },
+            refreshList: function () {
+                refreshList("#loginLogList");
             }
         }
     });

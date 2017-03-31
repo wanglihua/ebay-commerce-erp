@@ -32,7 +32,7 @@
                         </select>
                         <label class="control-label no-padding-right" for="pass_res_name_query">名称</label>
                         <input id="pass_res_name_query" class="input-sm" name="login_name_query" placeholder="名称" type="text" style="width: 120px;"/>
-                        <button class="btn btn-mini btn-primary" @click="reloadList()" style="margin-bottom: 2px;">
+                        <button class="btn btn-mini btn-primary" @click="refreshList()" style="margin-bottom: 2px;">
                             &nbsp;<i class="ace-icon fa fa-search"></i>查&nbsp;询&nbsp;
                         </button>
                     </div>
@@ -178,6 +178,9 @@
         methods: {
             reloadList: function () {
                 reloadList('#passResList');
+            },
+            refreshList: function () {
+                refreshList("#passResList");
             }
         }
     });

@@ -41,7 +41,7 @@
                         <input class="input-sm" id="logistics_mode_query" name="logistics_mode_query" placeholder="物流方式查询" type="text" style="width: 130px;"/>
                         <label class="control-label no-padding-right" for="postcode_query">邮政编码</label>
                         <input class="input-sm" id="postcode_query" name="postcode_query" placeholder="邮政编码查询" type="text" style="width: 130px;"/>
-                        <button class="btn btn-mini btn-primary" @click="reloadList()">
+                        <button class="btn btn-mini btn-primary" @click="refreshList()">
                             &nbsp;<i class="ace-icon fa fa-search"></i>查&nbsp;询&nbsp;
                         </button>
                     </div>
@@ -398,6 +398,9 @@
         methods: {
             reloadList: function () {
                 reloadList('#logisticsFeeRateList');
+            },
+            refreshList: function () {
+                refreshList("#logisticsFeeRateList");
             },
             showLogisticsFeeRateDetail: function (id) {
                 showMask("加载中...");

@@ -167,15 +167,15 @@ $.extend($.fn.dataTable.defaults, {
                 }
             });
     },
-    "initComplete": function(settings) {
+    "initComplete": function (settings) {
         var dataTable = this;
-        var searchHTML = '<label class="dataTable-custom-search"><span>搜索:</span><input type="search" class="form-control input-sm" placeholder="输入搜索内容按回车" aria-controls="'+ dataTable.selector.substring(1) +'"></label>';
+        var searchHTML = '<label class="dataTable-custom-search"><span>搜索:</span><input type="search" class="form-control input-sm" placeholder="输入搜索内容按回车" aria-controls="' + dataTable.selector.substring(1) + '"></label>';
         //快捷操作的HTML DOM
         $(dataTable.selector + '_wrapper .dataTables_filter').append(searchHTML);
 
         //重写搜索事件
         $(dataTable.selector + '_wrapper .dataTables_filter input').bind('keyup',
-            function(e) {
+            function (e) {
                 if (e.keyCode == 13 || (e.keyCode == 8 && (this.value.length == 0))) {
                     dataTable.api().search(this.value).draw();
                 }
@@ -207,19 +207,19 @@ function initDataTable(table, options) {
     $(table + '_wrapper').on('click', 'div.dataTables_scroll div.dataTables_scrollHead thead th input.checkall', checkAll);
 
     /*
-    htmlTable.on('click', 'tbody tr', function () {
-        var tableRow = $(this);
-        var checkbox = tableRow.find('td:first-child input:checkbox')[0];
-        if (checkbox != undefined) {
-            checkbox.checked = !checkbox.checked;
-            if (checkbox.checked) {
-                tableRow.addClass('selected');
-            } else {
-                tableRow.removeClass('selected');
-            }
-        }
-    });
-    */
+     htmlTable.on('click', 'tbody tr', function () {
+     var tableRow = $(this);
+     var checkbox = tableRow.find('td:first-child input:checkbox')[0];
+     if (checkbox != undefined) {
+     checkbox.checked = !checkbox.checked;
+     if (checkbox.checked) {
+     tableRow.addClass('selected');
+     } else {
+     tableRow.removeClass('selected');
+     }
+     }
+     });
+     */
 
     htmlTable.on('click', 'tbody td:first-child input:checkbox', function (event) {
         event.stopPropagation();
@@ -275,6 +275,11 @@ function initSingleSelectDataTable(table, options) {
 function reloadList(list) {
     var tables = $(list).dataTable().api();
     tables.draw(false);
+}
+
+function refreshList(list) {
+    var tables = $(list).dataTable().api();
+    tables.draw(true);
 }
 
 function trim(str) { //删除左右两端的空格

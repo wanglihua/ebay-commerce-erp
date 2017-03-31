@@ -22,6 +22,9 @@ type ErpProduct struct {
 }
 
 func (c ErpProduct) Index() revel.Result {
+	db_session := c.DbSession
+	var product_cate_list = product_cate_service.GetProductCateSelectItemList(db_session)
+	c.RenderArgs["product_cate_list"] = product_cate_list
 	return c.RenderTemplate("erp/kcgl/product/product_index.html")
 }
 
@@ -36,6 +39,15 @@ type ErpProductViewItem struct {
 
 func (c ErpProduct) ListData() revel.Result {
 	db_session := c.DbSession
+
+	var product_cate_query int64
+	c.Params.Bind(&product_cate_query, "product_cate_query")
+
+	var product_sku_query string
+	c.Params.Bind(&product_sku_query, "product_sku_query")
+
+	var product_name_query string
+	c.Params.Bind(&product_name_query, "product_name_query")
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
@@ -57,9 +69,20 @@ FROM erp_product prd
     LEFT JOIN erp_package_material pm ON prd.pkg_mtrl_id = pm.id
     INNER JOIN erp_status st ON prd.status_id = st.id`)
 
-	sql_builder.Where(filter)
-
 	//query extra filter here
+	if product_cate_query != 0 {
+		filter = core.SqlAnd(filter, fmt.Sprintf("prd.cate_id = %d", product_cate_query))
+	}
+
+	if strings.TrimSpace(product_sku_query) != "" {
+		filter = core.SqlAnd(filter, fmt.Sprintf("prd.sku LIKE '%%%s%%'", product_sku_query))
+	}
+
+	if strings.TrimSpace(product_name_query) != "" {
+		filter = core.SqlAnd(filter, fmt.Sprintf("prd.cn_name LIKE '%%%s%%'", product_name_query))
+	}
+
+	sql_builder.Where(filter)
 
 	if order != "" {
 		sql_builder.OrderBy(order)
