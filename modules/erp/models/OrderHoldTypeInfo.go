@@ -150,7 +150,7 @@ func (e OrderHoldTypeInfo) InitData(db_session *xorm.Session) {
 
 	// ORDER_HOLD_TYPE_EXPRESS                int64 = 10150 // 快递类。需要在基础设置里面有 收到快递费金额的设置功能，比如收到的运费高于什么金额，视为快递。否则就算收了快递费也视为普通包裹
 	order_hold_type = new(OrderHoldTypeInfo)
-	order_hold_type.Id = ORDER_HOLD_TYPE_ENVELOPE
+	order_hold_type.Id = ORDER_HOLD_TYPE_EXPRESS
 	order_hold_type.Name = "信封类"
 	order_hold_type.Desc = "匹配最佳仓库及物流后订单亏损"
 	db_session.Insert(order_hold_type)
