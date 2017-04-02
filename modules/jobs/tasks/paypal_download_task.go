@@ -11,8 +11,8 @@ import (
 	"github.com/go-xorm/xorm"
 	"github.com/logpacker/PayPal-Go-SDK"
 	"github.com/revel/revel"
-	"matrix/modules/erp/models"
 	"matrix/core"
+	"matrix/modules/erp/models"
 )
 
 type PaypalDownloadTask struct {
