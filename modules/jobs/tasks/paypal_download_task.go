@@ -12,6 +12,7 @@ import (
 	"github.com/logpacker/PayPal-Go-SDK"
 	"github.com/revel/revel"
 	"matrix/modules/erp/models"
+	"matrix/core"
 )
 
 type PaypalDownloadTask struct {
@@ -41,10 +42,7 @@ func (t PaypalDownloadTask) Run() {
 	}
 
 	db_engine, err := xorm.NewEngine(task_db_driver, task_db_url)
-	if err != nil {
-		revel.ERROR.Println(err)
-		return
-	}
+	core.HandleError(err)
 
 	db_engine.TZLocation = time.Local
 	db_engine.SetMaxIdleConns(3)
@@ -59,9 +57,7 @@ func (t PaypalDownloadTask) Run() {
 
 	paypal_account_list := make([]models.PaypalAccountInfo, 0)
 	err = db_session.Find(&paypal_account_list)
-	if err != nil {
-		revel.ERROR.Println(err)
-	}
+	core.HandleError(err)
 
 	for _, paypal_account := range paypal_account_list {
 		if strings.TrimSpace(paypal_account.ApiAccount) == "" || strings.TrimSpace(paypal_account.ApiToken) == "" {

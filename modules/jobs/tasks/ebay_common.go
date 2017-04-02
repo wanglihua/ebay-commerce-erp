@@ -29,9 +29,7 @@ FROM erp_ebay_api_config cfg
     INNER JOIN erp_shop_account sa ON cfg.shop_id = sa.id
 WHERE sa.status_id = %d`
 	err := db_session.Sql(fmt.Sprintf(sql, models.SHOP_ACCOUNT_STATUS_ENABLED)).Find(&ebay_api_config_list)
-	if err != nil {
-		revel.ERROR.Println(err)
-	}
+	core.HandleError(err)
 
 	return ebay_api_config_list
 }
@@ -91,9 +89,7 @@ func fetch_product_item(config models.EBayAPIConfigInfo, item_id string) ebay.Ge
 	}
 
 	err = xml.Unmarshal(data, &response)
-	if err != nil {
-		revel.ERROR.Println(err)
-	}
+	core.HandleError(err)
 
 	e := response.Errors
 
@@ -178,9 +174,7 @@ func fetch_product_item_to_db(config models.EBayAPIConfigInfo, db_session *xorm.
 	item_sku := item_response.Item.Sku
 	var product models.ProductInfo
 	has_product, err := db_session.Where(fmt.Sprintf("sku = '%s'", item_sku)).Get(&product)
-	if err != nil {
-		revel.ERROR.Println(err)
-	}
+	core.HandleError(err)
 
 	product.Sku = item_response.Item.Sku
 	product.Name = item_response.Item.Title
@@ -194,25 +188,19 @@ func fetch_product_item_to_db(config models.EBayAPIConfigInfo, db_session *xorm.
 		// do insert
 		product.CnName = product.Sku
 		_, err = db_session.Insert(&product)
-		if err != nil {
-			revel.ERROR.Println(err)
-		}
+		core.HandleError(err)
 	} else {
 		// do update
 		update_col_list := []string{"sku", "name", "image_url"}
 		_, err = db_session.Id(product.Id).Cols(update_col_list...).Update(&product)
-		if err != nil {
-			revel.ERROR.Println(err)
-		}
+		core.HandleError(err)
 	}
 
 	// product store item begin
 
 	var product_store_item models.ProductStoreItemInfo
 	has_product_store_item, err := db_session.Where(fmt.Sprintf("shop_id = %d AND item_id = '%s'", config.ShopId, item_response.Item.ItemId)).Get(&product_store_item)
-	if err != nil {
-		revel.ERROR.Println(err)
-	}
+	core.HandleError(err)
 
 	product_store_item.ProductId = product.Id
 	product_store_item.ShopId = config.ShopId
@@ -221,15 +209,11 @@ func fetch_product_item_to_db(config models.EBayAPIConfigInfo, db_session *xorm.
 
 	if has_product_store_item == false {
 		_, err = db_session.Insert(&product_store_item)
-		if err != nil {
-			revel.ERROR.Print(err)
-		}
+		core.HandleError(err)
 	} else {
 		update_col_list := []string{"view_item_url"}
 		_, err = db_session.Id(product_store_item.Id).Cols(update_col_list...).Update(&product_store_item)
-		if err != nil {
-			revel.ERROR.Println(err)
-		}
+		core.HandleError(err)
 	}
 
 	// product store item end
@@ -242,9 +226,7 @@ func fetch_product_item_to_db(config models.EBayAPIConfigInfo, db_session *xorm.
 	// 获得这个商品的所有图片
 	var product_image_list_in_db = make([]models.ProductImageInfo, 0)
 	err = db_session.Where(fmt.Sprintf("product_id = %d", product.Id)).Find(&product_image_list_in_db)
-	if err != nil {
-		revel.ERROR.Println(err)
-	}
+	core.HandleError(err)
 
 	// 插入数据库中没有的图片
 	var product_image_url_map_in_db = make(map[string]int)
@@ -263,9 +245,7 @@ func fetch_product_item_to_db(config models.EBayAPIConfigInfo, db_session *xorm.
 			product_image.Url = product_image_url_download
 
 			_, err := db_session.Insert(product_image)
-			if err != nil {
-				revel.ERROR.Println(err)
-			}
+			core.HandleError(err)
 		}
 	}
 

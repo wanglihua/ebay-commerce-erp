@@ -95,10 +95,7 @@ func (t EBayMessageDownloadTask) Run() {
 	}
 
 	db_engine, err := xorm.NewEngine(task_db_driver, task_db_url)
-	if err != nil {
-		revel.ERROR.Println(err)
-		return
-	}
+	core.HandleError(err)
 
 	db_engine.TZLocation = time.Local
 	db_engine.SetMaxIdleConns(3)
@@ -130,9 +127,8 @@ func (t EBayMessageDownloadTask) Run() {
 				message_in_db.ShopId = config.ShopId
 
 				has_message, err := db_session.Where(fmt.Sprintf("message_id = '%s'", message_id)).Get(&message_in_db)
-				if err != nil {
-					revel.ERROR.Println(err)
-				}
+				core.HandleError(err)
+
 				message_in_db.MessageId = message_id
 
 				// 如果这时产品不存在会怎样，下载产品
@@ -141,9 +137,7 @@ func (t EBayMessageDownloadTask) Run() {
 					ProductSku string `xorm:"'product_sku'"`
 				}
 				has_item_product, err := db_session.Sql(fmt.Sprintf("SELECT p.id AS product_id, p.sku AS product_sku FROM erp_product p WHERE p.item_id = '%s'", message_download.Item.ItemId)).Get(&product_result)
-				if err != nil {
-					revel.ERROR.Println(err)
-				}
+				core.HandleError(err)
 
 				product_id := product_result.ProductId
 				product_sku := product_result.ProductSku
@@ -158,9 +152,8 @@ func (t EBayMessageDownloadTask) Run() {
 
 				if message_download.CreationDate != "" {
 					creation_date, err := time.Parse("2006-01-02T15:04:05.000Z", message_download.CreationDate)
-					if err != nil {
-						revel.ERROR.Println(err)
-					}
+					core.HandleError(err)
+
 					// 转成北京时间
 					// modified_time = modified_time.Add(8 * time.Hour)
 					creation_date = creation_date.Local()
@@ -169,9 +162,8 @@ func (t EBayMessageDownloadTask) Run() {
 
 				if message_download.LastModifiedDate != "" {
 					last_modified_date, err := time.Parse("2006-01-02T15:04:05.000Z", message_download.LastModifiedDate)
-					if err != nil {
-						revel.ERROR.Println(err)
-					}
+					core.HandleError(err)
+
 					// 转成北京时间
 					last_modified_date = last_modified_date.Local()
 					message_in_db.LastModifiedDate = core.MakeNullLongTime(last_modified_date, true)
@@ -196,15 +188,11 @@ func (t EBayMessageDownloadTask) Run() {
 				if has_message == true {
 					// do update
 					_, err = db_session.Id(message_in_db.Id).Update(&message_in_db)
-					if err != nil {
-						revel.ERROR.Println(err)
-					}
+					core.HandleError(err)
 				} else {
 					// do insert
 					_, err = db_session.Insert(&message_in_db)
-					if err != nil {
-						revel.ERROR.Println(err)
-					}
+					core.HandleError(err)
 				}
 			}
 
@@ -315,9 +303,7 @@ func (t EBayMessageDownloadTask) fetch_messages(config models.EBayAPIConfigInfo,
 	}
 
 	err = xml.Unmarshal(data, &response)
-	if err != nil {
-		revel.ERROR.Println(err)
-	}
+	core.HandleError(err)
 
 	e := response.Errors
 

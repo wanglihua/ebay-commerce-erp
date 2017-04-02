@@ -83,10 +83,7 @@ func (t EBayProductDownloadTask) Run() {
 	}
 
 	db_engine, err := xorm.NewEngine(t.db_driver, t.db_url)
-	if err != nil {
-		revel.ERROR.Println(err)
-		return
-	}
+	core.HandleError(err)
 
 	db_engine.TZLocation = time.Local
 	db_engine.SetMaxIdleConns(3)
@@ -135,9 +132,7 @@ func (t EBayProductDownloadTask) Run() {
 				}
 
 				_, err := db_session.Sql(sql).Get(&product_item_count)
-				if err != nil {
-					revel.ERROR.Println(err)
-				}
+				core.HandleError(err)
 
 				if product_item_count.Count == 0 {
 					fetch_product_item_to_db(config, db_session, list_item.ItemId)
@@ -216,9 +211,7 @@ func (t EBayProductDownloadTask) fetch_product_list(config models.EBayAPIConfigI
 	}
 
 	err = xml.Unmarshal(data, &response)
-	if err != nil {
-		revel.ERROR.Println(err)
-	}
+	core.HandleError(err)
 
 	e := response.Errors
 

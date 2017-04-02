@@ -100,10 +100,7 @@ func (t EBayOrderDownloadTask) Run() {
 	}
 
 	db_engine, err := xorm.NewEngine(task_db_driver, task_db_url)
-	if err != nil {
-		revel.ERROR.Println(err)
-		return
-	}
+	core.HandleError(err)
 
 	db_engine.TZLocation = time.Local
 	db_engine.SetMaxIdleConns(3)
@@ -136,18 +133,14 @@ func (t EBayOrderDownloadTask) Run() {
 
 				var order_in_db models.OrderInfo
 				has_order, err := db_session.Where("code = ?", order_code).Get(&order_in_db)
-				if err != nil {
-					revel.ERROR.Println(err)
-				}
+				core.HandleError(err)
 
 				order_in_db.Code = order_code
 				order_in_db.ShopId = config.ShopId
 
 				var shop models.ShopAccountInfo
 				_, err = db_session.Id(config.ShopId).Get(&shop)
-				if err != nil {
-					revel.ERROR.Println(err)
-				}
+				core.HandleError(err)
 
 				order_in_db.TypeId = models.ORDER_TYPE_ZCDD //订单类型为正常下载订单
 
@@ -155,9 +148,8 @@ func (t EBayOrderDownloadTask) Run() {
 
 				if order_download.CreatedTime != "" {
 					created_time, err := time.Parse("2006-01-02T15:04:05.000Z", order_download.CreatedTime)
-					if err != nil {
-						revel.ERROR.Println(err)
-					}
+					core.HandleError(err)
+
 					// 转成北京时间
 					//created_time = created_time.Add(8 * time.Hour)
 					created_time = created_time.Local()
@@ -167,9 +159,8 @@ func (t EBayOrderDownloadTask) Run() {
 
 				if order_download.ModifiedTime != "" {
 					modified_time, err := time.Parse("2006-01-02T15:04:05.000Z", order_download.ModifiedTime)
-					if err != nil {
-						revel.ERROR.Println(err)
-					}
+					core.HandleError(err)
+
 					// 转成北京时间
 					// modified_time = modified_time.Add(8 * time.Hour)
 					modified_time = modified_time.Local()
@@ -179,9 +170,8 @@ func (t EBayOrderDownloadTask) Run() {
 
 				if order_download.PaidTime != "" {
 					paid_time, err := time.Parse("2006-01-02T15:04:05.000Z", order_download.PaidTime)
-					if err != nil {
-						revel.ERROR.Println(err)
-					}
+					core.HandleError(err)
+
 					// 转成北京时间
 					// paid_time = paid_time.Add(8 * time.Hour)\
 					paid_time = paid_time.Local()
@@ -191,9 +181,8 @@ func (t EBayOrderDownloadTask) Run() {
 
 				if order_download.ShippedTime != "" {
 					shipped_time, err := time.Parse("2006-01-02T15:04:05.000Z", order_download.ShippedTime)
-					if err != nil {
-						revel.ERROR.Println(err)
-					}
+					core.HandleError(err)
+
 					// 转成北京时间
 					// shipped_time = shipped_time.Add(8 * time.Hour)
 					shipped_time = shipped_time.Local()
@@ -336,17 +325,13 @@ func (t EBayOrderDownloadTask) Run() {
 				if has_order == true {
 					// update order
 					_, err = db_session.Id(order_in_db.Id).Cols(update_col_list...).Update(&order_in_db)
-					if err != nil {
-						revel.ERROR.Println(err)
-					}
+					core.HandleError(err)
 				} else {
 					// insert order
 					order_in_db.Code = order_code
 
 					_, err = db_session.Insert(&order_in_db)
-					if err != nil {
-						revel.ERROR.Println(err)
-					}
+					core.HandleError(err)
 				}
 
 				order_id := order_in_db.Id
@@ -389,9 +374,7 @@ func (t EBayOrderDownloadTask) Run() {
 							var order_item models.OrderItemInfo
 
 							has_order_item, err := db_session.Where(fmt.Sprintf("order_id = %d and item_sku = '%s'", order_id, product_sku)).Get(&order_item)
-							if err != nil {
-								revel.ERROR.Println(err)
-							}
+							core.HandleError(err)
 
 							// 设置明细字段
 							order_item.OrderId = order_id
@@ -427,9 +410,8 @@ func (t EBayOrderDownloadTask) Run() {
 							order_item.ProductCostPrice = product_service.Get_product_cost_price(product_id, db_session)
 
 							transaction_created_date, err := time.Parse("2006-01-02T15:04:05.000Z", transaction.CreatedDate)
-							if err != nil {
-								revel.ERROR.Println(err)
-							}
+							core.HandleError(err)
+
 							transaction_created_date = transaction_created_date.Local()
 							order_item.CreatedDate = core.LongTime(transaction_created_date)
 
@@ -437,15 +419,11 @@ func (t EBayOrderDownloadTask) Run() {
 							if has_order_item == false {
 								//新增
 								_, err = db_session.Insert(&order_item)
-								if err != nil {
-									revel.ERROR.Println(err)
-								}
+								core.HandleError(err)
 							} else {
 								//更新
 								_, err = db_session.Id(order_item.Id).Update(&order_item)
-								if err != nil {
-									revel.ERROR.Println(err)
-								}
+								core.HandleError(err)
 							}
 						}
 
@@ -453,9 +431,7 @@ func (t EBayOrderDownloadTask) Run() {
 						var order_item models.OrderItemInfo
 
 						has_order_item, err := db_session.Where(fmt.Sprintf("order_id = %d and item_sku = '%s'", order_id, item_sku)).Get(&order_item)
-						if err != nil {
-							revel.ERROR.Println(err)
-						}
+						core.HandleError(err)
 
 						// 设置明细字段
 						order_item.OrderId = order_id
@@ -487,9 +463,8 @@ func (t EBayOrderDownloadTask) Run() {
 						order_item.ProductCostPrice = product_service.Get_product_cost_price(product_id, db_session)
 
 						transaction_created_date, err := time.Parse("2006-01-02T15:04:05.000Z", transaction.CreatedDate)
-						if err != nil {
-							revel.ERROR.Println(err)
-						}
+						core.HandleError(err)
+
 						transaction_created_date = transaction_created_date.Local()
 						order_item.CreatedDate = core.LongTime(transaction_created_date)
 
@@ -497,15 +472,11 @@ func (t EBayOrderDownloadTask) Run() {
 						if has_order_item == false {
 							//新增
 							_, err = db_session.Insert(&order_item)
-							if err != nil {
-								revel.ERROR.Println(err)
-							}
+							core.HandleError(err)
 						} else {
 							//更新
 							_, err = db_session.Id(order_item.Id).Update(&order_item)
-							if err != nil {
-								revel.ERROR.Println(err)
-							}
+							core.HandleError(err)
 						}
 					}
 				}
@@ -531,15 +502,11 @@ func (t EBayOrderDownloadTask) Run() {
 				if has_order_shipping_address == true {
 					// do update
 					_, err = db_session.Id(order_shipping_address.Id).Update(&order_shipping_address)
-					if err != nil {
-						revel.ERROR.Println(err)
-					}
+					core.HandleError(err)
 				} else {
 					// do insert
 					_, err = db_session.Insert(&order_shipping_address)
-					if err != nil {
-						revel.ERROR.Println(err)
-					}
+					core.HandleError(err)
 				}
 
 				// Order Item
@@ -655,9 +622,7 @@ func (t EBayOrderDownloadTask) fetch_orders(config models.EBayAPIConfigInfo, pag
 
 	response := ebay.GetOrdersResponse{}
 	err = xml.Unmarshal(data, &response)
-	if err != nil {
-		revel.ERROR.Println(err)
-	}
+	core.HandleError(err)
 
 	e := response.Errors
 
