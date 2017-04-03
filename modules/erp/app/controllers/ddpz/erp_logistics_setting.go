@@ -1,13 +1,13 @@
-
 package controllers
 
 import (
 	"encoding/json"
-	"strconv"
-	"github.com/revel/revel"
+	"fmt"
 
+	"github.com/revel/revel"
 	"matrix/core"
 	"matrix/modules/erp/models"
+	"matrix/modules/erp/service/logistics_setting_service"
 )
 
 type ErpLogisticsSetting struct {
@@ -22,28 +22,18 @@ type LogisticsSettingDetailForm struct {
 	LogisticsSetting models.LogisticsSettingInfo `json:"logistics_setting"`
 }
 
-func (f *LogisticsSettingDetailForm) IsCreate() bool {
-	return f.LogisticsSetting.Id == 0
-}
-
-func (f *LogisticsSettingDetailForm) Valid(validation *revel.Validation) bool { 
+func (f *LogisticsSettingDetailForm) Valid(validation *revel.Validation) bool {
 	validation.Required(f.LogisticsSetting.AddressSpecialWord).Message("地址特殊字段不能为空！")
 	if f.LogisticsSetting.AddressSpecialWord != "" {
 		validation.MaxSize(f.LogisticsSetting.AddressSpecialWord, 300).Message("地址特殊字段长度不能大于300！")
 	}
 
 	validation.Required(f.LogisticsSetting.MaxDeficitPrice).Message("最大亏损价格不能为空！")
-
 	validation.Required(f.LogisticsSetting.MaxDeficitRate).Message("最大亏损率不能为空！")
-
 	validation.Required(f.LogisticsSetting.EnvelopeMaxLength).Message("信封最大长度不能为空！")
-
 	validation.Required(f.LogisticsSetting.EnvelopeMaxWidth).Message("信封最大宽度不能为空！")
-
 	validation.Required(f.LogisticsSetting.EnvelopeMaxHeight).Message("信封最大高度不能为空！")
-
 	validation.Required(f.LogisticsSetting.EnvelopeMaxWeight).Message("信封最大重量不能为空！")
-
 	validation.Required(f.LogisticsSetting.MinExpressFee).Message("最少快递费不能为空！")
 
 	return validation.HasErrors() == false
@@ -52,17 +42,7 @@ func (f *LogisticsSettingDetailForm) Valid(validation *revel.Validation) bool {
 func (c ErpLogisticsSetting) DetailData() revel.Result {
 	db_session := c.DbSession
 
-	var logistics_setting_id int64
-	c.Params.Bind(&logistics_setting_id, "id")
-
-	var logistics_setting models.LogisticsSettingInfo
-	if logistics_setting_id != 0 {
-		has, err := db_session.Id(logistics_setting_id).Get(&logistics_setting)
-		core.HandleError(err)
-		if has == false {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "指定的物流配置不存在！"})
-		}
-	}
+	var logistics_setting = logistics_setting_service.Get_logistics_setting(db_session)
 
 	var detail_form LogisticsSettingDetailForm
 	detail_form.LogisticsSetting = logistics_setting
@@ -81,20 +61,18 @@ func (c ErpLogisticsSetting) Save() revel.Result {
 		return c.RenderJson(core.JsonResult{Success: false, Message: c.GetValidationErrorMessage()})
 	}
 
+	// 先插入再删除，这样从表里面取数据的时候，总能取到的
+
+	// 插入当前的配置信息
 	logistics_setting := detail_form.LogisticsSetting
+	_, err = db_session.Insert(&logistics_setting)
+	core.HandleError(err)
 
-	var affected int64
-	if detail_form.IsCreate() { 
-		affected, err = db_session.Insert(&logistics_setting)
-		core.HandleError(err)
-	} else { 
-		affected, err = db_session.Id(logistics_setting.Id).Update(&logistics_setting)
-		core.HandleError(err)
+	// 删除原来表里面的信息记录
+	sql_delete := "DELETE FROM erp_logistics_setting WHERE id <> %d"
+	sql_delete = fmt.Sprintf(sql_delete, logistics_setting.Id)
+	_, err = db_session.Exec(sql_delete)
+	core.HandleError(err)
 
-		if affected == 0 {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！" })
-		}
-	}
-
-	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据保存成功!"})
+	return c.RenderJson(core.JsonResult{Success: true, Message: "数据保存成功!"})
 }
