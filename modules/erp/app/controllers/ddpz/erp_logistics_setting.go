@@ -62,15 +62,17 @@ func (c ErpLogisticsSetting) Save() revel.Result {
 		return c.RenderJson(core.JsonResult{Success: false, Message: c.GetValidationErrorMessage()})
 	}
 
+	logistics_setting := &(detail_form.LogisticsSetting) // 取地址，这样下面的对 logistics_setting 的修改都会反映到 detail_form 里面去的，返回的 json 里面也会有反映
+
 	// 检查地址特殊字段的格式
-	if strings.Index(detail_form.LogisticsSetting.AddressSpecialWord, "，") != -1 {
+	if strings.Index(logistics_setting.AddressSpecialWord, "，") != -1 {
 		return c.RenderJson(map[string]interface{}{
 			"success": false,
 			"message": "地址特殊字段不能用中文的逗号分隔！",
 		})
 	}
 
-	address_special_word_list := strings.Split(detail_form.LogisticsSetting.AddressSpecialWord, ",")
+	address_special_word_list := strings.Split(logistics_setting.AddressSpecialWord, ",")
 	for index, address_special_word := range address_special_word_list {
 		if strings.TrimSpace(address_special_word) == "" {
 			return c.RenderJson(map[string]interface{}{
@@ -82,13 +84,13 @@ func (c ErpLogisticsSetting) Save() revel.Result {
 		address_special_word_list[index] = strings.TrimSpace(address_special_word)
 	}
 
-	detail_form.LogisticsSetting.AddressSpecialWord = strings.Join(address_special_word_list, ",") //这里面保存的已经是去掉 字段 前后 多余的空白了的
+	logistics_setting.AddressSpecialWord = strings.Join(address_special_word_list, ",") //这里面保存的已经是去掉 字段 前后 多余的空白了的
 
 	// 先插入再删除，这样从表里面取数据的时候，总能取到的
 
 	// 插入当前的配置信息
-	logistics_setting := detail_form.LogisticsSetting
-	_, err = db_session.Insert(&logistics_setting)
+	logistics_setting.Id = 0
+	_, err = db_session.Insert(logistics_setting) // 因为前面取的是地址，所以这里就不用取地址了的
 	core.HandleError(err)
 
 	// 删除原来表里面的信息记录
@@ -97,5 +99,9 @@ func (c ErpLogisticsSetting) Save() revel.Result {
 	_, err = db_session.Exec(sql_delete)
 	core.HandleError(err)
 
-	return c.RenderJson(core.JsonResult{Success: true, Message: "数据保存成功!"})
+	return c.RenderJson(map[string]interface{}{
+		"success": true,
+		"detail":  detail_form, // detail_form 里面的数据有过优化和更改的（对 AddressSpecialWord 的优化），所以就再返回一下
+		"message": "数据保存成功!",
+	})
 }
