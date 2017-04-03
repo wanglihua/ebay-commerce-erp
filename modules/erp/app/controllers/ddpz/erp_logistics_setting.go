@@ -3,6 +3,7 @@ package controllers
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	"github.com/revel/revel"
 	"matrix/core"
@@ -60,6 +61,28 @@ func (c ErpLogisticsSetting) Save() revel.Result {
 	if detail_form.Valid(c.Validation) == false {
 		return c.RenderJson(core.JsonResult{Success: false, Message: c.GetValidationErrorMessage()})
 	}
+
+	// 检查地址特殊字段的格式
+	if strings.Index(detail_form.LogisticsSetting.AddressSpecialWord, "，") != -1 {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "地址特殊字段不能用中文的逗号分隔！",
+		})
+	}
+
+	address_special_word_list := strings.Split(detail_form.LogisticsSetting.AddressSpecialWord, ",")
+	for index, address_special_word := range address_special_word_list {
+		if strings.TrimSpace(address_special_word) == "" {
+			return c.RenderJson(map[string]interface{}{
+				"success": false,
+				"message": "地址特殊字段请用单个的英文逗号分隔！",
+			})
+		}
+
+		address_special_word_list[index] = strings.TrimSpace(address_special_word)
+	}
+
+	detail_form.LogisticsSetting.AddressSpecialWord = strings.Join(address_special_word_list, ",") //这里面保存的已经是去掉 字段 前后 多余的空白了的
 
 	// 先插入再删除，这样从表里面取数据的时候，总能取到的
 
