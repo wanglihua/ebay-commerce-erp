@@ -1,0 +1,247 @@
+{%header "物流配置" .%}
+<div id="page">
+    <div class="breadcrumbs" id="breadcrumbs">
+        <ul class="breadcrumb">
+            <li>
+                <a href='{%url "Home.Index"%}'><i class="ace-icon fa fa-home home-icon"></i></a>
+            </li>
+            <li class="parent" data-menu="ddpz-menu">订单配置</li>
+            <li class="active" data-menu="ddpz-logisticssetting-menu">物流配置</li>
+        </ul>
+    </div>
+    <div class="page-content">
+        <div class="row">
+            <div class="col-xs-12" style="padding: 0;">
+                <div class="gridToolBar clearfix">
+                    <button class="btn btn-primary btn-sm" onclick="loadLogisticsSettingDetail()">
+                        <i class="ace-icon fa fa-refresh"></i>
+                        刷新
+                    </button>
+                    <button class="btn btn-success btn-sm" @click="saveLogisticsSetting()">
+                        <i class="ace-icon fa fa-floppy-o"></i>
+                        保存
+                    </button>
+                </div>
+                <div>
+                    <div class="widget-box" style="border-style:none;width:680px; ">
+                        <div class="widget-body">
+                            <div class="widget-main">
+                                <form class="form-horizontal" role="form" id="logisticsSettingDetailForm">
+                                    <input id="logistics_setting_id" name="detail.logistics_setting.id" type="hidden" v-model.number="detail.logistics_setting.id"/>
+                                    <input id="logistics_setting_version" name="detail.logistics_setting.version" type="hidden" v-model.number="detail.logistics_setting.version"/>
+                                    <div class="row">
+                                        <div class="col-xs-12">
+                                            <div class="form-group">
+                                                <label for="address_special_word" class="col-xs-2 control-label">地址特殊字段</label>
+                                                <div class="col-xs-10">
+                                                    <input id="address_special_word" name="detail.logistics_setting.address_special_word" type="text" class="input-sm form-control" v-model="detail.logistics_setting.address_special_word"/>
+                                                    <div class="help-block">收货地址特殊字段，如 PO BOX, LOCKER 等，多个字段用逗号隔开。</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-xs-6">
+                                            <div class="form-group">
+                                                <label for="max_deficit_price" class="col-xs-4 control-label">最大亏损价格</label>
+                                                <div class="col-xs-8">
+                                                    <input id="max_deficit_price" name="detail.logistics_setting.max_deficit_price" type="text" class="input-sm form-control" v-model.number="detail.logistics_setting.max_deficit_price"/>
+                                                    <div class="help-block">匹配最佳仓库及物流后订单允许的最大亏损价格。</div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-xs-6">
+                                            <div class="form-group">
+                                                <label for="max_deficit_rate" class="col-xs-4 control-label">最大亏损率</label>
+                                                <div class="col-xs-8">
+                                                    <input id="max_deficit_rate" name="detail.logistics_setting.max_deficit_rate" type="text" class="input-sm form-control" v-model.number="detail.logistics_setting.max_deficit_rate"/>
+                                                    <div class="help-block">匹配最佳仓库及物流后订单允许的最大亏损率。</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-xs-6">
+                                            <div class="form-group">
+                                                <label for="envelope_max_length" class="col-xs-4 control-label">信封最大长度</label>
+                                                <div class="col-xs-8">
+                                                    <input id="envelope_max_length" name="detail.logistics_setting.envelope_max_length" type="text" class="input-sm form-control" v-model.number="detail.logistics_setting.envelope_max_length"/>
+                                                    <div class="help-block">信封允许的最大长度，单位cm。</div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-xs-6">
+                                            <div class="form-group">
+                                                <label for="envelope_max_width" class="col-xs-4 control-label">信封最大宽度</label>
+                                                <div class="col-xs-8">
+                                                    <input id="envelope_max_width" name="detail.logistics_setting.envelope_max_width" type="text" class="input-sm form-control" v-model.number="detail.logistics_setting.envelope_max_width"/>
+                                                    <div class="help-block">信封允许的最大宽度，单位cm。</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-xs-6">
+                                            <div class="form-group">
+                                                <label for="envelope_max_height" class="col-xs-4 control-label">信封最大高度</label>
+                                                <div class="col-xs-8">
+                                                    <input id="envelope_max_height" name="detail.logistics_setting.envelope_max_height" type="text" class="input-sm form-control" v-model.number="detail.logistics_setting.envelope_max_height"/>
+                                                    <div class="help-block">信封允许的最大高度，单位cm。</div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-xs-6">
+                                            <div class="form-group">
+                                                <label for="envelope_max_weight" class="col-xs-4 control-label">信封最大重量</label>
+                                                <div class="col-xs-8">
+                                                    <input id="envelope_max_weight" name="detail.logistics_setting.envelope_max_weight" type="text" class="input-sm form-control" v-model.number="detail.logistics_setting.envelope_max_weight"/>
+                                                    <div class="help-block">信封允许的最大重量，单位kg。</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-xs-6">
+                                            <div class="form-group">
+                                                <label for="min_express_fee" class="col-xs-4 control-label">最少快递费</label>
+                                                <div class="col-xs-8">
+                                                    <input id="min_express_fee" name="detail.logistics_setting.min_express_fee" type="text" class="input-sm form-control" v-model.number="detail.logistics_setting.min_express_fee"/>
+                                                    <div class="help-block">
+                                                        如果运费高于这个金额，就视为快递。
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </form>
+                                {%/*
+                                <hr/>
+                                <div class="wizard-actions">
+                                    <button class="btn btn-sm btn-primary">
+                                        <i class="ace-icon fa fa-floppy-o"></i>
+                                        保存
+                                    </button>
+                                    <button class="btn btn-sm btn-default">
+                                        <i class="ace-icon fa fa-undo"></i>
+                                        重置
+                                    </button>
+                                </div>
+                                */%}
+                            </div>
+
+                            <div class="todo">
+                                这些金额费用的单位是RMB？
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+
+    function loadLogisticsSettingDetail(this_vm) {
+        showMask("加载中...");
+        $("#logisticsSettingDetailForm").clearValidation();
+        $.ajax({
+                url: '{%url "ErpLogisticsSetting.DetailData" %}',
+                type: "POST",
+                success: function (result) {
+                    hideMask();
+                    if (result.success == false) {
+                        $.msg.error(result.message);
+                        return;
+                    }
+
+                    if (this_vm === void(0) || this_vm.page === void(0)) {
+                        vm.detail = result;
+                    }
+                    else {
+                        this_vm.detail = result;
+                    }
+                }
+            }
+        );
+    }
+
+    var vm = new Vue({
+        el: "#page",
+        data: {
+            "detail": {
+                "logistics_setting": {}
+            }
+        },
+        mounted: function () {
+            loadLogisticsSettingDetail(this);
+        },
+        methods: {
+            saveLogisticsSetting: function () {
+                showMask("提交中...");
+                var form = $("#logisticsSettingDetailForm");
+                var valid = validate(form, {
+                    'detail.logistics_setting.address_special_word': {
+                        required: true, maxlength: 300
+                    },
+                    'detail.logistics_setting.max_deficit_price': {
+                        required: true, number: true
+                    },
+                    'detail.logistics_setting.max_deficit_rate': {
+                        required: true, number: true
+                    },
+                    'detail.logistics_setting.envelope_max_length': {
+                        required: true, number: true
+                    },
+                    'detail.logistics_setting.envelope_max_width': {
+                        required: true, number: true
+                    },
+                    'detail.logistics_setting.envelope_max_height': {
+                        required: true, number: true
+                    },
+                    'detail.logistics_setting.envelope_max_weight': {
+                        required: true, number: true
+                    },
+                    'detail.logistics_setting.min_express_fee': {
+                        required: true, number: true
+                    }
+                });
+
+                if (!valid) {
+                    hideMask();
+                } else {
+                    $.ajax(
+                        {
+                            url: '{%url "ErpLogisticsSetting.Save"%}',
+                            type: "POST",
+                            processData: false,
+                            contentType: 'application/json',
+                            data: JSON.stringify(vm.detail),
+                            success: function (data) {
+                                hideMask();
+                                if (data.success == false) {
+                                    $.msg.error(data.message);
+                                    //return;
+                                }
+                                else {
+                                    $.msg.show(data.message);
+                                    //return;
+                                }
+                            }
+                        }
+                    );
+                }
+            }
+        }
+    });
+</script>
+{%footer%}
+

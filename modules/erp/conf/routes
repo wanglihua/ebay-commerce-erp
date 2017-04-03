@@ -291,6 +291,10 @@ POST /erp/platform/logistics/mode/data/detail  ErpPlatformLogisticsMode.DetailDa
 POST /erp/platform/logistics/mode/save         ErpPlatformLogisticsMode.Save
 POST /erp/platform/logistics/mode/delete       ErpPlatformLogisticsMode.Delete
 
+GET  /erp/logistics/setting                    ErpLogisticsSetting.Index
+POST /erp/logistics/setting/data/detail        ErpLogisticsSetting.DetailData
+POST /erp/logistics/setting/save               ErpLogisticsSetting.Save
+
 GET  /erp/purchase/bill                        ErpPurchaseBill.Index
 POST /erp/purchase/bill/data/list              ErpPurchaseBill.ListData
 POST /erp/purchase/bill/data/detail            ErpPurchaseBill.DetailData

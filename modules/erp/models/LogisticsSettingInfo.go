@@ -24,5 +24,5 @@ func (e LogisticsSettingInfo) TableName() string {
 }
 
 func (e LogisticsSettingInfo) ModelDesc() string {
-	return "verbose_name=状态,entity_json=logistics_setting,route=logistics/setting"
+	return "verbose_name=物流配置,entity_json=logistics_setting,route=logistics/setting"
 }
