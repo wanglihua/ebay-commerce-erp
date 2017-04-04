@@ -111,6 +111,8 @@ func (c ErpOrder) ListData() revel.Result {
 	c.Params.Bind(&status, "status")
 
 	var status_id int64 = 0          // 0： all status; other: 具体的 status_id
+
+	// 先看 URL 里面的状态分类
 	status = strings.ToLower(status) //大小写
 	if status == "all" {
 		status_id = 0
@@ -126,6 +128,7 @@ func (c ErpOrder) ListData() revel.Result {
 		status_id = models.ORDER_STATUS_YWC
 	}
 
+	// 再看查询条件里面的状态分类
 	c.Params.Bind(&status_id, "status_id") //查询条件的status_id，比url里面换算过来的status_id更为优先
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
