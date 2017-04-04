@@ -108,3 +108,32 @@ WHERE p.name like '%%%s%%'`
 
 	return order_id_list
 }
+
+func Get_paid_order_list(db_session *xorm.Session) []models.OrderInfo {
+	var paid_order_list = make([]models.OrderInfo, 0)
+	err := db_session.Sql(fmt.Sprintf("SELECT * FROM erp_order o WHERE o.status_id = %d", models.ORDER_STATUS_YZF)).Find(&paid_order_list)
+	core.HandleError(err)
+
+	return paid_order_list
+}
+
+type Order_product_info struct {
+	OrderId   int64   `xorm:"'order_id'"`
+	ProductId int64   `xorm:"'product_id'"`
+	Price     float64 `xorm:"'price'"`
+	Qty       int64   `xorm:"'qty'"`
+	CostPrice int64   `xorm:"'cost_price'"`
+}
+
+func Get_order_product_qty_list(order_id int64, db_session *xorm.Session) []Order_product_info {
+	sql := `SELECT oi.order_id, oi.item_product_id AS product_id, oi.transaction_price AS price, oi.quantity AS qty, oi.product_cost_price AS cost_price
+FROM erp_order_item oi
+WHERE oi.order_id = %d`
+	sql = fmt.Sprintf(sql, order_id)
+
+	var order_product_qty_list = make([]Order_product_info, 0)
+	err := db_session.Sql(sql).Find(&order_product_qty_list)
+	core.HandleError(err)
+
+	return order_product_qty_list
+}

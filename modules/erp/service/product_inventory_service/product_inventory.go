@@ -59,3 +59,23 @@ func Get_inventory_by_product_list(db_session *xorm.Session, product_id_list []i
 
 	return product_inventory_list
 }
+
+type Product_stock_qty struct {
+	ProductId int64     `xorm:"'product_id'"`
+	StockId   int64     `xorm:"'stock_id'"`
+	Qty       int64     `xorm:"'qty'"`
+}
+
+func Get_product_stock_qty(product_id int64, db_session *xorm.Session) []Product_stock_qty {
+	sql := `SELECT ivt.product_id AS product_id, ivt.stock_id AS stock_id, sum(ivt.qty) AS qty
+FROM erp_inventory ivt
+WHERE ivt.product_id = %d
+GROUP BY ivt.product_id, ivt.stock_id`
+	sql = fmt.Sprintf(sql, product_id)
+
+	var product_stock_qty_list = make([]Product_stock_qty, 0)
+	err := db_session.Sql(sql).Find(&product_stock_qty_list)
+	core.HandleError(err)
+
+	return product_stock_qty_list
+}

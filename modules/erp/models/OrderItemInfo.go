@@ -22,7 +22,7 @@ type OrderItemInfo struct {
 	ItemConditionDisplayName string          `xorm:"nvarchar(100) notnull 'item_condition_display_name'" json:"item_condition_display_name"`
 	CreatedDate              core.LongTime   `xorm:"datetime notnull 'created_date'" json:"created_date"`
 	Desc                     core.NullString `xorm:"nvarchar(500) 'desc'" json:"desc" smith:"verbose_name=备注"`
-	ProductCostPrice         float64         `xorm:"decimal(18,6) notnull 'product_cost_price'" json:"product_cost_price"` //下载订单是把商品现在的成本价放入这里
+	ProductCostPrice         float64         `xorm:"decimal(18,6) notnull 'product_cost_price'" json:"product_cost_price"` //下载订单是把商品现在的成本价放入这里， 这里是单个商品的成本价
 	CreateTime               core.Time       `xorm:"created notnull 'create_time'" json:"create_time"`
 	UpdateTime               core.Time       `xorm:"updated notnull 'update_time'" json:"update_time"`
 	Version                  int             `xorm:"version notnull 'version'" json:"version"`
