@@ -23,3 +23,20 @@ FROM erp_exchange_rate er
 
 	return exchange_rate_list
 }
+
+// 获取澳币的汇率
+func Get_aud_exchange_rate(db_session *xorm.Session) float64 {
+	var aud_rate struct {
+		Rate float64 `xorm:"'rate'"`
+	}
+
+	sql := `SELECT er.rate
+FROM erp_exchange_rate er
+    INNER JOIN erp_currency c ON c.id = er.currency_id
+WHERE c.code = 'USD'`
+
+	_, err := db_session.Sql(sql).Get(&aud_rate)
+	core.HandleError(err)
+
+	return aud_rate.Rate
+}

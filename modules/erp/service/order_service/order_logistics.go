@@ -7,6 +7,10 @@ import (
 
 // 计算订单的物流方式 和 Hold 类型
 func Calculate_order_logistics(db_session *xorm.Session) {
+	// 获取澳币的汇率
+
+
+
 	logistics_setting := logistics_setting_service.Get_logistics_setting(db_session)
 	_ = logistics_setting
 
