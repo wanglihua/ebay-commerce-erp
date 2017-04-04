@@ -118,14 +118,15 @@ func Get_paid_order_list(db_session *xorm.Session) []models.OrderInfo {
 }
 
 type Order_product_info struct {
-	OrderId   int64  `xorm:"'order_id'"`
-	ProductId int64  `xorm:"'product_id'"`
-	Qty       int64  `xorm:"'qty'"`
-	CostPrice int64  `xorm:"'cost_price'"`
+	OrderId   int64    `xorm:"'order_id'"`
+	ProductId int64    `xorm:"'product_id'"`
+	Price     float64  `xorm:"'price'"` // 方便后面的运费计算啥的，这里面的价格是 澳币
+	Qty       int64    `xorm:"'qty'"`
+	CostPrice int64    `xorm:"'cost_price'"` // 是 人民币 的成本价，由于运费都是用 澳币结算的，匹配物流时，应该把这个 成本价 换算成 澳币
 }
 
 func Get_order_product_qty_list(order_id int64, db_session *xorm.Session) []Order_product_info {
-	sql := `SELECT oi.order_id, oi.item_product_id AS product_id, oi.quantity AS qty, oi.product_cost_price AS cost_price
+	sql := `SELECT oi.order_id, oi.item_product_id AS product_id, oi.transaction_price AS price, oi.quantity AS qty, oi.product_cost_price AS cost_price
 FROM erp_order_item oi
 WHERE oi.order_id = %d`
 	sql = fmt.Sprintf(sql, order_id)
