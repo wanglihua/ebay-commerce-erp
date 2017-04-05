@@ -9,7 +9,7 @@ const (
 	STOCK_TYPE_CN int64 = 100
 
 	// STOCK_TYPE_ZAITU 在途仓库
-	STOCK_TYPE_ZAITU int64 = 200
+	STOCK_TYPE_ZT int64 = 200
 
 	// STOCK_TYPE_AU 澳洲仓库
 	STOCK_TYPE_AU int64 = 300
@@ -22,7 +22,7 @@ type StockInfo struct {
 	Contact       core.NullString `xorm:"nvarchar(200) 'contact'" json:"contact" smith:"verbose_name=联系人,min=2,max=100"`
 	Address       core.NullString `xorm:"nvarchar(200) 'address'" json:"address" smith:"verbose_name=地址,min=2,max=200"`
 	Phone         core.NullString `xorm:"nvarchar(200) 'phone'" json:"phone" smith:"verbose_name=电话,min=2,max=100"`
-	StockTypeId   int64           `xorm:"bigint notnull 'stock_type_id'" json:"stock_type_id" smith:"verbose_name=仓库类型"`  // 普通仓库， 在途仓库
+	StockTypeId   int64           `xorm:"bigint notnull 'stock_type_id'" json:"stock_type_id" smith:"verbose_name=仓库类型"`  // 国内仓库 在途仓库 澳洲仓库
 	TargetStockId core.NullInt    `xorm:"bigint null 'target_stock_id'" json:"target_stock_id" smith:"verbose_name=目的仓库"` //在途虚拟仓库的目的仓库
 	StatusId      int64           `xorm:"bigint notnull index 'status_id'" json:"status_id" smith:"verbose_name=状态"`
 	CreateTime    core.Time       `xorm:"created notnull 'create_time'" json:"create_time"`
@@ -51,7 +51,7 @@ func GetStockTypeList() []StockTypeInfo {
 	stock_type_cn.Name = "国内仓库"
 
 	var stock_type_zaitu StockTypeInfo
-	stock_type_zaitu.Id = STOCK_TYPE_ZAITU
+	stock_type_zaitu.Id = STOCK_TYPE_ZT
 	stock_type_zaitu.Name = "在途仓库"
 
 	var stock_type_au StockTypeInfo

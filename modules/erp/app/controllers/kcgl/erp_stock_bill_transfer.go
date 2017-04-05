@@ -162,7 +162,7 @@ func (c ErpStockBillTransfer) Save() revel.Result {
 		_, err := db_session.Id(stock_bill.StockId).Get(&stock)
 		core.HandleError(err)
 
-		if stock.StockTypeId == models.STOCK_TYPE_ZAITU {
+		if stock.StockTypeId == models.STOCK_TYPE_ZT {
 			stock_bill.TypeId = models.STOCK_BILL_TYPE_TRANSFER_ZT
 		} else {
 			stock_bill.TypeId = models.STOCK_BILL_TYPE_TRANSFER
