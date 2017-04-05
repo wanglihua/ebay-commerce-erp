@@ -137,3 +137,27 @@ WHERE oi.order_id = %d`
 
 	return order_product_qty_list
 }
+
+func get_order_shipping_address(order_id int64, db_session *xorm.Session) models.OrderShippingAddressInfo {
+	var order_shipping_address_list = make([]models.OrderShippingAddressInfo, 0)
+	err := db_session.Where(fmt.Sprintf("order_id = %d", order_id)).Find(&order_shipping_address_list)
+	core.HandleError(err)
+
+	for _, order_shipping_address := range order_shipping_address_list {
+		if order_shipping_address.AddressOwner == "PayPal" {  // PayPal 收货地址
+			return order_shipping_address
+		}
+	}
+
+	for _, order_shipping_address := range order_shipping_address_list {
+		if order_shipping_address.AddressOwner == "eBay" {  // eBay 收货地址
+			return order_shipping_address
+		}
+	}
+
+	if len(order_shipping_address_list) != 0 {
+		return order_shipping_address_list[0]
+	}
+
+	return models.OrderShippingAddressInfo{}
+}

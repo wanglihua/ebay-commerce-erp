@@ -2,12 +2,16 @@ package order_service
 
 import (
 	"errors"
+	"strings"
 
 	"github.com/go-xorm/xorm"
 	"github.com/revel/revel"
+	"matrix/core"
+	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/exchange_rate_service"
 	"matrix/modules/erp/service/logistics_setting_service"
 	"matrix/modules/erp/service/product_inventory_service"
+	"fmt"
 )
 
 // 计算订单的物流方式 和 Hold 类型
@@ -25,7 +29,12 @@ func Calculate_order_logistics(db_session *xorm.Session) {
 	}
 
 	logistics_setting := logistics_setting_service.Get_logistics_setting(db_session)
-	_ = logistics_setting
+
+	// 获得地址特殊字段的列表
+	address_special_word_list := strings.Split(logistics_setting.AddressSpecialWord, ",")
+	for index, address_special_word := range address_special_word_list {
+		address_special_word_list[index] = strings.TrimSpace(address_special_word)
+	}
 
 	// 拆分和合并订单，在这之前就已经完成了？ 不是在这里做，就可以了，做完进入 hold
 
@@ -39,15 +48,26 @@ func Calculate_order_logistics(db_session *xorm.Session) {
 			exchange_rate = aud_exchange_rate
 		}
 
+		var order_shipping_address = get_order_shipping_address(order.Id, db_session)
+
 		// 1 地址有特殊字段的
+		for _, address_special_word := range address_special_word_list {
+			// 地址包含特殊字段
+			address_special_word_lower_case := strings.ToLower(address_special_word)
+			address_detail_lower_case := strings.ToLower(fmt.Sprintf("%s %s", order_shipping_address.Street1, order_shipping_address.Street2))
+			if strings.Index(address_detail_lower_case, address_special_word_lower_case) != -1 {
+				update_order_to_hold_type(order, models.ORDER_HOLD_TYPE_SPECIAL_ADDRESS, db_session)
+				return
+			}
+		}
 
 		// 16 判断是否是国际件
-
-
+		if strings.ToLower(order_shipping_address.Country) == strings.ToLower("AU") {
+			update_order_to_hold_type(order, models.ORDER_HOLD_TYPE_INTERNATIONAL, db_session)
+			return
+		}
 
 		// 15 判断是否是快递
-
-
 
 		var order_product_info_list = get_order_product_info_list(order.Id, db_session)
 
@@ -64,6 +84,11 @@ func Calculate_order_logistics(db_session *xorm.Session) {
 
 }
 
+func update_order_to_hold_type(order models.OrderInfo, hold_type_id int64, db_session *xorm.Session) {
+	order.HoldTypeId = core.MakeNullInt(hold_type_id, true)
+	_, err := db_session.Id(order.Id).Cols("hold_type_id").Update(&order)
+	core.HandleError(err)
+}
 
 /*
 
@@ -71,7 +96,7 @@ func Calculate_order_logistics(db_session *xorm.Session) {
 2. 有买家留言 -- 导入的订单里面还没有留言
 3. 有平台留言 -- 导入的订单里面还没有留言
 4. PICK UP   -- 一般都是手工创建的订单
-5. 系统显示所有仓都缺货（中国仓除外）
+5. 系统显示所有仓都缺货（中国仓除外） -- 给仓库加个类型
 6. 系统显示最佳仓缺货（次佳、海上有货）
 7. 实际仓库缺货
 8. 多数量或多产品，但部分缺货（是否拆分订单）

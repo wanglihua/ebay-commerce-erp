@@ -483,7 +483,7 @@ func (t EBayOrderDownloadTask) Run() {
 
 				//新增或更新送货地址
 				var order_shipping_address models.OrderShippingAddressInfo
-				has_order_shipping_address, err := db_session.Where("order_id = ?", order_id).Get(&order_shipping_address)
+				has_order_shipping_address, err := db_session.Where("order_id = ? AND address_owner = 'eBay'", order_id).Get(&order_shipping_address) // 平台收货地址
 
 				//设置每个字段的值，存在的每个字段都要设置，不能漏，否则更新和新增的时候会出问题
 				order_shipping_address.OrderId = order_id
