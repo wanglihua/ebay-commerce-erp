@@ -109,7 +109,7 @@ WHERE p.name like '%%%s%%'`
 	return order_id_list
 }
 
-func Get_paid_order_list(db_session *xorm.Session) []models.OrderInfo {
+func get_paid_order_list(db_session *xorm.Session) []models.OrderInfo {
 	var paid_order_list = make([]models.OrderInfo, 0)
 	err := db_session.Sql(fmt.Sprintf("SELECT * FROM erp_order o WHERE o.status_id = %d", models.ORDER_STATUS_YZF)).Find(&paid_order_list)
 	core.HandleError(err)
@@ -125,7 +125,7 @@ type Order_product_info struct {
 	CostPrice int64    `xorm:"'cost_price'"` // 是 人民币 的成本价，由于运费都是用 澳币结算的，匹配物流时，应该把这个 成本价 换算成 澳币
 }
 
-func Get_order_product_qty_list(order_id int64, db_session *xorm.Session) []Order_product_info {
+func get_order_product_info_list(order_id int64, db_session *xorm.Session) []Order_product_info {
 	sql := `SELECT oi.order_id, oi.item_product_id AS product_id, oi.transaction_price AS price, oi.quantity AS qty, oi.product_cost_price AS cost_price
 FROM erp_order_item oi
 WHERE oi.order_id = %d`
