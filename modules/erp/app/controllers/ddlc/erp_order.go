@@ -110,7 +110,7 @@ func (c ErpOrder) ListData() revel.Result {
 	var status string //all，yzf, dph, phz, yfh, ywc
 	c.Params.Bind(&status, "status")
 
-	var status_id int64 = 0          // 0： all status; other: 具体的 status_id
+	var status_id int64 = 0 // 0： all status; other: 具体的 status_id
 
 	// 先看 URL 里面的状态分类
 	status = strings.ToLower(status) //大小写
@@ -224,8 +224,9 @@ func (c ErpOrder) DetailData() revel.Result {
 	_, err = db_session.Id(order.HoldTypeId).Get(&order_hold_type)
 	core.HandleError(err)
 
+	// 这里面取得是平台的地址
 	var shipping_address models.OrderShippingAddressInfo
-	_, err = db_session.Where(fmt.Sprintf("order_id = %d", order_id)).Get(&shipping_address)
+	_, err = db_session.Where(fmt.Sprintf("order_id = %d AND address_owner = 'eBay'", order_id)).Limit(1, 0).Get(&shipping_address)
 	core.HandleError(err)
 
 	type order_item_view_t struct {

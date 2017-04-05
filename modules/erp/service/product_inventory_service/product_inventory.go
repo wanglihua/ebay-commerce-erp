@@ -66,7 +66,7 @@ type Product_stock_qty struct {
 	Qty       int64     `xorm:"'qty'"`
 }
 
-func Get_product_stock_qty(product_id int64, db_session *xorm.Session) []Product_stock_qty {
+func Get_product_stock_qty_list(product_id int64, db_session *xorm.Session) []Product_stock_qty {
 	sql := `SELECT ivt.product_id AS product_id, ivt.stock_id AS stock_id, sum(ivt.qty) AS qty
 FROM erp_inventory ivt
 WHERE ivt.product_id = %d

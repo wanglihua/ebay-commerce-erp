@@ -18,7 +18,7 @@ func Calculate_order_logistics(db_session *xorm.Session) {
 		}
 	}()
 
-	// 获取澳币的汇率
+	// 获取澳币的汇率，如果定单里面的汇率没有记录下来，就用这个汇率
 	var aud_exchange_rate = exchange_rate_service.Get_aud_exchange_rate(db_session)
 	if aud_exchange_rate == 0 {
 		panic(errors.New("澳币汇率未设置！"))
@@ -34,10 +34,14 @@ func Calculate_order_logistics(db_session *xorm.Session) {
 
 	for _, order := range paid_order_list {
 
+		// 下载订单的时候就可把当时的汇率记录了下来
+		var exchange_rate = order.ExchangeRate
+		_ = exchange_rate
+
 		var order_product_info_list = get_order_product_info_list(order.Id, db_session)
 
 		for _, order_product_info := range order_product_info_list {
-			product_inventory_service.Get_product_stock_qty(order_product_info.OrderId, db_session)
+			product_inventory_service.Get_product_stock_qty_list(order_product_info.OrderId, db_session)
 		}
 
 		// 检查 订单状态 是不是 正确，状态应该是 已支付 ？？
