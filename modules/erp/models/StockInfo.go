@@ -38,6 +38,8 @@ func (e StockInfo) ModelDesc() string {
 	return "verbose_name=仓库,entity_json=stock,route=stock"
 }
 
+
+//todo: 变成一个表吧
 type StockTypeInfo struct {
 	Id   int64  `json:"id"`
 	Name string `json:"name"`
