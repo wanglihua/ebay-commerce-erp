@@ -2,6 +2,7 @@ package order_service
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 
 	"github.com/go-xorm/xorm"
@@ -11,7 +12,6 @@ import (
 	"matrix/modules/erp/service/exchange_rate_service"
 	"matrix/modules/erp/service/logistics_setting_service"
 	"matrix/modules/erp/service/product_inventory_service"
-	"fmt"
 )
 
 // 计算订单的物流方式 和 Hold 类型
@@ -61,7 +61,7 @@ func Calculate_order_logistics(db_session *xorm.Session) {
 			}
 		}
 
-		// 16 判断是否是国际件
+		// 16 判断是否是国际件，如果不是澳洲的就是国际件，一般就是新西兰的
 		if strings.ToLower(order_shipping_address.Country) == strings.ToLower("AU") {
 			update_order_to_hold_type(order, models.ORDER_HOLD_TYPE_INTERNATIONAL, db_session)
 			return

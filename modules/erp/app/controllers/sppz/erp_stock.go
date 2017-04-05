@@ -130,7 +130,7 @@ func (c ErpStock) DetailData() revel.Result {
 		}
 	} else {
 		stock.StatusId = models.STOCK_STATUS_ENABLED
-		stock.StockTypeId = models.STOCK_TYPE_COMMON
+		stock.StockTypeId = models.STOCK_TYPE_CN
 	}
 
 	status_list := status_service.GetStatusList(db_session, models.STATUS_TYPE_STOCK)
@@ -166,7 +166,7 @@ func (c ErpStock) Save() revel.Result {
 
 	stock := detail_form.Stock
 
-	if stock.StockTypeId == models.STOCK_TYPE_COMMON && (stock.TargetStockId.Valid == true && stock.TargetStockId.Int64 != 0) {
+	if stock.StockTypeId == models.STOCK_TYPE_CN && (stock.TargetStockId.Valid == true && stock.TargetStockId.Int64 != 0) {
 		return c.RenderJson(core.JsonResult{Success: false, Message: "普通仓库不应该有目的仓库！" })
 	}
 

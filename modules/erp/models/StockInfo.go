@@ -5,11 +5,14 @@ import (
 )
 
 const (
-	// STOCK_TYPE_COMMON 普通仓库
-	STOCK_TYPE_COMMON int64 = 100
+	// STOCK_TYPE_CN 国内仓库
+	STOCK_TYPE_CN int64 = 100
 
 	// STOCK_TYPE_ZAITU 在途仓库
 	STOCK_TYPE_ZAITU int64 = 200
+
+	// STOCK_TYPE_AU 澳洲仓库
+	STOCK_TYPE_AU int64 = 300
 )
 
 type StockInfo struct {
@@ -36,20 +39,24 @@ func (e StockInfo) ModelDesc() string {
 }
 
 type StockTypeInfo struct {
-	Id   int64 `json:"id"`
+	Id   int64  `json:"id"`
 	Name string `json:"name"`
 }
 
 func GetStockTypeList() []StockTypeInfo {
 	stock_type_list := make([]StockTypeInfo, 0)
 
-	var stock_type_common StockTypeInfo
-	stock_type_common.Id = STOCK_TYPE_COMMON
-	stock_type_common.Name = "普通仓库"
+	var stock_type_cn StockTypeInfo
+	stock_type_cn.Id = STOCK_TYPE_CN
+	stock_type_cn.Name = "国内仓库"
 
 	var stock_type_zaitu StockTypeInfo
 	stock_type_zaitu.Id = STOCK_TYPE_ZAITU
 	stock_type_zaitu.Name = "在途仓库"
 
-	return append(stock_type_list, stock_type_common, stock_type_zaitu)
+	var stock_type_au StockTypeInfo
+	stock_type_au.Id = STOCK_TYPE_AU
+	stock_type_au.Name = "澳洲仓库"
+
+	return append(stock_type_list, stock_type_cn, stock_type_zaitu, stock_type_au)
 }
