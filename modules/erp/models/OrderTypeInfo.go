@@ -1,9 +1,8 @@
 package models
 
-
 import (
-	"matrix/core"
 	"github.com/go-xorm/xorm"
+	"matrix/core"
 )
 
 const (
@@ -14,12 +13,12 @@ const (
 )
 
 type OrderTypeInfo struct {
-	Id          int64           `xorm:"bigint notnull pk 'id'" json:"id"`
-	Name        string          `xorm:"nvarchar(200) notnull index unique 'name'" json:"name" smith:"verbose_name=名称,min=2,max=100"`
-	Desc        core.NullString `xorm:"nvarchar(500) 'desc'" json:"desc" smith:"verbose_name=备注,max=500"`
-	CreateTime  core.Time       `xorm:"created notnull 'create_time'" json:"create_time"`
-	UpdateTime  core.Time       `xorm:"updated notnull 'update_time'" json:"update_time"`
-	Version     int             `xorm:"version notnull 'version'" json:"version"`
+	Id         int64           `xorm:"bigint notnull pk 'id'" json:"id"`
+	Name       string          `xorm:"nvarchar(200) notnull index unique 'name'" json:"name" smith:"verbose_name=名称,min=2,max=100"`
+	Desc       core.NullString `xorm:"nvarchar(500) 'desc'" json:"desc" smith:"verbose_name=备注,max=500"`
+	CreateTime core.Time       `xorm:"created notnull 'create_time'" json:"create_time"`
+	UpdateTime core.Time       `xorm:"updated notnull 'update_time'" json:"update_time"`
+	Version    int             `xorm:"version notnull 'version'" json:"version"`
 }
 
 func (e OrderTypeInfo) TableName() string {
@@ -31,6 +30,7 @@ func (e OrderTypeInfo) ModelDesc() string {
 }
 
 func (e OrderTypeInfo) InitData(db_session *xorm.Session) {
+	// PICK UP 的订单 一般就都是 手工创建的
 	order_type := new(OrderTypeInfo)
 	order_type.Id = ORDER_TYPE_SGCJ
 	order_type.Name = "手工创建"
