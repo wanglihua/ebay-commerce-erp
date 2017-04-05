@@ -68,6 +68,7 @@ func Calculate_order_logistics(db_session *xorm.Session) {
 		}
 
 		// 15 判断是否是快递
+		// order 里面要加个字段，运费收入
 
 		var order_product_info_list = get_order_product_info_list(order.Id, db_session)
 
