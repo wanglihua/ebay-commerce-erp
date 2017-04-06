@@ -4,17 +4,6 @@ import (
 	"matrix/core"
 )
 
-const (
-	// STOCK_TYPE_CN 国内仓库
-	STOCK_TYPE_CN int64 = 100
-
-	// STOCK_TYPE_ZAITU 在途仓库
-	STOCK_TYPE_ZT int64 = 200
-
-	// STOCK_TYPE_AU 澳洲仓库
-	STOCK_TYPE_AU int64 = 300
-)
-
 type StockInfo struct {
 	Id            int64           `xorm:"bigint notnull pk autoincr 'id'" json:"id"`
 	Name          string          `xorm:"nvarchar(200) notnull index unique 'name'" json:"name" smith:"verbose_name=名称,min=2,max=100"`
@@ -36,29 +25,4 @@ func (e StockInfo) TableName() string {
 
 func (e StockInfo) ModelDesc() string {
 	return "verbose_name=仓库,entity_json=stock,route=stock"
-}
-
-
-//todo: 变成一个表吧
-type StockTypeInfo struct {
-	Id   int64  `json:"id"`
-	Name string `json:"name"`
-}
-
-func GetStockTypeList() []StockTypeInfo {
-	stock_type_list := make([]StockTypeInfo, 0)
-
-	var stock_type_cn StockTypeInfo
-	stock_type_cn.Id = STOCK_TYPE_CN
-	stock_type_cn.Name = "国内仓库"
-
-	var stock_type_zaitu StockTypeInfo
-	stock_type_zaitu.Id = STOCK_TYPE_ZT
-	stock_type_zaitu.Name = "在途仓库"
-
-	var stock_type_au StockTypeInfo
-	stock_type_au.Id = STOCK_TYPE_AU
-	stock_type_au.Name = "澳洲仓库"
-
-	return append(stock_type_list, stock_type_cn, stock_type_zaitu, stock_type_au)
 }

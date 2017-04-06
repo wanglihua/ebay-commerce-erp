@@ -146,7 +146,7 @@ func (c ErpStock) DetailData() revel.Result {
 
 	var detail_form StockDetailForm
 	detail_form.Stock = stock
-	detail_form.StockTypeList = models.GetStockTypeList()
+	detail_form.StockTypeList = models.GetStockTypeList(db_session)
 	detail_form.TargetStockList = target_stock_list
 	detail_form.StatusList = status_list
 
