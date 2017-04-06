@@ -9,7 +9,7 @@ const (
 	// STOCK_TYPE_CN 国内仓库
 	STOCK_TYPE_CN int64 = 100
 
-	// STOCK_TYPE_ZAITU 在途仓库
+	// STOCK_TYPE_ZT 在途仓库
 	STOCK_TYPE_ZT int64 = 200
 
 	// STOCK_TYPE_AU 澳洲仓库
