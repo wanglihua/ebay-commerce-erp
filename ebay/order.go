@@ -51,7 +51,7 @@ type Order struct {
 	XMLName                             xml.Name `xml:"Order"`
 	OrderID                             string
 	OrderStatus                         string
-	BuyerCheckoutMessage                string
+	BuyerCheckoutMessage                string `xml:"BuyerCheckoutMessage"`
 	AdjustmentAmount                    Amount `xml:"AdjustmentAmount"`
 	AmountPaid                          Amount `xml:"AmountPaid"`
 	AmountSaved                         Amount `xml:"AmountSaved"`

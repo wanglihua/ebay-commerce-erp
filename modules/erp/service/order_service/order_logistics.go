@@ -51,20 +51,32 @@ func Calculate_order_logistics(db_session *xorm.Session) {
 		var order_shipping_address = get_order_shipping_address(order.Id, db_session)
 
 		// 1 地址有特殊字段的
+		var has_address_special_word = false
 		for _, address_special_word := range address_special_word_list {
 			// 地址包含特殊字段
 			address_special_word_lower_case := strings.ToLower(address_special_word)
 			address_detail_lower_case := strings.ToLower(fmt.Sprintf("%s %s", order_shipping_address.Street1, order_shipping_address.Street2))
 			if strings.Index(address_detail_lower_case, address_special_word_lower_case) != -1 {
 				update_order_to_hold_type(order, models.ORDER_HOLD_TYPE_SPECIAL_ADDRESS, db_session)
-				return
+				has_address_special_word = true
+				break
 			}
+		}
+
+		if has_address_special_word == true {
+			continue
+		}
+
+		// 2 有买家留言
+		if strings.TrimSpace(order.BuyerCheckoutMessage) != "" {
+			update_order_to_hold_type(order, models.ORDER_HOLD_TYPE_BUYER_CHECKOUT_MESSAGE, db_session)
+			continue
 		}
 
 		// 16 判断是否是国际件，如果不是澳洲的就是国际件，一般就是新西兰的
 		if strings.ToLower(order_shipping_address.Country) == strings.ToLower("AU") {
 			update_order_to_hold_type(order, models.ORDER_HOLD_TYPE_INTERNATIONAL, db_session)
-			return
+			continue
 		}
 
 		// 15 判断是否是快递
@@ -93,8 +105,8 @@ func update_order_to_hold_type(order models.OrderInfo, hold_type_id int64, db_se
 
 /*
 
-1. 地址有特殊字段的。比如 PO BOX, LOCKER。但最佳物流非AU POST的，需要在基础设置里面有特殊字段设置功能
-2. 有买家留言 -- 导入的订单里面还没有留言
+(完成)1. 地址有特殊字段的。比如 PO BOX, LOCKER。但最佳物流非AU POST的，需要在基础设置里面有特殊字段设置功能
+(完成)2. 有买家留言 -- 导入的订单里面还没有留言
 3. 有平台留言 -- 导入的订单里面还没有留言
 4. PICK UP   -- 一般都是手工创建的订单
 5. 系统显示所有仓都缺货（中国仓除外） -- 给仓库加个类型
@@ -108,6 +120,6 @@ func update_order_to_hold_type(order models.OrderInfo, hold_type_id int64, db_se
 13. 匹配最佳仓库及物流后订单亏损。需要在基础设置里面有设置亏损额或者亏损率的设置功能，超过设置范围了，自动到订单亏损hold
 14. 信封类。长宽高在35cm X 25cm X 2cm, 重量在0.5Kg以内的订单为信封。若是多数量或者多产品，以前我们设计的思路是，最大产品的长边为最长边，最大产品的中边为中边，所有产品的最小边之和为最小边，判断是否在35cm X 25cm X 2cm以内，重量之和是否在0.5Kg以内
 15. 快递类。需要在基础设置里面有 收到快递费金额的设置功能，比如收到的运费高于什么金额，视为快递。否则就算收了快递费也视为普通包裹
-16. 国际件。对于非澳大利亚的订单，直接到国际件模块
+(完成)16. 国际件。对于非澳大利亚的订单，直接到国际件模块
 
  */
