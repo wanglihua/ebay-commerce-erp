@@ -154,26 +154,27 @@ func hold_check_oss_all_stock(order *models.OrderInfo, order_product_info_list [
 		for _, order_product_info := range order_product_info_list {
 			var product_has_stock = false
 			for _, product_stock_qty := range product_stock_qty_list {
-				if product_stock_qty.StockId == stock_id && product_stock_qty.ProductId == order_product_info.ProductId {
+				if product_stock_qty.StockId == stock_id && product_stock_qty.ProductId == order_product_info.ProductId && product_stock_qty.StockTypeId != models.STOCK_TYPE_CN {
 					if product_stock_qty.Qty >= order_product_info.Qty {
 						product_has_stock = true
+						break //这个 break 加不加都可以的，因为 这个 stock_id， 这个 product_id 的就一条记录
 					}
 				}
 			}
 			// 如果商品在这个仓库里面没有货，就判定 这个仓库里面，并不是所有商品都有货
 			if product_has_stock == false {
 				stock_has_all_product = false
-				break
+				break // 订单里面的 接下来的 商品也就不用检查了
 			}
 		}
 
-		// 如果这个仓库里面不是全部商品都有货，就继续找
-		if stock_has_all_product == false {
-			continue
-		} else {
-			//找到仓库全部商品都有货了
+		// 找到仓库全部商品都有货了
+		if stock_has_all_product {
 			all_product_oss = false
 			break
+		} else {
+			// 如果这个仓库里面不是全部商品都有货，就继续找
+			continue // 因为是循环的最后，所以这个continue可以加也可以不加
 		}
 	}
 
@@ -208,7 +209,7 @@ func update_order_to_hold_type(order *models.OrderInfo, hold_type_id int64, db_s
 (完成)2. 有买家留言 -- 导入的订单里面还没有留言
 3. 有平台留言 -- 导入的订单里面还没有留言
 4. PICK UP   -- 一般都是手工创建的订单
-5. 系统显示所有仓都缺货（中国仓除外）
+(完成)5. 系统显示所有仓都缺货（中国仓除外）
 6. 系统显示最佳仓缺货（次佳、海上有货）
 7. 实际仓库缺货（是在捡货过程中，虽然系统显示有货，但实际仓库没有货了。就需要人工手动将这些订单搬至这里的模块，等待跟客户协商，是退款还是等待集装箱）
 8. 多数量或多产品，但部分缺货（是否拆分订单）
