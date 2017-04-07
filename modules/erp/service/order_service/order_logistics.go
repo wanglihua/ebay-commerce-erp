@@ -10,8 +10,8 @@ import (
 	"matrix/core"
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/exchange_rate_service"
+	"matrix/modules/erp/service/inventory_service"
 	"matrix/modules/erp/service/logistics_setting_service"
-	"matrix/modules/erp/service/product_inventory_service"
 )
 
 // 计算订单的物流方式 和 Hold 类型
@@ -51,31 +51,17 @@ func Calculate_order_logistics(db_session *xorm.Session) {
 		var order_shipping_address = get_order_shipping_address(order.Id, db_session)
 
 		// 1 地址有特殊字段的
-		var has_address_special_word = false
-		for _, address_special_word := range address_special_word_list {
-			// 地址包含特殊字段
-			address_special_word_lower_case := strings.ToLower(address_special_word)
-			address_detail_lower_case := strings.ToLower(fmt.Sprintf("%s %s", order_shipping_address.Street1, order_shipping_address.Street2))
-			if strings.Index(address_detail_lower_case, address_special_word_lower_case) != -1 {
-				update_order_to_hold_type(order, models.ORDER_HOLD_TYPE_SPECIAL_ADDRESS, db_session)
-				has_address_special_word = true
-				break
-			}
-		}
-
-		if has_address_special_word == true {
+		if hold_check_address_special_word(&order, &order_shipping_address, address_special_word_list, db_session) {
 			continue
 		}
 
 		// 2 有买家留言
-		if strings.TrimSpace(order.BuyerCheckoutMessage) != "" {
-			update_order_to_hold_type(order, models.ORDER_HOLD_TYPE_BUYER_CHECKOUT_MESSAGE, db_session)
+		if hold_check_buyer_checkout_message(&order, db_session) {
 			continue
 		}
 
 		// 16 判断是否是国际件，如果不是澳洲的就是国际件，一般就是新西兰的
-		if strings.ToLower(order_shipping_address.Country) == strings.ToLower("AU") {
-			update_order_to_hold_type(order, models.ORDER_HOLD_TYPE_INTERNATIONAL, db_session)
+		if hold_check_international(&order, &order_shipping_address, db_session) {
 			continue
 		}
 
@@ -84,16 +70,17 @@ func Calculate_order_logistics(db_session *xorm.Session) {
 
 		var order_product_info_list = get_order_product_info_list(order.Id, db_session)
 
-		// 先考虑单个商品的情况
-		if len(order_product_info_list) == 1 {
-			// 5. 系统显示所有仓都缺货（中国仓除外）
-			// 6. 系统显示最佳仓缺货（次佳、海上有货）
+		// 5. 系统显示所有仓都缺货（中国仓除外）
+		if hold_check_oss_all_stock(&order, order_product_info_list, db_session) {
+			continue
 		}
+
+		// 多个商品的情况
 
 		// 14 判断是否是信件
 
 		for _, order_product_info := range order_product_info_list {
-			product_inventory_service.Get_product_stock_qty_list(order_product_info.OrderId, db_session)
+			inventory_service.Get_product_stock_qty_list(order_product_info.OrderId, db_session)
 		}
 
 		// 检查 订单状态 是不是 正确，状态应该是 已支付 ？？
@@ -103,9 +90,59 @@ func Calculate_order_logistics(db_session *xorm.Session) {
 
 }
 
-func update_order_to_hold_type(order models.OrderInfo, hold_type_id int64, db_session *xorm.Session) {
+// 1 地址有特殊字段的
+func hold_check_address_special_word(order *models.OrderInfo, order_shipping_address *models.OrderShippingAddressInfo, address_special_word_list []string, db_session *xorm.Session) (is_hold_return bool) {
+	var has_address_special_word = false
+	for _, address_special_word := range address_special_word_list {
+		// 地址包含特殊字段
+		address_special_word_lower_case := strings.ToLower(address_special_word)
+		address_detail_lower_case := strings.ToLower(fmt.Sprintf("%s %s", order_shipping_address.Street1, order_shipping_address.Street2))
+		if strings.Index(address_detail_lower_case, address_special_word_lower_case) != -1 {
+			update_order_to_hold_type(order, models.ORDER_HOLD_TYPE_SPECIAL_ADDRESS, db_session)
+			has_address_special_word = true
+			break
+		}
+	}
+
+	return has_address_special_word
+}
+
+// 2 有买家留言
+func hold_check_buyer_checkout_message(order *models.OrderInfo, db_session *xorm.Session) (is_hold_return bool) {
+	if strings.TrimSpace(order.BuyerCheckoutMessage) != "" {
+		update_order_to_hold_type(order, models.ORDER_HOLD_TYPE_BUYER_CHECKOUT_MESSAGE, db_session)
+		return true
+	}
+
+	return false
+}
+
+// 5 系统显示所有仓都缺货（中国仓除外）
+func hold_check_oss_all_stock(order *models.OrderInfo, order_product_info_list []Order_product_info, db_session *xorm.Session) (is_hold_return bool) {
+
+	// 5. 系统显示所有仓都缺货（中国仓除外）
+	// 6. 系统显示最佳仓缺货（次佳、海上有货）
+
+	///var order_product_info = order_product_info_list[0];
+	//var product_stock_qty_list = inventory_service.Get_product_stock_qty_list(order_product_info.ProductId, db_session)
+	update_order_to_hold_type(order, models.ORDER_HOLD_TYPE_OOS_ALL_STOCK, db_session)
+
+	return false
+}
+
+// 16 判断是否是国际件，如果不是澳洲的就是国际件，一般就是新西兰的
+func hold_check_international(order *models.OrderInfo, order_shipping_address *models.OrderShippingAddressInfo, db_session *xorm.Session) (is_hold_return bool) {
+	if strings.ToLower(order_shipping_address.Country) == strings.ToLower("AU") {
+		update_order_to_hold_type(order, models.ORDER_HOLD_TYPE_INTERNATIONAL, db_session)
+		return true
+	}
+
+	return false
+}
+
+func update_order_to_hold_type(order *models.OrderInfo, hold_type_id int64, db_session *xorm.Session) {
 	order.HoldTypeId = core.MakeNullInt(hold_type_id, true)
-	_, err := db_session.Id(order.Id).Cols("hold_type_id").Update(&order)
+	_, err := db_session.Id(order.Id).Cols("hold_type_id").Update(order)
 	core.HandleError(err)
 }
 

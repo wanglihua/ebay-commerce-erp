@@ -39,13 +39,15 @@ func handleInvocationPanic(c *revel.Controller, err interface{}) {
 }
 
 var HeaderFilter = func(c *revel.Controller, fc []revel.Filter) {
+	var response_header = c.Response.Out.Header()
+
 	// Add some common security headers
-	c.Response.Out.Header().Add("X-Frame-Options", "SAMEORIGIN")
-	c.Response.Out.Header().Add("X-XSS-Protection", "1; mode=block")
-	c.Response.Out.Header().Add("X-Content-Type-Options", "nosniff")
+	response_header.Add("X-Frame-Options", "SAMEORIGIN")
+	response_header.Add("X-XSS-Protection", "1; mode=block")
+	response_header.Add("X-Content-Type-Options", "nosniff")
 
 	//add copyright
-	c.Response.Out.Header().Add("copyright", "Jiaxing Huadu Information Technolony Co.,Ltd")
+	response_header.Add("dev-company", "Jiaxing Huadu Information Technolony Co.,Ltd")
 	//add email and mobile
 
 	fc[0](c, fc[1:]) // Execute the next filter stage.

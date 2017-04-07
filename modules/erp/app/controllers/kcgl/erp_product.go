@@ -12,7 +12,7 @@ import (
 	"matrix/modules/erp/service/message_service"
 	"matrix/modules/erp/service/order_service"
 	"matrix/modules/erp/service/product_cate_service"
-	"matrix/modules/erp/service/product_inventory_service"
+	"matrix/modules/erp/service/inventory_service"
 	"matrix/modules/erp/service/product_log_service"
 	"matrix/modules/erp/service/status_service"
 )
@@ -34,7 +34,7 @@ type ErpProductViewItem struct {
 	Supplier        models.SupplierInfo          `xorm:"extends" json:"sup"`
 	PackageMaterial models.PackageMaterialInfo   `xorm:"extends" json:"pm"`
 	Status          models.StatusInfo            `xorm:"extends" json:"st"`
-	InventoryList   []product_inventory_service.Product_inventory_view_item_t `xorm:"-" json:"inventory_list"`
+	InventoryList   []inventory_service.Product_inventory_view_item_t `xorm:"-" json:"inventory_list"`
 }
 
 func (c ErpProduct) ListData() revel.Result {
@@ -101,10 +101,10 @@ FROM erp_product prd
 		product_id_list = append(product_id_list, product.Product.Id)
 	}
 
-	inventory_list_product_list := product_inventory_service.Get_inventory_by_product_list(db_session, product_id_list)
+	inventory_list_product_list := inventory_service.Get_inventory_by_product_list(db_session, product_id_list)
 
 	for index, _ := range product_list {
-		inventory_list_product := make([]product_inventory_service.Product_inventory_view_item_t, 0)
+		inventory_list_product := make([]inventory_service.Product_inventory_view_item_t, 0)
 		for _, inventory := range inventory_list_product_list {
 			if inventory.ProductId == product_list[index].Product.Id {
 				inventory_list_product = append(inventory_list_product, inventory)
@@ -133,7 +133,7 @@ type ProductDetailForm struct {
 	ProductCateSelectItemList []product_cate_service.ProductCateSelectItem                `json:"product_cate_list"`
 	PackageMaterialList       []models.PackageMaterialInfo                                `json:"package_material_list"`
 	StatusList                []models.StatusInfo                                         `json:"status_list"`
-	InventoryList             []product_inventory_service.Product_inventory_view_item_t   `json:"inventory_list"`
+	InventoryList             []inventory_service.Product_inventory_view_item_t   `json:"inventory_list"`
 	OrderItemList             []order_service.Order_item_view_item_t                      `json:"order_item_list"`
 	ProductLogList            []models.ProductLogInfo                                     `json:"product_log_list"`
 	MessageList               []message_service.Message_view_item_t                       `json:"message_list"`
@@ -212,7 +212,7 @@ func (c ErpProduct) DetailData() revel.Result {
 
 	status_list := status_service.GetStatusList(db_session, models.STATUS_TYPE_PRODUCT)
 
-	inventory_list := product_inventory_service.Get_product_inventory_list(db_session, product_id)
+	inventory_list := inventory_service.Get_product_inventory_list(db_session, product_id)
 	order_item_list := order_service.Get_order_item_data_list_by_product_id_top_n(db_session, product_id, 10)
 
 	var product_log_list = make([]models.ProductLogInfo, 0)

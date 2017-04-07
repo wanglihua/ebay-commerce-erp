@@ -37,7 +37,8 @@ type OrderInfo struct {
 	PaidTime                 core.NullLongTime   `xorm:"datetime 'paid_time'" json:"paid_time" smith:"verbose_name=支付时间"`
 	ShippedTime              core.NullLongTime   `xorm:"datetime 'shipped_time'" json:"shipped_time" smith:"verbose_name=发货时间"`
 	HoldTypeId               core.NullInt        `xorm:"bigint null index 'hold_type_id'" json:"hold_type_id" smith:"verbose_name=Hold类型"`
-	ExchangeRate             float64             `xorm:"decimal(18,6) notnull 'exchange_rate'" json:"exchange_rate" smith:"verbose_name=换算汇率"` //订单下载时把当前的汇率设置放到这个里面
+	ExchangeRate             float64             `xorm:"decimal(18,6) notnull 'exchange_rate'" json:"exchange_rate" smith:"verbose_name=换算汇率"` // 订单下载时把当前的汇率设置放到这个里面
+	ExpressFee               float64             `xorm:"decimal(18,6) notnull 'express_fee'" json:"express_fee" smith:"verbose_name=运费收入"` // 订单下载时还不知道如何获得运费收入
 	CreateTime               core.Time           `xorm:"created notnull 'create_time'" json:"create_time"`
 	UpdateTime               core.Time           `xorm:"updated notnull 'update_time'" json:"update_time"`
 	Version                  int                 `xorm:"version notnull 'version'" json:"version"`

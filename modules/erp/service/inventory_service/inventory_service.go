@@ -1,4 +1,4 @@
-package product_inventory_service
+package inventory_service
 
 import (
 	"fmt"
@@ -61,14 +61,24 @@ func Get_inventory_by_product_list(db_session *xorm.Session, product_id_list []i
 }
 
 type Product_stock_qty struct {
-	ProductId int64     `xorm:"'product_id'"`
-	StockId   int64     `xorm:"'stock_id'"`
-	Qty       int64     `xorm:"'qty'"`
+	ProductId   int64     `xorm:"'product_id'"`
+	StockId     int64     `xorm:"'stock_id'"`
+	StockTypeId int64     `xorm:"'stock_type_id'"`
+	Qty         int64     `xorm:"'qty'"`
 }
 
 func Get_product_stock_qty_list(product_id int64, db_session *xorm.Session) []Product_stock_qty {
-	sql := `SELECT ivt.product_id AS product_id, ivt.stock_id AS stock_id, sum(ivt.qty) AS qty
+	/*
+SELECT ivt.product_id AS product_id, ivt.stock_id AS stock_id, s.stock_type_id, sum(ivt.qty) AS qty
 FROM erp_inventory ivt
+    INNER JOIN erp_stock s ON s.id = ivt.stock_id
+WHERE ivt.product_id = 1
+GROUP BY ivt.product_id, ivt.stock_id
+	 */
+
+	sql := `SELECT ivt.product_id AS product_id, ivt.stock_id AS stock_id, s.stock_type_id, sum(ivt.qty) AS qty
+FROM erp_inventory ivt
+    INNER JOIN erp_stock s ON s.id = ivt.stock_id
 WHERE ivt.product_id = %d
 GROUP BY ivt.product_id, ivt.stock_id`
 	sql = fmt.Sprintf(sql, product_id)
