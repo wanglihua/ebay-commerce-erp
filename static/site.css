@@ -345,3 +345,17 @@ div.query button {
     margin-bottom: 3px;
     height: 30px;
 }
+
+div.beian {
+    color: #929293;
+    text-align: center;
+    width: 200px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 20px;
+    margin-bottom: 30px;
+}
+
+div.beian a {
+    color: #929293;
+}
