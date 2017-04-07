@@ -84,6 +84,12 @@ func Calculate_order_logistics(db_session *xorm.Session) {
 
 		var order_product_info_list = get_order_product_info_list(order.Id, db_session)
 
+		// 先考虑单个商品的情况
+		if len(order_product_info_list) == 1 {
+			// 5. 系统显示所有仓都缺货（中国仓除外）
+			// 6. 系统显示最佳仓缺货（次佳、海上有货）
+		}
+
 		// 14 判断是否是信件
 
 		for _, order_product_info := range order_product_info_list {
@@ -109,9 +115,9 @@ func update_order_to_hold_type(order models.OrderInfo, hold_type_id int64, db_se
 (完成)2. 有买家留言 -- 导入的订单里面还没有留言
 3. 有平台留言 -- 导入的订单里面还没有留言
 4. PICK UP   -- 一般都是手工创建的订单
-5. 系统显示所有仓都缺货（中国仓除外） -- 给仓库加个类型
+5. 系统显示所有仓都缺货（中国仓除外）
 6. 系统显示最佳仓缺货（次佳、海上有货）
-7. 实际仓库缺货
+7. 实际仓库缺货（是在捡货过程中，虽然系统显示有货，但实际仓库没有货了。就需要人工手动将这些订单搬至这里的模块，等待跟客户协商，是退款还是等待集装箱）
 8. 多数量或多产品，但部分缺货（是否拆分订单）
 9. 多数量或多产品，虽不缺货，但拆分订单发货，运费更便宜
 10. 多数量或多产品，虽不缺货，但拆分订单发货，运费虽然便宜，但仓库拣货更方便
