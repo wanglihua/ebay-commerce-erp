@@ -72,7 +72,15 @@ func Calculate_order_logistics(db_session *xorm.Session) {
 		var order_product_info_list = get_order_product_info_list(order.Id, db_session)
 
 		// 5. 系统显示所有仓都缺货（中国仓除外）
-		if hold_check_oss_all_stock(&order, order_product_info_list, db_session) {
+		var fun_is_not_cn_stock = func(stock_type_id int64) bool {
+			if stock_type_id != models.STOCK_TYPE_CN {
+				return true
+			} else {
+				return false
+			}
+		}
+
+		if hold_check_oss(&order, order_product_info_list, fun_is_not_cn_stock, db_session) {
 			continue
 		}
 
@@ -118,8 +126,11 @@ func hold_check_buyer_checkout_message(order *models.OrderInfo, db_session *xorm
 	return false
 }
 
+//返回 true, 表明考虑的是符合要求的
+type fun_stock_type_filter_t func(stock_type_id int64) bool
+
 // 5 系统显示所有仓都缺货（中国仓除外）
-func hold_check_oss_all_stock(order *models.OrderInfo, order_product_info_list []Order_product_info, db_session *xorm.Session) (is_hold_return bool) {
+func hold_check_oss(order *models.OrderInfo, order_product_info_list []Order_product_info, fun_stock_type_filter fun_stock_type_filter_t, db_session *xorm.Session) (is_hold_return bool) {
 	//todo: 暂时理解成是，所有商品，所有仓库(中国仓除外)都缺货。这里的缺货也理解成是，没有一个仓库能凑齐所以商品的所有数量
 
 	// 获取订单中的所有商品的id列表
@@ -154,7 +165,7 @@ func hold_check_oss_all_stock(order *models.OrderInfo, order_product_info_list [
 		for _, order_product_info := range order_product_info_list {
 			var product_has_stock = false
 			for _, product_stock_qty := range product_stock_qty_list {
-				if product_stock_qty.StockId == stock_id && product_stock_qty.ProductId == order_product_info.ProductId && product_stock_qty.StockTypeId != models.STOCK_TYPE_CN {
+				if product_stock_qty.StockId == stock_id && product_stock_qty.ProductId == order_product_info.ProductId && fun_stock_type_filter(product_stock_qty.StockTypeId) {
 					if product_stock_qty.Qty >= order_product_info.Qty {
 						product_has_stock = true
 						break //这个 break 加不加都可以的，因为 这个 stock_id， 这个 product_id 的就一条记录
