@@ -67,6 +67,7 @@ type Product_stock_qty struct {
 	Qty         int64     `xorm:"'qty'"`
 }
 
+// 获取包含"这个商品"的所有"产品库存数量记录"
 func Get_product_stock_qty_list(product_id int64, db_session *xorm.Session) []Product_stock_qty {
 	/*
 SELECT ivt.product_id AS product_id, ivt.stock_id AS stock_id, s.stock_type_id, sum(ivt.qty) AS qty
@@ -82,6 +83,31 @@ FROM erp_inventory ivt
 WHERE ivt.product_id = %d
 GROUP BY ivt.product_id, ivt.stock_id`
 	sql = fmt.Sprintf(sql, product_id)
+
+	var product_stock_qty_list = make([]Product_stock_qty, 0)
+	err := db_session.Sql(sql).Find(&product_stock_qty_list)
+	core.HandleError(err)
+
+	return product_stock_qty_list
+}
+
+// 获取包含"这个商品列表"的所有"产品库存数量记录"
+func Get_products_stock_qty_list(product_id_list []int64, db_session *xorm.Session) []Product_stock_qty {
+	/*
+SELECT ivt.product_id AS product_id, ivt.stock_id AS stock_id, s.stock_type_id, sum(ivt.qty) AS qty
+FROM erp_inventory ivt
+    INNER JOIN erp_stock s ON s.id = ivt.stock_id
+WHERE ivt.product_id IN (1, 2, 3)
+GROUP BY ivt.product_id, ivt.stock_id
+	 */
+
+	sql := `SELECT ivt.product_id AS product_id, ivt.stock_id AS stock_id, s.stock_type_id, sum(ivt.qty) AS qty
+FROM erp_inventory ivt
+    INNER JOIN erp_stock s ON s.id = ivt.stock_id
+WHERE ivt.product_id IN (%s)
+GROUP BY ivt.product_id, ivt.stock_id`
+	var product_id_str_list = core.Int_list_to_str_list(product_id_list)
+	sql = fmt.Sprintf(sql, strings.Join(product_id_str_list, ","))
 
 	var product_stock_qty_list = make([]Product_stock_qty, 0)
 	err := db_session.Sql(sql).Find(&product_stock_qty_list)

@@ -8,6 +8,7 @@ import (
 	"github.com/go-xorm/xorm"
 	"github.com/revel/revel"
 	"matrix/core"
+	"matrix/core/collections"
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/exchange_rate_service"
 	"matrix/modules/erp/service/inventory_service"
@@ -119,13 +120,67 @@ func hold_check_buyer_checkout_message(order *models.OrderInfo, db_session *xorm
 
 // 5 系统显示所有仓都缺货（中国仓除外）
 func hold_check_oss_all_stock(order *models.OrderInfo, order_product_info_list []Order_product_info, db_session *xorm.Session) (is_hold_return bool) {
+	//todo: 暂时理解成是，所有商品，所有仓库(中国仓除外)都缺货。这里的缺货也理解成是，没有一个仓库能凑齐所以商品的所有数量
 
-	// 5. 系统显示所有仓都缺货（中国仓除外）
-	// 6. 系统显示最佳仓缺货（次佳、海上有货）
+	// 获取订单中的所有商品的id列表
+	var get_order_product_id_list = func() []int64 {
+		var product_id_list = make([]int64, 0)
+		for _, order_product_info := range order_product_info_list {
+			product_id_list = append(product_id_list, order_product_info.ProductId)
+		}
+		return product_id_list
+	}
+	var order_product_id_list = get_order_product_id_list()
 
-	///var order_product_info = order_product_info_list[0];
-	//var product_stock_qty_list = inventory_service.Get_product_stock_qty_list(order_product_info.ProductId, db_session)
-	update_order_to_hold_type(order, models.ORDER_HOLD_TYPE_OOS_ALL_STOCK, db_session)
+	var product_stock_qty_list = inventory_service.Get_products_stock_qty_list(order_product_id_list, db_session)
+
+	// 找出所有包含这些商品库存的仓库id列表
+	var get_product_stock_id_list = func() []int64 {
+		var stock_id_set = collections.NewIntSet()
+		for _, product_stock_qty := range product_stock_qty_list {
+			stock_id_set.Add(product_stock_qty.StockId)
+		}
+		return stock_id_set.List()
+	}
+	var product_stock_id_list = get_product_stock_id_list()
+
+	var all_product_oss = true //下面的逻辑中，如果发现仓库有货，就设置为 false
+
+	// 对每一个仓库循环，看是不是这个仓库里面, 这些商品都有货
+	for _, stock_id := range product_stock_id_list {
+		var stock_has_all_product = true
+
+		// 对订单中的每个商品信息循环，看是不是这个商品在这个仓库里面有货且有足够的数量
+		for _, order_product_info := range order_product_info_list {
+			var product_has_stock = false
+			for _, product_stock_qty := range product_stock_qty_list {
+				if product_stock_qty.StockId == stock_id && product_stock_qty.ProductId == order_product_info.ProductId {
+					if product_stock_qty.Qty >= order_product_info.Qty {
+						product_has_stock = true
+					}
+				}
+			}
+			// 如果商品在这个仓库里面没有货，就判定 这个仓库里面，并不是所有商品都有货
+			if product_has_stock == false {
+				stock_has_all_product = false
+				break
+			}
+		}
+
+		// 如果这个仓库里面不是全部商品都有货，就继续找
+		if stock_has_all_product == false {
+			continue
+		} else {
+			//找到仓库全部商品都有货了
+			all_product_oss = false
+			break
+		}
+	}
+
+	if all_product_oss {
+		update_order_to_hold_type(order, models.ORDER_HOLD_TYPE_OOS_ALL_STOCK, db_session)
+		return true
+	}
 
 	return false
 }
@@ -146,6 +201,7 @@ func update_order_to_hold_type(order *models.OrderInfo, hold_type_id int64, db_s
 	core.HandleError(err)
 }
 
+//todo: 同一个商品的一半数量可以从这个仓库发货，另一半数量可以从哪个仓库发货的怎么处理
 /*
 
 (完成)1. 地址有特殊字段的。比如 PO BOX, LOCKER。但最佳物流非AU POST的，需要在基础设置里面有特殊字段设置功能
