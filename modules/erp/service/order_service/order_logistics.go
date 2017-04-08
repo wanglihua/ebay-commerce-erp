@@ -114,7 +114,10 @@ func (p_ol *OrderLogistics) Calculate(db_session *xorm.Session) {
 			continue
 		}
 
-		//  加载接下来的判断需要的数据，如果在循环开始时加载，就会有可能的性能浪费
+		// 3 有平台留言 -- 导入的订单里面还没有留言
+		// 4 PICK UP   -- 一般都是手工创建的订单
+
+		// 加载接下来的判断需要的数据，如果在循环开始时加载，就会有可能的性能浪费
 		p_order_logistics_data.load_order_product_info_list(order.Id, db_session)
 		p_order_logistics_data.load_products_stock_qty_list(order.Id, db_session)
 
@@ -128,15 +131,21 @@ func (p_ol *OrderLogistics) Calculate(db_session *xorm.Session) {
 			continue
 		}
 
+		// 7 实际仓库缺货（是在捡货过程中，虽然系统显示有货，但实际仓库没有货了。就需要人工手动将这些订单搬至这里的模块，等待跟客户协商，是退款还是等待集装箱）
+
 		// 8, 9, 10 临时的解决方案
 		if p_ol.hold_check_multi_product(&order, p_order_logistics_data, db_session) {
 			continue
 		}
 
+		// 11 无法匹配物流（长宽高重量没有物流满足）
+
 		// 12 产品信息不全（长宽高重量不全或者有误），这个检查应该放在任何使用长宽高重量数据的检查之前
 		if p_ol.hold_check_product_info_miss(&order, p_order_logistics_data, db_session) {
 			continue
 		}
+
+		// 13 匹配最佳仓库及物流后订单亏损。需要在基础设置里面有设置亏损额或者亏损率的设置功能，超过设置范围了，自动到订单亏损 hold
 
 		// 14 判断是否是信件
 		if p_ol.hold_check_envelope(&order, p_order_logistics_data, db_session) {
@@ -184,6 +193,10 @@ func (p_ol *OrderLogistics) hold_check_buyer_checkout_message(p_order *models.Or
 
 	return false
 }
+
+// 3 有平台留言 -- 导入的订单里面还没有留言
+
+// 4 PICK UP   -- 一般都是手工创建的订单
 
 // 5 系统显示所有仓都缺货（中国仓除外）
 func (p_ol *OrderLogistics) hold_check_oss_all_stock(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, db_session *xorm.Session) (is_hold_return bool) {
@@ -291,6 +304,8 @@ func (p_ol *OrderLogistics) hold_check_oss(p_order *models.OrderInfo, p_order_lo
 	return false
 }
 
+// 7 实际仓库缺货（是在捡货过程中，虽然系统显示有货，但实际仓库没有货了。就需要人工手动将这些订单搬至这里的模块，等待跟客户协商，是退款还是等待集装箱）
+
 // 8, 9, 10 临时的解决方案
 func (p_ol *OrderLogistics) hold_check_multi_product(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, db_session *xorm.Session) (is_hold_return bool) {
 	if len(p_order_logistics_data.order_product_info_list) > 1 {
@@ -300,6 +315,8 @@ func (p_ol *OrderLogistics) hold_check_multi_product(p_order *models.OrderInfo, 
 
 	return false
 }
+
+// 11 无法匹配物流（长宽高重量没有物流满足）
 
 // 12 产品信息不全（长宽高重量不全或者有误）
 func (p_ol *OrderLogistics) hold_check_product_info_miss(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, db_session *xorm.Session) (is_hold_return bool) {
@@ -314,6 +331,8 @@ func (p_ol *OrderLogistics) hold_check_product_info_miss(p_order *models.OrderIn
 
 	return false
 }
+
+// 13 匹配最佳仓库及物流后订单亏损。需要在基础设置里面有设置亏损额或者亏损率的设置功能，超过设置范围了，自动到订单亏损hold
 
 // 14 信封类。长宽高在35cm X 25cm X 2cm, 重量在0.5Kg以内的订单为信封。若是多数量或者多产品，以前我们设计的思路是，最大产品的长边为最长边，最大产品的中边为中边，所有产品的最小边之和为最小边，判断是否在35cm X 25cm X 2cm以内，重量之和是否在0.5Kg以内
 func (p_ol *OrderLogistics) hold_check_envelope(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, db_session *xorm.Session) (is_hold_return bool) {
