@@ -114,6 +114,7 @@ func (p_ol *OrderLogistics) Calculate(db_session *xorm.Session) {
 			continue
 		}
 
+		//  加载接下来的判断需要的数据，如果在循环开始时加载，就会有可能的性能浪费
 		p_order_logistics_data.load_order_product_info_list(order.Id, db_session)
 		p_order_logistics_data.load_products_stock_qty_list(order.Id, db_session)
 
@@ -127,6 +128,11 @@ func (p_ol *OrderLogistics) Calculate(db_session *xorm.Session) {
 			continue
 		}
 
+		// 8, 9, 10 临时的解决方案
+		if p_ol.hold_check_multi_product(&order, p_order_logistics_data, db_session) {
+			continue
+		}
+
 		// 12 产品信息不全（长宽高重量不全或者有误），这个检查应该放在任何使用长宽高重量数据的检查之前
 		if p_ol.hold_check_product_info_miss(&order, p_order_logistics_data, db_session) {
 			continue
@@ -136,12 +142,6 @@ func (p_ol *OrderLogistics) Calculate(db_session *xorm.Session) {
 		if p_ol.hold_check_envelope(&order, p_order_logistics_data, db_session) {
 			continue
 		}
-
-		/*
-		for _, order_product_info := range order_product_info_list {
-			inventory_service.Get_product_stock_qty_list(order_product_info.OrderId, db_session)
-		}
-		*/
 
 		// 15 判断是否是快递
 		if p_ol.hold_check_express(&order, db_session) {
@@ -291,6 +291,16 @@ func (p_ol *OrderLogistics) hold_check_oss(p_order *models.OrderInfo, p_order_lo
 	return false
 }
 
+// 8, 9, 10 临时的解决方案
+func (p_ol *OrderLogistics) hold_check_multi_product(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, db_session *xorm.Session) (is_hold_return bool) {
+	if len(p_order_logistics_data.order_product_info_list) > 1 {
+		p_ol.update_order_to_hold_type(p_order, models.ORDER_HOLD_TYPE_MULTI_PRODUCT, db_session)
+		return true
+	}
+
+	return false
+}
+
 // 12 产品信息不全（长宽高重量不全或者有误）
 func (p_ol *OrderLogistics) hold_check_product_info_miss(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, db_session *xorm.Session) (is_hold_return bool) {
 	var order_product_info_list = p_order_logistics_data.order_product_info_list
@@ -380,13 +390,13 @@ func (p_ol *OrderLogistics) update_order_to_hold_type(p_order *models.OrderInfo,
 (完成)5. 系统显示所有仓都缺货（中国仓除外）
 (完成)6. 系统显示最佳仓缺货（次佳、海上有货）
 7. 实际仓库缺货（是在捡货过程中，虽然系统显示有货，但实际仓库没有货了。就需要人工手动将这些订单搬至这里的模块，等待跟客户协商，是退款还是等待集装箱）
-8. 多数量或多产品，但部分缺货（是否拆分订单）
-9. 多数量或多产品，虽不缺货，但拆分订单发货，运费更便宜
-10. 多数量或多产品，虽不缺货，但拆分订单发货，运费虽然便宜，但仓库拣货更方便
+(完成，临时完成)8. 多数量或多产品，但部分缺货（是否拆分订单）
+(完成，临时完成)9. 多数量或多产品，虽不缺货，但拆分订单发货，运费更便宜
+(完成，临时完成)10. 多数量或多产品，虽不缺货，但拆分订单发货，运费虽然便宜，但仓库拣货更方便
 11. 无法匹配物流（长宽高重量没有物流满足）
 (完成，这个检查应该放在 11 之前， 就是任何是有长宽高重量数据之前）12. 产品信息不全（长宽高重量不全或者有误）
 13. 匹配最佳仓库及物流后订单亏损。需要在基础设置里面有设置亏损额或者亏损率的设置功能，超过设置范围了，自动到订单亏损hold
-14. 信封类。长宽高在35cm X 25cm X 2cm, 重量在0.5Kg以内的订单为信封。若是多数量或者多产品，以前我们设计的思路是，最大产品的长边为最长边，最大产品的中边为中边，所有产品的最小边之和为最小边，判断是否在35cm X 25cm X 2cm以内，重量之和是否在0.5Kg以内
+(完成)14. 信封类。长宽高在35cm X 25cm X 2cm, 重量在0.5Kg以内的订单为信封。若是多数量或者多产品，以前我们设计的思路是，最大产品的长边为最长边，最大产品的中边为中边，所有产品的最小边之和为最小边，判断是否在35cm X 25cm X 2cm以内，重量之和是否在0.5Kg以内
 (完成)15. 快递类。需要在基础设置里面有 收到快递费金额的设置功能，比如收到的运费高于什么金额，视为快递。否则就算收了快递费也视为普通包裹
 (完成)16. 国际件。对于非澳大利亚的订单，直接到国际件模块
 
