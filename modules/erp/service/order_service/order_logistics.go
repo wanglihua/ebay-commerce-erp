@@ -127,13 +127,15 @@ func (p_ol *OrderLogistics) Calculate(db_session *xorm.Session) {
 			continue
 		}
 
-		// 12 产品信息不全（长宽高重量不全或者有误）
+		// 12 产品信息不全（长宽高重量不全或者有误），这个检查应该放在任何使用长宽高重量数据的检查之前
 		if p_ol.hold_check_product_info_miss(&order, p_order_logistics_data, db_session) {
 			continue
 		}
-		// 多个商品的情况
 
 		// 14 判断是否是信件
+		if p_ol.hold_check_envelope(&order, p_order_logistics_data, db_session) {
+			continue
+		}
 
 		/*
 		for _, order_product_info := range order_product_info_list {
@@ -303,6 +305,40 @@ func (p_ol *OrderLogistics) hold_check_product_info_miss(p_order *models.OrderIn
 	return false
 }
 
+// 14 信封类。长宽高在35cm X 25cm X 2cm, 重量在0.5Kg以内的订单为信封。若是多数量或者多产品，以前我们设计的思路是，最大产品的长边为最长边，最大产品的中边为中边，所有产品的最小边之和为最小边，判断是否在35cm X 25cm X 2cm以内，重量之和是否在0.5Kg以内
+func (p_ol *OrderLogistics) hold_check_envelope(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, db_session *xorm.Session) (is_hold_return bool) {
+
+	var envelope_max_length = p_ol.logistics_setting.EnvelopeMaxLength
+	var envelope_max_width = p_ol.logistics_setting.EnvelopeMaxWidth
+	var envelope_max_height = p_ol.logistics_setting.EnvelopeMaxHeight
+	var envelope_max_weight = p_ol.logistics_setting.EnvelopeMaxWeight
+
+	// 如果没有设置信封的最大长度、宽度、高度、重量
+	if envelope_max_length == 0 || envelope_max_width == 0 || envelope_max_height == 0 || envelope_max_weight == 0 {
+		return false
+	}
+
+	//假定商品的 长 > 宽 > 高
+	var whole_length, whole_width, whole_height, whole_weight float64 = 0, 0, 0, 0
+	for _, order_product_info := range p_order_logistics_data.order_product_info_list {
+		if order_product_info.Length > whole_length {
+			whole_length = order_product_info.Length
+		}
+		if order_product_info.Width > whole_width {
+			whole_width = order_product_info.Width
+		}
+		whole_height = whole_height + order_product_info.Height
+		whole_weight = whole_weight + order_product_info.Weight
+	}
+
+	if whole_length <= envelope_max_length && whole_width <= envelope_max_width && whole_height <= envelope_max_height && whole_weight <= envelope_max_weight {
+		p_ol.update_order_to_hold_type(p_order, models.ORDER_HOLD_TYPE_ENVELOPE, db_session)
+		return true
+	}
+
+	return false
+}
+
 // 15 快递类。需要在基础设置里面有 收到快递费金额的设置功能，比如收到的运费高于什么金额，视为快递。否则就算收了快递费也视为普通包裹
 func (p_ol *OrderLogistics) hold_check_express(p_order *models.OrderInfo, db_session *xorm.Session) (is_hold_return bool) {
 	// 如果没有设置最小运费
@@ -348,7 +384,7 @@ func (p_ol *OrderLogistics) update_order_to_hold_type(p_order *models.OrderInfo,
 9. 多数量或多产品，虽不缺货，但拆分订单发货，运费更便宜
 10. 多数量或多产品，虽不缺货，但拆分订单发货，运费虽然便宜，但仓库拣货更方便
 11. 无法匹配物流（长宽高重量没有物流满足）
-12. 产品信息不全（长宽高重量不全或者有误）
+(完成，这个检查应该放在 11 之前， 就是任何是有长宽高重量数据之前）12. 产品信息不全（长宽高重量不全或者有误）
 13. 匹配最佳仓库及物流后订单亏损。需要在基础设置里面有设置亏损额或者亏损率的设置功能，超过设置范围了，自动到订单亏损hold
 14. 信封类。长宽高在35cm X 25cm X 2cm, 重量在0.5Kg以内的订单为信封。若是多数量或者多产品，以前我们设计的思路是，最大产品的长边为最长边，最大产品的中边为中边，所有产品的最小边之和为最小边，判断是否在35cm X 25cm X 2cm以内，重量之和是否在0.5Kg以内
 (完成)15. 快递类。需要在基础设置里面有 收到快递费金额的设置功能，比如收到的运费高于什么金额，视为快递。否则就算收了快递费也视为普通包裹
