@@ -117,21 +117,52 @@ func get_paid_order_list(db_session *xorm.Session) []models.OrderInfo {
 	return paid_order_list
 }
 
-type Order_product_info struct {
+type Order_product_info_t struct {
 	OrderId   int64    `xorm:"'order_id'"`
 	ProductId int64    `xorm:"'product_id'"`
 	Price     float64  `xorm:"'price'"` // 方便后面的运费计算啥的，这里面的价格是 澳币
 	Qty       int64    `xorm:"'qty'"`
 	CostPrice int64    `xorm:"'cost_price'"` // 是 人民币 的成本价，由于运费都是用 澳币结算的，匹配物流时，应该把这个 成本价 换算成 澳币
+	Length    float64  `xorm:"'length'"`
+	Width     float64  `xorm:"'width'"`
+	Height    float64  `xorm:"'height'"`
+	Weight    float64  `xorm:"'weight'"`
 }
 
-func get_order_product_info_list(order_id int64, db_session *xorm.Session) []Order_product_info {
-	sql := `SELECT oi.order_id, oi.item_product_id AS product_id, oi.transaction_price AS price, oi.quantity AS qty, oi.product_cost_price AS cost_price
+func get_order_product_info_list(order_id int64, db_session *xorm.Session) []Order_product_info_t {
+
+	/*
+SELECT
+    oi.order_id,
+    oi.item_product_id    AS product_id,
+    oi.transaction_price  AS price,
+    oi.quantity           AS qty,
+    oi.product_cost_price AS cost_price,
+    p.length              AS length,
+    p.width               AS width,
+    p.height              AS height,
+    p.weight              AS weight
 FROM erp_order_item oi
+    INNER JOIN erp_product p ON p.id = oi.item_product_id
+WHERE oi.order_id = 1
+	 */
+
+	sql := `SELECT
+    oi.order_id,
+    oi.item_product_id    AS product_id,
+    oi.transaction_price  AS price,
+    oi.quantity           AS qty,
+    oi.product_cost_price AS cost_price,
+    p.length              AS length,
+    p.width               AS width,
+    p.height              AS height,
+    p.weight              AS weight
+FROM erp_order_item oi
+    INNER JOIN erp_product p ON p.id = oi.item_product_id
 WHERE oi.order_id = %d`
 	sql = fmt.Sprintf(sql, order_id)
 
-	var order_product_qty_list = make([]Order_product_info, 0)
+	var order_product_qty_list = make([]Order_product_info_t, 0)
 	err := db_session.Sql(sql).Find(&order_product_qty_list)
 	core.HandleError(err)
 
@@ -144,13 +175,13 @@ func get_order_shipping_address(order_id int64, db_session *xorm.Session) models
 	core.HandleError(err)
 
 	for _, order_shipping_address := range order_shipping_address_list {
-		if order_shipping_address.AddressOwner == "PayPal" {  // PayPal 收货地址
+		if order_shipping_address.AddressOwner == "PayPal" { // PayPal 收货地址
 			return order_shipping_address
 		}
 	}
 
 	for _, order_shipping_address := range order_shipping_address_list {
-		if order_shipping_address.AddressOwner == "eBay" {  // eBay 收货地址
+		if order_shipping_address.AddressOwner == "eBay" { // eBay 收货地址
 			return order_shipping_address
 		}
 	}
