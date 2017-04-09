@@ -16,7 +16,8 @@ import (
 )
 
 type OrderLogistics struct {
-	aud_exchange_rate_setting         float64                                 // 澳币汇率
+	au_stock_list                     []models.StockInfo                      // 所有澳洲仓库列表
+	aud_exchange_rate                 float64                                 // 澳币汇率
 	logistics_setting                 models.LogisticsSettingInfo             // 物流设置
 	address_special_word_list_setting []string                                // 收货地址特殊字段
 	logistics_mode_list               []models.LogisticsModeInfo              // 物流方式列表
@@ -24,12 +25,19 @@ type OrderLogistics struct {
 }
 
 func (p_ol *OrderLogistics) init_data(db_session *xorm.Session) {
+	// 加载所有仓库
+	var au_stock_list = make([]models.StockInfo, 0)
+	err := db_session.Where(fmt.Sprintf("stock_type_id = %d", models.STOCK_TYPE_AU)).Find(&au_stock_list)
+	core.HandleError(err)
+
+	p_ol.au_stock_list = au_stock_list
+
 	// 获取澳币的汇率，如果定单里面的汇率没有记录下来，就用这个汇率
 	var aud_exchange_rate_setting = exchange_rate_service.Get_aud_exchange_rate(db_session)
 	if aud_exchange_rate_setting == 0 {
 		panic(errors.New("澳币汇率未设置！"))
 	}
-	p_ol.aud_exchange_rate_setting = aud_exchange_rate_setting
+	p_ol.aud_exchange_rate = aud_exchange_rate_setting
 
 	// 获取物流参数设置
 	var logistics_setting = logistics_setting_service.Get_logistics_setting(db_session)
@@ -85,6 +93,8 @@ func (p_ol *OrderLogistics) Calculate(db_session *xorm.Session) {
 
 	for _, order := range paid_order_list {
 		var p_order_logistics_data = new(order_logistics_data_t)
+		//　一起加载需要的数据的方式，对性能的影响应该不会很大的
+		// p_order_logistics_data.load_data(&order, p_ol, db_session)
 
 		// 加载订单数据 汇率 和 订单收货地址
 		p_order_logistics_data.load_exchange_rate(&order, p_ol)
@@ -364,18 +374,44 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 
 	// 在这之前要加载好 物流方式表里面的信息，物流费率里面的信息，防止对数据库的频繁访问
 
+	// 找出所有有商品数量的仓库
+	var au_stock_list = p_ol.au_stock_list
+	var stock_id_has_products_map = make(map[int64]bool)
+	for _, stock := range au_stock_list {
+		if check_stock_has_order_products(stock.Id, p_order_logistics_data) { // 仓库没有全部的商品数量的库存
+			stock_id_has_products_map[stock.Id] = true
+		}
+	}
+
 	var logistics_mode_list = p_ol.logistics_mode_list
 	var logistics_fee_rate_map = p_ol.logistics_fee_rate_map
+
 	for _, logistics_mode := range logistics_mode_list {
 		logistics_fee_rate_list, found := logistics_fee_rate_map[logistics_mode.Id]
-		if !found {
+		if found == false {
 			continue
 		}
 
-		_ = logistics_fee_rate_list
-	}
+		var stock_id = logistics_mode.StockId
+		if _, found := stock_id_has_products_map[stock_id]; found == false { // 如果物流方式对应的仓库，没有全部的商品数量的库存，就继续下一个物流方式
+			continue
+		}
 
-	// 查看 在那些仓库里面有货
+		// 获取所有商品的整体的 长，宽，高，重量 等的数据
+		var length, width, height, dim_weight, weight float64 = get_order_products_whole_logistics_data(p_order_logistics_data, logistics_mode.Tjzgs)
+
+		// 如果考虑体积重，就把计算好的体积重，用 体积重系数 打折
+		if logistics_mode.Sfkltjz == 1 {
+			dim_weight = dim_weight * logistics_mode.Tjzxs
+		}
+
+
+
+		var total_fee float64 = 0
+		for _, logistics_fee_rate := range logistics_fee_rate_list {
+
+		}
+	}
 
 	// 计算总的大小和重量等商品的自己的数据
 

@@ -12,13 +12,22 @@ type order_logistics_data_t struct {
 	order_shipping_address  models.OrderShippingAddressInfo
 	order_product_info_list []order_service.Order_product_info_t
 	products_stock_qty_list []inventory_service.Product_stock_qty
+	stock_list              []models.StockInfo
+}
+
+// 一次性全部加载
+func (p_d *order_logistics_data_t) load_data(p_order *models.OrderInfo, p_order_logistics *OrderLogistics, db_session *xorm.Session) {
+	p_d.load_exchange_rate(p_order, p_order_logistics)
+	p_d.load_order_shipping_address(p_order.Id, db_session)
+	p_d.load_order_product_info_list(p_order.Id, db_session)
+	p_d.load_products_stock_qty_list(p_order.Id, db_session)
 }
 
 func (p_d *order_logistics_data_t) load_exchange_rate(p_order *models.OrderInfo, p_order_logistics *OrderLogistics) {
 	// 下载订单的时候就把当时的汇率记录了下来了
 	var exchange_rate = p_order.ExchangeRate
 	if exchange_rate == 0.0 {
-		exchange_rate = p_order_logistics.aud_exchange_rate_setting
+		exchange_rate = p_order_logistics.aud_exchange_rate
 	}
 	p_d.exchange_rate = exchange_rate
 }

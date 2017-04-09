@@ -10,7 +10,7 @@ type LogisticsModeInfo struct {
 	StockId    int64           `xorm:"bigint notnull 'stock_id'" json:"stock_id" smith:"verbose_name=仓库"`
 	Name       string          `xorm:"nvarchar(200) notnull index 'name'" json:"name" smith:"verbose_name=物流方式名称,min=2,max=100"`
 	Sfkltjz    int             `xorm:"int notnull 'sfkltjz'" json:"sfkltjz" smith:"verbose_name=是否考虑体积重"`     // 0 否， 1 是
-	Tjzgs      float64         `xorm:"decimal(18,6) notnull 'tjzgs'" json:"tjzgs" smith:"verbose_name=体积重公式"` // 如果公式是:长X宽X高, 这里就取值 250
+	Tjzgs      float64         `xorm:"decimal(18,6) notnull 'tjzgs'" json:"tjzgs" smith:"verbose_name=体积重公式"` // 如果公式是:长X宽X高 / 4000, 这里就取值 4000
 	Tjzxs      float64         `xorm:"decimal(18,6) notnull 'tjzxs'" json:"tjzxs" smith:"verbose_name=体积重系数"`
 	Tjzysjzqx  int             `xorm:"int notnull 'tjzysjzqx'" json:"tjzysjzqx" smith:"verbose_name=体积重与实际重取向"`      //取大(1) or 取小(2)
 	Zlsfybzyq  int             `xorm:"int notnull 'zlsfybzyq'" json:"zlsfybzyq" smith:"verbose_name=体积重与实际重是否有比值要求"` //重量是否有比值要求  // 0 否， 1 是
