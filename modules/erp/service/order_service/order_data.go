@@ -109,7 +109,7 @@ WHERE p.name like '%%%s%%'`
 	return order_id_list
 }
 
-func get_paid_order_list(db_session *xorm.Session) []models.OrderInfo {
+func Get_paid_order_list(db_session *xorm.Session) []models.OrderInfo {
 	var paid_order_list = make([]models.OrderInfo, 0)
 	err := db_session.Sql(fmt.Sprintf("SELECT * FROM erp_order o WHERE o.status_id = %d", models.ORDER_STATUS_YZF)).Find(&paid_order_list)
 	core.HandleError(err)
@@ -129,7 +129,7 @@ type Order_product_info_t struct {
 	Weight    float64  `xorm:"'weight'"`
 }
 
-func get_order_product_info_list(order_id int64, db_session *xorm.Session) []Order_product_info_t {
+func Get_order_product_info_list(order_id int64, db_session *xorm.Session) []Order_product_info_t {
 
 	/*
 SELECT
@@ -169,7 +169,7 @@ WHERE oi.order_id = %d`
 	return order_product_qty_list
 }
 
-func get_order_shipping_address(order_id int64, db_session *xorm.Session) models.OrderShippingAddressInfo {
+func Get_order_shipping_address(order_id int64, db_session *xorm.Session) models.OrderShippingAddressInfo {
 	var order_shipping_address_list = make([]models.OrderShippingAddressInfo, 0)
 	err := db_session.Where(fmt.Sprintf("order_id = %d", order_id)).Find(&order_shipping_address_list)
 	core.HandleError(err)

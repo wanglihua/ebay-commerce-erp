@@ -1,0 +1,47 @@
+package order_logistics_service
+
+import (
+	"github.com/go-xorm/xorm"
+	"matrix/modules/erp/models"
+	"matrix/modules/erp/service/inventory_service"
+	"matrix/modules/erp/service/order_service"
+)
+
+type order_logistics_data_t struct {
+	exchange_rate           float64
+	order_shipping_address  models.OrderShippingAddressInfo
+	order_product_info_list []order_service.Order_product_info_t
+	products_stock_qty_list []inventory_service.Product_stock_qty
+}
+
+func (p_d *order_logistics_data_t) load_exchange_rate(p_order *models.OrderInfo, p_order_logistics *OrderLogistics) {
+	// 下载订单的时候就把当时的汇率记录了下来了
+	var exchange_rate = p_order.ExchangeRate
+	if exchange_rate == 0.0 {
+		exchange_rate = p_order_logistics.aud_exchange_rate_setting
+	}
+	p_d.exchange_rate = exchange_rate
+}
+
+func (p_d *order_logistics_data_t) load_order_shipping_address(order_id int64, db_session *xorm.Session) {
+	var order_shipping_address = order_service.Get_order_shipping_address(order_id, db_session)
+	p_d.order_shipping_address = order_shipping_address
+}
+
+func (p_d *order_logistics_data_t) load_order_product_info_list(order_id int64, db_session *xorm.Session) {
+	p_d.order_product_info_list = order_service.Get_order_product_info_list(order_id, db_session)
+}
+
+func (p_d *order_logistics_data_t) load_products_stock_qty_list(order_id int64, db_session *xorm.Session) {
+
+	// 获取订单中的所有商品的id列表
+	var get_order_product_id_list = func() []int64 {
+		var product_id_list = make([]int64, 0)
+		for _, order_product_info := range p_d.order_product_info_list {
+			product_id_list = append(product_id_list, order_product_info.ProductId)
+		}
+		return product_id_list
+	}
+	var order_product_id_list = get_order_product_id_list()
+	p_d.products_stock_qty_list = inventory_service.Get_products_stock_qty_list(order_product_id_list, db_session)
+}

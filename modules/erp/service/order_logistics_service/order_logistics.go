@@ -1,4 +1,4 @@
-package order_service
+package order_logistics_service
 
 import (
 	"errors"
@@ -11,8 +11,8 @@ import (
 	"matrix/core/collections"
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/exchange_rate_service"
-	"matrix/modules/erp/service/inventory_service"
 	"matrix/modules/erp/service/logistics_setting_service"
+	"matrix/modules/erp/service/order_service"
 )
 
 type OrderLogistics struct {
@@ -68,45 +68,6 @@ func (p_ol *OrderLogistics) init_data(db_session *xorm.Session) {
 	p_ol.logistics_fee_rate_map = logistics_fee_rate_map
 }
 
-type order_logistics_data_t struct {
-	exchange_rate           float64
-	order_shipping_address  models.OrderShippingAddressInfo
-	order_product_info_list []Order_product_info_t
-	products_stock_qty_list []inventory_service.Product_stock_qty
-}
-
-func (p_d *order_logistics_data_t) load_exchange_rate(p_order *models.OrderInfo, p_order_logistics *OrderLogistics) {
-	// 下载订单的时候就把当时的汇率记录了下来了
-	var exchange_rate = p_order.ExchangeRate
-	if exchange_rate == 0.0 {
-		exchange_rate = p_order_logistics.aud_exchange_rate_setting
-	}
-	p_d.exchange_rate = exchange_rate
-}
-
-func (p_d *order_logistics_data_t) load_order_shipping_address(order_id int64, db_session *xorm.Session) {
-	var order_shipping_address = get_order_shipping_address(order_id, db_session)
-	p_d.order_shipping_address = order_shipping_address
-}
-
-func (p_d *order_logistics_data_t) load_order_product_info_list(order_id int64, db_session *xorm.Session) {
-	p_d.order_product_info_list = get_order_product_info_list(order_id, db_session)
-}
-
-func (p_d *order_logistics_data_t) load_products_stock_qty_list(order_id int64, db_session *xorm.Session) {
-
-	// 获取订单中的所有商品的id列表
-	var get_order_product_id_list = func() []int64 {
-		var product_id_list = make([]int64, 0)
-		for _, order_product_info := range p_d.order_product_info_list {
-			product_id_list = append(product_id_list, order_product_info.ProductId)
-		}
-		return product_id_list
-	}
-	var order_product_id_list = get_order_product_id_list()
-	p_d.products_stock_qty_list = inventory_service.Get_products_stock_qty_list(order_product_id_list, db_session)
-}
-
 // 计算订单的物流方式 和 Hold 类型，调用这个函数的时候应该开启数据库事务，
 func (p_ol *OrderLogistics) Calculate(db_session *xorm.Session) {
 	defer func() {
@@ -120,7 +81,7 @@ func (p_ol *OrderLogistics) Calculate(db_session *xorm.Session) {
 	// 拆分和合并订单，在这之前就已经完成了？ 不是在这里做，就可以了，做完进入 hold
 
 	// 获取 已支付 状态的订单, 匹配完成后，订单的状态就是 Hold 或者 待配货
-	var paid_order_list = get_paid_order_list(db_session)
+	var paid_order_list = order_service.Get_paid_order_list(db_session)
 
 	for _, order := range paid_order_list {
 		var p_order_logistics_data = new(order_logistics_data_t)
@@ -312,6 +273,7 @@ func (p_ol *OrderLogistics) hold_check_oss(p_order *models.OrderInfo, p_order_lo
 	return false
 }
 
+// 检查仓库是否有订单中的所有商品数量的库存
 func (p_ol *OrderLogistics) check_stock_has_order_products(stock_id int64, p_order_logistics_data *order_logistics_data_t) bool {
 	var products_stock_qty_list = p_order_logistics_data.products_stock_qty_list
 	var order_product_info_list = p_order_logistics_data.order_product_info_list
@@ -329,7 +291,7 @@ func (p_ol *OrderLogistics) check_stock_has_order_products(stock_id int64, p_ord
 				}
 			}
 		}
-		
+
 		// 如果商品在这个仓库里面没有货，就判定 这个仓库里面，并不是所有商品都有货
 		if product_has_stock == false {
 			stock_has_all_product = false
