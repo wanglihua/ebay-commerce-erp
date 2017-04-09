@@ -16,9 +16,11 @@ import (
 )
 
 type OrderLogistics struct {
-	aud_exchange_rate_setting         float64
-	logistics_setting                 models.LogisticsSettingInfo
-	address_special_word_list_setting []string
+	aud_exchange_rate_setting         float64                                 // 澳币汇率
+	logistics_setting                 models.LogisticsSettingInfo             // 物流设置
+	address_special_word_list_setting []string                                // 收货地址特殊字段
+	logistics_mode_list               []models.LogisticsModeInfo              // 物流方式列表
+	logistics_fee_rate_map            map[int64][]models.LogisticsFeeRateInfo // 物流费率列表的映射，映射的 key 是， 物流方式的 id
 }
 
 func (p_ol *OrderLogistics) init_data(db_session *xorm.Session) {
@@ -39,6 +41,31 @@ func (p_ol *OrderLogistics) init_data(db_session *xorm.Session) {
 		address_special_word_list_setting[index] = strings.TrimSpace(address_special_word)
 	}
 	p_ol.address_special_word_list_setting = address_special_word_list_setting
+
+	// 加载 物流方式 和 物流费率
+
+	// 加载 物流方式
+	var logistics_mode_list = make([]models.LogisticsModeInfo, 0)
+	err := db_session.Find(&logistics_mode_list)
+	core.HandleError(err)
+	p_ol.logistics_mode_list = logistics_mode_list
+
+	// 加载 物流费率
+	var logistics_fee_rate_all_list = make([]models.LogisticsFeeRateInfo, 0)
+	err = db_session.Find(&logistics_fee_rate_all_list)
+	core.HandleError(err)
+
+	var logistics_fee_rate_map = make(map[int64][]models.LogisticsFeeRateInfo)
+	for _, logistics_fee_rate := range logistics_fee_rate_all_list {
+		logistics_fee_rate_list, found := logistics_fee_rate_map[logistics_fee_rate.ModeId]
+		if found {
+			logistics_fee_rate_list = append(logistics_fee_rate_list, logistics_fee_rate)
+			logistics_fee_rate_map[logistics_fee_rate.ModeId] = logistics_fee_rate_list
+		} else {
+			logistics_fee_rate_map[logistics_fee_rate.ModeId] = logistics_fee_rate_list
+		}
+	}
+	p_ol.logistics_fee_rate_map = logistics_fee_rate_map
 }
 
 type order_logistics_data_t struct {
