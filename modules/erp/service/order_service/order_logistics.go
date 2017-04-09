@@ -293,25 +293,7 @@ func (p_ol *OrderLogistics) hold_check_oss(p_order *models.OrderInfo, p_order_lo
 
 	// 对每一个仓库循环，看是不是这个仓库里面, 这些商品都有货
 	for _, stock_id := range product_stock_id_list {
-		var stock_has_all_product = true
-
-		// 对订单中的每个商品信息循环，看是不是这个商品在这个仓库里面有货且有足够的数量
-		for _, order_product_info := range p_order_logistics_data.order_product_info_list {
-			var product_has_stock = false
-			for _, product_stock_qty := range products_stock_qty_list {
-				if product_stock_qty.StockId == stock_id && product_stock_qty.ProductId == order_product_info.ProductId && fun_stock_type_filter(product_stock_qty.StockTypeId) {
-					if product_stock_qty.Qty >= order_product_info.Qty {
-						product_has_stock = true
-						break //这个 break 加不加都可以的，因为 这个 stock_id， 这个 product_id 的就一条记录
-					}
-				}
-			}
-			// 如果商品在这个仓库里面没有货，就判定 这个仓库里面，并不是所有商品都有货
-			if product_has_stock == false {
-				stock_has_all_product = false
-				break // 订单里面的 接下来的 商品也就不用检查了
-			}
-		}
+		var stock_has_all_product = p_ol.check_stock_has_order_products(stock_id, p_order_logistics_data)
 
 		// 找到仓库全部商品都有货了
 		if stock_has_all_product {
@@ -328,6 +310,34 @@ func (p_ol *OrderLogistics) hold_check_oss(p_order *models.OrderInfo, p_order_lo
 	}
 
 	return false
+}
+
+func (p_ol *OrderLogistics) check_stock_has_order_products(stock_id int64, p_order_logistics_data *order_logistics_data_t) bool {
+	var products_stock_qty_list = p_order_logistics_data.products_stock_qty_list
+	var order_product_info_list = p_order_logistics_data.order_product_info_list
+
+	var stock_has_all_product = true
+
+	// 对订单中的每个商品信息循环，看是不是这个商品在这个仓库里面有货且有足够的数量
+	for _, order_product_info := range order_product_info_list {
+		var product_has_stock = false
+		for _, product_stock_qty := range products_stock_qty_list {
+			if product_stock_qty.StockId == stock_id && product_stock_qty.ProductId == order_product_info.ProductId {
+				if product_stock_qty.Qty >= order_product_info.Qty {
+					product_has_stock = true
+					break //这个 break 加不加都可以的，因为 这个 stock_id， 这个 product_id 的就一条记录
+				}
+			}
+		}
+		
+		// 如果商品在这个仓库里面没有货，就判定 这个仓库里面，并不是所有商品都有货
+		if product_has_stock == false {
+			stock_has_all_product = false
+			break // 订单里面的 接下来的 商品也就不用检查了
+		}
+	}
+
+	return stock_has_all_product
 }
 
 // 7 实际仓库缺货（是在捡货过程中，虽然系统显示有货，但实际仓库没有货了。就需要人工手动将这些订单搬至这里的模块，等待跟客户协商，是退款还是等待集装箱）
@@ -430,6 +440,17 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 	// 在这里面只考虑最佳仓库的库存情况，次佳仓库有货的情况，别的地方已经考虑并 hold
 
 	// 在这之前要加载好 物流方式表里面的信息，物流费率里面的信息，防止对数据库的频繁访问
+
+	var logistics_mode_list = p_ol.logistics_mode_list
+	var logistics_fee_rate_map = p_ol.logistics_fee_rate_map
+	for _, logistics_mode := range logistics_mode_list {
+		logistics_fee_rate_list, found := logistics_fee_rate_map[logistics_mode.Id]
+		if !found {
+			continue
+		}
+
+		_ = logistics_fee_rate_list
+	}
 
 	// 查看 在那些仓库里面有货
 
