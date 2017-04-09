@@ -98,10 +98,8 @@ func (p_ol *OrderLogistics) Calculate(db_session *xorm.Session) {
 	for _, order := range paid_order_list {
 		var p_order_logistics_data = new(order_logistics_data_t)
 
-		// 汇率
+		// 加载订单数据 汇率 和 订单收货地址
 		p_order_logistics_data.load_exchange_rate(&order, p_ol)
-
-		// 订单收货地址
 		p_order_logistics_data.load_order_shipping_address(order.Id, db_session)
 
 		// 1 地址有特殊字段的
@@ -117,6 +115,7 @@ func (p_ol *OrderLogistics) Calculate(db_session *xorm.Session) {
 		// 3 有平台留言 -- 导入的订单里面还没有留言
 		// 4 PICK UP   -- 一般都是手工创建的订单
 
+		// 加载订单数据 订单产品信息 和 订单产品的库存信息
 		// 加载接下来的判断需要的数据，如果在循环开始时加载，就会有可能的性能浪费
 		p_order_logistics_data.load_order_product_info_list(order.Id, db_session)
 		p_order_logistics_data.load_products_stock_qty_list(order.Id, db_session)
@@ -397,6 +396,23 @@ func (p_ol *OrderLogistics) update_order_to_hold_type(p_order *models.OrderInfo,
 	p_order.HoldTypeId = core.MakeNullInt(hold_type_id, true)
 	_, err := db_session.Id(p_order.Id).Cols("hold_type_id").Update(p_order)
 	core.HandleError(err)
+}
+
+func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, db_session *xorm.Session) (success_return bool) {
+
+	// 在这里面只考虑最佳仓库的库存情况，次佳仓库有货的情况，别的地方已经考虑并 hold
+
+	// 在这之前要加载好 物流方式表里面的信息，物流费率里面的信息，防止对数据库的频繁访问
+
+	// 查看 在那些仓库里面有货
+
+	// 计算总的大小和重量等商品的自己的数据
+
+	//一次循环各种物流方式(只取仓库有货的物流方式)，二次循环物流方式的各种物流费率
+
+	// 循环过程中，如果发现新计算出来的价格比原来计算的最低价格还低，
+
+	return true
 }
 
 //todo: 同一个商品的一半数量可以从这个仓库发货，另一半数量可以从哪个仓库发货的怎么处理
