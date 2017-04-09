@@ -254,7 +254,7 @@ func (p_ol *OrderLogistics) hold_check_oss(p_order *models.OrderInfo, p_order_lo
 
 	// 对每一个仓库循环，看是不是这个仓库里面, 这些商品都有货
 	for _, stock_id := range product_stock_id_list {
-		var stock_has_all_product = p_ol.check_stock_has_order_products(stock_id, p_order_logistics_data)
+		var stock_has_all_product = check_stock_has_order_products(stock_id, p_order_logistics_data)
 
 		// 找到仓库全部商品都有货了
 		if stock_has_all_product {
@@ -271,35 +271,6 @@ func (p_ol *OrderLogistics) hold_check_oss(p_order *models.OrderInfo, p_order_lo
 	}
 
 	return false
-}
-
-// 检查仓库是否有订单中的所有商品数量的库存
-func (p_ol *OrderLogistics) check_stock_has_order_products(stock_id int64, p_order_logistics_data *order_logistics_data_t) bool {
-	var products_stock_qty_list = p_order_logistics_data.products_stock_qty_list
-	var order_product_info_list = p_order_logistics_data.order_product_info_list
-
-	var stock_has_all_product = true
-
-	// 对订单中的每个商品信息循环，看是不是这个商品在这个仓库里面有货且有足够的数量
-	for _, order_product_info := range order_product_info_list {
-		var product_has_stock = false
-		for _, product_stock_qty := range products_stock_qty_list {
-			if product_stock_qty.StockId == stock_id && product_stock_qty.ProductId == order_product_info.ProductId {
-				if product_stock_qty.Qty >= order_product_info.Qty {
-					product_has_stock = true
-					break //这个 break 加不加都可以的，因为 这个 stock_id， 这个 product_id 的就一条记录
-				}
-			}
-		}
-
-		// 如果商品在这个仓库里面没有货，就判定 这个仓库里面，并不是所有商品都有货
-		if product_has_stock == false {
-			stock_has_all_product = false
-			break // 订单里面的 接下来的 商品也就不用检查了
-		}
-	}
-
-	return stock_has_all_product
 }
 
 // 7 实际仓库缺货（是在捡货过程中，虽然系统显示有货，但实际仓库没有货了。就需要人工手动将这些订单搬至这里的模块，等待跟客户协商，是退款还是等待集装箱）
@@ -346,17 +317,7 @@ func (p_ol *OrderLogistics) hold_check_envelope(p_order *models.OrderInfo, p_ord
 	}
 
 	//假定商品的 长 > 宽 > 高
-	var whole_length, whole_width, whole_height, whole_weight float64 = 0, 0, 0, 0
-	for _, order_product_info := range p_order_logistics_data.order_product_info_list {
-		if order_product_info.Length > whole_length {
-			whole_length = order_product_info.Length
-		}
-		if order_product_info.Width > whole_width {
-			whole_width = order_product_info.Width
-		}
-		whole_height = whole_height + order_product_info.Height
-		whole_weight = whole_weight + order_product_info.Weight
-	}
+	var whole_length, whole_width, whole_height, _, whole_weight float64 = get_order_products_whole_logistics_data(p_order_logistics_data, 0)
 
 	if whole_length <= envelope_max_length && whole_width <= envelope_max_width && whole_height <= envelope_max_height && whole_weight <= envelope_max_weight {
 		p_ol.update_order_to_hold_type(p_order, models.ORDER_HOLD_TYPE_ENVELOPE, db_session)
@@ -422,7 +383,61 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 
 	// 循环过程中，如果发现新计算出来的价格比原来计算的最低价格还低，
 
+	// 多个商品时，考虑拆包的方式
+
+	// 多个商品时，能不能分仓库发货的？
+
 	return true
+}
+
+// 检查仓库是否有订单中的所有商品数量的库存
+func check_stock_has_order_products(stock_id int64, p_order_logistics_data *order_logistics_data_t) bool {
+	var products_stock_qty_list = p_order_logistics_data.products_stock_qty_list
+	var order_product_info_list = p_order_logistics_data.order_product_info_list
+
+	var stock_has_all_product = true
+
+	// 对订单中的每个商品信息循环，看是不是这个商品在这个仓库里面有货且有足够的数量
+	for _, order_product_info := range order_product_info_list {
+		var product_has_stock = false
+		for _, product_stock_qty := range products_stock_qty_list {
+			if product_stock_qty.StockId == stock_id && product_stock_qty.ProductId == order_product_info.ProductId {
+				if product_stock_qty.Qty >= order_product_info.Qty {
+					product_has_stock = true
+					break //这个 break 加不加都可以的，因为 这个 stock_id， 这个 product_id 的就一条记录
+				}
+			}
+		}
+
+		// 如果商品在这个仓库里面没有货，就判定 这个仓库里面，并不是所有商品都有货
+		if product_has_stock == false {
+			stock_has_all_product = false
+			break // 订单里面的 接下来的 商品也就不用检查了
+		}
+	}
+
+	return stock_has_all_product
+}
+
+func get_order_products_whole_logistics_data(p_order_logistics_data *order_logistics_data_t, dim_weight_ratio float64) (length_return float64, width_return float64, height float64, dim_weight_return float64, weight_return float64) {
+	var whole_length, whole_width, whole_height, whole_dim_weight, whole_weight float64 = 0, 0, 0, 0, 0
+	for _, order_product_info := range p_order_logistics_data.order_product_info_list {
+		if order_product_info.Length > whole_length {
+			whole_length = order_product_info.Length
+		}
+		if order_product_info.Width > whole_width {
+			whole_width = order_product_info.Width
+		}
+		whole_height = whole_height + order_product_info.Height
+		whole_weight = whole_weight + order_product_info.Weight
+	}
+
+	// 只有这个参数大于零的时候才有意义
+	if dim_weight_ratio > 0 {
+		whole_dim_weight = whole_length * whole_width * whole_height / dim_weight_ratio
+	}
+
+	return whole_length, whole_width, whole_height, whole_dim_weight, whole_weight
 }
 
 //todo: 同一个商品的一半数量可以从这个仓库发货，另一半数量可以从哪个仓库发货的怎么处理
