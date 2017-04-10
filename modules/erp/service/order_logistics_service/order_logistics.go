@@ -55,7 +55,7 @@ func (p_ol *OrderLogistics) init_data(db_session *xorm.Session) {
 
 	// 加载 物流方式
 	var logistics_mode_list = make([]models.LogisticsModeInfo, 0)
-	err := db_session.Find(&logistics_mode_list)
+	err = db_session.Find(&logistics_mode_list)
 	core.HandleError(err)
 	p_ol.logistics_mode_list = logistics_mode_list
 
@@ -456,18 +456,20 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 		var selected_fee_rate_id_in_mode int64 = 0
 		var total_fee_in_fee_rate float64 = 10000000 //非超重部分的费用，初始为一个很大的不可能的数字， 澳币
 		for _, logistics_fee_rate := range logistics_fee_rate_list {
-			//todo:  邮编要对上
-			var fee = logistics_fee_rate.Qbj + math.Ceil((final_weight-logistics_fee_rate.Qbjzl)/logistics_fee_rate.Xzjt)*logistics_fee_rate.Xzjtsf
-			// 计算最低费用的时候，还不考虑偏远地区的费用的吧
-			fee = math.Max(fee, logistics_fee_rate.Zdsf) //有最低收费
+			// 邮编要对上
+			if strings.TrimSpace(p_order_logistics_data.order_shipping_address.PostalCode) == strings.TrimSpace(logistics_fee_rate.Postcode) {
+				var fee = logistics_fee_rate.Qbj + math.Ceil((final_weight-logistics_fee_rate.Qbjzl)/logistics_fee_rate.Xzjt)*logistics_fee_rate.Xzjtsf
+				// 计算最低费用的时候，还不考虑偏远地区的费用的吧
+				fee = math.Max(fee, logistics_fee_rate.Zdsf) //有最低收费
 
-			if logistics_fee_rate.Sfpydq == 1 {
-				fee = fee + logistics_fee_rate.Pydqjsyf
-			}
+				if logistics_fee_rate.Sfpydq == 1 {
+					fee = fee + logistics_fee_rate.Pydqjsyf
+				}
 
-			if fee < total_fee_in_fee_rate { // 取得更优的费率方案
-				total_fee_in_fee_rate = fee
-				selected_fee_rate_id_in_mode = logistics_fee_rate.Id
+				if fee < total_fee_in_fee_rate { // 取得更优的费率方案
+					total_fee_in_fee_rate = fee
+					selected_fee_rate_id_in_mode = logistics_fee_rate.Id
+				}
 			}
 		} // for _, logistics_fee_rate := range logistics_fee_rate_list {
 
@@ -568,3 +570,8 @@ func get_order_products_whole_logistics_data(p_order_logistics_data *order_logis
 (完成)16. 国际件。对于非澳大利亚的订单，直接到国际件模块
 
  */
+
+//todo: 地址特殊字段的问题，与最后匹配的最佳物流方式有关
+//todo: 超长的问题，物流方式里面加上超长阶梯
+//todo: 体积重 实际重 比值的问题，可以继续关注，虽然感觉是理解的是对的，就是要确认
+//todo: 体积重 实际重 取向 这个值，还没用起来
