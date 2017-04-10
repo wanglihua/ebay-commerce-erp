@@ -47,7 +47,7 @@
                                                 <label for="max_deficit_price" class="col-xs-4 control-label">最大亏损价格</label>
                                                 <div class="col-xs-8">
                                                     <input id="max_deficit_price" name="detail.logistics_setting.max_deficit_price" type="text" class="input-sm form-control" v-model.number="detail.logistics_setting.max_deficit_price"/>
-                                                    <div class="help-block">匹配最佳仓库及物流后订单允许的最大亏损价格。</div>
+                                                    <div class="help-block">匹配最佳仓库及物流后订单允许的最大亏损价格，澳币。</div>
                                                 </div>
                                             </div>
                                         </div>
@@ -114,13 +114,112 @@
                                                 <div class="col-xs-8">
                                                     <input id="min_express_fee" name="detail.logistics_setting.min_express_fee" type="text" class="input-sm form-control" v-model.number="detail.logistics_setting.min_express_fee"/>
                                                     <div class="help-block">
-                                                        如果运费高于这个金额，就视为快递。
+                                                        如果运费高于这个金额，就视为快递，澳币。
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
 
+                                    <div class="row">
+                                        <div class="col-xs-6">
+                                            <div class="form-group">
+                                                <label for="ppqzldz" class="col-xs-4 control-label">匹配前重量打折</label>
+                                                <div class="col-xs-8">
+                                                    <select id="ppqzldz" name="detail.logistics_setting.ppqzldz" class="input-sm form-control" v-model.number="detail.logistics_setting.ppqzldz">
+                                                        <option :value="0">否</option>
+                                                        <option :value="1">是</option>
+                                                    </select>
+                                                    <div class="help-block">是否匹配物流前对重量打折</div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-xs-6">
+                                            <div class="form-group">
+                                                <label for="ppqzlzl" class="col-xs-4 control-label">匹配前重量折率</label>
+                                                <div class="col-xs-8">
+                                                    <input id="ppqzlzl" name="detail.logistics_setting.ppqzlzl" type="text" class="input-sm form-control" v-model.number="detail.logistics_setting.ppqzlzl"/>
+                                                    <div class="help-block">匹配物流前对重量打多少折。例如：0.9</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-xs-6">
+                                            <div class="form-group">
+                                                <label for="ppqzbdz" class="col-xs-4 control-label">匹配前中边打折</label>
+                                                <div class="col-xs-8">
+                                                    <select id="ppqzbdz" name="detail.logistics_setting.ppqzbdz" class="input-sm form-control" v-model.number="detail.logistics_setting.ppqzbdz">
+                                                        <option :value="0">否</option>
+                                                        <option :value="1">是</option>
+                                                    </select>
+                                                    <div class="help-block">是否匹配物流前对中边打折</div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-xs-6">
+                                            <div class="form-group">
+                                                <label for="ppqzbzl" class="col-xs-4 control-label">匹配前中边折率</label>
+                                                <div class="col-xs-8">
+                                                    <input id="ppqzbzl" name="detail.logistics_setting.ppqzbzl" type="text" class="input-sm form-control" v-model.number="detail.logistics_setting.ppqzbzl"/>
+                                                    <div class="help-block">匹配物流前对中边打多少折。例如：0.9</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-xs-6">
+                                            <div class="form-group">
+                                                <label for="pphzldz" class="col-xs-4 control-label">匹配后重量打折</label>
+                                                <div class="col-xs-8">
+                                                    <select id="pphzldz" name="detail.logistics_setting.pphzldz" class="input-sm form-control" v-model.number="detail.logistics_setting.pphzldz">
+                                                        <option :value="0">否</option>
+                                                        <option :value="1">是</option>
+                                                    </select>
+                                                    <div class="help-block">是否匹配物流后对重量打折</div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-xs-6">
+                                            <div class="form-group">
+                                                <label for="pphzlzl" class="col-xs-4 control-label">匹配后重量折率</label>
+                                                <div class="col-xs-8">
+                                                    <input id="pphzlzl" name="detail.logistics_setting.pphzlzl" type="text" class="input-sm form-control" v-model.number="detail.logistics_setting.pphzlzl"/>
+                                                    <div class="help-block">匹配物流后对重量打多少折。例如：0.9</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-xs-6">
+                                            <div class="form-group">
+                                                <label for="pphzbdz" class="col-xs-4 control-label">匹配后中边打折</label>
+                                                <div class="col-xs-8">
+                                                    <select id="pphzbdz" name="detail.logistics_setting.pphzbdz" class="input-sm form-control" v-model.number="detail.logistics_setting.pphzbdz">
+                                                        <option :value="0">否</option>
+                                                        <option :value="1">是</option>
+                                                    </select>
+                                                    <div class="help-block">是否匹配物流后对中边打折</div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-xs-6">
+                                            <div class="form-group">
+                                                <label for="pphzbzl" class="col-xs-4 control-label">匹配后中边折率</label>
+                                                <div class="col-xs-8">
+                                                    <input id="pphzbzl" name="detail.logistics_setting.pphzbzl" type="text" class="input-sm form-control" v-model.number="detail.logistics_setting.pphzbzl"/>
+                                                    <div class="help-block">匹配物流后对中边打多少折。例如：0.9</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </form>
                                 {%/*
                                 <hr/>
