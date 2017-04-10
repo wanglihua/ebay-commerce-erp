@@ -266,6 +266,10 @@ div.todo:before {
     cursor: text !important;
 }
 
+div.todo {
+    display: none;
+}
+
 div#order_detail div.widget-box {
     margin-top: 8px;
     margin-bottom: 15px;
