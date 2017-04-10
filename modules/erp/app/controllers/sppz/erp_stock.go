@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"encoding/json"
+	"fmt"
 	"strconv"
 
 	"github.com/revel/revel"
@@ -142,13 +143,8 @@ func (c ErpStock) DetailData() revel.Result {
 	status_list := status_service.GetStatusList(db_session, models.STATUS_TYPE_STOCK)
 
 	var target_stock_list = make([]models.StockInfo, 0)
-	if stock_id != 0 {
-		err := db_session.Where("id != ?", stock_id).Find(&target_stock_list)
-		core.HandleError(err)
-	} else {
-		err := db_session.Find(&target_stock_list)
-		core.HandleError(err)
-	}
+	err := db_session.Where(fmt.Sprintf("stock_type_id = %d", models.STOCK_TYPE_AU)).Find(&target_stock_list)
+	core.HandleError(err)
 
 	var detail_form StockDetailForm
 	detail_form.Stock = stock
