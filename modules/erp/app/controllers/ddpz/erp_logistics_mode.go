@@ -123,7 +123,7 @@ func (c ErpLogisticsMode) DetailData() revel.Result {
 	core.HandleError(err)
 
 	var stock_list = make([]models.StockInfo, 0)
-	err = db_session.Find(&stock_list)
+	err = db_session.Where(fmt.Sprintf("stock_type_id = %d", models.STOCK_TYPE_AU)).Find(&stock_list)
 	core.HandleError(err)
 
 	var detail_form LogisticsModeDetailForm
