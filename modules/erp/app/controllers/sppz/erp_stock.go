@@ -2,9 +2,9 @@ package controllers
 
 import (
 	"encoding/json"
-	"github.com/revel/revel"
 	"strconv"
 
+	"github.com/revel/revel"
 	"matrix/core"
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/status_service"
@@ -19,8 +19,9 @@ func (c ErpStock) Index() revel.Result {
 }
 
 type ErpStockViewItem struct {
-	models.StockInfo  `xorm:"extends" json:"stock"`
-	models.StatusInfo `xorm:"extends" json:"status"`
+	models.StockInfo     `xorm:"extends" json:"stock"`
+	models.StockTypeInfo `xorm:"extends" json:"stock_type"`
+	models.StatusInfo    `xorm:"extends" json:"status"`
 }
 
 func (c ErpStock) ListData() revel.Result {
@@ -29,13 +30,18 @@ func (c ErpStock) ListData() revel.Result {
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
 	/*
-		SELECT stock.*, status.*
-		FROM erp_stock stock
-		  INNER JOIN erp_status status ON stock.status_id = status.id
+SELECT
+    stock.*,
+    stock_type.*,
+    status.*
+FROM erp_stock stock
+    INNER JOIN erp_stock_type stock_type ON stock_type.id = stock.stock_type_id
+    INNER JOIN erp_status status ON stock.status_id = status.id
 	*/
 	query := db_session.
-	Select("stock.*, status.*").
+	Select("stock.*, stock_type.*, status.*").
 		Table("erp_stock").Alias("stock").
+		Join("INNER", []string{"erp_stock_type", "stock_type"}, "stock_type.id = stock.stock_type_id").
 		Join("INNER", []string{"erp_status", "status"}, "stock.status_id = status.id").
 		Where(filter)
 
