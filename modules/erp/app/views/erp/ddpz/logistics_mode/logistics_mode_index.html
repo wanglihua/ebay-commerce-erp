@@ -98,9 +98,9 @@
                                         <div class="form-group">
                                             <label for="sfkltjz" class="col-xs-6 control-label">是否考虑体积重</label>
                                             <div class="col-xs-6">
-                                                <select id="sfkltjz" name="detail.logistics_mode.sfkltjz" class="input-sm form-control" v-model="detail.logistics_mode.sfkltjz">
-                                                    <option value="1">是</option>
-                                                    <option value="0">否</option>
+                                                <select id="sfkltjz" name="detail.logistics_mode.sfkltjz" class="input-sm form-control" v-model.number="detail.logistics_mode.sfkltjz">
+                                                    <option :value="1">是</option>
+                                                    <option :value="0">否</option>
                                                 </select>
                                             </div>
                                         </div>
@@ -131,8 +131,8 @@
                                             <label for="tjzysjzqx" class="col-xs-6 control-label">体积重与实际重取向</label>
                                             <div class="col-xs-6">
                                                 <select id="tjzysjzqx" name="detail.logistics_mode.tjzysjzqx" class="input-sm form-control" v-model.number="detail.logistics_mode.tjzysjzqx">
-                                                    <option value="1">取大</option>
-                                                    <option value="2">取小</option>
+                                                    <option :value="1">取大</option>
+                                                    <option :value="2">取小</option>
                                                 </select>
                                             </div>
                                         </div>
@@ -144,9 +144,9 @@
                                         <div class="form-group">
                                             <label for="zlsfybzyq" class="col-xs-6 control-label">体积重与实际重是否有比值要求</label>
                                             <div class="col-xs-6">
-                                                <select id="zlsfybzyq" name="detail.logistics_mode.zlsfybzyq" class="input-sm form-control" v-model="detail.logistics_mode.zlsfybzyq">
-                                                    <option value="1">是</option>
-                                                    <option value="0">否</option>
+                                                <select id="zlsfybzyq" name="detail.logistics_mode.zlsfybzyq" class="input-sm form-control" v-model.number="detail.logistics_mode.zlsfybzyq">
+                                                    <option :value="1">是</option>
+                                                    <option :value="0">否</option>
                                                 </select>
                                             </div>
                                         </div>
@@ -167,9 +167,9 @@
                                         <div class="form-group">
                                             <label for="zcbsfyxz" class="col-xs-6 control-label">最长边是否有限制</label>
                                             <div class="col-xs-6">
-                                                <select id="zcbsfyxz" name="detail.logistics_mode.zcbsfyxz" class="input-sm form-control" v-model="detail.logistics_mode.zcbsfyxz">
-                                                    <option value="1">是</option>
-                                                    <option value="0">否</option>
+                                                <select id="zcbsfyxz" name="detail.logistics_mode.zcbsfyxz" class="input-sm form-control" v-model.number="detail.logistics_mode.zcbsfyxz">
+                                                    <option :value="1">是</option>
+                                                    <option :value="0">否</option>
                                                 </select>
                                             </div>
                                         </div>
@@ -191,9 +191,9 @@
                                         <div class="form-group">
                                             <label for="zlsfyxz" class="col-xs-6 control-label">重量是否有限制</label>
                                             <div class="col-xs-6">
-                                                <select id="zlsfyxz" name="detail.logistics_mode.zlsfyxz" class="input-sm form-control" v-model="detail.logistics_mode.zlsfyxz">
-                                                    <option value="1">是</option>
-                                                    <option value="0">否</option>
+                                                <select id="zlsfyxz" name="detail.logistics_mode.zlsfyxz" class="input-sm form-control" v-model.number="detail.logistics_mode.zlsfyxz">
+                                                    <option :value="1">是</option>
+                                                    <option :value="0">否</option>
                                                 </select>
                                             </div>
                                         </div>
@@ -215,9 +215,9 @@
                                         <div class="form-group">
                                             <label for="sfyxcc" class="col-xs-6 control-label">是否允许超长</label>
                                             <div class="col-xs-6">
-                                                <select id="sfyxcc" name="detail.logistics_mode.sfyxcc" class="input-sm form-control" v-model="detail.logistics_mode.sfyxcc">
-                                                    <option value="1">是</option>
-                                                    <option value="0">否</option>
+                                                <select id="sfyxcc" name="detail.logistics_mode.sfyxcc" class="input-sm form-control" v-model.number="detail.logistics_mode.sfyxcc">
+                                                    <option :value="1">是</option>
+                                                    <option :value="0">否</option>
                                                 </select>
                                             </div>
                                         </div>
@@ -238,9 +238,9 @@
                                         <div class="form-group">
                                             <label for="sfyxcz" class="col-xs-6 control-label">是否允许超重</label>
                                             <div class="col-xs-6">
-                                                <select id="sfyxcz" name="detail.logistics_mode.sfyxcz" class="input-sm form-control" v-model="detail.logistics_mode.sfyxcz">
-                                                    <option value="1">是</option>
-                                                    <option value="0">否</option>
+                                                <select id="sfyxcz" name="detail.logistics_mode.sfyxcz" class="input-sm form-control" v-model.number="detail.logistics_mode.sfyxcz">
+                                                    <option :value="1">是</option>
+                                                    <option :value="0">否</option>
                                                 </select>
                                             </div>
                                         </div>
