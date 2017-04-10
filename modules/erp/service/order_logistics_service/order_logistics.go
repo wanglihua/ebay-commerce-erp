@@ -3,6 +3,7 @@ package order_logistics_service
 import (
 	"errors"
 	"fmt"
+	"math"
 	"strings"
 
 	"github.com/go-xorm/xorm"
@@ -386,6 +387,7 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 	var logistics_mode_list = p_ol.logistics_mode_list
 	var logistics_fee_rate_map = p_ol.logistics_fee_rate_map
 
+	var final_total_fee float64 = 0;
 	for _, logistics_mode := range logistics_mode_list {
 		logistics_fee_rate_list, found := logistics_fee_rate_map[logistics_mode.Id]
 		if found == false {
@@ -397,20 +399,62 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 			continue
 		}
 
-		// 获取所有商品的整体的 长，宽，高，重量 等的数据
-		var length, width, height, dim_weight, weight float64 = get_order_products_whole_logistics_data(p_order_logistics_data, logistics_mode.Tjzgs)
+		// 获取所有商品的整体的 长，宽，高，重量 等的数据，体积重是利用体积重公式计算得到的结果
+		var length, width, height, dim_weight, actual_weight float64 = get_order_products_whole_logistics_data(p_order_logistics_data, logistics_mode.Tjzgs)
+
+		var final_weight = actual_weight // 用户存储最终的计费重量， 初始为实际重量
 
 		// 如果考虑体积重，就把计算好的体积重，用 体积重系数 打折
-		if logistics_mode.Sfkltjz == 1 {
-			dim_weight = dim_weight * logistics_mode.Tjzxs
+		if logistics_mode.Sfkltjz == 1 { // 是否考虑体积重
+			if logistics_mode.Tjzxs > 0 { // 如果 体积重系数 有设置的值
+				dim_weight = dim_weight / logistics_mode.Tjzxs // 这里是除以体积重系数
+			}
+
+			// 体积重与实际重取向， 如果考虑体积重，这个系数一般都会设置的？
+			if logistics_mode.Tjzysjzqx == 1 { // 取大
+				final_weight = math.Max(dim_weight, actual_weight)
+			} else if logistics_mode.Tjzysjzqx == 2 { // 取小
+				final_weight = math.Min(dim_weight, actual_weight)
+			}
+
+			// 体积重与实际重是否有比值要求，这个比值是要大于的，就是说这个东西不能太沉
+			if logistics_mode.Zlsfybzyq == 1 { //如果有比值要求
+				if dim_weight/actual_weight < logistics_mode.Tjzsjzbz { //如果小于了比值就是不符合要求，排除这个物流方式
+					continue
+				}
+			}
 		}
 
+		// 接下来计算都是针对 final_weight 来做，不管前面有没有考虑体积重
 
+		var extra_weight_fee float64 = 0 // 超重的费用， 澳币
+		// 重量是否有限制
+		if logistics_mode.Zlsfyxz == 1 { //如果有限制
+			var extra_weight = final_weight - logistics_mode.Zlbncg
+			if extra_weight > 0 { // 重量不能超过，如果重量有限制，这里的值，应该一般都有设置
+				// 查看是否允许超重
+				if logistics_mode.Sfyxcz == 0 { // 不允许超重
+					continue // 不允许超重，就排除当前物流方式s
+				}
+				// 允许超重 计算超重费用
+				var extra_weight_step float64 = 25 // 每 25 kg一个超重阶梯
+				extra_weight_fee = math.Ceil(extra_weight/extra_weight_step) * logistics_mode.Czjsyf
+			}
+			// 如更没有超过限重，就不需要继续考虑
+		}
 
-		var total_fee float64 = 0
+		// 最长边是否有限制
+		var max_length = math.Max(math.Max(length, width), height)
+		if logistics_mode.Zcbsfyxz == 1 && max_length > logistics_mode.Zcbxzcd && logistics_mode.Sfyxcc == 0 { // 如果有限制, 并且最长边大于了长度限制， 还不允许超长
+			continue // 排除当前物流方式
+		}
+
+		var total_fee float64 = 0 //非超重部分的费用，初始为 0， 澳币
 		for _, logistics_fee_rate := range logistics_fee_rate_list {
 
 		}
+
+		final_total_fee = total_fee + extra_weight_fee
 	}
 
 	// 计算总的大小和重量等商品的自己的数据
