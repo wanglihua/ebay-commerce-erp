@@ -114,6 +114,8 @@ func (c ErpLogisticsMode) DetailData() revel.Result {
 		if has == false {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "指定的物流方式不存在！"})
 		}
+	} else {
+		logistics_mode.Tjzysjzqx = 1
 	}
 
 	var logistics_company_list = make([]models.LogisticsCompanyInfo, 0)

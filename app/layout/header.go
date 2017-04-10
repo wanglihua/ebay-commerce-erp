@@ -266,6 +266,19 @@ func GetSiteHeader(title string, db_session *xorm.Session, web_session revel.Ses
     <link type="text/css" rel="stylesheet" href="/static/site.css?%[1]s"/>`, core.GetStaticVersion()))
 
 	if revel.DevMode {
+		site_header_buffer.WriteString(`
+    <style type="text/css">
+        div.todo {
+            margin: 10px 5px;
+            padding: 10px;
+            color: blue;
+            background-color: yellow;
+            line-height: 38px;
+        }
+    </style>`)
+	}
+
+	if revel.DevMode {
 		site_header_buffer.WriteString(fmt.Sprintf(`<script type="text/javascript" src="/static/js/vue.js?%[1]s"></script>`, core.GetStaticVersion()))
 	} else {
 		site_header_buffer.WriteString(fmt.Sprintf(`<script type="text/javascript" src="/static/js/vue.min.js?%[1]s"></script>`, core.GetStaticVersion()))
@@ -307,7 +320,6 @@ func GetSiteHeader(title string, db_session *xorm.Session, web_session revel.Ses
 
 	return site_header_buffer.String()
 }
-
 
 func GetLoginHeader(db_session *xorm.Session, web_session revel.Session) string {
 	var site_header_buffer bytes.Buffer

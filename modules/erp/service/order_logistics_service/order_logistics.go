@@ -421,7 +421,7 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 
 			// 体积重与实际重是否有比值要求，这个比值是要大于的，就是说这个东西不能太沉
 			if logistics_mode.Zlsfybzyq == 1 { //如果有比值要求
-				if dim_weight/actual_weight < logistics_mode.Tjzsjzbz { //如果小于了比值就是不符合要求，排除这个物流方式
+				if dim_weight/actual_weight < logistics_mode.Tjzsjzbz { //如果小于了比值就是不符合要求，排除这个物流方式，就是这个包裹不能太沉
 					continue
 				}
 			}

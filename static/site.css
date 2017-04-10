@@ -247,14 +247,6 @@ div.div-err {
     max-width: 200px;
 }
 
-div.todo {
-    margin: 10px 5px;
-    padding: 10px;
-    color: blue;
-    background-color: yellow;
-    line-height: 38px;
-}
-
 div.todo:before {
     content: "TODO:";
     padding-right: 10px;

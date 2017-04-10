@@ -130,7 +130,10 @@
                                         <div class="form-group">
                                             <label for="tjzysjzqx" class="col-xs-6 control-label">体积重与实际重取向</label>
                                             <div class="col-xs-6">
-                                                <input id="tjzysjzqx" name="detail.logistics_mode.tjzysjzqx" type="text" class="input-sm form-control" v-model.number="detail.logistics_mode.tjzysjzqx"/>
+                                                <select id="tjzysjzqx" name="detail.logistics_mode.tjzysjzqx" class="input-sm form-control" v-model.number="detail.logistics_mode.tjzysjzqx">
+                                                    <option value="1">取大</option>
+                                                    <option value="2">取小</option>
+                                                </select>
                                             </div>
                                         </div>
                                     </div>
