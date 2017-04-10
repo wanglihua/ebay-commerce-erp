@@ -33,7 +33,7 @@
         </div>
     </div>
     <div class="modal fade" id="logisticsCompanyDetailDialog">
-        <div class="modal-dialog" style="width: 480px;">
+        <div class="modal-dialog" style="width: 640px;">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="True">&times;</button>
@@ -62,6 +62,20 @@
                                             <label for="desc" class="col-xs-2 control-label">描述</label>
                                             <div class="col-xs-10">
                                                 <textarea id="desc" name="detail.logistics_company.desc" rows="3" class="input-sm form-control" v-model="detail.logistics_company.desc"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <label for="address_special_word" class="col-xs-2 control-label">地址特殊字段</label>
+                                            <div class="col-xs-10">
+                                                <select id="address_special_word" name="detail.logistics_company.address_special_word" class="input-sm form-control" v-model.number="detail.logistics_company.address_special_word">
+                                                    <option :value="0">否</option>
+                                                    <option :value="1">是</option>
+                                                </select>
                                             </div>
                                         </div>
                                     </div>
@@ -111,6 +125,15 @@
                         },
                         {"mDataProp": "name", "title": "名称", "bSearchable": true, "width": 250},
                         {"mDataProp": "desc", "title": "描述", "bSearchable": true},
+                        {
+                            "mDataProp": "address_special_word", "title": "地址特殊字段", "bSearchable": true, "width": 110,
+                            "render": function (data, type, row) {
+                                if (data == 1) {
+                                    return "是";
+                                }
+                                return "否";
+                            }
+                        },
                         {"mDataProp": "create_time", "title": "创建时间", "bSearchable": false, "width": 120},
                         {"mDataProp": "update_time", "title": "修改时间", "bSearchable": false, "width": 120}
                     ]

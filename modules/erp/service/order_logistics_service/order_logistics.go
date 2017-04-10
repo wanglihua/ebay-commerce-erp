@@ -166,6 +166,7 @@ func (p_ol *OrderLogistics) Calculate(db_session *xorm.Session) {
 }
 
 // 1 地址有特殊字段的
+//todo: 这个还有问题的  1. 地址有特殊字段的。比如 PO BOX, LOCKER。但最佳物流非AU POST的，需要在基础设置里面有特殊字段设置功能
 func (p_ol *OrderLogistics) hold_check_address_special_word(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, db_session *xorm.Session) (is_hold_return bool) {
 	var has_address_special_word = false
 	for _, address_special_word := range p_ol.address_special_word_list_setting {
