@@ -445,6 +445,7 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 			// 如更没有超过限重，就不需要继续考虑
 		}
 
+		// todo: 超长的问题
 		// 最长边是否有限制
 		var max_length = math.Max(math.Max(length, width), height)
 		if logistics_mode.Zcbsfyxz == 1 && max_length > logistics_mode.Zcbxzcd && logistics_mode.Sfyxcc == 0 { // 如果有限制, 并且最长边大于了长度限制， 还不允许超长
@@ -456,7 +457,7 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 		for _, logistics_fee_rate := range logistics_fee_rate_list {
 			//todo:  邮编要对上
 			var fee = logistics_fee_rate.Qbj + math.Ceil((final_weight-logistics_fee_rate.Qbjzl)/logistics_fee_rate.Xzjt)*logistics_fee_rate.Xzjtsf
-			//todo: 计算最低费用的时候，还不考虑偏远地区的费用的吧
+			// 计算最低费用的时候，还不考虑偏远地区的费用的吧
 			fee = math.Max(fee, logistics_fee_rate.Zdsf) //有最低收费
 
 			if logistics_fee_rate.Sfpydq == 1 {
