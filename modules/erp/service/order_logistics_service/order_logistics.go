@@ -446,6 +446,7 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 			// 如更没有超过限重，就不需要继续考虑
 		}
 
+		var extra_length_fee_in_mode float64 = 0 // 超长的费用， 澳币
 		// todo: 超长的问题
 		// 最长边是否有限制
 		var max_length = math.Max(math.Max(length, width), height)
@@ -477,7 +478,9 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 			continue // 排除该物流方式
 		}
 
-		var total_fee_in_mode float64 = total_fee_in_fee_rate + extra_weight_fee_in_mode
+		// 超重 和 超长 费用中， 取一个， 取大的一个
+		var extra_fee_in_mode = math.Max(extra_weight_fee_in_mode, extra_length_fee_in_mode)
+		var total_fee_in_mode float64 = total_fee_in_fee_rate + extra_fee_in_mode
 
 		if total_fee_in_mode < final_total_fee { // 取得更优的模式方案
 			final_selected_fee_rate_id = selected_fee_rate_id_in_mode
