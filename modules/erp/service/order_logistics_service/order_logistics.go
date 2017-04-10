@@ -387,6 +387,8 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 	var logistics_mode_list = p_ol.logistics_mode_list
 	var logistics_fee_rate_map = p_ol.logistics_fee_rate_map
 
+	var final_selected_mode_id = 0
+	var final_selected_fee_rate_id int64 = 0
 	var final_total_fee float64 = 0;
 	for _, logistics_mode := range logistics_mode_list {
 		logistics_fee_rate_list, found := logistics_fee_rate_map[logistics_mode.Id]
@@ -449,19 +451,35 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 			continue // 排除当前物流方式
 		}
 
-		var total_fee float64 = 0 //非超重部分的费用，初始为 0， 澳币
+		var selected_fee_rate_id_in_mode int64 = 0
+		var total_fee float64 = 10000000 //非超重部分的费用，初始为一个很大的不可能的数字， 澳币
 		for _, logistics_fee_rate := range logistics_fee_rate_list {
+			// 邮编要对上
+			var fee = logistics_fee_rate.Qbj + math.Ceil((final_weight-logistics_fee_rate.Qbjzl)/logistics_fee_rate.Xzjt)*logistics_fee_rate.Xzjtsf
+			//todo: 计算最低费用的时候，还不考虑偏远地区的费用的吧
+			fee = math.Max(fee, logistics_fee_rate.Zdsf) //有最低收费
 
+			if logistics_fee_rate.Sfpydq == 1 {
+				fee = fee + logistics_fee_rate.Pydqjsyf
+			}
+
+			if total_fee > fee { // 取得更优的费率方案
+				total_fee = fee
+				selected_fee_rate_id_in_mode = logistics_fee_rate.Id
+			}
+		} // for _, logistics_fee_rate := range logistics_fee_rate_list {
+
+		if selected_fee_rate_id_in_mode == 0 { //没有费率匹配, 比如说，还没有开通该地区的物流
+			continue // 排除该物流方式
 		}
 
-		final_total_fee = total_fee + extra_weight_fee
-	}
+		var total_fee_in_mode float64 = total_fee + extra_weight_fee
 
-	// 计算总的大小和重量等商品的自己的数据
+		// 不对还要判断的
+		final_selected_fee_rate_id = selected_fee_rate_id_in_mode
+		final_total_fee = total_fee_in_mode
 
-	//一次循环各种物流方式(只取仓库有货的物流方式)，二次循环物流方式的各种物流费率
-
-	// 循环过程中，如果发现新计算出来的价格比原来计算的最低价格还低，
+	} // for _, logistics_mode := range logistics_mode_list {
 
 	// 多个商品时，考虑拆包的方式
 
