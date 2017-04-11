@@ -13,12 +13,13 @@ type OrderLogisticsInfo struct {
 	Length     float64      `xorm:"float notnull 'length'" json:"length" smith:"verbose_name=长度,min=0"`              // cm
 	Width      float64      `xorm:"float notnull 'width'" json:"width" smith:"verbose_name=宽度,min=0"`                // cm
 	Height     float64      `xorm:"float notnull 'height'" json:"height" smith:"verbose_name=高度,min=0"`              // cm
-	DimWeight  float64      `xorm:"float notnull 'dim_weight'" json:"dim_weight" smith:"verbose_name=体积重,min=0"`     // kg Dimensional Weight
 	Weight     float64      `xorm:"float notnull 'weight'" json:"weight" smith:"verbose_name=重量,min=0"`              // kg
 	TotalFee   float64      `xorm:"decimal(18,6) notnull 'total_fee'" json:"total_fee" smith:"verbose_name=物流费用"`    // 由上面的 物流方式和物流费率，计算出来的物流费用
 	CreateTime core.Time    `xorm:"created notnull 'create_time'" json:"create_time"`
 	UpdateTime core.Time    `xorm:"updated notnull 'update_time'" json:"update_time"`
 	Version    int          `xorm:"version notnull 'version'" json:"version"`
+
+	//DimWeight  float64      `xorm:"float notnull 'dim_weight'" json:"dim_weight" smith:"verbose_name=体积重,min=0"`     // kg Dimensional Weight
 }
 
 func (e OrderLogisticsInfo) TableName() string {

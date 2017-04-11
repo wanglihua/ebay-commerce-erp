@@ -318,6 +318,7 @@ func (p_ol *OrderLogistics) hold_check_product_info_miss(p_order *models.OrderIn
 
 // 14 信封类。长宽高在35cm X 25cm X 2cm, 重量在0.5Kg以内的订单为信封。若是多数量或者多产品，以前我们设计的思路是，最大产品的长边为最长边，最大产品的中边为中边，所有产品的最小边之和为最小边，判断是否在35cm X 25cm X 2cm以内，重量之和是否在0.5Kg以内
 func (p_ol *OrderLogistics) hold_check_envelope(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, db_session *xorm.Session) (is_hold_return bool) {
+	// 这里假定信封的长宽高限制： 长 > 宽 > 高
 
 	var envelope_max_length = p_ol.logistics_setting.EnvelopeMaxLength
 	var envelope_max_width = p_ol.logistics_setting.EnvelopeMaxWidth
@@ -329,7 +330,7 @@ func (p_ol *OrderLogistics) hold_check_envelope(p_order *models.OrderInfo, p_ord
 		return false
 	}
 
-	//假定商品的 长 > 宽 > 高
+	// get_order_products_whole_logistics_data的输出中 长 > 宽 > 高
 	var whole_length, whole_width, whole_height, _, whole_weight float64 = get_order_products_whole_logistics_data(p_order_logistics_data, 0)
 
 	if whole_length <= envelope_max_length && whole_width <= envelope_max_width && whole_height <= envelope_max_height && whole_weight <= envelope_max_weight {
@@ -377,6 +378,8 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 
 	// 在这之前要加载好 物流方式表里面的信息，物流费率里面的信息，防止对数据库的频繁访问
 
+	var logistics_setting = p_ol.logistics_setting
+
 	// 找出所有有商品数量的仓库
 	var au_stock_list = p_ol.au_stock_list
 	var stock_id_has_products_map = make(map[int64]bool)
@@ -392,6 +395,10 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 	var final_selected_mode_id int64 = 0
 	var final_selected_fee_rate_id int64 = 0
 	var final_total_fee float64 = 100000; // 最终的物流费用，初始化为一个很大的不可能的值，澳币
+	var final_length float64 = 0
+	var final_width float64 = 0
+	var final_height float64 = 0
+	var final_weight float64 = 0
 	for _, logistics_mode := range logistics_mode_list {
 		logistics_fee_rate_list, found := logistics_fee_rate_map[logistics_mode.Id]
 		if found == false {
@@ -406,7 +413,31 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 		// 获取所有商品的整体的 长，宽，高，重量 等的数据，体积重是利用体积重公式计算得到的结果
 		var length, width, height, dim_weight, actual_weight float64 = get_order_products_whole_logistics_data(p_order_logistics_data, logistics_mode.Tjzgs)
 
-		var final_weight = actual_weight // 用户存储最终的计费重量， 初始为实际重量。如果不考虑体积重的话，就用实际重量来算重量的
+		// 匹配前重量打折
+		if logistics_setting.Ppqzldz == 1 {
+			// 是不是指定实际重量打折
+			actual_weight = actual_weight * logistics_setting.Ppqzlzl
+		}
+
+		// 匹配前中边打折
+		if logistics_setting.Ppqzbdz == 1 {
+			var side_length_slice = sort.Float64Slice([]float64{length, width, height})
+			side_length_slice.Sort()
+			var mid_length = side_length_slice[1] // 0, 1, 2 中间那条边
+
+			const MIN_FLOAT_DIFF = 0.0000000001
+			if (mid_length - length) < MIN_FLOAT_DIFF {
+				length = length * logistics_setting.Ppqzbzl
+			}
+			if (mid_length - width) < MIN_FLOAT_DIFF {
+				width = width * logistics_setting.Ppqzbzl
+			}
+			if (mid_length - height) < MIN_FLOAT_DIFF {
+				height = height * logistics_setting.Ppqzbzl
+			}
+		}
+
+		var final_weight_in_mode = actual_weight // 用户存储最终的计费重量， 初始为实际重量。如果不考虑体积重的话，就用实际重量来算重量的
 
 		// 如果考虑体积重，就把计算好的体积重，用 体积重系数 打折
 		if logistics_mode.Sfkltjz == 1 { // 是否考虑体积重
@@ -416,9 +447,9 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 
 			// 体积重与实际重取向， 如果考虑体积重，这个系数一般都会设置的？
 			if logistics_mode.Tjzysjzqx == 1 { // 取大
-				final_weight = math.Max(dim_weight, actual_weight)
+				final_weight_in_mode = math.Max(dim_weight, actual_weight)
 			} else if logistics_mode.Tjzysjzqx == 2 { // 取小
-				final_weight = math.Min(dim_weight, actual_weight)
+				final_weight_in_mode = math.Min(dim_weight, actual_weight)
 			}
 
 			// 体积重与实际重是否有比值要求，这个比值是要大于的，就是说这个东西不能太沉
@@ -429,12 +460,12 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 			}
 		}
 
-		// 接下来计算都是针对 final_weight 来做，不管前面有没有考虑体积重
+		// 接下来计算都是针对 final_weight_in_mode 来做，不管前面有没有考虑体积重
 
 		var extra_weight_fee_in_mode float64 = 0 // 超重的费用， 澳币
 		// 重量是否有限制
 		if logistics_mode.Zlsfyxz == 1 { //如果有限制
-			var extra_weight = final_weight - logistics_mode.Zlbncg
+			var extra_weight = final_weight_in_mode - logistics_mode.Zlbncg
 			if extra_weight > 0 { // 重量不能超过，如果重量有限制，物流方式里面一般都有超重限制
 				// 查看是否允许超重
 				if logistics_mode.Sfyxcz == 0 { // 不允许超重
@@ -470,7 +501,7 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 		for _, logistics_fee_rate := range logistics_fee_rate_list {
 			// 邮编要对上
 			if strings.TrimSpace(p_order_logistics_data.order_shipping_address.PostalCode) == strings.TrimSpace(logistics_fee_rate.Postcode) {
-				var fee = logistics_fee_rate.Qbj + math.Ceil((final_weight-logistics_fee_rate.Qbjzl)/logistics_fee_rate.Xzjt)*logistics_fee_rate.Xzjtsf
+				var fee = logistics_fee_rate.Qbj + math.Ceil((final_weight_in_mode-logistics_fee_rate.Qbjzl)/logistics_fee_rate.Xzjt)*logistics_fee_rate.Xzjtsf
 				// 计算最低费用的时候，还不考虑偏远地区的费用的吧
 				fee = math.Max(fee, logistics_fee_rate.Zdsf) //有最低收费
 
@@ -497,6 +528,11 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 			final_selected_fee_rate_id = selected_fee_rate_id_in_mode
 			final_selected_mode_id = logistics_mode.Id
 			final_total_fee = total_fee_in_mode
+
+			final_length = length
+			final_width = width
+			final_height = height
+			final_weight = final_weight_in_mode
 		}
 	} // for _, logistics_mode := range logistics_mode_list {
 
@@ -504,7 +540,30 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 		return false
 	}
 
-	// todo: 匹配成功
+	var address_id = p_order_logistics_data.order_shipping_address.Id
+
+	// 匹配成功，记录匹配成功数据
+	var order_logistics models.OrderLogisticsInfo
+	has, err := db_session.Where(fmt.Sprintf("order_id = %d", p_order.Id)).Get(&order_logistics)
+	core.HandleError(err)
+
+	order_logistics.OrderId = p_order.Id
+	order_logistics.AddressId = address_id
+	order_logistics.ModeId = final_selected_mode_id
+	order_logistics.FeeRateId = final_selected_fee_rate_id
+	order_logistics.Length = final_length
+	order_logistics.Width = final_width
+	order_logistics.Height = final_height
+	order_logistics.Weight = final_weight
+	order_logistics.TotalFee = final_total_fee
+
+	if has == true {
+		_, err := db_session.Id(order_logistics.Id).Update(&order_logistics)
+		core.HandleError(err)
+	} else {
+		_, err := db_session.Insert(&order_logistics)
+		core.HandleError(err)
+	}
 
 	// 多个商品时，考虑拆包的方式
 
@@ -542,6 +601,7 @@ func check_stock_has_order_products(stock_id int64, p_order_logistics_data *orde
 	return stock_has_all_product
 }
 
+// 输出的结果中，保证 length > width > height
 func get_order_products_whole_logistics_data(p_order_logistics_data *order_logistics_data_t, dim_weight_ratio float64) (length_return float64, width_return float64, height float64, dim_weight_return float64, weight_return float64) {
 	var whole_length, whole_width, whole_height, whole_dim_weight, whole_weight float64 = 0, 0, 0, 0, 0
 	for _, order_product_info := range p_order_logistics_data.order_product_info_list {
