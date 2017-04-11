@@ -373,6 +373,31 @@ func (c ErpLogisticsFeeRate) Import() revel.Result {
 		})
 	}
 
+	/*
+
+	加载所有物流公司和物流方式的名称的组合，方便接下来的验证，加快速度
+
+SELECT
+    DISTINCT
+    lc.name AS company_name,
+    lm.name AS mode_name
+FROM erp_logistics_mode lm
+    INNER JOIN erp_logistics_company lc ON lc.id = lm.company_id
+
+	 */
+
+	type logistics_company_and_mode_name_t struct {
+		CompanyName string  `xorm:"'company_name'"`
+		ModeName    string  `xorm:"'mode_name'"`
+	}
+
+	var logistics_company_and_mode_name_list = make([]logistics_company_and_mode_name_t, 0)
+	err = db_session.Find(&logistics_company_and_mode_name_list)
+	core.HandleError(err)
+
+	var is_logistics_company_and_mode_name
+
+
 	for _, logistics_fee_rate_import := range logistics_fee_rate_list {
 
 		var logistics_fee_rate = logistics_fee_rate_import.LogisticsFeeRate

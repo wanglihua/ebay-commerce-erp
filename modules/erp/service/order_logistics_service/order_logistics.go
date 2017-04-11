@@ -376,6 +376,8 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 
 	// 在这之前要加载好 物流方式表里面的信息，物流费率里面的信息，防止对数据库的频繁访问
 
+
+
 	// 找出所有有商品数量的仓库
 	var au_stock_list = p_ol.au_stock_list
 	var stock_id_has_products_map = make(map[int64]bool)
@@ -544,6 +546,9 @@ func check_stock_has_order_products(stock_id int64, p_order_logistics_data *orde
 func get_order_products_whole_logistics_data(p_order_logistics_data *order_logistics_data_t, dim_weight_ratio float64) (length_return float64, width_return float64, height float64, dim_weight_return float64, weight_return float64) {
 	var whole_length, whole_width, whole_height, whole_dim_weight, whole_weight float64 = 0, 0, 0, 0, 0
 	for _, order_product_info := range p_order_logistics_data.order_product_info_list {
+		// 有时产品的长宽高，可能不是 长 > 宽 > 高 的，需要调整一下，暂且
+		var logic_length =
+
 		if order_product_info.Length > whole_length {
 			whole_length = order_product_info.Length
 		}
@@ -581,9 +586,10 @@ func get_order_products_whole_logistics_data(p_order_logistics_data *order_logis
 (完成)14. 信封类。长宽高在35cm X 25cm X 2cm, 重量在0.5Kg以内的订单为信封。若是多数量或者多产品，以前我们设计的思路是，最大产品的长边为最长边，最大产品的中边为中边，所有产品的最小边之和为最小边，判断是否在35cm X 25cm X 2cm以内，重量之和是否在0.5Kg以内
 (完成)15. 快递类。需要在基础设置里面有 收到快递费金额的设置功能，比如收到的运费高于什么金额，视为快递。否则就算收了快递费也视为普通包裹
 (完成)16. 国际件。对于非澳大利亚的订单，直接到国际件模块
+17. 收货人信息不全的，比如没有手机号，没有邮编等等
 
  */
 
 //todo: 地址特殊字段的问题，与最后匹配的最佳物流方式有关
-//todo: 超长的问题，物流方式里面加上超长阶梯
 //todo: 体积重 实际重 比值的问题，可以继续关注，虽然感觉是理解的是对的，就是要确认
+//todo: 匹配前后打折的问题
