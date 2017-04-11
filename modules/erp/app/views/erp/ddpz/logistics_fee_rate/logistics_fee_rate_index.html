@@ -369,6 +369,8 @@
                         {"mDataProp": "fr.update_time", "title": "修改时间", "bSearchable": false, "width": 120}
                     ],
                     "fnServerData": function (sSource, aoData, fnCallback) {
+                        showMask("数据加载中，请稍候");
+
                         aoData.push({'name': 'logistics_company_query', 'value': $('#logistics_company_query').val()});
                         aoData.push({'name': 'logistics_mode_query', 'value': $('#logistics_mode_query').val()});
                         aoData.push({'name': 'postcode_query', 'value': $('#postcode_query').val()});
@@ -378,6 +380,8 @@
                             "url": sSource,
                             "data": aoData,
                             "success": function (data) {
+                                hideMask();
+
                                 if (data.success == false) {
                                     $.msg.error(data.message);
                                     return;

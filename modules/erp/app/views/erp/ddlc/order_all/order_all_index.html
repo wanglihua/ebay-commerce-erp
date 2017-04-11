@@ -116,6 +116,8 @@
                         {"mDataProp": "o.shipped_time", "title": "发货时间", "bSearchable": false, "width": 135}
                     ],
                     "fnServerData": function (sSource, aoData, fnCallback) {
+                        showMask("数据加载中，请稍候");
+
                         aoData.push({'name': 'shop_id', 'value': this_vm.page.shop_id});
 
                         $.ajax({
@@ -123,6 +125,8 @@
                             "url": sSource,
                             "data": aoData,
                             "success": function (data) {
+                                hideMask();
+
                                 if (data.success == false) {
                                     $.msg.error(data.message);
                                     return;

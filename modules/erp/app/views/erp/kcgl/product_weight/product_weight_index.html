@@ -273,9 +273,10 @@
                         {"mDataProp": "p.update_time", "title": "修改时间", "bSearchable": false, "width": 120}
                     ],
                     "fnServerData": function (sSource, aoData, fnCallback) {
+                        showMask("数据加载中，请稍候");
+
                         aoData.push({name: 'filter_type', value: this_vm.filter_type});
 
-                        showMask("数据加载中，请稍候");
                         $.ajax(
                             {
                                 "dataType": 'json',
@@ -283,6 +284,7 @@
                                 "data": aoData,
                                 "success": function (data) {
                                     hideMask();
+
                                     if (data.success == false) {
                                         $.msg.error(data.message);
                                         return;

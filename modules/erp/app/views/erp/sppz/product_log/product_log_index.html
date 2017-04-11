@@ -92,6 +92,8 @@
                         }
                     ],
                     "fnServerData": function (sSource, aoData, fnCallback) {
+                        showMask("数据加载中，请稍候");
+
                         aoData.push({'name': 'product_code_query', 'value': $('#product_code_query').val()});
                         aoData.push({'name': 'login_name_query', 'value': $('#login_name_query').val()});
                         aoData.push({'name': 'begin_time_query', 'value': $('#begin_time_query').val()});
@@ -102,6 +104,8 @@
                             "url": sSource,
                             "data": aoData,
                             "success": function (data) {
+                                hideMask();
+
                                 if (data.success == false) {
                                     $.msg.error(data.message);
                                     return;

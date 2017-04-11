@@ -176,11 +176,12 @@
                         }
                     ],
                     "fnServerData": function (sSource, aoData, fnCallback) {
+                        showMask("数据加载中，请稍候");
+
                         aoData.push({'name': 'product_cate_query', 'value': $('#product_cate_query').val()});
                         aoData.push({'name': 'product_sku_query', 'value': $('#product_sku_query').val()});
                         aoData.push({'name': 'product_name_query', 'value': $('#product_name_query').val()});
 
-                        showMask("数据加载中，请稍候");
                         $.ajax(
                             {
                                 "dataType": 'json',
@@ -188,6 +189,7 @@
                                 "data": aoData,
                                 "success": function (data) {
                                     hideMask();
+
                                     if (data.success == false) {
                                         $.msg.error(data.message);
                                         return;

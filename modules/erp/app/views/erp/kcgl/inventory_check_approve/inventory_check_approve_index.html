@@ -163,6 +163,7 @@
                                 "data": aoData,
                                 "success": function (data) {
                                     hideMask();
+
                                     if (data.success == false) {
                                         $.msg.error(data.message);
                                         return;
