@@ -10,7 +10,6 @@ import (
 	"github.com/tealeg/xlsx"
 	"matrix/core"
 	"matrix/modules/erp/models"
-	"github.com/liudng/godump"
 )
 
 type ErpLogisticsFeeRate struct {
@@ -93,8 +92,6 @@ func (c ErpLogisticsFeeRate) ListData() revel.Result {
 
 	_, err = db_session.Sql(sb.SqlCount()).Get(&fee_rate_count)
 	core.HandleError(err)
-
-	godump.Dump(logistics_fee_rate_list)
 
 	return c.RenderJson(core.GridResult{
 		Data:  logistics_fee_rate_list,
