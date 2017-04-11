@@ -386,29 +386,45 @@ FROM erp_logistics_mode lm
 
 	 */
 
-	type logistics_company_and_mode_name_t struct {
+	type logistics_company_and_mode_t struct {
 		CompanyName string  `xorm:"'company_name'"`
+		ModeId      int64   `xorm:"'mode_id'"`
 		ModeName    string  `xorm:"'mode_name'"`
 	}
 
-	var logistics_company_and_mode_name_list = make([]logistics_company_and_mode_name_t, 0)
-	err = db_session.Find(&logistics_company_and_mode_name_list)
+	sql := `SELECT
+    DISTINCT
+    lc.name AS company_name,
+    lm.id   AS mode_id,
+    lm.name AS mode_name
+FROM erp_logistics_mode lm
+    INNER JOIN erp_logistics_company lc ON lc.id = lm.company_id
+`
+
+	var logistics_company_and_mode_list = make([]logistics_company_and_mode_t, 0)
+	err = db_session.Sql(sql).Find(&logistics_company_and_mode_list)
 	core.HandleError(err)
 
-	var is_logistics_company_and_mode_name
-
+	var is_logistics_company_and_mode_exist = func(company_name string, mode_name string) (has_return bool, mode_id_return int64) {
+		for _, logistics_company_and_mode := range logistics_company_and_mode_list {
+			if strings.TrimSpace(company_name) == strings.TrimSpace(logistics_company_and_mode.CompanyName) &&
+				strings.TrimSpace(mode_name) == strings.TrimSpace(logistics_company_and_mode.ModeName) {
+				return true, logistics_company_and_mode.ModeId
+			}
+		}
+		return false, 0
+	}
 
 	for _, logistics_fee_rate_import := range logistics_fee_rate_list {
 
 		var logistics_fee_rate = logistics_fee_rate_import.LogisticsFeeRate
 
+		/* 使用了更好的方式
 		// 物流方式
-		/*
-SELECT lm.id AS mode_id
-FROM erp_logistics_mode lm
-    INNER JOIN erp_logistics_company lc ON lc.id = lm.company_id
-WHERE lc.name = 'company_name' AND lm.name = 'mode_name'
-		 */
+		//SELECT lm.id AS mode_id
+		//FROM erp_logistics_mode lm
+		//    INNER JOIN erp_logistics_company lc ON lc.id = lm.company_id
+		//WHERE lc.name = 'company_name' AND lm.name = 'mode_name'
 
 		var mode_id struct {
 			ModeId int64 `xorm:"'mode_id'"`
@@ -420,6 +436,10 @@ WHERE lc.name = '%s' AND lm.name = '%s'`
 		sql = fmt.Sprintf(sql, logistics_fee_rate_import.CompanyName, logistics_fee_rate_import.ModeName)
 		has, err := db_session.Sql(sql).Get(&mode_id)
 		core.HandleError(err)
+
+		*/
+
+		has, mode_id := is_logistics_company_and_mode_exist(logistics_fee_rate_import.CompanyName, logistics_fee_rate_import.ModeName)
 		if has == false {
 			return c.RenderJson(map[string]interface{}{
 				"success": false,
@@ -427,7 +447,7 @@ WHERE lc.name = '%s' AND lm.name = '%s'`
 			})
 		}
 
-		logistics_fee_rate.ModeId = mode_id.ModeId
+		logistics_fee_rate.ModeId = mode_id
 
 		_, err = db_session.Insert(&logistics_fee_rate)
 		core.HandleError(err)

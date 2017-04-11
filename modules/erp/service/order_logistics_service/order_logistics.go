@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"math"
+	"sort"
 	"strings"
 
 	"github.com/go-xorm/xorm"
@@ -376,8 +377,6 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 
 	// 在这之前要加载好 物流方式表里面的信息，物流费率里面的信息，防止对数据库的频繁访问
 
-
-
 	// 找出所有有商品数量的仓库
 	var au_stock_list = p_ol.au_stock_list
 	var stock_id_has_products_map = make(map[int64]bool)
@@ -546,16 +545,21 @@ func check_stock_has_order_products(stock_id int64, p_order_logistics_data *orde
 func get_order_products_whole_logistics_data(p_order_logistics_data *order_logistics_data_t, dim_weight_ratio float64) (length_return float64, width_return float64, height float64, dim_weight_return float64, weight_return float64) {
 	var whole_length, whole_width, whole_height, whole_dim_weight, whole_weight float64 = 0, 0, 0, 0, 0
 	for _, order_product_info := range p_order_logistics_data.order_product_info_list {
-		// 有时产品的长宽高，可能不是 长 > 宽 > 高 的，需要调整一下，暂且
-		var logic_length =
+		// 有时产品的长宽高，可能不是 长 > 宽 > 高 的，需要调整一下，暂且 称作 逻辑 长宽高
+		var side_length_slice = sort.Float64Slice([]float64{order_product_info.Length, order_product_info.Width, order_product_info.Height})
+		side_length_slice.Sort() // 从小到大的排序
+		// 排好序后，依次为 高 宽 长
+		var logic_height = side_length_slice[0]
+		var logic_width = side_length_slice[1]
+		var logic_length = side_length_slice[2]
 
-		if order_product_info.Length > whole_length {
-			whole_length = order_product_info.Length
+		if logic_length > whole_length {
+			whole_length = logic_length
 		}
-		if order_product_info.Width > whole_width {
-			whole_width = order_product_info.Width
+		if logic_width > whole_width {
+			whole_width = logic_width
 		}
-		whole_height = whole_height + order_product_info.Height
+		whole_height = whole_height + logic_height
 		whole_weight = whole_weight + order_product_info.Weight
 	}
 
