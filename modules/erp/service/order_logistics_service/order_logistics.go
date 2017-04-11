@@ -434,7 +434,7 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 		// 重量是否有限制
 		if logistics_mode.Zlsfyxz == 1 { //如果有限制
 			var extra_weight = final_weight - logistics_mode.Zlbncg
-			if extra_weight > 0 { // 重量不能超过，如果重量有限制，这里的值，应该一般都有设置
+			if extra_weight > 0 { // 重量不能超过，如果重量有限制，物流方式里面一般都有超重限制
 				// 查看是否允许超重
 				if logistics_mode.Sfyxcz == 0 { // 不允许超重
 					continue // 不允许超重，就排除当前物流方式s
@@ -447,11 +447,21 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 		}
 
 		var extra_length_fee_in_mode float64 = 0 // 超长的费用， 澳币
-		// todo: 超长的问题
 		// 最长边是否有限制
 		var max_length = math.Max(math.Max(length, width), height)
-		if logistics_mode.Zcbsfyxz == 1 && max_length > logistics_mode.Zcbxzcd && logistics_mode.Sfyxcc == 0 { // 如果有限制, 并且最长边大于了长度限制， 还不允许超长
-			continue // 排除当前物流方式
+		// 长度是否有限制
+		if logistics_mode.Zcbsfyxz == 1 { // 如果有限制
+			var extra_length = max_length - logistics_mode.Zcbxzcd
+			if extra_length > 0 { // 长度不能超过，如果最长边有限制，物流方式里面一般都有最长边超长限制
+				// 是否允许超长
+				if logistics_mode.Sfyxcc == 0 { // 如果不允许超长
+					continue
+				}
+				// 允许超长，计算超长费用
+				var extra_length_step float64 = logistics_mode.Ccsfjt
+				extra_length_fee_in_mode = math.Ceil(extra_length/extra_length_step) * logistics_mode.Ccjsyf
+			}
+			// 如果没有超过限长，就不需要继续考虑
 		}
 
 		var selected_fee_rate_id_in_mode int64 = 0
