@@ -229,9 +229,11 @@
 
             init: {
                 FilesAdded: function () {
+                    showMask("上传中...");
                     uploader.start();
                 },
                 FileUploaded: function (up, file, response) {
+                    hideMask();
                     var result = JSON.parse(response.response);
                     if (result.success != true) {
                         $.msg.error(result.message);
@@ -283,7 +285,7 @@
                         {
                             "mDataProp": "fr.qbj", "title": "起步价", "bSearchable": false, "width": 70,
                             "render": function (data, type, row) {
-                                if (data != "" && data == 0) {
+                                if (data != "" && data != 0) {
                                     return "AU " + data;
                                 }
                                 else {
@@ -294,7 +296,7 @@
                         {
                             "mDataProp": "fr.qbjzl", "title": "起步价重量", "bSearchable": false, "width": 90,
                             "render": function (data, type, row) {
-                                if (data != "" && data == 0) {
+                                if (data != "" && data != 0) {
                                     return data + " kg";
                                 }
                                 else {
@@ -305,7 +307,7 @@
                         {
                             "mDataProp": "fr.zdsf", "title": "最低收费", "bSearchable": false, "width": 80,
                             "render": function (data, type, row) {
-                                if (data != "" && data == 0) {
+                                if (data != "" && data != 0) {
                                     return "AU " + data;
                                 }
                                 else {
@@ -316,7 +318,7 @@
                         {
                             "mDataProp": "fr.xzjt", "title": "续重阶梯", "bSearchable": false, "width": 80,
                             "render": function (data, type, row) {
-                                if (data != "" && data == 0) {
+                                if (data != "" && data != 0) {
                                     return data + " kg";
                                 }
                                 else {
@@ -327,7 +329,7 @@
                         {
                             "mDataProp": "fr.xzjtsf", "title": "续重阶梯收费", "bSearchable": false, "width": 100,
                             "render": function (data, type, row) {
-                                if (data != "" && data == 0) {
+                                if (data != "" && data != 0) {
                                     return "AU " + data;
                                 }
                                 else {
@@ -355,7 +357,7 @@
                             "bSearchable": false,
                             "width": 130,
                             "render": function (data, type, row) {
-                                if (data != "" && data == 0) {
+                                if (data != "" && data != 0) {
                                     return "AU " + data;
                                 }
                                 else {
