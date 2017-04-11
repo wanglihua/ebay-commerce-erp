@@ -103,7 +103,7 @@ function handleJQueryAjaxError(xhr, textStatus, error) {
 $.ajaxSetup(
     {
         type: "POST",
-        "timeout": 15000,
+        "timeout": 600000,
         "error": handleJQueryAjaxError
     }
 );
