@@ -432,7 +432,6 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 
 		// 获取所有商品的整体的 长，宽，高，重量 等的数据，体积重是利用体积重公式计算得到的结果
 		var length, width, height, dim_weight, actual_weight float64 = get_order_products_whole_logistics_data(p_order_logistics_data, logistics_mode.Tjzgs)
-
 		// 匹配前打折
 		{
 			// 匹配前重量打折
@@ -562,6 +561,8 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 	if final_selected_mode_id == 0 || final_selected_fee_rate_id == 0 { // 匹配失败
 		return false
 	}
+
+	// 现在的做法是，最后输出的匹配结果的数据，是受前后打折两者影响的。
 
 	// 匹配后打折
 	{
