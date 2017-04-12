@@ -102,6 +102,11 @@ func (p_ol *OrderLogistics) Calculate(db_session *xorm.Session) {
 		p_order_logistics_data.load_exchange_rate(&order, p_ol)
 		p_order_logistics_data.load_order_shipping_address(order.Id, db_session)
 
+		// 17 收货人信息不全的，比如没有手机号，没有邮编等等，放在这里前面一点的地方检查比较好
+		if p_ol.hold_check_address_info_miss(&order, p_order_logistics_data, db_session) {
+			continue
+		}
+
 		// 1 地址有特殊字段的
 		if p_ol.hold_check_address_special_word(&order, p_order_logistics_data, db_session) {
 			continue
@@ -366,6 +371,21 @@ func (p_ol *OrderLogistics) hold_check_international(p_order *models.OrderInfo, 
 	return false
 }
 
+// 17. 收货人信息不全的，比如没有手机号，没有邮编等等
+func (p_ol *OrderLogistics) hold_check_address_info_miss(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, db_session *xorm.Session) (is_hold_return bool) {
+	var shipping_address = p_order_logistics_data.order_shipping_address
+	if shipping_address.Id == 0 || // 数据库中地址信息不存在
+		strings.TrimSpace(shipping_address.Phone) == "" || // 地址信息中缺少电话号码
+		strings.TrimSpace(shipping_address.PostalCode) == "" || // 地址信息中缺少邮政编码
+		strings.TrimSpace(shipping_address.Name) == "" || // 地址信息中缺少收件人
+		(strings.TrimSpace(shipping_address.Street1) == "" && strings.TrimSpace(shipping_address.Street2) == "" ) { // 地址信息中缺少详细地址信息
+		p_ol.update_order_to_hold_type(p_order, models.ORDER_HOLD_ADDRESS_INFO_MISS, db_session)
+		return true
+	}
+
+	return false
+}
+
 func (p_ol *OrderLogistics) update_order_to_hold_type(p_order *models.OrderInfo, hold_type_id int64, db_session *xorm.Session) {
 	p_order.HoldTypeId = core.MakeNullInt(hold_type_id, true)
 	_, err := db_session.Id(p_order.Id).Cols("hold_type_id").Update(p_order)
@@ -413,27 +433,30 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 		// 获取所有商品的整体的 长，宽，高，重量 等的数据，体积重是利用体积重公式计算得到的结果
 		var length, width, height, dim_weight, actual_weight float64 = get_order_products_whole_logistics_data(p_order_logistics_data, logistics_mode.Tjzgs)
 
-		// 匹配前重量打折
-		if logistics_setting.Ppqzldz == 1 {
-			// 是不是指定实际重量打折
-			actual_weight = actual_weight * logistics_setting.Ppqzlzl
-		}
-
-		// 匹配前中边打折
-		if logistics_setting.Ppqzbdz == 1 {
-			var side_length_slice = sort.Float64Slice([]float64{length, width, height})
-			side_length_slice.Sort()
-			var mid_length = side_length_slice[1] // 0, 1, 2 中间那条边
-
-			const MIN_FLOAT_DIFF = 0.0000000001
-			if (mid_length - length) < MIN_FLOAT_DIFF {
-				length = length * logistics_setting.Ppqzbzl
+		// 匹配前打折
+		{
+			// 匹配前重量打折
+			if logistics_setting.Ppqzldz == 1 {
+				// 是不是指定实际重量打折
+				actual_weight = actual_weight * logistics_setting.Ppqzlzl
 			}
-			if (mid_length - width) < MIN_FLOAT_DIFF {
-				width = width * logistics_setting.Ppqzbzl
-			}
-			if (mid_length - height) < MIN_FLOAT_DIFF {
-				height = height * logistics_setting.Ppqzbzl
+
+			// 匹配前中边打折
+			if logistics_setting.Ppqzbdz == 1 {
+				var side_length_slice = sort.Float64Slice([]float64{length, width, height})
+				side_length_slice.Sort()
+				var mid_length = side_length_slice[1] // 0, 1, 2 中间那条边
+
+				const MIN_FLOAT_DIFF = 0.0000000001
+				if (mid_length - length) < MIN_FLOAT_DIFF {
+					length = length * logistics_setting.Ppqzbzl
+				}
+				if (mid_length - width) < MIN_FLOAT_DIFF {
+					width = width * logistics_setting.Ppqzbzl
+				}
+				if (mid_length - height) < MIN_FLOAT_DIFF {
+					height = height * logistics_setting.Ppqzbzl
+				}
 			}
 		}
 
@@ -538,6 +561,33 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 
 	if final_selected_mode_id == 0 || final_selected_fee_rate_id == 0 { // 匹配失败
 		return false
+	}
+
+	// 匹配后打折
+	{
+		// 匹配后重量打折
+		if logistics_setting.Pphzldz == 1 {
+			// 是不是指定实际重量打折
+			final_weight = final_weight * logistics_setting.Pphzlzl
+		}
+
+		// 匹配后中边打折
+		if logistics_setting.Pphzbdz == 1 {
+			var side_length_slice = sort.Float64Slice([]float64{final_length, final_width, final_height})
+			side_length_slice.Sort()
+			var mid_length = side_length_slice[1] // 0, 1, 2 中间那条边
+
+			const MIN_FLOAT_DIFF = 0.0000000001
+			if (mid_length - final_length) < MIN_FLOAT_DIFF {
+				final_length = final_length * logistics_setting.Pphzbzl
+			}
+			if (mid_length - final_width) < MIN_FLOAT_DIFF {
+				final_width = final_width * logistics_setting.Pphzbzl
+			}
+			if (mid_length - final_height) < MIN_FLOAT_DIFF {
+				final_height = final_height * logistics_setting.Pphzbzl
+			}
+		}
 	}
 
 	var address_id = p_order_logistics_data.order_shipping_address.Id
@@ -645,15 +695,14 @@ func get_order_products_whole_logistics_data(p_order_logistics_data *order_logis
 (完成，临时完成)9. 多数量或多产品，虽不缺货，但拆分订单发货，运费更便宜
 (完成，临时完成)10. 多数量或多产品，虽不缺货，但拆分订单发货，运费虽然便宜，但仓库拣货更方便
 11. 无法匹配物流（长宽高重量没有物流满足）
-(完成，这个检查应该放在 11 之前， 就是任何是有长宽高重量数据之前）12. 产品信息不全（长宽高重量不全或者有误）
+(12.完成，这个检查应该放在 11 之前， 就是任何是有长宽高重量数据之前）12. 产品信息不全（长宽高重量不全或者有误）
 13. 匹配最佳仓库及物流后订单亏损。需要在基础设置里面有设置亏损额或者亏损率的设置功能，超过设置范围了，自动到订单亏损hold
 (完成)14. 信封类。长宽高在35cm X 25cm X 2cm, 重量在0.5Kg以内的订单为信封。若是多数量或者多产品，以前我们设计的思路是，最大产品的长边为最长边，最大产品的中边为中边，所有产品的最小边之和为最小边，判断是否在35cm X 25cm X 2cm以内，重量之和是否在0.5Kg以内
 (完成)15. 快递类。需要在基础设置里面有 收到快递费金额的设置功能，比如收到的运费高于什么金额，视为快递。否则就算收了快递费也视为普通包裹
 (完成)16. 国际件。对于非澳大利亚的订单，直接到国际件模块
-17. 收货人信息不全的，比如没有手机号，没有邮编等等
+(完成)17. 收货人信息不全的，比如没有手机号，没有邮编等等
 
  */
 
 //todo: 地址特殊字段的问题，与最后匹配的最佳物流方式有关
 //todo: 体积重 实际重 比值的问题，可以继续关注，虽然感觉是理解的是对的，就是要确认
-//todo: 匹配前后打折的问题
