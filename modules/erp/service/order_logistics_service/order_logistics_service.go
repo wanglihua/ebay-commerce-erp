@@ -107,11 +107,6 @@ func (p_ol *OrderLogistics) Calculate(db_session *xorm.Session) {
 			continue
 		}
 
-		// 1 地址有特殊字段的
-		if p_ol.hold_check_address_special_word(&order, p_order_logistics_data, db_session) {
-			continue
-		}
-
 		// 2 有买家留言
 		if p_ol.hold_check_buyer_checkout_message(&order, db_session) {
 			continue
@@ -142,7 +137,17 @@ func (p_ol *OrderLogistics) Calculate(db_session *xorm.Session) {
 			continue
 		}
 
+		match_success, order_logistics_id := p_ol.match_logistics_mode(&order, p_order_logistics_data, db_session)
+
 		// 11 无法匹配物流（长宽高重量没有物流满足）
+		if p_ol.hold_check_no_match_logistics_mode(&order, match_success, db_session) {
+			continue
+		}
+
+		// 1 地址有特殊字段的， 因为要查看匹配的物流方式，所以就放在这里了
+		if p_ol.hold_check_address_special_word(&order, p_order_logistics_data, order_logistics_id, db_session) {
+			continue
+		}
 
 		// 12 产品信息不全（长宽高重量不全或者有误），这个检查应该放在任何使用长宽高重量数据的检查之前
 		if p_ol.hold_check_product_info_miss(&order, p_order_logistics_data, db_session) {
@@ -150,6 +155,9 @@ func (p_ol *OrderLogistics) Calculate(db_session *xorm.Session) {
 		}
 
 		// 13 匹配最佳仓库及物流后订单亏损。需要在基础设置里面有设置亏损额或者亏损率的设置功能，超过设置范围了，自动到订单亏损 hold
+		if p_ol.hold_check_great_deficit(&order, p_order_logistics_data, order_logistics_id, db_session) {
+			continue
+		}
 
 		// 14 判断是否是信件
 		if p_ol.hold_check_envelope(&order, p_order_logistics_data, db_session) {
@@ -173,7 +181,8 @@ func (p_ol *OrderLogistics) Calculate(db_session *xorm.Session) {
 
 // 1 地址有特殊字段的
 //todo: 这个还有问题的  1. 地址有特殊字段的。比如 PO BOX, LOCKER。但最佳物流非AU POST的，需要在基础设置里面有特殊字段设置功能
-func (p_ol *OrderLogistics) hold_check_address_special_word(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, db_session *xorm.Session) (is_hold_return bool) {
+func (p_ol *OrderLogistics) hold_check_address_special_word(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, order_logistics_id int64, db_session *xorm.Session) (is_hold_return bool) {
+	//todo: to complete
 	var has_address_special_word = false
 	for _, address_special_word := range p_ol.address_special_word_list_setting {
 		// 地址包含特殊字段
@@ -304,6 +313,14 @@ func (p_ol *OrderLogistics) hold_check_multi_product(p_order *models.OrderInfo, 
 }
 
 // 11 无法匹配物流（长宽高重量没有物流满足）
+func (p_ol *OrderLogistics) hold_check_no_match_logistics_mode(p_order *models.OrderInfo, match_success bool, db_session *xorm.Session) (is_hold_return bool) {
+	if match_success == false {
+		p_ol.update_order_to_hold_type(p_order, models.ORDER_HOLD_TYPE_LOGISTICS_NO_MATCH, db_session)
+		return true
+	}
+
+	return false
+}
 
 // 12 产品信息不全（长宽高重量不全或者有误）
 func (p_ol *OrderLogistics) hold_check_product_info_miss(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, db_session *xorm.Session) (is_hold_return bool) {
@@ -320,6 +337,15 @@ func (p_ol *OrderLogistics) hold_check_product_info_miss(p_order *models.OrderIn
 }
 
 // 13 匹配最佳仓库及物流后订单亏损。需要在基础设置里面有设置亏损额或者亏损率的设置功能，超过设置范围了，自动到订单亏损hold
+func (p_ol *OrderLogistics) hold_check_great_deficit(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, order_logistics_id int64, db_session *xorm.Session) (is_hold_return bool) {
+	//todo: to complete
+	if true {
+		p_ol.update_order_to_hold_type(p_order, models.ORDER_HOLD_TYPE_GREAT_DEFICIT, db_session)
+		return true
+	}
+
+	return false
+}
 
 // 14 信封类。长宽高在35cm X 25cm X 2cm, 重量在0.5Kg以内的订单为信封。若是多数量或者多产品，以前我们设计的思路是，最大产品的长边为最长边，最大产品的中边为中边，所有产品的最小边之和为最小边，判断是否在35cm X 25cm X 2cm以内，重量之和是否在0.5Kg以内
 func (p_ol *OrderLogistics) hold_check_envelope(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, db_session *xorm.Session) (is_hold_return bool) {
@@ -392,7 +418,7 @@ func (p_ol *OrderLogistics) update_order_to_hold_type(p_order *models.OrderInfo,
 	core.HandleError(err)
 }
 
-func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, db_session *xorm.Session) (success_return bool) {
+func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, db_session *xorm.Session) (success_return bool, order_logistics_id_return int64) {
 
 	// 在这里面只考虑最佳仓库的库存情况，次佳仓库有货的情况，别的地方已经考虑并 hold
 
@@ -559,7 +585,7 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 	} // for _, logistics_mode := range logistics_mode_list {
 
 	if final_selected_mode_id == 0 || final_selected_fee_rate_id == 0 { // 匹配失败
-		return false
+		return false, 0
 	}
 
 	// 现在的做法是，最后输出的匹配结果的数据，是受前后打折两者影响的。
@@ -620,7 +646,7 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 
 	// 多个商品时，能不能分仓库发货的？
 
-	return true
+	return true, order_logistics.Id
 }
 
 // 检查仓库是否有订单中的所有商品数量的库存
