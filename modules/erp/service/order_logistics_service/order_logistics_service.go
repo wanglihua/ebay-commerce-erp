@@ -189,13 +189,44 @@ func (p_ol *OrderLogistics) hold_check_address_special_word(p_order *models.Orde
 		address_special_word_lower_case := strings.ToLower(address_special_word)
 		address_detail_lower_case := strings.ToLower(fmt.Sprintf("%s %s", p_order_logistics_data.order_shipping_address.Street1, p_order_logistics_data.order_shipping_address.Street2))
 		if strings.Index(address_detail_lower_case, address_special_word_lower_case) != -1 {
-			p_ol.update_order_to_hold_type(p_order, models.ORDER_HOLD_TYPE_SPECIAL_ADDRESS, db_session)
 			has_address_special_word = true
 			break
 		}
 	}
 
-	return has_address_special_word
+	if has_address_special_word == true {
+		// 检查匹配的物流方式对应的物流公司是不是 需要考虑 地址特殊字段的
+		var address_special_word struct {
+			AddressSpecialWord int64 `xorm:"'address_special_word'"`
+		}
+
+		/*
+	SELECT
+		lc.address_special_word
+	FROM erp_order_logistics ol
+		INNER JOIN erp_logistics_mode lm ON lm.id = ol.mode_id
+		INNER JOIN erp_logistics_company lc ON lc.id = lm.company_id
+	WHERE ol.id = 1
+		 */
+
+		sql := `SELECT
+		lc.address_special_word
+	FROM erp_order_logistics ol
+		INNER JOIN erp_logistics_mode lm ON lm.id = ol.mode_id
+		INNER JOIN erp_logistics_company lc ON lc.id = lm.company_id
+	WHERE ol.id = %d`
+		sql = fmt.Sprintf(sql, order_logistics_id)
+
+		_, err := db_session.Sql(sql).Get(&address_special_word)
+		core.HandleError(err)
+
+		if address_special_word.AddressSpecialWord == 0 { // 地址有特殊字段的。比如 PO BOX, LOCKER。但最佳物流   “ 非“   AU POST的，需要在基础设置里面有特殊字段设置功能
+			p_ol.update_order_to_hold_type(p_order, models.ORDER_HOLD_TYPE_SPECIAL_ADDRESS, db_session)
+			return true
+		}
+	}
+
+	return false
 }
 
 // 2 有买家留言
