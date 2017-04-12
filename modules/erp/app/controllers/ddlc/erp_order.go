@@ -128,8 +128,13 @@ func (c ErpOrder) ListData() revel.Result {
 		status_id = models.ORDER_STATUS_YWC
 	}
 
+	var status_id_query int64 = 0 // 下拉框里面的状态，不是通过 Url 里面来的
 	// 再看查询条件里面的状态分类
-	c.Params.Bind(&status_id, "status_id") //查询条件的status_id，比url里面换算过来的status_id更为优先
+	c.Params.Bind(&status_id_query, "status_id") //查询条件的status_id，比url里面换算过来的status_id更为优先
+
+	if status_id_query != 0 { // 只有在下拉框的状态为零的时候，下拉框才起作用
+		status_id = status_id_query
+	}
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
