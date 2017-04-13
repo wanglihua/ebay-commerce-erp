@@ -579,10 +579,14 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 		for _, logistics_fee_rate := range logistics_fee_rate_list {
 			// 邮编要对上
 			if strings.TrimSpace(p_order_logistics_data.order_shipping_address.PostalCode) == strings.TrimSpace(logistics_fee_rate.Postcode) {
-				var fee = logistics_fee_rate.Qbj + math.Ceil((final_weight_in_mode-logistics_fee_rate.Qbjzl)/logistics_fee_rate.Xzjt)*logistics_fee_rate.Xzjtsf
-				// 计算最低费用的时候，还不考虑偏远地区的费用的吧
+				var fee float64 =  logistics_fee_rate.Qbj //起步价
+				if final_weight_in_mode-logistics_fee_rate.Qbjzl > 0 { //如果超过了起步重量，就算超过部分的费率；不超过，就不用算了
+					fee = math.Ceil((final_weight_in_mode-logistics_fee_rate.Qbjzl)/logistics_fee_rate.Xzjt)*logistics_fee_rate.Xzjtsf
+				}
+				// 计算最低费用的时候，还不考虑偏远地区的费用
 				fee = math.Max(fee, logistics_fee_rate.Zdsf) //有最低收费
 
+				// 偏远地区
 				if logistics_fee_rate.Sfpydq == 1 {
 					fee = fee + logistics_fee_rate.Pydqjsyf
 				}
