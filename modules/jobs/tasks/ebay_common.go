@@ -196,6 +196,8 @@ func fetch_product_item_to_db(config models.EBayAPIConfigInfo, db_session *xorm.
 		core.HandleError(err)
 	}
 
+	//todo: ebay_common.go:198: Error 1364: Field 'length' doesn't have a default value 错误来之服务器日志
+
 	// product store item begin
 
 	var product_store_item models.ProductStoreItemInfo

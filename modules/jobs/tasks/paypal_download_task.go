@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"runtime/debug"
 	"strings"
 	"time"
 
@@ -26,6 +27,7 @@ func (t PaypalDownloadTask) Run() {
 	defer func() {
 		if err := recover(); err != nil {
 			revel.ERROR.Printf("下载PayPal账单出现错误： %s\n", err)
+			revel.ERROR.Println(string(debug.Stack()))
 		}
 	}()
 

@@ -4,6 +4,7 @@ import (
 	"encoding/xml"
 	"fmt"
 	"io/ioutil"
+	"runtime/debug"
 	"strings"
 	"time"
 
@@ -79,6 +80,7 @@ func (t EBayMessageDownloadTask) Run() {
 	defer func() {
 		if err := recover(); err != nil {
 			revel.ERROR.Printf("下载消息出现错误： %s\n", err)
+			revel.ERROR.Println(string(debug.Stack()))
 		}
 	}()
 
@@ -136,7 +138,26 @@ func (t EBayMessageDownloadTask) Run() {
 					ProductId  int64 `xorm:"'product_id'"`
 					ProductSku string `xorm:"'product_sku'"`
 				}
-				has_item_product, err := db_session.Sql(fmt.Sprintf("SELECT p.id AS product_id, p.sku AS product_sku FROM erp_product p WHERE p.item_id = '%s'", message_download.Item.ItemId)).Get(&product_result)
+
+				/*
+SELECT
+    p.id  AS product_id,
+    p.sku AS product_sku
+FROM
+    erp_product_store_item psi
+    INNER JOIN erp_product p ON p.id = psi.product_id
+WHERE psi.item_id = '123';
+				 */
+
+				sql := `SELECT
+    p.id  AS product_id,
+    p.sku AS product_sku
+FROM
+    erp_product_store_item psi
+    INNER JOIN erp_product p ON p.id = psi.product_id
+WHERE psi.item_id = '%s'`
+
+				has_item_product, err := db_session.Sql(fmt.Sprintf(sql, message_download.Item.ItemId)).Get(&product_result)
 				core.HandleError(err)
 
 				product_id := product_result.ProductId
@@ -184,6 +205,8 @@ func (t EBayMessageDownloadTask) Run() {
 				message_in_db.SenderId = message_download.Question.SenderId
 				message_in_db.Subject = message_download.Question.Subject
 				message_in_db.Body = message_download.Question.Body
+
+				// ebay_message_download_task.go:206: Error 1406: Data too long for column 'body' at row 1 错误来之服务器日志
 
 				if has_message == true {
 					// do update

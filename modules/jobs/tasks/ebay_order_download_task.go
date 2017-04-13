@@ -4,6 +4,7 @@ import (
 	"encoding/xml"
 	"fmt"
 	"io/ioutil"
+	"runtime/debug"
 	"strings"
 	"time"
 
@@ -84,8 +85,11 @@ func (t EBayOrderDownloadTask) Run() {
 	defer func() {
 		if err := recover(); err != nil {
 			revel.ERROR.Printf("下载订单出现错误： %s\n", err)
+			revel.ERROR.Println(string(debug.Stack()))
 		}
 	}()
+
+	//todo: ebay_order_download_task.go:86: 下载订单出现错误： Error 1364: Field 'express_fee' doesn't have a default value 错误来之服务器日志
 
 	job_time_begin := time.Now()
 

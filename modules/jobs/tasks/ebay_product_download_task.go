@@ -4,6 +4,7 @@ import (
 	"encoding/xml"
 	"fmt"
 	"io/ioutil"
+	"runtime/debug"
 	"time"
 
 	"github.com/franela/goreq"
@@ -67,6 +68,7 @@ func (t EBayProductDownloadTask) Run() {
 	defer func() {
 		if err := recover(); err != nil {
 			revel.ERROR.Printf("下载商品出现错误： %s\n", err)
+			revel.ERROR.Println(string(debug.Stack()))
 		}
 	}()
 
