@@ -382,7 +382,7 @@ func (p_ol *OrderLogistics) hold_check_great_deficit(p_order *models.OrderInfo, 
 
 // 14 信封类。长宽高在35cm X 25cm X 2cm, 重量在0.5Kg以内的订单为信封。若是多数量或者多产品，以前我们设计的思路是，最大产品的长边为最长边，最大产品的中边为中边，所有产品的最小边之和为最小边，判断是否在35cm X 25cm X 2cm以内，重量之和是否在0.5Kg以内
 func (p_ol *OrderLogistics) hold_check_envelope(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, db_session *xorm.Session) (is_hold_return bool) {
-	// 这里假定信封的长宽高限制： 长 > 宽 > 高
+	// 这里假定信封的长宽高限制： 长 > 宽 > 高，不能这么假定
 
 	var envelope_max_length = p_ol.logistics_setting.EnvelopeMaxLength
 	var envelope_max_width = p_ol.logistics_setting.EnvelopeMaxWidth
@@ -393,6 +393,14 @@ func (p_ol *OrderLogistics) hold_check_envelope(p_order *models.OrderInfo, p_ord
 	if envelope_max_length == 0 || envelope_max_width == 0 || envelope_max_height == 0 || envelope_max_weight == 0 {
 		return false
 	}
+
+	// 进行长宽高的排序，结果中 长 > 宽 > 高
+	var envelope_side_length_slice = sort.Float64Slice([]float64{envelope_max_length, envelope_max_weight, envelope_max_height})
+	envelope_side_length_slice.Sort()
+	envelope_max_length = envelope_side_length_slice[2] // 最长
+	envelope_max_weight = envelope_side_length_slice[1]
+	envelope_max_height = envelope_side_length_slice[0] // 最短
+
 
 	// get_order_products_whole_logistics_data的输出中 长 > 宽 > 高
 	var whole_length, whole_width, whole_height, _, whole_weight float64 = get_order_products_whole_logistics_data(p_order_logistics_data, 0)
