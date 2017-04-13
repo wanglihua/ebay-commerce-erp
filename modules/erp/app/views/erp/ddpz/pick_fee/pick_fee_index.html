@@ -1,0 +1,178 @@
+{%header "拣货费用" .%}
+<div id="page">
+    <div class="breadcrumbs" id="breadcrumbs">
+        <ul class="breadcrumb">
+            <li>
+                <a href='{%url "Home.Index"%}'><i class="ace-icon fa fa-home home-icon"></i></a>
+            </li>
+            <li class="parent" data-menu="ddpz-menu">订单配置</li>
+            <li class="active" data-menu="ddpz-pickfee-menu">拣货费用</li>
+        </ul>
+    </div>
+    <div class="page-content">
+        <div class="row">
+            <div class="col-xs-12" style="padding: 0;">
+                <div class="gridToolBar clearfix">
+                    <button class="btn btn-primary btn-sm" onclick="loadPickFeeDetail()">
+                        <i class="ace-icon fa fa-refresh"></i>
+                        刷新
+                    </button>
+                    <button class="btn btn-success btn-sm" @click="savePickFee()">
+                        <i class="ace-icon fa fa-floppy-o"></i>
+                        保存
+                    </button>
+                </div>
+                <div>
+                    <div class="widget-box" style="border-style:none;width:780px; ">
+                        <div class="widget-body">
+                            <div class="widget-main">
+                                <form class="form-horizontal" role="form" id="pickFeeDetailForm">
+                                    <input id="pick_fee_id" name="detail.pick_fee.id" type="hidden" v-model.number="detail.pick_fee.id"/>
+                                    <input id="pick_fee_version" name="detail.pick_fee.version" type="hidden" v-model.number="detail.pick_fee.version"/>
+                                    <div class="row">
+                                        <div class="col-xs-6">
+                                            <div class="form-group">
+                                                <label for="fee1" class="col-xs-2 control-label">5Kg以下</label>
+                                                <div class="col-xs-10">
+                                                    <input id="fee1" name="detail.pick_fee.fee1" type="text" class="input-sm form-control" v-model.number="detail.pick_fee.fee1"/>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-xs-6">
+                                            <div class="form-group">
+                                                <label for="fee2" class="col-xs-2 control-label">5.1KG-10KG</label>
+                                                <div class="col-xs-10">
+                                                    <input id="fee2" name="detail.pick_fee.fee2" type="text" class="input-sm form-control" v-model.number="detail.pick_fee.fee2"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-xs-6">
+                                            <div class="form-group">
+                                                <label for="fee3" class="col-xs-2 control-label">10.1KG-25KG</label>
+                                                <div class="col-xs-10">
+                                                    <input id="fee3" name="detail.pick_fee.fee3" type="text" class="input-sm form-control" v-model.number="detail.pick_fee.fee3"/>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-xs-6">
+                                            <div class="form-group">
+                                                <label for="fee4" class="col-xs-2 control-label">25.1KG-50KG</label>
+                                                <div class="col-xs-10">
+                                                    <input id="fee4" name="detail.pick_fee.fee4" type="text" class="input-sm form-control" v-model.number="detail.pick_fee.fee4"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-xs-6">
+                                            <div class="form-group">
+                                                <label for="fee5" class="col-xs-2 control-label">50.1KG以上</label>
+                                                <div class="col-xs-10">
+                                                    <input id="fee5" name="detail.pick_fee.fee5" type="text" class="input-sm form-control" v-model.number="detail.pick_fee.fee5"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-xs-6"></div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+<script type="text/javascript">
+    function loadPickFeeDetail(this_vm) {
+        showMask("加载中...");
+        $("#pickFeeDetailForm").clearValidation();
+        $.ajax({
+                url: '{%url "ErpPickFee.DetailData" %}',
+                type: "POST",
+                success: function (result) {
+                    hideMask();
+                    if (result.success == false) {
+                        $.msg.error(result.message);
+                        return;
+                    }
+                    if (this_vm === void(0) || this_vm.detail === void(0)) {
+                        vm.detail = result;
+                    }
+                    else {
+                        this_vm.detail = result;
+                    }
+                }
+            }
+        );
+    }
+
+    var vm = new Vue({
+        el: "#page",
+        data: {
+            "detail": {
+                "pick_fee": {}
+            }
+        },
+        mounted: function () {
+            loadPickFeeDetail(this);
+        },
+        methods: {
+            savePickFee: function () {
+                showMask("提交中...");
+                var form = $("#pickFeeDetailForm");
+                var valid = validate(form, {
+                    'detail.pick_fee.fee1': {
+                        required: true, number: true
+                    },
+                    'detail.pick_fee.fee2': {
+                        required: true, number: true
+                    },
+                    'detail.pick_fee.fee3': {
+                        required: true, number: true
+                    },
+                    'detail.pick_fee.fee4': {
+                        required: true, number: true
+                    },
+                    'detail.pick_fee.fee5': {
+                        required: true, number: true
+                    }
+                });
+
+                if (!valid) {
+                    hideMask();
+                } else {
+                    $.ajax({
+                            url: '{%url "ErpPickFee.Save"%}',
+                            type: "POST",
+                            processData: false,
+                            contentType: 'application/json',
+                            data: JSON.stringify(vm.detail),
+                            success: function (data) {
+                                hideMask();
+                                if (data.success == false) {
+                                    $.msg.error(data.message);
+                                    //return;
+                                }
+                                else {
+                                    $.msg.show(data.message);
+                                    vm.reloadList();
+                                    //return;
+                                }
+                            }
+                        }
+                    );
+                }
+            }
+        }
+    });
+</script>
+{%footer%}
+

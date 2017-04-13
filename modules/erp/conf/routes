@@ -303,6 +303,10 @@ GET  /erp/logistics/setting                    ErpLogisticsSetting.Index
 POST /erp/logistics/setting/data/detail        ErpLogisticsSetting.DetailData
 POST /erp/logistics/setting/save               ErpLogisticsSetting.Save
 
+GET  /erp/pick/fee                             ErpPickFee.Index
+POST /erp/pick/fee/data/detail                 ErpPickFee.DetailData
+POST /erp/pick/fee/save                        ErpPickFee.Save
+
 GET  /erp/purchase/bill                        ErpPurchaseBill.Index
 POST /erp/purchase/bill/data/list              ErpPurchaseBill.ListData
 POST /erp/purchase/bill/data/detail            ErpPurchaseBill.DetailData
