@@ -265,9 +265,11 @@ GET  /erp/person/sales/report                  ErpPersonSalesReport.Index
 POST /erp/order/data/page                      ErpOrder.PageData
 POST /erp/order/data/list                      ErpOrder.ListData
 
+# 可合并订单
 GET  /erp/order/khb                            ErpOrderKhb.Index
 GET  /erp/order/hold                           ErpOrderHold.Index
-GET  /erp/order/:status                        ErpOrder.Index
+# 这个路由应该放到最后去，否则放在他后面的有的路由会不工作
+# GET  /erp/order/:status                        ErpOrder.Index
 GET  /erp/order/detail/:order_id               ErpOrder.Detail
 POST /erp/order/data/detail                    ErpOrder.DetailData
 POST /erp/order/paypal/shipping/address        ErpOrder.GetPaypalShippingAddress
@@ -278,6 +280,12 @@ POST /erp/order/paypal/shipping/address        ErpOrder.GetPaypalShippingAddress
 # GET  /erp/order/yfh                            ErpOrderYfh.Index
 # GET  /erp/order/ywc                            ErpOrderYwc.Index
 # GET  /erp/order/khb                            ErpOrderKhb.Index
+
+GET  /erp/order/logistics                      ErpOrderLogistics.Index
+POST /erp/order/logistics/data/list            ErpOrderLogistics.ListData
+POST /erp/order/logistics/data/detail          ErpOrderLogistics.DetailData
+POST /erp/order/logistics/save                 ErpOrderLogistics.Save
+POST /erp/order/logistics/delete               ErpOrderLogistics.Delete
 
 GET  /erp/ecommerce/platform                   ErpECommercePlatform.Index
 POST /erp/ecommerce/platform/data/list         ErpECommercePlatform.ListData
@@ -330,3 +338,6 @@ POST /erp/message/data/list                  ErpMessage.ListData
 GET  /erp/schedule/task                      ErpScheduleTask.Index
 POST /erp/schedule/task/data                 ErpScheduleTask.TaskData
 POST /erp/schedule/task/history/data         ErpScheduleTask.HistoryData
+
+# 这个通用的路由应该放到最后比较合适，否则放在他后面的有的路由会不工作
+GET  /erp/order/:status                        ErpOrder.Index

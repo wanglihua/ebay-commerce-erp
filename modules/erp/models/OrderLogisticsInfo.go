@@ -7,9 +7,11 @@ import (
 type OrderLogisticsInfo struct {
 	Id         int64        `xorm:"bigint notnull pk autoincr 'id'" json:"id"`
 	OrderId    int64        `xorm:"bigint notnull index 'order_id'" json:"order_id" smith:"verbose_name=订单"`
-	AddressId  int64        `xorm:"bigint notnull index 'address_id'" json:"address_id" smith:"verbose_name=物流地址"`   // OrderShippingAddressInfo 的主键
-	ModeId     int64        `xorm:"bigint notnull index 'mode_id'" json:"mode_id" smith:"verbose_name=物流方式"`         // LogisticsModeInfo  的主键，这个表里面包含了 发货仓库Id 等的信息，也包含了 物流公司Id 等的信息
-	FeeRateId  int64        `xorm:"bigint notnull index 'fee_rate_id'" json:"fee_rate_id" smith:"verbose_name=物流费率"` // LogisticsFeeRateInfo  的主键
+	AddressId  int64        `xorm:"bigint notnull index 'address_id'" json:"address_id" smith:"verbose_name=物流地址"`   // OrderShippingAddressInfo 的主键，手工创建可能为空
+	CompanyId  int64        `xorm:"bigint notnull index 'company_id'" json:"company_id" smith:"verbose_name=物流公司"`   // 物流公司Id 等的信息，如果手工建的物流信息，这个字段是通过下拉框选择的
+	StockId    int64        `xorm:"bigint notnull index 'stock_id'" json:"stock_id" smith:"verbose_name=发货仓库"`       // 发货仓库，仓库的主键
+	ModeId     int64        `xorm:"bigint notnull index 'mode_id'" json:"mode_id" smith:"verbose_name=物流方式"`         // LogisticsModeInfo  的主键，这个表里面也包含了 发货仓库Id， 物流公司Id 等的信息，手工创建可能为空
+	FeeRateId  int64        `xorm:"bigint notnull index 'fee_rate_id'" json:"fee_rate_id" smith:"verbose_name=物流费率"` // LogisticsFeeRateInfo  的主键， 手工创建可能为空
 	Length     float64      `xorm:"float notnull 'length'" json:"length" smith:"verbose_name=长度,min=0"`              // cm
 	Width      float64      `xorm:"float notnull 'width'" json:"width" smith:"verbose_name=宽度,min=0"`                // cm
 	Height     float64      `xorm:"float notnull 'height'" json:"height" smith:"verbose_name=高度,min=0"`              // cm

@@ -1,0 +1,168 @@
+package controllers
+
+import (
+	"encoding/json"
+	"strconv"
+	"github.com/revel/revel"
+
+	"matrix/core"
+	"matrix/modules/erp/models"
+)
+
+type ErpOrderLogistics struct {
+	*revel.Controller
+}
+
+func (c ErpOrderLogistics) Index() revel.Result {
+	return c.RenderTemplate("erp/ddlc/order_logistics/order_logistics_index.html")
+}
+
+func (c ErpOrderLogistics) ListData() revel.Result {
+	db_session := c.DbSession
+
+	type order_logistics_view_item_t struct {
+		models.OrderLogisticsInfo    `xorm:"extends" json:"ol"`
+		models.OrderInfo             `xorm:"extends" json:"o"`
+		models.StockInfo             `xorm:"extends" json:"s"`
+		models.LogisticsCompanyInfo  `xorm:"extends" json:"lc"`
+	}
+
+	/*
+SELECT
+    ol.*, o.*, s.*, lc.*
+FROM erp_order_logistics ol
+    INNER JOIN erp_order o ON o.id = ol.order_id
+    INNER JOIN erp_stock s ON s.id = ol.stock_id
+    INNER JOIN erp_logistics_company lc ON lc.id = ol.company_id
+	 */
+
+	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
+
+	var sb = core.NewSqlBuilder()
+	sb.Select("ol.*, o.*, s.*, lc.*")
+	sb.Count("count(ol.id) AS order_logistics_count")
+	sb.From(`erp_order_logistics ol
+    INNER JOIN erp_order o ON o.id = ol.order_id
+    INNER JOIN erp_stock s ON s.id = ol.stock_id
+    INNER JOIN erp_logistics_company lc ON lc.id = ol.company_id`)
+	sb.Where(filter)
+
+	//query extra filter here
+
+	if order != "" {
+		sb.OrderBy(order)
+	} else {
+		sb.OrderBy("id ASC")
+	}
+
+	sb.Limit(offset, limit)
+
+	order_logistics_list := make([]order_logistics_view_item_t, 0, limit)
+	err := db_session.Sql(sb.SqlList()).Find(&order_logistics_list)
+	core.HandleError(err)
+
+	var order_logistics_count struct {
+		Count int64 `xorm:"'order_logistics_count'"`
+	}
+	_, err = db_session.Sql(sb.SqlCount()).Get(&order_logistics_count)
+	core.HandleError(err)
+
+	return c.RenderJson(core.GridResult{
+		Data:  order_logistics_list,
+		Total: order_logistics_count.Count,
+	})
+}
+
+type OrderLogisticsDetailForm struct {
+	OrderLogistics models.OrderLogisticsInfo `json:"order_logistics"`
+}
+
+func (f *OrderLogisticsDetailForm) IsCreate() bool {
+	return f.OrderLogistics.Id == 0
+}
+
+func (f *OrderLogisticsDetailForm) Valid(validation *revel.Validation) bool {
+	validation.Required(f.OrderLogistics.OrderId).Message("订单不能为空！")
+
+	validation.Required(f.OrderLogistics.AddressId).Message("物流地址不能为空！")
+
+	validation.Required(f.OrderLogistics.ModeId).Message("物流方式不能为空！")
+
+	validation.Required(f.OrderLogistics.FeeRateId).Message("物流费率不能为空！")
+
+	validation.Required(f.OrderLogistics.Length).Message("长度不能为空！")
+
+	validation.Required(f.OrderLogistics.Width).Message("宽度不能为空！")
+
+	validation.Required(f.OrderLogistics.Height).Message("高度不能为空！")
+
+	validation.Required(f.OrderLogistics.Weight).Message("重量不能为空！")
+
+	validation.Required(f.OrderLogistics.TotalFee).Message("物流费用不能为空！")
+
+	validation.Required(f.OrderLogistics.ActualFee).Message("实际费用不能为空！")
+
+	return validation.HasErrors() == false
+}
+
+func (c ErpOrderLogistics) DetailData() revel.Result {
+	db_session := c.DbSession
+
+	var order_logistics_id int64
+	c.Params.Bind(&order_logistics_id, "id")
+
+	var order_logistics models.OrderLogisticsInfo
+	if order_logistics_id != 0 {
+		has, err := db_session.Id(order_logistics_id).Get(&order_logistics)
+		core.HandleError(err)
+		if has == false {
+			return c.RenderJson(core.JsonResult{Success: false, Message: "指定的订单物流不存在！"})
+		}
+	}
+
+	var detail_form OrderLogisticsDetailForm
+	detail_form.OrderLogistics = order_logistics
+
+	return c.RenderJson(detail_form)
+}
+
+func (c ErpOrderLogistics) Save() revel.Result {
+	db_session := c.DbSession
+
+	var detail_form OrderLogisticsDetailForm
+	err := json.Unmarshal(c.GetRequestBody(), &detail_form)
+	core.HandleError(err)
+
+	if detail_form.Valid(c.Validation) == false {
+		return c.RenderJson(core.JsonResult{Success: false, Message: c.GetValidationErrorMessage()})
+	}
+
+	order_logistics := detail_form.OrderLogistics
+
+	var affected int64
+	if detail_form.IsCreate() {
+		affected, err = db_session.Insert(&order_logistics)
+		core.HandleError(err)
+	} else {
+		affected, err = db_session.Id(order_logistics.Id).Update(&order_logistics)
+		core.HandleError(err)
+
+		if affected == 0 {
+			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！" })
+		}
+	}
+
+	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据保存成功!"})
+}
+
+func (c ErpOrderLogistics) Delete() revel.Result {
+	db_session := c.DbSession
+
+	order_logistics_id_list := make([]int64, 0)
+	c.Params.Bind(&order_logistics_id_list, "id_list")
+
+	affected, err := db_session.In("id", order_logistics_id_list).Delete(new(models.OrderLogisticsInfo))
+	core.HandleError(err)
+
+	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})
+}

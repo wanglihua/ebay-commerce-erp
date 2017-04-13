@@ -271,6 +271,9 @@ func (c ErpLogisticsFeeRate) Import() revel.Result {
 		for row_index := 1; row_index < max_row; row_index ++ {
 			row := sheet.Rows[row_index]
 
+			revel.TRACE.Println("row_index:", row_index)
+			revel.Dump(row_index)
+
 			var cell *xlsx.Cell
 			var cell_val string
 			var err error
@@ -278,6 +281,10 @@ func (c ErpLogisticsFeeRate) Import() revel.Result {
 			var logistics_fee_rate logistics_fee_rate_import_t
 
 			col_index := 0
+
+			if len(row.Cells) == 0 {
+				break;
+			}
 
 			// 物流公司名称
 			cell = row.Cells[col_index]
@@ -355,11 +362,13 @@ func (c ErpLogisticsFeeRate) Import() revel.Result {
 			col_index++
 
 			// 偏远地区加收运费(澳币)
-			cell = row.Cells[col_index]
-			cell_val, err = cell.String()
-			core.HandleError(err)
-			cell_val = strings.TrimSpace(cell_val)
-			logistics_fee_rate.LogisticsFeeRate.Pydqjsyf, _ = strconv.ParseFloat(cell_val, 64)
+			if col_index+1 < len(row.Cells) {
+				cell = row.Cells[col_index]
+				cell_val, err = cell.String()
+				core.HandleError(err)
+				cell_val = strings.TrimSpace(cell_val)
+				logistics_fee_rate.LogisticsFeeRate.Pydqjsyf, _ = strconv.ParseFloat(cell_val, 64)
+			}
 			col_index++
 
 			logistics_fee_rate_list = append(logistics_fee_rate_list, logistics_fee_rate)

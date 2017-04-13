@@ -180,7 +180,6 @@ func (p_ol *OrderLogistics) Calculate(db_session *xorm.Session) {
 }
 
 // 1 地址有特殊字段的
-//todo: 这个还有问题的  1. 地址有特殊字段的。比如 PO BOX, LOCKER。但最佳物流非AU POST的，需要在基础设置里面有特殊字段设置功能
 func (p_ol *OrderLogistics) hold_check_address_special_word(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, order_logistics_id int64, db_session *xorm.Session) (is_hold_return bool) {
 	var has_address_special_word = false
 	for _, address_special_word := range p_ol.address_special_word_list_setting {
@@ -224,7 +223,7 @@ func (p_ol *OrderLogistics) hold_check_address_special_word(p_order *models.Orde
 			return true
 		}
 	}
-
+	// 不符合 地址有特殊字段的，但最佳物流 “ 非“ AU POST的
 	return false
 }
 
@@ -294,7 +293,7 @@ type fun_stock_type_filter_t func(stock_type_id int64) bool
 
 // 订单商品库存检查，用户给5和6的调用
 func (p_ol *OrderLogistics) hold_check_oss(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, fun_stock_type_filter fun_stock_type_filter_t, db_session *xorm.Session) (is_oss_return bool) {
-	//todo: 暂时理解成是，所有商品，所有仓库(中国仓除外)都缺货。这里的缺货也理解成是，没有一个仓库能凑齐所以商品的所有数量
+	//todo: 暂时理解成是，所有商品，所有仓库(中国仓除外)都缺货。这里的缺货也理解成是，没有一个仓库能凑齐所有商品的所有数量
 	var products_stock_qty_list = p_order_logistics_data.products_stock_qty_list
 
 	// 找出所有包含这些商品库存的仓库id列表
@@ -366,7 +365,7 @@ func (p_ol *OrderLogistics) hold_check_product_info_miss(p_order *models.OrderIn
 	return false
 }
 
-// 13 匹配最佳仓库及物流后订单亏损。需要在基础设置里面有设置亏损额或者亏损率的设置功能，超过设置范围了，自动到订单亏损hold
+// 13 //todo: 匹配最佳仓库及物流后订单亏损。需要在基础设置里面有设置亏损额或者亏损率的设置功能，超过设置范围了，自动到订单亏损hold
 func (p_ol *OrderLogistics) hold_check_great_deficit(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, order_logistics_id int64, db_session *xorm.Session) (is_hold_return bool) {
 	//todo: to complete
 	if true {
@@ -468,6 +467,8 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 	var logistics_mode_list = p_ol.logistics_mode_list
 	var logistics_fee_rate_map = p_ol.logistics_fee_rate_map
 
+	var final_selected_company_id int64 = 0
+	var final_selected_stock_id int64 = 0
 	var final_selected_mode_id int64 = 0
 	var final_selected_fee_rate_id int64 = 0
 	var final_total_fee float64 = 100000; // 最终的物流费用，初始化为一个很大的不可能的值，澳币
@@ -579,9 +580,9 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 		for _, logistics_fee_rate := range logistics_fee_rate_list {
 			// 邮编要对上
 			if strings.TrimSpace(p_order_logistics_data.order_shipping_address.PostalCode) == strings.TrimSpace(logistics_fee_rate.Postcode) {
-				var fee float64 =  logistics_fee_rate.Qbj //起步价
+				var fee float64 = logistics_fee_rate.Qbj //起步价
 				if final_weight_in_mode-logistics_fee_rate.Qbjzl > 0 { //如果超过了起步重量，就算超过部分的费率；不超过，就不用算了
-					fee = math.Ceil((final_weight_in_mode-logistics_fee_rate.Qbjzl)/logistics_fee_rate.Xzjt)*logistics_fee_rate.Xzjtsf
+					fee = math.Ceil((final_weight_in_mode-logistics_fee_rate.Qbjzl)/logistics_fee_rate.Xzjt) * logistics_fee_rate.Xzjtsf
 				}
 				// 计算最低费用的时候，还不考虑偏远地区的费用
 				fee = math.Max(fee, logistics_fee_rate.Zdsf) //有最低收费
@@ -608,6 +609,8 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 
 		if total_fee_in_mode < final_total_fee { // 取得更优的模式方案
 			final_selected_fee_rate_id = selected_fee_rate_id_in_mode
+			final_selected_company_id = logistics_mode.CompanyId
+			final_selected_stock_id = logistics_mode.StockId
 			final_selected_mode_id = logistics_mode.Id
 			final_total_fee = total_fee_in_mode
 
@@ -660,6 +663,8 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 
 	order_logistics.OrderId = p_order.Id
 	order_logistics.AddressId = address_id
+	order_logistics.CompanyId = final_selected_company_id
+	order_logistics.StockId = final_selected_stock_id
 	order_logistics.ModeId = final_selected_mode_id
 	order_logistics.FeeRateId = final_selected_fee_rate_id
 	order_logistics.Length = final_length
