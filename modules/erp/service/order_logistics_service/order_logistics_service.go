@@ -13,6 +13,8 @@ import (
 	"matrix/core/collections"
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/exchange_rate_service"
+	"matrix/modules/erp/service/logistics_fee_rate_service"
+	"matrix/modules/erp/service/logistics_mode_service"
 	"matrix/modules/erp/service/logistics_setting_service"
 	"matrix/modules/erp/service/order_service"
 	"matrix/modules/erp/service/pick_fee_service"
@@ -60,15 +62,12 @@ func (p_ol *OrderLogistics) init_data(db_session *xorm.Session) {
 	// 加载 物流方式 和 物流费率
 
 	// 加载 物流方式
-	var logistics_mode_list = make([]models.LogisticsModeInfo, 0)
-	err = db_session.Find(&logistics_mode_list)
-	core.HandleError(err)
-	p_ol.logistics_mode_list = logistics_mode_list
+	// 只加载 物流公司处于启用状态的物流方式
+	p_ol.logistics_mode_list = logistics_mode_service.Get_logistics_mode_enabled(db_session)
 
 	// 加载 物流费率
-	var logistics_fee_rate_all_list = make([]models.LogisticsFeeRateInfo, 0)
-	err = db_session.Find(&logistics_fee_rate_all_list)
-	core.HandleError(err)
+	// 只加载 物流公司处于启用状态的复溜费率
+	var logistics_fee_rate_all_list = logistics_fee_rate_service.Get_logistics_fee_rate_enabled(db_session)
 
 	var logistics_fee_rate_map = make(map[int64][]models.LogisticsFeeRateInfo)
 	for _, logistics_fee_rate := range logistics_fee_rate_all_list {
