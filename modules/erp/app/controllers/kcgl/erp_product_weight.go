@@ -9,6 +9,7 @@ import (
 	"github.com/tealeg/xlsx"
 	"matrix/core"
 	"matrix/modules/erp/models"
+	"strings"
 )
 
 type ErpProductWeight struct {
@@ -183,10 +184,18 @@ func (c ErpProductWeight) Import() revel.Result {
 
 			col_index := 1 //从第二列开始导入，略去第一列的编号
 
+			if len(row.Cells) == 0 {
+				break
+			}
+
 			//SKU
 			cell = row.Cells[col_index]
 			cell_val, err = cell.String()
 			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
+			if cell_val == "" {
+				break
+			}
 			//revel.TRACE.Println(cell_val)
 			product_weight.sku = cell_val
 			col_index++

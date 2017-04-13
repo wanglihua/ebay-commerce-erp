@@ -8,6 +8,7 @@ import (
 	"github.com/tealeg/xlsx"
 	"matrix/core"
 	"matrix/modules/erp/models"
+	"strings"
 )
 
 type ErpProductImport struct {
@@ -85,12 +86,20 @@ func (c ErpProductImport) Import() revel.Result {
 			var err error
 			col_index := 0
 
+			if len(row.Cells) == 0 {
+				break
+			}
+
 			var product_import models.ProductImportInfo
 
 			//SKU
 			cell = row.Cells[col_index]
 			cell_val, err = cell.String()
 			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
+			if cell_val == "" {
+				break
+			}
 			//revel.TRACE.Println(cell_val)
 			product_import.Sku = cell_val
 			col_index++

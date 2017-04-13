@@ -271,9 +271,6 @@ func (c ErpLogisticsFeeRate) Import() revel.Result {
 		for row_index := 1; row_index < max_row; row_index ++ {
 			row := sheet.Rows[row_index]
 
-			revel.TRACE.Println("row_index:", row_index)
-			revel.Dump(row_index)
-
 			var cell *xlsx.Cell
 			var cell_val string
 			var err error
@@ -283,7 +280,7 @@ func (c ErpLogisticsFeeRate) Import() revel.Result {
 			col_index := 0
 
 			if len(row.Cells) == 0 {
-				break;
+				break
 			}
 
 			// 物流公司名称
@@ -291,6 +288,9 @@ func (c ErpLogisticsFeeRate) Import() revel.Result {
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
+			if cell_val == "" {
+				break
+			}
 			logistics_fee_rate.CompanyName = cell_val
 			col_index++
 

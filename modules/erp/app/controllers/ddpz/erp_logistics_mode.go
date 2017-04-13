@@ -246,11 +246,18 @@ func (c ErpLogisticsMode) Import() revel.Result {
 
 			col_index := 0
 
+			if len(row.Cells) == 0 {
+				break
+			}
+
 			// 物流公司名称
 			cell = row.Cells[col_index]
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
+			if cell_val == "" {
+				break
+			}
 			logistics_mode.CompanyName = cell_val
 			col_index++
 

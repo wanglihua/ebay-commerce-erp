@@ -269,6 +269,7 @@ func GetSiteHeader(title string, db_session *xorm.Session, web_session revel.Ses
 		site_header_buffer.WriteString(`
     <style type="text/css">
         div.todo {
+            display: block;
             margin: 10px 5px;
             padding: 10px;
             color: blue;
