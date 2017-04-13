@@ -38,7 +38,7 @@ func (f *PickFeeDetailForm) Valid(validation *revel.Validation) bool {
 
 func (c ErpPickFee) DetailData() revel.Result {
 	db_session := c.DbSession
-	var pick_fee = pick_fee_service.Get_pick_fee(db_session)
+	var pick_fee = pick_fee_service.Get_pick_fee_setting(db_session)
 
 	var detail_form PickFeeDetailForm
 	detail_form.PickFee = pick_fee

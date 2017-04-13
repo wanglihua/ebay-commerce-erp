@@ -4,6 +4,7 @@ import (
 	"matrix/core"
 )
 
+// 拣货人工费用的设置
 type PickFeeInfo struct {
 	Id         int64           `xorm:"bigint notnull pk autoincr 'id'" json:"id"`
 	Fee1       float64         `xorm:"decimal(18,6) notnull 'fee1'" json:"fee1" smith:"verbose_name=5Kg以下"`

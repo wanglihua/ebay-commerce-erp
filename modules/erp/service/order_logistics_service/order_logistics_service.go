@@ -15,12 +15,14 @@ import (
 	"matrix/modules/erp/service/exchange_rate_service"
 	"matrix/modules/erp/service/logistics_setting_service"
 	"matrix/modules/erp/service/order_service"
+	"matrix/modules/erp/service/pick_fee_service"
 )
 
 type OrderLogistics struct {
 	au_stock_list                     []models.StockInfo                      // 所有澳洲仓库列表
 	aud_exchange_rate                 float64                                 // 澳币汇率
 	logistics_setting                 models.LogisticsSettingInfo             // 物流设置
+	pick_fee_setting                  models.PickFeeInfo                      // 拣货费用设置
 	address_special_word_list_setting []string                                // 收货地址特殊字段
 	logistics_mode_list               []models.LogisticsModeInfo              // 物流方式列表
 	logistics_fee_rate_map            map[int64][]models.LogisticsFeeRateInfo // 物流费率列表的映射，映射的 key 是， 物流方式的 id
@@ -44,6 +46,9 @@ func (p_ol *OrderLogistics) init_data(db_session *xorm.Session) {
 	// 获取物流参数设置
 	var logistics_setting = logistics_setting_service.Get_logistics_setting(db_session)
 	p_ol.logistics_setting = logistics_setting
+
+	// 获取拣货人工费用
+	p_ol.pick_fee_setting = pick_fee_service.Get_pick_fee_setting(db_session)
 
 	// 获得地址特殊字段的列表
 	var address_special_word_list_setting = strings.Split(logistics_setting.AddressSpecialWord, ",")
@@ -476,6 +481,7 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 	var final_width float64 = 0
 	var final_height float64 = 0
 	var final_weight float64 = 0
+	var final_actual_weight float64 = 0 //就是商品的实际重量合计，用 final 只是用于和下面的循环里面的 actual_weight 区别开来罢了
 	for _, logistics_mode := range logistics_mode_list {
 		logistics_fee_rate_list, found := logistics_fee_rate_map[logistics_mode.Id]
 		if found == false {
@@ -489,6 +495,7 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 
 		// 获取所有商品的整体的 长，宽，高，重量 等的数据，体积重是利用体积重公式计算得到的结果
 		var length, width, height, dim_weight, actual_weight float64 = get_order_products_whole_logistics_data(p_order_logistics_data, logistics_mode.Tjzgs)
+
 		// 匹配前打折
 		{
 			// 匹配前重量打折
@@ -618,6 +625,7 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 			final_width = width
 			final_height = height
 			final_weight = final_weight_in_mode
+			final_actual_weight = actual_weight
 		}
 	} // for _, logistics_mode := range logistics_mode_list {
 
@@ -672,6 +680,7 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 	order_logistics.Height = final_height
 	order_logistics.Weight = final_weight
 	order_logistics.TotalFee = final_total_fee
+	order_logistics.PickFee = pick_fee_service.Get_product_pick_fee(final_actual_weight, p_ol.pick_fee_setting)
 
 	if has == true {
 		_, err := db_session.Id(order_logistics.Id).Update(&order_logistics)
