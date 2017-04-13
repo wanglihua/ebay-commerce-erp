@@ -181,6 +181,7 @@ func (c ErpLogisticsMode) Delete() revel.Result {
 	logistics_mode_id_list := make([]int64, 0)
 	c.Params.Bind(&logistics_mode_id_list, "id_list")
 
+	/*
 	// 如果数据在使用的就不用被删除
 	var fee_rate_count struct {
 		Count int64 `xorm:"'fee_rate_count'"`
@@ -196,11 +197,23 @@ func (c ErpLogisticsMode) Delete() revel.Result {
 			"message": "数据在别处被引用，不能删除！",
 		})
 	}
+	*/
 
-	affected, err := db_session.In("id", logistics_mode_id_list).Delete(new(models.LogisticsModeInfo))
+	//todo: 查看物流方式是否已经在匹配物流方式的订单里面使用 ??
+	/*
+SELECT count(ol.id) AS ol_count
+FROM erp_order_logistics ol
+WHERE ol.mode_id IN (1, 2, 3)
+	 */
+
+
+	_, err := db_session.In("mode_id", logistics_mode_id_list).Delete(new(models.LogisticsFeeRateInfo))
 	core.HandleError(err)
 
-	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})
+	_, err = db_session.In("id", logistics_mode_id_list).Delete(new(models.LogisticsModeInfo))
+	core.HandleError(err)
+
+	return c.RenderJson(core.JsonResult{Success: true, Message: "数据删除成功!"})
 }
 
 func (c ErpLogisticsMode) Import() revel.Result {

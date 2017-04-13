@@ -571,7 +571,7 @@
                     return;
                 }
 
-                $.msg.confirm("确认要删除吗？", function () {
+                $.msg.confirm("将同时删除关联的费率数据，确认要删除吗？", function () {
                     $.ajax({
                         url: '{%url "ErpLogisticsMode.Delete"%}',
                         type: "POST",
