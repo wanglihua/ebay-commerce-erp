@@ -82,6 +82,7 @@ func (c Home) SyncDbPost() revel.Result {
 	model_list = append(model_list, &erp_models.PackageMaterialInfo{})
 	model_list = append(model_list, &erp_models.PaypalAccountInfo{})
 	model_list = append(model_list, &erp_models.PaypalReconInfo{})
+	model_list = append(model_list, &erp_models.PickFeeInfo{})
 	model_list = append(model_list, &erp_models.PlatformLogisticsModeInfo{})
 	model_list = append(model_list, &erp_models.ProductBindInfo{})
 	model_list = append(model_list, &erp_models.ProductCateInfo{})
