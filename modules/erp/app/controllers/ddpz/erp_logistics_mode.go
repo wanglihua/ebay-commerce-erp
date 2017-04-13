@@ -389,6 +389,14 @@ func (c ErpLogisticsMode) Import() revel.Result {
 			}
 			col_index++
 
+			// 超长收费阶梯（cm）
+			cell = row.Cells[col_index]
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
+			logistics_mode.LogisticsMode.Ccsfjt, _ = strconv.ParseFloat(cell_val, 64)
+			col_index++
+
 			// 超长加收多少 运费（澳币）
 			cell = row.Cells[col_index]
 			cell_val, err = cell.String()
