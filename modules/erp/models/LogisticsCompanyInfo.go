@@ -10,6 +10,7 @@ type LogisticsCompanyInfo struct {
 	Name               string          `xorm:"nvarchar(200) notnull index unique 'name'" json:"name" smith:"verbose_name=名称,min=2,max=100"`
 	AddressSpecialWord int             `xorm:"int notnull 'address_special_word'" json:"address_special_word" smith:"verbose_name=地址特殊字段"` // 地址特殊字段 0 否， 1 是
 	Desc               core.NullString `xorm:"nvarchar(500) 'desc'" json:"desc" smith:"verbose_name=描述,max=500"`
+	StatusId           int64           `xorm:"bigint notnull index 'status_id'" json:"status_id" smith:"verbose_name=状态"`
 	CreateTime         core.Time       `xorm:"created notnull 'create_time'" json:"create_time"`
 	UpdateTime         core.Time       `xorm:"updated notnull 'update_time'" json:"update_time"`
 	Version            int             `xorm:"version notnull 'version'" json:"version"`
@@ -29,6 +30,7 @@ func (e LogisticsCompanyInfo) InitData(db_session *xorm.Session) {
 		logistics_company.Name = "AU POST"
 		logistics_company.AddressSpecialWord = 1
 		logistics_company.Desc = core.MakeNullString("Australia Post", true)
+		logistics_company.StatusId = LOGISTICS_COMPANY_ENABLED
 		db_session.Insert(&logistics_company)
 	}
 

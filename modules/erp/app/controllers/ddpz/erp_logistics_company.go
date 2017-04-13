@@ -22,34 +22,56 @@ func (c ErpLogisticsCompany) Index() revel.Result {
 func (c ErpLogisticsCompany) ListData() revel.Result {
 	db_session := c.DbSession
 
+	type logitics_company_view_item_t struct {
+		models.LogisticsCompanyInfo  `xorm:"extends" json:"lc"`
+		models.StatusInfo            `xorm:"extends" json:"s"`
+	}
+
+	/*
+SELECT lc.*, s.*
+FROM erp_logistics_company lc
+    INNER JOIN erp_status s ON s.id = lc.status_id
+	 */
+
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
-	query := db_session.Where(filter)
+
+	sb := core.NewSqlBuilder()
+	sb.Select("lc.*, s.*")
+	sb.Count("count(lc.id) as logistics_company_count")
+	sb.From(`erp_logistics_company lc
+    INNER JOIN erp_status s ON s.id = lc.status_id`)
+	sb.Where(filter)
 
 	//query extra filter here
 
-	data_query := *query
 	if order != "" {
-		data_query = *data_query.OrderBy(order)
+		sb.OrderBy(order)
 	} else {
-		data_query = *data_query.Asc("id")
+		sb.OrderBy("lc.id ASC")
 	}
 
-	logistics_company_list := make([]models.LogisticsCompanyInfo, 0, limit)
-	err := data_query.Limit(limit, offset).Find(&logistics_company_list)
+	sb.Limit(offset, limit)
+
+	logistics_company_list := make([]logitics_company_view_item_t, 0, limit)
+	err := db_session.Sql(sb.SqlList()).Find(&logistics_company_list)
 	core.HandleError(err)
 
-	count_query := *query
-	count, err := count_query.Count(new(models.LogisticsCompanyInfo))
+	var logistics_company_count struct {
+		Count int64 `xorm:"'logistics_company_count'"`
+	}
+
+	_, err = db_session.Sql(sb.SqlCount()).Get(&logistics_company_count)
 	core.HandleError(err)
 
 	return c.RenderJson(core.GridResult{
 		Data:  logistics_company_list,
-		Total: count,
+		Total: logistics_company_count.Count,
 	})
 }
 
 type LogisticsCompanyDetailForm struct {
 	LogisticsCompany models.LogisticsCompanyInfo `json:"logistics_company"`
+	StatusList       []models.StatusInfo         `json:"status_list"`
 }
 
 func (f *LogisticsCompanyDetailForm) IsCreate() bool {
@@ -85,10 +107,17 @@ func (c ErpLogisticsCompany) DetailData() revel.Result {
 		if has == false {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "指定的物流公司不存在！"})
 		}
+	} else {
+		logistics_company.StatusId = models.LOGISTICS_COMPANY_ENABLED
 	}
+
+	var status_list = make([]models.StatusInfo, 0)
+	err := db_session.Where(fmt.Sprintf("type = %d", models.STATUS_TYPE_LOGISTICS_COMPANY)).Find(&status_list)
+	core.HandleError(err)
 
 	var detail_form LogisticsCompanyDetailForm
 	detail_form.LogisticsCompany = logistics_company
+	detail_form.StatusList = status_list
 
 	return c.RenderJson(detail_form)
 }

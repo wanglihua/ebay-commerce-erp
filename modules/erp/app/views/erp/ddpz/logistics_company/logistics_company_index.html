@@ -81,6 +81,21 @@
                                     </div>
                                 </div>
 
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <label for="status_id" class="col-xs-2 control-label">状态</label>
+                                            <div class="col-xs-10">
+                                                <select id="status_id" name="detail.logistics_company.status_id" class="input-sm form-control" v-model.number="detail.logistics_company.status_id">
+                                                    <template v-for="status in detail.status_list">
+                                                        <option :value="status.id">{{status.name}}</option>
+                                                    </template>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
                             </form>
                         </div>
                     </div>
@@ -113,7 +128,7 @@
                     "aaSorting": [[1, "asc"]],
                     "aoColumns": [
                         {
-                            "mDataProp": "id",
+                            "mDataProp": "lc.id",
                             "bSearchable": false,
                             "orderable": false,
                             "sClass": "center",
@@ -123,10 +138,13 @@
                                 return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
                             }
                         },
-                        {"mDataProp": "name", "title": "名称", "bSearchable": true, "width": 250},
-                        {"mDataProp": "desc", "title": "描述", "bSearchable": true},
+                        {"mDataProp": "lc.name", "title": "名称", "bSearchable": true, "width": 250},
+                        {"mDataProp": "lc.desc", "title": "描述", "bSearchable": true},
                         {
-                            "mDataProp": "address_special_word", "title": "地址特殊字段", "bSearchable": true, "width": 110,
+                            "mDataProp": "lc.address_special_word",
+                            "title": "地址特殊字段",
+                            "bSearchable": true,
+                            "width": 110,
                             "render": function (data, type, row) {
                                 if (data == 1) {
                                     return "是";
@@ -134,8 +152,9 @@
                                 return "否";
                             }
                         },
-                        {"mDataProp": "create_time", "title": "创建时间", "bSearchable": false, "width": 120},
-                        {"mDataProp": "update_time", "title": "修改时间", "bSearchable": false, "width": 120}
+                        {"mDataProp": "s.name", "title": "状态", "bSearchable": true, "width": 80},
+                        {"mDataProp": "lc.create_time", "title": "创建时间", "bSearchable": false, "width": 120},
+                        {"mDataProp": "lc.update_time", "title": "修改时间", "bSearchable": false, "width": 120}
                     ]
                 }
             );

@@ -46,6 +46,8 @@ const (
 	STATUS_TYPE_PURCHASE_BILL = 1800
 	// 消息状态
 	STATUS_TYPE_MESSAGE = 1900
+	// 物流公司状态
+	STATUS_TYPE_LOGISTICS_COMPANY = 2000
 
 	//状态类型 end
 
@@ -173,6 +175,11 @@ const (
 	MESSAGE_STATUS_ANSWERED = 4800
 	// 消息状态 未回复
 	MESSAGE_STATUS_UNANSWERED = 4900
+
+	// 物流公司启用
+	LOGISTICS_COMPANY_ENABLED = 5000
+	// 物流公司禁用
+	LOGISTICS_COMPANY_DISABLED = 5100
 
 	//状态 id end
 )
@@ -612,6 +619,23 @@ func (e StatusInfo) InitData(db_session *xorm.Session) {
 		status.Type = STATUS_TYPE_MESSAGE
 		status.Name = "未回复"
 		status.Desc = core.MakeNullString("消息状态 未回复", true)
+		db_session.Insert(status)
+	}
+
+	// 物流公司状态 启用 停用
+	{
+		status := new(StatusInfo)
+		status.Id = LOGISTICS_COMPANY_ENABLED
+		status.Type = STATUS_TYPE_LOGISTICS_COMPANY
+		status.Name = "正常"
+		status.Desc = core.MakeNullString("物流公司状态 正常", true)
+		db_session.Insert(status)
+
+		status = new(StatusInfo)
+		status.Id = LOGISTICS_COMPANY_DISABLED
+		status.Type = STATUS_TYPE_LOGISTICS_COMPANY
+		status.Name = "停用"
+		status.Desc = core.MakeNullString("物流公司状态 停用", true)
 		db_session.Insert(status)
 	}
 }
