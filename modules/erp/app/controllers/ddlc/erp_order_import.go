@@ -337,7 +337,7 @@ SELECT sa.id AS shop_id, sa.name AS shop_name FROM erp_shop_account sa;
 
 	var time_now = time.Now()
 	// 例如 20170414212812
-	var import_batch_code = time_now.Year() + int(time_now.Month())*100000000 + time_now.Day()*1000000 + time_now.Hour()*10000 + time_now.Minute()*100 + time_now.Second()
+	var import_batch_code = time_now.Year()*10000000000 + int(time_now.Month())*100000000 + time_now.Day()*1000000 + time_now.Hour()*10000 + time_now.Minute()*100 + time_now.Second()
 
 	for _, order_import := range order_import_list {
 		// 店铺是否存在
@@ -356,12 +356,20 @@ SELECT sa.id AS shop_id, sa.name AS shop_name FROM erp_shop_account sa;
 			var product models.ProductInfo
 			product.Sku = order_import.Spbh
 			product.CnName = order_import.Spbh
+			product.Name = order_import.Spbh
 			product.CostPrice = order_import.Cpcb
 
 			_, err := db_session.Insert(&product)
 			core.HandleError(err)
 
 			product_id = product.Id
+
+			// 数据库里面新增加的也放到 刚刚预先加载的列表里面去
+			var product_id_and_sku product_id_and_sku_t
+			product_id_and_sku.ProductId = product_id
+			product_id_and_sku.ProductSku = product.Sku
+
+			product_id_and_sku_list = append(product_id_and_sku_list, product_id_and_sku)
 		}
 
 		// 地址
@@ -385,6 +393,8 @@ SELECT sa.id AS shop_id, sa.name AS shop_name FROM erp_shop_account sa;
 		order.ExpressFee = order_import.Yfsr
 		order.BuyerUserId = order_import.Khzh
 		order.BuyerEmail = order_import.Khyx
+		order.TypeId = models.ORDER_TYPE_DRDD // 导入订单
+		order.StatusId = models.ORDER_STATUS_YZF
 		_, err = db_session.Insert(&order)
 		core.HandleError(err)
 
