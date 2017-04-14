@@ -87,6 +87,14 @@ func GetDdlcMenu(res_id_map map[int64]bool, db_session *xorm.Session, web_sessio
             <b class="arrow"></b>
         </li>
 
+        <li id="ddlc-order-import-menu" class="">
+            <a href="/erp/order/import">
+                <i class="menu-icon fa fa-caret-right"></i>
+                订单导入
+            </a>
+            <b class="arrow"></b>
+        </li>
+
         <li id="ddlc-orderlogistics-menu" class="">
             <a href="/erp/order/logistics">
                 <i class="menu-icon fa fa-caret-right"></i>

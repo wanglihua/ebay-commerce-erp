@@ -349,5 +349,9 @@ POST /erp/envelope/fee/rate/data/detail        ErpEnvelopeFeeRate.DetailData
 POST /erp/envelope/fee/rate/save               ErpEnvelopeFeeRate.Save
 POST /erp/envelope/fee/rate/delete             ErpEnvelopeFeeRate.Delete
 
+GET  /erp/order/import                       ErpOrderImport.Index
+POST /erp/order/import/data/list             ErpOrderImport.ListData
+POST /erp/order/import/upload                ErpOrderImport.Upload
+
 # 这个通用的路由应该放到最后比较合适，否则放在他后面的有的路由会不工作
 GET  /erp/order/:status                        ErpOrder.Index
