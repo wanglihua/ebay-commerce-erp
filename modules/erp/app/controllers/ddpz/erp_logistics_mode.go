@@ -444,7 +444,7 @@ func (c ErpLogisticsMode) Import() revel.Result {
 	if len(logistics_mode_list) == 0 {
 		return c.RenderJson(map[string]interface{}{
 			"success": false,
-			"message": "Excel文件中导入商品列表为空！",
+			"message": "Excel文件中导入物流方式列表为空！",
 		})
 	}
 

@@ -378,7 +378,7 @@ func (c ErpLogisticsFeeRate) Import() revel.Result {
 	if len(logistics_fee_rate_list) == 0 {
 		return c.RenderJson(map[string]interface{}{
 			"success": false,
-			"message": "Excel文件中导入商品列表为空！",
+			"message": "Excel文件中导入费率列表为空！",
 		})
 	}
 
