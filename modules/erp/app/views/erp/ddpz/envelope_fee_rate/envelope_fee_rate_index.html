@@ -33,7 +33,7 @@
         </div>
     </div>
     <div class="modal fade" id="envelopeFeeRateDetailDialog">
-        <div class="modal-dialog" style="width: 680px;">
+        <div class="modal-dialog" style="width: 780px;">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="True">&times;</button>
@@ -48,19 +48,17 @@
                                 <div class="row">
                                     <div class="col-xs-6">
                                         <div class="form-group">
-                                            <label for="name" class="col-xs-2 control-label">信封名称</label>
-                                            <div class="col-xs-10">
-                                                <input id="name" name="detail.envelope_fee_rate.name" type="text" class="input-sm form-control" v-model.number="detail.envelope_fee_rate.name"/>
+                                            <label for="name" class="col-xs-4 control-label">信封名称</label>
+                                            <div class="col-xs-8">
+                                                <input id="name" name="detail.envelope_fee_rate.name" type="text" class="input-sm form-control" v-model="detail.envelope_fee_rate.name"/>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
 
-                                <div class="row">
                                     <div class="col-xs-6">
                                         <div class="form-group">
-                                            <label for="fee" class="col-xs-2 control-label">费用（澳币）</label>
-                                            <div class="col-xs-10">
+                                            <label for="fee" class="col-xs-4 control-label">费用（澳币）</label>
+                                            <div class="col-xs-8">
                                                 <input id="fee" name="detail.envelope_fee_rate.fee" type="text" class="input-sm form-control" v-model.number="detail.envelope_fee_rate.fee"/>
                                             </div>
                                         </div>
@@ -70,19 +68,17 @@
                                 <div class="row">
                                     <div class="col-xs-6">
                                         <div class="form-group">
-                                            <label for="length" class="col-xs-2 control-label">信封长度（cm）</label>
-                                            <div class="col-xs-10">
+                                            <label for="length" class="col-xs-4 control-label">信封长度（cm）</label>
+                                            <div class="col-xs-8">
                                                 <input id="length" name="detail.envelope_fee_rate.length" type="text" class="input-sm form-control" v-model.number="detail.envelope_fee_rate.length"/>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
 
-                                <div class="row">
                                     <div class="col-xs-6">
                                         <div class="form-group">
-                                            <label for="width" class="col-xs-2 control-label">信封宽度（cm）</label>
-                                            <div class="col-xs-10">
+                                            <label for="width" class="col-xs-4 control-label">信封宽度（cm）</label>
+                                            <div class="col-xs-8">
                                                 <input id="width" name="detail.envelope_fee_rate.width" type="text" class="input-sm form-control" v-model.number="detail.envelope_fee_rate.width"/>
                                             </div>
                                         </div>
@@ -92,19 +88,17 @@
                                 <div class="row">
                                     <div class="col-xs-6">
                                         <div class="form-group">
-                                            <label for="height" class="col-xs-2 control-label">信封高度（cm）</label>
-                                            <div class="col-xs-10">
+                                            <label for="height" class="col-xs-4 control-label">信封高度（cm）</label>
+                                            <div class="col-xs-8">
                                                 <input id="height" name="detail.envelope_fee_rate.height" type="text" class="input-sm form-control" v-model.number="detail.envelope_fee_rate.height"/>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
 
-                                <div class="row">
                                     <div class="col-xs-6">
                                         <div class="form-group">
-                                            <label for="weight" class="col-xs-2 control-label">信封重量（kg）</label>
-                                            <div class="col-xs-10">
+                                            <label for="weight" class="col-xs-4 control-label">信封重量（kg）</label>
+                                            <div class="col-xs-8">
                                                 <input id="weight" name="detail.envelope_fee_rate.weight" type="text" class="input-sm form-control" v-model.number="detail.envelope_fee_rate.weight"/>
                                             </div>
                                         </div>
