@@ -55,6 +55,14 @@ func GetDdpzMenu(res_id_map map[int64]bool, db_session *xorm.Session, web_sessio
             <b class="arrow"></b>
         </li>
 
+        <li id="ddpz-envelopefeerate-menu" class="">
+            <a href="/erp/envelope/fee/rate">
+                <i class="menu-icon fa fa-caret-right"></i>
+                信封费率
+            </a>
+            <b class="arrow"></b>
+        </li>
+
         <li id="ddpz-pickfee-menu" class="">
              <a href="/erp/pick/fee">
                  <i class="menu-icon fa fa-caret-right"></i>
