@@ -3,11 +3,13 @@ package controllers
 import (
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/revel/revel"
 	"github.com/tealeg/xlsx"
 	"matrix/core"
 	"matrix/modules/erp/models"
+	"matrix/modules/erp/service/exchange_rate_service"
 )
 
 type ErpOrderImport struct {
@@ -39,22 +41,22 @@ func (c ErpOrderImport) Upload() revel.Result {
 	}
 
 	type order_import_t struct {
-		Yzbm string  // 0 邮政编码
-		Yjdz string  // 1 邮寄地址
-		Spbh string  // 2 商品编号
-		Spsl int64   // 3 商品数量
-		Dpm  string  // 4 店铺名
-		Ddbh string  // 5 订单编号
-		Jydh string  // 6 交易单号
-		Skje float64 // 7 收款金额(RMB)
-		Yfsr float64 // 8 运费收入
-		Cpcb float64 // 9 产品成本
-		Khzh string  // 10 客户账号
-		Khxm string  // 11 客户姓名
-		Khyx string  // 12 客户邮箱
-		Dh   string  // 13 电话
-		Ssdq string  // 14 所属地区
-		Sscs string  // 15 所属城市
+		Yzbm string  // 0 邮政编码  address
+		Yjdz string  // 1 邮寄地址  address
+		Spbh string  // 2 商品编号  order_item
+		Spsl int     // 3 商品数量  order_item
+		Dpm  string  // 4 店铺名    order
+		Ddbh string  // 5 订单编号  order
+		Jydh string  // 6 交易单号  order
+		Skje float64 // 7 收款金额(RMB) order
+		Yfsr float64 // 8 运费收入  order
+		Cpcb float64 // 9 产品成本  product, order_item
+		Khzh string  // 10 客户账号 order
+		Khxm string  // 11 客户姓名 order
+		Khyx string  // 12 客户邮箱 order
+		Dh   string  // 13 电话     address
+		Ssdq string  // 14 所属地区  address
+		Sscs string  // 15 所属城市  address
 	}
 
 	order_import_list := make([]order_import_t, 0)
@@ -116,7 +118,8 @@ func (c ErpOrderImport) Upload() revel.Result {
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
-			order_import.Spsl, _ = strconv.ParseInt(cell_val, 10, 64)
+			spsl, _ := strconv.ParseInt(cell_val, 10, 32)
+			order_import.Spsl = int(spsl)
 			col_index++
 
 			// 店铺名
@@ -271,6 +274,12 @@ SELECT sa.id AS shop_id, sa.name AS shop_name FROM erp_shop_account sa;
 		return false, 0
 	}
 
+	var aud_exchange_rate_setting = exchange_rate_service.Get_aud_exchange_rate(db_session)
+
+	var time_now = time.Now()
+	// 例如 20170414212812
+	var import_batch_code = time_now.Year() + int(time_now.Month())*100000000 + time_now.Day()*1000000 + time_now.Hour()*10000 + time_now.Minute()*100 + time_now.Second()
+
 	for _, order_import := range order_import_list {
 		// 店铺是否存在
 		has, shop_id := is_shop_name_exist(order_import.Dpm)
@@ -288,6 +297,7 @@ SELECT sa.id AS shop_id, sa.name AS shop_name FROM erp_shop_account sa;
 			var product models.ProductInfo
 			product.Sku = order_import.Spbh
 			product.CnName = order_import.Spbh
+			product.CostPrice = order_import.Cpcb
 
 			_, err := db_session.Insert(&product)
 			core.HandleError(err)
@@ -295,15 +305,45 @@ SELECT sa.id AS shop_id, sa.name AS shop_name FROM erp_shop_account sa;
 			product_id = product.Id
 		}
 
-		_ = product_id
+		// 地址
+		var order_shipping_address models.OrderShippingAddressInfo
+		order_shipping_address.PostalCode = order_import.Yzbm
+		order_shipping_address.Street1 = order_import.Yjdz
+		order_shipping_address.Phone = order_import.Dh
+		order_shipping_address.Province = order_import.Ssdq
+		order_shipping_address.CityName = order_import.Sscs
+		_, err = db_session.Insert(&order_shipping_address)
+		core.HandleError(err)
 
+		// 订单
 		var order models.OrderInfo
-
 		order.ShopId = shop_id
-
+		order.Code = order_import.Ddbh
+		order.TranId = order_import.Jydh
+		order.AmountPaidRmb = order_import.Skje
+		order.AmountPaidCurrency = "AU"                                  // 澳币的也设置一下
+		order.AmountPaid = order_import.Skje / aud_exchange_rate_setting // 汇率换算
+		order.ExpressFee = order_import.Yfsr
+		order.BuyerUserId = order_import.Khzh
+		order.BuyerEmail = order_import.Khyx
 		_, err = db_session.Insert(&order)
 		core.HandleError(err)
 
+		// 订单详细
+		var order_item models.OrderItemInfo
+		order_item.OrderId = order.Id
+		order_item.ItemProductId = product_id
+		order_item.Quantity = order_import.Spsl
+		order_item.ProductCostPrice = order_import.Cpcb //  这是单个的产品成本
+		_, err = db_session.Insert(&order_item)
+		core.HandleError(err)
+
+		// 导入批次
+		var order_import_batch models.OrderImportBatchInfo
+		order_import_batch.OrderId = order.Id
+		order_import_batch.BatchCode = import_batch_code
+		_, err = db_session.Insert(&order_import_batch)
+		core.HandleError(err)
 	}
 
 	return c.RenderJson(map[string]interface{}{

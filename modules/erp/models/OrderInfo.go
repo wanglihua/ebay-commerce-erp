@@ -31,6 +31,7 @@ type OrderInfo struct {
 	PaymentMethods           string              `xorm:"nvarchar(50) notnull 'payment_methods'" json:"payment_methods" smith:"verbose_name=支付方式"`
 	SellerEmail              string              `xorm:"nvarchar(200) notnull 'seller_email'" json:"seller_email" smith:"verbose_name=卖家邮件"`
 	SellerUserId             string              `xorm:"nvarchar(50) notnull 'seller_user_id'" json:"seller_user_id" smith:"verbose_name=卖家用户id"`
+	BuyerEmail               string              `xorm:"nvarchar(200) notnull 'buyer_email'" json:"buyer_email" smith:"verbose_name=买家邮件"`
 	BuyerUserId              string              `xorm:"nvarchar(50) notnull 'buyer_user_id'" json:"buyer_user_id" smith:"verbose_name=买家用户id"`
 	BuyerCheckoutMessage     string              `xorm:"nvarchar(500) notnull 'buyer_checkout_message'" json:"buyer_checkout_message" smith:"verbose_name=买家留言"`
 	CreatedTime              core.NullLongTime   `xorm:"datetime 'created_time'" json:"created_time" smith:"verbose_name=创建时间"`

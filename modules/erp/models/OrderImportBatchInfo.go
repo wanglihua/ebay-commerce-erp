@@ -6,7 +6,7 @@ import (
 
 type OrderImportBatchInfo struct {
 	Id         int64               `xorm:"bigint notnull pk autoincr 'id'" json:"id"`
-	BatchCode  int64               `xorm:"bigint notnull index 'batch_code'" json:"batch_code" smith:"verbose_name=批次号"`
+	BatchCode  int                 `xorm:"int notnull index 'batch_code'" json:"batch_code" smith:"verbose_name=批次号"`
 	OrderId    int64               `xorm:"bigint notnull index 'order_id'" json:"order_id" smith:"verbose_name=订单Id"`
 	CreateTime core.Time           `xorm:"created notnull 'create_time'" json:"create_time"`
 	UpdateTime core.Time           `xorm:"updated notnull 'update_time'" json:"update_time"`
