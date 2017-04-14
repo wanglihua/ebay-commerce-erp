@@ -17,6 +17,10 @@
                         <i class="ace-icon fa fa-refresh"></i>
                         刷新
                     </button>
+                    <button id="btnUpload" class="btn btn-success btn-sm">
+                        <i class="ace-icon fa fa-plus"></i>
+                        导入
+                    </button>
                 </div>
                 <div style="margin-top: 10px;">
                     <a href="/static/excel-template/order_import.xlsx">下载Excel模板</a>
@@ -28,7 +32,53 @@
         </div>
     </div>
 </div>
+
+<script type="text/javascript" src="/static/lib/plupload/moxie.min.js"></script>
+<script type="text/javascript" src="/static/lib/plupload/plupload.min.js"></script>
+<script type="text/javascript" src="/static/lib/plupload/zh_CN.js"></script>
+
 <script type="text/javascript">
+    function init_uploader() {
+        var uploader = new plupload.Uploader({
+            runtimes: 'html5,flash,html4',
+            multi_selection: false,
+
+            browse_button: 'btnUpload',
+            file_data_name: "excel_file",
+
+            url: '{%url "ErpOrderImport.Upload"%}',
+            max_file_size: '10000kb',
+
+            filters: [
+                {title: "Excel文件", extensions: "xlsx"}
+            ],
+
+            flash_swf_url: '/plupload/js/Moxie.swf',
+
+            init: {
+                FilesAdded: function () {
+                    showMask("上传中，请稍候...");
+                    uploader.start();
+                },
+                FileUploaded: function (up, file, response) {
+                    hideMask();
+                    var result = JSON.parse(response.response);
+                    if (result.success != true) {
+                        $.msg.error(result.message);
+                    } else {
+                        reloadList('#orderList');
+                        $.msg.show(result.message);
+                    }
+                },
+                Error: function (up, err) {
+                    $.msg.error("上传发生错误：" + err.code + ", " + err.message);
+                }
+            }
+        });
+
+        uploader.init();
+    }
+
     var vm = new Vue({
         el: "#page",
         data: {
@@ -70,6 +120,8 @@
                     ]
                 }
             );
+
+            init_uploader();
         },
         methods: {
             reloadList: function () {
