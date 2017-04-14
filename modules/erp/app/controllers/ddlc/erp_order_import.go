@@ -24,23 +24,38 @@ func (c ErpOrderImport) ListData() revel.Result {
 	db_session := c.DbSession
 
 	type order_import_view_item_t struct {
-		models.OrderInfo             `xorm:"extends" json:"o"`
-		models.OrderImportBatchInfo  `xorm:"extends" json:"ib"`
+		models.OrderInfo              `xorm:"extends" json:"o"`
+		models.OrderImportBatchInfo   `xorm:"extends" json:"ib"`
+		models.OrderTypeInfo          `xorm:"extends" json:"ot"`
+		models.OrderHoldTypeInfo      `xorm:"extends" json:"ht"`
+		models.ECommercePlatformInfo  `xorm:"extends" json:"pf"`
+		models.ShopAccountInfo        `xorm:"extends" json:"sa"`
+		models.StatusInfo             `xorm:"extends" json:"s"`
 	}
 
 	/*
-SELECT o.*, ib.*
+SELECT o.*, ib.*, ot.*, ht.*, pf.*, sa.*, s.*
 FROM erp_order o
     INNER JOIN erp_order_import_batch ib ON o.id = ib.order_id
+    INNER JOIN erp_order_type ot ON ot.id = o.type_id
+    LEFT JOIN erp_order_hold_type ht ON ht.id = o.hold_type_id
+    INNER JOIN erp_shop_account sa ON sa.id = o.shop_id
+    INNER JOIN erp_ecommerce_platform pf ON pf.id = sa.platform_id
+    INNER JOIN erp_status s ON s.id = o.status_id
 	 */
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
 	var sb = core.NewSqlBuilder()
-	sb.Select("o.*, ib.*")
+	sb.Select("o.*, ib.*, ot.*, ht.*, pf.*, sa.*, s.*")
 	sb.Count("count(o.id) as order_count")
 	sb.From(`erp_order o
-    INNER JOIN erp_order_import_batch ib ON o.id = ib.order_id`)
+    INNER JOIN erp_order_import_batch ib ON o.id = ib.order_id
+    INNER JOIN erp_order_type ot ON ot.id = o.type_id
+    LEFT JOIN erp_order_hold_type ht ON ht.id = o.hold_type_id
+    INNER JOIN erp_shop_account sa ON sa.id = o.shop_id
+    INNER JOIN erp_ecommerce_platform pf ON pf.id = sa.platform_id
+    INNER JOIN erp_status s ON s.id = o.status_id`)
 
 	sb.Where(filter)
 

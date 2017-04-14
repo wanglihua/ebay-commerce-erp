@@ -90,7 +90,7 @@
             initDataTable(
                 '#orderList',
                 {
-                    "sAjaxSource": '{%url "ErpOrderHold.ListData"%}',
+                    "sAjaxSource": '{%url "ErpOrderImport.ListData"%}',
                     "aaSorting": [[1, "asc"]],
                     "aoColumns": [
                         {
@@ -104,7 +104,7 @@
                                 return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
                             }
                         },
-
+                        {"mDataProp": "ib.batch_code", "title": "导入批次", "bSearchable": false, "width": 180},
                         {"mDataProp": "o.code", "title": "订单编号", "bSearchable": true, "width": 180},
                         {"mDataProp": "ot.name", "title": "类型", "bSearchable": true},
                         {"mDataProp": "s.name", "title": "状态", "bSearchable": true},
