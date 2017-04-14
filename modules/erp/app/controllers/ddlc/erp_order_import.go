@@ -337,7 +337,7 @@ SELECT sa.id AS shop_id, sa.name AS shop_name FROM erp_shop_account sa;
 
 	var time_now = time.Now()
 	// 例如 20170414212812
-	var import_batch_code = time_now.Year()*10000000000 + int(time_now.Month())*100000000 + time_now.Day()*1000000 + time_now.Hour()*10000 + time_now.Minute()*100 + time_now.Second()
+	var import_batch_code int64 = int64(time_now.Year())*10000000000 + int64(time_now.Month())*100000000 + int64(time_now.Day()*1000000) + int64(time_now.Hour()*10000) + int64(time_now.Minute()*100) + int64(time_now.Second())
 
 	for _, order_import := range order_import_list {
 		// 店铺是否存在
