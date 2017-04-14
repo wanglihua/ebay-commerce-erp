@@ -21,7 +21,51 @@ func (c ErpOrderImport) Index() revel.Result {
 }
 
 func (c ErpOrderImport) ListData() revel.Result {
-	return c.RenderEmpty()
+	db_session := c.DbSession
+
+	type order_import_view_item_t struct {
+		models.OrderInfo             `xorm:"extends" json:"o"`
+		models.OrderImportBatchInfo  `xorm:"extends" json:"ib"`
+	}
+
+	/*
+SELECT o.*, ib.*
+FROM erp_order o
+    INNER JOIN erp_order_import_batch ib ON o.id = ib.order_id
+	 */
+
+	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
+
+	var sb = core.NewSqlBuilder()
+	sb.Select("o.*, ib.*")
+	sb.Count("count(o.id) as order_count")
+	sb.From(`erp_order o
+    INNER JOIN erp_order_import_batch ib ON o.id = ib.order_id`)
+
+	sb.Where(filter)
+
+	if order != "" {
+		sb.OrderBy(order)
+	} else {
+		sb.OrderBy("o.id ASC")
+	}
+
+	sb.Limit(offset, limit)
+
+	var order_import_list = make([]order_import_view_item_t, 0)
+	err := db_session.Sql(sb.SqlList()).Find(&order_import_list)
+	core.HandleError(err)
+
+	var order_count struct {
+		Count int64 `xorm:"order_count"`
+	}
+	_, err = db_session.Sql(sb.SqlCount()).Get(&order_count)
+	core.HandleError(err)
+
+	return c.RenderJson(core.GridResult{
+		Data:  order_import_list,
+		Total: order_count.Count,
+	})
 }
 
 // 上传 Excel 导入订单
