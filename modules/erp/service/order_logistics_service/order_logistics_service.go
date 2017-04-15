@@ -82,22 +82,53 @@ func (p_ol *OrderLogistics) init_data(db_session *xorm.Session) {
 	p_ol.logistics_fee_rate_map = logistics_fee_rate_map
 }
 
-// 计算订单的物流方式 和 Hold 类型，调用这个函数的时候应该开启数据库事务，
-func (p_ol *OrderLogistics) Calculate(db_session *xorm.Session) {
+func (p_ol *OrderLogistics) CalculatePaidOrders(db_session *xorm.Session) error {
+	// 获取 已支付 状态的订单, 匹配完成后，订单的状态就是 Hold 或者 待配货
+	var order_list = order_service.Get_paid_order_list(db_session)
+	return p_ol.Calculate(order_list, db_session)
+}
+
+func (p_ol *OrderLogistics) CalculateImportBatch(batch_code int64, db_session *xorm.Session) error {
+
+	//获得该批次号的订单列表
+	/*
+SELECT o.* FROM erp_order o
+    INNER JOIN erp_order_import_batch ib ON ib.order_id = o.id
+WHERE ib.batch_code = 0
+	 */
+	var sql_import_batch_order = `SELECT o.* FROM erp_order o
+    INNER JOIN erp_order_import_batch ib ON ib.order_id = o.id
+WHERE ib.batch_code = %d`
+	sql_import_batch_order = fmt.Sprintf(sql_import_batch_order, batch_code)
+
+	var order_list = make([]models.OrderInfo, 0)
+	err := db_session.Sql(sql_import_batch_order).Find(&order_list)
+	core.HandleError(err)
+
+	return p_ol.Calculate(order_list, db_session)
+}
+
+// 匹配前要判断一下订单的状态，订单不是已支付状态的话，不能匹配
+// 计算订单的物流方式 和 Hold 类型，调用这个函数的时候应该  “开启数据库事务“， 调用完成后，订单的状态就是 Hold 或者 待配货
+func (p_ol *OrderLogistics) Calculate(order_list []models.OrderInfo, db_session *xorm.Session) error {
 	defer func() {
 		if err := recover(); err != nil {
 			revel.ERROR.Printf("匹配物流方式，出现错误： %s\n", err)
 		}
 	}()
 
+	//先判断订单状态
+	for _, order := range order_list {
+		if order.StatusId != models.ORDER_STATUS_YZF {
+			return errors.New("订单状态为已支付状态的，才能匹配物流！")
+		}
+	}
+
 	p_ol.init_data(db_session)
 
-	// 拆分和合并订单，在这之前就已经完成了？ 不是在这里做，就可以了，做完进入 hold
+	// 拆分和合并订单，在这之前就已经完成了？ 不是在这里做，就可以了，做完进入 hold ??
 
-	// 获取 已支付 状态的订单, 匹配完成后，订单的状态就是 Hold 或者 待配货
-	var paid_order_list = order_service.Get_paid_order_list(db_session)
-
-	for _, order := range paid_order_list {
+	for _, order := range order_list {
 		var p_order_logistics_data = new(order_logistics_data_t)
 		//　一起加载需要的数据的方式，对性能的影响应该不会很大的
 		// p_order_logistics_data.load_data(&order, p_ol, db_session)
@@ -181,6 +212,7 @@ func (p_ol *OrderLogistics) Calculate(db_session *xorm.Session) {
 
 	// 仓库的商品库存状态里面是不是也可以加一个待配货数量，实际库存没有减掉，但是已经这个商品被预定配货了，实际配货成功后，就减掉实际配货 ?? -- 通过在库存表里面插入一个特殊库位的库存记录的方法，这个特殊库位的Id为 -1
 
+	return nil
 }
 
 // 1 地址有特殊字段的
@@ -401,7 +433,6 @@ func (p_ol *OrderLogistics) hold_check_envelope(p_order *models.OrderInfo, p_ord
 	envelope_max_weight = envelope_side_length_slice[1]
 	envelope_max_height = envelope_side_length_slice[0] // 最短
 
-
 	// get_order_products_whole_logistics_data的输出中 长 > 宽 > 高
 	var whole_length, whole_width, whole_height, _, whole_weight float64 = get_order_products_whole_logistics_data(p_order_logistics_data, 0)
 
@@ -455,6 +486,7 @@ func (p_ol *OrderLogistics) hold_check_address_info_miss(p_order *models.OrderIn
 
 func (p_ol *OrderLogistics) update_order_to_hold_type(p_order *models.OrderInfo, hold_type_id int64, db_session *xorm.Session) {
 	p_order.HoldTypeId = core.MakeNullInt(hold_type_id, true)
+	p_order.StatusId = models.ORDER_STATUS_HOLD // 修改订单状态为 hold 状态
 	_, err := db_session.Id(p_order.Id).Cols("hold_type_id").Update(p_order)
 	core.HandleError(err)
 }
@@ -696,6 +728,11 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 		_, err := db_session.Insert(&order_logistics)
 		core.HandleError(err)
 	}
+
+	// 把订单状态修改为 待配货
+	p_order.StatusId = models.ORDER_STATUS_DPH
+	_, err = db_session.Id(p_order.Id).Cols("status_id").Update(p_order)
+	core.HandleError(err)
 
 	// 多个商品时，考虑拆包的方式
 

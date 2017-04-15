@@ -21,9 +21,13 @@
                         <i class="ace-icon fa fa-plus"></i>
                         导入
                     </button>
+                    <button class="btn btn-purple btn-sm" @click="matchLogistics()">
+                        <i class="ace-icon fa fa-truck"></i>
+                        匹配物流
+                    </button>
                     <button class="btn btn-danger btn-sm" @click="deleteImportOrder()">
                         <i class="ace-icon fa fa-trash-o"></i>
-                        删除
+                        删除订单
                     </button>
                     <button class="btn btn-danger btn-sm" @click="deleteImportBatch()">
                         <i class="ace-icon fa fa-trash"></i>
@@ -258,6 +262,31 @@
                                     }
                                 }
                             );
+
+                            vm.reloadList();
+                        }
+                    });
+                });
+            },
+            matchLogistics: function () {
+                if (vm.page.batch_code == 0) {
+                    $.msg.error("请选择要匹配物流的导入批次！");
+                    return;
+                }
+
+                $.msg.confirm("确认要匹配该批次的物流吗？", function () {
+                    $.ajax({
+                        url: '{%url "ErpOrderImport.MatchLogistics"%}',
+                        type: "POST",
+                        data: {"batch_code": vm.page.batch_code},
+                        success: function (data) {
+                            if (data.success == false) {
+                                $.msg.error(data.message);
+                                return;
+                            }
+                            else {
+                                $.msg.show(data.message);
+                            }
 
                             vm.reloadList();
                         }

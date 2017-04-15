@@ -11,6 +11,7 @@ import (
 	"matrix/core"
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/exchange_rate_service"
+	"matrix/modules/erp/service/order_logistics_service"
 )
 
 type ErpOrderImport struct {
@@ -542,5 +543,21 @@ func (c ErpOrderImport) Delete() revel.Result {
 	return c.RenderJson(map[string]interface{}{
 		"success": true,
 		"message": "删除成功！",
+	})
+}
+
+func (c ErpOrderImport) MatchLogistics() revel.Result {
+	var db_session = c.DbSession
+
+	var batch_code int64
+	c.Params.Bind(&batch_code, "batch_code")
+
+	var p_order_logistics = new(order_logistics_service.OrderLogistics)
+	err := p_order_logistics.CalculateImportBatch(batch_code, db_session)
+	core.HandleError(err)
+
+	return c.RenderJson(map[string]interface{}{
+		"success": true,
+		"message": "批次匹配物流完成！",
 	})
 }
