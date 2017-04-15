@@ -381,6 +381,24 @@ SELECT sa.id AS shop_id, sa.name AS shop_name FROM erp_shop_account sa;
 			})
 		}
 
+		// 检查导入的订单编号是否存在
+		/*
+		SELECT count(o.id) AS order_count FROM erp_order o WHERE o.code = '123'
+		 */
+		var order_count struct {
+			Count int64 `xorm:"'order_count'"`
+		}
+		var sql_order_count = `SELECT count(o.id) AS order_count FROM erp_order o WHERE o.code = '%s'`
+		sql_order_count = fmt.Sprintf(sql_order_count, order_import.Ddbh)
+		_, err := db_session.Sql(sql_order_count).Get(&order_count)
+		core.HandleError(err)
+		if order_count.Count != 0 {
+			return c.RenderJson(map[string]interface{}{
+				"success": false,
+				"message": "导入文件中的订单编号数据库中已经存在！",
+			})
+		}
+
 		// 商品SKU是否存在
 		has, product_id := is_product_sku_exist(order_import.Spbh)
 		if has == false {
