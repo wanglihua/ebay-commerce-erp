@@ -21,6 +21,10 @@
                         <i class="ace-icon fa fa-plus"></i>
                         导入
                     </button>
+                    <button class="btn btn-danger btn-sm" @click="deleteImportOrder()">
+                        <i class="ace-icon fa fa-trash-o"></i>
+                        删除
+                    </button>
                 </div>
                 <div style="margin-top: 10px;">
                     <a href="/static/excel-template/order_import.xlsx">下载Excel模板</a>
@@ -186,6 +190,37 @@
         methods: {
             reloadList: function () {
                 reloadList('#orderList');
+            },
+            deleteImportOrder: function () {
+                var id_list = [];
+                $('#orderList tbody tr>td:first-child input:checkbox').each(function () {
+                    if (this.checked) {
+                        id_list.push($(this).val());
+                    }
+                });
+
+                if (id_list.length == 0) {
+                    $.msg.alert("请选择数据！");
+                    return;
+                }
+
+                $.msg.confirm("确认要删除吗？", function () {
+                    $.ajax({
+                        url: '{%url "ErpOrderImport.Delete"%}',
+                        type: "POST",
+                        data: {"id_list": id_list},
+                        success: function (data) {
+                            if (data.success == false) {
+                                $.msg.error(data.message);
+                                return;
+                            }
+                            else {
+                                $.msg.show(data.message);
+                            }
+                            vm.reloadList();
+                        }
+                    });
+                });
             }
         }
     });

@@ -518,7 +518,7 @@ func (c ErpOrderImport) Delete() revel.Result {
 	/*
 	SELECT count(ib.id) AS order_import_count FROM erp_order_import_batch ib WHERE ib.order_id IN (0, 1, 2)
 	*/
-	var sql_order_import_count = `SELECT count(ib.id) AS order_import_count FROM erp_order_import_batch ib WHERE ib.order_id = IN (%s)`
+	var sql_order_import_count = `SELECT count(ib.id) AS order_import_count FROM erp_order_import_batch ib WHERE ib.order_id IN (%s)`
 	sql_order_import_count = fmt.Sprintf(sql_order_import_count, strings.Join(order_id_str_list, ","))
 	_, err := db_session.Sql(sql_order_import_count).Get(&order_import_count)
 	core.HandleError(err)
