@@ -36,7 +36,7 @@
                 <div class="row" style="margin-top: 20px;margin-bottom: 20px;">
                     <div id="query" class="col-xs-12" style="line-height: 28px;">
                         <div class="col-xs-12">
-                            <select id="shop_id" name="page.batch_code" v-model.number="page.batch_code" style="width: 120px;" @change="reloadList()">
+                            <select id="batch_code" name="page.batch_code" v-model.number="page.batch_code" style="width: 120px;" @change="reloadList()">
                                 <option :value="0">-导入批次号-</option>
                                 <template v-for="batch_code in page.batch_code_list">
                                     <option :value="batch_code">{{batch_code}}</option>
@@ -47,7 +47,6 @@
                 </div>
                 <div>
                     <table id="orderList" class="table table-striped table-bordered table-hover"></table>
-                    <div class="todo">1、按批次进行查询 2、按批次进行删除</div>
                 </div>
             </div>
         </div>
@@ -259,7 +258,7 @@
                                     }
                                 }
                             );
-                            
+
                             vm.reloadList();
                         }
                     });

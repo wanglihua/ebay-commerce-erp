@@ -2,9 +2,10 @@ package controllers
 
 import (
 	"encoding/json"
+	"fmt"
 	"strconv"
-	"github.com/revel/revel"
 
+	"github.com/revel/revel"
 	"matrix/core"
 	"matrix/modules/erp/models"
 )
@@ -17,8 +18,33 @@ func (c ErpOrderLogistics) Index() revel.Result {
 	return c.RenderTemplate("erp/ddlc/order_logistics/order_logistics_index.html")
 }
 
+func (c ErpOrderLogistics) PageData() revel.Result {
+	var db_session = c.DbSession
+
+	var stock_list = make([]models.StockInfo, 0)
+	err := db_session.Where(fmt.Sprintf("stock_type_id = %d", models.STOCK_TYPE_AU)).Find(&stock_list) //只取澳洲的仓库
+	core.HandleError(err)
+
+	var logistics_company_list = make([]models.LogisticsCompanyInfo, 0)
+	err = db_session.Find(&logistics_company_list)
+	core.HandleError(err)
+
+	return c.RenderJson(map[string]interface{}{
+		"stock_id":               0,
+		"stock_list":             stock_list,
+		"logistics_company_id":   0,
+		"logistics_company_list": logistics_company_list,
+	})
+}
+
 func (c ErpOrderLogistics) ListData() revel.Result {
 	db_session := c.DbSession
+
+	var stock_id int64
+	c.Params.Bind(&stock_id, "stock_id")
+
+	var logistics_company_id int64
+	c.Params.Bind(&logistics_company_id, "logistics_company_id")
 
 	type order_logistics_view_item_t struct {
 		models.OrderLogisticsInfo    `xorm:"extends" json:"ol"`
@@ -28,12 +54,12 @@ func (c ErpOrderLogistics) ListData() revel.Result {
 	}
 
 	/*
-SELECT
-    ol.*, o.*, s.*, lc.*
+SELECT ol.*, o.*, s.*, lc.*
 FROM erp_order_logistics ol
     INNER JOIN erp_order o ON o.id = ol.order_id
     INNER JOIN erp_stock s ON s.id = ol.stock_id
     INNER JOIN erp_logistics_company lc ON lc.id = ol.company_id
+WHERE ol.stock_id = 0 AND ol.company_id = 0;
 	 */
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
@@ -45,9 +71,16 @@ FROM erp_order_logistics ol
     INNER JOIN erp_order o ON o.id = ol.order_id
     INNER JOIN erp_stock s ON s.id = ol.stock_id
     INNER JOIN erp_logistics_company lc ON lc.id = ol.company_id`)
-	sb.Where(filter)
 
-	//query extra filter here
+	if stock_id != 0 {
+		filter = core.SqlAnd(filter, fmt.Sprintf("ol.stock_id = %d", stock_id))
+	}
+
+	if logistics_company_id != 0 {
+		filter = core.SqlAnd(filter, fmt.Sprintf("ol.company_id = %d", logistics_company_id))
+	}
+
+	sb.Where(filter)
 
 	if order != "" {
 		sb.OrderBy(order)

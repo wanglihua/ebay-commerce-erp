@@ -282,6 +282,7 @@ POST /erp/order/paypal/shipping/address        ErpOrder.GetPaypalShippingAddress
 # GET  /erp/order/khb                            ErpOrderKhb.Index
 
 GET  /erp/order/logistics                      ErpOrderLogistics.Index
+POST /erp/order/logistics/data/page            ErpOrderLogistics.PageData
 POST /erp/order/logistics/data/list            ErpOrderLogistics.ListData
 POST /erp/order/logistics/data/detail          ErpOrderLogistics.DetailData
 POST /erp/order/logistics/save                 ErpOrderLogistics.Save
