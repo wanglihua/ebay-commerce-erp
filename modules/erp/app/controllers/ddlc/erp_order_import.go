@@ -470,3 +470,15 @@ SELECT sa.id AS shop_id, sa.name AS shop_name FROM erp_shop_account sa;
 		"message": "数据导入成功！",
 	})
 }
+
+func (c ErpOrderImport) BatchDelete() revel.Result {
+	return c.RenderJson(map[string]interface{}{
+
+	})
+}
+
+func (c ErpOrderImport) Delete() revel.Result {
+	return c.RenderJson(map[string]interface{}{
+
+	})
+}

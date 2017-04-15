@@ -190,7 +190,6 @@ func (c ErpOrder) ListData() revel.Result {
 }
 
 func (c ErpOrder) Detail(order_id int64) revel.Result {
-	c.RenderArgs["static_version"] = core.GetStaticVersion()
 	c.RenderArgs["order_id"] = order_id
 	return c.RenderTemplate("erp/ddlc/order/order_detail.html")
 }
@@ -244,7 +243,7 @@ func (c ErpOrder) DetailData() revel.Result {
 SELECT oi.*, p.*, psi.*
 FROM erp_order_item oi
     INNER JOIN erp_product p ON p.id = oi.item_product_id
-    INNER JOIN erp_product_store_item psi ON psi.id = oi.product_store_item_id
+    LEFT JOIN erp_product_store_item psi ON psi.id = oi.product_store_item_id
 WHERE oi.order_id = %d;`
 	sql = fmt.Sprintf(sql, order_id)
 
