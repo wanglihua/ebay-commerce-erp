@@ -22,8 +22,16 @@ func (c ErpOrderHold) PageData() revel.Result {
 
 	// hold类型列表
 
-	return c.RenderJson(map[string]interface{}{
+	/*
+	             "hold_type_id": 0,
+                "hold_type_list": []
+	 */
 
+	var hold_type_list = make([]models.OrderHoldTypeInfo, 0)
+
+	return c.RenderJson(map[string]interface{}{
+		"hold_type_id":   0,
+		"hold_type_list": hold_type_list,
 	})
 }
 
