@@ -17,6 +17,16 @@ func (c ErpOrderHold) Index() revel.Result {
 	return c.RenderTemplate("erp/ddlc/order_hold/order_hold_index.html")
 }
 
+func (c ErpOrderHold) PageData() revel.Result {
+	//var db_session = c.DbSession
+
+	// hold类型列表
+
+	return c.RenderJson(map[string]interface{}{
+
+	})
+}
+
 func (c ErpOrderHold) ListData() revel.Result {
 	db_session := c.DbSession
 

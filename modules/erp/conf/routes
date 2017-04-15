@@ -265,9 +265,12 @@ GET  /erp/person/sales/report                  ErpPersonSalesReport.Index
 POST /erp/order/data/page                      ErpOrder.PageData
 POST /erp/order/data/list                      ErpOrder.ListData
 
+GET  /erp/order/hold                           ErpOrderHold.Index
+POST /erp/order/hold/list/data                 ErpOrderHold.ListData
+POST /erp/order/hold/page/data                 ErpOrderHold.PageData
+
 # 可合并订单
 GET  /erp/order/khb                            ErpOrderKhb.Index
-GET  /erp/order/hold                           ErpOrderHold.Index
 # 这个路由应该放到最后去，否则放在他后面的有的路由会不工作
 # GET  /erp/order/:status                        ErpOrder.Index
 GET  /erp/order/detail/:order_id               ErpOrder.Detail
