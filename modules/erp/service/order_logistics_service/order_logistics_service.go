@@ -117,6 +117,10 @@ func (p_ol *OrderLogistics) Calculate(order_list []models.OrderInfo, db_session 
 		}
 	}()
 
+	if len(order_list) == 0 {
+		return errors.New("订单列表为空！")
+	}
+
 	//先判断订单状态
 	for _, order := range order_list {
 		if order.StatusId != models.ORDER_STATUS_YZF {
