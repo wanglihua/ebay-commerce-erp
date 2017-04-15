@@ -472,13 +472,75 @@ SELECT sa.id AS shop_id, sa.name AS shop_name FROM erp_shop_account sa;
 }
 
 func (c ErpOrderImport) BatchDelete() revel.Result {
-	return c.RenderJson(map[string]interface{}{
+	var db_session = c.DbSession
 
+	var batch_code int64
+	c.Params.Bind(&batch_code, "batch_code")
+
+	/*
+DELETE FROM erp_order WHERE id IN (
+    SELECT order_id FROM erp_order_import_batch WHERE batch_code = 1
+);
+
+DELETE FROM erp_order_import_batch WHERE batch_code = 1;
+	 */
+
+	var sql_delete_order = `DELETE FROM erp_order WHERE id IN (
+    SELECT order_id FROM erp_order_import_batch WHERE batch_code = 1
+)`
+	sql_delete_order = fmt.Sprintf(sql_delete_order, batch_code)
+	_, err := db_session.Sql(sql_delete_order).Exec(sql_delete_order)
+	core.HandleError(err)
+
+	var sql_delete_batch = `DELETE FROM erp_order_import_batch WHERE batch_code = %d`
+	sql_delete_batch = fmt.Sprintf(sql_delete_batch, batch_code)
+	_, err = db_session.Sql(sql_delete_batch).Exec(sql_delete_batch)
+	core.HandleError(err)
+
+	return c.RenderJson(map[string]interface{}{
+		"success": true,
+		"message": "删除成功！",
 	})
 }
 
 func (c ErpOrderImport) Delete() revel.Result {
-	return c.RenderJson(map[string]interface{}{
+	var db_session = c.DbSession
 
+	var order_id_list = make([]int64, 0)
+	c.Params.Bind(&order_id_list, "id_list")
+
+	var order_id_str_list = core.Int_list_to_str_list(order_id_list)
+
+	// 判断是不是导入的订单，如果不是导入的订单就不能删除
+	var order_import_count struct {
+		Count int64  `xorm:"'order_import_count'"`
+	}
+	/*
+	SELECT count(ib.id) AS order_import_count FROM erp_order_import_batch ib WHERE ib.order_id IN (0, 1, 2)
+	*/
+	var sql_order_import_count = `SELECT count(ib.id) AS order_import_count FROM erp_order_import_batch ib WHERE ib.order_id = IN (%s)`
+	sql_order_import_count = fmt.Sprintf(sql_order_import_count, strings.Join(order_id_str_list, ","))
+	_, err := db_session.Sql(sql_order_import_count).Get(&order_import_count)
+	core.HandleError(err)
+
+	// 有 order 不是在导入批次里面的
+	if order_import_count.Count < int64(len(order_id_list)) {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "只有删除导入的订单！",
+		})
+	}
+
+	// 删除 订单信息
+	_, err = db_session.In("id", order_id_list).Delete(new(models.OrderInfo))
+	core.HandleError(err)
+
+	//删除 订单导入信息
+	_, err = db_session.In("order_id", order_id_list).Delete(new(models.OrderImportBatchInfo))
+	core.HandleError(err)
+
+	return c.RenderJson(map[string]interface{}{
+		"success": true,
+		"message": "删除成功！",
 	})
 }
