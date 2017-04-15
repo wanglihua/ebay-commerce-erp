@@ -90,6 +90,7 @@
                     if (result.success != true) {
                         $.msg.error(result.message);
                     } else {
+                        loadVmPageData();
                         reloadList('#orderList');
                         $.msg.show(result.message);
                     }
@@ -118,18 +119,7 @@
             var this_vm = this;
 
             //请求页面数据
-            $.ajax({
-                    url: '{%url "ErpOrderImport.PageData" %}',
-                    type: "POST",
-                    success: function (result) {
-                        if (result.success == false) {
-                            $.msg.error(result.message);
-                            return;
-                        }
-                        this_vm.page = result;
-                    }
-                }
-            );
+            loadPageData(this_vm);
 
             initDataTable(
                 '#orderList',
@@ -250,18 +240,7 @@
                             }
 
                             //重新加载页面数据，更新批次下拉框
-                            $.ajax({
-                                    url: '{%url "ErpOrderImport.PageData" %}',
-                                    type: "POST",
-                                    success: function (result) {
-                                        if (result.success == false) {
-                                            $.msg.error(result.message);
-                                            return;
-                                        }
-                                        vm.page = result;
-                                    }
-                                }
-                            );
+                           loadVmPageData();
 
                             vm.reloadList();
                         }
@@ -295,5 +274,24 @@
             }
         }
     });
+
+    function loadPageData(this_vm) {
+        $.ajax({
+                url: '{%url "ErpOrderImport.PageData" %}',
+                type: "POST",
+                success: function (result) {
+                    if (result.success == false) {
+                        $.msg.error(result.message);
+                        return;
+                    }
+                    this_vm.page = result;
+                }
+            }
+        );
+    }
+
+    function loadVmPageData() {
+        loadPageData(vm);
+    }
 </script>
 {%footer%}

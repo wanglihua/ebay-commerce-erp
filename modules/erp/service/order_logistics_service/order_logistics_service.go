@@ -491,7 +491,7 @@ func (p_ol *OrderLogistics) hold_check_address_info_miss(p_order *models.OrderIn
 func (p_ol *OrderLogistics) update_order_to_hold_type(p_order *models.OrderInfo, hold_type_id int64, db_session *xorm.Session) {
 	p_order.HoldTypeId = core.MakeNullInt(hold_type_id, true)
 	p_order.StatusId = models.ORDER_STATUS_HOLD // 修改订单状态为 hold 状态
-	_, err := db_session.Id(p_order.Id).Cols("hold_type_id").Update(p_order)
+	_, err := db_session.Id(p_order.Id).Cols("hold_type_id", "status_id").Update(p_order)
 	core.HandleError(err)
 }
 
