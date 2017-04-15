@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 	"time"
@@ -20,8 +21,34 @@ func (c ErpOrderImport) Index() revel.Result {
 	return c.RenderTemplate("erp/ddlc/order_import/order_import_index.html")
 }
 
+func (c ErpOrderImport) PageData() revel.Result {
+	var db_session = c.DbSession
+
+	// 获得导入的批次列表
+	type batch_code_t struct {
+		BatchCode int64 `xorm:"'batch_code'"`
+	}
+	var sql = `SELECT DISTINCT batch_code FROM erp_order_import_batch ORDER BY batch_code DESC`
+	var batch_code_t_list = make([]batch_code_t, 0)
+	err := db_session.Sql(sql).Find(&batch_code_t_list)
+	core.HandleError(err)
+
+	var batch_code_list = make([]int64, 0)
+	for _, batch_code := range batch_code_t_list {
+		batch_code_list = append(batch_code_list, batch_code.BatchCode)
+	}
+
+	return c.RenderJson(map[string]interface{}{
+		"batch_code":      0,
+		"batch_code_list": batch_code_list,
+	})
+}
+
 func (c ErpOrderImport) ListData() revel.Result {
 	db_session := c.DbSession
+
+	var batch_code int64
+	c.Params.Bind(&batch_code, "batch_code")
 
 	type order_import_view_item_t struct {
 		models.OrderInfo              `xorm:"extends" json:"o"`
@@ -42,6 +69,7 @@ FROM erp_order o
     INNER JOIN erp_shop_account sa ON sa.id = o.shop_id
     INNER JOIN erp_ecommerce_platform pf ON pf.id = sa.platform_id
     INNER JOIN erp_status s ON s.id = o.status_id
+WHERE ib.batch_code = 123
 	 */
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
@@ -56,6 +84,10 @@ FROM erp_order o
     INNER JOIN erp_shop_account sa ON sa.id = o.shop_id
     INNER JOIN erp_ecommerce_platform pf ON pf.id = sa.platform_id
     INNER JOIN erp_status s ON s.id = o.status_id`)
+
+	if batch_code != 0 {
+		filter = core.SqlAnd(filter, fmt.Sprintf("ib.batch_code = %d", batch_code))
+	}
 
 	sb.Where(filter)
 
