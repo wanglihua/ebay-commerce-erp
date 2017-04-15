@@ -340,7 +340,29 @@
                         },
                         {"mDataProp": "ol.create_time", "title": "创建时间", "bSearchable": false, "width": 120},
                         {"mDataProp": "ol.update_time", "title": "修改时间", "bSearchable": false, "width": 120}
-                    ]
+                    ],
+                    "fnServerData": function (sSource, aoData, fnCallback) {
+                        showMask("数据加载中，请稍候");
+
+                        aoData.push({'name': 'stock_id', 'value': this_vm.page.stock_id});
+                        aoData.push({'name': 'logistics_company_id', 'value': this_vm.page.logistics_company_id});
+
+                        $.ajax({
+                            "dataType": 'json',
+                            "url": sSource,
+                            "data": aoData,
+                            "success": function (data) {
+                                hideMask();
+
+                                if (data.success == false) {
+                                    $.msg.error(data.message);
+                                    return;
+                                }
+
+                                fnCallback(data);
+                            }
+                        });
+                    }
                 }
             );
 
