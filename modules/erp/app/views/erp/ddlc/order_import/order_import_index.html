@@ -25,6 +25,10 @@
                         <i class="ace-icon fa fa-trash-o"></i>
                         删除
                     </button>
+                    <button class="btn btn-danger btn-sm" @click="deleteImportBatch()">
+                        <i class="ace-icon fa fa-trash"></i>
+                        删除批次
+                    </button>
                 </div>
                 <div style="margin-top: 10px;">
                     <a href="/static/excel-template/order_import.xlsx">下载Excel模板</a>
@@ -119,7 +123,7 @@
                             $.msg.error(result.message);
                             return;
                         }
-                        vm.page = result;
+                        this_vm.page = result;
                     }
                 }
             );
@@ -199,7 +203,7 @@
                     }
                 });
 
-                if (id_list.length == 0) {
+                if (id_list.length === 0) {
                     $.msg.alert("请选择数据！");
                     return;
                 }
@@ -217,6 +221,45 @@
                             else {
                                 $.msg.show(data.message);
                             }
+                            vm.reloadList();
+                        }
+                    });
+                });
+            },
+            deleteImportBatch: function () {
+                if (vm.page.batch_code == 0) {
+                    $.msg.error("请选择要删除的导入批次！");
+                    return;
+                }
+
+                $.msg.confirm("确认要删除导入批次吗？", function () {
+                    $.ajax({
+                        url: '{%url "ErpOrderImport.BatchDelete"%}',
+                        type: "POST",
+                        data: {"batch_code": vm.page.batch_code},
+                        success: function (data) {
+                            if (data.success == false) {
+                                $.msg.error(data.message);
+                                return;
+                            }
+                            else {
+                                $.msg.show(data.message);
+                            }
+
+                            //重新加载页面数据，更新批次下拉框
+                            $.ajax({
+                                    url: '{%url "ErpOrderImport.PageData" %}',
+                                    type: "POST",
+                                    success: function (result) {
+                                        if (result.success == false) {
+                                            $.msg.error(result.message);
+                                            return;
+                                        }
+                                        vm.page = result;
+                                    }
+                                }
+                            );
+                            
                             vm.reloadList();
                         }
                     });

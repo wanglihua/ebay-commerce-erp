@@ -486,7 +486,7 @@ DELETE FROM erp_order_import_batch WHERE batch_code = 1;
 	 */
 
 	var sql_delete_order = `DELETE FROM erp_order WHERE id IN (
-    SELECT order_id FROM erp_order_import_batch WHERE batch_code = 1
+    SELECT order_id FROM erp_order_import_batch WHERE batch_code = %d
 )`
 	sql_delete_order = fmt.Sprintf(sql_delete_order, batch_code)
 	_, err := db_session.Sql(sql_delete_order).Exec(sql_delete_order)
