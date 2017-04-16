@@ -372,6 +372,18 @@ SELECT sa.id AS shop_id, sa.name AS shop_name FROM erp_shop_account sa;
 	// 例如 20170414212812
 	var import_batch_code int64 = int64(time_now.Year())*10000000000 + int64(time_now.Month())*100000000 + int64(time_now.Day()*1000000) + int64(time_now.Hour()*10000) + int64(time_now.Minute()*100) + int64(time_now.Second())
 
+	// 整理电话号码 "1234 5666"
+	for index, order_import := range order_import_list {
+		var phone = order_import.Dh
+
+		if phone != "" {
+			phone = strings.Replace(phone, " ", "", -1)
+			if len(phone) > 4 {
+				order_import_list[index].Dh = phone[0:4] + " " + phone[4:]
+			}
+		}
+	}
+
 	for _, order_import := range order_import_list {
 		// 店铺是否存在
 		has, shop_id := is_shop_name_exist(order_import.Dpm)

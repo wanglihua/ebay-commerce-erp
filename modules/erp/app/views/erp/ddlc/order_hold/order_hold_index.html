@@ -83,8 +83,14 @@
                             }
                         },
 
-                        {"mDataProp": "o.code", "title": "订单编号", "bSearchable": true, "width": 180},
+                        {
+                            "mDataProp": "o.code", "title": "订单编号", "bSearchable": true, "width": 180,
+                            "render": function (data, type, row) {
+                                return "<a href='/erp/order/detail/" + row.o.id + "' target='_blank'>" + data + "</a>";
+                            }
+                        },
                         {"mDataProp": "ot.name", "title": "类型", "bSearchable": true},
+                        {"mDataProp": "ht.name", "title": "hold", "bSearchable": true},
                         {"mDataProp": "s.name", "title": "状态", "bSearchable": true},
                         {"mDataProp": "sa.name", "title": "店铺", "bSearchable": true},
                         {"mDataProp": "o.buyer_user_id", "title": "买家用户id", "bSearchable": true},
