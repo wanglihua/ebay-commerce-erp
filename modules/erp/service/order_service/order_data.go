@@ -190,5 +190,5 @@ func Get_order_shipping_address(order_id int64, db_session *xorm.Session) models
 		return order_shipping_address_list[0]
 	}
 
-	return models.OrderShippingAddressInfo{}
+	return models.OrderShippingAddressInfo{} //如果前面的都不成立，就返回一个默认的
 }

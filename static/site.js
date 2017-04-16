@@ -272,11 +272,13 @@ function initSingleSelectDataTable(table, options) {
     }
 }
 
+//重新加载数据，但是分页页面还是停留在原来的分页号
 function reloadList(list) {
     var tables = $(list).dataTable().api();
     tables.draw(false);
 }
 
+//重新加载数据，分页页面变换为 第一页
 function refreshList(list) {
     var tables = $(list).dataTable().api();
     tables.draw(true);

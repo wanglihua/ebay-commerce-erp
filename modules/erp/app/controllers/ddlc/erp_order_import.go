@@ -423,17 +423,6 @@ SELECT sa.id AS shop_id, sa.name AS shop_name FROM erp_shop_account sa;
 			product_id_and_sku_list = append(product_id_and_sku_list, product_id_and_sku)
 		}
 
-		// 地址
-		var order_shipping_address models.OrderShippingAddressInfo
-		order_shipping_address.Name = order_import.Khxm
-		order_shipping_address.PostalCode = order_import.Yzbm
-		order_shipping_address.Street1 = order_import.Yjdz
-		order_shipping_address.Phone = order_import.Dh
-		order_shipping_address.Province = order_import.Ssdq
-		order_shipping_address.CityName = order_import.Sscs
-		_, err = db_session.Insert(&order_shipping_address)
-		core.HandleError(err)
-
 		// 订单
 		var order models.OrderInfo
 		order.ShopId = shop_id
@@ -448,6 +437,18 @@ SELECT sa.id AS shop_id, sa.name AS shop_name FROM erp_shop_account sa;
 		order.TypeId = models.ORDER_TYPE_DRDD // 导入订单
 		order.StatusId = models.ORDER_STATUS_YZF
 		_, err = db_session.Insert(&order)
+		core.HandleError(err)
+
+		// 地址
+		var order_shipping_address models.OrderShippingAddressInfo
+		order_shipping_address.OrderId = order.Id
+		order_shipping_address.Name = order_import.Khxm
+		order_shipping_address.PostalCode = order_import.Yzbm
+		order_shipping_address.Street1 = order_import.Yjdz
+		order_shipping_address.Phone = order_import.Dh
+		order_shipping_address.Province = order_import.Ssdq
+		order_shipping_address.CityName = order_import.Sscs
+		_, err = db_session.Insert(&order_shipping_address)
 		core.HandleError(err)
 
 		// 订单详细
@@ -480,6 +481,10 @@ func (c ErpOrderImport) BatchDelete() revel.Result {
 	c.Params.Bind(&batch_code, "batch_code")
 
 	/*
+DELETE FROM erp_order_logistics WHERE order_id IN (
+    SELECT order_id FROM erp_order_import_batch WHERE batch_code = 1
+);
+
 DELETE FROM erp_order_item WHERE order_id IN (
     SELECT order_id FROM erp_order_import_batch WHERE batch_code = 1
 );
@@ -495,12 +500,20 @@ DELETE FROM erp_order WHERE id IN (
 DELETE FROM erp_order_import_batch WHERE batch_code = 1;
 	 */
 
+	// 删除 订单物流信息
+	var sql_delete_order_logistics = `DELETE FROM erp_order_logistics WHERE order_id IN (
+    SELECT order_id FROM erp_order_import_batch WHERE batch_code = %d
+)`
+	sql_delete_order_logistics = fmt.Sprintf(sql_delete_order_logistics, batch_code)
+	_, err := db_session.Exec(sql_delete_order_logistics)
+	core.HandleError(err)
+
 	// 删除 订单明细信息
 	var sql_delete_order_item = `DELETE FROM erp_order_item WHERE order_id IN (
     SELECT order_id FROM erp_order_import_batch WHERE batch_code = %d
 )`
 	sql_delete_order_item = fmt.Sprintf(sql_delete_order_item, batch_code)
-	_, err := db_session.Exec(sql_delete_order_item)
+	_, err = db_session.Exec(sql_delete_order_item)
 	core.HandleError(err)
 
 	// 删除 订单收货地址信息
@@ -558,6 +571,10 @@ func (c ErpOrderImport) Delete() revel.Result {
 			"message": "只有删除导入的订单！",
 		})
 	}
+
+	// 删除 订单物流信息
+	_, err = db_session.In("order_id", order_id_list).Delete(new(models.OrderLogisticsInfo))
+	core.HandleError(err)
 
 	// 删除 订单明细信息
 	_, err = db_session.In("order_id", order_id_list).Delete(new(models.OrderItemInfo))

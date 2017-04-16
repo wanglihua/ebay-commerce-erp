@@ -21,7 +21,7 @@
                 <div class="row" style="margin-top: 20px;margin-bottom: 20px;">
                     <div id="query" class="col-xs-12" style="line-height: 28px;">
                         <div class="col-xs-12">
-                            <select id="hold_type_id" name="page.hold_type_id" v-model.number="page.hold_type_id" style="width: 120px;" @change="reloadList()">
+                            <select id="hold_type_id" name="page.hold_type_id" v-model.number="page.hold_type_id" style="width: 120px;" @change="refreshList()">
                                 <option :value="0">-Hold类型-</option>
                                 <template v-for="hold_type in page.hold_type_list">
                                     <option :value="hold_type.id">{{hold_type.name}}</option>
@@ -123,6 +123,9 @@
         methods: {
             reloadList: function () {
                 reloadList('#orderList');
+            },
+            refreshList: function () {
+                refreshList('#orderList');
             }
         }
     });
