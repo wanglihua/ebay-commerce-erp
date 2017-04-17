@@ -8,6 +8,7 @@ import (
 	"github.com/revel/revel"
 	"matrix/core"
 	"matrix/modules/erp/models"
+	"matrix/modules/erp/setting"
 )
 
 type ErpOrderLogistics struct {
@@ -15,6 +16,7 @@ type ErpOrderLogistics struct {
 }
 
 func (c ErpOrderLogistics) Index() revel.Result {
+	c.RenderArgs["icon_path"] = setting.ICON_PATH
 	return c.RenderTemplate("erp/ddlc/order_logistics/order_logistics_index.html")
 }
 
