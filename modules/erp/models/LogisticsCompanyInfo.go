@@ -11,6 +11,8 @@ type LogisticsCompanyInfo struct {
 	AddressSpecialWord int             `xorm:"int notnull 'address_special_word'" json:"address_special_word" smith:"verbose_name=地址特殊字段"` // 地址特殊字段 0 否， 1 是
 	Desc               core.NullString `xorm:"nvarchar(500) 'desc'" json:"desc" smith:"verbose_name=描述,max=500"`
 	StatusId           int64           `xorm:"bigint notnull index 'status_id'" json:"status_id" smith:"verbose_name=状态"`
+	IconFile           string          `xorm:"nvarchar(200) null 'icon_file'" json:"icon_file" smith:"verbose_name=图标"`
+	Ord                int64           `xorm:"bigint null 'ord'" json:"ord" smith:"verbose_name=排序"`
 	CreateTime         core.Time       `xorm:"created notnull 'create_time'" json:"create_time"`
 	UpdateTime         core.Time       `xorm:"updated notnull 'update_time'" json:"update_time"`
 	Version            int             `xorm:"version notnull 'version'" json:"version"`

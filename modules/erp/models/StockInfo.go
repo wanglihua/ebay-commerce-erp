@@ -14,6 +14,8 @@ type StockInfo struct {
 	StockTypeId   int64           `xorm:"bigint notnull 'stock_type_id'" json:"stock_type_id" smith:"verbose_name=仓库类型"`  // 国内仓库 在途仓库 澳洲仓库
 	TargetStockId core.NullInt    `xorm:"bigint null 'target_stock_id'" json:"target_stock_id" smith:"verbose_name=目的仓库"` //在途虚拟仓库的目的仓库
 	StatusId      int64           `xorm:"bigint notnull index 'status_id'" json:"status_id" smith:"verbose_name=状态"`
+	IconFile      string          `xorm:"nvarchar(200) null 'icon_file'" json:"icon_file" smith:"verbose_name=图标"`
+	Ord           int64           `xorm:"bigint null 'ord'" json:"ord" smith:"verbose_name=排序"`
 	CreateTime    core.Time       `xorm:"created notnull 'create_time'" json:"create_time"`
 	UpdateTime    core.Time       `xorm:"updated notnull 'update_time'" json:"update_time"`
 	Version       int             `xorm:"version notnull 'version'" json:"version"`
