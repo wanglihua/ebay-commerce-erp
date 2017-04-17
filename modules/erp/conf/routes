@@ -361,5 +361,12 @@ POST /erp/order/import/batch/delete          ErpOrderImport.BatchDelete
 POST /erp/order/import/delete                ErpOrderImport.Delete
 POST /erp/order/import/match/logistics       ErpOrderImport.MatchLogistics
 
+GET  /erp/little/icon                        ErpLittleIcon.Index
+POST /erp/little/icon/listdata               ErpLittleIcon.ListData
+POST /erp/little/icon/detail                 ErpLittleIcon.Detail
+POST /erp/little/icon/save                   ErpLittleIcon.Save
+POST /erp/little/icon/delete                 ErpLittleIcon.Delete
+POST /erp/lietle/icon/upload                 ErpLittleIcon.Upload
+
 # 这个通用的路由应该放到最后比较合适，否则放在他后面的有的路由会不工作
 GET  /erp/order/:status                        ErpOrder.Index

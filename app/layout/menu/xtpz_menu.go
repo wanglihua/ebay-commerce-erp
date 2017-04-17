@@ -70,6 +70,14 @@ func GetXtpzMenu(res_id_map map[int64]bool, db_session *xorm.Session, web_sessio
             </a>
             <b class="arrow"></b>
         </li>
+
+        <li id="xtpz-little-icon-menu" class="">
+            <a href="/erp/little/icon">
+                <i class="menu-icon fa fa-caret-right"></i>
+                图标管理
+            </a>
+            <b class="arrow"></b>
+        </li>
     </ul>
 </li>
 `)

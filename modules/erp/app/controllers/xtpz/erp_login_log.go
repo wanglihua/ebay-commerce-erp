@@ -1,12 +1,12 @@
 package controllers
 
 import (
-	"github.com/revel/revel"
+	"fmt"
+	"strings"
 
+	"github.com/revel/revel"
 	"matrix/core"
 	"matrix/modules/erp/models"
-	"strings"
-	"fmt"
 )
 
 type ErpLoginLog struct {

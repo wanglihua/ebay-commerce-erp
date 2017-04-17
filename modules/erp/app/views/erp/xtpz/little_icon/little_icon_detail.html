@@ -1,0 +1,128 @@
+<div class="modal fade" id="littleIconDetailDialog">
+    <div class="modal-dialog" style="width: 440px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="True">&times;</button>
+                <h4 class="modal-title">图标详细</h4>
+            </div>
+            <div class="modal-body clearfix">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <form class="form-horizontal" role="form" id="littleIconDetailForm" onsubmit="saveLittleIcon();return false;">
+                            <input id="littleIcon_id" name="form.LittleIcon.Id" type="hidden" value="{%.form_LittleIcon_Id%}"/>
+                            <input id="littleIcon_version" name="form.LittleIcon.Version" type="hidden" value="{%.form_LittleIcon_Version%}"/>
+                            <div class="form-group">
+                                <label for="icon_file_name" class="col-xs-2 control-label no-padding-right">图标</label>
+                                <div class="col-xs-10">
+                                    <div class="input-group">
+                                        <input id="icon_file_name" name="form.LittleIcon.IconFile" type="text" class="input-sm form-control" readonly="readonly" value="{%.form_LittleIcon_IconFile%}"/>
+                                        <span class="input-group-btn">
+                                            <button id="btnUpload" class="btn btn-sm btn-purple" type="button">
+                                                <i class="ace-icon fa fa-upload"></i>上传
+                                            </button>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-xs-2 control-label no-padding-right"></label>
+                                <div class="col-xs-10">
+                                    {%if .is_create %}
+                                    <img id='{%"cate_image"%}' src="/static/images/icons/noimg.png" alt="" />
+                                    {%else%}
+                                    <img id="cate_image" src="{%.icon_path%}{%.form_LittleIcon_IconFile%}" alt="" />
+                                    {%end%}
+                                </div>
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success btn-sm" onclick="saveLittleIcon()">
+                    <i class="ace-icon fa fa-floppy-o"></i>保存
+                </button>
+                <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">
+                    <i class="ace-icon fa fa-times"></i>关闭
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(function () {
+        var uploader = new plupload.Uploader({
+            runtimes: 'html5,flash,html4',
+
+            browse_button: 'btnUpload',
+            file_data_name: "icon_file",
+
+            url: '{%url "ErpLittleIcon.Upload"%}',
+
+            filters: {
+                max_file_size: '200kb',
+                mime_types: [
+                    {title: "图像文件", extensions: "jpg,png"}
+                ]
+            },
+
+            flash_swf_url: '/plupload/js/Moxie.swf',
+
+            init: {
+                FilesAdded: function () {
+                    uploader.start();
+                },
+                FileUploaded: function (up, file, response) {
+                    var result = JSON.parse(response.response);
+                    if (result.success != true) {
+                        $.msg.error(result.message);
+                    } else {
+                        $("#icon_file_name").val(result.fileName);
+                        $("#cate_image").attr("src", "{%.icon_path%}" + result.fileName)
+                    }
+                },
+                Error: function (up, err) {
+                    $.msg.error("上传发生错误：" + err.code + ", " + err.message);
+                }
+            }
+        });
+
+        uploader.init();
+    });
+
+    function saveLittleIcon() {
+        showMask("提交中...");
+        var form = $("#littleIconDetailForm");
+        var valid = validate(form, {
+            'form.LittleIcon.IconFile': {
+                required: true
+            }
+        });
+
+        if (!valid) {
+            hideMask();
+        } else {
+            $.ajax({
+                       url: '{%url "ErpLittleIcon.Save"%}',
+                       type: "POST",
+                       data: form.serialize(),
+                       success: function (data) {
+                           hideMask();
+                           if (data.success == false) {
+                               $.msg.error(data.message);
+                               //return;
+                           }
+                           else {
+                               $.msg.show(data.message);
+                               $('#littleIconDetailDialog').modal('hide');
+                               reloadList('#littleIconList');
+                               //return;
+                           }
+                       }
+                   }
+            );
+        }
+    }
+</script>
+
