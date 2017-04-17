@@ -31,9 +31,9 @@
                             */%}
 
                             <div id="order_hold_type_query_list">
-                                <a href="#" @click="selectHoldType(0)">全部</a> &nbsp;
+                                <a :class="page.hold_type_id == 0 ? 'selected' : ''" href="#" @click="selectHoldType(0)"><img src="/static/images/icons/all_check.png" class="hold_type_icon" alt="全部"/>全部</a>
                                 <template v-for="hold_type in page.hold_type_list">
-                                    <a :class="page.hold_type_id == hold_type.id ? 'selected' : ''" href="#" @click="selectHoldType(hold_type.id)">&nbsp;<img class="hold_type_icon" v-if="hold_type.icon_file != ''" :src="'{%.icon_path%}/' + hold_type.icon_file" :alt="hold_type.name"/>{{hold_type.name}}</a>
+                                    <a :class="page.hold_type_id == hold_type.id ? 'selected' : ''" href="#" @click="selectHoldType(hold_type.id)">&nbsp;<img v-if="hold_type.icon_file != ''" :src="'{%.icon_path%}/' + hold_type.icon_file" :alt="hold_type.name" class="hold_type_icon"/>{{hold_type.name}}</a>
                                 </template>
                             </div>
 
