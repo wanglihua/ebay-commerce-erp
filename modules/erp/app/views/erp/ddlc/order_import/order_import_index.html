@@ -47,7 +47,7 @@
                             </template>
                         </select>
                         <label class="control-label no-padding-right" for="order_code_query">订单编号</label>
-                        <input id="order_code_query" class="input-sm" name="order_code_query" placeholder="订单编号查询" type="text" style="width: 100px;"/>
+                        <input id="order_code_query" class="input-sm" name="order_code_query" placeholder="订单编号查询" type="text" v-model="page.order_code_query" style="width: 100px;"/>
                         <label class="control-label no-padding-right" for="product_code_query">商品编号</label>
                         <input id="product_code_query" class="input-sm" name="product_code_query" placeholder="商品编号查询" type="text" v-model="page.product_code_query" style="width: 100px;"/>
                         <label class="control-label no-padding-right" for="buyer_name_query">客户姓名</label>
@@ -120,6 +120,7 @@
             "page": {
                 "batch_code": 0,
                 "batch_code_list": [],
+                "order_code_query": "",
                 "product_code_query": "",
                 "buyer_name_query": "",
                 "buyer_email_query": ""
