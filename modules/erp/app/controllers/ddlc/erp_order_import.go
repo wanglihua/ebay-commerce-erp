@@ -51,6 +51,18 @@ func (c ErpOrderImport) ListData() revel.Result {
 	var batch_code int64
 	c.Params.Bind(&batch_code, "batch_code")
 
+	var product_code_query string
+	c.Params.Bind(&product_code_query, "product_code_query")
+	product_code_query = strings.TrimSpace(product_code_query)
+
+	var buyer_name_query string
+	c.Params.Bind(&buyer_name_query, "buyer_name_query")
+	buyer_name_query = strings.TrimSpace(buyer_name_query)
+
+	var buyer_email_query string
+	c.Params.Bind(&buyer_email_query, "buyer_email_query")
+	buyer_email_query = strings.TrimSpace(buyer_email_query)
+
 	type order_import_view_item_t struct {
 		models.OrderInfo              `xorm:"extends" json:"o"`
 		models.OrderImportBatchInfo   `xorm:"extends" json:"ib"`
@@ -70,7 +82,8 @@ FROM erp_order o
     INNER JOIN erp_shop_account sa ON sa.id = o.shop_id
     INNER JOIN erp_ecommerce_platform pf ON pf.id = sa.platform_id
     INNER JOIN erp_status s ON s.id = o.status_id
-WHERE ib.batch_code = 123
+WHERE ib.batch_code = 123 AND o.buyer_user_id LIKE '%abc%' AND o.buyer_email LIKE '%abc%'
+      AND o.id IN (SELECT oi.order_id FROM erp_order_item oi INNER JOIN erp_product p ON p.id = oi.item_product_id WHERE p.sku LIKE '%abc%');
 	 */
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
@@ -88,6 +101,18 @@ WHERE ib.batch_code = 123
 
 	if batch_code != 0 {
 		filter = core.SqlAnd(filter, fmt.Sprintf("ib.batch_code = %d", batch_code))
+	}
+
+	if buyer_name_query != "" {
+		filter = core.SqlAnd(filter, fmt.Sprintf("o.buyer_user_id LIKE '%%%s%%'", buyer_name_query))
+	}
+
+	if buyer_email_query != "" {
+		filter = core.SqlAnd(filter, fmt.Sprintf("o.buyer_email LIKE '%%%s%%'", buyer_email_query))
+	}
+
+	if product_code_query != "" {
+		filter = core.SqlAnd(filter, fmt.Sprintf("o.id IN (SELECT oi.order_id FROM erp_order_item oi INNER JOIN erp_product p ON p.id = oi.item_product_id WHERE p.sku LIKE '%%%s%%')", product_code_query))
 	}
 
 	sb.Where(filter)
