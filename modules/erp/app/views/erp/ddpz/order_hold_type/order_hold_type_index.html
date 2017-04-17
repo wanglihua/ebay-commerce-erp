@@ -166,9 +166,9 @@
                             "width": 60,
                             "render": function (data, type, row) {
                                 if (data == "") {
-                                    return '<img src="/static/images/icons/noimg.png"  alt="" />'
+                                    return '<img style="width:24px;height:24px;" src="/static/images/icons/noimg.png"  alt="" />'
                                 } else {
-                                    return '<img src="{% .icon_path %}/' + data + '"  alt="" />'
+                                    return '<img style="width:24px;height:24px;" src="{% .icon_path %}/' + data + '"  alt="" />'
                                 }
                             }
                         },
