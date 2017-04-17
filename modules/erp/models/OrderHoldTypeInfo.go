@@ -9,6 +9,8 @@ type OrderHoldTypeInfo struct {
 	Id         int64               `xorm:"bigint notnull pk 'id'" json:"id"`
 	Name       string              `xorm:"nvarchar(200) notnull index unique 'name'" json:"name" smith:"verbose_name=名称"`
 	Desc       string              `xorm:"nvarchar(500) notnull 'desc'" json:"desc" smith:"verbose_name=备注"`
+	IconFile   string              `xorm:"nvarchar(200) null 'icon_file'" json:"icon_file" smith:"verbose_name=图标"`
+	Ord        int64               `xorm:"bigint null 'ord'" json:"ord" smith:"verbose_name=排序"`
 	CreateTime core.Time           `xorm:"created notnull 'create_time'" json:"create_time"`
 	UpdateTime core.Time           `xorm:"updated notnull 'update_time'" json:"update_time"`
 	Version    int                 `xorm:"version notnull 'version'" json:"version"`

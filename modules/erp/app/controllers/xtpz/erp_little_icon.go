@@ -12,18 +12,15 @@ import (
 	"github.com/revel/revel"
 	"matrix/core"
 	"matrix/modules/erp/models"
+	"matrix/modules/erp/setting"
 )
 
 type ErpLittleIcon struct {
 	*revel.Controller
 }
 
-const (
-	ICON_PATH = "/static/upload/icon" //应该是  最前面带有 / ， 最后不带有 / 号的
-)
-
 func (c ErpLittleIcon) Index() revel.Result {
-	c.RenderArgs["icon_path"] = ICON_PATH
+	c.RenderArgs["icon_path"] = setting.ICON_PATH
 	return c.RenderTemplate("erp/xtpz/little_icon/little_icon_index.html")
 }
 
@@ -89,7 +86,7 @@ func (c ErpLittleIcon) Detail() revel.Result {
 	form.LittleIcon = *little_icon
 	c.UnbindToRenderArgs(form, "form")
 	c.RenderArgs["is_create"] = form.IsCreate()
-	c.RenderArgs["icon_path"] = ICON_PATH
+	c.RenderArgs["icon_path"] = setting.ICON_PATH
 
 	return c.RenderTemplate("erp/xtpz/little_icon/little_icon_detail.html")
 }
@@ -138,7 +135,7 @@ func (c ErpLittleIcon) Delete() revel.Result {
 
 	//同时删除文件
 	for _, little_icon := range little_icon_list {
-		os.Remove(filepath.Join(revel.BasePath, ICON_PATH, little_icon.IconFile))
+		os.Remove(filepath.Join(revel.BasePath, setting.ICON_PATH, little_icon.IconFile))
 	}
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})
@@ -189,7 +186,7 @@ func (c ErpLittleIcon) Upload() revel.Result {
 		fileExt = ".png"
 	}
 
-	cate_icon_path := filepath.Join(revel.BasePath, ICON_PATH)
+	cate_icon_path := filepath.Join(revel.BasePath, setting.ICON_PATH)
 
 	if core.IsDirExists(cate_icon_path) == false {
 		err = os.MkdirAll(cate_icon_path, 0777)

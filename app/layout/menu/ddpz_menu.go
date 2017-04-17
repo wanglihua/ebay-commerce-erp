@@ -71,6 +71,14 @@ func GetDdpzMenu(res_id_map map[int64]bool, db_session *xorm.Session, web_sessio
              <b class="arrow"></b>
         </li>
 
+        <li id="ddpz-orderholdtype-menu" class="">
+            <a href="/erp/order/hold/type">
+                <i class="menu-icon fa fa-caret-right"></i>
+                订单Hold类型
+            </a>
+            <b class="arrow"></b>
+        </li>
+
         <li id="ddpz-platformlogisticsmode-menu" class="">
             <a href="/erp/platform/logistics/mode">
                 <i class="menu-icon fa fa-caret-right"></i>

@@ -368,5 +368,10 @@ POST /erp/little/icon/save                   ErpLittleIcon.Save
 POST /erp/little/icon/delete                 ErpLittleIcon.Delete
 POST /erp/lietle/icon/upload                 ErpLittleIcon.Upload
 
+GET  /erp/order/hold/type                    ErpOrderHoldType.Index
+POST /erp/order/hold/type/data/list          ErpOrderHoldType.ListData
+POST /erp/order/hold/type/data/detail        ErpOrderHoldType.DetailData
+POST /erp/order/hold/type/save               ErpOrderHoldType.Save
+
 # 这个通用的路由应该放到最后比较合适，否则放在他后面的有的路由会不工作
 GET  /erp/order/:status                        ErpOrder.Index
