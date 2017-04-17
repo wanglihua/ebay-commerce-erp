@@ -144,7 +144,7 @@
                 '#orderHoldTypeList',
                 {
                     "sAjaxSource": '{%url "ErpOrderHoldType.ListData"%}',
-                    "aaSorting": [[2, "asc"]],
+                    "aaSorting": [[4, "asc"]],
                     "aoColumns": [
                         {
                             "mDataProp": "id",
@@ -162,7 +162,8 @@
                             "title": "图标",
                             "bSearchable": false,
                             "orderable": false,
-                            "width": 100,
+                            "sClass": "center",
+                            "width": 60,
                             "render": function (data, type, row) {
                                 if (data == "") {
                                     return '<img src="/static/images/icons/noimg.png"  alt="" />'
@@ -302,7 +303,7 @@
             },
             selectLittleCateIcon: function () {
                 var icon_file = $('#selectIconList tbody tr>td:first-child input:checkbox:checked').closest("td").find("input.icon-file-data").val();
-                $("#icon_file").val(icon_file);
+                vm.detail.order_hold_type.icon_file = icon_file;
                 $('#selectIconDialog').modal("hide");
             }
         }
