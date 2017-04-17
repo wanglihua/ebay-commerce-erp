@@ -120,7 +120,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-success btn-sm" @click="selectLittleCateIcon()">
+                    <button type="button" class="btn btn-success btn-sm" @click="selectLittleIcon()">
                         <i class="ace-icon fa fa-hand-pointer-o"></i>选择
                     </button>
                     <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">
@@ -226,7 +226,7 @@
             );
 
             $('#selectIconList tbody').on('dblclick', 'tr', function () {
-                selectLittleCateIcon();
+                selectLittleIcon();
             });
         },
         methods: {
@@ -301,7 +301,7 @@
             showSelectIcon: function () {
                 $('#selectIconDialog').modal(modalOptions);
             },
-            selectLittleCateIcon: function () {
+            selectLittleIcon: function () {
                 var icon_file = $('#selectIconList tbody tr>td:first-child input:checkbox:checked').closest("td").find("input.icon-file-data").val();
                 vm.detail.order_hold_type.icon_file = icon_file;
                 $('#selectIconDialog').modal("hide");
