@@ -51,6 +51,10 @@ func (c ErpOrderImport) ListData() revel.Result {
 	var batch_code int64
 	c.Params.Bind(&batch_code, "batch_code")
 
+	var order_code_query string
+	c.Params.Bind(&order_code_query, "order_code_query")
+	order_code_query = strings.TrimSpace(order_code_query)
+
 	var product_code_query string
 	c.Params.Bind(&product_code_query, "product_code_query")
 	product_code_query = strings.TrimSpace(product_code_query)
@@ -82,7 +86,7 @@ FROM erp_order o
     INNER JOIN erp_shop_account sa ON sa.id = o.shop_id
     INNER JOIN erp_ecommerce_platform pf ON pf.id = sa.platform_id
     INNER JOIN erp_status s ON s.id = o.status_id
-WHERE ib.batch_code = 123 AND o.buyer_user_id LIKE '%abc%' AND o.buyer_email LIKE '%abc%'
+WHERE ib.batch_code = 123 AND o.code LIKE '%abc%' AND o.buyer_user_id LIKE '%abc%' AND o.buyer_email LIKE '%abc%'
       AND o.id IN (SELECT oi.order_id FROM erp_order_item oi INNER JOIN erp_product p ON p.id = oi.item_product_id WHERE p.sku LIKE '%abc%');
 	 */
 
@@ -101,6 +105,10 @@ WHERE ib.batch_code = 123 AND o.buyer_user_id LIKE '%abc%' AND o.buyer_email LIK
 
 	if batch_code != 0 {
 		filter = core.SqlAnd(filter, fmt.Sprintf("ib.batch_code = %d", batch_code))
+	}
+
+	if order_code_query != "" {
+		filter = core.SqlAnd(filter, fmt.Sprintf("o.code LIKE '%%%s%%'", order_code_query))
 	}
 
 	if buyer_name_query != "" {
