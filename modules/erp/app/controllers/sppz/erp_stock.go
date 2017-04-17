@@ -9,6 +9,7 @@ import (
 	"matrix/core"
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/status_service"
+	"matrix/modules/erp/setting"
 )
 
 type ErpStock struct {
@@ -16,6 +17,7 @@ type ErpStock struct {
 }
 
 func (c ErpStock) Index() revel.Result {
+	c.RenderArgs["icon_path"] = setting.ICON_PATH
 	return c.RenderTemplate("erp/sppz/stock/stock_index.html")
 }
 
