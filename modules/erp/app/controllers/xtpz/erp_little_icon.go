@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"image"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 
@@ -18,7 +19,7 @@ type ErpLittleIcon struct {
 }
 
 const (
-	ICON_PATH = "/static/upload/icon"
+	ICON_PATH = "/static/upload/icon" //应该是  最前面带有 / ， 最后不带有 / 号的
 )
 
 func (c ErpLittleIcon) Index() revel.Result {
@@ -27,10 +28,10 @@ func (c ErpLittleIcon) Index() revel.Result {
 }
 
 func (c ErpLittleIcon) ListData() revel.Result {
-	session := c.DbSession
+	db_session := c.DbSession
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
-	query := session.Where(filter)
+	query := db_session.Where(filter)
 
 	//query extra filter here
 
@@ -41,8 +42,8 @@ func (c ErpLittleIcon) ListData() revel.Result {
 		dataQuery = *dataQuery.Asc("id")
 	}
 
-	reportCateIconList := make([]models.LittleIconInfo, 0, limit)
-	err := dataQuery.Limit(limit, offset).Find(&reportCateIconList)
+	little_icon_list := make([]models.LittleIconInfo, 0, limit)
+	err := dataQuery.Limit(limit, offset).Find(&little_icon_list)
 	core.HandleError(err)
 
 	countQuery := *query
@@ -50,7 +51,7 @@ func (c ErpLittleIcon) ListData() revel.Result {
 	core.HandleError(err)
 
 	return c.RenderJson(core.GridResult{
-		Data:  reportCateIconList,
+		Data:  little_icon_list,
 		Total: count,
 	})
 }
@@ -70,14 +71,14 @@ func (f *LittleIconInfoForm) Valid(validation *revel.Validation) bool {
 }
 
 func (c ErpLittleIcon) Detail() revel.Result {
-	session := c.DbSession
+	db_session := c.DbSession
 
-	var reportCateIconId int64
-	c.Params.Bind(&reportCateIconId, "id")
+	var little_icon_id int64
+	c.Params.Bind(&little_icon_id, "id")
 
-	reportCateIcon := new(models.LittleIconInfo)
-	if reportCateIconId != 0 {
-		has, err := session.Id(reportCateIconId).Get(reportCateIcon)
+	little_icon := new(models.LittleIconInfo)
+	if little_icon_id != 0 {
+		has, err := db_session.Id(little_icon_id).Get(little_icon)
 		core.HandleError(err)
 		if has == false {
 			panic("指定的列表图标不存在！")
@@ -85,7 +86,7 @@ func (c ErpLittleIcon) Detail() revel.Result {
 	}
 
 	form := new(LittleIconInfoForm)
-	form.LittleIcon = *reportCateIcon
+	form.LittleIcon = *little_icon
 	c.UnbindToRenderArgs(form, "form")
 	c.RenderArgs["is_create"] = form.IsCreate()
 	c.RenderArgs["icon_path"] = ICON_PATH
@@ -94,7 +95,7 @@ func (c ErpLittleIcon) Detail() revel.Result {
 }
 
 func (c ErpLittleIcon) Save() revel.Result {
-	session := c.DbSession
+	db_session := c.DbSession
 
 	form := new(LittleIconInfoForm)
 	c.Params.Bind(form, "form")
@@ -103,15 +104,15 @@ func (c ErpLittleIcon) Save() revel.Result {
 		return c.RenderJson(core.JsonResult{Success: false, Message: c.GetValidationErrorMessage()})
 	}
 
-	reportCateIcon := &form.LittleIcon
+	little_icon := &form.LittleIcon
 
 	var affected int64
 	var err error
 	if form.IsCreate() {
-		affected, err = session.Insert(reportCateIcon)
+		affected, err = db_session.Insert(little_icon)
 		core.HandleError(err)
 	} else {
-		affected, err = session.Id(reportCateIcon.Id).Update(reportCateIcon)
+		affected, err = db_session.Id(little_icon.Id).Update(little_icon)
 		core.HandleError(err)
 
 		if affected == 0 {
@@ -123,13 +124,22 @@ func (c ErpLittleIcon) Save() revel.Result {
 }
 
 func (c ErpLittleIcon) Delete() revel.Result {
-	session := c.DbSession
+	db_session := c.DbSession
 
-	reportCateIconIdList := make([]int64, 0)
-	c.Params.Bind(&reportCateIconIdList, "id_list")
+	little_icon_id_list := make([]int64, 0)
+	c.Params.Bind(&little_icon_id_list, "id_list")
 
-	affected, err := session.In("id", reportCateIconIdList).Delete(new(models.LittleIconInfo))
+	var little_icon_list = make([]models.LittleIconInfo, 0)
+	err := db_session.In("id", little_icon_id_list).Find(&little_icon_list)
 	core.HandleError(err)
+
+	affected, err := db_session.In("id", little_icon_id_list).Delete(new(models.LittleIconInfo))
+	core.HandleError(err)
+
+	//同时删除文件
+	for _, little_icon := range little_icon_list {
+		os.Remove(filepath.Join(revel.BasePath, ICON_PATH, little_icon.IconFile))
+	}
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})
 }
@@ -179,14 +189,14 @@ func (c ErpLittleIcon) Upload() revel.Result {
 		fileExt = ".png"
 	}
 
-	cate_icon_path := revel.BasePath + ICON_PATH
+	cate_icon_path := filepath.Join(revel.BasePath, ICON_PATH)
 
 	if core.IsDirExists(cate_icon_path) == false {
 		err = os.MkdirAll(cate_icon_path, 0777)
 		core.HandleError(err)
 	}
 
-	imageFile, err := os.Create(cate_icon_path + fileName + fileExt)
+	imageFile, err := os.Create(filepath.Join(cate_icon_path, fileName+fileExt))
 	defer imageFile.Close()
 
 	imageFile.Write(iconFileBytes)

@@ -30,7 +30,7 @@
                                     {%if .is_create %}
                                     <img id='{%"cate_image"%}' src="/static/images/icons/noimg.png" alt="" />
                                     {%else%}
-                                    <img id="cate_image" src="{%.icon_path%}{%.form_LittleIcon_IconFile%}" alt="" />
+                                    <img id="cate_image" src="{%.icon_path%}/{%.form_LittleIcon_IconFile%}" alt="" />
                                     {%end%}
                                 </div>
                             </div>
@@ -79,7 +79,7 @@
                         $.msg.error(result.message);
                     } else {
                         $("#icon_file_name").val(result.fileName);
-                        $("#cate_image").attr("src", "{%.icon_path%}" + result.fileName)
+                        $("#cate_image").attr("src", "{%.icon_path%}/" + result.fileName)
                     }
                 },
                 Error: function (up, err) {
