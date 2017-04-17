@@ -1,12 +1,15 @@
 package controllers
 
 import (
+	"encoding/json"
+	"fmt"
 	"strings"
 
 	"github.com/revel/revel"
 	"matrix/app/layout"
 	"matrix/core"
 	"matrix/core/captcha"
+	"matrix/core/requests"
 	"matrix/modules/auth/forms"
 	"matrix/modules/auth/models"
 	erp_models "matrix/modules/erp/models"
@@ -18,7 +21,7 @@ type Login struct {
 
 func (c Login) Index() revel.Result {
 	c.RenderArgs["sys_name"] = layout.GetSysName(c.DbSession)
-	c.RenderArgs["static_version"] = core.GetStaticVersion()
+	// c.RenderArgs["static_version"] = core.GetStaticVersion()
 	return c.RenderTemplate("login/login_index.html")
 }
 
@@ -72,8 +75,13 @@ func (c Login) Login() revel.Result {
 	//login log
 	var login_log erp_models.LoginLogInfo
 	login_log.LoginName = user.LoginName
-	login_log.IpAddress = get_request_client_ip(c.Request)
+
+	var client_ip = get_request_client_ip(c.Request)
+
+	login_log.IpAddress = client_ip
 	login_log.Content = "员工登录"
+	login_log.Desc = core.NullStringFrom(get_ip_location(client_ip))
+
 	db_session.Insert(login_log)
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: "登陆成功！"})
@@ -91,4 +99,22 @@ func (c Login) makePreviousSessionExpire() {
 
 func get_request_client_ip(request *revel.Request) string {
 	return strings.Split(request.RemoteAddr, ":")[0]
+}
+
+func get_ip_location(ip_address string) string {
+	//http://freeapi.ipip.net/120.151.39.56
+	var url = fmt.Sprintf("http://freeapi.ipip.net/%s", ip_address)
+	var location_script = requests.Get(url)
+	var location_list = make([]string, 0)
+	err := json.Unmarshal([]byte(location_script), &location_list)
+	core.HandleError(err)
+
+	// 去掉空白的项
+	var location_list_no_empty = make([]string, 0)
+	for _, loc := range location_list {
+		if strings.TrimSpace(loc) != "" {
+			location_list_no_empty = append(location_list_no_empty, loc)
+		}
+	}
+	return strings.Join(location_list_no_empty, " ")
 }
