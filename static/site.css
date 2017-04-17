@@ -355,3 +355,22 @@ div.beian {
 div.beian a {
     color: #929293;
 }
+
+div#order_hold_type_query_list {
+    font-size: 14px;
+    line-height: 24px;
+}
+
+div#order_hold_type_query_list img.hold_type_icon {
+    width: 24px;
+    height: 24px;
+}
+
+div#order_hold_type_query_list a {
+    padding: 4px 5px;
+}
+
+div#order_hold_type_query_list a.selected {
+    color: white;
+    background-color: #CC0000;
+}

@@ -7,6 +7,7 @@ import (
 	"matrix/core"
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/order_service"
+	"matrix/modules/erp/setting"
 )
 
 type ErpOrderHold struct {
@@ -14,6 +15,7 @@ type ErpOrderHold struct {
 }
 
 func (c ErpOrderHold) Index() revel.Result {
+	c.RenderArgs["icon_path"] = setting.ICON_PATH
 	return c.RenderTemplate("erp/ddlc/order_hold/order_hold_index.html")
 }
 
@@ -22,7 +24,7 @@ func (c ErpOrderHold) PageData() revel.Result {
 
 	// hold类型列表
 	var hold_type_list = make([]models.OrderHoldTypeInfo, 0)
-	err := db_session.OrderBy("id ASC").Find(&hold_type_list)
+	err := db_session.OrderBy("ord ASC").Find(&hold_type_list)
 	core.HandleError(err)
 
 	return c.RenderJson(map[string]interface{}{
