@@ -96,6 +96,35 @@
                                     </div>
                                 </div>
 
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <label for="icon_file" class="col-xs-2 control-label">图标</label>
+                                            <div class="col-xs-10">
+                                                <div class="input-group">
+                                                    <input id="icon_file" name="detail.logistics_company.icon_file" type="text" class="input-sm form-control" readonly="readonly" v-model="detail.logistics_company.icon_file"/>
+                                                    <span class="input-group-btn">
+                                                        <button class="btn btn-sm btn-purple" type="button" @click="showSelectIcon()">
+                                                            <i class="ace-icon fa fa-hand-pointer-o"></i>选择
+                                                        </button>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <label for="ord" class="col-xs-2 control-label">排序</label>
+                                            <div class="col-xs-10">
+                                                <input id="ord" name="detail.logistics_company.ord" type="text" class="input-sm form-control" v-model.number="detail.logistics_company.ord"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
                             </form>
                         </div>
                     </div>
@@ -103,6 +132,33 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-success btn-sm" @click="saveLogisticsCompany()">
                         <i class="ace-icon fa fa-floppy-o"></i>保存
+                    </button>
+                    <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">
+                        <i class="ace-icon fa fa-times"></i>关闭
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="selectIconDialog">
+        <div class="modal-dialog" style="width: 720px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="True">&times;</button>
+                    <h4 class="modal-title">选择图标</h4>
+                </div>
+                <div class="modal-body clearfix">
+                    <div class="row">
+                        <div class="col-xs-12" style="padding: 0;">
+                            <div>
+                                <table id="selectIconList" class="table table-striped table-bordered table-hover"></table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success btn-sm" @click="selectLittleCateIcon()">
+                        <i class="ace-icon fa fa-hand-pointer-o"></i>选择
                     </button>
                     <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">
                         <i class="ace-icon fa fa-times"></i>关闭
@@ -125,7 +181,7 @@
                 '#logisticsCompanyList',
                 {
                     "sAjaxSource": '{%url "ErpLogisticsCompany.ListData"%}',
-                    "aaSorting": [[1, "asc"]],
+                    "aaSorting": [[6, "asc"]],
                     "aoColumns": [
                         {
                             "mDataProp": "lc.id",
@@ -153,6 +209,22 @@
                             }
                         },
                         {"mDataProp": "s.name", "title": "状态", "bSearchable": true, "width": 80},
+                        {
+                            "mDataProp": "lc.icon_file",
+                            "title": "图标",
+                            "bSearchable": false,
+                            "orderable": false,
+                            "sClass": "center",
+                            "width": 60,
+                            "render": function (data, type, row) {
+                                if (data == "") {
+                                    return '<img style="width:24px;height:24px;" src="/static/images/icons/noimg.png"  alt="" />'
+                                } else {
+                                    return '<img style="width:24px;height:24px;" src="{% .icon_path %}/' + data + '"  alt="" />'
+                                }
+                            }
+                        },
+                        {"mDataProp": "lc.ord", "title": "排序", "bSearchable": false, "sClass": "center", "width": 60},
                         {"mDataProp": "lc.create_time", "title": "创建时间", "bSearchable": false, "width": 120},
                         {"mDataProp": "lc.update_time", "title": "修改时间", "bSearchable": false, "width": 120}
                     ]
@@ -162,6 +234,44 @@
             $('#logisticsCompanyList tbody').on('dblclick', 'tr', function () {
                 var id = $(this).find('td:first-child input:checkbox').val();
                 vm.showLogisticsCompanyDetail(id);
+            });
+
+            initSingleSelectDataTable(
+                '#selectIconList',
+                {
+                    "sAjaxSource": '{%url "ErpLittleIcon.ListData"%}',
+                    "aaSorting": [[1, "asc"]],
+                    "aoColumns": [
+                        {
+                            "mDataProp": "id",
+                            "bSearchable": false,
+                            "orderable": false,
+                            "sClass": "center",
+                            "width": 50,
+                            "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
+                            "render": function (data, type, row) {
+                                return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>'
+                                    + '<input type="hidden" class="icon-file-data" value="' + row.icon_file + '"/>';
+                            }
+                        },
+                        {
+                            "mDataProp": "icon_file", "title": "图标", "bSearchable": true,
+                            "render": function (data, type, row) {
+                                return '<img style="width:20px;height:20px;" src="{%.icon_path%}/' + data + '" alt="' + data + '" />&nbsp;&nbsp;' + data;
+                            }
+                        },
+                        {
+                            "mDataProp": "create_time",
+                            "title": "创建时间",
+                            "bSearchable": false,
+                            "width": 120
+                        }
+                    ]
+                }
+            );
+
+            $('#selectIconList tbody').on('dblclick', 'tr', function () {
+                selectLittleCateIcon();
             });
         },
         methods: {
@@ -257,6 +367,14 @@
                         }
                     });
                 });
+            },
+            showSelectIcon: function () {
+                $('#selectIconDialog').modal(modalOptions);
+            },
+            selectLittleCateIcon: function () {
+                var icon_file = $('#selectIconList tbody tr>td:first-child input:checkbox:checked').closest("td").find("input.icon-file-data").val();
+                vm.detail.logistics_company.icon_file = icon_file;
+                $('#selectIconDialog').modal("hide");
             }
         }
     });
