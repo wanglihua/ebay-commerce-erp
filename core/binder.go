@@ -14,7 +14,8 @@ import (
 var (
 	DateBinder = revel.Binder{
 		Bind: revel.ValueBinder(func(val string, typ reflect.Type) reflect.Value {
-			r, err := time.ParseInLocation("2006-01-02", val, time.Local)
+			// r, err := time.ParseInLocation("2006-01-02", val, time.Local)
+			r, err := Parse_time(val)
 			if err == nil {
 				return reflect.ValueOf(Date(r))
 			}
@@ -33,11 +34,15 @@ var (
 
 	TimeBinder = revel.Binder{
 		Bind: revel.ValueBinder(func(val string, typ reflect.Type) reflect.Value {
+			/*
 			r, err := time.ParseInLocation("2006-01-02 15:04", val, time.Local)
 			if err == nil {
 				return reflect.ValueOf(Time(r))
 			}
 			r, err = time.ParseInLocation("2006-01-02", val, time.Local)
+			*/
+
+			r, err := Parse_time(val)
 			if err == nil {
 				return reflect.ValueOf(Time(r))
 			}
@@ -56,6 +61,7 @@ var (
 
 	LongTimeBinder = revel.Binder{
 		Bind: revel.ValueBinder(func(val string, typ reflect.Type) reflect.Value {
+			/*
 			r, err := time.ParseInLocation("2006-01-02 15:04:05", val, time.Local)
 			if err == nil {
 				return reflect.ValueOf(LongTime(r))
@@ -65,6 +71,9 @@ var (
 				return reflect.ValueOf(LongTime(r))
 			}
 			r, err = time.ParseInLocation("2006-01-02", val, time.Local)
+			*/
+
+			r, err := Parse_time(val)
 			if err == nil {
 				return reflect.ValueOf(LongTime(r))
 			}
@@ -86,7 +95,12 @@ var (
 			if strings.TrimSpace(val) == "" {
 				return reflect.ValueOf(MakeNullDate(time.Time{}, false))
 			}
+
+			/*
 			r, err := time.ParseInLocation("2006-01-02", val, time.Local)
+			*/
+
+			r, err := Parse_time(val)
 			if err == nil {
 				return reflect.ValueOf(MakeNullDate(r, true))
 			}
@@ -109,11 +123,16 @@ var (
 			if strings.TrimSpace(val) == "" {
 				return reflect.ValueOf(MakeNullTime(time.Time{}, false))
 			}
+
+			/*
 			r, err := time.ParseInLocation("2006-01-02 15:04", val, time.Local)
 			if err == nil {
 				return reflect.ValueOf(MakeNullTime(r, true))
 			}
 			r, err = time.ParseInLocation("2006-01-02", val, time.Local)
+			*/
+
+			r, err := Parse_time(val)
 			if err == nil {
 				return reflect.ValueOf(MakeNullTime(r, true))
 			}
@@ -136,6 +155,8 @@ var (
 			if strings.TrimSpace(val) == "" {
 				return reflect.ValueOf(MakeNullLongTime(time.Time{}, false))
 			}
+
+			/*
 			r, err := time.ParseInLocation("2006-01-02 15:04:05", val, time.Local)
 			if err == nil {
 				return reflect.ValueOf(MakeNullLongTime(r, true))
@@ -145,6 +166,9 @@ var (
 				return reflect.ValueOf(MakeNullLongTime(r, true))
 			}
 			r, err = time.ParseInLocation("2006-01-02", val, time.Local)
+			*/
+
+			r, err := Parse_time(val)
 			if err == nil {
 				return reflect.ValueOf(MakeNullLongTime(r, true))
 			}
