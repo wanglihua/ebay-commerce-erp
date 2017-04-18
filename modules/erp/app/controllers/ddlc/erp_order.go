@@ -104,8 +104,10 @@ func (c ErpOrder) ListData() revel.Result {
 	var shop_id int64
 	c.Params.Bind(&shop_id, "shop_id")
 
+	/* Hold 订单有单独的界面，不用在这里考虑 ??
 	var hold_type_id int64
 	c.Params.Bind(&hold_type_id, "hold_type_id") // -1: all hold; 0: none hold; other: 具体的 hold_type_id
+	*/
 
 	var status string //all，yzf, dph, phz, yfh, ywc
 	c.Params.Bind(&status, "status")
@@ -168,7 +170,8 @@ func (c ErpOrder) ListData() revel.Result {
 		}
 	}
 
-	// todo: hold 订单是不是也应该可以看成是一个状态，状态中再加一个hold状态
+	// hold 订单 有了一个专门的 hold状态， 也有专门的 hold 状态的页面，在这里就不用多考虑了  ??
+	/*
 	if hold_type_id == 0 { //取不是hold的订单
 		filter = core.SqlAnd(filter, "o.hold_type_id IS NULL")
 	} else if hold_type_id == -1 { //取hold的所有订单
@@ -176,6 +179,7 @@ func (c ErpOrder) ListData() revel.Result {
 	} else { //取得具体 hold 的订单类型
 		filter = core.SqlAnd(filter, fmt.Sprintf("o.hold_type_id = %d", hold_type_id))
 	}
+	*/
 
 	if status_id != 0 {
 		filter = core.SqlAnd(filter, fmt.Sprintf("o.status_id = %d", status_id))

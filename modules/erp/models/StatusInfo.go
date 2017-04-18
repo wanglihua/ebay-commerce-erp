@@ -522,7 +522,7 @@ func (e StatusInfo) InitData(db_session *xorm.Session) {
 		db_session.Insert(status)
 	}
 
-	// 订单状态 已创建 已支付 待配货 配货中 已发货 已完成
+	// 订单状态 已创建 已支付 Hold 待配货 配货中 已发货 已完成
 	{
 		status := new(StatusInfo)
 		status.Id = ORDER_STATUS_YCJ

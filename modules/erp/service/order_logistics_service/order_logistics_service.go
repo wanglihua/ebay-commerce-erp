@@ -82,13 +82,25 @@ func (p_ol *OrderLogistics) init_data(db_session *xorm.Session) {
 	p_ol.logistics_fee_rate_map = logistics_fee_rate_map
 }
 
-func (p_ol *OrderLogistics) CalculatePaidOrders(db_session *xorm.Session) error {
+func (p_ol *OrderLogistics) CalculateListPaidOrders(db_session *xorm.Session) error {
 	// 获取 已支付 状态的订单, 匹配完成后，订单的状态就是 Hold 或者 待配货
 	var order_list = order_service.Get_paid_order_list(db_session)
-	return p_ol.Calculate(order_list, db_session)
+
+	if len(order_list) == 0 {
+		return errors.New("订单列表为空！")
+	}
+
+	//先判断订单状态
+	for _, order := range order_list {
+		if order.StatusId != models.ORDER_STATUS_YZF {
+			return errors.New("订单状态为已支付状态的，才能匹配物流！")
+		}
+	}
+
+	return p_ol.CalculateList(order_list, db_session)
 }
 
-func (p_ol *OrderLogistics) CalculateImportBatch(batch_code int64, db_session *xorm.Session) error {
+func (p_ol *OrderLogistics) CalculateListImportBatch(batch_code int64, db_session *xorm.Session) error {
 
 	//获得该批次号的订单列表
 	/*
@@ -105,18 +117,6 @@ WHERE ib.batch_code = %d`
 	err := db_session.Sql(sql_import_batch_order).Find(&order_list)
 	core.HandleError(err)
 
-	return p_ol.Calculate(order_list, db_session)
-}
-
-// 匹配前要判断一下订单的状态，订单不是已支付状态的话，不能匹配
-// 计算订单的物流方式 和 Hold 类型，调用这个函数的时候应该  “开启数据库事务“， 调用完成后，订单的状态就是 Hold 或者 待配货
-func (p_ol *OrderLogistics) Calculate(order_list []models.OrderInfo, db_session *xorm.Session) error {
-	defer func() {
-		if err := recover(); err != nil {
-			revel.ERROR.Printf("匹配物流方式，出现错误： %s\n", err)
-		}
-	}()
-
 	if len(order_list) == 0 {
 		return errors.New("订单列表为空！")
 	}
@@ -126,6 +126,22 @@ func (p_ol *OrderLogistics) Calculate(order_list []models.OrderInfo, db_session 
 		if order.StatusId != models.ORDER_STATUS_YZF {
 			return errors.New("订单状态为已支付状态的，才能匹配物流！")
 		}
+	}
+
+	return p_ol.CalculateList(order_list, db_session)
+}
+
+// 匹配前要判断一下订单的状态，订单不是已支付状态的话，不能匹配
+// 计算订单的物流方式 和 Hold 类型，调用这个函数的时候应该  “开启数据库事务“， 调用完成后，订单的状态就是 Hold 或者 待配货
+func (p_ol *OrderLogistics) CalculateList(order_list []models.OrderInfo, db_session *xorm.Session) error {
+	defer func() {
+		if err := recover(); err != nil {
+			revel.ERROR.Printf("匹配物流方式，出现错误： %s\n", err)
+		}
+	}()
+
+	if len(order_list) == 0 {
+		return errors.New("订单列表为空！")
 	}
 
 	p_ol.init_data(db_session)
@@ -217,6 +233,11 @@ func (p_ol *OrderLogistics) Calculate(order_list []models.OrderInfo, db_session 
 	// 仓库的商品库存状态里面是不是也可以加一个待配货数量，实际库存没有减掉，但是已经这个商品被预定配货了，实际配货成功后，就减掉实际配货 ?? -- 通过在库存表里面插入一个特殊库位的库存记录的方法，这个特殊库位的Id为 -1
 
 	return nil
+}
+
+// 用于单条物流的匹配
+func (p_ol *OrderLogistics) CalculateSingle(order models.OrderInfo, db_session *xorm.Session) error {
+	return p_ol.CalculateList([]models.OrderInfo{order}, db_session)
 }
 
 // 1 地址有特殊字段的

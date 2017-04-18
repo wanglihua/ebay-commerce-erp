@@ -650,7 +650,7 @@ func (c ErpOrderImport) MatchLogistics() revel.Result {
 	c.Params.Bind(&batch_code, "batch_code")
 
 	var p_order_logistics = new(order_logistics_service.OrderLogistics)
-	err := p_order_logistics.CalculateImportBatch(batch_code, db_session)
+	err := p_order_logistics.CalculateListImportBatch(batch_code, db_session)
 	core.HandleError(err)
 
 	return c.RenderJson(map[string]interface{}{
