@@ -473,9 +473,23 @@ SELECT sa.id AS shop_id, sa.name AS shop_name FROM erp_shop_account sa;
 		order.ShopId = shop_id
 		order.Code = order_import.Ddbh
 		order.TranId = order_import.Jydh
-		order.AmountPaidRmb = order_import.Skje
-		order.AmountPaidCurrency = "AU"                                  // 澳币的也设置一下
-		order.AmountPaid = order_import.Skje / aud_exchange_rate_setting // 汇率换算
+
+		var amount_rmb float64 = order_import.Skje
+		var amount_currency = "AU"                                 // 澳币的也设置一下
+		var amount = order_import.Skje / aud_exchange_rate_setting // 汇率换算
+
+		order.AmountPaidRmb = amount_rmb
+		order.AmountPaidCurrency = amount_currency
+		order.AmountPaid = amount
+
+		order.TotalAmountRmb = amount_rmb
+		order.TotalAmountCurrency = amount_currency
+		order.TotalAmount = amount
+
+		order.AdjustmentAmountRmb = amount_rmb
+		order.AdjustmentAmountCurrency = amount_currency
+		order.AdjustmentAmount = amount
+
 		order.ExpressFee = order_import.Yfsr
 		order.BuyerUserId = order_import.Khzh
 		order.BuyerEmail = order_import.Khyx
