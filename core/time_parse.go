@@ -45,6 +45,10 @@ func Parse_time(str string) (time.Time, error) {
 		date_time_buffer.WriteString(fmt.Sprintf("%02d", day))
 	}
 
+	if len(str_list) == 1 {
+		date_time_buffer.WriteString(" 00:00:00")
+	}
+
 	if len(str_list) == 2 {
 		date_time_buffer.WriteString(" ")
 
@@ -52,7 +56,6 @@ func Parse_time(str string) (time.Time, error) {
 		if len(time_str_list) > 3 {
 			return failed_time, failed_error
 		}
-
 
 		var hour int64 = 0
 		var err error
@@ -62,7 +65,6 @@ func Parse_time(str string) (time.Time, error) {
 				return failed_time, failed_error
 			}
 		}
-
 
 		var minute int64 = 0
 		if len(time_str_list) >= 2 {
