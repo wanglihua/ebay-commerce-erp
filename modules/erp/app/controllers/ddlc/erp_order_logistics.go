@@ -8,6 +8,7 @@ import (
 	"github.com/revel/revel"
 	"matrix/core"
 	"matrix/modules/erp/models"
+	"matrix/modules/erp/service/order_import_batch_service"
 	"matrix/modules/erp/setting"
 )
 
@@ -31,11 +32,16 @@ func (c ErpOrderLogistics) PageData() revel.Result {
 	err = db_session.OrderBy("ord asc").Find(&logistics_company_list)
 	core.HandleError(err)
 
+	// 获得导入的批次列表
+	var batch_code_list = order_import_batch_service.Get_order_import_batch_code_list(db_session)
+
 	return c.RenderJson(map[string]interface{}{
 		"stock_id":               0,
 		"stock_list":             stock_list,
 		"logistics_company_id":   0,
 		"logistics_company_list": logistics_company_list,
+		"batch_code":             0,
+		"batch_code_list":        batch_code_list,
 	})
 }
 
@@ -47,6 +53,14 @@ func (c ErpOrderLogistics) ListData() revel.Result {
 
 	var logistics_company_id int64
 	c.Params.Bind(&logistics_company_id, "logistics_company_id")
+
+	var batch_code int64
+	c.Params.Bind(&batch_code, "batch_code")
+
+	var begin_time_query core.NullLongTime
+	var end_time_query core.NullLongTime
+	c.Params.Bind(&begin_time_query, "begin_time_query")
+	c.Params.Bind(&end_time_query, "end_time_query")
 
 	type order_logistics_view_item_t struct {
 		models.OrderLogisticsInfo    `xorm:"extends" json:"ol"`
@@ -61,7 +75,9 @@ FROM erp_order_logistics ol
     INNER JOIN erp_order o ON o.id = ol.order_id
     INNER JOIN erp_stock s ON s.id = ol.stock_id
     INNER JOIN erp_logistics_company lc ON lc.id = ol.company_id
-WHERE ol.stock_id = 0 AND ol.company_id = 0;
+WHERE ol.stock_id = 0 AND ol.company_id = 0
+      AND o.id IN (SELECT ib.order_id FROM erp_order_import_batch ib WHERE ib.batch_code = 0)
+      AND o.paid_time > '2017-01-01' AND o.paid_time < '2017-04-30'
 	 */
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
@@ -80,6 +96,18 @@ WHERE ol.stock_id = 0 AND ol.company_id = 0;
 
 	if logistics_company_id != 0 {
 		filter = core.SqlAnd(filter, fmt.Sprintf("ol.company_id = %d", logistics_company_id))
+	}
+
+	if batch_code != 0 {
+		filter = core.SqlAnd(filter, fmt.Sprintf("o.id IN (SELECT ib.order_id FROM erp_order_import_batch ib WHERE ib.batch_code = %d)", batch_code))
+	}
+
+	if begin_time_query.Valid == true {
+		filter = core.SqlAnd(filter, fmt.Sprintf("o.paid_time >= '%s'", begin_time_query.Time.Format("2006-01-02 15:04:05")))
+	}
+
+	if end_time_query.Valid == true {
+		filter = core.SqlAnd(filter, fmt.Sprintf("o.paid_time <= '%s'", end_time_query.Time.Format("2006-01-02 15:04:05")))
 	}
 
 	sb.Where(filter)

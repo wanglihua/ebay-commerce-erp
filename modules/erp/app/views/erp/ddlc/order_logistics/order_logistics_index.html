@@ -29,7 +29,7 @@
                     */%}
                 </div>
                 <div class="row" style="margin-top: 10px;margin-bottom: 20px;">
-                    <div id="query" class="col-xs-12" style="line-height: 28px;">
+                    <div id="query" class="col-xs-12 query" style="line-height: 28px;">
                         <div class="col-xs-12">
                             {%/*
                             <select id="stock_id" name="page.stock_id" v-model.number="page.stock_id" style="width: 120px;" @change="reloadList()">
@@ -50,15 +50,28 @@
                                 <template v-for="stock in page.stock_list">
                                     <a :class="page.stock_id == stock.id ? 'selected' : ''" href="#" @click="selectStock(stock.id)">&nbsp;<img v-if="stock.icon_file != ''" :src="'{%.icon_path%}/' + stock.icon_file" :alt="stock.name" class="link_icon"/>{{stock.name}}</a>
                                 </template>
-                            </div>
-
-                            <div class="link_query_list">
+                                <span style="padding: 0 10px;color:lightgray;">|</span>
                                 <a :class="page.logistics_company_id == 0 ? 'selected' : ''" href="#" @click="selectLogisticsCompany(0)"><img src="/static/images/icons/all_check.png" class="link_icon" alt="全部物流公司"/>全部物流公司</a>
                                 <template v-for="logistics_company in page.logistics_company_list">
                                     <a :class="page.logistics_company_id == logistics_company.id ? 'selected' : ''" href="#" @click="selectLogisticsCompany(logistics_company.id)">&nbsp;<img v-if="logistics_company.icon_file != ''" :src="'{%.icon_path%}/' + logistics_company.icon_file" :alt="logistics_company.name" class="link_icon"/>{{logistics_company.name}}</a>
                                 </template>
                             </div>
-
+                            <div style="padding-top: 15px;">
+                                <label class="control-label no-padding-right" for="batch_code">导入批次号</label>
+                                <select id="batch_code" name="page.batch_code" v-model.number="page.batch_code" style="width: 120px;" @change="refreshList()">
+                                    <option :value="0">-导入批次号-</option>
+                                    <template v-for="batch_code in page.batch_code_list">
+                                        <option :value="batch_code">{{batch_code}}</option>
+                                    </template>
+                                </select>
+                                <label class="control-label no-padding-right" for="begin_time_query">开始时间</label>
+                                <input class="input-sm" id="begin_time_query" name="begin_time_query" placeholder="开始时间查询" type="text" v-model="page.begin_time_query" style="width: 130px;"/>
+                                <label class="control-label no-padding-right" for="end_time_query">结束时间</label>
+                                <input class="input-sm" id="end_time_query" name="end_time_query" placeholder="结束时间查询" type="text" v-model="page.end_time_query" style="width: 130px;"/>
+                                <button class="btn btn-mini btn-primary" @click="refreshList()">
+                                    &nbsp;<i class="ace-icon fa fa-search"></i>查&nbsp;询&nbsp;
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -222,6 +235,17 @@
     </div>
 </div>
 <script type="text/javascript">
+
+    $(function () {
+        $('#begin_time_query').datetimepicker({
+            locale: "zh-cn"
+        });
+
+        $('#end_time_query').datetimepicker({
+            locale: "zh-cn"
+        });
+    });
+
     var vm = new Vue({
         el: "#page",
         data: {
@@ -229,7 +253,11 @@
                 "stock_id": 0,
                 "stock_list": [],
                 "logistics_company_id": 0,
-                "logistics_company_list": []
+                "logistics_company_list": [],
+                "batch_code": 0,
+                "batch_code_list": [],
+                "begin_time_query": "",
+                "end_time_query": ""
             },
             "detail": {
                 "order_logistics": {}
@@ -362,6 +390,9 @@
 
                         aoData.push({'name': 'stock_id', 'value': this_vm.page.stock_id});
                         aoData.push({'name': 'logistics_company_id', 'value': this_vm.page.logistics_company_id});
+                        aoData.push({'name': 'batch_code', 'value': this_vm.page.batch_code});
+                        aoData.push({'name': 'begin_time_query', 'value': this_vm.page.begin_time_query});
+                        aoData.push({'name': 'end_time_query', 'value': this_vm.page.end_time_query});
 
                         $.ajax({
                             "dataType": 'json',

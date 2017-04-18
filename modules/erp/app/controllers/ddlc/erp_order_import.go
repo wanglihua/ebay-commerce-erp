@@ -11,6 +11,7 @@ import (
 	"matrix/core"
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/exchange_rate_service"
+	"matrix/modules/erp/service/order_import_batch_service"
 	"matrix/modules/erp/service/order_logistics_service"
 )
 
@@ -26,18 +27,7 @@ func (c ErpOrderImport) PageData() revel.Result {
 	var db_session = c.DbSession
 
 	// 获得导入的批次列表
-	type batch_code_t struct {
-		BatchCode int64 `xorm:"'batch_code'"`
-	}
-	var sql = `SELECT DISTINCT batch_code FROM erp_order_import_batch ORDER BY batch_code DESC`
-	var batch_code_t_list = make([]batch_code_t, 0)
-	err := db_session.Sql(sql).Find(&batch_code_t_list)
-	core.HandleError(err)
-
-	var batch_code_list = make([]int64, 0)
-	for _, batch_code := range batch_code_t_list {
-		batch_code_list = append(batch_code_list, batch_code.BatchCode)
-	}
+	var batch_code_list = order_import_batch_service.Get_order_import_batch_code_list(db_session)
 
 	return c.RenderJson(map[string]interface{}{
 		"batch_code":      0,
