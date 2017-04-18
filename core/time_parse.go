@@ -46,7 +46,7 @@ func Parse_time(str string) (time.Time, error) {
 	}
 
 	if len(str_list) == 1 {
-		date_time_buffer.WriteString(" 00:00:00")
+		date_time_buffer.WriteString(" 00:00:00") // 这里面的开头的空格不能少
 	}
 
 	if len(str_list) == 2 {
