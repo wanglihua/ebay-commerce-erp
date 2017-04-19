@@ -1,19 +1,23 @@
 package controllers
 
 import (
-	"github.com/revel/revel"
-
 	"fmt"
+	"strings"
+
+	"github.com/revel/revel"
 	"matrix/core"
 	"matrix/modules/auth/models"
-	"strings"
+	"matrix/modules/auth/service/pass_service"
 )
 
+//这里应该只有管理员才有权限。
 type AuthAdmin struct {
 	*revel.Controller
 }
 
 func (c AuthAdmin) Index() revel.Result {
+	pass_service.Check_login_user_super_admin_only(c.Session)
+
 	return c.RenderTemplate("auth/admin/admin_index.html")
 }
 
@@ -23,6 +27,8 @@ type AdminViewItem struct {
 }
 
 func (c AuthAdmin) ListData() revel.Result {
+	pass_service.Check_login_user_super_admin_only(c.Session)
+
 	session := c.DbSession
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
@@ -56,11 +62,15 @@ func (c AuthAdmin) ListData() revel.Result {
 }
 
 func (c AuthAdmin) Add() revel.Result {
+	pass_service.Check_login_user_super_admin_only(c.Session)
+
 	//session := c.DbSession
 	return c.RenderTemplate("auth/admin/admin_add.html")
 }
 
 func (c AuthAdmin) AddListData() revel.Result {
+	pass_service.Check_login_user_super_admin_only(c.Session)
+
 	session := c.DbSession
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
@@ -91,6 +101,8 @@ func (c AuthAdmin) AddListData() revel.Result {
 }
 
 func (c AuthAdmin) AddSave() revel.Result {
+	pass_service.Check_login_user_super_admin_only(c.Session)
+
 	session := c.DbSession
 
 	userIdList := make([]int64, 0)
@@ -111,6 +123,8 @@ func (c AuthAdmin) AddSave() revel.Result {
 }
 
 func (c AuthAdmin) Remove() revel.Result {
+	pass_service.Check_login_user_super_admin_only(c.Session)
+
 	db_session := c.DbSession
 
 	adminIdList := make([]int, 0)
@@ -123,30 +137,28 @@ func (c AuthAdmin) Remove() revel.Result {
 
 	admin_id_strs := strings.Join(admin_id_str_list, ",")
 
+	// 检查一下，要移除的管理员里面有没有超级管理员
 	/*
-		SELECT count(*) AS count
-		FROM auth_admin a
-		    INNER JOIN auth_user u ON a.user_id = u.id
-		WHERE a.id IN (1, 2, 3) AND u.login_name = 'admin';
+SELECT count(*) AS count
+FROM auth_admin a
+WHERE a.id IN (1, 2, 3) AND a.is_super = 1;
 	*/
 
 	sql := `
 SELECT count(*) AS count
 FROM auth_admin a
-    INNER JOIN auth_user u ON a.user_id = u.id
-WHERE a.id IN (%s) AND u.login_name = 'admin';
-	`
+WHERE a.id IN (%s) AND a.is_super = 1`
 	sql = fmt.Sprintf(sql, admin_id_strs)
 
-	var admin_count struct {
+	var super_admin_count struct {
 		Count int64 `xorm:"'count'" json:"count"`
 	}
 
-	_, err := db_session.Sql(sql).Get(&admin_count)
+	_, err := db_session.Sql(sql).Get(&super_admin_count)
 	core.HandleError(err)
 
-	if admin_count.Count != 0 {
-		return c.RenderJson(core.JsonResult{Success: false, Message: "移除失败，内置管理员不能移除!"})
+	if super_admin_count.Count != 0 {
+		return c.RenderJson(core.JsonResult{Success: false, Message: "移除失败，内置超级管理员不能移除!"})
 	}
 
 	/*

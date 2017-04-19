@@ -9,10 +9,11 @@ const LOGIN_USER_CACHE_KEY = "Login_User_b6db637be022550d"
 
 //根据以后需要再在这里添加成员
 type LoginUser struct {
-	UserId    int64
-	LoginName string
-	NickName  string
-	IsAdmin   bool
+	UserId       int64
+	LoginName    string
+	NickName     string
+	IsAdmin      bool
+	IsSuperAdmin bool
 }
 
 func GetLoginUser(session revel.Session) LoginUser {

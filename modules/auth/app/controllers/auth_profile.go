@@ -1,13 +1,15 @@
 package controllers
 
 import (
+	"strings"
+
 	"github.com/revel/revel"
 	"matrix/core"
 	"matrix/modules/auth/forms"
 	"matrix/modules/auth/models"
-	"strings"
 )
 
+// 这里没有什么权限控制的，能登录的都能访问
 type AuthProfile struct {
 	*revel.Controller
 }

@@ -8,6 +8,7 @@ import (
 	"matrix/core"
 	"matrix/modules/auth/forms"
 	"matrix/modules/auth/models"
+	"matrix/modules/auth/pass_res"
 	"matrix/modules/auth/service/pass_service"
 )
 
@@ -16,10 +17,14 @@ type AuthUser struct {
 }
 
 func (c AuthUser) Index() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.AUTH_USER, c.Session)
+
 	return c.RenderTemplate("auth/user/user_index.html")
 }
 
 func (c AuthUser) ListData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.AUTH_USER, c.Session)
+
 	session := c.DbSession
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
@@ -49,6 +54,8 @@ func (c AuthUser) ListData() revel.Result {
 }
 
 func (c AuthUser) RefreshPassCache() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.AUTH_USER, c.Session)
+
 	var db_session = c.DbSession
 
 	pass_service.Load_all_pass_to_cache(db_session)
@@ -60,6 +67,8 @@ func (c AuthUser) RefreshPassCache() revel.Result {
 }
 
 func (c AuthUser) Detail() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.AUTH_USER, c.Session)
+
 	session := c.DbSession
 
 	var userId int64
@@ -83,6 +92,8 @@ func (c AuthUser) Detail() revel.Result {
 }
 
 func (c AuthUser) Save() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.AUTH_USER, c.Session)
+
 	session := c.DbSession
 
 	form := new(forms.UserDetailForm)
@@ -131,6 +142,8 @@ func (c AuthUser) Save() revel.Result {
 }
 
 func (c AuthUser) Delete() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.AUTH_USER, c.Session)
+
 	session := c.DbSession
 
 	userIdList := make([]int64, 0)
@@ -149,6 +162,7 @@ func (c AuthUser) Delete() revel.Result {
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})
 }
 
+// 这里就不进行权限检查了，别的地方要调用
 func (c AuthUser) GetUserInfo() revel.Result {
 	db_session := c.DbSession
 

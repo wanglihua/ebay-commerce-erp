@@ -9,6 +9,7 @@ import (
 	"matrix/modules/auth/models"
 )
 
+//todo 除了Action权限控制，还要授权时检查当前登录人是不是有当前他授权的那个操作的权限。只能授权本人本来就有的权限。
 type AuthUserPassRes struct {
 	*revel.Controller
 }

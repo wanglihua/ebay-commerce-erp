@@ -282,10 +282,20 @@ func check_user_pass_cate_in_cache(user_id int64, cate_id int64) bool {
 	return false
 }
 
-// 管理员权限的检查
-func Check_login_user_admin(web_session revel.Session) bool {
+// 只有管理员才可以操作的资源的检查
+func Check_login_user_admin_only(web_session revel.Session) {
 	var login_user = core.GetLoginUser(web_session)
-	return login_user.IsAdmin
+	if login_user.IsAdmin == false {
+		panic(fmt.Sprintf("你不是管理员，没有操作权限！"))
+	}
+}
+
+//只有超级管理员才可以操作的资源的检查
+func Check_login_user_super_admin_only(web_session revel.Session) {
+	var login_user = core.GetLoginUser(web_session)
+	if login_user.IsAdmin == false || login_user.IsSuperAdmin == false {
+		panic(fmt.Sprintf("你不是超级管理员，没有操作权限！"))
+	}
 }
 
 /*

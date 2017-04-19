@@ -3,6 +3,7 @@ package controllers
 import (
 	"encoding/json"
 	"fmt"
+	"runtime/debug"
 	"strings"
 
 	"github.com/revel/revel"
@@ -64,11 +65,18 @@ func (c Login) Login() revel.Result {
 	loginUser.LoginName = user.LoginName
 	loginUser.NickName = user.NickName
 
-	admin_count, err := db_session.Where("user_id = ?", user.Id).Count(new(models.AdminInfo))
+	// 是不是管理员
+	var admin_user models.AdminInfo
+	has, err = db_session.Where("user_id = ?", user.Id).Get(&admin_user)
 	core.HandleError(err)
 	loginUser.IsAdmin = false
-	if admin_count != 0 {
+	if has == true && admin_user.Id != 0 {
 		loginUser.IsAdmin = true
+
+		// 是不是超级管理员
+		if admin_user.IsSuper == 1 {
+			loginUser.IsSuperAdmin = true
+		}
 	}
 
 	core.PutLoginUserToSession(c.Session, loginUser)
@@ -110,7 +118,10 @@ func get_ip_location(ip_address string) string {
 	var location_script = requests.Get(url)
 	var location_list = make([]string, 0)
 	err := json.Unmarshal([]byte(location_script), &location_list)
-	core.HandleError(err)
+	if err != nil {
+		revel.ERROR.Println(err)
+		revel.ERROR.Println(string(debug.Stack()))
+	}
 
 	// 去掉空白的项
 	var location_list_no_empty = make([]string, 0)
