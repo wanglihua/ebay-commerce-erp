@@ -200,11 +200,12 @@ func load_admin_list_to_cache(db_session *xorm.Session) {
 	core.HandleError(err)
 }
 
-func Check_login_user_pass(res_id int64, web_session revel.Session) bool {
+func Check_login_user_pass(res_id int64, web_session revel.Session) {
 	var login_user = core.GetLoginUser(web_session)
-	return check_user_pass_in_cache(login_user.UserId, res_id)
+	if check_user_pass_in_cache(login_user.UserId, res_id) == false {
+		panic("你没有操作权限，请联系管理员！")
+	}
 }
-
 
 func Get_login_user_pass_map_from_cache(web_session revel.Session) map[int64]bool {
 	var login_user = core.GetLoginUser(web_session)

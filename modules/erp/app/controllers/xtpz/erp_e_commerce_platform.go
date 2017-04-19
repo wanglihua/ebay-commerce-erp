@@ -13,14 +13,14 @@ type ErpECommercePlatform struct {
 }
 
 func (c ErpECommercePlatform) Index() revel.Result {
-	if pass_service.Check_login_user_pass(pass_res.XTPZ_ECOMMERCE_PLATFORM, c.Session) == false {
-		panic("你没有操作权限，请联系管理员！")
-	}
+	pass_service.Check_login_user_pass(pass_res.XTPZ_ECOMMERCE_PLATFORM, c.Session)
 
 	return c.RenderTemplate("erp/xtpz/e_commerce_platform/e_commerce_platform_index.html")
 }
 
 func (c ErpECommercePlatform) ListData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.XTPZ_ECOMMERCE_PLATFORM, c.Session)
+
 	db_session := c.DbSession
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)

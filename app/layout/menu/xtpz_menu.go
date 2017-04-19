@@ -2,14 +2,20 @@ package menu
 
 import (
 	"bytes"
+
 	"github.com/go-xorm/xorm"
 	"github.com/revel/revel"
+	"matrix/core"
+	"matrix/modules/auth/pass_res"
 )
 
 func GetXtpzMenu(res_id_map map[int64]bool, db_session *xorm.Session, web_session revel.Session) string {
 	if _, found := revel.ModuleByName("erp"); found == false {
 		return ""
 	}
+
+	login_user := core.GetLoginUser(web_session)
+	var is_admin = login_user.IsAdmin
 
 	var buffer bytes.Buffer
 
@@ -21,63 +27,93 @@ func GetXtpzMenu(res_id_map map[int64]bool, db_session *xorm.Session, web_sessio
         <b class="arrow fa fa-angle-down"></b>
     </a>
     <b class="arrow"></b>
-    <ul class="submenu">
+    <ul class="submenu">`)
 
+	var check_pass_res_menu = func(pass_res_id int64) bool {
+		if v, ok := res_id_map[pass_res_id]; is_admin == true || (v == true && ok == true) {
+			return true
+		}
+		return false
+	}
+
+	if check_pass_res_menu(pass_res.XTPZ_ECOMMERCE_PLATFORM) == true {
+		buffer.WriteString(`
         <li id="xtpz-ecommerceplatform-menu" class="">
             <a href="/erp/ecommerce/platform">
                 <i class="menu-icon fa fa-caret-right"></i>
                 电商平台
             </a>
             <b class="arrow"></b>
-        </li>
+        </li>`)
+	}
 
+	if check_pass_res_menu(pass_res.XTPZ_SHOP_ACCOUNT) == true {
+		buffer.WriteString(`
         <li id="xtpz-shopaccount-menu" class="">
             <a href="/erp/shop/account">
                 <i class="menu-icon fa fa-caret-right"></i>
                 店铺账号
             </a>
             <b class="arrow"></b>
-        </li>
+        </li>`)
+	}
 
+	if check_pass_res_menu(pass_res.XTPZ_PAYPAL_ACCOUNT) == true {
+		buffer.WriteString(`
         <li id="xtpz-paypalaccount-menu" class="">
             <a href="/erp/paypal/account">
                 <i class="menu-icon fa fa-caret-right"></i>
                 PayPal账号
             </a>
             <b class="arrow"></b>
-        </li>
+        </li>`)
+	}
 
+	if check_pass_res_menu(pass_res.XTPZ_EXCHANGE_RATE) == true {
+		buffer.WriteString(`
         <li id="xtpz-exchangerate-menu" class="">
             <a href="/erp/exchange/rate">
                 <i class="menu-icon fa fa-caret-right"></i>
                 汇率设置
             </a>
             <b class="arrow"></b>
-        </li>
+        </li>`)
+	}
 
+	if check_pass_res_menu(pass_res.XTPZ_LOGIN_LOG) == true {
+		buffer.WriteString(`
         <li id="xtpz-loginlog-menu" class="">
             <a href="/erp/login/log">
                 <i class="menu-icon fa fa-caret-right"></i>
                 系统日志
             </a>
             <b class="arrow"></b>
-        </li>
+        </li>`)
+	}
 
+	if check_pass_res_menu(pass_res.XTPZ_SCHEDULE_TASK) == true {
+		buffer.WriteString(`
         <li id="xtpz-schedule-task-menu" class="">
             <a href="/erp/schedule/task">
                 <i class="menu-icon fa fa-caret-right"></i>
                 定时任务
             </a>
             <b class="arrow"></b>
-        </li>
+        </li>`)
+	}
 
+	if check_pass_res_menu(pass_res.XTPZ_LITTLE_ICON) == true {
+		buffer.WriteString(`
         <li id="xtpz-little-icon-menu" class="">
             <a href="/erp/little/icon">
                 <i class="menu-icon fa fa-caret-right"></i>
                 图标管理
             </a>
             <b class="arrow"></b>
-        </li>
+        </li>`)
+	}
+
+	buffer.WriteString(`
     </ul>
 </li>
 `)
