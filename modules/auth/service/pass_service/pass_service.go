@@ -13,10 +13,82 @@ const (
 	PASS_USER_RES_CACHE_KEY   = "pass_user_res_%d"
 )
 
-// 加载用户权限信息到缓存，包括管理员列表
+// 加载指定用户的权限信息到缓存，包括管理员列表
 func Load_user_pass_to_cache(user_id int64, db_session *xorm.Session) {
 
 	// 缓存管理员列表
+	load_admin_list_to_cache(db_session)
+
+	// 缓存用户权限
+	type user_res_id_t struct {
+		ResId int64 `xorm:"'res_id'"`
+	}
+
+	/*
+		SELECT ur.res_id AS res_id FROM auth_pass_user_res ur WHERE ur.user_id = 0
+	 */
+
+	var sql_user_res_id_list = `SELECT ur.res_id AS res_id FROM auth_pass_user_res ur WHERE ur.user_id = %d`
+	sql_user_res_id_list = fmt.Sprintf(sql_user_res_id_list, user_id)
+
+	var user_res_id_list = make([]user_res_id_t, 0)
+	err := db_session.Sql(sql_user_res_id_list).Find(&user_res_id_list)
+	core.HandleError(err)
+
+	var user_res_id_map = make(map[int64]interface{})
+	for _, user_res_id := range user_res_id_list {
+		user_res_id_map[user_res_id.ResId] = true
+	}
+
+	err = cache.Set(fmt.Sprintf(PASS_USER_RES_CACHE_KEY, user_id), user_res_id_map, core.GetSessionExpire())
+	core.HandleError(err)
+}
+
+// 加载所有用户的权限信息到缓存，包括管理员列表
+func Load_all_pass_to_cache(db_session *xorm.Session) {
+
+	// 缓存管理员列表
+	load_admin_list_to_cache(db_session)
+
+	// 缓存用户权限
+	type user_res_id_t struct {
+		UserId int64 `xorm:"'user_id'"`
+		ResId  int64 `xorm:"'res_id'"`
+	}
+
+	/*
+		SELECT ur.user_id AS user_id, ur.res_id AS res_id FROM auth_pass_user_res ur
+	 */
+
+	var sql_user_res_id_list = `SELECT ur.user_id AS user_id, ur.res_id AS res_id FROM auth_pass_user_res ur`
+
+	var user_res_id_list = make([]user_res_id_t, 0)
+	err := db_session.Sql(sql_user_res_id_list).Find(&user_res_id_list)
+	core.HandleError(err)
+
+	// 每个用户各一个资源列表
+	var user_res_list_map = make(map[int64](map[int64]interface{}))
+
+	for _, user_res_id := range user_res_id_list {
+		user_res_id_map, found := user_res_list_map[user_res_id.UserId]
+		if found == false {
+			user_res_id_map = make(map[int64]interface{})
+		}
+
+		user_res_id_map[user_res_id.ResId] = true
+		user_res_list_map[user_res_id.UserId] = user_res_id_map
+	}
+
+	// 把各个用户的资源列表都放到缓存中去
+	for user_id := range user_res_list_map {
+		var user_res_id_map = user_res_list_map[user_id]
+		err = cache.Set(fmt.Sprintf(PASS_USER_RES_CACHE_KEY, user_id), user_res_id_map, core.GetSessionExpire())
+		core.HandleError(err)
+	}
+}
+
+// 加载管理员列表到缓存
+func load_admin_list_to_cache(db_session *xorm.Session) {
 	type admin_user_id_t struct {
 		UserId int64 `xorm:"'user_id'"`
 	}
@@ -38,34 +110,15 @@ func Load_user_pass_to_cache(user_id int64, db_session *xorm.Session) {
 
 	err = cache.Set(PASS_ADMIN_LIST_CACHE_KEY, admin_user_id_map, core.GetSessionExpire())
 	core.HandleError(err)
+}
 
-	// 缓存用户权限
-	type user_res_id_t struct {
-		ResId int64 `xorm:"'res_id'"`
-	}
-
-	/*
-		SELECT ur.res_id AS res_id FROM auth_pass_user_res ur WHERE ur.user_id = 0
-	 */
-
-	var sql_user_res_id_list = `SELECT ur.res_id AS res_id FROM auth_pass_user_res ur WHERE ur.user_id = %d`
-	sql_user_res_id_list = fmt.Sprintf(sql_user_res_id_list, user_id)
-
-	var user_res_id_list = make([]user_res_id_t, 0)
-	err = db_session.Sql(sql_user_res_id_list).Find(&user_res_id_list)
-	core.HandleError(err)
-
-	var user_res_id_map = make(map[int64]interface{})
-	for _, user_res_id := range user_res_id_list {
-		user_res_id_map[user_res_id.ResId] = true
-	}
-
-	err = cache.Set(fmt.Sprintf(PASS_USER_RES_CACHE_KEY, user_id), user_res_id_map, core.GetSessionExpire())
-	core.HandleError(err)
+// 检查用户权限
+func Check_user_pass(user_id int64) bool {
+	return check_user_pass_in_cache(user_id)
 }
 
 // 通过缓存的信息检查用户权限
-func Check_user_pass_in_cache(user_id int64) bool {
+func check_user_pass_in_cache(user_id int64) bool {
 	//检查是不是管理员
 	var admin_user_id_map = make(map[int64]interface{})
 	err := cache.Get(PASS_ADMIN_LIST_CACHE_KEY, &admin_user_id_map)
@@ -89,7 +142,7 @@ func Check_user_pass_in_cache(user_id int64) bool {
 	return false
 }
 
-func Check_user_pass_in_db(user_id int64, res_id int64, db_session *xorm.Session) bool {
+func check_user_pass_in_db(user_id int64, res_id int64, db_session *xorm.Session) bool {
 
 	// 检查是不是管理员
 	var admin_count struct {
