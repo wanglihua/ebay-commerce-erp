@@ -12,6 +12,7 @@ import (
 	"matrix/core/requests"
 	"matrix/modules/auth/forms"
 	"matrix/modules/auth/models"
+	"matrix/modules/auth/service/pass_service"
 	erp_models "matrix/modules/erp/models"
 )
 
@@ -71,6 +72,7 @@ func (c Login) Login() revel.Result {
 	}
 
 	core.PutLoginUserToSession(c.Session, loginUser)
+	pass_service.Load_user_pass_to_cache(loginUser.UserId, db_session)
 
 	//login log
 	var login_log erp_models.LoginLogInfo

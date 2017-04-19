@@ -17,7 +17,7 @@ type LoginUser struct {
 
 func GetLoginUser(session revel.Session) LoginUser {
 	var loginUser LoginUser
-	err := cache.Get(session.Id()+LOGIN_USER_CACHE_KEY, &loginUser)
+	err := cache.Get(LOGIN_USER_CACHE_KEY+session.Id(), &loginUser)
 	if err != nil {
 		revel.TRACE.Println(err.Error())
 	}
@@ -25,9 +25,9 @@ func GetLoginUser(session revel.Session) LoginUser {
 }
 
 func PutLoginUserToSession(session revel.Session, user LoginUser) {
-	cache.Set(session.Id()+LOGIN_USER_CACHE_KEY, user, GetSessionExpire())
+	cache.Set(LOGIN_USER_CACHE_KEY+session.Id(), user, GetSessionExpire())
 }
 
 func RemoveLoginUserInSession(session revel.Session) {
-	cache.Delete(session.Id() + LOGIN_USER_CACHE_KEY)
+	cache.Delete(LOGIN_USER_CACHE_KEY + session.Id())
 }

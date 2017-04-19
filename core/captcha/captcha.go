@@ -220,13 +220,13 @@ func Generate(width int, height int, web_session revel.Session) *Image {
 		text += strconv.FormatInt(int64(d[v]), 32)
 	}
 
-	cache.Set(web_session.Id()+cache_key, text, core.GetSessionExpire())
+	cache.Set(cache_key+web_session.Id(), text, core.GetSessionExpire())
 
 	return new_image(d, width, height)
 }
 
 func MakeCurrentExpire(web_session revel.Session) {
-	cache.Delete(web_session.Id() + cache_key)
+	cache.Delete(cache_key + web_session.Id())
 }
 
 func IsCorrect(captcha string, web_session revel.Session) bool {
@@ -235,7 +235,7 @@ func IsCorrect(captcha string, web_session revel.Session) bool {
 	}
 
 	var session_val string
-	cache.Get(web_session.Id()+cache_key, &session_val)
+	cache.Get(cache_key+web_session.Id(), &session_val)
 
 	//revel.TRACE.Println("session_val: " + session_val)
 	//revel.TRACE.Println("captcha: " + captcha)
