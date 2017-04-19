@@ -1,10 +1,12 @@
 package pass
 
 import (
-	"matrix/core"
 	"github.com/go-xorm/xorm"
 	"github.com/revel/revel"
+	"matrix/core"
 )
+
+// 这里的代码，基本上没用了的，使用 pass_service中的代码就行
 
 // 有一种做法是登录时把用户的权限全部缓存起来，这样下次检查权限的时候，就不用查询数据库了
 // 这里先用不缓存的方法来做
@@ -88,7 +90,7 @@ func GetLoginUserPassResList(db_session *xorm.Session, web_session revel.Session
 		ResId int64 `xorm:"'res_id'" json:"res_id"`
 	}
 
-	var user_pass_res_id_list = make([]UserPassResId,0)
+	var user_pass_res_id_list = make([]UserPassResId, 0)
 	sql := `
 SELECT DISTINCT r.id AS res_id
 FROM auth_pass_user_res ur

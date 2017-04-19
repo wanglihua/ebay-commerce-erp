@@ -4,17 +4,19 @@ import (
 	"fmt"
 
 	"github.com/go-xorm/xorm"
+	"github.com/revel/revel"
 	"github.com/revel/revel/cache"
 	"matrix/core"
 )
 
 const (
-	PASS_ADMIN_LIST_CACHE_KEY = "pass_admin_list"
-	PASS_USER_RES_CACHE_KEY   = "pass_user_res_%d"
+	PASS_ADMIN_LIST_CACHE_KEY    = "pass_admin_list"
+	PASS_USER_RES_CACHE_KEY      = "pass_user_res_%d"
+	PASS_USER_RES_CATE_CACHE_KEY = "pass_user_res_cate_%d"
 )
 
 // 加载指定用户的权限信息到缓存，包括管理员列表
-func Load_user_pass_to_cache(user_id int64, db_session *xorm.Session) {
+func Load_user_pass_res_to_cache(user_id int64, db_session *xorm.Session) {
 
 	// 缓存管理员列表
 	load_admin_list_to_cache(db_session)
@@ -35,7 +37,7 @@ func Load_user_pass_to_cache(user_id int64, db_session *xorm.Session) {
 	err := db_session.Sql(sql_user_res_id_list).Find(&user_res_id_list)
 	core.HandleError(err)
 
-	var user_res_id_map = make(map[int64]interface{})
+	var user_res_id_map = make(map[int64]bool)
 	for _, user_res_id := range user_res_id_list {
 		user_res_id_map[user_res_id.ResId] = true
 	}
@@ -45,7 +47,7 @@ func Load_user_pass_to_cache(user_id int64, db_session *xorm.Session) {
 }
 
 // 加载所有用户的权限信息到缓存，包括管理员列表
-func Load_all_pass_to_cache(db_session *xorm.Session) {
+func Load_all_pass_res_to_cache(db_session *xorm.Session) {
 
 	// 缓存管理员列表
 	load_admin_list_to_cache(db_session)
@@ -67,12 +69,12 @@ func Load_all_pass_to_cache(db_session *xorm.Session) {
 	core.HandleError(err)
 
 	// 每个用户各一个资源列表
-	var user_res_list_map = make(map[int64](map[int64]interface{}))
+	var user_res_list_map = make(map[int64](map[int64]bool))
 
 	for _, user_res_id := range user_res_id_list {
 		user_res_id_map, found := user_res_list_map[user_res_id.UserId]
 		if found == false {
-			user_res_id_map = make(map[int64]interface{})
+			user_res_id_map = make(map[int64]bool)
 		}
 
 		user_res_id_map[user_res_id.ResId] = true
@@ -83,6 +85,82 @@ func Load_all_pass_to_cache(db_session *xorm.Session) {
 	for user_id := range user_res_list_map {
 		var user_res_id_map = user_res_list_map[user_id]
 		err = cache.Set(fmt.Sprintf(PASS_USER_RES_CACHE_KEY, user_id), user_res_id_map, core.GetSessionExpire())
+		core.HandleError(err)
+	}
+}
+
+func load_user_pass_cate_to_cache(user_id int64, db_session *xorm.Session) {
+	type user_pass_res_cate_id_t struct {
+		ResCateId int64 `xorm:"'res_cate_id'"`
+	}
+
+	/*
+SELECT DISTINCT rc.id as res_cate_id
+FROM auth_pass_user_res ur
+    INNER JOIN auth_pass_res r ON ur.res_id = r.id
+    INNER JOIN auth_pass_res_cate rc ON r.cate_id = rc.id
+WHERE ur.user_id = 0
+	 */
+	sql_pass_cate_list := `
+SELECT DISTINCT rc.id as res_cate_id
+FROM auth_pass_user_res ur
+    INNER JOIN auth_pass_res r ON ur.res_id = r.id
+    INNER JOIN auth_pass_res_cate rc ON r.cate_id = rc.id
+WHERE ur.user_id = %d`
+	sql_pass_cate_list = fmt.Sprintf(sql_pass_cate_list, user_id)
+
+	var user_pass_res_cate_id_list = make([]user_pass_res_cate_id_t, 0)
+	err := db_session.Sql(sql_pass_cate_list).Find(&user_pass_res_cate_id_list)
+	core.HandleError(err)
+
+	var user_res_cate_id_map = make(map[int64]bool)
+	for _, user_pass_res_cate_id := range user_pass_res_cate_id_list {
+		user_res_cate_id_map[user_pass_res_cate_id.ResCateId] = true
+	}
+
+	err = cache.Set(fmt.Sprintf(PASS_USER_RES_CATE_CACHE_KEY, user_id), user_res_cate_id_map, core.GetSessionExpire())
+	core.HandleError(err)
+}
+
+func load_all_pass_cate_to_cache(user_id int64, db_session *xorm.Session) {
+	type user_pass_res_cate_id_t struct {
+		UserId    int64  `xorm:"'user_id'"`
+		ResCateId int64  `xorm:"'res_cate_id'"`
+	}
+
+	/*
+SELECT DISTINCT ur.user_id AS user_id, rc.id AS res_cate_id
+FROM auth_pass_user_res ur
+    INNER JOIN auth_pass_res r ON ur.res_id = r.id
+    INNER JOIN auth_pass_res_cate rc ON r.cate_id = rc.id;
+	 */
+	sql_pass_cate_list := `
+SELECT DISTINCT ur.user_id AS user_id, rc.id AS res_cate_id
+FROM auth_pass_user_res ur
+    INNER JOIN auth_pass_res r ON ur.res_id = r.id
+    INNER JOIN auth_pass_res_cate rc ON r.cate_id = rc.id`
+
+	var user_pass_res_cate_id_list = make([]user_pass_res_cate_id_t, 0)
+	err := db_session.Sql(sql_pass_cate_list).Find(&user_pass_res_cate_id_list)
+	core.HandleError(err)
+
+	// 每个用户各一个资源类别列表
+	var user_res_cate_list_map = make(map[int64](map[int64]bool))
+
+	for _, user_pass_cate_id := range user_pass_res_cate_id_list {
+		user_pass_cate_id_map, found := user_res_cate_list_map[user_pass_cate_id.UserId]
+		if found == false {
+			user_pass_cate_id_map = make(map[int64]bool)
+		}
+
+		user_pass_cate_id_map[user_pass_cate_id.ResCateId] = true
+		user_res_cate_list_map[user_pass_cate_id.UserId] = user_pass_cate_id_map
+	}
+
+	// 把各个用户的资源列表类别都放到缓存中去
+	for user_id := range user_res_cate_list_map {
+		var user_pass_cate_id_map = user_res_cate_list_map[user_id]
+		err = cache.Set(fmt.Sprintf(PASS_USER_RES_CATE_CACHE_KEY, user_id), user_pass_cate_id_map, core.GetSessionExpire())
 		core.HandleError(err)
 	}
 }
@@ -103,7 +181,7 @@ func load_admin_list_to_cache(db_session *xorm.Session) {
 	err := db_session.Sql(sql_admin_list).Find(&admin_user_id_list)
 	core.HandleError(err)
 
-	var admin_user_id_map = make(map[int64]interface{})
+	var admin_user_id_map = make(map[int64]bool)
 	for _, admin_user_id := range admin_user_id_list {
 		admin_user_id_map[admin_user_id.UserId] = true
 	}
@@ -112,15 +190,15 @@ func load_admin_list_to_cache(db_session *xorm.Session) {
 	core.HandleError(err)
 }
 
-// 检查用户权限
-func Check_user_pass(user_id int64, res_id int64) bool {
-	return check_user_pass_in_cache(user_id, res_id)
+func Check_login_user_pass(res_id int64, web_session revel.Session) bool {
+	var login_user = core.GetLoginUser(web_session)
+	return check_user_pass_in_cache(login_user.UserId, res_id)
 }
 
 // 通过缓存的信息检查用户权限
 func check_user_pass_in_cache(user_id int64, res_id int64) bool {
 	//检查是不是管理员
-	var admin_user_id_map = make(map[int64]interface{})
+	var admin_user_id_map = make(map[int64]bool)
 	err := cache.Get(PASS_ADMIN_LIST_CACHE_KEY, &admin_user_id_map)
 	core.HandleError(err)
 
@@ -130,7 +208,7 @@ func check_user_pass_in_cache(user_id int64, res_id int64) bool {
 	}
 
 	// 如果不是管理员，就检查有没有授权
-	var user_res_id_map = make(map[int64]interface{})
+	var user_res_id_map = make(map[int64]bool)
 	err = cache.Get(fmt.Sprintf(PASS_USER_RES_CACHE_KEY, user_id), &user_res_id_map)
 	core.HandleError(err)
 

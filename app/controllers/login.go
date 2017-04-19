@@ -72,8 +72,8 @@ func (c Login) Login() revel.Result {
 	}
 
 	core.PutLoginUserToSession(c.Session, loginUser)
-	//pass_service.Load_user_pass_to_cache(loginUser.UserId, db_session)
-	pass_service.Load_all_pass_to_cache(db_session)
+	pass_service.Load_user_pass_res_to_cache(loginUser.UserId, db_session)
+	//pass_service.Load_all_pass_to_cache(db_session)
 
 	//login log
 	var login_log erp_models.LoginLogInfo

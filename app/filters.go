@@ -33,7 +33,7 @@ func handleInvocationPanic(c *revel.Controller, err interface{}) {
 		if revel.DevMode == true {
 			c.Result = c.RenderError(fmt.Errorf("%s \r\n %s", errorDesc, string(debug.Stack())))
 		} else {
-			c.Result = c.RenderError(fmt.Errorf("%s \r\n %s", errorDesc, string(debug.Stack())))
+			c.Result = c.RenderText(fmt.Sprintf("%s", errorDesc))
 		}
 	}
 }
