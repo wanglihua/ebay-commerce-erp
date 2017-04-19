@@ -15,11 +15,16 @@ const (
 	PASS_USER_RES_CATE_CACHE_KEY = "pass_user_res_cate_%d"
 )
 
-// 加载指定用户的权限信息到缓存，包括管理员列表
-func Load_user_pass_res_to_cache(user_id int64, db_session *xorm.Session) {
-
+// 加载指定用户的权限信息到缓存，包括类别和管理员列表
+func Load_user_pass_to_cache(user_id int64, db_session *xorm.Session) {
 	// 缓存管理员列表
 	load_admin_list_to_cache(db_session)
+	load_user_pass_res_to_cache(user_id, db_session)
+	load_user_pass_cate_to_cache(user_id, db_session)
+}
+
+// 加载指定用户的权限信息到缓存
+func load_user_pass_res_to_cache(user_id int64, db_session *xorm.Session) {
 
 	// 缓存用户权限
 	type user_res_id_t struct {
@@ -46,11 +51,16 @@ func Load_user_pass_res_to_cache(user_id int64, db_session *xorm.Session) {
 	core.HandleError(err)
 }
 
-// 加载所有用户的权限信息到缓存，包括管理员列表
-func Load_all_pass_res_to_cache(db_session *xorm.Session) {
-
+// 加载所有用户的权限信息到缓存，包括类别和管理员列表
+func Load_all_pass_to_cache(db_session *xorm.Session) {
 	// 缓存管理员列表
 	load_admin_list_to_cache(db_session)
+	load_all_pass_res_to_cache(db_session)
+	load_all_pass_cate_to_cache(db_session)
+}
+
+// 加载所有用户的权限信息到缓存
+func load_all_pass_res_to_cache(db_session *xorm.Session) {
 
 	// 缓存用户权限
 	type user_res_id_t struct {
@@ -122,7 +132,7 @@ WHERE ur.user_id = %d`
 	core.HandleError(err)
 }
 
-func load_all_pass_cate_to_cache(user_id int64, db_session *xorm.Session) {
+func load_all_pass_cate_to_cache(db_session *xorm.Session) {
 	type user_pass_res_cate_id_t struct {
 		UserId    int64  `xorm:"'user_id'"`
 		ResCateId int64  `xorm:"'res_cate_id'"`
@@ -195,6 +205,17 @@ func Check_login_user_pass(res_id int64, web_session revel.Session) bool {
 	return check_user_pass_in_cache(login_user.UserId, res_id)
 }
 
+
+func Get_login_user_pass_map_from_cache(web_session revel.Session) map[int64]bool {
+	var login_user = core.GetLoginUser(web_session)
+
+	var user_res_id_map = make(map[int64]bool)
+	err := cache.Get(fmt.Sprintf(PASS_USER_RES_CACHE_KEY, login_user.UserId), &user_res_id_map)
+	core.HandleError(err)
+
+	return user_res_id_map
+}
+
 // 通过缓存的信息检查用户权限
 func check_user_pass_in_cache(user_id int64, res_id int64) bool {
 	//检查是不是管理员
@@ -220,6 +241,53 @@ func check_user_pass_in_cache(user_id int64, res_id int64) bool {
 	return false
 }
 
+func Check_login_user_pass_cate(cate_id int64, web_session revel.Session) bool {
+	var login_user = core.GetLoginUser(web_session)
+	return check_user_pass_cate_in_cache(login_user.UserId, cate_id)
+}
+
+func Get_login_user_pass_cate_map_from_cache(web_session revel.Session) map[int64]bool {
+	var login_user = core.GetLoginUser(web_session)
+
+	var user_res_cate_id_map = make(map[int64]bool)
+	err := cache.Get(fmt.Sprintf(PASS_USER_RES_CATE_CACHE_KEY, login_user.UserId), &user_res_cate_id_map)
+	core.HandleError(err)
+
+	return user_res_cate_id_map
+}
+
+// 通过缓存的信息检查用户对资源类别的权限
+func check_user_pass_cate_in_cache(user_id int64, cate_id int64) bool {
+	//检查是不是管理员
+	var admin_user_id_map = make(map[int64]bool)
+	err := cache.Get(PASS_ADMIN_LIST_CACHE_KEY, &admin_user_id_map)
+	core.HandleError(err)
+
+	is_admin, found := admin_user_id_map[user_id]
+	if found == true && is_admin == true {
+		return true
+	}
+
+	// 如果不是管理员，就检查有没有授权
+	var user_res_cate_id_map = make(map[int64]bool)
+	err = cache.Get(fmt.Sprintf(PASS_USER_RES_CATE_CACHE_KEY, user_id), &user_res_cate_id_map)
+	core.HandleError(err)
+
+	has_res, found := user_res_cate_id_map[cate_id]
+	if found == true && has_res == true {
+		return true
+	}
+
+	return false
+}
+
+// 管理员权限的检查
+func Check_login_user_admin(web_session revel.Session) bool {
+	var login_user = core.GetLoginUser(web_session)
+	return login_user.IsAdmin
+}
+
+/*
 func check_user_pass_in_db(user_id int64, res_id int64, db_session *xorm.Session) bool {
 
 	// 检查是不是管理员
@@ -227,9 +295,7 @@ func check_user_pass_in_db(user_id int64, res_id int64, db_session *xorm.Session
 		Count int64 `xorm:"'admin_count'"`
 	}
 
-	/*
-		SELECT count(a.id) AS admin_count FROM auth_admin a WHERE a.user_id = 0;
-	 */
+	// SELECT count(a.id) AS admin_count FROM auth_admin a WHERE a.user_id = 0;
 
 	var sql_admin_count = `SELECT count(a.id) AS admin_count FROM auth_admin a WHERE a.user_id = %d`
 	sql_admin_count = fmt.Sprintf(sql_admin_count, user_id)
@@ -246,9 +312,7 @@ func check_user_pass_in_db(user_id int64, res_id int64, db_session *xorm.Session
 		Count int64 `xorm:"'pass_count'"`
 	}
 
-	/*
-		SELECT count(ur.id) AS pass_count FROM auth_pass_user_res ur WHERE ur.user_id = 0 AND ur.res_id = 0
-	 */
+	// SELECT count(ur.id) AS pass_count FROM auth_pass_user_res ur WHERE ur.user_id = 0 AND ur.res_id = 0
 
 	var sql_pass_count = "SELECT count(ur.id) AS pass_count FROM auth_pass_user_res ur WHERE ur.user_id = %d AND ur.res_id = %d"
 	sql_pass_count = fmt.Sprintf(sql_pass_count, user_id, res_id)
@@ -261,3 +325,4 @@ func check_user_pass_in_db(user_id int64, res_id int64, db_session *xorm.Session
 
 	return true
 }
+*/

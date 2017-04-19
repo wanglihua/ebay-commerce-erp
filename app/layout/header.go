@@ -8,8 +8,8 @@ import (
 	"github.com/revel/revel"
 	"matrix/app/layout/menu"
 	"matrix/core"
-	"matrix/core/pass"
 	"matrix/modules/auth/models"
+	"matrix/modules/auth/service/pass_service"
 )
 
 func GetHeader(title string, db_session *xorm.Session, web_session revel.Session) string {
@@ -147,20 +147,8 @@ func GetHeader(title string, db_session *xorm.Session, web_session revel.Session
 
 	is_admin := login_user.IsAdmin
 
-	var res_cate_id_map = make(map[int64]bool)
-	var res_id_map = make(map[int64]bool)
-
-	if is_admin == false {
-		res_cate_id_list := pass.GetLoginUserPassResCateList(db_session, web_session)
-		for _, res_cate_id := range res_cate_id_list {
-			res_cate_id_map[res_cate_id] = true
-		}
-
-		res_id_list := pass.GetLoginUserPassResList(db_session, web_session)
-		for _, res_id := range res_id_list {
-			res_id_map[res_id] = true
-		}
-	}
+	var res_cate_id_map = pass_service.Get_login_user_pass_cate_map_from_cache(web_session)
+	var res_id_map = pass_service.Get_login_user_pass_map_from_cache(web_session)
 
 	if v, ok := res_cate_id_map[models.PASS_RES_CATE_DDLC]; is_admin == true || (v == true && ok == true) {
 		header_buffer.WriteString(menu.GetDdlcMenu(res_id_map, db_session, web_session))
