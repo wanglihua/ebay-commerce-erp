@@ -25,6 +25,10 @@
                     <i class="ace-icon fa fa-gavel"></i>
                     权限
                 </button>
+                <button class="btn btn-pink btn-sm" onclick="refreshPassCache()">
+                    <i class="ace-icon fa fa-refresh"></i>
+                    刷新权限缓存
+                </button>
                 <button class="btn btn-danger btn-sm" onclick="deleteUser()">
                     <i class="ace-icon fa fa-trash-o"></i>
                     删除
@@ -35,6 +39,24 @@
             </div>
             <div id="userDetailDialogWrapper"></div>
             <script type="text/javascript">
+                function refreshPassCache() {
+                    $.ajax({
+                            url: '{%url "AuthUser.RefreshPassCache" %}',
+                            type: "POST",
+                            success: function (result) {
+                                if (result.success == false) {
+                                    $.msg.error(result.message);
+                                    return;
+                                }
+                                else {
+                                    $.msg.show(result.message);
+                                    return;
+                                }
+                            }
+                        }
+                    );
+                }
+
                 function showUserDetail(id) {
                     $.ajax({
                             url: '{%url "AuthUser.Detail" %}',

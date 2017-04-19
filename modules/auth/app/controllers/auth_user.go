@@ -1,13 +1,14 @@
 package controllers
 
 import (
-	"github.com/revel/revel"
+	"strconv"
+	"strings"
 
+	"github.com/revel/revel"
 	"matrix/core"
 	"matrix/modules/auth/forms"
 	"matrix/modules/auth/models"
-	"strconv"
-	"strings"
+	"matrix/modules/auth/service/pass_service"
 )
 
 type AuthUser struct {
@@ -44,6 +45,17 @@ func (c AuthUser) ListData() revel.Result {
 	return c.RenderJson(core.GridResult{
 		Data:  userList,
 		Total: count,
+	})
+}
+
+func (c AuthUser) RefreshPassCache() revel.Result {
+	var db_session = c.DbSession
+
+	pass_service.Load_all_pass_to_cache(db_session)
+
+	return c.RenderJson(map[string]interface{}{
+		"success": true,
+		"message": "刷新权限缓存成功！",
 	})
 }
 
