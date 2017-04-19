@@ -8,6 +8,8 @@ import (
 	"github.com/go-xorm/xorm"
 	"github.com/revel/revel"
 	"matrix/core"
+	"matrix/modules/auth/pass_res"
+	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/status_service"
 )
@@ -17,6 +19,8 @@ type ErpExchangeRate struct {
 }
 
 func (c ErpExchangeRate) Index() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.XTPZ_EXCHANGE_RATE, c.Session)
+
 	return c.RenderTemplate("erp/xtpz/exchange_rate/exchange_rate_index.html")
 }
 
@@ -27,6 +31,8 @@ type ErpExchangeRateViewItem struct {
 }
 
 func (c ErpExchangeRate) ListData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.XTPZ_EXCHANGE_RATE, c.Session)
+
 	db_session := c.DbSession
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
@@ -91,6 +97,8 @@ func (f *ExchangeRateDetailForm) Valid(validation *revel.Validation) bool {
 }
 
 func (c ErpExchangeRate) DetailData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.XTPZ_EXCHANGE_RATE, c.Session)
+
 	db_session := c.DbSession
 
 	var exchange_rate_id int64
@@ -123,6 +131,8 @@ func (c ErpExchangeRate) DetailData() revel.Result {
 }
 
 func (c ErpExchangeRate) Save() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.XTPZ_EXCHANGE_RATE, c.Session)
+
 	db_session := c.DbSession
 
 	var detail_form ExchangeRateDetailForm
@@ -193,6 +203,8 @@ func (c ErpExchangeRate) Save() revel.Result {
 }
 
 func (c ErpExchangeRate) Delete() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.XTPZ_EXCHANGE_RATE, c.Session)
+	
 	db_session := c.DbSession
 
 	exchange_rate_id_list := make([]int64, 0)

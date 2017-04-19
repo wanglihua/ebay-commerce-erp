@@ -11,6 +11,8 @@ import (
 	"github.com/pborman/uuid"
 	"github.com/revel/revel"
 	"matrix/core"
+	"matrix/modules/auth/pass_res"
+	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/setting"
 )
@@ -20,11 +22,15 @@ type ErpLittleIcon struct {
 }
 
 func (c ErpLittleIcon) Index() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.XTPZ_LITTLE_ICON, c.Session)
+
 	c.RenderArgs["icon_path"] = setting.ICON_PATH
 	return c.RenderTemplate("erp/xtpz/little_icon/little_icon_index.html")
 }
 
 func (c ErpLittleIcon) ListData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.XTPZ_LITTLE_ICON, c.Session)
+
 	db_session := c.DbSession
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
@@ -68,6 +74,8 @@ func (f *LittleIconInfoForm) Valid(validation *revel.Validation) bool {
 }
 
 func (c ErpLittleIcon) Detail() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.XTPZ_LITTLE_ICON, c.Session)
+
 	db_session := c.DbSession
 
 	var little_icon_id int64
@@ -92,6 +100,8 @@ func (c ErpLittleIcon) Detail() revel.Result {
 }
 
 func (c ErpLittleIcon) Save() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.XTPZ_LITTLE_ICON, c.Session)
+
 	db_session := c.DbSession
 
 	form := new(LittleIconInfoForm)
@@ -121,6 +131,8 @@ func (c ErpLittleIcon) Save() revel.Result {
 }
 
 func (c ErpLittleIcon) Delete() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.XTPZ_LITTLE_ICON, c.Session)
+
 	db_session := c.DbSession
 
 	little_icon_id_list := make([]int64, 0)
@@ -149,6 +161,8 @@ const (
 )
 
 func (c ErpLittleIcon) Upload() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.XTPZ_LITTLE_ICON, c.Session)
+
 	iconFileBytes := make([]byte, 0)
 	c.Params.Bind(&iconFileBytes, "icon_file")
 

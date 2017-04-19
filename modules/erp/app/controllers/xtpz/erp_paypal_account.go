@@ -7,6 +7,8 @@ import (
 
 	"github.com/revel/revel"
 	"matrix/core"
+	"matrix/modules/auth/pass_res"
+	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/status_service"
 )
@@ -16,6 +18,8 @@ type ErpPaypalAccount struct {
 }
 
 func (c ErpPaypalAccount) Index() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.XTPZ_PAYPAL_ACCOUNT, c.Session)
+
 	return c.RenderTemplate("erp/xtpz/paypal_account/paypal_account_index.html")
 }
 
@@ -25,6 +29,8 @@ type ErpPaypalAccountViewItem struct {
 }
 
 func (c ErpPaypalAccount) ListData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.XTPZ_PAYPAL_ACCOUNT, c.Session)
+
 	db_session := c.DbSession
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
@@ -107,6 +113,8 @@ func (f *PaypalAccountDetailForm) Valid(validation *revel.Validation) bool {
 }
 
 func (c ErpPaypalAccount) DetailData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.XTPZ_PAYPAL_ACCOUNT, c.Session)
+
 	db_session := c.DbSession
 
 	var paypal_account_id int64
@@ -131,6 +139,8 @@ func (c ErpPaypalAccount) DetailData() revel.Result {
 }
 
 func (c ErpPaypalAccount) Save() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.XTPZ_PAYPAL_ACCOUNT, c.Session)
+
 	db_session := c.DbSession
 
 	var detail_form PaypalAccountDetailForm
@@ -170,6 +180,8 @@ func (c ErpPaypalAccount) Save() revel.Result {
 }
 
 func (c ErpPaypalAccount) Delete() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.XTPZ_PAYPAL_ACCOUNT, c.Session)
+
 	db_session := c.DbSession
 
 	paypal_account_id_list := make([]int64, 0)

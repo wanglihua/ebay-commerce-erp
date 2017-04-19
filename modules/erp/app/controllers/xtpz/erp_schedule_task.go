@@ -3,6 +3,8 @@ package controllers
 import (
 	"github.com/revel/cron"
 	"github.com/revel/revel"
+	"matrix/modules/auth/pass_res"
+	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/jobs/app/jobs"
 	"matrix/modules/jobs/tasks"
 )
@@ -12,10 +14,14 @@ type ErpScheduleTask struct {
 }
 
 func (c ErpScheduleTask) Index() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.XTPZ_SCHEDULE_TASK, c.Session)
+
 	return c.RenderTemplate("erp/xtpz/schedule_task/schedule_task_index.html")
 }
 
 func (c ErpScheduleTask) TaskData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.XTPZ_SCHEDULE_TASK, c.Session)
+
 	cast_job := func(job cron.Job) *jobs.Job {
 		return job.(*jobs.Job)
 	}
@@ -59,5 +65,7 @@ func (c ErpScheduleTask) TaskData() revel.Result {
 }
 
 func (c ErpScheduleTask) HistoryData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.XTPZ_SCHEDULE_TASK, c.Session)
+
 	return c.RenderEmpty()
 }

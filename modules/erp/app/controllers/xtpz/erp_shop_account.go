@@ -2,10 +2,12 @@ package controllers
 
 import (
 	"encoding/json"
-	"github.com/revel/revel"
 	"strconv"
 
+	"github.com/revel/revel"
 	"matrix/core"
+	"matrix/modules/auth/pass_res"
+	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/status_service"
 )
@@ -15,6 +17,8 @@ type ErpShopAccount struct {
 }
 
 func (c ErpShopAccount) Index() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.XTPZ_SHOP_ACCOUNT, c.Session)
+
 	return c.RenderTemplate("erp/xtpz/shop_account/shop_account_index.html")
 }
 
@@ -25,6 +29,8 @@ type ErpShopAccountViewItem struct {
 }
 
 func (c ErpShopAccount) ListData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.XTPZ_SHOP_ACCOUNT, c.Session)
+
 	db_session := c.DbSession
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
@@ -101,6 +107,8 @@ func (f *ShopAccountDetailForm) Valid(validation *revel.Validation) bool {
 }
 
 func (c ErpShopAccount) DetailData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.XTPZ_SHOP_ACCOUNT, c.Session)
+
 	db_session := c.DbSession
 
 	var shop_account_id int64
@@ -134,6 +142,8 @@ func (c ErpShopAccount) DetailData() revel.Result {
 }
 
 func (c ErpShopAccount) Save() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.XTPZ_SHOP_ACCOUNT, c.Session)
+
 	db_session := c.DbSession
 
 	var detail_form ShopAccountDetailForm
@@ -164,6 +174,8 @@ func (c ErpShopAccount) Save() revel.Result {
 }
 
 func (c ErpShopAccount) Delete() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.XTPZ_SHOP_ACCOUNT, c.Session)
+
 	db_session := c.DbSession
 
 	shop_account_id_list := make([]int64, 0)
@@ -181,6 +193,8 @@ func (c ErpShopAccount) Delete() revel.Result {
 }
 
 func (c ErpShopAccount) GetShopAccountInfo() revel.Result {
+	// 这里面就不做权限检查了，别的地方调用的
+
 	db_session := c.DbSession
 
 	var shop_account_id int64

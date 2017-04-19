@@ -6,6 +6,8 @@ import (
 
 	"github.com/revel/revel"
 	"matrix/core"
+	"matrix/modules/auth/pass_res"
+	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/erp/models"
 )
 
@@ -14,10 +16,14 @@ type ErpLoginLog struct {
 }
 
 func (c ErpLoginLog) Index() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.XTPZ_LOGIN_LOG, c.Session)
+
 	return c.RenderTemplate("erp/xtpz/login_log/login_log_index.html")
 }
 
 func (c ErpLoginLog) ListData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.XTPZ_LOGIN_LOG, c.Session)
+
 	db_session := c.DbSession
 
 	var login_name_query string

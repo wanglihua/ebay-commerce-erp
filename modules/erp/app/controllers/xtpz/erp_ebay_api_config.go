@@ -2,12 +2,12 @@ package controllers
 
 import (
 	"encoding/json"
+	"fmt"
 	"strconv"
-	"github.com/revel/revel"
 
+	"github.com/revel/revel"
 	"matrix/core"
 	"matrix/modules/erp/models"
-	"fmt"
 )
 
 type ErpEBayAPIConfig struct {
