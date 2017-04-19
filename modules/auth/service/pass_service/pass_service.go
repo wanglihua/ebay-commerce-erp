@@ -113,12 +113,12 @@ func load_admin_list_to_cache(db_session *xorm.Session) {
 }
 
 // 检查用户权限
-func Check_user_pass(user_id int64) bool {
-	return check_user_pass_in_cache(user_id)
+func Check_user_pass(user_id int64, res_id int64) bool {
+	return check_user_pass_in_cache(user_id, res_id)
 }
 
 // 通过缓存的信息检查用户权限
-func check_user_pass_in_cache(user_id int64) bool {
+func check_user_pass_in_cache(user_id int64, res_id int64) bool {
 	//检查是不是管理员
 	var admin_user_id_map = make(map[int64]interface{})
 	err := cache.Get(PASS_ADMIN_LIST_CACHE_KEY, &admin_user_id_map)
@@ -134,7 +134,7 @@ func check_user_pass_in_cache(user_id int64) bool {
 	err = cache.Get(fmt.Sprintf(PASS_USER_RES_CACHE_KEY, user_id), &user_res_id_map)
 	core.HandleError(err)
 
-	has_res, found := user_res_id_map[user_id]
+	has_res, found := user_res_id_map[res_id]
 	if found == true && has_res == true {
 		return true
 	}
