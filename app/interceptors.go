@@ -105,6 +105,11 @@ func userAuth(c *revel.Controller) revel.Result {
 		return nil //暂时先 return true
 	}
 
+	// 以 Api 开头 和 以 Api 结尾 的 Controller 都不做登录限制
+	if strings.HasPrefix(c.Name, "Api") || strings.HasSuffix(c.Name, "Api") {
+		return nil
+	}
+
 	loginuser := core.GetLoginUser(c.Session)
 	//revel.TRACE.Println("userAuth session id: " + c.Session.Id())
 

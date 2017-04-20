@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>eBay运费计算</title>
+</head>
+<body>
+<div id="descItemNumber"> 272534877840</div>
+<div id="log_fee_calc">
+    <label for="zip_code">zip</label>
+    <input id="zip_code" type="text" onkeyup="window.log_fee_callback = function(fee) {document.getElementById('logistic_fee').innerText=fee; };var spt=document.createElement('scr'+'ipt');spt.type='text'+'/'+'j'+'ava'+'scr'+'ipt';spt.src='http://localhost/api/calc/logistics/fee?item_num='+document.getElementById('descItemNumber').innerText+'&zip_code='+document.getElementById('zip_code').value;document.getElementById('log_fee_calc').appendChild(spt);"/>
+    <span id="logistic_fee"></span>
+</div>
+
+</body>
+</html>
