@@ -3,24 +3,7 @@ package models
 import (
 	"github.com/go-xorm/xorm"
 	"matrix/core"
-)
-
-const (
-	PASS_RES_CATE_AUTH = 10100 // 权限管理
-	PASS_RES_CATE_CGGL = 10200 // 采购管理
-	PASS_RES_CATE_DBGL = 10300 // 调拨管理
-	PASS_RES_CATE_DDBB = 10400 // 订单报表
-	PASS_RES_CATE_DDLC = 10500 // 订单流程
-	PASS_RES_CATE_DDPZ = 10600 // 订单配置
-	PASS_RES_CATE_KCGL = 10700 // 库存管理
-	PASS_RES_CATE_PPGL = 10800 // PayPal管理
-	PASS_RES_CATE_SPBB = 10900 // 商品报表
-	PASS_RES_CATE_SPPZ = 11000 // 商品配置
-	PASS_RES_CATE_THGL = 11100 // 退货管理
-	PASS_RES_CATE_XSBB = 11200 // 销售报表
-	PASS_RES_CATE_XSGL = 11300 // 销售管理
-	PASS_RES_CATE_XXGL = 11400 // 消息管理
-	PASS_RES_CATE_XTPZ = 11500 // 系统配置
+	"matrix/modules/auth/pass_res_cate"
 )
 
 type PassResCateInfo struct {
@@ -42,93 +25,93 @@ func (e PassResCateInfo) ModelDesc() string {
 
 func (e PassResCateInfo) InitData(db_session *xorm.Session) {
 
-	pass_res_cate := new(PassResCateInfo)
-	pass_res_cate.Id = PASS_RES_CATE_AUTH
-	pass_res_cate.Name = "权限管理"
-	pass_res_cate.Desc = core.MakeNullString("权限管理", true)
-	db_session.Insert(pass_res_cate)
+	cate := new(PassResCateInfo)
+	cate.Id = pass_res_cate.AUTH
+	cate.Name = "权限管理"
+	cate.Desc = core.MakeNullString("权限管理", true)
+	db_session.Insert(cate)
 
-	pass_res_cate = new(PassResCateInfo)
-	pass_res_cate.Id = PASS_RES_CATE_CGGL
-	pass_res_cate.Name = "采购管理"
-	pass_res_cate.Desc = core.MakeNullString("采购管理", true)
-	db_session.Insert(pass_res_cate)
+	cate = new(PassResCateInfo)
+	cate.Id = pass_res_cate.CGGL
+	cate.Name = "采购管理"
+	cate.Desc = core.MakeNullString("采购管理", true)
+	db_session.Insert(cate)
 
-	pass_res_cate = new(PassResCateInfo)
-	pass_res_cate.Id = PASS_RES_CATE_DBGL
-	pass_res_cate.Name = "调拨管理"
-	pass_res_cate.Desc = core.MakeNullString("调拨管理", true)
-	db_session.Insert(pass_res_cate)
+	cate = new(PassResCateInfo)
+	cate.Id = pass_res_cate.DBGL
+	cate.Name = "调拨管理"
+	cate.Desc = core.MakeNullString("调拨管理", true)
+	db_session.Insert(cate)
 
-	pass_res_cate = new(PassResCateInfo)
-	pass_res_cate.Id = PASS_RES_CATE_DDBB
-	pass_res_cate.Name = "订单报表"
-	pass_res_cate.Desc = core.MakeNullString("订单报表", true)
-	db_session.Insert(pass_res_cate)
+	cate = new(PassResCateInfo)
+	cate.Id = pass_res_cate.DDBB
+	cate.Name = "订单报表"
+	cate.Desc = core.MakeNullString("订单报表", true)
+	db_session.Insert(cate)
 
-	pass_res_cate = new(PassResCateInfo)
-	pass_res_cate.Id = PASS_RES_CATE_DDLC
-	pass_res_cate.Name = "订单流程"
-	pass_res_cate.Desc = core.MakeNullString("订单流程", true)
-	db_session.Insert(pass_res_cate)
+	cate = new(PassResCateInfo)
+	cate.Id = pass_res_cate.DDLC
+	cate.Name = "订单流程"
+	cate.Desc = core.MakeNullString("订单流程", true)
+	db_session.Insert(cate)
 
-	pass_res_cate = new(PassResCateInfo)
-	pass_res_cate.Id = PASS_RES_CATE_DDPZ
-	pass_res_cate.Name = "订单配置"
-	pass_res_cate.Desc = core.MakeNullString("订单配置", true)
-	db_session.Insert(pass_res_cate)
+	cate = new(PassResCateInfo)
+	cate.Id = pass_res_cate.DDPZ
+	cate.Name = "订单配置"
+	cate.Desc = core.MakeNullString("订单配置", true)
+	db_session.Insert(cate)
 
-	pass_res_cate = new(PassResCateInfo)
-	pass_res_cate.Id = PASS_RES_CATE_KCGL
-	pass_res_cate.Name = "库存管理"
-	pass_res_cate.Desc = core.MakeNullString("库存管理", true)
-	db_session.Insert(pass_res_cate)
+	cate = new(PassResCateInfo)
+	cate.Id = pass_res_cate.KCGL
+	cate.Name = "库存管理"
+	cate.Desc = core.MakeNullString("库存管理", true)
+	db_session.Insert(cate)
 
-	pass_res_cate = new(PassResCateInfo)
-	pass_res_cate.Id = PASS_RES_CATE_PPGL
-	pass_res_cate.Name = "PayPal管理"
-	pass_res_cate.Desc = core.MakeNullString("PayPal管理", true)
-	db_session.Insert(pass_res_cate)
+	cate = new(PassResCateInfo)
+	cate.Id = pass_res_cate.PPGL
+	cate.Name = "PayPal管理"
+	cate.Desc = core.MakeNullString("PayPal管理", true)
+	db_session.Insert(cate)
 
-	pass_res_cate = new(PassResCateInfo)
-	pass_res_cate.Id = PASS_RES_CATE_SPBB
-	pass_res_cate.Name = "商品报表"
-	pass_res_cate.Desc = core.MakeNullString("商品报表", true)
-	db_session.Insert(pass_res_cate)
+	cate = new(PassResCateInfo)
+	cate.Id = pass_res_cate.SPBB
+	cate.Name = "商品报表"
+	cate.Desc = core.MakeNullString("商品报表", true)
+	db_session.Insert(cate)
 
-	pass_res_cate = new(PassResCateInfo)
-	pass_res_cate.Id = PASS_RES_CATE_SPPZ
-	pass_res_cate.Name = "商品配置"
-	pass_res_cate.Desc = core.MakeNullString("商品配置", true)
-	db_session.Insert(pass_res_cate)
+	cate = new(PassResCateInfo)
+	cate.Id = pass_res_cate.SPPZ
+	cate.Name = "商品配置"
+	cate.Desc = core.MakeNullString("商品配置", true)
+	db_session.Insert(cate)
 
-	pass_res_cate = new(PassResCateInfo)
-	pass_res_cate.Id = PASS_RES_CATE_THGL
-	pass_res_cate.Name = "退货管理"
-	pass_res_cate.Desc = core.MakeNullString("退货管理", true)
-	db_session.Insert(pass_res_cate)
+	cate = new(PassResCateInfo)
+	cate.Id = pass_res_cate.THGL
+	cate.Name = "退货管理"
+	cate.Desc = core.MakeNullString("退货管理", true)
+	db_session.Insert(cate)
 
-	pass_res_cate = new(PassResCateInfo)
-	pass_res_cate.Id = PASS_RES_CATE_XSBB
-	pass_res_cate.Name = "销售报表"
-	pass_res_cate.Desc = core.MakeNullString("销售报表", true)
-	db_session.Insert(pass_res_cate)
+	cate = new(PassResCateInfo)
+	cate.Id = pass_res_cate.XSBB
+	cate.Name = "销售报表"
+	cate.Desc = core.MakeNullString("销售报表", true)
+	db_session.Insert(cate)
 
-	pass_res_cate = new(PassResCateInfo)
-	pass_res_cate.Id = PASS_RES_CATE_XSGL
-	pass_res_cate.Name = "销售管理"
-	pass_res_cate.Desc = core.MakeNullString("销售管理", true)
-	db_session.Insert(pass_res_cate)
+	cate = new(PassResCateInfo)
+	cate.Id = pass_res_cate.XSGL
+	cate.Name = "销售管理"
+	cate.Desc = core.MakeNullString("销售管理", true)
+	db_session.Insert(cate)
 
-	pass_res_cate = new(PassResCateInfo)
-	pass_res_cate.Id = PASS_RES_CATE_XXGL
-	pass_res_cate.Name = "消息管理"
-	pass_res_cate.Desc = core.MakeNullString("消息管理", true)
-	db_session.Insert(pass_res_cate)
+	cate = new(PassResCateInfo)
+	cate.Id = pass_res_cate.XXGL
+	cate.Name = "消息管理"
+	cate.Desc = core.MakeNullString("消息管理", true)
+	db_session.Insert(cate)
 
-	pass_res_cate = new(PassResCateInfo)
-	pass_res_cate.Id = PASS_RES_CATE_XTPZ
-	pass_res_cate.Name = "系统配置"
-	pass_res_cate.Desc = core.MakeNullString("系统配置", true)
-	db_session.Insert(pass_res_cate)
+	cate = new(PassResCateInfo)
+	cate.Id = pass_res_cate.XTPZ
+	cate.Name = "系统配置"
+	cate.Desc = core.MakeNullString("系统配置", true)
+	db_session.Insert(cate)
 }

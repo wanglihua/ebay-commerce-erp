@@ -5,6 +5,7 @@ import (
 	"github.com/go-xorm/xorm"
 	"github.com/revel/revel"
 	"matrix/core"
+	"matrix/modules/auth/pass_res"
 )
 
 func GetAuthMenu(res_id_map map[int64]bool, db_session *xorm.Session, web_session revel.Session) string {
@@ -18,6 +19,13 @@ func GetAuthMenu(res_id_map map[int64]bool, db_session *xorm.Session, web_sessio
 		is_admin = login_user.IsAdmin
 	}
 
+	var check_pass_res_menu = func(pass_res_id int64) bool {
+		if v, ok := res_id_map[pass_res_id]; is_admin == true || (v == true && ok == true) {
+			return true
+		}
+		return false
+	}
+
 	var buffer bytes.Buffer
 
 	if is_admin {
@@ -29,25 +37,29 @@ func GetAuthMenu(res_id_map map[int64]bool, db_session *xorm.Session, web_sessio
         <b class="arrow fa fa-angle-down"></b>
     </a>
     <b class="arrow"></b>
-    <ul class="submenu">
+    <ul class="submenu">`)
 
-        <li id="auth-user-menu" class="">
+		if check_pass_res_menu(pass_res.AUTH_USER) {
+			buffer.WriteString(`<li id="auth-user-menu" class="">
             <a href="/auth/user">
                 <i class="menu-icon fa fa-caret-right"></i>
                 用户管理
             </a>
             <b class="arrow"></b>
-        </li>
+        </li>`)
+		}
 
-        <li id="auth-admin-menu" class="">
+		if login_user.IsSuperAdmin == true {
+			buffer.WriteString(`<li id="auth-admin-menu" class="">
             <a href="/auth/admin">
                 <i class="menu-icon fa fa-caret-right"></i>
                 管理员组
             </a>
             <b class="arrow"></b>
-        </li>
+        </li>`)
+		}
 
-    </ul>
+		buffer.WriteString(`</ul>
 </li>
 `)
 	}

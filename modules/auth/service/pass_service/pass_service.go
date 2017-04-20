@@ -207,6 +207,12 @@ func Check_login_user_pass(res_id int64, web_session revel.Session) {
 	}
 }
 
+// 查看当前登录用户是不是有某个权限
+func Login_user_has_pass(res_id int64, web_session revel.Session) bool {
+	var login_user = core.GetLoginUser(web_session)
+	return check_user_pass_in_cache(login_user.UserId, res_id)
+}
+
 func Get_login_user_pass_map_from_cache(web_session revel.Session) map[int64]bool {
 	var login_user = core.GetLoginUser(web_session)
 

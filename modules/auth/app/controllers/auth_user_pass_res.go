@@ -7,14 +7,17 @@ import (
 	"github.com/revel/revel"
 	"matrix/core"
 	"matrix/modules/auth/models"
+	"matrix/modules/auth/pass_res"
+	"matrix/modules/auth/service/pass_service"
 )
 
-//todo 除了Action权限控制，还要授权时检查当前登录人是不是有当前他授权的那个操作的权限。只能授权本人本来就有的权限。
 type AuthUserPassRes struct {
 	*revel.Controller
 }
 
 func (c AuthUserPassRes) Index() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.AUTH_PASS, c.Session)
+
 	db_session := c.DbSession
 
 	var user_id_list = make([]int64, 0)
@@ -62,6 +65,8 @@ type AuthUserPassResViewItem struct {
 }
 
 func (c AuthUserPassRes) ListData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.AUTH_PASS, c.Session)
+
 	db_session := c.DbSession
 
 	var user_ids_str string
@@ -127,6 +132,8 @@ func (c AuthUserPassRes) ListData() revel.Result {
 }
 
 func (c AuthUserPassRes) Grant() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.AUTH_PASS, c.Session)
+
 	db_session := c.DbSession
 
 	user_id_list := make([]int64, 0)
@@ -138,6 +145,18 @@ func (c AuthUserPassRes) Grant() revel.Result {
 
 	var res_id int64
 	c.Params.Bind(&res_id, "res_id")
+
+	if res_id == 0 {
+		return c.RenderJson(core.JsonResult{Success: false, Message: "资源Id不能为空！"})
+	}
+
+	// 除了Action权限控制，还要授权时检查当前登录人是不是有当前他授权的那个操作的权限。只能授权本人本来就有的权限。
+	if pass_service.Login_user_has_pass(res_id, c.Session) == false {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "你没有该资源的操作权限，不能对该资源进行授权操作！",
+		})
+	}
 
 	/*
 		DELETE FROM auth_pass_user_res WHERE user_id IN (1, 2) AND res_id = 2;
@@ -167,6 +186,8 @@ func (c AuthUserPassRes) Grant() revel.Result {
 }
 
 func (c AuthUserPassRes) Revoke() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.AUTH_PASS, c.Session)
+
 	db_session := c.DbSession
 
 	user_id_list := make([]int64, 0)
@@ -183,6 +204,18 @@ func (c AuthUserPassRes) Revoke() revel.Result {
 
 	var res_id int64
 	c.Params.Bind(&res_id, "res_id")
+
+	if res_id == 0 {
+		return c.RenderJson(core.JsonResult{Success: false, Message: "资源Id不能为空！"})
+	}
+
+	// 除了Action权限控制，还要授权时检查当前登录人是不是有当前他授权的那个操作的权限。只能授权本人本来就有的权限。
+	if pass_service.Login_user_has_pass(res_id, c.Session) == false {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "你没有该资源的操作权限，不能对该资源进行收权操作！",
+		})
+	}
 
 	/*
 		DELETE FROM auth_pass_user_res WHERE user_id IN (1, 2) AND res_id = 1;

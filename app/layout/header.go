@@ -8,7 +8,7 @@ import (
 	"github.com/revel/revel"
 	"matrix/app/layout/menu"
 	"matrix/core"
-	"matrix/modules/auth/models"
+	"matrix/modules/auth/pass_res_cate"
 	"matrix/modules/auth/service/pass_service"
 )
 
@@ -161,63 +161,63 @@ func GetHeader(title string, db_session *xorm.Session, web_session revel.Session
 		return false
 	}
 
-	if check_pass_cate_menu(models.PASS_RES_CATE_DDLC) == true {
+	if check_pass_cate_menu(pass_res_cate.DDLC) == true {
 		header_buffer.WriteString(menu.GetDdlcMenu(res_id_map, db_session, web_session))
 	}
 
-	if check_pass_cate_menu(models.PASS_RES_CATE_XXGL) == true {
+	if check_pass_cate_menu(pass_res_cate.XXGL) == true {
 		header_buffer.WriteString(menu.GetXxglMenu(res_id_map, db_session, web_session))
 	}
 
-	if check_pass_cate_menu(models.PASS_RES_CATE_PPGL) == true {
+	if check_pass_cate_menu(pass_res_cate.PPGL) == true {
 		header_buffer.WriteString(menu.GetPpglMenu(res_id_map, db_session, web_session))
 	}
 
-	if check_pass_cate_menu(models.PASS_RES_CATE_THGL) == true {
+	if check_pass_cate_menu(pass_res_cate.THGL) == true {
 		header_buffer.WriteString(menu.GetThglMenu(res_id_map, db_session, web_session))
 	}
 
-	if check_pass_cate_menu(models.PASS_RES_CATE_DDPZ) == true {
+	if check_pass_cate_menu(pass_res_cate.DDPZ) == true {
 		header_buffer.WriteString(menu.GetDdpzMenu(res_id_map, db_session, web_session))
 	}
 
-	if check_pass_cate_menu(models.PASS_RES_CATE_DDBB) == true {
+	if check_pass_cate_menu(pass_res_cate.DDBB) == true {
 		header_buffer.WriteString(menu.GetDdbbMenu(res_id_map, db_session, web_session))
 	}
 
-	if check_pass_cate_menu(models.PASS_RES_CATE_KCGL) == true {
+	if check_pass_cate_menu(pass_res_cate.KCGL) == true {
 		header_buffer.WriteString(menu.GetKcglMenu(res_id_map, db_session, web_session))
 	}
 
-	if check_pass_cate_menu(models.PASS_RES_CATE_SPPZ) == true {
+	if check_pass_cate_menu(pass_res_cate.SPPZ) == true {
 		header_buffer.WriteString(menu.GetSppzMenu(res_id_map, db_session, web_session))
 	}
 
-	if check_pass_cate_menu(models.PASS_RES_CATE_SPBB) == true {
+	if check_pass_cate_menu(pass_res_cate.SPBB) == true {
 		header_buffer.WriteString(menu.GetSpbbMenu(res_id_map, db_session, web_session))
 	}
 
-	if check_pass_cate_menu(models.PASS_RES_CATE_CGGL) == true {
+	if check_pass_cate_menu(pass_res_cate.CGGL) == true {
 		header_buffer.WriteString(menu.GetCgglMenu(res_id_map, db_session, web_session))
 	}
 
-	if check_pass_cate_menu(models.PASS_RES_CATE_DBGL) == true {
+	if check_pass_cate_menu(pass_res_cate.DBGL) == true {
 		header_buffer.WriteString(menu.GetDbglMenu(res_id_map, db_session, web_session))
 	}
 
-	if check_pass_cate_menu(models.PASS_RES_CATE_XSGL) == true {
+	if check_pass_cate_menu(pass_res_cate.XSGL) == true {
 		header_buffer.WriteString(menu.GetXsglMenu(res_id_map, db_session, web_session))
 	}
 
-	if check_pass_cate_menu(models.PASS_RES_CATE_XSBB) == true {
+	if check_pass_cate_menu(pass_res_cate.XSBB) == true {
 		header_buffer.WriteString(menu.GetXsbbMenu(res_id_map, db_session, web_session))
 	}
 
-	if check_pass_cate_menu(models.PASS_RES_CATE_AUTH) == true {
+	if check_pass_cate_menu(pass_res_cate.AUTH) == true {
 		header_buffer.WriteString(menu.GetAuthMenu(res_id_map, db_session, web_session))
 	}
 
-	if check_pass_cate_menu(models.PASS_RES_CATE_XTPZ) == true {
+	if check_pass_cate_menu(pass_res_cate.XTPZ) == true {
 		header_buffer.WriteString(menu.GetXtpzMenu(res_id_map, db_session, web_session))
 	}
 

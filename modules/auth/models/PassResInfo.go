@@ -4,6 +4,7 @@ import (
 	"github.com/go-xorm/xorm"
 	"matrix/core"
 	"matrix/modules/auth/pass_res"
+	"matrix/modules/auth/pass_res_cate"
 )
 
 type PassResInfo struct {
@@ -30,49 +31,49 @@ func (e PassResInfo) InitData(db_session *xorm.Session) {
 	{
 		pass := new(PassResInfo)
 		pass.Id = pass_res.DDLC_ORDER_ALL
-		pass.CateId = PASS_RES_CATE_DDLC
+		pass.CateId = pass_res_cate.DDLC
 		pass.Name = "所有订单"
 		pass.Desc = core.MakeNullString("所有订单", true)
 		db_session.Insert(pass)
 
 		pass = new(PassResInfo)
 		pass.Id = pass_res.DDLC_ORDER_YZF
-		pass.CateId = PASS_RES_CATE_DDLC
+		pass.CateId = pass_res_cate.DDLC
 		pass.Name = "已支付"
 		pass.Desc = core.MakeNullString("已支付", true)
 		db_session.Insert(pass)
 
 		pass = new(PassResInfo)
 		pass.Id = pass_res.DDLC_ORDER_DPH
-		pass.CateId = PASS_RES_CATE_DDLC
+		pass.CateId = pass_res_cate.DDLC
 		pass.Name = "待配货"
 		pass.Desc = core.MakeNullString("待配货", true)
 		db_session.Insert(pass)
 
 		pass = new(PassResInfo)
 		pass.Id = pass_res.DDLC_ORDER_PHZ
-		pass.CateId = PASS_RES_CATE_DDLC
+		pass.CateId = pass_res_cate.DDLC
 		pass.Name = "配货中"
 		pass.Desc = core.MakeNullString("配货中", true)
 		db_session.Insert(pass)
 
 		pass = new(PassResInfo)
 		pass.Id = pass_res.DDLC_ORDER_YFH
-		pass.CateId = PASS_RES_CATE_DDLC
+		pass.CateId = pass_res_cate.DDLC
 		pass.Name = "已发货"
 		pass.Desc = core.MakeNullString("已发货", true)
 		db_session.Insert(pass)
 
 		pass = new(PassResInfo)
 		pass.Id = pass_res.DDLC_ORDER_YWC
-		pass.CateId = PASS_RES_CATE_DDLC
+		pass.CateId = pass_res_cate.DDLC
 		pass.Name = "已完成"
 		pass.Desc = core.MakeNullString("已完成", true)
 		db_session.Insert(pass)
 
 		pass = new(PassResInfo)
 		pass.Id = pass_res.DDLC_ORDER_KHB
-		pass.CateId = PASS_RES_CATE_DDLC
+		pass.CateId = pass_res_cate.DDLC
 		pass.Name = "可合并的订单"
 		pass.Desc = core.MakeNullString("可合并的订单", true)
 		db_session.Insert(pass)
@@ -82,28 +83,28 @@ func (e PassResInfo) InitData(db_session *xorm.Session) {
 	{
 		pass := new(PassResInfo)
 		pass.Id = pass_res.DDPZ_LOGISTICS_MODE
-		pass.CateId = PASS_RES_CATE_DDPZ
+		pass.CateId = pass_res_cate.DDPZ
 		pass.Name = "货运方式"
 		pass.Desc = core.MakeNullString("货运方式", true)
 		db_session.Insert(pass)
 
 		pass = new(PassResInfo)
 		pass.Id = pass_res.DDPZ_PLATFORM_LOGISTICS_MODE
-		pass.CateId = PASS_RES_CATE_DDPZ
+		pass.CateId = pass_res_cate.DDPZ
 		pass.Name = "电商平台物流方式"
 		pass.Desc = core.MakeNullString("电商平台物流方式", true)
 		db_session.Insert(pass)
 
 		pass = new(PassResInfo)
 		pass.Id = pass_res.DDPZ_ORDER_CUSTOM_TYPE
-		pass.CateId = PASS_RES_CATE_DDPZ
+		pass.CateId = pass_res_cate.DDPZ
 		pass.Name = "订单自定义类型"
 		pass.Desc = core.MakeNullString("订单自定义类型", true)
 		db_session.Insert(pass)
 
 		pass = new(PassResInfo)
 		pass.Id = pass_res.DDPZ_ORDER_LOG
-		pass.CateId = PASS_RES_CATE_DDPZ
+		pass.CateId = pass_res_cate.DDPZ
 		pass.Name = "订单修改日志"
 		pass.Desc = core.MakeNullString("订单修改日志", true)
 		db_session.Insert(pass)
@@ -113,77 +114,77 @@ func (e PassResInfo) InitData(db_session *xorm.Session) {
 	{
 		pass := new(PassResInfo)
 		pass.Id = pass_res.KCGL_PRODUCT
-		pass.CateId = PASS_RES_CATE_KCGL
+		pass.CateId = pass_res_cate.KCGL
 		pass.Name = "商品列表"
 		pass.Desc = core.MakeNullString("商品列表", true)
 		db_session.Insert(pass)
 
 		pass = new(PassResInfo)
 		pass.Id = pass_res.KCGL_PRODUCT_BIND
-		pass.CateId = PASS_RES_CATE_KCGL
+		pass.CateId = pass_res_cate.KCGL
 		pass.Name = "绑定商品"
 		pass.Desc = core.MakeNullString("绑定商品", true)
 		db_session.Insert(pass)
 
 		pass = new(PassResInfo)
 		pass.Id = pass_res.KCGL_PRODUCT_IMPORT
-		pass.CateId = PASS_RES_CATE_KCGL
+		pass.CateId = pass_res_cate.KCGL
 		pass.Name = "商品导入"
 		pass.Desc = core.MakeNullString("商品导入", true)
 		db_session.Insert(pass)
 
 		pass = new(PassResInfo)
 		pass.Id = pass_res.KCGL_PRODUCT_EXPORT
-		pass.CateId = PASS_RES_CATE_KCGL
+		pass.CateId = pass_res_cate.KCGL
 		pass.Name = "商品导出"
 		pass.Desc = core.MakeNullString("商品导出", true)
 		db_session.Insert(pass)
 
 		pass = new(PassResInfo)
 		pass.Id = pass_res.KCGL_INVENTORY
-		pass.CateId = PASS_RES_CATE_KCGL
+		pass.CateId = pass_res_cate.KCGL
 		pass.Name = "商品库存"
 		pass.Desc = core.MakeNullString("商品库存", true)
 		db_session.Insert(pass)
 
 		pass = new(PassResInfo)
 		pass.Id = pass_res.KCGL_INVENTORY_CHECK
-		pass.CateId = PASS_RES_CATE_KCGL
+		pass.CateId = pass_res_cate.KCGL
 		pass.Name = "库存盘点"
 		pass.Desc = core.MakeNullString("库存盘点", true)
 		db_session.Insert(pass)
 
 		pass = new(PassResInfo)
 		pass.Id = pass_res.KCGL_INVENTORY_CHECK_APPROVE
-		pass.CateId = PASS_RES_CATE_KCGL
+		pass.CateId = pass_res_cate.KCGL
 		pass.Name = "盘点审批"
 		pass.Desc = core.MakeNullString("盘点审批", true)
 		db_session.Insert(pass)
 
 		pass = new(PassResInfo)
 		pass.Id = pass_res.KCGL_STOCKBILL_TRANSFER
-		pass.CateId = PASS_RES_CATE_KCGL
+		pass.CateId = pass_res_cate.KCGL
 		pass.Name = "分仓调拨"
 		pass.Desc = core.MakeNullString("分仓调拨", true)
 		db_session.Insert(pass)
 
 		pass = new(PassResInfo)
 		pass.Id = pass_res.KCGL_PRODUCT_QUALITY_FEEDBACK
-		pass.CateId = PASS_RES_CATE_KCGL
+		pass.CateId = pass_res_cate.KCGL
 		pass.Name = "商品质量反馈"
 		pass.Desc = core.MakeNullString("商品质量反馈", true)
 		db_session.Insert(pass)
 
 		pass = new(PassResInfo)
 		pass.Id = pass_res.KCGL_STOCKBILL_CHECKIN
-		pass.CateId = PASS_RES_CATE_KCGL
+		pass.CateId = pass_res_cate.KCGL
 		pass.Name = "手工入库"
 		pass.Desc = core.MakeNullString("手工入库", true)
 		db_session.Insert(pass)
 
 		pass = new(PassResInfo)
 		pass.Id = pass_res.KCGL_STOCKBILL_CHECKOUT
-		pass.CateId = PASS_RES_CATE_KCGL
+		pass.CateId = pass_res_cate.KCGL
 		pass.Name = "手工出库"
 		pass.Desc = core.MakeNullString("手工出库", true)
 		db_session.Insert(pass)
@@ -193,16 +194,23 @@ func (e PassResInfo) InitData(db_session *xorm.Session) {
 	{
 		pass := new(PassResInfo)
 		pass.Id = pass_res.AUTH_USER
-		pass.CateId = PASS_RES_CATE_AUTH
+		pass.CateId = pass_res_cate.AUTH
 		pass.Name = "用户管理"
 		pass.Desc = core.MakeNullString("用户管理", true)
 		db_session.Insert(pass)
 
 		pass = new(PassResInfo)
 		pass.Id = pass_res.AUTH_ADMIN
-		pass.CateId = PASS_RES_CATE_AUTH
+		pass.CateId = pass_res_cate.AUTH
 		pass.Name = "管理员组"
 		pass.Desc = core.MakeNullString("管理员组", true)
+		db_session.Insert(pass)
+
+		pass = new(PassResInfo)
+		pass.Id = pass_res.AUTH_PASS
+		pass.CateId = pass_res_cate.AUTH
+		pass.Name = "授权管理"
+		pass.Desc = core.MakeNullString("授权管理", true)
 		db_session.Insert(pass)
 	}
 
@@ -210,49 +218,49 @@ func (e PassResInfo) InitData(db_session *xorm.Session) {
 	{
 		pass := new(PassResInfo)
 		pass.Id = pass_res.XTPZ_ECOMMERCE_PLATFORM
-		pass.CateId = PASS_RES_CATE_XTPZ
+		pass.CateId = pass_res_cate.XTPZ
 		pass.Name = "电商平台"
 		pass.Desc = core.MakeNullString("电商平台", true)
 		db_session.Insert(pass)
 
 		pass = new(PassResInfo)
 		pass.Id = pass_res.XTPZ_SHOP_ACCOUNT
-		pass.CateId = PASS_RES_CATE_XTPZ
+		pass.CateId = pass_res_cate.XTPZ
 		pass.Name = "店铺账号"
 		pass.Desc = core.MakeNullString("店铺账号", true)
 		db_session.Insert(pass)
 
 		pass = new(PassResInfo)
 		pass.Id = pass_res.XTPZ_PAYPAL_ACCOUNT
-		pass.CateId = PASS_RES_CATE_XTPZ
+		pass.CateId = pass_res_cate.XTPZ
 		pass.Name = "PayPal账号"
 		pass.Desc = core.MakeNullString("PayPal账号", true)
 		db_session.Insert(pass)
 
 		pass = new(PassResInfo)
 		pass.Id = pass_res.XTPZ_EXCHANGE_RATE
-		pass.CateId = PASS_RES_CATE_XTPZ
+		pass.CateId = pass_res_cate.XTPZ
 		pass.Name = "汇率设置"
 		pass.Desc = core.MakeNullString("汇率设置", true)
 		db_session.Insert(pass)
 
 		pass = new(PassResInfo)
 		pass.Id = pass_res.XTPZ_LOGIN_LOG
-		pass.CateId = PASS_RES_CATE_XTPZ
+		pass.CateId = pass_res_cate.XTPZ
 		pass.Name = "系统日志"
 		pass.Desc = core.MakeNullString("系统日志", true)
 		db_session.Insert(pass)
 
 		pass = new(PassResInfo)
 		pass.Id = pass_res.XTPZ_SCHEDULE_TASK
-		pass.CateId = PASS_RES_CATE_XTPZ
+		pass.CateId = pass_res_cate.XTPZ
 		pass.Name = "定时任务"
 		pass.Desc = core.MakeNullString("定时任务", true)
 		db_session.Insert(pass)
 
 		pass = new(PassResInfo)
 		pass.Id = pass_res.XTPZ_LITTLE_ICON
-		pass.CateId = PASS_RES_CATE_XTPZ
+		pass.CateId = pass_res_cate.XTPZ
 		pass.Name = "图标管理"
 		pass.Desc = core.MakeNullString("图标管理", true)
 		db_session.Insert(pass)

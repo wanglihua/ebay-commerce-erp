@@ -4,6 +4,7 @@ const (
 	// 权限管理
 	AUTH_USER  = 10100 // 用户管理
 	AUTH_ADMIN = 10200 // 管理员组
+	AUTH_PASS  = 10300 // 授权管理
 
 	// 采购管理
 
