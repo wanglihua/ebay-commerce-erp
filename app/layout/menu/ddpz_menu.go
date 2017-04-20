@@ -4,11 +4,23 @@ import (
 	"bytes"
 	"github.com/go-xorm/xorm"
 	"github.com/revel/revel"
+	"matrix/core"
+	"matrix/modules/auth/pass_res"
 )
 
 func GetDdpzMenu(res_id_map map[int64]bool, db_session *xorm.Session, web_session revel.Session) string {
 	if _, found := revel.ModuleByName("erp"); found == false {
 		return ""
+	}
+
+	login_user := core.GetLoginUser(web_session)
+	var is_admin = login_user.IsAdmin
+
+	var check_pass_res_menu = func(pass_res_id int64) bool {
+		if v, ok := res_id_map[pass_res_id]; is_admin == true || (v == true && ok == true) {
+			return true
+		}
+		return false
 	}
 
 	var buffer bytes.Buffer
@@ -21,88 +33,108 @@ func GetDdpzMenu(res_id_map map[int64]bool, db_session *xorm.Session, web_sessio
         <b class="arrow fa fa-angle-down"></b>
     </a>
     <b class="arrow"></b>
-    <ul class="submenu">
+    <ul class="submenu">`)
 
-        <li id="ddpz-logisticscompany-menu" class="">
+	if check_pass_res_menu(pass_res.DDPZ_LOGISTICS_COMPANY) {
+		buffer.WriteString(`<li id="ddpz-logisticscompany-menu" class="">
             <a href="/erp/logistics/company">
                 <i class="menu-icon fa fa-caret-right"></i>
                 物流公司
             </a>
             <b class="arrow"></b>
-        </li>
+        </li>`)
+	}
 
-        <li id="ddpz-logisticsmode-menu" class="">
+	if check_pass_res_menu(pass_res.DDPZ_LOGISTICS_MODE) {
+		buffer.WriteString(`<li id="ddpz-logisticsmode-menu" class="">
             <a href="/erp/logistics/mode">
                 <i class="menu-icon fa fa-caret-right"></i>
                 物流方式
             </a>
             <b class="arrow"></b>
-        </li>
+        </li>`)
+	}
 
-        <li id="ddpz-logisticsfeerate-menu" class="">
+	if check_pass_res_menu(pass_res.DDPZ_LOGISTICS_FEE_RATE) {
+		buffer.WriteString(`<li id="ddpz-logisticsfeerate-menu" class="">
             <a href="/erp/logistics/fee/rate">
                 <i class="menu-icon fa fa-caret-right"></i>
                 物流费率
             </a>
             <b class="arrow"></b>
-        </li>
+        </li>`)
+	}
 
-        <li id="ddpz-logisticssetting-menu" class="">
+	if check_pass_res_menu(pass_res.DDPZ_LOGISTICS_SETTING) {
+		buffer.WriteString(`<li id="ddpz-logisticssetting-menu" class="">
             <a href="/erp/logistics/setting">
                 <i class="menu-icon fa fa-caret-right"></i>
                 物流配置
             </a>
             <b class="arrow"></b>
-        </li>
+        </li>`)
+	}
 
-        <li id="ddpz-envelopefeerate-menu" class="">
+	if check_pass_res_menu(pass_res.DDPZ_ENVELOPE_FEE_RATE) {
+		buffer.WriteString(`<li id="ddpz-envelopefeerate-menu" class="">
             <a href="/erp/envelope/fee/rate">
                 <i class="menu-icon fa fa-caret-right"></i>
                 信封费率
             </a>
             <b class="arrow"></b>
-        </li>
+        </li>`)
+	}
 
-        <li id="ddpz-pickfee-menu" class="">
+	if check_pass_res_menu(pass_res.DDPZ_PICK_FEE) {
+		buffer.WriteString(`<li id="ddpz-pickfee-menu" class="">
              <a href="/erp/pick/fee">
                  <i class="menu-icon fa fa-caret-right"></i>
                  拣货费用
              </a>
              <b class="arrow"></b>
-        </li>
+        </li>`)
+	}
 
-        <li id="ddpz-orderholdtype-menu" class="">
+	if check_pass_res_menu(pass_res.DDPZ_ORDER_HOLD_TYPE) {
+		buffer.WriteString(`<li id="ddpz-orderholdtype-menu" class="">
             <a href="/erp/order/hold/type">
                 <i class="menu-icon fa fa-caret-right"></i>
                 订单Hold类型
             </a>
             <b class="arrow"></b>
-        </li>
+        </li>`)
+	}
 
-        <li id="ddpz-platformlogisticsmode-menu" class="">
+	/*
+	buffer.WriteString(`<li id="ddpz-platformlogisticsmode-menu" class="">
             <a href="/erp/platform/logistics/mode">
                 <i class="menu-icon fa fa-caret-right"></i>
                 电商平台物流方式
             </a>
             <b class="arrow"></b>
-        </li>
+        </li>`)
 
-        <li id="ddpz-ordercustomtype-menu" class="">
+
+	buffer.WriteString(`<li id="ddpz-ordercustomtype-menu" class="">
             <a href="/erp/order/custom/type">
                 <i class="menu-icon fa fa-caret-right"></i>
                 订单自定义类型
             </a>
             <b class="arrow"></b>
-        </li>
+        </li>`)
+    */
 
-        <li id="ddpz-orderlog-menu" class="">
+	if check_pass_res_menu(pass_res.DDPZ_ORDER_LOG) {
+		buffer.WriteString(`<li id="ddpz-orderlog-menu" class="">
             <a href="/erp/order/log">
                 <i class="menu-icon fa fa-caret-right"></i>
                 订单修改日志
             </a>
             <b class="arrow"></b>
-        </li>
+        </li>`)
+	}
 
+	buffer.WriteString(`
     </ul>
 </li>
 `)

@@ -8,6 +8,8 @@ import (
 
 	"github.com/revel/revel"
 	"matrix/core"
+	"matrix/modules/auth/pass_res"
+	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/setting"
 )
@@ -17,11 +19,15 @@ type ErpLogisticsCompany struct {
 }
 
 func (c ErpLogisticsCompany) Index() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.DDPZ_LOGISTICS_COMPANY, c.Session)
+
 	c.RenderArgs["icon_path"] = setting.ICON_PATH
 	return c.RenderTemplate("erp/ddpz/logistics_company/logistics_company_index.html")
 }
 
 func (c ErpLogisticsCompany) ListData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.DDPZ_LOGISTICS_COMPANY, c.Session)
+
 	db_session := c.DbSession
 
 	type logitics_company_view_item_t struct {
@@ -97,6 +103,8 @@ func (f *LogisticsCompanyDetailForm) Valid(validation *revel.Validation) bool {
 }
 
 func (c ErpLogisticsCompany) DetailData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.DDPZ_LOGISTICS_COMPANY, c.Session)
+
 	db_session := c.DbSession
 
 	var logistics_company_id int64
@@ -125,6 +133,8 @@ func (c ErpLogisticsCompany) DetailData() revel.Result {
 }
 
 func (c ErpLogisticsCompany) Save() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.DDPZ_LOGISTICS_COMPANY, c.Session)
+
 	db_session := c.DbSession
 
 	var detail_form LogisticsCompanyDetailForm
@@ -166,6 +176,8 @@ func (c ErpLogisticsCompany) Save() revel.Result {
 }
 
 func (c ErpLogisticsCompany) Delete() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.DDPZ_LOGISTICS_COMPANY, c.Session)
+
 	db_session := c.DbSession
 
 	logistics_company_id_list := make([]int64, 0)
@@ -189,8 +201,6 @@ func (c ErpLogisticsCompany) Delete() revel.Result {
 
 	affected, err := db_session.In("id", logistics_company_id_list).Delete(new(models.LogisticsCompanyInfo))
 	core.HandleError(err)
-
-	//todo: 删除时要考虑别的关联
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})
 }

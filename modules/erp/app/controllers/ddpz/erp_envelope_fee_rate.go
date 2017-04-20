@@ -1,12 +1,13 @@
-
 package controllers
 
 import (
 	"encoding/json"
 	"strconv"
-	"github.com/revel/revel"
 
+	"github.com/revel/revel"
 	"matrix/core"
+	"matrix/modules/auth/pass_res"
+	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/erp/models"
 )
 
@@ -15,10 +16,14 @@ type ErpEnvelopeFeeRate struct {
 }
 
 func (c ErpEnvelopeFeeRate) Index() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.DDPZ_ENVELOPE_FEE_RATE, c.Session)
+
 	return c.RenderTemplate("erp/ddpz/envelope_fee_rate/envelope_fee_rate_index.html")
 }
 
 func (c ErpEnvelopeFeeRate) ListData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.DDPZ_ENVELOPE_FEE_RATE, c.Session)
+
 	db_session := c.DbSession
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
@@ -67,6 +72,8 @@ func (f *EnvelopeFeeRateDetailForm) Valid(validation *revel.Validation) bool {
 }
 
 func (c ErpEnvelopeFeeRate) DetailData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.DDPZ_ENVELOPE_FEE_RATE, c.Session)
+
 	db_session := c.DbSession
 
 	var envelope_fee_rate_id int64
@@ -88,6 +95,8 @@ func (c ErpEnvelopeFeeRate) DetailData() revel.Result {
 }
 
 func (c ErpEnvelopeFeeRate) Save() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.DDPZ_ENVELOPE_FEE_RATE, c.Session)
+
 	db_session := c.DbSession
 
 	var detail_form EnvelopeFeeRateDetailForm
@@ -101,10 +110,10 @@ func (c ErpEnvelopeFeeRate) Save() revel.Result {
 	envelope_fee_rate := detail_form.EnvelopeFeeRate
 
 	var affected int64
-	if detail_form.IsCreate() { 
+	if detail_form.IsCreate() {
 		affected, err = db_session.Insert(&envelope_fee_rate)
 		core.HandleError(err)
-	} else { 
+	} else {
 		affected, err = db_session.Id(envelope_fee_rate.Id).Update(&envelope_fee_rate)
 		core.HandleError(err)
 
@@ -117,6 +126,8 @@ func (c ErpEnvelopeFeeRate) Save() revel.Result {
 }
 
 func (c ErpEnvelopeFeeRate) Delete() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.DDPZ_ENVELOPE_FEE_RATE, c.Session)
+
 	db_session := c.DbSession
 
 	envelope_fee_rate_id_list := make([]int64, 0)
@@ -127,4 +138,3 @@ func (c ErpEnvelopeFeeRate) Delete() revel.Result {
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})
 }
-

@@ -9,6 +9,8 @@ import (
 	"github.com/revel/revel"
 	"github.com/tealeg/xlsx"
 	"matrix/core"
+	"matrix/modules/auth/pass_res"
+	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/erp/models"
 )
 
@@ -17,10 +19,14 @@ type ErpLogisticsFeeRate struct {
 }
 
 func (c ErpLogisticsFeeRate) Index() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.DDPZ_LOGISTICS_FEE_RATE, c.Session)
+
 	return c.RenderTemplate("erp/ddpz/logistics_fee_rate/logistics_fee_rate_index.html")
 }
 
 func (c ErpLogisticsFeeRate) ListData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.DDPZ_LOGISTICS_FEE_RATE, c.Session)
+
 	db_session := c.DbSession
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
@@ -141,6 +147,8 @@ func (f *LogisticsFeeRateDetailForm) Valid(validation *revel.Validation) bool {
 }
 
 func (c ErpLogisticsFeeRate) DetailData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.DDPZ_LOGISTICS_FEE_RATE, c.Session)
+
 	db_session := c.DbSession
 
 	var logistics_fee_rate_id int64
@@ -194,6 +202,8 @@ func (c ErpLogisticsFeeRate) DetailData() revel.Result {
 }
 
 func (c ErpLogisticsFeeRate) Save() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.DDPZ_LOGISTICS_FEE_RATE, c.Session)
+
 	db_session := c.DbSession
 
 	var detail_form LogisticsFeeRateDetailForm
@@ -225,6 +235,8 @@ func (c ErpLogisticsFeeRate) Save() revel.Result {
 }
 
 func (c ErpLogisticsFeeRate) Delete() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.DDPZ_LOGISTICS_FEE_RATE, c.Session)
+
 	db_session := c.DbSession
 
 	logistics_fee_rate_id_list := make([]int64, 0)
@@ -237,6 +249,8 @@ func (c ErpLogisticsFeeRate) Delete() revel.Result {
 }
 
 func (c ErpLogisticsFeeRate) Import() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.DDPZ_LOGISTICS_FEE_RATE, c.Session)
+
 	db_session := c.DbSession
 
 	excel_file_bytes := make([]byte, 0)
@@ -469,6 +483,7 @@ WHERE lc.name = '%s' AND lm.name = '%s'`
 	})
 }
 
+// 这个的权限检查就不用加上了，别的多个地方会调用
 func (c ErpLogisticsFeeRate) GetLogisticsModeListByCompanyId() revel.Result {
 	db_session := c.DbSession
 

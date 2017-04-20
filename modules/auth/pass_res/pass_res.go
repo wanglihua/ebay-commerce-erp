@@ -21,11 +21,15 @@ const (
 	DDLC_ORDER_YWC = 11600 // 已完成
 	DDLC_ORDER_KHB = 11700 // 可合并的订单
 
-	// 订单配置
-	DDPZ_LOGISTICS_MODE          = 11800 // 货运方式
-	DDPZ_PLATFORM_LOGISTICS_MODE = 11900 // 电商平台物流方式
-	DDPZ_ORDER_CUSTOM_TYPE       = 12000 // 订单自定义类型
-	DDPZ_ORDER_LOG               = 12100 // 订单修改日志
+	// 订单配置, 模块编号 12
+	DDPZ_LOGISTICS_COMPANY  = 120100 // 物流公司
+	DDPZ_LOGISTICS_MODE     = 120200 // 物流方式
+	DDPZ_LOGISTICS_FEE_RATE = 120300 // 物流费率
+	DDPZ_LOGISTICS_SETTING  = 120400 // 物流配置
+	DDPZ_ENVELOPE_FEE_RATE  = 120500 // 信封费率
+	DDPZ_PICK_FEE           = 120600 // 拣货费用
+	DDPZ_ORDER_HOLD_TYPE    = 120700 // 订单HOLD类型
+	DDPZ_ORDER_LOG          = 120800 // 订单修改日志
 
 	// 库存管理
 	KCGL_PRODUCT                  = 12200 // 商品列表

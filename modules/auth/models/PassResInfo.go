@@ -81,25 +81,54 @@ func (e PassResInfo) InitData(db_session *xorm.Session) {
 
 	// 订单配置
 	{
+
 		pass := new(PassResInfo)
+		pass.Id = pass_res.DDPZ_LOGISTICS_COMPANY
+		pass.CateId = pass_res_cate.DDPZ
+		pass.Name = "物流公司"
+		pass.Desc = core.MakeNullString("物流公司", true)
+		db_session.Insert(pass)
+
+		pass = new(PassResInfo)
 		pass.Id = pass_res.DDPZ_LOGISTICS_MODE
 		pass.CateId = pass_res_cate.DDPZ
-		pass.Name = "货运方式"
-		pass.Desc = core.MakeNullString("货运方式", true)
+		pass.Name = "物流方式"
+		pass.Desc = core.MakeNullString("物流方式", true)
 		db_session.Insert(pass)
 
 		pass = new(PassResInfo)
-		pass.Id = pass_res.DDPZ_PLATFORM_LOGISTICS_MODE
+		pass.Id = pass_res.DDPZ_LOGISTICS_FEE_RATE
 		pass.CateId = pass_res_cate.DDPZ
-		pass.Name = "电商平台物流方式"
-		pass.Desc = core.MakeNullString("电商平台物流方式", true)
+		pass.Name = "物流费率"
+		pass.Desc = core.MakeNullString("物流费率", true)
 		db_session.Insert(pass)
 
 		pass = new(PassResInfo)
-		pass.Id = pass_res.DDPZ_ORDER_CUSTOM_TYPE
+		pass.Id = pass_res.DDPZ_LOGISTICS_SETTING
 		pass.CateId = pass_res_cate.DDPZ
-		pass.Name = "订单自定义类型"
-		pass.Desc = core.MakeNullString("订单自定义类型", true)
+		pass.Name = "物流配置"
+		pass.Desc = core.MakeNullString("物流配置", true)
+		db_session.Insert(pass)
+
+		pass = new(PassResInfo)
+		pass.Id = pass_res.DDPZ_ENVELOPE_FEE_RATE
+		pass.CateId = pass_res_cate.DDPZ
+		pass.Name = "信封费率"
+		pass.Desc = core.MakeNullString("信封费率", true)
+		db_session.Insert(pass)
+
+		pass = new(PassResInfo)
+		pass.Id = pass_res.DDPZ_PICK_FEE
+		pass.CateId = pass_res_cate.DDPZ
+		pass.Name = "拣货费用"
+		pass.Desc = core.MakeNullString("拣货费用", true)
+		db_session.Insert(pass)
+
+		pass = new(PassResInfo)
+		pass.Id = pass_res.DDPZ_ORDER_HOLD_TYPE
+		pass.CateId = pass_res_cate.DDPZ
+		pass.Name = "订单HOLD类型"
+		pass.Desc = core.MakeNullString("订单HOLD类型", true)
 		db_session.Insert(pass)
 
 		pass = new(PassResInfo)

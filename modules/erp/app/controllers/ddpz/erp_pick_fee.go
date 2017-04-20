@@ -6,6 +6,8 @@ import (
 
 	"github.com/revel/revel"
 	"matrix/core"
+	"matrix/modules/auth/pass_res"
+	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/pick_fee_service"
 )
@@ -15,6 +17,8 @@ type ErpPickFee struct {
 }
 
 func (c ErpPickFee) Index() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.DDPZ_PICK_FEE, c.Session)
+
 	return c.RenderTemplate("erp/ddpz/pick_fee/pick_fee_index.html")
 }
 
@@ -37,6 +41,8 @@ func (f *PickFeeDetailForm) Valid(validation *revel.Validation) bool {
 }
 
 func (c ErpPickFee) DetailData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.DDPZ_PICK_FEE, c.Session)
+
 	db_session := c.DbSession
 	var pick_fee = pick_fee_service.Get_pick_fee_setting(db_session)
 
@@ -47,6 +53,8 @@ func (c ErpPickFee) DetailData() revel.Result {
 }
 
 func (c ErpPickFee) Save() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.DDPZ_PICK_FEE, c.Session)
+
 	db_session := c.DbSession
 
 	var detail_form PickFeeDetailForm

@@ -9,6 +9,8 @@ import (
 	"github.com/revel/revel"
 	"github.com/tealeg/xlsx"
 	"matrix/core"
+	"matrix/modules/auth/pass_res"
+	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/erp/models"
 )
 
@@ -17,10 +19,14 @@ type ErpLogisticsMode struct {
 }
 
 func (c ErpLogisticsMode) Index() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.DDPZ_LOGISTICS_MODE, c.Session)
+
 	return c.RenderTemplate("erp/ddpz/logistics_mode/logistics_mode_index.html")
 }
 
 func (c ErpLogisticsMode) ListData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.DDPZ_LOGISTICS_MODE, c.Session)
+
 	db_session := c.DbSession
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
@@ -102,6 +108,8 @@ func (f *LogisticsModeDetailForm) Valid(validation *revel.Validation) bool {
 }
 
 func (c ErpLogisticsMode) DetailData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.DDPZ_LOGISTICS_MODE, c.Session)
+
 	db_session := c.DbSession
 
 	var logistics_mode_id int64
@@ -135,6 +143,8 @@ func (c ErpLogisticsMode) DetailData() revel.Result {
 }
 
 func (c ErpLogisticsMode) Save() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.DDPZ_LOGISTICS_MODE, c.Session)
+
 	db_session := c.DbSession
 
 	var detail_form LogisticsModeDetailForm
@@ -176,6 +186,8 @@ func (c ErpLogisticsMode) Save() revel.Result {
 }
 
 func (c ErpLogisticsMode) Delete() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.DDPZ_LOGISTICS_MODE, c.Session)
+
 	db_session := c.DbSession
 
 	logistics_mode_id_list := make([]int64, 0)
@@ -206,7 +218,7 @@ FROM erp_order_logistics ol
 WHERE ol.mode_id IN (1, 2, 3)
 	 */
 
-
+	// 一并删除物流费率
 	_, err := db_session.In("mode_id", logistics_mode_id_list).Delete(new(models.LogisticsFeeRateInfo))
 	core.HandleError(err)
 
@@ -217,6 +229,8 @@ WHERE ol.mode_id IN (1, 2, 3)
 }
 
 func (c ErpLogisticsMode) Import() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.DDPZ_LOGISTICS_MODE, c.Session)
+
 	db_session := c.DbSession
 
 	excel_file_bytes := make([]byte, 0)

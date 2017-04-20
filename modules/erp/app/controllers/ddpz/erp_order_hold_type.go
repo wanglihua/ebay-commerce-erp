@@ -3,9 +3,11 @@ package controllers
 import (
 	"encoding/json"
 	"strconv"
-	"github.com/revel/revel"
 
+	"github.com/revel/revel"
 	"matrix/core"
+	"matrix/modules/auth/pass_res"
+	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/setting"
 )
@@ -15,11 +17,15 @@ type ErpOrderHoldType struct {
 }
 
 func (c ErpOrderHoldType) Index() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.DDPZ_ORDER_HOLD_TYPE, c.Session)
+
 	c.RenderArgs["icon_path"] = setting.ICON_PATH
 	return c.RenderTemplate("erp/ddpz/order_hold_type/order_hold_type_index.html")
 }
 
 func (c ErpOrderHoldType) ListData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.DDPZ_ORDER_HOLD_TYPE, c.Session)
+
 	db_session := c.DbSession
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
@@ -65,6 +71,8 @@ func (f *OrderHoldTypeDetailForm) Valid(validation *revel.Validation) bool {
 }
 
 func (c ErpOrderHoldType) DetailData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.DDPZ_ORDER_HOLD_TYPE, c.Session)
+
 	db_session := c.DbSession
 
 	var order_hold_type_id int64
@@ -86,6 +94,8 @@ func (c ErpOrderHoldType) DetailData() revel.Result {
 }
 
 func (c ErpOrderHoldType) Save() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.DDPZ_ORDER_HOLD_TYPE, c.Session)
+
 	db_session := c.DbSession
 
 	var detail_form OrderHoldTypeDetailForm

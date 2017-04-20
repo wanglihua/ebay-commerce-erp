@@ -2,8 +2,9 @@ package controllers
 
 import (
 	"github.com/revel/revel"
-
 	"matrix/core"
+	"matrix/modules/auth/pass_res"
+	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/erp/models"
 )
 
@@ -12,10 +13,14 @@ type ErpOrderLog struct {
 }
 
 func (c ErpOrderLog) Index() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.DDPZ_ORDER_LOG, c.Session)
+
 	return c.RenderTemplate("erp/ddpz/order_log/order_log_index.html")
 }
 
 func (c ErpOrderLog) ListData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.DDPZ_ORDER_LOG, c.Session)
+
 	db_session := c.DbSession
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
