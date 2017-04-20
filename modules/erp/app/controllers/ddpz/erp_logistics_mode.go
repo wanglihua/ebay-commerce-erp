@@ -185,6 +185,45 @@ func (c ErpLogisticsMode) Save() revel.Result {
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据保存成功!"})
 }
 
+func (c ErpLogisticsMode) DeleteConfirm() revel.Result {
+	var db_session = c.DbSession
+
+	logistics_mode_id_list := make([]int64, 0)
+	c.Params.Bind(&logistics_mode_id_list, "id_list")
+
+	var mode_id_str_list = core.Int_list_to_str_list(logistics_mode_id_list)
+
+	// 查看物流方式是否已经在匹配物流方式的订单里面使用
+
+	var mode_use_count struct {
+		Count int64 `xorm:"'ol_count'"`
+	}
+	/*
+SELECT count(ol.id) AS ol_count
+FROM erp_order_logistics ol
+WHERE ol.mode_id IN (1, 2, 3)
+	 */
+	var sql_mode_use_count = `SELECT count(ol.id) AS ol_count
+FROM erp_order_logistics ol
+WHERE ol.mode_id IN (%s)`
+	sql_mode_use_count = fmt.Sprintf(sql_mode_use_count, strings.Join(mode_id_str_list, ","))
+
+	_,err:= db_session.Sql(sql_mode_use_count).Get(&mode_use_count)
+	core.HandleError(err)
+
+	if mode_use_count.Count != 0 {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "物流方式当前有匹配成功的订单，如果删除，这些订单的物流信息将不全，是否继续删除？",
+		})
+	}
+
+	return c.RenderJson(map[string]interface{}{
+		"success": true,
+		"message": "无需确认，直接删除！",
+	})
+}
+
 func (c ErpLogisticsMode) Delete() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.DDPZ_LOGISTICS_MODE, c.Session)
 
@@ -210,13 +249,6 @@ func (c ErpLogisticsMode) Delete() revel.Result {
 		})
 	}
 	*/
-
-	//todo: 查看物流方式是否已经在匹配物流方式的订单里面使用 ??
-	/*
-SELECT count(ol.id) AS ol_count
-FROM erp_order_logistics ol
-WHERE ol.mode_id IN (1, 2, 3)
-	 */
 
 	// 一并删除物流费率
 	_, err := db_session.In("mode_id", logistics_mode_id_list).Delete(new(models.LogisticsFeeRateInfo))

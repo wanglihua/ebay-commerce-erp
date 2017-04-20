@@ -571,7 +571,7 @@
                     return;
                 }
 
-                $.msg.confirm("将同时删除关联的费率数据，确认要删除吗？", function () {
+                var delete_mode = function () {
                     $.ajax({
                         url: '{%url "ErpLogisticsMode.Delete"%}',
                         type: "POST",
@@ -585,6 +585,26 @@
                                 $.msg.show(data.message);
                             }
                             vm.reloadList();
+                        }
+                    });
+                };
+
+                $.msg.confirm("将同时删除关联的费率数据，确认要删除吗？", function () {
+                    $.ajax({
+                        url: '{%url "ErpLogisticsMode.DeleteConfirm"%}',
+                        type: "POST",
+                        data: {"id_list": id_list},
+                        success: function (data) {
+                            if (data.success == false) {
+                                //使用中，再次确认
+                                $.msg.confirm(data.message, function () {
+                                    delete_mode();
+                                });
+                            }
+                            else {
+                                //没在使用，不用确认
+                                delete_mode();
+                            }
                         }
                     });
                 });

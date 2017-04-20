@@ -85,6 +85,7 @@ GET  /erp/logistics/mode                       ErpLogisticsMode.Index
 POST /erp/logistics/mode/data/list             ErpLogisticsMode.ListData
 POST /erp/logistics/mode/data/detail           ErpLogisticsMode.DetailData
 POST /erp/logistics/mode/save                  ErpLogisticsMode.Save
+POST /erp/logistics/mode/delete/confirm        ErpLogisticsMode.DeleteConfirm
 POST /erp/logistics/mode/delete                ErpLogisticsMode.Delete
 POST /erp/logistics/mode/import                ErpLogisticsMode.Import
 

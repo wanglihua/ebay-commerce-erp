@@ -31,7 +31,7 @@ func (c LogisticsFeeApi) Calc() revel.Result {
 	c.Params.Bind(&zip_code, "zip_code")
 	zip_code = strings.TrimSpace(zip_code)
 
-	//todo: 匹配的逻辑
+	//todo: 匹配的逻辑，加一个计费的权重，配置页面，计算出来的费用最后乘以这个权重
 	var fee float64 = rand.Float64()*5 + 5
 
 	var callback_code = `if(log_fee_callback) { log_fee_callback(%f); }`
