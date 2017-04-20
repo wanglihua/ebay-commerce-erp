@@ -21,6 +21,7 @@
                     <i class="ace-icon fa fa-plus"></i>
                     新增
                 </button>
+                {% if .has_auth_pass_res %}
                 <button class="btn btn-purple btn-sm" onclick="showUserPassRes()">
                     <i class="ace-icon fa fa-gavel"></i>
                     权限
@@ -29,6 +30,7 @@
                     <i class="ace-icon fa fa-refresh"></i>
                     刷新权限缓存
                 </button>
+                {% end %}
                 <button class="btn btn-danger btn-sm" onclick="deleteUser()">
                     <i class="ace-icon fa fa-trash-o"></i>
                     删除
