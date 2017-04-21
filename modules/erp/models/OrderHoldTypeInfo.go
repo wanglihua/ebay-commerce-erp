@@ -28,7 +28,7 @@ const (
 	ORDER_HOLD_TYPE_SELLER_PAYPAL_MISMATCH int64 = 10000 // 卖家邮件和PayPal的地址不匹配
 	ORDER_HOLD_TYPE_SPECIAL_ADDRESS        int64 = 10010 // 地址有特殊字段的。比如 PO BOX, LOCKER。但最佳物流非AU POST的，需要在基础设置里面有特殊字段设置功能
 	ORDER_HOLD_TYPE_BUYER_CHECKOUT_MESSAGE int64 = 10020 // 有买家留言
-	ORDER_HOLD_TYPE_SELLER_LEAVE_WORD      int64 = 10030 // 有卖家留言
+	ORDER_HOLD_TYPE_PLATFORM_LEAVE_WORD    int64 = 10030 // 有平台留言
 	ORDER_HOLD_TYPE_PICK_UP                int64 = 10040 // PICK UP
 	ORDER_HOLD_TYPE_OOS_ALL_STOCK          int64 = 10050 // 系统显示所有仓都缺货（中国仓除外） OOS: Out Of Stock
 	ORDER_HOLD_TYPE_OOS_BEST_STOCK         int64 = 10060 // 系统显示最佳仓缺货（次佳、海上有货）
@@ -70,9 +70,9 @@ func (e OrderHoldTypeInfo) InitData(db_session *xorm.Session) {
 
 	// ORDER_HOLD_TYPE_SELLER_LEAVE_WORD      int64 = 10030 // 有卖家留言
 	order_hold_type = new(OrderHoldTypeInfo)
-	order_hold_type.Id = ORDER_HOLD_TYPE_SELLER_LEAVE_WORD
-	order_hold_type.Name = "有卖家留言"
-	order_hold_type.Desc = "有卖家留言"
+	order_hold_type.Id = ORDER_HOLD_TYPE_PLATFORM_LEAVE_WORD
+	order_hold_type.Name = "有平台留言"
+	order_hold_type.Desc = "有平台留言"
 	db_session.Insert(order_hold_type)
 
 	// ORDER_HOLD_TYPE_PICK_UP                int64 = 10040 // PICK UP
@@ -156,14 +156,14 @@ func (e OrderHoldTypeInfo) InitData(db_session *xorm.Session) {
 	order_hold_type = new(OrderHoldTypeInfo)
 	order_hold_type.Id = ORDER_HOLD_TYPE_ENVELOPE
 	order_hold_type.Name = "信封类"
-	order_hold_type.Desc = "匹配最佳仓库及物流后订单亏损"
+	order_hold_type.Desc = "信封类"
 	db_session.Insert(order_hold_type)
 
 	// ORDER_HOLD_TYPE_EXPRESS                int64 = 10150 // 快递类。需要在基础设置里面有 收到快递费金额的设置功能，比如收到的运费高于什么金额，视为快递。否则就算收了快递费也视为普通包裹
 	order_hold_type = new(OrderHoldTypeInfo)
 	order_hold_type.Id = ORDER_HOLD_TYPE_EXPRESS
-	order_hold_type.Name = "信封类"
-	order_hold_type.Desc = "匹配最佳仓库及物流后订单亏损"
+	order_hold_type.Name = "快递类"
+	order_hold_type.Desc = "快递类，客户付了快递费的"
 	db_session.Insert(order_hold_type)
 
 	// ORDER_HOLD_TYPE_INTERNATIONAL          int64 = 10160 // 国际件。对于非澳大利亚的订单，直接到国际件模块

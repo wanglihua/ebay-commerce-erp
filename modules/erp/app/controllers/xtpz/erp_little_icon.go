@@ -171,6 +171,7 @@ func (c ErpLittleIcon) Upload() revel.Result {
 	c.Validation.MaxSize(iconFileBytes, 100*KB).Message("上传的文件太大了！")
 
 	conf, format, err := image.DecodeConfig(bytes.NewReader(iconFileBytes))
+	revel.TRACE.Println(err)
 	noError := err == nil
 	c.Validation.Required(noError).Message("解码错误，可能是上传的文件格式不对！")
 	formatLimit := format == "jpeg" || format == "png"
