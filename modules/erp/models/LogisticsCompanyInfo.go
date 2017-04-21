@@ -27,6 +27,7 @@ func (e LogisticsCompanyInfo) ModelDesc() string {
 }
 
 func (e LogisticsCompanyInfo) InitData(db_session *xorm.Session) {
+	/*
 	{
 		var logistics_company LogisticsCompanyInfo
 		logistics_company.Name = "AU POST"
@@ -67,4 +68,5 @@ func (e LogisticsCompanyInfo) InitData(db_session *xorm.Session) {
 		logistics_company.Desc = core.MakeNullString("FASTWAY", true)
 		db_session.Insert(&logistics_company)
 	}
+	*/
 }
