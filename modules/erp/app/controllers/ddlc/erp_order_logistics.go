@@ -7,6 +7,8 @@ import (
 
 	"github.com/revel/revel"
 	"matrix/core"
+	"matrix/modules/auth/pass_res"
+	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/order_import_batch_service"
 	"matrix/modules/erp/setting"
@@ -17,11 +19,15 @@ type ErpOrderLogistics struct {
 }
 
 func (c ErpOrderLogistics) Index() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_LOGISTICS, c.Session)
+
 	c.RenderArgs["icon_path"] = setting.ICON_PATH
 	return c.RenderTemplate("erp/ddlc/order_logistics/order_logistics_index.html")
 }
 
 func (c ErpOrderLogistics) PageData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_LOGISTICS, c.Session)
+
 	var db_session = c.DbSession
 
 	var stock_list = make([]models.StockInfo, 0)
@@ -48,6 +54,8 @@ func (c ErpOrderLogistics) PageData() revel.Result {
 }
 
 func (c ErpOrderLogistics) ListData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_LOGISTICS, c.Session)
+
 	db_session := c.DbSession
 
 	var stock_id int64
@@ -186,6 +194,8 @@ func (f *OrderLogisticsDetailForm) Valid(validation *revel.Validation) bool {
 }
 
 func (c ErpOrderLogistics) DetailData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_LOGISTICS, c.Session)
+
 	db_session := c.DbSession
 
 	var order_logistics_id int64
@@ -207,6 +217,8 @@ func (c ErpOrderLogistics) DetailData() revel.Result {
 }
 
 func (c ErpOrderLogistics) Save() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_LOGISTICS, c.Session)
+
 	db_session := c.DbSession
 
 	var detail_form OrderLogisticsDetailForm
@@ -236,6 +248,8 @@ func (c ErpOrderLogistics) Save() revel.Result {
 }
 
 func (c ErpOrderLogistics) Delete() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_LOGISTICS, c.Session)
+	
 	db_session := c.DbSession
 
 	order_logistics_id_list := make([]int64, 0)

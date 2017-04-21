@@ -9,6 +9,8 @@ import (
 	"github.com/revel/revel"
 	"github.com/tealeg/xlsx"
 	"matrix/core"
+	"matrix/modules/auth/pass_res"
+	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/exchange_rate_service"
 	"matrix/modules/erp/service/order_import_batch_service"
@@ -20,10 +22,14 @@ type ErpOrderImport struct {
 }
 
 func (c ErpOrderImport) Index() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_IMPORT, c.Session)
+
 	return c.RenderTemplate("erp/ddlc/order_import/order_import_index.html")
 }
 
 func (c ErpOrderImport) PageData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_IMPORT, c.Session)
+
 	var db_session = c.DbSession
 
 	// 获得导入的批次列表
@@ -36,6 +42,8 @@ func (c ErpOrderImport) PageData() revel.Result {
 }
 
 func (c ErpOrderImport) ListData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_IMPORT, c.Session)
+
 	db_session := c.DbSession
 
 	var batch_code int64
@@ -141,6 +149,8 @@ WHERE ib.batch_code = 123 AND o.code LIKE '%abc%' AND o.buyer_user_id LIKE '%abc
 
 // 上传 Excel 导入订单
 func (c ErpOrderImport) Upload() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_IMPORT, c.Session)
+
 	db_session := c.DbSession
 
 	excel_file_bytes := make([]byte, 0)
@@ -524,6 +534,8 @@ SELECT sa.id AS shop_id, sa.name AS shop_name FROM erp_shop_account sa;
 }
 
 func (c ErpOrderImport) BatchDelete() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_IMPORT, c.Session)
+
 	var db_session = c.DbSession
 
 	var batch_code int64
@@ -594,6 +606,8 @@ DELETE FROM erp_order_import_batch WHERE batch_code = 1;
 }
 
 func (c ErpOrderImport) Delete() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_IMPORT, c.Session)
+
 	var db_session = c.DbSession
 
 	var order_id_list = make([]int64, 0)
@@ -648,6 +662,8 @@ func (c ErpOrderImport) Delete() revel.Result {
 }
 
 func (c ErpOrderImport) MatchLogistics() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_IMPORT, c.Session)
+
 	var db_session = c.DbSession
 
 	var batch_code int64

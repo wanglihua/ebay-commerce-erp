@@ -79,6 +79,13 @@ func (e PassResInfo) InitData(db_session *xorm.Session) {
 		db_session.Insert(pass)
 
 		pass = new(PassResInfo)
+		pass.Id = pass_res.DDLC_ORDER_VIEW_DETAIL
+		pass.CateId = pass_res_cate.DDLC
+		pass.Name = "查看订单详细"
+		pass.Desc = core.MakeNullString("查看订单详细", true)
+		db_session.Insert(pass)
+
+		pass = new(PassResInfo)
 		pass.Id = pass_res.DDLC_ORDER_IMPORT
 		pass.CateId = pass_res_cate.DDLC
 		pass.Name = "订单导入"

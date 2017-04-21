@@ -5,6 +5,8 @@ import (
 
 	"github.com/revel/revel"
 	"matrix/core"
+	"matrix/modules/auth/pass_res"
+	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/order_service"
 	"matrix/modules/erp/setting"
@@ -15,6 +17,8 @@ type ErpOrderHold struct {
 }
 
 func (c ErpOrderHold) Index() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_HOLD, c.Session)
+
 	c.RenderArgs["icon_path"] = setting.ICON_PATH
 	return c.RenderTemplate("erp/ddlc/order_hold/order_hold_index.html")
 }
@@ -34,6 +38,8 @@ func (c ErpOrderHold) PageData() revel.Result {
 }
 
 func (c ErpOrderHold) ListData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_HOLD, c.Session)
+	
 	db_session := c.DbSession
 
 	var hold_type_id int64

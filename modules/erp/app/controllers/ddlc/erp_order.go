@@ -7,6 +7,8 @@ import (
 
 	"github.com/revel/revel"
 	"matrix/core"
+	"matrix/modules/auth/pass_res"
+	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/order_service"
 	"matrix/modules/erp/service/paypal_service"
@@ -23,23 +25,37 @@ func (c ErpOrder) Index(status string) revel.Result {
 	active_menu_html := `<li class="active" data-menu="ddlc-order-%s-menu">%s</li>`
 	status_chinese_name := ""
 	if status == "all" {
+		pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_ALL, c.Session)
+
 		active_menu_html = fmt.Sprintf(active_menu_html, status, "所有订单")
 		status_chinese_name = "所有订单"
 	} else if status == "yzf" {
+		pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_YZF, c.Session)
+
 		active_menu_html = fmt.Sprintf(active_menu_html, status, "已支付")
 		status_chinese_name = "已支付"
 	} else if status == "dph" {
+		pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_DPH, c.Session)
+
 		active_menu_html = fmt.Sprintf(active_menu_html, status, "待配货")
 		status_chinese_name = "待配货"
 	} else if status == "phz" {
+		pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_PHZ, c.Session)
+
 		active_menu_html = fmt.Sprintf(active_menu_html, status, "配货中")
 		status_chinese_name = "配货中"
 	} else if status == "yfh" {
+		pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_YFH, c.Session)
+
 		active_menu_html = fmt.Sprintf(active_menu_html, status, "已发货")
 		status_chinese_name = "已发货"
 	} else if status == "ywc" {
+		pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_YWC, c.Session)
+
 		active_menu_html = fmt.Sprintf(active_menu_html, status, "已完成")
 		status_chinese_name = "已完成"
+	} else {
+		panic("未知的订单状态！")
 	}
 
 	c.RenderArgs["active_menu_html"] = template.HTML(active_menu_html)
@@ -74,6 +90,8 @@ func (c ErpOrder) get_order_query_criteria_list() []order_query_criteria {
 
 // index page data
 func (c ErpOrder) PageData() revel.Result {
+	//这个的权限就不控制了
+
 	db_session := c.DbSession
 
 	shop_list := shop_service.Get_shop_select_item_list(db_session)
@@ -117,17 +135,31 @@ func (c ErpOrder) ListData() revel.Result {
 	// 先看 URL 里面的状态分类
 	status = strings.ToLower(status) //大小写
 	if status == "all" {
+		pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_ALL, c.Session)
+
 		status_id = 0
 	} else if status == "yzf" {
+		pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_YZF, c.Session)
+
 		status_id = models.ORDER_STATUS_YZF
 	} else if status == "dph" {
+		pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_DPH, c.Session)
+
 		status_id = models.ORDER_STATUS_DPH
 	} else if status == "phz" {
+		pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_PHZ, c.Session)
+
 		status_id = models.ORDER_STATUS_PHZ
 	} else if status == "yfh" {
+		pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_YFH, c.Session)
+
 		status_id = models.ORDER_STATUS_YFH
 	} else if status == "ywc" {
+		pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_YWC, c.Session)
+
 		status_id = models.ORDER_STATUS_YWC
+	} else {
+		panic("未知的订单状态！")
 	}
 
 	var status_id_query int64 = 0 // 下拉框里面的状态，不是通过 Url 里面来的
@@ -194,11 +226,15 @@ func (c ErpOrder) ListData() revel.Result {
 }
 
 func (c ErpOrder) Detail(order_id int64) revel.Result {
+	pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_VIEW_DETAIL, c.Session)
+
 	c.RenderArgs["order_id"] = order_id
 	return c.RenderTemplate("erp/ddlc/order/order_detail.html")
 }
 
 func (c ErpOrder) DetailData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_VIEW_DETAIL, c.Session)
+	
 	db_session := c.DbSession
 
 	var order_id int64
