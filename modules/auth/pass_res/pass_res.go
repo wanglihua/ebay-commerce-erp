@@ -12,14 +12,17 @@ const (
 
 	// 订单报表
 
-	// 订单流程
-	DDLC_ORDER_ALL = 11100 // 所有订单
-	DDLC_ORDER_YZF = 11200 // 已支付
-	DDLC_ORDER_DPH = 11300 // 待配货
-	DDLC_ORDER_PHZ = 11400 // 配货中
-	DDLC_ORDER_YFH = 11500 // 已发货
-	DDLC_ORDER_YWC = 11600 // 已完成
-	DDLC_ORDER_KHB = 11700 // 可合并的订单
+
+	// 订单流程, 模块编号 13
+	DDLC_ORDER_ALL       = 130100 // 所有订单
+	DDLC_ORDER_YZF       = 130200 // 已支付
+	DDLC_ORDER_HOLD      = 130300 // HOLD
+	DDLC_ORDER_DPH       = 130400 // 待配货
+	DDLC_ORDER_PHZ       = 130500 // 配货中
+	DDLC_ORDER_YFH       = 130600 // 已发货
+	DDLC_ORDER_YWC       = 130700 // 已完成
+	DDLC_ORDER_IMPORT    = 130800 // 订单导入
+	DDLC_ORDER_LOGISTICS = 130900 // 订单物流
 
 	// 订单配置, 模块编号 12
 	DDPZ_LOGISTICS_COMPANY  = 120100 // 物流公司

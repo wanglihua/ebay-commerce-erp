@@ -44,6 +44,13 @@ func (e PassResInfo) InitData(db_session *xorm.Session) {
 		db_session.Insert(pass)
 
 		pass = new(PassResInfo)
+		pass.Id = pass_res.DDLC_ORDER_HOLD
+		pass.CateId = pass_res_cate.DDLC
+		pass.Name = "HOLD"
+		pass.Desc = core.MakeNullString("HOLD", true)
+		db_session.Insert(pass)
+
+		pass = new(PassResInfo)
 		pass.Id = pass_res.DDLC_ORDER_DPH
 		pass.CateId = pass_res_cate.DDLC
 		pass.Name = "待配货"
@@ -72,10 +79,17 @@ func (e PassResInfo) InitData(db_session *xorm.Session) {
 		db_session.Insert(pass)
 
 		pass = new(PassResInfo)
-		pass.Id = pass_res.DDLC_ORDER_KHB
+		pass.Id = pass_res.DDLC_ORDER_IMPORT
 		pass.CateId = pass_res_cate.DDLC
-		pass.Name = "可合并的订单"
-		pass.Desc = core.MakeNullString("可合并的订单", true)
+		pass.Name = "订单导入"
+		pass.Desc = core.MakeNullString("订单导入", true)
+		db_session.Insert(pass)
+
+		pass = new(PassResInfo)
+		pass.Id = pass_res.DDLC_ORDER_LOGISTICS
+		pass.CateId = pass_res_cate.DDLC
+		pass.Name = "订单物流"
+		pass.Desc = core.MakeNullString("订单物流", true)
 		db_session.Insert(pass)
 	}
 
