@@ -34,22 +34,25 @@ func (c ErpLogisticsMode) ListData() revel.Result {
 	type logistics_mode_view_item_t struct {
 		models.LogisticsModeInfo          `xorm:"extends" json:"m"`
 		models.LogisticsCompanyInfo       `xorm:"extends" json:"c"`
-		models.StockInfo                  `xorm:"extends" json:"s"`
+		models.StockInfo                  `xorm:"extends" json:"sk"`
+		models.StatusInfo                 `xorm:"extends" json:"st"`
 	}
 
 	/*
-		SELECT m.*, c.*, s.*
+		SELECT m.*, c.*, sk.*, st.*
 		FROM erp_logistics_mode m
 		    INNER JOIN erp_logistics_company c ON c.id = m.company_id
-		    INNER JOIN erp_stock s ON s.id = m.stock_id
+		    INNER JOIN erp_stock sk ON sk.id = m.stock_id
+		    INNER JOIN erp_status st ON st.id = m.status_id
 	*/
 
 	sb := core.NewSqlBuilder()
-	sb.Select("m.*, c.*, s.*")
+	sb.Select("m.*, c.*, sk.*, st.*")
 	sb.Count("count(m.id) as mode_count")
 	sb.From(`erp_logistics_mode m
 		    INNER JOIN erp_logistics_company c ON c.id = m.company_id
-		    INNER JOIN erp_stock s ON s.id = m.stock_id`)
+		    INNER JOIN erp_stock sk ON sk.id = m.stock_id
+		    INNER JOIN erp_status st ON st.id = m.status_id`)
 
 	sb.Where(filter)
 
@@ -85,6 +88,7 @@ type LogisticsModeDetailForm struct {
 	LogisticsMode        models.LogisticsModeInfo       `json:"logistics_mode"`
 	LogisticsCompanyList []models.LogisticsCompanyInfo  `json:"logistics_company_list"`
 	StockList            []models.StockInfo             `json:"stock_list"`
+	StatusList           []models.StatusInfo            `json:"status_list"`
 }
 
 func (f *LogisticsModeDetailForm) IsCreate() bool {
@@ -124,6 +128,7 @@ func (c ErpLogisticsMode) DetailData() revel.Result {
 		}
 	} else {
 		logistics_mode.Tjzysjzqx = 1
+		logistics_mode.StatusId = models.LOGISTICS_MODE_ENABLED
 	}
 
 	var logistics_company_list = make([]models.LogisticsCompanyInfo, 0)
@@ -134,10 +139,15 @@ func (c ErpLogisticsMode) DetailData() revel.Result {
 	err = db_session.Where(fmt.Sprintf("stock_type_id = %d", models.STOCK_TYPE_AU)).Find(&stock_list)
 	core.HandleError(err)
 
+	var status_list = make([]models.StatusInfo, 0)
+	err = db_session.Where(fmt.Sprintf("type = %d", models.STATUS_TYPE_LOGISTICS_MODE)).Find(&status_list)
+	core.HandleError(err)
+
 	var detail_form LogisticsModeDetailForm
 	detail_form.LogisticsMode = logistics_mode
 	detail_form.LogisticsCompanyList = logistics_company_list
 	detail_form.StockList = stock_list
+	detail_form.StatusList = status_list
 
 	return c.RenderJson(detail_form)
 }
@@ -208,7 +218,7 @@ FROM erp_order_logistics ol
 WHERE ol.mode_id IN (%s)`
 	sql_mode_use_count = fmt.Sprintf(sql_mode_use_count, strings.Join(mode_id_str_list, ","))
 
-	_,err:= db_session.Sql(sql_mode_use_count).Get(&mode_use_count)
+	_, err := db_session.Sql(sql_mode_use_count).Get(&mode_use_count)
 	core.HandleError(err)
 
 	if mode_use_count.Count != 0 {

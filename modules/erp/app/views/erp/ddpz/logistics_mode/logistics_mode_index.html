@@ -207,7 +207,29 @@
                                             </div>
                                         </div>
                                     </div>
+                                </div>
 
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="sfyxcz" class="col-xs-6 control-label">是否允许超重</label>
+                                            <div class="col-xs-6">
+                                                <select id="sfyxcz" name="detail.logistics_mode.sfyxcz" class="input-sm form-control" v-model.number="detail.logistics_mode.sfyxcz">
+                                                    <option :value="1">是</option>
+                                                    <option :value="0">否</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="czjsyf" class="col-xs-6 control-label">超重加收多少运费（澳币）</label>
+                                            <div class="col-xs-6">
+                                                <input id="czjsyf" name="detail.logistics_mode.czjsyf" type="text" class="input-sm form-control" v-model.number="detail.logistics_mode.czjsyf"/>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <div class="row">
@@ -234,7 +256,6 @@
                                 </div>
 
                                 <div class="row">
-                                    <div class="col-xs-6"></div>
                                     <div class="col-xs-6">
                                         <div class="form-group">
                                             <label for="ccsfjt" class="col-xs-6 control-label">超长收费阶梯（cm）</label>
@@ -243,31 +264,18 @@
                                             </div>
                                         </div>
                                     </div>
-
-                                </div>
-
-                                <div class="row">
                                     <div class="col-xs-6">
                                         <div class="form-group">
-                                            <label for="sfyxcz" class="col-xs-6 control-label">是否允许超重</label>
+                                            <label for="status_id" class="col-xs-6 control-label">状态</label>
                                             <div class="col-xs-6">
-                                                <select id="sfyxcz" name="detail.logistics_mode.sfyxcz" class="input-sm form-control" v-model.number="detail.logistics_mode.sfyxcz">
-                                                    <option :value="1">是</option>
-                                                    <option :value="0">否</option>
+                                                <select id="status_id" name="detail.logistics_mode.status_id" class="input-sm form-control" v-model.number="detail.logistics_mode.status_id">
+                                                    <template v-for="status in detail.status_list">
+                                                        <option :value="status.id">{{status.name}}</option>
+                                                    </template>
                                                 </select>
                                             </div>
                                         </div>
                                     </div>
-
-                                    <div class="col-xs-6">
-                                        <div class="form-group">
-                                            <label for="czjsyf" class="col-xs-6 control-label">超重加收多少运费（澳币）</label>
-                                            <div class="col-xs-6">
-                                                <input id="czjsyf" name="detail.logistics_mode.czjsyf" type="text" class="input-sm form-control" v-model.number="detail.logistics_mode.czjsyf"/>
-                                            </div>
-                                        </div>
-                                    </div>
-
                                 </div>
 
                                 <div class="row">
@@ -370,7 +378,7 @@
                             }
                         },
                         {"mDataProp": "c.name", "title": "物流公司", "bSearchable": true, "width": 160},
-                        {"mDataProp": "s.name", "title": "仓库", "bSearchable": true, "width": 160},
+                        {"mDataProp": "sk.name", "title": "仓库", "bSearchable": true, "width": 160},
                         {"mDataProp": "m.name", "title": "物流方式名称", "bSearchable": true},
                         {
                             "mDataProp": "m.sfkltjz", "title": "考虑体积重", "bSearchable": false, "width": 120,
@@ -439,7 +447,7 @@
                          {"mDataProp": "m.czjsyf", "title": "超重加收多少运费（澳币）", "bSearchable": false },
                          {"mDataProp": "m.desc", "title": "描述", "bSearchable": true},
                          */
-
+                        {"mDataProp": "st.name", "title": "状态", "bSearchable": true, "width": 80},
                         {"mDataProp": "m.create_time", "title": "创建时间", "bSearchable": false, "width": 120},
                         {"mDataProp": "m.update_time", "title": "修改时间", "bSearchable": false, "width": 120}
                     ]
