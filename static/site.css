@@ -359,18 +359,27 @@ div.beian a {
 div.link_query_list {
     margin-top: 5px;
     font-size: 14px;
-    line-height: 24px;
-}
-
-div.link_query_list img.link_icon {
-    height: 24px;
+    height: 28px;
+    line-height: 28px;
 }
 
 div.link_query_list a {
+    margin-right: 5px;
+    float: left;
+    display: block;
     padding: 4px 5px;
+}
+
+div.link_query_list a img.link_icon {
+    height: 24px;
 }
 
 div.link_query_list a.selected {
     color: white;
     background-color: #CC0000;
+}
+
+div.link_query_list a.selected img.link_icon {
+    border: solid 1px gray;
+    height: 22px;
 }

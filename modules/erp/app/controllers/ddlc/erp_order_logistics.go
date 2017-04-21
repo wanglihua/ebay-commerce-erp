@@ -25,10 +25,12 @@ func (c ErpOrderLogistics) PageData() revel.Result {
 	var db_session = c.DbSession
 
 	var stock_list = make([]models.StockInfo, 0)
+	//err := db_session.Where(fmt.Sprintf("stock_type_id = %d AND status_id = %d", models.STOCK_TYPE_AU, models.STOCK_STATUS_ENABLED)).OrderBy("ord asc").Find(&stock_list) //只取澳洲的仓库
 	err := db_session.Where(fmt.Sprintf("stock_type_id = %d", models.STOCK_TYPE_AU)).OrderBy("ord asc").Find(&stock_list) //只取澳洲的仓库
 	core.HandleError(err)
 
 	var logistics_company_list = make([]models.LogisticsCompanyInfo, 0)
+	//err = db_session.Where(fmt.Sprintf("status_id = %d", models.LOGISTICS_COMPANY_ENABLED)).OrderBy("ord asc").Find(&logistics_company_list)
 	err = db_session.OrderBy("ord asc").Find(&logistics_company_list)
 	core.HandleError(err)
 

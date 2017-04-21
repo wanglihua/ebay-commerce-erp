@@ -46,15 +46,16 @@
                             </select>
                             */%}
                             <div class="link_query_list">
-                                <a :class="page.stock_id == 0 ? 'selected' : ''" href="#" @click="selectStock(0)"><img src="/static/images/icons/all_check.png" class="link_icon" alt="全部仓库"/>全部仓库</a>
+                                <a :class="page.stock_id == 0 ? 'selected' : ''" href="#" @click="selectStock(0)"><img style="border: none;height: 24px;" src="/static/images/icons/all_check.png" class="link_icon" alt="全部仓库"/>全部仓库</a>
                                 <template v-for="stock in page.stock_list">
-                                    <a :class="page.stock_id == stock.id ? 'selected' : ''" href="#" @click="selectStock(stock.id)">&nbsp;<img v-if="stock.icon_file != ''" :src="'{%.icon_path%}/' + stock.icon_file" :alt="stock.name" class="link_icon"/>{{stock.name}}</a>
+                                    <a :class="page.stock_id == stock.id ? 'selected' : ''" href="#" @click="selectStock(stock.id)"><img v-if="stock.icon_file != ''" :src="'{%.icon_path%}/' + stock.icon_file" :alt="stock.name" class="link_icon"/>{{stock.name}}</a>
                                 </template>
-                                <span style="padding: 0 10px;color:lightgray;">|</span>
-                                <a :class="page.logistics_company_id == 0 ? 'selected' : ''" href="#" @click="selectLogisticsCompany(0)"><img src="/static/images/icons/all_check.png" class="link_icon" alt="全部物流公司"/>全部物流公司</a>
+                                <span style="margin-top:5px; padding: 0 10px;color:lightgray;display: block;float: left;">|</span>
+                                <a :class="page.logistics_company_id == 0 ? 'selected' : ''" href="#" @click="selectLogisticsCompany(0)"><img style="border: none;height: 24px;" src="/static/images/icons/all_check.png" class="link_icon" alt="全部物流公司"/>全部物流公司</a>
                                 <template v-for="logistics_company in page.logistics_company_list">
-                                    <a :class="page.logistics_company_id == logistics_company.id ? 'selected' : ''" href="#" @click="selectLogisticsCompany(logistics_company.id)">&nbsp;<img v-if="logistics_company.icon_file != ''" :src="'{%.icon_path%}/' + logistics_company.icon_file" :alt="logistics_company.name" class="link_icon"/><span  v-if="logistics_company.icon_file == ''" >{{logistics_company.name}}</span></a>
+                                    <a :class="page.logistics_company_id == logistics_company.id ? 'selected' : ''" href="#" @click="selectLogisticsCompany(logistics_company.id)"><img v-if="logistics_company.icon_file != ''" :src="'{%.icon_path%}/' + logistics_company.icon_file" :alt="logistics_company.name" class="link_icon"/><span v-if="logistics_company.icon_file == ''">{{logistics_company.name}}</span></a>
                                 </template>
+                                <div style="clear:both;"></div>
                             </div>
                             <div style="padding-top: 15px;">
                                 <label class="control-label no-padding-right" for="batch_code">导入批次号</label>
