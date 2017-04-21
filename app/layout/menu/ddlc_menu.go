@@ -79,14 +79,6 @@ func GetDdlcMenu(res_id_map map[int64]bool, db_session *xorm.Session, web_sessio
             <b class="arrow"></b>
         </li>
 
-        <li id="ddlc-order-khb-menu" class="">
-            <a href="/erp/order/khb">
-                <i class="menu-icon fa fa-caret-right"></i>
-                可合并的订单
-            </a>
-            <b class="arrow"></b>
-        </li>
-
         <li id="ddlc-order-import-menu" class="">
             <a href="/erp/order/import">
                 <i class="menu-icon fa fa-caret-right"></i>
