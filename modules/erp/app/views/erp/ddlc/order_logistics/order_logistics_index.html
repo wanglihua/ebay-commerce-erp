@@ -53,7 +53,7 @@
                                 <span style="padding: 0 10px;color:lightgray;">|</span>
                                 <a :class="page.logistics_company_id == 0 ? 'selected' : ''" href="#" @click="selectLogisticsCompany(0)"><img src="/static/images/icons/all_check.png" class="link_icon" alt="全部物流公司"/>全部物流公司</a>
                                 <template v-for="logistics_company in page.logistics_company_list">
-                                    <a :class="page.logistics_company_id == logistics_company.id ? 'selected' : ''" href="#" @click="selectLogisticsCompany(logistics_company.id)">&nbsp;<img v-if="logistics_company.icon_file != ''" :src="'{%.icon_path%}/' + logistics_company.icon_file" :alt="logistics_company.name" class="link_icon"/>{{logistics_company.name}}</a>
+                                    <a :class="page.logistics_company_id == logistics_company.id ? 'selected' : ''" href="#" @click="selectLogisticsCompany(logistics_company.id)">&nbsp;<img v-if="logistics_company.icon_file != ''" :src="'{%.icon_path%}/' + logistics_company.icon_file" :alt="logistics_company.name" class="link_icon"/><span  v-if="logistics_company.icon_file == ''" >{{logistics_company.name}}</span></a>
                                 </template>
                             </div>
                             <div style="padding-top: 15px;">
@@ -68,6 +68,9 @@
                                 <input class="input-sm" id="begin_time_query" name="begin_time_query" placeholder="开始时间查询" type="text" v-model="page.begin_time_query" style="width: 130px;"/>
                                 <label class="control-label no-padding-right" for="end_time_query">结束时间</label>
                                 <input class="input-sm" id="end_time_query" name="end_time_query" placeholder="结束时间查询" type="text" v-model="page.end_time_query" style="width: 130px;"/>
+                                <label class="control-label no-padding-right" for="fee_diff_min_query">物流费用偏差区间</label>
+                                <input class="input-sm" id="fee_diff_min_query" name="fee_diff_min_query" placeholder="实际费用-预估费用" type="text" v-model.number="page.fee_diff_min_query" style="width: 130px;"/><span>~</span>&nbsp;
+                                <input class="input-sm" id="end_time_max_query" name="end_time_max_query" placeholder="实际费用-预估费用" type="text" v-model.number="page.end_time_max_query" style="width: 130px;"/>
                                 <button class="btn btn-mini btn-primary" @click="refreshList()">
                                     &nbsp;<i class="ace-icon fa fa-search"></i>查&nbsp;询&nbsp;
                                 </button>

@@ -170,6 +170,9 @@ func (c ErpLittleIcon) Upload() revel.Result {
 	c.Validation.MinSize(iconFileBytes, 800).Message("上传的文件太小了！")
 	c.Validation.MaxSize(iconFileBytes, 100*KB).Message("上传的文件太大了！")
 
+	_, format, err := image.DecodeConfig(bytes.NewReader(iconFileBytes))
+	revel.TRACE.Println(err)
+	/*
 	conf, format, err := image.DecodeConfig(bytes.NewReader(iconFileBytes))
 	revel.TRACE.Println(err)
 	noError := err == nil
@@ -183,7 +186,7 @@ func (c ErpLittleIcon) Upload() revel.Result {
 	c.Validation.Required(maxSize).Message("不能上传尺寸大于100x100像素的图片！")
 	sameWidthHeight := conf.Height == conf.Width
 	c.Validation.Required(sameWidthHeight).Message("请上传长和宽相同的图片！")
-
+	*/
 	if c.Validation.HasErrors() {
 		return c.RenderJson(map[string]interface{}{
 			"success": false,
@@ -199,12 +202,14 @@ func (c ErpLittleIcon) Upload() revel.Result {
 		fileExt = ".jpg"
 	} else if format == "png" {
 		fileExt = ".png"
+	} else {
+		fileExt = ".jpg"
 	}
 
 	cate_icon_path := filepath.Join(revel.BasePath, setting.ICON_PATH)
 
 	if core.IsDirExists(cate_icon_path) == false {
-		err = os.MkdirAll(cate_icon_path, 0777)
+		err := os.MkdirAll(cate_icon_path, 0777)
 		core.HandleError(err)
 	}
 
