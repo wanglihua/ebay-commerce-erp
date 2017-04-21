@@ -1,8 +1,6 @@
 package controllers
 
 import (
-	"bytes"
-	"image"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -166,13 +164,21 @@ func (c ErpLittleIcon) Upload() revel.Result {
 	iconFileBytes := make([]byte, 0)
 	c.Params.Bind(&iconFileBytes, "icon_file")
 
+	upload_file, header, err := c.Request.FormFile("icon_file")
+	core.HandleError(err)
+	defer upload_file.Close()
+
+	var upload_file_name = header.Filename
+	var file_ext = filepath.Ext(upload_file_name)
+
 	c.Validation.Required(iconFileBytes).Message("指定文件内容未成功上传！")
 	c.Validation.MinSize(iconFileBytes, 800).Message("上传的文件太小了！")
 	c.Validation.MaxSize(iconFileBytes, 100*KB).Message("上传的文件太大了！")
 
+	/*
 	_, format, err := image.DecodeConfig(bytes.NewReader(iconFileBytes))
 	revel.TRACE.Println(err)
-	/*
+
 	conf, format, err := image.DecodeConfig(bytes.NewReader(iconFileBytes))
 	revel.TRACE.Println(err)
 	noError := err == nil
@@ -196,7 +202,9 @@ func (c ErpLittleIcon) Upload() revel.Result {
 
 	//保存文件内容到指定文件夹
 	//fileName := time.Now().Format("20060102150405")
-	fileName := strings.Replace(uuid.NewUUID().String(), "-", "", -1)
+	new_file_name := strings.Replace(uuid.NewUUID().String(), "-", "", -1)
+
+	/*
 	fileExt := ""
 	if format == "jpeg" {
 		fileExt = ".jpg"
@@ -205,6 +213,7 @@ func (c ErpLittleIcon) Upload() revel.Result {
 	} else {
 		fileExt = ".jpg"
 	}
+	*/
 
 	cate_icon_path := filepath.Join(revel.BasePath, setting.ICON_PATH)
 
@@ -213,7 +222,7 @@ func (c ErpLittleIcon) Upload() revel.Result {
 		core.HandleError(err)
 	}
 
-	imageFile, err := os.Create(filepath.Join(cate_icon_path, fileName+fileExt))
+	imageFile, err := os.Create(filepath.Join(cate_icon_path, new_file_name+file_ext))
 	defer imageFile.Close()
 
 	imageFile.Write(iconFileBytes)
@@ -221,6 +230,6 @@ func (c ErpLittleIcon) Upload() revel.Result {
 	return c.RenderJson(map[string]interface{}{
 		"success":  true,
 		"message":  "图标上传成功！",
-		"fileName": fileName + fileExt,
+		"fileName": new_file_name + file_ext,
 	})
 }
