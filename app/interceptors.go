@@ -3,8 +3,10 @@ package app
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/revel/revel"
+	"github.com/revel/revel/cache"
 	"matrix/app/routes"
 	"matrix/core"
 	"matrix/db"
@@ -13,7 +15,8 @@ import (
 func BeforeInterceptor(c *revel.Controller) revel.Result {
 	if isStaticRequest(c) == false {
 		if revel.DevMode {
-			revel.TRACE.Println(blue_paint(fmt.Sprintf("begin action %s", c.Action)))
+			cache.Set("request_begin_time_"+c.Session.Id(), time.Now(), core.GetSessionExpire())
+			revel.TRACE.Println(blue_paint(fmt.Sprintf("### begin action %s", c.Action)))
 		}
 		//revel.TRACE.Println("session id: " + c.Session.Id())
 
@@ -48,7 +51,12 @@ func FinallyInterceptor(c *revel.Controller) revel.Result {
 
 		if revel.DevMode {
 			//revel.TRACE.Println("session id: " + c.Session.Id())
-			revel.TRACE.Println(green_paint(fmt.Sprintf("end   action %s\n", c.Action)))
+			var request_begin_time time.Time
+			cache.Get("request_begin_time_"+c.Session.Id(), &request_begin_time)
+			var milli_seconds float64 = float64(int64(time.Now().Sub(request_begin_time))) / float64(int64(time.Millisecond))
+			revel.TRACE.Println(green_paint(fmt.Sprintf("### end   action %s", c.Action)))
+			revel.TRACE.Println(green_paint(fmt.Sprintf("          action %s request time: %0.3f ms", c.Action, milli_seconds)))
+			revel.TRACE.Println(green_paint("----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------"))
 		}
 	}
 

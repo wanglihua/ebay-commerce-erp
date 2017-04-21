@@ -150,9 +150,6 @@ func GetHeader(title string, db_session *xorm.Session, web_session revel.Session
 	var res_cate_id_map = pass_service.Get_login_user_pass_cate_map_from_cache(web_session)
 	var res_id_map = pass_service.Get_login_user_pass_map_from_cache(web_session)
 
-	revel.TRACE.Println(res_cate_id_map)
-	revel.TRACE.Println(res_id_map)
-
 	var check_pass_cate_menu = func(pass_cate_id int64) bool {
 		if v, ok := res_cate_id_map[pass_cate_id]; is_admin == true || (v == true && ok == true) {
 			return true
