@@ -163,12 +163,12 @@
                             "bSearchable": false,
                             "orderable": false,
                             "sClass": "center",
-                            "width": 60,
+                            "width": 120,
                             "render": function (data, type, row) {
                                 if (data == "") {
-                                    return '<img style="width:24px;height:24px;" src="/static/images/icons/noimg.png"  alt="" />'
+                                    return '<img style="height:24px;" src="/static/images/icons/noimg.png"  alt="" />'
                                 } else {
-                                    return '<img style="width:24px;height:24px;" src="{% .icon_path %}/' + data + '"  alt="" />'
+                                    return '<img style="height:24px;" src="{% .icon_path %}/' + data + '"  alt="" />'
                                 }
                             }
                         },
@@ -212,7 +212,7 @@
                         {
                             "mDataProp": "icon_file", "title": "图标", "bSearchable": true,
                             "render": function (data, type, row) {
-                                return '<img style="width:20px;height:20px;" src="{%.icon_path%}/' + data + '" alt="' + data + '" />&nbsp;&nbsp;' + data;
+                                return '<img style="height:24px;" src="{%.icon_path%}/' + data + '" alt="' + data + '" />&nbsp;&nbsp;' + data;
                             }
                         },
                         {
