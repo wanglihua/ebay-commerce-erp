@@ -64,7 +64,7 @@ type Product_bind_sku_t struct {
 	Count int64
 }
 
-// product_bind_code 就是绑定商品的虚拟 sku
+// 解析绑定 sku， product_bind_code 就是绑定商品的虚拟 sku
 func Get_product_bind_skus(product_bind_code string, db_session *xorm.Session) []Product_bind_sku_t {
 	sql := `SELECT pb.bind_list FROM erp_product_bind pb WHERE pb.code = '%s'`
 	sql = fmt.Sprint(sql, product_bind_code)

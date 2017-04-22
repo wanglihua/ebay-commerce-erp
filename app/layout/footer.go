@@ -14,9 +14,9 @@ func GetFooter() string {
             } catch (e) {
             }
         </script>
+        <div class="beian"><a href="http://www.miibeian.gov.cn/">浙ICP备17002068号-2	卧龙海外仓储</a></div>
     </div>
 </div>
-	<div class="beian"><a href="http://www.miibeian.gov.cn/">浙ICP备17002068号-2	卧龙海外仓储</a></div>
 </body>
 </html>
 `)

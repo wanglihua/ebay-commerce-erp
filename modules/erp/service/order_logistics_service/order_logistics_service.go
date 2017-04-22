@@ -17,6 +17,7 @@ import (
 	"matrix/modules/erp/service/logistics_mode_service"
 	"matrix/modules/erp/service/logistics_setting_service"
 	"matrix/modules/erp/service/order_service"
+	//"matrix/modules/erp/service/order_shipping_address_service"
 	"matrix/modules/erp/service/pick_fee_service"
 )
 
@@ -146,7 +147,16 @@ func (p_ol *OrderLogistics) CalculateList(order_list []models.OrderInfo, db_sess
 
 	p_ol.init_data(db_session)
 
-	// 拆分和合并订单，在这之前就已经完成了？ 不是在这里做，就可以了，做完进入 hold ??
+	// todo: 拆分和合并订单的问题，在这之前就已经完成了？ 不是在这里做，就可以了，做完进入 hold ??
+
+	// todo 合并订单
+	// 同一买家，同一付款paypal，同一收货地址，同一店铺 的订单可以合并
+
+	// 可以先判断除收货地址外的其它信息是否一样，如果这些信息都不一样，就不用加载收货地址信息了
+
+	// 加载所有订单的 收货地址，这样在判断收货地址是否一样的时候，就不会多次访问数据库了
+	// 只需要加载前面判断出来的，其它信息一样的订单的收货地址就可以了，不用加载全部订单的收货地址信息
+	//var order_shipping_address_list = order_shipping_address_service.Get_orders_shipping_address_list(order_list, db_session)
 
 	for _, order := range order_list {
 		var p_order_logistics_data = new(order_logistics_data_t)

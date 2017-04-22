@@ -9,10 +9,10 @@ import (
 	"github.com/revel/revel"
 	"matrix/core"
 	"matrix/modules/erp/models"
+	"matrix/modules/erp/service/inventory_service"
 	"matrix/modules/erp/service/message_service"
 	"matrix/modules/erp/service/order_service"
 	"matrix/modules/erp/service/product_cate_service"
-	"matrix/modules/erp/service/inventory_service"
 	"matrix/modules/erp/service/product_log_service"
 	"matrix/modules/erp/service/status_service"
 )
@@ -133,7 +133,7 @@ type ProductDetailForm struct {
 	ProductCateSelectItemList []product_cate_service.ProductCateSelectItem                `json:"product_cate_list"`
 	PackageMaterialList       []models.PackageMaterialInfo                                `json:"package_material_list"`
 	StatusList                []models.StatusInfo                                         `json:"status_list"`
-	InventoryList             []inventory_service.Product_inventory_view_item_t   `json:"inventory_list"`
+	InventoryList             []inventory_service.Product_inventory_view_item_t           `json:"inventory_list"`
 	OrderItemList             []order_service.Order_item_view_item_t                      `json:"order_item_list"`
 	ProductLogList            []models.ProductLogInfo                                     `json:"product_log_list"`
 	MessageList               []message_service.Message_view_item_t                       `json:"message_list"`
@@ -272,7 +272,7 @@ func (c ErpProduct) Save() revel.Result {
 
 		product_id = product_from_ui.Id // 这是数据库保存后得到得到新生成的 id
 
-		product_log_service.Insert_product_log(nil, &product_from_ui, product_log_service.Product_operation_type.Insert, db_session, c.Session)
+		product_log_service.Insert_product_log(nil, &product_from_ui, core.Db_operation_types.Insert, db_session, c.Session)
 	} else {
 		sku_count, err := db_session.Where("id <> ? and sku = ?", product_from_ui.Id, product_from_ui.Sku).Count(&product_from_ui)
 		core.HandleError(err)
@@ -300,7 +300,7 @@ func (c ErpProduct) Save() revel.Result {
 
 		product_id = product_in_db.Id //就是原来的 id, 这一句赋值其实是可以省掉的
 
-		product_log_service.Insert_product_log(&product_from_ui, &product_in_db, product_log_service.Product_operation_type.Update, db_session, c.Session)
+		product_log_service.Insert_product_log(&product_from_ui, &product_in_db, core.Db_operation_types.Update, db_session, c.Session)
 	}
 
 	// 重新获得新增或者更新的product,用于返回
@@ -330,7 +330,7 @@ func (c ErpProduct) Delete() revel.Result {
 		core.HandleError(err)
 
 		if has {
-			product_log_service.Insert_product_log(nil, &product, product_log_service.Product_operation_type.Delete, db_session, c.Session)
+			product_log_service.Insert_product_log(nil, &product, core.Db_operation_types.Delete, db_session, c.Session)
 		}
 	}
 
