@@ -117,7 +117,7 @@ func (c ErpLogisticsNumberBatch) DetailData() revel.Result {
 	err := db_session.Find(&logistics_mode_list)
 	core.HandleError(err)
 
-	status_list := status_service.GetStatusList(db_session, models.STATUS_TYPE_LOGISTICS_NUMBER_BATCH)
+	status_list := status_service.Get_status_list(db_session, models.STATUS_TYPE_LOGISTICS_NUMBER_BATCH)
 
 	var detail_form LogisticsNumberBatchDetailForm
 	detail_form.LogisticsNumberBatch = logistics_number_batch

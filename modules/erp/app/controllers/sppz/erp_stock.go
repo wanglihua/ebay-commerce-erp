@@ -142,7 +142,7 @@ func (c ErpStock) DetailData() revel.Result {
 		stock.StockTypeId = models.STOCK_TYPE_CN
 	}
 
-	status_list := status_service.GetStatusList(db_session, models.STATUS_TYPE_STOCK)
+	status_list := status_service.Get_status_list(db_session, models.STATUS_TYPE_STOCK)
 
 	var target_stock_list = make([]models.StockInfo, 0)
 	err := db_session.Where(fmt.Sprintf("stock_type_id = %d", models.STOCK_TYPE_AU)).Find(&target_stock_list)

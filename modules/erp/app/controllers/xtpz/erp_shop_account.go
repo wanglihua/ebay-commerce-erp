@@ -127,7 +127,7 @@ func (c ErpShopAccount) DetailData() revel.Result {
 		shop_account.StatusId = models.SHOP_ACCOUNT_STATUS_ENABLED
 	}
 
-	status_list := status_service.GetStatusList(db_session, models.STATUS_TYPE_SHOP_ACCOUNT)
+	status_list := status_service.Get_status_list(db_session, models.STATUS_TYPE_SHOP_ACCOUNT)
 
 	platform_list := make([]models.ECommercePlatformInfo, 0)
 	err := db_session.Find(&platform_list)

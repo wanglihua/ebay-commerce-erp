@@ -210,7 +210,7 @@ func (c ErpProduct) DetailData() revel.Result {
 	err = db_session.Asc("name").Find(&package_material_list)
 	core.HandleError(err)
 
-	status_list := status_service.GetStatusList(db_session, models.STATUS_TYPE_PRODUCT)
+	status_list := status_service.Get_status_list(db_session, models.STATUS_TYPE_PRODUCT)
 
 	inventory_list := inventory_service.Get_product_inventory_list(db_session, product_id)
 	order_item_list := order_service.Get_order_item_data_list_by_product_id_top_n(db_session, product_id, 10)

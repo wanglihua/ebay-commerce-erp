@@ -129,7 +129,7 @@ func (c ErpPaypalAccount) DetailData() revel.Result {
 		}
 	}
 
-	status_list := status_service.GetStatusList(db_session, models.STATUS_TYPE_PAYPAL_ACCOUNT)
+	status_list := status_service.Get_status_list(db_session, models.STATUS_TYPE_PAYPAL_ACCOUNT)
 
 	var detail_form PaypalAccountDetailForm
 	detail_form.PaypalAccount = paypal_account

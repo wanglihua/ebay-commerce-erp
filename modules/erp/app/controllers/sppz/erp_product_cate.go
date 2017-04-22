@@ -125,7 +125,7 @@ func (c ErpProductCate) DetailData() revel.Result {
 		core.HandleError(err)
 	}
 
-	status_list := status_service.GetStatusList(db_session, models.STATUS_TYPE_PRODUCT_CATE)
+	status_list := status_service.Get_status_list(db_session, models.STATUS_TYPE_PRODUCT_CATE)
 
 	var detail_form ProductCateDetailForm
 	detail_form.ProductCate = product_cate

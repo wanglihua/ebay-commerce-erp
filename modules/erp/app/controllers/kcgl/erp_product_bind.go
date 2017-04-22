@@ -121,7 +121,7 @@ func (c ErpProductBind) DetailData() revel.Result {
 		product_bind.StatusId = models.PRODUCT_BIND_STATUS_NORMAL
 	}
 
-	status_list := status_service.GetStatusList(db_session, models.STATUS_TYPE_PRODUCT_BIND)
+	status_list := status_service.Get_status_list(db_session, models.STATUS_TYPE_PRODUCT_BIND)
 
 	var detail_form ProductBindDetailForm
 	detail_form.ProductBind = product_bind

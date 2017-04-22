@@ -103,7 +103,7 @@ func (c ErpOrderCustomType) DetailData() revel.Result {
 		}
 	}
 
-	status_list := status_service.GetStatusList(db_session, models.STATUS_TYPE_ORDER_CUSTOM_TYPE)
+	status_list := status_service.Get_status_list(db_session, models.STATUS_TYPE_ORDER_CUSTOM_TYPE)
 
 	var detail_form OrderCustomTypeDetailForm
 	detail_form.OrderCustomType = order_custom_type

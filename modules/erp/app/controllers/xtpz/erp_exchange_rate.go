@@ -116,7 +116,7 @@ func (c ErpExchangeRate) DetailData() revel.Result {
 		exchange_rate.StatusId = models.EXCHANGE_RATE_STATUS_ENABLED
 	}
 
-	status_list := status_service.GetStatusList(db_session, models.STATUS_TYPE_EXCHANGE_RATE)
+	status_list := status_service.Get_status_list(db_session, models.STATUS_TYPE_EXCHANGE_RATE)
 
 	currency_list := make([]models.CurrencyInfo, 0)
 	err := db_session.Sql(fmt.Sprintf("SELECT * FROM erp_currency WHERE id <> %d", models.CURRENCY_RMB)).Find(&currency_list)
