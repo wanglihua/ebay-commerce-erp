@@ -31,7 +31,6 @@ func Insert_product_bind_log(product_bind_from_ui *models.ProductBindInfo /*更�
 		//获得详细的字段修改数据
 		product_bind_log.Operation = "更新数据。"
 
-		// todo 商品日志里面也可以这样判断
 		var operation_list = make([]string, 0)
 		if product_bind_in_db.Code != product_bind_from_ui.Code {
 			operation_list = append(operation_list, fmt.Sprintf("编号: %s => %s", product_bind_in_db.Code, product_bind_from_ui.Code))

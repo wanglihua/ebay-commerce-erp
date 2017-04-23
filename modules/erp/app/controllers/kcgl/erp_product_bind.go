@@ -7,6 +7,7 @@ import (
 	"github.com/revel/revel"
 	"matrix/core"
 	"matrix/modules/erp/models"
+	"matrix/modules/erp/service/product_bind_log_service"
 	"matrix/modules/erp/service/product_bind_service"
 	"matrix/modules/erp/service/status_service"
 )
@@ -141,9 +142,9 @@ func (c ErpProductBind) Save() revel.Result {
 		return c.RenderJson(core.JsonResult{Success: false, Message: c.GetValidationErrorMessage()})
 	}
 
-	product_bind := detail_form.ProductBind
+	product_bind_from_ui := detail_form.ProductBind
 
-	valid, err := product_bind_service.Check_product_bind_valid(product_bind.BindList, db_session)
+	valid, err := product_bind_service.Check_product_bind_valid(product_bind_from_ui.BindList, db_session)
 	if valid == false {
 		return c.RenderJson(map[string]interface{}{
 			"success": false,
@@ -153,16 +154,60 @@ func (c ErpProductBind) Save() revel.Result {
 
 	var affected int64
 	if detail_form.IsCreate() {
-		affected, err = db_session.Insert(&product_bind)
+		code_count, err := db_session.Where("code = ?", product_bind_from_ui.Code).Count(&product_bind_from_ui)
 		core.HandleError(err)
+		if code_count != 0 {
+			return c.RenderJson(map[string]interface{}{
+				"success": false,
+				"message": "保存失败， 编码已存在！",
+			})
+		}
+
+		name_count, err := db_session.Where("name = ?", product_bind_from_ui.Name).Count(&product_bind_from_ui)
+		core.HandleError(err)
+		if name_count != 0 {
+			return c.RenderJson(map[string]interface{}{
+				"success": false,
+				"message": "保存失败， 名称已存在！",
+			})
+		}
+
+		affected, err = db_session.Insert(&product_bind_from_ui)
+		core.HandleError(err)
+
+		product_bind_log_service.Insert_product_bind_log(nil, &product_bind_from_ui, core.Db_operation_types.Insert, db_session, c.Session)
 	} else {
+		code_count, err := db_session.Where("id <> ? AND code = ?", product_bind_from_ui.Id, product_bind_from_ui.Code).Count(&product_bind_from_ui)
+		core.HandleError(err)
+		if code_count != 0 {
+			return c.RenderJson(map[string]interface{}{
+				"success": false,
+				"message": "保存失败， 编码已存在！",
+			})
+		}
+
+		name_count, err := db_session.Where("id <> ? AND name = ?", product_bind_from_ui.Id, product_bind_from_ui.Name).Count(&product_bind_from_ui)
+		core.HandleError(err)
+		if name_count != 0 {
+			return c.RenderJson(map[string]interface{}{
+				"success": false,
+				"message": "保存失败， 名称已存在！",
+			})
+		}
+
+		var product_bind_in_db models.ProductBindInfo
+		_, err = db_session.Id(product_bind_from_ui.Id).Get(&product_bind_in_db)
+		core.HandleError(err)
+
 		update_cols := []string{"code", "name", "bind_list", "desc", "status_id"}
-		affected, err = db_session.Id(product_bind.Id).Cols(update_cols...).Update(&product_bind)
+		affected, err = db_session.Id(product_bind_from_ui.Id).Cols(update_cols...).Update(&product_bind_from_ui)
 		core.HandleError(err)
 
 		if affected == 0 {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！"})
 		}
+
+		product_bind_log_service.Insert_product_bind_log(&product_bind_from_ui, &product_bind_in_db, core.Db_operation_types.Update, db_session, c.Session)
 	}
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据保存成功!"})
@@ -173,6 +218,16 @@ func (c ErpProductBind) Delete() revel.Result {
 
 	product_bind_id_list := make([]int64, 0)
 	c.Params.Bind(&product_bind_id_list, "id_list")
+
+	for _, product_bind_id := range product_bind_id_list {
+		var product_bind models.ProductBindInfo
+		has, err := db_session.Id(product_bind_id).Get(&product_bind)
+		core.HandleError(err)
+
+		if has {
+			product_bind_log_service.Insert_product_bind_log(nil, &product_bind, core.Db_operation_types.Delete, db_session, c.Session)
+		}
+	}
 
 	affected, err := db_session.In("id", product_bind_id_list).Delete(new(models.ProductBindInfo))
 	core.HandleError(err)
