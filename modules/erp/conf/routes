@@ -295,6 +295,10 @@ POST /erp/order/logistics/data/detail          ErpOrderLogistics.DetailData
 POST /erp/order/logistics/save                 ErpOrderLogistics.Save
 POST /erp/order/logistics/delete               ErpOrderLogistics.Delete
 
+GET  /erp/order/logistics/fee/diff             ErpOrderLogisticsFeeDiff.Index
+POST /erp/order/logistics/fee/diff/data/page   ErpOrderLogisticsFeeDiff.PageData
+POST /erp/order/logistics/fee/diff/data/list   ErpOrderLogisticsFeeDiff.ListData
+
 GET  /erp/ecommerce/platform                   ErpECommercePlatform.Index
 POST /erp/ecommerce/platform/data/list         ErpECommercePlatform.ListData
 # POST /erp/ecommerce/platform/data/detail       ErpECommercePlatform.DetailData

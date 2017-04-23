@@ -98,6 +98,15 @@ func (e PassResInfo) InitData(db_session *xorm.Session) {
 		pass.Name = "订单物流"
 		pass.Desc = core.MakeNullString("订单物流", true)
 		db_session.Insert(pass)
+
+		// DDLC_ORDER_LOGISTICS_FEE_DIFF = 131000 // 订单物流费用偏差
+
+		pass = new(PassResInfo)
+		pass.Id = pass_res.DDLC_ORDER_LOGISTICS_FEE_DIFF
+		pass.CateId = pass_res_cate.DDLC
+		pass.Name = "订单物流费用偏差"
+		pass.Desc = core.MakeNullString("订单物流费用理论和实际偏差", true)
+		db_session.Insert(pass)
 	}
 
 	// 订单配置

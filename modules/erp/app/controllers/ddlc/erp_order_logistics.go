@@ -72,10 +72,12 @@ func (c ErpOrderLogistics) ListData() revel.Result {
 	c.Params.Bind(&begin_time_query, "begin_time_query")
 	c.Params.Bind(&end_time_query, "end_time_query")
 
+	/*
 	var fee_diff_min_query float64
 	var fee_diff_max_query float64
 	c.Params.Bind(&fee_diff_min_query, "fee_diff_min_query")
 	c.Params.Bind(&fee_diff_max_query, "fee_diff_max_query")
+	*/
 
 	type order_logistics_view_item_t struct {
 		models.OrderLogisticsInfo    `xorm:"extends" json:"ol"`
@@ -127,6 +129,7 @@ WHERE ol.stock_id = 0 AND ol.company_id = 0
 		filter = core.SqlAnd(filter, fmt.Sprintf("o.paid_time <= '%s'", end_time_query.Time.Format("2006-01-02 15:04:05")))
 	}
 
+	/*
 	if fee_diff_min_query != 0 {
 		filter = core.SqlAnd(filter, fmt.Sprintf("(ol.actual_fee - ol.total_fee) >= %f", fee_diff_min_query))
 	}
@@ -134,6 +137,7 @@ WHERE ol.stock_id = 0 AND ol.company_id = 0
 	if fee_diff_max_query != 0 {
 		filter = core.SqlAnd(filter, fmt.Sprintf("(ol.actual_fee - ol.total_fee) <= %f", fee_diff_max_query))
 	}
+	*/
 
 	sb.Where(filter)
 

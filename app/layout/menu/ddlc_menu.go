@@ -125,6 +125,16 @@ func GetDdlcMenu(res_id_map map[int64]bool, db_session *xorm.Session, web_sessio
         </li>`)
 	}
 
+	if check_pass_res_menu(pass_res.DDLC_ORDER_LOGISTICS_FEE_DIFF) {
+		buffer.WriteString(`<li id="ddlc-order-logistics-fee-diff-menu" class="">
+            <a href="/erp/order/logistics/fee/diff">
+                <i class="menu-icon fa fa-caret-right"></i>
+                订单物流费用偏差
+            </a>
+            <b class="arrow"></b>
+        </li>`)
+	}
+
 	buffer.WriteString(`</ul>
 </li>
 `)

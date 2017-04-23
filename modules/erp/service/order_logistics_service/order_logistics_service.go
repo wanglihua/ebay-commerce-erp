@@ -132,6 +132,31 @@ WHERE ib.batch_code = %d`
 	return p_ol.CalculateList(order_list, db_session)
 }
 
+/*
+type Interface interface {
+
+    Len() int    // Len 为集合内元素的总数
+
+    Less(i, j int) bool　//如果index为i的元素小于index为j的元素，则返回true，否则返回false
+
+    Swap(i, j int)  // Swap 交换索引为 i 和 j 的元素
+}
+ */
+// 按 id 从小到大 进行排序
+type order_slice_t []models.OrderInfo
+
+func (s order_slice_t) Len() int {
+	return len(s)
+}
+
+func (s order_slice_t) Less(i int, j int) bool {
+	return s[i].Id < s[j].Id
+}
+
+func (s order_slice_t) Swap(i int, j int) {
+	s[i], s[j] = s[j], s[i]
+}
+
 // 匹配前要判断一下订单的状态，订单不是已支付状态的话，不能匹配
 // 计算订单的物流方式 和 Hold 类型，调用这个函数的时候应该  “开启数据库事务“， 调用完成后，订单的状态就是 Hold 或者 待配货
 func (p_ol *OrderLogistics) CalculateList(order_list []models.OrderInfo, db_session *xorm.Session) error {

@@ -1,0 +1,290 @@
+{%header "订单物流" .%}
+<div id="page">
+    <div class="breadcrumbs" id="breadcrumbs">
+        <ul class="breadcrumb">
+            <li>
+                <a href='{%url "Home.Index"%}'><i class="ace-icon fa fa-home home-icon"></i></a>
+            </li>
+            <li class="parent" data-menu="ddlc-menu">订单流程</li>
+            <li class="active" data-menu="ddlc-order-logistics-fee-diff-menu">订单物流费用偏差</li>
+        </ul>
+    </div>
+    <div class="page-content">
+        <div class="row">
+            <div class="col-xs-12" style="padding: 0;">
+                <div class="gridToolBar clearfix">
+                    <button class="btn btn-primary btn-sm" @click="reloadList('#orderLogisticsList')">
+                        <i class="ace-icon fa fa-refresh"></i>
+                        刷新
+                    </button>
+                    {%/*
+                    <button class="btn btn-success btn-sm" @click="showOrderLogisticsDetail(0)">
+                        <i class="ace-icon fa fa-plus"></i>
+                        新增
+                    </button>
+                    <button class="btn btn-danger btn-sm" @click="deleteOrderLogistics()">
+                        <i class="ace-icon fa fa-trash-o"></i>
+                        删除
+                    </button>
+                    */%}
+                </div>
+                <div class="row" style="margin-top: 10px;margin-bottom: 20px;">
+                    <div id="query" class="col-xs-12 query" style="line-height: 28px;">
+                        <div class="col-xs-12">
+                            {%/*
+                            <select id="stock_id" name="page.stock_id" v-model.number="page.stock_id" style="width: 120px;" @change="reloadList()">
+                                <option :value="0">-发货仓库-</option>
+                                <template v-for="stock in page.stock_list">
+                                    <option :value="stock.id">{{stock.name}}</option>
+                                </template>
+                            </select>
+                            <select id="logistics_company_id" name="page.logistics_company_id" v-model.number="page.logistics_company_id" style="width: 120px;" @change="reloadList()">
+                                <option :value="0">-物流公司-</option>
+                                <template v-for="logistics_company in page.logistics_company_list">
+                                    <option :value="logistics_company.id">{{logistics_company.name}}</option>
+                                </template>
+                            </select>
+                            */%}
+                            <div class="link_query_list">
+                                <a :class="page.stock_id == 0 ? 'selected' : ''" href="#" @click="selectStock(0)"><img style="border: none;height: 24px;" src="/static/images/icons/all_check.png" class="link_icon" alt="全部仓库"/>全部仓库</a>
+                                <template v-for="stock in page.stock_list">
+                                    <a :class="page.stock_id == stock.id ? 'selected' : ''" href="#" @click="selectStock(stock.id)"><img v-if="stock.icon_file != ''" :src="'{%.icon_path%}/' + stock.icon_file" :alt="stock.name" class="link_icon"/>{{stock.name}}</a>
+                                </template>
+                                <span style="margin-top:5px; padding: 0 10px;color:lightgray;display: block;float: left;">|</span>
+                                <a :class="page.logistics_company_id == 0 ? 'selected' : ''" href="#" @click="selectLogisticsCompany(0)"><img style="border: none;height: 24px;" src="/static/images/icons/all_check.png" class="link_icon" alt="全部物流公司"/>全部物流公司</a>
+                                <template v-for="logistics_company in page.logistics_company_list">
+                                    <a :class="page.logistics_company_id == logistics_company.id ? 'selected' : ''" href="#" @click="selectLogisticsCompany(logistics_company.id)"><img v-if="logistics_company.icon_file != ''" :src="'{%.icon_path%}/' + logistics_company.icon_file" :alt="logistics_company.name" class="link_icon"/><span v-if="logistics_company.icon_file == ''">{{logistics_company.name}}</span></a>
+                                </template>
+                                <div style="clear:both;"></div>
+                            </div>
+                            <div style="padding-top: 15px;">
+                                <label class="control-label no-padding-right" for="batch_code">导入批次号</label>
+                                <select id="batch_code" name="page.batch_code" v-model.number="page.batch_code" style="width: 120px;" @change="refreshList()">
+                                    <option :value="0">-导入批次号-</option>
+                                    <template v-for="batch_code in page.batch_code_list">
+                                        <option :value="batch_code">{{batch_code}}</option>
+                                    </template>
+                                </select>
+                                <label class="control-label no-padding-right" for="begin_time_query">开始时间</label>
+                                <input class="input-sm" id="begin_time_query" name="begin_time_query" placeholder="开始时间查询" type="text" v-model="page.begin_time_query" style="width: 130px;"/>
+                                <label class="control-label no-padding-right" for="end_time_query">结束时间</label>
+                                <input class="input-sm" id="end_time_query" name="end_time_query" placeholder="结束时间查询" type="text" v-model="page.end_time_query" style="width: 130px;"/>
+                                <label class="control-label no-padding-right" for="fee_diff_min_query">物流费用偏差区间</label>
+                                <input class="input-sm" id="fee_diff_min_query" name="fee_diff_min_query" placeholder="实际费用-预估费用" type="text" v-model.number="page.fee_diff_min_query" style="width: 130px;"/><span>~</span>&nbsp;
+                                <input class="input-sm" id="end_time_max_query" name="end_time_max_query" placeholder="实际费用-预估费用" type="text" v-model.number="page.end_time_max_query" style="width: 130px;"/>
+                                <button class="btn btn-mini btn-primary" @click="refreshList()">
+                                    &nbsp;<i class="ace-icon fa fa-search"></i>查&nbsp;询&nbsp;
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <table id="orderLogisticsList" class="table table-striped table-bordered table-hover"></table>
+                    <div class="todo">
+                        1、按物流公司导出需要的模板； 2、手工新增和修改； 3、条件查询什么的；
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+
+    $(function () {
+        $('#begin_time_query').datetimepicker({
+            locale: "zh-cn"
+        });
+
+        $('#end_time_query').datetimepicker({
+            locale: "zh-cn"
+        });
+    });
+
+    var vm = new Vue({
+        el: "#page",
+        data: {
+            "page": {
+                "stock_id": 0,
+                "stock_list": [],
+                "logistics_company_id": 0,
+                "logistics_company_list": [],
+                "batch_code": 0,
+                "batch_code_list": [],
+                "begin_time_query": "",
+                "end_time_query": ""
+            },
+            "detail": {
+                "order_logistics": {}
+            }
+        },
+        mounted: function () {
+            var this_vm = this;
+
+            //请求页面数据
+            $.ajax({
+                    url: '{%url "ErpOrderLogisticsFeeDiff.PageData" %}',
+                    type: "POST",
+                    success: function (result) {
+                        if (result.success == false) {
+                            $.msg.error(result.message);
+                            return;
+                        }
+                        this_vm.page = result;
+                    }
+                }
+            );
+
+            initDataTable(
+                '#orderLogisticsList',
+                {
+                    "sAjaxSource": '{%url "ErpOrderLogisticsFeeDiff.ListData"%}',
+                    "aaSorting": [[1, "asc"]],
+                    "aoColumns": [
+                        {
+                            "mDataProp": "ol.id",
+                            "bSearchable": false,
+                            "orderable": false,
+                            "sClass": "center",
+                            "width": 50,
+                            "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
+                            "render": function (data, type, row) {
+                                return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
+                            }
+                        },
+                        {
+                            "mDataProp": "o.code", "title": "订单", "bSearchable": true, "width": 120,
+                            "render": function (data, type, row) {
+                                return "<a href='/erp/order/detail/" + row.o.id + "' target='_blank'>" + data + "</a>";
+                            }
+                        },
+                        {"mDataProp": "s.name", "title": "发货仓库", "bSearchable": true, "width": 130},
+                        {"mDataProp": "lc.name", "title": "物流公司", "bSearchable": false},
+                        {
+                            "mDataProp": "ol.length", "title": "长度", "bSearchable": false, "width": 65,
+                            "render": function (data, type, row) {
+                                if (data != "" && data != 0) {
+                                    return data + " cm";
+                                }
+                                else {
+                                    return "";
+                                }
+                            }
+                        },
+                        {
+                            "mDataProp": "ol.width", "title": "宽度", "bSearchable": false, "width": 65,
+                            "render": function (data, type, row) {
+                                if (data != "" && data != 0) {
+                                    return data + " cm";
+                                }
+                                else {
+                                    return "";
+                                }
+                            }
+                        },
+                        {
+                            "mDataProp": "ol.height", "title": "高度", "bSearchable": false, "width": 65,
+                            "render": function (data, type, row) {
+                                if (data != "" && data != 0) {
+                                    return data + " cm";
+                                }
+                                else {
+                                    return "";
+                                }
+                            }
+                        },
+                        {
+                            "mDataProp": "ol.weight", "title": "重量", "bSearchable": false, "width": 65,
+                            "render": function (data, type, row) {
+                                if (data != "" && data != 0) {
+                                    return data + " kg";
+                                }
+                                else {
+                                    return "";
+                                }
+                            }
+                        },
+                        {
+                            "mDataProp": "ol.pick_fee", "title": "拣货费用", "bSearchable": false, "width": 75,
+                            "render": function (data, type, row) {
+                                if (data != "" && data != 0) {
+                                    return "AU " + data;
+                                }
+                                else {
+                                    return "";
+                                }
+                            }
+                        },
+                        {
+                            "mDataProp": "ol.total_fee", "title": "预估物流费用", "bSearchable": false, "width": 100,
+                            "render": function (data, type, row) {
+                                if (data != "" && data != 0) {
+                                    return "AU " + data;
+                                }
+                                else {
+                                    return "";
+                                }
+                            }
+                        },
+                        {
+                            "mDataProp": "ol.actual_fee", "title": "实际物流费用", "bSearchable": false, "width": 100,
+                            "render": function (data, type, row) {
+                                if (data != "" && data != 0) {
+                                    return "AU " + data;
+                                }
+                                else {
+                                    return "";
+                                }
+                            }
+                        },
+                        {"mDataProp": "ol.create_time", "title": "创建时间", "bSearchable": false, "width": 120},
+                        {"mDataProp": "ol.update_time", "title": "修改时间", "bSearchable": false, "width": 120}
+                    ],
+                    "fnServerData": function (sSource, aoData, fnCallback) {
+                        showMask("数据加载中，请稍候");
+
+                        aoData.push({'name': 'stock_id', 'value': this_vm.page.stock_id});
+                        aoData.push({'name': 'logistics_company_id', 'value': this_vm.page.logistics_company_id});
+                        aoData.push({'name': 'batch_code', 'value': this_vm.page.batch_code});
+                        aoData.push({'name': 'begin_time_query', 'value': this_vm.page.begin_time_query});
+                        aoData.push({'name': 'end_time_query', 'value': this_vm.page.end_time_query});
+
+                        $.ajax({
+                            "dataType": 'json',
+                            "url": sSource,
+                            "data": aoData,
+                            "success": function (data) {
+                                hideMask();
+
+                                if (data.success == false) {
+                                    $.msg.error(data.message);
+                                    return;
+                                }
+
+                                fnCallback(data);
+                            }
+                        });
+                    }
+                }
+            );
+        },
+        methods: {
+            reloadList: function () {
+                reloadList('#orderLogisticsList');
+            },
+            refreshList: function () {
+                refreshList('#orderLogisticsList');
+            },
+            selectStock: function (selected_stock_id) {
+                vm.page.stock_id = selected_stock_id;
+                vm.refreshList();
+            },
+            selectLogisticsCompany: function (selected_logistics_company_id) {
+                vm.page.logistics_company_id = selected_logistics_company_id;
+                vm.refreshList();
+            }
+        }
+    });
+</script>
+{%footer%}
+
