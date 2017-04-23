@@ -4,12 +4,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/revel/revel"
 	"github.com/tealeg/xlsx"
 	"matrix/core"
 	"matrix/modules/erp/models"
-	"strings"
 )
 
 type ErpProductWeight struct {
@@ -184,7 +184,7 @@ func (c ErpProductWeight) Import() revel.Result {
 
 			col_index := 1 //从第二列开始导入，略去第一列的编号
 
-			if len(row.Cells) == 0 {
+			if len(row.Cells) < 5 {
 				break
 			}
 

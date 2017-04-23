@@ -10,6 +10,11 @@ import (
 	"matrix/modules/erp/service/product_bind_log_service"
 	"matrix/modules/erp/service/product_bind_service"
 	"matrix/modules/erp/service/status_service"
+	"matrix/modules/auth/service/pass_service"
+	"matrix/modules/auth/pass_res"
+	"github.com/tealeg/xlsx"
+	"strings"
+	"fmt"
 )
 
 type ErpProductBind struct {
@@ -233,4 +238,133 @@ func (c ErpProductBind) Delete() revel.Result {
 	core.HandleError(err)
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})
+}
+
+func (c ErpProductBind) Import() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_PRODUCT_BIND, c.Session)
+
+	db_session := c.DbSession
+
+	excel_file_bytes := make([]byte, 0)
+	c.Params.Bind(&excel_file_bytes, "excel_file")
+
+	c.Validation.Required(excel_file_bytes).Message("指定文件内容未成功上传！")
+
+	if c.Validation.HasErrors() {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": c.GetValidationErrorMessage(),
+		})
+	}
+
+	type logistics_mode_t struct {
+		CompanyName   string
+		StockName     string
+		LogisticsMode models.LogisticsModeInfo
+	}
+
+	logistics_mode_list := make([]logistics_mode_t, 0)
+
+	xlsx_file, err := xlsx.OpenBinary(excel_file_bytes)
+	core.HandleError(err)
+
+	// 会导入所有 sheets
+	sheet_count := len(xlsx_file.Sheets)
+	for sheet_index := 0; sheet_index < sheet_count; sheet_index ++ {
+		sheet := xlsx_file.Sheets[sheet_index]
+		max_row := sheet.MaxRow
+		//略过标题行
+		for row_index := 1; row_index < max_row; row_index ++ {
+			row := sheet.Rows[row_index]
+
+			var cell *xlsx.Cell
+			var cell_val string
+			var err error
+
+			var logistics_mode logistics_mode_t
+
+			col_index := 0
+
+			if len(row.Cells) < 4 { // 四列数据
+				break
+			}
+
+			// 物流公司名称
+			cell = row.Cells[col_index]
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
+			if cell_val == "" {
+				break
+			}
+			logistics_mode.CompanyName = cell_val
+			col_index++
+
+			// 仓库名称
+			cell = row.Cells[col_index]
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
+			logistics_mode.StockName = cell_val
+			col_index++
+
+			// 物流方式名称
+			cell = row.Cells[col_index]
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
+			logistics_mode.LogisticsMode.Name = cell_val
+			col_index++
+
+
+			logistics_mode_list = append(logistics_mode_list, logistics_mode)
+		}
+	}
+
+	if len(logistics_mode_list) == 0 {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "Excel文件中导入物流方式列表为空！",
+		})
+	}
+
+	for _, logistics_mode_import := range logistics_mode_list {
+
+		var logistics_mode = logistics_mode_import.LogisticsMode
+
+		// 物流公司
+		var logistics_company models.LogisticsCompanyInfo
+		has, err := db_session.Where(fmt.Sprintf("name = '%s'", logistics_mode_import.CompanyName)).Get(&logistics_company)
+		core.HandleError(err)
+
+		if has == false {
+			logistics_company.Name = logistics_mode_import.CompanyName
+			logistics_company.Desc = core.NullStringFrom(logistics_mode_import.CompanyName)
+
+			_, err := db_session.Insert(&logistics_company)
+			core.HandleError(err)
+		}
+
+		logistics_mode.CompanyId = logistics_company.Id
+
+		// 仓库
+		var stock models.StockInfo
+		has, err = db_session.Where(fmt.Sprintf("name = '%s'", logistics_mode_import.StockName)).Get(&stock)
+		core.HandleError(err)
+		if has == false {
+			return c.RenderJson(map[string]interface{}{
+				"success": false,
+				"message": fmt.Sprintf("仓库名称 %s 不存在！", logistics_mode_import.StockName),
+			})
+		}
+
+		_, err = db_session.Insert(&logistics_mode)
+		core.HandleError(err)
+
+	}
+
+	return c.RenderJson(map[string]interface{}{
+		"success": true,
+		"message": "数据导入成功！",
+	})
 }

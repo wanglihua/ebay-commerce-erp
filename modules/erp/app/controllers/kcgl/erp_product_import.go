@@ -3,12 +3,12 @@ package controllers
 import (
 	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/revel/revel"
 	"github.com/tealeg/xlsx"
 	"matrix/core"
 	"matrix/modules/erp/models"
-	"strings"
 )
 
 type ErpProductImport struct {
@@ -86,7 +86,7 @@ func (c ErpProductImport) Import() revel.Result {
 			var err error
 			col_index := 0
 
-			if len(row.Cells) == 0 {
+			if len(row.Cells) < 4 {
 				break
 			}
 

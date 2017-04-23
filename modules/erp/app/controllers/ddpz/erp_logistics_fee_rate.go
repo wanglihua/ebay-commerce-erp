@@ -293,7 +293,7 @@ func (c ErpLogisticsFeeRate) Import() revel.Result {
 
 			col_index := 0
 
-			if len(row.Cells) == 0 {
+			if len(row.Cells) < 9 { // 本来是有10列数据的，但最后一列是可以为空的，有时里面的数据列里面没数据，不算在 len(row.Cells) 里面
 				break
 			}
 
@@ -376,7 +376,7 @@ func (c ErpLogisticsFeeRate) Import() revel.Result {
 			col_index++
 
 			// 偏远地区加收运费(澳币)
-			if col_index+1 < len(row.Cells) {
+			if col_index <= len(row.Cells)-1 {
 				cell = row.Cells[col_index]
 				cell_val, err = cell.String()
 				core.HandleError(err)

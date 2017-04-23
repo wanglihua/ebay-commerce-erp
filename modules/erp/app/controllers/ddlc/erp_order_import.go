@@ -207,7 +207,7 @@ func (c ErpOrderImport) Upload() revel.Result {
 
 			col_index := 0
 
-			if len(row.Cells) == 0 {
+			if len(row.Cells) < 16 {
 				break
 			}
 

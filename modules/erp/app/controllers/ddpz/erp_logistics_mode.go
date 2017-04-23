@@ -315,7 +315,8 @@ func (c ErpLogisticsMode) Import() revel.Result {
 
 			col_index := 0
 
-			if len(row.Cells) == 0 {
+			//todo 这里也有可能会出现问题的，如果最后几列用户没有填怎么办
+			if len(row.Cells) < 18 {
 				break
 			}
 
