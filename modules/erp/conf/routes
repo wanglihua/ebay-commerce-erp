@@ -131,6 +131,9 @@ POST /erp/product/export                       ErpProductExport.Export
 GET  /erp/product/log                          ErpProductLog.Index
 POST /erp/product/log/data/list                ErpProductLog.ListData
 
+GET  /erp/product/bind/log                     ErpProductBindLog.Index
+POST /erp/product/bind/log/data/list           ErpProductBindLog.ListData
+
 GET  /erp/order/log                            ErpOrderLog.Index
 POST /erp/order/log/data/list                  ErpOrderLog.ListData
 
