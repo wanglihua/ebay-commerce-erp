@@ -349,7 +349,13 @@ func (c ErpProductBind) Import() revel.Result {
 
 		// 检查 绑定列表是否合法有效
 		bind_list_valid, err := product_bind_service.Check_product_bind_valid(product_bind.BindList, db_session)
-		core.HandleError(err)
+		if err != nil {
+			return c.RenderJson(map[string]interface{}{
+				"success": false,
+				"message": fmt.Sprintf("序号 %s 的绑定列表无效，请核查！ %s", product_bind.BindList, err.Error()),
+			})
+		}
+
 		if bind_list_valid == false {
 			return c.RenderJson(map[string]interface{}{
 				"success": false,
