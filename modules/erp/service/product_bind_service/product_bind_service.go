@@ -41,7 +41,7 @@ func Check_product_bind_valid(bind_product_list string, db_session *xorm.Session
 	return true, nil
 }
 
-// 是否是绑定商品的sku，就是虚拟的那个sku
+// 是否是绑定商品的sku，就是虚拟的那个sku。是否是在商品绑定的数据库里面存在。
 func Is_product_bind_sku(product_bind_sku string, db_session *xorm.Session) bool {
 	sql := `SELECT count(pb.id) AS product_bind_count FROM erp_product_bind pb WHERE pb.code = '%s'`
 	sql = fmt.Sprintf(sql, product_bind_sku)

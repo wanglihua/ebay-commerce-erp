@@ -2,19 +2,19 @@ package controllers
 
 import (
 	"encoding/json"
+	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/revel/revel"
+	"github.com/tealeg/xlsx"
 	"matrix/core"
+	"matrix/modules/auth/pass_res"
+	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/product_bind_log_service"
 	"matrix/modules/erp/service/product_bind_service"
 	"matrix/modules/erp/service/status_service"
-	"matrix/modules/auth/service/pass_service"
-	"matrix/modules/auth/pass_res"
-	"github.com/tealeg/xlsx"
-	"strings"
-	"fmt"
 )
 
 type ErpProductBind struct {
@@ -257,13 +257,14 @@ func (c ErpProductBind) Import() revel.Result {
 		})
 	}
 
-	type logistics_mode_t struct {
-		CompanyName   string
-		StockName     string
-		LogisticsMode models.LogisticsModeInfo
+	type product_bind_import_t struct {
+		OrdNum   string // 序号
+		BindCode string // 编号
+		BindName string // 名称
+		BindList string // 绑定列表
 	}
 
-	logistics_mode_list := make([]logistics_mode_t, 0)
+	product_bind_import_list := make([]product_bind_import_t, 0)
 
 	xlsx_file, err := xlsx.OpenBinary(excel_file_bytes)
 	core.HandleError(err)
@@ -281,7 +282,7 @@ func (c ErpProductBind) Import() revel.Result {
 			var cell_val string
 			var err error
 
-			var logistics_mode logistics_mode_t
+			var product_bind_import product_bind_import_t
 
 			col_index := 0
 
@@ -289,7 +290,7 @@ func (c ErpProductBind) Import() revel.Result {
 				break
 			}
 
-			// 物流公司名称
+			// 序号
 			cell = row.Cells[col_index]
 			cell_val, err = cell.String()
 			core.HandleError(err)
@@ -297,70 +298,72 @@ func (c ErpProductBind) Import() revel.Result {
 			if cell_val == "" {
 				break
 			}
-			logistics_mode.CompanyName = cell_val
+			product_bind_import.OrdNum = cell_val
 			col_index++
 
-			// 仓库名称
+			// 编号
 			cell = row.Cells[col_index]
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
-			logistics_mode.StockName = cell_val
+			product_bind_import.BindCode = cell_val
 			col_index++
 
-			// 物流方式名称
+			// 名称
 			cell = row.Cells[col_index]
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
-			logistics_mode.LogisticsMode.Name = cell_val
+			product_bind_import.BindName = cell_val
 			col_index++
 
+			// 绑定列表
+			cell = row.Cells[col_index]
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
+			product_bind_import.BindList = cell_val
+			col_index++
 
-			logistics_mode_list = append(logistics_mode_list, logistics_mode)
+			product_bind_import_list = append(product_bind_import_list, product_bind_import)
 		}
 	}
 
-	if len(logistics_mode_list) == 0 {
+	if len(product_bind_import_list) == 0 {
 		return c.RenderJson(map[string]interface{}{
 			"success": false,
 			"message": "Excel文件中导入物流方式列表为空！",
 		})
 	}
 
-	for _, logistics_mode_import := range logistics_mode_list {
+	for _, product_bind_import := range product_bind_import_list {
+		var product_bind models.ProductBindInfo
 
-		var logistics_mode = logistics_mode_import.LogisticsMode
-
-		// 物流公司
-		var logistics_company models.LogisticsCompanyInfo
-		has, err := db_session.Where(fmt.Sprintf("name = '%s'", logistics_mode_import.CompanyName)).Get(&logistics_company)
-		core.HandleError(err)
-
-		if has == false {
-			logistics_company.Name = logistics_mode_import.CompanyName
-			logistics_company.Desc = core.NullStringFrom(logistics_mode_import.CompanyName)
-
-			_, err := db_session.Insert(&logistics_company)
-			core.HandleError(err)
-		}
-
-		logistics_mode.CompanyId = logistics_company.Id
-
-		// 仓库
-		var stock models.StockInfo
-		has, err = db_session.Where(fmt.Sprintf("name = '%s'", logistics_mode_import.StockName)).Get(&stock)
-		core.HandleError(err)
-		if has == false {
+		// 检查 绑定代码是否已存在
+		if product_bind_service.Is_product_bind_sku(product_bind_import.BindCode, db_session) == true {
 			return c.RenderJson(map[string]interface{}{
 				"success": false,
-				"message": fmt.Sprintf("仓库名称 %s 不存在！", logistics_mode_import.StockName),
+				"message": fmt.Sprintf("序号 %s 的绑定编号 %s 已存在，请核查！", product_bind_import.OrdNum, product_bind_import.BindCode),
 			})
 		}
 
-		_, err = db_session.Insert(&logistics_mode)
+		// 检查 绑定列表是否合法有效
+		bind_list_valid, err := product_bind_service.Check_product_bind_valid(product_bind.BindList, db_session)
 		core.HandleError(err)
+		if bind_list_valid == false {
+			return c.RenderJson(map[string]interface{}{
+				"success": false,
+				"message": fmt.Sprintf("序号 %s 的绑定列表无效，请核查！", product_bind.BindList),
+			})
+		}
 
+		product_bind.Code = product_bind_import.BindCode
+		product_bind.Name = product_bind_import.BindName
+		product_bind.BindList = product_bind_import.BindList
+		product_bind.StatusId = models.PRODUCT_BIND_STATUS_NORMAL
+
+		_, err = db_session.Insert(&product_bind)
+		core.HandleError(err)
 	}
 
 	return c.RenderJson(map[string]interface{}{
