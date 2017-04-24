@@ -337,8 +337,6 @@ func (c ErpProductBind) Import() revel.Result {
 	}
 
 	for _, product_bind_import := range product_bind_import_list {
-		revel.Dump(product_bind_import)
-
 		// 检查 绑定代码是否已存在
 		if product_bind_service.Is_product_bind_sku(product_bind_import.BindCode, db_session) == true {
 			return c.RenderJson(map[string]interface{}{

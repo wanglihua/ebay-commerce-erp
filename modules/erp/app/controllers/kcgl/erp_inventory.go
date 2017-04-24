@@ -2,11 +2,17 @@ package controllers
 
 import (
 	"encoding/json"
+	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/revel/revel"
+	"github.com/tealeg/xlsx"
 	"matrix/core"
 	"matrix/modules/erp/models"
+	"matrix/modules/erp/service/product_service"
+	"matrix/modules/erp/service/stock_service"
+	"matrix/modules/erp/service/storage_loc_service"
 )
 
 type ErpInventory struct {
@@ -148,4 +154,164 @@ func (c ErpInventory) Delete() revel.Result {
 	core.HandleError(err)
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})
+}
+
+func (c ErpInventory) Import() revel.Result {
+
+	db_session := c.DbSession
+
+	excel_file_bytes := make([]byte, 0)
+	c.Params.Bind(&excel_file_bytes, "excel_file")
+
+	c.Validation.Required(excel_file_bytes).Message("指定文件内容未成功上传！")
+
+	if c.Validation.HasErrors() {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": c.GetValidationErrorMessage(),
+		})
+	}
+
+	//序号 商品编号	仓库	仓位	库存
+
+	type inventory_import_t struct {
+		OrdNum         string // 序号
+		ProductSku     string // 商品编号
+		StockName      string // 仓库名称
+		StorageLocName string // 仓位名称
+		Qty            int64  // 库存
+	}
+
+	inventory_import_list := make([]inventory_import_t, 0)
+
+	xlsx_file, err := xlsx.OpenBinary(excel_file_bytes)
+	core.HandleError(err)
+
+	// 会导入所有 sheets
+	sheet_count := len(xlsx_file.Sheets)
+	for sheet_index := 0; sheet_index < sheet_count; sheet_index ++ {
+		sheet := xlsx_file.Sheets[sheet_index]
+		max_row := sheet.MaxRow
+		//略过标题行
+		for row_index := 1; row_index < max_row; row_index ++ {
+			row := sheet.Rows[row_index]
+
+			var cell *xlsx.Cell
+			var cell_val string
+			var err error
+
+			var inventory_import inventory_import_t
+
+			col_index := 0
+
+			if len(row.Cells) < 5 { // 5列数据
+				break
+			}
+
+			// 序号
+			cell = row.Cells[col_index]
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
+			if cell_val == "" {
+				break
+			}
+			inventory_import.OrdNum = cell_val
+			col_index++
+
+			// 商品编号
+			cell = row.Cells[col_index]
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
+			inventory_import.ProductSku = cell_val
+			col_index++
+
+			// 仓库名称
+			cell = row.Cells[col_index]
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
+			inventory_import.StockName = cell_val
+			col_index++
+
+			// 仓位名称
+			cell = row.Cells[col_index]
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
+			inventory_import.StorageLocName = cell_val
+			col_index++
+
+			// 库存
+			cell = row.Cells[col_index]
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
+			qty, _ := strconv.ParseInt(cell_val, 10, 64)
+			inventory_import.Qty = qty
+			col_index++
+
+			inventory_import_list = append(inventory_import_list, inventory_import)
+		}
+	}
+
+	if len(inventory_import_list) == 0 {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "Excel文件中导入商品库存列表为空！",
+		})
+	}
+
+	for _, inventory_import := range inventory_import_list {
+
+		// 检查 商品 sku
+		var product_id int64 = product_service.Get_product_id_by_sku(inventory_import.ProductSku, db_session)
+
+		if product_id == 0 {
+			return c.RenderJson(map[string]interface{}{
+				"success": false,
+				"message": fmt.Sprintf("序号 %s 的商品SKU %s 不存在！", inventory_import.OrdNum, inventory_import.ProductSku),
+			})
+		}
+
+		// 检查 仓库名称
+		var stock_id int64 = stock_service.Get_stock_id_by_name(inventory_import.StockName, db_session)
+		var storage_loc_id int64
+
+		if stock_id == 0 {
+			return c.RenderJson(map[string]interface{}{
+				"success": false,
+				"message": fmt.Sprintf("序号 %s 的仓库名称 %s 不存在！", inventory_import.OrdNum, inventory_import.StockName),
+			})
+		} else { //仓库名称存在
+			var storage_loc_name = strings.TrimSpace(inventory_import.StorageLocName)
+			if storage_loc_name != "" {
+				// 如果提供了仓位， 检查仓位名称
+
+				storage_loc_id = storage_loc_service.Get_storage_loc_id_by_name(storage_loc_name, stock_id, db_session)
+				if storage_loc_id == 0 {
+					return c.RenderJson(map[string]interface{}{
+						"success": false,
+						"message": fmt.Sprintf("序号 %s 的仓位名称 %s 不存在！", inventory_import.OrdNum, inventory_import.StorageLocName),
+					})
+				}
+			}
+		}
+
+		var inventory models.InventoryInfo
+
+		inventory.StockId = stock_id
+		inventory.StorageLocId = storage_loc_id
+		inventory.ProductId = product_id
+		inventory.Qty = inventory_import.Qty
+
+		_, err = db_session.Insert(&inventory)
+		core.HandleError(err)
+	}
+
+	return c.RenderJson(map[string]interface{}{
+		"success": true,
+		"message": "数据导入成功！",
+	})
 }

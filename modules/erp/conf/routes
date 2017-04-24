@@ -164,6 +164,7 @@ POST /erp/inventory/data/list                  ErpInventory.ListData
 POST /erp/inventory/data/detail                ErpInventory.DetailData
 POST /erp/inventory/save                       ErpInventory.Save
 POST /erp/inventory/delete                     ErpInventory.Delete
+POST /erp/inventory/import                     ErpInventory.Import
 
 GET  /erp/stock/bill/checkin                   ErpStockBillCheckin.Index
 POST /erp/stock/bill/checkin/data/list         ErpStockBillCheckin.ListData
