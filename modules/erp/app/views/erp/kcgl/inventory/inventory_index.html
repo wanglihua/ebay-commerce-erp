@@ -147,7 +147,7 @@
                     if (result.success != true) {
                         $.msg.error(result.message);
                     } else {
-                        reloadList('#logisticsFeeRateList');
+                        reloadList('#inventoryList');
                         $.msg.show(result.message);
                     }
                 },
@@ -187,7 +187,7 @@
                         },
                         {"mDataProp": "st.name", "title": "仓库", "bSearchable": false, "width": 180},
                         {"mDataProp": "loc.name", "title": "库位", "bSearchable": false, "width": 180},
-                        {"mDataProp": "prd.name", "title": "商品", "bSearchable": false},
+                        {"mDataProp": "prd.sku", "title": "商品", "bSearchable": false},
                         {"mDataProp": "ivt.qty", "title": "数量", "bSearchable": false, "width": 120},
                         {"mDataProp": "ivt.create_time", "title": "创建时间", "bSearchable": false, "width": 120},
                         {"mDataProp": "ivt.update_time", "title": "修改时间", "bSearchable": false, "width": 120}

@@ -339,26 +339,42 @@ func (c ErpProductBind) Import() revel.Result {
 	for _, product_bind_import := range product_bind_import_list {
 		// 检查 绑定代码是否已存在
 		if product_bind_service.Is_product_bind_sku(product_bind_import.BindCode, db_session) == true {
+
+			/*
 			return c.RenderJson(map[string]interface{}{
 				"success": false,
 				"message": fmt.Sprintf("序号 %s 的绑定编号 %s 已存在，请核查！", product_bind_import.OrdNum, product_bind_import.BindCode),
 			})
+			*/
+
+			//使用 panic 可以事务回滚导入
+			panic(fmt.Sprintf("序号 %s 的绑定编号 %s 已存在，请核查！", product_bind_import.OrdNum, product_bind_import.BindCode))
 		}
 
 		// 检查 绑定列表是否合法有效
 		bind_list_valid, err := product_bind_service.Check_product_bind_valid(product_bind_import.BindList, db_session)
 		if err != nil {
+			/*
 			return c.RenderJson(map[string]interface{}{
 				"success": false,
 				"message": fmt.Sprintf("序号 %s 的绑定列表无效，请核查！ %s", product_bind_import.OrdNum, err.Error()),
 			})
+			*/
+
+			//使用 panic 可以事务回滚导入
+			panic(fmt.Sprintf("序号 %s 的绑定列表无效，请核查！ %s", product_bind_import.OrdNum, err.Error()))
 		}
 
 		if bind_list_valid == false {
+			/*
 			return c.RenderJson(map[string]interface{}{
 				"success": false,
 				"message": fmt.Sprintf("序号 %s 的绑定列表无效，请核查！", product_bind_import.BindList),
 			})
+			*/
+
+			//使用 panic 可以事务回滚导入
+			panic(fmt.Sprintf("序号 %s 的绑定列表无效，请核查！", product_bind_import.BindList))
 		}
 
 		var product_bind models.ProductBindInfo

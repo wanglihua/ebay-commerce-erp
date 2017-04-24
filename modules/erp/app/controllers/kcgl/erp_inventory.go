@@ -269,10 +269,15 @@ func (c ErpInventory) Import() revel.Result {
 		var product_id int64 = product_service.Get_product_id_by_sku(inventory_import.ProductSku, db_session)
 
 		if product_id == 0 {
+			/*
 			return c.RenderJson(map[string]interface{}{
 				"success": false,
 				"message": fmt.Sprintf("序号 %s 的商品SKU %s 不存在！", inventory_import.OrdNum, inventory_import.ProductSku),
 			})
+			*/
+
+			//使用 panic 可以事务回滚导入
+			panic(fmt.Sprintf("序号 %s 的商品SKU %s 不存在！", inventory_import.OrdNum, inventory_import.ProductSku))
 		}
 
 		// 检查 仓库名称
@@ -280,10 +285,15 @@ func (c ErpInventory) Import() revel.Result {
 		var storage_loc_id int64
 
 		if stock_id == 0 {
+			/*
 			return c.RenderJson(map[string]interface{}{
 				"success": false,
 				"message": fmt.Sprintf("序号 %s 的仓库名称 %s 不存在！", inventory_import.OrdNum, inventory_import.StockName),
 			})
+			*/
+
+			//使用 panic 可以事务回滚导入
+			panic(fmt.Sprintf("序号 %s 的仓库名称 %s 不存在！", inventory_import.OrdNum, inventory_import.StockName))
 		} else { //仓库名称存在
 			var storage_loc_name = strings.TrimSpace(inventory_import.StorageLocName)
 			if storage_loc_name != "" {
@@ -291,23 +301,37 @@ func (c ErpInventory) Import() revel.Result {
 
 				storage_loc_id = storage_loc_service.Get_storage_loc_id_by_name(storage_loc_name, stock_id, db_session)
 				if storage_loc_id == 0 {
+					/*
 					return c.RenderJson(map[string]interface{}{
 						"success": false,
 						"message": fmt.Sprintf("序号 %s 的仓位名称 %s 不存在！", inventory_import.OrdNum, inventory_import.StorageLocName),
 					})
+					*/
+
+					//使用 panic 可以事务回滚导入
+					panic(fmt.Sprintf("序号 %s 的仓位名称 %s 不存在！", inventory_import.OrdNum, inventory_import.StorageLocName))
 				}
 			}
 		}
 
 		var inventory models.InventoryInfo
+		has, err := db_session.Where(fmt.Sprintf("stock_id = %d AND storage_loc_id = %d AND product_id = %d", stock_id, storage_loc_id, product_id)).Get(&inventory)
+		core.HandleError(err)
 
 		inventory.StockId = stock_id
 		inventory.StorageLocId = storage_loc_id
 		inventory.ProductId = product_id
-		inventory.Qty = inventory_import.Qty
+		inventory.Qty += inventory_import.Qty // 如果是插入的话， 开始时 inventory.Qty == 0
 
-		_, err = db_session.Insert(&inventory)
-		core.HandleError(err)
+		if has == false {
+			// 插入
+			_, err = db_session.Insert(&inventory)
+			core.HandleError(err)
+		} else {
+			// 更新
+			_, err := db_session.Id(inventory.Id).Cols("stock_id", "storage_loc_id", "product_id", "qty").Update(&inventory)
+			core.HandleError(err)
+		}
 	}
 
 	return c.RenderJson(map[string]interface{}{
