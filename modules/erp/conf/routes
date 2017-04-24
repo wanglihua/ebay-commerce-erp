@@ -62,6 +62,9 @@ POST /erp/shop/account/save                    ErpShopAccount.Save
 POST /erp/shop/account/delete                  ErpShopAccount.Delete
 POST /erp/shop/account/get/info                ErpShopAccount.GetShopAccountInfo
 
+GET  /erp/shop/account/log                     ErpShopAccountLog.Index
+POST /erp/shop/account/log/data/list           ErpShopAccountLog.ListData
+
 GET  /erp/paypal/account                       ErpPaypalAccount.Index
 POST /erp/paypal/account/data/list             ErpPaypalAccount.ListData
 POST /erp/paypal/account/data/detail           ErpPaypalAccount.DetailData

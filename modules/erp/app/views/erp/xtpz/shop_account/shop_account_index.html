@@ -29,7 +29,7 @@
                         <i class="ace-icon fa fa-trash-o"></i>
                         删除
                     </button>
-                    <button class="btn btn-info btn-sm">
+                    <button class="btn btn-info btn-sm" @click="showShopAccountLog()">
                         <i class="ace-icon fa fa-book"></i>
                         操作日志
                     </button>
@@ -298,6 +298,9 @@
         methods: {
             reloadList: function () {
                 reloadList('#shopAccountList');
+            },
+            showShopAccountLog: function () {
+                window.location.href = "/erp/shop/account/log";
             },
             showShopAccountDetail: function (id) {
                 showMask("加载中...");
