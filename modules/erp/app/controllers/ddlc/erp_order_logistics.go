@@ -87,11 +87,12 @@ func (c ErpOrderLogistics) ListData() revel.Result {
 	}
 
 	/*
-SELECT ol.*, o.*, s.*, lc.*
+SELECT ol.*, o.*, s.*, lc.*, lm.*
 FROM erp_order_logistics ol
     INNER JOIN erp_order o ON o.id = ol.order_id
     INNER JOIN erp_stock s ON s.id = ol.stock_id
     INNER JOIN erp_logistics_company lc ON lc.id = ol.company_id
+    INNER JOIN erp_logistics_mode lm ON lm.id = ol.mode_id
 WHERE ol.stock_id = 0 AND ol.company_id = 0
       AND o.id IN (SELECT ib.order_id FROM erp_order_import_batch ib WHERE ib.batch_code = 0)
       AND o.paid_time > '2017-01-01' AND o.paid_time < '2017-04-30'
@@ -107,7 +108,8 @@ WHERE ol.stock_id = 0 AND ol.company_id = 0
 	sb.From(`erp_order_logistics ol
     INNER JOIN erp_order o ON o.id = ol.order_id
     INNER JOIN erp_stock s ON s.id = ol.stock_id
-    INNER JOIN erp_logistics_company lc ON lc.id = ol.company_id`)
+    INNER JOIN erp_logistics_company lc ON lc.id = ol.company_id
+    INNER JOIN erp_logistics_mode lm ON lm.id = ol.mode_id`)
 
 	if stock_id != 0 {
 		filter = core.SqlAnd(filter, fmt.Sprintf("ol.stock_id = %d", stock_id))
