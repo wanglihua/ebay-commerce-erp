@@ -24,42 +24,46 @@ func init() {
 		   jobs.Every(24 * time.Hour,    TestTask{})
 		*/
 
-		cron_ebay_download_order, found := revel.Config.String("cron.ebay_download_order")
-		if found {
-			check_cron_support(cron_ebay_download_order)
-			jobs.Schedule(cron_ebay_download_order, tasks.EBayOrderDownloadTask{})
-		}
+		var schedule_task_enabled = false // 临时禁用定时任务
 
-		// cron.order_logistics_match
-		// 下载的已支付的订单匹配物流
-		cron_order_logistics_match, found := revel.Config.String("cron.order_logistics_match")
-		if found {
-			check_cron_support(cron_order_logistics_match)
-			jobs.Schedule(cron_order_logistics_match, tasks.OrderLogisticsMatchTask{})
-		}
+		if schedule_task_enabled == true {
+			cron_ebay_download_order, found := revel.Config.String("cron.ebay_download_order")
+			if found {
+				check_cron_support(cron_ebay_download_order)
+				jobs.Schedule(cron_ebay_download_order, tasks.EBayOrderDownloadTask{})
+			}
 
-		//jobs.Now(tasks.EBayOrderDownloadTask{}) // just for test
+			// cron.order_logistics_match
+			// 下载的已支付的订单匹配物流
+			cron_order_logistics_match, found := revel.Config.String("cron.order_logistics_match")
+			if found {
+				check_cron_support(cron_order_logistics_match)
+				jobs.Schedule(cron_order_logistics_match, tasks.OrderLogisticsMatchTask{})
+			}
 
-		cron_ebay_download_message, found := revel.Config.String("cron.ebay_download_message")
-		if found {
-			check_cron_support(cron_ebay_download_message)
-			jobs.Schedule(cron_ebay_download_message, tasks.EBayMessageDownloadTask{})
-		}
+			//jobs.Now(tasks.EBayOrderDownloadTask{}) // just for test
 
-		//jobs.Now(tasks.EBayMessageDownloadTask{}) // just for test
+			cron_ebay_download_message, found := revel.Config.String("cron.ebay_download_message")
+			if found {
+				check_cron_support(cron_ebay_download_message)
+				jobs.Schedule(cron_ebay_download_message, tasks.EBayMessageDownloadTask{})
+			}
 
-		cron_ebay_download_product, found := revel.Config.String("cron.ebay_download_product")
-		if found {
-			check_cron_support(cron_ebay_download_product)
-			jobs.Schedule(cron_ebay_download_product, tasks.EBayProductDownloadTask{})
-		}
+			//jobs.Now(tasks.EBayMessageDownloadTask{}) // just for test
 
-		//jobs.Now(tasks.EBayProductDownloadTask{})
+			cron_ebay_download_product, found := revel.Config.String("cron.ebay_download_product")
+			if found {
+				check_cron_support(cron_ebay_download_product)
+				jobs.Schedule(cron_ebay_download_product, tasks.EBayProductDownloadTask{})
+			}
 
-		cron_paypal_download, found := revel.Config.String("cron.paypal_download")
-		if found {
-			check_cron_support(cron_paypal_download)
-			jobs.Schedule(cron_paypal_download, tasks.PaypalDownloadTask{})
+			//jobs.Now(tasks.EBayProductDownloadTask{})
+
+			cron_paypal_download, found := revel.Config.String("cron.paypal_download")
+			if found {
+				check_cron_support(cron_paypal_download)
+				jobs.Schedule(cron_paypal_download, tasks.PaypalDownloadTask{})
+			}
 		}
 
 		// jobs.Now(tasks.PaypalDownloadTask{})
