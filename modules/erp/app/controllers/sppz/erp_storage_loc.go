@@ -2,9 +2,9 @@ package controllers
 
 import (
 	"encoding/json"
-	"github.com/revel/revel"
 	"strconv"
 
+	"github.com/revel/revel"
 	"matrix/core"
 	"matrix/modules/erp/models"
 )
@@ -34,7 +34,7 @@ func (c ErpStorageLoc) ListData() revel.Result {
 	*/
 
 	query := db_session.
-		Select("l.*, s.*").
+	Select("l.*, s.*").
 		Table("erp_storage_loc").Alias("l").
 		Join("INNER", []string{"erp_stock", "s"}, "l.stock_id = s.id").
 		Where(filter)
@@ -140,7 +140,7 @@ func (c ErpStorageLoc) Save() revel.Result {
 
 	var affected int64
 	if detail_form.IsCreate() {
-		stockId_count, err := db_session.Where("stock_id = ? and name = ?", storage_loc.StockId, storage_loc.Name).Count(&storage_loc)
+		stockId_count, err := db_session.Where("stock_id = ? and name = ?", storage_loc.StockId, storage_loc.Name).Count(new(models.StorageLocInfo))
 		core.HandleError(err)
 		if stockId_count != 0 {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，仓库、名称已存在！" })
@@ -149,7 +149,7 @@ func (c ErpStorageLoc) Save() revel.Result {
 		affected, err = db_session.Insert(&storage_loc)
 		core.HandleError(err)
 	} else {
-		stockId_count, err := db_session.Where("id <> ? and stock_id = ? and name = ?", storage_loc.Id, storage_loc.StockId, storage_loc.Name).Count(&storage_loc)
+		stockId_count, err := db_session.Where("id <> ? and stock_id = ? and name = ?", storage_loc.Id, storage_loc.StockId, storage_loc.Name).Count(new(models.StorageLocInfo))
 		core.HandleError(err)
 		if stockId_count != 0 {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，仓库、名称已存在！" })

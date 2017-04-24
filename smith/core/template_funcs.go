@@ -1,8 +1,9 @@
 package core
 
 import (
-	"matrix/smith/core/fieldtype"
 	"strings"
+
+	"matrix/smith/core/fieldtype"
 )
 
 func TemplateFuncFirstEntity(entityList []Entity) Entity {
@@ -338,7 +339,7 @@ func TemplateFuncCheckUniqueCreate(entity Entity, field Field) string {
 		if isSingleUnique {
 			//是 单独 unique
 
-			template := `		{{.fieldCamelCase}}_count, err := db_session.Where("{{.field.Column}} = ?", {{Underscore .entity.EntityCamelCase}}.{{.field.Name}}).Count(&{{Underscore .entity.EntityCamelCase}})
+			template := `		{{.fieldCamelCase}}_count, err := db_session.Where("{{.field.Column}} = ?", {{Underscore .entity.EntityCamelCase}}.{{.field.Name}}).Count(new(models.{{.entity.EntityTitleName}}Info))
 		core.HandleError(err)
 		if {{.fieldCamelCase}}_count != 0 {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，{{.field.VerboseName}}已存在！" })
@@ -380,7 +381,7 @@ func TemplateFuncCheckUniqueCreate(entity Entity, field Field) string {
 
 			where := `"` + fieldsCompare + `"` + ", " + fieldsValue
 
-			template := `		{{.fieldCamelCase}}_count, err := db_session.Where({{.where}}).Count(&{{Underscore .entity.EntityCamelCase}})
+			template := `		{{.fieldCamelCase}}_count, err := db_session.Where({{.where}}).Count(new(models.{{.entity.EntityTitleName}}Info))
 		core.HandleError(err)
 		if {{.fieldCamelCase}}_count != 0 {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，{{.chineseNames}}已存在！" })
@@ -436,7 +437,7 @@ func TemplateFuncCheckUniqueUpdate(entity Entity, field Field) string {
 		if isSingleUnique {
 			//是 单独 unique
 
-			template := `		{{.fieldCamelCase}}_count, err := db_session.Where("id <> ? and {{.field.Column}} = ?", {{Underscore .entity.EntityCamelCase}}.Id, {{Underscore .entity.EntityCamelCase}}.{{.field.Name}}).Count(&{{Underscore .entity.EntityCamelCase}})
+			template := `		{{.fieldCamelCase}}_count, err := db_session.Where("id <> ? and {{.field.Column}} = ?", {{Underscore .entity.EntityCamelCase}}.Id, {{Underscore .entity.EntityCamelCase}}.{{.field.Name}}).Count(new(models.{{.entity.EntityTitleName}}Info))
 		core.HandleError(err)
 		if {{.fieldCamelCase}}_count != 0 {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，{{.field.VerboseName}}已存在！" })
@@ -476,7 +477,7 @@ func TemplateFuncCheckUniqueUpdate(entity Entity, field Field) string {
 
 			where := `"` + fieldsCompare + `"` + ", " + fieldsValue
 
-			template := `		{{.fieldCamelCase}}_count, err := db_session.Where({{.where}}).Count(&{{Underscore .entity.EntityCamelCase}})
+			template := `		{{.fieldCamelCase}}_count, err := db_session.Where({{.where}}).Count(new(models.{{.entity.EntityTitleName}}Info))
 		core.HandleError(err)
 		if {{.fieldCamelCase}}_count != 0 {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，{{.chineseNames}}已存在！" })

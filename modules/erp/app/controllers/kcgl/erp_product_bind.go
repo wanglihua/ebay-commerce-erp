@@ -159,7 +159,7 @@ func (c ErpProductBind) Save() revel.Result {
 
 	var affected int64
 	if detail_form.IsCreate() {
-		code_count, err := db_session.Where("code = ?", product_bind_from_ui.Code).Count(&product_bind_from_ui)
+		code_count, err := db_session.Where("code = ?", product_bind_from_ui.Code).Count(new(models.ProductBindInfo))
 		core.HandleError(err)
 		if code_count != 0 {
 			return c.RenderJson(map[string]interface{}{
@@ -168,7 +168,7 @@ func (c ErpProductBind) Save() revel.Result {
 			})
 		}
 
-		name_count, err := db_session.Where("name = ?", product_bind_from_ui.Name).Count(&product_bind_from_ui)
+		name_count, err := db_session.Where("name = ?", product_bind_from_ui.Name).Count(new(models.ProductBindInfo))
 		core.HandleError(err)
 		if name_count != 0 {
 			return c.RenderJson(map[string]interface{}{
@@ -182,7 +182,7 @@ func (c ErpProductBind) Save() revel.Result {
 
 		product_bind_log_service.Insert_product_bind_log(nil, &product_bind_from_ui, core.Db_operation_types.Insert, db_session, c.Session)
 	} else {
-		code_count, err := db_session.Where("id <> ? AND code = ?", product_bind_from_ui.Id, product_bind_from_ui.Code).Count(&product_bind_from_ui)
+		code_count, err := db_session.Where("id <> ? AND code = ?", product_bind_from_ui.Id, product_bind_from_ui.Code).Count(new(models.ProductBindInfo))
 		core.HandleError(err)
 		if code_count != 0 {
 			return c.RenderJson(map[string]interface{}{
@@ -191,7 +191,7 @@ func (c ErpProductBind) Save() revel.Result {
 			})
 		}
 
-		name_count, err := db_session.Where("id <> ? AND name = ?", product_bind_from_ui.Id, product_bind_from_ui.Name).Count(&product_bind_from_ui)
+		name_count, err := db_session.Where("id <> ? AND name = ?", product_bind_from_ui.Id, product_bind_from_ui.Name).Count(new(models.ProductBindInfo))
 		core.HandleError(err)
 		if name_count != 0 {
 			return c.RenderJson(map[string]interface{}{

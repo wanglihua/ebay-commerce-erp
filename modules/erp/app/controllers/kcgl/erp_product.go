@@ -255,13 +255,13 @@ func (c ErpProduct) Save() revel.Result {
 	is_create := detail_form.IsCreate()
 	var product_id int64 = product_from_ui.Id
 	if is_create {
-		sku_count, err := db_session.Where("sku = ?", product_from_ui.Sku).Count(&product_from_ui)
+		sku_count, err := db_session.Where("sku = ?", product_from_ui.Sku).Count(new(models.ProductInfo))
 		core.HandleError(err)
 		if sku_count != 0 {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，SKU已存在！" })
 		}
 
-		name_count, err := db_session.Where("name = ?", product_from_ui.Name).Count(&product_from_ui)
+		name_count, err := db_session.Where("name = ?", product_from_ui.Name).Count(new(models.ProductInfo))
 		core.HandleError(err)
 		if name_count != 0 {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，名称已存在！" })
@@ -274,13 +274,13 @@ func (c ErpProduct) Save() revel.Result {
 
 		product_log_service.Insert_product_log(nil, &product_from_ui, core.Db_operation_types.Insert, db_session, c.Session)
 	} else {
-		sku_count, err := db_session.Where("id <> ? and sku = ?", product_from_ui.Id, product_from_ui.Sku).Count(&product_from_ui)
+		sku_count, err := db_session.Where("id <> ? and sku = ?", product_from_ui.Id, product_from_ui.Sku).Count(new(models.ProductInfo))
 		core.HandleError(err)
 		if sku_count != 0 {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，SKU已存在！" })
 		}
 
-		name_count, err := db_session.Where("id <> ? and name = ?", product_from_ui.Id, product_from_ui.Name).Count(&product_from_ui)
+		name_count, err := db_session.Where("id <> ? and name = ?", product_from_ui.Id, product_from_ui.Name).Count(new(models.ProductInfo))
 		core.HandleError(err)
 		if name_count != 0 {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，名称已存在！" })

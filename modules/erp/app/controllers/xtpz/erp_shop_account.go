@@ -156,13 +156,47 @@ func (c ErpShopAccount) Save() revel.Result {
 
 	shop_account := detail_form.ShopAccount
 
-	//todo 检测 唯一性 编号，名称等等
-
 	var affected int64
 	if detail_form.IsCreate() {
+		code_count, err := db_session.Where("code = ?", shop_account.Code).Count(new(models.ShopAccountInfo))
+		core.HandleError(err)
+		if code_count != 0 {
+			return c.RenderJson(map[string]interface{}{
+				"success": false,
+				"message": "保存失败， 编码已存在！",
+			})
+		}
+
+		name_count, err := db_session.Where("platform_id = ? AND name = ?", shop_account.PlatformId, shop_account.Name).Count(new(models.ShopAccountInfo))
+		core.HandleError(err)
+		if name_count != 0 {
+			return c.RenderJson(map[string]interface{}{
+				"success": false,
+				"message": "保存失败， 平台店铺名称已存在！",
+			})
+		}
+
 		affected, err = db_session.Insert(&shop_account)
 		core.HandleError(err)
 	} else {
+		code_count, err := db_session.Where("id <> ? AND code = ?", shop_account.Id, shop_account.Code).Count(new(models.ShopAccountInfo))
+		core.HandleError(err)
+		if code_count != 0 {
+			return c.RenderJson(map[string]interface{}{
+				"success": false,
+				"message": "保存失败， 编码已存在！",
+			})
+		}
+
+		name_count, err := db_session.Where("id <> ? AND platform_id = ? AND name = ?", shop_account.Id, shop_account.PlatformId, shop_account.Name).Count(new(models.ShopAccountInfo))
+		core.HandleError(err)
+		if name_count != 0 {
+			return c.RenderJson(map[string]interface{}{
+				"success": false,
+				"message": "保存失败， 平台店铺名称已存在！",
+			})
+		}
+
 		update_col_list := []string{"code", "name", "platform_id", "desc", "paypal_account", "manager", "status_id"}
 		affected, err = db_session.Id(shop_account.Id).Cols(update_col_list...).Update(&shop_account)
 		core.HandleError(err)

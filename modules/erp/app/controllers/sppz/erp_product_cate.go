@@ -150,7 +150,7 @@ func (c ErpProductCate) Save() revel.Result {
 
 	var affected int64
 	if detail_form.IsCreate() {
-		name_count, err := db_session.Where("name = ?", product_cate.Name).Count(&product_cate)
+		name_count, err := db_session.Where("name = ?", product_cate.Name).Count(new(models.ProductCateInfo))
 		core.HandleError(err)
 		if name_count != 0 {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，名称已存在！" })
@@ -164,7 +164,7 @@ func (c ErpProductCate) Save() revel.Result {
 		// 插入操作日志
 		c.insert_product_cate_log(&product_cate, "插入数据", c.DbSession, c.Session)
 	} else {
-		name_count, err := db_session.Where("id <> ? and name = ?", product_cate.Id, product_cate.Name).Count(&product_cate)
+		name_count, err := db_session.Where("id <> ? and name = ?", product_cate.Id, product_cate.Name).Count(new(models.ProductCateInfo))
 		core.HandleError(err)
 		if name_count != 0 {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，名称已存在！" })

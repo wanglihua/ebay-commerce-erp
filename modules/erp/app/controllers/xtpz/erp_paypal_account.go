@@ -155,7 +155,7 @@ func (c ErpPaypalAccount) Save() revel.Result {
 
 	var affected int64
 	if detail_form.IsCreate() {
-		paypal_account_count, err := db_session.Where(fmt.Sprintf("paypal_account = '%s'", paypal_account.PaypalAccount)).Count(&paypal_account)
+		paypal_account_count, err := db_session.Where(fmt.Sprintf("paypal_account = '%s'", paypal_account.PaypalAccount)).Count(new(models.PaypalAccountInfo))
 		if paypal_account_count != 0 {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，账号已存在！"})
 		}
@@ -163,7 +163,7 @@ func (c ErpPaypalAccount) Save() revel.Result {
 		affected, err = db_session.Insert(&paypal_account)
 		core.HandleError(err)
 	} else {
-		paypal_account_count, err := db_session.Where(fmt.Sprintf("id <> %d AND paypal_account = '%s'", paypal_account.Id, paypal_account.PaypalAccount)).Count(&paypal_account)
+		paypal_account_count, err := db_session.Where(fmt.Sprintf("id <> %d AND paypal_account = '%s'", paypal_account.Id, paypal_account.PaypalAccount)).Count(new(models.PaypalAccountInfo))
 		if paypal_account_count != 0 {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，账号已存在！"})
 		}

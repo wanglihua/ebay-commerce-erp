@@ -154,7 +154,7 @@ func (c ErpSalesManager) Save() revel.Result {
 	var affected int64
 	if detail_form.IsCreate() {
 		for _, product_id := range detail_form.ProductIdList {
-			sales_manager_entry_count, err := db_session.Where("shop_id = ? and product_id = ? and user_id = ?", sales_manager.ShopId, product_id, sales_manager.UserId).Count(&sales_manager)
+			sales_manager_entry_count, err := db_session.Where("shop_id = ? and product_id = ? and user_id = ?", sales_manager.ShopId, product_id, sales_manager.UserId).Count(new(models.SalesManagerInfo))
 			core.HandleError(err)
 			if sales_manager_entry_count != 0 {
 				panic(errors.New("保存失败，店铺、商品、销售已存在！")) // 用 panic 而不是用下面的原来的return json success false的方式,是因为这样可以让事务回滚, 让前面插入的数据取消
@@ -171,7 +171,7 @@ func (c ErpSalesManager) Save() revel.Result {
 		}
 	} else {
 		// 不能更新, 只能插入和删除数据, 所以这里的更新实体的代码没用了
-		shopId_count, err := db_session.Where("id <> ? and shop_id = ? and product_id = ? and user_id = ?", sales_manager.Id, sales_manager.ShopId, sales_manager.ProductId, sales_manager.UserId).Count(&sales_manager)
+		shopId_count, err := db_session.Where("id <> ? and shop_id = ? and product_id = ? and user_id = ?", sales_manager.Id, sales_manager.ShopId, sales_manager.ProductId, sales_manager.UserId).Count(new(models.SalesManagerInfo))
 		core.HandleError(err)
 		if shopId_count != 0 {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，店铺、商品、销售已存在！" })

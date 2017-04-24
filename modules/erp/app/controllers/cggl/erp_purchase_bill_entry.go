@@ -2,12 +2,12 @@ package controllers
 
 import (
 	"encoding/json"
+	"fmt"
 	"strconv"
-	"github.com/revel/revel"
 
+	"github.com/revel/revel"
 	"matrix/core"
 	"matrix/modules/erp/models"
-	"fmt"
 )
 
 type ErpPurchaseBillEntry struct {
@@ -184,7 +184,7 @@ func (c ErpPurchaseBillEntry) Save() revel.Result {
 
 	var affected int64
 	if detail_form.IsCreate() {
-		billId_count, err := db_session.Where("bill_id = ? and product_id = ?", purchase_bill_entry.BillId, purchase_bill_entry.ProductId).Count(&purchase_bill_entry)
+		billId_count, err := db_session.Where("bill_id = ? and product_id = ?", purchase_bill_entry.BillId, purchase_bill_entry.ProductId).Count(new(models.PurchaseBillEntryInfo))
 		core.HandleError(err)
 		if billId_count != 0 {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，批次、商品已存在！" })
@@ -195,7 +195,7 @@ func (c ErpPurchaseBillEntry) Save() revel.Result {
 		affected, err = db_session.Insert(&purchase_bill_entry)
 		core.HandleError(err)
 	} else {
-		billId_count, err := db_session.Where("id <> ? and bill_id = ? and product_id = ?", purchase_bill_entry.Id, purchase_bill_entry.BillId, purchase_bill_entry.ProductId).Count(&purchase_bill_entry)
+		billId_count, err := db_session.Where("id <> ? and bill_id = ? and product_id = ?", purchase_bill_entry.Id, purchase_bill_entry.BillId, purchase_bill_entry.ProductId).Count(new(models.PurchaseBillEntryInfo))
 		core.HandleError(err)
 		if billId_count != 0 {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，批次、商品已存在！" })

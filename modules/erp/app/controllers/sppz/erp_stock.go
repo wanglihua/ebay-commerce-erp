@@ -176,7 +176,7 @@ func (c ErpStock) Save() revel.Result {
 
 	var affected int64
 	if detail_form.IsCreate() {
-		name_count, err := db_session.Where("name = ?", stock.Name).Count(&stock)
+		name_count, err := db_session.Where("name = ?", stock.Name).Count(new(models.StockInfo))
 		core.HandleError(err)
 		if name_count != 0 {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，名称已存在！" })
@@ -185,7 +185,7 @@ func (c ErpStock) Save() revel.Result {
 		affected, err = db_session.Insert(&stock)
 		core.HandleError(err)
 	} else {
-		name_count, err := db_session.Where("id <> ? and name = ?", stock.Id, stock.Name).Count(&stock)
+		name_count, err := db_session.Where("id <> ? and name = ?", stock.Id, stock.Name).Count(new(models.StockInfo))
 		core.HandleError(err)
 		if name_count != 0 {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，名称已存在！" })

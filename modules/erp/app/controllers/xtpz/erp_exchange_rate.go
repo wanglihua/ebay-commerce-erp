@@ -147,7 +147,7 @@ func (c ErpExchangeRate) Save() revel.Result {
 
 	var affected int64
 	if detail_form.IsCreate() {
-		currency_rate_count, err := db_session.Where("currency_id = ?", exchange_rate_from_ui.CurrencyId).Count(&exchange_rate_from_ui)
+		currency_rate_count, err := db_session.Where("currency_id = ?", exchange_rate_from_ui.CurrencyId).Count(new(models.ExchangeRateInfo))
 		core.HandleError(err)
 		if currency_rate_count != 0 {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，货币汇率已存在！" })
@@ -169,7 +169,7 @@ func (c ErpExchangeRate) Save() revel.Result {
 		core.HandleError(err)
 
 	} else {
-		currency_rate_count, err := db_session.Where("id <> ? and currency_id = ?", exchange_rate_from_ui.Id, exchange_rate_from_ui.CurrencyId).Count(&exchange_rate_from_ui)
+		currency_rate_count, err := db_session.Where("id <> ? and currency_id = ?", exchange_rate_from_ui.Id, exchange_rate_from_ui.CurrencyId).Count(new(models.ExchangeRateInfo))
 		core.HandleError(err)
 		if currency_rate_count != 0 {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，货币汇率已存在！" })
@@ -204,7 +204,7 @@ func (c ErpExchangeRate) Save() revel.Result {
 
 func (c ErpExchangeRate) Delete() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.XTPZ_EXCHANGE_RATE, c.Session)
-	
+
 	db_session := c.DbSession
 
 	exchange_rate_id_list := make([]int64, 0)

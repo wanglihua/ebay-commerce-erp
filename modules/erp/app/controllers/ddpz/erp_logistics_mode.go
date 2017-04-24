@@ -169,7 +169,7 @@ func (c ErpLogisticsMode) Save() revel.Result {
 
 	var affected int64
 	if detail_form.IsCreate() {
-		name_count, err := db_session.Where(fmt.Sprintf("company_id = %d AND name = '%s'", logistics_mode.CompanyId, logistics_mode.Name)).Count(&logistics_mode)
+		name_count, err := db_session.Where(fmt.Sprintf("company_id = %d AND name = '%s'", logistics_mode.CompanyId, logistics_mode.Name)).Count(new(models.LogisticsModeInfo))
 		core.HandleError(err)
 		if name_count != 0 {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，名称已存在！" })
@@ -178,7 +178,7 @@ func (c ErpLogisticsMode) Save() revel.Result {
 		affected, err = db_session.Insert(&logistics_mode)
 		core.HandleError(err)
 	} else {
-		name_count, err := db_session.Where(fmt.Sprintf("id <> %d AND company_id = %d AND name = '%s'", logistics_mode.Id, logistics_mode.CompanyId, logistics_mode.Name)).Count(&logistics_mode)
+		name_count, err := db_session.Where(fmt.Sprintf("id <> %d AND company_id = %d AND name = '%s'", logistics_mode.Id, logistics_mode.CompanyId, logistics_mode.Name)).Count(new(models.LogisticsModeInfo))
 		core.HandleError(err)
 		if name_count != 0 {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，名称已存在！" })
