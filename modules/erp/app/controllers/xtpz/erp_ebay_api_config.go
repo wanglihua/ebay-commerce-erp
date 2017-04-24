@@ -7,6 +7,8 @@ import (
 
 	"github.com/revel/revel"
 	"matrix/core"
+	"matrix/modules/auth/pass_res"
+	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/erp/models"
 )
 
@@ -34,6 +36,8 @@ func (f *EBayAPIConfigDetailForm) Valid(validation *revel.Validation) bool {
 }
 
 func (c ErpEBayAPIConfig) DetailData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.XTPZ_SHOP_ACCOUNT, c.Session)
+
 	db_session := c.DbSession
 
 	var shop_id int64
@@ -77,6 +81,8 @@ WHERE sa.id = %d`, shop_id)
 }
 
 func (c ErpEBayAPIConfig) Save() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.XTPZ_SHOP_ACCOUNT, c.Session)
+
 	db_session := c.DbSession
 
 	var detail_form EBayAPIConfigDetailForm
@@ -106,6 +112,8 @@ func (c ErpEBayAPIConfig) Save() revel.Result {
 }
 
 func (c ErpEBayAPIConfig) Delete() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.XTPZ_SHOP_ACCOUNT, c.Session)
+
 	db_session := c.DbSession
 
 	var config_id int64
