@@ -6,6 +6,7 @@ import (
 
 type ShopAccountInfo struct {
 	Id            int64           `xorm:"bigint notnull pk autoincr 'id'" json:"id"`
+	Code          string          `xorm:"nvarchar(200) notnull index 'code'" json:"code" smith:"verbose_name=编号,min=2,max=100"`
 	Name          string          `xorm:"nvarchar(200) notnull index 'name'" json:"name" smith:"verbose_name=名称,min=2,max=100"`
 	PlatformId    int64           `xorm:"int64 notnull 'platform_id'" json:"platform_id" smith:"verbose_name=平台"`
 	Desc          core.NullString `xorm:"nvarchar(500) 'desc'" json:"desc" smith:"verbose_name=描述,max=500"`

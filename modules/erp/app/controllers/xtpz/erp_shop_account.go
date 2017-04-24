@@ -156,6 +156,8 @@ func (c ErpShopAccount) Save() revel.Result {
 
 	shop_account := detail_form.ShopAccount
 
+	//todo 检测 唯一性 编号，名称等等
+
 	var affected int64
 	if detail_form.IsCreate() {
 		affected, err = db_session.Insert(&shop_account)
