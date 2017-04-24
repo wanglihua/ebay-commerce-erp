@@ -128,11 +128,8 @@ func (c ErpEBayAPIConfig) Delete() revel.Result {
 	var config_id int64
 	c.Params.Bind(&config_id, "id")
 
-	_, err := db_session.Id(config_id).Delete(new(models.EBayAPIConfigInfo))
-	core.HandleError(err)
-
 	var ebay_api_config models.EBayAPIConfigInfo
-	_, err = db_session.Id(config_id).Get(&ebay_api_config)
+	_, err := db_session.Id(config_id).Get(&ebay_api_config)
 	core.HandleError(err)
 
 	var shop_account models.ShopAccountInfo
@@ -140,6 +137,9 @@ func (c ErpEBayAPIConfig) Delete() revel.Result {
 	core.HandleError(err)
 
 	shop_account_log_service.Insert_shop_account_api_log(&shop_account, core.Db_operation_types.Delete, db_session, c.Session)
+
+	_, err = db_session.Id(config_id).Delete(new(models.EBayAPIConfigInfo))
+	core.HandleError(err)
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: "API配置数据删除成功!"})
 }
