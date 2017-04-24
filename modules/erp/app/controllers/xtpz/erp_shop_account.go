@@ -163,7 +163,7 @@ func (c ErpShopAccount) Save() revel.Result {
 		affected, err = db_session.Insert(&shop_account)
 		core.HandleError(err)
 	} else {
-		update_col_list := []string{"name", "platform_id", "desc", "paypal_account", "manager", "status_id"}
+		update_col_list := []string{"code", "name", "platform_id", "desc", "paypal_account", "manager", "status_id"}
 		affected, err = db_session.Id(shop_account.Id).Cols(update_col_list...).Update(&shop_account)
 		core.HandleError(err)
 

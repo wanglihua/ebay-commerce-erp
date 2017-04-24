@@ -53,6 +53,18 @@
                             <form class="form-horizontal" role="form" id="shopAccountDetailForm">
                                 <input id="shop_account_id" name="detail.shop_account.id" type="hidden" v-model.number="detail.shop_account.id"/>
                                 <input id="shop_account_version" name="detail.shop_account.version" type="hidden" v-model.number="detail.shop_account.version"/>
+
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <label for="code" class="col-xs-2 control-label">名称</label>
+                                            <div class="col-xs-10">
+                                                <input id="code" name="detail.shop_account.code" type="text" class="input-sm form-control" v-model="detail.shop_account.code"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
@@ -265,6 +277,7 @@
                                 return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
                             }
                         },
+                        {"mDataProp": "a.code", "title": "编号", "bSearchable": true, "width": 100},
                         {"mDataProp": "a.name", "title": "名称", "bSearchable": true, "width": 150},
                         {"mDataProp": "p.name", "title": "平台", "bSearchable": true, "width": 150},
                         {"mDataProp": "a.desc", "title": "描述", "bSearchable": true},
@@ -311,6 +324,9 @@
                 showMask("提交中...");
                 var form = $("#shopAccountDetailForm");
                 var valid = validate(form, {
+                    'detail.shop_account.code': {
+                        required: true, minlength: 2, maxlength: 10
+                    },
                     'detail.shop_account.name': {
                         required: true, minlength: 2, maxlength: 100
                     },
