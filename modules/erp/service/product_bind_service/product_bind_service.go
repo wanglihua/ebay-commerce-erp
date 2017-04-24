@@ -13,6 +13,10 @@ import (
 // 暂时先写在这里
 // bind_produt_list: bind_product_expression
 func Check_product_bind_valid(bind_product_list string, db_session *xorm.Session) (result bool, err error) {
+	if strings.TrimSpace(bind_product_list) == "" {
+		return false, errors.New("绑定列表为空！")
+	}
+
 	if strings.Index(bind_product_list, "，") != -1 { //中文的逗号，看看有没有输入错误
 		return false, errors.New("多个商品时不能用中文的逗号（，）分割。")
 	}
