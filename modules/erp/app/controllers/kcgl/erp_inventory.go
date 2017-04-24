@@ -2,9 +2,9 @@ package controllers
 
 import (
 	"encoding/json"
-	"github.com/revel/revel"
 	"strconv"
 
+	"github.com/revel/revel"
 	"matrix/core"
 	"matrix/modules/erp/models"
 )
@@ -33,15 +33,15 @@ func (c ErpInventory) ListData() revel.Result {
 		SELECT ivt.*, st.*, loc.*, prd.*
 		FROM erp_inventory ivt
 		    INNER JOIN erp_stock st ON ivt.stock_id = st.id
-		    INNER JOIN erp_storage_loc loc ON ivt.storage_loc_id = loc.id
+		    LEFT JOIN erp_storage_loc loc ON ivt.storage_loc_id = loc.id
 		    INNER JOIN erp_product prd ON ivt.product_id = prd.id
 	*/
 
 	query := db_session.
-		Select("ivt.*, st.*, loc.*, prd.*").
+	Select("ivt.*, st.*, loc.*, prd.*").
 		Table("erp_inventory").Alias("ivt").
 		Join("INNER", []string{"erp_stock", "st"}, "ivt.stock_id = st.id").
-		Join("INNER", []string{"erp_storage_loc", "loc"}, "ivt.storage_loc_id = loc.id").
+		Join("LEFT", []string{"erp_storage_loc", "loc"}, "ivt.storage_loc_id = loc.id").
 		Join("INNER", []string{"erp_product", "prd"}, "ivt.product_id = prd.id").
 		Where(filter)
 
