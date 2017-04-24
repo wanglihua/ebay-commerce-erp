@@ -8,10 +8,12 @@ import (
 )
 
 // 插入店铺账户日志
-func Insert_shop_account_log(operation_type core.Db_operation_type, db_session *xorm.Session, web_session revel.Session) {
+func Insert_shop_account_log(shop_account *models.ShopAccountInfo, operation_type core.Db_operation_type, db_session *xorm.Session, web_session revel.Session) {
 	var shop_log models.ShopAccountLogInfo
 
 	login_user := core.GetLoginUser(web_session)
+	shop_log.ShopId = shop_account.Id
+	shop_log.ShopCode = shop_account.Code
 	shop_log.UserId = login_user.UserId
 	shop_log.LoginName = login_user.LoginName
 
@@ -28,10 +30,12 @@ func Insert_shop_account_log(operation_type core.Db_operation_type, db_session *
 }
 
 // 插入店铺账户API的日志
-func Insert_shop_account_api_log(operation_type core.Db_operation_type, db_session *xorm.Session, web_session revel.Session) {
+func Insert_shop_account_api_log(shop_account *models.ShopAccountInfo, operation_type core.Db_operation_type, db_session *xorm.Session, web_session revel.Session) {
 	var shop_log models.ShopAccountLogInfo
 
 	login_user := core.GetLoginUser(web_session)
+	shop_log.ShopId = shop_account.Id
+	shop_log.ShopCode = shop_account.Code
 	shop_log.UserId = login_user.UserId
 	shop_log.LoginName = login_user.LoginName
 

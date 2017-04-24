@@ -180,7 +180,7 @@ func (c ErpShopAccount) Save() revel.Result {
 		affected, err = db_session.Insert(&shop_account)
 		core.HandleError(err)
 
-		shop_account_log_service.Insert_shop_account_log(core.Db_operation_types.Insert, db_session, c.Session)
+		shop_account_log_service.Insert_shop_account_log(&shop_account, core.Db_operation_types.Insert, db_session, c.Session)
 	} else {
 		code_count, err := db_session.Where("id <> ? AND code = ?", shop_account.Id, shop_account.Code).Count(new(models.ShopAccountInfo))
 		core.HandleError(err)
@@ -204,7 +204,7 @@ func (c ErpShopAccount) Save() revel.Result {
 		affected, err = db_session.Id(shop_account.Id).Cols(update_col_list...).Update(&shop_account)
 		core.HandleError(err)
 
-		shop_account_log_service.Insert_shop_account_log(core.Db_operation_types.Update, db_session, c.Session)
+		shop_account_log_service.Insert_shop_account_log(&shop_account, core.Db_operation_types.Update, db_session, c.Session)
 
 		if affected == 0 {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！"})
@@ -230,7 +230,13 @@ func (c ErpShopAccount) Delete() revel.Result {
 	_, err = db_session.In("id", shop_account_id_list).Delete(new(models.ShopAccountInfo))
 	core.HandleError(err)
 
-	shop_account_log_service.Insert_shop_account_log(core.Db_operation_types.Delete, db_session, c.Session)
+	var shop_account_list = make([]models.ShopAccountInfo, 0)
+	err = db_session.In("id", shop_account_id_list).Find(&shop_account_list)
+	core.HandleError(err)
+
+	for _, shop_account := range shop_account_list {
+		shop_account_log_service.Insert_shop_account_log(&shop_account, core.Db_operation_types.Delete, db_session, c.Session)
+	}
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: "删除成功!"})
 }

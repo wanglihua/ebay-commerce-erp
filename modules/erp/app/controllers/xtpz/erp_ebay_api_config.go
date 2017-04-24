@@ -10,6 +10,7 @@ import (
 	"matrix/modules/auth/pass_res"
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/erp/models"
+	"matrix/modules/erp/service/shop_account_log_service"
 )
 
 type ErpEBayAPIConfig struct {
@@ -95,13 +96,21 @@ func (c ErpEBayAPIConfig) Save() revel.Result {
 
 	ebay_api_config := detail_form.EBayAPIConfig
 
+	var shop_account models.ShopAccountInfo
+	_, err = db_session.Id(ebay_api_config.ShopId).Get(&shop_account)
+	core.HandleError(err)
+
 	var affected int64
 	if detail_form.IsCreate() {
 		affected, err = db_session.Insert(&ebay_api_config)
 		core.HandleError(err)
+
+		shop_account_log_service.Insert_shop_account_api_log(&shop_account, core.Db_operation_types.Insert, db_session, c.Session)
 	} else {
 		affected, err = db_session.Id(ebay_api_config.Id).Update(&ebay_api_config)
 		core.HandleError(err)
+
+		shop_account_log_service.Insert_shop_account_api_log(&shop_account, core.Db_operation_types.Update, db_session, c.Session)
 
 		if affected == 0 {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！" })
@@ -121,6 +130,16 @@ func (c ErpEBayAPIConfig) Delete() revel.Result {
 
 	_, err := db_session.Id(config_id).Delete(new(models.EBayAPIConfigInfo))
 	core.HandleError(err)
+
+	var ebay_api_config models.EBayAPIConfigInfo
+	_, err = db_session.Id(config_id).Get(&ebay_api_config)
+	core.HandleError(err)
+
+	var shop_account models.ShopAccountInfo
+	_, err = db_session.Id(ebay_api_config.ShopId).Get(&shop_account)
+	core.HandleError(err)
+
+	shop_account_log_service.Insert_shop_account_api_log(&shop_account, core.Db_operation_types.Delete, db_session, c.Session)
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: "API配置数据删除成功!"})
 }
