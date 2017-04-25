@@ -10,6 +10,12 @@ POST /erp/stock/data/detail                    ErpStock.DetailData
 POST /erp/stock/save                           ErpStock.Save
 POST /erp/stock/delete                         ErpStock.Delete
 
+GET  /erp/stock/pick/crew                      ErpStockPickCrew.Index
+POST /erp/stock/pick/crew/data/list            ErpStockPickCrew.ListData
+POST /erp/stock/pick/crew/data/detail          ErpStockPickCrew.DetailData
+POST /erp/stock/pick/crew/save                 ErpStockPickCrew.Save
+POST /erp/stock/pick/crew/delete               ErpStockPickCrew.Delete
+
 GET  /erp/storage/loc                          ErpStorageLoc.Index
 POST /erp/storage/loc/data/list                ErpStorageLoc.ListData
 POST /erp/storage/loc/data/detail              ErpStorageLoc.DetailData

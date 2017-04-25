@@ -25,6 +25,10 @@
                         <i class="ace-icon fa fa-trash-o"></i>
                         删除
                     </button>
+                    <button class="btn btn-info btn-sm" @click="showStockPickCrew()">
+                        <i class="ace-icon fa fa-users"></i>
+                        仓库拣货人员
+                    </button>
                 </div>
                 <div>
                     <table id="stockList" class="table table-striped table-bordered table-hover"></table>
@@ -317,6 +321,9 @@
         methods: {
             reloadList: function () {
                 reloadList('#stockList');
+            },
+            showStockPickCrew: function () {
+                window.location.href = "/erp/stock/pick/crew";
             },
             showStockDetail: function (id) {
                 showMask("加载中...");

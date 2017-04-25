@@ -321,7 +321,8 @@ func (c ErpInventory) Import() revel.Result {
 		inventory.StockId = stock_id
 		inventory.StorageLocId = storage_loc_id
 		inventory.ProductId = product_id
-		inventory.Qty += inventory_import.Qty // 如果是插入的话， 开始时 inventory.Qty == 0
+		// inventory.Qty += inventory_import.Qty // 如果是插入的话， 开始时 inventory.Qty
+		inventory.Qty = inventory_import.Qty // 这里采用覆盖原来库存的方式
 
 		if has == false {
 			// 插入
