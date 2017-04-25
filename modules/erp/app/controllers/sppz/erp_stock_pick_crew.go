@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/revel/revel"
 	"matrix/core"
@@ -38,6 +39,14 @@ func (c ErpStockPickCrew) ListData() revel.Result {
 	var stock_id_query int64
 	c.Params.Bind(&stock_id_query, "stock_id_query")
 
+	var login_name_query string
+	c.Params.Bind(&login_name_query, "login_name_query")
+	login_name_query = strings.TrimSpace(login_name_query)
+
+	var nick_name_query string
+	c.Params.Bind(&nick_name_query, "nick_name_query")
+	nick_name_query = strings.TrimSpace(nick_name_query)
+
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
 	type stock_pick_crew_view_item_t struct {
@@ -51,7 +60,7 @@ SELECT spc.*, s.*, u.*
 FROM erp_stock_pick_crew spc
     INNER JOIN erp_stock s ON s.id = spc.stock_id
     INNER JOIN auth_user u ON u.id = spc.user_id
-WHERE spc.stock_id = 0
+WHERE spc.stock_id = 0 AND u.login_name LIKE '%abc%' AND u.nick_name LIKE '%abc%'
 	 */
 
 	var sb = core.NewSqlBuilder()
@@ -63,6 +72,14 @@ WHERE spc.stock_id = 0
 
 	if stock_id_query != 0 {
 		filter = core.SqlAnd(filter, fmt.Sprintf("spc.stock_id = %d", stock_id_query))
+	}
+
+	if login_name_query != "" {
+		filter = core.SqlAnd(filter, fmt.Sprintf("u.login_name LIKE '%%%s%%'", login_name_query))
+	}
+
+	if nick_name_query != "" {
+		filter = core.SqlAnd(filter, fmt.Sprintf("u.nick_name LIKE '%%%s%%'", nick_name_query))
 	}
 
 	sb.Where(filter)

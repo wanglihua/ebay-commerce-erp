@@ -27,6 +27,26 @@
                         删除
                     </button>
                 </div>
+                <div class="row" style="margin-top: 20px;margin-bottom: 20px;">
+                    <div id="query" class="col-xs-12 query" style="line-height: 28px;">
+                        <div class="col-xs-12">
+                            <label for="stock_id_query" class="control-label no-padding-right">仓库</label>
+                            <select id="stock_id_query" name="page.stock_id_query" v-model.number="page.stock_id_query" style="width: 120px;">
+                                <option value="0">-仓库-</option>
+                                <template v-for="stock in page.stock_list">
+                                    <option :value="stock.id">{{stock.name}}</option>
+                                </template>
+                            </select>
+                            <label for="login_name_query" class="control-label no-padding-right">工号</label>
+                            <input id="login_name_query" name="login_name_query" v-model="page.login_name_query" style="width: 120px;height:30px;" placeholder="工号"/>
+                            <label for="nick_name_query" class="control-label no-padding-right">用户名</label>
+                            <input id="nick_name_query" name="nick_name_query" v-model="page.nick_name_query" style="width: 120px;height:30px;" placeholder="用户名"/>
+                            <button class="btn btn-mini btn-primary" style="margin-bottom:3px;height: 30px;" @click="refreshList()">
+                                &nbsp;<i class="ace-icon fa fa-search"></i>查&nbsp;询&nbsp;
+                            </button>
+                        </div>
+                    </div>
+                </div>
                 <div>
                     <table id="stockPickCrewList" class="table table-striped table-bordered table-hover"></table>
                 </div>
@@ -99,11 +119,33 @@
     var vm = new Vue({
         el: "#page",
         data: {
+            "page": {
+                "stock_id_query": 0,
+                "stock_list": [],
+                "login_name_query": "",
+                "nick_name_query": ""
+            },
             "detail": {
                 "stock_pick_crew": {}
             }
         },
         mounted: function () {
+            var this_vm = this;
+
+            // 请求页面数据
+            $.ajax({
+                    url: '{%url "ErpStockPickCrew.PageData" %}',
+                    type: "POST",
+                    success: function (result) {
+                        if (result.success == false) {
+                            $.msg.error(result.message);
+                            return;
+                        }
+                        vm.page = result;
+                    }
+                }
+            );
+
             initDataTable(
                 '#stockPickCrewList',
                 {
@@ -127,7 +169,32 @@
                         {"mDataProp": "is_manager", "title": "是否管理员", "bSearchable": false},
                         {"mDataProp": "create_time", "title": "创建时间", "bSearchable": false, "width": 120},
                         {"mDataProp": "update_time", "title": "修改时间", "bSearchable": false, "width": 120}
-                    ]
+                    ],
+                    "fnServerData": function (sSource, aoData, fnCallback) {
+                        showMask("数据加载中，请稍候");
+
+                        aoData.push({'name': 'stock_id_query', 'value': this_vm.page.stock_id_query});
+                        aoData.push({'name': 'login_name_query', 'value': this_vm.page.login_name_query});
+                        aoData.push({'name': 'nick_name_query', 'value': this_vm.page.nick_name_query});
+
+                        //query_criteria_value
+
+                        $.ajax({
+                            "dataType": 'json',
+                            "url": sSource,
+                            "data": aoData,
+                            "success": function (data) {
+                                hideMask();
+
+                                if (data.success == false) {
+                                    $.msg.error(data.message);
+                                    return;
+                                }
+
+                                fnCallback(data);
+                            }
+                        });
+                    }
                 }
             );
 
@@ -139,6 +206,9 @@
         methods: {
             reloadList: function () {
                 reloadList('#stockPickCrewList');
+            },
+            refreshList: function () {
+                refreshList("#stockPickCrewList");
             },
             showStockPickCrewDetail: function (id) {
                 showMask("加载中...");
