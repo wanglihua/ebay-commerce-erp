@@ -56,9 +56,9 @@ func (c ErpStockPickCrew) ListData() revel.Result {
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
 	type stock_pick_crew_view_item_t struct {
-		models.StockPickCrewInfo  `json:"spc"`
-		models.StockInfo          `json:"s"`
-		auth_models.UserInfo      `json:"u"`
+		models.StockPickCrewInfo  `xorm:"extends" json:"spc"`
+		models.StockInfo          `xorm:"extends" json:"s"`
+		auth_models.UserInfo      `xorm:"extends" json:"u"`
 	}
 
 	/*
@@ -121,6 +121,7 @@ WHERE spc.stock_id = 0 AND u.login_name LIKE '%abc%' AND u.nick_name LIKE '%abc%
 type StockPickCrewDetailForm struct {
 	StockPickCrew models.StockPickCrewInfo  `json:"stock_pick_crew"`
 	StockList     []models.StockInfo        `json:"stock_list"`
+	UserLoginName string                    `json:"user_login_name"`
 }
 
 func (f *StockPickCrewDetailForm) IsCreate() bool {
@@ -129,6 +130,11 @@ func (f *StockPickCrewDetailForm) IsCreate() bool {
 
 func (f *StockPickCrewDetailForm) Valid(validation *revel.Validation) bool {
 	validation.Required(f.StockPickCrew.StockId).Message("仓库不能为空！")
+
+	if f.StockPickCrew.StockId == 0 {
+		validation.Error("请选择仓库！");
+	}
+
 	validation.Required(f.StockPickCrew.UserId).Message("用户不能为空！")
 	validation.Required(f.StockPickCrew.IsManager).Message("是否管理员不能为空！")
 
@@ -141,20 +147,32 @@ func (c ErpStockPickCrew) DetailData() revel.Result {
 	var stock_pick_crew_id int64
 	c.Params.Bind(&stock_pick_crew_id, "id")
 
+	var detail_form StockPickCrewDetailForm
+
 	var stock_pick_crew models.StockPickCrewInfo
 	if stock_pick_crew_id != 0 {
 		has, err := db_session.Id(stock_pick_crew_id).Get(&stock_pick_crew)
 		core.HandleError(err)
+
 		if has == false {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "指定的仓库拣货人员不存在！"})
 		}
+
+		var user_id = stock_pick_crew.UserId
+		var user auth_models.UserInfo
+		_, err = db_session.Id(user_id).Get(&user)
+		core.HandleError(err)
+
+		detail_form.UserLoginName = user.LoginName
+
+	} else {
+		stock_pick_crew.IsManager = -1 // 否，不是管理员
 	}
 
 	var stock_list = make([]models.StockInfo, 0)
 	err := db_session.Find(&stock_list)
 	core.HandleError(err)
 
-	var detail_form StockPickCrewDetailForm
 	detail_form.StockPickCrew = stock_pick_crew
 	detail_form.StockList = stock_list
 
@@ -200,4 +218,53 @@ func (c ErpStockPickCrew) Delete() revel.Result {
 	core.HandleError(err)
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})
+}
+
+func (c ErpStockPickCrew) SelectUserListData() revel.Result {
+	db_session := c.DbSession
+
+	var stock_id int64
+	c.Params.Bind(&stock_id, "stock_id")
+
+	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
+
+	/*
+SELECT u.*
+FROM auth_user u
+WHERE u.id NOT IN (SELECT spc.user_id FROM erp_stock_pick_crew spc WHERE spc.stock_id = 0)
+	 */
+
+	var sb = core.NewSqlBuilder()
+	sb.Select("u.*")
+	sb.Count("count(u.id) AS user_count")
+	sb.From("auth_user u")
+
+	if stock_id != 0 {
+		filter = core.SqlAnd(filter, fmt.Sprintf("u.id NOT IN (SELECT spc.user_id FROM erp_stock_pick_crew spc WHERE spc.stock_id = %d", stock_id))
+	}
+
+	sb.Where(filter)
+
+	if order != "" {
+		sb.OrderBy(order)
+	} else {
+		sb.OrderBy("u.id ASC")
+	}
+
+	sb.Limit(offset, limit)
+
+	userList := make([]auth_models.UserInfo, 0, limit)
+	err := db_session.Sql(sb.SqlList()).Find(&userList)
+	core.HandleError(err)
+
+	var user_count struct {
+		Count int64 `xorm:"'user_count'"`
+	}
+	_, err = db_session.Sql(sb.SqlCount()).Get(&user_count)
+	core.HandleError(err)
+
+	return c.RenderJson(core.GridResult{
+		Data:  userList,
+		Total: user_count.Count,
+	})
 }

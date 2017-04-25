@@ -157,7 +157,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-success btn-sm" @click="selectLittleIcon()">
+                    <button type="button" class="btn btn-success btn-sm" onclick="selectLittleIcon()">
                         <i class="ace-icon fa fa-hand-pointer-o"></i>选择
                     </button>
                     <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">
@@ -370,14 +370,15 @@
             },
             showSelectIcon: function () {
                 $('#selectIconDialog').modal(modalOptions);
-            },
-            selectLittleIcon: function () {
-                var icon_file = $('#selectIconList tbody tr>td:first-child input:checkbox:checked').closest("td").find("input.icon-file-data").val();
-                vm.detail.logistics_company.icon_file = icon_file;
-                $('#selectIconDialog').modal("hide");
             }
         }
     });
+
+    function selectLittleIcon() {
+        var icon_file = $('#selectIconList tbody tr>td:first-child input:checkbox:checked').closest("td").find("input.icon-file-data").val();
+        vm.detail.logistics_company.icon_file = icon_file;
+        $('#selectIconDialog').modal("hide");
+    }
 </script>
 {%footer%}
 
