@@ -28,8 +28,11 @@ func (c ErpStockPickCrew) PageData() revel.Result {
 	core.HandleError(err)
 
 	return c.RenderJson(map[string]interface{}{
-		"stock_id_query": 0,
-		"stock_list":     stock_list,
+		"stock_id_query":   0,
+		"stock_list":       stock_list,
+		"login_name_query": "",
+		"nick_name_query":  "",
+		"is_manager_query": 0,
 	})
 }
 
@@ -47,6 +50,9 @@ func (c ErpStockPickCrew) ListData() revel.Result {
 	c.Params.Bind(&nick_name_query, "nick_name_query")
 	nick_name_query = strings.TrimSpace(nick_name_query)
 
+	var is_manager_query int64
+	c.Params.Bind(&is_manager_query, "is_manager_query")
+
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
 	type stock_pick_crew_view_item_t struct {
@@ -60,7 +66,7 @@ SELECT spc.*, s.*, u.*
 FROM erp_stock_pick_crew spc
     INNER JOIN erp_stock s ON s.id = spc.stock_id
     INNER JOIN auth_user u ON u.id = spc.user_id
-WHERE spc.stock_id = 0 AND u.login_name LIKE '%abc%' AND u.nick_name LIKE '%abc%'
+WHERE spc.stock_id = 0 AND u.login_name LIKE '%abc%' AND u.nick_name LIKE '%abc%' AND spc.is_manager = -1
 	 */
 
 	var sb = core.NewSqlBuilder()
@@ -80,6 +86,10 @@ WHERE spc.stock_id = 0 AND u.login_name LIKE '%abc%' AND u.nick_name LIKE '%abc%
 
 	if nick_name_query != "" {
 		filter = core.SqlAnd(filter, fmt.Sprintf("u.nick_name LIKE '%%%s%%'", nick_name_query))
+	}
+
+	if is_manager_query != 0 {
+		filter = core.SqlAnd(filter, fmt.Sprintf("spc.is_manager = %d", is_manager_query))
 	}
 
 	sb.Where(filter)

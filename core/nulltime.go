@@ -26,7 +26,7 @@ func (t *NullDate) Scan(value interface{}) error {
 		t.Valid = true
 		return nil
 	case string:
-		x, err := time.Parse("2006-01-02 15:04:05", s)
+		x, err := time.ParseInLocation("2006-01-02 15:04:05", s, time.Local)
 		if err != nil {
 			return err
 		}
@@ -34,7 +34,7 @@ func (t *NullDate) Scan(value interface{}) error {
 		t.Valid = true
 		return nil
 	case []uint8:
-		x, err := time.Parse("2006-01-02 15:04:05", string(s))
+		x, err := time.ParseInLocation("2006-01-02 15:04:05", string(s), time.Local)
 		if err != nil {
 			return err
 		}
@@ -164,7 +164,7 @@ func (t *NullTime) Scan(value interface{}) error {
 		t.Valid = true
 		return nil
 	case string:
-		x, err := time.Parse("2006-01-02 15:04:05", s)
+		x, err := time.ParseInLocation("2006-01-02 15:04:05", s, time.Local)
 		if err != nil {
 			return err
 		}
@@ -172,7 +172,7 @@ func (t *NullTime) Scan(value interface{}) error {
 		t.Valid = true
 		return nil
 	case []uint8:
-		x, err := time.Parse("2006-01-02 15:04:05", string(s))
+		x, err := time.ParseInLocation("2006-01-02 15:04:05", string(s), time.Local)
 		if err != nil {
 			return err
 		}
@@ -302,7 +302,7 @@ func (t *NullLongTime) Scan(value interface{}) error {
 		t.Valid = true
 		return nil
 	case string:
-		x, err := time.Parse("2006-01-02 15:04:05", s)
+		x, err := time.ParseInLocation("2006-01-02 15:04:05", s, time.Local)
 		if err != nil {
 			return err
 		}
@@ -310,7 +310,7 @@ func (t *NullLongTime) Scan(value interface{}) error {
 		t.Valid = true
 		return nil
 	case []uint8:
-		x, err := time.Parse("2006-01-02 15:04:05", string(s))
+		x, err := time.ParseInLocation("2006-01-02 15:04:05", string(s), time.Local)
 		if err != nil {
 			return err
 		}

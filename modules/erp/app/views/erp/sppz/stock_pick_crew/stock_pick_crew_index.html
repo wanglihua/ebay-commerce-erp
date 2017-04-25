@@ -41,6 +41,12 @@
                             <input id="login_name_query" name="login_name_query" v-model="page.login_name_query" style="width: 120px;height:30px;" placeholder="工号"/>
                             <label for="nick_name_query" class="control-label no-padding-right">用户名</label>
                             <input id="nick_name_query" name="nick_name_query" v-model="page.nick_name_query" style="width: 120px;height:30px;" placeholder="用户名"/>
+                            <label for="is_manager_query" class="control-label no-padding-right">是否管理员</label>
+                            <select id="is_manager_query" name="page.is_manager_query" v-model.number="page.is_manager_query" style="width: 120px;">
+                                <option :value="0">-是否管理员-</option>
+                                <option :value="1">是</option>
+                                <option :value="-1">否</option>
+                            </select>
                             <button class="btn btn-mini btn-primary" style="margin-bottom:3px;height: 30px;" @click="refreshList()">
                                 &nbsp;<i class="ace-icon fa fa-search"></i>查&nbsp;询&nbsp;
                             </button>
@@ -123,7 +129,8 @@
                 "stock_id_query": 0,
                 "stock_list": [],
                 "login_name_query": "",
-                "nick_name_query": ""
+                "nick_name_query": "",
+                "is_manager_query": 0
             },
             "detail": {
                 "stock_pick_crew": {}
@@ -163,10 +170,23 @@
                                 return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
                             }
                         },
-                        {"mDataProp": "s.name", "title": "仓库", "bSearchable": true},
-                        {"mDataProp": "u.login_name", "title": "工号", "bSearchable": true},
-                        {"mDataProp": "u.nick_name", "title": "用户", "bSearchable": true},
-                        {"mDataProp": "is_manager", "title": "是否管理员", "bSearchable": false},
+                        {"mDataProp": "s.name", "title": "仓库", "bSearchable": true, "width": 130},
+                        {"mDataProp": "u.login_name", "title": "工号", "bSearchable": true, "width": 130},
+                        {"mDataProp": "u.nick_name", "title": "用户", "bSearchable": true, "width": 130},
+                        {
+                            "mDataProp": "is_manager", "title": "是否管理员", "bSearchable": false,
+                            "render": function (data, type, row) {
+                                if (data === 1) {
+                                    return "是";
+                                }
+                                else if (data === -1) {
+                                    return "否";
+                                }
+                                else {
+                                    return "";
+                                }
+                            }
+                        },
                         {"mDataProp": "create_time", "title": "创建时间", "bSearchable": false, "width": 120},
                         {"mDataProp": "update_time", "title": "修改时间", "bSearchable": false, "width": 120}
                     ],
@@ -176,6 +196,7 @@
                         aoData.push({'name': 'stock_id_query', 'value': this_vm.page.stock_id_query});
                         aoData.push({'name': 'login_name_query', 'value': this_vm.page.login_name_query});
                         aoData.push({'name': 'nick_name_query', 'value': this_vm.page.nick_name_query});
+                        aoData.push({'name': 'is_manager_query', 'value': this_vm.page.is_manager_query});
 
                         //query_criteria_value
 
