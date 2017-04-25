@@ -121,8 +121,9 @@
                                 return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
                             }
                         },
-                        {"mDataProp": "stock_id", "title": "仓库", "bSearchable": false},
-                        {"mDataProp": "user_id", "title": "用户", "bSearchable": false},
+                        {"mDataProp": "s.name", "title": "仓库", "bSearchable": true},
+                        {"mDataProp": "u.login_name", "title": "工号", "bSearchable": true},
+                        {"mDataProp": "u.nick_name", "title": "用户", "bSearchable": true},
                         {"mDataProp": "is_manager", "title": "是否管理员", "bSearchable": false},
                         {"mDataProp": "create_time", "title": "创建时间", "bSearchable": false, "width": 120},
                         {"mDataProp": "update_time", "title": "修改时间", "bSearchable": false, "width": 120}

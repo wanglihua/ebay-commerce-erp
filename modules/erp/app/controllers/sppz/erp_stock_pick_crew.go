@@ -2,10 +2,12 @@ package controllers
 
 import (
 	"encoding/json"
+	"fmt"
 	"strconv"
-	"github.com/revel/revel"
 
+	"github.com/revel/revel"
 	"matrix/core"
+	auth_models "matrix/modules/auth/models"
 	"matrix/modules/erp/models"
 )
 
@@ -33,29 +35,59 @@ func (c ErpStockPickCrew) PageData() revel.Result {
 func (c ErpStockPickCrew) ListData() revel.Result {
 	db_session := c.DbSession
 
+	var stock_id_query int64
+	c.Params.Bind(&stock_id_query, "stock_id_query")
+
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
-	query := db_session.Where(filter)
 
-	//query extra filter here
-
-	data_query := *query
-	if order != "" {
-		data_query = *data_query.OrderBy(order)
-	} else {
-		data_query = *data_query.Asc("id")
+	type stock_pick_crew_view_item_t struct {
+		models.StockPickCrewInfo  `json:"spc"`
+		models.StockInfo          `json:"s"`
+		auth_models.UserInfo      `json:"u"`
 	}
 
-	stock_pick_crew_list := make([]models.StockPickCrewInfo, 0, limit)
-	err := data_query.Limit(limit, offset).Find(&stock_pick_crew_list)
+	/*
+SELECT spc.*, s.*, u.*
+FROM erp_stock_pick_crew spc
+    INNER JOIN erp_stock s ON s.id = spc.stock_id
+    INNER JOIN auth_user u ON u.id = spc.user_id
+WHERE spc.stock_id = 0
+	 */
+
+	var sb = core.NewSqlBuilder()
+	sb.Select("spc.*, s.*, u.*")
+	sb.Count("count(spc.id) AS stock_pick_crew_count")
+	sb.From(`erp_stock_pick_crew spc
+    INNER JOIN erp_stock s ON s.id = spc.stock_id
+    INNER JOIN auth_user u ON u.id = spc.user_id`)
+
+	if stock_id_query != 0 {
+		filter = core.SqlAnd(filter, fmt.Sprintf("spc.stock_id = %d", stock_id_query))
+	}
+
+	sb.Where(filter)
+
+	if order != "" {
+		sb.OrderBy(order)
+	} else {
+		sb.OrderBy("spc.id ASC")
+	}
+
+	sb.Limit(offset, limit)
+
+	stock_pick_crew_list := make([]stock_pick_crew_view_item_t, 0, limit)
+	err := db_session.Sql(sb.SqlList()).Find(&stock_pick_crew_list)
 	core.HandleError(err)
 
-	count_query := *query
-	count, err := count_query.Count(new(models.StockPickCrewInfo))
+	var stock_pick_view_count struct {
+		Count int64 `xorm:"'stock_pick_crew_count'"`
+	}
+	_, err = db_session.Sql(sb.SqlCount()).Get(&stock_pick_view_count)
 	core.HandleError(err)
 
 	return c.RenderJson(core.GridResult{
 		Data:  stock_pick_crew_list,
-		Total: count,
+		Total: stock_pick_view_count.Count,
 	})
 }
 
