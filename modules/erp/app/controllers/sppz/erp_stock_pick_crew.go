@@ -192,11 +192,48 @@ func (c ErpStockPickCrew) Save() revel.Result {
 
 	stock_pick_crew := detail_form.StockPickCrew
 
+	//todo: 重复数据的判断， stock_id, user_id
+	var stock_pick_crew_count struct {
+		Count int64 `xorm:"'count'"`
+	}
+
 	var affected int64
 	if detail_form.IsCreate() {
+		/*
+		SELECT count(id) AS count FROM erp_stock_pick_crew WHERE stock_id = 0 AND user_id = 0
+		 */
+
+		var sql_count = `SELECT count(id) AS count FROM erp_stock_pick_crew WHERE stock_id = %d AND user_id = %d`
+		sql_count = fmt.Sprintf(sql_count, stock_pick_crew.StockId, stock_pick_crew.UserId)
+		_, err := db_session.Sql(sql_count).Get(&stock_pick_crew_count)
+		core.HandleError(err)
+
+		if stock_pick_crew_count.Count != 0 {
+			return c.RenderJson(map[string]interface{}{
+				"success": false,
+				"message": "该仓库已存在该拣货人员！",
+			})
+		}
+
 		affected, err = db_session.Insert(&stock_pick_crew)
 		core.HandleError(err)
 	} else {
+		/*
+		SELECT count(id) AS count FROM erp_stock_pick_crew WHERE id <> 0 AND stock_id = 0 AND user_id = 0
+		 */
+
+		var sql_count = `SELECT count(id) AS count FROM erp_stock_pick_crew WHERE id <> %d AND stock_id = %d AND user_id = %d`
+		sql_count = fmt.Sprintf(sql_count, stock_pick_crew.Id, stock_pick_crew.StockId, stock_pick_crew.UserId)
+		_, err := db_session.Sql(sql_count).Get(&stock_pick_crew_count)
+		core.HandleError(err)
+
+		if stock_pick_crew_count.Count != 0 {
+			return c.RenderJson(map[string]interface{}{
+				"success": false,
+				"message": "该仓库已存在该拣货人员！",
+			})
+		}
+
 		affected, err = db_session.Id(stock_pick_crew.Id).Update(&stock_pick_crew)
 		core.HandleError(err)
 

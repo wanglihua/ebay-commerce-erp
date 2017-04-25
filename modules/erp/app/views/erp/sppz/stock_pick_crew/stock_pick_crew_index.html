@@ -31,7 +31,7 @@
                     <div id="query" class="col-xs-12 query" style="line-height: 28px;">
                         <div class="col-xs-12">
                             <label for="stock_id_query" class="control-label no-padding-right">仓库</label>
-                            <select id="stock_id_query" name="page.stock_id_query" v-model.number="page.stock_id_query" style="width: 120px;">
+                            <select id="stock_id_query" name="page.stock_id_query" v-model.number="page.stock_id_query" @change="refreshList()" style="width: 120px;">
                                 <option value="0">-仓库-</option>
                                 <template v-for="stock in page.stock_list">
                                     <option :value="stock.id">{{stock.name}}</option>
@@ -113,7 +113,6 @@
                                             <label for="is_manager" class="col-xs-2 control-label">是否管理员</label>
                                             <div class="col-xs-10">
                                                 <select id="is_manager" name="detail.stock_pick_crew.is_manager" class="input-sm form-control" v-model.number="detail.stock_pick_crew.is_manager">
-                                                    <option :value="0">-是否管理员-</option>
                                                     <option :value="1">是</option>
                                                     <option :value="-1">否</option>
                                                 </select>
@@ -283,7 +282,7 @@
                             "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
                             "render": function (data, type, row) {
                                 return '<input type="checkbox" class="ace user_id" value="' + data + '"/><span class="lbl"></span>'
-                                    + '<input type="hidden" class="user_login_name" value="' + row.login_name + '" />';
+                                    + '<input type="hidden" class="user_login_name" value="' + row.u.login_name + '" />';
                             }
                         },
                         {"mDataProp": "u.login_name", "title": "工号", "bSearchable": true},
