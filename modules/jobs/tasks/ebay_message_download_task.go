@@ -172,7 +172,7 @@ WHERE psi.item_id = '%s'`
 				message_in_db.ItemId = message_download.Item.ItemId
 
 				if message_download.CreationDate != "" {
-					creation_date, err := time.Parse("2006-01-02T15:04:05.000Z", message_download.CreationDate)
+					creation_date, err := time.ParseInLocation("2006-01-02T15:04:05.000Z", message_download.CreationDate, time.Local)
 					core.HandleError(err)
 
 					// 转成北京时间
@@ -182,7 +182,7 @@ WHERE psi.item_id = '%s'`
 				}
 
 				if message_download.LastModifiedDate != "" {
-					last_modified_date, err := time.Parse("2006-01-02T15:04:05.000Z", message_download.LastModifiedDate)
+					last_modified_date, err := time.ParseInLocation("2006-01-02T15:04:05.000Z", message_download.LastModifiedDate,time.Local)
 					core.HandleError(err)
 
 					// 转成北京时间

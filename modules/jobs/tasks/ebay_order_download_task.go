@@ -151,7 +151,7 @@ func (t EBayOrderDownloadTask) Run() {
 				update_col_list := []string{"type_id", "ebay_status", "status_id"}
 
 				if order_download.CreatedTime != "" {
-					created_time, err := time.Parse("2006-01-02T15:04:05.000Z", order_download.CreatedTime)
+					created_time, err := time.ParseInLocation("2006-01-02T15:04:05.000Z", order_download.CreatedTime, time.Local)
 					core.HandleError(err)
 
 					// 转成北京时间
@@ -162,7 +162,7 @@ func (t EBayOrderDownloadTask) Run() {
 				}
 
 				if order_download.ModifiedTime != "" {
-					modified_time, err := time.Parse("2006-01-02T15:04:05.000Z", order_download.ModifiedTime)
+					modified_time, err := time.ParseInLocation("2006-01-02T15:04:05.000Z", order_download.ModifiedTime, time.Local)
 					core.HandleError(err)
 
 					// 转成北京时间
@@ -173,7 +173,7 @@ func (t EBayOrderDownloadTask) Run() {
 				}
 
 				if order_download.PaidTime != "" {
-					paid_time, err := time.Parse("2006-01-02T15:04:05.000Z", order_download.PaidTime)
+					paid_time, err := time.ParseInLocation("2006-01-02T15:04:05.000Z", order_download.PaidTime, time.Local)
 					core.HandleError(err)
 
 					// 转成北京时间
@@ -184,7 +184,7 @@ func (t EBayOrderDownloadTask) Run() {
 				}
 
 				if order_download.ShippedTime != "" {
-					shipped_time, err := time.Parse("2006-01-02T15:04:05.000Z", order_download.ShippedTime)
+					shipped_time, err := time.ParseInLocation("2006-01-02T15:04:05.000Z", order_download.ShippedTime, time.Local)
 					core.HandleError(err)
 
 					// 转成北京时间
@@ -413,7 +413,7 @@ func (t EBayOrderDownloadTask) Run() {
 							//todo: 获得商品的成本价，如果这时产品是刚刚下载的，成本价是零，之后如何更新订单的明细里面的成本价格。
 							order_item.ProductCostPrice = product_service.Get_product_cost_price(product_id, db_session)
 
-							transaction_created_date, err := time.Parse("2006-01-02T15:04:05.000Z", transaction.CreatedDate)
+							transaction_created_date, err := time.ParseInLocation("2006-01-02T15:04:05.000Z", transaction.CreatedDate, time.Local)
 							core.HandleError(err)
 
 							transaction_created_date = transaction_created_date.Local()
@@ -466,7 +466,7 @@ func (t EBayOrderDownloadTask) Run() {
 						//todo: 获得商品的成本价，如果这时产品是刚刚下载的，成本价是零，之后如何更新订单的明细里面的成本价格。
 						order_item.ProductCostPrice = product_service.Get_product_cost_price(product_id, db_session)
 
-						transaction_created_date, err := time.Parse("2006-01-02T15:04:05.000Z", transaction.CreatedDate)
+						transaction_created_date, err := time.ParseInLocation("2006-01-02T15:04:05.000Z", transaction.CreatedDate, time.Local)
 						core.HandleError(err)
 
 						transaction_created_date = transaction_created_date.Local()
