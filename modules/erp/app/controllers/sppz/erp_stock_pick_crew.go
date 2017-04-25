@@ -1,4 +1,3 @@
-
 package controllers
 
 import (
@@ -16,6 +15,19 @@ type ErpStockPickCrew struct {
 
 func (c ErpStockPickCrew) Index() revel.Result {
 	return c.RenderTemplate("erp/sppz/stock_pick_crew/stock_pick_crew_index.html")
+}
+
+func (c ErpStockPickCrew) PageData() revel.Result {
+	var db_session = c.DbSession
+
+	var stock_list = make([]models.StockInfo, 0)
+	err := db_session.Find(&stock_list)
+	core.HandleError(err)
+
+	return c.RenderJson(map[string]interface{}{
+		"stock_id_query": 0,
+		"stock_list":     stock_list,
+	})
 }
 
 func (c ErpStockPickCrew) ListData() revel.Result {
@@ -48,14 +60,15 @@ func (c ErpStockPickCrew) ListData() revel.Result {
 }
 
 type StockPickCrewDetailForm struct {
-	StockPickCrew models.StockPickCrewInfo `json:"stock_pick_crew"`
+	StockPickCrew models.StockPickCrewInfo  `json:"stock_pick_crew"`
+	StockList     []models.StockInfo        `json:"stock_list"`
 }
 
 func (f *StockPickCrewDetailForm) IsCreate() bool {
 	return f.StockPickCrew.Id == 0
 }
 
-func (f *StockPickCrewDetailForm) Valid(validation *revel.Validation) bool { 
+func (f *StockPickCrewDetailForm) Valid(validation *revel.Validation) bool {
 	validation.Required(f.StockPickCrew.StockId).Message("仓库不能为空！")
 	validation.Required(f.StockPickCrew.UserId).Message("用户不能为空！")
 	validation.Required(f.StockPickCrew.IsManager).Message("是否管理员不能为空！")
@@ -78,8 +91,13 @@ func (c ErpStockPickCrew) DetailData() revel.Result {
 		}
 	}
 
+	var stock_list = make([]models.StockInfo, 0)
+	err := db_session.Find(&stock_list)
+	core.HandleError(err)
+
 	var detail_form StockPickCrewDetailForm
 	detail_form.StockPickCrew = stock_pick_crew
+	detail_form.StockList = stock_list
 
 	return c.RenderJson(detail_form)
 }
@@ -98,10 +116,10 @@ func (c ErpStockPickCrew) Save() revel.Result {
 	stock_pick_crew := detail_form.StockPickCrew
 
 	var affected int64
-	if detail_form.IsCreate() { 
+	if detail_form.IsCreate() {
 		affected, err = db_session.Insert(&stock_pick_crew)
 		core.HandleError(err)
-	} else { 
+	} else {
 		affected, err = db_session.Id(stock_pick_crew.Id).Update(&stock_pick_crew)
 		core.HandleError(err)
 
@@ -124,4 +142,3 @@ func (c ErpStockPickCrew) Delete() revel.Result {
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})
 }
-

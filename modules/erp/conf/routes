@@ -15,6 +15,7 @@ POST /erp/stock/pick/crew/data/list            ErpStockPickCrew.ListData
 POST /erp/stock/pick/crew/data/detail          ErpStockPickCrew.DetailData
 POST /erp/stock/pick/crew/save                 ErpStockPickCrew.Save
 POST /erp/stock/pick/crew/delete               ErpStockPickCrew.Delete
+POST /erp/stock/pick/crew/data/page            ErpStockPickCrew.PageData
 
 GET  /erp/storage/loc                          ErpStorageLoc.Index
 POST /erp/storage/loc/data/list                ErpStorageLoc.ListData
