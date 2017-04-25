@@ -275,7 +275,7 @@
                     "aaSorting": [[1, "asc"]],
                     "aoColumns": [
                         {
-                            "mDataProp": "id",
+                            "mDataProp": "u.id",
                             "bSearchable": false,
                             "orderable": false,
                             "sClass": "center",
@@ -286,13 +286,34 @@
                                     + '<input type="hidden" class="user_login_name" value="' + row.login_name + '" />';
                             }
                         },
-                        {"mDataProp": "login_name", "title": "工号", "bSearchable": true},
-                        {"mDataProp": "nick_name", "title": "姓名", "bSearchable": true},
-                        {"mDataProp": "sex", "title": "性别", "bSearchable": true},
-                        {"mDataProp": "phone", "title": "联系电话", "bSearchable": true},
-                        {"mDataProp": "create_time", "title": "创建时间", "bSearchable": false, "width": 120},
-                        {"mDataProp": "update_time", "title": "修改时间", "bSearchable": false, "width": 120}
-                    ]
+                        {"mDataProp": "u.login_name", "title": "工号", "bSearchable": true},
+                        {"mDataProp": "u.nick_name", "title": "姓名", "bSearchable": true},
+                        {"mDataProp": "u.sex", "title": "性别", "bSearchable": true},
+                        {"mDataProp": "u.phone", "title": "联系电话", "bSearchable": true},
+                        {"mDataProp": "u.create_time", "title": "创建时间", "bSearchable": false, "width": 120},
+                        {"mDataProp": "u.update_time", "title": "修改时间", "bSearchable": false, "width": 120}
+                    ],
+                    "fnServerData": function (sSource, aoData, fnCallback) {
+                        showMask("数据加载中，请稍候");
+
+                        aoData.push({'name': 'stock_id', 'value': this_vm.detail.stock_pick_crew.stock_id});
+
+                        $.ajax({
+                            "dataType": 'json',
+                            "url": sSource,
+                            "data": aoData,
+                            "success": function (data) {
+                                hideMask();
+
+                                if (data.success == false) {
+                                    $.msg.error(data.message);
+                                    return;
+                                }
+
+                                fnCallback(data);
+                            }
+                        });
+                    }
                 }
             );
 
@@ -401,6 +422,7 @@
                 });
             },
             showSelectUser: function () {
+                refreshList("#userList");
                 $('#selectUserDialog').modal(modalOptions);
             }
         }

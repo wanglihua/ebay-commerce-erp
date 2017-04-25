@@ -228,6 +228,10 @@ func (c ErpStockPickCrew) SelectUserListData() revel.Result {
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
+	type user_view_item_t struct {
+		User auth_models.UserInfo `xorm:"extends" json:"u"`
+	}
+
 	/*
 SELECT u.*
 FROM auth_user u
@@ -240,7 +244,7 @@ WHERE u.id NOT IN (SELECT spc.user_id FROM erp_stock_pick_crew spc WHERE spc.sto
 	sb.From("auth_user u")
 
 	if stock_id != 0 {
-		filter = core.SqlAnd(filter, fmt.Sprintf("u.id NOT IN (SELECT spc.user_id FROM erp_stock_pick_crew spc WHERE spc.stock_id = %d", stock_id))
+		filter = core.SqlAnd(filter, fmt.Sprintf("u.id NOT IN (SELECT spc.user_id FROM erp_stock_pick_crew spc WHERE spc.stock_id = %d)", stock_id))
 	}
 
 	sb.Where(filter)
@@ -253,7 +257,7 @@ WHERE u.id NOT IN (SELECT spc.user_id FROM erp_stock_pick_crew spc WHERE spc.sto
 
 	sb.Limit(offset, limit)
 
-	userList := make([]auth_models.UserInfo, 0, limit)
+	userList := make([]user_view_item_t, 0, limit)
 	err := db_session.Sql(sb.SqlList()).Find(&userList)
 	core.HandleError(err)
 
