@@ -7,6 +7,8 @@ import (
 
 	"github.com/revel/revel"
 	"matrix/core"
+	"matrix/modules/auth/pass_res"
+	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/erp/models"
 )
 
@@ -15,6 +17,8 @@ type ErpStockBillCheckinEntry struct {
 }
 
 func (c ErpStockBillCheckinEntry) Index(bill_id int64) revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_STOCKBILL_CHECKIN, c.Session)
+
 	db_session := c.DbSession
 
 	var stock_bill models.StockBillInfo
@@ -48,6 +52,8 @@ type ErpStockBillCheckinEntryViewItem struct {
 }
 
 func (c ErpStockBillCheckinEntry) ListData(bill_id int64) revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_STOCKBILL_CHECKIN, c.Session)
+
 	db_session := c.DbSession
 
 	filter, order, _, _ := core.GetGridRequestParam(c.Request)
@@ -115,6 +121,8 @@ func (f *StockBillEntryCheckinDetailForm) Valid(validation *revel.Validation) bo
 }
 
 func (c ErpStockBillCheckinEntry) DetailData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_STOCKBILL_CHECKIN, c.Session)
+
 	db_session := c.DbSession
 
 	var stock_bill_entry_id int64
@@ -149,6 +157,8 @@ WHERE sbe.id = ?
 }
 
 func (c ErpStockBillCheckinEntry) Save() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_STOCKBILL_CHECKIN, c.Session)
+
 	db_session := c.DbSession
 
 	var detail_form StockBillEntryCheckinDetailForm
@@ -267,6 +277,8 @@ WHERE sbe.bill_id = %d AND sbe.storage_loc_id = %d AND sbe.product_id = %d
 }
 
 func (c ErpStockBillCheckinEntry) Delete() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_STOCKBILL_CHECKIN, c.Session)
+
 	db_session := c.DbSession
 
 	var entry_id int64

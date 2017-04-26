@@ -2,13 +2,15 @@ package controllers
 
 import (
 	"encoding/json"
-	"github.com/revel/revel"
-	"strconv"
-
-	"matrix/core"
-	"matrix/modules/erp/models"
 	"fmt"
+	"strconv"
 	"strings"
+
+	"github.com/revel/revel"
+	"matrix/core"
+	"matrix/modules/auth/pass_res"
+	"matrix/modules/auth/service/pass_service"
+	"matrix/modules/erp/models"
 )
 
 type ErpInventoryCheckEntry struct {
@@ -16,10 +18,14 @@ type ErpInventoryCheckEntry struct {
 }
 
 func (c ErpInventoryCheckEntry) Index() revel.Result {
+	pass_service.Check_login_user_pass_or([]int64{pass_res.KCGL_INVENTORY_CHECK, pass_res.KCGL_INVENTORY_CHECK_APPROVE}, c.Session)
+
 	return c.RenderTemplate("erp/kcgl/inventory_check_entry/inventory_check_entry_index.html")
 }
 
 func (c ErpInventoryCheckEntry) ListData() revel.Result {
+	pass_service.Check_login_user_pass_or([]int64{pass_res.KCGL_INVENTORY_CHECK, pass_res.KCGL_INVENTORY_CHECK_APPROVE}, c.Session)
+
 	db_session := c.DbSession
 
 	var bill_id int64
@@ -123,6 +129,8 @@ func (f *InventoryCheckEntryDetailForm) Valid(validation *revel.Validation) bool
 }
 
 func (c ErpInventoryCheckEntry) DetailData() revel.Result {
+	pass_service.Check_login_user_pass_or([]int64{pass_res.KCGL_INVENTORY_CHECK, pass_res.KCGL_INVENTORY_CHECK_APPROVE}, c.Session)
+
 	db_session := c.DbSession
 
 	var bill_id int64
@@ -176,6 +184,8 @@ func (c ErpInventoryCheckEntry) DetailData() revel.Result {
 }
 
 func (c ErpInventoryCheckEntry) Save() revel.Result {
+	pass_service.Check_login_user_pass_or([]int64{pass_res.KCGL_INVENTORY_CHECK, pass_res.KCGL_INVENTORY_CHECK_APPROVE}, c.Session)
+
 	db_session := c.DbSession
 
 	var detail_form InventoryCheckEntryDetailForm
@@ -215,6 +225,8 @@ func (c ErpInventoryCheckEntry) Save() revel.Result {
 }
 
 func (c ErpInventoryCheckEntry) Delete() revel.Result {
+	pass_service.Check_login_user_pass_or([]int64{pass_res.KCGL_INVENTORY_CHECK, pass_res.KCGL_INVENTORY_CHECK_APPROVE}, c.Session)
+
 	db_session := c.DbSession
 
 	inventory_check_entry_id_list := make([]int64, 0)
@@ -252,6 +264,8 @@ func (c ErpInventoryCheckEntry) Delete() revel.Result {
 }
 
 func (c ErpInventoryCheckEntry) ProductSelectListData() revel.Result {
+	pass_service.Check_login_user_pass_or([]int64{pass_res.KCGL_INVENTORY_CHECK, pass_res.KCGL_INVENTORY_CHECK_APPROVE}, c.Session)
+
 	db_session := c.DbSession
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)

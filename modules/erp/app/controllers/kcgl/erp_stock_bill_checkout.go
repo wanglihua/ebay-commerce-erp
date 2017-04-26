@@ -9,6 +9,8 @@ import (
 	"github.com/revel/revel"
 	"matrix/core"
 	auth_models "matrix/modules/auth/models"
+	"matrix/modules/auth/pass_res"
+	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/bill_service"
 )
@@ -18,6 +20,8 @@ type ErpStockBillCheckout struct {
 }
 
 func (c ErpStockBillCheckout) Index() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_STOCKBILL_CHECKOUT, c.Session)
+
 	return c.RenderTemplate("erp/kcgl/stock_bill_checkout/stock_bill_checkout_index.html")
 }
 
@@ -29,6 +33,8 @@ type ErpStockBillCheckoutViewItem struct {
 }
 
 func (c ErpStockBillCheckout) ListData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_STOCKBILL_CHECKOUT, c.Session)
+
 	db_session := c.DbSession
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
@@ -109,6 +115,8 @@ func (f *StockBillCheckoutDetailForm) Valid(validation *revel.Validation) bool {
 }
 
 func (c ErpStockBillCheckout) DetailData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_STOCKBILL_CHECKOUT, c.Session)
+
 	db_session := c.DbSession
 
 	var stock_bill_id int64
@@ -138,6 +146,8 @@ func (c ErpStockBillCheckout) DetailData() revel.Result {
 }
 
 func (c ErpStockBillCheckout) Save() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_STOCKBILL_CHECKOUT, c.Session)
+
 	db_session := c.DbSession
 
 	var detail_form StockBillCheckoutDetailForm
@@ -184,6 +194,8 @@ func (c ErpStockBillCheckout) Save() revel.Result {
 }
 
 func (c ErpStockBillCheckout) Submit() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_STOCKBILL_CHECKOUT, c.Session)
+
 	db_session := c.DbSession
 
 	var bill_id int64
@@ -263,6 +275,8 @@ CREATE PROCEDURE erp_stock_bill_checkout_to_inventory_v0001(p_bill_id BIGINT)
 }
 
 func (c ErpStockBillCheckout) Delete() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_STOCKBILL_CHECKOUT, c.Session)
+
 	db_session := c.DbSession
 
 	stock_bill_id_list := make([]int64, 0)

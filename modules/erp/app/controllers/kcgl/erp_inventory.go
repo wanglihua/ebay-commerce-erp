@@ -9,6 +9,8 @@ import (
 	"github.com/revel/revel"
 	"github.com/tealeg/xlsx"
 	"matrix/core"
+	"matrix/modules/auth/pass_res"
+	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/product_service"
 	"matrix/modules/erp/service/stock_service"
@@ -20,6 +22,8 @@ type ErpInventory struct {
 }
 
 func (c ErpInventory) Index() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_INVENTORY, c.Session)
+
 	return c.RenderTemplate("erp/kcgl/inventory/inventory_index.html")
 }
 
@@ -31,6 +35,8 @@ type ErpInventoryViewItem struct {
 }
 
 func (c ErpInventory) ListData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_INVENTORY, c.Session)
+
 	db_session := c.DbSession
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
@@ -95,6 +101,8 @@ func (f *InventoryDetailForm) Valid(validation *revel.Validation) bool {
 }
 
 func (c ErpInventory) DetailData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_INVENTORY, c.Session)
+
 	db_session := c.DbSession
 
 	var inventory_id int64
@@ -116,6 +124,8 @@ func (c ErpInventory) DetailData() revel.Result {
 }
 
 func (c ErpInventory) Save() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_INVENTORY, c.Session)
+
 	db_session := c.DbSession
 
 	var detail_form InventoryDetailForm
@@ -145,6 +155,8 @@ func (c ErpInventory) Save() revel.Result {
 }
 
 func (c ErpInventory) Delete() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_INVENTORY, c.Session)
+
 	db_session := c.DbSession
 
 	inventory_id_list := make([]int64, 0)
@@ -157,6 +169,7 @@ func (c ErpInventory) Delete() revel.Result {
 }
 
 func (c ErpInventory) Import() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_INVENTORY, c.Session)
 
 	db_session := c.DbSession
 

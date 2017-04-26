@@ -1,12 +1,14 @@
 package controllers
 
 import (
-	"github.com/revel/revel"
+	"fmt"
 
+	"github.com/revel/revel"
 	"matrix/core"
 	auth_models "matrix/modules/auth/models"
+	"matrix/modules/auth/pass_res"
+	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/erp/models"
-	"fmt"
 )
 
 type ErpInventoryCheckApprove struct {
@@ -14,6 +16,8 @@ type ErpInventoryCheckApprove struct {
 }
 
 func (c ErpInventoryCheckApprove) Index() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_INVENTORY_CHECK_APPROVE, c.Session)
+
 	return c.RenderTemplate("erp/kcgl/inventory_check_approve/inventory_check_approve_index.html")
 }
 
@@ -26,6 +30,8 @@ type ErpInventoryCheckApproveViewItem struct {
 }
 
 func (c ErpInventoryCheckApprove) ListData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_INVENTORY_CHECK_APPROVE, c.Session)
+
 	db_session := c.DbSession
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
@@ -74,6 +80,8 @@ func (c ErpInventoryCheckApprove) ListData() revel.Result {
 
 // 这里是不是要加个信号量，让检查状态和更新库存的操作互斥
 func (c ErpInventoryCheckApprove) Approve() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_INVENTORY_CHECK_APPROVE, c.Session)
+
 	db_session := c.DbSession
 
 	var check_id int64
@@ -130,6 +138,8 @@ func (c ErpInventoryCheckApprove) Approve() revel.Result {
 }
 
 func (c ErpInventoryCheckApprove) Back() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_INVENTORY_CHECK_APPROVE, c.Session)
+
 	db_session := c.DbSession
 
 	var check_id int64

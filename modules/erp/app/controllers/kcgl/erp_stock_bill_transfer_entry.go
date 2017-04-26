@@ -2,12 +2,14 @@ package controllers
 
 import (
 	"encoding/json"
-	"github.com/revel/revel"
+	"fmt"
 	"strconv"
 
+	"github.com/revel/revel"
 	"matrix/core"
+	"matrix/modules/auth/pass_res"
+	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/erp/models"
-	"fmt"
 )
 
 type ErpStockBillTransferEntry struct {
@@ -15,10 +17,14 @@ type ErpStockBillTransferEntry struct {
 }
 
 func (c ErpStockBillTransferEntry) Index() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_STOCKBILL_TRANSFER, c.Session)
+
 	return c.RenderTemplate("erp/kcgl/stock_bill_transfer_entry/stock_bill_transfer_entry_index.html")
 }
 
 func (c ErpStockBillTransferEntry) ListData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_STOCKBILL_TRANSFER, c.Session)
+
 	db_session := c.DbSession
 
 	var bill_id int64
@@ -117,6 +123,8 @@ func (f *StockBillEntryTransferDetailForm) Valid(validation *revel.Validation) b
 }
 
 func (c ErpStockBillTransferEntry) DetailData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_STOCKBILL_TRANSFER, c.Session)
+
 	db_session := c.DbSession
 
 	var bill_id int64
@@ -170,6 +178,8 @@ func (c ErpStockBillTransferEntry) DetailData() revel.Result {
 }
 
 func (c ErpStockBillTransferEntry) Save() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_STOCKBILL_TRANSFER, c.Session)
+
 	db_session := c.DbSession
 
 	var detail_form StockBillEntryTransferDetailForm
@@ -207,6 +217,8 @@ func (c ErpStockBillTransferEntry) Save() revel.Result {
 }
 
 func (c ErpStockBillTransferEntry) Delete() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_STOCKBILL_TRANSFER, c.Session)
+
 	db_session := c.DbSession
 
 	stock_bill_entry_id_list := make([]int64, 0)
@@ -219,6 +231,8 @@ func (c ErpStockBillTransferEntry) Delete() revel.Result {
 }
 
 func (c ErpStockBillTransferEntry) ProductSelectListData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_STOCKBILL_TRANSFER, c.Session)
+
 	db_session := c.DbSession
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)

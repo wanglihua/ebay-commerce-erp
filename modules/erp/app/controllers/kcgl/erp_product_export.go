@@ -1,14 +1,16 @@
 package controllers
 
 import (
-	"github.com/revel/revel"
-
 	"bytes"
+	"time"
+
 	"github.com/go-xorm/xorm"
+	"github.com/revel/revel"
 	"github.com/tealeg/xlsx"
 	"matrix/core"
+	"matrix/modules/auth/pass_res"
+	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/erp/models"
-	"time"
 )
 
 type ErpProductExport struct {
@@ -16,10 +18,14 @@ type ErpProductExport struct {
 }
 
 func (c ErpProductExport) Index() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_PRODUCT_EXPORT, c.Session)
+
 	return c.RenderTemplate("erp/kcgl/product_export/product_export.html")
 }
 
 func (c ErpProductExport) ListData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_PRODUCT_EXPORT, c.Session)
+
 	db_session := c.DbSession
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
@@ -51,6 +57,8 @@ func (c ErpProductExport) ListData() revel.Result {
 //todo: 做个QueryForm来接收查询参数? ListData() 和 Export() 里面
 
 func (c ErpProductExport) Export() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_PRODUCT_EXPORT, c.Session)
+
 	db_session := c.DbSession
 
 	product_list := make([]models.ProductInfo, 0)

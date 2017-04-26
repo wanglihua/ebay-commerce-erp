@@ -2,13 +2,15 @@ package controllers
 
 import (
 	"encoding/json"
-	"github.com/revel/revel"
 	"strconv"
+	"time"
 
+	"github.com/revel/revel"
 	"matrix/core"
 	auth_models "matrix/modules/auth/models"
+	"matrix/modules/auth/pass_res"
+	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/erp/models"
-	"time"
 	"matrix/modules/erp/service/bill_service"
 )
 
@@ -17,18 +19,22 @@ type ErpInventoryCheck struct {
 }
 
 func (c ErpInventoryCheck) Index() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_INVENTORY_CHECK, c.Session)
+
 	return c.RenderTemplate("erp/kcgl/inventory_check/inventory_check_index.html")
 }
 
 type ErpInventoryCheckViewItem struct {
-	models.InventoryCheckInfo `xorm:"extends" json:"ic"`
-	models.StockInfo          `xorm:"extends" json:"st"`
+	models.InventoryCheckInfo        `xorm:"extends" json:"ic"`
+	models.StockInfo                 `xorm:"extends" json:"st"`
 	CheckUser   auth_models.UserInfo `xorm:"extends" json:"cu"`
 	ApproveUser auth_models.UserInfo `xorm:"extends" json:"au"`
-	models.StatusInfo         `xorm:"extends" json:"ss"`
+	models.StatusInfo                `xorm:"extends" json:"ss"`
 }
 
 func (c ErpInventoryCheck) ListData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_INVENTORY_CHECK, c.Session)
+
 	db_session := c.DbSession
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
@@ -104,6 +110,8 @@ func (f *InventoryCheckDetailForm) Valid(validation *revel.Validation) bool {
 }
 
 func (c ErpInventoryCheck) DetailData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_INVENTORY_CHECK, c.Session)
+
 	db_session := c.DbSession
 
 	var inventory_check_id int64
@@ -133,6 +141,8 @@ func (c ErpInventoryCheck) DetailData() revel.Result {
 }
 
 func (c ErpInventoryCheck) Save() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_INVENTORY_CHECK, c.Session)
+
 	db_session := c.DbSession
 
 	var detail_form InventoryCheckDetailForm
@@ -169,6 +179,8 @@ func (c ErpInventoryCheck) Save() revel.Result {
 }
 
 func (c ErpInventoryCheck) Delete() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_INVENTORY_CHECK, c.Session)
+
 	db_session := c.DbSession
 
 	inventory_check_id_list := make([]int64, 0)
@@ -194,6 +206,8 @@ func (c ErpInventoryCheck) Delete() revel.Result {
 }
 
 func (c ErpInventoryCheck) Submit() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_INVENTORY_CHECK, c.Session)
+
 	db_session := c.DbSession
 
 	var check_id int64
@@ -219,6 +233,8 @@ func (c ErpInventoryCheck) Submit() revel.Result {
 }
 
 func (c ErpInventoryCheck) Back() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_INVENTORY_CHECK, c.Session)
+
 	db_session := c.DbSession
 
 	var check_id int64

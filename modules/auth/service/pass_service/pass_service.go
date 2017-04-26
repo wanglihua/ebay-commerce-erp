@@ -2,6 +2,7 @@ package pass_service
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/go-xorm/xorm"
 	"github.com/revel/revel"
@@ -204,6 +205,35 @@ func Check_login_user_pass(res_id int64, web_session revel.Session) {
 	var login_user = core.GetLoginUser(web_session)
 	if check_user_pass_in_cache(login_user.UserId, res_id) == false {
 		panic(fmt.Sprintf("你没有操作权限 %d，请联系管理员！", res_id))
+	}
+}
+
+// 如果列表里面的 其中一个 资源已经授权，就认为是授权的
+func Check_login_user_pass_or(res_id_list []int64, web_session revel.Session) {
+	var login_user = core.GetLoginUser(web_session)
+	for _, res_id := range res_id_list {
+		if check_user_pass_in_cache(login_user.UserId, res_id) == true {
+			return
+		}
+	}
+
+	var res_id_str_list = core.Int_list_to_str_list(res_id_list)
+	panic(fmt.Sprintf("你没有操作权限 %d，请联系管理员！", strings.Join(res_id_str_list, ",")))
+}
+
+// 如果列表里面的 全部 资源已经授权，就认为是授权的
+func Check_login_user_pass_and(res_id_list []int64, web_session revel.Session) {
+	var login_user = core.GetLoginUser(web_session)
+	var has_pass = true
+	for _, res_id := range res_id_list {
+		if check_user_pass_in_cache(login_user.UserId, res_id) == false {
+			has_pass = false
+		}
+	}
+
+	if has_pass == false {
+		var res_id_str_list = core.Int_list_to_str_list(res_id_list)
+		panic(fmt.Sprintf("你没有操作权限 %d，请联系管理员！", strings.Join(res_id_str_list, ",")))
 	}
 }
 

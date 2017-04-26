@@ -10,6 +10,8 @@ import (
 	"github.com/revel/revel"
 	"matrix/core"
 	auth_models "matrix/modules/auth/models"
+	"matrix/modules/auth/pass_res"
+	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/bill_service"
 )
@@ -19,17 +21,21 @@ type ErpStockBillTransfer struct {
 }
 
 func (c ErpStockBillTransfer) Index() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_STOCKBILL_TRANSFER, c.Session)
+
 	return c.RenderTemplate("erp/kcgl/stock_bill_transfer/stock_bill_transfer_index.html")
 }
 
 type ErpStockBillTransferViewItem struct {
-	models.StockBillInfo `xorm:"extends" json:"sb"`
+	models.StockBillInfo       `xorm:"extends" json:"sb"`
 	SrcStock  models.StockInfo `xorm:"extends" json:"sc"`
 	DestStock models.StockInfo `xorm:"extends" json:"dc"`
-	auth_models.UserInfo `xorm:"extends" json:"u"`
+	auth_models.UserInfo       `xorm:"extends" json:"u"`
 }
 
 func (c ErpStockBillTransfer) ListData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_STOCKBILL_TRANSFER, c.Session)
+
 	db_session := c.DbSession
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
@@ -107,6 +113,8 @@ func (f *StockBillTransferDetailForm) Valid(validation *revel.Validation) bool {
 }
 
 func (c ErpStockBillTransfer) DetailData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_STOCKBILL_TRANSFER, c.Session)
+
 	db_session := c.DbSession
 
 	var stock_bill_id int64
@@ -136,6 +144,8 @@ func (c ErpStockBillTransfer) DetailData() revel.Result {
 }
 
 func (c ErpStockBillTransfer) Save() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_STOCKBILL_TRANSFER, c.Session)
+
 	db_session := c.DbSession
 
 	var detail_form StockBillTransferDetailForm
@@ -183,6 +193,8 @@ func (c ErpStockBillTransfer) Save() revel.Result {
 }
 
 func (c ErpStockBillTransfer) Delete() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_STOCKBILL_TRANSFER, c.Session)
+
 	db_session := c.DbSession
 
 	stock_bill_id_list := make([]int64, 0)

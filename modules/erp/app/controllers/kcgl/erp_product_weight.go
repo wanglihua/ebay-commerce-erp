@@ -9,6 +9,8 @@ import (
 	"github.com/revel/revel"
 	"github.com/tealeg/xlsx"
 	"matrix/core"
+	"matrix/modules/auth/pass_res"
+	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/erp/models"
 )
 
@@ -17,10 +19,14 @@ type ErpProductWeight struct {
 }
 
 func (c ErpProductWeight) Index() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_PRODUCT_IMPORT, c.Session)
+
 	return c.RenderTemplate("erp/kcgl/product_weight/product_weight_index.html")
 }
 
 func (c ErpProductWeight) ListData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_PRODUCT_IMPORT, c.Session)
+
 	db_session := c.DbSession
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
@@ -81,6 +87,8 @@ type product_weight_detail_form_t struct {
 }
 
 func (c ErpProductWeight) DetailData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_PRODUCT_IMPORT, c.Session)
+
 	db_session := c.DbSession
 
 	var product_id int64
@@ -97,6 +105,8 @@ func (c ErpProductWeight) DetailData() revel.Result {
 }
 
 func (c ErpProductWeight) Save() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_PRODUCT_IMPORT, c.Session)
+
 	db_session := c.DbSession
 
 	var detail_form product_weight_detail_form_t
@@ -138,6 +148,8 @@ func (c ErpProductWeight) Save() revel.Result {
 }
 
 func (c ErpProductWeight) Import() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_PRODUCT_IMPORT, c.Session)
+
 	db_session := c.DbSession
 
 	excel_file_bytes := make([]byte, 0)

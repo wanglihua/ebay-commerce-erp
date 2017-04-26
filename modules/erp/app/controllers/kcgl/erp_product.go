@@ -8,6 +8,8 @@ import (
 
 	"github.com/revel/revel"
 	"matrix/core"
+	"matrix/modules/auth/pass_res"
+	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/inventory_service"
 	"matrix/modules/erp/service/message_service"
@@ -22,6 +24,8 @@ type ErpProduct struct {
 }
 
 func (c ErpProduct) Index() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_PRODUCT, c.Session)
+
 	db_session := c.DbSession
 	var product_cate_list = product_cate_service.GetProductCateSelectItemList(db_session)
 	c.RenderArgs["product_cate_list"] = product_cate_list
@@ -38,6 +42,8 @@ type ErpProductViewItem struct {
 }
 
 func (c ErpProduct) ListData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_PRODUCT, c.Session)
+
 	db_session := c.DbSession
 
 	var product_cate_query int64
@@ -170,12 +176,16 @@ func (f *ProductDetailForm) Valid(validation *revel.Validation) bool {
 }
 
 func (c ErpProduct) Detail(product_id int64) revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_PRODUCT, c.Session)
+
 	//return c.RenderText(fmt.Sprintf("product_id %d", product_id))
 	c.RenderArgs["product_id"] = product_id
 	return c.RenderTemplate("erp/kcgl/product/product_detail.html")
 }
 
 func (c ErpProduct) DetailData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_PRODUCT, c.Session)
+
 	db_session := c.DbSession
 
 	var product_id int64
@@ -239,6 +249,8 @@ func (c ErpProduct) DetailData() revel.Result {
 }
 
 func (c ErpProduct) Save() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_PRODUCT, c.Session)
+
 	db_session := c.DbSession
 
 	var detail_form ProductDetailForm
@@ -317,6 +329,8 @@ func (c ErpProduct) Save() revel.Result {
 }
 
 func (c ErpProduct) Delete() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_PRODUCT, c.Session)
+
 	db_session := c.DbSession
 
 	product_id_list := make([]int64, 0)
@@ -341,11 +355,15 @@ func (c ErpProduct) Delete() revel.Result {
 }
 
 func (c ErpProduct) ProductOrderList(product_id int64) revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_PRODUCT, c.Session)
+
 	c.RenderArgs["product_id"] = product_id
 	return c.RenderTemplate("erp/kcgl/product/product_order_list.html")
 }
 
 func (c ErpProduct) ProductOrderListData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_PRODUCT, c.Session)
+
 	db_session := c.DbSession
 
 	var product_id int64
@@ -363,11 +381,15 @@ func (c ErpProduct) ProductOrderListData() revel.Result {
 }
 
 func (c ErpProduct) ProductMessageList(product_id int64) revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_PRODUCT, c.Session)
+
 	c.RenderArgs["product_id"] = product_id
 	return c.RenderTemplate("erp/kcgl/product/product_message_list.html")
 }
 
 func (c ErpProduct) ProductMessageListData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_PRODUCT, c.Session)
+
 	db_session := c.DbSession
 
 	var product_id int64
@@ -385,11 +407,15 @@ func (c ErpProduct) ProductMessageListData() revel.Result {
 }
 
 func (c ErpProduct) ProductLogList(product_id int64) revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_PRODUCT, c.Session)
+
 	c.RenderArgs["product_id"] = product_id
 	return c.RenderTemplate("erp/kcgl/product/product_log_list.html")
 }
 
 func (c ErpProduct) ProductLogListData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_PRODUCT, c.Session)
+
 	db_session := c.DbSession
 
 	var product_id int64
@@ -409,6 +435,8 @@ func (c ErpProduct) ProductLogListData() revel.Result {
 }
 
 func (c ErpProduct) GetProductInfo() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_PRODUCT, c.Session)
+
 	db_session := c.DbSession
 
 	var product_id int64
@@ -424,6 +452,8 @@ func (c ErpProduct) GetProductInfo() revel.Result {
 }
 
 func (c ErpProduct) GetProductListSkus() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_PRODUCT, c.Session)
+
 	db_session := c.DbSession
 
 	var product_id_list = make([]int64, 0)

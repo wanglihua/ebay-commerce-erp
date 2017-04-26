@@ -22,6 +22,8 @@ type ErpProductBind struct {
 }
 
 func (c ErpProductBind) Index() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_PRODUCT_BIND, c.Session)
+
 	return c.RenderTemplate("erp/kcgl/product_bind/product_bind_index.html")
 }
 
@@ -31,6 +33,8 @@ type ErpProductBindViewItem struct {
 }
 
 func (c ErpProductBind) ListData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_PRODUCT_BIND, c.Session)
+
 	db_session := c.DbSession
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
@@ -111,6 +115,8 @@ func (f *ProductBindDetailForm) Valid(validation *revel.Validation) bool {
 }
 
 func (c ErpProductBind) DetailData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_PRODUCT_BIND, c.Session)
+
 	db_session := c.DbSession
 
 	var product_bind_id int64
@@ -137,6 +143,8 @@ func (c ErpProductBind) DetailData() revel.Result {
 }
 
 func (c ErpProductBind) Save() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_PRODUCT_BIND, c.Session)
+
 	db_session := c.DbSession
 
 	var detail_form ProductBindDetailForm
@@ -219,6 +227,8 @@ func (c ErpProductBind) Save() revel.Result {
 }
 
 func (c ErpProductBind) Delete() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_PRODUCT_BIND, c.Session)
+
 	db_session := c.DbSession
 
 	product_bind_id_list := make([]int64, 0)

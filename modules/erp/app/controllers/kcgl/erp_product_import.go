@@ -8,6 +8,8 @@ import (
 	"github.com/revel/revel"
 	"github.com/tealeg/xlsx"
 	"matrix/core"
+	"matrix/modules/auth/pass_res"
+	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/erp/models"
 )
 
@@ -16,10 +18,14 @@ type ErpProductImport struct {
 }
 
 func (c ErpProductImport) Index() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_PRODUCT_IMPORT, c.Session)
+
 	return c.RenderTemplate("erp/kcgl/product_import/product_import.html")
 }
 
 func (c ErpProductImport) ListData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_PRODUCT_IMPORT, c.Session)
+
 	db_session := c.DbSession
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
@@ -52,6 +58,8 @@ func (c ErpProductImport) ListData() revel.Result {
 }
 
 func (c ErpProductImport) Import() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_PRODUCT_IMPORT, c.Session)
+
 	db_session := c.DbSession
 
 	excel_file_bytes := make([]byte, 0)
@@ -159,6 +167,8 @@ func (c ErpProductImport) Import() revel.Result {
 }
 
 func (c ErpProductImport) Confirm() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_PRODUCT_IMPORT, c.Session)
+
 	db_session := c.DbSession
 
 	proc_sql := `
@@ -189,6 +199,8 @@ CREATE PROCEDURE erp_product_import_trans_v0001(p_user_id INT, p_product_status_
 }
 
 func (c ErpProductImport) Clear() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_PRODUCT_IMPORT, c.Session)
+
 	db_session := c.DbSession
 
 	login_user := core.GetLoginUser(c.Session)
