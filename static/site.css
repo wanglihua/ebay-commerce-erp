@@ -383,3 +383,16 @@ div.link_query_list a.selected img.link_icon {
     border: solid 1px gray;
     height: 22px;
 }
+
+div#release_note div.release {
+    border-bottom: 1px solid gray;
+    padding: 5px;
+}
+
+div#release_note div.release h3 {
+    font-size: 16px;
+}
+
+div#release_note div.release p {
+    font-size: 12px;
+}

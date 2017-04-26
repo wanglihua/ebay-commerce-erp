@@ -194,11 +194,16 @@
                         {
                             "mDataProp": "o.created_time", "title": "建单时间", "bSearchable": false, "width": 135,
                             "render": function (data, type, row) {
-                                if (row.o.shipped_time) {
-                                    return '<div class="div_created_time">' + row.o.created_time + '</div><div>' + row.o.shipped_time + '</div>';
-                                } else {
-                                    return '<div class="div_created_time">' + row.o.created_time + '</div><div>----------</div>';
+                                var order_created_time = "----------";
+                                if (row.o.created_time) {
+                                    order_created_time = row.o.created_time;
                                 }
+                                var order_shipped_time = "----------";
+                                if (row.o.shipped_time) {
+                                    order_shipped_time = row.o.shipped_time;
+                                }
+
+                                return '<div class="div_created_time">' + order_created_time + '</div><div>' + order_shipped_time + '</div>';
                             }
                         },
                         {

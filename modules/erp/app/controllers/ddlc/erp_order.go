@@ -164,37 +164,42 @@ func (c ErpOrder) ListData() revel.Result {
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
-	// 不同的仓库拣货人员可以看到不同的订单，管理员除外
-	/*
-SELECT *
-FROM erp_order o
-WHERE o.id IN (
-    SELECT ol.order_id
-    FROM erp_order_logistics ol
-    WHERE ol.stock_id IN (
-        SELECT spc.stock_id
-        FROM erp_stock_pick_crew spc
-        WHERE spc.user_id = 0))
-	 */
-	var login_user = core.GetLoginUser(c.Session)
-	if login_user.IsSuperAdmin == false && login_user.IsAdmin == false {
-		filter = core.SqlAnd(filter, fmt.Sprintf(`o.id IN (
+	// 只有待配货，配货中，已发货，已完成的订单可以分仓库查看
+	if status_id == models.ORDER_STATUS_DPH || status_id == models.ORDER_STATUS_PHZ || status_id == models.ORDER_STATUS_YFH || status_id == models.ORDER_STATUS_YWC {
+		// 不同的仓库拣货人员可以看到不同的订单，管理员除外
+		/*
+	SELECT *
+	FROM erp_order o
+	WHERE o.id IN (
+		SELECT ol.order_id
+		FROM erp_order_logistics ol
+		WHERE ol.stock_id IN (
+			SELECT spc.stock_id
+			FROM erp_stock_pick_crew spc
+			WHERE spc.user_id = 0))
+		 */
+		var login_user = core.GetLoginUser(c.Session)
+		if login_user.IsSuperAdmin == false && login_user.IsAdmin == false { // 管理员可以看到所有仓库的订单
+			filter = core.SqlAnd(filter, fmt.Sprintf(`o.id IN (
     SELECT ol.order_id
     FROM erp_order_logistics ol
     WHERE ol.stock_id IN (
         SELECT spc.stock_id
         FROM erp_stock_pick_crew spc
         WHERE spc.user_id = %d))`, login_user.UserId))
+		}
 	}
 
 	//todo: 界面上显示配货的仓库信息， left join
 
-	var status_id_query int64 = 0 // 下拉框里面的状态，不是通过 Url 里面来的
-	// 再看查询条件里面的状态分类
-	c.Params.Bind(&status_id_query, "status_id") //查询条件的status_id，比url里面换算过来的status_id更为优先
+	if status_id == 0 { // 后来改成只有在所有订单的的界面下，才有状态的下拉框
+		var status_id_query int64 = 0 // 下拉框里面的状态，不是通过 Url 里面来的
+		// 再看查询条件里面的状态分类
+		c.Params.Bind(&status_id_query, "status_id") //查询条件的status_id，比url里面换算过来的status_id更为优先
 
-	if status_id_query != 0 { // 只有在下拉框的状态为零的时候，下拉框才起作用
-		status_id = status_id_query
+		if status_id_query != 0 { // 只有在下拉框的状态为不零的时候，下拉框的状态才起作用
+			status_id = status_id_query
+		}
 	}
 
 	if shop_id != 0 {
