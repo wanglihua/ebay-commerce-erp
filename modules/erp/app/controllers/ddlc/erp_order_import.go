@@ -173,15 +173,15 @@ func (c ErpOrderImport) Upload() revel.Result {
 		Dpm  string  // 4 店铺名    order
 		Ddbh string  // 5 订单编号  order
 		Jydh string  // 6 交易单号  order
-		Skje float64 // 7 收款金额(RMB) order
-		Yfsr float64 // 8 运费收入  order
-		Cpcb float64 // 9 产品成本  product, order_item
-		Khzh string  // 10 客户账号 order
-		Khxm string  // 11 客户姓名 address
-		Khyx string  // 12 客户邮箱 order
-		Dh   string  // 13 电话     address
-		Ssdq string  // 14 所属地区  address
-		Sscs string  // 15 所属城市  address
+		Skje float64 // 7 收款金额(澳币) order
+		Yfsr float64 // 8 运费收入(澳币)  order
+		//Cpcb float64 // 9 产品成本  product, order_item
+		Khzh string // 10 客户账号 order
+		Khxm string // 11 客户姓名 address
+		Khyx string // 12 客户邮箱 order
+		Dh   string // 13 电话     address
+		Ssdq string // 14 所属地区  address
+		Sscs string // 15 所属城市  address
 	}
 
 	order_import_list := make([]order_import_t, 0)
@@ -287,6 +287,7 @@ func (c ErpOrderImport) Upload() revel.Result {
 			order_import.Yfsr, _ = strconv.ParseFloat(cell_val, 64)
 			col_index++
 
+			/*
 			// 产品成本
 			cell = row.Cells[col_index]
 			cell_val, err = cell.String()
@@ -294,6 +295,7 @@ func (c ErpOrderImport) Upload() revel.Result {
 			cell_val = strings.TrimSpace(cell_val)
 			order_import.Cpcb, _ = strconv.ParseFloat(cell_val, 64)
 			col_index++
+			*/
 
 			// 客户账号
 			cell = row.Cells[col_index]
@@ -453,7 +455,6 @@ SELECT sa.id AS shop_id, sa.name AS shop_name FROM erp_shop_account sa;
 			product.Sku = order_import.Spbh
 			product.CnName = order_import.Spbh
 			product.Name = order_import.Spbh
-			product.CostPrice = order_import.Cpcb
 
 			_, err := db_session.Insert(&product)
 			core.HandleError(err)
@@ -474,21 +475,21 @@ SELECT sa.id AS shop_id, sa.name AS shop_name FROM erp_shop_account sa;
 		order.Code = order_import.Ddbh
 		order.TranId = order_import.Jydh
 
-		var amount_rmb float64 = order_import.Skje
-		var amount_currency = "AU"                                 // 澳币的也设置一下
-		var amount = order_import.Skje / aud_exchange_rate_setting // 汇率换算
+		var amount_au float64 = order_import.Skje
+		var amount_currency = "AU"                                     // 澳币的也设置一下
+		var amount_rmb = order_import.Skje * aud_exchange_rate_setting // 汇率换算
 
 		order.AmountPaidRmb = amount_rmb
 		order.AmountPaidCurrency = amount_currency
-		order.AmountPaid = amount
+		order.AmountPaid = amount_au
 
 		order.TotalAmountRmb = amount_rmb
 		order.TotalAmountCurrency = amount_currency
-		order.TotalAmount = amount
+		order.TotalAmount = amount_au
 
 		order.AdjustmentAmountRmb = amount_rmb
 		order.AdjustmentAmountCurrency = amount_currency
-		order.AdjustmentAmount = amount
+		order.AdjustmentAmount = amount_au
 
 		order.ExpressFee = order_import.Yfsr
 		order.BuyerUserId = order_import.Khzh
@@ -515,7 +516,7 @@ SELECT sa.id AS shop_id, sa.name AS shop_name FROM erp_shop_account sa;
 		order_item.OrderId = order.Id
 		order_item.ItemProductId = product_id
 		order_item.Quantity = order_import.Spsl
-		order_item.ProductCostPrice = order_import.Cpcb //  这是单个的产品成本
+		//order_item.ProductCostPrice = order_import.Cpcb //  这是单个的产品成本
 		_, err = db_session.Insert(&order_item)
 		core.HandleError(err)
 
