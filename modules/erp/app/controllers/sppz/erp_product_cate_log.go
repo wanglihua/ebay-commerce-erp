@@ -1,10 +1,10 @@
-
 package controllers
 
 import (
 	"github.com/revel/revel"
-
 	"matrix/core"
+	"matrix/modules/auth/pass_res"
+	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/erp/models"
 )
 
@@ -13,10 +13,14 @@ type ErpProductCateLog struct {
 }
 
 func (c ErpProductCateLog) Index() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.SPPZ_PRODUCT_CATE, c.Session)
+
 	return c.RenderTemplate("erp/sppz/product_cate_log/product_cate_log_index.html")
 }
 
 func (c ErpProductCateLog) ListData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.SPPZ_PRODUCT_CATE, c.Session)
+
 	db_session := c.DbSession
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)

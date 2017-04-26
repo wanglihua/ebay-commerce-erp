@@ -2,10 +2,12 @@ package controllers
 
 import (
 	"encoding/json"
-	"github.com/revel/revel"
 	"strconv"
 
+	"github.com/revel/revel"
 	"matrix/core"
+	"matrix/modules/auth/pass_res"
+	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/status_service"
 )
@@ -15,6 +17,8 @@ type ErpPackageMaterial struct {
 }
 
 func (c ErpPackageMaterial) Index() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.SPPZ_PACKAGE_MATERIAL, c.Session)
+
 	return c.RenderTemplate("erp/sppz/package_material/package_material_index.html")
 }
 
@@ -24,6 +28,8 @@ type ErpPackageMaterialViewItem struct {
 }
 
 func (c ErpPackageMaterial) ListData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.SPPZ_PACKAGE_MATERIAL, c.Session)
+
 	db_session := c.DbSession
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
@@ -34,7 +40,7 @@ func (c ErpPackageMaterial) ListData() revel.Result {
 	*/
 
 	query := db_session.
-		Select("p.*, s.*").
+	Select("p.*, s.*").
 		Table("erp_package_material").Alias("p").
 		Join("INNER", []string{"erp_status", "s"}, "p.status_id = s.id").
 		Where(filter)
@@ -102,6 +108,8 @@ func (f *PackageMaterialDetailForm) Valid(validation *revel.Validation) bool {
 }
 
 func (c ErpPackageMaterial) DetailData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.SPPZ_PACKAGE_MATERIAL, c.Session)
+
 	db_session := c.DbSession
 
 	var package_material_id int64
@@ -130,6 +138,8 @@ func (c ErpPackageMaterial) DetailData() revel.Result {
 }
 
 func (c ErpPackageMaterial) Save() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.SPPZ_PACKAGE_MATERIAL, c.Session)
+
 	db_session := c.DbSession
 
 	var detail_form PackageMaterialDetailForm
@@ -159,6 +169,8 @@ func (c ErpPackageMaterial) Save() revel.Result {
 }
 
 func (c ErpPackageMaterial) Delete() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.SPPZ_PACKAGE_MATERIAL, c.Session)
+	
 	db_session := c.DbSession
 
 	package_material_id_list := make([]int64, 0)

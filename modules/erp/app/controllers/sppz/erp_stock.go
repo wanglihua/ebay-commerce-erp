@@ -7,6 +7,8 @@ import (
 
 	"github.com/revel/revel"
 	"matrix/core"
+	"matrix/modules/auth/pass_res"
+	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/status_service"
 	"matrix/modules/erp/setting"
@@ -17,6 +19,8 @@ type ErpStock struct {
 }
 
 func (c ErpStock) Index() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.SPPZ_STOCK, c.Session)
+
 	c.RenderArgs["icon_path"] = setting.ICON_PATH
 	return c.RenderTemplate("erp/sppz/stock/stock_index.html")
 }
@@ -28,6 +32,8 @@ type ErpStockViewItem struct {
 }
 
 func (c ErpStock) ListData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.SPPZ_STOCK, c.Session)
+
 	db_session := c.DbSession
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
@@ -125,6 +131,8 @@ func (f *StockDetailForm) Valid(validation *revel.Validation) bool {
 }
 
 func (c ErpStock) DetailData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.SPPZ_STOCK, c.Session)
+
 	db_session := c.DbSession
 
 	var stock_id int64
@@ -158,6 +166,8 @@ func (c ErpStock) DetailData() revel.Result {
 }
 
 func (c ErpStock) Save() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.SPPZ_STOCK, c.Session)
+
 	db_session := c.DbSession
 
 	var detail_form StockDetailForm
@@ -203,6 +213,8 @@ func (c ErpStock) Save() revel.Result {
 }
 
 func (c ErpStock) Delete() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.SPPZ_STOCK, c.Session)
+
 	db_session := c.DbSession
 
 	stock_id_list := make([]int64, 0)

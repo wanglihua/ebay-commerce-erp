@@ -6,6 +6,8 @@ import (
 
 	"github.com/revel/revel"
 	"matrix/core"
+	"matrix/modules/auth/pass_res"
+	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/erp/models"
 )
 
@@ -14,10 +16,14 @@ type ErpSupplier struct {
 }
 
 func (c ErpSupplier) Index() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.SPPZ_SUPPLIER, c.Session)
+
 	return c.RenderTemplate("erp/sppz/supplier/supplier_index.html")
 }
 
 func (c ErpSupplier) ListData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.SPPZ_SUPPLIER, c.Session)
+
 	db_session := c.DbSession
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
@@ -96,6 +102,8 @@ func (f *SupplierDetailForm) Valid(validation *revel.Validation) bool {
 }
 
 func (c ErpSupplier) DetailData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.SPPZ_SUPPLIER, c.Session)
+
 	db_session := c.DbSession
 
 	var supplier_id int64
@@ -117,6 +125,8 @@ func (c ErpSupplier) DetailData() revel.Result {
 }
 
 func (c ErpSupplier) Save() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.SPPZ_SUPPLIER, c.Session)
+
 	db_session := c.DbSession
 
 	var detail_form SupplierDetailForm
@@ -158,6 +168,8 @@ func (c ErpSupplier) Save() revel.Result {
 }
 
 func (c ErpSupplier) Delete() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.SPPZ_SUPPLIER, c.Session)
+
 	db_session := c.DbSession
 
 	supplier_id_list := make([]int64, 0)

@@ -9,6 +9,8 @@ import (
 	"github.com/revel/revel"
 	"matrix/core"
 	auth_models "matrix/modules/auth/models"
+	"matrix/modules/auth/pass_res"
+	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/erp/models"
 )
 
@@ -17,10 +19,14 @@ type ErpStockPickCrew struct {
 }
 
 func (c ErpStockPickCrew) Index() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.SPPZ_STOCK_PICK_CREW, c.Session)
+
 	return c.RenderTemplate("erp/sppz/stock_pick_crew/stock_pick_crew_index.html")
 }
 
 func (c ErpStockPickCrew) PageData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.SPPZ_STOCK_PICK_CREW, c.Session)
+
 	var db_session = c.DbSession
 
 	var stock_list = make([]models.StockInfo, 0)
@@ -37,6 +43,8 @@ func (c ErpStockPickCrew) PageData() revel.Result {
 }
 
 func (c ErpStockPickCrew) ListData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.SPPZ_STOCK_PICK_CREW, c.Session)
+
 	db_session := c.DbSession
 
 	var stock_id_query int64
@@ -142,6 +150,8 @@ func (f *StockPickCrewDetailForm) Valid(validation *revel.Validation) bool {
 }
 
 func (c ErpStockPickCrew) DetailData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.SPPZ_STOCK_PICK_CREW, c.Session)
+
 	db_session := c.DbSession
 
 	var stock_pick_crew_id int64
@@ -180,6 +190,8 @@ func (c ErpStockPickCrew) DetailData() revel.Result {
 }
 
 func (c ErpStockPickCrew) Save() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.SPPZ_STOCK_PICK_CREW, c.Session)
+
 	db_session := c.DbSession
 
 	var detail_form StockPickCrewDetailForm
@@ -246,6 +258,8 @@ func (c ErpStockPickCrew) Save() revel.Result {
 }
 
 func (c ErpStockPickCrew) Delete() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.SPPZ_STOCK_PICK_CREW, c.Session)
+
 	db_session := c.DbSession
 
 	stock_pick_crew_id_list := make([]int64, 0)
@@ -258,6 +272,8 @@ func (c ErpStockPickCrew) Delete() revel.Result {
 }
 
 func (c ErpStockPickCrew) SelectUserListData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.SPPZ_STOCK_PICK_CREW, c.Session)
+
 	db_session := c.DbSession
 
 	var stock_id int64

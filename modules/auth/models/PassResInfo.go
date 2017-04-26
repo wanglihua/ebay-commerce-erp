@@ -256,6 +256,65 @@ func (e PassResInfo) InitData(db_session *xorm.Session) {
 		db_session.Insert(pass)
 	}
 
+	// 商品配置
+	{
+		pass := new(PassResInfo)
+		pass.Id = pass_res.SPPZ_PRODUCT_BATCH
+		pass.CateId = pass_res_cate.SPPZ
+		pass.Name = "商品批量修改"
+		pass.Desc = core.MakeNullString("商品批量修改", true)
+		db_session.Insert(pass)
+
+		pass = new(PassResInfo)
+		pass.Id = pass_res.SPPZ_PACKAGE_MATERIAL
+		pass.CateId = pass_res_cate.SPPZ
+		pass.Name = "包材类型"
+		pass.Desc = core.MakeNullString("包材类型", true)
+		db_session.Insert(pass)
+
+		pass = new(PassResInfo)
+		pass.Id = pass_res.SPPZ_STOCK
+		pass.CateId = pass_res_cate.SPPZ
+		pass.Name = "仓库"
+		pass.Desc = core.MakeNullString("仓库", true)
+		db_session.Insert(pass)
+
+		pass = new(PassResInfo)
+		pass.Id = pass_res.SPPZ_STOCK_PICK_CREW
+		pass.CateId = pass_res_cate.SPPZ
+		pass.Name = "仓库拣货人员"
+		pass.Desc = core.MakeNullString("仓库拣货人员", true)
+		db_session.Insert(pass)
+
+		pass = new(PassResInfo)
+		pass.Id = pass_res.SPPZ_STORAGE_LOC
+		pass.CateId = pass_res_cate.SPPZ
+		pass.Name = "仓位"
+		pass.Desc = core.MakeNullString("仓位", true)
+		db_session.Insert(pass)
+
+		pass = new(PassResInfo)
+		pass.Id = pass_res.SPPZ_PRODUCT_CATE
+		pass.CateId = pass_res_cate.SPPZ
+		pass.Name = "商品目录"
+		pass.Desc = core.MakeNullString("商品目录", true)
+		db_session.Insert(pass)
+
+		pass = new(PassResInfo)
+		pass.Id = pass_res.SPPZ_PSL_BATCH
+		pass.CateId = pass_res_cate.SPPZ
+		pass.Name = "批量修改仓位"
+		pass.Desc = core.MakeNullString("批量修改仓位", true)
+		db_session.Insert(pass)
+
+		pass = new(PassResInfo)
+		pass.Id = pass_res.SPPZ_SUPPLIER
+		pass.CateId = pass_res_cate.SPPZ
+		pass.Name = "供应商"
+		pass.Desc = core.MakeNullString("供应商", true)
+		db_session.Insert(pass)
+	}
+
 	// 权限管理
 	{
 		pass := new(PassResInfo)

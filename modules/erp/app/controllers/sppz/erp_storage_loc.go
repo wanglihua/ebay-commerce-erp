@@ -6,6 +6,8 @@ import (
 
 	"github.com/revel/revel"
 	"matrix/core"
+	"matrix/modules/auth/pass_res"
+	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/erp/models"
 )
 
@@ -14,6 +16,8 @@ type ErpStorageLoc struct {
 }
 
 func (c ErpStorageLoc) Index() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.SPPZ_STORAGE_LOC, c.Session)
+
 	return c.RenderTemplate("erp/sppz/storage_loc/storage_loc_index.html")
 }
 
@@ -23,6 +27,8 @@ type ErpStorageLocViewItem struct {
 }
 
 func (c ErpStorageLoc) ListData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.SPPZ_STORAGE_LOC, c.Session)
+
 	db_session := c.DbSession
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
@@ -100,6 +106,8 @@ func (f *StorageLocDetailForm) Valid(validation *revel.Validation) bool {
 }
 
 func (c ErpStorageLoc) DetailData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.SPPZ_STORAGE_LOC, c.Session)
+
 	db_session := c.DbSession
 
 	var storage_loc_id int64
@@ -126,6 +134,8 @@ func (c ErpStorageLoc) DetailData() revel.Result {
 }
 
 func (c ErpStorageLoc) Save() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.SPPZ_STORAGE_LOC, c.Session)
+
 	db_session := c.DbSession
 
 	var detail_form StorageLocDetailForm
@@ -167,6 +177,8 @@ func (c ErpStorageLoc) Save() revel.Result {
 }
 
 func (c ErpStorageLoc) Delete() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.SPPZ_STORAGE_LOC, c.Session)
+
 	db_session := c.DbSession
 
 	storage_loc_id_list := make([]int64, 0)

@@ -2,14 +2,16 @@ package controllers
 
 import (
 	"encoding/json"
-	"github.com/revel/revel"
+	"fmt"
 	"strconv"
 
-	"fmt"
+	"github.com/go-xorm/xorm"
+	"github.com/revel/revel"
 	"matrix/core"
+	"matrix/modules/auth/pass_res"
+	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/status_service"
-	"github.com/go-xorm/xorm"
 )
 
 type ErpProductCate struct {
@@ -17,6 +19,8 @@ type ErpProductCate struct {
 }
 
 func (c ErpProductCate) Index() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.SPPZ_PRODUCT_CATE, c.Session)
+
 	return c.RenderTemplate("erp/sppz/product_cate/product_cate_index.html")
 }
 
@@ -27,6 +31,8 @@ type ErpProductCateViewItem struct {
 }
 
 func (c ErpProductCate) ListData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.SPPZ_PRODUCT_CATE, c.Session)
+
 	db_session := c.DbSession
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
@@ -97,6 +103,8 @@ func (f *ProductCateDetailForm) Valid(validation *revel.Validation) bool {
 }
 
 func (c ErpProductCate) DetailData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.SPPZ_PRODUCT_CATE, c.Session)
+
 	db_session := c.DbSession
 
 	var product_cate_id int64
@@ -136,6 +144,8 @@ func (c ErpProductCate) DetailData() revel.Result {
 }
 
 func (c ErpProductCate) Save() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.SPPZ_PRODUCT_CATE, c.Session)
+
 	db_session := c.DbSession
 
 	var detail_form ProductCateDetailForm
@@ -200,6 +210,8 @@ func (c ErpProductCate) calculate_product_cate_full_name(product_cate models.Pro
 }
 
 func (c ErpProductCate) Delete() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.SPPZ_PRODUCT_CATE, c.Session)
+
 	db_session := c.DbSession
 
 	product_cate_id_list := make([]int64, 0)

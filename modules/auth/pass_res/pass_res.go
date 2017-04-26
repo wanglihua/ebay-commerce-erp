@@ -13,12 +13,30 @@ const (
 	// 订单流程  模块编号 13
 	// 库存管理  模块编号 14
 
-
 	// 采购管理
 
 	// 调拨管理
 
 	// 订单报表
+
+	// 系统配置，模块编号 11
+	XTPZ_ECOMMERCE_PLATFORM = 110100 // 电商平台
+	XTPZ_SHOP_ACCOUNT       = 110200 // 店铺账号
+	XTPZ_PAYPAL_ACCOUNT     = 110300 // PAYPAL账号
+	XTPZ_EXCHANGE_RATE      = 110400 // 汇率设置
+	XTPZ_LOGIN_LOG          = 110500 // 系统日志
+	XTPZ_SCHEDULE_TASK      = 110600 // 定时任务
+	XTPZ_LITTLE_ICON        = 110700 // 图标管理
+
+	// 订单配置, 模块编号 12
+	DDPZ_LOGISTICS_COMPANY  = 120100 // 物流公司
+	DDPZ_LOGISTICS_MODE     = 120200 // 物流方式
+	DDPZ_LOGISTICS_FEE_RATE = 120300 // 物流费率
+	DDPZ_LOGISTICS_SETTING  = 120400 // 物流配置
+	DDPZ_ENVELOPE_FEE_RATE  = 120500 // 信封费率
+	DDPZ_PICK_FEE           = 120600 // 拣货费用
+	DDPZ_ORDER_HOLD_TYPE    = 120700 // 订单HOLD类型
+	DDPZ_ORDER_LOG          = 120800 // 订单修改日志
 
 	// 订单流程, 模块编号 13
 	DDLC_ORDER_ALL                = 130100 // 所有订单
@@ -34,16 +52,6 @@ const (
 	DDLC_ORDER_LOGISTICS          = 130900 // 订单物流
 	DDLC_ORDER_LOGISTICS_FEE_DIFF = 131000 // 订单物流费用偏差
 
-	// 订单配置, 模块编号 12
-	DDPZ_LOGISTICS_COMPANY  = 120100 // 物流公司
-	DDPZ_LOGISTICS_MODE     = 120200 // 物流方式
-	DDPZ_LOGISTICS_FEE_RATE = 120300 // 物流费率
-	DDPZ_LOGISTICS_SETTING  = 120400 // 物流配置
-	DDPZ_ENVELOPE_FEE_RATE  = 120500 // 信封费率
-	DDPZ_PICK_FEE           = 120600 // 拣货费用
-	DDPZ_ORDER_HOLD_TYPE    = 120700 // 订单HOLD类型
-	DDPZ_ORDER_LOG          = 120800 // 订单修改日志
-
 	// 库存管理 模块编号 14
 	KCGL_PRODUCT                  = 140100 // 商品列表
 	KCGL_PRODUCT_BIND             = 140200 // 绑定商品
@@ -57,12 +65,13 @@ const (
 	KCGL_STOCKBILL_CHECKIN        = 141000 // 手工入库
 	KCGL_STOCKBILL_CHECKOUT       = 141100 // 手工出库
 
-	// 系统配置，模块编号 11
-	XTPZ_ECOMMERCE_PLATFORM = 110100 // 电商平台
-	XTPZ_SHOP_ACCOUNT       = 110200 // 店铺账号
-	XTPZ_PAYPAL_ACCOUNT     = 110300 // PAYPAL账号
-	XTPZ_EXCHANGE_RATE      = 110400 // 汇率设置
-	XTPZ_LOGIN_LOG          = 110500 // 系统日志
-	XTPZ_SCHEDULE_TASK      = 110600 // 定时任务
-	XTPZ_LITTLE_ICON        = 110700 // 图标管理
+	// 商品配置 模块编号 15
+	SPPZ_PRODUCT_BATCH    = 150100 // 商品批量修改
+	SPPZ_PACKAGE_MATERIAL = 150200 // 包材类型
+	SPPZ_STOCK            = 150300 // 仓库
+	SPPZ_STOCK_PICK_CREW  = 150400 // 仓库拣货人员
+	SPPZ_STORAGE_LOC      = 150500 // 仓位
+	SPPZ_PRODUCT_CATE     = 150600 // 商品目录
+	SPPZ_PSL_BATCH        = 150700 // 批量修改仓位
+	SPPZ_SUPPLIER         = 150800 // 供应商
 )

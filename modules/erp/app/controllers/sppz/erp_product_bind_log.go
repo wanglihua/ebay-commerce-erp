@@ -6,6 +6,8 @@ import (
 
 	"github.com/revel/revel"
 	"matrix/core"
+	"matrix/modules/auth/pass_res"
+	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/erp/models"
 )
 
@@ -14,10 +16,14 @@ type ErpProductBindLog struct {
 }
 
 func (c ErpProductBindLog) Index() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_PRODUCT_BIND, c.Session)
+
 	return c.RenderTemplate("erp/sppz/product_bind_log/product_bind_log_index.html")
 }
 
 func (c ErpProductBindLog) ListData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_PRODUCT_BIND, c.Session)
+
 	db_session := c.DbSession
 
 	var product_bind_code_query string

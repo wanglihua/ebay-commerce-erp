@@ -1,11 +1,14 @@
 package controllers
 
 import (
+	"encoding/json"
+	"fmt"
+	"strings"
+
 	"github.com/revel/revel"
 	"matrix/core"
-	"encoding/json"
-	"strings"
-	"fmt"
+	"matrix/modules/auth/pass_res"
+	"matrix/modules/auth/service/pass_service"
 )
 
 type ErpProductBatchEdit struct {
@@ -19,19 +22,23 @@ const (
 )
 
 func (c ErpProductBatchEdit) Index() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.SPPZ_PRODUCT_BATCH, c.Session)
+
 	return c.RenderTemplate("erp/sppz/product_batch_edit/product_batch_edit_index.html")
 }
 
 func (c ErpProductBatchEdit) EditAttrList() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.SPPZ_PRODUCT_BATCH, c.Session)
+
 	type edit_attr struct {
 		AttrId   int64  `json:"attr_id"`
 		AttrName string `json:"attr_name"`
 	}
 
 	edit_attr_list := make([]edit_attr, 0)
-	edit_attr_list = append(edit_attr_list, edit_attr{AttrId:EDIT_ATTR_NAME, AttrName:"名称"})
-	edit_attr_list = append(edit_attr_list, edit_attr{AttrId:EDIT_ATTR_COST_PRICE, AttrName:"成本价"})
-	edit_attr_list = append(edit_attr_list, edit_attr{AttrId:EDIT_ATTR_WEIGHT, AttrName:"重量"})
+	edit_attr_list = append(edit_attr_list, edit_attr{AttrId: EDIT_ATTR_NAME, AttrName: "名称"})
+	edit_attr_list = append(edit_attr_list, edit_attr{AttrId: EDIT_ATTR_COST_PRICE, AttrName: "成本价"})
+	edit_attr_list = append(edit_attr_list, edit_attr{AttrId: EDIT_ATTR_WEIGHT, AttrName: "重量"})
 
 	return c.RenderJson(edit_attr_list)
 }
@@ -53,6 +60,8 @@ func (f *BatchEditProductDetailForm) Valid(validation *revel.Validation) bool {
 }
 
 func (c ErpProductBatchEdit) Save() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.SPPZ_PRODUCT_BATCH, c.Session)
+
 	db_session := c.DbSession
 
 	var detail_form BatchEditProductDetailForm
