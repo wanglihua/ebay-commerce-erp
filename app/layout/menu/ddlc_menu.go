@@ -45,6 +45,16 @@ func GetDdlcMenu(res_id_map map[int64]bool, db_session *xorm.Session, web_sessio
         </li>`)
 	}
 
+	if check_pass_res_menu(pass_res.DDLC_ORDER_YCJ) {
+		buffer.WriteString(`<li id="ddlc-order-ycj-menu" class="">
+            <a href="/erp/order/ycj">
+                <i class="menu-icon fa fa-caret-right"></i>
+                未支付
+            </a>
+            <b class="arrow"></b>
+        </li>`)
+	}
+
 	if check_pass_res_menu(pass_res.DDLC_ORDER_YZF) {
 		buffer.WriteString(`<li id="ddlc-order-yzf-menu" class="">
             <a href="/erp/order/yzf">

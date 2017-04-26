@@ -5,5 +5,5 @@ import (
 )
 
 func GetSysName(dbsession *xorm.Session) string {
-	return "OZO ERP"
+	return "wollongzone WMS"
 }

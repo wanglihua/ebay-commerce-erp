@@ -29,6 +29,11 @@ func (c ErpOrder) Index(status string) revel.Result {
 
 		active_menu_html = fmt.Sprintf(active_menu_html, status, "所有订单")
 		status_chinese_name = "所有订单"
+	} else if status == "ycj" {
+		pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_YCJ, c.Session)
+
+		active_menu_html = fmt.Sprintf(active_menu_html, status, "未支付")
+		status_chinese_name = "未支付"
 	} else if status == "yzf" {
 		pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_YZF, c.Session)
 
@@ -138,6 +143,10 @@ func (c ErpOrder) ListData() revel.Result {
 		pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_ALL, c.Session)
 
 		status_id = 0
+	} else if status == "ycj" {
+		pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_YCJ, c.Session)
+
+		status_id = models.ORDER_STATUS_YCJ
 	} else if status == "yzf" {
 		pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_YZF, c.Session)
 
@@ -168,9 +177,9 @@ func (c ErpOrder) ListData() revel.Result {
 	if status_id == models.ORDER_STATUS_DPH || status_id == models.ORDER_STATUS_PHZ || status_id == models.ORDER_STATUS_YFH || status_id == models.ORDER_STATUS_YWC {
 		// 不同的仓库拣货人员可以看到不同的订单，管理员除外
 		/*
-	SELECT *
-	FROM erp_order o
-	WHERE o.id IN (
+		SELECT *
+		FROM erp_order o
+		WHERE o.id IN (
 		SELECT ol.order_id
 		FROM erp_order_logistics ol
 		WHERE ol.stock_id IN (
