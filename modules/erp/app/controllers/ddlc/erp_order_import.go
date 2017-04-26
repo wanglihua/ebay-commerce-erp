@@ -202,12 +202,12 @@ func (c ErpOrderImport) Upload() revel.Result {
 			var cell_val string
 			var err error
 
-			// 邮政编码 邮寄地址 商品编号 商品数量 店铺名 订单编号 交易单号 收款金额(RMB) 运费收入 产品成本 客户账号 客户姓名 客户邮箱 电话 所属地区 所属城市
+			// 邮政编码 邮寄地址 商品编号 商品数量 店铺名 订单编号 交易单号 收款金额(澳币) 运费收入(澳币) 客户账号 客户姓名 客户邮箱 电话 所属地区 所属城市
 			var order_import order_import_t
 
 			col_index := 0
 
-			if len(row.Cells) < 16 {
+			if len(row.Cells) < 15 { // Excel的列信息有改动的时候，这个数字也要记得改动的
 				break
 			}
 
@@ -271,7 +271,7 @@ func (c ErpOrderImport) Upload() revel.Result {
 			order_import.Jydh = cell_val
 			col_index++
 
-			// 收款金额(RMB)
+			// 收款金额(澳币)
 			cell = row.Cells[col_index]
 			cell_val, err = cell.String()
 			core.HandleError(err)
@@ -279,7 +279,7 @@ func (c ErpOrderImport) Upload() revel.Result {
 			order_import.Skje, _ = strconv.ParseFloat(cell_val, 64)
 			col_index++
 
-			// 运费收入
+			// 运费收入(澳币)
 			cell = row.Cells[col_index]
 			cell_val, err = cell.String()
 			core.HandleError(err)

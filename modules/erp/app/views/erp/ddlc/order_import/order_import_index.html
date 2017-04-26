@@ -40,7 +40,7 @@
                 <div class="row" style="margin-top: 15px;margin-bottom: 5px;">
                     <div id="query" class="col-xs-12 query">
                         <label class="control-label no-padding-right" for="batch_code">导入批次号</label>
-                        <select id="batch_code" name="page.batch_code" v-model.number="page.batch_code" style="width: 120px;" @change="refreshList()">
+                        <select id="batch_code" name="page.batch_code" v-model.number="page.batch_code" style="width: 135px;" @change="refreshList()">
                             <option :value="0">-导入批次号-</option>
                             <template v-for="batch_code in page.batch_code_list">
                                 <option :value="batch_code">{{batch_code}}</option>
