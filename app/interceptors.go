@@ -92,7 +92,13 @@ func userAuth(c *revel.Controller) revel.Result {
 		return nil
 	}
 
+	/*
 	if c.Action == "Login.Index" || c.Action == "Login.Login" {
+		return nil
+	}
+	*/
+
+	if c.Name == "Login" {
 		return nil
 	}
 

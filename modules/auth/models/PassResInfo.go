@@ -265,12 +265,15 @@ func (e PassResInfo) InitData(db_session *xorm.Session) {
 		pass.Desc = core.MakeNullString("用户管理", true)
 		db_session.Insert(pass)
 
+		// 这个没有意义，只有超级管理员才能用的功能
+		/*
 		pass = new(PassResInfo)
 		pass.Id = pass_res.AUTH_ADMIN
 		pass.CateId = pass_res_cate.AUTH
 		pass.Name = "管理员组"
 		pass.Desc = core.MakeNullString("管理员组", true)
 		db_session.Insert(pass)
+		*/
 
 		pass = new(PassResInfo)
 		pass.Id = pass_res.AUTH_PASS
