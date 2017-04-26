@@ -69,9 +69,10 @@ func (c Login) Login() revel.Result {
 	var admin_user models.AdminInfo
 	has, err = db_session.Where("user_id = ?", user.Id).Get(&admin_user)
 	core.HandleError(err)
-	loginUser.IsAdmin = false
+
+	// loginUser.IsAdmin = false
 	if has == true && admin_user.Id != 0 {
-		loginUser.IsAdmin = true
+		// loginUser.IsAdmin = true
 
 		// 是不是超级管理员
 		if admin_user.IsSuper == 1 {

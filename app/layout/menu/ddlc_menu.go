@@ -6,6 +6,7 @@ import (
 	"github.com/revel/revel"
 	"matrix/core"
 	"matrix/modules/auth/pass_res"
+	"matrix/modules/auth/service/pass_service"
 )
 
 func GetDdlcMenu(res_id_map map[int64]bool, db_session *xorm.Session, web_session revel.Session) string {
@@ -14,7 +15,7 @@ func GetDdlcMenu(res_id_map map[int64]bool, db_session *xorm.Session, web_sessio
 	}
 
 	login_user := core.GetLoginUser(web_session)
-	var is_admin = login_user.IsAdmin
+	var is_admin = pass_service.Check_user_is_admin(login_user.UserId)
 
 	var check_pass_res_menu = func(pass_res_id int64) bool {
 		if v, ok := res_id_map[pass_res_id]; is_admin == true || (v == true && ok == true) {

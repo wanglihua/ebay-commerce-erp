@@ -12,8 +12,9 @@ type LoginUser struct {
 	UserId       int64
 	LoginName    string
 	NickName     string
-	IsAdmin      bool
 	IsSuperAdmin bool
+
+	// IsAdmin      bool // 这个不使用
 }
 
 func GetLoginUser(session revel.Session) LoginUser {

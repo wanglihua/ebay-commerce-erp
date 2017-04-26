@@ -253,6 +253,20 @@ func Get_login_user_pass_map_from_cache(web_session revel.Session) map[int64]boo
 	return user_res_id_map
 }
 
+func Check_user_is_admin(user_id int64) bool {
+	//检查是不是管理员
+	var admin_user_id_map = make(map[int64]bool)
+	err := cache.Get(PASS_ADMIN_LIST_CACHE_KEY, &admin_user_id_map)
+	core.HandleError(err)
+
+	is_admin, found := admin_user_id_map[user_id]
+	if found == true && is_admin == true {
+		return true
+	}
+
+	return false
+}
+
 // 通过缓存的信息检查用户权限
 func check_user_pass_in_cache(user_id int64, res_id int64) bool {
 	//检查是不是管理员
@@ -321,7 +335,8 @@ func check_user_pass_cate_in_cache(user_id int64, cate_id int64) bool {
 // 只有管理员才可以操作的资源的检查
 func Check_login_user_admin_only(web_session revel.Session) {
 	var login_user = core.GetLoginUser(web_session)
-	if login_user.IsAdmin == false {
+	var is_admin = Check_user_is_admin(login_user.UserId)
+	if is_admin == false {
 		panic(fmt.Sprintf("你不是管理员，没有操作权限！"))
 	}
 }
@@ -329,7 +344,8 @@ func Check_login_user_admin_only(web_session revel.Session) {
 //只有超级管理员才可以操作的资源的检查
 func Check_login_user_super_admin_only(web_session revel.Session) {
 	var login_user = core.GetLoginUser(web_session)
-	if login_user.IsAdmin == false || login_user.IsSuperAdmin == false {
+	var is_admin = Check_user_is_admin(login_user.UserId)
+	if is_admin == false || login_user.IsSuperAdmin == false {
 		panic(fmt.Sprintf("你不是超级管理员，没有操作权限！"))
 	}
 }

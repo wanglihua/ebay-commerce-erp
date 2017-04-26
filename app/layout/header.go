@@ -145,7 +145,7 @@ func GetHeader(title string, db_session *xorm.Session, web_session revel.Session
         <ul class="nav nav-list">
 `)
 
-	is_admin := login_user.IsAdmin
+	is_admin := pass_service.Check_user_is_admin(login_user.UserId)
 
 	var res_cate_id_map = pass_service.Get_login_user_pass_cate_map_from_cache(web_session)
 	var res_id_map = pass_service.Get_login_user_pass_map_from_cache(web_session)

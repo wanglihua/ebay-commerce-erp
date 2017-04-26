@@ -4,6 +4,7 @@ import (
 	"github.com/go-xorm/xorm"
 	"github.com/revel/revel"
 	"matrix/core"
+	"matrix/modules/auth/service/pass_service"
 )
 
 // 这里的代码，基本上没用了的，使用 pass_service中的代码就行
@@ -17,8 +18,10 @@ func UserHasPass(res_id int, web_session revel.Session, db_session *xorm.Session
 	login_user := core.GetLoginUser(web_session)
 	login_user_id := login_user.UserId
 
+	var is_admin = pass_service.Check_user_is_admin(login_user_id)
+
 	// 管理员有任何权限
-	if login_user.IsAdmin == true {
+	if is_admin == true {
 		return true
 	}
 
@@ -49,7 +52,8 @@ func CheckUserPass(res_id int, web_session revel.Session, db_session *xorm.Sessi
 
 func AdminOnly(web_session revel.Session) {
 	login_user := core.GetLoginUser(web_session)
-	if login_user.IsAdmin == false {
+	var is_admin = pass_service.Check_user_is_admin(login_user.UserId)
+	if is_admin == false {
 		panic("对不起，您没有当前操作的权限！")
 	}
 }
