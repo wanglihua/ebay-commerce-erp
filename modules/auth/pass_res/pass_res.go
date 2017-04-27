@@ -74,4 +74,5 @@ const (
 	SPPZ_PRODUCT_CATE     = 150600 // 商品目录
 	SPPZ_PSL_BATCH        = 150700 // 批量修改仓位
 	SPPZ_SUPPLIER         = 150800 // 供应商
+	SPPZ_PRODUCT_STATUS   = 150900 // 商品状态
 )

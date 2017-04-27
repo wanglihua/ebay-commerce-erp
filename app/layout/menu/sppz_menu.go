@@ -106,6 +106,14 @@ func GetSppzMenu(res_id_map map[int64]bool, db_session *xorm.Session, web_sessio
         </li>`)
 	}
 
+	buffer.WriteString(`<li id="sppz-product-status-menu" class="">
+            <a href="/erp/product/status">
+                <i class="menu-icon fa fa-caret-right"></i>
+                商品状态
+            </a>
+            <b class="arrow"></b>
+        </li>`)
+
 	buffer.WriteString(`</ul>
 </li>
 `)
