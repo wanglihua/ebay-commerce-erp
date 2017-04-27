@@ -86,7 +86,7 @@ WHERE prd.sku LIKE '%abc%' AND prd.id IN (SELECT pib.product_id FROM erp_product
 		filter = core.SqlAnd(filter, fmt.Sprintf("prd.sku LIKE '%%%s%%'", product_sku_query))
 	}
 
-	if batch_code == 0 {
+	if batch_code != 0 {
 		filter = core.SqlAnd(filter, fmt.Sprintf("prd.id IN (SELECT pib.product_id FROM erp_product_import_batch pib WHERE pib.batch_code = %d)", batch_code))
 	}
 
@@ -213,7 +213,7 @@ func (c ErpProductImport) Upload() revel.Result {
 			//revel.TRACE.Println(cell_val)
 			cost_price, err := strconv.ParseFloat(cell_val, 64)
 			core.HandleError(err)
-			product_import.length = cost_price
+			product_import.cost_price = cost_price
 			col_index++
 
 			// length
@@ -298,6 +298,7 @@ func (c ErpProductImport) Upload() revel.Result {
 
 		product.Sku = product_import.sku
 		product.CnName = product_import.cn_name
+		product.Name = product_import.sku
 		product.CostPrice = product_import.cost_price
 		product.Length = product_import.length
 		product.Width = product_import.width

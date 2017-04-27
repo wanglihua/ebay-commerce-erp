@@ -23,7 +23,7 @@
                     </button>
                     <button class="btn btn-danger btn-sm" @click="deleteImportProduct()">
                         <i class="ace-icon fa fa-trash-o"></i>
-                        删除订单
+                        删除商品
                     </button>
                     <button class="btn btn-danger btn-sm" @click="deleteImportBatch()">
                         <i class="ace-icon fa fa-trash"></i>
@@ -51,8 +51,8 @@
                                     <option :value="batch_code">{{batch_code}}</option>
                                 </template>
                             </select>
-                            <label class="control-label no-padding-right" for="product_code_query">订单编号</label>
-                            <input id="product_code_query" class="input-sm" name="product_code_query" placeholder="商品SKU查询" type="text" v-model="page.product_code_query" style="width: 100px;"/>
+                            <label class="control-label no-padding-right" for="product_sku_query">商品编号</label>
+                            <input id="product_sku_query" class="input-sm" name="product_sku_query" placeholder="商品SKU查询" type="text" v-model="page.product_sku_query" style="width: 100px;"/>
                             <button class="btn btn-mini btn-primary" @click="refreshList()">
                                 &nbsp;<i class="ace-icon fa fa-search"></i>查&nbsp;询&nbsp;
                             </button>
@@ -100,6 +100,7 @@
                     if (result.success != true) {
                         $.msg.error(result.message);
                     } else {
+                        loadVmPageData();
                         reloadList('#productList');
                         $.msg.show(result.message);
                     }
@@ -118,7 +119,7 @@
         data: {
             "page": {
                 "batch_code": 0,
-                "product_code_query": ""
+                "product_sku_query": ""
             },
             "detail": {
                 "product_import": {}
@@ -149,7 +150,7 @@
                         {"mDataProp": "prd.sku", "title": "商品SKU", "bSearchable": true, "width": 150},
                         {"mDataProp": "prd.cn_name", "title": "商品名称", "bSearchable": true},
                         {
-                            "mDataProp": "cost_price", "title": "成本价", "bSearchable": false, "width": 80,
+                            "mDataProp": "prd.cost_price", "title": "成本价", "bSearchable": false, "width": 80,
                             "render": function (data, type, row) {
                                 if (data != 0) {
                                     return "RMB " + data;
@@ -295,7 +296,8 @@
                             //重新加载页面数据，更新批次下拉框
                             loadVmPageData();
 
-                            vm.reloadList();
+                            vm.page.batch_code = 0;
+                            vm.refreshList();
                         }
                     });
                 });
