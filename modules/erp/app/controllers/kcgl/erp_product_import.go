@@ -44,32 +44,74 @@ func (c ErpProductImport) ListData() revel.Result {
 
 	db_session := c.DbSession
 
+	var batch_code int64
+	c.Params.Bind(&batch_code, "batch_code")
+
+	var product_sku_query string
+	c.Params.Bind(&product_sku_query, "product_sku_query")
+
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
-	query := db_session.Where(filter)
 
-	//query extra filter here
-	login_user := core.GetLoginUser(c.Session)
-	login_user_id := login_user.UserId
-	query = query.Where(fmt.Sprintf("user_id = %d", login_user_id))
-
-	data_query := *query
-	if order != "" {
-		data_query = *data_query.OrderBy(order)
-	} else {
-		data_query = *data_query.Asc("id")
+	type product_view_item_t struct {
+		Product         models.ProductInfo           `xorm:"extends" json:"prd"`
+		ProductCate     models.ProductCateInfo       `xorm:"extends" json:"cate"`
+		Supplier        models.SupplierInfo          `xorm:"extends" json:"sup"`
+		PackageMaterial models.PackageMaterialInfo   `xorm:"extends" json:"pm"`
+		Status          models.StatusInfo            `xorm:"extends" json:"st"`
 	}
 
-	product_import_list := make([]models.ProductImportInfo, 0, limit)
-	err := data_query.Limit(limit, offset).Find(&product_import_list)
+	/*
+SELECT prd.*, cate.*, sup.*, pm.*, st.*
+FROM erp_product prd
+    LEFT JOIN erp_product_cate cate ON prd.cate_id = cate.id
+    LEFT JOIN erp_supplier sup ON prd.supplier_id = sup.id
+    LEFT JOIN erp_package_material pm ON prd.pkg_mtrl_id = pm.id
+    INNER JOIN erp_status st ON prd.status_id = st.id
+WHERE prd.sku LIKE '%abc%' AND prd.id IN (SELECT pib.product_id FROM erp_product_import_batch pib WHERE pib.batch_code = 0)
+	*/
+
+	sql_builder := core.NewSqlBuilder()
+	sql_builder.Select("prd.*, cate.*, sup.*, pm.*, st.*")
+	sql_builder.Count("count(prd.id) as product_count")
+	sql_builder.From(`erp_product prd
+    LEFT JOIN erp_product_cate cate ON prd.cate_id = cate.id
+    LEFT JOIN erp_supplier sup ON prd.supplier_id = sup.id
+    LEFT JOIN erp_package_material pm ON prd.pkg_mtrl_id = pm.id
+    INNER JOIN erp_status st ON prd.status_id = st.id`)
+
+	//query extra filter here
+
+	if strings.TrimSpace(product_sku_query) != "" {
+		filter = core.SqlAnd(filter, fmt.Sprintf("prd.sku LIKE '%%%s%%'", product_sku_query))
+	}
+
+	if batch_code == 0 {
+		filter = core.SqlAnd(filter, fmt.Sprintf("prd.id IN (SELECT pib.product_id FROM erp_product_import_batch pib WHERE pib.batch_code = %d)", batch_code))
+	}
+
+	sql_builder.Where(filter)
+
+	if order != "" {
+		sql_builder.OrderBy(order)
+	} else {
+		sql_builder.OrderBy("prd.id ASC")
+	}
+
+	sql_builder.Limit(offset, limit)
+
+	product_list := make([]product_view_item_t, 0, limit)
+	err := db_session.Sql(sql_builder.SqlList()).Find(&product_list)
 	core.HandleError(err)
 
-	count_query := *query
-	count, err := count_query.Count(new(models.ProductImportInfo))
+	var product_count struct {
+		Count int64 `xorm:"'product_count'"`
+	}
+	_, err = db_session.Sql(sql_builder.SqlCount()).Get(&product_count)
 	core.HandleError(err)
 
 	return c.RenderJson(core.GridResult{
-		Data:  product_import_list,
-		Total: count,
+		Data:  product_list,
+		Total: product_count.Count,
 	})
 }
 

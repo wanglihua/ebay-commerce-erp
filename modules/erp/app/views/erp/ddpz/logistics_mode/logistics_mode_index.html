@@ -331,9 +331,11 @@
 
             init: {
                 FilesAdded: function () {
+                    showMask("上传中，请稍候...");
                     uploader.start();
                 },
                 FileUploaded: function (up, file, response) {
+                    hideMask();
                     var result = JSON.parse(response.response);
                     if (result.success != true) {
                         $.msg.error(result.message);
