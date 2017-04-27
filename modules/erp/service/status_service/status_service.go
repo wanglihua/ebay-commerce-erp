@@ -31,3 +31,20 @@ func Get_status_name(status_id int64, db_session *xorm.Session) string {
 
 	return status_name.Name
 }
+
+func Get_status_id_by_name(status_name string, status_type int64, db_session *xorm.Session) int64 {
+
+	var status_id struct {
+		StatusId int64 `xorm:"'status_id'"`
+	}
+	/*
+	SELECT s.id AS status_id FROM erp_status s WHERE s.type = 0 AND s.name = 'abc'
+	 */
+
+	var sql = `SELECT s.id AS status_id FROM erp_status s WHERE s.type = %d AND s.name = '%s'`
+	sql = fmt.Sprint(sql, status_type, status_name)
+	_, err := db_session.Sql(sql).Get(&status_id)
+	core.HandleError(err)
+
+	return status_id.StatusId
+}

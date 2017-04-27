@@ -117,7 +117,8 @@
         el: "#page",
         data: {
             "page": {
-                "batch_code": 0
+                "batch_code": 0,
+                "product_code_query": ""
             },
             "detail": {
                 "product_import": {}
@@ -135,7 +136,7 @@
                     "aaSorting": [[1, "asc"]],
                     "aoColumns": [
                         {
-                            "mDataProp": "id",
+                            "mDataProp": "prd.id",
                             "bSearchable": false,
                             "orderable": false,
                             "sClass": "center",
@@ -145,12 +146,89 @@
                                 return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
                             }
                         },
-                        {"mDataProp": "sku", "title": "SKU", "bSearchable": true},
-                        {"mDataProp": "name", "title": "名称", "bSearchable": true},
-                        {"mDataProp": "cost_price", "title": "成本价", "bSearchable": false},
-                        {"mDataProp": "weight", "title": "重量", "bSearchable": false},
-                        {"mDataProp": "import_time", "title": "导入时间", "bSearchable": false, "width": 120}
-                    ]
+                        {"mDataProp": "prd.sku", "title": "商品SKU", "bSearchable": true, "width": 150},
+                        {"mDataProp": "prd.cn_name", "title": "商品名称", "bSearchable": true},
+                        {
+                            "mDataProp": "cost_price", "title": "成本价", "bSearchable": false, "width": 80,
+                            "render": function (data, type, row) {
+                                if (data != 0) {
+                                    return "RMB " + data;
+                                }
+                                else {
+                                    return "";
+                                }
+                            }
+                        },
+                        {
+                            "mDataProp": "prd.length", "title": "长度", "bSearchable": false, "width": 80,
+                            "render": function (data, type, row) {
+                                if (data != 0) {
+                                    return data + " cm";
+                                }
+                                else {
+                                    return "";
+                                }
+                            }
+                        },
+                        {
+                            "mDataProp": "prd.width", "title": "宽度", "bSearchable": false, "width": 80,
+                            "render": function (data, type, row) {
+                                if (data != 0) {
+                                    return data + " cm";
+                                }
+                                else {
+                                    return "";
+                                }
+                            }
+                        },
+                        {
+                            "mDataProp": "prd.height", "title": "高度", "bSearchable": false, "width": 80,
+                            "render": function (data, type, row) {
+                                if (data != 0) {
+                                    return data + " cm";
+                                }
+                                else {
+                                    return "";
+                                }
+                            }
+                        },
+                        {
+                            "mDataProp": "prd.weight", "title": "重量", "bSearchable": false, "width": 80,
+                            "render": function (data, type, row) {
+                                if (data != 0) {
+                                    return data + " kg";
+                                }
+                                else {
+                                    return "";
+                                }
+                            }
+                        },
+                        {"mDataProp": "st.name", "title": "状态", "bSearchable": true, "width": 80},
+                        {"mDataProp": "prd.create_time", "title": "创建时间", "bSearchable": false, "width": 120},
+                        {"mDataProp": "prd.update_time", "title": "修改时间", "bSearchable": false, "width": 120}
+                    ],
+                    "fnServerData": function (sSource, aoData, fnCallback) {
+                        showMask("数据加载中，请稍候");
+
+                        aoData.push({'name': 'batch_code', 'value': this_vm.page.batch_code});
+                        aoData.push({'name': 'product_sku_query', 'value': this_vm.page.product_sku_query});
+
+                        $.ajax(
+                            {
+                                "dataType": 'json',
+                                "url": sSource,
+                                "data": aoData,
+                                "success": function (data) {
+                                    hideMask();
+
+                                    if (data.success == false) {
+                                        $.msg.error(data.message);
+                                        return;
+                                    }
+                                    fnCallback(data);
+                                }
+                            });
+                    }
                 }
             );
 

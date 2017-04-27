@@ -13,6 +13,7 @@ import (
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/import_batch_code_service"
 	"matrix/modules/erp/service/product_import_batch_service"
+	"matrix/modules/erp/service/status_service"
 )
 
 type ErpProductImport struct {
@@ -132,17 +133,17 @@ func (c ErpProductImport) Upload() revel.Result {
 		})
 	}
 
-	// 编号 SKU 中文名称 英文名 采购价（人民币元） 产品长度（cm） 产品宽度（cm） 产品高度（cm） 实际重量(kg)
+	// 编号 SKU 中文名称  采购价（人民币元） 产品长度（cm） 产品宽度（cm） 产品高度（cm） 实际重量(kg) 状态
 	type product_import_t struct {
 		ord_num    string
 		sku        string
 		cn_name    string
-		eng_name   string
 		cost_price float64
 		length     float64
 		width      float64
 		height     float64
 		weight     float64
+		status     string
 	}
 
 	product_import_list := make([]product_import_t, 0)
@@ -205,15 +206,6 @@ func (c ErpProductImport) Upload() revel.Result {
 			product_import.cn_name = cell_val
 			col_index++
 
-			// 英文名
-			cell = row.Cells[col_index]
-			cell_val, err = cell.String()
-			core.HandleError(err)
-			cell_val = strings.TrimSpace(cell_val)
-			//revel.TRACE.Println(cell_val)
-			product_import.eng_name = cell_val
-			col_index++
-
 			// 采购价（人民币元）
 			cell = row.Cells[col_index]
 			cell_val, err = cell.String()
@@ -264,6 +256,15 @@ func (c ErpProductImport) Upload() revel.Result {
 			product_import.weight = weight
 			col_index++
 
+			// 状态
+			cell = row.Cells[col_index]
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
+			//revel.TRACE.Println(cell_val)
+			product_import.status = cell_val
+			col_index++
+
 			product_import_list = append(product_import_list, product_import)
 		}
 	}
@@ -277,6 +278,18 @@ func (c ErpProductImport) Upload() revel.Result {
 
 	var import_batch_code = import_batch_code_service.Get_import_batch_code()
 
+	var product_status_list = status_service.Get_status_list(db_session, models.STATUS_TYPE_PRODUCT)
+
+	var get_product_status_id_by_name = func(status_name string) int64 {
+		for _, status := range product_status_list {
+			if status.Name == status_name {
+				return status.Id
+			}
+		}
+
+		return 0
+	}
+
 	has_zero_data := false
 	for _, product_import := range product_import_list {
 		var product models.ProductInfo
@@ -285,12 +298,24 @@ func (c ErpProductImport) Upload() revel.Result {
 
 		product.Sku = product_import.sku
 		product.CnName = product_import.cn_name
-		product.Name = product_import.eng_name
 		product.CostPrice = product_import.cost_price
 		product.Length = product_import.length
 		product.Width = product_import.width
 		product.Height = product_import.height
 		product.Weight = product_import.weight
+
+		var status_name = product_import.status
+		// 查看状态是否存在
+		var status_id = get_product_status_id_by_name(status_name)
+
+		if status_id == 0 {
+			return c.RenderJson(map[string]interface{}{
+				"success": false,
+				"message": fmt.Sprintf("序号 %s 的商品状态 %s 无效", product_import.ord_num, product_import.status),
+			})
+		}
+
+		product.StatusId = status_id
 
 		if product_import.length == 0 || product_import.width == 0 || product_import.height == 0 || product_import.weight == 0 {
 			has_zero_data = true
@@ -309,7 +334,6 @@ func (c ErpProductImport) Upload() revel.Result {
 			core.HandleError(err)
 			*/
 		} else {
-			product.StatusId = models.PRODUCT_STATUS_ZC
 			_, err = db_session.Insert(&product)
 			core.HandleError(err)
 
