@@ -131,6 +131,12 @@ func (c ErpInventory) DetailData() revel.Result {
 		core.HandleError(err)
 
 		detail_form.StorageLocList = storage_loc_list
+
+		var product models.ProductInfo
+		_, err = db_session.Id(inventory.ProductId).Get(&product)
+		core.HandleError(err)
+
+		detail_form.ProductSku = product.Sku
 	}
 
 	detail_form.Inventory = inventory
@@ -152,6 +158,17 @@ func (c ErpInventory) Save() revel.Result {
 	}
 
 	inventory := detail_form.Inventory
+	var product_sku = detail_form.ProductSku
+
+	var product_id = product_service.Get_product_id_by_sku(product_sku, db_session)
+	if product_id == 0 {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "保存失败，商品SKU不存在！",
+		})
+	}
+
+	inventory.ProductId = product_id
 
 	var affected int64
 	if detail_form.IsCreate() {

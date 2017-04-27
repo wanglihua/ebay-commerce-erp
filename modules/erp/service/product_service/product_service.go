@@ -10,6 +10,7 @@ import (
 	"matrix/modules/erp/service/product_log_service"
 )
 
+//todo: 调用这个方式的地方应该检查一下，是不是应该调用商品库存里面的成本价
 func Get_product_cost_price(product_id int64, db_session *xorm.Session) float64 {
 	// SELECT p.cost_price FROM erp_product p WHERE p.id = 1
 	sql := `SELECT p.cost_price FROM erp_product p WHERE p.id = %d`
