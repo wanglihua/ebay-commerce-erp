@@ -22,6 +22,8 @@ type LogisticsSettingInfo struct {
 	Pphzlzl            float64         `xorm:"decimal(18,6) notnull 'pphzlzl'" json:"pphzlzl"`                                            // 匹配后重量折率 匹配物流后对重量打多少折
 	Pphzbdz            int             `xorm:"int notnull 'pphzbdz'" json:"pphzbdz"`                                                      // 匹配后中边打折  是否匹配物流后对中边打折    1 是 0 否
 	Pphzbzl            float64         `xorm:"decimal(18,6) notnull 'pphzbzl'" json:"pphzbzl"`                                            // 匹配后中边折率 匹配物流后对中边打多少折
+	Ptfl               float64         `xorm:"decimal(18,6) notnull 'ptfl'" json:"ptfl"`                                                  // 平台费率
+	Jyfl               float64         `xorm:"decimal(18,6) notnull 'jyfl'" json:"jyfl"`                                                  // 交易费率
 	CreateTime         core.Time       `xorm:"created notnull 'create_time'" json:"create_time"`
 	UpdateTime         core.Time       `xorm:"updated notnull 'update_time'" json:"update_time"`
 	Version            int             `xorm:"version notnull 'version'" json:"version"`
