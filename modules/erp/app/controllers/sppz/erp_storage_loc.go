@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"encoding/json"
+	"fmt"
 	"strconv"
 
 	"github.com/revel/revel"
@@ -188,4 +189,23 @@ func (c ErpStorageLoc) Delete() revel.Result {
 	core.HandleError(err)
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})
+}
+
+func (c ErpStorageLoc) GetStorageLocList() revel.Result {
+	// 这个不用权限限制，别的地方都会调用
+
+	var db_session = c.DbSession
+
+	var stock_id int64
+	c.Params.Bind(&stock_id, "stock_id")
+
+	var storage_loc_list = make([]models.StorageLocInfo, 0)
+	err := db_session.Where(fmt.Sprintf("stock_id = %d", stock_id)).Find(&storage_loc_list)
+	core.HandleError(err)
+
+	return c.RenderJson(map[string]interface{}{
+		"success":          true,
+		"message":          "获取库位列表成功！",
+		"storage_loc_list": storage_loc_list,
+	})
 }

@@ -81,7 +81,10 @@ func (c ErpInventory) ListData() revel.Result {
 }
 
 type InventoryDetailForm struct {
-	Inventory models.InventoryInfo `json:"inventory"`
+	Inventory      models.InventoryInfo     `json:"inventory"`
+	StockList      []models.StockInfo       `json:"stock_list"`
+	StorageLocList []models.StorageLocInfo  `json:"storage_loc_list"`
+	ProductSku     string                   `json:"product_sku"`
 }
 
 func (f *InventoryDetailForm) IsCreate() bool {
@@ -108,6 +111,13 @@ func (c ErpInventory) DetailData() revel.Result {
 	var inventory_id int64
 	c.Params.Bind(&inventory_id, "id")
 
+	var stock_list = make([]models.StockInfo, 0)
+	err := db_session.Find(&stock_list)
+	core.HandleError(err)
+
+	var detail_form InventoryDetailForm
+	detail_form.StockList = stock_list
+
 	var inventory models.InventoryInfo
 	if inventory_id != 0 {
 		has, err := db_session.Id(inventory_id).Get(&inventory)
@@ -115,9 +125,14 @@ func (c ErpInventory) DetailData() revel.Result {
 		if has == false {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "指定的商品库存不存在！"})
 		}
+
+		var storage_loc_list = make([]models.StorageLocInfo, 0)
+		err = db_session.Where(fmt.Sprintf("stock_id = %d", inventory.StockId)).Find(&storage_loc_list)
+		core.HandleError(err)
+
+		detail_form.StorageLocList = storage_loc_list
 	}
 
-	var detail_form InventoryDetailForm
 	detail_form.Inventory = inventory
 
 	return c.RenderJson(detail_form)
@@ -188,11 +203,12 @@ func (c ErpInventory) Import() revel.Result {
 	//序号 商品编号	仓库	仓位	库存
 
 	type inventory_import_t struct {
-		OrdNum         string // 序号
-		ProductSku     string // 商品编号
-		StockName      string // 仓库名称
-		StorageLocName string // 仓位名称
-		Qty            int64  // 库存
+		OrdNum         string  // 序号
+		ProductSku     string  // 商品编号
+		StockName      string  // 仓库名称
+		StorageLocName string  // 仓位名称
+		Qty            int64   // 库存
+		CostPrice      float64 // 成本价
 	}
 
 	inventory_import_list := make([]inventory_import_t, 0)
@@ -263,6 +279,15 @@ func (c ErpInventory) Import() revel.Result {
 			cell_val = strings.TrimSpace(cell_val)
 			qty, _ := strconv.ParseInt(cell_val, 10, 64)
 			inventory_import.Qty = qty
+			col_index++
+
+			// 成本价
+			cell = row.Cells[col_index]
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
+			cost_price, _ := strconv.ParseFloat(cell_val, 64)
+			inventory_import.CostPrice = cost_price
 			col_index++
 
 			inventory_import_list = append(inventory_import_list, inventory_import)
@@ -336,6 +361,7 @@ func (c ErpInventory) Import() revel.Result {
 		inventory.ProductId = product_id
 		// inventory.Qty += inventory_import.Qty // 如果是插入的话， 开始时 inventory.Qty
 		inventory.Qty = inventory_import.Qty // 这里采用覆盖原来库存的方式
+		inventory.CostPrice = inventory_import.CostPrice
 
 		if has == false {
 			// 插入
@@ -343,7 +369,7 @@ func (c ErpInventory) Import() revel.Result {
 			core.HandleError(err)
 		} else {
 			// 更新
-			_, err := db_session.Id(inventory.Id).Cols("stock_id", "storage_loc_id", "product_id", "qty").Update(&inventory)
+			_, err := db_session.Id(inventory.Id).Cols("stock_id", "storage_loc_id", "product_id", "qty", "cost_price").Update(&inventory)
 			core.HandleError(err)
 		}
 	}
