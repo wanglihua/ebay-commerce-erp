@@ -21,6 +21,15 @@
                         <i class="ace-icon fa fa-file-excel-o"></i>
                         导入
                     </button>
+                    <button class="btn btn-danger btn-sm" @click="deleteImportProduct()">
+                        <i class="ace-icon fa fa-trash-o"></i>
+                        删除订单
+                    </button>
+                    <button class="btn btn-danger btn-sm" @click="deleteImportBatch()">
+                        <i class="ace-icon fa fa-trash"></i>
+                        删除批次
+                    </button>
+                    {%/*
                     <button class="btn btn-success btn-sm" @click="confirmProductImport()">
                         <i class="ace-icon fa fa-floppy-o"></i>
                         确认
@@ -29,15 +38,13 @@
                         <i class="ace-icon fa fa-trash-o"></i>
                         清空
                     </button>
+                    */%}
                     <div style="margin-top: 10px;">
                         <a href="/static/excel-template/product_import.xlsx">下载Excel模板</a>
                     </div>
                 </div>
                 <div>
-                    <table id="productImportList" class="table table-striped table-bordered table-hover"></table>
-                    <div class="todo">1、导入到 product_import 表中时，检查 sku 是否相重；2、从 product_import 到 product 表中时检查 product 中
-                        sku 是否相重；3、检查Excel中的数据格式是否可空和正确，价格重量等的实数格式是否对。
-                    </div>
+                    <table id="productList" class="table table-striped table-bordered table-hover"></table>
                 </div>
             </div>
         </div>
@@ -57,7 +64,7 @@
             browse_button: 'btnImport',
             file_data_name: "excel_file",
 
-            url: '{%url "ErpProductImport.Import"%}',
+            url: '{%url "ErpProductImport.Upload"%}',
             max_file_size: '10000kb',
 
             filters: [
@@ -75,7 +82,7 @@
                     if (result.success != true) {
                         $.msg.error(result.message);
                     } else {
-                        reloadList('#productImportList');
+                        reloadList('#productList');
                         $.msg.show(result.message);
                     }
                 },
@@ -91,13 +98,16 @@
     var vm = new Vue({
         el: "#page",
         data: {
+            "page": {
+                "batch_code": 0
+            },
             "detail": {
                 "product_import": {}
             }
         },
         mounted: function () {
             initDataTable(
-                '#productImportList',
+                '#productList',
                 {
                     "sAjaxSource": '{%url "ErpProductImport.ListData"%}',
                     "aaSorting": [[1, "asc"]],
@@ -126,16 +136,26 @@
         },
         methods: {
             reloadList: function () {
-                reloadList('#productImportList');
+                reloadList('#productList');
             },
-            showProductImport: function () {
+            deleteImportProduct: function () {
+                var id_list = [];
+                $('#productList tbody tr>td:first-child input:checkbox').each(function () {
+                    if (this.checked) {
+                        id_list.push($(this).val());
+                    }
+                });
 
-            },
-            confirmProductImport: function () {
-                $.msg.confirm("确认要导入当前数据吗？", function () {
+                if (id_list.length === 0) {
+                    $.msg.alert("请选择数据！");
+                    return;
+                }
+
+                $.msg.confirm("确认要删除吗？", function () {
                     $.ajax({
-                        url: '{%url "ErpProductImport.Confirm"%}',
+                        url: '{%url "ErpProductImport.Delete"%}',
                         type: "POST",
+                        data: {"id_list": id_list},
                         success: function (data) {
                             if (data.success == false) {
                                 $.msg.error(data.message);
@@ -149,11 +169,17 @@
                     });
                 });
             },
-            clearProductImport: function () {
-                $.msg.confirm("确认要清空吗？", function () {
+            deleteImportBatch: function () {
+                if (vm.page.batch_code == 0) {
+                    $.msg.error("请选择要删除的导入批次！");
+                    return;
+                }
+
+                $.msg.confirm("确认要删除导入批次吗？", function () {
                     $.ajax({
-                        url: '{%url "ErpProductImport.Clear"%}',
+                        url: '{%url "ErpProductImport.BatchDelete"%}',
                         type: "POST",
+                        data: {"batch_code": vm.page.batch_code},
                         success: function (data) {
                             if (data.success == false) {
                                 $.msg.error(data.message);
@@ -162,12 +188,75 @@
                             else {
                                 $.msg.show(data.message);
                             }
+
+                            //重新加载页面数据，更新批次下拉框
+                            loadVmPageData();
+
                             vm.reloadList();
                         }
                     });
                 });
             }
+
         }
     });
+
+    function loadPageData(this_vm) {
+        $.ajax({
+                url: '{%url "ErpProductImport.PageData" %}',
+                type: "POST",
+                success: function (result) {
+                    if (result.success == false) {
+                        $.msg.error(result.message);
+                        return;
+                    }
+                    this_vm.page = result;
+                }
+            }
+        );
+    }
+
+    function loadVmPageData() {
+        loadPageData(vm);
+    }
 </script>
 {%footer%}
+
+{%/*
+confirmProductImport: function () {
+$.msg.confirm("确认要导入当前数据吗？", function () {
+$.ajax({
+url: '{%url "ErpProductImport.Confirm"%}',
+type: "POST",
+success: function (data) {
+if (data.success == false) {
+$.msg.error(data.message);
+return;
+}
+else {
+$.msg.show(data.message);
+}
+vm.reloadList();
+}
+});
+});
+},
+clearProductImport: function () {
+$.msg.confirm("确认要清空吗？", function () {
+$.ajax({
+url: '{%url "ErpProductImport.Clear"%}',
+type: "POST",
+success: function (data) {
+if (data.success == false) {
+$.msg.error(data.message);
+return;
+}
+else {
+$.msg.show(data.message);
+}
+vm.reloadList();
+}
+});
+});
+}
+*/%}

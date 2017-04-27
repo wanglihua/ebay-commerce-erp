@@ -4,7 +4,10 @@ import (
 	"fmt"
 
 	"github.com/go-xorm/xorm"
+	"github.com/revel/revel"
 	"matrix/core"
+	"matrix/modules/erp/models"
+	"matrix/modules/erp/service/product_log_service"
 )
 
 func Get_product_cost_price(product_id int64, db_session *xorm.Session) float64 {
@@ -33,4 +36,22 @@ func Get_product_id_by_sku(sku string, db_session *xorm.Session) int64 {
 	core.HandleError(err)
 
 	return product_id.ProductId
+}
+
+func Delete_product_list(product_id_list []int64, db_session *xorm.Session, web_session revel.Session) {
+
+	//todo: InventoryCheckEntryInfo ProductId
+
+	for _, product_id := range product_id_list {
+		var product models.ProductInfo
+		has, err := db_session.Id(product_id).Get(&product)
+		core.HandleError(err)
+
+		if has {
+			product_log_service.Insert_product_log(nil, &product, core.Db_operation_types.Delete, db_session, web_session)
+		}
+	}
+
+	_, err := db_session.In("id", product_id_list).Delete(new(models.ProductInfo))
+	core.HandleError(err)
 }

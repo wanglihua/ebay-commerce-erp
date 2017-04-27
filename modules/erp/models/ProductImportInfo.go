@@ -4,6 +4,7 @@ import (
 	"matrix/core"
 )
 
+// 这个表可以废了
 type ProductImportInfo struct {
 	Id          int64     `xorm:"bigint notnull pk autoincr 'id'" json:"id"`
 	Sku         string    `xorm:"nvarchar(200) notnull index 'sku'" json:"sku" smith:"verbose_name=SKU,min=2,max=100"`

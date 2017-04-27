@@ -563,7 +563,7 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 	var au_stock_list = p_ol.au_stock_list
 	var stock_id_has_products_map = make(map[int64]bool)
 	for _, stock := range au_stock_list {
-		if check_stock_has_order_products(stock.Id, p_order_logistics_data) { // 仓库没有全部的商品数量的库存
+		if check_stock_has_order_products(stock.Id, p_order_logistics_data) { // 仓库有没有全部的商品数量的库存，有
 			stock_id_has_products_map[stock.Id] = true
 		}
 	}
@@ -802,6 +802,7 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 }
 
 // 检查仓库是否有订单中的所有商品数量的库存
+// todo: 匹配订单的时候，只能是澳洲的仓库的啊
 func check_stock_has_order_products(stock_id int64, p_order_logistics_data *order_logistics_data_t) bool {
 	var products_stock_qty_list = p_order_logistics_data.products_stock_qty_list
 	var order_product_info_list = p_order_logistics_data.order_product_info_list

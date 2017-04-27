@@ -130,10 +130,10 @@ POST /erp/product/weight/save                  ErpProductWeight.Save
 POST /erp/product/import                       ErpProductWeight.Import
 
 GET  /erp/product/import                       ErpProductImport.Index
+POST /erp/product/import/data/page             ErpProductImport.PageData
 POST /erp/product/import/data/list             ErpProductImport.ListData
-POST /erp/product/import/import                ErpProductImport.Import
-POST /erp/product/import/confirm               ErpProductImport.Confirm
-POST /erp/product/import/clear                 ErpProductImport.Clear
+POST /erp/product/import/delete                ErpProductImport.Delete
+POST /erp/product/import/batch/delete          ErpProductImport.BatchDelete
 
 GET  /erp/product/export                       ErpProductExport.Index
 POST /erp/product/export/data/list             ErpProductExport.ListData

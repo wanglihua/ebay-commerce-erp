@@ -3,7 +3,6 @@ package controllers
 import (
 	"encoding/json"
 	"fmt"
-	"strconv"
 	"strings"
 
 	"github.com/revel/revel"
@@ -16,6 +15,7 @@ import (
 	"matrix/modules/erp/service/order_service"
 	"matrix/modules/erp/service/product_cate_service"
 	"matrix/modules/erp/service/product_log_service"
+	"matrix/modules/erp/service/product_service"
 	"matrix/modules/erp/service/status_service"
 )
 
@@ -336,22 +336,9 @@ func (c ErpProduct) Delete() revel.Result {
 	product_id_list := make([]int64, 0)
 	c.Params.Bind(&product_id_list, "id_list")
 
-	//todo: InventoryCheckEntryInfo ProductId
+	product_service.Delete_product_list(product_id_list, db_session, c.Session)
 
-	for _, product_id := range product_id_list {
-		var product models.ProductInfo
-		has, err := db_session.Id(product_id).Get(&product)
-		core.HandleError(err)
-
-		if has {
-			product_log_service.Insert_product_log(nil, &product, core.Db_operation_types.Delete, db_session, c.Session)
-		}
-	}
-
-	affected, err := db_session.In("id", product_id_list).Delete(new(models.ProductInfo))
-	core.HandleError(err)
-
-	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})
+	return c.RenderJson(core.JsonResult{Success: true, Message: "数据删除成功!"})
 }
 
 func (c ErpProduct) ProductOrderList(product_id int64) revel.Result {

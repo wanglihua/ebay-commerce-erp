@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/revel/revel"
 	"github.com/tealeg/xlsx"
@@ -13,6 +12,7 @@ import (
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/exchange_rate_service"
+	"matrix/modules/erp/service/import_batch_code_service"
 	"matrix/modules/erp/service/order_import_batch_service"
 	"matrix/modules/erp/service/order_logistics_service"
 )
@@ -403,9 +403,8 @@ SELECT sa.id AS shop_id, sa.name AS shop_name FROM erp_shop_account sa;
 
 	var aud_exchange_rate_setting = exchange_rate_service.Get_aud_exchange_rate(db_session)
 
-	var time_now = time.Now()
 	// 例如 20170414212812
-	var import_batch_code int64 = int64(time_now.Year())*10000000000 + int64(time_now.Month())*100000000 + int64(time_now.Day()*1000000) + int64(time_now.Hour()*10000) + int64(time_now.Minute()*100) + int64(time_now.Second())
+	var import_batch_code int64 = import_batch_code_service.Get_import_batch_code()
 
 	// 整理电话号码 "1234 5666"
 	for index, order_import := range order_import_list {

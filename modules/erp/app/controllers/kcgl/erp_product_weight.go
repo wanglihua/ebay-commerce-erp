@@ -284,11 +284,19 @@ func (c ErpProductWeight) Import() revel.Result {
 			_, err = db_session.Id(product.Id).Cols(update_col_list...).Update(&product)
 			core.HandleError(err)
 		} else {
+			// 这里只用于维护和更新长宽高数据，不进行数据的插入操作
+			return c.RenderJson(map[string]interface{}{
+				"success": true,
+				"message": "商品SKU数据库中不存在！",
+			})
+
+			/*
 			product.CnName = product.Sku
 			product.Name = product.Sku
 			product.StatusId = models.PRODUCT_STATUS_ZC
 			_, err = db_session.Insert(&product)
 			core.HandleError(err)
+			*/
 		}
 	}
 
