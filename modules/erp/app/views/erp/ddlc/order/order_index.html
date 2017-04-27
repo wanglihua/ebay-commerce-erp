@@ -63,17 +63,24 @@
                         <thead>
                         <tr>
                             <th>id</th>
-                            <th>订单编号</th>
+                            <th id="th_order_code">订单编号</th>
                             <th id="th_status_name">订单状态</th>
                             <th id="th_type_name">订单类型</th>
-                            <th id="th_store_name">店铺</th>
-                            <th id="th_buyer_user">客户id</th>
-                            <th id="th_total_amount">原金额</th>
-                            <th id="th_total_amount_rmb">金额</th>
-                            <th id="th_amount_paid_rmb">支付金额</th>
-                            <th>支付方式</th>
+
+                            <th id="th_store_name">店铺名</th>
+                            <th id="th_store_code">店铺代码</th>
+                            <th id="th_tran_id">交易代码</th>
+
+                            <th id="th_buyer_user_id">客户id</th>
+                            <th id="th_payment_methods">支付方式</th>
+
+                            <th id="th_total_amount">原金额(AUD)</th>
+                            <th id="th_total_amount_rmb">原金额(RMB)</th>
+                            <th id="th_express_fee">原运费金额(AUD)</th>
+
                             <th id="th_created_time">建单时间</th>
                             <th id="th_shipped_time">发货时间</th>
+                            <th id="th_paid_time">支付时间</th>
                         </tr>
                         </thead>
                     </table>
@@ -139,15 +146,15 @@
                         },
 
                         {
-                            "mDataProp": "o.code", "title": "订单编号", "bSearchable": true, "width": 130,
+                            "mDataProp": "o.code", "title": "订单编号", "bSearchable": true,
                             "render": function (data, type, row) {
-                                return "<a href='/erp/order/detail/" + row.o.id + "' target='_blank'>" + data + "</a>";
+                                return "<div class='div_order_code'><a href='/erp/order/detail/" + row.o.id + "' target='_blank'>" + data + "</a></div><div>" + row.s.name + "</div><div>" + row.ot.name + "</div>";
                             }
                         },
                         {
                             "mDataProp": "s.name", "title": "订单状态", "bSearchable": true,
                             "render": function (data, type, row) {
-                                return "<div class='div_status_name'>" + row.s.name + "</div><div>" + row.ot.name + "</div>";
+                                return "<div class='div_status_name'></div>";
                             }
                         },
                         {
@@ -156,43 +163,62 @@
                                 return "<div class='div_type_name'></div>";
                             }
                         },
-
                         {
-                            "mDataProp": "sa.name", "title": "店铺", "bSearchable": true,
+                            "mDataProp": "sa.name", "title": "店铺名", "bSearchable": true,
                             "render": function (data, type, row) {
-                                return "<div class='div_store_name'>" + row.pf.name + " " + row.sa.name + "</div><div>" + row.o.buyer_user_id + "</div>";
+                                var tran_id = row.o.tran_id;
+                                if (tran_id === "") {
+                                    tran_id = "--------";
+                                }
+                                return "<div class='div_store_name'>" + row.pf.name + " " + row.sa.name + "</div><div>" + row.sa.code + "</div><div>" + tran_id + "</div>";
+                            }
+                        },
+                        {
+                            "mDataProp": "sa.name", "title": "店铺代码", "bSearchable": true,
+                            "render": function (data, type, row) {
+                                return "<div class='div_store_code'></div>";
+                            }
+                        },
+                        {
+                            "mDataProp": "o.tran_id", "title": "交易号", "bSearchable": true,
+                            "render": function (data, type, row) {
+                                return "<div class='div_tran_id'></div>";
                             }
                         },
                         {
                             "mDataProp": "o.buyer_user_id", "title": "客户id", "bSearchable": true,
                             "render": function (data, type, row) {
-                                return "<div class='div_buyer_user'></div>";
+                                return "<div class='div_buyer_user_id'>" + row.o.buyer_user_id + "</div><div>" + row.o.payment_methods + "</div>";
                             }
                         },
                         {
-                            "mDataProp": "o.total_amount", "title": "原金额", "bSearchable": false,
+                            "mDataProp": "o.payment_methods", "title": "支付方式", "bSearchable": true,
                             "render": function (data, type, row) {
-                                return "<div class='div_total_amount'>" + row.o.total_amount_currency + " " + row.o.total_amount + "</div><div>RMB " + row.o.total_amount_rmb + "</div><div>RMB " + row.o.amount_paid_rmb + "</div>";
+                                return "<div class='div_payment_methods'></div>";
                             }
                         },
                         {
-                            "mDataProp": "o.total_amount_rmb", "title": "金额", "bSearchable": false,
+                            "mDataProp": "o.total_amount", "title": "原金额(AUD)", "bSearchable": false,
+                            "render": function (data, type, row) {
+                                return "<div class='div_total_amount'>" + row.o.total_amount_currency + " " + row.o.total_amount + "</div><div>RMB " + row.o.total_amount_rmb + "</div><div>RMB " + row.o.express_fee + "</div>";
+                            }
+                        },
+                        {
+                            "mDataProp": "o.total_amount_rmb", "title": "原金额(RMB)", "bSearchable": false,
                             "render": function (data, type, row) {
                                 //return "RMB " + data;
                                 return "<div class='div_total_amount_rmb'></div>";
                             }
                         },
                         {
-                            "mDataProp": "o.amount_paid_rmb", "title": "支付金额", "bSearchable": false,
+                            "mDataProp": "o.express_fee", "title": "原运费金额(AUD)", "bSearchable": false,
                             "render": function (data, type, row) {
                                 //return "RMB " + data;
-                                return "<div class='div_amount_paid_rmb'></div>";
+                                return "<div class='div_express_fee'></div>";
                             }
                         },
-
-                        {"mDataProp": "o.payment_methods", "title": "支付方式", "bSearchable": true},
                         {
-                            "mDataProp": "o.created_time", "title": "建单时间", "bSearchable": false, "width": 135,
+                            "mDataProp": "o.created_time", "title": "建单时间", "bSearchable": false,
                             "render": function (data, type, row) {
                                 var order_created_time = "----------";
                                 if (row.o.created_time) {
@@ -207,9 +233,15 @@
                             }
                         },
                         {
-                            "mDataProp": "o.shipped_time", "title": "发货时间", "bSearchable": false, "width": 135,
+                            "mDataProp": "o.shipped_time", "title": "发货时间", "bSearchable": false,
                             "render": function (data, type, row) {
                                 return '<div class="div_shipped_time"></div>';
+                            }
+                        },
+                        {
+                            "mDataProp": "o.paid_time", "title": "支付时间", "bSearchable": false,
+                            "render": function (data, type, row) {
+                                return '<div class="div_paid_time">' + data + '</div>';
                             }
                         }
                     ],
@@ -239,15 +271,20 @@
 
                                 fnCallback(data);
 
-                                $("#orderList div.div_store_name").parent().css("width", "135px");
-                                $("#orderList div.div_buyer_user").parent().css("display", "none");
-
-                                $("#orderList div.div_status_name").parent().css("width", "80px");
+                                $("#orderList div.div_order_code").parent().css("width", "130px");
+                                $("#orderList div.div_status_name").parent().css("display", "none");
                                 $("#orderList div.div_type_name").parent().css("display", "none");
 
-                                $("#orderList div.div_total_amount").parent().css("width", "100px");
+                                $("#orderList div.div_store_name").parent().css("width", "135px");
+                                $("#orderList div.div_store_code").parent().css("display", "none");
+                                $("#orderList div.div_tran_id").parent().css("display", "none");
+
+                                $("#orderList div.div_buyer_user_id").parent().css("width", "135px");
+                                $("#orderList div.div_payment_methods").parent().css("display", "none");
+
+                                $("#orderList div.div_total_amount").parent().css("width", "135px");
                                 $("#orderList div.div_total_amount_rmb").parent().css("display", "none");
-                                $("#orderList div.div_amount_paid_rmb").parent().css("display", "none");
+                                $("#orderList div.div_express_fee").parent().css("display", "none");
 
                                 $("#orderList div.div_created_time").parent().css("width", "135px");
                                 $("#orderList div.div_shipped_time").parent().css("display", "none");
@@ -256,22 +293,28 @@
                     }
                 }
             );
-
-            $("#th_store_name").before("<th id='th_store_name_buyer_user'></th>");
-            $("#th_store_name").wrap("<div id='div_store_name'></div>");
-            $("#th_buyer_user").wrap("<div id='div_buyer_user'></div>");
-            $("#th_store_name_buyer_user").append($("#div_store_name")).append($("#div_buyer_user"));
-
-            $("#th_status_name").before("<th id='th_status_type_name'></th>");
+            $("#th_order_code").before("<th id='th_order_code_ext'></th>");
+            $("#th_order_code").wrap("<div id='div_order_code'></div>");
             $("#th_status_name").wrap("<div id='div_status_name'></div>");
             $("#th_type_name").wrap("<div id='div_type_name'></div>");
-            $("#th_status_type_name").append($("#div_status_name")).append($("#div_type_name"));
+            $("#th_order_code_ext").append($("#div_order_code")).append($("#div_status_name")).append($("#div_type_name"));
+
+            $("#th_store_name").before("<th id='th_store_name_ext'></th>");
+            $("#th_store_name").wrap("<div id='div_store_name'></div>");
+            $("#th_store_code").wrap("<div id='div_store_code'></div>");
+            $("#th_tran_id").wrap("<div id='div_tran_id'></div>");
+            $("#th_store_name_ext").append($("#div_store_name")).append($("#div_store_code")).append($("#div_tran_id"));
+
+            $("#th_buyer_user_id").before("<th id='th_buyer_user_id_ext'></th>");
+            $("#th_buyer_user_id").wrap("<div id='div_buyer_user_id'></div>");
+            $("#th_payment_methods").wrap("<div id='div_payment_methods'></div>");
+            $("#th_buyer_user_id_ext").append($("#div_buyer_user_id")).append($("#div_payment_methods"));
 
             $("#th_total_amount").before("<th id='th_total_paid_amount'></th>");
             $("#th_total_amount").wrap("<div id='div_total_amount'></div>");
             $("#th_total_amount_rmb").wrap("<div id='div_total_amount_rmb'></div>");
-            $("#th_amount_paid_rmb").wrap("<div id='div_amount_paid_rmb'></div>");
-            $("#th_total_paid_amount").append($("#div_total_amount")).append($("#div_total_amount_rmb")).append($("#div_amount_paid_rmb"));
+            $("#th_express_fee").wrap("<div id='div_express_fee'></div>");
+            $("#th_total_paid_amount").append($("#div_total_amount")).append($("#div_total_amount_rmb")).append($("#div_express_fee"));
 
             $("#th_created_time").before("<th id='th_created_time_shipped_time'></th>");
             $("#th_created_time").wrap("<div id='div_created_time'></div>");
