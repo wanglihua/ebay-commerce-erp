@@ -93,12 +93,12 @@ func (f *StorageLocDetailForm) Valid(validation *revel.Validation) bool {
 		validation.MaxSize(f.StorageLoc.Desc.String, 500).Message("描述长度不能大于500！")
 	}
 
-	validation.Required(f.StorageLoc.XAxes).Message("X轴坐标不能为空！")
+	// validation.Required(f.StorageLoc.XAxes).Message("X轴坐标不能为空！")
 	if f.StorageLoc.XAxes != "" {
 		validation.MaxSize(f.StorageLoc.XAxes, 100).Message("X轴坐标长度不能大于100！")
 	}
 
-	validation.Required(f.StorageLoc.YAxes).Message("Y轴坐标不能为空！")
+	// validation.Required(f.StorageLoc.YAxes).Message("Y轴坐标不能为空！")
 	if f.StorageLoc.YAxes != "" {
 		validation.MaxSize(f.StorageLoc.YAxes, 100).Message("Y轴坐标长度不能大于100！")
 	}
