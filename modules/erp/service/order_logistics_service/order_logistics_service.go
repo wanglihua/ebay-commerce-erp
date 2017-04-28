@@ -597,6 +597,8 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 		// 获取所有商品的整体的 长，宽，高，重量 等的数据，体积重是利用体积重公式计算得到的结果
 		var length, width, height, dim_weight, actual_weight float64 = get_order_products_whole_logistics_data(p_order_logistics_data, logistics_mode.Tjzgs)
 
+		revel.TRACE.Println("length, width, height, dim_weight, actual_weight", length, width, height, dim_weight, actual_weight)
+
 		// 匹配前打折
 		{
 			// 匹配前重量打折
@@ -730,9 +732,13 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 		}
 	} // for _, logistics_mode := range logistics_mode_list {
 
+	revel.TRACE.Println("final_length, final_width, final_height, final_weight, final_actual_weight", final_length, final_width, final_height, final_weight, final_actual_weight)
+
 	if final_selected_mode_id == 0 || final_selected_fee_rate_id == 0 { // 匹配失败
 		return false, 0
 	}
+
+	revel.TRACE.Println("final_selected_mode_id", final_selected_mode_id)
 
 	// 现在的做法是，最后输出的匹配结果的数据，是受前后打折两者影响的。
 
@@ -741,7 +747,7 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 		// 匹配后重量打折
 		if logistics_setting.Pphzldz == 1 {
 			// 是不是指定实际重量打折
-			final_weight = final_weight * logistics_setting.Pphzlzl
+			final_actual_weight = final_actual_weight * logistics_setting.Pphzlzl
 		}
 
 		// 匹配后中边打折
@@ -750,18 +756,22 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 			side_length_slice.Sort()
 			var mid_length = side_length_slice[1] // 0, 1, 2 中间那条边
 
+			revel.TRACE.Println("mid_length, final_length, final_width, final_height, final_weight", mid_length, final_length, final_width, final_height, final_weight)
+
 			const MIN_FLOAT_DIFF = 0.0000000001
-			if (mid_length - final_length) < MIN_FLOAT_DIFF {
+			if (math.Abs(mid_length - final_length)) < MIN_FLOAT_DIFF {
 				final_length = final_length * logistics_setting.Pphzbzl
 			}
-			if (mid_length - final_width) < MIN_FLOAT_DIFF {
+			if (math.Abs(mid_length - final_width)) < MIN_FLOAT_DIFF {
 				final_width = final_width * logistics_setting.Pphzbzl
 			}
-			if (mid_length - final_height) < MIN_FLOAT_DIFF {
+			if (math.Abs(mid_length - final_height)) < MIN_FLOAT_DIFF {
 				final_height = final_height * logistics_setting.Pphzbzl
 			}
 		}
 	}
+
+	revel.TRACE.Println("final_length, final_width, final_height, final_weight, final_actual_weight", final_length, final_width, final_height, final_weight, final_actual_weight)
 
 	var address_id = p_order_logistics_data.order_shipping_address.Id
 
@@ -779,7 +789,7 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 	order_logistics.Length = final_length
 	order_logistics.Width = final_width
 	order_logistics.Height = final_height
-	order_logistics.Weight = final_weight
+	order_logistics.Weight = final_actual_weight
 	order_logistics.TotalFee = final_total_fee
 	order_logistics.PickFee = pick_fee_service.Get_product_pick_fee(final_actual_weight, p_ol.pick_fee_setting)
 

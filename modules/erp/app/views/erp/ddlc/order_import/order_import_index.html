@@ -274,11 +274,13 @@
                 }
 
                 $.msg.confirm("确认要匹配该批次的物流吗？", function () {
+                    showMask("物流匹配中，请稍候...");
                     $.ajax({
                         url: '{%url "ErpOrderImport.MatchLogistics"%}',
                         type: "POST",
                         data: {"batch_code": vm.page.batch_code},
                         success: function (data) {
+                            hideMask();
                             if (data.success == false) {
                                 $.msg.error(data.message);
                                 return;

@@ -1,9 +1,12 @@
 package controllers
 
 import (
+	"fmt"
+
 	"github.com/revel/revel"
 	"matrix/core"
-	"matrix/modules/auth/models"
+	"matrix/modules/erp/models"
+	"matrix/modules/erp/service/order_logistics_service"
 )
 
 type Test struct {
@@ -11,24 +14,28 @@ type Test struct {
 }
 
 func (c Test) Index() revel.Result {
-	db_session := c.DbSession
+	var db_session = c.DbSession
 
-	sql_builder := core.NewSqlBuilder()
-	sql_builder.Select("*");
-	sql_builder.Count("count(*) as user_count")
-	sql_builder.From("auth_user")
-	sql_builder.Where("id > 1")
-	sql_builder.OrderBy("login_name asc, id asc")
-	sql_builder.Limit(1, 2);
-	var user_list = make([]models.UserInfo, 0)
-	err := db_session.Sql(sql_builder.SqlList()).Find(&user_list)
+	var order models.OrderInfo
+	_, err := db_session.Where(fmt.Sprintf("code = '%s'", "18797")).Get(&order)
 	core.HandleError(err)
 
-	var user_count struct {
-		UserCount int64 `xorm:"'user_count'"`
-	}
-	_, err = db_session.Sql(sql_builder.SqlCount()).Get(&user_count)
+	order.StatusId = models.ORDER_STATUS_YZF
+	_, err = db_session.Id(order.Id).Cols("status_id").Update(&order)
 	core.HandleError(err)
 
-	return c.RenderText("Hello World!")
+	var p_ol = new(order_logistics_service.OrderLogistics)
+	err = p_ol.CalculateList([]models.OrderInfo{order}, db_session)
+	core.HandleError(err)
+
+	var order_logistics models.OrderLogisticsInfo
+	_, err = db_session.Where(fmt.Sprintf("order_id = %d", order.Id)).Get(&order_logistics)
+	core.HandleError(err)
+
+	return c.RenderJson(map[string]interface{}{
+		"length": order_logistics.Length,
+		"width":  order_logistics.Width,
+		"height": order_logistics.Height,
+		"weight": order_logistics.Weight,
+	})
 }
