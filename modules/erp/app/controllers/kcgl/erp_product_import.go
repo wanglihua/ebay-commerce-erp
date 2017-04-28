@@ -310,10 +310,14 @@ func (c ErpProductImport) Upload() revel.Result {
 		var status_id = get_product_status_id_by_name(status_name)
 
 		if status_id == 0 {
+			/*
 			return c.RenderJson(map[string]interface{}{
 				"success": false,
 				"message": fmt.Sprintf("序号 %s 的商品状态 %s 无效", product_import.ord_num, product_import.status),
 			})
+			*/
+
+			panic(fmt.Sprintf("序号 %s 的商品状态 %s 无效", product_import.ord_num, product_import.status))
 		}
 
 		product.StatusId = status_id
@@ -324,10 +328,15 @@ func (c ErpProductImport) Upload() revel.Result {
 
 		if has == true {
 			//这里只做数据插入不做数据更新修改
+
+			/*
 			return c.RenderJson(map[string]interface{}{
 				"success": false,
 				"message": fmt.Sprintf("序号 %s 的商品SKU %s 已存在", product_import.ord_num, product_import.sku),
 			})
+			*/
+
+			panic(fmt.Sprintf("序号 %s 的商品SKU %s 已存在", product_import.ord_num, product_import.sku))
 
 			/*
 			update_col_list := []string{"sku", "cn_name", "name", "cost_price", "length", "width", "height", "weight"}

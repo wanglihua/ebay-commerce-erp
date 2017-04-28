@@ -464,10 +464,14 @@ WHERE lc.name = '%s' AND lm.name = '%s'`
 
 		has, mode_id := is_logistics_company_and_mode_exist(logistics_fee_rate_import.CompanyName, logistics_fee_rate_import.ModeName)
 		if has == false {
+			/*
 			return c.RenderJson(map[string]interface{}{
 				"success": false,
 				"message": "导入文件中的物流公司和物流方式不存在！",
 			})
+			*/
+
+			panic(fmt.Sprintf("导入文件中的物流公司 %s 和物流方式 %s不存在", logistics_fee_rate_import.CompanyName, logistics_fee_rate_import.ModeName))
 		}
 
 		logistics_fee_rate.ModeId = mode_id

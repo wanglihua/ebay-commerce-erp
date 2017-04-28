@@ -529,10 +529,14 @@ func (c ErpLogisticsMode) Import() revel.Result {
 		has, err = db_session.Where(fmt.Sprintf("name = '%s'", logistics_mode_import.StockName)).Get(&stock)
 		core.HandleError(err)
 		if has == false {
+			/*
 			return c.RenderJson(map[string]interface{}{
 				"success": false,
 				"message": fmt.Sprintf("仓库名称 %s 不存在！", logistics_mode_import.StockName),
 			})
+			*/
+
+			panic(fmt.Sprintf("仓库名称 %s 不存在！", logistics_mode_import.StockName))
 		}
 
 		_, err = db_session.Insert(&logistics_mode)
