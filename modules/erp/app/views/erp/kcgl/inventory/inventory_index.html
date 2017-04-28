@@ -35,6 +35,34 @@
                 </div>
                 <div>
                     <table id="inventoryList" class="table table-striped table-bordered table-hover"></table>
+                    <table id="error_data_list" class="table table-striped table-bordered table-hover" style="display: none;">
+                        <caption>错误列表</caption>
+                        <thead>
+                        <tr>
+                            <th>序号</th>
+                            <th>商品编号</th>
+                            <th>仓库</th>
+                            <th>仓位</th>
+                            <th>库存</th>
+                            <th>成本价</th>
+                            <th>错误信息</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <template v-for="error_data in error_data_list">
+                            <tr>
+                                <td>{{error_data.ord_num}}</td>
+                                <td>{{error_data.product_sku}}</td>
+                                <td>{{error_data.stock_name}}</td>
+                                <td>{{error_data.storage_loc_name}}</td>
+                                <td>{{error_data.qty}}</td>
+                                <td>{{error_data.cost_price}}</td>
+                                <td>{{error_data.error_message}}</td>
+                            </tr>
+                        </template>
+                        </tbody>
+                    </table>
+
                     <div class="todo">1、不同的仓库管理员，只能看到有权限的仓库内的商品库存；2、商品库存变动的日志记录</div>
                 </div>
             </div>
@@ -164,9 +192,12 @@
                     var result = JSON.parse(response.response);
                     if (result.success != true) {
                         $.msg.error(result.message);
+                        vm.error_data_list = result.error_data_list;
+                        $("table#error_data_list").show();
                     } else {
                         reloadList('#inventoryList');
                         $.msg.show(result.message);
+                        $("table#error_data_list").hide();
                     }
                 },
                 Error: function (up, err) {
@@ -184,7 +215,8 @@
             "detail": {
                 "inventory": {},
                 "product_sku": ""
-            }
+            },
+            "error_data_list": []
         },
         mounted: function () {
             initDataTable(

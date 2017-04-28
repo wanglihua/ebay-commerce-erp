@@ -394,7 +394,7 @@ func (c ErpInventory) Import() revel.Result {
 		return c.RenderJson(map[string]interface{}{
 			"success":    false,
 			"message":    "数据导入出现错误，详情查看页面下方表格！",
-			"error_data": inventory_import_error_list,
+			"error_data_list": inventory_import_error_list,
 		})
 	}
 
