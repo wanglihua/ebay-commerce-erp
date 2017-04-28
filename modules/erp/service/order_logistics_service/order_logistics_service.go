@@ -464,10 +464,12 @@ func (p_ol *OrderLogistics) hold_check_product_info_miss(p_order *models.OrderIn
 // 13 //todo: 匹配最佳仓库及物流后订单亏损。需要在基础设置里面有设置亏损额或者亏损率的设置功能，超过设置范围了，自动到订单亏损hold
 func (p_ol *OrderLogistics) hold_check_great_deficit(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, order_logistics_id int64, db_session *xorm.Session) (is_hold_return bool) {
 	//todo: to complete
+	/*
 	if true {
 		p_ol.update_order_to_hold_type(p_order, models.ORDER_HOLD_TYPE_GREAT_DEFICIT, db_session)
 		return true
 	}
+	*/
 
 	return false
 }

@@ -84,6 +84,7 @@ func (c ErpOrderLogistics) ListData() revel.Result {
 		models.OrderInfo             `xorm:"extends" json:"o"`
 		models.StockInfo             `xorm:"extends" json:"s"`
 		models.LogisticsCompanyInfo  `xorm:"extends" json:"lc"`
+		models.LogisticsModeInfo     `xorm:"extends" json:"lm"`
 	}
 
 	/*
@@ -103,7 +104,7 @@ WHERE ol.stock_id = 0 AND ol.company_id = 0
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
 	var sb = core.NewSqlBuilder()
-	sb.Select("ol.*, o.*, s.*, lc.*")
+	sb.Select("ol.*, o.*, s.*, lc.*, lm.*")
 	sb.Count("count(ol.id) AS order_logistics_count")
 	sb.From(`erp_order_logistics ol
     INNER JOIN erp_order o ON o.id = ol.order_id
@@ -255,7 +256,7 @@ func (c ErpOrderLogistics) Save() revel.Result {
 
 func (c ErpOrderLogistics) Delete() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_LOGISTICS, c.Session)
-	
+
 	db_session := c.DbSession
 
 	order_logistics_id_list := make([]int64, 0)

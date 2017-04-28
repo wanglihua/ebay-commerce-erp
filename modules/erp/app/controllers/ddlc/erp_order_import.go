@@ -175,7 +175,6 @@ func (c ErpOrderImport) Upload() revel.Result {
 		Jydh string  // 6 交易单号  order
 		Skje float64 // 7 收款金额(澳币) order
 		Yfsr float64 // 8 运费收入(澳币)  order
-		//Cpcb float64 // 9 产品成本  product, order_item
 		Khzh string // 10 客户账号 order
 		Khxm string // 11 客户姓名 address
 		Khyx string // 12 客户邮箱 order
@@ -238,7 +237,7 @@ func (c ErpOrderImport) Upload() revel.Result {
 			order_import.Spbh = cell_val
 			col_index++
 
-			// 商品数量
+			// 商品数量 todo 数量解析
 			cell = row.Cells[col_index]
 			cell_val, err = cell.String()
 			core.HandleError(err)
@@ -271,31 +270,19 @@ func (c ErpOrderImport) Upload() revel.Result {
 			order_import.Jydh = cell_val
 			col_index++
 
-			// 收款金额(澳币)
+			// 收款金额(澳币) todo 数量解析
 			cell = row.Cells[col_index]
-			cell_val, err = cell.String()
-			core.HandleError(err)
+			cell_val, _ = cell.String()
 			cell_val = strings.TrimSpace(cell_val)
 			order_import.Skje, _ = strconv.ParseFloat(cell_val, 64)
 			col_index++
 
-			// 运费收入(澳币)
+			// 运费收入(澳币) todo 数量解析
 			cell = row.Cells[col_index]
-			cell_val, err = cell.String()
-			core.HandleError(err)
+			cell_val, _ = cell.String()
 			cell_val = strings.TrimSpace(cell_val)
 			order_import.Yfsr, _ = strconv.ParseFloat(cell_val, 64)
 			col_index++
-
-			/*
-			// 产品成本
-			cell = row.Cells[col_index]
-			cell_val, err = cell.String()
-			core.HandleError(err)
-			cell_val = strings.TrimSpace(cell_val)
-			order_import.Cpcb, _ = strconv.ParseFloat(cell_val, 64)
-			col_index++
-			*/
 
 			// 客户账号
 			cell = row.Cells[col_index]
@@ -422,10 +409,14 @@ SELECT sa.id AS shop_id, sa.name AS shop_name FROM erp_shop_account sa;
 		// 店铺是否存在
 		has, shop_id := is_shop_name_exist(order_import.Dpm)
 		if has == false {
+			/*
 			return c.RenderJson(map[string]interface{}{
 				"success": false,
 				"message": "导入文件中的店铺名不存在！",
 			})
+			*/
+
+			panic(fmt.Sprintf("导入文件中的店铺名 %s 不存在！", order_import.Dpm))
 		}
 
 		// 检查导入的订单编号是否存在
@@ -440,10 +431,13 @@ SELECT sa.id AS shop_id, sa.name AS shop_name FROM erp_shop_account sa;
 		_, err := db_session.Sql(sql_order_count).Get(&order_count)
 		core.HandleError(err)
 		if order_count.Count != 0 {
+			/*
 			return c.RenderJson(map[string]interface{}{
 				"success": false,
 				"message": "导入文件中的订单编号数据库中已经存在！",
 			})
+			*/
+			panic(fmt.Sprintf("导入文件中的订单编号 %s 数据库中已经存在！", order_import.Ddbh))
 		}
 
 		// 商品SKU是否存在
