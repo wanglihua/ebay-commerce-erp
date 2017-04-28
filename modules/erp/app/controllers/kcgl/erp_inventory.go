@@ -220,12 +220,18 @@ func (c ErpInventory) Import() revel.Result {
 	//序号 商品编号	仓库	仓位	库存
 
 	type inventory_import_t struct {
-		OrdNum         string  // 序号
-		ProductSku     string  // 商品编号
-		StockName      string  // 仓库名称
-		StorageLocName string  // 仓位名称
-		Qty            int64   // 库存
-		CostPrice      float64 // 成本价
+		OrdNum         string  `json:"ord_num"`          // 序号
+		ProductSku     string  `json:"product_sku"`      // 商品编号
+		StockName      string  `json:"stock_name"`       // 仓库名称
+		StorageLocName string  `json:"storage_loc_name"` // 仓位名称
+		Qty            int64   `json:"qty"`              // 库存
+		CostPrice      float64 `json:"cost_price"`       // 成本价
+
+		// 下面这些字段是从数据库里面查询后保存在这里面的，这样过程中，就不用二次查询了
+		stock_id       int64
+		storage_loc_id int64
+		product_id     int64
+		ErrorMessage   string `json:"error_message"`
 	}
 
 	inventory_import_list := make([]inventory_import_t, 0)
@@ -320,19 +326,16 @@ func (c ErpInventory) Import() revel.Result {
 		})
 	}
 
+	var inventory_import_error_list = make([]inventory_import_t, 0)
+	// 先检查一遍是不是有错误，
 	for _, inventory_import := range inventory_import_list {
 
 		// 检查 商品 sku
 		var product_id int64 = product_service.Get_product_id_by_sku(inventory_import.ProductSku, db_session)
 
 		if product_id == 0 {
-			return c.RenderJson(map[string]interface{}{
-				"success": false,
-				"message": fmt.Sprintf("序号 %s 的商品SKU %s 不存在！", inventory_import.OrdNum, inventory_import.ProductSku),
-			})
-
-			//使用 panic 可以事务回滚导入
-			// panic(fmt.Sprintf("序号 %s 的商品SKU %s 不存在！", inventory_import.OrdNum, inventory_import.ProductSku))
+			inventory_import.ErrorMessage = fmt.Sprintf("序号 %s 的商品SKU %s 不存在！", inventory_import.OrdNum, inventory_import.ProductSku)
+			inventory_import_error_list = append(inventory_import_error_list, inventory_import)
 		}
 
 		// 检查 仓库名称
@@ -340,30 +343,30 @@ func (c ErpInventory) Import() revel.Result {
 		var storage_loc_id int64
 
 		if stock_id == 0 {
-			return c.RenderJson(map[string]interface{}{
-				"success": false,
-				"message": fmt.Sprintf("序号 %s 的仓库名称 %s 不存在！", inventory_import.OrdNum, inventory_import.StockName),
-			})
-
-			//使用 panic 可以事务回滚导入
-			//panic(fmt.Sprintf("序号 %s 的仓库名称 %s 不存在！", inventory_import.OrdNum, inventory_import.StockName))
+			inventory_import.ErrorMessage = fmt.Sprintf("序号 %s 的仓库名称 %s 不存在！", inventory_import.OrdNum, inventory_import.StockName)
+			inventory_import_error_list = append(inventory_import_error_list, inventory_import)
 		} else { //仓库名称存在
 			var storage_loc_name = strings.TrimSpace(inventory_import.StorageLocName)
 			if storage_loc_name != "" {
 				// 如果提供了仓位， 检查仓位名称
-
 				storage_loc_id = storage_loc_service.Get_storage_loc_id_by_name(storage_loc_name, stock_id, db_session)
 				if storage_loc_id == 0 {
-					return c.RenderJson(map[string]interface{}{
-						"success": false,
-						"message": fmt.Sprintf("序号 %s 的仓位名称 %s 不存在！", inventory_import.OrdNum, inventory_import.StorageLocName),
-					})
-
-					// 使用 panic 可以事务回滚导入
-					// panic(fmt.Sprintf("序号 %s 的仓位名称 %s 不存在！", inventory_import.OrdNum, inventory_import.StorageLocName))
+					inventory_import.ErrorMessage = fmt.Sprintf("序号 %s 的仓位名称 %s 不存在！", inventory_import.OrdNum, inventory_import.StorageLocName)
+					inventory_import_error_list = append(inventory_import_error_list, inventory_import)
 				}
 			}
 		}
+
+		inventory_import.product_id = product_id
+		inventory_import.stock_id = stock_id
+		inventory_import.storage_loc_id = storage_loc_id
+	}
+
+	for _, inventory_import := range inventory_import_list {
+
+		var stock_id = inventory_import.stock_id
+		var storage_loc_id = inventory_import.storage_loc_id
+		var product_id = inventory_import.product_id
 
 		var inventory models.InventoryInfo
 		has, err := db_session.Where(fmt.Sprintf("stock_id = %d AND storage_loc_id = %d AND product_id = %d", stock_id, storage_loc_id, product_id)).Get(&inventory)
@@ -385,6 +388,14 @@ func (c ErpInventory) Import() revel.Result {
 			_, err := db_session.Id(inventory.Id).Cols("stock_id", "storage_loc_id", "product_id", "qty", "cost_price").Update(&inventory)
 			core.HandleError(err)
 		}
+	}
+
+	if len(inventory_import_error_list) != 0 {
+		return c.RenderJson(map[string]interface{}{
+			"success":    false,
+			"message":    "数据导入出现错误，详情查看页面下方表格！",
+			"error_data": inventory_import_error_list,
+		})
 	}
 
 	return c.RenderJson(map[string]interface{}{

@@ -68,6 +68,8 @@ func PanicInterceptor(c *revel.Controller) revel.Result {
 		err := c.DbSession.Rollback()
 		core.HandleError(err)
 		//}
+		// 这里也要 close 吧
+		c.DbSession.Close();
 	}
 
 	return nil

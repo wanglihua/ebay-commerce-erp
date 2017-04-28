@@ -27,6 +27,10 @@ func handleInvocationPanic(c *revel.Controller, err interface{}) {
 	errorDesc := fmt.Sprint(err)
 	revel.ERROR.Print(errorDesc, "\n", string(debug.Stack()))
 
+	c.Result = c.RenderJson(core.JsonResult{Success: false, Message: "操作失败！详细:" + errorDesc})
+
+	/*
+	// 这个判断无法区别，是上传文件的请求还是普通的请求
 	if core.IsAjaxRequest(c.Request) {
 		c.Result = c.RenderJson(core.JsonResult{Success: false, Message: "操作失败！详细:" + errorDesc})
 	} else {
@@ -36,6 +40,7 @@ func handleInvocationPanic(c *revel.Controller, err interface{}) {
 			c.Result = c.RenderText(fmt.Sprintf("%s", errorDesc))
 		}
 	}
+	*/
 }
 
 var HeaderFilter = func(c *revel.Controller, fc []revel.Filter) {
