@@ -288,7 +288,9 @@ func (c ErpInventory) Import() revel.Result {
 
 			col_index := 0
 
-			if len(row.Cells) < 5 { // 6 列数据， 最后一列可能为空
+			var data_col_count = 6
+
+			if len(row.Cells) < data_col_count-1 { // 6 列数据， 最后一列可能为空
 				break
 			}
 
@@ -336,7 +338,7 @@ func (c ErpInventory) Import() revel.Result {
 			inventory_import.Qty = qty
 			col_index++
 
-			if len(row.Cells) > 5 {
+			if len(row.Cells) > data_col_count-1 { // 最后一列有数据
 				// 成本价
 				cell = row.Cells[col_index]
 				cell_val, err = cell.String()
@@ -360,7 +362,7 @@ func (c ErpInventory) Import() revel.Result {
 
 	var inventory_import_error_list = make([]inventory_import_t, 0)
 	// 先检查一遍是不是有错误，
-	for _, inventory_import := range inventory_import_list {
+	for index, inventory_import := range inventory_import_list {
 
 		// 检查 商品 sku
 		var product_id int64 = product_service.Get_product_id_by_sku(inventory_import.ProductSku, db_session)
@@ -389,9 +391,17 @@ func (c ErpInventory) Import() revel.Result {
 			}
 		}
 
-		inventory_import.product_id = product_id
-		inventory_import.stock_id = stock_id
-		inventory_import.storage_loc_id = storage_loc_id
+		inventory_import_list[index].product_id = product_id
+		inventory_import_list[index].stock_id = stock_id
+		inventory_import_list[index].storage_loc_id = storage_loc_id
+	}
+
+	if len(inventory_import_error_list) != 0 {
+		return c.RenderJson(map[string]interface{}{
+			"success":         false,
+			"message":         "数据导入出现错误，详情查看页面下方表格！",
+			"error_data_list": inventory_import_error_list,
+		})
 	}
 
 	for _, inventory_import := range inventory_import_list {
@@ -420,14 +430,6 @@ func (c ErpInventory) Import() revel.Result {
 			_, err := db_session.Id(inventory.Id).Cols("stock_id", "storage_loc_id", "product_id", "qty", "cost_price").Update(&inventory)
 			core.HandleError(err)
 		}
-	}
-
-	if len(inventory_import_error_list) != 0 {
-		return c.RenderJson(map[string]interface{}{
-			"success":         false,
-			"message":         "数据导入出现错误，详情查看页面下方表格！",
-			"error_data_list": inventory_import_error_list,
-		})
 	}
 
 	return c.RenderJson(map[string]interface{}{

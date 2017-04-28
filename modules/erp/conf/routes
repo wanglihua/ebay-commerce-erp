@@ -23,6 +23,7 @@ POST /erp/storage/loc/data/list                ErpStorageLoc.ListData
 POST /erp/storage/loc/data/detail              ErpStorageLoc.DetailData
 POST /erp/storage/loc/save                     ErpStorageLoc.Save
 POST /erp/storage/loc/delete                   ErpStorageLoc.Delete
+POST /erp/storage/loc/import                   ErpStorageLoc.Import
 POST /erp/get/storage/loc/list                 ErpStorageLoc.GetStorageLocList
 
 GET  /erp/supplier                             ErpSupplier.Index

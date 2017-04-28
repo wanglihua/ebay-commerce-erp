@@ -1,12 +1,12 @@
 package controllers
 
 import (
-	"fmt"
+	//"fmt"
 
 	"github.com/revel/revel"
-	"matrix/core"
-	"matrix/modules/erp/models"
-	"matrix/modules/erp/service/order_logistics_service"
+	//"matrix/core"
+	//"matrix/modules/erp/models"
+	//"matrix/modules/erp/service/order_logistics_service"
 )
 
 type Test struct {
@@ -14,6 +14,7 @@ type Test struct {
 }
 
 func (c Test) Index() revel.Result {
+	/*
 	var db_session = c.DbSession
 
 	var order models.OrderInfo
@@ -38,4 +39,7 @@ func (c Test) Index() revel.Result {
 		"height": order_logistics.Height,
 		"weight": order_logistics.Weight,
 	})
+	*/
+
+	return c.RenderEmpty()
 }

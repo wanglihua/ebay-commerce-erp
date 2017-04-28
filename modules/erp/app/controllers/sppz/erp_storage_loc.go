@@ -4,12 +4,16 @@ import (
 	"encoding/json"
 	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/revel/revel"
+	"github.com/tealeg/xlsx"
 	"matrix/core"
 	"matrix/modules/auth/pass_res"
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/erp/models"
+	"matrix/modules/erp/service/stock_service"
+	"matrix/modules/erp/service/storage_loc_service"
 )
 
 type ErpStorageLoc struct {
@@ -189,6 +193,164 @@ func (c ErpStorageLoc) Delete() revel.Result {
 	core.HandleError(err)
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})
+}
+
+func (c ErpStorageLoc) Import() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.SPPZ_STORAGE_LOC, c.Session)
+
+	var db_session = c.DbSession
+
+	excel_file_bytes := make([]byte, 0)
+	c.Params.Bind(&excel_file_bytes, "excel_file")
+
+	c.Validation.Required(excel_file_bytes).Message("指定文件内容未成功上传！")
+
+	if c.Validation.HasErrors() {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": c.GetValidationErrorMessage(),
+		})
+	}
+
+	type storage_loc_import_t struct {
+		OrdNum         string  `json:"ord_num"`          // 序号
+		StockName      string  `json:"stock_name"`       // 仓库名称
+		StorageLocName string  `json:"storage_loc_name"` // 仓位名称
+		StorageLocDesc string  `json:"storage_loc_desc"` // 仓位描述
+
+		// 下面这些字段是从数据库里面查询后保存在这里面的，这样过程中，就不用二次查询了
+		stock_id     int64
+		ErrorMessage string `json:"error_message"`
+	}
+
+	storage_loc_import_list := make([]storage_loc_import_t, 0)
+
+	xlsx_file, err := xlsx.OpenBinary(excel_file_bytes)
+	core.HandleError(err)
+
+	// 会导入所有 sheets
+	sheet_count := len(xlsx_file.Sheets)
+	for sheet_index := 0; sheet_index < sheet_count; sheet_index ++ {
+		sheet := xlsx_file.Sheets[sheet_index]
+		max_row := sheet.MaxRow
+		//略过标题行
+		for row_index := 1; row_index < max_row; row_index ++ {
+			row := sheet.Rows[row_index]
+
+			var cell *xlsx.Cell
+			var cell_val string
+			var err error
+
+			var storage_loc_import storage_loc_import_t
+
+			col_index := 0
+
+			// 序号	仓库名称	仓位名称	仓位描述
+			var data_col_count = 5
+
+			if len(row.Cells) < data_col_count-1 { // 最后一列可能为空
+				break
+			}
+
+			// 序号
+			cell = row.Cells[col_index]
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
+			if cell_val == "" {
+				break
+			}
+			storage_loc_import.OrdNum = cell_val
+			col_index++
+
+			// 仓库名称
+			cell = row.Cells[col_index]
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
+			storage_loc_import.StockName = cell_val
+			col_index++
+
+			// 仓位名称
+			cell = row.Cells[col_index]
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
+			storage_loc_import.StorageLocName = cell_val
+			col_index++
+
+			if len(row.Cells) > data_col_count-1 { // 最后一列有数据
+				// 成本价
+				cell = row.Cells[col_index]
+				cell_val, err = cell.String()
+				core.HandleError(err)
+				cell_val = strings.TrimSpace(cell_val)
+				storage_loc_import.StorageLocDesc = cell_val
+				col_index++
+			}
+
+			storage_loc_import_list = append(storage_loc_import_list, storage_loc_import)
+		}
+	}
+
+	if len(storage_loc_import_list) == 0 {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "Excel文件中导入商品库存列表为空！",
+		})
+	}
+
+	var storage_loc_import_error_list = make([]storage_loc_import_t, 0)
+	// 先检查一遍是不是有错误，
+	for index, storage_loc_import := range storage_loc_import_list {
+
+		// 检查 仓库名称
+		var stock_id int64 = stock_service.Get_stock_id_by_name(storage_loc_import.StockName, db_session)
+		var storage_loc_id int64
+
+		if stock_id == 0 {
+			storage_loc_import.ErrorMessage = fmt.Sprintf("序号 %s 的仓库名称 %s 不存在！", storage_loc_import.OrdNum, storage_loc_import.StockName)
+			storage_loc_import_error_list = append(storage_loc_import_error_list, storage_loc_import)
+		} else { //仓库名称存在
+			var storage_loc_name = strings.TrimSpace(storage_loc_import.StorageLocName)
+			if storage_loc_name != "" {
+				// 检查仓位是否已经存在
+				storage_loc_id = storage_loc_service.Get_storage_loc_id_by_name(storage_loc_name, stock_id, db_session)
+				if storage_loc_id != 0 {
+					storage_loc_import.ErrorMessage = fmt.Sprintf("序号 %s 的仓位名称 %s 已经存在！", storage_loc_import.OrdNum, storage_loc_import.StorageLocName)
+					storage_loc_import_error_list = append(storage_loc_import_error_list, storage_loc_import)
+				}
+			}
+		}
+
+		revel.TRACE.Println("stock_id", stock_id)
+		storage_loc_import_list[index].stock_id = stock_id
+	}
+
+	if len(storage_loc_import_error_list) != 0 {
+		return c.RenderJson(map[string]interface{}{
+			"success":         false,
+			"message":         "数据导入出现错误，详情查看页面下方表格！",
+			"error_data_list": storage_loc_import_error_list,
+		})
+	}
+
+	for _, storage_loc_import := range storage_loc_import_list {
+		revel.TRACE.Println("storage_loc_import.stock_id", storage_loc_import.stock_id)
+		var storage_loc models.StorageLocInfo
+		storage_loc.StockId = storage_loc_import.stock_id
+		storage_loc.Name = storage_loc_import.StorageLocName
+		storage_loc.Desc = core.MakeNullString(storage_loc_import.StorageLocDesc, true)
+
+		// 插入
+		_, err = db_session.Insert(&storage_loc)
+		core.HandleError(err)
+	}
+
+	return c.RenderJson(map[string]interface{}{
+		"success": true,
+		"message": "数据导入成功！",
+	})
 }
 
 func (c ErpStorageLoc) GetStorageLocList() revel.Result {

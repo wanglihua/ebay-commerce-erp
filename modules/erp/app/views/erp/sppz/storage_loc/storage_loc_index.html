@@ -32,6 +32,29 @@
                 </div>
                 <div>
                     <table id="storageLocList" class="table table-striped table-bordered table-hover"></table>
+                    <table id="error_data_list" class="table table-striped table-bordered table-hover" style="display: none;">
+                        <caption>错误列表</caption>
+                        <thead>
+                        <tr>
+                            <th>序号</th>
+                            <th>仓库名称</th>
+                            <th>仓位名称</th>
+                            <th>仓位描述</th>
+                            <th>错误信息</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <template v-for="error_data in error_data_list">
+                            <tr>
+                                <td>{{error_data.ord_num}}</td>
+                                <td>{{error_data.stock_name}}</td>
+                                <td>{{error_data.storage_loc_name}}</td>
+                                <td>{{error_data.storage_loc_desc}}</td>
+                                <td>{{error_data.error_message}}</td>
+                            </tr>
+                        </template>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -125,16 +148,69 @@
         </div>
     </div>
 </div>
+
+<script type="text/javascript" src="/static/lib/plupload/moxie.min.js"></script>
+<script type="text/javascript" src="/static/lib/plupload/plupload.min.js"></script>
+<script type="text/javascript" src="/static/lib/plupload/zh_CN.js"></script>
+
 <script type="text/javascript">
+
+    function init_uploader() {
+        var uploader = new plupload.Uploader({
+            runtimes: 'html5,flash,html4',
+            multi_selection: false,
+
+            browse_button: 'btnImport',
+            file_data_name: "excel_file",
+
+            url: '{%url "ErpStorageLoc.Import"%}',
+            max_file_size: '10000kb',
+
+            filters: [
+                {title: "Excel文件", extensions: "xlsx"}
+            ],
+
+            flash_swf_url: '/plupload/js/Moxie.swf',
+
+            init: {
+                FilesAdded: function () {
+                    showMask("上传中，请稍候...");
+                    uploader.start();
+                },
+                FileUploaded: function (up, file, response) {
+                    hideMask();
+                    var result = JSON.parse(response.response);
+                    if (result.success != true) {
+                        $.msg.error(result.message);
+                        vm.error_data_list = result.error_data_list;
+                        $("table#error_data_list").show();
+                    } else {
+                        reloadList('#storageLocList');
+                        $.msg.show(result.message);
+                        $("table#error_data_list").hide();
+                    }
+                },
+                Error: function (up, err) {
+                    $.msg.error("上传发生错误：" + err.code + ", " + err.message);
+                }
+            }
+        });
+
+        uploader.init();
+    }
+
     var vm = new Vue({
         el: "#page",
         data: {
             "detail": {
                 "storage_loc": {},
                 "stock_list": []
-            }
+            },
+            "error_data_list": []
         },
         mounted: function () {
+            init_uploader();
+
             initDataTable(
                 '#storageLocList',
                 {
