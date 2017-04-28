@@ -1,11 +1,14 @@
 package controllers
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"strconv"
 	"strings"
+	"time"
 
+	"github.com/go-xorm/xorm"
 	"github.com/revel/revel"
 	"github.com/tealeg/xlsx"
 	"matrix/core"
@@ -41,10 +44,10 @@ func (c ErpInventory) PageData() revel.Result {
 }
 
 type ErpInventoryViewItem struct {
-	models.InventoryInfo  `xorm:"extends" json:"ivt"`
-	models.StockInfo      `xorm:"extends" json:"st"`
-	models.StorageLocInfo `xorm:"extends" json:"loc"`
-	models.ProductInfo    `xorm:"extends" json:"prd"`
+	Inventory  models.InventoryInfo  `xorm:"extends" json:"ivt"`
+	Stock      models.StockInfo      `xorm:"extends" json:"st"`
+	StorageLoc models.StorageLocInfo `xorm:"extends" json:"loc"`
+	Product    models.ProductInfo    `xorm:"extends" json:"prd"`
 }
 
 func (c ErpInventory) ListData() revel.Result {
@@ -52,14 +55,14 @@ func (c ErpInventory) ListData() revel.Result {
 
 	db_session := c.DbSession
 
+	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
+
 	var stock_id_query int64
 	c.Params.Bind(&stock_id_query, "stock_id_query")
 
 	var product_code_query string
 	c.Params.Bind(&product_code_query, "product_code_query")
 	product_code_query = strings.TrimSpace(product_code_query)
-
-	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
 	/*
 		SELECT ivt.*, st.*, loc.*, prd.*
@@ -431,4 +434,215 @@ func (c ErpInventory) Import() revel.Result {
 		"success": true,
 		"message": "数据导入成功！",
 	})
+}
+
+func (c ErpInventory) Export() revel.Result {
+	db_session := c.DbSession
+
+	var stock_id_query int64
+	c.Params.Bind(&stock_id_query, "stock_id_query")
+
+	var product_code_query string
+	c.Params.Bind(&product_code_query, "product_code_query")
+	product_code_query = strings.TrimSpace(product_code_query)
+
+	xlsx_file := c.get_export_excel(db_session)
+
+	//先把文件内容写到buffer中，再从中读取
+	var buffer bytes.Buffer
+	err := xlsx_file.Write(&buffer)
+	core.HandleError(err)
+
+	reader := bytes.NewReader(buffer.Bytes()) //bytes.Reader 实现了 io.Reader 接口
+
+	file_name := "库存列表" + ".xlsx" //"file.xlsx" //可以根据参数生成文件名
+
+	return c.RenderBinary(reader, file_name, revel.Attachment, time.Now())
+}
+
+func (c ErpInventory) get_export_excel(db_session *xorm.Session) *xlsx.File {
+	filter, order, _, _ := core.GetGridRequestParam(c.Request)
+
+	var stock_id_query int64
+	c.Params.Bind(&stock_id_query, "stock_id_query")
+
+	var product_code_query string
+	c.Params.Bind(&product_code_query, "product_code_query")
+	product_code_query = strings.TrimSpace(product_code_query)
+
+	/*
+		SELECT ivt.*, st.*, loc.*, prd.*
+		FROM erp_inventory ivt
+		    INNER JOIN erp_stock st ON ivt.stock_id = st.id
+		    LEFT JOIN erp_storage_loc loc ON ivt.storage_loc_id = loc.id
+		    INNER JOIN erp_product prd ON ivt.product_id = prd.id
+	*/
+
+	query := db_session.
+	Select("ivt.*, st.*, loc.*, prd.*").
+		Table("erp_inventory").Alias("ivt").
+		Join("INNER", []string{"erp_stock", "st"}, "ivt.stock_id = st.id").
+		Join("LEFT", []string{"erp_storage_loc", "loc"}, "ivt.storage_loc_id = loc.id").
+		Join("INNER", []string{"erp_product", "prd"}, "ivt.product_id = prd.id")
+
+	//query extra filter here
+
+	if stock_id_query != 0 {
+		filter = core.SqlAnd(filter, fmt.Sprintf("st.id = %d", stock_id_query))
+	}
+
+	if product_code_query != "" {
+		filter = core.SqlAnd(filter, fmt.Sprintf("prd.sku LIKE '%%%s%%'", product_code_query))
+	}
+
+	query = query.Where(filter)
+
+	data_query := *query
+	if order != "" {
+		data_query = *data_query.OrderBy(order)
+	} else {
+		data_query = *data_query.Asc("ivt.id")
+	}
+
+	inventory_list := make([]ErpInventoryViewItem, 0)
+	err := query.Find(&inventory_list)
+	core.HandleError(err)
+
+	//创建工作薄
+	xlsx_file := xlsx.NewFile()
+
+	sheet, err := xlsx_file.AddSheet("库存列表")
+	core.HandleError(err)
+
+	//统一设置标题单元格格式的函数
+	set_head_cell_style := func(cell *xlsx.Cell) {
+		style := xlsx.NewStyle()
+
+		font := * xlsx.NewFont(9, "微软雅黑")
+		font.Bold = true
+		font.Italic = false
+		font.Underline = false
+		style.Font = font
+		style.ApplyBorder = true
+
+		fill := *xlsx.NewFill("solid", "00FFFFFF", "00000000") //CCFFCC
+		style.Fill = fill
+		style.ApplyFill = true
+
+		border := *xlsx.NewBorder("thin", "thin", "thin", "thin")
+		style.Border = border
+		style.ApplyBorder = true
+
+		alignment := *new(xlsx.Alignment)
+		alignment.Horizontal = "center"
+		alignment.Vertical = "center"
+		alignment.WrapText = true
+		style.Alignment = alignment
+		style.ApplyAlignment = true
+
+		cell.SetStyle(style)
+	}
+
+	set_text_cell_style := func(cell *xlsx.Cell, horizontal_align string) {
+		style := xlsx.NewStyle()
+
+		font := * xlsx.NewFont(9, "微软雅黑")
+		font.Bold = false
+		font.Italic = false
+		font.Underline = false
+		style.Font = font
+		style.ApplyBorder = true
+
+		fill := *xlsx.NewFill("solid", "00FFFFFF", "00000000") //CCFFCC
+		style.Fill = fill
+		style.ApplyFill = true
+
+		border := *xlsx.NewBorder("thin", "thin", "thin", "thin")
+		style.Border = border
+		style.ApplyBorder = true
+
+		alignment := *new(xlsx.Alignment)
+		alignment.Horizontal = horizontal_align
+		alignment.Vertical = "center"
+		alignment.WrapText = true
+		style.Alignment = alignment
+		style.ApplyAlignment = true
+
+		cell.SetStyle(style)
+	}
+
+	row_height := 0.6
+
+	// 序号	商品编号	仓库	仓位	库存	成本价（RMB）
+	{
+		header_row := sheet.AddRow()
+		header_row.SetHeightCM(row_height)
+
+		col_index := 0
+		cell := header_row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 8)
+		set_head_cell_style(cell)
+		cell.Value = "序号"
+
+		col_index++
+		cell = header_row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 25)
+		set_head_cell_style(cell)
+		cell.Value = "商品编号"
+
+		col_index++
+		cell = header_row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 22)
+		set_head_cell_style(cell)
+		cell.Value = "仓库"
+
+		col_index++
+		cell = header_row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 18)
+		set_head_cell_style(cell)
+		cell.Value = "仓位"
+
+		col_index++
+		cell = header_row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 10)
+		set_head_cell_style(cell)
+		cell.Value = "库存"
+
+		col_index++
+		cell = header_row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 10)
+		set_head_cell_style(cell)
+		cell.Value = "成本价（RMB）"
+	}
+
+	for index, inventory_view := range inventory_list {
+		row := sheet.AddRow()
+		row.SetHeightCM(row_height)
+
+		cell := row.AddCell()
+		set_text_cell_style(cell, "center")
+		cell.Value = fmt.Sprint(index + 1)
+
+		cell = row.AddCell()
+		set_text_cell_style(cell, "left")
+		cell.Value = inventory_view.Product.Sku
+
+		cell = row.AddCell()
+		set_text_cell_style(cell, "left")
+		cell.Value = inventory_view.Stock.Name
+
+		cell = row.AddCell()
+		set_text_cell_style(cell, "left")
+		cell.Value = inventory_view.StorageLoc.Name
+
+		cell = row.AddCell()
+		set_text_cell_style(cell, "center")
+		cell.Value = fmt.Sprint(inventory_view.Inventory.Qty)
+
+		cell = row.AddCell()
+		set_text_cell_style(cell, "center")
+		cell.Value = fmt.Sprint(inventory_view.Inventory.CostPrice)
+	}
+
+	return xlsx_file
 }

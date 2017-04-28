@@ -25,11 +25,19 @@
                         <i class="ace-icon fa fa-plus"></i>
                         导入
                     </button>
+                    <button class="btn btn-pink btn-sm" @click="exportInventory()">
+                        <i class="ace-icon fa fa-file-excel-o"></i>
+                        导出
+                    </button>
                     <button class="btn btn-danger btn-sm" @click="deleteInventory()">
                         <i class="ace-icon fa fa-trash-o"></i>
                         删除
                     </button>
                 </div>
+                <form id="formExport" method="post" action='{%url "ErpInventory.Export" %}'>
+                    <input type="hidden" name="stock_id_query" v-model="page.stock_id_query"/>
+                    <input type="hidden" name="product_code_query" v-model="page.product_code_query"/>
+                </form>
                 <div style="margin-top: 10px;">
                     <a href="/static/excel-template/product_inventory_import.xlsx">下载Excel模板</a>
                 </div>
@@ -421,6 +429,9 @@
                         }
                     });
                 });
+            },
+            exportInventory: function () {
+                $("#formExport").submit();
             },
             getStockStorageLocList: function () {
                 $.ajax({
