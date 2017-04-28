@@ -1,11 +1,13 @@
 package controllers
 
 import (
-	"github.com/revel/revel"
+	"strconv"
 
+	"github.com/revel/revel"
 	"matrix/core"
 	"matrix/modules/auth/models"
-	"strconv"
+	"matrix/modules/auth/pass_res"
+	"matrix/modules/auth/service/pass_service"
 )
 
 type AuthGroup struct {
@@ -13,20 +15,24 @@ type AuthGroup struct {
 }
 
 func (c AuthGroup) Index() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.AUTH_GROUP, c.Session)
+
 	return c.RenderTemplate("auth/group/group_index.html")
 }
 
 type GroupViewItem struct {
 	models.GroupInfo `xorm:"extends"`
-	UserCount        int `xorm:"bigint 'user_count'" json:"user_count"`
+	UserCount int `xorm:"bigint 'user_count'" json:"user_count"`
 }
 
 func (c AuthGroup) ListData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.AUTH_GROUP, c.Session)
+
 	session := c.DbSession
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 	query := session.
-		Select("auth_group.*, (SELECT count(*) FROM auth_group_user WHERE group_id = auth_group.id) as user_count").
+	Select("auth_group.*, (SELECT count(*) FROM auth_group_user WHERE group_id = auth_group.id) as user_count").
 		Where(filter)
 
 	dataQuery := *query
@@ -69,6 +75,8 @@ func (f *GroupForm) Valid(validation *revel.Validation) bool {
 }
 
 func (c AuthGroup) Detail() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.AUTH_GROUP, c.Session)
+
 	session := c.DbSession
 
 	var groupId int64
@@ -92,6 +100,8 @@ func (c AuthGroup) Detail() revel.Result {
 }
 
 func (c AuthGroup) Save() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.AUTH_GROUP, c.Session)
+
 	session := c.DbSession
 
 	form := new(GroupForm)
@@ -132,6 +142,8 @@ func (c AuthGroup) Save() revel.Result {
 }
 
 func (c AuthGroup) Delete() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.AUTH_GROUP, c.Session)
+
 	session := c.DbSession
 
 	groupIdList := make([]int64, 0)

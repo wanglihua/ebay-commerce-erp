@@ -1,12 +1,14 @@
 package controllers
 
 import (
-	"github.com/revel/revel"
 	"strconv"
+	"strings"
 
+	"github.com/revel/revel"
 	"matrix/core"
 	"matrix/modules/auth/models"
-	"strings"
+	"matrix/modules/auth/pass_res"
+	"matrix/modules/auth/service/pass_service"
 )
 
 type AuthGroupUser struct {
@@ -14,6 +16,8 @@ type AuthGroupUser struct {
 }
 
 func (c AuthGroupUser) Index() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.AUTH_GROUP, c.Session)
+
 	var groupId int64
 	c.Params.Bind(&groupId, "groupId")
 
@@ -28,6 +32,8 @@ type GroupUserViewItem struct {
 }
 
 func (c AuthGroupUser) ListData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.AUTH_GROUP, c.Session)
+
 	session := c.DbSession
 
 	var groupId int64
@@ -35,8 +41,8 @@ func (c AuthGroupUser) ListData() revel.Result {
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 	query := session.
-		Select("gu.*, g.*, u.*").
-		Table(models.TablePrefix+"group_user").Alias("gu").
+	Select("gu.*, g.*, u.*").
+		Table(models.TablePrefix + "group_user").Alias("gu").
 		Join("inner", []string{models.TablePrefix + "group", "g"}, "gu.group_id = g.id").
 		Join("inner", []string{models.TablePrefix + "user", "u"}, "gu.user_id = u.id").
 		Where(filter)
@@ -66,6 +72,8 @@ func (c AuthGroupUser) ListData() revel.Result {
 }
 
 func (c AuthGroupUser) Add() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.AUTH_GROUP, c.Session)
+
 	var groupId int64
 	c.Params.Bind(&groupId, "groupId")
 
@@ -74,6 +82,8 @@ func (c AuthGroupUser) Add() revel.Result {
 }
 
 func (c AuthGroupUser) AddListData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.AUTH_GROUP, c.Session)
+
 	session := c.DbSession
 
 	var groupId int64
@@ -117,6 +127,8 @@ func (c AuthGroupUser) AddListData() revel.Result {
 }
 
 func (c AuthGroupUser) AddSave() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.AUTH_GROUP, c.Session)
+
 	session := c.DbSession
 
 	var groupId int64
@@ -137,6 +149,8 @@ func (c AuthGroupUser) AddSave() revel.Result {
 }
 
 func (c AuthGroupUser) Remove() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.AUTH_GROUP, c.Session)
+	
 	session := c.DbSession
 
 	groupUserIdList := make([]int64, 0)

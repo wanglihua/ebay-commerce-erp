@@ -50,6 +50,16 @@ func GetAuthMenu(res_id_map map[int64]bool, db_session *xorm.Session, web_sessio
         </li>`)
 		}
 
+		if check_pass_res_menu(pass_res.AUTH_GROUP) {
+			buffer.WriteString(`<li id="auth-group-menu" class="">
+            <a href="/auth/group">
+                <i class="menu-icon fa fa-caret-right"></i>
+                群组管理
+            </a>
+            <b class="arrow"></b>
+        </li>`)
+		}
+
 		if login_user.IsSuperAdmin == true {
 			buffer.WriteString(`<li id="auth-admin-menu" class="">
             <a href="/auth/admin">

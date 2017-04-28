@@ -250,7 +250,7 @@ func (c ErpInventory) Import() revel.Result {
 
 			col_index := 0
 
-			if len(row.Cells) < 5 { // 5列数据
+			if len(row.Cells) < 5 { // 6 列数据， 最后一列可能为空
 				break
 			}
 
@@ -298,14 +298,16 @@ func (c ErpInventory) Import() revel.Result {
 			inventory_import.Qty = qty
 			col_index++
 
-			// 成本价
-			cell = row.Cells[col_index]
-			cell_val, err = cell.String()
-			core.HandleError(err)
-			cell_val = strings.TrimSpace(cell_val)
-			cost_price, _ := strconv.ParseFloat(cell_val, 64)
-			inventory_import.CostPrice = cost_price
-			col_index++
+			if len(row.Cells) > 5 {
+				// 成本价
+				cell = row.Cells[col_index]
+				cell_val, err = cell.String()
+				core.HandleError(err)
+				cell_val = strings.TrimSpace(cell_val)
+				cost_price, _ := strconv.ParseFloat(cell_val, 64)
+				inventory_import.CostPrice = cost_price
+				col_index++
+			}
 
 			inventory_import_list = append(inventory_import_list, inventory_import)
 		}
@@ -324,15 +326,13 @@ func (c ErpInventory) Import() revel.Result {
 		var product_id int64 = product_service.Get_product_id_by_sku(inventory_import.ProductSku, db_session)
 
 		if product_id == 0 {
-			/*
 			return c.RenderJson(map[string]interface{}{
 				"success": false,
 				"message": fmt.Sprintf("序号 %s 的商品SKU %s 不存在！", inventory_import.OrdNum, inventory_import.ProductSku),
 			})
-			*/
 
 			//使用 panic 可以事务回滚导入
-			panic(fmt.Sprintf("序号 %s 的商品SKU %s 不存在！", inventory_import.OrdNum, inventory_import.ProductSku))
+			// panic(fmt.Sprintf("序号 %s 的商品SKU %s 不存在！", inventory_import.OrdNum, inventory_import.ProductSku))
 		}
 
 		// 检查 仓库名称
@@ -340,15 +340,13 @@ func (c ErpInventory) Import() revel.Result {
 		var storage_loc_id int64
 
 		if stock_id == 0 {
-			/*
 			return c.RenderJson(map[string]interface{}{
 				"success": false,
 				"message": fmt.Sprintf("序号 %s 的仓库名称 %s 不存在！", inventory_import.OrdNum, inventory_import.StockName),
 			})
-			*/
 
 			//使用 panic 可以事务回滚导入
-			panic(fmt.Sprintf("序号 %s 的仓库名称 %s 不存在！", inventory_import.OrdNum, inventory_import.StockName))
+			//panic(fmt.Sprintf("序号 %s 的仓库名称 %s 不存在！", inventory_import.OrdNum, inventory_import.StockName))
 		} else { //仓库名称存在
 			var storage_loc_name = strings.TrimSpace(inventory_import.StorageLocName)
 			if storage_loc_name != "" {
@@ -356,15 +354,13 @@ func (c ErpInventory) Import() revel.Result {
 
 				storage_loc_id = storage_loc_service.Get_storage_loc_id_by_name(storage_loc_name, stock_id, db_session)
 				if storage_loc_id == 0 {
-					/*
 					return c.RenderJson(map[string]interface{}{
 						"success": false,
 						"message": fmt.Sprintf("序号 %s 的仓位名称 %s 不存在！", inventory_import.OrdNum, inventory_import.StorageLocName),
 					})
-					*/
 
-					//使用 panic 可以事务回滚导入
-					panic(fmt.Sprintf("序号 %s 的仓位名称 %s 不存在！", inventory_import.OrdNum, inventory_import.StorageLocName))
+					// 使用 panic 可以事务回滚导入
+					// panic(fmt.Sprintf("序号 %s 的仓位名称 %s 不存在！", inventory_import.OrdNum, inventory_import.StorageLocName))
 				}
 			}
 		}
