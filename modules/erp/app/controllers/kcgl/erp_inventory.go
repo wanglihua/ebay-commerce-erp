@@ -27,6 +27,19 @@ func (c ErpInventory) Index() revel.Result {
 	return c.RenderTemplate("erp/kcgl/inventory/inventory_index.html")
 }
 
+func (c ErpInventory) PageData() revel.Result {
+	var db_session = c.DbSession
+	var stock_list = make([]models.StockInfo, 0)
+	err := db_session.Find(&stock_list)
+	core.HandleError(err)
+
+	return c.RenderJson(map[string]interface{}{
+		"stock_list":         stock_list,
+		"stock_id_query":     0,
+		"product_code_query": "",
+	})
+}
+
 type ErpInventoryViewItem struct {
 	models.InventoryInfo  `xorm:"extends" json:"ivt"`
 	models.StockInfo      `xorm:"extends" json:"st"`
@@ -38,6 +51,13 @@ func (c ErpInventory) ListData() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.KCGL_INVENTORY, c.Session)
 
 	db_session := c.DbSession
+
+	var stock_id_query int64
+	c.Params.Bind(&stock_id_query, "stock_id_query")
+
+	var product_code_query string
+	c.Params.Bind(&product_code_query, "product_code_query")
+	product_code_query = strings.TrimSpace(product_code_query)
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
@@ -54,10 +74,19 @@ func (c ErpInventory) ListData() revel.Result {
 		Table("erp_inventory").Alias("ivt").
 		Join("INNER", []string{"erp_stock", "st"}, "ivt.stock_id = st.id").
 		Join("LEFT", []string{"erp_storage_loc", "loc"}, "ivt.storage_loc_id = loc.id").
-		Join("INNER", []string{"erp_product", "prd"}, "ivt.product_id = prd.id").
-		Where(filter)
+		Join("INNER", []string{"erp_product", "prd"}, "ivt.product_id = prd.id")
 
 	//query extra filter here
+
+	if stock_id_query != 0 {
+		filter = core.SqlAnd(filter, fmt.Sprintf("st.id = %d", stock_id_query))
+	}
+
+	if product_code_query != "" {
+		filter = core.SqlAnd(filter, fmt.Sprintf("prd.sku LIKE '%%%s%%'", product_code_query))
+	}
+
+	query = query.Where(filter)
 
 	data_query := *query
 	if order != "" {
@@ -392,8 +421,8 @@ func (c ErpInventory) Import() revel.Result {
 
 	if len(inventory_import_error_list) != 0 {
 		return c.RenderJson(map[string]interface{}{
-			"success":    false,
-			"message":    "数据导入出现错误，详情查看页面下方表格！",
+			"success":         false,
+			"message":         "数据导入出现错误，详情查看页面下方表格！",
 			"error_data_list": inventory_import_error_list,
 		})
 	}

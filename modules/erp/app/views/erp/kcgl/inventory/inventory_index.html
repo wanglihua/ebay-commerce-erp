@@ -33,6 +33,22 @@
                 <div style="margin-top: 10px;">
                     <a href="/static/excel-template/product_inventory_import.xlsx">下载Excel模板</a>
                 </div>
+                <div class="row" style="margin-top: 15px;margin-bottom: 5px;">
+                    <div id="query" class="col-xs-12 query">
+                        <label class="control-label no-padding-right" for="stock_id_query">仓库</label>
+                        <select id="stock_id_query" name="page.stock_id_query" v-model.number="page.stock_id_query" style="width: 135px;" @change="refreshList()">
+                            <option :value="0">-所有仓库-</option>
+                            <template v-for="stock in page.stock_list">
+                                <option :value="stock.id">{{stock.name}}</option>
+                            </template>
+                        </select>
+                        <label class="control-label no-padding-right" for="product_code_query">商品编号</label>
+                        <input id="product_code_query" class="input-sm" name="product_code_query" placeholder="商品编号查询" type="text" v-model="page.product_code_query" style="width: 100px;"/>
+                        <button class="btn btn-mini btn-primary" @click="refreshList()">
+                            &nbsp;<i class="ace-icon fa fa-search"></i>查&nbsp;询&nbsp;
+                        </button>
+                    </div>
+                </div>
                 <div>
                     <table id="inventoryList" class="table table-striped table-bordered table-hover"></table>
                     <table id="error_data_list" class="table table-striped table-bordered table-hover" style="display: none;">
@@ -209,9 +225,33 @@
         uploader.init();
     }
 
+    function loadPageData(this_vm) {
+        $.ajax({
+                url: '{%url "ErpInventory.PageData" %}',
+                type: "POST",
+                success: function (result) {
+                    if (result.success === false) {
+                        $.msg.error(result.message);
+                        return;
+                    }
+                    this_vm.page = result;
+                }
+            }
+        );
+    }
+
+    function loadVmPageData() {
+        loadPageData(vm);
+    }
+
     var vm = new Vue({
         el: "#page",
         data: {
+            "page": {
+                "stock_id_query": 0,
+                "stock_list": [],
+                "product_code_query": ""
+            },
             "detail": {
                 "inventory": {},
                 "product_sku": ""
@@ -219,6 +259,9 @@
             "error_data_list": []
         },
         mounted: function () {
+            var this_vm = this;
+            loadPageData(this_vm);
+
             initDataTable(
                 '#inventoryList',
                 {
@@ -243,7 +286,29 @@
                         {"mDataProp": "ivt.cost_price", "title": "成本价", "bSearchable": false, "width": 120},
                         {"mDataProp": "ivt.create_time", "title": "创建时间", "bSearchable": false, "width": 120},
                         {"mDataProp": "ivt.update_time", "title": "修改时间", "bSearchable": false, "width": 120}
-                    ]
+                    ],
+                    "fnServerData": function (sSource, aoData, fnCallback) {
+                        showMask("数据加载中，请稍候");
+
+                        aoData.push({'name': 'stock_id_query', 'value': this_vm.page.stock_id_query});
+                        aoData.push({'name': 'product_code_query', 'value': this_vm.page.product_code_query});
+
+                        $.ajax({
+                            "dataType": 'json',
+                            "url": sSource,
+                            "data": aoData,
+                            "success": function (data) {
+                                hideMask();
+
+                                if (data.success == false) {
+                                    $.msg.error(data.message);
+                                    return;
+                                }
+
+                                fnCallback(data);
+                            }
+                        });
+                    }
                 }
             );
 
@@ -257,6 +322,9 @@
         methods: {
             reloadList: function () {
                 reloadList('#inventoryList');
+            },
+            refreshList: function () {
+                refreshList("#inventoryList");
             },
             showInventoryDetail: function (id) {
                 showMask("加载中...");

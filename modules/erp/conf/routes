@@ -172,6 +172,7 @@ POST /erp/package/material/save                ErpPackageMaterial.Save
 POST /erp/package/material/delete              ErpPackageMaterial.Delete
 
 GET  /erp/inventory                            ErpInventory.Index
+POST /erp/inventory/data/page                  ErpInventory.PageData
 POST /erp/inventory/data/list                  ErpInventory.ListData
 POST /erp/inventory/data/detail                ErpInventory.DetailData
 POST /erp/inventory/save                       ErpInventory.Save
