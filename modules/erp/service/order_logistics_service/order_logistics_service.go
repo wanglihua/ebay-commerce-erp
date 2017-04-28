@@ -597,7 +597,7 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 		// 获取所有商品的整体的 长，宽，高，重量 等的数据，体积重是利用体积重公式计算得到的结果
 		var length, width, height, dim_weight, actual_weight float64 = get_order_products_whole_logistics_data(p_order_logistics_data, logistics_mode.Tjzgs)
 
-		revel.TRACE.Println("length, width, height, dim_weight, actual_weight", length, width, height, dim_weight, actual_weight)
+		//revel.TRACE.Println("length, width, height, dim_weight, actual_weight", length, width, height, dim_weight, actual_weight)
 
 		// 匹配前打折
 		{
@@ -732,13 +732,15 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 		}
 	} // for _, logistics_mode := range logistics_mode_list {
 
-	revel.TRACE.Println("final_length, final_width, final_height, final_weight, final_actual_weight", final_length, final_width, final_height, final_weight, final_actual_weight)
+	//revel.TRACE.Println("final_length, final_width, final_height, final_weight, final_actual_weight", final_length, final_width, final_height, final_weight, final_actual_weight)
+
+	_ = final_weight //暂时没用这个变量，必要的时候去掉这个变量
 
 	if final_selected_mode_id == 0 || final_selected_fee_rate_id == 0 { // 匹配失败
 		return false, 0
 	}
 
-	revel.TRACE.Println("final_selected_mode_id", final_selected_mode_id)
+	//revel.TRACE.Println("final_selected_mode_id", final_selected_mode_id)
 
 	// 现在的做法是，最后输出的匹配结果的数据，是受前后打折两者影响的。
 
@@ -756,7 +758,7 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 			side_length_slice.Sort()
 			var mid_length = side_length_slice[1] // 0, 1, 2 中间那条边
 
-			revel.TRACE.Println("mid_length, final_length, final_width, final_height, final_weight", mid_length, final_length, final_width, final_height, final_weight)
+			//revel.TRACE.Println("mid_length, final_length, final_width, final_height, final_weight", mid_length, final_length, final_width, final_height, final_weight)
 
 			const MIN_FLOAT_DIFF = 0.0000000001
 			if (math.Abs(mid_length - final_length)) < MIN_FLOAT_DIFF {
@@ -771,7 +773,7 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 		}
 	}
 
-	revel.TRACE.Println("final_length, final_width, final_height, final_weight, final_actual_weight", final_length, final_width, final_height, final_weight, final_actual_weight)
+	//revel.TRACE.Println("final_length, final_width, final_height, final_weight, final_actual_weight", final_length, final_width, final_height, final_weight, final_actual_weight)
 
 	var address_id = p_order_logistics_data.order_shipping_address.Id
 
