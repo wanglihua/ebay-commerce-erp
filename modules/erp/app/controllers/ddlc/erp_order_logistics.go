@@ -267,3 +267,25 @@ func (c ErpOrderLogistics) Delete() revel.Result {
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})
 }
+
+func (c ErpOrderLogistics) Export() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_LOGISTICS, c.Session)
+
+	/// db_session := c.DbSession
+
+	var stock_id int64
+	c.Params.Bind(&stock_id, "stock_id")
+
+	var logistics_company_id int64
+	c.Params.Bind(&logistics_company_id, "logistics_company_id")
+
+	var batch_code int64
+	c.Params.Bind(&batch_code, "batch_code")
+
+	var begin_time_query core.NullLongTime
+	var end_time_query core.NullLongTime
+	c.Params.Bind(&begin_time_query, "begin_time_query")
+	c.Params.Bind(&end_time_query, "end_time_query")
+
+	return c.RenderEmpty()
+}
