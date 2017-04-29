@@ -188,7 +188,7 @@ func (c ErpOrder) ListData() revel.Result {
 			WHERE spc.user_id = 0))
 		 */
 		var login_user = core.GetLoginUser(c.Session)
-		var is_admin = pass_service.Check_user_is_admin(login_user.UserId)
+		var is_admin = pass_service.Is_user_admin(login_user.UserId)
 		if login_user.IsSuperAdmin == false && is_admin == false { // 管理员可以看到所有仓库的订单
 			filter = core.SqlAnd(filter, fmt.Sprintf(`o.id IN (
     SELECT ol.order_id

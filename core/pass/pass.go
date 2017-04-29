@@ -18,7 +18,7 @@ func UserHasPass(res_id int, web_session revel.Session, db_session *xorm.Session
 	login_user := core.GetLoginUser(web_session)
 	login_user_id := login_user.UserId
 
-	var is_admin = pass_service.Check_user_is_admin(login_user_id)
+	var is_admin = pass_service.Is_user_admin(login_user_id)
 
 	// 管理员有任何权限
 	if is_admin == true {
@@ -52,7 +52,7 @@ func CheckUserPass(res_id int, web_session revel.Session, db_session *xorm.Sessi
 
 func AdminOnly(web_session revel.Session) {
 	login_user := core.GetLoginUser(web_session)
-	var is_admin = pass_service.Check_user_is_admin(login_user.UserId)
+	var is_admin = pass_service.Is_user_admin(login_user.UserId)
 	if is_admin == false {
 		panic("对不起，您没有当前操作的权限！")
 	}

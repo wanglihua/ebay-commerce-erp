@@ -20,7 +20,7 @@ type AuthUser struct {
 func (c AuthUser) Index() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.AUTH_USER, c.Session)
 
-	var has_auth_pass_res = pass_service.Login_user_has_pass(pass_res.AUTH_PASS, c.Session)
+	var has_auth_pass_res = pass_service.Is_login_user_has_pass(pass_res.AUTH_PASS, c.Session)
 
 	c.RenderArgs["has_auth_pass_res"] = has_auth_pass_res
 	return c.RenderTemplate("auth/user/user_index.html")

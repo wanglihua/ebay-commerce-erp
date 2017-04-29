@@ -151,7 +151,7 @@ func (c AuthUserPassRes) Grant() revel.Result {
 	}
 
 	// 除了Action权限控制，还要授权时检查当前登录人是不是有当前他授权的那个操作的权限。只能授权本人本来就有的权限。
-	if pass_service.Login_user_has_pass(res_id, c.Session) == false {
+	if pass_service.Is_login_user_has_pass(res_id, c.Session) == false {
 		return c.RenderJson(map[string]interface{}{
 			"success": false,
 			"message": "你没有该资源的操作权限，不能对该资源进行授权操作！",
@@ -210,7 +210,7 @@ func (c AuthUserPassRes) Revoke() revel.Result {
 	}
 
 	// 除了Action权限控制，还要授权时检查当前登录人是不是有当前他授权的那个操作的权限。只能授权本人本来就有的权限。
-	if pass_service.Login_user_has_pass(res_id, c.Session) == false {
+	if pass_service.Is_login_user_has_pass(res_id, c.Session) == false {
 		return c.RenderJson(map[string]interface{}{
 			"success": false,
 			"message": "你没有该资源的操作权限，不能对该资源进行收权操作！",

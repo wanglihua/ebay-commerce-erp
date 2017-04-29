@@ -17,7 +17,7 @@ func GetAuthMenu(res_id_map map[int64]bool, db_session *xorm.Session, web_sessio
 	login_user := core.GetLoginUser(web_session)
 	is_admin := false
 	if login_user.UserId != 0 {
-		is_admin = pass_service.Check_user_is_admin(login_user.UserId)
+		is_admin = pass_service.Is_user_admin(login_user.UserId)
 	}
 
 	var check_pass_res_menu = func(pass_res_id int64) bool {

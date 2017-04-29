@@ -203,7 +203,7 @@ func load_admin_list_to_cache(db_session *xorm.Session) {
 
 func Check_login_user_pass(res_id int64, web_session revel.Session) {
 	var login_user = core.GetLoginUser(web_session)
-	if check_user_pass_in_cache(login_user.UserId, res_id) == false {
+	if is_user_has_pass_in_cache(login_user.UserId, res_id) == false {
 		panic(fmt.Sprintf("你没有操作权限 %d，请联系管理员！", res_id))
 	}
 }
@@ -212,7 +212,7 @@ func Check_login_user_pass(res_id int64, web_session revel.Session) {
 func Check_login_user_pass_or(res_id_list []int64, web_session revel.Session) {
 	var login_user = core.GetLoginUser(web_session)
 	for _, res_id := range res_id_list {
-		if check_user_pass_in_cache(login_user.UserId, res_id) == true {
+		if is_user_has_pass_in_cache(login_user.UserId, res_id) == true {
 			return
 		}
 	}
@@ -226,7 +226,7 @@ func Check_login_user_pass_and(res_id_list []int64, web_session revel.Session) {
 	var login_user = core.GetLoginUser(web_session)
 	var has_pass = true
 	for _, res_id := range res_id_list {
-		if check_user_pass_in_cache(login_user.UserId, res_id) == false {
+		if is_user_has_pass_in_cache(login_user.UserId, res_id) == false {
 			has_pass = false
 		}
 	}
@@ -238,9 +238,9 @@ func Check_login_user_pass_and(res_id_list []int64, web_session revel.Session) {
 }
 
 // 查看当前登录用户是不是有某个权限
-func Login_user_has_pass(res_id int64, web_session revel.Session) bool {
+func Is_login_user_has_pass(res_id int64, web_session revel.Session) bool {
 	var login_user = core.GetLoginUser(web_session)
-	return check_user_pass_in_cache(login_user.UserId, res_id)
+	return is_user_has_pass_in_cache(login_user.UserId, res_id)
 }
 
 func Get_login_user_pass_map_from_cache(web_session revel.Session) map[int64]bool {
@@ -253,7 +253,7 @@ func Get_login_user_pass_map_from_cache(web_session revel.Session) map[int64]boo
 	return user_res_id_map
 }
 
-func Check_user_is_admin(user_id int64) bool {
+func Is_user_admin(user_id int64) bool {
 	//检查是不是管理员
 	var admin_user_id_map = make(map[int64]bool)
 	err := cache.Get(PASS_ADMIN_LIST_CACHE_KEY, &admin_user_id_map)
@@ -268,7 +268,7 @@ func Check_user_is_admin(user_id int64) bool {
 }
 
 // 通过缓存的信息检查用户权限
-func check_user_pass_in_cache(user_id int64, res_id int64) bool {
+func is_user_has_pass_in_cache(user_id int64, res_id int64) bool {
 	//检查是不是管理员
 	var admin_user_id_map = make(map[int64]bool)
 	err := cache.Get(PASS_ADMIN_LIST_CACHE_KEY, &admin_user_id_map)
@@ -292,9 +292,9 @@ func check_user_pass_in_cache(user_id int64, res_id int64) bool {
 	return false
 }
 
-func Check_login_user_pass_cate(cate_id int64, web_session revel.Session) bool {
+func Is_login_user_has_pass_cate(cate_id int64, web_session revel.Session) bool {
 	var login_user = core.GetLoginUser(web_session)
-	return check_user_pass_cate_in_cache(login_user.UserId, cate_id)
+	return Is_user_has_pass_cate_in_cache(login_user.UserId, cate_id)
 }
 
 func Get_login_user_pass_cate_map_from_cache(web_session revel.Session) map[int64]bool {
@@ -308,7 +308,7 @@ func Get_login_user_pass_cate_map_from_cache(web_session revel.Session) map[int6
 }
 
 // 通过缓存的信息检查用户对资源类别的权限
-func check_user_pass_cate_in_cache(user_id int64, cate_id int64) bool {
+func Is_user_has_pass_cate_in_cache(user_id int64, cate_id int64) bool {
 	//检查是不是管理员
 	var admin_user_id_map = make(map[int64]bool)
 	err := cache.Get(PASS_ADMIN_LIST_CACHE_KEY, &admin_user_id_map)
@@ -335,7 +335,7 @@ func check_user_pass_cate_in_cache(user_id int64, cate_id int64) bool {
 // 只有管理员才可以操作的资源的检查
 func Check_login_user_admin_only(web_session revel.Session) {
 	var login_user = core.GetLoginUser(web_session)
-	var is_admin = Check_user_is_admin(login_user.UserId)
+	var is_admin = Is_user_admin(login_user.UserId)
 	if is_admin == false {
 		panic(fmt.Sprintf("你不是管理员，没有操作权限！"))
 	}
@@ -344,7 +344,7 @@ func Check_login_user_admin_only(web_session revel.Session) {
 //只有超级管理员才可以操作的资源的检查
 func Check_login_user_super_admin_only(web_session revel.Session) {
 	var login_user = core.GetLoginUser(web_session)
-	var is_admin = Check_user_is_admin(login_user.UserId)
+	var is_admin = Is_user_admin(login_user.UserId)
 	if is_admin == false || login_user.IsSuperAdmin == false {
 		panic(fmt.Sprintf("你不是超级管理员，没有操作权限！"))
 	}
