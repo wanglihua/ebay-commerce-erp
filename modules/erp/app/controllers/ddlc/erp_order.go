@@ -177,7 +177,7 @@ func (c ErpOrder) ListData() revel.Result {
 	// 分仓库查看
 	// 只有待配货，配货中，已发货，已完成的订单可以分仓库查看
 	if status_id == models.ORDER_STATUS_DPH || status_id == models.ORDER_STATUS_PHZ || status_id == models.ORDER_STATUS_YFH || status_id == models.ORDER_STATUS_YWC {
-		// 不同的仓库拣货人员可以看到不同的订单，管理员除外
+		// 不同的仓库拣货人员可以看到不同的订单，管理员、销售、客服 除外
 		/*
 		SELECT *
 		FROM erp_order o

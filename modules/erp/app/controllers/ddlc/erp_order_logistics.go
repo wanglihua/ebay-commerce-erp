@@ -113,6 +113,7 @@ WHERE ol.stock_id = 0 AND ol.company_id = 0
     INNER JOIN erp_logistics_mode lm ON lm.id = ol.mode_id`)
 
 	if stock_id != 0 {
+		// 这里是查询上的对仓库的限制，如果是拣货人员的话，下面还有是不是这个仓库的拣货人员的限制
 		filter = core.SqlAnd(filter, fmt.Sprintf("ol.stock_id = %d", stock_id))
 	}
 
@@ -141,6 +142,27 @@ WHERE ol.stock_id = 0 AND ol.company_id = 0
 		filter = core.SqlAnd(filter, fmt.Sprintf("(ol.actual_fee - ol.total_fee) <= %f", fee_diff_max_query))
 	}
 	*/
+
+	// 分仓库查看
+	// 不同的仓库拣货人员可以看到不同的订单，管理员、销售、客服 除外
+	/*
+	SELECT *
+	FROM erp_order_logistics ol
+	WHERE ol.stock_id IN (
+		SELECT spc.stock_id
+		FROM erp_stock_pick_crew spc
+		WHERE spc.user_id = 0)
+	 */
+	var login_user = core.GetLoginUser(c.Session)
+	var is_admin = pass_service.Is_user_admin(login_user.UserId)                   // 是不是管理员
+	var is_sales = pass_service.Is_user_sales(login_user.UserId)                   // 是不是销售
+	var is_custom_service = pass_service.Is_user_custom_service(login_user.UserId) // 是不是客服
+	if login_user.IsSuperAdmin == false && is_admin == false && is_custom_service == false && is_sales == false { // 管理员，客服，销售 可以看到所有仓库的订单
+		filter = core.SqlAnd(filter, fmt.Sprintf(`ol.stock_id IN (
+        SELECT spc.stock_id
+        FROM erp_stock_pick_crew spc
+        WHERE spc.user_id = %d)`, login_user.UserId))
+	}
 
 	sb.Where(filter)
 
