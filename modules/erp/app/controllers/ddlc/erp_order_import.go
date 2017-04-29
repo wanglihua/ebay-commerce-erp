@@ -67,7 +67,6 @@ func (c ErpOrderImport) ListData() revel.Result {
 
 	type order_import_view_item_t struct {
 		models.OrderInfo              `xorm:"extends" json:"o"`
-		models.OrderImportBatchInfo   `xorm:"extends" json:"ib"`
 		models.OrderTypeInfo          `xorm:"extends" json:"ot"`
 		models.OrderHoldTypeInfo      `xorm:"extends" json:"ht"`
 		models.ECommercePlatformInfo  `xorm:"extends" json:"pf"`
@@ -76,25 +75,23 @@ func (c ErpOrderImport) ListData() revel.Result {
 	}
 
 	/*
-SELECT o.*, ib.*, ot.*, ht.*, pf.*, sa.*, s.*
+SELECT o.*, ot.*, ht.*, pf.*, sa.*, s.*
 FROM erp_order o
-    INNER JOIN erp_order_import_batch ib ON o.id = ib.order_id
     INNER JOIN erp_order_type ot ON ot.id = o.type_id
     LEFT JOIN erp_order_hold_type ht ON ht.id = o.hold_type_id
     INNER JOIN erp_shop_account sa ON sa.id = o.shop_id
     INNER JOIN erp_ecommerce_platform pf ON pf.id = sa.platform_id
     INNER JOIN erp_status s ON s.id = o.status_id
-WHERE ib.batch_code = 123 AND o.code LIKE '%abc%' AND o.buyer_user_id LIKE '%abc%' AND o.buyer_email LIKE '%abc%'
+WHERE o.batch_code = 123 AND o.code LIKE '%abc%' AND o.buyer_user_id LIKE '%abc%' AND o.buyer_email LIKE '%abc%'
       AND o.id IN (SELECT oi.order_id FROM erp_order_item oi INNER JOIN erp_product p ON p.id = oi.item_product_id WHERE p.sku LIKE '%abc%');
 	 */
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
 	var sb = core.NewSqlBuilder()
-	sb.Select("o.*, ib.*, ot.*, ht.*, pf.*, sa.*, s.*")
+	sb.Select("o.*, ot.*, ht.*, pf.*, sa.*, s.*")
 	sb.Count("count(o.id) as order_count")
 	sb.From(`erp_order o
-    INNER JOIN erp_order_import_batch ib ON o.id = ib.order_id
     INNER JOIN erp_order_type ot ON ot.id = o.type_id
     LEFT JOIN erp_order_hold_type ht ON ht.id = o.hold_type_id
     INNER JOIN erp_shop_account sa ON sa.id = o.shop_id
@@ -102,7 +99,7 @@ WHERE ib.batch_code = 123 AND o.code LIKE '%abc%' AND o.buyer_user_id LIKE '%abc
     INNER JOIN erp_status s ON s.id = o.status_id`)
 
 	if batch_code != 0 {
-		filter = core.SqlAnd(filter, fmt.Sprintf("ib.batch_code = %d", batch_code))
+		filter = core.SqlAnd(filter, fmt.Sprintf("o.batch_code = %d", batch_code))
 	}
 
 	if order_code_query != "" {
@@ -506,6 +503,7 @@ SELECT sa.id AS shop_id, sa.name AS shop_name FROM erp_shop_account sa;
 		order.BuyerEmail = order_import.Khyx
 		order.TypeId = models.ORDER_TYPE_DRDD // 导入订单
 		order.StatusId = models.ORDER_STATUS_YZF
+		order.BatchCode = import_batch_code // 导入批次
 		_, err = db_session.Insert(&order)
 		core.HandleError(err)
 
@@ -529,13 +527,6 @@ SELECT sa.id AS shop_id, sa.name AS shop_name FROM erp_shop_account sa;
 		//order_item.ProductCostPrice = order_import.Cpcb //  这是单个的产品成本
 		_, err = db_session.Insert(&order_item)
 		core.HandleError(err)
-
-		// 导入批次
-		var order_import_batch models.OrderImportBatchInfo
-		order_import_batch.OrderId = order.Id
-		order_import_batch.BatchCode = import_batch_code
-		_, err = db_session.Insert(&order_import_batch)
-		core.HandleError(err)
 	}
 
 	return c.RenderJson(map[string]interface{}{
@@ -553,61 +544,23 @@ func (c ErpOrderImport) BatchDelete() revel.Result {
 	c.Params.Bind(&batch_code, "batch_code")
 
 	/*
-DELETE FROM erp_order_logistics WHERE order_id IN (
-    SELECT order_id FROM erp_order_import_batch WHERE batch_code = 1
-);
-
-DELETE FROM erp_order_item WHERE order_id IN (
-    SELECT order_id FROM erp_order_import_batch WHERE batch_code = 1
-);
-
-DELETE FROM erp_order_shipping_address WHERE order_id IN (
-    SELECT order_id FROM erp_order_import_batch WHERE batch_code = 1
-);
-
-DELETE FROM erp_order WHERE id IN (
-    SELECT order_id FROM erp_order_import_batch WHERE batch_code = 1
-);
-
-DELETE FROM erp_order_import_batch WHERE batch_code = 1;
+DELETE o.*, ol.*, oi.*, osa.*
+FROM erp_order o
+    INNER JOIN erp_order_logistics ol ON ol.order_id = o.id
+    INNER JOIN erp_order_item oi ON oi.order_id = o.id
+    INNER JOIN erp_order_shipping_address osa ON osa.order_id = o.id
+WHERE o.batch_code = 1;
 	 */
 
-	// 删除 订单物流信息
-	var sql_delete_order_logistics = `DELETE FROM erp_order_logistics WHERE order_id IN (
-    SELECT order_id FROM erp_order_import_batch WHERE batch_code = %d
-)`
-	sql_delete_order_logistics = fmt.Sprintf(sql_delete_order_logistics, batch_code)
-	_, err := db_session.Exec(sql_delete_order_logistics)
-	core.HandleError(err)
-
-	// 删除 订单明细信息
-	var sql_delete_order_item = `DELETE FROM erp_order_item WHERE order_id IN (
-    SELECT order_id FROM erp_order_import_batch WHERE batch_code = %d
-)`
-	sql_delete_order_item = fmt.Sprintf(sql_delete_order_item, batch_code)
-	_, err = db_session.Exec(sql_delete_order_item)
-	core.HandleError(err)
-
-	// 删除 订单收货地址信息
-	var sql_delete_order_shipping_address = `DELETE FROM erp_order_shipping_address WHERE order_id IN (
-    SELECT order_id FROM erp_order_import_batch WHERE batch_code = %d
-)`
-	sql_delete_order_shipping_address = fmt.Sprintf(sql_delete_order_shipping_address, batch_code)
-	_, err = db_session.Exec(sql_delete_order_shipping_address)
-	core.HandleError(err)
-
-	// 删除 订单信息
-	var sql_delete_order = `DELETE FROM erp_order WHERE id IN (
-    SELECT order_id FROM erp_order_import_batch WHERE batch_code = %d
-)`
-	sql_delete_order = fmt.Sprintf(sql_delete_order, batch_code)
-	_, err = db_session.Exec(sql_delete_order)
-	core.HandleError(err)
-
-	//删除 订单导入批次信息
-	var sql_delete_batch = `DELETE FROM erp_order_import_batch WHERE batch_code = %d`
-	sql_delete_batch = fmt.Sprintf(sql_delete_batch, batch_code)
-	_, err = db_session.Exec(sql_delete_batch)
+	// 删除 采用多表一次性删除
+	var sql_delete = `DELETE o.*, ol.*, oi.*, osa.*
+FROM erp_order o
+    INNER JOIN erp_order_logistics ol ON ol.order_id = o.id
+    INNER JOIN erp_order_item oi ON oi.order_id = o.id
+    INNER JOIN erp_order_shipping_address osa ON osa.order_id = o.id
+WHERE o.batch_code = %d;`
+	sql_delete = fmt.Sprintf(sql_delete, batch_code)
+	_, err := db_session.Exec(sql_delete)
 	core.HandleError(err)
 
 	return c.RenderJson(map[string]interface{}{
@@ -631,9 +584,9 @@ func (c ErpOrderImport) Delete() revel.Result {
 		Count int64  `xorm:"'order_import_count'"`
 	}
 	/*
-	SELECT count(ib.id) AS order_import_count FROM erp_order_import_batch ib WHERE ib.order_id IN (0, 1, 2)
+	SELECT count(o.batch_code) AS order_import_count FROM erp_order o WHERE o.id IN (2, 3, 4, 490, 491, 492);
 	*/
-	var sql_order_import_count = `SELECT count(ib.id) AS order_import_count FROM erp_order_import_batch ib WHERE ib.order_id IN (%s)`
+	var sql_order_import_count = `SELECT count(o.batch_code) AS order_import_count FROM erp_order o WHERE o.id IN (%s);`
 	sql_order_import_count = fmt.Sprintf(sql_order_import_count, strings.Join(order_id_str_list, ","))
 	_, err := db_session.Sql(sql_order_import_count).Get(&order_import_count)
 	core.HandleError(err)
@@ -660,10 +613,6 @@ func (c ErpOrderImport) Delete() revel.Result {
 
 	// 删除 订单信息
 	_, err = db_session.In("id", order_id_list).Delete(new(models.OrderInfo))
-	core.HandleError(err)
-
-	//删除 订单导入批次信息
-	_, err = db_session.In("order_id", order_id_list).Delete(new(models.OrderImportBatchInfo))
 	core.HandleError(err)
 
 	return c.RenderJson(map[string]interface{}{

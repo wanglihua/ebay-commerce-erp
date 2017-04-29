@@ -99,7 +99,7 @@ FROM erp_order_logistics ol
     INNER JOIN erp_logistics_company lc ON lc.id = ol.company_id
     INNER JOIN erp_logistics_mode lm ON lm.id = ol.mode_id
 WHERE ol.stock_id = 0 AND ol.company_id = 0
-      AND o.id IN (SELECT ib.order_id FROM erp_order_import_batch ib WHERE ib.batch_code = 0)
+      AND o.batch_code = 0
       AND o.paid_time > '2017-01-01' AND o.paid_time < '2017-04-30'
       AND (ol.actual_fee - ol.total_fee) >= 0.01
       AND (ol.actual_fee - ol.total_fee) <= 100.00
@@ -126,7 +126,7 @@ WHERE ol.stock_id = 0 AND ol.company_id = 0
 	}
 
 	if batch_code != 0 {
-		filter = core.SqlAnd(filter, fmt.Sprintf("o.id IN (SELECT ib.order_id FROM erp_order_import_batch ib WHERE ib.batch_code = %d)", batch_code))
+		filter = core.SqlAnd(filter, fmt.Sprintf("o.batch_code = %d", batch_code))
 	}
 
 	if begin_time_query.Valid == true {
@@ -344,7 +344,7 @@ FROM erp_order_logistics ol
     INNER JOIN erp_logistics_company lc ON lc.id = ol.company_id
     INNER JOIN erp_logistics_mode lm ON lm.id = ol.mode_id
 WHERE ol.stock_id = 0 AND ol.company_id = 0
-      AND o.id IN (SELECT ib.order_id FROM erp_order_import_batch ib WHERE ib.batch_code = 0)
+      AND o.batch_code = 0
       AND o.paid_time > '2017-01-01' AND o.paid_time < '2017-04-30'
       AND (ol.actual_fee - ol.total_fee) >= 0.01
       AND (ol.actual_fee - ol.total_fee) <= 100.00
@@ -371,7 +371,7 @@ WHERE ol.stock_id = 0 AND ol.company_id = 0
 	}
 
 	if batch_code != 0 {
-		filter = core.SqlAnd(filter, fmt.Sprintf("o.id IN (SELECT ib.order_id FROM erp_order_import_batch ib WHERE ib.batch_code = %d)", batch_code))
+		filter = core.SqlAnd(filter, fmt.Sprintf("o.batch_code = %d", batch_code))
 	}
 
 	if begin_time_query.Valid == true {

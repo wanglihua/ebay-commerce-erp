@@ -105,13 +105,9 @@ func (p_ol *OrderLogistics) CalculateListImportBatch(batch_code int64, db_sessio
 
 	//获得该批次号的订单列表
 	/*
-SELECT o.* FROM erp_order o
-    INNER JOIN erp_order_import_batch ib ON ib.order_id = o.id
-WHERE ib.batch_code = 0
+SELECT o.* FROM erp_order o WHERE o.batch_code = 0
 	 */
-	var sql_import_batch_order = `SELECT o.* FROM erp_order o
-    INNER JOIN erp_order_import_batch ib ON ib.order_id = o.id
-WHERE ib.batch_code = %d`
+	var sql_import_batch_order = `SELECT o.* FROM erp_order o WHERE o.batch_code = %d`
 	sql_import_batch_order = fmt.Sprintf(sql_import_batch_order, batch_code)
 
 	var order_list = make([]models.OrderInfo, 0)
