@@ -98,6 +98,8 @@ WHERE o.batch_code = 123 AND o.code LIKE '%abc%' AND o.buyer_user_id LIKE '%abc%
     INNER JOIN erp_ecommerce_platform pf ON pf.id = sa.platform_id
     INNER JOIN erp_status s ON s.id = o.status_id`)
 
+	filter = core.SqlAnd(filter, "o.batch_code IS NOT NULL")
+
 	if batch_code != 0 {
 		filter = core.SqlAnd(filter, fmt.Sprintf("o.batch_code = %d", batch_code))
 	}
@@ -163,21 +165,24 @@ func (c ErpOrderImport) Upload() revel.Result {
 	}
 
 	type order_import_t struct {
-		Yzbm string  // 0 邮政编码  address
-		Yjdz string  // 1 邮寄地址  address
-		Spbh string  // 2 商品编号  order_item
-		Spsl int     // 3 商品数量  order_item
-		Dpm  string  // 4 店铺名    order
-		Ddbh string  // 5 订单编号  order
-		Jydh string  // 6 交易单号  order
-		Skje float64 // 7 收款金额(澳币) order
-		Yfsr float64 // 8 运费收入(澳币)  order
-		Khzh string  // 10 客户账号 order
-		Khxm string  // 11 客户姓名 address
-		Khyx string  // 12 客户邮箱 order
-		Dh   string  // 13 电话     address
-		Ssdq string  // 14 所属地区  address
-		Sscs string  // 15 所属城市  address
+		Yzbm         string  `json:"yzbm"` // 0 邮政编码  address
+		Yjdz         string  `json:"yjdz"` // 1 邮寄地址  address
+		Spbh         string  `json:"spbh"` // 2 商品编号  order_item
+		Spsl         int     `json:"spsl"` // 3 商品数量  order_item
+		Dpm          string  `json:"dpm"`  // 4 店铺名    order
+		Ddbh         string  `json:"ddbh"` // 5 订单编号  order
+		Jydh         string  `json:"jydh"` // 6 交易单号  order
+		Skje         float64 `json:"skje"` // 7 收款金额(澳币) order
+		Yfsr         float64 `json:"yfsr"` // 8 运费收入(澳币)  order
+		Khzh         string  `json:"khzh"` // 10 客户账号 order
+		Khxm         string  `json:"khxm"` // 11 客户姓名 address
+		Khyx         string  `json:"khyx"` // 12 客户邮箱 order
+		Dh           string  `json:"dh"`   // 13 电话     address
+		Ssdq         string  `json:"ssdq"` // 14 所属地区  address
+		Sscs         string  `json:"sscs"` // 15 所属城市  address
+		ErrorMessage string  `json:"error_message"`
+		shop_id      int64
+		product_id   int64
 	}
 
 	order_import_list := make([]order_import_t, 0)
@@ -400,7 +405,75 @@ SELECT sa.id AS shop_id, sa.name AS shop_name FROM erp_shop_account sa;
 		return false, 0
 	}
 
-	// todo: 错误检查
+	var order_import_error_list = make([]order_import_t, 0)
+
+	// 错误检查
+	for index, order_import := range order_import_list {
+		// 检查导入的订单编号是否存在，订单编号检查放在最前面
+		/*
+		SELECT count(o.id) AS order_count FROM erp_order o WHERE o.code = '123'
+		 */
+		var order_count struct {
+			Count int64 `xorm:"'order_count'"`
+		}
+		var sql_order_count = `SELECT count(o.id) AS order_count FROM erp_order o WHERE o.code = '%s'`
+		sql_order_count = fmt.Sprintf(sql_order_count, order_import.Ddbh)
+		_, err := db_session.Sql(sql_order_count).Get(&order_count)
+		core.HandleError(err)
+		if order_count.Count != 0 {
+			// panic(fmt.Sprintf("订单编号 %s 数据库中已经存在！", order_import.Ddbh))
+			order_import.ErrorMessage = fmt.Sprintf("订单编号 %s 数据库中已经存在！", order_import.Ddbh)
+			order_import_error_list = append(order_import_error_list, order_import)
+		}
+
+		// 店铺是否存在
+		has, shop_id := is_shop_name_exist(order_import.Dpm)
+		if has == false {
+			//panic(fmt.Sprintf("导入文件中的店铺名 %s 不存在！", order_import.Dpm))
+			order_import.ErrorMessage = fmt.Sprintf("编号为 %s 的订单中的店铺名 %s 不存在！", order_import.Ddbh, order_import.Dpm)
+			order_import_error_list = append(order_import_error_list, order_import)
+		}
+
+		// 商品SKU是否存在
+		has, product_id := is_product_sku_exist(order_import.Spbh)
+		if has == false {
+			/*
+			感觉不自动插入商品，提示商品不存在更合适，因为还有商品导入的功能
+
+			// 如果没有的话，插入商品
+			var product models.ProductInfo
+			product.Sku = order_import.Spbh
+			product.CnName = order_import.Spbh
+			product.Name = order_import.Spbh
+
+			_, err := db_session.Insert(&product)
+			core.HandleError(err)
+
+			product_id = product.Id
+
+			// 数据库里面新增加的也放到 刚刚预先加载的列表里面去
+			var product_id_and_sku product_id_and_sku_t
+			product_id_and_sku.ProductId = product_id
+			product_id_and_sku.ProductSku = product.Sku
+
+			product_id_and_sku_list = append(product_id_and_sku_list, product_id_and_sku)
+			*/
+
+			order_import.ErrorMessage = fmt.Sprintf("编号为 %s 的订单中的商品编号 %s 不存在！", order_import.Ddbh, order_import.Spbh)
+			order_import_error_list = append(order_import_error_list, order_import)
+		}
+
+		order_import_list[index].shop_id = shop_id
+		order_import_list[index].product_id = product_id
+	}
+
+	if len(order_import_error_list) != 0 {
+		return c.RenderJson(map[string]interface{}{
+			"success":         false,
+			"message":         "数据导入出现错误，详情查看页面下方表格！",
+			"error_data_list": order_import_error_list,
+		})
+	}
 
 	var aud_exchange_rate_setting = exchange_rate_service.Get_aud_exchange_rate(db_session)
 
@@ -420,65 +493,10 @@ SELECT sa.id AS shop_id, sa.name AS shop_name FROM erp_shop_account sa;
 	}
 
 	for _, order_import := range order_import_list {
-		// 店铺是否存在
-		has, shop_id := is_shop_name_exist(order_import.Dpm)
-		if has == false {
-			/*
-			return c.RenderJson(map[string]interface{}{
-				"success": false,
-				"message": "导入文件中的店铺名不存在！",
-			})
-			*/
-
-			panic(fmt.Sprintf("导入文件中的店铺名 %s 不存在！", order_import.Dpm))
-		}
-
-		// 检查导入的订单编号是否存在
-		/*
-		SELECT count(o.id) AS order_count FROM erp_order o WHERE o.code = '123'
-		 */
-		var order_count struct {
-			Count int64 `xorm:"'order_count'"`
-		}
-		var sql_order_count = `SELECT count(o.id) AS order_count FROM erp_order o WHERE o.code = '%s'`
-		sql_order_count = fmt.Sprintf(sql_order_count, order_import.Ddbh)
-		_, err := db_session.Sql(sql_order_count).Get(&order_count)
-		core.HandleError(err)
-		if order_count.Count != 0 {
-			/*
-			return c.RenderJson(map[string]interface{}{
-				"success": false,
-				"message": "导入文件中的订单编号数据库中已经存在！",
-			})
-			*/
-			panic(fmt.Sprintf("导入文件中的订单编号 %s 数据库中已经存在！", order_import.Ddbh))
-		}
-
-		// 商品SKU是否存在
-		has, product_id := is_product_sku_exist(order_import.Spbh)
-		if has == false {
-			// 如果没有的话，插入商品
-			var product models.ProductInfo
-			product.Sku = order_import.Spbh
-			product.CnName = order_import.Spbh
-			product.Name = order_import.Spbh
-
-			_, err := db_session.Insert(&product)
-			core.HandleError(err)
-
-			product_id = product.Id
-
-			// 数据库里面新增加的也放到 刚刚预先加载的列表里面去
-			var product_id_and_sku product_id_and_sku_t
-			product_id_and_sku.ProductId = product_id
-			product_id_and_sku.ProductSku = product.Sku
-
-			product_id_and_sku_list = append(product_id_and_sku_list, product_id_and_sku)
-		}
 
 		// 订单
 		var order models.OrderInfo
-		order.ShopId = shop_id
+		order.ShopId = order_import.shop_id
 		order.Code = order_import.Ddbh
 		order.TranId = order_import.Jydh
 
@@ -522,9 +540,9 @@ SELECT sa.id AS shop_id, sa.name AS shop_name FROM erp_shop_account sa;
 		// 订单详细
 		var order_item models.OrderItemInfo
 		order_item.OrderId = order.Id
-		order_item.ItemProductId = product_id
+		order_item.ItemProductId = order_import.product_id
 		order_item.Quantity = order_import.Spsl
-		//order_item.ProductCostPrice = order_import.Cpcb //  这是单个的产品成本
+		//order_item.ProductCostPrice = order_import.Cpcb //  这是单个的产品成本， 后来改为成本从库存里面导入，这里就不导入了
 		_, err = db_session.Insert(&order_item)
 		core.HandleError(err)
 	}

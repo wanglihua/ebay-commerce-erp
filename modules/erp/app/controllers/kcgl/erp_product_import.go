@@ -174,7 +174,7 @@ func (c ErpProductImport) Upload() revel.Result {
 				break
 			}
 
-			// 编号 SKU 中文名称 英文名 采购价（人民币元） 产品长度（cm） 产品宽度（cm） 产品高度（cm） 实际重量(kg)
+			// 编号 SKU 中文名称 采购价（人民币元） 产品长度（cm） 产品宽度（cm） 产品高度（cm） 实际重量(kg)
 
 			// 编号
 			cell = row.Cells[col_index]
@@ -327,22 +327,14 @@ func (c ErpProductImport) Upload() revel.Result {
 		}
 
 		if has == true {
-			//这里只做数据插入不做数据更新修改
+			//允许更新商品，这样导入商品的属性有变时会方便好多
 
-			/*
-			return c.RenderJson(map[string]interface{}{
-				"success": false,
-				"message": fmt.Sprintf("序号 %s 的商品SKU %s 已存在", product_import.ord_num, product_import.sku),
-			})
-			*/
+			// panic(fmt.Sprintf("序号 %s 的商品SKU %s 已存在", product_import.ord_num, product_import.sku))
 
-			panic(fmt.Sprintf("序号 %s 的商品SKU %s 已存在", product_import.ord_num, product_import.sku))
-
-			/*
-			update_col_list := []string{"sku", "cn_name", "name", "cost_price", "length", "width", "height", "weight"}
+			// 编号 SKU 中文名称 采购价（人民币元） 产品长度（cm） 产品宽度（cm） 产品高度（cm） 实际重量(kg)
+			update_col_list := []string{"sku", "cn_name", "cost_price", "length", "width", "height", "weight"} //这里不更新英文名称
 			_, err = db_session.Id(product.Id).Cols(update_col_list...).Update(&product)
 			core.HandleError(err)
-			*/
 		} else {
 			product.BatchCode = import_batch_code
 			_, err = db_session.Insert(&product)
