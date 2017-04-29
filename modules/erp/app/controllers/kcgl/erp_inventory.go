@@ -439,14 +439,9 @@ func (c ErpInventory) Import() revel.Result {
 }
 
 func (c ErpInventory) Export() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_INVENTORY, c.Session)
+
 	db_session := c.DbSession
-
-	var stock_id_query int64
-	c.Params.Bind(&stock_id_query, "stock_id_query")
-
-	var product_code_query string
-	c.Params.Bind(&product_code_query, "product_code_query")
-	product_code_query = strings.TrimSpace(product_code_query)
 
 	xlsx_file := c.get_export_excel(db_session)
 

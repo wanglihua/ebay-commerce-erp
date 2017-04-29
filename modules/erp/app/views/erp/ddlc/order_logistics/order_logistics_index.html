@@ -17,6 +17,10 @@
                         <i class="ace-icon fa fa-refresh"></i>
                         刷新
                     </button>
+                    <button class="btn btn-pink btn-sm" @click="exportOrderLogistics()">
+                        <i class="ace-icon fa fa-file-excel-o"></i>
+                        导出
+                    </button>
                     {%/*
                     <button class="btn btn-success btn-sm" @click="showOrderLogisticsDetail(0)">
                         <i class="ace-icon fa fa-plus"></i>
@@ -28,6 +32,13 @@
                     </button>
                     */%}
                 </div>
+                <form id="formExport" method="post" action='{%url "ErpOrderLogistics.Export" %}'>
+                    <input type="hidden" name="stock_id" v-model="page.stock_id"/>
+                    <input type="hidden" name="logistics_company_id" v-model="page.logistics_company_id"/>
+                    <input type="hidden" name="batch_code" v-model="page.batch_code"/>
+                    <input type="hidden" name="begin_time_query" v-model="page.begin_time_query"/>
+                    <input type="hidden" name="end_time_query" v-model="page.end_time_query"/>
+                </form>
                 <div class="row" style="margin-top: 10px;margin-bottom: 20px;">
                     <div id="query" class="col-xs-12 query" style="line-height: 28px;">
                         <div class="col-xs-12">
@@ -59,7 +70,7 @@
                             </div>
                             <div style="padding-top: 15px;">
                                 <label class="control-label no-padding-right" for="batch_code">导入批次号</label>
-                                <select id="batch_code" name="page.batch_code" v-model.number="page.batch_code" style="width: 120px;" @change="refreshList()">
+                                <select id="batch_code" name="page.batch_code" v-model.number="page.batch_code" style="width: 130px;" @change="refreshList()">
                                     <option :value="0">-导入批次号-</option>
                                     <template v-for="batch_code in page.batch_code_list">
                                         <option :value="batch_code">{{batch_code}}</option>
@@ -542,6 +553,9 @@
                         }
                     });
                 });
+            },
+            exportOrderLogistics: function () {
+                $("#formExport").submit();
             },
             selectStock: function (selected_stock_id) {
                 vm.page.stock_id = selected_stock_id;

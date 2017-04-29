@@ -175,12 +175,12 @@ func (c ErpOrderImport) Upload() revel.Result {
 		Jydh string  // 6 交易单号  order
 		Skje float64 // 7 收款金额(澳币) order
 		Yfsr float64 // 8 运费收入(澳币)  order
-		Khzh string // 10 客户账号 order
-		Khxm string // 11 客户姓名 address
-		Khyx string // 12 客户邮箱 order
-		Dh   string // 13 电话     address
-		Ssdq string // 14 所属地区  address
-		Sscs string // 15 所属城市  address
+		Khzh string  // 10 客户账号 order
+		Khxm string  // 11 客户姓名 address
+		Khyx string  // 12 客户邮箱 order
+		Dh   string  // 13 电话     address
+		Ssdq string  // 14 所属地区  address
+		Sscs string  // 15 所属城市  address
 	}
 
 	order_import_list := make([]order_import_t, 0)
@@ -237,12 +237,12 @@ func (c ErpOrderImport) Upload() revel.Result {
 			order_import.Spbh = cell_val
 			col_index++
 
-			// 商品数量 todo 数量解析
+			// 商品数量
 			cell = row.Cells[col_index]
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
-			spsl, _ := strconv.ParseInt(cell_val, 10, 32)
+			spsl, spsl_err := strconv.ParseInt(cell_val, 10, 32)
 			order_import.Spsl = int(spsl)
 			col_index++
 
@@ -262,6 +262,11 @@ func (c ErpOrderImport) Upload() revel.Result {
 			order_import.Ddbh = cell_val
 			col_index++
 
+			// 商品数量 的错误提示，放在订单编号后面
+			if spsl == 0 || spsl_err != nil {
+				panic(fmt.Sprintf("订单编号 %s, 商品数量为零或者格式不对！", order_import.Ddbh))
+			}
+
 			// 交易单号
 			cell = row.Cells[col_index]
 			cell_val, err = cell.String()
@@ -270,18 +275,28 @@ func (c ErpOrderImport) Upload() revel.Result {
 			order_import.Jydh = cell_val
 			col_index++
 
-			// 收款金额(澳币) todo 数量解析
+			// 收款金额(澳币)
 			cell = row.Cells[col_index]
 			cell_val, _ = cell.String()
 			cell_val = strings.TrimSpace(cell_val)
-			order_import.Skje, _ = strconv.ParseFloat(cell_val, 64)
+			if cell_val != "" {
+				order_import.Skje, err = strconv.ParseFloat(cell_val, 64)
+				if err != nil {
+					panic(fmt.Sprintf("订单编号 %s， 收款金额(澳币)格式不对！", order_import.Ddbh))
+				}
+			}
 			col_index++
 
-			// 运费收入(澳币) todo 数量解析
+			// 运费收入(澳币)
 			cell = row.Cells[col_index]
 			cell_val, _ = cell.String()
 			cell_val = strings.TrimSpace(cell_val)
-			order_import.Yfsr, _ = strconv.ParseFloat(cell_val, 64)
+			if cell_val != "" {
+				order_import.Yfsr, err = strconv.ParseFloat(cell_val, 64)
+				if err != nil {
+					panic(fmt.Sprintf("订单编号 %s， 运费收入(澳币)格式不对！", order_import.Ddbh))
+				}
+			}
 			col_index++
 
 			// 客户账号
@@ -387,6 +402,8 @@ SELECT sa.id AS shop_id, sa.name AS shop_name FROM erp_shop_account sa;
 		}
 		return false, 0
 	}
+
+	// todo: 错误检查
 
 	var aud_exchange_rate_setting = exchange_rate_service.Get_aud_exchange_rate(db_session)
 

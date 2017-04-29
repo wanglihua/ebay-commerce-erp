@@ -1,11 +1,15 @@
 package controllers
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"strconv"
+	"time"
 
+	"github.com/go-xorm/xorm"
 	"github.com/revel/revel"
+	"github.com/tealeg/xlsx"
 	"matrix/core"
 	"matrix/modules/auth/pass_res"
 	"matrix/modules/auth/service/pass_service"
@@ -169,7 +173,7 @@ WHERE ol.stock_id = 0 AND ol.company_id = 0
 	if order != "" {
 		sb.OrderBy(order)
 	} else {
-		sb.OrderBy("id ASC")
+		sb.OrderBy("ol.id ASC")
 	}
 
 	sb.Limit(offset, limit)
@@ -293,8 +297,23 @@ func (c ErpOrderLogistics) Delete() revel.Result {
 func (c ErpOrderLogistics) Export() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_LOGISTICS, c.Session)
 
-	/// db_session := c.DbSession
+	var db_session = c.DbSession
 
+	xlsx_file := c.get_export_excel(db_session)
+
+	//先把文件内容写到buffer中，再从中读取
+	var buffer bytes.Buffer
+	err := xlsx_file.Write(&buffer)
+	core.HandleError(err)
+
+	reader := bytes.NewReader(buffer.Bytes()) //bytes.Reader 实现了 io.Reader 接口
+
+	file_name := "订单物流费用" + ".xlsx" //"file.xlsx" //可以根据参数生成文件名
+
+	return c.RenderBinary(reader, file_name, revel.Attachment, time.Now())
+}
+
+func (c ErpOrderLogistics) get_export_excel(db_session *xorm.Session) *xlsx.File {
 	var stock_id int64
 	c.Params.Bind(&stock_id, "stock_id")
 
@@ -309,5 +328,209 @@ func (c ErpOrderLogistics) Export() revel.Result {
 	c.Params.Bind(&begin_time_query, "begin_time_query")
 	c.Params.Bind(&end_time_query, "end_time_query")
 
-	return c.RenderEmpty()
+	type order_logistics_view_item_t struct {
+		OrderLogistics   models.OrderLogisticsInfo    `xorm:"extends" json:"ol"`
+		Order            models.OrderInfo             `xorm:"extends" json:"o"`
+		Stock            models.StockInfo             `xorm:"extends" json:"s"`
+		LogisticsCompany models.LogisticsCompanyInfo  `xorm:"extends" json:"lc"`
+		LogisticsMode    models.LogisticsModeInfo     `xorm:"extends" json:"lm"`
+	}
+
+	/*
+SELECT ol.*, o.*, s.*, lc.*, lm.*
+FROM erp_order_logistics ol
+    INNER JOIN erp_order o ON o.id = ol.order_id
+    INNER JOIN erp_stock s ON s.id = ol.stock_id
+    INNER JOIN erp_logistics_company lc ON lc.id = ol.company_id
+    INNER JOIN erp_logistics_mode lm ON lm.id = ol.mode_id
+WHERE ol.stock_id = 0 AND ol.company_id = 0
+      AND o.id IN (SELECT ib.order_id FROM erp_order_import_batch ib WHERE ib.batch_code = 0)
+      AND o.paid_time > '2017-01-01' AND o.paid_time < '2017-04-30'
+      AND (ol.actual_fee - ol.total_fee) >= 0.01
+      AND (ol.actual_fee - ol.total_fee) <= 100.00
+	 */
+
+	var sb = core.NewSqlBuilder()
+	sb.Select("ol.*, o.*, s.*, lc.*, lm.*")
+	sb.Count("count(ol.id) AS order_logistics_count")
+	sb.From(`erp_order_logistics ol
+    INNER JOIN erp_order o ON o.id = ol.order_id
+    INNER JOIN erp_stock s ON s.id = ol.stock_id
+    INNER JOIN erp_logistics_company lc ON lc.id = ol.company_id
+    INNER JOIN erp_logistics_mode lm ON lm.id = ol.mode_id`)
+
+	var filter = "(1=1)"
+
+	if stock_id != 0 {
+		// 这里是查询上的对仓库的限制，如果是拣货人员的话，下面还有是不是这个仓库的拣货人员的限制
+		filter = core.SqlAnd(filter, fmt.Sprintf("ol.stock_id = %d", stock_id))
+	}
+
+	if logistics_company_id != 0 {
+		filter = core.SqlAnd(filter, fmt.Sprintf("ol.company_id = %d", logistics_company_id))
+	}
+
+	if batch_code != 0 {
+		filter = core.SqlAnd(filter, fmt.Sprintf("o.id IN (SELECT ib.order_id FROM erp_order_import_batch ib WHERE ib.batch_code = %d)", batch_code))
+	}
+
+	if begin_time_query.Valid == true {
+		filter = core.SqlAnd(filter, fmt.Sprintf("o.paid_time >= '%s'", begin_time_query.Time.Format("2006-01-02 15:04:05")))
+	}
+
+	if end_time_query.Valid == true {
+		filter = core.SqlAnd(filter, fmt.Sprintf("o.paid_time <= '%s'", end_time_query.Time.Format("2006-01-02 15:04:05")))
+	}
+
+	sb.Where(filter)
+
+	sb.OrderBy("ol.id ASC")
+
+	order_logistics_list := make([]order_logistics_view_item_t, 0)
+	err := db_session.Sql(sb.SqlList()).Find(&order_logistics_list)
+	core.HandleError(err)
+
+	//创建工作薄
+	xlsx_file := xlsx.NewFile()
+
+	sheet, err := xlsx_file.AddSheet("库存列表")
+	core.HandleError(err)
+
+	//统一设置标题单元格格式的函数
+	set_head_cell_style := func(cell *xlsx.Cell) {
+		style := xlsx.NewStyle()
+
+		font := * xlsx.NewFont(9, "微软雅黑")
+		font.Bold = true
+		font.Italic = false
+		font.Underline = false
+		style.Font = font
+		style.ApplyBorder = true
+
+		fill := *xlsx.NewFill("solid", "00FFFFFF", "00000000") //CCFFCC
+		style.Fill = fill
+		style.ApplyFill = true
+
+		border := *xlsx.NewBorder("thin", "thin", "thin", "thin")
+		style.Border = border
+		style.ApplyBorder = true
+
+		alignment := *new(xlsx.Alignment)
+		alignment.Horizontal = "center"
+		alignment.Vertical = "center"
+		alignment.WrapText = true
+		style.Alignment = alignment
+		style.ApplyAlignment = true
+
+		cell.SetStyle(style)
+	}
+
+	set_text_cell_style := func(cell *xlsx.Cell, horizontal_align string) {
+		style := xlsx.NewStyle()
+
+		font := * xlsx.NewFont(9, "微软雅黑")
+		font.Bold = false
+		font.Italic = false
+		font.Underline = false
+		style.Font = font
+		style.ApplyBorder = true
+
+		fill := *xlsx.NewFill("solid", "00FFFFFF", "00000000") //CCFFCC
+		style.Fill = fill
+		style.ApplyFill = true
+
+		border := *xlsx.NewBorder("thin", "thin", "thin", "thin")
+		style.Border = border
+		style.ApplyBorder = true
+
+		alignment := *new(xlsx.Alignment)
+		alignment.Horizontal = horizontal_align
+		alignment.Vertical = "center"
+		alignment.WrapText = true
+		style.Alignment = alignment
+		style.ApplyAlignment = true
+
+		cell.SetStyle(style)
+	}
+
+	row_height := 0.6
+
+	// 序号	商品编号	仓库	仓位	库存	成本价（RMB）
+	{
+		header_row := sheet.AddRow()
+		header_row.SetHeightCM(row_height)
+
+		col_index := 0
+		cell := header_row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 8)
+		set_head_cell_style(cell)
+		cell.Value = "序号"
+
+		col_index++
+		cell = header_row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 12)
+		set_head_cell_style(cell)
+		cell.Value = "订单"
+
+		col_index++
+		cell = header_row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 20)
+		set_head_cell_style(cell)
+		cell.Value = "发货仓库"
+
+		col_index++
+		cell = header_row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 20)
+		set_head_cell_style(cell)
+		cell.Value = "物流公司"
+
+		col_index++
+		cell = header_row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 20)
+		set_head_cell_style(cell)
+		cell.Value = "物流方式"
+
+		col_index++
+		cell = header_row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 10)
+		set_head_cell_style(cell)
+		cell.Value = "预估物流费用"
+	}
+
+	for index, order_logistics := range order_logistics_list {
+		row := sheet.AddRow()
+		row.SetHeightCM(row_height)
+
+		// 序号
+		cell := row.AddCell()
+		set_text_cell_style(cell, "center")
+		cell.Value = fmt.Sprint(index + 1)
+
+		// 订单
+		cell = row.AddCell()
+		set_text_cell_style(cell, "left")
+		cell.Value = order_logistics.Order.Code
+
+		// 发货仓库
+		cell = row.AddCell()
+		set_text_cell_style(cell, "left")
+		cell.Value = order_logistics.Stock.Name
+
+		// 物流公司
+		cell = row.AddCell()
+		set_text_cell_style(cell, "left")
+		cell.Value = order_logistics.LogisticsCompany.Name
+
+		// 物流方式
+		cell = row.AddCell()
+		set_text_cell_style(cell, "left")
+		cell.Value = order_logistics.LogisticsMode.Name
+
+		// 预估物流费用
+		cell = row.AddCell()
+		set_text_cell_style(cell, "center")
+		cell.Value = fmt.Sprint(order_logistics.OrderLogistics.TotalFee)
+	}
+
+	return xlsx_file
 }

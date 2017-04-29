@@ -310,8 +310,9 @@ func Get_login_user_pass_map_from_cache(web_session revel.Session) map[int64]boo
 	var login_user = core.GetLoginUser(web_session)
 
 	var user_res_id_map = make(map[int64]bool)
-	err := cache.Get(fmt.Sprintf(PASS_USER_RES_CACHE_KEY, login_user.UserId), &user_res_id_map)
-	core.HandleError(err)
+	cache.Get(fmt.Sprintf(PASS_USER_RES_CACHE_KEY, login_user.UserId), &user_res_id_map)
+	// err := cache.Get(fmt.Sprintf(PASS_USER_RES_CACHE_KEY, login_user.UserId), &user_res_id_map)
+	// core.HandleError(err)
 
 	return user_res_id_map
 }
@@ -319,8 +320,9 @@ func Get_login_user_pass_map_from_cache(web_session revel.Session) map[int64]boo
 // 检查是不是管理员
 func Is_user_admin(user_id int64) bool {
 	var admin_user_id_map = make(map[int64]bool)
-	err := cache.Get(PASS_ADMIN_LIST_CACHE_KEY, &admin_user_id_map)
-	core.HandleError(err)
+	cache.Get(PASS_ADMIN_LIST_CACHE_KEY, &admin_user_id_map)
+	// err := cache.Get(PASS_ADMIN_LIST_CACHE_KEY, &admin_user_id_map)
+	// core.HandleError(err)
 
 	is_admin, found := admin_user_id_map[user_id]
 	if found == true && is_admin == true {
@@ -333,8 +335,9 @@ func Is_user_admin(user_id int64) bool {
 // 检查是不是销售人员
 func Is_user_sales(user_id int64) bool {
 	var sales_user_id_map = make(map[int64]bool)
-	err := cache.Get(PASS_GROUP_SALES_USER_LIST_CACHE_KEY, &sales_user_id_map)
-	core.HandleError(err)
+	 cache.Get(PASS_GROUP_SALES_USER_LIST_CACHE_KEY, &sales_user_id_map)
+	// err := cache.Get(PASS_GROUP_SALES_USER_LIST_CACHE_KEY, &sales_user_id_map)
+	// core.HandleError(err)
 
 	is_sales, found := sales_user_id_map[user_id]
 	if found == true && is_sales == true {
@@ -347,8 +350,9 @@ func Is_user_sales(user_id int64) bool {
 // 检查是不是客服人员
 func Is_user_custom_service(user_id int64) bool {
 	var custom_service_user_id_map = make(map[int64]bool)
-	err := cache.Get(PASS_GROUP_CUSTOM_SERVICE_USER_LIST_CACHE_KEY, &custom_service_user_id_map)
-	core.HandleError(err)
+	cache.Get(PASS_GROUP_CUSTOM_SERVICE_USER_LIST_CACHE_KEY, &custom_service_user_id_map)
+	// err := cache.Get(PASS_GROUP_CUSTOM_SERVICE_USER_LIST_CACHE_KEY, &custom_service_user_id_map)
+	// core.HandleError(err)
 
 	is_custom_service, found := custom_service_user_id_map[user_id]
 	if found == true && is_custom_service == true {
@@ -361,8 +365,9 @@ func Is_user_custom_service(user_id int64) bool {
 // 检查是不是拣货人员
 func Is_user_pick_crew(user_id int64) bool {
 	var pick_crew_user_id_map = make(map[int64]bool)
-	err := cache.Get(PASS_GROUP_PICK_CREW_USER_LIST_CACHE_KEY, &pick_crew_user_id_map)
-	core.HandleError(err)
+	 cache.Get(PASS_GROUP_PICK_CREW_USER_LIST_CACHE_KEY, &pick_crew_user_id_map)
+	// err := cache.Get(PASS_GROUP_PICK_CREW_USER_LIST_CACHE_KEY, &pick_crew_user_id_map)
+	// core.HandleError(err)
 
 	is_pick_crew, found := pick_crew_user_id_map[user_id]
 	if found == true && is_pick_crew == true {
@@ -376,8 +381,9 @@ func Is_user_pick_crew(user_id int64) bool {
 func is_user_has_pass_in_cache(user_id int64, res_id int64) bool {
 	//检查是不是管理员
 	var admin_user_id_map = make(map[int64]bool)
-	err := cache.Get(PASS_ADMIN_LIST_CACHE_KEY, &admin_user_id_map)
-	core.HandleError(err)
+	cache.Get(PASS_ADMIN_LIST_CACHE_KEY, &admin_user_id_map)
+	// err := cache.Get(PASS_ADMIN_LIST_CACHE_KEY, &admin_user_id_map)
+	// core.HandleError(err)
 
 	is_admin, found := admin_user_id_map[user_id]
 	if found == true && is_admin == true {
@@ -386,8 +392,9 @@ func is_user_has_pass_in_cache(user_id int64, res_id int64) bool {
 
 	// 如果不是管理员，就检查有没有授权
 	var user_res_id_map = make(map[int64]bool)
-	err = cache.Get(fmt.Sprintf(PASS_USER_RES_CACHE_KEY, user_id), &user_res_id_map)
-	core.HandleError(err)
+	cache.Get(fmt.Sprintf(PASS_USER_RES_CACHE_KEY, user_id), &user_res_id_map)
+	// err = cache.Get(fmt.Sprintf(PASS_USER_RES_CACHE_KEY, user_id), &user_res_id_map)
+	// core.HandleError(err)
 
 	has_res, found := user_res_id_map[res_id]
 	if found == true && has_res == true {
@@ -406,8 +413,9 @@ func Get_login_user_pass_cate_map_from_cache(web_session revel.Session) map[int6
 	var login_user = core.GetLoginUser(web_session)
 
 	var user_res_cate_id_map = make(map[int64]bool)
-	err := cache.Get(fmt.Sprintf(PASS_USER_RES_CATE_CACHE_KEY, login_user.UserId), &user_res_cate_id_map)
-	core.HandleError(err)
+	cache.Get(fmt.Sprintf(PASS_USER_RES_CATE_CACHE_KEY, login_user.UserId), &user_res_cate_id_map)
+	// err := cache.Get(fmt.Sprintf(PASS_USER_RES_CATE_CACHE_KEY, login_user.UserId), &user_res_cate_id_map)
+	// core.HandleError(err)
 
 	return user_res_cate_id_map
 }
@@ -416,8 +424,9 @@ func Get_login_user_pass_cate_map_from_cache(web_session revel.Session) map[int6
 func Is_user_has_pass_cate_in_cache(user_id int64, cate_id int64) bool {
 	//检查是不是管理员
 	var admin_user_id_map = make(map[int64]bool)
-	err := cache.Get(PASS_ADMIN_LIST_CACHE_KEY, &admin_user_id_map)
-	core.HandleError(err)
+	cache.Get(PASS_ADMIN_LIST_CACHE_KEY, &admin_user_id_map)
+	// err := cache.Get(PASS_ADMIN_LIST_CACHE_KEY, &admin_user_id_map)
+	// core.HandleError(err)
 
 	is_admin, found := admin_user_id_map[user_id]
 	if found == true && is_admin == true {
@@ -426,8 +435,9 @@ func Is_user_has_pass_cate_in_cache(user_id int64, cate_id int64) bool {
 
 	// 如果不是管理员，就检查有没有授权
 	var user_res_cate_id_map = make(map[int64]bool)
-	err = cache.Get(fmt.Sprintf(PASS_USER_RES_CATE_CACHE_KEY, user_id), &user_res_cate_id_map)
-	core.HandleError(err)
+	cache.Get(fmt.Sprintf(PASS_USER_RES_CATE_CACHE_KEY, user_id), &user_res_cate_id_map)
+	// err = cache.Get(fmt.Sprintf(PASS_USER_RES_CATE_CACHE_KEY, user_id), &user_res_cate_id_map)
+	// core.HandleError(err)
 
 	has_res, found := user_res_cate_id_map[cate_id]
 	if found == true && has_res == true {
