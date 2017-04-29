@@ -139,7 +139,7 @@
                             "aaSorting": [[1, "asc"]],
                             "aoColumns": [
                                 {
-                                    "mDataProp": "id",
+                                    "mDataProp": "u.id",
                                     "bSearchable": false,
                                     "orderable": false,
                                     "sClass": "center",
@@ -149,12 +149,19 @@
                                         return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
                                     }
                                 },
-                                {"mDataProp": "login_name", "title": "工号", "bSearchable": true, "width": 120},
-                                {"mDataProp": "nick_name", "title": "姓名", "bSearchable": true, "width": 120},
-                                {"mDataProp": "sex", "title": "性别", "bSearchable": true, "width": 70},
-                                {"mDataProp": "phone", "title": "联系电话", "bSearchable": true},
-                                {"mDataProp": "create_time", "title": "创建时间", "bSearchable": false, "width": 120},
-                                {"mDataProp": "update_time", "title": "修改时间", "bSearchable": false, "width": 120}
+                                {"mDataProp": "u.login_name", "title": "工号", "bSearchable": true, "width": 120},
+                                {"mDataProp": "u.nick_name", "title": "姓名", "bSearchable": true, "width": 120},
+                                {"mDataProp": "u.sex", "title": "性别", "bSearchable": true, "width": 70},
+                                {
+                                    "mDataProp": "group_names",
+                                    "title": "群组",
+                                    "bSearchable": false,
+                                    "bSortable": false,
+                                    "width": 120
+                                },
+                                {"mDataProp": "u.phone", "title": "联系电话", "bSearchable": true},
+                                {"mDataProp": "u.create_time", "title": "创建时间", "bSearchable": false, "width": 120},
+                                {"mDataProp": "u.update_time", "title": "修改时间", "bSearchable": false, "width": 120}
                             ]
                         }
                     );

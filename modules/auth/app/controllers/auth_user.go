@@ -9,6 +9,7 @@ import (
 	"matrix/modules/auth/forms"
 	"matrix/modules/auth/models"
 	"matrix/modules/auth/pass_res"
+	"matrix/modules/auth/service/group_service"
 	"matrix/modules/auth/service/pass_service"
 )
 
@@ -28,31 +29,56 @@ func (c AuthUser) Index() revel.Result {
 func (c AuthUser) ListData() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.AUTH_USER, c.Session)
 
-	session := c.DbSession
+	db_session := c.DbSession
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
-	query := session.Where(filter)
 
-	//query extra filter here
-
-	dataQuery := *query
-	if order != "" {
-		dataQuery = *dataQuery.OrderBy(order)
-	} else {
-		dataQuery = *dataQuery.Asc("id")
+	type user_t struct {
+		User       models.UserInfo `xorm:"extends" json:"u"`
+		GroupNames string          `xorm:"-" json:"group_names"`
 	}
 
-	userList := make([]models.UserInfo, 0, limit)
-	err := dataQuery.Limit(limit, offset).Find(&userList)
+	/*
+	SELECT u.* FROM auth_user u
+	 */
+
+	var sb = core.NewSqlBuilder()
+	sb.Select("u.*")
+	sb.Count("count(u.id) AS user_count")
+	sb.From("auth_user u")
+	sb.Where(filter)
+
+	if order != "" {
+		sb.OrderBy(order)
+	} else {
+		sb.OrderBy("u.id ASC")
+	}
+
+	sb.Limit(offset, limit)
+
+	user_list := make([]user_t, 0)
+	err := db_session.Sql(sb.SqlList()).Find(&user_list)
 	core.HandleError(err)
 
-	countQuery := *query
-	count, err := countQuery.Count(new(models.UserInfo))
+	var user_id_list = make([]int64, 0)
+	for _, user := range user_list {
+		user_id_list = append(user_id_list, user.User.Id)
+	}
+
+	var users_group_name_list_map = group_service.Get_users_group_name_list_map(user_id_list, db_session)
+	for index, user := range user_list {
+		user_list[index].GroupNames = strings.Join(users_group_name_list_map[user.User.Id], "， ")
+	}
+
+	var user_count struct {
+		Count int64 `xorm:"'user_count'"`
+	}
+	_, err = db_session.Sql(sb.SqlCount()).Get(&user_count)
 	core.HandleError(err)
 
 	return c.RenderJson(core.GridResult{
-		Data:  userList,
-		Total: count,
+		Data:  user_list,
+		Total: user_count.Count,
 	})
 }
 
