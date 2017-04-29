@@ -95,7 +95,7 @@ func (c ErpOrder) get_order_query_criteria_list() []order_query_criteria {
 
 // index page data
 func (c ErpOrder) PageData() revel.Result {
-	//这个的权限就不控制了
+	//这个的权限就不用控制了
 
 	db_session := c.DbSession
 
@@ -122,6 +122,7 @@ func (c ErpOrder) PageData() revel.Result {
 }
 
 func (c ErpOrder) ListData() revel.Result {
+	// 权限控制是分流程状态的，在下面的状态检查里面做控制了
 	db_session := c.DbSession
 
 	var shop_id int64
@@ -173,6 +174,7 @@ func (c ErpOrder) ListData() revel.Result {
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
+	// 分仓库查看
 	// 只有待配货，配货中，已发货，已完成的订单可以分仓库查看
 	if status_id == models.ORDER_STATUS_DPH || status_id == models.ORDER_STATUS_PHZ || status_id == models.ORDER_STATUS_YFH || status_id == models.ORDER_STATUS_YWC {
 		// 不同的仓库拣货人员可以看到不同的订单，管理员除外
@@ -188,8 +190,10 @@ func (c ErpOrder) ListData() revel.Result {
 			WHERE spc.user_id = 0))
 		 */
 		var login_user = core.GetLoginUser(c.Session)
-		var is_admin = pass_service.Is_user_admin(login_user.UserId)
-		if login_user.IsSuperAdmin == false && is_admin == false { // 管理员可以看到所有仓库的订单
+		var is_admin = pass_service.Is_user_admin(login_user.UserId)                   // 是不是管理员
+		var is_sales = pass_service.Is_user_sales(login_user.UserId)                   // 是不是销售
+		var is_custom_service = pass_service.Is_user_custom_service(login_user.UserId) // 是不是客服
+		if login_user.IsSuperAdmin == false && is_admin == false && is_custom_service == false && is_sales == false { // 管理员，客服，销售 可以看到所有仓库的订单
 			filter = core.SqlAnd(filter, fmt.Sprintf(`o.id IN (
     SELECT ol.order_id
     FROM erp_order_logistics ol
