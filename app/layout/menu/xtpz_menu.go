@@ -3,14 +3,13 @@ package menu
 import (
 	"bytes"
 
-	"github.com/go-xorm/xorm"
 	"github.com/revel/revel"
 	"matrix/core"
 	"matrix/modules/auth/pass_res"
 	"matrix/modules/auth/service/pass_service"
 )
 
-func GetXtpzMenu(res_id_map map[int64]bool, db_session *xorm.Session, web_session revel.Session) string {
+func GetXtpzMenu(res_id_map map[int64]bool, web_session revel.Session) string {
 	if _, found := revel.ModuleByName("erp"); found == false {
 		return ""
 	}

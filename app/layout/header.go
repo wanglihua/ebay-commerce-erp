@@ -159,63 +159,63 @@ func GetHeader(title string, db_session *xorm.Session, web_session revel.Session
 	}
 
 	if check_pass_cate_menu(pass_res_cate.DDLC) == true {
-		header_buffer.WriteString(menu.GetDdlcMenu(res_id_map, db_session, web_session))
+		header_buffer.WriteString(menu.GetDdlcMenu(res_id_map, web_session))
 	}
 
 	if check_pass_cate_menu(pass_res_cate.XXGL) == true {
-		header_buffer.WriteString(menu.GetXxglMenu(res_id_map, db_session, web_session))
+		header_buffer.WriteString(menu.GetXxglMenu(res_id_map, web_session))
 	}
 
 	if check_pass_cate_menu(pass_res_cate.PPGL) == true {
-		header_buffer.WriteString(menu.GetPpglMenu(res_id_map, db_session, web_session))
+		header_buffer.WriteString(menu.GetPpglMenu(res_id_map, web_session))
 	}
 
 	if check_pass_cate_menu(pass_res_cate.THGL) == true {
-		header_buffer.WriteString(menu.GetThglMenu(res_id_map, db_session, web_session))
+		header_buffer.WriteString(menu.GetThglMenu(res_id_map, web_session))
 	}
 
 	if check_pass_cate_menu(pass_res_cate.DDPZ) == true {
-		header_buffer.WriteString(menu.GetDdpzMenu(res_id_map, db_session, web_session))
+		header_buffer.WriteString(menu.GetDdpzMenu(res_id_map, web_session))
 	}
 
 	if check_pass_cate_menu(pass_res_cate.DDBB) == true {
-		header_buffer.WriteString(menu.GetDdbbMenu(res_id_map, db_session, web_session))
+		header_buffer.WriteString(menu.GetDdbbMenu(res_id_map, web_session))
 	}
 
 	if check_pass_cate_menu(pass_res_cate.KCGL) == true {
-		header_buffer.WriteString(menu.GetKcglMenu(res_id_map, db_session, web_session))
+		header_buffer.WriteString(menu.GetKcglMenu(res_id_map, web_session))
 	}
 
 	if check_pass_cate_menu(pass_res_cate.SPPZ) == true {
-		header_buffer.WriteString(menu.GetSppzMenu(res_id_map, db_session, web_session))
+		header_buffer.WriteString(menu.GetSppzMenu(res_id_map, web_session))
 	}
 
 	if check_pass_cate_menu(pass_res_cate.SPBB) == true {
-		header_buffer.WriteString(menu.GetSpbbMenu(res_id_map, db_session, web_session))
+		header_buffer.WriteString(menu.GetSpbbMenu(res_id_map, web_session))
 	}
 
 	if check_pass_cate_menu(pass_res_cate.CGGL) == true {
-		header_buffer.WriteString(menu.GetCgglMenu(res_id_map, db_session, web_session))
+		header_buffer.WriteString(menu.GetCgglMenu(res_id_map, web_session))
 	}
 
 	if check_pass_cate_menu(pass_res_cate.DBGL) == true {
-		header_buffer.WriteString(menu.GetDbglMenu(res_id_map, db_session, web_session))
+		header_buffer.WriteString(menu.GetDbglMenu(res_id_map, web_session))
 	}
 
 	if check_pass_cate_menu(pass_res_cate.XSGL) == true {
-		header_buffer.WriteString(menu.GetXsglMenu(res_id_map, db_session, web_session))
+		header_buffer.WriteString(menu.GetXsglMenu(res_id_map, web_session))
 	}
 
 	if check_pass_cate_menu(pass_res_cate.XSBB) == true {
-		header_buffer.WriteString(menu.GetXsbbMenu(res_id_map, db_session, web_session))
+		header_buffer.WriteString(menu.GetXsbbMenu(res_id_map, web_session))
 	}
 
 	if check_pass_cate_menu(pass_res_cate.AUTH) == true {
-		header_buffer.WriteString(menu.GetAuthMenu(res_id_map, db_session, web_session))
+		header_buffer.WriteString(menu.GetAuthMenu(res_id_map, web_session))
 	}
 
 	if check_pass_cate_menu(pass_res_cate.XTPZ) == true {
-		header_buffer.WriteString(menu.GetXtpzMenu(res_id_map, db_session, web_session))
+		header_buffer.WriteString(menu.GetXtpzMenu(res_id_map, web_session))
 	}
 
 	header_buffer.WriteString(`
