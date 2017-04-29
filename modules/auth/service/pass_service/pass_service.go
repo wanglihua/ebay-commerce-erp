@@ -8,18 +8,23 @@ import (
 	"github.com/revel/revel"
 	"github.com/revel/revel/cache"
 	"matrix/core"
+	"matrix/modules/auth/models"
 )
 
 const (
-	PASS_ADMIN_LIST_CACHE_KEY    = "pass_admin_list"
-	PASS_USER_RES_CACHE_KEY      = "pass_user_res_%d"
-	PASS_USER_RES_CATE_CACHE_KEY = "pass_user_res_cate_%d"
+	PASS_ADMIN_LIST_CACHE_KEY                     = "pass_admin_list"
+	PASS_USER_RES_CACHE_KEY                       = "pass_user_res_%d"
+	PASS_USER_RES_CATE_CACHE_KEY                  = "pass_user_res_cate_%d"
+	PASS_GROUP_SALES_USER_LIST_CACHE_KEY          = "pass_group_sales_user_list"
+	PASS_GROUP_CUSTOM_SERVICE_USER_LIST_CACHE_KEY = "pass_group_custom_service_user_list"
+	PASS_GROUP_PICK_CREW_USER_LIST_CACHE_KEY      = "pass_group_pick_crew_user_list"
 )
 
-// 加载指定用户的权限信息到缓存，包括类别和管理员列表
+// 加载指定用户的权限信息到缓存，包括类别和管理员列表，群组用户列表
 func Load_user_pass_to_cache(user_id int64, db_session *xorm.Session) {
 	// 缓存管理员列表
 	load_admin_list_to_cache(db_session)
+	load_group_user_list_to_cache(db_session)
 	load_user_pass_res_to_cache(user_id, db_session)
 	load_user_pass_cate_to_cache(user_id, db_session)
 }
@@ -56,6 +61,7 @@ func load_user_pass_res_to_cache(user_id int64, db_session *xorm.Session) {
 func Load_all_pass_to_cache(db_session *xorm.Session) {
 	// 缓存管理员列表
 	load_admin_list_to_cache(db_session)
+	load_group_user_list_to_cache(db_session)
 	load_all_pass_res_to_cache(db_session)
 	load_all_pass_cate_to_cache(db_session)
 }
@@ -201,6 +207,63 @@ func load_admin_list_to_cache(db_session *xorm.Session) {
 	core.HandleError(err)
 }
 
+func load_group_user_list_to_cache(db_session *xorm.Session) {
+	type group_user_id_t struct {
+		UserId int64 `xorm:"'user_id'"`
+	}
+
+	/*
+	SELECT gu.user_id AS user_id FROM auth_group_user gu WHERE gu.group_id = 0;
+	 */
+
+	// 通过使用函数获取字符串的办法，可以保证每次获得的字符串都是一样的，都是原始的，没有格式化过的，修改过的
+	var get_group_user_list_sql = func() string {
+		return `SELECT gu.user_id AS user_id FROM auth_group_user gu WHERE gu.group_id = %d`
+	}
+
+	// load sales
+	var sql_sales_group_user_list = fmt.Sprintf(get_group_user_list_sql(), models.GROUP_SALES)
+	var sales_user_id_list = make([]group_user_id_t, 0)
+	err := db_session.Sql(sql_sales_group_user_list).Find(&sales_user_id_list)
+	core.HandleError(err)
+
+	var sales_user_id_map = make(map[int64]bool)
+	for _, sales_user_id := range sales_user_id_list {
+		sales_user_id_map[sales_user_id.UserId] = true
+	}
+
+	err = cache.Set(PASS_GROUP_SALES_USER_LIST_CACHE_KEY, sales_user_id_map, core.GetSessionExpire())
+	core.HandleError(err)
+
+	// load custom service
+	var sql_custom_service_group_user_list = fmt.Sprintf(get_group_user_list_sql(), models.GROUP_CUSTOM_SERVICE)
+	var custom_service_user_id_list = make([]group_user_id_t, 0)
+	err = db_session.Sql(sql_custom_service_group_user_list).Find(&custom_service_user_id_list)
+	core.HandleError(err)
+
+	var custom_service_user_id_map = make(map[int64]bool)
+	for _, custom_service_user_id := range custom_service_user_id_list {
+		custom_service_user_id_map[custom_service_user_id.UserId] = true
+	}
+
+	err = cache.Set(PASS_GROUP_CUSTOM_SERVICE_USER_LIST_CACHE_KEY, custom_service_user_id_map, core.GetSessionExpire())
+	core.HandleError(err)
+
+	// load pick crew
+	var sql_pick_crew_group_user_list = fmt.Sprintf(get_group_user_list_sql(), models.GROUP_PICK_CREW)
+	var pick_crew_user_id_list = make([]group_user_id_t, 0)
+	err = db_session.Sql(sql_pick_crew_group_user_list).Find(&pick_crew_user_id_list)
+	core.HandleError(err)
+
+	var pick_crew_user_id_map = make(map[int64]bool)
+	for _, pick_crew_user_id := range pick_crew_user_id_list {
+		pick_crew_user_id_map[pick_crew_user_id.UserId] = true
+	}
+
+	err = cache.Set(PASS_GROUP_PICK_CREW_USER_LIST_CACHE_KEY, pick_crew_user_id_map, core.GetSessionExpire())
+	core.HandleError(err)
+}
+
 func Check_login_user_pass(res_id int64, web_session revel.Session) {
 	var login_user = core.GetLoginUser(web_session)
 	if is_user_has_pass_in_cache(login_user.UserId, res_id) == false {
@@ -253,14 +316,56 @@ func Get_login_user_pass_map_from_cache(web_session revel.Session) map[int64]boo
 	return user_res_id_map
 }
 
+// 检查是不是管理员
 func Is_user_admin(user_id int64) bool {
-	//检查是不是管理员
 	var admin_user_id_map = make(map[int64]bool)
 	err := cache.Get(PASS_ADMIN_LIST_CACHE_KEY, &admin_user_id_map)
 	core.HandleError(err)
 
 	is_admin, found := admin_user_id_map[user_id]
 	if found == true && is_admin == true {
+		return true
+	}
+
+	return false
+}
+
+// 检查是不是销售人员
+func Is_user_sales(user_id int64) bool {
+	var sales_user_id_map = make(map[int64]bool)
+	err := cache.Get(PASS_GROUP_SALES_USER_LIST_CACHE_KEY, &sales_user_id_map)
+	core.HandleError(err)
+
+	is_sales, found := sales_user_id_map[user_id]
+	if found == true && is_sales == true {
+		return true
+	}
+
+	return false
+}
+
+// 检查是不是客服人员
+func Is_user_custom_service(user_id int64) bool {
+	var custom_service_user_id_map = make(map[int64]bool)
+	err := cache.Get(PASS_GROUP_CUSTOM_SERVICE_USER_LIST_CACHE_KEY, &custom_service_user_id_map)
+	core.HandleError(err)
+
+	is_custom_service, found := custom_service_user_id_map[user_id]
+	if found == true && is_custom_service == true {
+		return true
+	}
+
+	return false
+}
+
+// 检查是不是拣货人员
+func Is_user_pick_crew(user_id int64) bool {
+	var pick_crew_user_id_map = make(map[int64]bool)
+	err := cache.Get(PASS_GROUP_PICK_CREW_USER_LIST_CACHE_KEY, &pick_crew_user_id_map)
+	core.HandleError(err)
+
+	is_pick_crew, found := pick_crew_user_id_map[user_id]
+	if found == true && is_pick_crew == true {
 		return true
 	}
 
