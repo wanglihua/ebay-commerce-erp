@@ -16,10 +16,11 @@ type ProductInfo struct {
 	ImageUrl   core.NullString `xorm:"nvarchar(500) 'image_url'" json:"image_url" smith:"verbose_name=图片地址"` // 许多图片中的一个图片，用于商品列表中的图片显示，存储的是某个店铺的图片地址
 	Desc       core.NullString `xorm:"nvarchar(500) 'desc'" json:"desc" smith:"verbose_name=备注,max=500"`
 	StatusId   int64           `xorm:"bigint notnull index 'status_id'" json:"status_id" smith:"verbose_name=状态"`
-	Length     float64         `xorm:"float notnull 'length'" json:"length" smith:"verbose_name=长度,min=0"` //cm
-	Width      float64         `xorm:"float notnull 'width'" json:"width" smith:"verbose_name=宽度,min=0"`   //cm
-	Height     float64         `xorm:"float notnull 'height'" json:"height" smith:"verbose_name=高度,min=0"` //cm
-	Weight     float64         `xorm:"float notnull 'weight'" json:"weight" smith:"verbose_name=重量,min=0"` //kg
+	Length     float64         `xorm:"float notnull 'length'" json:"length" smith:"verbose_name=长度,min=0"`          //cm
+	Width      float64         `xorm:"float notnull 'width'" json:"width" smith:"verbose_name=宽度,min=0"`            //cm
+	Height     float64         `xorm:"float notnull 'height'" json:"height" smith:"verbose_name=高度,min=0"`          //cm
+	Weight     float64         `xorm:"float notnull 'weight'" json:"weight" smith:"verbose_name=重量,min=0"`          //kg
+	BatchCode  int64           `xorm:"bigint null index 'batch_code'" json:"batch_code" smith:"verbose_name=导入批次号"` //导入的批次号
 	CreateTime core.Time       `xorm:"created notnull 'create_time'" json:"create_time"`
 	UpdateTime core.Time       `xorm:"updated notnull 'update_time'" json:"update_time"`
 	Version    int             `xorm:"version notnull 'version'" json:"version"`

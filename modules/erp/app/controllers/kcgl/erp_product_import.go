@@ -68,7 +68,7 @@ FROM erp_product prd
     LEFT JOIN erp_supplier sup ON prd.supplier_id = sup.id
     LEFT JOIN erp_package_material pm ON prd.pkg_mtrl_id = pm.id
     INNER JOIN erp_status st ON prd.status_id = st.id
-WHERE prd.sku LIKE '%abc%' AND prd.id IN (SELECT pib.product_id FROM erp_product_import_batch pib WHERE pib.batch_code = 0)
+WHERE prd.sku LIKE '%abc%' AND prd.batch_code = 0
 	*/
 
 	sql_builder := core.NewSqlBuilder()
@@ -87,7 +87,7 @@ WHERE prd.sku LIKE '%abc%' AND prd.id IN (SELECT pib.product_id FROM erp_product
 	}
 
 	if batch_code != 0 {
-		filter = core.SqlAnd(filter, fmt.Sprintf("prd.id IN (SELECT pib.product_id FROM erp_product_import_batch pib WHERE pib.batch_code = %d)", batch_code))
+		filter = core.SqlAnd(filter, fmt.Sprintf("prd.batch_code = %d", batch_code))
 	}
 
 	sql_builder.Where(filter)
@@ -344,14 +344,8 @@ func (c ErpProductImport) Upload() revel.Result {
 			core.HandleError(err)
 			*/
 		} else {
+			product.BatchCode = import_batch_code
 			_, err = db_session.Insert(&product)
-			core.HandleError(err)
-
-			// 插入导入的批次号
-			var product_import_batch models.ProductImportBatchInfo
-			product_import_batch.ProductId = product.Id
-			product_import_batch.BatchCode = import_batch_code
-			_, err = db_session.Insert(&product_import_batch)
 			core.HandleError(err)
 		}
 	}
@@ -376,19 +370,12 @@ func (c ErpProductImport) BatchDelete() revel.Result {
 	c.Params.Bind(&batch_code, "batch_code")
 
 	/*
-DELETE FROM erp_product WHERE id IN (SELECT product_id FROM erp_product_import_batch WHERE batch_code = 0);
-
-DELETE FROM erp_product_import_batch WHERE batch_code = 0;
+DELETE FROM erp_product WHERE batch_code = 0;
 	 */
 
-	var sql_delete_product = `DELETE FROM erp_product WHERE id IN (SELECT product_id FROM erp_product_import_batch WHERE batch_code = %d)`
+	var sql_delete_product = `DELETE FROM erp_product WHERE batch_code = %d`
 	sql_delete_product = fmt.Sprintf(sql_delete_product, batch_code)
 	_, err := db_session.Exec(sql_delete_product)
-	core.HandleError(err)
-
-	var sql_delete_product_batch = `DELETE FROM erp_product_import_batch WHERE batch_code = %d`
-	sql_delete_product_batch = fmt.Sprintf(sql_delete_product_batch, batch_code)
-	_, err = db_session.Exec(sql_delete_product_batch)
 	core.HandleError(err)
 
 	return c.RenderJson(map[string]interface{}{
@@ -406,9 +393,6 @@ func (c ErpProductImport) Delete() revel.Result {
 	c.Params.Bind(&product_id_list, "id_list")
 
 	_, err := db_session.In("id", product_id_list).Delete(new(models.ProductInfo))
-	core.HandleError(err)
-
-	_, err = db_session.In("product_id", product_id_list).Delete(new(models.ProductImportBatchInfo))
 	core.HandleError(err)
 
 	return c.RenderJson(map[string]interface{}{

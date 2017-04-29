@@ -5,12 +5,12 @@ import (
 	"matrix/core"
 )
 
-func  Get_product_import_batch_code_list(db_session *xorm.Session) []int64 {
+func Get_product_import_batch_code_list(db_session *xorm.Session) []int64 {
 	// 获得导入的批次列表
 	type batch_code_t struct {
 		BatchCode int64 `xorm:"'batch_code'"`
 	}
-	var sql = `SELECT DISTINCT batch_code FROM erp_product_import_batch ORDER BY batch_code DESC`
+	var sql = `SELECT DISTINCT batch_code FROM erp_product WHERE batch_code IS NOT NULL ORDER BY batch_code DESC`
 	var batch_code_t_list = make([]batch_code_t, 0)
 	err := db_session.Sql(sql).Find(&batch_code_t_list)
 	core.HandleError(err)
