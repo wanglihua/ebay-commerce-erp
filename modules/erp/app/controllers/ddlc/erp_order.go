@@ -223,7 +223,7 @@ func (c ErpOrder) ListData() revel.Result {
 	var order_type_id int64 = 0
 	c.Params.Bind(&order_type_id, "order_type_id")
 	if order_type_id != 0 {
-		filter = core.SqlAnd(filter, fmt.Sprintf("type_id = %d", order_type_id))
+		filter = core.SqlAnd(filter, fmt.Sprintf("o.type_id = %d", order_type_id))
 	}
 
 	var query_criteria_id int64 = 0

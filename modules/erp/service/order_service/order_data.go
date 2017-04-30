@@ -5,41 +5,35 @@ import (
 
 	"github.com/go-xorm/xorm"
 	"matrix/core"
+	"matrix/core/collections"
 	"matrix/modules/erp/models"
+	"matrix/modules/erp/service/order_hold_type_service"
+	"matrix/modules/erp/service/order_type_service"
+	"matrix/modules/erp/service/shop_service"
+	"matrix/modules/erp/service/status_service"
 )
 
 type Order_view_item_t struct {
-	models.OrderInfo              `xorm:"extends" json:"o"`
-	models.OrderTypeInfo          `xorm:"extends" json:"ot"`
-	models.OrderHoldTypeInfo      `xorm:"extends" json:"ht"`
-	models.ECommercePlatformInfo  `xorm:"extends" json:"pf"`
-	models.ShopAccountInfo        `xorm:"extends" json:"sa"`
-	models.StatusInfo             `xorm:"extends" json:"s"`
+	Order        models.OrderInfo       `xorm:"extends" json:"o"`
+	TypeName     string                 `json:"type_name"`
+	HoldTypeName string                 `json:"hold_type_name"`
+	PlatformName string                 `json:"platform_name"`
+	ShopCode     string                 `json:"shop_code"`
+	ShopName     string                 `json:"shop_name"`
+	StatusName   string                 `json:"status_name"`
 }
 
 func Get_order_data_list(db_session *xorm.Session, filter string, order string, offset int64, limit int64) ([]Order_view_item_t, int64) {
 
 	/*
-SELECT o.*, ot.*, ht.*, pf.*, sa.*, s.*
+SELECT o.*
 FROM erp_order o
-    INNER JOIN erp_order_type ot ON ot.id = o.type_id
-    LEFT JOIN erp_order_hold_type ht ON ht.id = o.hold_type_id
-    INNER JOIN erp_shop_account sa ON sa.id = o.shop_id
-    inner join erp_ecommerce_platform pf on pf.id = sa.platform_id
-    INNER JOIN erp_status s ON s.id = o.status_id
 	 */
 
 	sql_builder := core.NewSqlBuilder()
-	sql_builder.Select("o.*, ot.*, ht.*, pf.*, sa.*, s.*")
+	sql_builder.Select("o.*")
 	sql_builder.Count("count(o.id) as order_count")
-	sql_builder.From(`
-erp_order o
-    INNER JOIN erp_order_type ot ON ot.id = o.type_id
-    LEFT JOIN erp_order_hold_type ht ON ht.id = o.hold_type_id
-    INNER JOIN erp_shop_account sa ON sa.id = o.shop_id
-    inner join erp_ecommerce_platform pf on pf.id = sa.platform_id
-    INNER JOIN erp_status s ON s.id = o.status_id
-	`)
+	sql_builder.From(`erp_order o`)
 	sql_builder.Where(filter)
 
 	if order == "" {
@@ -53,6 +47,40 @@ erp_order o
 	order_list := make([]Order_view_item_t, 0)
 	err := db_session.Sql(sql_builder.SqlList()).Find(&order_list)
 	core.HandleError(err)
+
+	// 加载订单列表额外信息
+	var order_type_id_set = collections.NewIntSet()
+	var hold_type_id_set = collections.NewIntSet()
+	var shop_account_id_set = collections.NewIntSet()
+	var status_id_set = collections.NewIntSet()
+
+	for _, order := range order_list {
+		order_type_id_set.Add(order.Order.TypeId)
+		if order.Order.HoldTypeId.Valid == true {
+			hold_type_id_set.Add(order.Order.HoldTypeId.Int64)
+		}
+		shop_account_id_set.Add(order.Order.ShopId)
+		status_id_set.Add(order.Order.StatusId)
+	}
+
+	var order_type_id_name_map = order_type_service.Get_order_type_id_name_map(order_type_id_set.List(), db_session)
+	var hold_type_id_name_map = order_hold_type_service.Get_order_hold_type_id_name_map(hold_type_id_set.List(), db_session)
+	var platform_shop_id_name_map = shop_service.Get_shop_id_name_map(shop_account_id_set.List(), db_session)
+	var status_id_name_map = status_service.Get_status_id_name_map(status_id_set.List(), db_session)
+
+	for index, order := range order_list {
+		order_list[index].TypeName = order_type_id_name_map[order.Order.TypeId]
+		if order.Order.HoldTypeId.Valid == true {
+			order_list[index].HoldTypeName = hold_type_id_name_map[order.Order.HoldTypeId.Int64]
+		}
+
+		var platform_shop_name = platform_shop_id_name_map[order.Order.ShopId]
+		order_list[index].PlatformName = platform_shop_name.PlatformName
+		order_list[index].ShopCode = platform_shop_name.ShopCode
+		order_list[index].ShopName = platform_shop_name.ShopName
+
+		order_list[index].StatusName = status_id_name_map[order.Order.StatusId]
+	}
 
 	var order_count struct {
 		Count int64 `xorm:"'order_count'"`

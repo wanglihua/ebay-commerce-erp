@@ -48,3 +48,21 @@ func Get_status_id_by_name(status_name string, status_type int64, db_session *xo
 
 	return status_id.StatusId
 }
+
+func Get_status_id_name_map(status_id_list []int64, db_session *xorm.Session) map[int64]string {
+	var status_id_name_map = make(map[int64]string)
+
+	if len(status_id_list) == 0 {
+		return status_id_name_map
+	}
+
+	var status_list = make([]models.StatusInfo, 0)
+	err := db_session.In("id", status_id_list).Find(&status_list)
+	core.HandleError(err)
+
+	for _, status := range status_list {
+		status_id_name_map[status.Id] = status.Name
+	}
+
+	return status_id_name_map
+}

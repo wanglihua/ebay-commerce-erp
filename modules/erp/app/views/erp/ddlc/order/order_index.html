@@ -148,33 +148,33 @@
                         {
                             "mDataProp": "o.code", "title": "订单编号", "bSearchable": true,
                             "render": function (data, type, row) {
-                                return "<div class='div_order_code'><a href='/erp/order/detail/" + row.o.id + "' target='_blank'>" + data + "</a></div><div>" + row.s.name + "</div><div>" + row.ot.name + "</div>";
+                                return "<div class='div_order_code'><a href='/erp/order/detail/" + row.o.id + "' target='_blank'>" + data + "</a></div><div>" + row.status_name + "</div><div>" + row.type_name + "</div>";
                             }
                         },
                         {
-                            "mDataProp": "s.name", "title": "订单状态", "bSearchable": true,
+                            "mDataProp": "s.name", "title": "订单状态", "bSearchable": false, "bSortable": false,
                             "render": function (data, type, row) {
                                 return "<div class='div_status_name'></div>";
                             }
                         },
                         {
-                            "mDataProp": "ot.name", "title": "订单类型", "bSearchable": true,
+                            "mDataProp": "ot.name", "title": "订单类型", "bSearchable": false, "bSortable": false,
                             "render": function (data, type, row) {
                                 return "<div class='div_type_name'></div>";
                             }
                         },
                         {
-                            "mDataProp": "sa.name", "title": "店铺名", "bSearchable": true,
+                            "mDataProp": "sa.name", "title": "店铺名", "bSearchable": false, "bSortable": false,
                             "render": function (data, type, row) {
                                 var tran_id = row.o.tran_id;
                                 if (tran_id === "") {
                                     tran_id = "--------";
                                 }
-                                return "<div class='div_store_name'>" + row.pf.name + " " + row.sa.name + "</div><div>" + row.sa.code + "</div><div>" + tran_id + "</div>";
+                                return "<div class='div_store_name'>" + row.platform_name + " " + row.shop_name + "</div><div>" + row.shop_code + "</div><div>" + tran_id + "</div>";
                             }
                         },
                         {
-                            "mDataProp": "sa.name", "title": "店铺代码", "bSearchable": true,
+                            "mDataProp": "sa.name", "title": "店铺代码", "bSearchable": false, "bSortable": false,
                             "render": function (data, type, row) {
                                 return "<div class='div_store_code'></div>";
                             }
