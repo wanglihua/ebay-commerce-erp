@@ -7,6 +7,8 @@ import (
 	"matrix/core"
 	"matrix/core/collections"
 	"matrix/modules/erp/models"
+	"matrix/modules/erp/service/logistics_company_service"
+	"matrix/modules/erp/service/logistics_mode_service"
 	"matrix/modules/erp/service/order_hold_type_service"
 	"matrix/modules/erp/service/order_shipping_address_service"
 	"matrix/modules/erp/service/order_type_service"
@@ -105,6 +107,9 @@ FROM erp_order o
 		mode_id_set.Add(order_logistics.ModeId)
 	}
 
+	var logistics_company_id_name_map = logistics_company_service.Get_company_id_name_map(company_id_set.List(), db_session)
+	var logistics_mode_id_name_map = logistics_mode_service.Get_logistics_mode_id_name_map(mode_id_set.List(), db_session)
+
 	for index, order := range order_list {
 		order_list[index].TypeName = order_type_id_name_map[order.Order.TypeId]
 
@@ -128,6 +133,14 @@ FROM erp_order o
 		}
 
 		order.OrderLogistics = order_logistics_id_info_map[order.Order.Id]
+
+		if order.Order.CompanyId != 0 {
+			order.CompanyName = logistics_company_id_name_map[order.Order.CompanyId]
+		}
+
+		if order.Order.ModeId != 0 {
+			order.ModeName = logistics_mode_id_name_map[order.Order.ModeId]
+		}
 	}
 
 	var order_count struct {
