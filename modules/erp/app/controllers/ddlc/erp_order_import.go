@@ -649,7 +649,13 @@ func (c ErpOrderImport) MatchLogistics() revel.Result {
 
 	var p_order_logistics = new(order_logistics_service.OrderLogistics)
 	err := p_order_logistics.CalculateListImportBatch(batch_code, db_session)
-	core.HandleError(err)
+	// core.HandleError(err)
+	if err != nil {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": err.Error(),
+		})
+	}
 
 	return c.RenderJson(map[string]interface{}{
 		"success": true,

@@ -70,17 +70,18 @@ func (p_ol *OrderLogistics) init_data(db_session *xorm.Session) {
 	// 只加载 物流公司处于启用状态的复溜费率
 	var logistics_fee_rate_all_list = logistics_fee_rate_service.Get_logistics_fee_rate_enabled(db_session)
 
-	var logistics_fee_rate_map = make(map[int64][]models.LogisticsFeeRateInfo)
+	// 考虑到数据量的问题，就不采用中间变量了 var logistics_fee_rate_map = make(map[int64][]models.LogisticsFeeRateInfo)
+	p_ol.logistics_fee_rate_map = make(map[int64][]models.LogisticsFeeRateInfo)
 	for _, logistics_fee_rate := range logistics_fee_rate_all_list {
-		logistics_fee_rate_list, found := logistics_fee_rate_map[logistics_fee_rate.ModeId]
+		logistics_fee_rate_list, found := p_ol.logistics_fee_rate_map[logistics_fee_rate.ModeId]
 		if found {
 			logistics_fee_rate_list = append(logistics_fee_rate_list, logistics_fee_rate)
-			logistics_fee_rate_map[logistics_fee_rate.ModeId] = logistics_fee_rate_list
+			p_ol.logistics_fee_rate_map[logistics_fee_rate.ModeId] = logistics_fee_rate_list
 		} else {
-			logistics_fee_rate_map[logistics_fee_rate.ModeId] = logistics_fee_rate_list
+			p_ol.logistics_fee_rate_map[logistics_fee_rate.ModeId] = logistics_fee_rate_list
 		}
 	}
-	p_ol.logistics_fee_rate_map = logistics_fee_rate_map
+	// 不采用中间变量了 p_ol.logistics_fee_rate_map = logistics_fee_rate_map
 }
 
 func (p_ol *OrderLogistics) CalculateListPaidOrders(db_session *xorm.Session) error {
@@ -168,6 +169,25 @@ func (p_ol *OrderLogistics) CalculateList(order_list []models.OrderInfo, db_sess
 
 	p_ol.init_data(db_session)
 
+	{
+		// 检查信封限制的相关设置，要放在 init_data() 之后
+
+		var envelope_max_length = p_ol.logistics_setting.EnvelopeMaxLength
+		var envelope_max_width = p_ol.logistics_setting.EnvelopeMaxWidth
+		var envelope_max_height = p_ol.logistics_setting.EnvelopeMaxHeight
+		var envelope_max_weight = p_ol.logistics_setting.EnvelopeMaxWeight
+
+		// 如果没有设置信封的最大长度、宽度、高度、重量
+		if envelope_max_length == 0 || envelope_max_width == 0 || envelope_max_height == 0 || envelope_max_weight == 0 {
+			return errors.New("系统的对信封的长宽高重量限制的设定不完整！")
+		}
+
+		// 检查系统没有设置快递的最小运费，要放在 init_data() 之后
+		if p_ol.logistics_setting.MinExpressFee == 0 {
+			return errors.New("系统没有设置快递的最小运费！")
+		}
+	}
+
 	// todo: 拆分和合并订单的问题，在这之前就已经完成了？ 不是在这里做，就可以了，做完进入 hold ??
 
 	// todo 合并订单
@@ -230,7 +250,7 @@ func (p_ol *OrderLogistics) CalculateList(order_list []models.OrderInfo, db_sess
 			continue
 		}
 
-		// 1 地址有特殊字段的， 因为要查看匹配的物流方式，所以就放在这里了
+		// 1 地址有特殊字段的， 因为要查看匹配的物流方式，所以就放在这里了，放在匹配物流方式之后
 		if p_ol.hold_check_address_special_word(&order, p_order_logistics_data, order_logistics_id, db_session) {
 			continue
 		}
@@ -273,6 +293,7 @@ func (p_ol *OrderLogistics) CalculateSingle(order models.OrderInfo, db_session *
 
 // 1 地址有特殊字段的
 func (p_ol *OrderLogistics) hold_check_address_special_word(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, order_logistics_id int64, db_session *xorm.Session) (is_hold_return bool) {
+	// 检查地址中是否有特殊字段
 	var has_address_special_word = false
 	for _, address_special_word := range p_ol.address_special_word_list_setting {
 		// 地址包含特殊字段
@@ -286,31 +307,29 @@ func (p_ol *OrderLogistics) hold_check_address_special_word(p_order *models.Orde
 
 	if has_address_special_word == true {
 		// 检查匹配的物流方式对应的物流公司是不是 需要考虑 地址特殊字段的
-		var address_special_word struct {
+		var company_address_special_word struct {
 			AddressSpecialWord int64 `xorm:"'address_special_word'"`
 		}
 
 		/*
-	SELECT
-		lc.address_special_word
-	FROM erp_order_logistics ol
-		INNER JOIN erp_logistics_mode lm ON lm.id = ol.mode_id
-		INNER JOIN erp_logistics_company lc ON lc.id = lm.company_id
-	WHERE ol.id = 1
+SELECT lc.address_special_word
+FROM erp_order_logistics ol
+    INNER JOIN erp_logistics_mode lm ON lm.id = ol.mode_id AND ol.id = 1
+    INNER JOIN erp_logistics_company lc ON lc.id = lm.company_id
+WHERE ol.id = 1
 		 */
 
-		sql := `SELECT
-		lc.address_special_word
-	FROM erp_order_logistics ol
-		INNER JOIN erp_logistics_mode lm ON lm.id = ol.mode_id
-		INNER JOIN erp_logistics_company lc ON lc.id = lm.company_id
-	WHERE ol.id = %d`
+		sql := `SELECT lc.address_special_word
+FROM erp_order_logistics ol
+    INNER JOIN erp_logistics_mode lm ON lm.id = ol.mode_id AND ol.id = %[1]d
+    INNER JOIN erp_logistics_company lc ON lc.id = lm.company_id
+WHERE ol.id = %[1]d`
 		sql = fmt.Sprintf(sql, order_logistics_id)
 
-		_, err := db_session.Sql(sql).Get(&address_special_word)
+		_, err := db_session.Sql(sql).Get(&company_address_special_word)
 		core.HandleError(err)
 
-		if address_special_word.AddressSpecialWord == 0 { // 地址有特殊字段的。比如 PO BOX, LOCKER。但最佳物流   “ 非“   AU POST的，需要在基础设置里面有特殊字段设置功能
+		if company_address_special_word.AddressSpecialWord == 0 { // 地址有特殊字段的。比如 PO BOX, LOCKER。但最佳物流   “ 非“   AU POST的，需要在基础设置里面有特殊字段设置功能
 			p_ol.update_order_to_hold_type(p_order, models.ORDER_HOLD_TYPE_SPECIAL_ADDRESS, db_session)
 			return true
 		}
@@ -329,9 +348,9 @@ func (p_ol *OrderLogistics) hold_check_buyer_checkout_message(p_order *models.Or
 	return false
 }
 
-// 3 有平台留言 -- 导入的订单里面还没有留言
+// todo: 3 有平台留言 -- 导入的订单里面还没有留言
 
-// 4 PICK UP   -- 一般都是手工创建的订单
+// todo: 4 PICK UP  -- 一般都是手工创建的订单，做一个 PICK UP的订单类型？
 
 // 5 系统显示所有仓都缺货（中国仓除外）
 func (p_ol *OrderLogistics) hold_check_oss_all_stock(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, db_session *xorm.Session) (is_hold_return bool) {
@@ -383,19 +402,21 @@ func (p_ol *OrderLogistics) hold_check_oss_best_stock(p_order *models.OrderInfo,
 //返回 true, 表明考虑的是符合要求的
 type fun_stock_type_filter_t func(stock_type_id int64) bool
 
-// 订单商品库存检查，用户给5和6的调用
+// 订单商品库存检查，用于给 5 和 6 的调用
 func (p_ol *OrderLogistics) hold_check_oss(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, fun_stock_type_filter fun_stock_type_filter_t, db_session *xorm.Session) (is_oss_return bool) {
-	//todo: 暂时理解成是，所有商品，所有仓库(中国仓除外)都缺货。这里的缺货也理解成是，没有一个仓库能凑齐所有商品的所有数量
 	var products_stock_qty_list = p_order_logistics_data.products_stock_qty_list
 
 	// 找出所有包含这些商品库存的仓库id列表
 	var get_product_stock_id_list = func() []int64 {
 		var stock_id_set = collections.NewIntSet()
 		for _, product_stock_qty := range products_stock_qty_list {
-			stock_id_set.Add(product_stock_qty.StockId)
+			if fun_stock_type_filter(product_stock_qty.StockTypeId) { // 只取符合要求的仓库类型。比如，匹配订单的时候，只取澳洲的仓库什么的
+				stock_id_set.Add(product_stock_qty.StockId)
+			}
 		}
 		return stock_id_set.List()
 	}
+
 	var product_stock_id_list = get_product_stock_id_list()
 
 	var all_product_oss = true //下面的逻辑中，如果发现仓库有货，就设置为 false
@@ -404,26 +425,19 @@ func (p_ol *OrderLogistics) hold_check_oss(p_order *models.OrderInfo, p_order_lo
 	for _, stock_id := range product_stock_id_list {
 		var stock_has_all_product = check_stock_has_order_products(stock_id, p_order_logistics_data)
 
-		// 找到仓库全部商品都有货了
+		// 找到仓库全部商品都有货了，就退出；如果这个仓库里面不是全部商品都有货，就继续找
 		if stock_has_all_product {
 			all_product_oss = false
 			break
-		} else {
-			// 如果这个仓库里面不是全部商品都有货，就继续找
-			continue // 因为是循环的最后，所以这个continue可以加也可以不加
 		}
 	}
 
-	if all_product_oss {
-		return true
-	}
-
-	return false
+	return all_product_oss
 }
 
-// 7 实际仓库缺货（是在捡货过程中，虽然系统显示有货，但实际仓库没有货了。就需要人工手动将这些订单搬至这里的模块，等待跟客户协商，是退款还是等待集装箱）
+// todo: 7 实际仓库缺货（是在捡货过程中，虽然系统显示有货，但实际仓库没有货了。就需要人工手动将这些订单搬至这里的模块，等待跟客户协商，是退款还是等待集装箱）, 这个 hold 由拣货过程中产生
 
-// 8, 9, 10 临时的解决方案
+// todo: 8, 9, 10 临时的解决方案
 func (p_ol *OrderLogistics) hold_check_multi_product(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, db_session *xorm.Session) (is_hold_return bool) {
 	if len(p_order_logistics_data.order_product_info_list) > 1 {
 		p_ol.update_order_to_hold_type(p_order, models.ORDER_HOLD_TYPE_MULTI_PRODUCT, db_session)
@@ -433,7 +447,7 @@ func (p_ol *OrderLogistics) hold_check_multi_product(p_order *models.OrderInfo, 
 	return false
 }
 
-// 11 无法匹配物流（长宽高重量没有物流满足）
+// 11 无法匹配物流（长宽高重量没有物流满足）， 对这个 函数 的调用放在匹配物流结束之后，这样才知道是不是匹配成功了
 func (p_ol *OrderLogistics) hold_check_no_match_logistics_mode(p_order *models.OrderInfo, match_success bool, db_session *xorm.Session) (is_hold_return bool) {
 	if match_success == false {
 		p_ol.update_order_to_hold_type(p_order, models.ORDER_HOLD_TYPE_LOGISTICS_NO_MATCH, db_session)
@@ -447,7 +461,7 @@ func (p_ol *OrderLogistics) hold_check_no_match_logistics_mode(p_order *models.O
 func (p_ol *OrderLogistics) hold_check_product_info_miss(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, db_session *xorm.Session) (is_hold_return bool) {
 	var order_product_info_list = p_order_logistics_data.order_product_info_list
 	for _, order_product_info := range order_product_info_list {
-		// 长宽高重量数据不全
+		// 长 宽 高 重量 数据不全
 		if order_product_info.Length == 0 || order_product_info.Width == 0 || order_product_info.Height == 0 || order_product_info.Weight == 0 {
 			p_ol.update_order_to_hold_type(p_order, models.ORDER_HOLD_TYPE_PRODUCT_INFO_MISS, db_session)
 			return true
@@ -481,10 +495,11 @@ func (p_ol *OrderLogistics) hold_check_envelope(p_order *models.OrderInfo, p_ord
 
 	// 如果没有设置信封的最大长度、宽度、高度、重量
 	if envelope_max_length == 0 || envelope_max_width == 0 || envelope_max_height == 0 || envelope_max_weight == 0 {
+		revel.ERROR.Printf("系统的对信封的长宽高重量限制的设定不完整！") // 在匹配开始时就提示错误
 		return false
 	}
 
-	// 进行长宽高的排序，结果中 长 > 宽 > 高
+	// 进行长宽高的排序，结果中 长 > 宽 > 高，这样在信封长宽高限制的设定中，就不用一定要保证 长 > 宽 > 高
 	var envelope_side_length_slice = sort.Float64Slice([]float64{envelope_max_length, envelope_max_weight, envelope_max_height})
 	envelope_side_length_slice.Sort()
 	envelope_max_length = envelope_side_length_slice[2] // 最长
@@ -504,12 +519,14 @@ func (p_ol *OrderLogistics) hold_check_envelope(p_order *models.OrderInfo, p_ord
 
 // 15 快递类。需要在基础设置里面有 收到快递费金额的设置功能，比如收到的运费高于什么金额，视为快递。否则就算收了快递费也视为普通包裹
 func (p_ol *OrderLogistics) hold_check_express(p_order *models.OrderInfo, db_session *xorm.Session) (is_hold_return bool) {
-	// 如果没有设置最小运费
+	// 系统没有设置快递的最小运费
 	if p_ol.logistics_setting.MinExpressFee == 0 {
+		revel.ERROR.Println("系统没有设置快递的最小运费！")
 		return false
 	}
 
-	if p_order.ExpressFee >= p_ol.logistics_setting.MinExpressFee { //假定都是澳币
+	// 这里假定都是澳币
+	if p_order.ExpressFee >= p_ol.logistics_setting.MinExpressFee {
 		p_ol.update_order_to_hold_type(p_order, models.ORDER_HOLD_TYPE_EXPRESS, db_session)
 		return true
 	}
@@ -577,7 +594,7 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 	var final_length float64 = 0
 	var final_width float64 = 0
 	var final_height float64 = 0
-	var final_weight float64 = 0
+	// var final_weight float64 = 0
 	var final_actual_weight float64 = 0 //就是商品的实际重量合计，用 final 只是用于和下面的循环里面的 actual_weight 区别开来罢了
 	for _, logistics_mode := range logistics_mode_list {
 		logistics_fee_rate_list, found := logistics_fee_rate_map[logistics_mode.Id]
@@ -599,7 +616,7 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 		{
 			// 匹配前重量打折
 			if logistics_setting.Ppqzldz == 1 {
-				// 是不是指定实际重量打折
+				// 实际重量打折
 				actual_weight = actual_weight * logistics_setting.Ppqzlzl
 			}
 
@@ -610,13 +627,13 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 				var mid_length = side_length_slice[1] // 0, 1, 2 中间那条边
 
 				const MIN_FLOAT_DIFF = 0.0000000001
-				if (mid_length - length) < MIN_FLOAT_DIFF {
+				if math.Abs(mid_length-length) < MIN_FLOAT_DIFF {
 					length = length * logistics_setting.Ppqzbzl
 				}
-				if (mid_length - width) < MIN_FLOAT_DIFF {
+				if math.Abs(mid_length-width) < MIN_FLOAT_DIFF {
 					width = width * logistics_setting.Ppqzbzl
 				}
-				if (mid_length - height) < MIN_FLOAT_DIFF {
+				if math.Abs(mid_length-height) < MIN_FLOAT_DIFF {
 					height = height * logistics_setting.Ppqzbzl
 				}
 			}
@@ -676,7 +693,11 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 				}
 				// 允许超长，计算超长费用
 				var extra_length_step float64 = logistics_mode.Ccsfjt
-				extra_length_fee_in_mode = math.Ceil(extra_length/extra_length_step) * logistics_mode.Ccjsyf
+				if extra_length_step > 0 {
+					extra_length_fee_in_mode = math.Ceil(extra_length/extra_length_step) * logistics_mode.Ccjsyf
+				} else {
+					revel.ERROR.Printf("id 为 %d 名称为 %s 的物流方式的超长收费阶梯设置有误！\n", logistics_mode.Id, logistics_mode.Name)
+				}
 			}
 			// 如果没有超过限长，就不需要继续考虑
 		}
@@ -705,7 +726,7 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 			}
 		} // for _, logistics_fee_rate := range logistics_fee_rate_list {
 
-		if selected_fee_rate_id_in_mode == 0 { //没有费率匹配, 比如说，还没有开通该地区的物流
+		if selected_fee_rate_id_in_mode == 0 { //没有费率匹配成功, 比如说，还没有开通该地区的物流
 			continue // 排除该物流方式
 		}
 
@@ -723,14 +744,14 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 			final_length = length
 			final_width = width
 			final_height = height
-			final_weight = final_weight_in_mode
+			// final_weight = final_weight_in_mode
 			final_actual_weight = actual_weight
 		}
 	} // for _, logistics_mode := range logistics_mode_list {
 
 	//revel.TRACE.Println("final_length, final_width, final_height, final_weight, final_actual_weight", final_length, final_width, final_height, final_weight, final_actual_weight)
 
-	_ = final_weight //暂时没用这个变量，必要的时候去掉这个变量
+	// _ = final_weight //暂时没用这个变量，必要的时候去掉这个变量
 
 	if final_selected_mode_id == 0 || final_selected_fee_rate_id == 0 { // 匹配失败
 		return false, 0
@@ -811,8 +832,7 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 	return true, order_logistics.Id
 }
 
-// 检查仓库是否有订单中的所有商品数量的库存
-// todo: 匹配订单的时候，只能是澳洲的仓库的啊
+// 检查仓库是否有订单中的所有商品数量的库存。这里的有货就理解成这个仓库有订单的所有的商品；这里的缺货也理解成是，没有一个仓库能凑齐所有商品的所有数量。
 func check_stock_has_order_products(stock_id int64, p_order_logistics_data *order_logistics_data_t) bool {
 	var products_stock_qty_list = p_order_logistics_data.products_stock_qty_list
 	var order_product_info_list = p_order_logistics_data.order_product_info_list
@@ -841,7 +861,7 @@ func check_stock_has_order_products(stock_id int64, p_order_logistics_data *orde
 	return stock_has_all_product
 }
 
-// 输出的结果中，保证 length > width > height
+// 获得多个商品的整体长宽高重量的参数，输出的结果中，保证 length > width > height
 func get_order_products_whole_logistics_data(p_order_logistics_data *order_logistics_data_t, dim_weight_ratio float64) (length_return float64, width_return float64, height float64, dim_weight_return float64, weight_return float64) {
 	var whole_length, whole_width, whole_height, whole_dim_weight, whole_weight float64 = 0, 0, 0, 0, 0
 	for _, order_product_info := range p_order_logistics_data.order_product_info_list {
