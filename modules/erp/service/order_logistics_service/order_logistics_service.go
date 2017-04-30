@@ -822,7 +822,12 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 
 	// 把订单状态修改为 待配货
 	p_order.StatusId = models.ORDER_STATUS_DPH
-	_, err = db_session.Id(p_order.Id).Cols("status_id").Update(p_order)
+	// 填入匹配过程中的最后的 stock_id 和 address_id
+	p_order.StockId = final_selected_stock_id
+	p_order.AddressId = address_id
+	p_order.CompanyId = final_selected_company_id
+	p_order.ModeId = final_selected_mode_id
+	_, err = db_session.Id(p_order.Id).Cols("status_id", "stock_id", "address_id", "company_id", "mode_id").Update(p_order)
 	core.HandleError(err)
 
 	// 多个商品时，考虑拆包的方式

@@ -178,33 +178,14 @@ func (c ErpOrder) ListData() revel.Result {
 	// 只有待配货，配货中，已发货，已完成的订单可以分仓库查看
 	if status_id == models.ORDER_STATUS_DPH || status_id == models.ORDER_STATUS_PHZ || status_id == models.ORDER_STATUS_YFH || status_id == models.ORDER_STATUS_YWC {
 		// 不同的仓库拣货人员可以看到不同的订单，管理员、销售、客服 除外
-		/*
-		SELECT *
-		FROM erp_order o
-		WHERE o.id IN (
-		SELECT ol.order_id
-		FROM erp_order_logistics ol
-		WHERE ol.stock_id IN (
-			SELECT spc.stock_id
-			FROM erp_stock_pick_crew spc
-			WHERE spc.user_id = 0))
-		 */
 		var login_user = core.GetLoginUser(c.Session)
 		var is_admin = pass_service.Is_user_admin(login_user.UserId)                   // 是不是管理员
 		var is_sales = pass_service.Is_user_sales(login_user.UserId)                   // 是不是销售
 		var is_custom_service = pass_service.Is_user_custom_service(login_user.UserId) // 是不是客服
 		if login_user.IsSuperAdmin == false && is_admin == false && is_custom_service == false && is_sales == false { // 管理员，客服，销售 可以看到所有仓库的订单
-			filter = core.SqlAnd(filter, fmt.Sprintf(`o.id IN (
-    SELECT ol.order_id
-    FROM erp_order_logistics ol
-    WHERE ol.stock_id IN (
-        SELECT spc.stock_id
-        FROM erp_stock_pick_crew spc
-        WHERE spc.user_id = %d))`, login_user.UserId))
+			filter = core.SqlAnd(filter, fmt.Sprintf(`o.stock_id IN (SELECT spc.stock_id FROM erp_stock_pick_crew spc WHERE spc.user_id = %d)`, login_user.UserId))
 		}
 	}
-
-	//todo: 界面上显示配货的仓库信息， left join
 
 	if status_id == 0 { // 后来改成只有在所有订单的的界面下，才有状态的下拉框
 		var status_id_query int64 = 0 // 下拉框里面的状态，不是通过 Url 里面来的

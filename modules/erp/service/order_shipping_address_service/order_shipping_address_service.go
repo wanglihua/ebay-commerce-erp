@@ -29,3 +29,21 @@ func Get_orders_shipping_address_list(order_list []models.OrderInfo, db_session 
 
 	return order_shipping_address_list
 }
+
+func Get_order_shipping_address_id_info_map(address_id_list []int64, db_session *xorm.Session) map[int64]models.OrderShippingAddressInfo {
+	var order_shipping_address_id_info_map = make(map[int64]models.OrderShippingAddressInfo)
+
+	if len(address_id_list) == 0 {
+		return order_shipping_address_id_info_map
+	}
+
+	var address_list = make([]models.OrderShippingAddressInfo, 0)
+	err := db_session.In("id", address_id_list).Find(&address_list)
+	core.HandleError(err)
+
+	for _, address := range address_list {
+		order_shipping_address_id_info_map[address.Id] = address
+	}
+
+	return order_shipping_address_id_info_map
+}

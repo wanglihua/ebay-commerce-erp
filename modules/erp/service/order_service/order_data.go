@@ -8,19 +8,26 @@ import (
 	"matrix/core/collections"
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/order_hold_type_service"
+	"matrix/modules/erp/service/order_shipping_address_service"
 	"matrix/modules/erp/service/order_type_service"
 	"matrix/modules/erp/service/shop_service"
 	"matrix/modules/erp/service/status_service"
+	"matrix/modules/erp/service/stock_service"
 )
 
 type Order_view_item_t struct {
-	Order        models.OrderInfo       `xorm:"extends" json:"o"`
-	TypeName     string                 `json:"type_name"`
-	HoldTypeName string                 `json:"hold_type_name"`
-	PlatformName string                 `json:"platform_name"`
-	ShopCode     string                 `json:"shop_code"`
-	ShopName     string                 `json:"shop_name"`
-	StatusName   string                 `json:"status_name"`
+	Order                models.OrderInfo                  `xorm:"extends" json:"o"`
+	TypeName             string                            `json:"type_name"`
+	HoldTypeName         string                            `json:"hold_type_name"`
+	PlatformName         string                            `json:"platform_name"`
+	ShopCode             string                            `json:"shop_code"`
+	ShopName             string                            `json:"shop_name"`
+	StatusName           string                            `json:"status_name"`
+	StockName            string                            `json:"stock_name"`
+	OrderLogistics       models.OrderLogisticsInfo         `json:"ol"`
+	OrderShippingAddress models.OrderShippingAddressInfo   `json:"ad"`
+	CompanyName          string                            `json:"company_name"`
+	ModeName             string                            `json:"mode_name"`
 }
 
 func Get_order_data_list(db_session *xorm.Session, filter string, order string, offset int64, limit int64) ([]Order_view_item_t, int64) {
@@ -53,23 +60,54 @@ FROM erp_order o
 	var hold_type_id_set = collections.NewIntSet()
 	var shop_account_id_set = collections.NewIntSet()
 	var status_id_set = collections.NewIntSet()
+	var stock_id_set = collections.NewIntSet()
+	var address_id_set = collections.NewIntSet()
+	var order_id_list = make([]int64, 0)
 
 	for _, order := range order_list {
 		order_type_id_set.Add(order.Order.TypeId)
+
 		if order.Order.HoldTypeId.Valid == true {
 			hold_type_id_set.Add(order.Order.HoldTypeId.Int64)
 		}
+
 		shop_account_id_set.Add(order.Order.ShopId)
 		status_id_set.Add(order.Order.StatusId)
+
+		if order.Order.StockId != 0 {
+			stock_id_set.Add(order.Order.StockId)
+		}
+
+		if order.Order.AddressId != 0 {
+			address_id_set.Add(order.Order.AddressId)
+		}
+
+		order_id_list = append(order_id_list, order.Order.Id)
 	}
 
 	var order_type_id_name_map = order_type_service.Get_order_type_id_name_map(order_type_id_set.List(), db_session)
 	var hold_type_id_name_map = order_hold_type_service.Get_order_hold_type_id_name_map(hold_type_id_set.List(), db_session)
 	var platform_shop_id_name_map = shop_service.Get_shop_id_name_map(shop_account_id_set.List(), db_session)
 	var status_id_name_map = status_service.Get_status_id_name_map(status_id_set.List(), db_session)
+	var stock_id_name_map = stock_service.Get_stock_id_name_map(stock_id_set.List(), db_session)
+	var order_shipping_address_id_info_map = order_shipping_address_service.Get_order_shipping_address_id_info_map(address_id_set.List(), db_session)
+
+	var order_logistics_list = make([]models.OrderLogisticsInfo, 0)
+	err = db_session.In("order_id", order_id_list).Find(&order_logistics_list)
+	core.HandleError(err)
+
+	var company_id_set = collections.NewIntSet()
+	var mode_id_set = collections.NewIntSet()
+	var order_logistics_id_info_map = make(map[int64]models.OrderLogisticsInfo)
+	for _, order_logistics := range order_logistics_list {
+		order_logistics_id_info_map[order_logistics.OrderId] = order_logistics
+		company_id_set.Add(order_logistics.CompanyId)
+		mode_id_set.Add(order_logistics.ModeId)
+	}
 
 	for index, order := range order_list {
 		order_list[index].TypeName = order_type_id_name_map[order.Order.TypeId]
+
 		if order.Order.HoldTypeId.Valid == true {
 			order_list[index].HoldTypeName = hold_type_id_name_map[order.Order.HoldTypeId.Int64]
 		}
@@ -80,6 +118,16 @@ FROM erp_order o
 		order_list[index].ShopName = platform_shop_name.ShopName
 
 		order_list[index].StatusName = status_id_name_map[order.Order.StatusId]
+
+		if order.Order.StockId != 0 {
+			order.StockName = stock_id_name_map[order.Order.StockId]
+		}
+
+		if order.Order.AddressId != 0 {
+			order.OrderShippingAddress = order_shipping_address_id_info_map[order.Order.AddressId]
+		}
+
+		order.OrderLogistics = order_logistics_id_info_map[order.Order.Id]
 	}
 
 	var order_count struct {
