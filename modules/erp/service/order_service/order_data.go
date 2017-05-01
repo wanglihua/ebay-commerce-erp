@@ -30,6 +30,7 @@ type Order_view_item_t struct {
 	OrderShippingAddress models.OrderShippingAddressInfo   `json:"ad"`
 	CompanyName          string                            `json:"company_name"`
 	ModeName             string                            `json:"mode_name"`
+	FeeDiff              float64                           `json:"fee_diff"`
 }
 
 func Get_order_data_list(db_session *xorm.Session, filter string, order string, offset int64, limit int64) ([]Order_view_item_t, int64) {
@@ -95,8 +96,11 @@ FROM erp_order o
 	var order_shipping_address_id_info_map = order_shipping_address_service.Get_order_shipping_address_id_info_map(address_id_set.List(), db_session)
 
 	var order_logistics_list = make([]models.OrderLogisticsInfo, 0)
-	err = db_session.In("order_id", order_id_list).Find(&order_logistics_list)
-	core.HandleError(err)
+
+	if len(order_id_list) != 0 {
+		err = db_session.In("order_id", order_id_list).Find(&order_logistics_list)
+		core.HandleError(err)
+	}
 
 	var company_id_set = collections.NewIntSet()
 	var mode_id_set = collections.NewIntSet()
@@ -140,6 +144,10 @@ FROM erp_order o
 
 		if order.Order.ModeId != 0 {
 			order.ModeName = logistics_mode_id_name_map[order.Order.ModeId]
+		}
+
+		if order.OrderLogistics.Id != 0 {
+			order.FeeDiff = order.OrderLogistics.ActualFee - order.OrderLogistics.TotalFee
 		}
 	}
 

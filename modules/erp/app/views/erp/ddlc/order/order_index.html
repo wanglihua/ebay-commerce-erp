@@ -80,6 +80,14 @@
 
                             <th id="th_paid_time">支付时间</th>
                             <th id="th_shipped_time">发货时间</th>
+
+                            <th id="th_logistics_company">货运公司</th>
+                            <th id="th_logistics_mode">货运方式</th>
+
+                            <th id="th_total_fee">预估运费</th>
+                            <th id="th_actual_fee">实际运费</th>
+                            <th id="th_fee_diff">运费偏差</th>
+
                             <th id="th_desc">描述</th>
                         </tr>
                         </thead>
@@ -238,6 +246,39 @@
                                 return '<div class="div_shipped_time"></div>';
                             }
                         },
+
+                        {
+                            "mDataProp": "o.company_name", "title": "货运公司", "bSearchable": false, "bSortable": false,
+                            "render": function (data, type, row) {
+                                return '<div class="div_logistics_company">' + row.company_name + '</div><div>' + row.mode_name + '</div>';
+                            }
+                        },
+                        {
+                            "mDataProp": "o.mode_name", "title": "货运方式", "bSearchable": false, "bSortable": false,
+                            "render": function (data, type, row) {
+                                return '<div class="div_logistics_mode"></div>';
+                            }
+                        },
+
+                        {
+                            "mDataProp": "o.ol.total_fee", "title": "预估运费", "bSearchable": false, "bSortable": false,
+                            "render": function (data, type, row) {
+                                return '<div class="div_total_fee">' + row.ol.total_fee + '</div><div>' + row.ol.actual_fee +'</div><div>' + row.fee_diff + '</div>';
+                            }
+                        },
+                        {
+                            "mDataProp": "o.ol.actual_fee", "title": "实际运费", "bSearchable": false, "bSortable": false,
+                            "render": function (data, type, row) {
+                                return '<div class="div_actual_fee"></div>';
+                            }
+                        },
+                        {
+                            "mDataProp": "o.ol.actual_fee", "title": "运费偏差", "bSearchable": false, "bSortable": false,
+                            "render": function (data, type, row) {
+                                return '<div class="div_fee_diff"></div>';
+                            }
+                        },
+
                         {
                             "mDataProp": "o.desc", "title": "描述", "bSearchable": true,
                             "render": function (data, type, row) {
@@ -288,6 +329,13 @@
 
                                 $("#orderList div.div_paid_time").parent().css("width", "135px");
                                 $("#orderList div.div_shipped_time").parent().css("display", "none");
+
+                                $("#orderList div.div_logistics_company").parent().css("width", "135px");
+                                $("#orderList div.div_logistics_mode").parent().css("display", "none");
+
+                                $("#orderList div.div_total_fee").parent().css("width", "135px");
+                                $("#orderList div.div_actual_fee").parent().css("display", "none");
+                                $("#orderList div.div_fee_diff").parent().css("display", "none");
                             }
                         });
                     }
@@ -320,6 +368,17 @@
             $("#th_paid_time").wrap("<div id='div_paid_time'></div>");
             $("#th_shipped_time").wrap("<div id='div_shipped_time'></div>");
             $("#th_paid_time_shipped_time").append($("#div_paid_time")).append($("#div_shipped_time"));
+
+            $("#th_logistics_company").before("<th id='th_logistics_company_ext'></th>");
+            $("#th_logistics_company").wrap("<div id='div_logistics_company'></div>");
+            $("#th_logistics_mode").wrap("<div id='div_logistics_mode'></div>");
+            $("#th_logistics_company_ext").append($("#div_logistics_company")).append($("#div_logistics_mode"));
+
+            $("#th_total_fee").before("<th id='th_total_fee_ext'></th>");
+            $("#th_total_fee").wrap("<div id='div_total_fee'></div>");
+            $("#th_actual_fee").wrap("<div id='div_actual_fee'></div>");
+            $("#th_fee_diff").wrap("<div id='div_fee_diff'></div>");
+            $("#th_total_fee_ext").append($("#div_total_fee")).append($("#div_actual_fee")).append($("#div_fee_diff"));
         },
         methods: {
             reloadList: function () {
