@@ -76,7 +76,7 @@
 
                             <th id="th_total_amount">原金额(AUD)</th>
                             <th id="th_total_amount_rmb">原金额(RMB)</th>
-                            <th id="th_express_fee">原运费金额(AUD)</th>
+                            <th id="th_express_fee">原运费金额</th>
 
                             <th id="th_paid_time">支付时间</th>
                             <th id="th_shipped_time">发货时间</th>
@@ -84,9 +84,9 @@
                             <th id="th_logistics_company">货运公司</th>
                             <th id="th_logistics_mode">货运方式</th>
 
-                            <th id="th_total_fee">预估运费(AUD)</th>
-                            <th id="th_actual_fee">实际运费(AUD)</th>
-                            <th id="th_fee_diff">运费偏差(AUD)</th>
+                            <th id="th_total_fee">预估运费</th>
+                            <th id="th_actual_fee">实际运费</th>
+                            <th id="th_fee_diff">运费偏差</th>
 
                             <th id="th_buyer_email">客户邮箱</th>
                             <th id="th_stock_name">发货仓库</th>
@@ -144,7 +144,7 @@
                 {
                     "sDom": "<'row'<'col-xs-12't>><'row'<'col-xs-6'i><'col-xs-6'p>>",
                     "sAjaxSource": '{%url "ErpOrder.ListData"%}',
-                    "aaSorting": [[10, "desc"]],
+                    "aaSorting": [[0, "desc"]],
                     "iDisplayLength": 50,
                     "aoColumns": [
                         {
@@ -224,7 +224,7 @@
                             }
                         },
                         {
-                            "mDataProp": "o.express_fee", "title": "原运费金额(AUD)", "bSearchable": false,
+                            "mDataProp": "o.express_fee", "title": "原运费金额", "bSearchable": false,
                             "render": function (data, type, row) {
                                 return "<div class='div_express_fee'></div>";
                             }
@@ -265,19 +265,19 @@
                         },
 
                         {
-                            "mDataProp": "o.ol.total_fee", "title": "预估运费(AUD)", "bSearchable": false, "bSortable": false,
+                            "mDataProp": "o.ol.total_fee", "title": "预估运费", "bSearchable": false, "bSortable": false,
                             "render": function (data, type, row) {
                                 return '<div class="div_total_fee">AUD ' + row.ol.total_fee + '</div><div>AUD ' + row.ol.actual_fee + '</div><div>AUD ' + row.fee_diff + '</div>';
                             }
                         },
                         {
-                            "mDataProp": "o.ol.actual_fee", "title": "实际运费(AUD)", "bSearchable": false, "bSortable": false,
+                            "mDataProp": "o.ol.actual_fee", "title": "实际运费", "bSearchable": false, "bSortable": false,
                             "render": function (data, type, row) {
                                 return '<div class="div_actual_fee"></div>';
                             }
                         },
                         {
-                            "mDataProp": "o.ol.actual_fee", "title": "运费偏差(AUD)", "bSearchable": false, "bSortable": false,
+                            "mDataProp": "o.ol.actual_fee", "title": "运费偏差", "bSearchable": false, "bSortable": false,
                             "render": function (data, type, row) {
                                 return '<div class="div_fee_diff"></div>';
                             }
@@ -350,14 +350,14 @@
                                 $("#orderList div.div_store_code").parent().css("display", "none");
                                 $("#orderList div.div_tran_id").parent().css("display", "none");
 
-                                $("#orderList div.div_buyer_user_id").parent().css("width", "135px");
+                                $("#orderList div.div_buyer_user_id").parent().css("width", "180px");
                                 $("#orderList div.div_payment_methods").parent().css("display", "none");
 
-                                $("#orderList div.div_total_amount").parent().css("width", "135px");
+                                $("#orderList div.div_total_amount").parent().css("width", "100px");
                                 $("#orderList div.div_total_amount_rmb").parent().css("display", "none");
                                 $("#orderList div.div_express_fee").parent().css("display", "none");
 
-                                $("#orderList div.div_paid_time").parent().css("width", "120px");
+                                $("#orderList div.div_paid_time").parent().css("width", "130px");
                                 $("#orderList div.div_shipped_time").parent().css("display", "none");
 
                                 $("#orderList div.div_logistics_company").parent().css("width", "135px");
@@ -367,7 +367,7 @@
                                 $("#orderList div.div_actual_fee").parent().css("display", "none");
                                 $("#orderList div.div_fee_diff").parent().css("display", "none");
 
-                                $("#orderList div.div_buyer_email").parent().css("width", "150px");
+                                //$("#orderList div.div_buyer_email").parent().css("width", "150px");
                                 $("#orderList div.div_stock_name").parent().css("display", "none");
 
                                 $("#orderList div.div_country_name").parent().css("width", "100px");

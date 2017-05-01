@@ -27,6 +27,7 @@ type OrderLogistics struct {
 	logistics_setting                 models.LogisticsSettingInfo             // 物流设置
 	pick_fee_setting                  models.PickFeeInfo                      // 拣货费用设置
 	address_special_word_list_setting []string                                // 收货地址特殊字段
+	logistics_company_list            []models.LogisticsCompanyInfo           // 物流公司列表
 	logistics_mode_list               []models.LogisticsModeInfo              // 物流方式列表
 	logistics_fee_rate_map            map[int64][]models.LogisticsFeeRateInfo // 物流费率列表的映射，映射的 key 是， 物流方式的 id
 }
@@ -59,6 +60,12 @@ func (p_ol *OrderLogistics) init_data(db_session *xorm.Session) {
 		address_special_word_list_setting[index] = strings.TrimSpace(address_special_word)
 	}
 	p_ol.address_special_word_list_setting = address_special_word_list_setting
+
+	// 加载物流公司
+	var logistics_company_list = make([]models.LogisticsCompanyInfo, 0)
+	err = db_session.Find(&logistics_company_list)
+	core.HandleError(err)
+	p_ol.logistics_company_list = logistics_company_list
 
 	// 加载 物流方式 和 物流费率
 
@@ -243,7 +250,7 @@ func (p_ol *OrderLogistics) CalculateList(order_list []models.OrderInfo, db_sess
 			continue
 		}
 
-		match_success, order_logistics_id := p_ol.match_logistics_mode(&order, p_order_logistics_data, db_session)
+		match_success, order_logistics := p_ol.match_logistics_mode(&order, p_order_logistics_data, db_session)
 
 		// 11 无法匹配物流（长宽高重量没有物流满足）
 		if p_ol.hold_check_no_match_logistics_mode(&order, match_success, db_session) {
@@ -251,7 +258,7 @@ func (p_ol *OrderLogistics) CalculateList(order_list []models.OrderInfo, db_sess
 		}
 
 		// 1 地址有特殊字段的， 因为要查看匹配的物流方式，所以就放在这里了，放在匹配物流方式之后
-		if p_ol.hold_check_address_special_word(&order, p_order_logistics_data, order_logistics_id, db_session) {
+		if p_ol.hold_check_address_special_word(&order, p_order_logistics_data, order_logistics, db_session) {
 			continue
 		}
 
@@ -261,7 +268,7 @@ func (p_ol *OrderLogistics) CalculateList(order_list []models.OrderInfo, db_sess
 		}
 
 		// 13 匹配最佳仓库及物流后订单亏损。需要在基础设置里面有设置亏损额或者亏损率的设置功能，超过设置范围了，自动到订单亏损 hold
-		if p_ol.hold_check_great_deficit(&order, p_order_logistics_data, order_logistics_id, db_session) {
+		if p_ol.hold_check_great_deficit(&order, p_order_logistics_data, order_logistics, db_session) {
 			continue
 		}
 
@@ -292,7 +299,7 @@ func (p_ol *OrderLogistics) CalculateSingle(order models.OrderInfo, db_session *
 }
 
 // 1 地址有特殊字段的
-func (p_ol *OrderLogistics) hold_check_address_special_word(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, order_logistics_id int64, db_session *xorm.Session) (is_hold_return bool) {
+func (p_ol *OrderLogistics) hold_check_address_special_word(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, order_logistics models.OrderLogisticsInfo, db_session *xorm.Session) (is_hold_return bool) {
 	// 检查地址中是否有特殊字段
 	var has_address_special_word = false
 	for _, address_special_word := range p_ol.address_special_word_list_setting {
@@ -304,27 +311,30 @@ func (p_ol *OrderLogistics) hold_check_address_special_word(p_order *models.Orde
 			break
 		}
 	}
+	if has_address_special_word == true {
+		var logistics_company_list = p_ol.logistics_company_list
+		for _, logistics_company := range logistics_company_list {
+			if order_logistics.CompanyId == logistics_company.Id && logistics_company.AddressSpecialWord == 0 {
+				p_ol.update_order_to_hold_type(p_order, models.ORDER_HOLD_TYPE_SPECIAL_ADDRESS, db_session)
+				return true
+			}
+		}
+	}
 
+	/*
+	可以采用上面的更高效的方式，这里就不用这种低效的每次都访问数据库的方式
 	if has_address_special_word == true {
 		// 检查匹配的物流方式对应的物流公司是不是 需要考虑 地址特殊字段的
 		var company_address_special_word struct {
 			AddressSpecialWord int64 `xorm:"'address_special_word'"`
 		}
 
-		/*
-SELECT lc.address_special_word
-FROM erp_order_logistics ol
-    INNER JOIN erp_logistics_mode lm ON lm.id = ol.mode_id AND ol.id = 1
-    INNER JOIN erp_logistics_company lc ON lc.id = lm.company_id
-WHERE ol.id = 1
-		 */
-
 		sql := `SELECT lc.address_special_word
 FROM erp_order_logistics ol
     INNER JOIN erp_logistics_mode lm ON lm.id = ol.mode_id AND ol.id = %[1]d
     INNER JOIN erp_logistics_company lc ON lc.id = lm.company_id
 WHERE ol.id = %[1]d`
-		sql = fmt.Sprintf(sql, order_logistics_id)
+		sql = fmt.Sprintf(sql, order_logistics.Id)
 
 		_, err := db_session.Sql(sql).Get(&company_address_special_word)
 		core.HandleError(err)
@@ -334,6 +344,8 @@ WHERE ol.id = %[1]d`
 			return true
 		}
 	}
+	*/
+
 	// 不符合 地址有特殊字段的，但最佳物流 “ 非“ AU POST的
 	return false
 }
@@ -423,7 +435,7 @@ func (p_ol *OrderLogistics) hold_check_oss(p_order *models.OrderInfo, p_order_lo
 
 	// 对每一个仓库循环，看是不是这个仓库里面, 这些商品都有货
 	for _, stock_id := range product_stock_id_list {
-		var stock_has_all_product = check_stock_has_order_products(stock_id, p_order_logistics_data)
+		var stock_has_all_product, _ = check_stock_has_order_products(stock_id, p_order_logistics_data)
 
 		// 找到仓库全部商品都有货了，就退出；如果这个仓库里面不是全部商品都有货，就继续找
 		if stock_has_all_product {
@@ -472,7 +484,7 @@ func (p_ol *OrderLogistics) hold_check_product_info_miss(p_order *models.OrderIn
 }
 
 // 13 //todo: 匹配最佳仓库及物流后订单亏损。需要在基础设置里面有设置亏损额或者亏损率的设置功能，超过设置范围了，自动到订单亏损hold
-func (p_ol *OrderLogistics) hold_check_great_deficit(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, order_logistics_id int64, db_session *xorm.Session) (is_hold_return bool) {
+func (p_ol *OrderLogistics) hold_check_great_deficit(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, order_logistics models.OrderLogisticsInfo, db_session *xorm.Session) (is_hold_return bool) {
 	//todo: to complete
 	/*
 	if true {
@@ -566,7 +578,7 @@ func (p_ol *OrderLogistics) update_order_to_hold_type(p_order *models.OrderInfo,
 	core.HandleError(err)
 }
 
-func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, db_session *xorm.Session) (success_return bool, order_logistics_id_return int64) {
+func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, db_session *xorm.Session) (success_return bool, order_logistics_return models.OrderLogisticsInfo) {
 
 	// 在这里面只考虑最佳仓库的库存情况，次佳仓库有货的情况，别的地方已经考虑并 hold
 
@@ -576,10 +588,10 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 
 	// 找出所有有商品数量的仓库
 	var au_stock_list = p_ol.au_stock_list
-	var stock_id_has_products_map = make(map[int64]bool)
+	var stock_id_has_products_map = make(map[int64]float64)
 	for _, stock := range au_stock_list {
-		if check_stock_has_order_products(stock.Id, p_order_logistics_data) { // 仓库有没有全部的商品数量的库存，有
-			stock_id_has_products_map[stock.Id] = true
+		if has, cost_amount := check_stock_has_order_products(stock.Id, p_order_logistics_data); has == true { // 仓库有没有全部的商品数量的库存，有
+			stock_id_has_products_map[stock.Id] = cost_amount
 		}
 	}
 
@@ -590,12 +602,14 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 	var final_selected_stock_id int64 = 0
 	var final_selected_mode_id int64 = 0
 	var final_selected_fee_rate_id int64 = 0
-	var final_total_fee float64 = 100000; // 最终的物流费用，初始化为一个很大的不可能的值，澳币
+	var final_total_fee float64 = 0 // 最终的物流费用，
 	var final_length float64 = 0
 	var final_width float64 = 0
 	var final_height float64 = 0
 	// var final_weight float64 = 0
 	var final_actual_weight float64 = 0 //就是商品的实际重量合计，用 final 只是用于和下面的循环里面的 actual_weight 区别开来罢了
+	var final_cost_amount float64 = 0
+	var final_total_amount float64 = math.MaxFloat64 // 总的 费用和成本的和 final_total_fee + final_cost_amount, 初始化为一个很大的不可能的值，澳币
 	for _, logistics_mode := range logistics_mode_list {
 		logistics_fee_rate_list, found := logistics_fee_rate_map[logistics_mode.Id]
 		if found == false {
@@ -603,8 +617,11 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 		}
 
 		var stock_id = logistics_mode.StockId
-		if _, found := stock_id_has_products_map[stock_id]; found == false { // 如果物流方式对应的仓库，没有全部的商品数量的库存，就继续下一个物流方式
+		var cost_amount_in_mode float64 = 0
+		if cost_amount, found := stock_id_has_products_map[stock_id]; found == false { // 如果物流方式对应的仓库，没有全部的商品数量的库存，就继续下一个物流方式
 			continue
+		} else { // 如果库存都有的，就记录下商品成本总价
+			cost_amount_in_mode = cost_amount
 		}
 
 		// 获取所有商品的整体的 长，宽，高，重量 等的数据，体积重是利用体积重公式计算得到的结果
@@ -734,12 +751,14 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 		var extra_fee_in_mode = math.Max(extra_weight_fee_in_mode, extra_length_fee_in_mode)
 		var total_fee_in_mode float64 = total_fee_in_fee_rate + extra_fee_in_mode
 
-		if total_fee_in_mode < final_total_fee { // 取得更优的模式方案
+		if total_fee_in_mode+cost_amount_in_mode < final_total_amount { // 取得更优的模式方案，挑选最优解时，把商品的到仓成本也考虑进去
 			final_selected_fee_rate_id = selected_fee_rate_id_in_mode
 			final_selected_company_id = logistics_mode.CompanyId
 			final_selected_stock_id = logistics_mode.StockId
 			final_selected_mode_id = logistics_mode.Id
 			final_total_fee = total_fee_in_mode
+			final_cost_amount = cost_amount_in_mode
+			final_total_amount = total_fee_in_mode + cost_amount_in_mode
 
 			final_length = length
 			final_width = width
@@ -754,7 +773,8 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 	// _ = final_weight //暂时没用这个变量，必要的时候去掉这个变量
 
 	if final_selected_mode_id == 0 || final_selected_fee_rate_id == 0 { // 匹配失败
-		return false, 0
+		var order_logistics models.OrderLogisticsInfo
+		return false, order_logistics
 	}
 
 	//revel.TRACE.Println("final_selected_mode_id", final_selected_mode_id)
@@ -811,6 +831,7 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 	order_logistics.Weight = final_actual_weight
 	order_logistics.TotalFee = final_total_fee
 	order_logistics.PickFee = pick_fee_service.Get_product_pick_fee(final_actual_weight, p_ol.pick_fee_setting)
+	order_logistics.CostAmount = final_cost_amount
 
 	if has == true {
 		_, err := db_session.Id(order_logistics.Id).Update(&order_logistics)
@@ -834,15 +855,16 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 
 	// 多个商品时，能不能分仓库发货的？
 
-	return true, order_logistics.Id
+	return true, order_logistics
 }
 
-// 检查仓库是否有订单中的所有商品数量的库存。这里的有货就理解成这个仓库有订单的所有的商品；这里的缺货也理解成是，没有一个仓库能凑齐所有商品的所有数量。
-func check_stock_has_order_products(stock_id int64, p_order_logistics_data *order_logistics_data_t) bool {
+// 检查仓库是否有订单中的所有商品数量的库存。这里的有货就理解成这个仓库有订单的所有的商品；这里的缺货也理解成是，没有一个仓库能凑齐所有商品的所有数量。同时返回订单的商品总成本
+func check_stock_has_order_products(stock_id int64, p_order_logistics_data *order_logistics_data_t) (has_return bool, cost_amount_return float64) {
 	var products_stock_qty_list = p_order_logistics_data.products_stock_qty_list
 	var order_product_info_list = p_order_logistics_data.order_product_info_list
 
 	var stock_has_all_product = true
+	var cost_amount float64 = 0
 
 	// 对订单中的每个商品信息循环，看是不是这个商品在这个仓库里面有货且有足够的数量
 	for _, order_product_info := range order_product_info_list {
@@ -851,6 +873,7 @@ func check_stock_has_order_products(stock_id int64, p_order_logistics_data *orde
 			if product_stock_qty.StockId == stock_id && product_stock_qty.ProductId == order_product_info.ProductId {
 				if product_stock_qty.Qty >= order_product_info.Qty {
 					product_has_stock = true
+					cost_amount = cost_amount + float64(order_product_info.Qty)*product_stock_qty.CostPrice
 					break //这个 break 加不加都可以的，因为 这个 stock_id， 这个 product_id 的就一条记录
 				}
 			}
@@ -863,7 +886,11 @@ func check_stock_has_order_products(stock_id int64, p_order_logistics_data *orde
 		}
 	}
 
-	return stock_has_all_product
+	if stock_has_all_product == true {
+		return true, cost_amount
+	} else {
+		return false, 0
+	}
 }
 
 // 获得多个商品的整体长宽高重量的参数，输出的结果中，保证 length > width > height

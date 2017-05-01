@@ -61,23 +61,24 @@ func Get_inventory_by_product_list(db_session *xorm.Session, product_id_list []i
 }
 
 type Product_stock_qty struct {
-	ProductId   int64     `xorm:"'product_id'"`
-	StockId     int64     `xorm:"'stock_id'"`
-	StockTypeId int64     `xorm:"'stock_type_id'"`
-	Qty         int64     `xorm:"'qty'"`
+	ProductId   int64       `xorm:"'product_id'"`
+	StockId     int64       `xorm:"'stock_id'"`
+	StockTypeId int64       `xorm:"'stock_type_id'"`
+	Qty         int64       `xorm:"'qty'"`
+	CostPrice   float64     `xorm:"'cost_price'"`
 }
 
 // 获取包含"这个商品"的所有"产品库存数量记录"
 func Get_product_stock_qty_list(product_id int64, db_session *xorm.Session) []Product_stock_qty {
 	/*
-SELECT ivt.product_id AS product_id, ivt.stock_id AS stock_id, s.stock_type_id, sum(ivt.qty) AS qty
+SELECT ivt.product_id AS product_id, ivt.stock_id AS stock_id, s.stock_type_id, sum(ivt.qty) AS qty, ivt.cost_price AS cost_price
 FROM erp_inventory ivt
     INNER JOIN erp_stock s ON s.id = ivt.stock_id
 WHERE ivt.product_id = 1
 GROUP BY ivt.product_id, ivt.stock_id
 	 */
 
-	sql := `SELECT ivt.product_id AS product_id, ivt.stock_id AS stock_id, s.stock_type_id, sum(ivt.qty) AS qty
+	sql := `SELECT ivt.product_id AS product_id, ivt.stock_id AS stock_id, s.stock_type_id, sum(ivt.qty) AS qty, ivt.cost_price AS cost_price
 FROM erp_inventory ivt
     INNER JOIN erp_stock s ON s.id = ivt.stock_id
 WHERE ivt.product_id = %d
