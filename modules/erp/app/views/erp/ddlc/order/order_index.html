@@ -88,7 +88,13 @@
                             <th id="th_actual_fee">实际运费</th>
                             <th id="th_fee_diff">运费偏差</th>
 
-                            <th id="th_desc">描述</th>
+                            <th id="th_buyer_email">客户邮箱</th>
+                            <th id="th_stock_name">发货仓库</th>
+
+                            <th id="th_country_name">国家</th>
+                            <th id="th_province">州</th>
+                            <th id="th_postal_code">邮编</th>
+
                         </tr>
                         </thead>
                     </table>
@@ -263,7 +269,7 @@
                         {
                             "mDataProp": "o.ol.total_fee", "title": "预估运费", "bSearchable": false, "bSortable": false,
                             "render": function (data, type, row) {
-                                return '<div class="div_total_fee">' + row.ol.total_fee + '</div><div>' + row.ol.actual_fee +'</div><div>' + row.fee_diff + '</div>';
+                                return '<div class="div_total_fee">' + row.ol.total_fee + '</div><div>' + row.ol.actual_fee + '</div><div>' + row.fee_diff + '</div>';
                             }
                         },
                         {
@@ -280,9 +286,35 @@
                         },
 
                         {
-                            "mDataProp": "o.desc", "title": "描述", "bSearchable": true,
+                            "mDataProp": "o.buyer_email", "title": "客户邮箱", "bSearchable": true,
                             "render": function (data, type, row) {
-                                return '<div class="div_desc">' + data + '</div>';
+                                return '<div class="div_buyer_email">' + row.o.buyer_email + '</div><div>' + row.stock_name + '</div>';
+                            }
+                        },
+                        {
+                            "mDataProp": "stock_name", "title": "发货仓库", "bSearchable": false, "bSortable": false,
+                            "render": function (data, type, row) {
+                                return '<div class="div_stock_name"></div>';
+                            }
+                        },
+
+
+                        {
+                            "mDataProp": "ad.country_name", "title": "国家", "bSearchable": false, "bSortable": false,
+                            "render": function (data, type, row) {
+                                return '<div class="div_country_name">' + row.ad.country_name + '</div><div>' + row.ad.province + '</div><div>' + row.ad.postal_code + '</div>';
+                            }
+                        },
+                        {
+                            "mDataProp": "ad.province", "title": "州", "bSearchable": false, "bSortable": false,
+                            "render": function (data, type, row) {
+                                return '<div class="div_province"></div>';
+                            }
+                        },
+                        {
+                            "mDataProp": "ad.postal_code", "title": "邮编", "bSearchable": false, "bSortable": false,
+                            "render": function (data, type, row) {
+                                return '<div class="div_postal_code"></div>';
                             }
                         }
                     ],
@@ -327,7 +359,7 @@
                                 $("#orderList div.div_total_amount_rmb").parent().css("display", "none");
                                 $("#orderList div.div_express_fee").parent().css("display", "none");
 
-                                $("#orderList div.div_paid_time").parent().css("width", "135px");
+                                $("#orderList div.div_paid_time").parent().css("width", "120px");
                                 $("#orderList div.div_shipped_time").parent().css("display", "none");
 
                                 $("#orderList div.div_logistics_company").parent().css("width", "135px");
@@ -336,6 +368,13 @@
                                 $("#orderList div.div_total_fee").parent().css("width", "135px");
                                 $("#orderList div.div_actual_fee").parent().css("display", "none");
                                 $("#orderList div.div_fee_diff").parent().css("display", "none");
+
+                                $("#orderList div.div_buyer_email").parent().css("width", "150px");
+                                $("#orderList div.div_stock_name").parent().css("display", "none");
+
+                                $("#orderList div.div_country_name").parent().css("width", "100px");
+                                $("#orderList div.div_province").parent().css("display", "none");
+                                $("#orderList div.div_postal_code").parent().css("display", "none");
                             }
                         });
                     }
@@ -379,6 +418,17 @@
             $("#th_actual_fee").wrap("<div id='div_actual_fee'></div>");
             $("#th_fee_diff").wrap("<div id='div_fee_diff'></div>");
             $("#th_total_fee_ext").append($("#div_total_fee")).append($("#div_actual_fee")).append($("#div_fee_diff"));
+
+            $("#th_buyer_email").before("<th id='th_buyer_email_ext'></th>");
+            $("#th_buyer_email").wrap("<div id='div_buyer_email'></div>");
+            $("#th_stock_name").wrap("<div id='div_stock_name'></div>");
+            $("#th_buyer_email_ext").append($("#div_buyer_email")).append($("#div_stock_name"));
+
+            $("#th_country_name").before("<th id='th_country_name_ext'></th>");
+            $("#th_country_name").wrap("<div id='div_country_name'></div>");
+            $("#th_province").wrap("<div id='div_province'></div>");
+            $("#th_postal_code").wrap("<div id='div_postal_code'></div>");
+            $("#th_country_name_ext").append($("#div_country_name")).append($("#div_province")).append($("#div_postal_code"));
         },
         methods: {
             reloadList: function () {
