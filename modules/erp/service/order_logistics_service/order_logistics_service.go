@@ -483,15 +483,24 @@ func (p_ol *OrderLogistics) hold_check_product_info_miss(p_order *models.OrderIn
 	return false
 }
 
-// 13 //todo: 匹配最佳仓库及物流后订单亏损。需要在基础设置里面有设置亏损额或者亏损率的设置功能，超过设置范围了，自动到订单亏损hold
+// 13 // 匹配最佳仓库及物流后订单亏损。需要在基础设置里面有设置亏损额或者亏损率的设置功能，超过设置范围了，自动到订单亏损hold
 func (p_ol *OrderLogistics) hold_check_great_deficit(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, order_logistics models.OrderLogisticsInfo, db_session *xorm.Session) (is_hold_return bool) {
-	//todo: to complete
-	/*
-	if true {
+	var total_amount = p_order.TotalAmount //收款金额，澳币
+	var express_fee = p_order.ExpressFee   // 运费收入，澳币
+	// todo 保险费的计算，怎么搞？
+	var insurance_fee float64 = 0
+	var platform_fee = p_order.TotalAmount * p_ol.logistics_setting.Ptfl // 平台交易费， 澳币
+	var payment_fee = p_order.TotalAmount * p_ol.logistics_setting.Jyfl  // 交易费率， 澳币
+	var logistics_fee = order_logistics.TotalFee                         // 物流费用，不包括拣货费用，澳币
+	var pick_fee = order_logistics.PickFee                               // 拣货费用，澳币
+	var cost_amount = order_logistics.CostAmount                         // 到仓总成本，澳币
+
+	var profit = (total_amount + express_fee) - (insurance_fee + platform_fee + payment_fee + logistics_fee + pick_fee + cost_amount)
+
+	if profit < 0 {
 		p_ol.update_order_to_hold_type(p_order, models.ORDER_HOLD_TYPE_GREAT_DEFICIT, db_session)
 		return true
 	}
-	*/
 
 	return false
 }
