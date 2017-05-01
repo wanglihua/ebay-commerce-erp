@@ -84,9 +84,9 @@
                             <th id="th_logistics_company">货运公司</th>
                             <th id="th_logistics_mode">货运方式</th>
 
-                            <th id="th_total_fee">预估运费</th>
-                            <th id="th_actual_fee">实际运费</th>
-                            <th id="th_fee_diff">运费偏差</th>
+                            <th id="th_total_fee">预估运费(AUD)</th>
+                            <th id="th_actual_fee">实际运费(AUD)</th>
+                            <th id="th_fee_diff">运费偏差(AUD)</th>
 
                             <th id="th_buyer_email">客户邮箱</th>
                             <th id="th_stock_name">发货仓库</th>
@@ -214,20 +214,18 @@
                         {
                             "mDataProp": "o.total_amount", "title": "原金额(AUD)", "bSearchable": false,
                             "render": function (data, type, row) {
-                                return "<div class='div_total_amount'>" + row.o.total_amount_currency + " " + row.o.total_amount + "</div><div>RMB " + row.o.total_amount_rmb + "</div><div>RMB " + row.o.express_fee + "</div>";
+                                return "<div class='div_total_amount'>" + row.o.total_amount_currency + " " + row.o.total_amount + "</div><div>RMB " + row.o.total_amount_rmb + "</div><div>AUD " + row.o.express_fee + "</div>";
                             }
                         },
                         {
                             "mDataProp": "o.total_amount_rmb", "title": "原金额(RMB)", "bSearchable": false,
                             "render": function (data, type, row) {
-                                //return "RMB " + data;
                                 return "<div class='div_total_amount_rmb'></div>";
                             }
                         },
                         {
                             "mDataProp": "o.express_fee", "title": "原运费金额(AUD)", "bSearchable": false,
                             "render": function (data, type, row) {
-                                //return "RMB " + data;
                                 return "<div class='div_express_fee'></div>";
                             }
                         },
@@ -267,19 +265,19 @@
                         },
 
                         {
-                            "mDataProp": "o.ol.total_fee", "title": "预估运费", "bSearchable": false, "bSortable": false,
+                            "mDataProp": "o.ol.total_fee", "title": "预估运费(AUD)", "bSearchable": false, "bSortable": false,
                             "render": function (data, type, row) {
-                                return '<div class="div_total_fee">' + row.ol.total_fee + '</div><div>' + row.ol.actual_fee + '</div><div>' + row.fee_diff + '</div>';
+                                return '<div class="div_total_fee">AUD ' + row.ol.total_fee + '</div><div>AUD ' + row.ol.actual_fee + '</div><div>AUD ' + row.fee_diff + '</div>';
                             }
                         },
                         {
-                            "mDataProp": "o.ol.actual_fee", "title": "实际运费", "bSearchable": false, "bSortable": false,
+                            "mDataProp": "o.ol.actual_fee", "title": "实际运费(AUD)", "bSearchable": false, "bSortable": false,
                             "render": function (data, type, row) {
                                 return '<div class="div_actual_fee"></div>';
                             }
                         },
                         {
-                            "mDataProp": "o.ol.actual_fee", "title": "运费偏差", "bSearchable": false, "bSortable": false,
+                            "mDataProp": "o.ol.actual_fee", "title": "运费偏差(AUD)", "bSearchable": false, "bSortable": false,
                             "render": function (data, type, row) {
                                 return '<div class="div_fee_diff"></div>';
                             }
