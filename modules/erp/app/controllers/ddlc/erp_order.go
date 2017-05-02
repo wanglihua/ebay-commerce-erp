@@ -324,10 +324,21 @@ WHERE oi.order_id = %d;`
 	_, err = db_session.Limit(1, 0).Get(&logistics_setting)
 	core.HandleError(err)
 
+	var order_cost_amount = order_logistics.CostAmount * order.ExchangeRate
+
+	// 物流费用
 	var logistics_fee float64 = (order_logistics.TotalFee + order_logistics.PickFee) * order.ExchangeRate
 
-	//todo 保险费？
-	var order_profit = (order.AmountPaid + order.ExpressFee) - (order.AmountPaid*(logistics_setting.Ptfl+logistics_setting.Jyfl) + order_logistics.TotalFee + order_logistics.PickFee)
+	// gst 消费税
+	var order_gst float64 = order.AmountPaid * 0.1
+
+	// 毛利
+
+	var order_logistics_total_fee = order_logistics.TotalFee
+	if order_logistics.ActualFee > 0 {
+		order_logistics_total_fee = order_logistics.ActualFee
+	}
+	var order_profit = ((order.AmountPaid + order.ExpressFee) - (order.AmountPaid*(logistics_setting.Ptfl+logistics_setting.Jyfl) + order_logistics_total_fee + order_logistics.PickFee + order_gst)) * order.ExchangeRate
 
 	return c.RenderJson(map[string]interface{}{
 		"order":             order,
@@ -339,8 +350,10 @@ WHERE oi.order_id = %d;`
 		"order_item_list":   order_item_list,
 		"order_logistics":   order_logistics,
 		"logistics_setting": logistics_setting,
-		"logistics_fee":     logistics_fee,
-		"order_profit":      order_profit,
+		"order_cost_amount": order_cost_amount, // rmb
+		"logistics_fee":     logistics_fee,     // rmb
+		"order_gst":         order_gst,         // aud
+		"order_profit":      order_profit,      //rmb
 	})
 }
 

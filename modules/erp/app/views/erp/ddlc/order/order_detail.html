@@ -217,7 +217,7 @@
                                     <th class="dtRight">结算汇率</th>
                                     <th class="dtRight">收款金额</th>
                                     <th class="dtRight">运费收入</th>
-                                    <th class="dtRight">保险</th>
+                                    <th class="dtRight">GST税</th>
                                     <th class="dtRight">平台交易费</th>
                                     <th class="dtRight">付款交易费</th>
                                     <th class="dtRight">拣货费</th>
@@ -237,7 +237,9 @@
                                     <td class="dtRight">
                                         AUD {{ format_amount(detail.order.express_fee) }}
                                     </td>
-                                    <td class="dtRight"></td>
+                                    <td class="dtRight">
+                                        AUD {{ format_amount(detail.order_gst) }}
+                                    </td>
                                     <td class="dtRight">
                                         AUD {{ format_amount(detail.order.amount_paid *
                                         detail.logistics_setting.ptfl) }}
@@ -267,7 +269,9 @@
                                     <td class="dtRight">
                                         RMB {{ format_amount(detail.order.express_fee * detail.order.exchange_rate)}}
                                     </td>
-                                    <td class="dtRight"></td>
+                                    <td class="dtRight">
+                                        RMB {{ format_amount(detail.order_gst * detail.order.exchange_rate) }}
+                                    </td>
                                     <td class="dtRight">
                                         RMB {{ format_amount(detail.order.amount_paid_rmb*
                                         detail.logistics_setting.ptfl) }}
@@ -460,7 +464,7 @@
                     });
             },
             format_amount: function (amount) {
-                return dtFormatFloat(amount);
+                return dtFormatFloat4(amount);
             }
         }
     });
