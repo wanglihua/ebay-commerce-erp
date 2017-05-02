@@ -220,26 +220,74 @@
                                     <th class="dtRight">保险</th>
                                     <th class="dtRight">平台交易费</th>
                                     <th class="dtRight">付款交易费</th>
+                                    <th class="dtRight">拣货费</th>
+                                    <th class="dtRight">预估物流费</th>
+                                    <th class="dtRight">实际物流费</th>
                                 </tr>
                                 </thead>
                                 <tbody>
                                 <tr>
                                     <td class="dtRight">收款货币</td>
+                                    <td class="dtRight">
+                                        AUD {{ format_amount(detail.order.exchange_rate) }}
+                                    </td>
+                                    <td class="dtRight">
+                                        AUD {{ format_amount(detail.order.amount_paid) }}
+                                    </td>
+                                    <td class="dtRight">
+                                        AUD {{ format_amount(detail.order.express_fee) }}
+                                    </td>
                                     <td class="dtRight"></td>
-                                    <td class="dtRight"></td>
-                                    <td class="dtRight"></td>
-                                    <td class="dtRight"></td>
-                                    <td class="dtRight"></td>
-                                    <td class="dtRight"></td>
+                                    <td class="dtRight">
+                                        AUD {{ format_amount(detail.order.amount_paid *
+                                        detail.logistics_setting.ptfl) }}
+                                    </td>
+                                    <td class="dtRight">
+                                        AUD {{ format_amount(detail.order.amount_paid *
+                                        detail.logistics_setting.jyfl) }}
+                                    </td>
+                                    <td class="dtRight">
+                                        AUD {{ format_amount(detail.order_logistics.pick_fee) }}
+                                    </td>
+                                    <td class="dtRight">
+                                        AUD {{ format_amount(detail.order_logistics.total_fee) }}
+                                    </td>
+                                    <td class="dtRight">
+                                        AUD {{ format_amount(detail.order_logistics.actual_fee) }}
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td class="dtRight">结算人民币</td>
+                                    <td class="dtRight">
+                                        RMB {{ format_amount(detail.order.exchange_rate) }}
+                                    </td>
+                                    <td class="dtRight">
+                                        RMB {{ format_amount(detail.order.amount_paid_rmb) }}
+                                    </td>
+                                    <td class="dtRight">
+                                        RMB {{ format_amount(detail.order.express_fee * detail.order.exchange_rate)}}
+                                    </td>
                                     <td class="dtRight"></td>
-                                    <td class="dtRight"></td>
-                                    <td class="dtRight"></td>
-                                    <td class="dtRight"></td>
-                                    <td class="dtRight"></td>
-                                    <td class="dtRight"></td>
+                                    <td class="dtRight">
+                                        RMB {{ format_amount(detail.order.amount_paid_rmb*
+                                        detail.logistics_setting.ptfl) }}
+                                    </td>
+                                    <td class="dtRight">
+                                        RMB {{ format_amount(detail.order.amount_paid_rmb*
+                                        detail.logistics_setting.jyfl) }}
+                                    </td>
+                                    <td class="dtRight">
+                                        RMB {{ format_amount(detail.order_logistics.pick_fee
+                                        *detail.order.exchange_rate) }}
+                                    </td>
+                                    <td class="dtRight">
+                                        RMB {{ format_amount(detail.order_logistics.total_fee
+                                        *detail.order.exchange_rate) }}
+                                    </td>
+                                    <td class="dtRight">
+                                        RMB {{ format_amount(detail.order_logistics.actual_fee
+                                        *detail.order.exchange_rate) }}
+                                    </td>
                                 </tr>
                                 </tbody>
                                 <tfoot>
@@ -248,9 +296,16 @@
                                     <td></td>
                                     <td></td>
                                     <td></td>
-                                    <td>商品成本</td>
-                                    <td>物流成本</td>
-                                    <td>毛利</td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td>商品成本
+                                        RMB {{ format_amount(detail.order_logistics.cost_amount *
+                                        detail.order.exchange_rate) }}
+                                    </td>
+                                    <td>物流成本 RMB {{ format_amount(detail.logistics_fee) }}
+                                    </td>
+                                    <td>毛利 RMB {{ format_amount(detail.order_profit) }}</td>
                                 </tr>
                                 </tfoot>
                             </table>
@@ -329,13 +384,6 @@
                                     </tr>
                                 </template>
                                 </tbody>
-                                <tfoot>
-                                <tr>
-                                    <td colspan="8">
-                                        Hello World!
-                                    </td>
-                                </tr>
-                                </tfoot>
                             </table>
                         </div>
                     </div>
@@ -372,7 +420,9 @@
                 "order_type": {},
                 "order_hold_type": {},
                 "shipping_address": {},
-                "order_item_list": []
+                "order_item_list": [],
+                "order_logistics": {},
+                "logistics_setting": {}
             }
         },
         mounted: function () {
@@ -408,6 +458,9 @@
                             alert(data);
                         }
                     });
+            },
+            format_amount: function (amount) {
+                return dtFormatFloat(amount);
             }
         }
     });

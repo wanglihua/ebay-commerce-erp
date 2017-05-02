@@ -316,14 +316,31 @@ WHERE oi.order_id = %d;`
 	err = db_session.Sql(sql).Find(&order_item_list)
 	core.HandleError(err)
 
+	var order_logistics models.OrderLogisticsInfo
+	_, err = db_session.Where(fmt.Sprintf("order_id = %d", order_id)).Get(&order_logistics)
+	core.HandleError(err)
+
+	var logistics_setting models.LogisticsSettingInfo
+	_, err = db_session.Limit(1, 0).Get(&logistics_setting)
+	core.HandleError(err)
+
+	var logistics_fee float64 = (order_logistics.TotalFee + order_logistics.PickFee) * order.ExchangeRate
+
+	//todo 保险费？
+	var order_profit = (order.AmountPaid + order.ExpressFee) - (order.AmountPaid*(logistics_setting.Ptfl+logistics_setting.Jyfl) + order_logistics.TotalFee + order_logistics.PickFee)
+
 	return c.RenderJson(map[string]interface{}{
-		"order":            order,
-		"status":           status,
-		"shop":             shop,
-		"order_type":       order_type,
-		"shipping_address": shipping_address,
-		"order_hold_type":  order_hold_type,
-		"order_item_list":  order_item_list,
+		"order":             order,
+		"status":            status,
+		"shop":              shop,
+		"order_type":        order_type,
+		"shipping_address":  shipping_address,
+		"order_hold_type":   order_hold_type,
+		"order_item_list":   order_item_list,
+		"order_logistics":   order_logistics,
+		"logistics_setting": logistics_setting,
+		"logistics_fee":     logistics_fee,
+		"order_profit":      order_profit,
 	})
 }
 

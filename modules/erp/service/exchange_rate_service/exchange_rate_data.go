@@ -33,7 +33,7 @@ func Get_aud_exchange_rate(db_session *xorm.Session) float64 {
 	sql := `SELECT er.rate
 FROM erp_exchange_rate er
     INNER JOIN erp_currency c ON c.id = er.currency_id
-WHERE c.code = 'USD'`
+WHERE c.code = 'AUD'`
 
 	_, err := db_session.Sql(sql).Get(&aud_rate)
 	core.HandleError(err)

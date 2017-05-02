@@ -501,7 +501,7 @@ SELECT sa.id AS shop_id, sa.name AS shop_name FROM erp_shop_account sa;
 		order.TranId = order_import.Jydh
 
 		var amount_au float64 = order_import.Skje
-		var amount_currency = "AU"                                     // 澳币的也设置一下
+		var amount_currency = "AUD"                                     // 澳币的也设置一下
 		var amount_rmb = order_import.Skje * aud_exchange_rate_setting // 汇率换算
 
 		order.AmountPaidRmb = amount_rmb
@@ -522,6 +522,9 @@ SELECT sa.id AS shop_id, sa.name AS shop_name FROM erp_shop_account sa;
 		order.TypeId = models.ORDER_TYPE_DRDD // 导入订单
 		order.StatusId = models.ORDER_STATUS_YZF
 		order.BatchCode = import_batch_code // 导入批次
+
+		order.ExchangeRate = aud_exchange_rate_setting
+
 		_, err = db_session.Insert(&order)
 		core.HandleError(err)
 
