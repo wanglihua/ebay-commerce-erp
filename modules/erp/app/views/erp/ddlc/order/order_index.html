@@ -232,11 +232,11 @@
                         {
                             "mDataProp": "o.paid_time", "title": "支付时间", "bSearchable": false,
                             "render": function (data, type, row) {
-                                var order_paid_time = "----------";
+                                var order_paid_time = "--";
                                 if (row.o.paid_time) {
                                     order_paid_time = row.o.paid_time;
                                 }
-                                var order_shipped_time = "----------";
+                                var order_shipped_time = "--";
                                 if (row.o.shipped_time) {
                                     order_shipped_time = row.o.shipped_time;
                                 }
