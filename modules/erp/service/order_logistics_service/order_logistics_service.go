@@ -12,12 +12,12 @@ import (
 	"matrix/core"
 	"matrix/core/collections"
 	"matrix/modules/erp/models"
+	"matrix/modules/erp/service/envelope_fee_rate_service"
 	"matrix/modules/erp/service/exchange_rate_service"
 	"matrix/modules/erp/service/logistics_fee_rate_service"
 	"matrix/modules/erp/service/logistics_mode_service"
 	"matrix/modules/erp/service/logistics_setting_service"
 	"matrix/modules/erp/service/order_service"
-	//"matrix/modules/erp/service/order_shipping_address_service"
 	"matrix/modules/erp/service/pick_fee_service"
 )
 
@@ -30,6 +30,7 @@ type OrderLogistics struct {
 	logistics_company_list            []models.LogisticsCompanyInfo           // 物流公司列表
 	logistics_mode_list               []models.LogisticsModeInfo              // 物流方式列表
 	logistics_fee_rate_map            map[int64][]models.LogisticsFeeRateInfo // 物流费率列表的映射，映射的 key 是， 物流方式的 id
+	envelope_fee_rate_list            []models.EnvelopeFeeRateInfo            // 信封物流费率， 按费用从小到大排序
 }
 
 func (p_ol *OrderLogistics) init_data(db_session *xorm.Session) {
@@ -89,6 +90,8 @@ func (p_ol *OrderLogistics) init_data(db_session *xorm.Session) {
 		}
 	}
 	// 不采用中间变量了 p_ol.logistics_fee_rate_map = logistics_fee_rate_map
+
+	p_ol.envelope_fee_rate_list = envelope_fee_rate_service.Get_envelope_fee_rate_list(db_session)
 }
 
 func (p_ol *OrderLogistics) CalculateListPaidOrders(db_session *xorm.Session) error {
@@ -485,14 +488,14 @@ func (p_ol *OrderLogistics) hold_check_product_info_miss(p_order *models.OrderIn
 
 // 13 // 匹配最佳仓库及物流后订单亏损。需要在基础设置里面有设置亏损额或者亏损率的设置功能，超过设置范围了，自动到订单亏损hold
 func (p_ol *OrderLogistics) hold_check_great_deficit(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, order_logistics models.OrderLogisticsInfo, db_session *xorm.Session) (is_hold_return bool) {
-	var total_amount = p_order.TotalAmount //收款金额，澳币
-	var express_fee = p_order.ExpressFee   // 运费收入，澳币
+	var total_amount = p_order.TotalAmount                                      //收款金额，澳币
+	var express_fee = p_order.ExpressFee                                        // 运费收入，澳币
 	var order_gst float64 = order_service.Get_order_gst_fee(p_order.AmountPaid) // GST消费税，澳币
-	var platform_fee = p_order.TotalAmount * p_ol.logistics_setting.Ptfl // 平台交易费， 澳币
-	var payment_fee = p_order.TotalAmount * p_ol.logistics_setting.Jyfl  // 交易费率， 澳币
-	var logistics_fee = order_logistics.TotalFee                         // 物流费用，不包括拣货费用，澳币
-	var pick_fee = order_logistics.PickFee                               // 拣货费用，澳币
-	var cost_amount = order_logistics.CostAmount                         // 到仓总成本，澳币
+	var platform_fee = p_order.TotalAmount * p_ol.logistics_setting.Ptfl        // 平台交易费， 澳币
+	var payment_fee = p_order.TotalAmount * p_ol.logistics_setting.Jyfl         // 交易费率， 澳币
+	var logistics_fee = order_logistics.TotalFee                                // 物流费用，不包括拣货费用，澳币
+	var pick_fee = order_logistics.PickFee                                      // 拣货费用，澳币
+	var cost_amount = order_logistics.CostAmount                                // 到仓总成本，澳币
 
 	var profit = (total_amount + express_fee) - (order_gst + platform_fee + payment_fee + logistics_fee + pick_fee + cost_amount)
 
@@ -531,6 +534,42 @@ func (p_ol *OrderLogistics) hold_check_envelope(p_order *models.OrderInfo, p_ord
 
 	if whole_length <= envelope_max_length && whole_width <= envelope_max_width && whole_height <= envelope_max_height && whole_weight <= envelope_max_weight {
 		p_ol.update_order_to_hold_type(p_order, models.ORDER_HOLD_TYPE_ENVELOPE, db_session)
+		// todo 匹配具体信封费率
+		var final_fee_rate_id int64 = 0
+		var final_fee float64 = math.MaxFloat64
+		var envelope_fee_rate_list = p_ol.envelope_fee_rate_list // 已经按费用从小到大排序好了
+		for _, envelope_fee_rate := range envelope_fee_rate_list {
+			var fee_rate_length = envelope_fee_rate.Length
+			var fee_rate_width = envelope_fee_rate.Width
+			var fee_rate_height = envelope_fee_rate.Height
+			var fee_rate_weight = envelope_fee_rate.Weight
+
+			var envelope_side_length_slice = sort.Float64Slice([]float64{fee_rate_length, fee_rate_width, fee_rate_height})
+			envelope_side_length_slice.Sort()
+			fee_rate_length = envelope_side_length_slice[2] // 最长
+			fee_rate_width = envelope_side_length_slice[1]
+			fee_rate_height = envelope_side_length_slice[0] // 最短
+
+			if whole_length < fee_rate_length && whole_width < fee_rate_width && whole_height < fee_rate_height && whole_weight < fee_rate_weight {
+				final_fee = envelope_fee_rate.Fee
+				final_fee_rate_id = envelope_fee_rate.Id
+				break
+			}
+		}
+
+		if final_fee_rate_id != 0 {
+			var order_logistics models.OrderLogisticsInfo
+			order_logistics.Length = whole_length
+			order_logistics.Width = whole_width
+			order_logistics.Height = whole_height
+			order_logistics.Weight = whole_weight
+			order_logistics.EnvelopeFeeId = final_fee_rate_id
+			order_logistics.TotalFee = final_fee
+
+			_, err := db_session.Insert(&order_logistics)
+			core.HandleError(err)
+		}
+
 		return true
 	}
 
