@@ -11,6 +11,9 @@ import (
 	"matrix/modules/erp/service/order_import_batch_service"
 	"matrix/modules/erp/service/stock_service"
 	"matrix/modules/erp/setting"
+	"matrix/core/collections"
+	"matrix/modules/erp/service/logistics_company_service"
+	"matrix/modules/erp/service/logistics_mode_service"
 )
 
 type ErpOrderLogisticsFeeDiff struct {
@@ -73,37 +76,31 @@ func (c ErpOrderLogisticsFeeDiff) ListData() revel.Result {
 	c.Params.Bind(&fee_diff_max_query, "fee_diff_max_query")
 
 	type order_logistics_view_item_t struct {
-		models.OrderLogisticsInfo    `xorm:"extends" json:"ol"`
-		models.OrderInfo             `xorm:"extends" json:"o"`
-		models.StockInfo             `xorm:"extends" json:"s"`
-		models.LogisticsCompanyInfo  `xorm:"extends" json:"lc"`
-		models.LogisticsModeInfo     `xorm:"extends" json:"lm"`
+		OrderLogistics models.OrderLogisticsInfo  `xorm:"extends" json:"ol"`
+		Order          models.OrderInfo           `xorm:"extends" json:"o"`
+		StockName      string                     `json:"stock_name"`
+		CompanyName    string                     `json:"company_name"`
+		ModeName       string                     `json:"mode_name"`
 	}
 
 	/*
-SELECT ol.*, o.*, s.*, lc.*, lm.*
+SELECT ol.*, o.*
 FROM erp_order_logistics ol
     INNER JOIN erp_order o ON o.id = ol.order_id
-    INNER JOIN erp_stock s ON s.id = ol.stock_id
-    INNER JOIN erp_logistics_company lc ON lc.id = ol.company_id
-    INNER JOIN erp_logistics_mode lm ON lm.id = ol.mode_id
 WHERE ol.stock_id = 0 AND ol.company_id = 0
       AND o.batch_code = 0
       AND o.paid_time > '2017-01-01' AND o.paid_time < '2017-04-30'
       AND (ol.actual_fee - ol.total_fee) >= 0.01
-      AND (ol.actual_fee - ol.total_fee) <= 100.00
+      AND (ol.actual_fee - ol.total_fee) <= 100.00;
 	 */
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
 	var sb = core.NewSqlBuilder()
-	sb.Select("ol.*, o.*, s.*, lc.*, lm.*")
+	sb.Select("ol.*, o.*")
 	sb.Count("count(ol.id) AS order_logistics_count")
 	sb.From(`erp_order_logistics ol
-    INNER JOIN erp_order o ON o.id = ol.order_id
-    INNER JOIN erp_stock s ON s.id = ol.stock_id
-    INNER JOIN erp_logistics_company lc ON lc.id = ol.company_id
-    INNER JOIN erp_logistics_mode lm ON lm.id = ol.mode_id`)
+    INNER JOIN erp_order o ON o.id = ol.order_id`)
 
 	if stock_id != 0 {
 		filter = core.SqlAnd(filter, fmt.Sprintf("ol.stock_id = %d", stock_id))
@@ -133,6 +130,16 @@ WHERE ol.stock_id = 0 AND ol.company_id = 0
 		filter = core.SqlAnd(filter, fmt.Sprintf("(ol.actual_fee - ol.total_fee) <= %f", fee_diff_max_query))
 	}
 
+	// 分仓库查看
+	// 不同的仓库拣货人员可以看到不同的订单，管理员、销售、客服 除外
+	var login_user = core.GetLoginUser(c.Session)
+	var is_admin = pass_service.Is_user_admin(login_user.UserId)                   // 是不是管理员
+	var is_sales = pass_service.Is_user_sales(login_user.UserId)                   // 是不是销售
+	var is_custom_service = pass_service.Is_user_custom_service(login_user.UserId) // 是不是客服
+	if login_user.IsSuperAdmin == false && is_admin == false && is_custom_service == false && is_sales == false { // 管理员，客服，销售 可以看到所有仓库的订单
+		filter = core.SqlAnd(filter, fmt.Sprintf(`ol.stock_id IN (SELECT spc.stock_id FROM erp_stock_pick_crew spc WHERE spc.user_id = %d)`, login_user.UserId))
+	}
+
 	sb.Where(filter)
 
 	if order != "" {
@@ -146,6 +153,34 @@ WHERE ol.stock_id = 0 AND ol.company_id = 0
 	order_logistics_list := make([]order_logistics_view_item_t, 0, limit)
 	err := db_session.Sql(sb.SqlList()).Find(&order_logistics_list)
 	core.HandleError(err)
+
+	var stock_id_set = collections.NewIntSet()
+	var company_id_set = collections.NewIntSet()
+	var mode_id_set = collections.NewIntSet()
+
+	for _, order_logistics := range order_logistics_list {
+		stock_id_set.Add(order_logistics.OrderLogistics.StockId)
+		company_id_set.Add(order_logistics.OrderLogistics.CompanyId)
+		mode_id_set.Add(order_logistics.OrderLogistics.ModeId)
+	}
+
+	var stock_id_name_map = stock_service.Get_stock_id_name_map(stock_id_set.List(), db_session)
+	var company_id_name_map = logistics_company_service.Get_company_id_name_map(company_id_set.List(), db_session)
+	var mode_id_name_map = logistics_mode_service.Get_logistics_mode_id_name_map(mode_id_set.List(), db_session)
+
+	for index, order_logistics := range order_logistics_list {
+		if order_logistics.OrderLogistics.StockId != 0 {
+			order_logistics_list[index].StockName = stock_id_name_map[order_logistics.OrderLogistics.StockId]
+		}
+
+		if order_logistics.OrderLogistics.CompanyId != 0 {
+			order_logistics_list[index].CompanyName = company_id_name_map[order_logistics.OrderLogistics.CompanyId]
+		}
+
+		if order_logistics.OrderLogistics.ModeId != 0 {
+			order_logistics_list[index].ModeName = mode_id_name_map[order_logistics.OrderLogistics.ModeId]
+		}
+	}
 
 	var order_logistics_count struct {
 		Count int64 `xorm:"'order_logistics_count'"`

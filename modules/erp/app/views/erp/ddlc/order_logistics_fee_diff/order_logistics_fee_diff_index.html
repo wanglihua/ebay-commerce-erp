@@ -158,8 +158,21 @@
                                 return "<a href='/erp/order/detail/" + row.o.id + "' target='_blank'>" + data + "</a>";
                             }
                         },
-                        {"mDataProp": "s.name", "title": "发货仓库", "bSearchable": true, "width": 130},
-                        {"mDataProp": "lc.name", "title": "物流公司", "bSearchable": false},
+                        {
+                            "mDataProp": "stock_name",
+                            "title": "发货仓库",
+                            "bSearchable": false,
+                            "bSortable": false,
+                            "width": 130
+                        },
+                        {"mDataProp": "company_name", "title": "物流公司", "bSearchable": false, "bSortable": false},
+                        {
+                            "mDataProp": "mode_name",
+                            "title": "物流方式",
+                            "bSearchable": false,
+                            "bSortable": false,
+                            "width": 150
+                        },
                         {
                             "mDataProp": "ol.length", "title": "长度", "bSearchable": false, "width": 65,
                             "render": function (data, type, row) {
