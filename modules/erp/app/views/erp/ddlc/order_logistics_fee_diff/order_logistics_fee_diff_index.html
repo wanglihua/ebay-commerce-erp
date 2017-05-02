@@ -53,7 +53,7 @@
                                 <span style="margin-top:5px; padding: 0 10px;color:lightgray;display: block;float: left;">|</span>
                                 <a :class="page.logistics_company_id == 0 ? 'selected' : ''" href="#" @click="selectLogisticsCompany(0)"><img style="border: none;height: 24px;" src="/static/images/icons/all_check.png" class="link_icon" alt="全部物流公司"/>全部物流公司</a>
                                 <template v-for="logistics_company in page.logistics_company_list">
-                                    <a :class="page.logistics_company_id == logistics_company.id ? 'selected' : ''" href="#" @click="selectLogisticsCompany(logistics_company.id)"><img v-if="logistics_company.icon_file != ''" :src="'{%.icon_path%}/' + logistics_company.icon_file" :alt="logistics_company.name" class="link_icon"/><span v-if="logistics_company.icon_file == ''">{{logistics_company.name}}</span></a>
+                                    <a :class="page.logistics_company_id == logistics_company.id ? 'selected' : ''" href="#" @click="selectLogisticsCompany(logistics_company.id)"><img v-if="logistics_company.icon_file != ''" :src="'{%.icon_path%}/' + logistics_company.icon_file" :alt="logistics_company.name" class="link_icon"/>&nbsp;<span>{{logistics_company.name}}</span></a>
                                 </template>
                                 <div style="clear:both;"></div>
                             </div>

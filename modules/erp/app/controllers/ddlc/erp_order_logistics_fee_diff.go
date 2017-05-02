@@ -2,12 +2,14 @@ package controllers
 
 import (
 	"fmt"
+
 	"github.com/revel/revel"
 	"matrix/core"
 	"matrix/modules/auth/pass_res"
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/order_import_batch_service"
+	"matrix/modules/erp/service/stock_service"
 	"matrix/modules/erp/setting"
 )
 
@@ -27,14 +29,10 @@ func (c ErpOrderLogisticsFeeDiff) PageData() revel.Result {
 
 	var db_session = c.DbSession
 
-	var stock_list = make([]models.StockInfo, 0)
-	//err := db_session.Where(fmt.Sprintf("stock_type_id = %d AND status_id = %d", models.STOCK_TYPE_AU, models.STOCK_STATUS_ENABLED)).OrderBy("ord asc").Find(&stock_list) //只取澳洲的仓库
-	err := db_session.Where(fmt.Sprintf("stock_type_id = %d", models.STOCK_TYPE_AU)).OrderBy("ord asc").Find(&stock_list) //只取澳洲的仓库
-	core.HandleError(err)
+	var stock_list = stock_service.Get_login_user_stock_list(db_session, c.Session)
 
 	var logistics_company_list = make([]models.LogisticsCompanyInfo, 0)
-	//err = db_session.Where(fmt.Sprintf("status_id = %d", models.LOGISTICS_COMPANY_ENABLED)).OrderBy("ord asc").Find(&logistics_company_list)
-	err = db_session.OrderBy("ord asc").Find(&logistics_company_list)
+	err := db_session.OrderBy("ord asc").Find(&logistics_company_list)
 	core.HandleError(err)
 
 	// 获得导入的批次列表

@@ -296,6 +296,8 @@ WHERE u.id NOT IN (SELECT spc.user_id FROM erp_stock_pick_crew spc WHERE spc.sto
 	sb.Count("count(u.id) AS user_count")
 	sb.From("auth_user u")
 
+	filter = core.SqlAnd(filter, fmt.Sprintf("u.id IN (SELECT gu.user_id FROM auth_group_user gu WHERE gu.group_id = %d)", auth_models.GROUP_PICK_CREW))
+
 	if stock_id != 0 {
 		filter = core.SqlAnd(filter, fmt.Sprintf("u.id NOT IN (SELECT spc.user_id FROM erp_stock_pick_crew spc WHERE spc.stock_id = %d)", stock_id))
 	}

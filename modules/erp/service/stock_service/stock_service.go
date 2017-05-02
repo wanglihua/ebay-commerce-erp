@@ -2,8 +2,11 @@ package stock_service
 
 import (
 	"fmt"
+
 	"github.com/go-xorm/xorm"
+	"github.com/revel/revel"
 	"matrix/core"
+	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/erp/models"
 )
 
@@ -41,4 +44,24 @@ func Get_stock_id_name_map(stock_id_list []int64, db_session *xorm.Session) map[
 	}
 
 	return stock_id_name_map
+}
+
+// 获取人员的仓库列表，如果是拣货人员的话，只获取有权限的仓库
+func Get_login_user_stock_list(db_session *xorm.Session, web_session revel.Session) []models.StockInfo {
+	/*
+	SELECT * FROM erp_stock WHERE stock_type_id = 1 AND id IN (SELECT spc.stock_id FROM erp_stock_pick_crew spc WHERE spc.user_id = 1)
+	 */
+
+	var stock_list = make([]models.StockInfo, 0)
+
+	var stock_list_filter = fmt.Sprintf("stock_type_id = %d", models.STOCK_TYPE_AU) //只取澳洲的仓库
+	var login_user = core.GetLoginUser(web_session)
+	if pass_service.Is_user_pick_crew(login_user.UserId) { // 如果是仓库拣货人员
+		stock_list_filter = core.SqlAnd(stock_list_filter, fmt.Sprintf("id IN (SELECT spc.stock_id FROM erp_stock_pick_crew spc WHERE spc.user_id = %d)", login_user.UserId))
+	}
+
+	err := db_session.Where(stock_list_filter).OrderBy("ord asc").Find(&stock_list)
+	core.HandleError(err)
+
+	return stock_list
 }
