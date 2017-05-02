@@ -104,6 +104,8 @@
 
                             <th id="th_actual_weight">实际重量（Kg)</th>
 
+                            <th id="th_products">订单商品</th>
+
                             <th id="th_paid_time">支付时间</th>
                             <th id="th_modify_time">修改时间</th>
                             <th id="th_shipped_time">发货时间</th>
@@ -405,6 +407,19 @@
                                 else {
                                     return "";
                                 }
+                            }
+                        },
+
+                        {
+                            "mDataProp": "products", "title": "订单商品", "bSearchable": false,
+                            "render": function (data, type, row) {
+                                var products_desc = "";
+                                if (data && data.length && data.length > 0) {
+                                    for (var i = 0; i < data.length; i++) {
+                                        products_desc = products_desc + "<div>" + data[i] + "</div>"
+                                    }
+                                }
+                                return products_desc;
                             }
                         },
 
