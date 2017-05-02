@@ -544,6 +544,7 @@ SELECT sa.id AS shop_id, sa.name AS shop_name FROM erp_shop_account sa;
 		var order_item models.OrderItemInfo
 		order_item.OrderId = order.Id
 		order_item.ItemProductId = order_import.product_id
+		order_item.ItemSku = order_import.Spbh
 		order_item.Quantity = order_import.Spsl
 		//order_item.ProductCostPrice = order_import.Cpcb //  这是单个的产品成本， 后来改为成本从库存里面导入，这里就不导入了
 		_, err = db_session.Insert(&order_item)
