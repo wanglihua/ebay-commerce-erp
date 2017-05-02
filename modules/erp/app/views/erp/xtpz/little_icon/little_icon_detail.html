@@ -1,5 +1,5 @@
 <div class="modal fade" id="littleIconDetailDialog">
-    <div class="modal-dialog" style="width: 440px;">
+    <div class="modal-dialog" style="width: 680px;">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="True">&times;</button>
@@ -28,15 +28,15 @@
                                 <label class="col-xs-2 control-label no-padding-right"></label>
                                 <div class="col-xs-10">
                                     {%if .is_create %}
-                                    <img id='{%"cate_image"%}' src="/static/images/icons/noimg.png" alt="" />
+                                    <img style="max-width: 200px;max-height: 200px;" id='{%"little_image"%}' src="/static/images/icons/noimg.png" alt="" />
                                     {%else%}
-                                    <img id="cate_image" src="{%.icon_path%}/{%.form_LittleIcon_IconFile%}" alt="" />
+                                    <img style="max-width: 200px;max-height: 200px;" id="little_image" src="{%.icon_path%}/{%.form_LittleIcon_IconFile%}" alt="" />
                                     {%end%}
                                 </div>
                             </div>
                         </form>
 
-                    </div>
+                    </div>``
                 </div>
             </div>
             <div class="modal-footer">
@@ -81,7 +81,7 @@
                         $.msg.error(result.message);
                     } else {
                         $("#icon_file_name").val(result.fileName);
-                        $("#cate_image").attr("src", "{%.icon_path%}/" + result.fileName)
+                        $("#little_image").attr("src", "{%.icon_path%}/" + result.fileName)
                     }
                 },
                 Error: function (up, err) {
