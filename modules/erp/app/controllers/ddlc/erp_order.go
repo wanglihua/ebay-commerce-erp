@@ -330,7 +330,7 @@ WHERE oi.order_id = %d;`
 	var logistics_fee float64 = (order_logistics.TotalFee + order_logistics.PickFee) * order.ExchangeRate
 
 	// gst 消费税
-	var order_gst float64 = order.AmountPaid * 0.1
+	var order_gst float64 = order_service.Get_order_gst_fee(order.AmountPaid)
 
 	// 毛利
 
