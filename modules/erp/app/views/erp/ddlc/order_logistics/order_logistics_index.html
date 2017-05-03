@@ -335,7 +335,7 @@
                         {
                             "mDataProp": "o.tran_id", "title": "订单代码", "bSearchable": true,
                             "render": function (data, type, row) {
-                                return "<div class='div_tran_id'><a href='/erp/order/detail/" + row.o.id + "' target='_blank'>" + data + "</a></div><div>" + row.stock_name + "</div>";
+                                return "<div class='div_tran_id'><a href='/erp/order/detail/" + row.o.id + "' target='_blank'>" + row.order_code + "</a></div><div>" + row.stock_name + "</div>";
                             }
                         },
                         {

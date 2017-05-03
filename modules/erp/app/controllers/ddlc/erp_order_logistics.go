@@ -19,6 +19,7 @@ import (
 	"matrix/modules/erp/service/logistics_mode_service"
 	"matrix/modules/erp/service/order_import_batch_service"
 	"matrix/modules/erp/service/order_item_service"
+	"matrix/modules/erp/service/shop_service"
 	"matrix/modules/erp/service/stock_service"
 	"matrix/modules/erp/setting"
 )
@@ -92,6 +93,7 @@ func (c ErpOrderLogistics) ListData() revel.Result {
 		CompanyName    string                     `json:"company_name"`
 		ModeName       string                     `json:"mode_name"`
 		Products       []string                   `json:"products"`
+		OrderCode      string                     `json:"order_code"` //交易代码 店铺号 + 交易号
 	}
 
 	/*
@@ -172,18 +174,21 @@ WHERE ol.stock_id = 0 AND ol.company_id = 0
 	var company_id_set = collections.NewIntSet()
 	var mode_id_set = collections.NewIntSet()
 	var order_id_set = collections.NewIntSet()
+	var shop_id_set = collections.NewIntSet()
 
 	for _, order_logistics := range order_logistics_list {
 		stock_id_set.Add(order_logistics.OrderLogistics.StockId)
 		company_id_set.Add(order_logistics.OrderLogistics.CompanyId)
 		mode_id_set.Add(order_logistics.OrderLogistics.ModeId)
 		order_id_set.Add(order_logistics.OrderLogistics.OrderId)
+		shop_id_set.Add(order_logistics.Order.ShopId)
 	}
 
 	var stock_id_name_map = stock_service.Get_stock_id_name_map(stock_id_set.List(), db_session)
 	var company_id_name_map = logistics_company_service.Get_company_id_name_map(company_id_set.List(), db_session)
 	var mode_id_name_map = logistics_mode_service.Get_logistics_mode_id_name_map(mode_id_set.List(), db_session)
 	var order_id_products_map = order_item_service.Get_order_id_products_map(order_id_set.List(), db_session)
+	var shop_id_name_map = shop_service.Get_shop_id_name_map(shop_id_set.List(), db_session)
 
 	for index, order_logistics := range order_logistics_list {
 		if order_logistics.OrderLogistics.StockId != 0 {
@@ -205,6 +210,10 @@ WHERE ol.stock_id = 0 AND ol.company_id = 0
 				products = append(products, fmt.Sprintf("%s × %d", order_id_sku_qty.Sku, order_id_sku_qty.Qty))
 			}
 			order_logistics_list[index].Products = products
+		}
+
+		if order_logistics.Order.ShopId != 0 {
+			order_logistics_list[index].OrderCode = shop_id_name_map[order_logistics.Order.ShopId].ShopCode + order_logistics.Order.Code
 		}
 	}
 
