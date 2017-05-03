@@ -61,7 +61,7 @@ func Log_logout(login_user core.LoginUser, db_session *xorm.Session) {
 	sql = fmt.Sprintf(sql, login_user.UserId)
 	var login_log models.LoginLogInfo
 	has, err := db_session.Sql(sql).Get(&login_log)
-	if has && err != nil {
+	if has && err == nil {
 		login_log.LogoutTime = core.Time(time.Now())
 		login_log.OnlineTime = time.Time(login_log.LogoutTime).Sub(time.Time(login_log.LoginTime)).Minutes()
 
@@ -88,7 +88,9 @@ func Check_user_active(db_session *xorm.Session) {
 
 	var online_user_list = get_online_user_list()
 
-	for index, online_user := range online_user_list {
+	var to_remove_login_user_key_map = make(map[string]bool)
+
+	for _, online_user := range online_user_list {
 		if time.Now().Sub(online_user.Active_time).Minutes() > float64(auth_setting.TimeOut) {
 			// 获得在线登录的用户
 			var login_user core.LoginUser
@@ -98,16 +100,24 @@ func Check_user_active(db_session *xorm.Session) {
 			cache.Delete(online_user.Login_user_key)
 
 			// 从在线用户列表中删除
-			online_user_list = append(online_user_list[:index], online_user_list[index:]...)
+			to_remove_login_user_key_map[online_user.Login_user_key] = true
 
 			// 记录登出日志
 			Log_logout(login_user, db_session)
 		}
 	}
 
-	cache.Set(ONLINE_USER_LIST_CACHE_KEY, online_user_list, online_user_list_expire)
+	var new_online_user_list = make([]online_user_t, 0)
+	for _, online_user := range online_user_list {
+		if _, found := to_remove_login_user_key_map[online_user.Login_user_key]; found == false {
+			new_online_user_list = append(new_online_user_list, online_user)
+		}
+	}
+
+	cache.Set(ONLINE_USER_LIST_CACHE_KEY, new_online_user_list, online_user_list_expire)
 }
 
+// 用户自己手工登出时从在线用户列表里面删除掉
 func Remove_user_from_online(web_session revel.Session) {
 	var login_user_key = core.GetLoginUserCacheKey(web_session)
 
