@@ -2,6 +2,7 @@ package captcha
 
 import (
 	crand "crypto/rand"
+	"fmt"
 	"image/color"
 	"io"
 	"math/rand"
@@ -10,7 +11,6 @@ import (
 
 	"github.com/revel/revel"
 	"github.com/revel/revel/cache"
-	"matrix/core"
 )
 
 const (
@@ -208,7 +208,7 @@ func new_len_chars(length int, chars []byte) string {
 	panic("unreachable")
 }
 
-const cache_key = "CAPTCHA_XXWWWDD12"
+const CAPTCHA_CACHE_KEY = "CAPTCHA_%s"
 
 func Generate(width int, height int, web_session revel.Session) *Image {
 	d := make([]byte, 4)
@@ -220,13 +220,13 @@ func Generate(width int, height int, web_session revel.Session) *Image {
 		text += strconv.FormatInt(int64(d[v]), 32)
 	}
 
-	cache.Set(cache_key+web_session.Id(), text, core.GetSessionExpire())
+	cache.Set(fmt.Sprintf(CAPTCHA_CACHE_KEY, web_session.Id()), text, time.Minute*5) // 验证码 5 分钟有效
 
 	return new_image(d, width, height)
 }
 
 func MakeCurrentExpire(web_session revel.Session) {
-	cache.Delete(cache_key + web_session.Id())
+	cache.Delete(fmt.Sprintf(CAPTCHA_CACHE_KEY, web_session.Id()))
 }
 
 func IsCorrect(captcha string, web_session revel.Session) bool {
@@ -235,7 +235,7 @@ func IsCorrect(captcha string, web_session revel.Session) bool {
 	}
 
 	var session_val string
-	cache.Get(cache_key+web_session.Id(), &session_val)
+	cache.Get(fmt.Sprintf(CAPTCHA_CACHE_KEY, web_session.Id()), &session_val)
 
 	//revel.TRACE.Println("session_val: " + session_val)
 	//revel.TRACE.Println("captcha: " + captcha)

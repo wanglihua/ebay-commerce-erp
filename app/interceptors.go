@@ -15,7 +15,7 @@ import (
 func BeforeInterceptor(c *revel.Controller) revel.Result {
 	if isStaticRequest(c) == false {
 		if revel.DevMode {
-			cache.Set("request_begin_time_"+c.Session.Id(), time.Now(), core.GetSessionExpire())
+			cache.Set("request_begin_time_"+c.Session.Id(), time.Now(), time.Minute*10) // 一般请求时间不会超过10分钟吧
 			revel.TRACE.Println(blue_paint(fmt.Sprintf("### begin action %s ###", c.Action)))
 		}
 		//revel.TRACE.Println("session id: " + c.Session.Id())
