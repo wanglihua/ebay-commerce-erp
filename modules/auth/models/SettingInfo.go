@@ -6,7 +6,7 @@ import (
 )
 
 type SettingInfo struct {
-	Id              int64           `xorm:"bigint notnull pk 'id'" json:"id"`
+	Id              int64           `xorm:"bigint notnull pk autoincr 'id'" json:"id"`
 	DefaultPassword string          `xorm:"nvarchar(100) notnull 'default_password'" json:"default_password" smith:"verbose_name=默认密码,min=6,max=20"`
 	TimeOut         int64           `xorm:"bigint notnull 'time_out'" json:"time_out" smith:"verbose_name=超时时长,min=1,max=10000"`
 	CreateTime      core.Time       `xorm:"created notnull 'create_time'" json:"create_time"`

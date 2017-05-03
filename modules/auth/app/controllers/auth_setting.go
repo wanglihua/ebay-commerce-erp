@@ -2,11 +2,12 @@ package controllers
 
 import (
 	"encoding/json"
-	"strconv"
-	"github.com/revel/revel"
+	"fmt"
 
+	"github.com/revel/revel"
 	"matrix/core"
 	"matrix/modules/auth/models"
+	"matrix/modules/auth/service/auth_setting_service"
 )
 
 type AuthSetting struct {
@@ -44,17 +45,7 @@ func (f *SettingDetailForm) Valid(validation *revel.Validation) bool {
 func (c AuthSetting) DetailData() revel.Result {
 	db_session := c.DbSession
 
-	var setting_id int64
-	c.Params.Bind(&setting_id, "id")
-
-	var setting models.SettingInfo
-	if setting_id != 0 {
-		has, err := db_session.Id(setting_id).Get(&setting)
-		core.HandleError(err)
-		if has == false {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "指定的授权设置不存在！"})
-		}
-	}
+	var setting = auth_setting_service.Get_auth_setting(db_session)
 
 	var detail_form SettingDetailForm
 	detail_form.Setting = setting
@@ -73,20 +64,21 @@ func (c AuthSetting) Save() revel.Result {
 		return c.RenderJson(core.JsonResult{Success: false, Message: c.GetValidationErrorMessage()})
 	}
 
-	setting := detail_form.Setting
+	setting := &(detail_form.Setting) //取地址，这样下面的对 setting 的修改都会反映到 detail_form 里面去的，返回的 json 里面也会有反映
 
-	var affected int64
-	if detail_form.IsCreate() {
-		affected, err = db_session.Insert(&setting)
-		core.HandleError(err)
-	} else {
-		affected, err = db_session.Id(setting.Id).Update(&setting)
-		core.HandleError(err)
+	setting.Id = 0
+	_, err = db_session.Insert(setting)
+	core.HandleError(err)
 
-		if affected == 0 {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！" })
-		}
-	}
+	// 删除原来表里面的信息记录
+	sql_delete := "DELETE FROM auth_setting WHERE id <> %d"
+	sql_delete = fmt.Sprintf(sql_delete, setting.Id)
+	_, err = db_session.Exec(sql_delete)
+	core.HandleError(err)
 
-	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据保存成功!"})
+	return c.RenderJson(map[string]interface{}{
+		"success": true,
+		"detail":  detail_form,
+		"message": "数据保存成功!",
+	})
 }
