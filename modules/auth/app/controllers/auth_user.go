@@ -100,21 +100,26 @@ func (c AuthUser) RefreshPassCache() revel.Result {
 func (c AuthUser) Detail() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.AUTH_USER, c.Session)
 
-	session := c.DbSession
+	db_session := c.DbSession
 
 	var userId int64
 	c.Params.Bind(&userId, "id")
 
+	form := new(forms.UserDetailForm)
+
 	user := new(models.UserInfo)
 	if userId != 0 {
-		has, err := session.Id(userId).Get(user)
+		has, err := db_session.Id(userId).Get(user)
 		core.HandleError(err)
 		if has == false {
 			panic("指定的用户不存在！")
 		}
+	} else {
+		var auth_setting = auth_setting_service.Get_auth_setting(db_session)
+		user.Password = auth_setting.DefaultPassword
+		form.PasswordAgain = auth_setting.DefaultPassword
 	}
 
-	form := new(forms.UserDetailForm)
 	form.User = *user
 
 	c.UnbindToRenderArgs(form, "form")
