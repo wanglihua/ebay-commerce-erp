@@ -33,3 +33,7 @@ GET  /auth/user/pass/res              AuthUserPassRes.Index
 POST /auth/user/pass/res/data/list    AuthUserPassRes.ListData
 POST /auth/user/pass/res/grant        AuthUserPassRes.Grant
 POST /auth/user/pass/res/revoke       AuthUserPassRes.Revoke
+
+GET  /auth/auth/setting                    AuthSetting.Index
+POST /auth/auth/setting/data/detail        AuthSetting.DetailData
+POST /auth/auth/setting/save               AuthSetting.Save

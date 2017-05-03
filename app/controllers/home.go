@@ -49,6 +49,7 @@ func (c Home) SyncDbPost() revel.Result {
 	model_list = append(model_list, &auth_models.PassResCateInfo{})
 	model_list = append(model_list, &auth_models.PassResInfo{})
 	model_list = append(model_list, &auth_models.PassUserResInfo{})
+	model_list = append(model_list, &auth_models.SettingInfo{})
 	model_list = append(model_list, &auth_models.UserInfo{})
 
 	model_list = append(model_list, &erp_models.BrandInfo{})

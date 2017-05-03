@@ -1,0 +1,141 @@
+{%header "授权设置" .%}
+<div id="page">
+    <div class="breadcrumbs" id="breadcrumbs">
+        <ul class="breadcrumb">
+            <li>
+                <a href='{%url "Home.Index"%}'><i class="ace-icon fa fa-home home-icon"></i></a>
+            </li>
+            <li class="parent" data-menu="auth-menu">权限管理</li>
+            <li class="active" data-menu="auth-setting-menu">授权设置</li>
+        </ul>
+    </div>
+    <div class="page-content">
+        <div class="row">
+            <div class="col-xs-12" style="padding: 0;">
+                <div class="gridToolBar clearfix">
+                    <button class="btn btn-primary btn-sm" @click="reloadList('#settingList')">
+                        <i class="ace-icon fa fa-refresh"></i>
+                        刷新
+                    </button>
+                    <button type="button" class="btn btn-success btn-sm" @click="saveSetting()">
+                        <i class="ace-icon fa fa-floppy-o"></i>保存
+                    </button>
+                </div>
+
+                <div class="widget-box" style="border-style:none;width:780px; ">
+                    <div class="widget-body">
+                        <div class="widget-main">
+                            <form class="form-horizontal" role="form" id="settingDetailForm">
+                                <input id="setting_id" name="detail.auth_setting.id" type="hidden" v-model.number="detail.auth_setting.id"/>
+                                <input id="setting_version" name="detail.auth_setting.version" type="hidden" v-model.number="detail.auth_setting.version"/>
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="default_password" class="col-xs-2 control-label">默认密码</label>
+                                            <div class="col-xs-10">
+                                                <input id="default_password" name="detail.auth_setting.default_password" type="text" class="input-sm form-control" v-model="detail.auth_setting.default_password"/>
+                                                <div class="help-block">用户默认密码。新用户的密码，和密码被重置时的密码。</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="time_out" class="col-xs-2 control-label">超时时长</label>
+                                            <div class="col-xs-10">
+                                                <input id="time_out" name="detail.auth_setting.time_out" type="text" class="input-sm form-control" v-model.number="detail.auth_setting.time_out"/>
+                                                <div class="help-block">超时时长，如果这段时间内没有操作，用户就会自动退出登录。</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+
+    function loadAuthSettingDetail(this_vm) {
+        showMask("加载中...");
+        $("#settingDetailForm").clearValidation();
+        $.ajax({
+                url: '{%url "AuthSetting.DetailData" %}',
+                type: "POST",
+                success: function (result) {
+                    hideMask();
+                    if (result.success == false) {
+                        $.msg.error(result.message);
+                        return;
+                    }
+
+                    if (this_vm === void(0) || this_vm.detail === void(0)) {
+                        vm.detail = result;
+                    }
+                    else {
+                        this_vm.detail = result;
+                    }
+                }
+            }
+        );
+    }
+
+    var vm = new Vue({
+        el: "#page",
+        data: {
+            "detail": {
+                "auth_setting": {}
+            }
+        },
+        mounted: function () {
+            loadAuthSettingDetail(this);
+        },
+        methods: {
+            saveSetting: function () {
+                showMask("提交中...");
+                var form = $("#settingDetailForm");
+                var valid = validate(form, {
+                    'detail.auth_setting.default_password': {
+                        required: true, minlength: 6, maxlength: 20
+                    },
+                    'detail.auth_setting.time_out': {
+                        required: true, digits: true, min: 1, max: 10000
+                    }
+                });
+
+                if (!valid) {
+                    hideMask();
+                } else {
+                    $.ajax({
+                            url: '{%url "AuthSetting.Save"%}',
+                            type: "POST",
+                            processData: false,
+                            contentType: 'application/json',
+                            data: JSON.stringify(vm.detail),
+                            success: function (data) {
+                                hideMask();
+                                if (data.success === false) {
+                                    $.msg.error(data.message);
+                                    //return;
+                                }
+                                else {
+                                    vm.detail = data.detail;
+                                    $.msg.show(data.message);
+                                    //return;
+                                }
+                            }
+                        }
+                    );
+                }
+            }
+        }
+    });
+</script>
+{%footer%}
+

@@ -358,7 +358,7 @@
                             data: JSON.stringify(vm.detail),
                             success: function (data) {
                                 hideMask();
-                                if (data.success == false) {
+                                if (data.success === false) {
                                     $.msg.error(data.message);
                                     //return;
                                 }

@@ -31,4 +31,5 @@ GET /release/note               ReleaseNote.Index
 GET  /api/calc/logistics/fee      LogisticsFeeApi.Calc
 GET  /api/calc/logistics/fee/test LogisticsFeeApi.Test
 
-*    /:controller/:action       :controller.:action
+# 禁用自动路由
+# *    /:controller/:action       :controller.:action
