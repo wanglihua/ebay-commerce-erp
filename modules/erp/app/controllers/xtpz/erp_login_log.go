@@ -3,6 +3,8 @@ package controllers
 import (
 	"fmt"
 	"strings"
+	"time"
+
 	"github.com/revel/revel"
 	"matrix/core"
 	"matrix/modules/auth/pass_res"
@@ -59,6 +61,14 @@ func (c ErpLoginLog) ListData() revel.Result {
 	login_log_list := make([]models.LoginLogInfo, 0, limit)
 	err := data_query.Limit(limit, offset).Find(&login_log_list)
 	core.HandleError(err)
+
+	for index, login_log := range login_log_list {
+		var logout_time = time.Time(login_log.LogoutTime)
+		if logout_time.IsZero() {
+			logout_time = time.Now()
+		}
+		login_log_list[index].OnlineTime = logout_time.Sub(time.Time(login_log.LoginTime)).Minutes()
+	}
 
 	count_query := *query
 	count, err := count_query.Count(new(models.LoginLogInfo))

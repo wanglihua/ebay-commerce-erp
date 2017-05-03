@@ -25,6 +25,8 @@ type online_user_t struct {
 
 const ONLINE_USER_LIST_CACHE_KEY = "online_user_list"
 
+var online_user_list_expire = time.Hour * 720
+
 func Log_login(user auth_models.UserInfo, ip_address string, web_session revel.Session, db_session *xorm.Session) {
 	//login log
 	var login_log models.LoginLogInfo
@@ -49,28 +51,63 @@ func Log_login(user auth_models.UserInfo, ip_address string, web_session revel.S
 
 	online_user_list = append(online_user_list, online_user)
 
-	cache.Set(ONLINE_USER_LIST_CACHE_KEY, online_user_list, time.Hour*720)
+	cache.Set(ONLINE_USER_LIST_CACHE_KEY, online_user_list, online_user_list_expire)
 }
 
 func Log_logout(login_user core.LoginUser, db_session *xorm.Session) {
+	// 先获取用户最近的一条登录记录
+	/*
+	SELECT * FROM erp_login_log WHERE user_id = 1 ORDER BY create_time DESC LIMIT 0, 1
+	 */
+	var sql = `SELECT * FROM erp_login_log WHERE user_id = %d ORDER BY create_time DESC LIMIT 0, 1`
+	sql = fmt.Sprintf(sql, login_user.UserId)
+	var login_log models.LoginLogInfo
+	has, err := db_session.Sql(sql).Get(&login_log)
+	if has && err != nil {
+		login_log.LogoutTime = core.Time(time.Now())
+		login_log.OnlineTime = time.Time(login_log.LogoutTime).Sub(time.Time(login_log.LoginTime)).Minutes()
+
+		db_session.Id(login_log.Id).Cols("logout_time", "online_time").Update(&login_log)
+	}
 }
 
 // 每次请求的时候，刷新在线用户的活动时间
 func Refresh_user_active(web_session revel.Session) {
+	var login_user_key = core.GetLoginUserCacheKey(web_session)
+	var online_user_list = get_online_user_list()
+	for index, online_user := range online_user_list {
+		if online_user.Login_user_key == login_user_key { //这样用 cache key来比较要合理一点，否则一个用户多个地方登录时，就会有问题
+			online_user_list[index].Active_time = time.Now()
+		}
+	}
 
+	cache.Set(ONLINE_USER_LIST_CACHE_KEY, online_user_list, online_user_list_expire)
 }
 
 func Check_user_active(db_session *xorm.Session) {
 	// 加载超时配置
-	var auth_setting = auth_setting_service.Get_auth_setting(db_session) // todo 可以缓存起来
+	var auth_setting = auth_setting_service.Get_auth_setting(db_session) // 可以考虑缓存起来
 
 	var online_user_list = get_online_user_list()
 
-	for _, online_user := range online_user_list {
+	for index, online_user := range online_user_list {
 		if time.Now().Sub(online_user.Active_time).Minutes() > float64(auth_setting.TimeOut) {
+			// 获得在线登录的用户
+			var login_user core.LoginUser
+			cache.Get(online_user.Login_user_key, &login_user)
+
 			// 把用户踢出登录
+			cache.Delete(online_user.Login_user_key)
+
+			// 从在线用户列表中删除
+			online_user_list = append(online_user_list[:index], online_user_list[index:]...)
+
+			// 记录登出日志
+			Log_logout(login_user, db_session)
 		}
 	}
+
+	cache.Set(ONLINE_USER_LIST_CACHE_KEY, online_user_list, online_user_list_expire)
 }
 
 func get_ip_location(ip_address string) string {

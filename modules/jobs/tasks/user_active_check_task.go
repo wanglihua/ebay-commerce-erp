@@ -7,6 +7,7 @@ import (
 	"github.com/go-xorm/xorm"
 	"github.com/revel/revel"
 	"matrix/core"
+	"matrix/modules/erp/service/login_log_service"
 )
 
 type UserActiveCheckTask struct {
@@ -51,4 +52,6 @@ func (t UserActiveCheckTask) Run() {
 	defer func() {
 		db_session.Close()
 	}()
+
+	login_log_service.Check_user_active(db_session)
 }
