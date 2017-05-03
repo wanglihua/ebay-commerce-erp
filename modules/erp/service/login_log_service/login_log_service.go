@@ -19,7 +19,6 @@ import (
 
 type online_user_t struct {
 	Login_user_key string
-	Login_time     time.Time
 	Active_time    time.Time
 }
 
@@ -46,7 +45,6 @@ func Log_login(user auth_models.UserInfo, ip_address string, web_session revel.S
 
 	var online_user online_user_t
 	online_user.Login_user_key = core.GetLoginUserCacheKey(web_session)
-	online_user.Login_time = time.Now()
 	online_user.Active_time = time.Now()
 
 	online_user_list = append(online_user_list, online_user)
@@ -104,6 +102,20 @@ func Check_user_active(db_session *xorm.Session) {
 
 			// 记录登出日志
 			Log_logout(login_user, db_session)
+		}
+	}
+
+	cache.Set(ONLINE_USER_LIST_CACHE_KEY, online_user_list, online_user_list_expire)
+}
+
+func Remove_user_from_online(web_session revel.Session) {
+	var login_user_key = core.GetLoginUserCacheKey(web_session)
+
+	var online_user_list = get_online_user_list()
+
+	for index, online_user := range online_user_list {
+		if online_user.Login_user_key == login_user_key {
+			online_user_list = append(online_user_list[:index], online_user_list[index:]...)
 		}
 	}
 
