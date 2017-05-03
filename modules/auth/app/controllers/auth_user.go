@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 
@@ -9,6 +10,7 @@ import (
 	"matrix/modules/auth/forms"
 	"matrix/modules/auth/models"
 	"matrix/modules/auth/pass_res"
+	"matrix/modules/auth/service/auth_setting_service"
 	"matrix/modules/auth/service/group_service"
 	"matrix/modules/auth/service/pass_service"
 )
@@ -189,6 +191,47 @@ func (c AuthUser) Delete() revel.Result {
 	core.HandleError(err)
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})
+}
+
+func (c AuthUser) ResetPassword() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.AUTH_USER, c.Session)
+
+	db_session := c.DbSession
+
+	user_id_list := make([]int64, 0)
+	c.Params.Bind(&user_id_list, "id_list")
+
+	if len(user_id_list) == 0 {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "用户列表不能为空，请选择用户！",
+		})
+	}
+
+	var login_user = core.GetLoginUser(c.Session)
+
+	count, err := db_session.In("user_id", user_id_list).Count(new(models.AdminInfo))
+	core.HandleError(err)
+
+	if count != 0 && login_user.IsSuperAdmin == false {
+		return c.RenderJson(core.JsonResult{Success: false, Message: "不能重置管理员的密码，需要超级管理员权限！"})
+	}
+
+	var auth_setting = auth_setting_service.Get_auth_setting(db_session)
+	var default_password = auth_setting.DefaultPassword
+
+	/*
+	UPDATE auth_user SET password = '123' WHERE id IN (-1, -2);
+	 */
+
+	var sql_reset_pwd = fmt.Sprintf(`UPDATE auth_user SET password = '%s' WHERE id IN (%s)`, core.EncryptPassword(default_password), core.Int_list_to_str_list(user_id_list))
+	_, err = db_session.Exec(sql_reset_pwd)
+	core.HandleError(err)
+
+	return c.RenderJson(map[string]interface{}{
+		"success": true,
+		"message": "用户密码重置成功！",
+	})
 }
 
 // 这里就不进行权限检查了，别的地方要调用

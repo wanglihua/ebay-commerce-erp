@@ -213,7 +213,7 @@ WHERE ol.stock_id = 0 AND ol.company_id = 0
 		}
 
 		if order_logistics.Order.ShopId != 0 {
-			order_logistics_list[index].OrderCode = shop_id_name_map[order_logistics.Order.ShopId].ShopCode + order_logistics.Order.Code
+			order_logistics_list[index].OrderCode = shop_id_name_map[order_logistics.Order.ShopId].ShopCode + order_logistics.Order.TranId
 		}
 	}
 

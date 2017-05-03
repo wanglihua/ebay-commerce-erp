@@ -21,7 +21,7 @@
                     <i class="ace-icon fa fa-plus"></i>
                     新增
                 </button>
-                <button class="btn btn-warning btn-sm" onclick="showUserPassRes()">
+                <button class="btn btn-warning btn-sm" onclick="resetPassword()">
                     <i class="ace-icon fa fa-key"></i>
                     重置密码
                 </button>
@@ -80,6 +80,37 @@
                             }
                         }
                     );
+                }
+
+                function resetPassword() {
+                    var id_list = [];
+                    $('#userList').find('tbody tr>td:first-child input:checkbox').each(function () {
+                        if (this.checked) {
+                            id_list.push($(this).val());
+                        }
+                    });
+
+                    if (id_list.length == 0) {
+                        $.msg.alert("请选择数据！");
+                        return;
+                    }
+
+                    $.msg.confirm("确认要删除吗？", function () {
+                        $.ajax({
+                            url: '{%url "AuthUser.ResetPassword"%}',
+                            type: "POST",
+                            data: {"id_list": id_list},
+                            success: function (data) {
+                                if (data.success == false) {
+                                    $.msg.error(data.message);
+                                    return;
+                                }
+                                else {
+                                    $.msg.show(data.message);
+                                }
+                            }
+                        });
+                    });
                 }
 
                 function showUserPassRes() {
