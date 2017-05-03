@@ -10,6 +10,7 @@ import (
 	"matrix/app/routes"
 	"matrix/core"
 	"matrix/db"
+	"matrix/modules/erp/service/login_log_service"
 )
 
 func BeforeInterceptor(c *revel.Controller) revel.Result {
@@ -142,6 +143,9 @@ func userAuth(c *revel.Controller) revel.Result {
 			//c.Result = c.Redirect(routes.Login.Index())
 			return c.Redirect(routes.Login.Index())
 		}
+	} else {
+		// 更新用户在线活动时间
+		login_log_service.Refresh_user_active(c.Session)
 	}
 
 	return nil

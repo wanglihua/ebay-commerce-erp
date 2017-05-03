@@ -1,11 +1,13 @@
 package core
 
 import (
+	"fmt"
+
 	"github.com/revel/revel"
 	"github.com/revel/revel/cache"
 )
 
-const LOGIN_USER_CACHE_KEY = "Login_User_b6db637be022550d"
+const LOGIN_USER_CACHE_KEY = "Login_User_%s"
 
 //根据以后需要再在这里添加成员
 type LoginUser struct {
@@ -17,9 +19,13 @@ type LoginUser struct {
 	// IsAdmin      bool // 这个不使用
 }
 
+func GetLoginUserCacheKey(session revel.Session) string {
+	return fmt.Sprintf(LOGIN_USER_CACHE_KEY, session.Id())
+}
+
 func GetLoginUser(session revel.Session) LoginUser {
 	var loginUser LoginUser
-	err := cache.Get(LOGIN_USER_CACHE_KEY+session.Id(), &loginUser)
+	err := cache.Get(GetLoginUserCacheKey(session), &loginUser)
 	if err != nil {
 		revel.TRACE.Println(err.Error())
 	}
@@ -27,9 +33,9 @@ func GetLoginUser(session revel.Session) LoginUser {
 }
 
 func PutLoginUserToSession(session revel.Session, user LoginUser) {
-	cache.Set(LOGIN_USER_CACHE_KEY+session.Id(), user, GetSessionExpire())
+	cache.Set(GetLoginUserCacheKey(session), user, GetSessionExpire())
 }
 
 func RemoveLoginUserInSession(session revel.Session) {
-	cache.Delete(LOGIN_USER_CACHE_KEY + session.Id())
+	cache.Delete(GetLoginUserCacheKey(session))
 }

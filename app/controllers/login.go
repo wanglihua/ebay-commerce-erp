@@ -1,20 +1,15 @@
 package controllers
 
 import (
-	"encoding/json"
-	"fmt"
-	"runtime/debug"
 	"strings"
-
 	"github.com/revel/revel"
 	"matrix/app/layout"
 	"matrix/core"
 	"matrix/core/captcha"
-	"matrix/core/requests"
 	"matrix/modules/auth/forms"
 	"matrix/modules/auth/models"
 	"matrix/modules/auth/service/pass_service"
-	erp_models "matrix/modules/erp/models"
+	"matrix/modules/erp/service/login_log_service"
 )
 
 type Login struct {
@@ -37,8 +32,8 @@ func (c Login) Login() revel.Result {
 		return c.RenderJson(core.JsonResult{Success: false, Message: c.GetValidationErrorMessage()})
 	}
 
-	user := new(models.UserInfo)
-	has, err := db_session.Where("login_name = ?", form.LoginName).Get(user)
+	var user models.UserInfo
+	has, err := db_session.Where("login_name = ?", form.LoginName).Get(&user)
 	core.HandleError(err)
 
 	if has == false {
@@ -84,17 +79,8 @@ func (c Login) Login() revel.Result {
 	pass_service.Load_user_pass_to_cache(loginUser.UserId, db_session)
 	//pass_service.Load_all_pass_to_cache(db_session)
 
-	//login log
-	var login_log erp_models.LoginLogInfo
-	login_log.LoginName = user.LoginName
-
-	var client_ip = get_request_client_ip(c.Request)
-
-	login_log.IpAddress = client_ip
-	login_log.Content = "员工登录"
-	login_log.Desc = core.NullStringFrom(get_ip_location(client_ip))
-
-	db_session.Insert(login_log)
+	var ip_address = get_request_client_ip(c.Request)
+	login_log_service.Log_login(user, ip_address, c.Session, db_session)
 
 	return c.RenderJson(map[string]interface{}{
 		"success":            true,
@@ -104,6 +90,13 @@ func (c Login) Login() revel.Result {
 }
 
 func (c Login) Logout() revel.Result {
+	var db_session = c.DbSession
+
+	var login_user = core.GetLoginUser(c.Session)
+	if login_user.UserId != 0 {
+		login_log_service.Log_logout(login_user, db_session)
+	}
+
 	core.RemoveLoginUserInSession(c.Session)
 	//c.makePreviousSessionExpire()
 	return c.RenderJson(core.JsonResult{Success: true, Message: "注销成功！"})
@@ -115,25 +108,4 @@ func (c Login) makePreviousSessionExpire() {
 
 func get_request_client_ip(request *revel.Request) string {
 	return strings.Split(request.RemoteAddr, ":")[0]
-}
-
-func get_ip_location(ip_address string) string {
-	//http://freeapi.ipip.net/120.151.39.56
-	var url = fmt.Sprintf("http://freeapi.ipip.net/%s", ip_address)
-	var location_script = requests.Get(url)
-	var location_list = make([]string, 0)
-	err := json.Unmarshal([]byte(location_script), &location_list)
-	if err != nil {
-		revel.ERROR.Println(err)
-		revel.ERROR.Println(string(debug.Stack()))
-	}
-
-	// 去掉空白的项
-	var location_list_no_empty = make([]string, 0)
-	for _, loc := range location_list {
-		if strings.TrimSpace(loc) != "" {
-			location_list_no_empty = append(location_list_no_empty, loc)
-		}
-	}
-	return strings.Join(location_list_no_empty, " ")
 }

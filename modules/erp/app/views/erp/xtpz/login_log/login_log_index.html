@@ -91,10 +91,16 @@
                     "aoColumns": [
                         {"mDataProp": "id", "title": "记录编号", "bSearchable": false, "sClass": "center", "width": 80},
                         {"mDataProp": "login_name", "title": "工号", "bSearchable": true, "width": 150},
+                        {"mDataProp": "login_time", "title": "登录时间", "bSearchable": false, "width": 120},
+                        {"mDataProp": "logout_time", "title": "登出时间", "bSearchable": false, "width": 120},
+                        {
+                            "mDataProp": "online_time", "title": "在线时间", "bSearchable": false, "width": 80,
+                            "render": function (data, type, row) {
+                                return dtFormatFloat(data) + "分钟";
+                            }
+                        },
                         {"mDataProp": "ip_address", "title": "IP", "bSearchable": true, "width": 150},
-                        {"mDataProp": "create_time", "title": "操作时间", "bSearchable": false, "width": 120},
-                        {"mDataProp": "content", "title": "内容", "bSearchable": true, "width": 200},
-                        {"mDataProp": "desc", "title": "描述", "bSearchable": true}
+                        {"mDataProp": "ip_loc", "title": "区域", "bSearchable": true}
                     ],
                     "fnServerData": function (sSource, aoData, fnCallback) {
                         showMask("数据加载中，请稍候");
@@ -109,7 +115,7 @@
                             "data": aoData,
                             "success": function (data) {
                                 hideMask();
-                                
+
                                 if (data.success == false) {
                                     $.msg.error(data.message);
                                     return;

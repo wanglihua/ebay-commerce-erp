@@ -3,7 +3,6 @@ package controllers
 import (
 	"fmt"
 	"strings"
-
 	"github.com/revel/revel"
 	"matrix/core"
 	"matrix/modules/auth/pass_res"
@@ -47,7 +46,7 @@ func (c ErpLoginLog) ListData() revel.Result {
 	}
 
 	if end_time_query.Valid == true {
-		query = query.Where(fmt.Sprintf("create_time <= '%s'", end_time_query.Time.Format("2006-01-02 15:04:05")))
+		query = query.Where(fmt.Sprintf("update_time <= '%s'", end_time_query.Time.Format("2006-01-02 15:04:05")))
 	}
 
 	data_query := *query
