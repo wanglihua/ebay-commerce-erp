@@ -118,8 +118,12 @@
                                     type: "POST",
                                     data: form.serialize(),
                                     success: function (data) {
-                                        if (data.success == true) {
-                                            window.location.href = '{%url "Home.Index"%}';
+                                        if (data.success === true) {
+                                            if (data.require_change_pwd === true) {
+                                                window.location.href = '{%url "AuthProfile.Index"%}?require_change_pwd=true';
+                                            } else {
+                                                window.location.href = '{%url "Home.Index"%}';
+                                            }
                                             //return;
                                         }
                                         else {

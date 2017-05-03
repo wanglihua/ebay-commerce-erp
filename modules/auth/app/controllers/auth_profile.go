@@ -17,12 +17,16 @@ type AuthProfile struct {
 func (c AuthProfile) Index() revel.Result {
 	session := c.DbSession
 
+	var require_change_pwd bool = false
+	c.Params.Bind(&require_change_pwd, "require_change_pwd")
+
 	loginUserId := core.GetLoginUser(c.Session).UserId
 	loginUser := new(models.UserInfo)
 	_, err := session.Id(loginUserId).Get(loginUser)
 	core.HandleError(err)
 
 	c.UnbindToRenderArgs(loginUser, "user")
+	c.RenderArgs["require_change_pwd"] = require_change_pwd
 
 	return c.RenderTemplate("auth/profile/profile_index.html")
 }
@@ -44,8 +48,9 @@ func (c AuthProfile) Save() revel.Result {
 
 	if strings.TrimSpace(form.Password) != "" {
 		loginUser.Password = core.EncryptPassword(form.Password)
+		loginUser.IsDefaultPwd = -1 //下次登录就不会要求改密码了
 
-		_, err = session.Id(loginUserId).Cols("password").Update(loginUser)
+		_, err = session.Id(loginUserId).Cols("password", "is_default_pwd").Update(loginUser)
 		core.HandleError(err)
 	}
 

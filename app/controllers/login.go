@@ -96,7 +96,11 @@ func (c Login) Login() revel.Result {
 
 	db_session.Insert(login_log)
 
-	return c.RenderJson(core.JsonResult{Success: true, Message: "登陆成功！"})
+	return c.RenderJson(map[string]interface{}{
+		"success":            true,
+		"require_change_pwd": user.IsDefaultPwd > 0,
+		"message":            "登陆成功！",
+	})
 }
 
 func (c Login) Logout() revel.Result {

@@ -145,6 +145,7 @@ func (c AuthUser) Save() revel.Result {
 		}
 
 		user.Password = core.EncryptPassword(user.Password)
+		user.IsDefaultPwd = 1 // 你用户时下次登录必须修改密码
 
 		affected, err = session.Insert(user)
 		core.HandleError(err)
@@ -221,10 +222,11 @@ func (c AuthUser) ResetPassword() revel.Result {
 	var default_password = auth_setting.DefaultPassword
 
 	/*
-	UPDATE auth_user SET password = '123' WHERE id IN (-1, -2);
+	UPDATE auth_user SET password = '123', is_default_pwd = 1 WHERE id IN (-1, -2);
 	 */
 
-	var sql_reset_pwd = fmt.Sprintf(`UPDATE auth_user SET password = '%s' WHERE id IN (%s)`, core.EncryptPassword(default_password), core.Int_list_to_str_list(user_id_list))
+	// 重置密码后下次登录必须修改密码
+	var sql_reset_pwd = fmt.Sprintf(`UPDATE auth_user SET password = '%s', is_default_pwd = 1 WHERE id IN (%s)`, core.EncryptPassword(default_password), strings.Join(core.Int_list_to_str_list(user_id_list), ","))
 	_, err = db_session.Exec(sql_reset_pwd)
 	core.HandleError(err)
 

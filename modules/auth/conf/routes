@@ -6,6 +6,7 @@ POST /auth/user/listdata              AuthUser.ListData
 POST /auth/user/refresh/pass/cache    AuthUser.RefreshPassCache
 POST /auth/user/detail                AuthUser.Detail
 POST /auth/user/save                  AuthUser.Save
+POST /auth/user/reset/password        AuthUser.ResetPassword
 POST /auth/user/delete                AuthUser.Delete
 POST /auth/user/get/info              AuthUser.GetUserInfo
 

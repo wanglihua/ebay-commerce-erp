@@ -4,6 +4,7 @@ package main
 // It catalogs the controllers, their methods, and their arguments.
 
 import (
+	"fmt"
 	"go/ast"
 	"go/build"
 	"go/parser"
@@ -281,8 +282,8 @@ func addImports(imports map[string]string, decl ast.Decl, srcDir string) {
 				continue
 			}
 		}
-		quotedPath := importSpec.Path.Value           // e.g. "\"sample/app/models\""
-		fullPath := quotedPath[1 : len(quotedPath)-1] // Remove the quotes
+		quotedPath := importSpec.Path.Value          // e.g. "\"sample/app/models\""
+		fullPath := quotedPath[1: len(quotedPath)-1] // Remove the quotes
 
 		// If the package was not aliased (common case), we have to import it
 		// to see what the package name is.
@@ -726,7 +727,7 @@ func NewTypeExpr(pkgName string, expr ast.Expr) TypeExpr {
 		e := NewTypeExpr(pkgName, t.Elt)
 		return TypeExpr{"[]" + e.Expr, e.PkgName, e.pkgIndex + 2, e.Valid}
 	default:
-		log.Println("Failed to generate name for field. Make sure the field name is valid.")
+		log.Println(fmt.Sprintf("package: %s. Failed to generate name for field. Make sure the field name is valid.", pkgName))
 	}
 	return TypeExpr{Valid: false}
 }
