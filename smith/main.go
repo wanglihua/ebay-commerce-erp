@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"matrix/core"
-	"matrix/modules/erp/models"
+	"matrix/modules/auth/models"
 	smith_core "matrix/smith/core"
 	"matrix/smith/core/template"
 )
@@ -19,7 +19,7 @@ var module_lower_case = models.ModuleLowerCase
 var module_chinese = models.ModuleChinese
 var table_prefix = models.TablePrefix
 var model_list = []interface{}{
-	models.StatusInfo{},
+	models.AuthSettingInfo{},
 }
 
 /*

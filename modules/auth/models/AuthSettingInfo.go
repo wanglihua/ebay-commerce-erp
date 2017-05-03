@@ -1,0 +1,30 @@
+package models
+
+import (
+	"github.com/go-xorm/xorm"
+	"matrix/core"
+)
+
+type AuthSettingInfo struct {
+	Id              int64           `xorm:"bigint notnull pk 'id'" json:"id"`
+	DefaultPassword string          `xorm:"nvarchar(100) notnull 'default_password'" json:"default_password" smith:"verbose_name=默认密码,min=6,max=20"`
+	TimeOut         int64           `xorm:"bigint notnull 'time_out'" json:"time_out" smith:"verbose_name=超时时长,min=1,max=10000"`
+	CreateTime      core.Time       `xorm:"created notnull 'create_time'" json:"create_time"`
+	UpdateTime      core.Time       `xorm:"updated notnull 'update_time'" json:"update_time"`
+	Version         int             `xorm:"version notnull 'version'" json:"version"`
+}
+
+func (e AuthSettingInfo) TableName() string {
+	return TablePrefix + "auth_setting"
+}
+
+func (e AuthSettingInfo) ModelDesc() string {
+	return "verbose_name=授权设置,entity_json=auth_setting,route=auth/setting"
+}
+
+func (e AuthSettingInfo) InitData(db_session *xorm.Session) {
+	var auth_setting AuthSettingInfo
+	auth_setting.DefaultPassword = "111111" // 默认密码 6 个 1
+	auth_setting.TimeOut = 10               // 超时时长，如果这段时间内部操作，就会自动退出登录
+	db_session.Insert(&auth_setting)
+}
