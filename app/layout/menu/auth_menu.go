@@ -69,13 +69,15 @@ func GetAuthMenu(res_id_map map[int64]bool, web_session revel.Session) string {
         </li>`)
 		}
 
-		buffer.WriteString(`<li id="auth-setting-menu" class="">
+		if check_pass_res_menu(pass_res.AUTH_SETTING) {
+			buffer.WriteString(`<li id="auth-setting-menu" class="">
             <a href="/auth/auth/setting">
                 <i class="menu-icon fa fa-caret-right"></i>
                 授权设置
             </a>
             <b class="arrow"></b>
         </li>`)
+		}
 
 		buffer.WriteString(`</ul>
 </li>

@@ -354,6 +354,13 @@ func (e PassResInfo) InitData(db_session *xorm.Session) {
 		pass.Name = "群组管理"
 		pass.Desc = core.MakeNullString("群组管理", true)
 		db_session.Insert(pass)
+
+		pass = new(PassResInfo)
+		pass.Id = pass_res.AUTH_SETTING
+		pass.CateId = pass_res_cate.AUTH
+		pass.Name = "授权配置"
+		pass.Desc = core.MakeNullString("授权配置", true)
+		db_session.Insert(pass)
 	}
 
 	// 系统配置

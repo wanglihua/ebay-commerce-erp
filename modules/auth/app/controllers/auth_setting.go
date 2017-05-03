@@ -7,7 +7,9 @@ import (
 	"github.com/revel/revel"
 	"matrix/core"
 	"matrix/modules/auth/models"
+	"matrix/modules/auth/pass_res"
 	"matrix/modules/auth/service/auth_setting_service"
+	"matrix/modules/auth/service/pass_service"
 )
 
 type AuthSetting struct {
@@ -15,6 +17,8 @@ type AuthSetting struct {
 }
 
 func (c AuthSetting) Index() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.AUTH_SETTING, c.Session)
+
 	return c.RenderTemplate("auth/setting/setting_index.html")
 }
 
@@ -43,6 +47,8 @@ func (f *SettingDetailForm) Valid(validation *revel.Validation) bool {
 }
 
 func (c AuthSetting) DetailData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.AUTH_SETTING, c.Session)
+
 	db_session := c.DbSession
 
 	var setting = auth_setting_service.Get_auth_setting(db_session)
@@ -54,6 +60,8 @@ func (c AuthSetting) DetailData() revel.Result {
 }
 
 func (c AuthSetting) Save() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.AUTH_SETTING, c.Session)
+
 	db_session := c.DbSession
 
 	var detail_form SettingDetailForm
