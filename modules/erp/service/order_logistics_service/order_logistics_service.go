@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math"
 	"sort"
+	"strconv"
 	"strings"
 
 	"github.com/go-xorm/xorm"
@@ -323,7 +324,7 @@ func (p_ol *OrderLogistics) hold_check_address_special_word(p_order *models.Orde
 			}
 		}
 	}
-	
+
 	// 不符合 地址有特殊字段的，但最佳物流 “ 非“ AU POST的
 	return false
 }
@@ -945,7 +946,116 @@ func get_order_products_whole_logistics_data(p_order_logistics_data *order_logis
 	return whole_length, whole_width, whole_height, whole_dim_weight, whole_weight
 }
 
-//todo: 同一个商品的一半数量可以从这个仓库发货，另一半数量可以从哪个仓库发货的怎么处理
+// todo 合并订单的时候，如果某个订单被删除了，会不会下次同步的时候，又下载下来了
+// 合并订单
+// order_filter: o.batch_code = '20170428120352'
+func Combine_orders(order_filter string, db_session *xorm.Session) error {
+
+	if len(order_filter) == 0 {
+		return errors.New("未提供订单过滤条件！")
+	}
+
+	// 同一买家，同一付款paypal，同一收货地址，同一店铺 的订单可以合并
+
+	type order_ids struct {
+		OrderIds string `xorm:"'order_ids'"`
+	}
+
+	/*
+		SELECT group_concat(o.id ORDER BY o.id ASC SEPARATOR ',') AS order_ids
+		FROM erp_order o
+		    INNER JOIN erp_order_shipping_address osa ON osa.order_id = o.id
+		WHERE o.batch_code = '20170428120352'
+		GROUP BY o.buyer_user_id, o.buyer_email, o.shop_id, osa.country, osa.country_name, osa.province, osa.city_name, osa.street1, osa.street2, osa.postal_code, osa.phone, osa.name
+		HAVING count(o.id) > 1
+	 */
+
+	var sql_get_combin_order_ids = `
+SELECT group_concat(o.id ORDER BY o.id ASC SEPARATOR ',') AS order_ids
+FROM erp_order o
+    INNER JOIN erp_order_shipping_address osa ON osa.order_id = o.id
+WHERE %s
+GROUP BY o.buyer_user_id, o.buyer_email, o.shop_id, osa.country, osa.country_name, osa.province, osa.city_name, osa.street1, osa.street2, osa.postal_code, osa.phone, osa.name
+HAVING count(o.id) > 1`
+	sql_get_combin_order_ids = fmt.Sprintf(sql_get_combin_order_ids, order_filter)
+
+	var order_ids_list = make([]order_ids, 0)
+	err := db_session.Sql(sql_get_combin_order_ids).Find(&order_ids_list)
+	core.HandleError(err)
+
+	for _, order_ids := range order_ids_list {
+		var order_id_str_list = strings.Split(order_ids.OrderIds, ",")
+		var order_id_list = make([]int64, 0)
+		for _, order_id_str := range order_id_str_list {
+			order_id, _ := strconv.ParseInt(order_id_str, 10, 64)
+			order_id_list = append(order_id_list, order_id)
+		}
+
+		var first_order_id = order_id_list[0]
+
+		// 修改 合并后的 order 各种款项
+		/*
+UPDATE erp_order order_first
+    INNER JOIN (
+                   SELECT sum(order_all.adjustment_amount) AS adjustment_amount_sum, sum(order_all.amount_paid) AS amount_paid_sum, sum(order_all.amount_saved) AS amount_saved_sum, sum(order_all.total_amount) AS total_amount_sum, sum(order_all.subtotal_amount) AS subtotal_amount_sum
+                   FROM erp_order order_all
+                   WHERE order_all.id IN (0, -1, -2, -3)
+               ) s
+        ON 1 = 1
+SET order_first.adjustment_amount     = s.adjustment_amount_sum,
+    order_first.adjustment_amount_rmb = s.adjustment_amount_sum * order_first.exchange_rate,
+    order_first.amount_paid           = s.amount_paid_sum,
+    order_first.amount_paid_rmb       = s.amount_paid_sum * order_first.exchange_rate,
+    order_first.amount_saved          = s.amount_saved_sum,
+    order_first.amount_saved_rmb      = s.amount_saved_sum * order_first.exchange_rate,
+    order_first.total_amount          = s.total_amount_sum,
+    order_first.total_amount_rmb      = s.total_amount_sum * order_first.exchange_rate
+WHERE id = 0
+		 */
+		var sql_sum_amount = `
+UPDATE erp_order order_first
+    INNER JOIN (
+                   SELECT sum(order_all.adjustment_amount) AS adjustment_amount_sum, sum(order_all.amount_paid) AS amount_paid_sum, sum(order_all.amount_saved) AS amount_saved_sum, sum(order_all.total_amount) AS total_amount_sum, sum(order_all.subtotal_amount) AS subtotal_amount_sum
+                   FROM erp_order order_all
+                   WHERE order_all.id IN (%s)
+               ) s
+        ON 1 = 1
+SET order_first.adjustment_amount     = s.adjustment_amount_sum,
+    order_first.adjustment_amount_rmb = s.adjustment_amount_sum * order_first.exchange_rate,
+    order_first.amount_paid           = s.amount_paid_sum,
+    order_first.amount_paid_rmb       = s.amount_paid_sum * order_first.exchange_rate,
+    order_first.amount_saved          = s.amount_saved_sum,
+    order_first.amount_saved_rmb      = s.amount_saved_sum * order_first.exchange_rate,
+    order_first.total_amount          = s.total_amount_sum,
+    order_first.total_amount_rmb      = s.total_amount_sum * order_first.exchange_rate
+WHERE id = %d`
+		sql_sum_amount = fmt.Sprintf(sql_sum_amount, order_ids.OrderIds, first_order_id)
+		_, err := db_session.Exec(sql_sum_amount)
+		core.HandleError(err)
+
+		// 修改 order_id_item
+		var sql_update_order_item = `UPDATE erp_order_item SET order_id = %d WHERE order_id IN (%s)`
+		sql_update_order_item = fmt.Sprintf(sql_update_order_item, first_order_id, strings.Join(order_id_str_list[1:], ","))
+		_, err = db_session.Exec(sql_update_order_item)
+		core.HandleError(err)
+
+		// 删除 shipping_address
+		var sql_delete_address = `DELETE FROM erp_order_shipping_address WHERE order_id IN (%s)`
+		sql_delete_address = fmt.Sprintf(sql_delete_address, strings.Join(order_id_str_list[1:], ","))
+		_, err = db_session.Exec(sql_delete_address)
+		core.HandleError(err)
+
+		// 删除 order
+		var sql_delete_order = `DELETE FROM erp_order WHERE id IN (%s)`
+		sql_delete_order = fmt.Sprintf(sql_delete_order, strings.Join(order_id_str_list[1:], ","))
+		_, err = db_session.Exec(sql_delete_order)
+		core.HandleError(err)
+	}
+
+	return nil
+}
+
+// todo: 同一个商品的一半数量可以从这个仓库发货，另一半数量可以从哪个仓库发货的怎么处理
 /*
 
 (完成)1. 地址有特殊字段的。比如 PO BOX, LOCKER。但最佳物流非AU POST的，需要在基础设置里面有特殊字段设置功能
@@ -962,7 +1072,7 @@ func get_order_products_whole_logistics_data(p_order_logistics_data *order_logis
 (12.完成，这个检查应该放在 11 之前， 就是任何是有长宽高重量数据之前）12. 产品信息不全（长宽高重量不全或者有误）
 13. 匹配最佳仓库及物流后订单亏损。需要在基础设置里面有设置亏损额或者亏损率的设置功能，超过设置范围了，自动到订单亏损hold
 (完成)14. 信封类。长宽高在35cm X 25cm X 2cm, 重量在0.5Kg以内的订单为信封。若是多数量或者多产品，以前我们设计的思路是，最大产品的长边为最长边，最大产品的中边为中边，所有产品的最小边之和为最小边，判断是否在35cm X 25cm X 2cm以内，重量之和是否在0.5Kg以内
-(完成)15. 快递类。需要在基础设置里面有 收到快递费金额的设置功能，比如收到的运费高于什么金额，视为快递。否则就算收了快递费也视为普通包裹
+(完成)15. 快递类。需要在基础设置里面有 收到快递费金额的设置功能，比如收到的运费高于什么金额，视为快递。否则就算收了快递费也视为普通包
 (完成)16. 国际件。对于非澳大利亚的订单，直接到国际件模块
 (完成)17. 收货人信息不全的，比如没有手机号，没有邮编等等
 

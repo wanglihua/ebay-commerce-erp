@@ -65,3 +65,21 @@ func Get_login_user_stock_list(db_session *xorm.Session, web_session revel.Sessi
 
 	return stock_list
 }
+
+//获取墨尔本仓库的 stock id
+func Get_mel_stock_id(db_session *xorm.Session) int64 {
+
+	var stock_id struct {
+		StockId int64 `xorm:"'stock_id'"`
+	}
+
+	/*
+	SELECT s.id AS stock_id FROM erp_stock s WHERE s.short_name = 'MEL' AND s.name LIKE '%墨尔本%';
+	 */
+
+	var sql = `SELECT s.id AS stock_id FROM erp_stock s WHERE s.short_name = 'MEL' AND s.name LIKE '%墨尔本%'`
+	_, err := db_session.Sql(sql).Get(&stock_id)
+	core.HandleError(err)
+
+	return stock_id.StockId
+}
