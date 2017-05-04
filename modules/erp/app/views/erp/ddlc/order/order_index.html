@@ -117,7 +117,9 @@
                 "status_list": [],
                 "query_criteria_id": 0,
                 "query_criteria_list": [],
-                "query_criteria_value": ""
+                "query_criteria_value": "",
+                "hold_type_list": [],
+                "holde_type_id": 0
             },
             "detail": {
                 "order": {}
@@ -325,8 +327,7 @@
                         aoData.push({'name': 'status_id', 'value': this_vm.page.status_id});
                         aoData.push({'name': 'query_criteria_id', 'value': this_vm.page.query_criteria_id});
                         aoData.push({'name': 'query_criteria_value', 'value': this_vm.page.query_criteria_value});
-
-                        //query_criteria_value
+                        aoData.push({'name': 'holde_type_id', 'value': this_vm.page.holde_type_id});
 
                         $.ajax({
                             "dataType": 'json',

@@ -946,7 +946,7 @@ func get_order_products_whole_logistics_data(p_order_logistics_data *order_logis
 	return whole_length, whole_width, whole_height, whole_dim_weight, whole_weight
 }
 
-// todo 合并订单的时候，如果某个订单被删除了，会不会下次同步的时候，又下载下来了
+// todo 合并订单的时候，如果某个订单被删除了，会不会下次同步的时候，又下载下来了。这样会不会引起混乱
 // 合并订单
 // order_filter: o.batch_code = '20170428120352'
 func Combine_orders(order_filter string, db_session *xorm.Session) error {
@@ -1009,9 +1009,11 @@ SET order_first.adjustment_amount     = s.adjustment_amount_sum,
     order_first.amount_saved          = s.amount_saved_sum,
     order_first.amount_saved_rmb      = s.amount_saved_sum * order_first.exchange_rate,
     order_first.total_amount          = s.total_amount_sum,
-    order_first.total_amount_rmb      = s.total_amount_sum * order_first.exchange_rate
+    order_first.total_amount_rmb      = s.total_amount_sum * order_first.exchange_rate,
+    order_first.type_id               = 0
 WHERE id = 0
 		 */
+		// 假设各订单的币种是一样的
 		var sql_sum_amount = `
 UPDATE erp_order order_first
     INNER JOIN (
@@ -1027,27 +1029,29 @@ SET order_first.adjustment_amount     = s.adjustment_amount_sum,
     order_first.amount_saved          = s.amount_saved_sum,
     order_first.amount_saved_rmb      = s.amount_saved_sum * order_first.exchange_rate,
     order_first.total_amount          = s.total_amount_sum,
-    order_first.total_amount_rmb      = s.total_amount_sum * order_first.exchange_rate
+    order_first.total_amount_rmb      = s.total_amount_sum * order_first.exchange_rate,
+    order_first.type_id               = %d
 WHERE id = %d`
-		sql_sum_amount = fmt.Sprintf(sql_sum_amount, order_ids.OrderIds, first_order_id)
+		sql_sum_amount = fmt.Sprintf(sql_sum_amount, order_ids.OrderIds, models.ORDER_TYPE_HBDD, first_order_id)
 		_, err := db_session.Exec(sql_sum_amount)
 		core.HandleError(err)
 
 		// 修改 order_id_item
 		var sql_update_order_item = `UPDATE erp_order_item SET order_id = %d WHERE order_id IN (%s)`
-		sql_update_order_item = fmt.Sprintf(sql_update_order_item, first_order_id, strings.Join(order_id_str_list[1:], ","))
+		sql_update_order_item = fmt.Sprintf(sql_update_order_item, first_order_id, strings.Join(order_id_str_list[1:], ",")) // 修改第一个订单之外的 order item
 		_, err = db_session.Exec(sql_update_order_item)
 		core.HandleError(err)
 
 		// 删除 shipping_address
 		var sql_delete_address = `DELETE FROM erp_order_shipping_address WHERE order_id IN (%s)`
-		sql_delete_address = fmt.Sprintf(sql_delete_address, strings.Join(order_id_str_list[1:], ","))
+		sql_delete_address = fmt.Sprintf(sql_delete_address, strings.Join(order_id_str_list[1:], ",")) // 修改第一个订单之外的 shipping address
 		_, err = db_session.Exec(sql_delete_address)
 		core.HandleError(err)
 
+		// todo 改成修改为一个特殊的状态？
 		// 删除 order
 		var sql_delete_order = `DELETE FROM erp_order WHERE id IN (%s)`
-		sql_delete_order = fmt.Sprintf(sql_delete_order, strings.Join(order_id_str_list[1:], ","))
+		sql_delete_order = fmt.Sprintf(sql_delete_order, strings.Join(order_id_str_list[1:], ",")) // 删除第一个之外的 order
 		_, err = db_session.Exec(sql_delete_order)
 		core.HandleError(err)
 	}

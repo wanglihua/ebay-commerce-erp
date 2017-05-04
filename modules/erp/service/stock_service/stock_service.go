@@ -66,7 +66,8 @@ func Get_login_user_stock_list(db_session *xorm.Session, web_session revel.Sessi
 	return stock_list
 }
 
-//获取墨尔本仓库的 stock id
+//获取墨尔本仓库的 stock id，这个函数后来没采用，用了这个 。stock_pick_crew_service.Is_pick_crew_has_mel_stock
+// deprecated
 func Get_mel_stock_id(db_session *xorm.Session) int64 {
 
 	var stock_id struct {
