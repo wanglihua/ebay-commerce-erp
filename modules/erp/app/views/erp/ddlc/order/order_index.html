@@ -13,7 +13,7 @@
         <div class="row">
             <div class="col-xs-12" style="padding: 0;">
                 <div class="gridToolBar clearfix">
-                    <button class="btn btn-primary btn-sm" @click="reloadList('#orderList')">
+                    <button class="btn btn-primary btn-sm" @click="search()">
                         <i class="ace-icon fa fa-refresh"></i>
                         刷新
                     </button>
@@ -25,36 +25,47 @@
                 <div class="row" style="margin-top: 20px;margin-bottom: 20px;">
                     <div id="query" class="col-xs-12" style="line-height: 28px;">
                         <div class="col-xs-12">
-                            <select id="shop_id" name="page.shop_id" v-model.number="page.shop_id" style="width: 120px;">
-                                <option value="0">-平台/店铺-</option>
-                                <template v-for="shop in page.shop_list">
-                                    <option :value="shop.id">{{shop.name}}</option>
+                            <div style="float: left;">
+                                <select id="shop_id" name="page.shop_id" v-model.number="page.shop_id" style="width: 120px;">
+                                    <option value="0">-平台/店铺-</option>
+                                    <template v-for="shop in page.shop_list">
+                                        <option :value="shop.id">{{shop.name}}</option>
+                                    </template>
+                                </select>
+                                <select id="order_type_id" name="page.order_type_id" v-model.number="page.order_type_id" style="width:120px;">
+                                    <option value="0">-订单类型-</option>
+                                    <template v-for="order_type in page.order_type_list">
+                                        <option :value="order_type.id">{{order_type.name}}</option>
+                                    </template>
+                                </select>
+                                {% if eq .status "all"%}
+                                <select id="status_id" name="page.status_id" v-model.number="page.status_id" style="width:120px;">
+                                    <option value="0">-订单状态-</option>
+                                    <template v-for="status in page.status_list">
+                                        <option :value="status.id">{{status.name}}</option>
+                                    </template>
+                                </select>
+                                {% end %}
+                                <select id="query_criteria_id" name="page.query_criteria_id" v-model.number="page.query_criteria_id" style="width:120px;">
+                                    <option value="0">-查询条件-</option>
+                                    <template v-for="criteria in page.query_criteria_list">
+                                        <option :value="criteria.id">{{criteria.name}}</option>
+                                    </template>
+                                </select>
+                                <input id="query_criteria_value" name="query_criteria_value" v-model="page.query_criteria_value" style="width: 120px;height:30px;"/>
+                                <button class="btn btn-mini btn-primary" style="margin-bottom:3px;height: 30px;" @click="search()">
+                                    &nbsp;<i class="ace-icon fa fa-search"></i>查&nbsp;询&nbsp;
+                                </button>
+                            </div>
+                            {% if .can_view_special_hold %}
+                            <div class="link_query_list" style="float: left;margin-left: 15px;margin-top: -3px;">
+                                <a :class="page.hold_type_id == 0 ? 'selected' : ''" href="#" @click="selectHoldType(0)"><img style="border: none;height: 24px;" src="/static/images/icons/all_check.png" class="link_icon" alt="全部"/>全部hold</a>
+                                <template v-for="hold_type in page.hold_type_list">
+                                    <a :class="page.hold_type_id == hold_type.id ? 'selected' : ''" href="#" @click="selectHoldType(hold_type.id)">&nbsp;<img style="border: none;height: 24px;" v-if="hold_type.icon_file != ''" :src="'{%.icon_path%}/' + hold_type.icon_file" :alt="hold_type.name" class="link_icon"/>{{hold_type.name}}</a>
                                 </template>
-                            </select>
-                            <select id="order_type_id" name="page.order_type_id" v-model.number="page.order_type_id" style="width:120px;">
-                                <option value="0">-订单类型-</option>
-                                <template v-for="order_type in page.order_type_list">
-                                    <option :value="order_type.id">{{order_type.name}}</option>
-                                </template>
-                            </select>
-                            {% if eq .status "all"%}
-                            <select id="status_id" name="page.status_id" v-model.number="page.status_id" style="width:120px;">
-                                <option value="0">-订单状态-</option>
-                                <template v-for="status in page.status_list">
-                                    <option :value="status.id">{{status.name}}</option>
-                                </template>
-                            </select>
+                            </div>
                             {% end %}
-                            <select id="query_criteria_id" name="page.query_criteria_id" v-model.number="page.query_criteria_id" style="width:120px;">
-                                <option value="0">-查询条件-</option>
-                                <template v-for="criteria in page.query_criteria_list">
-                                    <option :value="criteria.id">{{criteria.name}}</option>
-                                </template>
-                            </select>
-                            <input id="query_criteria_value" name="query_criteria_value" v-model="page.query_criteria_value" style="width: 120px;height:30px;"/>
-                            <button class="btn btn-mini btn-primary" style="margin-bottom:3px;height: 30px;" @click="search()">
-                                &nbsp;<i class="ace-icon fa fa-search"></i>查&nbsp;询&nbsp;
-                            </button>
+                            <div style="clear: both;"></div>
                         </div>
                     </div>
                 </div>
@@ -119,7 +130,7 @@
                 "query_criteria_list": [],
                 "query_criteria_value": "",
                 "hold_type_list": [],
-                "holde_type_id": 0
+                "hold_type_id": -1
             },
             "detail": {
                 "order": {}
@@ -327,7 +338,7 @@
                         aoData.push({'name': 'status_id', 'value': this_vm.page.status_id});
                         aoData.push({'name': 'query_criteria_id', 'value': this_vm.page.query_criteria_id});
                         aoData.push({'name': 'query_criteria_value', 'value': this_vm.page.query_criteria_value});
-                        aoData.push({'name': 'holde_type_id', 'value': this_vm.page.holde_type_id});
+                        aoData.push({'name': 'hold_type_id', 'value': this_vm.page.hold_type_id});
 
                         $.ajax({
                             "dataType": 'json',
@@ -437,8 +448,13 @@
                 reloadList("#orderList");
             },
             search: function () {
+                vm.page.hold_type_id = -1;
                 var tables = $("#orderList").dataTable().api();
                 tables.draw(true);
+            },
+            selectHoldType: function (selected_hold_type_id) {
+                vm.page.hold_type_id = selected_hold_type_id;
+                vm.refreshList();
             }
         }
     });

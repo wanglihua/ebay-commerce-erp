@@ -15,13 +15,14 @@ import (
 	"matrix/modules/erp/service/paypal_service"
 	"matrix/modules/erp/service/shop_service"
 	"matrix/modules/erp/service/stock_pick_crew_service"
+	"matrix/modules/erp/setting"
 )
 
 type ErpOrder struct {
 	*revel.Controller
 }
 
-var special_hold_type_id_list = []int64{models.ORDER_HOLD_TYPE_ENVELOPE, models.ORDER_HOLD_TYPE_EXPRESS, models.ORDER_HOLD_TYPE_INTERNATIONAL}
+var special_hold_type_id_list = []int64{models.ORDER_HOLD_TYPE_ENVELOPE, models.ORDER_HOLD_TYPE_EXPRESS, models.ORDER_HOLD_TYPE_INTERNATIONAL, models.ORDER_HOLD_TYPE_PICK_UP}
 
 func (c ErpOrder) Index(status string) revel.Result {
 	var db_session = c.DbSession
@@ -78,16 +79,13 @@ func (c ErpOrder) Index(status string) revel.Result {
 	}
 
 	// 如果是待配货状态，除了显示待配货状态的订单外，还要显示特殊 hold 类型的 hold 状态的订单，但如果是只有仓库拣货人员的权限的话，就只能由墨尔本仓库的拣货人员来查看
-
-	var display_hold_type_list = false
-	if can_view_special_hold(status_id, c.Session, db_session) { // 不是 待配货状态， 或者是 待配货状态，但只是一般拣货人员的权限, 也不是墨尔本仓库的拣货人员
-		display_hold_type_list = true
-	}
+	var can_view_special_hold = can_view_special_hold(status_id, c.Session, db_session)
 
 	c.RenderArgs["active_menu_html"] = template.HTML(active_menu_html)
 	c.RenderArgs["status"] = status
 	c.RenderArgs["status_chinese_name"] = status_chinese_name
-	c.RenderArgs["display_hold_type_list"] = display_hold_type_list
+	c.RenderArgs["can_view_special_hold"] = can_view_special_hold
+	c.RenderArgs["icon_path"] = setting.ICON_PATH
 	return c.RenderTemplate("erp/ddlc/order/order_index.html")
 }
 
@@ -145,7 +143,7 @@ func (c ErpOrder) PageData() revel.Result {
 		"query_criteria_id":   0,
 		"query_criteria_list": c.get_order_query_criteria_list(),
 		"hold_type_list":      special_hold_type_list,
-		"hold_type_id":        0,
+		"hold_type_id":        -1, // 表示不选择 hold
 	})
 }
 
@@ -278,8 +276,13 @@ func (c ErpOrder) ListData() revel.Result {
 		}
 	}
 
-	if hold_type_id != 0 {
+	// -1 表示不选中任何 hold
+	if hold_type_id != 0 && hold_type_id != -1 {
 		filter = core.SqlAnd(filter, fmt.Sprintf("o.hold_type_id = %d", hold_type_id))
+	}
+
+	if hold_type_id == 0 { // 表示全选全部的 hold
+		filter = core.SqlAnd(filter, fmt.Sprintf("o.status_id = %d OR o.hold_type_id IN (%s)", models.ORDER_STATUS_HOLD, strings.Join(core.Int_list_to_str_list(special_hold_type_id_list), ",")))
 	}
 
 	order_list, count := order_service.Get_order_data_list(db_session, filter, order, offset, limit)
