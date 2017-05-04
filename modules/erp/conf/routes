@@ -136,6 +136,7 @@ POST /erp/product/import/data/page             ErpProductImport.PageData
 POST /erp/product/import/data/list             ErpProductImport.ListData
 POST /erp/product/import/delete                ErpProductImport.Delete
 POST /erp/product/import/batch/delete          ErpProductImport.BatchDelete
+POST /erp/product/import/upload                ErpProductImport.Upload
 
 GET  /erp/product/export                       ErpProductExport.Index
 POST /erp/product/export/data/list             ErpProductExport.ListData

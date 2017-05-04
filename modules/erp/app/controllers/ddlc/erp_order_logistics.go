@@ -115,6 +115,8 @@ WHERE ol.stock_id = 0 AND ol.company_id = 0
 	sb.From(`erp_order_logistics ol
     INNER JOIN erp_order o ON o.id = ol.order_id`)
 
+	filter = core.SqlAnd(filter, fmt.Sprintf("o.status_id <> %d", models.ORDER_STATUS_HOLD))
+
 	if stock_id != 0 {
 		// 这里是查询上的对仓库的限制，如果是拣货人员的话，下面还有是不是这个仓库的拣货人员的限制
 		filter = core.SqlAnd(filter, fmt.Sprintf("ol.stock_id = %d", stock_id))

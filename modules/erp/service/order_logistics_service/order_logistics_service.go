@@ -323,32 +323,7 @@ func (p_ol *OrderLogistics) hold_check_address_special_word(p_order *models.Orde
 			}
 		}
 	}
-
-	/*
-	可以采用上面的更高效的方式，这里就不用这种低效的每次都访问数据库的方式
-	if has_address_special_word == true {
-		// 检查匹配的物流方式对应的物流公司是不是 需要考虑 地址特殊字段的
-		var company_address_special_word struct {
-			AddressSpecialWord int64 `xorm:"'address_special_word'"`
-		}
-
-		sql := `SELECT lc.address_special_word
-FROM erp_order_logistics ol
-    INNER JOIN erp_logistics_mode lm ON lm.id = ol.mode_id AND ol.id = %[1]d
-    INNER JOIN erp_logistics_company lc ON lc.id = lm.company_id
-WHERE ol.id = %[1]d`
-		sql = fmt.Sprintf(sql, order_logistics.Id)
-
-		_, err := db_session.Sql(sql).Get(&company_address_special_word)
-		core.HandleError(err)
-
-		if company_address_special_word.AddressSpecialWord == 0 { // 地址有特殊字段的。比如 PO BOX, LOCKER。但最佳物流   “ 非“   AU POST的，需要在基础设置里面有特殊字段设置功能
-			p_ol.update_order_to_hold_type(p_order, models.ORDER_HOLD_TYPE_SPECIAL_ADDRESS, db_session)
-			return true
-		}
-	}
-	*/
-
+	
 	// 不符合 地址有特殊字段的，但最佳物流 “ 非“ AU POST的
 	return false
 }
@@ -534,7 +509,7 @@ func (p_ol *OrderLogistics) hold_check_envelope(p_order *models.OrderInfo, p_ord
 
 	if whole_length <= envelope_max_length && whole_width <= envelope_max_width && whole_height <= envelope_max_height && whole_weight <= envelope_max_weight {
 		p_ol.update_order_to_hold_type(p_order, models.ORDER_HOLD_TYPE_ENVELOPE, db_session)
-		// todo 匹配具体信封费率
+		// 匹配具体信封费率
 		var final_fee_rate_id int64 = 0
 		var final_fee float64 = math.MaxFloat64
 		var envelope_fee_rate_list = p_ol.envelope_fee_rate_list // 已经按费用从小到大排序好了
@@ -992,6 +967,3 @@ func get_order_products_whole_logistics_data(p_order_logistics_data *order_logis
 (完成)17. 收货人信息不全的，比如没有手机号，没有邮编等等
 
  */
-
-//todo: 地址特殊字段的问题，与最后匹配的最佳物流方式有关
-//todo: 体积重 实际重 比值的问题，可以继续关注，虽然感觉是理解的是对的，就是要确认
