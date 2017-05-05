@@ -137,7 +137,7 @@ func get_ip_location(ip_address string) string {
 		// 有时网络不通什么的，课内
 		if err := recover(); err != nil {
 			revel.ERROR.Println(err)
-			revel.ERROR.Println(string(debug.Stack()))
+			// revel.ERROR.Println(string(debug.Stack()))
 		}
 	}()
 
