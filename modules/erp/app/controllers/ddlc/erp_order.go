@@ -458,7 +458,7 @@ func (c ErpOrder) PeiHuo() revel.Result {
 
 	for _, order := range order_list {
 		order.StatusId = models.ORDER_STATUS_PHZ
-		_, err = db_session.Cols("status_id").Update(&order)
+		_, err = db_session.Id(order.Id).Cols("status_id").Update(&order)
 		core.HandleError(err)
 	}
 
@@ -491,7 +491,7 @@ func (c ErpOrder) FaHuo() revel.Result {
 
 	for _, order := range order_list {
 		order.StatusId = models.ORDER_STATUS_YFH
-		_, err = db_session.Cols("status_id").Update(&order)
+		_, err = db_session.Id(order.Id).Cols("status_id").Update(&order)
 		core.HandleError(err)
 	}
 
@@ -525,7 +525,7 @@ func (c ErpOrder) ShiJiWuHuo() revel.Result {
 	for _, order := range order_list {
 		order.StatusId = models.ORDER_STATUS_HOLD
 		order.HoldTypeId = core.MakeNullInt(models.ORDER_HOLD_TYPE_OOS_ACTUAL_STOCK, true)
-		_, err = db_session.Cols("status_id", "hold_type_id").Update(&order)
+		_, err = db_session.Id(order.Id).Cols("status_id", "hold_type_id").Update(&order)
 		core.HandleError(err)
 	}
 
@@ -558,7 +558,7 @@ func (c ErpOrder) WanCheng() revel.Result {
 
 	for _, order := range order_list {
 		order.StatusId = models.ORDER_STATUS_YWC
-		_, err = db_session.Cols("status_id").Update(&order)
+		_, err = db_session.Id(order.Id).Cols("status_id").Update(&order)
 		core.HandleError(err)
 	}
 

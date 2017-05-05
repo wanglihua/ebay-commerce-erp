@@ -21,6 +21,28 @@
                         <i class="ace-icon fa fa-plus"></i>
                         新增
                     </button>
+                    {% if eq .status "dph" %}
+                    <button class="btn btn-purple btn-sm" @click="peiHuo()">
+                        <i class="ace-icon fa fa-shopping-basket"></i>
+                        配货
+                    </button>
+                    {% end %}
+                    {% if eq .status "phz" %}
+                    <button class="btn btn-purple btn-sm" @click="faHuo()">
+                        <i class="ace-icon fa fa-shopping-basket"></i>
+                        发货
+                    </button>
+                    <button class="btn btn-pink btn-sm" @click="shiJiWuHuo()">
+                        <i class="ace-icon fa fa-shopping-basket"></i>
+                        实际无货
+                    </button>
+                    {% end %}
+                    {% if eq .status "yfh" %}
+                    <button class="btn btn-purple btn-sm" @click="wanCheng()">
+                        <i class="ace-icon fa fa-shopping-basket"></i>
+                        完成
+                    </button>
+                    {% end %}
                 </div>
                 <div class="row" style="margin-top: 20px;margin-bottom: 20px;">
                     <div id="query" class="col-xs-12" style="line-height: 28px;">
@@ -454,6 +476,130 @@
             selectHoldType: function (selected_hold_type_id) {
                 vm.page.hold_type_id = selected_hold_type_id;
                 vm.refreshList();
+            },
+            peiHuo: function() {
+                var id_list = [];
+                $('#orderList tbody tr>td:first-child input:checkbox').each(function () {
+                    if (this.checked) {
+                        id_list.push($(this).val());
+                    }
+                });
+
+                if (id_list.length === 0) {
+                    $.msg.alert("请选择数据！");
+                    return;
+                }
+
+                $.msg.confirm("确认要配货吗？", function () {
+                    $.ajax({
+                        url: '{%url "ErpOrder.PeiHuo"%}',
+                        type: "POST",
+                        data: {"id_list": id_list},
+                        success: function (data) {
+                            if (data.success === false) {
+                                $.msg.error(data.message);
+                                return;
+                            }
+                            else {
+                                $.msg.show(data.message);
+                            }
+                            vm.reloadList();
+                        }
+                    });
+                });
+            },
+            faHuo: function() {
+                var id_list = [];
+                $('#orderList tbody tr>td:first-child input:checkbox').each(function () {
+                    if (this.checked) {
+                        id_list.push($(this).val());
+                    }
+                });
+
+                if (id_list.length === 0) {
+                    $.msg.alert("请选择数据！");
+                    return;
+                }
+
+                $.msg.confirm("确认要发货吗？", function () {
+                    $.ajax({
+                        url: '{%url "ErpOrder.FaHuo"%}',
+                        type: "POST",
+                        data: {"id_list": id_list},
+                        success: function (data) {
+                            if (data.success === false) {
+                                $.msg.error(data.message);
+                                return;
+                            }
+                            else {
+                                $.msg.show(data.message);
+                            }
+                            vm.reloadList();
+                        }
+                    });
+                });
+            },
+            shiJiWuHuo: function() {
+                var id_list = [];
+                $('#orderList tbody tr>td:first-child input:checkbox').each(function () {
+                    if (this.checked) {
+                        id_list.push($(this).val());
+                    }
+                });
+
+                if (id_list.length === 0) {
+                    $.msg.alert("请选择数据！");
+                    return;
+                }
+
+                $.msg.confirm("确认要设置实际无货吗？", function () {
+                    $.ajax({
+                        url: '{%url "ErpOrder.ShiJiWuHuo"%}',
+                        type: "POST",
+                        data: {"id_list": id_list},
+                        success: function (data) {
+                            if (data.success === false) {
+                                $.msg.error(data.message);
+                                return;
+                            }
+                            else {
+                                $.msg.show(data.message);
+                            }
+                            vm.reloadList();
+                        }
+                    });
+                });
+            },
+            wanCheng: function() {
+                var id_list = [];
+                $('#orderList tbody tr>td:first-child input:checkbox').each(function () {
+                    if (this.checked) {
+                        id_list.push($(this).val());
+                    }
+                });
+
+                if (id_list.length === 0) {
+                    $.msg.alert("请选择数据！");
+                    return;
+                }
+
+                $.msg.confirm("确认要设置完成吗？", function () {
+                    $.ajax({
+                        url: '{%url "ErpOrder.WanCheng"%}',
+                        type: "POST",
+                        data: {"id_list": id_list},
+                        success: function (data) {
+                            if (data.success === false) {
+                                $.msg.error(data.message);
+                                return;
+                            }
+                            else {
+                                $.msg.show(data.message);
+                            }
+                            vm.reloadList();
+                        }
+                    });
+                });
             }
         }
     });
