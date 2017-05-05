@@ -313,6 +313,11 @@ POST /erp/order/paypal/shipping/address        ErpOrder.GetPaypalShippingAddress
 # GET  /erp/order/ywc                            ErpOrderYwc.Index
 # GET  /erp/order/khb                            ErpOrderKhb.Index
 
+POST /erp/order/pei/huo                        ErpOrder.PeiHuo
+POST /erp/order/fa/huo                         ErpOrder.FaHuo
+POST /erp/order/shi/ji/wu/huo                  ErpOrder.ShiJiWuHuo
+POST /erp/order/wan/cheng                      ErpOrder.WanCheng
+
 GET  /erp/order/logistics                      ErpOrderLogistics.Index
 POST /erp/order/logistics/data/page            ErpOrderLogistics.PageData
 POST /erp/order/logistics/data/list            ErpOrderLogistics.ListData

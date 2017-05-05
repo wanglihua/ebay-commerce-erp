@@ -429,3 +429,141 @@ func (c ErpOrder) GetPaypalShippingAddress() revel.Result {
 		"shipping_address": shipping_address,
 	})
 }
+
+func (c ErpOrder) PeiHuo() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_DPH, c.Session)
+
+	db_session := c.DbSession
+
+	order_id_list := make([]int64, 0)
+	c.Params.Bind(&order_id_list, "id_list")
+
+	var order_list = make([]models.OrderInfo, 0)
+	err := db_session.In("id", order_id_list).Find(&order_list)
+	core.HandleError(err)
+
+	for _, order := range order_list {
+		if order.StatusId != models.ORDER_STATUS_DPH &&
+			(!(order.StatusId == models.ORDER_STATUS_HOLD && order.HoldTypeId.Valid &&
+				(order.HoldTypeId.Int64 == models.ORDER_HOLD_TYPE_ENVELOPE ||
+					order.HoldTypeId.Int64 == models.ORDER_HOLD_TYPE_EXPRESS ||
+					order.HoldTypeId.Int64 == models.ORDER_HOLD_TYPE_INTERNATIONAL ||
+					order.HoldTypeId.Int64 == models.ORDER_HOLD_TYPE_PICK_UP))) {
+			return c.RenderJson(map[string]interface{}{
+				"success": false,
+				"message": "订单当前状态不能配货！",
+			})
+		}
+	}
+
+	for _, order := range order_list {
+		order.StatusId = models.ORDER_STATUS_PHZ
+		_, err = db_session.Cols("status_id").Update(&order)
+		core.HandleError(err)
+	}
+
+	return c.RenderJson(map[string]interface{}{
+		"success": true,
+		"message": "订单配货成功！",
+	})
+}
+
+func (c ErpOrder) FaHuo() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_PHZ, c.Session)
+
+	db_session := c.DbSession
+
+	order_id_list := make([]int64, 0)
+	c.Params.Bind(&order_id_list, "id_list")
+
+	var order_list = make([]models.OrderInfo, 0)
+	err := db_session.In("id", order_id_list).Find(&order_list)
+	core.HandleError(err)
+
+	for _, order := range order_list {
+		if order.StatusId != models.ORDER_STATUS_PHZ {
+			return c.RenderJson(map[string]interface{}{
+				"success": false,
+				"message": "订单当前状态不能发货！",
+			})
+		}
+	}
+
+	for _, order := range order_list {
+		order.StatusId = models.ORDER_STATUS_YFH
+		_, err = db_session.Cols("status_id").Update(&order)
+		core.HandleError(err)
+	}
+
+	return c.RenderJson(map[string]interface{}{
+		"success": true,
+		"message": "订单发货成功！",
+	})
+}
+
+func (c ErpOrder) ShiJiWuHuo() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_PHZ, c.Session)
+
+	db_session := c.DbSession
+
+	order_id_list := make([]int64, 0)
+	c.Params.Bind(&order_id_list, "id_list")
+
+	var order_list = make([]models.OrderInfo, 0)
+	err := db_session.In("id", order_id_list).Find(&order_list)
+	core.HandleError(err)
+
+	for _, order := range order_list {
+		if order.StatusId != models.ORDER_STATUS_PHZ {
+			return c.RenderJson(map[string]interface{}{
+				"success": false,
+				"message": "订单当前状态不能设置实际无货！",
+			})
+		}
+	}
+
+	for _, order := range order_list {
+		order.StatusId = models.ORDER_STATUS_HOLD
+		order.HoldTypeId = core.MakeNullInt(models.ORDER_HOLD_TYPE_OOS_ACTUAL_STOCK, true)
+		_, err = db_session.Cols("status_id", "hold_type_id").Update(&order)
+		core.HandleError(err)
+	}
+
+	return c.RenderJson(map[string]interface{}{
+		"success": true,
+		"message": "订单设置实际无货成功！",
+	})
+}
+
+func (c ErpOrder) WanCheng() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_YFH, c.Session)
+
+	db_session := c.DbSession
+
+	order_id_list := make([]int64, 0)
+	c.Params.Bind(&order_id_list, "id_list")
+
+	var order_list = make([]models.OrderInfo, 0)
+	err := db_session.In("id", order_id_list).Find(&order_list)
+	core.HandleError(err)
+
+	for _, order := range order_list {
+		if order.StatusId != models.ORDER_STATUS_YFH {
+			return c.RenderJson(map[string]interface{}{
+				"success": false,
+				"message": "订单当前状态不能设置完成！",
+			})
+		}
+	}
+
+	for _, order := range order_list {
+		order.StatusId = models.ORDER_STATUS_YWC
+		_, err = db_session.Cols("status_id").Update(&order)
+		core.HandleError(err)
+	}
+
+	return c.RenderJson(map[string]interface{}{
+		"success": true,
+		"message": "订单完成成功！",
+	})
+}
