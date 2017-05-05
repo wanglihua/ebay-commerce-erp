@@ -32,6 +32,9 @@ POST /erp/supplier/data/detail                 ErpSupplier.DetailData
 POST /erp/supplier/save                        ErpSupplier.Save
 POST /erp/supplier/delete                      ErpSupplier.Delete
 
+POST /erp/region/province/list                 ErpRegion.GetProvinceList
+POST /erp/region/city/list                     ErpRegion.GetCityList
+
 GET  /erp/exchange/rate                        ErpExchangeRate.Index
 POST /erp/exchange/rate/data/list              ErpExchangeRate.ListData
 POST /erp/exchange/rate/data/detail            ErpExchangeRate.DetailData
