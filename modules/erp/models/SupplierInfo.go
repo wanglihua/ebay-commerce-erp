@@ -12,6 +12,7 @@ type SupplierInfo struct {
 	Address     core.NullString `xorm:"nvarchar(200) 'address'" json:"address" smith:"verbose_name=地址,min=2,max=200"`
 	Phone       core.NullString `xorm:"nvarchar(200) 'phone'" json:"phone" smith:"verbose_name=电话,min=2,max=100"`
 	Desc        core.NullString `xorm:"nvarchar(500) 'desc'" json:"desc" smith:"verbose_name=描述,max=500"`
+	RegionId    int64           `xorm:"bigint notnull 'region_id'" json:"region_id" smith:"verbose_name=区域,max=500"`
 	CreateTime  core.Time       `xorm:"created notnull 'create_time'" json:"create_time"`
 	UpdateTime  core.Time       `xorm:"updated notnull 'update_time'" json:"update_time"`
 	Version     int             `xorm:"version notnull 'version'" json:"version"`

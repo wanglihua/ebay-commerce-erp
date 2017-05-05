@@ -1,5 +1,7 @@
 package models
 
+const REGION_ROOT_ID = 1
+
 type RegionInfo struct {
 	Id       int64       `xorm:"bigint notnull pk autoincr 'id'" json:"id"`
 	Code     string      `xorm:"nvarchar(40) notnull 'code'" json:"code"`
