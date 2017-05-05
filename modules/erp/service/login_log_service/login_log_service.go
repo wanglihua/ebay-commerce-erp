@@ -133,15 +133,20 @@ func Remove_user_from_online(web_session revel.Session) {
 }
 
 func get_ip_location(ip_address string) string {
+	defer func() {
+		// 有时网络不通什么的，课内
+		if err := recover(); err != nil {
+			revel.ERROR.Println(err)
+			revel.ERROR.Println(string(debug.Stack()))
+		}
+	}()
+
 	//http://freeapi.ipip.net/120.151.39.56
 	var url = fmt.Sprintf("http://freeapi.ipip.net/%s", ip_address)
 	var location_script = requests.Get(url)
 	var location_list = make([]string, 0)
 	err := json.Unmarshal([]byte(location_script), &location_list)
-	if err != nil {
-		revel.ERROR.Println(err)
-		revel.ERROR.Println(string(debug.Stack()))
-	}
+	core.HandleError(err)
 
 	// 去掉空白的项
 	var location_list_no_empty = make([]string, 0)
