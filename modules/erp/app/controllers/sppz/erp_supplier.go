@@ -9,6 +9,7 @@ import (
 	"matrix/modules/auth/pass_res"
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/erp/models"
+	"matrix/modules/erp/service/region_service"
 )
 
 type ErpSupplier struct {
@@ -53,7 +54,12 @@ func (c ErpSupplier) ListData() revel.Result {
 }
 
 type SupplierDetailForm struct {
-	Supplier models.SupplierInfo `json:"supplier"`
+	Supplier       models.SupplierInfo       `json:"supplier"`
+	RegionFullName string                    `json:"region_full_name"`
+	ProvinceId     string                    `json:"province_id"`
+	ProvinceList   []region_service.Region_t `json:"province_list"`
+	CityList       []region_service.Region_t `json:"city_list"`
+	// city_id 就是 supplier 中的 region_id
 }
 
 func (f *SupplierDetailForm) IsCreate() bool {
