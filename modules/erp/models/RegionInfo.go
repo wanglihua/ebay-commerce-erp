@@ -6,7 +6,7 @@ type RegionInfo struct {
 	Province string      `xorm:"nvarchar(40) notnull 'province'" json:"province"`
 	City     string      `xorm:"nvarchar(40) notnull 'city'" json:"city"`
 	District string      `xorm:"nvarchar(40) notnull 'district'" json:"district"`
-	Parent   string      `xorm:"nvarchar(40) notnull 'parent'" json:"parent"`
+	Parent   int64       `xorm:"bigint notnull 'parent'" json:"parent"`
 }
 
 func (e RegionInfo) TableName() string {
