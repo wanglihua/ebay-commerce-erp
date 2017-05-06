@@ -128,6 +128,13 @@ func (t EBayOrderDownloadTask) Run() {
 			order_list := response.OrdersArray.Orders
 
 			for _, order_download := range order_list {
+				order_status := order_download.OrderStatus
+
+				// 如果是已完成的订单，就忽略
+				if strings.ToLower(order_status) == strings.ToLower("Completed") {
+					continue
+				}
+
 				order_code := order_download.OrderID // 已付款的 282359220529-1651978360018, 未付款的 282387576804-0
 				order_code_split_str_list := strings.Split(order_code, "-")
 				order_code_min_length := 13
@@ -260,7 +267,6 @@ func (t EBayOrderDownloadTask) Run() {
 				// 订单状态，这部分逻辑还可以继续探讨，判断状态的时候用到了前面已经设置的 order_in_db的状态，所以这段代码不能放到前面去的
 
 				// 订单状态 设置 开始
-				order_status := order_download.OrderStatus
 				order_in_db.EBayStatus = order_status
 				order_status_id := order_in_db.StatusId
 
