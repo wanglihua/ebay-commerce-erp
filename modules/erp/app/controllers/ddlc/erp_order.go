@@ -16,6 +16,7 @@ import (
 	"matrix/modules/erp/service/shop_service"
 	"matrix/modules/erp/service/stock_pick_crew_service"
 	"matrix/modules/erp/setting"
+	"matrix/modules/erp/service/order_logistics_service"
 )
 
 type ErpOrder struct {
@@ -427,6 +428,28 @@ func (c ErpOrder) GetPaypalShippingAddress() revel.Result {
 
 	return c.RenderJson(map[string]interface{}{
 		"shipping_address": shipping_address,
+	})
+}
+
+func (c ErpOrder) MatchLogistics() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_DPH, c.Session)
+
+	var db_session = c.DbSession
+
+	var p_order_logistics = new(order_logistics_service.OrderLogistics)
+	err := p_order_logistics.CalculateListPaidOrders(db_session)
+
+	// core.HandleError(err)
+	if err != nil {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": err.Error(),
+		})
+	}
+
+	return c.RenderJson(map[string]interface{}{
+		"success": true,
+		"message": "批次匹配物流完成！",
 	})
 }
 

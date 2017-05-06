@@ -59,6 +59,9 @@ func (t OrderLogisticsMatchTask) Run() {
 	core.HandleError(err)
 
 	if len(paid_download_order_list) != 0 {
+		err = order_logistics_service.Combine_orders(fmt.Sprintf("o.type_id <> %d AND o.status_id = %d", models.ORDER_TYPE_DRDD, models.ORDER_STATUS_YZF), db_session)
+		core.HandleError(err)
+
 		var order_logistics order_logistics_service.OrderLogistics
 		err = order_logistics.CalculateList(paid_download_order_list, db_session)
 		core.HandleError(err)

@@ -305,6 +305,9 @@ GET  /erp/order/khb                            ErpOrderKhb.Index
 GET  /erp/order/detail/:order_id               ErpOrder.Detail
 POST /erp/order/data/detail                    ErpOrder.DetailData
 POST /erp/order/paypal/shipping/address        ErpOrder.GetPaypalShippingAddress
+POST /erp/order/match/logistics                ErpOrder.MatchLogistics
+
+# MatchLogistics
 # GET  /erp/order/all                            ErpOrderAll.Index
 # GET  /erp/order/yzf                            ErpOrderYzf.Index
 # GET  /erp/order/dph                            ErpOrderDph.Index

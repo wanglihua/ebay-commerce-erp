@@ -110,6 +110,9 @@ func (p_ol *OrderLogistics) CalculateListPaidOrders(db_session *xorm.Session) er
 		}
 	}
 
+	err := Combine_orders(fmt.Sprintf("o.status_id = %d", models.ORDER_STATUS_YZF), db_session)
+	core.HandleError(err)
+
 	return p_ol.CalculateList(order_list, db_session)
 }
 
@@ -136,6 +139,9 @@ SELECT o.* FROM erp_order o WHERE o.batch_code = 0
 			return errors.New("订单状态为已支付状态的，才能匹配物流！")
 		}
 	}
+
+	err = Combine_orders(fmt.Sprintf("o.batch_code = %d", batch_code), db_session)
+	core.HandleError(err)
 
 	return p_ol.CalculateList(order_list, db_session)
 }

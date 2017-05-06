@@ -22,6 +22,10 @@
                         新增
                     </button>
                     {% if eq .status "dph" %}
+                    <button class="btn btn-purple btn-sm" @click="matchLogistics()">
+                        <i class="ace-icon fa fa-truck"></i>
+                        匹配物流
+                    </button>
                     <button class="btn btn-purple btn-sm" @click="peiHuo()">
                         <i class="ace-icon fa fa-shopping-basket"></i>
                         配货
@@ -466,7 +470,7 @@
                 reloadList('#orderList');
             },
             refreshList: function () {
-                reloadList("#orderList");
+                refreshList("#orderList");
             },
             search: function () {
                 vm.page.hold_type_id = -1;
@@ -476,6 +480,28 @@
             selectHoldType: function (selected_hold_type_id) {
                 vm.page.hold_type_id = selected_hold_type_id;
                 vm.refreshList();
+            },
+            matchLogistics: function () {
+                $.msg.confirm("确认要对所有未付款订单匹配物流吗？", function () {
+                    showMask("物流匹配中，请稍候...");
+                    $.ajax({
+                        url: '{%url "ErpOrder.MatchLogistics"%}',
+                        type: "POST",
+                        data: {"batch_code": vm.page.batch_code},
+                        success: function (data) {
+                            hideMask();
+                            if (data.success == false) {
+                                $.msg.error(data.message);
+                                return;
+                            }
+                            else {
+                                $.msg.show(data.message);
+                            }
+
+                            vm.reloadList();
+                        }
+                    });
+                });
             },
             peiHuo: function() {
                 var id_list = [];
