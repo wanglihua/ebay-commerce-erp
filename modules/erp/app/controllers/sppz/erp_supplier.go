@@ -55,8 +55,7 @@ func (c ErpSupplier) ListData() revel.Result {
 
 type SupplierDetailForm struct {
 	Supplier       models.SupplierInfo       `json:"supplier"`
-	RegionFullName string                    `json:"region_full_name"`
-	ProvinceId     string                    `json:"province_id"`
+	ProvinceId     int64                     `json:"province_id"`
 	ProvinceList   []region_service.Region_t `json:"province_list"`
 	CityList       []region_service.Region_t `json:"city_list"`
 	// city_id 就是 supplier 中的 region_id
@@ -115,6 +114,10 @@ func (c ErpSupplier) DetailData() revel.Result {
 	var supplier_id int64
 	c.Params.Bind(&supplier_id, "id")
 
+	var detail_form SupplierDetailForm
+	var province_list = region_service.Get_province_list(db_session)
+	detail_form.ProvinceList = province_list
+
 	var supplier models.SupplierInfo
 	if supplier_id != 0 {
 		has, err := db_session.Id(supplier_id).Get(&supplier)
@@ -122,9 +125,14 @@ func (c ErpSupplier) DetailData() revel.Result {
 		if has == false {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "指定的供应商不存在！"})
 		}
+
+		var province_id = region_service.Get_region_parent_id(supplier.RegionId, db_session)
+		detail_form.ProvinceId = province_id
+
+		var city_list = region_service.Get_city_list(province_id, db_session)
+		detail_form.CityList = city_list
 	}
 
-	var detail_form SupplierDetailForm
 	detail_form.Supplier = supplier
 
 	return c.RenderJson(detail_form)

@@ -33,7 +33,7 @@
         </div>
     </div>
     <div class="modal fade" id="supplierDetailDialog">
-        <div class="modal-dialog" style="width: 480px;">
+        <div class="modal-dialog" style="width: 580px;">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="True">&times;</button>
@@ -92,6 +92,27 @@
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
+                                            <label for="region" class="col-xs-2 control-label">区域</label>
+                                            <div class="col-xs-10">
+                                                <select id="province" name="detail.province_id" class="input-sm pull-left" style="width:48%;" @change="getCityList()" v-model="detail.province_id">
+                                                    <template v-for="province in detail.province_list">
+                                                        <option :value="province.id">{{province.name}}</option>
+                                                    </template>
+                                                </select>
+                                                <select id="region" name="detail.supplier.region_id" class="input-sm pull-right" style="width:48%;" v-model="detail.supplier.region_id">
+                                                    <template v-for="city in detail.city_list">
+                                                        <option :value="city.id">{{city.name}}</option>
+                                                    </template>
+                                                </select>
+                                                <div style="clear: both;"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
                                             <label for="address" class="col-xs-2 control-label">地址</label>
                                             <div class="col-xs-10">
                                                 <textarea id="address" name="detail.supplier.address" rows="2" class="input-sm form-control" v-model="detail.supplier.address"></textarea>
@@ -132,7 +153,11 @@
         el: "#page",
         data: {
             "detail": {
-                "supplier": {}
+                "supplier": {},
+                "region_full_name": "",
+                "province_id": 0,
+                "province_list": [],
+                "city_list": []
             }
         },
         mounted: function () {
@@ -264,7 +289,7 @@
                         type: "POST",
                         data: {"id_list": id_list},
                         success: function (data) {
-                            if (data.success == false) {
+                            if (data.success === false) {
                                 $.msg.error(data.message);
                                 return;
                             }
@@ -275,9 +300,43 @@
                         }
                     });
                 });
+            },
+            getCityList: function () {
+                $.ajax({
+                    url: '{%url "ErpRegion.GetCityList"%}',
+                    type: "POST",
+                    data: {"province": vm.detail.province_id},
+                    success: function (data) {
+                        if (data.success === false) {
+                            $.msg.error(data.message);
+                            return;
+                        }
+                        else {
+                            vm.detail.city_list = data.city_list;
+                            vm.detail.region_full_name = "";
+                            return;
+                        }
+                    }
+                });
+            },
+            getRegionFullName: function () {
+                $.ajax({
+                    url: '{%url "ErpRegion.GetRegionFullName"%}',
+                    type: "POST",
+                    data: {"region_id": vm.detail.supplier.region_id},
+                    success: function (data) {
+                        if (data.success === false) {
+                            $.msg.error(data.message);
+                            return;
+                        }
+                        else {
+                            vm.detail.region_full_name = data.region_full_name;
+                            return;
+                        }
+                    }
+                });
             }
         }
     });
 </script>
 {%footer%}
-

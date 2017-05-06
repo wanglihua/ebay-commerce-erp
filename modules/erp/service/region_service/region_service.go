@@ -67,6 +67,8 @@ func Get_region_full_name(region_id int64, db_session *xorm.Session) string {
 
 		region_full_name = region_name_parent_id.Name + region_full_name
 		parent_id = region_name_parent_id.ParentId
+
+		region_id = parent_id
 	}
 
 	return region_full_name

@@ -5,6 +5,7 @@ import (
 	"matrix/modules/erp/service/region_service"
 )
 
+// 这个 controller 上就不加权限控制了，都是别的页面对其的 ajax 调用
 type ErpRegion struct {
 	*revel.Controller
 }
