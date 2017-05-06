@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"strings"
 	"github.com/revel/revel"
 	"matrix/app/layout"
 	"matrix/core"
@@ -108,5 +107,6 @@ func (c Login) makePreviousSessionExpire() {
 }
 
 func get_request_client_ip(request *revel.Request) string {
-	return strings.Split(request.RemoteAddr, ":")[0]
+	return revel.ClientIP(request.Request)
+	//return strings.Split(request.RemoteAddr, ":")[0]
 }

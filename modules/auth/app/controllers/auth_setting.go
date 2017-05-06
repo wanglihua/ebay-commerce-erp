@@ -40,8 +40,9 @@ func (f *SettingDetailForm) Valid(validation *revel.Validation) bool {
 	}
 
 	validation.Required(f.Setting.TimeOut).Message("超时时长不能为空！")
-	validation.Min(int(f.Setting.TimeOut), 1).Message("超时时长不能小于1！")
-	validation.Max(int(f.Setting.TimeOut), 10000).Message("超时时长不能大于10000！")
+	var time_out int = int(f.Setting.TimeOut)
+	validation.Min(time_out, 1).Message("超时时长不能小于1！")
+	validation.Max(time_out, 10000).Message("超时时长不能大于10000！")
 
 	return validation.HasErrors() == false
 }

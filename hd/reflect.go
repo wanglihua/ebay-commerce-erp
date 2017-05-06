@@ -4,7 +4,6 @@ package main
 // It catalogs the controllers, their methods, and their arguments.
 
 import (
-	"fmt"
 	"go/ast"
 	"go/build"
 	"go/parser"
@@ -200,8 +199,10 @@ func processPackage(fset *token.FileSet, pkgImportPath, pkgPath string, pkg *ast
 			strings.Contains(pkgImportPath, "/tests/")
 	)
 
+	//log.Printf("pkgImportPath: %s, pkgPath: %s\n ", pkgImportPath, pkgPath)
 	// For each source file in the package...
 	for _, file := range pkg.Files {
+		//log.Printf("file.Name: %s\n", file.Name)
 
 		// Imports maps the package key to the full import path.
 		// e.g. import "sample/app/models" => "models": "sample/app/models"
@@ -221,6 +222,8 @@ func processPackage(fset *token.FileSet, pkgImportPath, pkgPath string, pkg *ast
 
 			// If this is a func...
 			if funcDecl, ok := decl.(*ast.FuncDecl); ok {
+				//log.Println("funcDecl.Name.Name", funcDecl.Name.Name)
+
 				// Scan it for validation calls
 				lineKeys := getValidationKeys(fset, funcDecl, imports)
 				if len(lineKeys) > 0 {
@@ -727,7 +730,8 @@ func NewTypeExpr(pkgName string, expr ast.Expr) TypeExpr {
 		e := NewTypeExpr(pkgName, t.Elt)
 		return TypeExpr{"[]" + e.Expr, e.PkgName, e.pkgIndex + 2, e.Valid}
 	default:
-		log.Println(fmt.Sprintf("package: %s. Failed to generate name for field. Make sure the field name is valid.", pkgName))
+		// log.Println(string(debug.Stack()))
+		log.Println("Failed to generate name for field. Make sure the field name is valid.")
 	}
 	return TypeExpr{Valid: false}
 }
