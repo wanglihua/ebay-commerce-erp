@@ -11,12 +11,12 @@ import (
 	"matrix/modules/auth/pass_res"
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/erp/models"
+	"matrix/modules/erp/service/order_logistics_service"
 	"matrix/modules/erp/service/order_service"
 	"matrix/modules/erp/service/paypal_service"
 	"matrix/modules/erp/service/shop_service"
 	"matrix/modules/erp/service/stock_pick_crew_service"
 	"matrix/modules/erp/setting"
-	"matrix/modules/erp/service/order_logistics_service"
 )
 
 type ErpOrder struct {
@@ -443,13 +443,13 @@ func (c ErpOrder) MatchLogistics() revel.Result {
 	if err != nil {
 		return c.RenderJson(map[string]interface{}{
 			"success": false,
-			"message": err.Error(),
+			"message": "匹配物流出现错误！" + err.Error(),
 		})
 	}
 
 	return c.RenderJson(map[string]interface{}{
 		"success": true,
-		"message": "批次匹配物流完成！",
+		"message": "已支付订单匹配物流完成！",
 	})
 }
 
