@@ -129,25 +129,27 @@ FROM erp_order o
 		order_list[index].StatusName = status_id_name_map[order.Order.StatusId]
 
 		if order.Order.StockId != 0 {
-			order.StockName = stock_id_name_map[order.Order.StockId]
+			order_list[index].StockName = stock_id_name_map[order.Order.StockId]
 		}
 
 		if order.Order.AddressId != 0 {
-			order.OrderShippingAddress = order_shipping_address_id_info_map[order.Order.AddressId]
+			order_list[index].OrderShippingAddress = order_shipping_address_id_info_map[order.Order.AddressId]
 		}
 
-		order.OrderLogistics = order_logistics_id_info_map[order.Order.Id]
+		var order_logistics = order_logistics_id_info_map[order.Order.Id]
+
+		order_list[index].OrderLogistics = order_logistics
 
 		if order.Order.CompanyId != 0 {
-			order.CompanyName = logistics_company_id_name_map[order.Order.CompanyId]
+			order_list[index].CompanyName = logistics_company_id_name_map[order.Order.CompanyId]
 		}
 
 		if order.Order.ModeId != 0 {
-			order.ModeName = logistics_mode_id_name_map[order.Order.ModeId]
+			order_list[index].ModeName = logistics_mode_id_name_map[order.Order.ModeId]
 		}
 
 		if order.OrderLogistics.Id != 0 {
-			order.FeeDiff = order.OrderLogistics.ActualFee - order.OrderLogistics.TotalFee
+			order_list[index].FeeDiff = order_logistics.ActualFee - order_logistics.TotalFee
 		}
 	}
 
