@@ -28,36 +28,56 @@ func (c ErpSupplier) ListData() revel.Result {
 	db_session := c.DbSession
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
-	query := db_session.Where(filter)
 
-	//query extra filter here
-
-	data_query := *query
-	if order != "" {
-		data_query = *data_query.OrderBy(order)
-	} else {
-		data_query = *data_query.Asc("id")
+	type supplier_view_item_t struct {
+		models.SupplierInfo `xorm:"extends" json:"s"`
+		models.RegionInfo   `xorm:"extends" json:"r"`
 	}
 
-	supplier_list := make([]models.SupplierInfo, 0, limit)
-	err := data_query.Limit(limit, offset).Find(&supplier_list)
+	/*
+SELECT s.*, r.*
+FROM erp_supplier s
+    LEFT JOIN erp_region r ON s.region_id = r.id
+	 */
+
+	var sb = core.NewSqlBuilder()
+	sb.Select("s.*, r.*")
+	sb.Count("count(s.id) AS supplier_count")
+	sb.From(`erp_supplier s
+    LEFT JOIN erp_region r ON s.region_id = r.id`)
+
+	sb.Where(filter)
+
+	if order != "" {
+		sb.OrderBy(order)
+	} else {
+		sb.OrderBy("o.id ASC")
+	}
+
+	sb.Limit(offset, limit)
+
+	supplier_list := make([]supplier_view_item_t, 0, limit)
+	err := db_session.Sql(sb.SqlList()).Find(&supplier_list)
 	core.HandleError(err)
 
-	count_query := *query
-	count, err := count_query.Count(new(models.SupplierInfo))
+	var supplier_count struct {
+		Count int64 `xorm:"'supplier_count'"`
+	}
+
+	_, err = db_session.Sql(sb.SqlCount()).Get(&supplier_count)
 	core.HandleError(err)
 
 	return c.RenderJson(core.GridResult{
 		Data:  supplier_list,
-		Total: count,
+		Total: supplier_count.Count,
 	})
 }
 
 type SupplierDetailForm struct {
-	Supplier       models.SupplierInfo       `json:"supplier"`
-	ProvinceId     int64                     `json:"province_id"`
-	ProvinceList   []region_service.Region_t `json:"province_list"`
-	CityList       []region_service.Region_t `json:"city_list"`
+	Supplier     models.SupplierInfo       `json:"supplier"`
+	ProvinceId   int64                     `json:"province_id"`
+	ProvinceList []region_service.Region_t `json:"province_list"`
+	CityList     []region_service.Region_t `json:"city_list"`
 	// city_id 就是 supplier 中的 region_id
 }
 
