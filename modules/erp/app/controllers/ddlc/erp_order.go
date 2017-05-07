@@ -432,7 +432,7 @@ func (c ErpOrder) GetPaypalShippingAddress() revel.Result {
 }
 
 func (c ErpOrder) MatchLogistics() revel.Result {
-	pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_DPH, c.Session)
+	pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_YZF, c.Session)
 
 	var db_session = c.DbSession
 

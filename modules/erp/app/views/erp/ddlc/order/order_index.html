@@ -17,14 +17,16 @@
                         <i class="ace-icon fa fa-refresh"></i>
                         刷新
                     </button>
+                    {% if eq .status "yzf" %}
+                    <button class="btn btn-purple btn-sm" @click="matchLogistics()">
+                        <i class="ace-icon fa fa-truck"></i>
+                        匹配物流
+                    </button>
+                    {% end %}
                     {% if eq .status "dph" %}
                     <button class="btn btn-success btn-sm" @click="showOrderDetail(0)">
                         <i class="ace-icon fa fa-plus"></i>
                         新增
-                    </button>
-                    <button class="btn btn-pink btn-sm" @click="matchLogistics()">
-                        <i class="ace-icon fa fa-truck"></i>
-                        匹配物流
                     </button>
                     <button class="btn btn-purple btn-sm" @click="peiHuo()">
                         <i class="ace-icon fa fa-shopping-basket"></i>
