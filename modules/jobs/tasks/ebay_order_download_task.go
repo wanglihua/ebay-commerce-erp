@@ -509,6 +509,7 @@ func (t EBayOrderDownloadTask) Run() {
 				order_shipping_address.Name = order_download.ShippingAddress.Name
 				order_shipping_address.Street1 = order_download.ShippingAddress.Street1
 				order_shipping_address.Street2 = order_download.ShippingAddress.Street2
+				order_shipping_address.Phone = order_download.ShippingAddress.Phone
 				order_shipping_address.CityName = order_download.ShippingAddress.CityName
 				order_shipping_address.Province = order_download.ShippingAddress.StateOrProvince
 				order_shipping_address.Country = order_download.ShippingAddress.Country

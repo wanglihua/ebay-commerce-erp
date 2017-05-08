@@ -105,13 +105,15 @@ func GetSppzMenu(res_id_map map[int64]bool, web_session revel.Session) string {
         </li>`)
 	}
 
-	buffer.WriteString(`<li id="sppz-product-status-menu" class="">
+	if check_pass_res_menu(pass_res.SPPZ_PRODUCT_STATUS) {
+		buffer.WriteString(`<li id="sppz-product-status-menu" class="">
             <a href="/erp/product/status">
                 <i class="menu-icon fa fa-caret-right"></i>
                 商品状态
             </a>
             <b class="arrow"></b>
         </li>`)
+	}
 
 	buffer.WriteString(`</ul>
 </li>
