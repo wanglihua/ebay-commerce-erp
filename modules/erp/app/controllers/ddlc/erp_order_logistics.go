@@ -115,6 +115,7 @@ WHERE ol.stock_id = 0 AND ol.company_id = 0
 	sb.From(`erp_order_logistics ol
     INNER JOIN erp_order o ON o.id = ol.order_id`)
 
+	filter = core.SqlAnd(filter, fmt.Sprintf("o.status_id <> %d", models.ORDER_STATUS_YQC))
 	filter = core.SqlAnd(filter, fmt.Sprintf("o.status_id <> %d", models.ORDER_STATUS_HOLD))
 
 	if stock_id != 0 {
