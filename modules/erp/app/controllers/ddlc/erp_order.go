@@ -214,7 +214,7 @@ func (c ErpOrder) ListData() revel.Result {
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
-	filter = fmt.Sprintf("o.status_id <> %d", models.ORDER_STATUS_YQC)
+	filter = core.SqlAnd(filter, fmt.Sprintf("o.status_id <> %d", models.ORDER_STATUS_YQC))
 
 	// 分仓库查看
 	// 只有待配货，配货中，已发货，已完成的订单可以分仓库查看
