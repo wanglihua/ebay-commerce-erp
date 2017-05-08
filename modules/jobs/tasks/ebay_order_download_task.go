@@ -138,8 +138,9 @@ func (t EBayOrderDownloadTask) Run() {
 				*/
 
 				if order_download.ShippedTime != "" {
-					shipped_time, err := time.ParseInLocation("2006-01-02T15:04:05.000Z", order_download.ShippedTime, time.Local)
+					shipped_time, err := time.ParseInLocation("2006-01-02T15:04:05.000Z", order_download.ShippedTime, time.UTC)
 					core.HandleError(err)
+					shipped_time = shipped_time.Local()
 					if shipped_time.IsZero() == false && err == nil {
 						// 已发货的订单，
 						continue
@@ -170,41 +171,33 @@ func (t EBayOrderDownloadTask) Run() {
 				update_col_list := []string{"type_id", "ebay_status", "status_id"}
 
 				if order_download.CreatedTime != "" {
-					created_time, err := time.ParseInLocation("2006-01-02T15:04:05.000Z", order_download.CreatedTime, time.Local)
+					created_time, err := time.ParseInLocation("2006-01-02T15:04:05.000Z", order_download.CreatedTime, time.UTC)
 					core.HandleError(err)
-
-					// 转成北京时间
-					//created_time = created_time.Local() // 其实这句已经不需要了吧， ParseInLocation 已经作了这个事情了
+					created_time = created_time.Local()
 					order_in_db.CreatedTime = core.MakeNullLongTime(created_time, true)
 					update_col_list = append(update_col_list, "created_time")
 				}
 
 				if order_download.ModifiedTime != "" {
-					modified_time, err := time.ParseInLocation("2006-01-02T15:04:05.000Z", order_download.ModifiedTime, time.Local)
+					modified_time, err := time.ParseInLocation("2006-01-02T15:04:05.000Z", order_download.ModifiedTime, time.UTC)
 					core.HandleError(err)
-
-					// 转成北京时间
-					//modified_time = modified_time.Local() // 其实这句已经不需要了吧， ParseInLocation 已经作了这个事情了
+					modified_time = modified_time.Local()
 					order_in_db.ModifiedTime = core.MakeNullLongTime(modified_time, true)
 					update_col_list = append(update_col_list, "modified_time")
 				}
 
 				if order_download.PaidTime != "" {
-					paid_time, err := time.ParseInLocation("2006-01-02T15:04:05.000Z", order_download.PaidTime, time.Local)
+					paid_time, err := time.ParseInLocation("2006-01-02T15:04:05.000Z", order_download.PaidTime, time.UTC)
 					core.HandleError(err)
-
-					// 转成北京时间
-					//paid_time = paid_time.Local() // 其实这句已经不需要了吧， ParseInLocation 已经作了这个事情了
+					paid_time = paid_time.Local()
 					order_in_db.PaidTime = core.MakeNullLongTime(paid_time, true)
 					update_col_list = append(update_col_list, "paid_time")
 				}
 
 				if order_download.ShippedTime != "" {
-					shipped_time, err := time.ParseInLocation("2006-01-02T15:04:05.000Z", order_download.ShippedTime, time.Local)
+					shipped_time, err := time.ParseInLocation("2006-01-02T15:04:05.000Z", order_download.ShippedTime, time.UTC)
 					core.HandleError(err)
-
-					// 转成北京时间
-					//shipped_time = shipped_time.Local() // 其实这句已经不需要了吧， ParseInLocation 已经作了这个事情了
+					shipped_time = shipped_time.Local()
 					order_in_db.ShippedTime = core.MakeNullLongTime(shipped_time, true)
 					update_col_list = append(update_col_list, "shipped_time")
 				}
@@ -429,10 +422,9 @@ func (t EBayOrderDownloadTask) Run() {
 							//todo: 获得商品的成本价，如果这时产品是刚刚下载的，成本价是零，之后如何更新订单的明细里面的成本价格。
 							order_item.ProductCostPrice = product_service.Get_product_cost_price(product_id, db_session)
 
-							transaction_created_date, err := time.ParseInLocation("2006-01-02T15:04:05.000Z", transaction.CreatedDate, time.Local)
+							transaction_created_date, err := time.ParseInLocation("2006-01-02T15:04:05.000Z", transaction.CreatedDate, time.UTC)
 							core.HandleError(err)
-
-							//transaction_created_date = transaction_created_date.Local() // 其实这句已经不需要了吧， ParseInLocation 已经作了这个事情了
+							transaction_created_date = transaction_created_date.Local()
 							order_item.CreatedDate = core.LongTime(transaction_created_date)
 
 							// 新增或更新明细
@@ -482,10 +474,9 @@ func (t EBayOrderDownloadTask) Run() {
 						//todo: 获得商品的成本价，如果这时产品是刚刚下载的，成本价是零，之后如何更新订单的明细里面的成本价格。
 						order_item.ProductCostPrice = product_service.Get_product_cost_price(product_id, db_session)
 
-						transaction_created_date, err := time.ParseInLocation("2006-01-02T15:04:05.000Z", transaction.CreatedDate, time.Local)
+						transaction_created_date, err := time.ParseInLocation("2006-01-02T15:04:05.000Z", transaction.CreatedDate, time.UTC)
 						core.HandleError(err)
-
-						//transaction_created_date = transaction_created_date.Local() // 其实这句已经不需要了吧， ParseInLocation 已经作了这个事情了
+						transaction_created_date = transaction_created_date.Local()
 						order_item.CreatedDate = core.LongTime(transaction_created_date)
 
 						// 新增或更新明细

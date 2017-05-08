@@ -172,20 +172,15 @@ WHERE psi.item_id = '%s'`
 				message_in_db.ItemId = message_download.Item.ItemId
 
 				if message_download.CreationDate != "" {
-					creation_date, err := time.ParseInLocation("2006-01-02T15:04:05.000Z", message_download.CreationDate, time.Local)
+					creation_date, err := time.ParseInLocation("2006-01-02T15:04:05.000Z", message_download.CreationDate, time.UTC)
 					core.HandleError(err)
-
-					// 转成北京时间
-					// modified_time = modified_time.Add(8 * time.Hour)
 					creation_date = creation_date.Local()
 					message_in_db.CreationDate = core.MakeNullLongTime(creation_date, true)
 				}
 
 				if message_download.LastModifiedDate != "" {
-					last_modified_date, err := time.ParseInLocation("2006-01-02T15:04:05.000Z", message_download.LastModifiedDate,time.Local)
+					last_modified_date, err := time.ParseInLocation("2006-01-02T15:04:05.000Z", message_download.LastModifiedDate, time.UTC)
 					core.HandleError(err)
-
-					// 转成北京时间
 					last_modified_date = last_modified_date.Local()
 					message_in_db.LastModifiedDate = core.MakeNullLongTime(last_modified_date, true)
 				}
