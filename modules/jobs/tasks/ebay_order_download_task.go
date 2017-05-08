@@ -130,9 +130,20 @@ func (t EBayOrderDownloadTask) Run() {
 			for _, order_download := range order_list {
 				order_status := order_download.OrderStatus
 
-				// 如果是已完成的订单，就忽略
+				// 如果是已完成的订单，就忽略 ???
+				/*
 				if strings.ToLower(order_status) == strings.ToLower("Completed") {
 					continue
+				}
+				*/
+
+				if order_download.ShippedTime != "" {
+					shipped_time, err := time.ParseInLocation("2006-01-02T15:04:05.000Z", order_download.ShippedTime, time.Local)
+					core.HandleError(err)
+					if shipped_time.IsZero() == false && err == nil {
+						// 已发货的订单，
+						continue
+					}
 				}
 
 				order_code := order_download.OrderID // 已付款的 282359220529-1651978360018, 未付款的 282387576804-0
@@ -162,8 +173,7 @@ func (t EBayOrderDownloadTask) Run() {
 					core.HandleError(err)
 
 					// 转成北京时间
-					//created_time = created_time.Add(8 * time.Hour)
-					created_time = created_time.Local()
+					//created_time = created_time.Local() // 其实这句已经不需要了吧， ParseInLocation 已经作了这个事情了
 					order_in_db.CreatedTime = core.MakeNullLongTime(created_time, true)
 					update_col_list = append(update_col_list, "created_time")
 				}
@@ -173,8 +183,7 @@ func (t EBayOrderDownloadTask) Run() {
 					core.HandleError(err)
 
 					// 转成北京时间
-					// modified_time = modified_time.Add(8 * time.Hour)
-					modified_time = modified_time.Local()
+					//modified_time = modified_time.Local() // 其实这句已经不需要了吧， ParseInLocation 已经作了这个事情了
 					order_in_db.ModifiedTime = core.MakeNullLongTime(modified_time, true)
 					update_col_list = append(update_col_list, "modified_time")
 				}
@@ -184,8 +193,7 @@ func (t EBayOrderDownloadTask) Run() {
 					core.HandleError(err)
 
 					// 转成北京时间
-					// paid_time = paid_time.Add(8 * time.Hour)\
-					paid_time = paid_time.Local()
+					//paid_time = paid_time.Local() // 其实这句已经不需要了吧， ParseInLocation 已经作了这个事情了
 					order_in_db.PaidTime = core.MakeNullLongTime(paid_time, true)
 					update_col_list = append(update_col_list, "paid_time")
 				}
@@ -195,8 +203,7 @@ func (t EBayOrderDownloadTask) Run() {
 					core.HandleError(err)
 
 					// 转成北京时间
-					// shipped_time = shipped_time.Add(8 * time.Hour)
-					shipped_time = shipped_time.Local()
+					//shipped_time = shipped_time.Local() // 其实这句已经不需要了吧， ParseInLocation 已经作了这个事情了
 					order_in_db.ShippedTime = core.MakeNullLongTime(shipped_time, true)
 					update_col_list = append(update_col_list, "shipped_time")
 				}
@@ -301,6 +308,8 @@ func (t EBayOrderDownloadTask) Run() {
 				if strings.ToLower(order_status) == strings.ToLower("Completed") && order_in_db.ShippedTime.Valid == true {
 					order_in_db.StatusId = models.ORDER_STATUS_YWC
 				}
+
+				//todo cancel_status, checkout_status
 
 				//订单状态 设置 结束
 
@@ -422,7 +431,7 @@ func (t EBayOrderDownloadTask) Run() {
 							transaction_created_date, err := time.ParseInLocation("2006-01-02T15:04:05.000Z", transaction.CreatedDate, time.Local)
 							core.HandleError(err)
 
-							transaction_created_date = transaction_created_date.Local()
+							//transaction_created_date = transaction_created_date.Local() // 其实这句已经不需要了吧， ParseInLocation 已经作了这个事情了
 							order_item.CreatedDate = core.LongTime(transaction_created_date)
 
 							// 新增或更新明细
@@ -475,7 +484,7 @@ func (t EBayOrderDownloadTask) Run() {
 						transaction_created_date, err := time.ParseInLocation("2006-01-02T15:04:05.000Z", transaction.CreatedDate, time.Local)
 						core.HandleError(err)
 
-						transaction_created_date = transaction_created_date.Local()
+						//transaction_created_date = transaction_created_date.Local() // 其实这句已经不需要了吧， ParseInLocation 已经作了这个事情了
 						order_item.CreatedDate = core.LongTime(transaction_created_date)
 
 						// 新增或更新明细
