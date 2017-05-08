@@ -18,10 +18,12 @@
                         刷新
                     </button>
                     {% if eq .status "yzf" %}
+                    {% if .has_pass_order_new %}
                     <button class="btn btn-success btn-sm" @click="showOrderDetail(0)">
                         <i class="ace-icon fa fa-plus"></i>
                         新增
                     </button>
+                    {% end %}
                     <button class="btn btn-purple btn-sm" @click="matchLogistics()">
                         <i class="ace-icon fa fa-truck"></i>
                         匹配物流
@@ -505,7 +507,7 @@
                     });
                 });
             },
-            peiHuo: function() {
+            peiHuo: function () {
                 var id_list = [];
                 $('#orderList tbody tr>td:first-child input:checkbox').each(function () {
                     if (this.checked) {
@@ -536,7 +538,7 @@
                     });
                 });
             },
-            faHuo: function() {
+            faHuo: function () {
                 var id_list = [];
                 $('#orderList tbody tr>td:first-child input:checkbox').each(function () {
                     if (this.checked) {
@@ -567,7 +569,7 @@
                     });
                 });
             },
-            shiJiWuHuo: function() {
+            shiJiWuHuo: function () {
                 var id_list = [];
                 $('#orderList tbody tr>td:first-child input:checkbox').each(function () {
                     if (this.checked) {
@@ -598,7 +600,7 @@
                     });
                 });
             },
-            wanCheng: function() {
+            wanCheng: function () {
                 var id_list = [];
                 $('#orderList tbody tr>td:first-child input:checkbox').each(function () {
                     if (this.checked) {

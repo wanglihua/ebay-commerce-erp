@@ -163,6 +163,8 @@ const (
 	ORDER_STATUS_YFH = 4200
 	// 订单状态 已完成
 	ORDER_STATUS_YWC = 4300
+	// 订单状态 已取消
+	ORDER_STATUS_YQC = 4350
 
 	// 采购单状态 已创建
 	PURCHASE_BILL_STATUS_YCJ = 4400
@@ -578,6 +580,13 @@ func (e StatusInfo) InitData(db_session *xorm.Session) {
 		status.Type = STATUS_TYPE_ORDER
 		status.Name = "已完成"
 		status.Desc = core.MakeNullString("订单状态 已完成", true)
+		db_session.Insert(status)
+
+		status = new(StatusInfo)
+		status.Id = ORDER_STATUS_YQC
+		status.Type = STATUS_TYPE_ORDER
+		status.Name = "已取消"
+		status.Desc = core.MakeNullString("订单状态 已取消", true)
 		db_session.Insert(status)
 	}
 

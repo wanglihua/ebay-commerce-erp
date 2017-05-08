@@ -1042,23 +1042,25 @@ WHERE id = %d`
 		_, err := db_session.Exec(sql_sum_amount)
 		core.HandleError(err)
 
+		//todo: 原来订单只是作废，不是删除，所以这里要修改
 		// 修改 order_id_item
 		var sql_update_order_item = `UPDATE erp_order_item SET order_id = %d WHERE order_id IN (%s)`
 		sql_update_order_item = fmt.Sprintf(sql_update_order_item, first_order_id, strings.Join(order_id_str_list[1:], ",")) // 修改第一个订单之外的 order item
 		_, err = db_session.Exec(sql_update_order_item)
 		core.HandleError(err)
 
+		//todo: 原来订单只是作废，不是删除，所以这里要修改
 		// 删除 shipping_address
 		var sql_delete_address = `DELETE FROM erp_order_shipping_address WHERE order_id IN (%s)`
 		sql_delete_address = fmt.Sprintf(sql_delete_address, strings.Join(order_id_str_list[1:], ",")) // 修改第一个订单之外的 shipping address
 		_, err = db_session.Exec(sql_delete_address)
 		core.HandleError(err)
 
-		// todo 改成修改为一个特殊的状态？
-		// 删除 order
-		var sql_delete_order = `DELETE FROM erp_order WHERE id IN (%s)`
-		sql_delete_order = fmt.Sprintf(sql_delete_order, strings.Join(order_id_str_list[1:], ",")) // 删除第一个之外的 order
-		_, err = db_session.Exec(sql_delete_order)
+		// 把原来的订单作废
+		// UPDATE erp_order SET status_id = 4350 WHERE id IN (-1, -2)
+		var sql_cancel_order = `UPDATE erp_order SET status_id = %d WHERE id IN (%s)`
+		sql_cancel_order = fmt.Sprintf(sql_cancel_order, models.ORDER_STATUS_YQC, strings.Join(order_id_str_list[1:], ",")) // 删除第一个之外的 order
+		_, err = db_session.Exec(sql_cancel_order)
 		core.HandleError(err)
 	}
 

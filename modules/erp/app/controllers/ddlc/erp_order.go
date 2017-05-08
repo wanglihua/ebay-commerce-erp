@@ -28,6 +28,8 @@ var special_hold_type_id_list = []int64{models.ORDER_HOLD_TYPE_ENVELOPE, models.
 func (c ErpOrder) Index(status string) revel.Result {
 	var db_session = c.DbSession
 
+	var has_pass_order_new = false
+
 	status = strings.ToLower(status) //大小写
 	// 已创建 已支付 待配货 配货中 已发货 已完成
 	active_menu_html := `<li class="active" data-menu="ddlc-order-%s-menu">%s</li>`
@@ -47,6 +49,10 @@ func (c ErpOrder) Index(status string) revel.Result {
 		status_id = models.ORDER_STATUS_YCJ
 	} else if status == "yzf" {
 		pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_YZF, c.Session)
+
+		if pass_service.Is_login_user_has_pass(pass_res.DDLC_ORDER_NEW, c.Session) {
+			has_pass_order_new = true
+		}
 
 		active_menu_html = fmt.Sprintf(active_menu_html, status, "已支付")
 		status_chinese_name = "已支付"
@@ -87,6 +93,7 @@ func (c ErpOrder) Index(status string) revel.Result {
 	c.RenderArgs["status_chinese_name"] = status_chinese_name
 	c.RenderArgs["can_view_special_hold"] = can_view_special_hold
 	c.RenderArgs["icon_path"] = setting.ICON_PATH
+	c.RenderArgs["has_pass_order_new"] = has_pass_order_new
 	return c.RenderTemplate("erp/ddlc/order/order_index.html")
 }
 
@@ -206,6 +213,8 @@ func (c ErpOrder) ListData() revel.Result {
 	}
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
+
+	filter = fmt.Sprintf("o.status_id <> %d", models.ORDER_STATUS_YQC)
 
 	// 分仓库查看
 	// 只有待配货，配货中，已发货，已完成的订单可以分仓库查看
@@ -416,6 +425,13 @@ WHERE oi.order_id = %d;`
 		"order_gst":         order_gst,         // aud
 		"order_profit":      order_profit,      //rmb
 	})
+}
+
+func (c ErpOrder) Save() revel.Result {
+	// 如果是新增保存，就检查有没有订单新增的权限
+	pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_NEW, c.Session)
+
+	return c.RenderEmpty()
 }
 
 func (c ErpOrder) GetPaypalShippingAddress() revel.Result {

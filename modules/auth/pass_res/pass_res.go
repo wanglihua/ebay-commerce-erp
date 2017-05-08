@@ -42,6 +42,7 @@ const (
 
 	// 订单流程, 模块编号 13
 	DDLC_ORDER_ALL                = 130100 // 所有订单
+	DDLC_ORDER_NEW                = 130130 // 新增订单
 	DDLC_ORDER_YCJ                = 130150 // 已创建
 	DDLC_ORDER_YZF                = 130200 // 已支付
 	DDLC_ORDER_HOLD               = 130300 // HOLD

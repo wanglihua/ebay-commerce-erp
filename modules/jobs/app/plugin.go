@@ -24,7 +24,7 @@ func init() {
 		   jobs.Every(24 * time.Hour,    TestTask{})
 		*/
 
-		var schedule_task_enabled = false // 临时禁用定时任务
+		var schedule_task_enabled = true // 临时禁用或启用定时任务
 
 		if schedule_task_enabled == true {
 			cron_ebay_download_order, found := revel.Config.String("cron.ebay_download_order")
