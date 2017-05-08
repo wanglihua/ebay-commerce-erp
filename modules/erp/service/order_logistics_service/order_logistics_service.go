@@ -1043,10 +1043,18 @@ WHERE id = %d`
 		core.HandleError(err)
 
 		//todo: 原来订单只是作废，不是删除，所以这里要修改
-		// 修改 order_id_item
-		var sql_update_order_item = `UPDATE erp_order_item SET order_id = %d WHERE order_id IN (%s)`
-		sql_update_order_item = fmt.Sprintf(sql_update_order_item, first_order_id, strings.Join(order_id_str_list[1:], ",")) // 修改第一个订单之外的 order item
-		_, err = db_session.Exec(sql_update_order_item)
+
+		/*
+INSERT INTO erp_order_item (id, order_id, order_line_item_id, quantity, transaction_id, transaction_price_currency, transaction_price, transaction_price_rmb, product_store_item_id, item_id, item_product_id, item_sku, item_title, item_condition_id, item_condition_display_name, created_date, `desc`, product_cost_price, create_time, update_time, version)
+    SELECT id, -1, order_line_item_id, quantity, transaction_id, transaction_price_currency, transaction_price, transaction_price_rmb, product_store_item_id, item_id, item_product_id, item_sku, item_title, item_condition_id, item_condition_display_name, created_date, `desc`, product_cost_price, create_time, update_time, version
+    FROM erp_order_item
+    WHERE order_id IN (-2, -3)
+		 */
+
+		// 添加新的 order_id_item
+		var sql_insert_order_item = `UPDATE erp_order_item SET order_id = %d WHERE order_id IN (%s)`
+		sql_insert_order_item = fmt.Sprintf(sql_insert_order_item, first_order_id, strings.Join(order_id_str_list[1:], ",")) // 修改第一个订单之外的 order item
+		_, err = db_session.Exec(sql_insert_order_item)
 		core.HandleError(err)
 
 		//todo: 原来订单只是作废，不是删除，所以这里要修改
