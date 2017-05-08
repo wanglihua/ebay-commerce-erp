@@ -147,6 +147,7 @@ func (t EBayOrderDownloadTask) Run() {
 				}
 
 				order_code := order_download.OrderID // 已付款的 282359220529-1651978360018, 未付款的 282387576804-0
+
 				order_code_split_str_list := strings.Split(order_code, "-")
 				order_code_min_length := 13
 				if len(order_code_split_str_list) > 1 && len(order_code_split_str_list[1]) >= order_code_min_length {

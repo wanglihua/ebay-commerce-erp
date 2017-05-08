@@ -1,12 +1,12 @@
 package controllers
 
 import (
-	//"fmt"
+	"fmt"
+	"time"
 
 	"github.com/revel/revel"
-	//"matrix/core"
-	//"matrix/modules/erp/models"
-	//"matrix/modules/erp/service/order_logistics_service"
+	"matrix/core"
+	"matrix/modules/erp/models"
 )
 
 type Test struct {
@@ -17,29 +17,52 @@ func (c Test) Index() revel.Result {
 	/*
 	var db_session = c.DbSession
 
-	var order models.OrderInfo
-	_, err := db_session.Where(fmt.Sprintf("code = '%s'", "18797")).Get(&order)
+	_, err := db_session.Exec("delete from erp_test")
 	core.HandleError(err)
 
-	order.StatusId = models.ORDER_STATUS_YZF
-	_, err = db_session.Id(order.Id).Cols("status_id").Update(&order)
+	paid_time, err := time.ParseInLocation("2006-01-02T15:04:05.000Z", "2017-05-08T18:31:43.000Z", time.Local)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	var test_info models.TestInfo
+
+	test_info.PaidTime = core.MakeNullLongTime(paid_time, true)
+
+	_, err = db_session.Insert(&test_info)
 	core.HandleError(err)
 
-	var p_ol = new(order_logistics_service.OrderLogistics)
-	err = p_ol.CalculateList([]models.OrderInfo{order}, db_session)
+	var test_info_list = make([]models.TestInfo, 0)
+	err = db_session.Find(&test_info_list)
 	core.HandleError(err)
 
-	var order_logistics models.OrderLogisticsInfo
-	_, err = db_session.Where(fmt.Sprintf("order_id = %d", order.Id)).Get(&order_logistics)
-	core.HandleError(err)
+	fmt.Println(test_info_list)
 
-	return c.RenderJson(map[string]interface{}{
-		"length": order_logistics.Length,
-		"width":  order_logistics.Width,
-		"height": order_logistics.Height,
-		"weight": order_logistics.Weight,
-	})
+	return c.RenderJson(test_info_list)
 	*/
 
-	return c.RenderEmpty()
+	var db_session = c.DbSession
+
+	_, err := db_session.Exec("delete from erp_test")
+	core.HandleError(err)
+
+	paid_time, err := time.ParseInLocation("2006-01-02T15:04:05.000Z", "2017-05-08T18:31:43.000Z", time.UTC)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	var test_info models.TestInfo
+
+	test_info.PaidTime = core.MakeNullLongTime(paid_time, true)
+
+	_, err = db_session.Insert(&test_info)
+	core.HandleError(err)
+
+	var test_info_list = make([]models.TestInfo, 0)
+	err = db_session.Find(&test_info_list)
+	core.HandleError(err)
+
+	fmt.Println(test_info_list)
+
+	return c.RenderJson(test_info_list)
 }
