@@ -952,7 +952,6 @@ func get_order_products_whole_logistics_data(p_order_logistics_data *order_logis
 	return whole_length, whole_width, whole_height, whole_dim_weight, whole_weight
 }
 
-// todo 合并订单的时候，如果某个订单被删除了，会不会下次同步的时候，又下载下来了。这样会不会引起混乱
 // 合并订单
 // order_filter: o.batch_code = '20170428120352'
 func Combine_orders(order_filter string, db_session *xorm.Session) error {
@@ -1042,26 +1041,35 @@ WHERE id = %d`
 		_, err := db_session.Exec(sql_sum_amount)
 		core.HandleError(err)
 
-		//todo: 原来订单只是作废，不是删除，所以这里要修改
-
 		/*
-INSERT INTO erp_order_item (id, order_id, order_line_item_id, quantity, transaction_id, transaction_price_currency, transaction_price, transaction_price_rmb, product_store_item_id, item_id, item_product_id, item_sku, item_title, item_condition_id, item_condition_display_name, created_date, `desc`, product_cost_price, create_time, update_time, version)
-    SELECT id, -1, order_line_item_id, quantity, transaction_id, transaction_price_currency, transaction_price, transaction_price_rmb, product_store_item_id, item_id, item_product_id, item_sku, item_title, item_condition_id, item_condition_display_name, created_date, `desc`, product_cost_price, create_time, update_time, version
+INSERT INTO erp_order_item (order_id, order_line_item_id, quantity, transaction_id, transaction_price_currency, transaction_price, transaction_price_rmb, product_store_item_id, item_id, item_product_id, item_sku, item_title, item_condition_id, item_condition_display_name, created_date, `desc`, product_cost_price, create_time, update_time)
+    SELECT -1, order_line_item_id, quantity, transaction_id, transaction_price_currency, transaction_price, transaction_price_rmb, product_store_item_id, item_id, item_product_id, item_sku, item_title, item_condition_id, item_condition_display_name, created_date, `desc`, product_cost_price, create_time, update_time
     FROM erp_order_item
     WHERE order_id IN (-2, -3)
 		 */
 
 		// 添加新的 order_id_item
-		var sql_insert_order_item = `UPDATE erp_order_item SET order_id = %d WHERE order_id IN (%s)`
-		sql_insert_order_item = fmt.Sprintf(sql_insert_order_item, first_order_id, strings.Join(order_id_str_list[1:], ",")) // 修改第一个订单之外的 order item
+		var sql_insert_order_item = `INSERT INTO erp_order_item (order_id, order_line_item_id, quantity, transaction_id, transaction_price_currency, transaction_price, transaction_price_rmb, product_store_item_id, item_id, item_product_id, item_sku, item_title, item_condition_id, item_condition_display_name, created_date, %s, product_cost_price, create_time, update_time)
+    SELECT %d, order_line_item_id, quantity, transaction_id, transaction_price_currency, transaction_price, transaction_price_rmb, product_store_item_id, item_id, item_product_id, item_sku, item_title, item_condition_id, item_condition_display_name, created_date, %s, product_cost_price, create_time, update_time
+    FROM erp_order_item
+    WHERE order_id IN (%s)`
+		sql_insert_order_item = fmt.Sprintf(sql_insert_order_item, "`desc`", first_order_id, "`desc`", strings.Join(order_id_str_list[1:], ",")) // 修改第一个订单之外的 order item
 		_, err = db_session.Exec(sql_insert_order_item)
 		core.HandleError(err)
 
-		//todo: 原来订单只是作废，不是删除，所以这里要修改
+		/*
+INSERT INTO erp_order_shipping_address (order_id, name, street1, street2, city_name, province, country, country_name, phone, postal_code, address_id, address_owner, external_address_id, create_time, update_time)
+    SELECT -3, name, street1, street2, city_name, province, country, country_name, phone, postal_code, address_id, address_owner, external_address_id, create_time, update_time
+    FROM erp_order_shipping_address
+    WHERE order_id IN (-1, -2)
+		 */
 		// 删除 shipping_address
-		var sql_delete_address = `DELETE FROM erp_order_shipping_address WHERE order_id IN (%s)`
-		sql_delete_address = fmt.Sprintf(sql_delete_address, strings.Join(order_id_str_list[1:], ",")) // 修改第一个订单之外的 shipping address
-		_, err = db_session.Exec(sql_delete_address)
+		var sql_insert_address = `INSERT INTO erp_order_shipping_address (order_id, name, street1, street2, city_name, province, country, country_name, phone, postal_code, address_id, address_owner, external_address_id, create_time, update_time)
+    SELECT %d, name, street1, street2, city_name, province, country, country_name, phone, postal_code, address_id, address_owner, external_address_id, create_time, update_time
+    FROM erp_order_shipping_address
+    WHERE order_id IN (%s)`
+		sql_insert_address = fmt.Sprintf(sql_insert_address, first_order_id, strings.Join(order_id_str_list[1:], ",")) // 修改第一个订单之外的 shipping address
+		_, err = db_session.Exec(sql_insert_address)
 		core.HandleError(err)
 
 		// 把原来的订单作废
