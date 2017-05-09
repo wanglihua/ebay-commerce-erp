@@ -130,13 +130,8 @@ func (t EBayOrderDownloadTask) Run() {
 			for _, order_download := range order_list {
 				order_status := order_download.OrderStatus
 
-				// 如果是已完成的订单，就忽略 ???
-				/*
-				if strings.ToLower(order_status) == strings.ToLower("Completed") {
-					continue
-				}
-				*/
-
+				// 如果是已完成的订单， 就忽略
+				/* todo: 临时去掉这个检查
 				if order_download.ShippedTime != "" {
 					shipped_time, err := time.ParseInLocation("2006-01-02T15:04:05.000Z", order_download.ShippedTime, time.UTC)
 					core.HandleError(err)
@@ -146,6 +141,7 @@ func (t EBayOrderDownloadTask) Run() {
 						continue
 					}
 				}
+				*/
 
 				order_code := order_download.OrderID // 已付款的 282359220529-1651978360018, 未付款的 282387576804-0
 
