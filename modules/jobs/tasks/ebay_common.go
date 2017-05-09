@@ -12,7 +12,7 @@ import (
 	"matrix/modules/erp/models"
 )
 
-const log_response_xml_to_file = true
+const log_response_xml_to_file = false
 
 func get_ebay_api_config_list(db_session *xorm.Session) []models.EBayAPIConfigInfo {
 	ebay_api_config_list := make([]models.EBayAPIConfigInfo, 0)
