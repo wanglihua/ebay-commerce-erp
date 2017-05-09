@@ -198,7 +198,8 @@ func (t NullTime) Value() (driver.Value, error) {
 	if !t.Valid {
 		return nil, nil
 	}
-	return t.Time, nil
+	// return t.Time, nil
+	return t.Time.Local().Format("2006-01-02 15:04:05"), nil
 }
 
 func MakeNullTime(t time.Time, valid bool) NullTime {
