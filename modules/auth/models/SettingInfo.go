@@ -23,8 +23,13 @@ func (e SettingInfo) ModelDesc() string {
 }
 
 func (e SettingInfo) InitData(db_session *xorm.Session) {
-	var auth_setting SettingInfo
-	auth_setting.DefaultPassword = "111111" // 默认密码 6 个 1
-	auth_setting.TimeOut = 10               // 超时时长，如果这段时间内部操作，就会自动退出登录
-	db_session.Insert(&auth_setting)
+	var setting_list = make([]SettingInfo, 0)
+	db_session.Find(&setting_list)
+
+	if len(setting_list) == 0 {
+		var auth_setting SettingInfo
+		auth_setting.DefaultPassword = "111111" // 默认密码 6 个 1
+		auth_setting.TimeOut = 10               // 超时时长，如果这段时间内部操作，就会自动退出登录
+		db_session.Insert(&auth_setting)
+	}
 }

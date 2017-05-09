@@ -26,7 +26,8 @@ func (t *NullDate) Scan(value interface{}) error {
 		t.Valid = true
 		return nil
 	case string:
-		x, err := time.ParseInLocation("2006-01-02 15:04:05", s, time.Local)
+		//x, err := time.ParseInLocation("2006-01-02 15:04:05", s, time.Local)
+		x, err := Parse_time(s)
 		if err != nil {
 			return err
 		}
@@ -34,7 +35,8 @@ func (t *NullDate) Scan(value interface{}) error {
 		t.Valid = true
 		return nil
 	case []uint8:
-		x, err := time.ParseInLocation("2006-01-02 15:04:05", string(s), time.Local)
+		//x, err := time.ParseInLocation("2006-01-02 15:04:05", string(s), time.Local)
+		x, err := Parse_time(string(s))
 		if err != nil {
 			return err
 		}
@@ -56,7 +58,7 @@ func (t NullDate) Value() (driver.Value, error) {
 	if !t.Valid {
 		return nil, nil
 	}
-	return t.Time, nil
+	return t.Time.Local().Format("2006-01-02 15:04:05"), nil
 }
 
 func MakeNullDate(t time.Time, valid bool) NullDate {
@@ -82,7 +84,7 @@ func (t NullDate) MarshalJSON() ([]byte, error) {
 		return []byte("null"), nil
 	}
 	//return t.Time.MarshalJSON()
-	return []byte(`"` + t.Time.Format("2006-01-02") + `"`), nil
+	return []byte(`"` + t.Time.Local().Format("2006-01-02") + `"`), nil
 
 }
 
@@ -164,7 +166,8 @@ func (t *NullTime) Scan(value interface{}) error {
 		t.Valid = true
 		return nil
 	case string:
-		x, err := time.ParseInLocation("2006-01-02 15:04:05", s, time.Local)
+		//x, err := time.ParseInLocation("2006-01-02 15:04:05", s, time.Local)
+		x, err := Parse_time(s)
 		if err != nil {
 			return err
 		}
@@ -172,7 +175,8 @@ func (t *NullTime) Scan(value interface{}) error {
 		t.Valid = true
 		return nil
 	case []uint8:
-		x, err := time.ParseInLocation("2006-01-02 15:04:05", string(s), time.Local)
+		//x, err := time.ParseInLocation("2006-01-02 15:04:05", string(s), time.Local)
+		x, err := Parse_time(string(s))
 		if err != nil {
 			return err
 		}
@@ -220,7 +224,7 @@ func (t NullTime) MarshalJSON() ([]byte, error) {
 		return []byte("null"), nil
 	}
 	//return t.Time.MarshalJSON()
-	return []byte(`"` + t.Time.Format("2006-01-02 15:04") + `"`), nil
+	return []byte(`"` + t.Time.Local().Format("2006-01-02 15:04") + `"`), nil
 
 }
 
@@ -302,7 +306,8 @@ func (t *NullLongTime) Scan(value interface{}) error {
 		t.Valid = true
 		return nil
 	case string:
-		x, err := time.ParseInLocation("2006-01-02 15:04:05", s, time.Local)
+		//x, err := time.ParseInLocation("2006-01-02 15:04:05", s, time.Local)
+		x, err := Parse_time(s)
 		if err != nil {
 			return err
 		}
@@ -310,7 +315,8 @@ func (t *NullLongTime) Scan(value interface{}) error {
 		t.Valid = true
 		return nil
 	case []uint8:
-		x, err := time.ParseInLocation("2006-01-02 15:04:05", string(s), time.Local)
+		//x, err := time.ParseInLocation("2006-01-02 15:04:05", string(s), time.Local)
+		x, err := Parse_time(string(s))
 		if err != nil {
 			return err
 		}
@@ -332,7 +338,7 @@ func (t NullLongTime) Value() (driver.Value, error) {
 	if !t.Valid {
 		return nil, nil
 	}
-	return t.Time, nil
+	return t.Time.Local().Format("2006-01-02 15:04:05"), nil
 }
 
 func MakeNullLongTime(t time.Time, valid bool) NullLongTime {
@@ -358,7 +364,7 @@ func (t NullLongTime) MarshalJSON() ([]byte, error) {
 		return []byte("null"), nil
 	}
 	//return t.Time.MarshalJSON()
-	return []byte(`"` + t.Time.Format("2006-01-02 15:04:05") + `"`), nil
+	return []byte(`"` + t.Time.Local().Format("2006-01-02 15:04:05") + `"`), nil
 
 }
 

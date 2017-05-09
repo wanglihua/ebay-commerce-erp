@@ -51,9 +51,18 @@ func (c Test) Index() revel.Result {
 		fmt.Println(err)
 	}
 
+	fmt.Println(paid_time.Format("2006-01-02 15:04:05"))
+
+	paid_time = paid_time.Local()
+	paid_time = paid_time.Local()
+
+	fmt.Println(paid_time.Format("2006-01-02 15:04:05"))
+
 	var test_info models.TestInfo
 
-	test_info.PaidTime = core.MakeNullLongTime(paid_time, true)
+	test_info.PaidTime1 = core.MakeNullLongTime(paid_time, true)
+	test_info.PaidTime2 = paid_time
+	test_info.PaidTime3 = core.Time(paid_time)
 
 	_, err = db_session.Insert(&test_info)
 	core.HandleError(err)
