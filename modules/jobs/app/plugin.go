@@ -64,6 +64,8 @@ func init() {
 				check_cron_support(cron_paypal_download)
 				jobs.Schedule(cron_paypal_download, tasks.PaypalDownloadTask{})
 			}
+
+			jobs.Every(4*time.Hour, tasks.EBayTokenStatusCheckTask{})
 		}
 
 		// jobs.Now(tasks.PaypalDownloadTask{})

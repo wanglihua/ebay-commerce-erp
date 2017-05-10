@@ -66,7 +66,7 @@ func (t EBayTokenStatusCheckTask) Run() {
 			expiration_time = expiration_time.Local()
 		}
 
-		// update shop account token result
+		// update shop account token_result and token_expire
 
 		var shop_account models.ShopAccountInfo
 		_, err := db_session.Id(config.ShopId).Get(&shop_account)

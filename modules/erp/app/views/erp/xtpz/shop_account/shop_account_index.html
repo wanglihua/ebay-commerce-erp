@@ -57,7 +57,7 @@
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
-                                            <label for="code" class="col-xs-2 control-label">名称</label>
+                                            <label for="code" class="col-xs-2 control-label">编号</label>
                                             <div class="col-xs-10">
                                                 <input id="code" name="detail.shop_account.code" type="text" class="input-sm form-control" v-model="detail.shop_account.code"/>
                                             </div>
@@ -282,6 +282,7 @@
                         {"mDataProp": "p.name", "title": "平台", "bSearchable": true, "width": 150},
                         {"mDataProp": "a.desc", "title": "描述", "bSearchable": true},
                         {"mDataProp": "a.manager", "title": "负责人", "bSearchable": true, "width": 150},
+                        {"mDataProp": "a.token_expire", "title": "Token过期时间", "bSearchable": false, "width": 150},
                         {"mDataProp": "a.token_result", "title": "Token验证结果", "bSearchable": true, "width": 150},
                         {"mDataProp": "s.name", "title": "状态", "bSearchable": true, "width": 80},
                         {"mDataProp": "a.create_time", "title": "创建时间", "bSearchable": false, "width": 120},
