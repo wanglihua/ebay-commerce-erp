@@ -104,7 +104,7 @@ func Get_orders(config models.EBayAPIConfigInfo, page_number int) ebay.GetOrders
 		ShowDebug:   revel.DevMode,
 	}
 
-	add_request_header(&req, config)
+	add_request_header("GetOrders", &req, config)
 
 	res, err := req.Do()
 

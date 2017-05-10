@@ -131,8 +131,7 @@ func (c ErpEBayAPIConfig) Save() revel.Result {
 
 		var expiration_time time.Time
 		if response.TokenStatus.ExpirationTime != "" {
-
-			expiration_time, err := time.ParseInLocation("2006-01-02T15:04:05.000Z", response.TokenStatus.ExpirationTime, time.UTC)
+			expiration_time, err = time.ParseInLocation("2006-01-02T15:04:05.000Z", response.TokenStatus.ExpirationTime, time.UTC)
 			core.HandleError(err)
 
 			expiration_time = expiration_time.Local()

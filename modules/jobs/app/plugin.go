@@ -66,6 +66,7 @@ func init() {
 			}
 
 			jobs.Every(4*time.Hour, tasks.EBayTokenStatusCheckTask{})
+			//jobs.Every(time.Minute, tasks.EBayTokenStatusCheckTask{})
 		}
 
 		// jobs.Now(tasks.PaypalDownloadTask{})

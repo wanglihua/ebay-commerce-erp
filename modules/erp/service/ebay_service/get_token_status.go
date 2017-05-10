@@ -99,7 +99,7 @@ func Get_token_status(config models.EBayAPIConfigInfo) ebay.GetTokenStatusRespon
 		ShowDebug:   revel.DevMode,
 	}
 
-	add_request_header(&req, config)
+	add_request_header("GetTokenStatus", &req, config)
 
 	res, err := req.Do()
 
@@ -109,6 +109,8 @@ func Get_token_status(config models.EBayAPIConfigInfo) ebay.GetTokenStatusRespon
 	}
 
 	data, err := ioutil.ReadAll(res.Body)
+
+	revel.TRACE.Println(string(data))
 
 	if err != nil {
 		revel.ERROR.Println("eBay GetTokenStatus ERROR - ioutil.ReadAll : " + err.Error())

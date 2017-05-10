@@ -7,8 +7,8 @@ import (
 
 const log_response_xml_to_file bool = false
 
-func add_request_header(request *goreq.Request, config models.EBayAPIConfigInfo) {
-	request.AddHeader("X-EBAY-API-CALL-NAME", "GetOrders")
+func add_request_header(call_name string, request *goreq.Request, config models.EBayAPIConfigInfo) {
+	request.AddHeader("X-EBAY-API-CALL-NAME", call_name)
 	request.AddHeader("X-EBAY-API-DEV-NAME", config.DevId)
 	request.AddHeader("X-EBAY-API-CERT-NAME", config.CertId)
 	request.AddHeader("X-EBAY-API-APP-NAME", config.AppId)

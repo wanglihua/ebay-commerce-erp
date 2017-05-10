@@ -10,7 +10,6 @@ import (
 )
 
 func Parse_time(str string) (time.Time, error) {
-
 	var failed_time = time.Time{}
 	var failed_error = errors.New(fmt.Sprintf("%s 不是有效的时间格式！", str))
 
@@ -93,7 +92,13 @@ func Parse_time(str string) (time.Time, error) {
 		return failed_time, failed_error
 	}
 
-	r, err := time.ParseInLocation("2006-01-02 15:04:05", date_time_buffer.String(), time.Local)
+	var date_time_str = date_time_buffer.String()
+
+	if date_time_str == "0000-00-00 00:00:00" {
+		return time.Time{}, nil
+	}
+
+	r, err := time.ParseInLocation("2006-01-02 15:04:05", date_time_str, time.Local)
 
 	if err == nil {
 		return r, nil
