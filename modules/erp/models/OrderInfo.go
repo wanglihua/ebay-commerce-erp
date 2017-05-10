@@ -43,7 +43,7 @@ type OrderInfo struct {
 	ExpressFee               float64             `xorm:"decimal(18,6) notnull 'express_fee'" json:"express_fee" smith:"verbose_name=运费收入"`     // 订单下载时还不知道如何获得运费收入  单位是澳币
 	BatchCode                int64               `xorm:"bigint null index 'batch_code'" json:"batch_code" smith:"verbose_name=导入批次号"`          //导入的批次号
 	StockId                  int64               `xorm:"bigint notnull index 'stock_id'" json:"stock_id" smith:"verbose_name=发货仓库"`            // 发货仓库，物流方式确定后，填入这个字段
-	AddressId                int64               `xorm:"bigint notnull index 'address_id'" json:"address_id" smith:"verbose_name=物流地址"`        // OrderShippingAddressInfo 的主键，物流方式确定后，填入这个字段
+	AddressId                int64               `xorm:"bigint notnull index 'address_id'" json:"address_id" smith:"verbose_name=物流地址"`        //todo: OrderShippingAddressInfo 的主键，物流方式确定后，填入这个字段，应该是下载和导入后填入这个字段
 	CompanyId                int64               `xorm:"bigint notnull index 'company_id'" json:"company_id" smith:"verbose_name=物流公司"`        // 物流公司Id，，物流方式确定后，填入这个字段
 	ModeId                   int64               `xorm:"bigint notnull index 'mode_id'" json:"mode_id" smith:"verbose_name=物流方式"`              // LogisticsModeInfo  的主键，，物流方式确定后，填入这个字段
 	CreateTime               core.Time           `xorm:"created notnull 'create_time'" json:"create_time"`

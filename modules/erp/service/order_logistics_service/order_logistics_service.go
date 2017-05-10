@@ -262,40 +262,41 @@ func (p_ol *OrderLogistics) CalculateList(order_list []models.OrderInfo, db_sess
 			continue
 		}
 
+		// 12 产品信息不全（长宽高重量不全或者有误），这个检查应该放在任何使用长宽高重量数据的检查之前。 放来匹配物流数据之前
+		if p_ol.hold_check_product_info_miss(&order, p_order_logistics_data, db_session) {
+			continue
+		}
+
+		// 14 判断是否是信件 放在匹配物流之前
+		if p_ol.hold_check_envelope(&order, p_order_logistics_data, db_session) {
+			continue
+		}
+
+		// 15 判断是否是快递 放在匹配物流之前
+		if p_ol.hold_check_express(&order, db_session) {
+			continue
+		}
+
+		// 16 判断是否是国际件，如果不是澳洲的就是国际件，一般就是新西兰的， 放在匹配物流之前
+		if p_ol.hold_check_international(&order, p_order_logistics_data, db_session) {
+			continue
+		}
+
 		match_success, order_logistics := p_ol.match_logistics_mode(&order, p_order_logistics_data, db_session)
+
+		// 1 地址有特殊字段的， 因为要查看匹配的物流方式，所以就放在这里了，放在匹配物流方式之后
+		if p_ol.hold_check_address_special_word(&order, p_order_logistics_data, order_logistics, db_session) {
+			//todo: 是不是要把前面匹配好的物流方式给去掉
+			continue
+		}
 
 		// 11 无法匹配物流（长宽高重量没有物流满足）
 		if p_ol.hold_check_no_match_logistics_mode(&order, match_success, db_session) {
 			continue
 		}
 
-		// 1 地址有特殊字段的， 因为要查看匹配的物流方式，所以就放在这里了，放在匹配物流方式之后
-		if p_ol.hold_check_address_special_word(&order, p_order_logistics_data, order_logistics, db_session) {
-			continue
-		}
-
-		// 12 产品信息不全（长宽高重量不全或者有误），这个检查应该放在任何使用长宽高重量数据的检查之前
-		if p_ol.hold_check_product_info_miss(&order, p_order_logistics_data, db_session) {
-			continue
-		}
-
 		// 13 匹配最佳仓库及物流后订单亏损。需要在基础设置里面有设置亏损额或者亏损率的设置功能，超过设置范围了，自动到订单亏损 hold
 		if p_ol.hold_check_great_deficit(&order, p_order_logistics_data, order_logistics, db_session) {
-			continue
-		}
-
-		// 14 判断是否是信件
-		if p_ol.hold_check_envelope(&order, p_order_logistics_data, db_session) {
-			continue
-		}
-
-		// 15 判断是否是快递
-		if p_ol.hold_check_express(&order, db_session) {
-			continue
-		}
-
-		// 16 判断是否是国际件，如果不是澳洲的就是国际件，一般就是新西兰的
-		if p_ol.hold_check_international(&order, p_order_logistics_data, db_session) {
 			continue
 		}
 	}
@@ -579,7 +580,7 @@ func (p_ol *OrderLogistics) hold_check_express(p_order *models.OrderInfo, db_ses
 
 // 16 判断是否是国际件，如果不是澳洲的就是国际件，一般就是新西兰的
 func (p_ol *OrderLogistics) hold_check_international(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, db_session *xorm.Session) (is_hold_return bool) {
-	if strings.ToLower(p_order_logistics_data.order_shipping_address.Country) == strings.ToLower("AU") {
+	if strings.ToLower(p_order_logistics_data.order_shipping_address.Country) != strings.ToLower("AU") {
 		p_ol.update_order_to_hold_type(p_order, models.ORDER_HOLD_TYPE_INTERNATIONAL, db_session)
 		return true
 	}
