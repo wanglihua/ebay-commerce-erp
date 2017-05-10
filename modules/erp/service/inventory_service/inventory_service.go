@@ -107,8 +107,12 @@ FROM erp_inventory ivt
     INNER JOIN erp_stock s ON s.id = ivt.stock_id
 WHERE ivt.product_id IN (%s)
 GROUP BY ivt.product_id, ivt.stock_id`
-	var product_id_str_list = core.Int_list_to_str_list(product_id_list)
-	sql = fmt.Sprintf(sql, strings.Join(product_id_str_list, ","))
+	if len(product_id_list) != 0 {
+		var product_id_str_list = core.Int_list_to_str_list(product_id_list)
+		sql = fmt.Sprintf(sql, strings.Join(product_id_str_list, ","))
+	} else {
+		sql = fmt.Sprintf(sql, "0") // 以免sql出错
+	}
 
 	var product_stock_qty_list = make([]Product_stock_qty, 0)
 	err := db_session.Sql(sql).Find(&product_stock_qty_list)

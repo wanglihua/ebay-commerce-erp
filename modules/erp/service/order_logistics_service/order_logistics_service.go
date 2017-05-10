@@ -174,11 +174,13 @@ func (s order_slice_t) Swap(i int, j int) {
 // 匹配前要判断一下订单的状态，订单不是已支付状态的话，不能匹配
 // 计算订单的物流方式 和 Hold 类型，调用这个函数的时候应该  “开启数据库事务“， 调用完成后，订单的状态就是 Hold 或者 待配货
 func (p_ol *OrderLogistics) CalculateList(order_list []models.OrderInfo, db_session *xorm.Session) error {
+	/*
 	defer func() {
 		if err := recover(); err != nil {
 			revel.ERROR.Printf("匹配物流方式，出现错误： %s\n", err)
 		}
 	}()
+	*/
 
 	if len(order_list) == 0 {
 		return errors.New("订单列表为空！")
