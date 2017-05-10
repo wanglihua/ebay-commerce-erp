@@ -599,6 +599,13 @@ func (c ErpOrderImport) Delete() revel.Result {
 	var order_id_list = make([]int64, 0)
 	c.Params.Bind(&order_id_list, "id_list")
 
+	if len(order_id_list) == 0 {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "请选择要删除的订单！",
+		})
+	}
+
 	var order_id_str_list = core.Int_list_to_str_list(order_id_list)
 
 	// 判断是不是导入的订单，如果不是导入的订单就不能删除

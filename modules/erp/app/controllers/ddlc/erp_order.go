@@ -252,12 +252,22 @@ func (c ErpOrder) ListData() revel.Result {
 			filter = core.SqlAnd(filter, fmt.Sprintf("o.code like '%%%s%%'", query_criteria_value))
 		} else if query_criteria_id == order_query_criteria_product_sku {
 			order_id_list := order_service.Get_order_id_list_by_product_sku_query(db_session, query_criteria_value)
-			order_id_str_list := core.Int_list_to_str_list(order_id_list)
-			filter = core.SqlAnd(filter, fmt.Sprintf("o.id IN (%s)", strings.Join(order_id_str_list, ",")))
+
+			var order_id_strs = "0"
+			if len(order_id_list) != 0 {
+				order_id_str_list := core.Int_list_to_str_list(order_id_list)
+				order_id_strs = strings.Join(order_id_str_list, ",")
+			}
+			filter = core.SqlAnd(filter, fmt.Sprintf("o.id IN (%s)", order_id_strs))
 		} else if query_criteria_id == order_query_criteria_product_name {
 			order_id_list := order_service.Get_order_id_list_by_product_name_query(db_session, query_criteria_value)
-			order_id_str_list := core.Int_list_to_str_list(order_id_list)
-			filter = core.SqlAnd(filter, fmt.Sprintf("o.id IN (%s)", strings.Join(order_id_str_list, ",")))
+
+			var order_id_strs = "0"
+			if len(order_id_list) != 0 {
+				order_id_str_list := core.Int_list_to_str_list(order_id_list)
+				order_id_strs = strings.Join(order_id_str_list, ",")
+			}
+			filter = core.SqlAnd(filter, fmt.Sprintf("o.id IN (%s)", order_id_strs))
 		} else if query_criteria_id == order_query_criteria_buyer_user_id {
 			filter = core.SqlAnd(filter, fmt.Sprintf("o.buyer_user_id like '%%%s%%'", query_criteria_value))
 		}

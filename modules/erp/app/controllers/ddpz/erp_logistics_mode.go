@@ -201,6 +201,13 @@ func (c ErpLogisticsMode) DeleteConfirm() revel.Result {
 	logistics_mode_id_list := make([]int64, 0)
 	c.Params.Bind(&logistics_mode_id_list, "id_list")
 
+	if len(logistics_mode_id_list) == 0 {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "请选择要删除的物流方式！",
+		})
+	}
+
 	var mode_id_str_list = core.Int_list_to_str_list(logistics_mode_id_list)
 
 	// 查看物流方式是否已经在匹配物流方式的订单里面使用

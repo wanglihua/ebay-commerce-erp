@@ -282,6 +282,13 @@ func (c ErpStockBillCheckin) Delete() revel.Result {
 	stock_bill_id_list := make([]int64, 0)
 	c.Params.Bind(&stock_bill_id_list, "id_list")
 
+	if len(stock_bill_id_list) == 0 {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "请选择要删除的数据！",
+		})
+	}
+
 	affected, err := db_session.In("id", stock_bill_id_list).Delete(new(models.StockBillInfo))
 	core.HandleError(err)
 

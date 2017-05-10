@@ -10,6 +10,12 @@ import (
 
 func Get_users_group_name_list_map(user_id_list []int64, db_session *xorm.Session) map[int64][]string {
 
+	var users_group_name_list_map = make(map[int64][]string)
+
+	if len(user_id_list) == 0 {
+		return users_group_name_list_map
+	}
+
 	var user_id_str_list = core.Int_list_to_str_list(user_id_list)
 
 	type user_group_name_t struct {
@@ -28,7 +34,6 @@ func Get_users_group_name_list_map(user_id_list []int64, db_session *xorm.Sessio
 	err := db_session.Sql(sql).Find(&users_group_name_list)
 	core.HandleError(err)
 
-	var users_group_name_list_map = make(map[int64][]string)
 	for _, user_group_name := range users_group_name_list {
 		user_group_name_list, found := users_group_name_list_map[user_group_name.UserId]
 		if found == false {

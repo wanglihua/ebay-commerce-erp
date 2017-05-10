@@ -55,6 +55,7 @@
 
                             <th id="th_buyer_user_id">客户id</th>
                             <th id="th_payment_methods">支付方式</th>
+                            <th id="th_hold_type_name">Hold类型</th>
 
                             <th id="th_total_amount">原金额(AUD)</th>
                             <th id="th_total_amount_rmb">原金额(RMB)</th>
@@ -157,7 +158,7 @@
                             "render": function (data, type, row) {
                                 var tran_id = row.o.tran_id;
                                 if (tran_id === "") {
-                                    tran_id = "--------";
+                                    tran_id = "--";
                                 }
                                 return "<div class='div_store_name'>" + row.platform_name + " " + row.shop_name + "</div><div>" + row.shop_code + "</div><div>" + tran_id + "</div>";
                             }
@@ -177,7 +178,19 @@
                         {
                             "mDataProp": "o.buyer_user_id", "title": "客户id", "bSearchable": true,
                             "render": function (data, type, row) {
-                                return "<div class='div_buyer_user_id'>" + row.o.buyer_user_id + "</div><div>" + row.o.payment_methods + "</div>";
+                                var buy_user_id = row.o.buyer_user_id;
+                                if (buy_user_id === "") {
+                                    buy_user_id = "--"
+                                }
+                                var payment_methods = row.o.payment_methods;
+                                if (payment_methods === "") {
+                                    payment_methods = "--";
+                                }
+                                var hold_type_name = row.hold_type_name;
+                                if (hold_type_name === "") {
+                                    hold_type_name = "--";
+                                }
+                                return "<div class='div_buyer_user_id'>" + buy_user_id + "</div><div>" + payment_methods + "</div><div>" + hold_type_name + "</div>";
                             }
                         },
                         {
@@ -186,6 +199,13 @@
                                 return "<div class='div_payment_methods'></div>";
                             }
                         },
+                        {
+                            "mDataProp": "hold_type_name", "title": "Hold类型", "bSearchable": true,
+                            "render": function (data, type, row) {
+                                return "<div class='div_hold_type_name'></div>";
+                            }
+                        },
+
                         {
                             "mDataProp": "o.total_amount", "title": "原金额(AUD)", "bSearchable": false,
                             "render": function (data, type, row) {
@@ -328,6 +348,7 @@
 
                                 $("#orderList div.div_buyer_user_id").parent().css("width", "180px");
                                 $("#orderList div.div_payment_methods").parent().css("display", "none");
+                                $("#orderList div.div_hold_type_name").parent().css("display", "none");
 
                                 $("#orderList div.div_total_amount").parent().css("width", "100px");
                                 $("#orderList div.div_total_amount_rmb").parent().css("display", "none");
@@ -369,7 +390,8 @@
             $("#th_buyer_user_id").before("<th id='th_buyer_user_id_ext'></th>");
             $("#th_buyer_user_id").wrap("<div id='div_buyer_user_id'></div>");
             $("#th_payment_methods").wrap("<div id='div_payment_methods'></div>");
-            $("#th_buyer_user_id_ext").append($("#div_buyer_user_id")).append($("#div_payment_methods"));
+            $("#th_hold_type_name").wrap("<div id='div_hold_type_name'></div>");
+            $("#th_buyer_user_id_ext").append($("#div_buyer_user_id")).append($("#div_payment_methods")).append($("#div_hold_type_name"));
 
             $("#th_total_amount").before("<th id='th_total_paid_amount'></th>");
             $("#th_total_amount").wrap("<div id='div_total_amount'></div>");

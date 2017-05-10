@@ -231,7 +231,11 @@ func (c AuthUser) ResetPassword() revel.Result {
 	 */
 
 	// 重置密码后下次登录必须修改密码
-	var sql_reset_pwd = fmt.Sprintf(`UPDATE auth_user SET password = '%s', is_default_pwd = 1 WHERE id IN (%s)`, core.EncryptPassword(default_password), strings.Join(core.Int_list_to_str_list(user_id_list), ","))
+	var user_id_strs = "0"
+	if len(user_id_list) != 0 {
+		user_id_strs = strings.Join(core.Int_list_to_str_list(user_id_list), ",")
+	}
+	var sql_reset_pwd = fmt.Sprintf(`UPDATE auth_user SET password = '%s', is_default_pwd = 1 WHERE id IN (%s)`, core.EncryptPassword(default_password), user_id_strs)
 	_, err = db_session.Exec(sql_reset_pwd)
 	core.HandleError(err)
 

@@ -146,11 +146,13 @@ WHERE a.id IN (1, 2, 3) AND a.is_super = 1;
 SELECT count(*) AS count
 FROM auth_admin a
 WHERE a.id IN (%s) AND a.is_super = 1`
+
+	var admin_id_strs = "0"
 	if len(admin_id_str_list) != 0 {
-		sql = fmt.Sprintf(sql, strings.Join(admin_id_str_list, ","))
-	} else {
-		sql = fmt.Sprintf(sql, "0")
+		admin_id_strs = strings.Join(admin_id_str_list, ",")
 	}
+
+	sql = fmt.Sprintf(sql, admin_id_strs)
 
 	var super_admin_count struct {
 		Count int64 `xorm:"'count'" json:"count"`

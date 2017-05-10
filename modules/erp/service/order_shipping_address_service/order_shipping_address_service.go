@@ -11,6 +11,11 @@ import (
 
 func Get_orders_shipping_address_list(order_list []models.OrderInfo, db_session *xorm.Session) []models.OrderShippingAddressInfo {
 	//Get_orders_shipping_address_list
+	var order_shipping_address_list = make([]models.OrderShippingAddressInfo, 0)
+
+	if len(order_list) == 0 {
+		return order_shipping_address_list
+	}
 
 	/*
 	SELECT sa.* FROM erp_order_shipping_address sa WHERE sa.order_id IN (1, 2, 3);
@@ -23,7 +28,6 @@ func Get_orders_shipping_address_list(order_list []models.OrderInfo, db_session 
 	var sql_order_shipping_address_list = `SELECT sa.* FROM erp_order_shipping_address sa WHERE sa.order_id IN (%s)`
 	sql_order_shipping_address_list = fmt.Sprintf(sql_order_shipping_address_list, strings.Join(order_id_str_list, ","))
 
-	var order_shipping_address_list = make([]models.OrderShippingAddressInfo, 0)
 	err := db_session.Sql(sql_order_shipping_address_list).Find(&order_shipping_address_list)
 	core.HandleError(err)
 

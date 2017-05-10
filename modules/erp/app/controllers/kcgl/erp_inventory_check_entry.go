@@ -232,6 +232,13 @@ func (c ErpInventoryCheckEntry) Delete() revel.Result {
 	inventory_check_entry_id_list := make([]int64, 0)
 	c.Params.Bind(&inventory_check_entry_id_list, "id_list")
 
+	if len(inventory_check_entry_id_list) == 0 {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "请选择要删除的数据？",
+		})
+	}
+
 	var check_id_list = make([]struct {
 		CheckId int64 `xorm:"'check_id'" json:"check_id"`
 	}, 0)

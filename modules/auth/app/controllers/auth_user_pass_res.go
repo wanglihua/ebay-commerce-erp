@@ -34,9 +34,14 @@ func (c AuthUserPassRes) Index() revel.Result {
 		UserName string `xorm:"'user_name'"`
 	}
 
-	var user_id_str_list = core.Int_list_to_str_list(user_id_list)
 	sql := `SELECT concat(u.login_name, ' ', u.nick_name) AS user_name FROM auth_user u WHERE u.id IN (%s)`
-	sql = fmt.Sprintf(sql, strings.Join(user_id_str_list, ","))
+
+	var user_id_strs = "0"
+	if len(user_id_list) != 0 {
+		var user_id_str_list = core.Int_list_to_str_list(user_id_list)
+		user_id_strs = strings.Join(user_id_str_list, ",")
+	}
+	sql = fmt.Sprintf(sql, user_id_strs)
 
 	var user_name_struct_list = make([]user_name_t, 0)
 	err := db_session.Sql(sql).Find(&user_name_struct_list)

@@ -446,6 +446,12 @@ func (c ErpProduct) GetProductListSkus() revel.Result {
 	var product_id_list = make([]int64, 0)
 	c.Params.Bind(&product_id_list, "product_id_list")
 
+	if len(product_id_list) == 0 {
+		return c.RenderJson(map[string]interface{}{
+			"product_skus": "",
+		})
+	}
+
 	var product_id_str_list = make([]string, 0)
 	for _, product_id := range product_id_list {
 		product_id_str_list = append(product_id_str_list, fmt.Sprint(product_id))

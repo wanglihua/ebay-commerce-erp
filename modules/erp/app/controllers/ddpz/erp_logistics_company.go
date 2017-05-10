@@ -183,6 +183,13 @@ func (c ErpLogisticsCompany) Delete() revel.Result {
 	logistics_company_id_list := make([]int64, 0)
 	c.Params.Bind(&logistics_company_id_list, "id_list")
 
+	if len(logistics_company_id_list) == 0 {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "请选择要删除的物流公司！",
+		})
+	}
+
 	var mode_count struct {
 		Count int64 `xorm:"'mode_count'"`
 	}
