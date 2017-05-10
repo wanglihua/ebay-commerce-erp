@@ -68,6 +68,18 @@ func (t EBayOrderDownloadTask) Run() {
 		for has_more_orders == true {
 			response := ebay_service.Get_orders(config, page_number)
 
+			switch response.Ack {
+			case "Success":
+				revel.TRACE.Printf("eBay GetOrders Response: " + response.Ack + "\n")
+				revel.TRACE.Printf("eBay GetOrders actual fetched orders count: %d", response.ReturnedOrderCountActual)
+			case "Failure":
+				revel.ERROR.Printf("eBay GetOrders Response: " + response.Ack + "\n")
+				continue
+			default:
+				revel.ERROR.Printf("eBay GetOrders Response: " + response.Ack + "\n")
+				continue
+			}
+
 			order_list := response.OrdersArray.Orders
 
 			for _, order_download := range order_list {
@@ -463,16 +475,6 @@ func (t EBayOrderDownloadTask) Run() {
 				// Order Item
 
 			} // for _, order_download := range order_list
-
-			switch response.Ack {
-			case "Success":
-				revel.TRACE.Printf("eBay GetOrders Response: " + response.Ack + "\n")
-				revel.TRACE.Printf("eBay GetOrders actual fetched orders count: %d", response.ReturnedOrderCountActual)
-			case "Failure":
-				revel.ERROR.Printf("eBay GetOrders Response: " + response.Ack + "\n")
-			default:
-				revel.ERROR.Printf("eBay GetOrders Response: " + response.Ack + "\n")
-			}
 
 			has_more_orders = response.HasMoreOrders
 			page_number += 1
