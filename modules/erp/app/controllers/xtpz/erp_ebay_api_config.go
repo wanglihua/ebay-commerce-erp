@@ -3,13 +3,15 @@ package controllers
 import (
 	"encoding/json"
 	"fmt"
-	"strconv"
+	"strings"
+	"time"
 
 	"github.com/revel/revel"
 	"matrix/core"
 	"matrix/modules/auth/pass_res"
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/erp/models"
+	"matrix/modules/erp/service/ebay_service"
 	"matrix/modules/erp/service/shop_account_log_service"
 )
 
@@ -117,7 +119,54 @@ func (c ErpEBayAPIConfig) Save() revel.Result {
 		}
 	}
 
-	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据保存成功!"})
+	var token_valid bool = false
+	var check_token_status = func() {
+		defer func() {
+			if err := recover(); err != nil {
+				token_valid = false
+			}
+		}()
+
+		response := ebay_service.Get_token_status(ebay_api_config)
+
+		var expiration_time time.Time
+		if response.TokenStatus.ExpirationTime != "" {
+
+			expiration_time, err := time.ParseInLocation("2006-01-02T15:04:05.000Z", response.TokenStatus.ExpirationTime, time.UTC)
+			core.HandleError(err)
+
+			expiration_time = expiration_time.Local()
+		}
+
+		var update_col_list = make([]string, 0)
+		if expiration_time.IsZero() == false {
+			shop_account.TokenExpire = core.MakeNullLongTime(expiration_time, true)
+			update_col_list = append(update_col_list, "token_expire")
+		}
+
+		if response.TokenStatus.Status != "" {
+			shop_account.TokenResult = core.MakeNullString(response.TokenStatus.Status, true)
+			update_col_list = append(update_col_list, "token_result")
+		}
+
+		if len(update_col_list) != 0 {
+			_, err := db_session.Id(shop_account.Id).Cols(update_col_list...).Update(&shop_account)
+			core.HandleError(err)
+		}
+
+		if strings.ToLower(response.Ack) == strings.ToLower("Success") {
+			token_valid = true
+		}
+	}
+
+	check_token_status()
+
+	var message = "数据保存成功，token验证成功！";
+	if token_valid == false {
+		message = "数据保存成功，token验证失败！";
+	}
+
+	return c.RenderJson(core.JsonResult{Success: true, Message: message})
 }
 
 func (c ErpEBayAPIConfig) Delete() revel.Result {
