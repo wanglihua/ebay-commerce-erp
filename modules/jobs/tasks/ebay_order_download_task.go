@@ -112,6 +112,7 @@ func (t EBayOrderDownloadTask) Run() {
 
 				order_in_db.Code = order_code
 				order_in_db.ShopId = config.ShopId
+				order_in_db.TranId = order_download.ShippingDetails.SellingManagerSalesRecordNumber
 
 				var shop models.ShopAccountInfo
 				_, err = db_session.Id(config.ShopId).Get(&shop)
@@ -237,38 +238,37 @@ func (t EBayOrderDownloadTask) Run() {
 				ORDER_STATUS_YWC = 4300
 				*/
 
+				// """同步逻辑要保证中间的 待配货，配货中，已发货 等的状态在同步时不被前面的状态覆盖，只有后面的“已完成”可以覆盖这些状态""
+				// 所以下面的两个条件中需要加 < 号的状态判断
+
 				// 如果是新的订单，一般是新增的订单，系统数据库中还没有的订单
-				if order_status_id < models.ORDER_STATUS_YCJ && order_in_db.PaidTime.Valid == false { //前面小于号的判断要不要加呢
+				if order_status_id < models.ORDER_STATUS_YCJ && //这个状态检查不能少，否则 待配货，已发货的状态可能会被覆盖
+					order_in_db.PaidTime.Valid == false {
 					order_in_db.StatusId = models.ORDER_STATUS_YCJ // 这个状态，有可能会被接下来的状态逻辑所修改，可能会，更进一步改成 “已支付”, “已完成”
 				}
 
 				// 有可能是新增的订单（最有可能），或者是原来 已创建 的状态过来的。这时支付时间不为空
-				if order_status_id < models.ORDER_STATUS_YZF && order_in_db.PaidTime.Valid == true {
+				if order_status_id < models.ORDER_STATUS_YZF && //这个状态检查不能少，否则 待配货，已发货的状态可能会被覆盖
+					order_in_db.PaidTime.Valid == true &&
+					strings.ToLower(order_download.CheckoutStatuss.Status) == strings.ToLower("Complete") {
 					order_in_db.StatusId = models.ORDER_STATUS_YZF // 这个状态，有可能会被接下来的状态逻辑所修改，可能会，更进一步改成 “已完成”
 				}
 
-				// 同步逻辑要保证中间的 待配货，配货中，已发货 等的状态在同步时不被前面的状态覆盖，只有后面的“已完成”可以覆盖这些状态
-
 				// 如果 下载订单里面的 OrderStatus 是 Completed， 且订单的发货时间不为空，订单状态就为 已完成
-				if strings.ToLower(order_status) == strings.ToLower("Completed") && order_in_db.ShippedTime.Valid == true {
+				if order_in_db.ShippedTime.Valid == true {
 					order_in_db.StatusId = models.ORDER_STATUS_YWC
 				}
 
-				//todo cancel_status, checkout_status
+				//todo cancel_status
 
 				//订单状态 设置 结束
 
-				// 支付方式的设置，这段代码依赖于前面代码设置的 order_in_db.StatusId
-				payment_methods := strings.Join(order_download.PaymentMethods, ",")
-				//if order_in_db.StatusId < models.ORDER_STATUS_YZF {
-				if strings.Index(payment_methods, ",") != -1 {
-					payment_methods = ""
-				}
-				order_in_db.PaymentMethods = payment_methods
+				var payment_method = order_download.CheckoutStatuss.PaymentMethod
+				order_in_db.PaymentMethods = payment_method
 
 				// 老鼠仓的判断
 				// 如果是通过PayPal支付的，而且店铺设置里面也设置了PayPal列表的
-				if strings.ToLower(payment_methods) == strings.ToLower("PayPal") && shop.PaypalAccount != "" {
+				if strings.ToLower(payment_method) == strings.ToLower("PayPal") && shop.PaypalAccount != "" {
 					shop_paypal_email_list := strings.Split(shop.PaypalAccount, ",")
 
 					seller_email := order_download.SellerEmail //是用SellerEmail来判断老鼠仓吗？

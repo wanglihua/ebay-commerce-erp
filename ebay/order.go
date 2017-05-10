@@ -88,7 +88,7 @@ type Order struct {
 	ShippedTime                         string
 	ShippingAddress                     OrderShippingAddress `xml:"ShippingAddress"`
 	ShippingConvenienceCharge           string
-	ShippingDetailss                    ShippingDetails `xml:"ShippingDetails"`
+	ShippingDetails                     ShippingDetails `xml:"ShippingDetails"`
 	ShippingServiceSelected             OrderShippingServiceSelected
 	Subtotal                            Amount
 	Total                               Amount
@@ -269,6 +269,8 @@ type PickupMethodSelected struct {
 }
 
 type ShippingDetails struct {
+	XMLName xml.Name `xml:"ShippingDetails"`
+
 	CalculatedShippingRate
 	CODCost         string
 	InsuranceFee    string
@@ -280,6 +282,8 @@ type ShippingDetails struct {
 	ShipmentTrackingDetails
 	ShippingServiceOptions
 	TaxTable
+
+	SellingManagerSalesRecordNumber string `xml:"SellingManagerSalesRecordNumber"`
 }
 
 type TaxJurisdiction struct {
