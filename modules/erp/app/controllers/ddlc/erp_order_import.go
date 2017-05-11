@@ -99,7 +99,7 @@ WHERE o.batch_code = 123 AND o.code LIKE '%abc%' AND o.buyer_user_id LIKE '%abc%
     INNER JOIN erp_ecommerce_platform pf ON pf.id = sa.platform_id
     INNER JOIN erp_status s ON s.id = o.status_id`)
 
-	filter = core.SqlAnd(filter, "o.batch_code IS NOT NULL")
+	filter = core.SqlAnd(filter, "o.batch_code IS NOT NULL AND o.batch_code <> 0")
 
 	if batch_code != 0 {
 		filter = core.SqlAnd(filter, fmt.Sprintf("o.batch_code = %d", batch_code))
@@ -567,21 +567,21 @@ func (c ErpOrderImport) BatchDelete() revel.Result {
 	/*
 DELETE o.*, ol.*, oi.*, osa.*
 FROM erp_order o
-    INNER JOIN erp_order_logistics ol ON ol.order_id = o.id
+    LEFT JOIN erp_order_logistics ol ON ol.order_id = o.id
     INNER JOIN erp_order_item oi ON oi.order_id = o.id
     INNER JOIN erp_order_shipping_address osa ON osa.order_id = o.id
 WHERE o.batch_code = 1;
 	 */
 
 	// 删除 采用多表一次性删除
-	var sql_delete = `DELETE o.*, ol.*, oi.*, osa.*
+	var sql_delete_orders = `DELETE o.*, ol.*, oi.*, osa.*
 FROM erp_order o
-    INNER JOIN erp_order_logistics ol ON ol.order_id = o.id
+    LEFT JOIN erp_order_logistics ol ON ol.order_id = o.id
     INNER JOIN erp_order_item oi ON oi.order_id = o.id
     INNER JOIN erp_order_shipping_address osa ON osa.order_id = o.id
 WHERE o.batch_code = %d;`
-	sql_delete = fmt.Sprintf(sql_delete, batch_code)
-	_, err := db_session.Exec(sql_delete)
+	sql_delete_orders = fmt.Sprintf(sql_delete_orders, batch_code)
+	_, err := db_session.Exec(sql_delete_orders)
 	core.HandleError(err)
 
 	return c.RenderJson(map[string]interface{}{

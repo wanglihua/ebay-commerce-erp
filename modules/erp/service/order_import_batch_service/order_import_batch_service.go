@@ -10,7 +10,7 @@ func Get_order_import_batch_code_list(db_session *xorm.Session) []int64 {
 	type batch_code_t struct {
 		BatchCode int64 `xorm:"'batch_code'"`
 	}
-	var sql = `SELECT DISTINCT batch_code FROM erp_order WHERE batch_code IS NOT NULL ORDER BY batch_code DESC;`
+	var sql = `SELECT DISTINCT batch_code FROM erp_order WHERE batch_code IS NOT NULL AND batch_code <> 0 ORDER BY batch_code DESC;`
 	var batch_code_t_list = make([]batch_code_t, 0)
 	err := db_session.Sql(sql).Find(&batch_code_t_list)
 	core.HandleError(err)
