@@ -12,7 +12,11 @@
     <div class="page-content">
         <div class="row">
             <div class="col-xs-12" style="padding: 0;">
-
+                <label for="order_codes">订单编号</label>
+                <input class="input-sm" id="order_codes" name="order_codes" placeholder="订单编号" type="text" v-model="page.order_codes" style="width: 250px;"/>
+                <button class="btn btn-mini btn-primary" @click="matchLogistics()">
+                    &nbsp;<i class="ace-icon fa fa-search"></i>查&nbsp;询&nbsp;
+                </button>
             </div>
         </div>
     </div>
@@ -26,16 +30,24 @@
             }
         },
         mounted: function () {
-            var this_vm = this;
-
-
         },
         methods: {
-            reloadList: function () {
-                reloadList('#orderLogisticsList');
-            },
-            refreshList: function () {
-                refreshList('#orderLogisticsList');
+            matchLogistics: function () {
+                showMask("匹配物流中...");
+                $.ajax({
+                        url: '{%url "ErpOrderLogisticsTest.Match" %}',
+                        type: "POST",
+                        data: {"order_codes": vm.page.order_codes},
+                        success: function (result) {
+                            hideMask();
+                            if (result.success === false) {
+                                $.msg.error(result.message);
+                            } else {
+                                $.msg.show(result.message);
+                            }
+                        }
+                    }
+                );
             }
         }
     });
