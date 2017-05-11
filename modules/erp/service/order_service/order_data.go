@@ -270,7 +270,7 @@ WHERE oi.order_id = %d`
 
 func Get_order_shipping_address(order_id int64, db_session *xorm.Session) models.OrderShippingAddressInfo {
 	var order_shipping_address_list = make([]models.OrderShippingAddressInfo, 0)
-	err := db_session.Where(fmt.Sprintf("order_id = %d", order_id)).Find(&order_shipping_address_list)
+	err := db_session.Where(fmt.Sprintf("order_id = %d", order_id)).OrderBy("address_owner DESC").Find(&order_shipping_address_list)
 	core.HandleError(err)
 
 	for _, order_shipping_address := range order_shipping_address_list {

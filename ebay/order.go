@@ -113,6 +113,7 @@ type Order struct {
  */
 
 type OrderShippingAddress struct {
+	XMLName           xml.Name      `xml:"ShippingAddress"`
 	Name              string
 	Street1           string
 	Street2           string

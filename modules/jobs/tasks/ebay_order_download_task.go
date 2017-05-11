@@ -447,13 +447,13 @@ func (t EBayOrderDownloadTask) Run() {
 				//新增或更新送货地址
 				var order_shipping_address models.OrderShippingAddressInfo
 				has_order_shipping_address, err := db_session.Where(fmt.Sprintf("order_id = %d AND address_owner = '%s'", order_id, order_download.ShippingAddress.AddressOwner)).Get(&order_shipping_address) // 收货地址
+				core.HandleError(err)
 
 				//设置每个字段的值，存在的每个字段都要设置，不能漏，否则更新和新增的时候会出问题
 				order_shipping_address.OrderId = order_id
 				order_shipping_address.Name = order_download.ShippingAddress.Name
 				order_shipping_address.Street1 = order_download.ShippingAddress.Street1
 				order_shipping_address.Street2 = order_download.ShippingAddress.Street2
-				order_shipping_address.Phone = order_download.ShippingAddress.Phone
 				order_shipping_address.Phone = order_shipping_address_service.Normalize_phone(order_download.ShippingAddress.Phone) // 整理电话号码
 				order_shipping_address.CityName = order_download.ShippingAddress.CityName
 				order_shipping_address.Province = order_download.ShippingAddress.StateOrProvince
