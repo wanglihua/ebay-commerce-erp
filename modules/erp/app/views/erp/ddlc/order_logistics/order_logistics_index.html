@@ -76,6 +76,8 @@
                                         <option :value="batch_code">{{batch_code}}</option>
                                     </template>
                                 </select>
+                                <label class="control-label no-padding-right" for="order_code_query">订单编号</label>
+                                <input class="input-sm" id="order_code_query" name="order_code_query" placeholder="订单编号" type="text" v-model="page.order_code_query" style="width: 130px;"/>
                                 <label class="control-label no-padding-right" for="begin_time_query">开始时间</label>
                                 <input class="input-sm" id="begin_time_query" name="begin_time_query" placeholder="开始时间查询" type="text" v-model="page.begin_time_query" style="width: 130px;"/>
                                 <label class="control-label no-padding-right" for="end_time_query">结束时间</label>
@@ -291,6 +293,7 @@
                 "logistics_company_list": [],
                 "batch_code": 0,
                 "batch_code_list": [],
+                "order_code_query": "",
                 "begin_time_query": "",
                 "end_time_query": ""
             },
@@ -461,6 +464,7 @@
                         aoData.push({'name': 'stock_id', 'value': this_vm.page.stock_id});
                         aoData.push({'name': 'logistics_company_id', 'value': this_vm.page.logistics_company_id});
                         aoData.push({'name': 'batch_code', 'value': this_vm.page.batch_code});
+                        aoData.push({'name': 'order_code_query', 'value': this_vm.page.order_code_query});
                         aoData.push({'name': 'begin_time_query', 'value': this_vm.page.begin_time_query});
                         aoData.push({'name': 'end_time_query', 'value': this_vm.page.end_time_query});
 

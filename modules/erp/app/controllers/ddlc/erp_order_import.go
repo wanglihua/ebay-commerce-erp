@@ -614,7 +614,7 @@ func (c ErpOrderImport) Delete() revel.Result {
 	/*
 	SELECT count(o.batch_code) AS order_import_count FROM erp_order o WHERE o.id IN (2, 3, 4, 490, 491, 492);
 	*/
-	var sql_order_import_count = `SELECT count(o.batch_code) AS order_import_count FROM erp_order o WHERE o.id IN (%s);`
+	var sql_order_import_count = `SELECT count(o.batch_code) AS order_import_count FROM erp_order o WHERE o.batch_code IS NOT NULL AND o.batch_code <> 0 AND o.id IN (%s);`
 	sql_order_import_count = fmt.Sprintf(sql_order_import_count, strings.Join(order_id_str_list, ","))
 	_, err := db_session.Sql(sql_order_import_count).Get(&order_import_count)
 	core.HandleError(err)
@@ -623,7 +623,7 @@ func (c ErpOrderImport) Delete() revel.Result {
 	if order_import_count.Count < int64(len(order_id_list)) {
 		return c.RenderJson(map[string]interface{}{
 			"success": false,
-			"message": "只有删除导入的订单！",
+			"message": "只能删除导入的订单！",
 		})
 	}
 

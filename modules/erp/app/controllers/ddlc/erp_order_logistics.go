@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/go-xorm/xorm"
@@ -74,6 +75,10 @@ func (c ErpOrderLogistics) ListData() revel.Result {
 	var batch_code int64
 	c.Params.Bind(&batch_code, "batch_code")
 
+	var order_code_query string
+	c.Params.Bind(&order_code_query, "order_code_query")
+	order_code_query = strings.TrimSpace(order_code_query)
+
 	var begin_time_query core.NullLongTime
 	var end_time_query core.NullLongTime
 	c.Params.Bind(&begin_time_query, "begin_time_query")
@@ -130,6 +135,10 @@ WHERE ol.stock_id = 0 AND ol.company_id = 0
 
 	if batch_code != 0 {
 		filter = core.SqlAnd(filter, fmt.Sprintf("o.batch_code = %d", batch_code))
+	}
+
+	if order_code_query != "" {
+		filter = core.SqlAnd(filter, fmt.Sprintf("o.code = '%s'", order_code_query))
 	}
 
 	if begin_time_query.Valid == true {
