@@ -15,6 +15,7 @@ import (
 	"matrix/modules/erp/service/import_batch_code_service"
 	"matrix/modules/erp/service/order_import_batch_service"
 	"matrix/modules/erp/service/order_logistics_service"
+	"matrix/modules/erp/service/order_shipping_address_service"
 )
 
 type ErpOrderImport struct {
@@ -482,14 +483,7 @@ SELECT sa.id AS shop_id, sa.name AS shop_name FROM erp_shop_account sa;
 
 	// 整理电话号码 "1234 5666"
 	for index, order_import := range order_import_list {
-		var phone = order_import.Dh
-
-		if phone != "" {
-			phone = strings.Replace(phone, " ", "", -1)
-			if len(phone) > 4 {
-				order_import_list[index].Dh = phone[0:4] + " " + phone[4:]
-			}
-		}
+		order_import_list[index].Dh = order_shipping_address_service.Normalize_phone(order_import.Dh)
 	}
 
 	for _, order_import := range order_import_list {
@@ -501,7 +495,7 @@ SELECT sa.id AS shop_id, sa.name AS shop_name FROM erp_shop_account sa;
 		order.TranId = order_import.Jydh
 
 		var amount_au float64 = order_import.Skje
-		var amount_currency = "AUD"                                     // 澳币的也设置一下
+		var amount_currency = "AUD"                                    // 澳币的也设置一下
 		var amount_rmb = order_import.Skje * aud_exchange_rate_setting // 汇率换算
 
 		order.AmountPaidRmb = amount_rmb
@@ -538,6 +532,11 @@ SELECT sa.id AS shop_id, sa.name AS shop_name FROM erp_shop_account sa;
 		order_shipping_address.Province = order_import.Ssdq
 		order_shipping_address.CityName = order_import.Sscs
 		_, err = db_session.Insert(&order_shipping_address)
+		core.HandleError(err)
+
+		// 回填 order address id
+		order.AddressId = order_shipping_address.Id
+		_, err = db_session.Id(order.Id).Cols("address_id").Update(&order)
 		core.HandleError(err)
 
 		// 订单详细

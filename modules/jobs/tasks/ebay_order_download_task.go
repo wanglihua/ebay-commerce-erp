@@ -12,6 +12,7 @@ import (
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/ebay_service"
 	"matrix/modules/erp/service/exchange_rate_service"
+	"matrix/modules/erp/service/order_shipping_address_service"
 	"matrix/modules/erp/service/product_bind_service"
 	"matrix/modules/erp/service/product_service"
 	"matrix/modules/erp/service/product_store_item_service"
@@ -445,7 +446,7 @@ func (t EBayOrderDownloadTask) Run() {
 
 				//新增或更新送货地址
 				var order_shipping_address models.OrderShippingAddressInfo
-				has_order_shipping_address, err := db_session.Where("order_id = ? AND address_owner = 'eBay'", order_id).Get(&order_shipping_address) // 平台收货地址
+				has_order_shipping_address, err := db_session.Where(fmt.Sprintf("order_id = %d AND address_owner = '%s'", order_id, order_download.ShippingAddress.AddressOwner)).Get(&order_shipping_address) // 收货地址
 
 				//设置每个字段的值，存在的每个字段都要设置，不能漏，否则更新和新增的时候会出问题
 				order_shipping_address.OrderId = order_id
@@ -453,6 +454,7 @@ func (t EBayOrderDownloadTask) Run() {
 				order_shipping_address.Street1 = order_download.ShippingAddress.Street1
 				order_shipping_address.Street2 = order_download.ShippingAddress.Street2
 				order_shipping_address.Phone = order_download.ShippingAddress.Phone
+				order_shipping_address.Phone = order_shipping_address_service.Normalize_phone(order_download.ShippingAddress.Phone) // 整理电话号码
 				order_shipping_address.CityName = order_download.ShippingAddress.CityName
 				order_shipping_address.Province = order_download.ShippingAddress.StateOrProvince
 				order_shipping_address.Country = order_download.ShippingAddress.Country
@@ -462,17 +464,25 @@ func (t EBayOrderDownloadTask) Run() {
 				order_shipping_address.AddressOwner = order_download.ShippingAddress.AddressOwner
 				order_shipping_address.ExternalAddressId = order_download.ShippingAddress.ExternalAddressID
 
+				var address_id = order_shipping_address.Id
 				if has_order_shipping_address == true {
 					// do update
 					_, err = db_session.Id(order_shipping_address.Id).Update(&order_shipping_address)
 					core.HandleError(err)
+
+					address_id = order_shipping_address.Id
 				} else {
 					// do insert
 					_, err = db_session.Insert(&order_shipping_address)
 					core.HandleError(err)
+
+					address_id = order_shipping_address.Id
 				}
 
-				// Order Item
+				//回填地址id到订单里面去
+				order_in_db.AddressId = address_id
+				_, err = db_session.Id(order_in_db.Id).Cols("address_id").Update(&order_in_db)
+				core.HandleError(err)
 
 			} // for _, order_download := range order_list
 

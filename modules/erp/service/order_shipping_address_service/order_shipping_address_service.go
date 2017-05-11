@@ -51,3 +51,15 @@ func Get_order_shipping_address_id_info_map(address_id_list []int64, db_session 
 
 	return order_shipping_address_id_info_map
 }
+
+// 整理电话号码，使固定的格式
+func Normalize_phone(phone string) string {
+	if phone != "" {
+		phone = strings.Replace(phone, " ", "", -1)
+		if len(phone) > 4 {
+			return phone[0:4] + " " + phone[4:]
+		}
+	}
+
+	return phone
+}
