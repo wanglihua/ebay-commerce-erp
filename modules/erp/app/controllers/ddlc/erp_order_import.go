@@ -476,78 +476,127 @@ SELECT sa.id AS shop_id, sa.name AS shop_name FROM erp_shop_account sa;
 		})
 	}
 
+	// 合并订单，马帮对于多SKU的订单导出的时候，会根据SKU对订单进行拆解。比如一个订单有3个SKU，那么马帮订单导出的时候，会拆解成3条记录，这个时候需要根据统一订单编号在wollongzone对订单进行合并。
+	var order_import_list_map = make(map[string][]order_import_t)
+
+	for _, order_import := range order_import_list {
+		order_import_same_code_list, found := order_import_list_map[order_import.Ddbh]
+		if found == false {
+			order_import_same_code_list = make([]order_import_t, 0)
+		}
+		order_import_same_code_list = append(order_import_same_code_list, order_import)
+		order_import_list_map[order_import.Ddbh] = order_import_same_code_list
+	}
+
 	var aud_exchange_rate_setting = exchange_rate_service.Get_aud_exchange_rate(db_session)
 
 	// 例如 20170414212812
 	var import_batch_code int64 = import_batch_code_service.Get_import_batch_code()
 
-	// 整理电话号码 "1234 5666"
-	for index, order_import := range order_import_list {
-		order_import_list[index].Dh = order_shipping_address_service.Normalize_phone(order_import.Dh)
-	}
-
-	for _, order_import := range order_import_list {
+	for order_code := range order_import_list_map {
+		var order_import_same_code_list = order_import_list_map[order_code]
 
 		// 订单
 		var order models.OrderInfo
-		order.ShopId = order_import.shop_id
-		order.Code = order_import.Ddbh
-		order.TranId = order_import.Jydh
 
-		var amount_au float64 = order_import.Skje
-		var amount_currency = "AUD"                                    // 澳币的也设置一下
-		var amount_rmb = order_import.Skje * aud_exchange_rate_setting // 汇率换算
+		if len(order_import_same_code_list) == 1 {
+			var order_import = order_import_same_code_list[0]
 
-		order.AmountPaidRmb = amount_rmb
-		order.AmountPaidCurrency = amount_currency
-		order.AmountPaid = amount_au
+			order.ShopId = order_import.shop_id
+			order.Code = order_import.Ddbh
+			order.TranId = order_import.Jydh
 
-		order.TotalAmountRmb = amount_rmb
-		order.TotalAmountCurrency = amount_currency
-		order.TotalAmount = amount_au
+			var amount_au float64 = order_import.Skje
+			var amount_currency = "AUD"                            // 澳币的也设置一下
+			var amount_rmb = amount_au * aud_exchange_rate_setting // 汇率换算
 
-		order.AdjustmentAmountRmb = amount_rmb
-		order.AdjustmentAmountCurrency = amount_currency
-		order.AdjustmentAmount = amount_au
+			order.AmountPaidRmb = amount_rmb
+			order.AmountPaidCurrency = amount_currency
+			order.AmountPaid = amount_au
 
-		order.ExpressFee = order_import.Yfsr
-		order.BuyerUserId = order_import.Khzh
-		order.BuyerEmail = order_import.Khyx
-		order.TypeId = models.ORDER_TYPE_DRDD // 导入订单
-		order.StatusId = models.ORDER_STATUS_YZF
-		order.BatchCode = import_batch_code // 导入批次
+			order.TotalAmountRmb = amount_rmb
+			order.TotalAmountCurrency = amount_currency
+			order.TotalAmount = amount_au
 
-		order.ExchangeRate = aud_exchange_rate_setting
+			order.AdjustmentAmountRmb = amount_rmb
+			order.AdjustmentAmountCurrency = amount_currency
+			order.AdjustmentAmount = amount_au
 
-		_, err = db_session.Insert(&order)
-		core.HandleError(err)
+			order.ExpressFee = order_import.Yfsr
+			order.BuyerUserId = order_import.Khzh
+			order.BuyerEmail = order_import.Khyx
+			order.TypeId = models.ORDER_TYPE_DRDD // 导入订单
+			order.StatusId = models.ORDER_STATUS_YZF
+			order.BatchCode = import_batch_code // 导入批次
 
-		// 地址
-		var order_shipping_address models.OrderShippingAddressInfo
-		order_shipping_address.OrderId = order.Id
-		order_shipping_address.Name = order_import.Khxm
-		order_shipping_address.PostalCode = order_import.Yzbm
-		order_shipping_address.Street1 = order_import.Yjdz
-		order_shipping_address.Phone = order_import.Dh
-		order_shipping_address.Province = order_import.Ssdq
-		order_shipping_address.CityName = order_import.Sscs
-		_, err = db_session.Insert(&order_shipping_address)
-		core.HandleError(err)
+			order.ExchangeRate = aud_exchange_rate_setting
 
-		// 回填 order address id
-		order.AddressId = order_shipping_address.Id
-		_, err = db_session.Id(order.Id).Cols("address_id").Update(&order)
-		core.HandleError(err)
+			_, err = db_session.Insert(&order)
+			core.HandleError(err)
 
-		// 订单详细
-		var order_item models.OrderItemInfo
-		order_item.OrderId = order.Id
-		order_item.ItemProductId = order_import.product_id
-		order_item.ItemSku = order_import.Spbh
-		order_item.Quantity = order_import.Spsl
-		//order_item.ProductCostPrice = order_import.Cpcb //  这是单个的产品成本， 后来改为成本从库存里面导入，这里就不导入了
-		_, err = db_session.Insert(&order_item)
-		core.HandleError(err)
+			// 地址
+			var order_shipping_address models.OrderShippingAddressInfo
+			order_shipping_address.OrderId = order.Id
+			order_shipping_address.Name = order_import.Khxm
+			order_shipping_address.PostalCode = order_import.Yzbm
+			order_shipping_address.Street1 = order_import.Yjdz
+			order_shipping_address.Phone = order_shipping_address_service.Normalize_phone(order_import.Dh) // 整理电话号码 "1234 5666"
+			order_shipping_address.Province = order_import.Ssdq
+			order_shipping_address.CityName = order_import.Sscs
+			_, err = db_session.Insert(&order_shipping_address)
+			core.HandleError(err)
+
+			// 回填 order address id
+			order.AddressId = order_shipping_address.Id
+			_, err = db_session.Id(order.Id).Cols("address_id").Update(&order)
+			core.HandleError(err)
+
+			// 订单详细
+			var order_item models.OrderItemInfo
+			order_item.OrderId = order.Id
+			order_item.ItemProductId = order_import.product_id
+			order_item.ItemSku = order_import.Spbh
+			order_item.Quantity = order_import.Spsl
+			//order_item.ProductCostPrice = order_import.Cpcb //  这是单个的产品成本， 后来改为成本从库存里面导入，这里就不导入了
+			_, err = db_session.Insert(&order_item)
+			core.HandleError(err)
+		}
+
+		if len(order_import_same_code_list) > 1 {
+			for _, order_import := range order_import_same_code_list[1:] {
+
+				var amount_au float64 = order.AmountPaidRmb + order_import.Skje // 这里累加
+				var amount_rmb = amount_au * aud_exchange_rate_setting // 汇率换算
+
+				order.AmountPaidRmb = amount_rmb
+				order.AmountPaid = amount_au
+
+				order.TotalAmountRmb = amount_rmb
+				order.TotalAmount = amount_au
+
+				order.AdjustmentAmountRmb = amount_rmb
+				order.AdjustmentAmount = amount_au
+
+				order.ExpressFee = order.ExpressFee + order_import.Yfsr
+
+				// 订单详细
+				var order_item models.OrderItemInfo
+				order_item.OrderId = order.Id
+				order_item.ItemProductId = order_import.product_id
+				order_item.ItemSku = order_import.Spbh
+				order_item.Quantity = order_import.Spsl
+
+				_, err = db_session.Insert(&order_item)
+				core.HandleError(err)
+			}
+
+			_, err = db_session.Id(order.Id).Cols(
+				"amount_paid_rmb", "amount_paid",
+				"total_amount_rmb", "total_amount",
+				"adjustment_amount_rmb", "adjustment_amount",
+				"express_fee").Update(&order)
+			core.HandleError(err)
+		}
 	}
 
 	return c.RenderJson(map[string]interface{}{
