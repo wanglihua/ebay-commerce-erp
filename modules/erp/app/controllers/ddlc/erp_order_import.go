@@ -499,7 +499,7 @@ SELECT sa.id AS shop_id, sa.name AS shop_name FROM erp_shop_account sa;
 		// 订单
 		var order models.OrderInfo
 
-		if len(order_import_same_code_list) == 1 {
+		if len(order_import_same_code_list) >= 1 {
 			var order_import = order_import_same_code_list[0]
 
 			order.ShopId = order_import.shop_id
@@ -566,7 +566,7 @@ SELECT sa.id AS shop_id, sa.name AS shop_name FROM erp_shop_account sa;
 			for _, order_import := range order_import_same_code_list[1:] {
 
 				var amount_au float64 = order.AmountPaidRmb + order_import.Skje // 这里累加
-				var amount_rmb = amount_au * aud_exchange_rate_setting // 汇率换算
+				var amount_rmb = amount_au * aud_exchange_rate_setting          // 汇率换算
 
 				order.AmountPaidRmb = amount_rmb
 				order.AmountPaid = amount_au
