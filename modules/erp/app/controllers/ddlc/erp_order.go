@@ -505,6 +505,9 @@ func (c ErpOrder) PeiHuo() revel.Result {
 		}
 	}
 
+	// todo: 检查和扣减库存
+	// todo: 如果是 hold 的应该如何操作
+
 	for _, order := range order_list {
 		order.StatusId = models.ORDER_STATUS_PHZ
 		_, err = db_session.Id(order.Id).Cols("status_id").Update(&order)

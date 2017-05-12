@@ -371,9 +371,6 @@ func (t EBayOrderDownloadTask) Run() {
 							order_item.ItemConditionId = transaction.Item.ConditionID
 							order_item.ItemConditionDisplayName = transaction.Item.ConditionDisplayName
 
-							//todo: 获得商品的成本价，如果这时产品是刚刚下载的，成本价是零，之后如何更新订单的明细里面的成本价格。
-							order_item.ProductCostPrice = product_service.Get_product_cost_price(product_id, db_session)
-
 							transaction_created_date, err := time.ParseInLocation("2006-01-02T15:04:05.000Z", transaction.CreatedDate, time.UTC)
 							core.HandleError(err)
 							transaction_created_date = transaction_created_date.Local()
@@ -422,9 +419,6 @@ func (t EBayOrderDownloadTask) Run() {
 						order_item.ItemTitle = transaction.Item.Title
 						order_item.ItemConditionId = transaction.Item.ConditionID
 						order_item.ItemConditionDisplayName = transaction.Item.ConditionDisplayName
-
-						//todo: 获得商品的成本价，如果这时产品是刚刚下载的，成本价是零，之后如何更新订单的明细里面的成本价格。
-						order_item.ProductCostPrice = product_service.Get_product_cost_price(product_id, db_session)
 
 						transaction_created_date, err := time.ParseInLocation("2006-01-02T15:04:05.000Z", transaction.CreatedDate, time.UTC)
 						core.HandleError(err)

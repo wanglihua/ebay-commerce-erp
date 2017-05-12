@@ -221,7 +221,6 @@ type Order_product_info_t struct {
 	ProductId int64    `xorm:"'product_id'"`
 	Price     float64  `xorm:"'price'"` // 方便后面的运费计算啥的，这里面的价格是 澳币
 	Qty       int64    `xorm:"'qty'"`
-	CostPrice int64    `xorm:"'cost_price'"` // 是 人民币 的成本价，由于运费都是用 澳币结算的，匹配物流时，应该把这个 成本价 换算成 澳币
 	Length    float64  `xorm:"'length'"`
 	Width     float64  `xorm:"'width'"`
 	Height    float64  `xorm:"'height'"`
@@ -236,7 +235,6 @@ SELECT
     oi.item_product_id    AS product_id,
     oi.transaction_price  AS price,
     oi.quantity           AS qty,
-    oi.product_cost_price AS cost_price,
     p.length              AS length,
     p.width               AS width,
     p.height              AS height,
@@ -251,7 +249,6 @@ WHERE oi.order_id = 1
     oi.item_product_id    AS product_id,
     oi.transaction_price  AS price,
     oi.quantity           AS qty,
-    oi.product_cost_price AS cost_price,
     p.length              AS length,
     p.width               AS width,
     p.height              AS height,

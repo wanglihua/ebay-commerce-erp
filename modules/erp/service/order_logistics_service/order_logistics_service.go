@@ -484,7 +484,8 @@ func (p_ol *OrderLogistics) hold_check_great_deficit(p_order *models.OrderInfo, 
 
 	var profit = (total_amount + express_fee) - (order_gst + platform_fee + payment_fee + logistics_fee + pick_fee + cost_amount)
 
-	if profit < 0 {
+	// 利润小于零，并且亏损价格大于最大价格或者亏损率大于最大亏损率
+	if profit < 0 && ((math.Abs(profit) > p_ol.logistics_setting.MaxDeficitPrice) || (math.Abs(profit)/profit > p_ol.logistics_setting.MaxDeficitRate)) {
 		p_ol.update_order_to_hold_type(p_order, models.ORDER_HOLD_TYPE_GREAT_DEFICIT, db_session)
 		return true
 	}
@@ -1045,15 +1046,15 @@ WHERE id = %d`
 		core.HandleError(err)
 
 		/*
-INSERT INTO erp_order_item (order_id, order_line_item_id, quantity, transaction_id, transaction_price_currency, transaction_price, transaction_price_rmb, product_store_item_id, item_id, item_product_id, item_sku, item_title, item_condition_id, item_condition_display_name, created_date, `desc`, product_cost_price, create_time, update_time)
-    SELECT -1, order_line_item_id, quantity, transaction_id, transaction_price_currency, transaction_price, transaction_price_rmb, product_store_item_id, item_id, item_product_id, item_sku, item_title, item_condition_id, item_condition_display_name, created_date, `desc`, product_cost_price, create_time, update_time
+INSERT INTO erp_order_item (order_id, order_line_item_id, quantity, transaction_id, transaction_price_currency, transaction_price, transaction_price_rmb, product_store_item_id, item_id, item_product_id, item_sku, item_title, item_condition_id, item_condition_display_name, created_date, `desc`, create_time, update_time)
+    SELECT -1, order_line_item_id, quantity, transaction_id, transaction_price_currency, transaction_price, transaction_price_rmb, product_store_item_id, item_id, item_product_id, item_sku, item_title, item_condition_id, item_condition_display_name, created_date, `desc`, create_time, update_time
     FROM erp_order_item
     WHERE order_id IN (-2, -3)
 		 */
 
 		// 添加新的 order_id_item
-		var sql_insert_order_item = `INSERT INTO erp_order_item (order_id, order_line_item_id, quantity, transaction_id, transaction_price_currency, transaction_price, transaction_price_rmb, product_store_item_id, item_id, item_product_id, item_sku, item_title, item_condition_id, item_condition_display_name, created_date, %s, product_cost_price, create_time, update_time)
-    SELECT %d, order_line_item_id, quantity, transaction_id, transaction_price_currency, transaction_price, transaction_price_rmb, product_store_item_id, item_id, item_product_id, item_sku, item_title, item_condition_id, item_condition_display_name, created_date, %s, product_cost_price, create_time, update_time
+		var sql_insert_order_item = `INSERT INTO erp_order_item (order_id, order_line_item_id, quantity, transaction_id, transaction_price_currency, transaction_price, transaction_price_rmb, product_store_item_id, item_id, item_product_id, item_sku, item_title, item_condition_id, item_condition_display_name, created_date, %s, create_time, update_time)
+    SELECT %d, order_line_item_id, quantity, transaction_id, transaction_price_currency, transaction_price, transaction_price_rmb, product_store_item_id, item_id, item_product_id, item_sku, item_title, item_condition_id, item_condition_display_name, created_date, %s, create_time, update_time
     FROM erp_order_item
     WHERE order_id IN (%s)`
 		sql_insert_order_item = fmt.Sprintf(sql_insert_order_item, "`desc`", first_order_id, "`desc`", strings.Join(order_id_str_list[1:], ",")) // 修改第一个订单之外的 order item
