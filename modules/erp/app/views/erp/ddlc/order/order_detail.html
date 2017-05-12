@@ -300,16 +300,13 @@
                                     <td></td>
                                     <td></td>
                                     <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td>商品奥仓成本
+                                    <td colspan="2">商品澳仓成本
                                         RMB {{ format_amount(detail.order_logistics.cost_amount *
                                         detail.order.exchange_rate) }}
                                     </td>
-                                    <td>物流成本 RMB {{ format_amount(detail.logistics_fee) }}
+                                    <td colspan="2">物流成本 RMB {{ format_amount(detail.logistics_fee) }}
                                     </td>
-                                    <td>毛利 RMB {{ format_amount(detail.order_profit) }}</td>
+                                    <td colspan="2">毛利 RMB {{ format_amount(detail.order_profit) }}</td>
                                 </tr>
                                 </tfoot>
                             </table>
