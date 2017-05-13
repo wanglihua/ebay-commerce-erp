@@ -4,7 +4,7 @@ import (
 	"matrix/core"
 )
 
-type Issue_attach_info struct {
+type IssueAttachInfo struct {
 	Id          int64             `xorm:"bigint notnull pk autoincr 'id'" json:"id"`
 	IssueId     int64             `xorm:"biging notnull index 'issue_id'" json:"issue_id" smith:"verbose_name=缺陷id"`
 	Type        int64             `xorm:"biging notnull index default(1) 'type'" json:"type" smith:"verbose_name=类型"` // 1 表示图片，2 表示普通附件,默认为 1
@@ -16,10 +16,10 @@ type Issue_attach_info struct {
 	Version     int               `xorm:"version notnull 'version'" json:"version"`
 }
 
-func (e Issue_attach_info) TableName() string {
+func (e IssueAttachInfo) TableName() string {
 	return TablePrefix + "issue_attach"
 }
 
-func (e Issue_attach_info) ModelDesc() string {
+func (e IssueAttachInfo) ModelDesc() string {
 	return "verbose_name=缺陷附件,entity_json=issue_attach,route=issue/attach"
 }

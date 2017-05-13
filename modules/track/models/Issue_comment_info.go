@@ -4,7 +4,7 @@ import (
 	"matrix/core"
 )
 
-type Issue_comment_info struct {
+type IssueCommentInfo struct {
 	Id          int64             `xorm:"bigint notnull pk autoincr 'id'" json:"id"`
 	IssueId     int64             `xorm:"biging notnull index 'issue_id'" json:"issue_id" smith:"verbose_name=缺陷id"`
 	Body        string            `xorm:"text notnull 'body'" json:"body" smith:"verbose_name=正文,min=2,max=4000"`
@@ -15,10 +15,10 @@ type Issue_comment_info struct {
 	Version     int               `xorm:"version notnull 'version'" json:"version"`
 }
 
-func (e Issue_comment_info) TableName() string {
+func (e IssueCommentInfo) TableName() string {
 	return TablePrefix + "issue_comment"
 }
 
-func (e Issue_comment_info) ModelDesc() string {
+func (e IssueCommentInfo) ModelDesc() string {
 	return "verbose_name=缺陷评论,entity_json=issue_comment,route=issue/comment"
 }

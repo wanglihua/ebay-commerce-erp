@@ -4,7 +4,7 @@ import (
 	"matrix/core"
 )
 
-type Issue_log_info struct {
+type IssueLogInfo struct {
 	Id          int64              `xorm:"bigint notnull pk autoincr 'id'" json:"id"`
 	IssueId     int64              `xorm:"biging notnull index 'issue_id'" json:"issue_id" smith:"verbose_name=缺陷id"`
 	Content     string             `xorm:"text notnull 'content'" json:"content" smith:"verbose_name=操作内容"`
@@ -15,10 +15,10 @@ type Issue_log_info struct {
 	Version     int                `xorm:"version notnull 'version'" json:"version"`
 }
 
-func (e Issue_log_info) TableName() string {
+func (e IssueLogInfo) TableName() string {
 	return TablePrefix + "issue_log"
 }
 
-func (e Issue_log_info) ModelDesc() string {
+func (e IssueLogInfo) ModelDesc() string {
 	return "verbose_name=缺陷日志,entity_json=issue_log,route=issue/log"
 }
