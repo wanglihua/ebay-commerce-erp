@@ -8,6 +8,7 @@ import (
 	"matrix/db"
 	auth_models "matrix/modules/auth/models"
 	erp_models "matrix/modules/erp/models"
+	track_modes "matrix/modules/track/models"
 )
 
 type Home struct {
@@ -114,6 +115,14 @@ func (c Home) SyncDbPost() revel.Result {
 	model_list = append(model_list, &erp_models.StorageLocInfo{})
 	model_list = append(model_list, &erp_models.SupplierInfo{})
 	model_list = append(model_list, &erp_models.TestInfo{})
+
+	model_list = append(model_list, &track_modes.Issue_attach_info{})
+	model_list = append(model_list, &track_modes.Issue_cate_info{})
+	model_list = append(model_list, &track_modes.Issue_comment_info{})
+	model_list = append(model_list, &track_modes.Issue_info{})
+	model_list = append(model_list, &track_modes.Issue_log_info{})
+	model_list = append(model_list, &track_modes.Issue_status_info{})
+	model_list = append(model_list, &track_modes.Issue_type_info{})
 
 	err := db.Engine.Sync2(model_list...)
 	core.HandleError(err)
