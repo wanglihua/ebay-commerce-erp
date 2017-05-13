@@ -16,7 +16,7 @@ type Issue_log_info struct {
 }
 
 func (e Issue_log_info) TableName() string {
-	return TablePrefix + "issue"
+	return TablePrefix + "issue_log"
 }
 
 func (e Issue_log_info) ModelDesc() string {

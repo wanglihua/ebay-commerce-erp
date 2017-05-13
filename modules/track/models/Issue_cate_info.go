@@ -14,7 +14,7 @@ type Issue_cate_info struct {
 }
 
 func (e Issue_cate_info) TableName() string {
-	return TablePrefix + "issue"
+	return TablePrefix + "issue_cate"
 }
 
 func (e Issue_cate_info) ModelDesc() string {

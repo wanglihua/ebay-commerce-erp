@@ -1,7 +1,7 @@
 package models
 
 import (
-"matrix/core"
+	"matrix/core"
 )
 
 type Issue_type_info struct {
@@ -14,7 +14,7 @@ type Issue_type_info struct {
 }
 
 func (e Issue_type_info) TableName() string {
-	return TablePrefix + "issue"
+	return TablePrefix + "issue_type"
 }
 
 func (e Issue_type_info) ModelDesc() string {
