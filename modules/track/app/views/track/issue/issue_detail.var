@@ -1,0 +1,3 @@
+<script type="text/javascript">
+    var issue_id = {%.issue_id%};
+</script>

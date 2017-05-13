@@ -1,0 +1,233 @@
+{%header "软件缺陷" .%}
+<div id="page">
+    <div class="breadcrumbs" id="breadcrumbs">
+        <ul class="breadcrumb">
+            <li>
+                <a href='{%url "Home.Index"%}'><i class="ace-icon fa fa-home home-icon"></i></a>
+            </li>
+            <li class="parent" data-menu="track-menu">缺陷跟踪</li>
+            <li class="active" data-menu="track-issue-menu">软件缺陷</li>
+            <li>软件缺陷详细</li>
+        </ul>
+    </div>
+    <div class="page-content">
+        <div class="row">
+            <div class="col-xs-12" style="padding: 0;">
+                <div class="gridToolBar clearfix">
+                    <button type="button" class="btn btn-success btn-sm" @click="saveIssue()">
+                        <i class="ace-icon fa fa-floppy-o"></i>保存
+                    </button>
+                    {% if ne .issue_id 0 %}
+                    <button class="btn btn-danger btn-sm" @click="deleteIssue()">
+                        <i class="ace-icon fa fa-trash-o"></i>
+                        删除
+                    </button>
+                    {% end %}
+                </div>
+                <div style="margin-top: 20px;">
+                    <div class="col-xs-12">
+                        <form class="form-horizontal" role="form" id="issueDetailForm">
+                            <input id="issue_id" name="detail.issue.id" type="hidden" v-model.number="detail.issue.id"/>
+                            <input id="issue_version" name="detail.issue.version" type="hidden" v-model.number="detail.issue.version"/>
+
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <div class="form-group">
+                                        <label for="type_id" class="col-xs-2 control-label">类型</label>
+                                        <div class="col-xs-10">
+                                            <select id="type_id" name="detail.issue.type_id" class="input-sm form-control" v-model.number="detail.issue.type_id">
+                                                <template v-for="issue_type in detail.issue_type_list">
+                                                    <option :value="issue_type.id">{{issue_type.type_name}}</option>
+                                                </template>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <div class="form-group">
+                                        <label for="title" class="col-xs-2 control-label">标题</label>
+                                        <div class="col-xs-10">
+                                            <input id="title" name="detail.issue.title" type="text" class="input-sm form-control" v-model="detail.issue.title"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <div class="form-group">
+                                        <label for="body" class="col-xs-2 control-label">正文</label>
+                                        <div class="col-xs-10">
+                                            <input id="body" name="detail.issue.body" type="text" class="input-sm form-control" v-model="detail.issue.body"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <div class="form-group">
+                                        <label for="cate_id" class="col-xs-2 control-label">类别</label>
+                                        <div class="col-xs-10">
+                                            <select id="cate_id" name="detail.issue.cate_id" class="input-sm form-control" v-model.number="detail.issue.cate_id">
+                                                <template v-for="issue_cate in detail.issue_cate_list">
+                                                    <option :value="issue_cate.id">{{issue_cate.cate_name}}</option>
+                                                </template>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <div class="form-group">
+                                        <label for="submit_user_id" class="col-xs-2 control-label">提报人</label>
+                                        <div class="col-xs-10">
+                                            <select id="submit_user_id" name="detail.issue.submit_user_id" class="input-sm form-control" v-model.number="detail.issue.submit_user_id">
+                                                <template v-for="user in detail.user_list">
+                                                    <option :value="user.id">{{user.nick_name}}</option>
+                                                </template>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+
+    function load_page_data() {
+        showMask("加载中...");
+        $.ajax({
+                url: '{%url "TrackIssue.DetailData" %}',
+                type: "POST",
+                data: {
+                    "id": issue_id
+                },
+                success: function (result) {
+                    hideMask();
+                    if (result.success === false) {
+                        $.msg.error(result.message);
+                        return;
+                    }
+                    vm.detail = result;
+                }
+            }
+        );
+    }
+
+    $(function () {
+        load_page_data();
+    });
+
+    var vm = new Vue({
+        el: "#page",
+        data: {
+            "detail": {
+                "issue": {}
+            }
+        },
+        mounted: function () {
+
+        },
+        methods: {
+            saveIssue: function () {
+                showMask("提交中...");
+                var form = $("#issueDetailForm");
+                var valid = validate(form, {
+                    'detail.issue.cate_id': {
+                        required: true
+                    },
+                    'detail.issue.type_id': {
+                        required: true
+                    },
+                    'detail.issue.title': {
+                        required: true, minlength: 2, maxlength: 100
+                    },
+                    'detail.issue.body': {
+                        required: true, minlength: 2, maxlength: 4000
+                    },
+                    'detail.issue.submit_user_id': {
+                        required: true
+                    },
+                    'detail.issue.submit_user_name': {
+                        required: true
+                    },
+                    'detail.issue.enter_user_id': {
+                        required: true
+                    },
+                    'detail.issue.enter_user_name': {
+                        required: true
+                    },
+                    'detail.issue.status_id': {
+                        required: true
+                    },
+                    'detail.issue.create_time': {
+                        required: true
+                    },
+                    'detail.issue.update_time': {
+                        required: true
+                    }
+                });
+
+                if (!valid) {
+                    hideMask();
+                } else {
+                    $.ajax({
+                            url: '{%url "TrackIssue.Save"%}',
+                            type: "POST",
+                            processData: false,
+                            contentType: 'application/json',
+                            data: JSON.stringify(vm.detail),
+                            success: function (data) {
+                                hideMask();
+                                if (data.success === false) {
+                                    $.msg.error(data.message);
+                                    //return;
+                                }
+                                else {
+                                    $.msg.show(data.message);
+                                    $('#issueDetailDialog').modal('hide');
+                                    vm.reloadList();
+                                    //return;
+                                }
+                            }
+                        }
+                    );
+                }
+            },
+            deleteIssue: function () {
+                var id_list = [];
+                id_list.push(issue_id);
+
+                $.msg.confirm("确认要删除吗？", function () {
+                    $.ajax({
+                        url: '{%url "TrackIssue.Delete"%}',
+                        type: "POST",
+                        data: {"id_list": id_list},
+                        success: function (data) {
+                            if (data.success === false) {
+                                $.msg.error(data.message);
+                                return;
+                            }
+                            else {
+                                $.msg.show(data.message);
+                            }
+                        }
+                    });
+                });
+            }
+        }
+    });
+</script>
+{%template "track/issue/issue_detail.var" .%}
+{%footer%}

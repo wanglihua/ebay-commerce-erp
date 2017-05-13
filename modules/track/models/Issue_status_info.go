@@ -6,16 +6,16 @@ import (
 )
 
 const (
-	ISSUE_STATUS_YTJ = 100  // 已提交
-	ISSUE_STATUS_CLZ = 200  // 处理中
-	ISSUE_STATUS_YCL = 300  // 已处理
-	ISSUE_STATUS_YJJ = 400  // 已解决
-	ISSUE_STATUS_WJJ = 500  // 未解决
-	ISSUE_STATUS_YCX = 600  // 又出现
-	ISSUE_STATUS_KFZ = 700  // 开发中
-	ISSUE_STATUS_YWC = 800  // 已完成
-	ISSUE_STATUS_YSX = 900  // 已实现
-	ISSUE_STATUS_WSX = 1000 // 未实现
+	ISSUE_STATUS_YTJ int64 = 100  // 已提交
+	ISSUE_STATUS_CLZ int64 = 200  // 处理中
+	ISSUE_STATUS_YCL int64 = 300  // 已处理
+	ISSUE_STATUS_YJJ int64 = 400  // 已解决
+	ISSUE_STATUS_WJJ int64 = 500  // 未解决
+	ISSUE_STATUS_YCX int64 = 600  // 又出现
+	ISSUE_STATUS_KFZ int64 = 700  // 开发中
+	ISSUE_STATUS_YWC int64 = 800  // 已完成
+	ISSUE_STATUS_YSX int64 = 900  // 已实现
+	ISSUE_STATUS_WSX int64 = 1000 // 未实现
 )
 
 type IssueStatusInfo struct {

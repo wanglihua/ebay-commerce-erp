@@ -103,31 +103,9 @@
                                 <div class="row">
                                     <div class="col-xs-6">
                                         <div class="form-group">
-                                            <label for="submit_user_code" class="col-xs-2 control-label">提报人工号</label>
+                                            <label for="submit_user_name" class="col-xs-2 control-label">提报人</label>
                                             <div class="col-xs-10">
-                                                <input id="submit_user_code" name="detail.issue.submit_user_code" type="text" class="input-sm form-control" v-model="detail.issue.submit_user_code"/>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-xs-6">
-                                        <div class="form-group">
-                                            <label for="enter_user_id" class="col-xs-2 control-label">录入人用户id</label>
-                                            <div class="col-xs-10">
-                                                <input id="enter_user_id" name="detail.issue.enter_user_id" type="text" class="input-sm form-control" v-model="detail.issue.enter_user_id"/>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-xs-6">
-                                        <div class="form-group">
-                                            <label for="enter_user_code" class="col-xs-2 control-label">录入人工号</label>
-                                            <div class="col-xs-10">
-                                                <input id="enter_user_code" name="detail.issue.enter_user_code" type="text" class="input-sm form-control" v-model="detail.issue.enter_user_code"/>
+                                                <input id="submit_user_name" name="detail.issue.submit_user_name" type="text" class="input-sm form-control" v-model="detail.issue.submit_user_name"/>
                                             </div>
                                         </div>
                                     </div>
@@ -191,11 +169,11 @@
             }
         },
         mounted: function () {
-            initDataTable(
+            initSingleSelectDataTable(
                 '#issueList',
                 {
                     "sAjaxSource": '{%url "TrackIssue.ListData"%}',
-                    "aaSorting": [[1, "asc"]],
+                    "aaSorting": [[8, "desc"]],
                     "aoColumns": [
                         {
                             "mDataProp": "id",
@@ -208,11 +186,11 @@
                                 return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
                             }
                         },
-                        {"mDataProp": "cate_name", "title": "类别", "bSearchable": true, "width": 180},
                         {"mDataProp": "type_id", "title": "类型", "bSearchable": true, "width": 100},
                         {"mDataProp": "title", "title": "标题", "bSearchable": true},
-                        {"mDataProp": "submit_user_code", "title": "提报人", "bSearchable": true, "width": 100},
-                        {"mDataProp": "enter_user_code", "title": "录入人", "bSearchable": true, "width": 100},
+                        {"mDataProp": "cate_name", "title": "类别", "bSearchable": true, "width": 180},
+                        {"mDataProp": "submit_user_name", "title": "提报人", "bSearchable": true, "width": 100},
+                        {"mDataProp": "enter_user_name", "title": "录入人", "bSearchable": true, "width": 100},
                         {"mDataProp": "status_id", "title": "状态", "bSearchable": true, "width": 100},
                         {"mDataProp": "create_time", "title": "创建时间", "bSearchable": false, "width": 120},
                         {"mDataProp": "update_time", "title": "修改时间", "bSearchable": false, "width": 120}
@@ -269,13 +247,13 @@
                     'detail.issue.submit_user_id': {
                         required: true
                     },
-                    'detail.issue.submit_user_code': {
+                    'detail.issue.submit_user_name': {
                         required: true
                     },
                     'detail.issue.enter_user_id': {
                         required: true
                     },
-                    'detail.issue.enter_user_code': {
+                    'detail.issue.enter_user_name': {
                         required: true
                     },
                     'detail.issue.status_id': {
@@ -323,8 +301,13 @@
                     }
                 });
 
-                if (id_list.length == 0) {
-                    $.msg.alert("请选择数据！");
+                if (id_list.length === 0) {
+                    $.msg.alert("请选择一条数据！");
+                    return;
+                }
+
+                if (id_list.length > 1) {
+                    $.msg.alert("请选择一条数据！");
                     return;
                 }
 
