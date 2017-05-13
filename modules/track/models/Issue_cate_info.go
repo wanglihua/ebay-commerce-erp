@@ -1,6 +1,7 @@
 package models
 
 import (
+	"github.com/go-xorm/xorm"
 	"matrix/core"
 )
 
@@ -19,4 +20,8 @@ func (e IssueCateInfo) TableName() string {
 
 func (e IssueCateInfo) ModelDesc() string {
 	return "verbose_name=缺陷类别,entity_json=issue_type,route=issue/type"
+}
+
+func (e IssueCateInfo) InitData(db_session *xorm.Session) {
+
 }

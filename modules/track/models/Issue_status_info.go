@@ -1,7 +1,13 @@
 package models
 
 import (
+	"github.com/go-xorm/xorm"
 	"matrix/core"
+)
+
+const (
+	ISSUE_STATUS_YTJ = 100 // 已提交
+	ISSUE_STATUS_YCL = 200 // 已处理
 )
 
 type IssueStatusInfo struct {
@@ -19,4 +25,18 @@ func (e IssueStatusInfo) TableName() string {
 
 func (e IssueStatusInfo) ModelDesc() string {
 	return "verbose_name=缺陷状态,entity_json=issue_status,route=issue/status"
+}
+
+func (e IssueStatusInfo) InitData(db_session *xorm.Session) {
+	var p_issue_status = new(IssueStatusInfo)
+	p_issue_status.Id = ISSUE_STATUS_YTJ
+	p_issue_status.Name = "已提交"
+	p_issue_status.Desc = "已提交"
+	db_session.Insert(p_issue_status)
+
+	p_issue_status = new(IssueStatusInfo)
+	p_issue_status.Id = ISSUE_STATUS_YCL
+	p_issue_status.Name = "已处理"
+	p_issue_status.Desc = "已处理"
+	db_session.Insert(p_issue_status)
 }

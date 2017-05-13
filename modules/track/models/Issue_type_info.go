@@ -1,7 +1,14 @@
 package models
 
 import (
+	"github.com/go-xorm/xorm"
 	"matrix/core"
+)
+
+const (
+	ISSUE_TYPE_REQ = 100 // 需求
+	ISSUE_TYPE_CHG = 200 // 变更
+	ISSUE_TYPE_BUG = 300 // Bug
 )
 
 type IssueTypeInfo struct {
@@ -19,4 +26,24 @@ func (e IssueTypeInfo) TableName() string {
 
 func (e IssueTypeInfo) ModelDesc() string {
 	return "verbose_name=缺陷类型,entity_json=issue_type,route=issue/type"
+}
+
+func (e IssueTypeInfo) InitData(db_session *xorm.Session) {
+	var p_issue_type = new(IssueTypeInfo)
+	p_issue_type.Id = ISSUE_TYPE_REQ
+	p_issue_type.Name = "需求"
+	p_issue_type.Desc = "需求"
+	db_session.Insert(p_issue_type)
+
+	p_issue_type = new(IssueTypeInfo)
+	p_issue_type.Id = ISSUE_TYPE_CHG
+	p_issue_type.Name = "变更"
+	p_issue_type.Desc = "变更"
+	db_session.Insert(p_issue_type)
+
+	p_issue_type = new(IssueTypeInfo)
+	p_issue_type.Id = ISSUE_TYPE_BUG
+	p_issue_type.Name = "Bug"
+	p_issue_type.Desc = "Bug"
+	db_session.Insert(p_issue_type)
 }
