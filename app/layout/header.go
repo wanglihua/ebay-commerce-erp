@@ -218,6 +218,8 @@ func GetHeader(title string, db_session *xorm.Session, web_session revel.Session
 		header_buffer.WriteString(menu.GetXtpzMenu(res_id_map, web_session))
 	}
 
+	header_buffer.WriteString(menu.GetTrackMenu(res_id_map, web_session))
+
 	header_buffer.WriteString(`
         <div class="sidebar-toggle sidebar-collapse" id="sidebar-collapse">
             <i class="ace-icon fa fa-angle-double-left" data-icon1="ace-icon fa fa-angle-double-left" data-icon2="ace-icon fa fa-angle-double-right"></i>

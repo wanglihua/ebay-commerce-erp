@@ -1,0 +1,27 @@
+GET  /track/issue/comment                TrackIssueComment.Index
+POST /track/issue/comment/data/list      TrackIssueComment.ListData
+POST /track/issue/comment/data/detail    TrackIssueComment.DetailData
+POST /track/issue/comment/save           TrackIssueComment.Save
+POST /track/issue/comment/delete         TrackIssueComment.Delete
+
+GET  /track/issue                    TrackIssue.Index
+POST /track/issue/data/list          TrackIssue.ListData
+POST /track/issue/data/detail        TrackIssue.DetailData
+POST /track/issue/save               TrackIssue.Save
+POST /track/issue/delete             TrackIssue.Delete
+
+GET  /track/issue/cate               TrackIssueCate.Index
+POST /track/issue/cate/data/list     TrackIssueCate.ListData
+POST /track/issue/cate/data/detail   TrackIssueCate.DetailData
+POST /track/issue/cate/save          TrackIssueCate.Save
+POST /track/issue/cate/delete        TrackIssueCate.Delete
+
+GET  /track/issue/log                TrackIssueLog.Index
+POST /track/issue/log/data/list      TrackIssueLog.ListData
+POST /track/issue/log/data/detail    TrackIssueLog.DetailData
+
+GET  /track/issue/status             TrackIssueStatus.Index
+POST /track/issue/status/data/list   TrackIssueStatus.ListData
+
+GET  /track/issue/type               TrackIssueType.Index
+POST /track/issue/type/data/list     TrackIssueType.ListData

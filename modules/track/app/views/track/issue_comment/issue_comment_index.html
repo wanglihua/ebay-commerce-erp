@@ -1,0 +1,279 @@
+{%header "缺陷评论" .%}
+<div id="page">
+   <div class="breadcrumbs" id="breadcrumbs">
+       <ul class="breadcrumb">
+           <li>
+               <a href='{%url "Home.Index"%}'><i class="ace-icon fa fa-home home-icon"></i></a>
+           </li>
+           <li class="parent" data-menu="track-menu">缺陷跟踪</li>
+           <li class="active" data-menu="track-issuecomment-menu">缺陷评论</li>
+       </ul>
+   </div>
+   <div class="page-content">
+       <div class="row">
+           <div class="col-xs-12" style="padding: 0;">
+               <div class="gridToolBar clearfix">
+                   <button class="btn btn-primary btn-sm" @click="reloadList('#issueCommentList')">
+                       <i class="ace-icon fa fa-refresh"></i>
+                       刷新
+                   </button>
+                   <button class="btn btn-success btn-sm" @click="showIssueCommentDetail(0)">
+                       <i class="ace-icon fa fa-plus"></i>
+                       新增
+                   </button>
+                   <button class="btn btn-danger btn-sm" @click="deleteIssueComment()">
+                       <i class="ace-icon fa fa-trash-o"></i>
+                       删除
+                   </button>
+               </div>
+               <div>
+                   <table id="issueCommentList" class="table table-striped table-bordered table-hover"></table>
+               </div>
+           </div>
+       </div>
+   </div>
+    <div class="modal fade" id="issueCommentDetailDialog">
+        <div class="modal-dialog" style="width: 680px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="True">&times;</button>
+                    <h4 class="modal-title">缺陷评论详细</h4>
+                </div>
+                <div class="modal-body clearfix">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <form class="form-horizontal" role="form" id="issueCommentDetailForm">
+                                <input id="issue_comment_id" name="detail.issue_comment.id" type="hidden" v-model.number="detail.issue_comment.id"/>
+                                <input id="issue_comment_version" name="detail.issue_comment.version" type="hidden" v-model.number="detail.issue_comment.version"/>
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="issue_id" class="col-xs-2 control-label">缺陷id</label>
+                                            <div class="col-xs-10">
+                                                <input id="issue_id" name="detail.issue_comment.issue_id" type="text" class="input-sm form-control" v-model="detail.issue_comment.issue_id"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="body" class="col-xs-2 control-label">正文</label>
+                                            <div class="col-xs-10">
+                                                <input id="body" name="detail.issue_comment.body" type="text" class="input-sm form-control" v-model="detail.issue_comment.body"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="user_id" class="col-xs-2 control-label">提报人用户id</label>
+                                            <div class="col-xs-10">
+                                                <input id="user_id" name="detail.issue_comment.user_id" type="text" class="input-sm form-control" v-model="detail.issue_comment.user_id"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="user_code" class="col-xs-2 control-label">提报人工号</label>
+                                            <div class="col-xs-10">
+                                                <input id="user_code" name="detail.issue_comment.user_code" type="text" class="input-sm form-control" v-model="detail.issue_comment.user_code"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="create_time" class="col-xs-2 control-label">Create_time</label>
+                                            <div class="col-xs-10">
+                                                <input id="create_time" name="detail.issue_comment.create_time" type="text" class="input-sm form-control" v-model="detail.issue_comment.create_time"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="update_time" class="col-xs-2 control-label">Update_time</label>
+                                            <div class="col-xs-10">
+                                                <input id="update_time" name="detail.issue_comment.update_time" type="text" class="input-sm form-control" v-model="detail.issue_comment.update_time"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success btn-sm" @click="saveIssueComment()">
+                        <i class="ace-icon fa fa-floppy-o"></i>保存
+                    </button>
+                    <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">
+                        <i class="ace-icon fa fa-times"></i>关闭
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    var vm = new Vue({
+        el: "#page",
+        data: {
+            "detail": {
+                "issue_comment": {}
+            }
+        },
+        mounted: function () {
+            initDataTable(
+                    '#issueCommentList',
+                    {
+                        "sAjaxSource": '{%url "TrackIssueComment.ListData"%}',
+                        "aaSorting": [[1, "asc"]],
+                        "aoColumns": [
+                            {
+                                "mDataProp": "id", "bSearchable": false, "orderable": false, "sClass": "center", "width": 50,
+                                "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
+                                "render": function (data, type, row) {
+                                    return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
+                                }
+                            },
+                            {"mDataProp": "issue_id", "title": "缺陷id", "bSearchable": true },
+                            {"mDataProp": "body", "title": "正文", "bSearchable": true },
+                            {"mDataProp": "user_id", "title": "提报人用户id", "bSearchable": true },
+                            {"mDataProp": "user_code", "title": "提报人工号", "bSearchable": true },
+                            {"mDataProp": "create_time", "title": "Create_time", "bSearchable": false },
+                            {"mDataProp": "update_time", "title": "Update_time", "bSearchable": false },
+                            {"mDataProp": "create_time", "title": "创建时间", "bSearchable": false, "width": 120 },
+                            {"mDataProp": "update_time", "title": "修改时间", "bSearchable": false, "width": 120 }
+                        ]
+                   }
+            );
+
+            $('#issueCommentList tbody').on('dblclick', 'tr', function () {
+                var id = $(this).find('td:first-child input:checkbox').val();
+                vm.showIssueCommentDetail(id);
+            });
+        },
+        methods: {
+            reloadList: function () {
+                reloadList('#issueCommentList');
+            },
+            showIssueCommentDetail: function (id) {
+                showMask("加载中...");
+                $("#issueCommentDetailForm").clearValidation();
+                $.ajax({
+                           url: '{%url "TrackIssueComment.DetailData" %}',
+                           type: "POST",
+                           data: {
+                               "id": id
+                           },
+                           success: function (result) {
+                               hideMask();
+                               if (result.success == false) {
+                                   $.msg.error(result.message);
+                                   return;
+                               }
+                               vm.detail = result;
+                               $('#issueCommentDetailDialog').modal(modalOptions);
+                           }
+                       }
+                );
+            },
+            saveIssueComment: function () {
+                showMask("提交中...");
+                var form = $("#issueCommentDetailForm");
+                var valid = validate(form, {  
+                    'detail.issue_comment.issue_id': {
+                        required: true
+                    },
+                    'detail.issue_comment.body': {
+                        required: true, minlength: 2, maxlength: 4000
+                    },
+                    'detail.issue_comment.user_id': {
+                        required: true
+                    },
+                    'detail.issue_comment.user_code': {
+                        required: true
+                    },
+                    'detail.issue_comment.create_time': {
+                        required: true
+                    },
+                    'detail.issue_comment.update_time': {
+                        required: true
+                    }
+                });
+
+                if (!valid) {
+                    hideMask();
+                } else {
+                    $.ajax({
+                               url: '{%url "TrackIssueComment.Save"%}',
+                               type: "POST",
+                               processData: false,
+                               contentType: 'application/json',
+                               data: JSON.stringify(vm.detail),
+                               success: function (data) {
+                                   hideMask();
+                                   if (data.success == false) {
+                                       $.msg.error(data.message);
+                                       //return;
+                                   }
+                                   else {
+                                       $.msg.show(data.message);
+                                       $('#issueCommentDetailDialog').modal('hide');
+                                       vm.reloadList();
+                                       //return;
+                                   }
+                               }
+                           }
+                    );
+                }
+            },
+            deleteIssueComment: function () {
+                var id_list = [];
+                $('#issueCommentList tbody tr>td:first-child input:checkbox').each(function () {
+                    if (this.checked) {
+                        id_list.push($(this).val());
+                    }
+                });
+
+                if (id_list.length == 0) {
+                    $.msg.alert("请选择数据！");
+                    return;
+                }
+
+                $.msg.confirm("确认要删除吗？", function () {
+                    $.ajax({
+                               url: '{%url "TrackIssueComment.Delete"%}',
+                               type: "POST",
+                               data: {"id_list": id_list},
+                               success: function (data) {
+                                   if (data.success == false) {
+                                       $.msg.error(data.message);
+                                       return;
+                                   }
+                                   else {
+                                       $.msg.show(data.message);
+                                   }
+                                   vm.reloadList();
+                               }
+                           });
+                });
+            }
+        }
+    });
+</script>
+{%footer%}
+

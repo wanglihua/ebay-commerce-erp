@@ -114,7 +114,7 @@ func (c Home) SyncDbPost() revel.Result {
 	model_list = append(model_list, &erp_models.StockTypeInfo{})
 	model_list = append(model_list, &erp_models.StorageLocInfo{})
 	model_list = append(model_list, &erp_models.SupplierInfo{})
-	model_list = append(model_list, &erp_models.TestInfo{})
+	// model_list = append(model_list, &erp_models.TestInfo{})
 
 	model_list = append(model_list, &track_modes.IssueAttachInfo{})
 	model_list = append(model_list, &track_modes.IssueCateInfo{})

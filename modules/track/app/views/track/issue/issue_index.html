@@ -1,1 +1,354 @@
-issue index
+{%header "软件缺陷" .%}
+<div id="page">
+   <div class="breadcrumbs" id="breadcrumbs">
+       <ul class="breadcrumb">
+           <li>
+               <a href='{%url "Home.Index"%}'><i class="ace-icon fa fa-home home-icon"></i></a>
+           </li>
+           <li class="parent" data-menu="track-menu">缺陷跟踪</li>
+           <li class="active" data-menu="track-issue-menu">软件缺陷</li>
+       </ul>
+   </div>
+   <div class="page-content">
+       <div class="row">
+           <div class="col-xs-12" style="padding: 0;">
+               <div class="gridToolBar clearfix">
+                   <button class="btn btn-primary btn-sm" @click="reloadList('#issueList')">
+                       <i class="ace-icon fa fa-refresh"></i>
+                       刷新
+                   </button>
+                   <button class="btn btn-success btn-sm" @click="showIssueDetail(0)">
+                       <i class="ace-icon fa fa-plus"></i>
+                       新增
+                   </button>
+                   <button class="btn btn-danger btn-sm" @click="deleteIssue()">
+                       <i class="ace-icon fa fa-trash-o"></i>
+                       删除
+                   </button>
+               </div>
+               <div>
+                   <table id="issueList" class="table table-striped table-bordered table-hover"></table>
+               </div>
+           </div>
+       </div>
+   </div>
+    <div class="modal fade" id="issueDetailDialog">
+        <div class="modal-dialog" style="width: 680px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="True">&times;</button>
+                    <h4 class="modal-title">软件缺陷详细</h4>
+                </div>
+                <div class="modal-body clearfix">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <form class="form-horizontal" role="form" id="issueDetailForm">
+                                <input id="issue_id" name="detail.issue.id" type="hidden" v-model.number="detail.issue.id"/>
+                                <input id="issue_version" name="detail.issue.version" type="hidden" v-model.number="detail.issue.version"/>
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="cate_id" class="col-xs-2 control-label">类别id</label>
+                                            <div class="col-xs-10">
+                                                <input id="cate_id" name="detail.issue.cate_id" type="text" class="input-sm form-control" v-model="detail.issue.cate_id"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="type_id" class="col-xs-2 control-label">类型id</label>
+                                            <div class="col-xs-10">
+                                                <input id="type_id" name="detail.issue.type_id" type="text" class="input-sm form-control" v-model="detail.issue.type_id"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="title" class="col-xs-2 control-label">标题</label>
+                                            <div class="col-xs-10">
+                                                <input id="title" name="detail.issue.title" type="text" class="input-sm form-control" v-model="detail.issue.title"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="body" class="col-xs-2 control-label">正文</label>
+                                            <div class="col-xs-10">
+                                                <input id="body" name="detail.issue.body" type="text" class="input-sm form-control" v-model="detail.issue.body"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="submit_user_id" class="col-xs-2 control-label">提报人用户id</label>
+                                            <div class="col-xs-10">
+                                                <input id="submit_user_id" name="detail.issue.submit_user_id" type="text" class="input-sm form-control" v-model="detail.issue.submit_user_id"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="submit_user_code" class="col-xs-2 control-label">提报人工号</label>
+                                            <div class="col-xs-10">
+                                                <input id="submit_user_code" name="detail.issue.submit_user_code" type="text" class="input-sm form-control" v-model="detail.issue.submit_user_code"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="enter_user_id" class="col-xs-2 control-label">录入人用户id</label>
+                                            <div class="col-xs-10">
+                                                <input id="enter_user_id" name="detail.issue.enter_user_id" type="text" class="input-sm form-control" v-model="detail.issue.enter_user_id"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="enter_user_code" class="col-xs-2 control-label">录入人工号</label>
+                                            <div class="col-xs-10">
+                                                <input id="enter_user_code" name="detail.issue.enter_user_code" type="text" class="input-sm form-control" v-model="detail.issue.enter_user_code"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="status_id" class="col-xs-2 control-label">状态id</label>
+                                            <div class="col-xs-10">
+                                                <input id="status_id" name="detail.issue.status_id" type="text" class="input-sm form-control" v-model="detail.issue.status_id"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="create_time" class="col-xs-2 control-label">Create_time</label>
+                                            <div class="col-xs-10">
+                                                <input id="create_time" name="detail.issue.create_time" type="text" class="input-sm form-control" v-model="detail.issue.create_time"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="update_time" class="col-xs-2 control-label">Update_time</label>
+                                            <div class="col-xs-10">
+                                                <input id="update_time" name="detail.issue.update_time" type="text" class="input-sm form-control" v-model="detail.issue.update_time"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success btn-sm" @click="saveIssue()">
+                        <i class="ace-icon fa fa-floppy-o"></i>保存
+                    </button>
+                    <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">
+                        <i class="ace-icon fa fa-times"></i>关闭
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    var vm = new Vue({
+        el: "#page",
+        data: {
+            "detail": {
+                "issue": {}
+            }
+        },
+        mounted: function () {
+            initDataTable(
+                    '#issueList',
+                    {
+                        "sAjaxSource": '{%url "TrackIssue.ListData"%}',
+                        "aaSorting": [[1, "asc"]],
+                        "aoColumns": [
+                            {
+                                "mDataProp": "id", "bSearchable": false, "orderable": false, "sClass": "center", "width": 50,
+                                "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
+                                "render": function (data, type, row) {
+                                    return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
+                                }
+                            },
+                            {"mDataProp": "cate_id", "title": "类别id", "bSearchable": true },
+                            {"mDataProp": "type_id", "title": "类型id", "bSearchable": true },
+                            {"mDataProp": "title", "title": "标题", "bSearchable": true },
+                            {"mDataProp": "body", "title": "正文", "bSearchable": true },
+                            {"mDataProp": "submit_user_id", "title": "提报人用户id", "bSearchable": true },
+                            {"mDataProp": "submit_user_code", "title": "提报人工号", "bSearchable": true },
+                            {"mDataProp": "enter_user_id", "title": "录入人用户id", "bSearchable": true },
+                            {"mDataProp": "enter_user_code", "title": "录入人工号", "bSearchable": true },
+                            {"mDataProp": "status_id", "title": "状态id", "bSearchable": true },
+                            {"mDataProp": "create_time", "title": "Create_time", "bSearchable": false },
+                            {"mDataProp": "update_time", "title": "Update_time", "bSearchable": false },
+                            {"mDataProp": "create_time", "title": "创建时间", "bSearchable": false, "width": 120 },
+                            {"mDataProp": "update_time", "title": "修改时间", "bSearchable": false, "width": 120 }
+                        ]
+                   }
+            );
+
+            $('#issueList tbody').on('dblclick', 'tr', function () {
+                var id = $(this).find('td:first-child input:checkbox').val();
+                vm.showIssueDetail(id);
+            });
+        },
+        methods: {
+            reloadList: function () {
+                reloadList('#issueList');
+            },
+            showIssueDetail: function (id) {
+                showMask("加载中...");
+                $("#issueDetailForm").clearValidation();
+                $.ajax({
+                           url: '{%url "TrackIssue.DetailData" %}',
+                           type: "POST",
+                           data: {
+                               "id": id
+                           },
+                           success: function (result) {
+                               hideMask();
+                               if (result.success == false) {
+                                   $.msg.error(result.message);
+                                   return;
+                               }
+                               vm.detail = result;
+                               $('#issueDetailDialog').modal(modalOptions);
+                           }
+                       }
+                );
+            },
+            saveIssue: function () {
+                showMask("提交中...");
+                var form = $("#issueDetailForm");
+                var valid = validate(form, {  
+                    'detail.issue.cate_id': {
+                        required: true
+                    },
+                    'detail.issue.type_id': {
+                        required: true
+                    },
+                    'detail.issue.title': {
+                        required: true, minlength: 2, maxlength: 100
+                    },
+                    'detail.issue.body': {
+                        required: true, minlength: 2, maxlength: 4000
+                    },
+                    'detail.issue.submit_user_id': {
+                        required: true
+                    },
+                    'detail.issue.submit_user_code': {
+                        required: true
+                    },
+                    'detail.issue.enter_user_id': {
+                        required: true
+                    },
+                    'detail.issue.enter_user_code': {
+                        required: true
+                    },
+                    'detail.issue.status_id': {
+                        required: true
+                    },
+                    'detail.issue.create_time': {
+                        required: true
+                    },
+                    'detail.issue.update_time': {
+                        required: true
+                    }
+                });
+
+                if (!valid) {
+                    hideMask();
+                } else {
+                    $.ajax({
+                               url: '{%url "TrackIssue.Save"%}',
+                               type: "POST",
+                               processData: false,
+                               contentType: 'application/json',
+                               data: JSON.stringify(vm.detail),
+                               success: function (data) {
+                                   hideMask();
+                                   if (data.success == false) {
+                                       $.msg.error(data.message);
+                                       //return;
+                                   }
+                                   else {
+                                       $.msg.show(data.message);
+                                       $('#issueDetailDialog').modal('hide');
+                                       vm.reloadList();
+                                       //return;
+                                   }
+                               }
+                           }
+                    );
+                }
+            },
+            deleteIssue: function () {
+                var id_list = [];
+                $('#issueList tbody tr>td:first-child input:checkbox').each(function () {
+                    if (this.checked) {
+                        id_list.push($(this).val());
+                    }
+                });
+
+                if (id_list.length == 0) {
+                    $.msg.alert("请选择数据！");
+                    return;
+                }
+
+                $.msg.confirm("确认要删除吗？", function () {
+                    $.ajax({
+                               url: '{%url "TrackIssue.Delete"%}',
+                               type: "POST",
+                               data: {"id_list": id_list},
+                               success: function (data) {
+                                   if (data.success == false) {
+                                       $.msg.error(data.message);
+                                       return;
+                                   }
+                                   else {
+                                       $.msg.show(data.message);
+                                   }
+                                   vm.reloadList();
+                               }
+                           });
+                });
+            }
+        }
+    });
+</script>
+{%footer%}
+

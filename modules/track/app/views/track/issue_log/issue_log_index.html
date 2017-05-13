@@ -1,0 +1,279 @@
+{%header "缺陷日志" .%}
+<div id="page">
+   <div class="breadcrumbs" id="breadcrumbs">
+       <ul class="breadcrumb">
+           <li>
+               <a href='{%url "Home.Index"%}'><i class="ace-icon fa fa-home home-icon"></i></a>
+           </li>
+           <li class="parent" data-menu="track-menu">缺陷跟踪</li>
+           <li class="active" data-menu="track-issuelog-menu">缺陷日志</li>
+       </ul>
+   </div>
+   <div class="page-content">
+       <div class="row">
+           <div class="col-xs-12" style="padding: 0;">
+               <div class="gridToolBar clearfix">
+                   <button class="btn btn-primary btn-sm" @click="reloadList('#issueLogList')">
+                       <i class="ace-icon fa fa-refresh"></i>
+                       刷新
+                   </button>
+                   <button class="btn btn-success btn-sm" @click="showIssueLogDetail(0)">
+                       <i class="ace-icon fa fa-plus"></i>
+                       新增
+                   </button>
+                   <button class="btn btn-danger btn-sm" @click="deleteIssueLog()">
+                       <i class="ace-icon fa fa-trash-o"></i>
+                       删除
+                   </button>
+               </div>
+               <div>
+                   <table id="issueLogList" class="table table-striped table-bordered table-hover"></table>
+               </div>
+           </div>
+       </div>
+   </div>
+    <div class="modal fade" id="issueLogDetailDialog">
+        <div class="modal-dialog" style="width: 680px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="True">&times;</button>
+                    <h4 class="modal-title">缺陷日志详细</h4>
+                </div>
+                <div class="modal-body clearfix">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <form class="form-horizontal" role="form" id="issueLogDetailForm">
+                                <input id="issue_log_id" name="detail.issue_log.id" type="hidden" v-model.number="detail.issue_log.id"/>
+                                <input id="issue_log_version" name="detail.issue_log.version" type="hidden" v-model.number="detail.issue_log.version"/>
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="issue_id" class="col-xs-2 control-label">缺陷id</label>
+                                            <div class="col-xs-10">
+                                                <input id="issue_id" name="detail.issue_log.issue_id" type="text" class="input-sm form-control" v-model="detail.issue_log.issue_id"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="content" class="col-xs-2 control-label">操作内容</label>
+                                            <div class="col-xs-10">
+                                                <input id="content" name="detail.issue_log.content" type="text" class="input-sm form-control" v-model="detail.issue_log.content"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="user_id" class="col-xs-2 control-label">录入人用户id</label>
+                                            <div class="col-xs-10">
+                                                <input id="user_id" name="detail.issue_log.user_id" type="text" class="input-sm form-control" v-model="detail.issue_log.user_id"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="user_code" class="col-xs-2 control-label">录入人工号</label>
+                                            <div class="col-xs-10">
+                                                <input id="user_code" name="detail.issue_log.user_code" type="text" class="input-sm form-control" v-model="detail.issue_log.user_code"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="create_time" class="col-xs-2 control-label">Create_time</label>
+                                            <div class="col-xs-10">
+                                                <input id="create_time" name="detail.issue_log.create_time" type="text" class="input-sm form-control" v-model="detail.issue_log.create_time"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="update_time" class="col-xs-2 control-label">Update_time</label>
+                                            <div class="col-xs-10">
+                                                <input id="update_time" name="detail.issue_log.update_time" type="text" class="input-sm form-control" v-model="detail.issue_log.update_time"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success btn-sm" @click="saveIssueLog()">
+                        <i class="ace-icon fa fa-floppy-o"></i>保存
+                    </button>
+                    <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">
+                        <i class="ace-icon fa fa-times"></i>关闭
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    var vm = new Vue({
+        el: "#page",
+        data: {
+            "detail": {
+                "issue_log": {}
+            }
+        },
+        mounted: function () {
+            initDataTable(
+                    '#issueLogList',
+                    {
+                        "sAjaxSource": '{%url "TrackIssueLog.ListData"%}',
+                        "aaSorting": [[1, "asc"]],
+                        "aoColumns": [
+                            {
+                                "mDataProp": "id", "bSearchable": false, "orderable": false, "sClass": "center", "width": 50,
+                                "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
+                                "render": function (data, type, row) {
+                                    return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
+                                }
+                            },
+                            {"mDataProp": "issue_id", "title": "缺陷id", "bSearchable": true },
+                            {"mDataProp": "content", "title": "操作内容", "bSearchable": true },
+                            {"mDataProp": "user_id", "title": "录入人用户id", "bSearchable": true },
+                            {"mDataProp": "user_code", "title": "录入人工号", "bSearchable": true },
+                            {"mDataProp": "create_time", "title": "Create_time", "bSearchable": false },
+                            {"mDataProp": "update_time", "title": "Update_time", "bSearchable": false },
+                            {"mDataProp": "create_time", "title": "创建时间", "bSearchable": false, "width": 120 },
+                            {"mDataProp": "update_time", "title": "修改时间", "bSearchable": false, "width": 120 }
+                        ]
+                   }
+            );
+
+            $('#issueLogList tbody').on('dblclick', 'tr', function () {
+                var id = $(this).find('td:first-child input:checkbox').val();
+                vm.showIssueLogDetail(id);
+            });
+        },
+        methods: {
+            reloadList: function () {
+                reloadList('#issueLogList');
+            },
+            showIssueLogDetail: function (id) {
+                showMask("加载中...");
+                $("#issueLogDetailForm").clearValidation();
+                $.ajax({
+                           url: '{%url "TrackIssueLog.DetailData" %}',
+                           type: "POST",
+                           data: {
+                               "id": id
+                           },
+                           success: function (result) {
+                               hideMask();
+                               if (result.success == false) {
+                                   $.msg.error(result.message);
+                                   return;
+                               }
+                               vm.detail = result;
+                               $('#issueLogDetailDialog').modal(modalOptions);
+                           }
+                       }
+                );
+            },
+            saveIssueLog: function () {
+                showMask("提交中...");
+                var form = $("#issueLogDetailForm");
+                var valid = validate(form, {  
+                    'detail.issue_log.issue_id': {
+                        required: true
+                    },
+                    'detail.issue_log.content': {
+                        required: true
+                    },
+                    'detail.issue_log.user_id': {
+                        required: true
+                    },
+                    'detail.issue_log.user_code': {
+                        required: true
+                    },
+                    'detail.issue_log.create_time': {
+                        required: true
+                    },
+                    'detail.issue_log.update_time': {
+                        required: true
+                    }
+                });
+
+                if (!valid) {
+                    hideMask();
+                } else {
+                    $.ajax({
+                               url: '{%url "TrackIssueLog.Save"%}',
+                               type: "POST",
+                               processData: false,
+                               contentType: 'application/json',
+                               data: JSON.stringify(vm.detail),
+                               success: function (data) {
+                                   hideMask();
+                                   if (data.success == false) {
+                                       $.msg.error(data.message);
+                                       //return;
+                                   }
+                                   else {
+                                       $.msg.show(data.message);
+                                       $('#issueLogDetailDialog').modal('hide');
+                                       vm.reloadList();
+                                       //return;
+                                   }
+                               }
+                           }
+                    );
+                }
+            },
+            deleteIssueLog: function () {
+                var id_list = [];
+                $('#issueLogList tbody tr>td:first-child input:checkbox').each(function () {
+                    if (this.checked) {
+                        id_list.push($(this).val());
+                    }
+                });
+
+                if (id_list.length == 0) {
+                    $.msg.alert("请选择数据！");
+                    return;
+                }
+
+                $.msg.confirm("确认要删除吗？", function () {
+                    $.ajax({
+                               url: '{%url "TrackIssueLog.Delete"%}',
+                               type: "POST",
+                               data: {"id_list": id_list},
+                               success: function (data) {
+                                   if (data.success == false) {
+                                       $.msg.error(data.message);
+                                       return;
+                                   }
+                                   else {
+                                       $.msg.show(data.message);
+                                   }
+                                   vm.reloadList();
+                               }
+                           });
+                });
+            }
+        }
+    });
+</script>
+{%footer%}
+

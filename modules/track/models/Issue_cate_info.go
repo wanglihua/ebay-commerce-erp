@@ -19,7 +19,7 @@ func (e IssueCateInfo) TableName() string {
 }
 
 func (e IssueCateInfo) ModelDesc() string {
-	return "verbose_name=缺陷类别,entity_json=issue_type,route=issue/type"
+	return "verbose_name=缺陷类别,entity_json=issue_cate,route=issue/cate"
 }
 
 func (e IssueCateInfo) InitData(db_session *xorm.Session) {
