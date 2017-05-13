@@ -7,6 +7,7 @@ import (
 type IssueInfo struct {
 	Id             int64             `xorm:"bigint notnull pk autoincr 'id'" json:"id"`
 	CateId         int64             `xorm:"biging notnull index 'cate_id'" json:"cate_id" smith:"verbose_name=类别id"`
+	CateName       string            `xorm:"nvarchar(255) notnull 'cate_name'" json:"cate_name" smith:"verbose_name=类别名称"`
 	TypeId         int64             `xorm:"biging notnull index 'type_id'" json:"type_id" smith:"verbose_name=类型id"`
 	Title          string            `xorm:"nvarchar(255) notnull index 'title'" json:"title" smith:"verbose_name=标题,min=2,max=100"`
 	Body           string            `xorm:"text notnull 'body'" json:"body" smith:"verbose_name=正文,min=2,max=4000"`
