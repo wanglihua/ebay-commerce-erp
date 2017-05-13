@@ -15,7 +15,7 @@ func GetTrackMenu(res_id_map map[int64]bool, web_session revel.Session) string {
 	buffer.WriteString(`
 <li id="track-menu" class="">
     <a href="#" class="dropdown-toggle">
-        <i class="menu-icon fa fa-users"></i>
+        <i class="menu-icon fa fa-cubes"></i>
         <span class="menu-text">缺陷跟踪</span>
         <b class="arrow fa fa-angle-down"></b>
     </a>
