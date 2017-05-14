@@ -25,22 +25,51 @@
                     {% end %}
                 </div>
                 <div style="margin-top: 20px;">
-                    <div class="col-xs-12">
+                    <div class="col-xs-8 col-xs-offset-1">
                         <form class="form-horizontal" role="form" id="issueDetailForm">
                             <input id="issue_id" name="detail.issue.id" type="hidden" v-model.number="detail.issue.id"/>
                             <input id="issue_version" name="detail.issue.version" type="hidden" v-model.number="detail.issue.version"/>
 
                             <div class="row">
+                                <div class="col-xs-3">
+                                    <div class="form-group">
+                                        <label for="type_id" class="control-label">类型</label>
+                                        <select id="type_id" name="detail.issue.type_id" class="input-sm form-control" v-model.number="detail.issue.type_id">
+                                            <template v-for="issue_type in detail.issue_type_list">
+                                                <option :value="issue_type.id">{{issue_type.type_name}}</option>
+                                            </template>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-xs-3 col-xs-offset-1">
+                                    <div class="form-group">
+                                        <label for="submit_user_id" class="control-label">提报人</label>
+                                        <select id="submit_user_id" name="detail.issue.submit_user_id" class="input-sm form-control" v-model.number="detail.issue.submit_user_id">
+                                            <template v-for="user in detail.user_list">
+                                                <option :value="user.id">{{user.nick_name}}</option>
+                                            </template>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="col-xs-4 col-xs-offset-1">
+                                    <div class="form-group">
+                                        <label for="cate_id" class="control-label">类别</label>
+                                        <select id="cate_id" name="detail.issue.cate_id" class="input-sm form-control" v-model.number="detail.issue.cate_id">
+                                            <template v-for="issue_cate in detail.issue_cate_list">
+                                                <option :value="issue_cate.id">{{issue_cate.cate_name}}</option>
+                                            </template>
+                                        </select>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="row">
                                 <div class="col-xs-12">
                                     <div class="form-group">
-                                        <label for="type_id" class="col-xs-2 control-label">类型</label>
-                                        <div class="col-xs-10">
-                                            <select id="type_id" name="detail.issue.type_id" class="input-sm form-control" v-model.number="detail.issue.type_id">
-                                                <template v-for="issue_type in detail.issue_type_list">
-                                                    <option :value="issue_type.id">{{issue_type.type_name}}</option>
-                                                </template>
-                                            </select>
-                                        </div>
+                                        <label for="title" class="control-label">标题</label>
+                                        <input id="title" name="detail.issue.title" type="text" class="input-sm form-control" v-model="detail.issue.title"/>
                                     </div>
                                 </div>
                             </div>
@@ -48,51 +77,8 @@
                             <div class="row">
                                 <div class="col-xs-12">
                                     <div class="form-group">
-                                        <label for="title" class="col-xs-2 control-label">标题</label>
-                                        <div class="col-xs-10">
-                                            <input id="title" name="detail.issue.title" type="text" class="input-sm form-control" v-model="detail.issue.title"/>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-xs-12">
-                                    <div class="form-group">
-                                        <label for="body" class="col-xs-2 control-label">正文</label>
-                                        <div class="col-xs-10">
-                                            <input id="body" name="detail.issue.body" type="text" class="input-sm form-control" v-model="detail.issue.body"/>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-xs-12">
-                                    <div class="form-group">
-                                        <label for="cate_id" class="col-xs-2 control-label">类别</label>
-                                        <div class="col-xs-10">
-                                            <select id="cate_id" name="detail.issue.cate_id" class="input-sm form-control" v-model.number="detail.issue.cate_id">
-                                                <template v-for="issue_cate in detail.issue_cate_list">
-                                                    <option :value="issue_cate.id">{{issue_cate.cate_name}}</option>
-                                                </template>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-xs-12">
-                                    <div class="form-group">
-                                        <label for="submit_user_id" class="col-xs-2 control-label">提报人</label>
-                                        <div class="col-xs-10">
-                                            <select id="submit_user_id" name="detail.issue.submit_user_id" class="input-sm form-control" v-model.number="detail.issue.submit_user_id">
-                                                <template v-for="user in detail.user_list">
-                                                    <option :value="user.id">{{user.nick_name}}</option>
-                                                </template>
-                                            </select>
-                                        </div>
+                                        <label for="body" class="control-label">正文</label>
+                                        <input id="body" name="detail.issue.body" type="text" class="input-sm form-control" v-model="detail.issue.body"/>
                                     </div>
                                 </div>
                             </div>
@@ -144,9 +130,6 @@
                 showMask("提交中...");
                 var form = $("#issueDetailForm");
                 var valid = validate(form, {
-                    'detail.issue.cate_id': {
-                        required: true
-                    },
                     'detail.issue.type_id': {
                         required: true
                     },
@@ -160,21 +143,6 @@
                         required: true
                     },
                     'detail.issue.submit_user_name': {
-                        required: true
-                    },
-                    'detail.issue.enter_user_id': {
-                        required: true
-                    },
-                    'detail.issue.enter_user_name': {
-                        required: true
-                    },
-                    'detail.issue.status_id': {
-                        required: true
-                    },
-                    'detail.issue.create_time': {
-                        required: true
-                    },
-                    'detail.issue.update_time': {
                         required: true
                     }
                 });

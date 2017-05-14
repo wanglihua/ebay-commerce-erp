@@ -58,39 +58,18 @@ func (f *IssueDetailForm) IsCreate() bool {
 }
 
 func (f *IssueDetailForm) Valid(validation *revel.Validation) bool {
-	validation.Required(f.Issue.CateId).Message("类别id不能为空！")
-
 	validation.Required(f.Issue.TypeId).Message("类型id不能为空！")
 
 	validation.Required(f.Issue.Title).Message("标题不能为空！")
-	if f.Issue.Title != "" {
-		validation.MinSize(f.Issue.Title, 2).Message("标题长度不能小于2！")
-	}
-	if f.Issue.Title != "" {
-		validation.MaxSize(f.Issue.Title, 100).Message("标题长度不能大于100！")
-	}
+	validation.MinSize(f.Issue.Title, 2).Message("标题长度不能小于2！")
+	validation.MaxSize(f.Issue.Title, 100).Message("标题长度不能大于100！")
 
 	validation.Required(f.Issue.Body).Message("正文不能为空！")
-	if f.Issue.Body != "" {
-		validation.MinSize(f.Issue.Body, 2).Message("正文长度不能小于2！")
-	}
-	if f.Issue.Body != "" {
-		validation.MaxSize(f.Issue.Body, 4000).Message("正文长度不能大于4000！")
-	}
+	validation.MinSize(f.Issue.Body, 2).Message("正文长度不能小于2！")
+	validation.MaxSize(f.Issue.Body, 4000).Message("正文长度不能大于4000！")
 
-	validation.Required(f.Issue.SubmitUserId).Message("提报人用户id不能为空！")
-
-	validation.Required(f.Issue.SubmitUserCode).Message("提报人工号不能为空！")
-
-	validation.Required(f.Issue.EnterUserId).Message("录入人用户id不能为空！")
-
-	validation.Required(f.Issue.EnterUserCode).Message("录入人工号不能为空！")
-
-	validation.Required(f.Issue.StatusId).Message("状态id不能为空！")
-
-	validation.Required(f.Issue.Create_time).Message("Create_time不能为空！")
-
-	validation.Required(f.Issue.Update_time).Message("Update_time不能为空！")
+	validation.Required(f.Issue.SubmitUserId).Message("提报人不能为空！")
+	validation.Required(f.Issue.EnterUserId).Message("录入人不能为空！")
 
 	return validation.HasErrors() == false
 }
@@ -160,10 +139,20 @@ func (c TrackIssue) Save() revel.Result {
 	issue := detail_form.Issue
 
 	if detail_form.IsCreate() {
+		issue.StatusId = models.ISSUE_STATUS_YTJ
+
+		var login_user = core.GetLoginUser(c.Session)
+		issue.EnterUserId = login_user.UserId
+		issue.EnterUserName = login_user.NickName
+
+		var submit_user auth_models.UserInfo
+		_, err := db_session.Id(issue.SubmitUserId).Get(&submit_user)
+		core.HandleError(err)
+		issue.SubmitUserName = submit_user.NickName
+
 		_, err = db_session.Insert(&issue)
 		core.HandleError(err)
 
-		issue.StatusId = models.ISSUE_STATUS_YTJ
 	} else {
 		affected, err := db_session.Id(issue.Id).Update(&issue)
 		core.HandleError(err)
