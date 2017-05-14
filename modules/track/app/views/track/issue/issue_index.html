@@ -17,7 +17,7 @@
                         <i class="ace-icon fa fa-refresh"></i>
                         刷新
                     </button>
-                    <button class="btn btn-success btn-sm" @click="showIssueDetail(0)">
+                    <button class="btn btn-success btn-sm" @click="showIssueAdd()">
                         <i class="ace-icon fa fa-plus"></i>
                         新增
                     </button>
@@ -34,6 +34,11 @@
     </div>
 </div>
 <script type="text/javascript">
+
+    function reloadIssueList() {
+        reloadList('#issueList');
+    }
+
     var vm = new Vue({
         el: "#page",
         data: {
@@ -59,8 +64,19 @@
                                 return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
                             }
                         },
+                        {
+                            "mDataProp": "ti.id", "title": "编号", "bSearchable": false, "width": 80,
+                            "render": function (data, type, row) {
+                                return "#" + data;
+                            }
+                        },
                         {"mDataProp": "tit.type_name", "title": "类型", "bSearchable": true, "width": 100},
-                        {"mDataProp": "ti.title", "title": "标题", "bSearchable": true},
+                        {
+                            "mDataProp": "ti.title", "title": "标题", "bSearchable": true,
+                            "render": function (data, type, row) {
+                                return "<a target='_blank' href='/track/issue/" + row.ti.id + "'>" + data + "</a>";
+                            }
+                        },
                         {"mDataProp": "tic.cate_name", "title": "类别", "bSearchable": true, "width": 180},
                         {"mDataProp": "ti.submit_user_name", "title": "提报人", "bSearchable": true, "width": 100},
                         {"mDataProp": "ti.enter_user_name", "title": "录入人", "bSearchable": true, "width": 100},
@@ -79,6 +95,9 @@
         methods: {
             reloadList: function () {
                 reloadList('#issueList');
+            },
+            showIssueAdd: function () {
+                window.open('{%url "TrackIssue.Add" %}');
             },
             deleteIssue: function () {
                 var id_list = [];

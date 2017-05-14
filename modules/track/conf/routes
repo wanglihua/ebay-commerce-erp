@@ -6,7 +6,10 @@ POST /track/issue/comment/delete         TrackIssueComment.Delete
 
 GET  /track/issue                    TrackIssue.Index
 POST /track/issue/data/list          TrackIssue.ListData
-GET  /track/issue/detail             TrackIssue.Detail
+POST /track/issue/add/redirect       TrackIssue.AddRedirect
+POST /track/issue/delete/redirect    TrackIssue.DeleteRedirect
+
+GET  /track/issue/add                TrackIssue.Add
 POST /track/issue/detail/data        TrackIssue.DetailData
 POST /track/issue/save               TrackIssue.Save
 POST /track/issue/delete             TrackIssue.Delete
@@ -26,3 +29,6 @@ POST /track/issue/status/data/list   TrackIssueStatus.ListData
 
 GET  /track/issue/type               TrackIssueType.Index
 POST /track/issue/type/data/list     TrackIssueType.ListData
+
+# 必须要把这个放在最后
+GET  /track/issue/:issue_id          TrackIssue.Detail

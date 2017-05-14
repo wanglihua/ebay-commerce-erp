@@ -3,7 +3,9 @@ package controllers
 import (
 	"encoding/json"
 	"fmt"
+
 	"github.com/revel/revel"
+	"matrix/app/routes"
 	"matrix/core"
 	auth_models "matrix/modules/auth/models"
 	"matrix/modules/track/models"
@@ -100,10 +102,12 @@ func (f *IssueDetailForm) Valid(validation *revel.Validation) bool {
 	return validation.HasErrors() == false
 }
 
-func (c TrackIssue) Detail() revel.Result {
-	var issue_id int64
-	c.Params.Bind(&issue_id, "id")
+func (c TrackIssue) Add() revel.Result {
+	c.RenderArgs["issue_id"] = 0
+	return c.RenderTemplate("track/issue/issue_detail.html")
+}
 
+func (c TrackIssue) Detail(issue_id int64) revel.Result {
 	c.RenderArgs["issue_id"] = issue_id
 	return c.RenderTemplate("track/issue/issue_detail.html")
 }
@@ -188,7 +192,11 @@ func (c TrackIssue) Save() revel.Result {
 		}
 	}
 
-	return c.RenderJson(core.JsonResult{Success: true, Message: "数据保存成功!"})
+	return c.RenderJson(map[string]interface{}{
+		"success":  true,
+		"message":  "数据保存成功!",
+		"issue_id": issue.Id,
+	})
 }
 
 func (c TrackIssue) Delete() revel.Result {
@@ -230,4 +238,15 @@ func (c TrackIssue) Delete() revel.Result {
 	core.HandleError(err)
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: "数据删除成功!"})
+}
+
+func (c TrackIssue) AddRedirect() revel.Result {
+	var added_issue_id int64
+	c.Params.Bind(&added_issue_id, "added_issue_id")
+
+	return c.Redirect(routes.TrackIssue.Detail(added_issue_id))
+}
+
+func (c TrackIssue) DeleteRedirect() revel.Result {
+	return c.Redirect(routes.TrackIssue.Add())
 }

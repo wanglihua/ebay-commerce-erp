@@ -6,8 +6,15 @@
                 <a href='{%url "Home.Index"%}'><i class="ace-icon fa fa-home home-icon"></i></a>
             </li>
             <li class="parent" data-menu="track-menu">缺陷跟踪</li>
-            <li class="active" data-menu="track-issue-menu">软件缺陷</li>
-            <li>软件缺陷详细</li>
+            <li class="active" data-menu="track-issue-menu"><a href='{%url "TrackIssue.Index" %}'>软件缺陷</a></li>
+            <li>
+                软件缺陷详细
+                {% if ne .issue_id 0 %}
+                <span>
+                    （缺陷编号 #{% .issue_id %}）
+                </span>
+                {% end %}
+            </li>
         </ul>
     </div>
     <div class="page-content">
@@ -89,6 +96,11 @@
         </div>
     </div>
 </div>
+<form id="form_add_redirect" action='{%url "TrackIssue.AddRedirect" %}' method="post">
+    <input id="added_issue_id" name="added_issue_id" type="hidden" value="0"/>
+</form>
+<form id="form_delete_redirect" action='{%url "TrackIssue.DeleteRedirect" %}' method="post">
+</form>
 <script type="text/javascript">
 
     function load_page_data() {
@@ -163,9 +175,10 @@
                                     //return;
                                 }
                                 else {
+                                    window.opener.reloadIssueList();
                                     $.msg.show(data.message);
-                                    $('#issueDetailDialog').modal('hide');
-                                    vm.reloadList();
+                                    $("#added_issue_id").val(data.issue_id);
+                                    $("#form_add_redirect").submit();
                                     //return;
                                 }
                             }
@@ -185,10 +198,11 @@
                         success: function (data) {
                             if (data.success === false) {
                                 $.msg.error(data.message);
-                                return;
                             }
                             else {
+                                window.opener.reloadIssueList();
                                 $.msg.show(data.message);
+                                $("#form_delete_redirect").submit();
                             }
                         }
                     });
