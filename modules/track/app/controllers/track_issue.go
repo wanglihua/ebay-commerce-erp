@@ -168,17 +168,17 @@ func (c TrackIssue) Save() revel.Result {
 
 	issue := detail_form.Issue
 
+	var submit_user auth_models.UserInfo
+	_, err = db_session.Id(issue.SubmitUserId).Get(&submit_user)
+	core.HandleError(err)
+	issue.SubmitUserName = submit_user.NickName
+
 	if detail_form.IsCreate() {
 		issue.StatusId = models.ISSUE_STATUS_YTJ
 
 		var login_user = core.GetLoginUser(c.Session)
 		issue.EnterUserId = login_user.UserId
 		issue.EnterUserName = login_user.NickName
-
-		var submit_user auth_models.UserInfo
-		_, err := db_session.Id(issue.SubmitUserId).Get(&submit_user)
-		core.HandleError(err)
-		issue.SubmitUserName = submit_user.NickName
 
 		_, err = db_session.Insert(&issue)
 		core.HandleError(err)
