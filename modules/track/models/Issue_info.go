@@ -16,8 +16,8 @@ type IssueInfo struct {
 	EnterUserId    int64             `xorm:"biging notnull index 'enter_user_id'" json:"enter_user_id" smith:"verbose_name=录入人用户id"`
 	EnterUserName  string            `xorm:"nvarchar(255) notnull index 'enter_user_name'" json:"enter_user_name" smith:"verbose_name=录入人工号"`
 	StatusId       int64             `xorm:"biging notnull index 'status_id'" json:"status_id" smith:"verbose_name=状态id"`
-	Create_time    core.Time         `xorm:"created notnull 'create_time'" json:"create_time"`
-	Update_time    core.Time         `xorm:"updated notnull 'update_time'" json:"update_time"`
+	CreateTime    core.Time         `xorm:"created notnull 'create_time'" json:"create_time"`
+	UpdateTime    core.Time         `xorm:"updated notnull 'update_time'" json:"update_time"`
 	Version        int               `xorm:"version notnull 'version'" json:"version"`
 }
 

@@ -72,10 +72,6 @@ func (f *IssueCateDetailForm) Valid(validation *revel.Validation) bool {
 		validation.MaxSize(f.IssueCate.Desc, 4000).Message("描述长度不能大于4000！")
 	}
 
-	validation.Required(f.IssueCate.Create_time).Message("Create_time不能为空！")
-
-	validation.Required(f.IssueCate.Update_time).Message("Update_time不能为空！")
-
 	return validation.HasErrors() == false
 }
 

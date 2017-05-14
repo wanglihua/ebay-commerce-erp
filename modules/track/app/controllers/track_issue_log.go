@@ -64,10 +64,6 @@ func (f *IssueLogDetailForm) Valid(validation *revel.Validation) bool {
 
 	validation.Required(f.IssueLog.UserCode).Message("录入人工号不能为空！")
 
-	validation.Required(f.IssueLog.Create_time).Message("Create_time不能为空！")
-
-	validation.Required(f.IssueLog.Update_time).Message("Update_time不能为空！")
-
 	return validation.HasErrors() == false
 }
 

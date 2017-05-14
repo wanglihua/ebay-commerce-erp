@@ -70,10 +70,6 @@ func (f *IssueCommentDetailForm) Valid(validation *revel.Validation) bool {
 
 	validation.Required(f.IssueComment.UserCode).Message("提报人工号不能为空！")
 
-	validation.Required(f.IssueComment.Create_time).Message("Create_time不能为空！")
-
-	validation.Required(f.IssueComment.Update_time).Message("Update_time不能为空！")
-
 	return validation.HasErrors() == false
 }
 

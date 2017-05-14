@@ -10,8 +10,8 @@ type IssueLogInfo struct {
 	Content     string             `xorm:"text notnull 'content'" json:"content" smith:"verbose_name=操作内容"`
 	UserId      int64              `xorm:"biging notnull index 'user_id'" json:"user_id" smith:"verbose_name=录入人用户id"`
 	UserCode    string             `xorm:"nvarchar(255) notnull index 'user_code'" json:"user_code" smith:"verbose_name=录入人工号"`
-	Create_time core.Time          `xorm:"created notnull 'create_time'" json:"create_time"`
-	Update_time core.Time          `xorm:"updated notnull 'update_time'" json:"update_time"`
+	CreateTime core.Time          `xorm:"created notnull 'create_time'" json:"create_time"`
+	UpdateTime core.Time          `xorm:"updated notnull 'update_time'" json:"update_time"`
 	Version     int                `xorm:"version notnull 'version'" json:"version"`
 }
 

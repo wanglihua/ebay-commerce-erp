@@ -66,10 +66,6 @@ func (f *IssueAttachDetailForm) Valid(validation *revel.Validation) bool {
 
 	validation.Required(f.IssueAttach.Status).Message("状态不能为空！")
 
-	validation.Required(f.IssueAttach.Create_time).Message("Create_time不能为空！")
-
-	validation.Required(f.IssueAttach.Update_time).Message("Update_time不能为空！")
-
 	return validation.HasErrors() == false
 }
 
