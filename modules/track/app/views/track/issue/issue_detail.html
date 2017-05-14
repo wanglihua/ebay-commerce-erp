@@ -1,4 +1,13 @@
-{%header "软件缺陷" .%}
+{%header "软件缺陷详细" .%}
+<link rel="stylesheet" href="/static/lib/line-control/editor.css">
+<script src="/static/lib/line-control/editor.js"></script>
+
+<style type="text/css">
+    .Editor-editor{
+        height:800px;
+    }
+</style>
+
 <div id="page">
     <div class="breadcrumbs" id="breadcrumbs">
         <ul class="breadcrumb">
@@ -31,8 +40,8 @@
                     </button>
                     {% end %}
                 </div>
-                <div style="margin-top: 20px;">
-                    <div class="col-xs-8 col-xs-offset-1">
+                <div style="margin-top: 20px;padding-left: 10px;">
+                    <div class="col-xs-11">
                         <form class="form-horizontal" role="form" id="issueDetailForm">
                             <input id="issue_id" name="detail.issue.id" type="hidden" v-model.number="detail.issue.id"/>
                             <input id="issue_version" name="detail.issue.version" type="hidden" v-model.number="detail.issue.version"/>
@@ -84,12 +93,15 @@
                             <div class="row">
                                 <div class="col-xs-12">
                                     <div class="form-group">
-                                        <label for="body" class="control-label">正文</label>
-                                        <input id="body" name="detail.issue.body" type="text" class="input-sm form-control" v-model="detail.issue.body"/>
+                                        <label for="issue_body" class="control-label">正文</label>
+                                        <textarea id="issue_body" name="detail.issue.body" rows="10" class="input-sm form-control" v-model="detail.issue.body"></textarea>
                                     </div>
                                 </div>
+
                             </div>
+
                         </form>
+
                     </div>
                 </div>
             </div>
@@ -118,6 +130,7 @@
                         return;
                     }
                     vm.detail = result;
+                    $("#issue_body").Editor("setText", vm.detail.issue.body);
                 }
             }
         );
@@ -125,6 +138,7 @@
 
     $(function () {
         load_page_data();
+        $("#issue_body").Editor();
     });
 
     var vm = new Vue({
@@ -140,6 +154,9 @@
         methods: {
             saveIssue: function () {
                 showMask("提交中...");
+
+                vm.detail.issue.body = $("#issue_body").Editor("getText");
+
                 var form = $("#issueDetailForm");
                 var valid = validate(form, {
                     'detail.issue.type_id': {
@@ -149,7 +166,7 @@
                         required: true, minlength: 2, maxlength: 100
                     },
                     'detail.issue.body': {
-                        required: true, minlength: 2, maxlength: 4000
+                        required: true, minlength: 2//, maxlength: 4000
                     },
                     'detail.issue.submit_user_id': {
                         required: true

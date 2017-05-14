@@ -94,7 +94,7 @@ func (f *IssueDetailForm) Valid(validation *revel.Validation) bool {
 
 	validation.Required(f.Issue.Body).Message("正文不能为空！")
 	validation.MinSize(f.Issue.Body, 2).Message("正文长度不能小于2！")
-	validation.MaxSize(f.Issue.Body, 4000).Message("正文长度不能大于4000！")
+	//validation.MaxSize(f.Issue.Body, 4000).Message("正文长度不能大于4000！")
 
 	validation.Required(f.Issue.SubmitUserId).Message("提报人不能为空！")
 	validation.Required(f.Issue.EnterUserId).Message("录入人不能为空！")
