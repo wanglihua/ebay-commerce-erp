@@ -21,28 +21,54 @@ func (c TrackIssue) ListData() revel.Result {
 	db_session := c.DbSession
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
-	query := db_session.Where(filter)
 
-	//query extra filter here
-
-	data_query := *query
-	if order != "" {
-		data_query = *data_query.OrderBy(order)
-	} else {
-		data_query = *data_query.Asc("id")
+	type issue_view_item_t struct {
+		Issue       models.IssueInfo       `xorm:"extends" json:"ti"`
+		IssueType   models.IssueTypeInfo   `xorm:"extends" json:"tit"`
+		IssueCate   models.IssueCateInfo   `xorm:"extends" json:"tic"`
+		IssueStatus models.IssueStatusInfo `xorm:"extends" json:"tis"`
 	}
 
-	issue_list := make([]models.IssueInfo, 0, limit)
-	err := data_query.Limit(limit, offset).Find(&issue_list)
+	/*
+SELECT ti.*, tit.*, tic.*, tis.*
+FROM track_issue ti
+    INNER JOIN track_issue_type tit ON tit.id = ti.type_id
+    LEFT JOIN track_issue_cate tic ON tic.id = ti.cate_id
+    INNER JOIN track_issue_status tis ON tis.id = ti.status_id
+	 */
+
+	var sb = core.NewSqlBuilder()
+	sb.Select("ti.*, tit.*, tic.*, tis.*")
+	sb.Count("count(ti.id) as issue_count")
+	sb.From(`track_issue ti
+    INNER JOIN track_issue_type tit ON tit.id = ti.type_id
+    LEFT JOIN track_issue_cate tic ON tic.id = ti.cate_id
+    INNER JOIN track_issue_status tis ON tis.id = ti.status_id`)
+
+	sb.Where(filter)
+
+	if order != "" {
+		sb.OrderBy(order)
+	} else {
+		sb.OrderBy("ti.id DESC")
+	}
+
+	sb.Limit(offset, limit)
+
+	issue_list := make([]issue_view_item_t, 0, limit)
+	err := db_session.Sql(sb.SqlList()).Find(&issue_list)
 	core.HandleError(err)
 
-	count_query := *query
-	count, err := count_query.Count(new(models.IssueInfo))
+	var issue_count struct {
+		Count int64  `xorm:"'issue_count'"`
+	}
+
+	_, err = db_session.Sql(sb.SqlCount()).Get(&issue_count)
 	core.HandleError(err)
 
 	return c.RenderJson(core.GridResult{
 		Data:  issue_list,
-		Total: count,
+		Total: issue_count.Count,
 	})
 }
 
