@@ -641,6 +641,7 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 	var final_height float64 = 0
 	// var final_weight float64 = 0
 	var final_actual_weight float64 = 0 //就是商品的实际重量合计，用 final 只是用于和下面的循环里面的 actual_weight 区别开来罢了
+	var final_dim_weight float64 = 0
 	var final_cost_amount float64 = 0
 	var final_total_amount float64 = math.MaxFloat64 // 总的 费用和成本的和 final_total_fee + final_cost_amount, 初始化为一个很大的不可能的值，澳币
 	for _, logistics_mode := range logistics_mode_list {
@@ -659,8 +660,6 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 
 		// 获取所有商品的整体的 长，宽，高，重量 等的数据，体积重是利用体积重公式计算得到的结果
 		var length, width, height, dim_weight, actual_weight float64 = get_order_products_whole_logistics_data(p_order_logistics_data, logistics_mode.Tjzgs)
-
-		revel.TRACE.Println("length, width, height, dim_weight, actual_weight", length, width, height, dim_weight, actual_weight)
 
 		// 匹配前打折
 		{
@@ -798,6 +797,7 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 			final_height = height
 			// final_weight = final_weight_in_mode
 			final_actual_weight = actual_weight
+			final_dim_weight = dim_weight
 		}
 	} // for _, logistics_mode := range logistics_mode_list {
 
@@ -861,6 +861,7 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 	order_logistics.Length = final_length
 	order_logistics.Width = final_width
 	order_logistics.Height = final_height
+	order_logistics.Weight = final_dim_weight
 	order_logistics.Weight = final_actual_weight
 	order_logistics.TotalFee = final_total_fee
 	order_logistics.PickFee = pick_fee_service.Get_product_pick_fee(final_actual_weight, p_ol.pick_fee_setting)

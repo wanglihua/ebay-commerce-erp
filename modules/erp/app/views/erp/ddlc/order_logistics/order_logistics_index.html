@@ -96,9 +96,12 @@
                             <th></th>
                             <th id="th_tran_id">订单代码</th>
                             <th id="th_stock_name">发货仓库</th>
+                            <th id="th_delivery_person">发货人员</th>
 
                             <th id="th_company_name">货运公司</th>
                             <th id="th_mode_name">货运方式</th>
+                            <th id="th_waybill_number">货运单号</th>
+
 
                             <th id="th_length">长(cm)</th>
                             <th id="th_width">宽(cm)</th>
@@ -338,7 +341,11 @@
                         {
                             "mDataProp": "o.tran_id", "title": "订单代码", "bSearchable": true,
                             "render": function (data, type, row) {
-                                return "<div class='div_tran_id'><a href='/erp/order/detail/" + row.o.id + "' target='_blank'>" + row.order_code + "</a></div><div>" + row.stock_name + "</div>";
+                                var delivery_person = row.o.delivery_person;
+                                if (delivery_person === "") {
+                                    delivery_person = "--";
+                                }
+                                return "<div class='div_tran_id'><a href='/erp/order/detail/" + row.o.id + "' target='_blank'>" + row.order_code + "</a></div><div>" + row.stock_name + "</div><div>" + delivery_person + "</div>";
                             }
                         },
                         {
@@ -350,11 +357,24 @@
                                 return "<div class='div_stock_name'></div>"
                             }
                         },
+                        {
+                            "mDataProp": "o.delivery_person",
+                            "title": "发货人员",
+                            "bSearchable": false,
+                            "bSortable": false,
+                            "render": function (data, type, row) {
+                                return "<div class='div_delivery_person'></div>"
+                            }
+                        },
 
                         {
                             "mDataProp": "company_name", "title": "物流公司", "bSearchable": false, "bSortable": false,
                             "render": function (data, type, row) {
-                                return "<div class='div_company_name'>" + row.company_name + "</div><div>" + row.mode_name + "</div>";
+                                var waybill_number = row.o.waybill_number;
+                                if (waybill_number === "") {
+                                    waybill_number = "--";
+                                }
+                                return "<div class='div_company_name'>" + row.company_name + "</div><div>" + row.mode_name + "</div><div>" + waybill_number + "</div>";
                             }
                         },
                         {
@@ -364,6 +384,15 @@
                             "bSortable": false,
                             "render": function (data, type, row) {
                                 return "<div class='div_mode_name'></div>"
+                            }
+                        },
+                        {
+                            "mDataProp": "waybill_number",
+                            "title": "货运单号",
+                            "bSearchable": false,
+                            "bSortable": false,
+                            "render": function (data, type, row) {
+                                return "<div class='div_waybill_number'></div>"
                             }
                         },
 
@@ -485,9 +514,11 @@
 
                                 $("#orderLogisticsList div.div_tran_id").parent().css("width", "120px");
                                 $("#orderLogisticsList div.div_stock_name").parent().css("display", "none");
+                                $("#orderLogisticsList div.div_delivery_person").parent().css("display", "none");
 
                                 $("#orderLogisticsList div.div_company_name").parent().css("width", "150px");
                                 $("#orderLogisticsList div.div_mode_name").parent().css("display", "none");
+                                $("#orderLogisticsList div.div_waybill_number").parent().css("display", "none");
 
                                 $("#orderLogisticsList div.div_lenght").parent().css("width", "100px");
                                 $("#orderLogisticsList div.div_width").parent().css("display", "none");
@@ -505,12 +536,14 @@
             $("#th_tran_id").before("<th id='th_tran_id_ext'></th>");
             $("#th_tran_id").wrap("<div id='div_tran_id'></div>");
             $("#th_stock_name").wrap("<div id='div_stock_name'></div>");
-            $("#th_tran_id_ext").append($("#div_tran_id")).append($("#div_stock_name"));
+            $("#th_delivery_person").wrap("<div id='div_delivery_person'></div>");
+            $("#th_tran_id_ext").append($("#div_tran_id")).append($("#div_stock_name")).append($("#div_delivery_person"));
 
             $("#th_company_name").before("<th id='th_company_name_ext'></th>");
             $("#th_company_name").wrap("<div id='div_company_name'></div>");
             $("#th_mode_name").wrap("<div id='div_mode_name'></div>");
-            $("#th_company_name_ext").append($("#div_company_name")).append($("#div_mode_name"));
+            $("#th_waybill_number").wrap("<div id='div_waybill_number'></div>");
+            $("#th_company_name_ext").append($("#div_company_name")).append($("#div_mode_name")).append($("#div_waybill_number"));
 
             $("#th_length").before("<th id='th_length_ext'></th>");
             $("#th_length").wrap("<div id='div_length'></div>");
