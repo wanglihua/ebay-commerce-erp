@@ -33,8 +33,8 @@ const (
 	ORDER_HOLD_TYPE_OOS_ALL_STOCK          int64 = 10050 // 系统显示所有仓都缺货（中国仓除外） OOS: Out Of Stock
 	ORDER_HOLD_TYPE_OOS_BEST_STOCK         int64 = 10060 // 系统显示最佳仓缺货（次佳、海上有货）
 	ORDER_HOLD_TYPE_OOS_ACTUAL_STOCK       int64 = 10070 // 实际仓库缺货
-	ORDER_HOLD_TYPE_MULTI_PRODUCT          int64 = 10075 // 多商品，这是个临时的状态，下面三个的多商品判断实在太麻烦，先用这个临时解决方案
 	ORDER_HOLD_TYPE_OOS_SOME_PRODUCT       int64 = 10080 // 多数量或多产品，但部分缺货（是否拆分订单）
+	ORDER_HOLD_TYPE_MULTI_PRODUCT          int64 = 10075 // 多商品，这是个临时的状态，下面三个的多商品判断实在太麻烦，先用这个临时解决方案
 	ORDER_HOLD_TYPE_MULTI_STOCK_LOW_FEE    int64 = 10090 // 多数量或多产品，虽不缺货，但拆分订单发货，运费更便宜
 	ORDER_HOLD_TYPE_ONO_STOCK_EASY         int64 = 10100 // 多数量或多产品，虽不缺货，但拆分订单发货，运费虽然便宜，但仓库拣货更方便
 	ORDER_HOLD_TYPE_LOGISTICS_NO_MATCH     int64 = 10110 // 无法匹配物流（长宽高重量没有物流满足）
@@ -103,12 +103,14 @@ func (e OrderHoldTypeInfo) InitData(db_session *xorm.Session) {
 	order_hold_type.Desc = "实际仓库缺货"
 	db_session.Insert(order_hold_type)
 
+	/*
 	// ORDER_HOLD_TYPE_MULTI_PRODUCT          int64 = 10075 // 多商品，这是个临时的状态，下面三个的多商品判断实在太麻烦，先用这个临时解决方案
 	order_hold_type = new(OrderHoldTypeInfo)
 	order_hold_type.Id = ORDER_HOLD_TYPE_MULTI_PRODUCT
 	order_hold_type.Name = "多商品"
 	order_hold_type.Desc = "多商品的一个临时解决方案"
 	db_session.Insert(order_hold_type)
+	*/
 
 	// ORDER_HOLD_TYPE_OOS_SOME_PRODUCT       int64 = 10080 // 多数量或多产品，但部分缺货（是否拆分订单）
 	order_hold_type = new(OrderHoldTypeInfo)
