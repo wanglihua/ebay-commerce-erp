@@ -46,6 +46,8 @@ type OrderInfo struct {
 	AddressId                int64               `xorm:"bigint notnull index 'address_id'" json:"address_id" smith:"verbose_name=物流地址"`        //todo: OrderShippingAddressInfo 的主键，物流方式确定后，填入这个字段，应该是下载和导入后填入这个字段
 	CompanyId                int64               `xorm:"bigint notnull index 'company_id'" json:"company_id" smith:"verbose_name=物流公司"`        // 物流公司Id，，物流方式确定后，填入这个字段
 	ModeId                   int64               `xorm:"bigint notnull index 'mode_id'" json:"mode_id" smith:"verbose_name=物流方式"`              // LogisticsModeInfo  的主键，，物流方式确定后，填入这个字段
+	DeliveryPerson           string              `xorm:"nvarchar(20) notnull 'delivery_person'" json:"delivery_person" smith:"verbose_name=发货人员"`
+	WaybillNumber            string              `xorm:"nvarchar(50) notnull 'waybill_number'" json:"waybill_number" smith:"verbose_name=货运单号"`
 	CreateTime               core.Time           `xorm:"created notnull 'create_time'" json:"create_time"`
 	UpdateTime               core.Time           `xorm:"updated notnull 'update_time'" json:"update_time"`
 	Version                  int                 `xorm:"version notnull 'version'" json:"version"`

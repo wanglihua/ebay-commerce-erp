@@ -61,11 +61,7 @@ func (c ErpOrderLogistics) PageData() revel.Result {
 	})
 }
 
-func (c ErpOrderLogistics) ListData() revel.Result {
-	pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_LOGISTICS, c.Session)
-
-	db_session := c.DbSession
-
+func (c ErpOrderLogistics) apply_query_filter(filter string) string {
 	var stock_id int64
 	c.Params.Bind(&stock_id, "stock_id")
 
@@ -83,6 +79,68 @@ func (c ErpOrderLogistics) ListData() revel.Result {
 	var end_time_query core.NullLongTime
 	c.Params.Bind(&begin_time_query, "begin_time_query")
 	c.Params.Bind(&end_time_query, "end_time_query")
+
+	if stock_id != 0 {
+		// 这里是查询上的对仓库的限制，如果是拣货人员的话，下面还有是不是这个仓库的拣货人员的限制
+		filter = core.SqlAnd(filter, fmt.Sprintf("ol.stock_id = %d", stock_id))
+	}
+
+	if logistics_company_id != 0 {
+		filter = core.SqlAnd(filter, fmt.Sprintf("ol.company_id = %d", logistics_company_id))
+	}
+
+	if batch_code != 0 {
+		filter = core.SqlAnd(filter, fmt.Sprintf("o.batch_code = %d", batch_code))
+	}
+
+	if order_code_query != "" {
+		filter = core.SqlAnd(filter, fmt.Sprintf("o.code = '%s'", order_code_query))
+	}
+
+	if begin_time_query.Valid == true {
+		filter = core.SqlAnd(filter, fmt.Sprintf("o.paid_time >= '%s'", begin_time_query.Time.Format("2006-01-02 15:04:05")))
+	}
+
+	if end_time_query.Valid == true {
+		filter = core.SqlAnd(filter, fmt.Sprintf("o.paid_time <= '%s'", end_time_query.Time.Format("2006-01-02 15:04:05")))
+	}
+
+	// #5 订单物流中只显示和只导出配货中的订单
+	filter = core.SqlAnd(filter, fmt.Sprintf("o.status_id = %d", models.ORDER_STATUS_PHZ)) //配货中
+
+	/*
+	filter = core.SqlAnd(filter, fmt.Sprintf("o.status_id <> %d", models.ORDER_STATUS_YQC))  // 已取消
+	filter = core.SqlAnd(filter, fmt.Sprintf("o.status_id <> %d", models.ORDER_STATUS_HOLD)) // hold
+	filter = core.SqlAnd(filter, fmt.Sprintf("o.status_id <> %d", models.ORDER_STATUS_YWC))  // 已完成
+	*/
+
+	/*
+	if fee_diff_min_query != 0 {
+		filter = core.SqlAnd(filter, fmt.Sprintf("(ol.actual_fee - ol.total_fee) >= %f", fee_diff_min_query))
+	}
+
+	if fee_diff_max_query != 0 {
+		filter = core.SqlAnd(filter, fmt.Sprintf("(ol.actual_fee - ol.total_fee) <= %f", fee_diff_max_query))
+	}
+	*/
+
+	// 分仓库查看
+	// 不同的仓库拣货人员可以看到不同的订单，管理员、销售、客服 除外
+	var login_user = core.GetLoginUser(c.Session)
+	var is_admin = pass_service.Is_user_admin(login_user.UserId)                   // 是不是管理员
+	var is_sales = pass_service.Is_user_sales(login_user.UserId)                   // 是不是销售
+	var is_custom_service = pass_service.Is_user_custom_service(login_user.UserId) // 是不是客服
+	if login_user.IsSuperAdmin == false && is_admin == false && is_custom_service == false && is_sales == false { // 管理员，客服，销售 可以看到所有仓库的订单
+		filter = core.SqlAnd(filter, fmt.Sprintf(`ol.stock_id IN (SELECT spc.stock_id FROM erp_stock_pick_crew spc WHERE spc.user_id = %d)`, login_user.UserId))
+	}
+
+	return filter
+}
+
+func (c ErpOrderLogistics) ListData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_LOGISTICS, c.Session)
+
+	db_session := c.DbSession
 
 	/*
 	var fee_diff_min_query float64
@@ -120,59 +178,7 @@ WHERE ol.stock_id = 0 AND ol.company_id = 0
 	sb.From(`erp_order_logistics ol
     INNER JOIN erp_order o ON o.id = ol.order_id`)
 
-	// #5 订单物流中只显示和只导出配货中的订单
-	filter = core.SqlAnd(filter, fmt.Sprintf("o.status_id = %d", models.ORDER_STATUS_PHZ))
-
-	/*
-	filter = core.SqlAnd(filter, fmt.Sprintf("o.status_id <> %d", models.ORDER_STATUS_YQC))
-	filter = core.SqlAnd(filter, fmt.Sprintf("o.status_id <> %d", models.ORDER_STATUS_HOLD))
-	filter = core.SqlAnd(filter, fmt.Sprintf("o.status_id <> %d", models.ORDER_STATUS_YWC))
-	*/
-
-	if stock_id != 0 {
-		// 这里是查询上的对仓库的限制，如果是拣货人员的话，下面还有是不是这个仓库的拣货人员的限制
-		filter = core.SqlAnd(filter, fmt.Sprintf("ol.stock_id = %d", stock_id))
-	}
-
-	if logistics_company_id != 0 {
-		filter = core.SqlAnd(filter, fmt.Sprintf("ol.company_id = %d", logistics_company_id))
-	}
-
-	if batch_code != 0 {
-		filter = core.SqlAnd(filter, fmt.Sprintf("o.batch_code = %d", batch_code))
-	}
-
-	if order_code_query != "" {
-		filter = core.SqlAnd(filter, fmt.Sprintf("o.code = '%s'", order_code_query))
-	}
-
-	if begin_time_query.Valid == true {
-		filter = core.SqlAnd(filter, fmt.Sprintf("o.paid_time >= '%s'", begin_time_query.Time.Format("2006-01-02 15:04:05")))
-	}
-
-	if end_time_query.Valid == true {
-		filter = core.SqlAnd(filter, fmt.Sprintf("o.paid_time <= '%s'", end_time_query.Time.Format("2006-01-02 15:04:05")))
-	}
-
-	/*
-	if fee_diff_min_query != 0 {
-		filter = core.SqlAnd(filter, fmt.Sprintf("(ol.actual_fee - ol.total_fee) >= %f", fee_diff_min_query))
-	}
-
-	if fee_diff_max_query != 0 {
-		filter = core.SqlAnd(filter, fmt.Sprintf("(ol.actual_fee - ol.total_fee) <= %f", fee_diff_max_query))
-	}
-	*/
-
-	// 分仓库查看
-	// 不同的仓库拣货人员可以看到不同的订单，管理员、销售、客服 除外
-	var login_user = core.GetLoginUser(c.Session)
-	var is_admin = pass_service.Is_user_admin(login_user.UserId)                   // 是不是管理员
-	var is_sales = pass_service.Is_user_sales(login_user.UserId)                   // 是不是销售
-	var is_custom_service = pass_service.Is_user_custom_service(login_user.UserId) // 是不是客服
-	if login_user.IsSuperAdmin == false && is_admin == false && is_custom_service == false && is_sales == false { // 管理员，客服，销售 可以看到所有仓库的订单
-		filter = core.SqlAnd(filter, fmt.Sprintf(`ol.stock_id IN (SELECT spc.stock_id FROM erp_stock_pick_crew spc WHERE spc.user_id = %d)`, login_user.UserId))
-	}
+	filter = c.apply_query_filter(filter)
 
 	sb.Where(filter)
 
@@ -414,26 +420,7 @@ WHERE ol.stock_id = 0 AND ol.company_id = 0
 
 	var filter = "(1=1)"
 
-	if stock_id != 0 {
-		// 这里是查询上的对仓库的限制，如果是拣货人员的话，下面还有是不是这个仓库的拣货人员的限制
-		filter = core.SqlAnd(filter, fmt.Sprintf("ol.stock_id = %d", stock_id))
-	}
-
-	if logistics_company_id != 0 {
-		filter = core.SqlAnd(filter, fmt.Sprintf("ol.company_id = %d", logistics_company_id))
-	}
-
-	if batch_code != 0 {
-		filter = core.SqlAnd(filter, fmt.Sprintf("o.batch_code = %d", batch_code))
-	}
-
-	if begin_time_query.Valid == true {
-		filter = core.SqlAnd(filter, fmt.Sprintf("o.paid_time >= '%s'", begin_time_query.Time.Format("2006-01-02 15:04:05")))
-	}
-
-	if end_time_query.Valid == true {
-		filter = core.SqlAnd(filter, fmt.Sprintf("o.paid_time <= '%s'", end_time_query.Time.Format("2006-01-02 15:04:05")))
-	}
+	filter = c.apply_query_filter(filter)
 
 	sb.Where(filter)
 

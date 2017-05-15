@@ -79,6 +79,12 @@ func (builder *SqlBuilder) Limit(skip int64, take int64) *SqlBuilder {
 	return builder
 }
 
+func (builder *SqlBuilder) CloneWithoutLimit() *SqlBuilder {
+	var new_sql_builder SqlBuilder = *builder
+	new_sql_builder.limit_clause = ""
+	return &new_sql_builder
+}
+
 type sql_type int64
 
 const (
