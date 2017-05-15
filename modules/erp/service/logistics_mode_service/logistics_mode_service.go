@@ -44,3 +44,21 @@ func Get_logistics_mode_id_name_map(mode_id_list []int64, db_session *xorm.Sessi
 
 	return mode_id_name_map
 }
+
+func Get_logistics_mode_map(mode_id_list []int64, db_session *xorm.Session) map[int64]models.LogisticsModeInfo {
+	var mode_map = make(map[int64]models.LogisticsModeInfo)
+
+	if len(mode_id_list) == 0 {
+		return mode_map
+	}
+
+	var mode_list = make([]models.LogisticsModeInfo, 0)
+	err := db_session.In("id", mode_id_list).Find(&mode_list)
+	core.HandleError(err)
+
+	for _, mode := range mode_list {
+		mode_map[mode.Id] = mode
+	}
+
+	return mode_map
+}

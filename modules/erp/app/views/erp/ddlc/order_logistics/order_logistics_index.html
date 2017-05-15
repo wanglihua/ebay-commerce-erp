@@ -108,6 +108,8 @@
                             <th id="th_height">高(cm)</th>
 
                             <th id="th_actual_weight">实际重量（Kg)</th>
+                            <th id="th_dim_weight">体积重量（Kg)</th>
+                            <th id="th_sfkltjz">考虑体积重</th>
 
                             <th id="th_products">订单商品</th>
 
@@ -433,12 +435,43 @@
                         {
                             "mDataProp": "ol.weight", "title": "实际重量", "bSearchable": false,
                             "render": function (data, type, row) {
-                                if (data != "" && data != 0) {
-                                    return data + " kg";
+                                var actual_weight = row.ol.weight;
+                                if (actual_weight !== "" && actual_weight !== 0) {
+                                    actual_weight = actual_weight + " kg";
                                 }
                                 else {
-                                    return "";
+                                    actual_weight = "--";
                                 }
+
+                                var dim_weight = row.ol.dim_weight;
+                                if (dim_weight !== "" && dim_weight !== 0) {
+                                    dim_weight = dim_weight + " kg";
+                                }
+                                else {
+                                    dim_weight = "--";
+                                }
+
+                                var sfkltjz = row.sfkltjz;
+                                if (sfkltjz === 0) {
+                                    sfkltjz = "否";
+                                }
+                                else {
+                                    sfkltjz = "是";
+                                }
+
+                                return "<div class='div_actual_weight'>" + actual_weight + "</div><div>" + dim_weight + "</div><div>" + sfkltjz + "</div>";
+                            }
+                        },
+                        {
+                            "mDataProp": "ol.dim_weight", "title": "体积重量", "bSearchable": false,
+                            "render": function (data, type, row) {
+                                return "<div class='div_dim_weight'></div>"
+                            }
+                        },
+                        {
+                            "mDataProp": "ol.weight", "title": "考虑体积重", "bSearchable": false,
+                            "render": function (data, type, row) {
+                                return "<div class='div_sfkltjz'></div>";
                             }
                         },
 
@@ -524,6 +557,10 @@
                                 $("#orderLogisticsList div.div_width").parent().css("display", "none");
                                 $("#orderLogisticsList div.div_height").parent().css("display", "none");
 
+                                $("#orderLogisticsList div.div_actual_weight").parent().css("width", "100px");
+                                $("#orderLogisticsList div.div_dim_weight").parent().css("display", "none");
+                                $("#orderLogisticsList div.div_sfkltjz").parent().css("display", "none");
+
                                 $("#orderLogisticsList div.div_paid_time").parent().css("width", "120px");
                                 $("#orderLogisticsList div.div_update_time").parent().css("display", "none");
                                 $("#orderLogisticsList div.div_shipped_time").parent().css("display", "none");
@@ -551,13 +588,11 @@
             $("#th_height").wrap("<div id='div_height'></div>");
             $("#th_length_ext").append($("#div_length")).append($("#div_width")).append($("#div_height"));
 
-            /*
              $("#th_actual_weight").before("<th id='th_actual_weight_ext'></th>");
              $("#th_actual_weight").wrap("<div id='div_actual_weight'></div>");
              $("#th_dim_weight").wrap("<div id='div_dim_weight'></div>");
-             $("#th_care_dim_weight").wrap("<div id='div_care_dim_weight'></div>");
-             $("#th_actual_weight_ext").append($("#div_actual_weight")).append($("#div_dim_weight")).append($("#div_care_dim_weight"));
-             */
+             $("#th_sfkltjz").wrap("<div id='div_sfkltjz'></div>");
+             $("#th_actual_weight_ext").append($("#div_actual_weight")).append($("#div_dim_weight")).append($("#div_sfkltjz"));
 
             $("#th_paid_time").before("<th id='th_paid_time_ext'></th>");
             $("#th_paid_time").wrap($("<div id='div_paid_time'></div>"));

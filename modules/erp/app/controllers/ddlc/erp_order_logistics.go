@@ -157,6 +157,7 @@ func (c ErpOrderLogistics) ListData() revel.Result {
 		ModeName       string                     `json:"mode_name"`
 		Products       []string                   `json:"products"`
 		OrderCode      string                     `json:"order_code"` //交易代码 店铺号 + 交易号
+		Sfkltjz        string                     `json:"sfkltjz"`    // 是否考虑体积重
 	}
 
 	/*
@@ -210,7 +211,7 @@ WHERE ol.stock_id = 0 AND ol.company_id = 0
 
 	var stock_id_name_map = stock_service.Get_stock_id_name_map(stock_id_set.List(), db_session)
 	var company_id_name_map = logistics_company_service.Get_company_id_name_map(company_id_set.List(), db_session)
-	var mode_id_name_map = logistics_mode_service.Get_logistics_mode_id_name_map(mode_id_set.List(), db_session)
+	var mode_map = logistics_mode_service.Get_logistics_mode_map(mode_id_set.List(), db_session)
 	var order_id_products_map = order_item_service.Get_order_id_products_map(order_id_set.List(), db_session)
 	var shop_id_name_map = shop_service.Get_shop_id_name_map(shop_id_set.List(), db_session)
 
@@ -223,9 +224,20 @@ WHERE ol.stock_id = 0 AND ol.company_id = 0
 			order_logistics_list[index].CompanyName = company_id_name_map[order_logistics.OrderLogistics.CompanyId]
 		}
 
+		var sfkltjz = "--"
 		if order_logistics.OrderLogistics.ModeId != 0 {
-			order_logistics_list[index].ModeName = mode_id_name_map[order_logistics.OrderLogistics.ModeId]
+			order_logistics_list[index].ModeName = mode_map[order_logistics.OrderLogistics.ModeId].Name
+
+
+			if mode_map[order_logistics.OrderLogistics.ModeId].Sfkltjz == 0 {
+				sfkltjz = "否"
+			} else {
+				sfkltjz = "是"
+			}
+
 		}
+		order_logistics_list[index].Sfkltjz = sfkltjz
+
 
 		var order_sku_qty_list = order_id_products_map[order_logistics.OrderLogistics.OrderId]
 		if len(order_sku_qty_list) != 0 {
