@@ -938,7 +938,7 @@ WHERE ol.stock_id = 0 AND ol.company_id = 0
 		//设置标题
 		if product_detail_list_len > max_product_sku_count {
 			var header_row = sheet.Rows[0]
-			for i := 0; i < max_product_sku_count-product_detail_list_len; i++ {
+			for i := 0; i < product_detail_list_len-max_product_sku_count; i++ {
 				var col_index = col_count_without_skus + max_product_sku_count*3
 				cell = header_row.AddCell()
 				sheet.SetColWidth(col_index, col_index, 10)
@@ -1015,7 +1015,7 @@ SELECT sl.name AS storage_loc_name, p.sku AS product_sku, oi.quantity
 FROM
     erp_order_item oi
     INNER JOIN erp_inventory nvt ON oi.item_product_id = nvt.product_id AND nvt.stock_id = 0
-    INNER JOIN erp_storage_loc sl ON nvt.stock_id = sl.stock_id AND nvt.storage_loc_id = sl.id
+    LEFT JOIN erp_storage_loc sl ON nvt.stock_id = sl.stock_id AND nvt.storage_loc_id = sl.id
     INNER JOIN erp_product p ON oi.item_product_id = p.id
 WHERE oi.order_id = 0
 ORDER BY oi.transaction_price * oi.quantity DESC
@@ -1026,7 +1026,7 @@ ORDER BY oi.transaction_price * oi.quantity DESC
 FROM
     erp_order_item oi
     INNER JOIN erp_inventory nvt ON oi.item_product_id = nvt.product_id AND nvt.stock_id = %d
-    INNER JOIN erp_storage_loc sl ON nvt.stock_id = sl.stock_id AND nvt.storage_loc_id = sl.id
+    LEFT JOIN erp_storage_loc sl ON nvt.stock_id = sl.stock_id AND nvt.storage_loc_id = sl.id
     INNER JOIN erp_product p ON oi.item_product_id = p.id
 WHERE oi.order_id = %d
 ORDER BY oi.transaction_price * oi.quantity DESC`
