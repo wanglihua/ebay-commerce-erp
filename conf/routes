@@ -26,8 +26,8 @@ POST /logout                    Login.Logout
 
 GET /release/note               ReleaseNote.Index
 
-# GET  /code/generate             CodeGenerate.Index
-# POST /code/generate/query       CodeGenerate.CodeQuery
+GET  /code/gen             CodeGenerate.Index
+POST /code/gen/query       CodeGenerate.CodeQuery
 
 GET  /api/calc/logistics/fee      LogisticsFeeApi.Calc
 GET  /api/calc/logistics/fee/test LogisticsFeeApi.Test

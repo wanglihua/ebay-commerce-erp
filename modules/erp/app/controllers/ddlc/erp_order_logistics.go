@@ -938,3 +938,41 @@ WHERE ol.stock_id = 0 AND ol.company_id = 0
 
 	return xlsx_file
 }
+
+type order_logistics_product_detail_t struct {
+	StorageLocName string `xorm:"'storage_loc_name'" json:"storage_loc_name"`
+	ProductSku     string `xorm:"'product_sku'" json:"product_sku"`
+	Quantity       int64 `xorm:"'quantity'" json:"quantity"`
+}
+
+func (c ErpOrderLogistics) get_order_logistics_product_detail_list(order_id int64, stock_id int64) []order_logistics_product_detail_t {
+	var db_session = c.DbSession
+
+	/*
+SELECT sl.name AS storage_loc_name, p.sku AS product_sku, oi.quantity
+FROM
+    erp_order_item oi
+    INNER JOIN erp_inventory nvt ON oi.item_product_id = nvt.product_id AND nvt.stock_id = 0
+    INNER JOIN erp_storage_loc sl ON nvt.stock_id = sl.stock_id AND nvt.storage_loc_id = sl.id
+    INNER JOIN erp_product p ON oi.item_product_id = p.id
+WHERE oi.order_id = 0
+ORDER BY oi.transaction_price * oi.quantity DESC
+	 */
+
+	var order_logistics_product_detail_list = make([]order_logistics_product_detail_t, 0)
+	sql := `SELECT sl.name AS storage_loc_name, p.sku AS product_sku, oi.quantity
+FROM
+    erp_order_item oi
+    INNER JOIN erp_inventory nvt ON oi.item_product_id = nvt.product_id AND nvt.stock_id = %d
+    INNER JOIN erp_storage_loc sl ON nvt.stock_id = sl.stock_id AND nvt.storage_loc_id = sl.id
+    INNER JOIN erp_product p ON oi.item_product_id = p.id
+WHERE oi.order_id = %d
+ORDER BY oi.transaction_price * oi.quantity DESC`
+
+	sql = fmt.Sprintf(sql, stock_id, order_id)
+
+	err := db_session.Sql(sql).Find(&order_logistics_product_detail_list)
+	core.HandleError(err)
+
+	return order_logistics_product_detail_list
+}
