@@ -117,7 +117,11 @@ func userAuth(c *revel.Controller) revel.Result {
 		return nil
 	}
 
-	if c.Action == "TrackIssue.Detail" || c.Action == "TrackIssue.DetailData" {
+	if c.Action == "TrackIssue.Index" ||
+		c.Action == "TrackIssue.PageData" ||
+		c.Action == "TrackIssue.ListData" ||
+		c.Action == "TrackIssue.Detail" ||
+		c.Action == "TrackIssue.DetailData" {
 		return nil
 	}
 

@@ -79,6 +79,7 @@ type IssueDetailForm struct {
 	IssueTypeList []models.IssueTypeInfo `json:"issue_type_list"`
 	IssueCateList []models.IssueCateInfo `json:"issue_cate_list"`
 	UserList      []auth_models.UserInfo `json:"user_list"`
+	IssueStatus   models.IssueStatusInfo `json:"issue_status"`
 }
 
 func (f *IssueDetailForm) IsCreate() bool {
@@ -146,11 +147,16 @@ func (c TrackIssue) DetailData() revel.Result {
 	err = db_session.Find(&user_list)
 	core.HandleError(err)
 
+	var issue_status models.IssueStatusInfo
+	_, err = db_session.Id(issue.StatusId).Get(&issue_status)
+	core.HandleError(err)
+
 	var detail_form IssueDetailForm
 	detail_form.Issue = issue
 	detail_form.IssueTypeList = issue_type_list
 	detail_form.IssueCateList = issue_cate_list
 	detail_form.UserList = user_list
+	detail_form.IssueStatus = issue_status
 
 	return c.RenderJson(detail_form)
 }
@@ -182,8 +188,14 @@ func (c TrackIssue) Save() revel.Result {
 
 		_, err = db_session.Insert(&issue)
 		core.HandleError(err)
-
 	} else {
+		if issue.StatusId != models.ISSUE_STATUS_YTJ {
+			return c.RenderJson(map[string]interface{}{
+				"success": false,
+				"message": "不是已提交状态的需求、变更、Bug不能修改！",
+			})
+		}
+
 		affected, err := db_session.Id(issue.Id).Update(&issue)
 		core.HandleError(err)
 
