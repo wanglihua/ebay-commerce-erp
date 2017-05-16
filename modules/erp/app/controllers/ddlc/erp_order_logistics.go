@@ -228,7 +228,6 @@ WHERE ol.stock_id = 0 AND ol.company_id = 0
 		if order_logistics.OrderLogistics.ModeId != 0 {
 			order_logistics_list[index].ModeName = mode_map[order_logistics.OrderLogistics.ModeId].Name
 
-
 			if mode_map[order_logistics.OrderLogistics.ModeId].Sfkltjz == 0 {
 				sfkltjz = "否"
 			} else {
@@ -237,7 +236,6 @@ WHERE ol.stock_id = 0 AND ol.company_id = 0
 
 		}
 		order_logistics_list[index].Sfkltjz = sfkltjz
-
 
 		var order_sku_qty_list = order_id_products_map[order_logistics.OrderLogistics.OrderId]
 		if len(order_sku_qty_list) != 0 {
@@ -445,7 +443,7 @@ WHERE ol.stock_id = 0 AND ol.company_id = 0
 	//创建工作薄
 	xlsx_file := xlsx.NewFile()
 
-	sheet, err := xlsx_file.AddSheet("库存列表")
+	sheet, err := xlsx_file.AddSheet("订单物流")
 	core.HandleError(err)
 
 	//统一设置标题单元格格式的函数
@@ -622,35 +620,39 @@ func (c ErpOrderLogistics) get_export_excel2(db_session *xorm.Session) *xlsx.Fil
 	c.Params.Bind(&end_time_query, "end_time_query")
 
 	type order_logistics_view_item_t struct {
-		OrderLogistics   models.OrderLogisticsInfo    `xorm:"extends" json:"ol"`
-		Order            models.OrderInfo             `xorm:"extends" json:"o"`
-		Stock            models.StockInfo             `xorm:"extends" json:"s"`
-		LogisticsCompany models.LogisticsCompanyInfo  `xorm:"extends" json:"lc"`
-		LogisticsMode    models.LogisticsModeInfo     `xorm:"extends" json:"lm"`
+		OrderLogistics       models.OrderLogisticsInfo          `xorm:"extends" json:"ol"`
+		Order                models.OrderInfo                   `xorm:"extends" json:"o"`
+		Stock                models.StockInfo                   `xorm:"extends" json:"s"`
+		LogisticsCompany     models.LogisticsCompanyInfo        `xorm:"extends" json:"lc"`
+		LogisticsMode        models.LogisticsModeInfo           `xorm:"extends" json:"lm"`
+		OrderShippingAddress models.OrderShippingAddressInfo    `xorm:"extends" json:"osa"`
+		ShopAccount          models.ShopAccountInfo             `xorm:"extends" json:"sa"`
 	}
 
 	/*
-SELECT ol.*, o.*, s.*, lc.*, lm.*
+SELECT ol.*, o.*, s.*, lc.*, lm.*, osa.*, sa.*
 FROM erp_order_logistics ol
     INNER JOIN erp_order o ON o.id = ol.order_id
     INNER JOIN erp_stock s ON s.id = ol.stock_id
     INNER JOIN erp_logistics_company lc ON lc.id = ol.company_id
     INNER JOIN erp_logistics_mode lm ON lm.id = ol.mode_id
+    INNER JOIN erp_order_shipping_address osa ON osa.id = ol.address_id
+    INNER JOIN erp_shop_account sa ON sa.id = o.shop_id
 WHERE ol.stock_id = 0 AND ol.company_id = 0
       AND o.batch_code = 0
       AND o.paid_time > '2017-01-01' AND o.paid_time < '2017-04-30'
-      AND (ol.actual_fee - ol.total_fee) >= 0.01
-      AND (ol.actual_fee - ol.total_fee) <= 100.00
 	 */
 
 	var sb = core.NewSqlBuilder()
-	sb.Select("ol.*, o.*, s.*, lc.*, lm.*")
+	sb.Select("ol.*, o.*, s.*, lc.*, lm.*, osa.*, sa.*")
 	sb.Count("count(ol.id) AS order_logistics_count")
 	sb.From(`erp_order_logistics ol
     INNER JOIN erp_order o ON o.id = ol.order_id
     INNER JOIN erp_stock s ON s.id = ol.stock_id
     INNER JOIN erp_logistics_company lc ON lc.id = ol.company_id
-    INNER JOIN erp_logistics_mode lm ON lm.id = ol.mode_id`)
+    INNER JOIN erp_logistics_mode lm ON lm.id = ol.mode_id
+    INNER JOIN erp_order_shipping_address osa ON osa.id = ol.address_id
+    INNER JOIN erp_shop_account sa ON sa.id = o.shop_id`)
 
 	var filter = "(1=1)"
 
@@ -667,7 +669,7 @@ WHERE ol.stock_id = 0 AND ol.company_id = 0
 	//创建工作薄
 	xlsx_file := xlsx.NewFile()
 
-	sheet, err := xlsx_file.AddSheet("库存列表")
+	sheet, err := xlsx_file.AddSheet("订单物流")
 	core.HandleError(err)
 
 	//统一设置标题单元格格式的函数
@@ -729,28 +731,16 @@ WHERE ol.stock_id = 0 AND ol.company_id = 0
 
 	row_height := 0.6
 
-	// 序号	商品编号	仓库	仓位	库存	成本价（RMB）
+	// 仓库 物流公司 物流方式 长(cm) 宽(cm) 高(cm) 实际重量（Kg） 邮政编码 客户姓名 电话 客户email 邮寄地址 所属城市 所属地区 国家 订单代码 仓位 商品编号 商品数量 仓位 商品编号 商品数量
 	{
 		header_row := sheet.AddRow()
 		header_row.SetHeightCM(row_height)
 
 		col_index := 0
 		cell := header_row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 8)
-		set_head_cell_style(cell)
-		cell.Value = "序号"
-
-		col_index++
-		cell = header_row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 12)
-		set_head_cell_style(cell)
-		cell.Value = "订单"
-
-		col_index++
-		cell = header_row.AddCell()
 		sheet.SetColWidth(col_index, col_index, 20)
 		set_head_cell_style(cell)
-		cell.Value = "发货仓库"
+		cell.Value = "仓库"
 
 		col_index++
 		cell = header_row.AddCell()
@@ -768,42 +758,182 @@ WHERE ol.stock_id = 0 AND ol.company_id = 0
 		cell = header_row.AddCell()
 		sheet.SetColWidth(col_index, col_index, 10)
 		set_head_cell_style(cell)
-		cell.Value = "预估物流费用"
+		cell.Value = "长(cm)"
+
+		col_index++
+		cell = header_row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 10)
+		set_head_cell_style(cell)
+		cell.Value = "宽(cm)"
+
+		col_index++
+		cell = header_row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 10)
+		set_head_cell_style(cell)
+		cell.Value = "高(cm)"
+
+		col_index++
+		cell = header_row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 10)
+		set_head_cell_style(cell)
+		cell.Value = "实际重量（Kg）"
+
+		col_index++
+		cell = header_row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 10)
+		set_head_cell_style(cell)
+		cell.Value = "邮政编码"
+
+		col_index++
+		cell = header_row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 20)
+		set_head_cell_style(cell)
+		cell.Value = "客户姓名"
+
+		col_index++
+		cell = header_row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 10)
+		set_head_cell_style(cell)
+		cell.Value = "电话"
+
+		col_index++
+		cell = header_row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 20)
+		set_head_cell_style(cell)
+		cell.Value = "客户email"
+
+		col_index++
+		cell = header_row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 20)
+		set_head_cell_style(cell)
+		cell.Value = "邮寄地址"
+
+		col_index++
+		cell = header_row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 15)
+		set_head_cell_style(cell)
+		cell.Value = "所属城市"
+
+		col_index++
+		cell = header_row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 15)
+		set_head_cell_style(cell)
+		cell.Value = "所属地区"
+
+		col_index++
+		cell = header_row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 10)
+		set_head_cell_style(cell)
+		cell.Value = "国家"
+
+		col_index++
+		cell = header_row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 10)
+		set_head_cell_style(cell)
+		cell.Value = "订单代码"
+
+		col_index++
+		cell = header_row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 10)
+		set_head_cell_style(cell)
+		cell.Value = "仓位"
+
+		col_index++
+		cell = header_row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 10)
+		set_head_cell_style(cell)
+		cell.Value = "商品编号"
+
+		col_index++
+		cell = header_row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 10)
+		set_head_cell_style(cell)
+		cell.Value = "商品数量"
 	}
 
-	for index, order_logistics := range order_logistics_list {
+	for _, order_logistics := range order_logistics_list {
 		row := sheet.AddRow()
 		row.SetHeightCM(row_height)
 
-		// 序号
+		// 仓库
 		cell := row.AddCell()
 		set_text_cell_style(cell, "center")
-		cell.Value = fmt.Sprint(index + 1)
-
-		// 订单
-		cell = row.AddCell()
-		set_text_cell_style(cell, "left")
-		cell.Value = order_logistics.Order.Code
-
-		// 发货仓库
-		cell = row.AddCell()
-		set_text_cell_style(cell, "left")
 		cell.Value = order_logistics.Stock.Name
 
 		// 物流公司
 		cell = row.AddCell()
-		set_text_cell_style(cell, "left")
+		set_text_cell_style(cell, "center")
 		cell.Value = order_logistics.LogisticsCompany.Name
 
 		// 物流方式
 		cell = row.AddCell()
-		set_text_cell_style(cell, "left")
+		set_text_cell_style(cell, "center")
 		cell.Value = order_logistics.LogisticsMode.Name
 
-		// 预估物流费用
+		// 长(cm)
 		cell = row.AddCell()
 		set_text_cell_style(cell, "center")
-		cell.Value = fmt.Sprint(order_logistics.OrderLogistics.TotalFee)
+		cell.Value = fmt.Sprint(order_logistics.OrderLogistics.Length)
+
+		// 宽(cm)
+		cell = row.AddCell()
+		set_text_cell_style(cell, "center")
+		cell.Value = fmt.Sprint(order_logistics.OrderLogistics.Width)
+
+		// 高(cm)
+		cell = row.AddCell()
+		set_text_cell_style(cell, "center")
+		cell.Value = fmt.Sprint(order_logistics.OrderLogistics.Height)
+
+		// 实际重量（Kg）
+		cell = row.AddCell()
+		set_text_cell_style(cell, "center")
+		cell.Value = fmt.Sprint(order_logistics.OrderLogistics.Weight)
+
+		// 邮政编码
+		cell = row.AddCell()
+		set_text_cell_style(cell, "center")
+		cell.Value = fmt.Sprint(order_logistics.OrderShippingAddress.PostalCode)
+
+		// 客户姓名
+		cell = row.AddCell()
+		set_text_cell_style(cell, "center")
+		cell.Value = fmt.Sprint(order_logistics.OrderShippingAddress.Name)
+
+		// 电话
+		cell = row.AddCell()
+		set_text_cell_style(cell, "center")
+		cell.Value = fmt.Sprint(order_logistics.OrderShippingAddress.Phone)
+
+		// 客户email
+		cell = row.AddCell()
+		set_text_cell_style(cell, "center")
+		cell.Value = fmt.Sprint(order_logistics.Order.BuyerEmail)
+
+		// 邮寄地址
+		cell = row.AddCell()
+		set_text_cell_style(cell, "center")
+		cell.Value = fmt.Sprint(order_logistics.OrderShippingAddress.Street1 + " " + order_logistics.OrderShippingAddress.Street2)
+
+		// 所属城市
+		cell = row.AddCell()
+		set_text_cell_style(cell, "center")
+		cell.Value = fmt.Sprint(order_logistics.OrderShippingAddress.CityName)
+
+		// 所属地区
+		cell = row.AddCell()
+		set_text_cell_style(cell, "center")
+		cell.Value = fmt.Sprint(order_logistics.OrderShippingAddress.Province)
+
+		// 国家
+		cell = row.AddCell()
+		set_text_cell_style(cell, "center")
+		cell.Value = fmt.Sprint(order_logistics.OrderShippingAddress.CountryName)
+
+		// 订单代码
+		cell = row.AddCell()
+		set_text_cell_style(cell, "center")
+		cell.Value = fmt.Sprint(order_logistics.ShopAccount.Code + order_logistics.Order.TranId)
 	}
 
 	return xlsx_file
