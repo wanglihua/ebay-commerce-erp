@@ -731,6 +731,7 @@ WHERE ol.stock_id = 0 AND ol.company_id = 0
 
 	row_height := 0.6
 
+	var col_count_without_skus = 0
 	// 仓库 物流公司 物流方式 长(cm) 宽(cm) 高(cm) 实际重量（Kg） 邮政编码 客户姓名 电话 客户email 邮寄地址 所属城市 所属地区 国家 订单代码 仓位 商品编号 商品数量 仓位 商品编号 商品数量
 	{
 		header_row := sheet.AddRow()
@@ -832,24 +833,10 @@ WHERE ol.stock_id = 0 AND ol.company_id = 0
 		set_head_cell_style(cell)
 		cell.Value = "订单代码"
 
-		col_index++
-		cell = header_row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 10)
-		set_head_cell_style(cell)
-		cell.Value = "仓位"
-
-		col_index++
-		cell = header_row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 10)
-		set_head_cell_style(cell)
-		cell.Value = "商品编号"
-
-		col_index++
-		cell = header_row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 10)
-		set_head_cell_style(cell)
-		cell.Value = "商品数量"
+		col_count_without_skus = col_index + 1
 	}
+
+	var max_product_sku_count = 0
 
 	for _, order_logistics := range order_logistics_list {
 		row := sheet.AddRow()
@@ -934,6 +921,81 @@ WHERE ol.stock_id = 0 AND ol.company_id = 0
 		cell = row.AddCell()
 		set_text_cell_style(cell, "center")
 		cell.Value = fmt.Sprint(order_logistics.ShopAccount.Code + order_logistics.Order.TranId)
+
+		var product_detail_list = c.get_order_logistics_product_detail_list(order_logistics.Order.Id, order_logistics.OrderLogistics.StockId)
+		var product_detail_list_len = len(product_detail_list)
+
+		var set_even_product_detail_background = func(cell *xlsx.Cell) {
+			style := cell.GetStyle()
+
+			fill := *xlsx.NewFill("solid", "00FFFF00", "00000000") //CCFFCC
+			style.Fill = fill
+			style.ApplyFill = true
+
+			cell.SetStyle(style)
+		}
+
+		//设置标题
+		if product_detail_list_len > max_product_sku_count {
+			var header_row = sheet.Rows[0]
+			for i := 0; i < max_product_sku_count-product_detail_list_len; i++ {
+				var col_index = col_count_without_skus + max_product_sku_count*3
+				cell = header_row.AddCell()
+				sheet.SetColWidth(col_index, col_index, 10)
+				set_head_cell_style(cell)
+				cell.Value = "仓位"
+				if product_detail_list_len%2 == 0 {
+					set_even_product_detail_background(cell)
+				}
+
+				col_index++
+				cell = header_row.AddCell()
+				sheet.SetColWidth(col_index, col_index, 20)
+				set_head_cell_style(cell)
+				cell.Value = "商品编号"
+				if product_detail_list_len%2 == 0 {
+					set_even_product_detail_background(cell)
+				}
+
+				col_index++
+				cell = header_row.AddCell()
+				sheet.SetColWidth(col_index, col_index, 10)
+				set_head_cell_style(cell)
+				cell.Value = "商品数量"
+				if product_detail_list_len%2 == 0 {
+					set_even_product_detail_background(cell)
+				}
+			}
+			max_product_sku_count = product_detail_list_len
+		}
+
+		// 设置文字
+		for index, product_detail := range product_detail_list {
+			// 仓位
+			cell = row.AddCell()
+			set_text_cell_style(cell, "center")
+			cell.Value = product_detail.StorageLocName
+			if (index+1)%2 == 0 {
+				set_even_product_detail_background(cell)
+			}
+
+			// 商品编号
+			cell = row.AddCell()
+			set_text_cell_style(cell, "center")
+			cell.Value = product_detail.ProductSku
+			if (index+1)%2 == 0 {
+				set_even_product_detail_background(cell)
+			}
+
+			// 商品数量
+			cell = row.AddCell()
+			set_text_cell_style(cell, "center")
+			cell.Value = fmt.Sprint(product_detail.Quantity)
+			if (index+1)%2 == 0 {
+				set_even_product_detail_background(cell)
+			}
+		}
+
 	}
 
 	return xlsx_file
