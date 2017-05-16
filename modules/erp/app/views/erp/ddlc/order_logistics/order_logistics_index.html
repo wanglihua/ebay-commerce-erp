@@ -17,9 +17,13 @@
                         <i class="ace-icon fa fa-refresh"></i>
                         刷新
                     </button>
-                    <button class="btn btn-pink btn-sm" @click="exportOrderLogistics()">
+                    <button class="btn btn-pink btn-sm" @click="exportOrderLogistics1()">
                         <i class="ace-icon fa fa-file-excel-o"></i>
                         导出
+                    </button>
+                    <button class="btn btn-pink btn-sm" @click="exportOrderLogistics2()">
+                        <i class="ace-icon fa fa-file-excel-o"></i>
+                        导出物流公司模板
                     </button>
                     {%/*
                     <button class="btn btn-success btn-sm" @click="showOrderLogisticsDetail(0)">
@@ -32,7 +36,14 @@
                     </button>
                     */%}
                 </div>
-                <form id="formExport" method="post" action='{%url "ErpOrderLogistics.Export" %}'>
+                <form id="formExport1" method="post" action='{%url "ErpOrderLogistics.Export1" %}'>
+                    <input type="hidden" name="stock_id" v-model="page.stock_id"/>
+                    <input type="hidden" name="logistics_company_id" v-model="page.logistics_company_id"/>
+                    <input type="hidden" name="batch_code" v-model="page.batch_code"/>
+                    <input type="hidden" name="begin_time_query" v-model="page.begin_time_query"/>
+                    <input type="hidden" name="end_time_query" v-model="page.end_time_query"/>
+                </form>
+                <form id="formExport2" method="post" action='{%url "ErpOrderLogistics.Export2" %}'>
                     <input type="hidden" name="stock_id" v-model="page.stock_id"/>
                     <input type="hidden" name="logistics_company_id" v-model="page.logistics_company_id"/>
                     <input type="hidden" name="batch_code" v-model="page.batch_code"/>
@@ -722,8 +733,11 @@
                     });
                 });
             },
-            exportOrderLogistics: function () {
-                $("#formExport").submit();
+            exportOrderLogistics1: function () {
+                $("#formExport1").submit();
+            },
+            exportOrderLogistics2: function () {
+                $("#formExport2").submit();
             },
             selectStock: function (selected_stock_id) {
                 vm.page.stock_id = selected_stock_id;

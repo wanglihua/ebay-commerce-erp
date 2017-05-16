@@ -327,7 +327,8 @@ POST /erp/order/logistics/data/list            ErpOrderLogistics.ListData
 POST /erp/order/logistics/data/detail          ErpOrderLogistics.DetailData
 POST /erp/order/logistics/save                 ErpOrderLogistics.Save
 POST /erp/order/logistics/delete               ErpOrderLogistics.Delete
-POST /erp/order/logistics/export               ErpOrderLogistics.Export
+POST /erp/order/logistics/export1              ErpOrderLogistics.Export1
+POST /erp/order/logistics/export2              ErpOrderLogistics.Export2
 
 GET  /erp/order/logistics/fee/diff             ErpOrderLogisticsFeeDiff.Index
 POST /erp/order/logistics/fee/diff/data/page   ErpOrderLogisticsFeeDiff.PageData
