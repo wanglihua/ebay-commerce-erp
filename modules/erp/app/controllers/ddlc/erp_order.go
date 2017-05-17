@@ -619,3 +619,29 @@ func (c ErpOrder) WanCheng() revel.Result {
 		"message": "订单完成成功！",
 	})
 }
+
+// #10 订单作废的功能
+func (c ErpOrder) QuXiao() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_QUXIAO, c.Session)
+
+	db_session := c.DbSession
+
+	order_id_list := make([]int64, 0)
+	c.Params.Bind(&order_id_list, "id_list")
+
+	var order_list = make([]models.OrderInfo, 0)
+	err := db_session.In("id", order_id_list).Find(&order_list)
+	core.HandleError(err)
+
+
+	for _, order := range order_list {
+		order.StatusId = models.ORDER_STATUS_YQC // 已取消
+		_, err = db_session.Id(order.Id).Cols("status_id").Update(&order)
+		core.HandleError(err)
+	}
+
+	return c.RenderJson(map[string]interface{}{
+		"success": true,
+		"message": "订单取消成功！",
+	})
+}

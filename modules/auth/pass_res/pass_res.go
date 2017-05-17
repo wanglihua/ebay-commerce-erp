@@ -50,10 +50,12 @@ const (
 	DDLC_ORDER_PHZ                = 130500 // 配货中
 	DDLC_ORDER_YFH                = 130600 // 已发货
 	DDLC_ORDER_YWC                = 130700 // 已完成
+	DDLC_ORDER_YQC                = 130730 // 已取消
 	DDLC_ORDER_VIEW_DETAIL        = 130750 // 查看订单详细
 	DDLC_ORDER_IMPORT             = 130800 // 订单导入
 	DDLC_ORDER_LOGISTICS          = 130900 // 订单物流
 	DDLC_ORDER_LOGISTICS_FEE_DIFF = 131000 // 订单物流费用偏差
+	DDLC_ORDER_QUXIAO             = 131100 // 订单取消
 
 	// 库存管理 模块编号 14
 	KCGL_PRODUCT                  = 140100 // 商品列表

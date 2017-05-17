@@ -320,6 +320,7 @@ POST /erp/order/pei/huo                        ErpOrder.PeiHuo
 POST /erp/order/fa/huo                         ErpOrder.FaHuo
 POST /erp/order/shi/ji/wu/huo                  ErpOrder.ShiJiWuHuo
 POST /erp/order/wan/cheng                      ErpOrder.WanCheng
+POST /erp/order/qu/xiao                        ErpOrder.QuXiao
 
 GET  /erp/order/logistics                      ErpOrderLogistics.Index
 POST /erp/order/logistics/data/page            ErpOrderLogistics.PageData

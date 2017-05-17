@@ -93,6 +93,13 @@ func (e PassResInfo) InitData(db_session *xorm.Session) {
 		db_session.Insert(pass)
 
 		pass = new(PassResInfo)
+		pass.Id = pass_res.DDLC_ORDER_YQC
+		pass.CateId = pass_res_cate.DDLC
+		pass.Name = "已取消"
+		pass.Desc = core.MakeNullString("已取消", true)
+		db_session.Insert(pass)
+
+		pass = new(PassResInfo)
 		pass.Id = pass_res.DDLC_ORDER_VIEW_DETAIL
 		pass.CateId = pass_res_cate.DDLC
 		pass.Name = "查看订单详细"
@@ -120,6 +127,13 @@ func (e PassResInfo) InitData(db_session *xorm.Session) {
 		pass.CateId = pass_res_cate.DDLC
 		pass.Name = "订单物流费用偏差"
 		pass.Desc = core.MakeNullString("订单物流费用理论和实际偏差", true)
+		db_session.Insert(pass)
+
+		pass = new(PassResInfo)
+		pass.Id = pass_res.DDLC_ORDER_QUXIAO
+		pass.CateId = pass_res_cate.DDLC
+		pass.Name = "订单取消"
+		pass.Desc = core.MakeNullString("订单取消", true)
 		db_session.Insert(pass)
 	}
 
