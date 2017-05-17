@@ -93,7 +93,7 @@ func (e PassResInfo) InitData(db_session *xorm.Session) {
 		db_session.Insert(pass)
 
 		pass = new(PassResInfo)
-		pass.Id = pass_res.DDLC_ORDER_YQC
+		pass.Id = pass_res.DDLC_ORDER_YQX
 		pass.CateId = pass_res_cate.DDLC
 		pass.Name = "已取消"
 		pass.Desc = core.MakeNullString("已取消", true)

@@ -115,6 +115,16 @@ func GetDdlcMenu(res_id_map map[int64]bool, web_session revel.Session) string {
         </li>`)
 	}
 
+	if check_pass_res_menu(pass_res.DDLC_ORDER_YQX) {
+		buffer.WriteString(`<li id="ddlc-order-yqx-menu" class="">
+            <a href="/erp/order/yqx">
+                <i class="menu-icon fa fa-caret-right"></i>
+                已取消
+            </a>
+            <b class="arrow"></b>
+        </li>`)
+	}
+
 	if check_pass_res_menu(pass_res.DDLC_ORDER_IMPORT) {
 		buffer.WriteString(`<li id="ddlc-order-import-menu" class="">
             <a href="/erp/order/import">

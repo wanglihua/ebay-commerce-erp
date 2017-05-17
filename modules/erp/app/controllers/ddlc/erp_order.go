@@ -81,6 +81,12 @@ func (c ErpOrder) Index(status string) revel.Result {
 		active_menu_html = fmt.Sprintf(active_menu_html, status, "已完成")
 		status_chinese_name = "已完成"
 		status_id = models.ORDER_STATUS_YWC
+	} else if status == "yqx" {
+		pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_YQX, c.Session)
+
+		active_menu_html = fmt.Sprintf(active_menu_html, status, "已取消")
+		status_chinese_name = "已取消"
+		status_id = models.ORDER_STATUS_YQX
 	} else {
 		panic("未知的订单状态！")
 	}
@@ -88,12 +94,15 @@ func (c ErpOrder) Index(status string) revel.Result {
 	// 如果是待配货状态，除了显示待配货状态的订单外，还要显示特殊 hold 类型的 hold 状态的订单，但如果是只有仓库拣货人员的权限的话，就只能由墨尔本仓库的拣货人员来查看
 	var can_view_special_hold = can_view_special_hold(status_id, c.Session, db_session)
 
+	var has_pass_order_quxiao =  pass_service.Is_login_user_has_pass(pass_res.DDLC_ORDER_QUXIAO, c.Session)
+
 	c.RenderArgs["active_menu_html"] = template.HTML(active_menu_html)
 	c.RenderArgs["status"] = status
 	c.RenderArgs["status_chinese_name"] = status_chinese_name
 	c.RenderArgs["can_view_special_hold"] = can_view_special_hold
 	c.RenderArgs["icon_path"] = setting.ICON_PATH
 	c.RenderArgs["has_pass_order_new"] = has_pass_order_new
+	c.RenderArgs["has_pass_order_quxiao"] = has_pass_order_quxiao
 	return c.RenderTemplate("erp/ddlc/order/order_index.html")
 }
 
@@ -208,13 +217,15 @@ func (c ErpOrder) ListData() revel.Result {
 		pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_YWC, c.Session)
 
 		status_id = models.ORDER_STATUS_YWC
+	} else if status == "yqx" {
+		pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_YQX, c.Session)
+
+		status_id = models.ORDER_STATUS_YQX
 	} else {
 		panic("未知的订单状态！")
 	}
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
-
-	filter = core.SqlAnd(filter, fmt.Sprintf("o.status_id <> %d", models.ORDER_STATUS_YQC))
 
 	// 分仓库查看
 	// 只有待配货，配货中，已发货，已完成的订单可以分仓库查看
@@ -633,9 +644,8 @@ func (c ErpOrder) QuXiao() revel.Result {
 	err := db_session.In("id", order_id_list).Find(&order_list)
 	core.HandleError(err)
 
-
 	for _, order := range order_list {
-		order.StatusId = models.ORDER_STATUS_YQC // 已取消
+		order.StatusId = models.ORDER_STATUS_YQX // 已取消
 		_, err = db_session.Id(order.Id).Cols("status_id").Update(&order)
 		core.HandleError(err)
 	}

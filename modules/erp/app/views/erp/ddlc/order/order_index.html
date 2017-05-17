@@ -51,6 +51,13 @@
                         完成
                     </button>
                     {% end %}
+
+                    {% if .has_pass_order_quxiao %}
+                    <button class="btn btn-warning btn-sm" @click="quXiao()">
+                        <i class="ace-icon fa fa-calendar-times-o"></i>
+                        取消
+                    </button>
+                    {% end %}
                 </div>
                 <div class="row" style="margin-top: 20px;margin-bottom: 20px;">
                     <div id="query" class="col-xs-12" style="line-height: 28px;">
@@ -638,6 +645,37 @@
                 $.msg.confirm("确认要设置完成吗？", function () {
                     $.ajax({
                         url: '{%url "ErpOrder.WanCheng"%}',
+                        type: "POST",
+                        data: {"id_list": id_list},
+                        success: function (data) {
+                            if (data.success === false) {
+                                $.msg.error(data.message);
+                                return;
+                            }
+                            else {
+                                $.msg.show(data.message);
+                            }
+                            vm.reloadList();
+                        }
+                    });
+                });
+            },
+            quXiao: function () {
+                var id_list = [];
+                $('#orderList tbody tr>td:first-child input:checkbox').each(function () {
+                    if (this.checked) {
+                        id_list.push($(this).val());
+                    }
+                });
+
+                if (id_list.length === 0) {
+                    $.msg.alert("请选择数据！");
+                    return;
+                }
+
+                $.msg.confirm("确认要取消订单吗？", function () {
+                    $.ajax({
+                        url: '{%url "ErpOrder.QuXiao"%}',
                         type: "POST",
                         data: {"id_list": id_list},
                         success: function (data) {

@@ -1080,7 +1080,7 @@ INSERT INTO erp_order_shipping_address (order_id, name, street1, street2, city_n
 		// 把原来的订单作废
 		// UPDATE erp_order SET status_id = 4350 WHERE id IN (-1, -2)
 		var sql_cancel_order = `UPDATE erp_order SET status_id = %d WHERE id IN (%s)`
-		sql_cancel_order = fmt.Sprintf(sql_cancel_order, models.ORDER_STATUS_YQC, strings.Join(order_id_str_list[1:], ",")) // 删除第一个之外的 order
+		sql_cancel_order = fmt.Sprintf(sql_cancel_order, models.ORDER_STATUS_YQX, strings.Join(order_id_str_list[1:], ",")) // 删除第一个之外的 order
 		_, err = db_session.Exec(sql_cancel_order)
 		core.HandleError(err)
 	}
