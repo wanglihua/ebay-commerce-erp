@@ -92,7 +92,10 @@ func (c ErpOrder) Index(status string) revel.Result {
 	}
 
 	// 如果是待配货状态，除了显示待配货状态的订单外，还要显示特殊 hold 类型的 hold 状态的订单，但如果是只有仓库拣货人员的权限的话，就只能由墨尔本仓库的拣货人员来查看
-	var can_view_special_hold = can_view_special_hold(status_id, c.Session, db_session)
+	var can_view_special_hold_ = false
+	if status_id == models.ORDER_STATUS_DPH {
+		can_view_special_hold_ = can_view_special_hold(c.Session, db_session)
+	}
 
 	var has_pass_order_quxiao = pass_service.Is_login_user_has_pass(pass_res.DDLC_ORDER_QUXIAO, c.Session)
 
@@ -108,7 +111,7 @@ func (c ErpOrder) Index(status string) revel.Result {
 	c.RenderArgs["active_menu_html"] = template.HTML(active_menu_html)
 	c.RenderArgs["status"] = status
 	c.RenderArgs["status_chinese_name"] = status_chinese_name
-	c.RenderArgs["can_view_special_hold"] = can_view_special_hold
+	c.RenderArgs["can_view_special_hold"] = can_view_special_hold_
 	c.RenderArgs["icon_path"] = setting.ICON_PATH
 	c.RenderArgs["has_pass_order_new"] = has_pass_order_new
 	c.RenderArgs["is_button_quxiao_visible"] = is_button_quxiao_visible
@@ -249,7 +252,7 @@ func (c ErpOrder) ListData() revel.Result {
 		}
 	}
 
-	if status_id == 0 { // 后来改成只有在所有订单的的界面下，才有状态的下拉框
+	if status_id == 0 { //表示所有订单的页面。 后来改成只有在所有订单的的界面下，才有状态的下拉框
 		var status_id_query int64 = 0 // 下拉框里面的状态，不是通过 Url 里面来的
 		// 再看查询条件里面的状态分类
 		c.Params.Bind(&status_id_query, "status_id") //查询条件的status_id，比url里面换算过来的status_id更为优先
@@ -304,25 +307,26 @@ func (c ErpOrder) ListData() revel.Result {
 	}
 	*/
 
-	if status_id != 0 {
-
+	if status_id != 0 { // 不是所有订单的时候
 		// 如果是待配货状态，除了显示待配货状态的订单外，还要显示特殊 hold 类型的 hold 状态的订单，但如果是只有仓库拣货人员的权限的话，就只能由墨尔本仓库的拣货人员来查看
-		if can_view_special_hold(status_id, c.Session, db_session) {
-			// 待配货状态，角色权限允许，或者有墨尔本仓库的权限， 除了显示待配货状态的订单外，还要显示特殊 hold 类型的 hold 状态的订单
-			filter = core.SqlAnd(filter, fmt.Sprintf("o.status_id = %d OR o.hold_type_id IN (%s)", status_id, strings.Join(core.Int_list_to_str_list(special_hold_type_id_list), ",")))
+		if status_id == models.ORDER_STATUS_DPH {
+
+			if can_view_special_hold(c.Session, db_session) { // 是待配货状态，且也有权限查看 hold
+				// -1 表示不选中任何 hold
+				if hold_type_id == -1 { // 不选中任何 hold 时，只显示 DPH 的订单
+					filter = core.SqlAnd(filter, fmt.Sprintf("o.status_id = %d", models.ORDER_STATUS_PHZ))
+				} else if hold_type_id == 0 { // 0 表示全选全部的 hold
+					filter = core.SqlAnd(filter, fmt.Sprintf("o.status_id = %d AND o.hold_type_id IN (%s)", models.ORDER_STATUS_HOLD, strings.Join(core.Int_list_to_str_list(special_hold_type_id_list), ",")))
+				} else if hold_type_id > 0 { // 选中了具体的 hold类型
+					filter = core.SqlAnd(filter, fmt.Sprintf("o.status_id = %d AND o.hold_type_id = %d", models.ORDER_STATUS_HOLD, hold_type_id))
+				}
+			} else { // 是待配货状态，但没有权限查看 hold
+				filter = core.SqlAnd(filter, fmt.Sprintf("o.status_id = %d", status_id))
+			}
 		} else {
-			// 不是 待配货状态， 或者是 待配货状态，但只是一般拣货人员的权限, 也不是墨尔本仓库的拣货人员
+			// 不是 待配货状态
 			filter = core.SqlAnd(filter, fmt.Sprintf("o.status_id = %d", status_id))
 		}
-	}
-
-	// -1 表示不选中任何 hold
-	if hold_type_id != 0 && hold_type_id != -1 {
-		filter = core.SqlAnd(filter, fmt.Sprintf("o.hold_type_id = %d", hold_type_id))
-	}
-
-	if hold_type_id == 0 { // 表示全选全部的 hold
-		filter = core.SqlAnd(filter, fmt.Sprintf("o.status_id = %d OR o.hold_type_id IN (%s)", models.ORDER_STATUS_HOLD, strings.Join(core.Int_list_to_str_list(special_hold_type_id_list), ",")))
 	}
 
 	order_list, count := order_service.Get_order_data_list(db_session, filter, order, offset, limit)
@@ -333,7 +337,7 @@ func (c ErpOrder) ListData() revel.Result {
 	})
 }
 
-func can_view_special_hold(status_id int64, web_session revel.Session, db_session *xorm.Session) bool {
+func can_view_special_hold(web_session revel.Session, db_session *xorm.Session) bool {
 	var login_user = core.GetLoginUser(web_session)
 	var is_pick_crew_has_mel_stock = stock_pick_crew_service.Is_pick_crew_has_mel_stock(login_user.UserId, db_session)
 
@@ -343,7 +347,7 @@ func can_view_special_hold(status_id int64, web_session revel.Session, db_sessio
 
 	// 如果是待配货状态，除了显示待配货状态的订单外，还要显示特殊 hold 类型的 hold 状态的订单，但如果是只有仓库拣货人员的权限的话，就只能由墨尔本仓库的拣货人员来查看
 
-	if status_id == models.ORDER_STATUS_DPH && (login_user.IsSuperAdmin || is_admin || is_custom_service || is_sales || is_pick_crew_has_mel_stock) {
+	if login_user.IsSuperAdmin || is_admin || is_custom_service || is_sales || is_pick_crew_has_mel_stock {
 		return true
 	}
 
