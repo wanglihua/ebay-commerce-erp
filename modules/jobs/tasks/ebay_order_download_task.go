@@ -216,6 +216,9 @@ func (t EBayOrderDownloadTask) Run() {
 				order_in_db.SellerUserId = order_download.SellerUserID
 
 				order_in_db.BuyerUserId = order_download.BuyerUserID
+				if len(order_download.TransactionArray.Transactions) > 0 {
+					order_in_db.BuyerEmail = order_download.TransactionArray.Transactions[0].Buyer.Email
+				}
 				order_in_db.BuyerCheckoutMessage = order_download.BuyerCheckoutMessage
 
 				// 订单状态，这部分逻辑还可以继续探讨，判断状态的时候用到了前面已经设置的 order_in_db的状态，所以这段代码不能放到前面去的
