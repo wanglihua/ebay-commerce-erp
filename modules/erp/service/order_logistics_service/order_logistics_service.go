@@ -32,6 +32,7 @@ type OrderLogistics struct {
 	logistics_mode_list               []models.LogisticsModeInfo              // 物流方式列表
 	logistics_fee_rate_map            map[int64][]models.LogisticsFeeRateInfo // 物流费率列表的映射，映射的 key 是， 物流方式的 id
 	envelope_fee_rate_list            []models.EnvelopeFeeRateInfo            // 信封物流费率， 按费用从小到大排序
+	shop_list                         []models.ShopAccountInfo                // 店铺列表，系统中的店铺列表
 }
 
 func (p_ol *OrderLogistics) init_data(db_session *xorm.Session) {
@@ -93,6 +94,10 @@ func (p_ol *OrderLogistics) init_data(db_session *xorm.Session) {
 	// 不采用中间变量了 p_ol.logistics_fee_rate_map = logistics_fee_rate_map
 
 	p_ol.envelope_fee_rate_list = envelope_fee_rate_service.Get_envelope_fee_rate_list(db_session)
+
+	var shop_list = make([]models.ShopAccountInfo, 0)
+	err = db_session.Find(&shop_list)
+	core.HandleError(err)
 }
 
 func (p_ol *OrderLogistics) CalculateListPaidOrders(db_session *xorm.Session) error {
@@ -226,6 +231,11 @@ func (p_ol *OrderLogistics) CalculateList(order_list []models.OrderInfo, db_sess
 		// 加载订单数据 汇率 和 订单收货地址
 		p_order_logistics_data.load_exchange_rate(&order, p_ol)
 		p_order_logistics_data.load_order_shipping_address(order.Id, db_session)
+
+		// 老鼠仓的检查
+		if p_ol.hold_check_paypal_account_not_match(&order, db_session) {
+			continue
+		}
 
 		// 17 收货人信息不全的，比如没有手机号，没有邮编等等，放在这里前面一点的地方检查比较好
 		if p_ol.hold_check_address_info_miss(&order, p_order_logistics_data, db_session) {
@@ -599,6 +609,47 @@ func (p_ol *OrderLogistics) hold_check_address_info_miss(p_order *models.OrderIn
 		(strings.TrimSpace(shipping_address.Street1) == "" && strings.TrimSpace(shipping_address.Street2) == "" ) { // 地址信息中缺少详细地址信息
 		p_ol.update_order_to_hold_type(p_order, models.ORDER_HOLD_ADDRESS_INFO_MISS, db_session)
 		return true
+	}
+
+	return false
+}
+
+// 18. 对老鼠仓的检查
+func (p_ol *OrderLogistics) hold_check_paypal_account_not_match(p_order *models.OrderInfo, db_session *xorm.Session) (is_hold_return bool) {
+	var payment_method = p_order.PaymentMethods
+
+	var find_shop_in_shop_list = func(shop_id int64, shop_list []models.ShopAccountInfo) models.ShopAccountInfo {
+		for _, shop := range shop_list {
+			if shop.Id == shop_id {
+				return shop
+			}
+		}
+
+		return models.ShopAccountInfo{}
+	}
+
+	var shop = find_shop_in_shop_list(p_order.ShopId, p_ol.shop_list)
+
+	// 老鼠仓的判断
+	// 如果是通过PayPal支付的，而且店铺设置里面也设置了PayPal列表的
+	if strings.ToLower(payment_method) == strings.ToLower("PayPal") && shop.PaypalAccount != "" {
+		shop_paypal_email_list := strings.Split(shop.PaypalAccount, ",")
+
+		// 之前订单下载和导入时，已经把SellerEmail放入订单中
+		seller_email := p_order.SellerEmail //是用SellerEmail来判断老鼠仓吗？
+
+		seller_email_in_list := false
+		for _, shop_paypal_email := range shop_paypal_email_list {
+			if strings.ToLower(seller_email) == strings.ToLower(shop_paypal_email) {
+				seller_email_in_list = true
+			}
+		}
+
+		// 设置的账户里面和卖家账户匹配的，就设置成为Hold订单
+		if seller_email_in_list == false {
+			p_ol.update_order_to_hold_type(p_order, models.ORDER_HOLD_TYPE_SELLER_PAYPAL_MISMATCH, db_session)
+			return true
+		}
 	}
 
 	return false

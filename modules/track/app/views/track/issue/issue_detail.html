@@ -167,6 +167,7 @@
                 showMask("提交中...");
 
                 vm.detail.issue.body = $("#issue_body").Editor("getText");
+                $("#issue_body").val(vm.detail.issue.body);
 
                 var form = $("#issueDetailForm");
                 var valid = validate(form, {

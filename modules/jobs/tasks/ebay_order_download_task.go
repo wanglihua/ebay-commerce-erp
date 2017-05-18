@@ -267,6 +267,7 @@ func (t EBayOrderDownloadTask) Run() {
 				var payment_method = order_download.CheckoutStatuss.PaymentMethod
 				order_in_db.PaymentMethods = payment_method
 
+				/* 这部分判断放到物流匹配中去
 				// 老鼠仓的判断
 				// 如果是通过PayPal支付的，而且店铺设置里面也设置了PayPal列表的
 				if strings.ToLower(payment_method) == strings.ToLower("PayPal") && shop.PaypalAccount != "" {
@@ -286,6 +287,7 @@ func (t EBayOrderDownloadTask) Run() {
 						order_in_db.HoldTypeId = core.MakeNullInt(models.ORDER_HOLD_TYPE_SELLER_PAYPAL_MISMATCH, true)
 					}
 				}
+				*/
 
 				if has_order == true {
 					// update order
