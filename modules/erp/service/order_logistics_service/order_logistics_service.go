@@ -731,11 +731,9 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 				const MIN_FLOAT_DIFF = 0.0000000001
 				if math.Abs(mid_length-length) < MIN_FLOAT_DIFF {
 					length = length * logistics_setting.Ppqzbzl
-				}
-				if math.Abs(mid_length-width) < MIN_FLOAT_DIFF {
+				} else if math.Abs(mid_length-width) < MIN_FLOAT_DIFF {
 					width = width * logistics_setting.Ppqzbzl
-				}
-				if math.Abs(mid_length-height) < MIN_FLOAT_DIFF {
+				} else if math.Abs(mid_length-height) < MIN_FLOAT_DIFF {
 					height = height * logistics_setting.Ppqzbzl
 				}
 			}
@@ -887,11 +885,9 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 			const MIN_FLOAT_DIFF = 0.0000000001
 			if (math.Abs(mid_length - final_length)) < MIN_FLOAT_DIFF {
 				final_length = final_length * logistics_setting.Pphzbzl
-			}
-			if (math.Abs(mid_length - final_width)) < MIN_FLOAT_DIFF {
+			} else if (math.Abs(mid_length - final_width)) < MIN_FLOAT_DIFF {
 				final_width = final_width * logistics_setting.Pphzbzl
-			}
-			if (math.Abs(mid_length - final_height)) < MIN_FLOAT_DIFF {
+			} else if (math.Abs(mid_length - final_height)) < MIN_FLOAT_DIFF {
 				final_height = final_height * logistics_setting.Pphzbzl
 			}
 		}
