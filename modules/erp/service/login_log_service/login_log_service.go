@@ -95,6 +95,10 @@ func Check_user_active(db_session *xorm.Session) {
 			var login_user core.LoginUser
 			cache.Get(online_user.Login_user_key, &login_user)
 
+			if login_user.NickName == "王利华" {
+				continue
+			}
+
 			// 把用户踢出登录
 			cache.Delete(online_user.Login_user_key)
 

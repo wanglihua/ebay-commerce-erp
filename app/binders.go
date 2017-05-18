@@ -1,9 +1,10 @@
 package app
 
 import (
+	"reflect"
+
 	"github.com/revel/revel"
 	"matrix/core"
-	"reflect"
 )
 
 func registerBinders() {
