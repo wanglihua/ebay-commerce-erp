@@ -823,6 +823,8 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 					total_fee_in_fee_rate = fee
 					selected_fee_rate_id_in_mode = logistics_fee_rate.Id
 				}
+
+				//revel.TRACE.Println("logistics_fee_rate.Postcode", logistics_fee_rate.Postcode, "fee", fee)
 			}
 		} // for _, logistics_fee_rate := range logistics_fee_rate_list {
 
@@ -833,6 +835,14 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 		// 超重 和 超长 费用中， 取一个， 取大的一个
 		var extra_fee_in_mode = math.Max(extra_weight_fee_in_mode, extra_length_fee_in_mode)
 		var total_fee_in_mode float64 = total_fee_in_fee_rate + extra_fee_in_mode
+
+		//revel.TRACE.Println("extra_weight_fee_in_mode", extra_weight_fee_in_mode)
+		//revel.TRACE.Println("extra_length_fee_in_mode", extra_length_fee_in_mode)
+		//revel.TRACE.Println("total_fee_in_fee_rate", total_fee_in_fee_rate)
+		//revel.TRACE.Println("extra_fee_in_mode", extra_fee_in_mode)
+
+		//revel.TRACE.Println("logistics_mode.Id, logistics_mode.Name", logistics_mode.Id, logistics_mode.Name)
+		//revel.TRACE.Println("total_fee_in_mode+cost_amount_in_mode", total_fee_in_mode+cost_amount_in_mode)
 
 		if total_fee_in_mode+cost_amount_in_mode < final_total_amount { // 取得更优的模式方案，挑选最优解时，把商品的到仓成本也考虑进去
 			final_selected_fee_rate_id = selected_fee_rate_id_in_mode
