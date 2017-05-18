@@ -712,7 +712,7 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 		// 获取所有商品的整体的 长，宽，高，重量 等的数据，体积重是利用体积重公式计算得到的结果
 		var length, width, height, dim_weight, actual_weight float64 = get_order_products_whole_logistics_data(p_order_logistics_data, logistics_mode.Tjzgs)
 
-		revel.TRACE.Println("get_order_products_whole_logistics_data dim_weight", dim_weight)
+		//revel.TRACE.Println("get_order_products_whole_logistics_data dim_weight", dim_weight)
 
 		// 匹配前打折
 		{
@@ -849,7 +849,7 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 			// final_weight = final_weight_in_mode
 			final_actual_weight = actual_weight
 			final_dim_weight = dim_weight
-			revel.TRACE.Println("final_dim_weight = dim_weight dim_weight", dim_weight)
+			//revel.TRACE.Println("final_dim_weight = dim_weight dim_weight", dim_weight)
 		}
 	} // for _, logistics_mode := range logistics_mode_list {
 
@@ -911,7 +911,7 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 	order_logistics.Length = final_length
 	order_logistics.Width = final_width
 	order_logistics.Height = final_height
-	revel.TRACE.Println("final_dim_weight", final_dim_weight)
+	//revel.TRACE.Println("final_dim_weight", final_dim_weight)
 	order_logistics.DimWeight = final_dim_weight
 	order_logistics.Weight = final_actual_weight
 	order_logistics.TotalFee = final_total_fee

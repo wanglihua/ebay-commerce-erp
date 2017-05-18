@@ -95,18 +95,18 @@ GROUP BY ivt.product_id, ivt.stock_id`
 // 获取包含"这个商品列表"的所有"产品库存数量记录"
 func Get_products_stock_qty_list(product_id_list []int64, db_session *xorm.Session) []Product_stock_qty {
 	/*
-SELECT ivt.product_id AS product_id, ivt.stock_id AS stock_id, s.stock_type_id, sum(ivt.qty) AS qty
-FROM erp_inventory ivt
-    INNER JOIN erp_stock s ON s.id = ivt.stock_id
-WHERE ivt.product_id IN (1, 2, 3)
-GROUP BY ivt.product_id, ivt.stock_id
+SELECT nvt.product_id AS product_id, nvt.stock_id AS stock_id, s.stock_type_id AS stock_type_id, sum(nvt.qty) AS qty, sum(nvt.cost_price * nvt.qty) / sum(nvt.qty) AS cost_price
+FROM erp_inventory nvt
+    INNER JOIN erp_stock s ON s.id = nvt.stock_id
+WHERE nvt.product_id IN (10000001)
+GROUP BY nvt.product_id, nvt.stock_id, s.stock_type_id
 	 */
 
-	sql := `SELECT ivt.product_id AS product_id, ivt.stock_id AS stock_id, s.stock_type_id, sum(ivt.qty) AS qty
-FROM erp_inventory ivt
-    INNER JOIN erp_stock s ON s.id = ivt.stock_id
-WHERE ivt.product_id IN (%s)
-GROUP BY ivt.product_id, ivt.stock_id`
+	sql := `SELECT nvt.product_id AS product_id, nvt.stock_id AS stock_id, s.stock_type_id AS stock_type_id, sum(nvt.qty) AS qty, sum(nvt.cost_price * nvt.qty) / sum(nvt.qty) AS cost_price
+FROM erp_inventory nvt
+    INNER JOIN erp_stock s ON s.id = nvt.stock_id
+WHERE nvt.product_id IN (%s)
+GROUP BY nvt.product_id, nvt.stock_id, s.stock_type_id`
 	if len(product_id_list) != 0 {
 		var product_id_str_list = core.Int_list_to_str_list(product_id_list)
 		sql = fmt.Sprintf(sql, strings.Join(product_id_str_list, ","))
