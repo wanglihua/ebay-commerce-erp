@@ -94,7 +94,16 @@ func (c ErpOrder) Index(status string) revel.Result {
 	// 如果是待配货状态，除了显示待配货状态的订单外，还要显示特殊 hold 类型的 hold 状态的订单，但如果是只有仓库拣货人员的权限的话，就只能由墨尔本仓库的拣货人员来查看
 	var can_view_special_hold = can_view_special_hold(status_id, c.Session, db_session)
 
-	var has_pass_order_quxiao =  pass_service.Is_login_user_has_pass(pass_res.DDLC_ORDER_QUXIAO, c.Session)
+	var has_pass_order_quxiao = pass_service.Is_login_user_has_pass(pass_res.DDLC_ORDER_QUXIAO, c.Session)
+
+	var is_button_quxiao_visible = false
+	if has_pass_order_quxiao == true &&
+		status_id != models.ORDER_STATUS_YFH &&
+		status_id != models.ORDER_STATUS_YWC &&
+		status_id != models.ORDER_STATUS_YQX {
+
+		is_button_quxiao_visible = true
+	}
 
 	c.RenderArgs["active_menu_html"] = template.HTML(active_menu_html)
 	c.RenderArgs["status"] = status
@@ -102,7 +111,7 @@ func (c ErpOrder) Index(status string) revel.Result {
 	c.RenderArgs["can_view_special_hold"] = can_view_special_hold
 	c.RenderArgs["icon_path"] = setting.ICON_PATH
 	c.RenderArgs["has_pass_order_new"] = has_pass_order_new
-	c.RenderArgs["has_pass_order_quxiao"] = has_pass_order_quxiao
+	c.RenderArgs["is_button_quxiao_visible"] = is_button_quxiao_visible
 	return c.RenderTemplate("erp/ddlc/order/order_index.html")
 }
 
