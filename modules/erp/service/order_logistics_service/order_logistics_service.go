@@ -698,61 +698,61 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 	var final_cost_amount float64 = 0
 	var final_total_amount float64 = math.MaxFloat64 // 总的 费用和成本的和 final_total_fee + final_cost_amount, 初始化为一个很大的不可能的值，澳币
 	for _, logistics_mode := range logistics_mode_list {
-		match_trace()
-		match_trace()
-		match_trace("匹配单个物流方式开始")
+		revel.TRACE.Println()
+		revel.TRACE.Println()
+		revel.TRACE.Println("匹配单个物流方式开始")
 		logistics_fee_rate_list, found := logistics_fee_rate_map[logistics_mode.Id]
 		if found == false {
-			match_trace("没有找到物流方式对应的费率设置")
-			match_trace("匹配单个物流方式结束")
+			revel.TRACE.Println("没有找到物流方式对应的费率设置")
+			revel.TRACE.Println("匹配单个物流方式结束")
 			continue
 		}
 
-		match_trace("物流方式数据库id", logistics_mode.Id, "物流方式名称：", logistics_mode.Name)
+		revel.TRACE.Println("物流方式数据库id", logistics_mode.Id, "物流方式名称：", logistics_mode.Name)
 		var stock_id = logistics_mode.StockId
-		match_trace("物流方式对应的仓库数据库id", stock_id)
+		revel.TRACE.Println("物流方式对应的仓库数据库id", stock_id)
 		var cost_amount_in_mode float64 = 0
 		if cost_amount, found := stock_id_has_products_map[stock_id]; found == false { // 如果物流方式对应的仓库，没有全部的商品数量的库存，就继续下一个物流方式
-			match_trace("物流方式对应的仓库没有订单对应的库存")
-			match_trace("匹配单个物流方式结束")
+			revel.TRACE.Println("物流方式对应的仓库没有订单对应的库存")
+			revel.TRACE.Println("匹配单个物流方式结束")
 			continue
 		} else { // 如果库存都有的，就记录下商品成本总价
-			match_trace("物流方式对应的仓库存在订单对应的库存，澳仓成本价为", cost_amount)
+			revel.TRACE.Println("物流方式对应的仓库存在订单对应的库存，澳仓成本价为", cost_amount)
 			cost_amount_in_mode = cost_amount
 		}
 
-		match_trace("物流方式的体积重公式参数为", logistics_mode.Tjzgs)
+		revel.TRACE.Println("物流方式的体积重公式参数为", logistics_mode.Tjzgs)
 		// 获取所有商品的整体的 长，宽，高，重量 等的数据，体积重是利用体积重公式计算得到的结果
 		var length, width, height, dim_weight, actual_weight float64 = get_order_products_whole_logistics_data(p_order_logistics_data, logistics_mode.Tjzgs)
-		match_trace("计算所得的订单商品的整体，长，宽，高，体积重，实际重量", length, width, height, dim_weight, actual_weight)
+		revel.TRACE.Println("计算所得的订单商品的整体，长，宽，高，体积重，实际重量", length, width, height, dim_weight, actual_weight)
 
 		// 匹配前打折
 		{
-			match_trace("现在考虑匹配前打折")
+			revel.TRACE.Println("现在考虑匹配前打折")
 
 			// 匹配前重量打折
 			if logistics_setting.Ppqzldz == 1 {
 				// 实际重量打折
-				match_trace("匹配前实际重量打折", "是")
-				match_trace("匹配前实际重量折率", logistics_setting.Ppqzlzl)
-				match_trace("匹配前打折前的实际重量", actual_weight)
+				revel.TRACE.Println("匹配前实际重量打折", "是")
+				revel.TRACE.Println("匹配前实际重量折率", logistics_setting.Ppqzlzl)
+				revel.TRACE.Println("匹配前打折前的实际重量", actual_weight)
 				actual_weight = actual_weight * logistics_setting.Ppqzlzl
-				match_trace("匹配前打折后的实际重量", actual_weight)
+				revel.TRACE.Println("匹配前打折后的实际重量", actual_weight)
 			} else {
-				match_trace("匹配实际重量打折", "否")
+				revel.TRACE.Println("匹配实际重量打折", "否")
 			}
 
 			// 匹配前中边打折
 			if logistics_setting.Ppqzbdz == 1 {
-				match_trace("匹配前中边打折", "是")
+				revel.TRACE.Println("匹配前中边打折", "是")
 
-				match_trace("打折时的长宽高", length, width, height)
+				revel.TRACE.Println("打折时的长宽高", length, width, height)
 
 				var side_length_slice = sort.Float64Slice([]float64{length, width, height})
 				side_length_slice.Sort()
 				var mid_length = side_length_slice[1] // 0, 1, 2 中间那条边
 
-				match_trace("打折时的中边为", mid_length)
+				revel.TRACE.Println("打折时的中边为", mid_length)
 
 				const MIN_FLOAT_DIFF = 0.0000000001
 				if math.Abs(mid_length-length) < MIN_FLOAT_DIFF {
@@ -763,7 +763,7 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 					height = height * logistics_setting.Ppqzbzl
 				}
 			} else {
-				match_trace("匹配前中边打折", "否")
+				revel.TRACE.Println("匹配前中边打折", "否")
 			}
 		}
 
@@ -771,28 +771,28 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 
 		// 如果考虑体积重，就把计算好的体积重，用 体积重系数 打折
 		if logistics_mode.Sfkltjz == 1 { // 是否考虑体积重
-			match_trace("是否考虑体积重", "是")
+			revel.TRACE.Println("是否考虑体积重", "是")
 
 			if logistics_mode.Tjzxs > 0 { // 如果 体积重系数 有设置的值
-				match_trace("体积重系数", logistics_mode.Tjzxs)
-				match_trace("体积重除以体积重系数之前", dim_weight)
+				revel.TRACE.Println("体积重系数", logistics_mode.Tjzxs)
+				revel.TRACE.Println("体积重除以体积重系数之前", dim_weight)
 				dim_weight = dim_weight / logistics_mode.Tjzxs // 这里是除以体积重系数
-				match_trace("体积重除以体积重系数之后", dim_weight)
+				revel.TRACE.Println("体积重除以体积重系数之后", dim_weight)
 			} else {
-				match_trace("体积重系数未设置或设置不符合要求")
+				revel.TRACE.Println("体积重系数未设置或设置不符合要求")
 			}
 
 			// 体积重与实际重取向， 如果考虑体积重，这个系数一般都会设置的？
 			if logistics_mode.Tjzysjzqx == 1 { // 取大
-				match_trace("体积重与实际重取向", "取大")
-				match_trace("这时的体积重和实际重量分别是", dim_weight, actual_weight)
+				revel.TRACE.Println("体积重与实际重取向", "取大")
+				revel.TRACE.Println("这时的体积重和实际重量分别是", dim_weight, actual_weight)
 				final_weight_in_mode = math.Max(dim_weight, actual_weight)
-				match_trace("体积重与实际重取向 取大 后的结果是", final_weight_in_mode)
+				revel.TRACE.Println("体积重与实际重取向 取大 后的结果是", final_weight_in_mode)
 			} else if logistics_mode.Tjzysjzqx == 2 { // 取小
-				match_trace("体积重与实际重取向", "取小")
-				match_trace("这时的体积重和实际重量分别是", dim_weight, actual_weight)
+				revel.TRACE.Println("体积重与实际重取向", "取小")
+				revel.TRACE.Println("这时的体积重和实际重量分别是", dim_weight, actual_weight)
 				final_weight_in_mode = math.Min(dim_weight, actual_weight)
-				match_trace("体积重与实际重取向 取小 后的结果是", final_weight_in_mode)
+				revel.TRACE.Println("体积重与实际重取向 取小 后的结果是", final_weight_in_mode)
 			}
 
 			// 体积重与实际重是否有比值要求，这个比值是要大于的，就是说这个东西不能太沉
@@ -802,7 +802,7 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 				}
 			}
 		} else {
-			match_trace("是否考虑体积重", "否")
+			revel.TRACE.Println("是否考虑体积重", "否")
 		}
 
 		// 接下来计算都是针对 final_weight_in_mode 来做，不管前面有没有考虑体积重
@@ -810,33 +810,33 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 		var extra_weight_fee_in_mode float64 = 0 // 超重的费用， 澳币
 		// 重量是否有限制
 		if logistics_mode.Zlsfyxz == 1 { //如果有限制
-			match_trace("重量是否有限制", "是")
-			match_trace("当前重量是", final_weight_in_mode)
-			match_trace("限制重量是", logistics_mode.Zlbncg)
+			revel.TRACE.Println("重量是否有限制", "是")
+			revel.TRACE.Println("当前重量是", final_weight_in_mode)
+			revel.TRACE.Println("限制重量是", logistics_mode.Zlbncg)
 			var extra_weight = final_weight_in_mode - logistics_mode.Zlbncg
 			if extra_weight > 0 { // 重量不能超过，如果重量有限制，物流方式里面一般都有超重限制
-				match_trace("超重了，超重的重量为", extra_weight)
+				revel.TRACE.Println("超重了，超重的重量为", extra_weight)
 				// 查看是否允许超重
 				if logistics_mode.Sfyxcz == 0 { // 不允许超重
-					match_trace("是否允许超重", "否")
-					match_trace("匹配单个物流方式结束")
+					revel.TRACE.Println("是否允许超重", "否")
+					revel.TRACE.Println("匹配单个物流方式结束")
 					continue // 不允许超重，就排除当前物流方式s
 				} else {
-					match_trace("是否允许超重", "是")
+					revel.TRACE.Println("是否允许超重", "是")
 				}
 				// 允许超重 计算超重费用
 				var extra_weight_step float64 = 25 // 每 25 kg一个超重阶梯
-				match_trace("超重阶梯", extra_weight_step)
+				revel.TRACE.Println("超重阶梯", extra_weight_step)
 				//超重加收运费
 				var cz_step_count = math.Ceil(extra_weight / extra_weight_step)
-				match_trace("超重阶梯数量", cz_step_count)
-				match_trace("超重阶梯收费", logistics_mode.Czjsyf)
+				revel.TRACE.Println("超重阶梯数量", cz_step_count)
+				revel.TRACE.Println("超重阶梯收费", logistics_mode.Czjsyf)
 				extra_weight_fee_in_mode = cz_step_count * logistics_mode.Czjsyf
-				match_trace("超重收费", extra_weight_fee_in_mode)
+				revel.TRACE.Println("超重收费", extra_weight_fee_in_mode)
 			}
 			// 如更没有超过限重，就不需要继续考虑
 		} else {
-			match_trace("没有超重")
+			revel.TRACE.Println("没有超重")
 		}
 
 		var extra_length_fee_in_mode float64 = 0 // 超长的费用， 澳币
@@ -844,115 +844,115 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 
 		// 长度是否有限制
 		if logistics_mode.Zcbsfyxz == 1 { // 如果有限制
-			match_trace("长度是否有限制", "是")
+			revel.TRACE.Println("长度是否有限制", "是")
 			var max_length = math.Max(math.Max(length, width), height)
-			match_trace("这时的边长分别是", length, width, height)
-			match_trace("这时的最长边是", max_length)
-			match_trace("最长边限制 长度", logistics_mode.Zcbxzcd)
+			revel.TRACE.Println("这时的边长分别是", length, width, height)
+			revel.TRACE.Println("这时的最长边是", max_length)
+			revel.TRACE.Println("最长边限制 长度", logistics_mode.Zcbxzcd)
 			var extra_length = max_length - logistics_mode.Zcbxzcd
 			if extra_length > 0 { // 长度不能超过，如果最长边有限制，物流方式里面一般都有最长边超长限制
-				match_trace("超长了，超过的长度为", extra_length)
+				revel.TRACE.Println("超长了，超过的长度为", extra_length)
 				// 是否允许超长
 				if logistics_mode.Sfyxcc == 0 { // 如果不允许超长
-					match_trace("是否允许超长", "否")
-					match_trace("匹配单个物流方式结束")
+					revel.TRACE.Println("是否允许超长", "否")
+					revel.TRACE.Println("匹配单个物流方式结束")
 					continue
 				} else {
-					match_trace("是否允许超长", "是")
+					revel.TRACE.Println("是否允许超长", "是")
 				}
 
 				// 允许超长，计算超长费用
 				var extra_length_step float64 = logistics_mode.Ccsfjt
 				if extra_length_step > 0 {
-					match_trace("超长阶梯", logistics_mode.Ccsfjt)
+					revel.TRACE.Println("超长阶梯", logistics_mode.Ccsfjt)
 					var cc_step_count = math.Ceil(extra_length / extra_length_step)
-					match_trace("超长阶梯数量", cc_step_count)
-					match_trace("超长阶梯收费", logistics_mode.Ccjsyf)
+					revel.TRACE.Println("超长阶梯数量", cc_step_count)
+					revel.TRACE.Println("超长阶梯收费", logistics_mode.Ccjsyf)
 					extra_length_fee_in_mode = cc_step_count * logistics_mode.Ccjsyf
-					match_trace("超长收费", extra_length_fee_in_mode)
+					revel.TRACE.Println("超长收费", extra_length_fee_in_mode)
 				} else {
 					revel.ERROR.Printf("id 为 %d 名称为 %s 的物流方式的超长收费阶梯设置有误！\n", logistics_mode.Id, logistics_mode.Name)
 				}
 			} else {
-				match_trace("没有超过限长")
+				revel.TRACE.Println("没有超过限长")
 			}
 			// 如果没有超过限长，就不需要继续考虑
 		} else {
-			match_trace("长度是否有限制", "否")
+			revel.TRACE.Println("长度是否有限制", "否")
 		}
 
 		var selected_fee_rate_id_in_mode int64 = 0
 		var total_fee_in_fee_rate float64 = 10000000 //非超重部分的费用，初始为一个很大的不可能的数字， 澳币
 		for _, logistics_fee_rate := range logistics_fee_rate_list {
-			match_trace()
-			match_trace("匹配单个费率开始")
+			revel.TRACE.Println()
+			revel.TRACE.Println("匹配单个费率开始")
 			// 邮编要对上
 			if strings.TrimSpace(p_order_logistics_data.order_shipping_address.PostalCode) == strings.TrimSpace(logistics_fee_rate.Postcode) {
-				match_trace("订单收货地址的邮编", p_order_logistics_data.order_shipping_address.PostalCode)
-				match_trace("当前物流方式下，符合邮编的费率数据库 id", logistics_fee_rate.Id)
+				revel.TRACE.Println("订单收货地址的邮编", p_order_logistics_data.order_shipping_address.PostalCode)
+				revel.TRACE.Println("当前物流方式下，符合邮编的费率数据库 id", logistics_fee_rate.Id)
 
-				match_trace("费率起步价", logistics_fee_rate.Qbj)
+				revel.TRACE.Println("费率起步价", logistics_fee_rate.Qbj)
 				var fee float64 = logistics_fee_rate.Qbj //起步价
 				if final_weight_in_mode-logistics_fee_rate.Qbjzl > 0 { //如果超过了起步重量，就算超过部分的费率；不超过，就不用算了
-					match_trace("超过起步价了")
+					revel.TRACE.Println("超过起步价了")
 					var extra_weight_in_fee_rate = final_weight_in_mode - logistics_fee_rate.Qbjzl
-					match_trace("超过重量", extra_weight_in_fee_rate)
-					match_trace("续重阶梯", logistics_fee_rate.Xzjt)
+					revel.TRACE.Println("超过重量", extra_weight_in_fee_rate)
+					revel.TRACE.Println("续重阶梯", logistics_fee_rate.Xzjt)
 					var xz_step_count = math.Ceil(extra_weight_in_fee_rate / logistics_fee_rate.Xzjt)
-					match_trace("续重阶梯数量", xz_step_count)
-					match_trace("续重阶梯收费", logistics_fee_rate.Xzjtsf)
+					revel.TRACE.Println("续重阶梯数量", xz_step_count)
+					revel.TRACE.Println("续重阶梯收费", logistics_fee_rate.Xzjtsf)
 					var xz_fee = math.Ceil(extra_weight_in_fee_rate/logistics_fee_rate.Xzjt) * logistics_fee_rate.Xzjtsf
-					match_trace("续重费用", xz_fee)
+					revel.TRACE.Println("续重费用", xz_fee)
 					fee = fee + xz_fee
-					match_trace("续重总费用", fee)
+					revel.TRACE.Println("续重总费用", fee)
 				} else {
-					match_trace("没有超过起步价")
+					revel.TRACE.Println("没有超过起步价")
 				}
-				match_trace("费率最低收费", logistics_fee_rate.Zdsf)
+				revel.TRACE.Println("费率最低收费", logistics_fee_rate.Zdsf)
 				// 计算最低费用的时候，还不考虑偏远地区的费用
 				fee = math.Max(fee, logistics_fee_rate.Zdsf) //有最低收费
-				match_trace("考虑费率最低收费后的费用", fee)
+				revel.TRACE.Println("考虑费率最低收费后的费用", fee)
 
 				// 偏远地区
 				if logistics_fee_rate.Sfpydq == 1 {
-					match_trace("是否偏远地区", "是")
-					match_trace("偏远地区加收运费", logistics_fee_rate.Pydqjsyf)
+					revel.TRACE.Println("是否偏远地区", "是")
+					revel.TRACE.Println("偏远地区加收运费", logistics_fee_rate.Pydqjsyf)
 					fee = fee + logistics_fee_rate.Pydqjsyf
-					match_trace("考虑偏远地区后的费用", fee)
+					revel.TRACE.Println("考虑偏远地区后的费用", fee)
 				} else {
-					match_trace("是否偏远地区", "否")
+					revel.TRACE.Println("是否偏远地区", "否")
 				}
 
-				match_trace("最终当前费率的费用", fee)
+				revel.TRACE.Println("最终当前费率的费用", fee)
 				if fee < total_fee_in_fee_rate { // 取得更优的费率方案
-					match_trace("之前没有匹配的费率，或当前费率比之前匹配的费率更优，暂时选用当前费率计算结果")
+					revel.TRACE.Println("之前没有匹配的费率，或当前费率比之前匹配的费率更优，暂时选用当前费率计算结果")
 					total_fee_in_fee_rate = fee
 					selected_fee_rate_id_in_mode = logistics_fee_rate.Id
 				} else {
-					match_trace("之前匹配的费率，比当前费率更优，弃用当前费率计算结果")
+					revel.TRACE.Println("之前匹配的费率，比当前费率更优，弃用当前费率计算结果")
 				}
 
 			}
-			match_trace("匹配单个费率结束")
+			revel.TRACE.Println("匹配单个费率结束")
 		} // for _, logistics_fee_rate := range logistics_fee_rate_list {
 
 		if selected_fee_rate_id_in_mode == 0 { //没有费率匹配成功, 比如说，还没有开通该地区的物流
-			match_trace("该物流方式下没有匹配的物流费率，弃用当前物流方式")
-			match_trace("匹配单个物流方式结束")
+			revel.TRACE.Println("该物流方式下没有匹配的物流费率，弃用当前物流方式")
+			revel.TRACE.Println("匹配单个物流方式结束")
 			continue // 排除该物流方式
 		}
 
 		// 超重 和 超长 费用中， 取一个， 取大的一个
-		match_trace("物流方式超重费用", extra_weight_fee_in_mode)
-		match_trace("物流方式超长费用", extra_length_fee_in_mode)
+		revel.TRACE.Println("物流方式超重费用", extra_weight_fee_in_mode)
+		revel.TRACE.Println("物流方式超长费用", extra_length_fee_in_mode)
 		var extra_fee_in_mode = math.Max(extra_weight_fee_in_mode, extra_length_fee_in_mode)
-		match_trace("物流方式超重和超长，取大的一个的结果", extra_fee_in_mode)
+		revel.TRACE.Println("物流方式超重和超长，取大的一个的结果", extra_fee_in_mode)
 		var total_fee_in_mode float64 = total_fee_in_fee_rate + extra_fee_in_mode
-		match_trace("物流方式中物流费率费用加上物流方式超重超长大的一个后的结果", total_fee_in_mode)
-		match_trace("考虑澳仓成本后的，物流方式总费用", total_fee_in_mode+cost_amount_in_mode)
+		revel.TRACE.Println("物流方式中物流费率费用加上物流方式超重超长大的一个后的结果", total_fee_in_mode)
+		revel.TRACE.Println("考虑澳仓成本后的，物流方式总费用", total_fee_in_mode+cost_amount_in_mode)
 
 		if total_fee_in_mode+cost_amount_in_mode < final_total_amount { // 取得更优的模式方案，挑选最优解时，把商品的到仓成本也考虑进去
-			match_trace("之前没有匹配的物流方式，或当前物流方式比之前匹配的物流方式更优，暂时选用当前物流方式计算结果")
+			revel.TRACE.Println("之前没有匹配的物流方式，或当前物流方式比之前匹配的物流方式更优，暂时选用当前物流方式计算结果")
 			final_selected_fee_rate_id = selected_fee_rate_id_in_mode
 			final_selected_company_id = logistics_mode.CompanyId
 			final_selected_stock_id = logistics_mode.StockId
@@ -969,10 +969,10 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 			final_dim_weight = dim_weight
 			//revel.TRACE.Println("final_dim_weight = dim_weight dim_weight", dim_weight)
 		} else {
-			match_trace("之前匹配的物流，比当前物流方式更优，弃用当前物流方式计算结果")
+			revel.TRACE.Println("之前匹配的物流，比当前物流方式更优，弃用当前物流方式计算结果")
 		}
 
-		match_trace("匹配单个物流方式结束")
+		revel.TRACE.Println("匹配单个物流方式结束")
 	} // for _, logistics_mode := range logistics_mode_list {
 
 	//revel.TRACE.Println("final_length, final_width, final_height, final_weight, final_actual_weight", final_length, final_width, final_height, final_weight, final_actual_weight)
@@ -1283,8 +1283,3 @@ INSERT INTO erp_order_shipping_address (order_id, name, street1, street2, city_n
 (完成)17. 收货人信息不全的，比如没有手机号，没有邮编等等
 
  */
-
-// 用于跟踪匹配过程，如果要关掉跟踪，只需要把这里的代码注释掉就可以了
-func match_trace(v ...interface{}) {
-	revel.TRACE.Println(v)
-}
