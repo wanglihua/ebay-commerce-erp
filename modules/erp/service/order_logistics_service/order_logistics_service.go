@@ -526,7 +526,7 @@ func (p_ol *OrderLogistics) hold_check_envelope(p_order *models.OrderInfo, p_ord
 	envelope_max_height = envelope_side_length_slice[0] // 最短
 
 	// get_order_products_whole_logistics_data的输出中 长 > 宽 > 高
-	var whole_length, whole_width, whole_height, _, whole_weight float64 = get_order_products_whole_logistics_data(p_order_logistics_data, 0) //这是不考虑体积重的问题
+	var whole_length, whole_width, whole_height, whole_weight float64 = get_order_products_whole_logistics_data(p_order_logistics_data)
 
 	if whole_length <= envelope_max_length && whole_width <= envelope_max_width && whole_height <= envelope_max_height && whole_weight <= envelope_max_weight {
 		p_ol.update_order_to_hold_type(p_order, models.ORDER_HOLD_TYPE_ENVELOPE, db_session)
@@ -721,10 +721,9 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 			cost_amount_in_mode = cost_amount
 		}
 
-		revel.TRACE.Println("物流方式的体积重公式参数为", logistics_mode.Tjzgs)
-		// 获取所有商品的整体的 长，宽，高，重量 等的数据，体积重是利用体积重公式计算得到的结果
-		var length, width, height, dim_weight, actual_weight float64 = get_order_products_whole_logistics_data(p_order_logistics_data, logistics_mode.Tjzgs)
-		revel.TRACE.Println("计算所得的订单商品的整体，长，宽，高，体积重，实际重量", length, width, height, dim_weight, actual_weight)
+		// 获取所有商品的整体的 长，宽，高，重量 等的数据
+		var length, width, height, actual_weight float64 = get_order_products_whole_logistics_data(p_order_logistics_data)
+		revel.TRACE.Println("计算所得的订单商品的整体，长，宽，高，实际重量", length, width, height, actual_weight)
 
 		// 匹配前打折
 		{
@@ -770,6 +769,19 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 				revel.TRACE.Println("匹配前中边打折", "否")
 			}
 		}
+
+		// 体积重是利用体积重公式计算得到的结果
+		// 只有这个参数大于零的时候才有意义
+		var dim_weight float64 = 0
+		if logistics_mode.Tjzgs > 0 {
+			revel.TRACE.Println("物流方式的体积重公式参数为", logistics_mode.Tjzgs)
+			dim_weight = length * width * height / logistics_mode.Tjzgs
+			revel.TRACE.Println("计算体积重，长，宽，高，体积重", length, width, height, dim_weight)
+		} else {
+			revel.TRACE.Println("物流方式的体积重公式参数为 0， 不计算体积重。")
+		}
+
+		revel.TRACE.Println("计算所得的订单商品的整体，长，宽，高，体积重，实际重量", length, width, height, dim_weight, actual_weight)
 
 		var final_weight_in_mode = actual_weight // 用户存储最终的计费重量， 初始为实际重量。如果不考虑体积重的话，就用实际重量来算重量的
 
@@ -898,6 +910,8 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 				revel.TRACE.Println("    当前物流方式下，符合邮编的费率数据库 id", logistics_fee_rate.Id)
 
 				revel.TRACE.Println("    费率起步价", logistics_fee_rate.Qbj)
+				revel.TRACE.Println("    费率起步价重量", logistics_fee_rate.Qbjzl)
+
 				var fee float64 = logistics_fee_rate.Qbj //起步价
 				if final_weight_in_mode-logistics_fee_rate.Qbjzl > 0 { //如果超过了起步重量，就算超过部分的费率；不超过，就不用算了
 					revel.TRACE.Println("    超过起步价了")
@@ -1110,8 +1124,8 @@ func check_stock_has_order_products(stock_id int64, p_order_logistics_data *orde
 }
 
 // 获得多个商品的整体长宽高重量的参数，输出的结果中，保证 length > width > height
-func get_order_products_whole_logistics_data(p_order_logistics_data *order_logistics_data_t, dim_weight_ratio float64) (length_return float64, width_return float64, height float64, dim_weight_return float64, weight_return float64) {
-	var whole_length, whole_width, whole_height, whole_dim_weight, whole_weight float64 = 0, 0, 0, 0, 0
+func get_order_products_whole_logistics_data(p_order_logistics_data *order_logistics_data_t) (length_return float64, width_return float64, height float64, weight_return float64) {
+	var whole_length, whole_width, whole_height, whole_weight float64 = 0, 0, 0, 0
 	for _, order_product_info := range p_order_logistics_data.order_product_info_list {
 		// 有时产品的长宽高，可能不是 长 > 宽 > 高 的，需要调整一下，暂且 称作 逻辑 长宽高
 		var side_length_slice = sort.Float64Slice([]float64{order_product_info.Length, order_product_info.Width, order_product_info.Height})
@@ -1131,12 +1145,7 @@ func get_order_products_whole_logistics_data(p_order_logistics_data *order_logis
 		whole_weight = whole_weight + order_product_info.Weight*float64(order_product_info.Qty)
 	}
 
-	// 只有这个参数大于零的时候才有意义
-	if dim_weight_ratio > 0 {
-		whole_dim_weight = whole_length * whole_width * whole_height / dim_weight_ratio
-	}
-
-	return whole_length, whole_width, whole_height, whole_dim_weight, whole_weight
+	return whole_length, whole_width, whole_height, whole_weight
 }
 
 // 合并订单

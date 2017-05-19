@@ -546,6 +546,9 @@ func (c ErpLogisticsMode) Import() revel.Result {
 			panic(fmt.Sprintf("仓库名称 %s 不存在！", logistics_mode_import.StockName))
 		}
 
+		logistics_mode.StockId = stock.Id
+		logistics_mode.StatusId = models.LOGISTICS_MODE_ENABLED
+
 		_, err = db_session.Insert(&logistics_mode)
 		core.HandleError(err)
 
