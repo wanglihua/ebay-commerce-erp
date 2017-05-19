@@ -752,15 +752,18 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 				side_length_slice.Sort()
 				var mid_length = side_length_slice[1] // 0, 1, 2 中间那条边
 
-				revel.TRACE.Println("打折时的中边为", mid_length)
+				revel.TRACE.Println("打折前的中边为", mid_length)
 
 				const MIN_FLOAT_DIFF = 0.0000000001
 				if math.Abs(mid_length-length) < MIN_FLOAT_DIFF {
 					length = length * logistics_setting.Ppqzbzl
+					revel.TRACE.Println("打折后的中边为", length)
 				} else if math.Abs(mid_length-width) < MIN_FLOAT_DIFF {
 					width = width * logistics_setting.Ppqzbzl
+					revel.TRACE.Println("打折后的中边为", width)
 				} else if math.Abs(mid_length-height) < MIN_FLOAT_DIFF {
 					height = height * logistics_setting.Ppqzbzl
+					revel.TRACE.Println("打折后的中边为", height)
 				}
 			} else {
 				revel.TRACE.Println("匹配前中边打折", "否")
