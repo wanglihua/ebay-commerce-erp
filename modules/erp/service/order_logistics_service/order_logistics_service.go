@@ -20,6 +20,7 @@ import (
 	"matrix/modules/erp/service/logistics_setting_service"
 	"matrix/modules/erp/service/order_service"
 	"matrix/modules/erp/service/pick_fee_service"
+	"bytes"
 )
 
 type OrderLogistics struct {
