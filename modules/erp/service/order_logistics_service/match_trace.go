@@ -10,7 +10,7 @@ type match_trace struct {
 	match_debug bytes.Buffer
 }
 
-func (mt match_trace) set_is_trace(setting int64) {
+func (mt *match_trace) set_is_trace(setting int64) {
 	if setting > 0 {
 		mt.is_trace = true
 	} else {

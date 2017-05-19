@@ -710,6 +710,9 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 		var mt match_trace
 		mt.set_is_trace(p_ol.logistics_setting.Qyppts)
 
+		revel.TRACE.Println("p_ol.logistics_setting.Qyppts", p_ol.logistics_setting.Qyppts)
+		revel.TRACE.Println("mt.is_trace", mt.is_trace)
+
 		mt.Println("订单编号", p_order.Code)
 		mt.Println("匹配单个物流方式开始")
 		mt.Println("物流方式数据库id", logistics_mode.Id, "物流方式名称：", logistics_mode.Name)
