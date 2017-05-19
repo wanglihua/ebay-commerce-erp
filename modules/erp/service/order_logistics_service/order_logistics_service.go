@@ -698,24 +698,71 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 	var final_cost_amount float64 = 0
 	var final_total_amount float64 = math.MaxFloat64 // 总的 费用和成本的和 final_total_fee + final_cost_amount, 初始化为一个很大的不可能的值，澳币
 
+	// 清除订单匹配的调试信息
+	if p_ol.logistics_setting.Qyppts > 0 {
+		var delete_sql = `DELETE FROM erp_order_logistics_match_debug WHERE order_id = %d;`
+		delete_sql = fmt.Sprintf(delete_sql, p_order.Id)
+		_, err := db_session.Exec(delete_sql)
+		core.HandleError(err)
+	}
+
 	for _, logistics_mode := range logistics_mode_list {
 		var mt match_trace
+		mt.set_is_trace(p_ol.logistics_setting.Qyppts)
+
 		mt.Println("订单编号", p_order.Code)
 		mt.Println("匹配单个物流方式开始")
+		mt.Println("物流方式数据库id", logistics_mode.Id, "物流方式名称：", logistics_mode.Name)
 		logistics_fee_rate_list, found := logistics_fee_rate_map[logistics_mode.Id]
 		if found == false {
 			mt.Println("没有找到物流方式对应的费率设置")
 			mt.Println("匹配单个物流方式结束")
+
+			if mt.is_trace == true {
+				var logistics_match_debug models.OrderLogisticsMatchDebugInfo
+				logistics_match_debug.OrderId = p_order.Id
+				logistics_match_debug.OrderCode = p_order.Code
+				logistics_match_debug.AddressId = p_order_logistics_data.order_shipping_address.Id
+				logistics_match_debug.CompanyId = logistics_mode.CompanyId
+				logistics_match_debug.StockId = logistics_mode.StockId
+				logistics_match_debug.ModeId = logistics_mode.Id
+				logistics_match_debug.FeeRateId = 0
+				logistics_match_debug.TotalFee = 0
+				logistics_match_debug.TotalCost = 0
+				logistics_match_debug.MatchResult = "无对应费率设置"
+				logistics_match_debug.MatchDebug = mt.String()
+
+				_, err := db_session.Insert(&logistics_match_debug)
+				core.HandleError(err)
+			}
+
 			continue
 		}
 
-		mt.Println("物流方式数据库id", logistics_mode.Id, "物流方式名称：", logistics_mode.Name)
 		var stock_id = logistics_mode.StockId
 		mt.Println("物流方式对应的仓库数据库id", stock_id)
 		var cost_amount_in_mode float64 = 0
 		if cost_amount, found := stock_id_has_products_map[stock_id]; found == false { // 如果物流方式对应的仓库，没有全部的商品数量的库存，就继续下一个物流方式
 			mt.Println("物流方式对应的仓库没有订单对应的库存")
 			mt.Println("匹配单个物流方式结束")
+
+			if mt.is_trace == true {
+				var logistics_match_debug models.OrderLogisticsMatchDebugInfo
+				logistics_match_debug.OrderId = p_order.Id
+				logistics_match_debug.OrderCode = p_order.Code
+				logistics_match_debug.AddressId = p_order_logistics_data.order_shipping_address.Id
+				logistics_match_debug.CompanyId = logistics_mode.CompanyId
+				logistics_match_debug.StockId = logistics_mode.StockId
+				logistics_match_debug.ModeId = logistics_mode.Id
+				logistics_match_debug.FeeRateId = 0
+				logistics_match_debug.TotalFee = 0
+				logistics_match_debug.TotalCost = 0
+				logistics_match_debug.MatchResult = "无对应库存"
+				logistics_match_debug.MatchDebug = mt.String()
+
+				_, err := db_session.Insert(&logistics_match_debug)
+				core.HandleError(err)
+			}
 			continue
 		} else { // 如果库存都有的，就记录下商品成本总价
 			mt.Println("物流方式对应的仓库存在订单对应的库存，澳仓成本价为", cost_amount)
@@ -837,6 +884,23 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 				if logistics_mode.Sfyxcz == 0 { // 不允许超重
 					mt.Println("是否允许超重", "否")
 					mt.Println("匹配单个物流方式结束")
+					if mt.is_trace == true {
+						var logistics_match_debug models.OrderLogisticsMatchDebugInfo
+						logistics_match_debug.OrderId = p_order.Id
+						logistics_match_debug.OrderCode = p_order.Code
+						logistics_match_debug.AddressId = p_order_logistics_data.order_shipping_address.Id
+						logistics_match_debug.CompanyId = logistics_mode.CompanyId
+						logistics_match_debug.StockId = logistics_mode.StockId
+						logistics_match_debug.ModeId = logistics_mode.Id
+						logistics_match_debug.FeeRateId = 0
+						logistics_match_debug.TotalFee = 0
+						logistics_match_debug.TotalCost = 0
+						logistics_match_debug.MatchResult = "超重"
+						logistics_match_debug.MatchDebug = mt.String()
+
+						_, err := db_session.Insert(&logistics_match_debug)
+						core.HandleError(err)
+					}
 					continue // 不允许超重，就排除当前物流方式s
 				} else {
 					mt.Println("是否允许超重", "是")
@@ -873,6 +937,23 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 				if logistics_mode.Sfyxcc == 0 { // 如果不允许超长
 					mt.Println("是否允许超长", "否")
 					mt.Println("匹配单个物流方式结束")
+					if mt.is_trace == true {
+						var logistics_match_debug models.OrderLogisticsMatchDebugInfo
+						logistics_match_debug.OrderId = p_order.Id
+						logistics_match_debug.OrderCode = p_order.Code
+						logistics_match_debug.AddressId = p_order_logistics_data.order_shipping_address.Id
+						logistics_match_debug.CompanyId = logistics_mode.CompanyId
+						logistics_match_debug.StockId = logistics_mode.StockId
+						logistics_match_debug.ModeId = logistics_mode.Id
+						logistics_match_debug.FeeRateId = 0
+						logistics_match_debug.TotalFee = 0
+						logistics_match_debug.TotalCost = 0
+						logistics_match_debug.MatchResult = "超长"
+						logistics_match_debug.MatchDebug = mt.String()
+
+						_, err := db_session.Insert(&logistics_match_debug)
+						core.HandleError(err)
+					}
 					continue
 				} else {
 					mt.Println("是否允许超长", "是")
@@ -960,6 +1041,25 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 		if selected_fee_rate_id_in_mode == 0 { //没有费率匹配成功, 比如说，还没有开通该地区的物流
 			mt.Println("该物流方式下没有匹配的物流费率，弃用当前物流方式")
 			mt.Println("匹配单个物流方式结束")
+
+			if mt.is_trace == true {
+				var logistics_match_debug models.OrderLogisticsMatchDebugInfo
+				logistics_match_debug.OrderId = p_order.Id
+				logistics_match_debug.OrderCode = p_order.Code
+				logistics_match_debug.AddressId = p_order_logistics_data.order_shipping_address.Id
+				logistics_match_debug.CompanyId = logistics_mode.CompanyId
+				logistics_match_debug.StockId = logistics_mode.StockId
+				logistics_match_debug.ModeId = logistics_mode.Id
+				logistics_match_debug.FeeRateId = 0
+				logistics_match_debug.TotalFee = 0
+				logistics_match_debug.TotalCost = 0
+				logistics_match_debug.MatchResult = "没有匹配的物流费率"
+				logistics_match_debug.MatchDebug = mt.String()
+
+				_, err := db_session.Insert(&logistics_match_debug)
+				core.HandleError(err)
+			}
+
 			continue // 排除该物流方式
 		}
 
@@ -994,6 +1094,26 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 		}
 
 		mt.Println("匹配单个物流方式结束")
+
+		// 插入调试信息，前面清除过，这里只做插入
+		if mt.is_trace == true {
+			var logistics_match_debug models.OrderLogisticsMatchDebugInfo
+			logistics_match_debug.OrderId = p_order.Id
+			logistics_match_debug.OrderCode = p_order.Code
+			logistics_match_debug.AddressId = p_order_logistics_data.order_shipping_address.Id
+			logistics_match_debug.CompanyId = final_selected_company_id
+			logistics_match_debug.StockId = final_selected_stock_id
+			logistics_match_debug.ModeId = final_selected_mode_id
+			logistics_match_debug.FeeRateId = final_selected_fee_rate_id
+			logistics_match_debug.TotalFee = final_total_fee
+			logistics_match_debug.TotalCost = final_total_fee + cost_amount_in_mode
+			logistics_match_debug.MatchResult = "备选"
+			logistics_match_debug.MatchDebug = mt.String()
+
+			_, err := db_session.Insert(&logistics_match_debug)
+			core.HandleError(err)
+
+		}
 	} // for _, logistics_mode := range logistics_mode_list {
 
 	// mt.Println("最终费用为", final_total_fee)
