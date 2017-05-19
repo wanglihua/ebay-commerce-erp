@@ -884,10 +884,12 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 		var selected_fee_rate_id_in_mode int64 = 0
 		var total_fee_in_fee_rate float64 = 10000000 //非超重部分的费用，初始为一个很大的不可能的数字， 澳币
 		for _, logistics_fee_rate := range logistics_fee_rate_list {
-			revel.TRACE.Println()
-			revel.TRACE.Println("匹配单个费率开始")
+
 			// 邮编要对上
 			if strings.TrimSpace(p_order_logistics_data.order_shipping_address.PostalCode) == strings.TrimSpace(logistics_fee_rate.Postcode) {
+				revel.TRACE.Println()
+				revel.TRACE.Println("匹配单个费率开始")
+
 				revel.TRACE.Println("订单收货地址的邮编", p_order_logistics_data.order_shipping_address.PostalCode)
 				revel.TRACE.Println("当前物流方式下，符合邮编的费率数据库 id", logistics_fee_rate.Id)
 
@@ -931,9 +933,8 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 				} else {
 					revel.TRACE.Println("之前匹配的费率，比当前费率更优，弃用当前费率计算结果")
 				}
-
+				revel.TRACE.Println("匹配单个费率结束")
 			}
-			revel.TRACE.Println("匹配单个费率结束")
 		} // for _, logistics_fee_rate := range logistics_fee_rate_list {
 
 		if selected_fee_rate_id_in_mode == 0 { //没有费率匹配成功, 比如说，还没有开通该地区的物流
@@ -974,6 +975,8 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 
 		revel.TRACE.Println("匹配单个物流方式结束")
 	} // for _, logistics_mode := range logistics_mode_list {
+
+	revel.TRACE.Println("最终费用为", final_total_fee)
 
 	//revel.TRACE.Println("final_length, final_width, final_height, final_weight, final_actual_weight", final_length, final_width, final_height, final_weight, final_actual_weight)
 
