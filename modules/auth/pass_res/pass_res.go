@@ -41,21 +41,22 @@ const (
 	DDPZ_ORDER_LOG          = 120800 // 订单修改日志
 
 	// 订单流程, 模块编号 13
-	DDLC_ORDER_ALL                = 130100 // 所有订单
-	DDLC_ORDER_NEW                = 130130 // 新增订单
-	DDLC_ORDER_YCJ                = 130150 // 已创建
-	DDLC_ORDER_YZF                = 130200 // 已支付
-	DDLC_ORDER_HOLD               = 130300 // HOLD
-	DDLC_ORDER_DPH                = 130400 // 待配货
-	DDLC_ORDER_PHZ                = 130500 // 配货中
-	DDLC_ORDER_YFH                = 130600 // 已发货
-	DDLC_ORDER_YWC                = 130700 // 已完成
-	DDLC_ORDER_YQX                = 130730 // 已取消
-	DDLC_ORDER_VIEW_DETAIL        = 130750 // 查看订单详细
-	DDLC_ORDER_IMPORT             = 130800 // 订单导入
-	DDLC_ORDER_LOGISTICS          = 130900 // 订单物流
-	DDLC_ORDER_LOGISTICS_FEE_DIFF = 131000 // 订单物流费用偏差
-	DDLC_ORDER_QUXIAO             = 131100 // 订单取消，是指取消订单这个动作， 不是指查看已取消的订单
+	DDLC_ORDER_ALL                   = 130100 // 所有订单
+	DDLC_ORDER_NEW                   = 130130 // 新增订单
+	DDLC_ORDER_YCJ                   = 130150 // 已创建
+	DDLC_ORDER_YZF                   = 130200 // 已支付
+	DDLC_ORDER_HOLD                  = 130300 // HOLD
+	DDLC_ORDER_DPH                   = 130400 // 待配货
+	DDLC_ORDER_PHZ                   = 130500 // 配货中
+	DDLC_ORDER_YFH                   = 130600 // 已发货
+	DDLC_ORDER_YWC                   = 130700 // 已完成
+	DDLC_ORDER_YQX                   = 130730 // 已取消
+	DDLC_ORDER_VIEW_DETAIL           = 130750 // 查看订单详细
+	DDLC_ORDER_IMPORT                = 130800 // 订单导入
+	DDLC_ORDER_LOGISTICS             = 130900 // 订单物流
+	DDLC_ORDER_LOGISTICS_FEE_DIFF    = 131000 // 订单物流费用偏差
+	DDLC_ORDER_QUXIAO                = 131100 // 订单取消，是指取消订单这个动作， 不是指查看已取消的订单
+	DDLC_ORDER_LOGISTICS_MATCH_DEBUG = 131200 // 订单物流匹配调试
 
 	// 库存管理 模块编号 14
 	KCGL_PRODUCT                  = 140100 // 商品列表

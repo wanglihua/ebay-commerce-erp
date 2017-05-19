@@ -155,6 +155,16 @@ func GetDdlcMenu(res_id_map map[int64]bool, web_session revel.Session) string {
         </li>`)
 	}
 
+	if check_pass_res_menu(pass_res.DDLC_ORDER_LOGISTICS_MATCH_DEBUG) {
+		buffer.WriteString(`<li id="ddlc-order-logistics-match-debug-menu" class="">
+            <a href="/erp/order/logistics/match/debug">
+                <i class="menu-icon fa fa-caret-right"></i>
+                订单物流匹配调试
+            </a>
+            <b class="arrow"></b>
+        </li>`)
+	}
+
 	buffer.WriteString(`</ul>
 </li>
 `)

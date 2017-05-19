@@ -135,6 +135,13 @@ func (e PassResInfo) InitData(db_session *xorm.Session) {
 		pass.Name = "订单取消"
 		pass.Desc = core.MakeNullString("订单取消", true)
 		db_session.Insert(pass)
+
+		pass = new(PassResInfo)
+		pass.Id = pass_res.DDLC_ORDER_LOGISTICS_MATCH_DEBUG
+		pass.CateId = pass_res_cate.DDLC
+		pass.Name = "订单物流匹配调试"
+		pass.Desc = core.MakeNullString("订单物流匹配调试", true)
+		db_session.Insert(pass)
 	}
 
 	// 订单配置

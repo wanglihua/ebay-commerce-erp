@@ -6,7 +6,7 @@ import (
 
 	"matrix/core"
 	//"matrix/modules/auth/models"
-	"matrix/modules/track/models"
+	"matrix/modules/erp/models"
 	smith_core "matrix/smith/core"
 	"matrix/smith/core/template"
 )
@@ -20,13 +20,7 @@ var module_lower_case = models.ModuleLowerCase
 var module_chinese = models.ModuleChinese
 var table_prefix = models.TablePrefix
 var model_list = []interface{}{
-	models.IssueAttachInfo{},
-	models.IssueCateInfo{},
-	models.IssueCommentInfo{},
-	models.IssueInfo{},
-	models.IssueLogInfo{},
-	models.IssueStatusInfo{},
-	models.IssueTypeInfo{},
+	models.OrderLogisticsMatchDebugInfo{},
 }
 
 /*

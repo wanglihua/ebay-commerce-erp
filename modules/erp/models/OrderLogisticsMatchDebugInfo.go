@@ -15,7 +15,7 @@ type OrderLogisticsMatchDebugInfo struct {
 	FeeRateId   int64        `xorm:"bigint notnull index 'fee_rate_id'" json:"fee_rate_id" smith:"verbose_name=物流费率"` // 如果物流方式没有符合要求的费率，值就是 0
 	TotalFee    float64      `xorm:"decimal(18,6) notnull 'total_fee'" json:"total_fee" smith:"verbose_name=物流费用"`    // 由上面的 物流方式和物流费率，计算出来的物流费用，不包括拣货费用
 	MatchResult string       `xorm:"nvarchar(200) notnull 'match_result'" json:"match_result" smith:"verbose_name=匹配结果"`
-	MatchDebug  string       `xorm:"text notnull 'match_debug'" json:"match_debug" smith:"verbose_name=匹配调试"`
+	MatchDebug  string       `xorm:"text notnull 'match_debug'" json:"match_debug" smith:"verbose_name=匹配调试信息"`
 	CreateTime  core.Time    `xorm:"created notnull 'create_time'" json:"create_time"`
 	UpdateTime  core.Time    `xorm:"updated notnull 'update_time'" json:"update_time"`
 	Version     int          `xorm:"version notnull 'version'" json:"version"`

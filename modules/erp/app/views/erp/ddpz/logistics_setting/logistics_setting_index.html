@@ -221,7 +221,7 @@
                                         </div>
                                     </div>
 
-                                    <hr />
+                                    <hr/>
 
                                     <div class="row">
                                         <div class="col-xs-6">
@@ -242,6 +242,27 @@
                                                     <div class="help-block">交易费率。例如：0.1</div>
                                                 </div>
                                             </div>
+                                        </div>
+                                    </div>
+
+                                    <hr/>
+
+                                    <div class="row">
+                                        <div class="col-xs-6">
+                                            <div class="form-group">
+                                                <label for="qyppts" class="col-xs-4 control-label">启用匹配调试</label>
+                                                <div class="col-xs-8">
+                                                    <select id="qyppts" name="detail.logistics_setting.qyppts"  class="input-sm form-control" v-model.number="detail.logistics_setting.qyppts">
+                                                        <option :value="0">否</option>
+                                                        <option :value="1">是</option>
+                                                    </select>
+                                                    <div class="help-block">是否启用物流匹配的时候的匹配调试，将生成额外的调试信息。</div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-xs-6">
+
                                         </div>
                                     </div>
 
