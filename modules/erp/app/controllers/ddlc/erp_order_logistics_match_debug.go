@@ -87,7 +87,8 @@ WHERE md.order_code = '2053968244015'
 }
 
 func (c ErpOrderLogisticsMatchDebug) Detail(id int64) revel.Result {
-	//var db_session = c.DbSession
+	var db_session = c.DbSession
+
 	/*
 SELECT md.*, s.*, osa.*, lc.*, lm.*, lfr.*
 FROM erp_order_logistics_match_debug md
@@ -99,5 +100,20 @@ FROM erp_order_logistics_match_debug md
 WHERE md.id = 1;
     */
 
+	var sql_get = `SELECT md.*, s.*, osa.*, lc.*, lm.*, lfr.*
+FROM erp_order_logistics_match_debug md
+    INNER JOIN erp_stock s ON s.id = md.stock_id
+    INNER JOIN erp_order_shipping_address osa ON osa.id = md.address_id
+    INNER JOIN erp_logistics_company lc ON lc.id = md.company_id
+    INNER JOIN erp_logistics_mode lm ON lm.id = md.mode_id
+    LEFT JOIN erp_logistics_fee_rate lfr ON lfr.id = md.fee_rate_id
+WHERE md.id = %d;`
+	sql_get = fmt.Sprintf(sql_get, id)
+
+	var logistics_match_debug logistics_match_debug_view_item_t
+	_, err := db_session.Sql(sql_get).Get(&logistics_match_debug)
+	core.HandleError(err)
+
+	c.RenderArgs["md"] = logistics_match_debug
 	return c.RenderTemplate("erp/ddlc/order_logistics_match_debug/order_logistics_match_debug_detail.html")
 }

@@ -710,9 +710,6 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 		var mt match_trace
 		mt.set_is_trace(p_ol.logistics_setting.Qyppts)
 
-		revel.TRACE.Println("p_ol.logistics_setting.Qyppts", p_ol.logistics_setting.Qyppts)
-		revel.TRACE.Println("mt.is_trace", mt.is_trace)
-
 		mt.Println("订单编号", p_order.Code)
 		mt.Println("匹配单个物流方式开始")
 		mt.Println("物流方式数据库id", logistics_mode.Id, "物流方式名称：", logistics_mode.Name)
@@ -802,9 +799,9 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 				side_length_slice.Sort()
 				var mid_length = side_length_slice[1] // 0, 1, 2 中间那条边
 
+				mt.Println("匹配前中边折率", logistics_setting.Ppqzbzl)
 				mt.Println("打折前的中边为", mid_length)
 
-				mt.Println("匹配前中边折率", logistics_setting.Ppqzbzl)
 				const MIN_FLOAT_DIFF = 0.0000000001
 				if math.Abs(mid_length-length) < MIN_FLOAT_DIFF {
 					length = length * logistics_setting.Ppqzbzl
@@ -864,9 +861,30 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 
 			// 体积重与实际重是否有比值要求，这个比值是要大于的，就是说这个东西不能太沉
 			if logistics_mode.Zlsfybzyq == 1 { //如果有比值要求
+				mt.Println("体积重与实际重是否有比值要求", "是")
 				if dim_weight/actual_weight < logistics_mode.Tjzsjzbz { //如果小于了比值就是不符合要求，排除这个物流方式，就是这个包裹不能太沉
+					if mt.is_trace == true {
+						var logistics_match_debug models.OrderLogisticsMatchDebugInfo
+						logistics_match_debug.OrderId = p_order.Id
+						logistics_match_debug.OrderCode = p_order.Code
+						logistics_match_debug.AddressId = p_order_logistics_data.order_shipping_address.Id
+						logistics_match_debug.CompanyId = logistics_mode.CompanyId
+						logistics_match_debug.StockId = logistics_mode.StockId
+						logistics_match_debug.ModeId = logistics_mode.Id
+						logistics_match_debug.FeeRateId = 0
+						logistics_match_debug.TotalFee = 0
+						logistics_match_debug.TotalCost = 0
+						logistics_match_debug.MatchResult = "体积重与实际重比值不符合"
+						logistics_match_debug.MatchDebug = mt.String()
+
+						_, err := db_session.Insert(&logistics_match_debug)
+						core.HandleError(err)
+					}
+
 					continue
 				}
+			} else {
+				mt.Println("体积重与实际重是否有比值要求", "否")
 			}
 		} else {
 			mt.Println("是否考虑体积重", "否")
@@ -917,10 +935,12 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 				mt.Println("超重阶梯收费", logistics_mode.Czjsyf)
 				extra_weight_fee_in_mode = cz_step_count * logistics_mode.Czjsyf
 				mt.Println("超重收费", extra_weight_fee_in_mode)
+			} else {
+				mt.Println("没有超重")
 			}
 			// 如更没有超过限重，就不需要继续考虑
 		} else {
-			mt.Println("没有超重")
+			mt.Println("重量是否有限制", "否")
 		}
 
 		var extra_length_fee_in_mode float64 = 0 // 超长的费用， 澳币
@@ -999,7 +1019,7 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 
 				var fee float64 = logistics_fee_rate.Qbj //起步价
 				if final_weight_in_mode-logistics_fee_rate.Qbjzl > 0 { //如果超过了起步重量，就算超过部分的费率；不超过，就不用算了
-					mt.PrintlnIndent(1, "超过起步价了")
+					mt.PrintlnIndent(1, "超过起步价重量了")
 					var extra_weight_in_fee_rate = final_weight_in_mode - logistics_fee_rate.Qbjzl
 					mt.PrintlnIndent(1, "超过重量", extra_weight_in_fee_rate)
 					mt.PrintlnIndent(1, "续重阶梯", logistics_fee_rate.Xzjt)
@@ -1011,7 +1031,7 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 					fee = fee + xz_fee
 					mt.PrintlnIndent(1, "续重后总费用", fee)
 				} else {
-					mt.PrintlnIndent(1, "没有超过起步价")
+					mt.PrintlnIndent(1, "没有超过起步价重量")
 				}
 				mt.PrintlnIndent(1, "费率最低收费", logistics_fee_rate.Zdsf)
 				// 计算最低费用的时候，还不考虑偏远地区的费用

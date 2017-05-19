@@ -13,7 +13,73 @@
     <div class="page-content">
         <div class="row">
             <div class="col-xs-12" style="padding: 0;">
-                hello world
+                <div>
+                    <h5>订单编号：{% .md.OrderLogisticsMatchDebug.OrderCode%}单个物流方式物流匹配过程</h5>
+                </div>
+                
+                <div>
+                    <h5>仓库信息</h5>
+                    <pre>
+名称：{%.md.Stock.Name%}
+                    </pre>
+                </div>
+                
+                <div>
+                    <h5>送货地址信息</h5>
+                    <pre>
+邮编：{%.md.OrderShippingAddress.PostalCode%}
+                    </pre>
+                </div>
+                
+                <div>
+                    <h5>物流公司信息</h5>
+                    <pre>
+名称：{%.md.LogisticsCompany.Name%} 描述:{%.md.LogisticsCompany.Desc.String%}
+                    </pre>
+                </div>
+
+                <div>
+                    <h5>物流方式信息</h5>
+                    <pre>
+名称：{%.md.LogisticsMode.Name%} 描述:{%.md.LogisticsMode.Desc.String%}
+是否考虑体积重(0 否， 1 是) {%.md.LogisticsMode.Sfkltjz%}
+体积重公式(如果公式是:长X宽X高 / 4000, 这里就取值 4000) {%.md.LogisticsMode.Tjzgs%}
+体积重系数 {%.md.LogisticsMode.Tjzxs%}
+体积重与实际重取向(取大1 or 取小2) {%.md.LogisticsMode.Tjzysjzqx%}
+体积重与实际重是否有比值要求(0 否， 1 是) {%.md.LogisticsMode.Zlsfybzyq%}
+体积重/实际重比值 {%.md.LogisticsMode.Tjzsjzbz%}
+最长边是否有限制(0 否， 1 是) {%.md.LogisticsMode.Zcbsfyxz%}
+最长边限制 {%.md.LogisticsMode.Zcbxzcd%}
+重量是否有限制( 0 否， 1 是) {%.md.LogisticsMode.Zlsfyxz%}
+重量不能超过 {%.md.LogisticsMode.Zlbncg%}
+是否允许超长(0 否， 1 是) {%.md.LogisticsMode.Sfyxcc%}
+超长收费阶梯 {%.md.LogisticsMode.Ccsfjt%}
+超长加收多少运费（澳币） {%.md.LogisticsMode.Ccjsyf%}
+是否允许超重(0 否， 1 是) {%.md.LogisticsMode.Sfyxcz%}
+超重加收多少运费（澳币） {%.md.LogisticsMode.Czjsyf%}
+                    </pre>
+                </div>
+
+                <div>
+                    <h5>物流费率信息</h5>
+                    <pre>
+邮编 {%.md.LogisticsFeeRate.Postcode%}
+起步价 {%.md.LogisticsFeeRate.Qbj%}
+起步价重量 {%.md.LogisticsFeeRate.Qbjzl%}
+最低收费 {%.md.LogisticsFeeRate.Zdsf%}
+续重阶梯 {%.md.LogisticsFeeRate.Xzjt%}
+续重阶梯收费 {%.md.LogisticsFeeRate.Xzjtsf%}
+是否为偏远地区(0 否， 1 是) {%.md.LogisticsFeeRate.Sfpydq%}
+偏远地区加收运费  {%.md.LogisticsFeeRate.Pydqjsyf%}
+                    </pre>
+                </div>
+
+                <div>
+                    <h5>匹配详细过程：</h5>
+                    <pre>
+{%.md.OrderLogisticsMatchDebug.MatchDebug %}
+                    </pre>
+                </div>
             </div>
         </div>
     </div>
