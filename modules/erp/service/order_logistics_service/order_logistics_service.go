@@ -932,29 +932,27 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 					match_trace("之前匹配的费率，比当前费率更优，弃用当前费率计算结果")
 				}
 
-
 			}
 			match_trace("匹配单个费率结束")
 		} // for _, logistics_fee_rate := range logistics_fee_rate_list {
 
 		if selected_fee_rate_id_in_mode == 0 { //没有费率匹配成功, 比如说，还没有开通该地区的物流
-			match_trace("")
+			match_trace("该物流方式下没有匹配的物流费率，弃用当前物流方式")
+			match_trace("匹配单个物流方式结束")
 			continue // 排除该物流方式
 		}
 
 		// 超重 和 超长 费用中， 取一个， 取大的一个
+		match_trace("物流方式超重费用", extra_weight_fee_in_mode)
+		match_trace("物流方式超长费用", extra_length_fee_in_mode)
 		var extra_fee_in_mode = math.Max(extra_weight_fee_in_mode, extra_length_fee_in_mode)
+		match_trace("物流方式超重和超长，取大的一个的结果", extra_fee_in_mode)
 		var total_fee_in_mode float64 = total_fee_in_fee_rate + extra_fee_in_mode
-
-		match_trace("extra_weight_fee_in_mode", extra_weight_fee_in_mode)
-		match_trace("extra_length_fee_in_mode", extra_length_fee_in_mode)
-		match_trace("total_fee_in_fee_rate", total_fee_in_fee_rate)
-		match_trace("extra_fee_in_mode", extra_fee_in_mode)
-
-		match_trace("logistics_mode.Id, logistics_mode.Name", logistics_mode.Id, logistics_mode.Name)
-		match_trace("total_fee_in_mode+cost_amount_in_mode", total_fee_in_mode+cost_amount_in_mode)
+		match_trace("物流方式中物流费率费用加上物流方式超重超长大的一个后的结果", total_fee_in_mode)
+		match_trace("考虑澳仓成本后的，物流方式总费用", total_fee_in_mode+cost_amount_in_mode)
 
 		if total_fee_in_mode+cost_amount_in_mode < final_total_amount { // 取得更优的模式方案，挑选最优解时，把商品的到仓成本也考虑进去
+			match_trace("之前没有匹配的物流方式，或当前物流方式比之前匹配的物流方式更优，暂时选用当前物流方式计算结果")
 			final_selected_fee_rate_id = selected_fee_rate_id_in_mode
 			final_selected_company_id = logistics_mode.CompanyId
 			final_selected_stock_id = logistics_mode.StockId
