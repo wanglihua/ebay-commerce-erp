@@ -698,12 +698,16 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 	var final_cost_amount float64 = 0
 	var final_total_amount float64 = math.MaxFloat64 // 总的 费用和成本的和 final_total_fee + final_cost_amount, 初始化为一个很大的不可能的值，澳币
 	for _, logistics_mode := range logistics_mode_list {
+		match_trace()
+		match_trace()
+		match_trace("匹配单个物流方式开始")
 		logistics_fee_rate_list, found := logistics_fee_rate_map[logistics_mode.Id]
 		if found == false {
+			match_trace("没有找到物流方式对应的费率设置")
+			match_trace("匹配单个物流方式结束")
 			continue
 		}
 
-		match_trace("匹配单个物流方式开始")
 		match_trace("物流方式数据库id", logistics_mode.Id, "物流方式名称：", logistics_mode.Name)
 		var stock_id = logistics_mode.StockId
 		match_trace("物流方式对应的仓库数据库id", stock_id)
@@ -806,47 +810,84 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 		var extra_weight_fee_in_mode float64 = 0 // 超重的费用， 澳币
 		// 重量是否有限制
 		if logistics_mode.Zlsfyxz == 1 { //如果有限制
+			match_trace("重量是否有限制", "是")
+			match_trace("当前重量是", final_weight_in_mode)
+			match_trace("限制重量是", logistics_mode.Zlbncg)
 			var extra_weight = final_weight_in_mode - logistics_mode.Zlbncg
 			if extra_weight > 0 { // 重量不能超过，如果重量有限制，物流方式里面一般都有超重限制
+				match_trace("超重了，超重的重量为", extra_weight)
 				// 查看是否允许超重
 				if logistics_mode.Sfyxcz == 0 { // 不允许超重
+					match_trace("是否允许超重", "否")
+					match_trace("匹配单个物流方式结束")
 					continue // 不允许超重，就排除当前物流方式s
+				} else {
+					match_trace("是否允许超重", "是")
 				}
 				// 允许超重 计算超重费用
 				var extra_weight_step float64 = 25 // 每 25 kg一个超重阶梯
-				extra_weight_fee_in_mode = math.Ceil(extra_weight/extra_weight_step) * logistics_mode.Czjsyf
+				match_trace("超重阶梯", extra_weight_step)
+				//超重加收运费
+				var cz_step_count = math.Ceil(extra_weight / extra_weight_step)
+				match_trace("超重阶梯数量", cz_step_count)
+				match_trace("超重阶梯收费", logistics_mode.Czjsyf)
+				extra_weight_fee_in_mode = cz_step_count * logistics_mode.Czjsyf
+				match_trace("超重收费", extra_weight_fee_in_mode)
 			}
 			// 如更没有超过限重，就不需要继续考虑
+		} else {
+			match_trace("没有超重")
 		}
 
 		var extra_length_fee_in_mode float64 = 0 // 超长的费用， 澳币
 		// 最长边是否有限制
-		var max_length = math.Max(math.Max(length, width), height)
+
 		// 长度是否有限制
 		if logistics_mode.Zcbsfyxz == 1 { // 如果有限制
+			match_trace("长度是否有限制", "是")
+			var max_length = math.Max(math.Max(length, width), height)
+			match_trace("这时的边长分别是", length, width, height)
+			match_trace("这时的最长边是", max_length)
+			match_trace("最长边限制 长度", logistics_mode.Zcbxzcd)
 			var extra_length = max_length - logistics_mode.Zcbxzcd
 			if extra_length > 0 { // 长度不能超过，如果最长边有限制，物流方式里面一般都有最长边超长限制
+				match_trace("超长了，超过的长度为", extra_length)
 				// 是否允许超长
 				if logistics_mode.Sfyxcc == 0 { // 如果不允许超长
+					match_trace("是否允许超长", "否")
+					match_trace("匹配单个物流方式结束")
 					continue
+				} else {
+					match_trace("是否允许超长", "是")
 				}
+
 				// 允许超长，计算超长费用
 				var extra_length_step float64 = logistics_mode.Ccsfjt
 				if extra_length_step > 0 {
-					extra_length_fee_in_mode = math.Ceil(extra_length/extra_length_step) * logistics_mode.Ccjsyf
+					match_trace("超长阶梯", logistics_mode.Ccsfjt)
+					var cc_step_count = math.Ceil(extra_length / extra_length_step)
+					match_trace("超长阶梯数量", cc_step_count)
+					match_trace("超长阶梯收费", logistics_mode.Ccjsyf)
+					extra_length_fee_in_mode = cc_step_count * logistics_mode.Ccjsyf
+					match_trace("超长收费", extra_length_fee_in_mode)
 				} else {
 					revel.ERROR.Printf("id 为 %d 名称为 %s 的物流方式的超长收费阶梯设置有误！\n", logistics_mode.Id, logistics_mode.Name)
 				}
+			} else {
+				match_trace("没有超过限长")
 			}
 			// 如果没有超过限长，就不需要继续考虑
+		} else {
+			match_trace("长度是否有限制", "否")
 		}
 
 		var selected_fee_rate_id_in_mode int64 = 0
 		var total_fee_in_fee_rate float64 = 10000000 //非超重部分的费用，初始为一个很大的不可能的数字， 澳币
 		for _, logistics_fee_rate := range logistics_fee_rate_list {
+			match_trace()
+			match_trace("匹配单个费率开始")
 			// 邮编要对上
 			if strings.TrimSpace(p_order_logistics_data.order_shipping_address.PostalCode) == strings.TrimSpace(logistics_fee_rate.Postcode) {
-				match_trace()
 				match_trace("logistics_fee_rate.Id", logistics_fee_rate.Id, "logistics_fee_rate.Postcode", logistics_fee_rate.Postcode)
 
 				var fee float64 = logistics_fee_rate.Qbj //起步价
@@ -868,7 +909,10 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 				}
 
 				match_trace("fee", fee)
+
+
 			}
+			match_trace("匹配单个费率结束")
 		} // for _, logistics_fee_rate := range logistics_fee_rate_list {
 
 		if selected_fee_rate_id_in_mode == 0 { //没有费率匹配成功, 比如说，还没有开通该地区的物流
