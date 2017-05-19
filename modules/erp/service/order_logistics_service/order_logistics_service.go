@@ -888,12 +888,25 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 			match_trace("匹配单个费率开始")
 			// 邮编要对上
 			if strings.TrimSpace(p_order_logistics_data.order_shipping_address.PostalCode) == strings.TrimSpace(logistics_fee_rate.Postcode) {
-				match_trace("logistics_fee_rate.Id", logistics_fee_rate.Id, "logistics_fee_rate.Postcode", logistics_fee_rate.Postcode)
+				match_trace("订单收货地址的邮编", p_order_logistics_data.order_shipping_address.PostalCode)
+				match_trace("当前物流方式下，符合的费率数据库 id", logistics_fee_rate.Id)
 
+				match_trace("费率起步价", logistics_fee_rate.Qbj)
 				var fee float64 = logistics_fee_rate.Qbj //起步价
-				revel.TRACE.Println("起步价", "logistics_fee_rate.Qbj", logistics_fee_rate.Qbj)
 				if final_weight_in_mode-logistics_fee_rate.Qbjzl > 0 { //如果超过了起步重量，就算超过部分的费率；不超过，就不用算了
-					fee = math.Ceil((final_weight_in_mode-logistics_fee_rate.Qbjzl)/logistics_fee_rate.Xzjt) * logistics_fee_rate.Xzjtsf
+					match_trace("超过起步价了")
+					var extra_weight_in_fee_rate = final_weight_in_mode - logistics_fee_rate.Qbjzl
+					match_trace("超过重量", extra_weight_in_fee_rate)
+					match_trace("续重阶梯", logistics_fee_rate.Xzjt)
+					var xz_step_count = math.Ceil(extra_weight_in_fee_rate / logistics_fee_rate.Xzjt)
+					match_trace("续重阶梯数量", xz_step_count)
+					match_trace("续重阶梯收费", logistics_fee_rate.Xzjtsf)
+					var xz_fee = math.Ceil(extra_weight_in_fee_rate/logistics_fee_rate.Xzjt) * logistics_fee_rate.Xzjtsf
+					match_trace("续重费用", xz_fee)
+					fee = fee + xz_fee
+					match_trace("续重总费用", fee)
+				} else {
+					match_trace("没有超过起步价")
 				}
 				// 计算最低费用的时候，还不考虑偏远地区的费用
 				fee = math.Max(fee, logistics_fee_rate.Zdsf) //有最低收费
@@ -909,7 +922,6 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 				}
 
 				match_trace("fee", fee)
-
 
 			}
 			match_trace("匹配单个费率结束")
