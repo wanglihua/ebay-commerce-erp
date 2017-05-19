@@ -888,52 +888,53 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 			// 邮编要对上
 			if strings.TrimSpace(p_order_logistics_data.order_shipping_address.PostalCode) == strings.TrimSpace(logistics_fee_rate.Postcode) {
 				revel.TRACE.Println()
-				revel.TRACE.Println("匹配单个费率开始")
+				revel.TRACE.Println("    匹配单个费率开始")
 
-				revel.TRACE.Println("订单收货地址的邮编", p_order_logistics_data.order_shipping_address.PostalCode)
-				revel.TRACE.Println("当前物流方式下，符合邮编的费率数据库 id", logistics_fee_rate.Id)
+				revel.TRACE.Println("    订单收货地址的邮编", p_order_logistics_data.order_shipping_address.PostalCode)
+				revel.TRACE.Println("    当前物流方式下，符合邮编的费率数据库 id", logistics_fee_rate.Id)
 
-				revel.TRACE.Println("费率起步价", logistics_fee_rate.Qbj)
+				revel.TRACE.Println("    费率起步价", logistics_fee_rate.Qbj)
 				var fee float64 = logistics_fee_rate.Qbj //起步价
 				if final_weight_in_mode-logistics_fee_rate.Qbjzl > 0 { //如果超过了起步重量，就算超过部分的费率；不超过，就不用算了
-					revel.TRACE.Println("超过起步价了")
+					revel.TRACE.Println("    超过起步价了")
 					var extra_weight_in_fee_rate = final_weight_in_mode - logistics_fee_rate.Qbjzl
-					revel.TRACE.Println("超过重量", extra_weight_in_fee_rate)
-					revel.TRACE.Println("续重阶梯", logistics_fee_rate.Xzjt)
+					revel.TRACE.Println("    超过重量", extra_weight_in_fee_rate)
+					revel.TRACE.Println("    续重阶梯", logistics_fee_rate.Xzjt)
 					var xz_step_count = math.Ceil(extra_weight_in_fee_rate / logistics_fee_rate.Xzjt)
-					revel.TRACE.Println("续重阶梯数量", xz_step_count)
-					revel.TRACE.Println("续重阶梯收费", logistics_fee_rate.Xzjtsf)
+					revel.TRACE.Println("    续重阶梯数量", xz_step_count)
+					revel.TRACE.Println("    续重阶梯收费", logistics_fee_rate.Xzjtsf)
 					var xz_fee = math.Ceil(extra_weight_in_fee_rate/logistics_fee_rate.Xzjt) * logistics_fee_rate.Xzjtsf
-					revel.TRACE.Println("续重费用", xz_fee)
+					revel.TRACE.Println("    续重费用", xz_fee)
 					fee = fee + xz_fee
-					revel.TRACE.Println("续重总费用", fee)
+					revel.TRACE.Println("    续重后总费用", fee)
 				} else {
-					revel.TRACE.Println("没有超过起步价")
+					revel.TRACE.Println("    没有超过起步价")
 				}
-				revel.TRACE.Println("费率最低收费", logistics_fee_rate.Zdsf)
+				revel.TRACE.Println("    费率最低收费", logistics_fee_rate.Zdsf)
 				// 计算最低费用的时候，还不考虑偏远地区的费用
 				fee = math.Max(fee, logistics_fee_rate.Zdsf) //有最低收费
-				revel.TRACE.Println("考虑费率最低收费后的费用", fee)
+				revel.TRACE.Println("    考虑费率最低收费后的费用", fee)
 
 				// 偏远地区
 				if logistics_fee_rate.Sfpydq == 1 {
-					revel.TRACE.Println("是否偏远地区", "是")
-					revel.TRACE.Println("偏远地区加收运费", logistics_fee_rate.Pydqjsyf)
+					revel.TRACE.Println("    是否偏远地区", "是")
+					revel.TRACE.Println("    偏远地区加收运费", logistics_fee_rate.Pydqjsyf)
 					fee = fee + logistics_fee_rate.Pydqjsyf
-					revel.TRACE.Println("考虑偏远地区后的费用", fee)
+					revel.TRACE.Println("    考虑偏远地区后的费用", fee)
 				} else {
-					revel.TRACE.Println("是否偏远地区", "否")
+					revel.TRACE.Println("    是否偏远地区", "否")
 				}
 
-				revel.TRACE.Println("最终当前费率的费用", fee)
+				revel.TRACE.Println("    最终当前费率的费用", fee)
 				if fee < total_fee_in_fee_rate { // 取得更优的费率方案
-					revel.TRACE.Println("之前没有匹配的费率，或当前费率比之前匹配的费率更优，暂时选用当前费率计算结果")
+					revel.TRACE.Println("    之前没有匹配的费率，或当前费率比之前匹配的费率更优，暂时选用当前费率计算结果")
 					total_fee_in_fee_rate = fee
 					selected_fee_rate_id_in_mode = logistics_fee_rate.Id
 				} else {
-					revel.TRACE.Println("之前匹配的费率，比当前费率更优，弃用当前费率计算结果")
+					revel.TRACE.Println("    之前匹配的费率，比当前费率更优，弃用当前费率计算结果")
 				}
-				revel.TRACE.Println("匹配单个费率结束")
+				revel.TRACE.Println("    匹配单个费率结束")
+				revel.TRACE.Println()
 			}
 		} // for _, logistics_fee_rate := range logistics_fee_rate_list {
 
@@ -976,6 +977,7 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 		revel.TRACE.Println("匹配单个物流方式结束")
 	} // for _, logistics_mode := range logistics_mode_list {
 
+	revel.TRACE.Println()
 	revel.TRACE.Println("最终费用为", final_total_fee)
 
 	//revel.TRACE.Println("final_length, final_width, final_height, final_weight, final_actual_weight", final_length, final_width, final_height, final_weight, final_actual_weight)
