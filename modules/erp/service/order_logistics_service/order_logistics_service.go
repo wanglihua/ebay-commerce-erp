@@ -697,6 +697,8 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 	var final_dim_weight float64 = 0
 	var final_cost_amount float64 = 0
 	var final_total_amount float64 = math.MaxFloat64 // 总的 费用和成本的和 final_total_fee + final_cost_amount, 初始化为一个很大的不可能的值，澳币
+
+	revel.TRACE.Println("订单编号", p_order.Code)
 	for _, logistics_mode := range logistics_mode_list {
 		revel.TRACE.Println()
 		revel.TRACE.Println()
