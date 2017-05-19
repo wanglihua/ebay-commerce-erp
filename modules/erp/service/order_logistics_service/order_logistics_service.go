@@ -889,7 +889,7 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 			// 邮编要对上
 			if strings.TrimSpace(p_order_logistics_data.order_shipping_address.PostalCode) == strings.TrimSpace(logistics_fee_rate.Postcode) {
 				match_trace("订单收货地址的邮编", p_order_logistics_data.order_shipping_address.PostalCode)
-				match_trace("当前物流方式下，符合的费率数据库 id", logistics_fee_rate.Id)
+				match_trace("当前物流方式下，符合邮编的费率数据库 id", logistics_fee_rate.Id)
 
 				match_trace("费率起步价", logistics_fee_rate.Qbj)
 				var fee float64 = logistics_fee_rate.Qbj //起步价
@@ -908,26 +908,37 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 				} else {
 					match_trace("没有超过起步价")
 				}
+				match_trace("费率最低收费", logistics_fee_rate.Zdsf)
 				// 计算最低费用的时候，还不考虑偏远地区的费用
 				fee = math.Max(fee, logistics_fee_rate.Zdsf) //有最低收费
+				match_trace("考虑费率最低收费后的费用", fee)
 
 				// 偏远地区
 				if logistics_fee_rate.Sfpydq == 1 {
+					match_trace("是否偏远地区", "是")
+					match_trace("偏远地区加收运费", logistics_fee_rate.Pydqjsyf)
 					fee = fee + logistics_fee_rate.Pydqjsyf
+					match_trace("考虑偏远地区后的费用", fee)
+				} else {
+					match_trace("是否偏远地区", "否")
 				}
 
+				match_trace("最终当前费率的费用", fee)
 				if fee < total_fee_in_fee_rate { // 取得更优的费率方案
+					match_trace("之前没有匹配的费率，或当前费率比之前匹配的费率更优，暂时选用当前费率计算结果")
 					total_fee_in_fee_rate = fee
 					selected_fee_rate_id_in_mode = logistics_fee_rate.Id
+				} else {
+					match_trace("之前匹配的费率，比当前费率更优，弃用当前费率计算结果")
 				}
 
-				match_trace("fee", fee)
 
 			}
 			match_trace("匹配单个费率结束")
 		} // for _, logistics_fee_rate := range logistics_fee_rate_list {
 
 		if selected_fee_rate_id_in_mode == 0 { //没有费率匹配成功, 比如说，还没有开通该地区的物流
+			match_trace("")
 			continue // 排除该物流方式
 		}
 
@@ -959,6 +970,8 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 			final_actual_weight = actual_weight
 			final_dim_weight = dim_weight
 			//revel.TRACE.Println("final_dim_weight = dim_weight dim_weight", dim_weight)
+		} else {
+			match_trace("之前匹配的物流，比当前物流方式更优，弃用当前物流方式计算结果")
 		}
 
 		match_trace("匹配单个物流方式结束")
