@@ -1,8 +1,9 @@
 package controllers
 
 import (
-	"github.com/revel/revel"
+	"fmt"
 
+	"github.com/revel/revel"
 	"matrix/core"
 	"matrix/modules/erp/models"
 )
@@ -15,35 +16,88 @@ func (c ErpOrderLogisticsMatchDebug) Index() revel.Result {
 	return c.RenderTemplate("erp/ddlc/order_logistics_match_debug/order_logistics_match_debug_index.html")
 }
 
+type logistics_match_debug_view_item_t struct {
+	OrderLogisticsMatchDebug models.OrderLogisticsMatchDebugInfo `xorm:"extends" json:"md"`
+	Stock                    models.StockInfo                    `xorm:"extends" json:"s"`
+	OrderShippingAddress     models.OrderShippingAddressInfo     `xorm:"extends" json:"osa"`
+	LogisticsCompany         models.LogisticsCompanyInfo         `xorm:"extends" json:"lc"`
+	LogisticsMode            models.LogisticsModeInfo            `xorm:"extends" json:"lm"`
+	LogisticsFeeRate         models.LogisticsFeeRateInfo         `xorm:"extends" json:"lfr"`
+}
+
 func (c ErpOrderLogisticsMatchDebug) ListData() revel.Result {
+
+	var order_code_query string
+	c.Params.Bind(&order_code_query, "order_code_query")
+
 	db_session := c.DbSession
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
-	query := db_session.Where(filter)
 
-	//query extra filter here
+	/*
+SELECT md.*, s.*, osa.*, lc.*, lm.*, lfr.*
+FROM erp_order_logistics_match_debug md
+    INNER JOIN erp_stock s ON s.id = md.stock_id
+    INNER JOIN erp_order_shipping_address osa ON osa.id = md.address_id
+    INNER JOIN erp_logistics_company lc ON lc.id = md.company_id
+    INNER JOIN erp_logistics_mode lm ON lm.id = md.mode_id
+    LEFT JOIN erp_logistics_fee_rate lfr ON lfr.id = md.fee_rate_id
+WHERE md.order_code = '2053968244015'
+	 */
 
-	data_query := *query
-	if order != "" {
-		data_query = *data_query.OrderBy(order)
-	} else {
-		data_query = *data_query.Asc("id")
+	var sb = core.NewSqlBuilder()
+	sb.Select("md.*, s.*, osa.*, lc.*, lm.*, lfr.*")
+	sb.Count("count(md.id) as match_debug_count")
+	sb.From(`erp_order_logistics_match_debug md
+    INNER JOIN erp_stock s ON s.id = md.stock_id
+    INNER JOIN erp_order_shipping_address osa ON osa.id = md.address_id
+    INNER JOIN erp_logistics_company lc ON lc.id = md.company_id
+    INNER JOIN erp_logistics_mode lm ON lm.id = md.mode_id
+    LEFT JOIN erp_logistics_fee_rate lfr ON lfr.id = md.fee_rate_id`)
+
+	if order_code_query != "" {
+		filter = core.SqlAnd(filter, fmt.Sprintf("md.order_code = '%s'", order_code_query))
 	}
 
-	order_logistics_match_debug_list := make([]models.OrderLogisticsMatchDebugInfo, 0, limit)
-	err := data_query.Limit(limit, offset).Find(&order_logistics_match_debug_list)
+	sb.Where(filter)
+
+	if order != "" {
+		sb.OrderBy(order)
+	} else {
+		sb.OrderBy("md.id ASC")
+	}
+
+	sb.Limit(offset, limit)
+
+	order_logistics_match_debug_list := make([]logistics_match_debug_view_item_t, 0, limit)
+	err := db_session.Sql(sb.SqlList()).Find(&order_logistics_match_debug_list)
 	core.HandleError(err)
 
-	count_query := *query
-	count, err := count_query.Count(new(models.OrderLogisticsMatchDebugInfo))
+	var match_debug_count struct {
+		Count int64 `xorm:"'match_debug_count'"`
+	}
+
+	_, err = db_session.Sql(sb.SqlCount()).Get(&match_debug_count)
 	core.HandleError(err)
 
 	return c.RenderJson(core.GridResult{
 		Data:  order_logistics_match_debug_list,
-		Total: count,
+		Total: match_debug_count.Count,
 	})
 }
 
 func (c ErpOrderLogisticsMatchDebug) Detail(id int64) revel.Result {
+	//var db_session = c.DbSession
+	/*
+SELECT md.*, s.*, osa.*, lc.*, lm.*, lfr.*
+FROM erp_order_logistics_match_debug md
+    INNER JOIN erp_stock s ON s.id = md.stock_id
+    INNER JOIN erp_order_shipping_address osa ON osa.id = md.address_id
+    INNER JOIN erp_logistics_company lc ON lc.id = md.company_id
+    INNER JOIN erp_logistics_mode lm ON lm.id = md.mode_id
+    LEFT JOIN erp_logistics_fee_rate lfr ON lfr.id = md.fee_rate_id
+WHERE md.id = 1;
+    */
+
 	return c.RenderTemplate("erp/ddlc/order_logistics_match_debug/order_logistics_match_debug_detail.html")
 }
