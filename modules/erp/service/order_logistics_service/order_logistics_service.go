@@ -1104,12 +1104,12 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 			logistics_match_debug.OrderId = p_order.Id
 			logistics_match_debug.OrderCode = p_order.Code
 			logistics_match_debug.AddressId = p_order_logistics_data.order_shipping_address.Id
-			logistics_match_debug.CompanyId = final_selected_company_id
-			logistics_match_debug.StockId = final_selected_stock_id
-			logistics_match_debug.ModeId = final_selected_mode_id
-			logistics_match_debug.FeeRateId = final_selected_fee_rate_id
-			logistics_match_debug.TotalFee = final_total_fee
-			logistics_match_debug.TotalCost = final_total_fee + cost_amount_in_mode
+			logistics_match_debug.CompanyId = logistics_mode.CompanyId
+			logistics_match_debug.StockId = logistics_mode.StockId
+			logistics_match_debug.ModeId = logistics_mode.Id
+			logistics_match_debug.FeeRateId = selected_fee_rate_id_in_mode
+			logistics_match_debug.TotalFee = total_fee_in_mode
+			logistics_match_debug.TotalCost = total_fee_in_mode + cost_amount_in_mode
 			logistics_match_debug.MatchResult = "备选"
 			logistics_match_debug.MatchDebug = mt.String()
 
