@@ -754,6 +754,7 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 
 				revel.TRACE.Println("打折前的中边为", mid_length)
 
+				revel.TRACE.Println("匹配前中边折率", logistics_setting.Ppqzbzl)
 				const MIN_FLOAT_DIFF = 0.0000000001
 				if math.Abs(mid_length-length) < MIN_FLOAT_DIFF {
 					length = length * logistics_setting.Ppqzbzl
