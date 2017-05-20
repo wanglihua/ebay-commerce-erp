@@ -51,22 +51,64 @@
                 {
                     "iDisplayLength": 100,
                     "sAjaxSource": '{%url "ErpOrderLogisticsMatchDebug.ListData"%}',
-                    "aaSorting": [[7, "asc"]],
+                    "aaSorting": [[10, "asc"]],
                     "aoColumns": [
-                        {"mDataProp": "md.order_code", "title": "订单编号", "bSearchable": true, "width": 120},
-                        {"mDataProp": "s.name", "title": "发货仓库", "bSearchable": true, "width": 120},
-                        {"mDataProp": "osa.postal_code", "title": "地址邮编", "bSearchable": true, "width": 80},
-                        {"mDataProp": "lc.name", "title": "物流公司", "bSearchable": true, "width": 90},
-                        {"mDataProp": "lm.name", "title": "物流方式", "bSearchable": true, "width": 240},
-                        {"mDataProp": "lfr.postcode", "title": "费率邮编", "bSearchable": true, "width": 100},
-                        {"mDataProp": "md.total_fee", "title": "物流费用", "bSearchable": false, "width": 100},
-                        {"mDataProp": "md.total_cost", "title": "成本费用", "bSearchable": false, "width": 100},
-                        {"mDataProp": "md.match_result", "title": "匹配结果", "bSearchable": true},
-                        {"mDataProp": "md.create_time", "title": "匹配时间", "bSearchable": false, "width": 120},
+                        {
+                            "mDataProp": "md.order_code",
+                            "title": "订单编号",
+                            "bSearchable": true,
+                            "bSortable": false,
+                            "width": 120
+                        },
+                        {"mDataProp": "s.name", "title": "发货仓库", "bSearchable": true, "bSortable": false, "width": 120},
+                        {
+                            "mDataProp": "osa.postal_code",
+                            "title": "地址邮编",
+                            "bSearchable": true,
+                            "bSortable": false,
+                            "width": 80
+                        },
+                        {"mDataProp": "lc.name", "title": "物流公司", "bSearchable": true, "bSortable": false, "width": 90},
+                        {
+                            "mDataProp": "lm.name",
+                            "title": "物流方式",
+                            "bSearchable": true,
+                            "bSortable": false,
+                            "width": 240
+                        },
+                        {
+                            "mDataProp": "lfr.postcode",
+                            "title": "费率邮编",
+                            "bSearchable": true,
+                            "bSortable": false,
+                            "width": 100
+                        },
+                        {
+                            "mDataProp": "md.total_fee",
+                            "title": "物流费用",
+                            "bSearchable": false,
+                            "bSortable": false,
+                            "width": 100
+                        },
+                        {
+                            "mDataProp": "md.total_cost",
+                            "title": "成本费用",
+                            "bSearchable": false,
+                            "bSortable": false,
+                            "width": 100
+                        },
+                        {"mDataProp": "md.match_result", "title": "匹配结果", "bSearchable": true, "bSortable": false},
+                        {
+                            "mDataProp": "md.create_time",
+                            "title": "匹配时间",
+                            "bSearchable": false,
+                            "bSortable": false,
+                            "width": 120
+                        },
                         {
                             "mDataProp": "md.id", "title": "操作", "bSearchable": false, "width": 120,
                             "render": function (data, type, row) {
-                                return "<a href='/erp/order/logistics/match/debug/detail/" + data + "'>查看详细</a>";
+                                return "<a target='_blank' href='/erp/order/logistics/match/debug/detail/" + data + "'>查看详细</a>";
                             }
                         }
                     ],
