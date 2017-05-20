@@ -314,7 +314,7 @@ func (c ErpOrder) ListData() revel.Result {
 			if can_view_special_hold(c.Session, db_session) { // 是待配货状态，且也有权限查看 hold
 				// -1 表示不选中任何 hold
 				if hold_type_id == -1 { // 不选中任何 hold 时，只显示 DPH 的订单
-					filter = core.SqlAnd(filter, fmt.Sprintf("o.status_id = %d", models.ORDER_STATUS_PHZ))
+					filter = core.SqlAnd(filter, fmt.Sprintf("o.status_id = %d", models.ORDER_STATUS_DPH))
 				} else if hold_type_id == 0 { // 0 表示全选全部的 hold
 					filter = core.SqlAnd(filter, fmt.Sprintf("o.status_id = %d AND o.hold_type_id IN (%s)", models.ORDER_STATUS_HOLD, strings.Join(core.Int_list_to_str_list(special_hold_type_id_list), ",")))
 				} else if hold_type_id > 0 { // 选中了具体的 hold类型
@@ -557,10 +557,10 @@ func (c ErpOrder) FaHuo() revel.Result {
 	core.HandleError(err)
 
 	for _, order := range order_list {
-		if order.StatusId != models.ORDER_STATUS_PHZ {
+		if order.StatusId != models.ORDER_STATUS_PHZ && order.StatusId != models.ORDER_STATUS_HOLD {
 			return c.RenderJson(map[string]interface{}{
 				"success": false,
-				"message": "订单当前状态不能发货！",
+				"message": "订单当前状态不是配货中或hold，不能发货！",
 			})
 		}
 	}
@@ -590,10 +590,10 @@ func (c ErpOrder) ShiJiWuHuo() revel.Result {
 	core.HandleError(err)
 
 	for _, order := range order_list {
-		if order.StatusId != models.ORDER_STATUS_PHZ {
+		if order.StatusId != models.ORDER_STATUS_PHZ && order.StatusId != models.ORDER_STATUS_HOLD {
 			return c.RenderJson(map[string]interface{}{
 				"success": false,
-				"message": "订单当前状态不能设置实际无货！",
+				"message": "订单当前状态不是配货中或hold，不能设置实际无货！",
 			})
 		}
 	}
