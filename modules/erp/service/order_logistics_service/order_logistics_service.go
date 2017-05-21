@@ -1102,6 +1102,7 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 
 		if total_fee_in_mode+cost_amount_in_mode < final_total_amount { // 取得更优的模式方案，挑选最优解时，把商品的到仓成本也考虑进去
 			mt.Println("之前没有匹配的物流方式，或当前物流方式比之前匹配的物流方式更优，暂时选用当前物流方式计算结果")
+
 			final_selected_fee_rate_id = selected_fee_rate_id_in_mode
 			final_selected_company_id = logistics_mode.CompanyId
 			final_selected_stock_id = logistics_mode.StockId
@@ -1113,13 +1114,29 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 			final_length = length
 			final_width = width
 			final_height = height
-			// final_weight = final_weight_in_mode
 			final_actual_weight = actual_weight
 			final_dim_weight = dim_weight
-			//mt.Println("final_dim_weight = dim_weight dim_weight", dim_weight)
 		} else if total_fee_in_mode+cost_amount_in_mode == final_total_amount {
 			//如果想等就取 墨尔本仓库的
+			if logistics_mode.StockId == p_ol.mel_stock_id {
+				mt.Println("当前匹配的物流方式费用和之前最优解相同，且当前仓库是墨尔本仓库，选用当前物流方式计算结果。")
 
+				final_selected_fee_rate_id = selected_fee_rate_id_in_mode
+				final_selected_company_id = logistics_mode.CompanyId
+				final_selected_stock_id = logistics_mode.StockId
+				final_selected_mode_id = logistics_mode.Id
+				final_total_fee = total_fee_in_mode
+				final_cost_amount = cost_amount_in_mode
+				final_total_amount = total_fee_in_mode + cost_amount_in_mode
+
+				final_length = length
+				final_width = width
+				final_height = height
+				final_actual_weight = actual_weight
+				final_dim_weight = dim_weight
+			} else {
+				mt.Println("当前匹配的物流方式费用和之前最优解相同，但当前仓库不是墨尔本仓库，弃用当前物流方式计算结果。")
+			}
 		} else {
 			mt.Println("之前匹配的物流，比当前物流方式更优，弃用当前物流方式计算结果")
 		}
