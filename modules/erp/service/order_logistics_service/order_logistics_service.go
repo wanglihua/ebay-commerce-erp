@@ -20,6 +20,7 @@ import (
 	"matrix/modules/erp/service/logistics_setting_service"
 	"matrix/modules/erp/service/order_service"
 	"matrix/modules/erp/service/pick_fee_service"
+	"matrix/modules/erp/service/stock_service"
 )
 
 type OrderLogistics struct {
@@ -33,6 +34,7 @@ type OrderLogistics struct {
 	logistics_fee_rate_map            map[int64][]models.LogisticsFeeRateInfo // 物流费率列表的映射，映射的 key 是， 物流方式的 id
 	envelope_fee_rate_list            []models.EnvelopeFeeRateInfo            // 信封物流费率， 按费用从小到大排序
 	shop_list                         []models.ShopAccountInfo                // 店铺列表，系统中的店铺列表
+	mel_stock_id                      int64                                   // 墨尔本仓库id
 }
 
 func (p_ol *OrderLogistics) init_data(db_session *xorm.Session) {
@@ -98,6 +100,9 @@ func (p_ol *OrderLogistics) init_data(db_session *xorm.Session) {
 	var shop_list = make([]models.ShopAccountInfo, 0)
 	err = db_session.Find(&shop_list)
 	core.HandleError(err)
+	p_ol.shop_list = shop_list
+
+	p_ol.mel_stock_id = stock_service.Get_mel_stock_id(db_session)
 }
 
 func (p_ol *OrderLogistics) CalculateListPaidOrders(db_session *xorm.Session) error {
@@ -1112,6 +1117,9 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 			final_actual_weight = actual_weight
 			final_dim_weight = dim_weight
 			//mt.Println("final_dim_weight = dim_weight dim_weight", dim_weight)
+		} else if total_fee_in_mode+cost_amount_in_mode == final_total_amount {
+			//如果想等就取 墨尔本仓库的
+
 		} else {
 			mt.Println("之前匹配的物流，比当前物流方式更优，弃用当前物流方式计算结果")
 		}
