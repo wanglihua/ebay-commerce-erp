@@ -135,6 +135,10 @@ func (f *LogisticsFeeRateDetailForm) Valid(validation *revel.Validation) bool {
 
 	validation.Required(f.LogisticsFeeRate.Xzjt).Message("续重阶梯不能为空！")
 
+	if f.LogisticsFeeRate.Xzjt <= 0 {
+		validation.Error("续重阶梯应该大于零！")
+	}
+
 	validation.Required(f.LogisticsFeeRate.Xzjtsf).Message("续重阶梯收费不能为空！")
 
 	validation.Required(f.LogisticsFeeRate.Pydqjsyf).Message("偏远地区加收运费不能为空！")
@@ -472,6 +476,10 @@ WHERE lc.name = '%s' AND lm.name = '%s'`
 			*/
 
 			panic(fmt.Sprintf("导入文件中的物流公司 %s 和物流方式 %s不存在", logistics_fee_rate_import.CompanyName, logistics_fee_rate_import.ModeName))
+		}
+
+		if logistics_fee_rate.Xzjt < 0 {
+			panic(fmt.Sprintf("续重阶梯不能小于零！ %d", logistics_fee_rate.Xzjt))
 		}
 
 		logistics_fee_rate.ModeId = mode_id

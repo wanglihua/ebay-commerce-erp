@@ -838,61 +838,83 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 
 		var final_weight_in_mode = actual_weight // 用户存储最终的计费重量， 初始为实际重量。如果不考虑体积重的话，就用实际重量来算重量的
 
-		// 如果考虑体积重，就把计算好的体积重，用 体积重系数 打折
-		if logistics_mode.Sfkltjz == 1 { // 是否考虑体积重
-			mt.Println("是否考虑体积重", "是")
+		// 体积重与实际重是否有比值要求
+		if logistics_mode.Zlsfybzyq == 1 { //如果有比值要求
+			// #35 18kg的 比值是 0.5， 实际重量限制是18kg，体积重限制是9kg，在这个限制范围内，他们的体积重和实际重量的比值他们是不关心的。
+			mt.Println("体积重与实际重是否有比值要求 ", "是")
 
-			if logistics_mode.Tjzxs > 0 { // 如果 体积重系数 有设置的值
-				mt.Println("体积重系数", logistics_mode.Tjzxs)
-				mt.Println("体积重除以体积重系数之前", dim_weight)
-				dim_weight = dim_weight / logistics_mode.Tjzxs // 这里是除以体积重系数
-				mt.Println("体积重除以体积重系数之后", dim_weight)
-			} else {
-				mt.Println("体积重系数未设置或设置不符合要求")
-			}
+			var actual_weight_limit = logistics_mode.Zlbncg // 实际重量的限重
+			mt.Println("实际重量的限重 ", actual_weight_limit)
 
-			// 体积重与实际重取向， 如果考虑体积重，这个系数一般都会设置的？
-			if logistics_mode.Tjzysjzqx == 1 { // 取大
-				mt.Println("体积重与实际重取向", "取大")
-				mt.Println("这时的体积重和实际重量分别是", dim_weight, actual_weight)
-				final_weight_in_mode = math.Max(dim_weight, actual_weight)
-				mt.Println("体积重与实际重取向 取大 后的结果是", final_weight_in_mode)
-			} else if logistics_mode.Tjzysjzqx == 2 { // 取小
-				mt.Println("体积重与实际重取向", "取小")
-				mt.Println("这时的体积重和实际重量分别是", dim_weight, actual_weight)
-				final_weight_in_mode = math.Min(dim_weight, actual_weight)
-				mt.Println("体积重与实际重取向 取小 后的结果是", final_weight_in_mode)
-			}
+			var dim_weight_limit = logistics_mode.Zlbncg * logistics_mode.Tjzsjzbz // 通过体积重和实际重量的比值计算 体积重的限重
+			mt.Println("体积重的限重 ", dim_weight_limit)
 
-			// 体积重与实际重是否有比值要求，这个比值是要大于的，就是说这个东西不能太沉
-			if logistics_mode.Zlsfybzyq == 1 { //如果有比值要求
-				mt.Println("体积重与实际重是否有比值要求", "是")
-				if dim_weight/actual_weight < logistics_mode.Tjzsjzbz { //如果小于了比值就是不符合要求，排除这个物流方式，就是这个包裹不能太沉
-					if mt.is_trace == true {
-						var logistics_match_debug models.OrderLogisticsMatchDebugInfo
-						logistics_match_debug.OrderId = p_order.Id
-						logistics_match_debug.OrderCode = p_order.Code
-						logistics_match_debug.AddressId = p_order_logistics_data.order_shipping_address.Id
-						logistics_match_debug.CompanyId = logistics_mode.CompanyId
-						logistics_match_debug.StockId = logistics_mode.StockId
-						logistics_match_debug.ModeId = logistics_mode.Id
-						logistics_match_debug.FeeRateId = 0
-						logistics_match_debug.TotalFee = 0
-						logistics_match_debug.TotalCost = 0
-						logistics_match_debug.MatchResult = "体积重与实际重比值不符合"
-						logistics_match_debug.MatchDebug = mt.String()
-
-						_, err := db_session.Insert(&logistics_match_debug)
-						core.HandleError(err)
-					}
-
-					continue
+			if dim_weight > dim_weight_limit || actual_weight > actual_weight_limit {
+				if actual_weight > actual_weight_limit {
+					mt.Println("体积重与实际重比值有要求，但实际重量超过了限重")
 				}
+
+				if dim_weight > dim_weight_limit {
+					mt.Println("体积重与实际重比值有要求，但体积重超过了限重")
+				}
+
+				if mt.is_trace == true {
+					var logistics_match_debug models.OrderLogisticsMatchDebugInfo
+					logistics_match_debug.OrderId = p_order.Id
+					logistics_match_debug.OrderCode = p_order.Code
+					logistics_match_debug.AddressId = p_order_logistics_data.order_shipping_address.Id
+					logistics_match_debug.CompanyId = logistics_mode.CompanyId
+					logistics_match_debug.StockId = logistics_mode.StockId
+					logistics_match_debug.ModeId = logistics_mode.Id
+					logistics_match_debug.FeeRateId = 0
+					logistics_match_debug.TotalFee = 0
+					logistics_match_debug.TotalCost = 0
+					logistics_match_debug.MatchResult = "体积重与实际重比值有要求，但超过了限重"
+					logistics_match_debug.MatchDebug = mt.String()
+
+					_, err := db_session.Insert(&logistics_match_debug)
+					core.HandleError(err)
+				}
+
+				continue
 			} else {
-				mt.Println("体积重与实际重是否有比值要求", "否")
+				mt.Println("体积重与实际重比值有要求，没有超过限重")
 			}
 		} else {
-			mt.Println("是否考虑体积重", "否")
+			//如果 体积重与实际重 “有” 比值要求， 是否考虑体积重，体积重与实际重取向都是没有意义的，
+			//所以只在 体积重与实际重 “没有” 比值要求的时候，才考虑这两个量
+
+			mt.Println("体积重与实际重是否有比值要求", "否")
+
+			// 如果考虑体积重，就把计算好的体积重，用 体积重系数 打折
+			if logistics_mode.Sfkltjz == 1 { // 是否考虑体积重
+				mt.Println("是否考虑体积重", "是")
+
+				if logistics_mode.Tjzxs > 0 { // 如果 体积重系数 有设置的值
+					mt.Println("体积重系数", logistics_mode.Tjzxs)
+					mt.Println("体积重除以体积重系数之前", dim_weight)
+					dim_weight = dim_weight / logistics_mode.Tjzxs // 这里是除以体积重系数
+					mt.Println("体积重除以体积重系数之后", dim_weight)
+				} else {
+					mt.Println("体积重系数未设置或设置不符合要求")
+				}
+
+				// 体积重与实际重取向， 如果考虑体积重，这个系数一般都会设置的？
+				if logistics_mode.Tjzysjzqx == 1 { // 取大
+					mt.Println("体积重与实际重取向", "取大")
+					mt.Println("这时的体积重和实际重量分别是", dim_weight, actual_weight)
+					final_weight_in_mode = math.Max(dim_weight, actual_weight)
+					mt.Println("体积重与实际重取向 取大 后的结果是", final_weight_in_mode)
+				} else if logistics_mode.Tjzysjzqx == 2 { // 取小
+					mt.Println("体积重与实际重取向", "取小")
+					mt.Println("这时的体积重和实际重量分别是", dim_weight, actual_weight)
+					final_weight_in_mode = math.Min(dim_weight, actual_weight)
+					mt.Println("体积重与实际重取向 取小 后的结果是", final_weight_in_mode)
+				}
+
+			} else {
+				mt.Println("是否考虑体积重", "否")
+			}
 		}
 
 		// 接下来计算都是针对 final_weight_in_mode 来做，不管前面有没有考虑体积重
@@ -935,7 +957,7 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 				var extra_weight_step float64 = 25 // 每 25 kg一个超重阶梯
 				mt.Println("超重阶梯", extra_weight_step)
 				//超重加收运费
-				var cz_step_count = math.Ceil(extra_weight / extra_weight_step)
+				var cz_step_count = math.Ceil(extra_weight / extra_weight_step) // 这个除数不可能为零
 				mt.Println("超重阶梯数量", cz_step_count)
 				mt.Println("超重阶梯收费", logistics_mode.Czjsyf)
 				extra_weight_fee_in_mode = cz_step_count * logistics_mode.Czjsyf
@@ -1028,15 +1050,20 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 					var extra_weight_in_fee_rate = final_weight_in_mode - logistics_fee_rate.Qbjzl
 					mt.PrintlnIndent(1, "超过重量", extra_weight_in_fee_rate)
 					mt.PrintlnIndent(1, "续重阶梯", logistics_fee_rate.Xzjt)
-					var xz_step_count = math.Ceil(extra_weight_in_fee_rate / logistics_fee_rate.Xzjt)
-					mt.PrintlnIndent(1, "续重阶梯数量", xz_step_count)
-					mt.PrintlnIndent(1, "续重阶梯收费", logistics_fee_rate.Xzjtsf)
-					var xz_fee = math.Ceil(extra_weight_in_fee_rate/logistics_fee_rate.Xzjt) * logistics_fee_rate.Xzjtsf
-					mt.PrintlnIndent(1, "续重费用", xz_fee)
-					fee = fee + xz_fee
-					mt.PrintlnIndent(1, "续重后总费用", fee)
+					if logistics_fee_rate.Xzjt > 0 {
+						var xz_step_count = math.Ceil(extra_weight_in_fee_rate / logistics_fee_rate.Xzjt)
+						mt.PrintlnIndent(1, "续重阶梯数量", xz_step_count)
+						mt.PrintlnIndent(1, "续重阶梯收费", logistics_fee_rate.Xzjtsf)
+						var xz_fee = math.Ceil(extra_weight_in_fee_rate/logistics_fee_rate.Xzjt) * logistics_fee_rate.Xzjtsf
+						mt.PrintlnIndent(1, "续重费用", xz_fee)
+						fee = fee + xz_fee
+						mt.PrintlnIndent(1, "续重后总费用", fee)
+					} else {
+						mt.PrintlnIndent(1, "续重后总费用", fee)
+					}
 				} else {
-					mt.PrintlnIndent(1, "没有超过起步价重量")
+					revel.ERROR.Println("续重阶梯设置有误，不能计算超重费用！", logistics_fee_rate.Xzjt)
+					mt.PrintlnIndent(1, "续重阶梯设置有误，不能计算超重费用！", logistics_fee_rate.Xzjt)
 				}
 				mt.PrintlnIndent(1, "费率最低收费", logistics_fee_rate.Zdsf)
 				// 计算最低费用的时候，还不考虑偏远地区的费用

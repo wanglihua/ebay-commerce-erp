@@ -96,12 +96,9 @@
                                 <div class="row">
                                     <div class="col-xs-6">
                                         <div class="form-group">
-                                            <label for="sfkltjz" class="col-xs-6 control-label">是否考虑体积重</label>
+                                            <label for="tjzxs" class="col-xs-6 control-label">体积重系数</label>
                                             <div class="col-xs-6">
-                                                <select id="sfkltjz" name="detail.logistics_mode.sfkltjz" class="input-sm form-control" v-model.number="detail.logistics_mode.sfkltjz">
-                                                    <option :value="1">是</option>
-                                                    <option :value="0">否</option>
-                                                </select>
+                                                <input id="tjzxs" name="detail.logistics_mode.tjzxs" type="text" class="input-sm form-control" v-model.number="detail.logistics_mode.tjzxs"/>
                                             </div>
                                         </div>
                                     </div>
@@ -119,9 +116,12 @@
                                 <div class="row">
                                     <div class="col-xs-6">
                                         <div class="form-group">
-                                            <label for="tjzxs" class="col-xs-6 control-label">体积重系数</label>
+                                            <label for="sfkltjz" class="col-xs-6 control-label">是否考虑体积重</label>
                                             <div class="col-xs-6">
-                                                <input id="tjzxs" name="detail.logistics_mode.tjzxs" type="text" class="input-sm form-control" v-model.number="detail.logistics_mode.tjzxs"/>
+                                                <select id="sfkltjz" name="detail.logistics_mode.sfkltjz" class="input-sm form-control" v-model.number="detail.logistics_mode.sfkltjz">
+                                                    <option :value="1">是</option>
+                                                    <option :value="0">否</option>
+                                                </select>
                                             </div>
                                         </div>
                                     </div>
