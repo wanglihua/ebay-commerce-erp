@@ -188,7 +188,7 @@
                     url: '{%url "ErpOrder.PageData" %}',
                     type: "POST",
                     success: function (result) {
-                        if (result.success == false) {
+                        if (result.success === false) {
                             $.msg.error(result.message);
                             return;
                         }
@@ -242,7 +242,8 @@
                                 if (tran_id === "") {
                                     tran_id = "--";
                                 }
-                                return "<div class='div_store_name'>" + row.platform_name + " " + row.shop_name + "</div><div>" + row.shop_code + "</div><div>" + tran_id + "</div>";
+                                //return "<div class='div_store_name'>" + row.platform_name + " " + row.shop_name + "</div><div>" + row.shop_code + "</div><div>" + tran_id + "</div>";
+                                return "<div class='div_store_name'>" + row.shop_name + "</div><div>" + row.shop_code + "</div><div>" + tran_id + "</div>";
                             }
                         },
                         {
@@ -272,7 +273,7 @@
                                 if (hold_type_name === "") {
                                     hold_type_name = "--";
                                 }
-                                return "<div class='div_buyer_user_id'>" + buy_user_id + "</div><div>" + payment_methods + "</div><div>" + hold_type_name + "</div>";
+                                return "<div class='div_buyer_user_id' style='min-width: 120px;white-space:normal; word-break: break-all; word-wrap:break-word;'>" + buy_user_id + "</div><div>" + payment_methods + "</div><div>" + hold_type_name + "</div>";
                             }
                         },
                         {
@@ -289,13 +290,13 @@
                         },
 
                         {
-                            "mDataProp": "o.total_amount", "title": "原金额(AUD)", "bSearchable": false,
+                            "mDataProp": "o.total_amount", "title": "原金额", "bSearchable": false,
                             "render": function (data, type, row) {
-                                return "<div class='div_total_amount'>" + row.o.total_amount_currency + " " + row.o.total_amount + "</div><div>RMB " + row.o.total_amount_rmb + "</div><div>AUD " + row.o.express_fee + "</div>";
+                                return "<div class='div_total_amount'>" + row.o.total_amount_currency + " " + dtFormatFloat(row.o.total_amount) + "</div><div>RMB " + dtFormatFloat(row.o.total_amount_rmb) + "</div><div>AUD " + dtFormatFloat(row.o.express_fee) + "</div>";
                             }
                         },
                         {
-                            "mDataProp": "o.total_amount_rmb", "title": "原金额(RMB)", "bSearchable": false,
+                            "mDataProp": "o.total_amount_rmb", "title": "原金额", "bSearchable": false,
                             "render": function (data, type, row) {
                                 return "<div class='div_total_amount_rmb'></div>";
                             }
@@ -331,7 +332,7 @@
                         {
                             "mDataProp": "o.company_name", "title": "货运公司", "bSearchable": false, "bSortable": false,
                             "render": function (data, type, row) {
-                                return '<div class="div_logistics_company">' + row.company_name + '</div><div>' + row.mode_name + '</div>';
+                                return '<div class="div_logistics_company">' + row.company_name + '</div><div style="min-width: 100px;white-space:normal; word-break: break-all; word-wrap:break-word;">' + row.mode_name + '</div>';
                             }
                         },
                         {
@@ -344,7 +345,7 @@
                         {
                             "mDataProp": "o.ol.total_fee", "title": "预估运费", "bSearchable": false, "bSortable": false,
                             "render": function (data, type, row) {
-                                return '<div class="div_total_fee">AUD ' + row.ol.total_fee + '</div><div>AUD ' + row.ol.actual_fee + '</div><div>AUD ' + row.fee_diff + '</div>';
+                                return '<div class="div_total_fee">AUD ' + dtFormatFloat(row.ol.total_fee) + '</div><div>AUD ' + dtFormatFloat(row.ol.actual_fee) + '</div><div>AUD ' + dtFormatFloat(row.fee_diff) + '</div>';
                             }
                         },
                         {
@@ -363,7 +364,7 @@
                         {
                             "mDataProp": "o.buyer_email", "title": "客户邮箱", "bSearchable": true,
                             "render": function (data, type, row) {
-                                return '<div class="div_buyer_email">' + row.o.buyer_email + '</div><div>' + row.stock_name + '</div>';
+                                return '<div class="div_buyer_email" style="min-width: 180px;white-space:normal; word-break: break-all; word-wrap:break-word;">' + row.o.buyer_email + '</div><div>' + row.stock_name + '</div>';
                             }
                         },
                         {
@@ -377,7 +378,7 @@
                         {
                             "mDataProp": "ad.country_name", "title": "国家", "bSearchable": false, "bSortable": false,
                             "render": function (data, type, row) {
-                                return '<div class="div_country_name">' + row.ad.country_name + '</div><div>' + row.ad.province + '</div><div>' + row.ad.postal_code + '</div>';
+                                return '<div class="div_country_name">' + row.ad.country_name + '</div><div  style="min-width: 105px;white-space:normal; word-break: break-all; word-wrap:break-word;">' + row.ad.province + '</div><div>' + row.ad.postal_code + '</div>';
                             }
                         },
                         {
@@ -418,15 +419,15 @@
 
                                 fnCallback(data);
 
-                                $("#orderList div.div_order_code").parent().css("width", "130px");
+                                $("#orderList div.div_order_code").parent().css("width", "110px");
                                 $("#orderList div.div_status_name").parent().css("display", "none");
                                 $("#orderList div.div_type_name").parent().css("display", "none");
 
-                                $("#orderList div.div_store_name").parent().css("width", "135px");
+                                $("#orderList div.div_store_name").parent().css("width", "90px");
                                 $("#orderList div.div_store_code").parent().css("display", "none");
                                 $("#orderList div.div_tran_id").parent().css("display", "none");
 
-                                $("#orderList div.div_buyer_user_id").parent().css("width", "180px");
+                                $("#orderList div.div_buyer_user_id").parent().css("width", "120px");
                                 $("#orderList div.div_payment_methods").parent().css("display", "none");
                                 $("#orderList div.div_hold_type_name").parent().css("display", "none");
 
@@ -437,17 +438,17 @@
                                 $("#orderList div.div_paid_time").parent().css("width", "130px");
                                 $("#orderList div.div_shipped_time").parent().css("display", "none");
 
-                                $("#orderList div.div_logistics_company").parent().css("width", "135px");
+                                $("#orderList div.div_logistics_company").parent().css("width", "100px");
                                 $("#orderList div.div_logistics_mode").parent().css("display", "none");
 
-                                $("#orderList div.div_total_fee").parent().css("width", "135px");
+                                $("#orderList div.div_total_fee").parent().css("width", "95px");
                                 $("#orderList div.div_actual_fee").parent().css("display", "none");
                                 $("#orderList div.div_fee_diff").parent().css("display", "none");
 
                                 //$("#orderList div.div_buyer_email").parent().css("width", "150px");
                                 $("#orderList div.div_stock_name").parent().css("display", "none");
 
-                                $("#orderList div.div_country_name").parent().css("width", "100px");
+                                $("#orderList div.div_country_name").parent().css("width", "105px");
                                 $("#orderList div.div_province").parent().css("display", "none");
                                 $("#orderList div.div_postal_code").parent().css("display", "none");
                             }
