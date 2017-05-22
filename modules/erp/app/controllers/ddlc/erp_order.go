@@ -119,10 +119,12 @@ func (c ErpOrder) Index(status string) revel.Result {
 }
 
 const (
-	order_query_criteria_order_code    int64 = 1000
-	order_query_criteria_product_sku   int64 = 2000
-	order_query_criteria_product_name  int64 = 3000
-	order_query_criteria_buyer_user_id int64 = 4000
+	order_query_criteria_order_code          int64 = 1000
+	order_query_criteria_product_sku         int64 = 2000
+	order_query_criteria_product_name        int64 = 3000
+	order_query_criteria_buyer_user_id       int64 = 4000
+	order_query_criteria_stock_name          int64 = 5000
+	order_query_criteria_logistics_mode_name int64 = 6000
 )
 
 type order_query_criteria struct {
@@ -138,6 +140,8 @@ func (c ErpOrder) get_order_query_criteria_list() []order_query_criteria {
 	order_query_criteria_list = append(order_query_criteria_list, order_query_criteria{Id: order_query_criteria_product_sku, Name: "商品编号"})
 	order_query_criteria_list = append(order_query_criteria_list, order_query_criteria{Id: order_query_criteria_product_name, Name: "商品名称"})
 	order_query_criteria_list = append(order_query_criteria_list, order_query_criteria{Id: order_query_criteria_buyer_user_id, Name: "买家账号"})
+	order_query_criteria_list = append(order_query_criteria_list, order_query_criteria{Id: order_query_criteria_stock_name, Name: "发货仓库"})
+	order_query_criteria_list = append(order_query_criteria_list, order_query_criteria{Id: order_query_criteria_logistics_mode_name, Name: "物流方式"})
 
 	return order_query_criteria_list
 }
@@ -293,6 +297,12 @@ func (c ErpOrder) ListData() revel.Result {
 			filter = core.SqlAnd(filter, fmt.Sprintf("o.id IN (%s)", order_id_strs))
 		} else if query_criteria_id == order_query_criteria_buyer_user_id {
 			filter = core.SqlAnd(filter, fmt.Sprintf("o.buyer_user_id like '%%%s%%'", query_criteria_value))
+		} else if query_criteria_id == order_query_criteria_stock_name {
+			// SELECT * FROM erp_order o WHERE o.stock_id IN (SELECT s.id FROM erp_stock s WHERE s.name LIKE '%name%')
+			filter = core.SqlAnd(filter, fmt.Sprintf("o.stock_id IN (SELECT s.id FROM erp_stock s WHERE s.name LIKE '%%%s%%')", query_criteria_value))
+		} else if query_criteria_id == order_query_criteria_logistics_mode_name {
+			// SELECT * FROM erp_order o WHERE o.mode_id IN (SELECT lm.id FROM erp_logistics_mode lm WHERE lm.name LIKE '%name%')
+			filter = core.SqlAnd(filter, fmt.Sprintf("o.mode_id IN (SELECT lm.id FROM erp_logistics_mode lm WHERE lm.name LIKE '%%%s%%')", query_criteria_value))
 		}
 	}
 
