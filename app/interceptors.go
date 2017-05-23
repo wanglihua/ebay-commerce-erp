@@ -138,6 +138,8 @@ func userAuth(c *revel.Controller) revel.Result {
 		return nil
 	}
 
+	//检查软件授权
+
 	loginuser := core.GetLoginUser(c.Session)
 	//revel.TRACE.Println("userAuth session id: " + c.Session.Id())
 

@@ -9,7 +9,11 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"os"
+	"path/filepath"
 	"time"
+
+	"github.com/revel/revel"
 )
 
 var encrypt_salt = "Jiaxing Huadu Information Technolony Co.,Ltd"
@@ -31,7 +35,7 @@ func DecryptLic(lic_app_name string, lic string) string {
 	if make_md5(string(lic_runes[0:lic_len-32])+encrypt_salt) != string(lic_runes[lic_len-32:lic_len]) {
 		log.Fatal(fmt.Sprintf("[L001] lic not valid: %s", lic))
 	}
-	encrypt_date := lic_runes[lic_len-48 : lic_len-32]
+	encrypt_date := lic_runes[lic_len-48: lic_len-32]
 	decrypt_date := string(des_decrypt(hex_string_to_bytes(string(encrypt_date)), []byte(encrypt_salt)))
 	if make_md5(lic_app_name+encrypt_salt) != string(lic_runes[lic_len-80:lic_len-48]) {
 		log.Fatal(fmt.Sprintf("[L002] lic not valid: %s", lic))
@@ -43,6 +47,23 @@ func DecryptLic(lic_app_name string, lic string) string {
 		log.Fatal(fmt.Sprintf("[L004] lic not valid: %s", lic))
 	}
 	return decrypt_date
+}
+
+func GetAppLicDate(app_name string) {
+	lic_file_path := ""
+
+	currentDir, err := filepath.Abs(filepath.Dir(os.Args[0]))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if revel.RunMode == "prod" {
+		lic_file_path = currentDir + string(os.PathSeparator) + revel.ImportPath + string(os.PathSeparator) + "app.lic"
+	} else {
+		lic_file_path = os.Getenv("GOPATH") + string(os.PathSeparator) + "src" + string(os.PathSeparator) + revel.ImportPath + string(os.PathSeparator) + "app.lic"
+	}
+
+	ValidAppLic(app_name, lic_file_path)
 }
 
 func ValidAppLic(lic_app_name string, lic_file_path string) {
