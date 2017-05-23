@@ -93,6 +93,14 @@
                             </div>
                         </div>
                         <div class="col-xs-9" style="height: 32px;"></div>
+
+                        <div class="col-xs-6">
+                            <div class="form-group">
+                                <label for="order_buyer_email" class="col-xs-2 control-label">电子邮件：</label>
+                                <input id="order_buyer_email" class="col-xs-10" type="text" disabled="disabled" v-model="detail.order.buyer_email"/>
+                            </div>
+                        </div>
+                        <div class="col-xs-6" style="height: 32px;"></div>
                         <div class="col-xs-6">
                             <div class="form-group">
                                 <label for="ebay_address" class="col-xs-2 control-label">平台地址：</label>
@@ -100,36 +108,36 @@
                                     <div id="ebay_address" class="address-box">
                                         <div>
                                             <label for="ebay_address_name">Name:</label>
-                                            <input id="ebay_address_name" type="text" v-model="detail.shipping_address.name"/>
+                                            <input id="ebay_address_name" type="text" v-model="detail.ebay_shipping_address.name"/>
                                         </div>
                                         <div>
                                             <label for="ebay_address_street1">Address:</label>
-                                            <input id="ebay_address_street1" type="text" v-model="detail.shipping_address.street1"/>
-                                            <input id="ebay_address_street2" type="text" v-model="detail.shipping_address.street2"/>
+                                            <input id="ebay_address_street1" type="text" v-model="detail.ebay_shipping_address.street1"/>
+                                            <input id="ebay_address_street2" type="text" v-model="detail.ebay_shipping_address.street2"/>
                                         </div>
                                         <div>
                                             <label for="ebay_address_city">City:</label>
-                                            <input id="ebay_address_city" type="text" v-model="detail.shipping_address.city_name"/>
+                                            <input id="ebay_address_city" type="text" v-model="detail.ebay_shipping_address.city_name"/>
                                         </div>
                                         <div>
                                             <label for="ebay_address_state">State:</label>
-                                            <input id="ebay_address_state" type="text" v-model="detail.shipping_address.province"/>
+                                            <input id="ebay_address_state" type="text" v-model="detail.ebay_shipping_address.province"/>
                                         </div>
                                         <div>
                                             <label for="ebay_address_country">Country:</label>
-                                            <input id="ebay_address_country" type="text" v-model="detail.shipping_address.country"/>
+                                            <input id="ebay_address_country" type="text" v-model="detail.ebay_shipping_address.country"/>
                                         </div>
                                         <div>
                                             <label for="ebay_address_country_name">Country Name:</label>
-                                            <input id="ebay_address_country_name" type="text" v-model="detail.shipping_address.country_name"/>
+                                            <input id="ebay_address_country_name" type="text" v-model="detail.ebay_shipping_address.country_name"/>
                                         </div>
                                         <div>
                                             <label for="ebay_address_postal_code">Post Code:</label>
-                                            <input id="ebay_address_postal_code" type="text" v-model="detail.shipping_address.postal_code"/>
+                                            <input id="ebay_address_postal_code" type="text" v-model="detail.ebay_shipping_address.postal_code"/>
                                         </div>
                                         <div>
                                             <label for="ebay_address_phone">Phone:</label>
-                                            <input id="ebay_address_phone" type="text" v-model="detail.shipping_address.phone"/>
+                                            <input id="ebay_address_phone" type="text" v-model="detail.ebay_shipping_address.phone"/>
                                         </div>
                                     </div>
 
@@ -143,45 +151,37 @@
                                     <div id="paypal_address" class="address-box">
                                         <div>
                                             <label for="paypal_address_name">Name:</label>
-                                            <input id="paypal_address_name" type="text" value=""/>
+                                            <input id="paypal_address_name" type="text" v-model="detail.paypal_shipping_address.name"/>
                                         </div>
                                         <div>
                                             <label for="paypal_address_street1">Address:</label>
-                                            <input id="paypal_address_street1" type="text" value=""/>
-                                            <input id="paypal_address_street2" type="text" value=""/>
+                                            <input id="paypal_address_street1" type="text" v-model="detail.paypal_shipping_address.street1"/>
+                                            <input id="paypal_address_street2" type="text" v-model="detail.paypal_shipping_address.street2"/>
                                         </div>
                                         <div>
                                             <label for="paypal_address_city">City:</label>
-                                            <input id="paypal_address_city" type="text" value=""/>
+                                            <input id="paypal_address_city" type="text" v-model="detail.paypal_shipping_address.city_name"/>
                                         </div>
                                         <div>
                                             <label for="paypal_address_state">State:</label>
-                                            <input id="paypal_address_state" type="text" value=""/>
+                                            <input id="paypal_address_state" type="text" v-model="detail.paypal_shipping_address.province"/>
                                         </div>
                                         <div>
                                             <label for="paypal_address_country">Country:</label>
-                                            <input id="paypal_address_country" type="text" value=""/>
+                                            <input id="paypal_address_country" type="text" v-model="detail.paypal_shipping_address.country"/>
                                         </div>
                                         <div>
                                             <label for="paypal_address_country_name">Country Name:</label>
-                                            <input id="paypal_address_country_name" type="text" value=""/>
+                                            <input id="paypal_address_country_name" type="text" v-model="detail.paypal_shipping_address.country_name"/>
                                         </div>
                                         <div>
                                             <label for="paypal_address_postal_code">Post Code:</label>
-                                            <input id="paypal_address_postal_code" type="text" value=""/>
+                                            <input id="paypal_address_postal_code" type="text" v-model="detail.paypal_shipping_address.postal_code"/>
                                         </div>
                                         <div>
                                             <label for="paypal_address_phone">Phone:</label>
-                                            <input id="paypal_address_phone" type="text" value=""/>
+                                            <input id="paypal_address_phone" type="text" v-model="detail.paypal_shipping_address.phone"/>
                                         </div>
-                                    </div>
-                                </div>
-                                <div class="col-xs-12" style="padding-top:5px;">
-                                    <div class="col-xs-9"></div>
-                                    <div class="col-xs-3" style="text-align: right;">
-                                        <button class="btn btn-minier btn-white btn-purple" @click="get_payal_address()">
-                                            获取PayPal地址
-                                        </button>
                                     </div>
                                 </div>
                             </div>

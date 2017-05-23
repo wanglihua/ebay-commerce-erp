@@ -407,11 +407,23 @@ func (c ErpOrder) DetailData() revel.Result {
 	_, err = db_session.Id(order.HoldTypeId).Get(&order_hold_type)
 	core.HandleError(err)
 
-	// 这里面取得是平台的地址
-	var shipping_address models.OrderShippingAddressInfo
-	// "" , "ebay", "PayPal"
-	_, err = db_session.Where(fmt.Sprintf("order_id = %d AND address_id <> ''", order_id)).OrderBy("address_owner ASC").Limit(1, 0).Get(&shipping_address)
+	var shipping_address models.OrderShippingAddressInfo // 取 ebay_shipping_address 中的一个， 优先取 paypal_shipping_address
+
+	// 这里面取得是平台的地址  eBay
+	var ebay_shipping_address models.OrderShippingAddressInfo
+	has, err := db_session.Where(fmt.Sprintf("order_id = %d AND address_owner='eBay'", order_id)).OrderBy("update_time DESC").Limit(1, 0).Get(&ebay_shipping_address)
 	core.HandleError(err)
+	if has == true {
+		shipping_address = ebay_shipping_address
+	}
+
+	// 这里面取得是PayPal的地址  PayPal
+	var paypal_shipping_address models.OrderShippingAddressInfo
+	has, err = db_session.Where(fmt.Sprintf("order_id = %d AND address_owner='PayPal'", order_id)).OrderBy("update_time DESC").Limit(1, 0).Get(&paypal_shipping_address)
+	core.HandleError(err)
+	if has == true {
+		shipping_address = paypal_shipping_address
+	}
 
 	type order_item_view_t struct {
 		OrderItem         models.OrderItemInfo          `xorm:"extends" json:"oi"`
@@ -456,19 +468,21 @@ WHERE oi.order_id = %d;`
 	var order_profit = ((order.AmountPaid + order.ExpressFee) - (order.AmountPaid*(logistics_setting.Ptfl+logistics_setting.Jyfl) + order_logistics_total_fee + order_logistics.PickFee + order_gst)) * order.ExchangeRate
 
 	return c.RenderJson(map[string]interface{}{
-		"order":             order,
-		"status":            status,
-		"shop":              shop,
-		"order_type":        order_type,
-		"shipping_address":  shipping_address,
-		"order_hold_type":   order_hold_type,
-		"order_item_list":   order_item_list,
-		"order_logistics":   order_logistics,
-		"logistics_setting": logistics_setting,
-		"order_cost_amount": order_cost_amount, // rmb
-		"logistics_fee":     logistics_fee,     // rmb
-		"order_gst":         order_gst,         // aud
-		"order_profit":      order_profit,      //rmb
+		"order":                   order,
+		"status":                  status,
+		"shop":                    shop,
+		"order_type":              order_type,
+		"ebay_shipping_address":   ebay_shipping_address,
+		"paypal_shipping_address": paypal_shipping_address,
+		"shipping_address":        shipping_address,
+		"order_hold_type":         order_hold_type,
+		"order_item_list":         order_item_list,
+		"order_logistics":         order_logistics,
+		"logistics_setting":       logistics_setting,
+		"order_cost_amount":       order_cost_amount, // rmb
+		"logistics_fee":           logistics_fee,     // rmb
+		"order_gst":               order_gst,         // aud
+		"order_profit":            order_profit,      //rmb
 	})
 }
 
