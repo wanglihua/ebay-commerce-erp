@@ -409,7 +409,8 @@ func (c ErpOrder) DetailData() revel.Result {
 
 	// 这里面取得是平台的地址
 	var shipping_address models.OrderShippingAddressInfo
-	_, err = db_session.Where(fmt.Sprintf("order_id = %d AND address_owner = 'eBay'", order_id)).Limit(1, 0).Get(&shipping_address)
+	// "" , "ebay", "PayPal"
+	_, err = db_session.Where(fmt.Sprintf("order_id = %d AND address_id <> ''", order_id)).OrderBy("address_owner ASC").Limit(1, 0).Get(&shipping_address)
 	core.HandleError(err)
 
 	type order_item_view_t struct {

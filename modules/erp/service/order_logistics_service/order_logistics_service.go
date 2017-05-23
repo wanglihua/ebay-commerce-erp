@@ -639,6 +639,7 @@ func (p_ol *OrderLogistics) hold_check_paypal_account_not_match(p_order *models.
 
 	// 老鼠仓的判断
 	// 如果是通过PayPal支付的，而且店铺设置里面也设置了PayPal列表的
+	// 由于导入的订单对 payment_method 没有设置值的，所以这里的老鼠仓的判断对导入订单是无效的
 	if strings.ToLower(payment_method) == strings.ToLower("PayPal") && shop.PaypalAccount != "" {
 		shop_paypal_email_list := strings.Split(shop.PaypalAccount, ",")
 
