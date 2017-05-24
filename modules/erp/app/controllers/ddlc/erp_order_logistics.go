@@ -1039,9 +1039,27 @@ ORDER BY oi.transaction_price * oi.quantity DESC`
 	return order_logistics_product_detail_list
 }
 
+var (
+	excel_export_company_eparcel_code = 100
+	excel_export_company_fastway_code = 200
+	excel_export_company_toll_code    = 300
+)
 
 func (c ErpOrderLogistics) ExportLogisticsCompanyOptionData() revel.Result {
-	return c.RenderEmpty()
+	var db_session = c.DbSession
+	var stock_list = stock_service.Get_login_user_stock_list(db_session, c.Session)
+
+	var excel_export_company_list = map[string]interface{}{
+		fmt.Sprint(excel_export_company_eparcel_code): "AU POST eParcel",
+		fmt.Sprint(excel_export_company_fastway_code): "FASTWAY,",
+		fmt.Sprint(excel_export_company_toll_code):    "TOLL IPEC",
+	}
+
+	return c.RenderJson(map[string]interface{}{
+		"success":      true,
+		"stock_list":   stock_list,
+		"company_list": excel_export_company_list,
+	})
 }
 
 func (c ErpOrderLogistics) ExportLogisticsCompanyExcel() revel.Result {
