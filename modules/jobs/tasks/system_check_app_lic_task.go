@@ -1,6 +1,7 @@
 package tasks
 
 import (
+	"github.com/revel/revel"
 	"matrix/app"
 	"matrix/core/lic"
 )
@@ -16,4 +17,5 @@ func (t SystemCheckAppLicTask) Name() string {
 
 func (t SystemCheckAppLicTask) Run() {
 	lic.App_lic_date = lic.GetAppLicDate(app.AppName)
+	revel.TRACE.Println("app_lic_date", lic.App_lic_date)
 }
