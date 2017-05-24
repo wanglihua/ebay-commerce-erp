@@ -37,7 +37,7 @@ func GetKcglMenu(res_id_map map[int64]bool, web_session revel.Session) string {
 
 	if check_pass_res_menu(pass_res.KCGL_PRODUCT) {
 		buffer.WriteString(`<li id="kcgl-product-menu" class="">
-            <a href="/erp/product">
+            <a href="/product">
                 <i class="menu-icon fa fa-caret-right"></i>
                 商品列表
             </a>
@@ -47,7 +47,7 @@ func GetKcglMenu(res_id_map map[int64]bool, web_session revel.Session) string {
 
 	if check_pass_res_menu(pass_res.KCGL_PRODUCT_IMPORT) {
 		buffer.WriteString(`<li id="kcgl-product-weight-menu" class="">
-            <a href="/erp/product/weight">
+            <a href="/product/weight">
                 <i class="menu-icon fa fa-caret-right"></i>
                 商品长宽高重量
             </a>
@@ -57,7 +57,7 @@ func GetKcglMenu(res_id_map map[int64]bool, web_session revel.Session) string {
 
 	if check_pass_res_menu(pass_res.KCGL_PRODUCT_BIND) {
 		buffer.WriteString(`<li id="kcgl-productbind-menu" class="">
-            <a href="/erp/product/bind">
+            <a href="/product/bind">
                 <i class="menu-icon fa fa-caret-right"></i>
                 绑定商品
             </a>
@@ -67,7 +67,7 @@ func GetKcglMenu(res_id_map map[int64]bool, web_session revel.Session) string {
 
 	if check_pass_res_menu(pass_res.KCGL_PRODUCT_IMPORT) {
 		buffer.WriteString(`<li id="kcgl-product-import-menu" class="">
-            <a href="/erp/product/import">
+            <a href="/product/import">
                 <i class="menu-icon fa fa-caret-right"></i>
                 商品导入
             </a>
@@ -77,7 +77,7 @@ func GetKcglMenu(res_id_map map[int64]bool, web_session revel.Session) string {
 
 	if check_pass_res_menu(pass_res.KCGL_PRODUCT_EXPORT) {
 		buffer.WriteString(`<li id="kcgl-product-export-menu" class="">
-            <a href="/erp/product/export">
+            <a href="/product/export">
                 <i class="menu-icon fa fa-caret-right"></i>
                 商品导出
             </a>
@@ -87,7 +87,7 @@ func GetKcglMenu(res_id_map map[int64]bool, web_session revel.Session) string {
 
 	if check_pass_res_menu(pass_res.KCGL_INVENTORY) {
 		buffer.WriteString(`<li id="kcgl-inventory-menu" class="">
-            <a href="/erp/inventory">
+            <a href="/inventory">
                 <i class="menu-icon fa fa-caret-right"></i>
                 商品库存
             </a>
@@ -97,7 +97,7 @@ func GetKcglMenu(res_id_map map[int64]bool, web_session revel.Session) string {
 
 	if check_pass_res_menu(pass_res.KCGL_INVENTORY_CHECK) {
 		buffer.WriteString(`<li id="kcgl-inventorycheck-menu" class="">
-            <a href="/erp/inventory/check">
+            <a href="/inventory/check">
                 <i class="menu-icon fa fa-caret-right"></i>
                 库存盘点
             </a>
@@ -107,7 +107,7 @@ func GetKcglMenu(res_id_map map[int64]bool, web_session revel.Session) string {
 
 	if check_pass_res_menu(pass_res.KCGL_INVENTORY_CHECK_APPROVE) {
 		buffer.WriteString(`<li id="kcgl-inventorycheck-approve-menu" class="">
-            <a href="/erp/inventory/check/approve">
+            <a href="/inventory/check/approve">
                 <i class="menu-icon fa fa-caret-right"></i>
                 盘点审批
             </a>
@@ -117,7 +117,7 @@ func GetKcglMenu(res_id_map map[int64]bool, web_session revel.Session) string {
 
 	if check_pass_res_menu(pass_res.KCGL_STOCKBILL_TRANSFER) {
 		buffer.WriteString(`<li id="kcgl-stockbill-transfer-menu" class="">
-            <a href="/erp/stock/bill/transfer">
+            <a href="/stock/bill/transfer">
                 <i class="menu-icon fa fa-caret-right"></i>
                 分仓调拨
             </a>
@@ -127,7 +127,7 @@ func GetKcglMenu(res_id_map map[int64]bool, web_session revel.Session) string {
 
 	if check_pass_res_menu(pass_res.KCGL_PRODUCT_QUALITY_FEEDBACK) {
 		buffer.WriteString(`<li id="kcgl-product-quality-feedback-menu" class="">
-            <a href="/erp/product/quality/feedback">
+            <a href="/product/quality/feedback">
                 <i class="menu-icon fa fa-caret-right"></i>
                 商品质量反馈
             </a>
@@ -137,7 +137,7 @@ func GetKcglMenu(res_id_map map[int64]bool, web_session revel.Session) string {
 
 	if check_pass_res_menu(pass_res.KCGL_STOCKBILL_CHECKIN) {
 		buffer.WriteString(`<li id="kcgl-stockbill-checkin-menu" class="">
-            <a href="/erp/stock/bill/checkin">
+            <a href="/stock/bill/checkin">
                 <i class="menu-icon fa fa-caret-right"></i>
                 手工入库
             </a>
@@ -147,7 +147,7 @@ func GetKcglMenu(res_id_map map[int64]bool, web_session revel.Session) string {
 
 	if check_pass_res_menu(pass_res.KCGL_STOCKBILL_CHECKOUT) {
 		buffer.WriteString(`<li id="kcgl-stockbill-checkout-menu" class="">
-            <a href="/erp/stock/bill/checkout">
+            <a href="/stock/bill/checkout">
                 <i class="menu-icon fa fa-caret-right"></i>
                 手工出库
             </a>

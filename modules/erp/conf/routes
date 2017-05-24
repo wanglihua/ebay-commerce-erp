@@ -1,428 +1,430 @@
-# GET  /erp/brand                                ErpBrand.Index
-# POST /erp/brand/data/list                      ErpBrand.ListData
-# POST /erp/brand/data/detail                    ErpBrand.DetailData
-# POST /erp/brand/save                           ErpBrand.Save
-# POST /erp/brand/delete                         ErpBrand.Delete
+# GET  /brand                                ErpBrand.Index
+# POST /brand/data/list                      ErpBrand.ListData
+# POST /brand/data/detail                    ErpBrand.DetailData
+# POST /brand/save                           ErpBrand.Save
+# POST /brand/delete                         ErpBrand.Delete
 
-GET  /erp/stock                                  ErpStock.Index
-POST /erp/stock/data/list                        ErpStock.ListData
-POST /erp/stock/data/detail                      ErpStock.DetailData
-POST /erp/stock/save                             ErpStock.Save
-POST /erp/stock/delete                           ErpStock.Delete
+GET  /stock                                  ErpStock.Index
+POST /stock/data/list                        ErpStock.ListData
+POST /stock/data/detail                      ErpStock.DetailData
+POST /stock/save                             ErpStock.Save
+POST /stock/delete                           ErpStock.Delete
 
-GET  /erp/stock/pick/crew                        ErpStockPickCrew.Index
-POST /erp/stock/pick/crew/data/page              ErpStockPickCrew.PageData
-POST /erp/stock/pick/crew/data/list              ErpStockPickCrew.ListData
-POST /erp/stock/pick/crew/data/detail            ErpStockPickCrew.DetailData
-POST /erp/stock/pick/crew/save                   ErpStockPickCrew.Save
-POST /erp/stock/pick/crew/delete                 ErpStockPickCrew.Delete
-POST /erp/stock/pick/crew/select/user/data/list  ErpStockPickCrew.SelectUserListData
+GET  /stock/pick/crew                        ErpStockPickCrew.Index
+POST /stock/pick/crew/data/page              ErpStockPickCrew.PageData
+POST /stock/pick/crew/data/list              ErpStockPickCrew.ListData
+POST /stock/pick/crew/data/detail            ErpStockPickCrew.DetailData
+POST /stock/pick/crew/save                   ErpStockPickCrew.Save
+POST /stock/pick/crew/delete                 ErpStockPickCrew.Delete
+POST /stock/pick/crew/select/user/data/list  ErpStockPickCrew.SelectUserListData
 
-GET  /erp/storage/loc                          ErpStorageLoc.Index
-POST /erp/storage/loc/data/list                ErpStorageLoc.ListData
-POST /erp/storage/loc/data/detail              ErpStorageLoc.DetailData
-POST /erp/storage/loc/save                     ErpStorageLoc.Save
-POST /erp/storage/loc/delete                   ErpStorageLoc.Delete
-POST /erp/storage/loc/import                   ErpStorageLoc.Import
-POST /erp/get/storage/loc/list                 ErpStorageLoc.GetStorageLocList
+GET  /storage/loc                          ErpStorageLoc.Index
+POST /storage/loc/data/list                ErpStorageLoc.ListData
+POST /storage/loc/data/detail              ErpStorageLoc.DetailData
+POST /storage/loc/save                     ErpStorageLoc.Save
+POST /storage/loc/delete                   ErpStorageLoc.Delete
+POST /storage/loc/import                   ErpStorageLoc.Import
+POST /get/storage/loc/list                 ErpStorageLoc.GetStorageLocList
 
-GET  /erp/supplier                             ErpSupplier.Index
-POST /erp/supplier/data/list                   ErpSupplier.ListData
-POST /erp/supplier/data/detail                 ErpSupplier.DetailData
-POST /erp/supplier/save                        ErpSupplier.Save
-POST /erp/supplier/delete                      ErpSupplier.Delete
+GET  /supplier                             ErpSupplier.Index
+POST /supplier/data/list                   ErpSupplier.ListData
+POST /supplier/data/detail                 ErpSupplier.DetailData
+POST /supplier/save                        ErpSupplier.Save
+POST /supplier/delete                      ErpSupplier.Delete
 
-POST /erp/region/province/list                 ErpRegion.GetProvinceList
-POST /erp/region/city/list                     ErpRegion.GetCityList
-POST /erp/region/full/name                     ErpRegion.GetRegionFullName
+POST /region/province/list                 ErpRegion.GetProvinceList
+POST /region/city/list                     ErpRegion.GetCityList
+POST /region/full/name                     ErpRegion.GetRegionFullName
 
-GET  /erp/exchange/rate                        ErpExchangeRate.Index
-POST /erp/exchange/rate/data/list              ErpExchangeRate.ListData
-POST /erp/exchange/rate/data/detail            ErpExchangeRate.DetailData
-POST /erp/exchange/rate/save                   ErpExchangeRate.Save
-POST /erp/exchange/rate/delete                 ErpExchangeRate.Delete
+GET  /exchange/rate                        ErpExchangeRate.Index
+POST /exchange/rate/data/list              ErpExchangeRate.ListData
+POST /exchange/rate/data/detail            ErpExchangeRate.DetailData
+POST /exchange/rate/save                   ErpExchangeRate.Save
+POST /exchange/rate/delete                 ErpExchangeRate.Delete
 
-GET  /erp/exchange/rate/log                    ErpExchangeRateLog.Index
-POST /erp/exchange/rate/log/data/list          ErpExchangeRateLog.ListData
+GET  /exchange/rate/log                    ErpExchangeRateLog.Index
+POST /exchange/rate/log/data/list          ErpExchangeRateLog.ListData
 
-# GET  /erp/eub/goods/type                       ErpEubGoodsType.Index
-# POST /erp/eub/goods/type/data/list             ErpEubGoodsType.ListData
-# POST /erp/eub/goods/type/data/detail           ErpEubGoodsType.DetailData
-# POST /erp/eub/goods/type/save                  ErpEubGoodsType.Save
-# POST /erp/eub/goods/type/delete                ErpEubGoodsType.Delete
+# GET  /eub/goods/type                       ErpEubGoodsType.Index
+# POST /eub/goods/type/data/list             ErpEubGoodsType.ListData
+# POST /eub/goods/type/data/detail           ErpEubGoodsType.DetailData
+# POST /eub/goods/type/save                  ErpEubGoodsType.Save
+# POST /eub/goods/type/delete                ErpEubGoodsType.Delete
 
-# GET  /erp/eub/insurance/type                   ErpEubInsuranceType.Index
-# POST /erp/eub/insurance/type/data/list         ErpEubInsuranceType.ListData
-# POST /erp/eub/insurance/type/data/detail       ErpEubInsuranceType.DetailData
-# POST /erp/eub/insurance/type/save              ErpEubInsuranceType.Save
-# POST /erp/eub/insurance/type/delete            ErpEubInsuranceType.Delete
+# GET  /eub/insurance/type                   ErpEubInsuranceType.Index
+# POST /eub/insurance/type/data/list         ErpEubInsuranceType.ListData
+# POST /eub/insurance/type/data/detail       ErpEubInsuranceType.DetailData
+# POST /eub/insurance/type/save              ErpEubInsuranceType.Save
+# POST /eub/insurance/type/delete            ErpEubInsuranceType.Delete
 
-GET  /erp/product/cate                         ErpProductCate.Index
-POST /erp/product/cate/data/list               ErpProductCate.ListData
-POST /erp/product/cate/data/detail             ErpProductCate.DetailData
-POST /erp/product/cate/save                    ErpProductCate.Save
-POST /erp/product/cate/delete                  ErpProductCate.Delete
+GET  /product/cate                         ErpProductCate.Index
+POST /product/cate/data/list               ErpProductCate.ListData
+POST /product/cate/data/detail             ErpProductCate.DetailData
+POST /product/cate/save                    ErpProductCate.Save
+POST /product/cate/delete                  ErpProductCate.Delete
 
-GET  /erp/product/cate/log                     ErpProductCateLog.Index
-POST /erp/product/cate/log/data/list           ErpProductCateLog.ListData
+GET  /product/cate/log                     ErpProductCateLog.Index
+POST /product/cate/log/data/list           ErpProductCateLog.ListData
 
-GET  /erp/login/log                            ErpLoginLog.Index
-POST /erp/login/log/data/list                  ErpLoginLog.ListData
+GET  /login/log                            ErpLoginLog.Index
+POST /login/log/data/list                  ErpLoginLog.ListData
 
-GET  /erp/shop/account                         ErpShopAccount.Index
-POST /erp/shop/account/data/list               ErpShopAccount.ListData
-POST /erp/shop/account/data/detail             ErpShopAccount.DetailData
-POST /erp/shop/account/save                    ErpShopAccount.Save
-POST /erp/shop/account/delete                  ErpShopAccount.Delete
-POST /erp/shop/account/get/info                ErpShopAccount.GetShopAccountInfo
+GET  /shop/account                         ErpShopAccount.Index
+POST /shop/account/data/list               ErpShopAccount.ListData
+POST /shop/account/data/detail             ErpShopAccount.DetailData
+POST /shop/account/save                    ErpShopAccount.Save
+POST /shop/account/delete                  ErpShopAccount.Delete
+POST /shop/account/get/info                ErpShopAccount.GetShopAccountInfo
 
-GET  /erp/shop/account/log                     ErpShopAccountLog.Index
-POST /erp/shop/account/log/data/list           ErpShopAccountLog.ListData
+GET  /shop/account/log                     ErpShopAccountLog.Index
+POST /shop/account/log/data/list           ErpShopAccountLog.ListData
 
-GET  /erp/paypal/account                       ErpPaypalAccount.Index
-POST /erp/paypal/account/data/list             ErpPaypalAccount.ListData
-POST /erp/paypal/account/data/detail           ErpPaypalAccount.DetailData
-POST /erp/paypal/account/save                  ErpPaypalAccount.Save
-POST /erp/paypal/account/delete                ErpPaypalAccount.Delete
+GET  /paypal/account                       ErpPaypalAccount.Index
+POST /paypal/account/data/list             ErpPaypalAccount.ListData
+POST /paypal/account/data/detail           ErpPaypalAccount.DetailData
+POST /paypal/account/save                  ErpPaypalAccount.Save
+POST /paypal/account/delete                ErpPaypalAccount.Delete
 
-GET  /erp/product/batch/edit                   ErpProductBatchEdit.Index
-POST /erp/product/batch/edit/attr/list         ErpProductBatchEdit.EditAttrList
-POST /erp/product/batch/edit/save              ErpProductBatchEdit.Save
+GET  /product/batch/edit                   ErpProductBatchEdit.Index
+POST /product/batch/edit/attr/list         ErpProductBatchEdit.EditAttrList
+POST /product/batch/edit/save              ErpProductBatchEdit.Save
 
-GET  /erp/product/storage/loc/batch/edit       ErpProductStorageLocBatchEdit.Index
-POST /erp/product/storage/loc/batch/edit/save  ErpProductStorageLocBatchEdit.Save
+GET  /product/storage/loc/batch/edit       ErpProductStorageLocBatchEdit.Index
+POST /product/storage/loc/batch/edit/save  ErpProductStorageLocBatchEdit.Save
 
-GET  /erp/logistics/company                    ErpLogisticsCompany.Index
-POST /erp/logistics/company/data/list          ErpLogisticsCompany.ListData
-POST /erp/logistics/company/data/detail        ErpLogisticsCompany.DetailData
-POST /erp/logistics/company/save               ErpLogisticsCompany.Save
-POST /erp/logistics/company/delete             ErpLogisticsCompany.Delete
+GET  /logistics/company                    ErpLogisticsCompany.Index
+POST /logistics/company/data/list          ErpLogisticsCompany.ListData
+POST /logistics/company/data/detail        ErpLogisticsCompany.DetailData
+POST /logistics/company/save               ErpLogisticsCompany.Save
+POST /logistics/company/delete             ErpLogisticsCompany.Delete
 
-GET  /erp/logistics/mode                       ErpLogisticsMode.Index
-POST /erp/logistics/mode/data/list             ErpLogisticsMode.ListData
-POST /erp/logistics/mode/data/detail           ErpLogisticsMode.DetailData
-POST /erp/logistics/mode/save                  ErpLogisticsMode.Save
-POST /erp/logistics/mode/delete/confirm        ErpLogisticsMode.DeleteConfirm
-POST /erp/logistics/mode/delete                ErpLogisticsMode.Delete
-POST /erp/logistics/mode/import                ErpLogisticsMode.Import
+GET  /logistics/mode                       ErpLogisticsMode.Index
+POST /logistics/mode/data/list             ErpLogisticsMode.ListData
+POST /logistics/mode/data/detail           ErpLogisticsMode.DetailData
+POST /logistics/mode/save                  ErpLogisticsMode.Save
+POST /logistics/mode/delete/confirm        ErpLogisticsMode.DeleteConfirm
+POST /logistics/mode/delete                ErpLogisticsMode.Delete
+POST /logistics/mode/import                ErpLogisticsMode.Import
 
-GET  /erp/logistics/fee/rate                    ErpLogisticsFeeRate.Index
-POST /erp/logistics/fee/rate/data/list          ErpLogisticsFeeRate.ListData
-POST /erp/logistics/fee/rate/data/detail        ErpLogisticsFeeRate.DetailData
-POST /erp/logistics/fee/rate/save               ErpLogisticsFeeRate.Save
-POST /erp/logistics/fee/rate/delete             ErpLogisticsFeeRate.Delete
-POST /erp/logistics/fee/rate/import             ErpLogisticsFeeRate.Import
-POST /erp/logistics/fee/rate/mode/list/by/company  ErpLogisticsFeeRate.GetLogisticsModeListByCompanyId
+GET  /logistics/fee/rate                    ErpLogisticsFeeRate.Index
+POST /logistics/fee/rate/data/list          ErpLogisticsFeeRate.ListData
+POST /logistics/fee/rate/data/detail        ErpLogisticsFeeRate.DetailData
+POST /logistics/fee/rate/save               ErpLogisticsFeeRate.Save
+POST /logistics/fee/rate/delete             ErpLogisticsFeeRate.Delete
+POST /logistics/fee/rate/import             ErpLogisticsFeeRate.Import
+POST /logistics/fee/rate/mode/list/by/company  ErpLogisticsFeeRate.GetLogisticsModeListByCompanyId
 
-GET  /erp/product                              ErpProduct.Index
-POST /erp/product/data/list                    ErpProduct.ListData
-GET  /erp/product/detail/:product_id           ErpProduct.Detail
-POST /erp/product/data/detail                  ErpProduct.DetailData
-POST /erp/product/save                         ErpProduct.Save
-POST /erp/product/delete                       ErpProduct.Delete
-POST /erp/product/get/info                     ErpProduct.GetProductInfo
-POST /erp/product/get/list/skus                ErpProduct.GetProductListSkus
-GET  /erp/product/order/list/:product_id       ErpProduct.ProductOrderList
-POST /erp/product/order/list/data              ErpProduct.ProductOrderListData
-GET  /erp/product/message/list/:product_id     ErpProduct.ProductMessageList
-POST /erp/product/message/list/data            ErpProduct.ProductMessageListData
-GET  /erp/product/log/list/:product_id         ErpProduct.ProductLogList
-POST /erp/product/log/list/data                ErpProduct.ProductLogListData
+GET  /product                              ErpProduct.Index
+POST /product/data/list                    ErpProduct.ListData
+GET  /product/detail/:product_id           ErpProduct.Detail
+POST /product/data/detail                  ErpProduct.DetailData
+POST /product/save                         ErpProduct.Save
+POST /product/delete                       ErpProduct.Delete
+POST /product/get/info                     ErpProduct.GetProductInfo
+POST /product/get/list/skus                ErpProduct.GetProductListSkus
+GET  /product/order/list/:product_id       ErpProduct.ProductOrderList
+POST /product/order/list/data              ErpProduct.ProductOrderListData
+GET  /product/message/list/:product_id     ErpProduct.ProductMessageList
+POST /product/message/list/data            ErpProduct.ProductMessageListData
+GET  /product/log/list/:product_id         ErpProduct.ProductLogList
+POST /product/log/list/data                ErpProduct.ProductLogListData
 
-GET  /erp/product/weight                       ErpProductWeight.Index
-POST /erp/product/weight/data/list             ErpProductWeight.ListData
-POST /erp/product/weight/data/detail           ErpProductWeight.DetailData
-POST /erp/product/weight/save                  ErpProductWeight.Save
-POST /erp/product/import                       ErpProductWeight.Import
+GET  /product/weight                       ErpProductWeight.Index
+POST /product/weight/data/list             ErpProductWeight.ListData
+POST /product/weight/data/detail           ErpProductWeight.DetailData
+POST /product/weight/save                  ErpProductWeight.Save
+POST /product/import                       ErpProductWeight.Import
 
-GET  /erp/product/import                       ErpProductImport.Index
-POST /erp/product/import/data/page             ErpProductImport.PageData
-POST /erp/product/import/data/list             ErpProductImport.ListData
-POST /erp/product/import/delete                ErpProductImport.Delete
-POST /erp/product/import/batch/delete          ErpProductImport.BatchDelete
-POST /erp/product/import/upload                ErpProductImport.Upload
+GET  /product/import                       ErpProductImport.Index
+POST /product/import/data/page             ErpProductImport.PageData
+POST /product/import/data/list             ErpProductImport.ListData
+POST /product/import/delete                ErpProductImport.Delete
+POST /product/import/batch/delete          ErpProductImport.BatchDelete
+POST /product/import/upload                ErpProductImport.Upload
 
-GET  /erp/product/export                       ErpProductExport.Index
-POST /erp/product/export/data/list             ErpProductExport.ListData
-POST /erp/product/export                       ErpProductExport.Export
+GET  /product/export                       ErpProductExport.Index
+POST /product/export/data/list             ErpProductExport.ListData
+POST /product/export                       ErpProductExport.Export
 
-GET  /erp/product/status                       ErpProductStatus.Index
-POST /erp/product/status/data/list             ErpProductStatus.ListData
+GET  /product/status                       ErpProductStatus.Index
+POST /product/status/data/list             ErpProductStatus.ListData
 
-GET  /erp/product/log                          ErpProductLog.Index
-POST /erp/product/log/data/list                ErpProductLog.ListData
+GET  /product/log                          ErpProductLog.Index
+POST /product/log/data/list                ErpProductLog.ListData
 
-GET  /erp/order/log                            ErpOrderLog.Index
-POST /erp/order/log/data/list                  ErpOrderLog.ListData
+GET  /order/log                            ErpOrderLog.Index
+POST /order/log/data/list                  ErpOrderLog.ListData
 
-GET  /erp/logistics/dialy/report               ErpLogisticsDialyReport.Index
+GET  /logistics/dialy/report               ErpLogisticsDialyReport.Index
 
-GET  /erp/product/image/type                   ErpProductImageType.Index
-POST /erp/product/image/type/data/list         ErpProductImageType.ListData
-POST /erp/product/image/type/data/detail       ErpProductImageType.DetailData
-POST /erp/product/image/type/save              ErpProductImageType.Save
-POST /erp/product/image/type/delete            ErpProductImageType.Delete
+GET  /product/image/type                   ErpProductImageType.Index
+POST /product/image/type/data/list         ErpProductImageType.ListData
+POST /product/image/type/data/detail       ErpProductImageType.DetailData
+POST /product/image/type/save              ErpProductImageType.Save
+POST /product/image/type/delete            ErpProductImageType.Delete
 
-GET  /erp/product/image                        ErpProductImage.Index
-POST /erp/product/image/data/list              ErpProductImage.ListData
-POST /erp/product/image/data/detail            ErpProductImage.DetailData
-POST /erp/product/image/save                   ErpProductImage.Save
-POST /erp/product/image/delete                 ErpProductImage.Delete
+GET  /product/image                        ErpProductImage.Index
+POST /product/image/data/list              ErpProductImage.ListData
+POST /product/image/data/detail            ErpProductImage.DetailData
+POST /product/image/save                   ErpProductImage.Save
+POST /product/image/delete                 ErpProductImage.Delete
 
-GET  /erp/product/quality/feedback             ErpProductQualityFeedback.Index
+GET  /product/quality/feedback             ErpProductQualityFeedback.Index
 
-GET  /erp/package/material                     ErpPackageMaterial.Index
-POST /erp/package/material/data/list           ErpPackageMaterial.ListData
-POST /erp/package/material/data/detail         ErpPackageMaterial.DetailData
-POST /erp/package/material/save                ErpPackageMaterial.Save
-POST /erp/package/material/delete              ErpPackageMaterial.Delete
+GET  /package/material                     ErpPackageMaterial.Index
+POST /package/material/data/list           ErpPackageMaterial.ListData
+POST /package/material/data/detail         ErpPackageMaterial.DetailData
+POST /package/material/save                ErpPackageMaterial.Save
+POST /package/material/delete              ErpPackageMaterial.Delete
 
-GET  /erp/inventory                            ErpInventory.Index
-POST /erp/inventory/data/page                  ErpInventory.PageData
-POST /erp/inventory/data/list                  ErpInventory.ListData
-POST /erp/inventory/data/detail                ErpInventory.DetailData
-POST /erp/inventory/save                       ErpInventory.Save
-POST /erp/inventory/delete                     ErpInventory.Delete
-POST /erp/inventory/import                     ErpInventory.Import
-POST /erp/inventory/export                     ErpInventory.Export
+GET  /inventory                            ErpInventory.Index
+POST /inventory/data/page                  ErpInventory.PageData
+POST /inventory/data/list                  ErpInventory.ListData
+POST /inventory/data/detail                ErpInventory.DetailData
+POST /inventory/save                       ErpInventory.Save
+POST /inventory/delete                     ErpInventory.Delete
+POST /inventory/import                     ErpInventory.Import
+POST /inventory/export                     ErpInventory.Export
 
-GET  /erp/stock/bill/checkin                   ErpStockBillCheckin.Index
-POST /erp/stock/bill/checkin/data/list         ErpStockBillCheckin.ListData
-POST /erp/stock/bill/checkin/data/detail       ErpStockBillCheckin.DetailData
-POST /erp/stock/bill/checkin/save              ErpStockBillCheckin.Save
-POST /erp/stock/bill/checkin/submit            ErpStockBillCheckin.Submit
-POST /erp/stock/bill/checkin/delete            ErpStockBillCheckin.Delete
+GET  /stock/bill/checkin                   ErpStockBillCheckin.Index
+POST /stock/bill/checkin/data/list         ErpStockBillCheckin.ListData
+POST /stock/bill/checkin/data/detail       ErpStockBillCheckin.DetailData
+POST /stock/bill/checkin/save              ErpStockBillCheckin.Save
+POST /stock/bill/checkin/submit            ErpStockBillCheckin.Submit
+POST /stock/bill/checkin/delete            ErpStockBillCheckin.Delete
 
-GET  /erp/stock/bill/checkin/:bill_id/entry             ErpStockBillCheckinEntry.Index
-POST /erp/stock/bill/checkin/:bill_id/entry/data/list   ErpStockBillCheckinEntry.ListData
-POST /erp/stock/bill/checkin/entry/data/detail          ErpStockBillCheckinEntry.DetailData
-POST /erp/stock/bill/checkin/entry/save                 ErpStockBillCheckinEntry.Save
-POST /erp/stock/bill/checkin/entry/delete               ErpStockBillCheckinEntry.Delete
+GET  /stock/bill/checkin/:bill_id/entry             ErpStockBillCheckinEntry.Index
+POST /stock/bill/checkin/:bill_id/entry/data/list   ErpStockBillCheckinEntry.ListData
+POST /stock/bill/checkin/entry/data/detail          ErpStockBillCheckinEntry.DetailData
+POST /stock/bill/checkin/entry/save                 ErpStockBillCheckinEntry.Save
+POST /stock/bill/checkin/entry/delete               ErpStockBillCheckinEntry.Delete
 
-GET  /erp/stock/bill/checkout                  ErpStockBillCheckout.Index
-POST /erp/stock/bill/checkout/data/list        ErpStockBillCheckout.ListData
-POST /erp/stock/bill/checkout/data/detail      ErpStockBillCheckout.DetailData
-POST /erp/stock/bill/checkout/save             ErpStockBillCheckout.Save
-POST /erp/stock/bill/checkout/delete           ErpStockBillCheckout.Delete
+GET  /stock/bill/checkout                  ErpStockBillCheckout.Index
+POST /stock/bill/checkout/data/list        ErpStockBillCheckout.ListData
+POST /stock/bill/checkout/data/detail      ErpStockBillCheckout.DetailData
+POST /stock/bill/checkout/save             ErpStockBillCheckout.Save
+POST /stock/bill/checkout/delete           ErpStockBillCheckout.Delete
 
-GET  /erp/stock/bill/checkout/:bill_id/entry            ErpStockBillCheckoutEntry.Index
-POST /erp/stock/bill/checkout/:bill_id/entry/data/list  ErpStockBillCheckoutEntry.ListData
-POST /erp/stock/bill/checkout/entry/data/detail         ErpStockBillCheckoutEntry.DetailData
-POST /erp/stock/bill/checkout/entry/save                ErpStockBillCheckoutEntry.Save
-POST /erp/stock/bill/checkout/entry/delete              ErpStockBillCheckoutEntry.Delete
+GET  /stock/bill/checkout/:bill_id/entry            ErpStockBillCheckoutEntry.Index
+POST /stock/bill/checkout/:bill_id/entry/data/list  ErpStockBillCheckoutEntry.ListData
+POST /stock/bill/checkout/entry/data/detail         ErpStockBillCheckoutEntry.DetailData
+POST /stock/bill/checkout/entry/save                ErpStockBillCheckoutEntry.Save
+POST /stock/bill/checkout/entry/delete              ErpStockBillCheckoutEntry.Delete
 
-GET  /erp/stock/bill/transfer                  ErpStockBillTransfer.Index
-POST /erp/stock/bill/transfer/data/list        ErpStockBillTransfer.ListData
-POST /erp/stock/bill/transfer/data/detail      ErpStockBillTransfer.DetailData
-POST /erp/stock/bill/transfer/save             ErpStockBillTransfer.Save
-POST /erp/stock/bill/transfer/delete           ErpStockBillTransfer.Delete
+GET  /stock/bill/transfer                  ErpStockBillTransfer.Index
+POST /stock/bill/transfer/data/list        ErpStockBillTransfer.ListData
+POST /stock/bill/transfer/data/detail      ErpStockBillTransfer.DetailData
+POST /stock/bill/transfer/save             ErpStockBillTransfer.Save
+POST /stock/bill/transfer/delete           ErpStockBillTransfer.Delete
 
-GET  /erp/stock/bill/transfer/entry               ErpStockBillTransferEntry.Index
-POST /erp/stock/bill/transfer/entry/data/list     ErpStockBillTransferEntry.ListData
-POST /erp/stock/bill/transfer/entry/data/detail   ErpStockBillTransferEntry.DetailData
-POST /erp/stock/bill/transfer/entry/save          ErpStockBillTransferEntry.Save
-POST /erp/stock/bill/transfer/entry/delete        ErpStockBillTransferEntry.Delete
-POST /erp/stock/bill/transfer/entry/product/select/data/list        ErpStockBillTransferEntry.ProductSelectListData
+GET  /stock/bill/transfer/entry               ErpStockBillTransferEntry.Index
+POST /stock/bill/transfer/entry/data/list     ErpStockBillTransferEntry.ListData
+POST /stock/bill/transfer/entry/data/detail   ErpStockBillTransferEntry.DetailData
+POST /stock/bill/transfer/entry/save          ErpStockBillTransferEntry.Save
+POST /stock/bill/transfer/entry/delete        ErpStockBillTransferEntry.Delete
+POST /stock/bill/transfer/entry/product/select/data/list        ErpStockBillTransferEntry.ProductSelectListData
 
-GET  /erp/inventory/check                      ErpInventoryCheck.Index
-POST /erp/inventory/check/data/list            ErpInventoryCheck.ListData
-POST /erp/inventory/check/data/detail          ErpInventoryCheck.DetailData
-POST /erp/inventory/check/save                 ErpInventoryCheck.Save
-POST /erp/inventory/check/delete               ErpInventoryCheck.Delete
-POST /erp/inventory/check/submit               ErpInventoryCheck.Submit
-POST /erp/inventory/check/back                 ErpInventoryCheck.Back
+GET  /inventory/check                      ErpInventoryCheck.Index
+POST /inventory/check/data/list            ErpInventoryCheck.ListData
+POST /inventory/check/data/detail          ErpInventoryCheck.DetailData
+POST /inventory/check/save                 ErpInventoryCheck.Save
+POST /inventory/check/delete               ErpInventoryCheck.Delete
+POST /inventory/check/submit               ErpInventoryCheck.Submit
+POST /inventory/check/back                 ErpInventoryCheck.Back
 
-GET  /erp/inventory/check/approve              ErpInventoryCheckApprove.Index
-POST /erp/inventory/check/approve/data/list    ErpInventoryCheckApprove.ListData
-POST /erp/inventory/check/approve/do           ErpInventoryCheckApprove.Approve
-POST /erp/inventory/check/approve/back         ErpInventoryCheckApprove.Back
+GET  /inventory/check/approve              ErpInventoryCheckApprove.Index
+POST /inventory/check/approve/data/list    ErpInventoryCheckApprove.ListData
+POST /inventory/check/approve/do           ErpInventoryCheckApprove.Approve
+POST /inventory/check/approve/back         ErpInventoryCheckApprove.Back
 
-GET  /erp/inventory/check/entry                ErpInventoryCheckEntry.Index
-POST /erp/inventory/check/entry/data/list      ErpInventoryCheckEntry.ListData
-POST /erp/inventory/check/entry/data/detail    ErpInventoryCheckEntry.DetailData
-POST /erp/inventory/check/entry/save           ErpInventoryCheckEntry.Save
-POST /erp/inventory/check/entry/delete         ErpInventoryCheckEntry.Delete
-POST /erp/inventory/check/entry/product/select/data/list      ErpInventoryCheckEntry.ProductSelectListData
+GET  /inventory/check/entry                ErpInventoryCheckEntry.Index
+POST /inventory/check/entry/data/list      ErpInventoryCheckEntry.ListData
+POST /inventory/check/entry/data/detail    ErpInventoryCheckEntry.DetailData
+POST /inventory/check/entry/save           ErpInventoryCheckEntry.Save
+POST /inventory/check/entry/delete         ErpInventoryCheckEntry.Delete
+POST /inventory/check/entry/product/select/data/list      ErpInventoryCheckEntry.ProductSelectListData
 
-GET  /erp/paypal/recon                         ErpPaypalRecon.Index
-POST /erp/paypal/recon/data/list               ErpPaypalRecon.ListData
+GET  /paypal/recon                         ErpPaypalRecon.Index
+POST /paypal/recon/data/list               ErpPaypalRecon.ListData
 
-GET  /erp/order/custom/type                    ErpOrderCustomType.Index
-POST /erp/order/custom/type/data/list          ErpOrderCustomType.ListData
-POST /erp/order/custom/type/data/detail        ErpOrderCustomType.DetailData
-POST /erp/order/custom/type/save               ErpOrderCustomType.Save
-POST /erp/order/custom/type/delete             ErpOrderCustomType.Delete
+GET  /order/custom/type                    ErpOrderCustomType.Index
+POST /order/custom/type/data/list          ErpOrderCustomType.ListData
+POST /order/custom/type/data/detail        ErpOrderCustomType.DetailData
+POST /order/custom/type/save               ErpOrderCustomType.Save
+POST /order/custom/type/delete             ErpOrderCustomType.Delete
 
-# GET  /erp/logistics/number                     ErpLogisticsNumber.Index
-# POST /erp/logistics/number/data/list           ErpLogisticsNumber.ListData
-# POST /erp/logistics/number/data/detail         ErpLogisticsNumber.DetailData
-# POST /erp/logistics/number/save                ErpLogisticsNumber.Save
-# POST /erp/logistics/number/delete              ErpLogisticsNumber.Delete
+# GET  /logistics/number                     ErpLogisticsNumber.Index
+# POST /logistics/number/data/list           ErpLogisticsNumber.ListData
+# POST /logistics/number/data/detail         ErpLogisticsNumber.DetailData
+# POST /logistics/number/save                ErpLogisticsNumber.Save
+# POST /logistics/number/delete              ErpLogisticsNumber.Delete
 
-# GET  /erp/logistics/number/batch               ErpLogisticsNumberBatch.Index
-# POST /erp/logistics/number/batch/data/list     ErpLogisticsNumberBatch.ListData
-# POST /erp/logistics/number/batch/data/detail   ErpLogisticsNumberBatch.DetailData
-# POST /erp/logistics/number/batch/save          ErpLogisticsNumberBatch.Save
-# POST /erp/logistics/number/batch/delete        ErpLogisticsNumberBatch.Delete
+# GET  /logistics/number/batch               ErpLogisticsNumberBatch.Index
+# POST /logistics/number/batch/data/list     ErpLogisticsNumberBatch.ListData
+# POST /logistics/number/batch/data/detail   ErpLogisticsNumberBatch.DetailData
+# POST /logistics/number/batch/save          ErpLogisticsNumberBatch.Save
+# POST /logistics/number/batch/delete        ErpLogisticsNumberBatch.Delete
 
-# GET  /erp/logistics/number/log                 ErpLogisticsNumberLog.Index
-# POST /erp/logistics/number/log/data/list       ErpLogisticsNumberLog.ListData
-# POST /erp/logistics/number/log/data/detail     ErpLogisticsNumberLog.DetailData
-# POST /erp/logistics/number/log/save            ErpLogisticsNumberLog.Save
-# POST /erp/logistics/number/log/delete          ErpLogisticsNumberLog.Delete
+# GET  /logistics/number/log                 ErpLogisticsNumberLog.Index
+# POST /logistics/number/log/data/list       ErpLogisticsNumberLog.ListData
+# POST /logistics/number/log/data/detail     ErpLogisticsNumberLog.DetailData
+# POST /logistics/number/log/save            ErpLogisticsNumberLog.Save
+# POST /logistics/number/log/delete          ErpLogisticsNumberLog.Delete
 
-GET  /erp/product/bind                         ErpProductBind.Index
-POST /erp/product/bind/data/list               ErpProductBind.ListData
-POST /erp/product/bind/data/detail             ErpProductBind.DetailData
-POST /erp/product/bind/save                    ErpProductBind.Save
-POST /erp/product/bind/delete                  ErpProductBind.Delete
-POST /erp/product/bind/import                  ErpProductBind.Import
+GET  /product/bind                         ErpProductBind.Index
+POST /product/bind/data/list               ErpProductBind.ListData
+POST /product/bind/data/detail             ErpProductBind.DetailData
+POST /product/bind/save                    ErpProductBind.Save
+POST /product/bind/delete                  ErpProductBind.Delete
+POST /product/bind/import                  ErpProductBind.Import
 
-GET  /erp/product/bind/log                     ErpProductBindLog.Index
-POST /erp/product/bind/log/data/list           ErpProductBindLog.ListData
+GET  /product/bind/log                     ErpProductBindLog.Index
+POST /product/bind/log/data/list           ErpProductBindLog.ListData
 
-GET  /erp/diary/income/report                  ErpDiaryIncomeReport.Index
-GET  /erp/diary/sales/report                   ErpDiarySalesReport.Index
-GET  /erp/month/sales/amount/report            ErpMonthSalesAmountReport.Index
-GET  /erp/hot/sales/product/rank               ErpHotSalesProductRank.Index
-GET  /erp/hot/sales/store/rank                 ErpHotSalesStoreRank.Index
-GET  /erp/area/sales/amount/report             ErpAreaSalesAmountReport.Index
-GET  /erp/product/feed/report                  ErpProductFeedReport.Index
-GET  /erp/single/product/sales/query           ErpSingleProductSalesQuery.Index
-GET  /erp/person/sales/report                  ErpPersonSalesReport.Index
+GET  /diary/income/report                  ErpDiaryIncomeReport.Index
+GET  /diary/sales/report                   ErpDiarySalesReport.Index
+GET  /month/sales/amount/report            ErpMonthSalesAmountReport.Index
+GET  /hot/sales/product/rank               ErpHotSalesProductRank.Index
+GET  /hot/sales/store/rank                 ErpHotSalesStoreRank.Index
+GET  /area/sales/amount/report             ErpAreaSalesAmountReport.Index
+GET  /product/feed/report                  ErpProductFeedReport.Index
+GET  /single/product/sales/query           ErpSingleProductSalesQuery.Index
+GET  /person/sales/report                  ErpPersonSalesReport.Index
 
-POST /erp/order/data/page                      ErpOrder.PageData
-POST /erp/order/data/list                      ErpOrder.ListData
+POST /order/data/page                      ErpOrder.PageData
+POST /order/data/list                      ErpOrder.ListData
 
-GET  /erp/order/hold                           ErpOrderHold.Index
-POST /erp/order/hold/list/data                 ErpOrderHold.ListData
-POST /erp/order/hold/page/data                 ErpOrderHold.PageData
+GET  /order/hold                           ErpOrderHold.Index
+POST /order/hold/list/data                 ErpOrderHold.ListData
+POST /order/hold/page/data                 ErpOrderHold.PageData
 
 # 可合并订单
-GET  /erp/order/khb                            ErpOrderKhb.Index
+GET  /order/khb                            ErpOrderKhb.Index
 # 这个路由应该放到最后去，否则放在他后面的有的路由会不工作
-# GET  /erp/order/:status                        ErpOrder.Index
-GET  /erp/order/detail/:order_id               ErpOrder.Detail
-POST /erp/order/data/detail                    ErpOrder.DetailData
-POST /erp/order/paypal/shipping/address        ErpOrder.GetPaypalShippingAddress
-POST /erp/order/match/logistics                ErpOrder.MatchLogistics
+# GET  /order/:status                        ErpOrder.Index
+GET  /order/detail/:order_id               ErpOrder.Detail
+POST /order/data/detail                    ErpOrder.DetailData
+POST /order/paypal/shipping/address        ErpOrder.GetPaypalShippingAddress
+POST /order/match/logistics                ErpOrder.MatchLogistics
 
 # MatchLogistics
-# GET  /erp/order/all                            ErpOrderAll.Index
-# GET  /erp/order/yzf                            ErpOrderYzf.Index
-# GET  /erp/order/dph                            ErpOrderDph.Index
-# GET  /erp/order/phz                            ErpOrderPhz.Index
-# GET  /erp/order/yfh                            ErpOrderYfh.Index
-# GET  /erp/order/ywc                            ErpOrderYwc.Index
-# GET  /erp/order/khb                            ErpOrderKhb.Index
+# GET  /order/all                            ErpOrderAll.Index
+# GET  /order/yzf                            ErpOrderYzf.Index
+# GET  /order/dph                            ErpOrderDph.Index
+# GET  /order/phz                            ErpOrderPhz.Index
+# GET  /order/yfh                            ErpOrderYfh.Index
+# GET  /order/ywc                            ErpOrderYwc.Index
+# GET  /order/khb                            ErpOrderKhb.Index
 
-POST /erp/order/pei/huo                        ErpOrder.PeiHuo
-POST /erp/order/fa/huo                         ErpOrder.FaHuo
-POST /erp/order/shi/ji/wu/huo                  ErpOrder.ShiJiWuHuo
-POST /erp/order/wan/cheng                      ErpOrder.WanCheng
-POST /erp/order/qu/xiao                        ErpOrder.QuXiao
+POST /order/pei/huo                        ErpOrder.PeiHuo
+POST /order/fa/huo                         ErpOrder.FaHuo
+POST /order/shi/ji/wu/huo                  ErpOrder.ShiJiWuHuo
+POST /order/wan/cheng                      ErpOrder.WanCheng
+POST /order/qu/xiao                        ErpOrder.QuXiao
 
-GET  /erp/order/logistics                      ErpOrderLogistics.Index
-POST /erp/order/logistics/data/page            ErpOrderLogistics.PageData
-POST /erp/order/logistics/data/list            ErpOrderLogistics.ListData
-POST /erp/order/logistics/data/detail          ErpOrderLogistics.DetailData
-POST /erp/order/logistics/save                 ErpOrderLogistics.Save
-POST /erp/order/logistics/delete               ErpOrderLogistics.Delete
-POST /erp/order/logistics/export1              ErpOrderLogistics.Export1
-POST /erp/order/logistics/export2              ErpOrderLogistics.Export2
+GET  /order/logistics                               ErpOrderLogistics.Index
+POST /order/logistics/data/page                     ErpOrderLogistics.PageData
+POST /order/logistics/data/list                     ErpOrderLogistics.ListData
+POST /order/logistics/data/detail                   ErpOrderLogistics.DetailData
+POST /order/logistics/save                          ErpOrderLogistics.Save
+POST /order/logistics/delete                        ErpOrderLogistics.Delete
+POST /order/logistics/export1                       ErpOrderLogistics.Export1
+POST /order/logistics/export2                       ErpOrderLogistics.Export2
+POST /order/logistics/export/company/excel          ErpOrderLogistics.ExportLogisticsCompanyExcel
+POST /order/logistics/export/company/option/data    ErpOrderLogistics.ExportLogisticsCompanyOptionData
 
-GET  /erp/order/logistics/match/debug             ErpOrderLogisticsMatchDebug.Index
-POST /erp/order/logistics/match/debug/data/list   ErpOrderLogisticsMatchDebug.ListData
-GET  /erp/order/logistics/match/debug/detail/:id  ErpOrderLogisticsMatchDebug.Detail
+GET  /order/logistics/match/debug             ErpOrderLogisticsMatchDebug.Index
+POST /order/logistics/match/debug/data/list   ErpOrderLogisticsMatchDebug.ListData
+GET  /order/logistics/match/debug/detail/:id  ErpOrderLogisticsMatchDebug.Detail
 
-GET  /erp/order/logistics/fee/diff             ErpOrderLogisticsFeeDiff.Index
-POST /erp/order/logistics/fee/diff/data/page   ErpOrderLogisticsFeeDiff.PageData
-POST /erp/order/logistics/fee/diff/data/list   ErpOrderLogisticsFeeDiff.ListData
+GET  /order/logistics/fee/diff             ErpOrderLogisticsFeeDiff.Index
+POST /order/logistics/fee/diff/data/page   ErpOrderLogisticsFeeDiff.PageData
+POST /order/logistics/fee/diff/data/list   ErpOrderLogisticsFeeDiff.ListData
 
-GET  /erp/order/logistics/test                 ErpOrderLogisticsTest.Index
-POST /erp/order/logistics/test/match           ErpOrderLogisticsTest.Match
+GET  /order/logistics/test                 ErpOrderLogisticsTest.Index
+POST /order/logistics/test/match           ErpOrderLogisticsTest.Match
 
-GET  /erp/ecommerce/platform                   ErpECommercePlatform.Index
-POST /erp/ecommerce/platform/data/list         ErpECommercePlatform.ListData
-# POST /erp/ecommerce/platform/data/detail       ErpECommercePlatform.DetailData
-# POST /erp/ecommerce/platform/save              ErpECommercePlatform.Save
-# POST /erp/ecommerce/platform/delete            ErpECommercePlatform.Delete
+GET  /ecommerce/platform                   ErpECommercePlatform.Index
+POST /ecommerce/platform/data/list         ErpECommercePlatform.ListData
+# POST /ecommerce/platform/data/detail       ErpECommercePlatform.DetailData
+# POST /ecommerce/platform/save              ErpECommercePlatform.Save
+# POST /ecommerce/platform/delete            ErpECommercePlatform.Delete
 
-GET  /erp/platform/logistics/mode              ErpPlatformLogisticsMode.Index
-POST /erp/platform/logistics/mode/data/list    ErpPlatformLogisticsMode.ListData
-POST /erp/platform/logistics/mode/data/detail  ErpPlatformLogisticsMode.DetailData
-POST /erp/platform/logistics/mode/save         ErpPlatformLogisticsMode.Save
-POST /erp/platform/logistics/mode/delete       ErpPlatformLogisticsMode.Delete
+GET  /platform/logistics/mode              ErpPlatformLogisticsMode.Index
+POST /platform/logistics/mode/data/list    ErpPlatformLogisticsMode.ListData
+POST /platform/logistics/mode/data/detail  ErpPlatformLogisticsMode.DetailData
+POST /platform/logistics/mode/save         ErpPlatformLogisticsMode.Save
+POST /platform/logistics/mode/delete       ErpPlatformLogisticsMode.Delete
 
-GET  /erp/logistics/setting                    ErpLogisticsSetting.Index
-POST /erp/logistics/setting/data/detail        ErpLogisticsSetting.DetailData
-POST /erp/logistics/setting/save               ErpLogisticsSetting.Save
+GET  /logistics/setting                    ErpLogisticsSetting.Index
+POST /logistics/setting/data/detail        ErpLogisticsSetting.DetailData
+POST /logistics/setting/save               ErpLogisticsSetting.Save
 
-GET  /erp/pick/fee                             ErpPickFee.Index
-POST /erp/pick/fee/data/detail                 ErpPickFee.DetailData
-POST /erp/pick/fee/save                        ErpPickFee.Save
+GET  /pick/fee                             ErpPickFee.Index
+POST /pick/fee/data/detail                 ErpPickFee.DetailData
+POST /pick/fee/save                        ErpPickFee.Save
 
-GET  /erp/purchase/bill                        ErpPurchaseBill.Index
-POST /erp/purchase/bill/data/list              ErpPurchaseBill.ListData
-POST /erp/purchase/bill/data/detail            ErpPurchaseBill.DetailData
-POST /erp/purchase/bill/save                   ErpPurchaseBill.Save
-POST /erp/purchase/bill/delete                 ErpPurchaseBill.Delete
+GET  /purchase/bill                        ErpPurchaseBill.Index
+POST /purchase/bill/data/list              ErpPurchaseBill.ListData
+POST /purchase/bill/data/detail            ErpPurchaseBill.DetailData
+POST /purchase/bill/save                   ErpPurchaseBill.Save
+POST /purchase/bill/delete                 ErpPurchaseBill.Delete
 
-GET  /erp/purchase/bill/entry                  ErpPurchaseBillEntry.Index
-POST /erp/purchase/bill/entry/data/list        ErpPurchaseBillEntry.ListData
-POST /erp/purchase/bill/entry/data/detail      ErpPurchaseBillEntry.DetailData
-POST /erp/purchase/bill/entry/save             ErpPurchaseBillEntry.Save
-POST /erp/purchase/bill/entry/delete           ErpPurchaseBillEntry.Delete
-POST /erp/purchase/bill/entry/product/select/data/list      ErpPurchaseBillEntry.ProductSelectListData
+GET  /purchase/bill/entry                  ErpPurchaseBillEntry.Index
+POST /purchase/bill/entry/data/list        ErpPurchaseBillEntry.ListData
+POST /purchase/bill/entry/data/detail      ErpPurchaseBillEntry.DetailData
+POST /purchase/bill/entry/save             ErpPurchaseBillEntry.Save
+POST /purchase/bill/entry/delete           ErpPurchaseBillEntry.Delete
+POST /purchase/bill/entry/product/select/data/list      ErpPurchaseBillEntry.ProductSelectListData
 
-GET  /erp/sales/manager                        ErpSalesManager.Index
-POST /erp/sales/manager/data/list              ErpSalesManager.ListData
-POST /erp/sales/manager/data/detail            ErpSalesManager.DetailData
-POST /erp/sales/manager/save                   ErpSalesManager.Save
-POST /erp/sales/manager/delete                 ErpSalesManager.Delete
-POST /erp/sales/manager/shop/account/select/show           ErpSalesManager.ShowShopAccountSelect
-POST /erp/sales/manager/shop/account/select/data/list      ErpSalesManager.ShopAccountSelectListData
-POST /erp/sales/manager/product/select/show                ErpSalesManager.ShowProductSelect
-POST /erp/sales/manager/product/select/data/list           ErpSalesManager.ProductSelectListData
-POST /erp/sales/manager/user/select/show                   ErpSalesManager.ShowUserSelect
-POST /erp/sales/manager/user/select/data/list              ErpSalesManager.UserSelectListData
+GET  /sales/manager                        ErpSalesManager.Index
+POST /sales/manager/data/list              ErpSalesManager.ListData
+POST /sales/manager/data/detail            ErpSalesManager.DetailData
+POST /sales/manager/save                   ErpSalesManager.Save
+POST /sales/manager/delete                 ErpSalesManager.Delete
+POST /sales/manager/shop/account/select/show           ErpSalesManager.ShowShopAccountSelect
+POST /sales/manager/shop/account/select/data/list      ErpSalesManager.ShopAccountSelectListData
+POST /sales/manager/product/select/show                ErpSalesManager.ShowProductSelect
+POST /sales/manager/product/select/data/list           ErpSalesManager.ProductSelectListData
+POST /sales/manager/user/select/show                   ErpSalesManager.ShowUserSelect
+POST /sales/manager/user/select/data/list              ErpSalesManager.UserSelectListData
 
-POST /erp/ebay/api/config/data/detail        ErpEBayAPIConfig.DetailData
-POST /erp/ebay/api/config/save               ErpEBayAPIConfig.Save
-POST /erp/ebay/api/config/delete             ErpEBayAPIConfig.Delete
+POST /ebay/api/config/data/detail        ErpEBayAPIConfig.DetailData
+POST /ebay/api/config/save               ErpEBayAPIConfig.Save
+POST /ebay/api/config/delete             ErpEBayAPIConfig.Delete
 
-GET  /erp/message                            ErpMessage.Index
-POST /erp/message/data/list                  ErpMessage.ListData
+GET  /message                            ErpMessage.Index
+POST /message/data/list                  ErpMessage.ListData
 
-GET  /erp/schedule/task                      ErpScheduleTask.Index
-POST /erp/schedule/task/data                 ErpScheduleTask.TaskData
-POST /erp/schedule/task/history/data         ErpScheduleTask.HistoryData
+GET  /schedule/task                      ErpScheduleTask.Index
+POST /schedule/task/data                 ErpScheduleTask.TaskData
+POST /schedule/task/history/data         ErpScheduleTask.HistoryData
 
-GET  /erp/envelope/fee/rate                    ErpEnvelopeFeeRate.Index
-POST /erp/envelope/fee/rate/data/list          ErpEnvelopeFeeRate.ListData
-POST /erp/envelope/fee/rate/data/detail        ErpEnvelopeFeeRate.DetailData
-POST /erp/envelope/fee/rate/save               ErpEnvelopeFeeRate.Save
-POST /erp/envelope/fee/rate/delete             ErpEnvelopeFeeRate.Delete
+GET  /envelope/fee/rate                    ErpEnvelopeFeeRate.Index
+POST /envelope/fee/rate/data/list          ErpEnvelopeFeeRate.ListData
+POST /envelope/fee/rate/data/detail        ErpEnvelopeFeeRate.DetailData
+POST /envelope/fee/rate/save               ErpEnvelopeFeeRate.Save
+POST /envelope/fee/rate/delete             ErpEnvelopeFeeRate.Delete
 
-GET  /erp/order/import                       ErpOrderImport.Index
-POST /erp/order/import/data/page             ErpOrderImport.PageData
-POST /erp/order/import/data/list             ErpOrderImport.ListData
-POST /erp/order/import/upload                ErpOrderImport.Upload
-POST /erp/order/import/batch/delete          ErpOrderImport.BatchDelete
-POST /erp/order/import/delete                ErpOrderImport.Delete
-POST /erp/order/import/match/logistics       ErpOrderImport.MatchLogistics
+GET  /order/import                       ErpOrderImport.Index
+POST /order/import/data/page             ErpOrderImport.PageData
+POST /order/import/data/list             ErpOrderImport.ListData
+POST /order/import/upload                ErpOrderImport.Upload
+POST /order/import/batch/delete          ErpOrderImport.BatchDelete
+POST /order/import/delete                ErpOrderImport.Delete
+POST /order/import/match/logistics       ErpOrderImport.MatchLogistics
 
-GET  /erp/little/icon                        ErpLittleIcon.Index
-POST /erp/little/icon/listdata               ErpLittleIcon.ListData
-POST /erp/little/icon/detail                 ErpLittleIcon.Detail
-POST /erp/little/icon/save                   ErpLittleIcon.Save
-POST /erp/little/icon/delete                 ErpLittleIcon.Delete
-POST /erp/lietle/icon/upload                 ErpLittleIcon.Upload
+GET  /little/icon                        ErpLittleIcon.Index
+POST /little/icon/listdata               ErpLittleIcon.ListData
+POST /little/icon/detail                 ErpLittleIcon.Detail
+POST /little/icon/save                   ErpLittleIcon.Save
+POST /little/icon/delete                 ErpLittleIcon.Delete
+POST /lietle/icon/upload                 ErpLittleIcon.Upload
 
-GET  /erp/order/hold/type                    ErpOrderHoldType.Index
-POST /erp/order/hold/type/data/list          ErpOrderHoldType.ListData
-POST /erp/order/hold/type/data/detail        ErpOrderHoldType.DetailData
-POST /erp/order/hold/type/save               ErpOrderHoldType.Save
+GET  /order/hold/type                    ErpOrderHoldType.Index
+POST /order/hold/type/data/list          ErpOrderHoldType.ListData
+POST /order/hold/type/data/detail        ErpOrderHoldType.DetailData
+POST /order/hold/type/save               ErpOrderHoldType.Save
 
 # 这个通用的路由应该放到最后比较合适，否则放在他后面的有的路由会不工作
-GET  /erp/order/:status                        ErpOrder.Index
+GET  /order/:status                        ErpOrder.Index

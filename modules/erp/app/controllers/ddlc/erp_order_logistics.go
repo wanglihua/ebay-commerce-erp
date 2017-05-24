@@ -1038,3 +1038,12 @@ ORDER BY oi.transaction_price * oi.quantity DESC`
 
 	return order_logistics_product_detail_list
 }
+
+
+func (c ErpOrderLogistics) ExportLogisticsCompanyOptionData() revel.Result {
+	return c.RenderEmpty()
+}
+
+func (c ErpOrderLogistics) ExportLogisticsCompanyExcel() revel.Result {
+	return c.RenderEmpty()
+}

@@ -23,7 +23,7 @@ func GetXxglMenu(res_id_map map[int64]bool, web_session revel.Session) string {
     <ul class="submenu">
 
         <li id="xxgl-all-message-menu" class="">
-            <a href="/erp/message">
+            <a href="/message">
                 <i class="menu-icon fa fa-caret-right"></i>
                 所有消息
             </a>

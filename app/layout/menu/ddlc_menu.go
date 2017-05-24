@@ -37,7 +37,7 @@ func GetDdlcMenu(res_id_map map[int64]bool, web_session revel.Session) string {
 
 	if check_pass_res_menu(pass_res.DDLC_ORDER_ALL) {
 		buffer.WriteString(`<li id="ddlc-order-all-menu" class="">
-            <a href="/erp/order/all">
+            <a href="/order/all">
                 <i class="menu-icon fa fa-caret-right"></i>
                 所有订单
             </a>
@@ -47,7 +47,7 @@ func GetDdlcMenu(res_id_map map[int64]bool, web_session revel.Session) string {
 
 	if check_pass_res_menu(pass_res.DDLC_ORDER_YCJ) {
 		buffer.WriteString(`<li id="ddlc-order-ycj-menu" class="">
-            <a href="/erp/order/ycj">
+            <a href="/order/ycj">
                 <i class="menu-icon fa fa-caret-right"></i>
                 未支付
             </a>
@@ -57,7 +57,7 @@ func GetDdlcMenu(res_id_map map[int64]bool, web_session revel.Session) string {
 
 	if check_pass_res_menu(pass_res.DDLC_ORDER_YZF) {
 		buffer.WriteString(`<li id="ddlc-order-yzf-menu" class="">
-            <a href="/erp/order/yzf">
+            <a href="/order/yzf">
                 <i class="menu-icon fa fa-caret-right"></i>
                 已支付
             </a>
@@ -67,7 +67,7 @@ func GetDdlcMenu(res_id_map map[int64]bool, web_session revel.Session) string {
 
 	if check_pass_res_menu(pass_res.DDLC_ORDER_HOLD) {
 		buffer.WriteString(`<li id="ddlc-order-hold-menu" class="">
-            <a href="/erp/order/hold">
+            <a href="/order/hold">
                 <i class="menu-icon fa fa-caret-right"></i>
                 Hold
             </a>
@@ -77,7 +77,7 @@ func GetDdlcMenu(res_id_map map[int64]bool, web_session revel.Session) string {
 
 	if check_pass_res_menu(pass_res.DDLC_ORDER_DPH) {
 		buffer.WriteString(`<li id="ddlc-order-dph-menu" class="">
-            <a href="/erp/order/dph">
+            <a href="/order/dph">
                 <i class="menu-icon fa fa-caret-right"></i>
                 待配货
             </a>
@@ -87,7 +87,7 @@ func GetDdlcMenu(res_id_map map[int64]bool, web_session revel.Session) string {
 
 	if check_pass_res_menu(pass_res.DDLC_ORDER_PHZ) {
 		buffer.WriteString(`<li id="ddlc-order-phz-menu" class="">
-            <a href="/erp/order/phz">
+            <a href="/order/phz">
                 <i class="menu-icon fa fa-caret-right"></i>
                 配货中
             </a>
@@ -97,7 +97,7 @@ func GetDdlcMenu(res_id_map map[int64]bool, web_session revel.Session) string {
 
 	if check_pass_res_menu(pass_res.DDLC_ORDER_YFH) {
 		buffer.WriteString(`<li id="ddlc-order-yfh-menu" class="">
-            <a href="/erp/order/yfh">
+            <a href="/order/yfh">
                 <i class="menu-icon fa fa-caret-right"></i>
                 已发货
             </a>
@@ -107,7 +107,7 @@ func GetDdlcMenu(res_id_map map[int64]bool, web_session revel.Session) string {
 
 	if check_pass_res_menu(pass_res.DDLC_ORDER_YWC) {
 		buffer.WriteString(`<li id="ddlc-order-ywc-menu" class="">
-            <a href="/erp/order/ywc">
+            <a href="/order/ywc">
                 <i class="menu-icon fa fa-caret-right"></i>
                 已完成
             </a>
@@ -117,7 +117,7 @@ func GetDdlcMenu(res_id_map map[int64]bool, web_session revel.Session) string {
 
 	if check_pass_res_menu(pass_res.DDLC_ORDER_YQX) {
 		buffer.WriteString(`<li id="ddlc-order-yqx-menu" class="">
-            <a href="/erp/order/yqx">
+            <a href="/order/yqx">
                 <i class="menu-icon fa fa-caret-right"></i>
                 已取消
             </a>
@@ -127,7 +127,7 @@ func GetDdlcMenu(res_id_map map[int64]bool, web_session revel.Session) string {
 
 	if check_pass_res_menu(pass_res.DDLC_ORDER_IMPORT) {
 		buffer.WriteString(`<li id="ddlc-order-import-menu" class="">
-            <a href="/erp/order/import">
+            <a href="/order/import">
                 <i class="menu-icon fa fa-caret-right"></i>
                 订单导入
             </a>
@@ -137,7 +137,7 @@ func GetDdlcMenu(res_id_map map[int64]bool, web_session revel.Session) string {
 
 	if check_pass_res_menu(pass_res.DDLC_ORDER_LOGISTICS) {
 		buffer.WriteString(`<li id="ddlc-orderlogistics-menu" class="">
-            <a href="/erp/order/logistics">
+            <a href="/order/logistics">
                 <i class="menu-icon fa fa-caret-right"></i>
                 订单物流
             </a>
@@ -147,7 +147,7 @@ func GetDdlcMenu(res_id_map map[int64]bool, web_session revel.Session) string {
 
 	if check_pass_res_menu(pass_res.DDLC_ORDER_LOGISTICS_FEE_DIFF) {
 		buffer.WriteString(`<li id="ddlc-order-logistics-fee-diff-menu" class="">
-            <a href="/erp/order/logistics/fee/diff">
+            <a href="/order/logistics/fee/diff">
                 <i class="menu-icon fa fa-caret-right"></i>
                 订单物流费用偏差
             </a>
@@ -157,7 +157,7 @@ func GetDdlcMenu(res_id_map map[int64]bool, web_session revel.Session) string {
 
 	if check_pass_res_menu(pass_res.DDLC_ORDER_LOGISTICS_MATCH_DEBUG) {
 		buffer.WriteString(`<li id="ddlc-order-logistics-match-debug-menu" class="">
-            <a href="/erp/order/logistics/match/debug">
+            <a href="/order/logistics/match/debug">
                 <i class="menu-icon fa fa-caret-right"></i>
                 订单物流匹配调试
             </a>

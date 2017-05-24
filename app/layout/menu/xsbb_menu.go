@@ -23,7 +23,7 @@ func GetXsbbMenu(res_id_map map[int64]bool, web_session revel.Session) string {
     <ul class="submenu">
 
         <li id="xsbb-diary-income-report-menu" class="">
-            <a href="/erp/diary/income/report">
+            <a href="/diary/income/report">
                 <i class="menu-icon fa fa-caret-right"></i>
                 日收入报表
             </a>
@@ -31,7 +31,7 @@ func GetXsbbMenu(res_id_map map[int64]bool, web_session revel.Session) string {
         </li>
 
         <li id="xsbb-diary-sales-report-menu" class="">
-            <a href="/erp/diary/sales/report">
+            <a href="/diary/sales/report">
                 <i class="menu-icon fa fa-caret-right"></i>
                 日销售报表
             </a>
@@ -39,7 +39,7 @@ func GetXsbbMenu(res_id_map map[int64]bool, web_session revel.Session) string {
         </li>
 
         <li id="xsbb-month-sales-amount-report-menu" class="">
-            <a href="/erp/month/sales/amount/report">
+            <a href="/month/sales/amount/report">
                 <i class="menu-icon fa fa-caret-right"></i>
                 月销售额报表
             </a>
@@ -47,7 +47,7 @@ func GetXsbbMenu(res_id_map map[int64]bool, web_session revel.Session) string {
         </li>
 
         <li id="xsbb-hot-sales-product-rank-menu" class="">
-            <a href="/erp/hot/sales/product/rank">
+            <a href="/hot/sales/product/rank">
                 <i class="menu-icon fa fa-caret-right"></i>
                 热销商品排名
             </a>
@@ -55,7 +55,7 @@ func GetXsbbMenu(res_id_map map[int64]bool, web_session revel.Session) string {
         </li>
 
         <li id="xsbb-hot-sales-store-rank-menu" class="">
-            <a href="/erp/hot/sales/store/rank">
+            <a href="/hot/sales/store/rank">
                 <i class="menu-icon fa fa-caret-right"></i>
                 热销店铺排名
             </a>
@@ -63,7 +63,7 @@ func GetXsbbMenu(res_id_map map[int64]bool, web_session revel.Session) string {
         </li>
 
         <li id="xsbb-area-sales-amount-report-menu" class="">
-            <a href="/erp/area/sales/amount/report">
+            <a href="/area/sales/amount/report">
                 <i class="menu-icon fa fa-caret-right"></i>
                 按地区销售额报表
             </a>
@@ -71,7 +71,7 @@ func GetXsbbMenu(res_id_map map[int64]bool, web_session revel.Session) string {
         </li>
 
         <li id="xsbb-product-feed-report-menu" class="">
-            <a href="/erp/product/feed/report">
+            <a href="/product/feed/report">
                 <i class="menu-icon fa fa-caret-right"></i>
                 商品反馈报表
             </a>
@@ -79,7 +79,7 @@ func GetXsbbMenu(res_id_map map[int64]bool, web_session revel.Session) string {
         </li>
 
         <li id="xsbb-single-product-sales-query-menu" class="">
-            <a href="/erp/single/product/sales/query">
+            <a href="/single/product/sales/query">
                 <i class="menu-icon fa fa-caret-right"></i>
                 单商品销售查询
             </a>
@@ -87,7 +87,7 @@ func GetXsbbMenu(res_id_map map[int64]bool, web_session revel.Session) string {
         </li>
 
         <li id="xsbb-person-sales-report-menu" class="">
-            <a href="/erp/person/sales/report">
+            <a href="/person/sales/report">
                 <i class="menu-icon fa fa-caret-right"></i>
                 人员营业报表
             </a>

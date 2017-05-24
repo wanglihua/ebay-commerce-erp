@@ -37,7 +37,7 @@ func GetSppzMenu(res_id_map map[int64]bool, web_session revel.Session) string {
 
 	if check_pass_res_menu(pass_res.SPPZ_PRODUCT_BATCH) {
 		buffer.WriteString(`<li id="sppz-product-batch-menu" class="">
-            <a href="/erp/product/batch/edit">
+            <a href="/product/batch/edit">
                 <i class="menu-icon fa fa-caret-right"></i>
                 商品批量修改
             </a>
@@ -47,7 +47,7 @@ func GetSppzMenu(res_id_map map[int64]bool, web_session revel.Session) string {
 
 	if check_pass_res_menu(pass_res.SPPZ_PACKAGE_MATERIAL) {
 		buffer.WriteString(`<li id="sppz-packagematerial-menu" class="">
-            <a href="/erp/package/material">
+            <a href="/package/material">
                 <i class="menu-icon fa fa-caret-right"></i>
                 包材类型
             </a>
@@ -57,7 +57,7 @@ func GetSppzMenu(res_id_map map[int64]bool, web_session revel.Session) string {
 
 	if check_pass_res_menu(pass_res.SPPZ_STOCK) {
 		buffer.WriteString(`<li id="sppz-stock-menu" class="">
-            <a href="/erp/stock">
+            <a href="/stock">
                 <i class="menu-icon fa fa-caret-right"></i>
                 仓库
             </a>
@@ -67,7 +67,7 @@ func GetSppzMenu(res_id_map map[int64]bool, web_session revel.Session) string {
 
 	if check_pass_res_menu(pass_res.SPPZ_STORAGE_LOC) {
 		buffer.WriteString(`<li id="sppz-storageloc-menu" class="">
-            <a href="/erp/storage/loc">
+            <a href="/storage/loc">
                 <i class="menu-icon fa fa-caret-right"></i>
                 仓位
             </a>
@@ -77,7 +77,7 @@ func GetSppzMenu(res_id_map map[int64]bool, web_session revel.Session) string {
 
 	if check_pass_res_menu(pass_res.SPPZ_PRODUCT_CATE) {
 		buffer.WriteString(`<li id="sppz-productcate-menu" class="">
-            <a href="/erp/product/cate">
+            <a href="/product/cate">
                 <i class="menu-icon fa fa-caret-right"></i>
                 商品目录
             </a>
@@ -87,7 +87,7 @@ func GetSppzMenu(res_id_map map[int64]bool, web_session revel.Session) string {
 
 	if check_pass_res_menu(pass_res.SPPZ_PSL_BATCH) {
 		buffer.WriteString(`<li id="sppz-psl-batch-menu" class="">
-            <a href="/erp/product/storage/loc/batch/edit">
+            <a href="/product/storage/loc/batch/edit">
                 <i class="menu-icon fa fa-caret-right"></i>
                 批量修改仓位
             </a>
@@ -97,7 +97,7 @@ func GetSppzMenu(res_id_map map[int64]bool, web_session revel.Session) string {
 
 	if check_pass_res_menu(pass_res.SPPZ_SUPPLIER) {
 		buffer.WriteString(`<li id="sppz-supplier-menu" class="">
-            <a href="/erp/supplier">
+            <a href="/supplier">
                 <i class="menu-icon fa fa-caret-right"></i>
                 供应商
             </a>
@@ -107,7 +107,7 @@ func GetSppzMenu(res_id_map map[int64]bool, web_session revel.Session) string {
 
 	if check_pass_res_menu(pass_res.SPPZ_PRODUCT_STATUS) {
 		buffer.WriteString(`<li id="sppz-product-status-menu" class="">
-            <a href="/erp/product/status">
+            <a href="/product/status">
                 <i class="menu-icon fa fa-caret-right"></i>
                 商品状态
             </a>
@@ -124,7 +124,7 @@ func GetSppzMenu(res_id_map map[int64]bool, web_session revel.Session) string {
 
 /*
    <li id="sppz-brand-menu" class="">
-       <a href="/erp/brand">
+       <a href="/brand">
            <i class="menu-icon fa fa-caret-right"></i>
            品牌
        </a>

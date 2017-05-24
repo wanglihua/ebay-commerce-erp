@@ -23,7 +23,7 @@ func GetCgglMenu(res_id_map map[int64]bool, web_session revel.Session) string {
     <ul class="submenu">
 
         <li id="cggl-purchasebill-menu" class="">
-            <a href="/erp/purchase/bill">
+            <a href="/purchase/bill">
                 <i class="menu-icon fa fa-caret-right"></i>
                 采购管理
             </a>

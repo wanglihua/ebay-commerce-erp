@@ -23,7 +23,7 @@ func GetXsglMenu(res_id_map map[int64]bool, web_session revel.Session) string {
     <ul class="submenu">
 
         <li id="xsgl-salesmanager-menu" class="">
-            <a href="/erp/sales/manager">
+            <a href="/sales/manager">
                 <i class="menu-icon fa fa-caret-right"></i>
                 销售负责人
             </a>
@@ -55,7 +55,7 @@ func GetXsglMenu(res_id_map map[int64]bool, web_session revel.Session) string {
         </li>
 
         <li id="xsgl-productimage-menu" class="">
-            <a href="/erp/product/image">
+            <a href="/product/image">
                 <i class="menu-icon fa fa-caret-right"></i>
                 商品图片
             </a>
@@ -63,7 +63,7 @@ func GetXsglMenu(res_id_map map[int64]bool, web_session revel.Session) string {
         </li>
 
         <li id="xsgl-productimagetype-menu" class="">
-            <a href="/erp/product/image/type">
+            <a href="/product/image/type">
                 <i class="menu-icon fa fa-caret-right"></i>
                 商品图片属性
             </a>
