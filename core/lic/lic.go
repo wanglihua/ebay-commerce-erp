@@ -18,6 +18,9 @@ import (
 
 var encrypt_salt = "Jiaxing Huadu Information Technolony Co.,Ltd"
 
+// 把获得的授权日期可以放在这里，就可以在各个检查的地方分享，不用每次都从授权文件中获取
+var App_lic_date time.Time
+
 func EncryptLic(lic_app_name string, date string) string {
 	app_name_md5 := make_md5(lic_app_name + encrypt_salt)
 	date_encrypt := des_encrypt([]byte(date), []byte(encrypt_salt))
@@ -49,7 +52,7 @@ func DecryptLic(lic_app_name string, lic string) string {
 	return decrypt_date
 }
 
-func GetAppLicDate(app_name string) {
+func GetAppLicDate(app_name string) time.Time {
 	lic_file_path := ""
 
 	currentDir, err := filepath.Abs(filepath.Dir(os.Args[0]))
@@ -63,7 +66,17 @@ func GetAppLicDate(app_name string) {
 		lic_file_path = os.Getenv("GOPATH") + string(os.PathSeparator) + "src" + string(os.PathSeparator) + revel.ImportPath + string(os.PathSeparator) + "app.lic"
 	}
 
-	ValidAppLic(app_name, lic_file_path)
+	lic_bytes, err := ioutil.ReadFile(lic_file_path)
+	if err != nil {
+		return time.Time{}
+	}
+	var lic_date_str = DecryptLic(app_name, string(lic_bytes))
+	lic_date, err := time.ParseInLocation("20060102", lic_date_str, time.Local)
+	if err != nil {
+		return time.Time{}
+	}
+
+	return lic_date
 }
 
 func ValidAppLic(lic_app_name string, lic_file_path string) {
@@ -71,10 +84,16 @@ func ValidAppLic(lic_app_name string, lic_file_path string) {
 	if err != nil {
 		log.Fatal(fmt.Sprintf("[L005] lic file path not valid: %s", lic_file_path))
 	}
-	lic_date := DecryptLic(lic_app_name, string(lic_bytes))
-	current_date := time.Now().Format("20060102")
-	if lic_date < current_date {
-		log.Fatal(fmt.Sprintf("[L006] lic not valid: %s", string(lic_bytes)))
+	lic_date_str := DecryptLic(lic_app_name, string(lic_bytes))
+	lic_date, err := time.ParseInLocation("20060102", lic_date_str, time.Local)
+	if err != nil {
+		log.Fatal(fmt.Sprintf("[L006] lic date not valid: %s", lic_date_str))
+	}
+	//把获取的授权日期记录下来
+	App_lic_date = lic_date
+	current_date := time.Now()
+	if current_date.After(lic_date) {
+		log.Fatal(fmt.Sprintf("[L007] lic not valid: %s", string(lic_bytes)))
 	}
 }
 

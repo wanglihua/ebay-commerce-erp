@@ -30,7 +30,7 @@ func (c Jobs) Status() revel.Result {
 	filtered_entries := make([]*cron.Entry, 0)
 	for _, job_entry := range entries {
 		job := cast_job(job_entry.Job)
-		if job.Name != tasks.Site_keep_hot_task_name {
+		if job.Name != tasks.Site_keep_hot_task_name && job.Name != tasks.System_check_app_lic_task_name {
 			filtered_entries = append(filtered_entries, job_entry)
 		}
 	}

@@ -11,6 +11,7 @@ import (
 	"matrix/core"
 	"matrix/db"
 	"matrix/modules/erp/service/login_log_service"
+	"matrix/core/lic"
 )
 
 func BeforeInterceptor(c *revel.Controller) revel.Result {
@@ -139,6 +140,10 @@ func userAuth(c *revel.Controller) revel.Result {
 	}
 
 	//检查软件授权
+	var current_time = time.Now()
+	if current_time.After(lic.App_lic_date) {
+		return c.RenderText("something is error! code: 1905689")
+	}
 
 	loginuser := core.GetLoginUser(c.Session)
 	//revel.TRACE.Println("userAuth session id: " + c.Session.Id())

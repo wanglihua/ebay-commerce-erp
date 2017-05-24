@@ -15,7 +15,7 @@ type EBayTokenStatusCheckTask struct {
 }
 
 func (t EBayTokenStatusCheckTask) Name() string {
-	return "Token状态检查"
+	return "店铺Token状态检查"
 }
 
 func (t EBayTokenStatusCheckTask) Run() {
