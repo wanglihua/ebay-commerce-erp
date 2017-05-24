@@ -1040,9 +1040,12 @@ ORDER BY oi.transaction_price * oi.quantity DESC`
 }
 
 var (
-	excel_export_company_eparcel_code = 100
-	excel_export_company_fastway_code = 200
-	excel_export_company_toll_code    = 300
+	excel_export_stock_mel_code = 100
+	excel_export_stock_bne_code = 200
+
+	excel_export_company_eparcel_code int = 100
+	excel_export_company_fastway_code int = 200
+	excel_export_company_toll_code    int = 300
 )
 
 func (c ErpOrderLogistics) ExportLogisticsCompanyOptionData() revel.Result {
@@ -1063,5 +1066,68 @@ func (c ErpOrderLogistics) ExportLogisticsCompanyOptionData() revel.Result {
 }
 
 func (c ErpOrderLogistics) ExportLogisticsCompanyExcel() revel.Result {
+	var db_session = c.DbSession
+
+	var stock_id int64
+	c.Params.Bind(&stock_id, "stock_id")
+
+	var company_code int
+	c.Params.Bind(&company_code, "company_code")
+
+	// 判断当前登录用户是否有选择的仓库的权限
+	var stock_list = stock_service.Get_login_user_stock_list(db_session, c.Session)
+	var has_stock = false
+	for _, stock := range stock_list {
+		if stock_id == stock.Id {
+			has_stock = true
+			break
+		}
+	}
+
+	if has_stock == false {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "你没有导出当前选择仓库物流的权限！",
+		})
+	}
+
+	// eparcel_bne.xlsx
+	// eparcel_mel.xlsx
+	// fastway_bne.xlsx
+	// fastway_mel.xlsx
+	// toll_bne.xlsx
+	// toll_mel.xlsx
+
+	// the stock selected is mel or bne?
+	var stock models.StockInfo
+	_, err := db_session.Id(stock_id).Get(&stock)
+	core.HandleError(err)
+
+	var stock_code = 0 // 用于区分 mel 还是 bne
+	if strings.ToLower(strings.TrimSpace(stock.ShortName.String)) == strings.ToLower("MEL") {
+		stock_code = excel_export_stock_mel_code
+	} else if strings.ToLower(strings.TrimSpace(stock.ShortName.String)) == strings.ToLower("BNE") {
+		stock_code = excel_export_stock_bne_code
+	} else {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "选择的仓库不能正确识别为墨尔本或布里斯班仓库！",
+		})
+	}
+
+	if company_code == excel_export_company_eparcel_code && stock_code == excel_export_stock_mel_code {
+
+	} else if company_code == excel_export_company_eparcel_code && stock_code == excel_export_stock_bne_code {
+
+	} else if company_code == excel_export_company_fastway_code && stock_code == excel_export_stock_mel_code {
+
+	} else if company_code == excel_export_company_fastway_code && stock_code == excel_export_stock_bne_code {
+
+	} else if company_code == excel_export_company_toll_code && stock_code == excel_export_stock_mel_code {
+
+	} else if company_code == excel_export_company_toll_code && stock_code == excel_export_stock_bne_code {
+
+	}
+
 	return c.RenderEmpty()
 }
