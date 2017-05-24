@@ -1148,7 +1148,7 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 			final_selected_mode_id = logistics_mode.Id
 			final_total_fee = total_fee_in_mode
 			final_cost_amount = cost_amount_in_mode
-			final_total_amount = total_fee_in_mode + cost_amount_in_mode
+			final_total_amount = total_amount_in_mode
 
 			final_length = length
 			final_width = width
@@ -1167,7 +1167,7 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 				final_selected_mode_id = logistics_mode.Id
 				final_total_fee = total_fee_in_mode
 				final_cost_amount = cost_amount_in_mode
-				final_total_amount = total_fee_in_mode + cost_amount_in_mode
+				final_total_amount = total_amount_in_mode
 
 				final_length = length
 				final_width = width
@@ -1194,7 +1194,7 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 			logistics_match_debug.ModeId = logistics_mode.Id
 			logistics_match_debug.FeeRateId = selected_fee_rate_id_in_mode
 			logistics_match_debug.TotalFee = total_fee_in_mode
-			logistics_match_debug.TotalCost = total_fee_in_mode + cost_amount_in_mode
+			logistics_match_debug.TotalCost = total_amount_in_mode
 			logistics_match_debug.MatchResult = "备选"
 			logistics_match_debug.MatchDebug = mt.String()
 
