@@ -1126,6 +1126,16 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 		var total_amount_in_mode = total_fee_in_mode + cost_amount_in_mode
 		mt.Println("考虑澳仓成本后的，物流方式总费用", total_amount_in_mode)
 
+		var logistics_mode_stock models.StockInfo
+		logistics_mode_stock.Priority = 100 // 默认给个很低的优先级，这样万一在列表里面没找到 stock 也不会出错
+
+		for _, stock := range au_stock_list {
+			if stock.Id == logistics_mode.StockId {
+				logistics_mode_stock = stock
+				break
+			}
+		}
+
 		// 三个区间 final_total_amount-total_amount_in_mode
 		// 负无穷大 到 -p_ol.logistics_setting.FeeMaxDiff， -p_ol.logistics_setting.FeeMaxDiff到+p_ol.logistics_setting.FeeMaxDiff, +p_ol.logistics_setting.FeeMaxDiff 到 正无穷大
 		if final_total_amount-total_amount_in_mode > p_ol.logistics_setting.FeeMaxDiff { // 取得更优的模式方案，挑选最优解时，把商品的到仓成本也考虑进去   +p_ol.logistics_setting.FeeMaxDiff 到 正无穷大
@@ -1134,14 +1144,7 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 			final_selected_fee_rate_id = selected_fee_rate_id_in_mode
 			final_selected_company_id = logistics_mode.CompanyId
 			final_selected_stock_id = logistics_mode.StockId
-
-			var au_stock_list = p_ol.au_stock_list
-			for _, stock := range au_stock_list {
-				if stock.Id == logistics_mode.StockId {
-					final_selected_stock = stock
-				}
-			}
-
+			final_selected_stock = logistics_mode_stock
 			final_selected_mode_id = logistics_mode.Id
 			final_total_fee = total_fee_in_mode
 			final_cost_amount = cost_amount_in_mode
@@ -1153,15 +1156,6 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 			final_actual_weight = actual_weight
 			final_dim_weight = dim_weight
 		} else if math.Abs(final_total_amount-total_amount_in_mode) <= p_ol.logistics_setting.FeeMaxDiff { // 运费偏差在最大允许范围内，其实还是算上了澳仓成本的  -p_ol.logistics_setting.FeeMaxDiff到+p_ol.logistics_setting.FeeMaxDiff,
-			var logistics_mode_stock models.StockInfo
-			logistics_mode_stock.Priority = 100 // 默认给个很低的优先级
-
-			for _, stock := range au_stock_list {
-				if stock.Id == logistics_mode.StockId {
-					logistics_mode_stock = stock
-				}
-			}
-
 			//取优先级高的仓库
 			if logistics_mode_stock.Priority > final_selected_stock.Priority { // 当前的仓库的优先级要高
 				mt.Println("当前匹配的物流方式费用和之前最优解在允许偏差范围内，且当前仓库是优先级更高，选用当前物流方式计算结果。")
