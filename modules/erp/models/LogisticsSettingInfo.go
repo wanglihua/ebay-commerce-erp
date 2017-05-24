@@ -24,7 +24,8 @@ type LogisticsSettingInfo struct {
 	Pphzbzl            float64         `xorm:"decimal(18,6) notnull 'pphzbzl'" json:"pphzbzl"`                                            // 匹配后中边折率 匹配物流后对中边打多少折
 	Ptfl               float64         `xorm:"decimal(18,6) notnull 'ptfl'" json:"ptfl"`                                                  // 平台费率
 	Jyfl               float64         `xorm:"decimal(18,6) notnull 'jyfl'" json:"jyfl"`                                                  // 交易费率
-	Qyppts             int64           `xorm:"bigint notnull 'qyppts'" json:"qyppts"`                                                       // 启用匹配调试， >0 是， 其他 否
+	FeeMaxDiff         float64         `xorm:"decimal(18,6) notnull 'fee_max_diff'" json:"fee_max_diff"`                                  // 运费允许偏差
+	Qyppts             int64           `xorm:"bigint notnull 'qyppts'" json:"qyppts"`                                                     // 启用匹配调试， >0 是， 其他 否
 	CreateTime         core.Time       `xorm:"created notnull 'create_time'" json:"create_time"`
 	UpdateTime         core.Time       `xorm:"updated notnull 'update_time'" json:"update_time"`
 	Version            int             `xorm:"version notnull 'version'" json:"version"`

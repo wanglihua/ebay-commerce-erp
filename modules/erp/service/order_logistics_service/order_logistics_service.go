@@ -20,7 +20,6 @@ import (
 	"matrix/modules/erp/service/logistics_setting_service"
 	"matrix/modules/erp/service/order_service"
 	"matrix/modules/erp/service/pick_fee_service"
-	"matrix/modules/erp/service/stock_service"
 )
 
 type OrderLogistics struct {
@@ -34,7 +33,6 @@ type OrderLogistics struct {
 	logistics_fee_rate_map            map[int64][]models.LogisticsFeeRateInfo // 物流费率列表的映射，映射的 key 是， 物流方式的 id
 	envelope_fee_rate_list            []models.EnvelopeFeeRateInfo            // 信封物流费率， 按费用从小到大排序
 	shop_list                         []models.ShopAccountInfo                // 店铺列表，系统中的店铺列表
-	mel_stock_id                      int64                                   // 墨尔本仓库id
 }
 
 func (p_ol *OrderLogistics) init_data(db_session *xorm.Session) {
@@ -101,8 +99,6 @@ func (p_ol *OrderLogistics) init_data(db_session *xorm.Session) {
 	err = db_session.Find(&shop_list)
 	core.HandleError(err)
 	p_ol.shop_list = shop_list
-
-	p_ol.mel_stock_id = stock_service.Get_mel_stock_id(db_session)
 }
 
 func (p_ol *OrderLogistics) CalculateListPaidOrders(db_session *xorm.Session) error {
@@ -692,7 +688,7 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 
 	var final_selected_company_id int64 = 0
 	var final_selected_stock_id int64 = 0
-	//var final_selected_stock models.StockInfo
+	var final_selected_stock models.StockInfo
 	var final_selected_mode_id int64 = 0
 	var final_selected_fee_rate_id int64 = 0
 	var final_total_fee float64 = 0 // 最终的物流费用，
@@ -1127,14 +1123,25 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 		mt.Println("物流方式超重和超长，取大的一个的结果", extra_fee_in_mode)
 		var total_fee_in_mode float64 = total_fee_in_fee_rate + extra_fee_in_mode
 		mt.Println("物流方式中物流费率费用加上物流方式超重超长大的一个后的结果", total_fee_in_mode)
-		mt.Println("考虑澳仓成本后的，物流方式总费用", total_fee_in_mode+cost_amount_in_mode)
+		var total_amount_in_mode = total_fee_in_mode + cost_amount_in_mode
+		mt.Println("考虑澳仓成本后的，物流方式总费用", total_amount_in_mode)
 
-		if total_fee_in_mode+cost_amount_in_mode < final_total_amount { // 取得更优的模式方案，挑选最优解时，把商品的到仓成本也考虑进去
-			mt.Println("之前没有匹配的物流方式，或当前物流方式比之前匹配的物流方式更优，暂时选用当前物流方式计算结果")
+		// 三个区间 final_total_amount-total_amount_in_mode
+		// 负无穷大 到 -p_ol.logistics_setting.FeeMaxDiff， -p_ol.logistics_setting.FeeMaxDiff到+p_ol.logistics_setting.FeeMaxDiff, +p_ol.logistics_setting.FeeMaxDiff 到 正无穷大
+		if final_total_amount-total_amount_in_mode > p_ol.logistics_setting.FeeMaxDiff { // 取得更优的模式方案，挑选最优解时，把商品的到仓成本也考虑进去   +p_ol.logistics_setting.FeeMaxDiff 到 正无穷大
+			mt.Println("之前没有匹配的物流方式，或当前物流方式比之前匹配的物流方式节省费用超过最大允许偏差，暂时选用当前物流方式计算结果")
 
 			final_selected_fee_rate_id = selected_fee_rate_id_in_mode
 			final_selected_company_id = logistics_mode.CompanyId
 			final_selected_stock_id = logistics_mode.StockId
+
+			var au_stock_list = p_ol.au_stock_list
+			for _, stock := range au_stock_list {
+				if stock.Id == logistics_mode.StockId {
+					final_selected_stock = stock
+				}
+			}
+
 			final_selected_mode_id = logistics_mode.Id
 			final_total_fee = total_fee_in_mode
 			final_cost_amount = cost_amount_in_mode
@@ -1145,14 +1152,24 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 			final_height = height
 			final_actual_weight = actual_weight
 			final_dim_weight = dim_weight
-		} else if total_fee_in_mode+cost_amount_in_mode == final_total_amount {
-			//如果想等就取 墨尔本仓库的
-			if logistics_mode.StockId == p_ol.mel_stock_id {
-				mt.Println("当前匹配的物流方式费用和之前最优解相同，且当前仓库是墨尔本仓库，选用当前物流方式计算结果。")
+		} else if math.Abs(final_total_amount-total_amount_in_mode) <= p_ol.logistics_setting.FeeMaxDiff { // 运费偏差在最大允许范围内，其实还是算上了澳仓成本的  -p_ol.logistics_setting.FeeMaxDiff到+p_ol.logistics_setting.FeeMaxDiff,
+			var logistics_mode_stock models.StockInfo
+			logistics_mode_stock.Priority = 100 // 默认给个很低的优先级
+
+			for _, stock := range au_stock_list {
+				if stock.Id == logistics_mode.StockId {
+					logistics_mode_stock = stock
+				}
+			}
+
+			//取优先级高的仓库
+			if logistics_mode_stock.Priority > final_selected_stock.Priority { // 当前的仓库的优先级要高
+				mt.Println("当前匹配的物流方式费用和之前最优解在允许偏差范围内，且当前仓库是优先级更高，选用当前物流方式计算结果。")
 
 				final_selected_fee_rate_id = selected_fee_rate_id_in_mode
 				final_selected_company_id = logistics_mode.CompanyId
 				final_selected_stock_id = logistics_mode.StockId
+				final_selected_stock = logistics_mode_stock
 				final_selected_mode_id = logistics_mode.Id
 				final_total_fee = total_fee_in_mode
 				final_cost_amount = cost_amount_in_mode
@@ -1163,11 +1180,11 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 				final_height = height
 				final_actual_weight = actual_weight
 				final_dim_weight = dim_weight
-			} else {
-				mt.Println("当前匹配的物流方式费用和之前最优解相同，但当前仓库不是墨尔本仓库，弃用当前物流方式计算结果。")
+			} else { //
+				mt.Println("当前匹配的物流方式费用和之前最优解在允许偏差范围内，但当前仓库是优先级并不更高，弃用当前物流方式计算结果。")
 			}
-		} else {
-			mt.Println("之前匹配的物流，比当前物流方式更优，弃用当前物流方式计算结果")
+		} else { // 在运费偏差范围之外， 负无穷大 到 -p_ol.logistics_setting.FeeMaxDiff
+			mt.Println("之前匹配的物流，比当前物流方式更优, 且超过了允许偏差范围，弃用当前物流方式计算结果")
 		}
 
 		mt.Println("匹配单个物流方式结束")

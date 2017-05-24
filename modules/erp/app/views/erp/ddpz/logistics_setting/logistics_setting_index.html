@@ -245,6 +245,25 @@
                                         </div>
                                     </div>
 
+                                    <div class="row">
+                                        <div class="col-xs-6">
+                                            <div class="form-group">
+                                                <label for="fee_max_diff" class="col-xs-4 control-label">运费允许偏差</label>
+                                                <div class="col-xs-8">
+                                                    <input id="fee_max_diff" name="detail.logistics_setting.fee_max_diff" type="text" class="input-sm form-control" v-model.number="detail.logistics_setting.fee_max_diff"/>
+                                                    <div class="help-block">匹配物流时运费允许的最大偏差。在运费偏差范围内，挑选优先级更高的仓库。例如：1 澳币
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-xs-6">
+                                            <div class="form-group">
+
+                                            </div>
+                                        </div>
+                                    </div>
+
                                     <hr/>
 
                                     <div class="row">
@@ -252,7 +271,7 @@
                                             <div class="form-group">
                                                 <label for="qyppts" class="col-xs-4 control-label">启用匹配调试</label>
                                                 <div class="col-xs-8">
-                                                    <select id="qyppts" name="detail.logistics_setting.qyppts"  class="input-sm form-control" v-model.number="detail.logistics_setting.qyppts">
+                                                    <select id="qyppts" name="detail.logistics_setting.qyppts" class="input-sm form-control" v-model.number="detail.logistics_setting.qyppts">
                                                         <option :value="0">否</option>
                                                         <option :value="1">是</option>
                                                     </select>
