@@ -21,6 +21,7 @@ const (
 	GROUP_CUSTOM_SERVICE = 11100
 	GROUP_SALES          = 11200
 	GROUP_PICK_CREW      = 11300
+	GROUP_BILL_LOGISTICS = 11400
 )
 
 func (e GroupInfo) InitData(db_session *xorm.Session) {
@@ -37,5 +38,10 @@ func (e GroupInfo) InitData(db_session *xorm.Session) {
 	group = new(GroupInfo)
 	group.Id = GROUP_PICK_CREW
 	group.GroupName = "拣货人员"
+	db_session.Insert(group)
+
+	group = new(GroupInfo)
+	group.Id = GROUP_BILL_LOGISTICS
+	group.GroupName = "单证物流"
 	db_session.Insert(group)
 }

@@ -339,6 +339,8 @@
                 {
                     "sAjaxSource": '{%url "ErpOrderLogistics.ListData"%}',
                     "aaSorting": [[0, "asc"]],
+                    "lengthMenu": [[25, 50, 100, 150, 200, 250, 300, 350, 400, 450, 500], [25, 50, 100, 150, 200, 250, 300, 350, 400, 450, 500]],
+                    "iDisplayLength": 50,
                     "aoColumns": [
                         {
                             "mDataProp": "ol.id",
@@ -599,11 +601,11 @@
             $("#th_height").wrap("<div id='div_height'></div>");
             $("#th_length_ext").append($("#div_length")).append($("#div_width")).append($("#div_height"));
 
-             $("#th_actual_weight").before("<th id='th_actual_weight_ext'></th>");
-             $("#th_actual_weight").wrap("<div id='div_actual_weight'></div>");
-             $("#th_dim_weight").wrap("<div id='div_dim_weight'></div>");
-             $("#th_sfkltjz").wrap("<div id='div_sfkltjz'></div>");
-             $("#th_actual_weight_ext").append($("#div_actual_weight")).append($("#div_dim_weight")).append($("#div_sfkltjz"));
+            $("#th_actual_weight").before("<th id='th_actual_weight_ext'></th>");
+            $("#th_actual_weight").wrap("<div id='div_actual_weight'></div>");
+            $("#th_dim_weight").wrap("<div id='div_dim_weight'></div>");
+            $("#th_sfkltjz").wrap("<div id='div_sfkltjz'></div>");
+            $("#th_actual_weight_ext").append($("#div_actual_weight")).append($("#div_dim_weight")).append($("#div_sfkltjz"));
 
             $("#th_paid_time").before("<th id='th_paid_time_ext'></th>");
             $("#th_paid_time").wrap($("<div id='div_paid_time'></div>"));

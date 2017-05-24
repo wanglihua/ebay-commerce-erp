@@ -170,6 +170,36 @@
                                     </div>
                                 </div>
 
+
+                                <div class="row">
+
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="priority" class="col-xs-3 control-label">优先级</label>
+                                            <div class="col-xs-9">
+                                                <select id="priority" name="detail.stock.priority" class="input-sm form-control" v-model.number="detail.stock.priority">
+                                                    <option :value="1">1</option>
+                                                    <option :value="2">2</option>
+                                                    <option :value="3">3</option>
+                                                    <option :value="4">4</option>
+                                                    <option :value="5">5</option>
+                                                    <option :value="6">6</option>
+                                                    <option :value="7">7</option>
+                                                    <option :value="8">8</option>
+                                                    <option :value="9">9</option>
+                                                    <option :value="10">10</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                        </div>
+                                    </div>
+
+                                </div>
+
                             </form>
                         </div>
                     </div>
@@ -243,8 +273,14 @@
                         {"mDataProp": "stock.name", "title": "名称", "bSearchable": true, "width": 130},
                         {"mDataProp": "stock.short_name", "title": "简称", "bSearchable": true, "width": 90},
                         {"mDataProp": "stock_type.name", "title": "仓库类型", "bSearchable": true, "width": 80},
+                        {
+                            "mDataProp": "stock.priority",
+                            "title": "优先级",
+                            "bSearchable": false,
+                            "sClass": "center",
+                            "width": 65
+                        },
                         {"mDataProp": "stock.contact", "title": "联系人", "bSearchable": true, "width": 90},
-                        {"mDataProp": "stock.address", "title": "地址", "bSearchable": true},
                         {"mDataProp": "stock.phone", "title": "电话", "bSearchable": true, "width": 140},
                         {"mDataProp": "status.name", "title": "状态", "bSearchable": true, "width": 80},
                         {
@@ -255,7 +291,7 @@
                             "sClass": "center",
                             "width": 60,
                             "render": function (data, type, row) {
-                                if (data == "") {
+                                if (data === "") {
                                     return '<img style="width:24px;height:24px;" src="/static/images/icons/noimg.png"  alt="" />'
                                 } else {
                                     return '<img style="width:24px;height:24px;" src="{% .icon_path %}/' + data + '"  alt="" />'

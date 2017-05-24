@@ -692,6 +692,7 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 
 	var final_selected_company_id int64 = 0
 	var final_selected_stock_id int64 = 0
+	//var final_selected_stock models.StockInfo
 	var final_selected_mode_id int64 = 0
 	var final_selected_fee_rate_id int64 = 0
 	var final_total_fee float64 = 0 // 最终的物流费用，

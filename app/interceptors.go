@@ -9,9 +9,9 @@ import (
 	"github.com/revel/revel/cache"
 	"matrix/app/routes"
 	"matrix/core"
+	"matrix/core/lic"
 	"matrix/db"
 	"matrix/modules/erp/service/login_log_service"
-	"matrix/core/lic"
 )
 
 func BeforeInterceptor(c *revel.Controller) revel.Result {
@@ -142,7 +142,7 @@ func userAuth(c *revel.Controller) revel.Result {
 	//检查软件授权
 	var current_time = time.Now()
 	if current_time.After(lic.App_lic_date) {
-		return c.RenderText("something is error! code: 1905689")
+		return c.RenderText("something error! code: 1905689")
 	}
 
 	loginuser := core.GetLoginUser(c.Session)

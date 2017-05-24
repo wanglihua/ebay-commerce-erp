@@ -16,6 +16,7 @@ type StockInfo struct {
 	StatusId      int64           `xorm:"bigint notnull index 'status_id'" json:"status_id" smith:"verbose_name=状态"`
 	IconFile      string          `xorm:"nvarchar(200) null 'icon_file'" json:"icon_file" smith:"verbose_name=图标"`
 	Ord           int64           `xorm:"bigint null 'ord'" json:"ord" smith:"verbose_name=排序"`
+	Priority      int64           `xorm:"bigint notnull default(1) 'priority'" json:"priority" smith:"verbose_name=优先级"`
 	CreateTime    core.Time       `xorm:"created notnull 'create_time'" json:"create_time"`
 	UpdateTime    core.Time       `xorm:"updated notnull 'update_time'" json:"update_time"`
 	Version       int             `xorm:"version notnull 'version'" json:"version"`
