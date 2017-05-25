@@ -1120,15 +1120,54 @@ func (c ErpOrderLogistics) ExportLogisticsCompanyExcel() revel.Result {
 
 	var xlsx_file *xlsx.File
 	var export_excel_file_name string
-	if company_code == excel_export_company_eparcel_code && stock_code == excel_export_stock_mel_code {
-		xlsx_file, err = xlsx.OpenFile(filepath.Join(excel_template_logistics_export_dir, "eparcel_mel.xlsx"))
-		core.HandleError(err)
-		export_excel_file_name = "eParcel 墨尔本"
+	if company_code == excel_export_company_eparcel_code && (stock_code == excel_export_stock_mel_code || stock_code == excel_export_stock_bne_code ) {
+		if stock_code == excel_export_stock_mel_code {
+			xlsx_file, err = xlsx.OpenFile(filepath.Join(excel_template_logistics_export_dir, "eparcel_mel.xlsx"))
+			core.HandleError(err)
+			export_excel_file_name = "eParcel 墨尔本"
+		} else if stock_code == excel_export_stock_bne_code {
+			xlsx_file, err = xlsx.OpenFile(filepath.Join(excel_template_logistics_export_dir, "eparcel_bne.xlsx"))
+			core.HandleError(err)
+			export_excel_file_name = "eParcel 布里斯班"
+		}
 
-	} else if company_code == excel_export_company_eparcel_code && stock_code == excel_export_stock_bne_code {
-		xlsx_file, err = xlsx.OpenFile(filepath.Join(excel_template_logistics_export_dir, "eparcel_bne.xlsx"))
+		type ModeId struct {
+			ModeId int64 `xorm:"'mode_id'" json:"mode_id"`
+		}
+
+		var mode_id_list = make([]ModeId, 0)
+		sql_get_mode_id_list := `SELECT lm.id AS mode_id FROM erp_logistics_mode lm WHERE lm.name LIKE '%eParcel%';`
+		err := db_session.Sql(sql_get_mode_id_list).Find(&mode_id_list)
 		core.HandleError(err)
-		export_excel_file_name = "eParcel 布里斯班"
+
+		var mode_id_str_list = make([]string, 0)
+		for _, mode_id := range mode_id_list {
+			mode_id_str_list = append(mode_id_str_list, fmt.Sprint(mode_id))
+		}
+
+		/*
+SELECT ol.*, o.*
+FROM erp_order_logistics ol
+    INNER JOIN erp_order o ON o.id = ol.order_id
+WHERE ol.mode_id IN (0) AND ol.stock_id = 0
+		 */
+
+		type order_logistics_view_item_t struct {
+			OrderLogistics models.OrderLogisticsInfo    `xorm:"extends" json:"ol"`
+			Order          models.OrderInfo             `xorm:"extends" json:"o"`
+		}
+
+		sql_get_logistics_list := `SELECT ol.*, o.*
+FROM erp_order_logistics ol
+    INNER JOIN erp_order o ON o.id = ol.order_id
+WHERE ol.mode_id IN (%s) AND ol.stock_id = %d`
+		sql_get_logistics_list = fmt.Sprintf(sql_get_logistics_list, strings.Join(mode_id_str_list, ","), stock_id)
+		var order_logistics_list = make([]order_logistics_view_item_t, 0)
+		err = db_session.Sql(sql_get_logistics_list).Find(&order_logistics_list)
+		core.HandleError(err)
+
+
+
 
 	} else if company_code == excel_export_company_fastway_code && stock_code == excel_export_stock_mel_code {
 		xlsx_file, err = xlsx.OpenFile(filepath.Join(excel_template_logistics_export_dir, "fastway_mel.xlsx"))
