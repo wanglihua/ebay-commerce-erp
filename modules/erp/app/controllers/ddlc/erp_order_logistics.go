@@ -1136,7 +1136,7 @@ func (c ErpOrderLogistics) ExportLogisticsCompanyExcel() revel.Result {
 	return c.RenderEmpty()
 }
 
-// 把 A转成0， C转成2， 把 AA 转成 26， 把 BA 转成
+// 把 A 转成 0， C 转成 2， 把 AA 转成 26， 把 BA 转成 52
 func excel_row_label_to_index(row_label string) int {
 	row_label = strings.ToUpper(row_label)
 	var row_label_rune_list = []rune(row_label)
