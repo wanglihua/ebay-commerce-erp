@@ -1118,22 +1118,54 @@ func (c ErpOrderLogistics) ExportLogisticsCompanyExcel() revel.Result {
 
 	var excel_template_logistics_export_dir = filepath.Join(revel.BasePath, "/static/excel-template/logistics_export")
 
+	var xlsx_file *xlsx.File
+	var export_excel_file_name string
 	if company_code == excel_export_company_eparcel_code && stock_code == excel_export_stock_mel_code {
-		_ = excel_template_logistics_export_dir
+		xlsx_file, err = xlsx.OpenFile(filepath.Join(excel_template_logistics_export_dir, "eparcel_mel.xlsx"))
+		core.HandleError(err)
+		export_excel_file_name = "eParcel 墨尔本"
 
 	} else if company_code == excel_export_company_eparcel_code && stock_code == excel_export_stock_bne_code {
+		xlsx_file, err = xlsx.OpenFile(filepath.Join(excel_template_logistics_export_dir, "eparcel_bne.xlsx"))
+		core.HandleError(err)
+		export_excel_file_name = "eParcel 布里斯班"
 
 	} else if company_code == excel_export_company_fastway_code && stock_code == excel_export_stock_mel_code {
+		xlsx_file, err = xlsx.OpenFile(filepath.Join(excel_template_logistics_export_dir, "fastway_mel.xlsx"))
+		core.HandleError(err)
+		export_excel_file_name = "FASTWAY 墨尔本"
 
 	} else if company_code == excel_export_company_fastway_code && stock_code == excel_export_stock_bne_code {
+		xlsx_file, err = xlsx.OpenFile(filepath.Join(excel_template_logistics_export_dir, "fastway_bne.xlsx"))
+		core.HandleError(err)
+		export_excel_file_name = "FASTWAY 布里斯班"
 
 	} else if company_code == excel_export_company_toll_code && stock_code == excel_export_stock_mel_code {
+		xlsx_file, err = xlsx.OpenFile(filepath.Join(excel_template_logistics_export_dir, "toll_mel.xlsx"))
+		core.HandleError(err)
+		export_excel_file_name = "TOLL 墨尔本"
 
 	} else if company_code == excel_export_company_toll_code && stock_code == excel_export_stock_bne_code {
+		xlsx_file, err = xlsx.OpenFile(filepath.Join(excel_template_logistics_export_dir, "toll_bne.xlsx"))
+		core.HandleError(err)
+		export_excel_file_name = "TOLL 布里斯班"
 
+	} else {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "未识别的仓库和物流公司！",
+		})
 	}
 
-	return c.RenderEmpty()
+	//先把文件内容写到buffer中，再从中读取
+	var buffer bytes.Buffer
+	err = xlsx_file.Write(&buffer)
+	core.HandleError(err)
+
+	reader := bytes.NewReader(buffer.Bytes()) //bytes.Reader 实现了 io.Reader 接口
+	file_name := export_excel_file_name + ".xlsx"
+
+	return c.RenderBinary(reader, file_name, revel.Attachment, time.Now())
 }
 
 // 把 A 转成 0， C 转成 2， 把 AA 转成 26， 把 BA 转成 52
