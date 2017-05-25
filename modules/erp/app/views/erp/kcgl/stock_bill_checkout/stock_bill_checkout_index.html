@@ -142,7 +142,7 @@
                         {
                             "mDataProp": "sb.code", "title": "批次号", "bSearchable": true, "width": 160,
                             "render": function (data, type, row) {
-                                return '<a href="/erp/stock/bill/checkout/' + row.sb.id + '/entry" target="_blank">' + data + '</a>';
+                                return '<a href="/stock/bill/checkout/' + row.sb.id + '/entry" target="_blank">' + data + '</a>';
                             }
                         },
                         {"mDataProp": "s.name", "title": "仓库", "bSearchable": true, "width": 160},
@@ -242,7 +242,7 @@
                                     $.msg.show(data.message);
                                     $('#stockBillDetailDialog').modal('hide');
                                     vm.reloadList();
-                                    bill_entry_window.location.href = '/erp/stock/bill/checkout/' + data.bill_id + '/entry';
+                                    bill_entry_window.location.href = '/stock/bill/checkout/' + data.bill_id + '/entry';
                                     //return;
                                 }
                             }

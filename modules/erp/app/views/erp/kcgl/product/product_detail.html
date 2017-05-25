@@ -459,7 +459,7 @@
                                     vm.detail.product.weight = parseFloat(dtFormatFloat(vm.detail.product.weight));
                                     $.msg.show(data.message);
                                     if (data.is_create == true) {
-                                        setTimeout("window.location.href='/erp/product/detail/" + data.product.id + "'", 1000) //重新打开已保存好的商品的详细页面
+                                        setTimeout("window.location.href='/product/detail/" + data.product.id + "'", 1000) //重新打开已保存好的商品的详细页面
                                     }
                                     //return;
                                 }

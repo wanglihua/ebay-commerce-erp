@@ -21,6 +21,7 @@ import (
 	"matrix/modules/erp/service/logistics_mode_service"
 	"matrix/modules/erp/service/order_import_batch_service"
 	"matrix/modules/erp/service/order_item_service"
+	"matrix/modules/erp/service/order_service"
 	"matrix/modules/erp/service/shop_service"
 	"matrix/modules/erp/service/stock_service"
 	"matrix/modules/erp/setting"
@@ -1168,8 +1169,10 @@ WHERE ol.mode_id IN (%s) AND ol.stock_id = %d`
 
 		sheet := xlsx_file.Sheets[0] // 模板里面应该至少有一个sheet
 		for index, order_logistics := range order_logistics_list {
-			sheet.Cell(index + 1, excel_col_label_to_index("C")).Value = "7D85"
-			sheet.Cell(index + 1, excel_col_label_to_index("D")).Value = order_logistics.Order.FullTranId
+			var order_shipping_address = order_service.Get_order_shipping_address(order_logistics.Order.Id, db_session)
+			sheet.Cell(index+1, excel_col_label_to_index("C")).Value = "7D85"
+			sheet.Cell(index+1, excel_col_label_to_index("D")).Value = order_logistics.Order.FullTranId
+			sheet.Cell(index+1, excel_col_label_to_index("E")).Value = order_shipping_address.Name
 		}
 
 	} else if company_code == excel_export_company_fastway_code && stock_code == excel_export_stock_mel_code {
@@ -1222,4 +1225,8 @@ func excel_col_label_to_index(row_label string) int {
 	}
 
 	return row_index - 1
+}
+
+func split_address(address string, letter_limit int) (address1 string, address2 string) {
+	return "", ""
 }

@@ -123,7 +123,7 @@
                                 if (row.sup.name != "") {
                                     sup_name = row.sup.name;
                                 }
-                                return '<div class="tdSkuNameSup"><a href="/erp/product/detail/' + row.prd.id + '" target="_blank">' + row.prd.sku + '</a></div><div>' + row.prd.cn_name + '</div><div>' + sup_name + '</div>';
+                                return '<div class="tdSkuNameSup"><a href="/product/detail/' + row.prd.id + '" target="_blank">' + row.prd.sku + '</a></div><div>' + row.prd.cn_name + '</div><div>' + sup_name + '</div>';
                             }
                         },
                         {
@@ -236,7 +236,7 @@
                 window.open(url, "_blank");
             },
             showProductLog: function () {
-                window.location.href = "/erp/product/log";
+                window.location.href = "/product/log";
             },
             saveProduct: function () {
                 showMask("提交中...");
