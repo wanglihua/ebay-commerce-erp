@@ -1166,8 +1166,11 @@ WHERE ol.mode_id IN (%s) AND ol.stock_id = %d`
 		err = db_session.Sql(sql_get_logistics_list).Find(&order_logistics_list)
 		core.HandleError(err)
 
-
-
+		sheet := xlsx_file.Sheets[0] // 模板里面应该至少有一个sheet
+		for index, order_logistics := range order_logistics_list {
+			sheet.Cell(index + 1, excel_col_label_to_index("C")).Value = "7D85"
+			sheet.Cell(index + 1, excel_col_label_to_index("D")).Value = order_logistics.Order.FullTranId
+		}
 
 	} else if company_code == excel_export_company_fastway_code && stock_code == excel_export_stock_mel_code {
 		xlsx_file, err = xlsx.OpenFile(filepath.Join(excel_template_logistics_export_dir, "fastway_mel.xlsx"))
@@ -1208,7 +1211,7 @@ WHERE ol.mode_id IN (%s) AND ol.stock_id = %d`
 }
 
 // 把 A 转成 0， C 转成 2， 把 AA 转成 26， 把 BA 转成 52
-func excel_row_label_to_index(row_label string) int {
+func excel_col_label_to_index(row_label string) int {
 	row_label = strings.ToUpper(row_label)
 	var row_label_rune_list = []rune(row_label)
 	var row_label_rune_list_len = len(row_label_rune_list)
