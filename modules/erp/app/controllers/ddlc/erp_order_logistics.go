@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -1115,7 +1116,10 @@ func (c ErpOrderLogistics) ExportLogisticsCompanyExcel() revel.Result {
 		})
 	}
 
+	var excel_template_logistics_export_dir = filepath.Join(revel.BasePath, "/static/excel-template/logistics_export")
+
 	if company_code == excel_export_company_eparcel_code && stock_code == excel_export_stock_mel_code {
+		_ = excel_template_logistics_export_dir
 
 	} else if company_code == excel_export_company_eparcel_code && stock_code == excel_export_stock_bne_code {
 
@@ -1130,4 +1134,18 @@ func (c ErpOrderLogistics) ExportLogisticsCompanyExcel() revel.Result {
 	}
 
 	return c.RenderEmpty()
+}
+
+// 把 A转成0， C转成2， 把 AA 转成 26， 把 BA 转成
+func excel_row_label_to_index(row_label string) int {
+	row_label = strings.ToUpper(row_label)
+	var row_label_rune_list = []rune(row_label)
+	var row_label_rune_list_len = len(row_label_rune_list)
+
+	var row_index int = 0
+	for i := 0; i < row_label_rune_list_len; i++ {
+		row_index = row_index*26 + int(row_label_rune_list[i]-rune('A')) + 1
+	}
+
+	return row_index - 1
 }
