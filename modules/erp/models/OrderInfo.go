@@ -9,6 +9,7 @@ type OrderInfo struct {
 	ShopId                   int64               `xorm:"bigint notnull index 'shop_id'" json:"shop_id" smith:"verbose_name=店铺"`
 	Code                     string              `xorm:"nvarchar(200) notnull index unique 'code'" json:"code" smith:"verbose_name=编码"`
 	TranId                   string              `xorm:"nvarchar(200) notnull 'tran_id'" json:"tran_id" smith:"verbose_name=交易号"`
+	FullTranId               string              `xorm:"nvarchar(200) notnull 'full_tran_id'" json:"full_tran_id" smith:"verbose_name=交易号"` //交易号，是把店铺号也放进去后的交易号
 	Desc                     core.NullString     `xorm:"nvarchar(500) 'desc'" json:"desc" smith:"verbose_name=备注"`
 	TypeId                   int64               `xorm:"bigint notnull index 'type_id'" json:"type_id" smith:"verbose_name=类型"`
 	EBayStatus               string              `xorm:"nvarchar(200) notnull 'ebay_status'" json:"ebay_status" smith:"verbose_name=ebay状态"`

@@ -117,7 +117,7 @@ func (t EBayMessageDownloadTask) Run() {
 		page_number := 1
 		for has_more_orders == true {
 
-			response := t.fetch_messages(config, page_number)
+			response := t.fetch_messages(config.APIConfig, page_number)
 
 			// insert into database
 			message_download_list := response.MemberMessagesArray.MemberMessageExchanges
@@ -126,7 +126,7 @@ func (t EBayMessageDownloadTask) Run() {
 				message_id := message_download.Question.MessageId
 
 				var message_in_db models.MessageInfo
-				message_in_db.ShopId = config.ShopId
+				message_in_db.ShopId = config.APIConfig.ShopId
 
 				has_message, err := db_session.Where(fmt.Sprintf("message_id = '%s'", message_id)).Get(&message_in_db)
 				core.HandleError(err)
@@ -164,7 +164,7 @@ WHERE psi.item_id = '%s'`
 				product_sku := product_result.ProductSku
 				if has_item_product == false {
 					// download product
-					product_id, product_sku, _ = fetch_product_item_to_db(config, db_session, message_download.Item.ItemId)
+					product_id, product_sku, _ = fetch_product_item_to_db(config.APIConfig, db_session, message_download.Item.ItemId)
 				}
 
 				message_in_db.ProductId = product_id

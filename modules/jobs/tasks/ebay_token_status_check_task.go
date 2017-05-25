@@ -55,7 +55,7 @@ func (t EBayTokenStatusCheckTask) Run() {
 	//todo: 如果发现 token 有问题 或者 即将过期， 加个提示消息进行提示
 
 	for _, config := range ebay_api_config_list {
-		response := ebay_service.Get_token_status(config)
+		response := ebay_service.Get_token_status(config.APIConfig)
 
 		var expiration_time time.Time
 		if response.TokenStatus.ExpirationTime != "" {
@@ -69,7 +69,7 @@ func (t EBayTokenStatusCheckTask) Run() {
 		// update shop account token_result and token_expire
 
 		var shop_account models.ShopAccountInfo
-		_, err := db_session.Id(config.ShopId).Get(&shop_account)
+		_, err := db_session.Id(config.APIConfig.ShopId).Get(&shop_account)
 		core.HandleError(err)
 
 		var update_col_list = make([]string, 0)

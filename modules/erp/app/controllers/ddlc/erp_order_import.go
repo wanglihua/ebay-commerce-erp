@@ -183,6 +183,7 @@ func (c ErpOrderImport) Upload() revel.Result {
 		Sscs         string  `json:"sscs"` // 15 所属城市  address
 		ErrorMessage string  `json:"error_message"`
 		shop_id      int64
+		shop_code    string
 		product_id   int64
 	}
 
@@ -373,8 +374,9 @@ SELECT sa.id AS shop_id, sa.name AS shop_name FROM erp_shop_account sa;
 		ProductSku string `xorm:"'product_sku'"`
 	}
 
-	type shop_id_and_name_t struct {
+	type shop_id_code_name_t struct {
 		ShopId   int64  `xorm:"'shop_id'"`
+		ShopCode string `xorm:"'shop_code'"`
 		ShopName string `xorm:"'shop_name'"`
 	}
 
@@ -383,18 +385,18 @@ SELECT sa.id AS shop_id, sa.name AS shop_name FROM erp_shop_account sa;
 	err = db_session.Sql(sql_product).Find(&product_id_and_sku_list)
 	core.HandleError(err)
 
-	var sql_shop = `SELECT sa.id AS shop_id, sa.name AS shop_name FROM erp_shop_account sa`
-	var shop_id_and_name_list = make([]shop_id_and_name_t, 0)
+	var sql_shop = `SELECT sa.id AS shop_id, sa.code AS shop_code, sa.name AS shop_name FROM erp_shop_account sa;`
+	var shop_id_and_name_list = make([]shop_id_code_name_t, 0)
 	err = db_session.Sql(sql_shop).Find(&shop_id_and_name_list)
 	core.HandleError(err)
 
-	var is_shop_name_exist = func(shop_name string) (has_return bool, shop_id_return int64) {
-		for _, shop_id_and_name := range shop_id_and_name_list {
-			if strings.TrimSpace(shop_name) == strings.TrimSpace(shop_id_and_name.ShopName) {
-				return true, shop_id_and_name.ShopId
+	var is_shop_name_exist = func(shop_name string) (has_return bool, shop_id_return int64, shop_code_return string) {
+		for _, shop_id_code_name := range shop_id_and_name_list {
+			if strings.TrimSpace(shop_name) == strings.TrimSpace(shop_id_code_name.ShopName) {
+				return true, shop_id_code_name.ShopId, shop_id_code_name.ShopCode
 			}
 		}
-		return false, 0
+		return false, 0, ""
 	}
 
 	var is_product_sku_exist = func(product_sku string) (has_return bool, product_id_return int64) {
@@ -428,7 +430,7 @@ SELECT sa.id AS shop_id, sa.name AS shop_name FROM erp_shop_account sa;
 		}
 
 		// 店铺是否存在
-		has, shop_id := is_shop_name_exist(order_import.Dpm)
+		has, shop_id, shop_code := is_shop_name_exist(order_import.Dpm)
 		if has == false {
 			//panic(fmt.Sprintf("导入文件中的店铺名 %s 不存在！", order_import.Dpm))
 			order_import.ErrorMessage = fmt.Sprintf("编号为 %s 的订单中的店铺名 %s 不存在！", order_import.Ddbh, order_import.Dpm)
@@ -465,6 +467,7 @@ SELECT sa.id AS shop_id, sa.name AS shop_name FROM erp_shop_account sa;
 		}
 
 		order_import_list[index].shop_id = shop_id
+		order_import_list[index].shop_code = shop_code
 		order_import_list[index].product_id = product_id
 	}
 
@@ -505,6 +508,7 @@ SELECT sa.id AS shop_id, sa.name AS shop_name FROM erp_shop_account sa;
 			order.ShopId = order_import.shop_id
 			order.Code = order_import.Ddbh
 			order.TranId = order_import.Jydh
+			order.FullTranId = order_import.shop_code + order_import.Jydh
 
 			var amount_au float64 = order_import.Skje
 			var amount_currency = "AUD"                            // 澳币的也设置一下

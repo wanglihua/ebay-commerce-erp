@@ -63,11 +63,11 @@ func (t EBayOrderDownloadTask) Run() {
 
 	ebay_api_config_list := get_ebay_api_config_list(db_session)
 
-	for _, config := range ebay_api_config_list {
+	for _, shop_account_config := range ebay_api_config_list {
 		has_more_orders := true
 		page_number := 1
 		for has_more_orders == true {
-			response := ebay_service.Get_orders(config, page_number)
+			response := ebay_service.Get_orders(shop_account_config.APIConfig, page_number)
 
 			switch response.Ack {
 			case "Success":
@@ -112,11 +112,12 @@ func (t EBayOrderDownloadTask) Run() {
 				core.HandleError(err)
 
 				order_in_db.Code = order_code
-				order_in_db.ShopId = config.ShopId
+				order_in_db.ShopId = shop_account_config.APIConfig.ShopId
 				order_in_db.TranId = order_download.ShippingDetails.SellingManagerSalesRecordNumber
+				order_in_db.FullTranId = shop_account_config.Shop.Code + order_download.ShippingDetails.SellingManagerSalesRecordNumber
 
 				var shop models.ShopAccountInfo
-				_, err = db_session.Id(config.ShopId).Get(&shop)
+				_, err = db_session.Id(shop_account_config.APIConfig.ShopId).Get(&shop)
 				core.HandleError(err)
 
 				order_in_db.TypeId = models.ORDER_TYPE_ZCDD //订单类型为正常下载订单
@@ -364,7 +365,7 @@ func (t EBayOrderDownloadTask) Run() {
 							has_product_store_item, _, product_store_item_id := product_store_item_service.Query_product_store_item(transaction.Item.ItemID, db_session)
 							if has_product_store_item == false {
 								//download product
-								_, _, product_store_item_id = fetch_product_item_to_db(config, db_session, transaction.Item.ItemID)
+								_, _, product_store_item_id = fetch_product_item_to_db(shop_account_config.APIConfig, db_session, transaction.Item.ItemID)
 							}
 
 							product_id := product_service.Get_product_id_by_sku(product_sku, db_session)
@@ -415,7 +416,7 @@ func (t EBayOrderDownloadTask) Run() {
 						has_product_store_item, product_id, product_store_item_id := product_store_item_service.Query_product_store_item(transaction.Item.ItemID, db_session)
 						if has_product_store_item == false {
 							//download product
-							product_id, _, product_store_item_id = fetch_product_item_to_db(config, db_session, transaction.Item.ItemID)
+							product_id, _, product_store_item_id = fetch_product_item_to_db(shop_account_config.APIConfig, db_session, transaction.Item.ItemID)
 						}
 
 						order_item.ItemProductId = product_id

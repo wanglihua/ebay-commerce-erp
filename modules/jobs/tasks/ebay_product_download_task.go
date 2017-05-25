@@ -105,7 +105,7 @@ func (t EBayProductDownloadTask) Run() {
 		page_number := 1
 		for has_more_orders == true {
 
-			list_response := t.fetch_product_list(config, page_number)
+			list_response := t.fetch_product_list(config.APIConfig, page_number)
 
 			switch list_response.Ack {
 			case "Success":
@@ -127,7 +127,7 @@ func (t EBayProductDownloadTask) Run() {
 				SELECT count(psi.id) AS product_item_count FROM erp_product_store_item psi WHERE psi.shop_id = 1 AND psi.item_id = '123'
 				 */
 				sql := `SELECT count(psi.id) AS product_item_count FROM erp_product_store_item psi WHERE psi.shop_id = %d AND psi.item_id = '%s'`
-				sql = fmt.Sprintf(sql, config.ShopId, list_item.ItemId)
+				sql = fmt.Sprintf(sql, config.APIConfig.ShopId, list_item.ItemId)
 
 				var product_item_count struct {
 					Count int64 `xorm:"'product_item_count'"`
@@ -137,7 +137,7 @@ func (t EBayProductDownloadTask) Run() {
 				core.HandleError(err)
 
 				if product_item_count.Count == 0 {
-					fetch_product_item_to_db(config, db_session, list_item.ItemId)
+					fetch_product_item_to_db(config.APIConfig, db_session, list_item.ItemId)
 				}
 			}
 		} // for has_more_orders == true
