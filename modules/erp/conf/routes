@@ -330,8 +330,9 @@ POST /order/logistics/save                          ErpOrderLogistics.Save
 POST /order/logistics/delete                        ErpOrderLogistics.Delete
 POST /order/logistics/export1                       ErpOrderLogistics.Export1
 POST /order/logistics/export2                       ErpOrderLogistics.Export2
-POST /order/logistics/export/company/excel          ErpOrderLogistics.ExportLogisticsCompanyExcel
-POST /order/logistics/export/company/option/data    ErpOrderLogistics.ExportLogisticsCompanyOptionData
+
+POST /order/logistics/company/export/excel          ErpOrderLogisticsCompanyExport.ExportExcel
+POST /order/logistics/company/export/option/data    ErpOrderLogisticsCompanyExport.ExportOptionData
 
 GET  /order/logistics/match/debug             ErpOrderLogisticsMatchDebug.Index
 POST /order/logistics/match/debug/data/list   ErpOrderLogisticsMatchDebug.ListData
