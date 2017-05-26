@@ -28,3 +28,9 @@ func Test_excel_row_label_to_index(t *testing.T) {
 		t.Error("结果不对！")
 	}
 }
+
+func Test_split_address(t *testing.T) {
+	address1, address2 := split_address("hello hello hello hello hello world abc hello hello hello hello hello hello hello hello hello hello hello", 35)
+	fmt.Println("address1", address1)
+	fmt.Println("address2", address2)
+}

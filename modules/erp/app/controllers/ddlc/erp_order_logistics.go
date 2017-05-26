@@ -1122,16 +1122,6 @@ func (c ErpOrderLogistics) ExportLogisticsCompanyExcel() revel.Result {
 	var xlsx_file *xlsx.File
 	var export_excel_file_name string
 	if company_code == excel_export_company_eparcel_code && (stock_code == excel_export_stock_mel_code || stock_code == excel_export_stock_bne_code ) {
-		if stock_code == excel_export_stock_mel_code {
-			xlsx_file, err = xlsx.OpenFile(filepath.Join(excel_template_logistics_export_dir, "eparcel_mel.xlsx"))
-			core.HandleError(err)
-			export_excel_file_name = "eParcel 墨尔本"
-		} else if stock_code == excel_export_stock_bne_code {
-			xlsx_file, err = xlsx.OpenFile(filepath.Join(excel_template_logistics_export_dir, "eparcel_bne.xlsx"))
-			core.HandleError(err)
-			export_excel_file_name = "eParcel 布里斯班"
-		}
-
 		type ModeId struct {
 			ModeId int64 `xorm:"'mode_id'" json:"mode_id"`
 		}
@@ -1167,14 +1157,92 @@ WHERE ol.mode_id IN (%s) AND ol.stock_id = %d`
 		err = db_session.Sql(sql_get_logistics_list).Find(&order_logistics_list)
 		core.HandleError(err)
 
-		sheet := xlsx_file.Sheets[0] // 模板里面应该至少有一个sheet
-		for index, order_logistics := range order_logistics_list {
-			var order_shipping_address = order_service.Get_order_shipping_address(order_logistics.Order.Id, db_session)
-			sheet.Cell(index+1, excel_col_label_to_index("C")).Value = "7D85"
-			sheet.Cell(index+1, excel_col_label_to_index("D")).Value = order_logistics.Order.FullTranId
-			sheet.Cell(index+1, excel_col_label_to_index("E")).Value = order_shipping_address.Name
-		}
+		if stock_code == excel_export_stock_mel_code {
+			xlsx_file, err = xlsx.OpenFile(filepath.Join(excel_template_logistics_export_dir, "eparcel_mel.xlsx"))
+			core.HandleError(err)
+			export_excel_file_name = "eParcel 墨尔本"
 
+			sheet := xlsx_file.Sheets[0] // 模板里面应该至少有一个sheet
+			for index, order_logistics := range order_logistics_list {
+				var order_shipping_address = order_service.Get_order_shipping_address(order_logistics.Order.Id, db_session)
+				sheet.Cell(index+1, excel_col_label_to_index("C")).Value = "7D85"
+				sheet.Cell(index+1, excel_col_label_to_index("D")).Value = order_logistics.Order.FullTranId
+				sheet.Cell(index+1, excel_col_label_to_index("E")).Value = order_shipping_address.Name
+
+				var full_address = order_shipping_address.Street1 + order_shipping_address.Street2
+				address1, address2 := split_address(full_address, 35)
+				sheet.Cell(index+1, excel_col_label_to_index("G")).Value = address1
+				sheet.Cell(index+1, excel_col_label_to_index("H")).Value = address2
+				sheet.Cell(index+1, excel_col_label_to_index("K")).Value = order_shipping_address.CityName
+				sheet.Cell(index+1, excel_col_label_to_index("L")).Value = order_shipping_address.Province
+				sheet.Cell(index+1, excel_col_label_to_index("M")).Value = order_shipping_address.PostalCode
+				sheet.Cell(index+1, excel_col_label_to_index("N")).Value = order_shipping_address.CountryName
+				sheet.Cell(index+1, excel_col_label_to_index("O")).Value = order_shipping_address.Phone
+				sheet.Cell(index+1, excel_col_label_to_index("P")).Value = "FALSE"
+				sheet.Cell(index+1, excel_col_label_to_index("S")).Value = "A"
+				sheet.Cell(index+1, excel_col_label_to_index("T")).Value = "N"
+				sheet.Cell(index+1, excel_col_label_to_index("V")).Value = "N"
+				sheet.Cell(index+1, excel_col_label_to_index("X")).Value = order_logistics.Order.FullTranId
+				sheet.Cell(index+1, excel_col_label_to_index("Y")).Value = "FALSE"
+				sheet.Cell(index+1, excel_col_label_to_index("Z")).Value = "sku 列表"
+				sheet.Cell(index+1, excel_col_label_to_index("AA")).Value = "FALSE"
+				sheet.Cell(index+1, excel_col_label_to_index("AC")).Value = "FALSE"
+				sheet.Cell(index+1, excel_col_label_to_index("AD")).Value = "Iepoch MEL (3PL)"
+				sheet.Cell(index+1, excel_col_label_to_index("AE")).Value = "2 Venture Court"
+				sheet.Cell(index+1, excel_col_label_to_index("AI")).Value = "DANDENONG SOUTH"
+				sheet.Cell(index+1, excel_col_label_to_index("AJ")).Value = "VIC"
+				sheet.Cell(index+1, excel_col_label_to_index("AK")).Value = "3175"
+				sheet.Cell(index+1, excel_col_label_to_index("AL")).Value = "AU"
+				sheet.Cell(index+1, excel_col_label_to_index("AX")).Value = order_logistics.Order.BuyerEmail
+				sheet.Cell(index+1, excel_col_label_to_index("AY")).Value = "TRACKADV"
+				sheet.Cell(index+1, excel_col_label_to_index("BI")).Value = fmt.Sprint(order_logistics.OrderLogistics.Weight)
+				sheet.Cell(index+1, excel_col_label_to_index("BO")).Value = "FALSE"
+				sheet.Cell(index+1, excel_col_label_to_index("BP")).Value = "FALSE"
+			}
+
+		} else if stock_code == excel_export_stock_bne_code {
+			xlsx_file, err = xlsx.OpenFile(filepath.Join(excel_template_logistics_export_dir, "eparcel_bne.xlsx"))
+			core.HandleError(err)
+			export_excel_file_name = "eParcel 布里斯班"
+
+			sheet := xlsx_file.Sheets[0] // 模板里面应该至少有一个sheet
+			for index, order_logistics := range order_logistics_list {
+				var order_shipping_address = order_service.Get_order_shipping_address(order_logistics.Order.Id, db_session)
+				sheet.Cell(index+1, excel_col_label_to_index("C")).Value = "7D85"
+				sheet.Cell(index+1, excel_col_label_to_index("D")).Value = order_logistics.Order.FullTranId
+				sheet.Cell(index+1, excel_col_label_to_index("E")).Value = order_shipping_address.Name
+
+				var full_address = order_shipping_address.Street1 + order_shipping_address.Street2
+				address1, address2 := split_address(full_address, 35)
+				sheet.Cell(index+1, excel_col_label_to_index("G")).Value = address1
+				sheet.Cell(index+1, excel_col_label_to_index("H")).Value = address2
+				sheet.Cell(index+1, excel_col_label_to_index("K")).Value = order_shipping_address.CityName
+				sheet.Cell(index+1, excel_col_label_to_index("L")).Value = order_shipping_address.Province
+				sheet.Cell(index+1, excel_col_label_to_index("M")).Value = order_shipping_address.PostalCode
+				sheet.Cell(index+1, excel_col_label_to_index("N")).Value = order_shipping_address.CountryName
+				sheet.Cell(index+1, excel_col_label_to_index("O")).Value = order_shipping_address.Phone
+				sheet.Cell(index+1, excel_col_label_to_index("P")).Value = "FALSE"
+				sheet.Cell(index+1, excel_col_label_to_index("S")).Value = "A"
+				sheet.Cell(index+1, excel_col_label_to_index("T")).Value = "N"
+				sheet.Cell(index+1, excel_col_label_to_index("V")).Value = "N"
+				sheet.Cell(index+1, excel_col_label_to_index("X")).Value = order_logistics.Order.FullTranId
+				sheet.Cell(index+1, excel_col_label_to_index("Y")).Value = "FALSE"
+				sheet.Cell(index+1, excel_col_label_to_index("Z")).Value = "sku 列表"
+				sheet.Cell(index+1, excel_col_label_to_index("AA")).Value = "FALSE"
+				sheet.Cell(index+1, excel_col_label_to_index("AC")).Value = "FALSE"
+				sheet.Cell(index+1, excel_col_label_to_index("AD")).Value = "Iepoch BNE (3PL)"
+				sheet.Cell(index+1, excel_col_label_to_index("AE")).Value = "2/30 Gow Street"
+				sheet.Cell(index+1, excel_col_label_to_index("AI")).Value = "MOOROOKA"
+				sheet.Cell(index+1, excel_col_label_to_index("AJ")).Value = "QLD"
+				sheet.Cell(index+1, excel_col_label_to_index("AK")).Value = "4105"
+				sheet.Cell(index+1, excel_col_label_to_index("AL")).Value = "AU"
+				sheet.Cell(index+1, excel_col_label_to_index("AX")).Value = order_logistics.Order.BuyerEmail
+				sheet.Cell(index+1, excel_col_label_to_index("AY")).Value = "TRACKADV"
+				sheet.Cell(index+1, excel_col_label_to_index("BI")).Value = fmt.Sprint(order_logistics.OrderLogistics.Weight)
+				sheet.Cell(index+1, excel_col_label_to_index("BO")).Value = "FALSE"
+				sheet.Cell(index+1, excel_col_label_to_index("BP")).Value = "FALSE"
+			}
+		}
 	} else if company_code == excel_export_company_fastway_code && stock_code == excel_export_stock_mel_code {
 		xlsx_file, err = xlsx.OpenFile(filepath.Join(excel_template_logistics_export_dir, "fastway_mel.xlsx"))
 		core.HandleError(err)
@@ -1228,5 +1296,24 @@ func excel_col_label_to_index(row_label string) int {
 }
 
 func split_address(address string, letter_limit int) (address1 string, address2 string) {
-	return "", ""
+	if letter_limit <= 0 {
+		return address, ""
+	}
+
+	var address_rune_list = []rune(address)
+	var address_rune_list_len = len(address_rune_list)
+
+	if address_rune_list_len <= letter_limit {
+		return address, ""
+	}
+
+	var space_rune = ([]rune(" "))[0]
+	var index int
+	for index = letter_limit; index > 0; index-- {
+		if address_rune_list[index] == space_rune {
+			break
+		}
+	}
+
+	return string(address_rune_list[0:index]), string(address_rune_list[index:])
 }
