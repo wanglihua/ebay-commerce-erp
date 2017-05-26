@@ -292,7 +292,7 @@ WHERE ol.mode_id IN (%s) AND ol.stock_id = %d`
 			sheet.Cell(index+1, excel_col_label_to_index("R")).Value = "ATL at safe place"
 			sheet.Cell(index+1, excel_col_label_to_index("S")).Value = order_logistics.Order.FullTranId
 			sheet.Cell(index+1, excel_col_label_to_index("T")).Value = get_order_sku_for_export(order_logistics.Order.Id, db_session)
-			sheet.Cell(index+1, excel_col_label_to_index("U")).Value = ""
+			sheet.Cell(index+1, excel_col_label_to_index("U")).Value = get_fastway_packaging_code(order_logistics.LogisticsMode)
 		}
 
 	} else if company_code == excel_export_company_toll_code && stock_code == excel_export_stock_mel_code {
@@ -404,5 +404,41 @@ WHERE oi.order_id = %d;`
 		}
 	} else { // if order_sku_quantity_list_len > 1 {
 		return "MM"
+	}
+}
+
+func get_fastway_packaging_code(logistics_mode models.LogisticsModeInfo) string {
+	/*
+	FASTWAY
+	字段    代码
+	Label    1
+	A2       4
+	A3       5
+	A4       6
+	A5       7
+	Small    16
+	Medium   17
+	Large    18
+
+	*/
+
+	if strings.Contains(logistics_mode.Name, "FASTWAY") && strings.Contains(logistics_mode.Name, "Label") {
+		return "1"
+	} else if strings.Contains(logistics_mode.Name, "FASTWAY") && strings.Contains(logistics_mode.Name, "A2") {
+		return "4"
+	} else if strings.Contains(logistics_mode.Name, "FASTWAY") && strings.Contains(logistics_mode.Name, "A3") {
+		return "5"
+	} else if strings.Contains(logistics_mode.Name, "FASTWAY") && strings.Contains(logistics_mode.Name, "A4") {
+		return "6"
+	} else if strings.Contains(logistics_mode.Name, "FASTWAY") && strings.Contains(logistics_mode.Name, "A5") {
+		return "7"
+	} else if strings.Contains(logistics_mode.Name, "FASTWAY") && strings.Contains(logistics_mode.Name, "Small") {
+		return "16"
+	} else if strings.Contains(logistics_mode.Name, "FASTWAY") && strings.Contains(logistics_mode.Name, "Medium") {
+		return "17"
+	} else if strings.Contains(logistics_mode.Name, "FASTWAY") && strings.Contains(logistics_mode.Name, "Large") {
+		return "18"
+	} else {
+		return ""
 	}
 }
