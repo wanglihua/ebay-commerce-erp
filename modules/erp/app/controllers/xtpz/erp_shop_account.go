@@ -92,7 +92,10 @@ func (f *ShopAccountDetailForm) Valid(validation *revel.Validation) bool {
 		validation.MaxSize(f.ShopAccount.Name, 100).Message("账号长度不能大于100！")
 	}
 
-	validation.Required(f.ShopAccount.PlatformId).Message("平台不能为空！")
+	// validation.Required(f.ShopAccount.PlatformId).Message("平台不能为空！")
+	if f.ShopAccount.PlatformId == 0 {
+		validation.Error("平台不能为空！")
+	}
 
 	if f.ShopAccount.Desc.Valid == true {
 		validation.MaxSize(f.ShopAccount.Desc.String, 500).Message("描述长度不能大于500！")
