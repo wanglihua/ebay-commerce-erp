@@ -333,8 +333,8 @@
 
                             </form>
                             <form id="formLogisticsCompanyExport" method="post" action='{%url "ErpOrderLogisticsCompanyExport.ExportExcel" %}'>
-                                <input type="hidden" id="company_export_stock_id" name="stock_id" />
-                                <input type="hidden" id="company_export_company_code" name="company_code" />
+                                <input type="hidden" id="company_export_stock_id" name="stock_id"/>
+                                <input type="hidden" id="company_export_company_code" name="company_code"/>
                             </form>
                         </div>
                     </div>
@@ -788,7 +788,7 @@
                         type: "POST",
                         data: {"id_list": id_list},
                         success: function (data) {
-                            if (data.success == false) {
+                            if (data.success === false) {
                                 $.msg.error(data.message);
                                 return;
                             }
@@ -825,6 +825,9 @@
                 );
             },
             exportOrderLogisticsCompany: function () {
+                if ((!vm.logistics_company_export_option.stock_id) || (!vm.logistics_company_export_option.company_code)) {
+                    $.msg.error("请选择要导出的仓库和物流公司！");
+                }
                 $("#company_export_stock_id").val(vm.logistics_company_export_option.stock_id);
                 $("#company_export_company_code").val(vm.logistics_company_export_option.company_code);
                 $("#formLogisticsCompanyExport").submit();
