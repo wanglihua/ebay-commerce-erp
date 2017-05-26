@@ -269,9 +269,12 @@ func (p_ol *OrderLogistics) CalculateList(order_list []models.OrderInfo, db_sess
 		// 7 实际仓库缺货（是在捡货过程中，虽然系统显示有货，但实际仓库没有货了。就需要人工手动将这些订单搬至这里的模块，等待跟客户协商，是退款还是等待集装箱）
 
 		// 8, 9, 10 临时的解决方案
+		//todo to complete
+		/*
 		if p_ol.hold_check_multi_product(&order, p_order_logistics_data, db_session) {
 			continue
 		}
+		*/
 
 		// 12 产品信息不全（长宽高重量不全或者有误），这个检查应该放在任何使用长宽高重量数据的检查之前。 放来匹配物流数据之前
 		if p_ol.hold_check_product_info_miss(&order, p_order_logistics_data, db_session) {
