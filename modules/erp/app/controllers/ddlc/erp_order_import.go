@@ -547,6 +547,7 @@ SELECT sa.id AS shop_id, sa.name AS shop_name FROM erp_shop_account sa;
 			order_shipping_address.Phone = order_shipping_address_service.Normalize_phone(order_import.Dh) // 整理电话号码 "1234 5666"
 			order_shipping_address.Province = order_import.Ssdq
 			order_shipping_address.CityName = order_import.Sscs
+			order_shipping_address.AddressOwner = "eBay"
 			_, err = db_session.Insert(&order_shipping_address)
 			core.HandleError(err)
 
@@ -561,6 +562,17 @@ SELECT sa.id AS shop_id, sa.name AS shop_name FROM erp_shop_account sa;
 			order_item.ItemProductId = order_import.product_id
 			order_item.ItemSku = order_import.Spbh
 			order_item.Quantity = order_import.Spsl
+			order_item.TransactionPriceCurrency = "AU"
+
+			/*
+
+			if order_item.Quantity != 0 {
+				order_item.TransactionPrice = amount_au / float64(order_item.Quantity)
+				order_item.TransactionPriceRmb = amount_rmb / float64(order_item.Quantity)
+			}
+
+			*/
+
 			//order_item.ProductCostPrice = order_import.Cpcb //  这是单个的产品成本， 后来改为成本从库存里面导入，这里就不导入了
 			_, err = db_session.Insert(&order_item)
 			core.HandleError(err)
@@ -568,9 +580,13 @@ SELECT sa.id AS shop_id, sa.name AS shop_name FROM erp_shop_account sa;
 
 		if len(order_import_same_code_list) > 1 {
 			for _, order_import := range order_import_same_code_list[1:] {
+				// 由于马帮导出 BUG 的存在，这里的金额不用累加
+				/*
+				var item_amount_au = order_import.Skje
+				// var item_amount_rmb = item_amount_au * aud_exchange_rate_setting
 
-				var amount_au float64 = order.AmountPaidRmb + order_import.Skje // 这里累加
-				var amount_rmb = amount_au * aud_exchange_rate_setting          // 汇率换算
+				var amount_au float64 = order.AmountPaid + item_amount_au // 这里累加
+				var amount_rmb = amount_au * aud_exchange_rate_setting    // 汇率换算
 
 				order.AmountPaidRmb = amount_rmb
 				order.AmountPaid = amount_au
@@ -582,6 +598,7 @@ SELECT sa.id AS shop_id, sa.name AS shop_name FROM erp_shop_account sa;
 				order.AdjustmentAmount = amount_au
 
 				order.ExpressFee = order.ExpressFee + order_import.Yfsr
+				*/
 
 				// 订单详细
 				var order_item models.OrderItemInfo
@@ -589,17 +606,29 @@ SELECT sa.id AS shop_id, sa.name AS shop_name FROM erp_shop_account sa;
 				order_item.ItemProductId = order_import.product_id
 				order_item.ItemSku = order_import.Spbh
 				order_item.Quantity = order_import.Spsl
+				order_item.TransactionPriceCurrency = "AU"
+
+				/*
+
+				if order_item.Quantity != 0 {
+					order_item.TransactionPrice = item_amount_au / float64(order_item.Quantity)
+					order_item.TransactionPriceRmb = item_amount_rmb  / float64(order_item.Quantity)
+				}
+
+				*/
 
 				_, err = db_session.Insert(&order_item)
 				core.HandleError(err)
 			}
 
+			/*
 			_, err = db_session.Id(order.Id).Cols(
 				"amount_paid_rmb", "amount_paid",
 				"total_amount_rmb", "total_amount",
 				"adjustment_amount_rmb", "adjustment_amount",
 				"express_fee").Update(&order)
 			core.HandleError(err)
+			*/
 		}
 	}
 
