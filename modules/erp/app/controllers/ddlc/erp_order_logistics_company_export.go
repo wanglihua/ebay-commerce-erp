@@ -3,6 +3,7 @@ package controllers
 import (
 	"bytes"
 	"fmt"
+	"math"
 	"path/filepath"
 	"strings"
 	"time"
@@ -295,16 +296,85 @@ WHERE ol.mode_id IN (%s) AND ol.stock_id = %d`
 			sheet.Cell(index+1, excel_col_label_to_index("U")).Value = get_fastway_packaging_code(order_logistics.LogisticsMode)
 		}
 
-	} else if company_code == excel_export_company_toll_code && stock_code == excel_export_stock_mel_code {
-		xlsx_file, err = xlsx.OpenFile(filepath.Join(excel_template_logistics_export_dir, "toll_mel.xlsx"))
+	} else if company_code == excel_export_company_toll_code && (stock_code == excel_export_stock_mel_code || stock_code == excel_export_stock_bne_code) {
+		xlsx_file, err = xlsx.OpenFile(filepath.Join(excel_template_logistics_export_dir, "toll.xlsx"))
 		core.HandleError(err)
-		export_excel_file_name = "TOLL 墨尔本"
+		if stock_code == excel_export_stock_mel_code {
+			export_excel_file_name = "TOLL 墨尔本"
+		} else if stock_code == excel_export_stock_bne_code {
+			export_excel_file_name = "TOLL 布里斯班"
+		}
 
-	} else if company_code == excel_export_company_toll_code && stock_code == excel_export_stock_bne_code {
-		xlsx_file, err = xlsx.OpenFile(filepath.Join(excel_template_logistics_export_dir, "toll_bne.xlsx"))
+		type ModeId struct {
+			ModeId int64 `xorm:"'mode_id'" json:"mode_id"`
+		}
+
+		var mode_id_list = make([]ModeId, 0)
+		sql_get_mode_id_list := `SELECT lm.id AS mode_id FROM erp_logistics_mode lm WHERE lm.stock_id = %d AND lm.name LIKE '%%TOLL%%';`
+		sql_get_mode_id_list = fmt.Sprintf(sql_get_mode_id_list, stock_id)
+		err := db_session.Sql(sql_get_mode_id_list).Find(&mode_id_list)
 		core.HandleError(err)
-		export_excel_file_name = "TOLL 布里斯班"
 
+		var mode_id_str_list = make([]string, 0)
+		for _, mode_id := range mode_id_list {
+			mode_id_str_list = append(mode_id_str_list, fmt.Sprint(mode_id))
+		}
+
+		/*
+SELECT ol.*, o.*, lm.*
+FROM erp_order_logistics ol
+    INNER JOIN erp_order o ON o.id = ol.order_id
+    INNER JOIN erp_logistics_mode lm ON lm.id = ol.mode_id
+WHERE ol.mode_id IN (0) AND ol.stock_id = 0
+		 */
+
+		type order_logistics_view_item_t struct {
+			OrderLogistics models.OrderLogisticsInfo    `xorm:"extends" json:"ol"`
+			Order          models.OrderInfo             `xorm:"extends" json:"o"`
+			LogisticsMode  models.LogisticsModeInfo     `xorm:"extends" json:"lm"`
+		}
+
+		sql_get_logistics_list := `SELECT ol.*, o.*, lm.*
+FROM erp_order_logistics ol
+    INNER JOIN erp_order o ON o.id = ol.order_id
+WHERE ol.mode_id IN (%s) AND ol.stock_id = %d`
+		sql_get_logistics_list = fmt.Sprintf(sql_get_logistics_list, strings.Join(mode_id_str_list, ","), stock_id)
+		var order_logistics_list = make([]order_logistics_view_item_t, 0)
+		err = db_session.Sql(sql_get_logistics_list).Find(&order_logistics_list)
+		core.HandleError(err)
+
+		sheet := xlsx_file.Sheets[0] // 模板里面应该至少有一个sheet
+		for index, order_logistics := range order_logistics_list {
+			var order_shipping_address = order_service.Get_order_shipping_address(order_logistics.Order.Id, db_session)
+			sheet.Cell(index+1, excel_col_label_to_index("A")).Value = "IPEC"
+			sheet.Cell(index+1, excel_col_label_to_index("B")).Value = "" // 暂时空着
+			sheet.Cell(index+1, excel_col_label_to_index("C")).Value = order_shipping_address.Name
+			sheet.Cell(index+1, excel_col_label_to_index("D")).Value = order_shipping_address.Name // 和 Ｃ　是一样的？
+
+			var full_address = order_shipping_address.Street1 + order_shipping_address.Street2
+			address1, address2 := split_address(full_address, 25)
+			sheet.Cell(index+1, excel_col_label_to_index("E")).Value = address1
+			sheet.Cell(index+1, excel_col_label_to_index("F")).Value = address2
+			sheet.Cell(index+1, excel_col_label_to_index("G")).Value = order_shipping_address.CityName
+			sheet.Cell(index+1, excel_col_label_to_index("H")).Value = order_shipping_address.Province
+			sheet.Cell(index+1, excel_col_label_to_index("I")).Value = order_shipping_address.PostalCode
+			sheet.Cell(index+1, excel_col_label_to_index("K")).Value = "CARTON"
+			sheet.Cell(index+1, excel_col_label_to_index("L")).Value = get_toll_packaging_code(order_logistics.OrderLogistics) // todo: 包裹类型要计算
+			sheet.Cell(index+1, excel_col_label_to_index("M")).Value = "1"
+			sheet.Cell(index+1, excel_col_label_to_index("N")).Value = fmt.Sprint(order_logistics.OrderLogistics.Length)
+			sheet.Cell(index+1, excel_col_label_to_index("Q")).Value = fmt.Sprint(order_logistics.OrderLogistics.Width)
+			sheet.Cell(index+1, excel_col_label_to_index("P")).Value = fmt.Sprint(order_logistics.OrderLogistics.Height)
+			sheet.Cell(index+1, excel_col_label_to_index("Q")).Value = fmt.Sprint(order_logistics.OrderLogistics.DimWeight)
+			sheet.Cell(index+1, excel_col_label_to_index("R")).Value = fmt.Sprint(order_logistics.OrderLogistics.Weight)
+			sheet.Cell(index+1, excel_col_label_to_index("S")).Value = order_logistics.Order.FullTranId
+			sheet.Cell(index+1, excel_col_label_to_index("T")).Value = order_logistics.Order.FullTranId // 和 S 一样的？
+			sheet.Cell(index+1, excel_col_label_to_index("U")).Value = "ATL at safe place"
+			sheet.Cell(index+1, excel_col_label_to_index("V")).Value = get_order_sku_for_export(order_logistics.Order.Id, db_session)
+			sheet.Cell(index+1, excel_col_label_to_index("W")).Value = order_logistics.Order.FullTranId // 和 S 一样的？
+
+			sheet.Cell(index+1, excel_col_label_to_index("X")).Value = order_shipping_address.Phone
+			sheet.Cell(index+1, excel_col_label_to_index("Y")).Value = order_logistics.Order.BuyerEmail
+		}
 	} else {
 		return c.RenderJson(map[string]interface{}{
 			"success": false,
@@ -409,17 +479,16 @@ WHERE oi.order_id = %d;`
 
 func get_fastway_packaging_code(logistics_mode models.LogisticsModeInfo) string {
 	/*
-	FASTWAY
-	字段    代码
-	Label    1
-	A2       4
-	A3       5
-	A4       6
-	A5       7
-	Small    16
-	Medium   17
-	Large    18
-
+		FASTWAY
+		字段    代码
+		Label    1
+		A2       4
+		A3       5
+		A4       6
+		A5       7
+		Small    16
+		Medium   17
+		Large    18
 	*/
 
 	if strings.Contains(logistics_mode.Name, "FASTWAY") && strings.Contains(logistics_mode.Name, "Label") {
@@ -438,6 +507,30 @@ func get_fastway_packaging_code(logistics_mode models.LogisticsModeInfo) string 
 		return "17"
 	} else if strings.Contains(logistics_mode.Name, "FASTWAY") && strings.Contains(logistics_mode.Name, "Large") {
 		return "18"
+	} else {
+		return ""
+	}
+}
+
+func get_toll_packaging_code(order_logistics models.OrderLogisticsInfo) string {
+	/*
+		包裹类型    代表
+		C         TOLL < 25KG
+		LC        TOLL >25KG
+		VL        TOLL > 50KG
+		XL        TOLL >100KG
+		这个是打折后的体积重 与 实际重 取大值 判断
+	 */
+
+	var weight = math.Max(order_logistics.DimWeight, order_logistics.Weight)
+	if weight <= 25 {
+		return "C"
+	} else if weight > 25 && weight <= 50 {
+		return "LC"
+	} else if weight > 50 && weight <= 100 {
+		return "VL"
+	} else if weight > 100 {
+		return "XL"
 	} else {
 		return ""
 	}

@@ -609,7 +609,7 @@ func (p_ol *OrderLogistics) hold_check_international(p_order *models.OrderInfo, 
 func (p_ol *OrderLogistics) hold_check_address_info_miss(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, db_session *xorm.Session) (is_hold_return bool) {
 	var shipping_address = p_order_logistics_data.order_shipping_address
 	if shipping_address.Id == 0 || // 数据库中地址信息不存在
-		strings.TrimSpace(shipping_address.Phone) == "" || // 地址信息中缺少电话号码
+		// strings.TrimSpace(shipping_address.Phone) == "" || // 地址信息中缺少电话号码，后来说电话号码缺失，不算收货人信息不全
 		strings.TrimSpace(shipping_address.PostalCode) == "" || // 地址信息中缺少邮政编码
 		strings.TrimSpace(shipping_address.Name) == "" || // 地址信息中缺少收件人
 		(strings.TrimSpace(shipping_address.Street1) == "" && strings.TrimSpace(shipping_address.Street2) == "" ) { // 地址信息中缺少详细地址信息

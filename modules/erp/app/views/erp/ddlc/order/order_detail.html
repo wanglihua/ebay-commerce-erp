@@ -111,9 +111,8 @@
                                             <input id="ebay_address_name" type="text" v-model="detail.ebay_shipping_address.name"/>
                                         </div>
                                         <div>
-                                            <label for="ebay_address_street1">Address:</label>
-                                            <input id="ebay_address_street1" type="text" v-model="detail.ebay_shipping_address.street1"/>
-                                            <input id="ebay_address_street2" type="text" v-model="detail.ebay_shipping_address.street2"/>
+                                            <label>Address:</label>
+                                            <span>{{detail.ebay_shipping_address.street1}} {{detail.ebay_shipping_address.street2}}</span>
                                         </div>
                                         <div>
                                             <label for="ebay_address_city">City:</label>
@@ -154,9 +153,8 @@
                                             <input id="paypal_address_name" type="text" v-model="detail.paypal_shipping_address.name"/>
                                         </div>
                                         <div>
-                                            <label for="paypal_address_street1">Address:</label>
-                                            <input id="paypal_address_street1" type="text" v-model="detail.paypal_shipping_address.street1"/>
-                                            <input id="paypal_address_street2" type="text" v-model="detail.paypal_shipping_address.street2"/>
+                                            <label>Address:</label>
+                                            <span>{{detail.paypal_shipping_address.street1}} {{detail.paypal_shipping_address.street2}}</span>
                                         </div>
                                         <div>
                                             <label for="paypal_address_city">City:</label>
