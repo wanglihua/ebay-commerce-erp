@@ -127,20 +127,23 @@ func (c ErpOrderLogisticsCompanyExport) ExportExcel() revel.Result {
 		}
 
 		/*
-SELECT ol.*, o.*
+SELECT ol.*, o.*, sa.*
 FROM erp_order_logistics ol
     INNER JOIN erp_order o ON o.id = ol.order_id
+    LEFT JOIN erp_shop_account sa ON sa.id = o.shop_id
 WHERE ol.mode_id IN (0) AND ol.stock_id = 0
 		 */
 
 		type order_logistics_view_item_t struct {
 			OrderLogistics models.OrderLogisticsInfo    `xorm:"extends" json:"ol"`
 			Order          models.OrderInfo             `xorm:"extends" json:"o"`
+			ShopAccount    models.ShopAccountInfo       `xorm:"extends" json:"sa"`
 		}
 
-		sql_get_logistics_list := `SELECT ol.*, o.*
+		sql_get_logistics_list := `SELECT ol.*, o.*, sa.*
 FROM erp_order_logistics ol
     INNER JOIN erp_order o ON o.id = ol.order_id
+    LEFT JOIN erp_shop_account sa ON sa.id = o.shop_id
 WHERE o.status_id = %d AND ol.mode_id IN (%s) AND ol.stock_id = %d`
 		sql_get_logistics_list = fmt.Sprintf(sql_get_logistics_list, models.ORDER_STATUS_PHZ, strings.Join(mode_id_str_list, ","), stock_id)
 		var order_logistics_list = make([]order_logistics_view_item_t, 0)
@@ -172,7 +175,7 @@ WHERE o.status_id = %d AND ol.mode_id IN (%s) AND ol.stock_id = %d`
 				sheet.Cell(index+2, excel_col_label_to_index("S")).Value = "A"
 				sheet.Cell(index+2, excel_col_label_to_index("T")).Value = "N"
 				sheet.Cell(index+2, excel_col_label_to_index("V")).Value = "N"
-				sheet.Cell(index+2, excel_col_label_to_index("X")).Value = order_logistics.Order.FullTranId
+				sheet.Cell(index+2, excel_col_label_to_index("X")).Value = fmt.Sprintf("FROM:%s", order_logistics.ShopAccount.Name)
 				sheet.Cell(index+2, excel_col_label_to_index("Y")).Value = "FALSE"
 				sheet.Cell(index+2, excel_col_label_to_index("Z")).Value = get_order_sku_for_export(order_logistics.Order.Id, db_session)
 				sheet.Cell(index+2, excel_col_label_to_index("AA")).Value = "FALSE"
@@ -263,6 +266,7 @@ SELECT ol.*, o.*, lm.*
 FROM erp_order_logistics ol
     INNER JOIN erp_order o ON o.id = ol.order_id
     INNER JOIN erp_logistics_mode lm ON lm.id = ol.mode_id
+    LEFT JOIN erp_shop_account sa ON sa.id = o.shop_id
 WHERE ol.mode_id IN (0) AND ol.stock_id = 0
 		 */
 
@@ -270,12 +274,14 @@ WHERE ol.mode_id IN (0) AND ol.stock_id = 0
 			OrderLogistics models.OrderLogisticsInfo    `xorm:"extends" json:"ol"`
 			Order          models.OrderInfo             `xorm:"extends" json:"o"`
 			LogisticsMode  models.LogisticsModeInfo     `xorm:"extends" json:"lm"`
+			ShopAccount    models.ShopAccountInfo       `xorm:"extends" json:"sa"`
 		}
 
-		sql_get_logistics_list := `SELECT ol.*, o.*, lm.*
+		sql_get_logistics_list := `SELECT ol.*, o.*, lm.*, sa.*
 FROM erp_order_logistics ol
     INNER JOIN erp_order o ON o.id = ol.order_id
     INNER JOIN erp_logistics_mode lm ON lm.id = ol.mode_id
+    LEFT JOIN erp_shop_account sa ON sa.id = o.shop_id
 WHERE  o.status_id = %d AND ol.mode_id IN (%s) AND ol.stock_id = %d`
 		sql_get_logistics_list = fmt.Sprintf(sql_get_logistics_list, models.ORDER_STATUS_PHZ, strings.Join(mode_id_str_list, ","), stock_id)
 		var order_logistics_list = make([]order_logistics_view_item_t, 0)
@@ -301,7 +307,7 @@ WHERE  o.status_id = %d AND ol.mode_id IN (%s) AND ol.stock_id = %d`
 			sheet.Cell(index+1, excel_col_label_to_index("O")).Value = order_logistics.Order.BuyerEmail
 			sheet.Cell(index+1, excel_col_label_to_index("P")).Value = order_shipping_address.Phone
 			sheet.Cell(index+1, excel_col_label_to_index("R")).Value = "ATL at safe place"
-			sheet.Cell(index+1, excel_col_label_to_index("S")).Value = order_logistics.Order.FullTranId
+			sheet.Cell(index+1, excel_col_label_to_index("S")).Value = fmt.Sprintf("FROM:%s", order_logistics.ShopAccount.Name)
 			sheet.Cell(index+1, excel_col_label_to_index("T")).Value = get_order_sku_for_export(order_logistics.Order.Id, db_session)
 			sheet.Cell(index+1, excel_col_label_to_index("U")).Value = get_fastway_packaging_code(order_logistics.LogisticsMode)
 		}
@@ -335,6 +341,7 @@ SELECT ol.*, o.*, lm.*
 FROM erp_order_logistics ol
     INNER JOIN erp_order o ON o.id = ol.order_id
     INNER JOIN erp_logistics_mode lm ON lm.id = ol.mode_id
+    LEFT JOIN erp_shop_account sa ON sa.id = o.shop_id
 WHERE ol.mode_id IN (0) AND ol.stock_id = 0
 		 */
 
@@ -342,12 +349,14 @@ WHERE ol.mode_id IN (0) AND ol.stock_id = 0
 			OrderLogistics models.OrderLogisticsInfo    `xorm:"extends" json:"ol"`
 			Order          models.OrderInfo             `xorm:"extends" json:"o"`
 			LogisticsMode  models.LogisticsModeInfo     `xorm:"extends" json:"lm"`
+			ShopAccount    models.ShopAccountInfo       `xorm:"extends" json:"sa"`
 		}
 
-		sql_get_logistics_list := `SELECT ol.*, o.*, lm.*
+		sql_get_logistics_list := `SELECT ol.*, o.*, lm.*, sa.*
 FROM erp_order_logistics ol
     INNER JOIN erp_order o ON o.id = ol.order_id
     INNER JOIN erp_logistics_mode lm ON lm.id = ol.mode_id
+    LEFT JOIN erp_shop_account sa ON sa.id = o.shop_id
 WHERE o.status_id = %d AND ol.mode_id IN (%s) AND ol.stock_id = %d`
 		sql_get_logistics_list = fmt.Sprintf(sql_get_logistics_list, models.ORDER_STATUS_PHZ, strings.Join(mode_id_str_list, ","), stock_id)
 		var order_logistics_list = make([]order_logistics_view_item_t, 0)
@@ -378,7 +387,7 @@ WHERE o.status_id = %d AND ol.mode_id IN (%s) AND ol.stock_id = %d`
 			sheet.Cell(index+1, excel_col_label_to_index("Q")).Value = fmt.Sprint(order_logistics.OrderLogistics.DimWeight)
 			sheet.Cell(index+1, excel_col_label_to_index("R")).Value = fmt.Sprint(order_logistics.OrderLogistics.Weight)
 			sheet.Cell(index+1, excel_col_label_to_index("S")).Value = order_logistics.Order.FullTranId
-			sheet.Cell(index+1, excel_col_label_to_index("T")).Value = order_logistics.Order.FullTranId // 和 S 一样的？
+			sheet.Cell(index+1, excel_col_label_to_index("T")).Value = fmt.Sprintf("FROM:%s", order_logistics.ShopAccount.Name)
 			sheet.Cell(index+1, excel_col_label_to_index("U")).Value = "ATL at safe place"
 			sheet.Cell(index+1, excel_col_label_to_index("V")).Value = get_order_sku_for_export(order_logistics.Order.Id, db_session)
 			sheet.Cell(index+1, excel_col_label_to_index("W")).Value = order_logistics.Order.FullTranId // 和 S 一样的？
