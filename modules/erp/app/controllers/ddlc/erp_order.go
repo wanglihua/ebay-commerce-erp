@@ -570,7 +570,7 @@ func (c ErpOrder) PeiHuo() revel.Result {
 }
 
 func (c ErpOrder) FaHuo() revel.Result {
-	pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_PHZ, c.Session)
+	pass_service.Check_login_user_pass_or([]int64{pass_res.DDLC_ORDER_PHZ, pass_res.DDLC_ORDER_HOLD}, c.Session)
 
 	db_session := c.DbSession
 
@@ -603,7 +603,7 @@ func (c ErpOrder) FaHuo() revel.Result {
 }
 
 func (c ErpOrder) ShiJiWuHuo() revel.Result {
-	pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_PHZ, c.Session)
+	pass_service.Check_login_user_pass_or([]int64{pass_res.DDLC_ORDER_PHZ, pass_res.DDLC_ORDER_HOLD}, c.Session)
 
 	db_session := c.DbSession
 
