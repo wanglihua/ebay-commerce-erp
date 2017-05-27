@@ -695,6 +695,7 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 	var final_selected_stock_id int64 = 0
 	var final_selected_stock models.StockInfo
 	var final_selected_mode_id int64 = 0
+	var final_selected_mode models.LogisticsModeInfo
 	var final_selected_fee_rate_id int64 = 0
 	var final_total_fee float64 = 0 // 最终的物流费用，
 	var final_length float64 = 0
@@ -1151,6 +1152,7 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 			final_selected_stock_id = logistics_mode.StockId
 			final_selected_stock = logistics_mode_stock
 			final_selected_mode_id = logistics_mode.Id
+			final_selected_mode = logistics_mode
 			final_total_fee = total_fee_in_mode
 			final_cost_amount = cost_amount_in_mode
 			final_total_amount = total_amount_in_mode
@@ -1170,6 +1172,7 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 				final_selected_stock_id = logistics_mode.StockId
 				final_selected_stock = logistics_mode_stock
 				final_selected_mode_id = logistics_mode.Id
+				final_selected_mode = logistics_mode
 				final_total_fee = total_fee_in_mode
 				final_cost_amount = cost_amount_in_mode
 				final_total_amount = total_amount_in_mode
@@ -1275,14 +1278,23 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 		core.HandleError(err)
 	}
 
-	// 把订单状态修改为 待配货
-	p_order.StatusId = models.ORDER_STATUS_DPH
+	var update_col_list = []string{"status_id", "stock_id", "address_id", "company_id", "mode_id"}
+	if final_selected_mode.TypeId == models.LOGISTICS_MODE_TYPE_EXPRESS {
+		// 把订单状态修改为 Hold
+		p_order.HoldTypeId = core.MakeNullInt(models.ORDER_HOLD_TYPE_EXPRESS, true)
+		p_order.StatusId = models.ORDER_STATUS_HOLD // 修改订单状态为 hold 状态
+
+		update_col_list = append(update_col_list, "hold_type_id")
+	} else {
+		// 把订单状态修改为 待配货
+		p_order.StatusId = models.ORDER_STATUS_DPH
+	}
 	// 填入匹配过程中的最后的 stock_id 和 address_id
 	p_order.StockId = final_selected_stock_id
 	p_order.AddressId = address_id
 	p_order.CompanyId = final_selected_company_id
 	p_order.ModeId = final_selected_mode_id
-	_, err = db_session.Id(p_order.Id).Cols("status_id", "stock_id", "address_id", "company_id", "mode_id").Update(p_order)
+	_, err = db_session.Id(p_order.Id).Cols(update_col_list...).Update(p_order)
 	core.HandleError(err)
 
 	// 多个商品时，考虑拆包的方式
