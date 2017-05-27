@@ -8,6 +8,7 @@ import (
 	"matrix/modules/auth/pass_res"
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/erp/models"
+	"matrix/modules/erp/service/order_import_batch_service"
 	"matrix/modules/erp/service/order_service"
 	"matrix/modules/erp/setting"
 )
@@ -34,14 +35,19 @@ func (c ErpOrderHold) Index() revel.Result {
 func (c ErpOrderHold) PageData() revel.Result {
 	var db_session = c.DbSession
 
+	// 获得导入的批次列表
+	var batch_code_list = order_import_batch_service.Get_order_import_batch_code_list(db_session)
+
 	// hold类型列表
 	var hold_type_list = make([]models.OrderHoldTypeInfo, 0)
 	err := db_session.OrderBy("ord ASC").Find(&hold_type_list)
 	core.HandleError(err)
 
 	return c.RenderJson(map[string]interface{}{
-		"hold_type_id":   0,
-		"hold_type_list": hold_type_list,
+		"batch_code":      0,
+		"batch_code_list": batch_code_list,
+		"hold_type_id":    0,
+		"hold_type_list":  hold_type_list,
 	})
 }
 
@@ -49,6 +55,9 @@ func (c ErpOrderHold) ListData() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_HOLD, c.Session)
 
 	db_session := c.DbSession
+
+	var batch_code int64
+	c.Params.Bind(&batch_code, "batch_code")
 
 	var hold_type_id int64
 	c.Params.Bind(&hold_type_id, "hold_type_id")
@@ -59,6 +68,10 @@ func (c ErpOrderHold) ListData() revel.Result {
 
 	if hold_type_id != 0 {
 		filter = core.SqlAnd(filter, fmt.Sprintf("o.hold_type_id = %d", hold_type_id))
+	}
+
+	if batch_code != 0 {
+		filter = core.SqlAnd(filter, fmt.Sprintf("o.batch_code = %d", batch_code))
 	}
 
 	order_list, count := order_service.Get_order_data_list(db_session, filter, order, offset, limit)

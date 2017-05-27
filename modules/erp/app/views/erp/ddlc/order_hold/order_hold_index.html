@@ -46,6 +46,17 @@
                             </select>
                             */%}
 
+                            <label class="control-label no-padding-right" for="batch_code">导入批次号</label>
+                            <select id="batch_code" name="page.batch_code" v-model.number="page.batch_code" style="width: 135px;" @change="refreshList()">
+                                <option :value="0">-导入批次号-</option>
+                                <template v-for="batch_code in page.batch_code_list">
+                                    <option :value="batch_code">{{batch_code}}</option>
+                                </template>
+                            </select>
+                            <button class="btn btn-mini btn-primary" @click="refreshList()">
+                                &nbsp;<i class="ace-icon fa fa-search"></i>查&nbsp;询&nbsp;
+                            </button>
+
                             <div class="link_query_list">
                                 <a :class="page.hold_type_id == 0 ? 'selected' : ''" href="#" @click="selectHoldType(0)"><img style="border: none;height: 24px;" src="/static/images/icons/all_check.png" class="link_icon" alt="全部"/>全部</a>
                                 <template v-for="hold_type in page.hold_type_list">
