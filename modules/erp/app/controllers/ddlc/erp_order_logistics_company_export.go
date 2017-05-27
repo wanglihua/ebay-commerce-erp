@@ -218,7 +218,7 @@ WHERE o.status_id = %d AND ol.mode_id IN (%s) AND ol.stock_id = %d`
 				sheet.Cell(index+2, excel_col_label_to_index("S")).Value = "A"
 				sheet.Cell(index+2, excel_col_label_to_index("T")).Value = "N"
 				sheet.Cell(index+2, excel_col_label_to_index("V")).Value = "N"
-				sheet.Cell(index+2, excel_col_label_to_index("X")).Value = order_logistics.Order.FullTranId
+				sheet.Cell(index+2, excel_col_label_to_index("X")).Value =  fmt.Sprintf("FROM:%s", order_logistics.ShopAccount.Name)
 				sheet.Cell(index+2, excel_col_label_to_index("Y")).Value = "FALSE"
 				sheet.Cell(index+2, excel_col_label_to_index("Z")).Value = get_order_sku_for_export(order_logistics.Order.Id, db_session)
 				sheet.Cell(index+2, excel_col_label_to_index("AA")).Value = "FALSE"
