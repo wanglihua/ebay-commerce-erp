@@ -162,12 +162,12 @@
                         {
                             "mDataProp": "sa.name", "title": "店铺名", "bSearchable": false, "bSortable": false,
                             "render": function (data, type, row) {
-                                var tran_id = row.o.tran_id;
-                                if (tran_id === "") {
-                                    tran_id = "--";
+                                var full_tran_id = row.o.full_tran_id;
+                                if (full_tran_id === "") {
+                                    full_tran_id = "--";
                                 }
                                 //return "<div class='div_store_name'>" + row.platform_name + " " + row.shop_name + "</div><div>" + row.shop_code + "</div><div>" + tran_id + "</div>";
-                                return "<div class='div_store_name'>" + row.shop_name + "</div><div>" + row.shop_code + "</div><div>" + tran_id + "</div>";
+                                return "<div class='div_store_name'>" + row.shop_name + "</div><div>" + full_tran_id + "</div>";
                             }
                         },
                         {
@@ -177,7 +177,7 @@
                             }
                         },
                         {
-                            "mDataProp": "o.tran_id", "title": "交易号", "bSearchable": true,
+                            "mDataProp": "o.full_tran_id", "title": "交易号", "bSearchable": true,
                             "render": function (data, type, row) {
                                 return "<div class='div_tran_id'></div>";
                             }
