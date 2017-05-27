@@ -342,6 +342,7 @@
                     "fnServerData": function (sSource, aoData, fnCallback) {
                         showMask("数据加载中，请稍候");
 
+                        aoData.push({'name': 'batch_code', 'value': this_vm.page.batch_code});
                         aoData.push({'name': 'status', 'value': status});
                         aoData.push({'name': 'shop_id', 'value': this_vm.page.shop_id});
                         aoData.push({'name': 'order_type_id', 'value': this_vm.page.order_type_id});
