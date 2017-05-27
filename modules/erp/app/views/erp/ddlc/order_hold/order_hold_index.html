@@ -124,9 +124,9 @@
             initDataTable(
                 '#orderList',
                 {
-                    "sDom": "<'row'<'col-xs-12't>><'row'<'col-xs-6'i><'col-xs-6'p>>",
                     "sAjaxSource": '{%url "ErpOrderHold.ListData"%}',
                     "aaSorting": [[0, "desc"]],
+                    "lengthMenu": [[25, 50, 100, 150, 200, 250, 300, 350, 400, 450, 500], [25, 50, 100, 150, 200, 250, 300, 350, 400, 450, 500]],
                     "iDisplayLength": 50,
                     "aoColumns": [
                         {

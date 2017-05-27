@@ -480,6 +480,7 @@ SELECT sa.id AS shop_id, sa.name AS shop_name FROM erp_shop_account sa;
 	}
 
 	// 合并订单，马帮对于多SKU的订单导出的时候，会根据SKU对订单进行拆解。比如一个订单有3个SKU，那么马帮订单导出的时候，会拆解成3条记录，这个时候需要根据同一订单编号在wollongzone对订单进行合并。
+	// 马帮导出的拆解订单，每一行的收款都是总金额，所以这里金额不用累加
 	var order_import_list_map = make(map[string][]order_import_t)
 
 	for _, order_import := range order_import_list {
