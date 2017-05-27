@@ -93,7 +93,8 @@ func (c Login) Logout() revel.Result {
 
 	var login_user = core.GetLoginUser(c.Session)
 	if login_user.UserId != 0 {
-		login_log_service.Log_logout(login_user, db_session)
+		var session_key = core.GetLoginUserCacheKey(c.Session)
+		login_log_service.Log_logout(session_key, db_session)
 		login_log_service.Remove_user_from_online(c.Session)
 	}
 

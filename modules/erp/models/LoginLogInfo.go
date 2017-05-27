@@ -13,6 +13,7 @@ type LoginLogInfo struct {
 	OnlineTime float64         `xorm:"decimal(18,6) notnull 'online_time'" json:"online_time" smith:"verbose_name=在线时间"`
 	IpAddress  string          `xorm:"nvarchar(20) notnull 'ip_address'" json:"ip_address" smith:"verbose_name=IP"`
 	IpLoc      string          `xorm:"nvarchar(300) notnull 'ip_loc'" json:"ip_loc" smith:"verbose_name=区域"`
+	SessionKey string          `xorm:"nvarchar(300) notnull default('') 'session_key'" json:"session_key" smith:"verbose_name=登录Session"`
 	CreateTime core.Time       `xorm:"created notnull 'create_time'" json:"create_time"`
 	UpdateTime core.Time       `xorm:"updated notnull 'update_time'" json:"update_time"`
 	Version    int             `xorm:"version notnull 'version'" json:"version"`

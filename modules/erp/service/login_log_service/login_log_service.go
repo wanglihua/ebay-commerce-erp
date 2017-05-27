@@ -36,6 +36,7 @@ func Log_login(user auth_models.UserInfo, ip_address string, web_session revel.S
 	login_log.IpLoc = get_ip_location(client_ip)
 
 	login_log.LoginTime = core.Time(time.Now())
+	login_log.SessionKey = core.GetLoginUserCacheKey(web_session)
 
 	db_session.Insert(login_log)
 
@@ -51,13 +52,17 @@ func Log_login(user auth_models.UserInfo, ip_address string, web_session revel.S
 	cache.Set(ONLINE_USER_LIST_CACHE_KEY, online_user_list, online_user_list_expire)
 }
 
-func Log_logout(login_user core.LoginUser, db_session *xorm.Session) {
+func Log_logout(session_key string, db_session *xorm.Session) {
+
+	var login_user core.LoginUser
+	cache.Get(session_key, &login_user)
+
 	// 先获取用户最近的一条登录记录
 	/*
-	SELECT * FROM erp_login_log WHERE user_id = 1 ORDER BY create_time DESC LIMIT 0, 1
+	SELECT * FROM erp_login_log WHERE user_id = 1 AND session_key = '%s' ORDER BY create_time DESC LIMIT 0, 1
 	 */
-	var sql = `SELECT * FROM erp_login_log WHERE user_id = %d ORDER BY create_time DESC LIMIT 0, 1`
-	sql = fmt.Sprintf(sql, login_user.UserId)
+	var sql = `SELECT * FROM erp_login_log WHERE user_id = %d AND session_key = '%s' ORDER BY create_time DESC LIMIT 0, 1`
+	sql = fmt.Sprintf(sql, login_user.UserId, session_key)
 	var login_log models.LoginLogInfo
 	has, err := db_session.Sql(sql).Get(&login_log)
 	if has && err == nil {
@@ -106,7 +111,7 @@ func Check_user_active(db_session *xorm.Session) {
 			to_remove_login_user_key_map[online_user.Login_user_key] = true
 
 			// 记录登出日志
-			Log_logout(login_user, db_session)
+			Log_logout(online_user.Login_user_key, db_session)
 		}
 	}
 
