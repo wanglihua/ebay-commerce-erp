@@ -264,6 +264,21 @@
                                             </div>
                                         </div>
                                     </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="ccsfjt" class="col-xs-6 control-label">物流类型</label>
+                                            <div class="col-xs-6">
+                                                <select id="type_id" name="detail.logistics_mode.type_id" class="input-sm form-control" v-model.number="detail.logistics_mode.type_id">
+                                                    <template v-for="type in detail.logistics_mode_type_list">
+                                                        <option :value="type.id">{{type.name}}</option>
+                                                    </template>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
                                     <div class="col-xs-6">
                                         <div class="form-group">
                                             <label for="status_id" class="col-xs-6 control-label">状态</label>

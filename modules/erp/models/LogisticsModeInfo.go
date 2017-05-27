@@ -25,6 +25,7 @@ type LogisticsModeInfo struct {
 	Sfyxcz     int             `xorm:"int notnull 'sfyxcz'" json:"sfyxcz" smith:"verbose_name=是否允许超重"`                 // 是否允许超重 0 否， 1 是
 	Czjsyf     float64         `xorm:"decimal(18,6) notnull 'czjsyf'" json:"czjsyf" smith:"verbose_name=超重加收多少运费（澳币）"` //超重加收运费
 	Desc       core.NullString `xorm:"nvarchar(500) 'desc'" json:"desc" smith:"verbose_name=描述,max=500"`
+	TypeId     int64           `xorm:"bigint notnull index 'type_id'" json:"type_id" smith:"verbose_name=物流方式类型"` // LogisticsModeTypeInfo 的主键
 	StatusId   int64           `xorm:"bigint notnull index 'status_id'" json:"status_id" smith:"verbose_name=状态"`
 	CreateTime core.Time       `xorm:"created notnull 'create_time'" json:"create_time"`
 	UpdateTime core.Time       `xorm:"updated notnull 'update_time'" json:"update_time"`

@@ -85,10 +85,11 @@ func (c ErpLogisticsMode) ListData() revel.Result {
 }
 
 type LogisticsModeDetailForm struct {
-	LogisticsMode        models.LogisticsModeInfo       `json:"logistics_mode"`
-	LogisticsCompanyList []models.LogisticsCompanyInfo  `json:"logistics_company_list"`
-	StockList            []models.StockInfo             `json:"stock_list"`
-	StatusList           []models.StatusInfo            `json:"status_list"`
+	LogisticsMode         models.LogisticsModeInfo       `json:"logistics_mode"`
+	LogisticsCompanyList  []models.LogisticsCompanyInfo  `json:"logistics_company_list"`
+	StockList             []models.StockInfo             `json:"stock_list"`
+	LogisticsModeTypeList []models.LogisticsModeTypeInfo `json:"logistics_mode_type_list"`
+	StatusList            []models.StatusInfo            `json:"status_list"`
 }
 
 func (f *LogisticsModeDetailForm) IsCreate() bool {
@@ -129,6 +130,7 @@ func (c ErpLogisticsMode) DetailData() revel.Result {
 	} else {
 		logistics_mode.Tjzysjzqx = 1
 		logistics_mode.StatusId = models.LOGISTICS_MODE_ENABLED
+		logistics_mode.TypeId = models.LOGISTICS_MODE_TYPE_PACKAGE
 	}
 
 	var logistics_company_list = make([]models.LogisticsCompanyInfo, 0)
@@ -143,11 +145,16 @@ func (c ErpLogisticsMode) DetailData() revel.Result {
 	err = db_session.Where(fmt.Sprintf("type = %d", models.STATUS_TYPE_LOGISTICS_MODE)).Find(&status_list)
 	core.HandleError(err)
 
+	var logistics_mode_type_list = make([]models.LogisticsModeTypeInfo, 0)
+	err = db_session.OrderBy("id ASC").Find(&logistics_mode_type_list)
+	core.HandleError(err)
+
 	var detail_form LogisticsModeDetailForm
 	detail_form.LogisticsMode = logistics_mode
 	detail_form.LogisticsCompanyList = logistics_company_list
 	detail_form.StockList = stock_list
 	detail_form.StatusList = status_list
+	detail_form.LogisticsModeTypeList = logistics_mode_type_list
 
 	return c.RenderJson(detail_form)
 }
