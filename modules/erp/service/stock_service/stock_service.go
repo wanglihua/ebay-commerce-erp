@@ -56,8 +56,16 @@ func Get_login_user_stock_list(db_session *xorm.Session, web_session revel.Sessi
 
 	var stock_list_filter = fmt.Sprintf("stock_type_id = %d", models.STOCK_TYPE_AU) //只取澳洲的仓库
 	var login_user = core.GetLoginUser(web_session)
-	if pass_service.Is_user_pick_crew(login_user.UserId) { // 如果是仓库拣货人员
-		stock_list_filter = core.SqlAnd(stock_list_filter, fmt.Sprintf("id IN (SELECT spc.stock_id FROM erp_stock_pick_crew spc WHERE spc.user_id = %d)", login_user.UserId))
+	if login_user.IsSuperAdmin == false && pass_service.Is_user_admin(login_user.UserId) == false {
+		var is_user_custom_service = pass_service.Is_user_custom_service(login_user.UserId)
+		var is_user_sales = pass_service.Is_user_sales(login_user.UserId)
+		if is_user_custom_service == false && is_user_sales == false {
+			if pass_service.Is_user_pick_crew(login_user.UserId) { // 如果是仓库拣货人员
+				stock_list_filter = core.SqlAnd(stock_list_filter, fmt.Sprintf("id IN (SELECT spc.stock_id FROM erp_stock_pick_crew spc WHERE spc.user_id = %d)", login_user.UserId))
+			} else {
+				stock_list_filter = core.SqlAnd(stock_list_filter, "1 = 0") //不是管理员，不是拣货人员，也不是销售和客服，就不能看任何一个仓库
+			}
+		}
 	}
 
 	err := db_session.Where(stock_list_filter).OrderBy("ord asc").Find(&stock_list)
