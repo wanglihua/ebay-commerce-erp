@@ -370,10 +370,10 @@ WHERE o.status_id = %d AND ol.mode_id IN (%s) AND ol.stock_id = %d`
 			sheet.Cell(index+1, excel_col_label_to_index("H")).Value = order_shipping_address.Province
 			sheet.Cell(index+1, excel_col_label_to_index("I")).Value = order_shipping_address.PostalCode
 			sheet.Cell(index+1, excel_col_label_to_index("K")).Value = "CARTON"
-			sheet.Cell(index+1, excel_col_label_to_index("L")).Value = get_toll_packaging_code(order_logistics.OrderLogistics) // todo: 包裹类型要计算
+			sheet.Cell(index+1, excel_col_label_to_index("L")).Value = get_toll_packaging_code(order_logistics.OrderLogistics) // 包裹类型要计算
 			sheet.Cell(index+1, excel_col_label_to_index("M")).Value = "1"
 			sheet.Cell(index+1, excel_col_label_to_index("N")).Value = fmt.Sprint(order_logistics.OrderLogistics.Length)
-			sheet.Cell(index+1, excel_col_label_to_index("Q")).Value = fmt.Sprint(order_logistics.OrderLogistics.Width)
+			sheet.Cell(index+1, excel_col_label_to_index("O")).Value = fmt.Sprint(order_logistics.OrderLogistics.Width)
 			sheet.Cell(index+1, excel_col_label_to_index("P")).Value = fmt.Sprint(order_logistics.OrderLogistics.Height)
 			sheet.Cell(index+1, excel_col_label_to_index("Q")).Value = fmt.Sprint(order_logistics.OrderLogistics.DimWeight)
 			sheet.Cell(index+1, excel_col_label_to_index("R")).Value = fmt.Sprint(order_logistics.OrderLogistics.Weight)
