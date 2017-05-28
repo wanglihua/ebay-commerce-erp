@@ -609,7 +609,7 @@ func (c ErpInventory) get_export_excel(db_session *xorm.Session) *xlsx.File {
 		cell = header_row.AddCell()
 		sheet.SetColWidth(col_index, col_index, 10)
 		set_head_cell_style(cell)
-		cell.Value = "成本价（RMB）"
+		cell.Value = "成本价"
 	}
 
 	for index, inventory_view := range inventory_list {
