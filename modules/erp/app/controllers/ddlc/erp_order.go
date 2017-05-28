@@ -11,6 +11,7 @@ import (
 	"matrix/modules/auth/pass_res"
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/erp/models"
+	"matrix/modules/erp/service/order_import_batch_service"
 	"matrix/modules/erp/service/order_logistics_service"
 	"matrix/modules/erp/service/order_service"
 	"matrix/modules/erp/service/paypal_service"
@@ -152,6 +153,9 @@ func (c ErpOrder) PageData() revel.Result {
 
 	db_session := c.DbSession
 
+	// 获得导入的批次列表
+	var batch_code_list = order_import_batch_service.Get_order_import_batch_code_list(db_session)
+
 	shop_list := shop_service.Get_shop_select_item_list(db_session)
 
 	var order_type_list = make([]models.OrderTypeInfo, 0)
@@ -177,6 +181,8 @@ func (c ErpOrder) PageData() revel.Result {
 		"query_criteria_list": c.get_order_query_criteria_list(),
 		"hold_type_list":      special_hold_type_list,
 		"hold_type_id":        -1, // 表示不选择 hold
+		"batch_code":          0,
+		"batch_code_list":     batch_code_list,
 	})
 }
 
@@ -200,6 +206,9 @@ func (c ErpOrder) ListData() revel.Result {
 
 	var hold_type_id int64 = 0
 	c.Params.Bind(&hold_type_id, "hold_type_id")
+
+	var batch_code int64
+	c.Params.Bind(&batch_code, "batch_code")
 
 	var status_id int64 = 0 // 0： all status; other: 具体的 status_id
 
@@ -337,6 +346,10 @@ func (c ErpOrder) ListData() revel.Result {
 			// 不是 待配货状态
 			filter = core.SqlAnd(filter, fmt.Sprintf("o.status_id = %d", status_id))
 		}
+	}
+
+	if batch_code != 0 {
+		filter = core.SqlAnd(filter, fmt.Sprintf("o.batch_code = %d", batch_code))
 	}
 
 	order_list, count := order_service.Get_order_data_list(db_session, filter, order, offset, limit)

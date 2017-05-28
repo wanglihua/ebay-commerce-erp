@@ -389,6 +389,7 @@ func (p_ol *OrderLogistics) hold_check_oss_all_stock(p_order *models.OrderInfo, 
 // 6. 系统显示最佳仓缺货（次佳、海上有货）
 func (p_ol *OrderLogistics) hold_check_oss_best_stock(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, db_session *xorm.Session) (is_hold_return bool) {
 	// 检查 澳洲 的仓库
+	// todo: 这里还有点问题，应该是检查对应的在途仓库？
 	var fun_is_au_stock = func(stock_type_id int64) bool {
 		if stock_type_id == models.STOCK_TYPE_AU {
 			return true
