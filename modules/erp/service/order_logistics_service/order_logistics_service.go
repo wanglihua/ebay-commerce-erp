@@ -1037,8 +1037,10 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 		var total_fee_in_fee_rate float64 = 10000000 //非超重部分的费用，初始为一个很大的不可能的数字， 澳币
 		for _, logistics_fee_rate := range logistics_fee_rate_list {
 
-			// 邮编要对上
-			if strings.TrimSpace(p_order_logistics_data.order_shipping_address.PostalCode) == strings.TrimSpace(logistics_fee_rate.Postcode) {
+			// 邮编要对上，忽略开头的 0
+			var postcode_in_address = strings.TrimPrefix(strings.TrimSpace(p_order_logistics_data.order_shipping_address.PostalCode), "0")
+			var postcode_in_fee_rate = strings.TrimPrefix(strings.TrimSpace(logistics_fee_rate.Postcode), "0")
+			if postcode_in_address == postcode_in_fee_rate {
 				mt.Println()
 				mt.PrintlnIndent(1, "匹配单个费率开始")
 

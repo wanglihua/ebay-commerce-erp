@@ -439,7 +439,7 @@
                     type: "POST",
                     data: {"stock_id": vm.detail.inventory.stock_id},
                     success: function (data) {
-                        if (data.success == false) {
+                        if (data.success === false) {
                             $.msg.error(data.message);
                             return;
                         }

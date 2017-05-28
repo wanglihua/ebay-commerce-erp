@@ -528,6 +528,39 @@ func (c ErpOrder) MatchLogistics() revel.Result {
 	})
 }
 
+func (c ErpOrder) DaiPeiHuo() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_HOLD, c.Session)
+
+	db_session := c.DbSession
+
+	order_id_list := make([]int64, 0)
+	c.Params.Bind(&order_id_list, "id_list")
+
+	var order_list = make([]models.OrderInfo, 0)
+	err := db_session.In("id", order_id_list).Find(&order_list)
+	core.HandleError(err)
+
+	for _, order := range order_list {
+		if order.StatusId != models.ORDER_STATUS_HOLD {
+			return c.RenderJson(map[string]interface{}{
+				"success": false,
+				"message": "订单当前状态不能搬至待配货！",
+			})
+		}
+	}
+
+	for _, order := range order_list {
+		order.StatusId = models.ORDER_STATUS_DPH
+		_, err = db_session.Id(order.Id).Cols("status_id").Update(&order)
+		core.HandleError(err)
+	}
+
+	return c.RenderJson(map[string]interface{}{
+		"success": true,
+		"message": "订单搬至待配货成功！",
+	})
+}
+
 func (c ErpOrder) PeiHuo() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_DPH, c.Session)
 
@@ -570,7 +603,7 @@ func (c ErpOrder) PeiHuo() revel.Result {
 }
 
 func (c ErpOrder) FaHuo() revel.Result {
-	pass_service.Check_login_user_pass_or([]int64{pass_res.DDLC_ORDER_PHZ, pass_res.DDLC_ORDER_HOLD}, c.Session)
+	pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_PHZ, c.Session)
 
 	db_session := c.DbSession
 
@@ -603,7 +636,7 @@ func (c ErpOrder) FaHuo() revel.Result {
 }
 
 func (c ErpOrder) ShiJiWuHuo() revel.Result {
-	pass_service.Check_login_user_pass_or([]int64{pass_res.DDLC_ORDER_PHZ, pass_res.DDLC_ORDER_HOLD}, c.Session)
+	pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_PHZ, c.Session)
 
 	db_session := c.DbSession
 

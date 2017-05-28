@@ -316,6 +316,7 @@ POST /order/match/logistics                ErpOrder.MatchLogistics
 # GET  /order/ywc                            ErpOrderYwc.Index
 # GET  /order/khb                            ErpOrderKhb.Index
 
+POST /order/dai/pei/huo                    ErpOrder.DaiPeiHuo
 POST /order/pei/huo                        ErpOrder.PeiHuo
 POST /order/fa/huo                         ErpOrder.FaHuo
 POST /order/shi/ji/wu/huo                  ErpOrder.ShiJiWuHuo

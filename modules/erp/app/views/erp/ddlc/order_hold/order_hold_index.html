@@ -18,13 +18,9 @@
                         刷新
                     </button>
 
-                    <button class="btn btn-purple btn-sm" @click="faHuo()">
+                    <button class="btn btn-purple btn-sm" @click="daiPeiHuo()">
                         <i class="ace-icon fa fa-shopping-basket"></i>
-                        发货
-                    </button>
-                    <button class="btn btn-pink btn-sm" @click="shiJiWuHuo()">
-                        <i class="ace-icon fa fa-shopping-basket"></i>
-                        实际无货
+                        待配货
                     </button>
 
                     {% if .is_button_quxiao_visible %}
@@ -466,7 +462,7 @@
                 vm.page.hold_type_id = selected_hold_type_id;
                 vm.refreshList();
             },
-            faHuo: function () {
+            daiPeiHuo: function () {
                 var id_list = [];
                 $('#orderList tbody tr>td:first-child input:checkbox').each(function () {
                     if (this.checked) {
@@ -479,40 +475,9 @@
                     return;
                 }
 
-                $.msg.confirm("确认要发货吗？", function () {
+                $.msg.confirm("确认要把订单搬至待配货吗？", function () {
                     $.ajax({
-                        url: '{%url "ErpOrder.FaHuo"%}',
-                        type: "POST",
-                        data: {"id_list": id_list},
-                        success: function (data) {
-                            if (data.success === false) {
-                                $.msg.error(data.message);
-                                return;
-                            }
-                            else {
-                                $.msg.show(data.message);
-                            }
-                            vm.reloadList();
-                        }
-                    });
-                });
-            },
-            shiJiWuHuo: function () {
-                var id_list = [];
-                $('#orderList tbody tr>td:first-child input:checkbox').each(function () {
-                    if (this.checked) {
-                        id_list.push($(this).val());
-                    }
-                });
-
-                if (id_list.length === 0) {
-                    $.msg.alert("请选择数据！");
-                    return;
-                }
-
-                $.msg.confirm("确认要设置实际无货吗？", function () {
-                    $.ajax({
-                        url: '{%url "ErpOrder.ShiJiWuHuo"%}',
+                        url: '{%url "ErpOrder.DaiPeiHuo"%}',
                         type: "POST",
                         data: {"id_list": id_list},
                         success: function (data) {
