@@ -169,7 +169,8 @@ WHERE o.status_id = %d AND ol.mode_id IN (%s) AND ol.stock_id = %d`
 				sheet.Cell(index+2, excel_col_label_to_index("K")).Value = order_shipping_address.CityName
 				sheet.Cell(index+2, excel_col_label_to_index("L")).Value = order_shipping_address.Province
 				sheet.Cell(index+2, excel_col_label_to_index("M")).Value = order_shipping_address.PostalCode
-				sheet.Cell(index+2, excel_col_label_to_index("N")).Value = order_shipping_address.CountryName
+				//sheet.Cell(index+2, excel_col_label_to_index("N")).Value = order_shipping_address.CountryName
+				sheet.Cell(index+2, excel_col_label_to_index("N")).Value = "AU" // 固定
 				sheet.Cell(index+2, excel_col_label_to_index("O")).Value = order_shipping_address.Phone
 				sheet.Cell(index+2, excel_col_label_to_index("P")).Value = "FALSE"
 				sheet.Cell(index+2, excel_col_label_to_index("S")).Value = "A"
@@ -185,7 +186,7 @@ WHERE o.status_id = %d AND ol.mode_id IN (%s) AND ol.stock_id = %d`
 				sheet.Cell(index+2, excel_col_label_to_index("AI")).Value = "DANDENONG SOUTH"
 				sheet.Cell(index+2, excel_col_label_to_index("AJ")).Value = "VIC"
 				sheet.Cell(index+2, excel_col_label_to_index("AK")).Value = "3175"
-				sheet.Cell(index+2, excel_col_label_to_index("AL")).Value = "AU"
+				sheet.Cell(index+2, excel_col_label_to_index("AL")).Value = "AU" // 固定
 				sheet.Cell(index+2, excel_col_label_to_index("AX")).Value = order_logistics.Order.BuyerEmail
 				sheet.Cell(index+2, excel_col_label_to_index("AY")).Value = "TRACKADV"
 				sheet.Cell(index+2, excel_col_label_to_index("BI")).Value = fmt.Sprint(order_logistics.OrderLogistics.Weight)
@@ -212,7 +213,8 @@ WHERE o.status_id = %d AND ol.mode_id IN (%s) AND ol.stock_id = %d`
 				sheet.Cell(index+2, excel_col_label_to_index("K")).Value = order_shipping_address.CityName
 				sheet.Cell(index+2, excel_col_label_to_index("L")).Value = order_shipping_address.Province
 				sheet.Cell(index+2, excel_col_label_to_index("M")).Value = order_shipping_address.PostalCode
-				sheet.Cell(index+2, excel_col_label_to_index("N")).Value = order_shipping_address.CountryName
+				//sheet.Cell(index+2, excel_col_label_to_index("N")).Value = order_shipping_address.CountryName
+				sheet.Cell(index+2, excel_col_label_to_index("N")).Value = "AU"  // 固定
 				sheet.Cell(index+2, excel_col_label_to_index("O")).Value = order_shipping_address.Phone
 				sheet.Cell(index+2, excel_col_label_to_index("P")).Value = "FALSE"
 				sheet.Cell(index+2, excel_col_label_to_index("S")).Value = "A"
@@ -228,7 +230,7 @@ WHERE o.status_id = %d AND ol.mode_id IN (%s) AND ol.stock_id = %d`
 				sheet.Cell(index+2, excel_col_label_to_index("AI")).Value = "MOOROOKA"
 				sheet.Cell(index+2, excel_col_label_to_index("AJ")).Value = "QLD"
 				sheet.Cell(index+2, excel_col_label_to_index("AK")).Value = "4105"
-				sheet.Cell(index+2, excel_col_label_to_index("AL")).Value = "AU"
+				sheet.Cell(index+2, excel_col_label_to_index("AL")).Value = "AU"  // 固定
 				sheet.Cell(index+2, excel_col_label_to_index("AX")).Value = order_logistics.Order.BuyerEmail
 				sheet.Cell(index+2, excel_col_label_to_index("AY")).Value = "TRACKADV"
 				sheet.Cell(index+2, excel_col_label_to_index("BI")).Value = fmt.Sprint(order_logistics.OrderLogistics.Weight)

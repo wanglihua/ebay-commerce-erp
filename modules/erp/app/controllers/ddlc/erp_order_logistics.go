@@ -505,7 +505,6 @@ WHERE ol.stock_id = 0 AND ol.company_id = 0
 
 	row_height := 0.6
 
-	// 序号	商品编号	仓库	仓位	库存	成本价（RMB）
 	{
 		header_row := sheet.AddRow()
 		header_row.SetHeightCM(row_height)

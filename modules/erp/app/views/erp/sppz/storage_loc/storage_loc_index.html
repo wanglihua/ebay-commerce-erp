@@ -25,12 +25,19 @@
                         <i class="ace-icon fa fa-plus"></i>
                         导入
                     </button>
+                    <button class="btn btn-pink btn-sm" @click="exportStorageLoc()">
+                        <i class="ace-icon fa fa-file-excel-o"></i>
+                        导出
+                    </button>
                     <button class="btn btn-danger btn-sm" @click="deleteStorageLoc()">
                         <i class="ace-icon fa fa-trash-o"></i>
                         删除
                     </button>
                 </div>
-                <div style="margin-top: 10px;"><a href="/static/excel-template/storage_loc_import.xlsx">下载Excel模板</a></div>
+                <form id="formExport" method="post" action='{%url "ErpStorageLoc.Export" %}'>
+                </form>
+                <div style="margin-top: 10px;"><a href="/static/excel-template/storage_loc_import.xlsx">下载Excel模板</a>
+                </div>
                 <div>
                     <table id="storageLocList" class="table table-striped table-bordered table-hover"></table>
                     <table id="error_data_list" class="table table-striped table-bordered table-hover" style="display: none;">
@@ -347,6 +354,9 @@
                         }
                     });
                 });
+            },
+            exportStorageLoc: function () {
+                $("#formExport").submit();
             }
         }
     });

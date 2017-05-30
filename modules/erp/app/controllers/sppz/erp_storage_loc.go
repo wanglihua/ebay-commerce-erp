@@ -1,11 +1,14 @@
 package controllers
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"strconv"
 	"strings"
+	"time"
 
+	"github.com/go-xorm/xorm"
 	"github.com/revel/revel"
 	"github.com/tealeg/xlsx"
 	"matrix/core"
@@ -351,6 +354,173 @@ func (c ErpStorageLoc) Import() revel.Result {
 		"success": true,
 		"message": "数据导入成功！",
 	})
+}
+
+func (c ErpStorageLoc) Export() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.SPPZ_STORAGE_LOC, c.Session)
+
+	var db_session = c.DbSession
+
+	xlsx_file := c.get_export_excel(db_session)
+
+	//先把文件内容写到buffer中，再从中读取
+	var buffer bytes.Buffer
+	err := xlsx_file.Write(&buffer)
+	core.HandleError(err)
+
+	reader := bytes.NewReader(buffer.Bytes()) //bytes.Reader 实现了 io.Reader 接口
+
+	file_name := "仓位" + ".xlsx" //"file.xlsx" //可以根据参数生成文件名
+
+	return c.RenderBinary(reader, file_name, revel.Attachment, time.Now())
+}
+
+func (c ErpStorageLoc) get_export_excel(db_session *xorm.Session) *xlsx.File {
+
+	type storage_loc_export_item_t struct {
+		StorageLoc models.StorageLocInfo `xorm:"extends" json:"sl"`
+		Stock      models.StockInfo      `xorm:"extends" json:"s"`
+	}
+
+	/*
+SELECT sl.*, s.*
+FROM erp_storage_loc sl
+    INNER JOIN erp_stock s ON s.id = sl.stock_id
+	 */
+
+	var sql_get_storage_loc_list = `SELECT sl.*, s.*
+FROM erp_storage_loc sl
+    INNER JOIN erp_stock s ON s.id = sl.stock_id`
+
+	var storage_loc_list = make([]storage_loc_export_item_t, 0)
+	err := db_session.Sql(sql_get_storage_loc_list).Find(&storage_loc_list)
+	core.HandleError(err)
+
+	//创建工作薄
+	xlsx_file := xlsx.NewFile()
+
+	sheet, err := xlsx_file.AddSheet("仓位")
+	core.HandleError(err)
+
+	//统一设置标题单元格格式的函数
+	set_head_cell_style := func(cell *xlsx.Cell) {
+		style := xlsx.NewStyle()
+
+		font := * xlsx.NewFont(9, "微软雅黑")
+		font.Bold = true
+		font.Italic = false
+		font.Underline = false
+		style.Font = font
+		style.ApplyBorder = true
+
+		fill := *xlsx.NewFill("solid", "00FFFFFF", "00000000") //CCFFCC
+		style.Fill = fill
+		style.ApplyFill = true
+
+		border := *xlsx.NewBorder("thin", "thin", "thin", "thin")
+		style.Border = border
+		style.ApplyBorder = true
+
+		alignment := *new(xlsx.Alignment)
+		alignment.Horizontal = "center"
+		alignment.Vertical = "center"
+		alignment.WrapText = true
+		style.Alignment = alignment
+		style.ApplyAlignment = true
+
+		cell.SetStyle(style)
+	}
+
+	set_text_cell_style := func(cell *xlsx.Cell, horizontal_align string) {
+		style := xlsx.NewStyle()
+
+		font := * xlsx.NewFont(9, "微软雅黑")
+		font.Bold = false
+		font.Italic = false
+		font.Underline = false
+		style.Font = font
+		style.ApplyBorder = true
+
+		fill := *xlsx.NewFill("solid", "00FFFFFF", "00000000") //CCFFCC
+		style.Fill = fill
+		style.ApplyFill = true
+
+		border := *xlsx.NewBorder("thin", "thin", "thin", "thin")
+		style.Border = border
+		style.ApplyBorder = true
+
+		alignment := *new(xlsx.Alignment)
+		alignment.Horizontal = horizontal_align
+		alignment.Vertical = "center"
+		alignment.WrapText = true
+		style.Alignment = alignment
+		style.ApplyAlignment = true
+
+		cell.SetStyle(style)
+	}
+
+	row_height := 0.6
+
+	// 序号	仓库名称	仓位名称	仓位描述
+	{
+		header_row := sheet.AddRow()
+		header_row.SetHeightCM(row_height)
+
+		col_index := 0
+		cell := header_row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 8)
+		set_head_cell_style(cell)
+		cell.Value = "序号"
+
+		col_index++
+		cell = header_row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 12)
+		set_head_cell_style(cell)
+		cell.Value = "仓库名称"
+
+		col_index++
+		cell = header_row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 20)
+		set_head_cell_style(cell)
+		cell.Value = "仓位名称"
+
+		col_index++
+		cell = header_row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 20)
+		set_head_cell_style(cell)
+		cell.Value = "仓位描述"
+	}
+
+	for index, storage_loc := range storage_loc_list {
+		row := sheet.AddRow()
+		row.SetHeightCM(row_height)
+
+		// 序号
+		cell := row.AddCell()
+		set_text_cell_style(cell, "center")
+		cell.Value = fmt.Sprint(index + 1)
+
+		// 仓库名称
+		cell = row.AddCell()
+		set_text_cell_style(cell, "left")
+		cell.Value = storage_loc.Stock.Name
+
+		// 仓位名称
+		cell = row.AddCell()
+		set_text_cell_style(cell, "left")
+		cell.Value = storage_loc.StorageLoc.Name
+
+		// 仓位描述
+		cell = row.AddCell()
+		set_text_cell_style(cell, "left")
+		if storage_loc.StorageLoc.Desc.Valid == true {
+			cell.Value = storage_loc.StorageLoc.Desc.String
+		} else {
+			cell.Value = ""
+		}
+	}
+
+	return xlsx_file
 }
 
 func (c ErpStorageLoc) GetStorageLocList() revel.Result {
