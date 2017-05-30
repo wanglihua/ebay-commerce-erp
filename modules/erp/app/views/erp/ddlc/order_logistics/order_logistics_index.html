@@ -529,15 +529,7 @@
                                     dim_weight = "--";
                                 }
 
-                                var sfkltjz = row.sfkltjz;
-                                if (sfkltjz === 0) {
-                                    sfkltjz = "否";
-                                }
-                                else {
-                                    sfkltjz = "是";
-                                }
-
-                                return "<div class='div_actual_weight'>" + actual_weight + "</div><div>" + dim_weight + "</div><div>" + sfkltjz + "</div>";
+                                return "<div class='div_actual_weight'>" + actual_weight + "</div><div>" + dim_weight + "</div><div>" + row.sfkltjz + "</div>";
                             }
                         },
                         {

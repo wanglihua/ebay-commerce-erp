@@ -1248,6 +1248,9 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 			} else if (math.Abs(mid_length - final_height)) < MIN_FLOAT_DIFF {
 				final_height = final_height * logistics_setting.Pphzbzl
 			}
+
+			// 匹配后中边打折时，同时对体积重打折。
+			final_dim_weight = final_dim_weight * logistics_setting.Pphzbzl
 		}
 	}
 

@@ -166,21 +166,22 @@ func (c ErpOrderImport) Upload() revel.Result {
 	}
 
 	type order_import_t struct {
-		Yzbm         string  `json:"yzbm"` // 0 邮政编码  address
-		Yjdz         string  `json:"yjdz"` // 1 邮寄地址  address
-		Spbh         string  `json:"spbh"` // 2 商品编号  order_item
-		Spsl         int     `json:"spsl"` // 3 商品数量  order_item
-		Dpm          string  `json:"dpm"`  // 4 店铺名    order
-		Ddbh         string  `json:"ddbh"` // 5 订单编号  order
-		Jydh         string  `json:"jydh"` // 6 交易单号  order
-		Skje         float64 `json:"skje"` // 7 收款金额(澳币) order
-		Yfsr         float64 `json:"yfsr"` // 8 运费收入(澳币)  order
-		Khzh         string  `json:"khzh"` // 10 客户账号 order
-		Khxm         string  `json:"khxm"` // 11 客户姓名 address
-		Khyx         string  `json:"khyx"` // 12 客户邮箱 order
-		Dh           string  `json:"dh"`   // 13 电话     address
-		Ssdq         string  `json:"ssdq"` // 14 所属地区  address
-		Sscs         string  `json:"sscs"` // 15 所属城市  address
+		Yzbm         string  `json:"yzbm"`   // 0 邮政编码  address
+		Yjdz         string  `json:"yjdz"`   // 1 邮寄地址  address
+		Spbh         string  `json:"spbh"`   // 2 商品编号  order_item
+		Spsl         int     `json:"spsl"`   // 3 商品数量  order_item
+		Dpm          string  `json:"dpm"`    // 4 店铺名    order
+		Ddbh         string  `json:"ddbh"`   // 5 订单编号  order
+		Jydh         string  `json:"jydh"`   // 6 交易单号  order
+		Skje         float64 `json:"skje"`   // 7 收款金额(澳币) order
+		Yfsr         float64 `json:"yfsr"`   // 8 运费收入(澳币)  order
+		Khzh         string  `json:"khzh"`   // 10 客户账号 order
+		Khxm         string  `json:"khxm"`   // 11 客户姓名 address
+		Khyx         string  `json:"khyx"`   // 12 客户邮箱 order
+		Dh           string  `json:"dh"`     // 13 电话     address
+		Guojia       string  `json:"guojia"` // 14 国家  address
+		Ssdq         string  `json:"ssdq"`   // 15 所属地区  address
+		Sscs         string  `json:"sscs"`   // 16 所属城市  address
 		ErrorMessage string  `json:"error_message"`
 		shop_id      int64
 		shop_code    string
@@ -333,6 +334,14 @@ func (c ErpOrderImport) Upload() revel.Result {
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
 			order_import.Dh = cell_val
+			col_index++
+
+			// 国家
+			cell = row.Cells[col_index]
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
+			order_import.Guojia = cell_val
 			col_index++
 
 			// 所属地区
@@ -546,6 +555,7 @@ SELECT sa.id AS shop_id, sa.name AS shop_name FROM erp_shop_account sa;
 			order_shipping_address.PostalCode = order_import.Yzbm
 			order_shipping_address.Street1 = order_import.Yjdz
 			order_shipping_address.Phone = order_shipping_address_service.Normalize_phone(order_import.Dh) // 整理电话号码 "1234 5666"
+			order_shipping_address.CountryName = order_import.Guojia
 			order_shipping_address.Province = order_import.Ssdq
 			order_shipping_address.CityName = order_import.Sscs
 			order_shipping_address.AddressOwner = "eBay"

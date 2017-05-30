@@ -833,6 +833,12 @@ WHERE ol.stock_id = 0 AND ol.company_id = 0
 		set_head_cell_style(cell)
 		cell.Value = "订单代码"
 
+		col_index++
+		cell = header_row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 15)
+		set_head_cell_style(cell)
+		cell.Value = "店铺名"
+
 		col_count_without_skus = col_index + 1
 	}
 
@@ -921,6 +927,11 @@ WHERE ol.stock_id = 0 AND ol.company_id = 0
 		cell = row.AddCell()
 		set_text_cell_style(cell, "center")
 		cell.Value = fmt.Sprint(order_logistics.ShopAccount.Code + order_logistics.Order.TranId)
+
+		// 店铺名
+		cell = row.AddCell()
+		set_text_cell_style(cell, "center")
+		cell.Value = fmt.Sprintf("FROM:%s", order_logistics.ShopAccount.Name)
 
 		var product_detail_list = c.get_order_logistics_product_detail_list(order_logistics.Order.Id, order_logistics.OrderLogistics.StockId)
 		var product_detail_list_len = len(product_detail_list)
