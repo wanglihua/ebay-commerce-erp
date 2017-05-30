@@ -832,7 +832,7 @@ func (c ErpInventory) ExportProductStorageLoc() revel.Result {
 
 	db_session := c.DbSession
 
-	xlsx_file := c.get_export_excel(db_session)
+	xlsx_file := c.get_export_product_storage_loc_excel(db_session)
 
 	//先把文件内容写到buffer中，再从中读取
 	var buffer bytes.Buffer
@@ -1211,7 +1211,7 @@ func (c ErpInventory) ExportInventoryQuantity() revel.Result {
 
 	db_session := c.DbSession
 
-	xlsx_file := c.get_export_excel(db_session)
+	xlsx_file := c.get_export_inventory_quantity_excel(db_session)
 
 	//先把文件内容写到buffer中，再从中读取
 	var buffer bytes.Buffer
@@ -1600,7 +1600,7 @@ func (c ErpInventory) ExportInventoryPrice() revel.Result {
 
 	db_session := c.DbSession
 
-	xlsx_file := c.get_export_excel(db_session)
+	xlsx_file := c.get_export_inventory_price_excel(db_session)
 
 	//先把文件内容写到buffer中，再从中读取
 	var buffer bytes.Buffer
