@@ -373,7 +373,14 @@ func (c ErpInventory) Import() revel.Result {
 		}
 
 		// 检查 仓库名称
-		var stock_id int64 = stock_service.Get_stock_id_by_name(inventory_import.StockName, db_session)
+		stock_id, type_id := stock_service.Get_stock_id_type_by_name(inventory_import.StockName, db_session)
+		if type_id != models.STOCK_TYPE_CN {
+			return c.RenderJson(map[string]interface{}{
+				"success": false,
+				"message": "只能导入中国仓的成本！",
+			})
+		}
+
 		var storage_loc_id int64
 
 		if stock_id == 0 {
@@ -765,7 +772,7 @@ func (c ErpInventory) ImportProductStorageLoc() revel.Result {
 		}
 
 		// 检查 仓库名称
-		var stock_id int64 = stock_service.Get_stock_id_by_name(inventory_import.StockName, db_session)
+		stock_id, _ := stock_service.Get_stock_id_type_by_name(inventory_import.StockName, db_session)
 		var storage_loc_id int64
 
 		if stock_id == 0 {
@@ -1143,7 +1150,7 @@ func (c ErpInventory) ImportInventoryQuantity() revel.Result {
 		}
 
 		// 检查 仓库名称
-		var stock_id int64 = stock_service.Get_stock_id_by_name(inventory_import.StockName, db_session)
+		stock_id, _ := stock_service.Get_stock_id_type_by_name(inventory_import.StockName, db_session)
 		var storage_loc_id int64
 
 		if stock_id == 0 {
@@ -1532,7 +1539,14 @@ func (c ErpInventory) ImportInventoryPrice() revel.Result {
 		}
 
 		// 检查 仓库名称
-		var stock_id int64 = stock_service.Get_stock_id_by_name(inventory_import.StockName, db_session)
+		stock_id, type_id := stock_service.Get_stock_id_type_by_name(inventory_import.StockName, db_session)
+		if type_id != models.STOCK_TYPE_CN {
+			return c.RenderJson(map[string]interface{}{
+				"success": false,
+				"message": "只能导入中国仓的成本！",
+			})
+		}
+
 		var storage_loc_id int64
 
 		if stock_id == 0 {

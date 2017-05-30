@@ -308,7 +308,7 @@ func (c ErpStorageLoc) Import() revel.Result {
 	for index, storage_loc_import := range storage_loc_import_list {
 
 		// 检查 仓库名称
-		var stock_id int64 = stock_service.Get_stock_id_by_name(storage_loc_import.StockName, db_session)
+		stock_id, _ := stock_service.Get_stock_id_type_by_name(storage_loc_import.StockName, db_session)
 		var storage_loc_id int64
 
 		if stock_id == 0 {

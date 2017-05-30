@@ -10,22 +10,23 @@ import (
 	"matrix/modules/erp/models"
 )
 
-func Get_stock_id_by_name(stock_name string, db_session *xorm.Session) int64 {
+func Get_stock_id_type_by_name(stock_name string, db_session *xorm.Session) (id_return int64, type_return int64) {
 
-	var stock_id struct {
+	var stock_id_type struct {
 		StockId int64 `xorm:"'stock_id'"`
+		TypeId  int64 `xorm:"'type_id'"`
 	}
 
 	/*
-	SELECT s.id AS stock_id FROM erp_stock s WHERE s.name = 'abc'
+SELECT s.id AS stock_id, s.stock_type_id AS type_id FROM erp_stock s WHERE s.name = 'abc'
 	 */
 
-	var sql_get_stock_id = `SELECT s.id AS stock_id FROM erp_stock s WHERE s.name = '%s'`
+	var sql_get_stock_id = `SELECT s.id AS stock_id, s.stock_type_id AS type_id FROM erp_stock s WHERE s.name = '%s''`
 	sql_get_stock_id = fmt.Sprintf(sql_get_stock_id, stock_name)
-	_, err := db_session.Sql(sql_get_stock_id).Get(&stock_id)
+	_, err := db_session.Sql(sql_get_stock_id).Get(&stock_id_type)
 	core.HandleError(err)
 
-	return stock_id.StockId
+	return stock_id_type.StockId, stock_id_type.TypeId
 }
 
 func Get_stock_id_name_map(stock_id_list []int64, db_session *xorm.Session) map[int64]string {
