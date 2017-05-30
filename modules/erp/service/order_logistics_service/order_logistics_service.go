@@ -599,7 +599,11 @@ func (p_ol *OrderLogistics) hold_check_express(p_order *models.OrderInfo, db_ses
 func (p_ol *OrderLogistics) hold_check_international(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, db_session *xorm.Session) (is_hold_return bool) {
 	var country = p_order_logistics_data.order_shipping_address.Country
 	country = strings.TrimSpace(country)
-	if country != "" && strings.ToLower(country) != strings.ToLower("AU") { // != "" 是因为有时导入的时候没提供国家信息的，就默认是国内件了
+	var country_name = p_order_logistics_data.order_shipping_address.CountryName
+	country_name = strings.TrimSpace(country_name)
+
+	if (country != "" && strings.ToLower(country) != strings.ToLower("AU")) ||
+		(country_name != "" && strings.ToLower(country_name) != strings.ToLower("Australia")) { // != "" 是因为有时导入的时候没提供国家信息的，就默认是国内件了
 		p_ol.update_order_to_hold_type(p_order, models.ORDER_HOLD_TYPE_INTERNATIONAL, db_session)
 		return true
 	}
