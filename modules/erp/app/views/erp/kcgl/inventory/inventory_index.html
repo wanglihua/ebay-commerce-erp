@@ -21,8 +21,8 @@
                         <i class="ace-icon fa fa-plus"></i>
                         新增
                     </button>
-                    <button id="btnImport" class="btn btn-success btn-sm">
-                        <i class="ace-icon fa fa-plus"></i>
+                    <button id="btnImport" class="btn btn-info btn-sm">
+                        <i class="ace-icon fa fa-file-excel-o"></i>
                         导入
                     </button>
                     <button class="btn btn-pink btn-sm" @click="exportInventory()">
@@ -34,12 +34,53 @@
                         删除
                     </button>
                 </div>
+                <div class="gridToolBar clearfix">
+                    <button id="btnImportSkuLoc" class="btn btn-info btn-sm">
+                        <i class="ace-icon fa fa-file-excel-o"></i>
+                        导入商品仓位
+                    </button>
+                    <button class="btn btn-pink btn-sm" @click="exportSkuLoc()">
+                        <i class="ace-icon fa fa-file-excel-o"></i>
+                        导出商品仓位
+                    </button>
+                    <button id="btnImportSkuQty" class="btn btn-info btn-sm">
+                        <i class="ace-icon fa fa-file-excel-o"></i>
+                        导入库存数量
+                    </button>
+                    <button class="btn btn-pink btn-sm" @click="exportSkuQty()">
+                        <i class="ace-icon fa fa-file-excel-o"></i>
+                        导出库存数量
+                    </button>
+                    <button id="btnImportSkuPrice" class="btn btn-info btn-sm">
+                        <i class="ace-icon fa fa-file-excel-o"></i>
+                        导入库存价格
+                    </button>
+                    <button class="btn btn-pink btn-sm" @click="exportSkuPrice()">
+                        <i class="ace-icon fa fa-file-excel-o"></i>
+                        导出库存价格
+                    </button>
+                </div>
                 <form id="formExport" method="post" action='{%url "ErpInventory.Export" %}'>
                     <input type="hidden" name="stock_id_query" v-model="page.stock_id_query"/>
                     <input type="hidden" name="product_code_query" v-model="page.product_code_query"/>
                 </form>
+                <form id="formSkuLocExport" method="post" action='{%url "ErpInventory.ExportProductStorageLoc" %}'>
+                    <input type="hidden" name="stock_id_query" v-model="page.stock_id_query"/>
+                    <input type="hidden" name="product_code_query" v-model="page.product_code_query"/>
+                </form>
+                <form id="formSkuQtyExport" method="post" action='{%url "ErpInventory.ExportInventoryQuantity" %}'>
+                    <input type="hidden" name="stock_id_query" v-model="page.stock_id_query"/>
+                    <input type="hidden" name="product_code_query" v-model="page.product_code_query"/>
+                </form>
+                <form id="formSkuPriceExport" method="post" action='{%url "ErpInventory.ExportInventoryPrice" %}'>
+                    <input type="hidden" name="stock_id_query" v-model="page.stock_id_query"/>
+                    <input type="hidden" name="product_code_query" v-model="page.product_code_query"/>
+                </form>
                 <div style="margin-top: 10px;">
-                    <a href="/static/excel-template/product_inventory_import.xlsx">下载Excel模板</a>
+                    <a href="/static/excel-template/inventory_import.xlsx">下载库存导入模板</a>&nbsp;&nbsp;
+                    <a href="/static/excel-template/inventory_sku_loc_import.xlsx">下载商品仓位导入模板</a>&nbsp;&nbsp;
+                    <a href="/static/excel-template/inventory_sku_qty_import.xlsx">下载库存数量导入模板</a>&nbsp;&nbsp;
+                    <a href="/static/excel-template/inventory_sku_price_import.xlsx">下载库存成本导入模板</a>
                 </div>
                 <div class="row" style="margin-top: 15px;margin-bottom: 5px;">
                     <div id="query" class="col-xs-12 query">
@@ -214,7 +255,7 @@
                 FileUploaded: function (up, file, response) {
                     hideMask();
                     var result = JSON.parse(response.response);
-                    if (result.success != true) {
+                    if (result.success !== true) {
                         $.msg.error(result.message);
                         vm.error_data_list = result.error_data_list;
                         $("table#error_data_list").show();
@@ -231,6 +272,132 @@
         });
 
         uploader.init();
+
+        var sku_loc_uploader = new plupload.Uploader({
+            runtimes: 'html5,flash,html4',
+            multi_selection: false,
+
+            browse_button: 'btnImportSkuLoc',
+            file_data_name: "excel_file",
+
+            url: '{%url "ErpInventory.ImportProductStorageLoc"%}',
+            max_file_size: '10000kb',
+
+            filters: [
+                {title: "Excel文件", extensions: "xlsx"}
+            ],
+
+            flash_swf_url: '/plupload/js/Moxie.swf',
+
+            init: {
+                FilesAdded: function () {
+                    showMask("上传中，请稍候...");
+                    uploader.start();
+                },
+                FileUploaded: function (up, file, response) {
+                    hideMask();
+                    var result = JSON.parse(response.response);
+                    if (result.success !== true) {
+                        $.msg.error(result.message);
+                        vm.error_data_list = result.error_data_list;
+                        $("table#error_data_list").show();
+                    } else {
+                        reloadList('#inventoryList');
+                        $.msg.show(result.message);
+                        $("table#error_data_list").hide();
+                    }
+                },
+                Error: function (up, err) {
+                    $.msg.error("上传发生错误：" + err.code + ", " + err.message);
+                }
+            }
+        });
+
+        sku_loc_uploader.init();
+
+        var sku_qty_uploader = new plupload.Uploader({
+            runtimes: 'html5,flash,html4',
+            multi_selection: false,
+
+            browse_button: 'btnImportSkuQty',
+            file_data_name: "excel_file",
+
+            url: '{%url "ErpInventory.ImportInventoryQuantity"%}',
+            max_file_size: '10000kb',
+
+            filters: [
+                {title: "Excel文件", extensions: "xlsx"}
+            ],
+
+            flash_swf_url: '/plupload/js/Moxie.swf',
+
+            init: {
+                FilesAdded: function () {
+                    showMask("上传中，请稍候...");
+                    uploader.start();
+                },
+                FileUploaded: function (up, file, response) {
+                    hideMask();
+                    var result = JSON.parse(response.response);
+                    if (result.success !== true) {
+                        $.msg.error(result.message);
+                        vm.error_data_list = result.error_data_list;
+                        $("table#error_data_list").show();
+                    } else {
+                        reloadList('#inventoryList');
+                        $.msg.show(result.message);
+                        $("table#error_data_list").hide();
+                    }
+                },
+                Error: function (up, err) {
+                    $.msg.error("上传发生错误：" + err.code + ", " + err.message);
+                }
+            }
+        });
+
+        sku_qty_uploader.init();
+
+        var sku_price_uploader = new plupload.Uploader({
+            runtimes: 'html5,flash,html4',
+            multi_selection: false,
+
+            browse_button: 'btnImportSkuPrice',
+            file_data_name: "excel_file",
+
+            url: '{%url "ErpInventory.ImportInventoryPrice"%}',
+            max_file_size: '10000kb',
+
+            filters: [
+                {title: "Excel文件", extensions: "xlsx"}
+            ],
+
+            flash_swf_url: '/plupload/js/Moxie.swf',
+
+            init: {
+                FilesAdded: function () {
+                    showMask("上传中，请稍候...");
+                    uploader.start();
+                },
+                FileUploaded: function (up, file, response) {
+                    hideMask();
+                    var result = JSON.parse(response.response);
+                    if (result.success !== true) {
+                        $.msg.error(result.message);
+                        vm.error_data_list = result.error_data_list;
+                        $("table#error_data_list").show();
+                    } else {
+                        reloadList('#inventoryList');
+                        $.msg.show(result.message);
+                        $("table#error_data_list").hide();
+                    }
+                },
+                Error: function (up, err) {
+                    $.msg.error("上传发生错误：" + err.code + ", " + err.message);
+                }
+            }
+        });
+
+        sku_price_uploader.init();
     }
 
     function loadPageData(this_vm) {
@@ -288,7 +455,7 @@
                             }
                         },
                         {"mDataProp": "st.name", "title": "仓库", "bSearchable": false, "width": 180},
-                        {"mDataProp": "loc.name", "title": "库位", "bSearchable": false, "width": 180},
+                        {"mDataProp": "loc.name", "title": "仓位", "bSearchable": false, "width": 180},
                         {"mDataProp": "prd.sku", "title": "商品", "bSearchable": false},
                         {"mDataProp": "ivt.qty", "title": "数量", "bSearchable": false, "width": 120},
                         {"mDataProp": "ivt.cost_price", "title": "成本价", "bSearchable": false, "width": 120},
@@ -308,7 +475,7 @@
                             "success": function (data) {
                                 hideMask();
 
-                                if (data.success == false) {
+                                if (data.success === false) {
                                     $.msg.error(data.message);
                                     return;
                                 }
@@ -345,7 +512,7 @@
                         },
                         success: function (result) {
                             hideMask();
-                            if (result.success == false) {
+                            if (result.success === false) {
                                 $.msg.error(result.message);
                                 return;
                             }
@@ -384,7 +551,7 @@
                             data: JSON.stringify(vm.detail),
                             success: function (data) {
                                 hideMask();
-                                if (data.success == false) {
+                                if (data.success === false) {
                                     $.msg.error(data.message);
                                     //return;
                                 }
@@ -407,7 +574,7 @@
                     }
                 });
 
-                if (id_list.length == 0) {
+                if (id_list.length === 0) {
                     $.msg.alert("请选择数据！");
                     return;
                 }
@@ -418,7 +585,7 @@
                         type: "POST",
                         data: {"id_list": id_list},
                         success: function (data) {
-                            if (data.success == false) {
+                            if (data.success === false) {
                                 $.msg.error(data.message);
                                 return;
                             }
@@ -432,6 +599,15 @@
             },
             exportInventory: function () {
                 $("#formExport").submit();
+            },
+            exportSkuLoc: function () {
+                $("#formSkuLocExport").submit();
+            },
+            exportSkuQty: function () {
+                $("#formSkuQtyExport").submit();
+            },
+            exportSkuPrice: function () {
+                $("#formSkuPriceExport").submit();
             },
             getStockStorageLocList: function () {
                 $.ajax({

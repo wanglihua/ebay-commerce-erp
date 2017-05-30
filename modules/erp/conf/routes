@@ -178,14 +178,20 @@ POST /package/material/data/detail         ErpPackageMaterial.DetailData
 POST /package/material/save                ErpPackageMaterial.Save
 POST /package/material/delete              ErpPackageMaterial.Delete
 
-GET  /inventory                            ErpInventory.Index
-POST /inventory/data/page                  ErpInventory.PageData
-POST /inventory/data/list                  ErpInventory.ListData
-POST /inventory/data/detail                ErpInventory.DetailData
-POST /inventory/save                       ErpInventory.Save
-POST /inventory/delete                     ErpInventory.Delete
-POST /inventory/import                     ErpInventory.Import
-POST /inventory/export                     ErpInventory.Export
+GET  /inventory                                  ErpInventory.Index
+POST /inventory/data/page                        ErpInventory.PageData
+POST /inventory/data/list                        ErpInventory.ListData
+POST /inventory/data/detail                      ErpInventory.DetailData
+POST /inventory/save                             ErpInventory.Save
+POST /inventory/delete                           ErpInventory.Delete
+POST /inventory/import                           ErpInventory.Import
+POST /inventory/export                           ErpInventory.Export
+POST /inventory/import/product/storage/loc       ErpInventory.ImportProductStorageLoc
+POST /inventory/export/product/storage/loc       ErpInventory.ExportProductStorageLoc
+POST /inventory/import/inventory/quantity        ErpInventory.ImportInventoryQuantity
+POST /inventory/export/inventory/quantity        ErpInventory.ExportInventoryQuantity
+POST /inventory/import/inventory/price           ErpInventory.ImportInventoryPrice
+POST /inventory/export/inventory/price           ErpInventory.ExportInventoryPrice
 
 GET  /stock/bill/checkin                   ErpStockBillCheckin.Index
 POST /stock/bill/checkin/data/list         ErpStockBillCheckin.ListData
