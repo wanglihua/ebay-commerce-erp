@@ -218,7 +218,7 @@ WHERE o.status_id = %d AND ol.mode_id IN (%s) AND ol.stock_id = %d`
 				sheet.Cell(index+2, excel_col_label_to_index("S")).Value = "A"
 				sheet.Cell(index+2, excel_col_label_to_index("T")).Value = "N"
 				sheet.Cell(index+2, excel_col_label_to_index("V")).Value = "N"
-				sheet.Cell(index+2, excel_col_label_to_index("X")).Value =  fmt.Sprintf("FROM:%s", order_logistics.ShopAccount.Name)
+				sheet.Cell(index+2, excel_col_label_to_index("X")).Value = fmt.Sprintf("FROM:%s", order_logistics.ShopAccount.Name)
 				sheet.Cell(index+2, excel_col_label_to_index("Y")).Value = "FALSE"
 				sheet.Cell(index+2, excel_col_label_to_index("Z")).Value = get_order_sku_for_export(order_logistics.Order.Id, db_session)
 				sheet.Cell(index+2, excel_col_label_to_index("AA")).Value = "FALSE"
@@ -367,7 +367,27 @@ WHERE o.status_id = %d AND ol.mode_id IN (%s) AND ol.stock_id = %d`
 		for index, order_logistics := range order_logistics_list {
 			var order_shipping_address = order_service.Get_order_shipping_address(order_logistics.Order.Id, db_session)
 			sheet.Cell(index+1, excel_col_label_to_index("A")).Value = "IPEC"
-			sheet.Cell(index+1, excel_col_label_to_index("B")).Value = "" // 暂时空着
+
+			// TOLL 的 导出模板，B列 service ID。如果是墨尔本仓库，邮编第一个数字是“3”的话，填充2，否则填充4 。 如果是布里斯班仓库，邮编第一个数字是“4”的话，填充2，否则填充4 。
+			var service_id string = ""
+			var postalcode_rune_list = []rune(order_shipping_address.PostalCode)
+			if len(postalcode_rune_list) > 0 {
+				if stock_code == excel_export_stock_mel_code {
+					if postalcode_rune_list[0] == ([]rune("3"))[0] {
+						service_id = "2"
+					} else {
+						service_id = "4"
+					}
+				} else if stock_code == excel_export_stock_bne_code {
+					if postalcode_rune_list[0] == ([]rune("4"))[0] {
+						service_id = "2"
+					} else {
+						service_id = "4"
+					}
+				}
+			}
+			sheet.Cell(index+1, excel_col_label_to_index("B")).Value = service_id
+
 			sheet.Cell(index+1, excel_col_label_to_index("C")).Value = order_shipping_address.Name
 			sheet.Cell(index+1, excel_col_label_to_index("D")).Value = order_shipping_address.Name // 和 Ｃ　是一样的？
 
