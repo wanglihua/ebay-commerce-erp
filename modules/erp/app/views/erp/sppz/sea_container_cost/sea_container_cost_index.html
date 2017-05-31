@@ -1,0 +1,144 @@
+{%header "物流配置" .%}
+<div id="page">
+    <div class="breadcrumbs" id="breadcrumbs">
+        <ul class="breadcrumb">
+            <li>
+                <a href='{%url "Home.Index"%}'><i class="ace-icon fa fa-home home-icon"></i></a>
+            </li>
+            <li class="parent" data-menu="sppz-menu">商品配置</li>
+            <li class="active" data-menu="sppz-sea-container-cost-menu">海运集装箱成本</li>
+        </ul>
+    </div>
+    <div class="page-content">
+        <div class="row">
+            <div class="col-xs-12" style="padding: 0;">
+                <div class="gridToolBar clearfix">
+                    <button class="btn btn-primary btn-sm" onclick="loadSeaContainerCostDetail()">
+                        <i class="ace-icon fa fa-refresh"></i>
+                        刷新
+                    </button>
+                    <button class="btn btn-success btn-sm" @click="saveSeaContainerCost()">
+                        <i class="ace-icon fa fa-floppy-o"></i>
+                        保存
+                    </button>
+                </div>
+                <div>
+                    <div class="widget-box" style="border-style:none;width:780px; ">
+                        <div class="widget-body">
+                            <div class="widget-main">
+                                <form class="form-horizontal" role="form" id="SeaContainerCostDetailForm">
+                                    <input id="sea_container_cost_id" name="detail.sea_container_cost.id" type="hidden" v-model.number="detail.sea_container_cost.id"/>
+                                    <input id="sea_container_cost_version" name="detail.sea_container_cost.version" type="hidden" v-model.number="detail.sea_container_cost.version"/>
+
+                                    <div class="row">
+                                        <div class="col-xs-6">
+                                            <div class="form-group">
+                                                <label for="volume" class="col-xs-4 control-label">集装箱容积</label>
+                                                <div class="col-xs-8">
+                                                    <input id="volume" name="detail.sea_container_cost.volume" type="text" class="input-sm form-control" v-model.number="detail.sea_container_cost.volume"/>
+                                                    <div class="help-block">集装箱容积，单位立方厘米</div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-xs-6">
+                                            <div class="form-group">
+                                                <label for="cost" class="col-xs-4 control-label">海运成本</label>
+                                                <div class="col-xs-8">
+                                                    <input id="cost" name="detail.sea_container_cost.cost" type="text" class="input-sm form-control" v-model.number="detail.sea_container_cost.cost"/>
+                                                    <div class="help-block">一个集装箱的海运成本，RMB</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+
+    function loadSeaContainerCostDetail(this_vm) {
+        showMask("加载中...");
+        $("#SeaContainerCostDetailForm").clearValidation();
+        $.ajax({
+                url: '{%url "ErpSeaContainerCost.DetailData" %}',
+                type: "POST",
+                success: function (result) {
+                    hideMask();
+                    if (result.success === false) {
+                        $.msg.error(result.message);
+                        return;
+                    }
+
+                    if (this_vm === void(0) || this_vm.detail === void(0)) {
+                        vm.detail = result;
+                    }
+                    else {
+                        this_vm.detail = result;
+                    }
+                }
+            }
+        );
+    }
+
+    var vm = new Vue({
+        el: "#page",
+        data: {
+            "detail": {
+                "sea_container_cost": {}
+            }
+        },
+        mounted: function () {
+            loadSeaContainerCostDetail(this);
+        },
+        methods: {
+            saveSeaContainerCost: function () {
+                showMask("提交中...");
+                var form = $("#SeaContainerCostDetailForm");
+                var valid = validate(form, {
+                    'detail.sea_container_cost.volume': {
+                        required: true, number: true
+                    },
+                    'detail.sea_container_cost.cost': {
+                        required: true, number: true
+                    }
+                });
+
+                if (!valid) {
+                    hideMask();
+                } else {
+                    $.ajax(
+                        {
+                            url: '{%url "ErpSeaContainerCost.Save"%}',
+                            type: "POST",
+                            processData: false,
+                            contentType: 'application/json',
+                            data: JSON.stringify(vm.detail),
+                            success: function (data) {
+                                hideMask();
+                                if (data.success === false) {
+                                    $.msg.error(data.message);
+                                    //return;
+                                }
+                                else {
+                                    vm.detail = data.detail;
+                                    $.msg.show(data.message);
+                                    //return;
+                                }
+                            }
+                        }
+                    );
+                }
+            }
+        }
+    });
+</script>
+{%footer%}
+

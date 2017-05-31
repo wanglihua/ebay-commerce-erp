@@ -369,6 +369,10 @@ GET  /logistics/setting                    ErpLogisticsSetting.Index
 POST /logistics/setting/data/detail        ErpLogisticsSetting.DetailData
 POST /logistics/setting/save               ErpLogisticsSetting.Save
 
+GET  /sea/container/cost                    ErpSeaContainerCost.Index
+POST /sea/container/cost/data/detail        ErpSeaContainerCost.DetailData
+POST /sea/container/cost/save               ErpSeaContainerCost.Save
+
 GET  /pick/fee                             ErpPickFee.Index
 POST /pick/fee/data/detail                 ErpPickFee.DetailData
 POST /pick/fee/save                        ErpPickFee.Save
