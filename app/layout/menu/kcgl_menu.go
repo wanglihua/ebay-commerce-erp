@@ -69,12 +69,13 @@ func GetKcglMenu(res_id_map map[int64]bool, web_session revel.Session) string {
 		buffer.WriteString(`<li id="kcgl-product-import-menu" class="">
             <a href="/product/import">
                 <i class="menu-icon fa fa-caret-right"></i>
-                商品导入
+                商品导入导出
             </a>
             <b class="arrow"></b>
         </li>`)
 	}
 
+	/*
 	if check_pass_res_menu(pass_res.KCGL_PRODUCT_EXPORT) {
 		buffer.WriteString(`<li id="kcgl-product-export-menu" class="">
             <a href="/product/export">
@@ -84,6 +85,7 @@ func GetKcglMenu(res_id_map map[int64]bool, web_session revel.Session) string {
             <b class="arrow"></b>
         </li>`)
 	}
+	*/
 
 	if check_pass_res_menu(pass_res.KCGL_INVENTORY) {
 		buffer.WriteString(`<li id="kcgl-inventory-menu" class="">

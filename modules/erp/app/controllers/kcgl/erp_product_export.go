@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"bytes"
+	"fmt"
 	"time"
 
 	"github.com/go-xorm/xorm"
@@ -53,8 +54,6 @@ func (c ErpProductExport) ListData() revel.Result {
 		Total: count,
 	})
 }
-
-//todo: 做个QueryForm来接收查询参数? ListData() 和 Export() 里面
 
 func (c ErpProductExport) Export() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.KCGL_PRODUCT_EXPORT, c.Session)
@@ -156,19 +155,126 @@ func (c ErpProductExport) export_product_list_to_excel(db_session *xorm.Session,
 
 	col_index := 0
 
-	cell := row.AddCell()
-	sheet.SetColWidth(col_index, col_index, 10)
-	set_head_cell_style(cell)
-	cell.Value = "商品名称"
-	col_index++
+	var product_status_list = make([]models.StatusInfo, 0)
+	err = db_session.Where(fmt.Sprintf("type = %d", models.STATUS_TYPE_PRODUCT)).Find(&product_status_list)
+	core.HandleError(err)
 
-	for _, product := range product_list {
+	var find_product_status_name = func(status_id int64) string {
+		for _, status := range product_status_list {
+			if status.Id == status_id {
+				return status.Name
+			}
+		}
+
+		return ""
+	}
+
+	//序号	SKU	中文名称	采购价（人民币元）	产品长度（cm）	产品宽度（cm）	产品高度（cm）	实际重量(kg)	状态
+
+	{
+		cell := row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 10)
+		set_head_cell_style(cell)
+		cell.Value = "序号"
+		col_index++
+
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 10)
+		set_head_cell_style(cell)
+		cell.Value = "SKU"
+		col_index++
+
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 10)
+		set_head_cell_style(cell)
+		cell.Value = "中文名称"
+		col_index++
+
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 10)
+		set_head_cell_style(cell)
+		cell.Value = "采购价（人民币元）"
+		col_index++
+
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 10)
+		set_head_cell_style(cell)
+		cell.Value = "产品长度（cm）"
+		col_index++
+
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 10)
+		set_head_cell_style(cell)
+		cell.Value = "产品宽度（cm）"
+		col_index++
+
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 10)
+		set_head_cell_style(cell)
+		cell.Value = "产品高度（cm）"
+		col_index++
+
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 10)
+		set_head_cell_style(cell)
+		cell.Value = "实际重量(kg)"
+		col_index++
+
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 10)
+		set_head_cell_style(cell)
+		cell.Value = "状态"
+		col_index++
+	}
+
+	for index, product := range product_list {
 		row = sheet.AddRow()
 		row.SetHeightCM(common_row_height)
 
-		cell := row.AddCell() //商品名
-		set_text_cell_style(cell, "left")
-		cell.Value = product.Name
+		// 序号
+		cell := row.AddCell()
+		set_text_cell_style(cell, "center")
+		cell.Value = fmt.Sprint(index + 1)
+
+		// SKU
+		cell = row.AddCell()
+		set_text_cell_style(cell, "center")
+		cell.Value = product.Sku
+
+		// 中文名称
+		cell = row.AddCell()
+		set_text_cell_style(cell, "center")
+		cell.Value = product.CnName
+
+		// 采购价（人民币元）
+		cell = row.AddCell()
+		set_text_cell_style(cell, "right")
+		cell.Value = fmt.Sprintf("%0.00f", product.CostPrice)
+
+		// 	产品长度（cm）
+		cell = row.AddCell()
+		set_text_cell_style(cell, "right")
+		cell.Value = fmt.Sprintf("%0.00f", product.Length)
+
+		// 产品宽度（cm）
+		cell = row.AddCell()
+		set_text_cell_style(cell, "right")
+		cell.Value = fmt.Sprintf("%0.00f", product.Width)
+
+		// 	产品高度（cm）
+		cell = row.AddCell()
+		set_text_cell_style(cell, "right")
+		cell.Value = fmt.Sprintf("%0.00f", product.Height)
+
+		// 	实际重量(kg)
+		cell = row.AddCell()
+		set_text_cell_style(cell, "right")
+		cell.Value = fmt.Sprintf("%0.00f", product.Weight)
+
+		// 状态
+		cell = row.AddCell()
+		set_text_cell_style(cell, "right")
+		cell.Value = find_product_status_name(product.StatusId)
 	}
 
 	return xlsx_file

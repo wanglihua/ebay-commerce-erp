@@ -6,7 +6,7 @@
                 <a href='{%url "Home.Index"%}'><i class="ace-icon fa fa-home home-icon"></i></a>
             </li>
             <li class="parent" data-menu="kcgl-menu">库存管理</li>
-            <li class="active" data-menu="kcgl-product-import-menu">商品导入</li>
+            <li class="active" data-menu="kcgl-product-import-menu">商品导入导出</li>
         </ul>
     </div>
     <div class="page-content">
@@ -20,6 +20,10 @@
                     <button id="btnImport" class="btn btn-purple btn-sm">
                         <i class="ace-icon fa fa-file-excel-o"></i>
                         导入
+                    </button>
+                    <button class="btn btn-purple btn-sm" @click="exportProduct()">
+                        <i class="ace-icon fa fa-file-excel-o"></i>
+                        导出
                     </button>
                     <button class="btn btn-danger btn-sm" @click="deleteImportProduct()">
                         <i class="ace-icon fa fa-trash-o"></i>
@@ -261,7 +265,7 @@
                         type: "POST",
                         data: {"id_list": id_list},
                         success: function (data) {
-                            if (data.success == false) {
+                            if (data.success === false) {
                                 $.msg.error(data.message);
                                 return;
                             }
@@ -274,7 +278,7 @@
                 });
             },
             deleteImportBatch: function () {
-                if (vm.page.batch_code == 0) {
+                if (vm.page.batch_code === 0) {
                     $.msg.error("请选择要删除的导入批次！");
                     return;
                 }
@@ -285,7 +289,7 @@
                         type: "POST",
                         data: {"batch_code": vm.page.batch_code},
                         success: function (data) {
-                            if (data.success == false) {
+                            if (data.success === false) {
                                 $.msg.error(data.message);
                                 return;
                             }
@@ -301,8 +305,12 @@
                         }
                     });
                 });
+            },
+            exportProduct: function () {
+                var params = $.param({"batch_code": page.batch_code});
+                var url = '{%url "ErpProductExport.Export"%}' + "?" + params;
+                $('<form method="post" action="' + url + '"></form>').appendTo('body').submit().remove();
             }
-
         }
     });
 
@@ -311,7 +319,7 @@
                 url: '{%url "ErpProductImport.PageData" %}',
                 type: "POST",
                 success: function (result) {
-                    if (result.success == false) {
+                    if (result.success === false) {
                         $.msg.error(result.message);
                         return;
                     }
