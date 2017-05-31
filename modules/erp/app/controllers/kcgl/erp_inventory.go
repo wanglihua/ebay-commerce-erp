@@ -204,9 +204,20 @@ func (c ErpInventory) Save() revel.Result {
 
 	var affected int64
 	if detail_form.IsCreate() {
+		inventory_count, err := db_session.Where("stock_id = ? AND storage_loc_id = ?", inventory.StockId, inventory.StorageLocId).Count(new(models.InventoryInfo))
+		core.HandleError(err)
+		if inventory_count != 0 {
+			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，仓库仓位中SKU库存已存在，一个仓位只能一个SKU！" })
+		}
 		affected, err = db_session.Insert(&inventory)
 		core.HandleError(err)
 	} else {
+		inventory_count, err := db_session.Where("id <> ? AND stock_id = ? AND storage_loc_id = ?", inventory.Id, inventory.StockId, inventory.StorageLocId).Count(new(models.InventoryInfo))
+		core.HandleError(err)
+		if inventory_count != 0 {
+			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，仓库仓位中SKU库存已存在，一个仓位只能一个SKU！" })
+		}
+
 		affected, err = db_session.Id(inventory.Id).Update(&inventory)
 		core.HandleError(err)
 
