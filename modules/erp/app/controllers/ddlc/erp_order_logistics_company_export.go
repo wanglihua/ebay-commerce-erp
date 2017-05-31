@@ -189,7 +189,7 @@ WHERE o.status_id = %d AND ol.mode_id IN (%s) AND ol.stock_id = %d`
 				sheet.Cell(index+2, excel_col_label_to_index("AL")).Value = "AU" // 固定
 				sheet.Cell(index+2, excel_col_label_to_index("AX")).Value = order_logistics.Order.BuyerEmail
 				sheet.Cell(index+2, excel_col_label_to_index("AY")).Value = "TRACKADV"
-				sheet.Cell(index+2, excel_col_label_to_index("BI")).Value = fmt.Sprint(order_logistics.OrderLogistics.Weight)
+				sheet.Cell(index+2, excel_col_label_to_index("BI")).Value = fmt.Sprintf("%0.1f", order_logistics.OrderLogistics.Weight)
 				sheet.Cell(index+2, excel_col_label_to_index("BO")).Value = "FALSE"
 				sheet.Cell(index+2, excel_col_label_to_index("BP")).Value = "FALSE"
 			}
@@ -214,7 +214,7 @@ WHERE o.status_id = %d AND ol.mode_id IN (%s) AND ol.stock_id = %d`
 				sheet.Cell(index+2, excel_col_label_to_index("L")).Value = order_shipping_address.Province
 				sheet.Cell(index+2, excel_col_label_to_index("M")).Value = order_shipping_address.PostalCode
 				//sheet.Cell(index+2, excel_col_label_to_index("N")).Value = order_shipping_address.CountryName
-				sheet.Cell(index+2, excel_col_label_to_index("N")).Value = "AU"  // 固定
+				sheet.Cell(index+2, excel_col_label_to_index("N")).Value = "AU" // 固定
 				sheet.Cell(index+2, excel_col_label_to_index("O")).Value = order_shipping_address.Phone
 				sheet.Cell(index+2, excel_col_label_to_index("P")).Value = "FALSE"
 				sheet.Cell(index+2, excel_col_label_to_index("S")).Value = "A"
@@ -230,10 +230,10 @@ WHERE o.status_id = %d AND ol.mode_id IN (%s) AND ol.stock_id = %d`
 				sheet.Cell(index+2, excel_col_label_to_index("AI")).Value = "MOOROOKA"
 				sheet.Cell(index+2, excel_col_label_to_index("AJ")).Value = "QLD"
 				sheet.Cell(index+2, excel_col_label_to_index("AK")).Value = "4105"
-				sheet.Cell(index+2, excel_col_label_to_index("AL")).Value = "AU"  // 固定
+				sheet.Cell(index+2, excel_col_label_to_index("AL")).Value = "AU" // 固定
 				sheet.Cell(index+2, excel_col_label_to_index("AX")).Value = order_logistics.Order.BuyerEmail
 				sheet.Cell(index+2, excel_col_label_to_index("AY")).Value = "TRACKADV"
-				sheet.Cell(index+2, excel_col_label_to_index("BI")).Value = fmt.Sprint(order_logistics.OrderLogistics.Weight)
+				sheet.Cell(index+2, excel_col_label_to_index("BI")).Value = fmt.Sprintf("%0.1f", order_logistics.OrderLogistics.Weight)
 				sheet.Cell(index+2, excel_col_label_to_index("BO")).Value = "FALSE"
 				sheet.Cell(index+2, excel_col_label_to_index("BP")).Value = "FALSE"
 			}
@@ -294,7 +294,7 @@ WHERE  o.status_id = %d AND ol.mode_id IN (%s) AND ol.stock_id = %d`
 		for index, order_logistics := range order_logistics_list {
 			var order_shipping_address = order_service.Get_order_shipping_address(order_logistics.Order.Id, db_session)
 			sheet.Cell(index+1, excel_col_label_to_index("B")).Value = order_logistics.Order.FullTranId
-			sheet.Cell(index+1, excel_col_label_to_index("C")).Value = fmt.Sprint(order_logistics.OrderLogistics.Weight)
+			sheet.Cell(index+1, excel_col_label_to_index("C")).Value = fmt.Sprintf("%0.1f", order_logistics.OrderLogistics.Weight)
 			sheet.Cell(index+1, excel_col_label_to_index("D")).Value = "1"
 
 			sheet.Cell(index+1, excel_col_label_to_index("H")).Value = order_shipping_address.Name
@@ -403,11 +403,11 @@ WHERE o.status_id = %d AND ol.mode_id IN (%s) AND ol.stock_id = %d`
 			sheet.Cell(index+1, excel_col_label_to_index("K")).Value = "CARTON"
 			sheet.Cell(index+1, excel_col_label_to_index("L")).Value = get_toll_packaging_code(order_logistics.OrderLogistics) // 包裹类型要计算
 			sheet.Cell(index+1, excel_col_label_to_index("M")).Value = "1"
-			sheet.Cell(index+1, excel_col_label_to_index("N")).Value = fmt.Sprint(order_logistics.OrderLogistics.Length)
-			sheet.Cell(index+1, excel_col_label_to_index("O")).Value = fmt.Sprint(order_logistics.OrderLogistics.Width)
-			sheet.Cell(index+1, excel_col_label_to_index("P")).Value = fmt.Sprint(order_logistics.OrderLogistics.Height)
-			sheet.Cell(index+1, excel_col_label_to_index("Q")).Value = fmt.Sprint(order_logistics.OrderLogistics.DimWeight)
-			sheet.Cell(index+1, excel_col_label_to_index("R")).Value = fmt.Sprint(order_logistics.OrderLogistics.Weight)
+			sheet.Cell(index+1, excel_col_label_to_index("N")).Value = fmt.Sprintf("%0.1f", order_logistics.OrderLogistics.Length)
+			sheet.Cell(index+1, excel_col_label_to_index("O")).Value = fmt.Sprintf("%0.1f", order_logistics.OrderLogistics.Width)
+			sheet.Cell(index+1, excel_col_label_to_index("P")).Value = fmt.Sprintf("%0.1f", order_logistics.OrderLogistics.Height)
+			sheet.Cell(index+1, excel_col_label_to_index("Q")).Value = fmt.Sprintf("%0.1f", order_logistics.OrderLogistics.DimWeight)
+			sheet.Cell(index+1, excel_col_label_to_index("R")).Value = fmt.Sprintf("%0.1f", order_logistics.OrderLogistics.Weight)
 			sheet.Cell(index+1, excel_col_label_to_index("S")).Value = order_logistics.Order.FullTranId
 			sheet.Cell(index+1, excel_col_label_to_index("T")).Value = fmt.Sprintf("FROM:%s", order_logistics.ShopAccount.Name)
 			sheet.Cell(index+1, excel_col_label_to_index("U")).Value = "ATL at safe place"

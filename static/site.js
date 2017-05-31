@@ -22,6 +22,13 @@ function dtFormatDateTime2(data) {
     return stringToDate(data).format("yyyy-MM-dd hh:mm:ss");
 }
 
+function dtFormatFloat1(data) {
+    if ((!data) && (data !== 0)) {
+        return "";
+    }
+    return $.formatNumber(data, {format: "#,##0.0", locale: "cn"});
+}
+
 function dtFormatFloat(data) {
     if ((!data) && (data !== 0)) {
         return "";

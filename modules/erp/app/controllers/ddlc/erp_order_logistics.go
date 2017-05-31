@@ -578,7 +578,7 @@ WHERE ol.stock_id = 0 AND ol.company_id = 0
 		// 预估物流费用
 		cell = row.AddCell()
 		set_text_cell_style(cell, "center")
-		cell.Value = fmt.Sprint(order_logistics.OrderLogistics.TotalFee)
+		cell.Value = fmt.Sprintf("%0.1f", order_logistics.OrderLogistics.TotalFee)
 	}
 
 	return xlsx_file
@@ -865,22 +865,22 @@ WHERE ol.stock_id = 0 AND ol.company_id = 0
 		// 长(cm)
 		cell = row.AddCell()
 		set_text_cell_style(cell, "center")
-		cell.Value = fmt.Sprint(order_logistics.OrderLogistics.Length)
+		cell.Value = fmt.Sprintf("%0.1f", order_logistics.OrderLogistics.Length)
 
 		// 宽(cm)
 		cell = row.AddCell()
 		set_text_cell_style(cell, "center")
-		cell.Value = fmt.Sprint(order_logistics.OrderLogistics.Width)
+		cell.Value = fmt.Sprintf("%0.1f", order_logistics.OrderLogistics.Width)
 
 		// 高(cm)
 		cell = row.AddCell()
 		set_text_cell_style(cell, "center")
-		cell.Value = fmt.Sprint(order_logistics.OrderLogistics.Height)
+		cell.Value = fmt.Sprintf("%0.1f", order_logistics.OrderLogistics.Height)
 
 		// 实际重量（Kg）
 		cell = row.AddCell()
 		set_text_cell_style(cell, "center")
-		cell.Value = fmt.Sprint(order_logistics.OrderLogistics.Weight)
+		cell.Value = fmt.Sprintf("%0.1f", order_logistics.OrderLogistics.Weight)
 
 		// 邮政编码
 		cell = row.AddCell()

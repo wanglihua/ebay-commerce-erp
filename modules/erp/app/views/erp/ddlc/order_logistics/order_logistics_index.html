@@ -481,17 +481,17 @@
                             "render": function (data, type, row) {
                                 var length = "--";
                                 if (row.ol.length !== "" && row.ol.length !== 0) {
-                                    length = row.ol.length + " cm";
+                                    length = dtFormatFloat1(row.ol.length) + " cm";
                                 }
 
                                 var width = "--";
                                 if (row.ol.width !== "" && row.ol.width !== 0) {
-                                    width = row.ol.width + " cm";
+                                    width = dtFormatFloat1(row.ol.width) + " cm";
                                 }
 
                                 var height = "--";
                                 if (row.ol.height !== "" && row.ol.height !== 0) {
-                                    height = row.ol.height + " cm";
+                                    height = dtFormatFloat1(row.ol.height) + " cm";
                                 }
 
                                 return "<div class='div_lenght'>" + length + "</div><div>" + width + "</div><div>" + height + "</div>";
@@ -515,7 +515,7 @@
                             "render": function (data, type, row) {
                                 var actual_weight = row.ol.weight;
                                 if (actual_weight !== "" && actual_weight !== 0) {
-                                    actual_weight = actual_weight + " kg";
+                                    actual_weight = dtFormatFloat1(actual_weight) + " kg";
                                 }
                                 else {
                                     actual_weight = "--";
@@ -523,7 +523,7 @@
 
                                 var dim_weight = row.ol.dim_weight;
                                 if (dim_weight !== "" && dim_weight !== 0) {
-                                    dim_weight = dim_weight + " kg";
+                                    dim_weight = dtFormatFloat1(dim_weight) + " kg";
                                 }
                                 else {
                                     dim_weight = "--";
