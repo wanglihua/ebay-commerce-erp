@@ -93,8 +93,8 @@ func (f *ProductCateDetailForm) Valid(validation *revel.Validation) bool {
 		validation.MaxSize(f.ProductCate.Name, 100).Message("名称长度不能大于100！")
 	}
 
-	if f.ProductCate.Desc.Valid == true {
-		validation.MaxSize(f.ProductCate.Desc.String, 500).Message("描述长度不能大于500！")
+	if f.ProductCate.Description != "" {
+		validation.MaxSize(f.ProductCate.Description, 500).Message("描述长度不能大于500！")
 	}
 
 	validation.Required(f.ProductCate.StatusId).Message("状态不能为空！")
@@ -197,16 +197,31 @@ func (c ErpProductCate) Save() revel.Result {
 }
 
 func (c ErpProductCate) calculate_product_cate_full_name(product_cate models.ProductCateInfo, db_session *xorm.Session) string {
-	if product_cate.ParentId.Valid == false || product_cate.ParentId.Int64 == 0 {
+	if product_cate.Level == 1 { //一级目录
 		return product_cate.Name
 	}
 
-	parent_cate_id := product_cate.ParentId.Int64
-	var parent_cate models.ProductCateInfo
-	_, err := db_session.Id(parent_cate_id).Get(&parent_cate)
-	core.HandleError(err)
+	if product_cate.Level == 2 { //二级目录
+		var l1_parent models.ProductCateInfo
+		_, err := db_session.Id(product_cate.L1Parent).Get(&l1_parent)
+		core.HandleError(err)
 
-	return fmt.Sprintf("%s-%s", parent_cate.Name, product_cate.Name)
+		return fmt.Sprintf("%s-%s", l1_parent.Name, product_cate.Name)
+	}
+
+	if product_cate.Level == 3 { // 三级目录
+		var l1_parent models.ProductCateInfo
+		_, err := db_session.Id(product_cate.L1Parent).Get(&l1_parent)
+		core.HandleError(err)
+
+		var l2_parent models.ProductCateInfo
+		_, err = db_session.Id(product_cate.L2Parent).Get(&l2_parent)
+		core.HandleError(err)
+
+		return fmt.Sprintf("%s-%s-%s", l1_parent.Name, l2_parent.Name, product_cate.Name)
+	}
+
+	return ""
 }
 
 func (c ErpProductCate) Delete() revel.Result {
