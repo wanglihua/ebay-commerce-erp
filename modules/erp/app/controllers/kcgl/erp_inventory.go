@@ -90,7 +90,6 @@ func (c ErpInventory) ListData() revel.Result {
 	}
 
 	var stock_id_str_list = stock_pick_crew_service.Get_login_user_stock_id_str_list(db_session, c.Session)
-
 	filter = core.SqlAnd(filter, fmt.Sprintf("st.id IN (%s)", strings.Join(stock_id_str_list, ",")))
 
 	sb.Where(filter)
@@ -517,6 +516,9 @@ func (c ErpInventory) get_export_excel(db_session *xorm.Session) *xlsx.File {
 		filter = core.SqlAnd(filter, fmt.Sprintf("prd.sku LIKE '%%%s%%'", product_code_query))
 	}
 
+	var stock_id_str_list = stock_pick_crew_service.Get_login_user_stock_id_str_list(db_session, c.Session)
+	filter = core.SqlAnd(filter, fmt.Sprintf("st.id IN (%s)", strings.Join(stock_id_str_list, ",")))
+
 	query = query.Where(filter)
 
 	data_query := *query
@@ -897,6 +899,8 @@ func (c ErpInventory) get_export_product_storage_loc_excel(db_session *xorm.Sess
 		Join("INNER", []string{"erp_product", "prd"}, "ivt.product_id = prd.id")
 
 	//query extra filter here
+	var stock_id_str_list = stock_pick_crew_service.Get_login_user_stock_id_str_list(db_session, c.Session)
+	filter = core.SqlAnd(filter, fmt.Sprintf("st.id IN (%s)", strings.Join(stock_id_str_list, ",")))
 
 	if stock_id_query != 0 {
 		filter = core.SqlAnd(filter, fmt.Sprintf("st.id = %d", stock_id_query))
@@ -1276,6 +1280,8 @@ func (c ErpInventory) get_export_inventory_quantity_excel(db_session *xorm.Sessi
 		Join("INNER", []string{"erp_product", "prd"}, "ivt.product_id = prd.id")
 
 	//query extra filter here
+	var stock_id_str_list = stock_pick_crew_service.Get_login_user_stock_id_str_list(db_session, c.Session)
+	filter = core.SqlAnd(filter, fmt.Sprintf("st.id IN (%s)", strings.Join(stock_id_str_list, ",")))
 
 	if stock_id_query != 0 {
 		filter = core.SqlAnd(filter, fmt.Sprintf("st.id = %d", stock_id_query))
@@ -1672,6 +1678,8 @@ func (c ErpInventory) get_export_inventory_price_excel(db_session *xorm.Session)
 		Join("INNER", []string{"erp_product", "prd"}, "ivt.product_id = prd.id")
 
 	//query extra filter here
+	var stock_id_str_list = stock_pick_crew_service.Get_login_user_stock_id_str_list(db_session, c.Session)
+	filter = core.SqlAnd(filter, fmt.Sprintf("st.id IN (%s)", strings.Join(stock_id_str_list, ",")))
 
 	if stock_id_query != 0 {
 		filter = core.SqlAnd(filter, fmt.Sprintf("st.id = %d", stock_id_query))
