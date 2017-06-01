@@ -26,7 +26,6 @@ func (c ErpProductCate) Index() revel.Result {
 
 type ErpProductCateViewItem struct {
 	models.ProductCateInfo         `xorm:"extends" json:"c"`
-	Parent models.ProductCateInfo  `xorm:"extends" json:"p"`
 	models.StatusInfo              `xorm:"extends" json:"s"`
 }
 
@@ -38,16 +37,14 @@ func (c ErpProductCate) ListData() revel.Result {
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
 	/*
-		SELECT c.*, p.*, s.*
+		SELECT c.*, s.*
 		FROM erp_product_cate c
-		    INNER JOIN erp_product_cate p ON c.parent_id = p.id
 		    INNER JOIN erp_status s ON c.status_id = s.id
 	*/
 
 	query := db_session.
-	Select("c.*, p.*, s.*").
+	Select("c.*, s.*").
 		Table("erp_product_cate").Alias("c").
-		Join("LEFT", []string{"erp_product_cate", "p"}, "c.parent_id = p.id").
 		Join("INNER", []string{"erp_status", "s"}, "c.status_id = s.id").
 		Where(filter)
 
@@ -75,9 +72,10 @@ func (c ErpProductCate) ListData() revel.Result {
 }
 
 type ProductCateDetailForm struct {
-	ProductCate    models.ProductCateInfo   `json:"product_cate"`
-	ParentCateList []models.ProductCateInfo `json:"parent_cate_list"`
-	StatusList     []models.StatusInfo      `json:"status_list"`
+	ProductCate      models.ProductCateInfo   `json:"product_cate"`
+	L1ParentCateList []models.ProductCateInfo `json:"l1_parent_cate_list"`
+	L2ParentCateList []models.ProductCateInfo `json:"l2_parent_cate_list"`
+	StatusList       []models.StatusInfo      `json:"status_list"`
 }
 
 func (f *ProductCateDetailForm) IsCreate() bool {
@@ -119,17 +117,17 @@ func (c ErpProductCate) DetailData() revel.Result {
 		}
 	}
 
-	var parent_cate_list []models.ProductCateInfo
+	var l1_parent_cate_list = make([]models.ProductCateInfo, 0)
+	err := db_session.Where("level = 1").Find(&l1_parent_cate_list)
+	core.HandleError(err)
+
+	var l2_parent_cate_list = make([]models.ProductCateInfo, 0)
+
 	if product_cate_id == 0 {
 		// 新的商品类别的默认状态
 		product_cate.StatusId = models.PRODUCT_CATE_STATUS_ENABLED
-		err := db_session.Where(fmt.Sprintf("%[1]s is null or %[1]s = 0", "parent_id")).Find(&parent_cate_list)
-		core.HandleError(err)
 	} else {
-		// 编辑是的父类别不应该和自己类别是一样的
-		err := db_session.
-		Where(fmt.Sprintf("(%[1]s is null or %[1]s = 0) and (%[2]s <> %[3]d)", "parent_id", "id", product_cate_id)).
-			Find(&parent_cate_list)
+		err = db_session.Where(fmt.Sprintf("level = 2 AND l1_parent = %d", product_cate.L1Parent)).Find(&l2_parent_cate_list)
 		core.HandleError(err)
 	}
 
@@ -138,7 +136,8 @@ func (c ErpProductCate) DetailData() revel.Result {
 	var detail_form ProductCateDetailForm
 	detail_form.ProductCate = product_cate
 	detail_form.StatusList = status_list
-	detail_form.ParentCateList = parent_cate_list
+	detail_form.L1ParentCateList = l1_parent_cate_list
+	detail_form.L2ParentCateList = l2_parent_cate_list
 
 	return c.RenderJson(detail_form)
 }
@@ -158,7 +157,40 @@ func (c ErpProductCate) Save() revel.Result {
 
 	product_cate := detail_form.ProductCate
 
+	if product_cate.Level == 1 {
+		product_cate.L1Parent = 0
+		product_cate.L2Parent = 0
+	}
+
+	if product_cate.Level == 2 {
+		if product_cate.L1Parent == 0 {
+			return c.RenderJson(map[string]interface{}{
+				"success":  false,
+				"messsage": "二级目录必须选择一级父目录！",
+			})
+		}
+
+		product_cate.L1Parent = 0
+	}
+
+	if product_cate.Level == 3 {
+		if product_cate.L1Parent == 0 {
+			return c.RenderJson(map[string]interface{}{
+				"success":  false,
+				"messsage": "三级目录必须选择一级父目录！",
+			})
+		}
+
+		if product_cate.L2Parent == 0 {
+			return c.RenderJson(map[string]interface{}{
+				"success":  false,
+				"messsage": "三级目录必须选择二级父目录！",
+			})
+		}
+	}
+
 	var affected int64
+
 	if detail_form.IsCreate() {
 		name_count, err := db_session.Where("name = ?", product_cate.Name).Count(new(models.ProductCateInfo))
 		core.HandleError(err)
@@ -257,4 +289,20 @@ func (c ErpProductCate) insert_product_cate_log(product_cate *models.ProductCate
 
 	_, err := db_session.Insert(&product_cate_log)
 	core.HandleError(err)
+}
+
+func (c ErpProductCate) GetL2ProductCateList() revel.Result {
+	var db_session = c.DbSession
+
+	var l1_parent int64
+	c.Params.Bind(&l1_parent, "l1_parent")
+
+	var l2_parent_cate_list = make([]models.ProductCateInfo, 0)
+	err := db_session.Where(fmt.Sprintf("level = 2 AND l1_parent = %d", l1_parent)).Find(&l2_parent_cate_list)
+	core.HandleError(err)
+
+	return c.RenderJson(map[string]interface{}{
+		"success":              true,
+		"l2_product_cate_list": l2_parent_cate_list,
+	})
 }

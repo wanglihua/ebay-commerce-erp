@@ -63,9 +63,9 @@
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
-                                            <label for="desc" class="col-xs-2 control-label">描述</label>
+                                            <label for="description" class="col-xs-2 control-label">描述</label>
                                             <div class="col-xs-10">
-                                                <textarea id="desc" name="detail.product_cate.desc" rows="2" class="input-sm form-control" v-model="detail.product_cate.desc"></textarea>
+                                                <textarea id="description" name="detail.product_cate.description" rows="2" class="input-sm form-control" v-model="detail.product_cate.description"></textarea>
                                             </div>
                                         </div>
                                     </div>
@@ -74,11 +74,42 @@
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
-                                            <label for="parent_id" class="col-xs-2 control-label">父目录</label>
+                                            <label for="level" class="col-xs-2 control-label">目录级别</label>
                                             <div class="col-xs-10">
-                                                <select id="parent_id" name="detail.product_cate.parent_id" class="input-sm form-control" v-model.number="detail.product_cate.parent_id">
-                                                    <option value=""></option>
-                                                    <template v-for="parent_cate in detail.parent_cate_list">
+                                                <select id="level" name="detail.product_cate.level" class="input-sm form-control" v-model.number="detail.product_cate.level">
+                                                    <option :value="1">一级目录</option>
+                                                    <option :value="2">二级目录</option>
+                                                    <option :value="3">三级目录</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <label for="l1_parent" class="col-xs-2 control-label">一级父目录</label>
+                                            <div class="col-xs-10">
+                                                <select id="l1_parent" name="detail.product_cate.l1_parent" class="input-sm form-control" v-model.number="detail.product_cate.l1_parent">
+                                                    <option :value="0"></option>
+                                                    <template v-for="parent_cate in detail.l1_parent_cate_list">
+                                                        <option :value="parent_cate.id">{{parent_cate.name}}</option>
+                                                    </template>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <label for="l2_parent" class="col-xs-2 control-label">二级父目录</label>
+                                            <div class="col-xs-10">
+                                                <select id="l2_parent" name="detail.product_cate.l2_parent" class="input-sm form-control" v-model.number="detail.product_cate.l2_parent">
+                                                    <option :value="0"></option>
+                                                    <template v-for="parent_cate in detail.l2_parent_cate_list">
                                                         <option :value="parent_cate.id">{{parent_cate.name}}</option>
                                                     </template>
                                                 </select>
@@ -148,8 +179,8 @@
                         },
                         {"mDataProp": "c.full_name", "title": "全称", "bSearchable": true, "width": 200},
                         {"mDataProp": "c.name", "title": "名称", "bSearchable": true, "width": 130},
-                        {"mDataProp": "p.name", "title": "父目录", "bSearchable": true, "width": 130},
-                        {"mDataProp": "c.desc", "title": "描述", "bSearchable": true},
+                        {"mDataProp": "c.level", "title": "目录级别", "bSearchable": true, "width": 130},
+                        {"mDataProp": "c.description", "title": "描述", "bSearchable": true},
                         {"mDataProp": "s.name", "title": "状态", "bSearchable": true, "width": 80},
                         {"mDataProp": "c.create_time", "title": "创建时间", "bSearchable": false, "width": 120},
                         {"mDataProp": "c.update_time", "title": "修改时间", "bSearchable": false, "width": 120}
@@ -177,7 +208,7 @@
                         },
                         success: function (result) {
                             hideMask();
-                            if (result.success == false) {
+                            if (result.success === false) {
                                 $.msg.error(result.message);
                                 return;
                             }
@@ -197,17 +228,11 @@
                     'detail.product_cate.name': {
                         required: true, minlength: 2, maxlength: 100
                     },
-                    'detail.product_cate.english_name': {
-                        required: true, minlength: 2, maxlength: 100
-                    },
-                    'detail.product_cate.desc': {
+                    'detail.product_cate.description': {
                         required: false, maxlength: 500
                     },
-                    'detail.product_cate.hs_code': {
-                        required: false, minlength: 2, maxlength: 20
-                    },
-                    'detail.product_cate.parent_id': {
-                        required: false, digits: true
+                    'detail.product_cate.level': {
+                        required: true
                     },
                     'detail.product_cate.status_id': {
                         required: true, digits: true
@@ -225,7 +250,7 @@
                             data: JSON.stringify(vm.detail),
                             success: function (data) {
                                 hideMask();
-                                if (data.success == false) {
+                                if (data.success === false) {
                                     $.msg.error(data.message);
                                     //return;
                                 }
@@ -259,7 +284,7 @@
                         type: "POST",
                         data: {"id_list": id_list},
                         success: function (data) {
-                            if (data.success == false) {
+                            if (data.success === false) {
                                 $.msg.error(data.message);
                                 return;
                             }
