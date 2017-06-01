@@ -377,6 +377,17 @@ func (c ErpInventory) Import() revel.Result {
 		})
 	}
 
+	var stock_id_list = stock_pick_crew_service.Get_login_user_stock_id_list(db_session, c.Session)
+
+	var is_stock_id_can_view = func(stock_id int64) bool {
+		for _, stock_id_in_list := range stock_id_list {
+			if stock_id_in_list == stock_id {
+				return true
+			}
+		}
+		return false
+	}
+
 	var inventory_import_error_list = make([]inventory_import_t, 0)
 	// 先检查一遍是不是有错误，
 	for index, inventory_import := range inventory_import_list {
@@ -404,6 +415,11 @@ func (c ErpInventory) Import() revel.Result {
 			inventory_import.ErrorMessage = fmt.Sprintf("序号 %s 的仓库名称 %s 不存在！", inventory_import.OrdNum, inventory_import.StockName)
 			inventory_import_error_list = append(inventory_import_error_list, inventory_import)
 		} else { //仓库名称存在
+			if is_stock_id_can_view(stock_id) == false {
+				inventory_import.ErrorMessage = fmt.Sprintf("序号 %s 的仓库 %s 你没有权限查看和修改！", inventory_import.OrdNum, inventory_import.StockName)
+				inventory_import_error_list = append(inventory_import_error_list, inventory_import)
+			}
+
 			var storage_loc_name = strings.TrimSpace(inventory_import.StorageLocName)
 			if storage_loc_name != "" {
 				// 如果提供了仓位， 检查仓位名称
@@ -779,6 +795,17 @@ func (c ErpInventory) ImportProductStorageLoc() revel.Result {
 		})
 	}
 
+	var stock_id_list = stock_pick_crew_service.Get_login_user_stock_id_list(db_session, c.Session)
+
+	var is_stock_id_can_view = func(stock_id int64) bool {
+		for _, stock_id_in_list := range stock_id_list {
+			if stock_id_in_list == stock_id {
+				return true
+			}
+		}
+		return false
+	}
+
 	var inventory_import_error_list = make([]inventory_import_t, 0)
 	// 先检查一遍是不是有错误，
 	for index, inventory_import := range inventory_import_list {
@@ -799,6 +826,11 @@ func (c ErpInventory) ImportProductStorageLoc() revel.Result {
 			inventory_import.ErrorMessage = fmt.Sprintf("序号 %s 的仓库名称 %s 不存在！", inventory_import.OrdNum, inventory_import.StockName)
 			inventory_import_error_list = append(inventory_import_error_list, inventory_import)
 		} else { //仓库名称存在
+			if is_stock_id_can_view(stock_id) == false {
+				inventory_import.ErrorMessage = fmt.Sprintf("序号 %s 的仓库 %s 你没有权限查看和修改！", inventory_import.OrdNum, inventory_import.StockName)
+				inventory_import_error_list = append(inventory_import_error_list, inventory_import)
+			}
+
 			var storage_loc_name = strings.TrimSpace(inventory_import.StorageLocName)
 			if storage_loc_name != "" {
 				// 如果提供了仓位， 检查仓位名称
@@ -1159,6 +1191,17 @@ func (c ErpInventory) ImportInventoryQuantity() revel.Result {
 		})
 	}
 
+	var stock_id_list = stock_pick_crew_service.Get_login_user_stock_id_list(db_session, c.Session)
+
+	var is_stock_id_can_view = func(stock_id int64) bool {
+		for _, stock_id_in_list := range stock_id_list {
+			if stock_id_in_list == stock_id {
+				return true
+			}
+		}
+		return false
+	}
+
 	var inventory_import_error_list = make([]inventory_import_t, 0)
 	// 先检查一遍是不是有错误，
 	for index, inventory_import := range inventory_import_list {
@@ -1179,6 +1222,11 @@ func (c ErpInventory) ImportInventoryQuantity() revel.Result {
 			inventory_import.ErrorMessage = fmt.Sprintf("序号 %s 的仓库名称 %s 不存在！", inventory_import.OrdNum, inventory_import.StockName)
 			inventory_import_error_list = append(inventory_import_error_list, inventory_import)
 		} else { //仓库名称存在
+			if is_stock_id_can_view(stock_id) == false {
+				inventory_import.ErrorMessage = fmt.Sprintf("序号 %s 的仓库 %s 你没有权限查看和修改！", inventory_import.OrdNum, inventory_import.StockName)
+				inventory_import_error_list = append(inventory_import_error_list, inventory_import)
+			}
+
 			var storage_loc_name = strings.TrimSpace(inventory_import.StorageLocName)
 			if storage_loc_name != "" {
 				// 如果提供了仓位， 检查仓位名称
@@ -1550,6 +1598,17 @@ func (c ErpInventory) ImportInventoryPrice() revel.Result {
 		})
 	}
 
+	var stock_id_list = stock_pick_crew_service.Get_login_user_stock_id_list(db_session, c.Session)
+
+	var is_stock_id_can_view = func(stock_id int64) bool {
+		for _, stock_id_in_list := range stock_id_list {
+			if stock_id_in_list == stock_id {
+				return true
+			}
+		}
+		return false
+	}
+
 	var inventory_import_error_list = make([]inventory_import_t, 0)
 	// 先检查一遍是不是有错误，
 	for index, inventory_import := range inventory_import_list {
@@ -1577,6 +1636,11 @@ func (c ErpInventory) ImportInventoryPrice() revel.Result {
 			inventory_import.ErrorMessage = fmt.Sprintf("序号 %s 的仓库名称 %s 不存在！", inventory_import.OrdNum, inventory_import.StockName)
 			inventory_import_error_list = append(inventory_import_error_list, inventory_import)
 		} else { //仓库名称存在
+			if is_stock_id_can_view(stock_id) == false {
+				inventory_import.ErrorMessage = fmt.Sprintf("序号 %s 的仓库 %s 你没有权限查看和修改！", inventory_import.OrdNum, inventory_import.StockName)
+				inventory_import_error_list = append(inventory_import_error_list, inventory_import)
+			}
+
 			var storage_loc_name = strings.TrimSpace(inventory_import.StorageLocName)
 			if storage_loc_name != "" {
 				// 如果提供了仓位， 检查仓位名称

@@ -37,7 +37,33 @@ WHERE spc.user_id = %d
 	}
 }
 
+func Get_login_user_stock_id_list(db_session *xorm.Session, web_session revel.Session) []int64 {
+	var stock_id_list = get_login_user_stock_id_t_list(db_session, web_session)
+
+	var stock_id_str_list = make([]int64, 0)
+	for _, stock_id := range stock_id_list {
+		stock_id_str_list = append(stock_id_str_list, stock_id.StockId)
+	}
+
+	return stock_id_str_list
+}
+
 func Get_login_user_stock_id_str_list(db_session *xorm.Session, web_session revel.Session) []string {
+	var stock_id_list = get_login_user_stock_id_t_list(db_session, web_session)
+
+	var stock_id_str_list = make([]string, 0)
+	for _, stock_id := range stock_id_list {
+		stock_id_str_list = append(stock_id_str_list, fmt.Sprint(stock_id.StockId))
+	}
+
+	return stock_id_str_list
+}
+
+type stock_id_t struct {
+	StockId int64 `xorm:"'stock_id'" json:"stock_id"`
+}
+
+func get_login_user_stock_id_t_list(db_session *xorm.Session, web_session revel.Session) []stock_id_t {
 	// 不同的仓库拣货人员可以看到不同的订单，管理员、销售、客服 除外
 	var login_user = core.GetLoginUser(web_session)
 	var is_admin = pass_service.Is_user_admin(login_user.UserId)                   // 是不是管理员
@@ -51,18 +77,9 @@ func Get_login_user_stock_id_str_list(db_session *xorm.Session, web_session reve
 		get_stock_id_list_sql = `SELECT s.id AS stock_id FROM erp_stock s`
 	}
 
-	type StockId struct {
-		StockId int64 `xorm:"'stock_id'" json:"stock_id"`
-	}
-
-	var stock_id_list = make([]StockId, 0)
+	var stock_id_list = make([]stock_id_t, 0)
 	err := db_session.Sql(get_stock_id_list_sql).Find(&stock_id_list)
 	core.HandleError(err)
 
-	var stock_id_str_list = make([]string, 0)
-	for _, stock_id := range stock_id_list {
-		stock_id_str_list = append(stock_id_str_list, fmt.Sprint(stock_id.StockId))
-	}
-
-	return stock_id_str_list
+	return stock_id_list
 }
