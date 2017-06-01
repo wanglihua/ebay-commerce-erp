@@ -21,7 +21,7 @@ func Get_stock_id_type_by_name(stock_name string, db_session *xorm.Session) (id_
 SELECT s.id AS stock_id, s.stock_type_id AS type_id FROM erp_stock s WHERE s.name = 'abc'
 	 */
 
-	var sql_get_stock_id = `SELECT s.id AS stock_id, s.stock_type_id AS type_id FROM erp_stock s WHERE s.name = '%s''`
+	var sql_get_stock_id = `SELECT s.id AS stock_id, s.stock_type_id AS type_id FROM erp_stock s WHERE s.name = '%s'`
 	sql_get_stock_id = fmt.Sprintf(sql_get_stock_id, stock_name)
 	_, err := db_session.Sql(sql_get_stock_id).Get(&stock_id_type)
 	core.HandleError(err)

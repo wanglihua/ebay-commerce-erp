@@ -16,6 +16,7 @@ import (
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/product_service"
+	"matrix/modules/erp/service/stock_pick_crew_service"
 	"matrix/modules/erp/service/stock_service"
 	"matrix/modules/erp/service/storage_loc_service"
 )
@@ -43,7 +44,7 @@ func (c ErpInventory) PageData() revel.Result {
 	})
 }
 
-type ErpInventoryViewItem struct {
+type InventoryViewItem struct {
 	Inventory  models.InventoryInfo  `xorm:"extends" json:"ivt"`
 	Stock      models.StockInfo      `xorm:"extends" json:"st"`
 	StorageLoc models.StorageLocInfo `xorm:"extends" json:"loc"`
@@ -72,14 +73,13 @@ func (c ErpInventory) ListData() revel.Result {
 		    INNER JOIN erp_product prd ON ivt.product_id = prd.id
 	*/
 
-	query := db_session.
-	Select("ivt.*, st.*, loc.*, prd.*").
-		Table("erp_inventory").Alias("ivt").
-		Join("INNER", []string{"erp_stock", "st"}, "ivt.stock_id = st.id").
-		Join("LEFT", []string{"erp_storage_loc", "loc"}, "ivt.storage_loc_id = loc.id").
-		Join("INNER", []string{"erp_product", "prd"}, "ivt.product_id = prd.id")
-
-	//query extra filter here
+	var sb = core.NewSqlBuilder()
+	sb.Select(`ivt.*, st.*, loc.*, prd.*`)
+	sb.Count(`count(ivt.id) AS ivt_count`)
+	sb.From(`erp_inventory ivt
+		    INNER JOIN erp_stock st ON ivt.stock_id = st.id
+		    LEFT JOIN erp_storage_loc loc ON ivt.storage_loc_id = loc.id
+		    INNER JOIN erp_product prd ON ivt.product_id = prd.id`)
 
 	if stock_id_query != 0 {
 		filter = core.SqlAnd(filter, fmt.Sprintf("st.id = %d", stock_id_query))
@@ -89,26 +89,33 @@ func (c ErpInventory) ListData() revel.Result {
 		filter = core.SqlAnd(filter, fmt.Sprintf("prd.sku LIKE '%%%s%%'", product_code_query))
 	}
 
-	query = query.Where(filter)
+	var stock_id_str_list = stock_pick_crew_service.Get_login_user_stock_id_str_list(db_session, c.Session)
 
-	data_query := *query
+	filter = core.SqlAnd(filter, fmt.Sprintf("st.id IN (%s)", strings.Join(stock_id_str_list, ",")))
+
+	sb.Where(filter)
+
 	if order != "" {
-		data_query = *data_query.OrderBy(order)
+		sb.OrderBy(order)
 	} else {
-		data_query = *data_query.Asc("ivt.id")
+		sb.OrderBy("ivt.id ASC")
 	}
 
-	inventory_list := make([]ErpInventoryViewItem, 0, limit)
-	err := data_query.Limit(limit, offset).Find(&inventory_list)
+	sb.Limit(offset, limit)
+
+	inventory_list := make([]InventoryViewItem, 0, limit)
+	err := db_session.Sql(sb.SqlList()).Find(&inventory_list)
 	core.HandleError(err)
 
-	count_query := *query
-	count, err := count_query.Count(new(ErpInventoryViewItem))
+	var ivt_count struct {
+		Count int64 `xorm:"ivt_count"`
+	}
+	_, err = db_session.Sql(sb.SqlCount()).Get(&ivt_count)
 	core.HandleError(err)
 
 	return c.RenderJson(core.GridResult{
 		Data:  inventory_list,
-		Total: count,
+		Total: ivt_count.Count,
 	})
 }
 
@@ -519,7 +526,7 @@ func (c ErpInventory) get_export_excel(db_session *xorm.Session) *xlsx.File {
 		data_query = *data_query.Asc("ivt.id")
 	}
 
-	inventory_list := make([]ErpInventoryViewItem, 0)
+	inventory_list := make([]InventoryViewItem, 0)
 	err := query.Find(&inventory_list)
 	core.HandleError(err)
 
@@ -908,7 +915,7 @@ func (c ErpInventory) get_export_product_storage_loc_excel(db_session *xorm.Sess
 		data_query = *data_query.Asc("ivt.id")
 	}
 
-	inventory_list := make([]ErpInventoryViewItem, 0)
+	inventory_list := make([]InventoryViewItem, 0)
 	err := query.Find(&inventory_list)
 	core.HandleError(err)
 
@@ -1287,7 +1294,7 @@ func (c ErpInventory) get_export_inventory_quantity_excel(db_session *xorm.Sessi
 		data_query = *data_query.Asc("ivt.id")
 	}
 
-	inventory_list := make([]ErpInventoryViewItem, 0)
+	inventory_list := make([]InventoryViewItem, 0)
 	err := query.Find(&inventory_list)
 	core.HandleError(err)
 
@@ -1683,7 +1690,7 @@ func (c ErpInventory) get_export_inventory_price_excel(db_session *xorm.Session)
 		data_query = *data_query.Asc("ivt.id")
 	}
 
-	inventory_list := make([]ErpInventoryViewItem, 0)
+	inventory_list := make([]InventoryViewItem, 0)
 	err := query.Find(&inventory_list)
 	core.HandleError(err)
 
