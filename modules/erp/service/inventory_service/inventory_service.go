@@ -65,7 +65,7 @@ type Product_stock_qty struct {
 	StockId     int64       `xorm:"'stock_id'"`
 	StockTypeId int64       `xorm:"'stock_type_id'"`
 	Qty         int64       `xorm:"'qty'"`
-	CostPrice   float64     `xorm:"'cost_price'"`
+	CostPrice   float64     `xorm:"'cost_price'"` //这个是RMB，但匹配是用的应该是澳币
 }
 
 // 获取包含"这个商品"的所有"产品库存数量记录"

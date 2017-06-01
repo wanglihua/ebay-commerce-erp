@@ -439,7 +439,7 @@ func (p_ol *OrderLogistics) hold_check_oss(p_order *models.OrderInfo, p_order_lo
 
 	// 对每一个仓库循环，看是不是这个仓库里面, 这些商品都有货
 	for _, stock_id := range product_stock_id_list {
-		var stock_has_all_product, _ = check_stock_has_order_products(stock_id, p_order_logistics_data)
+		var stock_has_all_product, _ = check_stock_has_order_products(p_ol, stock_id, p_order_logistics_data)
 
 		// 找到仓库全部商品都有货了，就退出；如果这个仓库里面不是全部商品都有货，就继续找
 		if stock_has_all_product {
@@ -688,7 +688,7 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 	var au_stock_list = p_ol.au_stock_list
 	var stock_id_has_products_map = make(map[int64]float64)
 	for _, stock := range au_stock_list {
-		if has, cost_amount := check_stock_has_order_products(stock.Id, p_order_logistics_data); has == true { // 仓库有没有全部的商品数量的库存，有
+		if has, cost_amount := check_stock_has_order_products(p_ol, stock.Id, p_order_logistics_data); has == true { // 仓库有没有全部的商品数量的库存，有
 			stock_id_has_products_map[stock.Id] = cost_amount
 		}
 	}
@@ -1315,7 +1315,7 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 }
 
 // 检查仓库是否有订单中的所有商品数量的库存。这里的有货就理解成这个仓库有订单的所有的商品；这里的缺货也理解成是，没有一个仓库能凑齐所有商品的所有数量。同时返回订单的商品总成本
-func check_stock_has_order_products(stock_id int64, p_order_logistics_data *order_logistics_data_t) (has_return bool, cost_amount_return float64) {
+func check_stock_has_order_products(p_ol *OrderLogistics, stock_id int64, p_order_logistics_data *order_logistics_data_t) (has_return bool, cost_amount_return float64) {
 	var products_stock_qty_list = p_order_logistics_data.products_stock_qty_list
 	var order_product_info_list = p_order_logistics_data.order_product_info_list
 
@@ -1329,8 +1329,8 @@ func check_stock_has_order_products(stock_id int64, p_order_logistics_data *orde
 			if product_stock_qty.StockId == stock_id && product_stock_qty.ProductId == order_product_info.ProductId {
 				if product_stock_qty.Qty >= order_product_info.Qty {
 					product_has_stock = true
-					cost_amount = cost_amount + float64(order_product_info.Qty)*product_stock_qty.CostPrice
-					break //这个 break 加不加都可以的，因为 这个 stock_id， 这个 product_id 的就一条记录
+					cost_amount = cost_amount + float64(order_product_info.Qty)*product_stock_qty.CostPrice/p_ol.aud_exchange_rate // 库存成本换算成澳币
+					break                                                                                                          //这个 break 加不加都可以的，因为 这个 stock_id， 这个 product_id 的就一条记录
 				}
 			}
 		}
