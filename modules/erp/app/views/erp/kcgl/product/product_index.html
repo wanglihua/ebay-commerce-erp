@@ -108,7 +108,7 @@
                             "width": 80,
                             "bSortable": false,
                             "render": function (data, type, row) {
-                                if (data != null) {
+                                if (data !== null) {
                                     return '<a href="' + data + '" target="_blank"><img style="width:60px;height:60px;" src="' + data + '" alt="" /></a>';
                                 }
                                 else {
@@ -120,7 +120,7 @@
                             "mDataProp": "prd.sku", "title": "SKU", "bSearchable": true,
                             "render": function (data, type, row) {
                                 var sup_name = "暂无供应商";
-                                if (row.sup.name != "") {
+                                if (row.sup.name !== "") {
                                     sup_name = row.sup.name;
                                 }
                                 return '<div class="tdSkuNameSup"><a href="/product/detail/' + row.prd.id + '" target="_blank">' + row.prd.sku + '</a></div><div>' + row.prd.cn_name + '</div><div>' + sup_name + '</div>';
@@ -139,7 +139,7 @@
                             }
                         },
                         {"mDataProp": "cate.full_name", "title": "商品目录", "bSearchable": false, "width": 150},
-                        {"mDataProp": "prd.cost_price", "title": "中国仓成本(RMB)", "bSearchable": false, "width": 130},
+                        {"mDataProp": "prd.cost_price", "title": "采购价(RMB)", "bSearchable": false, "width": 130},
                         {
                             "mDataProp": "prd.id",
                             "title": "库存",
@@ -148,7 +148,7 @@
                             "width": 100,
                             "render": function (data, type, row) {
                                 var inventory_list = row.inventory_list;
-                                if (inventory_list.length == 0) {
+                                if (inventory_list.length === 0) {
                                     return "";
                                 }
 

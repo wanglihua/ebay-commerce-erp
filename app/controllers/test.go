@@ -1,12 +1,8 @@
 package controllers
 
 import (
-	"fmt"
-	"time"
-
 	"github.com/revel/revel"
-	"matrix/core"
-	"matrix/modules/erp/models"
+	"matrix/modules/erp/service/stock_pick_crew_service"
 )
 
 type Test struct {
@@ -14,64 +10,10 @@ type Test struct {
 }
 
 func (c Test) Index() revel.Result {
-	/*
 	var db_session = c.DbSession
+	var web_session = c.Session
 
-	_, err := db_session.Exec("delete from erp_test")
-	core.HandleError(err)
+	var stock_id_str_list = stock_pick_crew_service.Get_login_user_stock_id_str_list(db_session, web_session)
 
-	paid_time, err := time.ParseInLocation("2006-01-02T15:04:05.000Z", "2017-05-08T18:31:43.000Z", time.Local)
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	var test_info models.TestInfo
-
-	test_info.PaidTime = core.MakeNullLongTime(paid_time, true)
-
-	_, err = db_session.Insert(&test_info)
-	core.HandleError(err)
-
-	var test_info_list = make([]models.TestInfo, 0)
-	err = db_session.Find(&test_info_list)
-	core.HandleError(err)
-
-	fmt.Println(test_info_list)
-
-	return c.RenderJson(test_info_list)
-	*/
-
-	var db_session = c.DbSession
-
-	_, err := db_session.Exec("delete from erp_test")
-	core.HandleError(err)
-
-	paid_time, err := time.ParseInLocation("2006-01-02T15:04:05.000Z", "2017-05-08T18:31:43.000Z", time.UTC)
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	fmt.Println(paid_time.Format("2006-01-02 15:04:05"))
-
-	paid_time = paid_time.Local()
-	paid_time = paid_time.Local()
-
-	fmt.Println(paid_time.Format("2006-01-02 15:04:05"))
-
-	var test_info models.TestInfo
-
-	test_info.PaidTime1 = core.MakeNullLongTime(paid_time, true)
-	test_info.PaidTime2 = paid_time
-	test_info.PaidTime3 = core.Time(paid_time)
-
-	_, err = db_session.Insert(&test_info)
-	core.HandleError(err)
-
-	var test_info_list = make([]models.TestInfo, 0)
-	err = db_session.Find(&test_info_list)
-	core.HandleError(err)
-
-	fmt.Println(test_info_list)
-
-	return c.RenderJson(test_info_list)
+	return c.RenderJson(stock_id_str_list)
 }
