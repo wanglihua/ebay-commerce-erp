@@ -91,7 +91,7 @@
                                         <div class="form-group">
                                             <label for="l1_parent" class="col-xs-2 control-label">一级父目录</label>
                                             <div class="col-xs-10">
-                                                <select id="l1_parent" name="detail.product_cate.l1_parent" class="input-sm form-control" v-model.number="detail.product_cate.l1_parent">
+                                                <select id="l1_parent" name="detail.product_cate.l1_parent" class="input-sm form-control" v-model.number="detail.product_cate.l1_parent" @change="getL2ParentCateList">
                                                     <option :value="0"></option>
                                                     <template v-for="parent_cate in detail.l1_parent_cate_list">
                                                         <option :value="parent_cate.id">{{parent_cate.name}}</option>
@@ -155,7 +155,8 @@
         data: {
             "detail": {
                 "product_cate": {},
-                "parent_cate_list": [],
+                "l1_parent_cate_list": [],
+                "l2_parent_cate_list": [],
                 "status_list": []
             }
         },
@@ -295,6 +296,23 @@
                         }
                     });
                 });
+            },
+            getL2ParentCateList: function () {
+                $.ajax({
+                        url: '{%url "ErpProductCate.GetL2ProductCateList" %}',
+                        type: "POST",
+                        data: {
+                            "l1_parent": vm.detail.product_cate.l1_parent
+                        },
+                        success: function (result) {
+                            if (result.success === false) {
+                                $.msg.error(result.message);
+                                return;
+                            }
+                            vm.detail.l2_parent_cate_list = result.l2_product_cate_list;
+                        }
+                    }
+                );
             }
         }
     });

@@ -170,7 +170,7 @@ func (c ErpProductCate) Save() revel.Result {
 			})
 		}
 
-		product_cate.L1Parent = 0
+		product_cate.L2Parent = 0
 	}
 
 	if product_cate.Level == 3 {
