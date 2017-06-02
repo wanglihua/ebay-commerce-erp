@@ -140,7 +140,7 @@
                         },
                         {"mDataProp": "cate.full_name", "title": "商品目录", "bSearchable": false, "width": 150},
                         {
-                            "mDataProp": "prd.cost_price", "title": "采购价(RMB)", "bSearchable": false, "width": 130,
+                            "mDataProp": "prd.cost_price", "title": "中国仓<br/>采购价(RMB)", "bSearchable": false, "width": 130,
                             "render": function (data, type, row) {
                                 return dtFormatFloat(data);
                             }
@@ -160,7 +160,7 @@
                                 var inventory_desc = "";
                                 for (var index in inventory_list) {
                                     var inventory = inventory_list[index];
-                                    inventory_desc += inventory.st.name + " " + inventory.sl.name + " " + inventory.nvt.qty + "<br/>";
+                                    inventory_desc += inventory.st.name + " " + inventory.sl.name + " " + inventory.nvt.qty + " " + dtFormatFloat(inventory.nvt.cost_price) +   "<br/>";
                                 }
                                 return inventory_desc;
                             }

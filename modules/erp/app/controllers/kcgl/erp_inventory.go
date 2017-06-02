@@ -1163,6 +1163,7 @@ func (c ErpInventory) ImportInventoryQuantity() revel.Result {
 			inventory_import.StockName = cell_val
 			col_index++
 
+			/*
 			// 仓位名称
 			cell = row.Cells[col_index]
 			cell_val, err = cell.String()
@@ -1170,6 +1171,7 @@ func (c ErpInventory) ImportInventoryQuantity() revel.Result {
 			cell_val = strings.TrimSpace(cell_val)
 			inventory_import.StorageLocName = cell_val
 			col_index++
+			*/
 
 			// 库存
 			cell = row.Cells[col_index]
@@ -1227,6 +1229,7 @@ func (c ErpInventory) ImportInventoryQuantity() revel.Result {
 				inventory_import_error_list = append(inventory_import_error_list, inventory_import)
 			}
 
+			/*
 			var storage_loc_name = strings.TrimSpace(inventory_import.StorageLocName)
 			if storage_loc_name != "" {
 				// 如果提供了仓位， 检查仓位名称
@@ -1236,6 +1239,7 @@ func (c ErpInventory) ImportInventoryQuantity() revel.Result {
 					inventory_import_error_list = append(inventory_import_error_list, inventory_import)
 				}
 			}
+			*/
 		}
 
 		inventory_import_list[index].product_id = product_id
@@ -1255,15 +1259,15 @@ func (c ErpInventory) ImportInventoryQuantity() revel.Result {
 	for _, inventory_import := range inventory_import_list {
 
 		var stock_id = inventory_import.stock_id
-		var storage_loc_id = inventory_import.storage_loc_id
+		//var storage_loc_id = inventory_import.storage_loc_id
 		var product_id = inventory_import.product_id
 
 		var inventory models.InventoryInfo
-		has, err := db_session.Where(fmt.Sprintf("stock_id = %d AND storage_loc_id = %d", stock_id, storage_loc_id)).Get(&inventory)
+		has, err := db_session.Where(fmt.Sprintf("stock_id = %d AND product_id = %d", stock_id, product_id)).Get(&inventory)
 		core.HandleError(err)
 
 		inventory.StockId = stock_id
-		inventory.StorageLocId = storage_loc_id
+		//inventory.StorageLocId = storage_loc_id
 		inventory.ProductId = product_id
 		inventory.Qty = inventory_import.Qty
 
@@ -1571,6 +1575,7 @@ func (c ErpInventory) ImportInventoryPrice() revel.Result {
 			inventory_import.StockName = cell_val
 			col_index++
 
+			/*
 			// 仓位名称
 			cell = row.Cells[col_index]
 			cell_val, err = cell.String()
@@ -1578,6 +1583,7 @@ func (c ErpInventory) ImportInventoryPrice() revel.Result {
 			cell_val = strings.TrimSpace(cell_val)
 			inventory_import.StorageLocName = cell_val
 			col_index++
+			*/
 
 			// 成本价
 			cell = row.Cells[col_index]
@@ -1642,6 +1648,7 @@ func (c ErpInventory) ImportInventoryPrice() revel.Result {
 				inventory_import_error_list = append(inventory_import_error_list, inventory_import)
 			}
 
+			/*
 			var storage_loc_name = strings.TrimSpace(inventory_import.StorageLocName)
 			if storage_loc_name != "" {
 				// 如果提供了仓位， 检查仓位名称
@@ -1651,6 +1658,7 @@ func (c ErpInventory) ImportInventoryPrice() revel.Result {
 					inventory_import_error_list = append(inventory_import_error_list, inventory_import)
 				}
 			}
+			*/
 		}
 
 		inventory_import_list[index].product_id = product_id
@@ -1669,15 +1677,15 @@ func (c ErpInventory) ImportInventoryPrice() revel.Result {
 	for _, inventory_import := range inventory_import_list {
 
 		var stock_id = inventory_import.stock_id
-		var storage_loc_id = inventory_import.storage_loc_id
+		//var storage_loc_id = inventory_import.storage_loc_id
 		var product_id = inventory_import.product_id
 
 		var inventory models.InventoryInfo
-		has, err := db_session.Where(fmt.Sprintf("stock_id = %d AND storage_loc_id = %d", stock_id, storage_loc_id)).Get(&inventory)
+		has, err := db_session.Where(fmt.Sprintf("stock_id = %d AND product_id = %d", stock_id, product_id)).Get(&inventory)
 		core.HandleError(err)
 
 		inventory.StockId = stock_id
-		inventory.StorageLocId = storage_loc_id
+		// inventory.StorageLocId = storage_loc_id
 		inventory.ProductId = product_id
 		inventory.CostPrice = inventory_import.CostPrice
 
