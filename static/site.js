@@ -36,6 +36,13 @@ function dtFormatFloat(data) {
     return $.formatNumber(data, {format: "#,##0.00", locale: "cn"});
 }
 
+function dtFormatFloat3(data) {
+    if ((!data) && (data !== 0)) {
+        return "";
+    }
+    return $.formatNumber(data, {format: "#,##0.000", locale: "cn"});
+}
+
 function dtFormatFloat4(data) {
     if ((!data) && (data !== 0)) {
         return "";

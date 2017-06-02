@@ -229,8 +229,8 @@
                         {
                             "mDataProp": "p.length", "title": "长度", "bSearchable": false, "width": 80,
                             "render": function (data, type, row) {
-                                if (data != 0) {
-                                    return data + " cm";
+                                if (data !== 0) {
+                                    return dtFormatFloat1(data) + " cm";
                                 }
                                 else {
                                     return "";
@@ -240,8 +240,8 @@
                         {
                             "mDataProp": "p.width", "title": "宽度", "bSearchable": false, "width": 80,
                             "render": function (data, type, row) {
-                                if (data != 0) {
-                                    return data + " cm";
+                                if (data !== 0) {
+                                    return dtFormatFloat1(data) + " cm";
                                 }
                                 else {
                                     return "";
@@ -251,8 +251,8 @@
                         {
                             "mDataProp": "p.height", "title": "高度", "bSearchable": false, "width": 80,
                             "render": function (data, type, row) {
-                                if (data != 0) {
-                                    return data + " cm";
+                                if (data !== 0) {
+                                    return dtFormatFloat1(data) + " cm";
                                 }
                                 else {
                                     return "";
@@ -262,8 +262,8 @@
                         {
                             "mDataProp": "p.weight", "title": "重量", "bSearchable": false, "width": 80,
                             "render": function (data, type, row) {
-                                if (data != 0) {
-                                    return data + " kg";
+                                if (data !== 0) {
+                                    return dtFormatFloat3(data) + " kg";
                                 }
                                 else {
                                     return "";
@@ -287,7 +287,7 @@
                                 "success": function (data) {
                                     hideMask();
 
-                                    if (data.success == false) {
+                                    if (data.success === false) {
                                         $.msg.error(data.message);
                                         return;
                                     }
