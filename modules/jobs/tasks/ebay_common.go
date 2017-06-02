@@ -15,8 +15,8 @@ import (
 const log_response_xml_to_file = false
 
 type Shop_account_api_info struct {
-	APIConfig models.EBayAPIConfigInfo `xorm:"'extends'"`
-	Shop      models.ShopAccountInfo   `xorm:"'extends'"`
+	APIConfig models.EBayAPIConfigInfo `xorm:"extends"`
+	Shop      models.ShopAccountInfo   `xorm:"extends"`
 }
 
 func get_ebay_api_config_list(db_session *xorm.Session) []Shop_account_api_info {
