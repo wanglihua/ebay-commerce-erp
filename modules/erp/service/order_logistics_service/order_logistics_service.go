@@ -1486,11 +1486,11 @@ INSERT INTO erp_order_shipping_address (order_id, name, street1, street2, city_n
     WHERE order_id IN (-1, -2)
 		 */
 		// 删除 shipping_address
-		//var sql_insert_address = `INSERT INTO erp_order_shipping_address (order_id, name, street1, street2, city_name, province, country, country_name, phone, postal_code, address_id, address_owner, external_address_id, create_time, update_time)
-    //SELECT %d, name, street1, street2, city_name, province, country, country_name, phone, postal_code, address_id, address_owner, external_address_id, create_time, update_time
-    //FROM erp_order_shipping_address
-    //WHERE order_id IN (%s)`
-		//sql_insert_address = fmt.Sprintf(sql_insert_address, first_order_id, strings.Join(order_id_str_list[1:], ",")) // 修改第一个订单之外的 shipping address
+		// var sql_insert_address = `INSERT INTO erp_order_shipping_address (order_id, name, street1, street2, city_name, province, country, country_name, phone, postal_code, address_id, address_owner, external_address_id, create_time, update_time)
+		// SELECT %d, name, street1, street2, city_name, province, country, country_name, phone, postal_code, address_id, address_owner, external_address_id, create_time, update_time
+		// FROM erp_order_shipping_address
+		// WHERE order_id IN (%s)`
+		// sql_insert_address = fmt.Sprintf(sql_insert_address, first_order_id, strings.Join(order_id_str_list[1:], ",")) // 修改第一个订单之外的 shipping address
 		// 好像不用修改被合并订单的地址
 		// _, err = db_session.Exec(sql_insert_address)
 		// core.HandleError(err)
@@ -1498,7 +1498,7 @@ INSERT INTO erp_order_shipping_address (order_id, name, street1, street2, city_n
 		// 把原来的订单作废
 		// UPDATE erp_order SET status_id = 4350 WHERE id IN (-1, -2)
 		var sql_cancel_order = `UPDATE erp_order SET status_id = %d WHERE id IN (%s)`
-		sql_cancel_order = fmt.Sprintf(sql_cancel_order, models.ORDER_STATUS_YQX, strings.Join(order_id_str_list[1:], ",")) // 作废第一个之外的 order
+		sql_cancel_order = fmt.Sprintf(sql_cancel_order, models.ORDER_STATUS_YQX, strings.Join(order_id_str_list[1:], ",")) // 作废第一个之外的 order，设置为已取消状态
 		_, err = db_session.Exec(sql_cancel_order)
 		core.HandleError(err)
 	}
