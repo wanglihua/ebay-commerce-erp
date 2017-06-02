@@ -236,6 +236,8 @@ func (c ErpStorageLoc) Import() revel.Result {
 	for sheet_index := 0; sheet_index < sheet_count; sheet_index ++ {
 		sheet := xlsx_file.Sheets[sheet_index]
 		max_row := sheet.MaxRow
+
+		revel.TRACE.Println("max_row", max_row)
 		//略过标题行
 		for row_index := 1; row_index < max_row; row_index ++ {
 			row := sheet.Rows[row_index]
@@ -250,10 +252,6 @@ func (c ErpStorageLoc) Import() revel.Result {
 
 			// 序号	仓库名称	仓位名称	仓位描述
 			var data_col_count = 5
-
-			if len(row.Cells) < data_col_count-1 { // 最后一列可能为空
-				break
-			}
 
 			// 序号
 			cell = row.Cells[col_index]

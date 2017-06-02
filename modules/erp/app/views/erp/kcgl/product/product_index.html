@@ -139,7 +139,12 @@
                             }
                         },
                         {"mDataProp": "cate.full_name", "title": "商品目录", "bSearchable": false, "width": 150},
-                        {"mDataProp": "prd.cost_price", "title": "采购价(RMB)", "bSearchable": false, "width": 130},
+                        {
+                            "mDataProp": "prd.cost_price", "title": "采购价(RMB)", "bSearchable": false, "width": 130,
+                            "render": function (data, type, row) {
+                                return dtFormatFloat(data);
+                            }
+                        },
                         {
                             "mDataProp": "prd.id",
                             "title": "库存",
@@ -190,7 +195,7 @@
                                 "success": function (data) {
                                     hideMask();
 
-                                    if (data.success == false) {
+                                    if (data.success === false) {
                                         $.msg.error(data.message);
                                         return;
                                     }
@@ -279,7 +284,7 @@
                             data: JSON.stringify(vm.detail),
                             success: function (data) {
                                 hideMask();
-                                if (data.success == false) {
+                                if (data.success === false) {
                                     $.msg.error(data.message);
                                     //return;
                                 }
@@ -302,7 +307,7 @@
                     }
                 });
 
-                if (id_list.length == 0) {
+                if (id_list.length === 0) {
                     $.msg.alert("请选择数据！");
                     return;
                 }
@@ -313,7 +318,7 @@
                         type: "POST",
                         data: {"id_list": id_list},
                         success: function (data) {
-                            if (data.success == false) {
+                            if (data.success === false) {
                                 $.msg.error(data.message);
                                 return;
                             }

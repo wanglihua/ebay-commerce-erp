@@ -85,6 +85,7 @@ func GetSppzMenu(res_id_map map[int64]bool, web_session revel.Session) string {
         </li>`)
 	}
 
+	/*
 	if check_pass_res_menu(pass_res.SPPZ_PSL_BATCH) {
 		buffer.WriteString(`<li id="sppz-psl-batch-menu" class="">
             <a href="/product/storage/loc/batch/edit">
@@ -94,6 +95,7 @@ func GetSppzMenu(res_id_map map[int64]bool, web_session revel.Session) string {
             <b class="arrow"></b>
         </li>`)
 	}
+	*/
 
 	if check_pass_res_menu(pass_res.SPPZ_SUPPLIER) {
 		buffer.WriteString(`<li id="sppz-supplier-menu" class="">
