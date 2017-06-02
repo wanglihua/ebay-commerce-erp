@@ -451,7 +451,7 @@ func (c ErpInventory) Import() revel.Result {
 		var product_id = inventory_import.product_id
 
 		var inventory models.InventoryInfo
-		has, err := db_session.Where(fmt.Sprintf("stock_id = %d AND storage_loc_id = %d AND product_id = %d", stock_id, storage_loc_id, product_id)).Get(&inventory)
+		has, err := db_session.Where(fmt.Sprintf("stock_id = %d AND storage_loc_id = %d", stock_id, storage_loc_id)).Get(&inventory)
 		core.HandleError(err)
 
 		inventory.StockId = stock_id
@@ -467,7 +467,7 @@ func (c ErpInventory) Import() revel.Result {
 			core.HandleError(err)
 		} else {
 			// 更新
-			_, err := db_session.Id(inventory.Id).Cols("stock_id", "storage_loc_id", "product_id", "qty", "cost_price").Update(&inventory)
+			_, err := db_session.Id(inventory.Id).Cols("product_id", "qty", "cost_price").Update(&inventory)
 			core.HandleError(err)
 		}
 	}
@@ -1251,6 +1251,7 @@ func (c ErpInventory) ImportInventoryQuantity() revel.Result {
 		})
 	}
 
+	revel.TRACE.Println("inventory_import_list", len(inventory_import_list))
 	for _, inventory_import := range inventory_import_list {
 
 		var stock_id = inventory_import.stock_id
