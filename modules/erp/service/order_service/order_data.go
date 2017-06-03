@@ -210,7 +210,7 @@ WHERE p.name like '%%%s%%'`
 
 func Get_paid_order_list(db_session *xorm.Session) []models.OrderInfo {
 	var paid_order_list = make([]models.OrderInfo, 0)
-	err := db_session.Sql(fmt.Sprintf("SELECT * FROM erp_order o WHERE o.status_id = %d", models.ORDER_STATUS_YZF)).Find(&paid_order_list)
+	err := db_session.Sql(fmt.Sprintf("SELECT * FROM erp_order o WHERE o.status_id = %d ORDER BY o.paid_time ASC, o.id ASC", models.ORDER_STATUS_YZF)).Find(&paid_order_list)
 	core.HandleError(err)
 
 	return paid_order_list

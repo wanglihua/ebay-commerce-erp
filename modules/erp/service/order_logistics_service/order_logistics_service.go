@@ -129,7 +129,7 @@ func (p_ol *OrderLogistics) CalculateListImportBatch(batch_code int64, db_sessio
 	/*
 SELECT o.* FROM erp_order o WHERE o.batch_code = 0
 	 */
-	var sql_import_batch_order = `SELECT o.* FROM erp_order o WHERE o.batch_code = %d`
+	var sql_import_batch_order = `SELECT o.* FROM erp_order o WHERE o.batch_code = %d ORDER BY o.paid_time ASC, o.id ASC`
 	sql_import_batch_order = fmt.Sprintf(sql_import_batch_order, batch_code)
 
 	var order_list = make([]models.OrderInfo, 0)
@@ -262,10 +262,12 @@ func (p_ol *OrderLogistics) CalculateList(order_list []models.OrderInfo, db_sess
 			continue
 		}
 
+		/*
 		// 6. 系统显示最佳仓缺货（次佳、海上有货）
 		if p_ol.hold_check_oss_best_stock(&order, p_order_logistics_data, db_session) {
 			continue
 		}
+		*/
 
 		// 7 实际仓库缺货（是在捡货过程中，虽然系统显示有货，但实际仓库没有货了。就需要人工手动将这些订单搬至这里的模块，等待跟客户协商，是退款还是等待集装箱）
 
@@ -378,7 +380,7 @@ func (p_ol *OrderLogistics) hold_check_oss_all_stock(p_order *models.OrderInfo, 
 		}
 	}
 
-	if p_ol.hold_check_oss(p_order, p_order_logistics_data, fun_is_not_cn_stock, db_session) {
+	if p_ol.hold_check_oss_by_stock_type(p_order, p_order_logistics_data, fun_is_not_cn_stock, db_session) {
 		p_ol.update_order_to_hold_type(p_order, models.ORDER_HOLD_TYPE_OOS_ALL_STOCK, db_session)
 		return true
 	}
@@ -387,6 +389,8 @@ func (p_ol *OrderLogistics) hold_check_oss_all_stock(p_order *models.OrderInfo, 
 }
 
 // 6. 系统显示最佳仓缺货（次佳、海上有货）
+// 这个在需求上有更改，不用这个了
+/*
 func (p_ol *OrderLogistics) hold_check_oss_best_stock(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, db_session *xorm.Session) (is_hold_return bool) {
 	// 检查 澳洲 的仓库
 	// todo: 这里还有点问题，应该是检查对应的在途仓库？
@@ -407,19 +411,20 @@ func (p_ol *OrderLogistics) hold_check_oss_best_stock(p_order *models.OrderInfo,
 	}
 
 	// 澳洲仓库缺货，但在途仓库有货
-	if p_ol.hold_check_oss(p_order, p_order_logistics_data, fun_is_au_stock, db_session) == true && p_ol.hold_check_oss(p_order, p_order_logistics_data, fun_is_zt_stock, db_session) == false {
+	if p_ol.hold_check_oss_by_stock_type(p_order, p_order_logistics_data, fun_is_au_stock, db_session) == true && p_ol.hold_check_oss_by_stock_type(p_order, p_order_logistics_data, fun_is_zt_stock, db_session) == false {
 		p_ol.update_order_to_hold_type(p_order, models.ORDER_HOLD_TYPE_OOS_BEST_STOCK, db_session)
 		return true
 	}
 
 	return false
 }
+*/
 
 //返回 true, 表明考虑的是符合要求的
 type fun_stock_type_filter_t func(stock_type_id int64) bool
 
 // 订单商品库存检查，用于给 5 和 6 的调用
-func (p_ol *OrderLogistics) hold_check_oss(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, fun_stock_type_filter fun_stock_type_filter_t, db_session *xorm.Session) (is_oss_return bool) {
+func (p_ol *OrderLogistics) hold_check_oss_by_stock_type(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, fun_stock_type_filter fun_stock_type_filter_t, db_session *xorm.Session) (is_oss_return bool) {
 	var products_stock_qty_list = p_order_logistics_data.products_stock_qty_list
 
 	// 找出所有包含这些商品库存的仓库id列表
@@ -1215,7 +1220,6 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 
 			_, err := db_session.Insert(&logistics_match_debug)
 			core.HandleError(err)
-
 		}
 	} // for _, logistics_mode := range logistics_mode_list {
 

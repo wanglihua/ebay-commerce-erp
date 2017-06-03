@@ -55,7 +55,7 @@ func (t OrderLogisticsMatchTask) Run() {
 	 */
 
 	var paid_download_order_list = make([]models.OrderInfo, 0)
-	err = db_session.Sql(fmt.Sprintf("SELECT * FROM erp_order o WHERE o.type_id <> %d AND o.status_id = %d", models.ORDER_TYPE_DRDD, models.ORDER_STATUS_YZF)).Find(&paid_download_order_list)
+	err = db_session.Sql(fmt.Sprintf("SELECT * FROM erp_order o WHERE o.type_id <> %d AND o.status_id = %d ORDER BY o.paid_time ASC, o.id ASC", models.ORDER_TYPE_DRDD, models.ORDER_STATUS_YZF)).Find(&paid_download_order_list)
 	core.HandleError(err)
 
 	if len(paid_download_order_list) != 0 {
