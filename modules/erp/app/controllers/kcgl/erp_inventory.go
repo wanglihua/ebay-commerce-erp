@@ -716,6 +716,7 @@ func (c ErpInventory) ImportProductStorageLoc() revel.Result {
 
 		// 下面这些字段是从数据库里面查询后保存在这里面的，这样过程中，就不用二次查询了
 		stock_id       int64
+		stock_type_id  int64
 		storage_loc_id int64
 		product_id     int64
 		ErrorMessage   string `json:"error_message"`
@@ -819,7 +820,7 @@ func (c ErpInventory) ImportProductStorageLoc() revel.Result {
 		}
 
 		// 检查 仓库名称
-		stock_id, _ := stock_service.Get_stock_id_type_by_name(inventory_import.StockName, db_session)
+		stock_id, stock_type_id := stock_service.Get_stock_id_type_by_name(inventory_import.StockName, db_session)
 		var storage_loc_id int64
 
 		if stock_id == 0 {
@@ -844,6 +845,7 @@ func (c ErpInventory) ImportProductStorageLoc() revel.Result {
 
 		inventory_import_list[index].product_id = product_id
 		inventory_import_list[index].stock_id = stock_id
+		inventory_import_list[index].stock_type_id = stock_type_id
 		inventory_import_list[index].storage_loc_id = storage_loc_id
 	}
 
@@ -858,25 +860,48 @@ func (c ErpInventory) ImportProductStorageLoc() revel.Result {
 	for _, inventory_import := range inventory_import_list {
 
 		var stock_id = inventory_import.stock_id
+		var stock_type_id = inventory_import.stock_type_id
 		var storage_loc_id = inventory_import.storage_loc_id
 		var product_id = inventory_import.product_id
 
-		var inventory models.InventoryInfo
-		has, err := db_session.Where(fmt.Sprintf("stock_id = %d AND storage_loc_id = %d", stock_id, storage_loc_id)).Get(&inventory)
-		core.HandleError(err)
-
-		inventory.StockId = stock_id
-		inventory.StorageLocId = storage_loc_id
-		inventory.ProductId = product_id
-
-		if has == false {
-			// 插入
-			_, err = db_session.Insert(&inventory)
+		if stock_type_id == models.STOCK_TYPE_AU {
+			//澳仓一个仓位只能一个SKU
+			var inventory models.InventoryInfo
+			has, err := db_session.Where(fmt.Sprintf("stock_id = %d AND storage_loc_id = %d", stock_id, storage_loc_id)).Get(&inventory)
 			core.HandleError(err)
+
+			inventory.StockId = stock_id
+			inventory.StorageLocId = storage_loc_id
+			inventory.ProductId = product_id
+
+			if has == false {
+				// 插入
+				_, err = db_session.Insert(&inventory)
+				core.HandleError(err)
+			} else {
+				// 更新
+				_, err := db_session.Id(inventory.Id).Cols("product_id").Update(&inventory)
+				core.HandleError(err)
+			}
 		} else {
-			// 更新
-			_, err := db_session.Id(inventory.Id).Cols("product_id").Update(&inventory)
+			// 中国仓和在途仓，一个仓位可以多个SKU
+			var inventory models.InventoryInfo
+			has, err := db_session.Where(fmt.Sprintf("stock_id = %d AND product_id = %d", stock_id, product_id)).Get(&inventory)
 			core.HandleError(err)
+
+			inventory.StockId = stock_id
+			inventory.StorageLocId = storage_loc_id
+			inventory.ProductId = product_id
+
+			if has == false {
+				// 插入
+				_, err = db_session.Insert(&inventory)
+				core.HandleError(err)
+			} else {
+				// 更新
+				_, err := db_session.Id(inventory.Id).Cols("storage_loc_id").Update(&inventory)
+				core.HandleError(err)
+			}
 		}
 	}
 
