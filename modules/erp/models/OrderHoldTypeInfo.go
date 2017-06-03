@@ -31,7 +31,8 @@ const (
 	ORDER_HOLD_TYPE_PLATFORM_LEAVE_WORD    int64 = 10030 // 有平台留言
 	ORDER_HOLD_TYPE_PICK_UP                int64 = 10040 // PICK UP
 	ORDER_HOLD_TYPE_OOS_ALL_STOCK          int64 = 10050 // 系统显示所有仓都缺货（中国仓除外） OOS: Out Of Stock
-	ORDER_HOLD_TYPE_OOS_BEST_STOCK         int64 = 10060 // 系统显示最佳仓缺货（次佳、海上有货）
+	ORDER_HOLD_TYPE_OOS_AU_STOCK_ZT_HAS    int64 = 10055 // 澳仓无货，在途才有货
+	ORDER_HOLD_TYPE_OOS_BEST_STOCK         int64 = 10060 // 匹配运费后，最佳仓库无货，运费偏差范围能的次佳仓库有货
 	ORDER_HOLD_TYPE_OOS_ACTUAL_STOCK       int64 = 10070 // 实际仓库缺货
 	ORDER_HOLD_TYPE_OOS_SOME_PRODUCT       int64 = 10080 // 多数量或多产品，但部分缺货（是否拆分订单）
 	ORDER_HOLD_TYPE_MULTI_PRODUCT          int64 = 10075 // 多商品，这是个临时的状态，下面三个的多商品判断实在太麻烦，先用这个临时解决方案
@@ -87,6 +88,13 @@ func (e OrderHoldTypeInfo) InitData(db_session *xorm.Session) {
 	order_hold_type.Id = ORDER_HOLD_TYPE_OOS_ALL_STOCK
 	order_hold_type.Name = "缺货"
 	order_hold_type.Desc = "系统显示所有仓都缺货（中国仓除外）"
+	db_session.Insert(order_hold_type)
+
+	//ORDER_HOLD_TYPE_OOS_AU_STOCK_ZT_HAS
+	order_hold_type = new(OrderHoldTypeInfo)
+	order_hold_type.Id = ORDER_HOLD_TYPE_OOS_AU_STOCK_ZT_HAS
+	order_hold_type.Name = "在途才有货"
+	order_hold_type.Desc = "澳仓没货，在途仓才有货"
 	db_session.Insert(order_hold_type)
 
 	// ORDER_HOLD_TYPE_OOS_BEST_STOCK         int64 = 10060 // 系统显示最佳仓缺货（次佳、海上有货）

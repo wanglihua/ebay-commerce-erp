@@ -262,12 +262,11 @@ func (p_ol *OrderLogistics) CalculateList(order_list []models.OrderInfo, db_sess
 			continue
 		}
 
-		/*
 		// 6. 系统显示最佳仓缺货（次佳、海上有货）
-		if p_ol.hold_check_oss_best_stock(&order, p_order_logistics_data, db_session) {
+		// 改成在途才有货
+		if p_ol.hold_check_oss_au_stock_but_zt_stock_has(&order, p_order_logistics_data, db_session) {
 			continue
 		}
-		*/
 
 		// 7 实际仓库缺货（是在捡货过程中，虽然系统显示有货，但实际仓库没有货了。就需要人工手动将这些订单搬至这里的模块，等待跟客户协商，是退款还是等待集装箱）
 
@@ -390,10 +389,12 @@ func (p_ol *OrderLogistics) hold_check_oss_all_stock(p_order *models.OrderInfo, 
 
 // 6. 系统显示最佳仓缺货（次佳、海上有货）
 // 这个在需求上有更改，不用这个了
-/*
-func (p_ol *OrderLogistics) hold_check_oss_best_stock(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, db_session *xorm.Session) (is_hold_return bool) {
+// 后来改成在途才有货
+
+func (p_ol *OrderLogistics) hold_check_oss_au_stock_but_zt_stock_has(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, db_session *xorm.Session) (is_hold_return bool) {
 	// 检查 澳洲 的仓库
-	// todo: 这里还有点问题，应该是检查对应的在途仓库？
+	// todo: 这里还有点问题，应该是检查对应的在途仓库？,先不考虑这个问题了
+
 	var fun_is_au_stock = func(stock_type_id int64) bool {
 		if stock_type_id == models.STOCK_TYPE_AU {
 			return true
@@ -412,13 +413,13 @@ func (p_ol *OrderLogistics) hold_check_oss_best_stock(p_order *models.OrderInfo,
 
 	// 澳洲仓库缺货，但在途仓库有货
 	if p_ol.hold_check_oss_by_stock_type(p_order, p_order_logistics_data, fun_is_au_stock, db_session) == true && p_ol.hold_check_oss_by_stock_type(p_order, p_order_logistics_data, fun_is_zt_stock, db_session) == false {
-		p_ol.update_order_to_hold_type(p_order, models.ORDER_HOLD_TYPE_OOS_BEST_STOCK, db_session)
+		p_ol.update_order_to_hold_type(p_order, models.ORDER_HOLD_TYPE_OOS_AU_STOCK_ZT_HAS, db_session)
 		return true
 	}
 
 	return false
 }
-*/
+
 
 //返回 true, 表明考虑的是符合要求的
 type fun_stock_type_filter_t func(stock_type_id int64) bool
