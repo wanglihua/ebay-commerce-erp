@@ -189,7 +189,7 @@ WHERE s.stock_type_id = %d;`
 		var avg_sea_shipping_cost = float64(sea_container_cost.Cost) * product.Length * product.Width * product.Height / float64(sea_container_cost.Volume)
 
 		var update_au_inventory_sql = `UPDATE erp_inventory SET cost_price = %f WHERE product_id = %d AND (SELECT s.stock_type_id FROM erp_stock s WHERE s.id = erp_inventory.stock_id) = %d;`
-		update_au_inventory_sql = fmt.Sprintf(update_au_inventory_sql, cn_cost_price+avg_sea_shipping_cost, cn_inventory.StockId, models.STOCK_TYPE_AU)
+		update_au_inventory_sql = fmt.Sprintf(update_au_inventory_sql, cn_cost_price+avg_sea_shipping_cost, cn_inventory.ProductId, models.STOCK_TYPE_AU)
 		_, err = db_session.Exec(update_au_inventory_sql)
 		core.HandleError(err)
 	}

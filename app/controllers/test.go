@@ -2,7 +2,7 @@ package controllers
 
 import (
 	"github.com/revel/revel"
-	"matrix/modules/erp/service/stock_pick_crew_service"
+	"matrix/modules/erp/service/inventory_service"
 )
 
 type Test struct {
@@ -10,10 +10,10 @@ type Test struct {
 }
 
 func (c Test) Index() revel.Result {
-	var db_session = c.DbSession
-	var web_session = c.Session
 
-	var stock_id_str_list = stock_pick_crew_service.Get_login_user_stock_id_str_list(db_session, web_session)
+	go inventory_service.Update_au_stock_cost()
 
-	return c.RenderJson(stock_id_str_list)
+	return c.RenderJson(map[string]interface{}{
+		"success": true,
+	})
 }
