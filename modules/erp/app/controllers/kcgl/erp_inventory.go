@@ -208,20 +208,42 @@ func (c ErpInventory) Save() revel.Result {
 
 	inventory.ProductId = product_id
 
+	// 数据库中 stock_id, storage_loc_id, product_id 三者的组合应该是唯一的
+	var inventory_in_db models.InventoryInfo
+	_, err = db_session.
+	Where("stock_id = ? AND storage_loc_id = ? AND product_id = ?", inventory.StockId, inventory.StorageLocId, inventory.ProductId).
+		Get(&inventory_in_db)
+	core.HandleError(err)
+
 	var affected int64
-	if detail_form.IsCreate() {
+	if inventory_in_db.Id == 0 { //创建数据库记录
 		inventory_count, err := db_session.Where("stock_id = ? AND storage_loc_id = ?", inventory.StockId, inventory.StorageLocId).Count(new(models.InventoryInfo))
 		core.HandleError(err)
 		if inventory_count != 0 {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，仓库仓位中SKU库存已存在，一个仓位只能一个SKU！" })
 		}
+
+		inventory_count, err = db_session.Where("stock_id = ? AND product_id = ?", inventory.StockId, inventory.ProductId).Count(new(models.InventoryInfo))
+		core.HandleError(err)
+		if inventory_count != 0 {
+			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，仓库中SKU的库存已存在，一个SKU只能一个仓位！" })
+		}
+
 		affected, err = db_session.Insert(&inventory)
 		core.HandleError(err)
-	} else {
+	} else { // 更新数据库记录
+		inventory.Id = inventory_in_db.Id
+
 		inventory_count, err := db_session.Where("id <> ? AND stock_id = ? AND storage_loc_id = ?", inventory.Id, inventory.StockId, inventory.StorageLocId).Count(new(models.InventoryInfo))
 		core.HandleError(err)
 		if inventory_count != 0 {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，仓库仓位中SKU库存已存在，一个仓位只能一个SKU！" })
+		}
+
+		inventory_count, err = db_session.Where("id <> ? AND stock_id = ? AND product_id = ?", inventory.Id, inventory.StockId, inventory.ProductId).Count(new(models.InventoryInfo))
+		core.HandleError(err)
+		if inventory_count != 0 {
+			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，仓库中SKU的库存已存在，一个SKU只能一个仓位！" })
 		}
 
 		affected, err = db_session.Id(inventory.Id).Update(&inventory)
@@ -807,6 +829,8 @@ func (c ErpInventory) ImportProductStorageLoc() revel.Result {
 		return false
 	}
 
+	var au_stock_id_map = make(map[int64]int64)
+	var au_stock_import_list = make([]inventory_import_t, 0)
 	var inventory_import_error_list = make([]inventory_import_t, 0)
 	// 先检查一遍是不是有错误，
 	for index, inventory_import := range inventory_import_list {
@@ -847,6 +871,11 @@ func (c ErpInventory) ImportProductStorageLoc() revel.Result {
 		inventory_import_list[index].stock_id = stock_id
 		inventory_import_list[index].stock_type_id = stock_type_id
 		inventory_import_list[index].storage_loc_id = storage_loc_id
+
+		if stock_type_id == models.STOCK_TYPE_AU {
+			au_stock_id_map[stock_id] = stock_id
+			au_stock_import_list = append(au_stock_import_list, inventory_import)
+		}
 	}
 
 	if len(inventory_import_error_list) != 0 {
@@ -857,6 +886,99 @@ func (c ErpInventory) ImportProductStorageLoc() revel.Result {
 		})
 	}
 
+	var au_stock_id_list = make([]int64, 0)
+	for stock_id := range au_stock_id_map {
+		au_stock_id_list = append(au_stock_id_list, stock_id)
+	}
+
+	if len(au_stock_id_list) > 0 {
+		// 澳仓的做 一个仓位一个SKU的检查
+		var au_stock_id_str_list = core.Int_list_to_str_list(au_stock_id_list)
+
+		/*
+CREATE TEMPORARY TABLE tmp_stock_sku_storage (
+    stock_id       BIGINT NOT NULL,
+    product_id     BIGINT NOT NULL,
+    storage_loc_id BIGINT NOT NULL
+);
+		 */
+		var sql_create_tmp_table = `CREATE TEMPORARY TABLE tmp_stock_sku_storage (
+    stock_id       BIGINT NOT NULL,
+    product_id     BIGINT NOT NULL,
+    storage_loc_id BIGINT NOT NULL
+);`
+		_, err := db_session.Exec(sql_create_tmp_table)
+		core.HandleError(err)
+
+		var sql_insert_record_in_db = `INSERT INTO tmp_stock_sku_storage (stock_id, product_id, storage_loc_id)
+    SELECT nvt.stock_id, nvt.product_id, nvt.storage_loc_id
+    FROM erp_inventory nvt
+    WHERE nvt.stock_id IN (%s);`
+		sql_insert_record_in_db = fmt.Sprintf(sql_insert_record_in_db, strings.Join(au_stock_id_str_list, ","))
+		_, err = db_session.Exec(sql_insert_record_in_db)
+		core.HandleError(err)
+
+		// # do insert and update by stock_id and product_id
+
+		// SELECT count(*) AS inventory_count FROM tmp_stock_sku_storage t WHERE t.stock_id = 0 AND t.product_id = 0;
+		for _, inventory_import := range au_stock_import_list {
+			var sql_select_count = `SELECT count(*) AS inventory_count FROM tmp_stock_sku_storage t WHERE t.stock_id = %d AND t.product_id = %d;`
+			sql_select_count = fmt.Sprintf(sql_select_count, inventory_import.stock_id, inventory_import.storage_loc_id)
+			var inventory_count struct {
+				Count int64 `xorm:"'inventory_count'"`
+			}
+			_, err = db_session.Sql(sql_select_count).Get(&inventory_count)
+			core.HandleError(err)
+
+			if inventory_count.Count == 0 {
+				var sql_insert = `INSERT INTO tmp_stock_sku_storage (stock_id, product_id, storage_loc_id) VALUES (%d, %d, %d);`
+				sql_insert = fmt.Sprintf(sql_insert, inventory_import.stock_id, inventory_import.product_id, inventory_import.storage_loc_id)
+				_, err = db_session.Exec(sql_insert)
+				core.HandleError(err)
+			} else {
+				var sql_update = `UPDATE tmp_stock_sku_storage SET storage_loc_id = 0 WHERE stock_id = 0 AND product_id = 0;`
+				sql_update = fmt.Sprintf(sql_update, inventory_import.storage_loc_id, inventory_import.stock_id, inventory_import.product_id)
+				_, err = db_session.Exec(sql_update)
+				core.HandleError(err)
+			}
+		}
+
+		var sql_get_list = `SELECT s.name AS stock_name, sl.name AS storage_loc_name
+FROM
+    (
+        SELECT t.stock_id, t.storage_loc_id FROM tmp_stock_sku_storage t
+        GROUP BY t.stock_id, t.storage_loc_id
+        HAVING count(*) > 1 # 如果大于一个记录，每个记录的product_id都不一样，所以就是一个仓位放了两个SKU
+    ) ss
+    INNER JOIN erp_stock s ON s.id = ss.stock_id
+    INNER JOIN erp_storage_loc sl ON sl.id = ss.storage_loc_id;`
+
+		type stock_storage_t struct {
+			StockName      string `xorm:"''stock_name"`
+			StorageLocName string `xorm:"''storage_loc_name"`
+		}
+		var stock_storage_list = make([]stock_storage_t, 0)
+		err = db_session.Sql(sql_get_list).Find(&stock_storage_list)
+		core.HandleError(err)
+
+		if len(stock_storage_list) > 0 {
+			var inventory_import_error_list = make([]inventory_import_t, 0)
+			for _, stock_storage := range stock_storage_list {
+				var inventory_import inventory_import_t
+				inventory_import.StockName = stock_storage.StockName
+				inventory_import.StorageLocName = stock_storage.StorageLocName
+
+				inventory_import_error_list = append(inventory_import_error_list, inventory_import)
+			}
+
+			return c.RenderJson(map[string]interface{}{
+				"success":         false,
+				"message":         "数据导入出现错误，详情查看页面下方表格！",
+				"error_data_list": inventory_import_error_list,
+			})
+		}
+	}
+
 	for _, inventory_import := range inventory_import_list {
 
 		var stock_id = inventory_import.stock_id
@@ -865,9 +987,9 @@ func (c ErpInventory) ImportProductStorageLoc() revel.Result {
 		var product_id = inventory_import.product_id
 
 		if stock_type_id == models.STOCK_TYPE_AU {
-			//澳仓一个仓位只能一个SKU
+			// 一个SKU一个仓位
 			var inventory models.InventoryInfo
-			has, err := db_session.Where(fmt.Sprintf("stock_id = %d AND storage_loc_id = %d", stock_id, storage_loc_id)).Get(&inventory)
+			has, err := db_session.Where(fmt.Sprintf("stock_id = %d AND product_id = %d", stock_id, product_id)).Get(&inventory) //这里只能保证一个SKU一个仓位
 			core.HandleError(err)
 
 			inventory.StockId = stock_id
@@ -880,11 +1002,11 @@ func (c ErpInventory) ImportProductStorageLoc() revel.Result {
 				core.HandleError(err)
 			} else {
 				// 更新
-				_, err := db_session.Id(inventory.Id).Cols("product_id").Update(&inventory)
+				_, err := db_session.Id(inventory.Id).Cols("storage_loc_id").Update(&inventory)
 				core.HandleError(err)
 			}
 		} else {
-			// 中国仓和在途仓，一个仓位可以多个SKU
+			// 中国仓和在途仓，一个仓位可以多个SKU，就是 stock_id, product_id 组合好后，一个仓库一个SKU，storage_loc_id随便填
 			var inventory models.InventoryInfo
 			has, err := db_session.Where(fmt.Sprintf("stock_id = %d AND product_id = %d", stock_id, product_id)).Get(&inventory)
 			core.HandleError(err)
@@ -1302,7 +1424,7 @@ func (c ErpInventory) ImportInventoryQuantity() revel.Result {
 			core.HandleError(err)
 		} else {
 			// 更新
-			_, err := db_session.Id(inventory.Id).Cols("product_id", "qty").Update(&inventory)
+			_, err := db_session.Id(inventory.Id).Cols("qty").Update(&inventory)
 			core.HandleError(err)
 		}
 	}
@@ -1720,7 +1842,7 @@ func (c ErpInventory) ImportInventoryPrice() revel.Result {
 			core.HandleError(err)
 		} else {
 			// 更新
-			_, err := db_session.Id(inventory.Id).Cols("product_id", "cost_price").Update(&inventory)
+			_, err := db_session.Id(inventory.Id).Cols("cost_price").Update(&inventory)
 			core.HandleError(err)
 		}
 	}
