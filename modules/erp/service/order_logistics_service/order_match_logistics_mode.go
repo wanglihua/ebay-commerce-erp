@@ -34,22 +34,23 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 
 	var final_result match_logistics_mode_result
 	final_result.order_id = p_order.Id
+	final_result.order_code = p_order.Code
 	final_result.address_id = 0
 	final_result.company_id = 0
-	final_result.stock_id  = 0
+	final_result.stock_id = 0
 	//final_result.stock
 	final_result.mode_id = 0
 	// final_result.mode
 	final_result.fee_rate_id = 0
-	final_result.total_fee  = 0 // 最终的物流费用，
+	final_result.total_fee = 0 // 最终的物流费用，
 	final_result.length = 0
-	final_result.width  = 0
+	final_result.width = 0
 	final_result.height = 0
 	// var final_weight float64 = 0
 	final_result.actual_weight = 0 //就是商品的实际重量合计，用 final 只是用于和下面的循环里面的 actual_weight 区别开来罢了
-	final_result.dim_weight  = 0
-	final_result.cost_amount  = 0
-	final_result.total_amount  = math.MaxFloat64 // 总的 费用和成本的和 final_total_fee + final_cost_amount, 初始化为一个很大的不可能的值，澳币
+	final_result.dim_weight = 0
+	final_result.cost_amount = 0
+	final_result.total_amount = math.MaxFloat64 // 总的 费用和成本的和 final_total_fee + final_cost_amount, 初始化为一个很大的不可能的值，澳币
 
 	// 清除订单匹配的调试信息
 	if p_ol.logistics_setting.Qyppts > 0 {
@@ -62,6 +63,37 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 	for _, logistics_mode := range logistics_mode_list {
 		var mt match_trace
 		mt.set_is_trace(p_ol.logistics_setting.Qyppts)
+
+		var mode_result match_logistics_mode_result
+		mode_result.order_id = p_order.Id
+		mode_result.order_code = p_order.Code
+		mode_result.address_id =  p_order_logistics_data.order_shipping_address.Id
+		mode_result.company_id =  logistics_mode.CompanyId
+		mode_result.stock_id = logistics_mode.StockId
+
+		mode_result.stock.Priority = 100 // 默认给个很低的优先级，这样万一在列表里面没找到 stock 也不会出错
+
+		for _, stock := range au_stock_list {
+			if stock.Id == logistics_mode.StockId {
+				mode_result.stock = stock
+				break
+			}
+		}
+
+		mode_result.mode_id = logistics_mode.Id
+		mode_result.mode = logistics_mode
+
+
+		/*
+
+logistics_match_debug.FeeRateId = selected_fee_rate_id_in_mode
+logistics_match_debug.TotalFee = total_fee_in_mode
+logistics_match_debug.TotalCost = total_amount_in_mode
+logistics_match_debug.MatchResult = "备选"
+logistics_match_debug.MatchDebug = mt.String()
+		 */
+
+
 
 		mt.Println("订单编号", p_order.Code)
 		mt.Println("匹配单个物流方式开始")
@@ -94,7 +126,7 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 
 		var stock_id = logistics_mode.StockId
 		mt.Println("物流方式对应的仓库数据库id", stock_id)
-		var cost_amount_in_mode float64 = 0
+		mode_result.cost_amount = 0
 		if cost_amount, found := stock_id_has_products_map[stock_id]; found == false { // 如果物流方式对应的仓库，没有全部的商品数量的库存，就继续下一个物流方式
 			mt.Println("物流方式对应的仓库没有订单对应的库存")
 			mt.Println("匹配单个物流方式结束")
@@ -119,7 +151,7 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 			continue
 		} else { // 如果库存都有的，就记录下商品成本总价
 			mt.Println("物流方式对应的仓库存在订单对应的库存，澳仓成本价为", cost_amount)
-			cost_amount_in_mode = cost_amount
+			mode_result.cost_amount = cost_amount
 		}
 
 		// 获取所有商品的整体的 长，宽，高，重量 等的数据
@@ -475,32 +507,23 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 		mt.Println("物流方式超重和超长，取大的一个的结果", extra_fee_in_mode)
 		var total_fee_in_mode float64 = total_fee_in_fee_rate + extra_fee_in_mode
 		mt.Println("物流方式中物流费率费用加上物流方式超重超长大的一个后的结果", total_fee_in_mode)
-		var total_amount_in_mode = total_fee_in_mode + cost_amount_in_mode
+		var total_amount_in_mode = total_fee_in_mode + mode_result.cost_amount
 		mt.Println("考虑澳仓成本后的，物流方式总费用", total_amount_in_mode)
 
-		var logistics_mode_stock models.StockInfo
-		logistics_mode_stock.Priority = 100 // 默认给个很低的优先级，这样万一在列表里面没找到 stock 也不会出错
-
-		for _, stock := range au_stock_list {
-			if stock.Id == logistics_mode.StockId {
-				logistics_mode_stock = stock
-				break
-			}
-		}
-
-		// 三个区间 final_total_amount-total_amount_in_mode
+		// 三个区间 final_total_amount-total_amount_in_mode，后来改用 fee了，不考虑 库存的cost_price，因为没有库存的也参与筛选
 		// 负无穷大 到 -p_ol.logistics_setting.FeeMaxDiff， -p_ol.logistics_setting.FeeMaxDiff到+p_ol.logistics_setting.FeeMaxDiff, +p_ol.logistics_setting.FeeMaxDiff 到 正无穷大
-		if final_result.total_amount-total_amount_in_mode > p_ol.logistics_setting.FeeMaxDiff { // 取得更优的模式方案，挑选最优解时，把商品的到仓成本也考虑进去   +p_ol.logistics_setting.FeeMaxDiff 到 正无穷大
+		//if final_result.total_amount-total_amount_in_mode > p_ol.logistics_setting.FeeMaxDiff { // 取得更优的模式方案，挑选最优解时，把商品的到仓成本也考虑进去   +p_ol.logistics_setting.FeeMaxDiff 到 正无穷大
+		if final_result.total_fee-total_fee_in_mode > p_ol.logistics_setting.FeeMaxDiff { // 取得更优的模式方案，挑选最优解时，把商品的到仓成本也考虑进去   +p_ol.logistics_setting.FeeMaxDiff 到 正无穷大
 			mt.Println("之前没有匹配的物流方式，或当前物流方式比之前匹配的物流方式节省费用超过最大允许偏差，暂时选用当前物流方式计算结果")
 
 			final_result.fee_rate_id = selected_fee_rate_id_in_mode
 			final_result.company_id = logistics_mode.CompanyId
 			final_result.stock_id = logistics_mode.StockId
-			final_result.stock = logistics_mode_stock
+			final_result.stock = mode_result.stock
 			final_result.mode_id = logistics_mode.Id
 			final_result.mode = logistics_mode
 			final_result.total_fee = total_fee_in_mode
-			final_result.cost_amount = cost_amount_in_mode
+			final_result.cost_amount = mode_result.cost_amount
 			final_result.total_amount = total_amount_in_mode
 
 			final_result.length = length
@@ -508,19 +531,20 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 			final_result.height = height
 			final_result.actual_weight = actual_weight
 			final_result.dim_weight = dim_weight
-		} else if math.Abs(final_result.total_amount-total_amount_in_mode) <= p_ol.logistics_setting.FeeMaxDiff { // 运费偏差在最大允许范围内，其实还是算上了澳仓成本的  -p_ol.logistics_setting.FeeMaxDiff到+p_ol.logistics_setting.FeeMaxDiff,
+			//} else if math.Abs(final_result.total_amount-total_amount_in_mode) <= p_ol.logistics_setting.FeeMaxDiff { // 运费偏差在最大允许范围内，其实还是算上了澳仓成本的  -p_ol.logistics_setting.FeeMaxDiff到+p_ol.logistics_setting.FeeMaxDiff,
+		} else if math.Abs(final_result.total_fee-total_fee_in_mode) <= p_ol.logistics_setting.FeeMaxDiff { // 运费偏差在最大允许范围内，其实还是算上了澳仓成本的  -p_ol.logistics_setting.FeeMaxDiff到+p_ol.logistics_setting.FeeMaxDiff,
 			//取优先级高的仓库
-			if logistics_mode_stock.Priority > final_result.stock.Priority { // 当前的仓库的优先级要高
+			if mode_result.stock.Priority > final_result.stock.Priority { // 当前的仓库的优先级要高
 				mt.Println("当前匹配的物流方式费用和之前最优解在允许偏差范围内，且当前仓库是优先级更高，选用当前物流方式计算结果。")
 
 				final_result.fee_rate_id = selected_fee_rate_id_in_mode
 				final_result.company_id = logistics_mode.CompanyId
 				final_result.stock_id = logistics_mode.StockId
-				final_result.stock = logistics_mode_stock
+				final_result.stock = mode_result.stock
 				final_result.mode_id = logistics_mode.Id
 				final_result.mode = logistics_mode
 				final_result.total_fee = total_fee_in_mode
-				final_result.cost_amount = cost_amount_in_mode
+				final_result.cost_amount = mode_result.cost_amount
 				final_result.total_amount = total_amount_in_mode
 
 				final_result.length = length

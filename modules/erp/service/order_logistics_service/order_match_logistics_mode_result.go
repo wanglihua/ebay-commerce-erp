@@ -4,6 +4,7 @@ import "matrix/modules/erp/models"
 
 type match_logistics_mode_result struct {
 	order_id      int64
+	order_code    string
 	address_id    int64
 	company_id    int64
 	stock_id      int64
@@ -23,3 +24,5 @@ type match_logistics_mode_result struct {
 	total_amount  float64
 	has_stock     bool
 }
+
+//排序相关的函数实现
