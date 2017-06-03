@@ -32,21 +32,24 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 	var logistics_mode_list = p_ol.logistics_mode_list
 	var logistics_fee_rate_map = p_ol.logistics_fee_rate_map
 
-	var final_selected_company_id int64 = 0
-	var final_selected_stock_id int64 = 0
-	var final_selected_stock models.StockInfo
-	var final_selected_mode_id int64 = 0
-	var final_selected_mode models.LogisticsModeInfo
-	var final_selected_fee_rate_id int64 = 0
-	var final_total_fee float64 = 0 // 最终的物流费用，
-	var final_length float64 = 0
-	var final_width float64 = 0
-	var final_height float64 = 0
+	var final_result match_logistics_mode_result
+	final_result.order_id = p_order.Id
+	final_result.address_id = 0
+	final_result.company_id = 0
+	final_result.stock_id  = 0
+	//final_result.stock
+	final_result.mode_id = 0
+	// final_result.mode
+	final_result.fee_rate_id = 0
+	final_result.total_fee  = 0 // 最终的物流费用，
+	final_result.length = 0
+	final_result.width  = 0
+	final_result.height = 0
 	// var final_weight float64 = 0
-	var final_actual_weight float64 = 0 //就是商品的实际重量合计，用 final 只是用于和下面的循环里面的 actual_weight 区别开来罢了
-	var final_dim_weight float64 = 0
-	var final_cost_amount float64 = 0
-	var final_total_amount float64 = math.MaxFloat64 // 总的 费用和成本的和 final_total_fee + final_cost_amount, 初始化为一个很大的不可能的值，澳币
+	final_result.actual_weight = 0 //就是商品的实际重量合计，用 final 只是用于和下面的循环里面的 actual_weight 区别开来罢了
+	final_result.dim_weight  = 0
+	final_result.cost_amount  = 0
+	final_result.total_amount  = math.MaxFloat64 // 总的 费用和成本的和 final_total_fee + final_cost_amount, 初始化为一个很大的不可能的值，澳币
 
 	// 清除订单匹配的调试信息
 	if p_ol.logistics_setting.Qyppts > 0 {
@@ -487,44 +490,44 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 
 		// 三个区间 final_total_amount-total_amount_in_mode
 		// 负无穷大 到 -p_ol.logistics_setting.FeeMaxDiff， -p_ol.logistics_setting.FeeMaxDiff到+p_ol.logistics_setting.FeeMaxDiff, +p_ol.logistics_setting.FeeMaxDiff 到 正无穷大
-		if final_total_amount-total_amount_in_mode > p_ol.logistics_setting.FeeMaxDiff { // 取得更优的模式方案，挑选最优解时，把商品的到仓成本也考虑进去   +p_ol.logistics_setting.FeeMaxDiff 到 正无穷大
+		if final_result.total_amount-total_amount_in_mode > p_ol.logistics_setting.FeeMaxDiff { // 取得更优的模式方案，挑选最优解时，把商品的到仓成本也考虑进去   +p_ol.logistics_setting.FeeMaxDiff 到 正无穷大
 			mt.Println("之前没有匹配的物流方式，或当前物流方式比之前匹配的物流方式节省费用超过最大允许偏差，暂时选用当前物流方式计算结果")
 
-			final_selected_fee_rate_id = selected_fee_rate_id_in_mode
-			final_selected_company_id = logistics_mode.CompanyId
-			final_selected_stock_id = logistics_mode.StockId
-			final_selected_stock = logistics_mode_stock
-			final_selected_mode_id = logistics_mode.Id
-			final_selected_mode = logistics_mode
-			final_total_fee = total_fee_in_mode
-			final_cost_amount = cost_amount_in_mode
-			final_total_amount = total_amount_in_mode
+			final_result.fee_rate_id = selected_fee_rate_id_in_mode
+			final_result.company_id = logistics_mode.CompanyId
+			final_result.stock_id = logistics_mode.StockId
+			final_result.stock = logistics_mode_stock
+			final_result.mode_id = logistics_mode.Id
+			final_result.mode = logistics_mode
+			final_result.total_fee = total_fee_in_mode
+			final_result.cost_amount = cost_amount_in_mode
+			final_result.total_amount = total_amount_in_mode
 
-			final_length = length
-			final_width = width
-			final_height = height
-			final_actual_weight = actual_weight
-			final_dim_weight = dim_weight
-		} else if math.Abs(final_total_amount-total_amount_in_mode) <= p_ol.logistics_setting.FeeMaxDiff { // 运费偏差在最大允许范围内，其实还是算上了澳仓成本的  -p_ol.logistics_setting.FeeMaxDiff到+p_ol.logistics_setting.FeeMaxDiff,
+			final_result.length = length
+			final_result.width = width
+			final_result.height = height
+			final_result.actual_weight = actual_weight
+			final_result.dim_weight = dim_weight
+		} else if math.Abs(final_result.total_amount-total_amount_in_mode) <= p_ol.logistics_setting.FeeMaxDiff { // 运费偏差在最大允许范围内，其实还是算上了澳仓成本的  -p_ol.logistics_setting.FeeMaxDiff到+p_ol.logistics_setting.FeeMaxDiff,
 			//取优先级高的仓库
-			if logistics_mode_stock.Priority > final_selected_stock.Priority { // 当前的仓库的优先级要高
+			if logistics_mode_stock.Priority > final_result.stock.Priority { // 当前的仓库的优先级要高
 				mt.Println("当前匹配的物流方式费用和之前最优解在允许偏差范围内，且当前仓库是优先级更高，选用当前物流方式计算结果。")
 
-				final_selected_fee_rate_id = selected_fee_rate_id_in_mode
-				final_selected_company_id = logistics_mode.CompanyId
-				final_selected_stock_id = logistics_mode.StockId
-				final_selected_stock = logistics_mode_stock
-				final_selected_mode_id = logistics_mode.Id
-				final_selected_mode = logistics_mode
-				final_total_fee = total_fee_in_mode
-				final_cost_amount = cost_amount_in_mode
-				final_total_amount = total_amount_in_mode
+				final_result.fee_rate_id = selected_fee_rate_id_in_mode
+				final_result.company_id = logistics_mode.CompanyId
+				final_result.stock_id = logistics_mode.StockId
+				final_result.stock = logistics_mode_stock
+				final_result.mode_id = logistics_mode.Id
+				final_result.mode = logistics_mode
+				final_result.total_fee = total_fee_in_mode
+				final_result.cost_amount = cost_amount_in_mode
+				final_result.total_amount = total_amount_in_mode
 
-				final_length = length
-				final_width = width
-				final_height = height
-				final_actual_weight = actual_weight
-				final_dim_weight = dim_weight
+				final_result.length = length
+				final_result.width = width
+				final_result.height = height
+				final_result.actual_weight = actual_weight
+				final_result.dim_weight = dim_weight
 			} else { //
 				mt.Println("当前匹配的物流方式费用和之前最优解在允许偏差范围内，但当前仓库是优先级并不更高，弃用当前物流方式计算结果。")
 			}
@@ -558,7 +561,7 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 
 	// _ = final_weight //暂时没用这个变量，必要的时候去掉这个变量
 
-	if final_selected_mode_id == 0 || final_selected_fee_rate_id == 0 { // 匹配失败
+	if final_result.mode_id == 0 || final_result.fee_rate_id == 0 { // 匹配失败
 		var order_logistics models.OrderLogisticsInfo
 		return false, order_logistics
 	}
@@ -570,26 +573,26 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 		// 匹配后重量打折
 		if logistics_setting.Pphzldz == 1 {
 			// 是不是指定实际重量打折
-			final_actual_weight = final_actual_weight * logistics_setting.Pphzlzl
+			final_result.actual_weight = final_result.actual_weight * logistics_setting.Pphzlzl
 		}
 
 		// 匹配后中边打折
 		if logistics_setting.Pphzbdz == 1 {
-			var side_length_slice = sort.Float64Slice([]float64{final_length, final_width, final_height})
+			var side_length_slice = sort.Float64Slice([]float64{final_result.length, final_result.width, final_result.height})
 			side_length_slice.Sort()
 			var mid_length = side_length_slice[1] // 0, 1, 2 中间那条边
 
 			const MIN_FLOAT_DIFF = 0.0000000001
-			if (math.Abs(mid_length - final_length)) < MIN_FLOAT_DIFF {
-				final_length = final_length * logistics_setting.Pphzbzl
-			} else if (math.Abs(mid_length - final_width)) < MIN_FLOAT_DIFF {
-				final_width = final_width * logistics_setting.Pphzbzl
-			} else if (math.Abs(mid_length - final_height)) < MIN_FLOAT_DIFF {
-				final_height = final_height * logistics_setting.Pphzbzl
+			if (math.Abs(mid_length - final_result.length)) < MIN_FLOAT_DIFF {
+				final_result.length = final_result.length * logistics_setting.Pphzbzl
+			} else if (math.Abs(mid_length - final_result.width)) < MIN_FLOAT_DIFF {
+				final_result.width = final_result.width * logistics_setting.Pphzbzl
+			} else if (math.Abs(mid_length - final_result.height)) < MIN_FLOAT_DIFF {
+				final_result.height = final_result.height * logistics_setting.Pphzbzl
 			}
 
 			// 匹配后中边打折时，同时对体积重打折。
-			final_dim_weight = final_dim_weight * logistics_setting.Pphzbzl
+			final_result.dim_weight = final_result.dim_weight * logistics_setting.Pphzbzl
 		}
 	}
 
@@ -602,18 +605,18 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 
 	order_logistics.OrderId = p_order.Id
 	order_logistics.AddressId = address_id
-	order_logistics.CompanyId = final_selected_company_id
-	order_logistics.StockId = final_selected_stock_id
-	order_logistics.ModeId = final_selected_mode_id
-	order_logistics.FeeRateId = final_selected_fee_rate_id
-	order_logistics.Length = final_length
-	order_logistics.Width = final_width
-	order_logistics.Height = final_height
-	order_logistics.DimWeight = final_dim_weight
-	order_logistics.Weight = final_actual_weight
-	order_logistics.TotalFee = final_total_fee
-	order_logistics.PickFee = pick_fee_service.Get_product_pick_fee(final_actual_weight, p_ol.pick_fee_setting)
-	order_logistics.CostAmount = final_cost_amount
+	order_logistics.CompanyId = final_result.company_id
+	order_logistics.StockId = final_result.stock_id
+	order_logistics.ModeId = final_result.mode_id
+	order_logistics.FeeRateId = final_result.fee_rate_id
+	order_logistics.Length = final_result.length
+	order_logistics.Width = final_result.width
+	order_logistics.Height = final_result.height
+	order_logistics.DimWeight = final_result.dim_weight
+	order_logistics.Weight = final_result.actual_weight
+	order_logistics.TotalFee = final_result.total_fee
+	order_logistics.PickFee = pick_fee_service.Get_product_pick_fee(final_result.actual_weight, p_ol.pick_fee_setting)
+	order_logistics.CostAmount = final_result.cost_amount
 
 	if has == true {
 		_, err := db_session.Id(order_logistics.Id).Update(&order_logistics)
@@ -624,7 +627,7 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 	}
 
 	var update_col_list = []string{"status_id", "stock_id", "address_id", "company_id", "mode_id"}
-	if final_selected_mode.TypeId == models.LOGISTICS_MODE_TYPE_EXPRESS {
+	if final_result.mode.TypeId == models.LOGISTICS_MODE_TYPE_EXPRESS {
 		// 把订单状态修改为 Hold
 		p_order.HoldTypeId = core.MakeNullInt(models.ORDER_HOLD_TYPE_EXPRESS, true)
 		p_order.StatusId = models.ORDER_STATUS_HOLD // 修改订单状态为 hold 状态
@@ -635,10 +638,10 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 		p_order.StatusId = models.ORDER_STATUS_DPH
 	}
 	// 填入匹配过程中的最后的 stock_id 和 address_id
-	p_order.StockId = final_selected_stock_id
+	p_order.StockId = final_result.stock_id
 	p_order.AddressId = address_id
-	p_order.CompanyId = final_selected_company_id
-	p_order.ModeId = final_selected_mode_id
+	p_order.CompanyId = final_result.company_id
+	p_order.ModeId = final_result.mode_id
 	_, err = db_session.Id(p_order.Id).Cols(update_col_list...).Update(p_order)
 	core.HandleError(err)
 
