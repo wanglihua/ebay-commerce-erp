@@ -137,7 +137,7 @@ $.extend($.fn.dataTable.defaults, {
     "sServerMethod": "POST",
     "bProcessing": false,
     "bPaginate": true,
-    "lengthMenu": [[5, 10, 15, 25, 50, 100, 300, 500], [5, 10, 15, 25, 50, 100, 300, 500]],
+    "lengthMenu": [[5, 10, 15, 25, 50, 100, 300, 500, 1000, 2000, 3000, 5000, 10000], [5, 10, 15, 25, 50, 100, 300, 500, 1000, 2000, 3000, 5000, 10000]],
     "iDisplayLength": 10,
     "sPaginationType": "full_numbers",
     "oLanguage": {
@@ -173,7 +173,7 @@ $.extend($.fn.dataTable.defaults, {
                 "data": aoData,
                 "success": function (data) {
                     hideMask();
-                    if (data.success == false) {
+                    if (data.success === false) {
                         $.msg.error(data.message);
                         return;
                     }
@@ -190,7 +190,7 @@ $.extend($.fn.dataTable.defaults, {
         //重写搜索事件
         $(dataTable.selector + '_wrapper .dataTables_filter input').bind('keyup',
             function (e) {
-                if (e.keyCode == 13 || (e.keyCode == 8 && (this.value.length == 0))) {
+                if (e.keyCode === 13 || (e.keyCode === 8 && (this.value.length === 0))) {
                     dataTable.api().search(this.value).draw();
                 }
             });
