@@ -493,7 +493,7 @@ func get_order_sku_for_export(order_id int64, db_session *xorm.Session) string {
     (SELECT sl.name
      FROM erp_inventory nvt
          INNER JOIN erp_storage_loc sl ON sl.id = nvt.storage_loc_id
-     WHERE nvt.product_id = 0
+     WHERE nvt.product_id = oi.item_product_id
      ORDER BY sl.update_time DESC
      LIMIT 0, 1) AS storage_loc_name
 FROM erp_order_item oi

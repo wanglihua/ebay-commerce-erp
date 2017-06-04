@@ -878,6 +878,7 @@ func (c ErpInventory) ImportProductStorageLoc() revel.Result {
 		})
 	}
 
+	/*
 	var au_stock_id_list = make([]int64, 0)
 	for stock_id := range au_stock_id_map {
 		au_stock_id_list = append(au_stock_id_list, stock_id)
@@ -887,19 +888,24 @@ func (c ErpInventory) ImportProductStorageLoc() revel.Result {
 		// 澳仓的做 一个仓位一个SKU的检查
 		var au_stock_id_str_list = core.Int_list_to_str_list(au_stock_id_list)
 
-		/*
-CREATE TEMPORARY TABLE tmp_stock_sku_storage (
-    stock_id       BIGINT NOT NULL,
-    product_id     BIGINT NOT NULL,
-    storage_loc_id BIGINT NOT NULL
-);
-		 */
+//DROP TEMPORARY TABLE IF EXISTS tmp_stock_sku_storage;
+
+		var sql_drop_tmp_table = `DROP TEMPORARY TABLE IF EXISTS tmp_stock_sku_storage;`
+		_, err := db_session.Exec(sql_drop_tmp_table)
+		core.HandleError(err)
+
+//CREATE TEMPORARY TABLE tmp_stock_sku_storage (
+//    stock_id       BIGINT NOT NULL,
+//    product_id     BIGINT NOT NULL,
+//    storage_loc_id BIGINT NOT NULL
+//);
+
 		var sql_create_tmp_table = `CREATE TEMPORARY TABLE tmp_stock_sku_storage (
     stock_id       BIGINT NOT NULL,
     product_id     BIGINT NOT NULL,
     storage_loc_id BIGINT NOT NULL
 );`
-		_, err := db_session.Exec(sql_create_tmp_table)
+		_, err = db_session.Exec(sql_create_tmp_table)
 		core.HandleError(err)
 
 		var sql_insert_record_in_db = `INSERT INTO tmp_stock_sku_storage (stock_id, product_id, storage_loc_id)
@@ -970,6 +976,7 @@ FROM
 			})
 		}
 	}
+	*/
 
 	for _, inventory_import := range inventory_import_list {
 
