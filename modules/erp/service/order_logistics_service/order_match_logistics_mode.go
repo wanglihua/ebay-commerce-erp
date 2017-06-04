@@ -42,7 +42,7 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 	final_result.mode_id = 0
 	// final_result.mode
 	final_result.fee_rate_id = 0
-	final_result.total_fee = 0 // 最终的物流费用，
+	final_result.total_fee = 0 // 最终的物流费用
 	final_result.length = 0
 	final_result.width = 0
 	final_result.height = 0
@@ -50,7 +50,9 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 	final_result.actual_weight = 0 //就是商品的实际重量合计，用 final 只是用于和下面的循环里面的 actual_weight 区别开来罢了
 	final_result.dim_weight = 0
 	final_result.cost_amount = 0
-	final_result.total_amount = math.MaxFloat64 // 总的 费用和成本的和 final_total_fee + final_cost_amount, 初始化为一个很大的不可能的值，澳币
+	final_result.total_amount = 0 // 总的 费用和成本的和 final_total_fee + final_cost_amount,
+
+	var lowest_total_fee = math.MaxFloat64 // 初始化为一个很大的不可能的值，澳币，
 
 	// 清除订单匹配的调试信息
 	if p_ol.logistics_setting.Qyppts > 0 {
@@ -455,41 +457,51 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 			}
 		}
 
+		var totol_fee_diff = lowest_total_fee - mode_result.total_fee // 就是当前模式比之前的省了多少钱
+
 		if mode_result.has_stock == true {
 			// 三个区间 final_total_amount-mode_result.total_amount，后来改用 fee了，不考虑 库存的cost_price，因为没有库存的也参与筛选
 			// 负无穷大 到 -p_ol.logistics_setting.FeeMaxDiff， -p_ol.logistics_setting.FeeMaxDiff到+p_ol.logistics_setting.FeeMaxDiff, +p_ol.logistics_setting.FeeMaxDiff 到 正无穷大
-			if final_result.total_fee-mode_result.total_fee > p_ol.logistics_setting.FeeMaxDiff { // 取得更优的模式方案，挑选最优解时，把商品的到仓成本也考虑进去   +p_ol.logistics_setting.FeeMaxDiff 到 正无穷大
+			if totol_fee_diff > p_ol.logistics_setting.FeeMaxDiff { // 取得更优的模式方案，挑选最优解时，把商品的到仓成本也考虑进去   +p_ol.logistics_setting.FeeMaxDiff 到 正无穷大
 				mt.Println("之前没有匹配的物流方式，或当前物流方式比之前匹配的物流方式节省费用超过最大允许偏差，暂时选用当前物流方式计算结果")
 				final_result = mode_result
-			} else if math.Abs(final_result.total_fee-mode_result.total_fee) <= p_ol.logistics_setting.FeeMaxDiff { // 运费偏差在最大允许范围内，其实还是算上了澳仓成本的  -p_ol.logistics_setting.FeeMaxDiff到+p_ol.logistics_setting.FeeMaxDiff,
+				match_result_list = append(match_result_list, mode_result)
+			} else if math.Abs(totol_fee_diff) <= p_ol.logistics_setting.FeeMaxDiff { // 运费偏差在最大允许范围内，其实还是算上了澳仓成本的  -p_ol.logistics_setting.FeeMaxDiff到+p_ol.logistics_setting.FeeMaxDiff,
 				//取优先级高的仓库
 
 				if mode_result.stock.Priority > final_result.stock.Priority { // 当前的仓库的优先级要高
 					mt.Println("当前匹配的物流方式费用和之前最优解在允许偏差范围内，且当前仓库是优先级更高，选用当前物流方式计算结果。")
 					final_result = mode_result
 				} else { //
-					mt.Println("当前匹配的物流方式费用和之前最优解在允许偏差范围内，但当前仓库是优先级并不更高，弃用当前物流方式计算结果。")
+					mt.Println("当前匹配的物流方式费用和之前最优解在允许偏差范围内，但当前仓库是优先级并不更高，弃用当前物流方式计算结果，但记录次佳仓备选。")
 				}
+				match_result_list = append(match_result_list, mode_result)
 			} else { // 在运费偏差范围之外， 负无穷大 到 -p_ol.logistics_setting.FeeMaxDiff
 				mt.Println("之前匹配的物流，比当前物流方式更优, 且超过了允许偏差范围，弃用当前物流方式计算结果")
 			}
 		} else {
 			//没有库存
-			if final_result.total_fee-mode_result.total_fee > p_ol.logistics_setting.FeeMaxDiff {
-				mt.Println("之前没有匹配的物流方式，或当前物流方式比之前匹配的物流方式节省费用超过最大允许偏差，暂时选用当前物流方式计算结果")
+			if totol_fee_diff > p_ol.logistics_setting.FeeMaxDiff {
+				mt.Println("之前没有匹配的物流方式，或当前物流方式比之前匹配的物流方式节省费用超过最大允许偏差，暂时选用当前物流方式计算结果，仓库无货。")
 				final_result = mode_result
-			} else if math.Abs(final_result.total_fee-mode_result.total_fee) <= p_ol.logistics_setting.FeeMaxDiff {
+				match_result_list = append(match_result_list, mode_result)
+			} else if math.Abs(totol_fee_diff) <= p_ol.logistics_setting.FeeMaxDiff {
 				//取优先级高的仓库
 
 				if mode_result.stock.Priority > final_result.stock.Priority { // 当前的仓库的优先级要高
-					mt.Println("当前匹配的物流方式费用和之前最优解在允许偏差范围内，且当前仓库是优先级更高，选用当前物流方式计算结果。")
+					mt.Println("当前匹配的物流方式费用和之前最优解在允许偏差范围内，且当前仓库是优先级更高，选用当前物流方式计算结果，仓库无货。")
 					final_result = mode_result
+					match_result_list = append(match_result_list, mode_result)
 				} else { //
-					mt.Println("当前匹配的物流方式费用和之前最优解在允许偏差范围内，但当前仓库是优先级并不更高，弃用当前物流方式计算结果。")
+					mt.Println("当前匹配的物流方式费用和之前最优解在允许偏差范围内，但当前仓库是优先级并不更高，弃用当前物流方式计算结果，仓库无货，不记录次佳仓备选。")
 				}
 			} else { // 在运费偏差范围之外， 负无穷大 到 -p_ol.logistics_setting.FeeMaxDiff
-				mt.Println("之前匹配的物流，比当前物流方式更优, 且超过了允许偏差范围，弃用当前物流方式计算结果")
+				mt.Println("之前匹配的物流，比当前物流方式更优, 且超过了允许偏差范围，弃用当前物流方式计算结果，但仓库无货。")
 			}
+		}
+
+		if mode_result.total_fee < lowest_total_fee {
+			lowest_total_fee = mode_result.total_fee
 		}
 
 		mt.Println("匹配单个物流方式结束")
