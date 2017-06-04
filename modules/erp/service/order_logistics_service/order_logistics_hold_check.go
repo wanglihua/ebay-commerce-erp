@@ -144,6 +144,42 @@ func (p_ol *OrderLogistics) hold_check_oss_by_stock_type(p_order *models.OrderIn
 	return all_product_oss
 }
 
+func (p_ol *OrderLogistics) hold_check_has_some_product(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, db_session *xorm.Session) (is_hold_return bool) {
+	var products_stock_qty_list = p_order_logistics_data.products_stock_qty_list
+
+	// 找出所有包含这些商品库存的仓库id列表
+	var get_product_stock_id_list = func() []int64 {
+		var stock_id_set = collections.NewIntSet()
+		for _, product_stock_qty := range products_stock_qty_list {
+			if product_stock_qty.StockTypeId == models.STOCK_TYPE_AU { // 只取符合要求的仓库类型。比如，匹配订单的时候，只取澳洲的仓库什么的
+				stock_id_set.Add(product_stock_qty.StockId)
+			}
+		}
+		return stock_id_set.List()
+	}
+
+	var product_stock_id_list = get_product_stock_id_list()
+
+	var has_some = false
+	// 对每一个仓库循环，看是不是这个仓库里面, 这些商品都有货
+	for _, stock_id := range product_stock_id_list {
+		var stock_has_some_product = check_stock_has_some_order_products(p_ol, stock_id, p_order_logistics_data)
+
+		// 找到仓库全部商品 部分有货，就退出
+		if stock_has_some_product {
+			has_some = true
+			break
+		}
+	}
+
+	if has_some == true {
+		p_ol.update_order_to_hold_type(p_order, models.ORDER_HOLD_TYPE_OOS_SOME_PRODUCT, db_session)
+		return true
+	}
+
+	return false
+}
+
 // todo: 7 实际仓库缺货（是在捡货过程中，虽然系统显示有货，但实际仓库没有货了。就需要人工手动将这些订单搬至这里的模块，等待跟客户协商，是退款还是等待集装箱）, 这个 hold 由拣货过程中产生
 
 // todo: 8, 9, 10 临时的解决方案
@@ -401,6 +437,57 @@ func check_stock_has_order_products(p_ol *OrderLogistics, stock_id int64, p_orde
 		return true, cost_amount
 	} else {
 		return false, 0
+	}
+}
+
+func check_stock_has_some_order_products(p_ol *OrderLogistics, stock_id int64, p_order_logistics_data *order_logistics_data_t) (has_some_return bool) {
+	var products_stock_qty_list = p_order_logistics_data.products_stock_qty_list
+	var order_product_info_list = p_order_logistics_data.order_product_info_list
+
+	/*
+	检查放在所有商品都缺货之后，所以这些就可以省掉了
+	var stock_has_all_product = true
+
+	for _, order_product_info := range order_product_info_list {
+		var product_has_stock = false
+		for _, product_stock_qty := range products_stock_qty_list {
+			if product_stock_qty.StockId == stock_id && product_stock_qty.ProductId == order_product_info.ProductId {
+				if product_stock_qty.Qty >= order_product_info.Qty {
+					product_has_stock = true
+					break
+				}
+			}
+		}
+
+		// 如果商品在这个仓库里面没有货，就判定 这个仓库里面，并不是所有商品都有货
+		if product_has_stock == false {
+			stock_has_all_product = false
+			break // 订单里面的 接下来的 商品也就不用检查了
+		}
+	}
+	*/
+
+	var stock_has_some_product = false
+	for _, order_product_info := range order_product_info_list {
+		for _, product_stock_qty := range products_stock_qty_list {
+			if product_stock_qty.StockId == stock_id && product_stock_qty.ProductId == order_product_info.ProductId {
+				if product_stock_qty.Qty >= order_product_info.Qty {
+					stock_has_some_product = true
+					break
+				}
+			}
+		}
+
+		if stock_has_some_product == true {
+			break
+		}
+	}
+
+	//if stock_has_all_product == false && stock_has_some_product == true {
+	if stock_has_some_product == true {
+		return true
+	} else {
+		return false
 	}
 }
 

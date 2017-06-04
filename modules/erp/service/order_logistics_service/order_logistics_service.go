@@ -292,6 +292,11 @@ func (p_ol *OrderLogistics) CalculateList(order_list []models.OrderInfo, db_sess
 			continue
 		}
 
+		//部分商品有货的检查，放在所有仓库都缺货的后面
+		if p_ol.hold_check_has_some_product(&order, p_order_logistics_data, db_session) {
+			continue
+		}
+
 		// 6. 系统显示最佳仓缺货（次佳、海上有货）
 		// 改成在途才有货
 		if p_ol.hold_check_oss_au_stock_but_zt_stock_has(&order, p_order_logistics_data, db_session) {

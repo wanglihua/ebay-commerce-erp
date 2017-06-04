@@ -35,22 +35,6 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 	var final_result match_logistics_mode_result
 	final_result.order_id = p_order.Id
 	final_result.order_code = p_order.Code
-	final_result.address_id = 0
-	final_result.company_id = 0
-	final_result.stock_id = 0
-	//final_result.stock
-	final_result.mode_id = 0
-	// final_result.mode
-	final_result.fee_rate_id = 0
-	final_result.total_fee = 0 // 最终的物流费用
-	final_result.length = 0
-	final_result.width = 0
-	final_result.height = 0
-	// var final_weight float64 = 0
-	final_result.actual_weight = 0 //就是商品的实际重量合计，用 final 只是用于和下面的循环里面的 actual_weight 区别开来罢了
-	final_result.dim_weight = 0
-	final_result.cost_amount = 0
-	final_result.total_amount = 0 // 总的 费用和成本的和 final_total_fee + final_cost_amount,
 
 	var lowest_total_fee = math.MaxFloat64 // 初始化为一个很大的不可能的值，澳币，
 
