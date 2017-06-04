@@ -289,11 +289,12 @@ func (p_ol *OrderLogistics) CalculateList(order_list []models.OrderInfo, db_sess
 
 		// 5. 系统显示所有仓都缺货（中国仓除外）
 		if p_ol.hold_check_oss_all_stock(&order, p_order_logistics_data, db_session) {
-			continue
-		}
 
-		//部分商品有货的检查，放在所有仓库都缺货的后面
-		if p_ol.hold_check_has_some_product(&order, p_order_logistics_data, db_session) {
+			//部分商品有货的检查，放在所有仓库都缺货的后面
+			if p_ol.hold_check_has_some_product(&order, p_order_logistics_data, db_session) {
+				continue
+			}
+
 			continue
 		}
 

@@ -37,17 +37,16 @@ func save_order_logistics(p_order *models.OrderInfo, match_result match_logistic
 		core.HandleError(err)
 	}
 
-	var update_col_list = []string{"status_id", "stock_id", "address_id", "company_id", "mode_id"}
+	var update_col_list = []string{"status_id", "stock_id", "address_id", "company_id", "mode_id", "hold_type_id"}
 
 	if match_result.has_stock == true {
 		if match_result.mode.TypeId == models.LOGISTICS_MODE_TYPE_EXPRESS {
 			// 把订单状态修改为 Hold
 			p_order.HoldTypeId = core.MakeNullInt(models.ORDER_HOLD_TYPE_EXPRESS, true)
 			p_order.StatusId = models.ORDER_STATUS_HOLD // 修改订单状态为 hold 状态
-
-			update_col_list = append(update_col_list, "hold_type_id")
 		} else {
 			// 把订单状态修改为 待配货
+			p_order.HoldTypeId = core.MakeNullInt(0, false)
 			p_order.StatusId = models.ORDER_STATUS_DPH
 		}
 	}

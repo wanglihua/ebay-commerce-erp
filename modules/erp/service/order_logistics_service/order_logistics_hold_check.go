@@ -242,6 +242,8 @@ func (p_ol *OrderLogistics) hold_check_great_deficit(p_order *models.OrderInfo, 
 func (p_ol *OrderLogistics) hold_check_envelope(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, db_session *xorm.Session) (is_hold_return bool) {
 	// 这里假定信封的长宽高限制： 长 > 宽 > 高，不能这么假定
 
+	revel.TRACE.Println("hold_check_envelope begin")
+
 	var envelope_max_length = p_ol.logistics_setting.EnvelopeMaxLength
 	var envelope_max_width = p_ol.logistics_setting.EnvelopeMaxWidth
 	var envelope_max_height = p_ol.logistics_setting.EnvelopeMaxHeight
@@ -254,14 +256,17 @@ func (p_ol *OrderLogistics) hold_check_envelope(p_order *models.OrderInfo, p_ord
 	}
 
 	// 进行长宽高的排序，结果中 长 > 宽 > 高，这样在信封长宽高限制的设定中，就不用一定要保证 长 > 宽 > 高
-	var envelope_side_length_slice = sort.Float64Slice([]float64{envelope_max_length, envelope_max_weight, envelope_max_height})
+	var envelope_side_length_slice = sort.Float64Slice([]float64{envelope_max_length, envelope_max_width, envelope_max_height})
 	envelope_side_length_slice.Sort()
 	envelope_max_length = envelope_side_length_slice[2] // 最长
-	envelope_max_weight = envelope_side_length_slice[1]
+	envelope_max_width = envelope_side_length_slice[1]
 	envelope_max_height = envelope_side_length_slice[0] // 最短
 
 	// get_order_products_whole_logistics_data的输出中 长 > 宽 > 高
 	var whole_length, whole_width, whole_height, whole_weight float64 = get_order_products_whole_logistics_data(p_order_logistics_data)
+
+	revel.TRACE.Println("whole_length, whole_width, whole_height, whole_weight", whole_length, whole_width, whole_height, whole_weight)
+	revel.TRACE.Println("envelope_max_length, envelope_max_width, envelope_max_height, envelope_max_weight", envelope_max_length, envelope_max_width, envelope_max_height, envelope_max_weight)
 
 	if whole_length <= envelope_max_length && whole_width <= envelope_max_width && whole_height <= envelope_max_height && whole_weight <= envelope_max_weight {
 		p_ol.update_order_to_hold_type(p_order, models.ORDER_HOLD_TYPE_ENVELOPE, db_session)
