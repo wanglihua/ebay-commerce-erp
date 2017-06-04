@@ -251,7 +251,6 @@ func (c ErpStorageLoc) Import() revel.Result {
 			col_index := 0
 
 			// 序号	仓库名称	仓位名称	仓位描述
-			var data_col_count = 5
 
 			// 序号
 			cell = row.Cells[col_index]
@@ -280,7 +279,7 @@ func (c ErpStorageLoc) Import() revel.Result {
 			storage_loc_import.StorageLocName = cell_val
 			col_index++
 
-			if len(row.Cells) > data_col_count-1 { // 最后一列有数据
+			if len(row.Cells) > col_index { // 最后一列有数据
 				// 成本价
 				cell = row.Cells[col_index]
 				cell_val, err = cell.String()
@@ -297,7 +296,7 @@ func (c ErpStorageLoc) Import() revel.Result {
 	if len(storage_loc_import_list) == 0 {
 		return c.RenderJson(map[string]interface{}{
 			"success": false,
-			"message": "Excel文件中导入商品库存列表为空！",
+			"message": "Excel文件中导入仓库库位列表为空！",
 		})
 	}
 
