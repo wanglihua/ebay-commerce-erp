@@ -17,6 +17,9 @@ import (
 
 // 1 地址有特殊字段的
 func (p_ol *OrderLogistics) hold_check_address_special_word(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, order_logistics models.OrderLogisticsInfo, db_session *xorm.Session) (is_hold_return bool) {
+
+	revel.TRACE.Println("hold_check_address_special_word begin")
+
 	// 检查地址中是否有特殊字段
 	var has_address_special_word = false
 	for _, address_special_word := range p_ol.address_special_word_list_setting {
@@ -28,10 +31,12 @@ func (p_ol *OrderLogistics) hold_check_address_special_word(p_order *models.Orde
 			break
 		}
 	}
+
 	if has_address_special_word == true {
 		var logistics_company_list = p_ol.logistics_company_list
 		for _, logistics_company := range logistics_company_list {
 			if order_logistics.CompanyId == logistics_company.Id && logistics_company.AddressSpecialWord == 0 {
+				revel.TRACE.Println("logistics_company.Name", logistics_company.Name)
 				p_ol.update_order_to_hold_type(p_order, models.ORDER_HOLD_TYPE_SPECIAL_ADDRESS, db_session)
 				return true
 			}
