@@ -67,8 +67,8 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 		var mode_result match_logistics_mode_result
 		mode_result.order_id = p_order.Id
 		mode_result.order_code = p_order.Code
-		mode_result.address_id =  p_order_logistics_data.order_shipping_address.Id
-		mode_result.company_id =  logistics_mode.CompanyId
+		mode_result.address_id = p_order_logistics_data.order_shipping_address.Id
+		mode_result.company_id = logistics_mode.CompanyId
 		mode_result.stock_id = logistics_mode.StockId
 
 		mode_result.stock.Priority = 100 // 默认给个很低的优先级，这样万一在列表里面没找到 stock 也不会出错
@@ -83,7 +83,6 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 		mode_result.mode_id = logistics_mode.Id
 		mode_result.mode = logistics_mode
 
-
 		/*
 
 logistics_match_debug.FeeRateId = selected_fee_rate_id_in_mode
@@ -92,8 +91,6 @@ logistics_match_debug.TotalCost = total_amount_in_mode
 logistics_match_debug.MatchResult = "备选"
 logistics_match_debug.MatchDebug = mt.String()
 		 */
-
-
 
 		mt.Println("订单编号", p_order.Code)
 		mt.Println("匹配单个物流方式开始")
@@ -104,21 +101,7 @@ logistics_match_debug.MatchDebug = mt.String()
 			mt.Println("匹配单个物流方式结束")
 
 			if mt.is_trace == true {
-				var logistics_match_debug models.OrderLogisticsMatchDebugInfo
-				logistics_match_debug.OrderId = p_order.Id
-				logistics_match_debug.OrderCode = p_order.Code
-				logistics_match_debug.AddressId = p_order_logistics_data.order_shipping_address.Id
-				logistics_match_debug.CompanyId = logistics_mode.CompanyId
-				logistics_match_debug.StockId = logistics_mode.StockId
-				logistics_match_debug.ModeId = logistics_mode.Id
-				logistics_match_debug.FeeRateId = 0
-				logistics_match_debug.TotalFee = 0
-				logistics_match_debug.TotalCost = 0
-				logistics_match_debug.MatchResult = "无对应费率设置"
-				logistics_match_debug.MatchDebug = mt.String()
-
-				_, err := db_session.Insert(&logistics_match_debug)
-				core.HandleError(err)
+				log_logistics_match_debug(mode_result, "无对应费率设置", mt.String(), db_session)
 			}
 
 			continue
@@ -132,21 +115,7 @@ logistics_match_debug.MatchDebug = mt.String()
 			mt.Println("匹配单个物流方式结束")
 
 			if mt.is_trace == true {
-				var logistics_match_debug models.OrderLogisticsMatchDebugInfo
-				logistics_match_debug.OrderId = p_order.Id
-				logistics_match_debug.OrderCode = p_order.Code
-				logistics_match_debug.AddressId = p_order_logistics_data.order_shipping_address.Id
-				logistics_match_debug.CompanyId = logistics_mode.CompanyId
-				logistics_match_debug.StockId = logistics_mode.StockId
-				logistics_match_debug.ModeId = logistics_mode.Id
-				logistics_match_debug.FeeRateId = 0
-				logistics_match_debug.TotalFee = 0
-				logistics_match_debug.TotalCost = 0
-				logistics_match_debug.MatchResult = "无对应库存"
-				logistics_match_debug.MatchDebug = mt.String()
-
-				_, err := db_session.Insert(&logistics_match_debug)
-				core.HandleError(err)
+				log_logistics_match_debug(mode_result, "无对应库存", mt.String(), db_session)
 			}
 			continue
 		} else { // 如果库存都有的，就记录下商品成本总价
@@ -239,21 +208,7 @@ logistics_match_debug.MatchDebug = mt.String()
 				}
 
 				if mt.is_trace == true {
-					var logistics_match_debug models.OrderLogisticsMatchDebugInfo
-					logistics_match_debug.OrderId = p_order.Id
-					logistics_match_debug.OrderCode = p_order.Code
-					logistics_match_debug.AddressId = p_order_logistics_data.order_shipping_address.Id
-					logistics_match_debug.CompanyId = logistics_mode.CompanyId
-					logistics_match_debug.StockId = logistics_mode.StockId
-					logistics_match_debug.ModeId = logistics_mode.Id
-					logistics_match_debug.FeeRateId = 0
-					logistics_match_debug.TotalFee = 0
-					logistics_match_debug.TotalCost = 0
-					logistics_match_debug.MatchResult = "体积重与实际重比值有要求，但超过了限重"
-					logistics_match_debug.MatchDebug = mt.String()
-
-					_, err := db_session.Insert(&logistics_match_debug)
-					core.HandleError(err)
+					log_logistics_match_debug(mode_result, "体积重与实际重比值有要求，但超过了限重", mt.String(), db_session)
 				}
 
 				continue
@@ -297,7 +252,7 @@ logistics_match_debug.MatchDebug = mt.String()
 			}
 		}
 
-		// 接下来计算都是针对 final_weight_in_mode 来做，不管前面有没有考虑体积重
+		// 接下来计算都是针对 final_weight_in_mode 来做，不管前面有没有考虑体积重, 后来就是 mode_result.weight
 
 		var extra_weight_fee_in_mode float64 = 0 // 超重的费用， 澳币
 		// 重量是否有限制
@@ -313,21 +268,7 @@ logistics_match_debug.MatchDebug = mt.String()
 					mt.Println("是否允许超重", "否")
 					mt.Println("匹配单个物流方式结束")
 					if mt.is_trace == true {
-						var logistics_match_debug models.OrderLogisticsMatchDebugInfo
-						logistics_match_debug.OrderId = p_order.Id
-						logistics_match_debug.OrderCode = p_order.Code
-						logistics_match_debug.AddressId = p_order_logistics_data.order_shipping_address.Id
-						logistics_match_debug.CompanyId = logistics_mode.CompanyId
-						logistics_match_debug.StockId = logistics_mode.StockId
-						logistics_match_debug.ModeId = logistics_mode.Id
-						logistics_match_debug.FeeRateId = 0
-						logistics_match_debug.TotalFee = 0
-						logistics_match_debug.TotalCost = 0
-						logistics_match_debug.MatchResult = "超重"
-						logistics_match_debug.MatchDebug = mt.String()
-
-						_, err := db_session.Insert(&logistics_match_debug)
-						core.HandleError(err)
+						log_logistics_match_debug(mode_result, "超重", mt.String(), db_session)
 					}
 					continue // 不允许超重，就排除当前物流方式s
 				} else {
@@ -368,21 +309,7 @@ logistics_match_debug.MatchDebug = mt.String()
 					mt.Println("是否允许超长", "否")
 					mt.Println("匹配单个物流方式结束")
 					if mt.is_trace == true {
-						var logistics_match_debug models.OrderLogisticsMatchDebugInfo
-						logistics_match_debug.OrderId = p_order.Id
-						logistics_match_debug.OrderCode = p_order.Code
-						logistics_match_debug.AddressId = p_order_logistics_data.order_shipping_address.Id
-						logistics_match_debug.CompanyId = logistics_mode.CompanyId
-						logistics_match_debug.StockId = logistics_mode.StockId
-						logistics_match_debug.ModeId = logistics_mode.Id
-						logistics_match_debug.FeeRateId = 0
-						logistics_match_debug.TotalFee = 0
-						logistics_match_debug.TotalCost = 0
-						logistics_match_debug.MatchResult = "超长"
-						logistics_match_debug.MatchDebug = mt.String()
-
-						_, err := db_session.Insert(&logistics_match_debug)
-						core.HandleError(err)
+						log_logistics_match_debug(mode_result, "超长", mt.String(), db_session)
 					}
 					continue
 				} else {
@@ -480,21 +407,7 @@ logistics_match_debug.MatchDebug = mt.String()
 			mt.Println("匹配单个物流方式结束")
 
 			if mt.is_trace == true {
-				var logistics_match_debug models.OrderLogisticsMatchDebugInfo
-				logistics_match_debug.OrderId = p_order.Id
-				logistics_match_debug.OrderCode = p_order.Code
-				logistics_match_debug.AddressId = p_order_logistics_data.order_shipping_address.Id
-				logistics_match_debug.CompanyId = logistics_mode.CompanyId
-				logistics_match_debug.StockId = logistics_mode.StockId
-				logistics_match_debug.ModeId = logistics_mode.Id
-				logistics_match_debug.FeeRateId = 0
-				logistics_match_debug.TotalFee = 0
-				logistics_match_debug.TotalCost = 0
-				logistics_match_debug.MatchResult = "没有匹配的物流费率"
-				logistics_match_debug.MatchDebug = mt.String()
-
-				_, err := db_session.Insert(&logistics_match_debug)
-				core.HandleError(err)
+				log_logistics_match_debug(mode_result, "没有匹配的物流费率", mt.String(), db_session)
 			}
 
 			continue // 排除该物流方式
@@ -505,15 +418,15 @@ logistics_match_debug.MatchDebug = mt.String()
 		mt.Println("物流方式超长费用", extra_length_fee_in_mode)
 		var extra_fee_in_mode = math.Max(extra_weight_fee_in_mode, extra_length_fee_in_mode)
 		mt.Println("物流方式超重和超长，取大的一个的结果", extra_fee_in_mode)
-		var total_fee_in_mode float64 = total_fee_in_fee_rate + extra_fee_in_mode
-		mt.Println("物流方式中物流费率费用加上物流方式超重超长大的一个后的结果", total_fee_in_mode)
-		var total_amount_in_mode = total_fee_in_mode + mode_result.cost_amount
-		mt.Println("考虑澳仓成本后的，物流方式总费用", total_amount_in_mode)
+		mode_result.total_fee = total_fee_in_fee_rate + extra_fee_in_mode
+		mt.Println("物流方式中物流费率费用加上物流方式超重超长大的一个后的结果", mode_result.total_fee)
+		mode_result.total_amount = mode_result.total_fee + mode_result.cost_amount
+		mt.Println("考虑澳仓成本后的，物流方式总费用", mode_result.total_amount)
 
-		// 三个区间 final_total_amount-total_amount_in_mode，后来改用 fee了，不考虑 库存的cost_price，因为没有库存的也参与筛选
+		// 三个区间 final_total_amount-mode_result.total_amount，后来改用 fee了，不考虑 库存的cost_price，因为没有库存的也参与筛选
 		// 负无穷大 到 -p_ol.logistics_setting.FeeMaxDiff， -p_ol.logistics_setting.FeeMaxDiff到+p_ol.logistics_setting.FeeMaxDiff, +p_ol.logistics_setting.FeeMaxDiff 到 正无穷大
-		//if final_result.total_amount-total_amount_in_mode > p_ol.logistics_setting.FeeMaxDiff { // 取得更优的模式方案，挑选最优解时，把商品的到仓成本也考虑进去   +p_ol.logistics_setting.FeeMaxDiff 到 正无穷大
-		if final_result.total_fee-total_fee_in_mode > p_ol.logistics_setting.FeeMaxDiff { // 取得更优的模式方案，挑选最优解时，把商品的到仓成本也考虑进去   +p_ol.logistics_setting.FeeMaxDiff 到 正无穷大
+		//if final_result.total_amount-mode_result.total_amount > p_ol.logistics_setting.FeeMaxDiff { // 取得更优的模式方案，挑选最优解时，把商品的到仓成本也考虑进去   +p_ol.logistics_setting.FeeMaxDiff 到 正无穷大
+		if final_result.total_fee-mode_result.total_fee > p_ol.logistics_setting.FeeMaxDiff { // 取得更优的模式方案，挑选最优解时，把商品的到仓成本也考虑进去   +p_ol.logistics_setting.FeeMaxDiff 到 正无穷大
 			mt.Println("之前没有匹配的物流方式，或当前物流方式比之前匹配的物流方式节省费用超过最大允许偏差，暂时选用当前物流方式计算结果")
 
 			final_result.fee_rate_id = mode_result.fee_rate_id
@@ -522,17 +435,17 @@ logistics_match_debug.MatchDebug = mt.String()
 			final_result.stock = mode_result.stock
 			final_result.mode_id = logistics_mode.Id
 			final_result.mode = logistics_mode
-			final_result.total_fee = total_fee_in_mode
+			final_result.total_fee = mode_result.total_fee
 			final_result.cost_amount = mode_result.cost_amount
-			final_result.total_amount = total_amount_in_mode
+			final_result.total_amount = mode_result.total_amount
 
 			final_result.length = mode_result.length
 			final_result.width = mode_result.width
 			final_result.height = mode_result.height
 			final_result.actual_weight = mode_result.actual_weight
 			final_result.dim_weight = mode_result.dim_weight
-			//} else if math.Abs(final_result.total_amount-total_amount_in_mode) <= p_ol.logistics_setting.FeeMaxDiff { // 运费偏差在最大允许范围内，其实还是算上了澳仓成本的  -p_ol.logistics_setting.FeeMaxDiff到+p_ol.logistics_setting.FeeMaxDiff,
-		} else if math.Abs(final_result.total_fee-total_fee_in_mode) <= p_ol.logistics_setting.FeeMaxDiff { // 运费偏差在最大允许范围内，其实还是算上了澳仓成本的  -p_ol.logistics_setting.FeeMaxDiff到+p_ol.logistics_setting.FeeMaxDiff,
+			//} else if math.Abs(final_result.total_amount-mode_result.total_amount) <= p_ol.logistics_setting.FeeMaxDiff { // 运费偏差在最大允许范围内，其实还是算上了澳仓成本的  -p_ol.logistics_setting.FeeMaxDiff到+p_ol.logistics_setting.FeeMaxDiff,
+		} else if math.Abs(final_result.total_fee-mode_result.total_fee) <= p_ol.logistics_setting.FeeMaxDiff { // 运费偏差在最大允许范围内，其实还是算上了澳仓成本的  -p_ol.logistics_setting.FeeMaxDiff到+p_ol.logistics_setting.FeeMaxDiff,
 			//取优先级高的仓库
 			if mode_result.stock.Priority > final_result.stock.Priority { // 当前的仓库的优先级要高
 				mt.Println("当前匹配的物流方式费用和之前最优解在允许偏差范围内，且当前仓库是优先级更高，选用当前物流方式计算结果。")
@@ -543,9 +456,9 @@ logistics_match_debug.MatchDebug = mt.String()
 				final_result.stock = mode_result.stock
 				final_result.mode_id = logistics_mode.Id
 				final_result.mode = logistics_mode
-				final_result.total_fee = total_fee_in_mode
+				final_result.total_fee = mode_result.total_fee
 				final_result.cost_amount = mode_result.cost_amount
-				final_result.total_amount = total_amount_in_mode
+				final_result.total_amount = mode_result.total_amount
 
 				final_result.length = mode_result.length
 				final_result.width = mode_result.width
@@ -563,22 +476,10 @@ logistics_match_debug.MatchDebug = mt.String()
 
 		// 插入调试信息，前面清除过，这里只做插入
 		if mt.is_trace == true {
-			var logistics_match_debug models.OrderLogisticsMatchDebugInfo
-			logistics_match_debug.OrderId = p_order.Id
-			logistics_match_debug.OrderCode = p_order.Code
-			logistics_match_debug.AddressId = p_order_logistics_data.order_shipping_address.Id
-			logistics_match_debug.CompanyId = logistics_mode.CompanyId
-			logistics_match_debug.StockId = logistics_mode.StockId
-			logistics_match_debug.ModeId = logistics_mode.Id
-			logistics_match_debug.FeeRateId = mode_result.fee_rate_id
-			logistics_match_debug.TotalFee = total_fee_in_mode
-			logistics_match_debug.TotalCost = total_amount_in_mode
-			logistics_match_debug.MatchResult = "备选"
-			logistics_match_debug.MatchDebug = mt.String()
-
-			_, err := db_session.Insert(&logistics_match_debug)
-			core.HandleError(err)
+			log_logistics_match_debug(mode_result, "备选", mt.String(), db_session)
 		}
+
+		mode_result.pick_fee = pick_fee_service.Get_product_pick_fee(final_result.actual_weight, p_ol.pick_fee_setting)
 	} // for _, logistics_mode := range logistics_mode_list {
 
 	// mt.Println("最终费用为", final_total_fee)
@@ -627,6 +528,8 @@ logistics_match_debug.MatchDebug = mt.String()
 	has, err := db_session.Where(fmt.Sprintf("order_id = %d", p_order.Id)).Get(&order_logistics)
 	core.HandleError(err)
 
+	final_result.pick_fee = pick_fee_service.Get_product_pick_fee(final_result.actual_weight, p_ol.pick_fee_setting)
+
 	order_logistics.OrderId = p_order.Id
 	order_logistics.AddressId = address_id
 	order_logistics.CompanyId = final_result.company_id
@@ -639,7 +542,7 @@ logistics_match_debug.MatchDebug = mt.String()
 	order_logistics.DimWeight = final_result.dim_weight
 	order_logistics.Weight = final_result.actual_weight
 	order_logistics.TotalFee = final_result.total_fee
-	order_logistics.PickFee = pick_fee_service.Get_product_pick_fee(final_result.actual_weight, p_ol.pick_fee_setting)
+	order_logistics.PickFee = final_result.pick_fee
 	order_logistics.CostAmount = final_result.cost_amount
 
 	if has == true {
