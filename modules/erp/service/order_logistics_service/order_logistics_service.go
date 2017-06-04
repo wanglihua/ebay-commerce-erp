@@ -282,6 +282,11 @@ func (p_ol *OrderLogistics) CalculateList(order_list []models.OrderInfo, db_sess
 
 		match_success, order_logistics := p_ol.match_logistics_mode(&order, p_order_logistics_data, db_session)
 
+		// 11 无法匹配物流（长宽高重量没有物流满足）
+		if p_ol.hold_check_no_match_logistics_mode(&order, match_success, db_session) {
+			continue
+		}
+
 		// 5. 系统显示所有仓都缺货（中国仓除外）
 		if p_ol.hold_check_oss_all_stock(&order, p_order_logistics_data, db_session) {
 			continue
@@ -296,11 +301,6 @@ func (p_ol *OrderLogistics) CalculateList(order_list []models.OrderInfo, db_sess
 		// 1 地址有特殊字段的， 因为要查看匹配的物流方式，所以就放在这里了，放在匹配物流方式之后
 		if p_ol.hold_check_address_special_word(&order, p_order_logistics_data, order_logistics, db_session) {
 			//todo: 是不是要把前面匹配好的物流方式给去掉。保留好了
-			continue
-		}
-
-		// 11 无法匹配物流（长宽高重量没有物流满足）
-		if p_ol.hold_check_no_match_logistics_mode(&order, match_success, db_session) {
 			continue
 		}
 
