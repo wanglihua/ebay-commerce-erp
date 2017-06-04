@@ -83,15 +83,6 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 		mode_result.mode_id = logistics_mode.Id
 		mode_result.mode = logistics_mode
 
-		/*
-
-logistics_match_debug.FeeRateId = selected_fee_rate_id_in_mode
-logistics_match_debug.TotalFee = total_fee_in_mode
-logistics_match_debug.TotalCost = total_amount_in_mode
-logistics_match_debug.MatchResult = "备选"
-logistics_match_debug.MatchDebug = mt.String()
-		 */
-
 		mt.Println("订单编号", p_order.Code)
 		mt.Println("匹配单个物流方式开始")
 		mt.Println("物流方式数据库id", logistics_mode.Id, "物流方式名称：", logistics_mode.Name)
@@ -126,6 +117,8 @@ logistics_match_debug.MatchDebug = mt.String()
 		// 获取所有商品的整体的 长，宽，高，重量 等的数据
 		mode_result.length, mode_result.width, mode_result.height, mode_result.actual_weight = get_order_products_whole_logistics_data(p_order_logistics_data)
 		mt.Println("计算所得的订单商品的整体，长，宽，高，实际重量", mode_result.length, mode_result.width, mode_result.height, mode_result.actual_weight)
+
+		mode_result.pick_fee = pick_fee_service.Get_product_pick_fee(mode_result.actual_weight, p_ol.pick_fee_setting)
 
 		// 匹配前打折
 		{
@@ -478,8 +471,6 @@ logistics_match_debug.MatchDebug = mt.String()
 		if mt.is_trace == true {
 			log_logistics_match_debug(mode_result, "备选", mt.String(), db_session)
 		}
-
-		mode_result.pick_fee = pick_fee_service.Get_product_pick_fee(final_result.actual_weight, p_ol.pick_fee_setting)
 	} // for _, logistics_mode := range logistics_mode_list {
 
 	// mt.Println("最终费用为", final_total_fee)
@@ -521,56 +512,12 @@ logistics_match_debug.MatchDebug = mt.String()
 		}
 	}
 
-	var address_id = p_order_logistics_data.order_shipping_address.Id
-
-	// 匹配成功，记录匹配成功数据
-	var order_logistics models.OrderLogisticsInfo
-	has, err := db_session.Where(fmt.Sprintf("order_id = %d", p_order.Id)).Get(&order_logistics)
-	core.HandleError(err)
-
+	final_result.order_id = p_order.Id
+	final_result.order_code = p_order.Code
+	final_result.address_id = p_order_logistics_data.order_shipping_address.Id
 	final_result.pick_fee = pick_fee_service.Get_product_pick_fee(final_result.actual_weight, p_ol.pick_fee_setting)
 
-	order_logistics.OrderId = p_order.Id
-	order_logistics.AddressId = address_id
-	order_logistics.CompanyId = final_result.company_id
-	order_logistics.StockId = final_result.stock_id
-	order_logistics.ModeId = final_result.mode_id
-	order_logistics.FeeRateId = final_result.fee_rate_id
-	order_logistics.Length = final_result.length
-	order_logistics.Width = final_result.width
-	order_logistics.Height = final_result.height
-	order_logistics.DimWeight = final_result.dim_weight
-	order_logistics.Weight = final_result.actual_weight
-	order_logistics.TotalFee = final_result.total_fee
-	order_logistics.PickFee = final_result.pick_fee
-	order_logistics.CostAmount = final_result.cost_amount
-
-	if has == true {
-		_, err := db_session.Id(order_logistics.Id).Update(&order_logistics)
-		core.HandleError(err)
-	} else {
-		_, err := db_session.Insert(&order_logistics)
-		core.HandleError(err)
-	}
-
-	var update_col_list = []string{"status_id", "stock_id", "address_id", "company_id", "mode_id"}
-	if final_result.mode.TypeId == models.LOGISTICS_MODE_TYPE_EXPRESS {
-		// 把订单状态修改为 Hold
-		p_order.HoldTypeId = core.MakeNullInt(models.ORDER_HOLD_TYPE_EXPRESS, true)
-		p_order.StatusId = models.ORDER_STATUS_HOLD // 修改订单状态为 hold 状态
-
-		update_col_list = append(update_col_list, "hold_type_id")
-	} else {
-		// 把订单状态修改为 待配货
-		p_order.StatusId = models.ORDER_STATUS_DPH
-	}
-	// 填入匹配过程中的最后的 stock_id 和 address_id
-	p_order.StockId = final_result.stock_id
-	p_order.AddressId = address_id
-	p_order.CompanyId = final_result.company_id
-	p_order.ModeId = final_result.mode_id
-	_, err = db_session.Id(p_order.Id).Cols(update_col_list...).Update(p_order)
-	core.HandleError(err)
+	var order_logistics = save_order_logistics(p_order, final_result, true, db_session)
 
 	// 多个商品时，考虑拆包的方式
 
