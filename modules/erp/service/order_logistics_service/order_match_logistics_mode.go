@@ -155,8 +155,8 @@ logistics_match_debug.MatchDebug = mt.String()
 		}
 
 		// 获取所有商品的整体的 长，宽，高，重量 等的数据
-		var length, width, height, actual_weight float64 = get_order_products_whole_logistics_data(p_order_logistics_data)
-		mt.Println("计算所得的订单商品的整体，长，宽，高，实际重量", length, width, height, actual_weight)
+		mode_result.length, mode_result.width, mode_result.height, mode_result.actual_weight = get_order_products_whole_logistics_data(p_order_logistics_data)
+		mt.Println("计算所得的订单商品的整体，长，宽，高，实际重量", mode_result.length, mode_result.width, mode_result.height, mode_result.actual_weight)
 
 		// 匹配前打折
 		{
@@ -167,9 +167,9 @@ logistics_match_debug.MatchDebug = mt.String()
 				// 实际重量打折
 				mt.Println("匹配前实际重量打折", "是")
 				mt.Println("匹配前实际重量折率", logistics_setting.Ppqzlzl)
-				mt.Println("匹配前打折前的实际重量", actual_weight)
-				actual_weight = actual_weight * logistics_setting.Ppqzlzl
-				mt.Println("匹配前打折后的实际重量", actual_weight)
+				mt.Println("匹配前打折前的实际重量", mode_result.actual_weight)
+				mode_result.actual_weight = mode_result.actual_weight * logistics_setting.Ppqzlzl
+				mt.Println("匹配前打折后的实际重量", mode_result.actual_weight)
 			} else {
 				mt.Println("匹配实际重量打折", "否")
 			}
@@ -178,9 +178,9 @@ logistics_match_debug.MatchDebug = mt.String()
 			if logistics_setting.Ppqzbdz == 1 {
 				mt.Println("匹配前中边打折", "是")
 
-				mt.Println("打折时的长宽高", length, width, height)
+				mt.Println("打折时的长宽高", mode_result.length, mode_result.width, mode_result.height)
 
-				var side_length_slice = sort.Float64Slice([]float64{length, width, height})
+				var side_length_slice = sort.Float64Slice([]float64{mode_result.length, mode_result.width, mode_result.height})
 				side_length_slice.Sort()
 				var mid_length = side_length_slice[1] // 0, 1, 2 中间那条边
 
@@ -188,15 +188,15 @@ logistics_match_debug.MatchDebug = mt.String()
 				mt.Println("打折前的中边为", mid_length)
 
 				const MIN_FLOAT_DIFF = 0.0000000001
-				if math.Abs(mid_length-length) < MIN_FLOAT_DIFF {
-					length = length * logistics_setting.Ppqzbzl
-					mt.Println("打折后的中边为", length)
-				} else if math.Abs(mid_length-width) < MIN_FLOAT_DIFF {
-					width = width * logistics_setting.Ppqzbzl
-					mt.Println("打折后的中边为", width)
-				} else if math.Abs(mid_length-height) < MIN_FLOAT_DIFF {
-					height = height * logistics_setting.Ppqzbzl
-					mt.Println("打折后的中边为", height)
+				if math.Abs(mid_length-mode_result.length) < MIN_FLOAT_DIFF {
+					mode_result.length = mode_result.length * logistics_setting.Ppqzbzl
+					mt.Println("打折后的中边为", mode_result.length)
+				} else if math.Abs(mid_length-mode_result.width) < MIN_FLOAT_DIFF {
+					mode_result.width = mode_result.width * logistics_setting.Ppqzbzl
+					mt.Println("打折后的中边为", mode_result.width)
+				} else if math.Abs(mid_length-mode_result.height) < MIN_FLOAT_DIFF {
+					mode_result.height = mode_result.height * logistics_setting.Ppqzbzl
+					mt.Println("打折后的中边为", mode_result.height)
 				}
 			} else {
 				mt.Println("匹配前中边打折", "否")
@@ -205,18 +205,18 @@ logistics_match_debug.MatchDebug = mt.String()
 
 		// 体积重是利用体积重公式计算得到的结果
 		// 只有这个参数大于零的时候才有意义
-		var dim_weight float64 = 0
+		mode_result.dim_weight = 0
 		if logistics_mode.Tjzgs > 0 {
 			mt.Println("物流方式的体积重公式参数为", logistics_mode.Tjzgs)
-			dim_weight = length * width * height / logistics_mode.Tjzgs
-			mt.Println("计算体积重，长，宽，高，体积重", length, width, height, dim_weight)
+			mode_result.dim_weight = mode_result.length * mode_result.width * mode_result.height / logistics_mode.Tjzgs
+			mt.Println("计算体积重，长，宽，高，体积重", mode_result.length, mode_result.width, mode_result.height, mode_result.dim_weight)
 		} else {
 			mt.Println("物流方式的体积重公式参数为 0， 不计算体积重。")
 		}
 
-		mt.Println("计算所得的订单商品的整体，长，宽，高，体积重，实际重量", length, width, height, dim_weight, actual_weight)
+		mt.Println("计算所得的订单商品的整体，长，宽，高，体积重，实际重量", mode_result.length, mode_result.width, mode_result.height, mode_result.dim_weight, mode_result.actual_weight)
 
-		var final_weight_in_mode = actual_weight // 用户存储最终的计费重量， 初始为实际重量。如果不考虑体积重的话，就用实际重量来算重量的
+		mode_result.weight = mode_result.actual_weight // 用户存储最终的计费重量， 初始为实际重量。如果不考虑体积重的话，就用实际重量来算重量的
 
 		// 体积重与实际重是否有比值要求
 		if logistics_mode.Zlsfybzyq == 1 { //如果有比值要求
@@ -229,12 +229,12 @@ logistics_match_debug.MatchDebug = mt.String()
 			var dim_weight_limit = logistics_mode.Zlbncg * logistics_mode.Tjzsjzbz // 通过体积重和实际重量的比值计算 体积重的限重
 			mt.Println("体积重的限重 ", dim_weight_limit)
 
-			if dim_weight > dim_weight_limit || actual_weight > actual_weight_limit {
-				if actual_weight > actual_weight_limit {
+			if mode_result.dim_weight > dim_weight_limit || mode_result.actual_weight > actual_weight_limit {
+				if mode_result.actual_weight > actual_weight_limit {
 					mt.Println("体积重与实际重比值有要求，但实际重量超过了限重")
 				}
 
-				if dim_weight > dim_weight_limit {
+				if mode_result.dim_weight > dim_weight_limit {
 					mt.Println("体积重与实际重比值有要求，但体积重超过了限重")
 				}
 
@@ -272,9 +272,9 @@ logistics_match_debug.MatchDebug = mt.String()
 
 				if logistics_mode.Tjzxs > 0 { // 如果 体积重系数 有设置的值
 					mt.Println("体积重系数", logistics_mode.Tjzxs)
-					mt.Println("体积重除以体积重系数之前", dim_weight)
-					dim_weight = dim_weight / logistics_mode.Tjzxs // 这里是除以体积重系数
-					mt.Println("体积重除以体积重系数之后", dim_weight)
+					mt.Println("体积重除以体积重系数之前", mode_result.dim_weight)
+					mode_result.dim_weight = mode_result.dim_weight / logistics_mode.Tjzxs // 这里是除以体积重系数
+					mt.Println("体积重除以体积重系数之后", mode_result.dim_weight)
 				} else {
 					mt.Println("体积重系数未设置或设置不符合要求")
 				}
@@ -282,14 +282,14 @@ logistics_match_debug.MatchDebug = mt.String()
 				// 体积重与实际重取向， 如果考虑体积重，这个系数一般都会设置的？
 				if logistics_mode.Tjzysjzqx == 1 { // 取大
 					mt.Println("体积重与实际重取向", "取大")
-					mt.Println("这时的体积重和实际重量分别是", dim_weight, actual_weight)
-					final_weight_in_mode = math.Max(dim_weight, actual_weight)
-					mt.Println("体积重与实际重取向 取大 后的结果是", final_weight_in_mode)
+					mt.Println("这时的体积重和实际重量分别是", mode_result.dim_weight, mode_result.actual_weight)
+					mode_result.weight = math.Max(mode_result.dim_weight, mode_result.actual_weight)
+					mt.Println("体积重与实际重取向 取大 后的结果是", mode_result.weight)
 				} else if logistics_mode.Tjzysjzqx == 2 { // 取小
 					mt.Println("体积重与实际重取向", "取小")
-					mt.Println("这时的体积重和实际重量分别是", dim_weight, actual_weight)
-					final_weight_in_mode = math.Min(dim_weight, actual_weight)
-					mt.Println("体积重与实际重取向 取小 后的结果是", final_weight_in_mode)
+					mt.Println("这时的体积重和实际重量分别是", mode_result.dim_weight, mode_result.actual_weight)
+					mode_result.weight = math.Min(mode_result.dim_weight, mode_result.actual_weight)
+					mt.Println("体积重与实际重取向 取小 后的结果是", mode_result.weight)
 				}
 
 			} else {
@@ -303,9 +303,9 @@ logistics_match_debug.MatchDebug = mt.String()
 		// 重量是否有限制
 		if logistics_mode.Zlsfyxz == 1 { //如果有限制
 			mt.Println("重量是否有限制", "是")
-			mt.Println("当前重量是", final_weight_in_mode)
+			mt.Println("当前重量是", mode_result.weight)
 			mt.Println("限制重量是", logistics_mode.Zlbncg)
-			var extra_weight = final_weight_in_mode - logistics_mode.Zlbncg
+			var extra_weight = mode_result.weight - logistics_mode.Zlbncg
 			if extra_weight > 0 { // 重量不能超过，如果重量有限制，物流方式里面一般都有超重限制
 				mt.Println("超重了，超重的重量为", extra_weight)
 				// 查看是否允许超重
@@ -356,8 +356,8 @@ logistics_match_debug.MatchDebug = mt.String()
 		// 长度是否有限制
 		if logistics_mode.Zcbsfyxz == 1 { // 如果有限制
 			mt.Println("长度是否有限制", "是")
-			var max_length = math.Max(math.Max(length, width), height)
-			mt.Println("这时的边长分别是", length, width, height)
+			var max_length = math.Max(math.Max(mode_result.length, mode_result.width), mode_result.height)
+			mt.Println("这时的边长分别是", mode_result.length, mode_result.width, mode_result.height)
 			mt.Println("这时的最长边是", max_length)
 			mt.Println("最长边限制 长度", logistics_mode.Zcbxzcd)
 			var extra_length = max_length - logistics_mode.Zcbxzcd
@@ -409,7 +409,7 @@ logistics_match_debug.MatchDebug = mt.String()
 			mt.Println("长度是否有限制", "否")
 		}
 
-		var selected_fee_rate_id_in_mode int64 = 0
+		mode_result.fee_rate_id = 0
 		var total_fee_in_fee_rate float64 = 10000000 //非超重部分的费用，初始为一个很大的不可能的数字， 澳币
 		for _, logistics_fee_rate := range logistics_fee_rate_list {
 
@@ -427,9 +427,9 @@ logistics_match_debug.MatchDebug = mt.String()
 				mt.PrintlnIndent(1, "费率起步价重量", logistics_fee_rate.Qbjzl)
 
 				var fee float64 = logistics_fee_rate.Qbj //起步价
-				if final_weight_in_mode-logistics_fee_rate.Qbjzl > 0 { //如果超过了起步重量，就算超过部分的费率；不超过，就不用算了
+				if mode_result.weight-logistics_fee_rate.Qbjzl > 0 { //如果超过了起步重量，就算超过部分的费率；不超过，就不用算了
 					mt.PrintlnIndent(1, "超过起步价重量了")
-					var extra_weight_in_fee_rate = final_weight_in_mode - logistics_fee_rate.Qbjzl
+					var extra_weight_in_fee_rate = mode_result.weight - logistics_fee_rate.Qbjzl
 					mt.PrintlnIndent(1, "超过重量", extra_weight_in_fee_rate)
 					mt.PrintlnIndent(1, "续重阶梯", logistics_fee_rate.Xzjt)
 					if logistics_fee_rate.Xzjt > 0 {
@@ -466,7 +466,7 @@ logistics_match_debug.MatchDebug = mt.String()
 				if fee < total_fee_in_fee_rate { // 取得更优的费率方案
 					mt.PrintlnIndent(1, "之前没有匹配的费率，或当前费率比之前匹配的费率更优，暂时选用当前费率计算结果")
 					total_fee_in_fee_rate = fee
-					selected_fee_rate_id_in_mode = logistics_fee_rate.Id
+					mode_result.fee_rate_id = logistics_fee_rate.Id
 				} else {
 					mt.PrintlnIndent(1, "之前匹配的费率，比当前费率更优，弃用当前费率计算结果")
 				}
@@ -475,7 +475,7 @@ logistics_match_debug.MatchDebug = mt.String()
 			}
 		} // for _, logistics_fee_rate := range logistics_fee_rate_list {
 
-		if selected_fee_rate_id_in_mode == 0 { //没有费率匹配成功, 比如说，还没有开通该地区的物流
+		if mode_result.fee_rate_id == 0 { //没有费率匹配成功, 比如说，还没有开通该地区的物流
 			mt.Println("该物流方式下没有匹配的物流费率，弃用当前物流方式")
 			mt.Println("匹配单个物流方式结束")
 
@@ -516,7 +516,7 @@ logistics_match_debug.MatchDebug = mt.String()
 		if final_result.total_fee-total_fee_in_mode > p_ol.logistics_setting.FeeMaxDiff { // 取得更优的模式方案，挑选最优解时，把商品的到仓成本也考虑进去   +p_ol.logistics_setting.FeeMaxDiff 到 正无穷大
 			mt.Println("之前没有匹配的物流方式，或当前物流方式比之前匹配的物流方式节省费用超过最大允许偏差，暂时选用当前物流方式计算结果")
 
-			final_result.fee_rate_id = selected_fee_rate_id_in_mode
+			final_result.fee_rate_id = mode_result.fee_rate_id
 			final_result.company_id = logistics_mode.CompanyId
 			final_result.stock_id = logistics_mode.StockId
 			final_result.stock = mode_result.stock
@@ -526,18 +526,18 @@ logistics_match_debug.MatchDebug = mt.String()
 			final_result.cost_amount = mode_result.cost_amount
 			final_result.total_amount = total_amount_in_mode
 
-			final_result.length = length
-			final_result.width = width
-			final_result.height = height
-			final_result.actual_weight = actual_weight
-			final_result.dim_weight = dim_weight
+			final_result.length = mode_result.length
+			final_result.width = mode_result.width
+			final_result.height = mode_result.height
+			final_result.actual_weight = mode_result.actual_weight
+			final_result.dim_weight = mode_result.dim_weight
 			//} else if math.Abs(final_result.total_amount-total_amount_in_mode) <= p_ol.logistics_setting.FeeMaxDiff { // 运费偏差在最大允许范围内，其实还是算上了澳仓成本的  -p_ol.logistics_setting.FeeMaxDiff到+p_ol.logistics_setting.FeeMaxDiff,
 		} else if math.Abs(final_result.total_fee-total_fee_in_mode) <= p_ol.logistics_setting.FeeMaxDiff { // 运费偏差在最大允许范围内，其实还是算上了澳仓成本的  -p_ol.logistics_setting.FeeMaxDiff到+p_ol.logistics_setting.FeeMaxDiff,
 			//取优先级高的仓库
 			if mode_result.stock.Priority > final_result.stock.Priority { // 当前的仓库的优先级要高
 				mt.Println("当前匹配的物流方式费用和之前最优解在允许偏差范围内，且当前仓库是优先级更高，选用当前物流方式计算结果。")
 
-				final_result.fee_rate_id = selected_fee_rate_id_in_mode
+				final_result.fee_rate_id = mode_result.fee_rate_id
 				final_result.company_id = logistics_mode.CompanyId
 				final_result.stock_id = logistics_mode.StockId
 				final_result.stock = mode_result.stock
@@ -547,11 +547,11 @@ logistics_match_debug.MatchDebug = mt.String()
 				final_result.cost_amount = mode_result.cost_amount
 				final_result.total_amount = total_amount_in_mode
 
-				final_result.length = length
-				final_result.width = width
-				final_result.height = height
-				final_result.actual_weight = actual_weight
-				final_result.dim_weight = dim_weight
+				final_result.length = mode_result.length
+				final_result.width = mode_result.width
+				final_result.height = mode_result.height
+				final_result.actual_weight = mode_result.actual_weight
+				final_result.dim_weight = mode_result.dim_weight
 			} else { //
 				mt.Println("当前匹配的物流方式费用和之前最优解在允许偏差范围内，但当前仓库是优先级并不更高，弃用当前物流方式计算结果。")
 			}
@@ -570,7 +570,7 @@ logistics_match_debug.MatchDebug = mt.String()
 			logistics_match_debug.CompanyId = logistics_mode.CompanyId
 			logistics_match_debug.StockId = logistics_mode.StockId
 			logistics_match_debug.ModeId = logistics_mode.Id
-			logistics_match_debug.FeeRateId = selected_fee_rate_id_in_mode
+			logistics_match_debug.FeeRateId = mode_result.fee_rate_id
 			logistics_match_debug.TotalFee = total_fee_in_mode
 			logistics_match_debug.TotalCost = total_amount_in_mode
 			logistics_match_debug.MatchResult = "备选"
