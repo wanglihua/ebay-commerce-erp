@@ -194,3 +194,4 @@ WHERE s.stock_type_id = %d;`
 		core.HandleError(err)
 	}
 }
+
