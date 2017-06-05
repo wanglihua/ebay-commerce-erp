@@ -11,6 +11,7 @@ import (
 	"matrix/modules/auth/pass_res"
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/erp/models"
+	"matrix/modules/erp/service/inventory_service"
 	"matrix/modules/erp/service/order_import_batch_service"
 	"matrix/modules/erp/service/order_logistics_service"
 	"matrix/modules/erp/service/order_service"
@@ -640,6 +641,8 @@ func (c ErpOrder) FaHuo() revel.Result {
 		order.StatusId = models.ORDER_STATUS_YFH
 		_, err = db_session.Id(order.Id).Cols("status_id").Update(&order)
 		core.HandleError(err)
+
+		inventory_service.Take_order_inventory(order.Id, db_session)
 	}
 
 	return c.RenderJson(map[string]interface{}{

@@ -60,7 +60,7 @@ func Take_order_inventory(order_id int64, db_session *xorm.Session) {
 		has, err := db_session.Sql(sql_get_inventory_record).Get(&inventory)
 		core.HandleError(err)
 
-		if has {
+		if has && inventory.Qty >= quantity {
 			inventory.Qty = inventory.Qty - quantity
 			_, err = db_session.Id(inventory.Id).Cols("qty").Update(&inventory)
 			core.HandleError(err)
