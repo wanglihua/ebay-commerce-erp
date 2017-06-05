@@ -16,12 +16,13 @@ type OrderLogisticsInfo struct {
 	Width         float64      `xorm:"float notnull 'width'" json:"width" smith:"verbose_name=宽度,min=0"`                        // cm
 	Height        float64      `xorm:"float notnull 'height'" json:"height" smith:"verbose_name=高度,min=0"`                      // cm
 	Weight        float64      `xorm:"float notnull 'weight'" json:"weight" smith:"verbose_name=重量,min=0"`                      // kg
-	DimWeight     float64      `xorm:"float notnull 'dim_weight'" json:"dim_weight" smith:"verbose_name=体积重,min=0"`                      // kg
+	DimWeight     float64      `xorm:"float notnull 'dim_weight'" json:"dim_weight" smith:"verbose_name=体积重,min=0"`             // kg
 	TotalFee      float64      `xorm:"decimal(18,6) notnull 'total_fee'" json:"total_fee" smith:"verbose_name=物流费用"`            // 由上面的 物流方式和物流费率，计算出来的物流费用，不包括拣货费用
 	ActualFee     float64      `xorm:"decimal(18,6) notnull 'actual_fee'" json:"actual_fee" smith:"verbose_name=实际费用"`          // 实际物流费用，有物流公司出来实际费用后，导入
 	PickFee       float64      `xorm:"decimal(18,6) notnull 'pick_fee'" json:"pick_fee" smith:"verbose_name=拣货费用"`              // 拣货费用，没有算在total_fee里面 total_fee里面只有物流公司的运费，匹配完成，匹配后打折完之后计算
 	CostAmount    float64      `xorm:"decimal(18,6) notnull 'cost_amount'" json:"cost_amount" smith:"verbose_name=商品成本"`        //商品成本，整个订单的商品成本总和
 	EnvelopeFeeId int64        `xorm:"bigint notnull index 'envelope_fee_id'" json:"envelope_fee_id" smith:"verbose_name=信封费率"` // 信封费率id，对于信封发货的，该字段才有设置
+	TrackingNum   string       `xorm:"nvarchar(100) null 'tracking_num'" json:"tracking_num" smith:"verbose_name=运单号"`
 	CreateTime    core.Time    `xorm:"created notnull 'create_time'" json:"create_time"`
 	UpdateTime    core.Time    `xorm:"updated notnull 'update_time'" json:"update_time"`
 	Version       int          `xorm:"version notnull 'version'" json:"version"`
