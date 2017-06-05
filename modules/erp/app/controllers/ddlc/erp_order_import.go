@@ -198,10 +198,11 @@ func (c ErpOrderImport) Upload() revel.Result {
 	for sheet_index := 0; sheet_index < sheet_count; sheet_index ++ {
 		sheet := xlsx_file.Sheets[sheet_index]
 		max_row := sheet.MaxRow
+
+		revel.TRACE.Println("sheet.MaxRow", sheet.MaxRow)
+
 		//略过标题行
 		for row_index := 1; row_index < max_row; row_index ++ {
-			row := sheet.Rows[row_index]
-
 			var cell *xlsx.Cell
 			var cell_val string
 			var err error
@@ -211,23 +212,16 @@ func (c ErpOrderImport) Upload() revel.Result {
 
 			col_index := 0
 
-			if len(row.Cells) < 15 { // Excel的列信息有改动的时候，这个数字也要记得改动的
-				break
-			}
-
 			// 邮政编码
-			cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
-			if cell_val == "" {
-				break
-			}
 			order_import.Yzbm = cell_val
 			col_index++
 
 			// 邮寄地址
-			cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
@@ -235,7 +229,7 @@ func (c ErpOrderImport) Upload() revel.Result {
 			col_index++
 
 			// 商品编号
-			cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
@@ -243,7 +237,7 @@ func (c ErpOrderImport) Upload() revel.Result {
 			col_index++
 
 			// 商品数量
-			cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
@@ -252,7 +246,7 @@ func (c ErpOrderImport) Upload() revel.Result {
 			col_index++
 
 			// 店铺名
-			cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
@@ -260,12 +254,16 @@ func (c ErpOrderImport) Upload() revel.Result {
 			col_index++
 
 			// 订单编号
-			cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
+			if cell_val == "" {
+				break; //如果订单编号为空了，就认为是数据结束了
+			}
 			order_import.Ddbh = cell_val
 			col_index++
+
 
 			// 商品数量 的错误提示，放在订单编号后面
 			if spsl == 0 || spsl_err != nil {
@@ -273,7 +271,7 @@ func (c ErpOrderImport) Upload() revel.Result {
 			}
 
 			// 交易单号
-			cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
@@ -281,7 +279,7 @@ func (c ErpOrderImport) Upload() revel.Result {
 			col_index++
 
 			// 收款金额(澳币)
-			cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
 			cell_val, _ = cell.String()
 			cell_val = strings.TrimSpace(cell_val)
 			if cell_val != "" {
@@ -293,7 +291,7 @@ func (c ErpOrderImport) Upload() revel.Result {
 			col_index++
 
 			// 运费收入(澳币)
-			cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
 			cell_val, _ = cell.String()
 			cell_val = strings.TrimSpace(cell_val)
 			if cell_val != "" {
@@ -305,7 +303,7 @@ func (c ErpOrderImport) Upload() revel.Result {
 			col_index++
 
 			// 客户账号
-			cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
@@ -313,7 +311,7 @@ func (c ErpOrderImport) Upload() revel.Result {
 			col_index++
 
 			// 客户姓名
-			cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
@@ -321,7 +319,7 @@ func (c ErpOrderImport) Upload() revel.Result {
 			col_index++
 
 			// 客户邮箱
-			cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
@@ -329,7 +327,7 @@ func (c ErpOrderImport) Upload() revel.Result {
 			col_index++
 
 			// 电话
-			cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
@@ -337,7 +335,7 @@ func (c ErpOrderImport) Upload() revel.Result {
 			col_index++
 
 			// 国家
-			cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
@@ -345,7 +343,7 @@ func (c ErpOrderImport) Upload() revel.Result {
 			col_index++
 
 			// 所属地区
-			cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
@@ -353,7 +351,7 @@ func (c ErpOrderImport) Upload() revel.Result {
 			col_index++
 
 			// 所属城市
-			cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
@@ -362,6 +360,8 @@ func (c ErpOrderImport) Upload() revel.Result {
 
 			order_import_list = append(order_import_list, order_import)
 		}
+
+		revel.TRACE.Println("sheet.MaxRow", sheet.MaxRow)
 	}
 
 	if len(order_import_list) == 0 {
@@ -370,6 +370,8 @@ func (c ErpOrderImport) Upload() revel.Result {
 			"message": "Excel文件中导入的订单列表为空！",
 		})
 	}
+
+	revel.TRACE.Println("len(order_import_list)", len(order_import_list))
 
 	/*
 	加载所有 店铺名称账户 和 商品SKU列表 ，方便接下来的验证，加快速度
@@ -488,6 +490,7 @@ SELECT sa.id AS shop_id, sa.name AS shop_name FROM erp_shop_account sa;
 		})
 	}
 
+	revel.TRACE.Println("order_import_list", len(order_import_list))
 	// 合并订单，马帮对于多SKU的订单导出的时候，会根据SKU对订单进行拆解。比如一个订单有3个SKU，那么马帮订单导出的时候，会拆解成3条记录，这个时候需要根据同一订单编号在wollongzone对订单进行合并。
 	// 马帮导出的拆解订单，每一行的收款都是总金额，所以这里金额不用累加
 	var order_import_list_map = make(map[string][]order_import_t)
@@ -501,12 +504,18 @@ SELECT sa.id AS shop_id, sa.name AS shop_name FROM erp_shop_account sa;
 		order_import_list_map[order_import.Ddbh] = order_import_same_code_list
 	}
 
+	revel.TRACE.Println("order_import_list_map", len(order_import_list_map))
+
 	var aud_exchange_rate_setting = exchange_rate_service.Get_aud_exchange_rate(db_session)
 
 	// 例如 20170414212812
 	var import_batch_code int64 = import_batch_code_service.Get_import_batch_code()
 
+	var order_code_count = 0
 	for order_code := range order_import_list_map {
+		order_code_count++
+		revel.TRACE.Println("order_code_count", order_code_count)
+
 		var order_import_same_code_list = order_import_list_map[order_code]
 
 		// 订单
