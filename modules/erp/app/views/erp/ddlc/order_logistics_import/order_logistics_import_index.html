@@ -1,0 +1,179 @@
+{%header "订单导入" .%}
+<div id="page">
+    <div class="breadcrumbs" id="breadcrumbs">
+        <ul class="breadcrumb">
+            <li>
+                <a href='{%url "Home.Index"%}'><i class="ace-icon fa fa-home home-icon"></i></a>
+            </li>
+            <li class="parent" data-menu="ddlc-menu">订单流程</li>
+            <li class="active" data-menu="ddlc-order-import-menu">订单导入</li>
+        </ul>
+    </div>
+    <div class="page-content">
+        <div class="row">
+            <div class="col-xs-12" style="padding: 0;">
+                <div class="gridToolBar clearfix">
+                    <button class="btn btn-primary btn-sm" @click="reloadList('#orderList')">
+                        <i class="ace-icon fa fa-refresh"></i>
+                        刷新
+                    </button>
+                    <button id="btnImportTrackingNumber" class="btn btn-success btn-sm">
+                        <i class="ace-icon fa fa-plus"></i>
+                        导入运单号
+                    </button>
+                    <button id="btnImportActualFee" class="btn btn-purple btn-sm">
+                        <i class="ace-icon fa fa-truck"></i>
+                        导入实际运费
+                    </button>
+                </div>
+                <div style="margin-top: 10px;">
+                    <a href="/static/excel-template/order_logistics_tracking_number_import.xlsx">下载导入运单号模板</a>
+                    <a href="/static/excel-template/order_logistics_actual_fee_import.xlsx">下载导入实际运费模板</a>
+                </div>
+                <div>
+                    <table id="tracking_number_error_data_list" class="table table-striped table-bordered table-hover" style="display: none;">
+                        <caption>运单号导入错误列表</caption>
+                        <thead>
+                        <tr>
+                            <th>订单代码</th>
+                            <th>运单号</th>
+                            <th>错误信息</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <template v-for="error_data in error_data_list">
+                            <tr>
+                                <td>{{error_data.order_number}}</td>
+                                <td>{{error_data.tracking_number}}</td>
+                                <td>{{error_data.error_message}}</td>
+                            </tr>
+                        </template>
+                        </tbody>
+                    </table>
+                    <table id="actual_fee_error_data_list" class="table table-striped table-bordered table-hover" style="display: none;">
+                        <caption>实际运费导入错误列表</caption>
+                        <thead>
+                        <tr>
+                            <th>订单代码</th>
+                            <th>实际运费</th>
+                            <th>错误信息</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <template v-for="error_data in error_data_list">
+                            <tr>
+                                <td>{{error_data.order_number}}</td>
+                                <td>{{error_data.actual_fee}}</td>
+                                <td>{{error_data.error_message}}</td>
+                            </tr>
+                        </template>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript" src="/static/lib/plupload/moxie.min.js"></script>
+<script type="text/javascript" src="/static/lib/plupload/plupload.min.js"></script>
+<script type="text/javascript" src="/static/lib/plupload/zh_CN.js"></script>
+
+<script type="text/javascript">
+    function init_uploader() {
+        var tracking_number_uploader = new plupload.Uploader({
+            runtimes: 'html5,flash,html4',
+            multi_selection: false,
+
+            browse_button: 'btnImportTrackingNumber',
+            file_data_name: "excel_file",
+
+            url: '{%url "ErpOrderLogisticsImport.ImportTrackingNumber"%}',
+            max_file_size: '10000kb',
+
+            filters: [
+                {title: "Excel文件", extensions: "xlsx"}
+            ],
+
+            flash_swf_url: '/plupload/js/Moxie.swf',
+
+            init: {
+                FilesAdded: function () {
+                    showMask("上传中，请稍候...");
+                    tracking_number_uploader.start();
+                },
+                FileUploaded: function (up, file, response) {
+                    hideMask();
+                    var result = JSON.parse(response.response);
+                    if (result.success !== true) {
+                        $.msg.error(result.message);
+                        vm.tracking_number_error_data_list = result.error_data_list;
+                        $("table#tracking_number_error_data_list").show();
+                    } else {
+                        $.msg.show(result.message);
+                        $("table#tracking_number_error_data_list").hide();
+                    }
+                },
+                Error: function (up, err) {
+                    $.msg.error("上传发生错误：" + err.code + ", " + err.message);
+                }
+            }
+        });
+
+        tracking_number_uploader.init();
+
+        var acutal_fee_uploader = new plupload.Uploader({
+            runtimes: 'html5,flash,html4',
+            multi_selection: false,
+
+            browse_button: 'btnImportActualFee',
+            file_data_name: "excel_file",
+
+            url: '{%url "ErpOrderLogisticsImport.ImportActualFee"%}',
+            max_file_size: '10000kb',
+
+            filters: [
+                {title: "Excel文件", extensions: "xlsx"}
+            ],
+
+            flash_swf_url: '/plupload/js/Moxie.swf',
+
+            init: {
+                FilesAdded: function () {
+                    showMask("上传中，请稍候...");
+                    acutal_fee_uploader.start();
+                },
+                FileUploaded: function (up, file, response) {
+                    hideMask();
+                    var result = JSON.parse(response.response);
+                    if (result.success !== true) {
+                        $.msg.error(result.message);
+                        vm.actual_fee_error_data_list = result.error_data_list;
+                        $("table#actual_fee_error_data_list").show();
+                    } else {
+                        $.msg.show(result.message);
+                        $("table#actual_fee_error_data_list").hide();
+                    }
+                },
+                Error: function (up, err) {
+                    $.msg.error("上传发生错误：" + err.code + ", " + err.message);
+                }
+            }
+        });
+
+        acutal_fee_uploader.init();
+    }
+
+    var vm = new Vue({
+        el: "#page",
+        data: {
+            "tracking_number_error_data_list": [],
+            "actual_fee_error_data_list": []
+        },
+        mounted: function () {
+            init_uploader();
+        },
+        methods: {}
+    });
+</script>
+{%footer%}

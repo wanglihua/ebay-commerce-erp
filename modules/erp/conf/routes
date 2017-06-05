@@ -354,6 +354,10 @@ POST /order/logistics/fee/diff/data/list   ErpOrderLogisticsFeeDiff.ListData
 GET  /order/logistics/test                 ErpOrderLogisticsTest.Index
 POST /order/logistics/test/match           ErpOrderLogisticsTest.Match
 
+GET  /order/logistics/import                  ErpOrderLogisticsImport.Index
+POST /order/logistics/import/tracking/number  ErpOrderLogisticsImport.ImportTrackingNumber
+POST /order/logistics/import/actual/fee       ErpOrderLogisticsImport.ImportActualFee
+
 GET  /ecommerce/platform                   ErpECommercePlatform.Index
 POST /ecommerce/platform/data/list         ErpECommercePlatform.ListData
 # POST /ecommerce/platform/data/detail       ErpECommercePlatform.DetailData
