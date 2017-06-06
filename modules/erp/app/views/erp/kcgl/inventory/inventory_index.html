@@ -463,9 +463,13 @@
                         {"mDataProp": "st.name", "title": "仓库", "bSearchable": false, "width": 180},
                         {"mDataProp": "loc.name", "title": "仓位", "bSearchable": false, "width": 180},
                         {"mDataProp": "prd.sku", "title": "商品", "bSearchable": false},
-                        {"mDataProp": "ivt.qty", "title": "数量", "bSearchable": false, "width": 120},
+                        {"mDataProp": "ivt.qty", "title": "数量", "sClass": "dtRight", "bSearchable": false, "width": 120},
                         {
-                            "mDataProp": "ivt.cost_price", "title": "成本价", "bSearchable": false, "width": 120,
+                            "mDataProp": "ivt.cost_price",
+                            "title": "成本价",
+                            "sClass": "dtRight",
+                            "bSearchable": false,
+                            "width": 120,
                             "render": function (data, type, row) {
                                 return dtFormatFloat(data);
                             }
