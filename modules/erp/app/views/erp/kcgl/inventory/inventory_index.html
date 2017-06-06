@@ -37,6 +37,7 @@
                     </button>
                 </div>
                 <div class="gridToolBar clearfix">
+                    {% if .has_sku_loc_res %}
                     <button id="btnImportSkuLoc" class="btn btn-info btn-sm">
                         <i class="ace-icon fa fa-file-excel-o"></i>
                         导入商品仓位
@@ -45,6 +46,8 @@
                         <i class="ace-icon fa fa-file-excel-o"></i>
                         导出商品仓位
                     </button>
+                    {% end %}
+                    {% if .has_sku_qty_res %}
                     <button id="btnImportSkuQty" class="btn btn-info btn-sm">
                         <i class="ace-icon fa fa-file-excel-o"></i>
                         导入库存数量
@@ -53,6 +56,8 @@
                         <i class="ace-icon fa fa-file-excel-o"></i>
                         导出库存数量
                     </button>
+                    {% end %}
+                    {% if .has_sku_price_res %}
                     <button id="btnImportSkuPrice" class="btn btn-info btn-sm">
                         <i class="ace-icon fa fa-file-excel-o"></i>
                         导入库存价格
@@ -61,6 +66,7 @@
                         <i class="ace-icon fa fa-file-excel-o"></i>
                         导出库存价格
                     </button>
+                    {% end %}
                 </div>
                 {%/*
                 <form id="formExport" method="post" action='{%url "ErpInventory.Export" %}'>
@@ -84,9 +90,15 @@
                     {%/*
                     <a href="/static/excel-template/inventory_import.xlsx">下载库存导入模板</a>&nbsp;&nbsp;
                     */%}
+                    {% if .has_sku_loc_res %}
                     <a href="/static/excel-template/inventory_sku_loc_import.xlsx">下载商品仓位导入模板</a>&nbsp;&nbsp;
+                    {% end %}
+                    {% if .has_sku_qty_res %}
                     <a href="/static/excel-template/inventory_sku_qty_import.xlsx">下载库存数量导入模板</a>&nbsp;&nbsp;
+                    {% end %}
+                    {% if .has_sku_price_res %}
                     <a href="/static/excel-template/inventory_sku_price_import.xlsx">下载库存成本导入模板</a>
+                    {% end %}
                 </div>
                 <div class="row" style="margin-top: 15px;margin-bottom: 5px;">
                     <div id="query" class="col-xs-12 query">
@@ -463,7 +475,13 @@
                         {"mDataProp": "st.name", "title": "仓库", "bSearchable": false, "width": 180},
                         {"mDataProp": "loc.name", "title": "仓位", "bSearchable": false, "width": 180},
                         {"mDataProp": "prd.sku", "title": "商品", "bSearchable": false},
-                        {"mDataProp": "ivt.qty", "title": "数量", "sClass": "dtRight", "bSearchable": false, "width": 120},
+                        {
+                            "mDataProp": "ivt.qty",
+                            "title": "数量",
+                            "sClass": "dtRight",
+                            "bSearchable": false,
+                            "width": 120
+                        },
                         {
                             "mDataProp": "ivt.cost_price",
                             "title": "成本价",
