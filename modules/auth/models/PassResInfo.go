@@ -242,6 +242,27 @@ func (e PassResInfo) InitData(db_session *xorm.Session) {
 		db_session.Insert(pass)
 
 		pass = new(PassResInfo)
+		pass.Id = pass_res.KCGL_INVENTORY_SKU_LOC
+		pass.CateId = pass_res_cate.KCGL
+		pass.Name = "商品库存 商品库位"
+		pass.Desc = core.MakeNullString("商品库存 商品库位", true)
+		db_session.Insert(pass)
+
+		pass = new(PassResInfo)
+		pass.Id = pass_res.KCGL_INVENTORY_SKU_QTY
+		pass.CateId = pass_res_cate.KCGL
+		pass.Name = "商品库存 库存数量"
+		pass.Desc = core.MakeNullString("商品库存 库存数量", true)
+		db_session.Insert(pass)
+
+		pass = new(PassResInfo)
+		pass.Id = pass_res.KCGL_INVENTORY_SKU_PRICE
+		pass.CateId = pass_res_cate.KCGL
+		pass.Name = "商品库存 库存成本"
+		pass.Desc = core.MakeNullString("商品库存 库存成本", true)
+		db_session.Insert(pass)
+
+		pass = new(PassResInfo)
 		pass.Id = pass_res.KCGL_INVENTORY_CHECK
 		pass.CateId = pass_res_cate.KCGL
 		pass.Name = "库存盘点"
