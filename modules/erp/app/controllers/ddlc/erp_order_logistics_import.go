@@ -95,7 +95,7 @@ func (c ErpOrderLogisticsImport) ImportTrackingNumber() revel.Result {
 		})
 	}
 
-	var order_import_error_list = make([]tracking_number_import_t, 0)
+	var tracking_number_import_error_list = make([]tracking_number_import_t, 0)
 
 	// 错误检查
 	for index, order_import := range tracking_number_import_list {
@@ -117,15 +117,15 @@ func (c ErpOrderLogisticsImport) ImportTrackingNumber() revel.Result {
 
 		if has == false {
 			tracking_number_import_list[index].ErrorMessage = fmt.Sprintf("订单代码 %s 对应的订单物流不存在！", order_import.OrderNumber)
-			order_import_error_list = append(order_import_error_list, order_import)
+			tracking_number_import_error_list = append(tracking_number_import_error_list, tracking_number_import_list[index])
 		}
 	}
 
-	if len(order_import_error_list) != 0 {
+	if len(tracking_number_import_error_list) != 0 {
 		return c.RenderJson(map[string]interface{}{
 			"success":         false,
 			"message":         "数据导入出现错误，详情查看页面下方表格！",
-			"error_data_list": order_import_error_list,
+			"error_data_list": tracking_number_import_error_list,
 		})
 	}
 
@@ -162,7 +162,7 @@ func (c ErpOrderLogisticsImport) ImportActualFee() revel.Result {
 		OrderNumber     string   `json:"order_number"`
 		ActualFee       float64  `json:"actual_fee"`
 		ErrorMessage    string   `json:"error_message"`
-		actual_fee_str  string
+		ActualFeeStr    string   `json:"actual_fee_str"`
 		order_logistics models.OrderLogisticsInfo
 	}
 
@@ -205,7 +205,7 @@ func (c ErpOrderLogisticsImport) ImportActualFee() revel.Result {
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
-			tracking_number_import.actual_fee_str = cell_val
+			tracking_number_import.ActualFeeStr = cell_val
 			col_index++
 
 			actual_fee_import_list = append(actual_fee_import_list, tracking_number_import)
@@ -241,13 +241,13 @@ func (c ErpOrderLogisticsImport) ImportActualFee() revel.Result {
 
 		if has == false {
 			actual_fee_import_list[index].ErrorMessage = fmt.Sprintf("订单代码 %s 对应的订单物流不存在！", actual_fee_import.OrderNumber)
-			order_import_error_list = append(order_import_error_list, actual_fee_import)
+			order_import_error_list = append(order_import_error_list, actual_fee_import_list[index])
 		}
 
-		actual_fee_import.ActualFee, err = strconv.ParseFloat(actual_fee_import.actual_fee_str, 64)
+		actual_fee_import.ActualFee, err = strconv.ParseFloat(actual_fee_import.ActualFeeStr, 64)
 		if err != nil {
-			actual_fee_import_list[index].ErrorMessage = fmt.Sprintf("订单代码 %s 对应实际运费的格式不对！", actual_fee_import.OrderNumber, actual_fee_import.actual_fee_str)
-			order_import_error_list = append(order_import_error_list, actual_fee_import)
+			actual_fee_import_list[index].ErrorMessage = fmt.Sprintf("订单代码 %s 对应实际运费 %s 的格式不对！", actual_fee_import.OrderNumber, actual_fee_import.ActualFeeStr)
+			order_import_error_list = append(order_import_error_list, actual_fee_import_list[index])
 		}
 	}
 

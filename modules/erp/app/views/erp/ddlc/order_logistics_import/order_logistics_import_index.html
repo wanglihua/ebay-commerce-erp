@@ -6,7 +6,8 @@
                 <a href='{%url "Home.Index"%}'><i class="ace-icon fa fa-home home-icon"></i></a>
             </li>
             <li class="parent" data-menu="ddlc-menu">订单流程</li>
-            <li class="active" data-menu="ddlc-order-import-menu">订单导入</li>
+            <li class="active" data-menu="ddlc-orderlogistics-menu"><a href='{%url "ErpOrderLogistics.Index" %}'>订单物流</a></li>
+            <li>物流信息导入</li>
         </ul>
     </div>
     <div class="page-content">
@@ -41,7 +42,7 @@
                         </tr>
                         </thead>
                         <tbody>
-                        <template v-for="error_data in error_data_list">
+                        <template v-for="error_data in tracking_number_error_data_list">
                             <tr>
                                 <td>{{error_data.order_number}}</td>
                                 <td>{{error_data.tracking_number}}</td>
@@ -60,10 +61,10 @@
                         </tr>
                         </thead>
                         <tbody>
-                        <template v-for="error_data in error_data_list">
+                        <template v-for="error_data in actual_fee_error_data_list">
                             <tr>
                                 <td>{{error_data.order_number}}</td>
-                                <td>{{error_data.actual_fee}}</td>
+                                <td>{{error_data.actual_fee_str}}</td>
                                 <td>{{error_data.error_message}}</td>
                             </tr>
                         </template>
