@@ -638,11 +638,12 @@ func (c ErpOrder) FaHuo() revel.Result {
 	}
 
 	for _, order := range order_list {
+
+		inventory_service.Take_order_inventory(order.Id, db_session)
+
 		order.StatusId = models.ORDER_STATUS_YFH
 		_, err = db_session.Id(order.Id).Cols("status_id").Update(&order)
 		core.HandleError(err)
-
-		inventory_service.Take_order_inventory(order.Id, db_session)
 	}
 
 	return c.RenderJson(map[string]interface{}{

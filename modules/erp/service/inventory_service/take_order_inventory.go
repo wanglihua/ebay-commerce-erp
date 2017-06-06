@@ -42,7 +42,8 @@ func Take_order_inventory(order_id int64, db_session *xorm.Session) {
 	var stock_id = order_stock_id.StockId
 	if stock_id == 0 {
 		//订单没有明确的发货仓库，不能扣减库存
-		panic("订单没有明确的发货仓库，不能扣减库存！")
+		//todo: 暂时不panic
+		//panic("订单没有明确的发货仓库，不能扣减库存！")
 	}
 
 	// 分别扣减库存
@@ -65,7 +66,8 @@ func Take_order_inventory(order_id int64, db_session *xorm.Session) {
 			_, err = db_session.Id(inventory.Id).Cols("qty").Update(&inventory)
 			core.HandleError(err)
 		} else {
-			panic("仓库中不存在相应库存，无法扣减相应库存！")
+			//todo: 暂时不panic
+			//panic("仓库中不存在相应库存，无法扣减相应库存！")
 		}
 	}
 }
