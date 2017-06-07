@@ -1,8 +1,6 @@
 package controllers
 
 import (
-	"time"
-
 	"github.com/revel/revel"
 	"matrix/core"
 	"matrix/db"
@@ -28,10 +26,12 @@ func (c Home) Hotload() revel.Result {
 
 	sql := `SELECT now() AS time_now`
 	var time_now struct {
-		Now time.Time `xorm:"'time_now'"`
+		Now core.Time `xorm:"'time_now'"`
 	}
 	_, err := db_session.Sql(sql).Get(&time_now)
 	core.HandleError(err)
+
+	revel.TRACE.Println(time_now.Now)
 
 	return c.RenderTemplate("home/home_hotload.html")
 }

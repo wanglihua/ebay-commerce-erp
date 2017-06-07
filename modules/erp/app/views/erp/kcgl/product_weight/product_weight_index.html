@@ -36,8 +36,12 @@
                         <i class="ace-icon fa fa-plus"></i>
                         导入
                     </button>
+                    <button class="btn btn-purple btn-sm" @click="exportProduct()">
+                        <i class="ace-icon fa fa-file-excel-o"></i>
+                        导出
+                    </button>
                     <div style="margin-top: 10px;">
-                        <a href="/static/excel-template/product_length_width_height_weight_import.xlsx">下载Excel模板</a>
+                        <a href="/static/excel-template/product_length_width_height_weight_import.xlsx">下载商品导入Excel模板</a>
                     </div>
                 </div>
                 <div>
@@ -374,6 +378,11 @@
                         }
                     );
                 }
+            },
+            exportProduct: function () {
+                var params = $.param({});
+                var url = '{%url "ErpProductWeightExport.Export"%}' + "?" + params;
+                $('<form method="post" action="' + url + '"></form>').appendTo('body').submit().remove();
             }
         }
     });
