@@ -197,7 +197,7 @@ func (p_ol *OrderLogistics) hold_check_multi_product(p_order *models.OrderInfo, 
 	return false
 }
 
-// 11 无法匹配物流（长宽高重量没有物流满足）， 对这个 函数 的调用放在匹配物流结束之后，这样才知道是不是匹配成功了
+// 11 无匹配的物流方式（长宽高重量没有物流满足）， 对这个 函数 的调用放在匹配物流结束之后，这样才知道是不是匹配成功了
 func (p_ol *OrderLogistics) hold_check_no_match_logistics_mode(p_order *models.OrderInfo, match_success bool, db_session *xorm.Session) (is_hold_return bool) {
 	if match_success == false {
 		p_ol.update_order_to_hold_type(p_order, models.ORDER_HOLD_TYPE_LOGISTICS_NO_MATCH, db_session)
@@ -539,7 +539,7 @@ func get_order_products_whole_logistics_data(p_order_logistics_data *order_logis
 (完成，临时完成)8. 多数量或多产品，但部分缺货（是否拆分订单）
 (完成，临时完成)9. 多数量或多产品，虽不缺货，但拆分订单发货，运费更便宜
 (完成，临时完成)10. 多数量或多产品，虽不缺货，但拆分订单发货，运费虽然便宜，但仓库拣货更方便
-11. 无法匹配物流（长宽高重量没有物流满足）
+11. 无匹配的物流方式（长宽高重量没有物流满足）
 (12.完成，这个检查应该放在 11 之前， 就是任何是有长宽高重量数据之前）12. 产品信息不全（长宽高重量不全或者有误）
 13. 匹配最佳仓库及物流后订单亏损。需要在基础设置里面有设置亏损额或者亏损率的设置功能，超过设置范围了，自动到订单亏损hold
 (完成)14. 信封类。长宽高在35cm X 25cm X 2cm, 重量在0.5Kg以内的订单为信封。若是多数量或者多产品，以前我们设计的思路是，最大产品的长边为最长边，最大产品的中边为中边，所有产品的最小边之和为最小边，判断是否在35cm X 25cm X 2cm以内，重量之和是否在0.5Kg以内

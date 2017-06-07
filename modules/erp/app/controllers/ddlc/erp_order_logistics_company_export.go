@@ -181,7 +181,7 @@ WHERE o.status_id = %d AND ol.mode_id IN (%s) AND ol.stock_id = %d`
 				sheet.Cell(index+2, excel_col_label_to_index("Z")).Value = get_order_sku_for_export(order_logistics.Order.Id, db_session)
 				sheet.Cell(index+2, excel_col_label_to_index("AA")).Value = "FALSE"
 				sheet.Cell(index+2, excel_col_label_to_index("AC")).Value = "FALSE"
-				sheet.Cell(index+2, excel_col_label_to_index("AD")).Value = "Iepoch MEL (3PL)"
+				sheet.Cell(index+2, excel_col_label_to_index("AD")).Value = "iepoch MEL (3PL)"
 				sheet.Cell(index+2, excel_col_label_to_index("AE")).Value = "2 Venture Court"
 				sheet.Cell(index+2, excel_col_label_to_index("AI")).Value = "DANDENONG SOUTH"
 				sheet.Cell(index+2, excel_col_label_to_index("AJ")).Value = "VIC"
@@ -225,8 +225,8 @@ WHERE o.status_id = %d AND ol.mode_id IN (%s) AND ol.stock_id = %d`
 				sheet.Cell(index+2, excel_col_label_to_index("Z")).Value = get_order_sku_for_export(order_logistics.Order.Id, db_session)
 				sheet.Cell(index+2, excel_col_label_to_index("AA")).Value = "FALSE"
 				sheet.Cell(index+2, excel_col_label_to_index("AC")).Value = "FALSE"
-				sheet.Cell(index+2, excel_col_label_to_index("AD")).Value = "Iepoch BNE (3PL)"
-				sheet.Cell(index+2, excel_col_label_to_index("AE")).Value = "2/30 Gow Street"
+				sheet.Cell(index+2, excel_col_label_to_index("AD")).Value = "iepoch BNE (3PL)"
+				sheet.Cell(index+2, excel_col_label_to_index("AE")).Value = "Basement 2/30 Gow Street"
 				sheet.Cell(index+2, excel_col_label_to_index("AI")).Value = "MOOROOKA"
 				sheet.Cell(index+2, excel_col_label_to_index("AJ")).Value = "QLD"
 				sheet.Cell(index+2, excel_col_label_to_index("AK")).Value = "4105"
@@ -371,23 +371,7 @@ WHERE o.status_id = %d AND ol.mode_id IN (%s) AND ol.stock_id = %d`
 			sheet.Cell(index+1, excel_col_label_to_index("A")).Value = "IPEC"
 
 			// TOLL 的 导出模板，B列 service ID。如果是墨尔本仓库，邮编第一个数字是“3”的话，填充2，否则填充4 。 如果是布里斯班仓库，邮编第一个数字是“4”的话，填充2，否则填充4 。
-			var service_id string = ""
-			var postalcode_rune_list = []rune(order_shipping_address.PostalCode)
-			if len(postalcode_rune_list) > 0 {
-				if stock_code == excel_export_stock_mel_code {
-					if postalcode_rune_list[0] == ([]rune("3"))[0] {
-						service_id = "2"
-					} else {
-						service_id = "4"
-					}
-				} else if stock_code == excel_export_stock_bne_code {
-					if postalcode_rune_list[0] == ([]rune("4"))[0] {
-						service_id = "2"
-					} else {
-						service_id = "4"
-					}
-				}
-			}
+			var service_id string = get_toll_service_id(stock_code, order_shipping_address)
 			sheet.Cell(index+1, excel_col_label_to_index("B")).Value = service_id
 
 			sheet.Cell(index+1, excel_col_label_to_index("C")).Value = order_shipping_address.Name
@@ -576,4 +560,36 @@ func get_toll_packaging_code(order_logistics models.OrderLogisticsInfo) string {
 	} else {
 		return ""
 	}
+}
+
+func get_toll_service_id(stock_code int, order_shipping_address models.OrderShippingAddressInfo) string {
+	var service_id string = ""
+	var postalcode_rune_list = []rune(order_shipping_address.PostalCode)
+	if len(postalcode_rune_list) > 0 {
+		if stock_code == excel_export_stock_mel_code {
+			if postalcode_rune_list[0] == ([]rune("3"))[0] {
+				service_id = "2"
+			} else {
+				service_id = "4"
+			}
+		} else if stock_code == excel_export_stock_bne_code {
+			/*
+			if postalcode_rune_list[0] == ([]rune("4"))[0] {
+				service_id = "2"
+			} else {
+				service_id = "4"
+			}
+			*/
+
+			/*
+				布里斯班的TOLL的导出模板，第二列
+				刘兴宗_浙江澳中欧易事多 2017-06-07 12:12:19
+				这里全部固定为4
+			 */
+
+			service_id = "4"
+		}
+	}
+
+	return service_id
 }

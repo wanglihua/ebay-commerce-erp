@@ -74,7 +74,7 @@
                         {
                             "mDataProp": "ti.title", "title": "标题", "bSearchable": true,
                             "render": function (data, type, row) {
-                                return "<a target='_blank' href='/track/issue/" + row.ti.id + "'>" + data + "</a>";
+                                return "<div style='min-width: 280px;white-space:normal; word-break: break-all; word-wrap:break-word;'><a target='_blank' href='/track/issue/" + row.ti.id + "'>" + data + "</a></div>";
                             }
                         },
                         {"mDataProp": "tic.cate_name", "title": "类别", "bSearchable": true, "width": 180},

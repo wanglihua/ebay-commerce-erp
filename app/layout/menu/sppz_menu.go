@@ -117,13 +117,15 @@ func GetSppzMenu(res_id_map map[int64]bool, web_session revel.Session) string {
         </li>`)
 	}
 
-	buffer.WriteString(`<li id="sppz-sea-container-cost-menu" class="">
+	if check_pass_res_menu(pass_res.SPPZ_SEA_CONTAINER_COST) {
+		buffer.WriteString(`<li id="sppz-sea-container-cost-menu" class="">
             <a href="/sea/container/cost">
                 <i class="menu-icon fa fa-caret-right"></i>
                 海运集装箱成本
             </a>
             <b class="arrow"></b>
         </li>`)
+	}
 
 	buffer.WriteString(`</ul>
 </li>

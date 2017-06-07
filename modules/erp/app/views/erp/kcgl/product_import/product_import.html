@@ -21,10 +21,12 @@
                         <i class="ace-icon fa fa-file-excel-o"></i>
                         导入
                     </button>
+                    {% if .has_product_export_pass %}
                     <button class="btn btn-purple btn-sm" @click="exportProduct()">
                         <i class="ace-icon fa fa-file-excel-o"></i>
                         导出
                     </button>
+                    {% end %}
                     <button class="btn btn-danger btn-sm" @click="deleteImportProduct()">
                         <i class="ace-icon fa fa-trash-o"></i>
                         删除商品

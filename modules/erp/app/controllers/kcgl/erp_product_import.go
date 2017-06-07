@@ -21,13 +21,16 @@ type ErpProductImport struct {
 }
 
 func (c ErpProductImport) Index() revel.Result {
-	pass_service.Check_login_user_pass(pass_res.KCGL_PRODUCT_IMPORT, c.Session)
+	pass_service.Check_login_user_pass_or([]int64{pass_res.KCGL_PRODUCT_IMPORT, pass_res.KCGL_PRODUCT_EXPORT}, c.Session)
+
+	var has_product_export_pass = pass_service.Is_login_user_has_pass(pass_res.KCGL_PRODUCT_EXPORT, c.Session)
+	c.RenderArgs["has_product_export_pass"] = has_product_export_pass
 
 	return c.RenderTemplate("erp/kcgl/product_import/product_import.html")
 }
 
 func (c ErpProductImport) PageData() revel.Result {
-	pass_service.Check_login_user_pass(pass_res.KCGL_PRODUCT_IMPORT, c.Session)
+	pass_service.Check_login_user_pass_or([]int64{pass_res.KCGL_PRODUCT_IMPORT, pass_res.KCGL_PRODUCT_EXPORT}, c.Session)
 
 	var db_session = c.DbSession
 
@@ -41,7 +44,7 @@ func (c ErpProductImport) PageData() revel.Result {
 }
 
 func (c ErpProductImport) ListData() revel.Result {
-	pass_service.Check_login_user_pass(pass_res.KCGL_PRODUCT_IMPORT, c.Session)
+	pass_service.Check_login_user_pass_or([]int64{pass_res.KCGL_PRODUCT_IMPORT, pass_res.KCGL_PRODUCT_EXPORT}, c.Session)
 
 	db_session := c.DbSession
 

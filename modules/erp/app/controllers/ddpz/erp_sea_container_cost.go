@@ -3,8 +3,11 @@ package controllers
 import (
 	"encoding/json"
 	"fmt"
+
 	"github.com/revel/revel"
 	"matrix/core"
+	"matrix/modules/auth/pass_res"
+	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/sea_container_cost_service"
 )
@@ -14,7 +17,7 @@ type ErpSeaContainerCost struct {
 }
 
 func (c ErpSeaContainerCost) Index() revel.Result {
-	// pass_service.Check_login_user_pass(pass_res.DDPZ_LOGISTICS_SETTING, c.Session)
+	pass_service.Check_login_user_pass(pass_res.SPPZ_SEA_CONTAINER_COST, c.Session)
 
 	return c.RenderTemplate("erp/sppz/sea_container_cost/sea_container_cost_index.html")
 }
@@ -31,7 +34,7 @@ func (f *SeaContainerCostDetailForm) Valid(validation *revel.Validation) bool {
 }
 
 func (c ErpSeaContainerCost) DetailData() revel.Result {
-	// pass_service.Check_login_user_pass(pass_res.DDPZ_LOGISTICS_SETTING, c.Session)
+	pass_service.Check_login_user_pass(pass_res.SPPZ_SEA_CONTAINER_COST, c.Session)
 
 	db_session := c.DbSession
 
@@ -44,7 +47,7 @@ func (c ErpSeaContainerCost) DetailData() revel.Result {
 }
 
 func (c ErpSeaContainerCost) Save() revel.Result {
-	// pass_service.Check_login_user_pass(pass_res.DDPZ_LOGISTICS_SETTING, c.Session)
+	pass_service.Check_login_user_pass(pass_res.SPPZ_SEA_CONTAINER_COST, c.Session)
 
 	db_session := c.DbSession
 

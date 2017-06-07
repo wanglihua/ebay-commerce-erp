@@ -113,7 +113,7 @@ func (c ErpOrder) Index(status string) revel.Result {
 	c.RenderArgs["active_menu_html"] = template.HTML(active_menu_html)
 	c.RenderArgs["status"] = status
 	c.RenderArgs["status_chinese_name"] = status_chinese_name
-	c.RenderArgs["can_view_special_hold"] = can_view_special_hold_
+	c.RenderArgs["can_view_special_hold"] = can_view_special_hold_ // 这个后来在页面中没有使用，只是这里暂时没有去掉。更改来之，任何权限的人都可以看到 pick hold
 	c.RenderArgs["icon_path"] = setting.ICON_PATH
 	c.RenderArgs["has_pass_order_new"] = has_pass_order_new
 	c.RenderArgs["is_button_quxiao_visible"] = is_button_quxiao_visible
@@ -167,8 +167,15 @@ func (c ErpOrder) PageData() revel.Result {
 	err = db_session.Where(fmt.Sprintf("type = %d", models.STATUS_TYPE_ORDER)).Find(&status_list)
 	core.HandleError(err)
 
+	// pick up hold任何权限的人都可以看到
 	var special_hold_type_list = make([]models.OrderHoldTypeInfo, 0)
-	err = db_session.In("id", special_hold_type_id_list).Find(&special_hold_type_list)
+	var can_view_special_hold_ = can_view_special_hold(c.Session, db_session)
+	if can_view_special_hold_ {
+		err = db_session.In("id", special_hold_type_id_list).Find(&special_hold_type_list)
+	} else {
+		var special_hold_type_id_list_only_pick_up = []int64{models.ORDER_HOLD_TYPE_PICK_UP}
+		err = db_session.In("id", special_hold_type_id_list_only_pick_up).Find(&special_hold_type_list)
+	}
 	core.HandleError(err)
 
 	return c.RenderJson(map[string]interface{}{

@@ -38,7 +38,7 @@ const (
 	ORDER_HOLD_TYPE_MULTI_PRODUCT          int64 = 10075 // 多商品，这是个临时的状态，下面三个的多商品判断实在太麻烦，先用这个临时解决方案
 	ORDER_HOLD_TYPE_MULTI_STOCK_LOW_FEE    int64 = 10090 // 多数量或多产品，虽不缺货，但拆分订单发货，运费更便宜
 	ORDER_HOLD_TYPE_ONO_STOCK_EASY         int64 = 10100 // 多数量或多产品，虽不缺货，但拆分订单发货，运费虽然便宜，但仓库拣货更方便
-	ORDER_HOLD_TYPE_LOGISTICS_NO_MATCH     int64 = 10110 // 无法匹配物流（长宽高重量没有物流满足）
+	ORDER_HOLD_TYPE_LOGISTICS_NO_MATCH     int64 = 10110 // 无匹配的物流方式（长宽高重量没有物流满足）
 	ORDER_HOLD_TYPE_PRODUCT_INFO_MISS      int64 = 10120 // 产品信息不全（长宽高重量不全或者有误）
 	ORDER_HOLD_TYPE_GREAT_DEFICIT          int64 = 10130 // 匹配最佳仓库及物流后订单亏损。需要在基础设置里面有设置亏损额或者亏损率的设置功能，超过设置范围了，自动到订单亏损hold
 	ORDER_HOLD_TYPE_ENVELOPE               int64 = 10140 // 信封类。长宽高在35cm X 25cm X 2cm, 重量在0.5Kg以内的订单为信封。若是多数量或者多产品，以前我们设计的思路是，最大产品的长边为最长边，最大产品的中边为中边，所有产品的最小边之和为最小边，判断是否在35cm X 25cm X 2cm以内，重量之和是否在0.5Kg以内
@@ -141,11 +141,11 @@ func (e OrderHoldTypeInfo) InitData(db_session *xorm.Session) {
 	order_hold_type.Desc = "多数量或多产品，虽不缺货，但拆分订单发货，运费虽然便宜，但仓库拣货更方便"
 	db_session.Insert(order_hold_type)
 
-	// ORDER_HOLD_TYPE_LOGISTICS_NO_MATCH     int64 = 10110 // 无法匹配物流（长宽高重量没有物流满足）
+	// ORDER_HOLD_TYPE_LOGISTICS_NO_MATCH     int64 = 10110 // 无匹配的物流方式（长宽高重量没有物流满足）
 	order_hold_type = new(OrderHoldTypeInfo)
 	order_hold_type.Id = ORDER_HOLD_TYPE_LOGISTICS_NO_MATCH
-	order_hold_type.Name = "无法匹配物流"
-	order_hold_type.Desc = "无法匹配物流（长宽高重量没有物流满足）"
+	order_hold_type.Name = "无匹配的物流方式"
+	order_hold_type.Desc = "无匹配的物流方式（长宽高重量没有物流满足）"
 	db_session.Insert(order_hold_type)
 
 	// ORDER_HOLD_TYPE_PRODUCT_INFO_MISS      int64 = 10120 // 产品信息不全（长宽高重量不全或者有误）

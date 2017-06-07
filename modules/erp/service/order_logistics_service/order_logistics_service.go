@@ -282,7 +282,7 @@ func (p_ol *OrderLogistics) CalculateList(order_list []models.OrderInfo, db_sess
 
 		match_success, order_logistics := p_ol.match_logistics_mode(&order, p_order_logistics_data, db_session)
 
-		// 11 无法匹配物流（长宽高重量没有物流满足）
+		// 11 无匹配的物流方式（长宽高重量没有物流满足）
 		if p_ol.hold_check_no_match_logistics_mode(&order, match_success, db_session) {
 			continue
 		}
