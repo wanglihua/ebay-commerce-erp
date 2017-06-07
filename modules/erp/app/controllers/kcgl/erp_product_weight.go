@@ -19,13 +19,13 @@ type ErpProductWeight struct {
 }
 
 func (c ErpProductWeight) Index() revel.Result {
-	pass_service.Check_login_user_pass(pass_res.KCGL_PRODUCT_IMPORT, c.Session)
+	pass_service.Check_login_user_pass(pass_res.KCGL_PRODUCT_LWHW, c.Session)
 
 	return c.RenderTemplate("erp/kcgl/product_weight/product_weight_index.html")
 }
 
 func (c ErpProductWeight) ListData() revel.Result {
-	pass_service.Check_login_user_pass(pass_res.KCGL_PRODUCT_IMPORT, c.Session)
+	pass_service.Check_login_user_pass(pass_res.KCGL_PRODUCT_LWHW, c.Session)
 
 	db_session := c.DbSession
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
@@ -87,7 +87,7 @@ type product_weight_detail_form_t struct {
 }
 
 func (c ErpProductWeight) DetailData() revel.Result {
-	pass_service.Check_login_user_pass(pass_res.KCGL_PRODUCT_IMPORT, c.Session)
+	pass_service.Check_login_user_pass(pass_res.KCGL_PRODUCT_LWHW, c.Session)
 
 	db_session := c.DbSession
 
@@ -105,7 +105,7 @@ func (c ErpProductWeight) DetailData() revel.Result {
 }
 
 func (c ErpProductWeight) Save() revel.Result {
-	pass_service.Check_login_user_pass(pass_res.KCGL_PRODUCT_IMPORT, c.Session)
+	pass_service.Check_login_user_pass(pass_res.KCGL_PRODUCT_LWHW, c.Session)
 
 	db_session := c.DbSession
 
@@ -148,7 +148,7 @@ func (c ErpProductWeight) Save() revel.Result {
 }
 
 func (c ErpProductWeight) Import() revel.Result {
-	pass_service.Check_login_user_pass(pass_res.KCGL_PRODUCT_IMPORT, c.Session)
+	pass_service.Check_login_user_pass(pass_res.KCGL_PRODUCT_LWHW, c.Session)
 
 	db_session := c.DbSession
 

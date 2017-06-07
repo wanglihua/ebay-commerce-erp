@@ -63,6 +63,7 @@ const (
 	KCGL_PRODUCT_BIND             = 140200 // 绑定商品
 	KCGL_PRODUCT_IMPORT           = 140300 // 商品导入
 	KCGL_PRODUCT_EXPORT           = 140400 // 商品导出
+	KCGL_PRODUCT_LWHW             = 140401 // 商品长宽高重量
 	KCGL_INVENTORY                = 140500 // 商品库存
 	KCGL_INVENTORY_SKU_LOC        = 140501 // 商品库存 商品库位
 	KCGL_INVENTORY_SKU_QTY        = 140502 // 商品库存 库存数量

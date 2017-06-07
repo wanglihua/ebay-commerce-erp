@@ -45,7 +45,7 @@ func GetKcglMenu(res_id_map map[int64]bool, web_session revel.Session) string {
         </li>`)
 	}
 
-	if check_pass_res_menu(pass_res.KCGL_PRODUCT_IMPORT) {
+	if check_pass_res_menu(pass_res.KCGL_PRODUCT_LWHW) {
 		buffer.WriteString(`<li id="kcgl-product-weight-menu" class="">
             <a href="/product/weight">
                 <i class="menu-icon fa fa-caret-right"></i>
