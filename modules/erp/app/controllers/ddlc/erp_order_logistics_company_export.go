@@ -626,7 +626,7 @@ aus    act	  ACT
 
 	state_name = strings.ToLower(strings.TrimSpace(state_name))
 
-	if strings.HasPrefix(state_name, "new") || strings.HasPrefix(state_name, "nsw`") {
+	if strings.HasPrefix(state_name, "new") || strings.HasPrefix(state_name, "nsw") {
 		return "NSW"
 	} else if strings.HasPrefix(state_name, "vic") {
 		return "VIC"

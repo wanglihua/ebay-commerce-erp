@@ -34,3 +34,9 @@ func Test_split_address(t *testing.T) {
 	fmt.Println("address1", address1)
 	fmt.Println("address2", address2)
 }
+
+
+func  Test_get_state_short_name(t *testing.T) {
+	var short_name = get_state_short_name("Nsw")
+	fmt.Println("short_name", short_name)
+}
