@@ -478,7 +478,7 @@ SELECT
      FROM erp_inventory nvt
          INNER JOIN erp_storage_loc sl ON sl.id = nvt.storage_loc_id
      WHERE nvt.product_id = oi.item_product_id
-           AND nvt.stock_id = (SELECT ol.stock_id FROM erp_order_logistics ol WHERE ol.order_id = oi.order_id)
+           AND nvt.stock_id = (SELECT ol.stock_id FROM erp_order_logistics ol WHERE ol.order_id = oi.order_id ORDER BY ol.create_time DESC LIMIT 0, 1)
      ORDER BY sl.update_time DESC
      LIMIT 0, 1) AS storage_loc_name
 FROM erp_order_item oi
@@ -494,7 +494,7 @@ SELECT
      FROM erp_inventory nvt
          INNER JOIN erp_storage_loc sl ON sl.id = nvt.storage_loc_id
      WHERE nvt.product_id = oi.item_product_id
-           AND nvt.stock_id = (SELECT ol.stock_id FROM erp_order_logistics ol WHERE ol.order_id = oi.order_id)
+           AND nvt.stock_id = (SELECT ol.stock_id FROM erp_order_logistics ol WHERE ol.order_id = oi.order_id ORDER BY ol.create_time DESC LIMIT 0, 1)
      ORDER BY sl.update_time DESC
      LIMIT 0, 1) AS storage_loc_name
 FROM erp_order_item oi
