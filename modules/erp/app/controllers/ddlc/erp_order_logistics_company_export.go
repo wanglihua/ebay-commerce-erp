@@ -470,14 +470,31 @@ func get_order_sku_for_export(order_id int64, db_session *xorm.Session) string {
 		StorageLocName string `xorm:"'storage_loc_name'" json:"storage_loc_name"`
 	}
 
-	var order_sku_quantity_list = make([]OrderSkuQuantity, 0)
-	sql := `SELECT
-    oi.item_sku  AS sku,
-    oi.quantity  AS quantity,
+	/*
+SELECT
+    oi.item_sku AS sku,
+    oi.quantity AS quantity,
     (SELECT sl.name
      FROM erp_inventory nvt
          INNER JOIN erp_storage_loc sl ON sl.id = nvt.storage_loc_id
      WHERE nvt.product_id = oi.item_product_id
+           AND nvt.stock_id = (SELECT ol.stock_id FROM erp_order_logistics ol WHERE ol.order_id = oi.order_id)
+     ORDER BY sl.update_time DESC
+     LIMIT 0, 1) AS storage_loc_name
+FROM erp_order_item oi
+WHERE oi.order_id = 58880;
+	 */
+
+	var order_sku_quantity_list = make([]OrderSkuQuantity, 0)
+	sql := `
+SELECT
+    oi.item_sku AS sku,
+    oi.quantity AS quantity,
+    (SELECT sl.name
+     FROM erp_inventory nvt
+         INNER JOIN erp_storage_loc sl ON sl.id = nvt.storage_loc_id
+     WHERE nvt.product_id = oi.item_product_id
+           AND nvt.stock_id = (SELECT ol.stock_id FROM erp_order_logistics ol WHERE ol.order_id = oi.order_id)
      ORDER BY sl.update_time DESC
      LIMIT 0, 1) AS storage_loc_name
 FROM erp_order_item oi
