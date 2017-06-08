@@ -386,9 +386,16 @@ func can_view_special_hold(web_session revel.Session, db_session *xorm.Session) 
 }
 
 func (c ErpOrder) Detail(order_id int64) revel.Result {
+	var db_session = c.DbSession
+
 	pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_VIEW_DETAIL, c.Session)
 
+	var order models.OrderInfo
+	_, err := db_session.Id(order_id).Get(&order)
+	core.HandleError(err)
+
 	c.RenderArgs["order_id"] = order_id
+	c.RenderArgs["is_hold"] = order.StatusId == models.ORDER_STATUS_HOLD
 	return c.RenderTemplate("erp/ddlc/order/order_detail.html")
 }
 
