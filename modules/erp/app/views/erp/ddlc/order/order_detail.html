@@ -435,7 +435,7 @@
                         "id": order_id
                     },
                     "success": function (data) {
-                        if (data.success == false) {
+                        if (data.success === false) {
                             $.msg.error(data.message);
                             return;
                         }
@@ -444,25 +444,28 @@
                 });
         },
         methods: {
-            get_payal_address: function () {
-                $.ajax(
-                    {
-                        "dataType": 'json',
-                        "url": '{% url "ErpOrder.GetPaypalShippingAddress"%}',
-                        "data": {
-                            "order_id": order_id
-                        },
-                        "success": function (data) {
-                            console.log(data);
-                            alert(data);
-                        }
-                    });
-            },
             format_amount: function (amount) {
                 return dtFormatFloat4(amount);
             }
         }
     });
+
+    function load_order_detail() {
+        $.ajax({
+            "dataType": 'json',
+            "url": '{% url "ErpOrder.DetailData"%}',
+            "data": {
+                "id": order_id
+            },
+            "success": function (data) {
+                if (data.success === false) {
+                    $.msg.error(data.message);
+                    return;
+                }
+                vm.detail = data;
+            }
+        });
+    }
 </script>
 {% site_footer %}
 

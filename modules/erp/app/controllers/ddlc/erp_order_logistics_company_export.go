@@ -167,7 +167,7 @@ WHERE o.status_id = %d AND ol.mode_id IN (%s) AND ol.stock_id = %d`
 				sheet.Cell(index+2, excel_col_label_to_index("G")).Value = address1
 				sheet.Cell(index+2, excel_col_label_to_index("H")).Value = address2
 				sheet.Cell(index+2, excel_col_label_to_index("K")).Value = order_shipping_address.CityName
-				sheet.Cell(index+2, excel_col_label_to_index("L")).Value = order_shipping_address.Province
+				sheet.Cell(index+2, excel_col_label_to_index("L")).Value = get_state_short_name(order_shipping_address.Province)
 				sheet.Cell(index+2, excel_col_label_to_index("M")).Value = order_shipping_address.PostalCode
 				//sheet.Cell(index+2, excel_col_label_to_index("N")).Value = order_shipping_address.CountryName
 				sheet.Cell(index+2, excel_col_label_to_index("N")).Value = "AU" // 固定
@@ -211,7 +211,7 @@ WHERE o.status_id = %d AND ol.mode_id IN (%s) AND ol.stock_id = %d`
 				sheet.Cell(index+2, excel_col_label_to_index("G")).Value = address1
 				sheet.Cell(index+2, excel_col_label_to_index("H")).Value = address2
 				sheet.Cell(index+2, excel_col_label_to_index("K")).Value = order_shipping_address.CityName
-				sheet.Cell(index+2, excel_col_label_to_index("L")).Value = order_shipping_address.Province
+				sheet.Cell(index+2, excel_col_label_to_index("L")).Value = get_state_short_name(order_shipping_address.Province)
 				sheet.Cell(index+2, excel_col_label_to_index("M")).Value = order_shipping_address.PostalCode
 				//sheet.Cell(index+2, excel_col_label_to_index("N")).Value = order_shipping_address.CountryName
 				sheet.Cell(index+2, excel_col_label_to_index("N")).Value = "AU" // 固定
@@ -303,7 +303,7 @@ WHERE  o.status_id = %d AND ol.mode_id IN (%s) AND ol.stock_id = %d`
 			sheet.Cell(index+1, excel_col_label_to_index("I")).Value = address1
 			sheet.Cell(index+1, excel_col_label_to_index("J")).Value = address2
 			sheet.Cell(index+1, excel_col_label_to_index("K")).Value = order_shipping_address.CityName
-			sheet.Cell(index+1, excel_col_label_to_index("L")).Value = order_shipping_address.Province
+			sheet.Cell(index+1, excel_col_label_to_index("L")).Value = get_state_short_name(order_shipping_address.Province)
 			sheet.Cell(index+1, excel_col_label_to_index("M")).Value = order_shipping_address.PostalCode
 			sheet.Cell(index+1, excel_col_label_to_index("N")).Value = order_shipping_address.Name
 			sheet.Cell(index+1, excel_col_label_to_index("O")).Value = order_logistics.Order.BuyerEmail
@@ -382,7 +382,7 @@ WHERE o.status_id = %d AND ol.mode_id IN (%s) AND ol.stock_id = %d`
 			sheet.Cell(index+1, excel_col_label_to_index("E")).Value = address1
 			sheet.Cell(index+1, excel_col_label_to_index("F")).Value = address2
 			sheet.Cell(index+1, excel_col_label_to_index("G")).Value = order_shipping_address.CityName
-			sheet.Cell(index+1, excel_col_label_to_index("H")).Value = order_shipping_address.Province
+			sheet.Cell(index+1, excel_col_label_to_index("H")).Value = get_state_short_name(order_shipping_address.Province)
 			sheet.Cell(index+1, excel_col_label_to_index("I")).Value = order_shipping_address.PostalCode
 			sheet.Cell(index+1, excel_col_label_to_index("K")).Value = "CARTON"
 			sheet.Cell(index+1, excel_col_label_to_index("L")).Value = get_toll_packaging_code(order_logistics.OrderLogistics) // 包裹类型要计算
@@ -592,4 +592,40 @@ func get_toll_service_id(stock_code int, order_shipping_address models.OrderShip
 	}
 
 	return service_id
+}
+
+func get_state_short_name(state_name string) string {
+	/*
+前三个字母		缩写
+new    nsw	    NSW
+vic             VIC
+que    qld	    QLD
+tas             TAS
+sou    sa	    SA
+wes    wa	   WA
+nor    nt	   NT
+aus    act	  ACT
+	 */
+
+	state_name = strings.ToLower(strings.TrimSpace(state_name))
+
+	if strings.HasPrefix(state_name, "new") || strings.HasPrefix(state_name, "nsw`") {
+		return "NSW"
+	} else if strings.HasPrefix(state_name, "vic") {
+		return "VIC"
+	} else if strings.HasPrefix(state_name, "que") || strings.HasPrefix(state_name, "qld") {
+		return "QLD"
+	} else if strings.HasPrefix(state_name, "tas") {
+		return "TAS"
+	} else if strings.HasPrefix(state_name, "sou") || strings.HasPrefix(state_name, "sa") {
+		return "SA"
+	} else if strings.HasPrefix(state_name, "wes") || strings.HasPrefix(state_name, "wa") {
+		return "WA"
+	} else if strings.HasPrefix(state_name, "nor") || strings.HasPrefix(state_name, "nt") {
+		return "NT"
+	} else if strings.HasPrefix(state_name, "aus") || strings.HasPrefix(state_name, "act") {
+		return "ACT"
+	} else {
+		return ""
+	}
 }
