@@ -621,6 +621,56 @@
             },
             show_address_edit: function () {
                 $("#orderShippingAddressDetailDialog").modal(modalOptions);
+            },
+            saveOrderShippingAddress: function () {
+                showMask("提交中...");
+                var form = $("#orderShippingAddressDetailForm");
+                var valid = validate(form, {
+                    'detail.shipping_address.name': {
+                        required: true
+                    },
+                    'detail.shipping_address.street1': {
+                        required: true
+                    },
+                    'detail.shipping_address.city_name': {
+                        required: true
+                    },
+                    'detail.shipping_address.province': {
+                        required: true
+                    },
+                    'detail.shipping_address.country_name': {
+                        required: true
+                    },
+                    'detail.shipping_address.postal_code': {
+                        required: true
+                    }
+                });
+
+                if (!valid) {
+                    hideMask();
+                } else {
+                    $.ajax({
+                            url: '{%url "ErpOrderShippingAddress.Save"%}',
+                            type: "POST",
+                            processData: false,
+                            contentType: 'application/json',
+                            data: JSON.stringify(vm.detail.shipping_address),
+                            success: function (data) {
+                                hideMask();
+                                if (data.success === false) {
+                                    $.msg.error(data.message);
+                                    //return;
+                                }
+                                else {
+                                    $.msg.show(data.message);
+                                    $('#orderShippingAddressDetailDialog').modal('hide');
+                                    load_order_detail();
+                                    //return;
+                                }
+                            }
+                        }
+                    );
+                }
             }
         }
     });

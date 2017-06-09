@@ -334,6 +334,8 @@ POST /order/wan/cheng                      ErpOrder.WanCheng
 POST /order/qu/xiao                        ErpOrder.QuXiao
 POST /order/rematch/hold/order/logistics   ErpOrder.ReMatchHoldOrderLogistics
 
+POST /order/shipping/address/save           ErpOrderShippingAddress.Save
+
 GET  /order/logistics                               ErpOrderLogistics.Index
 POST /order/logistics/data/page                     ErpOrderLogistics.PageData
 POST /order/logistics/data/list                     ErpOrderLogistics.ListData
