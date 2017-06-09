@@ -122,6 +122,7 @@ func (c ErpOrder) Index(status string) revel.Result {
 
 const (
 	order_query_criteria_order_code          int64 = 1000
+	order_query_criteria_order_number        int64 = 1100
 	order_query_criteria_product_sku         int64 = 2000
 	order_query_criteria_product_name        int64 = 3000
 	order_query_criteria_buyer_user_id       int64 = 4000
@@ -139,6 +140,7 @@ func (c ErpOrder) get_order_query_criteria_list() []order_query_criteria {
 	var order_query_criteria_list = make([]order_query_criteria, 0)
 
 	order_query_criteria_list = append(order_query_criteria_list, order_query_criteria{Id: order_query_criteria_order_code, Name: "订单编号"})
+	order_query_criteria_list = append(order_query_criteria_list, order_query_criteria{Id: order_query_criteria_order_number, Name: "订单代码"})
 	order_query_criteria_list = append(order_query_criteria_list, order_query_criteria{Id: order_query_criteria_product_sku, Name: "商品编号"})
 	order_query_criteria_list = append(order_query_criteria_list, order_query_criteria{Id: order_query_criteria_product_name, Name: "商品名称"})
 	order_query_criteria_list = append(order_query_criteria_list, order_query_criteria{Id: order_query_criteria_buyer_user_id, Name: "买家账号"})
@@ -294,6 +296,8 @@ func (c ErpOrder) ListData() revel.Result {
 	if query_criteria_id != 0 {
 		if query_criteria_id == order_query_criteria_order_code {
 			filter = core.SqlAnd(filter, fmt.Sprintf("o.code like '%%%s%%'", query_criteria_value))
+		} else if query_criteria_id == order_query_criteria_order_number {
+			filter = core.SqlAnd(filter, fmt.Sprintf("o.full_tran_id like '%%%s%%'", query_criteria_value))
 		} else if query_criteria_id == order_query_criteria_product_sku {
 			order_id_list := order_service.Get_order_id_list_by_product_sku_query(db_session, query_criteria_value)
 
