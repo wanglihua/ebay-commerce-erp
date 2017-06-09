@@ -515,16 +515,17 @@
             "dataType": 'json',
             "url": '{% url "ErpOrder.ReMatchHoldOrderLogistics"%}',
             "data": {
-                "id": order_id,
+                "order_id": order_id,
                 "prefer_stock_id": $("#prefer_stock").val()
             },
             "success": function (data) {
                 if (data.success === false) {
                     $.msg.error(data.message);
-                    return;
                 }
-
-                load_order_detail();
+                else {
+                    setTimeout("window.location.reload();", 1000);
+                    $.msg.show(data.message)
+                }
             }
         });
     }
