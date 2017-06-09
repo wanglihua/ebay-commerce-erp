@@ -8,7 +8,7 @@ import (
 	"matrix/modules/erp/models"
 )
 
-func save_order_logistics(p_order *models.OrderInfo, match_result match_logistics_mode_result, db_session *xorm.Session) models.OrderLogisticsInfo {
+func save_order_logistics(p_order *models.OrderInfo, match_result match_logistics_mode_result, unlock_express bool, db_session *xorm.Session) models.OrderLogisticsInfo {
 	// 匹配成功，记录匹配成功数据
 	var order_logistics models.OrderLogisticsInfo
 	has, err := db_session.Where(fmt.Sprintf("order_id = %d", match_result.order_id)).Get(&order_logistics)
@@ -40,7 +40,7 @@ func save_order_logistics(p_order *models.OrderInfo, match_result match_logistic
 	var update_col_list = []string{"status_id", "stock_id", "address_id", "company_id", "mode_id", "hold_type_id"}
 
 	if match_result.has_stock == true {
-		if match_result.mode.TypeId == models.LOGISTICS_MODE_TYPE_EXPRESS {
+		if match_result.mode.TypeId == models.LOGISTICS_MODE_TYPE_EXPRESS && unlock_express == false {
 			// 把订单状态修改为 Hold
 			p_order.HoldTypeId = core.MakeNullInt(models.ORDER_HOLD_TYPE_EXPRESS, true)
 			p_order.StatusId = models.ORDER_STATUS_HOLD // 修改订单状态为 hold 状态

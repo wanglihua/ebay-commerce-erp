@@ -18,7 +18,7 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 }
 */
 
-func (p_ol *OrderLogistics) match_logistics_mode_with_prefer_stock(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, prefer_stock_id int64, db_session *xorm.Session) (success_return bool, order_logistics_return models.OrderLogisticsInfo) {
+func (p_ol *OrderLogistics) match_logistics_mode_with_prefer_stock_and_unlock_express(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, prefer_stock_id int64, unlock_express bool, db_session *xorm.Session) (success_return bool, order_logistics_return models.OrderLogisticsInfo) {
 
 	// 在这里面只考虑最佳仓库的库存情况，次佳仓库有货的情况，别的地方已经考虑并 hold
 
@@ -511,7 +511,7 @@ func (p_ol *OrderLogistics) match_logistics_mode_with_prefer_stock(p_order *mode
 		return false, order_logistics
 	}
 
-	var order_logistics = save_order_logistics(p_order, final_result, db_session)
+	var order_logistics = save_order_logistics(p_order, final_result, unlock_express, db_session)
 
 	if final_result.has_stock == false {
 		if len(match_result_has_stock_list) != 0 {

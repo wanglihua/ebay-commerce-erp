@@ -286,7 +286,7 @@ func (p_ol *OrderLogistics) calculate_list_with_prefer_stock_and_unlock_expree(o
 			continue
 		}
 
-		match_success, order_logistics := p_ol.match_logistics_mode_with_prefer_stock(&order, p_order_logistics_data, prefer_stock_id, db_session)
+		match_success, order_logistics := p_ol.match_logistics_mode_with_prefer_stock_and_unlock_express(&order, p_order_logistics_data, prefer_stock_id, unlock_express, db_session)
 
 		// 11 无匹配的物流方式（长宽高重量没有物流满足）
 		if p_ol.hold_check_no_match_logistics_mode(&order, match_success, db_session) {
