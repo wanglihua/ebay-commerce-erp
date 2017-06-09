@@ -117,3 +117,18 @@ WHERE md.id = %d;`
 	c.RenderArgs["md"] = logistics_match_debug
 	return c.RenderTemplate("erp/ddlc/order_logistics_match_debug/order_logistics_match_debug_detail.html")
 }
+
+func (c ErpOrderLogisticsMatchDebug) Clear() revel.Result {
+	var db_session = c.DbSession
+
+	_, err := db_session.Exec("DROP TABLE erp_order_logistics_match_debug;")
+	core.HandleError(err)
+
+	err = db_session.Sync2(new(models.OrderLogisticsMatchDebugInfo))
+	core.HandleError(err)
+
+	return c.RenderJson(map[string]interface{}{
+		"success": true,
+		"message": "清理成功!",
+	})
+}

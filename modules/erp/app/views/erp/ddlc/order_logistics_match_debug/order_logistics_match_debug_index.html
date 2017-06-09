@@ -5,8 +5,8 @@
             <li>
                 <a href='{%url "Home.Index"%}'><i class="ace-icon fa fa-home home-icon"></i></a>
             </li>
-            <li class="parent" data-menu="erp-menu">订单流程</li>
-            <li class="active" data-menu="erp-order-logistics-match-debug-menu">订单物流匹配调试</li>
+            <li class="parent" data-menu="ddlc-menu">订单流程</li>
+            <li class="active" data-menu="ddlc-order-logistics-match-debug-menu">订单物流匹配调试</li>
         </ul>
     </div>
     <div class="page-content">
@@ -16,6 +16,10 @@
                     <button class="btn btn-primary btn-sm" @click="reloadList('#orderLogisticsMatchDebugList')">
                         <i class="ace-icon fa fa-refresh"></i>
                         刷新
+                    </button>
+                    <button class="btn btn-danger btn-sm" @click="clearMatchDebugData">
+                        <i class="ace-icon fa fa-trash-o"></i>
+                        清理调试数据
                     </button>
                 </div>
                 <div id="query" class="col-xs-12" style="line-height: 28px;">
@@ -141,6 +145,23 @@
             },
             search: function () {
                 reloadList('#orderLogisticsMatchDebugList');
+            },
+            clearMatchDebugData: function () {
+                $.msg.confirm("确认要清理吗？", function () {
+                    $.ajax({
+                        url: '{%url "ErpOrderLogisticsMatchDebug.Clear"%}',
+                        type: "POST",
+                        success: function (data) {
+                            if (data.success === false) {
+                                $.msg.error(data.message);
+                            }
+                            else {
+                                $.msg.show(data.message);
+                                reloadList('#orderLogisticsMatchDebugList');
+                            }
+                        }
+                    });
+                });
             }
         }
     });

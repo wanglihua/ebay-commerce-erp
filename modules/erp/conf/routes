@@ -355,6 +355,7 @@ POST /order/logistics/company/export/option/data    ErpOrderLogisticsCompanyExpo
 GET  /order/logistics/match/debug             ErpOrderLogisticsMatchDebug.Index
 POST /order/logistics/match/debug/data/list   ErpOrderLogisticsMatchDebug.ListData
 GET  /order/logistics/match/debug/detail/:id  ErpOrderLogisticsMatchDebug.Detail
+POST /order/logistics/match/debug/clear       ErpOrderLogisticsMatchDebug.Clear
 
 GET  /order/logistics/fee/diff             ErpOrderLogisticsFeeDiff.Index
 POST /order/logistics/fee/diff/data/page   ErpOrderLogisticsFeeDiff.PageData
