@@ -453,6 +453,8 @@ func (c ErpOrder) DetailData() revel.Result {
 		shipping_address = paypal_shipping_address
 	}
 
+	shipping_address.OrderId = order.Id //如果地址是空的，也先给一个 order_id
+
 	type order_item_view_t struct {
 		OrderItem         models.OrderItemInfo          `xorm:"extends" json:"oi"`
 		Product           models.ProductInfo            `xorm:"extends" json:"p"`

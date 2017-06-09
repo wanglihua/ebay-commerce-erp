@@ -236,7 +236,7 @@
                     <hr style="margin-top: 5px;margin-bottom: 5px;"/>
                     <div class="row">
                         <div class="col-xs-12" style="text-align: right;">
-                            <button class="btn btn-sm btn-purple">修改</button>
+                            <button class="btn btn-sm btn-purple" @click="show_address_edit">修改</button>
                         </div>
                     </div>
                 </div>
@@ -450,6 +450,130 @@
                 </div>
             </div>
         </div>
+
+        <div class="modal fade" id="orderShippingAddressDetailDialog">
+            <div class="modal-dialog" style="width: 680px;">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="True">&times;</button>
+                        <h4 class="modal-title">订单送货地址详细</h4>
+                    </div>
+                    <div class="modal-body clearfix">
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <form class="form-horizontal" role="form" id="orderShippingAddressDetailForm">
+                                    <input id="order_shipping_address_id" name="detail.shipping_address.id" type="hidden" v-model.number="detail.shipping_address.id"/>
+                                    <input id="order_shipping_address_version" name="detail.shipping_address.version" type="hidden" v-model.number="detail.shipping_address.version"/>
+                                    <input id="order_id" name="detail.shipping_address.order_id" type="hidden" v-model.number="detail.shipping_address.order_id"/>
+
+                                    <div class="row">
+                                        <div class="col-xs-6">
+                                            <div class="form-group">
+                                                <label for="name" class="col-xs-4 control-label">Name</label>
+                                                <div class="col-xs-8">
+                                                    <input id="name" name="detail.shipping_address.name" type="text" class="input-sm form-control" v-model="detail.shipping_address.name"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-xs-6">
+                                            <div class="form-group">
+                                                <label for="street1" class="col-xs-4 control-label">Street1</label>
+                                                <div class="col-xs-8">
+                                                    <input id="street1" name="detail.shipping_address.street1" type="text" class="input-sm form-control" v-model="detail.shipping_address.street1"/>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-xs-6">
+                                            <div class="form-group">
+                                                <label for="street2" class="col-xs-4 control-label">Street2</label>
+                                                <div class="col-xs-8">
+                                                    <input id="street2" name="detail.shipping_address.street2" type="text" class="input-sm form-control" v-model="detail.shipping_address.street2"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-xs-6">
+                                            <div class="form-group">
+                                                <label for="city_name" class="col-xs-4 control-label">City</label>
+                                                <div class="col-xs-8">
+                                                    <input id="city_name" name="detail.shipping_address.city_name" type="text" class="input-sm form-control" v-model="detail.shipping_address.city_name"/>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-xs-6">
+                                            <div class="form-group">
+                                                <label for="province" class="col-xs-4 control-label">State</label>
+                                                <div class="col-xs-8">
+                                                    <input id="province" name="detail.shipping_address.province" type="text" class="input-sm form-control" v-model="detail.shipping_address.province"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-xs-6">
+                                            <div class="form-group">
+                                                <label for="country" class="col-xs-4 control-label">Country</label>
+                                                <div class="col-xs-8">
+                                                    <input id="country" name="detail.shipping_address.country" type="text" class="input-sm form-control" v-model="detail.shipping_address.country"/>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-xs-6">
+                                            <div class="form-group">
+                                                <label for="country_name" class="col-xs-4 control-label">Country
+                                                    Name</label>
+                                                <div class="col-xs-8">
+                                                    <input id="shipping_address_country_name" name="detail.shipping_address.country_name" type="text" class="input-sm form-control" v-model="detail.shipping_address.country_name"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-xs-6">
+                                            <div class="form-group">
+                                                <label for="postal_code" class="col-xs-4 control-label">Post
+                                                    Code</label>
+                                                <div class="col-xs-8">
+                                                    <input id="postal_code" name="detail.shipping_address.postal_code" type="text" class="input-sm form-control" v-model="detail.shipping_address.postal_code"/>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-xs-6">
+                                            <div class="form-group">
+                                                <label for="phone" class="col-xs-4 control-label">Phone</label>
+                                                <div class="col-xs-8">
+                                                    <input id="shipping_address_phone" name="detail.shipping_address.phone" type="text" class="input-sm form-control" v-model="detail.shipping_address.phone"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-success btn-sm" @click="saveOrderShippingAddress()">
+                            <i class="ace-icon fa fa-floppy-o"></i>保存
+                        </button>
+                        <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">
+                            <i class="ace-icon fa fa-times"></i>关闭
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 {%template "erp/ddlc/order/order_detail.var" .%}
@@ -494,6 +618,9 @@
         methods: {
             format_amount: function (amount) {
                 return dtFormatFloat4(amount);
+            },
+            show_address_edit: function () {
+                $("#orderShippingAddressDetailDialog").modal(modalOptions);
             }
         }
     });
