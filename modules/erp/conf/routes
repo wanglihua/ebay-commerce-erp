@@ -336,6 +336,10 @@ POST /order/rematch/hold/order/logistics   ErpOrder.ReMatchHoldOrderLogistics
 
 POST /order/shipping/address/save           ErpOrderShippingAddress.Save
 
+POST /order/item/data/detail                ErpOrderItem.DetailData
+POST /order/item/save                       ErpOrderItem.Save
+POST /order/item/delete                     ErpOrderItem.Delete
+
 GET  /order/logistics                               ErpOrderLogistics.Index
 POST /order/logistics/data/page                     ErpOrderLogistics.PageData
 POST /order/logistics/data/list                     ErpOrderLogistics.ListData
