@@ -172,12 +172,12 @@ func (s order_slice_t) Swap(i int, j int) {
 }
 
 func (p_ol *OrderLogistics) CalculateList(order_list []models.OrderInfo, db_session *xorm.Session) error {
-	return p_ol.CalculateListWithPreferStock(order_list, 0, db_session)
+	return p_ol.calculate_list_with_prefer_stock_and_unlock_expree(order_list, 0, false, db_session)
 }
 
 // 匹配前要判断一下订单的状态，订单不是已支付状态的话，不能匹配
 // 计算订单的物流方式 和 Hold 类型，调用这个函数的时候应该  “开启数据库事务“， 调用完成后，订单的状态就是 Hold 或者 待配货
-func (p_ol *OrderLogistics) CalculateListWithPreferStock(order_list []models.OrderInfo, prefer_stock_id int64, db_session *xorm.Session) error {
+func (p_ol *OrderLogistics) calculate_list_with_prefer_stock_and_unlock_expree(order_list []models.OrderInfo, prefer_stock_id int64, unlock_express bool, db_session *xorm.Session) error {
 	/*
 	defer func() {
 		if err := recover(); err != nil {
@@ -274,9 +274,11 @@ func (p_ol *OrderLogistics) CalculateListWithPreferStock(order_list []models.Ord
 			continue
 		}
 
-		// 15 判断是否是快递 放在匹配物流之前
-		if p_ol.hold_check_express(&order, db_session) {
-			continue
+		if unlock_express == false {
+			// 15 判断是否是快递 放在匹配物流之前
+			if p_ol.hold_check_express(&order, db_session) {
+				continue
+			}
 		}
 
 		// 16 判断是否是国际件，如果不是澳洲的就是国际件，一般就是新西兰的， 放在匹配物流之前
@@ -329,6 +331,6 @@ func (p_ol *OrderLogistics) CalculateSingle(order models.OrderInfo, db_session *
 	return p_ol.CalculateList([]models.OrderInfo{order}, db_session)
 }
 
-func (p_ol *OrderLogistics) CalculateSingleWithPreferStock(order models.OrderInfo, prefer_stock_id int64, db_session *xorm.Session) error {
-	return p_ol.CalculateListWithPreferStock([]models.OrderInfo{order}, prefer_stock_id, db_session)
+func (p_ol *OrderLogistics) CalculateSingleWithPreferStockAndUnlockExpree(order models.OrderInfo, prefer_stock_id int64, unlock_express bool, db_session *xorm.Session) error {
+	return p_ol.calculate_list_with_prefer_stock_and_unlock_expree([]models.OrderInfo{order}, prefer_stock_id, unlock_express, db_session)
 }

@@ -530,6 +530,16 @@ func (c ErpOrder) ReMatchHoldOrderLogistics() revel.Result {
 	var prefer_stock_id int64
 	c.Params.Bind(&prefer_stock_id, "prefer_stock_id")
 
+	var unlock_express int64
+	c.Params.Bind(&unlock_express, "unlock_express")
+
+	var is_unlock_express bool
+	if unlock_express <= 0 {
+		is_unlock_express = false
+	} else {
+		is_unlock_express = true
+	}
+
 	var order models.OrderInfo
 	_, err := db_session.Id(order_id).Get(&order)
 	core.HandleError(err)
@@ -542,7 +552,7 @@ func (c ErpOrder) ReMatchHoldOrderLogistics() revel.Result {
 	}
 
 	var p_order_logistics = new(order_logistics_service.OrderLogistics)
-	err = p_order_logistics.CalculateSingleWithPreferStock(order, prefer_stock_id, db_session)
+	err = p_order_logistics.CalculateSingleWithPreferStockAndUnlockExpree(order, prefer_stock_id, is_unlock_express, db_session)
 	core.HandleError(err)
 
 	return c.RenderJson(map[string]interface{}{

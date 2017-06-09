@@ -71,6 +71,11 @@
                     <hr style="margin-top: 5px;margin-bottom: 5px;"/>
                     <div class="row">
                         <div class="col-xs-12" style="text-align: right;">
+                            <label for="unlock_express">解锁快递</label>
+                            <select id="unlock_express" class="input-sm" style="width: 80px;">
+                                <option :value="0">否</option>
+                                <option :value="1">是</option>
+                            </select>
                             <label for="prefer_stock">指定匹配仓库：</label>
                             <select id="prefer_stock" class="input-sm" style="width: 120px;">
                                 <option :value="0">当前不指定</option>
@@ -516,7 +521,8 @@
             "url": '{% url "ErpOrder.ReMatchHoldOrderLogistics"%}',
             "data": {
                 "order_id": order_id,
-                "prefer_stock_id": $("#prefer_stock").val()
+                "prefer_stock_id": $("#prefer_stock").val(),
+                "unlock_express": $("#unlock_express").val()
             },
             "success": function (data) {
                 if (data.success === false) {
