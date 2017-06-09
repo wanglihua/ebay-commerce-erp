@@ -32,6 +32,7 @@ func (c ErpOrderShippingAddress) Save() revel.Result {
 	if c.Validation.HasErrors() {
 		return c.RenderJson(core.JsonResult{Success: false, Message: c.GetValidationErrorMessage()})
 	}
+
 	var affected int64
 	if order_shipping_address.Id == 0 {
 		affected, err = db_session.Insert(&order_shipping_address)

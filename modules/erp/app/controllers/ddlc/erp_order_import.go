@@ -582,7 +582,7 @@ SELECT sa.id AS shop_id, sa.name AS shop_name FROM erp_shop_account sa;
 			order_item.ItemProductId = order_import.product_id
 			order_item.ItemSku = order_import.Spbh
 			order_item.Quantity = order_import.Spsl
-			order_item.TransactionPriceCurrency = "AU"
+			order_item.TransactionPriceCurrency = "AUD"
 
 			/*
 
@@ -626,7 +626,7 @@ SELECT sa.id AS shop_id, sa.name AS shop_name FROM erp_shop_account sa;
 				order_item.ItemProductId = order_import.product_id
 				order_item.ItemSku = order_import.Spbh
 				order_item.Quantity = order_import.Spsl
-				order_item.TransactionPriceCurrency = "AU"
+				order_item.TransactionPriceCurrency = "AUD"
 
 				/*
 
