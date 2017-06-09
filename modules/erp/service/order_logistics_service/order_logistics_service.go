@@ -171,9 +171,13 @@ func (s order_slice_t) Swap(i int, j int) {
 	s[i], s[j] = s[j], s[i]
 }
 
+func (p_ol *OrderLogistics) CalculateList(order_list []models.OrderInfo, db_session *xorm.Session) error {
+	return p_ol.CalculateListWithPreferStock(order_list, 0, db_session)
+}
+
 // 匹配前要判断一下订单的状态，订单不是已支付状态的话，不能匹配
 // 计算订单的物流方式 和 Hold 类型，调用这个函数的时候应该  “开启数据库事务“， 调用完成后，订单的状态就是 Hold 或者 待配货
-func (p_ol *OrderLogistics) CalculateList(order_list []models.OrderInfo, db_session *xorm.Session) error {
+func (p_ol *OrderLogistics) CalculateListWithPreferStock(order_list []models.OrderInfo, prefer_stock_id int64, db_session *xorm.Session) error {
 	/*
 	defer func() {
 		if err := recover(); err != nil {
@@ -280,7 +284,7 @@ func (p_ol *OrderLogistics) CalculateList(order_list []models.OrderInfo, db_sess
 			continue
 		}
 
-		match_success, order_logistics := p_ol.match_logistics_mode(&order, p_order_logistics_data, db_session)
+		match_success, order_logistics := p_ol.match_logistics_mode_with_prefer_stock(&order, p_order_logistics_data, prefer_stock_id, db_session)
 
 		// 11 无匹配的物流方式（长宽高重量没有物流满足）
 		if p_ol.hold_check_no_match_logistics_mode(&order, match_success, db_session) {
@@ -298,8 +302,7 @@ func (p_ol *OrderLogistics) CalculateList(order_list []models.OrderInfo, db_sess
 			continue
 		}
 
-		// 6. 系统显示最佳仓缺货（次佳、海上有货）
-		// 改成在途才有货
+		// 6. 系统显示 在途才有货
 		if p_ol.hold_check_oss_au_stock_but_zt_stock_has(&order, p_order_logistics_data, db_session) {
 			continue
 		}
@@ -324,4 +327,8 @@ func (p_ol *OrderLogistics) CalculateList(order_list []models.OrderInfo, db_sess
 // 用于单条物流的匹配
 func (p_ol *OrderLogistics) CalculateSingle(order models.OrderInfo, db_session *xorm.Session) error {
 	return p_ol.CalculateList([]models.OrderInfo{order}, db_session)
+}
+
+func (p_ol *OrderLogistics) CalculateSingleWithPreferStock(order models.OrderInfo, prefer_stock_id int64, db_session *xorm.Session) error {
+	return p_ol.CalculateListWithPreferStock([]models.OrderInfo{order}, prefer_stock_id, db_session)
 }

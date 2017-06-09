@@ -12,7 +12,13 @@ import (
 	"matrix/modules/erp/service/pick_fee_service"
 )
 
-func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, db_session *xorm.Session) (success_return bool, order_logistics_return models.OrderLogisticsInfo) {
+/*
+func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, perfer_stock_id int64, db_session *xorm.Session) (success_return bool, order_logistics_return models.OrderLogisticsInfo) {
+	return p_ol.match_logistics_mode_with_prefer_stock(p_order, p_order_logistics_data, 0, db_session)
+}
+*/
+
+func (p_ol *OrderLogistics) match_logistics_mode_with_prefer_stock(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, prefer_stock_id int64, db_session *xorm.Session) (success_return bool, order_logistics_return models.OrderLogisticsInfo) {
 
 	// 在这里面只考虑最佳仓库的库存情况，次佳仓库有货的情况，别的地方已经考虑并 hold
 
@@ -48,6 +54,10 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 
 	var match_result_has_stock_list = make([]match_logistics_mode_result, 0)
 	for _, logistics_mode := range logistics_mode_list {
+		if prefer_stock_id != 0 && prefer_stock_id != logistics_mode.StockId {
+			continue
+		}
+
 		var mt match_trace
 		mt.set_is_trace(p_ol.logistics_setting.Qyppts)
 
