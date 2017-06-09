@@ -586,15 +586,15 @@
                         <div class="row">
                             <div class="col-xs-12">
                                 <form class="form-horizontal" role="form" id="orderItemDetailForm">
-                                    <input id="order_item_id" name="detail.order_item_detail.item_id" type="hidden" v-model.number="detail.order_item_detail.item_id"/>
-                                    <input id="order_item_order_id" name="detail.order_item_detail.order_id" type="hidden" v-model.number="detail.order_item_detail.order_id"/>
+                                    <input id="order_item_id" name="order_item_detail.item_id" type="hidden" v-model.number="order_item_detail.item_id"/>
+                                    <input id="order_item_order_id" name="order_item_detail.order_id" type="hidden" v-model.number="order_item_detail.order_id"/>
 
                                     <div class="row">
                                         <div class="col-xs-6">
                                             <div class="form-group">
                                                 <label for="order_item_sku" class="col-xs-4 control-label">SKU</label>
                                                 <div class="col-xs-8">
-                                                    <input id="order_item_sku" name="detail.order_item_detail.sku" type="text" class="input-sm form-control" v-model="detail.order_item_detail.sku"/>
+                                                    <input id="order_item_sku" name="order_item_detail.sku" type="text" class="input-sm form-control" v-model="order_item_detail.sku"/>
                                                 </div>
                                             </div>
                                         </div>
@@ -603,7 +603,7 @@
                                             <div class="form-group">
                                                 <label for="order_item_qty" class="col-xs-4 control-label">数量</label>
                                                 <div class="col-xs-8">
-                                                    <input id="order_item_qty" name="detail.order_item_detail.qty" type="text" class="input-sm form-control" v-model.number="detail.order_item_detail.qty"/>
+                                                    <input id="order_item_qty" name="order_item_detail.qty" type="text" class="input-sm form-control" v-model.number="order_item_detail.qty"/>
                                                 </div>
                                             </div>
                                         </div>
@@ -642,9 +642,9 @@
                 "order_item_list": [],
                 "order_logistics": {},
                 "logistics_setting": {},
-                "au_stock_list": [],
-                "order_item_detail": {}
-            }
+                "au_stock_list": []
+            },
+            "order_item_detail": {}
         },
         mounted: function () {
             var this_vm = this;
@@ -662,8 +662,8 @@
                             return;
                         }
                         this_vm.detail = data;
-                        this_vm.detail.order_item_detail = {};
-                        this_vm.detail.order_item_detail.order_id = order_id;
+                        this_vm.order_item_detail = {};
+                        this_vm.order_item_detail.order_id = order_id;
                     }
                 });
         },
@@ -737,10 +737,8 @@
                             $.msg.error(data.message);
                         }
                         else {
-                            console.log(data);
+                            vm.order_item_detail = data.order_item_detail;
                             $("#orderItemDetailDialog").modal(modalOptions);
-                            vm.detail.order_item_detail = data.order_item_detail;
-                            vm.detail.order_item_detail.sku = data.order_item_detail.sku;
                         }
                     }
                 });
@@ -770,8 +768,7 @@
                             $.msg.error(data.message);
                         }
                         else {
-                            console.log(data);
-                            vm.detail.order_item_detail = data.order_item_detail;
+                            vm.order_item_detail = data.order_item_detail;
                             $("#orderItemDetailDialog").modal(modalOptions);
                         }
                     }
@@ -781,10 +778,10 @@
                 showMask("提交中...");
                 var form = $("#orderItemDetailForm");
                 var valid = validate(form, {
-                    'detail.order_item_detail.sku': {
+                    'order_item_detail.sku': {
                         required: true
                     },
-                    'detail.order_item_detail.qty': {
+                    'order_item_detail.qty': {
                         required: true, digits: true
                     }
                 });
@@ -797,7 +794,7 @@
                             type: "POST",
                             processData: false,
                             contentType: 'application/json',
-                            data: JSON.stringify(vm.detail.order_item_detail),
+                            data: JSON.stringify(vm.order_item_detail),
                             success: function (data) {
                                 hideMask();
                                 if (data.success === false) {
@@ -862,8 +859,8 @@
                     return;
                 }
                 vm.detail = data;
-                vm.detail.order_item_detail = {};
-                vm.detail.order_item_detail.order_id = order_id;
+                vm.order_item_detail = {};
+                vm.order_item_detail.order_id = order_id;
             }
         });
     }

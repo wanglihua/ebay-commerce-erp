@@ -79,7 +79,6 @@ func (c ErpOrderItem) Save() revel.Result {
 
 	var order_item models.OrderItemInfo
 	if order_item_form.ItemId != 0 {
-		var order_item models.OrderItemInfo
 		_, err = db_session.Id(order_item_form.ItemId).Get(&order_item)
 		core.HandleError(err)
 	}
