@@ -495,6 +495,10 @@ WHERE oi.order_id = %d;`
 	}
 	var order_profit = ((order.AmountPaid + order.ExpressFee) - (order.AmountPaid*(logistics_setting.Ptfl+logistics_setting.Jyfl) + order_logistics_total_fee + order_logistics.PickFee + order_gst)) * order.ExchangeRate
 
+	var au_stock_list = make([]models.StockInfo, 0)
+	err = db_session.Where(fmt.Sprintf("stock_type_id = %d", models.STOCK_TYPE_AU)).Find(&au_stock_list)
+	core.HandleError(err)
+
 	return c.RenderJson(map[string]interface{}{
 		"order":                   order,
 		"status":                  status,
@@ -511,6 +515,39 @@ WHERE oi.order_id = %d;`
 		"logistics_fee":           logistics_fee,     // rmb
 		"order_gst":               order_gst,         // aud
 		"order_profit":            order_profit,      //rmb
+		"au_stock_list":           au_stock_list,
+	})
+}
+
+func (c ErpOrder) ReMatchHoldOrderLogistics() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_VIEW_DETAIL, c.Session)
+
+	var db_session = c.DbSession
+
+	var order_id int64
+	c.Params.Bind(&order_id, "order_id")
+
+	var prefer_stock_id int64
+	c.Params.Bind(&prefer_stock_id, "prefer_stock_id")
+
+	var order models.OrderInfo
+	_, err := db_session.Id(order_id).Get(&order)
+	core.HandleError(err)
+
+	if order.StatusId != models.ORDER_STATUS_HOLD {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "当前状态不是Hold状态，不能重新匹配物流!",
+		})
+	}
+
+	var p_order_logistics = new(order_logistics_service.OrderLogistics)
+	err = p_order_logistics.CalculateSingleWithPreferStock(order, prefer_stock_id, db_session)
+	core.HandleError(err)
+
+	return c.RenderJson(map[string]interface{}{
+		"success": true,
+		"message": "重新匹配物流完成！",
 	})
 }
 

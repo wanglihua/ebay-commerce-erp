@@ -71,7 +71,16 @@
                     <hr style="margin-top: 5px;margin-bottom: 5px;"/>
                     <div class="row">
                         <div class="col-xs-12" style="text-align: right;">
-                            <button class="btn btn-sm btn-purple">转为已支付</button>
+                            <label for="prefer_stock">指定匹配仓库：</label>
+                            <select id="prefer_stock" class="input-sm" style="width: 120px;">
+                                <option :value="0">当前不指定</option>
+                                <template v-for="stock in detail.au_stock_list">
+                                    <option :value="stock.id">{{stock.name}}</option>
+                                </template>
+                            </select>
+                            <button class="btn btn-sm btn-purple" onclick="rematch_hold_order_logistics()">
+                                重新匹配物流
+                            </button>
                         </div>
                     </div>
                     {% end %}
@@ -379,7 +388,7 @@
                                             </a>
                                         </td>
                                         <td>
-                                            <div :title="order_item.p.name" style="width: 120px; overflow: hidden; text-overflow: ellipsis;white-space: nowrap;">
+                                            <div :title="order_item.p.cn_name" style="width: 120px; overflow: hidden; text-overflow: ellipsis;white-space: nowrap;">
                                                 {{order_item.oi.item_title}}
                                             </div>
                                             <div>
@@ -450,9 +459,12 @@
                 "order_type": {},
                 "order_hold_type": {},
                 "shipping_address": {},
+                "ebay_shipping_address": {},
+                "paypal_shipping_address": {},
                 "order_item_list": [],
                 "order_logistics": {},
-                "logistics_setting": {}
+                "logistics_setting": {},
+                "au_stock_list": []
             }
         },
         mounted: function () {
@@ -497,6 +509,26 @@
             }
         });
     }
+
+    function rematch_hold_order_logistics() {
+        $.ajax({
+            "dataType": 'json',
+            "url": '{% url "ErpOrder.ReMatchHoldOrderLogistics"%}',
+            "data": {
+                "id": order_id,
+                "prefer_stock_id": $("#prefer_stock").val()
+            },
+            "success": function (data) {
+                if (data.success === false) {
+                    $.msg.error(data.message);
+                    return;
+                }
+
+                load_order_detail();
+            }
+        });
+    }
+
 </script>
 {% site_footer %}
 
