@@ -434,6 +434,7 @@ POST /order/import/upload                ErpOrderImport.Upload
 POST /order/import/batch/delete          ErpOrderImport.BatchDelete
 POST /order/import/delete                ErpOrderImport.Delete
 POST /order/import/match/logistics       ErpOrderImport.MatchLogistics
+POST /order/export/export                ErpOrderExport.Export
 
 GET  /little/icon                        ErpLittleIcon.Index
 POST /little/icon/listdata               ErpLittleIcon.ListData
