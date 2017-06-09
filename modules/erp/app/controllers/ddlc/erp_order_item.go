@@ -21,6 +21,9 @@ func (c ErpOrderItem) DetailData() revel.Result {
 	var item_id int64
 	c.Params.Bind(&item_id, "item_id")
 
+	var order_id int64
+	c.Params.Bind(&order_id, "order_id")
+
 	var db_session = c.DbSession
 
 	var order_item models.OrderItemInfo
@@ -29,15 +32,18 @@ func (c ErpOrderItem) DetailData() revel.Result {
 
 	var order_item_form OrderItemForm
 	order_item_form.ItemId = order_item.Id
-	order_item_form.OrderId = order_item.OrderId
+	order_item_form.OrderId = order_id
 	order_item_form.Sku = order_item.ItemSku
 	order_item_form.Qty = order_item.Quantity
 
-	return c.RenderJson(order_item_form)
+	return c.RenderJson(map[string]interface{}{
+		"success":           true,
+		"order_item_detail": order_item_form,
+	})
 }
 
 type OrderItemForm struct {
-	ItemId  int64  `json:"item_id"`
+	ItemId  int64  `json:"item_id"` //这是 order_item 表的主键
 	OrderId int64  `json:"order_id"`
 	Sku     string `json:"sku"`
 	Qty     int    `json:"qty"`
@@ -61,8 +67,15 @@ func (c ErpOrderItem) Save() revel.Result {
 
 	//获取 product_id
 	var product models.ProductInfo
-	err = db_session.Where(fmt.Sprintf("sku = '%s'", order_item_form.Sku)).Find(&product)
+	_, err = db_session.Where(fmt.Sprintf("sku = '%s'", order_item_form.Sku)).Get(&product)
 	core.HandleError(err)
+
+	if product.Id == 0 {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "指定的SKU不存在!",
+		})
+	}
 
 	var order_item models.OrderItemInfo
 	if order_item_form.ItemId != 0 {

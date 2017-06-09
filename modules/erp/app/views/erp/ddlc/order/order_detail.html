@@ -432,9 +432,9 @@
                     <hr style="margin-top: 5px;margin-bottom: 5px;"/>
                     <div class="row">
                         <div class="col-xs-12" style="text-align: right;">
-                            <button class="btn btn-sm btn-success">添加</button>
-                            <button class="btn btn-sm btn-purple">修改</button>
-                            <button class="btn btn-sm btn-danger">删除</button>
+                            <button class="btn btn-sm btn-success" @click="add_order_item">添加</button>
+                            <button class="btn btn-sm btn-purple" @click="show_order_item">修改</button>
+                            <button class="btn btn-sm btn-danger" @click="delete_order_item">删除</button>
                         </div>
                     </div>
                 </div>
@@ -574,6 +574,55 @@
                 </div>
             </div>
         </div>
+
+        <div class="modal fade" id="orderItemDetailDialog">
+            <div class="modal-dialog" style="width: 680px;">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="True">&times;</button>
+                        <h4 class="modal-title">订单明细详细</h4>
+                    </div>
+                    <div class="modal-body clearfix">
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <form class="form-horizontal" role="form" id="orderItemDetailForm">
+                                    <input id="order_item_id" name="detail.order_item_detail.item_id" type="hidden" v-model.number="detail.order_item_detail.item_id"/>
+                                    <input id="order_item_order_id" name="detail.order_item_detail.order_id" type="hidden" v-model.number="detail.order_item_detail.order_id"/>
+
+                                    <div class="row">
+                                        <div class="col-xs-6">
+                                            <div class="form-group">
+                                                <label for="order_item_sku" class="col-xs-4 control-label">SKU</label>
+                                                <div class="col-xs-8">
+                                                    <input id="order_item_sku" name="detail.order_item_detail.sku" type="text" class="input-sm form-control" v-model="detail.order_item_detail.sku"/>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-xs-6">
+                                            <div class="form-group">
+                                                <label for="order_item_qty" class="col-xs-4 control-label">数量</label>
+                                                <div class="col-xs-8">
+                                                    <input id="order_item_qty" name="detail.order_item_detail.qty" type="text" class="input-sm form-control" v-model.number="detail.order_item_detail.qty"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-success btn-sm" @click="save_order_item()">
+                            <i class="ace-icon fa fa-floppy-o"></i>保存
+                        </button>
+                        <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">
+                            <i class="ace-icon fa fa-times"></i>关闭
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 {%template "erp/ddlc/order/order_detail.var" .%}
@@ -593,7 +642,8 @@
                 "order_item_list": [],
                 "order_logistics": {},
                 "logistics_setting": {},
-                "au_stock_list": []
+                "au_stock_list": [],
+                "order_item_detail": {}
             }
         },
         mounted: function () {
@@ -612,6 +662,8 @@
                             return;
                         }
                         this_vm.detail = data;
+                        this_vm.detail.order_item_detail = {};
+                        this_vm.detail.order_item_detail.order_id = order_id;
                     }
                 });
         },
@@ -671,6 +723,128 @@
                         }
                     );
                 }
+            },
+            add_order_item: function () {
+                $.ajax({
+                    url: '{%url "ErpOrderItem.DetailData"%}',
+                    type: "POST",
+                    data: {
+                        "item_id": 0,
+                        "order_id": order_id
+                    },
+                    success: function (data) {
+                        if (data.success === false) {
+                            $.msg.error(data.message);
+                        }
+                        else {
+                            console.log(data);
+                            $("#orderItemDetailDialog").modal(modalOptions);
+                            vm.detail.order_item_detail = data.order_item_detail;
+                            vm.detail.order_item_detail.sku = data.order_item_detail.sku;
+                        }
+                    }
+                });
+            },
+            show_order_item: function () {
+                var id_list = [];
+                $('#order_item_list tbody tr>td:first-child input:checkbox').each(function () {
+                    if (this.checked) {
+                        id_list.push($(this).val());
+                    }
+                });
+
+                if (id_list.length === 0 || id_list.length > 1) {
+                    $.msg.alert("请选择一行数据！");
+                    return;
+                }
+
+                $.ajax({
+                    url: '{%url "ErpOrderItem.DetailData"%}',
+                    type: "POST",
+                    data: {
+                        "item_id": id_list[0],
+                        "order_id": order_id
+                    },
+                    success: function (data) {
+                        if (data.success === false) {
+                            $.msg.error(data.message);
+                        }
+                        else {
+                            console.log(data);
+                            vm.detail.order_item_detail = data.order_item_detail;
+                            $("#orderItemDetailDialog").modal(modalOptions);
+                        }
+                    }
+                });
+            },
+            save_order_item: function () {
+                showMask("提交中...");
+                var form = $("#orderItemDetailForm");
+                var valid = validate(form, {
+                    'detail.order_item_detail.sku': {
+                        required: true
+                    },
+                    'detail.order_item_detail.qty': {
+                        required: true, digits: true
+                    }
+                });
+
+                if (!valid) {
+                    hideMask();
+                } else {
+                    $.ajax({
+                            url: '{%url "ErpOrderItem.Save"%}',
+                            type: "POST",
+                            processData: false,
+                            contentType: 'application/json',
+                            data: JSON.stringify(vm.detail.order_item_detail),
+                            success: function (data) {
+                                hideMask();
+                                if (data.success === false) {
+                                    $.msg.error(data.message);
+                                    //return;
+                                }
+                                else {
+                                    $.msg.show(data.message);
+                                    $('#orderItemDetailDialog').modal('hide');
+                                    load_order_detail();
+                                    //return;
+                                }
+                            }
+                        }
+                    );
+                }
+            },
+            delete_order_item: function () {
+                var id_list = [];
+                $('#order_item_list tbody tr>td:first-child input:checkbox').each(function () {
+                    if (this.checked) {
+                        id_list.push($(this).val());
+                    }
+                });
+
+                if (id_list.length === 0 || id_list.length > 1) {
+                    $.msg.alert("请选择一行数据！");
+                    return;
+                }
+
+                $.msg.confirm("确认要删除吗？", function () {
+                    $.ajax({
+                        url: '{%url "ErpOrderItem.Delete"%}',
+                        type: "POST",
+                        data: {"item_id": id_list[0]},
+                        success: function (data) {
+                            if (data.success === false) {
+                                $.msg.error(data.message);
+                                return;
+                            }
+                            else {
+                                $.msg.show(data.message);
+                            }
+                            load_order_detail();
+                        }
+                    });
+                });
             }
         }
     });
@@ -688,6 +862,8 @@
                     return;
                 }
                 vm.detail = data;
+                vm.detail.order_item_detail = {};
+                vm.detail.order_item_detail.order_id = order_id;
             }
         });
     }
