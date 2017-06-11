@@ -499,7 +499,10 @@ WHERE oi.order_id = %d;`
 	if order_logistics.ActualFee > 0 {
 		order_logistics_total_fee = order_logistics.ActualFee
 	}
-	var order_profit = ((order.AmountPaid + order.ExpressFee) - (order.AmountPaid*(logistics_setting.Ptfl+logistics_setting.Jyfl) + order_logistics_total_fee + order_logistics.PickFee + order_gst)) * order.ExchangeRate
+
+	// var profit = (total_amount + express_fee) - (order_gst + platform_fee + payment_fee + logistics_fee + pick_fee + cost_amount)
+	var order_profit = ((order.AmountPaid + order.ExpressFee) - (order_gst + order.AmountPaid*(logistics_setting.Ptfl+logistics_setting.Jyfl) +
+		order_logistics_total_fee + order_logistics.PickFee + order_logistics.CostAmount)) * order.ExchangeRate
 
 	var au_stock_list = make([]models.StockInfo, 0)
 	err = db_session.Where(fmt.Sprintf("stock_type_id = %d", models.STOCK_TYPE_AU)).Find(&au_stock_list)
