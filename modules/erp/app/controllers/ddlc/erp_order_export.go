@@ -20,9 +20,34 @@ func (c ErpOrderExport) Export() revel.Result {
 	var status string
 	c.Params.Bind(&status, "status")
 
+	var batch_code int64
+	c.Params.Bind(&batch_code, "batch_code")
+
+	var hold_type_id int64
+	c.Params.Bind(&hold_type_id, "hold_type_id")
+
 	var db_session = c.DbSession
 
-	xlsx_file := c.get_export_excel(db_session, status)
+	var status_id int64 = 0
+	if status == "dph" {
+		status_id = models.ORDER_STATUS_DPH
+	} else if status == "phz" {
+		status_id = models.ORDER_STATUS_PHZ
+	} else if status == "hold" {
+		status_id = models.ORDER_STATUS_HOLD
+	}
+
+	var filter = fmt.Sprintf("status_id = %d", status_id)
+
+	if batch_code != 0 {
+		filter = core.SqlAnd(filter, fmt.Sprintf("batch_code = %d", batch_code))
+	}
+
+	if hold_type_id != 0 {
+		filter = core.SqlAnd(filter, fmt.Sprintf("hold_type_id = %d", hold_type_id))
+	}
+
+	xlsx_file := c.get_export_excel(db_session, filter)
 
 	//先把文件内容写到buffer中，再从中读取
 	var buffer bytes.Buffer
@@ -36,18 +61,10 @@ func (c ErpOrderExport) Export() revel.Result {
 	return c.RenderBinary(reader, file_name, revel.Attachment, time.Now())
 }
 
-func (c ErpOrderExport) get_export_excel(db_session *xorm.Session, status string) *xlsx.File {
-	var status_id int64 = 0
-	if status == "dph" {
-		status_id = models.ORDER_STATUS_DPH
-	} else if status == "phz" {
-		status_id = models.ORDER_STATUS_PHZ
-	} else if status == "hold" {
-		status_id = models.ORDER_STATUS_HOLD
-	}
+func (c ErpOrderExport) get_export_excel(db_session *xorm.Session, filter string) *xlsx.File {
 
 	var order_list = make([]models.OrderInfo, 0)
-	err := db_session.Where(fmt.Sprintf("status_id = %d", status_id)).Find(&order_list)
+	err := db_session.Where(filter).Find(&order_list)
 	core.HandleError(err)
 
 	//创建工作薄
