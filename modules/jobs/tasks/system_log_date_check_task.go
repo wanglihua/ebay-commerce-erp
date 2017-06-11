@@ -12,6 +12,14 @@ type SystemLogDateCheckTask struct {
 
 var last_system_log_date_check_date = time.Now()
 
+const (
+	System_log_date_check_task_name = "system_log_date_check_task"
+)
+
+func (t SystemLogDateCheckTask) Name() string {
+	return System_log_date_check_task_name
+}
+
 func (t SystemLogDateCheckTask) Run() {
 	defer func() {
 		if err := recover(); err != nil {

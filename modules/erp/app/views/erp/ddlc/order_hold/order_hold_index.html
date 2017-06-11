@@ -29,6 +29,10 @@
                         取消
                     </button>
                     {% end %}
+                    <button class="btn btn-info btn-sm" @click="exportOrderCode()">
+                        <i class="ace-icon fa fa-file-excel-o"></i>
+                        导出订单编码代码
+                    </button>
                 </div>
                 <div class="row" style="margin-top: 20px;margin-bottom: 20px;">
                     <div id="query" class="col-xs-12" style="line-height: 28px;">
@@ -522,6 +526,11 @@
                         }
                     });
                 });
+            },
+            exportOrderCode: function () {
+                var params = $.param({"status": "hold"});
+                var url = '{%url "ErpOrderExport.Export"%}' + "?" + params;
+                $('<form method="post" action="' + url + '"></form>').appendTo('body').submit().remove();
             }
         }
     });

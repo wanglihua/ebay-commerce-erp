@@ -38,7 +38,7 @@ func (c ErpScheduleTask) TaskData() revel.Result {
 	schedule_task_list := make([]schedule_task_view_item_t, 0)
 	for _, job_entry := range entries {
 		job := cast_job(job_entry.Job)
-		if job.Name != tasks.Site_keep_hot_task_name && job.Name != tasks.System_check_app_lic_task_name {
+		if job.Name != tasks.Site_keep_hot_task_name && job.Name != tasks.System_check_app_lic_task_name && job.Name != tasks.System_log_date_check_task_name {
 			var schedule_task schedule_task_view_item_t
 			schedule_task.Name = job.Name
 			schedule_task.Status = job.Status()

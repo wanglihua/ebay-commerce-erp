@@ -44,10 +44,6 @@
                     </button>
                     {% end %}
                     {% if eq .status "phz" %}
-                    <button class="btn btn-info btn-sm" @click="exportOrderCode()">
-                        <i class="ace-icon fa fa-file-excel-o"></i>
-                        导出订单编码代码
-                    </button>
                     <button class="btn btn-purple btn-sm" @click="faHuo()">
                         <i class="ace-icon fa fa-shopping-basket"></i>
                         发货
@@ -72,6 +68,12 @@
                     <button class="btn btn-warning btn-sm" @click="quXiao()">
                         <i class="ace-icon fa fa-calendar-times-o"></i>
                         取消
+                    </button>
+                    {% end %}
+                    {% if or (eq .status "dph") (eq .status "phz") %}
+                    <button class="btn btn-info btn-sm" @click="exportOrderCode()">
+                        <i class="ace-icon fa fa-file-excel-o"></i>
+                        导出订单编码代码
                     </button>
                     {% end %}
                 </div>
@@ -116,11 +118,13 @@
                                     &nbsp;<i class="ace-icon fa fa-search"></i>查&nbsp;询&nbsp;
                                 </button>
                             </div>
+                            {% if eq .status "dph" %}
                             <div class="link_query_list" style="float: left;margin-left: 15px;margin-top: -3px;">
                                 <template v-for="hold_type in page.hold_type_list">
                                     <a :class="page.hold_type_id == hold_type.id ? 'selected' : ''" href="#" @click="selectHoldType(hold_type.id)">&nbsp;<img style="border: none;height: 24px;" v-if="hold_type.icon_file != ''" :src="'{%.icon_path%}/' + hold_type.icon_file" :alt="hold_type.name" class="link_icon"/>{{hold_type.name}}</a>
                                 </template>
                             </div>
+                            {% end %}
                             <div style="clear: both;"></div>
                         </div>
                     </div>
@@ -714,7 +718,7 @@
                 });
             },
             exportOrderCode: function () {
-                var params = $.param({"param1": "value1"});
+                var params = $.param({"status": "{%.status%}"});
                 var url = '{%url "ErpOrderExport.Export"%}' + "?" + params;
                 $('<form method="post" action="' + url + '"></form>').appendTo('body').submit().remove();
             }

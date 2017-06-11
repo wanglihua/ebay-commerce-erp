@@ -9,8 +9,6 @@ import (
 	"github.com/revel/revel"
 	"github.com/tealeg/xlsx"
 	"matrix/core"
-	"matrix/modules/auth/pass_res"
-	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/erp/models"
 )
 
@@ -19,11 +17,12 @@ type ErpOrderExport struct {
 }
 
 func (c ErpOrderExport) Export() revel.Result {
-	pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_PHZ, c.Session)
+	var status string
+	c.Params.Bind(&status, "status")
 
 	var db_session = c.DbSession
 
-	xlsx_file := c.get_export_excel(db_session)
+	xlsx_file := c.get_export_excel(db_session, status)
 
 	//先把文件内容写到buffer中，再从中读取
 	var buffer bytes.Buffer
@@ -37,9 +36,18 @@ func (c ErpOrderExport) Export() revel.Result {
 	return c.RenderBinary(reader, file_name, revel.Attachment, time.Now())
 }
 
-func (c ErpOrderExport) get_export_excel(db_session *xorm.Session) *xlsx.File {
+func (c ErpOrderExport) get_export_excel(db_session *xorm.Session, status string) *xlsx.File {
+	var status_id int64 = 0
+	if status == "dph" {
+		status_id = models.ORDER_STATUS_DPH
+	} else if status == "phz" {
+		status_id = models.ORDER_STATUS_PHZ
+	} else if status == "hold" {
+		status_id = models.ORDER_STATUS_HOLD
+	}
+
 	var order_list = make([]models.OrderInfo, 0)
-	err := db_session.Where(fmt.Sprintf("status_id = %d", models.ORDER_STATUS_PHZ)).Find(&order_list)
+	err := db_session.Where(fmt.Sprintf("status_id = %d", status_id)).Find(&order_list)
 	core.HandleError(err)
 
 	//创建工作薄
