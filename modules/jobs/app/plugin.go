@@ -74,7 +74,10 @@ func init() {
 		jobs.Every(time.Second, tasks.SystemLogDateCheckTask{})
 
 		jobs.Every(10*time.Minute, tasks.SiteKeepHotTask{})
-		jobs.Every(15*time.Minute, tasks.SystemCheckAppLicTask{})
+
+		//jobs.Every(15*time.Minute, tasks.SystemCheckAppLicTask{})
+		jobs.Every(1*time.Second, tasks.SystemCheckAppLicTask{})
+
 		jobs.Every(1*time.Hour, tasks.UpdateAuInventoryCostTask{})
 		//jobs.Every(1*time.Second, tasks.SystemCheckAppLicTask{})
 	})

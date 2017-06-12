@@ -28,6 +28,7 @@ func (t SystemCheckAppLicTask) Run() {
 
 	if lic.Is_lic_expire == false {
 		var current_time = get_current_time()
+		revel.TRACE.Println(current_time)
 		lic.App_lic_date = lic.GetAppLicDate(app.AppName)
 
 		if current_time.After(lic.App_lic_date) {
@@ -37,9 +38,11 @@ func (t SystemCheckAppLicTask) Run() {
 }
 
 func get_current_time() time.Time {
+	var time_layout = "Mon, 02 Jan 2006 15:04:05 GMT"
+
 	response, err := http.Head("http://www.taobao.com")
 	if err == nil {
-		time_taobao, err := time.Parse("Mon, 02 Jan 2006 03:04:05 GMT", response.Header.Get("Date"))
+		time_taobao, err := time.Parse(time_layout, response.Header.Get("Date"))
 		if err == nil {
 			return time_taobao.Local()
 		}
@@ -47,7 +50,7 @@ func get_current_time() time.Time {
 
 	response, err = http.Head("http://www.qq.com")
 	if err == nil {
-		time_qq, err := time.Parse("Mon, 02 Jan 2006 03:04:05 GMT", response.Header.Get("Date"))
+		time_qq, err := time.Parse(time_layout, response.Header.Get("Date"))
 		if err == nil {
 			return time_qq.Local()
 		}
@@ -55,7 +58,7 @@ func get_current_time() time.Time {
 
 	response, err = http.Head("http://www.baidu.com")
 	if err == nil {
-		time_baidu, err := time.Parse("Mon, 02 Jan 2006 03:04:05 GMT", response.Header.Get("Date"))
+		time_baidu, err := time.Parse(time_layout, response.Header.Get("Date"))
 		if err == nil {
 			return time_baidu.Local()
 		}
