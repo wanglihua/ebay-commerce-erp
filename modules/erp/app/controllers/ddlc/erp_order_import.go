@@ -264,7 +264,6 @@ func (c ErpOrderImport) Upload() revel.Result {
 			order_import.Ddbh = cell_val
 			col_index++
 
-
 			// 商品数量 的错误提示，放在订单编号后面
 			if spsl == 0 || spsl_err != nil {
 				panic(fmt.Sprintf("订单编号 %s, 商品数量为零或者格式不对！", order_import.Ddbh))
@@ -509,7 +508,8 @@ SELECT sa.id AS shop_id, sa.name AS shop_name FROM erp_shop_account sa;
 	var aud_exchange_rate_setting = exchange_rate_service.Get_aud_exchange_rate(db_session)
 
 	// 例如 20170414212812
-	var import_batch_code int64 = import_batch_code_service.Get_import_batch_code()
+	var login_user = core.GetLoginUser(c.Session)
+	var import_batch_code int64 = import_batch_code_service.Get_import_batch_code(login_user.LoginName)
 
 	var order_code_count = 0
 	for order_code := range order_import_list_map {

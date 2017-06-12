@@ -279,7 +279,8 @@ func (c ErpProductImport) Upload() revel.Result {
 		})
 	}
 
-	var import_batch_code = import_batch_code_service.Get_import_batch_code()
+	var login_user = core.GetLoginUser(c.Session)
+	var import_batch_code = import_batch_code_service.Get_import_batch_code(login_user.LoginName)
 
 	var product_status_list = status_service.Get_status_list(db_session, models.STATUS_TYPE_PRODUCT)
 
