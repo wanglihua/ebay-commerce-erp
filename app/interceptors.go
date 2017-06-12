@@ -140,8 +140,7 @@ func userAuth(c *revel.Controller) revel.Result {
 	}
 
 	//检查软件授权
-	var current_time = time.Now()
-	if current_time.After(lic.App_lic_date) {
+	if lic.Is_lic_expire == true {
 		return c.RenderText("something error! code: 1905689")
 	}
 

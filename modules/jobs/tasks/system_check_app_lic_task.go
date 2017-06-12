@@ -1,9 +1,12 @@
 package tasks
 
 import (
-	"github.com/revel/revel"
 	"matrix/app"
 	"matrix/core/lic"
+	"time"
+	"net/http"
+	"github.com/revel/revel"
+	"runtime/debug"
 )
 
 type SystemCheckAppLicTask struct {
@@ -16,6 +19,47 @@ func (t SystemCheckAppLicTask) Name() string {
 }
 
 func (t SystemCheckAppLicTask) Run() {
-	lic.App_lic_date = lic.GetAppLicDate(app.AppName)
-	revel.TRACE.Println("app_lic_date", lic.App_lic_date)
+	defer func() {
+		if err := recover(); err != nil {
+			revel.ERROR.Printf("check lic error： %s\n", err)
+			revel.ERROR.Println(string(debug.Stack()))
+		}
+	}()
+
+	if lic.Is_lic_expire == false {
+		var current_time = get_current_time()
+		lic.App_lic_date = lic.GetAppLicDate(app.AppName)
+
+		if current_time.After(lic.App_lic_date) {
+			lic.Is_lic_expire = true
+		}
+	}
+}
+
+func get_current_time() time.Time {
+	response, err := http.Head("http://www.taobao.com")
+	if err == nil {
+		time_taobao, err := time.Parse("Mon, 02 Jan 2006 03:04:05 GMT", response.Header.Get("Date"))
+		if err == nil {
+			return time_taobao.Local()
+		}
+	}
+
+	response, err = http.Head("http://www.qq.com")
+	if err == nil {
+		time_qq, err := time.Parse("Mon, 02 Jan 2006 03:04:05 GMT", response.Header.Get("Date"))
+		if err == nil {
+			return time_qq.Local()
+		}
+	}
+
+	response, err = http.Head("http://www.baidu.com")
+	if err == nil {
+		time_baidu, err := time.Parse("Mon, 02 Jan 2006 03:04:05 GMT", response.Header.Get("Date"))
+		if err == nil {
+			return time_baidu.Local()
+		}
+	}
+
+	return time.Now()
 }

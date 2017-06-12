@@ -21,6 +21,8 @@ var encrypt_salt = "Jiaxing Huadu Information Technolony Co.,Ltd"
 // 把获得的授权日期可以放在这里，就可以在各个检查的地方分享，不用每次都从授权文件中获取
 var App_lic_date time.Time
 
+var Is_lic_expire = false
+
 func EncryptLic(lic_app_name string, date string) string {
 	app_name_md5 := make_md5(lic_app_name + encrypt_salt)
 	date_encrypt := des_encrypt([]byte(date), []byte(encrypt_salt))
