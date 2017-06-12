@@ -766,12 +766,6 @@ func (c ErpInventory) ImportProductStorageLoc() revel.Result {
 
 			col_index := 0
 
-			var data_col_count = 4
-
-			if len(row.Cells) < data_col_count-1 { // 6 列数据， 最后一列可能为空
-				break
-			}
-
 			// 序号
 			cell = row.Cells[col_index]
 			cell_val, err = cell.String()
@@ -1277,12 +1271,6 @@ func (c ErpInventory) ImportInventoryQuantity() revel.Result {
 
 			col_index := 0
 
-			var data_col_count = 5
-
-			if len(row.Cells) < data_col_count-1 { // 6 列数据， 最后一列可能为空
-				break
-			}
-
 			// 序号
 			cell = row.Cells[col_index]
 			cell_val, err = cell.String()
@@ -1681,12 +1669,6 @@ func (c ErpInventory) ImportInventoryPrice() revel.Result {
 			var inventory_import inventory_import_t
 
 			col_index := 0
-
-			var data_col_count = 6
-
-			if len(row.Cells) < data_col_count-1 { // 6 列数据， 最后一列可能为空
-				break
-			}
 
 			// 序号
 			cell = row.Cells[col_index]
