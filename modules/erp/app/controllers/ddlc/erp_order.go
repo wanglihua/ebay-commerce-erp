@@ -400,6 +400,7 @@ func (c ErpOrder) Detail(order_id int64) revel.Result {
 
 	c.RenderArgs["order_id"] = order_id
 	c.RenderArgs["is_hold"] = order.StatusId == models.ORDER_STATUS_HOLD
+	c.RenderArgs["is_dph"] = order.StatusId == models.ORDER_STATUS_DPH
 	return c.RenderTemplate("erp/ddlc/order/order_detail.html")
 }
 
@@ -536,7 +537,7 @@ WHERE oi.order_id = %d;`
 		"order_gst":               order_gst,         // aud
 		"order_profit":            order_profit,      //rmb
 		"au_stock_list":           au_stock_list,
-		"logistics_stock":    logistics_stock,
+		"logistics_stock":         logistics_stock,
 	})
 }
 
