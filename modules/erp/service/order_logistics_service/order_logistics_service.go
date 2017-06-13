@@ -14,6 +14,7 @@ import (
 	"matrix/modules/erp/service/logistics_setting_service"
 	"matrix/modules/erp/service/order_service"
 	"matrix/modules/erp/service/pick_fee_service"
+	"matrix/modules/erp/service/inventory_service"
 )
 
 type OrderLogistics struct {
@@ -324,6 +325,9 @@ func (p_ol *OrderLogistics) calculate_list_with_prefer_stock_and_unlock_expree(o
 	}
 
 	// 仓库的商品库存状态里面是不是也可以加一个待配货数量，实际库存没有减掉，但是已经这个商品被预定配货了，实际配货成功后，就减掉实际配货 ?? -- 通过在库存表里面插入一个特殊库位的库存记录的方法，这个特殊库位的Id为 -1
+
+	// 更新库存待配货数量
+	go inventory_service.Calculate_inventory_pending_qty()
 
 	return nil
 }

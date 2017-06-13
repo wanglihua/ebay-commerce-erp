@@ -6,9 +6,11 @@ import (
 	"github.com/revel/revel"
 	"runtime/debug"
 	"matrix/core"
+	"fmt"
+	"matrix/modules/erp/models"
 )
 
-// 计算更新库存的 代发货 数量
+// 计算更新库存的 待发货 数量
 func Calculate_inventory_pending_qty() {
 
 	defer func() {
@@ -38,20 +40,33 @@ func Calculate_inventory_pending_qty() {
 	}()
 
 	/*
-# 定时进行代发货的计算
+# 定时进行待发货的计算
 # 匹配完成后马上触发代发货的计算
 # 订单搬到待配货的时候是不是也要触发
+
+# 订单帮到已发货的时候，是不是也要触发计算
 
 # 待配货 配货中
 UPDATE erp_inventory nvt INNER JOIN
     (SELECT o.stock_id AS stock_id, oi.item_product_id AS product_id, sum(oi.quantity) AS qty
      FROM erp_order o
-         INNER JOIN erp_order_item oi ON (o.status_id = 1 OR o.status_id = 2) AND oi.order_id = o.id
+         INNER JOIN erp_order_item oi ON (o.status_id = 4000 OR o.status_id = 4100) AND oi.order_id = o.id
      GROUP BY o.stock_id, oi.item_product_id) padding_order_item
         ON nvt.stock_id = padding_order_item.stock_id AND nvt.product_id = padding_order_item.product_id
-SET nvt.qty = padding_order_item.qty;
+SET nvt.pending_qty = padding_order_item.qty;
 
-# 匹配时要考虑 原数据表中 代发货的 数量 和 本次匹配造成的 代发货的数量
+# 匹配时要考虑 原数据表中 待发货的 数量 和 本次匹配造成的 代发货的数量
 	 */
 
+	var sql_update_inventory_pending_qty = `UPDATE erp_inventory nvt INNER JOIN
+    (SELECT o.stock_id AS stock_id, oi.item_product_id AS product_id, sum(oi.quantity) AS qty
+     FROM erp_order o
+         INNER JOIN erp_order_item oi ON (o.status_id = %d OR o.status_id = %d) AND oi.order_id = o.id
+     GROUP BY o.stock_id, oi.item_product_id) padding_order_item
+        ON nvt.stock_id = padding_order_item.stock_id AND nvt.product_id = padding_order_item.product_id
+SET nvt.pending_qty = padding_order_item.qty;`
+	sql_update_inventory_pending_qty = fmt.Sprintf(sql_update_inventory_pending_qty, models.ORDER_STATUS_DPH, models.ORDER_STATUS_PHZ)
+
+	_, err = db_session.Exec(sql_update_inventory_pending_qty)
+	core.HandleError(err)
 }

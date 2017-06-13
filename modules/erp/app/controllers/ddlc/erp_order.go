@@ -729,6 +729,9 @@ func (c ErpOrder) FaHuo() revel.Result {
 		core.HandleError(err)
 	}
 
+	// 更新库存待配货数量
+	go inventory_service.Calculate_inventory_pending_qty()
+
 	return c.RenderJson(map[string]interface{}{
 		"success": true,
 		"message": "订单发货成功！",
