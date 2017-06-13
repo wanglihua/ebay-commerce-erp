@@ -477,8 +477,18 @@ WHERE oi.order_id = %d;`
 	err = db_session.Sql(sql).Find(&order_item_list)
 	core.HandleError(err)
 
+	var inventory_list = make([]inventory_service.Product_inventory_view_item_t, 0)
+	for _, order_item := range order_item_list {
+		var inventory_single_product_list = inventory_service.Get_product_inventory_list(db_session, order_item.Product.Id)
+		inventory_list = append(inventory_list, inventory_single_product_list...)
+	}
+
 	var order_logistics models.OrderLogisticsInfo
 	_, err = db_session.Where(fmt.Sprintf("order_id = %d", order_id)).Get(&order_logistics)
+	core.HandleError(err)
+
+	var logistics_stock models.StockInfo
+	_, err = db_session.Id(order_logistics.StockId).Get(&logistics_stock)
 	core.HandleError(err)
 
 	var logistics_setting models.LogisticsSettingInfo
@@ -518,6 +528,7 @@ WHERE oi.order_id = %d;`
 		"shipping_address":        shipping_address,
 		"order_hold_type":         order_hold_type,
 		"order_item_list":         order_item_list,
+		"inventory_list":          inventory_list,
 		"order_logistics":         order_logistics,
 		"logistics_setting":       logistics_setting,
 		"order_cost_amount":       order_cost_amount, // rmb
@@ -525,6 +536,7 @@ WHERE oi.order_id = %d;`
 		"order_gst":               order_gst,         // aud
 		"order_profit":            order_profit,      //rmb
 		"au_stock_list":           au_stock_list,
+		"logistics_stock":    logistics_stock,
 	})
 }
 
