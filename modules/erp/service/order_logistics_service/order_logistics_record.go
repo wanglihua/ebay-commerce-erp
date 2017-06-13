@@ -40,7 +40,7 @@ func save_order_logistics(p_order *models.OrderInfo, match_result match_logistic
 	var update_col_list = []string{"status_id", "stock_id", "address_id", "company_id", "mode_id", "hold_type_id"}
 
 	if match_result.has_stock == true {
-		if match_result.mode.TypeId == models.LOGISTICS_MODE_TYPE_EXPRESS && unlock_express == false {
+		if match_result.mode.TypeId == models.LOGISTICS_MODE_TYPE_EXPRESS && unlock_express == false { // 匹配出来是快递，并且当前不解锁快递，就可以设置为快递 hold
 			// 把订单状态修改为 Hold
 			p_order.HoldTypeId = core.MakeNullInt(models.ORDER_HOLD_TYPE_EXPRESS, true)
 			p_order.StatusId = models.ORDER_STATUS_HOLD // 修改订单状态为 hold 状态

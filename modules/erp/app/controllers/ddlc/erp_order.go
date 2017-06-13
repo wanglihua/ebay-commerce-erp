@@ -571,10 +571,10 @@ func (c ErpOrder) ReMatchHoldOrderLogistics() revel.Result {
 	_, err := db_session.Id(order_id).Get(&order)
 	core.HandleError(err)
 
-	if order.StatusId != models.ORDER_STATUS_HOLD {
+	if order.StatusId != models.ORDER_STATUS_HOLD && order.StatusId != models.ORDER_STATUS_DPH {
 		return c.RenderJson(map[string]interface{}{
 			"success": false,
-			"message": "当前状态不是Hold状态，不能重新匹配物流!",
+			"message": "当前状态不是Hold状态或待配货状态，不能重新匹配物流!",
 		})
 	}
 
