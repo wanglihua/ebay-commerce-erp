@@ -23,7 +23,6 @@ func (p_ol *OrderLogistics) match_logistics_mode_with_prefer_stock_and_unlock_ex
 	// 在这里面只考虑最佳仓库的库存情况，次佳仓库有货的情况，别的地方已经考虑并 hold
 
 	// 在这之前要加载好 物流方式表里面的信息，物流费率里面的信息，防止对数据库的频繁访问
-
 	var logistics_setting = p_ol.logistics_setting
 
 	type stock_has_product_and_cost_amount_t struct {
@@ -529,6 +528,11 @@ func (p_ol *OrderLogistics) match_logistics_mode_with_prefer_stock_and_unlock_ex
 			// 最后匹配的仓库没有货，但是存在匹配的有货的仓库
 			p_ol.update_order_to_hold_type(p_order, models.ORDER_HOLD_TYPE_OOS_BEST_STOCK, db_session)
 		}
+	} else {
+		var product_info_list = p_order_logistics_data.order_product_info_list
+		for _, product_info := range product_info_list {
+			pending_keeper.add(order_logistics.StockId, product_info.ProductId, product_info.Qty)
+		}
 	}
 
 	return true, order_logistics
@@ -536,5 +540,4 @@ func (p_ol *OrderLogistics) match_logistics_mode_with_prefer_stock_and_unlock_ex
 	// 多个商品时，考虑拆包的方式
 
 	// 多个商品时，能不能分仓库发货的？
-
 }

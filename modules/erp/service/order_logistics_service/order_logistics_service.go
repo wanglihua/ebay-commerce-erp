@@ -176,6 +176,8 @@ func (p_ol *OrderLogistics) CalculateList(order_list []models.OrderInfo, db_sess
 	return p_ol.calculate_list_with_prefer_stock_and_unlock_expree(order_list, 0, false, db_session)
 }
 
+var pending_keeper *pending_inventory_temp_keeper = nil // 设置过程全局变量，每次开始匹配计算的时候一定要记得初始化
+
 // 匹配前要判断一下订单的状态，订单不是已支付状态的话，不能匹配
 // 计算订单的物流方式 和 Hold 类型，调用这个函数的时候应该  “开启数据库事务“， 调用完成后，订单的状态就是 Hold 或者 待配货
 func (p_ol *OrderLogistics) calculate_list_with_prefer_stock_and_unlock_expree(order_list []models.OrderInfo, prefer_stock_id int64, unlock_express bool, db_session *xorm.Session) error {
@@ -222,6 +224,8 @@ func (p_ol *OrderLogistics) calculate_list_with_prefer_stock_and_unlock_expree(o
 	// 加载所有订单的 收货地址，这样在判断收货地址是否一样的时候，就不会多次访问数据库了
 	// 只需要加载前面判断出来的，其它信息一样的订单的收货地址就可以了，不用加载全部订单的收货地址信息
 	//var order_shipping_address_list = order_shipping_address_service.Get_orders_shipping_address_list(order_list, db_session)
+
+	pending_keeper = new_pending_inventory_temp_keeper()
 
 	for _, order := range order_list {
 		var p_order_logistics_data = new(order_logistics_data_t)
