@@ -393,8 +393,8 @@
                                             </a>
                                         </td>
                                         <td>
-                                            <div :title="order_item.p.cn_name" style="width: 120px; overflow: hidden; text-overflow: ellipsis;white-space: nowrap;">
-                                                {{order_item.oi.item_title}}
+                                            <div :title="order_item.p.cn_name" style="width: 150px; white-space:normal; word-break: break-all; word-wrap:break-word;">
+                                                {{order_item.p.cn_name}}
                                             </div>
                                             <div>
                                                 <a :href="'/product/detail/' + order_item.p.id" target="_blank">

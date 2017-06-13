@@ -235,7 +235,7 @@ func (p_ol *OrderLogistics) hold_check_great_deficit(p_order *models.OrderInfo, 
 	var profit = (total_amount + express_fee) - (order_gst + platform_fee + payment_fee + logistics_fee + pick_fee + cost_amount)
 
 	// 利润小于零，并且亏损价格大于最大价格或者亏损率大于最大亏损率
-	if profit < 0 && ((math.Abs(profit) > p_ol.logistics_setting.MaxDeficitPrice) || (math.Abs(profit)/profit > p_ol.logistics_setting.MaxDeficitRate)) {
+	if profit < 0 && ((math.Abs(profit) > p_ol.logistics_setting.MaxDeficitPrice) || (math.Abs(profit)/(total_amount+express_fee) > p_ol.logistics_setting.MaxDeficitRate)) {
 		p_ol.update_order_to_hold_type(p_order, models.ORDER_HOLD_TYPE_GREAT_DEFICIT, db_session)
 		return true
 	}
