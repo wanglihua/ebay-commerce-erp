@@ -42,7 +42,7 @@ func InitDatabase() {
 		if revel.DevMode == true {
 			Engine.ShowSQL()
 			Engine.ShowExecTime()
-			xorm_core.LogQuerySql = true
+			xorm_core.LogQuerySql = false
 		}
 
 		//实体定义时明确指明了表名和列名，下面这些定义就不起作用了
