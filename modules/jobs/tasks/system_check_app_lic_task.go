@@ -26,14 +26,14 @@ func (t SystemCheckAppLicTask) Run() {
 		}
 	}()
 
-	if lic.Is_lic_expire == false {
-		var current_time = get_current_time()
-		revel.TRACE.Println(current_time)
-		lic.App_lic_date = lic.GetAppLicDate(app.AppName)
+	var current_time = get_current_time()
+	revel.TRACE.Println(current_time)
+	lic.App_lic_date = lic.GetAppLicDate(app.AppName)
 
-		if current_time.After(lic.App_lic_date) {
-			lic.Is_lic_expire = true
-		}
+	if current_time.After(lic.App_lic_date) {
+		lic.Is_lic_expire = true
+	} else {
+		lic.Is_lic_expire = false
 	}
 }
 
