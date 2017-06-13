@@ -488,6 +488,10 @@ WHERE oi.order_id = %d;`
 	_, err = db_session.Where(fmt.Sprintf("order_id = %d", order_id)).Get(&order_logistics)
 	core.HandleError(err)
 
+	var logistics_mode models.LogisticsModeInfo
+	_, err = db_session.Id(order_logistics.ModeId).Get(&logistics_mode)
+	core.HandleError(err)
+
 	var logistics_stock models.StockInfo
 	_, err = db_session.Id(order_logistics.StockId).Get(&logistics_stock)
 	core.HandleError(err)
@@ -538,6 +542,7 @@ WHERE oi.order_id = %d;`
 		"order_profit":            order_profit,      //rmb
 		"au_stock_list":           au_stock_list,
 		"logistics_stock":         logistics_stock,
+		"logistics_mode":          logistics_mode,
 	})
 }
 

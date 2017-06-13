@@ -449,7 +449,8 @@
                 <div class="widget-main">
                     <div class="row">
                         <div class="col-xs-12">
-                            订单已匹配物流仓库：&nbsp; {{detail.logistics_stock.name}}
+                            订单已匹配物流仓库：&nbsp;<span style="color:blue;">{{detail.logistics_stock.name}}</span>&nbsp;&nbsp;&nbsp;
+                            订单已匹配物流方式：&nbsp;<span style="color:blue;">{{detail.logistics_mode.name}}</span>
                         </div>
                     </div>
                     <div class="row">
@@ -727,6 +728,7 @@
                 "logistics_setting": {},
                 "au_stock_list": [],
                 "logistics_stock": {},
+                "logistics_mode": {},
                 "inventory_list": []
             },
             "order_item_detail": {}
