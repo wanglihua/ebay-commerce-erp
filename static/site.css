@@ -427,6 +427,11 @@ table.inline-inventory td.qty {
     text-align: center;
 }
 
+table.inline-inventory td.pending-qty {
+    width: 30px;
+    text-align: center;
+}
+
 table.inline-inventory td.price {
     width: 50px;
     text-align: center;

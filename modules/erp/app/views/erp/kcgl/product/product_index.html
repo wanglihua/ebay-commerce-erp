@@ -153,7 +153,7 @@
                             "title": "库存",
                             "bSearchable": false,
                             "bSortable": false,
-                            "width": 180,
+                            "width": 200,
                             "render": function (data, type, row) {
                                 var inventory_list = row.inventory_list;
                                 if (inventory_list.length === 0) {
@@ -164,7 +164,7 @@
                                 for (var index in inventory_list) {
                                     inventory_desc += "<tr>";
                                     var inventory = inventory_list[index];
-                                    inventory_desc += "<td class='sl'>" + inventory.st.name + " " + inventory.sl.name + "</td><td class='qty'>" + inventory.nvt.qty + "</td><td class='price'>" + dtFormatFloat(inventory.nvt.cost_price) + "</td>";
+                                    inventory_desc += "<td class='sl'>" + inventory.st.name + " " + inventory.sl.name + "</td><td class='qty'>" + inventory.nvt.qty  + "</td><td class='pending-qty'>" + inventory.nvt.pending_qty + "</td><td class='price'>" + dtFormatFloat(inventory.nvt.cost_price) + "</td>";
                                     inventory_desc += "</tr>";
                                 }
                                 inventory_desc += "</tbody></table>";
