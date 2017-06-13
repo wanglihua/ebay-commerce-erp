@@ -227,7 +227,7 @@
                             }
                         },
                         {
-                            "mDataProp": "hold_type_name", "title": "Hold类型", "bSearchable": false,
+                            "mDataProp": "hold_type_name", "title": "Hold类型", "bSearchable": false, "bSortable": false,
                             "render": function (data, type, row) {
                                 return "<div class='div_hold_type_name'></div>";
                             }
@@ -528,7 +528,11 @@
                 });
             },
             exportOrderCode: function () {
-                var params = $.param({"status": "hold", "batch_code": vm.page.batch_code, "hold_type_id": vm.page.hold_type_id});
+                var params = $.param({
+                    "status": "hold",
+                    "batch_code": vm.page.batch_code,
+                    "hold_type_id": vm.page.hold_type_id
+                });
                 var url = '{%url "ErpOrderExport.Export"%}' + "?" + params;
                 $('<form method="post" action="' + url + '"></form>').appendTo('body').submit().remove();
             }

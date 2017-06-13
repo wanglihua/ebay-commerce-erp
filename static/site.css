@@ -404,3 +404,30 @@ div#release_note div.release h3 {
 div#release_note div.release p {
     font-size: 12px;
 }
+
+table.inline-inventory {
+    border: 1px solid lightgray;
+    border-collapse: collapse;
+}
+
+table.inline-inventory td {
+    border: 1px solid lightgray;
+    padding: 3px;
+}
+
+table.inline-inventory td.sl {
+    width: 100px;
+    white-space: normal;
+    word-break: break-all;
+    word-wrap: break-word;
+}
+
+table.inline-inventory td.qty {
+    width: 30px;
+    text-align: center;
+}
+
+table.inline-inventory td.price {
+    width: 50px;
+    text-align: center;
+}

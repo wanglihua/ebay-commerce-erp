@@ -140,7 +140,10 @@
                         },
                         {"mDataProp": "cate.full_name", "title": "商品目录", "bSearchable": false, "width": 150},
                         {
-                            "mDataProp": "prd.cost_price", "title": "中国仓<br/>采购价(RMB)", "bSearchable": false, "width": 130,
+                            "mDataProp": "prd.cost_price",
+                            "title": "中国仓<br/>采购价(RMB)",
+                            "bSearchable": false,
+                            "width": 130,
                             "render": function (data, type, row) {
                                 return dtFormatFloat(data);
                             }
@@ -150,18 +153,21 @@
                             "title": "库存",
                             "bSearchable": false,
                             "bSortable": false,
-                            "width": 100,
+                            "width": 180,
                             "render": function (data, type, row) {
                                 var inventory_list = row.inventory_list;
                                 if (inventory_list.length === 0) {
                                     return "";
                                 }
 
-                                var inventory_desc = "";
+                                var inventory_desc = "<table class='inline-inventory'><tbody>";
                                 for (var index in inventory_list) {
+                                    inventory_desc += "<tr>";
                                     var inventory = inventory_list[index];
-                                    inventory_desc += inventory.st.name + " " + inventory.sl.name + " " + inventory.nvt.qty + " " + dtFormatFloat(inventory.nvt.cost_price) +   "<br/>";
+                                    inventory_desc += "<td class='sl'>" + inventory.st.name + " " + inventory.sl.name + "</td><td class='qty'>" + inventory.nvt.qty + "</td><td class='price'>" + dtFormatFloat(inventory.nvt.cost_price) + "</td>";
+                                    inventory_desc += "</tr>";
                                 }
+                                inventory_desc += "</tbody></table>";
                                 return inventory_desc;
                             }
                         },

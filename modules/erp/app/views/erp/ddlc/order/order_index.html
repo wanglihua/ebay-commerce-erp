@@ -714,7 +714,7 @@
                 });
             },
             exportOrderCode: function () {
-                var params = $.param({"status": "{%.status%}"});
+                var params = $.param({"status": "{%.status%}", "batch_code": vm.page.batch_code});
                 var url = '{%url "ErpOrderExport.Export"%}' + "?" + params;
                 $('<form method="post" action="' + url + '"></form>').appendTo('body').submit().remove();
             }
