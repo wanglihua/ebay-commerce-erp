@@ -270,7 +270,7 @@
                                 <tr>
                                     <td class="dtRight">收款货币</td>
                                     <td class="dtRight">
-                                        AUD {{ format_amount(detail.order.exchange_rate) }}
+                                        AUD {{ format_amount(1.00) }}
                                     </td>
                                     <td class="dtRight">
                                         AUD {{ format_amount(detail.order.amount_paid) }}
@@ -740,7 +740,7 @@
         },
         methods: {
             format_amount: function (amount) {
-                return dtFormatFloat4(amount);
+                return dtFormatFloat(amount);
             },
             show_address_edit: function () {
                 $("#orderShippingAddressDetailDialog").modal(modalOptions);
