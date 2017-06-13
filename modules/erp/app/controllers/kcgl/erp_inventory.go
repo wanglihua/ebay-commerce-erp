@@ -19,6 +19,7 @@ import (
 	"matrix/modules/erp/service/stock_pick_crew_service"
 	"matrix/modules/erp/service/stock_service"
 	"matrix/modules/erp/service/storage_loc_service"
+	"matrix/modules/erp/service/inventory_service"
 )
 
 type ErpInventory struct {
@@ -1821,6 +1822,9 @@ func (c ErpInventory) ImportInventoryPrice() revel.Result {
 			core.HandleError(err)
 		}
 	}
+
+	// 导入中国仓价格之后，马上更新澳仓价格
+	go inventory_service.Update_au_stock_cost()
 
 	return c.RenderJson(map[string]interface{}{
 		"success": true,

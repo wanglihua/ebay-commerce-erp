@@ -2,8 +2,6 @@ package inventory_service
 
 import (
 	"github.com/go-xorm/xorm"
-	"fmt"
-	"matrix/modules/erp/models"
 	"time"
 	"github.com/revel/revel"
 	"runtime/debug"
@@ -55,15 +53,5 @@ SET nvt.qty = padding_order_item.qty;
 
 # 匹配时要考虑 原数据表中 代发货的 数量 和 本次匹配造成的 代发货的数量
 	 */
-
-	type order_id_t struct {
-		OrderId int64 `xorm:"'order_id'"`
-	}
-	var sql_order_list = `SELECT o.id AS order_id FROM erp_order o WHERE o.status_id = %d OR o.status_id = %d;`
-	sql_order_list = fmt.Sprintf(sql_order_list, models.ORDER_STATUS_DPH, models.ORDER_STATUS_PHZ)
-	var order_id_list = make([]order_id_t, 0)
-	err = db_session.Sql(sql_order_list).Find(&order_id_list)
-	core.HandleError(err)
-
 
 }
