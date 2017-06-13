@@ -309,15 +309,17 @@ func (p_ol *OrderLogistics) calculate_list_with_prefer_stock_and_unlock_expree(o
 			continue
 		}
 
-		// 1 地址有特殊字段的， 因为要查看匹配的物流方式，所以就放在这里了，放在匹配物流方式之后
-		if p_ol.hold_check_address_special_word(&order, p_order_logistics_data, order_logistics, db_session) {
-			//todo: 是不是要把前面匹配好的物流方式给去掉。保留好了
-			continue
-		}
+		if match_success == true {
+			// 1 地址有特殊字段的， 因为要查看匹配的物流方式，所以就放在这里了，放在匹配物流方式之后
+			if p_ol.hold_check_address_special_word(&order, p_order_logistics_data, order_logistics, db_session) {
+				//todo: 是不是要把前面匹配好的物流方式给去掉。保留好了
+				continue
+			}
 
-		// 13 匹配最佳仓库及物流后订单亏损。需要在基础设置里面有设置亏损额或者亏损率的设置功能，超过设置范围了，自动到订单亏损 hold
-		if p_ol.hold_check_great_deficit(&order, p_order_logistics_data, order_logistics, db_session) {
-			continue
+			// 13 匹配最佳仓库及物流后订单亏损。需要在基础设置里面有设置亏损额或者亏损率的设置功能，超过设置范围了，自动到订单亏损 hold
+			if p_ol.hold_check_great_deficit(&order, p_order_logistics_data, order_logistics, db_session) {
+				continue
+			}
 		}
 	}
 

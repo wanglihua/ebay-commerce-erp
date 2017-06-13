@@ -26,13 +26,21 @@ func (p_ol *OrderLogistics) match_logistics_mode_with_prefer_stock_and_unlock_ex
 
 	var logistics_setting = p_ol.logistics_setting
 
+	type stock_has_product_and_cost_amount_t struct {
+		has_product bool
+		cost_amount float64
+	}
+
 	// 找出所有有商品数量的仓库
 	var au_stock_list = p_ol.au_stock_list
-	var stock_id_has_products_map = make(map[int64]float64)
+	var stock_id_has_products_map = make(map[int64]stock_has_product_and_cost_amount_t)
 	for _, stock := range au_stock_list {
-		if has, cost_amount := check_stock_has_order_products(p_ol, stock.Id, p_order_logistics_data); has == true { // 仓库有没有全部的商品数量的库存，有
-			stock_id_has_products_map[stock.Id] = cost_amount
-		}
+		var stock_has_product_and_cost_amount stock_has_product_and_cost_amount_t
+		has_product, cost_amount := check_stock_has_order_products(p_ol, stock.Id, p_order_logistics_data);
+		stock_has_product_and_cost_amount.has_product = has_product // 仓库有没有全部的商品数量的库存
+		stock_has_product_and_cost_amount.cost_amount = cost_amount
+
+		stock_id_has_products_map[stock.Id] = stock_has_product_and_cost_amount
 	}
 
 	var logistics_mode_list = p_ol.logistics_mode_list
@@ -99,7 +107,8 @@ func (p_ol *OrderLogistics) match_logistics_mode_with_prefer_stock_and_unlock_ex
 		var stock_id = logistics_mode.StockId
 		mt.Println("物流方式对应的仓库数据库id", stock_id)
 		mode_result.cost_amount = 0
-		if cost_amount, found := stock_id_has_products_map[stock_id]; found == false { // 如果物流方式对应的仓库，没有全部的商品数量的库存，就继续下一个物流方式
+		stock_has_product_and_cost_amount, found := stock_id_has_products_map[stock_id];
+		if found == false || stock_has_product_and_cost_amount.has_product == false { // 如果物流方式对应的仓库，没有全部的商品数量的库存，就继续下一个物流方式
 			mt.Println("物流方式对应的仓库没有订单对应的库存")
 			//mt.Println("匹配单个物流方式结束")
 			mt.Println("继续进行物流方式费用的计算")
@@ -114,9 +123,11 @@ func (p_ol *OrderLogistics) match_logistics_mode_with_prefer_stock_and_unlock_ex
 
 			*/
 		} else { // 如果库存都有的，就记录下商品成本总价
-			mt.Println("物流方式对应的仓库存在订单对应的库存，澳仓成本价为", cost_amount)
-			mode_result.cost_amount = cost_amount
+			mt.Println("物流方式对应的仓库存在订单对应的库存，澳仓成本价为", stock_has_product_and_cost_amount.cost_amount)
 		}
+
+		// 不管有没有库存都记录成本价
+		mode_result.cost_amount = stock_has_product_and_cost_amount.cost_amount
 
 		// 获取所有商品的整体的 长，宽，高，重量 等的数据
 		mode_result.length, mode_result.width, mode_result.height, mode_result.actual_weight = get_order_products_whole_logistics_data(p_order_logistics_data)
@@ -515,6 +526,7 @@ func (p_ol *OrderLogistics) match_logistics_mode_with_prefer_stock_and_unlock_ex
 
 	if final_result.has_stock == false {
 		if len(match_result_has_stock_list) != 0 {
+			// 最后匹配的仓库没有货，但是存在匹配的有货的仓库
 			p_ol.update_order_to_hold_type(p_order, models.ORDER_HOLD_TYPE_OOS_BEST_STOCK, db_session)
 		}
 	}

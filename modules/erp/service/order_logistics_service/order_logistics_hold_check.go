@@ -223,19 +223,19 @@ func (p_ol *OrderLogistics) hold_check_product_info_miss(p_order *models.OrderIn
 
 // 13 // 匹配最佳仓库及物流后订单亏损。需要在基础设置里面有设置亏损额或者亏损率的设置功能，超过设置范围了，自动到订单亏损hold
 func (p_ol *OrderLogistics) hold_check_great_deficit(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, order_logistics models.OrderLogisticsInfo, db_session *xorm.Session) (is_hold_return bool) {
-	var total_amount = p_order.TotalAmount                                      //收款金额，澳币
-	var express_fee = p_order.ExpressFee                                        // 运费收入，澳币
-	var order_gst float64 = order_service.Get_order_gst_fee(p_order.AmountPaid) // GST消费税，澳币
-	var platform_fee = p_order.TotalAmount * p_ol.logistics_setting.Ptfl        // 平台交易费， 澳币
-	var payment_fee = p_order.TotalAmount * p_ol.logistics_setting.Jyfl         // 交易费率， 澳币
-	var logistics_fee = order_logistics.TotalFee                                // 物流费用，不包括拣货费用，澳币
-	var pick_fee = order_logistics.PickFee                                      // 拣货费用，澳币
-	var cost_amount = order_logistics.CostAmount                                // 到仓总成本，澳币
+	var amount_paid = p_order.AmountPaid                                 //收款金额，澳币
+	var express_fee = p_order.ExpressFee                                 // 运费收入，澳币
+	var order_gst float64 = order_service.Get_order_gst_fee(amount_paid) // GST消费税，澳币
+	var platform_fee = amount_paid * p_ol.logistics_setting.Ptfl         // 平台交易费， 澳币
+	var payment_fee = amount_paid * p_ol.logistics_setting.Jyfl          // 交易费率， 澳币
+	var logistics_fee = order_logistics.TotalFee                         // 物流费用，不包括拣货费用，澳币
+	var pick_fee = order_logistics.PickFee                               // 拣货费用，澳币
+	var cost_amount = order_logistics.CostAmount                         // 到仓总成本，澳币
 
-	var profit = (total_amount + express_fee) - (order_gst + platform_fee + payment_fee + logistics_fee + pick_fee + cost_amount)
+	var profit = (amount_paid + express_fee) - (order_gst + platform_fee + payment_fee + logistics_fee + pick_fee + cost_amount)
 
 	// 利润小于零，并且亏损价格大于最大价格或者亏损率大于最大亏损率
-	if profit < 0 && ((math.Abs(profit) > p_ol.logistics_setting.MaxDeficitPrice) || (math.Abs(profit)/(total_amount+express_fee) > p_ol.logistics_setting.MaxDeficitRate)) {
+	if profit < 0 && ((math.Abs(profit) > p_ol.logistics_setting.MaxDeficitPrice) || (math.Abs(profit)/(amount_paid+express_fee) > p_ol.logistics_setting.MaxDeficitRate)) {
 		p_ol.update_order_to_hold_type(p_order, models.ORDER_HOLD_TYPE_GREAT_DEFICIT, db_session)
 		return true
 	}
@@ -417,7 +417,7 @@ func (p_ol *OrderLogistics) update_order_to_hold_type(p_order *models.OrderInfo,
 
 // 检查仓库是否有订单中的所有商品数量的库存。这里的有货就理解成这个仓库有订单的所有的商品；这里的缺货也理解成是，没有一个仓库能凑齐所有商品的所有数量。同时返回订单的商品总成本
 func check_stock_has_order_products(p_ol *OrderLogistics, stock_id int64, p_order_logistics_data *order_logistics_data_t) (has_return bool, cost_amount_return float64) {
-	var products_stock_qty_list = p_order_logistics_data.products_stock_qty_list
+	var products_stock_qty_list = p_order_logistics_data.products_stock_qty_list //库存为零的也包含，只要有记录的都会包含，可以从里面取得仓库的成本价，就算库存为零也能取得成本价
 	var order_product_info_list = p_order_logistics_data.order_product_info_list
 
 	var stock_has_all_product = true
@@ -428,10 +428,12 @@ func check_stock_has_order_products(p_ol *OrderLogistics, stock_id int64, p_orde
 		var product_has_stock = false
 		for _, product_stock_qty := range products_stock_qty_list {
 			if product_stock_qty.StockId == stock_id && product_stock_qty.ProductId == order_product_info.ProductId {
+				//这里的 cost_amount = cost_amount + 实际也不是累加，因为只运行一次
+				cost_amount = cost_amount + float64(order_product_info.Qty)*product_stock_qty.CostPrice/p_ol.aud_exchange_rate // 库存成本换算成澳币，仓库成本都是RMB的
+
 				if product_stock_qty.Qty >= order_product_info.Qty {
 					product_has_stock = true
-					cost_amount = cost_amount + float64(order_product_info.Qty)*product_stock_qty.CostPrice/p_ol.aud_exchange_rate // 库存成本换算成澳币
-					break                                                                                                          //这个 break 加不加都可以的，因为 这个 stock_id， 这个 product_id 的就一条记录
+					break //这个 break 加不加都可以的，因为 这个 stock_id， 这个 product_id 的就一条记录
 				}
 			}
 		}
@@ -446,7 +448,7 @@ func check_stock_has_order_products(p_ol *OrderLogistics, stock_id int64, p_orde
 	if stock_has_all_product == true {
 		return true, cost_amount
 	} else {
-		return false, 0
+		return false, cost_amount
 	}
 }
 

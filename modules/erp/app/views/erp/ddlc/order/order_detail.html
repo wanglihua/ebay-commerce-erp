@@ -462,6 +462,7 @@
                                     <th class="center" style="width: 120px;">仓库</th>
                                     <th class="center" style="width: 120px;">库位</th>
                                     <th class="center" style="width: 100px;">库存</th>
+                                    <th class="center" style="width: 100px;">成本</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -482,6 +483,9 @@
                                         <td class="center">
                                             {{inventory.nvt.qty}}
                                         </td>
+                                        <td class="center">
+                                            {{ format_amount(inventory.nvt.cost_price)}}
+                                        </td>
                                     </tr>
                                     <tr v-else>
                                         <td class="center">
@@ -498,6 +502,9 @@
                                         </td>
                                         <td class="center">
                                             {{inventory.nvt.qty}}
+                                        </td>
+                                        <td class="center">
+                                            {{ format_amount(inventory.nvt.cost_price)}}
                                         </td>
                                     </tr>
                                 </template>
