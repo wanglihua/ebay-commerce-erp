@@ -431,7 +431,7 @@ func check_stock_has_order_products(p_ol *OrderLogistics, stock_id int64, p_orde
 				//这里的 cost_amount = cost_amount + 实际也不是累加，因为只运行一次
 				cost_amount = cost_amount + float64(order_product_info.Qty)*product_stock_qty.CostPrice/p_ol.aud_exchange_rate // 库存成本换算成澳币，仓库成本都是RMB的
 
-				if product_stock_qty.Qty >= (order_product_info.Qty + product_stock_qty.PendingQty + pending_keeper.get(stock_id, order_product_info.ProductId)) { // 考虑匹配过程中 pending 的库存
+				if product_stock_qty.Qty >= (order_product_info.Qty + product_stock_qty.PendingQty + p_ol.pending_keeper.get(stock_id, order_product_info.ProductId)) { // 考虑匹配过程中 pending 的库存
 					product_has_stock = true
 					break //这个 break 加不加都可以的，因为 这个 stock_id， 这个 product_id 的就一条记录
 				}

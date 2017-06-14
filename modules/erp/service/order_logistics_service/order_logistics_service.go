@@ -28,6 +28,7 @@ type OrderLogistics struct {
 	logistics_fee_rate_map            map[int64][]models.LogisticsFeeRateInfo // 物流费率列表的映射，映射的 key 是， 物流方式的 id
 	envelope_fee_rate_list            []models.EnvelopeFeeRateInfo            // 信封物流费率， 按费用从小到大排序
 	shop_list                         []models.ShopAccountInfo                // 店铺列表，系统中的店铺列表
+	pending_keeper                    *pending_inventory_temp_keeper          // 设置过程全局变量，每次开始匹配计算的时候一定要记得初始化
 }
 
 func (p_ol *OrderLogistics) init_data(db_session *xorm.Session) {
@@ -176,8 +177,6 @@ func (p_ol *OrderLogistics) CalculateList(order_list []models.OrderInfo, db_sess
 	return p_ol.calculate_list_with_prefer_stock_and_unlock_expree(order_list, 0, false, db_session)
 }
 
-var pending_keeper *pending_inventory_temp_keeper = nil // 设置过程全局变量，每次开始匹配计算的时候一定要记得初始化
-
 // 匹配前要判断一下订单的状态，订单不是已支付状态的话，不能匹配
 // 计算订单的物流方式 和 Hold 类型，调用这个函数的时候应该  “开启数据库事务“， 调用完成后，订单的状态就是 Hold 或者 待配货
 func (p_ol *OrderLogistics) calculate_list_with_prefer_stock_and_unlock_expree(order_list []models.OrderInfo, prefer_stock_id int64, unlock_express bool, db_session *xorm.Session) error {
@@ -225,7 +224,7 @@ func (p_ol *OrderLogistics) calculate_list_with_prefer_stock_and_unlock_expree(o
 	// 只需要加载前面判断出来的，其它信息一样的订单的收货地址就可以了，不用加载全部订单的收货地址信息
 	//var order_shipping_address_list = order_shipping_address_service.Get_orders_shipping_address_list(order_list, db_session)
 
-	pending_keeper = new_pending_inventory_temp_keeper()
+	p_ol.pending_keeper = new_pending_inventory_temp_keeper()
 
 	for _, order := range order_list {
 		var p_order_logistics_data = new(order_logistics_data_t)

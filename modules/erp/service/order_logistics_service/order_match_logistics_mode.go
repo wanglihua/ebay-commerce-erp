@@ -531,7 +531,7 @@ func (p_ol *OrderLogistics) match_logistics_mode_with_prefer_stock_and_unlock_ex
 	} else {
 		var product_info_list = p_order_logistics_data.order_product_info_list
 		for _, product_info := range product_info_list {
-			pending_keeper.add(order_logistics.StockId, product_info.ProductId, product_info.Qty)
+			p_ol.pending_keeper.add(order_logistics.StockId, product_info.ProductId, product_info.Qty)
 		}
 	}
 
