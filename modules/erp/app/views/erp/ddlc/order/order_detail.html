@@ -90,7 +90,7 @@
                                     <option :value="mode.id">{{mode.name}}</option>
                                 </template>
                             </select>
-                            <button class="btn btn-sm btn-purple" onclick="rematch_hold_order_logistics()">
+                            <button class="btn btn-sm btn-purple" onclick="rematch_order_logistics()">
                                 重新匹配物流
                             </button>
                         </div>
@@ -960,12 +960,15 @@
         });
     }
 
-    function rematch_hold_order_logistics() {
+    function rematch_order_logistics() {
+        var order_list = [];
+        order_list.push(order_id);
+
         $.ajax({
             "dataType": 'json',
             "url": '{% url "ErpOrder.ReMatchHoldOrderLogistics"%}',
             "data": {
-                "order_id": order_id,
+                "order_id_list": order_list,
                 "prefer_stock_id": $("#prefer_stock").val(),
                 "prefer_mode_id": $("#prefer_mode").val(),
                 "unlock_express": $("#unlock_express").val()

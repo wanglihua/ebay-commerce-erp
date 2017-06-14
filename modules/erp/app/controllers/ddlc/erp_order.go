@@ -551,8 +551,8 @@ func (c ErpOrder) ReMatchHoldOrderLogistics() revel.Result {
 
 	var db_session = c.DbSession
 
-	var order_id int64
-	c.Params.Bind(&order_id, "order_id")
+	var order_id_list = make([]int64, 0)
+	c.Params.Bind(&order_id_list, "order_id_list")
 
 	var prefer_stock_id int64
 	c.Params.Bind(&prefer_stock_id, "prefer_stock_id")
@@ -571,7 +571,7 @@ func (c ErpOrder) ReMatchHoldOrderLogistics() revel.Result {
 	}
 
 	var order models.OrderInfo
-	_, err := db_session.Id(order_id).Get(&order)
+	_, err := db_session.In("id", order_id_list).Get(&order)
 	core.HandleError(err)
 
 	if order.StatusId != models.ORDER_STATUS_HOLD && order.StatusId != models.ORDER_STATUS_DPH {
