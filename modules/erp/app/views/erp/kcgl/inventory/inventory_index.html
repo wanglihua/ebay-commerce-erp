@@ -52,6 +52,10 @@
                         <i class="ace-icon fa fa-file-excel-o"></i>
                         导入库存数量
                     </button>
+                    <button id="btnImportSkuQtyDiff" class="btn btn-info btn-sm">
+                        <i class="ace-icon fa fa-file-excel-o"></i>
+                        导入库存差异
+                    </button>
                     <button class="btn btn-pink btn-sm" @click="exportSkuQty()">
                         <i class="ace-icon fa fa-file-excel-o"></i>
                         导出库存数量
@@ -374,6 +378,48 @@
         });
 
         sku_qty_uploader.init();
+
+        var sku_qty_diff_uploader = new plupload.Uploader({
+            runtimes: 'html5,flash,html4',
+            multi_selection: false,
+
+            browse_button: 'btnImportSkuQtyDiff',
+            file_data_name: "excel_file",
+
+            url: '{%url "ErpInventory.ImportInventoryQuantityDiff"%}',
+            max_file_size: '10000kb',
+
+            filters: [
+                {title: "Excel文件", extensions: "xlsx"}
+            ],
+
+            flash_swf_url: '/plupload/js/Moxie.swf',
+
+            init: {
+                FilesAdded: function () {
+                    showMask("上传中，请稍候...");
+                    sku_qty_diff_uploader.start();
+                },
+                FileUploaded: function (up, file, response) {
+                    hideMask();
+                    var result = JSON.parse(response.response);
+                    if (result.success !== true) {
+                        $.msg.error(result.message);
+                        vm.error_data_list = result.error_data_list;
+                        $("table#error_data_list").show();
+                    } else {
+                        reloadList('#inventoryList');
+                        $.msg.show(result.message);
+                        $("table#error_data_list").hide();
+                    }
+                },
+                Error: function (up, err) {
+                    $.msg.error("上传发生错误：" + err.code + ", " + err.message);
+                }
+            }
+        });
+
+        sku_qty_diff_uploader.init();
 
         var sku_price_uploader = new plupload.Uploader({
             runtimes: 'html5,flash,html4',
