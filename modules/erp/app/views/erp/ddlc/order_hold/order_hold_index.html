@@ -56,6 +56,29 @@
                             <button class="btn btn-mini btn-primary" @click="refreshList()">
                                 &nbsp;<i class="ace-icon fa fa-search"></i>查&nbsp;询&nbsp;
                             </button>
+                            &nbsp;&nbsp;&nbsp;
+                            <label for="unlock_express">解锁快递：</label>
+                            <select id="unlock_express" class="input-sm" style="width: 80px;">
+                                <option :value="0">否</option>
+                                <option :value="1">是</option>
+                            </select>
+                            &nbsp;<label for="prefer_stock">指定匹配仓库：</label>
+                            <select id="prefer_stock" class="input-sm" style="width: 120px;" onchange="load_logistics_model_list()">
+                                <option :value="0">当前不指定</option>
+                                <template v-for="stock in page.au_stock_list">
+                                    <option :value="stock.id">{{stock.name}}</option>
+                                </template>
+                            </select>
+                            &nbsp;<label for="prefer_mode">指定物流方式：</label>
+                            <select id="prefer_mode" class="input-sm" style="width: 120px;">
+                                <option :value="0">当前不指定</option>
+                                <template v-for="mode in logistics_mode_list">
+                                    <option :value="mode.id">{{mode.name}}</option>
+                                </template>
+                            </select>
+                            <button class="btn btn-mini btn-purple" onclick="rematch_order_logistics()">
+                                重新匹配物流
+                            </button>
 
                             <div class="link_query_list">
                                 <a :class="page.hold_type_id == 0 ? 'selected' : ''" href="#" @click="selectHoldType(0)"><img style="border: none;height: 24px;" src="/static/images/icons/all_check.png" class="link_icon" alt="全部"/>全部</a>
@@ -120,11 +143,13 @@
         data: {
             "page": {
                 "hold_type_id": 0,
-                "hold_type_list": []
+                "hold_type_list": [],
+                "au_stock_list": []
             },
             "detail": {
                 "order": {}
-            }
+            },
+            "logistics_mode_list": []
         },
         mounted: function () {
             var this_vm = this;
@@ -538,5 +563,59 @@
             }
         }
     });
+
+    function rematch_order_logistics() {
+        var order_id_list = [];
+        $('#orderList').find('tbody tr>td:first-child input:checkbox').each(function () {
+            if (this.checked) {
+                order_id_list.push($(this).val());
+            }
+        });
+
+        if (order_id_list.length === 0) {
+            $.msg.alert("请选择数据！");
+            return;
+        }
+
+        $.msg.confirm("确认要重新匹配物流吗？", function () {
+            $.ajax({
+                "dataType": 'json',
+                "url": '{% url "ErpOrder.ReMatchHoldOrderLogistics"%}',
+                "data": {
+                    "order_id_list": order_id_list,
+                    "prefer_stock_id": $("#prefer_stock").val(),
+                    "prefer_mode_id": $("#prefer_mode").val(),
+                    "unlock_express": $("#unlock_express").val()
+                },
+                "success": function (data) {
+                    if (data.success === false) {
+                        $.msg.error(data.message);
+                    }
+                    else {
+                        vm.refreshList();
+                        $.msg.show(data.message)
+                    }
+                }
+            });
+        });
+    }
+
+    function load_logistics_model_list() {
+        $.ajax({
+            "dataType": 'json',
+            "url": '{% url "ErpLogisticsMode.GetListByStock" %}',
+            "data": {
+                "stock_id": $("#prefer_stock").val()
+            },
+            "success": function (data) {
+                if (data.success === false) {
+                    $.msg.error(data.message);
+                }
+                else {
+                    vm.logistics_mode_list = data.mode_list;
+                }
+            }
+        });
+    }
 </script>
 {%footer%}

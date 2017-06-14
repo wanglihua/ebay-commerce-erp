@@ -547,7 +547,7 @@ WHERE oi.order_id = %d;`
 }
 
 func (c ErpOrder) ReMatchHoldOrderLogistics() revel.Result {
-	pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_VIEW_DETAIL, c.Session)
+	pass_service.Check_login_user_pass_or([]int64{pass_res.DDLC_ORDER_VIEW_DETAIL, pass_res.DDLC_ORDER_HOLD}, c.Session)
 
 	var db_session = c.DbSession
 
@@ -570,15 +570,17 @@ func (c ErpOrder) ReMatchHoldOrderLogistics() revel.Result {
 		is_unlock_express = true
 	}
 
-	var order models.OrderInfo
-	_, err := db_session.In("id", order_id_list).Get(&order)
+	var order_list = make([]models.OrderInfo, 0)
+	_, err := db_session.In("id", order_id_list).Get(&order_list)
 	core.HandleError(err)
 
-	if order.StatusId != models.ORDER_STATUS_HOLD && order.StatusId != models.ORDER_STATUS_DPH {
-		return c.RenderJson(map[string]interface{}{
-			"success": false,
-			"message": "当前状态不是Hold状态或待配货状态，不能重新匹配物流!",
-		})
+	for _, order := range order_list {
+		if order.StatusId != models.ORDER_STATUS_HOLD && order.StatusId != models.ORDER_STATUS_DPH {
+			return c.RenderJson(map[string]interface{}{
+				"success": false,
+				"message": "当前状态不是Hold状态或待配货状态，不能重新匹配物流!",
+			})
+		}
 	}
 
 	var p_order_logistics = new(order_logistics_service.OrderLogistics)
@@ -586,7 +588,7 @@ func (c ErpOrder) ReMatchHoldOrderLogistics() revel.Result {
 	match_option.Prefer_stock_id = prefer_stock_id
 	match_option.Prefer_mode_id = prefer_mode_id
 	match_option.Unlock_express = is_unlock_express
-	err = p_order_logistics.CalculateSingleWithOption(order, match_option, db_session)
+	err = p_order_logistics.CalculateListWithOption(order_list, match_option, db_session)
 	core.HandleError(err)
 
 	return c.RenderJson(map[string]interface{}{

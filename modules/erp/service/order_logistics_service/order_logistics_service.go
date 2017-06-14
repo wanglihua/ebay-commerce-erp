@@ -179,7 +179,7 @@ func (p_ol *OrderLogistics) CalculateList(order_list []models.OrderInfo, db_sess
 	match_option.Prefer_mode_id = 0
 	match_option.Unlock_express = false
 
-	return p_ol.calculate_list_with_option(order_list, match_option, db_session)
+	return p_ol.CalculateListWithOption(order_list, match_option, db_session)
 }
 
 type Match_option_t struct {
@@ -190,7 +190,7 @@ type Match_option_t struct {
 
 // 匹配前要判断一下订单的状态，订单不是已支付状态的话，不能匹配
 // 计算订单的物流方式 和 Hold 类型，调用这个函数的时候应该  “开启数据库事务“， 调用完成后，订单的状态就是 Hold 或者 待配货
-func (p_ol *OrderLogistics) calculate_list_with_option(order_list []models.OrderInfo, match_option Match_option_t, db_session *xorm.Session) error {
+func (p_ol *OrderLogistics) CalculateListWithOption(order_list []models.OrderInfo, match_option Match_option_t, db_session *xorm.Session) error {
 	/*
 	defer func() {
 		if err := recover(); err != nil {
@@ -352,5 +352,5 @@ func (p_ol *OrderLogistics) CalculateSingle(order models.OrderInfo, db_session *
 }
 
 func (p_ol *OrderLogistics) CalculateSingleWithOption(order models.OrderInfo, match_option Match_option_t, db_session *xorm.Session) error {
-	return p_ol.calculate_list_with_option([]models.OrderInfo{order}, match_option, db_session)
+	return p_ol.CalculateListWithOption([]models.OrderInfo{order}, match_option, db_session)
 }

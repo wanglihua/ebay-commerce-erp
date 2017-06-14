@@ -43,11 +43,16 @@ func (c ErpOrderHold) PageData() revel.Result {
 	err := db_session.OrderBy("ord ASC").Find(&hold_type_list)
 	core.HandleError(err)
 
+	var au_stock_list = make([]models.StockInfo, 0)
+	err = db_session.Where(fmt.Sprintf("stock_type_id = %d", models.STOCK_TYPE_AU)).Find(&au_stock_list)
+	core.HandleError(err)
+
 	return c.RenderJson(map[string]interface{}{
 		"batch_code":      0,
 		"batch_code_list": batch_code_list,
 		"hold_type_id":    0,
 		"hold_type_list":  hold_type_list,
+		"au_stock_list":   au_stock_list,
 	})
 }
 
