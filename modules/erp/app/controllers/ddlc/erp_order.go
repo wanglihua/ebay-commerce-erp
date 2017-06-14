@@ -557,6 +557,9 @@ func (c ErpOrder) ReMatchHoldOrderLogistics() revel.Result {
 	var prefer_stock_id int64
 	c.Params.Bind(&prefer_stock_id, "prefer_stock_id")
 
+	var prefer_mode_id int64
+	c.Params.Bind(&prefer_mode_id, "prefer_mode_id")
+
 	var unlock_express int64
 	c.Params.Bind(&unlock_express, "unlock_express")
 
@@ -579,7 +582,11 @@ func (c ErpOrder) ReMatchHoldOrderLogistics() revel.Result {
 	}
 
 	var p_order_logistics = new(order_logistics_service.OrderLogistics)
-	err = p_order_logistics.CalculateSingleWithPreferStockAndUnlockExpree(order, prefer_stock_id, is_unlock_express, db_session)
+	var match_option order_logistics_service.Match_option_t
+	match_option.Prefer_stock_id = prefer_stock_id
+	match_option.Prefer_mode_id = prefer_mode_id
+	match_option.Unlock_express = is_unlock_express
+	err = p_order_logistics.CalculateSingleWithOption(order, match_option, db_session)
 	core.HandleError(err)
 
 	return c.RenderJson(map[string]interface{}{
@@ -689,9 +696,6 @@ func (c ErpOrder) PeiHuo() revel.Result {
 		}
 	}
 
-	// todo: 检查和扣减库存
-	// todo: 如果是 hold 的应该如何操作
-
 	for _, order := range order_list {
 		order.StatusId = models.ORDER_STATUS_PHZ
 		_, err = db_session.Id(order.Id).Cols("status_id").Update(&order)
@@ -770,6 +774,8 @@ func (c ErpOrder) ShiJiWuHuo() revel.Result {
 		_, err = db_session.Id(order.Id).Cols("status_id", "hold_type_id").Update(&order)
 		core.HandleError(err)
 	}
+
+	go inventory_service.Calculate_inventory_pending_qty()
 
 	return c.RenderJson(map[string]interface{}{
 		"success": true,

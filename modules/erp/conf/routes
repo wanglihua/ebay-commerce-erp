@@ -107,6 +107,7 @@ POST /logistics/mode/save                  ErpLogisticsMode.Save
 POST /logistics/mode/delete/confirm        ErpLogisticsMode.DeleteConfirm
 POST /logistics/mode/delete                ErpLogisticsMode.Delete
 POST /logistics/mode/import                ErpLogisticsMode.Import
+POST /logistics/mode/get/list/by/stock     ErpLogisticsMode.GetListByStock
 
 GET  /logistics/fee/rate                    ErpLogisticsFeeRate.Index
 POST /logistics/fee/rate/data/list          ErpLogisticsFeeRate.ListData

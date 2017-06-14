@@ -566,3 +566,18 @@ func (c ErpLogisticsMode) Import() revel.Result {
 		"message": "数据导入成功！",
 	})
 }
+
+func (c ErpLogisticsMode) GetListByStock() revel.Result {
+	var db_session = c.DbSession
+
+	var stock_id int64
+	c.Params.Bind(&stock_id, "stock_id")
+
+	var model_list = make([]models.LogisticsModeInfo, 0)
+	err := db_session.Where(fmt.Sprintf("stock_id = %d", stock_id)).Find(&model_list)
+	core.HandleError(err)
+
+	return c.RenderJson(map[string]interface{}{
+		"mode_list": model_list,
+	})
+}

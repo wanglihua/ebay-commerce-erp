@@ -174,12 +174,23 @@ func (s order_slice_t) Swap(i int, j int) {
 }
 
 func (p_ol *OrderLogistics) CalculateList(order_list []models.OrderInfo, db_session *xorm.Session) error {
-	return p_ol.calculate_list_with_prefer_stock_and_unlock_expree(order_list, 0, false, db_session)
+	var match_option Match_option_t
+	match_option.Prefer_stock_id = 0
+	match_option.Prefer_mode_id = 0
+	match_option.Unlock_express = false
+
+	return p_ol.calculate_list_with_option(order_list, match_option, db_session)
+}
+
+type Match_option_t struct {
+	Prefer_stock_id int64
+	Prefer_mode_id  int64
+	Unlock_express  bool
 }
 
 // 匹配前要判断一下订单的状态，订单不是已支付状态的话，不能匹配
 // 计算订单的物流方式 和 Hold 类型，调用这个函数的时候应该  “开启数据库事务“， 调用完成后，订单的状态就是 Hold 或者 待配货
-func (p_ol *OrderLogistics) calculate_list_with_prefer_stock_and_unlock_expree(order_list []models.OrderInfo, prefer_stock_id int64, unlock_express bool, db_session *xorm.Session) error {
+func (p_ol *OrderLogistics) calculate_list_with_option(order_list []models.OrderInfo, match_option Match_option_t, db_session *xorm.Session) error {
 	/*
 	defer func() {
 		if err := recover(); err != nil {
@@ -278,7 +289,7 @@ func (p_ol *OrderLogistics) calculate_list_with_prefer_stock_and_unlock_expree(o
 			continue
 		}
 
-		if unlock_express == false {
+		if match_option.Unlock_express == false {
 			// 15 判断是否是快递 放在匹配物流之前
 			if p_ol.hold_check_express(&order, db_session) {
 				continue
@@ -290,7 +301,7 @@ func (p_ol *OrderLogistics) calculate_list_with_prefer_stock_and_unlock_expree(o
 			continue
 		}
 
-		match_success, order_logistics := p_ol.match_logistics_mode_with_prefer_stock_and_unlock_express(&order, p_order_logistics_data, prefer_stock_id, unlock_express, db_session)
+		match_success, order_logistics := p_ol.match_logistics_mode_with_option(&order, p_order_logistics_data, match_option, db_session)
 
 		// 11 无匹配的物流方式（长宽高重量没有物流满足）
 		if p_ol.hold_check_no_match_logistics_mode(&order, match_success, db_session) {
@@ -340,6 +351,6 @@ func (p_ol *OrderLogistics) CalculateSingle(order models.OrderInfo, db_session *
 	return p_ol.CalculateList([]models.OrderInfo{order}, db_session)
 }
 
-func (p_ol *OrderLogistics) CalculateSingleWithPreferStockAndUnlockExpree(order models.OrderInfo, prefer_stock_id int64, unlock_express bool, db_session *xorm.Session) error {
-	return p_ol.calculate_list_with_prefer_stock_and_unlock_expree([]models.OrderInfo{order}, prefer_stock_id, unlock_express, db_session)
+func (p_ol *OrderLogistics) CalculateSingleWithOption(order models.OrderInfo, match_option Match_option_t, db_session *xorm.Session) error {
+	return p_ol.calculate_list_with_option([]models.OrderInfo{order}, match_option, db_session)
 }

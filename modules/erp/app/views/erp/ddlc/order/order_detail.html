@@ -71,16 +71,23 @@
                     <hr style="margin-top: 5px;margin-bottom: 5px;"/>
                     <div class="row">
                         <div class="col-xs-12" style="text-align: right;">
-                            <label for="unlock_express">解锁快递</label>
+                            <label for="unlock_express">解锁快递：</label>
                             <select id="unlock_express" class="input-sm" style="width: 80px;">
                                 <option :value="0">否</option>
                                 <option :value="1">是</option>
                             </select>
-                            <label for="prefer_stock">指定匹配仓库：</label>
-                            <select id="prefer_stock" class="input-sm" style="width: 120px;">
+                            &nbsp;<label for="prefer_stock">指定匹配仓库：</label>
+                            <select id="prefer_stock" class="input-sm" style="width: 120px;" onchange="load_logistics_model_list()">
                                 <option :value="0">当前不指定</option>
                                 <template v-for="stock in detail.au_stock_list">
                                     <option :value="stock.id">{{stock.name}}</option>
+                                </template>
+                            </select>
+                            &nbsp;<label for="prefer_mode">指定物流方式：</label>
+                            <select id="prefer_mode" class="input-sm" style="width: 120px;">
+                                <option :value="0">当前不指定</option>
+                                <template v-for="mode in logistics_mode_list">
+                                    <option :value="mode.id">{{mode.name}}</option>
                                 </template>
                             </select>
                             <button class="btn btn-sm btn-purple" onclick="rematch_hold_order_logistics()">
@@ -731,7 +738,8 @@
                 "logistics_mode": {},
                 "inventory_list": []
             },
-            "order_item_detail": {}
+            "order_item_detail": {},
+            "logistics_mode_list": []
         },
         mounted: function () {
             var this_vm = this;
@@ -959,6 +967,7 @@
             "data": {
                 "order_id": order_id,
                 "prefer_stock_id": $("#prefer_stock").val(),
+                "prefer_mode_id": $("#prefer_mode").val(),
                 "unlock_express": $("#unlock_express").val()
             },
             "success": function (data) {
@@ -968,6 +977,24 @@
                 else {
                     setTimeout("window.location.reload();", 1000);
                     $.msg.show(data.message)
+                }
+            }
+        });
+    }
+
+    function load_logistics_model_list() {
+        $.ajax({
+            "dataType": 'json',
+            "url": '{% url "ErpLogisticsMode.GetListByStock" %}',
+            "data": {
+                "stock_id": $("#prefer_stock").val()
+            },
+            "success": function (data) {
+                if (data.success === false) {
+                    $.msg.error(data.message);
+                }
+                else {
+                    vm.logistics_mode_list = data.mode_list;
                 }
             }
         });
