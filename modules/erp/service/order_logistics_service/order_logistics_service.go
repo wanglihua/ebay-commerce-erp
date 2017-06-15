@@ -240,36 +240,15 @@ func (p_ol *OrderLogistics) CalculateListWithOption(order_list []models.OrderInf
 	for _, order := range order_list {
 		var p_order_logistics_data = new(order_logistics_data_t)
 		//　一起加载需要的数据的方式，对性能的影响应该不会很大的
-		// p_order_logistics_data.load_data(&order, p_ol, db_session)
-
-		// 加载订单数据 汇率 和 订单收货地址
-		p_order_logistics_data.load_exchange_rate(&order, p_ol)
-		p_order_logistics_data.load_order_shipping_address(order.Id, db_session)
+		p_order_logistics_data.load_data(&order, p_ol, db_session)
 
 		// 老鼠仓的检查
 		if p_ol.hold_check_paypal_account_not_match(&order, db_session) {
 			continue
 		}
 
-		// 17 收货人信息不全的，比如没有手机号，没有邮编等等，放在这里前面一点的地方检查比较好
-		if p_ol.hold_check_address_info_miss(&order, p_order_logistics_data, db_session) {
-			continue
-		}
-
-		// 2 有买家留言
-		if p_ol.hold_check_buyer_checkout_message(&order, db_session) {
-			continue
-		}
-
 		// 3 有平台留言 -- 导入的订单里面还没有留言
 		// 4 PICK UP   -- 一般都是手工创建的订单
-
-		// 加载订单数据 订单产品信息 和 订单产品的库存信息
-		// 加载接下来的判断需要的数据，如果在循环开始时加载，就会有可能的性能浪费
-		p_order_logistics_data.load_order_product_info_list(order.Id, db_session)
-		p_order_logistics_data.load_products_stock_qty_list(order.Id, db_session)
-
-		// 7 实际仓库缺货（是在捡货过程中，虽然系统显示有货，但实际仓库没有货了。就需要人工手动将这些订单搬至这里的模块，等待跟客户协商，是退款还是等待集装箱）
 
 		// 8, 9, 10 临时的解决方案
 		//todo to complete
@@ -290,7 +269,7 @@ func (p_ol *OrderLogistics) CalculateListWithOption(order_list []models.OrderInf
 		}
 
 		if match_option.Unlock_express == false {
-			// 15 判断是否是快递 放在匹配物流之前
+			// 15 判断是否是快递
 			if p_ol.hold_check_express(&order, db_session) {
 				continue
 			}
@@ -301,10 +280,39 @@ func (p_ol *OrderLogistics) CalculateListWithOption(order_list []models.OrderInf
 			continue
 		}
 
+		// 邮政编码信息不全 17 收货人信息不全的，比如没有手机号，没有邮编等等，放在这里前面一点的地方检查比较好
+		if p_ol.hold_check_address_info_post_code_miss(&order, p_order_logistics_data, db_session) {
+			continue
+		}
+
 		match_success, order_logistics := p_ol.match_logistics_mode_with_option(&order, p_order_logistics_data, match_option, db_session)
 
 		// 11 无匹配的物流方式（长宽高重量没有物流满足）
 		if p_ol.hold_check_no_match_logistics_mode(&order, match_success, db_session) {
+			continue
+		}
+
+		if match_success == true {
+			// 13 匹配最佳仓库及物流后订单亏损。需要在基础设置里面有设置亏损额或者亏损率的设置功能，超过设置范围了，自动到订单亏损 hold
+			if p_ol.hold_check_great_deficit(&order, p_order_logistics_data, order_logistics, db_session) {
+				//把亏损的尽量放在前面
+				continue
+			}
+
+			// 1 地址有特殊字段的， 因为要查看匹配的物流方式，所以就放在这里了，放在匹配物流方式之后
+			if p_ol.hold_check_address_special_word(&order, p_order_logistics_data, order_logistics, db_session) {
+				//todo: 是不是要把前面匹配好的物流方式给去掉。保留好了
+				continue
+			}
+		}
+
+		// 17 收货人信息不全的，比如没有手机号，没有邮编等等，放在这里前面一点的地方检查比较好
+		if p_ol.hold_check_address_info_miss(&order, p_order_logistics_data, db_session) {
+			continue
+		}
+
+		// 2 有买家留言
+		if p_ol.hold_check_buyer_checkout_message(&order, db_session) {
 			continue
 		}
 
@@ -322,19 +330,6 @@ func (p_ol *OrderLogistics) CalculateListWithOption(order_list []models.OrderInf
 		// 6. 系统显示 在途才有货
 		if p_ol.hold_check_oss_au_stock_but_zt_stock_has(&order, p_order_logistics_data, db_session) {
 			continue
-		}
-
-		if match_success == true {
-			// 1 地址有特殊字段的， 因为要查看匹配的物流方式，所以就放在这里了，放在匹配物流方式之后
-			if p_ol.hold_check_address_special_word(&order, p_order_logistics_data, order_logistics, db_session) {
-				//todo: 是不是要把前面匹配好的物流方式给去掉。保留好了
-				continue
-			}
-
-			// 13 匹配最佳仓库及物流后订单亏损。需要在基础设置里面有设置亏损额或者亏损率的设置功能，超过设置范围了，自动到订单亏损 hold
-			if p_ol.hold_check_great_deficit(&order, p_order_logistics_data, order_logistics, db_session) {
-				continue
-			}
 		}
 	}
 

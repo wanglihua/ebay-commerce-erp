@@ -381,11 +381,9 @@ func (p_ol *OrderLogistics) match_logistics_mode_with_option(p_order *models.Ord
 						fee = fee + xz_fee
 						mt.PrintlnIndent(1, "续重后总费用", fee)
 					} else {
-						mt.PrintlnIndent(1, "续重后总费用", fee)
+						revel.ERROR.Println("续重阶梯设置有误，不能计算超重费用！", logistics_fee_rate.Xzjt)
+						mt.PrintlnIndent(1, "续重阶梯设置有误，不能计算超重费用！", logistics_fee_rate.Xzjt)
 					}
-				} else {
-					revel.ERROR.Println("续重阶梯设置有误，不能计算超重费用！", logistics_fee_rate.Xzjt)
-					mt.PrintlnIndent(1, "续重阶梯设置有误，不能计算超重费用！", logistics_fee_rate.Xzjt)
 				}
 				mt.PrintlnIndent(1, "费率最低收费", logistics_fee_rate.Zdsf)
 				// 计算最低费用的时候，还不考虑偏远地区的费用

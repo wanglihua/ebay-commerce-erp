@@ -350,6 +350,18 @@ func (p_ol *OrderLogistics) hold_check_international(p_order *models.OrderInfo, 
 	return false
 }
 
+// 检查邮政编码是否为空 17. 收货人信息不全的 ，如果为空就不匹配了，这个放在匹配物流之前，和下面的一样也是 ORDER_HOLD_ADDRESS_INFO_MISS
+func (p_ol *OrderLogistics) hold_check_address_info_post_code_miss(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, db_session *xorm.Session) (is_hold_return bool) {
+	var shipping_address = p_order_logistics_data.order_shipping_address
+	if shipping_address.Id == 0 || // 数据库中地址信息不存在
+		strings.TrimSpace(shipping_address.PostalCode) == "" { // 地址信息中缺少邮政编码
+		p_ol.update_order_to_hold_type(p_order, models.ORDER_HOLD_ADDRESS_INFO_MISS, db_session)
+		return true
+	}
+
+	return false
+}
+
 // 17. 收货人信息不全的，比如没有手机号，没有邮编等等
 func (p_ol *OrderLogistics) hold_check_address_info_miss(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, db_session *xorm.Session) (is_hold_return bool) {
 	var shipping_address = p_order_logistics_data.order_shipping_address
