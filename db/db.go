@@ -7,6 +7,7 @@ import (
 	xorm_core "github.com/go-xorm/core"
 	"github.com/go-xorm/xorm"
 	"github.com/revel/revel"
+	"runtime/debug"
 )
 
 var Engine *xorm.Engine = nil
@@ -17,20 +18,12 @@ func InitDatabase() {
 
 	var err error
 	Engine, err = xorm.NewEngine(db_driver, db_url)
-	//Engine, err = xorm.NewEngine("sqlite3", "./matrix.db")
-	//Engine, err = xorm.NewEngine("mssql", "server=localhost;database=Matrix;user id=sa;password=sa;")
 	if err != nil {
-		panic(err)
+		revel.TRACE.Println(err)
+		revel.TRACE.Println(string(debug.Stack()))
 	}
 
-	//Engine.TZLocation, err = time.LoadLocation("Asia/Shanghai") //设置时区
-	//Engine.TZLocation, err = time.LoadLocation("Local") //设置时区
 	Engine.TZLocation = time.Local //设置时区
-	if err != nil {
-		panic(err)
-	}
-
-	//Engine.TZLocation = time.UTC //设置时区
 
 	//连接池
 	Engine.SetMaxIdleConns(3)   //最小
@@ -41,9 +34,4 @@ func InitDatabase() {
 		Engine.ShowExecTime()
 		xorm_core.LogQuerySql = true
 	}
-
-	//实体定义时明确指明了表名和列名，下面这些定义就不起作用了
-	//tableMapper := core.NewPrefixMapper(core.SameMapper{}, "hd_")
-	//Engine.SetTableMapper(tableMapper)
-	//Engine.SetColumnMapper(core.SameMapper{})
 }
