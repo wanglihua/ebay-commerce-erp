@@ -306,7 +306,7 @@ func (p_ol *OrderLogistics) CalculateListWithOption(order_list []models.OrderInf
 			}
 		}
 
-		// 17 收货人信息不全的，比如没有手机号，没有邮编等等，放在这里前面一点的地方检查比较好
+		// 17 收货人信息不全的，比如没有手机号，没有邮编等等，没有邮编前面也检查了的
 		if p_ol.hold_check_address_info_miss(&order, p_order_logistics_data, db_session) {
 			continue
 		}
