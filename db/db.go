@@ -19,8 +19,8 @@ func InitDatabase() {
 	var err error
 	Engine, err = xorm.NewEngine(db_driver, db_url)
 	if err != nil {
-		revel.TRACE.Println(err)
-		revel.TRACE.Println(string(debug.Stack()))
+		revel.ERROR.Println(err)
+		revel.ERROR.Println(string(debug.Stack()))
 	}
 
 	Engine.TZLocation = time.Local //设置时区
