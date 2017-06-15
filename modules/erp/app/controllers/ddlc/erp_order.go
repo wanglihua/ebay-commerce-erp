@@ -571,7 +571,7 @@ func (c ErpOrder) ReMatchHoldOrderLogistics() revel.Result {
 	}
 
 	var order_list = make([]models.OrderInfo, 0)
-	_, err := db_session.In("id", order_id_list).Get(&order_list)
+	err := db_session.In("id", order_id_list).Find(&order_list)
 	core.HandleError(err)
 
 	for _, order := range order_list {
