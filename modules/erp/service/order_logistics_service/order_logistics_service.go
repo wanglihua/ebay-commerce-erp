@@ -268,13 +268,6 @@ func (p_ol *OrderLogistics) CalculateListWithOption(order_list []models.OrderInf
 			continue
 		}
 
-		if match_option.Unlock_express == false {
-			// 15 判断是否是快递
-			if p_ol.hold_check_express(&order, db_session) {
-				continue
-			}
-		}
-
 		// 16 判断是否是国际件，如果不是澳洲的就是国际件，一般就是新西兰的， 放在匹配物流之前
 		if p_ol.hold_check_international(&order, p_order_logistics_data, db_session) {
 			continue
@@ -302,6 +295,13 @@ func (p_ol *OrderLogistics) CalculateListWithOption(order_list []models.OrderInf
 			// 1 地址有特殊字段的， 因为要查看匹配的物流方式，所以就放在这里了，放在匹配物流方式之后
 			if p_ol.hold_check_address_special_word(&order, p_order_logistics_data, order_logistics, db_session) {
 				//todo: 是不是要把前面匹配好的物流方式给去掉。保留好了
+				continue
+			}
+		}
+
+		if match_option.Unlock_express == false {
+			// 15 判断是否是快递
+			if p_ol.hold_check_express(&order, db_session) {
 				continue
 			}
 		}

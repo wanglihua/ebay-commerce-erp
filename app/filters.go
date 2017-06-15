@@ -6,6 +6,7 @@ import (
 
 	"github.com/revel/revel"
 	"matrix/core"
+	"matrix/db"
 )
 
 //捕获和处理整站异常
@@ -28,6 +29,9 @@ func handleInvocationPanic(c *revel.Controller, err interface{}) {
 	revel.ERROR.Print(errorDesc, "\n", string(debug.Stack()))
 
 	c.Result = c.RenderJson(core.JsonResult{Success: false, Message: "操作失败！详细:" + errorDesc})
+
+	// 有些 panic 会造成数库访问挂掉，碰到时重新初始化一下数据库访问
+	db.InitDatabase()
 
 	/*
 	// 这个判断无法区别，是上传文件的请求还是普通的请求
