@@ -110,7 +110,7 @@ func (c ErpOrderExport) get_export_excel(db_session *xorm.Session, filter string
 		font.Italic = false
 		font.Underline = false
 		style.Font = font
-		style.ApplyBorder = true
+		style.ApplyFont = true
 
 		fill := *xlsx.NewFill("solid", "00FFFFFF", "00000000") //CCFFCC
 		style.Fill = fill

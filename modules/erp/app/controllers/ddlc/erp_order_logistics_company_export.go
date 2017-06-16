@@ -106,6 +106,23 @@ func (c ErpOrderLogisticsCompanyExport) ExportExcel() revel.Result {
 		})
 	}
 
+	var set_cell_style = func(cell *xlsx.Cell) {
+		style := cell.GetStyle()
+
+		font := * xlsx.NewFont(11, "宋体")
+		font.Bold = false
+		font.Italic = false
+		font.Underline = false
+		style.Font = font
+		style.ApplyFont = true
+
+		border := *xlsx.NewBorder("thin", "thin", "thin", "thin")
+		style.Border = border
+		style.ApplyBorder = true
+
+		cell.SetStyle(style)
+	}
+
 	var excel_template_logistics_export_dir = filepath.Join(revel.BasePath, "/static/excel-template/logistics_export")
 
 	var xlsx_file *xlsx.File
@@ -294,8 +311,15 @@ WHERE  o.status_id = %d AND ol.mode_id IN (%s) AND ol.stock_id = %d`
 		for index, order_logistics := range order_logistics_list {
 			var order_shipping_address = order_service.Get_order_shipping_address(order_logistics.Order.Id, db_session)
 			sheet.Cell(index+1, excel_col_label_to_index("B")).Value = order_logistics.Order.FullTranId
-			sheet.Cell(index+1, excel_col_label_to_index("C")).Value = fmt.Sprintf("%0.1f", order_logistics.OrderLogistics.Weight)
-			sheet.Cell(index+1, excel_col_label_to_index("D")).Value = "1"
+			var c_cell = sheet.Cell(index+1, excel_col_label_to_index("C"))
+			//sheet.Cell(index+1, excel_col_label_to_index("C")).Value = fmt.Sprintf("%0.0f", order_logistics.OrderLogistics.Weight)
+			c_cell.SetFloat(math.Floor(order_logistics.OrderLogistics.Weight+ 0.5))
+			set_cell_style(c_cell)
+
+			//sheet.Cell(index+1, excel_col_label_to_index("D")).Value = "1"
+			var d_cell = sheet.Cell(index+1, excel_col_label_to_index("D"))
+			d_cell.SetInt(1)
+			set_cell_style(d_cell)
 
 			sheet.Cell(index+1, excel_col_label_to_index("H")).Value = order_shipping_address.Name
 			var full_address = order_shipping_address.Street1 + order_shipping_address.Street2
