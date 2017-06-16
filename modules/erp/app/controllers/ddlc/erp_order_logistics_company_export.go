@@ -311,9 +311,15 @@ WHERE  o.status_id = %d AND ol.mode_id IN (%s) AND ol.stock_id = %d`
 		for index, order_logistics := range order_logistics_list {
 			var order_shipping_address = order_service.Get_order_shipping_address(order_logistics.Order.Id, db_session)
 			sheet.Cell(index+1, excel_col_label_to_index("B")).Value = order_logistics.Order.FullTranId
+
 			var c_cell = sheet.Cell(index+1, excel_col_label_to_index("C"))
 			//sheet.Cell(index+1, excel_col_label_to_index("C")).Value = fmt.Sprintf("%0.0f", order_logistics.OrderLogistics.Weight)
-			c_cell.SetFloat(math.Floor(order_logistics.OrderLogistics.Weight+ 0.5))
+
+			if order_logistics.OrderLogistics.Weight < 1 {
+				c_cell.SetFloat(1)
+			} else {
+				c_cell.SetFloat(math.Floor(order_logistics.OrderLogistics.Weight + 0.5))
+			}
 			set_cell_style(c_cell)
 
 			//sheet.Cell(index+1, excel_col_label_to_index("D")).Value = "1"
