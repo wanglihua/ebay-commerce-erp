@@ -71,6 +71,11 @@ func (p_ol *OrderLogistics) match_logistics_mode_with_option(p_order *models.Ord
 			continue
 		}
 
+		// 如果是解锁快递，并且当前的物流方式是快递的，就排除掉
+		if match_option.Unlock_express == true && logistics_mode.TypeId == models.LOGISTICS_MODE_TYPE_EXPRESS {
+			continue
+		}
+
 		var mt match_trace
 		mt.set_is_trace(p_ol.logistics_setting.Qyppts)
 
