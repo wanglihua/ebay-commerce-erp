@@ -37,12 +37,14 @@ func (c ErpOrderWaybillPrint) Preview() revel.Result {
 		var order_shipping_address models.OrderShippingAddressInfo
 		_, err = db_session.Id(order.AddressId).Get(&order_shipping_address)
 		core.HandleError(err)
-		print_order.OrderShippingAddress = order_shipping_address
+		print_order.Address = order_shipping_address
 
 		var logistics_company models.LogisticsCompanyInfo
 		_, err = db_session.Id(order.CompanyId).Get(&logistics_company)
 		core.HandleError(err)
 		print_order.LogisticsCompanyName = logistics_company.Name
+
+		print_order.SkuQtyLocList = get_order_sku_qty_loc_list_for_print(order_id, db_session)
 
 		print_order_list = append(print_order_list, print_order)
 	}
@@ -52,10 +54,11 @@ func (c ErpOrderWaybillPrint) Preview() revel.Result {
 }
 
 type Print_order_t struct {
-	Order                models.OrderInfo
-	OrderShippingAddress models.OrderShippingAddressInfo
+	Order   models.OrderInfo
+	Address models.OrderShippingAddressInfo
 	//OrderLogistics       models.OrderLogisticsInfo
 	LogisticsCompanyName string
+	SkuQtyLocList        []string
 }
 
 func get_order_sku_qty_loc_list_for_print(order_id int64, db_session *xorm.Session) []string {

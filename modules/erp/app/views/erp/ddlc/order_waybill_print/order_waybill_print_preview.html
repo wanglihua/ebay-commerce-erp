@@ -24,6 +24,9 @@
         div#waybill_list div.waybill div.bill-block {
             height: 5cm;
             float: left;
+            white-space: normal;
+            word-break: break-all;
+            word-wrap: break-word;
         }
 
         div#waybill_list div.waybill div.bill-left {
@@ -47,9 +50,28 @@
 <div id="waybill_list">
     {% range $index, $print_order := .print_order_list %}
     <div class="waybill">
-        <div class="bill-block bill-left">teaf</div>
-        <div class="bill-block bill-center">adfa</div>
-        <div class="bill-block bill-right">asfda</div>
+        <div class="bill-block bill-left">
+            {% $print_order.LogisticsCompanyName %}
+        </div>
+        <div class="bill-block bill-center">
+            <div>
+                Qty * SKU
+            </div>
+            <div>
+                {% range $index, $sku_qty_loc := $print_order.SkuQtyLocList%}
+                <div>{% $sku_qty_loc %}</div>
+                {% end %}
+            </div>
+        </div>
+        <div class="bill-block bill-right">
+            <div>{% $print_order.Order.Code %}</div>
+            <div></div>
+            <div>To:</div>
+            <div>{% $print_order.Address.Name %}</div>
+            <div>{% $print_order.Address.Street1 %}&nbsp;{% $print_order.Address.Street2 %}</div>
+            <div>{% $print_order.Address.CityName %},{% $print_order.Address.Province %},{% $print_order.Address.PostalCode %}</div>
+            <div>Tel: {% $print_order.Address.Phone %}</div>
+        </div>
     </div>
     {% end %}
 </div>
