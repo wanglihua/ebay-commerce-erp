@@ -488,50 +488,16 @@ func split_address(address string, letter_limit int) (address1 string, address2 
 
 func get_order_sku_for_export(order_id int64, db_session *xorm.Session) string {
 	/*
+
 	single product, single quantity
 
 	1. 对于 SS， 显示 SKU 数量 [仓位号]
 	2. 对于 SM， 显示 SKU DOG数量 [仓位号]
 	3. 对于 MM, 显示 MM
-	 */
-	type OrderSkuQuantity struct {
-		Sku            string `xorm:"'sku'" json:"sku"`
-		Quantity       int64  `xorm:"'quantity'" json:"quantity"`
-		StorageLocName string `xorm:"'storage_loc_name'" json:"storage_loc_name"`
-	}
 
-	/*
-SELECT
-    oi.item_sku AS sku,
-    oi.quantity AS quantity,
-    (SELECT sl.name
-     FROM erp_inventory nvt
-         INNER JOIN erp_storage_loc sl ON sl.id = nvt.storage_loc_id
-     WHERE nvt.product_id = oi.item_product_id
-           AND nvt.stock_id = (SELECT ol.stock_id FROM erp_order_logistics ol WHERE ol.order_id = oi.order_id ORDER BY ol.create_time DESC LIMIT 0, 1)
-     ORDER BY sl.update_time DESC
-     LIMIT 0, 1) AS storage_loc_name
-FROM erp_order_item oi
-WHERE oi.order_id = 58880;
 	 */
 
-	var order_sku_quantity_list = make([]OrderSkuQuantity, 0)
-	sql := `
-SELECT
-    oi.item_sku AS sku,
-    oi.quantity AS quantity,
-    (SELECT sl.name
-     FROM erp_inventory nvt
-         INNER JOIN erp_storage_loc sl ON sl.id = nvt.storage_loc_id
-     WHERE nvt.product_id = oi.item_product_id
-           AND nvt.stock_id = (SELECT ol.stock_id FROM erp_order_logistics ol WHERE ol.order_id = oi.order_id ORDER BY ol.create_time DESC LIMIT 0, 1)
-     ORDER BY sl.update_time DESC
-     LIMIT 0, 1) AS storage_loc_name
-FROM erp_order_item oi
-WHERE oi.order_id = %d;`
-	sql = fmt.Sprintf(sql, order_id)
-	err := db_session.Sql(sql).Find(&order_sku_quantity_list)
-	core.HandleError(err)
+	var order_sku_quantity_list = order_service.Get_order_sku_qty_loc_list(order_id, db_session)
 
 	var order_sku_quantity_list_len = len(order_sku_quantity_list)
 	if order_sku_quantity_list_len < 1 {
