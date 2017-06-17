@@ -23,7 +23,7 @@ func (c ErpOrderWaybillPrint) Preview() revel.Result {
 	var order_id_list = make([]int64, 0)
 	c.Params.Bind(&order_id_list, "order_id_list")
 
-	order_id_list = []int64{83196, 83103}
+	order_id_list = []int64{83196, 83103} // jusr for test
 
 	var print_order_list = make([]Print_order_t, 0)
 	for _, order_id := range order_id_list {
@@ -43,6 +43,8 @@ func (c ErpOrderWaybillPrint) Preview() revel.Result {
 		_, err = db_session.Id(order.CompanyId).Get(&logistics_company)
 		core.HandleError(err)
 		print_order.LogisticsCompanyName = logistics_company.Name
+
+		print_order_list = append(print_order_list, print_order)
 	}
 
 	c.RenderArgs["print_order_list"] = print_order_list

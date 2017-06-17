@@ -45,16 +45,13 @@
 </head>
 <body>
 <div id="waybill_list">
+    {% range $index, $print_order := .print_order_list %}
     <div class="waybill">
         <div class="bill-block bill-left">teaf</div>
         <div class="bill-block bill-center">adfa</div>
         <div class="bill-block bill-right">asfda</div>
     </div>
-    <div class="waybill">
-        <div class="bill-block bill-left">teaf</div>
-        <div class="bill-block bill-center">adfa</div>
-        <div class="bill-block bill-right">asfda</div>
-    </div>
+    {% end %}
 </div>
 </body>
 </html>
