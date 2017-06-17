@@ -19,6 +19,7 @@ POST /syncdb/post               Home.SyncDbPost
 GET  /test                      Test.Index
 
 GET  /captcha/image             Captcha.Image
+GET  /barcode/waybill           Barcode.Waybill
 
 GET  /login                     Login.Index
 POST /login                     Login.Login
