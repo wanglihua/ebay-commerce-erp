@@ -155,17 +155,16 @@
             var this_vm = this;
 
             $.ajax({
-                    url: '{%url "ErpOrderHold.PageData" %}',
-                    type: "POST",
-                    success: function (result) {
-                        if (result.success === false) {
-                            $.msg.error(result.message);
-                            return;
-                        }
-                        this_vm.page = result;
+                url: '{%url "ErpOrderHold.PageData" %}',
+                type: "POST",
+                success: function (result) {
+                    if (result.success === false) {
+                        $.msg.error(result.message);
+                        return;
                     }
+                    this_vm.page = result;
                 }
-            );
+            });
 
             initDataTable(
                 '#orderList',
@@ -593,7 +592,7 @@
                     }
                     else {
                         vm.refreshList();
-                        $.msg.show(data.message)
+                        $.msg.show(data.message);
                     }
                 }
             });

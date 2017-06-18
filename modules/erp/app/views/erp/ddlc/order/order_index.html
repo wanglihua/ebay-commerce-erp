@@ -197,18 +197,17 @@
             var this_vm = this;
             //请求页面数据
             $.ajax({
-                    url: '{%url "ErpOrder.PageData" %}',
-                    type: "POST",
-                    data: {"status_id": status_id},
-                    success: function (result) {
-                        if (result.success === false) {
-                            $.msg.error(result.message);
-                            return;
-                        }
-                        vm.page = result;
+                url: '{%url "ErpOrder.PageData" %}',
+                type: "POST",
+                data: {"status_id": status_id},
+                success: function (result) {
+                    if (result.success === false) {
+                        $.msg.error(result.message);
+                        return;
                     }
+                    vm.page = result;
                 }
-            );
+            });
 
             initDataTable(
                 '#orderList',

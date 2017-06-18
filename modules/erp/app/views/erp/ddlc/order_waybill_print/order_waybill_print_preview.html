@@ -9,20 +9,21 @@
         }
 
         div#waybill_list {
-
+            font-size: 0.3cm;
+            line-height: 0.3cm;
         }
 
         div#waybill_list div.waybill {
-
-        }
-
-        div#waybill_list div.waybill {
-            content: " ";
-            clear: both;
+            width: 10cm;
+            height: 5cm;
         }
 
         div#waybill_list div.waybill div.bill-block {
-            height: 5cm;
+            height: 4.86cm;
+            border-top: 0.02cm solid black;
+            border-bottom: 0.02cm solid black;
+            padding: 0.05cm;
+
             float: left;
             white-space: normal;
             word-break: break-all;
@@ -30,19 +31,19 @@
         }
 
         div#waybill_list div.waybill div.bill-left {
-            width: 1.5cm;
-
-            background-color: chartreuse;
+            width: 1.38cm;
+            border-left: 0.02cm solid black;
         }
 
         div#waybill_list div.waybill div.bill-center {
-            width: 2.5cm;
-            background-color: burlywood;
+            width: 2.38cm;
+            border-left: 0.02cm dashed black;
         }
 
         div#waybill_list div.waybill div.bill-right {
-            width: 6cm;
-            background-color: #ffffcc;
+            width: 5.82cm;
+            border-left: 0.02cm dashed black;
+            border-right: 0.02cm solid black;
         }
     </style>
 </head>
@@ -64,15 +65,18 @@
             </div>
         </div>
         <div class="bill-block bill-right">
-            <div>{% $print_order.Order.Code %}</div>
-            <div><img src='{% url "Barcode.Waybill"%}?code={%$print_order.Order.Code%}' style="height:30px; width:120px;"/></div>
-            <div>To:</div>
-            <div>{% $print_order.Address.Name %}</div>
-            <div>{% $print_order.Address.Street1 %}&nbsp;{% $print_order.Address.Street2 %}</div>
-            <div>{% $print_order.Address.CityName %},{% $print_order.Address.Province %},{% $print_order.Address.PostalCode %}</div>
-            <div>Tel: {% $print_order.Address.Phone %}</div>
+            <div style="width:100%;text-align: right;">{% $print_order.Order.Code %}&nbsp;</div>
+            <div style="width:100%;text-align: right;"><img src='{% url "Barcode.Waybill" %}?code={% $print_order.Order.Code %}' style="height:0.7cm; width:3.5cm;"/>&nbsp;</div>
+            <div style="margin-top: -0.3cm;">
+                <div>To:</div>
+                <div>{% $print_order.Address.Name %}</div>
+                <div>{% $print_order.Address.Street1 %}&nbsp;{% $print_order.Address.Street2 %}</div>
+                <div>{% $print_order.Address.CityName %},{% $print_order.Address.Province %},{% $print_order.Address.PostalCode %}</div>
+                <div>Tel: {% $print_order.Address.Phone %}</div>
+            </div>
         </div>
     </div>
+    <div style="clear: both;width:0;height: 0;"></div>
     {% end %}
 </div>
 </body>
