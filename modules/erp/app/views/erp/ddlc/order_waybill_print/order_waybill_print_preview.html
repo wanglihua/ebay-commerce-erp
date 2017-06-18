@@ -67,7 +67,7 @@
         <div class="bill-block bill-right">
             <div style="width:100%;text-align: right;">{% $print_order.Order.Code %}&nbsp;</div>
             <div style="width:100%;text-align: right;"><img src='{% url "Barcode.Waybill" %}?code={% $print_order.Order.Code %}' style="height:0.7cm; width:3.5cm;"/>&nbsp;</div>
-            <div style="margin-top: -0.3cm;">
+            <div style="margin-top: -0.3cm;font-weight:bold;">
                 <div>To:</div>
                 <div>{% $print_order.Address.Name %}</div>
                 <div>{% $print_order.Address.Street1 %}&nbsp;{% $print_order.Address.Street2 %}</div>
