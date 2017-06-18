@@ -1,3 +1,4 @@
 <script type='text/javascript'>
     var status = "{% .status %}";
+    var status_id = {% .status_id %};
 </script>

@@ -199,6 +199,7 @@
             $.ajax({
                     url: '{%url "ErpOrder.PageData" %}',
                     type: "POST",
+                    data: {"status_id": status_id},
                     success: function (result) {
                         if (result.success === false) {
                             $.msg.error(result.message);

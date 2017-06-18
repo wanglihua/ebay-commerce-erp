@@ -49,7 +49,7 @@ func (c ErpOrderLogistics) PageData() revel.Result {
 	core.HandleError(err)
 
 	// 获得导入的批次列表
-	var batch_code_list = order_import_batch_service.Get_order_import_batch_code_list(db_session)
+	var batch_code_list = order_import_batch_service.Get_order_import_batch_code_list(models.ORDER_STATUS_PHZ, db_session)
 
 	return c.RenderJson(map[string]interface{}{
 		"stock_id":               0,

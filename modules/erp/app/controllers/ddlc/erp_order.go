@@ -112,6 +112,7 @@ func (c ErpOrder) Index(status string) revel.Result {
 
 	c.RenderArgs["active_menu_html"] = template.HTML(active_menu_html)
 	c.RenderArgs["status"] = status
+	c.RenderArgs["status_id"] = status_id
 	c.RenderArgs["status_chinese_name"] = status_chinese_name
 	c.RenderArgs["can_view_special_hold"] = can_view_special_hold_ // 这个后来在页面中没有使用，只是这里暂时没有去掉。更改来之，任何权限的人都可以看到 pick hold
 	c.RenderArgs["icon_path"] = setting.ICON_PATH
@@ -154,10 +155,13 @@ func (c ErpOrder) get_order_query_criteria_list() []order_query_criteria {
 func (c ErpOrder) PageData() revel.Result {
 	//这个的权限就不用控制了
 
+	var status_id int64
+	c.Params.Bind(&status_id, "status_id")
+
 	db_session := c.DbSession
 
 	// 获得导入的批次列表
-	var batch_code_list = order_import_batch_service.Get_order_import_batch_code_list(db_session)
+	var batch_code_list = order_import_batch_service.Get_order_import_batch_code_list(status_id, db_session)
 
 	shop_list := shop_service.Get_shop_select_item_list(db_session)
 
