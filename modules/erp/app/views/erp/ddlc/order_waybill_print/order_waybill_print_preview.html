@@ -52,22 +52,33 @@
     {% range $index, $print_order := .print_order_list %}
     <div class="waybill">
         <div class="bill-block bill-left">
-            {% $print_order.LogisticsCompanyName %}
+            <div style="font-weight: bold;">
+                <div style="margin-top:5px; margin-bottom: 3px;">{% $print_order.Order.FullTranId %}</div>
+                <div>{% $print_order.LogisticsCompanyName %}</div>
+            </div>
         </div>
         <div class="bill-block bill-center">
-            <div>
-                Qty * SKU
+            <div style="height: 3.4cm;">
+                <div style="margin-bottom: 5px;">
+                    Qty * SKU
+                </div>
+                <div>
+                    {% range $index, $sku_qty_loc := $print_order.SkuQtyLocList%}
+                    <div>{% $sku_qty_loc %}</div>
+                    {% end %}
+                </div>
             </div>
-            <div>
-                {% range $index, $sku_qty_loc := $print_order.SkuQtyLocList%}
-                <div>{% $sku_qty_loc %}</div>
-                {% end %}
+            <div style="height: 1.46cm;">
+                <div style="font-size: 0.3cm;font-weight: bold;">Total:</div>
+                <div style="font-size: 0.3cm;font-weight: bold;text-align: center;line-height: 1cm;">
+                    <span style="font-size:0.5cm;">{% $print_order.PcsCount %}</span>&nbsp;<span>pcs</span>
+                </div>
             </div>
         </div>
         <div class="bill-block bill-right">
             <div style="width:100%;text-align: right;">{% $print_order.Order.Code %}&nbsp;</div>
             <div style="width:100%;text-align: right;"><img src='{% url "Barcode.Waybill" %}?code={% $print_order.Order.Code %}' style="height:0.7cm; width:3.5cm;"/>&nbsp;</div>
-            <div style="margin-top: -0.3cm;font-weight:bold;">
+            <div style="margin-top: -0.2cm;font-weight:bold;">
                 <div>To:</div>
                 <div>{% $print_order.Address.Name %}</div>
                 <div>{% $print_order.Address.Street1 %}&nbsp;{% $print_order.Address.Street2 %}</div>

@@ -75,7 +75,7 @@ func Get_login_user_stock_list(db_session *xorm.Session, web_session revel.Sessi
 	return stock_list
 }
 
-//获取墨尔本仓库的 stock id，这个函数后来没采用，用了这个 。stock_pick_crew_service.Is_pick_crew_has_mel_stock
+//获取墨尔本仓库的 stock id，
 func Get_mel_stock_id(db_session *xorm.Session) int64 {
 
 	var stock_id struct {
@@ -87,6 +87,24 @@ func Get_mel_stock_id(db_session *xorm.Session) int64 {
 	 */
 
 	var sql = `SELECT s.id AS stock_id FROM erp_stock s WHERE s.short_name = 'MEL' AND s.name LIKE '%墨尔本%'`
+	_, err := db_session.Sql(sql).Get(&stock_id)
+	core.HandleError(err)
+
+	return stock_id.StockId
+}
+
+//获取 布里斯班仓库的 stock_id
+func Get_bne_stock_id(db_session *xorm.Session) int64 {
+
+	var stock_id struct {
+		StockId int64 `xorm:"'stock_id'"`
+	}
+
+	/*
+	SELECT s.id AS stock_id FROM erp_stock s WHERE s.short_name = 'BNE' AND s.name LIKE '%布里斯班%';
+	 */
+
+	var sql = `SELECT s.id AS stock_id FROM erp_stock s WHERE s.short_name = 'BNE' AND s.name LIKE '%布里斯班%'`
 	_, err := db_session.Sql(sql).Get(&stock_id)
 	core.HandleError(err)
 

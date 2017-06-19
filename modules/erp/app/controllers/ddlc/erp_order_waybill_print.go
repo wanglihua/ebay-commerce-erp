@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"matrix/modules/erp/service/order_service"
 	"matrix/core"
+	"matrix/modules/erp/service/stock_service"
 )
 
 type ErpOrderWaybillPrint struct {
@@ -24,6 +25,9 @@ func (c ErpOrderWaybillPrint) Preview() revel.Result {
 	c.Params.Bind(&order_id_list, "order_id_list")
 
 	order_id_list = []int64{83196, 83103} // jusr for test
+
+	var mel_stock_id = stock_service.Get_mel_stock_id(db_session)
+	var bne_stock_id = stock_service.Get_bne_stock_id(db_session)
 
 	var print_order_list = make([]Print_order_t, 0)
 	for _, order_id := range order_id_list {
@@ -45,6 +49,17 @@ func (c ErpOrderWaybillPrint) Preview() revel.Result {
 		print_order.LogisticsCompanyName = logistics_company.Name
 
 		print_order.SkuQtyLocList = get_order_sku_qty_loc_list_for_print(order_id, db_session)
+		print_order.PcsCount = len(print_order.SkuQtyLocList)
+
+		if order.StockId == mel_stock_id {
+			print_order.StockAddressLine1 = "2 Venture Court"
+			print_order.StockAddressLine2 = "DANDENONG SOUTH, VIC 3175"
+		}
+
+		if order.StockId == bne_stock_id {
+			print_order.StockAddressLine1 = "Basement 2/30 Gow Street"
+			print_order.StockAddressLine2 = "MOOROOKA, QLD 4105"
+		}
 
 		print_order_list = append(print_order_list, print_order)
 	}
@@ -59,6 +74,9 @@ type Print_order_t struct {
 	//OrderLogistics       models.OrderLogisticsInfo
 	LogisticsCompanyName string
 	SkuQtyLocList        []string
+	PcsCount             int
+	StockAddressLine1    string
+	StockAddressLine2    string
 }
 
 func get_order_sku_qty_loc_list_for_print(order_id int64, db_session *xorm.Session) []string {
