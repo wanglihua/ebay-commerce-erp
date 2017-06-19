@@ -372,6 +372,7 @@ POST /order/logistics/import/actual/fee       ErpOrderLogisticsImport.ImportActu
 
 GET  /order/waybill/print/preview             ErpOrderWaybillPrint.Preview
 POST /order/waybill/print/preview             ErpOrderWaybillPrint.Preview
+GET  /order/waybill/print                     ErpOrderWaybillPrint.Print
 POST /order/waybill/print                     ErpOrderWaybillPrint.Print
 
 GET  /ecommerce/platform                   ErpECommercePlatform.Index

@@ -113,6 +113,14 @@ func userAuth(c *revel.Controller) revel.Result {
 		return nil
 	}
 
+	if c.Name == "ErpOrderWaybillPrint" {
+		return nil
+	}
+
+	if c.Name == "Barcode" {
+		return nil
+	}
+
 	if c.Action == "TrackIssue.Index" ||
 		c.Action == "TrackIssue.PageData" ||
 		c.Action == "TrackIssue.ListData" ||

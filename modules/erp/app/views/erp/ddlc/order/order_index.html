@@ -746,6 +746,8 @@
                     success: function (data) {
                         if (data.success !== false) {
 
+                            print_print_preview.html(data);
+
                             LODOP = getLodop();
                             LODOP.SET_LICENSES("浙江雅莹服装有限公司", "853717765858688748719056235623", "", "");
                             LODOP.PRINT_INIT("订单标签");
@@ -753,9 +755,16 @@
                             LODOP.SET_PRINT_STYLE("FontSize", 18);
                             LODOP.SET_PRINT_STYLE("Bold", 1);
 
-                            LODOP.NewPage();
-                            LODOP.ADD_PRINT_HTM(0, 0, "RightMargin:0", "BottomMargin:0", data);
+                            var waybill_list = [];
+                            $('#order_print_preview div.waybillWrapper').each(function () {
+                                waybill_list.push($(this));
+                            });
 
+                            for (var i = 0; i < waybill_list.length; i++) {
+                                LODOP.NewPage();
+                                LODOP.ADD_PRINT_HTM(0, 0, "RightMargin:10", "BottomMargin:0", $(waybill_list[i]).html());
+                                //LODOP.ADD_PRINT_IMAGE (10,10,300,160,"<img src='http://l/barcode/waybill?code=123456789' style='height:0.7cm; width:3.5cm;'/>");
+                            }
 
                             LODOP.PREVIEW();
                             //LODOP.PRINT();
