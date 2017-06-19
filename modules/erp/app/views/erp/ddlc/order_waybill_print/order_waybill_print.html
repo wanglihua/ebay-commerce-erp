@@ -1,0 +1,91 @@
+<style type="text/css">
+    body {
+        margin: 0;
+    }
+
+    div#waybill_list {
+        font-size: 0.3cm;
+        line-height: 0.4cm;
+    }
+
+    div#waybill_list div.waybill {
+        width: 10cm;
+        height: 5cm;
+    }
+
+    div#waybill_list div.waybill div.bill-block {
+        height: 4.86cm;
+        border-top: 0.02cm solid black;
+        border-bottom: 0.02cm solid black;
+        padding: 0.05cm;
+
+        float: left;
+        white-space: normal;
+        word-break: break-all;
+        word-wrap: break-word;
+    }
+
+    div#waybill_list div.waybill div.bill-left {
+        width: 1.38cm;
+        border-left: 0.02cm solid black;
+    }
+
+    div#waybill_list div.waybill div.bill-center {
+        width: 2.38cm;
+        border-left: 0.02cm dashed black;
+    }
+
+    div#waybill_list div.waybill div.bill-right {
+        width: 5.82cm;
+        border-left: 0.02cm dashed black;
+        border-right: 0.02cm solid black;
+    }
+</style>
+
+<div id="waybill_list">
+    {% range $index, $print_order := .print_order_list %}
+    <div class="waybill">
+        <div class="bill-block bill-left">
+            <div style="font-weight: bold;">
+                <div style="margin-top:5px; margin-bottom: 3px;">{% $print_order.Order.FullTranId %}</div>
+                <div>{% $print_order.LogisticsCompanyName %}</div>
+            </div>
+        </div>
+        <div class="bill-block bill-center">
+            <div style="height: 3cm;">
+                <div style="margin-bottom: 5px;">
+                    Qty * SKU
+                </div>
+                <div>
+                    {% range $index, $sku_qty_loc := $print_order.SkuQtyLocList%}
+                    <div>{% $sku_qty_loc %}</div>
+                    {% end %}
+                </div>
+            </div>
+            <div>
+                <div style="font-size: 0.3cm;font-weight: bold;">Total:</div>
+                <div style="font-size: 0.3cm;font-weight: bold;text-align: center;line-height: 1cm;">
+                    <span style="font-size:0.5cm;">{% $print_order.PcsCount %}</span>&nbsp;<span>pcs</span>
+                </div>
+            </div>
+        </div>
+        <div class="bill-block bill-right">
+            <div style="width:100%;text-align: right;">{% $print_order.Order.Code %}&nbsp;</div>
+            <div style="width:100%;text-align: right;"><img src='{% url "Barcode.Waybill" %}?code={% $print_order.Order.Code %}' style="height:0.7cm; width:3.5cm;"/>&nbsp;</div>
+            <div style="margin-top: -0.2cm;font-weight:bold;height: 2.5cm;">
+                <div>To:</div>
+                <div>{% $print_order.Address.Name %}</div>
+                <div>{% $print_order.Address.Street1 %}&nbsp;{% $print_order.Address.Street2 %}</div>
+                <div>{% $print_order.Address.CityName %},{% $print_order.Address.Province %},{% $print_order.Address.PostalCode %}</div>
+                <div>Tel: {% $print_order.Address.Phone %}</div>
+            </div>
+
+            <div>
+                <div>From: {% $print_order.StockAddressLine1 %}</div>
+                <div> {% $print_order.StockAddressLine2 %}</div>
+            </div>
+        </div>
+        <div style="clear: both;width:0;height: 0;"></div>
+    </div>
+    {% end %}
+</div>
