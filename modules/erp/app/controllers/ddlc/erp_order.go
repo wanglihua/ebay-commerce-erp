@@ -172,7 +172,7 @@ func (c ErpOrder) get_good_query_list() []good_query {
 
 	good_query_list = append(good_query_list, good_query{Id: good_query_ss, Name: "单商品单数量"})
 	good_query_list = append(good_query_list, good_query{Id: good_query_sm, Name: "单商品多数量"})
-	good_query_list = append(good_query_list, good_query{Id: good_query_mm, Name: "多商品多数量"})
+	good_query_list = append(good_query_list, good_query{Id: good_query_mm, Name: "多商品"})
 
 	return good_query_list
 }
@@ -221,6 +221,8 @@ func (c ErpOrder) PageData() revel.Result {
 		"status_list":         status_list,
 		"query_criteria_id":   0,
 		"query_criteria_list": c.get_order_query_criteria_list(),
+		"good_query_id":       0,
+		"good_query_list":     c.get_good_query_list(),
 		"hold_type_list":      special_hold_type_list,
 		"hold_type_id":        -1, // 表示不选择 hold
 		"batch_code":          0,
@@ -242,6 +244,9 @@ func (c ErpOrder) ListData() revel.Result {
 	c.Params.Bind(&query_criteria_id, "query_criteria_id")
 	var query_criteria_value string = ""
 	c.Params.Bind(&query_criteria_value, "query_criteria_value")
+
+	var good_query_id int64 = 0
+	c.Params.Bind(&good_query_id, "good_query_id")
 
 	var order_type_id int64 = 0
 	c.Params.Bind(&order_type_id, "order_type_id")
@@ -394,6 +399,82 @@ func (c ErpOrder) ListData() revel.Result {
 
 	if batch_code != 0 {
 		filter = core.SqlAnd(filter, fmt.Sprintf("o.batch_code = %d", batch_code))
+	}
+
+	if good_query_id != 0 {
+		if good_query_id == good_query_ss {
+			/*
+# 单产品单数量
+SELECT * FROM erp_order o WHERE o.id IN (
+    SELECT oi.order_id AS order_id
+    FROM erp_order_item oi
+        INNER JOIN erp_order o ON oi.order_id = o.id AND 1 = 1 # order filter
+    WHERE oi.quantity = 1
+    GROUP BY oi.order_id
+    HAVING count(oi.id) = 1
+);
+			 */
+
+			var good_query = `
+o.id IN (
+    SELECT oi.order_id AS order_id
+    FROM erp_order_item oi
+        INNER JOIN erp_order o ON oi.order_id = o.id AND %s
+    WHERE oi.quantity = 1
+    GROUP BY oi.order_id
+    HAVING count(oi.id) = 1
+)
+`
+			filter = fmt.Sprintf(good_query, filter)
+
+		} else if good_query_id == good_query_sm {
+			/*
+# 单产品多数量
+SELECT * FROM erp_order o WHERE o.id IN (
+    SELECT oi.order_id AS order_id
+    FROM erp_order_item oi
+        INNER JOIN erp_order o ON oi.order_id = o.id AND 1 = 1 # order filter
+    WHERE oi.quantity > 1
+    GROUP BY oi.order_id
+    HAVING count(oi.id) = 1
+);
+			 */
+
+			var good_query = `
+o.id IN (
+    SELECT oi.order_id AS order_id
+    FROM erp_order_item oi
+        INNER JOIN erp_order o ON oi.order_id = o.id AND %s
+    WHERE oi.quantity > 1
+    GROUP BY oi.order_id
+    HAVING count(oi.id) = 1
+)
+`
+			filter = fmt.Sprintf(good_query, filter)
+
+		} else if good_query_id == good_query_mm {
+			/*
+# 多产品
+SELECT * FROM erp_order o WHERE o.id IN (
+    SELECT oi.order_id AS order_id
+    FROM erp_order_item oi
+        INNER JOIN erp_order o ON oi.order_id = o.id AND 1 = 1 # order filter
+    GROUP BY oi.order_id
+    HAVING count(oi.id) > 1
+);
+			 */
+
+			var good_query = `
+o.id IN (
+    SELECT oi.order_id AS order_id
+    FROM erp_order_item oi
+        INNER JOIN erp_order o ON oi.order_id = o.id AND %s
+    GROUP BY oi.order_id
+    HAVING count(oi.id) > 1
+)
+`
+			filter = fmt.Sprintf(good_query, filter)
+		}
 	}
 
 	order_list, count := order_service.Get_order_data_list(db_session, filter, order, offset, limit)

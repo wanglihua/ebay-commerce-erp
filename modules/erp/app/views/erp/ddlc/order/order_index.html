@@ -113,13 +113,13 @@
                                         <option :value="criteria.id">{{criteria.name}}</option>
                                     </template>
                                 </select>
+                                <input id="query_criteria_value" name="query_criteria_value" v-model="page.query_criteria_value" style="width: 120px;height:30px;"/>
                                 <select id="good_query_id" name="page.query_criteria_id" v-model.number="page.good_query_id" style="width:120px;">
                                     <option value="0">-优化查询-</option>
                                     <template v-for="query in page.good_query_list">
                                         <option :value="query.id">{{query.name}}</option>
                                     </template>
                                 </select>
-                                <input id="query_criteria_value" name="query_criteria_value" v-model="page.query_criteria_value" style="width: 120px;height:30px;"/>
                                 <button class="btn btn-mini btn-primary" style="margin-bottom:3px;height: 30px;" @click="search()">
                                     &nbsp;<i class="ace-icon fa fa-search"></i>查&nbsp;询&nbsp;
                                 </button>
@@ -196,6 +196,8 @@
                 "query_criteria_id": 0,
                 "query_criteria_list": [],
                 "query_criteria_value": "",
+                "good_query_id": 0,
+                "good_query_list": [],
                 "hold_type_list": [],
                 "hold_type_id": -1
             },
@@ -426,6 +428,7 @@
                         aoData.push({'name': 'status_id', 'value': this_vm.page.status_id});
                         aoData.push({'name': 'query_criteria_id', 'value': this_vm.page.query_criteria_id});
                         aoData.push({'name': 'query_criteria_value', 'value': this_vm.page.query_criteria_value});
+                        aoData.push({'name': 'good_query_id', 'value': this_vm.page.good_query_id});
                         aoData.push({'name': 'hold_type_id', 'value': this_vm.page.hold_type_id});
 
                         $.ajax({
