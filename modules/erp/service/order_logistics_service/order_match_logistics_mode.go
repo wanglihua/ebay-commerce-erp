@@ -18,7 +18,7 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_or
 }
 */
 
-func (p_ol *OrderLogistics) match_logistics_mode_with_option(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, match_option Match_option_t, db_session *xorm.Session) (success_return bool, order_logistics_return models.OrderLogisticsInfo) {
+func (p_ol *OrderLogistics) match_logistics_mode_with_option(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, match_option Match_option_t, db_session *xorm.Session) (success_return bool, order_logistics_return models.OrderLogisticsInfo, is_envelope_hold_return bool) {
 
 	// 在这里面只考虑最佳仓库的库存情况，次佳仓库有货的情况，别的地方已经考虑并 hold
 
@@ -61,6 +61,7 @@ func (p_ol *OrderLogistics) match_logistics_mode_with_option(p_order *models.Ord
 
 	// 匹配的结果中，有库存记录的那些记录列表
 	var match_result_has_stock_list = make([]match_logistics_mode_result, 0)
+	var is_envelope_hold = false
 	for _, logistics_mode := range logistics_mode_list {
 		// 如果指定了仓库，并且和指定的仓库不同，就忽略
 		if match_option.Prefer_stock_id != 0 && match_option.Prefer_stock_id != logistics_mode.StockId {
@@ -70,6 +71,14 @@ func (p_ol *OrderLogistics) match_logistics_mode_with_option(p_order *models.Ord
 		// 如果指定了物流方式，并且和指定的物流方式不同，就忽略
 		if match_option.Prefer_mode_id != 0 && match_option.Prefer_mode_id != logistics_mode.Id {
 			continue
+		}
+
+		// 如果指定了 物流方式，并且指定的物流方式是 信封， 就设置为信封Hold，并且匹配信封费率
+		if match_option.Prefer_mode_id != 0 && match_option.Prefer_mode_id == logistics_mode.Id && logistics_mode.TypeId == models.LOGISTICS_MODE_TYPE_ENVELOPE {
+			p_ol.update_order_to_hold_type(p_order, models.ORDER_HOLD_TYPE_ENVELOPE, db_session)
+			p_ol.match_envelope_fee_rate(p_order, p_order_logistics_data, db_session)
+			is_envelope_hold = true
+			break
 		}
 
 		// 如果是解锁快递，并且当前的物流方式是快递的，就排除掉
@@ -526,12 +535,17 @@ func (p_ol *OrderLogistics) match_logistics_mode_with_option(p_order *models.Ord
 		}
 	} // for _, logistics_mode := range logistics_mode_list {
 
-	if final_result.mode_id == 0 || final_result.fee_rate_id == 0 { // 匹配失败
-		var order_logistics models.OrderLogisticsInfo
-		return false, order_logistics
+	var order_logistics models.OrderLogisticsInfo
+
+	if is_envelope_hold == true {
+		return false, order_logistics, true
 	}
 
-	var order_logistics = save_order_logistics(p_order, final_result, match_option.Unlock_express, db_session)
+	if final_result.mode_id == 0 || final_result.fee_rate_id == 0 { // 匹配失败
+		return false, order_logistics, false
+	}
+
+	order_logistics = save_order_logistics(p_order, final_result, match_option.Unlock_express, db_session)
 
 	if final_result.has_stock == false {
 		if len(match_result_has_stock_list) != 0 {
@@ -545,7 +559,7 @@ func (p_ol *OrderLogistics) match_logistics_mode_with_option(p_order *models.Ord
 		}
 	}
 
-	return true, order_logistics
+	return true, order_logistics, false
 
 	// 多个商品时，考虑拆包的方式
 

@@ -281,7 +281,12 @@ func (p_ol *OrderLogistics) CalculateListWithOption(order_list []models.OrderInf
 			continue
 		}
 
-		match_success, order_logistics := p_ol.match_logistics_mode_with_option(&order, p_order_logistics_data, match_option, db_session)
+		match_success, order_logistics, is_envelope_hold := p_ol.match_logistics_mode_with_option(&order, p_order_logistics_data, match_option, db_session)
+
+		// 如果通过指定的物流的方式在匹配时进行了信封 Hold，就跳过
+		if is_envelope_hold == true {
+			continue
+		}
 
 		// 11 无匹配的物流方式（长宽高重量没有物流满足）
 		if p_ol.hold_check_no_match_logistics_mode(&order, match_success, db_session) {

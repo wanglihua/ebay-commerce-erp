@@ -602,12 +602,16 @@ WHERE oi.order_id = %d;`
 	core.HandleError(err)
 
 	var logistics_mode models.LogisticsModeInfo
-	_, err = db_session.Id(order_logistics.ModeId).Get(&logistics_mode)
-	core.HandleError(err)
+	if order.StatusId != models.ORDER_STATUS_HOLD { //如果是Hold状态就不显示匹配的物流，因为这些信息可以是前一次匹配时遗留的，后来指定了 Hold
+		_, err = db_session.Id(order_logistics.ModeId).Get(&logistics_mode)
+		core.HandleError(err)
+	}
 
 	var logistics_stock models.StockInfo
-	_, err = db_session.Id(order_logistics.StockId).Get(&logistics_stock)
-	core.HandleError(err)
+	if order.StatusId != models.ORDER_STATUS_HOLD { //如果是Hold状态就不显示匹配的物流，因为这些信息可以是前一次匹配时遗留的，后来指定了 Hold
+		_, err = db_session.Id(order_logistics.StockId).Get(&logistics_stock)
+		core.HandleError(err)
+	}
 
 	var logistics_setting models.LogisticsSettingInfo
 	_, err = db_session.Limit(1, 0).Get(&logistics_setting)
