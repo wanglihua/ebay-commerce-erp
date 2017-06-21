@@ -263,9 +263,12 @@ func (p_ol *OrderLogistics) CalculateListWithOption(order_list []models.OrderInf
 			continue
 		}
 
-		// 14 判断是否是信件 放在匹配物流之前
-		if p_ol.hold_check_envelope(&order, p_order_logistics_data, db_session) {
-			continue
+		// 如果不指定匹配的物流方式，就进行信封的 Hold；如果指定了，就不进行信封的 Hold
+		if match_option.Prefer_mode_id != 0 {
+			// 14 判断是否是信件 放在匹配物流之前
+			if p_ol.hold_check_envelope(&order, p_order_logistics_data, db_session) {
+				continue
+			}
 		}
 
 		// 16 判断是否是国际件，如果不是澳洲的就是国际件，一般就是新西兰的， 放在匹配物流之前
