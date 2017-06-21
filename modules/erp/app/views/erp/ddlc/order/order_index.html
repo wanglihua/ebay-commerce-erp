@@ -113,6 +113,12 @@
                                         <option :value="criteria.id">{{criteria.name}}</option>
                                     </template>
                                 </select>
+                                <select id="good_query_id" name="page.query_criteria_id" v-model.number="page.good_query_id" style="width:120px;">
+                                    <option value="0">-优化查询-</option>
+                                    <template v-for="query in page.good_query_list">
+                                        <option :value="query.id">{{query.name}}</option>
+                                    </template>
+                                </select>
                                 <input id="query_criteria_value" name="query_criteria_value" v-model="page.query_criteria_value" style="width: 120px;height:30px;"/>
                                 <button class="btn btn-mini btn-primary" style="margin-bottom:3px;height: 30px;" @click="search()">
                                     &nbsp;<i class="ace-icon fa fa-search"></i>查&nbsp;询&nbsp;

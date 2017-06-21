@@ -26,35 +26,35 @@ function dtFormatFloat1(data) {
     if ((!data) && (data !== 0)) {
         return "";
     }
-    return $.formatNumber(data, {format: "#,##0.0", locale: "cn"});
+    return $.formatNumber(data, {format: "###0.0", locale: "cn"});
 }
 
 function dtFormatFloat(data) {
     if ((!data) && (data !== 0)) {
         return "";
     }
-    return $.formatNumber(data, {format: "#,##0.00", locale: "cn"});
+    return $.formatNumber(data, {format: "###0.00", locale: "cn"});
 }
 
 function dtFormatFloat3(data) {
     if ((!data) && (data !== 0)) {
         return "";
     }
-    return $.formatNumber(data, {format: "#,##0.000", locale: "cn"});
+    return $.formatNumber(data, {format: "###0.000", locale: "cn"});
 }
 
 function dtFormatFloat4(data) {
     if ((!data) && (data !== 0)) {
         return "";
     }
-    return $.formatNumber(data, {format: "#,##0.0000", locale: "cn"});
+    return $.formatNumber(data, {format: "###0.0000", locale: "cn"});
 }
 
 function dtFormatInt(data) {
     if ((!data) && (data !== 0)) {
         return "";
     }
-    return $.formatNumber(data, {format: "#,##0", locale: "cn"});
+    return $.formatNumber(data, {format: "###0", locale: "cn"});
 }
 
 $.messager.model = {

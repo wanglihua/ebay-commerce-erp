@@ -121,6 +121,7 @@ func (c ErpOrder) Index(status string) revel.Result {
 	return c.RenderTemplate("erp/ddlc/order/order_index.html")
 }
 
+// 查询条件定义 开始
 const (
 	order_query_criteria_order_code          int64 = 1000
 	order_query_criteria_order_number        int64 = 1100
@@ -150,6 +151,33 @@ func (c ErpOrder) get_order_query_criteria_list() []order_query_criteria {
 
 	return order_query_criteria_list
 }
+
+// 查询条件定义  结束
+
+// 优化查询定义 开始
+const (
+	good_query_ss int64 = 1000 // 单商品单数量
+	good_query_sm int64 = 2000 // 单商品多数量
+	good_query_mm int64 = 3000 // 多商品多数量
+)
+
+type good_query struct {
+	Id   int64  `json:"id"`
+	Name string `json:"name"`
+}
+
+// 查询条件的列表
+func (c ErpOrder) get_good_query_list() []good_query {
+	var good_query_list = make([]good_query, 0)
+
+	good_query_list = append(good_query_list, good_query{Id: good_query_ss, Name: "单商品单数量"})
+	good_query_list = append(good_query_list, good_query{Id: good_query_sm, Name: "单商品多数量"})
+	good_query_list = append(good_query_list, good_query{Id: good_query_mm, Name: "多商品多数量"})
+
+	return good_query_list
+}
+
+// 优化查询定义  结束
 
 // index page data
 func (c ErpOrder) PageData() revel.Result {
