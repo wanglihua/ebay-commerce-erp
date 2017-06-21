@@ -245,6 +245,15 @@ func (p_ol *OrderLogistics) hold_check_great_deficit(p_order *models.OrderInfo, 
 
 // 14 信封类。长宽高在35cm X 25cm X 2cm, 重量在0.5Kg以内的订单为信封。若是多数量或者多产品，以前我们设计的思路是，最大产品的长边为最长边，最大产品的中边为中边，所有产品的最小边之和为最小边，判断是否在35cm X 25cm X 2cm以内，重量之和是否在0.5Kg以内
 func (p_ol *OrderLogistics) hold_check_envelope(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, db_session *xorm.Session) (is_hold_return bool) {
+	if p_ol.match_envelope_fee_rate(p_order, p_order_logistics_data, db_session) {
+		p_ol.update_order_to_hold_type(p_order, models.ORDER_HOLD_TYPE_ENVELOPE, db_session)
+		return true
+	}
+	return false
+}
+
+// 匹配信封物流
+func (p_ol *OrderLogistics) match_envelope_fee_rate(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, db_session *xorm.Session) (is_hold_return bool) {
 	// 这里假定信封的长宽高限制： 长 > 宽 > 高，不能这么假定
 
 	revel.TRACE.Println("hold_check_envelope begin")
@@ -274,7 +283,6 @@ func (p_ol *OrderLogistics) hold_check_envelope(p_order *models.OrderInfo, p_ord
 	revel.TRACE.Println("envelope_max_length, envelope_max_width, envelope_max_height, envelope_max_weight", envelope_max_length, envelope_max_width, envelope_max_height, envelope_max_weight)
 
 	if whole_length <= envelope_max_length && whole_width <= envelope_max_width && whole_height <= envelope_max_height && whole_weight <= envelope_max_weight {
-		p_ol.update_order_to_hold_type(p_order, models.ORDER_HOLD_TYPE_ENVELOPE, db_session)
 		// 匹配具体信封费率
 		var final_fee_rate_id int64 = 0
 		var final_fee float64 = math.MaxFloat64

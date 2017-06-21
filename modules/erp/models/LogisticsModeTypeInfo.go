@@ -6,8 +6,9 @@ import (
 )
 
 const (
-	LOGISTICS_MODE_TYPE_PACKAGE = 100 // 包裹
-	LOGISTICS_MODE_TYPE_EXPRESS = 200 // 快递
+	LOGISTICS_MODE_TYPE_PACKAGE  = 100 // 包裹
+	LOGISTICS_MODE_TYPE_EXPRESS  = 200 // 快递
+	LOGISTICS_MODE_TYPE_ENVELOPE = 300 // 信封
 )
 
 type LogisticsModeTypeInfo struct {
@@ -38,5 +39,11 @@ func (e LogisticsModeTypeInfo) InitData(db_session *xorm.Session) {
 	logistics_mode_type.Id = LOGISTICS_MODE_TYPE_EXPRESS
 	logistics_mode_type.Name = "快递"
 	logistics_mode_type.Description = "快递"
+	db_session.Insert(logistics_mode_type)
+
+	logistics_mode_type = new(LogisticsModeTypeInfo)
+	logistics_mode_type.Id = LOGISTICS_MODE_TYPE_ENVELOPE
+	logistics_mode_type.Name = "信封"
+	logistics_mode_type.Description = "信封"
 	db_session.Insert(logistics_mode_type)
 }
