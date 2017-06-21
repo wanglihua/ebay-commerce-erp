@@ -59,6 +59,7 @@ func (p_ol *OrderLogistics) match_logistics_mode_with_option(p_order *models.Ord
 		core.HandleError(err)
 	}
 
+	// 匹配的结果中，有库存记录的那些记录列表
 	var match_result_has_stock_list = make([]match_logistics_mode_result, 0)
 	for _, logistics_mode := range logistics_mode_list {
 		// 如果指定了仓库，并且和指定的仓库不同，就忽略
@@ -132,7 +133,7 @@ func (p_ol *OrderLogistics) match_logistics_mode_with_option(p_order *models.Ord
 			continue
 
 			*/
-		} else { // 如果库存都有的，就记录下商品成本总价
+		} else {
 			mt.Println("物流方式对应的仓库存在订单对应的库存，澳仓成本价为", stock_has_product_and_cost_amount.cost_amount)
 		}
 
