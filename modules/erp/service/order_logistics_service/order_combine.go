@@ -10,6 +10,7 @@ import (
 	"matrix/modules/erp/models"
 )
 
+// todo: 这里有问题的
 // 合并订单
 // order_filter: o.batch_code = '20170428120352'
 func Combine_orders(order_filter string, db_session *xorm.Session) error {
