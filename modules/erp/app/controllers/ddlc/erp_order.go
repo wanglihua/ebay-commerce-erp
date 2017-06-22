@@ -766,6 +766,8 @@ func (c ErpOrder) MatchLogistics() revel.Result {
 	})
 }
 
+// 订单从 Hold 状态 搬至 待配货 状态
+// 但 信封、快递、国际件、pick up 四个 Hold 类型除外
 func (c ErpOrder) DaiPeiHuo() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_HOLD, c.Session)
 
@@ -779,10 +781,15 @@ func (c ErpOrder) DaiPeiHuo() revel.Result {
 	core.HandleError(err)
 
 	for _, order := range order_list {
-		if order.StatusId != models.ORDER_STATUS_HOLD {
+		if order.StatusId != models.ORDER_STATUS_HOLD ||
+			( order.StatusId == models.ORDER_STATUS_HOLD &&
+				(order.HoldTypeId.Int64 == models.ORDER_HOLD_TYPE_ENVELOPE ||
+					order.HoldTypeId.Int64 == models.ORDER_HOLD_TYPE_EXPRESS ||
+					order.HoldTypeId.Int64 == models.ORDER_HOLD_TYPE_INTERNATIONAL ||
+					order.HoldTypeId.Int64 == models.ORDER_HOLD_TYPE_PICK_UP)) {
 			return c.RenderJson(map[string]interface{}{
 				"success": false,
-				"message": "订单当前状态不能搬至待配货！",
+				"message": "订单当前状态或Hold类型不能搬至待配货状态！",
 			})
 		}
 	}
