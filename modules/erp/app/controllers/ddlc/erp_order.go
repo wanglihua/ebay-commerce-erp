@@ -602,14 +602,22 @@ WHERE oi.order_id = %d;`
 	core.HandleError(err)
 
 	var logistics_mode models.LogisticsModeInfo
-	if !(order.StatusId == models.ORDER_STATUS_HOLD && order.HoldTypeId.Valid == true && order.HoldTypeId.Int64 == models.ORDER_HOLD_TYPE_ENVELOPE) {
+	if !(order.StatusId == models.ORDER_STATUS_HOLD && order.HoldTypeId.Valid == true &&
+		(order.HoldTypeId.Int64 == models.ORDER_HOLD_TYPE_ENVELOPE ||
+			order.HoldTypeId.Int64 == models.ORDER_HOLD_TYPE_LOGISTICS_NO_MATCH ||
+			order.HoldTypeId.Int64 == models.ORDER_HOLD_TYPE_INTERNATIONAL ||
+			order.HoldTypeId.Int64 == models.ORDER_HOLD_TYPE_PRODUCT_INFO_MISS)) {
 		//如果是Hold状态且是信封Hold的就不显示匹配的物流，因为这些信息可以是前一次匹配时遗留的，后来指定了 Hold
 		_, err = db_session.Id(order_logistics.ModeId).Get(&logistics_mode)
 		core.HandleError(err)
 	}
 
 	var logistics_stock models.StockInfo
-	if !(order.StatusId == models.ORDER_STATUS_HOLD && order.HoldTypeId.Valid == true && order.HoldTypeId.Int64 == models.ORDER_HOLD_TYPE_ENVELOPE) {
+	if !(order.StatusId == models.ORDER_STATUS_HOLD && order.HoldTypeId.Valid == true &&
+		(order.HoldTypeId.Int64 == models.ORDER_HOLD_TYPE_ENVELOPE ||
+			order.HoldTypeId.Int64 == models.ORDER_HOLD_TYPE_LOGISTICS_NO_MATCH ||
+			order.HoldTypeId.Int64 == models.ORDER_HOLD_TYPE_INTERNATIONAL ||
+			order.HoldTypeId.Int64 == models.ORDER_HOLD_TYPE_PRODUCT_INFO_MISS)) {
 		//如果是Hold状态且是信封Hold的就不显示匹配的物流，因为这些信息可以是前一次匹配时遗留的，后来指定了 Hold
 		_, err = db_session.Id(order_logistics.StockId).Get(&logistics_stock)
 		core.HandleError(err)
