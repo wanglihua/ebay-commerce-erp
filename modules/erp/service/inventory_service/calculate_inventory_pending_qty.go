@@ -48,23 +48,34 @@ func Calculate_inventory_pending_qty() {
 
 # 待配货 配货中
 UPDATE erp_inventory nvt INNER JOIN
-    (SELECT o.stock_id AS stock_id, oi.item_product_id AS product_id, sum(oi.quantity) AS qty
-     FROM erp_order o
-         INNER JOIN erp_order_item oi ON (o.status_id = 4000 OR o.status_id = 4100) AND oi.order_id = o.id
-     GROUP BY o.stock_id, oi.item_product_id) padding_order_item
-        ON nvt.stock_id = padding_order_item.stock_id AND nvt.product_id = padding_order_item.product_id
-SET nvt.pending_qty = padding_order_item.qty;
+    (SELECT nvt_inner.stock_id AS stock_id, nvt_inner.product_id AS product_id, ifnull(pending_order_item.qty, 0) AS qty
+     FROM erp_inventory nvt_inner
+         LEFT JOIN (SELECT o.stock_id AS stock_id, oi.item_product_id AS product_id, sum(oi.quantity) AS qty
+                    FROM erp_order o
+                        INNER JOIN erp_order_item oi ON (o.status_id = 4000 OR o.status_id = 4100) AND oi.order_id = o.id
+                    GROUP BY o.stock_id, oi.item_product_id)
+                   pending_order_item
+             ON nvt_inner.stock_id = pending_order_item.stock_id AND nvt_inner.product_id = pending_order_item.product_id)
+    pending_nvt
+        ON nvt.stock_id = pending_nvt.stock_id AND nvt.product_id = pending_nvt.product_id
+SET nvt.pending_qty = pending_nvt.qty;
 
 # 匹配时要考虑 原数据表中 待发货的 数量 和 本次匹配造成的 代发货的数量
 	 */
 
-	var sql_update_inventory_pending_qty = `UPDATE erp_inventory nvt INNER JOIN
-    (SELECT o.stock_id AS stock_id, oi.item_product_id AS product_id, sum(oi.quantity) AS qty
-     FROM erp_order o
-         INNER JOIN erp_order_item oi ON (o.status_id = %d OR o.status_id = %d) AND oi.order_id = o.id
-     GROUP BY o.stock_id, oi.item_product_id) padding_order_item
-        ON nvt.stock_id = padding_order_item.stock_id AND nvt.product_id = padding_order_item.product_id
-SET nvt.pending_qty = padding_order_item.qty;`
+	var sql_update_inventory_pending_qty = `
+UPDATE erp_inventory nvt INNER JOIN
+    (SELECT nvt_inner.stock_id AS stock_id, nvt_inner.product_id AS product_id, ifnull(pending_order_item.qty, 0) AS qty
+     FROM erp_inventory nvt_inner
+         LEFT JOIN (SELECT o.stock_id AS stock_id, oi.item_product_id AS product_id, sum(oi.quantity) AS qty
+                    FROM erp_order o
+                        INNER JOIN erp_order_item oi ON (o.status_id = %d OR o.status_id = %d) AND oi.order_id = o.id
+                    GROUP BY o.stock_id, oi.item_product_id)
+                   pending_order_item
+             ON nvt_inner.stock_id = pending_order_item.stock_id AND nvt_inner.product_id = pending_order_item.product_id)
+    pending_nvt
+        ON nvt.stock_id = pending_nvt.stock_id AND nvt.product_id = pending_nvt.product_id
+SET nvt.pending_qty = pending_nvt.qty;`
 	sql_update_inventory_pending_qty = fmt.Sprintf(sql_update_inventory_pending_qty, models.ORDER_STATUS_DPH, models.ORDER_STATUS_PHZ)
 
 	_, err = db_session.Exec(sql_update_inventory_pending_qty)
