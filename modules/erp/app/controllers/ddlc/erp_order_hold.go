@@ -11,6 +11,7 @@ import (
 	"matrix/modules/erp/service/order_import_batch_service"
 	"matrix/modules/erp/service/order_service"
 	"matrix/modules/erp/setting"
+	"strings"
 )
 
 type ErpOrderHold struct {
@@ -64,6 +65,10 @@ func (c ErpOrderHold) ListData() revel.Result {
 	var batch_code int64
 	c.Params.Bind(&batch_code, "batch_code")
 
+	var order_code string
+	c.Params.Bind(&order_code, "order_code")
+	order_code = strings.TrimSpace(order_code)
+
 	var hold_type_id int64
 	c.Params.Bind(&hold_type_id, "hold_type_id")
 
@@ -77,6 +82,10 @@ func (c ErpOrderHold) ListData() revel.Result {
 
 	if batch_code != 0 {
 		filter = core.SqlAnd(filter, fmt.Sprintf("o.batch_code = %d", batch_code))
+	}
+
+	if order_code != "" {
+		filter = core.SqlAnd(filter, fmt.Sprintf("o.code = '%s'", order_code))
 	}
 
 	order_list, count := order_service.Get_order_data_list(db_session, filter, order, offset, limit)

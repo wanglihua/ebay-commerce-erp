@@ -1,4 +1,4 @@
-{%header "所有订单" .%}
+{%header "Hold订单" .%}
 <div id="page">
     <div class="breadcrumbs" id="breadcrumbs">
         <ul class="breadcrumb">
@@ -47,12 +47,15 @@
                             */%}
 
                             <label class="control-label no-padding-right" for="batch_code">导入批次号</label>
-                            <select id="batch_code" name="page.batch_code" v-model.number="page.batch_code" style="width: 135px;" @change="refreshList()">
+                            <select id="batch_code" name="page.batch_code" class="input-sm" v-model.number="page.batch_code" style="width: 135px;" @change="refreshList()">
                                 <option :value="0">-导入批次号-</option>
                                 <template v-for="batch_code in page.batch_code_list">
                                     <option :value="batch_code">{{batch_code}}</option>
                                 </template>
                             </select>
+                            &nbsp;
+                            <label class="control-label no-padding-right" for="order_code">订单编号</label>
+                            <input id="order_code" name="page.order_code" type="text" class="input-sm" v-model="page.order_code" style="width: 135px;"/>
                             <button class="btn btn-mini btn-primary" @click="refreshList()">
                                 &nbsp;<i class="ace-icon fa fa-search"></i>查&nbsp;询&nbsp;
                             </button>
@@ -142,6 +145,8 @@
         el: "#page",
         data: {
             "page": {
+                "batch_code": "",
+                "order_code": "",
                 "hold_type_id": 0,
                 "hold_type_list": [],
                 "au_stock_list": []
@@ -366,6 +371,7 @@
                         showMask("数据加载中，请稍候");
 
                         aoData.push({'name': 'batch_code', 'value': this_vm.page.batch_code});
+                        aoData.push({'name': 'order_code', 'value': this_vm.page.order_code});
                         aoData.push({'name': 'status', 'value': status});
                         aoData.push({'name': 'shop_id', 'value': this_vm.page.shop_id});
                         aoData.push({'name': 'order_type_id', 'value': this_vm.page.order_type_id});
