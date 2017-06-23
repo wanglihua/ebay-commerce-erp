@@ -15,6 +15,7 @@ import (
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/order_service"
 	"matrix/modules/erp/service/stock_service"
+	"sort"
 )
 
 type ErpOrderLogisticsCompanyExport struct {
@@ -55,6 +56,50 @@ func (c ErpOrderLogisticsCompanyExport) ExportOptionData() revel.Result {
 		"company_list": excel_export_company_list,
 	})
 }
+
+type order_logistics_eparcel_view_item_t struct {
+	OrderLogistics models.OrderLogisticsInfo    `xorm:"extends" json:"ol"`
+	Order          models.OrderInfo             `xorm:"extends" json:"o"`
+	ShopAccount    models.ShopAccountInfo       `xorm:"extends" json:"sa"`
+	sku_qty_loc    string                       `xorm:"-"`
+	loc_name       string                       `xorm:"-"`
+}
+
+type order_logistics_eparcel_view_item_slice []order_logistics_eparcel_view_item_t
+
+func (s order_logistics_eparcel_view_item_slice) Len() int           { return len(s) }
+func (s order_logistics_eparcel_view_item_slice) Swap(i, j int)      { s[i], s[j] = s[j], s[i] }
+func (s order_logistics_eparcel_view_item_slice) Less(i, j int) bool { return s[i].loc_name < s[j].loc_name }
+
+type order_logistics_fastway_view_item_t struct {
+	OrderLogistics models.OrderLogisticsInfo    `xorm:"extends" json:"ol"`
+	Order          models.OrderInfo             `xorm:"extends" json:"o"`
+	LogisticsMode  models.LogisticsModeInfo     `xorm:"extends" json:"lm"`
+	ShopAccount    models.ShopAccountInfo       `xorm:"extends" json:"sa"`
+	sku_qty_loc    string                       `xorm:"-"`
+	loc_name       string                       `xorm:"-"`
+}
+
+type order_logistics_fastway_view_item_slice []order_logistics_fastway_view_item_t
+
+func (s order_logistics_fastway_view_item_slice) Len() int           { return len(s) }
+func (s order_logistics_fastway_view_item_slice) Swap(i, j int)      { s[i], s[j] = s[j], s[i] }
+func (s order_logistics_fastway_view_item_slice) Less(i, j int) bool { return s[i].loc_name < s[j].loc_name }
+
+type order_logistics_toll_view_item_t struct {
+	OrderLogistics models.OrderLogisticsInfo    `xorm:"extends" json:"ol"`
+	Order          models.OrderInfo             `xorm:"extends" json:"o"`
+	LogisticsMode  models.LogisticsModeInfo     `xorm:"extends" json:"lm"`
+	ShopAccount    models.ShopAccountInfo       `xorm:"extends" json:"sa"`
+	sku_qty_loc    string                       `xorm:"-"`
+	loc_name       string                       `xorm:"-"`
+}
+
+type order_logistics_toll_view_item_slice []order_logistics_toll_view_item_t
+
+func (s order_logistics_toll_view_item_slice) Len() int           { return len(s) }
+func (s order_logistics_toll_view_item_slice) Swap(i, j int)      { s[i], s[j] = s[j], s[i] }
+func (s order_logistics_toll_view_item_slice) Less(i, j int) bool { return s[i].loc_name < s[j].loc_name }
 
 func (c ErpOrderLogisticsCompanyExport) ExportExcel() revel.Result {
 	var db_session = c.DbSession
@@ -151,21 +196,24 @@ FROM erp_order_logistics ol
 WHERE ol.mode_id IN (0) AND ol.stock_id = 0
 		 */
 
-		type order_logistics_view_item_t struct {
-			OrderLogistics models.OrderLogisticsInfo    `xorm:"extends" json:"ol"`
-			Order          models.OrderInfo             `xorm:"extends" json:"o"`
-			ShopAccount    models.ShopAccountInfo       `xorm:"extends" json:"sa"`
-		}
-
 		sql_get_logistics_list := `SELECT ol.*, o.*, sa.*
 FROM erp_order_logistics ol
     INNER JOIN erp_order o ON o.id = ol.order_id
     LEFT JOIN erp_shop_account sa ON sa.id = o.shop_id
 WHERE o.status_id = %d AND ol.mode_id IN (%s) AND ol.stock_id = %d`
 		sql_get_logistics_list = fmt.Sprintf(sql_get_logistics_list, models.ORDER_STATUS_PHZ, strings.Join(mode_id_str_list, ","), stock_id)
-		var order_logistics_list = make([]order_logistics_view_item_t, 0)
+		var order_logistics_list = make([]order_logistics_eparcel_view_item_t, 0)
 		err = db_session.Sql(sql_get_logistics_list).Find(&order_logistics_list)
 		core.HandleError(err)
+
+		for index, order_logistics := range order_logistics_list {
+			order_logistics_list[index].sku_qty_loc, order_logistics_list[index].loc_name = get_order_sku_for_export(order_logistics.Order.Id, db_session)
+		}
+
+		var order_logistics_list_slice = order_logistics_eparcel_view_item_slice(order_logistics_list)
+		sort.Sort(order_logistics_list_slice)
+
+		order_logistics_list = []order_logistics_eparcel_view_item_t(order_logistics_list_slice)
 
 		if stock_code == excel_export_stock_mel_code {
 			xlsx_file, err = xlsx.OpenFile(filepath.Join(excel_template_logistics_export_dir, "eparcel_mel.xlsx"))
@@ -195,7 +243,7 @@ WHERE o.status_id = %d AND ol.mode_id IN (%s) AND ol.stock_id = %d`
 				sheet.Cell(index+2, excel_col_label_to_index("V")).Value = "N"
 				sheet.Cell(index+2, excel_col_label_to_index("X")).Value = fmt.Sprintf("%s FROM:%s", order_logistics.Order.FullTranId, order_logistics.ShopAccount.Name)
 				sheet.Cell(index+2, excel_col_label_to_index("Y")).Value = "FALSE"
-				sheet.Cell(index+2, excel_col_label_to_index("Z")).Value = get_order_sku_for_export(order_logistics.Order.Id, db_session)
+				sheet.Cell(index+2, excel_col_label_to_index("Z")).Value = order_logistics.sku_qty_loc
 				sheet.Cell(index+2, excel_col_label_to_index("AA")).Value = "FALSE"
 				sheet.Cell(index+2, excel_col_label_to_index("AC")).Value = "FALSE"
 				sheet.Cell(index+2, excel_col_label_to_index("AD")).Value = "iepoch MEL (3PL)"
@@ -239,7 +287,7 @@ WHERE o.status_id = %d AND ol.mode_id IN (%s) AND ol.stock_id = %d`
 				sheet.Cell(index+2, excel_col_label_to_index("V")).Value = "N"
 				sheet.Cell(index+2, excel_col_label_to_index("X")).Value = fmt.Sprintf("%s FROM:%s", order_logistics.Order.FullTranId, order_logistics.ShopAccount.Name)
 				sheet.Cell(index+2, excel_col_label_to_index("Y")).Value = "FALSE"
-				sheet.Cell(index+2, excel_col_label_to_index("Z")).Value = get_order_sku_for_export(order_logistics.Order.Id, db_session)
+				sheet.Cell(index+2, excel_col_label_to_index("Z")).Value = order_logistics.sku_qty_loc
 				sheet.Cell(index+2, excel_col_label_to_index("AA")).Value = "FALSE"
 				sheet.Cell(index+2, excel_col_label_to_index("AC")).Value = "FALSE"
 				sheet.Cell(index+2, excel_col_label_to_index("AD")).Value = "iepoch BNE (3PL)"
@@ -289,13 +337,6 @@ FROM erp_order_logistics ol
 WHERE ol.mode_id IN (0) AND ol.stock_id = 0
 		 */
 
-		type order_logistics_view_item_t struct {
-			OrderLogistics models.OrderLogisticsInfo    `xorm:"extends" json:"ol"`
-			Order          models.OrderInfo             `xorm:"extends" json:"o"`
-			LogisticsMode  models.LogisticsModeInfo     `xorm:"extends" json:"lm"`
-			ShopAccount    models.ShopAccountInfo       `xorm:"extends" json:"sa"`
-		}
-
 		sql_get_logistics_list := `SELECT ol.*, o.*, lm.*, sa.*
 FROM erp_order_logistics ol
     INNER JOIN erp_order o ON o.id = ol.order_id
@@ -303,9 +344,18 @@ FROM erp_order_logistics ol
     LEFT JOIN erp_shop_account sa ON sa.id = o.shop_id
 WHERE  o.status_id = %d AND ol.mode_id IN (%s) AND ol.stock_id = %d`
 		sql_get_logistics_list = fmt.Sprintf(sql_get_logistics_list, models.ORDER_STATUS_PHZ, strings.Join(mode_id_str_list, ","), stock_id)
-		var order_logistics_list = make([]order_logistics_view_item_t, 0)
+		var order_logistics_list = make([]order_logistics_fastway_view_item_t, 0)
 		err = db_session.Sql(sql_get_logistics_list).Find(&order_logistics_list)
 		core.HandleError(err)
+
+		for index, order_logistics := range order_logistics_list {
+			order_logistics_list[index].sku_qty_loc, order_logistics_list[index].loc_name = get_order_sku_for_export(order_logistics.Order.Id, db_session)
+		}
+
+		var order_logistics_list_slice = order_logistics_fastway_view_item_slice(order_logistics_list)
+		sort.Sort(order_logistics_list_slice)
+
+		order_logistics_list = []order_logistics_fastway_view_item_t(order_logistics_list_slice)
 
 		sheet := xlsx_file.Sheets[0] // 模板里面应该至少有一个sheet
 		for index, order_logistics := range order_logistics_list {
@@ -340,7 +390,7 @@ WHERE  o.status_id = %d AND ol.mode_id IN (%s) AND ol.stock_id = %d`
 			sheet.Cell(index+1, excel_col_label_to_index("P")).Value = order_shipping_address.Phone
 			sheet.Cell(index+1, excel_col_label_to_index("R")).Value = "ATL at safe place"
 			sheet.Cell(index+1, excel_col_label_to_index("S")).Value = fmt.Sprintf("FROM:%s", order_logistics.ShopAccount.Name)
-			sheet.Cell(index+1, excel_col_label_to_index("T")).Value = get_order_sku_for_export(order_logistics.Order.Id, db_session)
+			sheet.Cell(index+1, excel_col_label_to_index("T")).Value = order_logistics.sku_qty_loc
 			sheet.Cell(index+1, excel_col_label_to_index("U")).Value = get_fastway_packaging_code(order_logistics.LogisticsMode)
 		}
 
@@ -377,13 +427,6 @@ FROM erp_order_logistics ol
 WHERE ol.mode_id IN (0) AND ol.stock_id = 0
 		 */
 
-		type order_logistics_view_item_t struct {
-			OrderLogistics models.OrderLogisticsInfo    `xorm:"extends" json:"ol"`
-			Order          models.OrderInfo             `xorm:"extends" json:"o"`
-			LogisticsMode  models.LogisticsModeInfo     `xorm:"extends" json:"lm"`
-			ShopAccount    models.ShopAccountInfo       `xorm:"extends" json:"sa"`
-		}
-
 		sql_get_logistics_list := `SELECT ol.*, o.*, lm.*, sa.*
 FROM erp_order_logistics ol
     INNER JOIN erp_order o ON o.id = ol.order_id
@@ -391,9 +434,18 @@ FROM erp_order_logistics ol
     LEFT JOIN erp_shop_account sa ON sa.id = o.shop_id
 WHERE o.status_id = %d AND ol.mode_id IN (%s) AND ol.stock_id = %d`
 		sql_get_logistics_list = fmt.Sprintf(sql_get_logistics_list, models.ORDER_STATUS_PHZ, strings.Join(mode_id_str_list, ","), stock_id)
-		var order_logistics_list = make([]order_logistics_view_item_t, 0)
+		var order_logistics_list = make([]order_logistics_toll_view_item_t, 0)
 		err = db_session.Sql(sql_get_logistics_list).Find(&order_logistics_list)
 		core.HandleError(err)
+
+		for index, order_logistics := range order_logistics_list {
+			order_logistics_list[index].sku_qty_loc, order_logistics_list[index].loc_name = get_order_sku_for_export(order_logistics.Order.Id, db_session)
+		}
+
+		var order_logistics_list_slice = order_logistics_toll_view_item_slice(order_logistics_list)
+		sort.Sort(order_logistics_list_slice)
+
+		order_logistics_list = []order_logistics_toll_view_item_t(order_logistics_list_slice)
 
 		sheet := xlsx_file.Sheets[0] // 模板里面应该至少有一个sheet
 		for index, order_logistics := range order_logistics_list {
@@ -425,7 +477,7 @@ WHERE o.status_id = %d AND ol.mode_id IN (%s) AND ol.stock_id = %d`
 			sheet.Cell(index+1, excel_col_label_to_index("S")).Value = order_logistics.Order.FullTranId
 			sheet.Cell(index+1, excel_col_label_to_index("T")).Value = fmt.Sprintf("FROM:%s", order_logistics.ShopAccount.Name)
 			sheet.Cell(index+1, excel_col_label_to_index("U")).Value = "ATL at safe place"
-			sheet.Cell(index+1, excel_col_label_to_index("V")).Value = get_order_sku_for_export(order_logistics.Order.Id, db_session)
+			sheet.Cell(index+1, excel_col_label_to_index("V")).Value = order_logistics.sku_qty_loc
 			sheet.Cell(index+1, excel_col_label_to_index("W")).Value = order_logistics.Order.FullTranId // 和 S 一样的？
 
 			sheet.Cell(index+1, excel_col_label_to_index("X")).Value = order_shipping_address.Phone
@@ -486,7 +538,7 @@ func split_address(address string, letter_limit int) (address1 string, address2 
 	return string(address_rune_list[0:index]), string(address_rune_list[index:])
 }
 
-func get_order_sku_for_export(order_id int64, db_session *xorm.Session) string {
+func get_order_sku_for_export(order_id int64, db_session *xorm.Session) (order_sku_qty_loc_return string, loc_name string) {
 	/*
 
 	single product, single quantity
@@ -501,18 +553,18 @@ func get_order_sku_for_export(order_id int64, db_session *xorm.Session) string {
 
 	var order_sku_quantity_list_len = len(order_sku_quantity_list)
 	if order_sku_quantity_list_len < 1 {
-		return ""
+		return "", ""
 	} else if order_sku_quantity_list_len == 1 {
 		var order_sku_quantity = order_sku_quantity_list[0]
 		if order_sku_quantity.Quantity == 1 {
-			return fmt.Sprintf("%s %d [%s]", order_sku_quantity.Sku, order_sku_quantity.Quantity, order_sku_quantity.StorageLocName)
+			return fmt.Sprintf("%s %d [%s]", order_sku_quantity.Sku, order_sku_quantity.Quantity, order_sku_quantity.StorageLocName), order_sku_quantity.StorageLocName
 		} else if order_sku_quantity.Quantity > 1 {
-			return fmt.Sprintf("%s DOG%d [%s]", order_sku_quantity.Sku, order_sku_quantity.Quantity, order_sku_quantity.StorageLocName)
+			return fmt.Sprintf("%s DOG%d [%s]", order_sku_quantity.Sku, order_sku_quantity.Quantity, order_sku_quantity.StorageLocName), order_sku_quantity.StorageLocName
 		} else {
-			return ""
+			return "", ""
 		}
 	} else { // if order_sku_quantity_list_len > 1 {
-		return "MM"
+		return "MM", ""
 	}
 }
 
