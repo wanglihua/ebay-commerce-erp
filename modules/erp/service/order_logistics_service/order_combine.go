@@ -10,7 +10,6 @@ import (
 	"matrix/modules/erp/models"
 )
 
-// todo: 这里有问题的
 // 合并订单
 // order_filter: o.batch_code = '20170428120352'
 func Combine_orders(order_filter string, db_session *xorm.Session) error {
@@ -48,8 +47,8 @@ HAVING count(o.id) > 1`
 	core.HandleError(err)
 
 	for _, order_ids := range order_ids_list {
-		var order_id_str_list = strings.Split(order_ids.OrderIds, ",")
 		var order_id_list = make([]int64, 0)
+		var order_id_str_list = strings.Split(order_ids.OrderIds, ",")
 		for _, order_id_str := range order_id_str_list {
 			order_id, _ := strconv.ParseInt(order_id_str, 10, 64)
 			order_id_list = append(order_id_list, order_id)

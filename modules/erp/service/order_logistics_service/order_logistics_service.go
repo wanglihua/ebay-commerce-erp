@@ -124,8 +124,8 @@ func (p_ol *OrderLogistics) CalculateListImportBatch(batch_code int64, db_sessio
 	/*
 SELECT o.* FROM erp_order o WHERE o.batch_code = 0
 	 */
-	var sql_import_batch_order = `SELECT o.* FROM erp_order o WHERE o.batch_code = %d ORDER BY o.paid_time ASC, o.id ASC`
-	sql_import_batch_order = fmt.Sprintf(sql_import_batch_order, batch_code)
+	var sql_import_batch_order = `SELECT o.* FROM erp_order o WHERE o.batch_code = %d AND o.status_id <> %d ORDER BY o.paid_time ASC, o.id ASC`
+	sql_import_batch_order = fmt.Sprintf(sql_import_batch_order, batch_code, models.ORDER_STATUS_YQX)
 
 	var order_list = make([]models.OrderInfo, 0)
 	err := db_session.Sql(sql_import_batch_order).Find(&order_list)
@@ -238,6 +238,20 @@ func (p_ol *OrderLogistics) CalculateListWithOption(order_list []models.OrderInf
 	p_ol.pending_keeper = new_pending_inventory_temp_keeper()
 
 	for _, order := range order_list {
+
+		//订单状态检查 这些要排除的
+		if order.StatusId == models.ORDER_STATUS_YCJ ||
+			order.StatusId == models.ORDER_STATUS_YQX ||
+			order.StatusId == models.ORDER_STATUS_YWC ||
+			order.StatusId == models.ORDER_STATUS_YFH {
+			continue
+		}
+
+		// 这些是要包含的， 正反两方面进行状态检查
+		if order.StatusId != models.ORDER_STATUS_YZF && order.StatusId != models.ORDER_STATUS_HOLD && order.StatusId != models.ORDER_STATUS_DPH {
+			continue
+		}
+
 		var p_order_logistics_data = new(order_logistics_data_t)
 		//　一起加载需要的数据的方式，对性能的影响应该不会很大的
 		p_order_logistics_data.load_data(&order, p_ol, db_session)
