@@ -901,7 +901,12 @@ func (c ErpOrder) ShiJiWuHuo() revel.Result {
 	core.HandleError(err)
 
 	for _, order := range order_list {
-		if order.StatusId != models.ORDER_STATUS_PHZ && order.StatusId != models.ORDER_STATUS_HOLD {
+		if (order.StatusId != models.ORDER_STATUS_PHZ && order.StatusId != models.ORDER_STATUS_HOLD) ||
+			(order.StatusId == models.ORDER_STATUS_HOLD && (
+				order.HoldTypeId.Int64 != models.ORDER_HOLD_TYPE_ENVELOPE &&
+					order.HoldTypeId.Int64 != models.ORDER_HOLD_TYPE_EXPRESS &&
+					order.HoldTypeId.Int64 != models.ORDER_HOLD_TYPE_INTERNATIONAL &&
+					order.HoldTypeId.Int64 != models.ORDER_HOLD_TYPE_PICK_UP)) {
 			return c.RenderJson(map[string]interface{}{
 				"success": false,
 				"message": "订单当前状态不是配货中或hold，不能设置实际无货！",
