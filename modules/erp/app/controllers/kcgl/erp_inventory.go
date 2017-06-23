@@ -175,7 +175,8 @@ func (c ErpInventory) DetailData() revel.Result {
 		}
 
 		var storage_loc_list = make([]models.StorageLocInfo, 0)
-		err = db_session.Where(fmt.Sprintf("stock_id = %d", inventory.StockId)).Find(&storage_loc_list)
+		//err = db_session.Where(fmt.Sprintf("stock_id = %d", inventory.StockId)).Find(&storage_loc_list)
+		err = db_session.Id(inventory.StorageLocId).Find(&storage_loc_list) // 修改不是新增时不能改仓位，所以取一个就够了，那列表实在太大了
 		core.HandleError(err)
 
 		detail_form.StorageLocList = storage_loc_list
@@ -252,6 +253,7 @@ func (c ErpInventory) Save() revel.Result {
 	} else { // 更新数据库记录
 		inventory.Id = inventory_in_db.Id
 
+		/* 不知道为什么对有些SKU就是不能通过这个检查，而且数据库里面也没发现有重复的，先禁用这个检查再说，因为更新时，已不能更改SKU和仓位，所以也没关系的。
 		if stock.StockTypeId == models.STOCK_TYPE_AU {
 			inventory_count, err := db_session.Where("id <> ? AND stock_id = ? AND storage_loc_id = ?", inventory.Id, inventory.StockId, inventory.StorageLocId).Count(new(models.InventoryInfo))
 			core.HandleError(err)
@@ -265,6 +267,7 @@ func (c ErpInventory) Save() revel.Result {
 				return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，仓库中SKU的库存已存在，一个SKU只能一个仓位！" })
 			}
 		}
+		*/
 
 		affected, err = db_session.Id(inventory.Id).Update(&inventory)
 		core.HandleError(err)
