@@ -173,7 +173,12 @@
                                         <div class="form-group">
                                             <label for="stock_id" class="col-xs-2 control-label">仓库</label>
                                             <div class="col-xs-10">
-                                                <select id="stock_id" name="detail.inventory.stock_id" class="input-sm form-control" v-model.number="detail.inventory.stock_id" @change="getStockStorageLocList()">
+                                                <select v-if="detail.is_new" id="stock_id" name="detail.inventory.stock_id" class="input-sm form-control" v-model.number="detail.inventory.stock_id" @change="getStockStorageLocList()">
+                                                    <template v-for="stock in detail.stock_list">
+                                                        <option :value="stock.id">{{stock.name}}</option>
+                                                    </template>
+                                                </select>
+                                                <select v-else="detail.is_new" id="stock_id_disabled" name="detail.inventory.stock_id" class="input-sm form-control" disabled="disabled" v-model.number="detail.inventory.stock_id" @change="getStockStorageLocList()">
                                                     <template v-for="stock in detail.stock_list">
                                                         <option :value="stock.id">{{stock.name}}</option>
                                                     </template>
@@ -188,7 +193,12 @@
                                         <div class="form-group">
                                             <label for="storage_loc_id" class="col-xs-2 control-label">库位</label>
                                             <div class="col-xs-10">
-                                                <select id="storage_loc_id" name="detail.inventory.storage_loc_id" class="input-sm form-control" v-model.number="detail.inventory.storage_loc_id">
+                                                <select v-if="detail.is_new" id="storage_loc_id" name="detail.inventory.storage_loc_id" class="input-sm form-control" v-model.number="detail.inventory.storage_loc_id">
+                                                    <template v-for="storage_loc in detail.storage_loc_list">
+                                                        <option :value="storage_loc.id">{{storage_loc.name}}</option>
+                                                    </template>
+                                                </select>
+                                                <select v-else="detail.is_new" id="storage_loc_id_disabled" name="detail.inventory.storage_loc_id" class="input-sm form-control" disabled="disabled" v-model.number="detail.inventory.storage_loc_id">
                                                     <template v-for="storage_loc in detail.storage_loc_list">
                                                         <option :value="storage_loc.id">{{storage_loc.name}}</option>
                                                     </template>
@@ -203,7 +213,8 @@
                                         <div class="form-group">
                                             <label for="product_sku" class="col-xs-2 control-label">商品SKU</label>
                                             <div class="col-xs-10">
-                                                <input id="product_sku" name="detail.product_sku" type="text" class="input-sm form-control" v-model="detail.product_sku"/>
+                                                <input v-if="detail.is_new" id="product_sku" name="detail.product_sku" type="text" class="input-sm form-control" v-model="detail.product_sku"/>
+                                                <input v-else="detail.is_new" id="product_sku_disabled" name="detail.product_sku" type="text" class="input-sm form-control" disabled="disabled" v-model="detail.product_sku"/>
                                             </div>
                                         </div>
                                     </div>
@@ -626,6 +637,10 @@
                     }
                 });
 
+                var post_data = new Object();
+                post_data.inventory = vm.detail.inventory;
+                post_data.product_sku = vm.detail.product_sku;
+
                 if (!valid) {
                     hideMask();
                 } else {
@@ -634,7 +649,7 @@
                             type: "POST",
                             processData: false,
                             contentType: 'application/json',
-                            data: JSON.stringify(vm.detail),
+                            data: JSON.stringify(post_data),
                             success: function (data) {
                                 hideMask();
                                 if (data.success === false) {

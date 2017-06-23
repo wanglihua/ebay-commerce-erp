@@ -132,6 +132,7 @@ type InventoryDetailForm struct {
 	StockList      []models.StockInfo       `json:"stock_list"`
 	StorageLocList []models.StorageLocInfo  `json:"storage_loc_list"`
 	ProductSku     string                   `json:"product_sku"`
+	IsNew          bool                     `json:"is_new"`
 }
 
 func (f *InventoryDetailForm) IsCreate() bool {
@@ -188,6 +189,8 @@ func (c ErpInventory) DetailData() revel.Result {
 
 	detail_form.Inventory = inventory
 
+	detail_form.IsNew = detail_form.IsCreate()
+
 	return c.RenderJson(detail_form)
 }
 
@@ -224,18 +227,24 @@ func (c ErpInventory) Save() revel.Result {
 		Get(&inventory_in_db)
 	core.HandleError(err)
 
+	var stock models.StockInfo
+	_, err = db_session.Id(inventory.StockId).Get(&stock)
+	core.HandleError(err)
+
 	var affected int64
 	if inventory_in_db.Id == 0 { //创建数据库记录
-		inventory_count, err := db_session.Where("stock_id = ? AND storage_loc_id = ?", inventory.StockId, inventory.StorageLocId).Count(new(models.InventoryInfo))
-		core.HandleError(err)
-		if inventory_count != 0 {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，仓库仓位中SKU库存已存在，一个仓位只能一个SKU！" })
-		}
+		if stock.StockTypeId == models.STOCK_TYPE_AU {
+			inventory_count, err := db_session.Where("stock_id = ? AND storage_loc_id = ?", inventory.StockId, inventory.StorageLocId).Count(new(models.InventoryInfo))
+			core.HandleError(err)
+			if inventory_count != 0 {
+				return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，仓库仓位中SKU库存已存在，一个仓位只能一个SKU！" })
+			}
 
-		inventory_count, err = db_session.Where("stock_id = ? AND product_id = ?", inventory.StockId, inventory.ProductId).Count(new(models.InventoryInfo))
-		core.HandleError(err)
-		if inventory_count != 0 {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，仓库中SKU的库存已存在，一个SKU只能一个仓位！" })
+			inventory_count, err = db_session.Where("stock_id = ? AND product_id = ?", inventory.StockId, inventory.ProductId).Count(new(models.InventoryInfo))
+			core.HandleError(err)
+			if inventory_count != 0 {
+				return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，仓库中SKU的库存已存在，一个SKU只能一个仓位！" })
+			}
 		}
 
 		affected, err = db_session.Insert(&inventory)
@@ -243,16 +252,18 @@ func (c ErpInventory) Save() revel.Result {
 	} else { // 更新数据库记录
 		inventory.Id = inventory_in_db.Id
 
-		inventory_count, err := db_session.Where("id <> ? AND stock_id = ? AND storage_loc_id = ?", inventory.Id, inventory.StockId, inventory.StorageLocId).Count(new(models.InventoryInfo))
-		core.HandleError(err)
-		if inventory_count != 0 {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，仓库仓位中SKU库存已存在，一个仓位只能一个SKU！" })
-		}
+		if stock.StockTypeId == models.STOCK_TYPE_AU {
+			inventory_count, err := db_session.Where("id <> ? AND stock_id = ? AND storage_loc_id = ?", inventory.Id, inventory.StockId, inventory.StorageLocId).Count(new(models.InventoryInfo))
+			core.HandleError(err)
+			if inventory_count != 0 {
+				return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，仓库仓位中SKU库存已存在，一个仓位只能一个SKU！" })
+			}
 
-		inventory_count, err = db_session.Where("id <> ? AND stock_id = ? AND product_id = ?", inventory.Id, inventory.StockId, inventory.ProductId).Count(new(models.InventoryInfo))
-		core.HandleError(err)
-		if inventory_count != 0 {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，仓库中SKU的库存已存在，一个SKU只能一个仓位！" })
+			inventory_count, err = db_session.Where("id <> ? AND stock_id = ? AND product_id = ?", inventory.Id, inventory.StockId, inventory.ProductId).Count(new(models.InventoryInfo))
+			core.HandleError(err)
+			if inventory_count != 0 {
+				return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，仓库中SKU的库存已存在，一个SKU只能一个仓位！" })
+			}
 		}
 
 		affected, err = db_session.Id(inventory.Id).Update(&inventory)
