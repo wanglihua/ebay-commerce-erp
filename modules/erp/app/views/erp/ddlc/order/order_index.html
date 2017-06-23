@@ -532,6 +532,11 @@
             $("#th_province").wrap("<div id='div_province'></div>");
             $("#th_postal_code").wrap("<div id='div_postal_code'></div>");
             $("#th_country_name_ext").append($("#div_country_name")).append($("#div_province")).append($("#div_postal_code"));
+
+            $('#orderList tbody').on('dblclick', 'tr', function () {
+                var order_id = $(this).find('td:first-child input:checkbox').val();
+                show_simple_detail_dialog(order_id);
+            });
         },
         methods: {
             reloadList: function () {
@@ -783,8 +788,69 @@
             }
         }
     });
+
+    function load_order_detail_data(order_id) {
+        var detail_vm = new Vue({
+            el: "#order_simple_detail_dialog",
+            data: {
+                "detail": {
+                    "order": {},
+                    "status": {},
+                    "shop": {},
+                    "order_type": {},
+                    "order_hold_type": {},
+                    "shipping_address": {},
+                    "ebay_shipping_address": {},
+                    "paypal_shipping_address": {},
+                    "order_item_list": [],
+                    "order_logistics": {},
+                    "logistics_setting": {},
+                    "au_stock_list": [],
+                    "logistics_stock": {},
+                    "logistics_mode": {},
+                    "inventory_list": []
+                }
+            },
+            methods: {
+                format_amount: function (amount) {
+                    return dtFormatFloat(amount);
+                }
+            }
+        });
+
+        $.ajax({
+            url: '{%url "ErpOrder.DetailData" %}',
+            type: "POST",
+            data: {"id": order_id},
+            success: function (result) {
+                if (result.success === false) {
+                    $.msg.error(result.message);
+                    return;
+                }
+                detail_vm.detail = result;
+            }
+        });
+
+    }
+
+    function show_simple_detail_dialog(order_id) {
+        $("#order_simple_detail_wrapper").html("");
+
+        $.ajax({
+            url: '{%url "ErpOrderSimpleDetail.Index" %}',
+            type: "POST",
+            data: {"order_id": order_id},
+            success: function (result) {
+                $("#order_simple_detail_wrapper").html(result);
+                load_order_detail_data(order_id);
+                $("#order_simple_detail_dialog").modal();
+            }
+        });
+    }
+
 </script>
 <script type="text/javascript" src="/static/lib/lodop/LodopFuncs.js"></script>
 
 <div id="order_print_preview"></div>
+<div id="order_simple_detail_wrapper"></div>
 {%footer%}

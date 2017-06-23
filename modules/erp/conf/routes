@@ -462,5 +462,7 @@ POST /order/hold/type/data/list          ErpOrderHoldType.ListData
 POST /order/hold/type/data/detail        ErpOrderHoldType.DetailData
 POST /order/hold/type/save               ErpOrderHoldType.Save
 
+POST /order/simple/detail                ErpOrderSimpleDetail.Index
+
 # 这个通用的路由应该放到最后比较合适，否则放在他后面的有的路由会不工作
 GET  /order/:status                        ErpOrder.Index
