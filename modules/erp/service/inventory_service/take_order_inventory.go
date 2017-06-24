@@ -6,10 +6,12 @@ import (
 	"github.com/go-xorm/xorm"
 	"matrix/core"
 	"matrix/modules/erp/models"
+	"github.com/revel/revel"
+	"matrix/modules/erp/service/inventory_history_service"
 )
 
 // 扣减订单库存
-func Take_order_inventory(order_id int64, db_session *xorm.Session) {
+func Take_order_inventory(order_id int64, db_session *xorm.Session) bool {
 
 	/*
 	SELECT oi.item_product_id AS product_id, oi.quantity AS quantity FROM erp_order_item oi WHERE oi.order_id = 0;
@@ -44,7 +46,12 @@ func Take_order_inventory(order_id int64, db_session *xorm.Session) {
 		//订单没有明确的发货仓库，不能扣减库存
 		//todo: 暂时不panic
 		//panic("订单没有明确的发货仓库，不能扣减库存！")
+		revel.ERROR.Println(fmt.Sprintf("订单没有明确的发货仓库，不能扣减库存！ 订单 order_id:%d", order_id))
+
+		return false
 	}
+
+	var success = true
 
 	// 分别扣减库存
 	for _, order_product_quantity_item := range order_product_quantity_item_list {
@@ -61,13 +68,21 @@ func Take_order_inventory(order_id int64, db_session *xorm.Session) {
 		has, err := db_session.Sql(sql_get_inventory_record).Get(&inventory)
 		core.HandleError(err)
 
-		if has && inventory.Qty >= quantity {
+		//if has && inventory.Qty >= quantity {
+		if has {
 			inventory.Qty = inventory.Qty - quantity
 			_, err = db_session.Id(inventory.Id).Cols("qty").Update(&inventory)
 			core.HandleError(err)
+
+			inventory_history_service.Insert_inventory_history(inventory, "发货扣减订单库存", db_session)
 		} else {
 			//todo: 暂时不panic
 			//panic("仓库中不存在相应库存，无法扣减相应库存！")
+			revel.ERROR.Println(fmt.Sprintf("仓库中不存在相应库存，无法扣减相应库存！ 订单 order_id:%d", order_id))
+
+			success = false
 		}
 	}
+
+	return success
 }

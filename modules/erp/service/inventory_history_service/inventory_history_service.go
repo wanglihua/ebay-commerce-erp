@@ -6,7 +6,7 @@ import (
 	"matrix/core"
 )
 
-func insert_inventory_history(inventory models.InventoryInfo, description string, db_session *xorm.Session) {
+func Insert_inventory_history(inventory models.InventoryInfo, description string, db_session *xorm.Session) {
 
 	var inventory_history models.InventoryHistoryInfo
 

@@ -870,9 +870,12 @@ func (c ErpOrder) FaHuo() revel.Result {
 		}
 	}
 
+	var take_inventory_result = true
 	for _, order := range order_list {
 
-		inventory_service.Take_order_inventory(order.Id, db_session)
+		if inventory_service.Take_order_inventory(order.Id, db_session) == false {
+			take_inventory_result = false
+		}
 
 		order.StatusId = models.ORDER_STATUS_YFH
 		_, err = db_session.Id(order.Id).Cols("status_id").Update(&order)
@@ -882,10 +885,17 @@ func (c ErpOrder) FaHuo() revel.Result {
 	// 更新库存待配货数量
 	go inventory_service.Calculate_inventory_pending_qty()
 
-	return c.RenderJson(map[string]interface{}{
-		"success": true,
-		"message": "订单发货成功！",
-	})
+	if take_inventory_result == true {
+		return c.RenderJson(map[string]interface{}{
+			"success": true,
+			"message": "订单发货成功！",
+		})
+	} else {
+		return c.RenderJson(map[string]interface{}{
+			"success": true,
+			"message": "订单发货成功，但部分库存扣减失败！",
+		})
+	}
 }
 
 func (c ErpOrder) ShiJiWuHuo() revel.Result {
