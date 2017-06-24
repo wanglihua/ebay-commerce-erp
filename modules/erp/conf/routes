@@ -198,6 +198,9 @@ POST /inventory/import/inventory/price           ErpInventory.ImportInventoryPri
 POST /inventory/export/inventory/price           ErpInventory.ExportInventoryPrice
 POST /inventory/import/inventory/quantity/diff   ErpInventory.ImportInventoryQuantityDiff
 
+POST /erp/inventory/history                    ErpInventoryHistory.Index
+POST /erp/inventory/history/data/list          ErpInventoryHistory.ListData
+
 GET  /stock/bill/checkin                   ErpStockBillCheckin.Index
 POST /stock/bill/checkin/data/list         ErpStockBillCheckin.ListData
 POST /stock/bill/checkin/data/detail       ErpStockBillCheckin.DetailData

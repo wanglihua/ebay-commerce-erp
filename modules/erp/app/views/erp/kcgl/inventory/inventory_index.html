@@ -556,8 +556,17 @@
                                 return dtFormatFloat(data);
                             }
                         },
-                        {"mDataProp": "ivt.create_time", "title": "创建时间", "bSearchable": false, "width": 120},
-                        {"mDataProp": "ivt.update_time", "title": "修改时间", "bSearchable": false, "width": 120}
+                        {
+                            "mDataProp": "ivt.id",
+                            "bSearchable": false,
+                            "orderable": false,
+                            "sClass": "center",
+                            "width": 100,
+                            "title": '操作',
+                            "render": function (data, type, row) {
+                                return "<a class='btn btn-xs btn-info btn-inline pull-left' onclick='show_inventory_history_dialog(" + data + ");' ><i class='ace-icon fa fa-list'></i>查看历史</a>";
+                            }
+                        }
                     ],
                     "fnServerData": function (sSource, aoData, fnCallback) {
                         showMask("数据加载中，请稍候");
@@ -729,6 +738,70 @@
             }
         }
     });
+
+
+    function show_inventory_history_dialog(inventory_id) {
+        function load_inventory_history(inventory_id) {
+            var history_vm = new Vue({
+                el: "#inventory_history_dialog",
+                data: {}
+            });
+
+            initDataTable(
+                '#inventoryHistoryList',
+                {
+                    "sAjaxSource": '{%url "ErpInventoryHistory.ListData"%}',
+                    "aaSorting": [[0, "desc"]],
+                    "aoColumns": [
+                        {"mDataProp": "create_time", "title": "时间", "bSearchable": false, "width": 120},
+                        {"mDataProp": "stock_id", "title": "仓库", "bSearchable": false},
+                        {"mDataProp": "storage_loc_id", "title": "库位", "bSearchable": false},
+                        {"mDataProp": "product_id", "title": "商品", "bSearchable": false},
+                        {"mDataProp": "qty", "title": "数量", "bSearchable": false},
+                        {"mDataProp": "description", "title": "描述", "bSearchable": true}
+
+                    ],
+                    "fnServerData": function (sSource, aoData, fnCallback) {
+                        showMask("数据加载中，请稍候");
+
+                        aoData.push({'name': 'inventory_id', 'value': inventory_id});
+
+                        $.ajax({
+                            "dataType": 'json',
+                            "url": sSource,
+                            "data": aoData,
+                            "success": function (data) {
+                                hideMask();
+
+                                if (data.success === false) {
+                                    $.msg.error(data.message);
+                                    return;
+                                }
+
+                                fnCallback(data);
+                            }
+                        });
+                    }
+                }
+            );
+        }
+
+        $("#inventory_history_wrapper").html("");
+
+        $.ajax({
+            url: '{%url "ErpInventoryHistory.Index" %}',
+            type: "POST",
+            data: {"inventory_id": inventory_id},
+            success: function (result) {
+                $("#inventory_history_wrapper").html(result);
+                load_inventory_history(inventory_id);
+                $("#inventory_history_dialog").modal();
+            }
+        });
+    }
+
 </script>
+<div id="inventory_history_wrapper"></div>
+
 {%footer%}
 
