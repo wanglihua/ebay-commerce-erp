@@ -7,6 +7,7 @@ import (
 	"matrix/modules/erp/models"
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/auth/pass_res"
+	"fmt"
 )
 
 type ErpInventoryHistory struct {
@@ -19,7 +20,16 @@ func (c ErpInventoryHistory) Index() revel.Result {
 	var inventory_id int64
 	c.Params.Bind(&inventory_id, "inventory_id")
 
+	c.RenderArgs["inventory_id"] = inventory_id
+
 	return c.RenderTemplate("erp/kcgl/inventory_history/inventory_history_index.html")
+}
+
+type InventoryHistoryViewItem struct {
+	InventoryHistory models.InventoryHistoryInfo  `xorm:"extends" json:"his"`
+	Stock            models.StockInfo             `xorm:"extends" json:"st"`
+	StorageLoc       models.StorageLocInfo        `xorm:"extends" json:"loc"`
+	Product          models.ProductInfo           `xorm:"extends" json:"prd"`
 }
 
 func (c ErpInventoryHistory) ListData() revel.Result {
@@ -30,28 +40,56 @@ func (c ErpInventoryHistory) ListData() revel.Result {
 
 	db_session := c.DbSession
 
-	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
-	query := db_session.Where(filter)
-
-	//query extra filter here
-
-	data_query := *query
-	if order != "" {
-		data_query = *data_query.OrderBy(order)
-	} else {
-		data_query = *data_query.Asc("id")
-	}
-
-	inventory_history_list := make([]models.InventoryHistoryInfo, 0, limit)
-	err := data_query.Limit(limit, offset).Find(&inventory_history_list)
+	var inventory models.InventoryInfo
+	_, err := db_session.Id(inventory_id).Get(&inventory)
 	core.HandleError(err)
 
-	count_query := *query
-	count, err := count_query.Count(new(models.InventoryHistoryInfo))
+	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
+
+	/*
+		SELECT his.*, st.*, loc.*, prd.*
+		FROM erp_inventory_history his
+		    INNER JOIN erp_stock st ON his.stock_id = st.id
+		    LEFT JOIN erp_storage_loc loc ON his.storage_loc_id = loc.id
+		    INNER JOIN erp_product prd ON his.product_id = prd.id
+	*/
+
+	var sb = core.NewSqlBuilder()
+	sb.Select(`his.*, st.*, loc.*, prd.*`)
+	sb.Count(`count(his.id) AS his_count`)
+	sb.From(`erp_inventory_history his
+		    INNER JOIN erp_stock st ON his.stock_id = st.id
+		    LEFT JOIN erp_storage_loc loc ON his.storage_loc_id = loc.id
+		    INNER JOIN erp_product prd ON his.product_id = prd.id`)
+
+	if inventory_id != 0 {
+		filter = core.SqlAnd(filter, fmt.Sprintf("his.stock_id = %d", inventory.StockId))
+		filter = core.SqlAnd(filter, fmt.Sprintf("his.storage_loc_id = %d", inventory.StorageLocId))
+		filter = core.SqlAnd(filter, fmt.Sprintf("his.product_id = %d", inventory.ProductId))
+	}
+
+	sb.Where(filter)
+
+	if order != "" {
+		sb.OrderBy(order)
+	} else {
+		sb.OrderBy("his.id ASC")
+	}
+
+	sb.Limit(offset, limit)
+
+	inventory_history_list := make([]InventoryHistoryViewItem, 0, limit)
+	err = db_session.Sql(sb.SqlList()).Find(&inventory_history_list)
+	core.HandleError(err)
+
+	var his_count struct {
+		Count int64 `xorm:"his_count"`
+	}
+	_, err = db_session.Sql(sb.SqlCount()).Get(&his_count)
 	core.HandleError(err)
 
 	return c.RenderJson(core.GridResult{
 		Data:  inventory_history_list,
-		Total: count,
+		Total: his_count.Count,
 	})
 }

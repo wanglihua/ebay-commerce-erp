@@ -753,12 +753,12 @@
                     "sAjaxSource": '{%url "ErpInventoryHistory.ListData"%}',
                     "aaSorting": [[0, "desc"]],
                     "aoColumns": [
-                        {"mDataProp": "create_time", "title": "时间", "bSearchable": false, "width": 120},
-                        {"mDataProp": "stock_id", "title": "仓库", "bSearchable": false},
-                        {"mDataProp": "storage_loc_id", "title": "库位", "bSearchable": false},
-                        {"mDataProp": "product_id", "title": "商品", "bSearchable": false},
-                        {"mDataProp": "qty", "title": "数量", "bSearchable": false},
-                        {"mDataProp": "description", "title": "描述", "bSearchable": true}
+                        {"mDataProp": "his.create_time", "title": "时间", "bSearchable": false, "width": 120},
+                        {"mDataProp": "st.name", "title": "仓库", "bSearchable": false, "bSortable": false},
+                        {"mDataProp": "loc.name", "title": "库位", "bSearchable": false, "bSortable": false},
+                        {"mDataProp": "prd.sku", "title": "商品", "bSearchable": false, "bSortable": false},
+                        {"mDataProp": "his.qty", "title": "数量", "bSearchable": false, "bSortable": false},
+                        {"mDataProp": "his.description", "title": "描述", "bSearchable": true, "bSortable": false}
 
                     ],
                     "fnServerData": function (sSource, aoData, fnCallback) {
