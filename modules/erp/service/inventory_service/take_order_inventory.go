@@ -36,7 +36,8 @@ func Take_order_inventory(order_id int64, db_session *xorm.Session) bool {
 	}
 
 	var order_stock_id OrderStockId
-	sql_get_order_stock := `SELECT ol.stock_id AS stock_id FROM erp_order_logistics ol WHERE ol.order_id = %d;`
+	//sql_get_order_stock := `SELECT ol.stock_id AS stock_id FROM erp_order_logistics ol WHERE ol.order_id = %d;`
+	sql_get_order_stock := `SELECT o.stock_id AS stock_id FROM erp_order o WHERE o.id = %d;` //用这种方式处理Hold的时候可以方便点，把Hold类型直接发货的，仓库记录 放在 order 表里面的 stock_id
 	sql_get_order_stock = fmt.Sprintf(sql_get_order_stock, order_id)
 	_, err = db_session.Sql(sql_get_order_stock).Get(&order_stock_id)
 	core.HandleError(err)

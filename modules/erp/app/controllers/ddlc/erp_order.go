@@ -19,6 +19,7 @@ import (
 	"matrix/modules/erp/service/shop_service"
 	"matrix/modules/erp/service/stock_pick_crew_service"
 	"matrix/modules/erp/setting"
+	"matrix/modules/erp/service/stock_service"
 )
 
 type ErpOrder struct {
@@ -867,6 +868,17 @@ func (c ErpOrder) FaHuo() revel.Result {
 				"success": false,
 				"message": "订单当前状态不是配货中或特殊hold状态，不能发货！",
 			})
+		}
+	}
+
+	var mel_stock_id = stock_service.Get_mel_stock_id(db_session)
+
+	for _, order := range order_list {
+		if order.StatusId == models.ORDER_STATUS_HOLD {
+			// 是Hold直接发货的，把 Hold订单的仓库直接设置为墨尔本的仓库
+			order.StockId = mel_stock_id
+			_, err = db_session.Id(order.Id).Cols("stock_id").Update(&order)
+			core.HandleError(err)
 		}
 	}
 
