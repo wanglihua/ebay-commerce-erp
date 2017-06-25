@@ -7,6 +7,7 @@ import (
 	"matrix/core"
 )
 
+//这个方法在一些Hold之后会被调用，所以不能在这时去掉订单的Hold信息
 func remove_order_logistics(order models.OrderInfo, db_session *xorm.Session) {
 
 	order.StockId = 0
