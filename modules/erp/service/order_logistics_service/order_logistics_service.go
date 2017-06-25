@@ -252,6 +252,10 @@ func (p_ol *OrderLogistics) CalculateListWithOption(order_list []models.OrderInf
 			continue
 		}
 
+		//移除订单原来匹配的物流信息。如果订单接下来被Hold这些信息可能还会被保留
+		remove_order_logistics(order, db_session)
+
+
 		var p_order_logistics_data = new(order_logistics_data_t)
 		//　一起加载需要的数据的方式，对性能的影响应该不会很大的
 		p_order_logistics_data.load_data(&order, p_ol, db_session)
@@ -299,6 +303,8 @@ func (p_ol *OrderLogistics) CalculateListWithOption(order_list []models.OrderInf
 
 		// 如果通过指定的物流的方式在匹配时进行了信封 Hold，就跳过
 		if is_envelope_hold == true {
+			//移除刚刚匹配的物流方式
+			remove_order_logistics(order, db_session)
 			continue
 		}
 
@@ -323,6 +329,8 @@ func (p_ol *OrderLogistics) CalculateListWithOption(order_list []models.OrderInf
 		if match_option.Unlock_express == false {
 			// 15 判断是否是快递
 			if p_ol.hold_check_express(&order, db_session) {
+				//移除刚刚匹配的物流方式
+				remove_order_logistics(order, db_session)
 				continue
 			}
 		}
