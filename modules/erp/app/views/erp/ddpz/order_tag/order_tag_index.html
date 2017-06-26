@@ -1,0 +1,234 @@
+{%header "订单标签" .%}
+<div id="page">
+    <div class="breadcrumbs" id="breadcrumbs">
+        <ul class="breadcrumb">
+            <li>
+                <a href='{%url "Home.Index"%}'><i class="ace-icon fa fa-home home-icon"></i></a>
+            </li>
+            <li class="parent" data-menu="ddpz-menu">订单配置</li>
+            <li class="active" data-menu="ddpz-ordertag-menu">订单标签</li>
+        </ul>
+    </div>
+    <div class="page-content">
+        <div class="row">
+            <div class="col-xs-12" style="padding: 0;">
+                <div class="gridToolBar clearfix">
+                    <button class="btn btn-primary btn-sm" @click="reloadList('#orderTagList')">
+                        <i class="ace-icon fa fa-refresh"></i>
+                        刷新
+                    </button>
+                    <button class="btn btn-success btn-sm" @click="showOrderTagDetail(0)">
+                        <i class="ace-icon fa fa-plus"></i>
+                        新增
+                    </button>
+                    <button class="btn btn-danger btn-sm" @click="deleteOrderTag()">
+                        <i class="ace-icon fa fa-trash-o"></i>
+                        删除
+                    </button>
+                </div>
+                <div>
+                    <table id="orderTagList" class="table table-striped table-bordered table-hover"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="orderTagDetailDialog">
+        <div class="modal-dialog" style="width: 680px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="True">&times;</button>
+                    <h4 class="modal-title">订单标签详细</h4>
+                </div>
+                <div class="modal-body clearfix">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <form class="form-horizontal" role="form" id="orderTagDetailForm">
+                                <input id="order_tag_id" name="detail.order_tag.id" type="hidden" v-model.number="detail.order_tag.id"/>
+                                <input id="order_tag_version" name="detail.order_tag.version" type="hidden" v-model.number="detail.order_tag.version"/>
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <label for="name" class="col-xs-2 control-label">名称</label>
+                                            <div class="col-xs-10">
+                                                <input id="name" name="detail.order_tag.name" type="text" class="input-sm form-control" v-model="detail.order_tag.name"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <label for="bg_color" class="col-xs-2 control-label">背景色</label>
+                                            <div class="col-xs-10">
+                                                <input id="bg_color" name="detail.order_tag.bg_color" type="text" class="input-sm form-control" v-model="detail.order_tag.bg_color"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <label for="desc" class="col-xs-2 control-label">备注</label>
+                                            <div class="col-xs-10">
+                                                <input id="desc" name="detail.order_tag.desc" type="text" class="input-sm form-control" v-model="detail.order_tag.desc"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success btn-sm" @click="saveOrderTag()">
+                        <i class="ace-icon fa fa-floppy-o"></i>保存
+                    </button>
+                    <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">
+                        <i class="ace-icon fa fa-times"></i>关闭
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    var vm = new Vue({
+        el: "#page",
+        data: {
+            "detail": {
+                "order_tag": {}
+            }
+        },
+        mounted: function () {
+            initDataTable(
+                '#orderTagList',
+                {
+                    "sAjaxSource": '{%url "ErpOrderTag.ListData"%}',
+                    "aaSorting": [[1, "asc"]],
+                    "aoColumns": [
+                        {
+                            "mDataProp": "id", "bSearchable": false, "orderable": false, "sClass": "center", "width": 50,
+                            "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
+                            "render": function (data, type, row) {
+                                return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
+                            }
+                        },
+                        {"mDataProp": "name", "title": "名称", "bSearchable": true},
+                        {"mDataProp": "bg_color", "title": "背景色", "bSearchable": true},
+                        {"mDataProp": "desc", "title": "备注", "bSearchable": true},
+                        {"mDataProp": "create_time", "title": "创建时间", "bSearchable": false, "width": 120},
+                        {"mDataProp": "update_time", "title": "修改时间", "bSearchable": false, "width": 120}
+                    ]
+                }
+            );
+
+            $('#orderTagList tbody').on('dblclick', 'tr', function () {
+                var id = $(this).find('td:first-child input:checkbox').val();
+                vm.showOrderTagDetail(id);
+            });
+        },
+        methods: {
+            reloadList: function () {
+                reloadList('#orderTagList');
+            },
+            showOrderTagDetail: function (id) {
+                showMask("加载中...");
+                $("#orderTagDetailForm").clearValidation();
+                $.ajax({
+                        url: '{%url "ErpOrderTag.DetailData" %}',
+                        type: "POST",
+                        data: {
+                            "id": id
+                        },
+                        success: function (result) {
+                            hideMask();
+                            if (result.success === false) {
+                                $.msg.error(result.message);
+                                return;
+                            }
+                            vm.detail = result;
+                            $('#orderTagDetailDialog').modal(modalOptions);
+                        }
+                    }
+                );
+            },
+            saveOrderTag: function () {
+                showMask("提交中...");
+                var form = $("#orderTagDetailForm");
+                var valid = validate(form, {
+                    'detail.order_tag.name': {
+                        required: true, minlength: 2, maxlength: 100
+                    },
+                    'detail.order_tag.bg_color': {
+                        required: true, maxlength: 500
+                    },
+                    'detail.order_tag.desc': {
+                        required: true, maxlength: 500
+                    }
+                });
+
+                if (!valid) {
+                    hideMask();
+                } else {
+                    $.ajax({
+                            url: '{%url "ErpOrderTag.Save"%}',
+                            type: "POST",
+                            processData: false,
+                            contentType: 'application/json',
+                            data: JSON.stringify(vm.detail),
+                            success: function (data) {
+                                hideMask();
+                                if (data.success === false) {
+                                    $.msg.error(data.message);
+                                    //return;
+                                }
+                                else {
+                                    $.msg.show(data.message);
+                                    $('#orderTagDetailDialog').modal('hide');
+                                    vm.reloadList();
+                                    //return;
+                                }
+                            }
+                        }
+                    );
+                }
+            },
+            deleteOrderTag: function () {
+                var id_list = [];
+                $('#orderTagList tbody tr>td:first-child input:checkbox').each(function () {
+                    if (this.checked) {
+                        id_list.push($(this).val());
+                    }
+                });
+
+                if (id_list.length === 0) {
+                    $.msg.alert("请选择数据！");
+                    return;
+                }
+
+                $.msg.confirm("确认要删除吗？", function () {
+                    $.ajax({
+                        url: '{%url "ErpOrderTag.Delete"%}',
+                        type: "POST",
+                        data: {"id_list": id_list},
+                        success: function (data) {
+                            if (data.success === false) {
+                                $.msg.error(data.message);
+                                return;
+                            }
+                            else {
+                                $.msg.show(data.message);
+                            }
+                            vm.reloadList();
+                        }
+                    });
+                });
+            }
+        }
+    });
+</script>
+{%footer%}
+

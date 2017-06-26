@@ -39,6 +39,7 @@ const (
 	DDPZ_PICK_FEE           = 120600 // 拣货费用
 	DDPZ_ORDER_HOLD_TYPE    = 120700 // 订单HOLD类型
 	DDPZ_ORDER_LOG          = 120800 // 订单修改日志
+	DDPZ_ORDER_TAG          = 120900 // 订单标签
 
 	// 订单流程, 模块编号 13
 	DDLC_ORDER_ALL                   = 130100 // 所有订单

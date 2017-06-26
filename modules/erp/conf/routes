@@ -467,6 +467,12 @@ POST /order/hold/type/data/list          ErpOrderHoldType.ListData
 POST /order/hold/type/data/detail        ErpOrderHoldType.DetailData
 POST /order/hold/type/save               ErpOrderHoldType.Save
 
+GET  /erp/order/tag                    ErpOrderTag.Index
+POST /erp/order/tag/data/list          ErpOrderTag.ListData
+POST /erp/order/tag/data/detail        ErpOrderTag.DetailData
+POST /erp/order/tag/save               ErpOrderTag.Save
+POST /erp/order/tag/delete             ErpOrderTag.Delete
+
 POST /order/simple/detail                ErpOrderSimpleDetail.Index
 
 # 这个通用的路由应该放到最后比较合适，否则放在他后面的有的路由会不工作

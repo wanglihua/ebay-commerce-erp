@@ -202,6 +202,13 @@ func (e PassResInfo) InitData(db_session *xorm.Session) {
 		pass.Name = "订单修改日志"
 		pass.Desc = core.MakeNullString("订单修改日志", true)
 		db_session.Insert(pass)
+
+		pass = new(PassResInfo)
+		pass.Id = pass_res.DDPZ_ORDER_TAG
+		pass.CateId = pass_res_cate.DDPZ
+		pass.Name = "订单标签"
+		pass.Desc = core.MakeNullString("订单标签", true)
+		db_session.Insert(pass)
 	}
 
 	// 库存管理

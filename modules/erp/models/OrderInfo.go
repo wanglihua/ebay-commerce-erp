@@ -49,6 +49,7 @@ type OrderInfo struct {
 	ModeId                   int64               `xorm:"bigint notnull index 'mode_id'" json:"mode_id" smith:"verbose_name=物流方式"`              // LogisticsModeInfo  的主键，，物流方式确定后，填入这个字段
 	DeliveryPerson           string              `xorm:"nvarchar(20) null 'delivery_person'" json:"delivery_person" smith:"verbose_name=发货人员"`
 	WaybillNumber            string              `xorm:"nvarchar(50) null 'waybill_number'" json:"waybill_number" smith:"verbose_name=货运单号"`
+	TagId                    int64               `xorm:"bigint notnull index 'tag_id'" json:"tag_id" smith:"verbose_name=标签"`
 	CreateTime               core.Time           `xorm:"created notnull 'create_time'" json:"create_time"`
 	UpdateTime               core.Time           `xorm:"updated notnull 'update_time'" json:"update_time"`
 	Version                  int                 `xorm:"version notnull 'version'" json:"version"`
