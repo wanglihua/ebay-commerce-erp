@@ -1,4 +1,16 @@
 {%header "订单标签" .%}
+
+<style type="text/css">
+    .btn-colorpicker {
+        display: inline-block;
+        width: 120px;
+        height: 20px;
+        background-color: #DDD;
+        vertical-align: middle;
+        border-radius: 0;
+        margin-top: 3px;
+    }
+</style>
 <div id="page">
     <div class="breadcrumbs" id="breadcrumbs">
         <ul class="breadcrumb">
@@ -33,7 +45,7 @@
         </div>
     </div>
     <div class="modal fade" id="orderTagDetailDialog">
-        <div class="modal-dialog" style="width: 680px;">
+        <div class="modal-dialog" style="width: 520px;">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="True">&times;</button>
@@ -61,7 +73,34 @@
                                         <div class="form-group">
                                             <label for="bg_color" class="col-xs-2 control-label">背景色</label>
                                             <div class="col-xs-10">
-                                                <input id="bg_color" name="detail.order_tag.bg_color" type="text" class="input-sm form-control" v-model="detail.order_tag.bg_color"/>
+                                                <select id="bg_color" name="detail.order_tag.bg_color" class="input-sm form-control" v-model="detail.order_tag.bg_color" onchange="tag_color_change()">
+                                                    <option value="#ac725e" style="background-color: #ac725e;">#ac725e</option>
+                                                    <option value="#d06b64" style="background-color: #d06b64;">#d06b64</option>
+                                                    <option value="#f83a22" style="background-color: #f83a22;">#f83a22</option>
+                                                    <option value="#fa573c" style="background-color: #fa573c;">#fa573c</option>
+                                                    <option value="#ff7537" style="background-color: #ff7537;">#ff7537</option>
+                                                    <option value="#ffad46" style="background-color: #ffad46;">#ffad46</option>
+                                                    <option value="#42d692" style="background-color: #42d692;">#42d692</option>
+                                                    <option value="#16a765" style="background-color: #16a765;">#16a765</option>
+                                                    <option value="#7bd148" style="background-color: #7bd148;">#7bd148</option>
+                                                    <option value="#b3dc6c" style="background-color: #b3dc6c;">#b3dc6c</option>
+                                                    <option value="#fbe983" style="background-color: #fbe983;">#fbe983</option>
+                                                    <option value="#fad165" style="background-color: #fad165;">#fad165</option>
+                                                    <option value="#92e1c0" style="background-color: #92e1c0;">#92e1c0</option>
+                                                    <option value="#9fe1e7" style="background-color: #9fe1e7;">#9fe1e7</option>
+                                                    <option value="#9fc6e7" style="background-color: #9fc6e7;">#9fc6e7</option>
+                                                    <option value="#4986e7" style="background-color: #4986e7;">#4986e7</option>
+                                                    <option value="#9a9cff" style="background-color: #9a9cff;">#9a9cff</option>
+                                                    <option value="#b99aff" style="background-color: #b99aff;">#b99aff</option>
+                                                    <option value="#c2c2c2" style="background-color: #c2c2c2;">#c2c2c2</option>
+                                                    <option value="#cabdbf" style="background-color: #cabdbf;">#cabdbf</option>
+                                                    <option value="#cca6ac" style="background-color: #cca6ac;">#cca6ac</option>
+                                                    <option value="#f691b2" style="background-color: #f691b2;">#f691b2</option>
+                                                    <option value="#cd74e6" style="background-color: #cd74e6;">#cd74e6</option>
+                                                    <option value="#a47ae2" style="background-color: #a47ae2;">#a47ae2</option>
+                                                    <option value="#555555" style="background-color: #555555;">#555555</option>
+                                                </select>
+
                                             </div>
                                         </div>
                                     </div>
@@ -72,7 +111,7 @@
                                         <div class="form-group">
                                             <label for="desc" class="col-xs-2 control-label">备注</label>
                                             <div class="col-xs-10">
-                                                <input id="desc" name="detail.order_tag.desc" type="text" class="input-sm form-control" v-model="detail.order_tag.desc"/>
+                                                <textarea id="desc" name="detail.order_tag.desc" rows="2" class="input-sm form-control" v-model="detail.order_tag.desc"></textarea>
                                             </div>
                                         </div>
                                     </div>
@@ -116,8 +155,13 @@
                                 return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
                             }
                         },
-                        {"mDataProp": "name", "title": "名称", "bSearchable": true},
-                        {"mDataProp": "bg_color", "title": "背景色", "bSearchable": true},
+                        {"mDataProp": "name", "title": "名称", "bSearchable": true, "width": 150},
+                        {
+                            "mDataProp": "bg_color", "title": "背景色", "bSearchable": true, "width": 150,
+                            "render": function (data, type, row) {
+                                return "<div style='height: 18px;width: 120px; background-color: " + data + "'>" + data + "</div>";
+                            }
+                        },
                         {"mDataProp": "desc", "title": "备注", "bSearchable": true},
                         {"mDataProp": "create_time", "title": "创建时间", "bSearchable": false, "width": 120},
                         {"mDataProp": "update_time", "title": "修改时间", "bSearchable": false, "width": 120}
@@ -150,6 +194,7 @@
                                 return;
                             }
                             vm.detail = result;
+                            $("#bg_color").css("background-color", result.order_tag.bg_color);
                             $('#orderTagDetailDialog').modal(modalOptions);
                         }
                     }
@@ -229,6 +274,11 @@
             }
         }
     });
+
+    function tag_color_change() {
+        var bg_color = $("#bg_color");
+        bg_color.css("background-color", bg_color.val());
+    }
 </script>
 {%footer%}
 
