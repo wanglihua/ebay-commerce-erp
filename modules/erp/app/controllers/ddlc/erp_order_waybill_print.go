@@ -48,8 +48,7 @@ func (c ErpOrderWaybillPrint) Preview() revel.Result {
 		core.HandleError(err)
 		print_order.LogisticsCompanyName = logistics_company.Name
 
-		print_order.SkuQtyLocList = get_order_sku_qty_loc_list_for_print(order_id, db_session)
-		print_order.PcsCount = len(print_order.SkuQtyLocList)
+		print_order.SkuQtyLocList, print_order.PcsCount = get_order_sku_qty_loc_list_for_print(order_id, db_session)
 
 		if order.StockId == mel_stock_id {
 			print_order.StockAddressLine1 = "2 Venture Court"
@@ -98,8 +97,7 @@ func (c ErpOrderWaybillPrint) Print() revel.Result {
 		core.HandleError(err)
 		print_order.LogisticsCompanyName = logistics_company.Name
 
-		print_order.SkuQtyLocList = get_order_sku_qty_loc_list_for_print(order_id, db_session)
-		print_order.PcsCount = len(print_order.SkuQtyLocList)
+		print_order.SkuQtyLocList, print_order.PcsCount = get_order_sku_qty_loc_list_for_print(order_id, db_session)
 
 		if order.StockId == mel_stock_id {
 			print_order.StockAddressLine1 = "2 Venture Court"
@@ -124,12 +122,12 @@ type Print_order_t struct {
 	//OrderLogistics       models.OrderLogisticsInfo
 	LogisticsCompanyName string
 	SkuQtyLocList        []string
-	PcsCount             int
+	PcsCount             int64
 	StockAddressLine1    string
 	StockAddressLine2    string
 }
 
-func get_order_sku_qty_loc_list_for_print(order_id int64, db_session *xorm.Session) []string {
+func get_order_sku_qty_loc_list_for_print(order_id int64, db_session *xorm.Session) (sku_qty_loc_list_return []string, pcs_count_return int64) {
 	/*
 		数量*SKU_仓位号
 	 */
@@ -138,9 +136,11 @@ func get_order_sku_qty_loc_list_for_print(order_id int64, db_session *xorm.Sessi
 
 	var order_item_list = make([]string, 0)
 
+	var pcs_count int64 = 0
 	for _, order_sku_qty_loc := range order_sku_qty_loc_list {
 		order_item_list = append(order_item_list, fmt.Sprintf("%d*%s_%s", order_sku_qty_loc.Quantity, order_sku_qty_loc.Sku, order_sku_qty_loc.StorageLocName))
+		pcs_count = pcs_count + order_sku_qty_loc.Quantity
 	}
 
-	return order_item_list
+	return order_item_list, pcs_count
 }
