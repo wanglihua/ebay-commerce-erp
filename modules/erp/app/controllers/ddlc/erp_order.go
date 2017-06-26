@@ -20,6 +20,7 @@ import (
 	"matrix/modules/erp/service/stock_pick_crew_service"
 	"matrix/modules/erp/setting"
 	"matrix/modules/erp/service/stock_service"
+	"matrix/modules/erp/service/order_history_service"
 )
 
 type ErpOrder struct {
@@ -795,10 +796,14 @@ func (c ErpOrder) DaiPeiHuo() revel.Result {
 		}
 	}
 
+	var login_user = core.GetLoginUser(c.Session)
+
 	for _, order := range order_list {
 		order.StatusId = models.ORDER_STATUS_DPH
 		_, err = db_session.Id(order.Id).Cols("status_id").Update(&order)
 		core.HandleError(err)
+
+		order_history_service.Insert_order_history(order, fmt.Sprintf("订单Hold转 待配货， 工号： %s", login_user.LoginName), db_session)
 	}
 
 	return c.RenderJson(map[string]interface{}{
@@ -833,10 +838,14 @@ func (c ErpOrder) PeiHuo() revel.Result {
 		}
 	}
 
+	var login_user = core.GetLoginUser(c.Session)
+
 	for _, order := range order_list {
 		order.StatusId = models.ORDER_STATUS_PHZ
 		_, err = db_session.Id(order.Id).Cols("status_id").Update(&order)
 		core.HandleError(err)
+
+		order_history_service.Insert_order_history(order, fmt.Sprintf("订单配货， 工号： %s", login_user.LoginName), db_session)
 	}
 
 	return c.RenderJson(map[string]interface{}{
@@ -882,6 +891,8 @@ func (c ErpOrder) FaHuo() revel.Result {
 		}
 	}
 
+	var login_user = core.GetLoginUser(c.Session)
+
 	var take_inventory_result = true
 	for _, order := range order_list {
 
@@ -892,6 +903,8 @@ func (c ErpOrder) FaHuo() revel.Result {
 		order.StatusId = models.ORDER_STATUS_YFH
 		_, err = db_session.Id(order.Id).Cols("status_id").Update(&order)
 		core.HandleError(err)
+
+		order_history_service.Insert_order_history(order, fmt.Sprintf("订单发货， 工号： %s", login_user.LoginName), db_session)
 	}
 
 	// 更新库存待配货数量
@@ -936,11 +949,15 @@ func (c ErpOrder) ShiJiWuHuo() revel.Result {
 		}
 	}
 
+	var login_user = core.GetLoginUser(c.Session)
+
 	for _, order := range order_list {
 		order.StatusId = models.ORDER_STATUS_HOLD
 		order.HoldTypeId = core.MakeNullInt(models.ORDER_HOLD_TYPE_OOS_ACTUAL_STOCK, true)
 		_, err = db_session.Id(order.Id).Cols("status_id", "hold_type_id").Update(&order)
 		core.HandleError(err)
+
+		order_history_service.Insert_order_history(order, fmt.Sprintf("订单实际无货，工号： %s", login_user.LoginName), db_session)
 	}
 
 	go inventory_service.Calculate_inventory_pending_qty()
@@ -972,10 +989,14 @@ func (c ErpOrder) WanCheng() revel.Result {
 		}
 	}
 
+	var login_user = core.GetLoginUser(c.Session)
+
 	for _, order := range order_list {
 		order.StatusId = models.ORDER_STATUS_YWC
 		_, err = db_session.Id(order.Id).Cols("status_id").Update(&order)
 		core.HandleError(err)
+
+		order_history_service.Insert_order_history(order, fmt.Sprintf("订单完成，工号： %s", login_user.LoginName), db_session)
 	}
 
 	return c.RenderJson(map[string]interface{}{
@@ -997,10 +1018,14 @@ func (c ErpOrder) QuXiao() revel.Result {
 	err := db_session.In("id", order_id_list).Find(&order_list)
 	core.HandleError(err)
 
+	var login_user = core.GetLoginUser(c.Session)
+
 	for _, order := range order_list {
 		order.StatusId = models.ORDER_STATUS_YQX // 已取消
 		_, err = db_session.Id(order.Id).Cols("status_id").Update(&order)
 		core.HandleError(err)
+
+		order_history_service.Insert_order_history(order, fmt.Sprintf("订单取消， 工号： %s", login_user.LoginName), db_session)
 	}
 
 	return c.RenderJson(map[string]interface{}{

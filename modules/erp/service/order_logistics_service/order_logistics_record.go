@@ -6,6 +6,7 @@ import (
 	"github.com/go-xorm/xorm"
 	"matrix/core"
 	"matrix/modules/erp/models"
+	"matrix/modules/erp/service/order_history_service"
 )
 
 func save_order_logistics(p_order *models.OrderInfo, match_result match_logistics_mode_result, unlock_express bool, db_session *xorm.Session) models.OrderLogisticsInfo {
@@ -44,10 +45,14 @@ func save_order_logistics(p_order *models.OrderInfo, match_result match_logistic
 			// 把订单状态修改为 Hold
 			p_order.HoldTypeId = core.MakeNullInt(models.ORDER_HOLD_TYPE_EXPRESS, true)
 			p_order.StatusId = models.ORDER_STATUS_HOLD // 修改订单状态为 hold 状态
+
+			order_history_service.Insert_order_history(*p_order, fmt.Sprintf("匹配物流订单Hold 快递类",), db_session)
 		} else {
 			// 把订单状态修改为 待配货
 			p_order.HoldTypeId = core.MakeNullInt(0, false)
 			p_order.StatusId = models.ORDER_STATUS_DPH
+
+			order_history_service.Insert_order_history(*p_order, fmt.Sprintf("匹配物流订单待配货",), db_session)
 		}
 	}
 

@@ -13,6 +13,7 @@ import (
 	"matrix/core/collections"
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/order_service"
+	"matrix/modules/erp/service/order_history_service"
 )
 
 // 1 地址有特殊字段的
@@ -433,6 +434,12 @@ func (p_ol *OrderLogistics) update_order_to_hold_type(p_order *models.OrderInfo,
 	p_order.StatusId = models.ORDER_STATUS_HOLD // 修改订单状态为 hold 状态
 	_, err := db_session.Id(p_order.Id).Cols("hold_type_id", "status_id").Update(p_order)
 	core.HandleError(err)
+
+	var hold_type models.OrderHoldTypeInfo
+	_, err = db_session.Id(p_order.HoldTypeId.Int64).Get(&hold_type)
+	core.HandleError(err)
+
+	order_history_service.Insert_order_history(*p_order, fmt.Sprintf("匹配物流订单Hold %s", hold_type.Name), db_session)
 }
 
 // 检查仓库是否有订单中的所有商品数量的库存。这里的有货就理解成这个仓库有订单的所有的商品；这里的缺货也理解成是，没有一个仓库能凑齐所有商品的所有数量。同时返回订单的商品总成本

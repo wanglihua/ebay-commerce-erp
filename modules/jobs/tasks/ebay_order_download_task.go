@@ -16,6 +16,7 @@ import (
 	"matrix/modules/erp/service/product_bind_service"
 	"matrix/modules/erp/service/product_service"
 	"matrix/modules/erp/service/product_store_item_service"
+	"matrix/modules/erp/service/order_history_service"
 )
 
 type EBayOrderDownloadTask struct {
@@ -246,6 +247,8 @@ func (t EBayOrderDownloadTask) Run() {
 				// """同步逻辑要保证中间的 待配货，配货中，已发货 等的状态在同步时不被前面的状态覆盖，只有后面的“已完成”可以覆盖这些状态""
 				// 所以下面的两个条件中需要加 < 号的状态判断
 
+				var status_id_before = order_in_db.StatusId
+
 				// 如果是新的订单，一般是新增的订单，系统数据库中还没有的订单
 				if order_status_id < models.ORDER_STATUS_YCJ && //这个状态检查不能少，否则 待配货，已发货的状态可能会被覆盖
 					order_in_db.PaidTime.Valid == false {
@@ -297,12 +300,18 @@ func (t EBayOrderDownloadTask) Run() {
 					// update order
 					_, err = db_session.Id(order_in_db.Id).Cols(update_col_list...).Update(&order_in_db)
 					core.HandleError(err)
+
+					if status_id_before != order_in_db.StatusId {
+						order_history_service.Insert_order_history(order_in_db, "订单下载状态更新", db_session)
+					}
 				} else {
 					// insert order
 					order_in_db.Code = order_code
 
 					_, err = db_session.Insert(&order_in_db)
 					core.HandleError(err)
+
+					order_history_service.Insert_order_history(order_in_db, "订单下载新增订单", db_session)
 				}
 
 				order_id := order_in_db.Id

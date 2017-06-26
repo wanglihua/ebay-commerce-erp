@@ -16,6 +16,7 @@ import (
 	"matrix/modules/erp/service/order_import_batch_service"
 	"matrix/modules/erp/service/order_logistics_service"
 	"matrix/modules/erp/service/order_shipping_address_service"
+	"matrix/modules/erp/service/order_history_service"
 )
 
 type ErpOrderImport struct {
@@ -556,6 +557,8 @@ SELECT sa.id AS shop_id, sa.name AS shop_name FROM erp_shop_account sa;
 
 			_, err = db_session.Insert(&order)
 			core.HandleError(err)
+
+			order_history_service.Insert_order_history(order, fmt.Sprintf("订单导入新增订单", ), db_session)
 
 			// 地址
 			var order_shipping_address models.OrderShippingAddressInfo

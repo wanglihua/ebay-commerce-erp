@@ -18,6 +18,7 @@ func Insert_order_history(order models.OrderInfo, description string, db_session
 	core.HandleError(err)
 
 	order_history.StatusName = order_status.Name
+	order_history.Description = description
 
 	_, err = db_session.Insert(&order_history)
 	core.HandleError(err)
