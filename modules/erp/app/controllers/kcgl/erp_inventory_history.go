@@ -44,7 +44,7 @@ func (c ErpInventoryHistory) ListData() revel.Result {
 	_, err := db_session.Id(inventory_id).Get(&inventory)
 	core.HandleError(err)
 
-	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
+	filter, _, offset, limit := core.GetGridRequestParam(c.Request)
 
 	/*
 		SELECT his.*, st.*, loc.*, prd.*
@@ -70,11 +70,7 @@ func (c ErpInventoryHistory) ListData() revel.Result {
 
 	sb.Where(filter)
 
-	if order != "" {
-		sb.OrderBy(order)
-	} else {
-		sb.OrderBy("his.id ASC")
-	}
+	sb.OrderBy("his.id DESC")
 
 	sb.Limit(offset, limit)
 
