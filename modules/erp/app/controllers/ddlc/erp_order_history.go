@@ -18,7 +18,7 @@ func (c ErpOrderHistory) ListData() revel.Result {
 	var order_id int64
 	c.Params.Bind(&order_id, "order_id")
 
-	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
+	filter, order, _, _ := core.GetGridRequestParam(c.Request)
 
 	//query extra filter here
 	filter = core.SqlAnd(filter, fmt.Sprintf("order_id = %d", order_id))
@@ -32,8 +32,9 @@ func (c ErpOrderHistory) ListData() revel.Result {
 		data_query = *data_query.Asc("id")
 	}
 
-	order_history_list := make([]models.OrderHistoryInfo, 0, limit)
-	err := data_query.Limit(limit, offset).Find(&order_history_list)
+	order_history_list := make([]models.OrderHistoryInfo, 0)
+	//err := data_query.Limit(limit, offset).Find(&order_history_list)
+	err := data_query.Find(&order_history_list)
 	core.HandleError(err)
 
 	count_query := *query

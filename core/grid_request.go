@@ -6,13 +6,14 @@ import (
 
 	"github.com/revel/revel"
 	"matrix/db"
+	"math"
 )
 
 func GetGridRequestParam(request *revel.Request) (filter string, order string, offset int64, limit int64) {
-	filter = "" // return
-	order = ""  // return
-	offset = 0  // return
-	limit = 10  // return
+	filter = ""           // return
+	order = ""            // return
+	offset = 0            // return
+	limit = math.MaxInt64 // return
 
 	if len(request.Form["iColumns"]) == 0 {
 		return
