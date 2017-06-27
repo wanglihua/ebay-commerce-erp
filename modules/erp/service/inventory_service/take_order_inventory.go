@@ -11,7 +11,7 @@ import (
 )
 
 // 扣减订单库存
-func Take_order_inventory(order_id int64, db_session *xorm.Session) bool {
+func Take_order_inventory(order models.OrderInfo, db_session *xorm.Session) bool {
 
 	/*
 	SELECT oi.item_product_id AS product_id, oi.quantity AS quantity FROM erp_order_item oi WHERE oi.order_id = 0;
@@ -23,7 +23,7 @@ func Take_order_inventory(order_id int64, db_session *xorm.Session) bool {
 
 	var order_product_quantity_item_list = make([]OrderProductQuantityItem, 0)
 	sql_get_order_product_item := `SELECT oi.item_product_id AS product_id, oi.quantity AS quantity FROM erp_order_item oi WHERE oi.order_id = %d;`
-	sql_get_order_product_item = fmt.Sprintf(sql_get_order_product_item, order_id)
+	sql_get_order_product_item = fmt.Sprintf(sql_get_order_product_item, order.Id)
 	err := db_session.Sql(sql_get_order_product_item).Find(&order_product_quantity_item_list)
 	core.HandleError(err)
 
@@ -38,7 +38,7 @@ func Take_order_inventory(order_id int64, db_session *xorm.Session) bool {
 	var order_stock_id OrderStockId
 	//sql_get_order_stock := `SELECT ol.stock_id AS stock_id FROM erp_order_logistics ol WHERE ol.order_id = %d;`
 	sql_get_order_stock := `SELECT o.stock_id AS stock_id FROM erp_order o WHERE o.id = %d;` //用这种方式处理Hold的时候可以方便点，把Hold类型直接发货的，仓库记录 放在 order 表里面的 stock_id
-	sql_get_order_stock = fmt.Sprintf(sql_get_order_stock, order_id)
+	sql_get_order_stock = fmt.Sprintf(sql_get_order_stock, order.Id)
 	_, err = db_session.Sql(sql_get_order_stock).Get(&order_stock_id)
 	core.HandleError(err)
 
@@ -47,7 +47,7 @@ func Take_order_inventory(order_id int64, db_session *xorm.Session) bool {
 		//订单没有明确的发货仓库，不能扣减库存
 		//todo: 暂时不panic
 		//panic("订单没有明确的发货仓库，不能扣减库存！")
-		revel.ERROR.Println(fmt.Sprintf("订单没有明确的发货仓库，不能扣减库存！ 订单 order_id:%d", order_id))
+		revel.ERROR.Println(fmt.Sprintf("订单没有明确的发货仓库，不能扣减库存！ 订单 order_id:%d", order.Id))
 
 		return false
 	}
@@ -75,11 +75,11 @@ func Take_order_inventory(order_id int64, db_session *xorm.Session) bool {
 			_, err = db_session.Id(inventory.Id).Cols("qty").Update(&inventory)
 			core.HandleError(err)
 
-			inventory_history_service.Insert_inventory_history(inventory, "发货扣减订单库存", db_session)
+			inventory_history_service.Insert_inventory_history(inventory, fmt.Sprintf("发货扣减订单库存, 订单编号: %s", order.Code), db_session)
 		} else {
 			//todo: 暂时不panic
 			//panic("仓库中不存在相应库存，无法扣减相应库存！")
-			revel.ERROR.Println(fmt.Sprintf("仓库中不存在相应库存，无法扣减相应库存！ 订单 order_id:%d", order_id))
+			revel.ERROR.Println(fmt.Sprintf("仓库中不存在相应库存，无法扣减相应库存！ 订单编号:%s", order.Code))
 
 			success = false
 		}

@@ -910,7 +910,7 @@ func (c ErpOrder) FaHuo() revel.Result {
 	var take_inventory_result = true
 	for _, order := range order_list {
 
-		if inventory_service.Take_order_inventory(order.Id, db_session) == false {
+		if inventory_service.Take_order_inventory(order, db_session) == false {
 			take_inventory_result = false
 		}
 
