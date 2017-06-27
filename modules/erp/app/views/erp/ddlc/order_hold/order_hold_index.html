@@ -33,6 +33,21 @@
                         <i class="ace-icon fa fa-file-excel-o"></i>
                         导出订单编码代码
                     </button>
+
+                    <div class="btn-group">
+                        <button data-toggle="dropdown" class="btn btn-info btn-sm dropdown-toggle" aria-expanded="false" style="border-width: 4px;">
+                            <i class="ace-icon fa fa-tag"></i><span id="dataFilter" data-status="0">应用标签</span>
+                            <span class="ace-icon fa fa-caret-down icon-on-right"></span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-danger">
+                            <template v-for="order_tag in page.order_tag_list">
+                                <li :style="'background-color:' + order_tag.bg_color + ';'">
+                                    <a @click="apply_order_tag(order_tag.id)" style="cursor: pointer;">{{order_tag.name}}</a>
+                                </li>
+                            </template>
+                        </ul>
+                    </div>
+
                 </div>
                 <div class="row" style="margin-top: 20px;margin-bottom: 20px;">
                     <div id="query" class="col-xs-12" style="line-height: 28px;">
@@ -565,6 +580,38 @@
                 });
                 var url = '{%url "ErpOrderExport.Export"%}' + "?" + params;
                 $('<form method="post" action="' + url + '"></form>').appendTo('body').submit().remove();
+            },
+            apply_order_tag: function (order_tag_id) {
+                var order_id_list = [];
+                $('#orderList tbody tr>td:first-child input:checkbox').each(function () {
+                    if (this.checked) {
+                        order_id_list.push($(this).val());
+                    }
+                });
+
+                if (order_id_list.length === 0) {
+                    $.msg.alert("请选择数据！");
+                    return;
+                }
+
+                $.ajax({
+                    url: '{%url "ErpOrderTag.ApplyTag"%}',
+                    type: "POST",
+                    data: {
+                        "order_id_list": order_id_list,
+                        "order_tag_id": order_tag_id
+                    },
+                    success: function (data) {
+                        if (data.success === false) {
+                            $.msg.error(data.message);
+                            return;
+                        }
+                        else {
+                            $.msg.show(data.message);
+                        }
+                        vm.reloadList();
+                    }
+                });
             }
         }
     });

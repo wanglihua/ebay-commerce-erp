@@ -214,6 +214,10 @@ func (c ErpOrder) PageData() revel.Result {
 	}
 	core.HandleError(err)
 
+	var order_tag_list = make([]models.OrderTagInfo, 0)
+	err = db_session.OrderBy("name ASC").Find(&order_tag_list)
+	core.HandleError(err)
+
 	return c.RenderJson(map[string]interface{}{
 		"shop_id":             0,
 		"shop_list":           shop_list,
@@ -229,6 +233,7 @@ func (c ErpOrder) PageData() revel.Result {
 		"hold_type_id":        -1, // 表示不选择 hold
 		"batch_code":          0,
 		"batch_code_list":     batch_code_list,
+		"order_tag_list":      order_tag_list,
 	})
 }
 

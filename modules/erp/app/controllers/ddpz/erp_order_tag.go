@@ -7,6 +7,8 @@ import (
 
 	"matrix/core"
 	"matrix/modules/erp/models"
+	"matrix/modules/auth/service/pass_service"
+	"matrix/modules/auth/pass_res"
 )
 
 type ErpOrderTag struct {
@@ -14,10 +16,14 @@ type ErpOrderTag struct {
 }
 
 func (c ErpOrderTag) Index() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.DDPZ_ORDER_TAG, c.Session)
+
 	return c.RenderTemplate("erp/ddpz/order_tag/order_tag_index.html")
 }
 
 func (c ErpOrderTag) ListData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.DDPZ_ORDER_TAG, c.Session)
+
 	db_session := c.DbSession
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
@@ -77,6 +83,8 @@ func (f *OrderTagDetailForm) Valid(validation *revel.Validation) bool {
 }
 
 func (c ErpOrderTag) DetailData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.DDPZ_ORDER_TAG, c.Session)
+
 	db_session := c.DbSession
 
 	var order_tag_id int64
@@ -98,6 +106,8 @@ func (c ErpOrderTag) DetailData() revel.Result {
 }
 
 func (c ErpOrderTag) Save() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.DDPZ_ORDER_TAG, c.Session)
+
 	db_session := c.DbSession
 
 	var detail_form OrderTagDetailForm
@@ -139,6 +149,8 @@ func (c ErpOrderTag) Save() revel.Result {
 }
 
 func (c ErpOrderTag) Delete() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.DDPZ_ORDER_TAG, c.Session)
+
 	db_session := c.DbSession
 
 	order_tag_id_list := make([]int64, 0)
@@ -148,4 +160,29 @@ func (c ErpOrderTag) Delete() revel.Result {
 	core.HandleError(err)
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})
+}
+
+func (c ErpOrderTag) ApplyTag() revel.Result {
+	db_session := c.DbSession
+
+	var order_id_list = make([]int64, 0)
+	c.Params.Bind(&order_id_list, "order_id_list")
+
+	var order_tag_id int64
+	c.Params.Bind(&order_tag_id, "order_tag_id")
+
+	var order_list = make([]models.OrderInfo, 0)
+	err := db_session.In("id", order_id_list).Find(&order_list)
+	core.HandleError(err)
+
+	for _, order := range order_list {
+		order.TagId = order_tag_id
+		_, err = db_session.Id(order.Id).Cols("tag_id").Update(&order)
+		core.HandleError(err)
+	}
+
+	return c.RenderJson(map[string]interface{}{
+		"success": true,
+		"message": "标签应用成功！",
+	})
 }
