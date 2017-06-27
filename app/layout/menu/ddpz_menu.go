@@ -144,6 +144,7 @@ func GetDdpzMenu(res_id_map map[int64]bool, web_session revel.Session) string {
         </li>`)
     */
 
+	/* 先暂时禁用
 	if check_pass_res_menu(pass_res.DDPZ_ORDER_LOG) {
 		buffer.WriteString(`<li id="ddpz-orderlog-menu" class="">
             <a href="/order/log">
@@ -153,6 +154,7 @@ func GetDdpzMenu(res_id_map map[int64]bool, web_session revel.Session) string {
             <b class="arrow"></b>
         </li>`)
 	}
+	*/
 
 	buffer.WriteString(`
     </ul>
