@@ -19,10 +19,11 @@ func (c ErpOrderHistory) ListData() revel.Result {
 	c.Params.Bind(&order_id, "order_id")
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
-	query := db_session.Where(filter)
 
 	//query extra filter here
 	filter = core.SqlAnd(filter, fmt.Sprintf("order_id = %d", order_id))
+
+	query := db_session.Where(filter)
 
 	data_query := *query
 	if order != "" {
