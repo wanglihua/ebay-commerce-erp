@@ -13,7 +13,6 @@ type StorageLocInfo struct {
 	YAxes      string          `xorm:"nvarchar(100) notnull 'y_axes'" json:"y_axes" smith:"verbose_name=Y轴坐标,max=100"`
 	CreateTime core.Time       `xorm:"created notnull 'create_time'" json:"create_time"`
 	UpdateTime core.Time       `xorm:"updated notnull 'update_time'" json:"update_time"`
-	Version    int             `xorm:"version notnull 'version'" json:"version"`
 }
 
 func (e StorageLocInfo) TableName() string {

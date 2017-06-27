@@ -15,7 +15,6 @@ type LogisticsCompanyInfo struct {
 	Ord                int64           `xorm:"bigint null 'ord'" json:"ord" smith:"verbose_name=排序"`
 	CreateTime         core.Time       `xorm:"created notnull 'create_time'" json:"create_time"`
 	UpdateTime         core.Time       `xorm:"updated notnull 'update_time'" json:"update_time"`
-	Version            int             `xorm:"version notnull 'version'" json:"version"`
 }
 
 func (e LogisticsCompanyInfo) TableName() string {

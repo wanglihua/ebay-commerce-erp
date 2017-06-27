@@ -18,7 +18,6 @@ type IssueInfo struct {
 	StatusId       int64             `xorm:"biging notnull index 'status_id'" json:"status_id" smith:"verbose_name=状态id"`
 	CreateTime    core.Time         `xorm:"created notnull 'create_time'" json:"create_time"`
 	UpdateTime    core.Time         `xorm:"updated notnull 'update_time'" json:"update_time"`
-	Version        int               `xorm:"version notnull 'version'" json:"version"`
 }
 
 func (e IssueInfo) TableName() string {

@@ -12,7 +12,6 @@ type BrandInfo struct {
 	Phone      core.NullString `xorm:"nvarchar(200) 'phone'" json:"phone" smith:"verbose_name=电话,min=2,max=100"`
 	CreateTime core.Time       `xorm:"created notnull 'create_time'" json:"create_time"`
 	UpdateTime core.Time       `xorm:"updated notnull 'update_time'" json:"update_time"`
-	Version    int             `xorm:"version notnull 'version'" json:"version"`
 }
 
 func (e BrandInfo) TableName() string {

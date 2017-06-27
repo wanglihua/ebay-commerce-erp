@@ -23,7 +23,6 @@ type ProductInfo struct {
 	BatchCode  int64           `xorm:"bigint null index 'batch_code'" json:"batch_code" smith:"verbose_name=导入批次号"` //导入的批次号
 	CreateTime core.Time       `xorm:"created notnull 'create_time'" json:"create_time"`
 	UpdateTime core.Time       `xorm:"updated notnull 'update_time'" json:"update_time"`
-	Version    int             `xorm:"version notnull 'version'" json:"version"`
 }
 
 func (e ProductInfo) TableName() string {

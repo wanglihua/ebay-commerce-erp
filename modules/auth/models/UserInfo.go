@@ -15,7 +15,6 @@ type UserInfo struct {
 	IsDefaultPwd int64           `xorm:"bigint notnull 'is_default_pwd'" json:"is_default_pwd" smith:"verbose_name=是否为默认密码"` // <0 否， >0 是
 	CreateTime   core.Time       `xorm:"created notnull 'create_time'" json:"create_time"`
 	UpdateTime   core.Time       `xorm:"updated notnull 'update_time'" json:"update_time"`
-	Version      int             `xorm:"version notnull 'version'" json:"version"`
 }
 
 func (e UserInfo) TableName() string {

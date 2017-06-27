@@ -14,7 +14,6 @@ type PickFeeInfo struct {
 	Fee5       float64         `xorm:"decimal(18,6) notnull 'fee5'" json:"fee5" smith:"verbose_name=50.1KG以上"`
 	CreateTime core.Time       `xorm:"created notnull 'create_time'" json:"create_time"`
 	UpdateTime core.Time       `xorm:"updated notnull 'update_time'" json:"update_time"`
-	Version    int             `xorm:"version notnull 'version'" json:"version"`
 }
 
 func (e PickFeeInfo) TableName() string {

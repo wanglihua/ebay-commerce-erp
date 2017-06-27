@@ -25,7 +25,6 @@ type OrderLogisticsInfo struct {
 	TrackingNum   string       `xorm:"nvarchar(100) null 'tracking_num'" json:"tracking_num" smith:"verbose_name=运单号"`
 	CreateTime    core.Time    `xorm:"created notnull 'create_time'" json:"create_time"`
 	UpdateTime    core.Time    `xorm:"updated notnull 'update_time'" json:"update_time"`
-	Version       int          `xorm:"version notnull 'version'" json:"version"`
 }
 
 func (e OrderLogisticsInfo) TableName() string {

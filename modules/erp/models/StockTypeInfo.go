@@ -22,7 +22,6 @@ type StockTypeInfo struct {
 	Desc       string          `xorm:"nvarchar(500) notnull 'desc'" json:"desc"`
 	CreateTime core.Time       `xorm:"created notnull 'create_time'" json:"create_time"`
 	UpdateTime core.Time       `xorm:"updated notnull 'update_time'" json:"update_time"`
-	Version    int             `xorm:"version notnull 'version'" json:"version"`
 }
 
 func (e StockTypeInfo) TableName() string {

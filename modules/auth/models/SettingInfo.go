@@ -11,7 +11,6 @@ type SettingInfo struct {
 	TimeOut         int64           `xorm:"bigint notnull 'time_out'" json:"time_out" smith:"verbose_name=超时时长,min=1,max=10000"`
 	CreateTime      core.Time       `xorm:"created notnull 'create_time'" json:"create_time"`
 	UpdateTime      core.Time       `xorm:"updated notnull 'update_time'" json:"update_time"`
-	Version         int             `xorm:"version notnull 'version'" json:"version"`
 }
 
 func (e SettingInfo) TableName() string {

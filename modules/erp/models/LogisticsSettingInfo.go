@@ -28,7 +28,6 @@ type LogisticsSettingInfo struct {
 	Qyppts             int64           `xorm:"bigint notnull 'qyppts'" json:"qyppts"`                                                     // 启用匹配调试， >0 是， 其他 否
 	CreateTime         core.Time       `xorm:"created notnull 'create_time'" json:"create_time"`
 	UpdateTime         core.Time       `xorm:"updated notnull 'update_time'" json:"update_time"`
-	Version            int             `xorm:"version notnull 'version'" json:"version"`
 }
 
 func (e LogisticsSettingInfo) TableName() string {

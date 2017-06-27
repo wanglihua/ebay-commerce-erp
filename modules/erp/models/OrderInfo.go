@@ -52,7 +52,6 @@ type OrderInfo struct {
 	TagId                    int64               `xorm:"bigint notnull index 'tag_id'" json:"tag_id" smith:"verbose_name=标签"`
 	CreateTime               core.Time           `xorm:"created notnull 'create_time'" json:"create_time"`
 	UpdateTime               core.Time           `xorm:"updated notnull 'update_time'" json:"update_time"`
-	Version                  int                 `xorm:"version notnull 'version'" json:"version"`
 }
 
 func (e OrderInfo) TableName() string {

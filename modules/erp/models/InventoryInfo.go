@@ -14,7 +14,6 @@ type InventoryInfo struct {
 	CostPrice    float64   `xorm:"float notnull 'cost_price'" json:"cost_price" smith:"verbose_name=成本价,min=0"` // 到仓库的成本价格，如果各个批次的商品成本价不同，会人工做评价处理
 	CreateTime   core.Time `xorm:"created notnull 'create_time'" json:"create_time"`
 	UpdateTime   core.Time `xorm:"updated notnull 'update_time'" json:"update_time"`
-	Version      int       `xorm:"version notnull 'version'" json:"version"`
 }
 
 func (e InventoryInfo) TableName() string {

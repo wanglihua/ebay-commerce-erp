@@ -11,7 +11,6 @@ type SalesManagerInfo struct {
 	UserId     int64           `xorm:"bigint notnull index unique(shop_product_user) 'user_id'" json:"user_id" smith:"verbose_name=销售"`
 	CreateTime core.Time       `xorm:"created notnull 'create_time'" json:"create_time"`
 	UpdateTime core.Time       `xorm:"updated notnull 'update_time'" json:"update_time"`
-	Version    int             `xorm:"version notnull 'version'" json:"version"`
 }
 
 func (e SalesManagerInfo) TableName() string {

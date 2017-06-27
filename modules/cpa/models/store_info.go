@@ -11,7 +11,6 @@ type Store_info struct {
 	Desc        core.NullString    `xorm:"nvarchar(500) null 'desc'" json:"desc"`
 	Create_time core.Time          `xorm:"created notnull 'create_time'" json:"create_time"`
 	Update_time core.Time          `xorm:"updated notnull 'update_time'" json:"update_time"`
-	Version     int                `xorm:"version notnull 'version'" json:"version"`
 }
 
 func (e Store_info) TableName() string {

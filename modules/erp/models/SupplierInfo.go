@@ -15,7 +15,6 @@ type SupplierInfo struct {
 	RegionId    int64           `xorm:"bigint notnull 'region_id'" json:"region_id" smith:"verbose_name=区域,max=500"`
 	CreateTime  core.Time       `xorm:"created notnull 'create_time'" json:"create_time"`
 	UpdateTime  core.Time       `xorm:"updated notnull 'update_time'" json:"update_time"`
-	Version     int             `xorm:"version notnull 'version'" json:"version"`
 }
 
 func (e SupplierInfo) TableName() string {

@@ -12,7 +12,6 @@ type IssueCommentInfo struct {
 	UserCode   string            `xorm:"nvarchar(255) notnull index 'user_code'" json:"user_code" smith:"verbose_name=提报人工号"`
 	CreateTime core.Time         `xorm:"created notnull 'create_time'" json:"create_time"`
 	UpdateTime core.Time         `xorm:"updated notnull 'update_time'" json:"update_time"`
-	Version    int               `xorm:"version notnull 'version'" json:"version"`
 }
 
 func (e IssueCommentInfo) TableName() string {

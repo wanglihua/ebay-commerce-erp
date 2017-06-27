@@ -13,7 +13,6 @@ type ProductImageInfo struct {
 	Url         string    `xorm:"nvarchar(400) notnull index 'url'" json:"url" smith:"verbose_name=图片链接,min=2,max=300"`
 	CreateTime  core.Time `xorm:"created notnull 'create_time'" json:"create_time"`
 	UpdateTime  core.Time `xorm:"updated notnull 'update_time'" json:"update_time"`
-	Version     int       `xorm:"version notnull 'version'" json:"version"`
 }
 
 func (e ProductImageInfo) TableName() string {

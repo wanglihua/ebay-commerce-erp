@@ -13,7 +13,6 @@ type EBayAPIConfigInfo struct {
 	Token      string      `xorm:"nvarchar(2000)  notnull 'token'" json:"token" smith:"verbose_name=Token"`
 	CreateTime core.Time   `xorm:"created notnull 'create_time'" json:"create_time"`
 	UpdateTime core.Time   `xorm:"updated notnull 'update_time'" json:"update_time"`
-	Version    int         `xorm:"version notnull 'version'" json:"version"`
 }
 
 func (e EBayAPIConfigInfo) TableName() string {

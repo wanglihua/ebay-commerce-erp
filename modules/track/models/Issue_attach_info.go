@@ -13,7 +13,6 @@ type IssueAttachInfo struct {
 	Status     int64             `xorm:"biging notnull index default(1) 'status'" json:"status" smith:"verbose_name=状态"` //状态 如果是小于零就是已删除，大于等于零就是正常。默认为 1， 一般 -1 表示已删除
 	CreateTime core.Time         `xorm:"created notnull 'create_time'" json:"create_time"`
 	UpdateTime core.Time         `xorm:"updated notnull 'update_time'" json:"update_time"`
-	Version    int               `xorm:"version notnull 'version'" json:"version"`
 }
 
 func (e IssueAttachInfo) TableName() string {

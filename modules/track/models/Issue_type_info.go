@@ -17,7 +17,6 @@ type IssueTypeInfo struct {
 	Desc       string             `xorm:"nvarchar(4000) notnull 'type_desc'" json:"type_desc" smith:"verbose_name=描述,min=2,max=4000"`
 	CreateTime core.Time          `xorm:"created notnull 'create_time'" json:"create_time"`
 	UpdateTime core.Time          `xorm:"updated notnull 'update_time'" json:"update_time"`
-	Version    int                `xorm:"version notnull 'version'" json:"version"`
 }
 
 func (e IssueTypeInfo) TableName() string {

@@ -19,7 +19,6 @@ type OrderLogisticsMatchDebugInfo struct {
 	MatchDebug  string       `xorm:"text notnull 'match_debug'" json:"match_debug" smith:"verbose_name=匹配调试信息"` // 弃用，备选 等等
 	CreateTime  core.Time    `xorm:"created notnull 'create_time'" json:"create_time"`
 	UpdateTime  core.Time    `xorm:"updated notnull 'update_time'" json:"update_time"`
-	Version     int          `xorm:"version notnull 'version'" json:"version"`
 }
 
 func (e OrderLogisticsMatchDebugInfo) TableName() string {

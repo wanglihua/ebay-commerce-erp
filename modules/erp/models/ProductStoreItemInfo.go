@@ -12,7 +12,6 @@ type ProductStoreItemInfo struct {
 	ViewItemUrl string          `xorm:"nvarchar(500) notnull 'view_item_url'" json:"view_item_url"` // ebay系统的 查看商品的 url
 	CreateTime  core.Time       `xorm:"created notnull 'create_time'" json:"create_time"`
 	UpdateTime  core.Time       `xorm:"updated notnull 'update_time'" json:"update_time"`
-	Version     int             `xorm:"version notnull 'version'" json:"version"`
 }
 
 func (e ProductStoreItemInfo) TableName() string {

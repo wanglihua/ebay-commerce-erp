@@ -21,7 +21,6 @@ type OrderShippingAddressInfo struct {
 	ExternalAddressId string          `xorm:"nvarchar(200) notnull 'external_address_id'" json:"external_address_id"`
 	CreateTime        core.Time       `xorm:"created notnull 'create_time'" json:"create_time"`
 	UpdateTime        core.Time       `xorm:"updated notnull 'update_time'" json:"update_time"`
-	Version           int             `xorm:"version notnull 'version'" json:"version"`
 }
 
 func (e OrderShippingAddressInfo) TableName() string {
