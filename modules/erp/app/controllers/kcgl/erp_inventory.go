@@ -233,6 +233,8 @@ func (c ErpInventory) Save() revel.Result {
 	_, err = db_session.Id(inventory.StockId).Get(&stock)
 	core.HandleError(err)
 
+	var login_user = core.GetLoginUser(c.Session)
+
 	var affected int64
 	if inventory_in_db.Id == 0 { //创建数据库记录
 		if stock.StockTypeId == models.STOCK_TYPE_AU {
@@ -252,7 +254,7 @@ func (c ErpInventory) Save() revel.Result {
 		affected, err = db_session.Insert(&inventory)
 		core.HandleError(err)
 
-		inventory_history_service.Insert_inventory_history(inventory, "手工新增库存", db_session)
+		inventory_history_service.Insert_inventory_history(inventory, fmt.Sprintf("手工新增库存， 工号：%s", login_user.LoginName), db_session)
 	} else { // 更新数据库记录
 		inventory.Id = inventory_in_db.Id
 
@@ -279,7 +281,7 @@ func (c ErpInventory) Save() revel.Result {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！"})
 		}
 
-		inventory_history_service.Insert_inventory_history(inventory, "手工编辑库存", db_session)
+		inventory_history_service.Insert_inventory_history(inventory, fmt.Sprintf("手工编辑库存，工号：%s", login_user.LoginName), db_session)
 	}
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据保存成功!"})
@@ -300,8 +302,10 @@ func (c ErpInventory) Delete() revel.Result {
 	affected, err := db_session.In("id", inventory_id_list).Delete(new(models.InventoryInfo))
 	core.HandleError(err)
 
+	var login_user = core.GetLoginUser(c.Session)
+
 	for _, inventory := range inventory_list {
-		inventory_history_service.Insert_inventory_history(inventory, "手工删除库存", db_session)
+		inventory_history_service.Insert_inventory_history(inventory, fmt.Sprintf("手工删除库存, 工号：%s", login_user.LoginName), db_session)
 	}
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})
@@ -502,6 +506,8 @@ func (c ErpInventory) Import() revel.Result {
 		})
 	}
 
+	var login_user = core.GetLoginUser(c.Session)
+
 	for _, inventory_import := range inventory_import_list {
 
 		var stock_id = inventory_import.stock_id
@@ -524,13 +530,13 @@ func (c ErpInventory) Import() revel.Result {
 			_, err = db_session.Insert(&inventory)
 			core.HandleError(err)
 
-			inventory_history_service.Insert_inventory_history(inventory, "导入新增库存", db_session)
+			inventory_history_service.Insert_inventory_history(inventory, fmt.Sprintf("导入新增库存, 工号：%s", login_user.LoginName), db_session)
 		} else {
 			// 更新
 			_, err := db_session.Id(inventory.Id).Cols("product_id", "qty", "cost_price").Update(&inventory)
 			core.HandleError(err)
 
-			inventory_history_service.Insert_inventory_history(inventory, "导入更新库存", db_session)
+			inventory_history_service.Insert_inventory_history(inventory, fmt.Sprintf("导入更新库存, 工号：%s", login_user.LoginName), db_session)
 		}
 	}
 
@@ -1423,6 +1429,9 @@ func (c ErpInventory) ImportInventoryQuantity() revel.Result {
 	}
 
 	revel.TRACE.Println("inventory_import_list", len(inventory_import_list))
+
+	var login_user = core.GetLoginUser(c.Session)
+
 	for _, inventory_import := range inventory_import_list {
 
 		var stock_id = inventory_import.stock_id
@@ -1442,14 +1451,14 @@ func (c ErpInventory) ImportInventoryQuantity() revel.Result {
 			// 插入
 			_, err = db_session.Insert(&inventory)
 
-			inventory_history_service.Insert_inventory_history(inventory, "导入新增库存", db_session)
+			inventory_history_service.Insert_inventory_history(inventory, fmt.Sprintf("导入新增库存, 工号：%s", login_user.LoginName), db_session)
 			core.HandleError(err)
 		} else {
 			// 更新
 			_, err := db_session.Id(inventory.Id).Cols("qty").Update(&inventory)
 			core.HandleError(err)
 
-			inventory_history_service.Insert_inventory_history(inventory, "导入更新库存", db_session)
+			inventory_history_service.Insert_inventory_history(inventory, fmt.Sprintf("导入更新库存，工号：%s", login_user.LoginName), db_session)
 		}
 	}
 
@@ -2234,6 +2243,9 @@ func (c ErpInventory) ImportInventoryQuantityDiff() revel.Result {
 	}
 
 	revel.TRACE.Println("inventory_import_list", len(inventory_import_list))
+
+	var login_user = core.GetLoginUser(c.Session)
+
 	for _, inventory_import := range inventory_import_list {
 
 		var stock_id = inventory_import.stock_id
@@ -2254,13 +2266,13 @@ func (c ErpInventory) ImportInventoryQuantityDiff() revel.Result {
 			_, err = db_session.Insert(&inventory)
 			core.HandleError(err)
 
-			inventory_history_service.Insert_inventory_history(inventory, "导入差异新增", db_session)
+			inventory_history_service.Insert_inventory_history(inventory, fmt.Sprintf("导入差异新增， 工号：%s", login_user.LoginName), db_session)
 		} else {
 			// 更新
 			_, err := db_session.Id(inventory.Id).Cols("qty").Update(&inventory)
 			core.HandleError(err)
 
-			inventory_history_service.Insert_inventory_history(inventory, "导入差异更新", db_session)
+			inventory_history_service.Insert_inventory_history(inventory, fmt.Sprintf("导入差异更新，工号：%s", login_user.LoginName), db_session)
 		}
 	}
 
