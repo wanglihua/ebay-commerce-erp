@@ -31,6 +31,7 @@ type Order_view_item_t struct {
 	CompanyName          string                            `json:"company_name"`
 	ModeName             string                            `json:"mode_name"`
 	FeeDiff              float64                           `json:"fee_diff"`
+	OrderTag             models.OrderTagInfo               `json:"order_tag"`
 }
 
 func Get_order_data_list(db_session *xorm.Session, filter string, order string, offset int64, limit int64) ([]Order_view_item_t, int64) {
@@ -150,6 +151,14 @@ FROM erp_order o
 
 		if order.OrderLogistics.Id != 0 {
 			order_list[index].FeeDiff = order_logistics.ActualFee - order_logistics.TotalFee
+		}
+
+		if order.Order.TagId != 0 {
+			var order_tag models.OrderTagInfo
+			_, err := db_session.Id(order.Order.TagId).Get(&order_tag)
+			core.HandleError(err)
+
+			order_list[index].OrderTag = order_tag
 		}
 	}
 
