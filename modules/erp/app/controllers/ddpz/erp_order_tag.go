@@ -9,6 +9,7 @@ import (
 	"matrix/modules/erp/models"
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/auth/pass_res"
+	"strings"
 )
 
 type ErpOrderTag struct {
@@ -53,7 +54,8 @@ func (c ErpOrderTag) ListData() revel.Result {
 }
 
 type OrderTagDetailForm struct {
-	OrderTag models.OrderTagInfo `json:"order_tag"`
+	OrderTag  models.OrderTagInfo   `json:"order_tag"`
+	ColorList []string              `json:"color_list"`
 }
 
 func (f *OrderTagDetailForm) IsCreate() bool {
@@ -99,8 +101,38 @@ func (c ErpOrderTag) DetailData() revel.Result {
 		}
 	}
 
+	var color_list_all []string = []string{"#ac725e", "#d06b64", "#f83a22", "#fa573c", "#ff7537", "#ffad46", "#42d692", "#16a765", "#7bd148", "#b3dc6c",
+	                                       "#fbe983", "#fad165", "#92e1c0", "#9fe1e7", "#9fc6e7", "#4986e7", "#9a9cff", "#b99aff", "#c2c2c2", "#cabdbf",
+	                                       "#cca6ac", "#f691b2", "#cd74e6", "#a47ae2", "#555555"}
+
+	var order_tag_list = make([]models.OrderTagInfo, 0)
+	err := db_session.Find(&order_tag_list)
+	core.HandleError(err)
+
+	var is_color_used = func(color string) bool {
+		for _, ot := range order_tag_list {
+			if strings.TrimSpace(ot.BgColor) == strings.TrimSpace(color) {
+				return true
+			}
+		}
+		return false
+	}
+
+	var color_list = make([]string, 0)
+
+	if order_tag_id != 0 {
+		color_list = append(color_list, order_tag.BgColor)
+	}
+
+	for _, color := range color_list_all {
+		if is_color_used(color) == false {
+			color_list = append(color_list, color)
+		}
+	}
+
 	var detail_form OrderTagDetailForm
 	detail_form.OrderTag = order_tag
+	detail_form.ColorList = color_list
 
 	return c.RenderJson(detail_form)
 }

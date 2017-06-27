@@ -73,31 +73,9 @@
                                             <label for="bg_color" class="col-xs-2 control-label">背景色</label>
                                             <div class="col-xs-10">
                                                 <select id="bg_color" name="detail.order_tag.bg_color" class="input-sm form-control" v-model="detail.order_tag.bg_color" onchange="tag_color_change()">
-                                                    <option value="#ac725e" style="background-color: #ac725e;">#ac725e</option>
-                                                    <option value="#d06b64" style="background-color: #d06b64;">#d06b64</option>
-                                                    <option value="#f83a22" style="background-color: #f83a22;">#f83a22</option>
-                                                    <option value="#fa573c" style="background-color: #fa573c;">#fa573c</option>
-                                                    <option value="#ff7537" style="background-color: #ff7537;">#ff7537</option>
-                                                    <option value="#ffad46" style="background-color: #ffad46;">#ffad46</option>
-                                                    <option value="#42d692" style="background-color: #42d692;">#42d692</option>
-                                                    <option value="#16a765" style="background-color: #16a765;">#16a765</option>
-                                                    <option value="#7bd148" style="background-color: #7bd148;">#7bd148</option>
-                                                    <option value="#b3dc6c" style="background-color: #b3dc6c;">#b3dc6c</option>
-                                                    <option value="#fbe983" style="background-color: #fbe983;">#fbe983</option>
-                                                    <option value="#fad165" style="background-color: #fad165;">#fad165</option>
-                                                    <option value="#92e1c0" style="background-color: #92e1c0;">#92e1c0</option>
-                                                    <option value="#9fe1e7" style="background-color: #9fe1e7;">#9fe1e7</option>
-                                                    <option value="#9fc6e7" style="background-color: #9fc6e7;">#9fc6e7</option>
-                                                    <option value="#4986e7" style="background-color: #4986e7;">#4986e7</option>
-                                                    <option value="#9a9cff" style="background-color: #9a9cff;">#9a9cff</option>
-                                                    <option value="#b99aff" style="background-color: #b99aff;">#b99aff</option>
-                                                    <option value="#c2c2c2" style="background-color: #c2c2c2;">#c2c2c2</option>
-                                                    <option value="#cabdbf" style="background-color: #cabdbf;">#cabdbf</option>
-                                                    <option value="#cca6ac" style="background-color: #cca6ac;">#cca6ac</option>
-                                                    <option value="#f691b2" style="background-color: #f691b2;">#f691b2</option>
-                                                    <option value="#cd74e6" style="background-color: #cd74e6;">#cd74e6</option>
-                                                    <option value="#a47ae2" style="background-color: #a47ae2;">#a47ae2</option>
-                                                    <option value="#555555" style="background-color: #555555;">#555555</option>
+                                                    <template v-for="color in detail.color_list">
+                                                        <option :value="color" :style="'background-color: ' + color + ';'">{{color}}</option>
+                                                    </template>
                                                 </select>
 
                                             </div>
