@@ -19,6 +19,10 @@ func (c ErpOrderWaybillPrint) Index() revel.Result {
 	return c.RenderEmpty()
 }
 
+func (c ErpOrderWaybillPrint) SelectPrintOrder() revel.Result {
+	return c.RenderTemplate("")
+}
+
 func (c ErpOrderWaybillPrint) Preview() revel.Result {
 	var db_session = c.DbSession
 
