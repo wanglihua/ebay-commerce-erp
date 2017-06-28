@@ -21,6 +21,7 @@ import (
 	"matrix/modules/erp/setting"
 	"matrix/modules/erp/service/stock_service"
 	"matrix/modules/erp/service/order_history_service"
+	"time"
 )
 
 type ErpOrder struct {
@@ -908,6 +909,7 @@ func (c ErpOrder) FaHuo() revel.Result {
 	var login_user = core.GetLoginUser(c.Session)
 
 	var take_inventory_result = true
+	var time_now = time.Now()
 	for _, order := range order_list {
 
 		if inventory_service.Take_order_inventory(order, db_session) == false {
@@ -915,7 +917,8 @@ func (c ErpOrder) FaHuo() revel.Result {
 		}
 
 		order.StatusId = models.ORDER_STATUS_YFH
-		_, err = db_session.Id(order.Id).Cols("status_id").Update(&order)
+		order.ShippedTime = core.MakeNullLongTime(time_now, true)
+		_, err = db_session.Id(order.Id).Cols("status_id", "shipped_time").Update(&order)
 		core.HandleError(err)
 
 		order_history_service.Insert_order_history(order, fmt.Sprintf("订单发货， 工号： %s", login_user.LoginName), db_session)

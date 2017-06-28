@@ -67,6 +67,15 @@ func (c ErpOrderWaybillPrint) Preview() revel.Result {
 	return c.RenderTemplate("erp/ddlc/order_waybill_print/order_waybill_print_preview.html")
 }
 
+const (
+	ORDER_BY_SKU = 100 // 按SKU排序
+	ORDER_BY_SL  = 200 // 按库位排序
+)
+
+func (c ErpOrderWaybillPrint) SelectOrderByDialog() revel.Result {
+	return c.RenderEmpty()
+}
+
 func (c ErpOrderWaybillPrint) Print() revel.Result {
 	var db_session = c.DbSession
 

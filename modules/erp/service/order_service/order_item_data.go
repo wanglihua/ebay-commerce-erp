@@ -15,6 +15,7 @@ type Order_item_view_item_t struct {
 	Platform    models.ShopAccountInfo     `xorm:"extends" json:"pf"`
 	Product     models.ProductInfo         `xorm:"extends" json:"p"`
 	Status      models.StatusInfo          `xorm:"extends" json:"s"`
+	Stock       models.StockInfo           `xorm:"extends" json:"st"`
 }
 
 /*
@@ -36,14 +37,28 @@ WHERE oi.order_id = %d`
 */
 
 func get_order_item_data_list_sql_builder() *core.SqlBuilder {
+	/*
+SELECT oi.*, o.*, sa.*, pf.*, p.*, s.*, st.*
+FROM erp_order_item oi
+    INNER JOIN erp_order o ON o.id = oi.order_id
+    INNER JOIN erp_shop_account sa ON sa.id = o.shop_id
+    INNER JOIN erp_ecommerce_platform pf ON pf.id = sa.platform_id
+    INNER JOIN erp_product p ON p.id = oi.item_product_id
+    INNER JOIN erp_status s ON s.id = o.status_id
+    LEFT JOIN erp_stock st ON st.id = o.stock_id
+WHERE oi.item_product_id = 18816
+ORDER BY oi.id DESC
+	 */
+
 	sb := core.NewSqlBuilder()
-	sb.Select("oi.*, o.*, sa.*, pf.*, p.*, s.*")
+	sb.Select("oi.*, o.*, sa.*, pf.*, p.*, s.*, st.*")
 	sb.From(`erp_order_item oi
     INNER JOIN erp_order o ON o.id = oi.order_id
     INNER JOIN erp_shop_account sa ON sa.id = o.shop_id
     INNER JOIN erp_ecommerce_platform pf ON pf.id = sa.platform_id
     INNER JOIN erp_product p ON p.id = oi.item_product_id
-    INNER JOIN erp_status s ON s.id = o.status_id`)
+    INNER JOIN erp_status s ON s.id = o.status_id
+    LEFT JOIN erp_stock st ON st.id = o.stock_id`)
 
 	sb.OrderBy("oi.id DESC")
 

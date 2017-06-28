@@ -17,6 +17,7 @@ import (
 	"matrix/modules/erp/service/order_logistics_service"
 	"matrix/modules/erp/service/order_shipping_address_service"
 	"matrix/modules/erp/service/order_history_service"
+	"time"
 )
 
 type ErpOrderImport struct {
@@ -554,6 +555,8 @@ SELECT sa.id AS shop_id, sa.name AS shop_name FROM erp_shop_account sa;
 			order.BatchCode = import_batch_code // 导入批次
 
 			order.ExchangeRate = aud_exchange_rate_setting
+
+			order.PaidTime = core.MakeNullLongTime(time.Now(), true)
 
 			_, err = db_session.Insert(&order)
 			core.HandleError(err)

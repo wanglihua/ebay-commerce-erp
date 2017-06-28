@@ -243,11 +243,11 @@
                                 <tr>
                                     <th class="center" style="width: 50px;">编号</th>
                                     <th class="center">订单编号</th>
-                                    <th class="center">Item ID</th>
                                     <th class="center">数量</th>
                                     <th class="center">售价</th>
                                     <th class="center" style="width:120px;">下单时间</th>
                                     <th class="center" style="width:120px;">发货时间</th>
+                                    <th class="center" style="width:120px;">发货仓库</th>
                                     <th class="center">成交店铺</th>
                                     <th class="center" style="width:60px;">状态</th>
                                 </tr>
@@ -257,11 +257,11 @@
                                     <tr>
                                         <td class="center">{{index + 1}}</td>
                                         <td class="center">{{order_item.o.code}}</td>
-                                        <td class="center">{{order_item.oi.item_id}}</td>
                                         <td class="center">{{order_item.oi.quantity}}</td>
                                         <td class="center">{{order_item.oi.transaction_price_currency}}&nbsp;{{order_item.oi.transaction_price}}</td>
-                                        <td class="center">{{order_item.o.created_time}}</td>
+                                        <td class="center">{{order_item.o.paid_time}}</td>
                                         <td class="center">{{order_item.o.shipped_time}}</td>
+                                        <td class="center">{{order_item.st.name}}</td>
                                         <td class="center">{{order_item.pf.name}}&nbsp;{{order_item.sa.name}}</td>
                                         <td class="center">{{order_item.s.name}}</td>
                                     </tr>
