@@ -183,6 +183,19 @@ func (c ErpOrderWaybillPrint) Print() revel.Result {
 		print_order_list = append(print_order_list, print_order)
 	}
 
+	if revel.DevMode == true {
+		revel.TRACE.Println("before order")
+		for _, print_order := range print_order_list {
+			if order_by_code == ORDER_BY_SKU_CODE {
+				revel.TRACE.Println("print_order.first_sku", print_order.first_sku)
+			}
+
+			if order_by_code == ORDER_BY_SL_CODE {
+				revel.TRACE.Println("print_order.first_storage_loc", print_order.first_storage_loc)
+			}
+		}
+	}
+
 	if order_by_code == ORDER_BY_SKU_CODE {
 		var print_order_list_order_by_sku = print_order_order_by_sku_slice_t(print_order_list)
 		sort.Sort(print_order_list_order_by_sku)
@@ -193,6 +206,19 @@ func (c ErpOrderWaybillPrint) Print() revel.Result {
 		var print_order_list_order_by_sl = print_order_order_by_sl_slice_t(print_order_list)
 		sort.Sort(print_order_list_order_by_sl)
 		print_order_list = []Print_order_t(print_order_list_order_by_sl)
+	}
+
+	if revel.DevMode == true {
+		revel.TRACE.Println("after order")
+		for _, print_order := range print_order_list {
+			if order_by_code == ORDER_BY_SKU_CODE {
+				revel.TRACE.Println("print_order.first_sku", print_order.first_sku)
+			}
+
+			if order_by_code == ORDER_BY_SL_CODE {
+				revel.TRACE.Println("print_order.first_storage_loc", print_order.first_storage_loc)
+			}
+		}
 	}
 
 	c.RenderArgs["print_order_list"] = print_order_list
@@ -254,8 +280,8 @@ func get_order_sku_qty_loc_list_for_print(order_id int64, db_session *xorm.Sessi
 
 	var order_sku_qty_loc_list = order_service.Get_order_sku_qty_loc_list(order_id, db_session)
 
-	var first_sku string
-	var first_storage_loc string
+	var first_sku string = ""
+	var first_storage_loc string = ""
 
 	var order_item_list = make([]string, 0)
 	var pcs_count int64 = 0
