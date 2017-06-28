@@ -379,7 +379,7 @@ GET  /order/waybill/print/preview             ErpOrderWaybillPrint.Preview
 POST /order/waybill/print/preview             ErpOrderWaybillPrint.Preview
 GET  /order/waybill/print                     ErpOrderWaybillPrint.Print
 POST /order/waybill/print                     ErpOrderWaybillPrint.Print
-POST /order/waybill/select/print/order        ErpOrderWaybillPrint.SelectPrintOrder
+POST /order/waybill/print/show/select/order   ErpOrderWaybillPrint.ShowSelectOrderByDialog
 
 GET  /ecommerce/platform                   ErpECommercePlatform.Index
 POST /ecommerce/platform/data/list         ErpECommercePlatform.ListData

@@ -20,7 +20,7 @@ func (c ErpOrderWaybillPrint) Index() revel.Result {
 }
 
 func (c ErpOrderWaybillPrint) SelectPrintOrder() revel.Result {
-	return c.RenderTemplate("")
+	return c.RenderTemplate("erp/ddlc/order_waybill_print/order_waybill_print_select_print_order.html")
 }
 
 func (c ErpOrderWaybillPrint) Preview() revel.Result {
@@ -32,6 +32,20 @@ func (c ErpOrderWaybillPrint) Preview() revel.Result {
 	var order_by_code int64
 	c.Params.Bind(&order_by_code, "order_by_code")
 
+	if len(order_id_list) == 0 {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "打印订单列表不能为空！",
+		})
+	}
+
+	if order_by_code == 0 {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "打印订单列表排序方式不能为空！",
+		})
+	}
+
 	revel.TRACE.Println(order_id_list)
 
 	var mel_stock_id = stock_service.Get_mel_stock_id(db_session)
@@ -75,13 +89,13 @@ func (c ErpOrderWaybillPrint) Preview() revel.Result {
 		print_order_list = append(print_order_list, print_order)
 	}
 
-	if order_by_code == ORDER_BY_SKU {
+	if order_by_code == ORDER_BY_SKU_CODE {
 		var print_order_list_order_by_sku = print_order_order_by_sku_slice_t(print_order_list)
 		sort.Sort(print_order_list_order_by_sku)
 		print_order_list = []Print_order_t(print_order_list_order_by_sku)
 	}
 
-	if order_by_code == ORDER_BY_SL {
+	if order_by_code == ORDER_BY_SL_CODE {
 		var print_order_list_order_by_sl = print_order_order_by_sl_slice_t(print_order_list)
 		sort.Sort(print_order_list_order_by_sl)
 		print_order_list = []Print_order_t(print_order_list_order_by_sl)
@@ -92,12 +106,15 @@ func (c ErpOrderWaybillPrint) Preview() revel.Result {
 }
 
 const (
-	ORDER_BY_SKU int64 = 100 // 按SKU排序
-	ORDER_BY_SL  int64 = 200 // 按库位排序
+	ORDER_BY_SKU_CODE int64 = 100 // 按SKU排序
+	ORDER_BY_SL_CODE  int64 = 200 // 按库位排序
 )
 
-func (c ErpOrderWaybillPrint) SelectOrderByDialog() revel.Result {
-	return c.RenderEmpty()
+func (c ErpOrderWaybillPrint) ShowSelectOrderByDialog() revel.Result {
+
+	c.RenderArgs["order_by_sku_code"] = ORDER_BY_SKU_CODE
+	c.RenderArgs["order_by_sl_code"] = ORDER_BY_SL_CODE
+	return c.RenderTemplate("erp/ddlc/order_waybill_print/order_waybill_print_select_print_order.html")
 }
 
 func (c ErpOrderWaybillPrint) Print() revel.Result {
@@ -109,6 +126,20 @@ func (c ErpOrderWaybillPrint) Print() revel.Result {
 	var order_by_code int64
 	c.Params.Bind(&order_by_code, "order_by_code")
 
+	if len(order_id_list) == 0 {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "打印订单列表不能为空！",
+		})
+	}
+
+	if order_by_code == 0 {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "打印订单列表排序方式不能为空！",
+		})
+	}
+
 	revel.TRACE.Println(order_id_list)
 
 	var mel_stock_id = stock_service.Get_mel_stock_id(db_session)
@@ -152,13 +183,13 @@ func (c ErpOrderWaybillPrint) Print() revel.Result {
 		print_order_list = append(print_order_list, print_order)
 	}
 
-	if order_by_code == ORDER_BY_SKU {
+	if order_by_code == ORDER_BY_SKU_CODE {
 		var print_order_list_order_by_sku = print_order_order_by_sku_slice_t(print_order_list)
 		sort.Sort(print_order_list_order_by_sku)
 		print_order_list = []Print_order_t(print_order_list_order_by_sku)
 	}
 
-	if order_by_code == ORDER_BY_SL {
+	if order_by_code == ORDER_BY_SL_CODE {
 		var print_order_list_order_by_sl = print_order_order_by_sl_slice_t(print_order_list)
 		sort.Sort(print_order_list_order_by_sl)
 		print_order_list = []Print_order_t(print_order_list_order_by_sl)

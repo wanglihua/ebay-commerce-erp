@@ -310,7 +310,7 @@
                                         <div class="form-group">
                                             <label for="export_stock_id" class="col-xs-2 control-label">仓库</label>
                                             <div class="col-xs-10">
-                                                <select id="export_stock_id" name="logistics_company_export_option.stock_id" type="text" class="input-sm form-control" v-model.number="logistics_company_export_option.stock_id">
+                                                <select id="export_stock_id" name="logistics_company_export_option.stock_id" class="input-sm form-control" v-model.number="logistics_company_export_option.stock_id">
                                                     <template v-for="stock in logistics_company_export_option.stock_list">
                                                         <option :value="stock.id">{{stock.name}}</option>
                                                     </template>

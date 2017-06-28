@@ -30,7 +30,7 @@
                     </button>
                     {% end %}
                     {% if eq .status "dph" %}
-                    <button class="btn btn-grey btn-sm" @click="printWaybill()">
+                    <button class="btn btn-grey btn-sm" onclick="show_select_print_order_by()">
                         <i class="ace-icon fa fa-print"></i>
                         打印标签
                     </button>
@@ -750,57 +750,6 @@
                 var url = '{%url "ErpOrderExport.Export"%}' + "?" + params;
                 $('<form method="post" action="' + url + '"></form>').appendTo('body').submit().remove();
             },
-            printWaybill: function () {
-
-                var id_list = [];
-                $('#orderList tbody tr>td:first-child input:checkbox').each(function () {
-                    if (this.checked) {
-                        id_list.push($(this).val());
-                    }
-                });
-
-                if (id_list.length === 0) {
-                    $.msg.alert("请选择数据！");
-                    return;
-                }
-
-                var print_print_preview = $("#order_print_preview");
-                print_print_preview.html("");
-
-                $.ajax({
-                    url: '{% url "ErpOrderWaybillPrint.Print"%}',
-                    type: "POST",
-                    data: {"order_id_list": id_list},
-                    success: function (data) {
-                        if (data.success !== false) {
-
-                            print_print_preview.html(data);
-
-                            LODOP = getLodop();
-                            LODOP.SET_LICENSES("浙江雅莹服装有限公司", "853717765858688748719056235623", "", "");
-                            LODOP.PRINT_INIT("订单标签");
-                            LODOP.SET_PRINT_PAGESIZE(1, "100mm", "50mm", "订单标签");
-                            LODOP.SET_PRINT_STYLE("FontSize", 18);
-                            LODOP.SET_PRINT_STYLE("Bold", 1);
-
-                            var waybill_list = [];
-                            $('#order_print_preview div.waybillWrapper').each(function () {
-                                waybill_list.push($(this));
-                            });
-
-                            for (var i = 0; i < waybill_list.length; i++) {
-                                LODOP.NewPage();
-                                LODOP.ADD_PRINT_HTM(0, 0, "RightMargin:10", "BottomMargin:0", $(waybill_list[i]).html());
-                                //LODOP.ADD_PRINT_IMAGE (10,10,300,160,"<img src='http://l/barcode/waybill?code=123456789' style='height:0.7cm; width:3.5cm;'/>");
-                                //LODOP.ADD_PRINT_BARCODE("0.5cm", "0.7cm", "3.5cm", "1cm", "128Auto", "123456789012")
-                            }
-
-                            LODOP.PREVIEW();
-                            //LODOP.PRINT();
-                        }
-                    }
-                });
-            },
             apply_order_tag: function (order_tag_id) {
                 var order_id_list = [];
                 $('#orderList tbody tr>td:first-child input:checkbox').each(function () {
@@ -895,9 +844,91 @@
         });
     }
 
+    function show_select_print_order_by() {
+        var id_list = [];
+        $('#orderList tbody tr>td:first-child input:checkbox').each(function () {
+            if (this.checked) {
+                id_list.push($(this).val());
+            }
+        });
+
+        if (id_list.length === 0) {
+            $.msg.alert("请选择数据！");
+            return;
+        }
+
+        $("#order_print_order_by_option_wrapper").html("");
+
+        $.ajax({
+            url: '{%url "ErpOrderWaybillPrint.ShowSelectOrderByDialog" %}',
+            type: "POST",
+            success: function (result) {
+                $("#order_print_order_by_option_wrapper").html(result);
+                $("#order_print_order_by_option_dialog").modal();
+            }
+        });
+    }
+
+    function print_waybill() {
+
+        var id_list = [];
+        $('#orderList tbody tr>td:first-child input:checkbox').each(function () {
+            if (this.checked) {
+                id_list.push($(this).val());
+            }
+        });
+
+        if (id_list.length === 0) {
+            $.msg.alert("请选择数据！");
+            return;
+        }
+
+        var order_by_code = $("#order_by_code").val();
+
+        var print_print_preview = $("#order_print_preview");
+        print_print_preview.html("");
+
+        $.ajax({
+            url: '{% url "ErpOrderWaybillPrint.Print"%}',
+            type: "POST",
+            data: {
+                "order_id_list": id_list,
+                "order_by_code": order_by_code
+            },
+            success: function (data) {
+                if (data.success !== false) {
+
+                    print_print_preview.html(data);
+
+                    LODOP = getLodop();
+                    LODOP.SET_LICENSES("浙江雅莹服装有限公司", "853717765858688748719056235623", "", "");
+                    LODOP.PRINT_INIT("订单标签");
+                    LODOP.SET_PRINT_PAGESIZE(1, "100mm", "50mm", "订单标签");
+                    LODOP.SET_PRINT_STYLE("FontSize", 18);
+                    LODOP.SET_PRINT_STYLE("Bold", 1);
+
+                    var waybill_list = [];
+                    $('#order_print_preview div.waybillWrapper').each(function () {
+                        waybill_list.push($(this));
+                    });
+
+                    for (var i = 0; i < waybill_list.length; i++) {
+                        LODOP.NewPage();
+                        LODOP.ADD_PRINT_HTM(0, 0, "RightMargin:10", "BottomMargin:0", $(waybill_list[i]).html());
+                        //LODOP.ADD_PRINT_IMAGE (10,10,300,160,"<img src='http://l/barcode/waybill?code=123456789' style='height:0.7cm; width:3.5cm;'/>");
+                        //LODOP.ADD_PRINT_BARCODE("0.5cm", "0.7cm", "3.5cm", "1cm", "128Auto", "123456789012")
+                    }
+
+                    LODOP.PREVIEW();
+                    //LODOP.PRINT();
+                }
+            }
+        });
+    }
 </script>
 <script type="text/javascript" src="/static/lib/lodop/LodopFuncs.js"></script>
 
 <div id="order_print_preview"></div>
 <div id="order_simple_detail_wrapper"></div>
+<div id="order_print_order_by_option_wrapper"></div>
 {%footer%}
