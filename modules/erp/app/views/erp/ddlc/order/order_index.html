@@ -871,6 +871,8 @@
 
     function print_waybill() {
 
+        $("#order_print_order_by_option_dialog").modal("hide");
+
         var id_list = [];
         $('#orderList tbody tr>td:first-child input:checkbox').each(function () {
             if (this.checked) {
