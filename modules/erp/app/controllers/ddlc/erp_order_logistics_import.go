@@ -102,13 +102,13 @@ func (c ErpOrderLogisticsImport) ImportTrackingNumber() revel.Result {
 		/*
 			SELECT ol.* FROM erp_order o
 			    INNER JOIN erp_order_logistics ol ON ol.order_id = o.id
-			WHERE o.tran_id = ''
+			WHERE o.full_tran_id = ''
 		*/
 
 		var order_logistics models.OrderLogisticsInfo
 		var sql_get_order_logistics = `SELECT ol.* FROM erp_order o
 			    INNER JOIN erp_order_logistics ol ON ol.order_id = o.id
-			WHERE o.tran_id = '%s'`
+			WHERE o.full_tran_id = '%s'`
 		sql_get_order_logistics = fmt.Sprintf(sql_get_order_logistics, order_import.OrderNumber)
 		has, err := db_session.Sql(sql_get_order_logistics).Get(&order_logistics)
 		core.HandleError(err)
@@ -226,13 +226,13 @@ func (c ErpOrderLogisticsImport) ImportActualFee() revel.Result {
 		/*
 			SELECT ol.* FROM erp_order o
 			    INNER JOIN erp_order_logistics ol ON ol.order_id = o.id
-			WHERE o.tran_id = ''
+			WHERE o.full_tran_id = ''
 		*/
 
 		var order_logistics models.OrderLogisticsInfo
 		var sql_get_order_logistics = `SELECT ol.* FROM erp_order o
 			    INNER JOIN erp_order_logistics ol ON ol.order_id = o.id
-			WHERE o.tran_id = '%s'`
+			WHERE o.full_tran_id = '%s'`
 		sql_get_order_logistics = fmt.Sprintf(sql_get_order_logistics, actual_fee_import.OrderNumber)
 		has, err := db_session.Sql(sql_get_order_logistics).Get(&order_logistics)
 		core.HandleError(err)
