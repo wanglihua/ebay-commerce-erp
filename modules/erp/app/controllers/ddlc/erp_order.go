@@ -843,7 +843,6 @@ func (c ErpOrder) PeiHuo() revel.Result {
 			})
 		}
 	}
-
 	var login_user = core.GetLoginUser(c.Session)
 
 	for _, order := range order_list {
