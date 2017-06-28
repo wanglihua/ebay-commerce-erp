@@ -134,6 +134,8 @@
                                         <option :value="query.id">{{query.name}}</option>
                                     </template>
                                 </select>
+                                <input id="query_begin_time" name="query_begin_time" style="width: 135px;height:30px;" v-model="page.query_begin_time" placeholder="开始时间如2016-01-02"/>
+                                <input id="query_end_time" name="query_end_time" style="width: 135px;height:30px;" v-model="page.query_end_time" placeholder="结束时间如2016-01-02"/>
                                 <button class="btn btn-mini btn-primary" style="margin-bottom:3px;height: 30px;" @click="search()">
                                     &nbsp;<i class="ace-icon fa fa-search"></i>查&nbsp;询&nbsp;
                                 </button>
@@ -213,7 +215,9 @@
                 "good_query_id": 0,
                 "good_query_list": [],
                 "hold_type_list": [],
-                "hold_type_id": -1
+                "hold_type_id": -1,
+                "query_begin_time": "",
+                "query_end_time": ""
             },
             "detail": {
                 "order": {}
@@ -444,6 +448,8 @@
                         aoData.push({'name': 'query_criteria_value', 'value': this_vm.page.query_criteria_value});
                         aoData.push({'name': 'good_query_id', 'value': this_vm.page.good_query_id});
                         aoData.push({'name': 'hold_type_id', 'value': this_vm.page.hold_type_id});
+                        aoData.push({'name': 'query_begin_time', 'value': this_vm.page.query_begin_time});
+                        aoData.push({'name': 'query_end_time', 'value': this_vm.page.query_end_time});
 
                         $.ajax({
                             "dataType": 'json',

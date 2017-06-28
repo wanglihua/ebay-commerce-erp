@@ -71,6 +71,8 @@
                             &nbsp;
                             <label class="control-label no-padding-right" for="order_code">订单编号</label>
                             <input id="order_code" name="page.order_code" type="text" class="input-sm" v-model="page.order_code" style="width: 135px;"/>
+                            <input id="query_begin_time" name="query_begin_time" style="width: 135px;height:30px;" v-model="page.query_begin_time" placeholder="开始时间如2016-01-02"/>
+                            <input id="query_end_time" name="query_end_time" style="width: 135px;height:30px;" v-model="page.query_end_time" placeholder="结束时间如2016-01-02"/>
                             <button class="btn btn-mini btn-primary" @click="refreshList()">
                                 &nbsp;<i class="ace-icon fa fa-search"></i>查&nbsp;询&nbsp;
                             </button>
@@ -164,7 +166,9 @@
                 "order_code": "",
                 "hold_type_id": 0,
                 "hold_type_list": [],
-                "au_stock_list": []
+                "au_stock_list": [],
+                "query_begin_time": "",
+                "query_end_time": ""
             },
             "detail": {
                 "order": {}
@@ -394,6 +398,8 @@
                         aoData.push({'name': 'query_criteria_id', 'value': this_vm.page.query_criteria_id});
                         aoData.push({'name': 'query_criteria_value', 'value': this_vm.page.query_criteria_value});
                         aoData.push({'name': 'hold_type_id', 'value': this_vm.page.hold_type_id});
+                        aoData.push({'name': 'query_begin_time', 'value': this_vm.page.query_begin_time});
+                        aoData.push({'name': 'query_end_time', 'value': this_vm.page.query_end_time});
 
                         //query_criteria_value
 
@@ -498,6 +504,11 @@
             $("#th_province").wrap("<div id='div_province'></div>");
             $("#th_postal_code").wrap("<div id='div_postal_code'></div>");
             $("#th_country_name_ext").append($("#div_country_name")).append($("#div_province")).append($("#div_postal_code"));
+
+            $('#orderList tbody').on('dblclick', 'tr', function () {
+                var order_id = $(this).find('td:first-child input:checkbox').val();
+                show_simple_detail_dialog(order_id);
+            });
         },
         methods: {
             reloadList: function () {
@@ -669,5 +680,65 @@
             }
         });
     }
+
+    function load_order_detail_data(order_id) {
+        var detail_vm = new Vue({
+            el: "#order_simple_detail_dialog",
+            data: {
+                "detail": {
+                    "order": {},
+                    "status": {},
+                    "shop": {},
+                    "order_type": {},
+                    "order_hold_type": {},
+                    "shipping_address": {},
+                    "ebay_shipping_address": {},
+                    "paypal_shipping_address": {},
+                    "order_item_list": [],
+                    "order_logistics": {},
+                    "logistics_setting": {},
+                    "au_stock_list": [],
+                    "logistics_stock": {},
+                    "logistics_mode": {},
+                    "inventory_list": []
+                }
+            },
+            methods: {
+                format_amount: function (amount) {
+                    return dtFormatFloat(amount);
+                }
+            }
+        });
+
+        $.ajax({
+            url: '{%url "ErpOrder.DetailData" %}',
+            type: "POST",
+            data: {"id": order_id},
+            success: function (result) {
+                if (result.success === false) {
+                    $.msg.error(result.message);
+                    return;
+                }
+                detail_vm.detail = result;
+            }
+        });
+
+    }
+
+    function show_simple_detail_dialog(order_id) {
+        $("#order_simple_detail_wrapper").html("");
+
+        $.ajax({
+            url: '{%url "ErpOrderSimpleDetail.Index" %}',
+            type: "POST",
+            data: {"order_id": order_id},
+            success: function (result) {
+                $("#order_simple_detail_wrapper").html(result);
+                load_order_detail_data(order_id);
+                $("#order_simple_detail_dialog").modal();
+            }
+        });
+    }
 </script>
+<div id="order_simple_detail_wrapper"></div>
 {%footer%}

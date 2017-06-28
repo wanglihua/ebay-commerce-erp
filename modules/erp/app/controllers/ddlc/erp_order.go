@@ -265,6 +265,15 @@ func (c ErpOrder) ListData() revel.Result {
 	var batch_code int64
 	c.Params.Bind(&batch_code, "batch_code")
 
+	var query_begin_time string
+	c.Params.Bind(&query_begin_time, "query_begin_time")
+	query_begin_date, query_begin_date_err := core.Parse_time(query_begin_time)
+	revel.TRACE.Println("query_begin_time", query_begin_time)
+
+	var query_end_time string
+	c.Params.Bind(&query_end_time, "query_end_time")
+	query_end_date, query_end_date_err := core.Parse_time(query_end_time)
+
 	var status_id int64 = 0 // 0： all status; other: 具体的 status_id
 
 	// 先看 URL 里面的状态分类
@@ -306,6 +315,15 @@ func (c ErpOrder) ListData() revel.Result {
 	}
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
+
+	if query_begin_date_err == nil {
+		filter = core.SqlAnd(filter, fmt.Sprintf("o.paid_time >= '%04d-%02d-%02d'", query_begin_date.Year(), query_begin_date.Month(), query_begin_date.Day()))
+	}
+
+	if query_end_date_err == nil {
+		query_end_date = query_end_date.Add(time.Hour * 24)
+		filter = core.SqlAnd(filter, fmt.Sprintf("o.paid_time <= '%04d-%02d-%02d'", query_end_date.Year(), query_end_date.Month(), query_end_date.Day()))
+	}
 
 	// 分仓库查看
 	// 只有待配货，配货中，已发货，已完成的订单可以分仓库查看
