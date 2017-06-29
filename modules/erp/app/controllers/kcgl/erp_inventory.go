@@ -229,6 +229,8 @@ func (c ErpInventory) Save() revel.Result {
 		Get(&inventory_in_db)
 	core.HandleError(err)
 
+	var qty_before = inventory_in_db.Qty
+
 	var stock models.StockInfo
 	_, err = db_session.Id(inventory.StockId).Get(&stock)
 	core.HandleError(err)
@@ -277,11 +279,13 @@ func (c ErpInventory) Save() revel.Result {
 		affected, err = db_session.Id(inventory.Id).Update(&inventory)
 		core.HandleError(err)
 
+		var qty_after = inventory.Qty
+
 		if affected == 0 {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！"})
 		}
 
-		inventory_history_service.Insert_inventory_history(inventory, fmt.Sprintf("手工编辑库存，工号：%s", login_user.LoginName), db_session)
+		inventory_history_service.Insert_inventory_history(inventory, fmt.Sprintf("手工编辑库存 %d => %d，工号：%s", qty_before, qty_after, login_user.LoginName), db_session)
 	}
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据保存成功!"})
@@ -305,7 +309,7 @@ func (c ErpInventory) Delete() revel.Result {
 	var login_user = core.GetLoginUser(c.Session)
 
 	for _, inventory := range inventory_list {
-		inventory_history_service.Insert_inventory_history(inventory, fmt.Sprintf("手工删除库存, 工号：%s", login_user.LoginName), db_session)
+		inventory_history_service.Insert_inventory_history(inventory, fmt.Sprintf("手工删除库存 %d => 0, 工号：%s", inventory.Qty, login_user.LoginName), db_session)
 	}
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})
@@ -522,7 +526,9 @@ func (c ErpInventory) Import() revel.Result {
 		inventory.StorageLocId = storage_loc_id
 		inventory.ProductId = product_id
 		// inventory.Qty += inventory_import.Qty // 如果是插入的话， 开始时 inventory.Qty
+		var qty_before = inventory.Qty
 		inventory.Qty = inventory_import.Qty // 这里采用覆盖原来库存的方式
+		var qty_after = inventory.Qty
 		inventory.CostPrice = inventory_import.CostPrice
 
 		if has == false {
@@ -536,7 +542,7 @@ func (c ErpInventory) Import() revel.Result {
 			_, err := db_session.Id(inventory.Id).Cols("product_id", "qty", "cost_price").Update(&inventory)
 			core.HandleError(err)
 
-			inventory_history_service.Insert_inventory_history(inventory, fmt.Sprintf("导入更新库存, 工号：%s", login_user.LoginName), db_session)
+			inventory_history_service.Insert_inventory_history(inventory, fmt.Sprintf("导入更新库存 %d => %d, 工号：%s", qty_before, qty_after, login_user.LoginName), db_session)
 		}
 	}
 
@@ -1445,7 +1451,9 @@ func (c ErpInventory) ImportInventoryQuantity() revel.Result {
 		inventory.StockId = stock_id
 		//inventory.StorageLocId = storage_loc_id
 		inventory.ProductId = product_id
+		var qty_before = inventory.Qty
 		inventory.Qty = inventory_import.Qty
+		var qty_after = inventory.Qty
 
 		if has == false {
 			// 插入
@@ -1458,7 +1466,7 @@ func (c ErpInventory) ImportInventoryQuantity() revel.Result {
 			_, err := db_session.Id(inventory.Id).Cols("qty").Update(&inventory)
 			core.HandleError(err)
 
-			inventory_history_service.Insert_inventory_history(inventory, fmt.Sprintf("导入更新库存，工号：%s", login_user.LoginName), db_session)
+			inventory_history_service.Insert_inventory_history(inventory, fmt.Sprintf("导入更新库存 %d => %d，工号：%s", qty_before, qty_after, login_user.LoginName), db_session)
 		}
 	}
 
@@ -2259,7 +2267,9 @@ func (c ErpInventory) ImportInventoryQuantityDiff() revel.Result {
 		inventory.StockId = stock_id
 		//inventory.StorageLocId = storage_loc_id
 		inventory.ProductId = product_id
+		var qty_before = inventory.Qty
 		inventory.Qty = inventory.Qty + inventory_import.Qty
+		var qty_after = inventory.Qty
 
 		if has == false {
 			// 插入
@@ -2272,7 +2282,7 @@ func (c ErpInventory) ImportInventoryQuantityDiff() revel.Result {
 			_, err := db_session.Id(inventory.Id).Cols("qty").Update(&inventory)
 			core.HandleError(err)
 
-			inventory_history_service.Insert_inventory_history(inventory, fmt.Sprintf("导入差异更新，工号：%s", login_user.LoginName), db_session)
+			inventory_history_service.Insert_inventory_history(inventory, fmt.Sprintf("导入差异更新 %d + %d => %d，工号：%s", qty_before, inventory_import.Qty, qty_after, login_user.LoginName), db_session)
 		}
 	}
 

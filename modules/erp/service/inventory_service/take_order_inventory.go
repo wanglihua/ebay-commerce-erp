@@ -71,11 +71,13 @@ func Take_order_inventory(order models.OrderInfo, db_session *xorm.Session) bool
 
 		//if has && inventory.Qty >= quantity {
 		if has {
+			var qty_before = inventory.Qty
 			inventory.Qty = inventory.Qty - quantity
 			_, err = db_session.Id(inventory.Id).Cols("qty").Update(&inventory)
 			core.HandleError(err)
+			var qty_after = inventory.Qty
 
-			inventory_history_service.Insert_inventory_history(inventory, fmt.Sprintf("发货扣减订单库存, 订单编号: %s", order.Code), db_session)
+			inventory_history_service.Insert_inventory_history(inventory, fmt.Sprintf("发货扣减订单库存 %d - %d => %d , 订单编号: %s", qty_before, quantity, qty_after, order.Code), db_session)
 		} else {
 			//todo: 暂时不panic
 			//panic("仓库中不存在相应库存，无法扣减相应库存！")
