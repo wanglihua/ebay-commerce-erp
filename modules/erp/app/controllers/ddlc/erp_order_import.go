@@ -188,6 +188,8 @@ func (c ErpOrderImport) Upload() revel.Result {
 		shop_id      int64
 		shop_code    string
 		product_id   int64
+		cost_price   float64
+		gross_profit float64
 	}
 
 	order_import_list := make([]order_import_t, 0)
@@ -509,6 +511,12 @@ SELECT sa.id AS shop_id, sa.name AS shop_name FROM erp_shop_account sa;
 
 	var aud_exchange_rate_setting = exchange_rate_service.Get_aud_exchange_rate(db_session)
 
+	// 计算售价，成本价，毛利
+	for order_code := range order_import_list_map {
+		var order_import_same_code_list = order_import_list_map[order_code]
+		_ = order_import_same_code_list
+	}
+
 	// 例如 20170414212812
 	var login_user = core.GetLoginUser(c.Session)
 	var import_batch_code int64 = import_batch_code_service.Get_import_batch_code(login_user.LoginName)
@@ -598,6 +606,8 @@ SELECT sa.id AS shop_id, sa.name AS shop_name FROM erp_shop_account sa;
 			}
 
 			*/
+			order_item.CostPrice = order_import.cost_price
+			order_item.GrossProfit = order_import.gross_profit
 
 			//order_item.ProductCostPrice = order_import.Cpcb //  这是单个的产品成本， 后来改为成本从库存里面导入，这里就不导入了
 			_, err = db_session.Insert(&order_item)

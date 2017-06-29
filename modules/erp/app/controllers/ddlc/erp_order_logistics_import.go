@@ -97,7 +97,6 @@ func (c ErpOrderLogisticsImport) ImportTrackingNumber() revel.Result {
 
 	var tracking_number_import_error_list = make([]tracking_number_import_t, 0)
 
-	// 错误检查
 	for index, order_import := range tracking_number_import_list {
 		/*
 			SELECT ol.* FROM erp_order o
@@ -113,12 +112,20 @@ func (c ErpOrderLogisticsImport) ImportTrackingNumber() revel.Result {
 		has, err := db_session.Sql(sql_get_order_logistics).Get(&order_logistics)
 		core.HandleError(err)
 
-		tracking_number_import_list[index].order_logistics = order_logistics
-
+		/*
 		if has == false {
 			tracking_number_import_list[index].ErrorMessage = fmt.Sprintf("订单代码 %s 对应的订单物流不存在！", order_import.OrderNumber)
 			tracking_number_import_error_list = append(tracking_number_import_error_list, tracking_number_import_list[index])
 		}
+		*/
+
+		//临时的解决方案，如果物流信息不存在的话，就先建一个
+		if has == false {
+			_, err := db_session.Insert(&order_logistics)
+			core.HandleError(err)
+		}
+
+		tracking_number_import_list[index].order_logistics = order_logistics
 	}
 
 	if len(tracking_number_import_error_list) != 0 {
@@ -133,6 +140,11 @@ func (c ErpOrderLogisticsImport) ImportTrackingNumber() revel.Result {
 		var order_logistics = order_import.order_logistics
 		order_logistics.TrackingNum = order_import.TrackingNumber
 		_, err := db_session.Id(order_logistics.Id).Cols("tracking_num").Update(&order_logistics)
+		core.HandleError(err)
+
+		var order models.OrderInfo
+		order.WaybillNumber = order_import.TrackingNumber
+		_, err = db_session.Where(fmt.Sprintf("full_tran_id = '%s'", order_import.OrderNumber)).Cols("waybill_number").Update(&order)
 		core.HandleError(err)
 	}
 

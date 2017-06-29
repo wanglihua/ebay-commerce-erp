@@ -177,6 +177,7 @@
 
                             <th id="th_logistics_company">货运公司</th>
                             <th id="th_logistics_mode">货运方式</th>
+                            <th id="th_waybill_number">货运单号</th>
 
                             <th id="th_total_fee">预估运费</th>
                             <th id="th_actual_fee">实际运费</th>
@@ -374,7 +375,11 @@
                         {
                             "mDataProp": "o.company_name", "title": "货运公司", "bSearchable": false, "bSortable": false,
                             "render": function (data, type, row) {
-                                return '<div class="div_logistics_company">' + row.company_name + '</div><div style="min-width: 100px;white-space:normal; word-break: break-all; word-wrap:break-word;">' + row.mode_name + '</div>';
+                                var waybill_number = row.o.waybill_number;
+                                if (waybill_number === "") {
+                                    waybill_number = "--";
+                                }
+                                return '<div class="div_logistics_company">' + row.company_name + '</div><div style="min-width: 100px;white-space:normal; word-break: break-all; word-wrap:break-word;">' + row.mode_name + '</div><div>' + waybill_number + "</div>";
                             }
                         },
                         {
@@ -383,7 +388,15 @@
                                 return '<div class="div_logistics_mode"></div>';
                             }
                         },
-
+                        {
+                            "mDataProp": "waybill_number",
+                            "title": "货运单号",
+                            "bSearchable": false,
+                            "bSortable": false,
+                            "render": function (data, type, row) {
+                                return "<div class='div_waybill_number'></div>"
+                            }
+                        },
                         {
                             "mDataProp": "o.ol.total_fee", "title": "预估运费", "bSearchable": false, "bSortable": false,
                             "render": function (data, type, row) {
@@ -486,6 +499,7 @@
 
                                 $("#orderList div.div_logistics_company").parent().css("width", "100px");
                                 $("#orderList div.div_logistics_mode").parent().css("display", "none");
+                                $("#orderLogisticsList div.div_waybill_number").parent().css("display", "none");
 
                                 $("#orderList div.div_total_fee").parent().css("width", "95px");
                                 $("#orderList div.div_actual_fee").parent().css("display", "none");
@@ -534,7 +548,8 @@
             $("#th_logistics_company").before("<th id='th_logistics_company_ext'></th>");
             $("#th_logistics_company").wrap("<div id='div_logistics_company'></div>");
             $("#th_logistics_mode").wrap("<div id='div_logistics_mode'></div>");
-            $("#th_logistics_company_ext").append($("#div_logistics_company")).append($("#div_logistics_mode"));
+            $("#th_waybill_number").wrap("<div id='div_waybill_number'></div>");
+            $("#th_logistics_company_ext").append($("#div_logistics_company")).append($("#div_logistics_mode")).append($("#div_waybill_number"));
 
             $("#th_total_fee").before("<th id='th_total_fee_ext'></th>");
             $("#th_total_fee").wrap("<div id='div_total_fee'></div>");
