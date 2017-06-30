@@ -453,7 +453,11 @@ WHERE o.status_id = %d AND ol.mode_id IN (%s) AND ol.stock_id = %d`
 			sheet.Cell(index+1, excel_col_label_to_index("A")).Value = "IPEC"
 
 			// TOLL 的 导出模板，B列 service ID。如果是墨尔本仓库，邮编第一个数字是“3”的话，填充2，否则填充4 。 如果是布里斯班仓库，邮编第一个数字是“4”的话，填充2，否则填充4 。
-			var service_id string = get_toll_service_id(stock_code, order_shipping_address)
+			//var service_id string = get_toll_service_id(stock_code, order_shipping_address)
+
+			// 逻辑改了，现在不采用上面的方式了，而是从一个表里面取。只针对MEL的TOLL的 Service Id
+			var service_id string = get_mel_toll_service_id(order_shipping_address.PostalCode, db_session)
+
 			sheet.Cell(index+1, excel_col_label_to_index("B")).Value = service_id
 
 			sheet.Cell(index+1, excel_col_label_to_index("C")).Value = order_shipping_address.Name
@@ -693,4 +697,13 @@ aus    act	  ACT
 	} else {
 		return ""
 	}
+}
+
+func get_mel_toll_service_id(postcode string, db_session *xorm.Session) string {
+	var mel_toll_service_id models.MelTollSeviceIdInfo
+	postcode = strings.TrimPrefix(postcode, "0")
+	_, err := db_session.Where(fmt.Sprintf("postcode = '%s'", postcode)).Get(&mel_toll_service_id)
+	core.HandleError(err)
+
+	return mel_toll_service_id.ServiceId
 }
