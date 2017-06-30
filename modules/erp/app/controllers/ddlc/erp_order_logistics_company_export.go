@@ -701,8 +701,8 @@ aus    act	  ACT
 
 func get_mel_toll_service_id(postcode string, db_session *xorm.Session) string {
 	var mel_toll_service_id models.MelTollSeviceIdInfo
-	postcode = strings.TrimPrefix(postcode, "0")
-	_, err := db_session.Where(fmt.Sprintf("postcode = '%s'", postcode)).Get(&mel_toll_service_id)
+	postcode_without_prefix_zero := strings.TrimPrefix(postcode, "0")
+	_, err := db_session.Where(fmt.Sprintf("postcode = '%s' OR postcode = '%s'", postcode, postcode_without_prefix_zero)).Get(&mel_toll_service_id)
 	core.HandleError(err)
 
 	return mel_toll_service_id.ServiceId
