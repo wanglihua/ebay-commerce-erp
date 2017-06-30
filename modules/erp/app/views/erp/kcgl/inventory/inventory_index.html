@@ -115,6 +115,11 @@
                         </select>
                         <label class="control-label no-padding-right" for="product_code_query">商品编号</label>
                         <input id="product_code_query" class="input-sm" name="product_code_query" placeholder="商品编号查询" type="text" v-model="page.product_code_query" style="width: 100px;"/>
+                        <label class="control-label no-padding-right" for="cost_price_zero_query">成本价过滤</label>
+                        <select id="cost_price_zero_query" name="cost_price_zero_query" v-model.number="page.cost_price_zero_query" style="width: 140px;">
+                            <option :value="0">显示全部成本价记录</option>
+                            <option :value="1">只显示零成本价记录</option>
+                        </select>
                         <button class="btn btn-mini btn-primary" @click="refreshList()">
                             &nbsp;<i class="ace-icon fa fa-search"></i>查&nbsp;询&nbsp;
                         </button>
@@ -499,7 +504,8 @@
             "page": {
                 "stock_id_query": 0,
                 "stock_list": [],
-                "product_code_query": ""
+                "product_code_query": "",
+                "cost_price_zero_query": 0
             },
             "detail": {
                 "inventory": {},
@@ -572,6 +578,7 @@
 
                         aoData.push({'name': 'stock_id_query', 'value': this_vm.page.stock_id_query});
                         aoData.push({'name': 'product_code_query', 'value': this_vm.page.product_code_query});
+                        aoData.push({'name': 'cost_price_zero_query', 'value': this_vm.page.cost_price_zero_query});
 
                         $.ajax({
                             "dataType": 'json',
