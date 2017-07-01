@@ -436,3 +436,10 @@ table.inline-inventory td.price {
     width: 50px;
     text-align: center;
 }
+
+.dropdown-menu > li > a:hover {
+    background-color: transparent;
+    color: black;
+    font-weight: bold;
+    font-size: 14px;
+}

@@ -40,6 +40,9 @@
                             <span class="ace-icon fa fa-caret-down icon-on-right"></span>
                         </button>
                         <ul class="dropdown-menu dropdown-danger">
+                            <li>
+                                <a @click="apply_order_tag(0)" style="cursor: pointer;">取消标签</a>
+                            </li>
                             <template v-for="order_tag in page.order_tag_list">
                                 <li :style="'background-color:' + order_tag.bg_color + ';'">
                                     <a @click="apply_order_tag(order_tag.id)" style="cursor: pointer;">{{order_tag.name}}</a>

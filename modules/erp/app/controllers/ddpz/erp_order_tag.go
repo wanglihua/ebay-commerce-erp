@@ -213,8 +213,15 @@ func (c ErpOrderTag) ApplyTag() revel.Result {
 		core.HandleError(err)
 	}
 
-	return c.RenderJson(map[string]interface{}{
-		"success": true,
-		"message": "标签应用成功！",
-	})
+	if order_tag_id != 0 {
+		return c.RenderJson(map[string]interface{}{
+			"success": true,
+			"message": "标签应用成功！",
+		})
+	} else {
+		return c.RenderJson(map[string]interface{}{
+			"success": true,
+			"message": "标签取消成功！",
+		})
+	}
 }
