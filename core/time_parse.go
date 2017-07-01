@@ -94,7 +94,7 @@ func Parse_time(str string) (time.Time, error) {
 
 	var date_time_str = date_time_buffer.String()
 
-	if date_time_str == "0000-00-00 00:00:00" {
+	if date_time_str == "0001-01-01 00:00:00" {
 		return time.Time{}, nil
 	}
 
