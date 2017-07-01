@@ -76,10 +76,21 @@
                             <input id="order_code" name="page.order_code" type="text" class="input-sm" v-model="page.order_code" style="width: 135px;"/>
                             <input id="query_begin_time" name="query_begin_time" style="width: 135px;height:30px;" v-model="page.query_begin_time" placeholder="开始时间如2016-01-02"/>
                             <input id="query_end_time" name="query_end_time" style="width: 135px;height:30px;" v-model="page.query_end_time" placeholder="结束时间如2016-01-02"/>
+
+                            <label class="control-label no-padding-right" for="order_tag_id">订单标签</label>
+                            <select id="order_tag_id" name="order_tag_id" class="input-sm" v-model.number="page.order_tag_id" style="width: 135px;">
+                                <option :value="0">选择标签查询</option>
+                                <template v-for="order_tag in page.order_tag_list">
+                                    <option :value="order_tag.id">{{order_tag.name}}</option>
+                                </template>
+                            </select>
+
                             <button class="btn btn-mini btn-primary" @click="refreshList()">
                                 &nbsp;<i class="ace-icon fa fa-search"></i>查&nbsp;询&nbsp;
                             </button>
-                            &nbsp;&nbsp;&nbsp;
+                        </div>
+
+                        <div class="col-xs-12">
                             <label for="unlock_express">解锁快递：</label>
                             <select id="unlock_express" class="input-sm" style="width: 80px;">
                                 <option :value="0">否</option>
@@ -102,14 +113,15 @@
                             <button class="btn btn-mini btn-purple" onclick="rematch_order_logistics()">
                                 重新匹配物流
                             </button>
+                        </div>
 
+                        <div class="col-xs-12">
                             <div class="link_query_list">
                                 <a :class="page.hold_type_id == 0 ? 'selected' : ''" href="#" @click="selectHoldType(0)"><img style="border: none;height: 24px;" src="/static/images/icons/all_check.png" class="link_icon" alt="全部"/>全部</a>
                                 <template v-for="hold_type in page.hold_type_list">
                                     <a :class="page.hold_type_id == hold_type.id ? 'selected' : ''" href="#" @click="selectHoldType(hold_type.id)">&nbsp;<img style="border: none;height: 24px;" v-if="hold_type.icon_file != ''" :src="'{%.icon_path%}/' + hold_type.icon_file" :alt="hold_type.name" class="link_icon"/>{{hold_type.name}}</a>
                                 </template>
                             </div>
-
                         </div>
                     </div>
                 </div>
@@ -171,7 +183,8 @@
                 "hold_type_list": [],
                 "au_stock_list": [],
                 "query_begin_time": "",
-                "query_end_time": ""
+                "query_end_time": "",
+                "order_tag_id": 0
             },
             "detail": {
                 "order": {}
@@ -403,6 +416,7 @@
                         aoData.push({'name': 'hold_type_id', 'value': this_vm.page.hold_type_id});
                         aoData.push({'name': 'query_begin_time', 'value': this_vm.page.query_begin_time});
                         aoData.push({'name': 'query_end_time', 'value': this_vm.page.query_end_time});
+                        aoData.push({'name': 'order_tag_id', 'value': this_vm.page.order_tag_id});
 
                         //query_criteria_value
 

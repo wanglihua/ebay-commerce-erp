@@ -234,6 +234,7 @@ func (c ErpOrder) PageData() revel.Result {
 		"hold_type_id":        -1, // 表示不选择 hold
 		"batch_code":          0,
 		"batch_code_list":     batch_code_list,
+		"order_tag_id":        0,
 		"order_tag_list":      order_tag_list,
 	})
 }
@@ -273,6 +274,9 @@ func (c ErpOrder) ListData() revel.Result {
 	var query_end_time string
 	c.Params.Bind(&query_end_time, "query_end_time")
 	query_end_date, query_end_date_err := core.Parse_time(query_end_time)
+
+	var order_tag_id int64
+	c.Params.Bind(&order_tag_id, "order_tag_id")
 
 	var status_id int64 = 0 // 0： all status; other: 具体的 status_id
 
@@ -501,6 +505,10 @@ o.id IN (
 `
 			filter = fmt.Sprintf(good_query, filter)
 		}
+	}
+
+	if order_tag_id != 0 {
+		filter = core.SqlAnd(filter, fmt.Sprintf("o.tag_id = %d", order_tag_id))
 	}
 
 	order_list, count := order_service.Get_order_data_list(db_session, filter, order, offset, limit)

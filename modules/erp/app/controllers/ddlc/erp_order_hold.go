@@ -59,6 +59,7 @@ func (c ErpOrderHold) PageData() revel.Result {
 		"hold_type_id":    0,
 		"hold_type_list":  hold_type_list,
 		"au_stock_list":   au_stock_list,
+		"order_tag_id":    0,
 		"order_tag_list":  order_tag_list,
 	})
 }
@@ -77,6 +78,9 @@ func (c ErpOrderHold) ListData() revel.Result {
 
 	var hold_type_id int64
 	c.Params.Bind(&hold_type_id, "hold_type_id")
+
+	var order_tag_id int64
+	c.Params.Bind(&order_tag_id, "order_tag_id")
 
 	var query_begin_time string
 	c.Params.Bind(&query_begin_time, "query_begin_time")
@@ -110,6 +114,10 @@ func (c ErpOrderHold) ListData() revel.Result {
 
 	if order_code != "" {
 		filter = core.SqlAnd(filter, fmt.Sprintf("o.code = '%s'", order_code))
+	}
+
+	if order_tag_id != 0 {
+		filter = core.SqlAnd(filter, fmt.Sprintf("o.tag_id = %d", order_tag_id))
 	}
 
 	order_list, count := order_service.Get_order_data_list(db_session, filter, order, offset, limit)
