@@ -98,6 +98,12 @@
                                 </select>
                                 <label class="control-label no-padding-right" for="order_code_query">订单编号</label>
                                 <input class="input-sm" id="order_code_query" name="order_code_query" placeholder="订单编号" type="text" v-model="page.order_code_query" style="width: 130px;"/>
+                                <select id="good_query_id" name="page.query_criteria_id" v-model.number="page.good_query_id" style="width:120px;">
+                                    <option value="0">-优化查询-</option>
+                                    <template v-for="query in page.good_query_list">
+                                        <option :value="query.id">{{query.name}}</option>
+                                    </template>
+                                </select>
                                 <label class="control-label no-padding-right" for="begin_time_query">开始时间</label>
                                 <input class="input-sm" id="begin_time_query" name="begin_time_query" placeholder="开始时间查询" type="text" v-model="page.begin_time_query" style="width: 130px;"/>
                                 <label class="control-label no-padding-right" for="end_time_query">结束时间</label>
@@ -379,7 +385,8 @@
                 "batch_code_list": [],
                 "order_code_query": "",
                 "begin_time_query": "",
-                "end_time_query": ""
+                "end_time_query": "",
+                "good_query_id": 0
             },
             "detail": {
                 "order_logistics": {}
@@ -602,6 +609,7 @@
                         aoData.push({'name': 'order_code_query', 'value': this_vm.page.order_code_query});
                         aoData.push({'name': 'begin_time_query', 'value': this_vm.page.begin_time_query});
                         aoData.push({'name': 'end_time_query', 'value': this_vm.page.end_time_query});
+                        aoData.push({'name': 'good_query_id', 'value': this_vm.page.good_query_id});
 
                         $.ajax({
                             "dataType": 'json',

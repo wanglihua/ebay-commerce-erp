@@ -36,6 +36,17 @@ func (c ErpOrderLogistics) Index() revel.Result {
 	return c.RenderTemplate("erp/ddlc/order_logistics/order_logistics_index.html")
 }
 
+// 查询条件的列表
+func (c ErpOrderLogistics) get_good_query_list() []good_query {
+	var good_query_list = make([]good_query, 0)
+
+	good_query_list = append(good_query_list, good_query{Id: good_query_ss, Name: "单商品单数量"})
+	good_query_list = append(good_query_list, good_query{Id: good_query_sm, Name: "单商品多数量"})
+	good_query_list = append(good_query_list, good_query{Id: good_query_mm, Name: "多商品"})
+
+	return good_query_list
+}
+
 func (c ErpOrderLogistics) PageData() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_LOGISTICS, c.Session)
 
@@ -58,6 +69,8 @@ func (c ErpOrderLogistics) PageData() revel.Result {
 		"logistics_company_list": logistics_company_list,
 		"batch_code":             0,
 		"batch_code_list":        batch_code_list,
+		"good_query_id":          0,
+		"good_query_list":        c.get_good_query_list(),
 	})
 }
 
@@ -79,6 +92,9 @@ func (c ErpOrderLogistics) apply_query_filter(filter string) string {
 	var end_time_query core.NullLongTime
 	c.Params.Bind(&begin_time_query, "begin_time_query")
 	c.Params.Bind(&end_time_query, "end_time_query")
+
+	var good_query_id int64 = 0
+	c.Params.Bind(&good_query_id, "good_query_id")
 
 	if stock_id != 0 {
 		// 这里是查询上的对仓库的限制，如果是拣货人员的话，下面还有是不是这个仓库的拣货人员的限制
@@ -132,6 +148,83 @@ func (c ErpOrderLogistics) apply_query_filter(filter string) string {
 	var is_custom_service = pass_service.Is_user_custom_service(login_user.UserId) // 是不是客服
 	if login_user.IsSuperAdmin == false && is_admin == false && is_custom_service == false && is_sales == false { // 管理员，客服，销售 可以看到所有仓库的订单
 		filter = core.SqlAnd(filter, fmt.Sprintf(`ol.stock_id IN (SELECT spc.stock_id FROM erp_stock_pick_crew spc WHERE spc.user_id = %d)`, login_user.UserId))
+	}
+
+	// 优化查询
+	if good_query_id != 0 {
+		if good_query_id == good_query_ss {
+			/*
+# 单产品单数量
+SELECT * FROM erp_order o WHERE o.id IN (
+    SELECT oi.order_id AS order_id
+    FROM erp_order_item oi
+        INNER JOIN erp_order o ON oi.order_id = o.id AND 1 = 1 # order filter
+    WHERE oi.quantity = 1
+    GROUP BY oi.order_id
+    HAVING count(oi.id) = 1
+);
+			 */
+
+			var good_query = `
+o.id IN (
+    SELECT oi.order_id AS order_id
+    FROM erp_order_item oi
+        INNER JOIN erp_order o ON oi.order_id = o.id AND %s
+    WHERE oi.quantity = 1
+    GROUP BY oi.order_id
+    HAVING count(oi.id) = 1
+)
+`
+			filter = fmt.Sprintf(good_query, filter)
+
+		} else if good_query_id == good_query_sm {
+			/*
+# 单产品多数量
+SELECT * FROM erp_order o WHERE o.id IN (
+    SELECT oi.order_id AS order_id
+    FROM erp_order_item oi
+        INNER JOIN erp_order o ON oi.order_id = o.id AND 1 = 1 # order filter
+    WHERE oi.quantity > 1
+    GROUP BY oi.order_id
+    HAVING count(oi.id) = 1
+);
+			 */
+
+			var good_query = `
+o.id IN (
+    SELECT oi.order_id AS order_id
+    FROM erp_order_item oi
+        INNER JOIN erp_order o ON oi.order_id = o.id AND %s
+    WHERE oi.quantity > 1
+    GROUP BY oi.order_id
+    HAVING count(oi.id) = 1
+)
+`
+			filter = fmt.Sprintf(good_query, filter)
+
+		} else if good_query_id == good_query_mm {
+			/*
+# 多产品
+SELECT * FROM erp_order o WHERE o.id IN (
+    SELECT oi.order_id AS order_id
+    FROM erp_order_item oi
+        INNER JOIN erp_order o ON oi.order_id = o.id AND 1 = 1 # order filter
+    GROUP BY oi.order_id
+    HAVING count(oi.id) > 1
+);
+			 */
+
+			var good_query = `
+o.id IN (
+    SELECT oi.order_id AS order_id
+    FROM erp_order_item oi
+        INNER JOIN erp_order o ON oi.order_id = o.id AND %s
+    GROUP BY oi.order_id
+    HAVING count(oi.id) > 1
+)
+`
+			filter = fmt.Sprintf(good_query, filter)
+		}
 	}
 
 	return filter
