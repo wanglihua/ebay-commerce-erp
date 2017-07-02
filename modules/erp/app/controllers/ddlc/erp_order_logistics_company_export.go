@@ -93,6 +93,7 @@ type order_logistics_toll_view_item_t struct {
 	ShopAccount    models.ShopAccountInfo       `xorm:"extends" json:"sa"`
 	sku_qty_loc    string                       `xorm:"-"`
 	loc_name       string                       `xorm:"-"`
+	qty            int64                        `xorm:"-"`
 }
 
 type order_logistics_toll_view_item_slice []order_logistics_toll_view_item_t
@@ -439,7 +440,7 @@ WHERE o.status_id = %d AND ol.mode_id IN (%s) AND ol.stock_id = %d`
 		core.HandleError(err)
 
 		for index, order_logistics := range order_logistics_list {
-			order_logistics_list[index].sku_qty_loc, order_logistics_list[index].loc_name = get_order_sku_for_export(order_logistics.Order.Id, db_session)
+			order_logistics_list[index].sku_qty_loc, order_logistics_list[index].loc_name, order_logistics_list[index].qty = get_toll_order_sku_for_export(order_logistics.Order.Id, db_session)
 		}
 
 		var order_logistics_list_slice = order_logistics_toll_view_item_slice(order_logistics_list)
@@ -456,7 +457,15 @@ WHERE o.status_id = %d AND ol.mode_id IN (%s) AND ol.stock_id = %d`
 			//var service_id string = get_toll_service_id(stock_code, order_shipping_address)
 
 			// 逻辑改了，现在不采用上面的方式了，而是从一个表里面取。只针对MEL的TOLL的 Service Id
-			var service_id string = get_mel_toll_service_id(order_shipping_address.PostalCode, db_session)
+			var service_id string = ""
+
+			if stock_code == excel_export_stock_mel_code {
+				service_id = get_mel_toll_service_id(order_shipping_address.PostalCode, db_session)
+			}
+
+			if stock_code == excel_export_stock_bne_code {
+				service_id = get_toll_service_id(excel_export_stock_bne_code, order_shipping_address)
+			}
 
 			sheet.Cell(index+1, excel_col_label_to_index("B")).Value = service_id
 
@@ -472,12 +481,12 @@ WHERE o.status_id = %d AND ol.mode_id IN (%s) AND ol.stock_id = %d`
 			sheet.Cell(index+1, excel_col_label_to_index("I")).Value = order_shipping_address.PostalCode
 			sheet.Cell(index+1, excel_col_label_to_index("K")).Value = "CARTON"
 			sheet.Cell(index+1, excel_col_label_to_index("L")).Value = get_toll_packaging_code(order_logistics.OrderLogistics) // 包裹类型要计算
-			sheet.Cell(index+1, excel_col_label_to_index("M")).Value = "1"
+			sheet.Cell(index+1, excel_col_label_to_index("M")).Value = fmt.Sprint(order_logistics.qty)
 			sheet.Cell(index+1, excel_col_label_to_index("N")).Value = fmt.Sprintf("%0.1f", order_logistics.OrderLogistics.Length)
 			sheet.Cell(index+1, excel_col_label_to_index("O")).Value = fmt.Sprintf("%0.1f", order_logistics.OrderLogistics.Width)
-			sheet.Cell(index+1, excel_col_label_to_index("P")).Value = fmt.Sprintf("%0.1f", order_logistics.OrderLogistics.Height)
-			sheet.Cell(index+1, excel_col_label_to_index("Q")).Value = fmt.Sprintf("%0.1f", order_logistics.OrderLogistics.DimWeight)
-			sheet.Cell(index+1, excel_col_label_to_index("R")).Value = fmt.Sprintf("%0.1f", order_logistics.OrderLogistics.Weight)
+			sheet.Cell(index+1, excel_col_label_to_index("P")).Value = fmt.Sprintf("%0.1f", order_logistics.OrderLogistics.Height/float64(order_logistics.qty))
+			sheet.Cell(index+1, excel_col_label_to_index("Q")).Value = fmt.Sprintf("%0.1f", order_logistics.OrderLogistics.DimWeight/float64(order_logistics.qty))
+			sheet.Cell(index+1, excel_col_label_to_index("R")).Value = fmt.Sprintf("%0.1f", order_logistics.OrderLogistics.Weight/float64(order_logistics.qty))
 			sheet.Cell(index+1, excel_col_label_to_index("S")).Value = order_logistics.Order.FullTranId
 			sheet.Cell(index+1, excel_col_label_to_index("T")).Value = fmt.Sprintf("FROM:%s", order_logistics.ShopAccount.Name)
 			sheet.Cell(index+1, excel_col_label_to_index("U")).Value = "ATL at safe place"
@@ -569,6 +578,30 @@ func get_order_sku_for_export(order_id int64, db_session *xorm.Session) (order_s
 		}
 	} else { // if order_sku_quantity_list_len > 1 {
 		return "MM", ""
+	}
+}
+
+func get_toll_order_sku_for_export(order_id int64, db_session *xorm.Session) (order_sku_qty_loc_return string, loc_name_return string, qty_return int64) {
+	var order_sku_quantity_list = order_service.Get_order_sku_qty_loc_list(order_id, db_session)
+
+	var order_sku_quantity_list_len = len(order_sku_quantity_list)
+	if order_sku_quantity_list_len < 1 {
+		return "", "", 0
+	} else if order_sku_quantity_list_len == 1 {
+		var order_sku_quantity = order_sku_quantity_list[0]
+		if order_sku_quantity.Quantity == 1 {
+			return fmt.Sprintf("%s %d [%s]", order_sku_quantity.Sku, order_sku_quantity.Quantity, order_sku_quantity.StorageLocName), order_sku_quantity.StorageLocName, order_sku_quantity.Quantity
+		} else if order_sku_quantity.Quantity > 1 {
+			return fmt.Sprintf("%s DOG [%s]", order_sku_quantity.Sku, order_sku_quantity.StorageLocName), order_sku_quantity.StorageLocName, order_sku_quantity.Quantity
+		} else {
+			return "", "", 0
+		}
+	} else { // if order_sku_quantity_list_len > 1 {
+		var total_qty int64 = 0
+		for _, sku_qty := range order_sku_quantity_list {
+			total_qty = total_qty + sku_qty.Quantity
+		}
+		return "MM", "", total_qty
 	}
 }
 
