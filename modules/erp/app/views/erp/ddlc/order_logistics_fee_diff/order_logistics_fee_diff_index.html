@@ -234,6 +234,18 @@
                             }
                         },
                         {
+                            "mDataProp": "ol.sfkltjz", "title": "是否考虑体积重", "bSearchable": false, "width": 65,
+                            "render": function (data, type, row) {
+                                if (data === 0) {
+                                    return "";
+                                } else if (data === -1) {
+                                    return "否";
+                                } else if (data === 1) {
+                                    return "是"
+                                }
+                            }
+                        },
+                        {
                             "mDataProp": "ol.pick_fee", "title": "拣货费用", "bSearchable": false, "width": 75,
                             "render": function (data, type, row) {
                                 if (data != "" && data != 0) {

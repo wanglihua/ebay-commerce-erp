@@ -251,6 +251,7 @@ func (p_ol *OrderLogistics) match_logistics_mode_with_option(p_order *models.Ord
 
 			// 如果考虑体积重，就把计算好的体积重，用 体积重系数 打折
 			if logistics_mode.Sfkltjz == 1 { // 是否考虑体积重
+				mode_result.sfkltjz = 1
 				mt.Println("是否考虑体积重", "是")
 
 				if logistics_mode.Tjzxs > 0 { // 如果 体积重系数 有设置的值
@@ -276,6 +277,7 @@ func (p_ol *OrderLogistics) match_logistics_mode_with_option(p_order *models.Ord
 				}
 
 			} else {
+				mode_result.sfkltjz = -1
 				mt.Println("是否考虑体积重", "否")
 			}
 		}

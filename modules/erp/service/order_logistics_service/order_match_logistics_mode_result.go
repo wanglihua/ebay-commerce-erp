@@ -17,6 +17,7 @@ type match_logistics_mode_result struct {
 	height        float64
 	actual_weight float64
 	dim_weight    float64
+	sfkltjz       int64
 	weight        float64 //计算时用的重量体积重或者实际重量
 	total_fee     float64
 	pick_fee      float64

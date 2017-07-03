@@ -25,6 +25,7 @@ func save_order_logistics(p_order *models.OrderInfo, match_result match_logistic
 	order_logistics.Width = match_result.width
 	order_logistics.Height = match_result.height
 	order_logistics.DimWeight = match_result.dim_weight
+	order_logistics.Sfkltjz = match_result.sfkltjz
 	order_logistics.Weight = match_result.actual_weight
 	order_logistics.TotalFee = match_result.total_fee
 	order_logistics.PickFee = match_result.pick_fee
@@ -46,13 +47,13 @@ func save_order_logistics(p_order *models.OrderInfo, match_result match_logistic
 			p_order.HoldTypeId = core.MakeNullInt(models.ORDER_HOLD_TYPE_EXPRESS, true)
 			p_order.StatusId = models.ORDER_STATUS_HOLD // 修改订单状态为 hold 状态
 
-			order_history_service.Insert_order_history(*p_order, fmt.Sprintf("匹配物流订单Hold 快递类",), db_session)
+			order_history_service.Insert_order_history(*p_order, fmt.Sprintf("匹配物流订单Hold 快递类", ), db_session)
 		} else {
 			// 把订单状态修改为 待配货
 			p_order.HoldTypeId = core.MakeNullInt(0, false)
 			p_order.StatusId = models.ORDER_STATUS_DPH
 
-			order_history_service.Insert_order_history(*p_order, fmt.Sprintf("匹配物流订单待配货",), db_session)
+			order_history_service.Insert_order_history(*p_order, fmt.Sprintf("匹配物流订单待配货", ), db_session)
 		}
 	}
 
