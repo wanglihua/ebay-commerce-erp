@@ -408,7 +408,7 @@ WHERE ol.stock_id = 0 AND ol.company_id = 0
 	if order != "" {
 		sb.OrderBy(order)
 	} else {
-		sb.OrderBy("id ASC")
+		sb.OrderBy("o.id ASC")
 	}
 
 	if is_for_export == false {

@@ -27,6 +27,10 @@
                         删除
                     </button>
                     */%}
+                    <button class="btn btn-purple btn-sm" onclick="export_excel()">
+                        <i class="ace-icon fa fa-file-excel-o"></i>
+                        导出Excel
+                    </button>
                 </div>
                 <div class="row" style="margin-top: 10px;margin-bottom: 20px;">
                     <div id="query" class="col-xs-12 query" style="line-height: 28px;">
@@ -178,7 +182,7 @@
                             "mDataProp": "ol.length", "title": "长度", "bSearchable": false, "width": 65,
                             "render": function (data, type, row) {
                                 if (data != "" && data != 0) {
-                                    return data + " cm";
+                                    return dtFormatFloat(data) + " cm";
                                 }
                                 else {
                                     return "";
@@ -189,7 +193,7 @@
                             "mDataProp": "ol.width", "title": "宽度", "bSearchable": false, "width": 65,
                             "render": function (data, type, row) {
                                 if (data != "" && data != 0) {
-                                    return data + " cm";
+                                    return dtFormatFloat(data) + " cm";
                                 }
                                 else {
                                     return "";
@@ -200,7 +204,7 @@
                             "mDataProp": "ol.height", "title": "高度", "bSearchable": false, "width": 65,
                             "render": function (data, type, row) {
                                 if (data != "" && data != 0) {
-                                    return data + " cm";
+                                    return dtFormatFloat(data) + " cm";
                                 }
                                 else {
                                     return "";
@@ -211,7 +215,7 @@
                             "mDataProp": "ol.dim_weight", "title": "体积重", "bSearchable": false, "width": 65,
                             "render": function (data, type, row) {
                                 if (data != "" && data != 0) {
-                                    return data + " kg";
+                                    return dtFormatFloat(data) + " kg";
                                 }
                                 else {
                                     return "";
@@ -222,7 +226,7 @@
                             "mDataProp": "ol.weight", "title": "实际重", "bSearchable": false, "width": 65,
                             "render": function (data, type, row) {
                                 if (data != "" && data != 0) {
-                                    return data + " kg";
+                                    return dtFormatFloat(data) + " kg";
                                 }
                                 else {
                                     return "";
@@ -233,7 +237,7 @@
                             "mDataProp": "ol.pick_fee", "title": "拣货费用", "bSearchable": false, "width": 75,
                             "render": function (data, type, row) {
                                 if (data != "" && data != 0) {
-                                    return "AU " + data;
+                                    return "AU " + dtFormatFloat(data);
                                 }
                                 else {
                                     return "";
@@ -244,7 +248,7 @@
                             "mDataProp": "ol.total_fee", "title": "预估物流费用", "bSearchable": false, "width": 100,
                             "render": function (data, type, row) {
                                 if (data != "" && data != 0) {
-                                    return "AU " + data;
+                                    return "AU " + dtFormatFloat(data);
                                 }
                                 else {
                                     return "";
@@ -255,7 +259,7 @@
                             "mDataProp": "ol.actual_fee", "title": "实际物流费用", "bSearchable": false, "width": 100,
                             "render": function (data, type, row) {
                                 if (data != "" && data != 0) {
-                                    return "AU " + data;
+                                    return "AU " + dtFormatFloat(data);
                                 }
                                 else {
                                     return "";
@@ -308,6 +312,25 @@
             }
         }
     });
+
+    function export_excel() {
+        /*
+         aoData.push({'name': 'stock_id', 'value': this_vm.page.stock_id});
+         aoData.push({'name': 'logistics_company_id', 'value': this_vm.page.logistics_company_id});
+         aoData.push({'name': 'batch_code', 'value': this_vm.page.batch_code});
+         aoData.push({'name': 'begin_time_query', 'value': this_vm.page.begin_time_query});
+         aoData.push({'name': 'end_time_query', 'value': this_vm.page.end_time_query});
+         */
+        var params = $.param({
+            "stock_id": vm.page.stock_id,
+            "logistics_company_id": vm.page.logistics_company_id,
+            "batch_code": vm.page.batch_code,
+            "begin_time_query": vm.page.begin_time_query,
+            "end_time_query": vm.page.end_time_query
+        });
+        var url = '{%url "ErpOrderLogisticsFeeDiff.Export"%}' + "?" + params;
+        $('<form method="post" action="' + url + '"></form>').appendTo('body').submit().remove();
+    }
 </script>
 {%footer%}
 
