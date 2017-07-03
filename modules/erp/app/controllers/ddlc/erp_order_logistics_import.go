@@ -9,6 +9,7 @@ import (
 	"github.com/tealeg/xlsx"
 	"matrix/core"
 	"matrix/modules/erp/models"
+	"github.com/go-xorm/xorm"
 )
 
 type ErpOrderLogisticsImport struct {
@@ -121,6 +122,7 @@ func (c ErpOrderLogisticsImport) ImportTrackingNumber() revel.Result {
 
 		//临时的解决方案，如果物流信息不存在的话，就先建一个
 		if has == false {
+			order_logistics.OrderId = c.get_order_id_by_full_tran_id(order_import.OrderNumber, db_session)
 			_, err := db_session.Insert(&order_logistics)
 			core.HandleError(err)
 		}
@@ -251,9 +253,17 @@ func (c ErpOrderLogisticsImport) ImportActualFee() revel.Result {
 
 		actual_fee_import_list[index].order_logistics = order_logistics
 
+		/*
 		if has == false {
 			actual_fee_import_list[index].ErrorMessage = fmt.Sprintf("订单代码 %s 对应的订单物流不存在！", actual_fee_import.OrderNumber)
 			order_import_error_list = append(order_import_error_list, actual_fee_import_list[index])
+		}
+		*/
+		//临时的解决方案，如果物流信息不存在的话，就先建一个
+		if has == false {
+			order_logistics.OrderId = c.get_order_id_by_full_tran_id(actual_fee_import.OrderNumber, db_session)
+			_, err := db_session.Insert(&order_logistics)
+			core.HandleError(err)
 		}
 
 		actual_fee_import.ActualFee, err = strconv.ParseFloat(actual_fee_import.ActualFeeStr, 64)
@@ -282,4 +292,27 @@ func (c ErpOrderLogisticsImport) ImportActualFee() revel.Result {
 		"success": true,
 		"message": "数据导入成功！",
 	})
+}
+
+func (c ErpOrderLogisticsImport) get_order_id_by_full_tran_id(order_full_tran_id string, db_session *xorm.Session) int64 {
+	/*
+SELECT o.id AS order_id
+FROM erp_order o
+WHERE o.full_tran_id = '123' #'%s'
+	 */
+
+	var sql = `
+SELECT o.id AS order_id
+FROM erp_order o
+WHERE o.full_tran_id = '%s'
+			`
+	sql = fmt.Sprintf(sql, order_full_tran_id)
+	var order_id struct {
+		OrderId int64 `xorm:"'order_id'"`
+	}
+
+	_, err := db_session.Sql(sql).Get(&order_id)
+	core.HandleError(err)
+
+	return order_id.OrderId
 }
