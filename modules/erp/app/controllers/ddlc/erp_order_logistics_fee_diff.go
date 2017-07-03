@@ -283,7 +283,11 @@ func (c ErpOrderLogisticsFeeDiff) get_export_excel(db_session *xorm.Session) *xl
 		// 体积重（Kg）
 		cell = row.AddCell()
 		set_text_cell_style(cell, "center")
-		cell.Value = fmt.Sprintf("%0.2f", order_logistics_view.OrderLogistics.DimWeight)
+		if order_logistics_view.OrderLogistics.DimWeight != 0 {
+			cell.Value = fmt.Sprintf("%0.2f", order_logistics_view.OrderLogistics.DimWeight)
+		} else {
+			cell.Value = ""
+		}
 
 		// 实际重（Kg）
 		cell = row.AddCell()
