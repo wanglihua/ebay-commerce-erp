@@ -62,7 +62,6 @@
                                 <div style="clear:both;"></div>
                             </div>
                             <div style="padding-top: 15px;">
-                                <label class="control-label no-padding-right" for="batch_code">导入批次号</label>
                                 <select id="batch_code" name="page.batch_code" v-model.number="page.batch_code" style="width: 120px;" @change="refreshList()">
                                     <option :value="0">-导入批次号-</option>
                                     <template v-for="batch_code in page.batch_code_list">
@@ -73,7 +72,13 @@
                                 <input class="input-sm" id="begin_time_query" name="begin_time_query" placeholder="开始时间查询" type="text" v-model="page.begin_time_query" style="width: 130px;"/>
                                 <label class="control-label no-padding-right" for="end_time_query">结束时间</label>
                                 <input class="input-sm" id="end_time_query" name="end_time_query" placeholder="结束时间查询" type="text" v-model="page.end_time_query" style="width: 130px;"/>
-                                <label class="control-label no-padding-right" for="fee_diff_min_query">物流费用偏差区间</label>
+                                <select id="fee_diff_type_code" name="page.fee_diff_type_code" v-model.number="page.fee_diff_type_code" style="width: 120px;" @change="refreshList()">
+                                    <option :value="0">-费用偏差类别-</option>
+                                    <template v-for="fee_diff_type in page.fee_diff_type_list">
+                                        <option :value="fee_diff_type.code">{{fee_diff_type.name}}</option>
+                                    </template>
+                                </select>
+                                <label class="control-label no-padding-right" for="fee_diff_min_query">费用偏差区间</label>
                                 <input class="input-sm" id="fee_diff_min_query" name="fee_diff_min_query" placeholder="实际费用-预估费用" type="text" v-model.number="page.fee_diff_min_query" style="width: 130px;"/><span>~</span>&nbsp;
                                 <input class="input-sm" id="end_time_max_query" name="end_time_max_query" placeholder="实际费用-预估费用" type="text" v-model.number="page.end_time_max_query" style="width: 130px;"/>
                                 <button class="btn btn-mini btn-primary" @click="refreshList()">
@@ -116,7 +121,9 @@
                 "batch_code": 0,
                 "batch_code_list": [],
                 "begin_time_query": "",
-                "end_time_query": ""
+                "end_time_query": "",
+                "fee_diff_type_list": [],
+                "fee_diff_type_code": ""
             },
             "detail": {
                 "order_logistics": {}
@@ -287,6 +294,7 @@
                         aoData.push({'name': 'batch_code', 'value': this_vm.page.batch_code});
                         aoData.push({'name': 'begin_time_query', 'value': this_vm.page.begin_time_query});
                         aoData.push({'name': 'end_time_query', 'value': this_vm.page.end_time_query});
+                        aoData.push({'name': 'fee_diff_type_code', 'value': this_vm.page.fee_diff_type_code});
 
                         $.ajax({
                             "dataType": 'json',

@@ -31,6 +31,17 @@ func (c ErpOrderLogisticsFeeDiff) Index() revel.Result {
 	return c.RenderTemplate("erp/ddlc/order_logistics_fee_diff/order_logistics_fee_diff_index.html")
 }
 
+const (
+	FEE_DIFF_ACTUAL_FEE_GREATER int64 = 100
+	FEE_DIFF_ACTUAL_FEE_SMALLER int64 = 200
+	FEE_DIFF_ACTUAL_FEE_EQUAL   int64 = 300
+)
+
+type fee_diff_type_t struct {
+	Code int64  `json:"code"`
+	Name string `json:"name"`
+}
+
 func (c ErpOrderLogisticsFeeDiff) PageData() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_LOGISTICS_FEE_DIFF, c.Session)
 
@@ -45,6 +56,11 @@ func (c ErpOrderLogisticsFeeDiff) PageData() revel.Result {
 	// 获得导入的批次列表
 	var batch_code_list = order_import_batch_service.Get_order_import_batch_code_list(0, db_session)
 
+	var fee_diff_type_list = make([]fee_diff_type_t, 0)
+	fee_diff_type_list = append(fee_diff_type_list, fee_diff_type_t{Code: FEE_DIFF_ACTUAL_FEE_GREATER, Name: "实际费用大于预估"})
+	fee_diff_type_list = append(fee_diff_type_list, fee_diff_type_t{Code: FEE_DIFF_ACTUAL_FEE_SMALLER, Name: "实际费用小于预估"})
+	fee_diff_type_list = append(fee_diff_type_list, fee_diff_type_t{Code: FEE_DIFF_ACTUAL_FEE_EQUAL, Name: "实际费用等于预估"})
+
 	return c.RenderJson(map[string]interface{}{
 		"stock_id":               0,
 		"stock_list":             stock_list,
@@ -52,6 +68,8 @@ func (c ErpOrderLogisticsFeeDiff) PageData() revel.Result {
 		"logistics_company_list": logistics_company_list,
 		"batch_code":             0,
 		"batch_code_list":        batch_code_list,
+		"fee_diff_type_code":     0,
+		"fee_diff_type_list":     fee_diff_type_list,
 	})
 }
 
@@ -354,6 +372,9 @@ func (c ErpOrderLogisticsFeeDiff) get_list_data(is_for_export bool) (list_data_r
 	c.Params.Bind(&fee_diff_min_query, "fee_diff_min_query")
 	c.Params.Bind(&fee_diff_max_query, "fee_diff_max_query")
 
+	var fee_diff_type_code int64
+	c.Params.Bind(&fee_diff_type_code, "fee_diff_type_code")
+
 	/*
 SELECT ol.*, o.*
 FROM erp_order_logistics ol
@@ -406,6 +427,16 @@ WHERE ol.stock_id = 0 AND ol.company_id = 0
 
 	if fee_diff_max_query != 0 {
 		filter = core.SqlAnd(filter, fmt.Sprintf("(ol.actual_fee - ol.total_fee) <= %f", fee_diff_max_query))
+	}
+
+	if fee_diff_type_code != 0 {
+		if fee_diff_type_code == FEE_DIFF_ACTUAL_FEE_GREATER {
+			filter = core.SqlAnd(filter, "ol.actual_fee > ol.total_fee")
+		} else if fee_diff_type_code == FEE_DIFF_ACTUAL_FEE_SMALLER {
+			filter = core.SqlAnd(filter, "ol.actual_fee < ol.total_fee")
+		} else if fee_diff_type_code == FEE_DIFF_ACTUAL_FEE_EQUAL {
+			filter = core.SqlAnd(filter, "ol.actual_fee = ol.total_fee")
+		}
 	}
 
 	// 分仓库查看
