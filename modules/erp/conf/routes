@@ -367,6 +367,7 @@ POST /order/logistics/match/debug/clear       ErpOrderLogisticsMatchDebug.Clear
 GET  /order/logistics/fee/diff             ErpOrderLogisticsFeeDiff.Index
 POST /order/logistics/fee/diff/data/page   ErpOrderLogisticsFeeDiff.PageData
 POST /order/logistics/fee/diff/data/list   ErpOrderLogisticsFeeDiff.ListData
+POST /order/logistics/fee/diff/export      ErpOrderLogisticsFeeDiff.Export
 
 GET  /order/logistics/test                 ErpOrderLogisticsTest.Index
 POST /order/logistics/test/match           ErpOrderLogisticsTest.Match
