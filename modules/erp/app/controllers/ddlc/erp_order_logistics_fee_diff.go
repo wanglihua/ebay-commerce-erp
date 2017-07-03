@@ -232,6 +232,12 @@ func (c ErpOrderLogisticsFeeDiff) get_export_excel(db_session *xorm.Session) *xl
 		sheet.SetColWidth(col_index, col_index, 10)
 		set_head_cell_style(cell)
 		cell.Value = "实际物流费用"
+
+		col_index++
+		cell = header_row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 10)
+		set_head_cell_style(cell)
+		cell.Value = "运费偏差"
 	}
 
 	order_logistics_view_list, _ := c.get_list_data(true)
@@ -308,6 +314,11 @@ func (c ErpOrderLogisticsFeeDiff) get_export_excel(db_session *xorm.Session) *xl
 		cell = row.AddCell()
 		set_text_cell_style(cell, "center")
 		cell.Value = fmt.Sprintf("%0.2f", order_logistics_view.OrderLogistics.ActualFee)
+
+		// 运费偏差
+		cell = row.AddCell()
+		set_text_cell_style(cell, "center")
+		cell.Value = fmt.Sprintf("%0.2f", order_logistics_view.OrderLogistics.ActualFee-order_logistics_view.OrderLogistics.TotalFee)
 	}
 
 	return xlsx_file
