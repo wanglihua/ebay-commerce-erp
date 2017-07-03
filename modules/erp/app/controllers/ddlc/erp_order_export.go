@@ -37,14 +37,14 @@ func (c ErpOrderExport) Export() revel.Result {
 		status_id = models.ORDER_STATUS_HOLD
 	}
 
-	var filter = fmt.Sprintf("status_id = %d", status_id)
+	var filter = fmt.Sprintf("o.status_id = %d", status_id)
 
 	if batch_code != 0 {
-		filter = core.SqlAnd(filter, fmt.Sprintf("batch_code = %d", batch_code))
+		filter = core.SqlAnd(filter, fmt.Sprintf("o.batch_code = %d", batch_code))
 	}
 
 	if hold_type_id != 0 {
-		filter = core.SqlAnd(filter, fmt.Sprintf("hold_type_id = %d", hold_type_id))
+		filter = core.SqlAnd(filter, fmt.Sprintf("o.hold_type_id = %d", hold_type_id))
 	}
 
 	xlsx_file := c.get_export_excel(db_session, filter)
@@ -61,10 +61,28 @@ func (c ErpOrderExport) Export() revel.Result {
 	return c.RenderBinary(reader, file_name, revel.Attachment, time.Now())
 }
 
+type order_code_num_export_view_t struct {
+	Order    models.OrderInfo          `xorm:"extends" json:"o"`
+	HoldType models.OrderHoldTypeInfo  `xorm:"extends" json:"ht"`
+}
+
 func (c ErpOrderExport) get_export_excel(db_session *xorm.Session, filter string) *xlsx.File {
 
-	var order_list = make([]models.OrderInfo, 0)
-	err := db_session.Where(filter).Find(&order_list)
+	/*
+SELECT o.*, ht.*
+FROM erp_order o
+    LEFT JOIN erp_order_hold_type ht ON ht.id = o.hold_type_id
+	 */
+
+	var sql = `SELECT o.*, ht.*
+FROM erp_order o
+    LEFT JOIN erp_order_hold_type ht ON ht.id = o.hold_type_id
+WHERE `
+
+	sql = sql + filter
+
+	var order_list = make([]order_code_num_export_view_t, 0)
+	err := db_session.Sql(sql).Find(&order_list)
 	core.HandleError(err)
 
 	//创建工作薄
@@ -148,6 +166,12 @@ func (c ErpOrderExport) get_export_excel(db_session *xorm.Session, filter string
 		sheet.SetColWidth(col_index, col_index, 20)
 		set_head_cell_style(cell)
 		cell.Value = "订单代码"
+
+		col_index++
+		cell = header_row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 20)
+		set_head_cell_style(cell)
+		cell.Value = "hold原因"
 	}
 
 	for _, order := range order_list {
@@ -157,12 +181,17 @@ func (c ErpOrderExport) get_export_excel(db_session *xorm.Session, filter string
 		// 订单编码
 		var cell = row.AddCell()
 		set_text_cell_style(cell, "left")
-		cell.Value = order.Code
+		cell.Value = order.Order.Code
 
 		// 订单代码
 		cell = row.AddCell()
 		set_text_cell_style(cell, "left")
-		cell.Value = order.FullTranId
+		cell.Value = order.Order.FullTranId
+
+		// hold原因
+		cell = row.AddCell()
+		set_text_cell_style(cell, "left")
+		cell.Value = order.HoldType.Name
 	}
 
 	return xlsx_file
