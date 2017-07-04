@@ -378,6 +378,7 @@
                                     <th class="center" style="width: 50px;">选择</th>
                                     <th class="center" style="width: 60px;">图片</th>
                                     <th style="width: 120px;">商品名称</th>
+                                    <th class="center" style="width: 60px;">数量</th>
                                     <th class="center" style="width: 100px;">售价</th>
                                     <th class="center" style="width: 100px;">成本</th>
                                     <th class="center" style="width: 80px;">原始售价</th>
@@ -415,19 +416,25 @@
                                             </div>
                                         </td>
                                         <td class="center">
+                                            {{order_item.oi.quantity}}
+                                        </td>
+                                        <td class="center">
                                             <div>RMB
-                                                {{order_item.oi.transaction_price_rmb}} × {{order_item.oi.quantity}}
+                                                {{ format_amount(order_item.oi.transaction_price_rmb)}} × {{order_item.oi.quantity}}
                                             </div>
                                             <div>=RMB
-                                                {{order_item.oi.transaction_price_rmb * order_item.oi.quantity}}
+                                                {{format_amount(order_item.oi.transaction_price_rmb * order_item.oi.quantity)}}
                                             </div>
                                         </td>
-                                        <td></td>
+                                        <td class="center">
+                                            RMB {{ format_amount(order_item.oi.cost_price) }}
+                                        </td>
                                         <td class="center">
                                             {{order_item.oi.transaction_price_currency}}
-                                            {{order_item.oi.transaction_price * order_item.oi.quantity}}
+                                            {{ format_amount(order_item.oi.transaction_price * order_item.oi.quantity)}}
                                         </td>
-                                        <td>
+                                        <td class="center">
+                                            {{ format_amount(order_item.oi.gross_profit) }}
                                         </td>
                                         <td></td>
                                     </tr>

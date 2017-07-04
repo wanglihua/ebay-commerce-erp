@@ -164,31 +164,24 @@
                             }
                         },
                         {
-                            "mDataProp": "o.code", "title": "订单编号", "bSearchable": true, "width": 120,
+                            "mDataProp": "o.code", "title": "订单编号", "bSearchable": true, "width": 100,
                             "render": function (data, type, row) {
-                                return "<a href='/order/detail/" + row.o.id + "' target='_blank'>" + data + "</a>";
+                                return "<div style='min-width: 100px;white-space:normal; word-break: break-all; word-wrap:break-word;'><a href='/order/detail/" + row.o.id + "' target='_blank'>" + data + "</a></div>";
                             }
                         },
                         {
-                            "mDataProp": "o.full_tran_id", "title": "订单代码", "bSearchable": true, "width": 120,
+                            "mDataProp": "o.full_tran_id", "title": "订单代码", "bSearchable": true, "width": 80,
                             "render": function (data, type, row) {
-                                return "<div style='min-width: 100px;white-space:normal; word-break: break-all; word-wrap:break-word;'>" + data + "</div>";
+                                return "<div style='min-width: 80px;white-space:normal; word-break: break-all; word-wrap:break-word;'>" + data + "</div>";
                             }
                         },
-                        {
-                            "mDataProp": "stock_name",
-                            "title": "发货仓库",
-                            "bSearchable": false,
-                            "bSortable": false,
-                            "width": 130
-                        },
-                        {"mDataProp": "company_name", "title": "物流公司", "bSearchable": false, "bSortable": false},
+                        // {"mDataProp": "stock_name", "title": "发货仓库", "bSearchable": false, "bSortable": false, "width": 90},
+                        // {"mDataProp": "company_name", "title": "物流公司", "bSearchable": false, "bSortable": false, "width": 90},
                         {
                             "mDataProp": "mode_name",
                             "title": "物流方式",
                             "bSearchable": false,
-                            "bSortable": false,
-                            "width": 150
+                            "bSortable": false
                         },
                         {
                             "mDataProp": "ol.length", "title": "长度", "bSearchable": false, "width": 65,
