@@ -344,7 +344,8 @@
             "logistics_company_id": vm.page.logistics_company_id,
             "batch_code": vm.page.batch_code,
             "begin_time_query": vm.page.begin_time_query,
-            "end_time_query": vm.page.end_time_query
+            "end_time_query": vm.page.end_time_query,
+            "fee_diff_type_code": vm.page.fee_diff_type_code
         });
         var url = '{%url "ErpOrderLogisticsFeeDiff.Export"%}' + "?" + params;
         $('<form method="post" action="' + url + '"></form>').appendTo('body').submit().remove();
