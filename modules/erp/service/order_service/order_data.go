@@ -15,6 +15,7 @@ import (
 	"matrix/modules/erp/service/shop_service"
 	"matrix/modules/erp/service/status_service"
 	"matrix/modules/erp/service/stock_service"
+	"github.com/revel/revel"
 )
 
 type Order_view_item_t struct {
@@ -149,7 +150,10 @@ FROM erp_order o
 			order_list[index].ModeName = logistics_mode_id_name_map[order.Order.ModeId]
 		}
 
-		if order.OrderLogistics.Id != 0 {
+		if order_logistics.Id != 0 {
+			revel.TRACE.Println("order_logistics.ActualFee: ", order_logistics.ActualFee)
+			revel.TRACE.Println("order_logistics.TotalFee: ", order_logistics.TotalFee)
+			revel.TRACE.Println("order_logistics.ActualFee - order_logistics.TotalFee: ", order_logistics.ActualFee-order_logistics.TotalFee)
 			order_list[index].FeeDiff = order_logistics.ActualFee - order_logistics.TotalFee
 		}
 
