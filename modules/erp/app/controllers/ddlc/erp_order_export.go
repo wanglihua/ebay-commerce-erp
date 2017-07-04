@@ -10,6 +10,7 @@ import (
 	"github.com/tealeg/xlsx"
 	"matrix/core"
 	"matrix/modules/erp/models"
+	"strings"
 )
 
 type ErpOrderExport struct {
@@ -37,7 +38,31 @@ func (c ErpOrderExport) Export() revel.Result {
 		status_id = models.ORDER_STATUS_HOLD
 	}
 
-	var filter = fmt.Sprintf("o.status_id = %d", status_id)
+	// 先看 URL 里面的状态分类
+	status = strings.ToLower(status) //大小写
+	if status == "all" {
+		status_id = 0
+	} else if status == "ycj" {
+		status_id = models.ORDER_STATUS_YCJ
+	} else if status == "yzf" {
+		status_id = models.ORDER_STATUS_YZF
+	} else if status == "dph" {
+		status_id = models.ORDER_STATUS_DPH
+	} else if status == "phz" {
+		status_id = models.ORDER_STATUS_PHZ
+	} else if status == "yfh" {
+		status_id = models.ORDER_STATUS_YFH
+	} else if status == "ywc" {
+		status_id = models.ORDER_STATUS_YWC
+	} else if status == "yqx" {
+		status_id = models.ORDER_STATUS_YQX
+	}
+
+	var filter = "1=1"
+
+	if status_id != 0 {
+		filter = fmt.Sprintf("o.status_id = %d", status_id)
+	}
 
 	if batch_code != 0 {
 		filter = core.SqlAnd(filter, fmt.Sprintf("o.batch_code = %d", batch_code))

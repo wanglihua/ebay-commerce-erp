@@ -437,7 +437,7 @@ table.inline-inventory td.price {
     text-align: center;
 }
 
-.dropdown-menu > li > a:hover {
+div.gridToolBar .dropdown-menu > li > a:hover {
     background-color: transparent;
     color: black;
     font-weight: bold;
