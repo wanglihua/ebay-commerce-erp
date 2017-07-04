@@ -759,12 +759,17 @@
                     "sAjaxSource": '{%url "ErpInventoryHistory.ListData"%}',
                     "aaSorting": [[0, "desc"]],
                     "aoColumns": [
-                        {"mDataProp": "his.create_time", "title": "时间", "bSearchable": false, "bSortable": false, "width": 120},
-                        {"mDataProp": "st.name", "title": "仓库", "bSearchable": false, "bSortable": false},
-                        {"mDataProp": "loc.name", "title": "库位", "bSearchable": false, "bSortable": false},
-                        {"mDataProp": "prd.sku", "title": "商品", "bSearchable": false, "bSortable": false},
-                        {"mDataProp": "his.qty", "title": "数量", "bSearchable": false, "bSortable": false},
-                        {"mDataProp": "his.description", "title": "描述", "bSearchable": true, "bSortable": false}
+                        {"mDataProp": "his.create_time", "title": "时间", "sClass": "center", "bSearchable": false, "bSortable": false, "width": 120},
+                        {"mDataProp": "st.name", "title": "仓库", "sClass": "center", "bSearchable": false, "bSortable": false},
+                        {"mDataProp": "loc.name", "title": "库位", "sClass": "center", "bSearchable": false, "bSortable": false},
+                        {"mDataProp": "prd.sku", "title": "商品", "sClass": "center", "bSearchable": false, "bSortable": false},
+                        {"mDataProp": "his.qty", "title": "数量", "sClass": "center", "bSearchable": false, "bSortable": false},
+                        {
+                            "mDataProp": "his.description", "title": "描述", "bSearchable": true, "bSortable": false,
+                            "render": function (data, type, row) {
+                                return "<div style='white-space:normal; word-break: break-all; word-wrap:break-word;'>" + data + "</div>";
+                            }
+                        }
 
                     ],
                     "fnServerData": function (sSource, aoData, fnCallback) {
