@@ -214,7 +214,7 @@ func (c ErpOrderLogisticsImport) ImportActualFee() revel.Result {
 			tracking_number_import.OrderNumber = cell_val
 			col_index++
 
-			// 运单号
+			// 实际运费
 			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
@@ -251,8 +251,6 @@ func (c ErpOrderLogisticsImport) ImportActualFee() revel.Result {
 		has, err := db_session.Sql(sql_get_order_logistics).Get(&order_logistics)
 		core.HandleError(err)
 
-		actual_fee_import_list[index].order_logistics = order_logistics
-
 		/*
 		if has == false {
 			actual_fee_import_list[index].ErrorMessage = fmt.Sprintf("订单代码 %s 对应的订单物流不存在！", actual_fee_import.OrderNumber)
@@ -264,9 +262,12 @@ func (c ErpOrderLogisticsImport) ImportActualFee() revel.Result {
 			order_logistics.OrderId = c.get_order_id_by_full_tran_id(actual_fee_import.OrderNumber, db_session)
 			_, err := db_session.Insert(&order_logistics)
 			core.HandleError(err)
+
 		}
 
-		actual_fee_import.ActualFee, err = strconv.ParseFloat(actual_fee_import.ActualFeeStr, 64)
+		actual_fee_import_list[index].order_logistics = order_logistics
+
+		actual_fee_import_list[index].ActualFee, err = strconv.ParseFloat(actual_fee_import.ActualFeeStr, 64)
 		if err != nil {
 			actual_fee_import_list[index].ErrorMessage = fmt.Sprintf("订单代码 %s 对应实际运费 %s 的格式不对！", actual_fee_import.OrderNumber, actual_fee_import.ActualFeeStr)
 			order_import_error_list = append(order_import_error_list, actual_fee_import_list[index])
@@ -284,7 +285,7 @@ func (c ErpOrderLogisticsImport) ImportActualFee() revel.Result {
 	for _, order_import := range actual_fee_import_list {
 		var order_logistics = order_import.order_logistics
 		order_logistics.ActualFee = order_import.ActualFee
-		_, err := db_session.Id(order_logistics.Id).Cols("tracking_num").Update(&order_logistics)
+		_, err := db_session.Id(order_logistics.Id).Cols("actual_fee").Update(&order_logistics)
 		core.HandleError(err)
 	}
 
