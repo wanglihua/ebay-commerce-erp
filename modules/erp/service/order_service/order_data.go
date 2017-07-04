@@ -154,7 +154,9 @@ FROM erp_order o
 			revel.TRACE.Println("order_logistics.ActualFee: ", order_logistics.ActualFee)
 			revel.TRACE.Println("order_logistics.TotalFee: ", order_logistics.TotalFee)
 			revel.TRACE.Println("order_logistics.ActualFee - order_logistics.TotalFee: ", order_logistics.ActualFee-order_logistics.TotalFee)
-			order_list[index].FeeDiff = order_logistics.ActualFee - order_logistics.TotalFee
+			if order_logistics.ActualFee != 0 {
+				order_list[index].FeeDiff = order_logistics.ActualFee - order_logistics.TotalFee
+			}
 		}
 
 		if order.Order.TagId != 0 {
