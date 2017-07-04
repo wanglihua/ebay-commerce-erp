@@ -169,7 +169,12 @@
                                 return "<a href='/order/detail/" + row.o.id + "' target='_blank'>" + data + "</a>";
                             }
                         },
-                        {"mDataProp": "o.full_tran_id", "title": "订单代码", "bSearchable": true, "width": 100},
+                        {
+                            "mDataProp": "o.full_tran_id", "title": "订单代码", "bSearchable": true, "width": 120,
+                            "render": function (data, type, row) {
+                                return "<div style='min-width: 100px;white-space:normal; word-break: break-all; word-wrap:break-word;'>" + data + "</div>";
+                            }
+                        },
                         {
                             "mDataProp": "stock_name",
                             "title": "发货仓库",
@@ -292,8 +297,8 @@
                         aoData.push({'name': 'stock_id', 'value': this_vm.page.stock_id});
                         aoData.push({'name': 'logistics_company_id', 'value': this_vm.page.logistics_company_id});
                         aoData.push({'name': 'batch_code', 'value': this_vm.page.batch_code});
-                        aoData.push({'name': 'begin_time_query', 'value': this_vm.page.begin_time_query});
-                        aoData.push({'name': 'end_time_query', 'value': this_vm.page.end_time_query});
+                        aoData.push({'name': 'begin_time_query', 'value': $("#begin_time_query").val()});
+                        aoData.push({'name': 'end_time_query', 'value': $("#end_time_query").val()});
                         aoData.push({'name': 'fee_diff_type_code', 'value': this_vm.page.fee_diff_type_code});
 
                         $.ajax({
