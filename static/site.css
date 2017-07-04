@@ -443,3 +443,24 @@ div.gridToolBar .dropdown-menu > li > a:hover {
     font-weight: bold;
     font-size: 14px;
 }
+
+.wrap-word {
+    min-width: 80px;
+    white-space: normal;
+    word-break: break-all;
+    word-wrap: break-word;
+}
+
+.wrap-word div {
+    min-width: 80px;
+    white-space: normal;
+    word-break: break-all;
+    word-wrap: break-word;
+}
+
+.wrap-word a {
+    min-width: 80px;
+    white-space: normal;
+    word-break: break-all;
+    word-wrap: break-word;
+}

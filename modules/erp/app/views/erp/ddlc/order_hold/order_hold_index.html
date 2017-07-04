@@ -226,7 +226,7 @@
                         },
 
                         {
-                            "mDataProp": "o.code", "title": "订单编号", "bSearchable": true,
+                            "mDataProp": "o.code", "title": "订单编号", "bSearchable": true, "sClass": "wrap-word",
                             "render": function (data, type, row) {
                                 return "<div class='div_order_code'><a href='/order/detail/" + row.o.id + "' target='_blank'>" + data + "</a></div><div>" + row.status_name + "</div><div>" + row.type_name + "&nbsp;<span style='background-color:" + row.order_tag.bg_color + ";'>" + row.order_tag.name + "</span>" + "</div>";
                             }
@@ -244,7 +244,7 @@
                             }
                         },
                         {
-                            "mDataProp": "sa.name", "title": "店铺名", "bSearchable": false, "bSortable": false,
+                            "mDataProp": "sa.name", "title": "店铺名", "bSearchable": false, "bSortable": false, "sClass": "wrap-word",
                             "render": function (data, type, row) {
                                 var full_tran_id = row.o.full_tran_id;
                                 if (full_tran_id === "") {
@@ -267,7 +267,7 @@
                             }
                         },
                         {
-                            "mDataProp": "o.buyer_user_id", "title": "客户id", "bSearchable": true,
+                            "mDataProp": "o.buyer_user_id", "title": "客户id", "bSearchable": true, "sClass": "wrap-word",
                             "render": function (data, type, row) {
                                 var buy_user_id = row.o.buyer_user_id;
                                 if (buy_user_id === "") {
@@ -281,7 +281,7 @@
                                 if (hold_type_name === "") {
                                     hold_type_name = "--";
                                 }
-                                return "<div class='div_buyer_user_id' style='min-width: 120px;white-space:normal; word-break: break-all; word-wrap:break-word;'>" + buy_user_id + "</div><div>" + payment_methods + "</div><div>" + hold_type_name + "</div>";
+                                return "<div class='div_buyer_user_id'>" + buy_user_id + "</div><div>" + payment_methods + "</div><div>" + hold_type_name + "</div>";
                             }
                         },
                         {
@@ -340,7 +340,7 @@
                         {
                             "mDataProp": "o.company_name", "title": "货运公司", "bSearchable": false, "bSortable": false,
                             "render": function (data, type, row) {
-                                return '<div class="div_logistics_company">' + row.company_name + '</div><div style="min-width: 100px;white-space:normal; word-break: break-all; word-wrap:break-word;">' + row.mode_name + '</div>';
+                                return '<div class="div_logistics_company">' + row.company_name + '</div><div>' + row.mode_name + '</div>';
                             }
                         },
                         {
@@ -370,9 +370,9 @@
                         },
 
                         {
-                            "mDataProp": "o.buyer_email", "title": "客户邮箱", "bSearchable": true,
+                            "mDataProp": "o.buyer_email", "title": "客户邮箱", "bSearchable": true, "sClass": "wrap-word",
                             "render": function (data, type, row) {
-                                return '<div class="div_buyer_email" style="min-width: 180px;white-space:normal; word-break: break-all; word-wrap:break-word;">' + row.o.buyer_email + '</div><div>' + row.stock_name + '</div>';
+                                return '<div class="div_buyer_email">' + row.o.buyer_email + '</div><div>' + row.stock_name + '</div>';
                             }
                         },
                         {
@@ -384,9 +384,9 @@
 
 
                         {
-                            "mDataProp": "ad.country_name", "title": "国家", "bSearchable": false, "bSortable": false,
+                            "mDataProp": "ad.country_name", "title": "国家", "bSearchable": false, "bSortable": false, "sClass": "wrap-word",
                             "render": function (data, type, row) {
-                                return '<div class="div_country_name">' + row.ad.country_name + '</div><div  style="min-width: 105px;white-space:normal; word-break: break-all; word-wrap:break-word;">' + row.ad.province + '</div><div>' + row.ad.postal_code + '</div>';
+                                return '<div class="div_country_name">' + row.ad.country_name + '</div><div>' + row.ad.province + '</div><div>' + row.ad.postal_code + '</div>';
                             }
                         },
                         {
