@@ -22,8 +22,8 @@ type OrderItemInfo struct {
 	ItemConditionDisplayName string          `xorm:"nvarchar(100) notnull 'item_condition_display_name'" json:"item_condition_display_name"`
 	CreatedDate              core.LongTime   `xorm:"datetime notnull 'created_date'" json:"created_date"`
 	Desc                     core.NullString `xorm:"nvarchar(500) 'desc'" json:"desc" smith:"verbose_name=备注"`
-	CostPrice                float64         `xorm:"decimal(18,6) notnull 'cost_price'" json:"cost_price"`     //中国仓的成本
-	GrossProfit              float64         `xorm:"decimal(18,6) notnull 'gross_profit'" json:"gross_profit"` //毛利
+	CostPrice                float64         `xorm:"decimal(18,6) notnull 'cost_price'" json:"cost_price"`     //澳仓的成本 AUD 澳币
+	GrossProfit              float64         `xorm:"decimal(18,6) notnull 'gross_profit'" json:"gross_profit"` //毛利  AUD 澳币
 	CreateTime               core.Time       `xorm:"created notnull 'create_time'" json:"create_time"`
 	UpdateTime               core.Time       `xorm:"updated notnull 'update_time'" json:"update_time"`
 }

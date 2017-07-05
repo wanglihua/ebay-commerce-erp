@@ -427,14 +427,14 @@
                                             </div>
                                         </td>
                                         <td class="center">
-                                            RMB {{ format_amount(order_item.oi.cost_price) }}
+                                            RMB {{ format_amount(order_item.oi.cost_price * detail.order.exchange_rate) }}
                                         </td>
                                         <td class="center">
                                             {{order_item.oi.transaction_price_currency}}
                                             {{ format_amount(order_item.oi.transaction_price * order_item.oi.quantity)}}
                                         </td>
                                         <td class="center">
-                                            {{ format_amount(order_item.oi.gross_profit) }}
+                                            {{ format_amount(order_item.oi.gross_profit * detail.order.exchange_rate) }}
                                         </td>
                                         <td></td>
                                     </tr>
