@@ -7,9 +7,10 @@ import (
 	"matrix/core"
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/order_history_service"
+	"matrix/modules/erp/service/order_service"
 )
 
-func save_order_logistics(p_ol *OrderLogisticsService, p_order *models.OrderInfo, match_result match_logistics_mode_result, unlock_express bool, login_name string, db_session *xorm.Session) models.OrderLogisticsInfo {
+func save_order_logistics(p_ol *OrderLogisticsService, p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, match_result match_logistics_mode_result, unlock_express bool, login_name string, db_session *xorm.Session) models.OrderLogisticsInfo {
 	// 匹配成功，记录匹配成功数据
 	var order_logistics models.OrderLogisticsInfo
 	has, err := db_session.Where(fmt.Sprintf("order_id = %d", match_result.order_id)).Get(&order_logistics)
@@ -72,6 +73,26 @@ func save_order_logistics(p_ol *OrderLogisticsService, p_order *models.OrderInfo
 	p_order.ModeId = match_result.mode_id
 	_, err = db_session.Id(p_order.Id).Cols(update_col_list...).Update(p_order)
 	core.HandleError(err)
+
+	// 保存成本价和分配利润
+	var order_profit = order_service.CalculateOrderProfit(p_order, &order_logistics)
+	var cost_price_total float64 = 0
+	var product_info_list = p_order_logistics_data.order_product_info_list
+	for _, product_info := range product_info_list {
+		cost_price_total = cost_price_total + product_info.CostPrice
+	}
+
+	if cost_price_total != 0 {
+		for _, product_info := range product_info_list {
+			var item_profit = product_info.CostPrice * order_profit / cost_price_total
+
+			var order_item models.OrderItemInfo
+			order_item.CostPrice = product_info.CostPrice
+			order_item.GrossProfit = item_profit
+			_, err = db_session.Id(product_info.ItemId).Cols("cost_price", "gross_profit").Update(&order_item)
+			core.HandleError(err)
+		}
+	}
 
 	return order_logistics
 }

@@ -233,13 +233,17 @@ func Get_paid_order_list(db_session *xorm.Session) []models.OrderInfo {
 
 type Order_product_info_t struct {
 	OrderId   int64    `xorm:"'order_id'"`
+	ItemId    int64    `xorm:"'item_id'"` // 订单明细的主键
 	ProductId int64    `xorm:"'product_id'"`
-	Price     float64  `xorm:"'price'"` // 方便后面的运费计算啥的，这里面的价格是 澳币
+	Price     float64  `xorm:"'price'"` // 方便后面的运费计算啥的，这里面的价格是 澳币。后来这个价格在匹配物流的时候，好像也没用到
 	Qty       int64    `xorm:"'qty'"`
 	Length    float64  `xorm:"'length'"`
 	Width     float64  `xorm:"'width'"`
 	Height    float64  `xorm:"'height'"`
 	Weight    float64  `xorm:"'weight'"`
+
+	CostPrice float64  `xorm:"-"` // 这个用于在物流匹配过程中，把澳仓的成本暂时记录下来，保存物流的时候，可以记录到订单明细(order_item)里面，也用于订单利润在个订单明细里面的分配的权重。是整个明细的 澳仓成本价，不是单个商品的，是这个明细里面的所以数量的总和的澳仓成本
+	//Profit    float64  `xorm:"-"` // 这个用于在计算分配订单利润的时候用到，用于暂存。这个跟CostPrice一样，也是整个明细的毛利，不是单个商品的，是整个数量的毛利。
 }
 
 func Get_order_product_info_list(order_id int64, db_session *xorm.Session) []Order_product_info_t {
@@ -247,6 +251,7 @@ func Get_order_product_info_list(order_id int64, db_session *xorm.Session) []Ord
 	/*
 SELECT
     oi.order_id,
+    oi.id                 AS item_id,
     oi.item_product_id    AS product_id,
     oi.transaction_price  AS price,
     oi.quantity           AS qty,
@@ -256,11 +261,12 @@ SELECT
     p.weight              AS weight
 FROM erp_order_item oi
     INNER JOIN erp_product p ON p.id = oi.item_product_id
-WHERE oi.order_id = 1
+WHERE oi.order_id = 1;
 	 */
 
 	sql := `SELECT
     oi.order_id,
+    oi.id                 AS item_id,
     oi.item_product_id    AS product_id,
     oi.transaction_price  AS price,
     oi.quantity           AS qty,
