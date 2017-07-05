@@ -224,16 +224,22 @@ func (p_ol *OrderLogisticsService) hold_check_product_info_miss(p_order *models.
 
 // 13 // 匹配最佳仓库及物流后订单亏损。需要在基础设置里面有设置亏损额或者亏损率的设置功能，超过设置范围了，自动到订单亏损hold
 func (p_ol *OrderLogisticsService) hold_check_great_deficit(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, order_logistics models.OrderLogisticsInfo, db_session *xorm.Session) (is_hold_return bool) {
-	var amount_paid = p_order.AmountPaid                                 //收款金额，澳币
-	var express_fee = p_order.ExpressFee                                 // 运费收入，澳币
-	var order_gst float64 = order_service.Get_order_gst_fee(amount_paid) // GST消费税，澳币
-	var platform_fee = amount_paid * p_ol.logistics_setting.Ptfl         // 平台交易费， 澳币
-	var payment_fee = amount_paid * p_ol.logistics_setting.Jyfl          // 交易费率， 澳币
-	var logistics_fee = order_logistics.TotalFee                         // 物流费用，不包括拣货费用，澳币
-	var pick_fee = order_logistics.PickFee                               // 拣货费用，澳币
-	var cost_amount = order_logistics.CostAmount                         // 到仓总成本，澳币
+	var amount_paid = p_order.AmountPaid                             //收款金额，澳币
+	var express_fee = p_order.ExpressFee                             // 运费收入，澳币
+	/*
+	var order_gst float64 = order_service.Get_order_gst_fee(p_order) // GST消费税，澳币
+	var platform_fee = amount_paid * p_ol.logistics_setting.Ptfl     // 平台交易费， 澳币
+	var payment_fee = amount_paid * p_ol.logistics_setting.Jyfl      // 交易费率， 澳币
+	var logistics_fee = order_logistics.TotalFee                     // 物流费用，不包括拣货费用，澳币
+	var pick_fee = order_logistics.PickFee                           // 拣货费用，澳币
+	var cost_amount = order_logistics.CostAmount                     // 到仓总成本，澳币
+	*/
 
-	var profit = (amount_paid + express_fee) - (order_gst + platform_fee + payment_fee + logistics_fee + pick_fee + cost_amount)
+	//设置一下 order_logistics 的 ptfl 和 jyfl
+	order_logistics.Ptfl = p_ol.logistics_setting.Ptfl
+	order_logistics.Jyfl = p_ol.logistics_setting.Jyfl
+
+	var profit = order_service.CalculateOrderProfit(p_order, &order_logistics)
 
 	// 利润小于零，并且亏损价格大于最大价格或者亏损率大于最大亏损率
 	if profit < 0 && ((math.Abs(profit) > p_ol.logistics_setting.MaxDeficitPrice) || (math.Abs(profit)/(amount_paid+express_fee) > p_ol.logistics_setting.MaxDeficitRate)) {

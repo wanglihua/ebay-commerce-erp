@@ -667,17 +667,11 @@ WHERE oi.order_id = %d;`
 	var logistics_fee float64 = (order_logistics.TotalFee + order_logistics.PickFee) * order.ExchangeRate
 
 	// gst 消费税
-	var order_gst float64 = order_service.Get_order_gst_fee(order.AmountPaid)
+	var order_gst float64 = order_service.Get_order_gst_fee(&order)
 
 	// 毛利
-
-	var order_logistics_total_fee = order_logistics.TotalFee
-	if order_logistics.ActualFee > 0 {
-		order_logistics_total_fee = order_logistics.ActualFee
-	}
-
-	var order_profit = ((order.AmountPaid + order.ExpressFee) - (order_gst + order.AmountPaid*(logistics_setting.Ptfl+logistics_setting.Jyfl) +
-		order_logistics_total_fee + order_logistics.PickFee + order_logistics.CostAmount)) * order.ExchangeRate
+	var order_profit_au = order_service.CalculateOrderProfit(&order, &order_logistics)
+	var order_profit = order_profit_au * order.ExchangeRate
 
 	var au_stock_list = make([]models.StockInfo, 0)
 	err = db_session.Where(fmt.Sprintf("stock_type_id = %d", models.STOCK_TYPE_AU)).Find(&au_stock_list)
