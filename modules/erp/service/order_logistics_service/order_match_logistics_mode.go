@@ -547,7 +547,7 @@ func (p_ol *OrderLogisticsService) match_logistics_mode_with_option(p_order *mod
 		return false, order_logistics, false
 	}
 
-	order_logistics = save_order_logistics(p_order, final_result, match_option.Unlock_express, p_ol.UserLoginName, db_session)
+	order_logistics = save_order_logistics(p_ol, p_order, final_result, match_option.Unlock_express, p_ol.UserLoginName, db_session)
 
 	if final_result.has_stock == false {
 		if len(match_result_has_stock_list) != 0 {

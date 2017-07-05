@@ -9,7 +9,7 @@ import (
 	"matrix/modules/erp/service/order_history_service"
 )
 
-func save_order_logistics(p_order *models.OrderInfo, match_result match_logistics_mode_result, unlock_express bool, login_name string, db_session *xorm.Session) models.OrderLogisticsInfo {
+func save_order_logistics(p_ol *OrderLogisticsService, p_order *models.OrderInfo, match_result match_logistics_mode_result, unlock_express bool, login_name string, db_session *xorm.Session) models.OrderLogisticsInfo {
 	// 匹配成功，记录匹配成功数据
 	var order_logistics models.OrderLogisticsInfo
 	has, err := db_session.Where(fmt.Sprintf("order_id = %d", match_result.order_id)).Get(&order_logistics)
@@ -30,6 +30,8 @@ func save_order_logistics(p_order *models.OrderInfo, match_result match_logistic
 	order_logistics.TotalFee = match_result.total_fee
 	order_logistics.PickFee = match_result.pick_fee
 	order_logistics.CostAmount = match_result.cost_amount
+	order_logistics.Ptfl = p_ol.logistics_setting.Ptfl
+	order_logistics.Jyfl = p_ol.logistics_setting.Jyfl
 
 	if has == true {
 		_, err := db_session.Id(order_logistics.Id).Update(&order_logistics)

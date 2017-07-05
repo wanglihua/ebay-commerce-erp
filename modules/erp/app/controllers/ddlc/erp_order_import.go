@@ -541,6 +541,8 @@ WHERE st.stock_type_id = %d AND nvt.product_id = %d LIMIT 1;`
 			cost_price_total = cost_price_total + order_import_same_code_list[index].cost_price*(float64(order_import.Spsl))
 		}
 
+		// 订单导入的时候，进行价格和利润的分配。
+		// 现在是按照中国仓的成本价进行的分配和计算，不考虑物流等的费用；匹配物流后，会按照澳仓的成本进行分配和计算，考虑物流等的费用。
 		for index, order_import := range order_import_same_code_list {
 			order_import_same_code_list[index].price_au = ((order_import.cost_price * (float64(order_import.Spsl)) / cost_price_total) * order_import.Skje) / float64(order_import.Spsl)
 			order_import_same_code_list[index].price_rmb = order_import_same_code_list[index].price_au * aud_exchange_rate_setting

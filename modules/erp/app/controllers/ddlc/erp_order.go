@@ -676,7 +676,6 @@ WHERE oi.order_id = %d;`
 		order_logistics_total_fee = order_logistics.ActualFee
 	}
 
-	// var profit = (total_amount + express_fee) - (order_gst + platform_fee + payment_fee + logistics_fee + pick_fee + cost_amount)
 	var order_profit = ((order.AmountPaid + order.ExpressFee) - (order_gst + order.AmountPaid*(logistics_setting.Ptfl+logistics_setting.Jyfl) +
 		order_logistics_total_fee + order_logistics.PickFee + order_logistics.CostAmount)) * order.ExchangeRate
 
