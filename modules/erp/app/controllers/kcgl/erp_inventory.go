@@ -48,9 +48,9 @@ func (c ErpInventory) PageData() revel.Result {
 	core.HandleError(err)
 
 	return c.RenderJson(map[string]interface{}{
-		"stock_list":          stock_list,
-		"stock_id_query":      0,
-		"product_code_query":  "",
+		"stock_list":            stock_list,
+		"stock_id_query":        0,
+		"product_code_query":    "",
 		"cost_price_zero_query": 0,
 	})
 }
@@ -104,7 +104,11 @@ func (c ErpInventory) ListData() revel.Result {
 	}
 
 	var stock_id_str_list = stock_pick_crew_service.Get_login_user_stock_id_str_list(db_session, c.Session)
-	filter = core.SqlAnd(filter, fmt.Sprintf("st.id IN (%s)", strings.Join(stock_id_str_list, ",")))
+	if len(stock_id_str_list) != 0 {
+		filter = core.SqlAnd(filter, fmt.Sprintf("st.id IN (%s)", strings.Join(stock_id_str_list, ",")))
+	} else {
+		filter = core.SqlAnd(filter, "st.id IN (0)")
+	}
 
 	if cost_price_zero_query != 0 {
 		filter = core.SqlAnd(filter, "ivt.cost_price = 0")
