@@ -744,7 +744,9 @@ func (c ErpOrder) ReMatchHoldOrderLogistics() revel.Result {
 		}
 	}
 
-	var p_order_logistics = new(order_logistics_service.OrderLogistics)
+	var p_order_logistics = new(order_logistics_service.OrderLogisticsService)
+	var login_user = core.GetLoginUser(c.Session)
+	p_order_logistics.UserLoginName = login_user.LoginName
 	var match_option order_logistics_service.Match_option_t
 	match_option.Prefer_stock_id = prefer_stock_id
 	match_option.Prefer_mode_id = prefer_mode_id
@@ -783,7 +785,9 @@ func (c ErpOrder) MatchLogistics() revel.Result {
 
 	var db_session = c.DbSession
 
-	var p_order_logistics = new(order_logistics_service.OrderLogistics)
+	var p_order_logistics = new(order_logistics_service.OrderLogisticsService)
+	var login_user = core.GetLoginUser(c.Session)
+	p_order_logistics.UserLoginName = login_user.LoginName
 	err := p_order_logistics.CalculateListPaidOrders(db_session)
 
 	// core.HandleError(err)

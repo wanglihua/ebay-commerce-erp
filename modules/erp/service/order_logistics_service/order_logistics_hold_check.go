@@ -17,7 +17,7 @@ import (
 )
 
 // 1 地址有特殊字段的
-func (p_ol *OrderLogistics) hold_check_address_special_word(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, order_logistics models.OrderLogisticsInfo, db_session *xorm.Session) (is_hold_return bool) {
+func (p_ol *OrderLogisticsService) hold_check_address_special_word(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, order_logistics models.OrderLogisticsInfo, db_session *xorm.Session) (is_hold_return bool) {
 
 	revel.TRACE.Println("hold_check_address_special_word begin")
 
@@ -49,7 +49,7 @@ func (p_ol *OrderLogistics) hold_check_address_special_word(p_order *models.Orde
 }
 
 // 2 有买家留言
-func (p_ol *OrderLogistics) hold_check_buyer_checkout_message(p_order *models.OrderInfo, db_session *xorm.Session) (is_hold_return bool) {
+func (p_ol *OrderLogisticsService) hold_check_buyer_checkout_message(p_order *models.OrderInfo, db_session *xorm.Session) (is_hold_return bool) {
 	if strings.TrimSpace(p_order.BuyerCheckoutMessage) != "" {
 		p_ol.update_order_to_hold_type(p_order, models.ORDER_HOLD_TYPE_BUYER_CHECKOUT_MESSAGE, db_session)
 		return true
@@ -63,7 +63,7 @@ func (p_ol *OrderLogistics) hold_check_buyer_checkout_message(p_order *models.Or
 // todo: 4 PICK UP  -- 一般都是手工创建的订单，做一个 PICK UP的订单类型？
 
 // 5 系统显示所有仓都缺货（中国仓除外）
-func (p_ol *OrderLogistics) hold_check_oss_all_stock(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, db_session *xorm.Session) (is_hold_return bool) {
+func (p_ol *OrderLogisticsService) hold_check_oss_all_stock(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, db_session *xorm.Session) (is_hold_return bool) {
 	// 只检查不是 中国仓 的仓库
 	var fun_is_not_cn_stock = func(stock_type_id int64) bool {
 		if stock_type_id != models.STOCK_TYPE_CN {
@@ -85,7 +85,7 @@ func (p_ol *OrderLogistics) hold_check_oss_all_stock(p_order *models.OrderInfo, 
 // 这个在需求上有更改，不用这个了
 // 后来改成在途才有货
 
-func (p_ol *OrderLogistics) hold_check_oss_au_stock_but_zt_stock_has(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, db_session *xorm.Session) (is_hold_return bool) {
+func (p_ol *OrderLogisticsService) hold_check_oss_au_stock_but_zt_stock_has(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, db_session *xorm.Session) (is_hold_return bool) {
 	// 检查 澳洲 的仓库
 	// todo: 这里还有点问题，应该是检查对应的在途仓库？,先不考虑这个问题了
 
@@ -118,7 +118,7 @@ func (p_ol *OrderLogistics) hold_check_oss_au_stock_but_zt_stock_has(p_order *mo
 type fun_stock_type_filter_t func(stock_type_id int64) bool
 
 // 订单商品库存检查，用于给 5 和 6 的调用
-func (p_ol *OrderLogistics) hold_check_oss_by_stock_type(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, fun_stock_type_filter fun_stock_type_filter_t, db_session *xorm.Session) (is_oss_return bool) {
+func (p_ol *OrderLogisticsService) hold_check_oss_by_stock_type(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, fun_stock_type_filter fun_stock_type_filter_t, db_session *xorm.Session) (is_oss_return bool) {
 	var products_stock_qty_list = p_order_logistics_data.products_stock_qty_list
 
 	// 找出所有包含这些商品库存的仓库id列表
@@ -150,7 +150,7 @@ func (p_ol *OrderLogistics) hold_check_oss_by_stock_type(p_order *models.OrderIn
 	return all_product_oss
 }
 
-func (p_ol *OrderLogistics) hold_check_has_some_product(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, db_session *xorm.Session) (is_hold_return bool) {
+func (p_ol *OrderLogisticsService) hold_check_has_some_product(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, db_session *xorm.Session) (is_hold_return bool) {
 	var products_stock_qty_list = p_order_logistics_data.products_stock_qty_list
 
 	// 找出所有包含这些商品库存的仓库id列表
@@ -189,7 +189,7 @@ func (p_ol *OrderLogistics) hold_check_has_some_product(p_order *models.OrderInf
 // todo: 7 实际仓库缺货（是在捡货过程中，虽然系统显示有货，但实际仓库没有货了。就需要人工手动将这些订单搬至这里的模块，等待跟客户协商，是退款还是等待集装箱）, 这个 hold 由拣货过程中产生
 
 // todo: 8, 9, 10 临时的解决方案
-func (p_ol *OrderLogistics) hold_check_multi_product(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, db_session *xorm.Session) (is_hold_return bool) {
+func (p_ol *OrderLogisticsService) hold_check_multi_product(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, db_session *xorm.Session) (is_hold_return bool) {
 	if len(p_order_logistics_data.order_product_info_list) > 1 {
 		p_ol.update_order_to_hold_type(p_order, models.ORDER_HOLD_TYPE_MULTI_PRODUCT, db_session)
 		return true
@@ -199,7 +199,7 @@ func (p_ol *OrderLogistics) hold_check_multi_product(p_order *models.OrderInfo, 
 }
 
 // 11 无匹配的物流方式（长宽高重量没有物流满足）， 对这个 函数 的调用放在匹配物流结束之后，这样才知道是不是匹配成功了
-func (p_ol *OrderLogistics) hold_check_no_match_logistics_mode(p_order *models.OrderInfo, match_success bool, db_session *xorm.Session) (is_hold_return bool) {
+func (p_ol *OrderLogisticsService) hold_check_no_match_logistics_mode(p_order *models.OrderInfo, match_success bool, db_session *xorm.Session) (is_hold_return bool) {
 	if match_success == false {
 		p_ol.update_order_to_hold_type(p_order, models.ORDER_HOLD_TYPE_LOGISTICS_NO_MATCH, db_session)
 		return true
@@ -209,7 +209,7 @@ func (p_ol *OrderLogistics) hold_check_no_match_logistics_mode(p_order *models.O
 }
 
 // 12 产品信息不全（长宽高重量不全或者有误）
-func (p_ol *OrderLogistics) hold_check_product_info_miss(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, db_session *xorm.Session) (is_hold_return bool) {
+func (p_ol *OrderLogisticsService) hold_check_product_info_miss(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, db_session *xorm.Session) (is_hold_return bool) {
 	var order_product_info_list = p_order_logistics_data.order_product_info_list
 	for _, order_product_info := range order_product_info_list {
 		// 长 宽 高 重量 数据不全
@@ -223,7 +223,7 @@ func (p_ol *OrderLogistics) hold_check_product_info_miss(p_order *models.OrderIn
 }
 
 // 13 // 匹配最佳仓库及物流后订单亏损。需要在基础设置里面有设置亏损额或者亏损率的设置功能，超过设置范围了，自动到订单亏损hold
-func (p_ol *OrderLogistics) hold_check_great_deficit(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, order_logistics models.OrderLogisticsInfo, db_session *xorm.Session) (is_hold_return bool) {
+func (p_ol *OrderLogisticsService) hold_check_great_deficit(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, order_logistics models.OrderLogisticsInfo, db_session *xorm.Session) (is_hold_return bool) {
 	var amount_paid = p_order.AmountPaid                                 //收款金额，澳币
 	var express_fee = p_order.ExpressFee                                 // 运费收入，澳币
 	var order_gst float64 = order_service.Get_order_gst_fee(amount_paid) // GST消费税，澳币
@@ -245,7 +245,7 @@ func (p_ol *OrderLogistics) hold_check_great_deficit(p_order *models.OrderInfo, 
 }
 
 // 14 信封类。长宽高在35cm X 25cm X 2cm, 重量在0.5Kg以内的订单为信封。若是多数量或者多产品，以前我们设计的思路是，最大产品的长边为最长边，最大产品的中边为中边，所有产品的最小边之和为最小边，判断是否在35cm X 25cm X 2cm以内，重量之和是否在0.5Kg以内
-func (p_ol *OrderLogistics) hold_check_envelope(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, db_session *xorm.Session) (is_hold_return bool) {
+func (p_ol *OrderLogisticsService) hold_check_envelope(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, db_session *xorm.Session) (is_hold_return bool) {
 	if p_ol.match_envelope_fee_rate(p_order, p_order_logistics_data, db_session) {
 		p_ol.update_order_to_hold_type(p_order, models.ORDER_HOLD_TYPE_ENVELOPE, db_session)
 		return true
@@ -254,7 +254,7 @@ func (p_ol *OrderLogistics) hold_check_envelope(p_order *models.OrderInfo, p_ord
 }
 
 // 匹配信封物流
-func (p_ol *OrderLogistics) match_envelope_fee_rate(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, db_session *xorm.Session) (is_hold_return bool) {
+func (p_ol *OrderLogisticsService) match_envelope_fee_rate(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, db_session *xorm.Session) (is_hold_return bool) {
 	// 这里假定信封的长宽高限制： 长 > 宽 > 高，不能这么假定
 
 	revel.TRACE.Println("hold_check_envelope begin")
@@ -327,7 +327,7 @@ func (p_ol *OrderLogistics) match_envelope_fee_rate(p_order *models.OrderInfo, p
 }
 
 // 15 快递类。需要在基础设置里面有 收到快递费金额的设置功能，比如收到的运费高于什么金额，视为快递。否则就算收了快递费也视为普通包裹
-func (p_ol *OrderLogistics) hold_check_express(p_order *models.OrderInfo, db_session *xorm.Session) (is_hold_return bool) {
+func (p_ol *OrderLogisticsService) hold_check_express(p_order *models.OrderInfo, db_session *xorm.Session) (is_hold_return bool) {
 	// 系统没有设置快递的最小运费
 	if p_ol.logistics_setting.MinExpressFee == 0 {
 		revel.ERROR.Println("系统没有设置快递的最小运费！")
@@ -344,7 +344,7 @@ func (p_ol *OrderLogistics) hold_check_express(p_order *models.OrderInfo, db_ses
 }
 
 // 16 判断是否是国际件，如果不是澳洲的就是国际件，一般就是新西兰的
-func (p_ol *OrderLogistics) hold_check_international(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, db_session *xorm.Session) (is_hold_return bool) {
+func (p_ol *OrderLogisticsService) hold_check_international(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, db_session *xorm.Session) (is_hold_return bool) {
 	var country = p_order_logistics_data.order_shipping_address.Country
 	country = strings.TrimSpace(country)
 	var country_name = p_order_logistics_data.order_shipping_address.CountryName
@@ -360,7 +360,7 @@ func (p_ol *OrderLogistics) hold_check_international(p_order *models.OrderInfo, 
 }
 
 // 检查邮政编码是否为空 17. 收货人信息不全的 ，如果为空就不匹配了，这个放在匹配物流之前，和下面的一样也是 ORDER_HOLD_ADDRESS_INFO_MISS
-func (p_ol *OrderLogistics) hold_check_address_info_post_code_miss(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, db_session *xorm.Session) (is_hold_return bool) {
+func (p_ol *OrderLogisticsService) hold_check_address_info_post_code_miss(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, db_session *xorm.Session) (is_hold_return bool) {
 	var shipping_address = p_order_logistics_data.order_shipping_address
 	if shipping_address.Id == 0 || // 数据库中地址信息不存在
 		strings.TrimSpace(shipping_address.PostalCode) == "" { // 地址信息中缺少邮政编码
@@ -372,7 +372,7 @@ func (p_ol *OrderLogistics) hold_check_address_info_post_code_miss(p_order *mode
 }
 
 // 17. 收货人信息不全的，比如没有手机号，没有邮编等等
-func (p_ol *OrderLogistics) hold_check_address_info_miss(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, db_session *xorm.Session) (is_hold_return bool) {
+func (p_ol *OrderLogisticsService) hold_check_address_info_miss(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, db_session *xorm.Session) (is_hold_return bool) {
 	var shipping_address = p_order_logistics_data.order_shipping_address
 	if shipping_address.Id == 0 || // 数据库中地址信息不存在
 	// strings.TrimSpace(shipping_address.Phone) == "" || // 地址信息中缺少电话号码，后来说电话号码缺失，不算收货人信息不全
@@ -388,7 +388,7 @@ func (p_ol *OrderLogistics) hold_check_address_info_miss(p_order *models.OrderIn
 }
 
 // 18. 对老鼠仓的检查
-func (p_ol *OrderLogistics) hold_check_paypal_account_not_match(p_order *models.OrderInfo, db_session *xorm.Session) (is_hold_return bool) {
+func (p_ol *OrderLogisticsService) hold_check_paypal_account_not_match(p_order *models.OrderInfo, db_session *xorm.Session) (is_hold_return bool) {
 	var payment_method = p_order.PaymentMethods
 
 	var find_shop_in_shop_list = func(shop_id int64, shop_list []models.ShopAccountInfo) models.ShopAccountInfo {
@@ -429,7 +429,7 @@ func (p_ol *OrderLogistics) hold_check_paypal_account_not_match(p_order *models.
 	return false
 }
 
-func (p_ol *OrderLogistics) update_order_to_hold_type(p_order *models.OrderInfo, hold_type_id int64, db_session *xorm.Session) {
+func (p_ol *OrderLogisticsService) update_order_to_hold_type(p_order *models.OrderInfo, hold_type_id int64, db_session *xorm.Session) {
 	p_order.HoldTypeId = core.MakeNullInt(hold_type_id, true)
 	p_order.StatusId = models.ORDER_STATUS_HOLD // 修改订单状态为 hold 状态
 	_, err := db_session.Id(p_order.Id).Cols("hold_type_id", "status_id").Update(p_order)
@@ -439,11 +439,15 @@ func (p_ol *OrderLogistics) update_order_to_hold_type(p_order *models.OrderInfo,
 	_, err = db_session.Id(p_order.HoldTypeId.Int64).Get(&hold_type)
 	core.HandleError(err)
 
-	order_history_service.Insert_order_history(*p_order, fmt.Sprintf("匹配物流订单Hold %s", hold_type.Name), db_session)
+	var login_name = p_ol.UserLoginName
+	if login_name == "" {
+		login_name = "自动任务"
+	}
+	order_history_service.Insert_order_history(*p_order, fmt.Sprintf("匹配物流订单Hold %s，工号：%s", hold_type.Name, login_name), db_session)
 }
 
 // 检查仓库是否有订单中的所有商品数量的库存。这里的有货就理解成这个仓库有订单的所有的商品；这里的缺货也理解成是，没有一个仓库能凑齐所有商品的所有数量。同时返回订单的商品总成本
-func check_stock_has_order_products(p_ol *OrderLogistics, stock_id int64, p_order_logistics_data *order_logistics_data_t) (has_return bool, cost_amount_return float64) {
+func check_stock_has_order_products(p_ol *OrderLogisticsService, stock_id int64, p_order_logistics_data *order_logistics_data_t) (has_return bool, cost_amount_return float64) {
 	var products_stock_qty_list = p_order_logistics_data.products_stock_qty_list //库存为零的也包含，只要有记录的都会包含，可以从里面取得仓库的成本价，就算库存为零也能取得成本价
 	var order_product_info_list = p_order_logistics_data.order_product_info_list
 
@@ -479,7 +483,7 @@ func check_stock_has_order_products(p_ol *OrderLogistics, stock_id int64, p_orde
 	}
 }
 
-func check_stock_has_some_order_products(p_ol *OrderLogistics, stock_id int64, p_order_logistics_data *order_logistics_data_t) (has_some_return bool) {
+func check_stock_has_some_order_products(p_ol *OrderLogisticsService, stock_id int64, p_order_logistics_data *order_logistics_data_t) (has_some_return bool) {
 	var products_stock_qty_list = p_order_logistics_data.products_stock_qty_list
 	var order_product_info_list = p_order_logistics_data.order_product_info_list
 

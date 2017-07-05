@@ -62,8 +62,9 @@ func (t OrderLogisticsMatchTask) Run() {
 		err = order_logistics_service.Combine_orders(fmt.Sprintf("o.type_id <> %d AND o.status_id = %d", models.ORDER_TYPE_DRDD, models.ORDER_STATUS_YZF), db_session)
 		core.HandleError(err)
 
-		var order_logistics order_logistics_service.OrderLogistics
-		err = order_logistics.CalculateList(paid_download_order_list, db_session)
+		var p_order_logistics = new(order_logistics_service.OrderLogisticsService)
+		p_order_logistics.UserLoginName = "" // 自动任务 操作历史不记录工号
+		err = p_order_logistics.CalculateList(paid_download_order_list, db_session)
 		core.HandleError(err)
 	}
 }

@@ -17,7 +17,7 @@ import (
 	"matrix/modules/erp/service/inventory_service"
 )
 
-type OrderLogistics struct {
+type OrderLogisticsService struct {
 	au_stock_list                     []models.StockInfo                      // 所有澳洲仓库列表
 	aud_exchange_rate                 float64                                 // 澳币汇率
 	logistics_setting                 models.LogisticsSettingInfo             // 物流设置
@@ -29,9 +29,10 @@ type OrderLogistics struct {
 	envelope_fee_rate_list            []models.EnvelopeFeeRateInfo            // 信封物流费率， 按费用从小到大排序
 	shop_list                         []models.ShopAccountInfo                // 店铺列表，系统中的店铺列表
 	pending_keeper                    *pending_inventory_temp_keeper          // 设置过程全局变量，每次开始匹配计算的时候一定要记得初始化
+	UserLoginName                     string
 }
 
-func (p_ol *OrderLogistics) init_data(db_session *xorm.Session) {
+func (p_ol *OrderLogisticsService) init_data(db_session *xorm.Session) {
 	// 加载所有仓库
 	var au_stock_list = make([]models.StockInfo, 0)
 	err := db_session.Where(fmt.Sprintf("stock_type_id = %d", models.STOCK_TYPE_AU)).Find(&au_stock_list)
@@ -97,7 +98,7 @@ func (p_ol *OrderLogistics) init_data(db_session *xorm.Session) {
 	p_ol.shop_list = shop_list
 }
 
-func (p_ol *OrderLogistics) CalculateListPaidOrders(db_session *xorm.Session) error {
+func (p_ol *OrderLogisticsService) CalculateListPaidOrders(db_session *xorm.Session) error {
 	// 获取 已支付 状态的订单, 匹配完成后，订单的状态就是 Hold 或者 待配货
 	var order_list = order_service.Get_paid_order_list(db_session)
 
@@ -118,7 +119,7 @@ func (p_ol *OrderLogistics) CalculateListPaidOrders(db_session *xorm.Session) er
 	return p_ol.CalculateList(order_list, db_session)
 }
 
-func (p_ol *OrderLogistics) CalculateListImportBatch(batch_code int64, db_session *xorm.Session) error {
+func (p_ol *OrderLogisticsService) CalculateListImportBatch(batch_code int64, db_session *xorm.Session) error {
 
 	//获得该批次号的订单列表
 	/*
@@ -173,7 +174,7 @@ func (s order_slice_t) Swap(i int, j int) {
 	s[i], s[j] = s[j], s[i]
 }
 
-func (p_ol *OrderLogistics) CalculateList(order_list []models.OrderInfo, db_session *xorm.Session) error {
+func (p_ol *OrderLogisticsService) CalculateList(order_list []models.OrderInfo, db_session *xorm.Session) error {
 	var match_option Match_option_t
 	match_option.Prefer_stock_id = 0
 	match_option.Prefer_mode_id = 0
@@ -190,7 +191,7 @@ type Match_option_t struct {
 
 // 匹配前要判断一下订单的状态，订单不是已支付状态的话，不能匹配
 // 计算订单的物流方式 和 Hold 类型，调用这个函数的时候应该  “开启数据库事务“， 调用完成后，订单的状态就是 Hold 或者 待配货
-func (p_ol *OrderLogistics) CalculateListWithOption(order_list []models.OrderInfo, match_option Match_option_t, db_session *xorm.Session) error {
+func (p_ol *OrderLogisticsService) CalculateListWithOption(order_list []models.OrderInfo, match_option Match_option_t, db_session *xorm.Session) error {
 	/*
 	defer func() {
 		if err := recover(); err != nil {
@@ -370,10 +371,10 @@ func (p_ol *OrderLogistics) CalculateListWithOption(order_list []models.OrderInf
 }
 
 // 用于单条物流的匹配
-func (p_ol *OrderLogistics) CalculateSingle(order models.OrderInfo, db_session *xorm.Session) error {
+func (p_ol *OrderLogisticsService) CalculateSingle(order models.OrderInfo, db_session *xorm.Session) error {
 	return p_ol.CalculateList([]models.OrderInfo{order}, db_session)
 }
 
-func (p_ol *OrderLogistics) CalculateSingleWithOption(order models.OrderInfo, match_option Match_option_t, db_session *xorm.Session) error {
+func (p_ol *OrderLogisticsService) CalculateSingleWithOption(order models.OrderInfo, match_option Match_option_t, db_session *xorm.Session) error {
 	return p_ol.CalculateListWithOption([]models.OrderInfo{order}, match_option, db_session)
 }

@@ -601,7 +601,8 @@ WHERE st.stock_type_id = %d AND nvt.product_id = %d LIMIT 1;`
 			_, err = db_session.Insert(&order)
 			core.HandleError(err)
 
-			order_history_service.Insert_order_history(order, fmt.Sprintf("订单导入新增订单", ), db_session)
+			var login_user = core.GetLoginUser(c.Session)
+			order_history_service.Insert_order_history(order, fmt.Sprintf("订单导入新增订单，工号：%s", login_user.LoginName), db_session)
 
 			// 地址
 			var order_shipping_address models.OrderShippingAddressInfo
@@ -813,7 +814,9 @@ func (c ErpOrderImport) MatchLogistics() revel.Result {
 	var batch_code int64
 	c.Params.Bind(&batch_code, "batch_code")
 
-	var p_order_logistics = new(order_logistics_service.OrderLogistics)
+	var p_order_logistics = new(order_logistics_service.OrderLogisticsService)
+	var login_user = core.GetLoginUser(c.Session)
+	p_order_logistics.UserLoginName = login_user.LoginName
 	err := p_order_logistics.CalculateListImportBatch(batch_code, db_session)
 	// core.HandleError(err)
 	if err != nil {
