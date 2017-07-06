@@ -117,7 +117,7 @@
                             }
                         },
                         {
-                            "mDataProp": "prd.sku", "title": "SKU", "bSearchable": true,
+                            "mDataProp": "prd.sku", "title": "SKU", "bSearchable": true, "sClass": "wrap-word",
                             "render": function (data, type, row) {
                                 var sup_name = "暂无供应商";
                                 if (row.sup.name !== "") {
@@ -164,7 +164,7 @@
                                 for (var index in inventory_list) {
                                     inventory_desc += "<tr>";
                                     var inventory = inventory_list[index];
-                                    inventory_desc += "<td class='sl'>" + inventory.st.name + " " + inventory.sl.name + "</td><td class='qty'>" + inventory.nvt.qty  + "</td><td class='pending-qty'>" + inventory.nvt.pending_qty + "</td><td class='price'>" + dtFormatFloat(inventory.nvt.cost_price) + "</td>";
+                                    inventory_desc += "<td class='sl'>" + inventory.st.name + " " + inventory.sl.name + "</td><td class='qty'>" + inventory.nvt.qty + "</td><td class='pending-qty'>" + inventory.nvt.pending_qty + "</td><td class='price'>" + dtFormatFloat(inventory.nvt.cost_price) + "</td>";
                                     inventory_desc += "</tr>";
                                 }
                                 inventory_desc += "</tbody></table>";
