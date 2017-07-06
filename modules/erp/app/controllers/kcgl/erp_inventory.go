@@ -48,10 +48,11 @@ func (c ErpInventory) PageData() revel.Result {
 	core.HandleError(err)
 
 	return c.RenderJson(map[string]interface{}{
-		"stock_list":            stock_list,
-		"stock_id_query":        0,
-		"product_code_query":    "",
-		"cost_price_zero_query": 0,
+		"stock_list":                  stock_list,
+		"stock_id_query":              0,
+		"product_code_query":          "",
+		"cost_price_zero_query":       0,
+		"stock_product_one2one_query": 0,
 	})
 }
 
@@ -78,6 +79,10 @@ func (c ErpInventory) ListData() revel.Result {
 
 	var cost_price_zero_query int64
 	c.Params.Bind(&cost_price_zero_query, "cost_price_zero_query")
+
+	//stock_product_one2one_query
+	var stock_product_one2one_query int64
+	c.Params.Bind(&stock_product_one2one_query, "stock_product_one2one_query")
 
 	/*
 		SELECT ivt.*, st.*, loc.*, prd.*
@@ -112,6 +117,19 @@ func (c ErpInventory) ListData() revel.Result {
 
 	if cost_price_zero_query != 0 {
 		filter = core.SqlAnd(filter, "ivt.cost_price = 0")
+	}
+
+	if stock_product_one2one_query != 0 {
+		filter = core.SqlAnd(filter, `
+ivt.id IN (
+    SELECT id
+    FROM erp_inventory n
+        INNER JOIN (
+                       SELECT stock_id, product_id
+                       FROM erp_inventory
+                       GROUP BY stock_id, product_id
+                       HAVING count(*) > 1
+                   ) r ON n.stock_id = r.stock_id AND n.product_id = r.product_id)`)
 	}
 
 	sb.Where(filter)
