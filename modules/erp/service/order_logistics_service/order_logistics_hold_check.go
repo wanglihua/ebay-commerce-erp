@@ -324,7 +324,7 @@ func (p_ol *OrderLogisticsService) match_envelope_fee_rate(p_order *models.Order
 			order_logistics.Weight = whole_weight
 			order_logistics.EnvelopeFeeId = final_fee_rate_id
 			order_logistics.TotalFee = final_fee
-			order_logistics.StockId = p_ol.mel_stock_id
+			order_logistics.StockId = p_ol.mel_stock_id //设置发货仓库为墨尔本仓库
 
 			if has == false {
 				_, err = db_session.Insert(&order_logistics)
@@ -333,6 +333,10 @@ func (p_ol *OrderLogisticsService) match_envelope_fee_rate(p_order *models.Order
 				_, err = db_session.Id(order_logistics.Id).Update(&order_logistics)
 				core.HandleError(err)
 			}
+
+			p_order.StockId = p_ol.mel_stock_id
+			_, err = db_session.Id(p_order.Id).Cols("stock_id").Update(p_order)
+			core.HandleError(err)
 		}
 
 		return true
@@ -352,6 +356,26 @@ func (p_ol *OrderLogisticsService) hold_check_express(p_order *models.OrderInfo,
 	// 这里假定都是澳币
 	if p_order.ExpressFee >= p_ol.logistics_setting.MinExpressFee {
 		p_ol.update_order_to_hold_type(p_order, models.ORDER_HOLD_TYPE_EXPRESS, db_session)
+
+		//设置发货仓库为墨尔本仓库
+		var order_logistics models.OrderLogisticsInfo
+		has, err := db_session.Where("order_id = ?", p_order.Id).Get(&order_logistics)
+		core.HandleError(err)
+
+		order_logistics.StockId = p_ol.mel_stock_id
+
+		if has == true {
+			_, err := db_session.Id(order_logistics.Id).Cols("stock_id").Update(&order_logistics)
+			core.HandleError(err)
+		} else {
+			_, err := db_session.Insert(&order_logistics)
+			core.HandleError(err)
+		}
+
+		p_order.StockId = p_ol.mel_stock_id
+		_, err = db_session.Id(p_order.Id).Cols("stock_id").Update(p_order)
+		core.HandleError(err)
+
 		return true
 	}
 
@@ -368,6 +392,26 @@ func (p_ol *OrderLogisticsService) hold_check_international(p_order *models.Orde
 	if (country != "" && strings.ToLower(country) != strings.ToLower("AU")) ||
 		(country_name != "" && strings.ToLower(country_name) != strings.ToLower("Australia")) { // != "" 是因为有时导入的时候没提供国家信息的，就默认是国内件了
 		p_ol.update_order_to_hold_type(p_order, models.ORDER_HOLD_TYPE_INTERNATIONAL, db_session)
+
+		//设置发货仓库为墨尔本仓库
+		var order_logistics models.OrderLogisticsInfo
+		has, err := db_session.Where("order_id = ?", p_order.Id).Get(&order_logistics)
+		core.HandleError(err)
+
+		order_logistics.StockId = p_ol.mel_stock_id
+
+		if has == true {
+			_, err := db_session.Id(order_logistics.Id).Cols("stock_id").Update(&order_logistics)
+			core.HandleError(err)
+		} else {
+			_, err := db_session.Insert(&order_logistics)
+			core.HandleError(err)
+		}
+
+		p_order.StockId = p_ol.mel_stock_id
+		_, err = db_session.Id(p_order.Id).Cols("stock_id").Update(p_order)
+		core.HandleError(err)
+
 		return true
 	}
 
