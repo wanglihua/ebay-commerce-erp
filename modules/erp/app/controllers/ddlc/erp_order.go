@@ -664,7 +664,12 @@ WHERE oi.order_id = %d;`
 	var order_cost_amount = order_logistics.CostAmount * order.ExchangeRate
 
 	// 物流费用
+
 	var logistics_fee float64 = (order_logistics.TotalFee + order_logistics.PickFee) * order.ExchangeRate
+
+	if order_logistics.ActualFee != 0 {
+		logistics_fee = (order_logistics.ActualFee + order_logistics.PickFee) * order.ExchangeRate
+	}
 
 	// gst 消费税
 	var order_gst float64 = order_service.Get_order_gst_fee(&order)
