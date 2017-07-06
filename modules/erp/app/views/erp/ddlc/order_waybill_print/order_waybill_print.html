@@ -26,9 +26,9 @@
                     </div>
                 </div>
             </div>
-            <div class="bill-block bill-right" style="font-size:0.3cm;width: 5.82cm;border-left: 0.02cm dashed black;border-right: 0.02cm solid black;height: 4.86cm;border-top: 0.02cm solid black;border-bottom: 0.02cm solid black;padding: 0.05cm;  float: left; white-space: normal; word-break: break-all; word-wrap: break-word;">
-                <div style="font-size:0.3cm;width:100%;text-align: right;">{% $print_order.Order.Code %}&nbsp;</div>
-                <div style="width:100%;text-align: right;"><img src='{% url "Barcode.Waybill" %}?code={% $print_order.Order.Code %}' style="height:0.7cm; width:4.5cm;"/>&nbsp;</div>
+            <div class="bill-block bill-right" style="font-size:0.3cm;width: 5.82cm;border-left: 0.02cm dashed black;border-right: 0.02cm solid black;height: 4.85cm;border-top: 0.02cm solid black;border-bottom: 0.02cm solid black;padding: 0.05cm;  float: left; white-space: normal; word-break: break-all; word-wrap: break-word;">
+                <input class="order_code" type="hidden" value="{% $print_order.Order.Code %}" />
+                <div id="barcode_div" style="width:100%;height:1cm;text-align: right;"></div>
                 <div style="font-size: 0.3cm;margin-top: -0.2cm;font-weight:bold;height: 2.5cm;line-height: 0.4cm;">
                     <div>To:</div>
                     <div>{% $print_order.Address.Name %}</div>
