@@ -315,15 +315,24 @@ func (p_ol *OrderLogisticsService) match_envelope_fee_rate(p_order *models.Order
 
 		if final_fee_rate_id != 0 {
 			var order_logistics models.OrderLogisticsInfo
+			has, err := db_session.Where("order_id = ?", p_order.Id).Get(&order_logistics)
+			core.HandleError(err)
+
 			order_logistics.Length = whole_length
 			order_logistics.Width = whole_width
 			order_logistics.Height = whole_height
 			order_logistics.Weight = whole_weight
 			order_logistics.EnvelopeFeeId = final_fee_rate_id
 			order_logistics.TotalFee = final_fee
+			order_logistics.StockId = p_ol.mel_stock_id
 
-			_, err := db_session.Insert(&order_logistics)
-			core.HandleError(err)
+			if has == false {
+				_, err = db_session.Insert(&order_logistics)
+				core.HandleError(err)
+			} else {
+				_, err = db_session.Id(order_logistics.Id).Update(&order_logistics)
+				core.HandleError(err)
+			}
 		}
 
 		return true

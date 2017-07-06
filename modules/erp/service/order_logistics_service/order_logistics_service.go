@@ -15,6 +15,7 @@ import (
 	"matrix/modules/erp/service/order_service"
 	"matrix/modules/erp/service/pick_fee_service"
 	"matrix/modules/erp/service/inventory_service"
+	"matrix/modules/erp/service/stock_service"
 )
 
 type OrderLogisticsService struct {
@@ -29,6 +30,7 @@ type OrderLogisticsService struct {
 	envelope_fee_rate_list            []models.EnvelopeFeeRateInfo            // 信封物流费率， 按费用从小到大排序
 	shop_list                         []models.ShopAccountInfo                // 店铺列表，系统中的店铺列表
 	pending_keeper                    *pending_inventory_temp_keeper          // 设置过程全局变量，每次开始匹配计算的时候一定要记得初始化
+	mel_stock_id                      int64                                   // 墨尔本仓库 id
 	UserLoginName                     string
 }
 
@@ -96,6 +98,8 @@ func (p_ol *OrderLogisticsService) init_data(db_session *xorm.Session) {
 	err = db_session.Find(&shop_list)
 	core.HandleError(err)
 	p_ol.shop_list = shop_list
+
+	p_ol.mel_stock_id = stock_service.Get_mel_stock_id(db_session)
 }
 
 func (p_ol *OrderLogisticsService) CalculateListPaidOrders(db_session *xorm.Session) error {
