@@ -14,6 +14,7 @@ import (
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/order_service"
 	"matrix/modules/erp/service/order_history_service"
+	"matrix/modules/erp/service/pick_fee_service"
 )
 
 // 1 地址有特殊字段的
@@ -318,13 +319,26 @@ func (p_ol *OrderLogisticsService) match_envelope_fee_rate(p_order *models.Order
 			has, err := db_session.Where("order_id = ?", p_order.Id).Get(&order_logistics)
 			core.HandleError(err)
 
+			order_logistics.OrderId = p_order.Id
+			order_logistics.AddressId = 0 // todo
+			order_logistics.CompanyId = 0
+			order_logistics.StockId = p_ol.mel_stock_id //设置发货仓库为墨尔本仓库
+			order_logistics.ModeId = 0
+			order_logistics.FeeRateId = 0
+			order_logistics.EnvelopeFeeId = final_fee_rate_id
 			order_logistics.Length = whole_length
 			order_logistics.Width = whole_width
 			order_logistics.Height = whole_height
 			order_logistics.Weight = whole_weight
-			order_logistics.EnvelopeFeeId = final_fee_rate_id
+			order_logistics.DimWeight = 0
+			order_logistics.Sfkltjz = 0
+			order_logistics.Weight = whole_weight
+			order_logistics.Sfkltjz = 0
 			order_logistics.TotalFee = final_fee
-			order_logistics.StockId = p_ol.mel_stock_id //设置发货仓库为墨尔本仓库
+			order_logistics.PickFee = pick_fee_service.Get_product_pick_fee(whole_weight, p_ol.pick_fee_setting)
+			order_logistics.CostAmount = 0 // todo
+			order_logistics.Ptfl = p_ol.logistics_setting.Ptfl
+			order_logistics.Jyfl = p_ol.logistics_setting.Jyfl
 
 			if has == false {
 				_, err = db_session.Insert(&order_logistics)
