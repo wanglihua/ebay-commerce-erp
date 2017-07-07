@@ -6,7 +6,9 @@ type match_logistics_mode_result struct {
 	order_id      int64
 	order_code    string
 	address_id    int64
+	address       models.OrderShippingAddressInfo
 	company_id    int64
+	company       models.LogisticsCompanyInfo
 	stock_id      int64
 	stock         models.StockInfo
 	mode_id       int64
