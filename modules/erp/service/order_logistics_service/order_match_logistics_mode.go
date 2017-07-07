@@ -35,7 +35,7 @@ func (p_ol *OrderLogisticsService) match_logistics_mode_with_option(p_order *mod
 	var stock_id_has_products_map = make(map[int64]stock_has_product_and_cost_amount_t)
 	for _, stock := range au_stock_list {
 		var stock_has_product_and_cost_amount stock_has_product_and_cost_amount_t
-		has_product, cost_amount := check_stock_has_order_products(p_ol, stock.Id, p_order_logistics_data);
+		has_product, cost_amount := check_stock_has_order_products_and_get_cost_amount(p_ol, stock.Id, p_order_logistics_data);
 		stock_has_product_and_cost_amount.has_product = has_product // 仓库有没有全部的商品数量的库存
 		stock_has_product_and_cost_amount.cost_amount = cost_amount
 

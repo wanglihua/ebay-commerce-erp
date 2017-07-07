@@ -8,6 +8,7 @@ import (
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/order_history_service"
 	"matrix/modules/erp/service/order_service"
+	"matrix/modules/erp/service/pick_fee_service"
 )
 
 func save_order_logistics(p_ol *OrderLogisticsService, p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, match_result match_logistics_mode_result, unlock_express bool, login_name string, db_session *xorm.Session) models.OrderLogisticsInfo {
@@ -95,4 +96,51 @@ func save_order_logistics(p_ol *OrderLogisticsService, p_order *models.OrderInfo
 	}
 
 	return order_logistics
+}
+
+func save_special_hold_order_logistics(p_ol *OrderLogisticsService, p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, envelope_fee_id int64, total_fee float64, db_session *xorm.Session) {
+
+	var order_logistics models.OrderLogisticsInfo
+	has, err := db_session.Where("order_id = ?", p_order.Id).Get(&order_logistics)
+	core.HandleError(err)
+
+	var whole_length, whole_width, whole_height, whole_weight float64 = get_order_products_whole_logistics_data(p_order_logistics_data)
+
+	order_logistics.OrderId = p_order.Id
+	order_logistics.AddressId = p_order_logistics_data.order_shipping_address.Id
+	order_logistics.CompanyId = 0
+	order_logistics.StockId = p_ol.mel_stock_id //设置发货仓库为墨尔本仓库
+	order_logistics.ModeId = 0
+	order_logistics.FeeRateId = 0
+	order_logistics.EnvelopeFeeId = envelope_fee_id
+	order_logistics.Length = whole_length
+	order_logistics.Width = whole_width
+	order_logistics.Height = whole_height
+	order_logistics.Weight = whole_weight
+	order_logistics.DimWeight = 0
+	order_logistics.Sfkltjz = 0
+	order_logistics.Weight = whole_weight
+	order_logistics.Sfkltjz = 0
+	order_logistics.TotalFee = total_fee
+	order_logistics.PickFee = pick_fee_service.Get_product_pick_fee(whole_weight, p_ol.pick_fee_setting)
+	_, order_logistics.CostAmount = check_stock_has_order_products_and_get_cost_amount(p_ol, p_ol.mel_stock_id, p_order_logistics_data)
+	order_logistics.Ptfl = p_ol.logistics_setting.Ptfl
+	order_logistics.Jyfl = p_ol.logistics_setting.Jyfl
+
+	if has == false {
+		_, err = db_session.Insert(&order_logistics)
+		core.HandleError(err)
+	} else {
+		_, err = db_session.Id(order_logistics.Id).Update(&order_logistics)
+		core.HandleError(err)
+	}
+
+	p_order.StockId = p_ol.mel_stock_id
+	p_order.AddressId = p_order_logistics_data.order_shipping_address.Id
+	p_order.CompanyId = 0
+	p_order.ModeId = 0
+
+	var update_col_list = []string{"stock_id", "address_id", "company_id", "mode_id"}
+	_, err = db_session.Id(p_order.Id).Cols(update_col_list...).Update(p_order)
+	core.HandleError(err)
 }

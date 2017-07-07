@@ -14,7 +14,6 @@ import (
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/order_service"
 	"matrix/modules/erp/service/order_history_service"
-	"matrix/modules/erp/service/pick_fee_service"
 )
 
 // 1 地址有特殊字段的
@@ -139,7 +138,7 @@ func (p_ol *OrderLogisticsService) hold_check_oss_by_stock_type(p_order *models.
 
 	// 对每一个仓库循环，看是不是这个仓库里面, 这些商品都有货
 	for _, stock_id := range product_stock_id_list {
-		var stock_has_all_product, _ = check_stock_has_order_products(p_ol, stock_id, p_order_logistics_data)
+		var stock_has_all_product, _ = check_stock_has_order_products_and_get_cost_amount(p_ol, stock_id, p_order_logistics_data)
 
 		// 找到仓库全部商品都有货了，就退出；如果这个仓库里面不是全部商品都有货，就继续找
 		if stock_has_all_product {
@@ -315,42 +314,7 @@ func (p_ol *OrderLogisticsService) match_envelope_fee_rate(p_order *models.Order
 		}
 
 		if final_fee_rate_id != 0 {
-			var order_logistics models.OrderLogisticsInfo
-			has, err := db_session.Where("order_id = ?", p_order.Id).Get(&order_logistics)
-			core.HandleError(err)
-
-			order_logistics.OrderId = p_order.Id
-			order_logistics.AddressId = 0 // todo
-			order_logistics.CompanyId = 0
-			order_logistics.StockId = p_ol.mel_stock_id //设置发货仓库为墨尔本仓库
-			order_logistics.ModeId = 0
-			order_logistics.FeeRateId = 0
-			order_logistics.EnvelopeFeeId = final_fee_rate_id
-			order_logistics.Length = whole_length
-			order_logistics.Width = whole_width
-			order_logistics.Height = whole_height
-			order_logistics.Weight = whole_weight
-			order_logistics.DimWeight = 0
-			order_logistics.Sfkltjz = 0
-			order_logistics.Weight = whole_weight
-			order_logistics.Sfkltjz = 0
-			order_logistics.TotalFee = final_fee
-			order_logistics.PickFee = pick_fee_service.Get_product_pick_fee(whole_weight, p_ol.pick_fee_setting)
-			order_logistics.CostAmount = 0 // todo
-			order_logistics.Ptfl = p_ol.logistics_setting.Ptfl
-			order_logistics.Jyfl = p_ol.logistics_setting.Jyfl
-
-			if has == false {
-				_, err = db_session.Insert(&order_logistics)
-				core.HandleError(err)
-			} else {
-				_, err = db_session.Id(order_logistics.Id).Update(&order_logistics)
-				core.HandleError(err)
-			}
-
-			p_order.StockId = p_ol.mel_stock_id
-			_, err = db_session.Id(p_order.Id).Cols("stock_id").Update(p_order)
-			core.HandleError(err)
+			save_special_hold_order_logistics(p_ol, p_order, p_order_logistics_data, final_fee_rate_id, final_fee, db_session)
 		}
 
 		return true
@@ -520,7 +484,7 @@ func (p_ol *OrderLogisticsService) update_order_to_hold_type(p_order *models.Ord
 }
 
 // 检查仓库是否有订单中的所有商品数量的库存。这里的有货就理解成这个仓库有订单的所有的商品；这里的缺货也理解成是，没有一个仓库能凑齐所有商品的所有数量。同时返回订单的商品总成本
-func check_stock_has_order_products(p_ol *OrderLogisticsService, stock_id int64, p_order_logistics_data *order_logistics_data_t) (has_return bool, cost_amount_return float64) {
+func check_stock_has_order_products_and_get_cost_amount(p_ol *OrderLogisticsService, stock_id int64, p_order_logistics_data *order_logistics_data_t) (has_return bool, cost_amount_return float64) {
 	var products_stock_qty_list = p_order_logistics_data.products_stock_qty_list //库存为零的也包含，只要有记录的都会包含，可以从里面取得仓库的成本价，就算库存为零也能取得成本价
 	var order_product_info_list = p_order_logistics_data.order_product_info_list //保存物流的时候要从这里面取 澳仓成本 cost_price
 
