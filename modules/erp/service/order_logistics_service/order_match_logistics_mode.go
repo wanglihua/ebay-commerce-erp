@@ -93,7 +93,16 @@ func (p_ol *OrderLogisticsService) match_logistics_mode_with_option(p_order *mod
 		mode_result.order_id = p_order.Id
 		mode_result.order_code = p_order.Code
 		mode_result.address_id = p_order_logistics_data.order_shipping_address.Id
+		mode_result.address = p_order_logistics_data.order_shipping_address
 		mode_result.company_id = logistics_mode.CompanyId
+
+		for _, company := range p_ol.logistics_company_list {
+			if company.Id == logistics_mode.CompanyId {
+				mode_result.company = company
+				break
+			}
+		}
+
 		mode_result.stock_id = logistics_mode.StockId
 		mode_result.has_stock = true
 
@@ -367,6 +376,7 @@ func (p_ol *OrderLogisticsService) match_logistics_mode_with_option(p_order *mod
 		}
 
 		mode_result.fee_rate_id = 0
+		mode_result.fee_rate = models.LogisticsFeeRateInfo{}
 		var total_fee_in_fee_rate float64 = 10000000 //非超重部分的费用，初始为一个很大的不可能的数字， 澳币
 		for _, logistics_fee_rate := range logistics_fee_rate_list {
 
@@ -422,6 +432,7 @@ func (p_ol *OrderLogisticsService) match_logistics_mode_with_option(p_order *mod
 					mt.PrintlnIndent(1, "之前没有匹配的费率，或当前费率比之前匹配的费率更优，暂时选用当前费率计算结果")
 					total_fee_in_fee_rate = fee
 					mode_result.fee_rate_id = logistics_fee_rate.Id
+					mode_result.fee_rate = logistics_fee_rate
 				} else {
 					mt.PrintlnIndent(1, "之前匹配的费率，比当前费率更优，弃用当前费率计算结果")
 				}
