@@ -43,7 +43,6 @@ FROM erp_order_logistics_match_debug md
     INNER JOIN erp_logistics_mode lm ON lm.id = md.mode_id
     LEFT JOIN erp_logistics_fee_rate lfr ON lfr.id = md.fee_rate_id
 WHERE md.order_code = '2053968244015'
-	 */
 
 	var sb = core.NewSqlBuilder()
 	sb.Select("md.*, s.*, osa.*, lc.*, lm.*, lfr.*")
@@ -66,10 +65,28 @@ WHERE md.order_code = '2053968244015'
 	} else {
 		sb.OrderBy("md.id ASC")
 	}
+	*/
+
+	var sb = core.NewSqlBuilder()
+	sb.Select("id, order_code, address_postal_code, stock_name, company_name, mode_name, fee_rate_post_code, total_fee, total_cost, match_result, create_time")
+	sb.Count("count(id) as match_debug_count")
+	sb.From(`erp_order_logistics_match_debug`)
+
+	if order_code_query != "" {
+		filter = core.SqlAnd(filter, fmt.Sprintf("order_code = '%s'", order_code_query))
+	}
+
+	sb.Where(filter)
+
+	if order != "" {
+		sb.OrderBy(order)
+	} else {
+		sb.OrderBy("id ASC")
+	}
 
 	sb.Limit(offset, limit)
 
-	order_logistics_match_debug_list := make([]logistics_match_debug_view_item_t, 0, limit)
+	order_logistics_match_debug_list := make([]models.OrderLogisticsMatchDebugInfo, 0, limit)
 	err := db_session.Sql(sb.SqlList()).Find(&order_logistics_match_debug_list)
 	core.HandleError(err)
 
