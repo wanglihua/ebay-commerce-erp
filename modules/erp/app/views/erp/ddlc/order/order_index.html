@@ -949,7 +949,7 @@
                     LODOP.SET_PRINT_STYLE("FontSize", "6");
                     for (var i = 0; i < waybill_list.length; i++) {
                         LODOP.NewPage();
-                        LODOP.ADD_PRINT_HTM(0, "1mm", "RightMargin:0", "BottomMargin:0", $(waybill_list[i]).html());
+                        LODOP.ADD_PRINT_HTM("1mm", "2mm", "RightMargin:0", "BottomMargin:0", $(waybill_list[i]).html());
                         //LODOP.ADD_PRINT_IMAGE (10,10,300,160,"<img src='http://l/barcode/waybill?code=123456789' style='height:0.7cm; width:3.5cm;'/>");
                         LODOP.ADD_PRINT_BARCODE("0.2cm", "4.8cm", "5.1cm", "1cm", "128Auto", $(waybill_list[i]).find(".order_code").val())
                     }
