@@ -333,7 +333,7 @@ func (p_ol *OrderLogisticsService) CalculateListWithOption(order_list []models.O
 
 		if match_option.Unlock_express == false {
 			// 15 判断是否是快递
-			if p_ol.hold_check_express(&order, db_session) {
+			if p_ol.hold_check_express(&order, p_order_logistics_data, db_session) {
 				//移除刚刚匹配的物流方式
 				//remove_order_logistics(order, db_session) //要禁用，否则会出错
 				continue

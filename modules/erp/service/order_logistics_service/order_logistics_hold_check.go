@@ -326,20 +326,25 @@ func (p_ol *OrderLogisticsService) match_envelope_fee_rate(p_order *models.Order
 }
 
 // 15 快递类。需要在基础设置里面有 收到快递费金额的设置功能，比如收到的运费高于什么金额，视为快递。否则就算收了快递费也视为普通包裹
-func (p_ol *OrderLogisticsService) hold_check_express(p_order *models.OrderInfo, db_session *xorm.Session) (is_hold_return bool) {
+func (p_ol *OrderLogisticsService) hold_check_express(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, db_session *xorm.Session) (is_hold_return bool) {
 	// 系统没有设置快递的最小运费
 	if p_ol.logistics_setting.MinExpressFee == 0 {
 		revel.ERROR.Println("系统没有设置快递的最小运费！")
 		return false
 	}
 
-	// todo 快递的物流信息保存有点复杂，一个可以是通过匹配物流得到的快递Hold，一个可以是单纯的Hold住的快递Hold。
+	// 快递的物流信息保存有点复杂，一个可以是通过匹配物流得到的快递Hold，一个可以是单纯的Hold住的快递Hold。\
+	// 其实通过匹配物流得到的快递Hold，不会走这个方法这里的，是直接把状态设置成为  models.ORDER_HOLD_TYPE_EXPRESS 的
 
 	// 这里假定都是澳币
 	if p_order.ExpressFee >= p_ol.logistics_setting.MinExpressFee {
 		p_ol.update_order_to_hold_type(p_order, models.ORDER_HOLD_TYPE_EXPRESS, db_session)
 
 		//设置发货仓库为墨尔本仓库
+
+		save_special_hold_order_logistics(p_ol, p_order, p_order_logistics_data, 0, 0, db_session)
+
+		/*
 		var order_logistics models.OrderLogisticsInfo
 		has, err := db_session.Where("order_id = ?", p_order.Id).Get(&order_logistics)
 		core.HandleError(err)
@@ -357,6 +362,7 @@ func (p_ol *OrderLogisticsService) hold_check_express(p_order *models.OrderInfo,
 		p_order.StockId = p_ol.mel_stock_id
 		_, err = db_session.Id(p_order.Id).Cols("stock_id").Update(p_order)
 		core.HandleError(err)
+		*/
 
 		return true
 	}
