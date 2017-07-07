@@ -14,6 +14,7 @@ type match_logistics_mode_result struct {
 	mode_id       int64
 	mode          models.LogisticsModeInfo
 	fee_rate_id   int64
+	fee_rate      models.LogisticsFeeRateInfo
 	length        float64
 	width         float64
 	height        float64
