@@ -315,6 +315,8 @@ func (p_ol *OrderLogisticsService) match_envelope_fee_rate(p_order *models.Order
 
 		if final_fee_rate_id != 0 {
 			save_special_hold_order_logistics(p_ol, p_order, p_order_logistics_data, final_fee_rate_id, final_fee, db_session)
+		} else {
+			save_special_hold_order_logistics(p_ol, p_order, p_order_logistics_data, 0, 0, db_session)
 		}
 
 		return true
@@ -330,6 +332,8 @@ func (p_ol *OrderLogisticsService) hold_check_express(p_order *models.OrderInfo,
 		revel.ERROR.Println("系统没有设置快递的最小运费！")
 		return false
 	}
+
+	// todo 快递的物流信息保存有点复杂，一个可以是通过匹配物流得到的快递Hold，一个可以是单纯的Hold住的快递Hold。
 
 	// 这里假定都是澳币
 	if p_order.ExpressFee >= p_ol.logistics_setting.MinExpressFee {
@@ -372,6 +376,7 @@ func (p_ol *OrderLogisticsService) hold_check_international(p_order *models.Orde
 		p_ol.update_order_to_hold_type(p_order, models.ORDER_HOLD_TYPE_INTERNATIONAL, db_session)
 
 		//设置发货仓库为墨尔本仓库
+		/*
 		var order_logistics models.OrderLogisticsInfo
 		has, err := db_session.Where("order_id = ?", p_order.Id).Get(&order_logistics)
 		core.HandleError(err)
@@ -389,6 +394,9 @@ func (p_ol *OrderLogisticsService) hold_check_international(p_order *models.Orde
 		p_order.StockId = p_ol.mel_stock_id
 		_, err = db_session.Id(p_order.Id).Cols("stock_id").Update(p_order)
 		core.HandleError(err)
+		*/
+
+		save_special_hold_order_logistics(p_ol, p_order, p_order_logistics_data, 0, 0, db_session)
 
 		return true
 	}
