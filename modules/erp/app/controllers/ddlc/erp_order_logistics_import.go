@@ -10,6 +10,7 @@ import (
 	"matrix/core"
 	"matrix/modules/erp/models"
 	"github.com/go-xorm/xorm"
+	"matrix/modules/erp/service/order_history_service"
 )
 
 type ErpOrderLogisticsImport struct {
@@ -282,11 +283,19 @@ func (c ErpOrderLogisticsImport) ImportActualFee() revel.Result {
 		})
 	}
 
+	var login_user = core.GetLoginUser(c.Session)
+
 	for _, order_import := range actual_fee_import_list {
 		var order_logistics = order_import.order_logistics
 		order_logistics.ActualFee = order_import.ActualFee
 		_, err := db_session.Id(order_logistics.Id).Cols("actual_fee").Update(&order_logistics)
 		core.HandleError(err)
+
+		var order models.OrderInfo
+		_, err = db_session.Id(order_logistics.OrderId).Get(&order)
+		core.HandleError(err)
+
+		order_history_service.Insert_order_history(order, fmt.Sprintf("导入实际运费：%f，工号：%s", order_import.ActualFee, login_user.LoginName), db_session)
 	}
 
 	return c.RenderJson(map[string]interface{}{
