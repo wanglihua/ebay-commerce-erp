@@ -143,4 +143,9 @@ func save_special_hold_order_logistics(p_ol *OrderLogisticsService, p_order *mod
 	var update_col_list = []string{"stock_id", "address_id", "company_id", "mode_id"}
 	_, err = db_session.Id(p_order.Id).Cols(update_col_list...).Update(p_order)
 	core.HandleError(err)
+
+	var product_info_list = p_order_logistics_data.order_product_info_list
+	for _, product_info := range product_info_list {
+		p_ol.pending_keeper.add(order_logistics.StockId, product_info.ProductId, product_info.Qty)
+	}
 }
