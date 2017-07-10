@@ -546,8 +546,7 @@ WHERE st.stock_type_id = %d AND nvt.product_id = %d LIMIT 1;`
 		for index, order_import := range order_import_same_code_list {
 			order_import_same_code_list[index].price_au = ((order_import.cost_price * (float64(order_import.Spsl)) / cost_price_total) * order_import.Skje) / float64(order_import.Spsl)
 			order_import_same_code_list[index].price_rmb = order_import_same_code_list[index].price_au * aud_exchange_rate_setting
-			order_import_same_code_list[index].gross_profit = (order_import_same_code_list[index].price_rmb - order_import_same_code_list[index].cost_price) *
-				float64(order_import.Spsl)
+			order_import_same_code_list[index].gross_profit = (order_import_same_code_list[index].price_rmb - order_import_same_code_list[index].cost_price) * float64(order_import.Spsl)
 		}
 	}
 

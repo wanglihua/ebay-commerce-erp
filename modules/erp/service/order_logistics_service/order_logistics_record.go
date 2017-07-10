@@ -148,4 +148,24 @@ func save_special_hold_order_logistics(p_ol *OrderLogisticsService, p_order *mod
 	for _, product_info := range product_info_list {
 		p_ol.pending_keeper.add(order_logistics.StockId, product_info.ProductId, product_info.Qty)
 	}
+
+	// 保存成本价和分配利润
+	var order_profit = order_service.CalculateOrderProfit(p_order, &order_logistics)
+	var cost_price_total float64 = 0
+	// var product_info_list = p_order_logistics_data.order_product_info_list
+	for _, product_info := range product_info_list {
+		cost_price_total = cost_price_total + product_info.CostPrice
+	}
+
+	if cost_price_total != 0 {
+		for _, product_info := range product_info_list {
+			var item_profit = product_info.CostPrice * order_profit / cost_price_total
+
+			var order_item models.OrderItemInfo
+			order_item.CostPrice = product_info.CostPrice
+			order_item.GrossProfit = item_profit
+			_, err = db_session.Id(product_info.ItemId).Cols("cost_price", "gross_profit").Update(&order_item)
+			core.HandleError(err)
+		}
+	}
 }
