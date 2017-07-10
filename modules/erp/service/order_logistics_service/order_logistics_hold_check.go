@@ -306,7 +306,7 @@ func (p_ol *OrderLogisticsService) match_envelope_fee_rate(p_order *models.Order
 			fee_rate_width = envelope_side_length_slice[1]
 			fee_rate_height = envelope_side_length_slice[0] // 最短
 
-			if whole_length < fee_rate_length && whole_width < fee_rate_width && whole_height < fee_rate_height && whole_weight < fee_rate_weight {
+			if whole_length <= fee_rate_length && whole_width <= fee_rate_width && whole_height <= fee_rate_height && whole_weight <= fee_rate_weight {
 				final_fee = envelope_fee_rate.Fee
 				final_fee_rate_id = envelope_fee_rate.Id
 				break
