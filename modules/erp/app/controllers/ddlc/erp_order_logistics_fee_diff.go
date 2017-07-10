@@ -35,6 +35,7 @@ const (
 	FEE_DIFF_ACTUAL_FEE_GREATER int64 = 100
 	FEE_DIFF_ACTUAL_FEE_SMALLER int64 = 200
 	FEE_DIFF_ACTUAL_FEE_EQUAL   int64 = 300
+	FEE_DIFF_ACTUAL_FEE_MISS    int64 = 400
 )
 
 type fee_diff_type_t struct {
@@ -60,6 +61,7 @@ func (c ErpOrderLogisticsFeeDiff) PageData() revel.Result {
 	fee_diff_type_list = append(fee_diff_type_list, fee_diff_type_t{Code: FEE_DIFF_ACTUAL_FEE_GREATER, Name: "实际费用大于预估"})
 	fee_diff_type_list = append(fee_diff_type_list, fee_diff_type_t{Code: FEE_DIFF_ACTUAL_FEE_SMALLER, Name: "实际费用小于预估"})
 	fee_diff_type_list = append(fee_diff_type_list, fee_diff_type_t{Code: FEE_DIFF_ACTUAL_FEE_EQUAL, Name: "实际费用等于预估"})
+	fee_diff_type_list = append(fee_diff_type_list, fee_diff_type_t{Code: FEE_DIFF_ACTUAL_FEE_MISS, Name: "实际费用未导入"})
 
 	return c.RenderJson(map[string]interface{}{
 		"stock_id":               0,
@@ -433,9 +435,11 @@ WHERE ol.stock_id = 0 AND ol.company_id = 0
 		if fee_diff_type_code == FEE_DIFF_ACTUAL_FEE_GREATER {
 			filter = core.SqlAnd(filter, "ol.actual_fee > ol.total_fee")
 		} else if fee_diff_type_code == FEE_DIFF_ACTUAL_FEE_SMALLER {
-			filter = core.SqlAnd(filter, "ol.actual_fee < ol.total_fee")
+			filter = core.SqlAnd(filter, "ol.actual_fee < ol.total_fee AND ol.actual_fee <> 0")
 		} else if fee_diff_type_code == FEE_DIFF_ACTUAL_FEE_EQUAL {
-			filter = core.SqlAnd(filter, "ol.actual_fee = ol.total_fee")
+			filter = core.SqlAnd(filter, "ol.actual_fee = ol.total_fee AND ol.actual_fee <> 0")
+		} else if fee_diff_type_code == FEE_DIFF_ACTUAL_FEE_MISS {
+			filter = core.SqlAnd(filter, "ol.actual_fee = 0")
 		}
 	}
 
