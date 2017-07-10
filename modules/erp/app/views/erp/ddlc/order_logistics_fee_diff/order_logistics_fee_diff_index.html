@@ -68,10 +68,10 @@
                                         <option :value="batch_code">{{batch_code}}</option>
                                     </template>
                                 </select>
-                                <label class="control-label no-padding-right" for="begin_time_query">开始时间</label>
-                                <input class="input-sm" id="begin_time_query" name="begin_time_query" placeholder="开始时间查询" type="text" v-model="page.begin_time_query" style="width: 130px;"/>
-                                <label class="control-label no-padding-right" for="end_time_query">结束时间</label>
-                                <input class="input-sm" id="end_time_query" name="end_time_query" placeholder="结束时间查询" type="text" v-model="page.end_time_query" style="width: 130px;"/>
+                                <label class="control-label no-padding-right" for="begin_time_query">时间开始</label>
+                                <input class="input-sm" id="begin_time_query" name="begin_time_query" placeholder="支付时间开始" type="text" v-model="page.begin_time_query" style="width: 130px;"/>
+                                <label class="control-label no-padding-right" for="end_time_query">时间结束</label>
+                                <input class="input-sm" id="end_time_query" name="end_time_query" placeholder="支付时间结束" type="text" v-model="page.end_time_query" style="width: 130px;"/>
                                 <select id="fee_diff_type_code" name="page.fee_diff_type_code" v-model.number="page.fee_diff_type_code" style="width: 120px;" @change="refreshList()">
                                     <option :value="0">-费用偏差类别-</option>
                                     <template v-for="fee_diff_type in page.fee_diff_type_list">
@@ -150,7 +150,7 @@
                 '#orderLogisticsList',
                 {
                     "sAjaxSource": '{%url "ErpOrderLogisticsFeeDiff.ListData"%}',
-                    "aaSorting": [[1, "asc"]],
+                    "aaSorting": [[0, "desc"]],
                     "aoColumns": [
                         {
                             "mDataProp": "ol.id",
