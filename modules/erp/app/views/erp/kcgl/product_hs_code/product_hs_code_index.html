@@ -206,22 +206,25 @@
                             }
                         },
                         {"mDataProp": "p.sku", "title": "商品SKU", "bSearchable": true, "width": 150},
-                        {"mDataProp": "p.cn_name", "title": "商品名称", "bSearchable": true},
                         {
-                            "mDataProp": "p.cn_hs_code", "title": "中国海关编码", "bSearchable": false, "width": 80,
+                            "mDataProp": "p.cn_name", "title": "商品名称", "bSearchable": true, "sClass": "wrap-word",
+                            "render": function (data, type, row) {
+                                return '<div>' + data + '</div>';
+                            }
+                        },
+                        {
+                            "mDataProp": "p.cn_hs_code", "title": "中国海关编码", "bSearchable": false, "width": 150,
                             "render": function (data, type, row) {
                                 return data;
                             }
                         },
                         {
-                            "mDataProp": "p.au_hs_code", "title": "澳洲海关编码", "bSearchable": false, "width": 80,
+                            "mDataProp": "p.au_hs_code", "title": "澳洲海关编码", "bSearchable": false, "width": 150,
                             "render": function (data, type, row) {
                                 return data;
                             }
                         },
-                        {"mDataProp": "s.name", "title": "状态", "bSearchable": true, "width": 80},
-                        {"mDataProp": "p.create_time", "title": "创建时间", "bSearchable": false, "width": 120},
-                        {"mDataProp": "p.update_time", "title": "修改时间", "bSearchable": false, "width": 120}
+                        {"mDataProp": "s.name", "title": "状态", "bSearchable": true, "width": 80}
                     ],
                     "fnServerData": function (sSource, aoData, fnCallback) {
                         showMask("数据加载中，请稍候");
@@ -284,17 +287,11 @@
                 showMask("提交中...");
                 var form = $("#productDetailForm");
                 var valid = validate(form, {
-                    'detail.product.length': {
-                        required: false, number: true
+                    'detail.product.cn_hs_code': {
+                        required: false
                     },
-                    'detail.product.width': {
-                        required: false, number: true
-                    },
-                    'detail.product.height': {
-                        required: false, number: true
-                    },
-                    'detail.product.weight': {
-                        required: false, number: true
+                    'detail.product.au_hs_code': {
+                        required: false
                     }
                 });
 
@@ -333,4 +330,3 @@
     });
 </script>
 {%footer%}
-
