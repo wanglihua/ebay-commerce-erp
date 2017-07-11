@@ -119,7 +119,6 @@ func save_special_hold_order_logistics(p_ol *OrderLogisticsService, p_order *mod
 	order_logistics.Weight = whole_weight
 	order_logistics.DimWeight = 0
 	order_logistics.Sfkltjz = 0
-	order_logistics.Weight = whole_weight
 	order_logistics.Sfkltjz = 0
 	order_logistics.TotalFee = total_fee
 	order_logistics.PickFee = pick_fee_service.Get_product_pick_fee(whole_weight, p_ol.pick_fee_setting)
