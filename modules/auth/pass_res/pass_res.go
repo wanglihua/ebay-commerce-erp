@@ -92,4 +92,5 @@ const (
 
 	// 海关报关
 	HGBG_PRODUCT_HS_CODE = 160100 // 商品海关编码
+	HGBG_HS_CODE_AU_DUTY = 160200 // 澳洲海关编码
 )

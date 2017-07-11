@@ -206,8 +206,8 @@ POST /inventory/import/inventory/price           ErpInventory.ImportInventoryPri
 POST /inventory/export/inventory/price           ErpInventory.ExportInventoryPrice
 POST /inventory/import/inventory/quantity/diff   ErpInventory.ImportInventoryQuantityDiff
 
-POST /erp/inventory/history                    ErpInventoryHistory.Index
-POST /erp/inventory/history/data/list          ErpInventoryHistory.ListData
+POST /inventory/history                    ErpInventoryHistory.Index
+POST /inventory/history/data/list          ErpInventoryHistory.ListData
 
 GET  /stock/bill/checkin                   ErpStockBillCheckin.Index
 POST /stock/bill/checkin/data/list         ErpStockBillCheckin.ListData
@@ -477,14 +477,22 @@ POST /order/hold/type/data/list          ErpOrderHoldType.ListData
 POST /order/hold/type/data/detail        ErpOrderHoldType.DetailData
 POST /order/hold/type/save               ErpOrderHoldType.Save
 
-GET  /erp/order/tag                    ErpOrderTag.Index
-POST /erp/order/tag/data/list          ErpOrderTag.ListData
-POST /erp/order/tag/data/detail        ErpOrderTag.DetailData
-POST /erp/order/tag/save               ErpOrderTag.Save
-POST /erp/order/tag/delete             ErpOrderTag.Delete
-POST /erp/order/tag/apply              ErpOrderTag.ApplyTag
+GET  /order/tag                    ErpOrderTag.Index
+POST /order/tag/data/list          ErpOrderTag.ListData
+POST /order/tag/data/detail        ErpOrderTag.DetailData
+POST /order/tag/save               ErpOrderTag.Save
+POST /order/tag/delete             ErpOrderTag.Delete
+POST /order/tag/apply              ErpOrderTag.ApplyTag
 
 POST /order/simple/detail                ErpOrderSimpleDetail.Index
 
 # 这个通用的路由应该放到最后比较合适，否则放在他后面的有的路由会不工作
 GET  /order/:status                        ErpOrder.Index
+
+GET  /hs/code/au                    ErpHsCodeAuDuty.Index
+POST /hs/code/au/data/list          ErpHsCodeAuDuty.ListData
+POST /hs/code/au/data/detail        ErpHsCodeAuDuty.DetailData
+POST /hs/code/au/save               ErpHsCodeAuDuty.Save
+POST /hs/code/au/delete             ErpHsCodeAuDuty.Delete
+
+

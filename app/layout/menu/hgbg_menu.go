@@ -45,6 +45,28 @@ func GetHgbgMenu(res_id_map map[int64]bool, web_session revel.Session) string {
         </li>`)
 	}
 
+	if check_pass_res_menu(pass_res.HGBG_HS_CODE_AU_DUTY) {
+		buffer.WriteString(`<li id="hgbg-hs-code-au-duty-menu" class="">
+            <a href="/hs/code/au">
+                <i class="menu-icon fa fa-caret-right"></i>
+                澳洲海关编码
+            </a>
+            <b class="arrow"></b>
+        </li>`)
+	}
+
+
+
+	/*
+        <li id="hgbg-hs-code-au-duty-menu" class="">
+            <a href="/hs/code/au">
+                <i class="menu-icon fa fa-caret-right"></i>
+                澳洲海关编码
+            </a>
+            <b class="arrow"></b>
+        </li>
+	 */
+
 	buffer.WriteString(`</ul>
 </li>
 `)

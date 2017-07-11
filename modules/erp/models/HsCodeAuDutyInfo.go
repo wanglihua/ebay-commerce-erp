@@ -6,7 +6,7 @@ import (
 
 type HsCodeAuDutyInfo struct {
 	Id         int64     `xorm:"bigint notnull pk autoincr 'id'" json:"id"`
-	HsCode     string    `xorm:"nvarchar(100) notnull index" json:"hs_code" smith:"verbose_name=海关编码,min=1,max=10"`
+	HsCode     string    `xorm:"nvarchar(100) notnull index 'hs_code'" json:"hs_code" smith:"verbose_name=海关编码,min=1,max=10"`
 	CnName     string    `xorm:"nvarchar(200) notnull 'cn_name'" json:"cn_name" smith:"verbose_name=中文品名"`
 	EnName     string    `xorm:"nvarchar(200) notnull 'en_name'" json:"en_name" smith:"verbose_name=英文品名"`
 	DutyRate   float64   `xorm:"decimal(18,6) notnull 'duty_rate'" json:"duty_rate" smith:"verbose_name=关税税率"`
