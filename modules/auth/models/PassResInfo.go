@@ -248,7 +248,7 @@ func (e PassResInfo) InitData(db_session *xorm.Session) {
 		db_session.Insert(pass)
 
 		pass = new(PassResInfo)
-		pass.Id = pass_res.KCGL_PRODUCT_HS_CODE
+		pass.Id = pass_res.HGBG_PRODUCT_HS_CODE
 		pass.CateId = pass_res_cate.KCGL
 		pass.Name = "商品海关编码"
 		pass.Desc = core.MakeNullString("商品海关编码", true)

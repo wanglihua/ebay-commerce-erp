@@ -17,13 +17,13 @@ type ErpProductHsCode struct {
 }
 
 func (c ErpProductHsCode) Index() revel.Result {
-	pass_service.Check_login_user_pass(pass_res.KCGL_PRODUCT_HS_CODE, c.Session)
+	pass_service.Check_login_user_pass(pass_res.HGBG_PRODUCT_HS_CODE, c.Session)
 
-	return c.RenderTemplate("erp/kcgl/product_hs_code/product_hs_code_index.html")
+	return c.RenderTemplate("erp/hgbg/product_hs_code/product_hs_code_index.html")
 }
 
 func (c ErpProductHsCode) ListData() revel.Result {
-	pass_service.Check_login_user_pass(pass_res.KCGL_PRODUCT_HS_CODE, c.Session)
+	pass_service.Check_login_user_pass(pass_res.HGBG_PRODUCT_HS_CODE, c.Session)
 
 	db_session := c.DbSession
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
@@ -85,7 +85,7 @@ type product_hs_code_detail_form_t struct {
 }
 
 func (c ErpProductHsCode) DetailData() revel.Result {
-	pass_service.Check_login_user_pass(pass_res.KCGL_PRODUCT_HS_CODE, c.Session)
+	pass_service.Check_login_user_pass(pass_res.HGBG_PRODUCT_HS_CODE, c.Session)
 
 	db_session := c.DbSession
 
@@ -103,7 +103,7 @@ func (c ErpProductHsCode) DetailData() revel.Result {
 }
 
 func (c ErpProductHsCode) Save() revel.Result {
-	pass_service.Check_login_user_pass(pass_res.KCGL_PRODUCT_HS_CODE, c.Session)
+	pass_service.Check_login_user_pass(pass_res.HGBG_PRODUCT_HS_CODE, c.Session)
 
 	db_session := c.DbSession
 
@@ -144,7 +144,7 @@ func (c ErpProductHsCode) Save() revel.Result {
 }
 
 func (c ErpProductHsCode) Import() revel.Result {
-	pass_service.Check_login_user_pass(pass_res.KCGL_PRODUCT_HS_CODE, c.Session)
+	pass_service.Check_login_user_pass(pass_res.HGBG_PRODUCT_HS_CODE, c.Session)
 
 	db_session := c.DbSession
 

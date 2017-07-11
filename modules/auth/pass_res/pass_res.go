@@ -14,6 +14,8 @@ const (
 	// 订单配置  模块编号 12
 	// 订单流程  模块编号 13
 	// 库存管理  模块编号 14
+	// 商品配置  模块编号 15
+	// 海关报关  模块编号 16
 
 	// 采购管理
 
@@ -75,7 +77,6 @@ const (
 	KCGL_PRODUCT_QUALITY_FEEDBACK = 140900 // 商品质量反
 	KCGL_STOCKBILL_CHECKIN        = 141000 // 手工入库
 	KCGL_STOCKBILL_CHECKOUT       = 141100 // 手工出库
-	KCGL_PRODUCT_HS_CODE          = 141200 // 商品海关编码
 
 	// 商品配置 模块编号 15
 	SPPZ_PRODUCT_BATCH      = 150100 // 商品批量修改
@@ -88,4 +89,7 @@ const (
 	SPPZ_SUPPLIER           = 150800 // 供应商
 	SPPZ_PRODUCT_STATUS     = 150900 // 商品状态
 	SPPZ_SEA_CONTAINER_COST = 151000 // 商品状态
+
+	// 海关报关
+	HGBG_PRODUCT_HS_CODE          = 160100 // 商品海关编码
 )

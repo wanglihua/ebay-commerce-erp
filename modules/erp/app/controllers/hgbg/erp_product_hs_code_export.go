@@ -19,7 +19,7 @@ type ErpProductHsCodeExport struct {
 }
 
 func (c ErpProductHsCodeExport) Export() revel.Result {
-	pass_service.Check_login_user_pass(pass_res.KCGL_PRODUCT_HS_CODE, c.Session)
+	pass_service.Check_login_user_pass(pass_res.HGBG_PRODUCT_HS_CODE, c.Session)
 
 	db_session := c.DbSession
 

@@ -55,7 +55,9 @@ func GetKcglMenu(res_id_map map[int64]bool, web_session revel.Session) string {
         </li>`)
 	}
 
-	if check_pass_res_menu(pass_res.KCGL_PRODUCT_HS_CODE) {
+	/*
+	完成测试，暂时先放着
+	if check_pass_res_menu(pass_res.HGBG_PRODUCT_HS_CODE) {
 		buffer.WriteString(`<li id="kcgl-product-hs-code-menu" class="">
             <a href="/product/hs/code">
                 <i class="menu-icon fa fa-caret-right"></i>
@@ -64,6 +66,7 @@ func GetKcglMenu(res_id_map map[int64]bool, web_session revel.Session) string {
             <b class="arrow"></b>
         </li>`)
 	}
+	*/
 
 	if check_pass_res_menu(pass_res.KCGL_PRODUCT_BIND) {
 		buffer.WriteString(`<li id="kcgl-productbind-menu" class="">
