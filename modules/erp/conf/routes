@@ -136,7 +136,7 @@ GET  /product/weight                       ErpProductWeight.Index
 POST /product/weight/data/list             ErpProductWeight.ListData
 POST /product/weight/data/detail           ErpProductWeight.DetailData
 POST /product/weight/save                  ErpProductWeight.Save
-POST /product/import                       ErpProductWeight.Import
+POST /product/weight/import                ErpProductWeight.Import
 
 POST /product/weight/export                ErpProductWeightExport.Export
 

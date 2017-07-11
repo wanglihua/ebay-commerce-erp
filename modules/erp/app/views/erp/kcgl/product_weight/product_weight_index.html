@@ -41,7 +41,7 @@
                         导出
                     </button>
                     <div style="margin-top: 10px;">
-                        <a href="/static/excel-template/product_length_width_height_weight_import.xlsx">下载商品导入Excel模板</a>
+                        <a href="/static/excel-template/product_length_width_height_weight_import.xlsx">下载商品长宽高重量导入Excel模板</a>
                     </div>
                 </div>
                 <div>
@@ -79,7 +79,7 @@
                                         <div class="form-group">
                                             <label for="cn_name" class="col-xs-2 control-label">商品名称</label>
                                             <div class="col-xs-10">
-                                                <input id="cn_name" name="detail.product.cn_name" type="text" class="input-sm form-control" disabled="disabled" v-model.number="detail.product.cn_name"/>
+                                                <input id="cn_name" name="detail.product.cn_name" type="text" class="input-sm form-control" disabled="disabled" v-model="detail.product.cn_name"/>
                                             </div>
                                         </div>
                                     </div>
@@ -314,7 +314,7 @@
             },
             showProductDetail: function (product_id) {
                 showMask("加载中...");
-                $("#exchangeRateDetailForm").clearValidation();
+                $("#productDetailDialog").clearValidation();
                 $.ajax({
                         url: '{%url "ErpProductWeight.DetailData" %}',
                         type: "POST",

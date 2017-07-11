@@ -21,6 +21,8 @@ type ProductInfo struct {
 	Height     float64         `xorm:"float notnull 'height'" json:"height" smith:"verbose_name=高度,min=0"`          //cm
 	Weight     float64         `xorm:"float notnull 'weight'" json:"weight" smith:"verbose_name=重量,min=0"`          //kg
 	BatchCode  int64           `xorm:"bigint null index 'batch_code'" json:"batch_code" smith:"verbose_name=导入批次号"` //导入的批次号
+	CnHsCode   string          `xorm:"nvarchar(100) notnull index 'cn_hs_code'" json:"cn_hs_code" smith:"verbose_name=中国海关编码,min=1,max=10"`
+	AuHsCode   string          `xorm:"nvarchar(100) notnull index 'au_hs_code'" json:"au_hs_code" smith:"verbose_name=澳洲海关编码,min=1,max=8"`
 	CreateTime core.Time       `xorm:"created notnull 'create_time'" json:"create_time"`
 	UpdateTime core.Time       `xorm:"updated notnull 'update_time'" json:"update_time"`
 }

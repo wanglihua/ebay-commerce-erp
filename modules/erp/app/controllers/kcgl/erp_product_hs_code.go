@@ -1,0 +1,268 @@
+package controllers
+
+import (
+	"github.com/revel/revel"
+	"matrix/modules/auth/service/pass_service"
+	"matrix/modules/auth/pass_res"
+	"fmt"
+	"encoding/json"
+	"github.com/tealeg/xlsx"
+	"strings"
+	"matrix/core"
+	"matrix/modules/erp/models"
+)
+
+type ErpProductHsCode struct {
+	*revel.Controller
+}
+
+func (c ErpProductHsCode) Index() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_PRODUCT_HS_CODE, c.Session)
+
+	return c.RenderTemplate("erp/kcgl/product_hs_code/product_hs_code_index.html")
+}
+
+func (c ErpProductHsCode) ListData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_PRODUCT_HS_CODE, c.Session)
+
+	db_session := c.DbSession
+	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
+
+	var filter_type int64
+	c.Params.Bind(&filter_type, "filter_type")
+
+	type product_weight_view_item_t struct {
+		Product models.ProductInfo `xorm:"extends" json:"p"`
+		Status  models.StatusInfo  `xorm:"extends" json:"s"`
+	}
+
+	/*
+		SELECT p.*, s.*
+		FROM erp_product p
+		    INNER JOIN erp_status s ON s.id = p.status_id
+	 */
+
+	sb := core.NewSqlBuilder()
+	sb.Select("p.*, s.*")
+	sb.Count("count(p.id) AS product_count")
+	sb.From(`erp_product p
+		    INNER JOIN erp_status s ON s.id = p.status_id`)
+
+	if filter_type == 1 { //有零值数据的记录
+		filter_has_zero_data := core.SqlOr("length = 0", "width = 0")
+		filter = core.SqlAnd(filter, filter_has_zero_data)
+	}
+
+	sb.Where(filter)
+
+	if order != "" {
+		sb.OrderBy(order)
+	} else {
+		sb.OrderBy("p.id ASC")
+	}
+
+	sb.Limit(offset, limit)
+
+	var product_list = make([]product_weight_view_item_t, 0, limit)
+	err := db_session.Sql(sb.SqlList()).Find(&product_list)
+	core.HandleError(err)
+
+	type product_count_t struct {
+		Count int64 `xorm:"'product_count'"`
+	}
+	var product_count product_count_t
+	_, err = db_session.Sql(sb.SqlCount()).Get(&product_count)
+	core.HandleError(err)
+
+	return c.RenderJson(core.GridResult{
+		Data:  product_list,
+		Total: product_count.Count,
+	})
+}
+
+type product_hs_code_detail_form_t struct {
+	Product models.ProductInfo `json:"product"`
+}
+
+func (c ErpProductHsCode) DetailData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_PRODUCT_HS_CODE, c.Session)
+
+	db_session := c.DbSession
+
+	var product_id int64
+	c.Params.Bind(&product_id, "id")
+
+	var product models.ProductInfo
+	_, err := db_session.Id(product_id).Get(&product)
+	core.HandleError(err)
+
+	var detail_form product_hs_code_detail_form_t
+	detail_form.Product = product
+
+	return c.RenderJson(detail_form)
+}
+
+func (c ErpProductHsCode) Save() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_PRODUCT_HS_CODE, c.Session)
+
+	db_session := c.DbSession
+
+	var detail_form product_hs_code_detail_form_t
+	err := json.Unmarshal(c.GetRequestBody(), &detail_form)
+	core.HandleError(err)
+
+	var product_id = detail_form.Product.Id
+
+	var product_in_db models.ProductInfo
+	has, err := db_session.Id(product_id).Get(&product_in_db)
+	core.HandleError(err)
+	if has == false {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "商品不存在！",
+		})
+	}
+
+	product_in_db.CnHsCode = detail_form.Product.CnHsCode
+	product_in_db.AuHsCode = detail_form.Product.AuHsCode
+
+	updata_col_List := []string{"cn_hs_code", "au_hs_code"}
+	affected_count, err := db_session.Id(product_id).Cols(updata_col_List...).Update(&product_in_db)
+	core.HandleError(err)
+
+	if affected_count == 0 {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "商品海关编码数据未能更新！",
+		})
+	}
+
+	return c.RenderJson(map[string]interface{}{
+		"success": true,
+		"message": "保存成功！",
+	})
+}
+
+func (c ErpProductHsCode) Import() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_PRODUCT_HS_CODE, c.Session)
+
+	db_session := c.DbSession
+
+	excel_file_bytes := make([]byte, 0)
+	c.Params.Bind(&excel_file_bytes, "excel_file")
+
+	c.Validation.Required(excel_file_bytes).Message("指定文件内容未成功上传！")
+
+	if c.Validation.HasErrors() {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": c.GetValidationErrorMessage(),
+		})
+	}
+
+	type product_hs_code_t struct {
+		sku        string
+		cn_hs_code string
+		au_hs_code string
+	}
+
+	product_hs_code_list := make([]product_hs_code_t, 0)
+
+	xlsx_file, err := xlsx.OpenBinary(excel_file_bytes)
+	core.HandleError(err)
+
+	// 会导入所有 sheets
+	sheet_count := len(xlsx_file.Sheets)
+	//revel.TRACE.Printf("sheet_count: %d\n", sheet_count)
+	for sheet_index := 0; sheet_index < sheet_count; sheet_index ++ {
+		sheet := xlsx_file.Sheets[sheet_index]
+		max_row := sheet.MaxRow
+		//revel.TRACE.Printf("max_row: %d\n", max_row)
+		//略过标题行
+		for row_index := 1; row_index < max_row; row_index ++ {
+			row := sheet.Rows[row_index]
+
+			var cell *xlsx.Cell
+			var cell_val string
+			var err error
+
+			var product_hs_code product_hs_code_t
+
+			col_index := 1 //从第二列开始导入，略去第一列的编号
+
+			if len(row.Cells) < 5 {
+				break
+			}
+
+			//SKU
+			cell = row.Cells[col_index]
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
+			if cell_val == "" {
+				break
+			}
+			//revel.TRACE.Println(cell_val)
+			product_hs_code.sku = cell_val
+			col_index++
+
+			// cn_hs_code
+			cell = row.Cells[col_index]
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
+			product_hs_code.cn_hs_code = cell_val
+			col_index++
+
+			// au_hs_code
+			cell = row.Cells[col_index]
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
+			product_hs_code.au_hs_code = cell_val
+			col_index++
+
+			product_hs_code_list = append(product_hs_code_list, product_hs_code)
+		}
+	}
+
+	if len(product_hs_code_list) == 0 {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "Excel文件中导入商品列表为空！",
+		})
+	}
+
+	has_zero_data := false
+	for _, product_hs_code := range product_hs_code_list {
+		var product models.ProductInfo
+		has, err := db_session.Where(fmt.Sprintf("sku = '%s'", product_hs_code.sku)).Get(&product)
+		core.HandleError(err)
+
+		product.Sku = product_hs_code.sku
+		product.CnHsCode = product_hs_code.cn_hs_code
+		product.AuHsCode = product_hs_code.au_hs_code
+
+		if product_hs_code.cn_hs_code == "" || product_hs_code.au_hs_code == "" {
+			has_zero_data = true
+		}
+
+		if has == true {
+			update_col_list := []string{"length", "width", "height", "weight"}
+			_, err = db_session.Id(product.Id).Cols(update_col_list...).Update(&product)
+			core.HandleError(err)
+		} else {
+			panic(fmt.Sprintf("商品SKU %s 数据库中不存在！", product_hs_code.sku))
+		}
+	}
+
+	message := "数据导入成功！"
+	if has_zero_data == true {
+		message = "数据导入成功, 部分长宽高数据为零！"
+	}
+
+	return c.RenderJson(map[string]interface{}{
+		"success": true,
+		"message": message,
+	})
+}

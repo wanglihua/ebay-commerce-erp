@@ -109,7 +109,7 @@ func (c ErpProductWeightExport) export_product_list_to_excel(db_session *xorm.Se
 	xlsx_file := xlsx.NewFile()
 
 	//添加工作表
-	sheet, err := xlsx_file.AddSheet("商品列表")
+	sheet, err := xlsx_file.AddSheet("商品长宽高重量列表")
 	core.HandleError(err)
 
 	//添加标题行

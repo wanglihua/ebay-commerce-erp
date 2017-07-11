@@ -75,6 +75,7 @@ const (
 	KCGL_PRODUCT_QUALITY_FEEDBACK = 140900 // 商品质量反
 	KCGL_STOCKBILL_CHECKIN        = 141000 // 手工入库
 	KCGL_STOCKBILL_CHECKOUT       = 141100 // 手工出库
+	KCGL_PRODUCT_HS_CODE          = 141200 // 商品海关编码
 
 	// 商品配置 模块编号 15
 	SPPZ_PRODUCT_BATCH      = 150100 // 商品批量修改
