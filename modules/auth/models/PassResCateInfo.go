@@ -85,6 +85,12 @@ func (e PassResCateInfo) InitData(db_session *xorm.Session) {
 	db_session.Insert(cate)
 
 	cate = new(PassResCateInfo)
+	cate.Id = pass_res_cate.HGBG
+	cate.Name = "海关报关"
+	cate.Desc = core.MakeNullString("海关报关", true)
+	db_session.Insert(cate)
+
+	cate = new(PassResCateInfo)
 	cate.Id = pass_res_cate.THGL
 	cate.Name = "退货管理"
 	cate.Desc = core.MakeNullString("退货管理", true)

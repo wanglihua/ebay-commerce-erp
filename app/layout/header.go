@@ -190,6 +190,10 @@ func GetHeader(title string, db_session *xorm.Session, web_session revel.Session
 		header_buffer.WriteString(menu.GetSppzMenu(res_id_map, web_session))
 	}
 
+	if check_pass_cate_menu(pass_res_cate.HGBG) == true {
+		header_buffer.WriteString(menu.GetHgbgMenu(res_id_map, web_session))
+	}
+
 	if check_pass_cate_menu(pass_res_cate.SPBB) == true {
 		header_buffer.WriteString(menu.GetSpbbMenu(res_id_map, web_session))
 	}

@@ -398,6 +398,15 @@ func (e PassResInfo) InitData(db_session *xorm.Session) {
 		db_session.Insert(pass)
 	}
 
+	{
+		pass := new(PassResInfo)
+		pass.Id = pass_res.HGBG_PRODUCT_HS_CODE
+		pass.CateId = pass_res_cate.HGBG
+		pass.Name = "商品海关编码"
+		pass.Desc = core.MakeNullString("商品海关编码", true)
+		db_session.Insert(pass)
+	}
+
 	// 权限管理
 	{
 		pass := new(PassResInfo)
