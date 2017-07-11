@@ -49,7 +49,7 @@ func (c ErpProductHsCode) ListData() revel.Result {
 		    INNER JOIN erp_status s ON s.id = p.status_id`)
 
 	if filter_type == 1 { //有零值数据的记录
-		filter_has_zero_data := core.SqlOr("length = 0", "width = 0")
+		filter_has_zero_data := core.SqlOr("cn_hs_code = ''", "au_hs_code = ''")
 		filter = core.SqlAnd(filter, filter_has_zero_data)
 	}
 
@@ -180,7 +180,7 @@ func (c ErpProductHsCode) Import() revel.Result {
 		//revel.TRACE.Printf("max_row: %d\n", max_row)
 		//略过标题行
 		for row_index := 1; row_index < max_row; row_index ++ {
-			row := sheet.Rows[row_index]
+			//row := sheet.Rows[row_index]
 
 			var cell *xlsx.Cell
 			var cell_val string
@@ -188,14 +188,11 @@ func (c ErpProductHsCode) Import() revel.Result {
 
 			var product_hs_code product_hs_code_t
 
-			col_index := 1 //从第二列开始导入，略去第一列的编号
+			col_index := 0
 
-			if len(row.Cells) < 5 {
-				break
-			}
-
-			//SKU
-			cell = row.Cells[col_index]
+			// SKU
+			// cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
@@ -207,7 +204,8 @@ func (c ErpProductHsCode) Import() revel.Result {
 			col_index++
 
 			// cn_hs_code
-			cell = row.Cells[col_index]
+			// cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
@@ -215,7 +213,8 @@ func (c ErpProductHsCode) Import() revel.Result {
 			col_index++
 
 			// au_hs_code
-			cell = row.Cells[col_index]
+			//cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
@@ -248,7 +247,7 @@ func (c ErpProductHsCode) Import() revel.Result {
 		}
 
 		if has == true {
-			update_col_list := []string{"length", "width", "height", "weight"}
+			update_col_list := []string{"cn_hs_code", "au_hs_code"}
 			_, err = db_session.Id(product.Id).Cols(update_col_list...).Update(&product)
 			core.HandleError(err)
 		} else {
