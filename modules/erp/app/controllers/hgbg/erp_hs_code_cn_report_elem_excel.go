@@ -37,9 +37,23 @@ func (c ErpHsCodeCnReportElemExcel) Import() revel.Result {
 	}
 
 	type product_hs_code_t struct {
-		sku        string
-		cn_hs_code string
-		au_hs_code string
+		hs_code string
+		cn_name string
+		en_name string
+		elem01  string
+		elem02  string
+		elem03  string
+		elem04  string
+		elem05  string
+		elem06  string
+		elem07  string
+		elem08  string
+		elem09  string
+		elem10  string
+		elem11  string
+		elem12  string
+		elem13  string
+		elem14  string
 	}
 
 	product_hs_code_list := make([]product_hs_code_t, 0)

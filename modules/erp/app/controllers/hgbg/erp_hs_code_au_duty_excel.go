@@ -37,14 +37,14 @@ func (c ErpHsCodeAuDutyExcel) Import() revel.Result {
 		})
 	}
 
-	type hs_code_au_t struct {
+	type hs_code_au_import_t struct {
 		hs_code   string
 		cn_name   string
 		en_name   string
 		duty_rate string
 	}
 
-	hs_code_au_list := make([]hs_code_au_t, 0)
+	hs_code_au_import_list := make([]hs_code_au_import_t, 0)
 
 	xlsx_file, err := xlsx.OpenBinary(excel_file_bytes)
 	core.HandleError(err)
@@ -64,7 +64,7 @@ func (c ErpHsCodeAuDutyExcel) Import() revel.Result {
 			var cell_val string
 			var err error
 
-			var hs_code_au hs_code_au_t
+			var hs_code_au hs_code_au_import_t
 
 			col_index := 0
 
@@ -104,11 +104,11 @@ func (c ErpHsCodeAuDutyExcel) Import() revel.Result {
 			hs_code_au.duty_rate = cell_val
 			col_index++
 
-			hs_code_au_list = append(hs_code_au_list, hs_code_au)
+			hs_code_au_import_list = append(hs_code_au_import_list, hs_code_au)
 		}
 	}
 
-	if len(hs_code_au_list) == 0 {
+	if len(hs_code_au_import_list) == 0 {
 		return c.RenderJson(map[string]interface{}{
 			"success": false,
 			"message": "Excel文件中导入海关编码列表为空！",
@@ -117,7 +117,7 @@ func (c ErpHsCodeAuDutyExcel) Import() revel.Result {
 
 	//todo: 验证导入的数据
 
-	for _, hs_code_au_import := range hs_code_au_list {
+	for _, hs_code_au_import := range hs_code_au_import_list {
 		var hs_code_au models.HsCodeAuDutyInfo
 		has, err := db_session.Where(fmt.Sprintf("hs_code = '%s'", hs_code_au_import.hs_code)).Get(&hs_code_au)
 		core.HandleError(err)
