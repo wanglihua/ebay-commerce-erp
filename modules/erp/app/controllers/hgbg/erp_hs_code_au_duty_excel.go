@@ -38,10 +38,13 @@ func (c ErpHsCodeAuDutyExcel) Import() revel.Result {
 	}
 
 	type hs_code_au_import_t struct {
-		hs_code   string
-		cn_name   string
-		en_name   string
-		duty_rate string
+		HsCode       string  `json:"hs_code"`
+		CnName       string  `json:"cn_name"`
+		EnName       string  `json:"en_name"`
+		DutyRate     string  `json:"duty_rate"`
+		ErrorMessage string  `json:"error_message"`
+
+		duty_rate float64  `json:"-"`
 	}
 
 	hs_code_au_import_list := make([]hs_code_au_import_t, 0)
@@ -77,7 +80,7 @@ func (c ErpHsCodeAuDutyExcel) Import() revel.Result {
 				break
 			}
 			//revel.TRACE.Println(cell_val)
-			hs_code_au.hs_code = cell_val
+			hs_code_au.HsCode = cell_val
 			col_index++
 
 			// cell = row.Cells[col_index]
@@ -85,7 +88,7 @@ func (c ErpHsCodeAuDutyExcel) Import() revel.Result {
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
-			hs_code_au.cn_name = cell_val
+			hs_code_au.CnName = cell_val
 			col_index++
 
 			//cell = row.Cells[col_index]
@@ -93,7 +96,7 @@ func (c ErpHsCodeAuDutyExcel) Import() revel.Result {
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
-			hs_code_au.en_name = cell_val
+			hs_code_au.EnName = cell_val
 			col_index++
 
 			//cell = row.Cells[col_index]
@@ -101,7 +104,7 @@ func (c ErpHsCodeAuDutyExcel) Import() revel.Result {
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
-			hs_code_au.duty_rate = cell_val
+			hs_code_au.DutyRate = cell_val
 			col_index++
 
 			hs_code_au_import_list = append(hs_code_au_import_list, hs_code_au)
@@ -115,17 +118,38 @@ func (c ErpHsCodeAuDutyExcel) Import() revel.Result {
 		})
 	}
 
-	//todo: 验证导入的数据
+	// 验证导入的数据
+	var hs_code_au_import_error_list = make([]hs_code_au_import_t, 0)
+	for index, hs_code_au_import := range hs_code_au_import_list {
+		if strings.TrimSpace(hs_code_au_import.DutyRate) == "" {
+			hs_code_au_import.duty_rate = 0
+		} else {
+			duty_rate, err := strconv.ParseFloat(hs_code_au_import.DutyRate, 64)
+			if err != nil {
+				hs_code_au_import.ErrorMessage = "关税税率输入有误！"
+				hs_code_au_import_error_list = append(hs_code_au_import_error_list, hs_code_au_import)
+			}
+			hs_code_au_import_list[index].duty_rate = duty_rate
+		}
+	}
+
+	if len(hs_code_au_import_error_list) != 0 {
+		return c.RenderJson(map[string]interface{}{
+			"success":         false,
+			"message":         "导入出现错误，详细请查看页面下部列表！",
+			"error_data_list": hs_code_au_import_error_list,
+		})
+	}
 
 	for _, hs_code_au_import := range hs_code_au_import_list {
 		var hs_code_au models.HsCodeAuDutyInfo
-		has, err := db_session.Where(fmt.Sprintf("hs_code = '%s'", hs_code_au_import.hs_code)).Get(&hs_code_au)
+		has, err := db_session.Where(fmt.Sprintf("hs_code = '%s'", hs_code_au_import.HsCode)).Get(&hs_code_au)
 		core.HandleError(err)
 
-		hs_code_au.HsCode = hs_code_au_import.hs_code
-		hs_code_au.CnName = hs_code_au_import.cn_name
-		hs_code_au.EnName = hs_code_au_import.en_name
-		hs_code_au.DutyRate, _ = strconv.ParseFloat(hs_code_au_import.duty_rate, 64)
+		hs_code_au.HsCode = hs_code_au_import.HsCode
+		hs_code_au.CnName = hs_code_au_import.CnName
+		hs_code_au.EnName = hs_code_au_import.EnName
+		hs_code_au.DutyRate, _ = strconv.ParseFloat(hs_code_au_import.DutyRate, 64)
 
 		if has == true {
 			update_col_list := []string{"cn_name", "en_name", "duty_rate"}
