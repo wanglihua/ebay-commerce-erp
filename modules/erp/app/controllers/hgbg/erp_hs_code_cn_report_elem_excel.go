@@ -108,7 +108,6 @@ func (c ErpHsCodeCnReportElemExcel) Import() revel.Result {
 		})
 	}
 
-	has_zero_data := false
 	for _, product_hs_code := range product_hs_code_list {
 		var product models.ProductInfo
 		has, err := db_session.Where(fmt.Sprintf("sku = '%s'", product_hs_code.sku)).Get(&product)
@@ -117,10 +116,6 @@ func (c ErpHsCodeCnReportElemExcel) Import() revel.Result {
 		product.Sku = product_hs_code.sku
 		product.CnHsCode = product_hs_code.cn_hs_code
 		product.AuHsCode = product_hs_code.au_hs_code
-
-		if product_hs_code.cn_hs_code == "" || product_hs_code.au_hs_code == "" {
-			has_zero_data = true
-		}
 
 		if has == true {
 			update_col_list := []string{"cn_hs_code", "au_hs_code"}
@@ -131,14 +126,9 @@ func (c ErpHsCodeCnReportElemExcel) Import() revel.Result {
 		}
 	}
 
-	message := "数据导入成功！"
-	if has_zero_data == true {
-		message = "数据导入成功, 部分长宽高数据为零！"
-	}
-
 	return c.RenderJson(map[string]interface{}{
 		"success": true,
-		"message": message,
+		"message": "数据导入成功",
 	})
 }
 

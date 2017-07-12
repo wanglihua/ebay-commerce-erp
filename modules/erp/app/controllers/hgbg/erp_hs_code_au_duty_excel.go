@@ -36,13 +36,13 @@ func (c ErpHsCodeAuDutyExcel) Import() revel.Result {
 		})
 	}
 
-	type product_hs_code_t struct {
+	type hs_code_au_t struct {
 		sku        string
 		cn_hs_code string
 		au_hs_code string
 	}
 
-	product_hs_code_list := make([]product_hs_code_t, 0)
+	hs_code_au_list := make([]hs_code_au_t, 0)
 
 	xlsx_file, err := xlsx.OpenBinary(excel_file_bytes)
 	core.HandleError(err)
@@ -62,7 +62,7 @@ func (c ErpHsCodeAuDutyExcel) Import() revel.Result {
 			var cell_val string
 			var err error
 
-			var product_hs_code product_hs_code_t
+			var hs_code_au hs_code_au_t
 
 			col_index := 0
 
@@ -76,7 +76,7 @@ func (c ErpHsCodeAuDutyExcel) Import() revel.Result {
 				break
 			}
 			//revel.TRACE.Println(cell_val)
-			product_hs_code.sku = cell_val
+			hs_code_au.sku = cell_val
 			col_index++
 
 			// cn_hs_code
@@ -85,7 +85,7 @@ func (c ErpHsCodeAuDutyExcel) Import() revel.Result {
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
-			product_hs_code.cn_hs_code = cell_val
+			hs_code_au.cn_hs_code = cell_val
 			col_index++
 
 			// au_hs_code
@@ -94,51 +94,41 @@ func (c ErpHsCodeAuDutyExcel) Import() revel.Result {
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
-			product_hs_code.au_hs_code = cell_val
+			hs_code_au.au_hs_code = cell_val
 			col_index++
 
-			product_hs_code_list = append(product_hs_code_list, product_hs_code)
+			hs_code_au_list = append(hs_code_au_list, hs_code_au)
 		}
 	}
 
-	if len(product_hs_code_list) == 0 {
+	if len(hs_code_au_list) == 0 {
 		return c.RenderJson(map[string]interface{}{
 			"success": false,
-			"message": "Excel文件中导入商品列表为空！",
+			"message": "Excel文件中导入海关编码列表为空！",
 		})
 	}
 
-	has_zero_data := false
-	for _, product_hs_code := range product_hs_code_list {
+	for _, hs_code_au := range hs_code_au_list {
 		var product models.ProductInfo
-		has, err := db_session.Where(fmt.Sprintf("sku = '%s'", product_hs_code.sku)).Get(&product)
+		has, err := db_session.Where(fmt.Sprintf("sku = '%s'", hs_code_au.sku)).Get(&product)
 		core.HandleError(err)
 
-		product.Sku = product_hs_code.sku
-		product.CnHsCode = product_hs_code.cn_hs_code
-		product.AuHsCode = product_hs_code.au_hs_code
-
-		if product_hs_code.cn_hs_code == "" || product_hs_code.au_hs_code == "" {
-			has_zero_data = true
-		}
+		product.Sku = hs_code_au.sku
+		product.CnHsCode = hs_code_au.cn_hs_code
+		product.AuHsCode = hs_code_au.au_hs_code
 
 		if has == true {
 			update_col_list := []string{"cn_hs_code", "au_hs_code"}
 			_, err = db_session.Id(product.Id).Cols(update_col_list...).Update(&product)
 			core.HandleError(err)
 		} else {
-			panic(fmt.Sprintf("商品SKU %s 数据库中不存在！", product_hs_code.sku))
+			panic(fmt.Sprintf("商品SKU %s 数据库中不存在！", hs_code_au.sku))
 		}
-	}
-
-	message := "数据导入成功！"
-	if has_zero_data == true {
-		message = "数据导入成功, 部分长宽高数据为零！"
 	}
 
 	return c.RenderJson(map[string]interface{}{
 		"success": true,
-		"message": message,
+		"message": "数据导入成功！",
 	})
 }
 
