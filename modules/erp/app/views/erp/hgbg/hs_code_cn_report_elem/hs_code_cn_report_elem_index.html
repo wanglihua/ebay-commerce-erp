@@ -13,7 +13,7 @@
         <div class="row">
             <div class="col-xs-12" style="padding: 0;">
                 <div class="gridToolBar clearfix">
-                    <button class="btn btn-primary btn-sm" @click="reloadList('#hsCodeCnReportElemList')">
+                    <button class="btn btn-primary btn-sm" @click="reloadList('#hs_code_list')">
                         <i class="ace-icon fa fa-refresh"></i>
                         刷新
                     </button>
@@ -25,12 +25,20 @@
                         <i class="ace-icon fa fa-trash-o"></i>
                         删除
                     </button>
+                    <button id="btnImport" class="btn btn-success btn-sm">
+                        <i class="ace-icon fa fa-plus"></i>
+                        导入
+                    </button>
+                    <button class="btn btn-purple btn-sm" @click="export_hs_code()">
+                        <i class="ace-icon fa fa-file-excel-o"></i>
+                        导出
+                    </button>
                     <div style="margin-top: 10px;">
                         <a href="/static/excel-template/hs_code_cn_import.xlsx">下载中国海关编码导入Excel模板</a>
                     </div>
                 </div>
                 <div>
-                    <table id="hsCodeCnReportElemList" class="table table-striped table-bordered table-hover"></table>
+                    <table id="hs_code_list" class="table table-striped table-bordered table-hover"></table>
                 </div>
             </div>
         </div>
@@ -235,7 +243,53 @@
         </div>
     </div>
 </div>
+<script type="text/javascript" src="/static/lib/plupload/moxie.min.js"></script>
+<script type="text/javascript" src="/static/lib/plupload/plupload.min.js"></script>
+<script type="text/javascript" src="/static/lib/plupload/zh_CN.js"></script>
+
 <script type="text/javascript">
+    function init_uploader() {
+        
+        var uploader = new plupload.Uploader({
+            runtimes: 'html5,flash,html4',
+            multi_selection: false,
+
+            browse_button: 'btnImport',
+            file_data_name: "excel_file",
+
+            url: '{%url "ErpHsCodeCnReportElemExcel.Import"%}',
+            max_file_size: '10000kb',
+
+            filters: [
+                {title: "Excel文件", extensions: "xlsx"}
+            ],
+
+            flash_swf_url: '/plupload/js/Moxie.swf',
+
+            init: {
+                FilesAdded: function () {
+                    showMask("上传中，请稍候...");
+                    uploader.start();
+                },
+                FileUploaded: function (up, file, response) {
+                    hideMask();
+                    var result = JSON.parse(response.response);
+                    if (result.success !== true) {
+                        $.msg.error(result.message);
+                    } else {
+                        reloadList('#hs_code_list');
+                        $.msg.show(result.message);
+                    }
+                },
+                Error: function (up, err) {
+                    $.msg.error("上传发生错误：" + err.code + ", " + err.message);
+                }
+            }
+        });
+
+        uploader.init();
+    }
+
     var vm = new Vue({
         el: "#page",
         data: {
@@ -245,7 +299,7 @@
         },
         mounted: function () {
             initDataTable(
-                '#hsCodeCnReportElemList',
+                '#hs_code_list',
                 {
                     "sAjaxSource": '{%url "ErpHsCodeCnReportElem.ListData"%}',
                     "aaSorting": [[1, "asc"]],
@@ -294,14 +348,14 @@
                 }
             );
 
-            $('#hsCodeCnReportElemList tbody').on('dblclick', 'tr', function () {
+            $('#hs_code_list tbody').on('dblclick', 'tr', function () {
                 var id = $(this).find('td:first-child input:checkbox').val();
                 vm.showHsCodeCnReportElemDetail(id);
             });
         },
         methods: {
             reloadList: function () {
-                reloadList('#hsCodeCnReportElemList');
+                reloadList('#hs_code_list');
             },
             showHsCodeCnReportElemDetail: function (id) {
                 showMask("加载中...");
@@ -409,13 +463,13 @@
             },
             deleteHsCodeCnReportElem: function () {
                 var id_list = [];
-                $('#hsCodeCnReportElemList tbody tr>td:first-child input:checkbox').each(function () {
+                $('#hs_code_list tbody tr>td:first-child input:checkbox').each(function () {
                     if (this.checked) {
                         id_list.push($(this).val());
                     }
                 });
 
-                if (id_list.length == 0) {
+                if (id_list.length === 0) {
                     $.msg.alert("请选择数据！");
                     return;
                 }
@@ -426,7 +480,7 @@
                         type: "POST",
                         data: {"id_list": id_list},
                         success: function (data) {
-                            if (data.success == false) {
+                            if (data.success === false) {
                                 $.msg.error(data.message);
                                 return;
                             }
@@ -437,6 +491,11 @@
                         }
                     });
                 });
+            },
+            export_hs_code: function () {
+                var params = $.param({});
+                var url = '{%url "ErpHsCodeCnReportElemExcel.Export"%}' + "?" + params;
+                $('<form method="post" action="' + url + '"></form>').appendTo('body').submit().remove();
             }
         }
     });

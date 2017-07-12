@@ -28,7 +28,7 @@
                         </ul>
                     </div>
 
-                    <button class="btn btn-primary btn-sm" @click="reloadList('#productList')">
+                    <button class="btn btn-primary btn-sm" @click="reloadList('#hs_code_list')">
                         <i class="ace-icon fa fa-refresh"></i>
                         刷新
                     </button>
@@ -36,7 +36,7 @@
                         <i class="ace-icon fa fa-plus"></i>
                         导入
                     </button>
-                    <button class="btn btn-purple btn-sm" @click="exportProduct()">
+                    <button class="btn btn-purple btn-sm" @click="export_hs_code()">
                         <i class="ace-icon fa fa-file-excel-o"></i>
                         导出
                     </button>
@@ -45,12 +45,12 @@
                     </div>
                 </div>
                 <div>
-                    <table id="productList" class="table table-striped table-bordered table-hover"></table>
+                    <table id="hs_code_list" class="table table-striped table-bordered table-hover"></table>
                 </div>
             </div>
         </div>
     </div>
-    <div class="modal fade" id="productDetailDialog">
+    <div class="modal fade" id="hs_code_detail_dialog">
         <div class="modal-dialog" style="width: 480px;">
             <div class="modal-content">
                 <div class="modal-header">
@@ -60,7 +60,7 @@
                 <div class="modal-body clearfix">
                     <div class="row">
                         <div class="col-xs-12">
-                            <form class="form-horizontal" role="form" id="productDetailForm">
+                            <form class="form-horizontal" role="form" id="hs_code_detail_form">
                                 <input id="product_id" name="detail.product.id" type="hidden" v-model.number="detail.product.id"/>
 
                                 <div class="row">
@@ -133,7 +133,7 @@
         vm.filter_type = filter_type;
         var dataFilter = $("#dataFilter");
         dataFilter.html(filter_name);
-        reloadList('#productList');
+        reloadList('#hs_code_list');
     }
 
     function init_uploader() {
@@ -164,7 +164,7 @@
                     if (result.success !== true) {
                         $.msg.error(result.message);
                     } else {
-                        reloadList('#productList');
+                        reloadList('#hs_code_list');
                         $.msg.show(result.message);
                     }
                 },
@@ -189,7 +189,7 @@
             var this_vm = this;
 
             initDataTable(
-                '#productList',
+                '#hs_code_list',
                 {
                     "sAjaxSource": '{%url "ErpProductHsCode.ListData"%}',
                     "aaSorting": [[1, "asc"]],
@@ -250,7 +250,7 @@
                 }
             );
 
-            $('#productList tbody').on('dblclick', 'tr', function () {
+            $('#hs_code_list tbody').on('dblclick', 'tr', function () {
                 var id = $(this).find('td:first-child input:checkbox').val();
                 vm.showProductDetail(id);
             });
@@ -259,11 +259,11 @@
         },
         methods: {
             reloadList: function () {
-                reloadList('#productList');
+                reloadList('#hs_code_list');
             },
             showProductDetail: function (product_id) {
                 showMask("加载中...");
-                $("#productDetailForm").clearValidation();
+                $("#hs_code_detail_form").clearValidation();
                 $.ajax({
                         url: '{%url "ErpProductHsCode.DetailData" %}',
                         type: "POST",
@@ -278,14 +278,14 @@
                             }
                             vm.detail = result;
 
-                            $('#productDetailDialog').modal(modalOptions);
+                            $('#hs_code_detail_dialog').modal(modalOptions);
                         }
                     }
                 );
             },
             saveProductHsCode: function () {
                 showMask("提交中...");
-                var form = $("#productDetailForm");
+                var form = $("#hs_code_detail_form");
                 var valid = validate(form, {
                     'detail.product.cn_hs_code': {
                         required: false
@@ -312,7 +312,7 @@
                                 }
                                 else {
                                     $.msg.show(data.message);
-                                    $('#productDetailDialog').modal('hide');
+                                    $('#hs_code_detail_dialog').modal('hide');
                                     vm.reloadList();
                                     //return;
                                 }
@@ -321,7 +321,7 @@
                     );
                 }
             },
-            exportProduct: function () {
+            export_hs_code: function () {
                 var params = $.param({});
                 var url = '{%url "ErpProductHsCodeExcel.Export"%}' + "?" + params;
                 $('<form method="post" action="' + url + '"></form>').appendTo('body').submit().remove();
