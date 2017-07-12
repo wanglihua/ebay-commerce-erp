@@ -4,10 +4,7 @@ import (
 	"github.com/revel/revel"
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/auth/pass_res"
-	"fmt"
 	"encoding/json"
-	"github.com/tealeg/xlsx"
-	"strings"
 	"matrix/core"
 	"matrix/modules/erp/models"
 )
@@ -140,128 +137,5 @@ func (c ErpProductHsCode) Save() revel.Result {
 	return c.RenderJson(map[string]interface{}{
 		"success": true,
 		"message": "保存成功！",
-	})
-}
-
-func (c ErpProductHsCode) Import() revel.Result {
-	pass_service.Check_login_user_pass(pass_res.HGBG_PRODUCT_HS_CODE, c.Session)
-
-	db_session := c.DbSession
-
-	excel_file_bytes := make([]byte, 0)
-	c.Params.Bind(&excel_file_bytes, "excel_file")
-
-	c.Validation.Required(excel_file_bytes).Message("指定文件内容未成功上传！")
-
-	if c.Validation.HasErrors() {
-		return c.RenderJson(map[string]interface{}{
-			"success": false,
-			"message": c.GetValidationErrorMessage(),
-		})
-	}
-
-	type product_hs_code_t struct {
-		sku        string
-		cn_hs_code string
-		au_hs_code string
-	}
-
-	product_hs_code_list := make([]product_hs_code_t, 0)
-
-	xlsx_file, err := xlsx.OpenBinary(excel_file_bytes)
-	core.HandleError(err)
-
-	// 会导入所有 sheets
-	sheet_count := len(xlsx_file.Sheets)
-	//revel.TRACE.Printf("sheet_count: %d\n", sheet_count)
-	for sheet_index := 0; sheet_index < sheet_count; sheet_index ++ {
-		sheet := xlsx_file.Sheets[sheet_index]
-		max_row := sheet.MaxRow
-		//revel.TRACE.Printf("max_row: %d\n", max_row)
-		//略过标题行
-		for row_index := 1; row_index < max_row; row_index ++ {
-			//row := sheet.Rows[row_index]
-
-			var cell *xlsx.Cell
-			var cell_val string
-			var err error
-
-			var product_hs_code product_hs_code_t
-
-			col_index := 0
-
-			// SKU
-			// cell = row.Cells[col_index]
-			cell = sheet.Cell(row_index, col_index)
-			cell_val, err = cell.String()
-			core.HandleError(err)
-			cell_val = strings.TrimSpace(cell_val)
-			if cell_val == "" {
-				break
-			}
-			//revel.TRACE.Println(cell_val)
-			product_hs_code.sku = cell_val
-			col_index++
-
-			// cn_hs_code
-			// cell = row.Cells[col_index]
-			cell = sheet.Cell(row_index, col_index)
-			cell_val, err = cell.String()
-			core.HandleError(err)
-			cell_val = strings.TrimSpace(cell_val)
-			product_hs_code.cn_hs_code = cell_val
-			col_index++
-
-			// au_hs_code
-			//cell = row.Cells[col_index]
-			cell = sheet.Cell(row_index, col_index)
-			cell_val, err = cell.String()
-			core.HandleError(err)
-			cell_val = strings.TrimSpace(cell_val)
-			product_hs_code.au_hs_code = cell_val
-			col_index++
-
-			product_hs_code_list = append(product_hs_code_list, product_hs_code)
-		}
-	}
-
-	if len(product_hs_code_list) == 0 {
-		return c.RenderJson(map[string]interface{}{
-			"success": false,
-			"message": "Excel文件中导入商品列表为空！",
-		})
-	}
-
-	has_zero_data := false
-	for _, product_hs_code := range product_hs_code_list {
-		var product models.ProductInfo
-		has, err := db_session.Where(fmt.Sprintf("sku = '%s'", product_hs_code.sku)).Get(&product)
-		core.HandleError(err)
-
-		product.Sku = product_hs_code.sku
-		product.CnHsCode = product_hs_code.cn_hs_code
-		product.AuHsCode = product_hs_code.au_hs_code
-
-		if product_hs_code.cn_hs_code == "" || product_hs_code.au_hs_code == "" {
-			has_zero_data = true
-		}
-
-		if has == true {
-			update_col_list := []string{"cn_hs_code", "au_hs_code"}
-			_, err = db_session.Id(product.Id).Cols(update_col_list...).Update(&product)
-			core.HandleError(err)
-		} else {
-			panic(fmt.Sprintf("商品SKU %s 数据库中不存在！", product_hs_code.sku))
-		}
-	}
-
-	message := "数据导入成功！"
-	if has_zero_data == true {
-		message = "数据导入成功, 部分长宽高数据为零！"
-	}
-
-	return c.RenderJson(map[string]interface{}{
-		"success": true,
-		"message": message,
 	})
 }

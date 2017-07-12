@@ -144,7 +144,7 @@
             browse_button: 'btnImport',
             file_data_name: "excel_file",
 
-            url: '{%url "ErpProductHsCode.Import"%}',
+            url: '{%url "ErpProductHsCodeExcel.Import"%}',
             max_file_size: '10000kb',
 
             filters: [
@@ -323,7 +323,7 @@
             },
             exportProduct: function () {
                 var params = $.param({});
-                var url = '{%url "ErpProductHsCodeExport.Export"%}' + "?" + params;
+                var url = '{%url "ErpProductHsCodeExcel.Export"%}' + "?" + params;
                 $('<form method="post" action="' + url + '"></form>').appendTo('body').submit().remove();
             }
         }

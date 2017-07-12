@@ -144,9 +144,9 @@ GET  /product/hs/code                       ErpProductHsCode.Index
 POST /product/hs/code/data/list             ErpProductHsCode.ListData
 POST /product/hs/code/data/detail           ErpProductHsCode.DetailData
 POST /product/hs/code/save                  ErpProductHsCode.Save
-POST /product/hs/code/import                ErpProductHsCode.Import
 
-POST /product/hs/code/export                ErpProductHsCodeExport.Export
+POST /product/hs/code/import                ErpProductHsCodeExcel.Import
+POST /product/hs/code/export                ErpProductHsCodeExcel.Export
 
 GET  /product/import                       ErpProductImport.Index
 POST /product/import/data/page             ErpProductImport.PageData
