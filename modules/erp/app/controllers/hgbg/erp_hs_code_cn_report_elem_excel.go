@@ -36,7 +36,7 @@ func (c ErpHsCodeCnReportElemExcel) Import() revel.Result {
 		})
 	}
 
-	type product_hs_code_t struct {
+	type hs_code_import_t struct {
 		hs_code string
 		cn_name string
 		en_name string
@@ -56,7 +56,7 @@ func (c ErpHsCodeCnReportElemExcel) Import() revel.Result {
 		elem14  string
 	}
 
-	product_hs_code_list := make([]product_hs_code_t, 0)
+	hs_code_import_list := make([]hs_code_import_t, 0)
 
 	xlsx_file, err := xlsx.OpenBinary(excel_file_bytes)
 	core.HandleError(err)
@@ -76,11 +76,11 @@ func (c ErpHsCodeCnReportElemExcel) Import() revel.Result {
 			var cell_val string
 			var err error
 
-			var product_hs_code product_hs_code_t
+			var hs_code_import hs_code_import_t
 
 			col_index := 0
 
-			// SKU
+			// 中国海关编码
 			// cell = row.Cells[col_index]
 			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
@@ -90,53 +90,197 @@ func (c ErpHsCodeCnReportElemExcel) Import() revel.Result {
 				break
 			}
 			//revel.TRACE.Println(cell_val)
-			product_hs_code.sku = cell_val
+			hs_code_import.hs_code = cell_val
 			col_index++
 
-			// cn_hs_code
+			// 申报中文品名
 			// cell = row.Cells[col_index]
 			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
-			product_hs_code.cn_hs_code = cell_val
+			hs_code_import.cn_name = cell_val
 			col_index++
 
-			// au_hs_code
+			// 申报英文品名
 			//cell = row.Cells[col_index]
 			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
-			product_hs_code.au_hs_code = cell_val
+			hs_code_import.en_name = cell_val
 			col_index++
 
-			product_hs_code_list = append(product_hs_code_list, product_hs_code)
+			// 要素1
+			//cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
+			hs_code_import.elem01 = cell_val
+			col_index++
+
+			// 要素2
+			//cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
+			hs_code_import.elem02 = cell_val
+			col_index++
+
+			// 要素3
+			//cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
+			hs_code_import.elem03 = cell_val
+			col_index++
+
+			// 要素4
+			//cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
+			hs_code_import.elem04 = cell_val
+			col_index++
+
+			// 要素5
+			//cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
+			hs_code_import.elem05 = cell_val
+			col_index++
+
+			// 要素6
+			//cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
+			hs_code_import.elem06 = cell_val
+			col_index++
+
+			// 要素7
+			//cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
+			hs_code_import.elem07 = cell_val
+			col_index++
+
+			// 要素8
+			//cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
+			hs_code_import.elem08 = cell_val
+			col_index++
+
+			// 要素9
+			//cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
+			hs_code_import.elem09 = cell_val
+			col_index++
+
+			// 要素10
+			//cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
+			hs_code_import.elem10 = cell_val
+			col_index++
+
+			// 要素11
+			//cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
+			hs_code_import.elem11 = cell_val
+			col_index++
+
+			// 要素12
+			//cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
+			hs_code_import.elem12 = cell_val
+			col_index++
+
+			// 要素13
+			//cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
+			hs_code_import.elem13 = cell_val
+			col_index++
+
+			// 要素14
+			//cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
+			hs_code_import.elem14 = cell_val
+			col_index++
+
+			hs_code_import_list = append(hs_code_import_list, hs_code_import)
 		}
 	}
 
-	if len(product_hs_code_list) == 0 {
+	if len(hs_code_import_list) == 0 {
 		return c.RenderJson(map[string]interface{}{
 			"success": false,
-			"message": "Excel文件中导入商品列表为空！",
+			"message": "Excel文件中导入海关编码列表为空！",
 		})
 	}
 
-	for _, product_hs_code := range product_hs_code_list {
-		var product models.ProductInfo
-		has, err := db_session.Where(fmt.Sprintf("sku = '%s'", product_hs_code.sku)).Get(&product)
+	//todo: 验证导入的数据
+
+	for _, hs_code_import := range hs_code_import_list {
+		var hs_code models.HsCodeCnReportElemInfo
+		has, err := db_session.Where(fmt.Sprintf("hs_code = '%s'", hs_code_import.hs_code)).Get(&hs_code)
 		core.HandleError(err)
 
-		product.Sku = product_hs_code.sku
-		product.CnHsCode = product_hs_code.cn_hs_code
-		product.AuHsCode = product_hs_code.au_hs_code
+		hs_code.HsCode = hs_code_import.hs_code
+		hs_code.CnName = hs_code_import.cn_name
+		hs_code.EnName = hs_code_import.en_name
+		hs_code.Elem01 = hs_code_import.elem01
+		hs_code.Elem02 = hs_code_import.elem02
+		hs_code.Elem03 = hs_code_import.elem03
+		hs_code.Elem04 = hs_code_import.elem04
+		hs_code.Elem05 = hs_code_import.elem05
+		hs_code.Elem06 = hs_code_import.elem06
+		hs_code.Elem07 = hs_code_import.elem07
+		hs_code.Elem08 = hs_code_import.elem08
+		hs_code.Elem09 = hs_code_import.elem09
+		hs_code.Elem10 = hs_code_import.elem10
+		hs_code.Elem11 = hs_code_import.elem11
+		hs_code.Elem12 = hs_code_import.elem12
+		hs_code.Elem13 = hs_code_import.elem13
+		hs_code.Elem14 = hs_code_import.elem14
 
 		if has == true {
-			update_col_list := []string{"cn_hs_code", "au_hs_code"}
-			_, err = db_session.Id(product.Id).Cols(update_col_list...).Update(&product)
+			update_col_list := []string{"hs_code", "cn_name", "en_name", "elem01", "elem02", "elem03", "elem04", "elem05",
+			                            "elem06", "elem07", "elem08", "elem09", "elem10", "elem11", "elem12", "elem13", "elem14"}
+			_, err = db_session.Id(hs_code.Id).Cols(update_col_list...).Update(&hs_code)
 			core.HandleError(err)
 		} else {
-			panic(fmt.Sprintf("商品SKU %s 数据库中不存在！", product_hs_code.sku))
+			_, err = db_session.Insert(&hs_code)
+			core.HandleError(err)
 		}
 	}
 
@@ -151,12 +295,12 @@ func (c ErpHsCodeCnReportElemExcel) Export() revel.Result {
 
 	db_session := c.DbSession
 
-	product_list := make([]models.ProductInfo, 0)
+	product_list := make([]models.HsCodeCnReportElemInfo, 0)
 
 	err := db_session.Find(&product_list)
 	core.HandleError(err)
 
-	xlsx_file := c.export_product_list_to_excel(db_session, product_list)
+	xlsx_file := c.export_hs_code_list_to_excel(db_session, product_list)
 
 	//先把文件内容写到buffer中，再从中读取
 	var buffer bytes.Buffer
@@ -170,7 +314,7 @@ func (c ErpHsCodeCnReportElemExcel) Export() revel.Result {
 	return c.RenderBinary(reader, file_name, revel.Attachment, time.Now())
 }
 
-func (c ErpHsCodeCnReportElemExcel) export_product_list_to_excel(db_session *xorm.Session, product_list []models.ProductInfo) *xlsx.File {
+func (c ErpHsCodeCnReportElemExcel) export_hs_code_list_to_excel(db_session *xorm.Session, hs_code_list []models.HsCodeCnReportElemInfo) *xlsx.File {
 
 	//统一设置标题单元格格式的函数
 	set_head_cell_style := func(cell *xlsx.Cell) {
@@ -246,82 +390,188 @@ func (c ErpHsCodeCnReportElemExcel) export_product_list_to_excel(db_session *xor
 
 	col_index := 0
 
-	var product_status_list = make([]models.StatusInfo, 0)
-	err = db_session.Where(fmt.Sprintf("type = %d", models.STATUS_TYPE_PRODUCT)).Find(&product_status_list)
-	core.HandleError(err)
-
-	var find_product_status_name = func(status_id int64) string {
-		for _, status := range product_status_list {
-			if status.Id == status_id {
-				return status.Name
-			}
-		}
-
-		return ""
-	}
-
-	//序号 SKU 中国海关编码 澳洲海关编码
+	// 中国海关编码 	中文品名	英文品名	要素1	要素2	要素3	要素4	要素5	要素6	要素7	要素8	要素9	要素10	要素11	要素12	要素13	要素14
 
 	{
 		cell := row.AddCell()
 		sheet.SetColWidth(col_index, col_index, 10)
 		set_head_cell_style(cell)
-		cell.Value = "序号"
+		cell.SetString("中国海关编码")
 		col_index++
 
 		cell = row.AddCell()
 		sheet.SetColWidth(col_index, col_index, 10)
 		set_head_cell_style(cell)
-		cell.Value = "SKU"
+		cell.SetString("中文品名")
 		col_index++
 
 		cell = row.AddCell()
 		sheet.SetColWidth(col_index, col_index, 10)
 		set_head_cell_style(cell)
-		cell.Value = "中国海关编码"
+		cell.SetString("英文品名")
 		col_index++
 
 		cell = row.AddCell()
 		sheet.SetColWidth(col_index, col_index, 10)
 		set_head_cell_style(cell)
-		cell.Value = "澳洲海关编码"
+		cell.SetString("要素1")
 		col_index++
 
 		cell = row.AddCell()
 		sheet.SetColWidth(col_index, col_index, 10)
 		set_head_cell_style(cell)
-		cell.Value = "状态"
+		cell.SetString("要素2")
+		col_index++
+
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 10)
+		set_head_cell_style(cell)
+		cell.SetString("要素3")
+		col_index++
+
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 10)
+		set_head_cell_style(cell)
+		cell.SetString("要素4")
+		col_index++
+
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 10)
+		set_head_cell_style(cell)
+		cell.SetString("要素5")
+		col_index++
+
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 10)
+		set_head_cell_style(cell)
+		cell.SetString("要素6")
+		col_index++
+
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 10)
+		set_head_cell_style(cell)
+		cell.SetString("要素7")
+		col_index++
+
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 10)
+		set_head_cell_style(cell)
+		cell.SetString("要素8")
+		col_index++
+
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 10)
+		set_head_cell_style(cell)
+		cell.SetString("要素9")
+		col_index++
+
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 10)
+		set_head_cell_style(cell)
+		cell.SetString("要素10")
+		col_index++
+
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 10)
+		set_head_cell_style(cell)
+		cell.SetString("要素11")
+		col_index++
+
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 10)
+		set_head_cell_style(cell)
+		cell.SetString("要素12")
+		col_index++
+
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 10)
+		set_head_cell_style(cell)
+		cell.SetString("要素13")
+		col_index++
+
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 10)
+		set_head_cell_style(cell)
+		cell.SetString("要素14")
 		col_index++
 	}
 
-	for index, product := range product_list {
+	for _, product := range hs_code_list {
 		row = sheet.AddRow()
 		row.SetHeightCM(common_row_height)
 
-		// 序号
-		cell := row.AddCell()
-		set_text_cell_style(cell, "center")
-		cell.Value = fmt.Sprint(index + 1)
-
-		// SKU
-		cell = row.AddCell()
-		set_text_cell_style(cell, "center")
-		cell.Value = product.Sku
+		// 中国海关编码 	中文品名	英文品名	要素1	要素2	要素3	要素4	要素5	要素6	要素7	要素8	要素9	要素10	要素11	要素12	要素13	要素14
 
 		// 中国海关编码
-		cell = row.AddCell()
-		set_text_cell_style(cell, "right")
-		cell.Value = product.CnHsCode
+		cell := row.AddCell()
+		set_text_cell_style(cell, "left")
+		cell.SetString(product.HsCode)
 
-		// 澳洲海关编码
+		// 中文品名
 		cell = row.AddCell()
-		set_text_cell_style(cell, "right")
-		cell.Value = product.AuHsCode
+		set_text_cell_style(cell, "left")
+		cell.SetString(product.CnName)
 
-		// 状态
+		// 英文品名
 		cell = row.AddCell()
-		set_text_cell_style(cell, "right")
-		cell.Value = find_product_status_name(product.StatusId)
+		set_text_cell_style(cell, "left")
+		cell.SetString(product.EnName)
+
+		cell = row.AddCell()
+		set_text_cell_style(cell, "left")
+		cell.SetString(product.Elem01)
+
+		cell = row.AddCell()
+		set_text_cell_style(cell, "left")
+		cell.SetString(product.Elem02)
+
+		cell = row.AddCell()
+		set_text_cell_style(cell, "left")
+		cell.SetString(product.Elem03)
+
+		cell = row.AddCell()
+		set_text_cell_style(cell, "left")
+		cell.SetString(product.Elem04)
+
+		cell = row.AddCell()
+		set_text_cell_style(cell, "left")
+		cell.SetString(product.Elem05)
+
+		cell = row.AddCell()
+		set_text_cell_style(cell, "left")
+		cell.SetString(product.Elem06)
+
+		cell = row.AddCell()
+		set_text_cell_style(cell, "left")
+		cell.SetString(product.Elem07)
+
+		cell = row.AddCell()
+		set_text_cell_style(cell, "left")
+		cell.SetString(product.Elem08)
+
+		cell = row.AddCell()
+		set_text_cell_style(cell, "left")
+		cell.SetString(product.Elem09)
+
+		cell = row.AddCell()
+		set_text_cell_style(cell, "left")
+		cell.SetString(product.Elem10)
+
+		cell = row.AddCell()
+		set_text_cell_style(cell, "left")
+		cell.SetString(product.Elem11)
+
+		cell = row.AddCell()
+		set_text_cell_style(cell, "left")
+		cell.SetString(product.Elem12)
+
+		cell = row.AddCell()
+		set_text_cell_style(cell, "left")
+		cell.SetString(product.Elem13)
+
+		cell = row.AddCell()
+		set_text_cell_style(cell, "left")
+		cell.SetString(product.Elem14)
 	}
 
 	return xlsx_file
