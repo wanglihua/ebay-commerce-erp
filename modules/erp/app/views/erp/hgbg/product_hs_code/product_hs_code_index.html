@@ -161,7 +161,7 @@
                 FileUploaded: function (up, file, response) {
                     hideMask();
                     var result = JSON.parse(response.response);
-                    if (result.success != true) {
+                    if (result.success !== true) {
                         $.msg.error(result.message);
                     } else {
                         reloadList('#productList');

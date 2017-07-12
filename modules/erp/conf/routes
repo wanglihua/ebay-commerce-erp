@@ -140,14 +140,6 @@ POST /product/weight/import                ErpProductWeight.Import
 
 POST /product/weight/export                ErpProductWeightExport.Export
 
-GET  /product/hs/code                       ErpProductHsCode.Index
-POST /product/hs/code/data/list             ErpProductHsCode.ListData
-POST /product/hs/code/data/detail           ErpProductHsCode.DetailData
-POST /product/hs/code/save                  ErpProductHsCode.Save
-
-POST /product/hs/code/import                ErpProductHsCodeExcel.Import
-POST /product/hs/code/export                ErpProductHsCodeExcel.Export
-
 GET  /product/import                       ErpProductImport.Index
 POST /product/import/data/page             ErpProductImport.PageData
 POST /product/import/data/list             ErpProductImport.ListData
@@ -489,14 +481,29 @@ POST /order/simple/detail                ErpOrderSimpleDetail.Index
 # 这个通用的路由应该放到最后比较合适，否则放在他后面的有的路由会不工作
 GET  /order/:status                        ErpOrder.Index
 
+GET  /product/hs/code               ErpProductHsCode.Index
+POST /product/hs/code/data/list     ErpProductHsCode.ListData
+POST /product/hs/code/data/detail   ErpProductHsCode.DetailData
+POST /product/hs/code/save          ErpProductHsCode.Save
+
+POST /product/hs/code/import        ErpProductHsCodeExcel.Import
+POST /product/hs/code/export        ErpProductHsCodeExcel.Export
+
+
 GET  /hs/code/au                    ErpHsCodeAuDuty.Index
 POST /hs/code/au/data/list          ErpHsCodeAuDuty.ListData
 POST /hs/code/au/data/detail        ErpHsCodeAuDuty.DetailData
 POST /hs/code/au/save               ErpHsCodeAuDuty.Save
 POST /hs/code/au/delete             ErpHsCodeAuDuty.Delete
 
+POST /hs/code/au/import             ErpHsCodeAuDutyExcel.Import
+POST /hs/code/au/export             ErpHsCodeAuDutyExcel.Export
+
 GET  /hs/code/cn                    ErpHsCodeCnReportElem.Index
 POST /hs/code/cn/data/list          ErpHsCodeCnReportElem.ListData
 POST /hs/code/cn/data/detail        ErpHsCodeCnReportElem.DetailData
 POST /hs/code/cn/save               ErpHsCodeCnReportElem.Save
 POST /hs/code/cn/delete             ErpHsCodeCnReportElem.Delete
+
+POST /hs/code/cn/import             ErpHsCodeCnReportElemExcel.Import
+POST /hs/code/cn/export             ErpHsCodeCnReportElemExcel.Export
