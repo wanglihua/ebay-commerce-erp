@@ -108,6 +108,8 @@ func (c ErpProductHsCodeExcel) Import() revel.Result {
 		})
 	}
 
+	//todo: 验证导入的数据
+
 	for _, product_hs_code := range product_hs_code_list {
 		var product models.ProductInfo
 		has, err := db_session.Where(fmt.Sprintf("sku = '%s'", product_hs_code.sku)).Get(&product)
