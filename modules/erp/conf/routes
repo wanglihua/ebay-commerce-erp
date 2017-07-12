@@ -495,4 +495,8 @@ POST /hs/code/au/data/detail        ErpHsCodeAuDuty.DetailData
 POST /hs/code/au/save               ErpHsCodeAuDuty.Save
 POST /hs/code/au/delete             ErpHsCodeAuDuty.Delete
 
-
+GET  /hs/code/cn                    ErpHsCodeCnReportElem.Index
+POST /hs/code/cn/data/list          ErpHsCodeCnReportElem.ListData
+POST /hs/code/cn/data/detail        ErpHsCodeCnReportElem.DetailData
+POST /hs/code/cn/save               ErpHsCodeCnReportElem.Save
+POST /hs/code/cn/delete             ErpHsCodeCnReportElem.Delete

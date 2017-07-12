@@ -1,0 +1,442 @@
+{%header "中国海关编码" .%}
+<div id="page">
+    <div class="breadcrumbs" id="breadcrumbs">
+        <ul class="breadcrumb">
+            <li>
+                <a href='{%url "Home.Index"%}'><i class="ace-icon fa fa-home home-icon"></i></a>
+            </li>
+            <li class="parent" data-menu="hgbg-menu">海关报关</li>
+            <li class="active" data-menu="hgbg-hs-code-cn-report-elem-menu">中国海关编码</li>
+        </ul>
+    </div>
+    <div class="page-content">
+        <div class="row">
+            <div class="col-xs-12" style="padding: 0;">
+                <div class="gridToolBar clearfix">
+                    <button class="btn btn-primary btn-sm" @click="reloadList('#hsCodeCnReportElemList')">
+                        <i class="ace-icon fa fa-refresh"></i>
+                        刷新
+                    </button>
+                    <button class="btn btn-success btn-sm" @click="showHsCodeCnReportElemDetail(0)">
+                        <i class="ace-icon fa fa-plus"></i>
+                        新增
+                    </button>
+                    <button class="btn btn-danger btn-sm" @click="deleteHsCodeCnReportElem()">
+                        <i class="ace-icon fa fa-trash-o"></i>
+                        删除
+                    </button>
+                </div>
+                <div>
+                    <table id="hsCodeCnReportElemList" class="table table-striped table-bordered table-hover"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="hsCodeCnReportElemDetailDialog">
+        <div class="modal-dialog" style="width: 750px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="True">&times;</button>
+                    <h4 class="modal-title">中国海关编码详细</h4>
+                </div>
+                <div class="modal-body clearfix">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <form class="form-horizontal" role="form" id="hsCodeCnReportElemDetailForm">
+                                <input id="hs_code_cn_report_elem_id" name="detail.hs_code_cn.id" type="hidden" v-model.number="detail.hs_code_cn.id"/>
+                                <input id="hs_code_cn_report_elem_version" name="detail.hs_code_cn.version" type="hidden" v-model.number="detail.hs_code_cn.version"/>
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="hs_code" class="col-xs-2 control-label">海关编码</label>
+                                            <div class="col-xs-10">
+                                                <input id="hs_code" name="detail.hs_code_cn.hs_code" type="text" class="input-sm form-control" v-model="detail.hs_code_cn.hs_code"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="cn_name" class="col-xs-2 control-label">中文品名</label>
+                                            <div class="col-xs-10">
+                                                <input id="cn_name" name="detail.hs_code_cn.cn_name" type="text" class="input-sm form-control" v-model="detail.hs_code_cn.cn_name"/>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="en_name" class="col-xs-2 control-label">英文品名</label>
+                                            <div class="col-xs-10">
+                                                <input id="en_name" name="detail.hs_code_cn.en_name" type="text" class="input-sm form-control" v-model="detail.hs_code_cn.en_name"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="elem01" class="col-xs-2 control-label">要素1</label>
+                                            <div class="col-xs-10">
+                                                <textarea id="elem01" name="detail.hs_code_cn.elem01" rows="1" class="input-sm form-control" v-model="detail.hs_code_cn.elem01"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="elem02" class="col-xs-2 control-label">要素2</label>
+                                            <div class="col-xs-10">
+                                                <textarea id="elem02" name="detail.hs_code_cn.elem02" rows="1" class="input-sm form-control" v-model="detail.hs_code_cn.elem02"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="elem03" class="col-xs-2 control-label">要素3</label>
+                                            <div class="col-xs-10">
+                                                <textarea id="elem03" name="detail.hs_code_cn.elem03" rows="1" class="input-sm form-control" v-model="detail.hs_code_cn.elem03"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="elem04" class="col-xs-2 control-label">要素4</label>
+                                            <div class="col-xs-10">
+                                                <textarea id="elem04" name="detail.hs_code_cn.elem04" rows="1" class="input-sm form-control" v-model="detail.hs_code_cn.elem04"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="elem05" class="col-xs-2 control-label">要素5</label>
+                                            <div class="col-xs-10">
+                                                <textarea id="elem05" name="detail.hs_code_cn.elem05" rows="1" class="input-sm form-control" v-model="detail.hs_code_cn.elem05"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="elem06" class="col-xs-2 control-label">要素6</label>
+                                            <div class="col-xs-10">
+                                                <textarea id="elem06" name="detail.hs_code_cn.elem06" rows="1" class="input-sm form-control" v-model="detail.hs_code_cn.elem06"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="elem07" class="col-xs-2 control-label">要素7</label>
+                                            <div class="col-xs-10">
+                                                <textarea id="elem07" name="detail.hs_code_cn.elem07" rows="1" class="input-sm form-control" v-model="detail.hs_code_cn.elem07"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="elem08" class="col-xs-2 control-label">要素8</label>
+                                            <div class="col-xs-10">
+                                                <textarea id="elem08" name="detail.hs_code_cn.elem08" rows="1" class="input-sm form-control" v-model="detail.hs_code_cn.elem08"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="elem09" class="col-xs-2 control-label">要素9</label>
+                                            <div class="col-xs-10">
+                                                <textarea id="elem09" name="detail.hs_code_cn.elem09" rows="1" class="input-sm form-control" v-model="detail.hs_code_cn.elem09"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="elem10" class="col-xs-2 control-label">要素10</label>
+                                            <div class="col-xs-10">
+                                                <textarea id="elem10" name="detail.hs_code_cn.elem10" rows="1" class="input-sm form-control" v-model="detail.hs_code_cn.elem10"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="elem11" class="col-xs-2 control-label">要素11</label>
+                                            <div class="col-xs-10">
+                                                <textarea id="elem11" name="detail.hs_code_cn.elem11" rows="1" class="input-sm form-control" v-model="detail.hs_code_cn.elem11"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="elem12" class="col-xs-2 control-label">要素12</label>
+                                            <div class="col-xs-10">
+                                                <textarea id="elem12" name="detail.hs_code_cn.elem12" rows="1"  class="input-sm form-control" v-model="detail.hs_code_cn.elem12"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="elem13" class="col-xs-2 control-label">要素13</label>
+                                            <div class="col-xs-10">
+                                                <textarea id="elem13" name="detail.hs_code_cn.elem13" rows="1" class="input-sm form-control" v-model="detail.hs_code_cn.elem13"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="elem14" class="col-xs-2 control-label">要素14</label>
+                                            <div class="col-xs-10">
+                                                <textarea id="elem14" name="detail.hs_code_cn.elem14" rows="1" class="input-sm form-control" v-model="detail.hs_code_cn.elem14"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success btn-sm" @click="saveHsCodeCnReportElem()">
+                        <i class="ace-icon fa fa-floppy-o"></i>保存
+                    </button>
+                    <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">
+                        <i class="ace-icon fa fa-times"></i>关闭
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    var vm = new Vue({
+        el: "#page",
+        data: {
+            "detail": {
+                "hs_code_cn": {}
+            }
+        },
+        mounted: function () {
+            initDataTable(
+                '#hsCodeCnReportElemList',
+                {
+                    "sAjaxSource": '{%url "ErpHsCodeCnReportElem.ListData"%}',
+                    "aaSorting": [[1, "asc"]],
+                    "aoColumns": [
+                        {
+                            "mDataProp": "id", "bSearchable": false, "orderable": false, "sClass": "center", "width": 50,
+                            "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
+                            "render": function (data, type, row) {
+                                return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
+                            }
+                        },
+                        {"mDataProp": "hs_code", "title": "海关编码", "bSearchable": true, "width": 120},
+                        {
+                            "mDataProp": "cn_name", "title": "中文品名", "bSearchable": true, "sClass": "wrap-word",
+                            "render": function (data, type, row) {
+                                return "<div>" + data + "</div>";
+                            }
+                        },
+                        {
+                            "mDataProp": "en_name", "title": "英文品名", "bSearchable": true, "sClass": "wrap-word",
+                            "render": function (data, type, row) {
+                                return "<div>" + data + "</div>";
+                            }
+                        },
+                        {
+                            "mDataProp": "elem01", "title": "要素1", "bSearchable": true, "sClass": "wrap-word",
+                            "render": function (data, type, row) {
+                                return "<div>" + data + "</div>";
+                            }
+                        },
+                        {
+                            "mDataProp": "elem02", "title": "要素2", "bSearchable": true, "sClass": "wrap-word",
+                            "render": function (data, type, row) {
+                                return "<div>" + data + "</div>";
+                            }
+                        },
+                        {
+                            "mDataProp": "elem03", "title": "要素3", "bSearchable": true, "sClass": "wrap-word",
+                            "render": function (data, type, row) {
+                                return "<div>" + data + "</div>";
+                            }
+                        },
+                        {"mDataProp": "create_time", "title": "创建时间", "bSearchable": false, "width": 120},
+                        {"mDataProp": "update_time", "title": "修改时间", "bSearchable": false, "width": 120}
+                    ]
+                }
+            );
+
+            $('#hsCodeCnReportElemList tbody').on('dblclick', 'tr', function () {
+                var id = $(this).find('td:first-child input:checkbox').val();
+                vm.showHsCodeCnReportElemDetail(id);
+            });
+        },
+        methods: {
+            reloadList: function () {
+                reloadList('#hsCodeCnReportElemList');
+            },
+            showHsCodeCnReportElemDetail: function (id) {
+                showMask("加载中...");
+                $("#hsCodeCnReportElemDetailForm").clearValidation();
+                $.ajax({
+                        url: '{%url "ErpHsCodeCnReportElem.DetailData" %}',
+                        type: "POST",
+                        data: {
+                            "id": id
+                        },
+                        success: function (result) {
+                            hideMask();
+                            if (result.success == false) {
+                                $.msg.error(result.message);
+                                return;
+                            }
+                            vm.detail = result;
+                            $('#hsCodeCnReportElemDetailDialog').modal(modalOptions);
+                        }
+                    }
+                );
+            },
+            saveHsCodeCnReportElem: function () {
+                showMask("提交中...");
+                var form = $("#hsCodeCnReportElemDetailForm");
+                var valid = validate(form, {
+                    'detail.hs_code_cn.hs_code': {
+                        required: true, minlength: 1, maxlength: 10
+                    },
+                    'detail.hs_code_cn.cn_name': {
+                        required: true
+                    },
+                    'detail.hs_code_cn.en_name': {
+                        required: true
+                    },
+                    'detail.hs_code_cn.elem01': {
+                        required: false
+                    },
+                    'detail.hs_code_cn.elem02': {
+                        required: false
+                    },
+                    'detail.hs_code_cn.elem03': {
+                        required: false
+                    },
+                    'detail.hs_code_cn.elem04': {
+                        required: false
+                    },
+                    'detail.hs_code_cn.elem05': {
+                        required: false
+                    },
+                    'detail.hs_code_cn.elem06': {
+                        required: false
+                    },
+                    'detail.hs_code_cn.elem07': {
+                        required: false
+                    },
+                    'detail.hs_code_cn.elem08': {
+                        required: false
+                    },
+                    'detail.hs_code_cn.elem09': {
+                        required: false
+                    },
+                    'detail.hs_code_cn.elem10': {
+                        required: false
+                    },
+                    'detail.hs_code_cn.elem11': {
+                        required: false
+                    },
+                    'detail.hs_code_cn.elem12': {
+                        required: false
+                    },
+                    'detail.hs_code_cn.elem13': {
+                        required: false
+                    },
+                    'detail.hs_code_cn.elem14': {
+                        required: false
+                    }
+                });
+
+                if (!valid) {
+                    hideMask();
+                } else {
+                    $.ajax({
+                            url: '{%url "ErpHsCodeCnReportElem.Save"%}',
+                            type: "POST",
+                            processData: false,
+                            contentType: 'application/json',
+                            data: JSON.stringify(vm.detail),
+                            success: function (data) {
+                                hideMask();
+                                if (data.success == false) {
+                                    $.msg.error(data.message);
+                                    //return;
+                                }
+                                else {
+                                    $.msg.show(data.message);
+                                    $('#hsCodeCnReportElemDetailDialog').modal('hide');
+                                    vm.reloadList();
+                                    //return;
+                                }
+                            }
+                        }
+                    );
+                }
+            },
+            deleteHsCodeCnReportElem: function () {
+                var id_list = [];
+                $('#hsCodeCnReportElemList tbody tr>td:first-child input:checkbox').each(function () {
+                    if (this.checked) {
+                        id_list.push($(this).val());
+                    }
+                });
+
+                if (id_list.length == 0) {
+                    $.msg.alert("请选择数据！");
+                    return;
+                }
+
+                $.msg.confirm("确认要删除吗？", function () {
+                    $.ajax({
+                        url: '{%url "ErpHsCodeCnReportElem.Delete"%}',
+                        type: "POST",
+                        data: {"id_list": id_list},
+                        success: function (data) {
+                            if (data.success == false) {
+                                $.msg.error(data.message);
+                                return;
+                            }
+                            else {
+                                $.msg.show(data.message);
+                            }
+                            vm.reloadList();
+                        }
+                    });
+                });
+            }
+        }
+    });
+</script>
+{%footer%}
+

@@ -400,6 +400,13 @@ func (e PassResInfo) InitData(db_session *xorm.Session) {
 		db_session.Insert(pass)
 
 		pass = new(PassResInfo)
+		pass.Id = pass_res.HGBG_HS_CODE_CN_REPORT_ELEM
+		pass.CateId = pass_res_cate.HGBG
+		pass.Name = "中国海关编码"
+		pass.Desc = core.MakeNullString("中国海关编码", true)
+		db_session.Insert(pass)
+
+		pass = new(PassResInfo)
 		pass.Id = pass_res.HGBG_HS_CODE_AU_DUTY
 		pass.CateId = pass_res_cate.HGBG
 		pass.Name = "澳洲海关编码"
