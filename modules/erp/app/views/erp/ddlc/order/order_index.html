@@ -48,6 +48,10 @@
                     </button>
                     {% end %}
                     {% if eq .status "phz" %}
+                    <button class="btn btn-grey btn-sm" onclick="show_select_print_order_by()">
+                        <i class="ace-icon fa fa-print"></i>
+                        打印标签
+                    </button>
                     <button class="btn btn-purple btn-sm" @click="faHuo()">
                         <i class="ace-icon fa fa-shopping-basket"></i>
                         发货
