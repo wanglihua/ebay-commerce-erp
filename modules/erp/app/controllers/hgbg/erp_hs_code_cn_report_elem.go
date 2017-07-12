@@ -1,4 +1,3 @@
-
 package controllers
 
 import (
@@ -8,6 +7,8 @@ import (
 
 	"matrix/core"
 	"matrix/modules/erp/models"
+	"matrix/modules/auth/service/pass_service"
+	"matrix/modules/auth/pass_res"
 )
 
 type ErpHsCodeCnReportElem struct {
@@ -15,10 +16,14 @@ type ErpHsCodeCnReportElem struct {
 }
 
 func (c ErpHsCodeCnReportElem) Index() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.HGBG_HS_CODE_CN_REPORT_ELEM, c.Session)
+
 	return c.RenderTemplate("erp/hgbg/hs_code_cn_report_elem/hs_code_cn_report_elem_index.html")
 }
 
 func (c ErpHsCodeCnReportElem) ListData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.HGBG_HS_CODE_CN_REPORT_ELEM, c.Session)
+
 	db_session := c.DbSession
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
@@ -55,7 +60,7 @@ func (f *HsCodeCnReportElemDetailForm) IsCreate() bool {
 	return f.HsCodeCnReportElem.Id == 0
 }
 
-func (f *HsCodeCnReportElemDetailForm) Valid(validation *revel.Validation) bool { 
+func (f *HsCodeCnReportElemDetailForm) Valid(validation *revel.Validation) bool {
 	validation.Required(f.HsCodeCnReportElem.HsCode).Message("海关编码不能为空！")
 	if f.HsCodeCnReportElem.HsCode != "" {
 		validation.MinSize(f.HsCodeCnReportElem.HsCode, 1).Message("海关编码长度不能小于1！")
@@ -72,6 +77,8 @@ func (f *HsCodeCnReportElemDetailForm) Valid(validation *revel.Validation) bool 
 }
 
 func (c ErpHsCodeCnReportElem) DetailData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.HGBG_HS_CODE_CN_REPORT_ELEM, c.Session)
+
 	db_session := c.DbSession
 
 	var hs_code_cn_report_elem_id int64
@@ -93,6 +100,8 @@ func (c ErpHsCodeCnReportElem) DetailData() revel.Result {
 }
 
 func (c ErpHsCodeCnReportElem) Save() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.HGBG_HS_CODE_CN_REPORT_ELEM, c.Session)
+
 	db_session := c.DbSession
 
 	var detail_form HsCodeCnReportElemDetailForm
@@ -106,10 +115,10 @@ func (c ErpHsCodeCnReportElem) Save() revel.Result {
 	hs_code_cn_report_elem := detail_form.HsCodeCnReportElem
 
 	var affected int64
-	if detail_form.IsCreate() { 
+	if detail_form.IsCreate() {
 		affected, err = db_session.Insert(&hs_code_cn_report_elem)
 		core.HandleError(err)
-	} else { 
+	} else {
 		affected, err = db_session.Id(hs_code_cn_report_elem.Id).Update(&hs_code_cn_report_elem)
 		core.HandleError(err)
 
@@ -122,6 +131,8 @@ func (c ErpHsCodeCnReportElem) Save() revel.Result {
 }
 
 func (c ErpHsCodeCnReportElem) Delete() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.HGBG_HS_CODE_CN_REPORT_ELEM, c.Session)
+
 	db_session := c.DbSession
 
 	hs_code_cn_report_elem_id_list := make([]int64, 0)
@@ -132,4 +143,3 @@ func (c ErpHsCodeCnReportElem) Delete() revel.Result {
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})
 }
-

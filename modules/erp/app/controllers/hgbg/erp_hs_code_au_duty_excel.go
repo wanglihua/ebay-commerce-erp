@@ -20,7 +20,7 @@ type ErpHsCodeAuDutyExcel struct {
 }
 
 func (c ErpHsCodeAuDutyExcel) Import() revel.Result {
-	pass_service.Check_login_user_pass(pass_res.HGBG_PRODUCT_HS_CODE, c.Session)
+	pass_service.Check_login_user_pass(pass_res.HGBG_HS_CODE_AU_DUTY, c.Session)
 
 	db_session := c.DbSession
 
@@ -143,7 +143,7 @@ func (c ErpHsCodeAuDutyExcel) Import() revel.Result {
 }
 
 func (c ErpHsCodeAuDutyExcel) Export() revel.Result {
-	pass_service.Check_login_user_pass(pass_res.HGBG_PRODUCT_HS_CODE, c.Session)
+	pass_service.Check_login_user_pass(pass_res.HGBG_HS_CODE_AU_DUTY, c.Session)
 
 	db_session := c.DbSession
 

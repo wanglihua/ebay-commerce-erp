@@ -8,6 +8,8 @@ import (
 
 	"matrix/core"
 	"matrix/modules/erp/models"
+	"matrix/modules/auth/service/pass_service"
+	"matrix/modules/auth/pass_res"
 )
 
 type ErpHsCodeAuDuty struct {
@@ -15,10 +17,14 @@ type ErpHsCodeAuDuty struct {
 }
 
 func (c ErpHsCodeAuDuty) Index() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.HGBG_HS_CODE_AU_DUTY, c.Session)
+
 	return c.RenderTemplate("erp/hgbg/hs_code_au_duty/hs_code_au_duty_index.html")
 }
 
 func (c ErpHsCodeAuDuty) ListData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.HGBG_HS_CODE_AU_DUTY, c.Session)
+
 	db_session := c.DbSession
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
@@ -74,6 +80,8 @@ func (f *HsCodeAuDutyDetailForm) Valid(validation *revel.Validation) bool {
 }
 
 func (c ErpHsCodeAuDuty) DetailData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.HGBG_HS_CODE_AU_DUTY, c.Session)
+
 	db_session := c.DbSession
 
 	var hs_code_au_duty_id int64
@@ -95,6 +103,8 @@ func (c ErpHsCodeAuDuty) DetailData() revel.Result {
 }
 
 func (c ErpHsCodeAuDuty) Save() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.HGBG_HS_CODE_AU_DUTY, c.Session)
+
 	db_session := c.DbSession
 
 	var detail_form HsCodeAuDutyDetailForm
@@ -124,6 +134,8 @@ func (c ErpHsCodeAuDuty) Save() revel.Result {
 }
 
 func (c ErpHsCodeAuDuty) Delete() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.HGBG_HS_CODE_AU_DUTY, c.Session)
+
 	db_session := c.DbSession
 
 	hs_code_au_duty_id_list := make([]int64, 0)

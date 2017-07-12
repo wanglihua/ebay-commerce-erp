@@ -15,12 +15,12 @@ import (
 	"strings"
 )
 
-type ErpHsCodeReportElemExcel struct {
+type ErpHsCodeCnReportElemExcel struct {
 	*revel.Controller
 }
 
-func (c ErpHsCodeReportElemExcel) Import() revel.Result {
-	pass_service.Check_login_user_pass(pass_res.HGBG_PRODUCT_HS_CODE, c.Session)
+func (c ErpHsCodeCnReportElemExcel) Import() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.HGBG_HS_CODE_CN_REPORT_ELEM, c.Session)
 
 	db_session := c.DbSession
 
@@ -142,8 +142,8 @@ func (c ErpHsCodeReportElemExcel) Import() revel.Result {
 	})
 }
 
-func (c ErpHsCodeReportElemExcel) Export() revel.Result {
-	pass_service.Check_login_user_pass(pass_res.HGBG_PRODUCT_HS_CODE, c.Session)
+func (c ErpHsCodeCnReportElemExcel) Export() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.HGBG_HS_CODE_CN_REPORT_ELEM, c.Session)
 
 	db_session := c.DbSession
 
@@ -166,7 +166,7 @@ func (c ErpHsCodeReportElemExcel) Export() revel.Result {
 	return c.RenderBinary(reader, file_name, revel.Attachment, time.Now())
 }
 
-func (c ErpHsCodeReportElemExcel) export_product_list_to_excel(db_session *xorm.Session, product_list []models.ProductInfo) *xlsx.File {
+func (c ErpHsCodeCnReportElemExcel) export_product_list_to_excel(db_session *xorm.Session, product_list []models.ProductInfo) *xlsx.File {
 
 	//统一设置标题单元格格式的函数
 	set_head_cell_style := func(cell *xlsx.Cell) {
