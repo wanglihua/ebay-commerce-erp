@@ -36,13 +36,16 @@ func (c ErpProductHsCodeExcel) Import() revel.Result {
 		})
 	}
 
-	type product_hs_code_t struct {
-		sku        string
-		cn_hs_code string
-		au_hs_code string
+	type product_hs_code_import_t struct {
+		Sku          string  `json:"sku"`
+		CnHsCode     string  `json:"cn_hs_code"`
+		AuHsCode     string  `json:"au_hs_code"`
+		ErrorMessage string  `json:"error_message"`
+
+		product models.ProductInfo `json:"-"`
 	}
 
-	product_hs_code_list := make([]product_hs_code_t, 0)
+	product_hs_code_import_list := make([]product_hs_code_import_t, 0)
 
 	xlsx_file, err := xlsx.OpenBinary(excel_file_bytes)
 	core.HandleError(err)
@@ -62,7 +65,7 @@ func (c ErpProductHsCodeExcel) Import() revel.Result {
 			var cell_val string
 			var err error
 
-			var product_hs_code product_hs_code_t
+			var product_hs_code product_hs_code_import_t
 
 			col_index := 0
 
@@ -76,7 +79,7 @@ func (c ErpProductHsCodeExcel) Import() revel.Result {
 				break
 			}
 			//revel.TRACE.Println(cell_val)
-			product_hs_code.sku = cell_val
+			product_hs_code.Sku = cell_val
 			col_index++
 
 			// cn_hs_code
@@ -85,7 +88,7 @@ func (c ErpProductHsCodeExcel) Import() revel.Result {
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
-			product_hs_code.cn_hs_code = cell_val
+			product_hs_code.CnHsCode = cell_val
 			col_index++
 
 			// au_hs_code
@@ -94,38 +97,54 @@ func (c ErpProductHsCodeExcel) Import() revel.Result {
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
-			product_hs_code.au_hs_code = cell_val
+			product_hs_code.AuHsCode = cell_val
 			col_index++
 
-			product_hs_code_list = append(product_hs_code_list, product_hs_code)
+			product_hs_code_import_list = append(product_hs_code_import_list, product_hs_code)
 		}
 	}
 
-	if len(product_hs_code_list) == 0 {
+	if len(product_hs_code_import_list) == 0 {
 		return c.RenderJson(map[string]interface{}{
 			"success": false,
 			"message": "Excel文件中导入商品列表为空！",
 		})
 	}
 
-	//todo: 验证导入的数据
+	//验证导入的数据
+	var product_hs_code_import_error_list = make([]product_hs_code_import_t, 0)
 
-	for _, product_hs_code := range product_hs_code_list {
+	for index, product_hs_code_import := range product_hs_code_import_list {
 		var product models.ProductInfo
-		has, err := db_session.Where(fmt.Sprintf("sku = '%s'", product_hs_code.sku)).Get(&product)
+		has, err := db_session.Where(fmt.Sprintf("sku = '%s'", product_hs_code_import.Sku)).Get(&product)
 		core.HandleError(err)
 
-		product.Sku = product_hs_code.sku
-		product.CnHsCode = product_hs_code.cn_hs_code
-		product.AuHsCode = product_hs_code.au_hs_code
-
-		if has == true {
-			update_col_list := []string{"cn_hs_code", "au_hs_code"}
-			_, err = db_session.Id(product.Id).Cols(update_col_list...).Update(&product)
-			core.HandleError(err)
+		if has == false {
+			product_hs_code_import.ErrorMessage = fmt.Sprintf("商品SKU %s 数据库中不存在！", product_hs_code_import.Sku)
+			product_hs_code_import_error_list = append(product_hs_code_import_error_list, product_hs_code_import)
 		} else {
-			panic(fmt.Sprintf("商品SKU %s 数据库中不存在！", product_hs_code.sku))
+			product_hs_code_import_list[index].product = product
 		}
+	}
+
+	if len(product_hs_code_import_error_list) != 0 {
+		return c.RenderJson(map[string]interface{}{
+			"success":         false,
+			"message":         "导入出现错误，详细请查看页面下部列表！",
+			"error_data_list": product_hs_code_import_error_list,
+		})
+	}
+
+	for _, product_hs_code_import := range product_hs_code_import_list {
+		var product = product_hs_code_import.product
+
+		product.Sku = product_hs_code_import.Sku
+		product.CnHsCode = product_hs_code_import.CnHsCode
+		product.AuHsCode = product_hs_code_import.AuHsCode
+
+		update_col_list := []string{"cn_hs_code", "au_hs_code"}
+		_, err = db_session.Id(product.Id).Cols(update_col_list...).Update(&product)
+		core.HandleError(err)
 	}
 
 	return c.RenderJson(map[string]interface{}{
