@@ -149,7 +149,7 @@ func (c ErpHsCodeAuDutyExcel) Import() revel.Result {
 		hs_code_au.HsCode = hs_code_au_import.HsCode
 		hs_code_au.CnName = hs_code_au_import.CnName
 		hs_code_au.EnName = hs_code_au_import.EnName
-		hs_code_au.DutyRate, _ = strconv.ParseFloat(hs_code_au_import.DutyRate, 64)
+		hs_code_au.DutyRate = hs_code_au_import.duty_rate
 
 		if has == true {
 			update_col_list := []string{"cn_name", "en_name", "duty_rate"}
