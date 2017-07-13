@@ -133,6 +133,7 @@ const (
 	order_query_criteria_buyer_user_id       int64 = 4000
 	order_query_criteria_stock_name          int64 = 5000
 	order_query_criteria_logistics_mode_name int64 = 6000
+	order_query_criteria_waybill_number      int64 = 7000
 )
 
 type order_query_criteria struct {
@@ -151,6 +152,7 @@ func (c ErpOrder) get_order_query_criteria_list() []order_query_criteria {
 	order_query_criteria_list = append(order_query_criteria_list, order_query_criteria{Id: order_query_criteria_buyer_user_id, Name: "买家账号"})
 	order_query_criteria_list = append(order_query_criteria_list, order_query_criteria{Id: order_query_criteria_stock_name, Name: "发货仓库"})
 	order_query_criteria_list = append(order_query_criteria_list, order_query_criteria{Id: order_query_criteria_logistics_mode_name, Name: "物流方式"})
+	order_query_criteria_list = append(order_query_criteria_list, order_query_criteria{Id: order_query_criteria_waybill_number, Name: "运输单号"})
 
 	return order_query_criteria_list
 }
@@ -391,6 +393,9 @@ func (c ErpOrder) ListData() revel.Result {
 		} else if query_criteria_id == order_query_criteria_logistics_mode_name {
 			// SELECT * FROM erp_order o WHERE o.mode_id IN (SELECT lm.id FROM erp_logistics_mode lm WHERE lm.name LIKE '%name%')
 			filter = core.SqlAnd(filter, fmt.Sprintf("o.mode_id IN (SELECT lm.id FROM erp_logistics_mode lm WHERE lm.name LIKE '%%%s%%')", query_criteria_value))
+		} else if query_criteria_id == order_query_criteria_waybill_number {
+			//waybill_number
+			filter = core.SqlAnd(filter, fmt.Sprintf("o.waybill_number like '%%%s%%'", query_criteria_value))
 		}
 	}
 
