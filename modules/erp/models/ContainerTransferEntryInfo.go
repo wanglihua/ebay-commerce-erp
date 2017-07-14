@@ -9,6 +9,7 @@ type ContainerTransferEntryInfo struct {
 	ProductSku string          `xorm:"nvarchar(200) notnull 'product_sku'" json:"product_sku" smith:"verbose_name=SKU"`
 	Qty        int64           `xorm:"bigint notnull 'qty'" json:"qty" smith:"verbose_name=数量"`
 	BoxQty     int64           `xorm:"bigint notnull 'box_qty'" json:"box_qty" smith:"verbose_name=箱数"`
+	Price      float64         `xorm:"float64 notnull 'price'" json:"price"  smith:"verbose_name=价格"`
 	CreateTime core.Time       `xorm:"created notnull 'create_time'" json:"create_time"`
 	UpdateTime core.Time       `xorm:"updated notnull 'update_time'" json:"update_time"`
 }
