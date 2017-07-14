@@ -5,7 +5,7 @@ import "matrix/core"
 type ContainerTransferEntryInfo struct {
 	Id         int64           `xorm:"bigint notnull pk autoincr 'id'" json:"id"`
 	TransferId int64           `xorm:"bigint notnull index 'transfer_id'" json:"transfer_id" smith:"verbose_name=集装箱调拨Id"`
-	ProductId  int64           `xorm:"bigint notnull 'transfer_id'" json:"transfer_id" smith:"verbose_name=集装箱调拨Id"`
+	ProductId  int64           `xorm:"bigint notnull 'product_id'" json:"product_id" smith:"verbose_name=商品Id"`
 	ProductSku string          `xorm:"nvarchar(200) notnull 'product_sku'" json:"product_sku" smith:"verbose_name=SKU"`
 	Qty        int64           `xorm:"bigint notnull 'qty'" json:"qty" smith:"verbose_name=数量"`
 	BoxQty     int64           `xorm:"bigint notnull 'box_qty'" json:"box_qty" smith:"verbose_name=箱数"`

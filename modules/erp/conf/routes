@@ -507,3 +507,9 @@ POST /hs/code/cn/delete             ErpHsCodeCnReportElem.Delete
 
 POST /hs/code/cn/import             ErpHsCodeCnReportElemExcel.Import
 POST /hs/code/cn/export             ErpHsCodeCnReportElemExcel.Export
+
+GET  /container/transfer              ErpContainerTransfer.Index
+POST /container/transfer/data/list    ErpContainerTransfer.ListData
+POST /container/transfer/data/detail  ErpContainerTransfer.DetailData
+POST /container/transfer/save         ErpContainerTransfer.Save
+POST /container/transfer/delete       ErpContainerTransfer.Delete
