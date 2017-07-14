@@ -1,0 +1,135 @@
+
+package controllers
+
+import (
+	"encoding/json"
+	"strconv"
+	"github.com/revel/revel"
+
+	"matrix/core"
+	"matrix/modules/erp/models"
+)
+
+type ErpContainerTransferEntry struct {
+	*revel.Controller
+}
+
+func (c ErpContainerTransferEntry) Index() revel.Result {
+	return c.RenderTemplate("erp/hgbg/container_transfer_entry/container_transfer_entry_index.html")
+}
+
+func (c ErpContainerTransferEntry) ListData() revel.Result {
+	db_session := c.DbSession
+
+	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
+	query := db_session.Where(filter)
+
+	//query extra filter here
+
+	data_query := *query
+	if order != "" {
+		data_query = *data_query.OrderBy(order)
+	} else {
+		data_query = *data_query.Asc("id")
+	}
+
+	container_transfer_entry_list := make([]models.ContainerTransferEntryInfo, 0, limit)
+	err := data_query.Limit(limit, offset).Find(&container_transfer_entry_list)
+	core.HandleError(err)
+
+	count_query := *query
+	count, err := count_query.Count(new(models.ContainerTransferEntryInfo))
+	core.HandleError(err)
+
+	return c.RenderJson(core.GridResult{
+		Data:  container_transfer_entry_list,
+		Total: count,
+	})
+}
+
+type ContainerTransferEntryDetailForm struct {
+	ContainerTransferEntry models.ContainerTransferEntryInfo `json:"transfer_entry"`
+}
+
+func (f *ContainerTransferEntryDetailForm) IsCreate() bool {
+	return f.ContainerTransferEntry.Id == 0
+}
+
+func (f *ContainerTransferEntryDetailForm) Valid(validation *revel.Validation) bool { 
+	validation.Required(f.ContainerTransferEntry.TransferId).Message("集装箱调拨Id不能为空！")
+
+	validation.Required(f.ContainerTransferEntry.ProductId).Message("商品Id不能为空！")
+
+	validation.Required(f.ContainerTransferEntry.ProductSku).Message("SKU不能为空！")
+
+	validation.Required(f.ContainerTransferEntry.Qty).Message("数量不能为空！")
+
+	validation.Required(f.ContainerTransferEntry.BoxQty).Message("箱数不能为空！")
+
+	validation.Required(f.ContainerTransferEntry.Price).Message("价格不能为空！")
+
+	return validation.HasErrors() == false
+}
+
+func (c ErpContainerTransferEntry) DetailData() revel.Result {
+	db_session := c.DbSession
+
+	var container_transfer_entry_id int64
+	c.Params.Bind(&container_transfer_entry_id, "id")
+
+	var container_transfer_entry models.ContainerTransferEntryInfo
+	if container_transfer_entry_id != 0 {
+		has, err := db_session.Id(container_transfer_entry_id).Get(&container_transfer_entry)
+		core.HandleError(err)
+		if has == false {
+			return c.RenderJson(core.JsonResult{Success: false, Message: "指定的集装箱调拨明细不存在！"})
+		}
+	}
+
+	var detail_form ContainerTransferEntryDetailForm
+	detail_form.ContainerTransferEntry = container_transfer_entry
+
+	return c.RenderJson(detail_form)
+}
+
+func (c ErpContainerTransferEntry) Save() revel.Result {
+	db_session := c.DbSession
+
+	var detail_form ContainerTransferEntryDetailForm
+	err := json.Unmarshal(c.GetRequestBody(), &detail_form)
+	core.HandleError(err)
+
+	if detail_form.Valid(c.Validation) == false {
+		return c.RenderJson(core.JsonResult{Success: false, Message: c.GetValidationErrorMessage()})
+	}
+
+	container_transfer_entry := detail_form.ContainerTransferEntry
+
+	var affected int64
+	if detail_form.IsCreate() { 
+		affected, err = db_session.Insert(&container_transfer_entry)
+		core.HandleError(err)
+	} else { 
+		affected, err = db_session.Id(container_transfer_entry.Id).Update(&container_transfer_entry)
+		core.HandleError(err)
+
+		if affected == 0 {
+			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！" })
+		}
+	}
+
+	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据保存成功!"})
+}
+
+func (c ErpContainerTransferEntry) Delete() revel.Result {
+	db_session := c.DbSession
+
+	container_transfer_entry_id_list := make([]int64, 0)
+	c.Params.Bind(&container_transfer_entry_id_list, "id_list")
+
+	affected, err := db_session.In("id", container_transfer_entry_id_list).Delete(new(models.ContainerTransferEntryInfo))
+	core.HandleError(err)
+
+	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})
+}
+

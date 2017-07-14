@@ -1,0 +1,278 @@
+{%header "集装箱调拨明细" .%}
+<div id="page">
+    <div class="breadcrumbs" id="breadcrumbs">
+        <ul class="breadcrumb">
+            <li>
+                <a href='{%url "Home.Index"%}'><i class="ace-icon fa fa-home home-icon"></i></a>
+            </li>
+            <li class="parent" data-menu="hgbg-menu">海关报关</li>
+            <li class="active" data-menu="hgbg-container-transfer-entry-menu">集装箱调拨明细</li>
+        </ul>
+    </div>
+    <div class="page-content">
+        <div class="row">
+            <div class="col-xs-12" style="padding: 0;">
+                <div class="gridToolBar clearfix">
+                    <button class="btn btn-primary btn-sm" @click="reloadList('#containerTransferEntryList')">
+                        <i class="ace-icon fa fa-refresh"></i>
+                        刷新
+                    </button>
+                    <button class="btn btn-success btn-sm" @click="showContainerTransferEntryDetail(0)">
+                        <i class="ace-icon fa fa-plus"></i>
+                        新增
+                    </button>
+                    <button class="btn btn-danger btn-sm" @click="deleteContainerTransferEntry()">
+                        <i class="ace-icon fa fa-trash-o"></i>
+                        删除
+                    </button>
+                </div>
+                <div>
+                    <table id="containerTransferEntryList" class="table table-striped table-bordered table-hover"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="containerTransferEntryDetailDialog">
+        <div class="modal-dialog" style="width: 680px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="True">&times;</button>
+                    <h4 class="modal-title">集装箱调拨明细详细</h4>
+                </div>
+                <div class="modal-body clearfix">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <form class="form-horizontal" role="form" id="containerTransferEntryDetailForm">
+                                <input id="container_transfer_entry_id" name="detail.transfer_entry.id" type="hidden" v-model.number="detail.transfer_entry.id"/>
+                                <input id="container_transfer_entry_version" name="detail.transfer_entry.version" type="hidden" v-model.number="detail.transfer_entry.version"/>
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="transfer_id" class="col-xs-2 control-label">集装箱调拨Id</label>
+                                            <div class="col-xs-10">
+                                                <input id="transfer_id" name="detail.transfer_entry.transfer_id" type="text" class="input-sm form-control" v-model.number="detail.transfer_entry.transfer_id"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="product_id" class="col-xs-2 control-label">商品Id</label>
+                                            <div class="col-xs-10">
+                                                <input id="product_id" name="detail.transfer_entry.product_id" type="text" class="input-sm form-control" v-model.number="detail.transfer_entry.product_id"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="product_sku" class="col-xs-2 control-label">SKU</label>
+                                            <div class="col-xs-10">
+                                                <input id="product_sku" name="detail.transfer_entry.product_sku" type="text" class="input-sm form-control" v-model="detail.transfer_entry.product_sku"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="qty" class="col-xs-2 control-label">数量</label>
+                                            <div class="col-xs-10">
+                                                <input id="qty" name="detail.transfer_entry.qty" type="text" class="input-sm form-control" v-model.number="detail.transfer_entry.qty"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="box_qty" class="col-xs-2 control-label">箱数</label>
+                                            <div class="col-xs-10">
+                                                <input id="box_qty" name="detail.transfer_entry.box_qty" type="text" class="input-sm form-control" v-model.number="detail.transfer_entry.box_qty"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="price" class="col-xs-2 control-label">价格</label>
+                                            <div class="col-xs-10">
+                                                <input id="price" name="detail.transfer_entry.price" type="text" class="input-sm form-control" v-model="detail.transfer_entry.price"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success btn-sm" @click="saveContainerTransferEntry()">
+                        <i class="ace-icon fa fa-floppy-o"></i>保存
+                    </button>
+                    <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">
+                        <i class="ace-icon fa fa-times"></i>关闭
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    var vm = new Vue({
+        el: "#page",
+        data: {
+            "detail": {
+                "transfer_entry": {}
+            }
+        },
+        mounted: function () {
+            initDataTable(
+                '#containerTransferEntryList',
+                {
+                    "sAjaxSource": '{%url "ErpContainerTransferEntry.ListData"%}',
+                    "aaSorting": [[1, "asc"]],
+                    "aoColumns": [
+                        {
+                            "mDataProp": "id", "bSearchable": false, "orderable": false, "sClass": "center", "width": 50,
+                            "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
+                            "render": function (data, type, row) {
+                                return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
+                            }
+                        },
+                        {"mDataProp": "batch_code", "title": "批次号", "bSearchable": false, "width": 150},
+                        {"mDataProp": "product_sku", "title": "SKU", "bSearchable": true},
+                        {"mDataProp": "qty", "title": "数量", "bSearchable": false, "width": 100},
+                        {"mDataProp": "box_qty", "title": "箱数", "bSearchable": false, "width": 100},
+                        {"mDataProp": "price", "title": "价格", "bSearchable": true, "width": 100},
+                        {"mDataProp": "create_time", "title": "创建时间", "bSearchable": false, "width": 120},
+                        {"mDataProp": "update_time", "title": "修改时间", "bSearchable": false, "width": 120}
+                    ]
+                }
+            );
+
+            $('#containerTransferEntryList tbody').on('dblclick', 'tr', function () {
+                var id = $(this).find('td:first-child input:checkbox').val();
+                vm.showContainerTransferEntryDetail(id);
+            });
+        },
+        methods: {
+            reloadList: function () {
+                reloadList('#containerTransferEntryList');
+            },
+            showContainerTransferEntryDetail: function (id) {
+                showMask("加载中...");
+                $("#containerTransferEntryDetailForm").clearValidation();
+                $.ajax({
+                        url: '{%url "ErpContainerTransferEntry.DetailData" %}',
+                        type: "POST",
+                        data: {
+                            "id": id
+                        },
+                        success: function (result) {
+                            hideMask();
+                            if (result.success === false) {
+                                $.msg.error(result.message);
+                                return;
+                            }
+                            vm.detail = result;
+                            $('#containerTransferEntryDetailDialog').modal(modalOptions);
+                        }
+                    }
+                );
+            },
+            saveContainerTransferEntry: function () {
+                showMask("提交中...");
+                var form = $("#containerTransferEntryDetailForm");
+                var valid = validate(form, {
+                    'detail.transfer_entry.transfer_id': {
+                        required: true, digits: true
+                    },
+                    'detail.transfer_entry.product_id': {
+                        required: true, digits: true
+                    },
+                    'detail.transfer_entry.product_sku': {
+                        required: true
+                    },
+                    'detail.transfer_entry.qty': {
+                        required: true, digits: true
+                    },
+                    'detail.transfer_entry.box_qty': {
+                        required: true, digits: true
+                    },
+                    'detail.transfer_entry.price': {
+                        required: true
+                    }
+                });
+
+                if (!valid) {
+                    hideMask();
+                } else {
+                    $.ajax({
+                            url: '{%url "ErpContainerTransferEntry.Save"%}',
+                            type: "POST",
+                            processData: false,
+                            contentType: 'application/json',
+                            data: JSON.stringify(vm.detail),
+                            success: function (data) {
+                                hideMask();
+                                if (data.success === false) {
+                                    $.msg.error(data.message);
+                                    //return;
+                                }
+                                else {
+                                    $.msg.show(data.message);
+                                    $('#containerTransferEntryDetailDialog').modal('hide');
+                                    vm.reloadList();
+                                    //return;
+                                }
+                            }
+                        }
+                    );
+                }
+            },
+            deleteContainerTransferEntry: function () {
+                var id_list = [];
+                $('#containerTransferEntryList tbody tr>td:first-child input:checkbox').each(function () {
+                    if (this.checked) {
+                        id_list.push($(this).val());
+                    }
+                });
+
+                if (id_list.length === 0) {
+                    $.msg.alert("请选择数据！");
+                    return;
+                }
+
+                $.msg.confirm("确认要删除吗？", function () {
+                    $.ajax({
+                        url: '{%url "ErpContainerTransferEntry.Delete"%}',
+                        type: "POST",
+                        data: {"id_list": id_list},
+                        success: function (data) {
+                            if (data.success === false) {
+                                $.msg.error(data.message);
+                                return;
+                            }
+                            else {
+                                $.msg.show(data.message);
+                            }
+                            vm.reloadList();
+                        }
+                    });
+                });
+            }
+        }
+    });
+</script>
+{%footer%}
+
