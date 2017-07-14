@@ -104,7 +104,7 @@ func (c ErpHsCodeAuDutyExcel) Import() revel.Result {
 			cell_val = cell.Value
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
-			hs_code_au.DutyRate = cell_val
+			hs_code_au.DutyRate = cell_val // 5% 会自动变为 0.05
 			col_index++
 
 			hs_code_au_import_list = append(hs_code_au_import_list, hs_code_au)
@@ -124,12 +124,14 @@ func (c ErpHsCodeAuDutyExcel) Import() revel.Result {
 		if strings.TrimSpace(hs_code_au_import.DutyRate) == "" {
 			hs_code_au_import.duty_rate = 0
 		} else {
-			duty_rate, err := strconv.ParseFloat(strings.TrimSpace(strings.Trim(hs_code_au_import.DutyRate, "%")), 64)
+			duty_rate, err := strconv.ParseFloat(hs_code_au_import.DutyRate, 64)
+			revel.TRACE.Println(`strings.TrimSpace(strings.Trim(hs_code_au_import.DutyRate, "%%"))`, strings.TrimSpace(strings.Trim(hs_code_au_import.DutyRate, "%")))
+			revel.TRACE.Println("duty_rate", duty_rate)
 			if err != nil {
 				hs_code_au_import.ErrorMessage = "关税税率输入有误！"
 				hs_code_au_import_error_list = append(hs_code_au_import_error_list, hs_code_au_import)
 			}
-			hs_code_au_import_list[index].duty_rate = duty_rate / float64(100)
+			hs_code_au_import_list[index].duty_rate = duty_rate
 		}
 	}
 
