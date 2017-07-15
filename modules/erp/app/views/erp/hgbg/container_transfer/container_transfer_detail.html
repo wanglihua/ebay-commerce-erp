@@ -48,7 +48,6 @@
                                         </div>
                                     </div>
 
-
                                     <div class="col-xs-3">
                                         <div class="form-group">
                                             <label for="container_code" class="col-xs-4 control-label">集装箱号</label>
@@ -232,9 +231,19 @@
         methods: {}
     });
 
-    $(function () {
-        reloadPageData();
+    var entries_vm = new Vue({
+        el: "#entries",
+        data: {
+            "detail": {
+                "transfer_entry": {}
+            }
+        },
+        mounted: function () {
+        },
+        methods: {}
+    });
 
+    $(function () {
         initDataTable(
             '#entry_list',
             {
@@ -263,6 +272,9 @@
             var id = $(this).find('td:first-child input:checkbox').val();
             entries_vm.showContainerTransferEntryDetail(id);
         });
+
+        reloadTransferDetail();
+        //reloadPageData();
     });
 
     function reloadPageData() {
@@ -406,18 +418,6 @@
 
         }
     }
-
-    var entries_vm = new Vue({
-        el: "#entries",
-        data: {
-            "detail": {
-                "transfer_entry": {}
-            }
-        },
-        mounted: function () {
-        },
-        methods: {}
-    });
 
     function reloadEntryList() {
         reloadList('#entry_list');
