@@ -1,4 +1,3 @@
-
 package controllers
 
 import (
@@ -8,6 +7,7 @@ import (
 
 	"matrix/core"
 	"matrix/modules/erp/models"
+	"fmt"
 )
 
 type ErpContainerTransferEntry struct {
@@ -21,10 +21,14 @@ func (c ErpContainerTransferEntry) Index() revel.Result {
 func (c ErpContainerTransferEntry) ListData() revel.Result {
 	db_session := c.DbSession
 
-	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
-	query := db_session.Where(filter)
+	var transfer_id int64
+	c.Params.Bind(&transfer_id, "transfer_id")
 
-	//query extra filter here
+	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
+
+	filter = core.SqlAnd(filter, fmt.Sprintf("transfer_id = %d", transfer_id))
+
+	query := db_session.Where(filter)
 
 	data_query := *query
 	if order != "" {
@@ -55,7 +59,7 @@ func (f *ContainerTransferEntryDetailForm) IsCreate() bool {
 	return f.ContainerTransferEntry.Id == 0
 }
 
-func (f *ContainerTransferEntryDetailForm) Valid(validation *revel.Validation) bool { 
+func (f *ContainerTransferEntryDetailForm) Valid(validation *revel.Validation) bool {
 	validation.Required(f.ContainerTransferEntry.TransferId).Message("集装箱调拨Id不能为空！")
 
 	validation.Required(f.ContainerTransferEntry.ProductId).Message("商品Id不能为空！")
@@ -105,11 +109,23 @@ func (c ErpContainerTransferEntry) Save() revel.Result {
 
 	container_transfer_entry := detail_form.ContainerTransferEntry
 
+	var product_sku = container_transfer_entry.ProductSku
+
+	var product models.ProductInfo
+	has, err := db_session.Where(fmt.Sprintf("sku = '%s'", product_sku)).Get(&product)
+	core.HandleError(err)
+
+	if has == false {
+		return c.RenderJson(core.JsonResult{Success: false, Message: "商品SKU不存在！" })
+	}
+
+	container_transfer_entry.ProductId = product.Id
+
 	var affected int64
-	if detail_form.IsCreate() { 
+	if detail_form.IsCreate() {
 		affected, err = db_session.Insert(&container_transfer_entry)
 		core.HandleError(err)
-	} else { 
+	} else {
 		affected, err = db_session.Id(container_transfer_entry.Id).Update(&container_transfer_entry)
 		core.HandleError(err)
 
@@ -132,4 +148,3 @@ func (c ErpContainerTransferEntry) Delete() revel.Result {
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})
 }
-
