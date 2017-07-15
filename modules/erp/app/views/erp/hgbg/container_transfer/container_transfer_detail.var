@@ -1,0 +1,3 @@
+<script type="text/javascript">
+    var transfer_id = {%.transfer_id%};
+</script>
