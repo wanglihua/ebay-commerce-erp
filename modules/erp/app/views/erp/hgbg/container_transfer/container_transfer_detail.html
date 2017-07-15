@@ -15,203 +15,203 @@
     <div class="page-content">
         <div class="row">
             <div class="col-xs-12" style="padding: 0;">
-                <div class="gridToolBar clearfix">
-                    <button class="btn btn-primary btn-sm" onclick="reloadContainerTransfer()">
-                        <i class="ace-icon fa fa-refresh"></i>
-                        刷新
-                    </button>
-                    <button class="btn btn-purple btn-sm" onclick="addContainerTransfer()">
-                        <i class="ace-icon fa fa-plus"></i>
-                        新增
-                    </button>
-                    <button class="btn btn-success btn-sm" onclick="saveContainerTransfer()">
-                        <i class="ace-icon fa fa-floppy-o"></i>保存
-                    </button>
-                    <button class="btn btn-danger btn-sm" onclick="deleteContainerTransfer()">
-                        <i class="ace-icon fa fa-trash-o"></i>
-                        删除
-                    </button>
-                </div>
-                <div style="margin-top: 25px;">
-                    <div class="col-xs-12">
-                        <form class="form-horizontal" role="form" id="containerTransferDetailForm">
-                            <input id="container_transfer_id" name="detail.transfer.id" type="hidden" v-model.number="detail.transfer.id"/>
-                            <input id="container_transfer_version" name="detail.transfer.version" type="hidden" v-model.number="detail.transfer.version"/>
-                            <div class="row">
-                                <div class="col-xs-3">
-                                    <div class="form-group">
-                                        <label for="batch_code" class="col-xs-4 control-label">批次号</label>
-                                        <div class="col-xs-8">
-                                            <input id="batch_code" name="detail.transfer.batch_code" type="text" class="input-sm form-control" v-model="detail.transfer.batch_code"/>
-                                        </div>
-                                    </div>
-                                </div>
-
-
-                                <div class="col-xs-3">
-                                    <div class="form-group">
-                                        <label for="container_code" class="col-xs-4 control-label">集装箱号</label>
-                                        <div class="col-xs-8">
-                                            <input id="container_code" name="detail.transfer.container_code" type="text" class="input-sm form-control" v-model="detail.transfer.container_code"/>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="col-xs-3">
-                                    <div class="form-group">
-                                        <label for="bl_no" class="col-xs-4 control-label">提单号</label>
-                                        <div class="col-xs-8">
-                                            <input id="bl_no" name="detail.transfer.bl_no" type="text" class="input-sm form-control" v-model="detail.transfer.bl_no"/>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="col-xs-3">
-                                    <div class="form-group">
-                                        <label for="seal_no" class="col-xs-4 control-label">铅封号</label>
-                                        <div class="col-xs-8">
-                                            <input id="seal_no" name="detail.transfer.seal_no" type="text" class="input-sm form-control" v-model="detail.transfer.seal_no"/>
-                                        </div>
-                                    </div>
-                                </div>
-
-                            </div>
-
-                            <div class="row">
-
-                                <div class="col-xs-3">
-                                    <div class="form-group">
-                                        <label for="dest_stock_id" class="col-xs-4 control-label">目的仓库</label>
-                                        <div class="col-xs-8">
-                                            <input id="dest_stock_id" name="detail.transfer.dest_stock_id" type="text" class="input-sm form-control" v-model.number="detail.transfer.dest_stock_id"/>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="col-xs-3">
-                                    <div class="form-group">
-                                        <label for="price_up_rate" class="col-xs-4 control-label">非征品上调</label>
-                                        <div class="col-xs-8">
-                                            <input id="price_up_rate" name="detail.transfer.price_up_rate" type="text" class="input-sm form-control" v-model.number="detail.transfer.price_up_rate"/>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="col-xs-3">
-                                    <div class="form-group">
-                                        <label for="price_down_rate" class="col-xs-4 control-label">征税品下调</label>
-                                        <div class="col-xs-8">
-                                            <input id="price_down_rate" name="detail.transfer.price_down_rate" type="text" class="input-sm form-control" v-model.number="detail.transfer.price_down_rate"/>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="col-xs-3">
-                                    <div class="form-group">
-                                        <label for="cost_up_rate" class="col-xs-4 control-label">成本上调</label>
-                                        <div class="col-xs-8">
-                                            <input id="cost_up_rate" name="detail.transfer.cost_up_rate" type="text" class="input-sm form-control" v-model.number="detail.transfer.cost_up_rate"/>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-xs-3">
-                                    <div class="form-group">
-                                        <label for="total_volumn" class="col-xs-4 control-label">总体积</label>
-                                        <div class="col-xs-8">
-                                            <input id="total_volumn" name="detail.transfer.total_volumn" type="text" class="input-sm form-control" v-model.number="detail.transfer.total_volumn"/>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="col-xs-3">
-                                    <div class="form-group">
-                                        <label for="total_weight" class="col-xs-4 control-label">总重量</label>
-                                        <div class="col-xs-8">
-                                            <input id="total_weight" name="detail.transfer.total_weight" type="text" class="input-sm form-control" v-model.number="detail.transfer.total_weight"/>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="col-xs-3">
-                                    <div class="form-group">
-                                        <label for="total_amount1" class="col-xs-4 control-label">总金额1</label>
-                                        <div class="col-xs-8">
-                                            <input id="total_amount1" name="detail.transfer.total_amount1" type="text" class="input-sm form-control" v-model.number="detail.transfer.total_amount1"/>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="col-xs-3">
-                                    <div class="form-group">
-                                        <label for="total_amount2" class="col-xs-4 control-label">总金额2</label>
-                                        <div class="col-xs-8">
-                                            <input id="total_amount2" name="detail.transfer.total_amount2" type="text" class="input-sm form-control" v-model.number="detail.transfer.total_amount2"/>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-xs-3">
-                                    <div class="form-group">
-                                        <label for="packing_time" class="col-xs-4 control-label">装箱时间</label>
-                                        <div class="col-xs-8">
-                                            <input id="packing_time" name="detail.transfer.packing_time" type="text" class="input-sm form-control" v-model="detail.transfer.packing_time"/>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="col-xs-3">
-                                    <div class="form-group">
-                                        <label for="departure_time" class="col-xs-4 control-label">到港时间</label>
-                                        <div class="col-xs-8">
-                                            <input id="departure_time" name="detail.transfer.departure_time" type="text" class="input-sm form-control" v-model="detail.transfer.departure_time"/>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="col-xs-3">
-                                    <div class="form-group">
-                                        <label for="stock_time" class="col-xs-4 control-label">到仓时间</label>
-                                        <div class="col-xs-8">
-                                            <input id="stock_time" name="detail.transfer.stock_time" type="text" class="input-sm form-control" v-model="detail.transfer.stock_time"/>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                        </form>
+                <div id="detail">
+                    <div class="gridToolBar clearfix">
+                        <button class="btn btn-primary btn-sm" onclick="reloadPageData()">
+                            <i class="ace-icon fa fa-refresh"></i>
+                            刷新
+                        </button>
+                        <button class="btn btn-purple btn-sm" onclick="addContainerTransfer()">
+                            <i class="ace-icon fa fa-plus"></i>
+                            新增
+                        </button>
+                        <button class="btn btn-success btn-sm" onclick="saveContainerTransfer()">
+                            <i class="ace-icon fa fa-floppy-o"></i>保存
+                        </button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteContainerTransfer()">
+                            <i class="ace-icon fa fa-trash-o"></i>
+                            删除
+                        </button>
                     </div>
+                    <div style="margin-top: 25px;">
+                        <div class="col-xs-12">
+                            <form class="form-horizontal" role="form" id="containerTransferDetailForm">
+                                <input id="container_transfer_id" name="detail.transfer.id" type="hidden" v-model.number="detail.transfer.id"/>
+                                <input id="container_transfer_version" name="detail.transfer.version" type="hidden" v-model.number="detail.transfer.version"/>
+                                <div class="row">
+                                    <div class="col-xs-3">
+                                        <div class="form-group">
+                                            <label for="batch_code" class="col-xs-4 control-label">批次号</label>
+                                            <div class="col-xs-8">
+                                                <input id="batch_code" name="detail.transfer.batch_code" type="text" class="input-sm form-control" v-model="detail.transfer.batch_code"/>
+                                            </div>
+                                        </div>
+                                    </div>
 
+
+                                    <div class="col-xs-3">
+                                        <div class="form-group">
+                                            <label for="container_code" class="col-xs-4 control-label">集装箱号</label>
+                                            <div class="col-xs-8">
+                                                <input id="container_code" name="detail.transfer.container_code" type="text" class="input-sm form-control" v-model="detail.transfer.container_code"/>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xs-3">
+                                        <div class="form-group">
+                                            <label for="bl_no" class="col-xs-4 control-label">提单号</label>
+                                            <div class="col-xs-8">
+                                                <input id="bl_no" name="detail.transfer.bl_no" type="text" class="input-sm form-control" v-model="detail.transfer.bl_no"/>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xs-3">
+                                        <div class="form-group">
+                                            <label for="seal_no" class="col-xs-4 control-label">铅封号</label>
+                                            <div class="col-xs-8">
+                                                <input id="seal_no" name="detail.transfer.seal_no" type="text" class="input-sm form-control" v-model="detail.transfer.seal_no"/>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                <div class="row">
+
+                                    <div class="col-xs-3">
+                                        <div class="form-group">
+                                            <label for="dest_stock_id" class="col-xs-4 control-label">目的仓库</label>
+                                            <div class="col-xs-8">
+                                                <input id="dest_stock_id" name="detail.transfer.dest_stock_id" type="text" class="input-sm form-control" v-model.number="detail.transfer.dest_stock_id"/>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xs-3">
+                                        <div class="form-group">
+                                            <label for="price_up_rate" class="col-xs-4 control-label">非征品上调</label>
+                                            <div class="col-xs-8">
+                                                <input id="price_up_rate" name="detail.transfer.price_up_rate" type="text" class="input-sm form-control" v-model.number="detail.transfer.price_up_rate"/>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xs-3">
+                                        <div class="form-group">
+                                            <label for="price_down_rate" class="col-xs-4 control-label">征税品下调</label>
+                                            <div class="col-xs-8">
+                                                <input id="price_down_rate" name="detail.transfer.price_down_rate" type="text" class="input-sm form-control" v-model.number="detail.transfer.price_down_rate"/>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xs-3">
+                                        <div class="form-group">
+                                            <label for="cost_up_rate" class="col-xs-4 control-label">成本上调</label>
+                                            <div class="col-xs-8">
+                                                <input id="cost_up_rate" name="detail.transfer.cost_up_rate" type="text" class="input-sm form-control" v-model.number="detail.transfer.cost_up_rate"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-3">
+                                        <div class="form-group">
+                                            <label for="total_volumn" class="col-xs-4 control-label">总体积</label>
+                                            <div class="col-xs-8">
+                                                <input id="total_volumn" name="detail.transfer.total_volumn" type="text" class="input-sm form-control" v-model.number="detail.transfer.total_volumn"/>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xs-3">
+                                        <div class="form-group">
+                                            <label for="total_weight" class="col-xs-4 control-label">总重量</label>
+                                            <div class="col-xs-8">
+                                                <input id="total_weight" name="detail.transfer.total_weight" type="text" class="input-sm form-control" v-model.number="detail.transfer.total_weight"/>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xs-3">
+                                        <div class="form-group">
+                                            <label for="total_amount1" class="col-xs-4 control-label">总金额1</label>
+                                            <div class="col-xs-8">
+                                                <input id="total_amount1" name="detail.transfer.total_amount1" type="text" class="input-sm form-control" v-model.number="detail.transfer.total_amount1"/>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xs-3">
+                                        <div class="form-group">
+                                            <label for="total_amount2" class="col-xs-4 control-label">总金额2</label>
+                                            <div class="col-xs-8">
+                                                <input id="total_amount2" name="detail.transfer.total_amount2" type="text" class="input-sm form-control" v-model.number="detail.transfer.total_amount2"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-3">
+                                        <div class="form-group">
+                                            <label for="packing_time" class="col-xs-4 control-label">装箱时间</label>
+                                            <div class="col-xs-8">
+                                                <input id="packing_time" name="detail.transfer.packing_time" type="text" class="input-sm form-control" v-model="detail.transfer.packing_time"/>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xs-3">
+                                        <div class="form-group">
+                                            <label for="departure_time" class="col-xs-4 control-label">到港时间</label>
+                                            <div class="col-xs-8">
+                                                <input id="departure_time" name="detail.transfer.departure_time" type="text" class="input-sm form-control" v-model="detail.transfer.departure_time"/>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xs-3">
+                                        <div class="form-group">
+                                            <label for="stock_time" class="col-xs-4 control-label">到仓时间</label>
+                                            <div class="col-xs-8">
+                                                <input id="stock_time" name="detail.transfer.stock_time" type="text" class="input-sm form-control" v-model="detail.transfer.stock_time"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div id="entries">
                     <div class="row">
                         <div class="col-xs-6">
                             <h5 class="modal-title" style="font-size:13px; margin-top: 15px;">集装箱调拨明细</h5>
                         </div>
                     </div>
                     <hr style="margin-top: 5px;margin-bottom: 15px;"/>
-                    <div class="row">
-                        <div class="col-xs-12" style="padding: 0;">
-                            <div class="gridToolBar clearfix">
-                                <button class="btn btn-primary btn-sm" onclick="reloadList('#stockBillEntryList')">
-                                    <i class="ace-icon fa fa-refresh"></i>
-                                    刷新
-                                </button>
-                                <button class="btn btn-success btn-sm" onclick="showStockBillEntryDetail(0)">
-                                    <i class="ace-icon fa fa-plus"></i>
-                                    新增
-                                </button>
-                                <button class="btn btn-danger btn-sm" @click="deleteStockBillEntry()">
-                                    <i class="ace-icon fa fa-trash-o"></i>
-                                    删除
-                                </button>
-                            </div>
-                            <div>
-                                <table id="stockBillEntryList" class="table table-striped table-bordered table-hover"></table>
-                            </div>
-                        </div>
+
+                    <div class="gridToolBar clearfix">
+                        <button class="btn btn-primary btn-sm" onclick="reloadEntryList()">
+                            <i class="ace-icon fa fa-refresh"></i>
+                            刷新
+                        </button>
+                        <button class="btn btn-success btn-sm" onclick="showEntryDetail(0)">
+                            <i class="ace-icon fa fa-plus"></i>
+                            新增
+                        </button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteEntry()">
+                            <i class="ace-icon fa fa-trash-o"></i>
+                            删除
+                        </button>
+                    </div>
+                    <div>
+                        <table id="entry_list" class="table table-striped table-bordered table-hover"></table>
                     </div>
                 </div>
             </div>
@@ -220,8 +220,8 @@
 </div>
 {%template "erp/hgbg/container_transfer/container_transfer_detail.var" .%}
 <script type="text/javascript">
-    var vm = new Vue({
-        el: "#page",
+    var detai_vm = new Vue({
+        el: "#detail",
         data: {
             "detail": {
                 "transfer": {}
@@ -233,12 +233,45 @@
     });
 
     $(function () {
-        reloadContainerTransfer();
+        reloadPageData();
+
+        initDataTable(
+            '#entry_list',
+            {
+                "sAjaxSource": '{%url "ErpContainerTransferEntry.ListData"%}',
+                "aaSorting": [[1, "asc"]],
+                "aoColumns": [
+                    {
+                        "mDataProp": "id", "bSearchable": false, "orderable": false, "sClass": "center", "width": 50,
+                        "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
+                        "render": function (data, type, row) {
+                            return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
+                        }
+                    },
+                    {"mDataProp": "batch_code", "title": "批次号", "bSearchable": false, "width": 150},
+                    {"mDataProp": "product_sku", "title": "SKU", "bSearchable": true},
+                    {"mDataProp": "qty", "title": "数量", "bSearchable": false, "width": 100},
+                    {"mDataProp": "box_qty", "title": "箱数", "bSearchable": false, "width": 100},
+                    {"mDataProp": "price", "title": "价格", "bSearchable": true, "width": 100},
+                    {"mDataProp": "create_time", "title": "创建时间", "bSearchable": false, "width": 120},
+                    {"mDataProp": "update_time", "title": "修改时间", "bSearchable": false, "width": 120}
+                ]
+            }
+        );
+
+        $('#entry_list tbody').on('dblclick', 'tr', function () {
+            var id = $(this).find('td:first-child input:checkbox').val();
+            entries_vm.showContainerTransferEntryDetail(id);
+        });
     });
 
-    function reloadContainerTransfer() {
+    function reloadPageData() {
         // 刷新 详细 和 明细
+        reloadTransferDetail();
+        reloadEntryList();
+    }
 
+    function reloadTransferDetail() {
         //详细
         $.ajax({
                 url: '{%url "ErpContainerTransfer.DetailData" %}',
@@ -251,12 +284,10 @@
                         $.msg.error(result.message);
                         return;
                     }
-                    vm.detail = result;
+                    detai_vm.detail = result;
                 }
             }
         );
-
-        //todo 明细
     }
 
     function addContainerTransfer() {
@@ -325,7 +356,7 @@
                     type: "POST",
                     processData: false,
                     contentType: 'application/json',
-                    data: JSON.stringify(vm.detail),
+                    data: JSON.stringify(detai_vm.detail),
                     success: function (data) {
                         hideMask();
                         if (data.success === false) {
@@ -375,154 +406,127 @@
 
         }
     }
-</script>
 
-<script type="text/javascript">
-    var entry_vm = new Vue({
-        el: "#page",
+    var entries_vm = new Vue({
+        el: "#entries",
         data: {
             "detail": {
                 "transfer_entry": {}
             }
         },
         mounted: function () {
-            initDataTable(
-                '#containerTransferEntryList',
-                {
-                    "sAjaxSource": '{%url "ErpContainerTransferEntry.ListData"%}',
-                    "aaSorting": [[1, "asc"]],
-                    "aoColumns": [
-                        {
-                            "mDataProp": "id", "bSearchable": false, "orderable": false, "sClass": "center", "width": 50,
-                            "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
-                            "render": function (data, type, row) {
-                                return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
-                            }
-                        },
-                        {"mDataProp": "batch_code", "title": "批次号", "bSearchable": false, "width": 150},
-                        {"mDataProp": "product_sku", "title": "SKU", "bSearchable": true},
-                        {"mDataProp": "qty", "title": "数量", "bSearchable": false, "width": 100},
-                        {"mDataProp": "box_qty", "title": "箱数", "bSearchable": false, "width": 100},
-                        {"mDataProp": "price", "title": "价格", "bSearchable": true, "width": 100},
-                        {"mDataProp": "create_time", "title": "创建时间", "bSearchable": false, "width": 120},
-                        {"mDataProp": "update_time", "title": "修改时间", "bSearchable": false, "width": 120}
-                    ]
+        },
+        methods: {}
+    });
+
+    function reloadEntryList() {
+        reloadList('#entry_list');
+    }
+
+    function showEntryDetail(id) {
+        showMask("加载中...");
+        $("#containerTransferEntryDetailForm").clearValidation();
+        $.ajax({
+                url: '{%url "ErpContainerTransferEntry.DetailData" %}',
+                type: "POST",
+                data: {
+                    "id": id
+                },
+                success: function (result) {
+                    hideMask();
+                    if (result.success === false) {
+                        $.msg.error(result.message);
+                        return;
+                    }
+                    entries_vm.detail = result;
+                    $('#containerTransferEntryDetailDialog').modal(modalOptions);
+                }
+            }
+        );
+    }
+
+    function saveEntry() {
+        showMask("提交中...");
+        var form = $("#containerTransferEntryDetailForm");
+        var valid = validate(form, {
+            'detail.transfer_entry.transfer_id': {
+                required: true, digits: true
+            },
+            'detail.transfer_entry.product_id': {
+                required: true, digits: true
+            },
+            'detail.transfer_entry.product_sku': {
+                required: true
+            },
+            'detail.transfer_entry.qty': {
+                required: true, digits: true
+            },
+            'detail.transfer_entry.box_qty': {
+                required: true, digits: true
+            },
+            'detail.transfer_entry.price': {
+                required: true
+            }
+        });
+
+        if (!valid) {
+            hideMask();
+        } else {
+            $.ajax({
+                    url: '{%url "ErpContainerTransferEntry.Save"%}',
+                    type: "POST",
+                    processData: false,
+                    contentType: 'application/json',
+                    data: JSON.stringify(entries_vm.detail),
+                    success: function (data) {
+                        hideMask();
+                        if (data.success === false) {
+                            $.msg.error(data.message);
+                            //return;
+                        }
+                        else {
+                            $.msg.show(data.message);
+                            $('#containerTransferEntryDetailDialog').modal('hide');
+                            entries_vm.reloadList();
+                            //return;
+                        }
+                    }
                 }
             );
-
-            $('#containerTransferEntryList tbody').on('dblclick', 'tr', function () {
-                var id = $(this).find('td:first-child input:checkbox').val();
-                entry_vm.showContainerTransferEntryDetail(id);
-            });
-        },
-        methods: {
-            reloadList: function () {
-                reloadList('#containerTransferEntryList');
-            },
-            showContainerTransferEntryDetail: function (id) {
-                showMask("加载中...");
-                $("#containerTransferEntryDetailForm").clearValidation();
-                $.ajax({
-                        url: '{%url "ErpContainerTransferEntry.DetailData" %}',
-                        type: "POST",
-                        data: {
-                            "id": id
-                        },
-                        success: function (result) {
-                            hideMask();
-                            if (result.success === false) {
-                                $.msg.error(result.message);
-                                return;
-                            }
-                            entry_vm.detail = result;
-                            $('#containerTransferEntryDetailDialog').modal(modalOptions);
-                        }
-                    }
-                );
-            },
-            saveContainerTransferEntry: function () {
-                showMask("提交中...");
-                var form = $("#containerTransferEntryDetailForm");
-                var valid = validate(form, {
-                    'detail.transfer_entry.transfer_id': {
-                        required: true, digits: true
-                    },
-                    'detail.transfer_entry.product_id': {
-                        required: true, digits: true
-                    },
-                    'detail.transfer_entry.product_sku': {
-                        required: true
-                    },
-                    'detail.transfer_entry.qty': {
-                        required: true, digits: true
-                    },
-                    'detail.transfer_entry.box_qty': {
-                        required: true, digits: true
-                    },
-                    'detail.transfer_entry.price': {
-                        required: true
-                    }
-                });
-
-                if (!valid) {
-                    hideMask();
-                } else {
-                    $.ajax({
-                            url: '{%url "ErpContainerTransferEntry.Save"%}',
-                            type: "POST",
-                            processData: false,
-                            contentType: 'application/json',
-                            data: JSON.stringify(entry_vm.detail),
-                            success: function (data) {
-                                hideMask();
-                                if (data.success === false) {
-                                    $.msg.error(data.message);
-                                    //return;
-                                }
-                                else {
-                                    $.msg.show(data.message);
-                                    $('#containerTransferEntryDetailDialog').modal('hide');
-                                    entry_vm.reloadList();
-                                    //return;
-                                }
-                            }
-                        }
-                    );
-                }
-            },
-            deleteContainerTransferEntry: function () {
-                var id_list = [];
-                $('#containerTransferEntryList tbody tr>td:first-child input:checkbox').each(function () {
-                    if (this.checked) {
-                        id_list.push($(this).val());
-                    }
-                });
-
-                if (id_list.length === 0) {
-                    $.msg.alert("请选择数据！");
-                    return;
-                }
-
-                $.msg.confirm("确认要删除吗？", function () {
-                    $.ajax({
-                        url: '{%url "ErpContainerTransferEntry.Delete"%}',
-                        type: "POST",
-                        data: {"id_list": id_list},
-                        success: function (data) {
-                            if (data.success === false) {
-                                $.msg.error(data.message);
-                                return;
-                            }
-                            else {
-                                $.msg.show(data.message);
-                            }
-                            entry_vm.reloadList();
-                        }
-                    });
-                });
-            }
         }
-    });
+    }
+
+    function deleteEntry() {
+        var id_list = [];
+        $('#entry_list tbody tr>td:first-child input:checkbox').each(function () {
+            if (this.checked) {
+                id_list.push($(this).val());
+            }
+        });
+
+        if (id_list.length === 0) {
+            $.msg.alert("请选择数据！");
+            return;
+        }
+
+        $.msg.confirm("确认要删除吗？", function () {
+            $.ajax({
+                url: '{%url "ErpContainerTransferEntry.Delete"%}',
+                type: "POST",
+                data: {"id_list": id_list},
+                success: function (data) {
+                    if (data.success === false) {
+                        $.msg.error(data.message);
+                        return;
+                    }
+                    else {
+                        $.msg.show(data.message);
+                    }
+                    entries_vm.reloadList();
+                }
+            });
+        });
+    }
 </script>
 {%footer%}
 
