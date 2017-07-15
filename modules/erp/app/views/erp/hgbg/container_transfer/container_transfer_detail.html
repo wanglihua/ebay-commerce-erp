@@ -82,7 +82,11 @@
                                         <div class="form-group">
                                             <label for="dest_stock_id" class="col-xs-4 control-label">目的仓库</label>
                                             <div class="col-xs-8">
-                                                <input id="dest_stock_id" name="detail.transfer.dest_stock_id" type="text" class="input-sm form-control" v-model.number="detail.transfer.dest_stock_id"/>
+                                                <select id="dest_stock_id" name="detail.transfer.dest_stock_id" class="input-sm form-control" v-model.number="detail.transfer.dest_stock_id" @change="getL2ParentCateList">
+                                                    <template v-for="stock in detail.au_stock_list">
+                                                        <option :value="stock.id">{{stock.name}}</option>
+                                                    </template>
+                                                </select>
                                             </div>
                                         </div>
                                     </div>
@@ -317,6 +321,19 @@
     });
 
     $(function () {
+
+        $('#packing_time').datetimepicker({
+            locale: "zh-cn"
+        });
+
+        $('#departure_time').datetimepicker({
+            locale: "zh-cn"
+        });
+
+        $('#stock_time').datetimepicker({
+            locale: "zh-cn"
+        });
+
         initDataTable(
             '#entry_list',
             {
@@ -455,6 +472,10 @@
         if (!valid) {
             hideMask();
         } else {
+            detai_vm.detail.transfer.packing_time = $("#packing_time").val();
+            detai_vm.detail.transfer.departure_time = $("#departure_time").val();
+            detai_vm.detail.transfer.stock_time = $("#stock_time").val();
+
             $.ajax({
                     url: '{%url "ErpContainerTransfer.Save"%}',
                     type: "POST",

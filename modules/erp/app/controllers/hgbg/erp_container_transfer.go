@@ -7,6 +7,7 @@ import (
 
 	"matrix/core"
 	"matrix/modules/erp/models"
+	"fmt"
 )
 
 type ErpContainerTransfer struct {
@@ -48,6 +49,7 @@ func (c ErpContainerTransfer) ListData() revel.Result {
 
 type ContainerTransferDetailForm struct {
 	ContainerTransfer models.ContainerTransferInfo `json:"transfer"`
+	AuStockList       []models.StockInfo           `json:"au_stock_list"`
 }
 
 func (f *ContainerTransferDetailForm) IsCreate() bool {
@@ -58,8 +60,6 @@ func (f *ContainerTransferDetailForm) Valid(validation *revel.Validation) bool {
 	validation.Required(f.ContainerTransfer.BatchCode).Message("批次号不能为空！")
 
 	validation.Required(f.ContainerTransfer.DestStockId).Message("目的仓库不能为空！")
-
-	validation.Required(f.ContainerTransfer.DestStockName).Message("目的仓库不能为空！")
 
 	validation.Required(f.ContainerTransfer.ContainerCode).Message("集装箱号不能为空！")
 	if f.ContainerTransfer.ContainerCode != "" {
@@ -84,14 +84,6 @@ func (f *ContainerTransferDetailForm) Valid(validation *revel.Validation) bool {
 	if f.ContainerTransfer.SealNo != "" {
 		validation.MaxSize(f.ContainerTransfer.SealNo, 100).Message("铅封号长度不能大于100！")
 	}
-
-	validation.Required(f.ContainerTransfer.TotalVolumn).Message("总体积不能为空！")
-
-	validation.Required(f.ContainerTransfer.TotalWeight).Message("总重量不能为空！")
-
-	validation.Required(f.ContainerTransfer.TotalAmount1).Message("总金额1不能为空！")
-
-	validation.Required(f.ContainerTransfer.TotalAmount2).Message("总金额2不能为空！")
 
 	validation.Required(f.ContainerTransfer.PriceUpRate).Message("非征品上调不能为空！")
 
@@ -128,8 +120,12 @@ func (c ErpContainerTransfer) DetailData() revel.Result {
 		}
 	}
 
+	var au_stock_list = make([]models.StockInfo, 0)
+	core.HandleError(db_session.Where(fmt.Sprintf("stock_type_id = %d", models.STOCK_TYPE_AU)).Find(&au_stock_list))
+
 	var detail_form ContainerTransferDetailForm
 	detail_form.ContainerTransfer = container_transfer
+	detail_form.AuStockList = au_stock_list
 
 	return c.RenderJson(detail_form)
 }
@@ -146,6 +142,14 @@ func (c ErpContainerTransfer) Save() revel.Result {
 	}
 
 	container_transfer := detail_form.ContainerTransfer
+
+	var stock_id = container_transfer.DestStockId
+
+	var stock models.StockInfo
+	_, err = db_session.Id(stock_id).Get(&stock)
+	core.HandleError(err)
+
+	container_transfer.DestStockName = stock.Name
 
 	var affected int64
 	if detail_form.IsCreate() {
