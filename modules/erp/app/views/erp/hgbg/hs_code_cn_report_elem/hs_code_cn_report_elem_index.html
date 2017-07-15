@@ -201,7 +201,7 @@
                                         <div class="form-group">
                                             <label for="elem12" class="col-xs-2 control-label">要素12</label>
                                             <div class="col-xs-10">
-                                                <textarea id="elem12" name="detail.hs_code_cn.elem12" rows="1"  class="input-sm form-control" v-model="detail.hs_code_cn.elem12"></textarea>
+                                                <textarea id="elem12" name="detail.hs_code_cn.elem12" rows="1" class="input-sm form-control" v-model="detail.hs_code_cn.elem12"></textarea>
                                             </div>
                                         </div>
                                     </div>
@@ -249,7 +249,7 @@
 
 <script type="text/javascript">
     function init_uploader() {
-        
+
         var uploader = new plupload.Uploader({
             runtimes: 'html5,flash,html4',
             multi_selection: false,
@@ -311,7 +311,12 @@
                                 return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
                             }
                         },
-                        {"mDataProp": "hs_code", "title": "中国海关编码", "bSearchable": true, "width": 120},
+                        {
+                            "mDataProp": "hs_code", "title": "中国海关编码", "bSearchable": true, "width": 120,
+                            "render": function (data, type, row) {
+                                return "<a href='javascript:vm.showHsCodeCnReportElemDetail(" + row.id + ");'>" + data + "</a>";
+                            }
+                        },
                         {
                             "mDataProp": "cn_name", "title": "中文品名", "bSearchable": true, "sClass": "wrap-word",
                             "render": function (data, type, row) {
