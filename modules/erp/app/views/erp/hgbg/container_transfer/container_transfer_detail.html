@@ -37,7 +37,6 @@
                         <div class="col-xs-12">
                             <form class="form-horizontal" role="form" id="containerTransferDetailForm">
                                 <input id="container_transfer_id" name="detail.transfer.id" type="hidden" v-model.number="detail.transfer.id"/>
-                                <input id="container_transfer_version" name="detail.transfer.version" type="hidden" v-model.number="detail.transfer.version"/>
                                 <div class="row">
                                     <div class="col-xs-3">
                                         <div class="form-group">
@@ -121,7 +120,7 @@
                                         <div class="form-group">
                                             <label for="total_volumn" class="col-xs-4 control-label">总体积</label>
                                             <div class="col-xs-8">
-                                                <input id="total_volumn" name="detail.transfer.total_volumn" type="text" class="input-sm form-control" v-model.number="detail.transfer.total_volumn"/>
+                                                <input id="total_volumn" name="detail.transfer.total_volumn" type="text" class="input-sm form-control" disabled="disabled" v-model.number="detail.transfer.total_volumn"/>
                                             </div>
                                         </div>
                                     </div>
@@ -130,7 +129,7 @@
                                         <div class="form-group">
                                             <label for="total_weight" class="col-xs-4 control-label">总重量</label>
                                             <div class="col-xs-8">
-                                                <input id="total_weight" name="detail.transfer.total_weight" type="text" class="input-sm form-control" v-model.number="detail.transfer.total_weight"/>
+                                                <input id="total_weight" name="detail.transfer.total_weight" type="text" class="input-sm form-control" disabled="disabled" v-model.number="detail.transfer.total_weight"/>
                                             </div>
                                         </div>
                                     </div>
@@ -139,7 +138,7 @@
                                         <div class="form-group">
                                             <label for="total_amount1" class="col-xs-4 control-label">总金额1</label>
                                             <div class="col-xs-8">
-                                                <input id="total_amount1" name="detail.transfer.total_amount1" type="text" class="input-sm form-control" v-model.number="detail.transfer.total_amount1"/>
+                                                <input id="total_amount1" name="detail.transfer.total_amount1" type="text" class="input-sm form-control" disabled="disabled" v-model.number="detail.transfer.total_amount1"/>
                                             </div>
                                         </div>
                                     </div>
@@ -148,7 +147,7 @@
                                         <div class="form-group">
                                             <label for="total_amount2" class="col-xs-4 control-label">总金额2</label>
                                             <div class="col-xs-8">
-                                                <input id="total_amount2" name="detail.transfer.total_amount2" type="text" class="input-sm form-control" v-model.number="detail.transfer.total_amount2"/>
+                                                <input id="total_amount2" name="detail.transfer.total_amount2" type="text" class="input-sm form-control" disabled="disabled" v-model.number="detail.transfer.total_amount2"/>
                                             </div>
                                         </div>
                                     </div>
@@ -224,9 +223,8 @@
                                         <div class="col-xs-12">
                                             <form class="form-horizontal" role="form" id="containerTransferEntryDetailForm">
                                                 <input id="container_transfer_entry_id" name="detail.transfer_entry.id" type="hidden" v-model.number="detail.transfer_entry.id"/>
-                                                <input id="container_transfer_entry_version" name="detail.transfer_entry.version" type="hidden" v-model.number="detail.transfer_entry.version"/>
                                                 <input id="transfer_id" name="detail.transfer_entry.transfer_id" type="hidden" class="input-sm form-control" v-model.number="detail.transfer_entry.transfer_id"/>
-                                                <!--这个不需要在界面上体现，只是存储的时候需要<input id="product_id" name="detail.transfer_entry.product_id" type="hidden" class="input-sm form-control" v-model.number="detail.transfer_entry.product_id"/>-->
+                                                <input id="product_id" name="detail.transfer_entry.product_id" type="hidden" class="input-sm form-control" v-model.number="detail.transfer_entry.product_id"/>
 
                                                 <div class="row">
                                                     <div class="col-xs-12">
@@ -366,7 +364,7 @@
 
         $('#entry_list tbody').on('dblclick', 'tr', function () {
             var id = $(this).find('td:first-child input:checkbox').val();
-            entries_vm.showContainerTransferEntryDetail(id);
+            showEntryDetail(id);
         });
 
         reloadTransferDetail();
@@ -393,6 +391,16 @@
                         return;
                     }
                     detai_vm.detail = result;
+
+                    if (detai_vm.detail.transfer.packing_time < '2000-01-01 00:00') {
+                        detai_vm.detail.transfer.packing_time = null;
+                    }
+                    if (detai_vm.detail.transfer.departure_time < '2000-01-01 00:00') {
+                        detai_vm.detail.transfer.departure_time = null;
+                    }
+                    if (detai_vm.detail.transfer.stock_time < '2000-01-01 00:00') {
+                        detai_vm.detail.transfer.stock_time = null;
+                    }
                 }
             }
         );
@@ -423,18 +431,6 @@
             },
             'detail.transfer.seal_no': {
                 required: true, minlength: 2, maxlength: 100
-            },
-            'detail.transfer.total_volumn': {
-                required: true
-            },
-            'detail.transfer.total_weight': {
-                required: true
-            },
-            'detail.transfer.total_amount1': {
-                required: true
-            },
-            'detail.transfer.total_amount2': {
-                required: true
             },
             'detail.transfer.price_up_rate': {
                 required: true
@@ -584,7 +580,7 @@
                         else {
                             $.msg.show(data.message);
                             $('#containerTransferEntryDetailDialog').modal('hide');
-                            entries_vm.reloadList();
+                            reloadEntryList();
                             //return;
                         }
                     }
@@ -619,7 +615,7 @@
                     else {
                         $.msg.show(data.message);
                     }
-                    entries_vm.reloadList();
+                    reloadEntryList();
                 }
             });
         });

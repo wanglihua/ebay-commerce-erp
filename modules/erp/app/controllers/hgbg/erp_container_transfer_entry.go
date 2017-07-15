@@ -121,6 +121,12 @@ func (c ErpContainerTransferEntry) Save() revel.Result {
 
 	container_transfer_entry.ProductId = product.Id
 
+	var containerTransfer models.ContainerTransferInfo
+	_, err = db_session.Id(container_transfer_entry.TransferId).Get(&containerTransfer)
+	core.HandleError(err)
+
+	container_transfer_entry.BatchCode = containerTransfer.BatchCode
+
 	var affected int64
 	if detail_form.IsCreate() {
 		affected, err = db_session.Insert(&container_transfer_entry)
