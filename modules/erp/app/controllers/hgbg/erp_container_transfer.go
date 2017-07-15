@@ -1,4 +1,3 @@
-
 package controllers
 
 import (
@@ -55,7 +54,7 @@ func (f *ContainerTransferDetailForm) IsCreate() bool {
 	return f.ContainerTransfer.Id == 0
 }
 
-func (f *ContainerTransferDetailForm) Valid(validation *revel.Validation) bool { 
+func (f *ContainerTransferDetailForm) Valid(validation *revel.Validation) bool {
 	validation.Required(f.ContainerTransfer.BatchCode).Message("批次号不能为空！")
 
 	validation.Required(f.ContainerTransfer.DestStockId).Message("目的仓库不能为空！")
@@ -109,6 +108,11 @@ func (f *ContainerTransferDetailForm) Valid(validation *revel.Validation) bool {
 	return validation.HasErrors() == false
 }
 
+func (c ErpContainerTransfer) Detail(id int64) revel.Result {
+	c.RenderArgs["transfer_id"] = id
+	return c.RenderTemplate("erp/hgbg/container_transfer/container_transfer_detail.html")
+}
+
 func (c ErpContainerTransfer) DetailData() revel.Result {
 	db_session := c.DbSession
 
@@ -144,10 +148,10 @@ func (c ErpContainerTransfer) Save() revel.Result {
 	container_transfer := detail_form.ContainerTransfer
 
 	var affected int64
-	if detail_form.IsCreate() { 
+	if detail_form.IsCreate() {
 		affected, err = db_session.Insert(&container_transfer)
 		core.HandleError(err)
-	} else { 
+	} else {
 		affected, err = db_session.Id(container_transfer.Id).Update(&container_transfer)
 		core.HandleError(err)
 
@@ -170,4 +174,3 @@ func (c ErpContainerTransfer) Delete() revel.Result {
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})
 }
-

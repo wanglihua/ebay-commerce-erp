@@ -510,6 +510,7 @@ POST /hs/code/cn/export             ErpHsCodeCnReportElemExcel.Export
 
 GET  /container/transfer              ErpContainerTransfer.Index
 POST /container/transfer/data/list    ErpContainerTransfer.ListData
+GET  /container/transfer/detail/:id   ErpContainerTransfer.Detail
 POST /container/transfer/data/detail  ErpContainerTransfer.DetailData
 POST /container/transfer/save         ErpContainerTransfer.Save
 POST /container/transfer/delete       ErpContainerTransfer.Delete
