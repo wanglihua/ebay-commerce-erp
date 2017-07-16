@@ -11,6 +11,7 @@ import (
 	"bytes"
 	"time"
 	"github.com/go-xorm/xorm"
+	"strconv"
 )
 
 type ErpContainerTransferEntryExcel struct {
@@ -19,6 +20,13 @@ type ErpContainerTransferEntryExcel struct {
 
 func (c ErpContainerTransferEntryExcel) Import() revel.Result {
 	db_session := c.DbSession
+
+	var transfer_id int64
+	c.Params.Bind(&transfer_id, "transfer_id")
+
+	var containerTransfer models.ContainerTransferInfo
+	_, err := db_session.Id(transfer_id).Get(&containerTransfer)
+	core.HandleError(err)
 
 	excel_file_bytes := make([]byte, 0)
 	c.Params.Bind(&excel_file_bytes, "excel_file")
@@ -32,16 +40,22 @@ func (c ErpContainerTransferEntryExcel) Import() revel.Result {
 		})
 	}
 
-	type product_hs_code_import_t struct {
-		Sku          string  `json:"sku"`
-		CnHsCode     string  `json:"cn_hs_code"`
-		AuHsCode     string  `json:"au_hs_code"`
+	type transfer_entry_import_t struct {
+		ProductSku   string  `json:"product_sku"`
+		Qty          string  `json:"qty"`
+		BoxQty       string  `json:"box_qty"`
+		Price        string  `json:"price"`
 		ErrorMessage string  `json:"error_message"`
 
-		product models.ProductInfo `json:"-"`
+		product    models.ProductInfo            `json:"-"`
+		hs_code_au models.HsCodeAuDutyInfo       `json:"-"`
+		hs_code_cn models.HsCodeCnReportElemInfo `json:"-"`
+		qty        int64                         `json:"-"`
+		box_qty    int64                         `json:"-"`
+		price      float64                       `json:"-"`
 	}
 
-	product_hs_code_import_list := make([]product_hs_code_import_t, 0)
+	transfer_entry_import_list := make([]transfer_entry_import_t, 0)
 
 	xlsx_file, err := xlsx.OpenBinary(excel_file_bytes)
 	core.HandleError(err)
@@ -61,12 +75,11 @@ func (c ErpContainerTransferEntryExcel) Import() revel.Result {
 			var cell_val string
 			var err error
 
-			var product_hs_code product_hs_code_import_t
+			var transfer_entry_import transfer_entry_import_t
 
 			col_index := 0
 
 			// SKU
-			// cell = row.Cells[col_index]
 			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
@@ -75,71 +88,150 @@ func (c ErpContainerTransferEntryExcel) Import() revel.Result {
 				break
 			}
 			//revel.TRACE.Println(cell_val)
-			product_hs_code.Sku = cell_val
+			transfer_entry_import.ProductSku = cell_val
 			col_index++
 
-			// cn_hs_code
+			// qty
 			// cell = row.Cells[col_index]
 			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
-			product_hs_code.CnHsCode = cell_val
+			transfer_entry_import.Qty = cell_val
 			col_index++
 
-			// au_hs_code
+			// box_qty
 			//cell = row.Cells[col_index]
 			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
-			product_hs_code.AuHsCode = cell_val
+			transfer_entry_import.BoxQty = cell_val
 			col_index++
 
-			product_hs_code_import_list = append(product_hs_code_import_list, product_hs_code)
+			// price
+			//cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
+			transfer_entry_import.Price = cell_val
+			col_index++
+
+			transfer_entry_import_list = append(transfer_entry_import_list, transfer_entry_import)
 		}
 	}
 
-	if len(product_hs_code_import_list) == 0 {
+	if len(transfer_entry_import_list) == 0 {
 		return c.RenderJson(map[string]interface{}{
 			"success": false,
-			"message": "Excel文件中导入商品列表为空！",
+			"message": "Excel文件中导入列表为空！",
 		})
 	}
 
 	//验证导入的数据
-	var product_hs_code_import_error_list = make([]product_hs_code_import_t, 0)
+	var container_transfer_entry_import_error_list = make([]transfer_entry_import_t, 0)
 
-	for index, product_hs_code_import := range product_hs_code_import_list {
+	for index, transfer_entry_import := range transfer_entry_import_list {
+		var buffer bytes.Buffer
+
 		var product models.ProductInfo
-		has, err := db_session.Where(fmt.Sprintf("sku = '%s'", product_hs_code_import.Sku)).Get(&product)
+		has, err := db_session.Where(fmt.Sprintf("sku = '%s'", transfer_entry_import.ProductSku)).Get(&product)
 		core.HandleError(err)
 
 		if has == false {
-			product_hs_code_import.ErrorMessage = fmt.Sprintf("商品SKU %s 数据库中不存在！", product_hs_code_import.Sku)
-			product_hs_code_import_error_list = append(product_hs_code_import_error_list, product_hs_code_import)
+			buffer.WriteString("商品SKU不存在！")
+
 		} else {
-			product_hs_code_import_list[index].product = product
+			transfer_entry_import_list[index].product = product
+		}
+
+		if product.AuHsCode == "" {
+			buffer.WriteString("商品澳洲海关编码未设置")
+		} else {
+			var hsCodeAu models.HsCodeAuDutyInfo
+			has, err := db_session.Where("hs_code = ?", product.AuHsCode).Get(&hsCodeAu)
+			core.HandleError(err)
+
+			if has == false {
+				buffer.WriteString("商品澳洲海关编码已设置，但该海关编码不存在！")
+			} else {
+				transfer_entry_import_list[index].hs_code_au = hsCodeAu
+			}
+		}
+
+		if product.CnHsCode == "" {
+			buffer.WriteString("商品中国海关编码未设置！")
+		} else {
+			var hsCodeCn models.HsCodeCnReportElemInfo
+			has, err := db_session.Where("hs_code = ?", product.CnHsCode).Get(&hsCodeCn)
+			core.HandleError(err)
+
+			if has == false {
+				buffer.WriteString("商品中国海关编码已设置，但该海关编码不存在！")
+			} else {
+				transfer_entry_import_list[index].hs_code_cn = hsCodeCn
+			}
+		}
+
+		qty, err := strconv.ParseInt(transfer_entry_import.Qty, 64, 10)
+		if err != nil {
+			buffer.WriteString("数量格式输入不对！")
+		} else {
+			transfer_entry_import_list[index].qty = qty
+		}
+
+		box_qty, err := strconv.ParseInt(transfer_entry_import.BoxQty, 64, 10)
+		if err != nil {
+			buffer.WriteString("箱数格式输入不对！")
+		} else {
+			transfer_entry_import_list[index].box_qty = box_qty
+		}
+
+		price, err := strconv.ParseFloat(transfer_entry_import.Price, 64)
+		if err != nil {
+			buffer.WriteString("价格格式输入不对！")
+		} else {
+			transfer_entry_import_list[index].price = price
+		}
+
+		transfer_entry_import.ErrorMessage = buffer.String()
+
+		if transfer_entry_import.ErrorMessage != "" {
+			container_transfer_entry_import_error_list = append(container_transfer_entry_import_error_list, transfer_entry_import)
 		}
 	}
 
-	if len(product_hs_code_import_error_list) != 0 {
+	if len(container_transfer_entry_import_error_list) != 0 {
 		return c.RenderJson(map[string]interface{}{
 			"success":         false,
 			"message":         "导入出现错误，详细请查看页面下部列表！",
-			"error_data_list": product_hs_code_import_error_list,
+			"error_data_list": container_transfer_entry_import_error_list,
 		})
 	}
 
-	for _, product_hs_code_import := range product_hs_code_import_list {
-		var product = product_hs_code_import.product
+	for _, transfer_entry_import := range transfer_entry_import_list {
+		var transfer_entry models.ContainerTransferEntryInfo
+		transfer_entry.TransferId = transfer_id
+		transfer_entry.BatchCode = containerTransfer.BatchCode
+		transfer_entry.ProductId = transfer_entry_import.product.Id
+		transfer_entry.ProductSku = transfer_entry_import.ProductSku
+		transfer_entry.Qty = transfer_entry_import.qty
+		transfer_entry.BoxQty = transfer_entry_import.box_qty
+		transfer_entry.Price = transfer_entry_import.price
 
-		product.Sku = product_hs_code_import.Sku
-		product.CnHsCode = product_hs_code_import.CnHsCode
-		product.AuHsCode = product_hs_code_import.AuHsCode
+		transfer_entry.AuHsId = transfer_entry_import.hs_code_au.Id
+		transfer_entry.AuHsCode = transfer_entry_import.hs_code_au.HsCode
+		transfer_entry.AuHsDutyRate = transfer_entry_import.hs_code_au.DutyRate
+		transfer_entry.AuHsCnName = transfer_entry_import.hs_code_au.CnName
+		transfer_entry.AuHsEnName = transfer_entry_import.hs_code_au.EnName
 
-		update_col_list := []string{"cn_hs_code", "au_hs_code"}
-		_, err = db_session.Id(product.Id).Cols(update_col_list...).Update(&product)
+		transfer_entry.CnHsId = transfer_entry_import.hs_code_cn.Id
+		transfer_entry.CnHsCode = transfer_entry_import.hs_code_cn.HsCode
+		transfer_entry.CnHsCnName = transfer_entry_import.hs_code_cn.CnName
+		transfer_entry.CnHsEnName = transfer_entry_import.hs_code_cn.EnName
+
+		_, err := db_session.Insert(&transfer_entry)
 		core.HandleError(err)
 	}
 

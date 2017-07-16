@@ -520,3 +520,6 @@ POST /container/transfer/entry/data/list    ErpContainerTransferEntry.ListData
 POST /container/transfer/entry/data/detail  ErpContainerTransferEntry.DetailData
 POST /container/transfer/entry/save         ErpContainerTransferEntry.Save
 POST /container/transfer/entry/delete       ErpContainerTransferEntry.Delete
+
+POST /container/transfer/entry/import  ErpContainerTransferEntryExcel.Import
+POST /container/transfer/entry/export  ErpContainerTransferEntryExcel.Export
