@@ -8,6 +8,7 @@ import (
 	"matrix/core"
 	"matrix/modules/erp/models"
 	"fmt"
+	"matrix/modules/erp/service/container_transfer_service"
 )
 
 type ErpContainerTransferEntry struct {
@@ -175,6 +176,8 @@ func (c ErpContainerTransferEntry) Save() revel.Result {
 		}
 	}
 
+	container_transfer_service.CalculateAndSaveWeightVolumeAmount(container_transfer_entry.TransferId, db_session)
+
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据保存成功!"})
 }
 
@@ -184,8 +187,19 @@ func (c ErpContainerTransferEntry) Delete() revel.Result {
 	container_transfer_entry_id_list := make([]int64, 0)
 	c.Params.Bind(&container_transfer_entry_id_list, "id_list")
 
+	if len(container_transfer_entry_id_list) == 0 {
+		return c.RenderJson(core.JsonResult{Success: false, Message: "请选择要删除的数据!"})
+	}
+
+	var entry_id = container_transfer_entry_id_list[0]
+	var containerTransferEntry models.ContainerTransferEntryInfo
+	_, err := db_session.Id(entry_id).Get(&containerTransferEntry)
+	core.HandleError(err)
+
 	affected, err := db_session.In("id", container_transfer_entry_id_list).Delete(new(models.ContainerTransferEntryInfo))
 	core.HandleError(err)
+
+	container_transfer_service.CalculateAndSaveWeightVolumeAmount(containerTransferEntry.TransferId, db_session)
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})
 }

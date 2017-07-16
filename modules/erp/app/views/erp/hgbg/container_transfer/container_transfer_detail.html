@@ -268,7 +268,7 @@
                                                         <div class="form-group">
                                                             <label for="price" class="col-xs-2 control-label">价格</label>
                                                             <div class="col-xs-10">
-                                                                <input id="price" name="detail.transfer_entry.price" type="text" class="input-sm form-control" v-model="detail.transfer_entry.price"/>
+                                                                <input id="price" name="detail.transfer_entry.price" type="text" class="input-sm form-control" v-model.number="detail.transfer_entry.price"/>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -491,6 +491,7 @@
                         else {
                             $.msg.show(data.message);
                             reloadContainerTransferList();
+                            reloadPageData();
                             //return;
                         }
                     }
@@ -601,7 +602,7 @@
                         else {
                             $.msg.show(data.message);
                             $('#containerTransferEntryDetailDialog').modal('hide');
-                            reloadEntryList();
+                            reloadPageData();
                             //return;
                         }
                     }
@@ -636,7 +637,7 @@
                     else {
                         $.msg.show(data.message);
                     }
-                    reloadEntryList();
+                    reloadPageData();
                 }
             });
         });

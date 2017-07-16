@@ -8,6 +8,7 @@ import (
 	"matrix/core"
 	"matrix/modules/erp/models"
 	"fmt"
+	"matrix/modules/erp/service/container_transfer_service"
 )
 
 type ErpContainerTransfer struct {
@@ -163,6 +164,8 @@ func (c ErpContainerTransfer) Save() revel.Result {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！" })
 		}
 	}
+
+	container_transfer_service.CalculateAndSaveWeightVolumeAmount(container_transfer.Id, db_session)
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据保存成功!"})
 }
