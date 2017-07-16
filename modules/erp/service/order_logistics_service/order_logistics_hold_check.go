@@ -378,8 +378,7 @@ func (p_ol *OrderLogisticsService) hold_check_international(p_order *models.Orde
 	country_name = strings.TrimSpace(country_name)
 
 	if (country != "" && strings.ToLower(country) != strings.ToLower("AU")) ||
-		(country_name != "" && strings.ToLower(country_name) != strings.ToLower("Australia")) ||
-		(country_name != "" && strings.ToLower(country_name) != strings.ToLower("AU")) { // != "" 是因为有时导入的时候没提供国家信息的，就默认是国内件了
+		(country_name != "" && strings.ToLower(country_name) != strings.ToLower("Australia") && strings.ToLower(country_name) != strings.ToLower("AU")) { // != "" 是因为有时导入的时候没提供国家信息的，就默认是国内件了
 		p_ol.update_order_to_hold_type(p_order, models.ORDER_HOLD_TYPE_INTERNATIONAL, db_session)
 
 		//设置发货仓库为墨尔本仓库
