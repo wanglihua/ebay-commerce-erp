@@ -86,7 +86,7 @@
                                         <div class="form-group">
                                             <label for="dest_stock_id" class="col-xs-4 control-label">目的仓库</label>
                                             <div class="col-xs-8">
-                                                <select id="dest_stock_id" name="detail.transfer.dest_stock_id" class="input-sm form-control" v-model.number="detail.transfer.dest_stock_id" @change="getL2ParentCateList">
+                                                <select id="dest_stock_id" name="detail.transfer.dest_stock_id" class="input-sm form-control" v-model.number="detail.transfer.dest_stock_id">
                                                     <template v-for="stock in detail.au_stock_list">
                                                         <option :value="stock.id">{{stock.name}}</option>
                                                     </template>
@@ -367,7 +367,7 @@
                     var result = JSON.parse(response.response);
                     if (result.success !== true) {
                         $.msg.error(result.message);
-                        vm.error_data_list = result.error_data_list;
+                        detail_vm.error_data_list = result.error_data_list;
                         $("table#error_data_list").show();
                     } else {
                         reloadList('#hs_code_list');
@@ -384,7 +384,7 @@
         uploader.init();
     }
 
-    var detai_vm = new Vue({
+    var detail_vm = new Vue({
         el: "#detail",
         data: {
             "detail": {
@@ -401,7 +401,8 @@
         data: {
             "detail": {
                 "transfer_entry": {}
-            }
+            },
+            "error_data_list": []
         },
         mounted: function () {
         },
@@ -497,16 +498,16 @@
                         $.msg.error(result.message);
                         return;
                     }
-                    detai_vm.detail = result;
+                    detail_vm.detail = result;
 
-                    if (detai_vm.detail.transfer.packing_time < '2000-01-01 00:00') {
-                        detai_vm.detail.transfer.packing_time = null;
+                    if (detail_vm.detail.transfer.packing_time < '2000-01-01 00:00') {
+                        detail_vm.detail.transfer.packing_time = null;
                     }
-                    if (detai_vm.detail.transfer.departure_time < '2000-01-01 00:00') {
-                        detai_vm.detail.transfer.departure_time = null;
+                    if (detail_vm.detail.transfer.departure_time < '2000-01-01 00:00') {
+                        detail_vm.detail.transfer.departure_time = null;
                     }
-                    if (detai_vm.detail.transfer.stock_time < '2000-01-01 00:00') {
-                        detai_vm.detail.transfer.stock_time = null;
+                    if (detail_vm.detail.transfer.stock_time < '2000-01-01 00:00') {
+                        detail_vm.detail.transfer.stock_time = null;
                     }
                 }
             }
@@ -562,16 +563,16 @@
         if (!valid) {
             hideMask();
         } else {
-            detai_vm.detail.transfer.packing_time = $("#packing_time").val();
-            detai_vm.detail.transfer.departure_time = $("#departure_time").val();
-            detai_vm.detail.transfer.stock_time = $("#stock_time").val();
+            detail_vm.detail.transfer.packing_time = $("#packing_time").val();
+            detail_vm.detail.transfer.departure_time = $("#departure_time").val();
+            detail_vm.detail.transfer.stock_time = $("#stock_time").val();
 
             $.ajax({
                     url: '{%url "ErpContainerTransfer.Save"%}',
                     type: "POST",
                     processData: false,
                     contentType: 'application/json',
-                    data: JSON.stringify(detai_vm.detail),
+                    data: JSON.stringify(detail_vm.detail),
                     success: function (data) {
                         hideMask();
                         if (data.success === false) {
