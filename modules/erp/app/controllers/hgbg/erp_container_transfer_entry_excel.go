@@ -12,6 +12,7 @@ import (
 	"time"
 	"github.com/go-xorm/xorm"
 	"strconv"
+	"matrix/modules/erp/service/container_transfer_service"
 )
 
 type ErpContainerTransferEntryExcel struct {
@@ -174,14 +175,14 @@ func (c ErpContainerTransferEntryExcel) Import() revel.Result {
 			}
 		}
 
-		qty, err := strconv.ParseInt(transfer_entry_import.Qty, 64, 10)
+		qty, err := strconv.ParseInt(transfer_entry_import.Qty, 10, 64)
 		if err != nil {
 			buffer.WriteString("数量格式输入不对！")
 		} else {
 			transfer_entry_import_list[index].qty = qty
 		}
 
-		box_qty, err := strconv.ParseInt(transfer_entry_import.BoxQty, 64, 10)
+		box_qty, err := strconv.ParseInt(transfer_entry_import.BoxQty, 10, 64)
 		if err != nil {
 			buffer.WriteString("箱数格式输入不对！")
 		} else {
@@ -234,6 +235,8 @@ func (c ErpContainerTransferEntryExcel) Import() revel.Result {
 		_, err := db_session.Insert(&transfer_entry)
 		core.HandleError(err)
 	}
+
+	container_transfer_service.CalculateAndSaveWeightVolumeAmount(transfer_id, db_session)
 
 	return c.RenderJson(map[string]interface{}{
 		"success": true,

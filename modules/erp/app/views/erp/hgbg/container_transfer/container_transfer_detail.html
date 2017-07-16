@@ -339,6 +339,8 @@
 <script type="text/javascript" src="/static/lib/plupload/plupload.min.js"></script>
 <script type="text/javascript" src="/static/lib/plupload/zh_CN.js"></script>
 <script type="text/javascript">
+    var params = $.param({"transfer_id": transfer_id});
+    var upload_url = '{%url "ErpContainerTransferEntryExcel.Import"%}' + "?" + params;
 
     function init_uploader() {
         var uploader = new plupload.Uploader({
@@ -348,7 +350,7 @@
             browse_button: 'btnImportEntries',
             file_data_name: "excel_file",
 
-            url: '{%url "ErpContainerTransferEntryExcel.Import"%}',
+            url: upload_url,
             max_file_size: '10000kb',
 
             filters: [
@@ -367,12 +369,13 @@
                     var result = JSON.parse(response.response);
                     if (result.success !== true) {
                         $.msg.error(result.message);
-                        detail_vm.error_data_list = result.error_data_list;
+                        entries_vm.error_data_list = result.error_data_list;
                         $("table#error_data_list").show();
                     } else {
                         reloadList('#hs_code_list');
                         $.msg.show(result.message);
                         $("table#error_data_list").hide();
+                        reloadPageData();
                     }
                 },
                 Error: function (up, err) {
@@ -743,7 +746,7 @@
     }
 
     function exportEntryList() {
-        var params = $.param({"transfer_id": transfer_id});
+        var params = $.param({});
         var url = '{%url "ErpContainerTransferEntryExcel.Export"%}' + "?" + params;
         $('<form method="post" action="' + url + '"></form>').appendTo('body').submit().remove();
     }
