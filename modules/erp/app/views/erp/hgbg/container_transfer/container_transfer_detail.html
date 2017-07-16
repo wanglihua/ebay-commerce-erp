@@ -424,7 +424,7 @@
     }
 
     function addContainerTransfer() {
-
+        window.location.href = "/container/transfer/detail/0";
     }
 
     function saveContainerTransfer() {
@@ -490,9 +490,17 @@
                         }
                         else {
                             $.msg.show(data.message);
+
                             reloadContainerTransferList();
-                            reloadPageData();
-                            //return;
+
+                            if (data.is_create === true) {
+                                setTimeout("window.location.href = '/container/transfer/detail/" + data.transfer_id + "';", 1000);
+                                //return;
+                            }
+                            else {
+                                reloadPageData();
+                                //return;
+                            }
                         }
                     }
                 }

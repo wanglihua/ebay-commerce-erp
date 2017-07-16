@@ -152,8 +152,10 @@ func (c ErpContainerTransfer) Save() revel.Result {
 
 	container_transfer.DestStockName = stock.Name
 
+	var is_create = detail_form.IsCreate()
+
 	var affected int64
-	if detail_form.IsCreate() {
+	if is_create == true {
 		affected, err = db_session.Insert(&container_transfer)
 		core.HandleError(err)
 	} else {
@@ -167,7 +169,12 @@ func (c ErpContainerTransfer) Save() revel.Result {
 
 	container_transfer_service.CalculateAndSaveWeightVolumeAmount(container_transfer.Id, db_session)
 
-	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据保存成功!"})
+	return c.RenderJson(map[string]interface{}{
+		"success":     true,
+		"is_create":   is_create,
+		"transfer_id": container_transfer.Id,
+		"message":     "数据保存成功",
+	})
 }
 
 func (c ErpContainerTransfer) Delete() revel.Result {
