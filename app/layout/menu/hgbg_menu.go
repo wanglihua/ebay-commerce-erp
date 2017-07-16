@@ -74,7 +74,7 @@ func GetHgbgMenu(res_id_map map[int64]bool, web_session revel.Session) string {
             <b class="arrow"></b>
         </li>`)
 
-	//todo 只是测试
+	/*
 	buffer.WriteString(`<li id="hgbg-container-transfer-entry-menu" class="">
             <a href="/container/transfer/entry">
                 <i class="menu-icon fa fa-caret-right"></i>
@@ -82,22 +82,11 @@ func GetHgbgMenu(res_id_map map[int64]bool, web_session revel.Session) string {
             </a>
             <b class="arrow"></b>
         </li>`)
-
-	/*
-        <li id="erp-containertransferentry-menu" class="">
-            <a href="/erp/container/transfer/entry">
-                <i class="menu-icon fa fa-caret-right"></i>
-                集装箱调拨明细
-            </a>
-            <b class="arrow"></b>
-        </li>
 	 */
-
 
 	buffer.WriteString(`</ul>
 </li>
 `)
-
 
 	return buffer.String()
 }

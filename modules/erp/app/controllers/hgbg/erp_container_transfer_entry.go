@@ -119,6 +119,41 @@ func (c ErpContainerTransferEntry) Save() revel.Result {
 		return c.RenderJson(core.JsonResult{Success: false, Message: "商品SKU不存在！" })
 	}
 
+	if product.AuHsCode == "" {
+		return c.RenderJson(core.JsonResult{Success: false, Message: "商品澳洲海关编码未设置！" })
+	} else {
+		var hsCodeAu models.HsCodeAuDutyInfo
+		has, err := db_session.Where("hs_code = ?", product.AuHsCode).Get(&hsCodeAu)
+		core.HandleError(err)
+
+		if has == false {
+			return c.RenderJson(core.JsonResult{Success: false, Message: "商品澳洲海关编码已设置，但该海关编码不存在！" })
+		}
+
+		container_transfer_entry.AuHsId = hsCodeAu.Id
+		container_transfer_entry.AuHsCode = hsCodeAu.HsCode
+		container_transfer_entry.AuHsDutyRate = hsCodeAu.DutyRate
+		container_transfer_entry.AuHsCnName = hsCodeAu.CnName
+		container_transfer_entry.AuHsEnName = hsCodeAu.EnName
+	}
+
+	if product.CnHsCode == "" {
+		return c.RenderJson(core.JsonResult{Success: false, Message: "商品中国海关编码未设置！" })
+	} else {
+		var hsCodeCn models.HsCodeCnReportElemInfo
+		has, err := db_session.Where("hs_code = ?", product.CnHsCode).Get(&hsCodeCn)
+		core.HandleError(err)
+
+		if has == false {
+			return c.RenderJson(core.JsonResult{Success: false, Message: "商品中国海关编码已设置，但该海关编码不存在！" })
+		}
+
+		container_transfer_entry.CnHsId = hsCodeCn.Id
+		container_transfer_entry.CnHsCode = hsCodeCn.HsCode
+		container_transfer_entry.CnHsCnName = hsCodeCn.CnName
+		container_transfer_entry.CnHsEnName = hsCodeCn.EnName
+	}
+
 	container_transfer_entry.ProductId = product.Id
 
 	var containerTransfer models.ContainerTransferInfo
