@@ -122,24 +122,27 @@ ORDER BY hcc.hs_code;`
 		cell.SetStyle(style)
 	}
 
-	head_row_height := 0.8
-	common_row_height := 0.6
+	row_height := 1.0
 
 	//创建工作薄
 	xlsx_file := xlsx.NewFile()
 
 	//添加工作表
-	sheet, err := xlsx_file.AddSheet("集装箱调拨明细")
+	sheet, err := xlsx_file.AddSheet("中国海关申报元素")
 	core.HandleError(err)
 
-	//添加标题行
-	row := sheet.AddRow()
-	row.SetHeightCM(head_row_height)
+	sheet.SetColWidth(0, 0, 10)
+	sheet.SetColWidth(1, 1, 11)
+	sheet.SetColWidth(2, 2, 60)
 
-	for _, hs_code_cn := range hs_code_cn_list {
+	for index, hs_code_cn := range hs_code_cn_list {
 		// 新建行
-		row = sheet.AddRow()
-		row.SetHeightCM(common_row_height)
+		row := sheet.AddRow()
+		row.SetHeightCM(row_height)
+
+		first_cell := row.AddCell()
+		set_text_cell_style(first_cell, "center")
+		first_cell.SetInt(index + 1)
 
 		cell := row.AddCell()
 		set_head_cell_style(cell, "center")
@@ -151,7 +154,9 @@ ORDER BY hcc.hs_code;`
 
 		// 新建行
 		row = sheet.AddRow()
-		row.SetHeightCM(common_row_height)
+		row.SetHeightCM(row_height)
+
+		cell = row.AddCell()
 
 		cell = row.AddCell()
 		set_text_cell_style(cell, "center")
@@ -161,9 +166,12 @@ ORDER BY hcc.hs_code;`
 		set_text_cell_style(cell, "left")
 		cell.SetString(hs_code_cn.CnName)
 
+		var per_code_row_count = 2
 		if hs_code_cn.Elem01 != "" {
 			row = sheet.AddRow()
-			row.SetHeightCM(common_row_height)
+			row.SetHeightCM(row_height)
+
+			cell = row.AddCell()
 
 			cell = row.AddCell()
 			set_text_cell_style(cell, "center")
@@ -172,11 +180,15 @@ ORDER BY hcc.hs_code;`
 			cell = row.AddCell()
 			set_text_cell_style(cell, "left")
 			cell.SetString(hs_code_cn.Elem01)
+
+			per_code_row_count++
 		}
 
 		if hs_code_cn.Elem02 != "" {
 			row = sheet.AddRow()
-			row.SetHeightCM(common_row_height)
+			row.SetHeightCM(row_height)
+
+			cell = row.AddCell()
 
 			cell = row.AddCell()
 			set_text_cell_style(cell, "center")
@@ -185,11 +197,15 @@ ORDER BY hcc.hs_code;`
 			cell = row.AddCell()
 			set_text_cell_style(cell, "left")
 			cell.SetString(hs_code_cn.Elem02)
+
+			per_code_row_count++
 		}
 
 		if hs_code_cn.Elem03 != "" {
 			row = sheet.AddRow()
-			row.SetHeightCM(common_row_height)
+			row.SetHeightCM(row_height)
+
+			cell = row.AddCell()
 
 			cell = row.AddCell()
 			set_text_cell_style(cell, "center")
@@ -198,11 +214,15 @@ ORDER BY hcc.hs_code;`
 			cell = row.AddCell()
 			set_text_cell_style(cell, "left")
 			cell.SetString(hs_code_cn.Elem03)
+
+			per_code_row_count++
 		}
 
 		if hs_code_cn.Elem04 != "" {
 			row = sheet.AddRow()
-			row.SetHeightCM(common_row_height)
+			row.SetHeightCM(row_height)
+
+			cell = row.AddCell()
 
 			cell = row.AddCell()
 			set_text_cell_style(cell, "center")
@@ -211,11 +231,15 @@ ORDER BY hcc.hs_code;`
 			cell = row.AddCell()
 			set_text_cell_style(cell, "left")
 			cell.SetString(hs_code_cn.Elem04)
+
+			per_code_row_count++
 		}
 
 		if hs_code_cn.Elem05 != "" {
 			row = sheet.AddRow()
-			row.SetHeightCM(common_row_height)
+			row.SetHeightCM(row_height)
+
+			cell = row.AddCell()
 
 			cell = row.AddCell()
 			set_text_cell_style(cell, "center")
@@ -224,11 +248,15 @@ ORDER BY hcc.hs_code;`
 			cell = row.AddCell()
 			set_text_cell_style(cell, "left")
 			cell.SetString(hs_code_cn.Elem05)
+
+			per_code_row_count++
 		}
 
 		if hs_code_cn.Elem06 != "" {
 			row = sheet.AddRow()
-			row.SetHeightCM(common_row_height)
+			row.SetHeightCM(row_height)
+
+			cell = row.AddCell()
 
 			cell = row.AddCell()
 			set_text_cell_style(cell, "center")
@@ -237,11 +265,15 @@ ORDER BY hcc.hs_code;`
 			cell = row.AddCell()
 			set_text_cell_style(cell, "left")
 			cell.SetString(hs_code_cn.Elem06)
+
+			per_code_row_count++
 		}
 
 		if hs_code_cn.Elem06 != "" {
 			row = sheet.AddRow()
-			row.SetHeightCM(common_row_height)
+			row.SetHeightCM(row_height)
+
+			cell = row.AddCell()
 
 			cell = row.AddCell()
 			set_text_cell_style(cell, "center")
@@ -250,11 +282,15 @@ ORDER BY hcc.hs_code;`
 			cell = row.AddCell()
 			set_text_cell_style(cell, "left")
 			cell.SetString(hs_code_cn.Elem06)
+
+			per_code_row_count++
 		}
 
 		if hs_code_cn.Elem07 != "" {
 			row = sheet.AddRow()
-			row.SetHeightCM(common_row_height)
+			row.SetHeightCM(row_height)
+
+			cell = row.AddCell()
 
 			cell = row.AddCell()
 			set_text_cell_style(cell, "center")
@@ -263,11 +299,15 @@ ORDER BY hcc.hs_code;`
 			cell = row.AddCell()
 			set_text_cell_style(cell, "left")
 			cell.SetString(hs_code_cn.Elem07)
+
+			per_code_row_count++
 		}
 
 		if hs_code_cn.Elem08 != "" {
 			row = sheet.AddRow()
-			row.SetHeightCM(common_row_height)
+			row.SetHeightCM(row_height)
+
+			cell = row.AddCell()
 
 			cell = row.AddCell()
 			set_text_cell_style(cell, "center")
@@ -276,11 +316,15 @@ ORDER BY hcc.hs_code;`
 			cell = row.AddCell()
 			set_text_cell_style(cell, "left")
 			cell.SetString(hs_code_cn.Elem08)
+
+			per_code_row_count++
 		}
 
 		if hs_code_cn.Elem09 != "" {
 			row = sheet.AddRow()
-			row.SetHeightCM(common_row_height)
+			row.SetHeightCM(row_height)
+
+			cell = row.AddCell()
 
 			cell = row.AddCell()
 			set_text_cell_style(cell, "center")
@@ -289,11 +333,15 @@ ORDER BY hcc.hs_code;`
 			cell = row.AddCell()
 			set_text_cell_style(cell, "left")
 			cell.SetString(hs_code_cn.Elem09)
+
+			per_code_row_count++
 		}
 
 		if hs_code_cn.Elem10 != "" {
 			row = sheet.AddRow()
-			row.SetHeightCM(common_row_height)
+			row.SetHeightCM(row_height)
+
+			cell = row.AddCell()
 
 			cell = row.AddCell()
 			set_text_cell_style(cell, "center")
@@ -302,11 +350,15 @@ ORDER BY hcc.hs_code;`
 			cell = row.AddCell()
 			set_text_cell_style(cell, "left")
 			cell.SetString(hs_code_cn.Elem10)
+
+			per_code_row_count++
 		}
 
 		if hs_code_cn.Elem11 != "" {
 			row = sheet.AddRow()
-			row.SetHeightCM(common_row_height)
+			row.SetHeightCM(row_height)
+
+			cell = row.AddCell()
 
 			cell = row.AddCell()
 			set_text_cell_style(cell, "center")
@@ -315,11 +367,15 @@ ORDER BY hcc.hs_code;`
 			cell = row.AddCell()
 			set_text_cell_style(cell, "left")
 			cell.SetString(hs_code_cn.Elem11)
+
+			per_code_row_count++
 		}
 
 		if hs_code_cn.Elem12 != "" {
 			row = sheet.AddRow()
-			row.SetHeightCM(common_row_height)
+			row.SetHeightCM(row_height)
+
+			cell = row.AddCell()
 
 			cell = row.AddCell()
 			set_text_cell_style(cell, "center")
@@ -328,11 +384,15 @@ ORDER BY hcc.hs_code;`
 			cell = row.AddCell()
 			set_text_cell_style(cell, "left")
 			cell.SetString(hs_code_cn.Elem12)
+
+			per_code_row_count++
 		}
 
 		if hs_code_cn.Elem13 != "" {
 			row = sheet.AddRow()
-			row.SetHeightCM(common_row_height)
+			row.SetHeightCM(row_height)
+
+			cell = row.AddCell()
 
 			cell = row.AddCell()
 			set_text_cell_style(cell, "center")
@@ -341,11 +401,15 @@ ORDER BY hcc.hs_code;`
 			cell = row.AddCell()
 			set_text_cell_style(cell, "left")
 			cell.SetString(hs_code_cn.Elem13)
+
+			per_code_row_count++
 		}
 
 		if hs_code_cn.Elem14 != "" {
 			row = sheet.AddRow()
-			row.SetHeightCM(common_row_height)
+			row.SetHeightCM(row_height)
+
+			cell = row.AddCell()
 
 			cell = row.AddCell()
 			set_text_cell_style(cell, "center")
@@ -354,6 +418,21 @@ ORDER BY hcc.hs_code;`
 			cell = row.AddCell()
 			set_text_cell_style(cell, "left")
 			cell.SetString(hs_code_cn.Elem14)
+
+			per_code_row_count++
+		}
+
+		first_cell.Merge(0, per_code_row_count-1)
+
+		{
+			row = sheet.AddRow()
+			row.SetHeightCM(row_height)
+
+			cell := row.AddCell()
+			set_text_cell_style(cell, "center")
+			row.AddCell()
+			row.AddCell()
+			cell.Merge(2, 0)
 		}
 	}
 
