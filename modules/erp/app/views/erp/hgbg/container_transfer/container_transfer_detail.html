@@ -32,7 +32,7 @@
                             <i class="ace-icon fa fa-trash-o"></i>
                             删除
                         </button>
-                        <button class="btn btn-pink btn-sm">
+                        <button class="btn btn-pink btn-sm" onclick="exportTransferReportElem()">
                             <i class="ace-icon fa fa-file-excel-o"></i>
                             导出中国海关申报元素
                         </button>
@@ -748,6 +748,12 @@
     function exportEntryList() {
         var params = $.param({});
         var url = '{%url "ErpContainerTransferEntryExcel.Export"%}' + "?" + params;
+        $('<form method="post" action="' + url + '"></form>').appendTo('body').submit().remove();
+    }
+
+    function exportTransferReportElem() {
+        var params = $.param({});
+        var url = '{%url "ErpContainerTransferReportElemExcel.Export"%}' + "?" + params;
         $('<form method="post" action="' + url + '"></form>').appendTo('body').submit().remove();
     }
 </script>
