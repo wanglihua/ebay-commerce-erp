@@ -7,6 +7,8 @@ import (
 
 	"matrix/core"
 	"matrix/modules/erp/models"
+	"strings"
+	"fmt"
 )
 
 type ErpSpecialProduct struct {
@@ -47,36 +49,18 @@ func (c ErpSpecialProduct) ListData() revel.Result {
 }
 
 type SpecialProductDetailForm struct {
-	SpecialProduct models.SpecialProductInfo `json:"special_product"`
-}
-
-func (f *SpecialProductDetailForm) IsCreate() bool {
-	return f.SpecialProduct.Id == 0
+	SkuList string `json:"sku_list"`
 }
 
 func (f *SpecialProductDetailForm) Valid(validation *revel.Validation) bool {
-	validation.Required(f.SpecialProduct.ProductId).Message("ProductId不能为空！")
+	validation.Required(f.SkuList).Message("SKU列表不能为空！")
 
 	return validation.HasErrors() == false
 }
 
 func (c ErpSpecialProduct) DetailData() revel.Result {
-	db_session := c.DbSession
-
-	var special_product_id int64
-	c.Params.Bind(&special_product_id, "id")
-
-	var special_product models.SpecialProductInfo
-	if special_product_id != 0 {
-		has, err := db_session.Id(special_product_id).Get(&special_product)
-		core.HandleError(err)
-		if has == false {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "指定的特殊SKU不存在！"})
-		}
-	}
-
 	var detail_form SpecialProductDetailForm
-	detail_form.SpecialProduct = special_product
+	detail_form.SkuList = ""
 
 	return c.RenderJson(detail_form)
 }
@@ -92,22 +76,25 @@ func (c ErpSpecialProduct) Save() revel.Result {
 		return c.RenderJson(core.JsonResult{Success: false, Message: c.GetValidationErrorMessage()})
 	}
 
-	special_product := detail_form.SpecialProduct
+	var sku_list_str = detail_form.SkuList
+	var sku_list = strings.Split(sku_list_str, ";")
+	if len(sku_list) == 0 {
+		return c.RenderJson(core.JsonResult{Success: false, Message: "SKU列表为空！"})
+	}
 
-	var affected int64
-	if detail_form.IsCreate() {
-		affected, err = db_session.Insert(&special_product)
-		core.HandleError(err)
-	} else {
-		affected, err = db_session.Id(special_product.Id).Update(&special_product)
-		core.HandleError(err)
+	for _, sku := range sku_list {
+		if strings.TrimSpace(sku) != "" {
+			var product models.ProductInfo
+			has, err := db_session.Where("sku = ?", sku).Get(&product)
+			core.HandleError(err)
 
-		if affected == 0 {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！" })
+			if has == false {
+				return c.RenderJson(core.JsonResult{Success: false, Message: fmt.Sprintf("商品SKU %s 不存在！", sku)})
+			}
 		}
 	}
 
-	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据保存成功!"})
+	return c.RenderJson(core.JsonResult{Success: true, Message: "数据保存成功!"})
 }
 
 func (c ErpSpecialProduct) Delete() revel.Result {
