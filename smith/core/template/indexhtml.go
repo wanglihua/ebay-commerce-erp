@@ -45,7 +45,7 @@ var IndexHtmlTemplate = `{%header "{{.entity.EntityChinese}}" .%}
                     <div class="row">
                         <div class="col-xs-12">
                             <form class="form-horizontal" role="form" id="{{.entity.EntityCamelCase}}DetailForm">
-                                <input id="{{Underscore .entity.EntityCamelCase}}_id" name="detail.{{.entity.EntityJson}}.id" type="hidden" v-model.number="detail.{{.entity.EntityJson}}.id"/>
+                                <input id="{{Underscore .entity.EntityCamelCase}}_id" name="detail.{{.entity.EntityJson}}.id" type="hidden" v-model.number="detail.{{.entity.EntityJson}}.id"/>{{range $fieldIndex, $field := .entity.FieldList}}
                                 <div class="row">
                                     <div class="col-xs-6">
                                         <div class="form-group">
