@@ -91,6 +91,18 @@ func (c ErpSpecialProduct) Save() revel.Result {
 			if has == false {
 				return c.RenderJson(core.JsonResult{Success: false, Message: fmt.Sprintf("商品SKU %s 不存在！", sku)})
 			}
+
+			var special_product models.SpecialProductInfo
+			count, err := db_session.Where("product_id = ?", product.Id).Count(&models.SpecialProductInfo{})
+			core.HandleError(err)
+
+			if count != 0 {
+				return c.RenderJson(core.JsonResult{Success: false, Message: fmt.Sprintf("商品SKU %s 之前已经被设置为特殊SKU！", sku)})
+			}
+
+			special_product.ProductId = product.Id
+			_, err = db_session.Insert(&special_product)
+			core.HandleError(err)
 		}
 	}
 
