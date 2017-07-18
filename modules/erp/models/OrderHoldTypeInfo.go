@@ -43,7 +43,8 @@ const (
 	ORDER_HOLD_TYPE_ENVELOPE               int64 = 10140 // 信封类。长宽高在35cm X 25cm X 2cm, 重量在0.5Kg以内的订单为信封。若是多数量或者多产品，以前我们设计的思路是，最大产品的长边为最长边，最大产品的中边为中边，所有产品的最小边之和为最小边，判断是否在35cm X 25cm X 2cm以内，重量之和是否在0.5Kg以内
 	ORDER_HOLD_TYPE_EXPRESS                int64 = 10150 // 快递类。需要在基础设置里面有 收到快递费金额的设置功能，比如收到的运费高于什么金额，视为快递。否则就算收了快递费也视为普通包裹
 	ORDER_HOLD_TYPE_INTERNATIONAL          int64 = 10160 // 国际件。对于非澳大利亚的订单，直接到国际件模块
-	ORDER_HOLD_ADDRESS_INFO_MISS           int64 = 10170 // 收货人信息不全的，比如没有手机号，没有邮编等等
+	ORDER_HOLD_TYPE_ADDRESS_INFO_MISS      int64 = 10170 // 收货人信息不全的，比如没有手机号，没有邮编等等
+	ORDER_HOLD_TYPE_SPECIAL_PRODUCT        int64 = 10180 // 特殊SKU
 )
 
 func (e OrderHoldTypeInfo) InitData(db_session *xorm.Session) {
@@ -184,8 +185,15 @@ func (e OrderHoldTypeInfo) InitData(db_session *xorm.Session) {
 
 	// ORDER_HOLD_ADDRESS_INFO_MISS           int64 = 10170 // 收货人信息不全的，比如没有手机号，没有邮编等等
 	order_hold_type = new(OrderHoldTypeInfo)
-	order_hold_type.Id = ORDER_HOLD_ADDRESS_INFO_MISS
+	order_hold_type.Id = ORDER_HOLD_TYPE_ADDRESS_INFO_MISS
 	order_hold_type.Name = "收货人信息不全"
 	order_hold_type.Desc = "收货人信息不全的，比如没有手机号，没有邮编等等"
+	db_session.Insert(order_hold_type)
+
+	// ORDER_HOLD_TYPE_SPECIAL_PRODUCT        int64 = 10180 // 特殊SKU
+	order_hold_type = new(OrderHoldTypeInfo)
+	order_hold_type.Id = ORDER_HOLD_TYPE_SPECIAL_PRODUCT
+	order_hold_type.Name = "特殊SKU"
+	order_hold_type.Desc = "特殊的商品SKU"
 	db_session.Insert(order_hold_type)
 }
