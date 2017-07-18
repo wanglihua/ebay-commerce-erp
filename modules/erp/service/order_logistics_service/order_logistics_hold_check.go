@@ -480,6 +480,28 @@ func (p_ol *OrderLogisticsService) hold_check_paypal_account_not_match(p_order *
 	return false
 }
 
+// 19.特殊商品SKU Hold
+func (p_ol *OrderLogisticsService) hold_check_special_sku(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, db_session *xorm.Session) (is_hold_return bool) {
+	var is_special_product_id = func(product_id int64, special_product_list []models.SpecialProductInfo) bool {
+		for _, special_product := range special_product_list {
+			if special_product.ProductId == product_id {
+				return true
+			}
+		}
+
+		return false
+	}
+
+	for _, order_product_info := range p_order_logistics_data.order_product_info_list {
+		if is_special_product_id(order_product_info.ProductId, p_ol.special_product_list) == true {
+			p_ol.update_order_to_hold_type(p_order, models.ORDER_HOLD_TYPE_SPECIAL_PRODUCT, db_session)
+			return true
+		}
+	}
+
+	return false
+}
+
 func (p_ol *OrderLogisticsService) update_order_to_hold_type(p_order *models.OrderInfo, hold_type_id int64, db_session *xorm.Session) {
 	p_order.HoldTypeId = core.MakeNullInt(hold_type_id, true)
 	p_order.StatusId = models.ORDER_STATUS_HOLD // 修改订单状态为 hold 状态

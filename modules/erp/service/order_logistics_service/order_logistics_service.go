@@ -29,6 +29,7 @@ type OrderLogisticsService struct {
 	logistics_fee_rate_map            map[int64][]models.LogisticsFeeRateInfo // 物流费率列表的映射，映射的 key 是， 物流方式的 id
 	envelope_fee_rate_list            []models.EnvelopeFeeRateInfo            // 信封物流费率， 按费用从小到大排序
 	shop_list                         []models.ShopAccountInfo                // 店铺列表，系统中的店铺列表
+	special_product_list              []models.SpecialProductInfo             // 特殊商品SKU列表
 	pending_keeper                    *pending_inventory_temp_keeper          // 设置过程全局变量，每次开始匹配计算的时候一定要记得初始化
 	mel_stock_id                      int64                                   // 墨尔本仓库 id
 	UserLoginName                     string
@@ -98,6 +99,11 @@ func (p_ol *OrderLogisticsService) init_data(db_session *xorm.Session) {
 	err = db_session.Find(&shop_list)
 	core.HandleError(err)
 	p_ol.shop_list = shop_list
+
+	var special_product_list = make([]models.SpecialProductInfo, 0)
+	err = db_session.Find(&special_product_list)
+	core.HandleError(err)
+	p_ol.special_product_list = special_product_list
 
 	p_ol.mel_stock_id = stock_service.Get_mel_stock_id(db_session)
 }
@@ -362,6 +368,11 @@ func (p_ol *OrderLogisticsService) CalculateListWithOption(order_list []models.O
 
 		// 6. 系统显示 在途才有货
 		if p_ol.hold_check_oss_au_stock_but_zt_stock_has(&order, p_order_logistics_data, db_session) {
+			continue
+		}
+
+		// 7. 特殊SKU
+		if p_ol.hold_check_special_sku(&order, p_order_logistics_data, db_session) {
 			continue
 		}
 	}
