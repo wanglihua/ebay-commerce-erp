@@ -13,3 +13,7 @@ type SpecialProductInfo struct {
 func (e SpecialProductInfo) TableName() string {
 	return TablePrefix + "special_product"
 }
+
+func (e SpecialProductInfo) ModelDesc() string {
+	return "verbose_name=特殊SKU,entity_json=special_product,route=special/product"
+}
