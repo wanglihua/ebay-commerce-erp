@@ -23,23 +23,39 @@ func (c ErpSpecialProduct) ListData() revel.Result {
 	db_session := c.DbSession
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
-	query := db_session.Where(filter)
 
-	//query extra filter here
+	type special_product_view_item_t struct {
+		SpecialProduct models.SpecialProductInfo `xorm:"extends" json:"sp"`
+		Product        models.ProductInfo        `xorm:"extends" json:"p"`
+	}
+
+	/*
+SELECT
+    sp.*,
+    p.*
+FROM erp_special_product sp
+    INNER JOIN erp_product p ON p.id = sp.product_id
+	 */
+
+	query := db_session.
+	Select("sp.*,p.*").
+		Table("erp_special_product").Alias("sp").
+		Join("INNER", []string{"erp_product", "p"}, "p.id = sp.product_id").
+		Where(filter)
 
 	data_query := *query
 	if order != "" {
 		data_query = *data_query.OrderBy(order)
 	} else {
-		data_query = *data_query.Asc("id")
+		data_query = *data_query.Asc("sp.id")
 	}
 
-	special_product_list := make([]models.SpecialProductInfo, 0, limit)
+	special_product_list := make([]special_product_view_item_t, 0, limit)
 	err := data_query.Limit(limit, offset).Find(&special_product_list)
 	core.HandleError(err)
 
 	count_query := *query
-	count, err := count_query.Count(new(models.SpecialProductInfo))
+	count, err := count_query.Count(new(special_product_view_item_t))
 	core.HandleError(err)
 
 	return c.RenderJson(core.GridResult{
