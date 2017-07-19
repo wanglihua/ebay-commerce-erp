@@ -156,11 +156,20 @@ func (c ErpProductHsCodeExcel) Import() revel.Result {
 func (c ErpProductHsCodeExcel) Export() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.HGBG_PRODUCT_HS_CODE, c.Session)
 
+	var filter_type int64
+	c.Params.Bind(&filter_type, "filter_type")
+
 	db_session := c.DbSession
 
 	product_list := make([]models.ProductInfo, 0)
 
-	err := db_session.Find(&product_list)
+	var filter = "1=1"
+	if filter_type == 1 { //有零值数据的记录
+		filter_has_zero_data := core.SqlOr("cn_hs_code = ''", "au_hs_code = ''")
+		filter = core.SqlAnd(filter, filter_has_zero_data)
+	}
+
+	err := db_session.Where(filter).Find(&product_list)
 	core.HandleError(err)
 
 	xlsx_file := c.export_product_list_to_excel(db_session, product_list)
