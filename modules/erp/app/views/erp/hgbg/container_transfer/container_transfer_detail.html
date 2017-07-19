@@ -188,6 +188,19 @@
                                             </div>
                                         </div>
                                     </div>
+
+                                    <div class="col-xs-3">
+                                        <div class="form-group">
+                                            <label for="start_port_id" class="col-xs-4 control-label">起始港口</label>
+                                            <div class="col-xs-8">
+                                                <select id="start_port_id" name="detail.transfer.start_port_id" class="input-sm form-control" v-model.number="detail.transfer.start_port_id">
+                                                    <template v-for="port in detail.start_port_list">
+                                                        <option :value="port.id">{{port.port_name}}</option>
+                                                    </template>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
 
                             </form>

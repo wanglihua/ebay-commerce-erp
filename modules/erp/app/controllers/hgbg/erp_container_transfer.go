@@ -49,8 +49,9 @@ func (c ErpContainerTransfer) ListData() revel.Result {
 }
 
 type ContainerTransferDetailForm struct {
-	ContainerTransfer models.ContainerTransferInfo `json:"transfer"`
-	AuStockList       []models.StockInfo           `json:"au_stock_list"`
+	ContainerTransfer models.ContainerTransferInfo              `json:"transfer"`
+	AuStockList       []models.StockInfo                        `json:"au_stock_list"`
+	StartPortList     []models.ContainerTransferStartPortInfo   `json:"start_port_list"`
 }
 
 func (f *ContainerTransferDetailForm) IsCreate() bool {
@@ -124,9 +125,13 @@ func (c ErpContainerTransfer) DetailData() revel.Result {
 	var au_stock_list = make([]models.StockInfo, 0)
 	core.HandleError(db_session.Where(fmt.Sprintf("stock_type_id = %d", models.STOCK_TYPE_AU)).Find(&au_stock_list))
 
+	var start_port_list = make([]models.ContainerTransferStartPortInfo, 0)
+	core.HandleError(db_session.Find(&start_port_list))
+
 	var detail_form ContainerTransferDetailForm
 	detail_form.ContainerTransfer = container_transfer
 	detail_form.AuStockList = au_stock_list
+	detail_form.StartPortList = start_port_list
 
 	return c.RenderJson(detail_form)
 }
