@@ -104,14 +104,14 @@ func Check_user_active(db_session *xorm.Session) {
 				continue
 			}
 
+			// 记录登出日志
+			Log_logout(online_user.Login_user_key, db_session)
+
 			// 把用户踢出登录
 			cache.Delete(online_user.Login_user_key)
 
 			// 从在线用户列表中删除
 			to_remove_login_user_key_map[online_user.Login_user_key] = true
-
-			// 记录登出日志
-			Log_logout(online_user.Login_user_key, db_session)
 		}
 	}
 

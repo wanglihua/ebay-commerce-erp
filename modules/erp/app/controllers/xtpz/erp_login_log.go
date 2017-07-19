@@ -64,7 +64,8 @@ func (c ErpLoginLog) ListData() revel.Result {
 
 	for index, login_log := range login_log_list {
 		var logout_time = time.Time(login_log.LogoutTime)
-		if logout_time.IsZero() {
+		//if logout_time.IsZero() {
+		if logout_time.Year() < 2000 {
 			logout_time = time.Now()
 		}
 		login_log_list[index].OnlineTime = logout_time.Sub(time.Time(login_log.LoginTime)).Minutes()
