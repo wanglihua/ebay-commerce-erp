@@ -6,9 +6,9 @@ import (
 )
 
 const (
-	PORT_NINGBO   = 100
-	PORT_SHANGHAI = 200
-	PORT_SHENZHEN = 300
+	START_PORT_NINGBO   = 100
+	START_PORT_SHANGHAI = 200
+	START_PORT_SHENZHEN = 300
 )
 
 type ContainerTransferStartPortInfo struct {
@@ -29,19 +29,19 @@ func (e ContainerTransferStartPortInfo) ModelDesc() string {
 
 func (e ContainerTransferStartPortInfo) InitData(db_session *xorm.Session) {
 	var port = new(ContainerTransferStartPortInfo)
-	port.Id = PORT_NINGBO
+	port.Id = START_PORT_NINGBO
 	port.PortName = "NINGBO CHINA"
 	port.TradeItem = "FOB NINGBO"
 	db_session.Insert(port)
 
 	port = new(ContainerTransferStartPortInfo)
-	port.Id = PORT_SHANGHAI
+	port.Id = START_PORT_SHANGHAI
 	port.PortName = "SHANGHAI CHINA"
 	port.TradeItem = "FOB SHANGHAI"
 	db_session.Insert(port)
 
 	port = new(ContainerTransferStartPortInfo)
-	port.Id = PORT_SHENZHEN
+	port.Id = START_PORT_SHENZHEN
 	port.PortName = "SHENZHEN CHINA"
 	port.TradeItem = "FOB SHENZHEN"
 	db_session.Insert(port)

@@ -7,7 +7,6 @@ import (
 
 	"matrix/core"
 	"matrix/modules/erp/models"
-	"fmt"
 	"matrix/modules/erp/service/container_transfer_service"
 )
 
@@ -50,8 +49,8 @@ func (c ErpContainerTransfer) ListData() revel.Result {
 
 type ContainerTransferDetailForm struct {
 	ContainerTransfer models.ContainerTransferInfo              `json:"transfer"`
-	AuStockList       []models.StockInfo                        `json:"au_stock_list"`
 	StartPortList     []models.ContainerTransferStartPortInfo   `json:"start_port_list"`
+	DestPortList      []models.ContainerTransferDestPortInfo    `json:"dest_port_list"`
 }
 
 func (f *ContainerTransferDetailForm) IsCreate() bool {
@@ -61,7 +60,8 @@ func (f *ContainerTransferDetailForm) IsCreate() bool {
 func (f *ContainerTransferDetailForm) Valid(validation *revel.Validation) bool {
 	validation.Required(f.ContainerTransfer.BatchCode).Message("批次号不能为空！")
 
-	validation.Required(f.ContainerTransfer.DestStockId).Message("目的仓库不能为空！")
+	validation.Required(f.ContainerTransfer.StartPortId).Message("起始港口不能为空！")
+	validation.Required(f.ContainerTransfer.DestPortId).Message("目的港口不能为空！")
 
 	validation.Required(f.ContainerTransfer.ContainerCode).Message("集装箱号不能为空！")
 	if f.ContainerTransfer.ContainerCode != "" {
@@ -122,16 +122,16 @@ func (c ErpContainerTransfer) DetailData() revel.Result {
 		}
 	}
 
-	var au_stock_list = make([]models.StockInfo, 0)
-	core.HandleError(db_session.Where(fmt.Sprintf("stock_type_id = %d", models.STOCK_TYPE_AU)).Find(&au_stock_list))
-
 	var start_port_list = make([]models.ContainerTransferStartPortInfo, 0)
 	core.HandleError(db_session.Find(&start_port_list))
 
+	var dest_port_list = make([]models.ContainerTransferDestPortInfo, 0)
+	core.HandleError(db_session.Find(&dest_port_list))
+
 	var detail_form ContainerTransferDetailForm
 	detail_form.ContainerTransfer = container_transfer
-	detail_form.AuStockList = au_stock_list
 	detail_form.StartPortList = start_port_list
+	detail_form.DestPortList = dest_port_list
 
 	return c.RenderJson(detail_form)
 }
@@ -148,14 +148,6 @@ func (c ErpContainerTransfer) Save() revel.Result {
 	}
 
 	container_transfer := detail_form.ContainerTransfer
-
-	var stock_id = container_transfer.DestStockId
-
-	var stock models.StockInfo
-	_, err = db_session.Id(stock_id).Get(&stock)
-	core.HandleError(err)
-
-	container_transfer.DestStockName = stock.Name
 
 	var is_create = detail_form.IsCreate()
 

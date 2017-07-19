@@ -7,8 +7,6 @@ import (
 type ContainerTransferInfo struct {
 	Id            int64           `xorm:"bigint notnull pk autoincr 'id'" json:"id"`
 	BatchCode     string          `xorm:"nvarchar(200) notnull index 'batch_code'" json:"batch_code" smith:"verbose_name=批次号"`
-	DestStockId   int64           `xorm:"bigint notnull index 'dest_stock_id'" json:"dest_stock_id" smith:"verbose_name=目的仓库"`
-	DestStockName string          `xorm:"nvarchar(200) notnull 'dest_stock_name'" json:"dest_stock_name" smith:"verbose_name=目的仓库"`
 	ContainerCode string          `xorm:"nvarchar(200) notnull 'container_code'" json:"container_code" smith:"verbose_name=集装箱号,min=2,max=100"`
 	BlNo          string          `xorm:"nvarchar(200) notnull 'bl_no'" json:"bl_no" smith:"verbose_name=提单号,min=2,max=100"`
 	SealNo        string          `xorm:"nvarchar(200) notnull 'seal_no'" json:"seal_no" smith:"verbose_name=铅封号,min=2,max=100"`
@@ -23,6 +21,7 @@ type ContainerTransferInfo struct {
 	DepartureTime core.Time       `xorm:"datetime notnull 'departure_time'" json:"departure_time" smith:"verbose_name=到港时间"`
 	StockTime     core.Time       `xorm:"datetime notnull 'stock_time'" json:"stock_time" smith:"verbose_name=到仓时间"`
 	StartPortId   int64           `xorm:"bigint notnull index 'start_port_id'" json:"start_port_id" smith:"verbose_name=起始港口"`
+	DestPortId    int64           `xorm:"bigint notnull index 'dest_port_id'" json:"dest_port_id" smith:"verbose_name=目的港口"`
 	CreateTime    core.Time       `xorm:"created notnull 'create_time'" json:"create_time"`
 	UpdateTime    core.Time       `xorm:"updated notnull 'update_time'" json:"update_time"`
 }
