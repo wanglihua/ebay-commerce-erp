@@ -305,7 +305,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="True">&times;</button>
-                    <h4 class="modal-title">订单物流详细</h4>
+                    <h4 class="modal-title">导出物流公司模板选项</h4>
                 </div>
                 <div class="modal-body clearfix">
                     <div class="row">
@@ -345,6 +345,7 @@
                             <form id="formLogisticsCompanyExport" method="post" action='{%url "ErpOrderLogisticsCompanyExport.ExportExcel" %}'>
                                 <input type="hidden" id="company_export_stock_id" name="stock_id"/>
                                 <input type="hidden" id="company_export_company_code" name="company_code"/>
+                                <input type="hidden" id="company_export_batch_code" name="batch_code"/>
                             </form>
                         </div>
                     </div>
@@ -833,6 +834,7 @@
                 }
                 $("#company_export_stock_id").val(vm.logistics_company_export_option.stock_id);
                 $("#company_export_company_code").val(vm.logistics_company_export_option.company_code);
+                $("#company_export_batch_code").val(vm.page.batch_code);
                 $("#formLogisticsCompanyExport").submit();
                 $('#logisticsCompanyExportOptionDialog').modal('hide');
             },
