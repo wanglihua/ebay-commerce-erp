@@ -234,10 +234,13 @@ WHERE o.status_id = %d AND ol.mode_id IN (%s) AND ol.stock_id = %d`
 				var order_shipping_address = order_service.Get_order_shipping_address(order_logistics.Order.Id, db_session)
 				sheet.Cell(index+2, excel_col_label_to_index("C")).Value = "7D85"
 				sheet.Cell(index+2, excel_col_label_to_index("D")).Value = order_logistics.Order.FullTranId
-				sheet.Cell(index+2, excel_col_label_to_index("E")).Value = order_shipping_address.Name
+
+				name1, name2 := split_long_string(order_shipping_address.Name, 35)
+				sheet.Cell(index+2, excel_col_label_to_index("E")).Value = name1
+				sheet.Cell(index+2, excel_col_label_to_index("F")).Value = name2
 
 				var full_address = order_shipping_address.Street1 + order_shipping_address.Street2
-				address1, address2 := split_address(full_address, 35)
+				address1, address2 := split_long_string(full_address, 35)
 				sheet.Cell(index+2, excel_col_label_to_index("G")).Value = address1
 				sheet.Cell(index+2, excel_col_label_to_index("H")).Value = address2
 				sheet.Cell(index+2, excel_col_label_to_index("K")).Value = order_shipping_address.CityName
@@ -278,10 +281,13 @@ WHERE o.status_id = %d AND ol.mode_id IN (%s) AND ol.stock_id = %d`
 				var order_shipping_address = order_service.Get_order_shipping_address(order_logistics.Order.Id, db_session)
 				sheet.Cell(index+2, excel_col_label_to_index("C")).Value = "7D85"
 				sheet.Cell(index+2, excel_col_label_to_index("D")).Value = order_logistics.Order.FullTranId
-				sheet.Cell(index+2, excel_col_label_to_index("E")).Value = order_shipping_address.Name
+
+				name1, name2 := split_long_string(order_shipping_address.Name, 35)
+				sheet.Cell(index+2, excel_col_label_to_index("E")).Value = name1
+				sheet.Cell(index+2, excel_col_label_to_index("F")).Value = name2
 
 				var full_address = order_shipping_address.Street1 + order_shipping_address.Street2
-				address1, address2 := split_address(full_address, 35)
+				address1, address2 := split_long_string(full_address, 35)
 				sheet.Cell(index+2, excel_col_label_to_index("G")).Value = address1
 				sheet.Cell(index+2, excel_col_label_to_index("H")).Value = address2
 				sheet.Cell(index+2, excel_col_label_to_index("K")).Value = order_shipping_address.CityName
@@ -393,7 +399,7 @@ WHERE  o.status_id = %d AND ol.mode_id IN (%s) AND ol.stock_id = %d`
 
 			sheet.Cell(index+1, excel_col_label_to_index("H")).Value = order_shipping_address.Name
 			var full_address = order_shipping_address.Street1 + order_shipping_address.Street2
-			address1, address2 := split_address(full_address, 25)
+			address1, address2 := split_long_string(full_address, 25)
 			sheet.Cell(index+1, excel_col_label_to_index("I")).Value = address1
 			sheet.Cell(index+1, excel_col_label_to_index("J")).Value = address2
 			sheet.Cell(index+1, excel_col_label_to_index("K")).Value = order_shipping_address.CityName
@@ -491,7 +497,7 @@ WHERE o.status_id = %d AND ol.mode_id IN (%s) AND ol.stock_id = %d`
 			sheet.Cell(index+1, excel_col_label_to_index("D")).Value = order_shipping_address.Name // 和 Ｃ　是一样的？
 
 			var full_address = order_shipping_address.Street1 + order_shipping_address.Street2
-			address1, address2 := split_address(full_address, 25)
+			address1, address2 := split_long_string(full_address, 25)
 			sheet.Cell(index+1, excel_col_label_to_index("E")).Value = address1
 			sheet.Cell(index+1, excel_col_label_to_index("F")).Value = address2
 			sheet.Cell(index+1, excel_col_label_to_index("G")).Value = order_shipping_address.CityName
@@ -504,7 +510,13 @@ WHERE o.status_id = %d AND ol.mode_id IN (%s) AND ol.stock_id = %d`
 			sheet.Cell(index+1, excel_col_label_to_index("O")).Value = fmt.Sprintf("%0.1f", order_logistics.OrderLogistics.Width)
 			sheet.Cell(index+1, excel_col_label_to_index("P")).Value = fmt.Sprintf("%0.1f", order_logistics.OrderLogistics.Height/float64(order_logistics.qty))
 			sheet.Cell(index+1, excel_col_label_to_index("Q")).Value = fmt.Sprintf("%0.1f", order_logistics.OrderLogistics.DimWeight/float64(order_logistics.qty))
-			sheet.Cell(index+1, excel_col_label_to_index("R")).Value = fmt.Sprintf("%0.1f", order_logistics.OrderLogistics.Weight/float64(order_logistics.qty))
+
+			if order_logistics.OrderLogistics.Weight/float64(order_logistics.qty) >= 1 {
+				sheet.Cell(index+1, excel_col_label_to_index("R")).Value = fmt.Sprintf("%0.1f", order_logistics.OrderLogistics.Weight/float64(order_logistics.qty))
+			} else {
+				sheet.Cell(index+1, excel_col_label_to_index("R")).Value = fmt.Sprintf("%0.1f", math.Ceil(order_logistics.OrderLogistics.Weight/float64(order_logistics.qty)))
+			}
+
 			sheet.Cell(index+1, excel_col_label_to_index("S")).Value = order_logistics.Order.FullTranId
 			sheet.Cell(index+1, excel_col_label_to_index("T")).Value = fmt.Sprintf("FROM:%s", order_logistics.ShopAccount.Name)
 			sheet.Cell(index+1, excel_col_label_to_index("U")).Value = "ATL at safe place"
@@ -546,27 +558,27 @@ func excel_col_label_to_index(row_label string) int {
 	return row_index - 1
 }
 
-func split_address(address string, letter_limit int) (address1 string, address2 string) {
+func split_long_string(long_str string, letter_limit int) (str1 string, str2 string) {
 	if letter_limit <= 0 {
-		return address, ""
+		return long_str, ""
 	}
 
-	var address_rune_list = []rune(address)
-	var address_rune_list_len = len(address_rune_list)
+	var long_str_rune_list = []rune(long_str)
+	var long_str_rune_list_len = len(long_str_rune_list)
 
-	if address_rune_list_len <= letter_limit {
-		return address, ""
+	if long_str_rune_list_len <= letter_limit {
+		return long_str, ""
 	}
 
 	var space_rune = ([]rune(" "))[0]
 	var index int
 	for index = letter_limit; index > 0; index-- {
-		if address_rune_list[index] == space_rune {
+		if long_str_rune_list[index] == space_rune {
 			break
 		}
 	}
 
-	return string(address_rune_list[0:index]), string(address_rune_list[index:])
+	return strings.TrimSpace(string(long_str_rune_list[0:index])), strings.TrimSpace(string(long_str_rune_list[index:]))
 }
 
 func get_order_sku_for_export(order_id int64, db_session *xorm.Session) (order_sku_qty_loc_return string, loc_name string) {
