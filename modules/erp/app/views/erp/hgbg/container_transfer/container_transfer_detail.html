@@ -84,11 +84,11 @@
 
                                     <div class="col-xs-3">
                                         <div class="form-group">
-                                            <label for="dest_port_id" class="col-xs-4 control-label">目的港口</label>
+                                            <label for="start_port_id" class="col-xs-4 control-label">起始港口</label>
                                             <div class="col-xs-8">
-                                                <select id="dest_port_id" name="detail.transfer.dest_port_id" class="input-sm form-control" v-model.number="detail.transfer.dest_port_id">
-                                                    <template v-for="stock in detail.au_stock_list">
-                                                        <option :value="stock.id">{{stock.name}}</option>
+                                                <select id="start_port_id" name="detail.transfer.start_port_id" class="input-sm form-control" v-model.number="detail.transfer.start_port_id">
+                                                    <template v-for="port in detail.start_port_list">
+                                                        <option :value="port.id">{{port.port_name}}</option>
                                                     </template>
                                                 </select>
                                             </div>
@@ -124,6 +124,50 @@
                                 </div>
 
                                 <div class="row">
+
+                                    <div class="col-xs-3">
+                                        <div class="form-group">
+                                            <label for="dest_port_id" class="col-xs-4 control-label">目的港口</label>
+                                            <div class="col-xs-8">
+                                                <select id="dest_port_id" name="detail.transfer.dest_port_id" class="input-sm form-control" v-model.number="detail.transfer.dest_port_id">
+                                                    <template v-for="port in detail.dest_port_list">
+                                                        <option :value="port.id">{{port.port_name}}</option>
+                                                    </template>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xs-3">
+                                        <div class="form-group">
+                                            <label for="packing_time" class="col-xs-4 control-label">装箱时间</label>
+                                            <div class="col-xs-8">
+                                                <input id="packing_time" name="detail.transfer.packing_time" type="text" class="input-sm form-control" v-model="detail.transfer.packing_time"/>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xs-3">
+                                        <div class="form-group">
+                                            <label for="departure_time" class="col-xs-4 control-label">到港时间</label>
+                                            <div class="col-xs-8">
+                                                <input id="departure_time" name="detail.transfer.departure_time" type="text" class="input-sm form-control" v-model="detail.transfer.departure_time"/>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xs-3">
+                                        <div class="form-group">
+                                            <label for="stock_time" class="col-xs-4 control-label">到仓时间</label>
+                                            <div class="col-xs-8">
+                                                <input id="stock_time" name="detail.transfer.stock_time" type="text" class="input-sm form-control" v-model="detail.transfer.stock_time"/>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                <div class="row">
                                     <div class="col-xs-3">
                                         <div class="form-group">
                                             <label for="total_volumn" class="col-xs-4 control-label">总体积</label>
@@ -156,48 +200,6 @@
                                             <label for="total_amount2" class="col-xs-4 control-label">总金额2</label>
                                             <div class="col-xs-8">
                                                 <input id="total_amount2" name="detail.transfer.total_amount2" type="text" class="input-sm form-control" disabled="disabled" v-model.number="detail.transfer.total_amount2"/>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-xs-3">
-                                        <div class="form-group">
-                                            <label for="packing_time" class="col-xs-4 control-label">装箱时间</label>
-                                            <div class="col-xs-8">
-                                                <input id="packing_time" name="detail.transfer.packing_time" type="text" class="input-sm form-control" v-model="detail.transfer.packing_time"/>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-xs-3">
-                                        <div class="form-group">
-                                            <label for="departure_time" class="col-xs-4 control-label">到港时间</label>
-                                            <div class="col-xs-8">
-                                                <input id="departure_time" name="detail.transfer.departure_time" type="text" class="input-sm form-control" v-model="detail.transfer.departure_time"/>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-xs-3">
-                                        <div class="form-group">
-                                            <label for="stock_time" class="col-xs-4 control-label">到仓时间</label>
-                                            <div class="col-xs-8">
-                                                <input id="stock_time" name="detail.transfer.stock_time" type="text" class="input-sm form-control" v-model="detail.transfer.stock_time"/>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-xs-3">
-                                        <div class="form-group">
-                                            <label for="start_port_id" class="col-xs-4 control-label">起始港口</label>
-                                            <div class="col-xs-8">
-                                                <select id="start_port_id" name="detail.transfer.start_port_id" class="input-sm form-control" v-model.number="detail.transfer.start_port_id">
-                                                    <template v-for="port in detail.start_port_list">
-                                                        <option :value="port.id">{{port.port_name}}</option>
-                                                    </template>
-                                                </select>
                                             </div>
                                         </div>
                                     </div>

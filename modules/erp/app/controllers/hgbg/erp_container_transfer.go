@@ -149,6 +149,16 @@ func (c ErpContainerTransfer) Save() revel.Result {
 
 	container_transfer := detail_form.ContainerTransfer
 
+	var start_port models.ContainerTransferStartPortInfo
+	_, err = db_session.Id(container_transfer.StartPortId).Get(&start_port)
+	core.HandleError(err)
+	container_transfer.StartPortName = start_port.PortName
+
+	var dest_port models.ContainerTransferDestPortInfo
+	_, err = db_session.Id(container_transfer.DestPortId).Get(&dest_port)
+	core.HandleError(err)
+	container_transfer.DestPortName = dest_port.PortName
+
 	var is_create = detail_form.IsCreate()
 
 	var affected int64

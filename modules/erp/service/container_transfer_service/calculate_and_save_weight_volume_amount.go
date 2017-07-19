@@ -55,7 +55,12 @@ WHERE cte.transfer_id = %d;`
 	container_transfer.TotalVolumn = weight_volume_amount.TotalVolume
 	container_transfer.TotalAmount1 = weight_volume_amount.TotalAmount1
 	container_transfer.TotalAmount2 = weight_volume_amount.TotalAmount2
-	container_transfer.PriceUpRate = (weight_volume_amount.TotalAmount2 - weight_volume_amount.DutyAmountDiscounted - weight_volume_amount.DutyFreeAmount) / weight_volume_amount.DutyFreeAmount
+
+	if weight_volume_amount.DutyFreeAmount != 0 {
+		container_transfer.PriceUpRate = (weight_volume_amount.TotalAmount2 - weight_volume_amount.DutyAmountDiscounted - weight_volume_amount.DutyFreeAmount) / weight_volume_amount.DutyFreeAmount
+	} else {
+		container_transfer.PriceUpRate = 0
+	}
 
 	_, err = db_session.Cols("total_weight", "total_volumn", "total_amount1", "total_amount2", "price_up_rate").Update(&container_transfer)
 	core.HandleError(err)
