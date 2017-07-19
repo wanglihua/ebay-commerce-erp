@@ -616,6 +616,12 @@ WHERE ol.stock_id = 0 AND ol.company_id = 0
 
 		col_index++
 		cell = header_row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 12)
+		set_head_cell_style(cell)
+		cell.Value = "订单代码"
+
+		col_index++
+		cell = header_row.AddCell()
 		sheet.SetColWidth(col_index, col_index, 20)
 		set_head_cell_style(cell)
 		cell.Value = "发货仓库"
@@ -652,6 +658,11 @@ WHERE ol.stock_id = 0 AND ol.company_id = 0
 		cell = row.AddCell()
 		set_text_cell_style(cell, "left")
 		cell.Value = order_logistics.Order.Code
+
+		// 订单代码
+		cell = row.AddCell()
+		set_text_cell_style(cell, "left")
+		cell.Value = order_logistics.Order.FullTranId
 
 		// 发货仓库
 		cell = row.AddCell()
