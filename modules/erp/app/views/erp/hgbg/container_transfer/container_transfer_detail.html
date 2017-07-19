@@ -237,7 +237,6 @@
                                 <th>SKU</th>
                                 <th>数量</th>
                                 <th>箱数</th>
-                                <th>价格</th>
                                 <th>错误信息</th>
                             </tr>
                             </thead>
@@ -247,7 +246,6 @@
                                     <td>{{error_data.product_sku}}</td>
                                     <td>{{error_data.qty}}</td>
                                     <td>{{error_data.box_qty}}</td>
-                                    <td>{{error_data.price}}</td>
                                     <td>{{error_data.error_message}}</td>
                                 </tr>
                             </template>
@@ -298,17 +296,6 @@
                                                             <label for="box_qty" class="col-xs-2 control-label">箱数</label>
                                                             <div class="col-xs-10">
                                                                 <input id="box_qty" name="detail.transfer_entry.box_qty" type="text" class="input-sm form-control" v-model.number="detail.transfer_entry.box_qty"/>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                <div class="row">
-                                                    <div class="col-xs-12">
-                                                        <div class="form-group">
-                                                            <label for="price" class="col-xs-2 control-label">价格</label>
-                                                            <div class="col-xs-10">
-                                                                <input id="price" name="detail.transfer_entry.price" type="text" class="input-sm form-control" v-model.number="detail.transfer_entry.price"/>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -680,9 +667,6 @@
             },
             'detail.transfer_entry.box_qty': {
                 required: true, digits: true
-            },
-            'detail.transfer_entry.price': {
-                required: true
             }
         });
 
