@@ -111,6 +111,9 @@ func (c ErpOrderLogisticsCompanyExport) ExportExcel() revel.Result {
 	var company_code int
 	c.Params.Bind(&company_code, "company_code")
 
+	var batch_code int64
+	c.Params.Bind(&batch_code, "batch_code")
+
 	// 判断当前登录用户是否有选择的仓库的权限
 	var stock_list = stock_service.Get_login_user_stock_list(db_session, c.Session)
 	var has_stock = false
@@ -203,6 +206,11 @@ FROM erp_order_logistics ol
     LEFT JOIN erp_shop_account sa ON sa.id = o.shop_id
 WHERE o.status_id = %d AND ol.mode_id IN (%s) AND ol.stock_id = %d`
 		sql_get_logistics_list = fmt.Sprintf(sql_get_logistics_list, models.ORDER_STATUS_PHZ, strings.Join(mode_id_str_list, ","), stock_id)
+
+		if batch_code != 0 {
+			sql_get_logistics_list += fmt.Sprintf(" AND o.batch_code = %d", batch_code)
+		}
+
 		var order_logistics_list = make([]order_logistics_eparcel_view_item_t, 0)
 		err = db_session.Sql(sql_get_logistics_list).Find(&order_logistics_list)
 		core.HandleError(err)
@@ -345,6 +353,11 @@ FROM erp_order_logistics ol
     LEFT JOIN erp_shop_account sa ON sa.id = o.shop_id
 WHERE  o.status_id = %d AND ol.mode_id IN (%s) AND ol.stock_id = %d`
 		sql_get_logistics_list = fmt.Sprintf(sql_get_logistics_list, models.ORDER_STATUS_PHZ, strings.Join(mode_id_str_list, ","), stock_id)
+
+		if batch_code != 0 {
+			sql_get_logistics_list += fmt.Sprintf(" AND o.batch_code = %d", batch_code)
+		}
+
 		var order_logistics_list = make([]order_logistics_fastway_view_item_t, 0)
 		err = db_session.Sql(sql_get_logistics_list).Find(&order_logistics_list)
 		core.HandleError(err)
@@ -435,6 +448,11 @@ FROM erp_order_logistics ol
     LEFT JOIN erp_shop_account sa ON sa.id = o.shop_id
 WHERE o.status_id = %d AND ol.mode_id IN (%s) AND ol.stock_id = %d`
 		sql_get_logistics_list = fmt.Sprintf(sql_get_logistics_list, models.ORDER_STATUS_PHZ, strings.Join(mode_id_str_list, ","), stock_id)
+
+		if batch_code != 0 {
+			sql_get_logistics_list += fmt.Sprintf(" AND o.batch_code = %d", batch_code)
+		}
+
 		var order_logistics_list = make([]order_logistics_toll_view_item_t, 0)
 		err = db_session.Sql(sql_get_logistics_list).Find(&order_logistics_list)
 		core.HandleError(err)
