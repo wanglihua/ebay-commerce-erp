@@ -9,6 +9,7 @@ import (
 	"matrix/modules/erp/models"
 	"fmt"
 	"matrix/modules/erp/service/container_transfer_service"
+	"matrix/modules/erp/service/inventory_service"
 )
 
 type ErpContainerTransferEntry struct {
@@ -119,6 +120,8 @@ func (c ErpContainerTransferEntry) Save() revel.Result {
 	if has == false {
 		return c.RenderJson(core.JsonResult{Success: false, Message: "商品SKU不存在！" })
 	}
+
+	container_transfer_entry.Price = inventory_service.GetProductCnStockCostPrice(product.Id, db_session)
 
 	if product.AuHsCode == "" {
 		return c.RenderJson(core.JsonResult{Success: false, Message: "商品澳洲海关编码未设置！" })

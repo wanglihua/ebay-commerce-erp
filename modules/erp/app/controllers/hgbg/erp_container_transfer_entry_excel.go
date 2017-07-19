@@ -13,6 +13,7 @@ import (
 	"github.com/go-xorm/xorm"
 	"strconv"
 	"matrix/modules/erp/service/container_transfer_service"
+	"matrix/modules/erp/service/inventory_service"
 )
 
 type ErpContainerTransferEntryExcel struct {
@@ -45,7 +46,6 @@ func (c ErpContainerTransferEntryExcel) Import() revel.Result {
 		ProductSku   string  `json:"product_sku"`
 		Qty          string  `json:"qty"`
 		BoxQty       string  `json:"box_qty"`
-		Price        string  `json:"price"`
 		ErrorMessage string  `json:"error_message"`
 
 		product    models.ProductInfo            `json:"-"`
@@ -108,15 +108,6 @@ func (c ErpContainerTransferEntryExcel) Import() revel.Result {
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
 			transfer_entry_import.BoxQty = cell_val
-			col_index++
-
-			// price
-			//cell = row.Cells[col_index]
-			cell = sheet.Cell(row_index, col_index)
-			cell_val, err = cell.String()
-			core.HandleError(err)
-			cell_val = strings.TrimSpace(cell_val)
-			transfer_entry_import.Price = cell_val
 			col_index++
 
 			transfer_entry_import_list = append(transfer_entry_import_list, transfer_entry_import)
@@ -189,12 +180,7 @@ func (c ErpContainerTransferEntryExcel) Import() revel.Result {
 			transfer_entry_import_list[index].box_qty = box_qty
 		}
 
-		price, err := strconv.ParseFloat(transfer_entry_import.Price, 64)
-		if err != nil {
-			buffer.WriteString("价格格式输入不对！")
-		} else {
-			transfer_entry_import_list[index].price = price
-		}
+		transfer_entry_import_list[index].price = inventory_service.GetProductCnStockCostPrice(product.Id, db_session)
 
 		transfer_entry_import.ErrorMessage = buffer.String()
 
