@@ -22,6 +22,7 @@ type ContainerTransferInfo struct {
 	PackingTime   core.Time       `xorm:"datetime notnull 'packing_time'" json:"packing_time" smith:"verbose_name=装箱时间"`
 	DepartureTime core.Time       `xorm:"datetime notnull 'departure_time'" json:"departure_time" smith:"verbose_name=到港时间"`
 	StockTime     core.Time       `xorm:"datetime notnull 'stock_time'" json:"stock_time" smith:"verbose_name=到仓时间"`
+	StartPortId   int64           `xorm:"bigint notnull index 'start_port_id'" json:"start_port_id" smith:"verbose_name=起始港口"`
 	CreateTime    core.Time       `xorm:"created notnull 'create_time'" json:"create_time"`
 	UpdateTime    core.Time       `xorm:"updated notnull 'update_time'" json:"update_time"`
 }
