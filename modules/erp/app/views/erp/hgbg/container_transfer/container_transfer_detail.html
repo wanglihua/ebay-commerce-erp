@@ -32,10 +32,12 @@
                             <i class="ace-icon fa fa-trash-o"></i>
                             删除
                         </button>
+                        {%/*
                         <button class="btn btn-pink btn-sm" onclick="exportTransferReportElem()">
                             <i class="ace-icon fa fa-file-excel-o"></i>
                             导出中国海关申报元素
                         </button>
+                        */%}
 
                         <div class="btn-group">
                             <button data-toggle="dropdown" class="btn btn-pink btn-sm dropdown-toggle" aria-expanded="false" style="border-width: 4px;">
@@ -44,13 +46,13 @@
                             </button>
                             <ul class="dropdown-menu dropdown-danger">
                                 <li>
-                                    <a onclick="" style="cursor: pointer;">澳中欧</a>
+                                    <a onclick="export_hgbg_out_excel('ozo')" style="cursor: pointer;">澳中欧</a>
                                 </li>
                                 <li>
-                                    <a onclick="" style="cursor: pointer;">五洲通</a>
+                                    <a onclick="export_hgbg_out_excel('wzt')" style="cursor: pointer;">五洲通</a>
                                 </li>
                                 <li>
-                                    <a onclick="" style="cursor: pointer;">第三方</a>
+                                    <a onclick="export_hgbg_out_excel('third')" style="cursor: pointer;">第三方</a>
                                 </li>
                             </ul>
                         </div>
@@ -62,13 +64,13 @@
                             </button>
                             <ul class="dropdown-menu dropdown-danger">
                                 <li>
-                                    <a onclick="" style="cursor: pointer;">ozo estore</a>
+                                    <a onclick="export_hgbg_in_excel('ozo')" style="cursor: pointer;">ozo estore</a>
                                 </li>
                                 <li>
-                                    <a onclick="" style="cursor: pointer;">elife pty ltd</a>
+                                    <a onclick="export_hgbg_in_excel('elife')" style="cursor: pointer;">elife pty ltd</a>
                                 </li>
                                 <li>
-                                    <a onclick="" style="cursor: pointer;">Giant Star</a>
+                                    <a onclick="export_hgbg_in_excel('giant')" style="cursor: pointer;">Giant Star</a>
                                 </li>
                             </ul>
                         </div>
