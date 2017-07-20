@@ -531,3 +531,6 @@ POST /container/transfer/entry/import  ErpContainerTransferEntryExcel.Import
 POST /container/transfer/entry/export  ErpContainerTransferEntryExcel.Export
 
 POST /container/transfer/report/elem/export  ErpContainerTransferReportElemExcel.Export
+
+POST /container/transfer/excel/in/export   ErpContainerTransferExcelIn.Export
+POST /container/transfer/excel/out/export  ErpContainerTransferExcelOut.Export

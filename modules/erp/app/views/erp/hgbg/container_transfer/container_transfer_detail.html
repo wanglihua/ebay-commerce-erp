@@ -791,5 +791,17 @@
         var url = '{%url "ErpContainerTransferReportElemExcel.Export"%}' + "?" + params;
         $('<form method="post" action="' + url + '"></form>').appendTo('body').submit().remove();
     }
+
+    function export_hgbg_in_excel(company_code) {
+        var params = $.param({"transfer_id": transfer_id, "company_code": company_code});
+        var url = '{%url "ErpContainerTransferExcelIn.Export"%}' + "?" + params;
+        $('<form method="post" action="' + url + '"></form>').appendTo('body').submit().remove();
+    }
+
+    function export_hgbg_out_excel(company_code) {
+        var params = $.param({"transfer_id": transfer_id, "company_code": company_code});
+        var url = '{%url "ErpContainerTransferExcelOut.Export"%}' + "?" + params;
+        $('<form method="post" action="' + url + '"></form>').appendTo('body').submit().remove();
+    }
 </script>
 {%footer%}
