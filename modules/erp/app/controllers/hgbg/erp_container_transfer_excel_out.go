@@ -5,10 +5,9 @@ import (
 
 	"matrix/core"
 	"matrix/modules/erp/models"
-	"fmt"
-	"github.com/tealeg/xlsx"
 	"bytes"
 	"time"
+	"matrix/modules/erp/app/controllers/hgbg/container_transfer_excel_out"
 )
 
 type ErpContainerTransferExcelOut struct {
@@ -21,14 +20,16 @@ func (c ErpContainerTransferExcelOut) Export() revel.Result {
 	var transfer_id int64
 	c.Params.Bind(&transfer_id, "transfer_id")
 
-	var company_code string
+	var company_code string // ozo, third, wzt
 	c.Params.Bind(&company_code, "company_code")
 
 	var containerTransfer models.ContainerTransferInfo
 	_, err := db_session.Id(transfer_id).Get(&containerTransfer)
 	core.HandleError(err)
 
-	xlsx_file := xlsx.NewFile()
+	var excel_exporter = container_transfer_excel_out.GetExporter(company_code)
+
+	xlsx_file := excel_exporter.GetExcelFile(&containerTransfer, db_session)
 
 	//先把文件内容写到buffer中，再从中读取
 	var buffer bytes.Buffer
@@ -37,7 +38,7 @@ func (c ErpContainerTransferExcelOut) Export() revel.Result {
 
 	reader := bytes.NewReader(buffer.Bytes()) //bytes.Reader 实现了 io.Reader 接口
 
-	file_name := fmt.Sprintf("中国海关申报元素导出_%s.xlsx", containerTransfer.BatchCode) //"file.xlsx" //可以根据参数生成文件名
+	file_name := excel_exporter.GetExcelFileName(&containerTransfer) //fmt.Sprintf("中国海关申报元素导出_%s.xlsx", containerTransfer.BatchCode) //"file.xlsx" //可以根据参数生成文件名
 
 	return c.RenderBinary(reader, file_name, revel.Attachment, time.Now())
 }

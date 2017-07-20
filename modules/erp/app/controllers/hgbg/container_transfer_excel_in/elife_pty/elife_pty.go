@@ -1,16 +1,18 @@
 package elife_pty
 
-/*
-type ContainerTransferExcelInExportInterface interface {
-	GetExcelFileName(p_transfer *models.ContainerTransferInfo) string
-	GetExcelFile(p_transfer *models.ContainerTransferInfo, db_session *xorm.Session) *xlsx.File
+import (
+	"matrix/modules/erp/models"
+	"github.com/go-xorm/xorm"
+	"github.com/tealeg/xlsx"
+)
+
+type Exporter struct {
 }
 
- */
-
-type ElifePty struct {
-}
-
-func (c ElifePty) GetExcelFileName() string {
+func (c Exporter) GetExcelFileName(p_transfer *models.ContainerTransferInfo) string {
 	return ""
+}
+
+func (c Exporter) GetExcelFile(p_transfer *models.ContainerTransferInfo, db_session *xorm.Session) *xlsx.File {
+	return nil
 }
