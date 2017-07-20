@@ -41,6 +41,7 @@ func (c Exporter) GetExcelFile(p_transfer *models.ContainerTransferInfo, db_sess
 	xlsx_file.SetCellStr(sheet1_name, "G14", dest_port.PortName)
 
 	var sheet2_name = "Sheet2"
+
 	xlsx_file.SetCellStr(sheet2_name, "G13", p_transfer.BatchCode)
 	xlsx_file.SetCellStr(sheet2_name, "G14", p_transfer.BatchCode)
 	xlsx_file.SetCellStr(sheet2_name, "G16", time.Time(p_transfer.PackingTime).Format("2006-01-02"))
