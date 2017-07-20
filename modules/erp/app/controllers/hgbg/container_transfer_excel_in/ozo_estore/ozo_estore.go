@@ -26,9 +26,12 @@ func (c Exporter) GetExcelFile(p_transfer *models.ContainerTransferInfo, db_sess
 
 	var sheet1_name = xlsx_file.GetSheetName(1)
 
-	xlsx_file.SetCellStr(sheet1_name, "J1", p_transfer.BatchCode)
-	xlsx_file.SetCellStr(sheet1_name, "K1", p_transfer.BatchCode)
+	xlsx_file.SetCellStr(sheet1_name, "G4", p_transfer.BatchCode)
+	xlsx_file.SetCellStr(sheet1_name, "G5", p_transfer.BatchCode)
 	xlsx_file.SetCellStr(sheet1_name, "L1", sheet1_name)
+
+	xlsx_file.SetSheetName(sheet1_name, "COMMERCIAL_INVOICE")
+
 
 	revel.TRACE.Println("sheet1_name", sheet1_name)
 
