@@ -9,6 +9,8 @@ import (
 	"matrix/modules/erp/models"
 	"strings"
 	"fmt"
+	"matrix/modules/auth/service/pass_service"
+	"matrix/modules/auth/pass_res"
 )
 
 type ErpSpecialProduct struct {
@@ -16,10 +18,14 @@ type ErpSpecialProduct struct {
 }
 
 func (c ErpSpecialProduct) Index() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_SPECIAL_SKU, c.Session)
+
 	return c.RenderTemplate("erp/kcgl/special_product/special_product_index.html")
 }
 
 func (c ErpSpecialProduct) ListData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_SPECIAL_SKU, c.Session)
+
 	db_session := c.DbSession
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
@@ -75,6 +81,8 @@ func (f *SpecialProductDetailForm) Valid(validation *revel.Validation) bool {
 }
 
 func (c ErpSpecialProduct) DetailData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_SPECIAL_SKU, c.Session)
+
 	var detail_form SpecialProductDetailForm
 	detail_form.SkuList = ""
 
@@ -82,6 +90,8 @@ func (c ErpSpecialProduct) DetailData() revel.Result {
 }
 
 func (c ErpSpecialProduct) Save() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_SPECIAL_SKU, c.Session)
+
 	db_session := c.DbSession
 
 	var detail_form SpecialProductDetailForm
@@ -126,6 +136,8 @@ func (c ErpSpecialProduct) Save() revel.Result {
 }
 
 func (c ErpSpecialProduct) Delete() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_SPECIAL_SKU, c.Session)
+
 	db_session := c.DbSession
 
 	special_product_id_list := make([]int64, 0)

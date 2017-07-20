@@ -316,6 +316,14 @@ func (e PassResInfo) InitData(db_session *xorm.Session) {
 		pass.Name = "手工出库"
 		pass.Desc = core.MakeNullString("手工出库", true)
 		db_session.Insert(pass)
+
+		// KCGL_SPECIAL_SKU
+		pass = new(PassResInfo)
+		pass.Id = pass_res.KCGL_SPECIAL_SKU
+		pass.CateId = pass_res_cate.KCGL
+		pass.Name = "特殊SKU"
+		pass.Desc = core.MakeNullString("特殊SKU", true)
+		db_session.Insert(pass)
 	}
 
 	// 商品配置

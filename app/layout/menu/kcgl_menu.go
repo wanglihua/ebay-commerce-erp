@@ -55,14 +55,15 @@ func GetKcglMenu(res_id_map map[int64]bool, web_session revel.Session) string {
         </li>`)
 	}
 
-	// todo 权限检查
-	buffer.WriteString(`<li id="kcgl-special-product-menu" class="">
+	if check_pass_res_menu(pass_res.KCGL_SPECIAL_SKU) {
+		buffer.WriteString(`<li id="kcgl-special-product-menu" class="">
             <a href="/special/product">
                 <i class="menu-icon fa fa-caret-right"></i>
                 特殊SKU
             </a>
             <b class="arrow"></b>
         </li>`)
+	}
 
 	if check_pass_res_menu(pass_res.KCGL_PRODUCT_BIND) {
 		buffer.WriteString(`<li id="kcgl-productbind-menu" class="">
