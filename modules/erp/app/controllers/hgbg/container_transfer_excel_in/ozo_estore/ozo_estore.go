@@ -8,6 +8,7 @@ import (
 	"github.com/revel/revel"
 	"matrix/core"
 	"github.com/Luxurioust/excelize"
+	"time"
 )
 
 type Exporter struct {
@@ -27,9 +28,22 @@ func (c Exporter) GetExcelFile(p_transfer *models.ContainerTransferInfo, db_sess
 
 	xlsx_file.SetCellStr(sheet1_name, "G4", p_transfer.BatchCode)
 	xlsx_file.SetCellStr(sheet1_name, "G5", p_transfer.BatchCode)
-	xlsx_file.SetCellStr(sheet1_name, "L1", sheet1_name)
+	xlsx_file.SetCellStr(sheet1_name, "G7", time.Time(p_transfer.PackingTime).Format("2006-01-02"))
 
-	xlsx_file.SetSheetName(sheet1_name, "COMMERCIAL_INVOICE")
+	var start_port models.ContainerTransferStartPortInfo
+	_, err = db_session.Id(p_transfer.StartPortId).Get(&start_port)
+	core.HandleError(err)
+	xlsx_file.SetCellStr(sheet1_name, "G13", start_port.PortName)
+
+	var dest_port models.ContainerTransferDestPortInfo
+	_, err = db_session.Id(p_transfer.DestPortId).Get(&dest_port)
+	core.HandleError(err)
+	xlsx_file.SetCellStr(sheet1_name, "G14", dest_port.PortName)
+
+	var sheet2_name = "Sheet2"
+	xlsx_file.SetCellStr(sheet2_name, "G13", p_transfer.BatchCode)
+	xlsx_file.SetCellStr(sheet2_name, "G14", p_transfer.BatchCode)
+	xlsx_file.SetCellStr(sheet2_name, "G16", time.Time(p_transfer.PackingTime).Format("2006-01-02"))
 
 	return xlsx_file
 }
