@@ -14,6 +14,7 @@ import (
 	"strconv"
 	"matrix/modules/erp/service/container_transfer_service"
 	"matrix/modules/erp/service/inventory_service"
+	"matrix/modules/erp/service/exchange_rate_service"
 )
 
 type ErpContainerTransferEntryExcel struct {
@@ -180,7 +181,8 @@ func (c ErpContainerTransferEntryExcel) Import() revel.Result {
 			transfer_entry_import_list[index].box_qty = box_qty
 		}
 
-		transfer_entry_import_list[index].price = inventory_service.GetProductCnStockCostPrice(product.Id, db_session)
+		var au_exchange_rate =  exchange_rate_service.Get_aud_exchange_rate(db_session)
+		transfer_entry_import_list[index].price = inventory_service.GetProductCnStockCostPrice(product.Id, db_session) / au_exchange_rate
 
 		transfer_entry_import.ErrorMessage = buffer.String()
 

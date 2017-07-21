@@ -38,5 +38,9 @@ WHERE c.code = 'AUD'`
 	_, err := db_session.Sql(sql).Get(&aud_rate)
 	core.HandleError(err)
 
+	if aud_rate.Rate == 0 {
+		return 1
+	}
+
 	return aud_rate.Rate
 }
