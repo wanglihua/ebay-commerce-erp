@@ -82,12 +82,24 @@ func (c Exporter) GetExcelFile(p_transfer *models.ContainerTransferInfo, db_sess
 		var gross_weight = net_weight * 1.01
 		var vol = (product.Length * product.Width * product.Height / 1000000) * float64(entry.Qty)
 
+		xlsx_file.SetCellValue(sheet2_name, fmt.Sprintf("F%d", 19+index), net_weight)
+		xlsx_file.SetCellValue(sheet2_name, fmt.Sprintf("G%d", 19+index), vol)
+		xlsx_file.SetCellValue(sheet2_name, fmt.Sprintf("H%d", 19+index), gross_weight)
+
 		total_qty += entry.Qty
 		total_pkgs += entry.BoxQty
 		total_net_weight += net_weight
 		total_gross_weight += gross_weight
 		total_vol += vol
 	}
+
+	xlsx_file.SetCellValue(sheet2_name, "I19", total_vol)
+
+	xlsx_file.SetCellValue(sheet2_name, "D119", total_qty)
+	xlsx_file.SetCellValue(sheet2_name, "E119", total_pkgs)
+	xlsx_file.SetCellValue(sheet2_name, "F119", total_net_weight)
+	xlsx_file.SetCellValue(sheet2_name, "G119", total_vol)
+	xlsx_file.SetCellValue(sheet2_name, "H119", total_vol)
 
 	return xlsx_file
 }
