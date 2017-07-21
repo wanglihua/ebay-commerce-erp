@@ -43,12 +43,12 @@ func (c Exporter) GetExcelFile(p_transfer *models.ContainerTransferInfo, db_sess
 		xlsx_file.SetCellStr(sheet1_name, "E2", time.Time(p_transfer.PackingTime).Format("2006-01-02"))
 
 		xlsx_file.SetCellStr(sheet1_name, "B125", start_port.TradeItem)
-
 		xlsx_file.SetCellStr(sheet1_name, "E125", dest_port.PortName)
+		xlsx_file.SetCellValue(sheet1_name, "C132", p_transfer.BatchCode)
 
 		var total_amount float64 = 0
 		for index, entry := range entry_list {
-			xlsx_file.SetCellValue(sheet1_name, fmt.Sprintf("B%d", 12+index), entry.CnHsCnName)
+			xlsx_file.SetCellValue(sheet1_name, fmt.Sprintf("B%d", 12+index), fmt.Sprintf("%s %s", entry.CnHsCnName, entry.CnHsEnName))
 			xlsx_file.SetCellValue(sheet1_name, fmt.Sprintf("C%d", 12+index), entry.Qty)
 			xlsx_file.SetCellValue(sheet1_name, fmt.Sprintf("E%d", 12+index), entry.Price)
 			var amount = entry.Price * float64(entry.Qty)
@@ -60,7 +60,6 @@ func (c Exporter) GetExcelFile(p_transfer *models.ContainerTransferInfo, db_sess
 		xlsx_file.SetCellValue(sheet1_name, "F112", total_amount)
 		xlsx_file.SetCellValue(sheet1_name, "F115", total_amount)
 		xlsx_file.SetCellValue(sheet1_name, "F117", total_amount)
-		xlsx_file.SetCellValue(sheet1_name, "C132", p_transfer.BatchCode)
 	}
 
 	{
