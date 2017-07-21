@@ -68,8 +68,8 @@ func (c Exporter) GetExcelFile(p_transfer *models.ContainerTransferInfo, db_sess
 	xlsx_file.SetCellStr(sheet2_name, "G5", p_transfer.BatchCode)
 	xlsx_file.SetCellStr(sheet2_name, "G7", time.Time(p_transfer.PackingTime).Format("2006-01-02"))
 
-	xlsx_file.SetCellStr(sheet1_name, "C10", start_port.PortName)
-	xlsx_file.SetCellStr(sheet1_name, "D11", dest_port.PortName)
+	xlsx_file.SetCellStr(sheet2_name, "C10", start_port.PortName)
+	xlsx_file.SetCellStr(sheet2_name, "D11", dest_port.PortName)
 
 	total_qty = 0
 	var total_pkgs int64 = 0
