@@ -92,5 +92,72 @@ func (c Exporter) GetExcelFile(p_transfer *models.ContainerTransferInfo, db_sess
 		xlsx_file.SetCellValue(sheet2_name, "F114", total_amount)
 	}
 
+	{
+		// --------------------------------------------------------------------------------------------------------
+		var sheet3_name = "Sheet3"
+
+		xlsx_file.SetCellStr(sheet3_name, "G4", p_transfer.BatchCode)
+		xlsx_file.SetCellStr(sheet3_name, "G5", p_transfer.BatchCode)
+		xlsx_file.SetCellStr(sheet3_name, "G7", time.Time(p_transfer.PackingTime).Format("2006-01-02"))
+		xlsx_file.SetCellStr(sheet3_name, "C10", start_port.PortName)
+		xlsx_file.SetCellStr(sheet3_name, "G10", start_port.TradeItem)
+		xlsx_file.SetCellStr(sheet3_name, "D11", dest_port.PortName)
+
+		var total_qty int64 = 0
+		var total_pkgs int64 = 0
+		var total_net_weight float64 = 0
+		var total_vol float64 = 0
+		var total_gross_weight float64 = 0
+		for index, entry := range entry_list {
+			xlsx_file.SetCellValue(sheet3_name, fmt.Sprintf("B%d", 14+index), entry.CnHsCnName)
+			xlsx_file.SetCellValue(sheet3_name, fmt.Sprintf("C%d", 14+index), entry.CnHsEnName)
+			xlsx_file.SetCellValue(sheet3_name, fmt.Sprintf("D%d", 14+index), entry.Qty)
+			xlsx_file.SetCellValue(sheet3_name, fmt.Sprintf("E%d", 14+index), entry.BoxQty)
+
+			var product models.ProductInfo
+			_, err := db_session.Id(entry.ProductId).Get(&product)
+			core.HandleError(err)
+
+			var net_weight = product.Weight * float64(entry.Qty)
+			var gross_weight = net_weight * 1.01
+			var vol = (product.Length * product.Width * product.Height / 1000000) * float64(entry.Qty)
+
+			xlsx_file.SetCellValue(sheet3_name, fmt.Sprintf("F%d", 14+index), net_weight)
+			xlsx_file.SetCellValue(sheet3_name, fmt.Sprintf("G%d", 14+index), gross_weight)
+			xlsx_file.SetCellValue(sheet3_name, fmt.Sprintf("H%d", 14+index), vol)
+
+			total_qty += entry.Qty
+			total_pkgs += entry.BoxQty
+			total_net_weight += net_weight
+			total_gross_weight += gross_weight
+			total_vol += vol
+		}
+
+		xlsx_file.SetCellValue(sheet3_name, "I14", total_vol)
+
+		xlsx_file.SetCellValue(sheet3_name, "D114", total_qty)
+		xlsx_file.SetCellValue(sheet3_name, "E114", total_pkgs)
+		xlsx_file.SetCellValue(sheet3_name, "F114", total_net_weight)
+		xlsx_file.SetCellValue(sheet3_name, "G114", total_gross_weight)
+		xlsx_file.SetCellValue(sheet3_name, "H114", total_vol)
+	}
+
+	{
+		// --------------------------------------------------------------------------------------------------------
+		var sheet4_name = "Sheet4"
+
+		for index, entry := range entry_list {
+			xlsx_file.SetCellValue(sheet4_name, fmt.Sprintf("B%d", 2+index), entry.CnHsCode)
+			xlsx_file.SetCellValue(sheet4_name, fmt.Sprintf("C%d", 2+index), entry.CnHsCnName)
+			xlsx_file.SetCellValue(sheet4_name, fmt.Sprintf("D%d", 2+index), entry.Qty)
+			xlsx_file.SetCellValue(sheet4_name, fmt.Sprintf("E%d", 2+index), "个")
+			xlsx_file.SetCellValue(sheet4_name, fmt.Sprintf("F%d", 2+index), entry.Price)
+			var amount = entry.Price * float64(entry.Qty)
+			xlsx_file.SetCellValue(sheet4_name, fmt.Sprintf("G%d", 2+index), amount)
+			xlsx_file.SetCellValue(sheet4_name, fmt.Sprintf("H%d", 2+index), "澳币")
+
+		}
+	}
+
 	return xlsx_file
 }
