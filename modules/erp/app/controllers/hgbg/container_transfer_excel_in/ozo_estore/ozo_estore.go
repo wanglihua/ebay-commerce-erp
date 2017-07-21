@@ -24,7 +24,7 @@ func (c Exporter) GetExcelFile(p_transfer *models.ContainerTransferInfo, db_sess
 	xlsx_file, err := excelize.OpenFile(filepath.Join(excel_template_hgbg_in_dir, "ozo_estore.xlsx"))
 	core.HandleError(err)
 
-	// --------------------------------------------------------------------------------------------------------------------
+	// --------------------------------------------------------------------------------------------------------
 	var sheet1_name = "Sheet1"
 
 	xlsx_file.SetCellStr(sheet1_name, "G4", p_transfer.BatchCode)
@@ -57,7 +57,7 @@ func (c Exporter) GetExcelFile(p_transfer *models.ContainerTransferInfo, db_sess
 
 	xlsx_file.SetCellValue(sheet1_name, "H122", total_amount)
 
-	// --------------------------------------------------------------------------------------------------------------------
+	// --------------------------------------------------------------------------------------------------------
 	var sheet2_name = "Sheet2"
 
 	xlsx_file.SetCellStr(sheet2_name, "G13", p_transfer.BatchCode)
@@ -99,7 +99,8 @@ func (c Exporter) GetExcelFile(p_transfer *models.ContainerTransferInfo, db_sess
 	xlsx_file.SetCellValue(sheet2_name, "E119", total_pkgs)
 	xlsx_file.SetCellValue(sheet2_name, "F119", total_net_weight)
 	xlsx_file.SetCellValue(sheet2_name, "G119", total_vol)
-	xlsx_file.SetCellValue(sheet2_name, "H119", total_vol)
+	xlsx_file.SetCellValue(sheet2_name, "H119", total_gross_weight)
+	xlsx_file.SetCellValue(sheet2_name, "I119", total_vol)
 
 	return xlsx_file
 }
