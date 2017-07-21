@@ -159,5 +159,185 @@ func (c Exporter) GetExcelFile(p_transfer *models.ContainerTransferInfo, db_sess
 		}
 	}
 
+	{
+		// --------------------------------------------------------------------------------------------------------
+		var sheet5_name = "Sheet5"
+
+		/*
+	SELECT
+		DISTINCT
+		hcc.*
+	FROM erp_container_transfer_entry cte
+		INNER JOIN erp_hs_code_cn hcc ON hcc.id = cte.cn_hs_id
+	WHERE cte.transfer_id = 1
+	ORDER BY hcc.hs_code;
+		 */
+
+		var sql = `
+SELECT
+    DISTINCT
+    hcc.*
+FROM erp_container_transfer_entry cte
+    INNER JOIN erp_hs_code_cn hcc ON hcc.id = cte.cn_hs_id
+WHERE cte.transfer_id = %d
+ORDER BY hcc.hs_code;`
+		sql = fmt.Sprintf(sql, p_transfer.Id)
+
+		var hs_code_cn_list = make([]models.HsCodeCnReportElemInfo, 0)
+		core.HandleError(db_session.Sql(sql).Find(&hs_code_cn_list))
+
+		// 92D050
+		header_style1, _ := xlsx_file.NewStyle(`{"alignment":{"horizontal":"left", "vertical":"","ident":1},"font":{"bold":true},"fill":{"type":"pattern","color":["#92D050"],"pattern":1},"border":[{"type":"right","color":"000000","style":1}]}`)
+		header_style2, _ := xlsx_file.NewStyle(`{"alignment":{"horizontal":"center", "vertical":"","ident":1},"font":{"bold":true},"fill":{"type":"pattern","color":["#92D050"],"pattern":1},"border":[{"type":"right","color":"000000","style":1}]}`)
+
+		// {"alignment":{"horizontal":"center"}}
+		var row_num = 1
+		xlsx_file.SetCellValue(sheet5_name, "A1", "编号")
+		xlsx_file.SetCellStyle(sheet5_name, "A1", "A1", header_style2)
+		row_num++
+
+		for index, hs_code_cn := range hs_code_cn_list {
+			// --------------------------------------------------------------------------------------
+			var first_cell_axis = fmt.Sprintf("A%d", row_num)
+			xlsx_file.SetCellValue(sheet5_name, first_cell_axis, index+1)
+
+			var product_code_title_cell_axis = fmt.Sprintf("B%d", row_num)
+			xlsx_file.SetCellValue(sheet5_name, product_code_title_cell_axis, "商品编码")
+			xlsx_file.SetCellStyle(sheet5_name, product_code_title_cell_axis, product_code_title_cell_axis, header_style2)
+
+			var product_code_cell_axis = fmt.Sprintf("C%d", row_num)
+			xlsx_file.SetCellValue(sheet5_name, product_code_cell_axis, hs_code_cn.HsCode)
+			xlsx_file.SetCellStyle(sheet5_name, product_code_cell_axis, product_code_title_cell_axis, header_style1)
+
+			row_num++
+
+			// --------------------------------------------------------------------------------------
+			xlsx_file.SetCellValue(sheet5_name, fmt.Sprintf("B%d", row_num), "品名")
+			xlsx_file.SetCellStr(sheet5_name, fmt.Sprintf("C%d", row_num), hs_code_cn.CnName)
+
+			row_num++
+
+			// --------------------------------------------------------------------------------------
+			//if hs_code_cn.Elem01 != "" {
+			{
+				xlsx_file.SetCellValue(sheet5_name, fmt.Sprintf("B%d", row_num), "申报元素 1")
+				xlsx_file.SetCellValue(sheet5_name, fmt.Sprintf("C%d", row_num), hs_code_cn.Elem01)
+
+				row_num++
+			}
+
+			// --------------------------------------------------------------------------------------
+			//if hs_code_cn.Elem02 != "" {
+			{
+				xlsx_file.SetCellValue(sheet5_name, fmt.Sprintf("B%d", row_num), "申报元素 2")
+				xlsx_file.SetCellValue(sheet5_name, fmt.Sprintf("C%d", row_num), hs_code_cn.Elem02)
+
+				row_num++
+			}
+
+			// --------------------------------------------------------------------------------------
+			//if hs_code_cn.Elem03 != "" {
+			{
+				xlsx_file.SetCellValue(sheet5_name, fmt.Sprintf("B%d", row_num), "申报元素 3")
+				xlsx_file.SetCellValue(sheet5_name, fmt.Sprintf("C%d", row_num), hs_code_cn.Elem03)
+
+				row_num++
+			}
+
+			// --------------------------------------------------------------------------------------
+			//if hs_code_cn.Elem04 != "" {
+			{
+				xlsx_file.SetCellValue(sheet5_name, fmt.Sprintf("B%d", row_num), "申报元素 4")
+				xlsx_file.SetCellValue(sheet5_name, fmt.Sprintf("C%d", row_num), hs_code_cn.Elem04)
+
+				row_num++
+			}
+
+			// --------------------------------------------------------------------------------------
+			//if hs_code_cn.Elem05 != "" {
+			{
+				xlsx_file.SetCellValue(sheet5_name, fmt.Sprintf("B%d", row_num), "申报元素 5")
+				xlsx_file.SetCellValue(sheet5_name, fmt.Sprintf("C%d", row_num), hs_code_cn.Elem05)
+
+				row_num++
+			}
+
+			// --------------------------------------------------------------------------------------
+			//if hs_code_cn.Elem06 != "" {
+			{
+				xlsx_file.SetCellValue(sheet5_name, fmt.Sprintf("B%d", row_num), "申报元素 6")
+				xlsx_file.SetCellValue(sheet5_name, fmt.Sprintf("C%d", row_num), hs_code_cn.Elem06)
+
+				row_num++
+			}
+
+			// --------------------------------------------------------------------------------------
+			//if hs_code_cn.Elem07 != "" {
+			{
+				xlsx_file.SetCellValue(sheet5_name, fmt.Sprintf("B%d", row_num), "申报元素 7")
+				xlsx_file.SetCellValue(sheet5_name, fmt.Sprintf("C%d", row_num), hs_code_cn.Elem07)
+
+				row_num++
+			}
+
+			// --------------------------------------------------------------------------------------
+			//if hs_code_cn.Elem08 != "" {
+			{
+				xlsx_file.SetCellValue(sheet5_name, fmt.Sprintf("B%d", row_num), "申报元素 8")
+				xlsx_file.SetCellValue(sheet5_name, fmt.Sprintf("C%d", row_num), hs_code_cn.Elem08)
+
+				row_num++
+			}
+
+			if hs_code_cn.Elem09 != "" {
+				xlsx_file.SetCellValue(sheet5_name, fmt.Sprintf("B%d", row_num), "申报元素 9")
+				xlsx_file.SetCellValue(sheet5_name, fmt.Sprintf("C%d", row_num), hs_code_cn.Elem09)
+
+				row_num++
+			}
+
+			if hs_code_cn.Elem10 != "" {
+				xlsx_file.SetCellValue(sheet5_name, fmt.Sprintf("B%d", row_num), "申报元素 10")
+				xlsx_file.SetCellValue(sheet5_name, fmt.Sprintf("C%d", row_num), hs_code_cn.Elem10)
+
+				row_num++
+			}
+
+			if hs_code_cn.Elem11 != "" {
+				xlsx_file.SetCellValue(sheet5_name, fmt.Sprintf("B%d", row_num), "申报元素 11")
+				xlsx_file.SetCellValue(sheet5_name, fmt.Sprintf("C%d", row_num), hs_code_cn.Elem11)
+
+				row_num++
+			}
+
+			if hs_code_cn.Elem12 != "" {
+				xlsx_file.SetCellValue(sheet5_name, fmt.Sprintf("B%d", row_num), "申报元素 12")
+				xlsx_file.SetCellValue(sheet5_name, fmt.Sprintf("C%d", row_num), hs_code_cn.Elem12)
+
+				row_num++
+			}
+
+			if hs_code_cn.Elem13 != "" {
+				xlsx_file.SetCellValue(sheet5_name, fmt.Sprintf("B%d", row_num), "申报元素 13")
+				xlsx_file.SetCellValue(sheet5_name, fmt.Sprintf("C%d", row_num), hs_code_cn.Elem13)
+
+				row_num++
+			}
+
+			if hs_code_cn.Elem14 != "" {
+				xlsx_file.SetCellValue(sheet5_name, fmt.Sprintf("B%d", row_num), "申报元素 14")
+				xlsx_file.SetCellValue(sheet5_name, fmt.Sprintf("C%d", row_num), hs_code_cn.Elem14)
+
+				row_num++
+			}
+
+			xlsx_file.MergeCell(sheet5_name, first_cell_axis, fmt.Sprintf("A%d", row_num-1))
+
+			xlsx_file.MergeCell(sheet5_name, fmt.Sprintf("A%d", row_num), fmt.Sprintf("C%d", row_num))
+			row_num++
+		}
+
+	}
+
 	return xlsx_file
 }
