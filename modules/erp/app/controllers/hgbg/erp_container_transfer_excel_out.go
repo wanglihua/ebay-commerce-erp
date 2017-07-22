@@ -8,6 +8,8 @@ import (
 	"bytes"
 	"time"
 	"matrix/modules/erp/app/controllers/hgbg/container_transfer_excel_out"
+	"matrix/modules/auth/service/pass_service"
+	"matrix/modules/auth/pass_res"
 )
 
 type ErpContainerTransferExcelOut struct {
@@ -15,6 +17,8 @@ type ErpContainerTransferExcelOut struct {
 }
 
 func (c ErpContainerTransferExcelOut) Export() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.HGBG_CONTAINER_TRANSFER, c.Session)
+
 	db_session := c.DbSession
 
 	var transfer_id int64

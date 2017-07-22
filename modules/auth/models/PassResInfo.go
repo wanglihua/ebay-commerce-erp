@@ -420,6 +420,13 @@ func (e PassResInfo) InitData(db_session *xorm.Session) {
 		pass.Name = "澳洲海关编码"
 		pass.Desc = core.MakeNullString("澳洲海关编码", true)
 		db_session.Insert(pass)
+
+		pass = new(PassResInfo)
+		pass.Id = pass_res.HGBG_CONTAINER_TRANSFER
+		pass.CateId = pass_res_cate.HGBG
+		pass.Name = "集装箱调拨"
+		pass.Desc = core.MakeNullString("集装箱调拨", true)
+		db_session.Insert(pass)
 	}
 
 	// 权限管理

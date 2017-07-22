@@ -65,14 +65,15 @@ func GetHgbgMenu(res_id_map map[int64]bool, web_session revel.Session) string {
         </li>`)
 	}
 
-	//todo 加上权限检查
-	buffer.WriteString(`<li id="hgbg-container-transfer-menu" class="">
+	if check_pass_res_menu(pass_res.HGBG_CONTAINER_TRANSFER) {
+		buffer.WriteString(`<li id="hgbg-container-transfer-menu" class="">
             <a href="/container/transfer">
                 <i class="menu-icon fa fa-caret-right"></i>
                 集装箱调拨
             </a>
             <b class="arrow"></b>
         </li>`)
+	}
 
 	/*
 	buffer.WriteString(`<li id="hgbg-container-transfer-entry-menu" class="">

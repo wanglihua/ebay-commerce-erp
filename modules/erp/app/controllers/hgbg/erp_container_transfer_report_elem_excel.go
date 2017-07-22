@@ -10,6 +10,8 @@ import (
 	"bytes"
 	"time"
 	"github.com/go-xorm/xorm"
+	"matrix/modules/auth/service/pass_service"
+	"matrix/modules/auth/pass_res"
 )
 
 type ErpContainerTransferReportElemExcel struct {
@@ -17,6 +19,8 @@ type ErpContainerTransferReportElemExcel struct {
 }
 
 func (c ErpContainerTransferReportElemExcel) Export() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.HGBG_CONTAINER_TRANSFER, c.Session)
+
 	db_session := c.DbSession
 
 	var transfer_id int64

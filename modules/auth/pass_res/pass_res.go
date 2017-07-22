@@ -95,4 +95,5 @@ const (
 	HGBG_PRODUCT_HS_CODE        = 160100 // 商品海关编码
 	HGBG_HS_CODE_CN_REPORT_ELEM = 160200 // 中国海关编码
 	HGBG_HS_CODE_AU_DUTY        = 160300 // 澳洲海关编码
+	HGBG_CONTAINER_TRANSFER     = 160400 // 集装箱调拨
 )

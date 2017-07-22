@@ -11,6 +11,8 @@ import (
 	"matrix/modules/erp/service/container_transfer_service"
 	"matrix/modules/erp/service/inventory_service"
 	"matrix/modules/erp/service/exchange_rate_service"
+	"matrix/modules/auth/service/pass_service"
+	"matrix/modules/auth/pass_res"
 )
 
 type ErpContainerTransferEntry struct {
@@ -18,10 +20,14 @@ type ErpContainerTransferEntry struct {
 }
 
 func (c ErpContainerTransferEntry) Index() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.HGBG_CONTAINER_TRANSFER, c.Session)
+
 	return c.RenderTemplate("erp/hgbg/container_transfer_entry/container_transfer_entry_index.html")
 }
 
 func (c ErpContainerTransferEntry) ListData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.HGBG_CONTAINER_TRANSFER, c.Session)
+
 	db_session := c.DbSession
 
 	var transfer_id int64
@@ -79,6 +85,8 @@ func (f *ContainerTransferEntryDetailForm) Valid(validation *revel.Validation) b
 }
 
 func (c ErpContainerTransferEntry) DetailData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.HGBG_CONTAINER_TRANSFER, c.Session)
+
 	db_session := c.DbSession
 
 	var container_transfer_entry_id int64
@@ -100,6 +108,8 @@ func (c ErpContainerTransferEntry) DetailData() revel.Result {
 }
 
 func (c ErpContainerTransferEntry) Save() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.HGBG_CONTAINER_TRANSFER, c.Session)
+
 	db_session := c.DbSession
 
 	var detail_form ContainerTransferEntryDetailForm
@@ -122,7 +132,7 @@ func (c ErpContainerTransferEntry) Save() revel.Result {
 		return c.RenderJson(core.JsonResult{Success: false, Message: "商品SKU不存在！" })
 	}
 
-	var au_exchange_rate =  exchange_rate_service.Get_aud_exchange_rate(db_session)
+	var au_exchange_rate = exchange_rate_service.Get_aud_exchange_rate(db_session)
 	container_transfer_entry.Price = inventory_service.GetProductCnStockCostPrice(product.Id, db_session) / au_exchange_rate
 
 	if product.AuHsCode == "" {
@@ -187,6 +197,8 @@ func (c ErpContainerTransferEntry) Save() revel.Result {
 }
 
 func (c ErpContainerTransferEntry) Delete() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.HGBG_CONTAINER_TRANSFER, c.Session)
+
 	db_session := c.DbSession
 
 	container_transfer_entry_id_list := make([]int64, 0)

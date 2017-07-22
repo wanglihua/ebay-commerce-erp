@@ -8,6 +8,8 @@ import (
 	"matrix/core"
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/container_transfer_service"
+	"matrix/modules/auth/service/pass_service"
+	"matrix/modules/auth/pass_res"
 )
 
 type ErpContainerTransfer struct {
@@ -15,10 +17,14 @@ type ErpContainerTransfer struct {
 }
 
 func (c ErpContainerTransfer) Index() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.HGBG_CONTAINER_TRANSFER, c.Session)
+
 	return c.RenderTemplate("erp/hgbg/container_transfer/container_transfer_index.html")
 }
 
 func (c ErpContainerTransfer) ListData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.HGBG_CONTAINER_TRANSFER, c.Session)
+
 	db_session := c.DbSession
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
@@ -103,6 +109,8 @@ func (f *ContainerTransferDetailForm) Valid(validation *revel.Validation) bool {
 }
 
 func (c ErpContainerTransfer) Detail(id int64) revel.Result {
+	pass_service.Check_login_user_pass(pass_res.HGBG_CONTAINER_TRANSFER, c.Session)
+
 	c.RenderArgs["transfer_id"] = id
 
 	if id == 0 {
@@ -115,6 +123,8 @@ func (c ErpContainerTransfer) Detail(id int64) revel.Result {
 }
 
 func (c ErpContainerTransfer) DetailData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.HGBG_CONTAINER_TRANSFER, c.Session)
+
 	db_session := c.DbSession
 
 	var container_transfer_id int64
@@ -144,6 +154,8 @@ func (c ErpContainerTransfer) DetailData() revel.Result {
 }
 
 func (c ErpContainerTransfer) Save() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.HGBG_CONTAINER_TRANSFER, c.Session)
+
 	db_session := c.DbSession
 
 	var detail_form ContainerTransferDetailForm
@@ -192,6 +204,8 @@ func (c ErpContainerTransfer) Save() revel.Result {
 }
 
 func (c ErpContainerTransfer) Delete() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.HGBG_CONTAINER_TRANSFER, c.Session)
+
 	db_session := c.DbSession
 
 	container_transfer_id_list := make([]int64, 0)
