@@ -158,7 +158,7 @@
                                             <label for="cost_up_rate" class="col-xs-4 control-label">成本上调</label>
                                             <div class="col-xs-8">
                                                 <input id="cost_up_rate" name="detail.transfer.cost_up_rate" type="text" class="input-sm form-control" v-model.number="detail.transfer.cost_up_rate"/>
-                                                <div class="help-block">澳洲海关征税商品价格打折后，再对全部商品的成本上调率。</div>
+                                                <div class="help-block">对全部商品的成本价格上调率。</div>
                                             </div>
                                         </div>
                                     </div>
@@ -565,13 +565,13 @@
                         detail_vm.detail.transfer.stock_time = null;
                     }
 
-                    detail_vm.detail.transfer.price_up_rate = dtFormatFloat(detail_vm.detail.transfer.price_up_rate);
-                    detail_vm.detail.transfer.price_down_rate = dtFormatFloat(detail_vm.detail.transfer.price_down_rate);
-                    detail_vm.detail.transfer.cost_up_rate = dtFormatFloat(detail_vm.detail.transfer.cost_up_rate);
-                    detail_vm.detail.transfer.total_volumn = dtFormatFloat(detail_vm.detail.transfer.total_volumn);
-                    detail_vm.detail.transfer.total_weight = dtFormatFloat(detail_vm.detail.transfer.total_weight);
-                    detail_vm.detail.transfer.total_amount1 = dtFormatFloat(detail_vm.detail.transfer.total_amount1);
-                    detail_vm.detail.transfer.total_amount2 = dtFormatFloat(detail_vm.detail.transfer.total_amount2);
+                    detail_vm.detail.transfer.price_up_rate = parseFloat(dtFormatFloat(detail_vm.detail.transfer.price_up_rate));
+                    detail_vm.detail.transfer.price_down_rate = parseFloat(dtFormatFloat(detail_vm.detail.transfer.price_down_rate));
+                    detail_vm.detail.transfer.cost_up_rate = parseFloat(dtFormatFloat(detail_vm.detail.transfer.cost_up_rate));
+                    detail_vm.detail.transfer.total_volumn = parseFloat(dtFormatFloat(detail_vm.detail.transfer.total_volumn));
+                    detail_vm.detail.transfer.total_weight = parseFloat(dtFormatFloat(detail_vm.detail.transfer.total_weight));
+                    detail_vm.detail.transfer.total_amount1 = parseFloat(dtFormatFloat(detail_vm.detail.transfer.total_amount1));
+                    detail_vm.detail.transfer.total_amount2 = parseFloat(dtFormatFloat(detail_vm.detail.transfer.total_amount2));
                 }
             }
         );
