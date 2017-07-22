@@ -9,6 +9,7 @@ import (
 	"github.com/revel/revel"
 	"matrix/core"
 	"time"
+	"matrix/modules/erp/service/container_transfer_service"
 )
 
 type Exporter struct {
@@ -34,6 +35,8 @@ func (c Exporter) GetExcelFile(p_transfer *models.ContainerTransferInfo, db_sess
 
 	var entry_list = make([]models.ContainerTransferEntryInfo, 0)
 	core.HandleError(db_session.Where("transfer_id = ?", p_transfer.Id).Find(&entry_list))
+
+	entry_list = container_transfer_service.EntryCombineForCn(entry_list, db_session)
 
 	{
 		// --------------------------------------------------------------------------------------------------------
