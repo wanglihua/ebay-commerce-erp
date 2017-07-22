@@ -10,6 +10,8 @@ import (
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/auth/pass_res"
 	"strings"
+	"matrix/modules/erp/service/order_history_service"
+	"fmt"
 )
 
 type ErpOrderTag struct {
@@ -203,14 +205,30 @@ func (c ErpOrderTag) ApplyTag() revel.Result {
 	var order_tag_id int64
 	c.Params.Bind(&order_tag_id, "order_tag_id")
 
-	var order_list = make([]models.OrderInfo, 0)
-	err := db_session.In("id", order_id_list).Find(&order_list)
+	var order_tag models.OrderTagInfo
+	_, err := db_session.Id(order_tag_id).Get(&order_tag)
 	core.HandleError(err)
+
+	var order_list = make([]models.OrderInfo, 0)
+	err = db_session.In("id", order_id_list).Find(&order_list)
+	core.HandleError(err)
+
+	var login_user = core.GetLoginUser(c.Session)
 
 	for _, order := range order_list {
 		order.TagId = order_tag_id
 		_, err = db_session.Id(order.Id).Cols("tag_id").Update(&order)
 		core.HandleError(err)
+
+		if order_tag_id != 0 {
+			order_history_service.Insert_order_history(order, login_user.UserId, fmt.Sprintf("应用标签 %s， 工号： %s", order_tag.Name, login_user.LoginName), db_session)
+		} else {
+			var order_tag_to_cancel models.OrderTagInfo
+			_, err := db_session.Id(order.TagId).Get(&order_tag_to_cancel)
+			core.HandleError(err)
+
+			order_history_service.Insert_order_history(order, login_user.UserId, fmt.Sprintf("取消标签 %s， 工号： %s", order_tag_to_cancel.Name, login_user.LoginName), db_session)
+		}
 	}
 
 	if order_tag_id != 0 {
