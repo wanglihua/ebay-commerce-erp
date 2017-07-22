@@ -11,12 +11,13 @@ type StockInfo struct {
 	Contact       core.NullString `xorm:"nvarchar(200) 'contact'" json:"contact" smith:"verbose_name=联系人,min=2,max=100"`
 	Address       core.NullString `xorm:"nvarchar(200) 'address'" json:"address" smith:"verbose_name=地址,min=2,max=200"`
 	Phone         core.NullString `xorm:"nvarchar(200) 'phone'" json:"phone" smith:"verbose_name=电话,min=2,max=100"`
-	StockTypeId   int64           `xorm:"bigint notnull 'stock_type_id'" json:"stock_type_id" smith:"verbose_name=仓库类型"`  // 国内仓库 在途仓库 澳洲仓库
-	TargetStockId core.NullInt    `xorm:"bigint null 'target_stock_id'" json:"target_stock_id" smith:"verbose_name=目的仓库"` //在途虚拟仓库的目的仓库
+	StockTypeId   int64           `xorm:"bigint notnull index 'stock_type_id'" json:"stock_type_id" smith:"verbose_name=仓库类型"`  // 国内仓库 在途仓库 澳洲仓库
+	TargetStockId core.NullInt    `xorm:"bigint null index 'target_stock_id'" json:"target_stock_id" smith:"verbose_name=目的仓库"` //在途虚拟仓库的目的仓库
 	StatusId      int64           `xorm:"bigint notnull index 'status_id'" json:"status_id" smith:"verbose_name=状态"`
 	IconFile      string          `xorm:"nvarchar(200) null 'icon_file'" json:"icon_file" smith:"verbose_name=图标"`
 	Ord           int64           `xorm:"bigint null 'ord'" json:"ord" smith:"verbose_name=排序"`
 	Priority      int64           `xorm:"bigint notnull default(1) 'priority'" json:"priority" smith:"verbose_name=优先级"`
+	DestPortId    int64           `xorm:"bigint notnull index 'dest_port_id'" json:"dest_port_id" smith:"verbose_name=目的港口"`
 	CreateTime    core.Time       `xorm:"created notnull 'create_time'" json:"create_time"`
 	UpdateTime    core.Time       `xorm:"updated notnull 'update_time'" json:"update_time"`
 }
