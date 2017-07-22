@@ -82,8 +82,8 @@
                                 <div class="row">
                                     <div class="col-xs-3">
                                         <div class="form-group">
-                                            <label for="batch_code" class="col-xs-5 control-label">批次号</label>
-                                            <div class="col-xs-7">
+                                            <label for="batch_code" class="col-xs-4 control-label">批次号</label>
+                                            <div class="col-xs-8">
                                                 <input id="batch_code" name="detail.transfer.batch_code" type="text" class="input-sm form-control" v-model="detail.transfer.batch_code"/>
                                             </div>
                                         </div>
@@ -91,8 +91,8 @@
 
                                     <div class="col-xs-3">
                                         <div class="form-group">
-                                            <label for="container_code" class="col-xs-5 control-label">集装箱号</label>
-                                            <div class="col-xs-7">
+                                            <label for="container_code" class="col-xs-4 control-label">集装箱号</label>
+                                            <div class="col-xs-8">
                                                 <input id="container_code" name="detail.transfer.container_code" type="text" class="input-sm form-control" v-model="detail.transfer.container_code"/>
                                             </div>
                                         </div>
@@ -100,8 +100,8 @@
 
                                     <div class="col-xs-3">
                                         <div class="form-group">
-                                            <label for="bl_no" class="col-xs-5 control-label">提单号</label>
-                                            <div class="col-xs-7">
+                                            <label for="bl_no" class="col-xs-4 control-label">提单号</label>
+                                            <div class="col-xs-8">
                                                 <input id="bl_no" name="detail.transfer.bl_no" type="text" class="input-sm form-control" v-model="detail.transfer.bl_no"/>
                                             </div>
                                         </div>
@@ -109,8 +109,8 @@
 
                                     <div class="col-xs-3">
                                         <div class="form-group">
-                                            <label for="seal_no" class="col-xs-5 control-label">铅封号</label>
-                                            <div class="col-xs-7">
+                                            <label for="seal_no" class="col-xs-4 control-label">铅封号</label>
+                                            <div class="col-xs-8">
                                                 <input id="seal_no" name="detail.transfer.seal_no" type="text" class="input-sm form-control" v-model="detail.transfer.seal_no"/>
                                             </div>
                                         </div>
@@ -122,8 +122,8 @@
 
                                     <div class="col-xs-3">
                                         <div class="form-group">
-                                            <label for="start_port_id" class="col-xs-5 control-label">起始港口</label>
-                                            <div class="col-xs-7">
+                                            <label for="start_port_id" class="col-xs-4 control-label">起始港口</label>
+                                            <div class="col-xs-8">
                                                 <select id="start_port_id" name="detail.transfer.start_port_id" class="input-sm form-control" v-model.number="detail.transfer.start_port_id">
                                                     <template v-for="port in detail.start_port_list">
                                                         <option :value="port.id">{{port.port_name}}</option>
@@ -135,27 +135,30 @@
 
                                     <div class="col-xs-3">
                                         <div class="form-group">
-                                            <label for="price_up_rate" class="col-xs-5 control-label">非征品上调</label>
-                                            <div class="col-xs-7">
+                                            <label for="price_up_rate" class="col-xs-4 control-label">非征品上调</label>
+                                            <div class="col-xs-8">
                                                 <input id="price_up_rate" name="detail.transfer.price_up_rate" type="text" class="input-sm form-control" disabled="disabled" v-model.number="detail.transfer.price_up_rate"/>
+                                                <div class="help-block">根据 征税品打折，成本上调计算的总价，推算出的澳洲非征税商品的价格上调率。</div>
                                             </div>
                                         </div>
                                     </div>
 
                                     <div class="col-xs-3">
                                         <div class="form-group">
-                                            <label for="price_down_rate" class="col-xs-5 control-label">征税品打折</label>
-                                            <div class="col-xs-7">
+                                            <label for="price_down_rate" class="col-xs-4 control-label">征税品打折</label>
+                                            <div class="col-xs-8">
                                                 <input id="price_down_rate" name="detail.transfer.price_down_rate" type="text" class="input-sm form-control" v-model.number="detail.transfer.price_down_rate"/>
+                                                <div class="help-block">澳洲海关征税商品价格打折率。</div>
                                             </div>
                                         </div>
                                     </div>
 
                                     <div class="col-xs-3">
                                         <div class="form-group">
-                                            <label for="cost_up_rate" class="col-xs-5 control-label">成本上调</label>
-                                            <div class="col-xs-7">
+                                            <label for="cost_up_rate" class="col-xs-4 control-label">成本上调</label>
+                                            <div class="col-xs-8">
                                                 <input id="cost_up_rate" name="detail.transfer.cost_up_rate" type="text" class="input-sm form-control" v-model.number="detail.transfer.cost_up_rate"/>
+                                                <div class="help-block">澳洲海关征税商品价格打折后，再对全部商品的成本上调率。</div>
                                             </div>
                                         </div>
                                     </div>
@@ -165,8 +168,8 @@
 
                                     <div class="col-xs-3">
                                         <div class="form-group">
-                                            <label for="dest_port_id" class="col-xs-5 control-label">目的港口</label>
-                                            <div class="col-xs-7">
+                                            <label for="dest_port_id" class="col-xs-4 control-label">目的港口</label>
+                                            <div class="col-xs-8">
                                                 <select id="dest_port_id" name="detail.transfer.dest_port_id" class="input-sm form-control" v-model.number="detail.transfer.dest_port_id">
                                                     <template v-for="port in detail.dest_port_list">
                                                         <option :value="port.id">{{port.port_name}}</option>
@@ -178,8 +181,8 @@
 
                                     <div class="col-xs-3">
                                         <div class="form-group">
-                                            <label for="packing_time" class="col-xs-5 control-label">装箱时间</label>
-                                            <div class="col-xs-7">
+                                            <label for="packing_time" class="col-xs-4 control-label">装箱时间</label>
+                                            <div class="col-xs-8">
                                                 <input id="packing_time" name="detail.transfer.packing_time" type="text" class="input-sm form-control" v-model="detail.transfer.packing_time"/>
                                             </div>
                                         </div>
@@ -187,8 +190,8 @@
 
                                     <div class="col-xs-3">
                                         <div class="form-group">
-                                            <label for="departure_time" class="col-xs-5 control-label">到港时间</label>
-                                            <div class="col-xs-7">
+                                            <label for="departure_time" class="col-xs-4 control-label">到港时间</label>
+                                            <div class="col-xs-8">
                                                 <input id="departure_time" name="detail.transfer.departure_time" type="text" class="input-sm form-control" v-model="detail.transfer.departure_time"/>
                                             </div>
                                         </div>
@@ -196,8 +199,8 @@
 
                                     <div class="col-xs-3">
                                         <div class="form-group">
-                                            <label for="stock_time" class="col-xs-5 control-label">到仓时间</label>
-                                            <div class="col-xs-7">
+                                            <label for="stock_time" class="col-xs-4 control-label">到仓时间</label>
+                                            <div class="col-xs-8">
                                                 <input id="stock_time" name="detail.transfer.stock_time" type="text" class="input-sm form-control" v-model="detail.transfer.stock_time"/>
                                             </div>
                                         </div>
@@ -208,36 +211,40 @@
                                 <div class="row">
                                     <div class="col-xs-3">
                                         <div class="form-group">
-                                            <label for="total_volumn" class="col-xs-5 control-label">总体积（立方米）</label>
-                                            <div class="col-xs-7">
+                                            <label for="total_volumn" class="col-xs-4 control-label">总体积</label>
+                                            <div class="col-xs-8">
                                                 <input id="total_volumn" name="detail.transfer.total_volumn" type="text" class="input-sm form-control" disabled="disabled" v-model.number="detail.transfer.total_volumn"/>
+                                                <div class="help-block">单位，立方米。</div>
                                             </div>
                                         </div>
                                     </div>
 
                                     <div class="col-xs-3">
                                         <div class="form-group">
-                                            <label for="total_weight" class="col-xs-5 control-label">总重量（Kg）</label>
-                                            <div class="col-xs-7">
+                                            <label for="total_weight" class="col-xs-4 control-label">总重量</label>
+                                            <div class="col-xs-8">
                                                 <input id="total_weight" name="detail.transfer.total_weight" type="text" class="input-sm form-control" disabled="disabled" v-model.number="detail.transfer.total_weight"/>
+                                                <div class="help-block">单位，Kg。</div>
                                             </div>
                                         </div>
                                     </div>
 
                                     <div class="col-xs-3">
                                         <div class="form-group">
-                                            <label for="total_amount1" class="col-xs-5 control-label">总金额1（澳币）</label>
-                                            <div class="col-xs-7">
+                                            <label for="total_amount1" class="col-xs-4 control-label">总金额1</label>
+                                            <div class="col-xs-8">
                                                 <input id="total_amount1" name="detail.transfer.total_amount1" type="text" class="input-sm form-control" disabled="disabled" v-model.number="detail.transfer.total_amount1"/>
+                                                <div class="help-block">单位，澳币。商品实际价格的合计。</div>
                                             </div>
                                         </div>
                                     </div>
 
                                     <div class="col-xs-3">
                                         <div class="form-group">
-                                            <label for="total_amount2" class="col-xs-5 control-label">总金额2（澳币）</label>
-                                            <div class="col-xs-7">
+                                            <label for="total_amount2" class="col-xs-4 control-label">总金额2</label>
+                                            <div class="col-xs-8">
                                                 <input id="total_amount2" name="detail.transfer.total_amount2" type="text" class="input-sm form-control" disabled="disabled" v-model.number="detail.transfer.total_amount2"/>
+                                                <div class="help-block">单位，澳币。商品根据征税打折和成本上调后调整的合计价格。</div>
                                             </div>
                                         </div>
                                     </div>
