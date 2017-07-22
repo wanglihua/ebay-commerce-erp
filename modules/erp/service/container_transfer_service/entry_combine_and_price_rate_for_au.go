@@ -2,7 +2,7 @@ package container_transfer_service
 
 import "matrix/modules/erp/models"
 
-func EntryCombineAndPriceRate(p_transfer *models.ContainerTransferInfo, entry_list []models.ContainerTransferEntryInfo) []models.ContainerTransferEntryInfo {
+func EntryCombineAndPriceRateForAu(p_transfer *models.ContainerTransferInfo, entry_list []models.ContainerTransferEntryInfo) []models.ContainerTransferEntryInfo {
 	var find_entry_in_list = func(au_hs_code string, entry_list []models.ContainerTransferEntryInfo) (index_ret int, entry_ret models.ContainerTransferEntryInfo) {
 		for index, entry := range entry_list {
 			if entry.AuHsCode == au_hs_code {
