@@ -88,7 +88,7 @@
                                             <label for="target_stock_id" class="col-xs-3 control-label">目的仓库</label>
                                             <div class="col-xs-9">
                                                 <select id="target_stock_id" name="detail.stock.target_stock_id" class="input-sm form-control" v-model.number="detail.stock.target_stock_id">
-                                                    <option value=""></option>
+                                                    <option :value="0"></option>
                                                     <template v-for="target_stock in detail.target_stock_list">
                                                         <option :value="target_stock.id">{{target_stock.name}}</option>
                                                     </template>
@@ -195,6 +195,15 @@
 
                                     <div class="col-xs-6">
                                         <div class="form-group">
+                                            <label for="dest_port_id" class="col-xs-3 control-label">目的港口</label>
+                                            <div class="col-xs-9">
+                                                <select id="dest_port_id" name="detail.stock.dest_port_id" class="input-sm form-control" v-model.number="detail.stock.dest_port_id">
+                                                    <option :value="0"></option>
+                                                    <template v-for="port in detail.dest_port_list">
+                                                        <option :value="port.id">{{port.port_name}}</option>
+                                                    </template>
+                                                </select>
+                                            </div>
                                         </div>
                                     </div>
 

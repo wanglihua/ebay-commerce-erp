@@ -78,10 +78,11 @@ FROM erp_stock stock
 }
 
 type StockDetailForm struct {
-	Stock           models.StockInfo       `json:"stock"`
-	StockTypeList   []models.StockTypeInfo `json:"stock_type_list"`
-	TargetStockList []models.StockInfo     `json:"target_stock_list"`
-	StatusList      []models.StatusInfo    `json:"status_list"`
+	Stock           models.StockInfo                       `json:"stock"`
+	StockTypeList   []models.StockTypeInfo                 `json:"stock_type_list"`
+	TargetStockList []models.StockInfo                     `json:"target_stock_list"`
+	StatusList      []models.StatusInfo                    `json:"status_list"`
+	DestPortList    []models.ContainerTransferDestPortInfo `json:"dest_port_list"`
 }
 
 func (f *StockDetailForm) IsCreate() bool {
@@ -156,11 +157,16 @@ func (c ErpStock) DetailData() revel.Result {
 	err := db_session.Where(fmt.Sprintf("stock_type_id = %d", models.STOCK_TYPE_AU)).Find(&target_stock_list)
 	core.HandleError(err)
 
+	var dest_port_list = make([]models.ContainerTransferDestPortInfo, 0)
+	err = db_session.Find(&dest_port_list)
+	core.HandleError(err)
+
 	var detail_form StockDetailForm
 	detail_form.Stock = stock
 	detail_form.StockTypeList = models.GetStockTypeList(db_session)
 	detail_form.TargetStockList = target_stock_list
 	detail_form.StatusList = status_list
+	detail_form.DestPortList = dest_port_list
 
 	return c.RenderJson(detail_form)
 }
@@ -180,8 +186,22 @@ func (c ErpStock) Save() revel.Result {
 
 	stock := detail_form.Stock
 
-	if stock.StockTypeId == models.STOCK_TYPE_CN && (stock.TargetStockId.Valid == true && stock.TargetStockId.Int64 != 0) {
-		return c.RenderJson(core.JsonResult{Success: false, Message: "普通仓库不应该有目的仓库！" })
+	// 不是在途仓，并且目的仓库有设置
+	if stock.StockTypeId != models.STOCK_TYPE_ZT && (stock.TargetStockId.Valid == true && stock.TargetStockId.Int64 != 0) {
+		return c.RenderJson(core.JsonResult{Success: false, Message: "在途仓库才会有目的仓库！" })
+	}
+
+	if stock.StockTypeId == models.STOCK_TYPE_ZT && (stock.TargetStockId.Valid == false || stock.TargetStockId.Int64 == 0) {
+		return c.RenderJson(core.JsonResult{Success: false, Message: "在途仓库需要设置目的仓库！" })
+	}
+
+	// 不是在途仓，并且目的港口有设置
+	if stock.StockTypeId != models.STOCK_TYPE_ZT && (stock.DestPortId != 0) {
+		return c.RenderJson(core.JsonResult{Success: false, Message: "在途仓库才会有目的港口！" })
+	}
+
+	if stock.StockTypeId == models.STOCK_TYPE_ZT && (stock.DestPortId == 0) {
+		return c.RenderJson(core.JsonResult{Success: false, Message: "在途仓库需要设置目的港口！" })
 	}
 
 	var affected int64
