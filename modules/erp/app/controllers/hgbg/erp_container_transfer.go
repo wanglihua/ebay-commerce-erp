@@ -104,6 +104,13 @@ func (f *ContainerTransferDetailForm) Valid(validation *revel.Validation) bool {
 
 func (c ErpContainerTransfer) Detail(id int64) revel.Result {
 	c.RenderArgs["transfer_id"] = id
+
+	if id == 0 {
+		c.RenderArgs["entries_display"] = "none"
+	} else {
+		c.RenderArgs["entries_display"] = "block"
+	}
+
 	return c.RenderTemplate("erp/hgbg/container_transfer/container_transfer_detail.html")
 }
 
