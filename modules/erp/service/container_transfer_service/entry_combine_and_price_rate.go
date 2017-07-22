@@ -22,9 +22,9 @@ func EntryCombineAndPriceRate(p_transfer *models.ContainerTransferInfo, entry_li
 			combined_entry_list = append(combined_entry_list, entry)
 		} else {
 			// do combine
+			combined_entry_list[found_index].Price = (combined_entry.Price*float64(combined_entry.Qty) + entry.Price*float64(entry.Qty)) / float64(combined_entry.Qty+entry.Qty)
 			combined_entry_list[found_index].Qty = combined_entry.Qty + entry.Qty
 			combined_entry_list[found_index].BoxQty = combined_entry.BoxQty + entry.BoxQty
-			combined_entry_list[found_index].Price = (combined_entry.Price*float64(combined_entry.Qty) + entry.Price*float64(entry.Qty)) / float64(combined_entry.Qty+entry.Qty)
 		}
 	}
 
