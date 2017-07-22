@@ -153,6 +153,18 @@
                                     </div>
                                 </div>
                             </div>
+
+                            <div class="col-xs-3">
+                                <div class="form-group">
+                                    <label for="need_invoice" class="col-xs-4 control-label">是否开票：</label>
+                                    <div class="col-xs-8">
+                                        <select id="need_invoice" name="detail.product.need_invoice" class="input-sm form-control" v-model.number="detail.product.need_invoice">
+                                            <option :value="0">否</option>
+                                            <option :value="1">是</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <div class="row">
                             <div class="col-xs-6">
