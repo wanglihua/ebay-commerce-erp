@@ -199,6 +199,16 @@ func (c AuthUser) Delete() revel.Result {
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})
 }
 
+func (c AuthUser) OrderHistory() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.AUTH_USER, c.Session)
+
+	var user_id int64
+	c.Params.Bind(&user_id, "user_id")
+
+	c.RenderArgs["user_id"] = user_id
+	return c.RenderTemplate("auth/user/user_order_history.html")
+}
+
 func (c AuthUser) ResetPassword() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.AUTH_USER, c.Session)
 

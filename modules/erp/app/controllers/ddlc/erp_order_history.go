@@ -18,10 +18,18 @@ func (c ErpOrderHistory) ListData() revel.Result {
 	var order_id int64
 	c.Params.Bind(&order_id, "order_id")
 
+	var user_id int64
+	c.Params.Bind(&user_id, "user_id")
+
 	filter, order, _, _ := core.GetGridRequestParam(c.Request)
 
-	//query extra filter here
-	filter = core.SqlAnd(filter, fmt.Sprintf("order_id = %d", order_id))
+	if order_id != 0 {
+		filter = core.SqlAnd(filter, fmt.Sprintf("order_id = %d", order_id))
+	}
+
+	if user_id != 0 {
+		filter = core.SqlAnd(filter, fmt.Sprintf("user_id = %d", user_id))
+	}
 
 	query := db_session.Where(filter)
 

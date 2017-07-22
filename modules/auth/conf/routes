@@ -9,6 +9,7 @@ POST /auth/user/save                  AuthUser.Save
 POST /auth/user/reset/password        AuthUser.ResetPassword
 POST /auth/user/delete                AuthUser.Delete
 POST /auth/user/get/info              AuthUser.GetUserInfo
+POST /auth/user/order/history         AuthUser.OrderHistory
 
 GET  /auth/admin                      AuthAdmin.Index
 POST /auth/admin/listdata             AuthAdmin.ListData
