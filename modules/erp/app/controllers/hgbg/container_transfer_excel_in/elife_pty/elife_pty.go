@@ -9,6 +9,7 @@ import (
 	"matrix/core"
 	"github.com/Luxurioust/excelize"
 	"time"
+	"matrix/modules/erp/service/container_transfer_service"
 )
 
 type Exporter struct {
@@ -43,6 +44,8 @@ func (c Exporter) GetExcelFile(p_transfer *models.ContainerTransferInfo, db_sess
 
 	var entry_list = make([]models.ContainerTransferEntryInfo, 0)
 	core.HandleError(db_session.Where("transfer_id = ?", p_transfer.Id).Find(&entry_list))
+
+	entry_list = container_transfer_service.EntryCombineAndPriceRate(p_transfer, entry_list)
 
 	var total_amount float64 = 0
 	for index, entry := range entry_list {
