@@ -6,7 +6,7 @@ import (
 	"matrix/core"
 )
 
-func Insert_order_history(order models.OrderInfo, description string, db_session *xorm.Session) {
+func Insert_order_history(order models.OrderInfo, login_user_id int64, description string, db_session *xorm.Session) {
 	var order_history models.OrderHistoryInfo
 
 	order_history.OrderId = order.Id
@@ -19,6 +19,7 @@ func Insert_order_history(order models.OrderInfo, description string, db_session
 
 	order_history.StatusName = order_status.Name
 	order_history.Description = description
+	order_history.UserId = login_user_id
 
 	_, err = db_session.Insert(&order_history)
 	core.HandleError(err)

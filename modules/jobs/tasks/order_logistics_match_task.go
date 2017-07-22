@@ -63,7 +63,7 @@ func (t OrderLogisticsMatchTask) Run() {
 		core.HandleError(err)
 
 		var p_order_logistics = new(order_logistics_service.OrderLogisticsService)
-		p_order_logistics.UserLoginName = "" // 自动任务 操作历史不记录工号
+		p_order_logistics.LoginUser = core.LoginUser{} // 自动任务 操作历史不记录工号
 		err = p_order_logistics.CalculateList(paid_download_order_list, db_session)
 		core.HandleError(err)
 	}

@@ -512,11 +512,12 @@ func (p_ol *OrderLogisticsService) update_order_to_hold_type(p_order *models.Ord
 	_, err = db_session.Id(p_order.HoldTypeId.Int64).Get(&hold_type)
 	core.HandleError(err)
 
-	var login_name = p_ol.UserLoginName
+	var login_user_id = p_ol.LoginUser.UserId
+	var login_name = p_ol.LoginUser.LoginName
 	if login_name == "" {
 		login_name = "自动任务"
 	}
-	order_history_service.Insert_order_history(*p_order, fmt.Sprintf("匹配物流订单Hold %s，工号：%s", hold_type.Name, login_name), db_session)
+	order_history_service.Insert_order_history(*p_order, login_user_id, fmt.Sprintf("匹配物流订单Hold %s，工号：%s", hold_type.Name, login_name), db_session)
 }
 
 // 检查仓库是否有订单中的所有商品数量的库存。这里的有货就理解成这个仓库有订单的所有的商品；这里的缺货也理解成是，没有一个仓库能凑齐所有商品的所有数量。同时返回订单的商品总成本

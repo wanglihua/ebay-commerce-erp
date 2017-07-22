@@ -32,7 +32,7 @@ type OrderLogisticsService struct {
 	special_product_list              []models.SpecialProductInfo             // 特殊商品SKU列表
 	pending_keeper                    *pending_inventory_temp_keeper          // 设置过程全局变量，每次开始匹配计算的时候一定要记得初始化
 	mel_stock_id                      int64                                   // 墨尔本仓库 id
-	UserLoginName                     string
+	LoginUser                         core.LoginUser
 }
 
 func (p_ol *OrderLogisticsService) init_data(db_session *xorm.Session) {

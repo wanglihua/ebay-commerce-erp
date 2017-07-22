@@ -302,7 +302,7 @@ func (t EBayOrderDownloadTask) Run() {
 					core.HandleError(err)
 
 					if status_id_before != order_in_db.StatusId {
-						order_history_service.Insert_order_history(order_in_db, "订单下载状态更新", db_session)
+						order_history_service.Insert_order_history(order_in_db, 0, "订单下载状态更新", db_session)
 					}
 				} else {
 					// insert order
@@ -311,7 +311,7 @@ func (t EBayOrderDownloadTask) Run() {
 					_, err = db_session.Insert(&order_in_db)
 					core.HandleError(err)
 
-					order_history_service.Insert_order_history(order_in_db, "订单下载新增订单", db_session)
+					order_history_service.Insert_order_history(order_in_db, 0, "订单下载新增订单", db_session)
 				}
 
 				order_id := order_in_db.Id

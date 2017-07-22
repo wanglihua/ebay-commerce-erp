@@ -749,7 +749,7 @@ func (c ErpOrder) ReMatchHoldOrderLogistics() revel.Result {
 
 	var p_order_logistics = new(order_logistics_service.OrderLogisticsService)
 	var login_user = core.GetLoginUser(c.Session)
-	p_order_logistics.UserLoginName = login_user.LoginName
+	p_order_logistics.LoginUser = login_user
 	var match_option order_logistics_service.Match_option_t
 	match_option.Prefer_stock_id = prefer_stock_id
 	match_option.Prefer_mode_id = prefer_mode_id
@@ -790,7 +790,7 @@ func (c ErpOrder) MatchLogistics() revel.Result {
 
 	var p_order_logistics = new(order_logistics_service.OrderLogisticsService)
 	var login_user = core.GetLoginUser(c.Session)
-	p_order_logistics.UserLoginName = login_user.LoginName
+	p_order_logistics.LoginUser = login_user
 	err := p_order_logistics.CalculateListPaidOrders(db_session)
 
 	// core.HandleError(err)
@@ -842,7 +842,7 @@ func (c ErpOrder) DaiPeiHuo() revel.Result {
 		_, err = db_session.Id(order.Id).Cols("status_id").Update(&order)
 		core.HandleError(err)
 
-		order_history_service.Insert_order_history(order, fmt.Sprintf("订单Hold转 待配货， 工号： %s", login_user.LoginName), db_session)
+		order_history_service.Insert_order_history(order, login_user.UserId, fmt.Sprintf("订单Hold转 待配货， 工号： %s", login_user.LoginName), db_session)
 	}
 
 	return c.RenderJson(map[string]interface{}{
@@ -883,7 +883,7 @@ func (c ErpOrder) PeiHuo() revel.Result {
 		_, err = db_session.Id(order.Id).Cols("status_id").Update(&order)
 		core.HandleError(err)
 
-		order_history_service.Insert_order_history(order, fmt.Sprintf("订单配货， 工号： %s", login_user.LoginName), db_session)
+		order_history_service.Insert_order_history(order, login_user.UserId, fmt.Sprintf("订单配货， 工号： %s", login_user.LoginName), db_session)
 	}
 
 	return c.RenderJson(map[string]interface{}{
@@ -953,7 +953,7 @@ func (c ErpOrder) FaHuo() revel.Result {
 		_, err = db_session.Id(order.Id).Cols("status_id", "shipped_time").Update(&order)
 		core.HandleError(err)
 
-		order_history_service.Insert_order_history(order, fmt.Sprintf("订单发货， 工号： %s", login_user.LoginName), db_session)
+		order_history_service.Insert_order_history(order, login_user.UserId, fmt.Sprintf("订单发货， 工号： %s", login_user.LoginName), db_session)
 	}
 
 	// 更新库存待配货数量
@@ -1006,7 +1006,7 @@ func (c ErpOrder) ShiJiWuHuo() revel.Result {
 		_, err = db_session.Id(order.Id).Cols("status_id", "hold_type_id").Update(&order)
 		core.HandleError(err)
 
-		order_history_service.Insert_order_history(order, fmt.Sprintf("订单实际无货，工号： %s", login_user.LoginName), db_session)
+		order_history_service.Insert_order_history(order, login_user.UserId, fmt.Sprintf("订单实际无货，工号： %s", login_user.LoginName), db_session)
 	}
 
 	go inventory_service.Calculate_inventory_pending_qty()
@@ -1045,7 +1045,7 @@ func (c ErpOrder) WanCheng() revel.Result {
 		_, err = db_session.Id(order.Id).Cols("status_id").Update(&order)
 		core.HandleError(err)
 
-		order_history_service.Insert_order_history(order, fmt.Sprintf("订单完成，工号： %s", login_user.LoginName), db_session)
+		order_history_service.Insert_order_history(order, login_user.UserId, fmt.Sprintf("订单完成，工号： %s", login_user.LoginName), db_session)
 	}
 
 	return c.RenderJson(map[string]interface{}{
@@ -1074,7 +1074,7 @@ func (c ErpOrder) QuXiao() revel.Result {
 		_, err = db_session.Id(order.Id).Cols("status_id").Update(&order)
 		core.HandleError(err)
 
-		order_history_service.Insert_order_history(order, fmt.Sprintf("订单取消， 工号： %s", login_user.LoginName), db_session)
+		order_history_service.Insert_order_history(order, login_user.UserId, fmt.Sprintf("订单取消， 工号： %s", login_user.LoginName), db_session)
 	}
 
 	return c.RenderJson(map[string]interface{}{

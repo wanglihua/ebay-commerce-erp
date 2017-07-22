@@ -32,7 +32,7 @@ func (c ErpOrderLogisticsTest) Match() revel.Result {
 
 	var p_order_logistics = new(order_logistics_service.OrderLogisticsService)
 	var login_user = core.GetLoginUser(c.Session)
-	p_order_logistics.UserLoginName = login_user.LoginName
+	p_order_logistics.LoginUser = login_user
 	err = p_order_logistics.CalculateList(order_list, db_session)
 	core.HandleError(err)
 

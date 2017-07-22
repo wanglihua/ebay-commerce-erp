@@ -295,7 +295,7 @@ func (c ErpOrderLogisticsImport) ImportActualFee() revel.Result {
 		_, err = db_session.Id(order_logistics.OrderId).Get(&order)
 		core.HandleError(err)
 
-		order_history_service.Insert_order_history(order, fmt.Sprintf("导入实际运费：%f，工号：%s", order_import.ActualFee, login_user.LoginName), db_session)
+		order_history_service.Insert_order_history(order, login_user.UserId, fmt.Sprintf("导入实际运费：%f，工号：%s", order_import.ActualFee, login_user.LoginName), db_session)
 	}
 
 	return c.RenderJson(map[string]interface{}{
