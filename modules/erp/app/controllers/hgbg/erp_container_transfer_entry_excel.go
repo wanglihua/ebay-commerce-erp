@@ -359,11 +359,13 @@ func (c ErpContainerTransferEntryExcel) export_entry_list_to_excel(db_session *x
 		cell.Value = "箱数"
 		col_index++
 
+		/*
 		cell = row.AddCell()
 		sheet.SetColWidth(col_index, col_index, 10)
 		set_head_cell_style(cell)
 		cell.Value = "价格"
 		col_index++
+		*/
 	}
 
 	for _, entry := range entry_list {
@@ -385,10 +387,12 @@ func (c ErpContainerTransferEntryExcel) export_entry_list_to_excel(db_session *x
 		set_text_cell_style(cell, "right")
 		cell.SetInt64(entry.BoxQty)
 
+		/*
 		// 价格
 		cell = row.AddCell()
 		set_text_cell_style(cell, "right")
 		cell.SetFloat(entry.Price)
+		*/
 	}
 
 	return xlsx_file

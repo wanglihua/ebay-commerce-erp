@@ -190,7 +190,7 @@
 
                                     <div class="col-xs-3">
                                         <div class="form-group">
-                                            <label for="departure_time" class="col-xs-4 control-label">到港时间</label>
+                                            <label for="departure_time" class="col-xs-4 control-label">预计到港时间</label>
                                             <div class="col-xs-8">
                                                 <input id="departure_time" name="detail.transfer.departure_time" type="text" class="input-sm form-control" v-model="detail.transfer.departure_time"/>
                                             </div>
@@ -199,7 +199,7 @@
 
                                     <div class="col-xs-3">
                                         <div class="form-group">
-                                            <label for="stock_time" class="col-xs-4 control-label">到仓时间</label>
+                                            <label for="stock_time" class="col-xs-4 control-label">预计到仓时间</label>
                                             <div class="col-xs-8">
                                                 <input id="stock_time" name="detail.transfer.stock_time" type="text" class="input-sm form-control" v-model="detail.transfer.stock_time"/>
                                             </div>
@@ -803,7 +803,7 @@
     }
 
     function exportEntryList() {
-        var params = $.param({});
+        var params = $.param({"transfer_id": transfer_id});
         var url = '{%url "ErpContainerTransferEntryExcel.Export"%}' + "?" + params;
         $('<form method="post" action="' + url + '"></form>').appendTo('body').submit().remove();
     }
