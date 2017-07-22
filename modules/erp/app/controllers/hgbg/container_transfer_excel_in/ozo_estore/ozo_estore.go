@@ -44,6 +44,9 @@ func (c Exporter) GetExcelFile(p_transfer *models.ContainerTransferInfo, db_sess
 	var entry_list = make([]models.ContainerTransferEntryInfo, 0)
 	core.HandleError(db_session.Where("transfer_id = ?", p_transfer.Id).Find(&entry_list))
 
+
+
+
 	var total_amount float64 = 0
 	for index, entry := range entry_list {
 		xlsx_file.SetCellValue(sheet1_name, fmt.Sprintf("A%d", 22+index), fmt.Sprintf("%s(%s)", entry.AuHsEnName, entry.AuHsCnName))
