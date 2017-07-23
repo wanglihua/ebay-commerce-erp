@@ -18,13 +18,13 @@ type ErpProductInvoice struct {
 }
 
 func (c ErpProductInvoice) Index() revel.Result {
-	pass_service.Check_login_user_pass(pass_res.HGBG_CONTAINER_TRANSFER, c.Session)
+	pass_service.Check_login_user_pass(pass_res.HGBG_PRODUCT_INVOICE, c.Session)
 
 	return c.RenderTemplate("erp/hgbg/product_invoice/product_invoice_index.html")
 }
 
 func (c ErpProductInvoice) ListData() revel.Result {
-	pass_service.Check_login_user_pass(pass_res.HGBG_CONTAINER_TRANSFER, c.Session)
+	pass_service.Check_login_user_pass(pass_res.HGBG_PRODUCT_INVOICE, c.Session)
 
 	db_session := c.DbSession
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
@@ -78,7 +78,7 @@ type product_weight_detail_form_t struct {
 }
 
 func (c ErpProductInvoice) DetailData() revel.Result {
-	pass_service.Check_login_user_pass(pass_res.HGBG_CONTAINER_TRANSFER, c.Session)
+	pass_service.Check_login_user_pass(pass_res.HGBG_PRODUCT_INVOICE, c.Session)
 
 	db_session := c.DbSession
 
@@ -96,7 +96,7 @@ func (c ErpProductInvoice) DetailData() revel.Result {
 }
 
 func (c ErpProductInvoice) Save() revel.Result {
-	pass_service.Check_login_user_pass(pass_res.HGBG_CONTAINER_TRANSFER, c.Session)
+	pass_service.Check_login_user_pass(pass_res.HGBG_PRODUCT_INVOICE, c.Session)
 
 	db_session := c.DbSession
 
@@ -129,7 +129,7 @@ func (c ErpProductInvoice) Save() revel.Result {
 }
 
 func (c ErpProductInvoice) Import() revel.Result {
-	pass_service.Check_login_user_pass(pass_res.HGBG_CONTAINER_TRANSFER, c.Session)
+	pass_service.Check_login_user_pass(pass_res.HGBG_PRODUCT_INVOICE, c.Session)
 
 	db_session := c.DbSession
 

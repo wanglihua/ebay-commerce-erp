@@ -427,6 +427,13 @@ func (e PassResInfo) InitData(db_session *xorm.Session) {
 		pass.Name = "集装箱调拨"
 		pass.Desc = core.MakeNullString("集装箱调拨", true)
 		db_session.Insert(pass)
+
+		pass = new(PassResInfo)
+		pass.Id = pass_res.HGBG_PRODUCT_INVOICE
+		pass.CateId = pass_res_cate.HGBG
+		pass.Name = "商品是否开票"
+		pass.Desc = core.MakeNullString("商品是否开票", true)
+		db_session.Insert(pass)
 	}
 
 	// 权限管理
