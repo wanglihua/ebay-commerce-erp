@@ -269,7 +269,7 @@ func (c ErpProductExport) export_product_list_to_excel(db_session *xorm.Session,
 		// 	实际重量(kg)
 		cell = row.AddCell()
 		set_text_cell_style(cell, "right")
-		cell.Value = fmt.Sprintf("%0.2f", product.Weight)
+		cell.Value = fmt.Sprintf("%0.3f", product.Weight)
 
 		// 状态
 		cell = row.AddCell()

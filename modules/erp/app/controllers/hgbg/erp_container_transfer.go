@@ -10,6 +10,7 @@ import (
 	"matrix/modules/erp/service/container_transfer_service"
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/auth/pass_res"
+	"time"
 )
 
 type ErpContainerTransfer struct {
@@ -164,6 +165,18 @@ func (c ErpContainerTransfer) Save() revel.Result {
 
 	if detail_form.Valid(c.Validation) == false {
 		return c.RenderJson(core.JsonResult{Success: false, Message: c.GetValidationErrorMessage()})
+	}
+
+	var packing_time = time.Time(detail_form.ContainerTransfer.PackingTime)
+	var departure_time = time.Time(detail_form.ContainerTransfer.DepartureTime)
+	var stock_time = time.Time(detail_form.ContainerTransfer.StockTime)
+
+	if packing_time.After(departure_time) {
+		return c.RenderJson(core.JsonResult{Success: false, Message: "装箱时间 不能晚于 预计到港时间！"})
+	}
+
+	if departure_time.After(stock_time) {
+		return c.RenderJson(core.JsonResult{Success: false, Message: "预计到港时间 不能晚于 预计到仓时间！"})
 	}
 
 	container_transfer := detail_form.ContainerTransfer
