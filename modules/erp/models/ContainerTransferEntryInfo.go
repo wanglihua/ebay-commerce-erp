@@ -22,6 +22,9 @@ type ContainerTransferEntryInfo struct {
 	CnHsEnName   string          `xorm:"nvarchar(200) notnull 'cn_hs_en_name'" json:"cn_hs_en_name"`
 	CreateTime   core.Time       `xorm:"created notnull 'create_time'" json:"create_time"`
 	UpdateTime   core.Time       `xorm:"updated notnull 'update_time'" json:"update_time"`
+
+	WeightSum float64 `xorm:"-"` // 用户记录导出时SKU合并的重量
+	VolumeSum float64 `xorm:"-"` // 用户记录导出时SKU合并的体积
 }
 
 func (e ContainerTransferEntryInfo) TableName() string {

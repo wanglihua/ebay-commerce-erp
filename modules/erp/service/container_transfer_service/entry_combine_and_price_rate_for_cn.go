@@ -22,9 +22,18 @@ func EntryCombineForCn(entry_list []models.ContainerTransferEntryInfo, is_third 
 	var combined_entry_list = make([]models.ContainerTransferEntryInfo, 0)
 
 	for _, entry := range entry_list {
+		// weight volume 的计算
+		var product models.ProductInfo
+		_, err := db_session.Id(entry.ProductId).Get(&product)
+		core.HandleError(err)
+
+		var net_weight = product.Weight * float64(entry.Qty)
+		var vol = (product.Length * product.Width * product.Height / 1000000) * float64(entry.Qty)
 
 		// 需要开票的不合并
 		if is_product_need_invoice(entry.ProductId, db_session) == true {
+			entry.WeightSum = net_weight * float64(entry.Qty)
+			entry.VolumeSum = vol * float64(entry.Qty)
 			not_combined_entry_list = append(not_combined_entry_list, entry)
 		} else { //不需要开票的合并
 			found_index, combined_entry := find_entry_in_list(entry.AuHsCode, combined_entry_list)
@@ -36,6 +45,8 @@ func EntryCombineForCn(entry_list []models.ContainerTransferEntryInfo, is_third 
 				combined_entry_list[found_index].Price = (combined_entry.Price*float64(combined_entry.Qty) + entry.Price*float64(entry.Qty)) / float64(combined_entry.Qty+entry.Qty)
 				combined_entry_list[found_index].Qty = combined_entry.Qty + entry.Qty
 				combined_entry_list[found_index].BoxQty = combined_entry.BoxQty + entry.BoxQty
+				combined_entry_list[found_index].WeightSum = combined_entry.WeightSum + net_weight*float64(entry.Qty)
+				combined_entry_list[found_index].VolumeSum = combined_entry.VolumeSum + vol*float64(entry.Qty)
 			}
 		}
 	}

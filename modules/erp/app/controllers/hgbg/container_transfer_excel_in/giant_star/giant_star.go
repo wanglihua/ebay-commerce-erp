@@ -45,7 +45,7 @@ func (c Exporter) GetExcelFile(p_transfer *models.ContainerTransferInfo, db_sess
 	var entry_list = make([]models.ContainerTransferEntryInfo, 0)
 	core.HandleError(db_session.Where("transfer_id = ?", p_transfer.Id).Find(&entry_list))
 
-	entry_list = container_transfer_service.EntryCombineAndPriceRateForAu(p_transfer, entry_list)
+	entry_list = container_transfer_service.EntryCombineAndPriceRateForAu(p_transfer, entry_list, db_session)
 
 	var total_qty int64 = 0
 	var total_amount float64 = 0
@@ -85,13 +85,9 @@ func (c Exporter) GetExcelFile(p_transfer *models.ContainerTransferInfo, db_sess
 		xlsx_file.SetCellValue(sheet2_name, fmt.Sprintf("D%d", 14+index), entry.Qty)
 		xlsx_file.SetCellValue(sheet2_name, fmt.Sprintf("E%d", 14+index), entry.BoxQty)
 
-		var product models.ProductInfo
-		_, err := db_session.Id(entry.ProductId).Get(&product)
-		core.HandleError(err)
-
-		var net_weight = product.Weight * float64(entry.Qty)
+		var net_weight = entry.WeightSum
 		var gross_weight = net_weight * 1.01
-		var vol = (product.Length * product.Width * product.Height / 1000000) * float64(entry.Qty)
+		var vol = entry.VolumeSum
 
 		xlsx_file.SetCellValue(sheet2_name, fmt.Sprintf("F%d", 14+index), net_weight)
 		xlsx_file.SetCellValue(sheet2_name, fmt.Sprintf("G%d", 14+index), gross_weight)
