@@ -75,6 +75,16 @@ func GetHgbgMenu(res_id_map map[int64]bool, web_session revel.Session) string {
         </li>`)
 	}
 
+	if check_pass_res_menu(pass_res.HGBG_CONTAINER_TRANSFER) {
+		buffer.WriteString(`<li id="hgbg-product-invoice-menu" class="">
+            <a href="/product/invoice">
+                <i class="menu-icon fa fa-caret-right"></i>
+                商品是否开票
+            </a>
+            <b class="arrow"></b>
+        </li>`)
+	}
+
 	/*
 	buffer.WriteString(`<li id="hgbg-container-transfer-entry-menu" class="">
             <a href="/container/transfer/entry">
