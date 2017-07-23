@@ -138,6 +138,19 @@ func (c ErpContainerTransfer) DetailData() revel.Result {
 		if has == false {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "指定的集装箱调拨不存在！"})
 		}
+	} else {
+		// 填入上次的
+		var last_container_transfer models.ContainerTransferInfo
+		_, err := db_session.Sql("SELECT ct.* FROM erp_container_transfer ct ORDER BY ct.id DESC LIMIT 1").Get(&last_container_transfer)
+		core.HandleError(err)
+
+		revel.TRACE.Println("last_container_transfer.Id", last_container_transfer.Id)
+
+		container_transfer.PriceDownRate = last_container_transfer.PriceDownRate
+		container_transfer.CostUpRate = last_container_transfer.CostUpRate
+
+		revel.TRACE.Println("container_transfer.PriceDownRate", container_transfer.PriceDownRate)
+		revel.TRACE.Println("container_transfer.CostUpRate", container_transfer.CostUpRate)
 	}
 
 	var start_port_list = make([]models.ContainerTransferStartPortInfo, 0)
