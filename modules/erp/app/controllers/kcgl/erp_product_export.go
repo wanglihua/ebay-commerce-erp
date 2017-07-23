@@ -249,27 +249,27 @@ func (c ErpProductExport) export_product_list_to_excel(db_session *xorm.Session,
 		// 采购价（人民币元）
 		cell = row.AddCell()
 		set_text_cell_style(cell, "right")
-		cell.Value = fmt.Sprintf("%0.00f", product.CostPrice)
+		cell.Value = fmt.Sprintf("%0.2f", product.CostPrice)
 
 		// 	产品长度（cm）
 		cell = row.AddCell()
 		set_text_cell_style(cell, "right")
-		cell.Value = fmt.Sprintf("%0.00f", product.Length)
+		cell.Value = fmt.Sprintf("%0.2f", product.Length)
 
 		// 产品宽度（cm）
 		cell = row.AddCell()
 		set_text_cell_style(cell, "right")
-		cell.Value = fmt.Sprintf("%0.00f", product.Width)
+		cell.Value = fmt.Sprintf("%0.2f", product.Width)
 
 		// 	产品高度（cm）
 		cell = row.AddCell()
 		set_text_cell_style(cell, "right")
-		cell.Value = fmt.Sprintf("%0.00f", product.Height)
+		cell.Value = fmt.Sprintf("%0.2f", product.Height)
 
 		// 	实际重量(kg)
 		cell = row.AddCell()
 		set_text_cell_style(cell, "right")
-		cell.Value = fmt.Sprintf("%0.00f", product.Weight)
+		cell.Value = fmt.Sprintf("%0.2f", product.Weight)
 
 		// 状态
 		cell = row.AddCell()
