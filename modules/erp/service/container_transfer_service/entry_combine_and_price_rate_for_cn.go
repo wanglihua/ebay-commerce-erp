@@ -7,7 +7,7 @@ import (
 	"matrix/core"
 )
 
-func EntryCombineForCn(entry_list []models.ContainerTransferEntryInfo, db_session *xorm.Session) []models.ContainerTransferEntryInfo {
+func EntryCombineForCn(entry_list []models.ContainerTransferEntryInfo, is_third bool, db_session *xorm.Session) []models.ContainerTransferEntryInfo {
 	var find_entry_in_list = func(au_hs_code string, entry_list []models.ContainerTransferEntryInfo) (index_ret int, entry_ret models.ContainerTransferEntryInfo) {
 		for index, entry := range entry_list {
 			if entry.AuHsCode == au_hs_code {
@@ -40,10 +40,19 @@ func EntryCombineForCn(entry_list []models.ContainerTransferEntryInfo, db_sessio
 		}
 	}
 
+	/*
 	// 开票的和不开票的合并
 	combined_entry_list = append(not_combined_entry_list, combined_entry_list...)
 
 	return combined_entry_list
+	*/
+
+	// 不开票的导出到第三方, 就是合并的那部分
+	if is_third {
+		return combined_entry_list
+	} else {
+		return not_combined_entry_list
+	}
 }
 
 // 需要开票的不合并，不需要开票的合并
