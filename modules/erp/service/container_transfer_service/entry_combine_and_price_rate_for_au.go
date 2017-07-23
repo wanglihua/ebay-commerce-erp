@@ -27,12 +27,12 @@ func EntryCombineAndPriceRateForAu(p_transfer *models.ContainerTransferInfo, ent
 		_, err := db_session.Id(entry.ProductId).Get(&product)
 		core.HandleError(err)
 
-		var net_weight = product.Weight * float64(entry.Qty)
-		var vol = (product.Length * product.Width * product.Height / 1000000) * float64(entry.Qty)
+		var net_weight_sum = product.Weight * float64(entry.Qty)
+		var vol_sum = (product.Length * product.Width * product.Height / 1000000) * float64(entry.Qty)
 
 		if found_index < 0 {
-			entry.WeightSum = net_weight * float64(entry.Qty)
-			entry.VolumeSum = vol * float64(entry.Qty)
+			entry.WeightSum = net_weight_sum
+			entry.VolumeSum = vol_sum
 			combined_entry_list = append(combined_entry_list, entry)
 		} else {
 			// do combine
@@ -40,8 +40,8 @@ func EntryCombineAndPriceRateForAu(p_transfer *models.ContainerTransferInfo, ent
 			combined_entry_list[found_index].Qty = combined_entry.Qty + entry.Qty
 			combined_entry_list[found_index].BoxQty = combined_entry.BoxQty + entry.BoxQty
 			combined_entry_list[found_index].BoxQty = combined_entry.BoxQty + entry.BoxQty
-			combined_entry_list[found_index].WeightSum = combined_entry.WeightSum + net_weight*float64(entry.Qty)
-			combined_entry_list[found_index].VolumeSum = combined_entry.VolumeSum + vol*float64(entry.Qty)
+			combined_entry_list[found_index].WeightSum = combined_entry.WeightSum + net_weight_sum
+			combined_entry_list[found_index].VolumeSum = combined_entry.VolumeSum + vol_sum
 		}
 	}
 
