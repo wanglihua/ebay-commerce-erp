@@ -135,16 +135,18 @@
             }
         });
 
-        if (id_list.length === 0) {
-            $.msg.alert("请选择数据！");
+        if (id_list.length === 1) {
+            $.msg.alert("请选择一条数据！");
             return;
         }
 
-        $.msg.confirm("确认要删除吗？", function () {
+        var transfer_id = id_list[0];
+
+        $.msg.confirm("设置为已出发后状态，将不能修改调拨和明细，并会更新仓库库存，是否继续？", function () {
             $.ajax({
-                url: '{%url "ErpContainerTransfer.Delete"%}',
+                url: '{% url "ErpContainerTransfer.Depart" %}',
                 type: "POST",
-                data: {"id_list": id_list},
+                data: {"transfer_id": transfer_id},
                 success: function (data) {
                     if (data.success === false) {
                         $.msg.error(data.message);
@@ -167,16 +169,18 @@
             }
         });
 
-        if (id_list.length === 0) {
-            $.msg.alert("请选择数据！");
+        if (id_list.length === 1) {
+            $.msg.alert("请选择一条数据！");
             return;
         }
 
-        $.msg.confirm("确认要删除吗？", function () {
+        var transfer_id = id_list[0];
+
+        $.msg.confirm("设置为已到仓后状态，将会更新仓库库存，是否继续？", function () {
             $.ajax({
-                url: '{%url "ErpContainerTransfer.Delete"%}',
+                url: '{% url "ErpContainerTransfer.Stock" %}',
                 type: "POST",
-                data: {"id_list": id_list},
+                data: {"transfer_id": transfer_id},
                 success: function (data) {
                     if (data.success === false) {
                         $.msg.error(data.message);
