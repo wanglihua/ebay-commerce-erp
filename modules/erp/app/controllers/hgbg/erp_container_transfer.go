@@ -294,6 +294,13 @@ func (c ErpContainerTransfer) Depart() revel.Result {
 	_, err := db_session.Id(transfer_id).Get(&ct)
 	core.HandleError(err)
 
+	if ct.StatusId == models.CONTAINER_TRANSFER_STATUS_DEPART {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "当前集装箱调拨已经为已出发状态！",
+		})
+	}
+
 	if container_transfer_can_depart(ct) == false {
 		return c.RenderJson(map[string]interface{}{
 			"success": false,
@@ -324,7 +331,14 @@ func (c ErpContainerTransfer) Stock() revel.Result {
 	_, err := db_session.Id(transfer_id).Get(&ct)
 	core.HandleError(err)
 
-	if container_transfer_can_depart(ct) == false {
+	if ct.StatusId == models.CONTAINER_TRANSFER_STATUS_STOCK {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "当前集装箱调拨已经为已到仓状态！",
+		})
+	}
+
+	if container_transfer_can_stock(ct) == false {
 		return c.RenderJson(map[string]interface{}{
 			"success": false,
 			"message": "当前集装箱调拨不能设置为已到仓状态！",
