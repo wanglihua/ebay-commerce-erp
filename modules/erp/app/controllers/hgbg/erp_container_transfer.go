@@ -112,7 +112,21 @@ func (f *ContainerTransferDetailForm) Valid(validation *revel.Validation) bool {
 func (c ErpContainerTransfer) Detail(id int64) revel.Result {
 	pass_service.Check_login_user_pass(pass_res.HGBG_CONTAINER_TRANSFER, c.Session)
 
-	c.RenderArgs["transfer_id"] = id
+	var db_session = c.DbSession
+
+	var transfer_id = id
+	var container_transfer models.ContainerTransferInfo
+	_, err := db_session.Id(transfer_id).Get(&container_transfer)
+	core.HandleError(err)
+
+	var status models.StatusInfo
+	_, err = db_session.Id(container_transfer.StatusId).Get(&status)
+	core.HandleError(err)
+
+	c.RenderArgs["transfer_id"] = transfer_id
+	c.RenderArgs["status_name"] = status.Name
+	c.RenderArgs["can_modify"] = container_transfer_can_modify(container_transfer)
+	c.RenderArgs["is_not_new"] = transfer_id != 0
 
 	if id == 0 {
 		c.RenderArgs["entries_display"] = "none"
@@ -176,6 +190,10 @@ func (c ErpContainerTransfer) Save() revel.Result {
 	err := json.Unmarshal(c.GetRequestBody(), &detail_form)
 	core.HandleError(err)
 
+	if container_transfer_can_modify(detail_form.ContainerTransfer) == false {
+		return c.RenderJson(core.JsonResult{Success: false, Message: "当前状态不能修改！"})
+	}
+
 	if detail_form.Valid(c.Validation) == false {
 		return c.RenderJson(core.JsonResult{Success: false, Message: c.GetValidationErrorMessage()})
 	}
@@ -237,8 +255,21 @@ func (c ErpContainerTransfer) Delete() revel.Result {
 	container_transfer_id_list := make([]int64, 0)
 	c.Params.Bind(&container_transfer_id_list, "id_list")
 
+	var container_transfer_list = make([]models.ContainerTransferInfo, 0)
+	core.HandleError(db_session.In("id", container_transfer_id_list).Find(&container_transfer_list))
+
+	for _, container_transfer := range container_transfer_list {
+		if container_transfer_can_modify(container_transfer) == false {
+			return c.RenderJson(core.JsonResult{Success: false, Message: "当前状态不能删除！"})
+		}
+	}
+
 	affected, err := db_session.In("id", container_transfer_id_list).Delete(new(models.ContainerTransferInfo))
 	core.HandleError(err)
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})
+}
+
+func container_transfer_can_modify(container_transfer models.ContainerTransferInfo) bool {
+	return container_transfer.StatusId == models.CONTAINER_TRANSFER_STATUS_NEW
 }

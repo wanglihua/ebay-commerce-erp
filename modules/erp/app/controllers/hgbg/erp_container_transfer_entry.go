@@ -116,6 +116,14 @@ func (c ErpContainerTransferEntry) Save() revel.Result {
 	err := json.Unmarshal(c.GetRequestBody(), &detail_form)
 	core.HandleError(err)
 
+	var ct models.ContainerTransferInfo
+	_, err = db_session.Id(detail_form.ContainerTransferEntry.TransferId).Get(&ct)
+	core.HandleError(err)
+
+	if container_transfer_can_modify(ct) == false {
+		return c.RenderJson(core.JsonResult{Success: false, Message: "当前状态不能修改！"})
+	}
+
 	if detail_form.Valid(c.Validation) == false {
 		return c.RenderJson(core.JsonResult{Success: false, Message: c.GetValidationErrorMessage()})
 	}
@@ -212,6 +220,14 @@ func (c ErpContainerTransferEntry) Delete() revel.Result {
 	var containerTransferEntry models.ContainerTransferEntryInfo
 	_, err := db_session.Id(entry_id).Get(&containerTransferEntry)
 	core.HandleError(err)
+
+	var ct models.ContainerTransferInfo
+	_, err = db_session.Id(containerTransferEntry.TransferId).Get(&ct)
+	core.HandleError(err)
+
+	if container_transfer_can_modify(ct) == false {
+		return c.RenderJson(core.JsonResult{Success: false, Message: "当前状态不能修改！"})
+	}
 
 	affected, err := db_session.In("id", container_transfer_entry_id_list).Delete(new(models.ContainerTransferEntryInfo))
 	core.HandleError(err)
