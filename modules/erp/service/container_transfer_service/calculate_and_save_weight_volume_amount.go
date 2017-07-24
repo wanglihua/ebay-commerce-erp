@@ -62,6 +62,6 @@ WHERE cte.transfer_id = %d;`
 		container_transfer.PriceUpRate = 0
 	}
 
-	_, err = db_session.Cols("total_weight", "total_volumn", "total_amount1", "total_amount2", "price_up_rate").Update(&container_transfer)
+	_, err = db_session.Id(container_transfer.Id).Cols("total_weight", "total_volumn", "total_amount1", "total_amount2", "price_up_rate").Update(&container_transfer)
 	core.HandleError(err)
 }
