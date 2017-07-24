@@ -5,32 +5,34 @@ import (
 	"matrix/modules/erp/models"
 	"matrix/core"
 	"fmt"
+	"github.com/revel/revel"
+	"matrix/modules/erp/service/inventory_history_service"
 )
 
-func UpdateStockInventory(container_transfer models.ContainerTransferInfo, db_session *xorm.Session) {
+func UpdateStockInventory(container_transfer models.ContainerTransferInfo, web_session revel.Session, db_session *xorm.Session) {
 
 	var entry_list = make([]models.ContainerTransferEntryInfo, 0)
 	core.HandleError(db_session.Where("transfer_id = ?", container_transfer.Id).Find(&entry_list))
 
 	zt_stock_id, au_stock_id := get_zt_au_stock_id(container_transfer.Id, db_session)
 
-	_, _ = zt_stock_id, au_stock_id
-
 	// 状态是 已出发的 更新在途仓的库存，扣减中国仓的库存
 	if container_transfer.StatusId == models.CONTAINER_TRANSFER_STATUS_DEPART {
 		var cn_stock_id = get_cn_stock_id(db_session)
-		_ = cn_stock_id
 
 		for _, entry := range entry_list {
-			_ = entry
+			update_stock_product_inventory(cn_stock_id, entry.ProductId, -entry.Qty, web_session, db_session)
+			update_stock_product_inventory(zt_stock_id, entry.ProductId, entry.Qty, web_session, db_session)
 		}
 	}
 
 	// 状态是 已到仓的 更新目的仓库的库存，扣减在途仓的库存
 	if container_transfer.StatusId == models.CONTAINER_TRANSFER_STATUS_STOCK {
-
+		for _, entry := range entry_list {
+			update_stock_product_inventory(zt_stock_id, entry.ProductId, -entry.Qty, web_session, db_session)
+			update_stock_product_inventory(au_stock_id, entry.ProductId, entry.Qty, web_session, db_session)
+		}
 	}
-
 }
 
 func get_cn_stock_id(db_session *xorm.Session) int64 {
@@ -97,4 +99,31 @@ func get_zt_au_stock_id(transfer_id int64, db_session *xorm.Session) (zt_stock_i
 	core.HandleError(err)
 
 	return zt_au_stock_id_struct.ZtStockId, zt_au_stock_id_struct.AuStockId
+}
+
+func update_stock_product_inventory(stock_id int64, product_id int64, qty_diff int64, web_session revel.Session, db_session *xorm.Session) {
+	var inventory models.InventoryInfo
+	_, err := db_session.Where("stock_id = ? AND product_id = ?", stock_id, product_id).Get(&inventory)
+	core.HandleError(err)
+
+	var login_user = core.GetLoginUser(web_session)
+
+	if inventory.Id != 0 {
+		var qty_before = inventory.Qty
+		inventory.Qty = inventory.Qty + qty_diff
+		var qty_after = inventory.Qty
+		db_session.Id(inventory.Id).Cols("qty").Update(&inventory)
+
+		inventory_history_service.Insert_inventory_history(inventory, fmt.Sprintf("集装箱调拨更新库存 %d => %d, 工号：%s", qty_before, qty_after, login_user.LoginName), db_session)
+	} else {
+		inventory.StockId = stock_id
+		inventory.ProductId = product_id
+		inventory.StorageLocId = 0 // 暂时设置为零吧
+		inventory.Qty = qty_diff
+
+		_, err := db_session.Insert(&inventory)
+		core.HandleError(err)
+
+		inventory_history_service.Insert_inventory_history(inventory, fmt.Sprintf("集装箱调拨新增库存记录 %d => %d, 工号：%s", 0, qty_diff, login_user.LoginName), db_session)
+	}
 }

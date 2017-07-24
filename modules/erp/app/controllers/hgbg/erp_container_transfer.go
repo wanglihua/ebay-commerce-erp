@@ -313,7 +313,7 @@ func (c ErpContainerTransfer) Depart() revel.Result {
 	_, err = db_session.Id(transfer_id).Cols("status_id").Update(&ct)
 	core.HandleError(err)
 
-	container_transfer_service.UpdateStockInventory(ct, db_session)
+	container_transfer_service.UpdateStockInventory(ct, c.Session, db_session)
 
 	return c.RenderJson(map[string]interface{}{
 		"success": true,
@@ -352,7 +352,7 @@ func (c ErpContainerTransfer) Stock() revel.Result {
 	_, err = db_session.Id(transfer_id).Cols("status_id").Update(&ct)
 	core.HandleError(err)
 
-	container_transfer_service.UpdateStockInventory(ct, db_session)
+	container_transfer_service.UpdateStockInventory(ct, c.Session, db_session)
 
 	return c.RenderJson(map[string]interface{}{
 		"success": true,
