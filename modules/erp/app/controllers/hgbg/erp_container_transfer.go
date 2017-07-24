@@ -31,14 +31,14 @@ func (c ErpContainerTransfer) ListData() revel.Result {
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
 	type container_transfer_view_item_t struct {
-		models.ContainerTransferInfo `xorm:"extends" json:"et"`
+		models.ContainerTransferInfo `xorm:"extends" json:"ct"`
 		models.StatusInfo            `xorm:"extends" json:"s"`
 	}
 
 	query := db_session.
-	Select("et.*, s.*").
-		Table("erp_container_transfer").Alias("et").
-		Join("inner", []string{"erp_status", "s"}, "et.status_id = s.id").
+	Select("ct.*, s.*").
+		Table("erp_container_transfer").Alias("ct").
+		Join("inner", []string{"erp_status", "s"}, "ct.status_id = s.id").
 		Where(filter)
 
 	//query extra filter here

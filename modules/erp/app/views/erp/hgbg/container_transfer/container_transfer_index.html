@@ -57,23 +57,23 @@
                     "aaSorting": [[1, "asc"]],
                     "aoColumns": [
                         {
-                            "mDataProp": "et.id", "bSearchable": false, "orderable": false, "sClass": "center", "width": 50,
+                            "mDataProp": "ct.id", "bSearchable": false, "orderable": false, "sClass": "center", "width": 50,
                             "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
                             "render": function (data, type, row) {
                                 return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
                             }
                         },
                         {
-                            "mDataProp": "et.batch_code", "title": "批次号", "bSearchable": true,
+                            "mDataProp": "ct.batch_code", "title": "批次号", "bSearchable": true,
                             "render": function (data, type, row) {
-                                return "<a href='javascript:showContainerTransferDetail(" + row.id + ")'>" + data + "</a>";
+                                return "<a href='javascript:showContainerTransferDetail(" + row.ct.id + ")'>" + data + "</a>";
                             }
                         },
-                        {"mDataProp": "et.start_port_name", "title": "起始港口", "bSearchable": true, "width": 150},
-                        {"mDataProp": "et.dest_port_name", "title": "目的港口", "bSearchable": true, "width": 150},
-                        {"mDataProp": "et.packing_time", "title": "装箱时间", "bSearchable": false, "width": 120},
-                        {"mDataProp": "et.departure_time", "title": "预计到港时间", "bSearchable": false, "width": 120},
-                        {"mDataProp": "et.stock_time", "title": "预计到仓时间", "bSearchable": false, "width": 120},
+                        {"mDataProp": "ct.start_port_name", "title": "起始港口", "bSearchable": true, "width": 150},
+                        {"mDataProp": "ct.dest_port_name", "title": "目的港口", "bSearchable": true, "width": 150},
+                        {"mDataProp": "ct.packing_time", "title": "装箱时间", "bSearchable": false, "width": 120},
+                        {"mDataProp": "ct.departure_time", "title": "预计到港时间", "bSearchable": false, "width": 120},
+                        {"mDataProp": "ct.stock_time", "title": "预计到仓时间", "bSearchable": false, "width": 120},
                         {"mDataProp": "s.name", "title": "状态", "bSearchable": true, "width": 80}
                     ]
                 }
