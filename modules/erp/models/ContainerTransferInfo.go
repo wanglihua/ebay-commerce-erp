@@ -21,9 +21,10 @@ type ContainerTransferInfo struct {
 	DepartureTime core.Time       `xorm:"datetime notnull 'departure_time'" json:"departure_time" smith:"verbose_name=到港时间"`
 	StockTime     core.Time       `xorm:"datetime notnull 'stock_time'" json:"stock_time" smith:"verbose_name=到仓时间"`
 	StartPortId   int64           `xorm:"bigint notnull index 'start_port_id'" json:"start_port_id" smith:"verbose_name=起始港口"`
-	StartPortName string           `xorm:"nvarchar(200) notnull default('') 'start_port_name'" json:"start_port_name" smith:"verbose_name=起始港口"`
+	StartPortName string          `xorm:"nvarchar(200) notnull default('') 'start_port_name'" json:"start_port_name" smith:"verbose_name=起始港口"`
 	DestPortId    int64           `xorm:"bigint notnull index 'dest_port_id'" json:"dest_port_id" smith:"verbose_name=目的港口"`
-	DestPortName  string           `xorm:"nvarchar(200) notnull default('') 'dest_port_name'" json:"dest_port_name" smith:"verbose_name=目的港口"`
+	DestPortName  string          `xorm:"nvarchar(200) notnull default('') 'dest_port_name'" json:"dest_port_name" smith:"verbose_name=目的港口"`
+	StatusId      int64           `xorm:"bigint notnull index 'status_id'" json:"status_id" smith:"verbose_name=状态"`
 	CreateTime    core.Time       `xorm:"created notnull 'create_time'" json:"create_time"`
 	UpdateTime    core.Time       `xorm:"updated notnull 'update_time'" json:"update_time"`
 }

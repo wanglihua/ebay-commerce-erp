@@ -50,6 +50,8 @@ const (
 	STATUS_TYPE_LOGISTICS_COMPANY = 2000
 	// 物流模式状态
 	STATUS_TYPE_LOGISTICS_MODE = 2100
+	// 集装箱调拨状态
+	STATUS_TYPE_CONTAINER_TRANSFER = 2200
 
 	//状态类型 end
 
@@ -189,6 +191,11 @@ const (
 	LOGISTICS_MODE_ENABLED = 5200
 	// 物流模式禁用
 	LOGISTICS_MODE_DISABLED = 5300
+
+	// 集装箱调拨 已创建，已装箱，已到仓
+	CONTAINER_TRANSFER_STATUS_NEW   = 5400
+	CONTAINER_TRANSFER_STATUS_PACK  = 5500
+	CONTAINER_TRANSFER_STATUS_STOCK = 5600
 
 	//状态 id end
 )
@@ -668,6 +675,30 @@ func (e StatusInfo) InitData(db_session *xorm.Session) {
 		status.Type = STATUS_TYPE_LOGISTICS_MODE
 		status.Name = "停用"
 		status.Desc = core.MakeNullString("物流模式状态 停用", true)
+		db_session.Insert(status)
+	}
+
+	// 集装箱调拨状态
+	{
+		status := new(StatusInfo)
+		status.Id = CONTAINER_TRANSFER_STATUS_NEW
+		status.Type = STATUS_TYPE_CONTAINER_TRANSFER
+		status.Name = "已新建"
+		status.Desc = core.MakeNullString("集装箱调拨状态 已新建", true)
+		db_session.Insert(status)
+
+		status = new(StatusInfo)
+		status.Id = CONTAINER_TRANSFER_STATUS_PACK
+		status.Type = STATUS_TYPE_CONTAINER_TRANSFER
+		status.Name = "已装箱"
+		status.Desc = core.MakeNullString("集装箱调拨状态 已装箱", true)
+		db_session.Insert(status)
+
+		status = new(StatusInfo)
+		status.Id = CONTAINER_TRANSFER_STATUS_STOCK
+		status.Type = STATUS_TYPE_CONTAINER_TRANSFER
+		status.Name = "已到仓"
+		status.Desc = core.MakeNullString("集装箱调拨状态 已到仓", true)
 		db_session.Insert(status)
 	}
 }
