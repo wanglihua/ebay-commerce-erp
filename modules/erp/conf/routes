@@ -520,6 +520,8 @@ GET  /container/transfer/detail/:id   ErpContainerTransfer.Detail
 POST /container/transfer/data/detail  ErpContainerTransfer.DetailData
 POST /container/transfer/save         ErpContainerTransfer.Save
 POST /container/transfer/delete       ErpContainerTransfer.Delete
+POST /container/transfer/depart       ErpContainerTransfer.Depart
+POST /container/transfer/stock        ErpContainerTransfer.Stock
 
 GET  /container/transfer/entry              ErpContainerTransferEntry.Index
 POST /container/transfer/entry/data/list    ErpContainerTransferEntry.ListData

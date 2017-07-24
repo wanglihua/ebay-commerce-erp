@@ -126,6 +126,8 @@ func (c ErpContainerTransfer) Detail(id int64) revel.Result {
 	c.RenderArgs["transfer_id"] = transfer_id
 	c.RenderArgs["status_name"] = status.Name
 	c.RenderArgs["can_modify"] = container_transfer_can_modify(container_transfer)
+	c.RenderArgs["can_depart"] = container_transfer_can_depart(container_transfer)
+	c.RenderArgs["can_stock"] = container_transfer_can_stock(container_transfer)
 	c.RenderArgs["is_not_new"] = transfer_id != 0
 
 	if id == 0 {
@@ -270,6 +272,60 @@ func (c ErpContainerTransfer) Delete() revel.Result {
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})
 }
 
+func (c ErpContainerTransfer) Depart() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.HGBG_CONTAINER_TRANSFER, c.Session)
+
+	db_session := c.DbSession
+
+	var transfer_id int64
+	c.Params.Bind(&transfer_id, "transfer_id")
+
+	var ct models.ContainerTransferInfo
+	_, err := db_session.Id(transfer_id).Get(&ct)
+	core.HandleError(err)
+
+	ct.StatusId = models.CONTAINER_TRANSFER_STATUS_DEPART
+
+	_, err = db_session.Id(transfer_id).Cols("status_id").Update(&ct)
+	core.HandleError(err)
+
+	return c.RenderJson(map[string]interface{}{
+		"success": false,
+		"message": "设置集装箱调拨为 已出发状态 成功！",
+	})
+}
+
+func (c ErpContainerTransfer) Stock() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.HGBG_CONTAINER_TRANSFER, c.Session)
+
+	db_session := c.DbSession
+
+	var transfer_id int64
+	c.Params.Bind(&transfer_id, "transfer_id")
+
+	var ct models.ContainerTransferInfo
+	_, err := db_session.Id(transfer_id).Get(&ct)
+	core.HandleError(err)
+
+	ct.StatusId = models.CONTAINER_TRANSFER_STATUS_STOCK
+
+	_, err = db_session.Id(transfer_id).Cols("status_id").Update(&ct)
+	core.HandleError(err)
+
+	return c.RenderJson(map[string]interface{}{
+		"success": false,
+		"message": "设置集装箱调拨为 已到仓状态 成功！",
+	})
+}
+
 func container_transfer_can_modify(container_transfer models.ContainerTransferInfo) bool {
 	return container_transfer.StatusId == models.CONTAINER_TRANSFER_STATUS_NEW
+}
+
+func container_transfer_can_depart(container_transfer models.ContainerTransferInfo) bool {
+	return container_transfer.StatusId == models.CONTAINER_TRANSFER_STATUS_NEW
+}
+
+func container_transfer_can_stock(container_transfer models.ContainerTransferInfo) bool {
+	return container_transfer.StatusId == models.CONTAINER_TRANSFER_STATUS_DEPART
 }
