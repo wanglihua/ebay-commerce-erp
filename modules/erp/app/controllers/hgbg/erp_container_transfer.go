@@ -29,7 +29,17 @@ func (c ErpContainerTransfer) ListData() revel.Result {
 	db_session := c.DbSession
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
-	query := db_session.Where(filter)
+
+	type container_transfer_view_item_t struct {
+		models.ContainerTransferInfo `xorm:"extends" json:"et"`
+		models.StatusInfo            `xorm:"extends" json:"s"`
+	}
+
+	query := db_session.
+	Select("et.*, s.*").
+		Table("erp_container_transfer").Alias("et").
+		Join("inner", []string{"erp_status", "s"}, "et.status_id = s.id").
+		Where(filter)
 
 	//query extra filter here
 
@@ -40,12 +50,12 @@ func (c ErpContainerTransfer) ListData() revel.Result {
 		data_query = *data_query.Asc("id")
 	}
 
-	container_transfer_list := make([]models.ContainerTransferInfo, 0, limit)
+	container_transfer_list := make([]container_transfer_view_item_t, 0, limit)
 	err := data_query.Limit(limit, offset).Find(&container_transfer_list)
 	core.HandleError(err)
 
 	count_query := *query
-	count, err := count_query.Count(new(models.ContainerTransferInfo))
+	count, err := count_query.Count(new(container_transfer_view_item_t))
 	core.HandleError(err)
 
 	return c.RenderJson(core.GridResult{
@@ -284,13 +294,20 @@ func (c ErpContainerTransfer) Depart() revel.Result {
 	_, err := db_session.Id(transfer_id).Get(&ct)
 	core.HandleError(err)
 
+	if container_transfer_can_depart(ct) == false {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "当前集装箱调拨不能设置为已出发状态！",
+		})
+	}
+
 	ct.StatusId = models.CONTAINER_TRANSFER_STATUS_DEPART
 
 	_, err = db_session.Id(transfer_id).Cols("status_id").Update(&ct)
 	core.HandleError(err)
 
 	return c.RenderJson(map[string]interface{}{
-		"success": false,
+		"success": true,
 		"message": "设置集装箱调拨为 已出发状态 成功！",
 	})
 }
@@ -307,13 +324,20 @@ func (c ErpContainerTransfer) Stock() revel.Result {
 	_, err := db_session.Id(transfer_id).Get(&ct)
 	core.HandleError(err)
 
+	if container_transfer_can_depart(ct) == false {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "当前集装箱调拨不能设置为已到仓状态！",
+		})
+	}
+
 	ct.StatusId = models.CONTAINER_TRANSFER_STATUS_STOCK
 
 	_, err = db_session.Id(transfer_id).Cols("status_id").Update(&ct)
 	core.HandleError(err)
 
 	return c.RenderJson(map[string]interface{}{
-		"success": false,
+		"success": true,
 		"message": "设置集装箱调拨为 已到仓状态 成功！",
 	})
 }

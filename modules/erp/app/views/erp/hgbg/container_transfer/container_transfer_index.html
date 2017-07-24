@@ -57,23 +57,24 @@
                     "aaSorting": [[1, "asc"]],
                     "aoColumns": [
                         {
-                            "mDataProp": "id", "bSearchable": false, "orderable": false, "sClass": "center", "width": 50,
+                            "mDataProp": "et.id", "bSearchable": false, "orderable": false, "sClass": "center", "width": 50,
                             "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
                             "render": function (data, type, row) {
                                 return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
                             }
                         },
                         {
-                            "mDataProp": "batch_code", "title": "批次号", "bSearchable": true,
+                            "mDataProp": "et.batch_code", "title": "批次号", "bSearchable": true,
                             "render": function (data, type, row) {
                                 return "<a href='javascript:showContainerTransferDetail(" + row.id + ")'>" + data + "</a>";
                             }
                         },
-                        {"mDataProp": "start_port_name", "title": "起始港口", "bSearchable": true, "width": 150},
-                        {"mDataProp": "dest_port_name", "title": "目的港口", "bSearchable": true, "width": 150},
-                        {"mDataProp": "packing_time", "title": "装箱时间", "bSearchable": false, "width": 120},
-                        {"mDataProp": "departure_time", "title": "预计到港时间", "bSearchable": false, "width": 120},
-                        {"mDataProp": "stock_time", "title": "预计到仓时间", "bSearchable": false, "width": 120}
+                        {"mDataProp": "et.start_port_name", "title": "起始港口", "bSearchable": true, "width": 150},
+                        {"mDataProp": "et.dest_port_name", "title": "目的港口", "bSearchable": true, "width": 150},
+                        {"mDataProp": "et.packing_time", "title": "装箱时间", "bSearchable": false, "width": 120},
+                        {"mDataProp": "et.departure_time", "title": "预计到港时间", "bSearchable": false, "width": 120},
+                        {"mDataProp": "et.stock_time", "title": "预计到仓时间", "bSearchable": false, "width": 120},
+                        {"mDataProp": "s.name", "title": "状态", "bSearchable": true, "width": 80}
                     ]
                 }
             );
@@ -135,7 +136,7 @@
             }
         });
 
-        if (id_list.length === 1) {
+        if (id_list.length !== 1) {
             $.msg.alert("请选择一条数据！");
             return;
         }
@@ -169,7 +170,7 @@
             }
         });
 
-        if (id_list.length === 1) {
+        if (id_list.length !== 1) {
             $.msg.alert("请选择一条数据！");
             return;
         }
