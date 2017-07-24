@@ -142,7 +142,7 @@
 
         var transfer_id = id_list[0];
 
-        $.msg.confirm("设置为已出发后状态，将不能修改调拨和明细，并会更新仓库库存，是否继续？", function () {
+        $.msg.confirm("设置为已出发后状态后，将不能修改调拨和明细，并会更新仓库库存，是否继续？", function () {
             $.ajax({
                 url: '{% url "ErpContainerTransfer.Depart" %}',
                 type: "POST",
@@ -176,7 +176,7 @@
 
         var transfer_id = id_list[0];
 
-        $.msg.confirm("设置为已到仓后状态，将会更新仓库库存，是否继续？", function () {
+        $.msg.confirm("设置为已到仓后状态后，将会更新仓库库存，是否继续？", function () {
             $.ajax({
                 url: '{% url "ErpContainerTransfer.Stock" %}',
                 type: "POST",
