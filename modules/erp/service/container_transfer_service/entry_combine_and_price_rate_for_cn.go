@@ -39,6 +39,8 @@ func EntryCombineForCn(entry_list []models.ContainerTransferEntryInfo, is_third 
 			found_index, combined_entry := find_entry_in_list(entry.AuHsCode, combined_entry_list)
 
 			if found_index < 0 {
+				entry.WeightSum = net_weight_sum
+				entry.VolumeSum = vol_sum
 				combined_entry_list = append(combined_entry_list, entry)
 			} else {
 				// do combine

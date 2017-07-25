@@ -1,16 +1,16 @@
 package controllers
 
 import (
-	"encoding/json"
-	"strconv"
 	"github.com/revel/revel"
 
 	"matrix/core"
 	"matrix/modules/erp/models"
-	"strings"
-	"fmt"
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/auth/pass_res"
+	"encoding/json"
+	"fmt"
+	"strings"
+	"strconv"
 )
 
 type ErpSpecialProduct struct {
@@ -71,9 +71,11 @@ FROM erp_special_product sp
 }
 
 type SpecialProductDetailForm struct {
-	SkuList        string                    `json:"sku_list"`
-	Sku            string                    `json:"sku"`
-	SpecialProduct models.SpecialProductInfo `json:"special_product"`
+	SkuList     string         `json:"sku_list"`
+	SpecialId   int64          `json:"special_id"`
+	Sku         string         `json:"sku"`
+	Description string         `json:"description"`
+	IsCreate    bool           `json:"is_create"`
 }
 
 func (f *SpecialProductDetailForm) Valid(validation *revel.Validation) bool {
@@ -83,7 +85,28 @@ func (f *SpecialProductDetailForm) Valid(validation *revel.Validation) bool {
 func (c ErpSpecialProduct) DetailData() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.KCGL_SPECIAL_SKU, c.Session)
 
+	var db_session = c.DbSession
+
+	var id int64
+	c.Params.Bind(&id, "id")
+
 	var detail_form SpecialProductDetailForm
+
+	if id != 0 {
+		var special_product models.SpecialProductInfo
+		_, err := db_session.Id(id).Get(&special_product)
+		core.HandleError(err)
+
+		var product models.ProductInfo
+		_, err = db_session.Id(special_product.ProductId).Get(&product)
+		core.HandleError(err)
+
+		detail_form.Sku = product.Sku
+		detail_form.Description = special_product.Description
+		detail_form.IsCreate = false
+	} else {
+		detail_form.IsCreate = true
+	}
 
 	return c.RenderJson(detail_form)
 }
@@ -101,29 +124,40 @@ func (c ErpSpecialProduct) Save() revel.Result {
 		return c.RenderJson(core.JsonResult{Success: false, Message: c.GetValidationErrorMessage()})
 	}
 
-	var sku = detail_form.Sku
+	if detail_form.SpecialId == 0 {
+		var sku = detail_form.Sku
 
-	var product models.ProductInfo
-	has, err := db_session.Where("sku = ?", sku).Get(&product)
-	core.HandleError(err)
+		var product models.ProductInfo
+		has, err := db_session.Where("sku = ?", sku).Get(&product)
+		core.HandleError(err)
 
-	if has == false {
-		return c.RenderJson(core.JsonResult{Success: false, Message: fmt.Sprintf("商品SKU %s 不存在！", sku)})
+		if has == false {
+			return c.RenderJson(core.JsonResult{Success: false, Message: fmt.Sprintf("商品SKU %s 不存在！", sku)})
+		}
+
+		count, err := db_session.Where("product_id = ?", product.Id).Count(&models.SpecialProductInfo{})
+		core.HandleError(err)
+
+		if count != 0 {
+			return c.RenderJson(core.JsonResult{Success: false, Message: fmt.Sprintf("商品SKU %s 之前已经被设置为特殊SKU！", sku)})
+		}
+
+		var special_product models.SpecialProductInfo
+		special_product.ProductId = product.Id
+		special_product.Description = detail_form.Description
+
+		_, err = db_session.Insert(&special_product)
+		core.HandleError(err)
+	} else {
+		var special_product models.SpecialProductInfo
+		_, err := db_session.Where("id = ?", detail_form.SpecialId).Get(&special_product)
+		core.HandleError(err)
+
+		special_product.Description = detail_form.Description
+
+		_, err = db_session.Id(detail_form.SpecialId).Cols("description").Update(&special_product)
+		core.HandleError(err)
 	}
-
-
-
-	var special_product models.SpecialProductInfo
-	count, err := db_session.Where("product_id = ?", product.Id).Count(&models.SpecialProductInfo{})
-	core.HandleError(err)
-
-	if count != 0 {
-		return c.RenderJson(core.JsonResult{Success: false, Message: fmt.Sprintf("商品SKU %s 之前已经被设置为特殊SKU！", sku)})
-	}
-
-	special_product.ProductId = product.Id
-	_, err = db_session.Insert(&special_product)
-	core.HandleError(err)
 
 	return c.RenderJson(detail_form)
 }

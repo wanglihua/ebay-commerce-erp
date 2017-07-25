@@ -47,6 +47,7 @@
                     <div class="row">
                         <div class="col-xs-12">
                             <form class="form-horizontal" role="form" id="specialProductDetailForm">
+                                <input id="special_id" type="hidden" v-model="detail.special_id"/>
 
                                 <div class="row">
                                     <div class="col-xs-12">
@@ -64,7 +65,7 @@
                                         <div class="form-group">
                                             <label for="description" class="col-xs-2 control-label">描述</label>
                                             <div class="col-xs-10">
-                                                <textarea id="description" name="detail.special_product.description" rows="4" class="input-sm form-control" v-model="detail.special_product.description"></textarea>
+                                                <textarea id="description" name="detail.description" rows="4" class="input-sm form-control" v-model="detail.description"></textarea>
                                             </div>
                                         </div>
                                     </div>
@@ -130,7 +131,8 @@
         el: "#page",
         data: {
             "detail": {
-                "special_product": {},
+                "sku": "",
+                "description": "",
                 "sku_list": "" //用户批量添加时
             }
         },
