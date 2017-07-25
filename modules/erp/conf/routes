@@ -178,6 +178,7 @@ GET  /special/product                      ErpSpecialProduct.Index
 POST /special/product/data/list            ErpSpecialProduct.ListData
 POST /special/product/data/detail          ErpSpecialProduct.DetailData
 POST /special/product/save                 ErpSpecialProduct.Save
+POST /special/product/batch/add            ErpSpecialProduct.BatchAdd
 POST /special/product/delete               ErpSpecialProduct.Delete
 
 GET  /product/quality/feedback             ErpProductQualityFeedback.Index

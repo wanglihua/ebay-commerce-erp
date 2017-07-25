@@ -17,9 +17,13 @@
                         <i class="ace-icon fa fa-refresh"></i>
                         刷新
                     </button>
-                    <button class="btn btn-success btn-sm" @click="addSpecialProduct(0)">
+                    <button class="btn btn-success btn-sm" @click="addSpecialProduct()">
                         <i class="ace-icon fa fa-plus"></i>
                         添加
+                    </button>
+                    <button class="btn btn-success btn-sm" @click="showBatchAddSpecialProduct()">
+                        <i class="ace-icon fa fa-plus"></i>
+                        批量添加
                     </button>
                     <button class="btn btn-danger btn-sm" @click="deleteSpecialProduct()">
                         <i class="ace-icon fa fa-trash-o"></i>
@@ -33,11 +37,11 @@
         </div>
     </div>
     <div class="modal fade" id="specialProductDetailDialog">
-        <div class="modal-dialog" style="width: 580px;">
+        <div class="modal-dialog" style="width: 480px;">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="True">&times;</button>
-                    <h4 class="modal-title">特殊SKU添加</h4>
+                    <h4 class="modal-title">特殊SKU详细</h4>
                 </div>
                 <div class="modal-body clearfix">
                     <div class="row">
@@ -47,10 +51,20 @@
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
-                                            <label for="sku_list" class="col-xs-2 control-label">添加SKU列表</label>
+                                            <label for="sku" class="col-xs-2 control-label">SKU</label>
                                             <div class="col-xs-10">
-                                                <textarea id="sku_list" name="detail.sku_list" rows="3" class="input-sm form-control" v-model="detail.sku_list"></textarea>
-                                                <div class="help-block">多个SKU之间用；分割</div>
+                                                <input id="sku" name="detail.sku" type="text" class="input-sm form-control" v-model="detail.sku"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <label for="description" class="col-xs-2 control-label">描述</label>
+                                            <div class="col-xs-10">
+                                                <textarea id="description" name="detail.special_product.description" rows="4" class="input-sm form-control" v-model="detail.special_product.description"></textarea>
                                             </div>
                                         </div>
                                     </div>
@@ -71,13 +85,53 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" id="specialProductBatchAddDialog">
+        <div class="modal-dialog" style="width: 580px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="True">&times;</button>
+                    <h4 class="modal-title">特殊SKU批量添加</h4>
+                </div>
+                <div class="modal-body clearfix">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <form class="form-horizontal" role="form" id="specialProductBatchAddForm">
+
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <label for="sku_list" class="col-xs-2 control-label">添加SKU列表</label>
+                                            <div class="col-xs-10">
+                                                <textarea id="sku_list" name="detail.sku_list" rows="3" class="input-sm form-control" v-model="detail.sku_list"></textarea>
+                                                <div class="help-block">多个SKU之间用；分割</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success btn-sm" @click="batchAddSpecialProduct()">
+                        <i class="ace-icon fa fa-floppy-o"></i>保存
+                    </button>
+                    <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">
+                        <i class="ace-icon fa fa-times"></i>关闭
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 <script type="text/javascript">
     var vm = new Vue({
         el: "#page",
         data: {
             "detail": {
-                "special_product": {}
+                "special_product": {},
+                "sku_list": "" //用户批量添加时
             }
         },
         mounted: function () {
@@ -127,8 +181,8 @@
                 showMask("提交中...");
                 var form = $("#specialProductDetailForm");
                 var valid = validate(form, {
-                    'detail.special_product.product_id': {
-                        required: true, digits: true
+                    'detail.sku': {
+                        required: true
                     }
                 });
 
@@ -150,6 +204,47 @@
                                 else {
                                     $.msg.show(data.message);
                                     $('#specialProductDetailDialog').modal('hide');
+                                    vm.reloadList();
+                                    //return;
+                                }
+                            }
+                        }
+                    );
+                }
+            },
+            showBatchAddSpecialProduct: function () {
+                showMask("加载中...");
+                $("#specialProductBatchAddForm").clearValidation();
+                vm.detail.sku_list = "";
+                $('#specialProductBatchAddDialog').modal(modalOptions);
+            },
+            batchAddSpecialProduct: function () {
+                showMask("提交中...");
+                var form = $("#specialProductBatchAddForm");
+                var valid = validate(form, {
+                    'detail.sku_list': {
+                        required: truse
+                    }
+                });
+
+                if (!valid) {
+                    hideMask();
+                } else {
+                    $.ajax({
+                            url: '{%url "ErpSpecialProduct.BatchAdd"%}',
+                            type: "POST",
+                            processData: false,
+                            contentType: 'application/json',
+                            data: JSON.stringify(vm.detail),
+                            success: function (data) {
+                                hideMask();
+                                if (data.success === false) {
+                                    $.msg.error(data.message);
+                                    //return;
+                                }
+                                else {
+                                    $.msg.show(data.message);
+                                    $('#specialProductBatchAddDialog').modal('hide');
                                     vm.reloadList();
                                     //return;
                                 }
