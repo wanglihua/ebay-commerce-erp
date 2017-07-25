@@ -60,6 +60,7 @@ const (
 	DDLC_ORDER_LOGISTICS_FEE_DIFF    = 131000 // 订单物流费用偏差
 	DDLC_ORDER_QUXIAO                = 131100 // 订单取消，是指取消订单这个动作， 不是指查看已取消的订单
 	DDLC_ORDER_LOGISTICS_MATCH_DEBUG = 131200 // 订单物流匹配调试
+	DDLC_ORDER_LOGISTICS_MATCH       = 131300 // 订单物流匹配
 
 	// 库存管理 模块编号 14
 	KCGL_PRODUCT                  = 140100 // 商品列表

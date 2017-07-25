@@ -712,6 +712,7 @@ WHERE oi.order_id = %d;`
 
 func (c ErpOrder) ReMatchHoldOrderLogistics() revel.Result {
 	pass_service.Check_login_user_pass_or([]int64{pass_res.DDLC_ORDER_VIEW_DETAIL, pass_res.DDLC_ORDER_HOLD}, c.Session)
+	pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_LOGISTICS_MATCH, c.Session)
 
 	var db_session = c.DbSession
 
@@ -784,7 +785,7 @@ func (c ErpOrder) GetPaypalShippingAddress() revel.Result {
 }
 
 func (c ErpOrder) MatchLogistics() revel.Result {
-	pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_YZF, c.Session)
+	pass_service.Check_login_user_pass_and([]int64{pass_res.DDLC_ORDER_YZF, pass_res.DDLC_ORDER_LOGISTICS_MATCH}, c.Session)
 
 	var db_session = c.DbSession
 
