@@ -27,11 +27,11 @@
                     </button>
                     <button class="btn btn-pink btn-sm" onclick="departContainerTransfer()">
                         <i class="ace-icon fa fa-ship"></i>
-                        设为已出发
+                        调拨至在途仓
                     </button>
                     <button class="btn btn-pink btn-sm" onclick="stockContainerTransfer()">
                         <i class="ace-icon fa fa-bank"></i>
-                        设为已到仓
+                        调拨至澳洲仓
                     </button>
                 </div>
                 <div>
@@ -143,7 +143,7 @@
 
         var transfer_id = id_list[0];
 
-        $.msg.confirm("设置为已出发后状态后，将不能修改调拨和明细，并会更新仓库库存，是否继续？", function () {
+        $.msg.confirm("设置为调拨至在途仓状态后，将不能修改调拨和明细，并会更新仓库库存，是否继续？", function () {
             $.ajax({
                 url: '{% url "ErpContainerTransfer.Depart" %}',
                 type: "POST",
@@ -177,7 +177,7 @@
 
         var transfer_id = id_list[0];
 
-        $.msg.confirm("设置为已到仓后状态后，将会更新仓库库存，是否继续？", function () {
+        $.msg.confirm("设置为调拨至澳洲仓状态后，将会更新仓库库存，是否继续？", function () {
             $.ajax({
                 url: '{% url "ErpContainerTransfer.Stock" %}',
                 type: "POST",

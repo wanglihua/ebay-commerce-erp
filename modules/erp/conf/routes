@@ -323,6 +323,7 @@ POST /order/hold/page/data                 ErpOrderHold.PageData
 GET  /order/processed/hold                 ErpOrderProcessedHold.Index
 POST /order/processed/hold/list/data       ErpOrderProcessedHold.ListData
 POST /order/processed/hold/page/data       ErpOrderProcessedHold.PageData
+POST /order/processed/hold/dai/pei/huo     ErpOrderProcessedHold.DaiPeiHuo
 
 # 可合并订单
 GET  /order/khb                            ErpOrderKhb.Index

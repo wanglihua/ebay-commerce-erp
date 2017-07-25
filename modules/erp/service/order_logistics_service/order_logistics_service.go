@@ -263,6 +263,8 @@ func (p_ol *OrderLogisticsService) CalculateListWithOption(order_list []models.O
 			continue
 		}
 
+		var is_previous_hold = order.StatusId == models.ORDER_STATUS_HOLD
+
 		//移除订单原来匹配的物流信息。如果订单接下来被Hold这些信息可能还会被保留
 		//remove_order_logistics(order, db_session) //要禁用，否则会出错
 
@@ -374,6 +376,13 @@ func (p_ol *OrderLogisticsService) CalculateListWithOption(order_list []models.O
 		// 7. 特殊SKU
 		if p_ol.hold_check_special_sku(&order, p_order_logistics_data, db_session) {
 			continue
+		}
+
+		// 如果状态开始是 hold，现在又变为非Hold的，就把状态改成 已处理 Hold
+		if is_previous_hold == true && order.StatusId != models.ORDER_STATUS_HOLD {
+			order.StatusId = models.ORDER_STATUS_PROCESSED_HOLD
+			_, err := db_session.Id(order.Id).Cols("status_id").Update(&order)
+			core.HandleError(err)
 		}
 	}
 

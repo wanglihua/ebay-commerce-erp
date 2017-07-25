@@ -13,6 +13,7 @@ import (
 	"matrix/modules/erp/setting"
 	"strings"
 	"time"
+	"matrix/modules/erp/service/order_history_service"
 )
 
 type ErpOrderProcessedHold struct {
@@ -125,5 +126,43 @@ func (c ErpOrderProcessedHold) ListData() revel.Result {
 	return c.RenderJson(core.GridResult{
 		Data:  order_list,
 		Total: count,
+	})
+}
+
+// 订单从 已处理Hold 状态 搬至 待配货 状态
+func (c ErpOrderProcessedHold) DaiPeiHuo() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_PROCESSED_HOLD, c.Session)
+
+	db_session := c.DbSession
+
+	order_id_list := make([]int64, 0)
+	c.Params.Bind(&order_id_list, "id_list")
+
+	var order_list = make([]models.OrderInfo, 0)
+	err := db_session.In("id", order_id_list).Find(&order_list)
+	core.HandleError(err)
+
+	for _, order := range order_list {
+		if order.StatusId != models.ORDER_STATUS_PROCESSED_HOLD {
+			return c.RenderJson(map[string]interface{}{
+				"success": false,
+				"message": "订单当前状态不能搬至待配货状态！",
+			})
+		}
+	}
+
+	var login_user = core.GetLoginUser(c.Session)
+
+	for _, order := range order_list {
+		order.StatusId = models.ORDER_STATUS_DPH
+		_, err = db_session.Id(order.Id).Cols("status_id").Update(&order)
+		core.HandleError(err)
+
+		order_history_service.Insert_order_history(order, login_user.UserId, fmt.Sprintf("订单 已处理Hold 转 待配货， 工号： %s", login_user.LoginName), db_session)
+	}
+
+	return c.RenderJson(map[string]interface{}{
+		"success": true,
+		"message": "订单搬至待配货成功！",
 	})
 }

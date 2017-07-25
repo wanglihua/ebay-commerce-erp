@@ -91,31 +91,6 @@
                         </div>
 
                         <div class="col-xs-12">
-                            <label for="unlock_express">解锁快递：</label>
-                            <select id="unlock_express" class="input-sm" style="width: 80px;">
-                                <option :value="0">否</option>
-                                <option :value="1">是</option>
-                            </select>
-                            &nbsp;<label for="prefer_stock">指定匹配仓库：</label>
-                            <select id="prefer_stock" class="input-sm" style="width: 120px;" onchange="load_logistics_model_list()">
-                                <option :value="0">当前不指定</option>
-                                <template v-for="stock in page.au_stock_list">
-                                    <option :value="stock.id">{{stock.name}}</option>
-                                </template>
-                            </select>
-                            &nbsp;<label for="prefer_mode">指定物流方式：</label>
-                            <select id="prefer_mode" class="input-sm" style="width: 120px;">
-                                <option :value="0">当前不指定</option>
-                                <template v-for="mode in logistics_mode_list">
-                                    <option :value="mode.id">{{mode.name}}</option>
-                                </template>
-                            </select>
-                            <button class="btn btn-mini btn-purple" onclick="rematch_order_logistics()">
-                                重新匹配物流
-                            </button>
-                        </div>
-
-                        <div class="col-xs-12">
                             <div class="link_query_list">
                                 <a :class="page.hold_type_id == 0 ? 'selected' : ''" href="#" @click="selectHoldType(0)"><img style="border: none;height: 24px;" src="/static/images/icons/all_check.png" class="link_icon" alt="全部"/>全部</a>
                                 <template v-for="hold_type in page.hold_type_list">
@@ -553,7 +528,7 @@
 
                 $.msg.confirm("确认要把订单搬至待配货吗？", function () {
                     $.ajax({
-                        url: '{%url "ErpOrder.DaiPeiHuo"%}',
+                        url: '{%url "ErpOrderProcessedHold.DaiPeiHuo"%}',
                         type: "POST",
                         data: {"id_list": id_list},
                         success: function (data) {
