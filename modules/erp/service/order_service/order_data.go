@@ -62,7 +62,6 @@ FROM erp_order o
 
 	// 加载订单列表额外信息
 	var order_type_id_set = collections.NewIntSet()
-	var hold_type_id_set = collections.NewIntSet()
 	var shop_account_id_set = collections.NewIntSet()
 	var status_id_set = collections.NewIntSet()
 	var stock_id_set = collections.NewIntSet()
@@ -71,10 +70,6 @@ FROM erp_order o
 
 	for _, order := range order_list {
 		order_type_id_set.Add(order.Order.TypeId)
-
-		if order.Order.HoldTypeId.Valid == true {
-			hold_type_id_set.Add(order.Order.HoldTypeId.Int64)
-		}
 
 		shop_account_id_set.Add(order.Order.ShopId)
 		status_id_set.Add(order.Order.StatusId)
@@ -91,7 +86,7 @@ FROM erp_order o
 	}
 
 	var order_type_id_name_map = order_type_service.Get_order_type_id_name_map(order_type_id_set.List(), db_session)
-	var hold_type_id_name_map = order_hold_type_service.Get_order_hold_type_id_name_map(hold_type_id_set.List(), db_session)
+	var hold_type_id_name_map = order_hold_type_service.Get_order_hold_type_id_name_map(db_session)
 	var platform_shop_id_name_map = shop_service.Get_shop_id_name_map(shop_account_id_set.List(), db_session)
 	var status_id_name_map = status_service.Get_status_id_name_map(status_id_set.List(), db_session)
 	var stock_id_name_map = stock_service.Get_stock_id_name_map(stock_id_set.List(), db_session)
@@ -120,13 +115,17 @@ FROM erp_order o
 		order_list[index].TypeName = order_type_id_name_map[order.Order.TypeId]
 
 		// HoldTypeName 暂时两者共用吧，一般不会两者同时要用
+		revel.TRACE.Println("order.Order.PreHoldTypeId", order.Order.PreHoldTypeId)
 		if order.Order.PreHoldTypeId != 0 {
 			order_list[index].HoldTypeName = hold_type_id_name_map[order.Order.PreHoldTypeId]
 		}
 
-		if order.Order.HoldTypeId.Valid == true {
+		revel.TRACE.Println("order.Order.HoldTypeId.Int64", order.Order.HoldTypeId.Int64)
+		if order.Order.HoldTypeId.Valid == true && order.Order.HoldTypeId.Int64 != 0 {
 			order_list[index].HoldTypeName = hold_type_id_name_map[order.Order.HoldTypeId.Int64]
 		}
+
+		revel.TRACE.Println("order_list[index].HoldTypeName", order_list[index].HoldTypeName)
 
 		var platform_shop_name = platform_shop_id_name_map[order.Order.ShopId]
 		order_list[index].PlatformName = platform_shop_name.PlatformName
