@@ -320,6 +320,10 @@ GET  /order/hold                           ErpOrderHold.Index
 POST /order/hold/list/data                 ErpOrderHold.ListData
 POST /order/hold/page/data                 ErpOrderHold.PageData
 
+GET  /order/processed/hold                 ErpOrderProcessedHold.Index
+POST /order/processed/hold/list/data       ErpOrderProcessedHold.ListData
+POST /order/processed/hold/page/data       ErpOrderProcessedHold.PageData
+
 # 可合并订单
 GET  /order/khb                            ErpOrderKhb.Index
 # 这个路由应该放到最后去，否则放在他后面的有的路由会不工作

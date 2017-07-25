@@ -75,6 +75,16 @@ func GetDdlcMenu(res_id_map map[int64]bool, web_session revel.Session) string {
         </li>`)
 	}
 
+	if check_pass_res_menu(pass_res.DDLC_ORDER_PROCESSED_HOLD) {
+		buffer.WriteString(`<li id="ddlc-order-processed-hold-menu" class="">
+            <a href="/order/processed/hold">
+                <i class="menu-icon fa fa-caret-right"></i>
+                已处理Hold
+            </a>
+            <b class="arrow"></b>
+        </li>`)
+	}
+
 	if check_pass_res_menu(pass_res.DDLC_ORDER_DPH) {
 		buffer.WriteString(`<li id="ddlc-order-dph-menu" class="">
             <a href="/order/dph">
