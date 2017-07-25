@@ -101,6 +101,7 @@ func (c ErpSpecialProduct) DetailData() revel.Result {
 		_, err = db_session.Id(special_product.ProductId).Get(&product)
 		core.HandleError(err)
 
+		detail_form.SpecialId = special_product.Id
 		detail_form.Sku = product.Sku
 		detail_form.Description = special_product.Description
 		detail_form.IsCreate = false

@@ -17,7 +17,7 @@
                         <i class="ace-icon fa fa-refresh"></i>
                         刷新
                     </button>
-                    <button class="btn btn-success btn-sm" @click="addSpecialProduct()">
+                    <button class="btn btn-success btn-sm" @click="showSpecialProductDetail(0)">
                         <i class="ace-icon fa fa-plus"></i>
                         添加
                     </button>
@@ -54,7 +54,8 @@
                                         <div class="form-group">
                                             <label for="sku" class="col-xs-2 control-label">SKU</label>
                                             <div class="col-xs-10">
-                                                <input id="sku" name="detail.sku" type="text" class="input-sm form-control" v-model="detail.sku"/>
+                                                <input v-if="detail.is_create" id="sku" name="detail.sku" type="text" class="input-sm form-control" v-model="detail.sku"/>
+                                                <input v-else="detail.is_create" id="sku" name="detail.sku" type="text" class="input-sm form-control" v-model="detail.sku" disabled="disabled"/>
                                             </div>
                                         </div>
                                     </div>
@@ -167,17 +168,25 @@
                     ]
                 }
             );
+
+            $('#specialProductList tbody').on('dblclick', 'tr', function () {
+                var id = $(this).find('td:first-child input:checkbox').val();
+                vm.showSpecialProductDetail(id);
+            });
         },
         methods: {
             reloadList: function () {
                 reloadList('#specialProductList');
             },
-            addSpecialProduct: function () {
+            showSpecialProductDetail: function (id) {
                 showMask("加载中...");
                 $("#specialProductDetailForm").clearValidation();
                 $.ajax({
                         url: '{%url "ErpSpecialProduct.DetailData" %}',
                         type: "POST",
+                        data: {
+                            "id": id
+                        },
                         success: function (result) {
                             hideMask();
                             if (result.success === false) {
