@@ -119,6 +119,11 @@ FROM erp_order o
 	for index, order := range order_list {
 		order_list[index].TypeName = order_type_id_name_map[order.Order.TypeId]
 
+		// HoldTypeName 暂时两者共用吧，一般不会两者同时要用
+		if order.Order.PreHoldTypeId != 0 {
+			order_list[index].HoldTypeName = hold_type_id_name_map[order.Order.PreHoldTypeId]
+		}
+
 		if order.Order.HoldTypeId.Valid == true {
 			order_list[index].HoldTypeName = hold_type_id_name_map[order.Order.HoldTypeId.Int64]
 		}

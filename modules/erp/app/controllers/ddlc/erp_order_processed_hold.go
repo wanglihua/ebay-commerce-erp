@@ -106,7 +106,7 @@ func (c ErpOrderProcessedHold) ListData() revel.Result {
 	filter = core.SqlAnd(filter, fmt.Sprintf("o.status_id = %d", models.ORDER_STATUS_PROCESSED_HOLD))
 
 	if hold_type_id != 0 {
-		filter = core.SqlAnd(filter, fmt.Sprintf("o.hold_type_id = %d", hold_type_id))
+		filter = core.SqlAnd(filter, fmt.Sprintf("o.pre_hold_type_id = %d", hold_type_id))
 	}
 
 	if batch_code != 0 {
