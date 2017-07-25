@@ -114,6 +114,15 @@ func (c ErpOrderLogisticsCompanyExport) ExportExcel() revel.Result {
 	var batch_code int64
 	c.Params.Bind(&batch_code, "batch_code")
 
+	var export_type int64
+	c.Params.Bind(&export_type, "export_type")
+	// 如果 export_type == 0， 是订单物流导出； 如果 export_type == 1 是待配货导出
+
+	var order_id_list_str string
+	if export_type == 1 {
+		c.Params.Bind(&order_id_list_str, "order_id_list")
+	}
+
 	// 判断当前登录用户是否有选择的仓库的权限
 	var stock_list = stock_service.Get_login_user_stock_list(db_session, c.Session)
 	var has_stock = false
@@ -205,10 +214,21 @@ FROM erp_order_logistics ol
     INNER JOIN erp_order o ON o.id = ol.order_id
     LEFT JOIN erp_shop_account sa ON sa.id = o.shop_id
 WHERE o.status_id = %d AND ol.mode_id IN (%s) AND ol.stock_id = %d`
-		sql_get_logistics_list = fmt.Sprintf(sql_get_logistics_list, models.ORDER_STATUS_PHZ, strings.Join(mode_id_str_list, ","), stock_id)
+
+		if export_type == 0 {
+			sql_get_logistics_list = fmt.Sprintf(sql_get_logistics_list, models.ORDER_STATUS_PHZ, strings.Join(mode_id_str_list, ","), stock_id)
+		}
+
+		if export_type == 1 {
+			sql_get_logistics_list = fmt.Sprintf(sql_get_logistics_list, models.ORDER_STATUS_DPH, strings.Join(mode_id_str_list, ","), stock_id)
+		}
 
 		if batch_code != 0 {
 			sql_get_logistics_list += fmt.Sprintf(" AND o.batch_code = %d", batch_code)
+		}
+
+		if export_type == 1 { //待配货的导出
+			sql_get_logistics_list = sql_get_logistics_list + fmt.Sprintf(" AND o.id IN(%s)", order_id_list_str)
 		}
 
 		var order_logistics_list = make([]order_logistics_eparcel_view_item_t, 0)
@@ -358,10 +378,21 @@ FROM erp_order_logistics ol
     INNER JOIN erp_logistics_mode lm ON lm.id = ol.mode_id
     LEFT JOIN erp_shop_account sa ON sa.id = o.shop_id
 WHERE  o.status_id = %d AND ol.mode_id IN (%s) AND ol.stock_id = %d`
-		sql_get_logistics_list = fmt.Sprintf(sql_get_logistics_list, models.ORDER_STATUS_PHZ, strings.Join(mode_id_str_list, ","), stock_id)
+
+		if export_type == 0 {
+			sql_get_logistics_list = fmt.Sprintf(sql_get_logistics_list, models.ORDER_STATUS_PHZ, strings.Join(mode_id_str_list, ","), stock_id)
+		}
+
+		if export_type == 1 {
+			sql_get_logistics_list = fmt.Sprintf(sql_get_logistics_list, models.ORDER_STATUS_DPH, strings.Join(mode_id_str_list, ","), stock_id)
+		}
 
 		if batch_code != 0 {
 			sql_get_logistics_list += fmt.Sprintf(" AND o.batch_code = %d", batch_code)
+		}
+
+		if export_type == 1 { //待配货的导出
+			sql_get_logistics_list = sql_get_logistics_list + fmt.Sprintf(" AND o.id IN(%s)", order_id_list_str)
 		}
 
 		var order_logistics_list = make([]order_logistics_fastway_view_item_t, 0)
@@ -453,10 +484,21 @@ FROM erp_order_logistics ol
     INNER JOIN erp_logistics_mode lm ON lm.id = ol.mode_id
     LEFT JOIN erp_shop_account sa ON sa.id = o.shop_id
 WHERE o.status_id = %d AND ol.mode_id IN (%s) AND ol.stock_id = %d`
-		sql_get_logistics_list = fmt.Sprintf(sql_get_logistics_list, models.ORDER_STATUS_PHZ, strings.Join(mode_id_str_list, ","), stock_id)
+
+		if export_type == 0 {
+			sql_get_logistics_list = fmt.Sprintf(sql_get_logistics_list, models.ORDER_STATUS_PHZ, strings.Join(mode_id_str_list, ","), stock_id)
+		}
+
+		if export_type == 1 {
+			sql_get_logistics_list = fmt.Sprintf(sql_get_logistics_list, models.ORDER_STATUS_DPH, strings.Join(mode_id_str_list, ","), stock_id)
+		}
 
 		if batch_code != 0 {
 			sql_get_logistics_list += fmt.Sprintf(" AND o.batch_code = %d", batch_code)
+		}
+
+		if export_type == 1 { //待配货的导出
+			sql_get_logistics_list = sql_get_logistics_list + fmt.Sprintf(" AND o.id IN(%s)", order_id_list_str)
 		}
 
 		var order_logistics_list = make([]order_logistics_toll_view_item_t, 0)

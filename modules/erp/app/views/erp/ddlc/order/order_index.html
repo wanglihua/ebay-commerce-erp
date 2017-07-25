@@ -80,6 +80,13 @@
                         导出订单编码代码
                     </button>
 
+                    {% if eq .status "dph" %}
+                    <button class="btn btn-pink btn-sm" @click="showExportOrderLogisticsCompany()">
+                        <i class="ace-icon fa fa-file-excel-o"></i>
+                        导出物流公司模板
+                    </button>
+                    {% end %}
+
                     <div class="btn-group">
                         <button data-toggle="dropdown" class="btn btn-info btn-sm dropdown-toggle" aria-expanded="false" style="border-width: 4px;">
                             <i class="ace-icon fa fa-tag"></i><span id="dataFilter" data-status="0">应用标签</span>
@@ -210,6 +217,69 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" id="logisticsCompanyExportOptionDialog">
+        <div class="modal-dialog" style="width: 480px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="True">&times;</button>
+                    <h4 class="modal-title">导出物流公司模板选项</h4>
+                </div>
+                <div class="modal-body clearfix">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <form class="form-horizontal" role="form" id="logisticsCompanyExportOptionForm">
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <label for="export_stock_id" class="col-xs-2 control-label">仓库</label>
+                                            <div class="col-xs-10">
+                                                <select id="export_stock_id" name="logistics_company_export_option.stock_id" class="input-sm form-control" v-model.number="logistics_company_export_option.stock_id">
+                                                    <template v-for="stock in logistics_company_export_option.stock_list">
+                                                        <option :value="stock.id">{{stock.name}}</option>
+                                                    </template>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <label for="export_company_code" class="col-xs-2 control-label">物流公司</label>
+                                            <div class="col-xs-10">
+                                                <select id="export_company_code" name="logistics_company_export_option.company_code" class="input-sm form-control" v-model.number="logistics_company_export_option.company_code">
+                                                    <template v-for="company in logistics_company_export_option.company_list">
+                                                        <option :value="company.code">{{company.name}}</option>
+                                                    </template>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </form>
+                            <form id="formLogisticsCompanyExport" method="post" action='{%url "ErpOrderLogisticsCompanyExport.ExportExcel" %}'>
+                                <input type="hidden" id="company_export_export_type" name="export_type" value="1"/>
+                                <input type="hidden" id="company_export_order_id_list" name="order_id_list"/>
+                                <input type="hidden" id="company_export_stock_id" name="stock_id"/>
+                                <input type="hidden" id="company_export_company_code" name="company_code"/>
+                                <input type="hidden" id="company_export_batch_code" name="batch_code"/>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success btn-sm" @click="exportOrderLogisticsCompany()">
+                        <i class="ace-icon fa fa-floppy-o"></i>导出
+                    </button>
+                    <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">
+                        <i class="ace-icon fa fa-times"></i>取消
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 {%template "erp/ddlc/order/order_index.var" .%}
 <script type="text/javascript">
@@ -236,7 +306,8 @@
             },
             "detail": {
                 "order": {}
-            }
+            },
+            "logistics_company_export_option": {}
         },
         mounted: function () {
             var this_vm = this;
@@ -817,6 +888,60 @@
                         vm.reloadList();
                     }
                 });
+            },
+            showExportOrderLogisticsCompany: function () {
+                var order_id_list = [];
+                $('#orderList tbody tr>td:first-child input:checkbox').each(function () {
+                    if (this.checked) {
+                        order_id_list.push($(this).val());
+                    }
+                });
+
+                if (order_id_list.length === 0) {
+                    $.msg.alert("请选择数据！");
+                    return;
+                }
+
+                showMask("加载中...");
+                $("#logisticsCompanyExportOptionForm").clearValidation();
+                $.ajax({
+                        url: '{%url "ErpOrderLogisticsCompanyExport.ExportOptionData" %}',
+                        type: "POST",
+                        success: function (result) {
+                            hideMask();
+                            if (result.success === false) {
+                                $.msg.error(result.message);
+                                return;
+                            }
+                            vm.logistics_company_export_option = result;
+                            $('#logisticsCompanyExportOptionDialog').modal(modalOptions);
+                        }
+                    }
+                );
+            },
+            exportOrderLogisticsCompany: function () {
+                var order_id_list = [];
+                $('#orderList tbody tr>td:first-child input:checkbox').each(function () {
+                    if (this.checked) {
+                        order_id_list.push($(this).val());
+                    }
+                });
+
+                if (order_id_list.length === 0) {
+                    $.msg.alert("请选择数据！");
+                    return;
+                }
+
+                if ((!vm.logistics_company_export_option.stock_id) || (!vm.logistics_company_export_option.company_code)) {
+                    $.msg.error("请选择要导出的仓库和物流公司！");
+                }
+
+                $("#company_export_stock_id").val(vm.logistics_company_export_option.stock_id);
+                $("#company_export_company_code").val(vm.logistics_company_export_option.company_code);
+                $("#company_export_batch_code").val(vm.page.batch_code);
+                $("#company_export_order_id_list").val(order_id_list);
+                $("#formLogisticsCompanyExport").submit();
+                $('#logisticsCompanyExportOptionDialog').modal('hide');
             }
         }
     });
