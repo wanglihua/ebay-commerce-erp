@@ -64,6 +64,13 @@ func (e PassResInfo) InitData(db_session *xorm.Session) {
 		db_session.Insert(pass)
 
 		pass = new(PassResInfo)
+		pass.Id = pass_res.DDLC_ORDER_PROCESSED_HOLD
+		pass.CateId = pass_res_cate.DDLC
+		pass.Name = "已处理HOLD"
+		pass.Desc = core.MakeNullString("已处理HOLD", true)
+		db_session.Insert(pass)
+
+		pass = new(PassResInfo)
 		pass.Id = pass_res.DDLC_ORDER_DPH
 		pass.CateId = pass_res_cate.DDLC
 		pass.Name = "待配货"

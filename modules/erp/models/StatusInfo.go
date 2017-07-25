@@ -157,6 +157,8 @@ const (
 	ORDER_STATUS_YZF = 3900
 	// 订单状态 Hold
 	ORDER_STATUS_HOLD = 3950
+	// 订单状态 已处理Hold
+	ORDER_STATUS_PROCESSED_HOLD = 3975
 	// 订单状态 待配货
 	ORDER_STATUS_DPH = 4000
 	// 订单状态 配货中
@@ -558,6 +560,13 @@ func (e StatusInfo) InitData(db_session *xorm.Session) {
 		status.Type = STATUS_TYPE_ORDER
 		status.Name = "Hold"
 		status.Desc = core.MakeNullString("订单状态 Hold", true)
+		db_session.Insert(status)
+
+		status = new(StatusInfo)
+		status.Id = ORDER_STATUS_PROCESSED_HOLD
+		status.Type = STATUS_TYPE_ORDER
+		status.Name = "已处理Hold"
+		status.Desc = core.MakeNullString("订单状态 已处理Hold", true)
 		db_session.Insert(status)
 
 		status = new(StatusInfo)
