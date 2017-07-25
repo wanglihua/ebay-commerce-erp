@@ -149,7 +149,18 @@
                             }
                         },
                         {"mDataProp": "p.sku", "title": "商品SKU", "bSearchable": true, "width": 150},
-                        {"mDataProp": "p.cn_name", "title": "商品名称", "bSearchable": true},
+                        {
+                            "mDataProp": "p.cn_name", "title": "商品名称", "bSearchable": true, "width": 350, "sClass": "wrap-word",
+                            "render": function (data, type, row) {
+                                return "<div>" + data + "</div>";
+                            }
+                        },
+                        {
+                            "mDataProp": "sp.description", "title": "描述", "bSearchable": true, "sClass": "wrap-word",
+                            "render": function (data, type, row) {
+                                return "<div>" + data + "</div>";
+                            }
+                        },
                         {"mDataProp": "sp.create_time", "title": "添加时间", "bSearchable": false, "width": 120}
                     ]
                 }
