@@ -129,6 +129,10 @@ func (c ErpContainerTransfer) Detail(id int64) revel.Result {
 	_, err := db_session.Id(transfer_id).Get(&container_transfer)
 	core.HandleError(err)
 
+	if container_transfer.Id == 0 {
+		container_transfer.StatusId = models.CONTAINER_TRANSFER_STATUS_NEW
+	}
+
 	var status models.StatusInfo
 	_, err = db_session.Id(container_transfer.StatusId).Get(&status)
 	core.HandleError(err)
@@ -172,6 +176,7 @@ func (c ErpContainerTransfer) DetailData() revel.Result {
 
 		revel.TRACE.Println("last_container_transfer.Id", last_container_transfer.Id)
 
+		container_transfer.StatusId = models.CONTAINER_TRANSFER_STATUS_NEW
 		container_transfer.PriceDownRate = last_container_transfer.PriceDownRate
 		container_transfer.CostUpRate = last_container_transfer.CostUpRate
 
@@ -238,6 +243,7 @@ func (c ErpContainerTransfer) Save() revel.Result {
 
 	var affected int64
 	if is_create == true {
+		container_transfer.StatusId = models.CONTAINER_TRANSFER_STATUS_NEW
 		affected, err = db_session.Insert(&container_transfer)
 		core.HandleError(err)
 	} else {

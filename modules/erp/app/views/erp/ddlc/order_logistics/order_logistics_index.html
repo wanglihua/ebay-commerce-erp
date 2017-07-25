@@ -812,7 +812,7 @@
             },
             showExportOrderLogisticsCompany: function () {
                 showMask("加载中...");
-                $("#orderLogisticsDetailForm").clearValidation();
+                $("#logisticsCompanyExportOptionForm").clearValidation();
                 $.ajax({
                         url: '{%url "ErpOrderLogisticsCompanyExport.ExportOptionData" %}',
                         type: "POST",
