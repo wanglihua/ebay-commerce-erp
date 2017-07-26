@@ -1131,8 +1131,40 @@ func (c ErpOrder) PickupOptionData() revel.Result {
 }
 
 func (c ErpOrder) Pickup() revel.Result {
+	var db_session = c.DbSession
+
+	order_id_list := make([]int64, 0)
+	c.Params.Bind(&order_id_list, "id_list")
+	revel.TRACE.Println("order_id_list", order_id_list)
+
 	var stock_id int64
 	c.Params.Bind(&stock_id, "stock_id")
+	revel.TRACE.Println("stock_id", stock_id)
+
+	var order_list = make([]models.OrderInfo, 0)
+	core.HandleError(db_session.In("id", order_id_list).Find(&order_list))
+
+	for _, order := range order_list {
+		order.StatusId = models.ORDER_STATUS_HOLD
+		order.HoldTypeId = core.MakeNullInt(models.ORDER_HOLD_TYPE_PICK_UP, true)
+		order.StockId = stock_id
+		order.CompanyId = 0
+		order.ModeId = 0
+
+		_, err := db_session.Id(order.Id).Cols("status_id", "hold_type_id", "stock_id", "company_id", "mode_id").Update(&order)
+		core.HandleError(err)
+
+		var order_logistics models.OrderLogisticsInfo
+		_, err = db_session.Where(fmt.Sprintf("order_id = %d", order.Id)).Get(&order_logistics)
+		core.HandleError(err)
+
+		order_logistics.StockId = stock_id
+		order_logistics.CompanyId = 0
+		order_logistics.ModeId = 0
+
+		_, err = db_session.Id(order_logistics.Id).Cols("stock_id", "company_id", "mode_id").Update(&order_logistics)
+		core.HandleError(err)
+	}
 
 	return c.RenderJson(map[string]interface{}{
 		"success": true,
