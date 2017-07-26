@@ -13,6 +13,7 @@ import (
 	"matrix/modules/erp/setting"
 	"strings"
 	"time"
+	"matrix/modules/erp/service/order_history_service"
 )
 
 type ErpOrderHold struct {
@@ -125,5 +126,50 @@ func (c ErpOrderHold) ListData() revel.Result {
 	return c.RenderJson(core.GridResult{
 		Data:  order_list,
 		Total: count,
+	})
+}
+
+// 订单从 Hold 状态 搬至 待配货 状态
+// 但 信封、快递、国际件、pick up 四个 Hold 类型除外
+func (c ErpOrderHold) Processed() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_HOLD, c.Session)
+
+	db_session := c.DbSession
+
+	order_id_list := make([]int64, 0)
+	c.Params.Bind(&order_id_list, "id_list")
+
+	var order_list = make([]models.OrderInfo, 0)
+	err := db_session.In("id", order_id_list).Find(&order_list)
+	core.HandleError(err)
+
+	for _, order := range order_list {
+		if order.StatusId != models.ORDER_STATUS_HOLD ||
+			( order.StatusId == models.ORDER_STATUS_HOLD &&
+				(order.HoldTypeId.Int64 == models.ORDER_HOLD_TYPE_ENVELOPE ||
+					order.HoldTypeId.Int64 == models.ORDER_HOLD_TYPE_EXPRESS ||
+					order.HoldTypeId.Int64 == models.ORDER_HOLD_TYPE_INTERNATIONAL ||
+					order.HoldTypeId.Int64 == models.ORDER_HOLD_TYPE_PICK_UP)) {
+			return c.RenderJson(map[string]interface{}{
+				"success": false,
+				"message": "订单当前状态或Hold类型不能搬至已处理Hold状态！",
+			})
+		}
+	}
+
+	var login_user = core.GetLoginUser(c.Session)
+
+	for _, order := range order_list {
+		order.PreHoldTypeId = order.HoldTypeId.Int64
+		order.StatusId = models.ORDER_STATUS_PROCESSED_HOLD
+		_, err = db_session.Id(order.Id).Cols("pre_hold_type_id", "status_id").Update(&order)
+		core.HandleError(err)
+
+		order_history_service.Insert_order_history(order, login_user.UserId, fmt.Sprintf("订单 Hold 转 已处理Hold， 工号： %s", login_user.LoginName), db_session)
+	}
+
+	return c.RenderJson(map[string]interface{}{
+		"success": true,
+		"message": "订单搬至已处理Hold成功！",
 	})
 }

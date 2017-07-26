@@ -18,9 +18,9 @@
                         刷新
                     </button>
 
-                    <button class="btn btn-purple btn-sm" @click="daiPeiHuo()">
+                    <button class="btn btn-purple btn-sm" @click="processedHold()">
                         <i class="ace-icon fa fa-shopping-basket"></i>
-                        待配货
+                        已处理Hold
                     </button>
 
                     {% if .is_button_quxiao_visible %}
@@ -538,7 +538,7 @@
                 vm.page.hold_type_id = selected_hold_type_id;
                 vm.refreshList();
             },
-            daiPeiHuo: function () {
+            processedHold: function () {
                 var id_list = [];
                 $('#orderList tbody tr>td:first-child input:checkbox').each(function () {
                     if (this.checked) {
@@ -551,9 +551,9 @@
                     return;
                 }
 
-                $.msg.confirm("确认要把订单搬至待配货吗？", function () {
+                $.msg.confirm("确认要把订单搬至已处理Hold吗？", function () {
                     $.ajax({
-                        url: '{%url "ErpOrder.DaiPeiHuo"%}',
+                        url: '{%url "ErpOrderHold.Processed"%}',
                         type: "POST",
                         data: {"id_list": id_list},
                         success: function (data) {

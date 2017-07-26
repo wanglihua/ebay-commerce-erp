@@ -16,6 +16,7 @@ import (
 	"matrix/modules/erp/service/pick_fee_service"
 	"matrix/modules/erp/service/inventory_service"
 	"matrix/modules/erp/service/stock_service"
+	"matrix/modules/erp/service/order_history_service"
 )
 
 type OrderLogisticsService struct {
@@ -390,6 +391,9 @@ func (p_ol *OrderLogisticsService) CalculateListWithOption(order_list []models.O
 			order.StatusId = models.ORDER_STATUS_PROCESSED_HOLD
 			_, err := db_session.Id(order.Id).Cols("pre_hold_type_id", "status_id").Update(&order)
 			core.HandleError(err)
+
+			var login_user = p_ol.LoginUser
+			order_history_service.Insert_order_history(order, login_user.UserId, fmt.Sprintf("匹配物流订单 Hold 转 已处理Hold， 工号：%s", login_user.LoginName), db_session)
 		}
 	}
 

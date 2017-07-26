@@ -319,6 +319,7 @@ POST /order/data/list                      ErpOrder.ListData
 GET  /order/hold                           ErpOrderHold.Index
 POST /order/hold/list/data                 ErpOrderHold.ListData
 POST /order/hold/page/data                 ErpOrderHold.PageData
+POST /order/hold/processed                 ErpOrderHold.Processed
 
 GET  /order/processed/hold                 ErpOrderProcessedHold.Index
 POST /order/processed/hold/list/data       ErpOrderProcessedHold.ListData
