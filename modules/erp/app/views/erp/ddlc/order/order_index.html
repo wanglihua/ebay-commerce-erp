@@ -128,12 +128,14 @@
                                     </template>
                                 </select>
                                 {% end %}
+                                {%/*
                                 <select id="batch_code" name="page.batch_code" v-model.number="page.batch_code" style="width: 135px;" @change="refreshList()">
                                     <option :value="0">-导入批次号-</option>
                                     <template v-for="batch_code in page.batch_code_list">
                                         <option :value="batch_code">{{batch_code}}</option>
                                     </template>
                                 </select>
+                                */%}
                                 <select id="query_criteria_id" name="page.query_criteria_id" v-model.number="page.query_criteria_id" style="width:120px;">
                                     <option value="0">-查询条件-</option>
                                     <template v-for="criteria in page.query_criteria_list">
