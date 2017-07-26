@@ -333,7 +333,13 @@ func (c ErpOrder) ListData() revel.Result {
 
 	// 分仓库查看
 	// 只有待配货，配货中，已发货，已完成的订单可以分仓库查看
-	if status_id == models.ORDER_STATUS_DPH || status_id == models.ORDER_STATUS_PHZ || status_id == models.ORDER_STATUS_YFH || status_id == models.ORDER_STATUS_YWC {
+	if status_id == models.ORDER_STATUS_DPH ||
+		status_id == models.ORDER_STATUS_PHZ ||
+		status_id == models.ORDER_STATUS_YFH ||
+		status_id == models.ORDER_STATUS_YWC ||
+		(
+			status_id == models.ORDER_STATUS_HOLD &&
+				hold_type_id == models.ORDER_HOLD_TYPE_PICK_UP) {
 		// 不同的仓库拣货人员可以看到不同的订单，管理员、销售、客服 除外
 		var login_user = core.GetLoginUser(c.Session)
 		var is_admin = pass_service.Is_user_admin(login_user.UserId)                   // 是不是管理员
