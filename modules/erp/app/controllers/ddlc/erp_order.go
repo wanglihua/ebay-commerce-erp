@@ -860,9 +860,25 @@ func (c ErpOrder) PeiHuo() revel.Result {
 	order_id_list := make([]int64, 0)
 	c.Params.Bind(&order_id_list, "id_list")
 
-	var order_list = make([]models.OrderInfo, 0)
-	err := db_session.In("id", order_id_list).Find(&order_list)
+	count, err := db_session.Where(fmt.Sprintf("status_id = %d", models.ORDER_STATUS_PHZ)).Count(&models.OrderInfo{})
 	core.HandleError(err)
+
+	if count != 0 {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "有订单还在配货中，不能搬至已配货！",
+		})
+	}
+
+	var order_list = make([]models.OrderInfo, 0)
+
+	if len(order_id_list) != 0 {
+		err = db_session.In("id", order_id_list).Find(&order_list)
+		core.HandleError(err)
+	} else {
+		err = db_session.Where(fmt.Sprintf("status_id = %d", models.ORDER_STATUS_DPH)).Find(&order_list)
+		core.HandleError(err)
+	}
 
 	for _, order := range order_list {
 		if order.StatusId != models.ORDER_STATUS_DPH &&
@@ -890,6 +906,53 @@ func (c ErpOrder) PeiHuo() revel.Result {
 	return c.RenderJson(map[string]interface{}{
 		"success": true,
 		"message": "订单配货成功！",
+	})
+}
+
+func (c ErpOrder) ForcePeiHuo() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_FORCE_PEIHUO, c.Session)
+
+	db_session := c.DbSession
+
+	order_id_list := make([]int64, 0)
+	c.Params.Bind(&order_id_list, "id_list")
+
+	var order_list = make([]models.OrderInfo, 0)
+
+	if len(order_id_list) != 0 {
+		err := db_session.In("id", order_id_list).Find(&order_list)
+		core.HandleError(err)
+	} else {
+		err := db_session.Where(fmt.Sprintf("status_id = %d", models.ORDER_STATUS_DPH)).Find(&order_list)
+		core.HandleError(err)
+	}
+
+	for _, order := range order_list {
+		if order.StatusId != models.ORDER_STATUS_DPH &&
+			(!(order.StatusId == models.ORDER_STATUS_HOLD && order.HoldTypeId.Valid &&
+				(order.HoldTypeId.Int64 == models.ORDER_HOLD_TYPE_ENVELOPE ||
+					order.HoldTypeId.Int64 == models.ORDER_HOLD_TYPE_EXPRESS ||
+					order.HoldTypeId.Int64 == models.ORDER_HOLD_TYPE_INTERNATIONAL ||
+					order.HoldTypeId.Int64 == models.ORDER_HOLD_TYPE_PICK_UP))) {
+			return c.RenderJson(map[string]interface{}{
+				"success": false,
+				"message": "订单当前状态不能配货！",
+			})
+		}
+	}
+	var login_user = core.GetLoginUser(c.Session)
+
+	for _, order := range order_list {
+		order.StatusId = models.ORDER_STATUS_PHZ
+		_, err := db_session.Id(order.Id).Cols("status_id").Update(&order)
+		core.HandleError(err)
+
+		order_history_service.Insert_order_history(order, login_user.UserId, fmt.Sprintf("订单配货， 工号： %s", login_user.LoginName), db_session)
+	}
+
+	return c.RenderJson(map[string]interface{}{
+		"success": true,
+		"message": "订单强制配货成功！",
 	})
 }
 

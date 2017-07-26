@@ -38,6 +38,10 @@
                         <i class="ace-icon fa fa-shopping-basket"></i>
                         配货
                     </button>
+                    <button class="btn btn-purple btn-sm" @click="forcePeiHuo()">
+                        <i class="ace-icon fa fa-shopping-basket"></i>
+                        强制配货
+                    </button>
                     <button class="btn btn-purple btn-sm" @click="faHuo()">
                         <i class="ace-icon fa fa-shopping-basket"></i>
                         发货
@@ -707,14 +711,49 @@
                     }
                 });
 
+                var confirm_msg = "";
                 if (id_list.length === 0) {
-                    $.msg.alert("请选择数据！");
-                    return;
+                    confirm_msg = "当前没有选择订单，确认要将待配货的订单全部配货吗？";
+                } else if (id_list.length > 0) {
+                    confirm_msg = "当前选择了订单，未选择订单将在当前选择订单完成后才能配货，确认要继续吗？";
                 }
 
-                $.msg.confirm("确认要配货吗？", function () {
+                $.msg.confirm(confirm_msg, function () {
                     $.ajax({
                         url: '{%url "ErpOrder.PeiHuo"%}',
+                        type: "POST",
+                        data: {"id_list": id_list},
+                        success: function (data) {
+                            if (data.success === false) {
+                                $.msg.error(data.message);
+                                return;
+                            }
+                            else {
+                                $.msg.show(data.message);
+                            }
+                            vm.reloadList();
+                        }
+                    });
+                });
+            },
+            forcePeiHuo: function () {
+                var id_list = [];
+                $('#orderList tbody tr>td:first-child input:checkbox').each(function () {
+                    if (this.checked) {
+                        id_list.push($(this).val());
+                    }
+                });
+
+                var confirm_msg = "";
+                if (id_list.length === 0) {
+                    confirm_msg = "当前没有选择订单，确认要将待配货的订单全部配货吗？";
+                } else if (id_list.length > 0) {
+                    confirm_msg = "当前选择了订单，未选择订单将在当前选择订单完成后才能配货，确认要继续吗？";
+                }
+
+                $.msg.confirm(confirm_msg, function () {
+                    $.ajax({
+                        url: '{%url "ErpOrder.ForcePeiHuo"%}',
                         type: "POST",
                         data: {"id_list": id_list},
                         success: function (data) {
