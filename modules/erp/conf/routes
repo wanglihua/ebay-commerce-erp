@@ -351,6 +351,7 @@ POST /order/fa/huo                         ErpOrder.FaHuo
 POST /order/shi/ji/wu/huo                  ErpOrder.ShiJiWuHuo
 POST /order/wan/cheng                      ErpOrder.WanCheng
 POST /order/qu/xiao                        ErpOrder.QuXiao
+POST /order/pick/up                        ErpOrder.Pickup
 POST /order/rematch/hold/order/logistics   ErpOrder.ReMatchHoldOrderLogistics
 
 POST /order/shipping/address/save           ErpOrderShippingAddress.Save

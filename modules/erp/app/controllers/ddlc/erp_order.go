@@ -1118,6 +1118,13 @@ func (c ErpOrder) WanCheng() revel.Result {
 	})
 }
 
+func (c ErpOrder) Pickup() revel.Result {
+	return c.RenderJson(map[string]interface{}{
+		"success": true,
+		"message": "设置为 PICK UP 成功！",
+	})
+}
+
 // #10 订单作废的功能
 func (c ErpOrder) QuXiao() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_QUXIAO, c.Session)

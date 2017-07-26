@@ -38,7 +38,7 @@
                         <i class="ace-icon fa fa-shopping-basket"></i>
                         配货
                     </button>
-                    <button class="btn btn-purple btn-sm" @click="forcePeiHuo()">
+                    <button class="btn btn-pink btn-sm" @click="forcePeiHuo()">
                         <i class="ace-icon fa fa-shopping-basket"></i>
                         强制配货
                     </button>
@@ -49,6 +49,10 @@
                     <button class="btn btn-pink btn-sm" @click="shiJiWuHuo()">
                         <i class="ace-icon fa fa-shopping-basket"></i>
                         实际无货
+                    </button>
+                    <button class="btn btn-purple btn-sm" @click="makePickup()">
+                        <i class="ace-icon fa fa-shopping-basket"></i>
+                        PICK UP
                     </button>
                     {% end %}
                     {% if eq .status "phz" %}
@@ -878,6 +882,37 @@
                 $.msg.confirm("确认要取消订单吗？", function () {
                     $.ajax({
                         url: '{%url "ErpOrder.QuXiao"%}',
+                        type: "POST",
+                        data: {"id_list": id_list},
+                        success: function (data) {
+                            if (data.success === false) {
+                                $.msg.error(data.message);
+                                return;
+                            }
+                            else {
+                                $.msg.show(data.message);
+                            }
+                            vm.reloadList();
+                        }
+                    });
+                });
+            },
+            makePickup: function () {
+                var id_list = [];
+                $('#orderList tbody tr>td:first-child input:checkbox').each(function () {
+                    if (this.checked) {
+                        id_list.push($(this).val());
+                    }
+                });
+
+                if (id_list.length === 0) {
+                    $.msg.alert("请选择数据！");
+                    return;
+                }
+
+                $.msg.confirm("确认要设置为 PICK UP 吗？", function () {
+                    $.ajax({
+                        url: '{%url "ErpOrder.Pickup"%}',
                         type: "POST",
                         data: {"id_list": id_list},
                         success: function (data) {

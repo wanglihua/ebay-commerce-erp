@@ -464,3 +464,7 @@ div.gridToolBar .dropdown-menu > li > a:hover {
     word-break: break-all;
     word-wrap: break-word;
 }
+
+.pagination > li > a {
+    cursor: pointer;
+}
