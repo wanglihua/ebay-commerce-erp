@@ -9,6 +9,7 @@ import (
 	"matrix/modules/auth/pass_res"
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/erp/models"
+	"matrix/modules/erp/service/order_service"
 )
 
 type ErpOrderItem struct {
@@ -57,6 +58,18 @@ func (c ErpOrderItem) Save() revel.Result {
 	var order_item_form OrderItemForm
 	err := json.Unmarshal(c.GetRequestBody(), &order_item_form)
 	core.HandleError(err)
+
+	// 判断订单当前状态是不是可以修改
+	var order models.OrderInfo
+	_, err = db_session.Id(order_item_form.OrderId).Get(&order)
+	core.HandleError(err)
+
+	if order_service.Can_order_modify(&order) == false {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "订单当前状态不能修改订单明细！",
+		})
+	}
 
 	c.Validation.Required(order_item_form.Sku).Message("SKU 不能为空！")
 	c.Validation.Required(order_item_form.Qty).Message("数量 不能为空！")
@@ -112,7 +125,23 @@ func (c ErpOrderItem) Delete() revel.Result {
 
 	var db_session = c.DbSession
 
-	_, err := db_session.Id(item_id).Delete(new(models.OrderItemInfo))
+	//判断订单当前状态是不是可以修改
+	var order_item models.OrderItemInfo
+	_, err := db_session.Id(item_id).Get(&order_item)
+	core.HandleError(err)
+
+	var order models.OrderInfo
+	_, err = db_session.Id(order_item.OrderId).Get(&order)
+	core.HandleError(err)
+
+	if order_service.Can_order_modify(&order) == false {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "订单当前状态不能删除订单明细！",
+		})
+	}
+
+	_, err = db_session.Id(item_id).Delete(new(models.OrderItemInfo))
 	core.HandleError(err)
 
 	return c.RenderJson(map[string]interface{}{

@@ -7,6 +7,7 @@ import (
 	"matrix/modules/auth/pass_res"
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/erp/models"
+	"matrix/modules/erp/service/order_service"
 )
 
 type ErpOrderShippingAddress struct {
@@ -38,6 +39,22 @@ func (c ErpOrderShippingAddress) Save() revel.Result {
 		affected, err = db_session.Insert(&order_shipping_address)
 		core.HandleError(err)
 	} else {
+		//判断订单当前状态是不是可以修改
+		var order_address_in_db models.OrderShippingAddressInfo
+		_, err := db_session.Id(order_shipping_address.Id).Get(&order_address_in_db)
+		core.HandleError(err)
+
+		var order models.OrderInfo
+		_, err = db_session.Id(order_address_in_db.OrderId).Get(&order)
+		core.HandleError(err)
+
+		if order_service.Can_order_modify(&order) == false {
+			return c.RenderJson(map[string]interface{}{
+				"success": false,
+				"message": "订单当前状态不能删除订单地址！",
+			})
+		}
+
 		var update_cols = []string{"name", "street1", "street2", "city_name", "province", "country", "country_name", "postal_code", "phone"}
 		affected, err = db_session.Id(order_shipping_address.Id).Cols(update_cols...).Update(&order_shipping_address)
 		core.HandleError(err)

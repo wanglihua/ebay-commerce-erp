@@ -559,6 +559,10 @@ func (c ErpOrder) Detail(order_id int64) revel.Result {
 	c.RenderArgs["order_id"] = order_id
 	c.RenderArgs["is_hold"] = order.StatusId == models.ORDER_STATUS_HOLD
 	c.RenderArgs["is_dph"] = order.StatusId == models.ORDER_STATUS_DPH
+
+	// 不是 已发货 已完成 已取消 状态的都能修改
+	c.RenderArgs["can_modify"] = order_service.Can_order_modify(&order)
+
 	return c.RenderTemplate("erp/ddlc/order/order_detail.html")
 }
 
