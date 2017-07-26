@@ -1118,7 +1118,22 @@ func (c ErpOrder) WanCheng() revel.Result {
 	})
 }
 
+func (c ErpOrder) PickupOptionData() revel.Result {
+	var db_session = c.DbSession
+
+	var stock_list = make([]models.StockInfo, 0)
+	core.HandleError(db_session.Where(fmt.Sprintf("stock_type_id = %d", models.STOCK_TYPE_AU)).Find(&stock_list))
+
+	return c.RenderJson(map[string]interface{}{
+		"success":    true,
+		"stock_list": stock_list,
+	})
+}
+
 func (c ErpOrder) Pickup() revel.Result {
+	var stock_id int64
+	c.Params.Bind(&stock_id, "stock_id")
+
 	return c.RenderJson(map[string]interface{}{
 		"success": true,
 		"message": "设置为 PICK UP 成功！",

@@ -50,7 +50,7 @@
                         <i class="ace-icon fa fa-shopping-basket"></i>
                         实际无货
                     </button>
-                    <button class="btn btn-purple btn-sm" @click="makePickup()">
+                    <button class="btn btn-purple btn-sm" @click="showPickupOption()">
                         <i class="ace-icon fa fa-shopping-basket"></i>
                         PICK UP
                     </button>
@@ -290,6 +290,49 @@
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="pickupOptionDialog">
+        <div class="modal-dialog" style="width: 480px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="True">&times;</button>
+                    <h4 class="modal-title">设置订单PICK UP</h4>
+                </div>
+                <div class="modal-body clearfix">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <form class="form-horizontal" role="form" id="pickupOptionForm">
+
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <label for="export_stock_id" class="col-xs-2 control-label">仓库</label>
+                                            <div class="col-xs-10">
+                                                <select id="pickup_stock_id" name="pickup_option.stock_id" class="input-sm form-control" v-model.number="pickup_option.stock_id">
+                                                    <template v-for="stock in pickup_option.stock_list">
+                                                        <option :value="stock.id">{{stock.name}}</option>
+                                                    </template>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success btn-sm" @click="makePickup()">
+                        <i class="ace-icon fa fa-floppy-o"></i>导出
+                    </button>
+                    <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">
+                        <i class="ace-icon fa fa-times"></i>取消
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 {%template "erp/ddlc/order/order_index.var" .%}
 <script type="text/javascript">
@@ -317,7 +360,8 @@
             "detail": {
                 "order": {}
             },
-            "logistics_company_export_option": {}
+            "logistics_company_export_option": {},
+            "pickup_option": {}
         },
         mounted: function () {
             var this_vm = this;
@@ -897,6 +941,37 @@
                     });
                 });
             },
+            showPickupOption: function () {
+                var id_list = [];
+                $('#orderList tbody tr>td:first-child input:checkbox').each(function () {
+                    if (this.checked) {
+                        id_list.push($(this).val());
+                    }
+                });
+
+                if (id_list.length === 0) {
+                    $.msg.alert("请选择数据！");
+                    return;
+                }
+
+                showMask("加载中...");
+                $("#pickupOptionForm").clearValidation();
+                $.ajax({
+                        url: '{%url "ErpOrderLogisticsCompanyExport.ExportOptionData" %}',
+                        type: "POST",
+                        success: function (result) {
+                            hideMask();
+                            if (result.success === false) {
+                                $.msg.error(result.message);
+                                return;
+                            }
+                            vm.pickup_option = result;
+                            $('#pickupOptionDialog').modal(modalOptions);
+                        }
+                    }
+                );
+
+            },
             makePickup: function () {
                 var id_list = [];
                 $('#orderList tbody tr>td:first-child input:checkbox').each(function () {
@@ -910,23 +985,39 @@
                     return;
                 }
 
-                $.msg.confirm("确认要设置为 PICK UP 吗？", function () {
-                    $.ajax({
-                        url: '{%url "ErpOrder.Pickup"%}',
-                        type: "POST",
-                        data: {"id_list": id_list},
-                        success: function (data) {
-                            if (data.success === false) {
-                                $.msg.error(data.message);
-                                return;
-                            }
-                            else {
-                                $.msg.show(data.message);
-                            }
-                            vm.reloadList();
-                        }
-                    });
+                var form = $("#pickupOptionForm");
+                var valid = validate(form, {
+                    'pickup_option.stock_id': {
+                        required: true, digits: true
+                    }
                 });
+
+                if (!valid) {
+                    hideMask();
+                } else {
+                    $('#pickupOptionDialog').modal("hide");
+
+                    $.msg.confirm("确认要设置为 PICK UP 吗？", function () {
+                        $.ajax({
+                            url: '{%url "ErpOrder.Pickup"%}',
+                            type: "POST",
+                            data: {
+                                "id_list": id_list,
+                                "stock_id": $("#pickup_stock_id").val()
+                            },
+                            success: function (data) {
+                                if (data.success === false) {
+                                    $.msg.error(data.message);
+                                    return;
+                                }
+                                else {
+                                    $.msg.show(data.message);
+                                }
+                                vm.reloadList();
+                            }
+                        });
+                    });
+                }
             },
             exportOrderCode: function () {
                 var params = $.param({"status": "{%.status%}", "batch_code": vm.page.batch_code});
