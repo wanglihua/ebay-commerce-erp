@@ -450,6 +450,20 @@ func (e PassResInfo) InitData(db_session *xorm.Session) {
 		db_session.Insert(pass)
 
 		pass = new(PassResInfo)
+		pass.Id = pass_res.HGBG_CONTAINER_TRANSFER_TO_ZT_STOCK
+		pass.CateId = pass_res_cate.HGBG
+		pass.Name = "集装箱调拨 调拨至在途仓"
+		pass.Desc = core.MakeNullString("集装箱调拨 调拨至在途仓", true)
+		db_session.Insert(pass)
+
+		pass = new(PassResInfo)
+		pass.Id = pass_res.HGBG_CONTAINER_TRANSFER_TO_AU_STOCK
+		pass.CateId = pass_res_cate.HGBG
+		pass.Name = "集装箱调拨 调拨至澳洲仓"
+		pass.Desc = core.MakeNullString("集装箱调拨 调拨至澳洲仓", true)
+		db_session.Insert(pass)
+
+		pass = new(PassResInfo)
 		pass.Id = pass_res.HGBG_PRODUCT_INVOICE
 		pass.CateId = pass_res_cate.HGBG
 		pass.Name = "商品是否开票"

@@ -25,11 +25,11 @@
                         <i class="ace-icon fa fa-trash-o"></i>
                         删除
                     </button>
-                    <button class="btn btn-pink btn-sm" onclick="departContainerTransfer()">
+                    <button class="btn btn-pink btn-sm" onclick="departContainerTransfer()" {% .to_zt_stock_disabled %}>
                         <i class="ace-icon fa fa-ship"></i>
                         调拨至在途仓
                     </button>
-                    <button class="btn btn-pink btn-sm" onclick="stockContainerTransfer()">
+                    <button class="btn btn-pink btn-sm" onclick="stockContainerTransfer()"  {% .to_au_stock_disabled %}>
                         <i class="ace-icon fa fa-bank"></i>
                         调拨至澳洲仓
                     </button>

@@ -95,9 +95,11 @@ const (
 	SPPZ_SEA_CONTAINER_COST = 151000 // 商品状态
 
 	// 海关报关
-	HGBG_PRODUCT_HS_CODE        = 160100 // 商品海关编码
-	HGBG_HS_CODE_CN_REPORT_ELEM = 160200 // 中国海关编码
-	HGBG_HS_CODE_AU_DUTY        = 160300 // 澳洲海关编码
-	HGBG_CONTAINER_TRANSFER     = 160400 // 集装箱调拨
-	HGBG_PRODUCT_INVOICE        = 160500 // 商品是否开票
+	HGBG_PRODUCT_HS_CODE                = 160100 // 商品海关编码
+	HGBG_HS_CODE_CN_REPORT_ELEM         = 160200 // 中国海关编码
+	HGBG_HS_CODE_AU_DUTY                = 160300 // 澳洲海关编码
+	HGBG_CONTAINER_TRANSFER             = 160400 // 集装箱调拨
+	HGBG_CONTAINER_TRANSFER_TO_ZT_STOCK = 160410 // 集装箱调拨 调拨至在途仓
+	HGBG_CONTAINER_TRANSFER_TO_AU_STOCK = 160420 // 集装箱调拨 调拨至澳洲仓
+	HGBG_PRODUCT_INVOICE                = 160500 // 商品是否开票
 )

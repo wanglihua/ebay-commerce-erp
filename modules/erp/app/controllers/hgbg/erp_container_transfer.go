@@ -20,6 +20,21 @@ type ErpContainerTransfer struct {
 func (c ErpContainerTransfer) Index() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.HGBG_CONTAINER_TRANSFER, c.Session)
 
+	var can_to_zt_stock = pass_service.Is_login_user_has_pass(pass_res.HGBG_CONTAINER_TRANSFER_TO_ZT_STOCK, c.Session)
+	var can_to_au_stock = pass_service.Is_login_user_has_pass(pass_res.HGBG_CONTAINER_TRANSFER_TO_AU_STOCK, c.Session)
+
+	if can_to_zt_stock {
+		c.RenderArgs["to_zt_stock_disabled"] = ""
+	} else {
+		c.RenderArgs["to_zt_stock_disabled"] = `disabled="disabled"`
+	}
+
+	if can_to_au_stock {
+		c.RenderArgs["to_au_stock_disabled"] = ""
+	} else {
+		c.RenderArgs["to_au_stock_disabled"] = `disabled="disabled"`
+	}
+
 	return c.RenderTemplate("erp/hgbg/container_transfer/container_transfer_index.html")
 }
 
@@ -289,7 +304,7 @@ func (c ErpContainerTransfer) Delete() revel.Result {
 }
 
 func (c ErpContainerTransfer) Depart() revel.Result {
-	pass_service.Check_login_user_pass(pass_res.HGBG_CONTAINER_TRANSFER, c.Session)
+	pass_service.Check_login_user_pass(pass_res.HGBG_CONTAINER_TRANSFER_TO_ZT_STOCK, c.Session)
 
 	db_session := c.DbSession
 
@@ -328,7 +343,7 @@ func (c ErpContainerTransfer) Depart() revel.Result {
 }
 
 func (c ErpContainerTransfer) Stock() revel.Result {
-	pass_service.Check_login_user_pass(pass_res.HGBG_CONTAINER_TRANSFER, c.Session)
+	pass_service.Check_login_user_pass(pass_res.HGBG_CONTAINER_TRANSFER_TO_AU_STOCK, c.Session)
 
 	db_session := c.DbSession
 
