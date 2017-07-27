@@ -1141,6 +1141,8 @@ func (c ErpOrder) PickupOptionData() revel.Result {
 }
 
 func (c ErpOrder) Pickup() revel.Result {
+	pass_service.Check_login_user_pass_or([]int64{pass_res.DDLC_ORDER_DPH, pass_res.DDLC_ORDER_HOLD}, c.Session)
+
 	var db_session = c.DbSession
 
 	order_id_list := make([]int64, 0)
@@ -1153,6 +1155,24 @@ func (c ErpOrder) Pickup() revel.Result {
 
 	var order_list = make([]models.OrderInfo, 0)
 	core.HandleError(db_session.In("id", order_id_list).Find(&order_list))
+
+	for _, order := range order_list {
+		if order.StatusId == models.ORDER_STATUS_HOLD && order.HoldTypeId.Int64 == models.ORDER_HOLD_TYPE_PICK_UP {
+			return c.RenderJson(map[string]interface{}{
+				"success": false,
+				"message": fmt.Sprintf("订单 %s 当前状态 已经是 PICK UP", order.Code),
+			})
+		}
+	}
+
+	for _, order := range order_list {
+		if order.StatusId != models.ORDER_STATUS_DPH && order.StatusId != models.ORDER_STATUS_HOLD {
+			return c.RenderJson(map[string]interface{}{
+				"success": false,
+				"message": fmt.Sprintf("订单 %s 当前状态不能搬至 PICK UP", order.Code),
+			})
+		}
+	}
 
 	for _, order := range order_list {
 		order.StatusId = models.ORDER_STATUS_HOLD

@@ -306,7 +306,7 @@
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
-                                            <label for="export_stock_id" class="col-xs-2 control-label">仓库</label>
+                                            <label for="pickup_stock_id" class="col-xs-2 control-label">仓库</label>
                                             <div class="col-xs-10">
                                                 <select id="pickup_stock_id" name="pickup_option.stock_id" class="input-sm form-control" v-model.number="pickup_option.stock_id">
                                                     <template v-for="stock in pickup_option.stock_list">
@@ -957,7 +957,7 @@
                 showMask("加载中...");
                 $("#pickupOptionForm").clearValidation();
                 $.ajax({
-                        url: '{%url "ErpOrderLogisticsCompanyExport.ExportOptionData" %}',
+                        url: '{%url "ErpOrder.PickupOptionData" %}',
                         type: "POST",
                         success: function (result) {
                             hideMask();
