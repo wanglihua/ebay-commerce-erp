@@ -6,6 +6,7 @@ import (
 	"matrix/modules/auth/pass_res"
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/erp/models"
+	"fmt"
 )
 
 type ErpOrderWaybillNumber struct {
@@ -51,7 +52,7 @@ func (c ErpOrderWaybillNumber) Save() revel.Result {
 	// order logistics
 
 	var order_logistics models.OrderLogisticsInfo
-	_, err = db_session.Where("order_id = %d", order_id).Get(&order_logistics)
+	_, err = db_session.Where(fmt.Sprintf("order_id = %d", order_id)).Get(&order_logistics)
 	core.HandleError(err)
 
 	order_logistics.TrackingNum = waybill_number

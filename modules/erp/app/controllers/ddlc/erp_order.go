@@ -1193,6 +1193,8 @@ func (c ErpOrder) Pickup() revel.Result {
 		order_logistics.StockId = stock_id
 		order_logistics.CompanyId = 0
 		order_logistics.ModeId = 0
+		order_logistics.TotalFee = 0
+		order_logistics.PickFee = 0
 
 		_, err = db_session.Id(order_logistics.Id).Cols("stock_id", "company_id", "mode_id").Update(&order_logistics)
 		core.HandleError(err)
