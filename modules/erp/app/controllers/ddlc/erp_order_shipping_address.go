@@ -51,7 +51,7 @@ func (c ErpOrderShippingAddress) Save() revel.Result {
 		if order_service.Can_order_modify(&order) == false {
 			return c.RenderJson(map[string]interface{}{
 				"success": false,
-				"message": "订单当前状态不能删除订单地址！",
+				"message": "订单当前状态不能保存订单地址！",
 			})
 		}
 
