@@ -1184,6 +1184,8 @@ func (c ErpOrder) Pickup() revel.Result {
 		}
 	}
 
+	var login_user = core.GetLoginUser(c.Session)
+
 	for _, order := range order_list {
 		order.StatusId = models.ORDER_STATUS_HOLD
 		order.HoldTypeId = core.MakeNullInt(models.ORDER_HOLD_TYPE_PICK_UP, true)
@@ -1206,6 +1208,8 @@ func (c ErpOrder) Pickup() revel.Result {
 
 		_, err = db_session.Id(order_logistics.Id).Cols("stock_id", "company_id", "mode_id").Update(&order_logistics)
 		core.HandleError(err)
+
+		order_history_service.Insert_order_history(order, login_user.UserId, fmt.Sprintf("订单PICK UP， 工号： %s", login_user.LoginName), db_session)
 	}
 
 	return c.RenderJson(map[string]interface{}{
