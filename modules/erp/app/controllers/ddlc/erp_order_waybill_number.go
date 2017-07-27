@@ -30,6 +30,8 @@ func (c ErpOrderWaybillNumber) Save() revel.Result {
 		return c.RenderJson(core.JsonResult{Success: false, Message: c.GetValidationErrorMessage()})
 	}
 
+	// order
+
 	var order models.OrderInfo
 	has, err := db_session.Id(order_id).Get(&order)
 	core.HandleError(err)
@@ -44,6 +46,17 @@ func (c ErpOrderWaybillNumber) Save() revel.Result {
 	order.WaybillNumber = waybill_number
 
 	_, err = db_session.Id(order_id).Cols("waybill_number").Update(&order)
+	core.HandleError(err)
+
+	// order logistics
+
+	var order_logistics models.OrderLogisticsInfo
+	_, err = db_session.Where("order_id = %d", order_id).Get(&order_logistics)
+	core.HandleError(err)
+
+	order_logistics.TrackingNum = waybill_number
+
+	_, err = db_session.Id(order_logistics.Id).Cols("tracking_num").Update(&order_logistics)
 	core.HandleError(err)
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: "数据保存成功!"})

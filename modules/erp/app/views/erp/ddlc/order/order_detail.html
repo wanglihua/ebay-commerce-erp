@@ -67,10 +67,11 @@
                             </div>
                         </div>
                     </div>
-                    {% if or .is_hold .is_dph %}
+
                     <hr style="margin-top: 5px;margin-bottom: 5px;"/>
                     <div class="row">
                         <div class="col-xs-12" style="text-align: right;">
+                            {% if or .is_hold .is_dph %}
                             <label for="unlock_express">解锁快递：</label>
                             <select id="unlock_express" class="input-sm" style="width: 80px;">
                                 <option :value="0">否</option>
@@ -93,9 +94,12 @@
                             <button class="btn btn-sm btn-purple" onclick="rematch_order_logistics()">
                                 重新匹配物流
                             </button>
+                            {% end %}
+                            {% if .can_edit_waybill_number %}
+                            <button class="btn btn-sm btn-purple" @click="show_order_waybill_number_edit">修改运单号</button>
+                            {% end %}
                         </div>
                     </div>
-                    {% end %}
                 </div>
             </div>
         </div>
@@ -553,6 +557,46 @@
             </div>
         </div>
 
+        <div class="modal fade" id="orderWaybillNumberDialog">
+            <div class="modal-dialog" style="width: 680px;">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="True">&times;</button>
+                        <h4 class="modal-title">订单运单号</h4>
+                    </div>
+                    <div class="modal-body clearfix">
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <form class="form-horizontal" role="form" id="orderWaybillNumberForm">
+                                    <input id="waybill_number_order_id" name="detail.order.id" type="hidden" v-model.number="detail.order.id"/>
+
+                                    <div class="row">
+                                        <div class="col-xs-6">
+                                            <div class="form-group">
+                                                <label for="name" class="col-xs-4 control-label">Name</label>
+                                                <div class="col-xs-8">
+                                                    <input id="order_waybill_number" name="detail.order.waybill_number" type="text" class="input-sm form-control" v-model="detail.order.waybill_number"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-success btn-sm" @click="saveOrderWaybillNumber()">
+                            <i class="ace-icon fa fa-floppy-o"></i>保存
+                        </button>
+                        <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">
+                            <i class="ace-icon fa fa-times"></i>关闭
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="modal fade" id="orderShippingAddressDetailDialog">
             <div class="modal-dialog" style="width: 680px;">
                 <div class="modal-content">
@@ -821,6 +865,48 @@
                                 else {
                                     $.msg.show(data.message);
                                     $('#orderShippingAddressDetailDialog').modal('hide');
+                                    load_order_detail();
+                                    //return;
+                                }
+                            }
+                        }
+                    );
+                }
+            },
+            show_order_waybill_number_edit: function () {
+                $("#orderWaybillNumberDialog").modal(modalOptions);
+            },
+            saveOrderWaybillNumber: function () {
+                showMask("提交中...");
+                var form = $("#orderWaybillNumberForm");
+                var valid = validate(form, {
+                    'detail.order.id': {
+                        required: true
+                    },
+                    'detail.order.waybill_number': {
+                        required: true
+                    }
+                });
+
+                if (!valid) {
+                    hideMask();
+                } else {
+                    $.ajax({
+                            url: '{%url "ErpOrderWaybillNumber.Save"%}',
+                            type: "POST",
+                            data: {
+                                "order_id": vm.detail.order.id,
+                                "waybill_number": vm.detail.waybill_number
+                            },
+                            success: function (data) {
+                                hideMask();
+                                if (data.success === false) {
+                                    $.msg.error(data.message);
+                                    //return;
+                                }
+                                else {
+                                    $.msg.show(data.message);
+                                    $('#orderWaybillNumberDialog').modal('hide');
                                     load_order_detail();
                                     //return;
                                 }

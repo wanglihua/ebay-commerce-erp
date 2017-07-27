@@ -563,6 +563,8 @@ func (c ErpOrder) Detail(order_id int64) revel.Result {
 	// 不是 已发货 已完成 已取消 状态的都能修改
 	c.RenderArgs["can_modify"] = order_service.Can_order_modify(&order)
 
+	c.RenderArgs["can_edit_waybill_number"] = order_service.Can_order_modify_waybill_number(&order)
+
 	return c.RenderTemplate("erp/ddlc/order/order_detail.html")
 }
 
