@@ -161,9 +161,11 @@ func (c ErpOrder) get_order_query_criteria_list() []order_query_criteria {
 
 // 优化查询定义 开始
 const (
-	good_query_ss int64 = 1000 // 单商品单数量
-	good_query_sm int64 = 2000 // 单商品多数量
-	good_query_mm int64 = 3000 // 多商品多数量
+	good_query_ss                       int64 = 1000 // 单商品单数量
+	good_query_sm                       int64 = 2000 // 单商品多数量
+	good_query_mm                       int64 = 3000 // 多商品多数量
+	good_query_empty_waybill_number     int64 = 4000 // 运单号为空
+	good_query_not_empty_waybill_number int64 = 5000 // 运单号不为空
 )
 
 type good_query struct {
@@ -178,6 +180,8 @@ func (c ErpOrder) get_good_query_list() []good_query {
 	good_query_list = append(good_query_list, good_query{Id: good_query_ss, Name: "单商品单数量"})
 	good_query_list = append(good_query_list, good_query{Id: good_query_sm, Name: "单商品多数量"})
 	good_query_list = append(good_query_list, good_query{Id: good_query_mm, Name: "多商品"})
+	good_query_list = append(good_query_list, good_query{Id: good_query_empty_waybill_number, Name: "运单号为空"})
+	good_query_list = append(good_query_list, good_query{Id: good_query_not_empty_waybill_number, Name: "运单号不为空"})
 
 	return good_query_list
 }
@@ -515,6 +519,10 @@ o.id IN (
 )
 `
 			filter = fmt.Sprintf(good_query, filter)
+		} else if good_query_id == good_query_empty_waybill_number {
+			filter = core.SqlAnd(filter, "(o.waybill_number IS NULL OR o.waybill_number = '')")
+		} else if good_query_id == good_query_not_empty_waybill_number {
+			filter = core.SqlAnd(filter, "(o.waybill_number IS NOT NULL AND o.waybill_number <> '')")
 		}
 	}
 

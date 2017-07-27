@@ -88,6 +88,10 @@ func (c ErpOrderLogistics) apply_query_filter(filter string) string {
 	c.Params.Bind(&order_code_query, "order_code_query")
 	order_code_query = strings.TrimSpace(order_code_query)
 
+	var waybill_number_query string
+	c.Params.Bind(&waybill_number_query, "waybill_number_query")
+	waybill_number_query = strings.TrimSpace(waybill_number_query)
+
 	var begin_time_query core.NullLongTime
 	var end_time_query core.NullLongTime
 	c.Params.Bind(&begin_time_query, "begin_time_query")
@@ -111,6 +115,10 @@ func (c ErpOrderLogistics) apply_query_filter(filter string) string {
 
 	if order_code_query != "" {
 		filter = core.SqlAnd(filter, fmt.Sprintf("o.code = '%s'", order_code_query))
+	}
+
+	if waybill_number_query != "" {
+		filter = core.SqlAnd(filter, fmt.Sprintf("o.waybill_number = '%s'", waybill_number_query))
 	}
 
 	if begin_time_query.Valid == true {

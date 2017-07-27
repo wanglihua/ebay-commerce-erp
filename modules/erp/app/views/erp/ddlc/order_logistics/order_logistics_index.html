@@ -98,6 +98,8 @@
                                 </select>
                                 <label class="control-label no-padding-right" for="order_code_query">订单编号</label>
                                 <input class="input-sm" id="order_code_query" name="order_code_query" placeholder="订单编号" type="text" v-model="page.order_code_query" style="width: 130px;"/>
+                                <label class="control-label no-padding-right" for="waybill_number_query">货运单号</label>
+                                <input class="input-sm" id="waybill_number_query" name="waybill_number_query" placeholder="货运单号" type="text" v-model="page.waybill_number_query" style="width: 130px;"/>
                                 <select id="good_query_id" name="page.query_criteria_id" v-model.number="page.good_query_id" style="width:120px;">
                                     <option value="0">-优化查询-</option>
                                     <template v-for="query in page.good_query_list">
@@ -385,6 +387,7 @@
                 "batch_code": 0,
                 "batch_code_list": [],
                 "order_code_query": "",
+                "waybill_number_query": "",
                 "begin_time_query": "",
                 "end_time_query": "",
                 "good_query_id": 0
@@ -608,6 +611,7 @@
                         aoData.push({'name': 'logistics_company_id', 'value': this_vm.page.logistics_company_id});
                         aoData.push({'name': 'batch_code', 'value': this_vm.page.batch_code});
                         aoData.push({'name': 'order_code_query', 'value': this_vm.page.order_code_query});
+                        aoData.push({'name': 'waybill_number_query', 'value': this_vm.page.waybill_number_query});
                         aoData.push({'name': 'begin_time_query', 'value': this_vm.page.begin_time_query});
                         aoData.push({'name': 'end_time_query', 'value': this_vm.page.end_time_query});
                         aoData.push({'name': 'good_query_id', 'value': this_vm.page.good_query_id});
@@ -619,7 +623,7 @@
                             "success": function (data) {
                                 hideMask();
 
-                                if (data.success == false) {
+                                if (data.success === false) {
                                     $.msg.error(data.message);
                                     return;
                                 }
@@ -701,7 +705,7 @@
                         },
                         success: function (result) {
                             hideMask();
-                            if (result.success == false) {
+                            if (result.success === false) {
                                 $.msg.error(result.message);
                                 return;
                             }
