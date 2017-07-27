@@ -148,7 +148,7 @@ func (p_ol *OrderLogisticsService) match_logistics_mode_with_option(p_order *mod
 			if mt.is_trace == true {
 				log_logistics_match_debug(mode_result, "无对应库存", mt.String(), db_session)
 			}
-			continue
+			continue //todo: 如果 found == false 是不是应该 continue
 
 			*/
 		} else {
