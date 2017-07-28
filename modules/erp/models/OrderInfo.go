@@ -51,6 +51,8 @@ type OrderInfo struct {
 	DeliveryPerson           string              `xorm:"nvarchar(20) null 'delivery_person'" json:"delivery_person" smith:"verbose_name=发货人员"`
 	WaybillNumber            string              `xorm:"nvarchar(50) null 'waybill_number'" json:"waybill_number" smith:"verbose_name=货运单号"`
 	TagId                    int64               `xorm:"bigint notnull index 'tag_id'" json:"tag_id" smith:"verbose_name=标签"`
+	ProfitAu                 float64             `xorm:"decimal(18,6) notnull 'profit_au'" json:"profit_au" smith:"verbose_name=毛利（澳币）"`
+	ProfitRmb                float64             `xorm:"decimal(18,6) notnull 'profit_rmb'" json:"profit_rmb" smith:"verbose_name=毛利（人民币）"`
 	CreateTime               core.Time           `xorm:"created notnull 'create_time'" json:"create_time"`
 	UpdateTime               core.Time           `xorm:"updated notnull 'update_time'" json:"update_time"`
 }
