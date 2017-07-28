@@ -12,7 +12,24 @@ import (
 
 func (p_ol *OrderLogisticsService) match_logistics_mode_logic(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, db_session *xorm.Session) {
 
-	// 在这里面只考虑最佳仓库的库存情况，次佳仓库有货的情况，别的地方已经考虑并 hold
+	// 信封的忽略
+
+	// 国际件的忽略
+	if p_ol.is_international_order(p_order, p_order_logistics_data) == true {
+		return
+	}
+
+	// 快递类的忽略
+	if p_ol.is_express(p_order, p_order_logistics_data) == true {
+		return
+	}
+
+	// 邮政编码信息不全 17 收货人信息不全的，比如 没有邮编等等
+	if p_ol.is_address_info_post_code_miss(p_order_logistics_data) == true {
+		return
+	}
+
+	// 产品信息不全（长宽高重量不全或者有误），这个检查应该放在任何使用长宽高重量数据的检查之前。
 
 	// 在这之前要加载好 物流方式表里面的信息，物流费率里面的信息，防止对数据库的频繁访问
 	var logistics_setting = p_ol.logistics_setting

@@ -262,9 +262,6 @@ func (p_ol *OrderLogisticsService) hold_check_envelope(p_order *models.OrderInfo
 // 匹配信封物流
 func (p_ol *OrderLogisticsService) match_envelope_fee_rate(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, db_session *xorm.Session) (is_hold_return bool) {
 	// 这里假定信封的长宽高限制： 长 > 宽 > 高，不能这么假定
-
-	revel.TRACE.Println("hold_check_envelope begin")
-
 	var envelope_max_length = p_ol.logistics_setting.EnvelopeMaxLength
 	var envelope_max_width = p_ol.logistics_setting.EnvelopeMaxWidth
 	var envelope_max_height = p_ol.logistics_setting.EnvelopeMaxHeight
@@ -325,8 +322,7 @@ func (p_ol *OrderLogisticsService) match_envelope_fee_rate(p_order *models.Order
 	return false
 }
 
-// 15 快递类。需要在基础设置里面有 收到快递费金额的设置功能，比如收到的运费高于什么金额，视为快递。否则就算收了快递费也视为普通包裹
-func (p_ol *OrderLogisticsService) hold_check_express(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, db_session *xorm.Session) (is_hold_return bool) {
+func (p_ol *OrderLogisticsService) is_express(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t) bool {
 	// 系统没有设置快递的最小运费
 	if p_ol.logistics_setting.MinExpressFee == 0 {
 		revel.ERROR.Println("系统没有设置快递的最小运费！")
@@ -338,6 +334,20 @@ func (p_ol *OrderLogisticsService) hold_check_express(p_order *models.OrderInfo,
 
 	// 这里假定都是澳币
 	if p_order.ExpressFee >= p_ol.logistics_setting.MinExpressFee {
+		return true
+	}
+
+	return false
+}
+
+// 15 快递类。需要在基础设置里面有 收到快递费金额的设置功能，比如收到的运费高于什么金额，视为快递。否则就算收了快递费也视为普通包裹
+func (p_ol *OrderLogisticsService) hold_check_express(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, db_session *xorm.Session) (is_hold_return bool) {
+
+	// 快递的物流信息保存有点复杂，一个可以是通过匹配物流得到的快递Hold，一个可以是单纯的Hold住的快递Hold。\
+	// 其实通过匹配物流得到的快递Hold，不会走这个方法这里的，是直接把状态设置成为  models.ORDER_HOLD_TYPE_EXPRESS 的
+
+	// 这里假定都是澳币
+	if p_ol.is_express(p_order, p_order_logistics_data) == true {
 		p_ol.update_order_to_hold_type(p_order, models.ORDER_HOLD_TYPE_EXPRESS, db_session)
 
 		//设置发货仓库为墨尔本仓库
@@ -370,8 +380,7 @@ func (p_ol *OrderLogisticsService) hold_check_express(p_order *models.OrderInfo,
 	return false
 }
 
-// 16 判断是否是国际件，如果不是澳洲的就是国际件，一般就是新西兰的
-func (p_ol *OrderLogisticsService) hold_check_international(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, db_session *xorm.Session) (is_hold_return bool) {
+func (p_ol *OrderLogisticsService) is_international_order(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t) bool {
 	var country = p_order_logistics_data.order_shipping_address.Country
 	country = strings.TrimSpace(country)
 	var country_name = p_order_logistics_data.order_shipping_address.CountryName
@@ -379,6 +388,17 @@ func (p_ol *OrderLogisticsService) hold_check_international(p_order *models.Orde
 
 	if (country != "" && strings.ToLower(country) != strings.ToLower("AU")) ||
 		(country_name != "" && strings.ToLower(country_name) != strings.ToLower("Australia") && strings.ToLower(country_name) != strings.ToLower("AU")) { // != "" 是因为有时导入的时候没提供国家信息的，就默认是国内件了
+
+		return true
+	}
+
+	return false
+}
+
+// 16 判断是否是国际件，如果不是澳洲的就是国际件，一般就是新西兰的
+func (p_ol *OrderLogisticsService) hold_check_international(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, db_session *xorm.Session) (is_hold_return bool) {
+
+	if p_ol.is_international_order(p_order, p_order_logistics_data) == true { // != "" 是因为有时导入的时候没提供国家信息的，就默认是国内件了
 		p_ol.update_order_to_hold_type(p_order, models.ORDER_HOLD_TYPE_INTERNATIONAL, db_session)
 
 		//设置发货仓库为墨尔本仓库
@@ -410,11 +430,19 @@ func (p_ol *OrderLogisticsService) hold_check_international(p_order *models.Orde
 	return false
 }
 
-// 检查邮政编码是否为空 17. 收货人信息不全的 ，如果为空就不匹配了，这个放在匹配物流之前，和下面的一样也是 ORDER_HOLD_ADDRESS_INFO_MISS
-func (p_ol *OrderLogisticsService) hold_check_address_info_post_code_miss(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, db_session *xorm.Session) (is_hold_return bool) {
+func (p_ol *OrderLogisticsService) is_address_info_post_code_miss(p_order_logistics_data *order_logistics_data_t) bool {
 	var shipping_address = p_order_logistics_data.order_shipping_address
 	if shipping_address.Id == 0 || // 数据库中地址信息不存在
 		strings.TrimSpace(shipping_address.PostalCode) == "" { // 地址信息中缺少邮政编码
+		return true
+	}
+
+	return false
+}
+
+// 检查邮政编码是否为空 17. 收货人信息不全的 ，如果为空就不匹配了，这个放在匹配物流之前，和下面的一样也是 ORDER_HOLD_ADDRESS_INFO_MISS
+func (p_ol *OrderLogisticsService) hold_check_address_info_post_code_miss(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, db_session *xorm.Session) (is_hold_return bool) {
+	if p_ol.is_address_info_post_code_miss(p_order_logistics_data) { // 地址信息中缺少邮政编码
 		p_ol.update_order_to_hold_type(p_order, models.ORDER_HOLD_TYPE_ADDRESS_INFO_MISS, db_session)
 		return true
 	}
