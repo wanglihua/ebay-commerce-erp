@@ -201,6 +201,7 @@
                             <th id="th_total_amount">原金额(AUD)</th>
                             <th id="th_total_amount_rmb">原金额(RMB)</th>
                             <th id="th_express_fee">原运费金额</th>
+                            <th id="th_profit">订单利润</th>
 
                             <th id="th_paid_time">支付时间</th>
                             <th id="th_shipped_time">发货时间</th>
@@ -474,7 +475,7 @@
                         {
                             "mDataProp": "o.total_amount", "title": "原金额", "bSearchable": false,
                             "render": function (data, type, row) {
-                                return "<div class='div_total_amount'>" + row.o.total_amount_currency + " " + dtFormatFloat(row.o.total_amount) + "</div><div>RMB " + dtFormatFloat(row.o.total_amount_rmb) + "</div><div>AUD " + dtFormatFloat(row.o.express_fee) + "</div>";
+                                return "<div class='div_total_amount'>" + row.o.total_amount_currency + " " + dtFormatFloat(row.o.total_amount) + "</div><div>RMB " + dtFormatFloat(row.o.total_amount_rmb) + "</div><div>AUD " + dtFormatFloat(row.o.express_fee) + "</div><div>RMB " + dtFormatFloat(row.o.profit_rmb) + "</div>";
                             }
                         },
                         {
@@ -487,6 +488,12 @@
                             "mDataProp": "o.express_fee", "title": "原运费金额", "bSearchable": false,
                             "render": function (data, type, row) {
                                 return "<div class='div_express_fee'></div>";
+                            }
+                        },
+                        {
+                            "mDataProp": "o.profit_rmb", "title": "订单利润", "bSearchable": false,
+                            "render": function (data, type, row) {
+                                return "<div class='div_profit'></div>";
                             }
                         },
                         {
@@ -633,6 +640,7 @@
                                 $("#orderList div.div_total_amount").parent().css("width", "100px");
                                 $("#orderList div.div_total_amount_rmb").parent().css("display", "none");
                                 $("#orderList div.div_express_fee").parent().css("display", "none");
+                                $("#orderList div.div_profit").parent().css("display", "none");
 
                                 $("#orderList div.div_paid_time").parent().css("width", "130px");
                                 $("#orderList div.div_shipped_time").parent().css("display", "none");
@@ -678,7 +686,8 @@
             $("#th_total_amount").wrap("<div id='div_total_amount'></div>");
             $("#th_total_amount_rmb").wrap("<div id='div_total_amount_rmb'></div>");
             $("#th_express_fee").wrap("<div id='div_express_fee'></div>");
-            $("#th_total_paid_amount").append($("#div_total_amount")).append($("#div_total_amount_rmb")).append($("#div_express_fee"));
+            $("#th_profit").wrap("<div id='div_profit'></div>");
+            $("#th_total_paid_amount").append($("#div_total_amount")).append($("#div_total_amount_rmb")).append($("#div_express_fee")).append($("#div_profit"));
 
             $("#th_paid_time").before("<th id='th_paid_time_shipped_time'></th>");
             $("#th_paid_time").wrap("<div id='div_paid_time'></div>");
