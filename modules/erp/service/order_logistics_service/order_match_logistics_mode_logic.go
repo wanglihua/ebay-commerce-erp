@@ -13,6 +13,9 @@ import (
 func (p_ol *OrderLogisticsService) match_logistics_mode_logic(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, db_session *xorm.Session) {
 
 	// 信封的忽略
+	if p_ol.is_envelope(p_order, p_order_logistics_data) == true {
+		return
+	}
 
 	// 国际件的忽略
 	if p_ol.is_international_order(p_order, p_order_logistics_data) == true {
@@ -30,6 +33,9 @@ func (p_ol *OrderLogisticsService) match_logistics_mode_logic(p_order *models.Or
 	}
 
 	// 产品信息不全（长宽高重量不全或者有误），这个检查应该放在任何使用长宽高重量数据的检查之前。
+	if p_ol.is_product_info_miss(p_order, p_order_logistics_data) == true {
+		return
+	}
 
 	// 在这之前要加载好 物流方式表里面的信息，物流费率里面的信息，防止对数据库的频繁访问
 	var logistics_setting = p_ol.logistics_setting

@@ -209,14 +209,24 @@ func (p_ol *OrderLogisticsService) hold_check_no_match_logistics_mode(p_order *m
 }
 
 // 12 产品信息不全（长宽高重量不全或者有误）
-func (p_ol *OrderLogisticsService) hold_check_product_info_miss(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, db_session *xorm.Session) (is_hold_return bool) {
+func (p_ol *OrderLogisticsService) is_product_info_miss(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t) bool {
 	var order_product_info_list = p_order_logistics_data.order_product_info_list
 	for _, order_product_info := range order_product_info_list {
 		// 长 宽 高 重量 数据不全
 		if order_product_info.Length == 0 || order_product_info.Width == 0 || order_product_info.Height == 0 || order_product_info.Weight == 0 {
-			p_ol.update_order_to_hold_type(p_order, models.ORDER_HOLD_TYPE_PRODUCT_INFO_MISS, db_session)
 			return true
 		}
+	}
+
+	return false
+}
+
+// 12 产品信息不全（长宽高重量不全或者有误）
+func (p_ol *OrderLogisticsService) hold_check_product_info_miss(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, db_session *xorm.Session) (is_hold_return bool) {
+
+	if p_ol.is_product_info_miss(p_order, p_order_logistics_data) == true {
+		p_ol.update_order_to_hold_type(p_order, models.ORDER_HOLD_TYPE_PRODUCT_INFO_MISS, db_session)
+		return true
 	}
 
 	return false
@@ -259,8 +269,7 @@ func (p_ol *OrderLogisticsService) hold_check_envelope(p_order *models.OrderInfo
 	return false
 }
 
-// 匹配信封物流
-func (p_ol *OrderLogisticsService) match_envelope_fee_rate(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, db_session *xorm.Session) (is_hold_return bool) {
+func (p_ol *OrderLogisticsService) is_envelope(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t) bool {
 	// 这里假定信封的长宽高限制： 长 > 宽 > 高，不能这么假定
 	var envelope_max_length = p_ol.logistics_setting.EnvelopeMaxLength
 	var envelope_max_width = p_ol.logistics_setting.EnvelopeMaxWidth
@@ -287,6 +296,19 @@ func (p_ol *OrderLogisticsService) match_envelope_fee_rate(p_order *models.Order
 	revel.TRACE.Println("envelope_max_length, envelope_max_width, envelope_max_height, envelope_max_weight", envelope_max_length, envelope_max_width, envelope_max_height, envelope_max_weight)
 
 	if whole_length <= envelope_max_length && whole_width <= envelope_max_width && whole_height <= envelope_max_height && whole_weight <= envelope_max_weight {
+		return true
+	}
+
+	return false
+}
+
+// 匹配信封物流
+func (p_ol *OrderLogisticsService) match_envelope_fee_rate(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, db_session *xorm.Session) (is_hold_return bool) {
+
+	if p_ol.is_envelope(p_order, p_order_logistics_data) == true {
+		// get_order_products_whole_logistics_data的输出中 长 > 宽 > 高
+		var whole_length, whole_width, whole_height, whole_weight float64 = get_order_products_whole_logistics_data(p_order_logistics_data)
+
 		// 匹配具体信封费率
 		var final_fee_rate_id int64 = 0
 		var final_fee float64 = math.MaxFloat64
