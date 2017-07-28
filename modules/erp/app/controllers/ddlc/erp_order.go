@@ -703,6 +703,14 @@ WHERE oi.order_id = %d;`
 	var order_profit_au = order_service.CalculateOrderProfit(&order, &order_logistics)
 	var order_profit = order_profit_au * order.ExchangeRate
 
+	if order.ProfitAu == 0 {
+		order.ProfitAu = order_profit_au
+		order.ProfitRmb = order_profit
+
+		_, err := db_session.Id(order.Id).Cols("profit_au", "profit_rmb").Update(&order)
+		core.HandleError(err)
+	}
+
 	var au_stock_list = make([]models.StockInfo, 0)
 	err = db_session.Where(fmt.Sprintf("stock_type_id = %d", models.STOCK_TYPE_AU)).Find(&au_stock_list)
 	core.HandleError(err)
