@@ -43,7 +43,7 @@ func save_order_logistics(p_ol *OrderLogisticsService, p_order *models.OrderInfo
 		core.HandleError(err)
 	}
 
-	var update_col_list = []string{"status_id", "stock_id", "address_id", "company_id", "mode_id", "hold_type_id"}
+	var update_col_list = []string{"status_id", "stock_id", "address_id", "company_id", "mode_id", "hold_type_id", "profit_au", "profit_rmb"}
 
 	if match_result.has_stock == true {
 		if match_result.mode.TypeId == models.LOGISTICS_MODE_TYPE_EXPRESS && unlock_express == false { // 匹配出来是快递，并且当前不解锁快递，就可以设置为快递 hold
@@ -76,11 +76,16 @@ func save_order_logistics(p_ol *OrderLogisticsService, p_order *models.OrderInfo
 	p_order.AddressId = match_result.address_id
 	p_order.CompanyId = match_result.company_id
 	p_order.ModeId = match_result.mode_id
+
+	var order_profit = order_service.CalculateOrderProfit(p_order, &order_logistics)
+	p_order.ProfitAu = order_profit
+	p_order.ProfitRmb = order_profit * p_order.ExchangeRate
+
 	_, err = db_session.Id(p_order.Id).Cols(update_col_list...).Update(p_order)
 	core.HandleError(err)
 
 	// 保存成本价和分配利润
-	var order_profit = order_service.CalculateOrderProfit(p_order, &order_logistics)
+	//var order_profit = order_service.CalculateOrderProfit(p_order, &order_logistics)
 	var cost_price_total float64 = 0
 	var product_info_list = p_order_logistics_data.order_product_info_list
 	for _, product_info := range product_info_list {
@@ -143,7 +148,11 @@ func save_special_hold_order_logistics(p_ol *OrderLogisticsService, p_order *mod
 	p_order.CompanyId = 0
 	p_order.ModeId = 0
 
-	var update_col_list = []string{"stock_id", "address_id", "company_id", "mode_id"}
+	var order_profit = order_service.CalculateOrderProfit(p_order, &order_logistics)
+	p_order.ProfitAu = order_profit
+	p_order.ProfitRmb = order_profit * p_order.ExchangeRate
+
+	var update_col_list = []string{"stock_id", "address_id", "company_id", "mode_id", "profit_au", "profit_rmb"}
 	_, err = db_session.Id(p_order.Id).Cols(update_col_list...).Update(p_order)
 	core.HandleError(err)
 
@@ -153,7 +162,7 @@ func save_special_hold_order_logistics(p_ol *OrderLogisticsService, p_order *mod
 	}
 
 	// 保存成本价和分配利润
-	var order_profit = order_service.CalculateOrderProfit(p_order, &order_logistics)
+	//var order_profit = order_service.CalculateOrderProfit(p_order, &order_logistics)
 	var cost_price_total float64 = 0
 	// var product_info_list = p_order_logistics_data.order_product_info_list
 	for _, product_info := range product_info_list {
