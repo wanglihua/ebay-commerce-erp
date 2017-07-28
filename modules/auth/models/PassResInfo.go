@@ -159,8 +159,8 @@ func (e PassResInfo) InitData(db_session *xorm.Session) {
 		pass = new(PassResInfo)
 		pass.Id = pass_res.DDLC_ORDER_FORCE_PEIHUO
 		pass.CateId = pass_res_cate.DDLC
-		pass.Name = "订单流程强制配货"
-		pass.Desc = core.MakeNullString("订单流程强制配货", true)
+		pass.Name = "订单流程取消波次限制配货"
+		pass.Desc = core.MakeNullString("订单流程取消波次限制配货", true)
 		db_session.Insert(pass)
 	}
 

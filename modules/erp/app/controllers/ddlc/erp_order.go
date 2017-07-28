@@ -972,7 +972,7 @@ func (c ErpOrder) ForcePeiHuo() revel.Result {
 
 	return c.RenderJson(map[string]interface{}{
 		"success": true,
-		"message": "订单强制配货成功！",
+		"message": "订单取消波次限制配货成功！",
 	})
 }
 
