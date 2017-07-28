@@ -10,9 +10,45 @@ import (
 	"matrix/modules/erp/service/pick_fee_service"
 	"fmt"
 	"matrix/core"
+	"time"
+	"runtime/debug"
 )
 
-func (p_ol *OrderLogisticsService) match_logistics_mode_logic(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, db_session *xorm.Session) {
+var db_driver string
+var db_url string
+
+func (p_ol *OrderLogisticsService) match_logistics_mode_logic(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t) {
+
+	defer func() {
+		if err := recover(); err != nil {
+			revel.ERROR.Printf("匹配订单理论值出现错误： %s\n", err)
+			revel.ERROR.Println(string(debug.Stack()))
+		}
+	}()
+
+	// get db driver and db url
+
+	if db_driver == "" {
+		db_driver, _ = revel.Config.String("db.driver")
+	}
+
+	if db_url == "" {
+		db_url, _ = revel.Config.String("db.url")
+	}
+
+	db_engine, err := xorm.NewEngine(db_driver, db_url)
+	core.HandleError(err)
+
+	db_engine.TZLocation = time.Local
+	db_engine.SetMaxIdleConns(3)
+	db_engine.SetMaxOpenConns(100)
+
+	db_session := db_engine.NewSession()
+	db_session = db_session.NoAutoCondition(true)
+
+	defer func() {
+		db_session.Close()
+	}()
 
 	// 信封的忽略
 	if p_ol.is_envelope(p_order, p_order_logistics_data) == true {

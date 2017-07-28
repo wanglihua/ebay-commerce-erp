@@ -279,6 +279,9 @@ func (p_ol *OrderLogisticsService) CalculateListWithOption(order_list []models.O
 		//　一起加载需要的数据的方式，对性能的影响应该不会很大的
 		p_order_logistics_data.load_data(&order, p_ol, db_session)
 
+		// 匹配理论值
+		go p_ol.match_logistics_mode_logic(&order, p_order_logistics_data)
+
 		// 老鼠仓的检查
 		if p_ol.hold_check_paypal_account_not_match(&order, db_session) {
 			continue
