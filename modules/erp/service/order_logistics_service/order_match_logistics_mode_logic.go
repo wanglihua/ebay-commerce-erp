@@ -8,6 +8,8 @@ import (
 	"github.com/revel/revel"
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/pick_fee_service"
+	"fmt"
+	"matrix/core"
 )
 
 func (p_ol *OrderLogisticsService) match_logistics_mode_logic(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, db_session *xorm.Session) {
@@ -309,13 +311,13 @@ func (p_ol *OrderLogisticsService) match_logistics_mode_logic(p_order *models.Or
 			}
 		}
 
-		var totol_fee_diff = lowest_total_fee - mode_result.total_fee // 就是当前模式比之前的省了多少钱
+		var total_fee_diff = lowest_total_fee - mode_result.total_fee // 就是当前模式比之前的省了多少钱
 
 		// 三个区间 final_total_amount-mode_result.total_amount，后来改用 fee了，不考虑 库存的cost_price，因为没有库存的也参与筛选
 		// 负无穷大 到 -p_ol.logistics_setting.FeeMaxDiff， -p_ol.logistics_setting.FeeMaxDiff到+p_ol.logistics_setting.FeeMaxDiff, +p_ol.logistics_setting.FeeMaxDiff 到 正无穷大
-		if totol_fee_diff > p_ol.logistics_setting.FeeMaxDiff { // 取得更优的模式方案，挑选最优解时，把商品的到仓成本也考虑进去   +p_ol.logistics_setting.FeeMaxDiff 到 正无穷大
+		if total_fee_diff > p_ol.logistics_setting.FeeMaxDiff { // 取得更优的模式方案，挑选最优解时，把商品的到仓成本也考虑进去   +p_ol.logistics_setting.FeeMaxDiff 到 正无穷大
 			final_result = mode_result
-		} else if math.Abs(totol_fee_diff) <= p_ol.logistics_setting.FeeMaxDiff { // 运费偏差在最大允许范围内，其实还是算上了澳仓成本的  -p_ol.logistics_setting.FeeMaxDiff到+p_ol.logistics_setting.FeeMaxDiff,
+		} else if math.Abs(total_fee_diff) <= p_ol.logistics_setting.FeeMaxDiff { // 运费偏差在最大允许范围内，其实还是算上了澳仓成本的  -p_ol.logistics_setting.FeeMaxDiff到+p_ol.logistics_setting.FeeMaxDiff,
 			//取优先级高的仓库
 
 			if mode_result.stock.Priority > final_result.stock.Priority { // 当前的仓库的优先级要高
@@ -329,5 +331,39 @@ func (p_ol *OrderLogisticsService) match_logistics_mode_logic(p_order *models.Or
 
 	} // for _, logistics_mode := range logistics_mode_list {
 
-	//todo: 保存最后的匹配结果
+	// 保存最后的匹配结果
+	save_order_logistics_logic(p_ol, final_result, db_session)
+}
+
+func save_order_logistics_logic(p_ol *OrderLogisticsService, match_result match_logistics_mode_result, db_session *xorm.Session) {
+	// 匹配成功，记录匹配成功数据
+	var order_logistics_logic models.OrderLogisticsLogicInfo
+	has, err := db_session.Where(fmt.Sprintf("order_id = %d", match_result.order_id)).Get(&order_logistics_logic)
+	core.HandleError(err)
+
+	order_logistics_logic.OrderId = match_result.order_id
+	order_logistics_logic.AddressId = match_result.address_id
+	order_logistics_logic.CompanyId = match_result.company_id
+	order_logistics_logic.StockId = match_result.stock_id
+	order_logistics_logic.ModeId = match_result.mode_id
+	order_logistics_logic.FeeRateId = match_result.fee_rate_id
+	order_logistics_logic.Length = match_result.length
+	order_logistics_logic.Width = match_result.width
+	order_logistics_logic.Height = match_result.height
+	order_logistics_logic.DimWeight = match_result.dim_weight
+	order_logistics_logic.Sfkltjz = match_result.sfkltjz
+	order_logistics_logic.Weight = match_result.actual_weight
+	order_logistics_logic.TotalFee = match_result.total_fee
+	order_logistics_logic.PickFee = match_result.pick_fee
+	order_logistics_logic.CostAmount = match_result.cost_amount
+	order_logistics_logic.Ptfl = p_ol.logistics_setting.Ptfl
+	order_logistics_logic.Jyfl = p_ol.logistics_setting.Jyfl
+
+	if has == true {
+		_, err := db_session.Id(order_logistics_logic.Id).Update(&order_logistics_logic)
+		core.HandleError(err)
+	} else {
+		_, err := db_session.Insert(&order_logistics_logic)
+		core.HandleError(err)
+	}
 }
