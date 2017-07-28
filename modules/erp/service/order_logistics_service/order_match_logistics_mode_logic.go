@@ -21,7 +21,7 @@ func (p_ol *OrderLogisticsService) match_logistics_mode_logic(p_order *models.Or
 
 	defer func() {
 		if err := recover(); err != nil {
-			revel.ERROR.Printf("匹配订单理论值出现错误： %s\n", err)
+			revel.ERROR.Printf("匹配订单物流理论值出现错误： %s\n", err)
 			revel.ERROR.Println(string(debug.Stack()))
 		}
 	}()
