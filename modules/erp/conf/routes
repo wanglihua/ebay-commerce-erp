@@ -181,6 +181,10 @@ POST /special/product/save                 ErpSpecialProduct.Save
 POST /special/product/batch/add            ErpSpecialProduct.BatchAdd
 POST /special/product/delete               ErpSpecialProduct.Delete
 
+GET  /product/sale/analysis/setting              ErpProductSaleAnalysisSetting.Index
+POST /product/sale/analysis/setting/data/detail  ErpProductSaleAnalysisSetting.DetailData
+POST /product/sale/analysis/setting/save         ErpProductSaleAnalysisSetting.Save
+
 GET  /product/quality/feedback             ErpProductQualityFeedback.Index
 
 GET  /package/material                     ErpPackageMaterial.Index

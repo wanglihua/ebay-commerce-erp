@@ -129,7 +129,7 @@ func (c ErpOrderHold) ListData() revel.Result {
 	})
 }
 
-// 订单从 Hold 状态 搬至 待配货 状态
+// 订单从 Hold 状态 搬至 已处理Hold 状态
 // 但 信封、快递、国际件、pick up 四个 Hold 类型除外
 func (c ErpOrderHold) Processed() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_HOLD, c.Session)
