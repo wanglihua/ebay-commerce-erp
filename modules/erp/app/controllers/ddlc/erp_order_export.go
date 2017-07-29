@@ -72,7 +72,7 @@ func (c ErpOrderExport) Export() revel.Result {
 		filter = core.SqlAnd(filter, fmt.Sprintf("o.hold_type_id = %d", hold_type_id))
 	}
 
-	xlsx_file := c.get_export_excel(db_session, filter)
+	xlsx_file := c.get_export_excel(db_session, filter, status_id)
 
 	//先把文件内容写到buffer中，再从中读取
 	var buffer bytes.Buffer
@@ -91,7 +91,7 @@ type order_code_num_export_view_t struct {
 	HoldType models.OrderHoldTypeInfo  `xorm:"extends" json:"ht"`
 }
 
-func (c ErpOrderExport) get_export_excel(db_session *xorm.Session, filter string) *xlsx.File {
+func (c ErpOrderExport) get_export_excel(db_session *xorm.Session, filter string, status_id int64) *xlsx.File {
 
 	/*
 SELECT o.*, ht.*
@@ -197,6 +197,20 @@ WHERE `
 		sheet.SetColWidth(col_index, col_index, 20)
 		set_head_cell_style(cell)
 		cell.Value = "hold原因"
+
+		if status_id == models.ORDER_STATUS_HOLD {
+			col_index++
+			cell = header_row.AddCell()
+			sheet.SetColWidth(col_index, col_index, 20)
+			set_head_cell_style(cell)
+			cell.Value = "最佳仓"
+
+			col_index++
+			cell = header_row.AddCell()
+			sheet.SetColWidth(col_index, col_index, 20)
+			set_head_cell_style(cell)
+			cell.Value = "最佳物流"
+		}
 	}
 
 	for _, order := range order_list {
@@ -217,6 +231,32 @@ WHERE `
 		cell = row.AddCell()
 		set_text_cell_style(cell, "left")
 		cell.Value = order.HoldType.Name
+
+		if status_id == models.ORDER_STATUS_HOLD {
+
+			var order_logistics_logic models.OrderLogisticsLogicInfo
+			_, err := db_session.Where(fmt.Sprintf("order_id = %d", order.Order.Id)).Get(&order_logistics_logic)
+			core.HandleError(err)
+
+			// 最佳仓
+
+			var stock models.StockInfo
+			_, err = db_session.Id(order_logistics_logic.StockId).Get(&stock)
+			core.HandleError(err)
+
+			cell = row.AddCell()
+			set_text_cell_style(cell, "left")
+			cell.Value = stock.Name
+
+			// 最佳物流
+			var mode models.LogisticsModeInfo
+			_, err = db_session.Id(order_logistics_logic.ModeId).Get(&mode)
+			core.HandleError(err)
+
+			cell = row.AddCell()
+			set_text_cell_style(cell, "left")
+			cell.Value = mode.Name
+		}
 	}
 
 	return xlsx_file
