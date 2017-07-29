@@ -27,11 +27,11 @@ type ProductSaleAnalysisSettingDetailForm struct {
 
 func (f *ProductSaleAnalysisSettingDetailForm) Valid(validation *revel.Validation) bool {
 
-	validation.Min(int(f.Setting.Level1Days), 2).Message("1档统计天数不能小于2！")
-	validation.Min(int(f.Setting.Level2Days), 2).Message("2档统计天数不能小于2！")
-	validation.Min(int(f.Setting.Level3Days), 2).Message("3档统计天数不能小于2！")
-	validation.Min(int(f.Setting.Level4Days), 2).Message("4档统计天数不能小于2！")
-	validation.Min(int(f.Setting.Level5Days), 2).Message("5档统计天数不能小于2！")
+	validation.Min(int(f.Setting.Level1Days), 0).Message("1档统计天数不能小于0！")
+	validation.Min(int(f.Setting.Level2Days), 0).Message("2档统计天数不能小于0！")
+	validation.Min(int(f.Setting.Level3Days), 0).Message("3档统计天数不能小于0！")
+	validation.Min(int(f.Setting.Level4Days), 0).Message("4档统计天数不能小于0！")
+	validation.Min(int(f.Setting.Level5Days), 0).Message("5档统计天数不能小于0！")
 
 	validation.Max(int(f.Setting.Level1Days), 300).Message("1档统计天数不能大于300！")
 	validation.Max(int(f.Setting.Level2Days), 300).Message("2档统计天数不能大于300！")
@@ -94,6 +94,7 @@ func (c ErpProductSaleAnalysisSetting) Save() revel.Result {
 
 	// 插入当前的配置信息
 	setting.Id = 0
+	setting.Name = "default"
 	_, err = db_session.Insert(setting) // 因为前面取的是地址，所以这里就不用取地址了的
 	core.HandleError(err)
 

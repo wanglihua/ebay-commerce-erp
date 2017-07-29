@@ -1,0 +1,295 @@
+{%header "商品销售统计设置" .%}
+<div id="page">
+    <div class="breadcrumbs" id="breadcrumbs">
+        <ul class="breadcrumb">
+            <li>
+                <a href='{%url "Home.Index"%}'><i class="ace-icon fa fa-home home-icon"></i></a>
+            </li>
+            <li class="parent" data-menu="spbb-menu">商品报表</li>
+            <li class="active" data-menu="spbb-product-sale-analysis-setting-menu">商品销售统计设置</li>
+        </ul>
+    </div>
+    <div class="page-content">
+        <div class="row">
+            <div class="col-xs-12" style="padding: 0;">
+                <div class="gridToolBar clearfix">
+                    <button class="btn btn-primary btn-sm" onclick="loadSettingDetail()">
+                        <i class="ace-icon fa fa-refresh"></i>
+                        刷新
+                    </button>
+                    <button class="btn btn-success btn-sm" @click="saveSetting()">
+                        <i class="ace-icon fa fa-floppy-o"></i>
+                        保存
+                    </button>
+                </div>
+                <div>
+                    <div class="widget-box" style="border-style:none;width:780px; ">
+                        <div class="widget-body">
+                            <div class="widget-main">
+                                <form class="form-horizontal" role="form" id="settingDetailForm">
+                                    <input id="setting_id" name="detail.setting.id" type="hidden" v-model.number="detail.setting.id"/>
+
+                                    <div class="row">
+                                        <div class="col-xs-6">
+                                            <div class="form-group">
+                                                <label for="level1_days" class="col-xs-4 control-label">1档统计天数</label>
+                                                <div class="col-xs-8">
+                                                    <input id="level1_days" name="detail.setting.level1_days" type="text" class="input-sm form-control" v-model.number="detail.setting.level1_days"/>
+                                                    <div class="help-block">商品销售统计时的第1档天数。</div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-xs-6">
+                                            <div class="form-group">
+                                                <label for="level1_weight" class="col-xs-4 control-label">1档统计权重</label>
+                                                <div class="col-xs-8">
+                                                    <input id="level1_weight" name="detail.setting.level1_weight" type="text" class="input-sm form-control" v-model.number="detail.setting.level1_weight"/>
+                                                    <div class="help-block">商品销售统计时的第1档权重。</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-xs-6">
+                                            <div class="form-group">
+                                                <label for="level2_days" class="col-xs-4 control-label">2档统计天数</label>
+                                                <div class="col-xs-8">
+                                                    <input id="level2_days" name="detail.setting.level2_days" type="text" class="input-sm form-control" v-model.number="detail.setting.level2_days"/>
+                                                    <div class="help-block">商品销售统计时的第2档天数。</div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-xs-6">
+                                            <div class="form-group">
+                                                <label for="level2_weight" class="col-xs-4 control-label">2档统计权重</label>
+                                                <div class="col-xs-8">
+                                                    <input id="level2_weight" name="detail.setting.level2_weight" type="text" class="input-sm form-control" v-model.number="detail.setting.level2_weight"/>
+                                                    <div class="help-block">商品销售统计时的第2档权重。</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-xs-6">
+                                            <div class="form-group">
+                                                <label for="level3_days" class="col-xs-4 control-label">3档统计天数</label>
+                                                <div class="col-xs-8">
+                                                    <input id="level3_days" name="detail.setting.level3_days" type="text" class="input-sm form-control" v-model.number="detail.setting.level3_days"/>
+                                                    <div class="help-block">商品销售统计时的第3档天数。</div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-xs-6">
+                                            <div class="form-group">
+                                                <label for="level3_weight" class="col-xs-4 control-label">3档统计权重</label>
+                                                <div class="col-xs-8">
+                                                    <input id="level3_weight" name="detail.setting.level3_weight" type="text" class="input-sm form-control" v-model.number="detail.setting.level3_weight"/>
+                                                    <div class="help-block">商品销售统计时的第3档权重。</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-xs-6">
+                                            <div class="form-group">
+                                                <label for="level4_days" class="col-xs-4 control-label">4档统计天数</label>
+                                                <div class="col-xs-8">
+                                                    <input id="level4_days" name="detail.setting.level4_days" type="text" class="input-sm form-control" v-model.number="detail.setting.level4_days"/>
+                                                    <div class="help-block">商品销售统计时的第4档天数。</div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-xs-6">
+                                            <div class="form-group">
+                                                <label for="level4_weight" class="col-xs-4 control-label">4档统计权重</label>
+                                                <div class="col-xs-8">
+                                                    <input id="level4_weight" name="detail.setting.level4_weight" type="text" class="input-sm form-control" v-model.number="detail.setting.level4_weight"/>
+                                                    <div class="help-block">商品销售统计时的第4档权重。</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-xs-6">
+                                            <div class="form-group">
+                                                <label for="level5_days" class="col-xs-4 control-label">5档统计天数</label>
+                                                <div class="col-xs-8">
+                                                    <input id="level5_days" name="detail.setting.level5_days" type="text" class="input-sm form-control" v-model.number="detail.setting.level5_days"/>
+                                                    <div class="help-block">商品销售统计时的第5档天数。</div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-xs-6">
+                                            <div class="form-group">
+                                                <label for="level5_weight" class="col-xs-4 control-label">5档统计权重</label>
+                                                <div class="col-xs-8">
+                                                    <input id="level5_weight" name="detail.setting.level5_weight" type="text" class="input-sm form-control" v-model.number="detail.setting.level5_weight"/>
+                                                    <div class="help-block">商品销售统计时的第5档权重。</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+
+    function loadSettingDetail(this_vm) {
+        showMask("加载中...");
+        $("#settingDetailForm").clearValidation();
+        $.ajax({
+                url: '{%url "ErpProductSaleAnalysisSetting.DetailData" %}',
+                type: "POST",
+                success: function (result) {
+                    hideMask();
+                    if (result.success === false) {
+                        $.msg.error(result.message);
+                        return;
+                    }
+
+                    if (result.setting.level1_days === 0) {
+                        result.setting.level1_days = null;
+                    }
+
+                    if (result.setting.level2_days === 0) {
+                        result.setting.level2_days = null;
+                    }
+
+                    if (result.setting.level3_days === 0) {
+                        result.setting.level3_days = null;
+                    }
+
+                    if (result.setting.level4_days === 0) {
+                        result.setting.level4_days = null;
+                    }
+
+                    if (result.setting.level5_days === 0) {
+                        result.setting.level5_days = null;
+                    }
+
+                    if (result.setting.level1_weight === 0) {
+                        result.setting.level1_weight = null;
+                    }
+
+                    if (result.setting.level2_weight === 0) {
+                        result.setting.level2_weight = null;
+                    }
+
+                    if (result.setting.level3_weight === 0) {
+                        result.setting.level3_weight = null;
+                    }
+
+                    if (result.setting.level4_weight === 0) {
+                        result.setting.level4_weight = null;
+                    }
+
+                    if (result.setting.level5_weight === 0) {
+                        result.setting.level5_weight = null;
+                    }
+
+                    if (this_vm === void(0) || this_vm.detail === void(0)) {
+                        vm.detail = result;
+                    }
+                    else {
+                        this_vm.detail = result;
+                    }
+                }
+            }
+        );
+    }
+
+    var vm = new Vue({
+        el: "#page",
+        data: {
+            "detail": {
+                "setting": {}
+            }
+        },
+        mounted: function () {
+            loadSettingDetail(this);
+        },
+        methods: {
+            saveSetting: function () {
+                showMask("提交中...");
+                var form = $("#settingDetailForm");
+                var valid = validate(form, {
+
+                    'detail.setting.level1_days': {
+                        required: false, digits: true, min: 0, max: 300
+                    },
+                    'detail.setting.level1_weight': {
+                        required: false, number: true, min: 0, max: 1
+                    },
+                    'detail.setting.level2_days': {
+                        required: false, digits: true, min: 0, max: 300
+                    },
+                    'detail.setting.level2_weight': {
+                        required: false, number: true, min: 0, max: 1
+                    },
+                    'detail.setting.level3_days': {
+                        required: false, digits: true, min: 0, max: 300
+                    },
+                    'detail.setting.level3_weight': {
+                        required: false, number: true, min: 0, max: 1
+                    },
+                    'detail.setting.level4_days': {
+                        required: false, digits: true, min: 0, max: 300
+                    },
+                    'detail.setting.level14_weight': {
+                        required: false, number: true, min: 0, max: 1
+                    },
+                    'detail.setting.level5_days': {
+                        required: false, digits: true, min: 0, max: 300
+                    },
+                    'detail.setting.level5_weight': {
+                        required: false, number: true, min: 0, max: 1
+                    }
+                });
+
+                if (!valid) {
+                    hideMask();
+                } else {
+                    $.ajax(
+                        {
+                            url: '{%url "ErpProductSaleAnalysisSetting.Save"%}',
+                            type: "POST",
+                            processData: false,
+                            contentType: 'application/json',
+                            data: JSON.stringify(vm.detail),
+                            success: function (data) {
+                                hideMask();
+                                if (data.success === false) {
+                                    $.msg.error(data.message);
+                                    //return;
+                                }
+                                else {
+                                    //vm.detail = data.detail;
+                                    $.msg.show(data.message);
+                                    //return;
+                                }
+                            }
+                        }
+                    );
+                }
+            }
+        }
+    });
+</script>
+{%footer%}
+
