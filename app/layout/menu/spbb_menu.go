@@ -38,6 +38,30 @@ func GetSpbbMenu(res_id_map map[int64]bool, web_session revel.Session) string {
             <b class="arrow"></b>
         </li>
 
+        <li id="spbb-product-sale-analysis-menu" class="">
+            <a href="/product/sale/analysis">
+                <i class="menu-icon fa fa-caret-right"></i>
+                商品销售统计
+            </a>
+            <b class="arrow"></b>
+        </li>
+
+        <li id="spbb-product-sale-analysis-setting-menu" class="">
+            <a href="/product/sale/analysis/setting">
+                <i class="menu-icon fa fa-caret-right"></i>
+                商品销售统计设置
+            </a>
+            <b class="arrow"></b>
+        </li>
+
+    </ul>
+</li>
+`)
+
+	/*
+
+	商品销售统计设置
+
         <li id="spbb-packagematerial-menu" class="">
             <a href="#">
                 <i class="menu-icon fa fa-caret-right"></i>
@@ -53,10 +77,7 @@ func GetSpbbMenu(res_id_map map[int64]bool, web_session revel.Session) string {
             </a>
             <b class="arrow"></b>
         </li>
-
-    </ul>
-</li>
-`)
+	 */
 
 	return buffer.String()
 }

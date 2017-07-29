@@ -16,6 +16,7 @@ const (
 	// 库存管理  模块编号 14
 	// 商品配置  模块编号 15
 	// 海关报关  模块编号 16
+	// 商品报表  模块编号 17
 
 	// 采购管理
 
@@ -102,4 +103,8 @@ const (
 	HGBG_CONTAINER_TRANSFER_TO_ZT_STOCK = 160410 // 集装箱调拨 调拨至在途仓
 	HGBG_CONTAINER_TRANSFER_TO_AU_STOCK = 160420 // 集装箱调拨 调拨至澳洲仓
 	HGBG_PRODUCT_INVOICE                = 160500 // 商品是否开票
+
+	// 商品报表
+	SPBB_PRODUCT_SALE_ANALYSIS_SETTING = 170100 // 商品销售分析设置
+	SPBB_PRODUCT_SALE_ANALYSIS         = 170200 // 商品销售分析
 )

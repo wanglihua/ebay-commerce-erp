@@ -420,6 +420,24 @@ func (e PassResInfo) InitData(db_session *xorm.Session) {
 		db_session.Insert(pass)
 	}
 
+	// 商品报表
+	{
+		pass := new(PassResInfo)
+		pass.Id = pass_res.SPBB_PRODUCT_SALE_ANALYSIS_SETTING
+		pass.CateId = pass_res_cate.SPBB
+		pass.Name = "商品销售分析设置"
+		pass.Desc = core.MakeNullString("商品销售分析设置", true)
+		db_session.Insert(pass)
+
+		pass = new(PassResInfo)
+		pass.Id = pass_res.SPBB_PRODUCT_SALE_ANALYSIS
+		pass.CateId = pass_res_cate.SPBB
+		pass.Name = "商品销售分析"
+		pass.Desc = core.MakeNullString("商品销售分析", true)
+		db_session.Insert(pass)
+	}
+
+	// 海关报关
 	{
 		pass := new(PassResInfo)
 		pass.Id = pass_res.HGBG_PRODUCT_HS_CODE

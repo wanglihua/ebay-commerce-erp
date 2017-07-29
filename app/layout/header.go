@@ -162,18 +162,6 @@ func GetHeader(title string, db_session *xorm.Session, web_session revel.Session
 		header_buffer.WriteString(menu.GetDdlcMenu(res_id_map, web_session))
 	}
 
-	if check_pass_cate_menu(pass_res_cate.XXGL) == true {
-		header_buffer.WriteString(menu.GetXxglMenu(res_id_map, web_session))
-	}
-
-	if check_pass_cate_menu(pass_res_cate.PPGL) == true {
-		header_buffer.WriteString(menu.GetPpglMenu(res_id_map, web_session))
-	}
-
-	if check_pass_cate_menu(pass_res_cate.THGL) == true {
-		header_buffer.WriteString(menu.GetThglMenu(res_id_map, web_session))
-	}
-
 	if check_pass_cate_menu(pass_res_cate.DDPZ) == true {
 		header_buffer.WriteString(menu.GetDdpzMenu(res_id_map, web_session))
 	}
@@ -190,12 +178,24 @@ func GetHeader(title string, db_session *xorm.Session, web_session revel.Session
 		header_buffer.WriteString(menu.GetSppzMenu(res_id_map, web_session))
 	}
 
+	if check_pass_cate_menu(pass_res_cate.SPBB) == true {
+		header_buffer.WriteString(menu.GetSpbbMenu(res_id_map, web_session))
+	}
+
 	if check_pass_cate_menu(pass_res_cate.HGBG) == true {
 		header_buffer.WriteString(menu.GetHgbgMenu(res_id_map, web_session))
 	}
 
-	if check_pass_cate_menu(pass_res_cate.SPBB) == true {
-		header_buffer.WriteString(menu.GetSpbbMenu(res_id_map, web_session))
+	if check_pass_cate_menu(pass_res_cate.XXGL) == true {
+		header_buffer.WriteString(menu.GetXxglMenu(res_id_map, web_session))
+	}
+
+	if check_pass_cate_menu(pass_res_cate.PPGL) == true {
+		header_buffer.WriteString(menu.GetPpglMenu(res_id_map, web_session))
+	}
+
+	if check_pass_cate_menu(pass_res_cate.THGL) == true {
+		header_buffer.WriteString(menu.GetThglMenu(res_id_map, web_session))
 	}
 
 	if check_pass_cate_menu(pass_res_cate.CGGL) == true {
