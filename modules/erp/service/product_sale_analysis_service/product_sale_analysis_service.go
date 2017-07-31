@@ -36,6 +36,7 @@ func ProductSaleAnalyze() {
 		db_session.Close()
 	}()
 
+	// 按单日统计
 	{
 		// 按单日统计
 
@@ -175,5 +176,11 @@ ORDER BY oi.item_product_id ASC;`
 				}
 			}
 		}
+	}
+
+	// 按多日统计
+	{
+		// 按多日统计
+
 	}
 }
