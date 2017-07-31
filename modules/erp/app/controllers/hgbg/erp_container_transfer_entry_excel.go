@@ -17,6 +17,7 @@ import (
 	"matrix/modules/erp/service/exchange_rate_service"
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/auth/pass_res"
+	"matrix/modules/erp/service/container_transfer_log_service"
 )
 
 type ErpContainerTransferEntryExcel struct {
@@ -229,6 +230,8 @@ func (c ErpContainerTransferEntryExcel) Import() revel.Result {
 	}
 
 	container_transfer_service.CalculateAndSaveWeightVolumeAmount(transfer_id, db_session)
+
+	container_transfer_log_service.Insert_container_transfer_log(containerTransfer, "导入调拨明细", db_session, c.Session)
 
 	return c.RenderJson(map[string]interface{}{
 		"success": true,

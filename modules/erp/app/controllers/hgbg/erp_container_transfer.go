@@ -11,6 +11,7 @@ import (
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/auth/pass_res"
 	"time"
+	"matrix/modules/erp/service/container_transfer_log_service"
 )
 
 type ErpContainerTransfer struct {
@@ -261,9 +262,13 @@ func (c ErpContainerTransfer) Save() revel.Result {
 		container_transfer.StatusId = models.CONTAINER_TRANSFER_STATUS_NEW
 		affected, err = db_session.Insert(&container_transfer)
 		core.HandleError(err)
+
+		container_transfer_log_service.Insert_container_transfer_log(container_transfer, "新建调拨单", db_session, c.Session)
 	} else {
 		affected, err = db_session.Id(container_transfer.Id).Update(&container_transfer)
 		core.HandleError(err)
+
+		container_transfer_log_service.Insert_container_transfer_log(container_transfer, "修改调拨单", db_session, c.Session)
 
 		if affected == 0 {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！" })
@@ -295,6 +300,10 @@ func (c ErpContainerTransfer) Delete() revel.Result {
 		if container_transfer_can_modify(container_transfer) == false {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "当前状态不能删除！"})
 		}
+	}
+
+	for _, container_transfer := range container_transfer_list {
+		container_transfer_log_service.Insert_container_transfer_log(container_transfer, "删除调拨单", db_session, c.Session)
 	}
 
 	affected, err := db_session.In("id", container_transfer_id_list).Delete(new(models.ContainerTransferInfo))
@@ -336,6 +345,8 @@ func (c ErpContainerTransfer) Depart() revel.Result {
 
 	container_transfer_service.UpdateStockInventory(ct, c.Session, db_session)
 
+	container_transfer_log_service.Insert_container_transfer_log(ct, "调拨至在途仓", db_session, c.Session)
+
 	return c.RenderJson(map[string]interface{}{
 		"success": true,
 		"message": "设置集装箱调拨为 已出发状态 成功！",
@@ -374,6 +385,8 @@ func (c ErpContainerTransfer) Stock() revel.Result {
 	core.HandleError(err)
 
 	container_transfer_service.UpdateStockInventory(ct, c.Session, db_session)
+
+	container_transfer_log_service.Insert_container_transfer_log(ct, "调拨至澳洲仓", db_session, c.Session)
 
 	return c.RenderJson(map[string]interface{}{
 		"success": true,

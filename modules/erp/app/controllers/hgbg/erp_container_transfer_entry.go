@@ -13,6 +13,7 @@ import (
 	"matrix/modules/erp/service/exchange_rate_service"
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/auth/pass_res"
+	"matrix/modules/erp/service/container_transfer_log_service"
 )
 
 type ErpContainerTransferEntry struct {
@@ -180,19 +181,19 @@ func (c ErpContainerTransferEntry) Save() revel.Result {
 
 	container_transfer_entry.ProductId = product.Id
 
-	var containerTransfer models.ContainerTransferInfo
-	_, err = db_session.Id(container_transfer_entry.TransferId).Get(&containerTransfer)
-	core.HandleError(err)
-
-	container_transfer_entry.BatchCode = containerTransfer.BatchCode
+	container_transfer_entry.BatchCode = ct.BatchCode
 
 	var affected int64
 	if detail_form.IsCreate() {
 		affected, err = db_session.Insert(&container_transfer_entry)
 		core.HandleError(err)
+
+		container_transfer_log_service.Insert_container_transfer_log(ct, "新增调拨明细", db_session, c.Session)
 	} else {
 		affected, err = db_session.Id(container_transfer_entry.Id).Update(&container_transfer_entry)
 		core.HandleError(err)
+
+		container_transfer_log_service.Insert_container_transfer_log(ct, "修改调拨明细", db_session, c.Session)
 
 		if affected == 0 {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！" })
@@ -228,6 +229,8 @@ func (c ErpContainerTransferEntry) Delete() revel.Result {
 	if container_transfer_can_modify(ct) == false {
 		return c.RenderJson(core.JsonResult{Success: false, Message: "当前状态不能修改！"})
 	}
+
+	container_transfer_log_service.Insert_container_transfer_log(ct, "删除调拨明细", db_session, c.Session)
 
 	affected, err := db_session.In("id", container_transfer_entry_id_list).Delete(new(models.ContainerTransferEntryInfo))
 	core.HandleError(err)
