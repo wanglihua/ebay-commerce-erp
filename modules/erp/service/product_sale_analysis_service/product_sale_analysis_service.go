@@ -92,13 +92,18 @@ ORDER BY oi.item_product_id ASC;`
 						_, err := db_session.Id(product_sale_day_analysis.Id).Cols("qty").Update(&product_sale_day_analysis)
 						core.HandleError(err)
 					} else {
+						var product models.ProductInfo
+						_, err := db_session.Id(product_sale.ProductId).Get(&product)
+						core.HandleError(err)
+
 						product_sale_day_analysis.StockId = 0
 						product_sale_day_analysis.Type = models.PRODUCT_SALE_ANALYSIS_TYPE_SKU
 						product_sale_day_analysis.ProductId = product_sale.ProductId
+						product_sale_day_analysis.Sku = product.Sku
 						product_sale_day_analysis.Qty = product_sale.Qty
 						product_sale_day_analysis.Day = core.Date(day_time_begin)
 
-						_, err := db_session.Insert(&product_sale_day_analysis)
+						_, err = db_session.Insert(&product_sale_day_analysis)
 						core.HandleError(err)
 					}
 				}
@@ -127,13 +132,18 @@ ORDER BY oi.item_product_id ASC;`
 							_, err := db_session.Id(product_sale_day_analysis.Id).Cols("qty").Update(&product_sale_day_analysis)
 							core.HandleError(err)
 						} else {
+							var product models.ProductInfo
+							_, err := db_session.Id(product_sale.ProductId).Get(&product)
+							core.HandleError(err)
+
 							product_sale_day_analysis.StockId = stock_id
 							product_sale_day_analysis.Type = models.PRODUCT_SALE_ANALYSIS_TYPE_ACTUAL
 							product_sale_day_analysis.ProductId = product_sale.ProductId
+							product_sale_day_analysis.Sku = product.Sku
 							product_sale_day_analysis.Qty = product_sale.Qty
 							product_sale_day_analysis.Day = core.Date(day_time_begin)
 
-							_, err := db_session.Insert(&product_sale_day_analysis)
+							_, err = db_session.Insert(&product_sale_day_analysis)
 							core.HandleError(err)
 						}
 					}
@@ -163,13 +173,18 @@ ORDER BY oi.item_product_id ASC;`
 							_, err := db_session.Id(product_sale_day_analysis.Id).Cols("qty").Update(&product_sale_day_analysis)
 							core.HandleError(err)
 						} else {
+							var product models.ProductInfo
+							_, err := db_session.Id(product_sale.ProductId).Get(&product)
+							core.HandleError(err)
+
 							product_sale_day_analysis.StockId = stock_id
 							product_sale_day_analysis.Type = models.PRODUCT_SALE_ANALYSIS_TYPE_LOGIC
 							product_sale_day_analysis.ProductId = product_sale.ProductId
+							product_sale_day_analysis.Sku = product.Sku
 							product_sale_day_analysis.Qty = product_sale.Qty
 							product_sale_day_analysis.Day = core.Date(day_time_begin)
 
-							_, err := db_session.Insert(&product_sale_day_analysis)
+							_, err = db_session.Insert(&product_sale_day_analysis)
 							core.HandleError(err)
 						}
 					}

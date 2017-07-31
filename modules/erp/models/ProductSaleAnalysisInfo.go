@@ -17,6 +17,7 @@ type ProductSaleAnalysisInfo struct {
 	Id         int64             `xorm:"bigint notnull pk autoincr 'id'" json:"id"`
 	StockId    int64             `xorm:"bigint notnull index 'stock_id'" json:"stock_id" smith:"verbose_name=仓库"` // 如果不是分仓库统计的，全局置为 0
 	ProductId  int64             `xorm:"bigint notnull index 'product_id'" json:"product_id" smith:"verbose_name=商品"`
+	Sku        string            `xorm:"bigint notnull index 'sku'" json:"sku" smith:"verbose_name=SKU"`
 	Level1Qty  int64             `xorm:"bigint notnull 'level1_qty'" json:"level1_qty" smith:"verbose_name=1档数量"`
 	Level2Qty  int64             `xorm:"bigint notnull 'level2_qty'" json:"level2_qty" smith:"verbose_name=2档数量"`
 	Level3Qty  int64             `xorm:"bigint notnull 'level3_qty'" json:"level3_qty" smith:"verbose_name=3档数量"`

@@ -40,10 +40,15 @@
                     "sAjaxSource": '{%url "ErpProductSaleDayAnalysis.ListData"%}',
                     "aaSorting": [[1, "asc"]],
                     "aoColumns": [
-                        {"mDataProp": "type", "title": "统计类型", "bSearchable": false},
+                        {
+                            "mDataProp": "type", "title": "统计类型", "bSearchable": false,
+                            "render": function (data, type, row) {
+                                return data;
+                            }
+                        },
                         {"mDataProp": "stock_id", "title": "仓库", "bSearchable": false},
                         {"mDataProp": "product_id", "title": "商品", "bSearchable": false},
-                        {"mDataProp": "day", "title": "Day", "bSearchable": false},
+                        {"mDataProp": "day", "title": "日期", "bSearchable": false},
                         {"mDataProp": "qty", "title": "销售数量", "bSearchable": false}
                     ]
                 }
