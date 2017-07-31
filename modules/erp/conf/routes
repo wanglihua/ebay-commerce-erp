@@ -552,6 +552,9 @@ POST /container/transfer/report/elem/export  ErpContainerTransferReportElemExcel
 POST /container/transfer/excel/in/export   ErpContainerTransferExcelIn.Export
 POST /container/transfer/excel/out/export  ErpContainerTransferExcelOut.Export
 
+POST /container/transfer/log              ErpContainerTransferLog.Index
+POST /container/transfer/log/data/list    ErpContainerTransferLog.ListData
+
 GET  /product/invoice                      ErpProductInvoice.Index
 POST /product/invoice/data/list            ErpProductInvoice.ListData
 POST /product/invoice/data/detail          ErpProductInvoice.DetailData

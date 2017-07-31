@@ -29,7 +29,7 @@
                         <i class="ace-icon fa fa-ship"></i>
                         调拨至在途仓
                     </button>
-                    <button class="btn btn-pink btn-sm" onclick="stockContainerTransfer()"  {% .to_au_stock_disabled %}>
+                    <button class="btn btn-pink btn-sm" onclick="stockContainerTransfer()" {% .to_au_stock_disabled %}>
                         <i class="ace-icon fa fa-bank"></i>
                         调拨至澳洲仓
                     </button>
@@ -74,7 +74,18 @@
                         {"mDataProp": "ct.packing_time", "title": "装箱时间", "bSearchable": false, "width": 120},
                         {"mDataProp": "ct.departure_time", "title": "预计到港时间", "bSearchable": false, "width": 120},
                         {"mDataProp": "ct.stock_time", "title": "预计到仓时间", "bSearchable": false, "width": 120},
-                        {"mDataProp": "s.name", "title": "状态", "bSearchable": true, "width": 80}
+                        {"mDataProp": "s.name", "title": "状态", "bSearchable": true, "width": 80},
+                        {
+                            "mDataProp": "ct.id",
+                            "bSearchable": false,
+                            "orderable": false,
+                            "sClass": "center",
+                            "width": 100,
+                            "title": '操作',
+                            "render": function (data, type, row) {
+                                return "<a class='btn btn-xs btn-info btn-inline pull-left' onclick='show_log_dialog(" + data + ");' ><i class='ace-icon fa fa-list'></i>查看历史</a>";
+                            }
+                        }
                     ]
                 }
             );
@@ -195,6 +206,69 @@
             });
         });
     }
+
+    function show_log_dialog(transfer_id) {
+        function load_container_transfer_log(transfer_id) {
+            var history_vm = new Vue({
+                el: "#container_transfer_log_dialog",
+                data: {}
+            });
+
+            initDataTable(
+                '#containerTransferLogList',
+                {
+                    "sAjaxSource": '{%url "ErpContainerTransferLog.ListData"%}',
+                    "aaSorting": [[0, "desc"]],
+                    "aoColumns": [
+                        {"mDataProp": "create_time", "title": "时间", "sClass": "center", "bSearchable": false, "bSortable": false, "width": 120},
+                        {"mDataProp": "login_name", "title": "工号", "sClass": "center", "bSearchable": false, "bSortable": false, "width": 120},
+                        {
+                            "mDataProp": "operation", "title": "描述", "bSearchable": true, "bSortable": false,
+                            "render": function (data, type, row) {
+                                return "<div style='white-space:normal; word-break: break-all; word-wrap:break-word;'>" + data + "</div>";
+                            }
+                        }
+
+                    ],
+                    "fnServerData": function (sSource, aoData, fnCallback) {
+                        showMask("数据加载中，请稍候");
+
+                        aoData.push({'name': 'transfer_id', 'value': transfer_id});
+
+                        $.ajax({
+                            "dataType": 'json',
+                            "url": sSource,
+                            "data": aoData,
+                            "success": function (data) {
+                                hideMask();
+
+                                if (data.success === false) {
+                                    $.msg.error(data.message);
+                                    return;
+                                }
+
+                                fnCallback(data);
+                            }
+                        });
+                    }
+                }
+            );
+        }
+
+        $("#container_transfer_log_wrapper").html("");
+
+        $.ajax({
+            url: '{%url "ErpContainerTransferLog.Index" %}',
+            type: "POST",
+            data: {"transfer_id": transfer_id},
+            success: function (result) {
+                $("#container_transfer_log_wrapper").html(result);
+                load_container_transfer_log(transfer_id);
+                $("#container_transfer_log_dialog").modal();
+            }
+        });
+    }
 </script>
+<div id="container_transfer_log_wrapper"></div>
 {%footer%}
 
