@@ -219,11 +219,16 @@ func processPackage(fset *token.FileSet, pkgImportPath, pkgPath string, pkg *ast
 
 			// If this is a func...
 			if funcDecl, ok := decl.(*ast.FuncDecl); ok {
+
+				/*
+
 				// Scan it for validation calls
 				lineKeys := getValidationKeys(fset, funcDecl, imports)
 				if len(lineKeys) > 0 {
 					validationKeys[pkgImportPath+"."+getFuncName(funcDecl)] = lineKeys
 				}
+
+				 */
 
 				// Check if it's an init function.
 				if funcDecl.Name.Name == "init" {
@@ -280,8 +285,8 @@ func addImports(imports map[string]string, decl ast.Decl, srcDir string) {
 				continue
 			}
 		}
-		quotedPath := importSpec.Path.Value           // e.g. "\"sample/app/models\""
-		fullPath := quotedPath[1 : len(quotedPath)-1] // Remove the quotes
+		quotedPath := importSpec.Path.Value          // e.g. "\"sample/app/models\""
+		fullPath := quotedPath[1: len(quotedPath)-1] // Remove the quotes
 
 		// If the package was not aliased (common case), we have to import it
 		// to see what the package name is.

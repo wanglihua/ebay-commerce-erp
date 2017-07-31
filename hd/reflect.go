@@ -225,11 +225,15 @@ func processPackage(fset *token.FileSet, pkgImportPath, pkgPath string, pkg *ast
 			if funcDecl, ok := decl.(*ast.FuncDecl); ok {
 				//log.Println("funcDecl.Name.Name", funcDecl.Name.Name)
 
+				/*
+
 				// Scan it for validation calls
 				lineKeys := getValidationKeys(fset, funcDecl, imports)
 				if len(lineKeys) > 0 {
 					validationKeys[pkgImportPath+"."+getFuncName(funcDecl)] = lineKeys
 				}
+
+				 */
 
 				// Check if it's an init function.
 				if funcDecl.Name.Name == "init" {
