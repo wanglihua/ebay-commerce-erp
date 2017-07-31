@@ -8,7 +8,9 @@ const (
 	// 统计实际值
 	PRODUCT_SALE_ANALYSIS_TYPE_ACTUAL = 100
 	// 统计理论值
-	PRODUCT_SALE_ANALYSIS_TYPE_LOGIC  = 200
+	PRODUCT_SALE_ANALYSIS_TYPE_LOGIC = 200
+	// 只统计SKU，不分仓库统计
+	PRODUCT_SALE_ANALYSIS_TYPE_SKU = 300
 )
 
 type ProductSaleAnalysisInfo struct {
