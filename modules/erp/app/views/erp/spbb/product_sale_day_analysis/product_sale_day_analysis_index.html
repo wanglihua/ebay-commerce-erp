@@ -1,0 +1,60 @@
+{%header "商品销售日统计" .%}
+<div id="page">
+    <div class="breadcrumbs" id="breadcrumbs">
+        <ul class="breadcrumb">
+            <li>
+                <a href='{%url "Home.Index"%}'><i class="ace-icon fa fa-home home-icon"></i></a>
+            </li>
+            <li class="parent" data-menu="spbb-menu">商品报表</li>
+            <li class="active" data-menu="spbb-product-sale-day-analysis-menu">商品销售日统计</li>
+        </ul>
+    </div>
+    <div class="page-content">
+        <div class="row">
+            <div class="col-xs-12" style="padding: 0;">
+                <div class="gridToolBar clearfix">
+                    <button class="btn btn-primary btn-sm" @click="reloadList('#productSaleDayAnalysisList')">
+                        <i class="ace-icon fa fa-refresh"></i>
+                        刷新
+                    </button>
+                </div>
+                <div>
+                    <table id="productSaleDayAnalysisList" class="table table-striped table-bordered table-hover"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    var vm = new Vue({
+        el: "#page",
+        data: {
+            "detail": {
+                "analysis": {}
+            }
+        },
+        mounted: function () {
+            initDataTable(
+                '#productSaleDayAnalysisList',
+                {
+                    "sAjaxSource": '{%url "ErpProductSaleDayAnalysis.ListData"%}',
+                    "aaSorting": [[1, "asc"]],
+                    "aoColumns": [
+                        {"mDataProp": "type", "title": "统计类型", "bSearchable": false},
+                        {"mDataProp": "stock_id", "title": "仓库", "bSearchable": false},
+                        {"mDataProp": "product_id", "title": "商品", "bSearchable": false},
+                        {"mDataProp": "day", "title": "Day", "bSearchable": false},
+                        {"mDataProp": "qty", "title": "销售数量", "bSearchable": false}
+                    ]
+                }
+            );
+        },
+        methods: {
+            reloadList: function () {
+                reloadList('#productSaleDayAnalysisList');
+            }
+        }
+    });
+</script>
+{%footer%}
+

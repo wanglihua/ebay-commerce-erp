@@ -15,6 +15,7 @@ import (
 	"strings"
 
 	"github.com/revel/revel"
+	"runtime/debug"
 )
 
 // SourceInfo is the top-level struct containing all extracted information
@@ -731,7 +732,9 @@ func NewTypeExpr(pkgName string, expr ast.Expr) TypeExpr {
 		return TypeExpr{"[]" + e.Expr, e.PkgName, e.pkgIndex + 2, e.Valid}
 	default:
 		// log.Println(string(debug.Stack()))
+		log.Println("pkgName: ", pkgName)
 		log.Println("Failed to generate name for field. Make sure the field name is valid.")
+		log.Println(string(debug.Stack()))
 	}
 	return TypeExpr{Valid: false}
 }

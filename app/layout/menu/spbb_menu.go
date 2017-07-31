@@ -46,6 +46,14 @@ func GetSpbbMenu(res_id_map map[int64]bool, web_session revel.Session) string {
             <b class="arrow"></b>
         </li>
 
+        <li id="spbb-product-sale-day-analysis-menu" class="">
+            <a href="/product/sale/day/analysis">
+                <i class="menu-icon fa fa-caret-right"></i>
+                商品销售日统计
+            </a>
+            <b class="arrow"></b>
+        </li>
+
         <li id="spbb-product-sale-analysis-setting-menu" class="">
             <a href="/product/sale/analysis/setting">
                 <i class="menu-icon fa fa-caret-right"></i>
