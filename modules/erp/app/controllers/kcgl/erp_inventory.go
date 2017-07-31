@@ -345,6 +345,16 @@ func (c ErpInventory) Delete() revel.Result {
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})
 }
 
+func (c ErpInventory) ReCalPending() revel.Result {
+
+	inventory_service.Calculate_inventory_pending_qty()
+
+	return c.RenderJson(map[string]interface{}{
+		"success": true,
+		"message": "更新待配货数量成功",
+	})
+}
+
 func (c ErpInventory) Import() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.KCGL_INVENTORY, c.Session)
 

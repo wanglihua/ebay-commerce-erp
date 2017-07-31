@@ -42,6 +42,8 @@ func (c *pending_inventory_temp_keeper) add(stock_id int64, product_id int64, qt
 		pi_found.qty = qty
 		pending_inventory_list = append(pending_inventory_list, pi_found)
 	}
+
+	c.pending_inventory_list = pending_inventory_list
 }
 
 func (c *pending_inventory_temp_keeper) get(stock_id int64, product_id int64) int64 {

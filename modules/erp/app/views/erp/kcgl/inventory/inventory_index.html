@@ -21,6 +21,12 @@
                         <i class="ace-icon fa fa-plus"></i>
                         新增
                     </button>
+
+                    <button class="btn btn-purple btn-sm" @click="reCalPending()">
+                        <i class="ace-icon fa fa-calculator"></i>
+                        重新计算待发货数量
+                    </button>
+
                     {%/*
                     <button id="btnImport" class="btn btn-info btn-sm">
                         <i class="ace-icon fa fa-file-excel-o"></i>
@@ -744,6 +750,24 @@
                         }
                         else {
                             vm.detail.storage_loc_list = data.storage_loc_list;
+                            return;
+                        }
+                    }
+                });
+            },
+            reCalPending: function () {
+                $.ajax({
+                    url: '{%url "ErpInventory.ReCalPending"%}',
+                    type: "POST",
+
+                    success: function (data) {
+                        if (data.success === false) {
+                            $.msg.error(data.message);
+                            return;
+                        }
+                        else {
+                            $.msg.show(data.message);
+                            vm.reloadList();
                             return;
                         }
                     }
