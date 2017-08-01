@@ -69,7 +69,7 @@ WHERE md.order_code = '2053968244015'
 
 	var sb = core.NewSqlBuilder()
 	sb.Select("id, order_code, address_postal_code, stock_name, company_name, mode_name, fee_rate_post_code, total_fee, total_cost, match_result, create_time")
-	sb.Count("count(id) as match_debug_count")
+	sb.Count("count(1) as match_debug_count")
 	sb.From(`erp_order_logistics_match_debug`)
 
 	if order_code_query != "" {
@@ -94,8 +94,14 @@ WHERE md.order_code = '2053968244015'
 		Count int64 `xorm:"'match_debug_count'"`
 	}
 
-	_, err = db_session.Sql(sb.SqlCount()).Get(&match_debug_count)
-	core.HandleError(err)
+	if order_code_query != "" {
+		_, err = db_session.Sql(sb.SqlCount()).Get(&match_debug_count)
+		core.HandleError(err)
+	} else {
+		var sql_count = `SELECT id AS match_debug_count FROM erp_order_logistics_match_debug ORDER BY id DESC LIMIT 1;`
+		_, err = db_session.Sql(sql_count).Get(&match_debug_count)
+		core.HandleError(err)
+	}
 
 	return c.RenderJson(core.GridResult{
 		Data:  order_logistics_match_debug_list,
