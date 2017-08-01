@@ -28,7 +28,7 @@ func (c ErpProductSaleDayAnalysis) ListData() revel.Result {
 	/*
 SELECT da.*, s.*
 FROM erp_product_sale_day_analysis da
-    INNER JOIN erp_stock s ON da.stock_id = s.id
+    LEFT JOIN erp_stock s ON da.stock_id = s.id
 	 */
 
 	var sb = core.NewSqlBuilder()
@@ -36,7 +36,7 @@ FROM erp_product_sale_day_analysis da
 	sb.Select("da.*, s.*")
 	sb.Count("count(1) AS da_count")
 	sb.From(`erp_product_sale_day_analysis da
-    INNER JOIN erp_stock s ON da.stock_id = s.id`)
+    LEFT JOIN erp_stock s ON da.stock_id = s.id`)
 	sb.Where(filter)
 
 	if order != "" {
