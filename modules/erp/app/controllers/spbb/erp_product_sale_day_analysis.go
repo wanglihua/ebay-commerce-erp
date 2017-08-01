@@ -31,23 +31,24 @@ FROM erp_product_sale_day_analysis da
     INNER JOIN erp_stock s ON da.stock_id = s.id
 	 */
 
-	query := db_session.
-	Select("da.*, s.*").
-		Table("erp_product_sale_day_analysis").Alias("da").
-		Join("INNER", []string{"erp_stock", "s"}, "da.stock_id = s.id").
-		Where(filter)
+	var sb = core.NewSqlBuilder()
 
-	//query extra filter here
+	sb.Select("da.*, s.*")
+	sb.Count("count(1) AS da_count")
+	sb.From(`erp_product_sale_day_analysis da
+    INNER JOIN erp_stock s ON da.stock_id = s.id`)
+	sb.Where(filter)
 
-	data_query := *query
 	if order != "" {
-		data_query = *data_query.OrderBy(order)
+		sb.OrderBy(order)
 	} else {
-		data_query = *data_query.Asc("da.id")
+		sb.OrderBy("da.id ASC")
 	}
 
+	sb.Limit(offset, limit)
+
 	product_sale_day_analysis_list := make([]product_sale_day_analysis_item_t, 0, limit)
-	err := data_query.Limit(limit, offset).Find(&product_sale_day_analysis_list)
+	err := db_session.Sql(sb.SqlList()).Find(&product_sale_day_analysis_list)
 	core.HandleError(err)
 
 	for index, product_sale_day_analysis := range product_sale_day_analysis_list {
@@ -70,12 +71,15 @@ FROM erp_product_sale_day_analysis da
 		product_sale_day_analysis_list[index].ProductSaleDayAnalysis.ProductName = product.CnName
 	}
 
-	count_query := *query
-	count, err := count_query.Count(new(product_sale_day_analysis_item_t))
+	var da_count struct {
+		Count int64 `xorm:"'da_count'"`
+	}
+
+	_, err = db_session.Sql(sb.SqlCount()).Get(&da_count)
 	core.HandleError(err)
 
 	return c.RenderJson(core.GridResult{
 		Data:  product_sale_day_analysis_list,
-		Total: count,
+		Total: da_count.Count,
 	})
 }
