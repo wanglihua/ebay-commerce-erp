@@ -564,3 +564,4 @@ POST /product/invoice/import               ErpProductInvoice.Import
 
 GET  /product/sale/day/analysis            ErpProductSaleDayAnalysis.Index
 POST /product/sale/day/analysis/data/list  ErpProductSaleDayAnalysis.ListData
+POST /product/sale/day/analysis/analyze    ErpProductSaleDayAnalysis.Analyze

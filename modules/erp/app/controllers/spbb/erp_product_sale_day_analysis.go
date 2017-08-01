@@ -5,6 +5,8 @@ import (
 
 	"matrix/core"
 	"matrix/modules/erp/models"
+	"fmt"
+	"matrix/modules/erp/service/product_sale_analysis_service"
 )
 
 type ErpProductSaleDayAnalysis struct {
@@ -92,5 +94,15 @@ FROM erp_product_sale_day_analysis da
 	return c.RenderJson(core.GridResult{
 		Data:  product_sale_day_analysis_list,
 		Total: da_count.Count,
+	})
+}
+
+func (c ErpProductSaleDayAnalysis) Analyze() revel.Result {
+
+	go product_sale_analysis_service.ProductSaleAnalyze()
+
+	return c.RenderJson(map[string]interface{}{
+		"success": true,
+		"message": fmt.Sprintf("立即启动 近%d天日销售情况分析任务成功！", product_sale_analysis_service.DaysToAnalyze),
 	})
 }

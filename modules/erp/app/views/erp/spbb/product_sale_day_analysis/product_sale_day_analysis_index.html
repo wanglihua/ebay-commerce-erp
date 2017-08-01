@@ -17,6 +17,10 @@
                         <i class="ace-icon fa fa-refresh"></i>
                         刷新
                     </button>
+                    <button class="btn btn-pink btn-sm" @click="analyze()">
+                        <i class="ace-icon fa fa-refresh"></i>
+                        立即分析近日销售情况
+                    </button>
                 </div>
                 <div id="query" class="col-xs-12" style="line-height: 28px;">
                     <div class="col-xs-12" style="margin-top: 20px;margin-bottom: 20px;">
@@ -90,6 +94,24 @@
         methods: {
             reloadList: function () {
                 reloadList('#productSaleDayAnalysisList');
+            },
+            analyze: function () {
+
+                $.ajax({
+                    "dataType": 'json',
+                    "url": '{% url "ErpProductSaleDayAnalysis.Analyze" %}',
+                    "success": function (data) {
+
+                        if (data.success === false) {
+                            $.msg.error(data.message);
+                            return;
+                        }
+                        else {
+                            $.msg.show(data.message);
+                            return;
+                        }
+                    }
+                });
             }
         }
     });
