@@ -18,6 +18,9 @@ func (c ErpProductSaleDayAnalysis) Index() revel.Result {
 func (c ErpProductSaleDayAnalysis) ListData() revel.Result {
 	db_session := c.DbSession
 
+	var sku_query string
+	c.Params.Bind(&sku_query, "sku_query")
+
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
 	type product_sale_day_analysis_item_t struct {
@@ -37,6 +40,14 @@ FROM erp_product_sale_day_analysis da
 	sb.Count("count(1) AS da_count")
 	sb.From(`erp_product_sale_day_analysis da
     LEFT JOIN erp_stock s ON da.stock_id = s.id`)
+
+	var sql_args = make([]interface{}, 0)
+
+	if sku_query != "" {
+		filter = core.SqlAnd(filter, "da.sku = ?")
+		sql_args = append(sql_args, sku_query)
+	}
+
 	sb.Where(filter)
 
 	if order != "" {
@@ -48,7 +59,7 @@ FROM erp_product_sale_day_analysis da
 	sb.Limit(offset, limit)
 
 	product_sale_day_analysis_list := make([]product_sale_day_analysis_item_t, 0, limit)
-	err := db_session.Sql(sb.SqlList()).Find(&product_sale_day_analysis_list)
+	err := db_session.Sql(sb.SqlList(), sql_args...).Find(&product_sale_day_analysis_list)
 	core.HandleError(err)
 
 	for index, product_sale_day_analysis := range product_sale_day_analysis_list {
@@ -75,7 +86,7 @@ FROM erp_product_sale_day_analysis da
 		Count int64 `xorm:"'da_count'"`
 	}
 
-	_, err = db_session.Sql(sb.SqlCount()).Get(&da_count)
+	_, err = db_session.Sql(sb.SqlCount(), sql_args...).Get(&da_count)
 	core.HandleError(err)
 
 	return c.RenderJson(core.GridResult{

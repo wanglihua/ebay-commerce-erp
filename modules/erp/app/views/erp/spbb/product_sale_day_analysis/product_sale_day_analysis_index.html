@@ -18,6 +18,18 @@
                         刷新
                     </button>
                 </div>
+                <div id="query" class="col-xs-12" style="line-height: 28px;">
+                    <div class="col-xs-12" style="margin-top: 20px;margin-bottom: 20px;">
+                        <div style="float: left;">
+                            <label for="sku_query">商品编号查询</label>
+                            <input id="sku_query" name="sku_query" style="width: 180px;height:30px;"/>
+                            <button class="btn btn-mini btn-primary" style="margin-bottom:3px;height: 30px;" @click="reloadList()">
+                                &nbsp;<i class="ace-icon fa fa-search"></i>查&nbsp;询&nbsp;
+                            </button>
+                        </div>
+                        <div style="clear: both;"></div>
+                    </div>
+                </div>
                 <div>
                     <table id="productSaleDayAnalysisList" class="table table-striped table-bordered table-hover"></table>
                 </div>
@@ -41,17 +53,37 @@
                     "aaSorting": [[1, "asc"]],
                     "aoColumns": [
                         {
-                            "mDataProp": "da.type", "title": "统计类型", "bSearchable": false, "width": 120,
+                            "mDataProp": "da.type", "title": "统计类型", "bSearchable": false, "sClass": "center", "width": 120,
                             "render": function (data, type, row) {
                                 return row.da.type_name;
                             }
                         },
-                        {"mDataProp": "s.name", "title": "仓库", "bSearchable": true, "width": 200},
+                        {"mDataProp": "s.name", "title": "仓库", "bSearchable": true, "sClass": "center", "width": 200},
                         {"mDataProp": "da.sku", "title": "SKU", "bSearchable": true, "width": 200},
-                        {"mDataProp": "da.day", "title": "日期", "bSearchable": false, "width": 120},
-                        {"mDataProp": "da.qty", "title": "销售数量", "bSearchable": false, "width": 80},
+                        {"mDataProp": "da.day", "title": "日期", "bSearchable": false, "sClass": "center", "width": 120},
+                        {"mDataProp": "da.qty", "title": "销售数量", "bSearchable": false, "sClass": "center", "width": 80},
                         {"mDataProp": "da.product_name", "title": "商品名称", "bSearchable": false, "bSortable": false}
-                    ]
+                    ],
+                    "fnServerData": function (sSource, aoData, fnCallback) {
+                        showMask("数据加载中，请稍候");
+                        aoData.push({'name': 'sku_query', 'value': $("#sku_query").val()});
+
+                        $.ajax({
+                            "dataType": 'json',
+                            "url": sSource,
+                            "data": aoData,
+                            "success": function (data) {
+                                hideMask();
+
+                                if (data.success === false) {
+                                    $.msg.error(data.message);
+                                    return;
+                                }
+
+                                fnCallback(data);
+                            }
+                        });
+                    }
                 }
             );
         },
