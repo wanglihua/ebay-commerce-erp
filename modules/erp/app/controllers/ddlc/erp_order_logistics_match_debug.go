@@ -81,7 +81,7 @@ WHERE md.order_code = '2053968244015'
 	if order != "" {
 		sb.OrderBy(order)
 	} else {
-		sb.OrderBy("id ASC")
+		sb.OrderBy("id DESC")
 	}
 
 	sb.Limit(offset, limit)

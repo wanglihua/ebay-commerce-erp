@@ -12,6 +12,7 @@ import (
 	"matrix/modules/auth/pass_res"
 	"time"
 	"matrix/modules/erp/service/container_transfer_log_service"
+	"fmt"
 )
 
 type ErpContainerTransfer struct {
@@ -324,6 +325,16 @@ func (c ErpContainerTransfer) Depart() revel.Result {
 	_, err := db_session.Id(transfer_id).Get(&ct)
 	core.HandleError(err)
 
+	count, err := db_session.Where(fmt.Sprintf("transfer_id = %d", transfer_id)).Count(new(models.ContainerTransferEntryInfo))
+	core.HandleError(err)
+
+	if count == 0 {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "当前集装箱调拨明细为空，不能操作！",
+		})
+	}
+
 	if ct.StatusId == models.CONTAINER_TRANSFER_STATUS_DEPART {
 		return c.RenderJson(map[string]interface{}{
 			"success": false,
@@ -364,6 +375,16 @@ func (c ErpContainerTransfer) Stock() revel.Result {
 	var ct models.ContainerTransferInfo
 	_, err := db_session.Id(transfer_id).Get(&ct)
 	core.HandleError(err)
+
+	count, err := db_session.Where(fmt.Sprintf("transfer_id = %d", transfer_id)).Count(new(models.ContainerTransferEntryInfo))
+	core.HandleError(err)
+
+	if count == 0 {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "当前集装箱调拨明细为空，不能操作！",
+		})
+	}
 
 	if ct.StatusId == models.CONTAINER_TRANSFER_STATUS_STOCK {
 		return c.RenderJson(map[string]interface{}{
