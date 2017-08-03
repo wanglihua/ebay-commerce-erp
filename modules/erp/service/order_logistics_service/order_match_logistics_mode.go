@@ -565,7 +565,7 @@ func (p_ol *OrderLogisticsService) match_logistics_mode_with_option(p_order *mod
 			// 最后匹配的仓库没有货，但是存在匹配的有货的仓库
 			p_ol.update_order_to_hold_type(p_order, models.ORDER_HOLD_TYPE_OOS_BEST_STOCK, db_session)
 		} else {
-			p_ol.update_order_to_hold_type(p_order, models.ORDER_HOLD_TYPE_OOS_BEST_STOCK, db_session) // 应该还缺一个缺货的HOLD类型，就是澳仓无货？
+			p_ol.update_order_to_hold_type(p_order, models.ORDER_HOLD_TYPE_OOS_ALL_STOCK, db_session) // 缺货的Hold，后面的 Hold check 会把它进一步更新成 在途才有货等等。
 		}
 	} else {
 		var product_info_list = p_order_logistics_data.order_product_info_list
