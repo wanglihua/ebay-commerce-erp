@@ -35,8 +35,8 @@ func (p_ol *OrderLogisticsService) match_logistics_mode_with_option(p_order *mod
 	var stock_id_has_products_map = make(map[int64]stock_has_product_and_cost_amount_t)
 	for _, stock := range au_stock_list {
 		var stock_has_product_and_cost_amount stock_has_product_and_cost_amount_t
-		has_product, cost_amount := check_stock_has_order_products_and_get_cost_amount(p_ol, stock.Id, p_order_logistics_data);
-		stock_has_product_and_cost_amount.has_product = has_product // 仓库有没有全部的商品数量的库存
+		has_product, cost_amount := check_stock_has_order_products_and_get_cost_amount(p_ol, p_order, stock.Id, p_order_logistics_data, true) // 最后一个参数取 true，考虑订单中被 temp pending的数量
+		stock_has_product_and_cost_amount.has_product = has_product                                                                           // 仓库有没有全部的商品数量的库存
 		stock_has_product_and_cost_amount.cost_amount = cost_amount
 
 		stock_id_has_products_map[stock.Id] = stock_has_product_and_cost_amount
@@ -564,6 +564,8 @@ func (p_ol *OrderLogisticsService) match_logistics_mode_with_option(p_order *mod
 		if len(match_result_has_stock_list) != 0 {
 			// 最后匹配的仓库没有货，但是存在匹配的有货的仓库
 			p_ol.update_order_to_hold_type(p_order, models.ORDER_HOLD_TYPE_OOS_BEST_STOCK, db_session)
+		} else {
+			p_ol.update_order_to_hold_type(p_order, models.ORDER_HOLD_TYPE_OOS_BEST_STOCK, db_session) // 应该还缺一个缺货的HOLD类型，就是澳仓无货？
 		}
 	} else {
 		var product_info_list = p_order_logistics_data.order_product_info_list

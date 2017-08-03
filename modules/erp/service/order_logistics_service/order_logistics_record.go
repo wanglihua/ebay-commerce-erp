@@ -131,7 +131,7 @@ func save_special_hold_order_logistics(p_ol *OrderLogisticsService, p_order *mod
 	order_logistics.Sfkltjz = 0
 	order_logistics.TotalFee = total_fee
 	order_logistics.PickFee = pick_fee_service.Get_product_pick_fee(whole_weight, p_ol.pick_fee_setting)
-	_, order_logistics.CostAmount = check_stock_has_order_products_and_get_cost_amount(p_ol, p_ol.mel_stock_id, p_order_logistics_data)
+	_, order_logistics.CostAmount = check_stock_has_order_products_and_get_cost_amount(p_ol, p_order, p_ol.mel_stock_id, p_order_logistics_data, false) // 最后的 true false 都无所谓的，因为不关心数量
 	order_logistics.Ptfl = p_ol.logistics_setting.Ptfl
 	order_logistics.Jyfl = p_ol.logistics_setting.Jyfl
 

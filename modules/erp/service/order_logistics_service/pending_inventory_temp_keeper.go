@@ -1,5 +1,7 @@
 package order_logistics_service
 
+import "github.com/revel/revel"
+
 type pending_inventory struct {
 	stock_id   int64
 	product_id int64
@@ -18,6 +20,11 @@ func new_pending_inventory_temp_keeper() *pending_inventory_temp_keeper {
 }
 
 func (c *pending_inventory_temp_keeper) add(stock_id int64, product_id int64, qty int64) {
+	revel.TRACE.Println("(c *pending_inventory_temp_keeper) add(stock_id int64, product_id int64, qty int64)")
+	revel.TRACE.Println("stock_id", stock_id)
+	revel.TRACE.Println("product_id", product_id)
+	revel.TRACE.Println("qty", qty)
+
 	var pending_inventory_list = c.pending_inventory_list
 
 	var pi_found pending_inventory

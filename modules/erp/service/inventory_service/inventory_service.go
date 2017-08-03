@@ -76,18 +76,18 @@ type Product_stock_qty struct {
 // 获取包含"这个商品"的所有"产品库存数量记录"
 func Get_product_stock_qty_list(product_id int64, db_session *xorm.Session) []Product_stock_qty {
 	/*
-SELECT ivt.product_id AS product_id, ivt.stock_id AS stock_id, s.stock_type_id, sum(ivt.qty) AS qty, sum(ivt.pending_qty) as pending_qty, ivt.cost_price AS cost_price
-FROM erp_inventory ivt
-    INNER JOIN erp_stock s ON s.id = ivt.stock_id
-WHERE ivt.product_id = 1
-GROUP BY ivt.product_id, ivt.stock_id
+SELECT nvt.product_id AS product_id, nvt.stock_id AS stock_id, s.stock_type_id, sum(nvt.qty) AS qty, sum(nvt.pending_qty) as pending_qty, nvt.cost_price AS cost_price
+FROM erp_inventory nvt
+    INNER JOIN erp_stock s ON s.id = nvt.stock_id
+WHERE nvt.product_id = 1
+GROUP BY nvt.product_id, nvt.stock_id
 	 */
 
-	sql := `SELECT ivt.product_id AS product_id, ivt.stock_id AS stock_id, s.stock_type_id, sum(ivt.qty) AS qty, sum(ivt.pending_qty) as pending_qty, ivt.cost_price AS cost_price
-FROM erp_inventory ivt
-    INNER JOIN erp_stock s ON s.id = ivt.stock_id
-WHERE ivt.product_id = %d
-GROUP BY ivt.product_id, ivt.stock_id`
+	sql := `SELECT nvt.product_id AS product_id, nvt.stock_id AS stock_id, s.stock_type_id, sum(nvt.qty) AS qty, sum(nvt.pending_qty) as pending_qty, nvt.cost_price AS cost_price
+FROM erp_inventory nvt
+    INNER JOIN erp_stock s ON s.id = nvt.stock_id
+WHERE nvt.product_id = %d
+GROUP BY nvt.product_id, nvt.stock_id`
 	sql = fmt.Sprintf(sql, product_id)
 
 	var product_stock_qty_list = make([]Product_stock_qty, 0)
@@ -101,7 +101,7 @@ GROUP BY ivt.product_id, ivt.stock_id`
 func Get_products_stock_qty_list(product_id_list []int64, db_session *xorm.Session) []Product_stock_qty {
 	/*
 SELECT nvt.product_id AS product_id, nvt.stock_id AS stock_id, s.stock_type_id AS stock_type_id,
-    sum(nvt.qty) AS qty,
+    sum(nvt.qty) AS qty, sum(nvt.pending_qty) as pending_qty,
     if(sum(nvt.qty) <> 0,sum(nvt.cost_price * nvt.qty) / sum(nvt.qty), sum(nvt.cost_price)/count(*)) AS cost_price
 FROM erp_inventory nvt
 INNER JOIN erp_stock s ON s.id = nvt.stock_id
@@ -110,7 +110,7 @@ GROUP BY nvt.product_id, nvt.stock_id, s.stock_type_id
 	 */
 
 	sql := `SELECT nvt.product_id AS product_id, nvt.stock_id AS stock_id, s.stock_type_id AS stock_type_id,
-	sum(nvt.qty) AS qty,
+	sum(nvt.qty) AS qty, sum(nvt.pending_qty) as pending_qty,
     if(sum(nvt.qty) <> 0, sum(nvt.cost_price * nvt.qty) / sum(nvt.qty), sum(nvt.cost_price) / count(*)) AS cost_price
 FROM erp_inventory nvt
     INNER JOIN erp_stock s ON s.id = nvt.stock_id

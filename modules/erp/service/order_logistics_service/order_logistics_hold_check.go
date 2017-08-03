@@ -106,7 +106,8 @@ func (p_ol *OrderLogisticsService) hold_check_oss_au_stock_but_zt_stock_has(p_or
 	}
 
 	// 澳洲仓库缺货，但在途仓库有货
-	if p_ol.hold_check_oss_by_stock_type(p_order, p_order_logistics_data, fun_is_au_stock, db_session) == true && p_ol.hold_check_oss_by_stock_type(p_order, p_order_logistics_data, fun_is_zt_stock, db_session) == false {
+	if p_ol.hold_check_oss_by_stock_type(p_order, p_order_logistics_data, fun_is_au_stock, db_session) == true &&
+		p_ol.hold_check_oss_by_stock_type(p_order, p_order_logistics_data, fun_is_zt_stock, db_session) == false {
 		p_ol.update_order_to_hold_type(p_order, models.ORDER_HOLD_TYPE_OOS_AU_STOCK_ZT_HAS, db_session)
 		return true
 	}
@@ -138,7 +139,7 @@ func (p_ol *OrderLogisticsService) hold_check_oss_by_stock_type(p_order *models.
 
 	// 对每一个仓库循环，看是不是这个仓库里面, 这些商品都有货
 	for _, stock_id := range product_stock_id_list {
-		var stock_has_all_product, _ = check_stock_has_order_products_and_get_cost_amount(p_ol, stock_id, p_order_logistics_data)
+		var stock_has_all_product, _ = check_stock_has_order_products_and_get_cost_amount(p_ol, p_order, stock_id, p_order_logistics_data, false) // 由于 hold 是在匹配物流之后，所以 这时就不考虑当前被 temp pending 的当前订单的数量
 
 		// 找到仓库全部商品都有货了，就退出；如果这个仓库里面不是全部商品都有货，就继续找
 		if stock_has_all_product {
@@ -571,7 +572,8 @@ func (p_ol *OrderLogisticsService) update_order_to_hold_type(p_order *models.Ord
 }
 
 // 检查仓库是否有订单中的所有商品数量的库存。这里的有货就理解成这个仓库有订单的所有的商品；这里的缺货也理解成是，没有一个仓库能凑齐所有商品的所有数量。同时返回订单的商品总成本
-func check_stock_has_order_products_and_get_cost_amount(p_ol *OrderLogisticsService, stock_id int64, p_order_logistics_data *order_logistics_data_t) (has_return bool, cost_amount_return float64) {
+// consider_temp_pending_for_this_order 是否考虑当前订单被pending的数量
+func check_stock_has_order_products_and_get_cost_amount(p_ol *OrderLogisticsService, p_order *models.OrderInfo, stock_id int64, p_order_logistics_data *order_logistics_data_t, consider_temp_pending_for_this_order bool) (has_return bool, cost_amount_return float64) {
 	var products_stock_qty_list = p_order_logistics_data.products_stock_qty_list //库存为零的也包含，只要有记录的都会包含，可以从里面取得仓库的成本价，就算库存为零也能取得成本价
 	var order_product_info_list = p_order_logistics_data.order_product_info_list //保存物流的时候要从这里面取 澳仓成本 cost_price
 
@@ -589,7 +591,35 @@ func check_stock_has_order_products_and_get_cost_amount(p_ol *OrderLogisticsServ
 				// 记录下订单明细里面的 商品的澳仓成本价，这代码是后来加上的
 				order_product_info_list[index].CostPrice = cost_amount
 
-				if product_stock_qty.Qty >= (order_product_info.Qty + product_stock_qty.PendingQty + p_ol.pending_keeper.get(stock_id, order_product_info.ProductId)) { // 考虑匹配过程中 pending 的库存
+				var temp_pending_qty_by_this_order_product_to_remove int64 = order_product_info.Qty
+				if consider_temp_pending_for_this_order == true {
+					temp_pending_qty_by_this_order_product_to_remove = 0
+				}
+
+				revel.TRACE.Println("order_product_info.Qty", order_product_info.Qty)
+				revel.TRACE.Println("product_stock_qty.PendingQty", product_stock_qty.PendingQty)
+				revel.TRACE.Println("p_ol.pending_keeper.get(stock_id, order_product_info.ProductId)", p_ol.pending_keeper.get(stock_id, order_product_info.ProductId))
+				revel.TRACE.Println("temp_pending_qty_by_this_order_product_to_remove", temp_pending_qty_by_this_order_product_to_remove)
+
+				if consider_temp_pending_for_this_order == true {
+					revel.TRACE.Println(" product_stock_qty.Qty >= (order_product_info.Qty + product_stock_qty.PendingQty + p_ol.pending_keeper.get(stock_id, order_product_info.ProductId) - temp_pending_qty_by_this_order_product_to_remove", product_stock_qty.Qty >= (order_product_info.Qty + product_stock_qty.PendingQty + p_ol.pending_keeper.get(stock_id, order_product_info.ProductId) - temp_pending_qty_by_this_order_product_to_remove))
+				}
+
+				// models.ORDER_STATUS_HOLD, models.ORDER_HOLD_TYPE_PICK_UP, models.ORDER_HOLD_TYPE_ENVELOPE, models.ORDER_HOLD_TYPE_EXPRESS, models.ORDER_HOLD_TYPE_INTERNATIONAL
+				var pending_in_db_to_clear int64 = 0
+				// 如果是待配货状态的，应该把数据库中待发货的数量给清除掉，不考虑；配货中一般不可能，先放着吧；还有几个Hold
+				if p_order.StatusId == models.ORDER_STATUS_DPH ||
+					p_order.StatusId == models.ORDER_STATUS_PHZ ||
+					(p_order.StatusId == models.ORDER_STATUS_HOLD &&
+						(p_order.HoldTypeId.Int64 == models.ORDER_HOLD_TYPE_PICK_UP ||
+							p_order.HoldTypeId.Int64 == models.ORDER_HOLD_TYPE_ENVELOPE ||
+							p_order.HoldTypeId.Int64 == models.ORDER_HOLD_TYPE_EXPRESS ||
+							p_order.HoldTypeId.Int64 == models.ORDER_HOLD_TYPE_INTERNATIONAL)) {
+					pending_in_db_to_clear = order_product_info.Qty
+				}
+
+				// p_ol.pending_keeper.get(stock_id, order_product_info.ProductId) 和 temp_pending_qty_by_this_order_product_to_remove 这两个有可能是不同的，后面的一个是针对这个订单的
+				if product_stock_qty.Qty >= (order_product_info.Qty + product_stock_qty.PendingQty + p_ol.pending_keeper.get(stock_id, order_product_info.ProductId) - pending_in_db_to_clear - temp_pending_qty_by_this_order_product_to_remove) { // 考虑匹配过程中 pending 的库存
 					product_has_stock = true
 					break //这个 break 加不加都可以的，因为 这个 stock_id， 这个 product_id 的就一条记录
 				}

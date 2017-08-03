@@ -250,12 +250,14 @@ func (p_ol *OrderLogisticsService) CalculateListWithOption(order_list []models.O
 	p_ol.pending_keeper = new_pending_inventory_temp_keeper()
 
 	for _, order := range order_list {
-
+		//检查订单状态
 		//订单状态检查 这些要排除的
 		if order.StatusId == models.ORDER_STATUS_YCJ ||
+			order.StatusId == models.ORDER_STATUS_PHZ ||
 			order.StatusId == models.ORDER_STATUS_YQX ||
 			order.StatusId == models.ORDER_STATUS_YWC ||
 			order.StatusId == models.ORDER_STATUS_YFH {
+
 			continue
 		}
 
