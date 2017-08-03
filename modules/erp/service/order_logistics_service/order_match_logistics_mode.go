@@ -76,7 +76,13 @@ func (p_ol *OrderLogisticsService) match_logistics_mode_with_option(p_order *mod
 		// 如果指定了 物流方式，并且指定的物流方式是 信封， 就设置为信封Hold，并且匹配信封费率
 		if match_option.Prefer_mode_id != 0 && match_option.Prefer_mode_id == logistics_mode.Id && logistics_mode.TypeId == models.LOGISTICS_MODE_TYPE_ENVELOPE {
 			p_ol.update_order_to_hold_type(p_order, models.ORDER_HOLD_TYPE_ENVELOPE, db_session)
-			p_ol.match_envelope_fee_rate(p_order, p_order_logistics_data, db_session)
+			var match_envelope_success = p_ol.match_envelope_fee_rate(p_order, p_order_logistics_data, db_session)
+			if match_envelope_success == false {
+				// 强制匹配为信封，但是费率没有匹配成功，就是长宽高重量没有符合信封的要求，就把费用最大的那个信封费率设置为最后匹配成功的费率
+				var envelope_fee_rate_list = p_ol.envelope_fee_rate_list
+				var max_fee_envelop_fee_rate = envelope_fee_rate_list[len(envelope_fee_rate_list)-1]
+				save_special_hold_order_logistics(p_ol, p_order, p_order_logistics_data, max_fee_envelop_fee_rate.Id, max_fee_envelop_fee_rate.Fee, db_session)
+			}
 			is_envelope_hold = true
 			break
 		}
