@@ -10,8 +10,6 @@ import (
 	"matrix/modules/erp/models"
 )
 
-
-
 func ProductSaleAnalyze() {
 	defer func() {
 		if err := recover(); err != nil {
@@ -226,5 +224,6 @@ ORDER BY oi.item_product_id ASC;`
 	{
 		// 按多日统计
 
+		//var analysis_setting =  product_sale_analysis_setting_service.Get_product_sale_analysis_setting(db_session)
 	}
 }

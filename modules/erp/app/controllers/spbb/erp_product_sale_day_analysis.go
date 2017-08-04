@@ -17,11 +17,34 @@ func (c ErpProductSaleDayAnalysis) Index() revel.Result {
 	return c.RenderTemplate("erp/spbb/product_sale_day_analysis/product_sale_day_analysis_index.html")
 }
 
+func (c ErpProductSaleDayAnalysis) PageData() revel.Result {
+	return c.RenderJson(map[string]interface{}{
+		"analysis_type_id": 0,
+		"analysis_type_list": []map[string]interface{}{
+			map[string]interface{}{
+				"id":   models.PRODUCT_SALE_ANALYSIS_TYPE_ACTUAL,
+				"name": "实际仓库发货",
+			},
+			map[string]interface{}{
+				"id":   models.PRODUCT_SALE_ANALYSIS_TYPE_LOGIC,
+				"name": "理论仓库发货",
+			},
+			map[string]interface{}{
+				"id":   models.PRODUCT_SALE_ANALYSIS_TYPE_SKU,
+				"name": "不分仓统计",
+			},
+		},
+	})
+}
+
 func (c ErpProductSaleDayAnalysis) ListData() revel.Result {
 	db_session := c.DbSession
 
 	var sku_query string
 	c.Params.Bind(&sku_query, "sku_query")
+
+	var analysis_type_id int64
+	c.Params.Bind(&analysis_type_id, "analysis_type_id")
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
@@ -48,6 +71,11 @@ FROM erp_product_sale_day_analysis da
 	if sku_query != "" {
 		filter = core.SqlAnd(filter, "da.sku = ?")
 		sql_args = append(sql_args, sku_query)
+	}
+
+	if analysis_type_id != 0 {
+		filter = core.SqlAnd(filter, "type = ?")
+		sql_args = append(sql_args, analysis_type_id)
 	}
 
 	sb.Where(filter)

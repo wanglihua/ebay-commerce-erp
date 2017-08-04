@@ -25,6 +25,12 @@
                 <div id="query" class="col-xs-12" style="line-height: 28px;">
                     <div class="col-xs-12" style="margin-top: 20px;margin-bottom: 20px;">
                         <div style="float: left;">
+                            <label for="analysis_type_id">统计类型</label>
+                            <select id="analysis_type_id" name="analysis_type_id" class="input-sm form-control">
+                                <template v-for="analysis_type in analysis_type_list">
+                                    <option :value="type.id">{{type.name}}</option>
+                                </template>
+                            </select>
                             <label for="sku_query">商品编号查询</label>
                             <input id="sku_query" name="sku_query" style="width: 180px;height:30px;"/>
                             <button class="btn btn-mini btn-primary" style="margin-bottom:3px;height: 30px;" @click="reloadList()">
@@ -45,6 +51,10 @@
     var vm = new Vue({
         el: "#page",
         data: {
+            "page": {
+                "analysis_type_id": 0,
+                "analysis_type_list": []
+            },
             "detail": {
                 "analysis": {}
             }
@@ -71,6 +81,7 @@
                     "fnServerData": function (sSource, aoData, fnCallback) {
                         showMask("数据加载中，请稍候");
                         aoData.push({'name': 'sku_query', 'value': $("#sku_query").val()});
+                        aoData.push({'name': 'analysis_type_id', 'value': $("#analysis_type_id").val()});
 
                         $.ajax({
                             "dataType": 'json',
@@ -114,6 +125,26 @@
                 });
             }
         }
+    });
+
+    function loadPageData() {
+        $.ajax({
+            "dataType": 'json',
+            "url": '{% url "ErpProductSaleDayAnalysis.PageData" %}',
+            "success": function (data) {
+
+                if (data.success === false) {
+                    $.msg.error(data.message);
+                    return;
+                }
+
+                vm.page = data;
+            }
+        });
+    }
+
+    $(function () {
+
     });
 </script>
 {%footer%}

@@ -331,9 +331,9 @@ POST /order/processed/hold/list/data       ErpOrderProcessedHold.ListData
 POST /order/processed/hold/page/data       ErpOrderProcessedHold.PageData
 POST /order/processed/hold/dai/pei/huo     ErpOrderProcessedHold.DaiPeiHuo
 
-# 可合并订单
+# ?????
 GET  /order/khb                            ErpOrderKhb.Index
-# 这个路由应该放到最后去，否则放在他后面的有的路由会不工作
+# ????????????????????????????
 # GET  /order/:status                        ErpOrder.Index
 GET  /order/detail/:order_id               ErpOrder.Detail
 POST /order/data/detail                    ErpOrder.DetailData
@@ -500,7 +500,7 @@ POST /order/tag/apply              ErpOrderTag.ApplyTag
 
 POST /order/simple/detail                ErpOrderSimpleDetail.Index
 
-# 这个通用的路由应该放到最后比较合适，否则放在他后面的有的路由会不工作
+# ??????????????????????????????????
 GET  /order/:status                        ErpOrder.Index
 
 GET  /product/hs/code               ErpProductHsCode.Index
@@ -563,5 +563,6 @@ POST /product/invoice/save                 ErpProductInvoice.Save
 POST /product/invoice/import               ErpProductInvoice.Import
 
 GET  /product/sale/day/analysis            ErpProductSaleDayAnalysis.Index
+POST /product/sale/day/analysis/page/data  ErpProductSaleDayAnalysis.PageData
 POST /product/sale/day/analysis/data/list  ErpProductSaleDayAnalysis.ListData
 POST /product/sale/day/analysis/analyze    ErpProductSaleDayAnalysis.Analyze
