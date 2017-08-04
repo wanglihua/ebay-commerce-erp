@@ -566,3 +566,8 @@ GET  /product/sale/day/analysis            ErpProductSaleDayAnalysis.Index
 POST /product/sale/day/analysis/page/data  ErpProductSaleDayAnalysis.PageData
 POST /product/sale/day/analysis/data/list  ErpProductSaleDayAnalysis.ListData
 POST /product/sale/day/analysis/analyze    ErpProductSaleDayAnalysis.Analyze
+
+GET  /product/sale/analysis                ErpProductSaleAnalysis.Index
+POST /product/sale/analysis/page/data      ErpProductSaleAnalysis.PageData
+POST /product/sale/analysis/data/list      ErpProductSaleAnalysis.ListData
+POST /product/sale/analysis/analyze        ErpProductSaleAnalysis.Analyze

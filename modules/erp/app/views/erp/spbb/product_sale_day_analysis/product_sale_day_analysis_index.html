@@ -55,9 +55,6 @@
             "page": {
                 "analysis_type_id": 0,
                 "analysis_type_list": []
-            },
-            "detail": {
-                "analysis": {}
             }
         },
         mounted: function () {
@@ -108,21 +105,22 @@
                 reloadList('#productSaleDayAnalysisList');
             },
             analyze: function () {
+                $.msg.confirm("将立即启动单日销售后台分析任务，分析近3天日销售情况", function () {
+                    $.ajax({
+                        "dataType": 'json',
+                        "url": '{% url "ErpProductSaleDayAnalysis.Analyze" %}',
+                        "success": function (data) {
 
-                $.ajax({
-                    "dataType": 'json',
-                    "url": '{% url "ErpProductSaleDayAnalysis.Analyze" %}',
-                    "success": function (data) {
-
-                        if (data.success === false) {
-                            $.msg.error(data.message);
-                            return;
+                            if (data.success === false) {
+                                $.msg.error(data.message);
+                                return;
+                            }
+                            else {
+                                $.msg.show(data.message);
+                                return;
+                            }
                         }
-                        else {
-                            $.msg.show(data.message);
-                            return;
-                        }
-                    }
+                    });
                 });
             }
         }
