@@ -127,10 +127,10 @@ FROM erp_product_sale_day_analysis da
 
 func (c ErpProductSaleDayAnalysis) Analyze() revel.Result {
 
-	go product_sale_analysis_service.ProductSaleAnalyze()
+	go product_sale_analysis_service.ProductSaleAnalyzeSingleDay()
 
 	return c.RenderJson(map[string]interface{}{
 		"success": true,
-		"message": fmt.Sprintf("立即启动 近%d天日销售情况分析任务成功！", product_sale_analysis_service.DaysToAnalyze),
+		"message": fmt.Sprintf("立即启动 近%d天日销售情况单日分析任务成功！", product_sale_analysis_service.DaysToAnalyze),
 	})
 }
