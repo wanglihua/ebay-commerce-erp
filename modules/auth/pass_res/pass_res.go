@@ -107,4 +107,5 @@ const (
 	// 商品报表
 	SPBB_PRODUCT_SALE_ANALYSIS_SETTING = 170100 // 商品销售分析设置
 	SPBB_PRODUCT_SALE_ANALYSIS         = 170200 // 商品销售分析
+	SPBB_PRODUCT_SALE_DAY_ANALYSIS     = 170300 // 商品日销售分析
 )

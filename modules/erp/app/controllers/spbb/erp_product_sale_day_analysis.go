@@ -7,6 +7,8 @@ import (
 	"matrix/modules/erp/models"
 	"fmt"
 	"matrix/modules/erp/service/product_sale_analysis_service"
+	"matrix/modules/auth/service/pass_service"
+	"matrix/modules/auth/pass_res"
 )
 
 type ErpProductSaleDayAnalysis struct {
@@ -14,6 +16,8 @@ type ErpProductSaleDayAnalysis struct {
 }
 
 func (c ErpProductSaleDayAnalysis) Index() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.SPBB_PRODUCT_SALE_DAY_ANALYSIS, c.Session)
+
 	return c.RenderTemplate("erp/spbb/product_sale_day_analysis/product_sale_day_analysis_index.html")
 }
 
@@ -38,6 +42,8 @@ func (c ErpProductSaleDayAnalysis) PageData() revel.Result {
 }
 
 func (c ErpProductSaleDayAnalysis) ListData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.SPBB_PRODUCT_SALE_DAY_ANALYSIS, c.Session)
+
 	db_session := c.DbSession
 
 	var sku_query string
@@ -126,6 +132,7 @@ FROM erp_product_sale_day_analysis da
 }
 
 func (c ErpProductSaleDayAnalysis) Analyze() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.SPBB_PRODUCT_SALE_DAY_ANALYSIS, c.Session)
 
 	go product_sale_analysis_service.ProductSaleAnalyzeSingleDay()
 

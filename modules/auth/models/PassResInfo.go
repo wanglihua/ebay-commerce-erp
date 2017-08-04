@@ -435,6 +435,13 @@ func (e PassResInfo) InitData(db_session *xorm.Session) {
 		pass.Name = "商品销售分析"
 		pass.Desc = core.MakeNullString("商品销售分析", true)
 		db_session.Insert(pass)
+
+		pass = new(PassResInfo)
+		pass.Id = pass_res.SPBB_PRODUCT_SALE_DAY_ANALYSIS
+		pass.CateId = pass_res_cate.SPBB
+		pass.Name = "商品日销售分析"
+		pass.Desc = core.MakeNullString("商品日销售分析", true)
+		db_session.Insert(pass)
 	}
 
 	// 海关报关
