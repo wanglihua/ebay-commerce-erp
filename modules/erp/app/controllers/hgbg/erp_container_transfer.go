@@ -160,6 +160,25 @@ func (c ErpContainerTransfer) Detail(id int64) revel.Result {
 	c.RenderArgs["can_depart"] = container_transfer_can_depart(container_transfer)
 	c.RenderArgs["can_stock"] = container_transfer_can_stock(container_transfer)
 	c.RenderArgs["is_not_new"] = transfer_id != 0
+	c.RenderArgs["is_stock"] = container_transfer.StatusId == models.CONTAINER_TRANSFER_STATUS_STOCK
+
+	/*
+	var can_modify_disabled template.HTML = ""
+	if container_transfer_can_modify(container_transfer) == false {
+		can_modify_disabled = template.HTML(` disabled = "disabled" `)
+	}
+	c.RenderArgs["can_modify_disabled"] = can_modify_disabled
+
+	revel.TRACE.Println("can_modify_disabled", can_modify_disabled)
+
+	var is_stock_disabled template.HTML = ""
+	if container_transfer.StatusId == models.CONTAINER_TRANSFER_STATUS_STOCK {
+		is_stock_disabled = ` disabled="disabled" `
+	}
+	c.RenderArgs["is_stock_disabled"] = is_stock_disabled
+
+	revel.TRACE.Println("is_stock_disabled", is_stock_disabled)
+	*/
 
 	if id == 0 {
 		c.RenderArgs["entries_display"] = "none"
@@ -224,7 +243,11 @@ func (c ErpContainerTransfer) Save() revel.Result {
 	err := json.Unmarshal(c.GetRequestBody(), &detail_form)
 	core.HandleError(err)
 
-	if container_transfer_can_modify(detail_form.ContainerTransfer) == false {
+	var ct_in_db models.ContainerTransferInfo
+	_, err = db_session.Id(detail_form.ContainerTransfer.Id).Get(&ct_in_db)
+	core.HandleError(err)
+
+	if ct_in_db.StatusId == models.CONTAINER_TRANSFER_STATUS_STOCK {
 		return c.RenderJson(core.JsonResult{Success: false, Message: "当前状态不能修改！"})
 	}
 
@@ -266,13 +289,18 @@ func (c ErpContainerTransfer) Save() revel.Result {
 
 		container_transfer_log_service.Insert_container_transfer_log(container_transfer, "新建调拨单", db_session, c.Session)
 	} else {
-		affected, err = db_session.Id(container_transfer.Id).Update(&container_transfer)
-		core.HandleError(err)
+		if ct_in_db.StatusId == models.CONTAINER_TRANSFER_STATUS_DEPART {
+			affected, err = db_session.Id(container_transfer.Id).Cols("departure_time", "stock_time").Update(&container_transfer)
+			core.HandleError(err)
+		} else {
+			affected, err = db_session.Id(container_transfer.Id).Update(&container_transfer)
+			core.HandleError(err)
+		}
 
 		container_transfer_log_service.Insert_container_transfer_log(container_transfer, "修改调拨单", db_session, c.Session)
 
 		if affected == 0 {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！" })
+			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！"})
 		}
 	}
 

@@ -14,6 +14,8 @@
                 {% if .is_not_new %}
                 （{% .status_name %}）
                 {% end %}
+
+                {%.can_modify_disabled%}
             </li>
         </ul>
     </div>
@@ -30,18 +32,23 @@
                             <i class="ace-icon fa fa-plus"></i>
                             新增
                         </button>
-                        {% if .can_modify %}
+                        {% if .is_stock %}
+                        <button class="btn btn-success btn-sm" onclick="saveContainerTransfer()" disabled="disabled">
+                            <i class="ace-icon fa fa-floppy-o"></i>保存
+                        </button>
+                        {% else %}
                         <button class="btn btn-success btn-sm" onclick="saveContainerTransfer()">
                             <i class="ace-icon fa fa-floppy-o"></i>保存
                         </button>
+                        {% end %}
+
+                        {% if .can_modify %}
                         <button class="btn btn-danger btn-sm" onclick="deleteContainerTransfer()">
                             <i class="ace-icon fa fa-trash-o"></i>
                             删除
                         </button>
                         {% else %}
-                        <button class="btn btn-success btn-sm" onclick="saveContainerTransfer()" disabled="disabled">
-                            <i class="ace-icon fa fa-floppy-o"></i>保存
-                        </button>
+
                         <button class="btn btn-danger btn-sm" onclick="deleteContainerTransfer()" disabled="disabled">
                             <i class="ace-icon fa fa-trash-o"></i>
                             删除
@@ -94,7 +101,11 @@
                                         <div class="form-group">
                                             <label for="batch_code" class="col-xs-4 control-label">批次号</label>
                                             <div class="col-xs-8">
+                                                {% if .can_modify %}
                                                 <input id="batch_code" name="detail.transfer.batch_code" type="text" class="input-sm form-control" v-model="detail.transfer.batch_code"/>
+                                                {% else %}
+                                                <input id="batch_code" name="detail.transfer.batch_code" type="text" class="input-sm form-control" v-model="detail.transfer.batch_code" disabled="disabled"/>
+                                                {% end %}
                                             </div>
                                         </div>
                                     </div>
@@ -103,7 +114,11 @@
                                         <div class="form-group">
                                             <label for="container_code" class="col-xs-4 control-label">集装箱号</label>
                                             <div class="col-xs-8">
+                                                {% if .can_modify %}
                                                 <input id="container_code" name="detail.transfer.container_code" type="text" class="input-sm form-control" v-model="detail.transfer.container_code"/>
+                                                {% else %}
+                                                <input id="container_code" name="detail.transfer.container_code" type="text" class="input-sm form-control" v-model="detail.transfer.container_code" disabled="disabled"/>
+                                                {% end %}
                                             </div>
                                         </div>
                                     </div>
@@ -112,7 +127,11 @@
                                         <div class="form-group">
                                             <label for="bl_no" class="col-xs-4 control-label">提单号</label>
                                             <div class="col-xs-8">
+                                                {% if .can_modify %}
                                                 <input id="bl_no" name="detail.transfer.bl_no" type="text" class="input-sm form-control" v-model="detail.transfer.bl_no"/>
+                                                {% else %}
+                                                <input id="bl_no" name="detail.transfer.bl_no" type="text" class="input-sm form-control" v-model="detail.transfer.bl_no" disabled="disabled"/>
+                                                {% end %}
                                             </div>
                                         </div>
                                     </div>
@@ -121,7 +140,11 @@
                                         <div class="form-group">
                                             <label for="seal_no" class="col-xs-4 control-label">铅封号</label>
                                             <div class="col-xs-8">
+                                                {% if .can_modify %}
                                                 <input id="seal_no" name="detail.transfer.seal_no" type="text" class="input-sm form-control" v-model="detail.transfer.seal_no"/>
+                                                {% else %}
+                                                <input id="seal_no" name="detail.transfer.seal_no" type="text" class="input-sm form-control" v-model="detail.transfer.seal_no" disabled="disabled"/>
+                                                {% end %}
                                             </div>
                                         </div>
                                     </div>
@@ -134,11 +157,19 @@
                                         <div class="form-group">
                                             <label for="start_port_id" class="col-xs-4 control-label">起始港</label>
                                             <div class="col-xs-8">
+                                                {% if .can_modify %}
                                                 <select id="start_port_id" name="detail.transfer.start_port_id" class="input-sm form-control" v-model.number="detail.transfer.start_port_id">
                                                     <template v-for="port in detail.start_port_list">
                                                         <option :value="port.id">{{port.port_name}}</option>
                                                     </template>
                                                 </select>
+                                                {% else %}
+                                                <select id="start_port_id" name="detail.transfer.start_port_id" class="input-sm form-control" v-model.number="detail.transfer.start_port_id" disabled="disabled">
+                                                    <template v-for="port in detail.start_port_list">
+                                                        <option :value="port.id">{{port.port_name}}</option>
+                                                    </template>
+                                                </select>
+                                                {% end %}
                                             </div>
                                         </div>
                                     </div>
@@ -157,7 +188,11 @@
                                         <div class="form-group">
                                             <label for="price_down_rate" class="col-xs-4 control-label">征税品打折</label>
                                             <div class="col-xs-8">
+                                                {% if .can_modify %}
                                                 <input id="price_down_rate" name="detail.transfer.price_down_rate" type="text" class="input-sm form-control" v-model.number="detail.transfer.price_down_rate"/>
+                                                {% else %}
+                                                <input id="price_down_rate" name="detail.transfer.price_down_rate" type="text" class="input-sm form-control" v-model.number="detail.transfer.price_down_rate" disabled="disabled"/>
+                                                {% end %}
                                                 <div class="help-block">澳洲海关征税商品价格打折率。</div>
                                             </div>
                                         </div>
@@ -167,7 +202,11 @@
                                         <div class="form-group">
                                             <label for="cost_up_rate" class="col-xs-4 control-label">成本上调</label>
                                             <div class="col-xs-8">
+                                                {% if .can_modify %}
                                                 <input id="cost_up_rate" name="detail.transfer.cost_up_rate" type="text" class="input-sm form-control" v-model.number="detail.transfer.cost_up_rate"/>
+                                                {% else %}
+                                                <input id="cost_up_rate" name="detail.transfer.cost_up_rate" type="text" class="input-sm form-control" v-model.number="detail.transfer.cost_up_rate" disabled="disabled"/>
+                                                {% end %}
                                                 <div class="help-block">对全部商品的成本价格上调率。</div>
                                             </div>
                                         </div>
@@ -180,11 +219,19 @@
                                         <div class="form-group">
                                             <label for="dest_port_id" class="col-xs-4 control-label">目的港</label>
                                             <div class="col-xs-8">
+                                                {% if .can_modify %}
                                                 <select id="dest_port_id" name="detail.transfer.dest_port_id" class="input-sm form-control" v-model.number="detail.transfer.dest_port_id">
                                                     <template v-for="port in detail.dest_port_list">
                                                         <option :value="port.id">{{port.port_name}}</option>
                                                     </template>
                                                 </select>
+                                                {% else %}
+                                                <select id="dest_port_id" name="detail.transfer.dest_port_id" class="input-sm form-control" v-model.number="detail.transfer.dest_port_id" disabled="disabled">
+                                                    <template v-for="port in detail.dest_port_list">
+                                                        <option :value="port.id">{{port.port_name}}</option>
+                                                    </template>
+                                                </select>
+                                                {% end %}
                                             </div>
                                         </div>
                                     </div>
@@ -193,7 +240,11 @@
                                         <div class="form-group">
                                             <label for="packing_time" class="col-xs-4 control-label">装箱时间</label>
                                             <div class="col-xs-8">
+                                                {% if .can_modify %}
                                                 <input id="packing_time" name="detail.transfer.packing_time" type="text" class="input-sm form-control" v-model="detail.transfer.packing_time"/>
+                                                {% else %}
+                                                <input id="packing_time" name="detail.transfer.packing_time" type="text" class="input-sm form-control" v-model="detail.transfer.packing_time" disabled="disabled"/>
+                                                {% end %}
                                             </div>
                                         </div>
                                     </div>
@@ -202,7 +253,11 @@
                                         <div class="form-group">
                                             <label for="departure_time" class="col-xs-4 control-label">预计到港时间</label>
                                             <div class="col-xs-8">
+                                                {% if .is_stock %}
+                                                <input id="departure_time" name="detail.transfer.departure_time" type="text" class="input-sm form-control" v-model="detail.transfer.departure_time" disabled="disabled"/>
+                                                {% else %}
                                                 <input id="departure_time" name="detail.transfer.departure_time" type="text" class="input-sm form-control" v-model="detail.transfer.departure_time"/>
+                                                {% end %}
                                             </div>
                                         </div>
                                     </div>
@@ -211,7 +266,11 @@
                                         <div class="form-group">
                                             <label for="stock_time" class="col-xs-4 control-label">预计到仓时间</label>
                                             <div class="col-xs-8">
+                                                {% if .is_stock %}
+                                                <input id="stock_time" name="detail.transfer.stock_time" type="text" class="input-sm form-control" v-model="detail.transfer.stock_time" disabled="disabled"/>
+                                                {% else %}
                                                 <input id="stock_time" name="detail.transfer.stock_time" type="text" class="input-sm form-control" v-model="detail.transfer.stock_time"/>
+                                                {% end %}
                                             </div>
                                         </div>
                                     </div>
