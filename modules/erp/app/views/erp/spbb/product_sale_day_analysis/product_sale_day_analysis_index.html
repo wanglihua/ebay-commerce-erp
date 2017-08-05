@@ -32,6 +32,13 @@
                                     <option :value="analysis_type.id">{{analysis_type.name}}</option>
                                 </template>
                             </select>&nbsp;&nbsp;
+                            <label for="stock_id">仓库</label>
+                            <select id="stock_id" name="stock_id" style="width: 150px;" @change="reloadList()">
+                                <option :value="0">仓库查询</option>
+                                <template v-for="stock in page.stock_list">
+                                    <option :value="stock.id">{{stock.name}}</option>
+                                </template>
+                            </select>&nbsp;&nbsp;
                             <label for="sku_query">商品编号查询</label>
                             <input id="sku_query" name="sku_query" style="width: 180px;height:30px;"/>
                             <button class="btn btn-mini btn-primary" style="margin-bottom:3px;height: 30px;" @click="reloadList()">
@@ -80,6 +87,7 @@
                         showMask("数据加载中，请稍候");
                         aoData.push({'name': 'sku_query', 'value': $("#sku_query").val()});
                         aoData.push({'name': 'analysis_type_id', 'value': $("#analysis_type_id").val()});
+                        aoData.push({'name': 'stock_id', 'value': $("#stock_id").val()});
 
                         $.ajax({
                             "dataType": 'json',

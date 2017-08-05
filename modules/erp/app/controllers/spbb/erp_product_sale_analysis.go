@@ -9,6 +9,7 @@ import (
 	"matrix/modules/erp/service/product_sale_analysis_setting_service"
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/auth/pass_res"
+	"fmt"
 )
 
 type ErpProductSaleAnalysis struct {
@@ -34,6 +35,11 @@ func (c ErpProductSaleAnalysis) Index() revel.Result {
 func (c ErpProductSaleAnalysis) PageData() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.SPBB_PRODUCT_SALE_ANALYSIS, c.Session)
 
+	var db_session = c.DbSession
+
+	var stock_list = make([]models.StockInfo, 0)
+	core.HandleError(db_session.Where(fmt.Sprintf("stock_type_id = %d", models.STOCK_TYPE_AU)).Find(&stock_list))
+
 	return c.RenderJson(map[string]interface{}{
 		"analysis_type_id": 0,
 		"analysis_type_list": []map[string]interface{}{
@@ -50,6 +56,7 @@ func (c ErpProductSaleAnalysis) PageData() revel.Result {
 				"name": "不分仓统计",
 			},
 		},
+		"stock_list": stock_list,
 	})
 }
 
@@ -63,6 +70,9 @@ func (c ErpProductSaleAnalysis) ListData() revel.Result {
 
 	var analysis_type_id int64
 	c.Params.Bind(&analysis_type_id, "analysis_type_id")
+
+	var stock_id int64
+	c.Params.Bind(&stock_id, "stock_id")
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
@@ -92,8 +102,13 @@ FROM erp_product_sale_analysis sa
 	}
 
 	if analysis_type_id != 0 {
-		filter = core.SqlAnd(filter, "type = ?")
+		filter = core.SqlAnd(filter, "sa.type = ?")
 		sql_args = append(sql_args, analysis_type_id)
+	}
+
+	if stock_id != 0 {
+		filter = core.SqlAnd(filter, "sa.stock_id = ?")
+		sql_args = append(sql_args, stock_id)
 	}
 
 	sb.Where(filter)
@@ -145,7 +160,7 @@ FROM erp_product_sale_analysis sa
 
 func (c ErpProductSaleAnalysis) Analyze() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.SPBB_PRODUCT_SALE_ANALYSIS, c.Session)
-	
+
 	go product_sale_analysis_service.ProductSaleAnalyzeMultipleDay()
 
 	return c.RenderJson(map[string]interface{}{

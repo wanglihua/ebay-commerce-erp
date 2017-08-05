@@ -22,6 +22,13 @@ func (c ErpProductSaleDayAnalysis) Index() revel.Result {
 }
 
 func (c ErpProductSaleDayAnalysis) PageData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.SPBB_PRODUCT_SALE_DAY_ANALYSIS, c.Session)
+
+	var db_session = c.DbSession
+
+	var stock_list = make([]models.StockInfo, 0)
+	core.HandleError(db_session.Where(fmt.Sprintf("stock_type_id = %d", models.STOCK_TYPE_AU)).Find(&stock_list))
+
 	return c.RenderJson(map[string]interface{}{
 		"analysis_type_id": 0,
 		"analysis_type_list": []map[string]interface{}{
@@ -38,6 +45,7 @@ func (c ErpProductSaleDayAnalysis) PageData() revel.Result {
 				"name": "不分仓统计",
 			},
 		},
+		"stock_list": stock_list,
 	})
 }
 
@@ -51,6 +59,9 @@ func (c ErpProductSaleDayAnalysis) ListData() revel.Result {
 
 	var analysis_type_id int64
 	c.Params.Bind(&analysis_type_id, "analysis_type_id")
+
+	var stock_id int64
+	c.Params.Bind(&stock_id, "stock_id")
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
@@ -80,8 +91,13 @@ FROM erp_product_sale_day_analysis da
 	}
 
 	if analysis_type_id != 0 {
-		filter = core.SqlAnd(filter, "type = ?")
+		filter = core.SqlAnd(filter, "da.type = ?")
 		sql_args = append(sql_args, analysis_type_id)
+	}
+
+	if stock_id != 0 {
+		filter = core.SqlAnd(filter, "da.stock_id = ?")
+		sql_args = append(sql_args, stock_id)
 	}
 
 	sb.Where(filter)
