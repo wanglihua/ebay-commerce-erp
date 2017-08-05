@@ -1,6 +1,7 @@
-{% site_header "订单详情" . %}
+{% site_header "订单创建" . %}
 <div class="main-container" id="main-container">
     <div id="order_detail" style="width: 1024px;margin-left: auto;margin-right: auto;">
+        <!-- 订单信息 -->
         <div class="widget-box">
             <div class="widget-header">
                 <h4 class="smaller">订单信息</h4>
@@ -72,6 +73,7 @@
             </div>
         </div>
 
+        <!-- 客户信息 -->
         <div class="widget-box">
             <div class="widget-header">
                 <h4 class="smaller">客户信息</h4>
@@ -224,120 +226,7 @@
             </div>
         </div>
 
-        <div class="widget-box">
-            <div class="widget-header">
-                <h4 class="smaller">订单报表</h4>
-            </div>
-            <div class="widget-body">
-                <div class="widget-main">
-                    <div class="row">
-                        <div class="col-xs-12">
-                            <table id="order_price_report" class="table table-bordered">
-                                <thead>
-                                <tr>
-                                    <th class="dtRight">结账信息</th>
-                                    <th class="dtRight">结算汇率</th>
-                                    <th class="dtRight">收款金额</th>
-                                    <th class="dtRight">运费收入</th>
-                                    <th class="dtRight">GST税</th>
-                                    <th class="dtRight">平台交易费</th>
-                                    <th class="dtRight">付款交易费</th>
-                                    <th class="dtRight">拣货费</th>
-                                    <th class="dtRight">预估物流费</th>
-                                    <th class="dtRight">实际物流费</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <tr>
-                                    <td class="dtRight">收款货币</td>
-                                    <td class="dtRight">
-                                        AUD {{ format_amount(1.00) }}
-                                    </td>
-                                    <td class="dtRight">
-                                        AUD {{ format_amount(detail.order.amount_paid) }}
-                                    </td>
-                                    <td class="dtRight">
-                                        AUD {{ format_amount(detail.order.express_fee) }}
-                                    </td>
-                                    <td class="dtRight">
-                                        AUD {{ format_amount(detail.order_gst) }}
-                                    </td>
-                                    <td class="dtRight">
-                                        AUD {{ format_amount(detail.order.amount_paid *
-                                        detail.logistics_setting.ptfl) }}
-                                    </td>
-                                    <td class="dtRight">
-                                        AUD {{ format_amount(detail.order.amount_paid *
-                                        detail.logistics_setting.jyfl) }}
-                                    </td>
-                                    <td class="dtRight">
-                                        AUD {{ format_amount(detail.order_logistics.pick_fee) }}
-                                    </td>
-                                    <td class="dtRight">
-                                        AUD {{ format_amount(detail.order_logistics.total_fee) }}
-                                    </td>
-                                    <td class="dtRight">
-                                        AUD {{ format_amount(detail.order_logistics.actual_fee) }}
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="dtRight">结算人民币</td>
-                                    <td class="dtRight">
-                                        RMB {{ format_amount(detail.order.exchange_rate) }}
-                                    </td>
-                                    <td class="dtRight">
-                                        RMB {{ format_amount(detail.order.amount_paid_rmb) }}
-                                    </td>
-                                    <td class="dtRight">
-                                        RMB {{ format_amount(detail.order.express_fee * detail.order.exchange_rate)}}
-                                    </td>
-                                    <td class="dtRight">
-                                        RMB {{ format_amount(detail.order_gst * detail.order.exchange_rate) }}
-                                    </td>
-                                    <td class="dtRight">
-                                        RMB {{ format_amount(detail.order.amount_paid_rmb*
-                                        detail.logistics_setting.ptfl) }}
-                                    </td>
-                                    <td class="dtRight">
-                                        RMB {{ format_amount(detail.order.amount_paid_rmb*
-                                        detail.logistics_setting.jyfl) }}
-                                    </td>
-                                    <td class="dtRight">
-                                        RMB {{ format_amount(detail.order_logistics.pick_fee
-                                        *detail.order.exchange_rate) }}
-                                    </td>
-                                    <td class="dtRight">
-                                        RMB {{ format_amount(detail.order_logistics.total_fee
-                                        *detail.order.exchange_rate) }}
-                                    </td>
-                                    <td class="dtRight">
-                                        RMB {{ format_amount(detail.order_logistics.actual_fee
-                                        *detail.order.exchange_rate) }}
-                                    </td>
-                                </tr>
-                                </tbody>
-                                <tfoot>
-                                <tr>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td colspan="2">商品澳仓成本
-                                        RMB {{ format_amount(detail.order_logistics.cost_amount *
-                                        detail.order.exchange_rate) }}
-                                    </td>
-                                    <td colspan="2">物流成本 RMB {{ format_amount(detail.logistics_fee) }}
-                                    </td>
-                                    <td colspan="2">毛利 RMB {{ format_amount(detail.order_profit) }}</td>
-                                </tr>
-                                </tfoot>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
+        <!-- 订单详情 -->
         <div class="widget-box">
             <div class="widget-header">
                 <h4 class="smaller">订单详情</h4>
@@ -431,140 +320,7 @@
             </div>
         </div>
 
-        <div class="widget-box">
-            <div class="widget-header">
-                <h4 class="smaller">订单商品库存</h4>
-            </div>
-            <div class="widget-body">
-                <div class="widget-main">
-                    <div class="row">
-                        <div class="col-xs-12">
-                            订单已匹配物流仓库：&nbsp;<span style="color:blue;">{{detail.logistics_stock.name}}</span>&nbsp;&nbsp;&nbsp;
-                            订单已匹配物流方式：&nbsp;<span style="color:blue;">{{detail.logistics_mode.name}}</span>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-xs-12">
-                            <table id="product_inventory_list" class="table table-striped table-bordered">
-                                <thead>
-                                <tr>
-                                    <th class="center" style="width: 100px;">SKU</th>
-                                    <th class="center">商品名称</th>
-                                    <th class="center" style="width: 120px;">仓库</th>
-                                    <th class="center" style="width: 120px;">库位</th>
-                                    <th class="center" style="width: 80px;">库存</th>
-                                    <th class="center" style="width: 80px;">待发货</th>
-                                    <th class="center" style="width: 100px;">成本</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <template v-for="inventory in detail.inventory_list">
-                                    <tr v-if="inventory.st.id == detail.logistics_stock.id" style="background-color: #dde6f0;">
-                                        <td class="center">
-                                            {{inventory.p.sku}}
-                                        </td>
-                                        <td>
-                                            {{inventory.p.cn_name}}
-                                        </td>
-                                        <td class="center">
-                                            {{inventory.st.name}}
-                                        </td>
-                                        <td class="center">
-                                            {{inventory.sl.name}}
-                                        </td>
-                                        <td class="center">
-                                            {{inventory.nvt.qty}}
-                                        </td>
-                                        <td class="center">
-                                            {{inventory.nvt.pending_qty}}
-                                        </td>
-                                        <td class="center">
-                                            {{ format_amount(inventory.nvt.cost_price)}}
-                                        </td>
-                                    </tr>
-                                    <tr v-else>
-                                        <td class="center">
-                                            {{inventory.p.sku}}
-                                        </td>
-                                        <td>
-                                            {{inventory.p.cn_name}}
-                                        </td>
-                                        <td class="center">
-                                            {{inventory.st.name}}
-                                        </td>
-                                        <td class="center">
-                                            {{inventory.sl.name}}
-                                        </td>
-                                        <td class="center">
-                                            {{inventory.nvt.qty}}
-                                        </td>
-                                        <td class="center">
-                                            {{inventory.nvt.pending_qty}}
-                                        </td>
-                                        <td class="center">
-                                            {{ format_amount(inventory.nvt.cost_price)}}
-                                        </td>
-                                    </tr>
-                                </template>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="widget-box">
-            <div class="widget-header">
-                <h4 class="smaller">操作日志</h4>
-            </div>
-            <div class="widget-body">
-                <div class="widget-main">
-                    <table id="orderHistoryList" class="table table-striped table-bordered table-hover"></table>
-                </div>
-            </div>
-        </div>
-
-        <div class="modal fade" id="orderWaybillNumberDialog">
-            <div class="modal-dialog" style="width: 480px;">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-hidden="True">&times;</button>
-                        <h4 class="modal-title">订单运单号</h4>
-                    </div>
-                    <div class="modal-body clearfix">
-                        <div class="row">
-                            <div class="col-xs-12">
-                                <form class="form-horizontal" role="form" id="orderWaybillNumberForm">
-                                    <input id="waybill_number_order_id" name="detail.order.id" type="hidden" v-model.number="detail.order.id"/>
-
-                                    <div class="row">
-                                        <div class="col-xs-12">
-                                            <div class="form-group">
-                                                <label for="order_waybill_number" class="col-xs-3 control-label">运单号</label>
-                                                <div class="col-xs-9">
-                                                    <input id="order_waybill_number" name="detail.order.waybill_number" type="text" class="input-sm form-control" v-model="detail.order.waybill_number"/>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-success btn-sm" @click="saveOrderWaybillNumber()">
-                            <i class="ace-icon fa fa-floppy-o"></i>保存
-                        </button>
-                        <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">
-                            <i class="ace-icon fa fa-times"></i>关闭
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
+        <!--订单送货地址详细-->
         <div class="modal fade" id="orderShippingAddressDetailDialog">
             <div class="modal-dialog" style="width: 680px;">
                 <div class="modal-content">
@@ -688,6 +444,7 @@
             </div>
         </div>
 
+        <!--订单明细详细-->
         <div class="modal fade" id="orderItemDetailDialog">
             <div class="modal-dialog" style="width: 680px;">
                 <div class="modal-content">
@@ -760,29 +517,7 @@
                 "logistics_mode": {},
                 "inventory_list": []
             },
-            "order_item_detail": {},
-            "logistics_mode_list": []
-        },
-        mounted: function () {
-            var this_vm = this;
-
-            $.ajax(
-                {
-                    "dataType": 'json',
-                    "url": '{% url "ErpOrder.DetailData"%}',
-                    "data": {
-                        "id": order_id
-                    },
-                    "success": function (data) {
-                        if (data.success === false) {
-                            $.msg.error(data.message);
-                            return;
-                        }
-                        this_vm.detail = data;
-                        this_vm.order_item_detail = {};
-                        this_vm.order_item_detail.order_id = order_id;
-                    }
-                });
+            "order_item_detail": {}
         },
         methods: {
             format_amount: function (amount) {
@@ -833,48 +568,6 @@
                                 else {
                                     $.msg.show(data.message);
                                     $('#orderShippingAddressDetailDialog').modal('hide');
-                                    load_order_detail();
-                                    //return;
-                                }
-                            }
-                        }
-                    );
-                }
-            },
-            show_order_waybill_number_edit: function () {
-                $("#orderWaybillNumberDialog").modal(modalOptions);
-            },
-            saveOrderWaybillNumber: function () {
-                showMask("提交中...");
-                var form = $("#orderWaybillNumberForm");
-                var valid = validate(form, {
-                    'detail.order.id': {
-                        required: true
-                    },
-                    'detail.order.waybill_number': {
-                        required: true
-                    }
-                });
-
-                if (!valid) {
-                    hideMask();
-                } else {
-                    $.ajax({
-                            url: '{%url "ErpOrderWaybillNumber.Save"%}',
-                            type: "POST",
-                            data: {
-                                "order_id": vm.detail.order.id,
-                                "waybill_number": vm.detail.order.waybill_number
-                            },
-                            success: function (data) {
-                                hideMask();
-                                if (data.success === false) {
-                                    $.msg.error(data.message);
-                                    //return;
-                                }
-                                else {
-                                    $.msg.show(data.message);
-                                    $('#orderWaybillNumberDialog').modal('hide');
                                     load_order_detail();
                                     //return;
                                 }
@@ -1023,7 +716,6 @@
             }
         });
     }
-
 
 </script>
 {% site_footer %}

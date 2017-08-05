@@ -287,6 +287,14 @@ WHERE oi.order_id = %d`
 	err := db_session.Sql(sql).Find(&order_product_qty_list)
 	core.HandleError(err)
 
+	if len(order_product_qty_list) == 0 {
+		var order models.OrderInfo
+		_, err := db_session.Id(order_id).Get(&order)
+		core.HandleError(err)
+
+		panic(fmt.Sprintf("订单 %s 明细为空！", order.Code))
+	}
+
 	return order_product_qty_list
 }
 
