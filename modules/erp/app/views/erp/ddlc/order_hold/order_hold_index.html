@@ -739,10 +739,19 @@
                 }
             },
             exportOrderCode: function () {
+
+                var order_id_list = [];
+                $('#orderList tbody tr>td:first-child input:checkbox').each(function () {
+                    if (this.checked) {
+                        order_id_list.push($(this).val());
+                    }
+                });
+
                 var params = $.param({
                     "status": "hold",
                     "batch_code": vm.page.batch_code,
-                    "hold_type_id": vm.page.hold_type_id
+                    "hold_type_id": vm.page.hold_type_id,
+                    "id_list": order_id_list
                 });
                 var url = '{%url "ErpOrderExport.Export"%}' + "?" + params;
                 $('<form method="post" action="' + url + '"></form>').appendTo('body').submit().remove();

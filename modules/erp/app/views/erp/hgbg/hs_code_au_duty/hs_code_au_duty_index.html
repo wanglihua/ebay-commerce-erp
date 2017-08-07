@@ -342,7 +342,16 @@
                 });
             },
             export_hs_code: function () {
-                var params = $.param({});
+                var id_list = [];
+                $('#hs_code_list tbody tr>td:first-child input:checkbox').each(function () {
+                    if (this.checked) {
+                        id_list.push($(this).val());
+                    }
+                });
+
+                var params = $.param({
+                    "id_list": id_list
+                });
                 var url = '{%url "ErpHsCodeAuDutyExcel.Export"%}' + "?" + params;
                 $('<form method="post" action="' + url + '"></form>').appendTo('body').submit().remove();
             }

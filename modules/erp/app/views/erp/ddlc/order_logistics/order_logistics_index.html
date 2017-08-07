@@ -49,6 +49,7 @@
                     <input type="hidden" name="stock_id" v-model="page.stock_id"/>
                     <input type="hidden" name="logistics_company_id" v-model="page.logistics_company_id"/>
                     <input type="hidden" name="batch_code" v-model="page.batch_code"/>
+                    <input id="formExport1IdList" type="hidden" name="id_list"/>
                     <input type="hidden" name="begin_time_query" v-model="page.begin_time_query"/>
                     <input type="hidden" name="end_time_query" v-model="page.end_time_query"/>
                 </form>
@@ -56,6 +57,7 @@
                     <input type="hidden" name="stock_id" v-model="page.stock_id"/>
                     <input type="hidden" name="logistics_company_id" v-model="page.logistics_company_id"/>
                     <input type="hidden" name="batch_code" v-model="page.batch_code"/>
+                    <input id="formExport2IdList" type="hidden" name="id_list"/>
                     <input type="hidden" name="begin_time_query" v-model="page.begin_time_query"/>
                     <input type="hidden" name="end_time_query" v-model="page.end_time_query"/>
                 </form>
@@ -348,6 +350,7 @@
                                 <input type="hidden" id="company_export_stock_id" name="stock_id"/>
                                 <input type="hidden" id="company_export_company_code" name="company_code"/>
                                 <input type="hidden" id="company_export_batch_code" name="batch_code"/>
+                                <input type="hidden" id="company_export_id_list" name="id_list"/>
                             </form>
                         </div>
                     </div>
@@ -809,9 +812,28 @@
                 });
             },
             exportOrderLogistics1: function () {
+                var id_list = [];
+                $('#orderLogisticsList tbody tr>td:first-child input:checkbox').each(function () {
+                    if (this.checked) {
+                        id_list.push($(this).val());
+                    }
+                });
+
+                $("#formExport1IdList").val(id_list);
+
                 $("#formExport1").submit();
             },
             exportOrderLogistics2: function () {
+
+                var id_list = [];
+                $('#orderLogisticsList tbody tr>td:first-child input:checkbox').each(function () {
+                    if (this.checked) {
+                        id_list.push($(this).val());
+                    }
+                });
+
+                $("#formExport2IdList").val(id_list);
+
                 $("#formExport2").submit();
             },
             showExportOrderLogisticsCompany: function () {
@@ -833,12 +855,20 @@
                 );
             },
             exportOrderLogisticsCompany: function () {
+                var id_list = [];
+                $('#orderLogisticsList tbody tr>td:first-child input:checkbox').each(function () {
+                    if (this.checked) {
+                        id_list.push($(this).val());
+                    }
+                });
+
                 if ((!vm.logistics_company_export_option.stock_id) || (!vm.logistics_company_export_option.company_code)) {
                     $.msg.error("请选择要导出的仓库和物流公司！");
                 }
                 $("#company_export_stock_id").val(vm.logistics_company_export_option.stock_id);
                 $("#company_export_company_code").val(vm.logistics_company_export_option.company_code);
                 $("#company_export_batch_code").val(vm.page.batch_code);
+                $("#company_export_id_list").val(id_list);
                 $("#formLogisticsCompanyExport").submit();
                 $('#logisticsCompanyExportOptionDialog').modal('hide');
             },

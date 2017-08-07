@@ -35,6 +35,7 @@
                     </button>
                 </div>
                 <form id="formExport" method="post" action='{%url "ErpStorageLoc.Export" %}'>
+                    <input type="hidden" id="formExportIdList" name="id_list"/>
                 </form>
                 <div style="margin-top: 10px;"><a href="/static/excel-template/storage_loc_import.xlsx">下载Excel模板</a>
                 </div>
@@ -355,6 +356,15 @@
                 });
             },
             exportStorageLoc: function () {
+                var id_list = [];
+                $('#storageLocList tbody tr>td:first-child input:checkbox').each(function () {
+                    if (this.checked) {
+                        id_list.push($(this).val());
+                    }
+                });
+
+                $("#formExportIdList").val(id_list);
+
                 $("#formExport").submit();
             }
         }

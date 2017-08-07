@@ -82,19 +82,23 @@
                 <form id="formExport" method="post" action='{%url "ErpInventory.Export" %}'>
                     <input type="hidden" name="stock_id_query" v-model="page.stock_id_query"/>
                     <input type="hidden" name="product_code_query" v-model="page.product_code_query"/>
+                    <input id="formExportIdList" type="hidden" name="id_list" />
                 </form>
                 */%}
                 <form id="formSkuLocExport" method="post" action='{%url "ErpInventory.ExportProductStorageLoc" %}'>
                     <input type="hidden" name="stock_id_query" v-model="page.stock_id_query"/>
                     <input type="hidden" name="product_code_query" v-model="page.product_code_query"/>
+                    <input id="formSkuLocExportIdList" type="hidden" name="id_list" />
                 </form>
                 <form id="formSkuQtyExport" method="post" action='{%url "ErpInventory.ExportInventoryQuantity" %}'>
                     <input type="hidden" name="stock_id_query" v-model="page.stock_id_query"/>
                     <input type="hidden" name="product_code_query" v-model="page.product_code_query"/>
+                    <input id="formSkuQtyExportIdList" type="hidden" name="id_list" />
                 </form>
                 <form id="formSkuPriceExport" method="post" action='{%url "ErpInventory.ExportInventoryPrice" %}'>
                     <input type="hidden" name="stock_id_query" v-model="page.stock_id_query"/>
                     <input type="hidden" name="product_code_query" v-model="page.product_code_query"/>
+                    <input id="formSkuPriceExportIdList" type="hidden" name="id_list" />
                 </form>
                 <div style="margin-top: 10px;">
                     {%/*
@@ -727,15 +731,51 @@
                 });
             },
             exportInventory: function () {
+                var id_list = [];
+                $('#inventoryList tbody tr>td:first-child input:checkbox').each(function () {
+                    if (this.checked) {
+                        id_list.push($(this).val());
+                    }
+                });
+
+                $("#formExportIdList").val(id_list);
+
                 $("#formExport").submit();
             },
             exportSkuLoc: function () {
+                var id_list = [];
+                $('#inventoryList tbody tr>td:first-child input:checkbox').each(function () {
+                    if (this.checked) {
+                        id_list.push($(this).val());
+                    }
+                });
+
+                $("#formSkuLocExportIdList").val(id_list);
+
                 $("#formSkuLocExport").submit();
             },
             exportSkuQty: function () {
+                var id_list = [];
+                $('#inventoryList tbody tr>td:first-child input:checkbox').each(function () {
+                    if (this.checked) {
+                        id_list.push($(this).val());
+                    }
+                });
+
+                $("#formSkuQtyExportIdList").val(id_list);
+
                 $("#formSkuQtyExport").submit();
             },
             exportSkuPrice: function () {
+                var id_list = [];
+                $('#inventoryList tbody tr>td:first-child input:checkbox').each(function () {
+                    if (this.checked) {
+                        id_list.push($(this).val());
+                    }
+                });
+
+                $("#formSkuPriceExportIdList").val(id_list);
+
                 $("#formSkuPriceExport").submit();
             },
             getStockStorageLocList: function () {
