@@ -174,9 +174,19 @@ func (c ErpHsCodeAuDutyExcel) Export() revel.Result {
 
 	db_session := c.DbSession
 
+	var id_list = make([]int64, 0)
+	c.Params.Bind(&id_list, "id_list")
+
+	var filter = "(1=1)"
+
+	if len(id_list) != 0 {
+		var id_str_list = core.Int_list_to_str_list(id_list)
+		filter = core.SqlAnd(filter, fmt.Sprintf("id IN (%s)", strings.Join(id_str_list, ",")))
+	}
+
 	hs_code_au_list := make([]models.HsCodeAuDutyInfo, 0)
 
-	err := db_session.Find(&hs_code_au_list)
+	err := db_session.Where(filter).Find(&hs_code_au_list)
 	core.HandleError(err)
 
 	xlsx_file := c.export_hs_code_list_to_excel(db_session, hs_code_au_list)

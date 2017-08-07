@@ -634,6 +634,9 @@ func (c ErpInventory) get_export_excel(db_session *xorm.Session) *xlsx.File {
 	c.Params.Bind(&product_code_query, "product_code_query")
 	product_code_query = strings.TrimSpace(product_code_query)
 
+	var id_list = make([]int64, 0)
+	c.Params.Bind(&id_list, "id_list")
+
 	/*
 	SELECT ivt.*, st.*, loc.*, prd.*
 	FROM erp_inventory ivt
@@ -654,12 +657,17 @@ func (c ErpInventory) get_export_excel(db_session *xorm.Session) *xlsx.File {
 	var stock_id_str_list = stock_pick_crew_service.Get_login_user_stock_id_str_list(db_session, c.Session)
 	var filter = fmt.Sprintf("st.id IN (%s)", strings.Join(stock_id_str_list, ","))
 
-	if stock_id_query != 0 {
-		filter = core.SqlAnd(filter, fmt.Sprintf("st.id = %d", stock_id_query))
-	}
+	if len(id_list) == 0 {
+		if stock_id_query != 0 {
+			filter = core.SqlAnd(filter, fmt.Sprintf("st.id = %d", stock_id_query))
+		}
 
-	if product_code_query != "" {
-		filter = core.SqlAnd(filter, fmt.Sprintf("prd.sku LIKE '%%%s%%'", product_code_query))
+		if product_code_query != "" {
+			filter = core.SqlAnd(filter, fmt.Sprintf("prd.sku LIKE '%%%s%%'", product_code_query))
+		}
+	} else {
+		var id_str_list = core.Int_list_to_str_list(id_list)
+		filter = core.SqlAnd(filter, fmt.Sprintf("ivt.id IN (%s)", strings.Join(id_str_list, ",")))
 	}
 
 	sb.Where(filter)
@@ -1175,6 +1183,9 @@ func (c ErpInventory) get_export_product_storage_loc_excel(db_session *xorm.Sess
 	c.Params.Bind(&product_code_query, "product_code_query")
 	product_code_query = strings.TrimSpace(product_code_query)
 
+	var id_list = make([]int64, 0)
+	c.Params.Bind(&id_list, "id_list")
+
 	/*
 	SELECT ivt.*, st.*, loc.*, prd.*
 	FROM erp_inventory ivt
@@ -1195,12 +1206,17 @@ func (c ErpInventory) get_export_product_storage_loc_excel(db_session *xorm.Sess
 	var stock_id_str_list = stock_pick_crew_service.Get_login_user_stock_id_str_list(db_session, c.Session)
 	var filter = fmt.Sprintf("st.id IN (%s)", strings.Join(stock_id_str_list, ","))
 
-	if stock_id_query != 0 {
-		filter = core.SqlAnd(filter, fmt.Sprintf("st.id = %d", stock_id_query))
-	}
+	if len(id_list) == 0 {
+		if stock_id_query != 0 {
+			filter = core.SqlAnd(filter, fmt.Sprintf("st.id = %d", stock_id_query))
+		}
 
-	if product_code_query != "" {
-		filter = core.SqlAnd(filter, fmt.Sprintf("prd.sku LIKE '%%%s%%'", product_code_query))
+		if product_code_query != "" {
+			filter = core.SqlAnd(filter, fmt.Sprintf("prd.sku LIKE '%%%s%%'", product_code_query))
+		}
+	} else {
+		var id_str_list = core.Int_list_to_str_list(id_list)
+		filter = core.SqlAnd(filter, fmt.Sprintf("ivt.id IN (%s)", strings.Join(id_str_list, ",")))
 	}
 
 	sb.Where(filter)
@@ -1588,6 +1604,9 @@ func (c ErpInventory) get_export_inventory_quantity_excel(db_session *xorm.Sessi
 	c.Params.Bind(&product_code_query, "product_code_query")
 	product_code_query = strings.TrimSpace(product_code_query)
 
+	var id_list = make([]int64, 0)
+	c.Params.Bind(&id_list, "id_list")
+
 	/*
 	SELECT ivt.*, st.*, loc.*, prd.*
 	FROM erp_inventory ivt
@@ -1608,12 +1627,17 @@ func (c ErpInventory) get_export_inventory_quantity_excel(db_session *xorm.Sessi
 	var stock_id_str_list = stock_pick_crew_service.Get_login_user_stock_id_str_list(db_session, c.Session)
 	var filter = fmt.Sprintf("st.id IN (%s)", strings.Join(stock_id_str_list, ","))
 
-	if stock_id_query != 0 {
-		filter = core.SqlAnd(filter, fmt.Sprintf("st.id = %d", stock_id_query))
-	}
+	if len(id_list) == 0 {
+		if stock_id_query != 0 {
+			filter = core.SqlAnd(filter, fmt.Sprintf("st.id = %d", stock_id_query))
+		}
 
-	if product_code_query != "" {
-		filter = core.SqlAnd(filter, fmt.Sprintf("prd.sku LIKE '%%%s%%'", product_code_query))
+		if product_code_query != "" {
+			filter = core.SqlAnd(filter, fmt.Sprintf("prd.sku LIKE '%%%s%%'", product_code_query))
+		}
+	} else {
+		var id_str_list = core.Int_list_to_str_list(id_list)
+		filter = core.SqlAnd(filter, fmt.Sprintf("ivt.id IN (%s)", strings.Join(id_str_list, ",")))
 	}
 
 	sb.Where(filter)
@@ -2011,6 +2035,9 @@ func (c ErpInventory) get_export_inventory_price_excel(db_session *xorm.Session)
 	c.Params.Bind(&product_code_query, "product_code_query")
 	product_code_query = strings.TrimSpace(product_code_query)
 
+	var id_list = make([]int64, 0)
+	c.Params.Bind(&id_list, "id_list")
+
 	/*
 	SELECT ivt.*, st.*, loc.*, prd.*
 	FROM erp_inventory ivt
@@ -2031,12 +2058,17 @@ func (c ErpInventory) get_export_inventory_price_excel(db_session *xorm.Session)
 	var stock_id_str_list = stock_pick_crew_service.Get_login_user_stock_id_str_list(db_session, c.Session)
 	var filter = fmt.Sprintf("st.id IN (%s)", strings.Join(stock_id_str_list, ","))
 
-	if stock_id_query != 0 {
-		filter = core.SqlAnd(filter, fmt.Sprintf("st.id = %d", stock_id_query))
-	}
+	if len(id_list) == 0 {
+		if stock_id_query != 0 {
+			filter = core.SqlAnd(filter, fmt.Sprintf("st.id = %d", stock_id_query))
+		}
 
-	if product_code_query != "" {
-		filter = core.SqlAnd(filter, fmt.Sprintf("prd.sku LIKE '%%%s%%'", product_code_query))
+		if product_code_query != "" {
+			filter = core.SqlAnd(filter, fmt.Sprintf("prd.sku LIKE '%%%s%%'", product_code_query))
+		}
+	} else {
+		var id_str_list = core.Int_list_to_str_list(id_list)
+		filter = core.SqlAnd(filter, fmt.Sprintf("ivt.id IN (%s)", strings.Join(id_str_list, ",")))
 	}
 
 	sb.Where(filter)

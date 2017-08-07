@@ -18,6 +18,7 @@ import (
 	"time"
 	"github.com/go-xorm/xorm"
 	"github.com/tealeg/xlsx"
+	"strings"
 )
 
 type ErpOrderLogisticsFeeDiff struct {
@@ -377,6 +378,9 @@ func (c ErpOrderLogisticsFeeDiff) get_list_data(is_for_export bool) (list_data_r
 	var fee_diff_type_code int64
 	c.Params.Bind(&fee_diff_type_code, "fee_diff_type_code")
 
+	var id_list = make([]int64, 0)
+	c.Params.Bind(&id_list, "id_list")
+
 	/*
 SELECT ol.*, o.*
 FROM erp_order_logistics ol
@@ -403,44 +407,49 @@ WHERE ol.stock_id = 0 AND ol.company_id = 0
 	sb.From(`erp_order_logistics ol
     INNER JOIN erp_order o ON o.id = ol.order_id`)
 
-	if stock_id != 0 {
-		filter = core.SqlAnd(filter, fmt.Sprintf("ol.stock_id = %d", stock_id))
-	}
-
-	if logistics_company_id != 0 {
-		filter = core.SqlAnd(filter, fmt.Sprintf("ol.company_id = %d", logistics_company_id))
-	}
-
-	if batch_code != 0 {
-		filter = core.SqlAnd(filter, fmt.Sprintf("o.batch_code = %d", batch_code))
-	}
-
-	if begin_time_query.Valid == true {
-		filter = core.SqlAnd(filter, fmt.Sprintf("o.paid_time >= '%s'", begin_time_query.Time.Format("2006-01-02 15:04:05")))
-	}
-
-	if end_time_query.Valid == true {
-		filter = core.SqlAnd(filter, fmt.Sprintf("o.paid_time <= '%s'", end_time_query.Time.Format("2006-01-02 15:04:05")))
-	}
-
-	if fee_diff_min_query != 0 {
-		filter = core.SqlAnd(filter, fmt.Sprintf("(ol.actual_fee - ol.total_fee) >= %f", fee_diff_min_query))
-	}
-
-	if fee_diff_max_query != 0 {
-		filter = core.SqlAnd(filter, fmt.Sprintf("(ol.actual_fee - ol.total_fee) <= %f", fee_diff_max_query))
-	}
-
-	if fee_diff_type_code != 0 {
-		if fee_diff_type_code == FEE_DIFF_ACTUAL_FEE_GREATER {
-			filter = core.SqlAnd(filter, "ol.actual_fee > ol.total_fee")
-		} else if fee_diff_type_code == FEE_DIFF_ACTUAL_FEE_SMALLER {
-			filter = core.SqlAnd(filter, "ol.actual_fee < ol.total_fee AND ol.actual_fee <> 0")
-		} else if fee_diff_type_code == FEE_DIFF_ACTUAL_FEE_EQUAL {
-			filter = core.SqlAnd(filter, "ol.actual_fee = ol.total_fee AND ol.actual_fee <> 0")
-		} else if fee_diff_type_code == FEE_DIFF_ACTUAL_FEE_MISS {
-			filter = core.SqlAnd(filter, "ol.actual_fee = 0")
+	if len(id_list) == 0 {
+		if stock_id != 0 {
+			filter = core.SqlAnd(filter, fmt.Sprintf("ol.stock_id = %d", stock_id))
 		}
+
+		if logistics_company_id != 0 {
+			filter = core.SqlAnd(filter, fmt.Sprintf("ol.company_id = %d", logistics_company_id))
+		}
+
+		if batch_code != 0 {
+			filter = core.SqlAnd(filter, fmt.Sprintf("o.batch_code = %d", batch_code))
+		}
+
+		if begin_time_query.Valid == true {
+			filter = core.SqlAnd(filter, fmt.Sprintf("o.paid_time >= '%s'", begin_time_query.Time.Format("2006-01-02 15:04:05")))
+		}
+
+		if end_time_query.Valid == true {
+			filter = core.SqlAnd(filter, fmt.Sprintf("o.paid_time <= '%s'", end_time_query.Time.Format("2006-01-02 15:04:05")))
+		}
+
+		if fee_diff_min_query != 0 {
+			filter = core.SqlAnd(filter, fmt.Sprintf("(ol.actual_fee - ol.total_fee) >= %f", fee_diff_min_query))
+		}
+
+		if fee_diff_max_query != 0 {
+			filter = core.SqlAnd(filter, fmt.Sprintf("(ol.actual_fee - ol.total_fee) <= %f", fee_diff_max_query))
+		}
+
+		if fee_diff_type_code != 0 {
+			if fee_diff_type_code == FEE_DIFF_ACTUAL_FEE_GREATER {
+				filter = core.SqlAnd(filter, "ol.actual_fee > ol.total_fee")
+			} else if fee_diff_type_code == FEE_DIFF_ACTUAL_FEE_SMALLER {
+				filter = core.SqlAnd(filter, "ol.actual_fee < ol.total_fee AND ol.actual_fee <> 0")
+			} else if fee_diff_type_code == FEE_DIFF_ACTUAL_FEE_EQUAL {
+				filter = core.SqlAnd(filter, "ol.actual_fee = ol.total_fee AND ol.actual_fee <> 0")
+			} else if fee_diff_type_code == FEE_DIFF_ACTUAL_FEE_MISS {
+				filter = core.SqlAnd(filter, "ol.actual_fee = 0")
+			}
+		}
+	} else {
+		var id_str_list = core.Int_list_to_str_list(id_list)
+		filter = core.SqlAnd(filter, fmt.Sprintf("ol.id IN (%s)", strings.Join(id_str_list, ",")))
 	}
 
 	// 分仓库查看

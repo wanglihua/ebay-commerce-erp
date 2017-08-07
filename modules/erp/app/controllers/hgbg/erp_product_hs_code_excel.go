@@ -159,6 +159,9 @@ func (c ErpProductHsCodeExcel) Export() revel.Result {
 	var filter_type int64
 	c.Params.Bind(&filter_type, "filter_type")
 
+	var id_list = make([]int64, 0)
+	c.Params.Bind(&id_list, "id_list")
+
 	db_session := c.DbSession
 
 	product_list := make([]models.ProductInfo, 0)
@@ -167,6 +170,11 @@ func (c ErpProductHsCodeExcel) Export() revel.Result {
 	if filter_type == 1 { //有零值数据的记录
 		filter_has_zero_data := core.SqlOr("cn_hs_code = ''", "au_hs_code = ''")
 		filter = core.SqlAnd(filter, filter_has_zero_data)
+	}
+
+	if len(id_list) != 0 {
+		var id_str_list = core.Int_list_to_str_list(id_list)
+		filter = core.SqlAnd(filter, fmt.Sprintf("id IN (%s)", strings.Join(id_str_list, ",")))
 	}
 
 	err := db_session.Where(filter).Find(&product_list)

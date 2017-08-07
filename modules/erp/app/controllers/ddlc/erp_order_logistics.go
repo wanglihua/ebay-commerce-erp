@@ -100,33 +100,41 @@ func (c ErpOrderLogistics) apply_query_filter(filter string) string {
 	var good_query_id int64 = 0
 	c.Params.Bind(&good_query_id, "good_query_id")
 
-	if stock_id != 0 {
-		// 这里是查询上的对仓库的限制，如果是拣货人员的话，下面还有是不是这个仓库的拣货人员的限制
-		filter = core.SqlAnd(filter, fmt.Sprintf("ol.stock_id = %d", stock_id))
-	}
+	var id_list = make([]int64, 0)
+	c.Params.Bind(&id_list, "id_list")
 
-	if logistics_company_id != 0 {
-		filter = core.SqlAnd(filter, fmt.Sprintf("ol.company_id = %d", logistics_company_id))
-	}
+	if len(id_list) == 0 {
+		if stock_id != 0 {
+			// 这里是查询上的对仓库的限制，如果是拣货人员的话，下面还有是不是这个仓库的拣货人员的限制
+			filter = core.SqlAnd(filter, fmt.Sprintf("ol.stock_id = %d", stock_id))
+		}
 
-	if batch_code != 0 {
-		filter = core.SqlAnd(filter, fmt.Sprintf("o.batch_code = %d", batch_code))
-	}
+		if logistics_company_id != 0 {
+			filter = core.SqlAnd(filter, fmt.Sprintf("ol.company_id = %d", logistics_company_id))
+		}
 
-	if order_code_query != "" {
-		filter = core.SqlAnd(filter, fmt.Sprintf("o.code = '%s'", order_code_query))
-	}
+		if batch_code != 0 {
+			filter = core.SqlAnd(filter, fmt.Sprintf("o.batch_code = %d", batch_code))
+		}
 
-	if waybill_number_query != "" {
-		filter = core.SqlAnd(filter, fmt.Sprintf("o.waybill_number = '%s'", waybill_number_query))
-	}
+		if order_code_query != "" {
+			filter = core.SqlAnd(filter, fmt.Sprintf("o.code = '%s'", order_code_query))
+		}
 
-	if begin_time_query.Valid == true {
-		filter = core.SqlAnd(filter, fmt.Sprintf("o.paid_time >= '%s'", begin_time_query.Time.Format("2006-01-02 15:04:05")))
-	}
+		if waybill_number_query != "" {
+			filter = core.SqlAnd(filter, fmt.Sprintf("o.waybill_number = '%s'", waybill_number_query))
+		}
 
-	if end_time_query.Valid == true {
-		filter = core.SqlAnd(filter, fmt.Sprintf("o.paid_time <= '%s'", end_time_query.Time.Format("2006-01-02 15:04:05")))
+		if begin_time_query.Valid == true {
+			filter = core.SqlAnd(filter, fmt.Sprintf("o.paid_time >= '%s'", begin_time_query.Time.Format("2006-01-02 15:04:05")))
+		}
+
+		if end_time_query.Valid == true {
+			filter = core.SqlAnd(filter, fmt.Sprintf("o.paid_time <= '%s'", end_time_query.Time.Format("2006-01-02 15:04:05")))
+		}
+	} else {
+		var id_str_list = core.Int_list_to_str_list(id_list)
+		filter = core.SqlAnd(filter, fmt.Sprintf("ol.id IN (%s)", strings.Join(id_str_list, ",")))
 	}
 
 	// #5 订单物流中只显示和只导出配货中的订单
@@ -443,7 +451,7 @@ func (c ErpOrderLogistics) Save() revel.Result {
 		core.HandleError(err)
 
 		if affected == 0 {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！" })
+			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！"})
 		}
 	}
 
@@ -484,19 +492,6 @@ func (c ErpOrderLogistics) Export1() revel.Result {
 }
 
 func (c ErpOrderLogistics) get_export_excel1(db_session *xorm.Session) *xlsx.File {
-	var stock_id int64
-	c.Params.Bind(&stock_id, "stock_id")
-
-	var logistics_company_id int64
-	c.Params.Bind(&logistics_company_id, "logistics_company_id")
-
-	var batch_code int64
-	c.Params.Bind(&batch_code, "batch_code")
-
-	var begin_time_query core.NullLongTime
-	var end_time_query core.NullLongTime
-	c.Params.Bind(&begin_time_query, "begin_time_query")
-	c.Params.Bind(&end_time_query, "end_time_query")
 
 	type order_logistics_view_item_t struct {
 		OrderLogistics   models.OrderLogisticsInfo    `xorm:"extends" json:"ol"`
@@ -716,19 +711,6 @@ func (c ErpOrderLogistics) Export2() revel.Result {
 }
 
 func (c ErpOrderLogistics) get_export_excel2(db_session *xorm.Session) *xlsx.File {
-	var stock_id int64
-	c.Params.Bind(&stock_id, "stock_id")
-
-	var logistics_company_id int64
-	c.Params.Bind(&logistics_company_id, "logistics_company_id")
-
-	var batch_code int64
-	c.Params.Bind(&batch_code, "batch_code")
-
-	var begin_time_query core.NullLongTime
-	var end_time_query core.NullLongTime
-	c.Params.Bind(&begin_time_query, "begin_time_query")
-	c.Params.Bind(&end_time_query, "end_time_query")
 
 	type order_logistics_view_item_t struct {
 		OrderLogistics       models.OrderLogisticsInfo          `xorm:"extends" json:"ol"`
@@ -1126,7 +1108,7 @@ WHERE ol.stock_id = 0 AND ol.company_id = 0
 type order_logistics_product_detail_t struct {
 	StorageLocName string `xorm:"'storage_loc_name'" json:"storage_loc_name"`
 	ProductSku     string `xorm:"'product_sku'" json:"product_sku"`
-	Quantity       int64 `xorm:"'quantity'" json:"quantity"`
+	Quantity       int64  `xorm:"'quantity'" json:"quantity"`
 }
 
 func (c ErpOrderLogistics) get_order_logistics_product_detail_list(order_id int64, stock_id int64) []order_logistics_product_detail_t {

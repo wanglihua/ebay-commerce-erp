@@ -161,7 +161,7 @@ func (c ErpStorageLoc) Save() revel.Result {
 		stockId_count, err := db_session.Where("stock_id = ? and name = ?", storage_loc.StockId, storage_loc.Name).Count(new(models.StorageLocInfo))
 		core.HandleError(err)
 		if stockId_count != 0 {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，仓库、名称已存在！" })
+			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，仓库、名称已存在！"})
 		}
 
 		affected, err = db_session.Insert(&storage_loc)
@@ -170,7 +170,7 @@ func (c ErpStorageLoc) Save() revel.Result {
 		stockId_count, err := db_session.Where("id <> ? and stock_id = ? and name = ?", storage_loc.Id, storage_loc.StockId, storage_loc.Name).Count(new(models.StorageLocInfo))
 		core.HandleError(err)
 		if stockId_count != 0 {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，仓库、名称已存在！" })
+			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，仓库、名称已存在！"})
 		}
 
 		affected, err = db_session.Id(storage_loc.Id).Update(&storage_loc)
@@ -374,6 +374,16 @@ func (c ErpStorageLoc) Export() revel.Result {
 
 func (c ErpStorageLoc) get_export_excel(db_session *xorm.Session) *xlsx.File {
 
+	var id_list = make([]int64, 0)
+	c.Params.Bind(&id_list, "id_list")
+
+	var filter = ""
+
+	if len(id_list) != 0 {
+		var id_str_list = core.Int_list_to_str_list(id_list)
+		filter = core.SqlAnd(filter, fmt.Sprintf("sl.id IN (%s)", strings.Join(id_str_list, ",")))
+	}
+
 	type storage_loc_export_item_t struct {
 		StorageLoc models.StorageLocInfo `xorm:"extends" json:"sl"`
 		Stock      models.StockInfo      `xorm:"extends" json:"s"`
@@ -388,6 +398,10 @@ FROM erp_storage_loc sl
 	var sql_get_storage_loc_list = `SELECT sl.*, s.*
 FROM erp_storage_loc sl
     INNER JOIN erp_stock s ON s.id = sl.stock_id`
+
+	if filter != "" {
+		sql_get_storage_loc_list = sql_get_storage_loc_list + " WHERE " + filter
+	}
 
 	var storage_loc_list = make([]storage_loc_export_item_t, 0)
 	err := db_session.Sql(sql_get_storage_loc_list).Find(&storage_loc_list)

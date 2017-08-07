@@ -27,6 +27,9 @@ func (c ErpOrderExport) Export() revel.Result {
 	var hold_type_id int64
 	c.Params.Bind(&hold_type_id, "hold_type_id")
 
+	var id_list = make([]int64, 0)
+	c.Params.Bind(&id_list, "id_list")
+
 	var db_session = c.DbSession
 
 	var status_id int64 = 0
@@ -60,16 +63,21 @@ func (c ErpOrderExport) Export() revel.Result {
 
 	var filter = "1=1"
 
-	if status_id != 0 {
-		filter = fmt.Sprintf("o.status_id = %d", status_id)
-	}
+	if len(id_list) == 0 {
+		if status_id != 0 {
+			filter = fmt.Sprintf("o.status_id = %d", status_id)
+		}
 
-	if batch_code != 0 {
-		filter = core.SqlAnd(filter, fmt.Sprintf("o.batch_code = %d", batch_code))
-	}
+		if batch_code != 0 {
+			filter = core.SqlAnd(filter, fmt.Sprintf("o.batch_code = %d", batch_code))
+		}
 
-	if hold_type_id != 0 {
-		filter = core.SqlAnd(filter, fmt.Sprintf("o.hold_type_id = %d", hold_type_id))
+		if hold_type_id != 0 {
+			filter = core.SqlAnd(filter, fmt.Sprintf("o.hold_type_id = %d", hold_type_id))
+		}
+	} else {
+		var id_str_list = core.Int_list_to_str_list(id_list)
+		filter = core.SqlAnd(filter, fmt.Sprintf("o.id IN (%s)", strings.Join(id_str_list, ",")))
 	}
 
 	xlsx_file := c.get_export_excel(db_session, filter, status_id)

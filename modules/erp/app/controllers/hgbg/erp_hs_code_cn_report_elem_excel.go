@@ -275,7 +275,7 @@ func (c ErpHsCodeCnReportElemExcel) Import() revel.Result {
 
 		if has == true {
 			update_col_list := []string{"hs_code", "cn_name", "en_name", "elem01", "elem02", "elem03", "elem04", "elem05",
-			                            "elem06", "elem07", "elem08", "elem09", "elem10", "elem11", "elem12", "elem13", "elem14"}
+				"elem06", "elem07", "elem08", "elem09", "elem10", "elem11", "elem12", "elem13", "elem14"}
 			_, err = db_session.Id(hs_code.Id).Cols(update_col_list...).Update(&hs_code)
 			core.HandleError(err)
 		} else {
@@ -295,9 +295,18 @@ func (c ErpHsCodeCnReportElemExcel) Export() revel.Result {
 
 	db_session := c.DbSession
 
-	product_list := make([]models.HsCodeCnReportElemInfo, 0)
+	var id_list = make([]int64, 0)
+	c.Params.Bind(&id_list, "id_list")
 
-	err := db_session.Find(&product_list)
+	var filter = "(1=1)"
+
+	if len(id_list) != 0 {
+		var id_str_list = core.Int_list_to_str_list(id_list)
+		filter = core.SqlAnd(filter, fmt.Sprintf("id IN (%s)", strings.Join(id_str_list, ",")))
+	}
+
+	product_list := make([]models.HsCodeCnReportElemInfo, 0)
+	err := db_session.Where(filter).Find(&product_list)
 	core.HandleError(err)
 
 	xlsx_file := c.export_hs_code_list_to_excel(db_session, product_list)
