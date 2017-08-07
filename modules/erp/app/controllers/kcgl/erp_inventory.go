@@ -273,13 +273,13 @@ func (c ErpInventory) Save() revel.Result {
 			inventory_count, err := db_session.Where("stock_id = ? AND storage_loc_id = ?", inventory.StockId, inventory.StorageLocId).Count(new(models.InventoryInfo))
 			core.HandleError(err)
 			if inventory_count != 0 {
-				return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，仓库仓位中SKU库存已存在，一个仓位只能一个SKU！" })
+				return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，仓库仓位中SKU库存已存在，一个仓位只能一个SKU！"})
 			}
 
 			inventory_count, err = db_session.Where("stock_id = ? AND product_id = ?", inventory.StockId, inventory.ProductId).Count(new(models.InventoryInfo))
 			core.HandleError(err)
 			if inventory_count != 0 {
-				return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，仓库中SKU的库存已存在，一个SKU只能一个仓位！" })
+				return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，仓库中SKU的库存已存在，一个SKU只能一个仓位！"})
 			}
 		}
 
@@ -494,6 +494,9 @@ func (c ErpInventory) Import() revel.Result {
 		return false
 	}
 
+	// 用于检查 仓库和SKU 的重复
+	var stock_product_map = make(map[string]string)
+
 	var inventory_import_error_list = make([]inventory_import_t, 0)
 	// 先检查一遍是不是有错误，
 	for index, inventory_import := range inventory_import_list {
@@ -535,6 +538,18 @@ func (c ErpInventory) Import() revel.Result {
 					inventory_import_error_list = append(inventory_import_error_list, inventory_import)
 				}
 			}
+		}
+
+		// 检查导入的SKU是否有重复的，是 仓库和SKU 的组合的重复检查
+		if stock_id != 0 && product_id != 0 {
+			var map_key = fmt.Sprintf("%d_%d", stock_id, product_id)
+			pre_order_num, found := stock_product_map[map_key]
+			if found {
+				inventory_import.ErrorMessage = fmt.Sprintf("序号 %s 的仓库（%s）和商品（%s）的组合和之前(序号%s)的有重复！", inventory_import.OrdNum, inventory_import.StockName, inventory_import.ProductSku, pre_order_num)
+				inventory_import_error_list = append(inventory_import_error_list, inventory_import)
+			}
+
+			stock_product_map[map_key] = inventory_import.OrdNum
 		}
 
 		inventory_import_list[index].product_id = product_id
@@ -907,6 +922,9 @@ func (c ErpInventory) ImportProductStorageLoc() revel.Result {
 		return false
 	}
 
+	// 用于检查 仓库和SKU 的重复
+	var stock_product_map = make(map[string]string)
+
 	var au_stock_id_map = make(map[int64]int64)
 	var au_stock_import_list = make([]inventory_import_t, 0)
 	var inventory_import_error_list = make([]inventory_import_t, 0)
@@ -943,6 +961,18 @@ func (c ErpInventory) ImportProductStorageLoc() revel.Result {
 					inventory_import_error_list = append(inventory_import_error_list, inventory_import)
 				}
 			}
+		}
+
+		// 检查导入的SKU是否有重复的，是 仓库和SKU 的组合的重复检查
+		if stock_id != 0 && product_id != 0 {
+			var map_key = fmt.Sprintf("%d_%d", stock_id, product_id)
+			pre_order_num, found := stock_product_map[map_key]
+			if found {
+				inventory_import.ErrorMessage = fmt.Sprintf("序号 %s 的仓库（%s）和商品（%s）的组合和之前(序号%s)的有重复！", inventory_import.OrdNum, inventory_import.StockName, inventory_import.ProductSku, pre_order_num)
+				inventory_import_error_list = append(inventory_import_error_list, inventory_import)
+			}
+
+			stock_product_map[map_key] = inventory_import.OrdNum
 		}
 
 		inventory_import_list[index].product_id = product_id
@@ -1423,6 +1453,9 @@ func (c ErpInventory) ImportInventoryQuantity() revel.Result {
 		return false
 	}
 
+	// 用于检查 仓库和SKU 的重复
+	var stock_product_map = make(map[string]string)
+
 	var inventory_import_error_list = make([]inventory_import_t, 0)
 	// 先检查一遍是不是有错误，
 	for index, inventory_import := range inventory_import_list {
@@ -1459,6 +1492,18 @@ func (c ErpInventory) ImportInventoryQuantity() revel.Result {
 				}
 			}
 			*/
+		}
+
+		// 检查导入的SKU是否有重复的，是 仓库和SKU 的组合的重复检查
+		if stock_id != 0 && product_id != 0 {
+			var map_key = fmt.Sprintf("%d_%d", stock_id, product_id)
+			pre_order_num, found := stock_product_map[map_key]
+			if found {
+				inventory_import.ErrorMessage = fmt.Sprintf("序号 %s 的仓库（%s）和商品（%s）的组合和之前(序号%s)的有重复！", inventory_import.OrdNum, inventory_import.StockName, inventory_import.ProductSku, pre_order_num)
+				inventory_import_error_list = append(inventory_import_error_list, inventory_import)
+			}
+
+			stock_product_map[map_key] = inventory_import.OrdNum
 		}
 
 		inventory_import_list[index].product_id = product_id
@@ -1831,6 +1876,9 @@ func (c ErpInventory) ImportInventoryPrice() revel.Result {
 		return false
 	}
 
+	// 用于检查 仓库和SKU 的重复
+	var stock_product_map = make(map[string]string)
+
 	var inventory_import_error_list = make([]inventory_import_t, 0)
 	// 先检查一遍是不是有错误，
 	for index, inventory_import := range inventory_import_list {
@@ -1874,6 +1922,18 @@ func (c ErpInventory) ImportInventoryPrice() revel.Result {
 				}
 			}
 			*/
+		}
+
+		// 检查导入的SKU是否有重复的，是 仓库和SKU 的组合的重复检查
+		if stock_id != 0 && product_id != 0 {
+			var map_key = fmt.Sprintf("%d_%d", stock_id, product_id)
+			pre_order_num, found := stock_product_map[map_key]
+			if found {
+				inventory_import.ErrorMessage = fmt.Sprintf("序号 %s 的仓库（%s）和商品（%s）的组合和之前(序号%s)的有重复！", inventory_import.OrdNum, inventory_import.StockName, inventory_import.ProductSku, pre_order_num)
+				inventory_import_error_list = append(inventory_import_error_list, inventory_import)
+			}
+
+			stock_product_map[map_key] = inventory_import.OrdNum
 		}
 
 		inventory_import_list[index].product_id = product_id
@@ -2239,6 +2299,9 @@ func (c ErpInventory) ImportInventoryQuantityDiff() revel.Result {
 		return false
 	}
 
+	// 用于检查 仓库和SKU 的重复
+	var stock_product_map = make(map[string]string)
+
 	var inventory_import_error_list = make([]inventory_import_t, 0)
 	// 先检查一遍是不是有错误，
 	for index, inventory_import := range inventory_import_list {
@@ -2275,6 +2338,18 @@ func (c ErpInventory) ImportInventoryQuantityDiff() revel.Result {
 				}
 			}
 			*/
+		}
+
+		// 检查导入的SKU是否有重复的，是 仓库和SKU 的组合的重复检查
+		if stock_id != 0 && product_id != 0 {
+			var map_key = fmt.Sprintf("%d_%d", stock_id, product_id)
+			pre_order_num, found := stock_product_map[map_key]
+			if found {
+				inventory_import.ErrorMessage = fmt.Sprintf("序号 %s 的仓库（%s）和商品（%s）的组合和之前(序号%s)的有重复！", inventory_import.OrdNum, inventory_import.StockName, inventory_import.ProductSku, pre_order_num)
+				inventory_import_error_list = append(inventory_import_error_list, inventory_import)
+			}
+
+			stock_product_map[map_key] = inventory_import.OrdNum
 		}
 
 		inventory_import_list[index].product_id = product_id

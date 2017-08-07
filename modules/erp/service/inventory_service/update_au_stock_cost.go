@@ -89,7 +89,7 @@ WHERE s.stock_type_id = %d;`
 				au_stock_inventory.PendingQty = 0
 				au_stock_inventory.CostPrice = 0
 
-				_, err = db_session.Insert(au_stock_inventory)
+				_, err = db_session.Insert(&au_stock_inventory)
 				core.HandleError(err)
 			}
 		}
