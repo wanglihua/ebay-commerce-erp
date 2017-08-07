@@ -31,7 +31,7 @@ func (f *UserDetailForm) Valid(validation *revel.Validation) bool {
 	validation.MaxSize(f.User.LoginName, 10).Message("工号长度不能大于10！")
 
 	validation.Required(f.User.NickName).Message("姓名不能为空！")
-	validation.MinSize(f.User.NickName, 3).Message("姓名长度不能小于3！")
+	validation.MinSize(f.User.NickName, 2).Message("姓名长度不能小于2！")
 	validation.MaxSize(f.User.NickName, 10).Message("姓名长度不能大于10！")
 
 	if f.IsCreate() {

@@ -16,7 +16,7 @@ function saveUser() {
         },
         'form.User.NickName': {
             required: true,
-            minlength: 3,
+            minlength: 2,
             maxlength: 10
         },
         {%if .is_create%}
