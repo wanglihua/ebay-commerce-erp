@@ -117,6 +117,7 @@ func GetKcglMenu(res_id_map map[int64]bool, web_session revel.Session) string {
         </li>`)
 	}
 
+	/*
 	if check_pass_res_menu(pass_res.KCGL_INVENTORY_CHECK_APPROVE) {
 		buffer.WriteString(`<li id="kcgl-inventorycheck-approve-menu" class="">
             <a href="/inventory/check/approve">
@@ -136,6 +137,7 @@ func GetKcglMenu(res_id_map map[int64]bool, web_session revel.Session) string {
             <b class="arrow"></b>
         </li>`)
 	}
+	*/
 
 	if check_pass_res_menu(pass_res.KCGL_STOCKBILL_CHECKIN) {
 		buffer.WriteString(`<li id="kcgl-stockbill-checkin-menu" class="">
