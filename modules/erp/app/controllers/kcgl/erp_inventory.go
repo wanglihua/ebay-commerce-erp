@@ -1330,7 +1330,7 @@ func (c ErpInventory) get_export_product_storage_loc_excel(db_session *xorm.Sess
 }
 
 func (c ErpInventory) ImportInventoryQuantity() revel.Result {
-	pass_service.Check_login_user_pass(pass_res.KCGL_INVENTORY_SKU_QTY, c.Session)
+	pass_service.Check_login_user_pass(pass_res.KCGL_INVENTORY_IMPORT_QTY_OVER, c.Session)
 
 	db_session := c.DbSession
 
@@ -2176,7 +2176,7 @@ func (c ErpInventory) get_export_inventory_price_excel(db_session *xorm.Session)
 }
 
 func (c ErpInventory) ImportInventoryQuantityDiff() revel.Result {
-	pass_service.Check_login_user_pass(pass_res.KCGL_INVENTORY_SKU_QTY, c.Session)
+	pass_service.Check_login_user_pass(pass_res.KCGL_INVENTORY_IMPORT_QTY_DIFF, c.Session)
 
 	db_session := c.DbSession
 

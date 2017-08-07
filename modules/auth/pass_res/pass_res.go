@@ -66,21 +66,23 @@ const (
 	DDLC_ORDER_FORCE_PEIHUO          = 131400 // 强制配货
 
 	// 库存管理 模块编号 14
-	KCGL_PRODUCT                  = 140100 // 商品列表
-	KCGL_PRODUCT_BIND             = 140200 // 绑定商品
-	KCGL_PRODUCT_IMPORT           = 140300 // 商品导入
-	KCGL_PRODUCT_EXPORT           = 140400 // 商品导出
-	KCGL_PRODUCT_LWHW             = 140401 // 商品长宽高重量
-	KCGL_INVENTORY                = 140500 // 商品库存
-	KCGL_INVENTORY_SKU_LOC        = 140501 // 商品库存 商品库位
-	KCGL_INVENTORY_SKU_QTY        = 140502 // 商品库存 库存数量
-	KCGL_INVENTORY_SKU_PRICE      = 140503 // 商品库存 库存成本
-	KCGL_INVENTORY_CHECK          = 140600 // 库存盘点
-	KCGL_INVENTORY_CHECK_APPROVE  = 140700 // 盘点审批
-	KCGL_STOCKBILL_TRANSFER       = 140800 // 分仓调拨
-	KCGL_STOCKBILL_CHECKIN        = 141000 // 手工入库
-	KCGL_STOCKBILL_CHECKOUT       = 141100 // 手工出库
-	KCGL_SPECIAL_SKU              = 141200 // 特殊SKU
+	KCGL_PRODUCT                   = 140100 // 商品列表
+	KCGL_PRODUCT_BIND              = 140200 // 绑定商品
+	KCGL_PRODUCT_IMPORT            = 140300 // 商品导入
+	KCGL_PRODUCT_EXPORT            = 140400 // 商品导出
+	KCGL_PRODUCT_LWHW              = 140401 // 商品长宽高重量
+	KCGL_INVENTORY                 = 140500 // 商品库存
+	KCGL_INVENTORY_IMPORT_QTY_OVER = 140510 // 商品库存 导入覆盖库存数量
+	KCGL_INVENTORY_IMPORT_QTY_DIFF = 140520 // 商品库存 导入修正库存数量
+	KCGL_INVENTORY_SKU_LOC         = 140501 // 商品库存 商品库位
+	KCGL_INVENTORY_SKU_QTY         = 140502 // 商品库存 库存数量
+	KCGL_INVENTORY_SKU_PRICE       = 140503 // 商品库存 库存成本
+	KCGL_INVENTORY_CHECK           = 140600 // 库存盘点
+	KCGL_INVENTORY_CHECK_APPROVE   = 140700 // 盘点审批
+	KCGL_STOCKBILL_TRANSFER        = 140800 // 分仓调拨
+	KCGL_STOCKBILL_CHECKIN         = 141000 // 手工入库
+	KCGL_STOCKBILL_CHECKOUT        = 141100 // 手工出库
+	KCGL_SPECIAL_SKU               = 141200 // 特殊SKU
 
 	// 商品配置 模块编号 15
 	SPPZ_PRODUCT_BATCH      = 150100 // 商品批量修改
