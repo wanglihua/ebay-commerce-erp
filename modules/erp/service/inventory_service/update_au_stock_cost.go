@@ -61,6 +61,9 @@ WHERE s.stock_type_id = %d;`
 	// 不用汇率换算了，仓库的成本都是RMB的
 	var sea_container_cost = sea_container_cost_service.Get_sea_container_cost(db_session)
 
+	var au_stock_list = make([]models.StockInfo, 0)
+	core.HandleError(db_session.Where("stock_type_id = ?", models.STOCK_TYPE_AU).Find(&au_stock_list))
+
 	// 汇率换算
 	//var aud_exchange_rate = exchange_rate_service.Get_aud_exchange_rate(db_session)
 
@@ -72,6 +75,25 @@ WHERE s.stock_type_id = %d;`
 		_, err = db_session.Id(cn_inventory.ProductId).Get(&product)
 		core.HandleError(err)
 
+		// 如果澳仓库存不存的的，需要自动添加零库存的记录，方便记录澳仓成本。
+		for _, au_stock := range au_stock_list {
+			var au_stock_inventory models.InventoryInfo
+			has, err := db_session.Where("product_id = ? AND stock_id = ?", cn_inventory.ProductId, au_stock.Id).Get(&au_stock_inventory)
+			core.HandleError(err)
+
+			if has == false {
+				au_stock_inventory.ProductId = cn_inventory.ProductId
+				au_stock_inventory.StockId = au_stock.Id
+				au_stock_inventory.StorageLocId = 0
+				au_stock_inventory.Qty = 0
+				au_stock_inventory.PendingQty = 0
+				au_stock_inventory.CostPrice = 0
+
+				_, err = db_session.Insert(au_stock_inventory)
+				core.HandleError(err)
+			}
+		}
+
 		// 计算商品体积，计算平摊海运成本
 		var avg_sea_shipping_cost = float64(sea_container_cost.Cost) * product.Length * product.Width * product.Height / float64(sea_container_cost.Volume)
 
@@ -81,5 +103,3 @@ WHERE s.stock_type_id = %d;`
 		core.HandleError(err)
 	}
 }
-
-// 如果澳仓库存不存的的，需要自动添加零库存的记录，方便记录澳仓成本。
