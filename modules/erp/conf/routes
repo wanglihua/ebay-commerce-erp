@@ -185,8 +185,6 @@ GET  /product/sale/analysis/setting              ErpProductSaleAnalysisSetting.I
 POST /product/sale/analysis/setting/data/detail  ErpProductSaleAnalysisSetting.DetailData
 POST /product/sale/analysis/setting/save         ErpProductSaleAnalysisSetting.Save
 
-GET  /product/quality/feedback             ErpProductQualityFeedback.Index
-
 GET  /package/material                     ErpPackageMaterial.Index
 POST /package/material/data/list           ErpPackageMaterial.ListData
 POST /package/material/data/detail         ErpPackageMaterial.DetailData

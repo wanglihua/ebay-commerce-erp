@@ -137,18 +137,6 @@ func GetKcglMenu(res_id_map map[int64]bool, web_session revel.Session) string {
         </li>`)
 	}
 
-	/*
-	if check_pass_res_menu(pass_res.KCGL_PRODUCT_QUALITY_FEEDBACK) {
-		buffer.WriteString(`<li id="kcgl-product-quality-feedback-menu" class="">
-            <a href="/product/quality/feedback">
-                <i class="menu-icon fa fa-caret-right"></i>
-                商品质量反馈
-            </a>
-            <b class="arrow"></b>
-        </li>`)
-	}
-	*/
-
 	if check_pass_res_menu(pass_res.KCGL_STOCKBILL_CHECKIN) {
 		buffer.WriteString(`<li id="kcgl-stockbill-checkin-menu" class="">
             <a href="/stock/bill/checkin">
