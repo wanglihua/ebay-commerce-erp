@@ -50,20 +50,23 @@ func (p_ol *OrderLogisticsService) match_logistics_mode_logic(p_order *models.Or
 		db_session.Close()
 	}()
 
-	// todo: 下面的三个也应该加上理论发货仓库的记录，方便进行理论仓发货的统计
+	// 下面的三个 Hold 也应该加上理论发货仓库的记录，方便进行理论仓发货的统计
 
 	// 信封的忽略
 	if p_ol.is_envelope(p_order, p_order_logistics_data) == true {
+		save_special_hold_order_logistics_logic(p_ol, p_order.Id, p_order_logistics_data, db_session)
 		return
 	}
 
 	// 国际件的忽略
 	if p_ol.is_international_order(p_order, p_order_logistics_data) == true {
+		save_special_hold_order_logistics_logic(p_ol, p_order.Id, p_order_logistics_data, db_session)
 		return
 	}
 
 	// 快递类的忽略
 	if p_ol.is_express(p_order, p_order_logistics_data) == true {
+		save_special_hold_order_logistics_logic(p_ol, p_order.Id, p_order_logistics_data, db_session)
 		return
 	}
 
@@ -402,6 +405,39 @@ func save_order_logistics_logic(p_ol *OrderLogisticsService, match_result match_
 		core.HandleError(err)
 	} else {
 		_, err := db_session.Insert(&order_logistics_logic)
+		core.HandleError(err)
+	}
+}
+
+func save_special_hold_order_logistics_logic(p_ol *OrderLogisticsService, order_id int64, p_order_logistics_data *order_logistics_data_t, db_session *xorm.Session) {
+
+	var order_logistics_logic models.OrderLogisticsLogicInfo
+	has, err := db_session.Where("order_id = ?", order_id).Get(&order_logistics_logic)
+	core.HandleError(err)
+
+	var whole_length, whole_width, whole_height, whole_weight float64 = get_order_products_whole_logistics_data(p_order_logistics_data)
+
+	order_logistics_logic.OrderId = order_id
+	order_logistics_logic.AddressId = p_order_logistics_data.order_shipping_address.Id
+	order_logistics_logic.CompanyId = 0
+	order_logistics_logic.StockId = p_ol.mel_stock_id //设置发货仓库为墨尔本仓库
+	order_logistics_logic.ModeId = 0
+	order_logistics_logic.FeeRateId = 0
+	order_logistics_logic.Length = whole_length
+	order_logistics_logic.Width = whole_width
+	order_logistics_logic.Height = whole_height
+	order_logistics_logic.Weight = whole_weight
+	order_logistics_logic.DimWeight = 0
+	order_logistics_logic.Sfkltjz = 0
+	order_logistics_logic.Sfkltjz = 0
+	order_logistics_logic.Ptfl = p_ol.logistics_setting.Ptfl
+	order_logistics_logic.Jyfl = p_ol.logistics_setting.Jyfl
+
+	if has == false {
+		_, err = db_session.Insert(&order_logistics_logic)
+		core.HandleError(err)
+	} else {
+		_, err = db_session.Id(order_logistics_logic.Id).Update(&order_logistics_logic)
 		core.HandleError(err)
 	}
 }
