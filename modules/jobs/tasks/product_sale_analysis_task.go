@@ -12,5 +12,5 @@ func (t ProductSaleAnalysisTask) Name() string {
 }
 
 func (t ProductSaleAnalysisTask) Run() {
-	product_sale_analysis_service.ProductSaleAnalyze();
+	product_sale_analysis_service.ProductSaleAnalyze()
 }

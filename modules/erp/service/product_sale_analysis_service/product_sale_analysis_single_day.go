@@ -110,7 +110,71 @@ ORDER BY oi.item_product_id ASC;`
 			}
 		}
 
-		// 分仓统计
+		// 分仓统计 实际仓统计 已发货时间为准
+		{
+			/*
+SELECT oi.order_id AS order_id, oi.item_product_id AS product_id, sum(oi.quantity) AS qty
+FROM erp_order_item oi
+	INNER JOIN erp_order o ON oi.order_id = o.id
+WHERE '2017-06-01' <= o.shipped_time AND o.shipped_time < '2017-06-02'
+GROUP BY oi.order_id, oi.item_product_id
+ORDER BY oi.item_product_id ASC;
+		 */
+
+			var sql = `SELECT oi.order_id AS order_id, oi.item_product_id AS product_id, sum(oi.quantity) AS qty
+FROM erp_order_item oi
+    INNER JOIN erp_order o ON oi.order_id = o.id
+WHERE '%s' <= o.shipped_time AND o.shipped_time < '%s'
+GROUP BY oi.order_id, oi.item_product_id
+ORDER BY oi.item_product_id ASC;`
+			sql = fmt.Sprintf(sql, day_time_begin.Format("2006-01-02"), day_time_end.Format("2006-01-02"))
+
+			var product_sale_list = make([]product_sale_t, 0)
+			core.HandleError(db_session.Sql(sql).Find(&product_sale_list))
+
+			for _, product_sale := range product_sale_list {
+				// 实际仓统计 stock_id != 0
+
+				var order_logistics models.OrderLogisticsInfo
+				has, err := db_session.Where(fmt.Sprintf("order_id = %d", product_sale.OrderId)).Get(&order_logistics)
+				core.HandleError(err)
+
+				var stock_id = order_logistics.StockId
+
+				if has == true && stock_id != 0 { // 如果有匹配的物流信息，并且仓库信息不为空
+					var product_sale_day_analysis models.ProductSaleDayAnalysisInfo
+					has, err := db_session.Where(fmt.Sprintf("type = %d AND stock_id = %d AND product_id = %d AND day = '%s'",
+						models.PRODUCT_SALE_ANALYSIS_TYPE_ACTUAL,
+						stock_id,
+						product_sale.ProductId,
+						day_time_begin.Format("2006-01-02"))).
+						Get(&product_sale_day_analysis)
+					core.HandleError(err)
+
+					if has == true {
+						product_sale_day_analysis.Qty = product_sale.Qty
+						_, err := db_session.Id(product_sale_day_analysis.Id).Cols("qty").Update(&product_sale_day_analysis)
+						core.HandleError(err)
+					} else {
+						var product models.ProductInfo
+						_, err := db_session.Id(product_sale.ProductId).Get(&product)
+						core.HandleError(err)
+
+						product_sale_day_analysis.StockId = stock_id
+						product_sale_day_analysis.Type = models.PRODUCT_SALE_ANALYSIS_TYPE_ACTUAL
+						product_sale_day_analysis.ProductId = product_sale.ProductId
+						product_sale_day_analysis.Sku = product.Sku
+						product_sale_day_analysis.Qty = product_sale.Qty
+						product_sale_day_analysis.Day = core.Date(day_time_begin)
+
+						_, err = db_session.Insert(&product_sale_day_analysis)
+						core.HandleError(err)
+					}
+				}
+			}
+		}
+
+		// 分仓统计 理论仓统计 以支付时间为准
 		{
 			/*
 SELECT oi.order_id AS order_id, oi.item_product_id AS product_id, sum(oi.quantity) AS qty
@@ -133,85 +197,42 @@ ORDER BY oi.item_product_id ASC;`
 			core.HandleError(db_session.Sql(sql).Find(&product_sale_list))
 
 			for _, product_sale := range product_sale_list {
-				{
-					// 实际仓统计 stock_id != 0
+				// 逻辑仓统计 stock_id != 0
 
-					var order_logistics models.OrderLogisticsInfo
-					has, err := db_session.Where(fmt.Sprintf("order_id = %d", product_sale.OrderId)).Get(&order_logistics)
+				var order_logistics_logic models.OrderLogisticsLogicInfo
+				has, err := db_session.Where(fmt.Sprintf("order_id = %d", product_sale.OrderId)).Get(&order_logistics_logic)
+				core.HandleError(err)
+
+				var stock_id = order_logistics_logic.StockId
+
+				if has == true && stock_id != 0 { // 如果有匹配的物流信息，并且仓库信息不为空
+					var product_sale_day_analysis models.ProductSaleDayAnalysisInfo
+					has, err := db_session.Where(fmt.Sprintf("type = %d AND stock_id = %d AND product_id = %d AND day = '%s'",
+						models.PRODUCT_SALE_ANALYSIS_TYPE_LOGIC,
+						stock_id,
+						product_sale.ProductId,
+						day_time_begin.Format("2006-01-02"))).
+						Get(&product_sale_day_analysis)
 					core.HandleError(err)
 
-					var stock_id = order_logistics.StockId
-
-					if has == true && stock_id != 0 { // 如果有匹配的物流信息，并且仓库信息不为空
-						var product_sale_day_analysis models.ProductSaleDayAnalysisInfo
-						has, err := db_session.Where(fmt.Sprintf("type = %d AND stock_id = %d AND product_id = %d AND day = '%s'",
-							models.PRODUCT_SALE_ANALYSIS_TYPE_ACTUAL,
-							stock_id,
-							product_sale.ProductId,
-							day_time_begin.Format("2006-01-02"))).
-							Get(&product_sale_day_analysis)
+					if has == true {
+						product_sale_day_analysis.Qty = product_sale.Qty
+						_, err := db_session.Id(product_sale_day_analysis.Id).Cols("qty").Update(&product_sale_day_analysis)
+						core.HandleError(err)
+					} else {
+						var product models.ProductInfo
+						_, err := db_session.Id(product_sale.ProductId).Get(&product)
 						core.HandleError(err)
 
-						if has == true {
-							product_sale_day_analysis.Qty = product_sale.Qty
-							_, err := db_session.Id(product_sale_day_analysis.Id).Cols("qty").Update(&product_sale_day_analysis)
-							core.HandleError(err)
-						} else {
-							var product models.ProductInfo
-							_, err := db_session.Id(product_sale.ProductId).Get(&product)
-							core.HandleError(err)
+						product_sale_day_analysis.StockId = stock_id
+						product_sale_day_analysis.Type = models.PRODUCT_SALE_ANALYSIS_TYPE_LOGIC
+						product_sale_day_analysis.ProductId = product_sale.ProductId
+						product_sale_day_analysis.Sku = product.Sku
+						product_sale_day_analysis.Qty = product_sale.Qty
+						product_sale_day_analysis.Day = core.Date(day_time_begin)
 
-							product_sale_day_analysis.StockId = stock_id
-							product_sale_day_analysis.Type = models.PRODUCT_SALE_ANALYSIS_TYPE_ACTUAL
-							product_sale_day_analysis.ProductId = product_sale.ProductId
-							product_sale_day_analysis.Sku = product.Sku
-							product_sale_day_analysis.Qty = product_sale.Qty
-							product_sale_day_analysis.Day = core.Date(day_time_begin)
-
-							_, err = db_session.Insert(&product_sale_day_analysis)
-							core.HandleError(err)
-						}
-					}
-				}
-
-				{
-					// 逻辑仓统计 stock_id != 0
-
-					var order_logistics_logic models.OrderLogisticsLogicInfo
-					has, err := db_session.Where(fmt.Sprintf("order_id = %d", product_sale.OrderId)).Get(&order_logistics_logic)
-					core.HandleError(err)
-
-					var stock_id = order_logistics_logic.StockId
-
-					if has == true && stock_id != 0 { // 如果有匹配的物流信息，并且仓库信息不为空
-						var product_sale_day_analysis models.ProductSaleDayAnalysisInfo
-						has, err := db_session.Where(fmt.Sprintf("type = %d AND stock_id = %d AND product_id = %d AND day = '%s'",
-							models.PRODUCT_SALE_ANALYSIS_TYPE_LOGIC,
-							stock_id,
-							product_sale.ProductId,
-							day_time_begin.Format("2006-01-02"))).
-							Get(&product_sale_day_analysis)
+						_, err = db_session.Insert(&product_sale_day_analysis)
 						core.HandleError(err)
-
-						if has == true {
-							product_sale_day_analysis.Qty = product_sale.Qty
-							_, err := db_session.Id(product_sale_day_analysis.Id).Cols("qty").Update(&product_sale_day_analysis)
-							core.HandleError(err)
-						} else {
-							var product models.ProductInfo
-							_, err := db_session.Id(product_sale.ProductId).Get(&product)
-							core.HandleError(err)
-
-							product_sale_day_analysis.StockId = stock_id
-							product_sale_day_analysis.Type = models.PRODUCT_SALE_ANALYSIS_TYPE_LOGIC
-							product_sale_day_analysis.ProductId = product_sale.ProductId
-							product_sale_day_analysis.Sku = product.Sku
-							product_sale_day_analysis.Qty = product_sale.Qty
-							product_sale_day_analysis.Day = core.Date(day_time_begin)
-
-							_, err = db_session.Insert(&product_sale_day_analysis)
-							core.HandleError(err)
-						}
 					}
 				}
 			}

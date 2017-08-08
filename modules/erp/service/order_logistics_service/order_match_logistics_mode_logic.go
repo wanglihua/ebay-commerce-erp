@@ -50,6 +50,8 @@ func (p_ol *OrderLogisticsService) match_logistics_mode_logic(p_order *models.Or
 		db_session.Close()
 	}()
 
+	// todo: 下面的三个也应该加上理论发货仓库的记录，方便进行理论仓发货的统计
+
 	// 信封的忽略
 	if p_ol.is_envelope(p_order, p_order_logistics_data) == true {
 		return

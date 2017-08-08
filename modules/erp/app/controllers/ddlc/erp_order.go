@@ -186,6 +186,25 @@ func (c ErpOrder) get_good_query_list() []good_query {
 	return good_query_list
 }
 
+const (
+	time_query_paid_time int64 = 100 // 支付时间
+	time_query_ship_time int64 = 200 // 发货时间
+)
+
+type time_query struct {
+	Id   int64  `json:"id"`
+	Name string `json:"name"`
+}
+
+func (c ErpOrder) get_time_query_list() []time_query {
+	var time_query_list = make([]time_query, 0)
+
+	time_query_list = append(time_query_list, time_query{Id: time_query_paid_time, Name: "支付时间"})
+	time_query_list = append(time_query_list, time_query{Id: time_query_ship_time, Name: "发货时间"})
+
+	return time_query_list
+}
+
 // 优化查询定义  结束
 
 // index page data
@@ -242,6 +261,8 @@ func (c ErpOrder) PageData() revel.Result {
 		"batch_code_list":     batch_code_list,
 		"order_tag_id":        0,
 		"order_tag_list":      order_tag_list,
+		"time_query_id":       0,
+		"time_query_list":     c.get_time_query_list(),
 	})
 }
 
@@ -271,6 +292,9 @@ func (c ErpOrder) ListData() revel.Result {
 
 	var batch_code int64
 	c.Params.Bind(&batch_code, "batch_code")
+
+	var time_query_id int64
+	c.Params.Bind(&time_query_id, "time_query_id")
 
 	var query_begin_time string
 	c.Params.Bind(&query_begin_time, "query_begin_time")
@@ -326,13 +350,26 @@ func (c ErpOrder) ListData() revel.Result {
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
-	if query_begin_date_err == nil {
-		filter = core.SqlAnd(filter, fmt.Sprintf("o.paid_time >= '%04d-%02d-%02d'", query_begin_date.Year(), query_begin_date.Month(), query_begin_date.Day()))
+	if time_query_id == time_query_paid_time {
+		if query_begin_date_err == nil {
+			filter = core.SqlAnd(filter, fmt.Sprintf("o.paid_time >= '%04d-%02d-%02d'", query_begin_date.Year(), query_begin_date.Month(), query_begin_date.Day()))
+		}
+
+		if query_end_date_err == nil {
+			query_end_date = query_end_date.Add(time.Hour * 24)
+			filter = core.SqlAnd(filter, fmt.Sprintf("o.paid_time < '%04d-%02d-%02d'", query_end_date.Year(), query_end_date.Month(), query_end_date.Day()))
+		}
 	}
 
-	if query_end_date_err == nil {
-		query_end_date = query_end_date.Add(time.Hour * 24)
-		filter = core.SqlAnd(filter, fmt.Sprintf("o.paid_time <= '%04d-%02d-%02d'", query_end_date.Year(), query_end_date.Month(), query_end_date.Day()))
+	if time_query_id == time_query_ship_time {
+		if query_begin_date_err == nil {
+			filter = core.SqlAnd(filter, fmt.Sprintf("o.shipped_time >= '%04d-%02d-%02d'", query_begin_date.Year(), query_begin_date.Month(), query_begin_date.Day()))
+		}
+
+		if query_end_date_err == nil {
+			query_end_date = query_end_date.Add(time.Hour * 24)
+			filter = core.SqlAnd(filter, fmt.Sprintf("o.shipped_time < '%04d-%02d-%02d'", query_end_date.Year(), query_end_date.Month(), query_end_date.Day()))
+		}
 	}
 
 	// 分仓库查看
