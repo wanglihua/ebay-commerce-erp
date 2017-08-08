@@ -299,12 +299,14 @@ func (c ErpOrderExport) get_export_logisics_excel(db_session *xorm.Session) *xls
 	}
 
 	/*
-SELECT ol.*, o.*, s.*, lc.*, lm.*
-FROM erp_order_logistics ol
-    INNER JOIN erp_order o ON o.id = ol.order_id
-    INNER JOIN erp_stock s ON s.id = ol.stock_id
-    INNER JOIN erp_logistics_company lc ON lc.id = ol.company_id
-    INNER JOIN erp_logistics_mode lm ON lm.id = ol.mode_id
+SELECT
+    ol.*, o.*, s.*, lc.*, lm.*
+FROM
+    erp_order o
+    LEFT JOIN erp_order_logistics ol ON o.id = ol.order_id
+    LEFT JOIN erp_stock s ON s.id = ol.stock_id
+    LEFT JOIN erp_logistics_company lc ON lc.id = ol.company_id
+    LEFT JOIN erp_logistics_mode lm ON lm.id = ol.mode_id
 WHERE ol.stock_id = 0 AND ol.company_id = 0
       AND o.batch_code = 0
       AND o.paid_time > '2017-01-01' AND o.paid_time < '2017-04-30'
@@ -315,11 +317,11 @@ WHERE ol.stock_id = 0 AND ol.company_id = 0
 	var sb = core.NewSqlBuilder()
 	sb.Select("ol.*, o.*, s.*, lc.*, lm.*")
 	sb.Count("count(ol.id) AS order_logistics_count")
-	sb.From(`erp_order_logistics ol
-    INNER JOIN erp_order o ON o.id = ol.order_id
-    INNER JOIN erp_stock s ON s.id = ol.stock_id
-    INNER JOIN erp_logistics_company lc ON lc.id = ol.company_id
-    INNER JOIN erp_logistics_mode lm ON lm.id = ol.mode_id`)
+	sb.From(`erp_order o
+    LEFT JOIN erp_order_logistics ol ON o.id = ol.order_id
+    LEFT JOIN erp_stock s ON s.id = ol.stock_id
+    LEFT JOIN erp_logistics_company lc ON lc.id = ol.company_id
+    LEFT JOIN erp_logistics_mode lm ON lm.id = ol.mode_id`)
 
 	var filter = "(1=1)"
 
@@ -332,6 +334,24 @@ WHERE ol.stock_id = 0 AND ol.company_id = 0
 	order_logistics_list := make([]order_logistics_view_item_t, 0)
 	err := db_session.Sql(sb.SqlList()).Find(&order_logistics_list)
 	core.HandleError(err)
+
+	for index, order_logistics := range order_logistics_list {
+		if order_logistics.Order.HoldTypeId.Int64 == models.ORDER_HOLD_TYPE_PICK_UP {
+			order_logistics_list[index].LogisticsMode.Name = "PICK UP"
+		}
+
+		if order_logistics.Order.HoldTypeId.Int64 == models.ORDER_HOLD_TYPE_ENVELOPE {
+			order_logistics_list[index].LogisticsMode.Name = "信封"
+		}
+
+		if order_logistics.Order.HoldTypeId.Int64 == models.ORDER_HOLD_TYPE_EXPRESS {
+			order_logistics_list[index].LogisticsMode.Name = "快递"
+		}
+
+		if order_logistics.Order.HoldTypeId.Int64 == models.ORDER_HOLD_TYPE_INTERNATIONAL {
+			order_logistics_list[index].LogisticsMode.Name = "国际件"
+		}
+	}
 
 	//创建工作薄
 	xlsx_file := xlsx.NewFile()
