@@ -35,6 +35,15 @@ func (c ErpOrderProcessedHold) Index() revel.Result {
 	return c.RenderTemplate("erp/ddlc/order_processed_hold/order_processed_hold_index.html")
 }
 
+func (c ErpOrderProcessedHold) get_time_query_list() []time_query {
+	var time_query_list = make([]time_query, 0)
+
+	time_query_list = append(time_query_list, time_query{Id: time_query_paid_time, Name: "支付时间"})
+	time_query_list = append(time_query_list, time_query{Id: time_query_ship_time, Name: "发货时间"})
+
+	return time_query_list
+}
+
 func (c ErpOrderProcessedHold) PageData() revel.Result {
 	var db_session = c.DbSession
 
@@ -63,6 +72,8 @@ func (c ErpOrderProcessedHold) PageData() revel.Result {
 		"au_stock_list":   au_stock_list,
 		"order_tag_id":    0,
 		"order_tag_list":  order_tag_list,
+		"time_query_id":   time_query_paid_time,
+		"time_query_list": c.get_time_query_list(),
 	})
 }
 
@@ -84,6 +95,9 @@ func (c ErpOrderProcessedHold) ListData() revel.Result {
 	var order_tag_id int64
 	c.Params.Bind(&order_tag_id, "order_tag_id")
 
+	var time_query_id int64
+	c.Params.Bind(&time_query_id, "time_query_id")
+
 	var query_begin_time string
 	c.Params.Bind(&query_begin_time, "query_begin_time")
 	query_begin_date, query_begin_date_err := core.Parse_time(query_begin_time)
@@ -95,13 +109,26 @@ func (c ErpOrderProcessedHold) ListData() revel.Result {
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
-	if query_begin_date_err == nil {
-		filter = core.SqlAnd(filter, fmt.Sprintf("o.paid_time >= '%04d-%02d-%02d'", query_begin_date.Year(), query_begin_date.Month(), query_begin_date.Day()))
+	if time_query_id == time_query_paid_time {
+		if query_begin_date_err == nil {
+			filter = core.SqlAnd(filter, fmt.Sprintf("o.paid_time >= '%04d-%02d-%02d'", query_begin_date.Year(), query_begin_date.Month(), query_begin_date.Day()))
+		}
+
+		if query_end_date_err == nil {
+			query_end_date = query_end_date.Add(time.Hour * 24)
+			filter = core.SqlAnd(filter, fmt.Sprintf("o.paid_time <= '%04d-%02d-%02d'", query_end_date.Year(), query_end_date.Month(), query_end_date.Day()))
+		}
 	}
 
-	if query_end_date_err == nil {
-		query_end_date = query_end_date.Add(time.Hour * 24)
-		filter = core.SqlAnd(filter, fmt.Sprintf("o.paid_time <= '%04d-%02d-%02d'", query_end_date.Year(), query_end_date.Month(), query_end_date.Day()))
+	if time_query_id == time_query_ship_time {
+		if query_begin_date_err == nil {
+			filter = core.SqlAnd(filter, fmt.Sprintf("o.shipped_time >= '%04d-%02d-%02d'", query_begin_date.Year(), query_begin_date.Month(), query_begin_date.Day()))
+		}
+
+		if query_end_date_err == nil {
+			query_end_date = query_end_date.Add(time.Hour * 24)
+			filter = core.SqlAnd(filter, fmt.Sprintf("o.shipped_time <= '%04d-%02d-%02d'", query_end_date.Year(), query_end_date.Month(), query_end_date.Day()))
+		}
 	}
 
 	filter = core.SqlAnd(filter, fmt.Sprintf("o.status_id = %d", models.ORDER_STATUS_PROCESSED_HOLD))

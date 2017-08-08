@@ -81,6 +81,11 @@
                             */%}
                             <label class="control-label no-padding-right" for="order_code">订单编号</label>
                             <input id="order_code" name="page.order_code" type="text" class="input-sm" v-model="page.order_code" style="width: 135px;"/>
+                            <select id="time_query_id" name="time_query_id" class="input-sm" v-model.number="page.time_query_id" style="width: 120px;">
+                                <template v-for="time_query in page.time_query_list">
+                                    <option :value="time_query.id">{{time_query.name}}</option>
+                                </template>
+                            </select>
                             <input id="query_begin_time" name="query_begin_time" style="width: 135px;height:30px;" v-model="page.query_begin_time" placeholder="开始时间如2016-01-02"/>
                             <input id="query_end_time" name="query_end_time" style="width: 135px;height:30px;" v-model="page.query_end_time" placeholder="结束时间如2016-01-02"/>
 
@@ -235,7 +240,9 @@
                 "au_stock_list": [],
                 "query_begin_time": "",
                 "query_end_time": "",
-                "order_tag_id": 0
+                "order_tag_id": 0,
+                "time_query_id": 0,
+                "time_query_list": []
             },
             "detail": {
                 "order": {}
@@ -475,6 +482,7 @@
                         aoData.push({'name': 'query_begin_time', 'value': this_vm.page.query_begin_time});
                         aoData.push({'name': 'query_end_time', 'value': this_vm.page.query_end_time});
                         aoData.push({'name': 'order_tag_id', 'value': this_vm.page.order_tag_id});
+                        aoData.push({'name': 'time_query_id', 'value': this_vm.page.time_query_id});
 
                         //query_criteria_value
 

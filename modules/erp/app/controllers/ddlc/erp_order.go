@@ -261,7 +261,7 @@ func (c ErpOrder) PageData() revel.Result {
 		"batch_code_list":     batch_code_list,
 		"order_tag_id":        0,
 		"order_tag_list":      order_tag_list,
-		"time_query_id":       0,
+		"time_query_id":       time_query_paid_time,
 		"time_query_list":     c.get_time_query_list(),
 	})
 }
