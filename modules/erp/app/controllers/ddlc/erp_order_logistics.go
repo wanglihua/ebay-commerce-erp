@@ -646,6 +646,12 @@ WHERE ol.stock_id = 0 AND ol.company_id = 0
 		sheet.SetColWidth(col_index, col_index, 10)
 		set_head_cell_style(cell)
 		cell.Value = "预估物流费用"
+
+		col_index++
+		cell = header_row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 20)
+		set_head_cell_style(cell)
+		cell.Value = "运单号"
 	}
 
 	for index, order_logistics := range order_logistics_list {
@@ -686,6 +692,11 @@ WHERE ol.stock_id = 0 AND ol.company_id = 0
 		cell = row.AddCell()
 		set_text_cell_style(cell, "center")
 		cell.Value = fmt.Sprintf("%0.1f", order_logistics.OrderLogistics.TotalFee)
+
+		// 运单号
+		cell = row.AddCell()
+		set_text_cell_style(cell, "left")
+		cell.Value = order_logistics.Order.WaybillNumber
 	}
 
 	return xlsx_file
