@@ -8,6 +8,7 @@ import (
 	"matrix/core"
 	"fmt"
 	auth_models "matrix/modules/auth/models"
+	"encoding/json"
 )
 
 type ErpOrderNew struct {
@@ -62,12 +63,54 @@ func (c ErpOrderNew) Save() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_NEW, c.Session)
 
 	var db_session = c.DbSession
-	_ = db_session
 
-	// models.ORDER_TYPE_SGCJ //手工创建
+	var form OrderCreateForm
+	err := json.Unmarshal(c.GetRequestBody(), &form)
+	core.HandleError(err)
+
+
+
+	if form.Valid(c.Validation) == false {
+		return c.RenderJson(core.JsonResult{Success: false, Message: c.GetValidationErrorMessage()})
+	}
+
+	var order = form.Order
+	_, err = db_session.Insert(&order)
+	core.HandleError(err)
+
+	var shipping_address = form.ShippingAddress
+	shipping_address.OrderId = order.Id
+	shipping_address.AddressOwner = "eBay"
+	_, err = db_session.Insert(&shipping_address)
+	core.HandleError(err)
+
+	if order.HoldTypeId.Int64 == models.ORDER_HOLD_TYPE_PICK_UP {
+		var pickup_info = form.PickupInfo
+		pickup_info.OrderId = order.Id
+
+		_, err = db_session.Insert(&pickup_info)
+		core.HandleError(err)
+	}
 
 	return c.RenderJson(map[string]interface{}{
-		"success": true,
-		"message": "订单创建成功，请添加明细！",
+		"success":  true,
+		"message":  "订单创建成功，请添加明细！",
+		"order_id": order.Id,
 	})
+}
+
+type OrderCreateForm struct {
+	Order           models.OrderInfo                `json:"order"`
+	ShippingAddress models.OrderShippingAddressInfo `json:"shipping_address"`
+	PickupInfo      models.PickupOrderInfo          `json:"pickup_info"`
+}
+
+func (f *OrderCreateForm) Valid(validation *revel.Validation) bool {
+	validation.Required(f.Order.Code).Message("订单编码不能为空！")
+	validation.Required(f.Order.CreatedTime).Message("订单创建时间不能为空！")
+	validation.Required(f.Order.StatusId).Message("订单状态不能为空！")
+	validation.Required(f.Order.TypeId).Message("订单状态不能为空！")
+	validation.Required(f.Order.ShopId).Message("订单来源不能为空！")
+
+	return validation.HasErrors() == false
 }

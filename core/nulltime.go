@@ -2,9 +2,7 @@ package core
 
 import (
 	"database/sql/driver"
-	"encoding/json"
 	"fmt"
-	"reflect"
 	"strings"
 	"time"
 
@@ -89,6 +87,7 @@ func (t NullDate) MarshalJSON() ([]byte, error) {
 }
 
 func (t *NullDate) UnmarshalJSON(data []byte) error {
+	/*
 	var err error
 	var v interface{}
 	if err = json.Unmarshal(data, &v); err != nil {
@@ -117,6 +116,16 @@ func (t *NullDate) UnmarshalJSON(data []byte) error {
 	}
 	t.Valid = err == nil
 	return err
+	*/
+
+	//parsed_time, err := time.ParseInLocation("2006-01-02", strings.Trim(string(data), `"`), time.Local)
+	parsed_time, err := Parse_time(strings.Trim(string(data), `"`))
+	if err != nil {
+		return err
+	}
+	t.Time = parsed_time
+	t.Valid = true
+	return nil
 }
 
 func (t NullDate) MarshalText() ([]byte, error) {
@@ -230,6 +239,7 @@ func (t NullTime) MarshalJSON() ([]byte, error) {
 }
 
 func (t *NullTime) UnmarshalJSON(data []byte) error {
+	/*
 	var err error
 	var v interface{}
 	if err = json.Unmarshal(data, &v); err != nil {
@@ -258,6 +268,15 @@ func (t *NullTime) UnmarshalJSON(data []byte) error {
 	}
 	t.Valid = err == nil
 	return err
+	*/
+	//parsed_time, err := time.ParseInLocation("2006-01-02", strings.Trim(string(data), `"`), time.Local)
+	parsed_time, err := Parse_time(strings.Trim(string(data), `"`))
+	if err != nil {
+		return err
+	}
+	t.Time = parsed_time
+	t.Valid = true
+	return nil
 }
 
 func (t NullTime) MarshalText() ([]byte, error) {
@@ -370,6 +389,7 @@ func (t NullLongTime) MarshalJSON() ([]byte, error) {
 }
 
 func (t *NullLongTime) UnmarshalJSON(data []byte) error {
+	/*
 	var err error
 	var v interface{}
 	if err = json.Unmarshal(data, &v); err != nil {
@@ -398,6 +418,16 @@ func (t *NullLongTime) UnmarshalJSON(data []byte) error {
 	}
 	t.Valid = err == nil
 	return err
+	*/
+	//parsed_time, err := time.ParseInLocation("2006-01-02", strings.Trim(string(data), `"`), time.Local)
+	parsed_time, err := Parse_time(strings.Trim(string(data), `"`))
+	if err != nil {
+		return err
+	}
+	t.Time = parsed_time
+	t.Valid = true
+
+	return nil
 }
 
 func (t NullLongTime) MarshalText() ([]byte, error) {
