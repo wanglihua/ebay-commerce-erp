@@ -8,7 +8,7 @@ type UpdateInventoryPendingQtyTask struct {
 }
 
 func (t UpdateInventoryPendingQtyTask) Name() string {
-	return "更新仓库库存代发货数量"
+	return "更新仓库库存待发货数量"
 }
 
 func (t UpdateInventoryPendingQtyTask) Run() {

@@ -81,8 +81,15 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="col-xs-3">
+                                <div class="form-group">
+                                    <label for="amount_paid" class="col-xs-4 control-label">收款澳币：</label>
+                                    <div class="col-xs-8">
+                                        <input id="amount_paid" name="detail.order.amount_paid" class="input-sm form-control" v-model.number="detail.order.amount_paid"/>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-
                     </div>
                 </div>
             </div>
@@ -259,6 +266,20 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="row">
+                            <div class="col-xs-3">
+                                <div class="form-group">
+                                    <label for="stock_id" class="col-xs-4 control-label">发货仓库：</label>
+                                    <div class="col-xs-8">
+                                        <select id="stock_id" name="stock_id" class="input-sm form-control" v-model.number="detail.stock_id">
+                                            <template v-for="stock in create_data.stock_list">
+                                                <option :value="stock.id">{{stock.name}}</option>
+                                            </template>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -301,6 +322,7 @@
                     return;
                 }
                 vm.create_data = data;
+                vm.detail.stock_id = data.stock_id;
             }
         });
     }
@@ -313,7 +335,8 @@
                     "hold_type_id": 0
                 },
                 "shipping_address": {},
-                "pickup_info": {}
+                "pickup_info": {},
+                "stock_id": 0
             },
             "create_data": {
                 "type_list": [],
@@ -362,6 +385,9 @@
             },
             'detail.order.buyer_user_id': {
                 required: false
+            },
+            'detail.order.amount_paid': {
+                required: false, number: true
             },
             'detail.shipping_address.name': {
                 required: true

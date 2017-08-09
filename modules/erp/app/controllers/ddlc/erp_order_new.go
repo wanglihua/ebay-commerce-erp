@@ -9,6 +9,7 @@ import (
 	"fmt"
 	auth_models "matrix/modules/auth/models"
 	"encoding/json"
+	"matrix/modules/erp/service/exchange_rate_service"
 )
 
 type ErpOrderNew struct {
@@ -46,6 +47,14 @@ func (c ErpOrderNew) CreateData() revel.Result {
 	var user_list = make([]auth_models.UserInfo, 0)
 	core.HandleError(db_session.Find(&user_list))
 
+	var au_stock_list = make([]models.StockInfo, 0)
+	core.HandleError(db_session.Where("stock_type_id = ?", models.STOCK_TYPE_AU).Find(&au_stock_list))
+
+	var stock_id int64 = 0
+	if len(au_stock_list) > 0 {
+		stock_id = au_stock_list[0].Id
+	}
+
 	var login_user = core.GetLoginUser(c.Session)
 
 	return c.RenderJson(map[string]interface{}{
@@ -56,6 +65,8 @@ func (c ErpOrderNew) CreateData() revel.Result {
 		"pickup_pay_method_list": pickup_pay_method_list,
 		"user_list":              user_list,
 		"creator":                fmt.Sprintf("%s(%s)", login_user.LoginName, login_user.NickName),
+		"stock_list":             au_stock_list,
+		"stock_id":               stock_id,
 	})
 }
 
@@ -68,13 +79,24 @@ func (c ErpOrderNew) Save() revel.Result {
 	err := json.Unmarshal(c.GetRequestBody(), &form)
 	core.HandleError(err)
 
-
-
 	if form.Valid(c.Validation) == false {
 		return c.RenderJson(core.JsonResult{Success: false, Message: c.GetValidationErrorMessage()})
 	}
 
+	var aud_exchange_rate_setting = exchange_rate_service.Get_aud_exchange_rate(db_session)
+
 	var order = form.Order
+	order.AmountPaidCurrency = "AUD"
+	order.AmountPaidRmb = order.AmountPaid * aud_exchange_rate_setting
+
+	order.AdjustmentAmount = order.AmountPaid
+	order.AdjustmentAmountCurrency = "AUD"
+	order.AdjustmentAmountRmb = order.AmountPaid * aud_exchange_rate_setting
+
+	order.TotalAmount = order.AmountPaid
+	order.TotalAmountCurrency = "AUD"
+	order.TotalAmountRmb = order.AmountPaid * aud_exchange_rate_setting
+
 	_, err = db_session.Insert(&order)
 	core.HandleError(err)
 
@@ -90,6 +112,22 @@ func (c ErpOrderNew) Save() revel.Result {
 
 		_, err = db_session.Insert(&pickup_info)
 		core.HandleError(err)
+
+		var stock_id = form.StockId
+
+		var order_logistics models.OrderLogisticsInfo
+		order_logistics.OrderId = order.Id
+		order_logistics.StockId = stock_id
+		order_logistics.AddressId = shipping_address.Id
+
+		_, err = db_session.Insert(&order_logistics)
+		core.HandleError(err)
+
+		order.AddressId = shipping_address.Id
+		order.StockId = stock_id
+		_, err = db_session.Cols("address_id", "stock_id").Update(&order)
+		core.HandleError(err)
+
 	}
 
 	return c.RenderJson(map[string]interface{}{
@@ -103,6 +141,7 @@ type OrderCreateForm struct {
 	Order           models.OrderInfo                `json:"order"`
 	ShippingAddress models.OrderShippingAddressInfo `json:"shipping_address"`
 	PickupInfo      models.PickupOrderInfo          `json:"pickup_info"`
+	StockId         int64                           `json:"stock_id"`
 }
 
 func (f *OrderCreateForm) Valid(validation *revel.Validation) bool {

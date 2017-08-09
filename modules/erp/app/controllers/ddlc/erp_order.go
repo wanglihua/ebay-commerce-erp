@@ -35,6 +35,10 @@ func (c ErpOrder) Index(status string) revel.Result {
 
 	var has_pass_order_new = false
 
+	if pass_service.Is_login_user_has_pass(pass_res.DDLC_ORDER_NEW, c.Session) {
+		has_pass_order_new = true
+	}
+
 	status = strings.ToLower(status) //大小写
 	// 已创建 已支付 待配货 配货中 已发货 已完成
 	active_menu_html := `<li class="active" data-menu="ddlc-order-%s-menu">%s</li>`
@@ -54,10 +58,6 @@ func (c ErpOrder) Index(status string) revel.Result {
 		status_id = models.ORDER_STATUS_YCJ
 	} else if status == "yzf" {
 		pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_YZF, c.Session)
-
-		if pass_service.Is_login_user_has_pass(pass_res.DDLC_ORDER_NEW, c.Session) {
-			has_pass_order_new = true
-		}
 
 		active_menu_html = fmt.Sprintf(active_menu_html, status, "已支付")
 		status_chinese_name = "已支付"

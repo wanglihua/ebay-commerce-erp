@@ -81,7 +81,8 @@ func init() {
 		jobs.Every(1*time.Hour, tasks.UpdateAuInventoryCostTask{})
 		//jobs.Every(1*time.Second, tasks.SystemCheckAppLicTask{})
 
-		jobs.Every(5*time.Minute, tasks.UpdateInventoryPendingQtyTask{})
+		//jobs.Every(5*time.Minute, tasks.UpdateInventoryPendingQtyTask{})
+		jobs.Every(1*time.Minute, tasks.UpdateInventoryPendingQtyTask{})
 
 		// 商品销售分析
 		jobs.Every(2*time.Hour, tasks.ProductSaleAnalysisTask{})
