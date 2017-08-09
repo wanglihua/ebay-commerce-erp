@@ -19,17 +19,21 @@
                         </div>
                         <div class="col-xs-3">
                             <div class="form-group">
-                                <label for="created_time" class="col-xs-4 control-label">建单时间：</label>
+                                <label for="order_created_time" class="col-xs-4 control-label">建单时间：</label>
                                 <div class="col-xs-8">
-                                    <input id="created_time" name="created_time" type="text" class="input-sm form-control" v-model="detail.order.created_time"/>
+                                    <input id="order_created_time" name="created_time" type="text" class="input-sm form-control" v-model="detail.order.created_time"/>
                                 </div>
                             </div>
                         </div>
                         <div class="col-xs-3">
                             <div class="form-group">
-                                <label for="status_name" class="col-xs-4 control-label">状态：</label>
+                                <label for="order_status_id" class="col-xs-4 control-label">状态：</label>
                                 <div class="col-xs-8">
-                                    <input id="status_name" name="status_name" type="text" class="input-sm form-control" disabled="disabled" v-model="detail.status.name"/>
+                                    <select id="order_status_id" name="order_status_id" class="input-sm form-control">
+                                        <template v-for="status in status_list">
+                                            <option :value="status.id">{{status.name}}</option>
+                                        </template>
+                                    </select>
                                 </div>
                             </div>
                         </div>
@@ -47,7 +51,7 @@
                             <div class="form-group">
                                 <label for="order_number" class="col-xs-4 control-label">订单代码：</label>
                                 <div class="col-xs-8">
-                                    <input id="order_number" name="order_number" type="text" class="input-sm form-control" disabled="disabled" v-model="detail.order.full_tran_id"/>
+                                    <input id="order_number" name="order_number" type="text" class="input-sm form-control" v-model="detail.order.full_tran_id"/>
                                 </div>
                             </div>
                         </div>
@@ -55,15 +59,19 @@
                             <div class="form-group">
                                 <label for="order_paid_time" class="col-xs-4 control-label">支付时间：</label>
                                 <div class="col-xs-8">
-                                    <input id="order_paid_time" name="order_paid_time" type="text" class="input-sm form-control" disabled="disabled" v-model="detail.order.paid_time"/>
+                                    <input id="order_paid_time" name="paid_time" type="text" class="input-sm form-control" v-model="detail.order.paid_time"/>
                                 </div>
                             </div>
                         </div>
                         <div class="col-xs-3">
                             <div class="form-group">
-                                <label for="order_hold_type" class="col-xs-4 control-label">hold类型：</label>
+                                <label for="order_hold_type_id" class="col-xs-4 control-label">hold类型：</label>
                                 <div class="col-xs-8">
-                                    <input id="order_hold_type" name="order_hold_type" type="text" class="input-sm form-control" disabled="disabled" v-model="detail.order_hold_type.name"/>
+                                    <select id="order_hold_type_id" name="order_hold_type_id" class="input-sm form-control">
+                                        <template v-for="hold_type in create_data.hold_type_list">
+                                            <option :value="hold_type.id">{{hold_type.name}}</option>
+                                        </template>
+                                    </select>
                                 </div>
                             </div>
                         </div>
@@ -352,6 +360,32 @@
     </div>
 </div>
 <script type="text/javascript">
+    $(function () {
+        $('#order_created_time').datetimepicker({
+            locale: "zh-cn"
+        });
+
+        $('#order_paid_time').datetimepicker({
+            locale: "zh-cn"
+        });
+
+        loadCreateData();
+    });
+
+    function loadCreateData() {
+        $.ajax({
+            "dataType": 'json',
+            "url": '{% url "ErpOrderNew.CreateData"%}',
+            "success": function (data) {
+                if (data.success === false) {
+                    $.msg.error(data.message);
+                    return;
+                }
+                vm.create_data = data;
+            }
+        });
+    }
+
     var vm = new Vue({
         el: "#order_detail",
         data: {
@@ -363,16 +397,12 @@
                 "order_hold_type": {},
                 "shipping_address": {},
                 "ebay_shipping_address": {},
-                "paypal_shipping_address": {},
-                "order_item_list": [],
-                "order_logistics": {},
-                "logistics_setting": {},
-                "au_stock_list": [],
-                "logistics_stock": {},
-                "logistics_mode": {},
-                "inventory_list": []
+                "paypal_shipping_address": {}
             },
-            "order_item_detail": {}
+            "create_data": {
+                "status_list": [],
+                "hold_type_list": []
+            }
         },
         methods: {
             format_amount: function (amount) {
@@ -433,25 +463,6 @@
             }
         }
     });
-
-    function load_order_detail() {
-        $.ajax({
-            "dataType": 'json',
-            "url": '{% url "ErpOrder.DetailData"%}',
-            "data": {
-                "id": order_id
-            },
-            "success": function (data) {
-                if (data.success === false) {
-                    $.msg.error(data.message);
-                    return;
-                }
-                vm.detail = data;
-                vm.order_item_detail = {};
-                vm.order_item_detail.order_id = order_id;
-            }
-        });
-    }
 
 </script>
 {% site_footer %}

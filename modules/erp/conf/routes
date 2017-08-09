@@ -573,4 +573,5 @@ POST /product/sale/analysis/data/list      ErpProductSaleAnalysis.ListData
 POST /product/sale/analysis/analyze        ErpProductSaleAnalysis.Analyze
 
 GET  /order/new/create           ErpOrderNew.Create
+POST /order/new/create/data      ErpOrderNew.CreateData
 POST /order/new/save             ErpOrderNew.Save
