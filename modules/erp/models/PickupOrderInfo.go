@@ -26,12 +26,3 @@ func (e PickupOrderInfo) ModelDesc() string {
 	return "verbose_name=Pickup订单信息,entity_json=pickup_order,route=pickup/order"
 }
 
-// 是否已收款信息放在对应的订单信息里面的状态，如果是 YZF 状态就是已收款
-
-//在线支付、现金支付、现场刷卡
-
-const (
-	PICKUP_PAY_METHOD_ONLINE = 100 // 在线支付
-	PICKUP_PAY_METHOD_CASH   = 200 // 现金支付
-	PICKUP_PAY_METHOD_CARD   = 300 // 现场刷卡
-)

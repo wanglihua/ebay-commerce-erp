@@ -6,6 +6,8 @@ import (
 	"matrix/modules/auth/pass_res"
 	"matrix/modules/erp/models"
 	"matrix/core"
+	"fmt"
+	auth_models "matrix/modules/auth/models"
 )
 
 type ErpOrderNew struct {
@@ -37,11 +39,22 @@ func (c ErpOrderNew) CreateData() revel.Result {
 	var shop_list = make([]models.ShopAccountInfo, 0)
 	core.HandleError(db_session.Find(&shop_list))
 
+	var pickup_pay_method_list = make([]models.PickupPayMethodInfo, 0)
+	core.HandleError(db_session.Find(&pickup_pay_method_list))
+
+	var user_list = make([]auth_models.UserInfo, 0)
+	core.HandleError(db_session.Find(&user_list))
+
+	var login_user = core.GetLoginUser(c.Session)
+
 	return c.RenderJson(map[string]interface{}{
-		"type_list":      order_type_list,
-		"status_list":    status_list,
-		"hold_type_list": hold_type_list,
-		"shop_list":      shop_list,
+		"type_list":              order_type_list,
+		"status_list":            status_list,
+		"hold_type_list":         hold_type_list,
+		"shop_list":              shop_list,
+		"pickup_pay_method_list": pickup_pay_method_list,
+		"user_list":              user_list,
+		"creator":                fmt.Sprintf("%s(%s)", login_user.LoginName, login_user.NickName),
 	})
 }
 

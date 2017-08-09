@@ -213,7 +213,7 @@
                             <div class="form-group">
                                 <label for="creator" class="col-xs-4 control-label">建单人员：</label>
                                 <div class="col-xs-8">
-                                    <input id="creator" name="creator" type="text" class="input-sm form-control" v-model="detail.pickup_info.creator"/>
+                                    <input id="creator" name="creator" type="text" class="input-sm form-control" disabled="disabled" v-model="create_data.creator"/>
                                 </div>
                             </div>
                         </div>
@@ -221,7 +221,11 @@
                             <div class="form-group">
                                 <label for="payee" class="col-xs-4 control-label">收款人员：</label>
                                 <div class="col-xs-8">
-                                    <input id="payee" name="payee" type="text" class="input-sm form-control" v-model="detail.pickup_info.payee"/>
+                                    <select id="payee" name="payee" class="input-sm form-control" v-model.number="detail.pickup_info.payee_id">
+                                        <template v-for="user in create_data.user_list">
+                                            <option :value="user.id">{{user.login_name}}（{{user.nick_name}}）</option>
+                                        </template>
+                                    </select>
                                 </div>
                             </div>
                         </div>
@@ -241,7 +245,7 @@
                                 <label for="pay_method_id" class="col-xs-4 control-label">收款方式：</label>
                                 <div class="col-xs-8">
                                     <select id="pay_method_id" name="pay_method_id" class="input-sm form-control" v-model.number="detail.pickup_info.pay_method_id">
-                                        <template v-for="pay_method in create_data.pay_method_list">
+                                        <template v-for="pay_method in create_data.pickup_pay_method_list">
                                             <option :value="pay_method.id">{{pay_method.name}}</option>
                                         </template>
                                     </select>
@@ -306,7 +310,10 @@
                 "type_list": [],
                 "status_list": [],
                 "hold_type_list": [],
-                "shop_list": []
+                "shop_list": [],
+                "pickup_pay_method_list": [],
+                "user_list": [],
+                "creator": []
             }
         },
         methods: {
