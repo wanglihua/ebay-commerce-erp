@@ -13,7 +13,7 @@
                             <div class="form-group">
                                 <label for="order_code" class="col-xs-4 control-label">订单编号：</label>
                                 <div class="col-xs-8">
-                                    <input id="order_code" name="order_code" type="text" class="input-sm form-control" disabled="disabled" v-model="detail.order.code"/>
+                                    <input id="order_code" name="order_code" type="text" class="input-sm form-control" v-model="detail.order.code"/>
                                 </div>
                             </div>
                         </div>
@@ -21,7 +21,7 @@
                             <div class="form-group">
                                 <label for="created_time" class="col-xs-4 control-label">建单时间：</label>
                                 <div class="col-xs-8">
-                                    <input id="created_time" name="created_time" type="text" class="input-sm form-control" disabled="disabled" v-model="detail.order.created_time"/>
+                                    <input id="created_time" name="created_time" type="text" class="input-sm form-control" v-model="detail.order.created_time"/>
                                 </div>
                             </div>
                         </div>
@@ -226,100 +226,6 @@
             </div>
         </div>
 
-        <!-- 订单详情 -->
-        <div class="widget-box">
-            <div class="widget-header">
-                <h4 class="smaller">订单详情</h4>
-            </div>
-            <div class="widget-body">
-                <div class="widget-main">
-                    <div class="row">
-                        <div class="col-xs-12">
-                            <table id="order_item_list" class="table table-striped table-bordered">
-                                <thead>
-                                <tr>
-                                    <th class="center" style="width: 50px;">选择</th>
-                                    <th class="center" style="width: 60px;">图片</th>
-                                    <th style="width: 120px;">商品名称</th>
-                                    <th class="center" style="width: 60px;">数量</th>
-                                    <th class="center" style="width: 100px;">售价</th>
-                                    <th class="center" style="width: 100px;">澳仓成本</th>
-                                    <th class="center" style="width: 80px;">原始售价</th>
-                                    <th class="center" style="width: 80px;">毛利</th>
-                                    <th>留言</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <template v-for="order_item in detail.order_item_list">
-                                    <tr>
-                                        <td class="center">
-                                            <label class="pos-rel">
-                                                <input type="checkbox" class="ace" :value="order_item.oi.id"/>
-                                                <span class="lbl"></span>
-                                            </label>
-                                        </td>
-                                        <td class="center">
-                                            <a :href="order_item.psi.view_item_url" target="_blank">
-                                                <img :src="order_item.p.image_url" alt="" style="width: 60px;height: 60px;"/>
-                                            </a>
-                                        </td>
-                                        <td>
-                                            <div :title="order_item.p.cn_name" style="width: 150px; white-space:normal; word-break: break-all; word-wrap:break-word;">
-                                                {{order_item.p.cn_name}}
-                                            </div>
-                                            <div>
-                                                <a :href="'/product/detail/' + order_item.p.id" target="_blank">
-                                                    {{order_item.p.sku}}
-                                                </a>
-                                            </div>
-                                            <div>
-                                                <a :href="order_item.p.view_item_url" target="_blank">
-                                                    {{order_item.p.item_id}}
-                                                </a>
-                                            </div>
-                                        </td>
-                                        <td class="center">
-                                            {{order_item.oi.quantity}}
-                                        </td>
-                                        <td class="center">
-                                            <div>RMB
-                                                {{ format_amount(order_item.oi.transaction_price_rmb)}} × {{order_item.oi.quantity}}
-                                            </div>
-                                            <div>=RMB
-                                                {{format_amount(order_item.oi.transaction_price_rmb * order_item.oi.quantity)}}
-                                            </div>
-                                        </td>
-                                        <td class="center">
-                                            RMB {{ format_amount(order_item.oi.cost_price * detail.order.exchange_rate) }}
-                                        </td>
-                                        <td class="center">
-                                            {{order_item.oi.transaction_price_currency}}
-                                            {{ format_amount(order_item.oi.transaction_price * order_item.oi.quantity)}}
-                                        </td>
-                                        <td class="center">
-                                            {{ format_amount(order_item.oi.gross_profit * detail.order.exchange_rate) }}
-                                        </td>
-                                        <td></td>
-                                    </tr>
-                                </template>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    {% if .can_modify %}
-                    <hr style="margin-top: 5px;margin-bottom: 5px;"/>
-                    <div class="row">
-                        <div class="col-xs-12" style="text-align: right;">
-                            <button class="btn btn-sm btn-success" @click="add_order_item">添加</button>
-                            <button class="btn btn-sm btn-purple" @click="show_order_item">修改</button>
-                            <button class="btn btn-sm btn-danger" @click="delete_order_item">删除</button>
-                        </div>
-                    </div>
-                    {% end %}
-                </div>
-            </div>
-        </div>
-
         <!--订单送货地址详细-->
         <div class="modal fade" id="orderShippingAddressDetailDialog">
             <div class="modal-dialog" style="width: 680px;">
@@ -443,59 +349,8 @@
                 </div>
             </div>
         </div>
-
-        <!--订单明细详细-->
-        <div class="modal fade" id="orderItemDetailDialog">
-            <div class="modal-dialog" style="width: 680px;">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-hidden="True">&times;</button>
-                        <h4 class="modal-title">订单明细详细</h4>
-                    </div>
-                    <div class="modal-body clearfix">
-                        <div class="row">
-                            <div class="col-xs-12">
-                                <form class="form-horizontal" role="form" id="orderItemDetailForm">
-                                    <input id="order_item_id" name="order_item_detail.item_id" type="hidden" v-model.number="order_item_detail.item_id"/>
-                                    <input id="order_item_order_id" name="order_item_detail.order_id" type="hidden" v-model.number="order_item_detail.order_id"/>
-
-                                    <div class="row">
-                                        <div class="col-xs-6">
-                                            <div class="form-group">
-                                                <label for="order_item_sku" class="col-xs-4 control-label">SKU</label>
-                                                <div class="col-xs-8">
-                                                    <input id="order_item_sku" name="order_item_detail.sku" type="text" class="input-sm form-control" v-model="order_item_detail.sku"/>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-xs-6">
-                                            <div class="form-group">
-                                                <label for="order_item_qty" class="col-xs-4 control-label">数量</label>
-                                                <div class="col-xs-8">
-                                                    <input id="order_item_qty" name="order_item_detail.qty" type="text" class="input-sm form-control" v-model.number="order_item_detail.qty"/>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-success btn-sm" @click="save_order_item()">
-                            <i class="ace-icon fa fa-floppy-o"></i>保存
-                        </button>
-                        <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">
-                            <i class="ace-icon fa fa-times"></i>关闭
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
 </div>
-{%template "erp/ddlc/order/order_detail.var" .%}
 <script type="text/javascript">
     var vm = new Vue({
         el: "#order_detail",
@@ -575,125 +430,6 @@
                         }
                     );
                 }
-            },
-            add_order_item: function () {
-                $.ajax({
-                    url: '{%url "ErpOrderItem.DetailData"%}',
-                    type: "POST",
-                    data: {
-                        "item_id": 0,
-                        "order_id": order_id
-                    },
-                    success: function (data) {
-                        if (data.success === false) {
-                            $.msg.error(data.message);
-                        }
-                        else {
-                            vm.order_item_detail = data.order_item_detail;
-                            $("#orderItemDetailDialog").modal(modalOptions);
-                        }
-                    }
-                });
-            },
-            show_order_item: function () {
-                var id_list = [];
-                $('#order_item_list tbody tr>td:first-child input:checkbox').each(function () {
-                    if (this.checked) {
-                        id_list.push($(this).val());
-                    }
-                });
-
-                if (id_list.length === 0 || id_list.length > 1) {
-                    $.msg.alert("请选择一行数据！");
-                    return;
-                }
-
-                $.ajax({
-                    url: '{%url "ErpOrderItem.DetailData"%}',
-                    type: "POST",
-                    data: {
-                        "item_id": id_list[0],
-                        "order_id": order_id
-                    },
-                    success: function (data) {
-                        if (data.success === false) {
-                            $.msg.error(data.message);
-                        }
-                        else {
-                            vm.order_item_detail = data.order_item_detail;
-                            $("#orderItemDetailDialog").modal(modalOptions);
-                        }
-                    }
-                });
-            },
-            save_order_item: function () {
-                showMask("提交中...");
-                var form = $("#orderItemDetailForm");
-                var valid = validate(form, {
-                    'order_item_detail.sku': {
-                        required: true
-                    },
-                    'order_item_detail.qty': {
-                        required: true, digits: true
-                    }
-                });
-
-                if (!valid) {
-                    hideMask();
-                } else {
-                    $.ajax({
-                            url: '{%url "ErpOrderItem.Save"%}',
-                            type: "POST",
-                            processData: false,
-                            contentType: 'application/json',
-                            data: JSON.stringify(vm.order_item_detail),
-                            success: function (data) {
-                                hideMask();
-                                if (data.success === false) {
-                                    $.msg.error(data.message);
-                                    //return;
-                                }
-                                else {
-                                    $.msg.show(data.message);
-                                    $('#orderItemDetailDialog').modal('hide');
-                                    load_order_detail();
-                                    //return;
-                                }
-                            }
-                        }
-                    );
-                }
-            },
-            delete_order_item: function () {
-                var id_list = [];
-                $('#order_item_list tbody tr>td:first-child input:checkbox').each(function () {
-                    if (this.checked) {
-                        id_list.push($(this).val());
-                    }
-                });
-
-                if (id_list.length === 0 || id_list.length > 1) {
-                    $.msg.alert("请选择一行数据！");
-                    return;
-                }
-
-                $.msg.confirm("确认要删除吗？", function () {
-                    $.ajax({
-                        url: '{%url "ErpOrderItem.Delete"%}',
-                        type: "POST",
-                        data: {"item_id": id_list[0]},
-                        success: function (data) {
-                            if (data.success === false) {
-                                $.msg.error(data.message);
-                                return;
-                            }
-                            else {
-                                $.msg.show(data.message);
-                            }
-                            load_order_detail();
-                        }
-                    });
-                });
             }
         }
     });

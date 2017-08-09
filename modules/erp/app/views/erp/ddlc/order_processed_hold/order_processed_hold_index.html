@@ -155,6 +155,16 @@
 </div>
 
 <script type="text/javascript">
+    $(function () {
+        $('#query_begin_time').datetimepicker({
+            locale: "zh-cn"
+        });
+
+        $('#query_end_time').datetimepicker({
+            locale: "zh-cn"
+        });
+    });
+
     var vm = new Vue({
         el: "#page",
         data: {
@@ -404,8 +414,10 @@
                         aoData.push({'name': 'query_criteria_id', 'value': this_vm.page.query_criteria_id});
                         aoData.push({'name': 'query_criteria_value', 'value': this_vm.page.query_criteria_value});
                         aoData.push({'name': 'hold_type_id', 'value': this_vm.page.hold_type_id});
-                        aoData.push({'name': 'query_begin_time', 'value': this_vm.page.query_begin_time});
-                        aoData.push({'name': 'query_end_time', 'value': this_vm.page.query_end_time});
+                        //aoData.push({'name': 'query_begin_time', 'value': this_vm.page.query_begin_time});
+                        //aoData.push({'name': 'query_end_time', 'value': this_vm.page.query_end_time});
+                        aoData.push({'name': 'query_begin_time', 'value': $("#query_begin_time").val()});
+                        aoData.push({'name': 'query_end_time', 'value': $("#query_end_time").val()});
                         aoData.push({'name': 'order_tag_id', 'value': this_vm.page.order_tag_id});
                         aoData.push({'name': 'time_query_id', 'value': this_vm.page.time_query_id});
 
