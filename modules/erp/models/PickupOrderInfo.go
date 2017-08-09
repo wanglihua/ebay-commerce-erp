@@ -13,6 +13,7 @@ type PickupOrderInfo struct {
 	PayeeId     int64        `xorm:"bigint notnull 'payee_id'" json:"payee_id" smith:"verbose_name=收款人员id"`
 	Payee       string       `xorm:"nvarchar(255) notnull 'payee'" json:"payee" smith:"verbose_name=收款人员工号"`
 	PayMethodId int64        `xorm:"bigint notnull 'pay_method_id'" json:"pay_method_id" smith:"verbose_name=收款方式id"`
+	IsPaid      int64        `xorm:"bigint notnull 'is_paid'" json:"is_paid" smith:"verbose_name=是否已付款"`
 	CreateTime  core.Time    `xorm:"created notnull 'create_time'" json:"create_time"`
 	UpdateTime  core.Time    `xorm:"updated notnull 'update_time'" json:"update_time"`
 }

@@ -29,8 +29,8 @@
                             <div class="form-group">
                                 <label for="order_status_id" class="col-xs-4 control-label">状态：</label>
                                 <div class="col-xs-8">
-                                    <select id="order_status_id" name="order_status_id" class="input-sm form-control">
-                                        <template v-for="status in status_list">
+                                    <select id="order_status_id" name="order_status_id" class="input-sm form-control" v-model.number="detail.order.status_id">
+                                        <template v-for="status in create_data.status_list">
                                             <option :value="status.id">{{status.name}}</option>
                                         </template>
                                     </select>
@@ -39,9 +39,13 @@
                         </div>
                         <div class="col-xs-3">
                             <div class="form-group">
-                                <label for="order_type_name" class="col-xs-4 control-label">订单类型：</label>
+                                <label for="order_type_id" class="col-xs-4 control-label">订单类型：</label>
                                 <div class="col-xs-8">
-                                    <input id="order_type_name" name="order_type" type="text" class="input-sm form-control" disabled="disabled" v-model="detail.order_type.name"/>
+                                    <select id="order_type_id" name="order_type_id" class="input-sm form-control" v-model.number="detail.order.type_id">
+                                        <template v-for="type in create_data.type_list">
+                                            <option :value="type.id">{{type.name}}</option>
+                                        </template>
+                                    </select>
                                 </div>
                             </div>
                         </div>
@@ -67,7 +71,8 @@
                             <div class="form-group">
                                 <label for="order_hold_type_id" class="col-xs-4 control-label">hold类型：</label>
                                 <div class="col-xs-8">
-                                    <select id="order_hold_type_id" name="order_hold_type_id" class="input-sm form-control">
+                                    <select id="order_hold_type_id" name="order_hold_type_id" class="input-sm form-control" v-model.number="detail.order.hold_type_id">
+                                        <option :value="0">无Hold</option>
                                         <template v-for="hold_type in create_data.hold_type_list">
                                             <option :value="hold_type.id">{{hold_type.name}}</option>
                                         </template>
@@ -91,9 +96,13 @@
                     <div class="row">
                         <div class="col-xs-3">
                             <div class="form-group">
-                                <label for="shop_name" class="col-xs-4 control-label">客户来源：</label>
+                                <label for="order_shop_id" class="col-xs-4 control-label">客户来源：</label>
                                 <div class="col-xs-8">
-                                    <input id="shop_name" name="detail.shop.name" type="text" class="input-sm form-control" disabled="disabled" v-model="detail.shop.name"/>
+                                    <select id="order_shop_id" name="order_shop_id" class="input-sm form-control" v-model.number="detail.order.shop_id">
+                                        <template v-for="shop in create_data.shop_list">
+                                            <option :value="shop.id">{{shop.name}}</option>
+                                        </template>
+                                    </select>
                                 </div>
                             </div>
                         </div>
@@ -101,7 +110,7 @@
                             <div class="form-group">
                                 <label for="buyer_user_id" class="col-xs-4 control-label">买家帐号：</label>
                                 <div class="col-xs-8">
-                                    <input id="buyer_user_id" name="detail.order.buyer_user_id" type="text" class="input-sm form-control" disabled="disabled" v-model="detail.order.buyer_user_id"/>
+                                    <input id="buyer_user_id" name="detail.order.buyer_user_id" type="text" class="input-sm form-control" v-model="detail.order.buyer_user_id"/>
                                 </div>
                             </div>
                         </div>
@@ -109,15 +118,15 @@
                             <div class="form-group">
                                 <label for="buyer_user_name" class="col-xs-4 control-label">客户姓名：</label>
                                 <div class="col-xs-8">
-                                    <input id="buyer_user_name" name="detail.order.buyer_user_name" type="text" class="input-sm form-control" disabled="disabled" v-model="detail.shipping_address.name"/>
+                                    <input id="buyer_user_name" name="detail.order.buyer_user_name" type="text" class="input-sm form-control" v-model="detail.shipping_address.name"/>
                                 </div>
                             </div>
                         </div>
                         <div class="col-xs-3">
                             <div class="form-group">
-                                <label for="country_name" class="col-xs-4 control-label">国家：</label>
+                                <label for="country" class="col-xs-4 control-label">国家代码：</label>
                                 <div class="col-xs-8">
-                                    <input id="country_name" name="detail.shipping_address.country_name" type="text" class="input-sm form-control" disabled="disabled" v-model="detail.shipping_address.country_name"/>
+                                    <input id="country" name="detail.shipping_address.country" type="text" class="input-sm form-control" v-model="detail.shipping_address.country"/>
                                 </div>
                             </div>
                         </div>
@@ -125,233 +134,132 @@
                             <div class="form-group">
                                 <label for="phone" class="col-xs-4 control-label">联系电话：</label>
                                 <div class="col-xs-8">
-                                    <input id="phone" name="detail.shipping_address.country_name" type="text" class="input-sm form-control" disabled="disabled" v-model="detail.shipping_address.phone"/>
+                                    <input id="phone" name="detail.shipping_address.country_name" type="text" class="input-sm form-control" v-model="detail.shipping_address.phone"/>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-xs-9" style="height: 32px;"></div>
-
                         <div class="col-xs-6">
                             <div class="form-group">
                                 <label for="order_buyer_email" class="col-xs-2 control-label">电子邮件：</label>
-                                <input id="order_buyer_email" class="col-xs-10" type="text" disabled="disabled" v-model="detail.order.buyer_email"/>
+                                <div class="col-xs-10">
+                                    <input id="order_buyer_email" name="order_buyer_email" class="input-sm form-control" type="text" v-model="detail.order.buyer_email"/>
+                                </div>
                             </div>
                         </div>
-                        <div class="col-xs-6" style="height: 32px;"></div>
+                        <div class="col-xs-3">
+                            <div class="form-group">
+                                <label for="country_name" class="col-xs-4 control-label">国家名称：</label>
+                                <div class="col-xs-8">
+                                    <input id="country_name" name="detail.shipping_address.country_name" type="text" class="input-sm form-control" v-model="detail.shipping_address.country_name"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-3">
+                            <div class="form-group">
+                                <label for="province" class="col-xs-4 control-label">State</label>
+                                <div class="col-xs-8">
+                                    <input id="province" name="detail.shipping_address.province" type="text" class="input-sm form-control" v-model="detail.shipping_address.province"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-3">
+                            <div class="form-group">
+                                <label for="city_name" class="col-xs-4 control-label">City</label>
+                                <div class="col-xs-8">
+                                    <input id="city_name" name="detail.shipping_address.city_name" type="text" class="input-sm form-control" v-model="detail.shipping_address.city_name"/>
+                                </div>
+                            </div>
+                        </div>
                         <div class="col-xs-6">
                             <div class="form-group">
-                                <label for="ebay_address" class="col-xs-2 control-label">平台地址：</label>
+                                <label for="street1" class="col-xs-2 control-label">Street1</label>
                                 <div class="col-xs-10">
-                                    <div id="ebay_address" class="address-box">
-                                        <div>
-                                            <label for="ebay_address_name">Name:</label>
-                                            <input id="ebay_address_name" type="text" v-model="detail.ebay_shipping_address.name"/>
-                                        </div>
-                                        <div>
-                                            <label>Address:</label>
-                                            <span>{{detail.ebay_shipping_address.street1}} {{detail.ebay_shipping_address.street2}}</span>
-                                        </div>
-                                        <div>
-                                            <label for="ebay_address_city">City:</label>
-                                            <input id="ebay_address_city" type="text" v-model="detail.ebay_shipping_address.city_name"/>
-                                        </div>
-                                        <div>
-                                            <label for="ebay_address_state">State:</label>
-                                            <input id="ebay_address_state" type="text" v-model="detail.ebay_shipping_address.province"/>
-                                        </div>
-                                        <div>
-                                            <label for="ebay_address_country">Country:</label>
-                                            <input id="ebay_address_country" type="text" v-model="detail.ebay_shipping_address.country"/>
-                                        </div>
-                                        <div>
-                                            <label for="ebay_address_country_name">Country Name:</label>
-                                            <input id="ebay_address_country_name" type="text" v-model="detail.ebay_shipping_address.country_name"/>
-                                        </div>
-                                        <div>
-                                            <label for="ebay_address_postal_code">Post Code:</label>
-                                            <input id="ebay_address_postal_code" type="text" v-model="detail.ebay_shipping_address.postal_code"/>
-                                        </div>
-                                        <div>
-                                            <label for="ebay_address_phone">Phone:</label>
-                                            <input id="ebay_address_phone" type="text" v-model="detail.ebay_shipping_address.phone"/>
-                                        </div>
-                                    </div>
+                                    <input id="street1" name="detail.shipping_address.street1" type="text" class="input-sm form-control" v-model="detail.shipping_address.street1"/>
+                                </div>
+                            </div>
+                        </div>
 
-                                </div>
-                            </div>
-                        </div>
                         <div class="col-xs-6">
                             <div class="form-group">
-                                <label for="paypal_address" class="col-xs-2 control-label">PayPal<br/>地址：</label>
+                                <label for="street2" class="col-xs-2 control-label">Street2</label>
                                 <div class="col-xs-10">
-                                    <div id="paypal_address" class="address-box">
-                                        <div>
-                                            <label for="paypal_address_name">Name:</label>
-                                            <input id="paypal_address_name" type="text" v-model="detail.paypal_shipping_address.name"/>
-                                        </div>
-                                        <div>
-                                            <label>Address:</label>
-                                            <span>{{detail.paypal_shipping_address.street1}} {{detail.paypal_shipping_address.street2}}</span>
-                                        </div>
-                                        <div>
-                                            <label for="paypal_address_city">City:</label>
-                                            <input id="paypal_address_city" type="text" v-model="detail.paypal_shipping_address.city_name"/>
-                                        </div>
-                                        <div>
-                                            <label for="paypal_address_state">State:</label>
-                                            <input id="paypal_address_state" type="text" v-model="detail.paypal_shipping_address.province"/>
-                                        </div>
-                                        <div>
-                                            <label for="paypal_address_country">Country:</label>
-                                            <input id="paypal_address_country" type="text" v-model="detail.paypal_shipping_address.country"/>
-                                        </div>
-                                        <div>
-                                            <label for="paypal_address_country_name">Country Name:</label>
-                                            <input id="paypal_address_country_name" type="text" v-model="detail.paypal_shipping_address.country_name"/>
-                                        </div>
-                                        <div>
-                                            <label for="paypal_address_postal_code">Post Code:</label>
-                                            <input id="paypal_address_postal_code" type="text" v-model="detail.paypal_shipping_address.postal_code"/>
-                                        </div>
-                                        <div>
-                                            <label for="paypal_address_phone">Phone:</label>
-                                            <input id="paypal_address_phone" type="text" v-model="detail.paypal_shipping_address.phone"/>
-                                        </div>
-                                    </div>
+                                    <input id="street2" name="detail.shipping_address.street2" type="text" class="input-sm form-control" v-model="detail.shipping_address.street2"/>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-xs-3">
+                            <div class="form-group">
+                                <label for="postal_code" class="col-xs-4 control-label">Post Code</label>
+                                <div class="col-xs-8">
+                                    <input id="postal_code" name="detail.shipping_address.postal_code" type="text" class="input-sm form-control" v-model="detail.shipping_address.postal_code"/>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    {% if .can_modify %}
-                    <hr style="margin-top: 5px;margin-bottom: 5px;"/>
-                    <div class="row">
-                        <div class="col-xs-12" style="text-align: right;">
-                            <button class="btn btn-sm btn-purple" @click="show_address_edit">修改</button>
-                        </div>
-                    </div>
-                    {% end %}
                 </div>
             </div>
         </div>
 
-        <!--订单送货地址详细-->
-        <div class="modal fade" id="orderShippingAddressDetailDialog">
-            <div class="modal-dialog" style="width: 680px;">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-hidden="True">&times;</button>
-                        <h4 class="modal-title">订单送货地址详细</h4>
-                    </div>
-                    <div class="modal-body clearfix">
-                        <div class="row">
-                            <div class="col-xs-12">
-                                <form class="form-horizontal" role="form" id="orderShippingAddressDetailForm">
-                                    <input id="order_shipping_address_id" name="detail.shipping_address.id" type="hidden" v-model.number="detail.shipping_address.id"/>
-                                    <input id="order_id" name="detail.shipping_address.order_id" type="hidden" v-model.number="detail.shipping_address.order_id"/>
-
-                                    <div class="row">
-                                        <div class="col-xs-6">
-                                            <div class="form-group">
-                                                <label for="name" class="col-xs-4 control-label">Name</label>
-                                                <div class="col-xs-8">
-                                                    <input id="name" name="detail.shipping_address.name" type="text" class="input-sm form-control" v-model="detail.shipping_address.name"/>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="row">
-                                        <div class="col-xs-6">
-                                            <div class="form-group">
-                                                <label for="street1" class="col-xs-4 control-label">Street1</label>
-                                                <div class="col-xs-8">
-                                                    <input id="street1" name="detail.shipping_address.street1" type="text" class="input-sm form-control" v-model="detail.shipping_address.street1"/>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-xs-6">
-                                            <div class="form-group">
-                                                <label for="street2" class="col-xs-4 control-label">Street2</label>
-                                                <div class="col-xs-8">
-                                                    <input id="street2" name="detail.shipping_address.street2" type="text" class="input-sm form-control" v-model="detail.shipping_address.street2"/>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="row">
-                                        <div class="col-xs-6">
-                                            <div class="form-group">
-                                                <label for="city_name" class="col-xs-4 control-label">City</label>
-                                                <div class="col-xs-8">
-                                                    <input id="city_name" name="detail.shipping_address.city_name" type="text" class="input-sm form-control" v-model="detail.shipping_address.city_name"/>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-xs-6">
-                                            <div class="form-group">
-                                                <label for="province" class="col-xs-4 control-label">State</label>
-                                                <div class="col-xs-8">
-                                                    <input id="province" name="detail.shipping_address.province" type="text" class="input-sm form-control" v-model="detail.shipping_address.province"/>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="row">
-                                        <div class="col-xs-6">
-                                            <div class="form-group">
-                                                <label for="country" class="col-xs-4 control-label">Country</label>
-                                                <div class="col-xs-8">
-                                                    <input id="country" name="detail.shipping_address.country" type="text" class="input-sm form-control" v-model="detail.shipping_address.country"/>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-xs-6">
-                                            <div class="form-group">
-                                                <label for="country_name" class="col-xs-4 control-label">Country
-                                                    Name</label>
-                                                <div class="col-xs-8">
-                                                    <input id="shipping_address_country_name" name="detail.shipping_address.country_name" type="text" class="input-sm form-control" v-model="detail.shipping_address.country_name"/>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="row">
-                                        <div class="col-xs-6">
-                                            <div class="form-group">
-                                                <label for="postal_code" class="col-xs-4 control-label">Post
-                                                    Code</label>
-                                                <div class="col-xs-8">
-                                                    <input id="postal_code" name="detail.shipping_address.postal_code" type="text" class="input-sm form-control" v-model="detail.shipping_address.postal_code"/>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-xs-6">
-                                            <div class="form-group">
-                                                <label for="phone" class="col-xs-4 control-label">Phone</label>
-                                                <div class="col-xs-8">
-                                                    <input id="shipping_address_phone" name="detail.shipping_address.phone" type="text" class="input-sm form-control" v-model="detail.shipping_address.phone"/>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                </form>
+        <!-- PICK UP 信息 -->
+        <div class="widget-box">
+            <div class="widget-header">
+                <h4 class="smaller">PICK UP 信息</h4>
+            </div>
+            <div class="widget-body">
+                <div class="widget-main">
+                    <div class="row">
+                        <div class="col-xs-3">
+                            <div class="form-group">
+                                <label for="creator" class="col-xs-4 control-label">建单人员：</label>
+                                <div class="col-xs-8">
+                                    <input id="creator" name="creator" type="text" class="input-sm form-control" v-model="detail.pickup_info.creator"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-3">
+                            <div class="form-group">
+                                <label for="payee" class="col-xs-4 control-label">收款人员：</label>
+                                <div class="col-xs-8">
+                                    <input id="payee" name="payee" type="text" class="input-sm form-control" v-model="detail.pickup_info.payee"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-3">
+                            <div class="form-group">
+                                <label for="is_paid" class="col-xs-4 control-label">已收款：</label>
+                                <div class="col-xs-8">
+                                    <select id="is_paid" name="is_paid" class="input-sm form-control" v-model.number="detail.pickup_info.is_paid">
+                                        <option :value="0">否</option>
+                                        <option :value="1">是</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-3">
+                            <div class="form-group">
+                                <label for="pay_method_id" class="col-xs-4 control-label">收款方式：</label>
+                                <div class="col-xs-8">
+                                    <select id="pay_method_id" name="pay_method_id" class="input-sm form-control" v-model.number="detail.pickup_info.pay_method_id">
+                                        <template v-for="pay_method in create_data.pay_method_list">
+                                            <option :value="pay_method.id">{{pay_method.name}}</option>
+                                        </template>
+                                    </select>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-success btn-sm" @click="saveOrderShippingAddress()">
-                            <i class="ace-icon fa fa-floppy-o"></i>保存
-                        </button>
-                        <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">
-                            <i class="ace-icon fa fa-times"></i>关闭
+                </div>
+            </div>
+        </div>
+
+        <div class="widget-box" style="border-style:none;">
+            <div class="widget-body">
+                <div class="widget-main">
+                    <div class="wizard-actions">
+                        <button class="btn btn-sm btn-primary" onclick="">
+                            <i class="ace-icon fa fa-floppy-o"></i>
+                            保存
                         </button>
                     </div>
                 </div>
@@ -391,17 +299,14 @@
         data: {
             "detail": {
                 "order": {},
-                "status": {},
-                "shop": {},
-                "order_type": {},
-                "order_hold_type": {},
                 "shipping_address": {},
-                "ebay_shipping_address": {},
-                "paypal_shipping_address": {}
+                "pickup_info": {}
             },
             "create_data": {
+                "type_list": [],
                 "status_list": [],
-                "hold_type_list": []
+                "hold_type_list": [],
+                "shop_list": []
             }
         },
         methods: {
