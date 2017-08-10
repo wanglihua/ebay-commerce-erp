@@ -7,6 +7,8 @@ import (
 	"github.com/revel/revel"
 	"matrix/core"
 	"matrix/modules/erp/models"
+	"matrix/modules/auth/service/pass_service"
+	"matrix/modules/auth/pass_res"
 )
 
 type ErpBrand struct {
@@ -14,10 +16,14 @@ type ErpBrand struct {
 }
 
 func (c ErpBrand) Index() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.SPPZ_BRAND, c.Session)
+
 	return c.RenderTemplate("erp/sppz/brand/brand_index.html")
 }
 
 func (c ErpBrand) ListData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.SPPZ_BRAND, c.Session)
+
 	db_session := c.DbSession
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
@@ -63,31 +69,12 @@ func (f *BrandDetailForm) Valid(validation *revel.Validation) bool {
 		validation.MaxSize(f.Brand.Name, 100).Message("品牌名称长度不能大于100！")
 	}
 
-	if f.Brand.Contact.Valid == true {
-		validation.MinSize(f.Brand.Contact.String, 2).Message("联系人长度不能小于2！")
-	}
-	if f.Brand.Contact.Valid == true {
-		validation.MaxSize(f.Brand.Contact.String, 100).Message("联系人长度不能大于100！")
-	}
-
-	if f.Brand.Address.Valid == true {
-		validation.MinSize(f.Brand.Address.String, 2).Message("地址长度不能小于2！")
-	}
-	if f.Brand.Address.Valid == true {
-		validation.MaxSize(f.Brand.Address.String, 200).Message("地址长度不能大于100！")
-	}
-
-	if f.Brand.Phone.Valid == true {
-		validation.MinSize(f.Brand.Phone.String, 2).Message("电话长度不能小于2！")
-	}
-	if f.Brand.Phone.Valid == true {
-		validation.MaxSize(f.Brand.Phone.String, 100).Message("电话长度不能大于100！")
-	}
-
 	return validation.HasErrors() == false
 }
 
 func (c ErpBrand) DetailData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.SPPZ_BRAND, c.Session)
+
 	db_session := c.DbSession
 
 	var brand_id int64
@@ -109,6 +96,8 @@ func (c ErpBrand) DetailData() revel.Result {
 }
 
 func (c ErpBrand) Save() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.SPPZ_BRAND, c.Session)
+
 	db_session := c.DbSession
 
 	var detail_form BrandDetailForm
@@ -138,6 +127,8 @@ func (c ErpBrand) Save() revel.Result {
 }
 
 func (c ErpBrand) Delete() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.SPPZ_BRAND, c.Session)
+	
 	db_session := c.DbSession
 
 	brand_id_list := make([]int64, 0)

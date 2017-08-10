@@ -95,6 +95,7 @@ const (
 	SPPZ_SUPPLIER           = 150800 // 供应商
 	SPPZ_PRODUCT_STATUS     = 150900 // 商品状态
 	SPPZ_SEA_CONTAINER_COST = 151000 // 商品状态
+	SPPZ_BRAND              = 151100 // 商品品牌
 
 	// 海关报关
 	HGBG_PRODUCT_HS_CODE                = 160100 // 商品海关编码

@@ -75,6 +75,16 @@ func GetSppzMenu(res_id_map map[int64]bool, web_session revel.Session) string {
         </li>`)
 	}
 
+	if check_pass_res_menu(pass_res.SPPZ_BRAND) {
+		buffer.WriteString(`<li id="sppz-brand-menu" class="">
+            <a href="/brand">
+                <i class="menu-icon fa fa-caret-right"></i>
+                商品品牌
+            </a>
+            <b class="arrow"></b>
+        </li>`)
+	}
+
 	if check_pass_res_menu(pass_res.SPPZ_PRODUCT_CATE) {
 		buffer.WriteString(`<li id="sppz-productcate-menu" class="">
             <a href="/product/cate">

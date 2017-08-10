@@ -1,8 +1,8 @@
-# GET  /brand                                ErpBrand.Index
-# POST /brand/data/list                      ErpBrand.ListData
-# POST /brand/data/detail                    ErpBrand.DetailData
-# POST /brand/save                           ErpBrand.Save
-# POST /brand/delete                         ErpBrand.Delete
+GET  /brand                                ErpBrand.Index
+POST /brand/data/list                      ErpBrand.ListData
+POST /brand/data/detail                    ErpBrand.DetailData
+POST /brand/save                           ErpBrand.Save
+POST /brand/delete                         ErpBrand.Delete
 
 GET  /stock                                  ErpStock.Index
 POST /stock/data/list                        ErpStock.ListData
