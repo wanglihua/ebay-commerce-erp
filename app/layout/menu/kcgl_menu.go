@@ -107,57 +107,58 @@ func GetKcglMenu(res_id_map map[int64]bool, web_session revel.Session) string {
         </li>`)
 	}
 
-	if check_pass_res_menu(pass_res.KCGL_INVENTORY_CHECK) {
-		buffer.WriteString(`<li id="kcgl-inventorycheck-menu" class="">
-            <a href="/inventory/check">
-                <i class="menu-icon fa fa-caret-right"></i>
-                库存盘点
-            </a>
-            <b class="arrow"></b>
-        </li>`)
-	}
-
 	/*
-	if check_pass_res_menu(pass_res.KCGL_INVENTORY_CHECK_APPROVE) {
-		buffer.WriteString(`<li id="kcgl-inventorycheck-approve-menu" class="">
-            <a href="/inventory/check/approve">
-                <i class="menu-icon fa fa-caret-right"></i>
-                盘点审批
-            </a>
-            <b class="arrow"></b>
-        </li>`)
-	}
+		if check_pass_res_menu(pass_res.KCGL_INVENTORY_CHECK) {
+			buffer.WriteString(`<li id="kcgl-inventorycheck-menu" class="">
+				<a href="/inventory/check">
+					<i class="menu-icon fa fa-caret-right"></i>
+					库存盘点
+				</a>
+				<b class="arrow"></b>
+			</li>`)
+		}
 
-	if check_pass_res_menu(pass_res.KCGL_STOCKBILL_TRANSFER) {
-		buffer.WriteString(`<li id="kcgl-stockbill-transfer-menu" class="">
-            <a href="/stock/bill/transfer">
-                <i class="menu-icon fa fa-caret-right"></i>
-                分仓调拨
-            </a>
-            <b class="arrow"></b>
-        </li>`)
-	}
+		if check_pass_res_menu(pass_res.KCGL_INVEORY_CHECK_APPROVE) {
+			buffer.WriteString(`<li id="kcgl-inventorycheck-approve-menu" class="">
+				<a href="/inventory/check/approve">
+					<i class="menu-icon fa fa-caret-right"></i>
+					盘点审批
+				</a>
+				<b class="arrow"></b>
+			</li>`)
+		}
+
+		if check_pass_res_menu(pass_res.KCGL_STOCKBILL_TRANSFER) {
+			buffer.WriteString(`<li id="kcgl-stockbill-transfer-menu" class="">
+				<a href="/stock/bill/transfer">
+					<i class="menu-icon fa fa-caret-right"></i>
+					分仓调拨
+				</a>
+				<b class="arrow"></b>
+			</li>`)
+		}
+
+
+		if check_pass_res_menu(pass_res.KCGL_STOCKBILL_CHECKIN) {
+			buffer.WriteString(`<li id="kcgl-stockbill-checkin-menu" class="">
+				<a href="/stock/bill/checkin">
+					<i class="menu-icon fa fa-caret-right"></i>
+					手工入库
+				</a>
+				<b class="arrow"></b>
+			</li>`)
+		}
+
+		if check_pass_res_menu(pass_res.KCGL_STOCKBILL_CHECKOUT) {
+			buffer.WriteString(`<li id="kcgl-stockbill-checkout-menu" class="">
+				<a href="/stock/bill/checkout">
+					<i class="menu-icon fa fa-caret-right"></i>
+					手工出库
+				</a>
+				<b class="arrow"></b>
+			</li>`)
+		}
 	*/
-
-	if check_pass_res_menu(pass_res.KCGL_STOCKBILL_CHECKIN) {
-		buffer.WriteString(`<li id="kcgl-stockbill-checkin-menu" class="">
-            <a href="/stock/bill/checkin">
-                <i class="menu-icon fa fa-caret-right"></i>
-                手工入库
-            </a>
-            <b class="arrow"></b>
-        </li>`)
-	}
-
-	if check_pass_res_menu(pass_res.KCGL_STOCKBILL_CHECKOUT) {
-		buffer.WriteString(`<li id="kcgl-stockbill-checkout-menu" class="">
-            <a href="/stock/bill/checkout">
-                <i class="menu-icon fa fa-caret-right"></i>
-                手工出库
-            </a>
-            <b class="arrow"></b>
-        </li>`)
-	}
 
 	buffer.WriteString(`</ul>
 </li>
