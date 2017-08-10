@@ -97,6 +97,7 @@ const (
 	SPPZ_SEA_CONTAINER_COST = 151000 // 商品状态
 	SPPZ_BRAND              = 151100 // 商品品牌
 	SPPZ_PRODUCT_CERT       = 151200 // 商品认证
+	SPPZ_PRODUCT_STYLE      = 151300 // 商品款式
 
 	// 海关报关
 	HGBG_PRODUCT_HS_CODE                = 160100 // 商品海关编码

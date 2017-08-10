@@ -581,3 +581,9 @@ POST /product/cert/data/list          ErpProductCert.ListData
 POST /product/cert/data/detail        ErpProductCert.DetailData
 POST /product/cert/save               ErpProductCert.Save
 POST /product/cert/delete             ErpProductCert.Delete
+
+GET  /product/style                   ErpProductStyle.Index
+POST /product/style/data/list         ErpProductStyle.ListData
+POST /product/style/data/detail       ErpProductStyle.DetailData
+POST /product/style/save              ErpProductStyle.Save
+POST /product/style/delete            ErpProductStyle.Delete

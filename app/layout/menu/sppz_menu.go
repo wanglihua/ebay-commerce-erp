@@ -85,7 +85,7 @@ func GetSppzMenu(res_id_map map[int64]bool, web_session revel.Session) string {
         </li>`)
 	}
 
-	if check_pass_res_menu(pass_res.SPPZ_PRODUCT_CERT) {
+	if check_pass_res_menu(pass_res.SPPZ_PRODUCT_CATE) {
 		buffer.WriteString(`<li id="sppz-productcate-menu" class="">
             <a href="/product/cate">
                 <i class="menu-icon fa fa-caret-right"></i>
@@ -95,7 +95,7 @@ func GetSppzMenu(res_id_map map[int64]bool, web_session revel.Session) string {
         </li>`)
 	}
 
-	if check_pass_res_menu(pass_res.SPPZ_PRODUCT_CATE) {
+	if check_pass_res_menu(pass_res.SPPZ_PRODUCT_CERT) {
 		buffer.WriteString(`<li id="sppz-product-cert-menu" class="">
 		<a href="/product/cert">
 			<i class="menu-icon fa fa-caret-right"></i>
@@ -105,8 +105,27 @@ func GetSppzMenu(res_id_map map[int64]bool, web_session revel.Session) string {
 	</li>`)
 	}
 
+	if check_pass_res_menu(pass_res.SPPZ_PRODUCT_STYLE) {
+		buffer.WriteString(`<li id="sppz-product-style-menu" class="">
+		<a href="/product/style">
+			<i class="menu-icon fa fa-caret-right"></i>
+			商品款式
+		</a>
+		<b class="arrow"></b>
+	</li>`)
+	}
+
 
 	/*
+
+	<li id="sppz-product-style-menu" class="">
+		<a href="/product/style">
+			<i class="menu-icon fa fa-caret-right"></i>
+			商品款式
+		</a>
+		<b class="arrow"></b>
+	</li>
+
 	<li id="sppz-product-cert-menu" class="">
 		<a href="/product/cert">
 			<i class="menu-icon fa fa-caret-right"></i>

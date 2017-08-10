@@ -405,6 +405,12 @@ func (e PassResInfo) InitData(db_session *xorm.Session) {
 		pass.Desc = core.MakeNullString("商品认证", true)
 
 		pass = new(PassResInfo)
+		pass.Id = pass_res.SPPZ_PRODUCT_STYLE
+		pass.CateId = pass_res_cate.SPPZ
+		pass.Name = "商品款式"
+		pass.Desc = core.MakeNullString("商品款式", true)
+
+		pass = new(PassResInfo)
 		pass.Id = pass_res.SPPZ_PRODUCT_CATE
 		pass.CateId = pass_res_cate.SPPZ
 		pass.Name = "商品目录"
