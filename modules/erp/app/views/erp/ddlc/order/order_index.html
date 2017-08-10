@@ -53,7 +53,7 @@
                     </button>
                     <button class="btn btn-purple btn-sm" @click="peiHuo()">
                         <i class="ace-icon fa fa-shopping-basket"></i>
-                        配货
+                        正常包裹配货
                     </button>
                     <button class="btn btn-pink btn-sm" @click="forcePeiHuo()">
                         <i class="ace-icon fa fa-shopping-basket"></i>
@@ -61,11 +61,11 @@
                     </button>
                     <button class="btn btn-purple btn-sm" @click="faHuo()">
                         <i class="ace-icon fa fa-shopping-basket"></i>
-                        发货
+                        特殊hold发货
                     </button>
                     <button class="btn btn-pink btn-sm" @click="shiJiWuHuo()">
                         <i class="ace-icon fa fa-shopping-basket"></i>
-                        实际无货
+                        特殊hold实际无货
                     </button>
                     <button class="btn btn-purple btn-sm" @click="showPickupOption()">
                         <i class="ace-icon fa fa-shopping-basket"></i>
@@ -79,11 +79,11 @@
                     </button>
                     <button class="btn btn-purple btn-sm" @click="faHuo()">
                         <i class="ace-icon fa fa-shopping-basket"></i>
-                        发货
+                        正常包裹发货
                     </button>
                     <button class="btn btn-pink btn-sm" @click="shiJiWuHuo()">
                         <i class="ace-icon fa fa-shopping-basket"></i>
-                        实际无货
+                        正常包裹实际无货
                     </button>
                     {% end %}
                     {% if eq .status "yfh" %}
