@@ -399,6 +399,12 @@ func (e PassResInfo) InitData(db_session *xorm.Session) {
 		db_session.Insert(pass)
 
 		pass = new(PassResInfo)
+		pass.Id = pass_res.SPPZ_PRODUCT_CERT
+		pass.CateId = pass_res_cate.SPPZ
+		pass.Name = "商品认证"
+		pass.Desc = core.MakeNullString("商品认证", true)
+
+		pass = new(PassResInfo)
 		pass.Id = pass_res.SPPZ_PRODUCT_CATE
 		pass.CateId = pass_res_cate.SPPZ
 		pass.Name = "商品目录"

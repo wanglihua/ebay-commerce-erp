@@ -136,7 +136,7 @@
                         },
                         success: function (result) {
                             hideMask();
-                            if (result.success == false) {
+                            if (result.success === false) {
                                 $.msg.error(result.message);
                                 return;
                             }

@@ -575,3 +575,9 @@ POST /product/sale/analysis/analyze        ErpProductSaleAnalysis.Analyze
 GET  /order/new/create           ErpOrderNew.Create
 POST /order/new/create/data      ErpOrderNew.CreateData
 POST /order/new/save             ErpOrderNew.Save
+
+GET  /product/cert                    ErpProductCert.Index
+POST /product/cert/data/list          ErpProductCert.ListData
+POST /product/cert/data/detail        ErpProductCert.DetailData
+POST /product/cert/save               ErpProductCert.Save
+POST /product/cert/delete             ErpProductCert.Delete
