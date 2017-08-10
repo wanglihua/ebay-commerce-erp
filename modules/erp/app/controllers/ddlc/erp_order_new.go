@@ -142,8 +142,8 @@ func (c ErpOrderNew) Save() revel.Result {
 
 			//如果选择了已收款，那么建单人默认为收款人。
 
-			pickup_info.Payee = login_user.LoginName
-			pickup_info.PayeeId = login_user.UserId
+			pickup_info.Payee = pickup_info.Creator
+			pickup_info.PayeeId = pickup_info.CreatorId
 		}
 
 		pickup_info.OrderId = order.Id
