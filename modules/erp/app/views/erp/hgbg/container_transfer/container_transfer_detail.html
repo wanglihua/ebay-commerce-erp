@@ -348,16 +348,14 @@
                                         <div class="form-group">
                                             <label for="import_company_code" class="col-xs-4 control-label">澳洲清关公司</label>
                                             <div class="col-xs-8">
-                                                {% if .is_not_new %}
+                                                {% if .can_modify %}
                                                 <select id="import_company_code" name="detail.transfer.import_company_code" class="input-sm form-control" v-model="detail.transfer.import_company_code">
                                                     <option value="ozo">ozo e-store</option>
                                                     <option value="elife">elife pty ltd</option>
                                                     <option value="giant">Giant Star</option>
                                                 </select>
-                                                {% end %}
-
-                                                {% if not .is_not_new %}
-                                                <select id="import_company_code" name="detail.transfer.import_company_code" class="input-sm form-control" v-model="detail.transfer.import_company_code">
+                                                {% else %}
+                                                <select id="import_company_code" name="detail.transfer.import_company_code" class="input-sm form-control" disabled="disabled" v-model="detail.transfer.import_company_code">
                                                     <option value="ozo">ozo e-store</option>
                                                     <option value="elife">elife pty ltd</option>
                                                     <option value="giant">Giant Star</option>
