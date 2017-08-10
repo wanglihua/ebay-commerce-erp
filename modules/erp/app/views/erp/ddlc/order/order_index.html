@@ -1327,7 +1327,8 @@
     }
 
     function create_order() {
-        window.location.href = '{% url "ErpOrderNew.Create" %}';
+        //window.location.href = '{% url "ErpOrderNew.Create" %}';
+        window.open('{% url "ErpOrderNew.Create" %}', "order_create");
     }
 </script>
 <script type="text/javascript" src="/static/lib/lodop/LodopFuncs.js"></script>

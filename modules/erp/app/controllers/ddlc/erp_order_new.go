@@ -86,6 +86,8 @@ func (c ErpOrderNew) Save() revel.Result {
 	var aud_exchange_rate_setting = exchange_rate_service.Get_aud_exchange_rate(db_session)
 
 	var order = form.Order
+	order.ExchangeRate = aud_exchange_rate_setting
+
 	order.AmountPaidCurrency = "AUD"
 	order.AmountPaidRmb = order.AmountPaid * aud_exchange_rate_setting
 
