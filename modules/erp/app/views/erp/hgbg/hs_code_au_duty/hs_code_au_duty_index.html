@@ -271,7 +271,7 @@
                 var form = $("#hsCodeAuDutyDetailForm");
                 var valid = validate(form, {
                     'detail.hs_code_au.hs_code': {
-                        required: true, minlength: 1, maxlength: 10
+                        required: true, digits: true, minlength: 1, maxlength: 10
                     },
                     'detail.hs_code_au.cn_name': {
                         required: true

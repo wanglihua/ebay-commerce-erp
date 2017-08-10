@@ -374,7 +374,7 @@
                         },
                         success: function (result) {
                             hideMask();
-                            if (result.success == false) {
+                            if (result.success === false) {
                                 $.msg.error(result.message);
                                 return;
                             }
@@ -389,7 +389,7 @@
                 var form = $("#hsCodeCnReportElemDetailForm");
                 var valid = validate(form, {
                     'detail.hs_code_cn.hs_code': {
-                        required: true, minlength: 1, maxlength: 10
+                        required: true, digits: true, minlength: 1, maxlength: 10
                     },
                     'detail.hs_code_cn.cn_name': {
                         required: true
