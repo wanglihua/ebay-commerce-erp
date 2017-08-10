@@ -83,9 +83,26 @@ func (c ErpOrderNew) Save() revel.Result {
 		return c.RenderJson(core.JsonResult{Success: false, Message: c.GetValidationErrorMessage()})
 	}
 
+	var order = form.Order
+
+	if order.HoldTypeId.Int64 != models.ORDER_HOLD_TYPE_PICK_UP && order.PaidTime.Valid == false {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "请填写支付时间",
+		})
+	}
+
+	/*
+	if order.HoldTypeId.Int64 != models.ORDER_HOLD_TYPE_PICK_UP && order.StatusId != models.ORDER_STATUS_YCJ {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "请创建已支付的非PICKUP订单！",
+		})
+	}
+	*/
+
 	var aud_exchange_rate_setting = exchange_rate_service.Get_aud_exchange_rate(db_session)
 
-	var order = form.Order
 	order.ExchangeRate = aud_exchange_rate_setting
 
 	order.AmountPaidCurrency = "AUD"
@@ -109,7 +126,26 @@ func (c ErpOrderNew) Save() revel.Result {
 	core.HandleError(err)
 
 	if order.HoldTypeId.Int64 == models.ORDER_HOLD_TYPE_PICK_UP {
+
 		var pickup_info = form.PickupInfo
+
+		var login_user = core.GetLoginUser(c.Session)
+
+		pickup_info.Creator = login_user.LoginName
+		pickup_info.CreatorId = login_user.UserId
+
+		if pickup_info.IsPaid == 1 {
+			// 如果PICK UP下面选择了已收款，则建单时间默认为支付时间
+			order.PaidTime = order.CreatedTime
+			_, err := db_session.Id(order.Id).Cols("paid_time").Update(&order)
+			core.HandleError(err)
+
+			//如果选择了已收款，那么建单人默认为收款人。
+
+			pickup_info.Payee = login_user.LoginName
+			pickup_info.PayeeId = login_user.UserId
+		}
+
 		pickup_info.OrderId = order.Id
 
 		_, err = db_session.Insert(&pickup_info)

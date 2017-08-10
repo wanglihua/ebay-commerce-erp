@@ -33,6 +33,10 @@
                         <i class="ace-icon fa fa-plus"></i>
                         新增
                     </button>
+                    <button class="btn btn-purple btn-sm" @click="pickupDaiPeiHuo()">
+                        <i class="ace-icon fa fa-truck"></i>
+                        PICKUP待配货
+                    </button>
                     {% end %}
                     {% end %}
 
@@ -797,6 +801,37 @@
                                 $.msg.show(data.message);
                             }
 
+                            vm.reloadList();
+                        }
+                    });
+                });
+            },
+            pickupDaiPeiHuo: function () {
+                var id_list = [];
+                $('#orderList tbody tr>td:first-child input:checkbox').each(function () {
+                    if (this.checked) {
+                        id_list.push($(this).val());
+                    }
+                });
+
+                if (id_list.length === 0) {
+                    $.msg.error("当前未选择订单！");
+                    return;
+                }
+
+                $.msg.confirm("确实要把PICKUP订单搬至待配货吗?", function () {
+                    $.ajax({
+                        url: '{%url "ErpOrder.PickupDaiPeiHuo"%}',
+                        type: "POST",
+                        data: {"id_list": id_list},
+                        success: function (data) {
+                            if (data.success === false) {
+                                $.msg.error(data.message);
+                                return;
+                            }
+                            else {
+                                $.msg.show(data.message);
+                            }
                             vm.reloadList();
                         }
                     });

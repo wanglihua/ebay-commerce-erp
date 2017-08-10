@@ -917,6 +917,38 @@ func (c ErpOrder) DaiPeiHuo() revel.Result {
 	})
 }
 
+func (c ErpOrder) PickupDaiPeiHuo() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_YZF, c.Session)
+
+	db_session := c.DbSession
+
+	order_id_list := make([]int64, 0)
+	c.Params.Bind(&order_id_list, "id_list")
+
+	var order_list = make([]models.OrderInfo, 0)
+	core.HandleError(db_session.In("id", order_id_list).Find(&order_list))
+
+	for _, order := range order_list {
+		if order.StatusId != models.ORDER_STATUS_YZF || order.HoldTypeId.Int64 != models.ORDER_HOLD_TYPE_PICK_UP {
+			return c.RenderJson(map[string]interface{}{
+				"success": false,
+				"message": "当前选择订单不全是已支付状态的PICKUP订单！",
+			})
+		}
+	}
+
+	for _, order := range order_list {
+		order.StatusId = models.ORDER_STATUS_HOLD
+		_, err := db_session.Id(order.Id).Cols("status_id").Update(&order)
+		core.HandleError(err)
+	}
+
+	return c.RenderJson(map[string]interface{}{
+		"success": true,
+		"message": "PICKUP订单待配货成功！",
+	})
+}
+
 func (c ErpOrder) PeiHuo() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_DPH, c.Session)
 

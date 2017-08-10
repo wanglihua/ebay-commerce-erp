@@ -64,7 +64,9 @@
                                 <div class="form-group">
                                     <label for="order_paid_time" class="col-xs-4 control-label">支付时间：</label>
                                     <div class="col-xs-8">
-                                        <input id="order_paid_time" name="detail.order.paid_time" type="text" class="input-sm form-control" v-model="detail.order.paid_time"/>
+                                        <!--pickup hold type id = 10040-->
+                                        <input v-if="detail.order.hold_type_id == 10040" id="order_paid_time" name="detail.order.paid_time" type="text" class="input-sm form-control" v-model="detail.order.paid_time" disabled="disabled"/>
+                                        <input v-else id="order_paid_time" name="detail.order.paid_time" type="text" class="input-sm form-control" v-model="detail.order.paid_time"/>
                                     </div>
                                 </div>
                             </div>
@@ -246,7 +248,7 @@
                                 <div class="form-group">
                                     <label for="is_paid" class="col-xs-4 control-label">已收款：</label>
                                     <div class="col-xs-8">
-                                        <select id="is_paid" name="is_paid" class="input-sm form-control" v-model.number="detail.pickup_info.is_paid">
+                                        <select id="is_paid" name="is_paid" class="input-sm form-control" v-model.number="detail.pickup_info.is_paid" onchange="isPaidSelChanged()">
                                             <option :value="0">否</option>
                                             <option :value="1">是</option>
                                         </select>
@@ -325,6 +327,21 @@
                 vm.detail.stock_id = data.stock_id;
             }
         });
+    }
+
+    function isPaidSelChanged() {
+        var is_paid = $("#is_paid").val();
+        //if (vm.detail.pickup_info.is_paid === 1) {
+        if (is_paid === "1") {
+            //vm.detail.order.paid_time = vm.detail.order.created_time;
+            $("#payee").attr("disabled", "disabled");
+        }
+
+        //if (vm.detail.pickup_info.is_paid === 0) {
+        if (is_paid === "0") {
+            //vm.detail.order.paid_time = null;
+            $("#payee").removeAttr("disabled");
+        }
     }
 
     var vm = new Vue({

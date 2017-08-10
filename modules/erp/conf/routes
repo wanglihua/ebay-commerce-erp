@@ -357,6 +357,7 @@ POST /order/qu/xiao                        ErpOrder.QuXiao
 POST /order/pick/up/option/data            ErpOrder.PickupOptionData
 POST /order/pick/up                        ErpOrder.Pickup
 POST /order/rematch/hold/order/logistics   ErpOrder.ReMatchHoldOrderLogistics
+POST /order/pickup/dai/pei/huo             ErpOrder.PickupDaiPeiHuo
 
 POST /order/shipping/address/save           ErpOrderShippingAddress.Save
 POST /order/waybill/number/save             ErpOrderWaybillNumber.Save
