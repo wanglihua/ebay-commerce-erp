@@ -15,6 +15,10 @@ var (
 	DateBinder = revel.Binder{
 		Bind: revel.ValueBinder(func(val string, typ reflect.Type) reflect.Value {
 			// r, err := time.ParseInLocation("2006-01-02", val, time.Local)
+			if strings.TrimSpace(val) == "" || strings.TrimSpace(val) == "null" {
+				return reflect.Zero(typ)
+			}
+
 			r, err := Parse_time(val)
 			if err == nil {
 				return reflect.ValueOf(Date(r))
@@ -41,6 +45,9 @@ var (
 			}
 			r, err = time.ParseInLocation("2006-01-02", val, time.Local)
 			*/
+			if strings.TrimSpace(val) == "" || strings.TrimSpace(val) == "null" {
+				return reflect.Zero(typ)
+			}
 
 			r, err := Parse_time(val)
 			if err == nil {
@@ -72,6 +79,10 @@ var (
 			}
 			r, err = time.ParseInLocation("2006-01-02", val, time.Local)
 			*/
+
+			if strings.TrimSpace(val) == "" || strings.TrimSpace(val) == "null" {
+				return reflect.Zero(typ)
+			}
 
 			r, err := Parse_time(val)
 			if err == nil {

@@ -17,7 +17,9 @@ func (t Date) MarshalJSON() ([]byte, error) {
 
 func (t *Date) UnmarshalJSON(data []byte) error {
 	//parsed_time, err := time.ParseInLocation("2006-01-02", strings.Trim(string(data), `"`), time.Local)
-	parsed_time, err := Parse_time(strings.Trim(string(data), `"`))
+	var str = strings.Trim(string(data), `"`)
+
+	parsed_time, err := Parse_time(str)
 	if err != nil {
 		return err
 	}
@@ -35,7 +37,9 @@ func (t Time) MarshalJSON() ([]byte, error) {
 
 func (t *Time) UnmarshalJSON(data []byte) error {
 	//parsed_time, err := time.ParseInLocation("2006-01-02 15:04", strings.Trim(string(data), `"`), time.Local)
-	parsed_time, err := Parse_time(strings.Trim(string(data), `"`))
+	var str = strings.Trim(string(data), `"`)
+
+	parsed_time, err := Parse_time(str)
 	if err != nil {
 		return err
 	}
@@ -53,7 +57,9 @@ func (t LongTime) MarshalJSON() ([]byte, error) {
 
 func (t *LongTime) UnmarshalJSON(data []byte) error {
 	//parsed_time, err := time.ParseInLocation("2006-01-02 15:04:05", strings.Trim(string(data), `"`), time.Local)
-	parsed_time, err := Parse_time(strings.Trim(string(data), `"`))
+	var str = strings.Trim(string(data), `"`)
+
+	parsed_time, err := Parse_time(str)
 	if err != nil {
 		return err
 	}
