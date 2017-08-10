@@ -80,13 +80,37 @@
                             </button>
                             <ul class="dropdown-menu dropdown-danger">
                                 <li>
-                                    <a onclick="export_hgbg_in_excel('ozo')" style="cursor: pointer;">ozo estore</a>
+                                    {% if eq .import_company_code "ozo" %}
+                                    <a onclick="export_hgbg_in_excel('ozo')" style="cursor: pointer;">ozo e-store</a>
+                                    {% else %}
+                                    {% if eq .import_company_code "" %}
+                                    <a onclick="export_hgbg_in_excel('ozo')" style="cursor: pointer;">ozo e-store</a>
+                                    {% else %}
+                                    <a style="font-size: 12px;font-weight: normal; cursor: not-allowed;">ozo e-store</a>
+                                    {% end %}
+                                    {% end %}
                                 </li>
                                 <li>
+                                    {% if eq .import_company_code "elife" %}
                                     <a onclick="export_hgbg_in_excel('elife')" style="cursor: pointer;">elife pty ltd</a>
+                                    {% else %}
+                                    {% if eq .import_company_code "" %}
+                                    <a onclick="export_hgbg_in_excel('elife')" style="cursor: pointer;">elife pty ltd</a>
+                                    {% else %}
+                                    <a style="font-size: 12px;font-weight: normal; cursor: not-allowed;">elife pty ltd</a>
+                                    {% end %}
+                                    {% end %}
                                 </li>
                                 <li>
+                                    {% if eq .import_company_code "giant" %}
                                     <a onclick="export_hgbg_in_excel('giant')" style="cursor: pointer;">Giant Star</a>
+                                    {% else %}
+                                    {% if eq .import_company_code "" %}
+                                    <a onclick="export_hgbg_in_excel('giant')" style="cursor: pointer;">Giant Star</a>
+                                    {% else %}
+                                    <a style="font-size: 12px;font-weight: normal; cursor: not-allowed;">Giant Star</a>
+                                    {% end %}
+                                    {% end %}
                                 </li>
                             </ul>
                         </div>
@@ -314,6 +338,31 @@
                                             <div class="col-xs-8">
                                                 <input id="total_amount2" name="detail.transfer.total_amount2" type="text" class="input-sm form-control" disabled="disabled" v-model.number="detail.transfer.total_amount2"/>
                                                 <div class="help-block">单位，澳币。商品根据征税打折和成本上调后调整的合计价格。</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-3">
+                                        <div class="form-group">
+                                            <label for="import_company_code" class="col-xs-4 control-label">澳洲清关公司</label>
+                                            <div class="col-xs-8">
+                                                {% if .is_not_new %}
+                                                <select id="import_company_code" name="detail.transfer.import_company_code" class="input-sm form-control" v-model="detail.transfer.import_company_code">
+                                                    <option value="ozo">ozo e-store</option>
+                                                    <option value="elife">elife pty ltd</option>
+                                                    <option value="giant">Giant Star</option>
+                                                </select>
+                                                {% end %}
+
+                                                {% if not .is_not_new %}
+                                                <select id="import_company_code" name="detail.transfer.import_company_code" class="input-sm form-control" v-model="detail.transfer.import_company_code">
+                                                    <option value="ozo">ozo e-store</option>
+                                                    <option value="elife">elife pty ltd</option>
+                                                    <option value="giant">Giant Star</option>
+                                                </select>
+                                                {% end %}
                                             </div>
                                         </div>
                                     </div>
@@ -706,6 +755,9 @@
                 required: true
             },
             'detail.transfer.stock_time': {
+                required: true
+            },
+            'detail.transfer.import_company_code': {
                 required: true
             }
         });

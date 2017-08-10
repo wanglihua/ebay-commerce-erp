@@ -161,6 +161,7 @@ func (c ErpContainerTransfer) Detail(id int64) revel.Result {
 	c.RenderArgs["can_stock"] = container_transfer_can_stock(container_transfer)
 	c.RenderArgs["is_not_new"] = transfer_id != 0
 	c.RenderArgs["is_stock"] = container_transfer.StatusId == models.CONTAINER_TRANSFER_STATUS_STOCK
+	c.RenderArgs["import_company_code"] = container_transfer.ImportCompanyCode
 
 	/*
 	var can_modify_disabled template.HTML = ""
@@ -281,9 +282,24 @@ func (c ErpContainerTransfer) Save() revel.Result {
 
 	var is_create = detail_form.IsCreate()
 
+	/*
+	 <option value="ozo">ozo e-store</option>
+	 <option value="elife">elife pty ltd</option>
+	 <option value="giant">Giant Star</option>
+	 */
+
+	if container_transfer.ImportCompanyCode == "ozo" {
+		container_transfer.ImportCompanyName = "ozo e-store"
+	} else if container_transfer.ImportCompanyCode == "elife" {
+		container_transfer.ImportCompanyName = "elife pty ltd"
+	} else if container_transfer.ImportCompanyCode == "giant" {
+		container_transfer.ImportCompanyName = "Giant Star"
+	}
+
 	var affected int64
 	if is_create == true {
 		container_transfer.StatusId = models.CONTAINER_TRANSFER_STATUS_NEW
+
 		affected, err = db_session.Insert(&container_transfer)
 		core.HandleError(err)
 
