@@ -622,16 +622,14 @@
                             return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
                         }
                     },
-                    {"mDataProp": "batch_code", "title": "批次号", "bSearchable": false, "width": 150},
-                    {"mDataProp": "product_sku", "title": "SKU", "bSearchable": true},
+                    {"mDataProp": "product_sku", "title": "SKU", "bSearchable": true, "width": 120},
+                    {"mDataProp": "cn_hs_code", "title": "中国海关编码", "bSearchable": true, "width": 120},
+                    {"mDataProp": "cn_hs_cn_name", "title": "中国海关名称", "bSearchable": true},
+                    {"mDataProp": "au_hs_code", "title": "澳洲海关编码", "bSearchable": true, "width": 120},
+                    {"mDataProp": "au_hs_cn_name", "title": "澳洲海关名称", "bSearchable": true},
                     {"mDataProp": "qty", "title": "数量", "bSearchable": false, "width": 100},
                     {"mDataProp": "box_qty", "title": "箱数", "bSearchable": false, "width": 100},
-                    {
-                        "mDataProp": "price", "title": "价格", "bSearchable": true, "width": 100,
-                        "render": function (data, type, row) {
-                            return dtFormatFloat(data);
-                        }
-                    },
+
                     {"mDataProp": "create_time", "title": "创建时间", "bSearchable": false, "width": 120},
                     {"mDataProp": "update_time", "title": "修改时间", "bSearchable": false, "width": 120}
                 ],

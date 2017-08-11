@@ -10,6 +10,7 @@ import (
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/order_service"
+	"matrix/modules/erp/service/inventory_service"
 )
 
 type ErpOrderItem struct {
@@ -51,6 +52,7 @@ type OrderItemForm struct {
 }
 
 func (c ErpOrderItem) Save() revel.Result {
+
 	pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_VIEW_DETAIL, c.Session)
 
 	var db_session = c.DbSession
@@ -78,6 +80,13 @@ func (c ErpOrderItem) Save() revel.Result {
 		return c.RenderJson(core.JsonResult{Success: false, Message: c.GetValidationErrorMessage()})
 	}
 
+	// 获得当前订单的仓库
+	var order_logistics models.OrderLogisticsInfo
+	_, err = db_session.Where("order_id = ?", order.Id).Get(&order_logistics)
+	core.HandleError(err)
+
+	var stock_id = order_logistics.StockId
+
 	//获取 product_id
 	var product models.ProductInfo
 	_, err = db_session.Where(fmt.Sprintf("sku = '%s'", order_item_form.Sku)).Get(&product)
@@ -102,12 +111,38 @@ func (c ErpOrderItem) Save() revel.Result {
 	order_item.ItemSku = order_item_form.Sku
 	order_item.Quantity = order_item_form.Qty
 
+	//获取成本价
+	if stock_id == 0 {
+		order_item.CostPrice = inventory_service.GetProductCnStockCostPrice(product.Id, db_session)
+	} else {
+		order_item.CostPrice = inventory_service.GetProductStockCostPrice(stock_id, product.Id, db_session)
+	}
+
 	if order_item_form.ItemId == 0 {
 		_, err = db_session.Insert(&order_item)
 		core.HandleError(err)
 	} else {
-		var update_cols = []string{"item_product_id", "item_sku", "quantity"}
+		var update_cols = []string{"item_product_id", "item_sku", "quantity", "cost_price"}
 		_, err = db_session.Id(order_item_form.ItemId).Cols(update_cols...).Update(&order_item)
+		core.HandleError(err)
+	}
+
+	// 计算订单成本
+	var order_cost_amount = order_service.GetOrderCostAmountSum(order.Id, db_session)
+
+	order_logistics.CostAmount = order_cost_amount
+	_, err = db_session.Id(order_logistics.Id).Cols("cost_amount").Update(&order_logistics)
+	core.HandleError(err)
+
+	// 重新计算订单毛利
+	var order_profit_au = order_service.CalculateOrderProfit(&order, &order_logistics)
+	var order_profit = order_profit_au * order.ExchangeRate
+
+	if order.ProfitAu == 0 {
+		order.ProfitAu = order_profit_au
+		order.ProfitRmb = order_profit
+
+		_, err := db_session.Id(order.Id).Cols("profit_au", "profit_rmb").Update(&order)
 		core.HandleError(err)
 	}
 

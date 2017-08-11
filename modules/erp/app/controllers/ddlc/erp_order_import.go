@@ -18,6 +18,7 @@ import (
 	"matrix/modules/erp/service/order_shipping_address_service"
 	"matrix/modules/erp/service/order_history_service"
 	"time"
+	"matrix/modules/erp/service/inventory_service"
 )
 
 type ErpOrderImport struct {
@@ -520,20 +521,10 @@ SELECT sa.id AS shop_id, sa.name AS shop_name FROM erp_shop_account sa;
 
 		var cost_price_total float64 = 0
 		for index, order_import := range order_import_same_code_list {
-			var sql = `SELECT nvt.cost_price AS cost_price
-FROM erp_inventory nvt
-    INNER JOIN erp_stock st ON st.id = nvt.stock_id
-WHERE st.stock_type_id = %d AND nvt.product_id = %d LIMIT 1;`
-			sql = fmt.Sprintf(sql, models.STOCK_TYPE_CN, order_import.product_id)
+			var cost_price = inventory_service.GetProductCnStockCostPrice(order_import.product_id, db_session)
 
-			var product_cost_price struct {
-				CostPrice float64 `xorm:"'cost_price'"`
-			}
-			_, err := db_session.Sql(sql).Get(&product_cost_price)
-			core.HandleError(err)
-
-			if product_cost_price.CostPrice != 0 {
-				order_import_same_code_list[index].cost_price = product_cost_price.CostPrice
+			if cost_price != 0 {
+				order_import_same_code_list[index].cost_price = cost_price
 			} else {
 				order_import_same_code_list[index].cost_price = 0.00001 // 是零的时候，随便给个数
 			}
