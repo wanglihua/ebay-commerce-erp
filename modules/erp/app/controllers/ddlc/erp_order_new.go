@@ -10,6 +10,8 @@ import (
 	auth_models "matrix/modules/auth/models"
 	"encoding/json"
 	"matrix/modules/erp/service/exchange_rate_service"
+	"time"
+	"matrix/modules/erp/service/order_history_service"
 )
 
 type ErpOrderNew struct {
@@ -33,7 +35,7 @@ func (c ErpOrderNew) CreateData() revel.Result {
 	core.HandleError(db_session.In("id", []int64{models.ORDER_TYPE_SGCJ}).Find(&order_type_list))
 
 	var status_list = make([]models.StatusInfo, 0)
-	core.HandleError(db_session.In("id", []int64{models.ORDER_STATUS_YCJ, models.ORDER_STATUS_YZF}).Where("type = ?", models.STATUS_TYPE_ORDER).Find(&status_list))
+	core.HandleError(db_session.In("id", []int64{models.ORDER_STATUS_YZF}).Where("type = ?", models.STATUS_TYPE_ORDER).Find(&status_list))
 
 	var hold_type_list = make([]models.OrderHoldTypeInfo, 0)
 	core.HandleError(db_session.In("id", []int64{models.ORDER_HOLD_TYPE_PICK_UP}).Find(&hold_type_list))
@@ -67,6 +69,7 @@ func (c ErpOrderNew) CreateData() revel.Result {
 		"creator":                fmt.Sprintf("%s(%s)", login_user.LoginName, login_user.NickName),
 		"stock_list":             au_stock_list,
 		"stock_id":               stock_id,
+		"create_time":            core.LongTime(time.Now()),
 	})
 }
 
@@ -115,6 +118,7 @@ func (c ErpOrderNew) Save() revel.Result {
 	order.TotalAmount = order.AmountPaid
 	order.TotalAmountCurrency = "AUD"
 	order.TotalAmountRmb = order.AmountPaid * aud_exchange_rate_setting
+	order.StatusId = models.ORDER_STATUS_YZF
 
 	_, err = db_session.Insert(&order)
 	core.HandleError(err)
@@ -167,6 +171,10 @@ func (c ErpOrderNew) Save() revel.Result {
 		core.HandleError(err)
 
 	}
+
+	var login_user = core.GetLoginUser(c.Session)
+
+	order_history_service.Insert_order_history(order, login_user.UserId, fmt.Sprintf("订单手工创建， 工号： %s", login_user.LoginName), db_session)
 
 	return c.RenderJson(map[string]interface{}{
 		"success":  true,

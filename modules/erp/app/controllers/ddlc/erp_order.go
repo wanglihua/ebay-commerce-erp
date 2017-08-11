@@ -1079,6 +1079,21 @@ func (c ErpOrder) FaHuo() revel.Result {
 		}
 	}
 
+	for _, order := range order_list {
+		if order.HoldTypeId.Int64 == models.ORDER_HOLD_TYPE_PICK_UP {
+			var pickup_order_info models.PickupOrderInfo
+			_, err := db_session.Where("order_id = ?", order.Id).Get(&pickup_order_info)
+			core.HandleError(err)
+
+			if pickup_order_info.IsPaid == 0 {
+				return c.RenderJson(map[string]interface{}{
+					"success": false,
+					"message": "PICKUP订单未收款不能搬至已发货！",
+				})
+			}
+		}
+	}
+
 	var mel_stock_id = stock_service.Get_mel_stock_id(db_session)
 
 	for _, order := range order_list {

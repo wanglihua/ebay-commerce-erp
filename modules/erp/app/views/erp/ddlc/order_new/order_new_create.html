@@ -22,7 +22,7 @@
                                 <div class="form-group">
                                     <label for="order_created_time" class="col-xs-4 control-label">建单时间：</label>
                                     <div class="col-xs-8">
-                                        <input id="order_created_time" name="detail.order.created_time" type="text" class="input-sm form-control" v-model="detail.order.created_time"/>
+                                        <input id="order_created_time" name="detail.order.created_time" type="text" class="input-sm form-control" v-model="detail.order.created_time" disabled="disabled"/>
                                     </div>
                                 </div>
                             </div>
@@ -30,7 +30,7 @@
                                 <div class="form-group">
                                     <label for="order_status_id" class="col-xs-4 control-label">状态：</label>
                                     <div class="col-xs-8">
-                                        <select id="order_status_id" name="detail.order.status_id" class="input-sm form-control" v-model.number="detail.order.status_id">
+                                        <select id="order_status_id" name="detail.order.status_id" class="input-sm form-control" v-model.number="detail.order.status_id" disabled="disabled">
                                             <template v-for="status in create_data.status_list">
                                                 <option :value="status.id">{{status.name}}</option>
                                             </template>
@@ -42,7 +42,7 @@
                                 <div class="form-group">
                                     <label for="order_type_id" class="col-xs-4 control-label">订单类型：</label>
                                     <div class="col-xs-8">
-                                        <select id="order_type_id" name="detail.order.type_id" class="input-sm form-control" v-model.number="detail.order.type_id">
+                                        <select id="order_type_id" name="detail.order.type_id" class="input-sm form-control" v-model.number="detail.order.type_id" disabled="disabled">
                                             <template v-for="type in create_data.type_list">
                                                 <option :value="type.id">{{type.name}}</option>
                                             </template>
@@ -323,8 +323,12 @@
                     $.msg.error(data.message);
                     return;
                 }
+
                 vm.create_data = data;
                 vm.detail.stock_id = data.stock_id;
+                vm.detail.order.created_time = data.create_time;
+                vm.detail.order.status_id = data.status_list[0].id;
+                vm.detail.order.type_id = data.type_list[0].id;
             }
         });
     }
