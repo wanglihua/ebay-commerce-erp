@@ -6,7 +6,7 @@ import (
 	"matrix/core"
 )
 
-// 获取的是 RMB 的成本总额
+// 获取的是 AUD 的成本总额
 func GetOrderCostAmountSum(order_id int64, db_session *xorm.Session) float64 {
 	var cost_amount_sum struct {
 		CostAmount float64 `xorm:"'cost_amount'"`
