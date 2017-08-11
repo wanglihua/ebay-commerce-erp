@@ -616,22 +616,20 @@
                 "aaSorting": [[1, "asc"]],
                 "aoColumns": [
                     {
-                        "mDataProp": "id", "bSearchable": false, "orderable": false, "sClass": "center", "width": 50,
+                        "mDataProp": "cte.id", "bSearchable": false, "orderable": false, "sClass": "center", "width": 50,
                         "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
                         "render": function (data, type, row) {
                             return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
                         }
                     },
-                    {"mDataProp": "product_sku", "title": "SKU", "bSearchable": true, "width": 120},
-                    {"mDataProp": "cn_hs_code", "title": "中国海关编码", "bSearchable": true, "width": 120},
-                    {"mDataProp": "cn_hs_cn_name", "title": "中国海关名称", "bSearchable": true},
-                    {"mDataProp": "au_hs_code", "title": "澳洲海关编码", "bSearchable": true, "width": 120},
-                    {"mDataProp": "au_hs_cn_name", "title": "澳洲海关名称", "bSearchable": true},
-                    {"mDataProp": "qty", "title": "数量", "bSearchable": false, "width": 100},
-                    {"mDataProp": "box_qty", "title": "箱数", "bSearchable": false, "width": 100},
-
-                    {"mDataProp": "create_time", "title": "创建时间", "bSearchable": false, "width": 120},
-                    {"mDataProp": "update_time", "title": "修改时间", "bSearchable": false, "width": 120}
+                    {"mDataProp": "cte.product_sku", "title": "SKU", "bSearchable": true, "width": 120},
+                    {"mDataProp": "p.cn_name", "title": "名称", "bSearchable": true},
+                    {"mDataProp": "cte.cn_hs_code", "title": "中国海关编码", "bSearchable": true, "width": 120},
+                    {"mDataProp": "cte.au_hs_code", "title": "澳洲海关编码", "bSearchable": true, "width": 120},
+                    {"mDataProp": "cte.qty", "title": "数量", "bSearchable": false, "width": 100},
+                    {"mDataProp": "cte.box_qty", "title": "箱数", "bSearchable": false, "width": 100},
+                    {"mDataProp": "cte.create_time", "title": "创建时间", "bSearchable": false, "width": 120},
+                    {"mDataProp": "cte.update_time", "title": "修改时间", "bSearchable": false, "width": 120}
                 ],
                 "fnServerData": function (sSource, aoData, fnCallback) {
                     showMask("数据加载中，请稍候");

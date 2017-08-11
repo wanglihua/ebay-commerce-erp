@@ -36,28 +36,49 @@ func (c ErpContainerTransferEntry) ListData() revel.Result {
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
-	filter = core.SqlAnd(filter, fmt.Sprintf("transfer_id = %d", transfer_id))
-
-	query := db_session.Where(filter)
-
-	data_query := *query
-	if order != "" {
-		data_query = *data_query.OrderBy(order)
-	} else {
-		data_query = *data_query.Asc("id")
+	type cte_item_t struct {
+		models.ContainerTransferEntryInfo `xorm:"extends" json:"cte"`
+		models.ProductInfo                `xorm:"extends" json:"p"`
 	}
 
-	container_transfer_entry_list := make([]models.ContainerTransferEntryInfo, 0, limit)
-	err := data_query.Limit(limit, offset).Find(&container_transfer_entry_list)
+	/*
+
+SELECT cte.*, p.*
+FROM erp_container_transfer_entry cte
+    INNER JOIN erp_product p ON cte.product_id = p.id
+
+	 */
+
+	var sb = core.NewSqlBuilder()
+	sb.Select("cte.*, p.*")
+	sb.Count("count(*) as entry_count")
+	sb.From(`erp_container_transfer_entry cte
+    INNER JOIN erp_product p ON cte.product_id = p.id`)
+
+	filter = core.SqlAnd(filter, fmt.Sprintf("cte.transfer_id = %d", transfer_id))
+
+	sb.Where(filter)
+
+	sb.Limit(offset, limit)
+
+	if order != "" {
+		sb.OrderBy(order)
+	} else {
+		sb.OrderBy("id asc")
+	}
+	container_transfer_entry_list := make([]cte_item_t, 0, limit)
+	err := db_session.Sql(sb.SqlList()).Find(&container_transfer_entry_list)
 	core.HandleError(err)
 
-	count_query := *query
-	count, err := count_query.Count(new(models.ContainerTransferEntryInfo))
+	var entry_count struct {
+		EntryCount int64 `xorm:"'entry_count'"`
+	}
+	_, err = db_session.Sql(sb.SqlCount()).Get(&entry_count)
 	core.HandleError(err)
 
 	return c.RenderJson(core.GridResult{
 		Data:  container_transfer_entry_list,
-		Total: count,
+		Total: entry_count.EntryCount,
 	})
 }
 
@@ -138,21 +159,21 @@ func (c ErpContainerTransferEntry) Save() revel.Result {
 	core.HandleError(err)
 
 	if has == false {
-		return c.RenderJson(core.JsonResult{Success: false, Message: "商品SKU不存在！" })
+		return c.RenderJson(core.JsonResult{Success: false, Message: "商品SKU不存在！"})
 	}
 
 	var au_exchange_rate = exchange_rate_service.Get_aud_exchange_rate(db_session)
 	container_transfer_entry.Price = inventory_service.GetProductCnStockCostPrice(product.Id, db_session) / au_exchange_rate
 
 	if product.AuHsCode == "" {
-		return c.RenderJson(core.JsonResult{Success: false, Message: "商品澳洲海关编码未设置！" })
+		return c.RenderJson(core.JsonResult{Success: false, Message: "商品澳洲海关编码未设置！"})
 	} else {
 		var hsCodeAu models.HsCodeAuDutyInfo
 		has, err := db_session.Where("hs_code = ?", product.AuHsCode).Get(&hsCodeAu)
 		core.HandleError(err)
 
 		if has == false {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "商品澳洲海关编码已设置，但该海关编码不存在！" })
+			return c.RenderJson(core.JsonResult{Success: false, Message: "商品澳洲海关编码已设置，但该海关编码不存在！"})
 		}
 
 		container_transfer_entry.AuHsId = hsCodeAu.Id
@@ -163,14 +184,14 @@ func (c ErpContainerTransferEntry) Save() revel.Result {
 	}
 
 	if product.CnHsCode == "" {
-		return c.RenderJson(core.JsonResult{Success: false, Message: "商品中国海关编码未设置！" })
+		return c.RenderJson(core.JsonResult{Success: false, Message: "商品中国海关编码未设置！"})
 	} else {
 		var hsCodeCn models.HsCodeCnReportElemInfo
 		has, err := db_session.Where("hs_code = ?", product.CnHsCode).Get(&hsCodeCn)
 		core.HandleError(err)
 
 		if has == false {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "商品中国海关编码已设置，但该海关编码不存在！" })
+			return c.RenderJson(core.JsonResult{Success: false, Message: "商品中国海关编码已设置，但该海关编码不存在！"})
 		}
 
 		container_transfer_entry.CnHsId = hsCodeCn.Id
@@ -196,7 +217,7 @@ func (c ErpContainerTransferEntry) Save() revel.Result {
 		container_transfer_log_service.Insert_container_transfer_log(ct, "修改调拨明细", db_session, c.Session)
 
 		if affected == 0 {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！" })
+			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！"})
 		}
 	}
 
