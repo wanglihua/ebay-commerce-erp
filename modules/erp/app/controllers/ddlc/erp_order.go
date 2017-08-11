@@ -610,6 +610,13 @@ func (c ErpOrder) Detail(order_id int64) revel.Result {
 
 	c.RenderArgs["can_edit_waybill_number"] = order_service.Can_order_modify_waybill_number(&order)
 
+	var is_pickup = false
+	if order.HoldTypeId.Int64 == models.ORDER_HOLD_TYPE_PICK_UP {
+		is_pickup = true
+	}
+
+	c.RenderArgs["is_pickup"] = is_pickup
+
 	return c.RenderTemplate("erp/ddlc/order/order_detail.html")
 }
 
@@ -752,6 +759,15 @@ WHERE oi.order_id = %d;`
 	err = db_session.Where(fmt.Sprintf("stock_type_id = %d", models.STOCK_TYPE_AU)).Find(&au_stock_list)
 	core.HandleError(err)
 
+	var pickup_pay_method_list = make([]models.PickupPayMethodInfo, 0)
+	core.HandleError(db_session.Find(&pickup_pay_method_list))
+
+	var pickup_order models.PickupOrderInfo
+	if order.HoldTypeId.Int64 == models.ORDER_HOLD_TYPE_PICK_UP {
+		_, err := db_session.Where("order_id = ?", order.Id).Get(&pickup_order)
+		core.HandleError(err)
+	}
+
 	return c.RenderJson(map[string]interface{}{
 		"order":                   order,
 		"status":                  status,
@@ -772,6 +788,8 @@ WHERE oi.order_id = %d;`
 		"au_stock_list":           au_stock_list,
 		"logistics_stock":         logistics_stock,
 		"logistics_mode":          logistics_mode,
+		"pickup":                  pickup_order,
+		"pickup_pay_method_list":  pickup_pay_method_list,
 	})
 }
 

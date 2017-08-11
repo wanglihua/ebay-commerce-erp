@@ -482,6 +482,59 @@
             </div>
         </div>
 
+        {% if .is_pickup %}
+        <div class="widget-box">
+            <div class="widget-header">
+                <h4 class="smaller">PICK UP 信息</h4>
+            </div>
+            <div class="widget-body">
+                <div class="widget-main">
+                    <div class="row">
+                        <div class="col-xs-3">
+                            <div class="form-group">
+                                <label for="creator" class="col-xs-4 control-label">建单人员：</label>
+                                <div class="col-xs-8">
+                                    <input id="creator" name="creator" type="text" class="input-sm form-control" disabled="disabled" v-model="pickup.creator"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-3">
+                            <div class="form-group">
+                                <label for="payee" class="col-xs-4 control-label">收款人员：</label>
+                                <div class="col-xs-8">
+                                    <input id="payee" name="payee" type="text" class="input-sm form-control" disabled="disabled" v-model="pickup.payee"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-3">
+                            <div class="form-group">
+                                <label for="is_paid" class="col-xs-4 control-label">已收款：</label>
+                                <div class="col-xs-8">
+                                    <select id="is_paid" name="is_paid" class="input-sm form-control" v-model.number="pickup.is_paid" disabled="disabled">
+                                        <option :value="0">否</option>
+                                        <option :value="1">是</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-3">
+                            <div class="form-group">
+                                <label for="pay_method_id" class="col-xs-4 control-label">收款方式：</label>
+                                <div class="col-xs-8">
+                                    <select id="pay_method_id" name="pay_method_id" class="input-sm form-control" v-model.number="pickup.pay_method_id" disabled="disabled">
+                                        <template v-for="pay_method in pickup_pay_method_list">
+                                            <option :value="pay_method.id">{{pay_method.name}}</option>
+                                        </template>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% end %}
+
         <div class="widget-box">
             <div class="widget-header">
                 <h4 class="smaller">订单商品库存</h4>
@@ -803,14 +856,16 @@
                 "shipping_address": {},
                 "ebay_shipping_address": {},
                 "paypal_shipping_address": {},
-                "order_item_list": [],
                 "order_logistics": {},
                 "logistics_setting": {},
-                "au_stock_list": [],
                 "logistics_stock": {},
                 "logistics_mode": {},
-                "inventory_list": []
+                "order_item_list": [],
+                "inventory_list": [],
+                "au_stock_list": []
             },
+            "pickup": {},
+            "pickup_pay_method_list": [],
             "order_item_detail": {},
             "logistics_mode_list": []
         },
@@ -832,6 +887,8 @@
                         this_vm.detail = data;
                         this_vm.order_item_detail = {};
                         this_vm.order_item_detail.order_id = order_id;
+                        this_vm.pickup = data.pickup;
+                        this_vm.pickup_pay_method_list = data.pickup_pay_method_list;
                     }
                 });
         },
