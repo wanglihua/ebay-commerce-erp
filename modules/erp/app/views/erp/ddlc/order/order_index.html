@@ -397,10 +397,10 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-success btn-sm" @click="specialNotShip()">
-                        <i class="ace-icon fa fa-floppy-o"></i>导出
+                        <i class="ace-icon fa fa-floppy-o"></i>确认
                     </button>
                     <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">
-                        <i class="ace-icon fa fa-times"></i>取消
+                        <i class="ace-icon fa fa-times"></i>关闭
                     </button>
                 </div>
             </div>
@@ -1054,6 +1054,7 @@
                                 return;
                             }
                             else {
+                                $('#specialNotShipDialog').modal("hide");
                                 $.msg.show(data.message);
                             }
                             vm.reloadList();

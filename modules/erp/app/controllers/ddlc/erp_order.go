@@ -1225,7 +1225,7 @@ func (c ErpOrder) SpecialNotShip() revel.Result {
 
 	for _, order := range order_list {
 		order.StatusId = models.ORDER_STATUS_HOLD
-		order.HoldTypeId = core.MakeNullInt(models.ORDER_HOLD_TYPE_OOS_ACTUAL_STOCK, true)
+		order.HoldTypeId = core.MakeNullInt(models.ORDER_HOLD_TYPE_SPECIAL_NOT_SHIP, true)
 
 		if order.Desc.Valid == false {
 			order.Desc = core.MakeNullString(desc, true)
