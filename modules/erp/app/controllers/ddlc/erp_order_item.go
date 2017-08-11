@@ -129,6 +129,7 @@ func (c ErpOrderItem) Save() revel.Result {
 
 	// 计算订单成本
 	var order_cost_amount = order_service.GetOrderCostAmountSum(order.Id, db_session)
+	order_cost_amount = order_cost_amount / order.ExchangeRate
 
 	order_logistics.CostAmount = order_cost_amount
 	_, err = db_session.Id(order_logistics.Id).Cols("cost_amount").Update(&order_logistics)

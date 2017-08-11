@@ -18,15 +18,6 @@
                         刷新
                     </button>
 
-                    {% if eq .status "ycj" %}
-                    {% if .has_pass_order_new %}
-                    <button class="btn btn-success btn-sm" onclick="create_order()">
-                        <i class="ace-icon fa fa-plus"></i>
-                        新增
-                    </button>
-                    {% end %}
-                    {% end %}
-
                     {% if eq .status "yzf" %}
                     {% if .has_pass_order_new %}
                     <button class="btn btn-success btn-sm" onclick="create_order()">
