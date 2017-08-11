@@ -45,6 +45,7 @@ const (
 	ORDER_HOLD_TYPE_INTERNATIONAL          int64 = 10160 // 国际件。对于非澳大利亚的订单，直接到国际件模块
 	ORDER_HOLD_TYPE_ADDRESS_INFO_MISS      int64 = 10170 // 收货人信息不全的，比如没有手机号，没有邮编等等
 	ORDER_HOLD_TYPE_SPECIAL_PRODUCT        int64 = 10180 // 特殊SKU
+	ORDER_HOLD_TYPE_SPECIAL_NOT_SHIP       int64 = 10190 // 特殊情况实际未发货
 )
 
 func (e OrderHoldTypeInfo) InitData(db_session *xorm.Session) {
@@ -195,5 +196,12 @@ func (e OrderHoldTypeInfo) InitData(db_session *xorm.Session) {
 	order_hold_type.Id = ORDER_HOLD_TYPE_SPECIAL_PRODUCT
 	order_hold_type.Name = "特殊SKU"
 	order_hold_type.Desc = "特殊的商品SKU"
+	db_session.Insert(order_hold_type)
+
+	// ORDER_HOLD_TYPE_SPECIAL_NOT_SHIP      int64 = 10190 // 特殊情况实际未发货
+	order_hold_type = new(OrderHoldTypeInfo)
+	order_hold_type.Id = ORDER_HOLD_TYPE_SPECIAL_NOT_SHIP
+	order_hold_type.Name = "特殊情况实际未发货"
+	order_hold_type.Desc = "特殊情况实际未发货"
 	db_session.Insert(order_hold_type)
 }

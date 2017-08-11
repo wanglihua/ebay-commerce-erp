@@ -85,6 +85,10 @@
                         <i class="ace-icon fa fa-shopping-basket"></i>
                         正常包裹实际无货
                     </button>
+                    <button class="btn btn-pink btn-sm" @click="showSpecialNotShip()">
+                        <i class="ace-icon fa fa-shopping-basket"></i>
+                        特殊情况实际未发货
+                    </button>
                     {% end %}
                     {% if eq .status "yfh" %}
                     <button class="btn btn-purple btn-sm" @click="wanCheng()">
@@ -354,6 +358,45 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-success btn-sm" @click="makePickup()">
+                        <i class="ace-icon fa fa-floppy-o"></i>导出
+                    </button>
+                    <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">
+                        <i class="ace-icon fa fa-times"></i>取消
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="specialNotShipDialog">
+        <div class="modal-dialog" style="width: 480px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="True">&times;</button>
+                    <h4 class="modal-title">设置特殊情况实际未发货</h4>
+                </div>
+                <div class="modal-body clearfix">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <form class="form-horizontal" role="form" id="specialNotShipForm">
+
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <label for="special_not_ship_desc" class="col-xs-2 control-label">描述</label>
+                                            <div class="col-xs-10">
+                                                <textarea id="special_not_ship_desc" name="special_not_ship_desc" rows="4" class="input-sm form-control"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success btn-sm" @click="specialNotShip()">
                         <i class="ace-icon fa fa-floppy-o"></i>导出
                     </button>
                     <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">
@@ -952,6 +995,59 @@
                         url: '{%url "ErpOrder.ShiJiWuHuo"%}',
                         type: "POST",
                         data: {"id_list": id_list},
+                        success: function (data) {
+                            if (data.success === false) {
+                                $.msg.error(data.message);
+                                return;
+                            }
+                            else {
+                                $.msg.show(data.message);
+                            }
+                            vm.reloadList();
+                        }
+                    });
+                });
+            },
+            showSpecialNotShip: function () {
+                var id_list = [];
+                $('#orderList tbody tr>td:first-child input:checkbox').each(function () {
+                    if (this.checked) {
+                        id_list.push($(this).val());
+                    }
+                });
+
+                if (id_list.length !== 1) {
+                    $.msg.alert("请选择一条数据数据！");
+                    return;
+                }
+
+                $("#special_not_ship_desc").val("");
+
+                $('#specialNotShipDialog').modal(modalOptions);
+            },
+            specialNotShip: function () {
+                var id_list = [];
+                $('#orderList tbody tr>td:first-child input:checkbox').each(function () {
+                    if (this.checked) {
+                        id_list.push($(this).val());
+                    }
+                });
+
+                if (id_list.length !== 1) {
+                    $.msg.alert("请选择一条数据数据！");
+                    return;
+                }
+
+                var desc = $("#special_not_ship_desc").val();
+
+                $.msg.confirm("确认要设置 特殊情况实际未发货 吗？", function () {
+                    $.ajax({
+                        url: '{%url "ErpOrder.SpecialNotShip"%}',
+                        type: "POST",
+                        data: {
+                            "id_list": id_list,
+                            "desc": desc
+                        },
                         success: function (data) {
                             if (data.success === false) {
                                 $.msg.error(data.message);

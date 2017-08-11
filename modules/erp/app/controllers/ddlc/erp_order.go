@@ -1178,6 +1178,75 @@ func (c ErpOrder) ShiJiWuHuo() revel.Result {
 	})
 }
 
+func (c ErpOrder) SpecialNotShip() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_PHZ, c.Session)
+
+	db_session := c.DbSession
+
+	order_id_list := make([]int64, 0)
+	c.Params.Bind(&order_id_list, "id_list")
+
+	var desc string
+	c.Params.Bind(&desc, "desc")
+
+	if len(order_id_list) != 1 {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "请选择一条订单",
+		})
+	}
+
+	if strings.TrimSpace(desc) == "" {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "请输入描述!",
+		})
+	}
+
+	var order_list = make([]models.OrderInfo, 0)
+	err := db_session.In("id", order_id_list).Find(&order_list)
+	core.HandleError(err)
+
+	for _, order := range order_list {
+		if (order.StatusId != models.ORDER_STATUS_PHZ && order.StatusId != models.ORDER_STATUS_HOLD) ||
+			(order.StatusId == models.ORDER_STATUS_HOLD && (
+				order.HoldTypeId.Int64 != models.ORDER_HOLD_TYPE_ENVELOPE &&
+					order.HoldTypeId.Int64 != models.ORDER_HOLD_TYPE_EXPRESS &&
+					order.HoldTypeId.Int64 != models.ORDER_HOLD_TYPE_INTERNATIONAL &&
+					order.HoldTypeId.Int64 != models.ORDER_HOLD_TYPE_PICK_UP)) {
+			return c.RenderJson(map[string]interface{}{
+				"success": false,
+				"message": "订单当前状态不是配货中或hold，不能设置 特殊情况实际未发货！",
+			})
+		}
+	}
+
+	var login_user = core.GetLoginUser(c.Session)
+
+	for _, order := range order_list {
+		order.StatusId = models.ORDER_STATUS_HOLD
+		order.HoldTypeId = core.MakeNullInt(models.ORDER_HOLD_TYPE_OOS_ACTUAL_STOCK, true)
+
+		if order.Desc.Valid == false {
+			order.Desc = core.MakeNullString(desc, true)
+		} else {
+			order.Desc = core.MakeNullString(order.Desc.String+desc, true)
+		}
+
+		_, err = db_session.Id(order.Id).Cols("status_id", "hold_type_id", "desc").Update(&order)
+		core.HandleError(err)
+
+		order_history_service.Insert_order_history(order, login_user.UserId, fmt.Sprintf("特殊情况实际未发货，工号： %s", login_user.LoginName), db_session)
+	}
+
+	go inventory_service.Calculate_inventory_pending_qty()
+
+	return c.RenderJson(map[string]interface{}{
+		"success": true,
+		"message": "订单设置 特殊情况实际未发货 成功！",
+	})
+}
+
 func (c ErpOrder) WanCheng() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_YFH, c.Session)
 
