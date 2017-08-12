@@ -22,6 +22,7 @@ import (
 	"matrix/modules/erp/service/stock_service"
 	"matrix/modules/erp/service/order_history_service"
 	"time"
+	"encoding/json"
 )
 
 type ErpOrder struct {
@@ -617,6 +618,15 @@ func (c ErpOrder) Detail(order_id int64) revel.Result {
 
 	c.RenderArgs["is_pickup"] = is_pickup
 
+	var is_pickup_paid int64 = 0
+	var pickup_order models.PickupOrderInfo
+	_, err = db_session.Where("order_id = ?", order_id).Get(&pickup_order)
+	core.HandleError(err)
+
+	is_pickup_paid = pickup_order.IsPaid
+
+	c.RenderArgs["is_pickup_paid"] = is_pickup_paid
+
 	return c.RenderTemplate("erp/ddlc/order/order_detail.html")
 }
 
@@ -762,34 +772,40 @@ WHERE oi.order_id = %d;`
 	var pickup_pay_method_list = make([]models.PickupPayMethodInfo, 0)
 	core.HandleError(db_session.Find(&pickup_pay_method_list))
 
+	var pickup_actual_pay_method_list = make([]models.PickupPayMethodInfo, 0)
+	core.HandleError(db_session.In("id", []int64{models.PICKUP_PAY_METHOD_CARD, models.PICKUP_PAY_METHOD_CASH}).Find(&pickup_actual_pay_method_list))
+
 	var pickup_order models.PickupOrderInfo
 	if order.HoldTypeId.Int64 == models.ORDER_HOLD_TYPE_PICK_UP {
 		_, err := db_session.Where("order_id = ?", order.Id).Get(&pickup_order)
 		core.HandleError(err)
 	}
 
+	pickup_order.ActualAmount = order.AmountPaid
+
 	return c.RenderJson(map[string]interface{}{
-		"order":                   order,
-		"status":                  status,
-		"shop":                    shop,
-		"order_type":              order_type,
-		"ebay_shipping_address":   ebay_shipping_address,
-		"paypal_shipping_address": paypal_shipping_address,
-		"shipping_address":        shipping_address,
-		"order_hold_type":         order_hold_type,
-		"order_item_list":         order_item_list,
-		"inventory_list":          inventory_list,
-		"order_logistics":         order_logistics,
-		"logistics_setting":       logistics_setting,
-		"order_cost_amount":       order_cost_amount, // rmb
-		"logistics_fee":           logistics_fee,     // rmb
-		"order_gst":               order_gst,         // aud
-		"order_profit":            order_profit,      //rmb
-		"au_stock_list":           au_stock_list,
-		"logistics_stock":         logistics_stock,
-		"logistics_mode":          logistics_mode,
-		"pickup":                  pickup_order,
-		"pickup_pay_method_list":  pickup_pay_method_list,
+		"order":                         order,
+		"status":                        status,
+		"shop":                          shop,
+		"order_type":                    order_type,
+		"ebay_shipping_address":         ebay_shipping_address,
+		"paypal_shipping_address":       paypal_shipping_address,
+		"shipping_address":              shipping_address,
+		"order_hold_type":               order_hold_type,
+		"order_item_list":               order_item_list,
+		"inventory_list":                inventory_list,
+		"order_logistics":               order_logistics,
+		"logistics_setting":             logistics_setting,
+		"order_cost_amount":             order_cost_amount, // rmb
+		"logistics_fee":                 logistics_fee,     // rmb
+		"order_gst":                     order_gst,         // aud
+		"order_profit":                  order_profit,      //rmb
+		"au_stock_list":                 au_stock_list,
+		"logistics_stock":               logistics_stock,
+		"logistics_mode":                logistics_mode,
+		"pickup":                        pickup_order,
+		"pickup_pay_method_list":        pickup_pay_method_list,
+		"pickup_actual_pay_method_list": pickup_actual_pay_method_list,
 	})
 }
 
@@ -853,6 +869,50 @@ func (c ErpOrder) Save() revel.Result {
 
 	return c.RenderEmpty()
 }
+
+func (c ErpOrder) SavePickupActual() revel.Result {
+	var db_session = c.DbSession
+
+	var pick_order models.PickupOrderInfo
+	err := json.Unmarshal(c.GetRequestBody(), &pick_order)
+	core.HandleError(err)
+
+	if pick_order.ActualPayMethodId == 0 {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "现场付款方式不能为空！",
+		})
+	}
+
+	_, err = db_session.Id(pick_order.Id).Cols("actual_is_paid", "actual_pay_method_id").Update(&pick_order)
+	core.HandleError(err)
+
+	var order models.OrderInfo
+	_, err = db_session.Id(pick_order.OrderId).Get(&order)
+	core.HandleError(err)
+
+	order.AdjustmentAmount = pick_order.ActualAmount
+	order.AdjustmentAmountCurrency = "AUD"
+	order.AdjustmentAmountRmb = pick_order.ActualAmount * order.ExchangeRate
+	order.AmountPaid = pick_order.ActualAmount
+	order.AmountPaidCurrency = "AUD"
+	order.AmountPaidRmb = pick_order.ActualAmount * order.ExchangeRate
+	order.TotalAmount = pick_order.ActualAmount
+	order.TotalAmountCurrency = "AUD"
+	order.TotalAmountRmb = pick_order.ActualAmount * order.ExchangeRate
+
+	_, err = db_session.Id(order.Id).
+		Cols("adjustment_amount", "adjustment_amount_currency", "adjustment_amount_rmb", "amount_paid", "amount_paid_currency", "amount_paid_rmb", "total_amount", "total_amount_currency", "total_amount_rmb").
+		Update(&order)
+	core.HandleError(err)
+
+	return c.RenderJson(map[string]interface{}{
+		"success": true,
+		"message": "保存PICK现场收款信息成功！",
+	})
+}
+
+// SavePickupActual
 
 func (c ErpOrder) GetPaypalShippingAddress() revel.Result {
 	db_session := c.DbSession
@@ -1103,7 +1163,7 @@ func (c ErpOrder) FaHuo() revel.Result {
 			_, err := db_session.Where("order_id = ?", order.Id).Get(&pickup_order_info)
 			core.HandleError(err)
 
-			if pickup_order_info.IsPaid == 0 {
+			if pickup_order_info.IsPaid == 0 && pickup_order_info.ActualIsPaid == 0 {
 				return c.RenderJson(map[string]interface{}{
 					"success": false,
 					"message": "PICKUP订单未收款不能搬至已发货！",

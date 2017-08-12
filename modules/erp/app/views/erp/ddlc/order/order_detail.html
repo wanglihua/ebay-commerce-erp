@@ -532,6 +532,7 @@
                             </div>
                         </div>
 
+                        {% if eq .is_pickup_paid 0 %}
                         <div class="row">
                             <div class="col-xs-3">
                                 <div class="form-group">
@@ -549,7 +550,7 @@
                                     <label for="pickup_actual_pay_method_id" class="col-xs-5 control-label">现场收款方式：</label>
                                     <div class="col-xs-7">
                                         <select id="pickup_actual_pay_method_id" name="pickup_actual_pay_method_id" class="input-sm form-control" v-model.number="pickup.actual_pay_method_id">
-                                            <template v-for="pay_method in pickup_pay_method_list">
+                                            <template v-for="pay_method in pickup_actual_pay_method_list">
                                                 <option :value="pay_method.id">{{pay_method.name}}</option>
                                             </template>
                                         </select>
@@ -558,7 +559,7 @@
                             </div>
                             <div class="col-xs-3">
                                 <div class="form-group">
-                                    <label for="pickup_actual_amount" class="col-xs-5 control-label">实际收款金额：</label>
+                                    <label for="pickup_actual_amount" class="col-xs-5 control-label">实际收款澳币：</label>
                                     <div class="col-xs-7">
                                         <input id="pickup_actual_amount" name="pickup_actual_amount" class="input-sm form-control" v-model.number="pickup.actual_amount"/>
                                     </div>
@@ -573,6 +574,7 @@
                             <button class="btn btn-sm btn-purple" @click="savePickupActual">保存</button>
                         </div>
                     </div>
+                    {% end %}
                     {% end %}
                 </div>
             </div>
@@ -910,6 +912,7 @@
             },
             "pickup": {},
             "pickup_pay_method_list": [],
+            "pickup_actual_pay_method_list": [],
             "order_item_detail": {},
             "logistics_mode_list": []
         },
@@ -933,6 +936,7 @@
                         this_vm.order_item_detail.order_id = order_id;
                         this_vm.pickup = data.pickup;
                         this_vm.pickup_pay_method_list = data.pickup_pay_method_list;
+                        this_vm.pickup_actual_pay_method_list = data.pickup_actual_pay_method_list;
                     }
                 });
         },
@@ -1142,7 +1146,7 @@
                     hideMask();
                 } else {
                     $.ajax({
-                            url: '{%url "ErpOrderItem.SavePickupActual"%}',
+                            url: '{%url "ErpOrder.SavePickupActual"%}',
                             type: "POST",
                             processData: false,
                             contentType: 'application/json',
