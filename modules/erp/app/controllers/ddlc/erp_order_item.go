@@ -11,7 +11,6 @@ import (
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/order_service"
 	"matrix/modules/erp/service/inventory_service"
-	"matrix/modules/erp/service/exchange_rate_service"
 )
 
 type ErpOrderItem struct {
@@ -112,16 +111,11 @@ func (c ErpOrderItem) Save() revel.Result {
 	order_item.ItemSku = order_item_form.Sku
 	order_item.Quantity = order_item_form.Qty
 
-	var aud_rate = exchange_rate_service.Get_aud_exchange_rate(db_session)
-
-	var order_item_list = make([]models.OrderItemInfo, 0)
-	core.HandleError(db_session.Where("order_id = ?", order.Id).Find(&order_item_list))
-
 	//获取成本价 AUD
 	if stock_id == 0 {
-		order_item.CostPrice = inventory_service.GetProductCnStockCostPrice(product.Id, db_session) / aud_rate
+		order_item.CostPrice = inventory_service.GetProductCnStockCostPrice(product.Id, db_session) / order.ExchangeRate
 	} else {
-		order_item.CostPrice = inventory_service.GetProductStockCostPrice(stock_id, product.Id, db_session) / aud_rate
+		order_item.CostPrice = inventory_service.GetProductStockCostPrice(stock_id, product.Id, db_session) / order.ExchangeRate
 	}
 
 	if order_item_form.ItemId == 0 {
@@ -153,6 +147,9 @@ func (c ErpOrderItem) Save() revel.Result {
 	_, err = db_session.Id(order.Id).Cols("profit_au", "profit_rmb").Update(&order)
 	core.HandleError(err)
 
+	var order_item_list = make([]models.OrderItemInfo, 0)
+	core.HandleError(db_session.Where("order_id = ?", order.Id).Find(&order_item_list))
+
 	/*
 	order_import_same_code_list[index].price_au = ((order_import.cost_price * (float64(order_import.Spsl)) / cost_price_total) * order_import.Skje) / float64(order_import.Spsl)
 	order_import_same_code_list[index].price_rmb = order_import_same_code_list[index].price_au * aud_exchange_rate_setting
@@ -163,7 +160,7 @@ func (c ErpOrderItem) Save() revel.Result {
 		// 价格分配
 		oi.TransactionPrice = oi.CostPrice * float64(oi.Quantity) * order.AmountPaid / order_cost_amount / float64(oi.Quantity)
 		oi.TransactionPriceCurrency = "AUD"
-		oi.TransactionPriceRmb = oi.TransactionPrice * aud_rate
+		oi.TransactionPriceRmb = oi.TransactionPrice * order.ExchangeRate
 
 		// 利润分配
 		oi.GrossProfit = oi.CostPrice * float64(oi.Quantity) * order.ProfitAu / order_cost_amount
