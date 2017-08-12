@@ -607,7 +607,14 @@ func (c ErpOrder) Detail(order_id int64) revel.Result {
 	c.RenderArgs["is_dph"] = order.StatusId == models.ORDER_STATUS_DPH
 
 	// 不是 已发货 已完成 已取消 状态的都能修改
-	c.RenderArgs["can_modify"] = order_service.Can_order_modify(&order)
+	var can_modify = order_service.Can_order_modify(&order)
+	c.RenderArgs["can_modify"] = can_modify
+
+	var can_modify_disabled = template.HTML("")
+	if can_modify == false {
+		can_modify_disabled = template.HTML(` disabled="disabled" `)
+	}
+	c.RenderArgs["can_modify_disabled"] = can_modify_disabled
 
 	c.RenderArgs["can_edit_waybill_number"] = order_service.Can_order_modify_waybill_number(&order)
 
@@ -779,6 +786,7 @@ WHERE oi.order_id = %d;`
 	if order.HoldTypeId.Int64 == models.ORDER_HOLD_TYPE_PICK_UP {
 		_, err := db_session.Where("order_id = ?", order.Id).Get(&pickup_order)
 		core.HandleError(err)
+		pickup_order.OrderId = order.Id
 	}
 
 	pickup_order.ActualAmount = order.AmountPaid
@@ -873,33 +881,44 @@ func (c ErpOrder) Save() revel.Result {
 func (c ErpOrder) SavePickupActual() revel.Result {
 	var db_session = c.DbSession
 
-	var pick_order models.PickupOrderInfo
-	err := json.Unmarshal(c.GetRequestBody(), &pick_order)
+	var pickup_order models.PickupOrderInfo
+	err := json.Unmarshal(c.GetRequestBody(), &pickup_order)
 	core.HandleError(err)
 
-	if pick_order.ActualPayMethodId == 0 {
+	if pickup_order.ActualPayMethodId == 0 {
 		return c.RenderJson(map[string]interface{}{
 			"success": false,
 			"message": "现场付款方式不能为空！",
 		})
 	}
 
-	_, err = db_session.Id(pick_order.Id).Cols("actual_is_paid", "actual_pay_method_id").Update(&pick_order)
+	var pickup_order_in_db models.PickupOrderInfo
+	has, err := db_session.Where("order_id = ?", pickup_order.OrderId).Get(&pickup_order_in_db)
 	core.HandleError(err)
+
+	if has == true {
+		pickup_order_in_db.ActualIsPaid = pickup_order.ActualIsPaid
+		pickup_order_in_db.ActualPayMethodId = pickup_order.ActualPayMethodId
+		_, err = db_session.Id(pickup_order.Id).Cols("actual_is_paid", "actual_pay_method_id").Update(&pickup_order_in_db)
+		core.HandleError(err)
+	} else {
+		_, err = db_session.Insert(&pickup_order)
+		core.HandleError(err)
+	}
 
 	var order models.OrderInfo
-	_, err = db_session.Id(pick_order.OrderId).Get(&order)
+	_, err = db_session.Id(pickup_order.OrderId).Get(&order)
 	core.HandleError(err)
 
-	order.AdjustmentAmount = pick_order.ActualAmount
+	order.AdjustmentAmount = pickup_order.ActualAmount
 	order.AdjustmentAmountCurrency = "AUD"
-	order.AdjustmentAmountRmb = pick_order.ActualAmount * order.ExchangeRate
-	order.AmountPaid = pick_order.ActualAmount
+	order.AdjustmentAmountRmb = pickup_order.ActualAmount * order.ExchangeRate
+	order.AmountPaid = pickup_order.ActualAmount
 	order.AmountPaidCurrency = "AUD"
-	order.AmountPaidRmb = pick_order.ActualAmount * order.ExchangeRate
-	order.TotalAmount = pick_order.ActualAmount
+	order.AmountPaidRmb = pickup_order.ActualAmount * order.ExchangeRate
+	order.TotalAmount = pickup_order.ActualAmount
 	order.TotalAmountCurrency = "AUD"
-	order.TotalAmountRmb = pick_order.ActualAmount * order.ExchangeRate
+	order.TotalAmountRmb = pickup_order.ActualAmount * order.ExchangeRate
 
 	_, err = db_session.Id(order.Id).
 		Cols("adjustment_amount", "adjustment_amount_currency", "adjustment_amount_rmb", "amount_paid", "amount_paid_currency", "amount_paid_rmb", "total_amount", "total_amount_currency", "total_amount_rmb").
