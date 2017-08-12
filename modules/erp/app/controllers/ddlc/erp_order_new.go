@@ -167,7 +167,7 @@ func (c ErpOrderNew) Save() revel.Result {
 
 		order.AddressId = shipping_address.Id
 		order.StockId = stock_id
-		_, err = db_session.Cols("address_id", "stock_id").Update(&order)
+		_, err = db_session.Id(order.Id).Cols("address_id", "stock_id").Update(&order)
 		core.HandleError(err)
 
 	}
