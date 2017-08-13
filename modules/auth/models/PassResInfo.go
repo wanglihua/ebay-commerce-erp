@@ -310,6 +310,7 @@ func (e PassResInfo) InitData(db_session *xorm.Session) {
 		pass.Desc = core.MakeNullString("商品库存 库存成本", true)
 		db_session.Insert(pass)
 
+		/*
 		pass = new(PassResInfo)
 		pass.Id = pass_res.KCGL_INVENTORY_CHECK
 		pass.CateId = pass_res_cate.KCGL
@@ -323,6 +324,7 @@ func (e PassResInfo) InitData(db_session *xorm.Session) {
 		pass.Name = "盘点审批"
 		pass.Desc = core.MakeNullString("盘点审批", true)
 		db_session.Insert(pass)
+		*/
 
 		pass = new(PassResInfo)
 		pass.Id = pass_res.KCGL_STOCKBILL_TRANSFER
@@ -331,6 +333,7 @@ func (e PassResInfo) InitData(db_session *xorm.Session) {
 		pass.Desc = core.MakeNullString("分仓调拨", true)
 		db_session.Insert(pass)
 
+		/*
 		pass = new(PassResInfo)
 		pass.Id = pass_res.KCGL_STOCKBILL_CHECKIN
 		pass.CateId = pass_res_cate.KCGL
@@ -344,6 +347,7 @@ func (e PassResInfo) InitData(db_session *xorm.Session) {
 		pass.Name = "手工出库"
 		pass.Desc = core.MakeNullString("手工出库", true)
 		db_session.Insert(pass)
+		*/
 
 		// KCGL_SPECIAL_SKU
 		pass = new(PassResInfo)
