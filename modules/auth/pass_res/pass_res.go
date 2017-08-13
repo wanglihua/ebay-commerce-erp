@@ -75,7 +75,7 @@ const (
 	KCGL_INVENTORY_IMPORT_QTY_OVER = 140510 // 商品库存 导入覆盖库存数量
 	KCGL_INVENTORY_IMPORT_QTY_DIFF = 140520 // 商品库存 导入修正库存数量
 	KCGL_INVENTORY_SKU_LOC         = 140501 // 商品库存 商品库位
-	KCGL_INVENTORY_SKU_QTY         = 140502 // 商品库存 库存数量
+	//KCGL_INVENTORY_SKU_QTY         = 140502 // 商品库存 库存数量
 	KCGL_INVENTORY_SKU_PRICE       = 140503 // 商品库存 库存成本
 	KCGL_INVENTORY_CHECK           = 140600 // 库存盘点
 	KCGL_INVENTORY_CHECK_APPROVE   = 140700 // 盘点审批

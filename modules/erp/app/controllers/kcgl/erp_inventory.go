@@ -31,7 +31,7 @@ func (c ErpInventory) Index() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.KCGL_INVENTORY, c.Session)
 
 	var has_sku_loc_res = pass_service.Is_login_user_has_pass(pass_res.KCGL_INVENTORY_SKU_LOC, c.Session)
-	var has_sku_qty_res = pass_service.Is_login_user_has_pass(pass_res.KCGL_INVENTORY_SKU_QTY, c.Session)
+	var has_sku_qty_res = pass_service.Is_login_user_has_pass(pass_res.KCGL_INVENTORY_IMPORT_QTY_OVER, c.Session) || pass_service.Is_login_user_has_pass(pass_res.KCGL_INVENTORY_IMPORT_QTY_DIFF, c.Session)
 	var has_sku_price_res = pass_service.Is_login_user_has_pass(pass_res.KCGL_INVENTORY_SKU_PRICE, c.Session)
 
 	c.RenderArgs["has_sku_loc_res"] = has_sku_loc_res
@@ -1578,7 +1578,7 @@ func (c ErpInventory) ImportInventoryQuantity() revel.Result {
 }
 
 func (c ErpInventory) ExportInventoryQuantity() revel.Result {
-	pass_service.Check_login_user_pass(pass_res.KCGL_INVENTORY_SKU_QTY, c.Session)
+	pass_service.Check_login_user_pass_or([]int64{pass_res.KCGL_INVENTORY_IMPORT_QTY_OVER, pass_res.KCGL_INVENTORY_IMPORT_QTY_DIFF}, c.Session)
 
 	db_session := c.DbSession
 
