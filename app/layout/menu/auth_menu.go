@@ -59,6 +59,16 @@ func GetAuthMenu(res_id_map map[int64]bool, web_session revel.Session) string {
         </li>`)
 		}
 
+		if check_pass_res_menu(pass_res.SPPZ_STOCK_PICK_CREW) {
+			buffer.WriteString(`<li id="auth-stock-pick-crew-menu" class="">
+            <a href="/stock/pick/crew">
+                <i class="menu-icon fa fa-caret-right"></i>
+                仓库拣货人员
+            </a>
+            <b class="arrow"></b>
+        </li>`)
+		}
+
 		if login_user.IsSuperAdmin == true {
 			buffer.WriteString(`<li id="auth-admin-menu" class="">
             <a href="/auth/admin">
