@@ -59,6 +59,8 @@ func main() {
 		}
 	}
 
+	revel.Init(runMode, importPath, srcPath)
+
 	var err error
 	if strings.TrimSpace(service_action) == "" {
 		show_cmd_usage()
@@ -133,7 +135,6 @@ func run_web() {
 
 	lic.ValidAppLic(app.AppNameForLic, lic_file_path)
 
-	revel.Init(runMode, importPath, srcPath)
 	revel.INFO.Println("Running revel server")
 
 	{{range $i, $c := .Controllers}}
