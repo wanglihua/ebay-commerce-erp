@@ -1243,8 +1243,8 @@ func (c ErpOrder) FaHuo() revel.Result {
 	var mel_stock_id = stock_service.Get_mel_stock_id(db_session)
 
 	for _, order := range order_list {
-		if order.StatusId == models.ORDER_STATUS_HOLD {
-			// 是Hold直接发货的，把 Hold订单的仓库直接设置为墨尔本的仓库
+		if order.StatusId == models.ORDER_STATUS_HOLD && order.HoldTypeId.Int64 != models.ORDER_HOLD_TYPE_PICK_UP {
+			// 是Hold直接发货的，把 Hold订单的仓库直接设置为墨尔本的仓库，但 pickup 的有自己的仓库
 			order.StockId = mel_stock_id
 			_, err = db_session.Id(order.Id).Cols("stock_id").Update(&order)
 			core.HandleError(err)
