@@ -10,8 +10,8 @@ import (
 	auth_models "matrix/modules/auth/models"
 	"encoding/json"
 	"matrix/modules/erp/service/exchange_rate_service"
-	"time"
 	"matrix/modules/erp/service/order_history_service"
+	"time"
 )
 
 type ErpOrderNew struct {
@@ -50,14 +50,48 @@ func (c ErpOrderNew) CreateData() revel.Result {
 	core.HandleError(db_session.Find(&user_list))
 
 	var au_stock_list = make([]models.StockInfo, 0)
-	core.HandleError(db_session.Where("stock_type_id = ?", models.STOCK_TYPE_AU).Find(&au_stock_list))
+
+	var login_user = core.GetLoginUser(c.Session)
+
+	/*
+SELECT count(*) AS gu_count
+FROM auth_group_user gu
+WHERE gu.group_id = 11300 AND gu.user_id = 22;
+	 */
+
+	var GuCount struct {
+		Count int64 `xorm:"'gu_count'"`
+	}
+
+	var gu_count_sql = `SELECT count(*) AS gu_count
+FROM auth_group_user gu
+WHERE gu.group_id = %d AND gu.user_id = %d;`
+	gu_count_sql = fmt.Sprintf(gu_count_sql, auth_models.GROUP_PICK_CREW, login_user.UserId)
+	_, err := db_session.Sql(gu_count_sql).Get(&GuCount)
+	core.HandleError(err)
+
+	if GuCount.Count != 0 { // 如果是拣货人员
+		/*
+SELECT s.*
+FROM erp_stock_pick_crew spc
+    INNER JOIN erp_stock s ON s.id = spc.stock_id
+WHERE s.stock_type_id = 300 AND spc.user_id = 22;
+		 */
+
+		var stock_list_sql = `SELECT s.*
+FROM erp_stock_pick_crew spc
+    INNER JOIN erp_stock s ON s.id = spc.stock_id
+WHERE s.stock_type_id = %d AND spc.user_id = %d;`
+		stock_list_sql = fmt.Sprintf(stock_list_sql, models.STOCK_TYPE_AU, login_user.UserId)
+		core.HandleError(db_session.Sql(stock_list_sql).Find(&au_stock_list))
+	} else {
+		core.HandleError(db_session.Where("stock_type_id = ?", models.STOCK_TYPE_AU).Find(&au_stock_list))
+	}
 
 	var stock_id int64 = 0
 	if len(au_stock_list) > 0 {
 		stock_id = au_stock_list[0].Id
 	}
-
-	var login_user = core.GetLoginUser(c.Session)
 
 	return c.RenderJson(map[string]interface{}{
 		"type_list":              order_type_list,

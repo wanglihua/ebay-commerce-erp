@@ -107,7 +107,7 @@ func GetDdpzMenu(res_id_map map[int64]bool, web_session revel.Session) string {
 
 	if check_pass_res_menu(pass_res.DDPZ_ORDER_TAG) {
 		buffer.WriteString(`<li id="ddpz-ordertag-menu" class="">
-            <a href="/erp/order/tag">
+            <a href="/order/tag">
                 <i class="menu-icon fa fa-caret-right"></i>
                 订单标签
             </a>
