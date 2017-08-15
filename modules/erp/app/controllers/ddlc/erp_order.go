@@ -462,7 +462,7 @@ func (c ErpOrder) ListData() revel.Result {
 		// 如果是待配货状态，除了显示待配货状态的订单外，还要显示特殊 hold 类型的 hold 状态的订单，但如果是只有仓库拣货人员的权限的话，就只能由墨尔本仓库的拣货人员来查看
 		if status_id == models.ORDER_STATUS_DPH {
 
-			if can_view_special_hold(c.Session, db_session) { // 是待配货状态，且也有权限查看 hold
+			if can_view_special_hold(c.Session, db_session) || hold_type_id == models.ORDER_HOLD_TYPE_PICK_UP { // 是待配货状态，且也有权限查看 hold, // pickup 的任何人员都可以看到
 				// -1 表示不选中任何 hold
 				if hold_type_id == -1 { // 不选中任何 hold 时，只显示 DPH 的订单
 					filter = core.SqlAnd(filter, fmt.Sprintf("o.status_id = %d", models.ORDER_STATUS_DPH))
