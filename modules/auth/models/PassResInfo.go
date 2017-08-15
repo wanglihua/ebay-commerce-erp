@@ -452,6 +452,23 @@ func (e PassResInfo) InitData(db_session *xorm.Session) {
 		db_session.Insert(pass)
 	}
 
+	// 商品质量反馈
+	{
+		pass := new(PassResInfo)
+		pass.Id = pass_res.SPZLFK_PRODUCT_FEEDBACK_CATE
+		pass.CateId = pass_res_cate.SPZLFK
+		pass.Name = "商品质量反馈类别"
+		pass.Desc = core.MakeNullString("商品质量反馈类别", true)
+		db_session.Insert(pass)
+
+		pass = new(PassResInfo)
+		pass.Id = pass_res.SPZLFK_PRODUCT_FEEDBACK
+		pass.CateId = pass_res_cate.SPZLFK
+		pass.Name = "商品质量反馈"
+		pass.Desc = core.MakeNullString("商品质量反馈", true)
+		db_session.Insert(pass)
+	}
+
 	// 商品报表
 	{
 		pass := new(PassResInfo)

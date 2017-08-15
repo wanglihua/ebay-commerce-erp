@@ -119,4 +119,10 @@ func (e PassResCateInfo) InitData(db_session *xorm.Session) {
 	cate.Name = "系统配置"
 	cate.Desc = core.MakeNullString("系统配置", true)
 	db_session.Insert(cate)
+
+	cate = new(PassResCateInfo)
+	cate.Id = pass_res_cate.SPZLFK
+	cate.Name = "商品质量反馈"
+	cate.Desc = core.MakeNullString("商品质量反馈", true)
+	db_session.Insert(cate)
 }
