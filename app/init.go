@@ -7,7 +7,17 @@ import (
 	"github.com/revel/revel"
 )
 
-var AppName string = "ozoerp"
+var AppNameForLic string = "ozoerp"
+
+var app_name_for_service = ""
+
+func GetAppNameForService() string {
+	if app_name_for_service == "" {
+		app_name_for_service = revel.Config.StringDefault("app.service.name", "app_service_name")
+	}
+
+	return app_name_for_service
+}
 
 var green_paint, blue_paint func(v ...interface{}) string
 
