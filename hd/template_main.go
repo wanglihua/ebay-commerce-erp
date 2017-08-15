@@ -59,9 +59,25 @@ func main() {
 		}
 	}
 
-	revel.Init(runMode, importPath, srcPath)
+	currentDir, err := filepath.Abs(filepath.Dir(os.Args[0]))
+	if err != nil {
+		log.Fatal(err)
+	}
 
-	var err error
+	lic_file_path := ""
+
+	if runMode == "prod" {
+		srcPath = currentDir
+		lic_file_path = currentDir + string(os.PathSeparator) + importPath + string(os.PathSeparator) + "app.lic"
+	} else {
+		lic_file_path = os.Getenv("GOPATH") + string(os.PathSeparator) + "src" + string(os.PathSeparator) + importPath + string(os.PathSeparator) + "app.lic"
+	}
+
+	lic.ValidAppLic(app.AppNameForLic, lic_file_path)
+
+	revel.Init(runMode, importPath, srcPath)
+	revel.INFO.Println("Running revel server")
+
 	if strings.TrimSpace(service_action) == "" {
 		show_cmd_usage()
 		run_web()
@@ -119,23 +135,6 @@ func show_cmd_usage() {
 }
 
 func run_web() {
-	currentDir, err := filepath.Abs(filepath.Dir(os.Args[0]))
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	lic_file_path := ""
-
-	if runMode == "prod" {
-		srcPath = currentDir
-		lic_file_path = currentDir + string(os.PathSeparator) + importPath + string(os.PathSeparator) + "app.lic"
-	} else {
-		lic_file_path = os.Getenv("GOPATH") + string(os.PathSeparator) + "src" + string(os.PathSeparator) + importPath + string(os.PathSeparator) + "app.lic"
-	}
-
-	lic.ValidAppLic(app.AppNameForLic, lic_file_path)
-
-	revel.INFO.Println("Running revel server")
 
 	{{range $i, $c := .Controllers}}
 	revel.RegisterController((*{{index $.ImportPaths .ImportPath}}.{{.StructName}})(nil),
