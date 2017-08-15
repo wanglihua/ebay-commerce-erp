@@ -23,6 +23,7 @@ import (
 	"matrix/modules/erp/service/order_history_service"
 	"time"
 	"encoding/json"
+	"sync"
 )
 
 type ErpOrder struct {
@@ -1199,7 +1200,12 @@ func (c ErpOrder) ForcePeiHuo() revel.Result {
 	})
 }
 
+var fahuo_mutex sync.Mutex
+
 func (c ErpOrder) FaHuo() revel.Result {
+	// 通过互斥锁来解决并发发货多次同时扣减库存的问题
+	fahuo_mutex.Lock()
+
 	pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_PHZ, c.Session)
 
 	db_session := c.DbSession
@@ -1280,6 +1286,8 @@ func (c ErpOrder) FaHuo() revel.Result {
 
 	// 更新库存待配货数量
 	go inventory_service.Calculate_inventory_pending_qty()
+
+	fahuo_mutex.Unlock()
 
 	if take_inventory_result == true {
 		return c.RenderJson(map[string]interface{}{
