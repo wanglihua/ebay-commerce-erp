@@ -131,7 +131,7 @@ func run_web() {
 		lic_file_path = os.Getenv("GOPATH") + string(os.PathSeparator) + "src" + string(os.PathSeparator) + importPath + string(os.PathSeparator) + "app.lic"
 	}
 
-	lic.ValidAppLic(app.AppName, lic_file_path)
+	lic.ValidAppLic(app.AppNameForLic, lic_file_path)
 
 	revel.Init(runMode, importPath, srcPath)
 	revel.INFO.Println("Running revel server")
