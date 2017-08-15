@@ -899,7 +899,8 @@ func (c ErpOrder) SavePickupActual() revel.Result {
 	if has == true {
 		pickup_order_in_db.ActualIsPaid = pickup_order.ActualIsPaid
 		pickup_order_in_db.ActualPayMethodId = pickup_order.ActualPayMethodId
-		_, err = db_session.Id(pickup_order.Id).Cols("actual_is_paid", "actual_pay_method_id").Update(&pickup_order_in_db)
+		pickup_order_in_db.Description = pickup_order.Description
+		_, err = db_session.Id(pickup_order.Id).Cols("actual_is_paid", "actual_pay_method_id", "description").Update(&pickup_order_in_db)
 		core.HandleError(err)
 	} else {
 		_, err = db_session.Insert(&pickup_order)

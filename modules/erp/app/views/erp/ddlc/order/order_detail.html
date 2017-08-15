@@ -566,6 +566,15 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="col-xs-3">
+                                <div class="form-group">
+                                    <label for="pickup_description" class="col-xs-5 control-label">描述：</label>
+                                    <div class="col-xs-7">
+                                        <input id="pickup_description" name="pickup_description" class="input-sm form-control" v-model="pickup.description"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--description-->
                         </div>
                         {% else %}
                         <div class="row">
@@ -597,6 +606,14 @@
                                     <label for="pickup_actual_amount" class="col-xs-5 control-label">实际收款澳币：</label>
                                     <div class="col-xs-7">
                                         <input id="pickup_actual_amount" name="pickup_actual_amount" class="input-sm form-control" v-model.number="pickup.actual_amount" disabled="disabled"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-3">
+                                <div class="form-group">
+                                    <label for="pickup_description" class="col-xs-5 control-label">描述：</label>
+                                    <div class="col-xs-7">
+                                        <input id="pickup_description" name="pickup_description" class="input-sm form-control" v-model="pickup.description" disabled="disabled"/>
                                     </div>
                                 </div>
                             </div>

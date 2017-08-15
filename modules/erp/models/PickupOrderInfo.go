@@ -17,6 +17,7 @@ type PickupOrderInfo struct {
 	ActualIsPaid      int64        `xorm:"bigint notnull 'actual_is_paid'" json:"actual_is_paid" smith:"verbose_name=现场是否已付款"`
 	ActualPayMethodId int64        `xorm:"bigint notnull 'actual_pay_method_id'" json:"actual_pay_method_id" smith:"verbose_name=现场收款方式id"`
 	ActualAmount      float64      `xorm:"-" json:"actual_amount"`
+	Description       string       `xorm:"nvarchar(500) 'description'" json:"description"`
 	CreateTime        core.Time    `xorm:"created notnull 'create_time'" json:"create_time"`
 	UpdateTime        core.Time    `xorm:"updated notnull 'update_time'" json:"update_time"`
 }
