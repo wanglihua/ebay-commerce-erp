@@ -24,6 +24,7 @@ import (
 	"time"
 	"encoding/json"
 	"sync"
+	"matrix/modules/erp/service/order_item_service"
 )
 
 type ErpOrder struct {
@@ -1072,6 +1073,13 @@ func (c ErpOrder) PickupDaiPeiHuo() revel.Result {
 	order_id_list := make([]int64, 0)
 	c.Params.Bind(&order_id_list, "id_list")
 
+	if len(order_id_list) == 0 {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "订单列表不能为空！",
+		})
+	}
+
 	var order_list = make([]models.OrderInfo, 0)
 	core.HandleError(db_session.In("id", order_id_list).Find(&order_list))
 
@@ -1082,6 +1090,15 @@ func (c ErpOrder) PickupDaiPeiHuo() revel.Result {
 				"message": "当前选择订单不全是已支付状态的PICKUP订单！",
 			})
 		}
+	}
+
+	var order_item_zero_count = order_item_service.Get_order_item_zero_count_in_order_list(order_list, db_session)
+
+	if order_item_zero_count > 0 {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "订单明细不能为空！",
+		})
 	}
 
 	for _, order := range order_list {

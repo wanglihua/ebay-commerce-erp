@@ -17,6 +17,7 @@ import (
 	"matrix/modules/erp/service/inventory_service"
 	"matrix/modules/erp/service/stock_service"
 	"matrix/modules/erp/service/order_history_service"
+	"matrix/modules/erp/service/order_item_service"
 )
 
 type OrderLogisticsService struct {
@@ -122,6 +123,12 @@ func (p_ol *OrderLogisticsService) CalculateListPaidOrders(db_session *xorm.Sess
 		if order.StatusId != models.ORDER_STATUS_YZF {
 			return errors.New("订单状态为已支付状态的，才能匹配物流！")
 		}
+	}
+
+	var order_item_zero_count = order_item_service.Get_order_item_zero_count_in_order_list(order_list, db_session)
+
+	if order_item_zero_count > 0 {
+		return errors.New("订单明细不能为空！")
 	}
 
 	err := Combine_orders(fmt.Sprintf("o.status_id = %d", models.ORDER_STATUS_YZF), db_session)
