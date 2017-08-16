@@ -97,22 +97,31 @@ func (c AuthUserPassRes) ListData() revel.Result {
 		Where(filter)
 
 	/*
-        aoData.push({'name': 'pass_res_cate_id_query', 'value': $("#pass_res_cate_query").val()});
-        aoData.push({'name': 'pass_res_cate_name_query', 'value': $("#pass_res_name_query").val()});
+       aoData.push({'name': 'user_id_list', 'value': user_id_list});
+       aoData.push({'name': 'pass_res_cate_id_query', 'value': $("#pass_res_cate_query").val()});
+       aoData.push({'name': 'pass_res_id_query', 'value': $("#pass_res_id_query").val()});
+       aoData.push({'name': 'pass_res_name_query', 'value': $("#pass_res_name_query").val()});
 	 */
 	//query extra filter here
 	var pass_res_cate_id_query int64
 	c.Params.Bind(&pass_res_cate_id_query, "pass_res_cate_id_query")
 
-	var pass_res_cate_name_query string
-	c.Params.Bind(&pass_res_cate_name_query, "pass_res_cate_name_query")
+	var pass_res_name_query string
+	c.Params.Bind(&pass_res_name_query, "pass_res_name_query")
+
+	var pass_res_id_query int64
+	c.Params.Bind(&pass_res_id_query, "pass_res_id_query")
 
 	if pass_res_cate_id_query != 0 {
 		query = query.Where(fmt.Sprintf("rc.id = %d", pass_res_cate_id_query))
 	}
 
-	if pass_res_cate_name_query != "" {
-		query = query.Where(fmt.Sprintf("r.name LIKE '%%%s%%'", pass_res_cate_name_query))
+	if pass_res_id_query != 0 {
+		query = query.Where(fmt.Sprintf("r.id = %d", pass_res_id_query))
+	}
+
+	if pass_res_name_query != "" {
+		query = query.Where(fmt.Sprintf("r.name LIKE '%%%s%%'", pass_res_name_query))
 	}
 
 	data_query := *query
