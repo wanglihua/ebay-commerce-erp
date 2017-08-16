@@ -71,7 +71,6 @@ func packageApp(cmd *Command, args []string) int {
 	}
 	// build end
 
-
 	cur_path_list := strings.Split(currentDir, string(os.PathSeparator))
 	import_path := cur_path_list[len(cur_path_list)-1]
 
@@ -189,6 +188,10 @@ func filterPathFiles(srcPath string) bool {
 	}
 
 	if strings.HasSuffix(srcPath, "test.exe") {
+		return true
+	}
+
+	if strings.HasSuffix(srcPath, "app.conf") {
 		return true
 	}
 
