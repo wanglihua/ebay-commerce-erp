@@ -50,6 +50,14 @@ func GetSpzlMenu(res_id_map map[int64]bool, web_session revel.Session) string {
             <b class="arrow"></b>
         </li>`)
 
+	buffer.WriteString(`<li id="spzl-product-feedback-cate-menu" class="">
+            <a href="/product/feedback/cate">
+                <i class="menu-icon fa fa-caret-right"></i>
+                商品质量反馈类别
+            </a>
+            <b class="arrow"></b>
+        </li>`)
+
 	buffer.WriteString(`</ul>
 </li>
 `)

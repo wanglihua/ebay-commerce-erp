@@ -590,3 +590,9 @@ POST /product/style/data/list         ErpProductStyle.ListData
 POST /product/style/data/detail       ErpProductStyle.DetailData
 POST /product/style/save              ErpProductStyle.Save
 POST /product/style/delete            ErpProductStyle.Delete
+
+GET  /product/feedback/cate                    ErpProductFeedbackCate.Index
+POST /product/feedback/cate/data/list          ErpProductFeedbackCate.ListData
+POST /product/feedback/cate/data/detail        ErpProductFeedbackCate.DetailData
+POST /product/feedback/cate/save               ErpProductFeedbackCate.Save
+POST /product/feedback/cate/delete             ErpProductFeedbackCate.Delete
