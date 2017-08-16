@@ -23,9 +23,9 @@ func Get_order_item_zero_count_in_order_list(order_list []models.OrderInfo, db_s
 SELECT count(*) AS order_item_zero_count
 FROM (
          SELECT count(oi.id) AS order_item_count
-         FROM erp_order_item oi
-         WHERE oi.order_id IN (88415, 88416, 88417)
-         GROUP BY oi.order_id
+         FROM erp_order o LEFT JOIN erp_order_item oi ON o.id = oi.order_id
+         WHERE o.id IN (141408, 141407, 141406, 141405)
+         GROUP BY o.id
          HAVING count(oi.id) = 0
      ) order_item_counts;
 	 */
@@ -38,9 +38,9 @@ FROM (
 	var sql = `SELECT count(*) AS order_item_zero_count
 FROM (
          SELECT count(oi.id) AS order_item_count
-         FROM erp_order_item oi
-         WHERE oi.order_id IN (%s)
-         GROUP BY oi.order_id
+         FROM erp_order o LEFT JOIN erp_order_item oi ON o.id = oi.order_id
+         WHERE o.id IN (%s)
+         GROUP BY o.id
          HAVING count(oi.id) = 0
      ) order_item_counts;`
 
