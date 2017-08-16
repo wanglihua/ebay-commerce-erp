@@ -12,12 +12,17 @@ import (
 
 var Engine *xorm.Engine = nil
 
+var (
+	DbDriver string = ""
+	DbUrl    string = ""
+)
+
 func InitDatabase() {
-	db_driver, _ := revel.Config.String("db.driver")
-	db_url, _ := revel.Config.String("db.url")
+	DbDriver, _ = revel.Config.String("db.driver")
+	DbUrl, _ = revel.Config.String("db.url")
 
 	var err error
-	Engine, err = xorm.NewEngine(db_driver, db_url)
+	Engine, err = xorm.NewEngine(DbDriver, DbUrl)
 	if err != nil {
 		revel.ERROR.Println(err)
 		revel.ERROR.Println(string(debug.Stack()))

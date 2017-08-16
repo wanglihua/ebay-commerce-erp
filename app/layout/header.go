@@ -10,6 +10,8 @@ import (
 	"matrix/core"
 	"matrix/modules/auth/pass_res_cate"
 	"matrix/modules/auth/service/pass_service"
+	"strings"
+	"matrix/db"
 )
 
 func GetHeader(title string, db_session *xorm.Session, web_session revel.Session) string {
@@ -46,6 +48,10 @@ func GetHeader(title string, db_session *xorm.Session, web_session revel.Session
                 <small>`)
 
 	header_buffer.WriteString(sys_name)
+
+	if strings.Contains(strings.ToLower(db.DbUrl), strings.ToLower("ozoerp_test")) {
+		header_buffer.WriteString("测试环境")
+	}
 
 	header_buffer.WriteString(`</small>
             </a>
