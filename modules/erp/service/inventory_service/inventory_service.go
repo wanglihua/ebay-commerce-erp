@@ -21,7 +21,7 @@ func get_inventory_list_sql_builder() *core.SqlBuilder {
 	sb.From(`erp_inventory nvt
     INNER JOIN erp_product p ON p.id = nvt.product_id
     INNER JOIN erp_stock st ON st.id = nvt.stock_id
-    INNER JOIN erp_storage_loc sl ON sl.id = nvt.storage_loc_id`)
+    LEFT JOIN erp_storage_loc sl ON sl.id = nvt.storage_loc_id`)
 
 	return sb
 }
@@ -124,4 +124,3 @@ GROUP BY nvt.product_id, nvt.stock_id, s.stock_type_id`
 
 	return product_stock_qty_list
 }
-
