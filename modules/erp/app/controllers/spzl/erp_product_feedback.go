@@ -47,7 +47,7 @@ func (c ErpProductFeedback) ListData() revel.Result {
 }
 
 type ProductFeedbackDetailForm struct {
-	ProductFeedback models.ProductFeedbackInfo `json:"product_feedback"`
+	ProductFeedback models.ProductFeedbackInfo      `json:"product_feedback"`
 }
 
 func (f *ProductFeedbackDetailForm) IsCreate() bool {
@@ -95,7 +95,17 @@ func (c ErpProductFeedback) DetailData() revel.Result {
 	var detail_form ProductFeedbackDetailForm
 	detail_form.ProductFeedback = product_feedback
 
-	return c.RenderJson(detail_form)
+	var product_feedback_cate_list = make([]models.ProductFeedbackCateInfo, 0)
+	core.HandleError(db_session.OrderBy("id ASC").Find(&product_feedback_cate_list))
+
+	var supplier_list = make([]models.SupplierInfo, 0)
+	core.HandleError(db_session.OrderBy("id ASC").Find(&supplier_list))
+
+	return c.RenderJson(map[string]interface{}{
+		"detail":                     detail_form,
+		"product_feedback_cate_list": product_feedback_cate_list,
+		"supplier_list":              supplier_list,
+	})
 }
 
 func (c ErpProductFeedback) Save() revel.Result {
