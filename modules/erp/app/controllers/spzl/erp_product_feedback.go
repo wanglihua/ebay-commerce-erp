@@ -7,6 +7,7 @@ import (
 
 	"matrix/core"
 	"matrix/modules/erp/models"
+	"fmt"
 )
 
 type ErpProductFeedback struct {
@@ -56,22 +57,10 @@ func (f *ProductFeedbackDetailForm) IsCreate() bool {
 
 func (f *ProductFeedbackDetailForm) Valid(validation *revel.Validation) bool {
 	validation.Required(f.ProductFeedback.CateId).Message("反馈类别不能为空！")
-	validation.Required(f.ProductFeedback.ProductId).Message("商品不能为空！")
 	validation.Required(f.ProductFeedback.SupplierId).Message("供应商不能为空！")
-	validation.Required(f.ProductFeedback.Code).Message("反馈编码不能为空！")
 
 	if f.ProductFeedback.Description != "" {
 		validation.MaxSize(f.ProductFeedback.Description, 800).Message("描述长度不能大于800！")
-	}
-
-	validation.Required(f.ProductFeedback.UserId).Message("反馈人id不能为空！")
-
-	validation.Required(f.ProductFeedback.UserLoginName).Message("反馈人工号不能为空！")
-	if f.ProductFeedback.UserLoginName != "" {
-		validation.MinSize(f.ProductFeedback.UserLoginName, 2).Message("反馈人工号长度不能小于2！")
-	}
-	if f.ProductFeedback.UserLoginName != "" {
-		validation.MaxSize(f.ProductFeedback.UserLoginName, 100).Message("反馈人工号长度不能大于100！")
 	}
 
 	return validation.HasErrors() == false
@@ -91,6 +80,13 @@ func (c ErpProductFeedback) DetailData() revel.Result {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "指定的商品质量反馈不存在！"})
 		}
 	}
+
+	// 获取商品的SKU
+	var product models.ProductInfo
+	_, err := db_session.Id(product_feedback.ProductId).Get(&product)
+	core.HandleError(err)
+
+	product_feedback.Sku = product.Sku
 
 	var detail_form ProductFeedbackDetailForm
 	detail_form.ProductFeedback = product_feedback
@@ -121,12 +117,31 @@ func (c ErpProductFeedback) Save() revel.Result {
 
 	product_feedback := detail_form.ProductFeedback
 
+	var product models.ProductInfo
+	has, err := db_session.Where("sku = ?", product_feedback.Sku).Get(&product)
+	if has == false {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "输入的SKU不存在！",
+		})
+	}
+
+	product_feedback.ProductId = product.Id
+
 	var affected int64
 	if detail_form.IsCreate() {
+		var login_user = core.GetLoginUser(c.Session)
+		product_feedback.UserId = login_user.UserId
+		product_feedback.UserLoginName = login_user.LoginName
+
 		affected, err = db_session.Insert(&product_feedback)
 		core.HandleError(err)
+
+		product_feedback.Code = fmt.Sprintf("FB%04d", product_feedback.Id)
+		_, err = db_session.Id(product_feedback.Id).Cols("code").Update(&product_feedback)
+		core.HandleError(err)
 	} else {
-		affected, err = db_session.Id(product_feedback.Id).Update(&product_feedback)
+		affected, err = db_session.Id(product_feedback.Id).Cols("cate_id", "product_id", "supplier_id", "description").Update(&product_feedback)
 		core.HandleError(err)
 
 		if affected == 0 {
