@@ -9,6 +9,8 @@ import (
 	"matrix/modules/erp/models"
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/auth/pass_res"
+	"fmt"
+	"strings"
 )
 
 type ErpProductFeedbackCate struct {
@@ -137,6 +139,30 @@ func (c ErpProductFeedbackCate) Delete() revel.Result {
 
 	product_feedback_cate_id_list := make([]int64, 0)
 	c.Params.Bind(&product_feedback_cate_id_list, "id_list")
+
+	var feedback_count struct {
+		Count int64 `xorm:"'feedback_count'"`
+	}
+
+	/*
+SELECT count(pf.id) AS feedback_count
+FROM erp_product_feedback pf
+WHERE pf.cate_id IN (123, 234, 345);
+	 */
+
+	var cate_feedback_sql = `SELECT count(pf.id) AS feedback_count
+FROM erp_product_feedback pf
+WHERE pf.cate_id IN (%s);`
+	cate_feedback_sql = fmt.Sprintf(cate_feedback_sql, strings.Join(core.Int_list_to_str_list(product_feedback_cate_id_list), ","))
+	_, err := db_session.Sql(cate_feedback_sql).Get(&feedback_count)
+	core.HandleError(err)
+
+	if feedback_count.Count > 0 {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "有类别在商品质量反馈信息中被引用，不能被删除！",
+		})
+	}
 
 	affected, err := db_session.In("id", product_feedback_cate_id_list).Delete(new(models.ProductFeedbackCateInfo))
 	core.HandleError(err)

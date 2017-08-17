@@ -10,6 +10,8 @@ import (
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/region_service"
+	"fmt"
+	"strings"
 )
 
 type ErpSupplier struct {
@@ -178,7 +180,7 @@ func (c ErpSupplier) Save() revel.Result {
 		name_count, err := db_session.Where("name = ?", supplier.Name).Count(new(models.SupplierInfo))
 		core.HandleError(err)
 		if name_count != 0 {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，名称已存在！" })
+			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，名称已存在！"})
 		}
 
 		affected, err = db_session.Insert(&supplier)
@@ -187,7 +189,7 @@ func (c ErpSupplier) Save() revel.Result {
 		name_count, err := db_session.Where("id <> ? and name = ?", supplier.Id, supplier.Name).Count(new(models.SupplierInfo))
 		core.HandleError(err)
 		if name_count != 0 {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，名称已存在！" })
+			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，名称已存在！"})
 		}
 
 		affected, err = db_session.Id(supplier.Id).Update(&supplier)
@@ -208,6 +210,35 @@ func (c ErpSupplier) Delete() revel.Result {
 
 	supplier_id_list := make([]int64, 0)
 	c.Params.Bind(&supplier_id_list, "id_list")
+
+	// 检查供应商是否在使用中
+
+	// 检查在商品反馈中的使用
+
+	var feedback_count struct {
+		Count int64 `xorm:"'feedback_count'"`
+	}
+	/*
+SELECT count(pf.id) AS feedback_count
+FROM erp_product_feedback pf
+WHERE pf.supplier_id IN (123, 234, 345);
+	 */
+
+	var supplier_feedback_sql = `SELECT count(pf.id) AS feedback_count
+FROM erp_product_feedback pf
+WHERE pf.supplier_id IN (%s);`
+	supplier_feedback_sql = fmt.Sprintf(supplier_feedback_sql, strings.Join(core.Int_list_to_str_list(supplier_id_list), ","))
+	_, err := db_session.Sql(supplier_feedback_sql).Get(&feedback_count)
+	core.HandleError(err)
+
+	if feedback_count.Count > 0 {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "有供应商在商品质量反馈信息中被引用，不能被删除！",
+		})
+	}
+
+	// todo: 检查在商品详情中的使用
 
 	affected, err := db_session.In("id", supplier_id_list).Delete(new(models.SupplierInfo))
 	core.HandleError(err)
