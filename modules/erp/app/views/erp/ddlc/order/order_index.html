@@ -58,6 +58,10 @@
                         <i class="ace-icon fa fa-shopping-basket"></i>
                         特殊hold实际无货
                     </button>
+                    <button class="btn btn-pink btn-sm" @click="showSpecialHoldNotShip()">
+                        <i class="ace-icon fa fa-shopping-basket"></i>
+                        特殊Hold特殊情况实际未发货
+                    </button>
                     <button class="btn btn-purple btn-sm" @click="showPickupOption()">
                         <i class="ace-icon fa fa-shopping-basket"></i>
                         PICK UP
@@ -388,6 +392,45 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-success btn-sm" @click="specialNotShip()">
+                        <i class="ace-icon fa fa-floppy-o"></i>确认
+                    </button>
+                    <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">
+                        <i class="ace-icon fa fa-times"></i>关闭
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="specialHoldNotShipDialog">
+        <div class="modal-dialog" style="width: 480px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="True">&times;</button>
+                    <h4 class="modal-title">设置特殊Hold特殊情况实际未发货</h4>
+                </div>
+                <div class="modal-body clearfix">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <form class="form-horizontal" role="form" id="specialHoldNotShipForm">
+
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <label for="special_hold_not_ship_desc" class="col-xs-2 control-label">描述</label>
+                                            <div class="col-xs-10">
+                                                <textarea id="special_hold_not_ship_desc" name="special_hold_not_ship_desc" rows="4" class="input-sm form-control"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success btn-sm" @click="specialHoldNotShip()">
                         <i class="ace-icon fa fa-floppy-o"></i>确认
                     </button>
                     <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">
@@ -1046,6 +1089,60 @@
                             }
                             else {
                                 $('#specialNotShipDialog').modal("hide");
+                                $.msg.show(data.message);
+                            }
+                            vm.reloadList();
+                        }
+                    });
+                });
+            },
+            showSpecialHoldNotShip: function () {
+                var id_list = [];
+                $('#orderList tbody tr>td:first-child input:checkbox').each(function () {
+                    if (this.checked) {
+                        id_list.push($(this).val());
+                    }
+                });
+
+                if (id_list.length !== 1) {
+                    $.msg.alert("请选择一条数据数据！");
+                    return;
+                }
+
+                $("#special_hold_not_ship_desc").val("");
+
+                $('#specialHoldNotShipDialog').modal(modalOptions);
+            },
+            specialHoldNotShip: function () {
+                var id_list = [];
+                $('#orderList tbody tr>td:first-child input:checkbox').each(function () {
+                    if (this.checked) {
+                        id_list.push($(this).val());
+                    }
+                });
+
+                if (id_list.length !== 1) {
+                    $.msg.alert("请选择一条数据数据！");
+                    return;
+                }
+
+                var desc = $("#special_hold_not_ship_desc").val();
+
+                $.msg.confirm("确认要设置 特殊Hold特殊情况实际未发货 吗？", function () {
+                    $.ajax({
+                        url: '{%url "ErpOrder.SpecialHoldSpecialNotShip"%}',
+                        type: "POST",
+                        data: {
+                            "id_list": id_list,
+                            "desc": desc
+                        },
+                        success: function (data) {
+                            if (data.success === false) {
+                                $.msg.error(data.message);
+                                return;
+                            }
+                            else {
+                                $('#specialHoldNotShipDialog').modal("hide");
                                 $.msg.show(data.message);
                             }
                             vm.reloadList();

@@ -353,6 +353,8 @@ POST /order/force/pei/huo                  ErpOrder.ForcePeiHuo
 POST /order/fa/huo                         ErpOrder.FaHuo
 POST /order/shi/ji/wu/huo                  ErpOrder.ShiJiWuHuo
 POST /order/special/not/ship               ErpOrder.SpecialNotShip
+POST /order/special/hold/not/ship          ErpOrder.SpecialHoldSpecialNotShip
+
 POST /order/wan/cheng                      ErpOrder.WanCheng
 POST /order/qu/xiao                        ErpOrder.QuXiao
 POST /order/pick/up/option/data            ErpOrder.PickupOptionData
