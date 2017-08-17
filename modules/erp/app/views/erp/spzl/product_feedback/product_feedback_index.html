@@ -140,6 +140,8 @@
 <script type="text/javascript">
 
     $(function () {
+        loadPageData();
+
         initDataTable(
             '#productFeedbackList',
             {
@@ -209,11 +211,25 @@
         });
     });
 
+    function loadPageData() {
+        $.ajax({
+                url: '{%url "ErpProductFeedback.PageData" %}',
+                type: "POST",
+                success: function (result) {
+                    if (result.success === false) {
+                        $.msg.error(result.message);
+                        return;
+                    }
+                    vm.page = result;
+                }
+            }
+        );
+    }
+
     var vm = new Vue({
         el: "#page",
         data: {
             "page": {
-                "feedback_code": "",
                 "feedback_cate_id": 0,
                 "feedback_cate_list": [],
                 "feedback_sku": "",

@@ -23,6 +23,37 @@ func (c ErpProductFeedback) Index() revel.Result {
 	return c.RenderTemplate("erp/spzl/product_feedback/product_feedback_index.html")
 }
 
+func (c ErpProductFeedback) PageData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.SPZL_PRODUCT_FEEDBACK, c.Session)
+
+	var db_session = c.DbSession
+
+	/*
+		"page": {
+			"feedback_cate_id": 0,
+			"feedback_cate_list": [],
+			"feedback_sku": "",
+			"feedback_supplier_id": 0,
+			"feedback_supplier_list": []
+		}
+	 */
+
+	var feedback_cate_list = make([]models.ProductFeedbackCateInfo, 0)
+	core.HandleError(db_session.Find(&feedback_cate_list))
+
+	var feedback_supplier_list = make([]models.SupplierInfo, 0)
+	core.HandleError(db_session.Find(&feedback_supplier_list))
+
+	return c.RenderJson(map[string]interface{}{
+		"success":                true,
+		"feedback_cate_id":       0,
+		"feedback_cate_list":     feedback_cate_list,
+		"feedback_sku":           "",
+		"feedback_supplier_id":   0,
+		"feedback_supplier_list": feedback_supplier_list,
+	})
+}
+
 func (c ErpProductFeedback) ListData() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.SPZL_PRODUCT_FEEDBACK, c.Session)
 
