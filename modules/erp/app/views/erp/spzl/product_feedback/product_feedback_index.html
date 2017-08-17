@@ -130,30 +130,36 @@
                     "aaSorting": [[1, "asc"]],
                     "aoColumns": [
                         {
-                            "mDataProp": "id", "bSearchable": false, "orderable": false, "sClass": "center", "width": 50,
+                            "mDataProp": "pf.id", "bSearchable": false, "orderable": false, "sClass": "center", "width": 50,
                             "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
                             "render": function (data, type, row) {
                                 return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
                             }
                         },
-                        {"mDataProp": "code", "title": "反馈编码", "bSearchable": true, "width": 80},
+                        {"mDataProp": "pf.code", "title": "反馈编码", "bSearchable": true, "width": 80},
                         {
-                            "mDataProp": "cate_id", "title": "反馈类别", "bSearchable": false, "sClass": "wrap-word", "width": 120,
+                            "mDataProp": "c.name", "title": "反馈类别", "bSearchable": false, "sClass": "wrap-word", "width": 100,
                             "render": function (data, type, row) {
                                 return "<div>" + data + "</div>";
                             }
                         },
-                        {"mDataProp": "product_id", "title": "商品", "bSearchable": false},
+                        {"mDataProp": "p.sku", "title": "SKU", "bSearchable": false, "width": 120},
                         {
-                            "mDataProp": "supplier_id", "title": "供应商", "bSearchable": false, "sClass": "wrap-word",
+                            "mDataProp": "p.cn_name", "title": "商品名称", "bSearchable": false, "sClass": "wrap-word", "width": 180,
                             "render": function (data, type, row) {
                                 return "<div>" + data + "</div>";
                             }
                         },
-                        {"mDataProp": "description", "title": "描述", "bSearchable": true},
-                        {"mDataProp": "user_login_name", "title": "反馈人", "bSearchable": true, "width": 120},
-                        {"mDataProp": "create_time", "title": "创建时间", "bSearchable": false, "width": 120},
-                        {"mDataProp": "update_time", "title": "修改时间", "bSearchable": false, "width": 120}
+                        {
+                            "mDataProp": "sup.name", "title": "供应商", "bSearchable": false, "sClass": "wrap-word", "width": 100,
+                            "render": function (data, type, row) {
+                                return "<div>" + data + "</div>";
+                            }
+                        },
+                        {"mDataProp": "pf.description", "title": "描述", "bSearchable": true},
+                        {"mDataProp": "pf.user_login_name", "title": "反馈人", "bSearchable": true, "width": 120},
+                        {"mDataProp": "pf.create_time", "title": "创建时间", "bSearchable": false, "width": 120},
+                        {"mDataProp": "pf.update_time", "title": "修改时间", "bSearchable": false, "width": 120}
                     ]
                 }
             );
