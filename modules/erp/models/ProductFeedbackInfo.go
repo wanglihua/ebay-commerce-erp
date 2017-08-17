@@ -10,7 +10,6 @@ type ProductFeedbackInfo struct {
 	ProductId     int64          `xorm:"bigint notnull index 'product_id'" json:"product_id" smith:"verbose_name=商品"`
 	Sku           string         `xorm:"-" json:"sku"`
 	SupplierId    int64          `xorm:"bigint notnull index 'supplier_id'" json:"supplier_id" smith:"verbose_name=供应商"`
-	Code          string         `xorm:"nvarchar(200) notnull index 'code'" json:"code" smith:"verbose_name=反馈编码"` //数据插入后， 根据生成的ID更新Code
 	Description   string         `xorm:"nvarchar(800) 'description'" json:"description" smith:"verbose_name=描述,min=0,max=800"`
 	UserId        int64          `xorm:"bigint notnull index 'user_id'" json:"user_id" smith:"verbose_name=反馈人id"`
 	UserLoginName string         `xorm:"nvarchar(200) notnull 'user_login_name'" json:"user_login_name" smith:"verbose_name=反馈人工号,min=2,max=100"`

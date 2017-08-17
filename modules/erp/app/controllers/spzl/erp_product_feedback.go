@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/auth/pass_res"
+	"strings"
 )
 
 type ErpProductFeedback struct {
@@ -24,6 +25,20 @@ func (c ErpProductFeedback) Index() revel.Result {
 
 func (c ErpProductFeedback) ListData() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.SPZL_PRODUCT_FEEDBACK, c.Session)
+
+	var feedback_code string
+	c.Params.Bind(&feedback_code, "feedback_code")
+	feedback_code = strings.TrimSpace(feedback_code)
+
+	var feedback_cate_id int64
+	c.Params.Bind(&feedback_cate_id, "feedback_cate_id")
+
+	var feedback_sku string
+	c.Params.Bind(&feedback_sku, "feedback_sku")
+	feedback_sku = strings.TrimSpace(feedback_sku)
+
+	var feedback_supplier_id int64
+	c.Params.Bind(&feedback_supplier_id, "feedback_supplier_id")
 
 	db_session := c.DbSession
 
@@ -58,6 +73,18 @@ FROM erp_product_feedback pf
     INNER JOIN erp_product_feedback_cate c ON c.id = pf.cate_id
     INNER JOIN erp_product p ON p.id = pf.product_id
     INNER JOIN erp_supplier sup ON sup.id = pf.supplier_id`)
+
+	if feedback_cate_id != 0 {
+		filter = core.SqlAnd(filter, fmt.Sprintf("pf.cate_id = %d", feedback_cate_id))
+	}
+
+	if feedback_sku != "" {
+		filter = core.SqlAnd(filter, fmt.Sprintf("p.sku = '%s'", feedback_sku))
+	}
+
+	if feedback_supplier_id != 0 {
+		filter = core.SqlAnd(filter, fmt.Sprintf("pf.supplier_id = %d", feedback_supplier_id))
+	}
 
 	sb.Where(filter)
 
@@ -180,9 +207,9 @@ func (c ErpProductFeedback) Save() revel.Result {
 		affected, err = db_session.Insert(&product_feedback)
 		core.HandleError(err)
 
-		product_feedback.Code = fmt.Sprintf("FB%04d", product_feedback.Id)
-		_, err = db_session.Id(product_feedback.Id).Cols("code").Update(&product_feedback)
-		core.HandleError(err)
+		//product_feedback.Code = fmt.Sprintf("FB%04d", product_feedback.Id)
+		//_, err = db_session.Id(product_feedback.Id).Cols("code").Update(&product_feedback)
+		//core.HandleError(err)
 	} else {
 		affected, err = db_session.Id(product_feedback.Id).Cols("cate_id", "product_id", "supplier_id", "description").Update(&product_feedback)
 		core.HandleError(err)
