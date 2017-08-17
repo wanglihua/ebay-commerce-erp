@@ -126,7 +126,7 @@ func (c AuthUserPassRes) ListData() revel.Result {
 
 	data_query := *query
 	if order != "" {
-		data_query = *data_query.OrderBy(order)
+		data_query = *data_query.OrderBy(order + ", r.id ASC")
 	} else {
 		data_query = *data_query.Asc("r.id")
 	}

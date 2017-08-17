@@ -56,9 +56,8 @@ func (f *ProductFeedbackDetailForm) IsCreate() bool {
 
 func (f *ProductFeedbackDetailForm) Valid(validation *revel.Validation) bool {
 	validation.Required(f.ProductFeedback.CateId).Message("反馈类别不能为空！")
-
+	validation.Required(f.ProductFeedback.ProductId).Message("商品不能为空！")
 	validation.Required(f.ProductFeedback.SupplierId).Message("供应商不能为空！")
-
 	validation.Required(f.ProductFeedback.Code).Message("反馈编码不能为空！")
 
 	if f.ProductFeedback.Description != "" {
