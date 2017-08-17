@@ -25,7 +25,7 @@ func GetSpzlMenu(res_id_map map[int64]bool, web_session revel.Session) string {
 	var buffer bytes.Buffer
 
 	buffer.WriteString(`
-<li id=spzl-menu" class="">
+<li id="spzl-menu" class="">
     <a href="#" class="dropdown-toggle">
         <i class="menu-icon fa fa-reply"></i>
         <span class="menu-text">商品质量反馈</span>

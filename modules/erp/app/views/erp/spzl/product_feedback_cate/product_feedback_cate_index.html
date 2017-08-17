@@ -1,37 +1,37 @@
 {%header "商品质量反馈类别" .%}
 <div id="page">
-   <div class="breadcrumbs" id="breadcrumbs">
-       <ul class="breadcrumb">
-           <li>
-               <a href='{%url "Home.Index"%}'><i class="ace-icon fa fa-home home-icon"></i></a>
-           </li>
-           <li class="parent" data-menu="spzl-menu">商品质量反馈</li>
-           <li class="active" data-menu="spzl-product-feedback-cate-menu">商品质量反馈类别</li>
-       </ul>
-   </div>
-   <div class="page-content">
-       <div class="row">
-           <div class="col-xs-12" style="padding: 0;">
-               <div class="gridToolBar clearfix">
-                   <button class="btn btn-primary btn-sm" @click="reloadList('#productFeedbackCateList')">
-                       <i class="ace-icon fa fa-refresh"></i>
-                       刷新
-                   </button>
-                   <button class="btn btn-success btn-sm" @click="showProductFeedbackCateDetail(0)">
-                       <i class="ace-icon fa fa-plus"></i>
-                       新增
-                   </button>
-                   <button class="btn btn-danger btn-sm" @click="deleteProductFeedbackCate()">
-                       <i class="ace-icon fa fa-trash-o"></i>
-                       删除
-                   </button>
-               </div>
-               <div>
-                   <table id="productFeedbackCateList" class="table table-striped table-bordered table-hover"></table>
-               </div>
-           </div>
-       </div>
-   </div>
+    <div class="breadcrumbs" id="breadcrumbs">
+        <ul class="breadcrumb">
+            <li>
+                <a href='{%url "Home.Index"%}'><i class="ace-icon fa fa-home home-icon"></i></a>
+            </li>
+            <li class="parent" data-menu="spzl-menu">商品质量反馈</li>
+            <li class="active" data-menu="spzl-product-feedback-cate-menu">商品质量反馈类别</li>
+        </ul>
+    </div>
+    <div class="page-content">
+        <div class="row">
+            <div class="col-xs-12" style="padding: 0;">
+                <div class="gridToolBar clearfix">
+                    <button class="btn btn-primary btn-sm" @click="reloadList('#productFeedbackCateList')">
+                        <i class="ace-icon fa fa-refresh"></i>
+                        刷新
+                    </button>
+                    <button class="btn btn-success btn-sm" @click="showProductFeedbackCateDetail(0)">
+                        <i class="ace-icon fa fa-plus"></i>
+                        新增
+                    </button>
+                    <button class="btn btn-danger btn-sm" @click="deleteProductFeedbackCate()">
+                        <i class="ace-icon fa fa-trash-o"></i>
+                        删除
+                    </button>
+                </div>
+                <div>
+                    <table id="productFeedbackCateList" class="table table-striped table-bordered table-hover"></table>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="modal fade" id="productFeedbackCateDetailDialog">
         <div class="modal-dialog" style="width: 680px;">
             <div class="modal-content">
@@ -45,7 +45,7 @@
                             <form class="form-horizontal" role="form" id="productFeedbackCateDetailForm">
                                 <input id="product_feedback_cate_id" name="detail.product_feedback_cate.id" type="hidden" v-model.number="detail.product_feedback_cate.id"/>
                                 <div class="row">
-                                    <div class="col-xs-6">
+                                    <div class="col-xs-12">
                                         <div class="form-group">
                                             <label for="name" class="col-xs-2 control-label">名称</label>
                                             <div class="col-xs-10">
@@ -56,11 +56,11 @@
                                 </div>
 
                                 <div class="row">
-                                    <div class="col-xs-6">
+                                    <div class="col-xs-12">
                                         <div class="form-group">
                                             <label for="description" class="col-xs-2 control-label">描述</label>
                                             <div class="col-xs-10">
-                                                <input id="description" name="detail.product_feedback_cate.description" type="text" class="input-sm form-control" v-model="detail.product_feedback_cate.description"/>
+                                                <textarea id="description" name="detail.product_feedback_cate.description" rows="3" class="input-sm form-control" v-model="detail.product_feedback_cate.description"></textarea>
                                             </div>
                                         </div>
                                     </div>
@@ -92,24 +92,24 @@
         },
         mounted: function () {
             initDataTable(
-                    '#productFeedbackCateList',
-                    {
-                        "sAjaxSource": '{%url "ErpProductFeedbackCate.ListData"%}',
-                        "aaSorting": [[1, "asc"]],
-                        "aoColumns": [
-                            {
-                                "mDataProp": "id", "bSearchable": false, "orderable": false, "sClass": "center", "width": 50,
-                                "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
-                                "render": function (data, type, row) {
-                                    return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
-                                }
-                            },
-                            {"mDataProp": "name", "title": "名称", "bSearchable": true },
-                            {"mDataProp": "description", "title": "描述", "bSearchable": true },
-                            {"mDataProp": "create_time", "title": "创建时间", "bSearchable": false, "width": 120 },
-                            {"mDataProp": "update_time", "title": "修改时间", "bSearchable": false, "width": 120 }
-                        ]
-                   }
+                '#productFeedbackCateList',
+                {
+                    "sAjaxSource": '{%url "ErpProductFeedbackCate.ListData"%}',
+                    "aaSorting": [[1, "asc"]],
+                    "aoColumns": [
+                        {
+                            "mDataProp": "id", "bSearchable": false, "orderable": false, "sClass": "center", "width": 50,
+                            "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
+                            "render": function (data, type, row) {
+                                return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
+                            }
+                        },
+                        {"mDataProp": "name", "title": "名称", "bSearchable": true, "width": 220},
+                        {"mDataProp": "description", "title": "描述", "bSearchable": true},
+                        {"mDataProp": "create_time", "title": "创建时间", "bSearchable": false, "width": 120},
+                        {"mDataProp": "update_time", "title": "修改时间", "bSearchable": false, "width": 120}
+                    ]
+                }
             );
 
             $('#productFeedbackCateList tbody').on('dblclick', 'tr', function () {
@@ -125,27 +125,27 @@
                 showMask("加载中...");
                 $("#productFeedbackCateDetailForm").clearValidation();
                 $.ajax({
-                           url: '{%url "ErpProductFeedbackCate.DetailData" %}',
-                           type: "POST",
-                           data: {
-                               "id": id
-                           },
-                           success: function (result) {
-                               hideMask();
-                               if (result.success == false) {
-                                   $.msg.error(result.message);
-                                   return;
-                               }
-                               vm.detail = result;
-                               $('#productFeedbackCateDetailDialog').modal(modalOptions);
-                           }
-                       }
+                        url: '{%url "ErpProductFeedbackCate.DetailData" %}',
+                        type: "POST",
+                        data: {
+                            "id": id
+                        },
+                        success: function (result) {
+                            hideMask();
+                            if (result.success == false) {
+                                $.msg.error(result.message);
+                                return;
+                            }
+                            vm.detail = result;
+                            $('#productFeedbackCateDetailDialog').modal(modalOptions);
+                        }
+                    }
                 );
             },
             saveProductFeedbackCate: function () {
                 showMask("提交中...");
                 var form = $("#productFeedbackCateDetailForm");
-                var valid = validate(form, {  
+                var valid = validate(form, {
                     'detail.product_feedback_cate.name': {
                         required: true, minlength: 2, maxlength: 100
                     },
@@ -158,25 +158,25 @@
                     hideMask();
                 } else {
                     $.ajax({
-                               url: '{%url "ErpProductFeedbackCate.Save"%}',
-                               type: "POST",
-                               processData: false,
-                               contentType: 'application/json',
-                               data: JSON.stringify(vm.detail),
-                               success: function (data) {
-                                   hideMask();
-                                   if (data.success == false) {
-                                       $.msg.error(data.message);
-                                       //return;
-                                   }
-                                   else {
-                                       $.msg.show(data.message);
-                                       $('#productFeedbackCateDetailDialog').modal('hide');
-                                       vm.reloadList();
-                                       //return;
-                                   }
-                               }
-                           }
+                            url: '{%url "ErpProductFeedbackCate.Save"%}',
+                            type: "POST",
+                            processData: false,
+                            contentType: 'application/json',
+                            data: JSON.stringify(vm.detail),
+                            success: function (data) {
+                                hideMask();
+                                if (data.success == false) {
+                                    $.msg.error(data.message);
+                                    //return;
+                                }
+                                else {
+                                    $.msg.show(data.message);
+                                    $('#productFeedbackCateDetailDialog').modal('hide');
+                                    vm.reloadList();
+                                    //return;
+                                }
+                            }
+                        }
                     );
                 }
             },
@@ -195,20 +195,20 @@
 
                 $.msg.confirm("确认要删除吗？", function () {
                     $.ajax({
-                               url: '{%url "ErpProductFeedbackCate.Delete"%}',
-                               type: "POST",
-                               data: {"id_list": id_list},
-                               success: function (data) {
-                                   if (data.success == false) {
-                                       $.msg.error(data.message);
-                                       return;
-                                   }
-                                   else {
-                                       $.msg.show(data.message);
-                                   }
-                                   vm.reloadList();
-                               }
-                           });
+                        url: '{%url "ErpProductFeedbackCate.Delete"%}',
+                        type: "POST",
+                        data: {"id_list": id_list},
+                        success: function (data) {
+                            if (data.success == false) {
+                                $.msg.error(data.message);
+                                return;
+                            }
+                            else {
+                                $.msg.show(data.message);
+                            }
+                            vm.reloadList();
+                        }
+                    });
                 });
             }
         }
