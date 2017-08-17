@@ -7,6 +7,8 @@ import (
 
 	"matrix/core"
 	"matrix/modules/erp/models"
+	"matrix/modules/auth/service/pass_service"
+	"matrix/modules/auth/pass_res"
 )
 
 type ErpProductFeedbackCate struct {
@@ -14,10 +16,14 @@ type ErpProductFeedbackCate struct {
 }
 
 func (c ErpProductFeedbackCate) Index() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.SPZL_PRODUCT_FEEDBACK_CATE, c.Session)
+
 	return c.RenderTemplate("erp/spzl/product_feedback_cate/product_feedback_cate_index.html")
 }
 
 func (c ErpProductFeedbackCate) ListData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.SPZL_PRODUCT_FEEDBACK_CATE, c.Session)
+
 	db_session := c.DbSession
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
@@ -71,6 +77,8 @@ func (f *ProductFeedbackCateDetailForm) Valid(validation *revel.Validation) bool
 }
 
 func (c ErpProductFeedbackCate) DetailData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.SPZL_PRODUCT_FEEDBACK_CATE, c.Session)
+
 	db_session := c.DbSession
 
 	var product_feedback_cate_id int64
@@ -92,6 +100,8 @@ func (c ErpProductFeedbackCate) DetailData() revel.Result {
 }
 
 func (c ErpProductFeedbackCate) Save() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.SPZL_PRODUCT_FEEDBACK_CATE, c.Session)
+
 	db_session := c.DbSession
 
 	var detail_form ProductFeedbackCateDetailForm
@@ -121,6 +131,8 @@ func (c ErpProductFeedbackCate) Save() revel.Result {
 }
 
 func (c ErpProductFeedbackCate) Delete() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.SPZL_PRODUCT_FEEDBACK_CATE, c.Session)
+
 	db_session := c.DbSession
 
 	product_feedback_cate_id_list := make([]int64, 0)

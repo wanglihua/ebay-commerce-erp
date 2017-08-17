@@ -3,6 +3,9 @@ package menu
 import (
 	"bytes"
 	"github.com/revel/revel"
+	"matrix/modules/auth/service/pass_service"
+	"matrix/core"
+	"matrix/modules/auth/pass_res"
 )
 
 func GetSpzlMenu(res_id_map map[int64]bool, web_session revel.Session) string {
@@ -10,7 +13,6 @@ func GetSpzlMenu(res_id_map map[int64]bool, web_session revel.Session) string {
 		return ""
 	}
 
-	/*
 	login_user := core.GetLoginUser(web_session)
 	var is_admin = pass_service.Is_user_admin(login_user.UserId)
 
@@ -20,7 +22,6 @@ func GetSpzlMenu(res_id_map map[int64]bool, web_session revel.Session) string {
 		}
 		return false
 	}
-	*/
 
 	var buffer bytes.Buffer
 
@@ -34,21 +35,25 @@ func GetSpzlMenu(res_id_map map[int64]bool, web_session revel.Session) string {
     <b class="arrow"></b>
     <ul class="submenu">`)
 
-	buffer.WriteString(`<li id="spzl-product-feedback-menu" class="">
+	if check_pass_res_menu(pass_res.SPZL_PRODUCT_FEEDBACK) {
+		buffer.WriteString(`<li id="spzl-product-feedback-menu" class="">
             <a href="/product/feedback">
                 <i class="menu-icon fa fa-caret-right"></i>
                 商品质量反馈
             </a>
             <b class="arrow"></b>
         </li>`)
+	}
 
-	buffer.WriteString(`<li id="spzl-product-feedback-cate-menu" class="">
+	if check_pass_res_menu(pass_res.SPZL_PRODUCT_FEEDBACK) {
+		buffer.WriteString(`<li id="spzl-product-feedback-cate-menu" class="">
             <a href="/product/feedback/cate">
                 <i class="menu-icon fa fa-caret-right"></i>
                 商品质量反馈类别
             </a>
             <b class="arrow"></b>
         </li>`)
+	}
 
 	buffer.WriteString(`</ul>
 </li>

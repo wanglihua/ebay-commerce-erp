@@ -8,6 +8,8 @@ import (
 	"matrix/core"
 	"matrix/modules/erp/models"
 	"fmt"
+	"matrix/modules/auth/service/pass_service"
+	"matrix/modules/auth/pass_res"
 )
 
 type ErpProductFeedback struct {
@@ -15,10 +17,14 @@ type ErpProductFeedback struct {
 }
 
 func (c ErpProductFeedback) Index() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.SPZL_PRODUCT_FEEDBACK, c.Session)
+
 	return c.RenderTemplate("erp/spzl/product_feedback/product_feedback_index.html")
 }
 
 func (c ErpProductFeedback) ListData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.SPZL_PRODUCT_FEEDBACK, c.Session)
+
 	db_session := c.DbSession
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
@@ -100,6 +106,8 @@ func (f *ProductFeedbackDetailForm) Valid(validation *revel.Validation) bool {
 }
 
 func (c ErpProductFeedback) DetailData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.SPZL_PRODUCT_FEEDBACK, c.Session)
+
 	db_session := c.DbSession
 
 	var product_feedback_id int64
@@ -138,6 +146,8 @@ func (c ErpProductFeedback) DetailData() revel.Result {
 }
 
 func (c ErpProductFeedback) Save() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.SPZL_PRODUCT_FEEDBACK, c.Session)
+
 	db_session := c.DbSession
 
 	var detail_form ProductFeedbackDetailForm
@@ -186,6 +196,8 @@ func (c ErpProductFeedback) Save() revel.Result {
 }
 
 func (c ErpProductFeedback) Delete() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.SPZL_PRODUCT_FEEDBACK, c.Session)
+
 	db_session := c.DbSession
 
 	product_feedback_id_list := make([]int64, 0)
