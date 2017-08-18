@@ -113,6 +113,9 @@ func (c ErpProductFeedback) PageData() revel.Result {
 
 	var db_session = c.DbSession
 
+	var product_id int64
+	c.Params.Bind(&product_id, "product_id")
+
 	/*
 		"page": {
 			"feedback_cate_id": 0,
@@ -124,10 +127,18 @@ func (c ErpProductFeedback) PageData() revel.Result {
 	 */
 
 	var feedback_cate_list = make([]models.ProductFeedbackCateInfo, 0)
-	core.HandleError(db_session.Find(&feedback_cate_list))
+	var filter_cate = `id IN (SELECT DISTINCT cate_id
+FROM erp_product_feedback pf
+WHERE pf.product_id = %d)`
+	filter_cate = fmt.Sprintf(filter_cate, product_id)
+	core.HandleError(db_session.Where(filter_cate).Find(&feedback_cate_list))
 
 	var feedback_supplier_list = make([]models.SupplierInfo, 0)
-	core.HandleError(db_session.Find(&feedback_supplier_list))
+	var filter_supplier = `id IN (SELECT DISTINCT supplier_id
+FROM erp_product_feedback pf
+WHERE pf.product_id = %d)`
+	filter_supplier = fmt.Sprintf(filter_supplier, product_id)
+	core.HandleError(db_session.Where(filter_supplier).Find(&feedback_supplier_list))
 
 	return c.RenderJson(map[string]interface{}{
 		"success":                true,
@@ -216,9 +227,40 @@ FROM erp_product_feedback pf
 	_, err = db_session.Sql(sb.SqlCount()).Get(&feedback_count)
 	core.HandleError(err)
 
-	return c.RenderJson(core.GridResult{
-		Data:  product_feedback_list,
-		Total: feedback_count.Count,
+	type cate_sum_t struct {
+		CateId   int64  `xorm:"'cate_id'" json:"cate_id"`
+		CateName string `xorm:"'cate_name'" json:"cate_name"`
+		Count    int64  `xorm:"'pf_count'" json:"count"`
+	}
+	/*
+SELECT
+    pf.cate_id AS cate_id,
+    cate.name  AS cate_name,
+    count(*)   AS pf_count
+FROM erp_product_feedback pf
+    INNER JOIN erp_product_feedback_cate cate ON pf.cate_id = cate.id
+WHERE pf.product_id = 17629
+GROUP BY pf.cate_id;
+	 */
+	var cate_sum_sql = `SELECT
+    pf.cate_id AS cate_id,
+    cate.name  AS cate_name,
+    count(*)   AS pf_count
+FROM erp_product_feedback pf
+    INNER JOIN erp_product_feedback_cate cate ON pf.cate_id = cate.id
+WHERE pf.product_id = %d
+GROUP BY pf.cate_id;`
+	cate_sum_sql = fmt.Sprintf(cate_sum_sql, product_id)
+
+	var cate_sum_list = make([]cate_sum_t, 0)
+	core.HandleError(db_session.Sql(cate_sum_sql).Find(&cate_sum_list))
+
+	return c.RenderJson(map[string]interface{}{
+		"grid_data": core.GridResult{
+			Data:  product_feedback_list,
+			Total: feedback_count.Count,
+		},
+		"cate_sum_list": cate_sum_list,
 	})
 }
 

@@ -60,6 +60,24 @@
                     </div>
                 </div>
                 <div>
+                    <table id="cate_sum_list" style="width: 350px;" class="table table-striped table-bordered table-hover">
+                        <thead>
+                        <tr>
+                            <th>反馈分类</th>
+                            <th style="width: 120px;">反馈数量</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <template v-for="cate_sum in cate_sum_list">
+                            <tr>
+                                <td><a :href="show_cate(cate_sum.cate_id)">{{cate_sum.cate_name}}</a></td>
+                                <td>{{cate_sum.count}}</td>
+                            </tr>
+                        </template>
+                        </tbody>
+                    </table>
+                </div>
+                <div>
                     <table id="productFeedbackList" class="table table-striped table-bordered table-hover"></table>
                 </div>
             </div>
@@ -178,7 +196,18 @@
                             return "<div>" + data + "</div>";
                         }
                     },
-                    {"mDataProp": "pf.description", "title": "描述", "bSearchable": true},
+                    {
+                        "mDataProp": "pf.description", "title": "描述", "bSearchable": true, "sClass": "wrap-word",
+                        "render": function (data, type, row) {
+                            return "<div>" + data + "</div>";
+                        }
+                    },
+                    {
+                        "mDataProp": "pf.solution", "title": "解决方案", "bSearchable": true, "sClass": "wrap-word",
+                        "render": function (data, type, row) {
+                            return "<div>" + data + "</div>";
+                        }
+                    },
                     {"mDataProp": "pf.user_login_name", "title": "反馈人", "bSearchable": true, "width": 120},
                     {"mDataProp": "pf.create_time", "title": "创建时间", "bSearchable": false, "width": 120},
                     {"mDataProp": "pf.update_time", "title": "修改时间", "bSearchable": false, "width": 120}
@@ -201,7 +230,8 @@
                                     $.msg.error(data.message);
                                     return;
                                 }
-                                fnCallback(data);
+                                fnCallback(data.grid_data);
+                                vm.cate_sum_list = data.cate_sum_list;
                             }
                         });
                 }
@@ -218,6 +248,9 @@
         $.ajax({
                 url: '{%url "ErpProductFeedback.PageData" %}',
                 type: "POST",
+                data: {
+                    "product_id": product_id
+                },
                 success: function (result) {
                     if (result.success === false) {
                         $.msg.error(result.message);
@@ -242,13 +275,17 @@
                 "product_feedback": {}
             },
             "product_feedback_cate_list": [],
-            "supplier_list": []
+            "supplier_list": [],
+            "cate_sum_list": []
         },
         mounted: function () {
         },
         methods: {
             reloadList: function () {
                 reloadList('#productFeedbackList');
+            },
+            show_cate: function (cate_id) {
+                vm.page.feedback_cate_id = cate_id;
             },
             showProductFeedbackDetail: function (id) {
                 showMask("加载中...");
