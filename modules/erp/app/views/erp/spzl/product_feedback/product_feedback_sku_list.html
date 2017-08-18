@@ -128,25 +128,25 @@
                 "aaSorting": [[0, "asc"]],
                 "aoColumns": [
                     {
-                        "mDataProp": "sku", "title": "SKU", "bSearchable": false, "width": 150,
+                        "mDataProp": "p.sku", "title": "SKU", "bSearchable": false, "width": 150,
                         "render": function (data, type, row) {
-                            return "<a style='cursor: pointer;' onclick='show_sku_feedback(" + row.id + ");' >" + data + "</a>";
+                            return "<a style='cursor: pointer;' onclick='show_sku_feedback(" + row.p.id + ");' >" + data + "</a>";
                         }
                     },
                     {
-                        "mDataProp": "cn_name", "title": "商品名称", "bSearchable": false, "sClass": "wrap-word",
+                        "mDataProp": "p.cn_name", "title": "商品名称", "bSearchable": false, "sClass": "wrap-word",
                         "render": function (data, type, row) {
                             return "<div>" + data + "</div>";
                         }
                     },
                     {
-                        "mDataProp": "id", "title": "操作", "bSearchable": false, "sClass": "wrap-word", "width": 100,
+                        "mDataProp": "p.id", "title": "操作", "bSearchable": false, "sClass": "wrap-word", "width": 100,
                         "render": function (data, type, row) {
                             return "<a class='btn btn-xs btn-info btn-inline pull-left' onclick='show_sku_feedback(" + data + ");' ><i class='ace-icon fa fa-list'></i>查看反馈</a>";
                         }
                     },
-                    {"mDataProp": "create_time", "title": "最近创建", "bSearchable": false, "width": 120},
-                    {"mDataProp": "update_time", "title": "最近修改", "bSearchable": false, "width": 120}
+                    {"mDataProp": "pfu.last_create", "title": "最近创建", "bSearchable": false, "width": 120},
+                    {"mDataProp": "pfu.last_update", "title": "最近修改", "bSearchable": false, "width": 120}
                 ],
                 "fnServerData": function (sSource, aoData, fnCallback) {
                     showMask("数据加载中，请稍候");

@@ -11,6 +11,7 @@ import (
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/auth/pass_res"
 	"strings"
+	"time"
 )
 
 type ErpProductFeedback struct {
@@ -34,23 +35,31 @@ func (c ErpProductFeedback) SkuListData() revel.Result {
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
-	/*
-SELECT DISTINCT p.*
-FROM erp_product_feedback pf
-    INNER JOIN erp_product p ON pf.product_id = p.id
-WHERE p.sku = '12344';
+	type product_feedback_sku_view_item_t struct {
+		Product            models.ProductInfo             `xorm:"extends" json:"p"`
+		ProductFeedbackSku models.ProductFeedbackSkuInfo  `xorm:"extends" json:"pfu"`
+	}
 
-SELECT count(DISTINCT p.id) AS sku_count
-FROM erp_product_feedback pf
-    INNER JOIN erp_product p ON pf.product_id = p.id
+	/*
+SELECT
+    p.*,
+    pfu.*
+FROM erp_product_feedback_sku pfu
+    INNER JOIN erp_product p ON pfu.product_id = p.id
+WHERE p.sku = '12344'
+ORDER BY p.id;
+
+SELECT count(pfu.id) AS sku_count
+FROM erp_product_feedback_sku pfu
+    INNER JOIN erp_product p ON pfu.product_id = p.id
 WHERE p.sku = '12344';
 	 */
 
 	var sb = core.NewSqlBuilder()
-	sb.Select(`DISTINCT p.*`)
-	sb.Count("count(DISTINCT p.id) AS sku_count")
-	sb.From(`erp_product_feedback pf
-    INNER JOIN erp_product p ON pf.product_id = p.id`)
+	sb.Select(`p.*, pfu.*`)
+	sb.Count("count(pfu.id) AS sku_count")
+	sb.From(`erp_product_feedback_sku pfu
+    INNER JOIN erp_product p ON pfu.product_id = p.id`)
 
 	if feedback_sku != "" {
 		filter = core.SqlAnd(filter, fmt.Sprintf("p.sku = '%s'", feedback_sku))
@@ -66,7 +75,7 @@ WHERE p.sku = '12344';
 
 	sb.Limit(offset, limit)
 
-	product_list := make([]models.ProductInfo, 0, limit)
+	product_list := make([]product_feedback_sku_view_item_t, 0, limit)
 	err := db_session.Sql(sb.SqlList()).Find(&product_list)
 	core.HandleError(err)
 
@@ -324,6 +333,24 @@ func (c ErpProductFeedback) Save() revel.Result {
 		}
 	}
 
+	var feedback_sku models.ProductFeedbackSkuInfo
+	has, err = db_session.Where("product_id = ?", product.Id).Get(&feedback_sku)
+	core.HandleError(err)
+
+	feedback_sku.ProductId = product.Id
+
+	var time_now = time.Now()
+	feedback_sku.LastCreate = core.Time(time_now)
+	feedback_sku.LastUpdate = core.Time(time_now)
+
+	if has == false {
+		_, err = db_session.Insert(&feedback_sku)
+		core.HandleError(err)
+	} else {
+		_, err = db_session.Id(feedback_sku.Id).Cols("last_update").Update(&feedback_sku) // 只更新修改时间
+		core.HandleError(err)
+	}
+
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据保存成功!"})
 }
 
@@ -335,8 +362,41 @@ func (c ErpProductFeedback) Delete() revel.Result {
 	product_feedback_id_list := make([]int64, 0)
 	c.Params.Bind(&product_feedback_id_list, "id_list")
 
+	if len(product_feedback_id_list) == 0 {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "请选择要删除的商品质量反馈！",
+		})
+	}
+
+	var product_feedback_id = product_feedback_id_list[0]
+
+	var product_feedback models.ProductFeedbackInfo
+	_, err := db_session.Id(product_feedback_id).Get(&product_feedback)
+	core.HandleError(err)
+
 	affected, err := db_session.In("id", product_feedback_id_list).Delete(new(models.ProductFeedbackInfo))
 	core.HandleError(err)
+
+	// 一般删除的是同一个SKU下面的
+	var product_id = product_feedback.ProductId
+	count, err := db_session.Where("product_id = ?", product_id).Count(new(models.ProductFeedbackInfo))
+	core.HandleError(err)
+
+	if count == 0 {
+		_, err := db_session.Where("product_id = ?", product_id).Delete(new(models.ProductFeedbackSkuInfo))
+		core.HandleError(err)
+	} else {
+		var feedback_sku models.ProductFeedbackSkuInfo
+		_, err = db_session.Where("product_id = ?", product_id).Get(&feedback_sku)
+		core.HandleError(err)
+
+		var time_now = time.Now()
+		feedback_sku.LastUpdate = core.Time(time_now)
+
+		_, err = db_session.Id(feedback_sku.Id).Cols("last_update").Update(&feedback_sku) // 只更新修改时间
+		core.HandleError(err)
+	}
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})
 }
