@@ -239,6 +239,11 @@ func (c ErpContainerTransferEntryExcel) Import() revel.Result {
 	})
 }
 
+type cte_item_t struct {
+	ContainerTransferEntry models.ContainerTransferEntryInfo `xorm:"extends" json:"cte"`
+	Product                models.ProductInfo                `xorm:"extends" json:"p"`
+}
+
 func (c ErpContainerTransferEntryExcel) Export() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.HGBG_CONTAINER_TRANSFER, c.Session)
 
@@ -251,8 +256,25 @@ func (c ErpContainerTransferEntryExcel) Export() revel.Result {
 	_, err := db_session.Id(transfer_id).Get(&containerTransfer)
 	core.HandleError(err)
 
-	entry_list := make([]models.ContainerTransferEntryInfo, 0)
-	err = db_session.Where(fmt.Sprintf("transfer_id = %d", transfer_id)).Find(&entry_list)
+	/*
+		SELECT cte.*, p.*
+			FROM erp_container_transfer_entry cte
+		INNER JOIN erp_product p ON cte.product_id = p.id
+	*/
+
+	var sb = core.NewSqlBuilder()
+	sb.Select("cte.*, p.*")
+	sb.Count("count(*) as entry_count")
+	sb.From(`erp_container_transfer_entry cte
+    INNER JOIN erp_product p ON cte.product_id = p.id`)
+
+	var filter = fmt.Sprintf("cte.transfer_id = %d", transfer_id)
+	sb.Where(filter)
+
+	sb.OrderBy("cte.id asc")
+
+	entry_list := make([]cte_item_t, 0)
+	err = db_session.Sql(sb.SqlList()).Find(&entry_list)
 	core.HandleError(err)
 
 	xlsx_file := c.export_entry_list_to_excel(db_session, entry_list)
@@ -269,7 +291,7 @@ func (c ErpContainerTransferEntryExcel) Export() revel.Result {
 	return c.RenderBinary(reader, file_name, revel.Attachment, time.Now())
 }
 
-func (c ErpContainerTransferEntryExcel) export_entry_list_to_excel(db_session *xorm.Session, entry_list []models.ContainerTransferEntryInfo) *xlsx.File {
+func (c ErpContainerTransferEntryExcel) export_entry_list_to_excel(db_session *xorm.Session, entry_list []cte_item_t) *xlsx.File {
 
 	//统一设置标题单元格格式的函数
 	set_head_cell_style := func(cell *xlsx.Cell) {
@@ -351,19 +373,25 @@ func (c ErpContainerTransferEntryExcel) export_entry_list_to_excel(db_session *x
 		 */
 
 		cell := row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 10)
+		sheet.SetColWidth(col_index, col_index, 12)
 		set_head_cell_style(cell)
 		cell.Value = "SKU"
 		col_index++
 
 		cell = row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 10)
+		sheet.SetColWidth(col_index, col_index, 35)
+		set_head_cell_style(cell)
+		cell.Value = "中文名称"
+		col_index++
+
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 8)
 		set_head_cell_style(cell)
 		cell.Value = "数量"
 		col_index++
 
 		cell = row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 10)
+		sheet.SetColWidth(col_index, col_index, 8)
 		set_head_cell_style(cell)
 		cell.Value = "箱数"
 		col_index++
@@ -384,17 +412,22 @@ func (c ErpContainerTransferEntryExcel) export_entry_list_to_excel(db_session *x
 		// SKU
 		cell := row.AddCell()
 		set_text_cell_style(cell, "center")
-		cell.Value = entry.ProductSku
+		cell.Value = entry.Product.Sku
+
+		// SKU
+		cell = row.AddCell()
+		set_text_cell_style(cell, "left")
+		cell.Value = entry.Product.CnName
 
 		// 数量
 		cell = row.AddCell()
 		set_text_cell_style(cell, "right")
-		cell.SetInt64(entry.Qty)
+		cell.SetInt64(entry.ContainerTransferEntry.Qty)
 
 		// 箱数
 		cell = row.AddCell()
 		set_text_cell_style(cell, "right")
-		cell.SetInt64(entry.BoxQty)
+		cell.SetInt64(entry.ContainerTransferEntry.BoxQty)
 
 		/*
 		// 价格
