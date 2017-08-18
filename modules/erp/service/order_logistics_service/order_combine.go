@@ -144,14 +144,18 @@ INSERT INTO erp_order_shipping_address (order_id, name, street1, street2, city_n
 		_, err = db_session.Id(order_id_list[0]).Get(&first_order)
 		core.HandleError(err)
 
-		order_history_service.Insert_order_history(first_order, user.UserId, fmt.Sprintf("订单合并,被和并订单id: %s, 工号：%s", strings.Join(order_id_str_list[1:], ","), user.LoginName), db_session)
+		var combined_order_list = make([]models.OrderInfo, 0)
+		core.HandleError(db_session.In("id", order_id_list[1:]).Find(&combined_order_list))
 
-		for _, order_id := range order_id_list[1:] {
-			var order models.OrderInfo
-			_, err := db_session.Id(order_id).Get(&order)
-			core.HandleError(err)
+		var combined_order_code_list = make([]string, 0)
+		for _, order := range combined_order_list {
+			combined_order_code_list = append(combined_order_code_list, order.Code)
+		}
 
-			order_history_service.Insert_order_history(order, user.UserId, fmt.Sprintf("订单被合并而取消, 并入订单id: %s， 工号：%s", order_id_str_list[0], user.LoginName), db_session)
+		order_history_service.Insert_order_history(first_order, user.UserId, fmt.Sprintf("订单合并,被和并订单编码: %s, 工号：%s", strings.Join(combined_order_code_list, ","), user.LoginName), db_session)
+
+		for _, order := range combined_order_list {
+			order_history_service.Insert_order_history(order, user.UserId, fmt.Sprintf("订单被合并而取消, 并入订单编码: %s， 工号：%s", first_order.Code, user.LoginName), db_session)
 		}
 	}
 
