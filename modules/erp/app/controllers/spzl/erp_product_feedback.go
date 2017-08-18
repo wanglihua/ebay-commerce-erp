@@ -144,7 +144,6 @@ WHERE pf.product_id = %d)`
 		"success":                true,
 		"feedback_cate_id":       0,
 		"feedback_cate_list":     feedback_cate_list,
-		"feedback_sku":           "",
 		"feedback_supplier_id":   0,
 		"feedback_supplier_list": feedback_supplier_list,
 	})
@@ -367,7 +366,7 @@ func (c ErpProductFeedback) Save() revel.Result {
 		//_, err = db_session.Id(product_feedback.Id).Cols("code").Update(&product_feedback)
 		//core.HandleError(err)
 	} else {
-		affected, err = db_session.Id(product_feedback.Id).Cols("cate_id", "product_id", "supplier_id", "description").Update(&product_feedback)
+		affected, err = db_session.Id(product_feedback.Id).Cols("cate_id", "product_id", "supplier_id", "description", "solution").Update(&product_feedback)
 		core.HandleError(err)
 
 		if affected == 0 {
