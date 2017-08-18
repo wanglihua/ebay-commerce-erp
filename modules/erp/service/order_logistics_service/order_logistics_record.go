@@ -89,12 +89,12 @@ func save_order_logistics(p_ol *OrderLogisticsService, p_order *models.OrderInfo
 	var cost_price_total float64 = 0
 	var product_info_list = p_order_logistics_data.order_product_info_list
 	for _, product_info := range product_info_list {
-		cost_price_total = cost_price_total + product_info.CostPrice
+		cost_price_total = cost_price_total + product_info.CostPrice*float64(product_info.Qty)
 	}
 
 	if cost_price_total != 0 {
 		for _, product_info := range product_info_list {
-			var item_profit = product_info.CostPrice * order_profit / cost_price_total
+			var item_profit = product_info.CostPrice * float64(product_info.Qty) * order_profit / cost_price_total
 
 			var order_item models.OrderItemInfo
 			order_item.CostPrice = product_info.CostPrice
@@ -166,12 +166,12 @@ func save_special_hold_order_logistics(p_ol *OrderLogisticsService, p_order *mod
 	var cost_price_total float64 = 0
 	// var product_info_list = p_order_logistics_data.order_product_info_list
 	for _, product_info := range product_info_list {
-		cost_price_total = cost_price_total + product_info.CostPrice
+		cost_price_total = cost_price_total + product_info.CostPrice*float64(product_info.Qty)
 	}
 
 	if cost_price_total != 0 {
 		for _, product_info := range product_info_list {
-			var item_profit = product_info.CostPrice * order_profit / cost_price_total
+			var item_profit = product_info.CostPrice * float64(product_info.Qty) * order_profit / cost_price_total
 
 			var order_item models.OrderItemInfo
 			order_item.CostPrice = product_info.CostPrice

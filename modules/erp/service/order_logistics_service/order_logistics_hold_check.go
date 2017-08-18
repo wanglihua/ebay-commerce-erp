@@ -589,7 +589,7 @@ func check_stock_has_order_products_and_get_cost_amount(p_ol *OrderLogisticsServ
 				cost_amount = cost_amount + float64(order_product_info.Qty)*product_stock_qty.CostPrice/p_ol.aud_exchange_rate // 库存成本换算成澳币，仓库成本都是RMB的
 
 				// 记录下订单明细里面的 商品的澳仓成本价，这代码是后来加上的
-				order_product_info_list[index].CostPrice = cost_amount
+				order_product_info_list[index].CostPrice = product_stock_qty.CostPrice / p_ol.aud_exchange_rate
 
 				var temp_pending_qty_by_this_order_product_to_remove int64 = order_product_info.Qty
 				if consider_temp_pending_for_this_order == true {

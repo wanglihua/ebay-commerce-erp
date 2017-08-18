@@ -928,53 +928,12 @@ func (c ErpOrder) SavePickupActual() revel.Result {
 		Update(&order)
 	core.HandleError(err)
 
-	var order_item_list = make([]models.OrderItemInfo, 0)
-	core.HandleError(db_session.Where("order_id = ?", order.Id).Find(&order_item_list))
-
 	// 获得当前订单的物流信息
 	var order_logistics models.OrderLogisticsInfo
 	_, err = db_session.Where("order_id = ?", order.Id).Get(&order_logistics)
 	core.HandleError(err)
 
-	// 计算订单成本 AUD
-	var order_cost_amount = order_service.GetOrderCostAmountSum(order.Id, db_session)
-
-	revel.TRACE.Println("order_cost_amount", order_cost_amount)
-
-	order_logistics.CostAmount = order_cost_amount
-	_, err = db_session.Id(order_logistics.Id).Cols("cost_amount").Update(&order_logistics)
-	core.HandleError(err)
-
-	// 重新计算订单毛利
-	var order_profit_au = order_service.CalculateOrderProfit(&order, &order_logistics)
-	revel.TRACE.Println("order_profit_au", order_profit_au)
-	var order_profit = order_profit_au * order.ExchangeRate
-
-	order.ProfitAu = order_profit_au
-	order.ProfitRmb = order_profit
-
-	/*
-	order_import_same_code_list[index].price_au = ((order_import.cost_price * (float64(order_import.Spsl)) / cost_price_total) * order_import.Skje) / float64(order_import.Spsl)
-	order_import_same_code_list[index].price_rmb = order_import_same_code_list[index].price_au * aud_exchange_rate_setting
-	order_import_same_code_list[index].gross_profit = (order_import_same_code_list[index].price_rmb - order_import_same_code_list[index].cost_price) * float64(order_import.Spsl)
-	 */
-
-	for _, oi := range order_item_list {
-		// 价格分配
-		oi.TransactionPrice = oi.CostPrice * float64(oi.Quantity) * order.AmountPaid / order_cost_amount / float64(oi.Quantity)
-		oi.TransactionPriceCurrency = "AUD"
-		oi.TransactionPriceRmb = oi.TransactionPrice * order.ExchangeRate
-
-		// 利润分配
-		oi.GrossProfit = oi.CostPrice * float64(oi.Quantity) * order.ProfitAu / order_cost_amount
-		revel.TRACE.Println("oi.CostPrice * float64(oi.Quantity)", oi.CostPrice*float64(oi.Quantity))
-		revel.TRACE.Println("order.ProfitAu", order.ProfitAu)
-		revel.TRACE.Println("order_cost_amount", order_cost_amount)
-		revel.TRACE.Println("oi.GrossProfit", oi.GrossProfit)
-
-		_, err := db_session.Id(oi.Id).Cols("transaction_price", "transaction_price_currency", "transaction_price_rmb", "gross_profit").Update(&oi)
-		core.HandleError(err)
-	}
+	order_service.Update_order_logistics_cost_amount_and_order_profit_and_order_item_price_profit(order, order_logistics, db_session)
 
 	return c.RenderJson(map[string]interface{}{
 		"success": true,
