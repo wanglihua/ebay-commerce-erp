@@ -1597,18 +1597,41 @@ func (c ErpOrder) Pickup() revel.Result {
 		_, err := db_session.Id(order.Id).Cols("status_id", "hold_type_id", "stock_id", "company_id", "mode_id").Update(&order)
 		core.HandleError(err)
 
+		// order logistics
 		var order_logistics models.OrderLogisticsInfo
-		_, err = db_session.Where(fmt.Sprintf("order_id = %d", order.Id)).Get(&order_logistics)
+		has, err := db_session.Where(fmt.Sprintf("order_id = %d", order.Id)).Get(&order_logistics)
 		core.HandleError(err)
 
+		order_logistics.OrderId = order.Id
 		order_logistics.StockId = stock_id
 		order_logistics.CompanyId = 0
 		order_logistics.ModeId = 0
 		order_logistics.TotalFee = 0
 		order_logistics.PickFee = 0
 
-		_, err = db_session.Id(order_logistics.Id).Cols("stock_id", "company_id", "mode_id").Update(&order_logistics)
+		if has {
+			_, err = db_session.Id(order_logistics.Id).Cols("stock_id", "company_id", "mode_id").Update(&order_logistics)
+			core.HandleError(err)
+		} else {
+			_, err = db_session.Insert(&order_logistics)
+			core.HandleError(err)
+		}
+
+		// pickup order
+		var pickup_order models.PickupOrderInfo
+		has, err = db_session.Where(fmt.Sprintf("order_id = %d", order.Id)).Get(&pickup_order)
 		core.HandleError(err)
+
+		pickup_order.OrderId = order.Id
+		pickup_order.IsPaid = 1
+
+		if has {
+			_, err = db_session.Id(order_logistics.Id).Cols("is_paid").Update(&order_logistics)
+			core.HandleError(err)
+		} else {
+			_, err = db_session.Insert(&pickup_order)
+			core.HandleError(err)
+		}
 
 		order_history_service.Insert_order_history(order, login_user.UserId, fmt.Sprintf("订单PICK UP， 工号： %s", login_user.LoginName), db_session)
 	}
