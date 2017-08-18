@@ -862,7 +862,7 @@
                 vm.refreshList();
             },
             matchLogistics: function () {
-                $.msg.confirm("确认要对所有未付款订单匹配物流吗？", function () {
+                $.msg.confirm("确认要对所有已支付订单匹配物流吗？", function () {
                     showMask("物流匹配中，请稍候...");
                     $.ajax({
                         url: '{%url "ErpOrder.MatchLogistics"%}',

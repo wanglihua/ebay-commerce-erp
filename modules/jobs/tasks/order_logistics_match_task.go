@@ -49,6 +49,10 @@ func (t OrderLogisticsMatchTask) Run() {
 		db_session.Close()
 	}()
 
+	// 先进行合并
+	err = order_logistics_service.Combine_orders(fmt.Sprintf("o.type_id <> %d AND o.status_id = %d", models.ORDER_TYPE_DRDD, models.ORDER_STATUS_YZF), core.LoginUser{}, db_session)
+	core.HandleError(err)
+
 	// 获得不是导入的且已支付的订单列表
 	/*
 	SELECT * FROM erp_order o WHERE o.type_id <> 0 AND o.status_id = 0
@@ -59,8 +63,6 @@ func (t OrderLogisticsMatchTask) Run() {
 	core.HandleError(err)
 
 	if len(paid_download_order_list) != 0 {
-		err = order_logistics_service.Combine_orders(fmt.Sprintf("o.type_id <> %d AND o.status_id = %d", models.ORDER_TYPE_DRDD, models.ORDER_STATUS_YZF), db_session)
-		core.HandleError(err)
 
 		var p_order_logistics = new(order_logistics_service.OrderLogisticsService)
 		p_order_logistics.LoginUser = core.LoginUser{} // 自动任务 操作历史不记录工号

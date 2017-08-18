@@ -809,7 +809,7 @@ func (c ErpOrderImport) MatchLogistics() revel.Result {
 	var p_order_logistics = new(order_logistics_service.OrderLogisticsService)
 	var login_user = core.GetLoginUser(c.Session)
 	p_order_logistics.LoginUser = login_user
-	err := p_order_logistics.CalculateListImportBatch(batch_code, db_session)
+	err := p_order_logistics.CalculateListImportBatch(batch_code, login_user, db_session)
 	// core.HandleError(err)
 	if err != nil {
 		return c.RenderJson(map[string]interface{}{

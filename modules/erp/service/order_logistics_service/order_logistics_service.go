@@ -110,7 +110,12 @@ func (p_ol *OrderLogisticsService) init_data(db_session *xorm.Session) {
 	p_ol.mel_stock_id = stock_service.Get_mel_stock_id(db_session)
 }
 
-func (p_ol *OrderLogisticsService) CalculateListPaidOrders(db_session *xorm.Session) error {
+func (p_ol *OrderLogisticsService) CalculateListPaidOrders(user core.LoginUser, db_session *xorm.Session) error {
+
+	// 需要先合并
+	err := Combine_orders(fmt.Sprintf("o.status_id = %d", models.ORDER_STATUS_YZF), user, db_session)
+	core.HandleError(err)
+
 	// 获取 已支付 状态的订单, 匹配完成后，订单的状态就是 Hold 或者 待配货
 	var order_list = order_service.Get_paid_order_list(db_session)
 
@@ -131,13 +136,14 @@ func (p_ol *OrderLogisticsService) CalculateListPaidOrders(db_session *xorm.Sess
 		return errors.New("订单明细不能为空！")
 	}
 
-	err := Combine_orders(fmt.Sprintf("o.status_id = %d", models.ORDER_STATUS_YZF), db_session)
-	core.HandleError(err)
-
 	return p_ol.CalculateList(order_list, db_session)
 }
 
-func (p_ol *OrderLogisticsService) CalculateListImportBatch(batch_code int64, db_session *xorm.Session) error {
+func (p_ol *OrderLogisticsService) CalculateListImportBatch(batch_code int64, user core.LoginUser, db_session *xorm.Session) error {
+
+	// 先合并
+	err := Combine_orders(fmt.Sprintf("o.batch_code = %d", batch_code), user, db_session)
+	core.HandleError(err)
 
 	//获得该批次号的订单列表
 	/*
@@ -147,7 +153,7 @@ SELECT o.* FROM erp_order o WHERE o.batch_code = 0
 	sql_import_batch_order = fmt.Sprintf(sql_import_batch_order, batch_code, models.ORDER_STATUS_YQX)
 
 	var order_list = make([]models.OrderInfo, 0)
-	err := db_session.Sql(sql_import_batch_order).Find(&order_list)
+	err = db_session.Sql(sql_import_batch_order).Find(&order_list)
 	core.HandleError(err)
 
 	if len(order_list) == 0 {
@@ -160,9 +166,6 @@ SELECT o.* FROM erp_order o WHERE o.batch_code = 0
 			return errors.New("订单状态为已支付状态的，才能匹配物流！")
 		}
 	}
-
-	err = Combine_orders(fmt.Sprintf("o.batch_code = %d", batch_code), db_session)
-	core.HandleError(err)
 
 	return p_ol.CalculateList(order_list, db_session)
 }

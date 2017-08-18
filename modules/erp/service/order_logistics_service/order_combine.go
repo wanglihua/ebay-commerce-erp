@@ -8,11 +8,12 @@ import (
 	"github.com/go-xorm/xorm"
 	"matrix/core"
 	"matrix/modules/erp/models"
+	"matrix/modules/erp/service/order_history_service"
 )
 
 // 合并订单
 // order_filter: o.batch_code = '20170428120352'
-func Combine_orders(order_filter string, db_session *xorm.Session) error {
+func Combine_orders(order_filter string, user core.LoginUser, db_session *xorm.Session) error {
 
 	if len(order_filter) == 0 {
 		return errors.New("未提供订单过滤条件！")
@@ -137,6 +138,21 @@ INSERT INTO erp_order_shipping_address (order_id, name, street1, street2, city_n
 		sql_cancel_order = fmt.Sprintf(sql_cancel_order, models.ORDER_STATUS_YQX, strings.Join(order_id_str_list[1:], ",")) // 作废第一个之外的 order，设置为已取消状态
 		_, err = db_session.Exec(sql_cancel_order)
 		core.HandleError(err)
+
+		// 订单历史
+		var first_order models.OrderInfo
+		_, err = db_session.Id(order_id_list[0]).Get(&first_order)
+		core.HandleError(err)
+
+		order_history_service.Insert_order_history(first_order, user.UserId, fmt.Sprintf("订单合并,被和并订单id: %s, 工号：%s", strings.Join(order_id_str_list[1:], ","), user.LoginName), db_session)
+
+		for _, order_id := range order_id_list[1:] {
+			var order models.OrderInfo
+			_, err := db_session.Id(order_id).Get(&order)
+			core.HandleError(err)
+
+			order_history_service.Insert_order_history(order, user.UserId, fmt.Sprintf("订单被合并而取消, 并入订单id: %s， 工号：%s", order_id_str_list[0], user.LoginName), db_session)
+		}
 	}
 
 	return nil

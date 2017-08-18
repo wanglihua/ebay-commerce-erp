@@ -766,7 +766,7 @@ WHERE oi.order_id = %d;`
 	var order_profit_au = order_service.CalculateOrderProfit(&order, &order_logistics)
 	var order_profit = order_profit_au * order.ExchangeRate
 
-	if order.ProfitAu == 0 {
+	if order.ProfitAu == 0 { // 之前许多订单没有预先计算毛利，所以没计算的，这个机会计算一下
 		order.ProfitAu = order_profit_au
 		order.ProfitRmb = order_profit
 
@@ -964,7 +964,7 @@ func (c ErpOrder) MatchLogistics() revel.Result {
 	var p_order_logistics = new(order_logistics_service.OrderLogisticsService)
 	var login_user = core.GetLoginUser(c.Session)
 	p_order_logistics.LoginUser = login_user
-	err := p_order_logistics.CalculateListPaidOrders(db_session)
+	err := p_order_logistics.CalculateListPaidOrders(login_user, db_session)
 
 	// core.HandleError(err)
 	if err != nil {
