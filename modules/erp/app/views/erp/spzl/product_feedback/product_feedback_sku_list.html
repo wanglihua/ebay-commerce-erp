@@ -6,7 +6,7 @@
                 <a href='{%url "Home.Index"%}'><i class="ace-icon fa fa-home home-icon"></i></a>
             </li>
             <li class="parent" data-menu="spzl-menu">商品质量反馈</li>
-            <li class="active" data-menu="spzl-product-feedback-menu">商品质量反馈</li>
+            <li class="active" data-menu="spzl-product-feedback-menu">反馈SKU列表</li>
         </ul>
     </div>
     <div class="page-content">
@@ -16,6 +16,10 @@
                     <button class="btn btn-primary btn-sm" @click="reloadList('#productList')">
                         <i class="ace-icon fa fa-refresh"></i>
                         刷新
+                    </button>
+                    <button class="btn btn-success btn-sm" @click="showProductFeedbackDetail()">
+                        <i class="ace-icon fa fa-plus"></i>
+                        新增
                     </button>
                 </div>
                 <div class="row" style="margin-top:10px;margin-bottom:5px;">
@@ -35,6 +39,85 @@
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="productFeedbackDetailDialog">
+        <div class="modal-dialog" style="width: 680px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="True">&times;</button>
+                    <h4 class="modal-title">商品质量反馈详细</h4>
+                </div>
+                <div class="modal-body clearfix">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <form class="form-horizontal" role="form" id="productFeedbackDetailForm">
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <label for="sku" class="col-xs-2 control-label">商品SKU</label>
+                                            <div class="col-xs-10">
+                                                <input id="sku" name="detail.product_feedback.sku" type="text" class="input-sm form-control" v-model.number="detail.product_feedback.sku"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <label for="cate_id" class="col-xs-2 control-label">反馈类别</label>
+                                            <div class="col-xs-10">
+                                                <select id="cate_id" name="detail.product_feedback.cate_id" type="text" class="input-sm form-control" v-model.number="detail.product_feedback.cate_id">
+                                                    <template v-for="cate in product_feedback_cate_list">
+                                                        <option :value="cate.id">{{cate.name}}</option>
+                                                    </template>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <label for="supplier_id" class="col-xs-2 control-label">供应商</label>
+                                            <div class="col-xs-10">
+                                                <select id="supplier_id" name="detail.product_feedback.supplier_id" class="input-sm form-control" v-model.number="detail.product_feedback.supplier_id">
+                                                    <template v-for="supplier in supplier_list">
+                                                        <option :value="supplier.id">{{supplier.name}}</option>
+                                                    </template>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <label for="description" class="col-xs-2 control-label">描述</label>
+                                            <div class="col-xs-10">
+                                                <textarea id="description" name="detail.product_feedback.description" rows="4" class="input-sm form-control" v-model="detail.product_feedback.description"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success btn-sm" @click="saveProductFeedback()">
+                        <i class="ace-icon fa fa-floppy-o"></i>保存
+                    </button>
+                    <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">
+                        <i class="ace-icon fa fa-times"></i>关闭
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 <script type="text/javascript">
     $(function () {
@@ -44,7 +127,12 @@
                 "sAjaxSource": '{%url "ErpProductFeedback.SkuListData"%}',
                 "aaSorting": [[0, "asc"]],
                 "aoColumns": [
-                    {"mDataProp": "sku", "title": "SKU", "bSearchable": false, "width": 150},
+                    {
+                        "mDataProp": "sku", "title": "SKU", "bSearchable": false, "width": 150,
+                        "render": function (data, type, row) {
+                            return "<a style='cursor: pointer;' onclick='show_sku_feedback(" + row.id + ");' >" + data + "</a>";
+                        }
+                    },
                     {
                         "mDataProp": "cn_name", "title": "商品名称", "bSearchable": false, "sClass": "wrap-word",
                         "render": function (data, type, row) {
@@ -57,8 +145,8 @@
                             return "<a class='btn btn-xs btn-info btn-inline pull-left' onclick='show_sku_feedback(" + data + ");' ><i class='ace-icon fa fa-list'></i>查看反馈</a>";
                         }
                     },
-                    {"mDataProp": "create_time", "title": "创建时间", "bSearchable": false, "width": 120},
-                    {"mDataProp": "update_time", "title": "修改时间", "bSearchable": false, "width": 120}
+                    {"mDataProp": "create_time", "title": "最近创建", "bSearchable": false, "width": 120},
+                    {"mDataProp": "update_time", "title": "最近修改", "bSearchable": false, "width": 120}
                 ],
                 "fnServerData": function (sSource, aoData, fnCallback) {
                     showMask("数据加载中，请稍候");
@@ -91,6 +179,11 @@
     var vm = new Vue({
         el: "#page",
         data: {
+            "detail": {
+                "product_feedback": {}
+            },
+            "product_feedback_cate_list": [],
+            "supplier_list": [],
             "page": {
                 "feedback_sku": ""
             }
@@ -100,6 +193,80 @@
         methods: {
             reloadList: function () {
                 reloadList('#productList');
+            },
+            showProductFeedbackDetail: function () {
+                showMask("加载中...");
+                $("#productFeedbackDetailForm").clearValidation();
+                $.ajax({
+                        url: '{%url "ErpProductFeedback.DetailData" %}',
+                        type: "POST",
+                        success: function (result) {
+                            hideMask();
+                            if (result.success === false) {
+                                $.msg.error(result.message);
+                                return;
+                            }
+                            vm.detail = result.detail;
+                            vm.product_feedback_cate_list = result.product_feedback_cate_list;
+                            vm.supplier_list = result.supplier_list;
+
+                            $('#productFeedbackDetailDialog').modal(modalOptions);
+                        }
+                    }
+                );
+            },
+            saveProductFeedback: function () {
+                showMask("提交中...");
+                var form = $("#productFeedbackDetailForm");
+                var valid = validate(form, {
+                    'detail.product_feedback.cate_id': {
+                        required: true, digits: true
+                    },
+                    'detail.product_feedback.sku': {
+                        required: true
+                    },
+                    'detail.product_feedback.supplier_id': {
+                        required: true, digits: true
+                    },
+                    'detail.product_feedback.code': {
+                        required: true
+                    },
+                    'detail.product_feedback.description': {
+                        required: false, maxlength: 800
+                    },
+                    'detail.product_feedback.user_id': {
+                        required: true, digits: true
+                    },
+                    'detail.product_feedback.user_login_name': {
+                        required: true, minlength: 2, maxlength: 100
+                    }
+                });
+
+                if (!valid) {
+                    hideMask();
+                } else {
+                    $.ajax({
+                            url: '{%url "ErpProductFeedback.Save"%}',
+                            type: "POST",
+                            processData: false,
+                            contentType: 'application/json',
+                            data: JSON.stringify(vm.detail),
+                            success: function (data) {
+                                hideMask();
+                                if (data.success === false) {
+                                    $.msg.error(data.message);
+                                    //return;
+                                }
+                                else {
+                                    $.msg.show(data.message);
+                                    $('#productFeedbackDetailDialog').modal('hide');
+                                    vm.reloadList();
+                                    //return;
+                                }
+                            }
+                        }
+                    );
+                }
             }
         }
     });

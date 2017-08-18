@@ -240,6 +240,9 @@ func (c ErpProductFeedback) DetailData() revel.Result {
 	var product_feedback_id int64
 	c.Params.Bind(&product_feedback_id, "id")
 
+	var product_id int64
+	c.Params.Bind(&product_id, "product_id")
+
 	var product_feedback models.ProductFeedbackInfo
 	if product_feedback_id != 0 {
 		has, err := db_session.Id(product_feedback_id).Get(&product_feedback)
@@ -247,6 +250,8 @@ func (c ErpProductFeedback) DetailData() revel.Result {
 		if has == false {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "指定的商品质量反馈不存在！"})
 		}
+	} else {
+		product_feedback.ProductId = product_id
 	}
 
 	// 获取商品的SKU
