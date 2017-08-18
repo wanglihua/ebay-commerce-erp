@@ -83,8 +83,18 @@ WHERE p.sku = '12344';
 	})
 }
 
-func (c ErpProductFeedback) Index() revel.Result {
+func (c ErpProductFeedback) Index(id int64) revel.Result {
 	pass_service.Check_login_user_pass(pass_res.SPZL_PRODUCT_FEEDBACK, c.Session)
+
+	var db_session = c.DbSession
+
+	var product_id = id
+	c.RenderArgs["product_id"] = product_id
+
+	var product models.ProductInfo
+	_, err := db_session.Id(product_id).Get(&product)
+	core.HandleError(err)
+	c.RenderArgs["product"] = product
 
 	return c.RenderTemplate("erp/spzl/product_feedback/product_feedback_index.html")
 }
@@ -123,16 +133,11 @@ func (c ErpProductFeedback) PageData() revel.Result {
 func (c ErpProductFeedback) ListData() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.SPZL_PRODUCT_FEEDBACK, c.Session)
 
-	var feedback_code string
-	c.Params.Bind(&feedback_code, "feedback_code")
-	feedback_code = strings.TrimSpace(feedback_code)
+	var product_id int64
+	c.Params.Bind(&product_id, "product_id")
 
 	var feedback_cate_id int64
 	c.Params.Bind(&feedback_cate_id, "feedback_cate_id")
-
-	var feedback_sku string
-	c.Params.Bind(&feedback_sku, "feedback_sku")
-	feedback_sku = strings.TrimSpace(feedback_sku)
 
 	var feedback_supplier_id int64
 	c.Params.Bind(&feedback_supplier_id, "feedback_supplier_id")
@@ -171,12 +176,10 @@ FROM erp_product_feedback pf
     INNER JOIN erp_product p ON p.id = pf.product_id
     INNER JOIN erp_supplier sup ON sup.id = pf.supplier_id`)
 
+	filter = core.SqlAnd(filter, fmt.Sprintf("p.id = %d", product_id))
+
 	if feedback_cate_id != 0 {
 		filter = core.SqlAnd(filter, fmt.Sprintf("pf.cate_id = %d", feedback_cate_id))
-	}
-
-	if feedback_sku != "" {
-		filter = core.SqlAnd(filter, fmt.Sprintf("p.sku = '%s'", feedback_sku))
 	}
 
 	if feedback_supplier_id != 0 {

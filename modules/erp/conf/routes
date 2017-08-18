@@ -599,11 +599,11 @@ POST /product/feedback/cate/data/detail        ErpProductFeedbackCate.DetailData
 POST /product/feedback/cate/save               ErpProductFeedbackCate.Save
 POST /product/feedback/cate/delete             ErpProductFeedbackCate.Delete
 
-GET  /product/feedback                    ErpProductFeedback.Index
-POST /product/feedback/data/page          ErpProductFeedback.PageData
-POST /product/feedback/data/list          ErpProductFeedback.ListData
 GET  /product/feedback/sku/list           ErpProductFeedback.SkuList
 POST /product/feedback/sku/list/data      ErpProductFeedback.SkuListData
+GET  /product/feedback/sku/:id            ErpProductFeedback.Index
+POST /product/feedback/data/page          ErpProductFeedback.PageData
+POST /product/feedback/data/list          ErpProductFeedback.ListData
 POST /product/feedback/data/detail        ErpProductFeedback.DetailData
 POST /product/feedback/save               ErpProductFeedback.Save
 POST /product/feedback/delete             ErpProductFeedback.Delete

@@ -26,20 +26,27 @@
                         删除
                     </button>
                 </div>
+
+                <div class="row" style="margin-top:10px;margin-bottom:5px;">
+                    <div class="col-xs-12" style="line-height: 28px;">
+                        <div class="col-xs-12">
+                            <a href="/product/detail/{%.product_id%}" target="product_detail"><span style="font-weight: bold;">{% .product.Sku %}&nbsp;&nbsp;{% .product.CnName %}<span></a>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="row" style="margin-top:10px;margin-bottom:5px;">
                     <div id="query" class="col-xs-12" style="line-height: 28px;">
                         <div class="col-xs-12">
-                            <label for="feedback_sku">SKU</label>
-                            <input id="feedback_sku" name="feedback_sku" v-model="page.feedback_sku" style="width: 130px;height: 28px;"/>&nbsp;&nbsp;
                             <label for="feedback_cate_id">反馈类别</label>
-                            <select id="feedback_cate_id" name="feedback_cate_id" v-model.number="page.feedback_cate_id" style="width: 180px;height: 28px;">
+                            <select id="feedback_cate_id" name="feedback_cate_id" v-model.number="page.feedback_cate_id" style="width: 180px;height: 28px;" @change="reloadList()">
                                 <option :value="0">反馈类别</option>
                                 <template v-for="cate in page.feedback_cate_list">
                                     <option :value="cate.id">{{cate.name}}</option>
                                 </template>
                             </select>&nbsp;&nbsp;
                             <label for="feedback_supplier_id">供应商</label>
-                            <select id="feedback_supplier_id" name="feedback_supplier_id" v-model.number="page.feedback_supplier_id" style="width: 180px;height: 28px;">
+                            <select id="feedback_supplier_id" name="feedback_supplier_id" v-model.number="page.feedback_supplier_id" style="width: 180px;height: 28px;" @change="reloadList()">
                                 <option :value="0">供应商</option>
                                 <template v-for="supplier in page.feedback_supplier_list">
                                     <option :value="supplier.id">{{supplier.name}}</option>
@@ -137,6 +144,7 @@
         </div>
     </div>
 </div>
+{%template "erp/spzl/product_feedback/product_feedback_index.var" .%}
 <script type="text/javascript">
 
     $(function () {
@@ -146,20 +154,13 @@
             '#productFeedbackList',
             {
                 "sAjaxSource": '{%url "ErpProductFeedback.ListData"%}',
-                "aaSorting": [[1, "asc"]],
+                "aaSorting": [[0, "asc"]],
                 "aoColumns": [
                     {
                         "mDataProp": "pf.id", "bSearchable": false, "orderable": false, "sClass": "center", "width": 50,
                         "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
                         "render": function (data, type, row) {
                             return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
-                        }
-                    },
-                    {"mDataProp": "p.sku", "title": "SKU", "bSearchable": false, "width": 120},
-                    {
-                        "mDataProp": "p.cn_name", "title": "商品名称", "bSearchable": false, "sClass": "wrap-word", "width": 180,
-                        "render": function (data, type, row) {
-                            return "<div>" + data + "</div>";
                         }
                     },
                     {
@@ -183,8 +184,8 @@
                 "fnServerData": function (sSource, aoData, fnCallback) {
                     showMask("数据加载中，请稍候");
 
+                    aoData.push({'name': 'product_id', 'value': product_id});
                     aoData.push({'name': 'feedback_cate_id', 'value': vm.page.feedback_cate_id});
-                    aoData.push({'name': 'feedback_sku', 'value': vm.page.feedback_sku});
                     aoData.push({'name': 'feedback_supplier_id', 'value': vm.page.feedback_supplier_id});
 
                     $.ajax(
@@ -232,7 +233,6 @@
             "page": {
                 "feedback_cate_id": 0,
                 "feedback_cate_list": [],
-                "feedback_sku": "",
                 "feedback_supplier_id": 0,
                 "feedback_supplier_list": []
             },
