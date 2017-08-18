@@ -37,7 +37,7 @@ func GetSpzlMenu(res_id_map map[int64]bool, web_session revel.Session) string {
 
 	if check_pass_res_menu(pass_res.SPZL_PRODUCT_FEEDBACK) {
 		buffer.WriteString(`<li id="spzl-product-feedback-menu" class="">
-            <a href="/product/feedback">
+            <a href="/product/feedback/sku/list">
                 <i class="menu-icon fa fa-caret-right"></i>
                 商品质量反馈
             </a>

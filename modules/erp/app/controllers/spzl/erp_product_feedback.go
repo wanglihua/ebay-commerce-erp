@@ -24,6 +24,8 @@ func (c ErpProductFeedback) SkuList() revel.Result {
 }
 
 func (c ErpProductFeedback) SkuListData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.SPZL_PRODUCT_FEEDBACK, c.Session)
+
 	db_session := c.DbSession
 
 	var feedback_sku string
