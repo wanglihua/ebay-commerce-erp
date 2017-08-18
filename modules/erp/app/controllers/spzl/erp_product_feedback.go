@@ -20,7 +20,7 @@ type ErpProductFeedback struct {
 func (c ErpProductFeedback) SkuList() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.SPZL_PRODUCT_FEEDBACK, c.Session)
 
-	return c.RenderTemplate("erp/spzl/product_feedback/product_feedback_index.html")
+	return c.RenderTemplate("erp/spzl/product_feedback/product_feedback_sku_list.html")
 }
 
 func (c ErpProductFeedback) SkuListData() revel.Result {

@@ -1,0 +1,104 @@
+{%header "商品质量反馈" .%}
+<div id="page">
+    <div class="breadcrumbs" id="breadcrumbs">
+        <ul class="breadcrumb">
+            <li>
+                <a href='{%url "Home.Index"%}'><i class="ace-icon fa fa-home home-icon"></i></a>
+            </li>
+            <li class="parent" data-menu="spzl-menu">商品质量反馈</li>
+            <li class="active" data-menu="spzl-product-feedback-menu">商品质量反馈</li>
+        </ul>
+    </div>
+    <div class="page-content">
+        <div class="row">
+            <div class="col-xs-12" style="padding: 0;">
+                <div class="gridToolBar clearfix">
+                    <button class="btn btn-primary btn-sm" @click="reloadList('#productList')">
+                        <i class="ace-icon fa fa-refresh"></i>
+                        刷新
+                    </button>
+                </div>
+                <div class="row" style="margin-top:10px;margin-bottom:5px;">
+                    <div id="query" class="col-xs-12" style="line-height: 28px;">
+                        <div class="col-xs-12">
+                            <label for="feedback_sku">SKU</label>
+                            <input id="feedback_sku" name="feedback_sku" v-model="page.feedback_sku" style="width: 130px;height: 28px;"/>&nbsp;&nbsp;
+                            <button class="btn btn-mini btn-primary" style="margin-bottom:3px;height: 30px;" @click="reloadList()">
+                                &nbsp;<i class="ace-icon fa fa-search"></i>查&nbsp;询&nbsp;
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <table id="productList" class="table table-striped table-bordered table-hover"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(function () {
+        initDataTable(
+            '#productList',
+            {
+                "sAjaxSource": '{%url "ErpProductFeedback.SkuListData"%}',
+                "aaSorting": [[0, "asc"]],
+                "aoColumns": [
+                    {"mDataProp": "sku", "title": "SKU", "bSearchable": false, "width": 150},
+                    {
+                        "mDataProp": "cn_name", "title": "商品名称", "bSearchable": false, "sClass": "wrap-word",
+                        "render": function (data, type, row) {
+                            return "<div>" + data + "</div>";
+                        }
+                    },
+                    {
+                        "mDataProp": "id", "title": "查看反馈", "bSearchable": false, "sClass": "wrap-word", "width": 100,
+                        "render": function (data, type, row) {
+                            return "<div>" + data + "</div>";
+                        }
+                    },
+                    {"mDataProp": "create_time", "title": "创建时间", "bSearchable": false, "width": 120},
+                    {"mDataProp": "update_time", "title": "修改时间", "bSearchable": false, "width": 120}
+                ],
+                "fnServerData": function (sSource, aoData, fnCallback) {
+                    showMask("数据加载中，请稍候");
+
+                    aoData.push({'name': 'feedback_sku', 'value': vm.page.feedback_sku});
+
+                    $.ajax(
+                        {
+                            "dataType": 'json',
+                            "url": sSource,
+                            "data": aoData,
+                            "success": function (data) {
+                                hideMask();
+                                if (data.success === false) {
+                                    $.msg.error(data.message);
+                                    return;
+                                }
+                                fnCallback(data);
+                            }
+                        });
+                }
+            }
+        );
+    });
+
+    var vm = new Vue({
+        el: "#page",
+        data: {
+            "page": {
+                "feedback_sku": ""
+            }
+        },
+        mounted: function () {
+        },
+        methods: {
+            reloadList: function () {
+                reloadList('#productList');
+            }
+        }
+    });
+</script>
+{%footer%}
+
