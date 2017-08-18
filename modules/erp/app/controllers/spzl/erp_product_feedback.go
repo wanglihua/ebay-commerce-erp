@@ -17,6 +17,70 @@ type ErpProductFeedback struct {
 	*revel.Controller
 }
 
+func (c ErpProductFeedback) SkuList() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.SPZL_PRODUCT_FEEDBACK, c.Session)
+
+	return c.RenderTemplate("erp/spzl/product_feedback/product_feedback_index.html")
+}
+
+func (c ErpProductFeedback) SkuListData() revel.Result {
+	db_session := c.DbSession
+
+	var feedback_sku string
+	c.Params.Bind(&feedback_sku, "feedback_sku")
+	feedback_sku = strings.TrimSpace(feedback_sku)
+
+	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
+
+	/*
+SELECT DISTINCT p.*
+FROM erp_product_feedback pf
+    INNER JOIN erp_product p ON pf.product_id = p.id
+WHERE p.sku = '12344';
+
+SELECT count(DISTINCT p.id) AS sku_count
+FROM erp_product_feedback pf
+    INNER JOIN erp_product p ON pf.product_id = p.id
+WHERE p.sku = '12344';
+	 */
+
+	var sb = core.NewSqlBuilder()
+	sb.Select(`DISTINCT p.*`)
+	sb.Count("count(DISTINCT p.id) AS sku_count")
+	sb.From(`erp_product_feedback pf
+    INNER JOIN erp_product p ON pf.product_id = p.id`)
+
+	if feedback_sku != "" {
+		filter = core.SqlAnd(filter, fmt.Sprintf("p.sku = '%s'", feedback_sku))
+	}
+
+	sb.Where(filter)
+
+	if order != "" {
+		sb.OrderBy(order)
+	} else {
+		sb.OrderBy("p.id ASC")
+	}
+
+	sb.Limit(offset, limit)
+
+	product_list := make([]models.ProductInfo, 0, limit)
+	err := db_session.Sql(sb.SqlList()).Find(&product_list)
+	core.HandleError(err)
+
+	var sku_count struct {
+		Count int64 `xorm:"'sku_count'"`
+	}
+
+	_, err = db_session.Sql(sb.SqlCount()).Get(&sku_count)
+	core.HandleError(err)
+
+	return c.RenderJson(core.GridResult{
+		Data:  product_list,
+		Total: sku_count.Count,
+	})
+}
+
 func (c ErpProductFeedback) Index() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.SPZL_PRODUCT_FEEDBACK, c.Session)
 
