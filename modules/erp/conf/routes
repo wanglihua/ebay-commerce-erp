@@ -33,6 +33,9 @@ POST /supplier/data/detail                 ErpSupplier.DetailData
 POST /supplier/save                        ErpSupplier.Save
 POST /supplier/delete                      ErpSupplier.Delete
 
+POST /supplier/import                      ErpSupplierExcel.Import
+POST /supplier/export                      ErpSupplierExcel.Export
+
 POST /region/province/list                 ErpRegion.GetProvinceList
 POST /region/city/list                     ErpRegion.GetCityList
 POST /region/full/name                     ErpRegion.GetRegionFullName
@@ -607,3 +610,6 @@ POST /product/feedback/data/list          ErpProductFeedback.ListData
 POST /product/feedback/data/detail        ErpProductFeedback.DetailData
 POST /product/feedback/save               ErpProductFeedback.Save
 POST /product/feedback/delete             ErpProductFeedback.Delete
+
+POST /product/feedback/import             ErpProductFeedbackExcel.Import
+POST /product/feedback/export             ErpProductFeedbackExcel.Export
