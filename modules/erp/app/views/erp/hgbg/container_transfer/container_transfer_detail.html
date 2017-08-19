@@ -364,6 +364,16 @@
                                             </div>
                                         </div>
                                     </div>
+
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="description" class="col-xs-2 control-label">描述</label>
+                                            <div class="col-xs-10">
+                                                <textarea id="description" name="detail.transfer.description" rows="3" class="input-sm form-control" v-model="detail.transfer.description"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                 </div>
 
                             </form>
@@ -785,7 +795,8 @@
                                 //return;
                             }
                             else {
-                                reloadPageData();
+                                //reloadPageData();
+                                window.location.reload();
                                 //return;
                             }
                         }

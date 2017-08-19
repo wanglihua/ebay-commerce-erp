@@ -27,6 +27,7 @@ type ContainerTransferInfo struct {
 	StatusId          int64           `xorm:"bigint notnull index 'status_id'" json:"status_id" smith:"verbose_name=状态"`
 	ImportCompanyCode string          `xorm:"nvarchar(20) notnull default('') 'import_company_code'" json:"import_company_code" smith:"verbose_name=澳洲清关公司代码"`
 	ImportCompanyName string          `xorm:"nvarchar(200) notnull default('') 'import_company_name'" json:"import_company_name" smith:"verbose_name=澳洲清关公司"`
+	Description       string          `xorm:"nvarchar(800) notnull default('') 'description'" json:"description"`
 	CreateTime        core.Time       `xorm:"created notnull 'create_time'" json:"create_time"`
 	UpdateTime        core.Time       `xorm:"updated notnull 'update_time'" json:"update_time"`
 }
