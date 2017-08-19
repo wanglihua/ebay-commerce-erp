@@ -223,7 +223,17 @@ func (c ErpContainerTransferEntry) Save() revel.Result {
 
 	container_transfer_service.CalculateAndSaveWeightVolumeAmount(container_transfer_entry.TransferId, db_session)
 
-	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据保存成功!"})
+	if container_transfer_entry.Price == 0 {
+		return c.RenderJson(core.JsonResult{
+			Success: false,
+			Message: "数据保存成功，但商品中国仓成本价格为零！修改中国仓成本后，请重新保存本条数据！",
+		})
+	} else {
+		return c.RenderJson(core.JsonResult{
+			Success: true,
+			Message: strconv.FormatInt(affected, 10) + "条数据保存成功!",
+		})
+	}
 }
 
 func (c ErpContainerTransferEntry) Delete() revel.Result {
