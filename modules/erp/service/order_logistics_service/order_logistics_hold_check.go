@@ -577,19 +577,25 @@ func check_stock_has_order_products_and_get_cost_amount(p_ol *OrderLogisticsServ
 	var products_stock_qty_list = p_order_logistics_data.products_stock_qty_list //库存为零的也包含，只要有记录的都会包含，可以从里面取得仓库的成本价，就算库存为零也能取得成本价
 	var order_product_info_list = p_order_logistics_data.order_product_info_list //保存物流的时候要从这里面取 澳仓成本 cost_price
 
-	var stock_has_all_product = true
+	// 计算总的澳仓成本
 	var cost_amount float64 = 0
-
-	// 对订单中的每个商品信息循环，看是不是这个商品在这个仓库里面有货且有足够的数量
-	for index, order_product_info := range order_product_info_list {
-		revel.TRACE.Println("order_product_info:", order_product_info)
-		var product_has_stock = false
+	for _, order_product_info := range order_product_info_list {
 		for _, product_stock_qty := range products_stock_qty_list {
-			revel.TRACE.Println("product_stock_qty.ProductId, product_stock_qty.Qty:", product_stock_qty.ProductId, product_stock_qty.Qty)
 			if product_stock_qty.StockId == stock_id && product_stock_qty.ProductId == order_product_info.ProductId {
 				//这里的 cost_amount = cost_amount + 实际也不是累加，因为只运行一次
 				cost_amount = cost_amount + float64(order_product_info.Qty)*product_stock_qty.CostPrice/p_ol.aud_exchange_rate // 库存成本换算成澳币，仓库成本都是RMB的
+			}
+		}
+	}
 
+	var stock_has_all_product = true
+	// 对订单中的每个商品信息循环，看是不是这个商品在这个仓库里面有货且有足够的数量
+	for index, order_product_info := range order_product_info_list {
+		// revel.TRACE.Println("order_product_info:", order_product_info)
+		var product_has_stock = false
+		for _, product_stock_qty := range products_stock_qty_list {
+			// revel.TRACE.Println("product_stock_qty.ProductId, product_stock_qty.Qty:", product_stock_qty.ProductId, product_stock_qty.Qty)
+			if product_stock_qty.StockId == stock_id && product_stock_qty.ProductId == order_product_info.ProductId {
 				// 记录下订单明细里面的 商品的澳仓成本价，这代码是后来加上的
 				order_product_info_list[index].CostPrice = product_stock_qty.CostPrice / p_ol.aud_exchange_rate
 
@@ -623,7 +629,7 @@ func check_stock_has_order_products_and_get_cost_amount(p_ol *OrderLogisticsServ
 				// p_ol.pending_keeper.get(stock_id, order_product_info.ProductId) 和 temp_pending_qty_by_this_order_product_to_remove 这两个有可能是不同的，后面的一个是针对这个订单的
 				if product_stock_qty.Qty >= (order_product_info.Qty + product_stock_qty.PendingQty + p_ol.pending_keeper.get(stock_id, order_product_info.ProductId) - pending_in_db_to_clear - temp_pending_qty_by_this_order_product_to_remove) { // 考虑匹配过程中 pending 的库存
 					product_has_stock = true
-					break //这个 break 加不加都可以的，因为 这个 stock_id， 这个 product_id 的就一条记录
+					break //这个 break 加不加都可以的，因为 这个 stock_id， 这个 product_id 的就一条记录。后来，合并订单也有可能两条的SKU是一样的
 				}
 			}
 		}
