@@ -19,7 +19,7 @@ import (
 // 1 地址有特殊字段的
 func (p_ol *OrderLogisticsService) hold_check_address_special_word(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, order_logistics models.OrderLogisticsInfo, db_session *xorm.Session) (is_hold_return bool) {
 
-	revel.TRACE.Println("hold_check_address_special_word begin")
+	//revel.TRACE.Println("hold_check_address_special_word begin")
 
 	// 检查地址中是否有特殊字段
 	var has_address_special_word = false
@@ -293,8 +293,8 @@ func (p_ol *OrderLogisticsService) is_envelope(p_order *models.OrderInfo, p_orde
 	// get_order_products_whole_logistics_data的输出中 长 > 宽 > 高
 	var whole_length, whole_width, whole_height, whole_weight float64 = get_order_products_whole_logistics_data(p_order_logistics_data)
 
-	revel.TRACE.Println("whole_length, whole_width, whole_height, whole_weight", whole_length, whole_width, whole_height, whole_weight)
-	revel.TRACE.Println("envelope_max_length, envelope_max_width, envelope_max_height, envelope_max_weight", envelope_max_length, envelope_max_width, envelope_max_height, envelope_max_weight)
+	//revel.TRACE.Println("whole_length, whole_width, whole_height, whole_weight", whole_length, whole_width, whole_height, whole_weight)
+	//revel.TRACE.Println("envelope_max_length, envelope_max_width, envelope_max_height, envelope_max_weight", envelope_max_length, envelope_max_width, envelope_max_height, envelope_max_weight)
 
 	if whole_length <= envelope_max_length && whole_width <= envelope_max_width && whole_height <= envelope_max_height && whole_weight <= envelope_max_weight {
 		return true
@@ -582,8 +582,10 @@ func check_stock_has_order_products_and_get_cost_amount(p_ol *OrderLogisticsServ
 
 	// 对订单中的每个商品信息循环，看是不是这个商品在这个仓库里面有货且有足够的数量
 	for index, order_product_info := range order_product_info_list {
+		revel.TRACE.Println("order_product_info:", order_product_info)
 		var product_has_stock = false
 		for _, product_stock_qty := range products_stock_qty_list {
+			revel.TRACE.Println("product_stock_qty.ProductId, product_stock_qty.Qty:", product_stock_qty.ProductId, product_stock_qty.Qty)
 			if product_stock_qty.StockId == stock_id && product_stock_qty.ProductId == order_product_info.ProductId {
 				//这里的 cost_amount = cost_amount + 实际也不是累加，因为只运行一次
 				cost_amount = cost_amount + float64(order_product_info.Qty)*product_stock_qty.CostPrice/p_ol.aud_exchange_rate // 库存成本换算成澳币，仓库成本都是RMB的
@@ -596,13 +598,13 @@ func check_stock_has_order_products_and_get_cost_amount(p_ol *OrderLogisticsServ
 					temp_pending_qty_by_this_order_product_to_remove = 0
 				}
 
-				revel.TRACE.Println("order_product_info.Qty", order_product_info.Qty)
-				revel.TRACE.Println("product_stock_qty.PendingQty", product_stock_qty.PendingQty)
-				revel.TRACE.Println("p_ol.pending_keeper.get(stock_id, order_product_info.ProductId)", p_ol.pending_keeper.get(stock_id, order_product_info.ProductId))
-				revel.TRACE.Println("temp_pending_qty_by_this_order_product_to_remove", temp_pending_qty_by_this_order_product_to_remove)
+				//revel.TRACE.Println("order_product_info.Qty", order_product_info.Qty)
+				//revel.TRACE.Println("product_stock_qty.PendingQty", product_stock_qty.PendingQty)
+				//revel.TRACE.Println("p_ol.pending_keeper.get(stock_id, order_product_info.ProductId)", p_ol.pending_keeper.get(stock_id, order_product_info.ProductId))
+				//revel.TRACE.Println("temp_pending_qty_by_this_order_product_to_remove", temp_pending_qty_by_this_order_product_to_remove)
 
 				if consider_temp_pending_for_this_order == true {
-					revel.TRACE.Println(" product_stock_qty.Qty >= (order_product_info.Qty + product_stock_qty.PendingQty + p_ol.pending_keeper.get(stock_id, order_product_info.ProductId) - temp_pending_qty_by_this_order_product_to_remove", product_stock_qty.Qty >= (order_product_info.Qty + product_stock_qty.PendingQty + p_ol.pending_keeper.get(stock_id, order_product_info.ProductId) - temp_pending_qty_by_this_order_product_to_remove))
+					//revel.TRACE.Println(" product_stock_qty.Qty >= (order_product_info.Qty + product_stock_qty.PendingQty + p_ol.pending_keeper.get(stock_id, order_product_info.ProductId) - temp_pending_qty_by_this_order_product_to_remove", product_stock_qty.Qty >= (order_product_info.Qty + product_stock_qty.PendingQty + p_ol.pending_keeper.get(stock_id, order_product_info.ProductId) - temp_pending_qty_by_this_order_product_to_remove))
 				}
 
 				// models.ORDER_STATUS_HOLD, models.ORDER_HOLD_TYPE_PICK_UP, models.ORDER_HOLD_TYPE_ENVELOPE, models.ORDER_HOLD_TYPE_EXPRESS, models.ORDER_HOLD_TYPE_INTERNATIONAL
@@ -632,6 +634,8 @@ func check_stock_has_order_products_and_get_cost_amount(p_ol *OrderLogisticsServ
 			break // 订单里面的 接下来的 商品也就不用检查了
 		}
 	}
+
+	revel.TRACE.Println("cost_amount", cost_amount)
 
 	if stock_has_all_product == true {
 		return true, cost_amount

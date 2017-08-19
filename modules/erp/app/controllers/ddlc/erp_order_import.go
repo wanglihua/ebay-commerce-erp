@@ -524,7 +524,7 @@ SELECT sa.id AS shop_id, sa.name AS shop_name FROM erp_shop_account sa;
 			var cost_price = inventory_service.GetProductCnStockCostPrice(order_import.product_id, db_session)
 
 			if cost_price != 0 {
-				order_import_same_code_list[index].cost_price = cost_price
+				order_import_same_code_list[index].cost_price = cost_price / aud_exchange_rate_setting
 			} else {
 				order_import_same_code_list[index].cost_price = 0.00001 // 是零的时候，随便给个数
 			}
@@ -537,7 +537,7 @@ SELECT sa.id AS shop_id, sa.name AS shop_name FROM erp_shop_account sa;
 		for index, order_import := range order_import_same_code_list {
 			order_import_same_code_list[index].price_au = ((order_import.cost_price * (float64(order_import.Spsl)) / cost_price_total) * order_import.Skje) / float64(order_import.Spsl)
 			order_import_same_code_list[index].price_rmb = order_import_same_code_list[index].price_au * aud_exchange_rate_setting
-			order_import_same_code_list[index].gross_profit = (order_import_same_code_list[index].price_rmb - order_import_same_code_list[index].cost_price) * float64(order_import.Spsl)
+			order_import_same_code_list[index].gross_profit = (order_import_same_code_list[index].price_rmb - order_import_same_code_list[index].cost_price) * float64(order_import.Spsl) / aud_exchange_rate_setting
 		}
 	}
 
