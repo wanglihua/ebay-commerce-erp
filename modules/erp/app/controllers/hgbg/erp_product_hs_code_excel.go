@@ -38,6 +38,8 @@ func (c ErpProductHsCodeExcel) Import() revel.Result {
 
 	type product_hs_code_import_t struct {
 		Sku          string  `json:"sku"`
+		CnDeclName   string  `json:"cn_decl_name"`
+		AuDeclName   string  `json:"au_decl_name"`
 		CnHsCode     string  `json:"cn_hs_code"`
 		AuHsCode     string  `json:"au_hs_code"`
 		ErrorMessage string  `json:"error_message"`
@@ -80,6 +82,24 @@ func (c ErpProductHsCodeExcel) Import() revel.Result {
 			}
 			//revel.TRACE.Println(cell_val)
 			product_hs_code.Sku = cell_val
+			col_index++
+
+			// cn_decl_name
+			// cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
+			product_hs_code.CnDeclName = cell_val
+			col_index++
+
+			// au_decl_name
+			// cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
+			product_hs_code.AuDeclName = cell_val
 			col_index++
 
 			// cn_hs_code
@@ -300,6 +320,18 @@ func (c ErpProductHsCodeExcel) export_product_list_to_excel(db_session *xorm.Ses
 		col_index++
 
 		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 15)
+		set_head_cell_style(cell)
+		cell.Value = "中国申报品名"
+		col_index++
+
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 15)
+		set_head_cell_style(cell)
+		cell.Value = "澳洲申报品名"
+		col_index++
+
+		cell = row.AddCell()
 		sheet.SetColWidth(col_index, col_index, 10)
 		set_head_cell_style(cell)
 		cell.Value = "中国海关编码"
@@ -331,6 +363,16 @@ func (c ErpProductHsCodeExcel) export_product_list_to_excel(db_session *xorm.Ses
 		cell = row.AddCell()
 		set_text_cell_style(cell, "center")
 		cell.Value = product.Sku
+
+		// 中国申报品名
+		cell = row.AddCell()
+		set_text_cell_style(cell, "left")
+		cell.Value = product.CnDeclName
+
+		// 澳洲申报品名
+		cell = row.AddCell()
+		set_text_cell_style(cell, "left")
+		cell.Value = product.AuDeclName
 
 		// 中国海关编码
 		cell = row.AddCell()

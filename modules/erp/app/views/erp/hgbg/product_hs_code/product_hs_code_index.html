@@ -51,6 +51,8 @@
                         <thead>
                         <tr>
                             <th>商品SKU</th>
+                            <th>中国申报品名</th>
+                            <th>澳洲申报品名</th>
                             <th>中国海关编码</th>
                             <th>澳洲海关编码</th>
                             <th>错误信息</th>
@@ -60,6 +62,8 @@
                         <template v-for="error_data in error_data_list">
                             <tr>
                                 <td>{{error_data.sku}}</td>
+                                <td>{{error_data.cn_decl_name}}</td>
+                                <td>{{error_data.au_decl_name}}</td>
                                 <td>{{error_data.cn_hs_code}}</td>
                                 <td>{{error_data.au_hs_code}}</td>
                                 <td>{{error_data.error_message}}</td>
