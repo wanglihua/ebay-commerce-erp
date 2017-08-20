@@ -9,11 +9,11 @@ import (
 	"matrix/modules/erp/models"
 	"fmt"
 	"matrix/modules/erp/service/container_transfer_service"
-	"matrix/modules/erp/service/inventory_service"
 	"matrix/modules/erp/service/exchange_rate_service"
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/auth/pass_res"
 	"matrix/modules/erp/service/container_transfer_log_service"
+	"matrix/modules/erp/service/product_service"
 )
 
 type ErpContainerTransferEntry struct {
@@ -166,7 +166,8 @@ func (c ErpContainerTransferEntry) Save() revel.Result {
 	}
 
 	var au_exchange_rate = exchange_rate_service.Get_aud_exchange_rate(db_session)
-	container_transfer_entry.Price = inventory_service.GetProductCnStockCostPrice(product.Id, db_session) / au_exchange_rate
+	//container_transfer_entry.Price = inventory_service.GetProductCnStockCostPrice(product.Id, db_session) / au_exchange_rate
+	container_transfer_entry.Price = product_service.GetProductPrice(product.Id, db_session) / au_exchange_rate
 
 	if product.AuHsCode == "" {
 		return c.RenderJson(core.JsonResult{Success: false, Message: "商品澳洲海关编码未设置！"})
@@ -214,6 +215,7 @@ func (c ErpContainerTransferEntry) Save() revel.Result {
 
 		container_transfer_log_service.Insert_container_transfer_log(ct, "新增调拨明细", db_session, c.Session)
 	} else {
+		//todo: 哪些字段需要更新
 		affected, err = db_session.Id(container_transfer_entry.Id).Update(&container_transfer_entry)
 		core.HandleError(err)
 
@@ -229,7 +231,7 @@ func (c ErpContainerTransferEntry) Save() revel.Result {
 	if container_transfer_entry.Price == 0 {
 		return c.RenderJson(core.JsonResult{
 			Success: false,
-			Message: "数据保存成功，但商品中国仓成本价格为零！修改中国仓成本后，请重新保存本条数据！",
+			Message: "数据保存成功，但商品采购价为零！修改商品采购价后，请重新保存本条数据！",
 		})
 	} else {
 		return c.RenderJson(core.JsonResult{

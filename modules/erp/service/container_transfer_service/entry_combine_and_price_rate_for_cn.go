@@ -3,7 +3,6 @@ package container_transfer_service
 import (
 	"matrix/modules/erp/models"
 	"github.com/go-xorm/xorm"
-	"fmt"
 	"matrix/core"
 )
 
@@ -31,7 +30,8 @@ func EntryCombineForCn(entry_list []models.ContainerTransferEntryInfo, is_third 
 		var vol_sum = (product.Length * product.Width * product.Height / 1000000) * float64(entry.Qty)
 
 		// 需要开票的不合并
-		if is_product_need_invoice(entry.ProductId, db_session) == true {
+		//if is_product_need_invoice(entry.ProductId, db_session) == true {
+		if entry.NeedInvoice > 0 { // 如需要开票
 			entry.WeightSum = net_weight_sum
 			entry.VolumeSum = vol_sum
 			not_combined_entry_list = append(not_combined_entry_list, entry)
@@ -68,6 +68,7 @@ func EntryCombineForCn(entry_list []models.ContainerTransferEntryInfo, is_third 
 	}
 }
 
+/*
 // 需要开票的不合并，不需要开票的合并
 func is_product_need_invoice(product_id int64, db_session *xorm.Session) bool {
 	var need_invoice struct {
@@ -89,3 +90,4 @@ WHERE p.id = %d`
 		return true
 	}
 }
+*/

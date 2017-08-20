@@ -505,6 +505,20 @@
                                                     </div>
                                                 </div>
 
+                                                <div class="row">
+                                                    <div class="col-xs-12">
+                                                        <div class="form-group">
+                                                            <label for="need_invoice" class="col-xs-2 control-label">是否开票</label>
+                                                            <div class="col-xs-10">
+                                                                <select id="need_invoice" name="detail.transfer_entry.need_invoice" class="input-sm form-control" v-model.number="detail.transfer_entry.need_invoice">
+                                                                    <option :value="0">否</option>
+                                                                    <option :value="1">是</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
                                             </form>
                                         </div>
                                     </div>
@@ -649,6 +663,16 @@
                     },
                     {"mDataProp": "cte.qty", "title": "数量", "bSearchable": false, "width": 70, "sClass": "center"},
                     {"mDataProp": "cte.box_qty", "title": "箱数", "bSearchable": false, "width": 70, "sClass": "center"},
+                    {
+                        "mDataProp": "cte.need_invoice", "title": "开票", "bSearchable": false, "width": 70, "sClass": "center",
+                        "render": function (data, type, row) {
+                            if (data === 0) {
+                                return "否";
+                            } else {
+                                return "是";
+                            }
+                        }
+                    },
                     {"mDataProp": "cte.create_time", "title": "创建时间", "bSearchable": false, "width": 120},
                     {"mDataProp": "cte.update_time", "title": "修改时间", "bSearchable": false, "width": 120}
                 ],
