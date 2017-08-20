@@ -28,6 +28,7 @@ type ContainerTransferInfo struct {
 	ImportCompanyCode string          `xorm:"nvarchar(20) notnull default('') 'import_company_code'" json:"import_company_code" smith:"verbose_name=澳洲清关公司代码"`
 	ImportCompanyName string          `xorm:"nvarchar(200) notnull default('') 'import_company_name'" json:"import_company_name" smith:"verbose_name=澳洲清关公司"`
 	Description       string          `xorm:"nvarchar(800) notnull default('') 'description'" json:"description"`
+	ExchangeRate      float64         `xorm:"decimal(18,6) notnull 'exchange_rate'" json:"exchange_rate"` // 订单下载时把当前的汇率设置放到这个里面
 	CreateTime        core.Time       `xorm:"created notnull 'create_time'" json:"create_time"`
 	UpdateTime        core.Time       `xorm:"updated notnull 'update_time'" json:"update_time"`
 }

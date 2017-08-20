@@ -270,13 +270,13 @@ func (c ErpProduct) Save() revel.Result {
 		sku_count, err := db_session.Where("sku = ?", product_from_ui.Sku).Count(new(models.ProductInfo))
 		core.HandleError(err)
 		if sku_count != 0 {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，SKU已存在！" })
+			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，SKU已存在！"})
 		}
 
 		name_count, err := db_session.Where("name = ?", product_from_ui.Name).Count(new(models.ProductInfo))
 		core.HandleError(err)
 		if name_count != 0 {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，名称已存在！" })
+			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，名称已存在！"})
 		}
 
 		affected, err = db_session.Insert(&product_from_ui)
@@ -289,20 +289,21 @@ func (c ErpProduct) Save() revel.Result {
 		sku_count, err := db_session.Where("id <> ? and sku = ?", product_from_ui.Id, product_from_ui.Sku).Count(new(models.ProductInfo))
 		core.HandleError(err)
 		if sku_count != 0 {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，SKU已存在！" })
+			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，SKU已存在！"})
 		}
 
 		name_count, err := db_session.Where("id <> ? and name = ?", product_from_ui.Id, product_from_ui.Name).Count(new(models.ProductInfo))
 		core.HandleError(err)
 		if name_count != 0 {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，名称已存在！" })
+			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，名称已存在！"})
 		}
 
 		var product_in_db models.ProductInfo
 		_, err = db_session.Id(product_from_ui.Id).Get(&product_in_db)
 		core.HandleError(err)
 
-		update_cols := []string{"sku", "cn_name", "name", "cate_id", "supplier_id", "pkg_mtrl_id", "cost_price", "status_id", "desc", "weight", "need_invoice" }
+		//update_cols := []string{"sku", "cn_name", "name", "cate_id", "supplier_id", "pkg_mtrl_id", "cost_price", "status_id", "desc", "weight", "need_invoice" }
+		update_cols := []string{"sku", "cn_name", "name", "cate_id", "supplier_id", "pkg_mtrl_id", "cost_price", "status_id", "desc", "weight"}
 		affected, err = db_session.Id(product_from_ui.Id).Cols(update_cols...).Update(&product_from_ui)
 		core.HandleError(err)
 
