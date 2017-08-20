@@ -109,6 +109,28 @@
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
+                                            <label for="cn_decl_name" class="col-xs-2 control-label">中国申报品名</label>
+                                            <div class="col-xs-10">
+                                                <input id="cn_decl_name" name="detail.product.cn_decl_name" type="text" class="input-sm form-control" v-model="detail.product.cn_decl_name"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <label for="au_decl_name" class="col-xs-2 control-label">澳洲申报品名</label>
+                                            <div class="col-xs-10">
+                                                <input id="au_decl_name" name="detail.product.au_decl_name" type="text" class="input-sm form-control" v-model="detail.product.au_decl_name"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
                                             <label for="cn_hs_code" class="col-xs-2 control-label">中国海关编码</label>
                                             <div class="col-xs-10">
                                                 <input id="cn_hs_code" name="detail.product.cn_hs_code" type="text" class="input-sm form-control" v-model="detail.product.cn_hs_code"/>
@@ -235,6 +257,18 @@
                             "mDataProp": "p.cn_name", "title": "商品名称", "bSearchable": true, "sClass": "wrap-word",
                             "render": function (data, type, row) {
                                 return '<div>' + data + '</div>';
+                            }
+                        },
+                        {
+                            "mDataProp": "p.cn_decl_name", "title": "中国申报品名", "bSearchable": true, "width": 200,
+                            "render": function (data, type, row) {
+                                return data;
+                            }
+                        },
+                        {
+                            "mDataProp": "p.au_decl_name", "title": "澳洲申报品名", "bSearchable": true, "width": 200,
+                            "render": function (data, type, row) {
+                                return data;
                             }
                         },
                         {

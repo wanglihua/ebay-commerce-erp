@@ -120,10 +120,12 @@ func (c ErpProductHsCode) Save() revel.Result {
 		})
 	}
 
+	product_in_db.CnDeclName = detail_form.Product.CnDeclName
+	product_in_db.AuDeclName = detail_form.Product.AuDeclName
 	product_in_db.CnHsCode = detail_form.Product.CnHsCode
 	product_in_db.AuHsCode = detail_form.Product.AuHsCode
 
-	updata_col_List := []string{"cn_hs_code", "au_hs_code"}
+	updata_col_List := []string{"cn_hs_code", "au_hs_code", "cn_decl_name", "au_decl_name"}
 	affected_count, err := db_session.Id(product_id).Cols(updata_col_List...).Update(&product_in_db)
 	core.HandleError(err)
 
