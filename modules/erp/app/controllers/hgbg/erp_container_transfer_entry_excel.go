@@ -52,6 +52,7 @@ func (c ErpContainerTransferEntryExcel) Import() revel.Result {
 		ProductSku   string  `json:"product_sku"`
 		Qty          string  `json:"qty"`
 		BoxQty       string  `json:"box_qty"`
+		NeedInvoice  string  `json:"need_invoice"`
 		ErrorMessage string  `json:"error_message"`
 
 		product    models.ProductInfo            `json:"-"`
@@ -114,6 +115,14 @@ func (c ErpContainerTransferEntryExcel) Import() revel.Result {
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
 			transfer_entry_import.BoxQty = cell_val
+			col_index++
+
+			// 是否开票
+			cell = sheet.Cell(row_index, col_index)
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
+			transfer_entry_import.NeedInvoice = cell_val
 			col_index++
 
 			transfer_entry_import_list = append(transfer_entry_import_list, transfer_entry_import)
@@ -184,6 +193,10 @@ func (c ErpContainerTransferEntryExcel) Import() revel.Result {
 			buffer.WriteString("箱数格式输入不对！")
 		} else {
 			transfer_entry_import_list[index].box_qty = box_qty
+		}
+
+		if transfer_entry_import.NeedInvoice != "是" && transfer_entry_import.NeedInvoice != "否" {
+			buffer.WriteString("是否开票输入不对！")
 		}
 
 		var au_exchange_rate = exchange_rate_service.Get_aud_exchange_rate(db_session)
@@ -397,6 +410,11 @@ func (c ErpContainerTransferEntryExcel) export_entry_list_to_excel(db_session *x
 		cell.Value = "箱数"
 		col_index++
 
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 8)
+		set_head_cell_style(cell)
+		cell.Value = "开票"
+		col_index++
 		/*
 		cell = row.AddCell()
 		sheet.SetColWidth(col_index, col_index, 10)
@@ -429,6 +447,17 @@ func (c ErpContainerTransferEntryExcel) export_entry_list_to_excel(db_session *x
 		cell = row.AddCell()
 		set_text_cell_style(cell, "right")
 		cell.SetInt64(entry.ContainerTransferEntry.BoxQty)
+
+		// 开票
+		cell = row.AddCell()
+		set_text_cell_style(cell, "center")
+		cell.Value = func() string {
+			if entry.ContainerTransferEntry.NeedInvoice == 0 {
+				return "否"
+			} else {
+				return "是"
+			}
+		}()
 
 		/*
 		// 价格
