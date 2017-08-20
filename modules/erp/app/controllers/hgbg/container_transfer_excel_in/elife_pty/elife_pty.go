@@ -48,7 +48,7 @@ func (c Exporter) GetExcelFile(p_transfer *models.ContainerTransferInfo, db_sess
 
 	var total_amount float64 = 0
 	for index, item := range item_list {
-		xlsx_file.SetCellValue(sheet1_name, fmt.Sprintf("A%d", 22+index), fmt.Sprintf("%s(%s)", item.ContainerTransferEntry.AuHsEnName, item.ContainerTransferEntry.AuHsCnName))
+		xlsx_file.SetCellValue(sheet1_name, fmt.Sprintf("A%d", 22+index), fmt.Sprintf("%s(%s)", item.ContainerTransferEntry.AuHsEnName, item.Product.AuDeclName))
 		xlsx_file.SetCellValue(sheet1_name, fmt.Sprintf("D%d", 22+index), item.ContainerTransferEntry.Price)
 		xlsx_file.SetCellValue(sheet1_name, fmt.Sprintf("F%d", 22+index), item.ContainerTransferEntry.Qty)
 		var amount = item.ContainerTransferEntry.Price * float64(item.ContainerTransferEntry.Qty)
@@ -72,7 +72,7 @@ func (c Exporter) GetExcelFile(p_transfer *models.ContainerTransferInfo, db_sess
 	var total_vol float64 = 0
 	var total_gross_weight float64 = 0
 	for index, item := range item_list {
-		xlsx_file.SetCellValue(sheet2_name, fmt.Sprintf("A%d", 19+index), fmt.Sprintf("%s(%s)", item.ContainerTransferEntry.AuHsEnName, item.ContainerTransferEntry.AuHsCnName))
+		xlsx_file.SetCellValue(sheet2_name, fmt.Sprintf("A%d", 19+index), fmt.Sprintf("%s(%s)", item.ContainerTransferEntry.AuHsEnName, item.Product.AuDeclName))
 		xlsx_file.SetCellValue(sheet2_name, fmt.Sprintf("D%d", 19+index), item.ContainerTransferEntry.Qty)
 		xlsx_file.SetCellValue(sheet2_name, fmt.Sprintf("E%d", 19+index), item.ContainerTransferEntry.BoxQty)
 
