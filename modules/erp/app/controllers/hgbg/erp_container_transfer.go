@@ -379,6 +379,39 @@ func (c ErpContainerTransfer) Depart() revel.Result {
 		})
 	}
 
+	// 检查明细里面是否有价格为零的明细
+	var price_zero_sql = `SELECT count(*) AS count
+FROM erp_container_transfer_entry cte
+WHERE cte.transfer_id = %d AND cte.price = 0;`
+	price_zero_sql = fmt.Sprintf(price_zero_sql, transfer_id)
+	var price_zero_count core.Count
+	_, err = db_session.Sql(price_zero_sql).Get(&price_zero_count)
+	core.HandleError(err)
+
+	if price_zero_count.Count > 0 {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "当前集装箱调拨明细中存在价格为零的记录！",
+		})
+	}
+
+	// 检查明细里面是否有长宽高为零的明细
+	var lwhw_zero_sql = `SELECT count(*) AS count
+FROM erp_container_transfer_entry cte
+    INNER JOIN erp_product p ON cte.product_id = p.id
+WHERE cte.transfer_id = %d AND (p.length = 0 OR p.width = 0 OR p.height = 0 OR p.weight = 0)`
+	lwhw_zero_sql = fmt.Sprintf(lwhw_zero_sql, transfer_id)
+	var lwhw_zero_count core.Count
+	_, err = db_session.Sql(lwhw_zero_sql).Get(&lwhw_zero_count)
+	core.HandleError(err)
+
+	if lwhw_zero_count.Count > 0 {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "当前集装箱调拨明细中存在商品长宽高重量为零的记录！",
+		})
+	}
+
 	if ct.StatusId == models.CONTAINER_TRANSFER_STATUS_DEPART {
 		return c.RenderJson(map[string]interface{}{
 			"success": false,
