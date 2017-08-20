@@ -178,6 +178,8 @@ func (f *ProductDetailForm) Valid(validation *revel.Validation) bool {
 func (c ErpProduct) Detail(product_id int64) revel.Result {
 	pass_service.Check_login_user_pass(pass_res.KCGL_PRODUCT, c.Session)
 
+	c.RenderArgs["can_save"] = pass_service.Is_login_user_has_pass(pass_res.KCGL_PRODUCT_DETAIL_SAVE, c.Session)
+
 	//return c.RenderText(fmt.Sprintf("product_id %d", product_id))
 	c.RenderArgs["product_id"] = product_id
 	return c.RenderTemplate("erp/kcgl/product/product_detail.html")
@@ -249,7 +251,7 @@ func (c ErpProduct) DetailData() revel.Result {
 }
 
 func (c ErpProduct) Save() revel.Result {
-	pass_service.Check_login_user_pass(pass_res.KCGL_PRODUCT, c.Session)
+	pass_service.Check_login_user_pass(pass_res.KCGL_PRODUCT_DETAIL_SAVE, c.Session)
 
 	db_session := c.DbSession
 

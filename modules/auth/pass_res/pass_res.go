@@ -67,6 +67,7 @@ const (
 
 	// 库存管理 模块编号 14
 	KCGL_PRODUCT                   = 140100 // 商品列表
+	KCGL_PRODUCT_DETAIL_SAVE       = 140150 // 商品详细保存
 	KCGL_PRODUCT_BIND              = 140200 // 绑定商品
 	KCGL_PRODUCT_IMPORT            = 140300 // 商品导入
 	KCGL_PRODUCT_EXPORT            = 140400 // 商品导出
