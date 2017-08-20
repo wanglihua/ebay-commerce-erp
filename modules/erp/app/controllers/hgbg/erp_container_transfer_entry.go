@@ -275,3 +275,42 @@ func (c ErpContainerTransferEntry) Delete() revel.Result {
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})
 }
+
+func (c ErpContainerTransferEntry) GetSkuNeedInvoice() revel.Result {
+	var db_session = c.DbSession
+
+	var sku string
+	c.Params.Bind(&sku, "sku")
+
+	var product_need_invoice struct {
+		NeedInvoice int64  `xorm:"'need_invoice'"`
+	}
+
+	/*
+SELECT
+    p.need_invoice AS need_invoice
+FROM erp_product p
+WHERE p.sku = '124'
+	 */
+
+	var sql = `SELECT
+    p.need_invoice AS need_invoice
+FROM erp_product p
+WHERE p.sku = '%s'`
+	sql = fmt.Sprintf(sql, sku)
+	has, err := db_session.Sql(sql).Get(&product_need_invoice)
+	core.HandleError(err)
+
+	if has == false {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "输入的SKU在数据库中不存在！",
+		})
+	}
+
+	return c.RenderJson(map[string]interface{}{
+		"success":      true,
+		"message":      "success",
+		"need_invoice": product_need_invoice.NeedInvoice,
+	})
+}

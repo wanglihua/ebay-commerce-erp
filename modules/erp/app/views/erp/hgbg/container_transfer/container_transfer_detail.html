@@ -479,7 +479,7 @@
                                                         <div class="form-group">
                                                             <label for="product_sku" class="col-xs-2 control-label">SKU</label>
                                                             <div class="col-xs-10">
-                                                                <input id="product_sku" name="detail.transfer_entry.product_sku" type="text" class="input-sm form-control" v-model="detail.transfer_entry.product_sku"/>
+                                                                <input id="product_sku" name="detail.transfer_entry.product_sku" type="text" class="input-sm form-control" v-model="detail.transfer_entry.product_sku" onchange="getSkuNeedInvoice()"/>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -749,6 +749,24 @@
                     detail_vm.detail.transfer.total_weight = parseFloat(dtFormatFloat(detail_vm.detail.transfer.total_weight));
                     detail_vm.detail.transfer.total_amount1 = parseFloat(dtFormatFloat(detail_vm.detail.transfer.total_amount1));
                     detail_vm.detail.transfer.total_amount2 = parseFloat(dtFormatFloat(detail_vm.detail.transfer.total_amount2));
+                }
+            }
+        );
+    }
+
+    function getSkuNeedInvoice() {
+        $.ajax({
+                url: '{%url "ErpContainerTransferEntry.GetSkuNeedInvoice" %}',
+                type: "POST",
+                data: {
+                    "sku": entries_vm.detail.transfer_entry.product_sku
+                },
+                success: function (result) {
+                    if (result.success === false) {
+                        $.msg.error(result.message);
+                        return;
+                    }
+                    entries_vm.detail.transfer_entry.need_invoice = result.need_invoice;
                 }
             }
         );
