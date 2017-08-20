@@ -6,49 +6,49 @@ import (
 	"matrix/core"
 )
 
-func EntryCombineForCn(entry_list []models.ContainerTransferEntryInfo, is_third bool, db_session *xorm.Session) []models.ContainerTransferEntryInfo {
-	var find_entry_in_list = func(au_hs_code string, entry_list []models.ContainerTransferEntryInfo) (index_ret int, entry_ret models.ContainerTransferEntryInfo) {
+func EntryCombineForCn(item_list []ContainerTransferEntryItem, is_third bool, db_session *xorm.Session) []ContainerTransferEntryItem {
+	var find_entry_in_list = func(cn_decl_name string, entry_list []ContainerTransferEntryItem) (index_ret int, entry_ret ContainerTransferEntryItem) {
 		for index, entry := range entry_list {
-			if entry.AuHsCode == au_hs_code {
+			if entry.Product.CnDeclName == cn_decl_name {
 				return index, entry
 			}
 		}
 
-		return -1, models.ContainerTransferEntryInfo{}
+		return -1, ContainerTransferEntryItem{}
 	}
 
-	var not_combined_entry_list = make([]models.ContainerTransferEntryInfo, 0)
-	var combined_entry_list = make([]models.ContainerTransferEntryInfo, 0)
+	var not_combined_entry_list = make([]ContainerTransferEntryItem, 0)
+	var combined_entry_list = make([]ContainerTransferEntryItem, 0)
 
-	for _, entry := range entry_list {
+	for _, item := range item_list {
 		// weight volume 的计算
 		var product models.ProductInfo
-		_, err := db_session.Id(entry.ProductId).Get(&product)
+		_, err := db_session.Id(item.ContainerTransferEntry.ProductId).Get(&product)
 		core.HandleError(err)
 
-		var net_weight_sum = product.Weight * float64(entry.Qty)
-		var vol_sum = (product.Length * product.Width * product.Height / 1000000) * float64(entry.Qty)
+		var net_weight_sum = product.Weight * float64(item.ContainerTransferEntry.Qty)
+		var vol_sum = (product.Length * product.Width * product.Height / 1000000) * float64(item.ContainerTransferEntry.Qty)
 
 		// 需要开票的不合并
-		//if is_product_need_invoice(entry.ProductId, db_session) == true {
-		if entry.NeedInvoice > 0 { // 如需要开票
-			entry.WeightSum = net_weight_sum
-			entry.VolumeSum = vol_sum
-			not_combined_entry_list = append(not_combined_entry_list, entry)
+		//if is_product_need_invoice(item.ProductId, db_session) == true {
+		if item.ContainerTransferEntry.NeedInvoice > 0 { // 如需要开票
+			item.ContainerTransferEntry.WeightSum = net_weight_sum
+			item.ContainerTransferEntry.VolumeSum = vol_sum
+			not_combined_entry_list = append(not_combined_entry_list, item)
 		} else { //不需要开票的合并
-			found_index, combined_entry := find_entry_in_list(entry.AuHsCode, combined_entry_list)
+			found_index, combined_entry := find_entry_in_list(item.Product.CnDeclName, combined_entry_list)
 
 			if found_index < 0 {
-				entry.WeightSum = net_weight_sum
-				entry.VolumeSum = vol_sum
-				combined_entry_list = append(combined_entry_list, entry)
+				item.ContainerTransferEntry.WeightSum = net_weight_sum
+				item.ContainerTransferEntry.VolumeSum = vol_sum
+				combined_entry_list = append(combined_entry_list, item)
 			} else {
 				// do combine
-				combined_entry_list[found_index].Price = (combined_entry.Price*float64(combined_entry.Qty) + entry.Price*float64(entry.Qty)) / float64(combined_entry.Qty+entry.Qty)
-				combined_entry_list[found_index].Qty = combined_entry.Qty + entry.Qty
-				combined_entry_list[found_index].BoxQty = combined_entry.BoxQty + entry.BoxQty
-				combined_entry_list[found_index].WeightSum = combined_entry.WeightSum + net_weight_sum
-				combined_entry_list[found_index].VolumeSum = combined_entry.VolumeSum + vol_sum
+				combined_entry_list[found_index].ContainerTransferEntry.Price = (combined_entry.ContainerTransferEntry.Price*float64(combined_entry.ContainerTransferEntry.Qty) + item.ContainerTransferEntry.Price*float64(item.ContainerTransferEntry.Qty)) / float64(combined_entry.ContainerTransferEntry.Qty+item.ContainerTransferEntry.Qty)
+				combined_entry_list[found_index].ContainerTransferEntry.Qty = combined_entry.ContainerTransferEntry.Qty + item.ContainerTransferEntry.Qty
+				combined_entry_list[found_index].ContainerTransferEntry.BoxQty = combined_entry.ContainerTransferEntry.BoxQty + item.ContainerTransferEntry.BoxQty
+				combined_entry_list[found_index].ContainerTransferEntry.WeightSum = combined_entry.ContainerTransferEntry.WeightSum + net_weight_sum
+				combined_entry_list[found_index].ContainerTransferEntry.VolumeSum = combined_entry.ContainerTransferEntry.VolumeSum + vol_sum
 			}
 		}
 	}

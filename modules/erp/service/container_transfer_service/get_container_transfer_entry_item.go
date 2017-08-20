@@ -1,16 +1,10 @@
 package container_transfer_service
 
 import (
-	"matrix/modules/erp/models"
 	"github.com/go-xorm/xorm"
 	"fmt"
 	"matrix/core"
 )
-
-type ContainerTransferEntryItem struct {
-	ContainerTransferEntry models.ContainerTransferEntryInfo   `xorm:"extends" json:"cte"`
-	Product                models.ProductInfo                  `xorm:"extends" json:"p"`
-}
 
 func GetContainerTransferEntryItem(transfer_id int64, db_session *xorm.Session) []ContainerTransferEntryItem {
 	/*
