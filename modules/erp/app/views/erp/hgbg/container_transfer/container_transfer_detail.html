@@ -644,7 +644,7 @@
                     {
                         "mDataProp": "cte.price", "title": "价格", "bSearchable": false, "width": 70, "sClass": "center",
                         "render": function (data, type, row) {
-                            return $.formatNumber(data, {format: "###0.00", locale: "cn"});
+                            return "RMB " + $.formatNumber(data * row.ct.exchange_rate, {format: "###0.00", locale: "cn"});
                         }
                     },
                     {"mDataProp": "cte.qty", "title": "数量", "bSearchable": false, "width": 70, "sClass": "center"},

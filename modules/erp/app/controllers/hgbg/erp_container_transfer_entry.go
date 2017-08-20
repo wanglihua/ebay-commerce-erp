@@ -37,22 +37,25 @@ func (c ErpContainerTransferEntry) ListData() revel.Result {
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
 	type cte_item_t struct {
-		models.ContainerTransferEntryInfo `xorm:"extends" json:"cte"`
-		models.ProductInfo                `xorm:"extends" json:"p"`
+		ContainerTransferEntry models.ContainerTransferEntryInfo `xorm:"extends" json:"cte"`
+		ContainerTransfer      models.ContainerTransferInfo      `xorm:"extends" json:"ct"`
+		Product                models.ProductInfo                `xorm:"extends" json:"p"`
 	}
 
 	/*
 
-SELECT cte.*, p.*
+SELECT cte.*, ct.*, p.*
 FROM erp_container_transfer_entry cte
+    INNER JOIN erp_container_transfer ct ON cte.transfer_id = ct.id
     INNER JOIN erp_product p ON cte.product_id = p.id
 
 	 */
 
 	var sb = core.NewSqlBuilder()
-	sb.Select("cte.*, p.*")
+	sb.Select("cte.*, ct.*, p.*")
 	sb.Count("count(*) as entry_count")
 	sb.From(`erp_container_transfer_entry cte
+    INNER JOIN erp_container_transfer ct ON cte.transfer_id = ct.id
     INNER JOIN erp_product p ON cte.product_id = p.id`)
 
 	filter = core.SqlAnd(filter, fmt.Sprintf("cte.transfer_id = %d", transfer_id))

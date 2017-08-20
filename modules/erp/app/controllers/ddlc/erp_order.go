@@ -1181,6 +1181,9 @@ var fahuo_mutex sync.Mutex
 func (c ErpOrder) FaHuo() revel.Result {
 	// 通过互斥锁来解决并发发货多次同时扣减库存的问题
 	fahuo_mutex.Lock()
+	defer func() {
+		fahuo_mutex.Unlock()
+	}()
 
 	pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_PHZ, c.Session)
 
@@ -1200,7 +1203,6 @@ func (c ErpOrder) FaHuo() revel.Result {
 					order.HoldTypeId.Int64 != models.ORDER_HOLD_TYPE_EXPRESS &&
 					order.HoldTypeId.Int64 != models.ORDER_HOLD_TYPE_INTERNATIONAL &&
 					order.HoldTypeId.Int64 != models.ORDER_HOLD_TYPE_PICK_UP)) {
-			fahuo_mutex.Unlock()
 			return c.RenderJson(map[string]interface{}{
 				"success": false,
 				"message": "订单当前状态不是配货中或特殊hold状态，不能发货！",
@@ -1215,7 +1217,6 @@ func (c ErpOrder) FaHuo() revel.Result {
 			core.HandleError(err)
 
 			if pickup_order_info.IsPaid == 0 && pickup_order_info.ActualIsPaid == 0 {
-				fahuo_mutex.Unlock()
 				return c.RenderJson(map[string]interface{}{
 					"success": false,
 					"message": "PICKUP订单未收款不能搬至已发货！",
@@ -1265,16 +1266,12 @@ func (c ErpOrder) FaHuo() revel.Result {
 	// 更新库存待配货数量
 	go inventory_service.Calculate_inventory_pending_qty()
 
-	//fahuo_mutex.Unlock()
-
 	if take_inventory_result == true {
-		fahuo_mutex.Unlock()
 		return c.RenderJson(map[string]interface{}{
 			"success": true,
 			"message": "订单发货成功！",
 		})
 	} else {
-		fahuo_mutex.Unlock()
 		return c.RenderJson(map[string]interface{}{
 			"success": true,
 			"message": "订单发货成功，但部分库存扣减失败！",
