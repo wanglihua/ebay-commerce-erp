@@ -1005,8 +1005,9 @@
                             }
                             else {
                                 $.msg.show(data.message);
+                                vm.reloadList();
+                                return;
                             }
-                            vm.reloadList();
                         }
                     });
                 });
