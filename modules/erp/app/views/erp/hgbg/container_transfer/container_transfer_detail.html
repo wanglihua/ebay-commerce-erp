@@ -633,11 +633,22 @@
                         }
                     },
                     {"mDataProp": "cte.product_sku", "title": "SKU", "bSearchable": true, "width": 120},
-                    {"mDataProp": "p.cn_name", "title": "名称", "bSearchable": true},
+                    {
+                        "mDataProp": "p.cn_name", "title": "名称", "bSearchable": true, "sClass": "wrap-word",
+                        "render": function (data, type, row) {
+                            return "<div>" + data + "</div>"
+                        }
+                    },
                     {"mDataProp": "cte.cn_hs_code", "title": "中国海关编码", "bSearchable": true, "width": 120},
                     {"mDataProp": "cte.au_hs_code", "title": "澳洲海关编码", "bSearchable": true, "width": 120},
-                    {"mDataProp": "cte.qty", "title": "数量", "bSearchable": false, "width": 100},
-                    {"mDataProp": "cte.box_qty", "title": "箱数", "bSearchable": false, "width": 100},
+                    {
+                        "mDataProp": "cte.price", "title": "价格", "bSearchable": false, "width": 70, "sClass": "center",
+                        "render": function (data, type, row) {
+                            return $.formatNumber(data, {format: "###0.00", locale: "cn"});
+                        }
+                    },
+                    {"mDataProp": "cte.qty", "title": "数量", "bSearchable": false, "width": 70, "sClass": "center"},
+                    {"mDataProp": "cte.box_qty", "title": "箱数", "bSearchable": false, "width": 70, "sClass": "center"},
                     {"mDataProp": "cte.create_time", "title": "创建时间", "bSearchable": false, "width": 120},
                     {"mDataProp": "cte.update_time", "title": "修改时间", "bSearchable": false, "width": 120}
                 ],

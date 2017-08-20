@@ -29,7 +29,7 @@ func (c ErpProductInvoice) ListData() revel.Result {
 	db_session := c.DbSession
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
-	type product_weight_view_item_t struct {
+	type product_invoice_view_item_t struct {
 		Product models.ProductInfo `xorm:"extends" json:"p"`
 		Status  models.StatusInfo  `xorm:"extends" json:"s"`
 	}
@@ -56,7 +56,7 @@ func (c ErpProductInvoice) ListData() revel.Result {
 
 	sb.Limit(offset, limit)
 
-	var product_list = make([]product_weight_view_item_t, 0, limit)
+	var product_list = make([]product_invoice_view_item_t, 0, limit)
 	err := db_session.Sql(sb.SqlList()).Find(&product_list)
 	core.HandleError(err)
 
