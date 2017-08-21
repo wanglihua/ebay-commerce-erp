@@ -91,12 +91,15 @@
                     <div class="row">
                         <div class="col-xs-12" style="text-align: right;">
                             {% if or .is_hold .is_dph %}
+                            {% if .is_express %}
                             <label for="unlock_express">解锁快递：</label>
                             <select id="unlock_express" class="input-sm" style="width: 80px;">
                                 <option :value="0">否</option>
                                 <option :value="1">是</option>
                             </select>
-                            &nbsp;<label for="prefer_stock">指定匹配仓库：</label>
+                            &nbsp;
+                            {% end %}
+                            <label for="prefer_stock">指定匹配仓库：</label>
                             <select id="prefer_stock" class="input-sm" style="width: 120px;" onchange="load_logistics_model_list()">
                                 <option :value="0">当前不指定</option>
                                 <template v-for="stock in detail.au_stock_list">

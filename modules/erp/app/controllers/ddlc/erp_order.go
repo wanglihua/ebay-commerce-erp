@@ -624,8 +624,13 @@ func (c ErpOrder) Detail(order_id int64) revel.Result {
 	if order.HoldTypeId.Int64 == models.ORDER_HOLD_TYPE_PICK_UP {
 		is_pickup = true
 	}
-
 	c.RenderArgs["is_pickup"] = is_pickup
+
+	var is_express = false
+	if order.HoldTypeId.Int64 == models.ORDER_HOLD_TYPE_EXPRESS {
+		is_express = true
+	}
+	c.RenderArgs["is_express"] = is_express
 
 	var is_pickup_paid int64 = 0
 	var pickup_order models.PickupOrderInfo
