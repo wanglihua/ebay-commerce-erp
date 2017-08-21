@@ -343,6 +343,11 @@ func (p_ol *OrderLogisticsService) CalculateListWithOption(order_list []models.O
 			continue
 		}
 
+		// 如果匹配过程中， 保存的状态为 hold 就不继续 hold 了。比如说，匹配过程中，匹配成快递了
+		if order.StatusId == models.ORDER_STATUS_HOLD {
+			continue
+		}
+
 		// 11 无匹配的物流方式（长宽高重量没有物流满足）
 		if p_ol.hold_check_no_match_logistics_mode(&order, match_success, db_session) {
 			continue
