@@ -82,9 +82,11 @@ func (c ErpContainerTransfer) ListData() revel.Result {
 }
 
 type ContainerTransferDetailForm struct {
-	ContainerTransfer models.ContainerTransferInfo              `json:"transfer"`
-	StartPortList     []models.ContainerTransferStartPortInfo   `json:"start_port_list"`
-	DestPortList      []models.ContainerTransferDestPortInfo    `json:"dest_port_list"`
+	ContainerTransfer       models.ContainerTransferInfo              `json:"transfer"`
+	StartPortList           []models.ContainerTransferStartPortInfo   `json:"start_port_list"`
+	DestPortList            []models.ContainerTransferDestPortInfo    `json:"dest_port_list"`
+	LwhwZeroProductSkuList  []string                                  `json:"lwhw_zero_product_sku_list"`
+	LwhwZeroProductSkuCount int                                       `json:"lwhw_zero_product_sku_count"`
 }
 
 func (f *ContainerTransferDetailForm) IsCreate() bool {
@@ -186,6 +188,28 @@ func (c ErpContainerTransfer) Detail(id int64) revel.Result {
 	} else {
 		c.RenderArgs["entries_display"] = "block"
 	}
+
+	type product_sku struct {
+		Sku string `xorm:"'sku'"`
+	}
+	var lwhw_zero_sku_list = make([]product_sku, 0)
+	// 检查明细里面是否有长宽高为零的明细
+	var lwhw_zero_sql = `SELECT p.sku
+FROM erp_container_transfer_entry cte
+    INNER JOIN erp_product p ON cte.product_id = p.id
+WHERE cte.transfer_id = %d AND (p.length = 0 OR p.width = 0 OR p.height = 0 OR p.weight = 0)`
+	lwhw_zero_sql = fmt.Sprintf(lwhw_zero_sql, transfer_id)
+	core.HandleError(db_session.Sql(lwhw_zero_sql).Find(&lwhw_zero_sku_list))
+
+	var lwhw_zero_product_sku_list = make([]string, 0)
+	for _, sku := range lwhw_zero_sku_list {
+		lwhw_zero_product_sku_list = append(lwhw_zero_product_sku_list, sku.Sku)
+	}
+
+	var lwhw_zero_product_count = len(lwhw_zero_product_sku_list)
+
+	c.RenderArgs["lwhw_zero_product_sku_list"] = lwhw_zero_product_sku_list
+	c.RenderArgs["lwhw_zero_product_count"] = lwhw_zero_product_count
 
 	return c.RenderTemplate("erp/hgbg/container_transfer/container_transfer_detail.html")
 }

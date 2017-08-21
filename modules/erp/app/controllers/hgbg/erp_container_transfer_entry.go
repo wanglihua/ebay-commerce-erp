@@ -169,15 +169,15 @@ func (c ErpContainerTransferEntry) Save() revel.Result {
 	//container_transfer_entry.Price = inventory_service.GetProductCnStockCostPrice(product.Id, db_session) / au_exchange_rate
 	container_transfer_entry.Price = product_service.GetProductPrice(product.Id, db_session) / au_exchange_rate
 
-	if product.AuHsCode == "" {
-		return c.RenderJson(core.JsonResult{Success: false, Message: "商品澳洲海关编码未设置！"})
+	if product.AuDeclName == "" {
+		return c.RenderJson(core.JsonResult{Success: false, Message: "商品澳洲海关申报名未设置！"})
 	} else {
 		var hsCodeAu models.HsCodeAuDutyInfo
-		has, err := db_session.Where("hs_code = ?", product.AuHsCode).Get(&hsCodeAu)
+		has, err := db_session.Where("en_name = ?", product.AuDeclName).Get(&hsCodeAu)
 		core.HandleError(err)
 
 		if has == false {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "商品澳洲海关编码已设置，但该海关编码不存在！"})
+			return c.RenderJson(core.JsonResult{Success: false, Message: "商品澳洲海关申报名已设置，但该申报名在澳洲海关编码列表中不存在！"})
 		}
 
 		container_transfer_entry.AuHsId = hsCodeAu.Id
@@ -187,15 +187,15 @@ func (c ErpContainerTransferEntry) Save() revel.Result {
 		container_transfer_entry.AuHsEnName = hsCodeAu.EnName
 	}
 
-	if product.CnHsCode == "" {
-		return c.RenderJson(core.JsonResult{Success: false, Message: "商品中国海关编码未设置！"})
+	if product.CnDeclName == "" {
+		return c.RenderJson(core.JsonResult{Success: false, Message: "商品中国海关申报名未设置！"})
 	} else {
 		var hsCodeCn models.HsCodeCnReportElemInfo
-		has, err := db_session.Where("hs_code = ?", product.CnHsCode).Get(&hsCodeCn)
+		has, err := db_session.Where("cn_name = ?", product.CnDeclName).Get(&hsCodeCn)
 		core.HandleError(err)
 
 		if has == false {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "商品中国海关编码已设置，但该海关编码不存在！"})
+			return c.RenderJson(core.JsonResult{Success: false, Message: "商品中国海关申报名已设置，但该申报名在中国海关编码列表中不存在！"})
 		}
 
 		container_transfer_entry.CnHsId = hsCodeCn.Id

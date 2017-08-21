@@ -15,10 +15,10 @@ type ContainerTransferEntryInfo struct {
 	AuHsCode     string          `xorm:"nvarchar(100) notnull 'au_hs_code'" json:"au_hs_code"`
 	AuHsDutyRate float64         `xorm:"decimal(18,6) notnull 'au_hs_duty_rate'" json:"au_hs_duty_rate"`
 	AuHsCnName   string          `xorm:"nvarchar(200) notnull 'au_hs_cn_name'" json:"au_hs_cn_name"`
-	AuHsEnName   string          `xorm:"nvarchar(200) notnull 'au_hs_en_name'" json:"au_hs_en_name"`
+	AuHsEnName   string          `xorm:"nvarchar(200) notnull 'au_hs_en_name'" json:"au_hs_en_name"` // 澳洲海关申报名
 	CnHsId       int64           `xorm:"bigint notnull 'cn_hs_id'" json:"cn_hs_id"`
 	CnHsCode     string          `xorm:"nvarchar(100) notnull 'cn_hs_code'" json:"cn_hs_code"`
-	CnHsCnName   string          `xorm:"nvarchar(200) notnull 'cn_hs_cn_name'" json:"cn_hs_cn_name"`
+	CnHsCnName   string          `xorm:"nvarchar(200) notnull 'cn_hs_cn_name'" json:"cn_hs_cn_name"`  // 中国海关申报名
 	CnHsEnName   string          `xorm:"nvarchar(200) notnull 'cn_hs_en_name'" json:"cn_hs_en_name"`
 	NeedInvoice  int64           `xorm:"bigint notnull 'need_invoice'" json:"need_invoice"` // 是否开票
 	CreateTime   core.Time       `xorm:"created notnull 'create_time'" json:"create_time"`

@@ -431,6 +431,14 @@
                     <div style="margin-top: 10px;">
                         <a href="/static/excel-template/container_transfer_entry_import.xlsx">下载集装箱调拨明细导入Excel模板</a>
                     </div>
+                    {% if ne .lwhw_zero_product_count 0 %}
+                    <div style="margin-top: 10px;">
+                        存在长宽高重量为零的SKU：
+                        {% range $index, $sku := .lwhw_zero_product_sku_list%}
+                        {% $sku %}&nbsp;&nbsp;
+                        {% end %}
+                    </div>
+                    {% end %}
                     <div>
                         <table id="entry_list" class="table table-striped table-bordered table-hover"></table>
 

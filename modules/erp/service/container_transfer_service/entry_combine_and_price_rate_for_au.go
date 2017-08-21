@@ -20,7 +20,7 @@ func EntryCombineAndPriceRateForAu(p_transfer *models.ContainerTransferInfo, ent
 	var combined_entry_list = make([]ContainerTransferEntryItem, 0)
 
 	for _, item := range entry_list {
-		found_index, combined_entry := find_entry_in_list(item.ContainerTransferEntry.AuHsCode, combined_entry_list)
+		found_index, combined_entry := find_entry_in_list(item.Product.AuDeclName, combined_entry_list)
 
 		// weight volume 的计算
 		var product models.ProductInfo
