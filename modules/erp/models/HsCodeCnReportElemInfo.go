@@ -7,7 +7,7 @@ import (
 type HsCodeCnReportElemInfo struct {
 	Id         int64     `xorm:"bigint notnull pk autoincr 'id'" json:"id"`
 	HsCode     string    `xorm:"nvarchar(100) notnull index 'hs_code'" json:"hs_code" smith:"verbose_name=海关编码,min=1,max=10"`
-	CnName     string    `xorm:"nvarchar(200) notnull 'cn_name'" json:"cn_name" smith:"verbose_name=中文品名"`
+	CnName     string    `xorm:"nvarchar(200) notnull index 'cn_name'" json:"cn_name" smith:"verbose_name=中文品名"`
 	EnName     string    `xorm:"nvarchar(200) notnull 'en_name'" json:"en_name" smith:"verbose_name=英文品名"`
 	Elem01     string    `xorm:"nvarchar(300) 'elem01'" json:"elem01" smith:"verbose_name=要素1"`
 	Elem02     string    `xorm:"nvarchar(300) 'elem02'" json:"elem02" smith:"verbose_name=要素2"`
