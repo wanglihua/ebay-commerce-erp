@@ -13,7 +13,6 @@ import (
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/auth/pass_res"
 	"matrix/modules/erp/service/container_transfer_log_service"
-	"matrix/modules/erp/service/product_service"
 )
 
 type ErpContainerTransferEntry struct {
@@ -167,7 +166,21 @@ func (c ErpContainerTransferEntry) Save() revel.Result {
 
 	var au_exchange_rate = exchange_rate_service.Get_aud_exchange_rate(db_session)
 	//container_transfer_entry.Price = inventory_service.GetProductCnStockCostPrice(product.Id, db_session) / au_exchange_rate
-	container_transfer_entry.Price = product_service.GetProductPrice(product.Id, db_session) / au_exchange_rate
+	container_transfer_entry.Price = product.CostPrice / au_exchange_rate
+
+	if product.CostPrice == 0 {
+		return c.RenderJson(core.JsonResult{
+			Success: false,
+			Message: "商品采购价为零，请先更新商品采购价！",
+		})
+	}
+
+	if product.Length == 0 || product.Width == 0 || product.Height == 0 || product.Weight == 0 {
+		return c.RenderJson(core.JsonResult{
+			Success: false,
+			Message: "商品长宽高重量有为零，请先更新商品相关数据！",
+		})
+	}
 
 	if product.AuDeclName == "" {
 		return c.RenderJson(core.JsonResult{Success: false, Message: "商品澳洲海关申报名未设置！"})
@@ -228,17 +241,10 @@ func (c ErpContainerTransferEntry) Save() revel.Result {
 
 	container_transfer_service.CalculateAndSaveWeightVolumeAmount(container_transfer_entry.TransferId, db_session)
 
-	if container_transfer_entry.Price == 0 {
-		return c.RenderJson(core.JsonResult{
-			Success: false,
-			Message: "数据保存成功，但商品采购价为零！修改商品采购价后，请重新保存本条数据！",
-		})
-	} else {
-		return c.RenderJson(core.JsonResult{
-			Success: true,
-			Message: strconv.FormatInt(affected, 10) + "条数据保存成功!",
-		})
-	}
+	return c.RenderJson(core.JsonResult{
+		Success: true,
+		Message: strconv.FormatInt(affected, 10) + "条数据保存成功!",
+	})
 }
 
 func (c ErpContainerTransferEntry) Delete() revel.Result {

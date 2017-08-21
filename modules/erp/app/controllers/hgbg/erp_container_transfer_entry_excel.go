@@ -17,7 +17,6 @@ import (
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/auth/pass_res"
 	"matrix/modules/erp/service/container_transfer_log_service"
-	"matrix/modules/erp/service/product_service"
 )
 
 type ErpContainerTransferEntryExcel struct {
@@ -201,7 +200,16 @@ func (c ErpContainerTransferEntryExcel) Import() revel.Result {
 
 		var au_exchange_rate = exchange_rate_service.Get_aud_exchange_rate(db_session)
 		//transfer_entry_import_list[index].price = inventory_service.GetProductCnStockCostPrice(product.Id, db_session) / au_exchange_rate
-		transfer_entry_import_list[index].price = product_service.GetProductPrice(product.Id, db_session) / au_exchange_rate
+		//transfer_entry_import_list[index].price = product_service.GetProductPrice(product.Id, db_session) / au_exchange_rate
+		transfer_entry_import_list[index].price = product.CostPrice / au_exchange_rate
+
+		if product.CostPrice == 0 {
+			buffer.WriteString("商品的采购价为零！")
+		}
+
+		if product.Length == 0 || product.Width == 0 || product.Height == 0 || product.Weight == 0 {
+			buffer.WriteString("商品长宽高重量数据有为零！")
+		}
 
 		transfer_entry_import.ErrorMessage = buffer.String()
 
