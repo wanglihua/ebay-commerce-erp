@@ -159,10 +159,12 @@ func (c ErpProductHsCodeExcel) Import() revel.Result {
 		var product = product_hs_code_import.product
 
 		product.Sku = product_hs_code_import.Sku
+		product.CnDeclName = product_hs_code_import.CnDeclName
+		product.AuDeclName = product_hs_code_import.AuDeclName
 		product.CnHsCode = product_hs_code_import.CnHsCode
 		product.AuHsCode = product_hs_code_import.AuHsCode
 
-		update_col_list := []string{"cn_hs_code", "au_hs_code"}
+		update_col_list := []string{"cn_decl_name", "au_decl_name", "cn_hs_code", "au_hs_code"}
 		_, err = db_session.Id(product.Id).Cols(update_col_list...).Update(&product)
 		core.HandleError(err)
 	}
