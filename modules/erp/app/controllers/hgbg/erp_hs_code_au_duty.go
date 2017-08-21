@@ -119,7 +119,7 @@ func (c ErpHsCodeAuDuty) Save() revel.Result {
 
 	var affected int64
 	if detail_form.IsCreate() {
-		var hs_code models.HsCodeCnReportElemInfo
+		var hs_code models.HsCodeAuDutyInfo
 		has, err := db_session.Where(fmt.Sprintf("en_name = '%s'", hs_code_au_duty.EnName)).Get(&hs_code)
 		core.HandleError(err)
 
@@ -130,7 +130,7 @@ func (c ErpHsCodeAuDuty) Save() revel.Result {
 		affected, err = db_session.Insert(&hs_code_au_duty)
 		core.HandleError(err)
 	} else {
-		var hs_code models.HsCodeCnReportElemInfo
+		var hs_code models.HsCodeAuDutyInfo
 		has, err := db_session.Where(fmt.Sprintf("id <> %d AND en_name = '%s'", hs_code_au_duty.Id, hs_code_au_duty.EnName)).Get(&hs_code)
 		core.HandleError(err)
 
