@@ -134,6 +134,8 @@ func (c ErpOrderHold) ListData() revel.Result {
 
 	if hold_type_id != 0 {
 		filter = core.SqlAnd(filter, fmt.Sprintf("o.hold_type_id = %d", hold_type_id))
+	} else { // 如果没选Hold类型，就不显示那四个特殊个Hold类型
+		filter = core.SqlAnd(filter, fmt.Sprintf("o.hold_type_id <> %d AND o.hold_type_id <> %d AND o.hold_type_id <> %d AND o.hold_type_id <> %d", models.ORDER_HOLD_TYPE_INTERNATIONAL, models.ORDER_HOLD_TYPE_EXPRESS, models.ORDER_HOLD_TYPE_PICK_UP, models.ORDER_HOLD_TYPE_ENVELOPE))
 	}
 
 	if batch_code != 0 {

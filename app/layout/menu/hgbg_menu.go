@@ -39,7 +39,7 @@ func GetHgbgMenu(res_id_map map[int64]bool, web_session revel.Session) string {
 		buffer.WriteString(`<li id="hgbg-product-hs-code-menu" class="">
             <a href="/product/hs/code">
                 <i class="menu-icon fa fa-caret-right"></i>
-                商品海关编码
+                商品申报品名
             </a>
             <b class="arrow"></b>
         </li>`)
@@ -49,7 +49,7 @@ func GetHgbgMenu(res_id_map map[int64]bool, web_session revel.Session) string {
 		buffer.WriteString(`<li id="hgbg-hs-code-cn-report-elem-menu" class="">
             <a href="/hs/code/cn">
                 <i class="menu-icon fa fa-caret-right"></i>
-                中国海关编码
+                中国海关申报品名
             </a>
             <b class="arrow"></b>
         </li>`)
@@ -59,7 +59,7 @@ func GetHgbgMenu(res_id_map map[int64]bool, web_session revel.Session) string {
 		buffer.WriteString(`<li id="hgbg-hs-code-au-duty-menu" class="">
             <a href="/hs/code/au">
                 <i class="menu-icon fa fa-caret-right"></i>
-                澳洲海关编码
+                澳洲海关申报品名
             </a>
             <b class="arrow"></b>
         </li>`)
