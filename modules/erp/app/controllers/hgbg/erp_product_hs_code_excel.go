@@ -37,11 +37,11 @@ func (c ErpProductHsCodeExcel) Import() revel.Result {
 	}
 
 	type product_hs_code_import_t struct {
-		Sku          string  `json:"sku"`
-		CnDeclName   string  `json:"cn_decl_name"`
-		AuDeclName   string  `json:"au_decl_name"`
-		CnHsCode     string  `json:"cn_hs_code"`
-		AuHsCode     string  `json:"au_hs_code"`
+		Sku        string  `json:"sku"`
+		CnDeclName string  `json:"cn_decl_name"`
+		AuDeclName string  `json:"au_decl_name"`
+		//CnHsCode     string  `json:"cn_hs_code"`
+		//AuHsCode     string  `json:"au_hs_code"`
 		ErrorMessage string  `json:"error_message"`
 
 		product models.ProductInfo `json:"-"`
@@ -102,6 +102,7 @@ func (c ErpProductHsCodeExcel) Import() revel.Result {
 			product_hs_code.AuDeclName = cell_val
 			col_index++
 
+			/*
 			// cn_hs_code
 			// cell = row.Cells[col_index]
 			cell = sheet.Cell(row_index, col_index)
@@ -119,6 +120,7 @@ func (c ErpProductHsCodeExcel) Import() revel.Result {
 			cell_val = strings.TrimSpace(cell_val)
 			product_hs_code.AuHsCode = cell_val
 			col_index++
+			*/
 
 			product_hs_code_import_list = append(product_hs_code_import_list, product_hs_code)
 		}
@@ -161,10 +163,11 @@ func (c ErpProductHsCodeExcel) Import() revel.Result {
 		product.Sku = product_hs_code_import.Sku
 		product.CnDeclName = product_hs_code_import.CnDeclName
 		product.AuDeclName = product_hs_code_import.AuDeclName
-		product.CnHsCode = product_hs_code_import.CnHsCode
-		product.AuHsCode = product_hs_code_import.AuHsCode
+		//product.CnHsCode = product_hs_code_import.CnHsCode
+		//product.AuHsCode = product_hs_code_import.AuHsCode
 
-		update_col_list := []string{"cn_decl_name", "au_decl_name", "cn_hs_code", "au_hs_code"}
+		// update_col_list := []string{"cn_decl_name", "au_decl_name", "cn_hs_code", "au_hs_code"}
+		update_col_list := []string{"cn_decl_name", "au_decl_name"}
 		_, err = db_session.Id(product.Id).Cols(update_col_list...).Update(&product)
 		core.HandleError(err)
 	}
@@ -333,17 +336,17 @@ func (c ErpProductHsCodeExcel) export_product_list_to_excel(db_session *xorm.Ses
 		cell.Value = "澳洲申报品名"
 		col_index++
 
-		cell = row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 10)
-		set_head_cell_style(cell)
-		cell.Value = "中国海关编码"
-		col_index++
-
-		cell = row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 10)
-		set_head_cell_style(cell)
-		cell.Value = "澳洲海关编码"
-		col_index++
+		//cell = row.AddCell()
+		//sheet.SetColWidth(col_index, col_index, 10)
+		//set_head_cell_style(cell)
+		//cell.Value = "中国海关编码"
+		//col_index++
+		//
+		//cell = row.AddCell()
+		//sheet.SetColWidth(col_index, col_index, 10)
+		//set_head_cell_style(cell)
+		//cell.Value = "澳洲海关编码"
+		//col_index++
 
 		cell = row.AddCell()
 		sheet.SetColWidth(col_index, col_index, 10)
@@ -376,6 +379,7 @@ func (c ErpProductHsCodeExcel) export_product_list_to_excel(db_session *xorm.Ses
 		set_text_cell_style(cell, "left")
 		cell.Value = product.AuDeclName
 
+		/*
 		// 中国海关编码
 		cell = row.AddCell()
 		set_text_cell_style(cell, "right")
@@ -385,6 +389,7 @@ func (c ErpProductHsCodeExcel) export_product_list_to_excel(db_session *xorm.Ses
 		cell = row.AddCell()
 		set_text_cell_style(cell, "right")
 		cell.Value = product.AuHsCode
+		*/
 
 		// 状态
 		cell = row.AddCell()
