@@ -145,7 +145,7 @@ func (c ErpHsCodeAuDutyExcel) Import() revel.Result {
 
 	for _, hs_code_au_import := range hs_code_au_import_list {
 		var hs_code_au models.HsCodeAuDutyInfo
-		has, err := db_session.Where(fmt.Sprintf("hs_code = '%s'", hs_code_au_import.HsCode)).Get(&hs_code_au)
+		has, err := db_session.Where(fmt.Sprintf("en_name = '%s'", hs_code_au_import.EnName)).Get(&hs_code_au)
 		core.HandleError(err)
 
 		hs_code_au.HsCode = hs_code_au_import.HsCode
@@ -154,7 +154,7 @@ func (c ErpHsCodeAuDutyExcel) Import() revel.Result {
 		hs_code_au.DutyRate = hs_code_au_import.duty_rate
 
 		if has == true {
-			update_col_list := []string{"cn_name", "en_name", "duty_rate"}
+			update_col_list := []string{"hs_code", "cn_name", "en_name", "duty_rate"}
 			_, err = db_session.Id(hs_code_au.Id).Cols(update_col_list...).Update(&hs_code_au)
 			core.HandleError(err)
 		} else {

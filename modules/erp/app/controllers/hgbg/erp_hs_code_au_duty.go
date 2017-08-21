@@ -1,4 +1,3 @@
-
 package controllers
 
 import (
@@ -10,6 +9,7 @@ import (
 	"matrix/modules/erp/models"
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/auth/pass_res"
+	"fmt"
 )
 
 type ErpHsCodeAuDuty struct {
@@ -61,7 +61,7 @@ func (f *HsCodeAuDutyDetailForm) IsCreate() bool {
 	return f.HsCodeAuDuty.Id == 0
 }
 
-func (f *HsCodeAuDutyDetailForm) Valid(validation *revel.Validation) bool { 
+func (f *HsCodeAuDutyDetailForm) Valid(validation *revel.Validation) bool {
 	validation.Required(f.HsCodeAuDuty.HsCode).Message("海关编码不能为空！")
 	if f.HsCodeAuDuty.HsCode != "" {
 		validation.MinSize(f.HsCodeAuDuty.HsCode, 1).Message("海关编码长度不能小于1！")
@@ -118,15 +118,31 @@ func (c ErpHsCodeAuDuty) Save() revel.Result {
 	hs_code_au_duty := detail_form.HsCodeAuDuty
 
 	var affected int64
-	if detail_form.IsCreate() { 
+	if detail_form.IsCreate() {
+		var hs_code models.HsCodeCnReportElemInfo
+		has, err := db_session.Where(fmt.Sprintf("en_name = '%s'", hs_code_au_duty.EnName)).Get(&hs_code)
+		core.HandleError(err)
+
+		if has == true {
+			return c.RenderJson(core.JsonResult{Success: false, Message: "海关申报品名（英文名）应唯一！"})
+		}
+
 		affected, err = db_session.Insert(&hs_code_au_duty)
 		core.HandleError(err)
-	} else { 
+	} else {
+		var hs_code models.HsCodeCnReportElemInfo
+		has, err := db_session.Where(fmt.Sprintf("id <> %d AND en_name = '%s'", hs_code_au_duty.Id, hs_code_au_duty.EnName)).Get(&hs_code)
+		core.HandleError(err)
+
+		if has == true {
+			return c.RenderJson(core.JsonResult{Success: false, Message: "海关申报品名（英文名）应唯一！"})
+		}
+
 		affected, err = db_session.Id(hs_code_au_duty.Id).Update(&hs_code_au_duty)
 		core.HandleError(err)
 
 		if affected == 0 {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！" })
+			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！"})
 		}
 	}
 
@@ -146,4 +162,3 @@ func (c ErpHsCodeAuDuty) Delete() revel.Result {
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})
 }
-

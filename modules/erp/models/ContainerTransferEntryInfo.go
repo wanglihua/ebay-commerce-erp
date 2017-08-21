@@ -20,7 +20,7 @@ type ContainerTransferEntryInfo struct {
 	CnHsCode     string          `xorm:"nvarchar(100) notnull 'cn_hs_code'" json:"cn_hs_code"`
 	CnHsCnName   string          `xorm:"nvarchar(200) notnull 'cn_hs_cn_name'" json:"cn_hs_cn_name"`  // 中国海关申报名
 	CnHsEnName   string          `xorm:"nvarchar(200) notnull 'cn_hs_en_name'" json:"cn_hs_en_name"`
-	NeedInvoice  int64           `xorm:"bigint notnull 'need_invoice'" json:"need_invoice"` // 是否开票
+	NeedInvoice  int64           `xorm:"bigint notnull 'need_invoice' default(0)" json:"need_invoice"` // 是否开票
 	CreateTime   core.Time       `xorm:"created notnull 'create_time'" json:"create_time"`
 	UpdateTime   core.Time       `xorm:"updated notnull 'update_time'" json:"update_time"`
 

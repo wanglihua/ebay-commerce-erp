@@ -252,7 +252,7 @@ func (c ErpHsCodeCnReportElemExcel) Import() revel.Result {
 
 	for _, hs_code_import := range hs_code_import_list {
 		var hs_code models.HsCodeCnReportElemInfo
-		has, err := db_session.Where(fmt.Sprintf("hs_code = '%s'", hs_code_import.hs_code)).Get(&hs_code)
+		has, err := db_session.Where(fmt.Sprintf("cn_name = '%s'", hs_code_import.cn_name)).Get(&hs_code)
 		core.HandleError(err)
 
 		hs_code.HsCode = hs_code_import.hs_code

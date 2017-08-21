@@ -9,6 +9,7 @@ import (
 	"matrix/modules/erp/models"
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/auth/pass_res"
+	"fmt"
 )
 
 type ErpHsCodeCnReportElem struct {
@@ -116,14 +117,30 @@ func (c ErpHsCodeCnReportElem) Save() revel.Result {
 
 	var affected int64
 	if detail_form.IsCreate() {
+		var hs_code models.HsCodeCnReportElemInfo
+		has, err := db_session.Where(fmt.Sprintf("cn_name = '%s'", hs_code_cn_report_elem.CnName)).Get(&hs_code)
+		core.HandleError(err)
+
+		if has == true {
+			return c.RenderJson(core.JsonResult{Success: false, Message: "海关申报品名（中文名）应唯一！"})
+		}
+
 		affected, err = db_session.Insert(&hs_code_cn_report_elem)
 		core.HandleError(err)
 	} else {
+		var hs_code models.HsCodeCnReportElemInfo
+		has, err := db_session.Where(fmt.Sprintf("id <> %d AND cn_name = '%s'", hs_code_cn_report_elem.Id, hs_code_cn_report_elem.CnName)).Get(&hs_code)
+		core.HandleError(err)
+
+		if has == true {
+			return c.RenderJson(core.JsonResult{Success: false, Message: "海关申报品名（中文名）应唯一！"})
+		}
+
 		affected, err = db_session.Id(hs_code_cn_report_elem.Id).Update(&hs_code_cn_report_elem)
 		core.HandleError(err)
 
 		if affected == 0 {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！" })
+			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！"})
 		}
 	}
 
