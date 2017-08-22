@@ -30,8 +30,9 @@ func EntryCombineForCn(item_list []ContainerTransferEntryItem, is_third bool, db
 		var vol_sum = (product.Length * product.Width * product.Height / 1000000) * float64(item.ContainerTransferEntry.Qty)
 
 		// 需要开票的不合并
-		//if is_product_need_invoice(item.ProductId, db_session) == true {
-		if item.ContainerTransferEntry.NeedInvoice > 0 { // 如需要开票
+		//if is_product_need_invoice(item.Product.Id, db_session) == true {
+		if product.NeedInvoice > 0 {
+			//if item.ContainerTransferEntry.NeedInvoice > 0 { // 如需要开票
 			item.ContainerTransferEntry.WeightSum = net_weight_sum
 			item.ContainerTransferEntry.VolumeSum = vol_sum
 			not_combined_entry_list = append(not_combined_entry_list, item)

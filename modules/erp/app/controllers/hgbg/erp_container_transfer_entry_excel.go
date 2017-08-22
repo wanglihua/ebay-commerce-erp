@@ -456,6 +456,7 @@ func (c ErpContainerTransferEntryExcel) export_entry_list_to_excel(db_session *x
 		set_text_cell_style(cell, "right")
 		cell.SetInt64(entry.ContainerTransferEntry.BoxQty)
 
+		/*
 		// 开票
 		cell = row.AddCell()
 		set_text_cell_style(cell, "center")
@@ -466,6 +467,7 @@ func (c ErpContainerTransferEntryExcel) export_entry_list_to_excel(db_session *x
 				return "是"
 			}
 		}()
+		*/
 
 		/*
 		// 价格
