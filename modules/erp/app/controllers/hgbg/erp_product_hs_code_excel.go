@@ -137,15 +137,36 @@ func (c ErpProductHsCodeExcel) Import() revel.Result {
 	var product_hs_code_import_error_list = make([]product_hs_code_import_t, 0)
 
 	for index, product_hs_code_import := range product_hs_code_import_list {
+		var buffer bytes.Buffer
+
 		var product models.ProductInfo
 		has, err := db_session.Where(fmt.Sprintf("sku = '%s'", product_hs_code_import.Sku)).Get(&product)
 		core.HandleError(err)
 
 		if has == false {
-			product_hs_code_import.ErrorMessage = fmt.Sprintf("商品SKU %s 数据库中不存在！", product_hs_code_import.Sku)
-			product_hs_code_import_error_list = append(product_hs_code_import_error_list, product_hs_code_import)
+			buffer.WriteString(fmt.Sprintf("商品SKU %s 数据库中不存在！", product_hs_code_import.Sku))
 		} else {
 			product_hs_code_import_list[index].product = product
+		}
+
+		var hs_code_cn models.HsCodeCnReportElemInfo
+		has, err = db_session.Where("cn_name = ?", product_hs_code_import.CnDeclName).Get(&hs_code_cn)
+		core.HandleError(err)
+		if has == false {
+			buffer.WriteString("中国海关申报品名不存在！")
+		}
+
+		var hs_code_au models.HsCodeAuDutyInfo
+		has, err = db_session.Where("en_name = ?", product_hs_code_import.AuDeclName).Get(&hs_code_au)
+		core.HandleError(err)
+		if has == false {
+			buffer.WriteString("澳洲海关申报品名不存在！")
+		}
+
+		var error_message = buffer.String()
+		if error_message != "" {
+			product_hs_code_import.ErrorMessage = error_message
+			product_hs_code_import_error_list = append(product_hs_code_import_error_list, product_hs_code_import)
 		}
 	}
 

@@ -149,194 +149,219 @@
 </div>
 <script type="text/javascript">
     var vm = new Vue({
-        el: "#page",
-        data: {
-            "detail": {
-                "supplier": {},
-                "region_full_name": "",
-                "province_id": 0,
-                "province_list": [],
-                "city_list": []
-            }
-        },
-        mounted: function () {
-            initDataTable(
-                '#supplierList',
-                {
-                    "sAjaxSource": '{%url "ErpSupplier.ListData"%}',
-                    "aaSorting": [[1, "asc"]],
-                    "aoColumns": [
-                        {
-                            "mDataProp": "s.id",
-                            "bSearchable": false,
-                            "orderable": false,
-                            "sClass": "center",
-                            "width": 50,
-                            "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
-                            "render": function (data, type, row) {
-                                return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
-                            }
-                        },
-                        {"mDataProp": "s.name", "title": "名称", "bSearchable": true, "width": 120},
-                        {"mDataProp": "s.contact", "title": "联系人", "bSearchable": true, "width": 90},
-                        {"mDataProp": "s.phone", "title": "电话", "bSearchable": true, "width": 140},
-                        {"mDataProp": "s.contact_info", "title": "联系方式", "bSearchable": true, "width": 200},
-                        {"mDataProp": "r.city", "title": "地区", "bSearchable": true, "width": 80},
-                        {"mDataProp": "s.address", "title": "地址", "bSearchable": true, "width": 200},
-                        {"mDataProp": "s.desc", "title": "描述", "bSearchable": true},
-                        {"mDataProp": "s.create_time", "title": "创建时间", "bSearchable": false, "width": 120},
-                        {"mDataProp": "s.update_time", "title": "修改时间", "bSearchable": false, "width": 120}
-                    ]
+            el: "#page",
+            data: {
+                "detail": {
+                    "supplier": {},
+                    "region_full_name": "",
+                    "province_id": 0,
+                    "province_list": [],
+                    "city_list": []
                 }
-            );
-
-            $('#supplierList tbody').on('dblclick', 'tr', function () {
-                var id = $(this).find('td:first-child input:checkbox').val();
-                vm.showSupplierDetail(id);
-            });
-        },
-        methods: {
-            reloadList: function () {
-                reloadList('#supplierList');
             },
-            showSupplierDetail: function (id) {
-                showMask("加载中...");
-                $("#supplierDetailForm").clearValidation();
-                $.ajax({
-                        url: '{%url "ErpSupplier.DetailData" %}',
-                        type: "POST",
-                        data: {
-                            "id": id
-                        },
-                        success: function (result) {
-                            hideMask();
-                            if (result.success == false) {
-                                $.msg.error(result.message);
-                                return;
-                            }
-                            vm.detail = result;
-                            $('#supplierDetailDialog').modal(modalOptions);
-                        }
+            mounted: function () {
+                initDataTable(
+                    '#supplierList',
+                    {
+                        "sAjaxSource": '{%url "ErpSupplier.ListData"%}',
+                        "aaSorting": [[1, "asc"]],
+                        "aoColumns": [
+                            {
+                                "mDataProp": "s.id",
+                                "bSearchable": false,
+                                "orderable": false,
+                                "sClass": "center",
+                                "width": 50,
+                                "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
+                                "render": function (data, type, row) {
+                                    return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
+                                }
+                            },
+                            {"mDataProp": "s.name", "title": "名称", "bSearchable": true, "width": 120},
+                            {"mDataProp": "s.contact", "title": "联系人", "bSearchable": true, "width": 90},
+                            {"mDataProp": "s.phone", "title": "电话", "bSearchable": true, "width": 140},
+                            {"mDataProp": "s.contact_info", "title": "联系方式", "bSearchable": true, "width": 200},
+                            {"mDataProp": "r.city", "title": "地区", "bSearchable": true, "width": 80},
+                            {
+                                "mDataProp": "s.address", "title": "地址", "bSearchable": true, "width": 200, "sClass": "wrap-word",
+                                "render": function (data, type, row) {
+                                    if (data) {
+                                        return '<div>' + data + '</div>';
+                                    } else {
+                                        return "";
+                                    }
+                                }
+                            },
+                            {
+                                "mDataProp": "s.desc", "title": "描述", "bSearchable": true, "sClass": "wrap-word",
+                                "render": function (data, type, row) {
+                                    if (data) {
+                                        return '<div>' + data + '</div>';
+                                    }
+                                    else {
+                                        return "";
+                                    }
+                                }
+                            },
+                            {"mDataProp": "s.create_time", "title": "创建时间", "bSearchable": false, "width": 120},
+                            {"mDataProp": "s.update_time", "title": "修改时间", "bSearchable": false, "width": 120}
+                        ]
                     }
                 );
-            },
-            saveSupplier: function () {
-                showMask("提交中...");
-                var form = $("#supplierDetailForm");
-                var valid = validate(form, {
-                    'detail.supplier.name': {
-                        required: true, minlength: 2, maxlength: 100
-                    },
-                    'detail.supplier.contact': {
-                        required: false, minlength: 2, maxlength: 100
-                    },
-                    'detail.supplier.contact_info': {
-                        required: false, maxlength: 500
-                    },
-                    'detail.supplier.address': {
-                        required: false, minlength: 2, maxlength: 200
-                    },
-                    'detail.supplier.phone': {
-                        required: false, minlength: 2, maxlength: 100
-                    },
-                    'detail.supplier.desc': {
-                        required: false, maxlength: 500
-                    }
-                });
 
-                if (!valid) {
-                    hideMask();
-                } else {
+                $('#supplierList tbody').on('dblclick', 'tr', function () {
+                    var id = $(this).find('td:first-child input:checkbox').val();
+                    vm.showSupplierDetail(id);
+                });
+            },
+            methods: {
+                reloadList: function () {
+                    reloadList('#supplierList');
+                }
+                ,
+                showSupplierDetail: function (id) {
+                    showMask("加载中...");
+                    $("#supplierDetailForm").clearValidation();
                     $.ajax({
-                            url: '{%url "ErpSupplier.Save"%}',
+                            url: '{%url "ErpSupplier.DetailData" %}',
                             type: "POST",
-                            processData: false,
-                            contentType: 'application/json',
-                            data: JSON.stringify(vm.detail),
-                            success: function (data) {
+                            data: {
+                                "id": id
+                            },
+                            success: function (result) {
                                 hideMask();
-                                if (data.success == false) {
-                                    $.msg.error(data.message);
-                                    //return;
+                                if (result.success === false) {
+                                    $.msg.error(result.message);
+                                    return;
                                 }
-                                else {
-                                    $.msg.show(data.message);
-                                    $('#supplierDetailDialog').modal('hide');
-                                    vm.reloadList();
-                                    //return;
-                                }
+                                vm.detail = result;
+                                $('#supplierDetailDialog').modal(modalOptions);
                             }
                         }
                     );
                 }
-            },
-            deleteSupplier: function () {
-                var id_list = [];
-                $('#supplierList tbody tr>td:first-child input:checkbox').each(function () {
-                    if (this.checked) {
-                        id_list.push($(this).val());
+                ,
+                saveSupplier: function () {
+                    showMask("提交中...");
+                    var form = $("#supplierDetailForm");
+                    var valid = validate(form, {
+                        'detail.supplier.name': {
+                            required: true, minlength: 2, maxlength: 100
+                        },
+                        'detail.supplier.contact': {
+                            required: false, minlength: 2, maxlength: 100
+                        },
+                        'detail.supplier.contact_info': {
+                            required: false, maxlength: 500
+                        },
+                        'detail.supplier.address': {
+                            required: false, minlength: 2, maxlength: 200
+                        },
+                        'detail.supplier.phone': {
+                            required: false, minlength: 2, maxlength: 100
+                        },
+                        'detail.supplier.desc': {
+                            required: false, maxlength: 500
+                        }
+                    });
+
+                    if (!valid) {
+                        hideMask();
+                    } else {
+                        $.ajax({
+                                url: '{%url "ErpSupplier.Save"%}',
+                                type: "POST",
+                                processData: false,
+                                contentType: 'application/json',
+                                data: JSON.stringify(vm.detail),
+                                success: function (data) {
+                                    hideMask();
+                                    if (data.success === false) {
+                                        $.msg.error(data.message);
+                                        //return;
+                                    }
+                                    else {
+                                        $.msg.show(data.message);
+                                        $('#supplierDetailDialog').modal('hide');
+                                        vm.reloadList();
+                                        //return;
+                                    }
+                                }
+                            }
+                        );
                     }
-                });
-
-                if (id_list.length == 0) {
-                    $.msg.alert("请选择数据！");
-                    return;
                 }
+                ,
+                deleteSupplier: function () {
+                    var id_list = [];
+                    $('#supplierList tbody tr>td:first-child input:checkbox').each(function () {
+                        if (this.checked) {
+                            id_list.push($(this).val());
+                        }
+                    });
 
-                $.msg.confirm("确认要删除吗？", function () {
+                    if (id_list.length === 0) {
+                        $.msg.alert("请选择数据！");
+                        return;
+                    }
+
+                    $.msg.confirm("确认要删除吗？", function () {
+                        $.ajax({
+                            url: '{%url "ErpSupplier.Delete"%}',
+                            type: "POST",
+                            data: {"id_list": id_list},
+                            success: function (data) {
+                                if (data.success === false) {
+                                    $.msg.error(data.message);
+                                    return;
+                                }
+                                else {
+                                    $.msg.show(data.message);
+                                }
+                                vm.reloadList();
+                            }
+                        });
+                    });
+                }
+                ,
+                getCityList: function () {
                     $.ajax({
-                        url: '{%url "ErpSupplier.Delete"%}',
+                        url: '{%url "ErpRegion.GetCityList"%}',
                         type: "POST",
-                        data: {"id_list": id_list},
+                        data: {"province": vm.detail.province_id},
                         success: function (data) {
                             if (data.success === false) {
                                 $.msg.error(data.message);
                                 return;
                             }
                             else {
-                                $.msg.show(data.message);
+                                vm.detail.city_list = data.city_list;
+                                vm.detail.region_full_name = "";
+                                return;
                             }
-                            vm.reloadList();
                         }
                     });
-                });
-            },
-            getCityList: function () {
-                $.ajax({
-                    url: '{%url "ErpRegion.GetCityList"%}',
-                    type: "POST",
-                    data: {"province": vm.detail.province_id},
-                    success: function (data) {
-                        if (data.success === false) {
-                            $.msg.error(data.message);
-                            return;
+                }
+                ,
+                getRegionFullName: function () {
+                    $.ajax({
+                        url: '{%url "ErpRegion.GetRegionFullName"%}',
+                        type: "POST",
+                        data: {"region_id": vm.detail.supplier.region_id},
+                        success: function (data) {
+                            if (data.success === false) {
+                                $.msg.error(data.message);
+                                return;
+                            }
+                            else {
+                                vm.detail.region_full_name = data.region_full_name;
+                                return;
+                            }
                         }
-                        else {
-                            vm.detail.city_list = data.city_list;
-                            vm.detail.region_full_name = "";
-                            return;
-                        }
-                    }
-                });
-            },
-            getRegionFullName: function () {
-                $.ajax({
-                    url: '{%url "ErpRegion.GetRegionFullName"%}',
-                    type: "POST",
-                    data: {"region_id": vm.detail.supplier.region_id},
-                    success: function (data) {
-                        if (data.success === false) {
-                            $.msg.error(data.message);
-                            return;
-                        }
-                        else {
-                            vm.detail.region_full_name = data.region_full_name;
-                            return;
-                        }
-                    }
-                });
+                    });
+                }
             }
-        }
-    });
+        })
+    ;
 </script>
 {%footer%}

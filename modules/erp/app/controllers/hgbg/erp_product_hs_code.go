@@ -120,6 +120,26 @@ func (c ErpProductHsCode) Save() revel.Result {
 		})
 	}
 
+	var hs_code_cn models.HsCodeCnReportElemInfo
+	has, err = db_session.Where("cn_name = ?", detail_form.Product.CnDeclName).Get(&hs_code_cn)
+	core.HandleError(err)
+	if has == false {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "中国海关申报品名不存在！",
+		})
+	}
+
+	var hs_code_au models.HsCodeAuDutyInfo
+	has, err = db_session.Where("en_name = ?", detail_form.Product.AuDeclName).Get(&hs_code_au)
+	core.HandleError(err)
+	if has == false {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "澳洲海关申报品名不存在！",
+		})
+	}
+
 	product_in_db.CnDeclName = detail_form.Product.CnDeclName
 	product_in_db.AuDeclName = detail_form.Product.AuDeclName
 	// product_in_db.CnHsCode = detail_form.Product.CnHsCode
