@@ -161,22 +161,22 @@ func (c Exporter) GetExcelFile(p_transfer *models.ContainerTransferInfo, db_sess
 		var sheet5_name = "Sheet5"
 
 		/*
-	SELECT
-		DISTINCT
-		hcc.*
-	FROM erp_container_transfer_entry cte
-		INNER JOIN erp_hs_code_cn hcc ON hcc.id = cte.cn_hs_id
-	WHERE cte.transfer_id = 1
-	ORDER BY hcc.hs_code;
+SELECT
+    DISTINCT hcc.*
+FROM erp_container_transfer_entry cte
+    INNER JOIN erp_hs_code_cn hcc ON hcc.id = cte.cn_hs_id
+    INNER JOIN erp_product p ON p.id = cte.product_id
+WHERE cte.transfer_id = 1 AND p.need_invoice = 0 # 取不开票的
+ORDER BY hcc.hs_code;
 		 */
 
 		var sql = `
 SELECT
-    DISTINCT
-    hcc.*
+    DISTINCT hcc.*
 FROM erp_container_transfer_entry cte
     INNER JOIN erp_hs_code_cn hcc ON hcc.id = cte.cn_hs_id
-WHERE cte.transfer_id = %d
+    INNER JOIN erp_product p ON p.id = cte.product_id
+WHERE cte.transfer_id = %d AND p.need_invoice = 0 # 取不开票的
 ORDER BY hcc.hs_code;`
 		sql = fmt.Sprintf(sql, p_transfer.Id)
 
