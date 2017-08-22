@@ -152,29 +152,30 @@ func (c ErpContainerTransferEntryExcel) Import() revel.Result {
 			transfer_entry_import_list[index].product = product
 		}
 
-		if product.AuHsCode == "" {
-			buffer.WriteString("商品澳洲海关编码未设置")
+		//if product.AuHsCode == "" {
+		if product.AuDeclName == "" {
+			buffer.WriteString("商品澳洲海关品名未设置")
 		} else {
 			var hsCodeAu models.HsCodeAuDutyInfo
-			has, err := db_session.Where("hs_code = ?", product.AuHsCode).Get(&hsCodeAu)
+			has, err := db_session.Where("en_name = ?", product.AuDeclName).Get(&hsCodeAu)
 			core.HandleError(err)
 
 			if has == false {
-				buffer.WriteString("商品澳洲海关编码已设置，但该海关编码不存在！")
+				buffer.WriteString("商品澳洲海关品名已设置，但该澳洲海关品名不存在！")
 			} else {
 				transfer_entry_import_list[index].hs_code_au = hsCodeAu
 			}
 		}
 
-		if product.CnHsCode == "" {
-			buffer.WriteString("商品中国海关编码未设置！")
+		if product.CnDeclName == "" {
+			buffer.WriteString("商品中国海关品名未设置！")
 		} else {
 			var hsCodeCn models.HsCodeCnReportElemInfo
-			has, err := db_session.Where("hs_code = ?", product.CnHsCode).Get(&hsCodeCn)
+			has, err := db_session.Where("cn_name = ?", product.CnDeclName).Get(&hsCodeCn)
 			core.HandleError(err)
 
 			if has == false {
-				buffer.WriteString("商品中国海关编码已设置，但该海关编码不存在！")
+				buffer.WriteString("商品中国海关品名已设置，但该中国海关品名不存在！")
 			} else {
 				transfer_entry_import_list[index].hs_code_cn = hsCodeCn
 			}
@@ -194,9 +195,9 @@ func (c ErpContainerTransferEntryExcel) Import() revel.Result {
 			transfer_entry_import_list[index].box_qty = box_qty
 		}
 
-		if transfer_entry_import.NeedInvoice != "是" && transfer_entry_import.NeedInvoice != "否" {
-			buffer.WriteString("是否开票输入不对！")
-		}
+		//if transfer_entry_import.NeedInvoice != "是" && transfer_entry_import.NeedInvoice != "否" {
+		//	buffer.WriteString("是否开票输入不对！")
+		//}
 
 		var au_exchange_rate = exchange_rate_service.Get_aud_exchange_rate(db_session)
 		//transfer_entry_import_list[index].price = inventory_service.GetProductCnStockCostPrice(product.Id, db_session) / au_exchange_rate
@@ -418,12 +419,14 @@ func (c ErpContainerTransferEntryExcel) export_entry_list_to_excel(db_session *x
 		cell.Value = "箱数"
 		col_index++
 
+		/*
+
 		cell = row.AddCell()
 		sheet.SetColWidth(col_index, col_index, 8)
 		set_head_cell_style(cell)
 		cell.Value = "开票"
 		col_index++
-		/*
+
 		cell = row.AddCell()
 		sheet.SetColWidth(col_index, col_index, 10)
 		set_head_cell_style(cell)

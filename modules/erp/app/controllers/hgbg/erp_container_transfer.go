@@ -13,6 +13,7 @@ import (
 	"time"
 	"matrix/modules/erp/service/container_transfer_log_service"
 	"fmt"
+	"matrix/modules/erp/service/exchange_rate_service"
 )
 
 type ErpContainerTransfer struct {
@@ -323,6 +324,7 @@ func (c ErpContainerTransfer) Save() revel.Result {
 	var affected int64
 	if is_create == true {
 		container_transfer.StatusId = models.CONTAINER_TRANSFER_STATUS_NEW
+		container_transfer.ExchangeRate = exchange_rate_service.Get_aud_exchange_rate(db_session)
 
 		affected, err = db_session.Insert(&container_transfer)
 		core.HandleError(err)

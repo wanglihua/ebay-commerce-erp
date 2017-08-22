@@ -120,6 +120,7 @@
                             <form class="form-horizontal" role="form" id="containerTransferDetailForm">
                                 <input id="container_transfer_id" name="detail.transfer.id" type="hidden" v-model.number="detail.transfer.id"/>
                                 <input id="container_transfer_status_id" name="detail.transfer.status_id" type="hidden" v-model.number="detail.transfer.status_id"/>
+                                <input id="container_transfer_exchange_rate" name="detail.transfer.exchange_rate" type="hidden" v-model.number="detail.transfer.exchange_rate"/>
                                 <div class="row">
                                     <div class="col-xs-3">
                                         <div class="form-group">
@@ -657,16 +658,6 @@
                     },
                     {"mDataProp": "cte.qty", "title": "数量", "bSearchable": false, "width": 70, "sClass": "center"},
                     {"mDataProp": "cte.box_qty", "title": "箱数", "bSearchable": false, "width": 70, "sClass": "center"},
-                    {
-                        "mDataProp": "cte.need_invoice", "title": "开票", "bSearchable": false, "width": 70, "sClass": "center",
-                        "render": function (data, type, row) {
-                            if (data === 0) {
-                                return "否";
-                            } else {
-                                return "是";
-                            }
-                        }
-                    },
                     {"mDataProp": "cte.create_time", "title": "创建时间", "bSearchable": false, "width": 120},
                     {"mDataProp": "cte.update_time", "title": "修改时间", "bSearchable": false, "width": 120}
                 ],
