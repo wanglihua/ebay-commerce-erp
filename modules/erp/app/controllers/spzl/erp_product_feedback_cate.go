@@ -6,11 +6,11 @@ import (
 	"github.com/revel/revel"
 
 	"matrix/core"
-	"matrix/modules/erp/models"
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/auth/pass_res"
 	"fmt"
 	"strings"
+	"matrix/modules/erp/models/spzl_models"
 )
 
 type ErpProductFeedbackCate struct {
@@ -40,12 +40,12 @@ func (c ErpProductFeedbackCate) ListData() revel.Result {
 		data_query = *data_query.Asc("id")
 	}
 
-	product_feedback_cate_list := make([]models.ProductFeedbackCateInfo, 0, limit)
+	product_feedback_cate_list := make([]spzl_models.ProductFeedbackCateInfo, 0, limit)
 	err := data_query.Limit(limit, offset).Find(&product_feedback_cate_list)
 	core.HandleError(err)
 
 	count_query := *query
-	count, err := count_query.Count(new(models.ProductFeedbackCateInfo))
+	count, err := count_query.Count(new(spzl_models.ProductFeedbackCateInfo))
 	core.HandleError(err)
 
 	return c.RenderJson(core.GridResult{
@@ -55,7 +55,7 @@ func (c ErpProductFeedbackCate) ListData() revel.Result {
 }
 
 type ProductFeedbackCateDetailForm struct {
-	ProductFeedbackCate models.ProductFeedbackCateInfo `json:"product_feedback_cate"`
+	ProductFeedbackCate spzl_models.ProductFeedbackCateInfo `json:"product_feedback_cate"`
 }
 
 func (f *ProductFeedbackCateDetailForm) IsCreate() bool {
@@ -86,7 +86,7 @@ func (c ErpProductFeedbackCate) DetailData() revel.Result {
 	var product_feedback_cate_id int64
 	c.Params.Bind(&product_feedback_cate_id, "id")
 
-	var product_feedback_cate models.ProductFeedbackCateInfo
+	var product_feedback_cate spzl_models.ProductFeedbackCateInfo
 	if product_feedback_cate_id != 0 {
 		has, err := db_session.Id(product_feedback_cate_id).Get(&product_feedback_cate)
 		core.HandleError(err)
@@ -164,7 +164,7 @@ WHERE pf.cate_id IN (%s);`
 		})
 	}
 
-	affected, err := db_session.In("id", product_feedback_cate_id_list).Delete(new(models.ProductFeedbackCateInfo))
+	affected, err := db_session.In("id", product_feedback_cate_id_list).Delete(new(spzl_models.ProductFeedbackCateInfo))
 	core.HandleError(err)
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})

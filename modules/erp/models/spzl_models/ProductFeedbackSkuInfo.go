@@ -1,4 +1,4 @@
-package models
+package spzl_models
 
 import (
 	"matrix/core"

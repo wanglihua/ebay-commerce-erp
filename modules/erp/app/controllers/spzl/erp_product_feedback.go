@@ -13,6 +13,7 @@ import (
 	"strings"
 	"time"
 	"matrix/modules/erp/models/kcgl_models"
+	"matrix/modules/erp/models/spzl_models"
 )
 
 type ErpProductFeedback struct {
@@ -38,7 +39,7 @@ func (c ErpProductFeedback) SkuListData() revel.Result {
 
 	type product_feedback_sku_view_item_t struct {
 		Product            kcgl_models.ProductInfo             `xorm:"extends" json:"p"`
-		ProductFeedbackSku models.ProductFeedbackSkuInfo  `xorm:"extends" json:"pfu"`
+		ProductFeedbackSku spzl_models.ProductFeedbackSkuInfo  `xorm:"extends" json:"pfu"`
 	}
 
 	/*
@@ -127,7 +128,7 @@ func (c ErpProductFeedback) PageData() revel.Result {
 		}
 	 */
 
-	var feedback_cate_list = make([]models.ProductFeedbackCateInfo, 0)
+	var feedback_cate_list = make([]spzl_models.ProductFeedbackCateInfo, 0)
 	var filter_cate = `id IN (SELECT DISTINCT cate_id
 FROM erp_product_feedback pf
 WHERE pf.product_id = %d)`
@@ -167,8 +168,8 @@ func (c ErpProductFeedback) ListData() revel.Result {
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
 	type product_feedback_view_item_t struct {
-		ProductFeedback     models.ProductFeedbackInfo     `xorm:"extends" json:"pf"`
-		ProductFeedbackCate models.ProductFeedbackCateInfo `xorm:"extends" json:"c"`
+		ProductFeedback     spzl_models.ProductFeedbackInfo     `xorm:"extends" json:"pf"`
+		ProductFeedbackCate spzl_models.ProductFeedbackCateInfo `xorm:"extends" json:"c"`
 		Product             kcgl_models.ProductInfo             `xorm:"extends" json:"p"`
 		Supplier            models.SupplierInfo            `xorm:"extends" json:"sup"`
 	}
@@ -265,7 +266,7 @@ GROUP BY pf.cate_id;`
 }
 
 type ProductFeedbackDetailForm struct {
-	ProductFeedback models.ProductFeedbackInfo      `json:"product_feedback"`
+	ProductFeedback spzl_models.ProductFeedbackInfo      `json:"product_feedback"`
 }
 
 func (f *ProductFeedbackDetailForm) IsCreate() bool {
@@ -294,7 +295,7 @@ func (c ErpProductFeedback) DetailData() revel.Result {
 	var product_id int64
 	c.Params.Bind(&product_id, "product_id")
 
-	var product_feedback models.ProductFeedbackInfo
+	var product_feedback spzl_models.ProductFeedbackInfo
 	if product_feedback_id != 0 {
 		has, err := db_session.Id(product_feedback_id).Get(&product_feedback)
 		core.HandleError(err)
@@ -315,7 +316,7 @@ func (c ErpProductFeedback) DetailData() revel.Result {
 	var detail_form ProductFeedbackDetailForm
 	detail_form.ProductFeedback = product_feedback
 
-	var product_feedback_cate_list = make([]models.ProductFeedbackCateInfo, 0)
+	var product_feedback_cate_list = make([]spzl_models.ProductFeedbackCateInfo, 0)
 	core.HandleError(db_session.OrderBy("id ASC").Find(&product_feedback_cate_list))
 
 	var supplier_list = make([]models.SupplierInfo, 0)
@@ -375,7 +376,7 @@ func (c ErpProductFeedback) Save() revel.Result {
 		}
 	}
 
-	var feedback_sku models.ProductFeedbackSkuInfo
+	var feedback_sku spzl_models.ProductFeedbackSkuInfo
 	has, err = db_session.Where("product_id = ?", product.Id).Get(&feedback_sku)
 	core.HandleError(err)
 
@@ -413,23 +414,23 @@ func (c ErpProductFeedback) Delete() revel.Result {
 
 	var product_feedback_id = product_feedback_id_list[0]
 
-	var product_feedback models.ProductFeedbackInfo
+	var product_feedback spzl_models.ProductFeedbackInfo
 	_, err := db_session.Id(product_feedback_id).Get(&product_feedback)
 	core.HandleError(err)
 
-	affected, err := db_session.In("id", product_feedback_id_list).Delete(new(models.ProductFeedbackInfo))
+	affected, err := db_session.In("id", product_feedback_id_list).Delete(new(spzl_models.ProductFeedbackInfo))
 	core.HandleError(err)
 
 	// 一般删除的是同一个SKU下面的
 	var product_id = product_feedback.ProductId
-	count, err := db_session.Where("product_id = ?", product_id).Count(new(models.ProductFeedbackInfo))
+	count, err := db_session.Where("product_id = ?", product_id).Count(new(spzl_models.ProductFeedbackInfo))
 	core.HandleError(err)
 
 	if count == 0 {
-		_, err := db_session.Where("product_id = ?", product_id).Delete(new(models.ProductFeedbackSkuInfo))
+		_, err := db_session.Where("product_id = ?", product_id).Delete(new(spzl_models.ProductFeedbackSkuInfo))
 		core.HandleError(err)
 	} else {
-		var feedback_sku models.ProductFeedbackSkuInfo
+		var feedback_sku spzl_models.ProductFeedbackSkuInfo
 		_, err = db_session.Where("product_id = ?", product_id).Get(&feedback_sku)
 		core.HandleError(err)
 

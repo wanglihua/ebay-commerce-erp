@@ -10,6 +10,7 @@ import (
 	"matrix/modules/erp/models/sppz_models"
 	"matrix/modules/erp/models/hgbg_models"
 	"matrix/modules/erp/models/kcgl_models"
+	"matrix/modules/erp/models/spzl_models"
 )
 
 type Home struct {
@@ -76,6 +77,10 @@ func (c Home) SyncDbPost() revel.Result {
 	model_list = append(model_list, &kcgl_models.ProductInfo{})
 	model_list = append(model_list, &kcgl_models.ProductLogInfo{})
 
+	model_list = append(model_list, &spzl_models.ProductFeedbackCateInfo{})
+	model_list = append(model_list, &spzl_models.ProductFeedbackSkuInfo{})
+	model_list = append(model_list, &spzl_models.ProductFeedbackInfo{})
+
 	model_list = append(model_list, &erp_models.CurrencyInfo{})
 	model_list = append(model_list, &erp_models.EBayAPIConfigInfo{})
 	model_list = append(model_list, &erp_models.ECommercePlatformInfo{})
@@ -126,9 +131,6 @@ func (c Home) SyncDbPost() revel.Result {
 	model_list = append(model_list, &erp_models.ProductSaleAnalysisInfo{})
 	model_list = append(model_list, &erp_models.ProductSaleAnalysisSettingInfo{})
 
-	model_list = append(model_list, &erp_models.ProductFeedbackCateInfo{})
-	model_list = append(model_list, &erp_models.ProductFeedbackSkuInfo{})
-	model_list = append(model_list, &erp_models.ProductFeedbackInfo{})
 	model_list = append(model_list, &erp_models.ProductStoreItemInfo{})
 	model_list = append(model_list, &erp_models.ProductStyleInfo{})
 	model_list = append(model_list, &erp_models.PurchaseBillEntryInfo{})
