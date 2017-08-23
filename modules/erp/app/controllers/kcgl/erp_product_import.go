@@ -62,7 +62,7 @@ func (c ErpProductImport) ListData() revel.Result {
 		Product         kcgl_models.ProductInfo           `xorm:"extends" json:"prd"`
 		ProductCate     kcgl_models.ProductCateInfo       `xorm:"extends" json:"cate"`
 		Supplier        sppz_models.SupplierInfo          `xorm:"extends" json:"sup"`
-		PackageMaterial models.PackageMaterialInfo   `xorm:"extends" json:"pm"`
+		PackageMaterial sppz_models.PackageMaterialInfo   `xorm:"extends" json:"pm"`
 		Status          models.StatusInfo            `xorm:"extends" json:"st"`
 	}
 

@@ -12,6 +12,7 @@ import (
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/models/kcgl_models"
 	"matrix/modules/erp/models/xtpz_models"
+	"matrix/modules/erp/models/sppz_models"
 )
 
 const log_response_xml_to_file = false
@@ -207,7 +208,7 @@ func fetch_product_item_to_db(config xtpz_models.EBayAPIConfigInfo, db_session *
 
 	// product store item begin
 
-	var product_store_item models.ProductStoreItemInfo
+	var product_store_item sppz_models.ProductStoreItemInfo
 	has_product_store_item, err := db_session.Where(fmt.Sprintf("shop_id = %d AND item_id = '%s'", config.ShopId, item_response.Item.ItemId)).Get(&product_store_item)
 	core.HandleError(err)
 

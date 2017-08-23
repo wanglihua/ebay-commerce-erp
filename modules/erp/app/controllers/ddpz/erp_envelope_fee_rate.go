@@ -8,7 +8,7 @@ import (
 	"matrix/core"
 	"matrix/modules/auth/pass_res"
 	"matrix/modules/auth/service/pass_service"
-	"matrix/modules/erp/models"
+	"matrix/modules/erp/models/ddpz_models"
 )
 
 type ErpEnvelopeFeeRate struct {
@@ -38,12 +38,12 @@ func (c ErpEnvelopeFeeRate) ListData() revel.Result {
 		data_query = *data_query.Asc("id")
 	}
 
-	envelope_fee_rate_list := make([]models.EnvelopeFeeRateInfo, 0, limit)
+	envelope_fee_rate_list := make([]ddpz_models.EnvelopeFeeRateInfo, 0, limit)
 	err := data_query.Limit(limit, offset).Find(&envelope_fee_rate_list)
 	core.HandleError(err)
 
 	count_query := *query
-	count, err := count_query.Count(new(models.EnvelopeFeeRateInfo))
+	count, err := count_query.Count(new(ddpz_models.EnvelopeFeeRateInfo))
 	core.HandleError(err)
 
 	return c.RenderJson(core.GridResult{
@@ -53,7 +53,7 @@ func (c ErpEnvelopeFeeRate) ListData() revel.Result {
 }
 
 type EnvelopeFeeRateDetailForm struct {
-	EnvelopeFeeRate models.EnvelopeFeeRateInfo `json:"envelope_fee_rate"`
+	EnvelopeFeeRate ddpz_models.EnvelopeFeeRateInfo `json:"envelope_fee_rate"`
 }
 
 func (f *EnvelopeFeeRateDetailForm) IsCreate() bool {
@@ -79,7 +79,7 @@ func (c ErpEnvelopeFeeRate) DetailData() revel.Result {
 	var envelope_fee_rate_id int64
 	c.Params.Bind(&envelope_fee_rate_id, "id")
 
-	var envelope_fee_rate models.EnvelopeFeeRateInfo
+	var envelope_fee_rate ddpz_models.EnvelopeFeeRateInfo
 	if envelope_fee_rate_id != 0 {
 		has, err := db_session.Id(envelope_fee_rate_id).Get(&envelope_fee_rate)
 		core.HandleError(err)
@@ -118,7 +118,7 @@ func (c ErpEnvelopeFeeRate) Save() revel.Result {
 		core.HandleError(err)
 
 		if affected == 0 {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！" })
+			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！"})
 		}
 	}
 
@@ -133,7 +133,7 @@ func (c ErpEnvelopeFeeRate) Delete() revel.Result {
 	envelope_fee_rate_id_list := make([]int64, 0)
 	c.Params.Bind(&envelope_fee_rate_id_list, "id_list")
 
-	affected, err := db_session.In("id", envelope_fee_rate_id_list).Delete(new(models.EnvelopeFeeRateInfo))
+	affected, err := db_session.In("id", envelope_fee_rate_id_list).Delete(new(ddpz_models.EnvelopeFeeRateInfo))
 	core.HandleError(err)
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})

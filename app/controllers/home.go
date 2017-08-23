@@ -85,7 +85,6 @@ func (c Home) SyncDbPost() revel.Result {
 	model_list = append(model_list, &sppz_models.StorageLocInfo{})
 	model_list = append(model_list, &sppz_models.SupplierInfo{})
 
-
 	model_list = append(model_list, &hgbg_models.ContainerTransferInfo{})
 	model_list = append(model_list, &hgbg_models.ContainerTransferDestPortInfo{})
 	model_list = append(model_list, &hgbg_models.ContainerTransferEntryInfo{})
@@ -136,15 +135,15 @@ func (c Home) SyncDbPost() revel.Result {
 	model_list = append(model_list, &ddlc_models.OrderShippingAddressInfo{})
 
 	model_list = append(model_list, &erp_models.EntityCodeInfo{})
-	model_list = append(model_list, &erp_models.EnvelopeFeeRateInfo{})
-	model_list = append(model_list, &erp_models.EubGoodsTypeInfo{})
-	model_list = append(model_list, &erp_models.EubInsuranceTypeInfo{})
+	model_list = append(model_list, &ddpz_models.EnvelopeFeeRateInfo{})
+	model_list = append(model_list, &sppz_models.EubGoodsTypeInfo{})
+	model_list = append(model_list, &sppz_models.EubInsuranceTypeInfo{})
 
 	model_list = append(model_list, &erp_models.LittleIconInfo{})
 	model_list = append(model_list, &erp_models.LoginLogInfo{})
 	model_list = append(model_list, &erp_models.MessageInfo{})
 
-	model_list = append(model_list, &erp_models.PackageMaterialInfo{})
+	model_list = append(model_list, &sppz_models.PackageMaterialInfo{})
 
 	model_list = append(model_list, &erp_models.PaypalReconInfo{})
 	model_list = append(model_list, &ddlc_models.PickupOrderInfo{})
@@ -155,7 +154,7 @@ func (c Home) SyncDbPost() revel.Result {
 	model_list = append(model_list, &spbb_models.ProductSaleAnalysisInfo{})
 	model_list = append(model_list, &spbb_models.ProductSaleAnalysisSettingInfo{})
 
-	model_list = append(model_list, &erp_models.ProductStoreItemInfo{})
+	model_list = append(model_list, &sppz_models.ProductStoreItemInfo{})
 
 	model_list = append(model_list, &erp_models.SalesManagerInfo{})
 	model_list = append(model_list, &sppz_models.SeaContainerCostInfo{})

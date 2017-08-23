@@ -283,7 +283,7 @@ func (c ErpInventoryCheckEntry) ProductSelectListData() revel.Result {
 		kcgl_models.ProductInfo          `xorm:"extends" json:"prd"`
 		kcgl_models.ProductCateInfo      `xorm:"extends" json:"cate"`
 		sppz_models.SupplierInfo         `xorm:"extends" json:"sup"`
-		models.PackageMaterialInfo  `xorm:"extends" json:"pm"`
+		sppz_models.PackageMaterialInfo  `xorm:"extends" json:"pm"`
 		models.StatusInfo           `xorm:"extends" json:"st"`
 	}
 

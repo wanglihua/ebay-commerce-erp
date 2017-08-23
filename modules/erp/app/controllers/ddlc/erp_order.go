@@ -708,7 +708,7 @@ func (c ErpOrder) DetailData() revel.Result {
 	type order_item_view_t struct {
 		OrderItem         ddlc_models.OrderItemInfo          `xorm:"extends" json:"oi"`
 		Product           kcgl_models.ProductInfo            `xorm:"extends" json:"p"`
-		ProductSotoreItem models.ProductStoreItemInfo   `xorm:"extends" json:"psi"`
+		ProductSotoreItem sppz_models.ProductStoreItemInfo   `xorm:"extends" json:"psi"`
 	}
 
 	sql := `

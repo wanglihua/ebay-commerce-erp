@@ -6,7 +6,7 @@ import (
 
 	"github.com/revel/revel"
 	"matrix/core"
-	"matrix/modules/erp/models"
+	"matrix/modules/erp/models/sppz_models"
 )
 
 type ErpEubGoodsType struct {
@@ -32,12 +32,12 @@ func (c ErpEubGoodsType) ListData() revel.Result {
 		data_query = *data_query.Asc("id")
 	}
 
-	eub_goods_type_list := make([]models.EubGoodsTypeInfo, 0, limit)
+	eub_goods_type_list := make([]sppz_models.EubGoodsTypeInfo, 0, limit)
 	err := data_query.Limit(limit, offset).Find(&eub_goods_type_list)
 	core.HandleError(err)
 
 	count_query := *query
-	count, err := count_query.Count(new(models.EubGoodsTypeInfo))
+	count, err := count_query.Count(new(sppz_models.EubGoodsTypeInfo))
 	core.HandleError(err)
 
 	return c.RenderJson(core.GridResult{
@@ -47,7 +47,7 @@ func (c ErpEubGoodsType) ListData() revel.Result {
 }
 
 type EubGoodsTypeDetailForm struct {
-	EubGoodsType models.EubGoodsTypeInfo `json:"eub_goods_type"`
+	EubGoodsType sppz_models.EubGoodsTypeInfo `json:"eub_goods_type"`
 }
 
 func (f *EubGoodsTypeDetailForm) IsCreate() bool {
@@ -79,7 +79,7 @@ func (c ErpEubGoodsType) DetailData() revel.Result {
 	var eub_goods_type_id int64
 	c.Params.Bind(&eub_goods_type_id, "id")
 
-	var eub_goods_type models.EubGoodsTypeInfo
+	var eub_goods_type sppz_models.EubGoodsTypeInfo
 	if eub_goods_type_id != 0 {
 		has, err := db_session.Id(eub_goods_type_id).Get(&eub_goods_type)
 		core.HandleError(err)
@@ -129,7 +129,7 @@ func (c ErpEubGoodsType) Delete() revel.Result {
 	eub_goods_type_id_list := make([]int64, 0)
 	c.Params.Bind(&eub_goods_type_id_list, "id_list")
 
-	affected, err := db_session.In("id", eub_goods_type_id_list).Delete(new(models.EubGoodsTypeInfo))
+	affected, err := db_session.In("id", eub_goods_type_id_list).Delete(new(sppz_models.EubGoodsTypeInfo))
 	core.HandleError(err)
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})

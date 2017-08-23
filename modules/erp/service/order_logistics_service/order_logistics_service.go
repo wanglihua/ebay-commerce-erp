@@ -34,7 +34,7 @@ type OrderLogisticsService struct {
 	logistics_company_list            []ddpz_models.LogisticsCompanyInfo           // 物流公司列表
 	logistics_mode_list               []ddpz_models.LogisticsModeInfo              // 物流方式列表
 	logistics_fee_rate_map            map[int64][]ddpz_models.LogisticsFeeRateInfo // 物流费率列表的映射，映射的 key 是， 物流方式的 id
-	envelope_fee_rate_list            []models.EnvelopeFeeRateInfo            // 信封物流费率， 按费用从小到大排序
+	envelope_fee_rate_list            []ddpz_models.EnvelopeFeeRateInfo            // 信封物流费率， 按费用从小到大排序
 	shop_list                         []xtpz_models.ShopAccountInfo           // 店铺列表，系统中的店铺列表
 	special_product_list              []kcgl_models.SpecialProductInfo             // 特殊商品SKU列表
 	pending_keeper                    *pending_inventory_temp_keeper          // 设置过程全局变量，每次开始匹配计算的时候一定要记得初始化

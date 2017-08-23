@@ -6,7 +6,7 @@ import (
 
 	"github.com/revel/revel"
 	"matrix/core"
-	"matrix/modules/erp/models"
+	"matrix/modules/erp/models/sppz_models"
 )
 
 type ErpEubInsuranceType struct {
@@ -32,12 +32,12 @@ func (c ErpEubInsuranceType) ListData() revel.Result {
 		data_query = *data_query.Asc("id")
 	}
 
-	eub_insurance_type_list := make([]models.EubInsuranceTypeInfo, 0, limit)
+	eub_insurance_type_list := make([]sppz_models.EubInsuranceTypeInfo, 0, limit)
 	err := data_query.Limit(limit, offset).Find(&eub_insurance_type_list)
 	core.HandleError(err)
 
 	count_query := *query
-	count, err := count_query.Count(new(models.EubInsuranceTypeInfo))
+	count, err := count_query.Count(new(sppz_models.EubInsuranceTypeInfo))
 	core.HandleError(err)
 
 	return c.RenderJson(core.GridResult{
@@ -47,7 +47,7 @@ func (c ErpEubInsuranceType) ListData() revel.Result {
 }
 
 type EubInsuranceTypeDetailForm struct {
-	EubInsuranceType models.EubInsuranceTypeInfo `json:"eub_insurance_type"`
+	EubInsuranceType sppz_models.EubInsuranceTypeInfo `json:"eub_insurance_type"`
 }
 
 func (f *EubInsuranceTypeDetailForm) IsCreate() bool {
@@ -79,7 +79,7 @@ func (c ErpEubInsuranceType) DetailData() revel.Result {
 	var eub_insurance_type_id int64
 	c.Params.Bind(&eub_insurance_type_id, "id")
 
-	var eub_insurance_type models.EubInsuranceTypeInfo
+	var eub_insurance_type sppz_models.EubInsuranceTypeInfo
 	if eub_insurance_type_id != 0 {
 		has, err := db_session.Id(eub_insurance_type_id).Get(&eub_insurance_type)
 		core.HandleError(err)
@@ -129,7 +129,7 @@ func (c ErpEubInsuranceType) Delete() revel.Result {
 	eub_insurance_type_id_list := make([]int64, 0)
 	c.Params.Bind(&eub_insurance_type_id_list, "id_list")
 
-	affected, err := db_session.In("id", eub_insurance_type_id_list).Delete(new(models.EubInsuranceTypeInfo))
+	affected, err := db_session.In("id", eub_insurance_type_id_list).Delete(new(sppz_models.EubInsuranceTypeInfo))
 	core.HandleError(err)
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})

@@ -10,6 +10,7 @@ import (
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/status_service"
+	"matrix/modules/erp/models/sppz_models"
 )
 
 type ErpPackageMaterial struct {
@@ -23,7 +24,7 @@ func (c ErpPackageMaterial) Index() revel.Result {
 }
 
 type ErpPackageMaterialViewItem struct {
-	models.PackageMaterialInfo `xorm:"extends" json:"p"`
+	sppz_models.PackageMaterialInfo `xorm:"extends" json:"p"`
 	models.StatusInfo          `xorm:"extends" json:"s"`
 }
 
@@ -69,7 +70,7 @@ func (c ErpPackageMaterial) ListData() revel.Result {
 }
 
 type PackageMaterialDetailForm struct {
-	PackageMaterial models.PackageMaterialInfo `json:"package_material"`
+	PackageMaterial sppz_models.PackageMaterialInfo `json:"package_material"`
 	StatusList      []models.StatusInfo        `json:"status_list"`
 }
 
@@ -115,7 +116,7 @@ func (c ErpPackageMaterial) DetailData() revel.Result {
 	var package_material_id int64
 	c.Params.Bind(&package_material_id, "id")
 
-	var package_material models.PackageMaterialInfo
+	var package_material sppz_models.PackageMaterialInfo
 	if package_material_id != 0 {
 		has, err := db_session.Id(package_material_id).Get(&package_material)
 		core.HandleError(err)
@@ -176,7 +177,7 @@ func (c ErpPackageMaterial) Delete() revel.Result {
 	package_material_id_list := make([]int64, 0)
 	c.Params.Bind(&package_material_id_list, "id_list")
 
-	affected, err := db_session.In("id", package_material_id_list).Delete(new(models.PackageMaterialInfo))
+	affected, err := db_session.In("id", package_material_id_list).Delete(new(sppz_models.PackageMaterialInfo))
 	core.HandleError(err)
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})

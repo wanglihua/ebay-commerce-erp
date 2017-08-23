@@ -38,7 +38,7 @@ type ErpProductViewItem struct {
 	Product         kcgl_models.ProductInfo           `xorm:"extends" json:"prd"`
 	ProductCate     kcgl_models.ProductCateInfo       `xorm:"extends" json:"cate"`
 	Supplier        sppz_models.SupplierInfo          `xorm:"extends" json:"sup"`
-	PackageMaterial models.PackageMaterialInfo   `xorm:"extends" json:"pm"`
+	PackageMaterial sppz_models.PackageMaterialInfo   `xorm:"extends" json:"pm"`
 	Status          models.StatusInfo            `xorm:"extends" json:"st"`
 	InventoryList   []inventory_service.Product_inventory_view_item_t `xorm:"-" json:"inventory_list"`
 }
@@ -139,7 +139,7 @@ type ProductDetailForm struct {
 	ProductImageList          []kcgl_models.ProductImageInfo                                   `json:"product_image_list"`
 	SupplierList              []sppz_models.SupplierInfo                                       `json:"supplier_list"`
 	ProductCateSelectItemList []product_cate_service.ProductCateSelectItem                `json:"product_cate_list"`
-	PackageMaterialList       []models.PackageMaterialInfo                                `json:"package_material_list"`
+	PackageMaterialList       []sppz_models.PackageMaterialInfo                                `json:"package_material_list"`
 	StatusList                []models.StatusInfo                                         `json:"status_list"`
 	InventoryList             []inventory_service.Product_inventory_view_item_t           `json:"inventory_list"`
 	OrderItemList             []order_service.Order_item_view_item_t                      `json:"order_item_list"`
@@ -220,7 +220,7 @@ func (c ErpProduct) DetailData() revel.Result {
 
 	var product_cate_list = product_cate_service.GetProductCateSelectItemList(db_session)
 
-	var package_material_list [] models.PackageMaterialInfo
+	var package_material_list [] sppz_models.PackageMaterialInfo
 	err = db_session.Asc("name").Find(&package_material_list)
 	core.HandleError(err)
 
