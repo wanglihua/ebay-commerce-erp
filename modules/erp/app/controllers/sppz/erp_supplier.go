@@ -24,17 +24,17 @@ func (c ErpSupplier) Index() revel.Result {
 	return c.RenderTemplate("erp/sppz/supplier/supplier_index.html")
 }
 
+type supplier_view_item_t struct {
+	Supplier models.SupplierInfo `xorm:"extends" json:"s"`
+	Region   models.RegionInfo   `xorm:"extends" json:"r"`
+}
+
 func (c ErpSupplier) ListData() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.SPPZ_SUPPLIER, c.Session)
 
 	db_session := c.DbSession
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
-
-	type supplier_view_item_t struct {
-		models.SupplierInfo `xorm:"extends" json:"s"`
-		models.RegionInfo   `xorm:"extends" json:"r"`
-	}
 
 	/*
 SELECT s.*, r.*

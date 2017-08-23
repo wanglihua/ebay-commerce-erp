@@ -5,13 +5,13 @@ import (
 	"matrix/modules/auth/pass_res"
 	"matrix/modules/auth/service/pass_service"
 	"fmt"
-	"strings"
 	"bytes"
 	"time"
 	"github.com/go-xorm/xorm"
 	"github.com/tealeg/xlsx"
 	"matrix/core"
 	"matrix/modules/erp/models"
+	"strings"
 )
 
 type ErpSupplierExcel struct {
@@ -27,31 +27,36 @@ func (c ErpSupplierExcel) Import() revel.Result {
 func (c ErpSupplierExcel) Export() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.SPPZ_SUPPLIER, c.Session)
 
-	var filter_type int64
-	c.Params.Bind(&filter_type, "filter_type")
+	db_session := c.DbSession
 
 	var id_list = make([]int64, 0)
 	c.Params.Bind(&id_list, "id_list")
 
-	db_session := c.DbSession
-
-	product_list := make([]models.ProductInfo, 0)
-
 	var filter = "1=1"
-	if filter_type == 1 { //有零值数据的记录
-		filter_has_zero_data := core.SqlOr("cn_hs_code = ''", "au_hs_code = ''")
-		filter = core.SqlAnd(filter, filter_has_zero_data)
-	}
 
 	if len(id_list) != 0 {
 		var id_str_list = core.Int_list_to_str_list(id_list)
-		filter = core.SqlAnd(filter, fmt.Sprintf("id IN (%s)", strings.Join(id_str_list, ",")))
+		filter = core.SqlAnd(filter, fmt.Sprintf("s.id IN (%s)", strings.Join(id_str_list, ",")))
 	}
 
-	err := db_session.Where(filter).Find(&product_list)
+	/*
+SELECT s.*, r.*
+FROM erp_supplier s
+    LEFT JOIN erp_region r ON s.region_id = r.id
+	 */
+
+	var sb = core.NewSqlBuilder()
+	sb.Select("s.*, r.*")
+	sb.From(`erp_supplier s
+    LEFT JOIN erp_region r ON s.region_id = r.id`)
+	sb.Where(filter)
+	sb.OrderBy("s.id ASC")
+
+	supplier_list := make([]supplier_view_item_t, 0)
+	err := db_session.Sql(sb.SqlList()).Find(&supplier_list)
 	core.HandleError(err)
 
-	xlsx_file := c.export_supplier_list_to_excel(db_session, product_list)
+	xlsx_file := c.export_supplier_list_to_excel(db_session, supplier_list)
 
 	//先把文件内容写到buffer中，再从中读取
 	var buffer bytes.Buffer
@@ -60,12 +65,12 @@ func (c ErpSupplierExcel) Export() revel.Result {
 
 	reader := bytes.NewReader(buffer.Bytes()) //bytes.Reader 实现了 io.Reader 接口
 
-	file_name := "商品海关编码导出.xlsx" //"file.xlsx" //可以根据参数生成文件名
+	file_name := "供应商导出.xlsx" //"file.xlsx" //可以根据参数生成文件名
 
 	return c.RenderBinary(reader, file_name, revel.Attachment, time.Now())
 }
 
-func (c ErpSupplierExcel) export_supplier_list_to_excel(db_session *xorm.Session, product_list []models.ProductInfo) *xlsx.File {
+func (c ErpSupplierExcel) export_supplier_list_to_excel(db_session *xorm.Session, supplier_list []supplier_view_item_t) *xlsx.File {
 
 	//统一设置标题单元格格式的函数
 	set_head_cell_style := func(cell *xlsx.Cell) {
@@ -145,102 +150,92 @@ func (c ErpSupplierExcel) export_supplier_list_to_excel(db_session *xorm.Session
 	err = db_session.Where(fmt.Sprintf("type = %d", models.STATUS_TYPE_PRODUCT)).Find(&product_status_list)
 	core.HandleError(err)
 
-	var find_product_status_name = func(status_id int64) string {
-		for _, status := range product_status_list {
-			if status.Id == status_id {
-				return status.Name
-			}
-		}
-
-		return ""
-	}
-
-	//序号 SKU 中国海关编码 澳洲海关编码
+	// 名称 联系人 电话 联系方式 地区 地址 描述
 
 	{
 		cell := row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 10)
+		sheet.SetColWidth(col_index, col_index, 15)
 		set_head_cell_style(cell)
-		cell.Value = "序号"
-		col_index++
-
-		cell = row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 10)
-		set_head_cell_style(cell)
-		cell.Value = "SKU"
+		cell.Value = "名称"
 		col_index++
 
 		cell = row.AddCell()
 		sheet.SetColWidth(col_index, col_index, 15)
 		set_head_cell_style(cell)
-		cell.Value = "中国申报品名"
+		cell.Value = "联系人"
+		col_index++
+
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 10)
+		set_head_cell_style(cell)
+		cell.Value = "电话"
 		col_index++
 
 		cell = row.AddCell()
 		sheet.SetColWidth(col_index, col_index, 15)
 		set_head_cell_style(cell)
-		cell.Value = "澳洲申报品名"
+		cell.Value = "联系方式"
 		col_index++
-
-		//cell = row.AddCell()
-		//sheet.SetColWidth(col_index, col_index, 10)
-		//set_head_cell_style(cell)
-		//cell.Value = "中国海关编码"
-		//col_index++
-		//
-		//cell = row.AddCell()
-		//sheet.SetColWidth(col_index, col_index, 10)
-		//set_head_cell_style(cell)
-		//cell.Value = "澳洲海关编码"
-		//col_index++
 
 		cell = row.AddCell()
 		sheet.SetColWidth(col_index, col_index, 10)
 		set_head_cell_style(cell)
-		cell.Value = "状态"
+		cell.Value = "地区"
+		col_index++
+
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 20)
+		set_head_cell_style(cell)
+		cell.Value = "地址"
+		col_index++
+
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 25)
+		set_head_cell_style(cell)
+		cell.Value = "描述"
 		col_index++
 	}
 
-	for index, product := range product_list {
+	for _, supplier := range supplier_list {
 		row = sheet.AddRow()
 		row.SetHeightCM(common_row_height)
 
-		// 序号
+		// 名称 联系人 电话 联系方式 地区 地址 描述
+
+		// 名称
 		cell := row.AddCell()
-		set_text_cell_style(cell, "center")
-		cell.Value = fmt.Sprint(index + 1)
+		set_text_cell_style(cell, "left")
+		cell.Value = supplier.Supplier.Name
 
-		// SKU
-		cell = row.AddCell()
-		set_text_cell_style(cell, "center")
-		cell.Value = product.Sku
-
-		// 中国申报品名
+		// 联系人
 		cell = row.AddCell()
 		set_text_cell_style(cell, "left")
-		cell.Value = product.CnDeclName
+		cell.Value = supplier.Supplier.Contact.String
 
-		// 澳洲申报品名
+		// 电话
 		cell = row.AddCell()
 		set_text_cell_style(cell, "left")
-		cell.Value = product.AuDeclName
+		cell.Value = supplier.Supplier.Phone.String
 
-		/*
-		// 中国海关编码
+		// 联系方式
 		cell = row.AddCell()
-		set_text_cell_style(cell, "right")
-		cell.Value = product.CnHsCode
+		set_text_cell_style(cell, "left")
+		cell.Value = supplier.Supplier.ContactInfo.String
 
-		// 澳洲海关编码
+		// 地区
 		cell = row.AddCell()
-		set_text_cell_style(cell, "right")
-		cell.Value = product.AuHsCode
-		*/
+		set_text_cell_style(cell, "left")
+		cell.Value = supplier.Region.City + supplier.Region.District
 
-		// 状态
+		// 地址
 		cell = row.AddCell()
-		set_text_cell_style(cell, "right")
-		cell.Value = find_product_status_name(product.StatusId)
+		set_text_cell_style(cell, "left")
+		cell.Value = supplier.Supplier.Address.String
+
+		// 描述
+		cell = row.AddCell()
+		set_text_cell_style(cell, "left")
+		cell.Value = supplier.Supplier.Desc.String
 	}
 
 	return xlsx_file
