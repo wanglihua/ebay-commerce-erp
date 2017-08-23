@@ -13,7 +13,7 @@ type ProductCertInfo struct {
 }
 
 func (e ProductCertInfo) TableName() string {
-	return TablePrefix + "product_cert"
+	return "erp_product_cert"
 }
 
 func (e ProductCertInfo) ModelDesc() string {

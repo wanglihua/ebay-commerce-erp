@@ -42,9 +42,9 @@ func (c AuthGroupUser) ListData() revel.Result {
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 	query := session.
 	Select("gu.*, g.*, u.*").
-		Table(models.TablePrefix + "group_user").Alias("gu").
-		Join("inner", []string{models.TablePrefix + "group", "g"}, "gu.group_id = g.id").
-		Join("inner", []string{models.TablePrefix + "user", "u"}, "gu.user_id = u.id").
+		Table("auth_group_user").Alias("gu").
+		Join("inner", []string{"auth_group", "g"}, "gu.group_id = g.id").
+		Join("inner", []string{"auth_user", "u"}, "gu.user_id = u.id").
 		Where(filter)
 
 	//query extra filter here

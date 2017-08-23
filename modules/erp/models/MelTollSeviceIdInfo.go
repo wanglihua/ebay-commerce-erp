@@ -6,7 +6,7 @@ type MelTollSeviceIdInfo struct {
 }
 
 func (e MelTollSeviceIdInfo) TableName() string {
-	return TablePrefix + "mel_toll_service_id"
+	return "erp_mel_toll_service_id"
 }
 
 func (e MelTollSeviceIdInfo) ModelDesc() string {

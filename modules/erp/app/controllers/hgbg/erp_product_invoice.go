@@ -11,6 +11,7 @@ import (
 	"matrix/modules/auth/pass_res"
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/erp/models"
+	"matrix/modules/erp/models/kcgl_models"
 )
 
 type ErpProductInvoice struct {
@@ -30,7 +31,7 @@ func (c ErpProductInvoice) ListData() revel.Result {
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
 	type product_invoice_view_item_t struct {
-		Product models.ProductInfo `xorm:"extends" json:"p"`
+		Product kcgl_models.ProductInfo `xorm:"extends" json:"p"`
 		Status  models.StatusInfo  `xorm:"extends" json:"s"`
 	}
 
@@ -74,7 +75,7 @@ func (c ErpProductInvoice) ListData() revel.Result {
 }
 
 type product_weight_detail_form_t struct {
-	Product models.ProductInfo `json:"product"`
+	Product kcgl_models.ProductInfo `json:"product"`
 }
 
 func (c ErpProductInvoice) DetailData() revel.Result {
@@ -85,7 +86,7 @@ func (c ErpProductInvoice) DetailData() revel.Result {
 	var product_id int64
 	c.Params.Bind(&product_id, "id")
 
-	var product models.ProductInfo
+	var product kcgl_models.ProductInfo
 	_, err := db_session.Id(product_id).Get(&product)
 	core.HandleError(err)
 
@@ -106,7 +107,7 @@ func (c ErpProductInvoice) Save() revel.Result {
 
 	var product_id = detail_form.Product.Id
 
-	var product_in_db models.ProductInfo
+	var product_in_db kcgl_models.ProductInfo
 	has, err := db_session.Id(product_id).Get(&product_in_db)
 	core.HandleError(err)
 	if has == false {
@@ -210,7 +211,7 @@ func (c ErpProductInvoice) Import() revel.Result {
 	}
 
 	for _, product_invoice := range product_invoice_list {
-		var product models.ProductInfo
+		var product kcgl_models.ProductInfo
 		has, err := db_session.Where(fmt.Sprintf("sku = '%s'", product_invoice.sku)).Get(&product)
 		core.HandleError(err)
 

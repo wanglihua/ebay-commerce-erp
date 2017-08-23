@@ -13,7 +13,7 @@ type EubInsuranceTypeInfo struct {
 }
 
 func (e EubInsuranceTypeInfo) TableName() string {
-	return TablePrefix + "eub_insurance_type"
+	return "erp_eub_insurance_type"
 }
 
 func (e EubInsuranceTypeInfo) ModelDesc() string {

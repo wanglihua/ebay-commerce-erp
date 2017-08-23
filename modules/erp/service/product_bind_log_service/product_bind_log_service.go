@@ -7,13 +7,13 @@ import (
 	"github.com/go-xorm/xorm"
 	"github.com/revel/revel"
 	"matrix/core"
-	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/status_service"
+	"matrix/modules/erp/models/kcgl_models"
 )
 
 // 插入商品绑定日志
-func Insert_product_bind_log(product_bind_from_ui *models.ProductBindInfo /*更新操作时使用*/ , product_bind_in_db *models.ProductBindInfo, operation_type core.Db_operation_type, db_session *xorm.Session, web_session revel.Session) {
-	var product_bind_log models.ProductBindLogInfo
+func Insert_product_bind_log(product_bind_from_ui *kcgl_models.ProductBindInfo /*更新操作时使用*/ , product_bind_in_db *kcgl_models.ProductBindInfo, operation_type core.Db_operation_type, db_session *xorm.Session, web_session revel.Session) {
+	var product_bind_log kcgl_models.ProductBindLogInfo
 
 	product_bind_log.ProductBindId = product_bind_in_db.Id
 	product_bind_log.ProductBindCode = product_bind_in_db.Code

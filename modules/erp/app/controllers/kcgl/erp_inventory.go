@@ -21,6 +21,7 @@ import (
 	"matrix/modules/erp/service/storage_loc_service"
 	"matrix/modules/erp/service/inventory_service"
 	"matrix/modules/erp/service/inventory_history_service"
+	"matrix/modules/erp/models/kcgl_models"
 )
 
 type ErpInventory struct {
@@ -60,7 +61,7 @@ type InventoryViewItem struct {
 	Inventory  models.InventoryInfo  `xorm:"extends" json:"ivt"`
 	Stock      models.StockInfo      `xorm:"extends" json:"st"`
 	StorageLoc models.StorageLocInfo `xorm:"extends" json:"loc"`
-	Product    models.ProductInfo    `xorm:"extends" json:"prd"`
+	Product    kcgl_models.ProductInfo    `xorm:"extends" json:"prd"`
 }
 
 func (c ErpInventory) ListData() revel.Result {
@@ -212,7 +213,7 @@ func (c ErpInventory) DetailData() revel.Result {
 
 		detail_form.StorageLocList = storage_loc_list
 
-		var product models.ProductInfo
+		var product kcgl_models.ProductInfo
 		_, err = db_session.Id(inventory.ProductId).Get(&product)
 		core.HandleError(err)
 

@@ -25,6 +25,7 @@ import (
 	"encoding/json"
 	"sync"
 	"matrix/modules/erp/service/order_item_service"
+	"matrix/modules/erp/models/kcgl_models"
 )
 
 type ErpOrder struct {
@@ -702,7 +703,7 @@ func (c ErpOrder) DetailData() revel.Result {
 
 	type order_item_view_t struct {
 		OrderItem         models.OrderItemInfo          `xorm:"extends" json:"oi"`
-		Product           models.ProductInfo            `xorm:"extends" json:"p"`
+		Product           kcgl_models.ProductInfo            `xorm:"extends" json:"p"`
 		ProductSotoreItem models.ProductStoreItemInfo   `xorm:"extends" json:"psi"`
 	}
 

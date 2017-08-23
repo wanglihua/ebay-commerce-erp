@@ -28,7 +28,7 @@ type MessageInfo struct {
 }
 
 func (e MessageInfo) TableName() string {
-	return TablePrefix + "message"
+	return "erp_message"
 }
 
 func (e MessageInfo) ModelDesc() string {

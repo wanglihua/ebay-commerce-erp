@@ -32,7 +32,7 @@ type LogisticsModeInfo struct {
 }
 
 func (e LogisticsModeInfo) TableName() string {
-	return TablePrefix + "logistics_mode"
+	return "erp_logistics_mode"
 }
 
 func (e LogisticsModeInfo) ModelDesc() string {

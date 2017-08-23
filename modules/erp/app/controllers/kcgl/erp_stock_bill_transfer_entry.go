@@ -10,6 +10,7 @@ import (
 	"matrix/modules/auth/pass_res"
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/erp/models"
+	"matrix/modules/erp/models/kcgl_models"
 )
 
 type ErpStockBillTransferEntry struct {
@@ -57,7 +58,7 @@ WHERE sbe.bill_id = 0;
 		models.StockBillInfo      `xorm:"extends" json:"sb"`
 		models.StockInfo          `xorm:"extends" json:"s"`
 		models.StorageLocInfo     `xorm:"extends" json:"sl"`
-		models.ProductInfo        `xorm:"extends" json:"p"`
+		kcgl_models.ProductInfo        `xorm:"extends" json:"p"`
 	}
 
 	sb := core.NewSqlBuilder()
@@ -160,7 +161,7 @@ func (c ErpStockBillTransferEntry) DetailData() revel.Result {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "指定的调拨单明细不存在！"})
 		}
 
-		var product models.ProductInfo
+		var product kcgl_models.ProductInfo
 		product_id := stock_bill_entry.ProductId
 		_, err = db_session.Id(product_id).Get(&product)
 		core.HandleError(err)
@@ -238,8 +239,8 @@ func (c ErpStockBillTransferEntry) ProductSelectListData() revel.Result {
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
 	type ErpProductViewItem struct {
-		models.ProductInfo          `xorm:"extends" json:"prd"`
-		models.ProductCateInfo      `xorm:"extends" json:"cate"`
+		kcgl_models.ProductInfo          `xorm:"extends" json:"prd"`
+		kcgl_models.ProductCateInfo      `xorm:"extends" json:"cate"`
 		models.SupplierInfo         `xorm:"extends" json:"sup"`
 		models.PackageMaterialInfo  `xorm:"extends" json:"pm"`
 		models.StatusInfo           `xorm:"extends" json:"st"`

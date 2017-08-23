@@ -15,7 +15,7 @@ type ProductStoreItemInfo struct {
 }
 
 func (e ProductStoreItemInfo) TableName() string {
-	return TablePrefix + "product_store_item"
+	return "erp_product_store_item"
 }
 
 func (e ProductStoreItemInfo) ModelDesc() string {

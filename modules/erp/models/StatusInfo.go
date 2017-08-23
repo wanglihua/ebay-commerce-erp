@@ -212,7 +212,7 @@ type StatusInfo struct {
 }
 
 func (e StatusInfo) TableName() string {
-	return TablePrefix + "status"
+	return "erp_status"
 }
 
 func (e StatusInfo) ModelDesc() string {

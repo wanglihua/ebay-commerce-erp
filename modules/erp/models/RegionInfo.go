@@ -12,5 +12,5 @@ type RegionInfo struct {
 }
 
 func (e RegionInfo) TableName() string {
-	return TablePrefix + "region"
+	return "erp_region"
 }

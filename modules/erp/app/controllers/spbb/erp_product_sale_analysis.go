@@ -10,6 +10,7 @@ import (
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/auth/pass_res"
 	"fmt"
+	"matrix/modules/erp/models/kcgl_models"
 )
 
 type ErpProductSaleAnalysis struct {
@@ -138,7 +139,7 @@ FROM erp_product_sale_analysis sa
 			product_sale_analysis_list[index].ProductSaleAnalysis.TypeName = "不分仓统计"
 		}
 
-		var product models.ProductInfo
+		var product kcgl_models.ProductInfo
 		_, err := db_session.Id(product_sale_day_analysis.ProductSaleAnalysis.ProductId).Get(&product)
 		core.HandleError(err)
 

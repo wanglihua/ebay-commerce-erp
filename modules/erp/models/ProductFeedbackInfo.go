@@ -19,7 +19,7 @@ type ProductFeedbackInfo struct {
 }
 
 func (e ProductFeedbackInfo) TableName() string {
-	return TablePrefix + "product_feedback"
+	return "erp_product_feedback"
 }
 
 func (e ProductFeedbackInfo) ModelDesc() string {

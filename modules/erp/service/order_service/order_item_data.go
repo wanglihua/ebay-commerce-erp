@@ -6,6 +6,7 @@ import (
 	"github.com/go-xorm/xorm"
 	"matrix/core"
 	"matrix/modules/erp/models"
+	"matrix/modules/erp/models/kcgl_models"
 )
 
 type Order_item_view_item_t struct {
@@ -13,7 +14,7 @@ type Order_item_view_item_t struct {
 	Order       models.OrderInfo           `xorm:"extends" json:"o"`
 	ShopAccount models.ShopAccountInfo     `xorm:"extends" json:"sa"`
 	Platform    models.ShopAccountInfo     `xorm:"extends" json:"pf"`
-	Product     models.ProductInfo         `xorm:"extends" json:"p"`
+	Product     kcgl_models.ProductInfo         `xorm:"extends" json:"p"`
 	Status      models.StatusInfo          `xorm:"extends" json:"s"`
 	Stock       models.StockInfo           `xorm:"extends" json:"st"`
 }

@@ -12,7 +12,7 @@ type ProductFeedbackSkuInfo struct {
 }
 
 func (e ProductFeedbackSkuInfo) TableName() string {
-	return TablePrefix + "product_feedback_sku"
+	return "erp_product_feedback_sku"
 }
 
 func (e ProductFeedbackSkuInfo) ModelDesc() string {

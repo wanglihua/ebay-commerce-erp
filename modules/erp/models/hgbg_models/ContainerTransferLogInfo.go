@@ -2,7 +2,6 @@ package hgbg_models
 
 import (
 	"matrix/core"
-	"matrix/modules/erp/models"
 )
 
 type ContainerTransferLogInfo struct {
@@ -17,7 +16,7 @@ type ContainerTransferLogInfo struct {
 }
 
 func (e ContainerTransferLogInfo) TableName() string {
-	return models.TablePrefix + "container_transfer_log"
+	return "erp_container_transfer_log"
 }
 
 func (e ContainerTransferLogInfo) ModelDesc() string {

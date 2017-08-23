@@ -1,4 +1,4 @@
-package models
+package kcgl_models
 
 import (
 	"matrix/core"
@@ -15,7 +15,7 @@ type ProductBindLogInfo struct {
 }
 
 func (e ProductBindLogInfo) TableName() string {
-	return TablePrefix + "product_bind_log"
+	return "erp_product_bind_log"
 }
 
 func (e ProductBindLogInfo) ModelDesc() string {

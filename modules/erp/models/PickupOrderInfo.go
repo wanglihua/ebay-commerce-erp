@@ -23,7 +23,7 @@ type PickupOrderInfo struct {
 }
 
 func (e PickupOrderInfo) TableName() string {
-	return TablePrefix + "pickup_order"
+	return "erp_pickup_order"
 }
 
 func (e PickupOrderInfo) ModelDesc() string {

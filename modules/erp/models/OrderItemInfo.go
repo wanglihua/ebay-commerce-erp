@@ -29,7 +29,7 @@ type OrderItemInfo struct {
 }
 
 func (e OrderItemInfo) TableName() string {
-	return TablePrefix + "order_item"
+	return "erp_order_item"
 }
 
 func (e OrderItemInfo) ModelDesc() string {

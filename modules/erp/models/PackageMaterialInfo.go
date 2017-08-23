@@ -20,7 +20,7 @@ type PackageMaterialInfo struct {
 }
 
 func (e PackageMaterialInfo) TableName() string {
-	return TablePrefix + "package_material"
+	return "erp_package_material"
 }
 
 func (e PackageMaterialInfo) ModelDesc() string {

@@ -14,7 +14,7 @@ type SalesManagerInfo struct {
 }
 
 func (e SalesManagerInfo) TableName() string {
-	return TablePrefix + "sales_manager"
+	return "erp_sales_manager"
 }
 
 func (e SalesManagerInfo) ModelDesc() string {

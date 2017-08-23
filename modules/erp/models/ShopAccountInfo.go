@@ -20,7 +20,7 @@ type ShopAccountInfo struct {
 }
 
 func (e ShopAccountInfo) TableName() string {
-	return TablePrefix + "shop_account"
+	return "erp_shop_account"
 }
 
 func (e ShopAccountInfo) ModelDesc() string {

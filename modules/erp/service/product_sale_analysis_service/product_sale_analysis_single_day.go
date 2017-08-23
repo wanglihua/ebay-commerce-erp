@@ -8,6 +8,7 @@ import (
 	"github.com/revel/revel"
 	"fmt"
 	"matrix/modules/erp/models"
+	"matrix/modules/erp/models/kcgl_models"
 )
 
 func ProductSaleAnalyzeSingleDay() {
@@ -92,7 +93,7 @@ ORDER BY oi.item_product_id ASC;`
 						_, err := db_session.Id(product_sale_day_analysis.Id).Cols("qty").Update(&product_sale_day_analysis)
 						core.HandleError(err)
 					} else {
-						var product models.ProductInfo
+						var product kcgl_models.ProductInfo
 						_, err := db_session.Id(product_sale.ProductId).Get(&product)
 						core.HandleError(err)
 
@@ -156,7 +157,7 @@ ORDER BY oi.item_product_id ASC;`
 						_, err := db_session.Id(product_sale_day_analysis.Id).Cols("qty").Update(&product_sale_day_analysis)
 						core.HandleError(err)
 					} else {
-						var product models.ProductInfo
+						var product kcgl_models.ProductInfo
 						_, err := db_session.Id(product_sale.ProductId).Get(&product)
 						core.HandleError(err)
 
@@ -220,7 +221,7 @@ ORDER BY oi.item_product_id ASC;`
 						_, err := db_session.Id(product_sale_day_analysis.Id).Cols("qty").Update(&product_sale_day_analysis)
 						core.HandleError(err)
 					} else {
-						var product models.ProductInfo
+						var product kcgl_models.ProductInfo
 						_, err := db_session.Id(product_sale.ProductId).Get(&product)
 						core.HandleError(err)
 

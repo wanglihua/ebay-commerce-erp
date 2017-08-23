@@ -18,7 +18,7 @@ type LogisticsCompanyInfo struct {
 }
 
 func (e LogisticsCompanyInfo) TableName() string {
-	return TablePrefix + "logistics_company"
+	return "erp_logistics_company"
 }
 
 func (e LogisticsCompanyInfo) ModelDesc() string {

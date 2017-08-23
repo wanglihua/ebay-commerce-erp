@@ -12,7 +12,7 @@ type StockPickCrewInfo struct {
 }
 
 func (e StockPickCrewInfo) TableName() string {
-	return TablePrefix + "stock_pick_crew"
+	return "erp_stock_pick_crew"
 }
 
 func (e StockPickCrewInfo) ModelDesc() string {

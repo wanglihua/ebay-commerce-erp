@@ -6,8 +6,8 @@ import (
 	"github.com/go-xorm/xorm"
 	"github.com/revel/revel"
 	"matrix/core"
-	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/product_log_service"
+	"matrix/modules/erp/models/kcgl_models"
 )
 
 func Get_product_id_by_sku(sku string, db_session *xorm.Session) int64 {
@@ -28,7 +28,7 @@ func Delete_product_list(product_id_list []int64, db_session *xorm.Session, web_
 	//todo: InventoryCheckEntryInfo ProductId
 
 	for _, product_id := range product_id_list {
-		var product models.ProductInfo
+		var product kcgl_models.ProductInfo
 		has, err := db_session.Id(product_id).Get(&product)
 		core.HandleError(err)
 
@@ -37,6 +37,6 @@ func Delete_product_list(product_id_list []int64, db_session *xorm.Session, web_
 		}
 	}
 
-	_, err := db_session.In("id", product_id_list).Delete(new(models.ProductInfo))
+	_, err := db_session.In("id", product_id_list).Delete(new(kcgl_models.ProductInfo))
 	core.HandleError(err)
 }

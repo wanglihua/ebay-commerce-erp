@@ -14,6 +14,7 @@ import (
 	"matrix/modules/erp/models"
 	"strings"
 	"matrix/modules/erp/models/hgbg_models"
+	"matrix/modules/erp/models/kcgl_models"
 )
 
 type ErpProductHsCodeExcel struct {
@@ -45,7 +46,7 @@ func (c ErpProductHsCodeExcel) Import() revel.Result {
 		//AuHsCode     string  `json:"au_hs_code"`
 		ErrorMessage string  `json:"error_message"`
 
-		product models.ProductInfo `json:"-"`
+		product kcgl_models.ProductInfo `json:"-"`
 	}
 
 	product_hs_code_import_list := make([]product_hs_code_import_t, 0)
@@ -140,7 +141,7 @@ func (c ErpProductHsCodeExcel) Import() revel.Result {
 	for index, product_hs_code_import := range product_hs_code_import_list {
 		var buffer bytes.Buffer
 
-		var product models.ProductInfo
+		var product kcgl_models.ProductInfo
 		has, err := db_session.Where(fmt.Sprintf("sku = '%s'", product_hs_code_import.Sku)).Get(&product)
 		core.HandleError(err)
 
@@ -211,7 +212,7 @@ func (c ErpProductHsCodeExcel) Export() revel.Result {
 
 	db_session := c.DbSession
 
-	product_list := make([]models.ProductInfo, 0)
+	product_list := make([]kcgl_models.ProductInfo, 0)
 
 	var filter = "1=1"
 	if filter_type == 1 { //有零值数据的记录
@@ -241,7 +242,7 @@ func (c ErpProductHsCodeExcel) Export() revel.Result {
 	return c.RenderBinary(reader, file_name, revel.Attachment, time.Now())
 }
 
-func (c ErpProductHsCodeExcel) export_product_list_to_excel(db_session *xorm.Session, product_list []models.ProductInfo) *xlsx.File {
+func (c ErpProductHsCodeExcel) export_product_list_to_excel(db_session *xorm.Session, product_list []kcgl_models.ProductInfo) *xlsx.File {
 
 	//统一设置标题单元格格式的函数
 	set_head_cell_style := func(cell *xlsx.Cell) {

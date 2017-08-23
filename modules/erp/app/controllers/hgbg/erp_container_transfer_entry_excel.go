@@ -4,7 +4,6 @@ import (
 	"github.com/revel/revel"
 
 	"matrix/core"
-	"matrix/modules/erp/models"
 	"matrix/modules/erp/models/hgbg_models"
 	"fmt"
 	"github.com/tealeg/xlsx"
@@ -18,6 +17,7 @@ import (
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/auth/pass_res"
 	"matrix/modules/erp/service/container_transfer_log_service"
+	"matrix/modules/erp/models/kcgl_models"
 )
 
 type ErpContainerTransferEntryExcel struct {
@@ -55,7 +55,7 @@ func (c ErpContainerTransferEntryExcel) Import() revel.Result {
 		NeedInvoice  string  `json:"need_invoice"`
 		ErrorMessage string  `json:"error_message"`
 
-		product    models.ProductInfo            `json:"-"`
+		product    kcgl_models.ProductInfo            `json:"-"`
 		hs_code_au hgbg_models.HsCodeAuDutyInfo       `json:"-"`
 		hs_code_cn hgbg_models.HsCodeCnReportElemInfo `json:"-"`
 		qty        int64                         `json:"-"`
@@ -142,7 +142,7 @@ func (c ErpContainerTransferEntryExcel) Import() revel.Result {
 	for index, transfer_entry_import := range transfer_entry_import_list {
 		var buffer bytes.Buffer
 
-		var product models.ProductInfo
+		var product kcgl_models.ProductInfo
 		has, err := db_session.Where(fmt.Sprintf("sku = '%s'", transfer_entry_import.ProductSku)).Get(&product)
 		core.HandleError(err)
 
@@ -265,7 +265,7 @@ func (c ErpContainerTransferEntryExcel) Import() revel.Result {
 
 type cte_item_t struct {
 	ContainerTransferEntry hgbg_models.ContainerTransferEntryInfo `xorm:"extends" json:"cte"`
-	Product                models.ProductInfo                `xorm:"extends" json:"p"`
+	Product                kcgl_models.ProductInfo                `xorm:"extends" json:"p"`
 }
 
 func (c ErpContainerTransferEntryExcel) Export() revel.Result {

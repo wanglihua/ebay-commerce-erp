@@ -17,6 +17,7 @@ import (
 	"matrix/modules/erp/service/product_log_service"
 	"matrix/modules/erp/service/product_service"
 	"matrix/modules/erp/service/status_service"
+	"matrix/modules/erp/models/kcgl_models"
 )
 
 type ErpProduct struct {
@@ -33,8 +34,8 @@ func (c ErpProduct) Index() revel.Result {
 }
 
 type ErpProductViewItem struct {
-	Product         models.ProductInfo           `xorm:"extends" json:"prd"`
-	ProductCate     models.ProductCateInfo       `xorm:"extends" json:"cate"`
+	Product         kcgl_models.ProductInfo           `xorm:"extends" json:"prd"`
+	ProductCate     kcgl_models.ProductCateInfo       `xorm:"extends" json:"cate"`
 	Supplier        models.SupplierInfo          `xorm:"extends" json:"sup"`
 	PackageMaterial models.PackageMaterialInfo   `xorm:"extends" json:"pm"`
 	Status          models.StatusInfo            `xorm:"extends" json:"st"`
@@ -133,15 +134,15 @@ FROM erp_product prd
 }
 
 type ProductDetailForm struct {
-	Product                   models.ProductInfo                                          `json:"product"`
-	ProductImageList          []models.ProductImageInfo                                   `json:"product_image_list"`
+	Product                   kcgl_models.ProductInfo                                          `json:"product"`
+	ProductImageList          []kcgl_models.ProductImageInfo                                   `json:"product_image_list"`
 	SupplierList              []models.SupplierInfo                                       `json:"supplier_list"`
 	ProductCateSelectItemList []product_cate_service.ProductCateSelectItem                `json:"product_cate_list"`
 	PackageMaterialList       []models.PackageMaterialInfo                                `json:"package_material_list"`
 	StatusList                []models.StatusInfo                                         `json:"status_list"`
 	InventoryList             []inventory_service.Product_inventory_view_item_t           `json:"inventory_list"`
 	OrderItemList             []order_service.Order_item_view_item_t                      `json:"order_item_list"`
-	ProductLogList            []models.ProductLogInfo                                     `json:"product_log_list"`
+	ProductLogList            []kcgl_models.ProductLogInfo                                     `json:"product_log_list"`
 	MessageList               []message_service.Message_view_item_t                       `json:"message_list"`
 }
 
@@ -193,7 +194,7 @@ func (c ErpProduct) DetailData() revel.Result {
 	var product_id int64
 	c.Params.Bind(&product_id, "id")
 
-	var product models.ProductInfo
+	var product kcgl_models.ProductInfo
 	if product_id != 0 { // 如果是不为零的时候，才会有这样的判断
 		has, err := db_session.Id(product_id).Get(&product)
 		core.HandleError(err)
@@ -206,7 +207,7 @@ func (c ErpProduct) DetailData() revel.Result {
 		product.StatusId = models.PRODUCT_STATUS_ZC
 	}
 
-	var product_image_list = make([]models.ProductImageInfo, 0)
+	var product_image_list = make([]kcgl_models.ProductImageInfo, 0)
 	if product_id != 0 {
 		err := db_session.Where(fmt.Sprintf("product_id = %d", product_id)).Find(&product_image_list)
 		core.HandleError(err)
@@ -227,7 +228,7 @@ func (c ErpProduct) DetailData() revel.Result {
 	inventory_list := inventory_service.Get_product_inventory_list(db_session, product_id)
 	order_item_list := order_service.Get_order_item_data_list_by_product_id_top_n(db_session, product_id, 10)
 
-	var product_log_list = make([]models.ProductLogInfo, 0)
+	var product_log_list = make([]kcgl_models.ProductLogInfo, 0)
 	if product_id != 0 {
 		err = db_session.Where(fmt.Sprintf("product_id = %d", product_id)).OrderBy("id DESC").Limit(10, 0).Find(&product_log_list)
 		core.HandleError(err)
@@ -269,13 +270,13 @@ func (c ErpProduct) Save() revel.Result {
 	is_create := detail_form.IsCreate()
 	var product_id int64 = product_from_ui.Id
 	if is_create {
-		sku_count, err := db_session.Where("sku = ?", product_from_ui.Sku).Count(new(models.ProductInfo))
+		sku_count, err := db_session.Where("sku = ?", product_from_ui.Sku).Count(new(kcgl_models.ProductInfo))
 		core.HandleError(err)
 		if sku_count != 0 {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，SKU已存在！"})
 		}
 
-		name_count, err := db_session.Where("name = ?", product_from_ui.Name).Count(new(models.ProductInfo))
+		name_count, err := db_session.Where("name = ?", product_from_ui.Name).Count(new(kcgl_models.ProductInfo))
 		core.HandleError(err)
 		if name_count != 0 {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，名称已存在！"})
@@ -288,19 +289,19 @@ func (c ErpProduct) Save() revel.Result {
 
 		product_log_service.Insert_product_log(nil, &product_from_ui, core.Db_operation_types.Insert, db_session, c.Session)
 	} else {
-		sku_count, err := db_session.Where("id <> ? and sku = ?", product_from_ui.Id, product_from_ui.Sku).Count(new(models.ProductInfo))
+		sku_count, err := db_session.Where("id <> ? and sku = ?", product_from_ui.Id, product_from_ui.Sku).Count(new(kcgl_models.ProductInfo))
 		core.HandleError(err)
 		if sku_count != 0 {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，SKU已存在！"})
 		}
 
-		name_count, err := db_session.Where("id <> ? and name = ?", product_from_ui.Id, product_from_ui.Name).Count(new(models.ProductInfo))
+		name_count, err := db_session.Where("id <> ? and name = ?", product_from_ui.Id, product_from_ui.Name).Count(new(kcgl_models.ProductInfo))
 		core.HandleError(err)
 		if name_count != 0 {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，名称已存在！"})
 		}
 
-		var product_in_db models.ProductInfo
+		var product_in_db kcgl_models.ProductInfo
 		_, err = db_session.Id(product_from_ui.Id).Get(&product_in_db)
 		core.HandleError(err)
 
@@ -319,7 +320,7 @@ func (c ErpProduct) Save() revel.Result {
 	}
 
 	// 重新获得新增或者更新的product,用于返回
-	var product models.ProductInfo
+	var product kcgl_models.ProductInfo
 	_, err = db_session.Id(product_id).Get(&product)
 	core.HandleError(err)
 
@@ -359,7 +360,7 @@ func (c ErpProduct) ProductOrderListData() revel.Result {
 	var product_id int64
 	c.Params.Bind(&product_id, "id")
 
-	var product models.ProductInfo
+	var product kcgl_models.ProductInfo
 	_, err := db_session.Id(product_id).Get(&product)
 	core.HandleError(err)
 
@@ -385,7 +386,7 @@ func (c ErpProduct) ProductMessageListData() revel.Result {
 	var product_id int64
 	c.Params.Bind(&product_id, "id")
 
-	var product models.ProductInfo
+	var product kcgl_models.ProductInfo
 	_, err := db_session.Id(product_id).Get(&product)
 	core.HandleError(err)
 
@@ -411,11 +412,11 @@ func (c ErpProduct) ProductLogListData() revel.Result {
 	var product_id int64
 	c.Params.Bind(&product_id, "id")
 
-	var product models.ProductInfo
+	var product kcgl_models.ProductInfo
 	_, err := db_session.Id(product_id).Get(&product)
 	core.HandleError(err)
 
-	var product_log_list = make([]models.ProductLogInfo, 0)
+	var product_log_list = make([]kcgl_models.ProductLogInfo, 0)
 	err = db_session.Where(fmt.Sprintf("product_id = %d", product_id)).OrderBy("id DESC").Find(&product_log_list)
 	core.HandleError(err)
 	return c.RenderJson(map[string]interface{}{
@@ -432,7 +433,7 @@ func (c ErpProduct) GetProductInfo() revel.Result {
 	var product_id int64
 	c.Params.Bind(&product_id, "product_id")
 
-	var product models.ProductInfo
+	var product kcgl_models.ProductInfo
 	_, err := db_session.Id(product_id).Get(&product)
 	core.HandleError(err)
 

@@ -10,6 +10,7 @@ import (
 	"matrix/core"
 	auth_models "matrix/modules/auth/models"
 	"matrix/modules/erp/models"
+	"matrix/modules/erp/models/kcgl_models"
 )
 
 type ErpSalesManager struct {
@@ -29,7 +30,7 @@ func (c ErpSalesManager) ListData() revel.Result {
 		models.SalesManagerInfo       `xorm:"extends" json:"sm"`
 		models.ShopAccountInfo        `xorm:"extends" json:"sa"`
 		models.ECommercePlatformInfo  `xorm:"extends" json:"ep"`
-		models.ProductInfo            `xorm:"extends" json:"p"`
+		kcgl_models.ProductInfo            `xorm:"extends" json:"p"`
 		auth_models.UserInfo          `xorm:"extends" json:"u"`
 	}
 
@@ -174,14 +175,14 @@ func (c ErpSalesManager) Save() revel.Result {
 		shopId_count, err := db_session.Where("id <> ? and shop_id = ? and product_id = ? and user_id = ?", sales_manager.Id, sales_manager.ShopId, sales_manager.ProductId, sales_manager.UserId).Count(new(models.SalesManagerInfo))
 		core.HandleError(err)
 		if shopId_count != 0 {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，店铺、商品、销售已存在！" })
+			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，店铺、商品、销售已存在！"})
 		}
 
 		affected, err = db_session.Id(sales_manager.Id).Update(&sales_manager)
 		core.HandleError(err)
 
 		if affected == 0 {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！" })
+			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！"})
 		}
 	}
 
@@ -262,8 +263,8 @@ func (c ErpSalesManager) ProductSelectListData() revel.Result {
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
 	type ErpProductViewItem struct {
-		models.ProductInfo          `xorm:"extends" json:"prd"`
-		models.ProductCateInfo      `xorm:"extends" json:"cate"`
+		kcgl_models.ProductInfo          `xorm:"extends" json:"prd"`
+		kcgl_models.ProductCateInfo      `xorm:"extends" json:"cate"`
 		models.SupplierInfo         `xorm:"extends" json:"sup"`
 		models.PackageMaterialInfo  `xorm:"extends" json:"pm"`
 		models.StatusInfo           `xorm:"extends" json:"st"`

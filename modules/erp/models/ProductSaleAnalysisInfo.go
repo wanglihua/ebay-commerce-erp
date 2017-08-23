@@ -31,7 +31,7 @@ type ProductSaleAnalysisInfo struct {
 }
 
 func (e ProductSaleAnalysisInfo) TableName() string {
-	return TablePrefix + "product_sale_analysis"
+	return "erp_product_sale_analysis"
 }
 
 func (e ProductSaleAnalysisInfo) ModelDesc() string {

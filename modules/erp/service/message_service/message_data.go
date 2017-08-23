@@ -7,13 +7,14 @@ import (
 	"github.com/revel/revel"
 	"matrix/core"
 	"matrix/modules/erp/models"
+	"matrix/modules/erp/models/kcgl_models"
 )
 
 type Message_view_item_t struct {
 	models.MessageInfo           `xorm:"extends" json:"msg"`
 	models.ShopAccountInfo       `xorm:"extends" json:"sa"`
 	models.ECommercePlatformInfo `xorm:"extends" json:"pf"`
-	models.ProductInfo           `xorm:"extends" json:"p"`
+	kcgl_models.ProductInfo           `xorm:"extends" json:"p"`
 	models.StatusInfo            `xorm:"extends" json:"s"`
 }
 

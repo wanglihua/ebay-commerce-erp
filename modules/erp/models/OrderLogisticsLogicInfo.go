@@ -31,7 +31,7 @@ type OrderLogisticsLogicInfo struct {
 }
 
 func (e OrderLogisticsLogicInfo) TableName() string {
-	return TablePrefix + "order_logistics_logic"
+	return "erp_order_logistics_logic"
 }
 
 func (e OrderLogisticsLogicInfo) ModelDesc() string {

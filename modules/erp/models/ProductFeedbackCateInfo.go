@@ -13,7 +13,7 @@ type ProductFeedbackCateInfo struct {
 }
 
 func (e ProductFeedbackCateInfo) TableName() string {
-	return TablePrefix + "product_feedback_cate"
+	return "erp_product_feedback_cate"
 }
 
 func (e ProductFeedbackCateInfo) ModelDesc() string {

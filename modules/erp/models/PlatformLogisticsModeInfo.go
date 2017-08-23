@@ -15,7 +15,7 @@ type PlatformLogisticsModeInfo struct {
 }
 
 func (e PlatformLogisticsModeInfo) TableName() string {
-	return TablePrefix + "platform_logistics_mode"
+	return "erp_platform_logistics_mode"
 }
 
 func (e PlatformLogisticsModeInfo) ModelDesc() string {

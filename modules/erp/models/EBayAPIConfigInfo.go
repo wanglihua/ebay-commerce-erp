@@ -16,7 +16,7 @@ type EBayAPIConfigInfo struct {
 }
 
 func (e EBayAPIConfigInfo) TableName() string {
-	return TablePrefix + "ebay_api_config"
+	return "erp_ebay_api_config"
 }
 
 func (e EBayAPIConfigInfo) ModelDesc() string {

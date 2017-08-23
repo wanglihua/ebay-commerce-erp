@@ -6,7 +6,6 @@ import (
 	"github.com/revel/revel"
 
 	"matrix/core"
-	"matrix/modules/erp/models"
 	"matrix/modules/erp/models/hgbg_models"
 	"fmt"
 	"matrix/modules/erp/service/container_transfer_service"
@@ -14,6 +13,7 @@ import (
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/auth/pass_res"
 	"matrix/modules/erp/service/container_transfer_log_service"
+	"matrix/modules/erp/models/kcgl_models"
 )
 
 type ErpContainerTransferEntry struct {
@@ -39,7 +39,7 @@ func (c ErpContainerTransferEntry) ListData() revel.Result {
 	type cte_item_t struct {
 		ContainerTransferEntry hgbg_models.ContainerTransferEntryInfo `xorm:"extends" json:"cte"`
 		ContainerTransfer      hgbg_models.ContainerTransferInfo      `xorm:"extends" json:"ct"`
-		Product                models.ProductInfo                `xorm:"extends" json:"p"`
+		Product                kcgl_models.ProductInfo                `xorm:"extends" json:"p"`
 	}
 
 	/*
@@ -157,7 +157,7 @@ func (c ErpContainerTransferEntry) Save() revel.Result {
 
 	var product_sku = container_transfer_entry.ProductSku
 
-	var product models.ProductInfo
+	var product kcgl_models.ProductInfo
 	has, err := db_session.Where(fmt.Sprintf("sku = '%s'", product_sku)).Get(&product)
 	core.HandleError(err)
 

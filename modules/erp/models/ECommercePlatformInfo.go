@@ -20,7 +20,7 @@ type ECommercePlatformInfo struct {
 }
 
 func (e ECommercePlatformInfo) TableName() string {
-	return TablePrefix + "ecommerce_platform"
+	return "erp_ecommerce_platform"
 }
 
 func (e ECommercePlatformInfo) ModelDesc() string {

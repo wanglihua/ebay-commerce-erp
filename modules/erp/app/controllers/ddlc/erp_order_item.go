@@ -11,6 +11,7 @@ import (
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/order_service"
 	"matrix/modules/erp/service/inventory_service"
+	"matrix/modules/erp/models/kcgl_models"
 )
 
 type ErpOrderItem struct {
@@ -88,7 +89,7 @@ func (c ErpOrderItem) Save() revel.Result {
 	var stock_id = order_logistics.StockId
 
 	//获取 product_id
-	var product models.ProductInfo
+	var product kcgl_models.ProductInfo
 	_, err = db_session.Where(fmt.Sprintf("sku = '%s'", order_item_form.Sku)).Get(&product)
 	core.HandleError(err)
 

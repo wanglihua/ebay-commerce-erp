@@ -19,7 +19,7 @@ type CurrencyInfo struct {
 }
 
 func (e CurrencyInfo) TableName() string {
-	return TablePrefix + "currency"
+	return "erp_currency"
 }
 
 func (e CurrencyInfo) ModelDesc() string {

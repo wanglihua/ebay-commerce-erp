@@ -19,7 +19,7 @@ type StockBillInfo struct {
 }
 
 func (e StockBillInfo) TableName() string {
-	return TablePrefix + "stock_bill"
+	return "erp_stock_bill"
 }
 
 func (e StockBillInfo) ModelDesc() string {

@@ -6,7 +6,7 @@ import (
 	"strconv"
 
 	"matrix/core"
-	"matrix/modules/erp/models"
+	"matrix/modules/erp/models/kcgl_models"
 )
 
 type ErpProductImageType struct {
@@ -32,12 +32,12 @@ func (c ErpProductImageType) ListData() revel.Result {
 		data_query = *data_query.Asc("id")
 	}
 
-	product_image_type_list := make([]models.ProductImageTypeInfo, 0, limit)
+	product_image_type_list := make([]kcgl_models.ProductImageTypeInfo, 0, limit)
 	err := data_query.Limit(limit, offset).Find(&product_image_type_list)
 	core.HandleError(err)
 
 	count_query := *query
-	count, err := count_query.Count(new(models.ProductImageTypeInfo))
+	count, err := count_query.Count(new(kcgl_models.ProductImageTypeInfo))
 	core.HandleError(err)
 
 	return c.RenderJson(core.GridResult{
@@ -47,7 +47,7 @@ func (c ErpProductImageType) ListData() revel.Result {
 }
 
 type ProductImageTypeDetailForm struct {
-	ProductImageType models.ProductImageTypeInfo `json:"product_image_type"`
+	ProductImageType kcgl_models.ProductImageTypeInfo `json:"product_image_type"`
 }
 
 func (f *ProductImageTypeDetailForm) IsCreate() bool {
@@ -79,7 +79,7 @@ func (c ErpProductImageType) DetailData() revel.Result {
 	var product_image_type_id int64
 	c.Params.Bind(&product_image_type_id, "id")
 
-	var product_image_type models.ProductImageTypeInfo
+	var product_image_type kcgl_models.ProductImageTypeInfo
 	if product_image_type_id != 0 {
 		has, err := db_session.Id(product_image_type_id).Get(&product_image_type)
 		core.HandleError(err)
@@ -130,15 +130,15 @@ func (c ErpProductImageType) Delete() revel.Result {
 	c.Params.Bind(&product_image_type_id_list, "id_list")
 
 	for _, product_image_type_id := range product_image_type_id_list {
-		if product_image_type_id == models.PRODUCT_IMAGE_TYPE_CCTP ||
-			product_image_type_id == models.PRODUCT_IMAGE_TYPE_NRTP ||
-			product_image_type_id == models.PRODUCT_IMAGE_TYPE_KCTP ||
-			product_image_type_id == models.PRODUCT_IMAGE_TYPE_ZJTP {
+		if product_image_type_id == kcgl_models.PRODUCT_IMAGE_TYPE_CCTP ||
+			product_image_type_id == kcgl_models.PRODUCT_IMAGE_TYPE_NRTP ||
+			product_image_type_id == kcgl_models.PRODUCT_IMAGE_TYPE_KCTP ||
+			product_image_type_id == kcgl_models.PRODUCT_IMAGE_TYPE_ZJTP {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "内置图片属性：橱窗图片、内容图片、库存图片、质检图片，不能删除!"})
 		}
 	}
 
-	affected, err := db_session.In("id", product_image_type_id_list).Delete(new(models.ProductImageTypeInfo))
+	affected, err := db_session.In("id", product_image_type_id_list).Delete(new(kcgl_models.ProductImageTypeInfo))
 	core.HandleError(err)
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})

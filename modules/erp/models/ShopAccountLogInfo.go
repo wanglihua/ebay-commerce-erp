@@ -15,7 +15,7 @@ type ShopAccountLogInfo struct {
 }
 
 func (e ShopAccountLogInfo) TableName() string {
-	return TablePrefix + "shop_account_log"
+	return "erp_shop_account_log"
 }
 
 func (e ShopAccountLogInfo) ModelDesc() string {

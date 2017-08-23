@@ -14,7 +14,7 @@ type ExchangeRateInfo struct {
 }
 
 func (e ExchangeRateInfo) TableName() string {
-	return TablePrefix + "exchange_rate"
+	return "erp_exchange_rate"
 }
 
 func (e ExchangeRateInfo) ModelDesc() string {

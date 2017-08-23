@@ -8,6 +8,7 @@ import (
 	"github.com/revel/revel"
 	"matrix/core"
 	"matrix/modules/erp/models"
+	"matrix/modules/erp/models/kcgl_models"
 )
 
 type ErpPurchaseBillEntry struct {
@@ -20,7 +21,7 @@ func (c ErpPurchaseBillEntry) Index() revel.Result {
 
 type ErpPurchaseBillEntryViewItem struct {
 	models.PurchaseBillEntryInfo `xorm:"extends" json:"pbe"`
-	models.ProductInfo           `xorm:"extends" json:"p"`
+	kcgl_models.ProductInfo           `xorm:"extends" json:"p"`
 	models.StatusInfo            `xorm:"extends" json:"s"`
 }
 
@@ -151,7 +152,7 @@ func (c ErpPurchaseBillEntry) DetailData() revel.Result {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "指定的采购单明细不存在！"})
 		}
 
-		var product models.ProductInfo
+		var product kcgl_models.ProductInfo
 		product_id := purchase_bill_entry.ProductId
 		_, err = db_session.Id(product_id).Get(&product)
 		core.HandleError(err)
@@ -187,7 +188,7 @@ func (c ErpPurchaseBillEntry) Save() revel.Result {
 		billId_count, err := db_session.Where("bill_id = ? and product_id = ?", purchase_bill_entry.BillId, purchase_bill_entry.ProductId).Count(new(models.PurchaseBillEntryInfo))
 		core.HandleError(err)
 		if billId_count != 0 {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，批次、商品已存在！" })
+			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，批次、商品已存在！"})
 		}
 
 		purchase_bill_entry.StatusId = models.PURCHASE_BILL_STATUS_YCJ
@@ -198,14 +199,14 @@ func (c ErpPurchaseBillEntry) Save() revel.Result {
 		billId_count, err := db_session.Where("id <> ? and bill_id = ? and product_id = ?", purchase_bill_entry.Id, purchase_bill_entry.BillId, purchase_bill_entry.ProductId).Count(new(models.PurchaseBillEntryInfo))
 		core.HandleError(err)
 		if billId_count != 0 {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，批次、商品已存在！" })
+			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，批次、商品已存在！"})
 		}
 
 		affected, err = db_session.Id(purchase_bill_entry.Id).Update(&purchase_bill_entry)
 		core.HandleError(err)
 
 		if affected == 0 {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！" })
+			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！"})
 		}
 	}
 
@@ -230,8 +231,8 @@ func (c ErpPurchaseBillEntry) ProductSelectListData() revel.Result {
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
 	type ErpProductViewItem struct {
-		models.ProductInfo          `xorm:"extends" json:"prd"`
-		models.ProductCateInfo      `xorm:"extends" json:"cate"`
+		kcgl_models.ProductInfo          `xorm:"extends" json:"prd"`
+		kcgl_models.ProductCateInfo      `xorm:"extends" json:"cate"`
 		models.SupplierInfo         `xorm:"extends" json:"sup"`
 		models.PackageMaterialInfo  `xorm:"extends" json:"pm"`
 		models.StatusInfo           `xorm:"extends" json:"st"`

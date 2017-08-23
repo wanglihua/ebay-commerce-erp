@@ -19,7 +19,7 @@ type LogisticsFeeRateInfo struct {
 }
 
 func (e LogisticsFeeRateInfo) TableName() string {
-	return TablePrefix + "logistics_fee_rate"
+	return "erp_logistics_fee_rate"
 }
 
 func (e LogisticsFeeRateInfo) ModelDesc() string {

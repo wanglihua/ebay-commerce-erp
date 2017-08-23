@@ -19,7 +19,7 @@ type PickupPayMethodInfo struct {
 }
 
 func (e PickupPayMethodInfo) TableName() string {
-	return TablePrefix + "pickup_pay_method"
+	return "erp_pickup_pay_method"
 }
 
 func (e PickupPayMethodInfo) ModelDesc() string {

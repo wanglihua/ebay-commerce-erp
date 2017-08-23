@@ -16,7 +16,7 @@ type OrderLogInfo struct {
 }
 
 func (e OrderLogInfo) TableName() string {
-	return TablePrefix + "order_log"
+	return "erp_order_log"
 }
 
 func (e OrderLogInfo) ModelDesc() string {

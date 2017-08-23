@@ -13,6 +13,7 @@ import (
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/erp/models"
 	"strings"
+	"matrix/modules/erp/models/kcgl_models"
 )
 
 type ErpProductWeightExport struct {
@@ -34,7 +35,7 @@ func (c ErpProductWeightExport) Export() revel.Result {
 		filter = core.SqlAnd(filter, fmt.Sprintf("id IN (%s)", strings.Join(id_str_list, ",")))
 	}
 
-	product_list := make([]models.ProductInfo, 0)
+	product_list := make([]kcgl_models.ProductInfo, 0)
 	err := db_session.Where(filter).Find(&product_list)
 	core.HandleError(err)
 
@@ -52,7 +53,7 @@ func (c ErpProductWeightExport) Export() revel.Result {
 	return c.RenderBinary(reader, file_name, revel.Attachment, time.Now())
 }
 
-func (c ErpProductWeightExport) export_product_list_to_excel(db_session *xorm.Session, product_list []models.ProductInfo) *xlsx.File {
+func (c ErpProductWeightExport) export_product_list_to_excel(db_session *xorm.Session, product_list []kcgl_models.ProductInfo) *xlsx.File {
 
 	//统一设置标题单元格格式的函数
 	set_head_cell_style := func(cell *xlsx.Cell) {

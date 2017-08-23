@@ -14,7 +14,7 @@ type OrderTagInfo struct {
 }
 
 func (e OrderTagInfo) TableName() string {
-	return TablePrefix + "order_tag"
+	return "erp_order_tag"
 }
 
 func (e OrderTagInfo) ModelDesc() string {

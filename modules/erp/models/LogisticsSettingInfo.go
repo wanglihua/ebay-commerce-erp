@@ -31,7 +31,7 @@ type LogisticsSettingInfo struct {
 }
 
 func (e LogisticsSettingInfo) TableName() string {
-	return TablePrefix + "logistics_setting"
+	return "erp_logistics_setting"
 }
 
 func (e LogisticsSettingInfo) ModelDesc() string {

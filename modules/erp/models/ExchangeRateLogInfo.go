@@ -13,7 +13,7 @@ type ExchangeRateLogInfo struct {
 }
 
 func (e ExchangeRateLogInfo) TableName() string {
-	return TablePrefix + "exchange_rate_log"
+	return "erp_exchange_rate_log"
 }
 
 func (e ExchangeRateLogInfo) ModelDesc() string {

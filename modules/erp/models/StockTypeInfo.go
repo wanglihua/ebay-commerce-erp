@@ -25,7 +25,7 @@ type StockTypeInfo struct {
 }
 
 func (e StockTypeInfo) TableName() string {
-	return TablePrefix + "stock_type"
+	return "erp_stock_type"
 }
 
 func (e StockTypeInfo) ModelDesc() string {

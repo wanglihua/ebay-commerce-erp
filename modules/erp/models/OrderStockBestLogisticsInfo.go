@@ -17,7 +17,7 @@ type OrderStockBestLogisticsInfo struct {
 }
 
 func (e OrderStockBestLogisticsInfo) TableName() string {
-	return TablePrefix + "order_stock_best_logistics"
+	return "erp_order_stock_best_logistics"
 }
 
 func (e OrderStockBestLogisticsInfo) ModelDesc() string {

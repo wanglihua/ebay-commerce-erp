@@ -12,7 +12,7 @@ type SpecialProductInfo struct {
 }
 
 func (e SpecialProductInfo) TableName() string {
-	return TablePrefix + "special_product"
+	return "erp_special_product"
 }
 
 func (e SpecialProductInfo) ModelDesc() string {

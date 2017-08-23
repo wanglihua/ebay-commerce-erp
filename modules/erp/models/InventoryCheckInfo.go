@@ -18,7 +18,7 @@ type InventoryCheckInfo struct {
 }
 
 func (e InventoryCheckInfo) TableName() string {
-	return TablePrefix + "inventory_check"
+	return "erp_inventory_check"
 }
 
 func (e InventoryCheckInfo) ModelDesc() string {

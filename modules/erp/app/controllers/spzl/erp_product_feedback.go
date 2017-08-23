@@ -12,6 +12,7 @@ import (
 	"matrix/modules/auth/pass_res"
 	"strings"
 	"time"
+	"matrix/modules/erp/models/kcgl_models"
 )
 
 type ErpProductFeedback struct {
@@ -36,7 +37,7 @@ func (c ErpProductFeedback) SkuListData() revel.Result {
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
 	type product_feedback_sku_view_item_t struct {
-		Product            models.ProductInfo             `xorm:"extends" json:"p"`
+		Product            kcgl_models.ProductInfo             `xorm:"extends" json:"p"`
 		ProductFeedbackSku models.ProductFeedbackSkuInfo  `xorm:"extends" json:"pfu"`
 	}
 
@@ -100,7 +101,7 @@ func (c ErpProductFeedback) Index(id int64) revel.Result {
 	var product_id = id
 	c.RenderArgs["product_id"] = product_id
 
-	var product models.ProductInfo
+	var product kcgl_models.ProductInfo
 	_, err := db_session.Id(product_id).Get(&product)
 	core.HandleError(err)
 	c.RenderArgs["product"] = product
@@ -168,7 +169,7 @@ func (c ErpProductFeedback) ListData() revel.Result {
 	type product_feedback_view_item_t struct {
 		ProductFeedback     models.ProductFeedbackInfo     `xorm:"extends" json:"pf"`
 		ProductFeedbackCate models.ProductFeedbackCateInfo `xorm:"extends" json:"c"`
-		Product             models.ProductInfo             `xorm:"extends" json:"p"`
+		Product             kcgl_models.ProductInfo             `xorm:"extends" json:"p"`
 		Supplier            models.SupplierInfo            `xorm:"extends" json:"sup"`
 	}
 
@@ -305,7 +306,7 @@ func (c ErpProductFeedback) DetailData() revel.Result {
 	}
 
 	// 获取商品的SKU
-	var product models.ProductInfo
+	var product kcgl_models.ProductInfo
 	_, err := db_session.Id(product_feedback.ProductId).Get(&product)
 	core.HandleError(err)
 
@@ -342,7 +343,7 @@ func (c ErpProductFeedback) Save() revel.Result {
 
 	product_feedback := detail_form.ProductFeedback
 
-	var product models.ProductInfo
+	var product kcgl_models.ProductInfo
 	has, err := db_session.Where("sku = ?", product_feedback.Sku).Get(&product)
 	if has == false {
 		return c.RenderJson(map[string]interface{}{

@@ -5,7 +5,7 @@ import (
 	"matrix/core"
 	"matrix/modules/auth/pass_res"
 	"matrix/modules/auth/service/pass_service"
-	"matrix/modules/erp/models"
+	"matrix/modules/erp/models/kcgl_models"
 )
 
 type ErpProductCateLog struct {
@@ -35,12 +35,12 @@ func (c ErpProductCateLog) ListData() revel.Result {
 		data_query = *data_query.Asc("id")
 	}
 
-	product_cate_log_list := make([]models.ProductCateLogInfo, 0, limit)
+	product_cate_log_list := make([]kcgl_models.ProductCateLogInfo, 0, limit)
 	err := data_query.Limit(limit, offset).Find(&product_cate_log_list)
 	core.HandleError(err)
 
 	count_query := *query
-	count, err := count_query.Count(new(models.ProductCateLogInfo))
+	count, err := count_query.Count(new(kcgl_models.ProductCateLogInfo))
 	core.HandleError(err)
 
 	return c.RenderJson(core.GridResult{

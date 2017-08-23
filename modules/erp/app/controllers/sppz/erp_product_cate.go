@@ -12,6 +12,7 @@ import (
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/status_service"
+	"matrix/modules/erp/models/kcgl_models"
 )
 
 type ErpProductCate struct {
@@ -25,7 +26,7 @@ func (c ErpProductCate) Index() revel.Result {
 }
 
 type ErpProductCateViewItem struct {
-	models.ProductCateInfo         `xorm:"extends" json:"c"`
+	kcgl_models.ProductCateInfo         `xorm:"extends" json:"c"`
 	models.StatusInfo              `xorm:"extends" json:"s"`
 }
 
@@ -72,9 +73,9 @@ func (c ErpProductCate) ListData() revel.Result {
 }
 
 type ProductCateDetailForm struct {
-	ProductCate      models.ProductCateInfo   `json:"product_cate"`
-	L1ParentCateList []models.ProductCateInfo `json:"l1_parent_cate_list"`
-	L2ParentCateList []models.ProductCateInfo `json:"l2_parent_cate_list"`
+	ProductCate      kcgl_models.ProductCateInfo   `json:"product_cate"`
+	L1ParentCateList []kcgl_models.ProductCateInfo `json:"l1_parent_cate_list"`
+	L2ParentCateList []kcgl_models.ProductCateInfo `json:"l2_parent_cate_list"`
 	StatusList       []models.StatusInfo      `json:"status_list"`
 }
 
@@ -108,7 +109,7 @@ func (c ErpProductCate) DetailData() revel.Result {
 	var product_cate_id int64
 	c.Params.Bind(&product_cate_id, "id")
 
-	var product_cate models.ProductCateInfo
+	var product_cate kcgl_models.ProductCateInfo
 	if product_cate_id != 0 {
 		has, err := db_session.Id(product_cate_id).Get(&product_cate)
 		core.HandleError(err)
@@ -117,11 +118,11 @@ func (c ErpProductCate) DetailData() revel.Result {
 		}
 	}
 
-	var l1_parent_cate_list = make([]models.ProductCateInfo, 0)
+	var l1_parent_cate_list = make([]kcgl_models.ProductCateInfo, 0)
 	err := db_session.Where("level = 1").Find(&l1_parent_cate_list)
 	core.HandleError(err)
 
-	var l2_parent_cate_list = make([]models.ProductCateInfo, 0)
+	var l2_parent_cate_list = make([]kcgl_models.ProductCateInfo, 0)
 
 	if product_cate_id == 0 {
 		// 新的商品类别的默认状态
@@ -192,10 +193,10 @@ func (c ErpProductCate) Save() revel.Result {
 	var affected int64
 
 	if detail_form.IsCreate() {
-		name_count, err := db_session.Where("name = ?", product_cate.Name).Count(new(models.ProductCateInfo))
+		name_count, err := db_session.Where("name = ?", product_cate.Name).Count(new(kcgl_models.ProductCateInfo))
 		core.HandleError(err)
 		if name_count != 0 {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，名称已存在！" })
+			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，名称已存在！"})
 		}
 
 		product_cate.FullName = c.calculate_product_cate_full_name(product_cate, db_session)
@@ -206,10 +207,10 @@ func (c ErpProductCate) Save() revel.Result {
 		// 插入操作日志
 		c.insert_product_cate_log(&product_cate, "插入数据", c.DbSession, c.Session)
 	} else {
-		name_count, err := db_session.Where("id <> ? and name = ?", product_cate.Id, product_cate.Name).Count(new(models.ProductCateInfo))
+		name_count, err := db_session.Where("id <> ? and name = ?", product_cate.Id, product_cate.Name).Count(new(kcgl_models.ProductCateInfo))
 		core.HandleError(err)
 		if name_count != 0 {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，名称已存在！" })
+			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，名称已存在！"})
 		}
 
 		product_cate.FullName = c.calculate_product_cate_full_name(product_cate, db_session)
@@ -228,13 +229,13 @@ func (c ErpProductCate) Save() revel.Result {
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据保存成功!"})
 }
 
-func (c ErpProductCate) calculate_product_cate_full_name(product_cate models.ProductCateInfo, db_session *xorm.Session) string {
+func (c ErpProductCate) calculate_product_cate_full_name(product_cate kcgl_models.ProductCateInfo, db_session *xorm.Session) string {
 	if product_cate.Level == 1 { //一级目录
 		return product_cate.Name
 	}
 
 	if product_cate.Level == 2 { //二级目录
-		var l1_parent models.ProductCateInfo
+		var l1_parent kcgl_models.ProductCateInfo
 		_, err := db_session.Id(product_cate.L1Parent).Get(&l1_parent)
 		core.HandleError(err)
 
@@ -242,11 +243,11 @@ func (c ErpProductCate) calculate_product_cate_full_name(product_cate models.Pro
 	}
 
 	if product_cate.Level == 3 { // 三级目录
-		var l1_parent models.ProductCateInfo
+		var l1_parent kcgl_models.ProductCateInfo
 		_, err := db_session.Id(product_cate.L1Parent).Get(&l1_parent)
 		core.HandleError(err)
 
-		var l2_parent models.ProductCateInfo
+		var l2_parent kcgl_models.ProductCateInfo
 		_, err = db_session.Id(product_cate.L2Parent).Get(&l2_parent)
 		core.HandleError(err)
 
@@ -266,7 +267,7 @@ func (c ErpProductCate) Delete() revel.Result {
 
 	// 插入删除日志
 	for _, product_cate_id := range product_cate_id_list {
-		var product_cate models.ProductCateInfo
+		var product_cate kcgl_models.ProductCateInfo
 		has, err := db_session.Id(product_cate_id).Get(&product_cate)
 		core.HandleError(err)
 
@@ -275,14 +276,14 @@ func (c ErpProductCate) Delete() revel.Result {
 		}
 	}
 
-	affected, err := db_session.In("id", product_cate_id_list).Delete(new(models.ProductCateInfo))
+	affected, err := db_session.In("id", product_cate_id_list).Delete(new(kcgl_models.ProductCateInfo))
 	core.HandleError(err)
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})
 }
 
-func (c ErpProductCate) insert_product_cate_log(product_cate *models.ProductCateInfo, log_desc string, db_session *xorm.Session, web_session revel.Session) {
-	var product_cate_log models.ProductCateLogInfo
+func (c ErpProductCate) insert_product_cate_log(product_cate *kcgl_models.ProductCateInfo, log_desc string, db_session *xorm.Session, web_session revel.Session) {
+	var product_cate_log kcgl_models.ProductCateLogInfo
 	product_cate_log.Name = product_cate.FullName
 	product_cate_log.Desc = log_desc
 	product_cate_log.LoginName = core.GetLoginUser(c.Session).LoginName
@@ -297,7 +298,7 @@ func (c ErpProductCate) GetL2ProductCateList() revel.Result {
 	var l1_parent int64
 	c.Params.Bind(&l1_parent, "l1_parent")
 
-	var l2_parent_cate_list = make([]models.ProductCateInfo, 0)
+	var l2_parent_cate_list = make([]kcgl_models.ProductCateInfo, 0)
 	err := db_session.Where(fmt.Sprintf("level = 2 AND l1_parent = %d", l1_parent)).Find(&l2_parent_cate_list)
 	core.HandleError(err)
 

@@ -16,7 +16,7 @@ type OrderCustomTypeInfo struct {
 }
 
 func (e OrderCustomTypeInfo) TableName() string {
-	return TablePrefix + "order_custom_type"
+	return "erp_order_custom_type"
 }
 
 func (e OrderCustomTypeInfo) ModelDesc() string {

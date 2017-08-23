@@ -20,7 +20,7 @@ type LogisticsNumberBatchInfo struct {
 }
 
 func (e LogisticsNumberBatchInfo) TableName() string {
-	return TablePrefix + "logistics_number_batch"
+	return "erp_logistics_number_batch"
 }
 
 func (e LogisticsNumberBatchInfo) ModelDesc() string {

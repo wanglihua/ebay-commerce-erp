@@ -17,7 +17,7 @@ type PaypalAccountInfo struct {
 }
 
 func (e PaypalAccountInfo) TableName() string {
-	return TablePrefix + "paypal_account"
+	return "erp_paypal_account"
 }
 
 func (e PaypalAccountInfo) ModelDesc() string {

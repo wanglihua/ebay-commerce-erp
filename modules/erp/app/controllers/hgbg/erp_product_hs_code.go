@@ -8,6 +8,7 @@ import (
 	"matrix/core"
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/models/hgbg_models"
+	"matrix/modules/erp/models/kcgl_models"
 )
 
 type ErpProductHsCode struct {
@@ -30,7 +31,7 @@ func (c ErpProductHsCode) ListData() revel.Result {
 	c.Params.Bind(&filter_type, "filter_type")
 
 	type product_weight_view_item_t struct {
-		Product models.ProductInfo `xorm:"extends" json:"p"`
+		Product kcgl_models.ProductInfo `xorm:"extends" json:"p"`
 		Status  models.StatusInfo  `xorm:"extends" json:"s"`
 	}
 
@@ -79,7 +80,7 @@ func (c ErpProductHsCode) ListData() revel.Result {
 }
 
 type product_hs_code_detail_form_t struct {
-	Product models.ProductInfo `json:"product"`
+	Product kcgl_models.ProductInfo `json:"product"`
 }
 
 func (c ErpProductHsCode) DetailData() revel.Result {
@@ -90,7 +91,7 @@ func (c ErpProductHsCode) DetailData() revel.Result {
 	var product_id int64
 	c.Params.Bind(&product_id, "id")
 
-	var product models.ProductInfo
+	var product kcgl_models.ProductInfo
 	_, err := db_session.Id(product_id).Get(&product)
 	core.HandleError(err)
 
@@ -111,7 +112,7 @@ func (c ErpProductHsCode) Save() revel.Result {
 
 	var product_id = detail_form.Product.Id
 
-	var product_in_db models.ProductInfo
+	var product_in_db kcgl_models.ProductInfo
 	has, err := db_session.Id(product_id).Get(&product_in_db)
 	core.HandleError(err)
 	if has == false {

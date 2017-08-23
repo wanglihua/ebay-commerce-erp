@@ -31,7 +31,7 @@ type StockBillTypeInfo struct {
 }
 
 func (e StockBillTypeInfo) TableName() string {
-	return TablePrefix + "stock_bill_type"
+	return "erp_stock_bill_type"
 }
 
 func (e StockBillTypeInfo) ModelDesc() string {

@@ -1,4 +1,4 @@
-package models
+package kcgl_models
 
 import (
 	"github.com/go-xorm/xorm"
@@ -28,7 +28,7 @@ type ProductImageTypeInfo struct {
 }
 
 func (e ProductImageTypeInfo) TableName() string {
-	return TablePrefix + "product_image_type"
+	return "erp_product_image_type"
 }
 
 func (e ProductImageTypeInfo) ModelDesc() string {

@@ -18,7 +18,7 @@ type SupplierInfo struct {
 }
 
 func (e SupplierInfo) TableName() string {
-	return TablePrefix + "supplier"
+	return "erp_supplier"
 }
 
 func (e SupplierInfo) ModelDesc() string {

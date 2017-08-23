@@ -2,7 +2,6 @@ package hgbg_models
 
 import (
 	"matrix/core"
-	"matrix/modules/erp/models"
 )
 
 type ContainerTransferEntryInfo struct {
@@ -32,7 +31,7 @@ type ContainerTransferEntryInfo struct {
 }
 
 func (e ContainerTransferEntryInfo) TableName() string {
-	return models.TablePrefix + "container_transfer_entry"
+	return "erp_container_transfer_entry"
 }
 
 func (e ContainerTransferEntryInfo) ModelDesc() string {

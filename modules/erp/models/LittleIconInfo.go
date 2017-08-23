@@ -12,7 +12,7 @@ type LittleIconInfo struct {
 }
 
 func (e LittleIconInfo) TableName() string {
-	return TablePrefix + "little_icon"
+	return "erp_little_icon"
 }
 
 func (e LittleIconInfo) ModelDesc() string {

@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"strings"
 	"strconv"
+	"matrix/modules/erp/models/kcgl_models"
 )
 
 type ErpSpecialProduct struct {
@@ -32,7 +33,7 @@ func (c ErpSpecialProduct) ListData() revel.Result {
 
 	type special_product_view_item_t struct {
 		SpecialProduct models.SpecialProductInfo `xorm:"extends" json:"sp"`
-		Product        models.ProductInfo        `xorm:"extends" json:"p"`
+		Product        kcgl_models.ProductInfo        `xorm:"extends" json:"p"`
 	}
 
 	/*
@@ -97,7 +98,7 @@ func (c ErpSpecialProduct) DetailData() revel.Result {
 		_, err := db_session.Id(id).Get(&special_product)
 		core.HandleError(err)
 
-		var product models.ProductInfo
+		var product kcgl_models.ProductInfo
 		_, err = db_session.Id(special_product.ProductId).Get(&product)
 		core.HandleError(err)
 
@@ -128,7 +129,7 @@ func (c ErpSpecialProduct) Save() revel.Result {
 	if detail_form.SpecialId == 0 {
 		var sku = detail_form.Sku
 
-		var product models.ProductInfo
+		var product kcgl_models.ProductInfo
 		has, err := db_session.Where("sku = ?", sku).Get(&product)
 		core.HandleError(err)
 
@@ -191,7 +192,7 @@ func (c ErpSpecialProduct) BatchAdd() revel.Result {
 
 	for _, sku := range sku_list {
 		if strings.TrimSpace(sku) != "" {
-			var product models.ProductInfo
+			var product kcgl_models.ProductInfo
 			has, err := db_session.Where("sku = ?", sku).Get(&product)
 			core.HandleError(err)
 

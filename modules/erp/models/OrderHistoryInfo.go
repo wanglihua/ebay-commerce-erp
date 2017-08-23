@@ -16,7 +16,7 @@ type OrderHistoryInfo struct {
 }
 
 func (e OrderHistoryInfo) TableName() string {
-	return TablePrefix + "order_history"
+	return "erp_order_history"
 }
 
 func (e OrderHistoryInfo) ModelDesc() string {

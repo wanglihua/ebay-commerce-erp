@@ -24,7 +24,7 @@ type OrderShippingAddressInfo struct {
 }
 
 func (e OrderShippingAddressInfo) TableName() string {
-	return TablePrefix + "order_shipping_address"
+	return "erp_order_shipping_address"
 }
 
 func (e OrderShippingAddressInfo) ModelDesc() string {

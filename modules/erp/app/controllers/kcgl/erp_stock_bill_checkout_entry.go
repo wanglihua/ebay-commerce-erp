@@ -10,6 +10,7 @@ import (
 	"matrix/modules/auth/pass_res"
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/erp/models"
+	"matrix/modules/erp/models/kcgl_models"
 )
 
 type ErpStockBillCheckoutEntry struct {
@@ -48,7 +49,7 @@ type ErpStockBillCheckoutEntryViewItem struct {
 	models.StockBillEntryInfo `xorm:"extends" json:"sbe"`
 	models.StockBillInfo      `xorm:"extends" json:"sb"`
 	models.StorageLocInfo     `xorm:"extends" json:"sl"`
-	models.ProductInfo        `xorm:"extends" json:"p"`
+	kcgl_models.ProductInfo        `xorm:"extends" json:"p"`
 }
 
 func (c ErpStockBillCheckoutEntry) ListData(bill_id int64) revel.Result {

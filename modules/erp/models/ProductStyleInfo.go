@@ -13,7 +13,7 @@ type ProductStyleInfo struct {
 }
 
 func (e ProductStyleInfo) TableName() string {
-	return TablePrefix + "product_style"
+	return "erp_product_style"
 }
 
 func (e ProductStyleInfo) ModelDesc() string {

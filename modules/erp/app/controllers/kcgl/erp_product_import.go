@@ -14,6 +14,7 @@ import (
 	"matrix/modules/erp/service/import_batch_code_service"
 	"matrix/modules/erp/service/product_import_batch_service"
 	"matrix/modules/erp/service/status_service"
+	"matrix/modules/erp/models/kcgl_models"
 )
 
 type ErpProductImport struct {
@@ -57,8 +58,8 @@ func (c ErpProductImport) ListData() revel.Result {
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
 	type product_view_item_t struct {
-		Product         models.ProductInfo           `xorm:"extends" json:"prd"`
-		ProductCate     models.ProductCateInfo       `xorm:"extends" json:"cate"`
+		Product         kcgl_models.ProductInfo           `xorm:"extends" json:"prd"`
+		ProductCate     kcgl_models.ProductCateInfo       `xorm:"extends" json:"cate"`
 		Supplier        models.SupplierInfo          `xorm:"extends" json:"sup"`
 		PackageMaterial models.PackageMaterialInfo   `xorm:"extends" json:"pm"`
 		Status          models.StatusInfo            `xorm:"extends" json:"st"`
@@ -296,7 +297,7 @@ func (c ErpProductImport) Upload() revel.Result {
 
 	has_zero_data := false
 	for _, product_import := range product_import_list {
-		var product models.ProductInfo
+		var product kcgl_models.ProductInfo
 		has, err := db_session.Where(fmt.Sprintf("sku = '%s'", product_import.sku)).Get(&product)
 		core.HandleError(err)
 
@@ -388,7 +389,7 @@ func (c ErpProductImport) Delete() revel.Result {
 	var product_id_list = make([]int64, 0)
 	c.Params.Bind(&product_id_list, "id_list")
 
-	_, err := db_session.In("id", product_id_list).Delete(new(models.ProductInfo))
+	_, err := db_session.In("id", product_id_list).Delete(new(kcgl_models.ProductInfo))
 	core.HandleError(err)
 
 	return c.RenderJson(map[string]interface{}{

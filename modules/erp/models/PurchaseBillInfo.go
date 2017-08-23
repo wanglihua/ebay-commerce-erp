@@ -17,7 +17,7 @@ type PurchaseBillInfo struct {
 }
 
 func (e PurchaseBillInfo) TableName() string {
-	return TablePrefix + "purchase_bill"
+	return "erp_purchase_bill"
 }
 
 func (e PurchaseBillInfo) ModelDesc() string {

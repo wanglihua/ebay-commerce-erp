@@ -15,7 +15,7 @@ type InventoryHistoryInfo struct {
 }
 
 func (e InventoryHistoryInfo) TableName() string {
-	return TablePrefix + "inventory_history"
+	return "erp_inventory_history"
 }
 
 func (e InventoryHistoryInfo) ModelDesc() string {

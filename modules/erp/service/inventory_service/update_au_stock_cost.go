@@ -10,6 +10,7 @@ import (
 	"runtime/debug"
 	"matrix/core"
 	"matrix/modules/erp/models"
+	"matrix/modules/erp/models/kcgl_models"
 )
 
 func Update_au_stock_cost() {
@@ -73,7 +74,7 @@ WHERE s.stock_type_id = %d;`
 			// 获取中国仓商品成本
 			var cn_cost_price = cn_inventory.CostPrice
 
-			var product models.ProductInfo
+			var product kcgl_models.ProductInfo
 			_, err = db_session.Id(cn_inventory.ProductId).Get(&product)
 			core.HandleError(err)
 

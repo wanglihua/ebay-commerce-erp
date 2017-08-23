@@ -1,4 +1,4 @@
-package models
+package kcgl_models
 
 import (
 	"matrix/core"
@@ -31,7 +31,7 @@ type ProductInfo struct {
 }
 
 func (e ProductInfo) TableName() string {
-	return TablePrefix + "product"
+	return "erp_product"
 }
 
 func (e ProductInfo) ModelDesc() string {

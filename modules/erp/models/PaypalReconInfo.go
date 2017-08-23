@@ -17,7 +17,7 @@ type PaypalReconInfo struct {
 }
 
 func (e PaypalReconInfo) TableName() string {
-	return TablePrefix + "paypal_recon"
+	return "erp_paypal_recon"
 }
 
 func (e PaypalReconInfo) ModelDesc() string {

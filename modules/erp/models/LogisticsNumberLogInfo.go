@@ -18,7 +18,7 @@ type LogisticsNumberLogInfo struct {
 }
 
 func (e LogisticsNumberLogInfo) TableName() string {
-	return TablePrefix + "logistics_number_log"
+	return "erp_logistics_number_log"
 }
 
 func (e LogisticsNumberLogInfo) ModelDesc() string {

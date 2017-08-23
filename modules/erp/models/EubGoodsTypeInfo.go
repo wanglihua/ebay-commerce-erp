@@ -13,7 +13,7 @@ type EubGoodsTypeInfo struct {
 }
 
 func (e EubGoodsTypeInfo) TableName() string {
-	return TablePrefix + "eub_goods_type"
+	return "erp_eub_goods_type"
 }
 
 func (e EubGoodsTypeInfo) ModelDesc() string {

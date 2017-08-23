@@ -9,6 +9,7 @@ import (
 	track_modes "matrix/modules/track/models"
 	"matrix/modules/erp/models/sppz_models"
 	"matrix/modules/erp/models/hgbg_models"
+	"matrix/modules/erp/models/kcgl_models"
 )
 
 type Home struct {
@@ -65,6 +66,16 @@ func (c Home) SyncDbPost() revel.Result {
 	model_list = append(model_list, &hgbg_models.HsCodeAuDutyInfo{})
 	model_list = append(model_list, &hgbg_models.HsCodeCnReportElemInfo{})
 
+	model_list = append(model_list, &kcgl_models.ProductBindInfo{})
+	model_list = append(model_list, &kcgl_models.ProductBindLogInfo{})
+	model_list = append(model_list, &kcgl_models.ProductCateInfo{})
+	model_list = append(model_list, &kcgl_models.ProductCateLogInfo{})
+	model_list = append(model_list, &kcgl_models.ProductImageInfo{})
+	model_list = append(model_list, &kcgl_models.ProductImageTypeInfo{})
+	model_list = append(model_list, &kcgl_models.ProductImportInfo{})
+	model_list = append(model_list, &kcgl_models.ProductInfo{})
+	model_list = append(model_list, &kcgl_models.ProductLogInfo{})
+
 	model_list = append(model_list, &erp_models.CurrencyInfo{})
 	model_list = append(model_list, &erp_models.EBayAPIConfigInfo{})
 	model_list = append(model_list, &erp_models.ECommercePlatformInfo{})
@@ -114,18 +125,10 @@ func (c Home) SyncDbPost() revel.Result {
 	model_list = append(model_list, &erp_models.ProductSaleDayAnalysisInfo{})
 	model_list = append(model_list, &erp_models.ProductSaleAnalysisInfo{})
 	model_list = append(model_list, &erp_models.ProductSaleAnalysisSettingInfo{})
-	model_list = append(model_list, &erp_models.ProductBindInfo{})
-	model_list = append(model_list, &erp_models.ProductBindLogInfo{})
-	model_list = append(model_list, &erp_models.ProductCateInfo{})
-	model_list = append(model_list, &erp_models.ProductCateLogInfo{})
+
 	model_list = append(model_list, &erp_models.ProductFeedbackCateInfo{})
 	model_list = append(model_list, &erp_models.ProductFeedbackSkuInfo{})
 	model_list = append(model_list, &erp_models.ProductFeedbackInfo{})
-	model_list = append(model_list, &erp_models.ProductImageInfo{})
-	model_list = append(model_list, &erp_models.ProductImageTypeInfo{})
-	model_list = append(model_list, &erp_models.ProductImportInfo{})
-	model_list = append(model_list, &erp_models.ProductInfo{})
-	model_list = append(model_list, &erp_models.ProductLogInfo{})
 	model_list = append(model_list, &erp_models.ProductStoreItemInfo{})
 	model_list = append(model_list, &erp_models.ProductStyleInfo{})
 	model_list = append(model_list, &erp_models.PurchaseBillEntryInfo{})

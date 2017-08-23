@@ -16,5 +16,5 @@ type TestInfo struct {
 }
 
 func (e TestInfo) TableName() string {
-	return TablePrefix + "test"
+	return "erp_test"
 }

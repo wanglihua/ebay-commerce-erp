@@ -17,7 +17,7 @@ type PickFeeInfo struct {
 }
 
 func (e PickFeeInfo) TableName() string {
-	return TablePrefix + "pick_fee"
+	return "erp_pick_fee"
 }
 
 func (e PickFeeInfo) ModelDesc() string {

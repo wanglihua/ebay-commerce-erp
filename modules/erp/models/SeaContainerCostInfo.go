@@ -13,5 +13,5 @@ type SeaContainerCostInfo struct {
 }
 
 func (e SeaContainerCostInfo) TableName() string {
-	return TablePrefix + "sea_container_cost"
+	return "erp_sea_container_cost"
 }

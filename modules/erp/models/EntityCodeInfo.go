@@ -17,7 +17,7 @@ type EntityCodeInfo struct {
 }
 
 func (e EntityCodeInfo) TableName() string {
-	return TablePrefix + "entity_code"
+	return "erp_entity_code"
 }
 
 func (e EntityCodeInfo) ModelDesc() string {

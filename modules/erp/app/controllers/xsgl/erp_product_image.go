@@ -7,8 +7,8 @@ import (
 
 	"github.com/revel/revel"
 	"matrix/core"
-	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/shop_service"
+	"matrix/modules/erp/models/kcgl_models"
 )
 
 type ErpProductImage struct {
@@ -90,8 +90,8 @@ type shop_select_item_t struct {
 }
 
 type ProductImageDetailForm struct {
-	ProductImage         models.ProductImageInfo            `json:"product_image"`
-	ProductImageTypeList []models.ProductImageTypeInfo      `json:"product_image_type_list"`
+	ProductImage         kcgl_models.ProductImageInfo            `json:"product_image"`
+	ProductImageTypeList []kcgl_models.ProductImageTypeInfo      `json:"product_image_type_list"`
 	ShopList             []shop_service.Shop_select_item_t  `json:"shop_list"`
 }
 
@@ -129,7 +129,7 @@ func (c ErpProductImage) DetailData() revel.Result {
 	var product_image_id int64
 	c.Params.Bind(&product_image_id, "id")
 
-	var product_image models.ProductImageInfo
+	var product_image kcgl_models.ProductImageInfo
 	if product_image_id != 0 {
 		has, err := db_session.Id(product_image_id).Get(&product_image)
 		core.HandleError(err)
@@ -138,7 +138,7 @@ func (c ErpProductImage) DetailData() revel.Result {
 		}
 	}
 
-	var product_image_type_list []models.ProductImageTypeInfo
+	var product_image_type_list []kcgl_models.ProductImageTypeInfo
 	err := db_session.Find(&product_image_type_list)
 	core.HandleError(err)
 
@@ -165,7 +165,7 @@ func (c ErpProductImage) Save() revel.Result {
 
 	product_image := detail_form.ProductImage
 
-	var product models.ProductInfo
+	var product kcgl_models.ProductInfo
 	found, err := db_session.Where(fmt.Sprintf("sku = '%s'", product_image.ProductCode)).Get(&product)
 	core.HandleError(err)
 
@@ -197,7 +197,7 @@ func (c ErpProductImage) Delete() revel.Result {
 	product_image_id_list := make([]int64, 0)
 	c.Params.Bind(&product_image_id_list, "id_list")
 
-	affected, err := db_session.In("id", product_image_id_list).Delete(new(models.ProductImageInfo))
+	affected, err := db_session.In("id", product_image_id_list).Delete(new(kcgl_models.ProductImageInfo))
 	core.HandleError(err)
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})

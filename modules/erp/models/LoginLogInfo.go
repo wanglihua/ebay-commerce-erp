@@ -19,7 +19,7 @@ type LoginLogInfo struct {
 }
 
 func (e LoginLogInfo) TableName() string {
-	return TablePrefix + "login_log"
+	return "erp_login_log"
 }
 
 func (e LoginLogInfo) ModelDesc() string {

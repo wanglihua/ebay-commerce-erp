@@ -2,7 +2,6 @@ package hgbg_models
 
 import (
 	"matrix/core"
-	"matrix/modules/erp/models"
 )
 
 type HsCodeAuDutyInfo struct {
@@ -16,7 +15,7 @@ type HsCodeAuDutyInfo struct {
 }
 
 func (e HsCodeAuDutyInfo) TableName() string {
-	return models.TablePrefix + "hs_code_au"
+	return "erp_hs_code_au"
 }
 
 func (e HsCodeAuDutyInfo) ModelDesc() string {

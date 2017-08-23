@@ -16,7 +16,7 @@ type OrderHoldTypeInfo struct {
 }
 
 func (e OrderHoldTypeInfo) TableName() string {
-	return TablePrefix + "order_hold_type"
+	return "erp_order_hold_type"
 }
 
 func (e OrderHoldTypeInfo) ModelDesc() string {

@@ -1,9 +1,9 @@
 package container_transfer_service
 
 import (
-	"matrix/modules/erp/models"
 	"github.com/go-xorm/xorm"
 	"matrix/core"
+	"matrix/modules/erp/models/kcgl_models"
 )
 
 func EntryCombineForCn(item_list []ContainerTransferEntryItem, is_third bool, db_session *xorm.Session) []ContainerTransferEntryItem {
@@ -22,7 +22,7 @@ func EntryCombineForCn(item_list []ContainerTransferEntryItem, is_third bool, db
 
 	for _, item := range item_list {
 		// weight volume 的计算
-		var product models.ProductInfo
+		var product kcgl_models.ProductInfo
 		_, err := db_session.Id(item.ContainerTransferEntry.ProductId).Get(&product)
 		core.HandleError(err)
 

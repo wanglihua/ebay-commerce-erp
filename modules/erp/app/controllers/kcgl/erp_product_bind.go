@@ -15,6 +15,7 @@ import (
 	"matrix/modules/erp/service/product_bind_log_service"
 	"matrix/modules/erp/service/product_bind_service"
 	"matrix/modules/erp/service/status_service"
+	"matrix/modules/erp/models/kcgl_models"
 )
 
 type ErpProductBind struct {
@@ -28,7 +29,7 @@ func (c ErpProductBind) Index() revel.Result {
 }
 
 type ErpProductBindViewItem struct {
-	models.ProductBindInfo     `xorm:"extends" json:"b"`
+	kcgl_models.ProductBindInfo     `xorm:"extends" json:"b"`
 	models.StatusInfo          `xorm:"extends" json:"s"`
 }
 
@@ -76,7 +77,7 @@ func (c ErpProductBind) ListData() revel.Result {
 }
 
 type ProductBindDetailForm struct {
-	ProductBind models.ProductBindInfo       `json:"product_bind"`
+	ProductBind kcgl_models.ProductBindInfo       `json:"product_bind"`
 	StatusList  []models.StatusInfo          `json:"status_list"`
 }
 
@@ -122,7 +123,7 @@ func (c ErpProductBind) DetailData() revel.Result {
 	var product_bind_id int64
 	c.Params.Bind(&product_bind_id, "id")
 
-	var product_bind models.ProductBindInfo
+	var product_bind kcgl_models.ProductBindInfo
 	if product_bind_id != 0 {
 		has, err := db_session.Id(product_bind_id).Get(&product_bind)
 		core.HandleError(err)
@@ -167,7 +168,7 @@ func (c ErpProductBind) Save() revel.Result {
 
 	var affected int64
 	if detail_form.IsCreate() {
-		code_count, err := db_session.Where("code = ?", product_bind_from_ui.Code).Count(new(models.ProductBindInfo))
+		code_count, err := db_session.Where("code = ?", product_bind_from_ui.Code).Count(new(kcgl_models.ProductBindInfo))
 		core.HandleError(err)
 		if code_count != 0 {
 			return c.RenderJson(map[string]interface{}{
@@ -176,7 +177,7 @@ func (c ErpProductBind) Save() revel.Result {
 			})
 		}
 
-		name_count, err := db_session.Where("name = ?", product_bind_from_ui.Name).Count(new(models.ProductBindInfo))
+		name_count, err := db_session.Where("name = ?", product_bind_from_ui.Name).Count(new(kcgl_models.ProductBindInfo))
 		core.HandleError(err)
 		if name_count != 0 {
 			return c.RenderJson(map[string]interface{}{
@@ -190,7 +191,7 @@ func (c ErpProductBind) Save() revel.Result {
 
 		product_bind_log_service.Insert_product_bind_log(nil, &product_bind_from_ui, core.Db_operation_types.Insert, db_session, c.Session)
 	} else {
-		code_count, err := db_session.Where("id <> ? AND code = ?", product_bind_from_ui.Id, product_bind_from_ui.Code).Count(new(models.ProductBindInfo))
+		code_count, err := db_session.Where("id <> ? AND code = ?", product_bind_from_ui.Id, product_bind_from_ui.Code).Count(new(kcgl_models.ProductBindInfo))
 		core.HandleError(err)
 		if code_count != 0 {
 			return c.RenderJson(map[string]interface{}{
@@ -199,7 +200,7 @@ func (c ErpProductBind) Save() revel.Result {
 			})
 		}
 
-		name_count, err := db_session.Where("id <> ? AND name = ?", product_bind_from_ui.Id, product_bind_from_ui.Name).Count(new(models.ProductBindInfo))
+		name_count, err := db_session.Where("id <> ? AND name = ?", product_bind_from_ui.Id, product_bind_from_ui.Name).Count(new(kcgl_models.ProductBindInfo))
 		core.HandleError(err)
 		if name_count != 0 {
 			return c.RenderJson(map[string]interface{}{
@@ -208,7 +209,7 @@ func (c ErpProductBind) Save() revel.Result {
 			})
 		}
 
-		var product_bind_in_db models.ProductBindInfo
+		var product_bind_in_db kcgl_models.ProductBindInfo
 		_, err = db_session.Id(product_bind_from_ui.Id).Get(&product_bind_in_db)
 		core.HandleError(err)
 
@@ -235,7 +236,7 @@ func (c ErpProductBind) Delete() revel.Result {
 	c.Params.Bind(&product_bind_id_list, "id_list")
 
 	for _, product_bind_id := range product_bind_id_list {
-		var product_bind models.ProductBindInfo
+		var product_bind kcgl_models.ProductBindInfo
 		has, err := db_session.Id(product_bind_id).Get(&product_bind)
 		core.HandleError(err)
 
@@ -244,7 +245,7 @@ func (c ErpProductBind) Delete() revel.Result {
 		}
 	}
 
-	affected, err := db_session.In("id", product_bind_id_list).Delete(new(models.ProductBindInfo))
+	affected, err := db_session.In("id", product_bind_id_list).Delete(new(kcgl_models.ProductBindInfo))
 	core.HandleError(err)
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})
@@ -387,7 +388,7 @@ func (c ErpProductBind) Import() revel.Result {
 			panic(fmt.Sprintf("序号 %s 的绑定列表无效，请核查！", product_bind_import.BindList))
 		}
 
-		var product_bind models.ProductBindInfo
+		var product_bind kcgl_models.ProductBindInfo
 
 		product_bind.Code = product_bind_import.BindCode
 		product_bind.Name = product_bind_import.BindName

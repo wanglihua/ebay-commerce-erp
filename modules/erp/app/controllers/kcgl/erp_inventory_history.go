@@ -8,6 +8,7 @@ import (
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/auth/pass_res"
 	"fmt"
+	"matrix/modules/erp/models/kcgl_models"
 )
 
 type ErpInventoryHistory struct {
@@ -29,7 +30,7 @@ type InventoryHistoryViewItem struct {
 	InventoryHistory models.InventoryHistoryInfo  `xorm:"extends" json:"his"`
 	Stock            models.StockInfo             `xorm:"extends" json:"st"`
 	StorageLoc       models.StorageLocInfo        `xorm:"extends" json:"loc"`
-	Product          models.ProductInfo           `xorm:"extends" json:"prd"`
+	Product          kcgl_models.ProductInfo           `xorm:"extends" json:"prd"`
 }
 
 func (c ErpInventoryHistory) ListData() revel.Result {

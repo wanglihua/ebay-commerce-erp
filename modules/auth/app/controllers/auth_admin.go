@@ -34,8 +34,8 @@ func (c AuthAdmin) ListData() revel.Result {
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 	query := session.
 	Select("a.*, u.*").
-		Table(models.TablePrefix + "user").Alias("u").
-		Join("inner", []string{models.TablePrefix + "admin", "a"}, "u.id = a.user_id").
+		Table("auth_user").Alias("u").
+		Join("inner", []string{"auth_admin", "a"}, "u.id = a.user_id").
 		Where(filter)
 
 	//query extra filter here

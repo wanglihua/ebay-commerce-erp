@@ -16,7 +16,7 @@ type StorageLocInfo struct {
 }
 
 func (e StorageLocInfo) TableName() string {
-	return TablePrefix + "storage_loc"
+	return "erp_storage_loc"
 }
 
 func (e StorageLocInfo) ModelDesc() string {

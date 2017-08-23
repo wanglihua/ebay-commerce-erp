@@ -17,7 +17,7 @@ type EnvelopeFeeRateInfo struct {
 }
 
 func (e EnvelopeFeeRateInfo) TableName() string {
-	return TablePrefix + "envelope_fee_rate"
+	return "erp_envelope_fee_rate"
 }
 
 func (e EnvelopeFeeRateInfo) ModelDesc() string {

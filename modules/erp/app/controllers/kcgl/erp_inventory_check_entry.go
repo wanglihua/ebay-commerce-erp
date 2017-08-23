@@ -11,6 +11,7 @@ import (
 	"matrix/modules/auth/pass_res"
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/erp/models"
+	"matrix/modules/erp/models/kcgl_models"
 )
 
 type ErpInventoryCheckEntry struct {
@@ -47,7 +48,7 @@ func (c ErpInventoryCheckEntry) ListData() revel.Result {
 		models.StockBillEntryInfo `xorm:"extends" json:"ice"`
 		models.InventoryCheckInfo      `xorm:"extends" json:"ic"`
 		models.StorageLocInfo          `xorm:"extends" json:"sl"`
-		models.ProductInfo             `xorm:"extends" json:"p"`
+		kcgl_models.ProductInfo             `xorm:"extends" json:"p"`
 	}
 
 	/*
@@ -166,7 +167,7 @@ func (c ErpInventoryCheckEntry) DetailData() revel.Result {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "指定的库存盘点明细不存在！"})
 		}
 
-		var product models.ProductInfo
+		var product kcgl_models.ProductInfo
 		product_id := inventory_check_entry.ProductId
 		_, err = db_session.Id(product_id).Get(&product)
 		core.HandleError(err)
@@ -278,8 +279,8 @@ func (c ErpInventoryCheckEntry) ProductSelectListData() revel.Result {
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
 	type ErpProductViewItem struct {
-		models.ProductInfo          `xorm:"extends" json:"prd"`
-		models.ProductCateInfo      `xorm:"extends" json:"cate"`
+		kcgl_models.ProductInfo          `xorm:"extends" json:"prd"`
+		kcgl_models.ProductCateInfo      `xorm:"extends" json:"cate"`
 		models.SupplierInfo         `xorm:"extends" json:"sup"`
 		models.PackageMaterialInfo  `xorm:"extends" json:"pm"`
 		models.StatusInfo           `xorm:"extends" json:"st"`

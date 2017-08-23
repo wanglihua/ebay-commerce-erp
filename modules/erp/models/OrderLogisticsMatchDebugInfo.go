@@ -27,7 +27,7 @@ type OrderLogisticsMatchDebugInfo struct {
 }
 
 func (e OrderLogisticsMatchDebugInfo) TableName() string {
-	return TablePrefix + "order_logistics_match_debug"
+	return "erp_order_logistics_match_debug"
 }
 
 func (e OrderLogisticsMatchDebugInfo) ModelDesc() string {

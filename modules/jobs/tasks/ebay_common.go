@@ -10,6 +10,7 @@ import (
 	"matrix/core"
 	"matrix/ebay"
 	"matrix/modules/erp/models"
+	"matrix/modules/erp/models/kcgl_models"
 )
 
 const log_response_xml_to_file = false
@@ -177,7 +178,7 @@ func fetch_product_item_to_db(config models.EBayAPIConfigInfo, db_session *xorm.
 	item_response := fetch_product_item(config, item_id)
 
 	item_sku := item_response.Item.Sku
-	var product models.ProductInfo
+	var product kcgl_models.ProductInfo
 	has_product, err := db_session.Where(fmt.Sprintf("sku = '%s'", item_sku)).Get(&product)
 	core.HandleError(err)
 
@@ -231,7 +232,7 @@ func fetch_product_item_to_db(config models.EBayAPIConfigInfo, db_session *xorm.
 	// 如果这个商品的这个图片URL已经存在，就不做插入了
 
 	// 获得这个商品的所有图片
-	var product_image_list_in_db = make([]models.ProductImageInfo, 0)
+	var product_image_list_in_db = make([]kcgl_models.ProductImageInfo, 0)
 	err = db_session.Where(fmt.Sprintf("product_id = %d", product.Id)).Find(&product_image_list_in_db)
 	core.HandleError(err)
 
@@ -244,10 +245,10 @@ func fetch_product_item_to_db(config models.EBayAPIConfigInfo, db_session *xorm.
 	for _, product_image_url_download := range item_response.Item.PictureDetails.PictureUrls {
 		if _, found := product_image_url_map_in_db[product_image_url_download]; found == false {
 
-			var product_image models.ProductImageInfo
+			var product_image kcgl_models.ProductImageInfo
 			product_image.ProductId = product.Id
 			product_image.ProductCode = product.Sku
-			product_image.TypeId = models.PRODUCT_IMAGE_TYPE_CCTP
+			product_image.TypeId = kcgl_models.PRODUCT_IMAGE_TYPE_CCTP
 			product_image.ShopId = config.ShopId
 			product_image.Url = product_image_url_download
 
@@ -264,7 +265,7 @@ func fetch_product_item_to_db(config models.EBayAPIConfigInfo, db_session *xorm.
 
 	for _, product_image_in_db := range product_image_list_in_db {
 		if _, found := product_image_url_map_download[product_image_in_db.Url]; found == false {
-			db_session.Id(product_image_in_db.Id).Delete(new(models.ProductImageInfo))
+			db_session.Id(product_image_in_db.Id).Delete(new(kcgl_models.ProductImageInfo))
 		}
 	}
 
