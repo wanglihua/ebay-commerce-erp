@@ -5,9 +5,9 @@ import (
 
 	"github.com/revel/revel"
 	"matrix/core"
-	"matrix/modules/erp/models"
 	"matrix/modules/erp/models/ddpz_models"
 	"matrix/modules/erp/models/sppz_models"
+	"matrix/modules/erp/models/ddlc_models"
 )
 
 type ErpOrderLogisticsMatchDebug struct {
@@ -19,9 +19,9 @@ func (c ErpOrderLogisticsMatchDebug) Index() revel.Result {
 }
 
 type logistics_match_debug_view_item_t struct {
-	OrderLogisticsMatchDebug models.OrderLogisticsMatchDebugInfo `xorm:"extends" json:"md"`
+	OrderLogisticsMatchDebug ddlc_models.OrderLogisticsMatchDebugInfo `xorm:"extends" json:"md"`
 	Stock                    sppz_models.StockInfo                    `xorm:"extends" json:"s"`
-	OrderShippingAddress     models.OrderShippingAddressInfo     `xorm:"extends" json:"osa"`
+	OrderShippingAddress     ddlc_models.OrderShippingAddressInfo     `xorm:"extends" json:"osa"`
 	LogisticsCompany         ddpz_models.LogisticsCompanyInfo         `xorm:"extends" json:"lc"`
 	LogisticsMode            ddpz_models.LogisticsModeInfo            `xorm:"extends" json:"lm"`
 	LogisticsFeeRate         ddpz_models.LogisticsFeeRateInfo         `xorm:"extends" json:"lfr"`
@@ -88,7 +88,7 @@ WHERE md.order_code = '2053968244015'
 
 	sb.Limit(offset, limit)
 
-	order_logistics_match_debug_list := make([]models.OrderLogisticsMatchDebugInfo, 0, limit)
+	order_logistics_match_debug_list := make([]ddlc_models.OrderLogisticsMatchDebugInfo, 0, limit)
 	err := db_session.Sql(sb.SqlList()).Find(&order_logistics_match_debug_list)
 	core.HandleError(err)
 
@@ -149,7 +149,7 @@ func (c ErpOrderLogisticsMatchDebug) Clear() revel.Result {
 	_, err := db_session.Exec("DROP TABLE erp_order_logistics_match_debug;")
 	core.HandleError(err)
 
-	err = db_session.Sync2(new(models.OrderLogisticsMatchDebugInfo))
+	err = db_session.Sync2(new(ddlc_models.OrderLogisticsMatchDebugInfo))
 	core.HandleError(err)
 
 	return c.RenderJson(map[string]interface{}{

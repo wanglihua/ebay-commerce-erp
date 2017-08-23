@@ -6,12 +6,13 @@ import (
 	"github.com/revel/revel"
 
 	"matrix/core"
-	"matrix/modules/erp/models"
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/auth/pass_res"
 	"strings"
 	"matrix/modules/erp/service/order_history_service"
 	"fmt"
+	"matrix/modules/erp/models/ddlc_models"
+	"matrix/modules/erp/models/ddpz_models"
 )
 
 type ErpOrderTag struct {
@@ -41,12 +42,12 @@ func (c ErpOrderTag) ListData() revel.Result {
 		data_query = *data_query.Asc("id")
 	}
 
-	order_tag_list := make([]models.OrderTagInfo, 0, limit)
+	order_tag_list := make([]ddpz_models.OrderTagInfo, 0, limit)
 	err := data_query.Limit(limit, offset).Find(&order_tag_list)
 	core.HandleError(err)
 
 	count_query := *query
-	count, err := count_query.Count(new(models.OrderTagInfo))
+	count, err := count_query.Count(new(ddpz_models.OrderTagInfo))
 	core.HandleError(err)
 
 	return c.RenderJson(core.GridResult{
@@ -56,7 +57,7 @@ func (c ErpOrderTag) ListData() revel.Result {
 }
 
 type OrderTagDetailForm struct {
-	OrderTag  models.OrderTagInfo   `json:"order_tag"`
+	OrderTag  ddpz_models.OrderTagInfo   `json:"order_tag"`
 	ColorList []string              `json:"color_list"`
 }
 
@@ -94,7 +95,7 @@ func (c ErpOrderTag) DetailData() revel.Result {
 	var order_tag_id int64
 	c.Params.Bind(&order_tag_id, "id")
 
-	var order_tag models.OrderTagInfo
+	var order_tag ddpz_models.OrderTagInfo
 	if order_tag_id != 0 {
 		has, err := db_session.Id(order_tag_id).Get(&order_tag)
 		core.HandleError(err)
@@ -104,10 +105,10 @@ func (c ErpOrderTag) DetailData() revel.Result {
 	}
 
 	var color_list_all []string = []string{"#ac725e", "#d06b64", "#f83a22", "#fa573c", "#ff7537", "#ffad46", "#42d692", "#16a765", "#7bd148", "#b3dc6c",
-	                                       "#fbe983", "#fad165", "#92e1c0", "#9fe1e7", "#9fc6e7", "#4986e7", "#9a9cff", "#b99aff", "#c2c2c2", "#cabdbf",
-	                                       "#cca6ac", "#f691b2", "#cd74e6", "#a47ae2", "#555555"}
+		"#fbe983", "#fad165", "#92e1c0", "#9fe1e7", "#9fc6e7", "#4986e7", "#9a9cff", "#b99aff", "#c2c2c2", "#cabdbf",
+		"#cca6ac", "#f691b2", "#cd74e6", "#a47ae2", "#555555"}
 
-	var order_tag_list = make([]models.OrderTagInfo, 0)
+	var order_tag_list = make([]ddpz_models.OrderTagInfo, 0)
 	err := db_session.Find(&order_tag_list)
 	core.HandleError(err)
 
@@ -156,26 +157,26 @@ func (c ErpOrderTag) Save() revel.Result {
 
 	var affected int64
 	if detail_form.IsCreate() {
-		name_count, err := db_session.Where("name = ?", order_tag.Name).Count(new(models.OrderTagInfo))
+		name_count, err := db_session.Where("name = ?", order_tag.Name).Count(new(ddpz_models.OrderTagInfo))
 		core.HandleError(err)
 		if name_count != 0 {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，名称已存在！" })
+			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，名称已存在！"})
 		}
 
 		affected, err = db_session.Insert(&order_tag)
 		core.HandleError(err)
 	} else {
-		name_count, err := db_session.Where("id <> ? and name = ?", order_tag.Id, order_tag.Name).Count(new(models.OrderTagInfo))
+		name_count, err := db_session.Where("id <> ? and name = ?", order_tag.Id, order_tag.Name).Count(new(ddpz_models.OrderTagInfo))
 		core.HandleError(err)
 		if name_count != 0 {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，名称已存在！" })
+			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，名称已存在！"})
 		}
 
 		affected, err = db_session.Id(order_tag.Id).Update(&order_tag)
 		core.HandleError(err)
 
 		if affected == 0 {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！" })
+			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！"})
 		}
 	}
 
@@ -190,7 +191,7 @@ func (c ErpOrderTag) Delete() revel.Result {
 	order_tag_id_list := make([]int64, 0)
 	c.Params.Bind(&order_tag_id_list, "id_list")
 
-	affected, err := db_session.In("id", order_tag_id_list).Delete(new(models.OrderTagInfo))
+	affected, err := db_session.In("id", order_tag_id_list).Delete(new(ddpz_models.OrderTagInfo))
 	core.HandleError(err)
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})
@@ -205,11 +206,11 @@ func (c ErpOrderTag) ApplyTag() revel.Result {
 	var order_tag_id int64
 	c.Params.Bind(&order_tag_id, "order_tag_id")
 
-	var order_tag models.OrderTagInfo
+	var order_tag ddpz_models.OrderTagInfo
 	_, err := db_session.Id(order_tag_id).Get(&order_tag)
 	core.HandleError(err)
 
-	var order_list = make([]models.OrderInfo, 0)
+	var order_list = make([]ddlc_models.OrderInfo, 0)
 	err = db_session.In("id", order_id_list).Find(&order_list)
 	core.HandleError(err)
 
@@ -223,7 +224,7 @@ func (c ErpOrderTag) ApplyTag() revel.Result {
 		if order_tag_id != 0 {
 			order_history_service.Insert_order_history(order, login_user.UserId, fmt.Sprintf("应用标签 %s， 工号： %s", order_tag.Name, login_user.LoginName), db_session)
 		} else {
-			var order_tag_to_cancel models.OrderTagInfo
+			var order_tag_to_cancel ddpz_models.OrderTagInfo
 			_, err := db_session.Id(order.TagId).Get(&order_tag_to_cancel)
 			core.HandleError(err)
 

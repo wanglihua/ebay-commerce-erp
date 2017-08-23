@@ -10,11 +10,12 @@ import (
 	"matrix/modules/erp/service/order_service"
 	"matrix/modules/erp/service/pick_fee_service"
 	"matrix/modules/erp/models/ddpz_models"
+	"matrix/modules/erp/models/ddlc_models"
 )
 
-func save_order_logistics(p_ol *OrderLogisticsService, p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, match_result match_logistics_mode_result, unlock_express bool, login_user core.LoginUser, db_session *xorm.Session) models.OrderLogisticsInfo {
+func save_order_logistics(p_ol *OrderLogisticsService, p_order *ddlc_models.OrderInfo, p_order_logistics_data *order_logistics_data_t, match_result match_logistics_mode_result, unlock_express bool, login_user core.LoginUser, db_session *xorm.Session) ddlc_models.OrderLogisticsInfo {
 	// 匹配成功，记录匹配成功数据
-	var order_logistics models.OrderLogisticsInfo
+	var order_logistics ddlc_models.OrderLogisticsInfo
 	has, err := db_session.Where(fmt.Sprintf("order_id = %d", match_result.order_id)).Get(&order_logistics)
 	core.HandleError(err)
 
@@ -49,7 +50,7 @@ func save_order_logistics(p_ol *OrderLogisticsService, p_order *models.OrderInfo
 	if match_result.has_stock == true {
 		if match_result.mode.TypeId == ddpz_models.LOGISTICS_MODE_TYPE_EXPRESS && unlock_express == false { // 匹配出来是快递，并且当前不解锁快递，就可以设置为快递 hold
 			// 把订单状态修改为 Hold
-			p_order.HoldTypeId = core.MakeNullInt(models.ORDER_HOLD_TYPE_EXPRESS, true)
+			p_order.HoldTypeId = core.MakeNullInt(ddpz_models.ORDER_HOLD_TYPE_EXPRESS, true)
 			p_order.StatusId = models.ORDER_STATUS_HOLD // 修改订单状态为 hold 状态
 
 			var login_user_id = login_user.UserId
@@ -97,7 +98,7 @@ func save_order_logistics(p_ol *OrderLogisticsService, p_order *models.OrderInfo
 		for _, product_info := range product_info_list {
 			var item_profit = product_info.CostPrice * float64(product_info.Qty) * order_profit / cost_price_total
 
-			var order_item models.OrderItemInfo
+			var order_item ddlc_models.OrderItemInfo
 			order_item.CostPrice = product_info.CostPrice
 			order_item.GrossProfit = item_profit
 			_, err = db_session.Id(product_info.ItemId).Cols("cost_price", "gross_profit").Update(&order_item)
@@ -108,9 +109,9 @@ func save_order_logistics(p_ol *OrderLogisticsService, p_order *models.OrderInfo
 	return order_logistics
 }
 
-func save_special_hold_order_logistics(p_ol *OrderLogisticsService, p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, envelope_fee_id int64, total_fee float64, db_session *xorm.Session) {
+func save_special_hold_order_logistics(p_ol *OrderLogisticsService, p_order *ddlc_models.OrderInfo, p_order_logistics_data *order_logistics_data_t, envelope_fee_id int64, total_fee float64, db_session *xorm.Session) {
 
-	var order_logistics models.OrderLogisticsInfo
+	var order_logistics ddlc_models.OrderLogisticsInfo
 	has, err := db_session.Where("order_id = ?", p_order.Id).Get(&order_logistics)
 	core.HandleError(err)
 
@@ -174,7 +175,7 @@ func save_special_hold_order_logistics(p_ol *OrderLogisticsService, p_order *mod
 		for _, product_info := range product_info_list {
 			var item_profit = product_info.CostPrice * float64(product_info.Qty) * order_profit / cost_price_total
 
-			var order_item models.OrderItemInfo
+			var order_item ddlc_models.OrderItemInfo
 			order_item.CostPrice = product_info.CostPrice
 			order_item.GrossProfit = item_profit
 			_, err = db_session.Id(product_info.ItemId).Cols("cost_price", "gross_profit").Update(&order_item)

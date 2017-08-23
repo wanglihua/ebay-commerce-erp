@@ -14,6 +14,8 @@ import (
 	"time"
 	"matrix/modules/erp/models/xtpz_models"
 	"matrix/modules/erp/models/sppz_models"
+	"matrix/modules/erp/models/ddpz_models"
+	"matrix/modules/erp/models/ddlc_models"
 )
 
 type ErpOrderNew struct {
@@ -31,16 +33,16 @@ func (c ErpOrderNew) CreateData() revel.Result {
 
 	var db_session = c.DbSession
 
-	// models.ORDER_TYPE_SGCJ //手工创建
+	// ddpz_models.ORDER_TYPE_SGCJ //手工创建
 
-	var order_type_list = make([]models.OrderTypeInfo, 0)
-	core.HandleError(db_session.In("id", []int64{models.ORDER_TYPE_SGCJ}).Find(&order_type_list))
+	var order_type_list = make([]ddpz_models.OrderTypeInfo, 0)
+	core.HandleError(db_session.In("id", []int64{ddpz_models.ORDER_TYPE_SGCJ}).Find(&order_type_list))
 
 	var status_list = make([]models.StatusInfo, 0)
 	core.HandleError(db_session.In("id", []int64{models.ORDER_STATUS_YZF}).Where("type = ?", models.STATUS_TYPE_ORDER).Find(&status_list))
 
-	var hold_type_list = make([]models.OrderHoldTypeInfo, 0)
-	core.HandleError(db_session.In("id", []int64{models.ORDER_HOLD_TYPE_PICK_UP}).Find(&hold_type_list))
+	var hold_type_list = make([]ddpz_models.OrderHoldTypeInfo, 0)
+	core.HandleError(db_session.In("id", []int64{ddpz_models.ORDER_HOLD_TYPE_PICK_UP}).Find(&hold_type_list))
 
 	var shop_list = make([]xtpz_models.ShopAccountInfo, 0)
 	core.HandleError(db_session.Find(&shop_list))
@@ -124,7 +126,7 @@ func (c ErpOrderNew) Save() revel.Result {
 
 	var order = form.Order
 
-	if order.HoldTypeId.Int64 != models.ORDER_HOLD_TYPE_PICK_UP && order.PaidTime.Valid == false {
+	if order.HoldTypeId.Int64 != ddpz_models.ORDER_HOLD_TYPE_PICK_UP && order.PaidTime.Valid == false {
 		return c.RenderJson(map[string]interface{}{
 			"success": false,
 			"message": "请填写支付时间",
@@ -132,7 +134,7 @@ func (c ErpOrderNew) Save() revel.Result {
 	}
 
 	/*
-	if order.HoldTypeId.Int64 != models.ORDER_HOLD_TYPE_PICK_UP && order.StatusId != models.ORDER_STATUS_YCJ {
+	if order.HoldTypeId.Int64 != ddpz_models.ORDER_HOLD_TYPE_PICK_UP && order.StatusId != models.ORDER_STATUS_YCJ {
 		return c.RenderJson(map[string]interface{}{
 			"success": false,
 			"message": "请创建已支付的非PICKUP订单！",
@@ -165,7 +167,7 @@ func (c ErpOrderNew) Save() revel.Result {
 	_, err = db_session.Insert(&shipping_address)
 	core.HandleError(err)
 
-	if order.HoldTypeId.Int64 == models.ORDER_HOLD_TYPE_PICK_UP {
+	if order.HoldTypeId.Int64 == ddpz_models.ORDER_HOLD_TYPE_PICK_UP {
 
 		var pickup_info = form.PickupInfo
 
@@ -193,7 +195,7 @@ func (c ErpOrderNew) Save() revel.Result {
 
 		var stock_id = form.StockId
 
-		var order_logistics models.OrderLogisticsInfo
+		var order_logistics ddlc_models.OrderLogisticsInfo
 		order_logistics.OrderId = order.Id
 		order_logistics.StockId = stock_id
 		order_logistics.AddressId = shipping_address.Id
@@ -220,8 +222,8 @@ func (c ErpOrderNew) Save() revel.Result {
 }
 
 type OrderCreateForm struct {
-	Order           models.OrderInfo                `json:"order"`
-	ShippingAddress models.OrderShippingAddressInfo `json:"shipping_address"`
+	Order           ddlc_models.OrderInfo                `json:"order"`
+	ShippingAddress ddlc_models.OrderShippingAddressInfo `json:"shipping_address"`
 	PickupInfo      models.PickupOrderInfo          `json:"pickup_info"`
 	StockId         int64                           `json:"stock_id"`
 }

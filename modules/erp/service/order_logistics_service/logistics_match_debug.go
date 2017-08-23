@@ -3,11 +3,11 @@ package order_logistics_service
 import (
 	"github.com/go-xorm/xorm"
 	"matrix/core"
-	"matrix/modules/erp/models"
+	"matrix/modules/erp/models/ddlc_models"
 )
 
 func log_logistics_match_debug(match_result match_logistics_mode_result, result_desc string, match_debug string, db_session *xorm.Session) {
-	var logistics_match_debug models.OrderLogisticsMatchDebugInfo
+	var logistics_match_debug ddlc_models.OrderLogisticsMatchDebugInfo
 
 	logistics_match_debug.OrderId = match_result.order_id
 	logistics_match_debug.OrderCode = match_result.order_code

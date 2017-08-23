@@ -4,8 +4,8 @@ import (
 	"github.com/revel/revel"
 
 	"matrix/core"
-	"matrix/modules/erp/models"
 	"fmt"
+	"matrix/modules/erp/models/ddlc_models"
 )
 
 type ErpOrderHistory struct {
@@ -40,13 +40,13 @@ func (c ErpOrderHistory) ListData() revel.Result {
 		data_query = *data_query.Asc("id")
 	}
 
-	order_history_list := make([]models.OrderHistoryInfo, 0)
+	order_history_list := make([]ddlc_models.OrderHistoryInfo, 0)
 	//err := data_query.Limit(limit, offset).Find(&order_history_list)
 	err := data_query.Find(&order_history_list)
 	core.HandleError(err)
 
 	count_query := *query
-	count, err := count_query.Count(new(models.OrderHistoryInfo))
+	count, err := count_query.Count(new(ddlc_models.OrderHistoryInfo))
 	core.HandleError(err)
 
 	return c.RenderJson(core.GridResult{

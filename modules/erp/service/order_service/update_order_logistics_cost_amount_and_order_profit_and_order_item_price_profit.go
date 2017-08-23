@@ -2,11 +2,11 @@ package order_service
 
 import (
 	"github.com/go-xorm/xorm"
-	"matrix/modules/erp/models"
 	"matrix/core"
+	"matrix/modules/erp/models/ddlc_models"
 )
 
-func Update_order_logistics_cost_amount_and_order_profit_and_order_item_price_profit(order models.OrderInfo, order_logistics models.OrderLogisticsInfo, db_session *xorm.Session) {
+func Update_order_logistics_cost_amount_and_order_profit_and_order_item_price_profit(order ddlc_models.OrderInfo, order_logistics ddlc_models.OrderLogisticsInfo, db_session *xorm.Session) {
 	// 计算订单成本 AUD
 	var order_cost_amount = GetOrderCostAmountSum(order.Id, db_session)
 
@@ -24,7 +24,7 @@ func Update_order_logistics_cost_amount_and_order_profit_and_order_item_price_pr
 	_, err = db_session.Id(order.Id).Cols("profit_au", "profit_rmb").Update(&order)
 	core.HandleError(err)
 
-	var order_item_list = make([]models.OrderItemInfo, 0)
+	var order_item_list = make([]ddlc_models.OrderItemInfo, 0)
 	core.HandleError(db_session.Where("order_id = ?", order.Id).Find(&order_item_list))
 
 	/*

@@ -1,9 +1,11 @@
 package order_service
 
-import "matrix/modules/erp/models"
+import (
+	"matrix/modules/erp/models/ddlc_models"
+)
 
 // 根据数据计算订单利润，单位是澳元
-func CalculateOrderProfit(p_order *models.OrderInfo, p_order_logistics *models.OrderLogisticsInfo) float64 {
+func CalculateOrderProfit(p_order *ddlc_models.OrderInfo, p_order_logistics *ddlc_models.OrderLogisticsInfo) float64 {
 	var order_gst = Get_order_gst_fee(p_order)
 
 	// 如果有实际物流费用，就按实际物流费用来计算。

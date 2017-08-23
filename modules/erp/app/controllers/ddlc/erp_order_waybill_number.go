@@ -5,8 +5,8 @@ import (
 	"matrix/core"
 	"matrix/modules/auth/pass_res"
 	"matrix/modules/auth/service/pass_service"
-	"matrix/modules/erp/models"
 	"fmt"
+	"matrix/modules/erp/models/ddlc_models"
 )
 
 type ErpOrderWaybillNumber struct {
@@ -33,7 +33,7 @@ func (c ErpOrderWaybillNumber) Save() revel.Result {
 
 	// order
 
-	var order models.OrderInfo
+	var order ddlc_models.OrderInfo
 	has, err := db_session.Id(order_id).Get(&order)
 	core.HandleError(err)
 
@@ -51,7 +51,7 @@ func (c ErpOrderWaybillNumber) Save() revel.Result {
 
 	// order logistics
 
-	var order_logistics models.OrderLogisticsInfo
+	var order_logistics ddlc_models.OrderLogisticsInfo
 	_, err = db_session.Where(fmt.Sprintf("order_id = %d", order_id)).Get(&order_logistics)
 	core.HandleError(err)
 

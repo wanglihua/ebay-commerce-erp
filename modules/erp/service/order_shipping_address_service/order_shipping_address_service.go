@@ -6,12 +6,12 @@ import (
 
 	"github.com/go-xorm/xorm"
 	"matrix/core"
-	"matrix/modules/erp/models"
+	"matrix/modules/erp/models/ddlc_models"
 )
 
-func Get_orders_shipping_address_list(order_list []models.OrderInfo, db_session *xorm.Session) []models.OrderShippingAddressInfo {
+func Get_orders_shipping_address_list(order_list []ddlc_models.OrderInfo, db_session *xorm.Session) []ddlc_models.OrderShippingAddressInfo {
 	//Get_orders_shipping_address_list
-	var order_shipping_address_list = make([]models.OrderShippingAddressInfo, 0)
+	var order_shipping_address_list = make([]ddlc_models.OrderShippingAddressInfo, 0)
 
 	if len(order_list) == 0 {
 		return order_shipping_address_list
@@ -34,14 +34,14 @@ func Get_orders_shipping_address_list(order_list []models.OrderInfo, db_session 
 	return order_shipping_address_list
 }
 
-func Get_order_shipping_address_id_info_map(address_id_list []int64, db_session *xorm.Session) map[int64]models.OrderShippingAddressInfo {
-	var order_shipping_address_id_info_map = make(map[int64]models.OrderShippingAddressInfo)
+func Get_order_shipping_address_id_info_map(address_id_list []int64, db_session *xorm.Session) map[int64]ddlc_models.OrderShippingAddressInfo {
+	var order_shipping_address_id_info_map = make(map[int64]ddlc_models.OrderShippingAddressInfo)
 
 	if len(address_id_list) == 0 {
 		return order_shipping_address_id_info_map
 	}
 
-	var address_list = make([]models.OrderShippingAddressInfo, 0)
+	var address_list = make([]ddlc_models.OrderShippingAddressInfo, 0)
 	err := db_session.In("id", address_id_list).Find(&address_list)
 	core.HandleError(err)
 

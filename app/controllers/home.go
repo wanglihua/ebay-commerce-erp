@@ -13,6 +13,7 @@ import (
 	"matrix/modules/erp/models/spzl_models"
 	"matrix/modules/erp/models/xtpz_models"
 	"matrix/modules/erp/models/ddpz_models"
+	"matrix/modules/erp/models/ddlc_models"
 )
 
 type Home struct {
@@ -68,7 +69,11 @@ func (c Home) SyncDbPost() revel.Result {
 	model_list = append(model_list, &ddpz_models.LogisticsNumberLogInfo{})
 	model_list = append(model_list, &ddpz_models.LogisticsSettingInfo{})
 	model_list = append(model_list, &ddpz_models.MelTollSeviceIdInfo{})
+	model_list = append(model_list, &ddpz_models.OrderCustomTypeInfo{})
+	model_list = append(model_list, &ddpz_models.OrderHoldTypeInfo{})
 	model_list = append(model_list, &ddpz_models.PickFeeInfo{})
+	model_list = append(model_list, &ddpz_models.OrderTagInfo{})
+	model_list = append(model_list, &ddpz_models.OrderTypeInfo{})
 
 	model_list = append(model_list, &sppz_models.BrandInfo{})
 	model_list = append(model_list, &sppz_models.ProductStyleInfo{})
@@ -114,6 +119,15 @@ func (c Home) SyncDbPost() revel.Result {
 	model_list = append(model_list, &xtpz_models.ShopAccountInfo{})
 	model_list = append(model_list, &xtpz_models.ShopAccountLogInfo{})
 
+	model_list = append(model_list, &ddlc_models.OrderInfo{})
+	model_list = append(model_list, &ddlc_models.OrderHistoryInfo{})
+	model_list = append(model_list, &ddlc_models.OrderItemInfo{})
+	model_list = append(model_list, &ddlc_models.OrderLogInfo{})
+	model_list = append(model_list, &ddlc_models.OrderLogisticsInfo{})
+	model_list = append(model_list, &ddlc_models.OrderLogisticsLogicInfo{})
+	model_list = append(model_list, &ddlc_models.OrderLogisticsMatchDebugInfo{})
+	model_list = append(model_list, &ddlc_models.OrderShippingAddressInfo{})
+
 	model_list = append(model_list, &erp_models.EntityCodeInfo{})
 	model_list = append(model_list, &erp_models.EnvelopeFeeRateInfo{})
 	model_list = append(model_list, &erp_models.EubGoodsTypeInfo{})
@@ -122,18 +136,7 @@ func (c Home) SyncDbPost() revel.Result {
 	model_list = append(model_list, &erp_models.LittleIconInfo{})
 	model_list = append(model_list, &erp_models.LoginLogInfo{})
 	model_list = append(model_list, &erp_models.MessageInfo{})
-	model_list = append(model_list, &erp_models.OrderCustomTypeInfo{})
-	model_list = append(model_list, &erp_models.OrderHoldTypeInfo{})
-	model_list = append(model_list, &erp_models.OrderInfo{})
-	model_list = append(model_list, &erp_models.OrderHistoryInfo{})
-	model_list = append(model_list, &erp_models.OrderItemInfo{})
-	model_list = append(model_list, &erp_models.OrderLogInfo{})
-	model_list = append(model_list, &erp_models.OrderLogisticsInfo{})
-	model_list = append(model_list, &erp_models.OrderLogisticsLogicInfo{})
-	model_list = append(model_list, &erp_models.OrderLogisticsMatchDebugInfo{})
-	model_list = append(model_list, &erp_models.OrderShippingAddressInfo{})
-	model_list = append(model_list, &erp_models.OrderTagInfo{})
-	model_list = append(model_list, &erp_models.OrderTypeInfo{})
+
 	model_list = append(model_list, &erp_models.PackageMaterialInfo{})
 
 	model_list = append(model_list, &erp_models.PaypalReconInfo{})

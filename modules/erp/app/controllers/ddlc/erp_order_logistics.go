@@ -26,6 +26,7 @@ import (
 	"matrix/modules/erp/models/xtpz_models"
 	"matrix/modules/erp/models/ddpz_models"
 	"matrix/modules/erp/models/sppz_models"
+	"matrix/modules/erp/models/ddlc_models"
 )
 
 type ErpOrderLogistics struct {
@@ -262,8 +263,8 @@ func (c ErpOrderLogistics) ListData() revel.Result {
 	*/
 
 	type order_logistics_view_item_t struct {
-		OrderLogistics models.OrderLogisticsInfo  `xorm:"extends" json:"ol"`
-		Order          models.OrderInfo           `xorm:"extends" json:"o"`
+		OrderLogistics ddlc_models.OrderLogisticsInfo  `xorm:"extends" json:"ol"`
+		Order          ddlc_models.OrderInfo           `xorm:"extends" json:"o"`
 		StockName      string                     `json:"stock_name"`
 		CompanyName    string                     `json:"company_name"`
 		ModeName       string                     `json:"mode_name"`
@@ -376,7 +377,7 @@ WHERE ol.stock_id = 0 AND ol.company_id = 0
 }
 
 type OrderLogisticsDetailForm struct {
-	OrderLogistics models.OrderLogisticsInfo `json:"order_logistics"`
+	OrderLogistics ddlc_models.OrderLogisticsInfo `json:"order_logistics"`
 }
 
 func (f *OrderLogisticsDetailForm) IsCreate() bool {
@@ -415,7 +416,7 @@ func (c ErpOrderLogistics) DetailData() revel.Result {
 	var order_logistics_id int64
 	c.Params.Bind(&order_logistics_id, "id")
 
-	var order_logistics models.OrderLogisticsInfo
+	var order_logistics ddlc_models.OrderLogisticsInfo
 	if order_logistics_id != 0 {
 		has, err := db_session.Id(order_logistics_id).Get(&order_logistics)
 		core.HandleError(err)
@@ -469,7 +470,7 @@ func (c ErpOrderLogistics) Delete() revel.Result {
 	order_logistics_id_list := make([]int64, 0)
 	c.Params.Bind(&order_logistics_id_list, "id_list")
 
-	affected, err := db_session.In("id", order_logistics_id_list).Delete(new(models.OrderLogisticsInfo))
+	affected, err := db_session.In("id", order_logistics_id_list).Delete(new(ddlc_models.OrderLogisticsInfo))
 	core.HandleError(err)
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})
@@ -497,8 +498,8 @@ func (c ErpOrderLogistics) Export1() revel.Result {
 func (c ErpOrderLogistics) get_export_excel1(db_session *xorm.Session) *xlsx.File {
 
 	type order_logistics_view_item_t struct {
-		OrderLogistics   models.OrderLogisticsInfo    `xorm:"extends" json:"ol"`
-		Order            models.OrderInfo             `xorm:"extends" json:"o"`
+		OrderLogistics   ddlc_models.OrderLogisticsInfo    `xorm:"extends" json:"ol"`
+		Order            ddlc_models.OrderInfo             `xorm:"extends" json:"o"`
 		Stock            sppz_models.StockInfo             `xorm:"extends" json:"s"`
 		LogisticsCompany ddpz_models.LogisticsCompanyInfo  `xorm:"extends" json:"lc"`
 		LogisticsMode    ddpz_models.LogisticsModeInfo     `xorm:"extends" json:"lm"`
@@ -727,12 +728,12 @@ func (c ErpOrderLogistics) Export2() revel.Result {
 func (c ErpOrderLogistics) get_export_excel2(db_session *xorm.Session) *xlsx.File {
 
 	type order_logistics_view_item_t struct {
-		OrderLogistics       models.OrderLogisticsInfo          `xorm:"extends" json:"ol"`
-		Order                models.OrderInfo                   `xorm:"extends" json:"o"`
+		OrderLogistics       ddlc_models.OrderLogisticsInfo          `xorm:"extends" json:"ol"`
+		Order                ddlc_models.OrderInfo                   `xorm:"extends" json:"o"`
 		Stock                sppz_models.StockInfo                   `xorm:"extends" json:"s"`
 		LogisticsCompany     ddpz_models.LogisticsCompanyInfo        `xorm:"extends" json:"lc"`
 		LogisticsMode        ddpz_models.LogisticsModeInfo           `xorm:"extends" json:"lm"`
-		OrderShippingAddress models.OrderShippingAddressInfo    `xorm:"extends" json:"osa"`
+		OrderShippingAddress ddlc_models.OrderShippingAddressInfo    `xorm:"extends" json:"osa"`
 		ShopAccount          xtpz_models.ShopAccountInfo             `xorm:"extends" json:"sa"`
 	}
 

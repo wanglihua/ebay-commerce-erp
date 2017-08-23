@@ -1,15 +1,15 @@
 package order_item_service
 
 import (
-	"matrix/modules/erp/models"
 	"github.com/go-xorm/xorm"
 	"fmt"
 	"strings"
 	"matrix/core"
+	"matrix/modules/erp/models/ddlc_models"
 )
 
 // 获取订单列表中订单明细项是空的订单数目
-func Get_order_item_zero_count_in_order_list(order_list []models.OrderInfo, db_session *xorm.Session) int64 {
+func Get_order_item_zero_count_in_order_list(order_list []ddlc_models.OrderInfo, db_session *xorm.Session) int64 {
 
 	if len(order_list) == 0 {
 		panic("订单列表不能为空！")

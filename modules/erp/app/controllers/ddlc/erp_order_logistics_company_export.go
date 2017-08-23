@@ -19,6 +19,7 @@ import (
 	"matrix/modules/erp/models/xtpz_models"
 	"matrix/modules/erp/models/ddpz_models"
 	"matrix/modules/erp/models/sppz_models"
+	"matrix/modules/erp/models/ddlc_models"
 )
 
 type ErpOrderLogisticsCompanyExport struct {
@@ -61,8 +62,8 @@ func (c ErpOrderLogisticsCompanyExport) ExportOptionData() revel.Result {
 }
 
 type order_logistics_eparcel_view_item_t struct {
-	OrderLogistics models.OrderLogisticsInfo    `xorm:"extends" json:"ol"`
-	Order          models.OrderInfo             `xorm:"extends" json:"o"`
+	OrderLogistics ddlc_models.OrderLogisticsInfo    `xorm:"extends" json:"ol"`
+	Order          ddlc_models.OrderInfo             `xorm:"extends" json:"o"`
 	ShopAccount    xtpz_models.ShopAccountInfo       `xorm:"extends" json:"sa"`
 	sku_qty_loc    string                       `xorm:"-"`
 	loc_name       string                       `xorm:"-"`
@@ -75,8 +76,8 @@ func (s order_logistics_eparcel_view_item_slice) Swap(i, j int)      { s[i], s[j
 func (s order_logistics_eparcel_view_item_slice) Less(i, j int) bool { return s[i].loc_name < s[j].loc_name }
 
 type order_logistics_fastway_view_item_t struct {
-	OrderLogistics models.OrderLogisticsInfo    `xorm:"extends" json:"ol"`
-	Order          models.OrderInfo             `xorm:"extends" json:"o"`
+	OrderLogistics ddlc_models.OrderLogisticsInfo    `xorm:"extends" json:"ol"`
+	Order          ddlc_models.OrderInfo             `xorm:"extends" json:"o"`
 	LogisticsMode  ddpz_models.LogisticsModeInfo     `xorm:"extends" json:"lm"`
 	ShopAccount    xtpz_models.ShopAccountInfo       `xorm:"extends" json:"sa"`
 	sku_qty_loc    string                       `xorm:"-"`
@@ -90,8 +91,8 @@ func (s order_logistics_fastway_view_item_slice) Swap(i, j int)      { s[i], s[j
 func (s order_logistics_fastway_view_item_slice) Less(i, j int) bool { return s[i].loc_name < s[j].loc_name }
 
 type order_logistics_toll_view_item_t struct {
-	OrderLogistics models.OrderLogisticsInfo    `xorm:"extends" json:"ol"`
-	Order          models.OrderInfo             `xorm:"extends" json:"o"`
+	OrderLogistics ddlc_models.OrderLogisticsInfo    `xorm:"extends" json:"ol"`
+	Order          ddlc_models.OrderInfo             `xorm:"extends" json:"o"`
 	LogisticsMode  ddpz_models.LogisticsModeInfo     `xorm:"extends" json:"lm"`
 	ShopAccount    xtpz_models.ShopAccountInfo       `xorm:"extends" json:"sa"`
 	sku_qty_loc    string                       `xorm:"-"`
@@ -715,7 +716,7 @@ func get_fastway_packaging_code(logistics_mode ddpz_models.LogisticsModeInfo) st
 	}
 }
 
-func get_toll_packaging_code(order_logistics models.OrderLogisticsInfo) string {
+func get_toll_packaging_code(order_logistics ddlc_models.OrderLogisticsInfo) string {
 	/*
 		包裹类型    代表
 		C         TOLL < 25KG
@@ -739,7 +740,7 @@ func get_toll_packaging_code(order_logistics models.OrderLogisticsInfo) string {
 	}
 }
 
-func get_toll_service_id(stock_code int, order_shipping_address models.OrderShippingAddressInfo) string {
+func get_toll_service_id(stock_code int, order_shipping_address ddlc_models.OrderShippingAddressInfo) string {
 	var service_id string = ""
 	var postalcode_rune_list = []rune(order_shipping_address.PostalCode)
 	if len(postalcode_rune_list) > 0 {

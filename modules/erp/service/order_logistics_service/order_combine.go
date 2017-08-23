@@ -9,6 +9,8 @@ import (
 	"matrix/core"
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/order_history_service"
+	"matrix/modules/erp/models/ddlc_models"
+	"matrix/modules/erp/models/ddpz_models"
 )
 
 // 合并订单
@@ -96,7 +98,7 @@ SET order_first.adjustment_amount     = s.adjustment_amount_sum,
     order_first.total_amount_rmb      = s.total_amount_sum * order_first.exchange_rate,
     order_first.type_id               = %d
 WHERE id = %d`
-		sql_sum_amount = fmt.Sprintf(sql_sum_amount, order_ids.OrderIds, models.ORDER_TYPE_HBDD, first_order_id)
+		sql_sum_amount = fmt.Sprintf(sql_sum_amount, order_ids.OrderIds, ddpz_models.ORDER_TYPE_HBDD, first_order_id)
 		_, err := db_session.Exec(sql_sum_amount)
 		core.HandleError(err)
 
@@ -140,11 +142,11 @@ INSERT INTO erp_order_shipping_address (order_id, name, street1, street2, city_n
 		core.HandleError(err)
 
 		// 订单历史
-		var first_order models.OrderInfo
+		var first_order ddlc_models.OrderInfo
 		_, err = db_session.Id(order_id_list[0]).Get(&first_order)
 		core.HandleError(err)
 
-		var combined_order_list = make([]models.OrderInfo, 0)
+		var combined_order_list = make([]ddlc_models.OrderInfo, 0)
 		core.HandleError(db_session.In("id", order_id_list[1:]).Find(&combined_order_list))
 
 		var combined_order_code_list = make([]string, 0)

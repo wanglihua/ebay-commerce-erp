@@ -16,10 +16,12 @@ import (
 	"matrix/modules/erp/service/status_service"
 	"matrix/modules/erp/service/stock_service"
 	"github.com/revel/revel"
+	"matrix/modules/erp/models/ddlc_models"
+	"matrix/modules/erp/models/ddpz_models"
 )
 
 type Order_view_item_t struct {
-	Order                models.OrderInfo                  `xorm:"extends" json:"o"`
+	Order                ddlc_models.OrderInfo                  `xorm:"extends" json:"o"`
 	TypeName             string                            `json:"type_name"`
 	HoldTypeName         string                            `json:"hold_type_name"`
 	PlatformName         string                            `json:"platform_name"`
@@ -27,12 +29,12 @@ type Order_view_item_t struct {
 	ShopName             string                            `json:"shop_name"`
 	StatusName           string                            `json:"status_name"`
 	StockName            string                            `json:"stock_name"`
-	OrderLogistics       models.OrderLogisticsInfo         `json:"ol"`
-	OrderShippingAddress models.OrderShippingAddressInfo   `json:"ad"`
+	OrderLogistics       ddlc_models.OrderLogisticsInfo         `json:"ol"`
+	OrderShippingAddress ddlc_models.OrderShippingAddressInfo   `json:"ad"`
 	CompanyName          string                            `json:"company_name"`
 	ModeName             string                            `json:"mode_name"`
 	FeeDiff              float64                           `json:"fee_diff"`
-	OrderTag             models.OrderTagInfo               `json:"order_tag"`
+	OrderTag             ddpz_models.OrderTagInfo               `json:"order_tag"`
 }
 
 func Get_order_data_list(db_session *xorm.Session, filter string, order string, offset int64, limit int64) ([]Order_view_item_t, int64) {
@@ -92,7 +94,7 @@ FROM erp_order o
 	var stock_id_name_map = stock_service.Get_stock_id_name_map(stock_id_set.List(), db_session)
 	var order_shipping_address_id_info_map = order_shipping_address_service.Get_order_shipping_address_id_info_map(address_id_set.List(), db_session)
 
-	var order_logistics_list = make([]models.OrderLogisticsInfo, 0)
+	var order_logistics_list = make([]ddlc_models.OrderLogisticsInfo, 0)
 
 	if len(order_id_list) != 0 {
 		err = db_session.In("order_id", order_id_list).Find(&order_logistics_list)
@@ -101,7 +103,7 @@ FROM erp_order o
 
 	var company_id_set = collections.NewIntSet()
 	var mode_id_set = collections.NewIntSet()
-	var order_logistics_id_info_map = make(map[int64]models.OrderLogisticsInfo)
+	var order_logistics_id_info_map = make(map[int64]ddlc_models.OrderLogisticsInfo)
 	for _, order_logistics := range order_logistics_list {
 		order_logistics_id_info_map[order_logistics.OrderId] = order_logistics
 		company_id_set.Add(order_logistics.CompanyId)
@@ -164,7 +166,7 @@ FROM erp_order o
 		}
 
 		if order.Order.TagId != 0 {
-			var order_tag models.OrderTagInfo
+			var order_tag ddpz_models.OrderTagInfo
 			_, err := db_session.Id(order.Order.TagId).Get(&order_tag)
 			core.HandleError(err)
 
@@ -227,8 +229,8 @@ WHERE p.name like '%%%s%%'`
 	return order_id_list
 }
 
-func Get_paid_order_list(db_session *xorm.Session) []models.OrderInfo {
-	var paid_order_list = make([]models.OrderInfo, 0)
+func Get_paid_order_list(db_session *xorm.Session) []ddlc_models.OrderInfo {
+	var paid_order_list = make([]ddlc_models.OrderInfo, 0)
 	err := db_session.Sql(fmt.Sprintf("SELECT * FROM erp_order o WHERE o.status_id = %d ORDER BY o.paid_time ASC, o.id ASC", models.ORDER_STATUS_YZF)).Find(&paid_order_list)
 	core.HandleError(err)
 
@@ -288,7 +290,7 @@ WHERE oi.order_id = %d`
 	core.HandleError(err)
 
 	if len(order_product_qty_list) == 0 {
-		var order models.OrderInfo
+		var order ddlc_models.OrderInfo
 		_, err := db_session.Id(order_id).Get(&order)
 		core.HandleError(err)
 
@@ -299,8 +301,8 @@ WHERE oi.order_id = %d`
 }
 
 // PayPal地址优先，再接下来是 eBay 地址，再是其他地址
-func Get_order_shipping_address(order_id int64, db_session *xorm.Session) models.OrderShippingAddressInfo {
-	var order_shipping_address_list = make([]models.OrderShippingAddressInfo, 0)
+func Get_order_shipping_address(order_id int64, db_session *xorm.Session) ddlc_models.OrderShippingAddressInfo {
+	var order_shipping_address_list = make([]ddlc_models.OrderShippingAddressInfo, 0)
 	err := db_session.Where(fmt.Sprintf("order_id = %d", order_id)).OrderBy("address_owner DESC").Find(&order_shipping_address_list)
 	core.HandleError(err)
 
@@ -320,5 +322,5 @@ func Get_order_shipping_address(order_id int64, db_session *xorm.Session) models
 		return order_shipping_address_list[0]
 	}
 
-	return models.OrderShippingAddressInfo{} //如果前面的都不成立，就返回一个默认的
+	return ddlc_models.OrderShippingAddressInfo{} //如果前面的都不成立，就返回一个默认的
 }

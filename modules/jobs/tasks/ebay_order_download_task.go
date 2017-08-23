@@ -18,6 +18,8 @@ import (
 	"matrix/modules/erp/service/product_store_item_service"
 	"matrix/modules/erp/service/order_history_service"
 	"matrix/modules/erp/models/xtpz_models"
+	"matrix/modules/erp/models/ddlc_models"
+	"matrix/modules/erp/models/ddpz_models"
 )
 
 type EBayOrderDownloadTask struct {
@@ -109,7 +111,7 @@ func (t EBayOrderDownloadTask) Run() {
 					order_code = order_code_split_str_list[1]
 				}
 
-				var order_in_db models.OrderInfo
+				var order_in_db ddlc_models.OrderInfo
 				has_order, err := db_session.Where("code = ?", order_code).Get(&order_in_db)
 				core.HandleError(err)
 
@@ -122,7 +124,7 @@ func (t EBayOrderDownloadTask) Run() {
 				_, err = db_session.Id(shop_account_config.APIConfig.ShopId).Get(&shop)
 				core.HandleError(err)
 
-				order_in_db.TypeId = models.ORDER_TYPE_ZCDD //订单类型为正常下载订单
+				order_in_db.TypeId = ddpz_models.ORDER_TYPE_ZCDD //订单类型为正常下载订单
 
 				update_col_list := []string{"type_id", "ebay_status", "status_id"}
 
@@ -292,7 +294,7 @@ func (t EBayOrderDownloadTask) Run() {
 
 					// 设置的账户里面和卖家账户匹配的，就设置成为Hold订单
 					if seller_email_in_list == false {
-						order_in_db.HoldTypeId = core.MakeNullInt(models.ORDER_HOLD_TYPE_SELLER_PAYPAL_MISMATCH, true)
+						order_in_db.HoldTypeId = core.MakeNullInt(ddpz_models.ORDER_HOLD_TYPE_SELLER_PAYPAL_MISMATCH, true)
 					}
 				}
 				*/
@@ -352,7 +354,7 @@ func (t EBayOrderDownloadTask) Run() {
 							product_sku := product_bind_sku.Sku
 							product_sku_count := product_bind_sku.Count
 
-							var order_item models.OrderItemInfo
+							var order_item ddlc_models.OrderItemInfo
 
 							has_order_item, err := db_session.Where(fmt.Sprintf("order_id = %d and item_sku = '%s'", order_id, product_sku)).Get(&order_item)
 							core.HandleError(err)
@@ -405,7 +407,7 @@ func (t EBayOrderDownloadTask) Run() {
 						}
 
 					} else {
-						var order_item models.OrderItemInfo
+						var order_item ddlc_models.OrderItemInfo
 
 						has_order_item, err := db_session.Where(fmt.Sprintf("order_id = %d and item_sku = '%s'", order_id, item_sku)).Get(&order_item)
 						core.HandleError(err)
@@ -456,7 +458,7 @@ func (t EBayOrderDownloadTask) Run() {
 
 				if order_download.ShippingAddress.AddressOwner != "" && order_download.ShippingAddress.AddressID != "" {
 					//新增或更新送货地址
-					var order_shipping_address models.OrderShippingAddressInfo
+					var order_shipping_address ddlc_models.OrderShippingAddressInfo
 					has_order_shipping_address, err := db_session.Where(fmt.Sprintf("order_id = %d AND address_owner = '%s'", order_id, order_download.ShippingAddress.AddressOwner)).Get(&order_shipping_address) // 收货地址
 					core.HandleError(err)
 

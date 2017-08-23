@@ -9,11 +9,12 @@ import (
 	"matrix/modules/erp/models/kcgl_models"
 	"matrix/modules/erp/models/xtpz_models"
 	"matrix/modules/erp/models/sppz_models"
+	"matrix/modules/erp/models/ddlc_models"
 )
 
 type Order_item_view_item_t struct {
-	OrderItem   models.OrderItemInfo       `xorm:"extends" json:"oi"`
-	Order       models.OrderInfo           `xorm:"extends" json:"o"`
+	OrderItem   ddlc_models.OrderItemInfo       `xorm:"extends" json:"oi"`
+	Order       ddlc_models.OrderInfo           `xorm:"extends" json:"o"`
 	ShopAccount xtpz_models.ShopAccountInfo     `xorm:"extends" json:"sa"`
 	Platform    xtpz_models.ShopAccountInfo     `xorm:"extends" json:"pf"`
 	Product     kcgl_models.ProductInfo         `xorm:"extends" json:"p"`

@@ -15,6 +15,8 @@ import (
 	"time"
 	"matrix/modules/erp/service/order_history_service"
 	"matrix/modules/erp/models/sppz_models"
+	"matrix/modules/erp/models/ddpz_models"
+	"matrix/modules/erp/models/ddlc_models"
 )
 
 type ErpOrderProcessedHold struct {
@@ -52,8 +54,8 @@ func (c ErpOrderProcessedHold) PageData() revel.Result {
 	var batch_code_list = order_import_batch_service.Get_order_import_batch_code_list(models.ORDER_STATUS_PROCESSED_HOLD, db_session)
 
 	// hold类型列表
-	var exclude_hold = fmt.Sprintf("%d,%d,%d,%d", models.ORDER_HOLD_TYPE_ENVELOPE, models.ORDER_HOLD_TYPE_EXPRESS, models.ORDER_HOLD_TYPE_INTERNATIONAL, models.ORDER_HOLD_TYPE_PICK_UP)
-	var hold_type_list = make([]models.OrderHoldTypeInfo, 0)
+	var exclude_hold = fmt.Sprintf("%d,%d,%d,%d", ddpz_models.ORDER_HOLD_TYPE_ENVELOPE, ddpz_models.ORDER_HOLD_TYPE_EXPRESS, ddpz_models.ORDER_HOLD_TYPE_INTERNATIONAL, ddpz_models.ORDER_HOLD_TYPE_PICK_UP)
+	var hold_type_list = make([]ddpz_models.OrderHoldTypeInfo, 0)
 	err := db_session.Where(fmt.Sprintf("id NOT IN(%s)", exclude_hold)).OrderBy("ord ASC").Find(&hold_type_list)
 	core.HandleError(err)
 
@@ -61,7 +63,7 @@ func (c ErpOrderProcessedHold) PageData() revel.Result {
 	err = db_session.Where(fmt.Sprintf("stock_type_id = %d", sppz_models.STOCK_TYPE_AU)).Find(&au_stock_list)
 	core.HandleError(err)
 
-	var order_tag_list = make([]models.OrderTagInfo, 0)
+	var order_tag_list = make([]ddpz_models.OrderTagInfo, 0)
 	err = db_session.OrderBy("name ASC").Find(&order_tag_list)
 	core.HandleError(err)
 
@@ -167,7 +169,7 @@ func (c ErpOrderProcessedHold) DaiPeiHuo() revel.Result {
 	order_id_list := make([]int64, 0)
 	c.Params.Bind(&order_id_list, "id_list")
 
-	var order_list = make([]models.OrderInfo, 0)
+	var order_list = make([]ddlc_models.OrderInfo, 0)
 	err := db_session.In("id", order_id_list).Find(&order_list)
 	core.HandleError(err)
 

@@ -8,9 +8,9 @@ import (
 	"github.com/revel/revel"
 	"github.com/tealeg/xlsx"
 	"matrix/core"
-	"matrix/modules/erp/models"
 	"github.com/go-xorm/xorm"
 	"matrix/modules/erp/service/order_history_service"
+	"matrix/modules/erp/models/ddlc_models"
 )
 
 type ErpOrderLogisticsImport struct {
@@ -41,7 +41,7 @@ func (c ErpOrderLogisticsImport) ImportTrackingNumber() revel.Result {
 		OrderNumber     string  `json:"order_number"`
 		TrackingNumber  string  `json:"tracking_number"`
 		ErrorMessage    string  `json:"error_message"`
-		order_logistics models.OrderLogisticsInfo
+		order_logistics ddlc_models.OrderLogisticsInfo
 	}
 
 	tracking_number_import_list := make([]tracking_number_import_t, 0)
@@ -106,7 +106,7 @@ func (c ErpOrderLogisticsImport) ImportTrackingNumber() revel.Result {
 			WHERE o.full_tran_id = ''
 		*/
 
-		var order_logistics models.OrderLogisticsInfo
+		var order_logistics ddlc_models.OrderLogisticsInfo
 		var sql_get_order_logistics = `SELECT ol.* FROM erp_order o
 			    INNER JOIN erp_order_logistics ol ON ol.order_id = o.id
 			WHERE o.full_tran_id = '%s'`
@@ -145,7 +145,7 @@ func (c ErpOrderLogisticsImport) ImportTrackingNumber() revel.Result {
 		_, err := db_session.Id(order_logistics.Id).Cols("tracking_num").Update(&order_logistics)
 		core.HandleError(err)
 
-		var order models.OrderInfo
+		var order ddlc_models.OrderInfo
 		order.WaybillNumber = order_import.TrackingNumber
 		_, err = db_session.Where(fmt.Sprintf("full_tran_id = '%s'", order_import.OrderNumber)).Cols("waybill_number").Update(&order)
 		core.HandleError(err)
@@ -178,7 +178,7 @@ func (c ErpOrderLogisticsImport) ImportActualFee() revel.Result {
 		ActualFee       float64  `json:"actual_fee"`
 		ErrorMessage    string   `json:"error_message"`
 		ActualFeeStr    string   `json:"actual_fee_str"`
-		order_logistics models.OrderLogisticsInfo
+		order_logistics ddlc_models.OrderLogisticsInfo
 	}
 
 	actual_fee_import_list := make([]actual_fee_import_t, 0)
@@ -244,7 +244,7 @@ func (c ErpOrderLogisticsImport) ImportActualFee() revel.Result {
 			WHERE o.full_tran_id = ''
 		*/
 
-		var order_logistics models.OrderLogisticsInfo
+		var order_logistics ddlc_models.OrderLogisticsInfo
 		var sql_get_order_logistics = `SELECT ol.* FROM erp_order o
 			    INNER JOIN erp_order_logistics ol ON ol.order_id = o.id
 			WHERE o.full_tran_id = '%s'`
@@ -291,7 +291,7 @@ func (c ErpOrderLogisticsImport) ImportActualFee() revel.Result {
 		_, err := db_session.Id(order_logistics.Id).Cols("actual_fee").Update(&order_logistics)
 		core.HandleError(err)
 
-		var order models.OrderInfo
+		var order ddlc_models.OrderInfo
 		_, err = db_session.Id(order_logistics.OrderId).Get(&order)
 		core.HandleError(err)
 

@@ -8,8 +8,8 @@ import (
 	"matrix/core"
 	"matrix/modules/auth/pass_res"
 	"matrix/modules/auth/service/pass_service"
-	"matrix/modules/erp/models"
 	"matrix/modules/erp/setting"
+	"matrix/modules/erp/models/ddpz_models"
 )
 
 type ErpOrderHoldType struct {
@@ -40,12 +40,12 @@ func (c ErpOrderHoldType) ListData() revel.Result {
 		data_query = *data_query.Asc("id")
 	}
 
-	order_hold_type_list := make([]models.OrderHoldTypeInfo, 0, limit)
+	order_hold_type_list := make([]ddpz_models.OrderHoldTypeInfo, 0, limit)
 	err := data_query.Limit(limit, offset).Find(&order_hold_type_list)
 	core.HandleError(err)
 
 	count_query := *query
-	count, err := count_query.Count(new(models.OrderHoldTypeInfo))
+	count, err := count_query.Count(new(ddpz_models.OrderHoldTypeInfo))
 	core.HandleError(err)
 
 	return c.RenderJson(core.GridResult{
@@ -55,7 +55,7 @@ func (c ErpOrderHoldType) ListData() revel.Result {
 }
 
 type OrderHoldTypeDetailForm struct {
-	OrderHoldType models.OrderHoldTypeInfo `json:"order_hold_type"`
+	OrderHoldType ddpz_models.OrderHoldTypeInfo `json:"order_hold_type"`
 }
 
 func (f *OrderHoldTypeDetailForm) IsCreate() bool {
@@ -78,7 +78,7 @@ func (c ErpOrderHoldType) DetailData() revel.Result {
 	var order_hold_type_id int64
 	c.Params.Bind(&order_hold_type_id, "id")
 
-	var order_hold_type models.OrderHoldTypeInfo
+	var order_hold_type ddpz_models.OrderHoldTypeInfo
 	if order_hold_type_id != 0 {
 		has, err := db_session.Id(order_hold_type_id).Get(&order_hold_type)
 		core.HandleError(err)
@@ -110,26 +110,26 @@ func (c ErpOrderHoldType) Save() revel.Result {
 
 	var affected int64
 	if detail_form.IsCreate() {
-		name_count, err := db_session.Where("name = ?", order_hold_type.Name).Count(new(models.OrderHoldTypeInfo))
+		name_count, err := db_session.Where("name = ?", order_hold_type.Name).Count(new(ddpz_models.OrderHoldTypeInfo))
 		core.HandleError(err)
 		if name_count != 0 {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，名称已存在！" })
+			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，名称已存在！"})
 		}
 
 		affected, err = db_session.Insert(&order_hold_type)
 		core.HandleError(err)
 	} else {
-		name_count, err := db_session.Where("id <> ? and name = ?", order_hold_type.Id, order_hold_type.Name).Count(new(models.OrderHoldTypeInfo))
+		name_count, err := db_session.Where("id <> ? and name = ?", order_hold_type.Id, order_hold_type.Name).Count(new(ddpz_models.OrderHoldTypeInfo))
 		core.HandleError(err)
 		if name_count != 0 {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，名称已存在！" })
+			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，名称已存在！"})
 		}
 
 		affected, err = db_session.Id(order_hold_type.Id).Update(&order_hold_type)
 		core.HandleError(err)
 
 		if affected == 0 {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！" })
+			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！"})
 		}
 	}
 

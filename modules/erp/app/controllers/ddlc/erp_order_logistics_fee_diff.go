@@ -7,7 +7,6 @@ import (
 	"matrix/core"
 	"matrix/modules/auth/pass_res"
 	"matrix/modules/auth/service/pass_service"
-	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/order_import_batch_service"
 	"matrix/modules/erp/service/stock_service"
 	"matrix/modules/erp/setting"
@@ -20,6 +19,7 @@ import (
 	"github.com/tealeg/xlsx"
 	"strings"
 	"matrix/modules/erp/models/ddpz_models"
+	"matrix/modules/erp/models/ddlc_models"
 )
 
 type ErpOrderLogisticsFeeDiff struct {
@@ -347,8 +347,8 @@ func (c ErpOrderLogisticsFeeDiff) get_export_excel(db_session *xorm.Session) *xl
 }
 
 type order_logistics_view_item_t struct {
-	OrderLogistics models.OrderLogisticsInfo  `xorm:"extends" json:"ol"`
-	Order          models.OrderInfo           `xorm:"extends" json:"o"`
+	OrderLogistics ddlc_models.OrderLogisticsInfo  `xorm:"extends" json:"ol"`
+	Order          ddlc_models.OrderInfo           `xorm:"extends" json:"o"`
 	StockName      string                     `json:"stock_name"`
 	CompanyName    string                     `json:"company_name"`
 	ModeName       string                     `json:"mode_name"`

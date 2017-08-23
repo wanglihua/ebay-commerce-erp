@@ -5,14 +5,14 @@ import (
 
 	"github.com/go-xorm/xorm"
 	"matrix/core"
-	"matrix/modules/erp/models"
 	"github.com/revel/revel"
 	"matrix/modules/erp/service/inventory_history_service"
 	"matrix/modules/erp/models/kcgl_models"
+	"matrix/modules/erp/models/ddlc_models"
 )
 
 // 扣减订单库存
-func Take_order_inventory(order models.OrderInfo, db_session *xorm.Session) bool {
+func Take_order_inventory(order ddlc_models.OrderInfo, db_session *xorm.Session) bool {
 
 	/*
 	SELECT oi.item_product_id AS product_id, oi.quantity AS quantity FROM erp_order_item oi WHERE oi.order_id = 0;

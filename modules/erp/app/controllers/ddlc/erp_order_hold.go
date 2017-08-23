@@ -15,6 +15,8 @@ import (
 	"time"
 	"matrix/modules/erp/service/order_history_service"
 	"matrix/modules/erp/models/sppz_models"
+	"matrix/modules/erp/models/ddpz_models"
+	"matrix/modules/erp/models/ddlc_models"
 )
 
 type ErpOrderHold struct {
@@ -52,7 +54,7 @@ func (c ErpOrderHold) PageData() revel.Result {
 	var batch_code_list = order_import_batch_service.Get_order_import_batch_code_list(models.ORDER_STATUS_HOLD, db_session)
 
 	// hold类型列表
-	var hold_type_list = make([]models.OrderHoldTypeInfo, 0)
+	var hold_type_list = make([]ddpz_models.OrderHoldTypeInfo, 0)
 	err := db_session.OrderBy("ord ASC").Find(&hold_type_list)
 	core.HandleError(err)
 
@@ -60,7 +62,7 @@ func (c ErpOrderHold) PageData() revel.Result {
 	err = db_session.Where(fmt.Sprintf("stock_type_id = %d", sppz_models.STOCK_TYPE_AU)).Find(&au_stock_list)
 	core.HandleError(err)
 
-	var order_tag_list = make([]models.OrderTagInfo, 0)
+	var order_tag_list = make([]ddpz_models.OrderTagInfo, 0)
 	err = db_session.OrderBy("name ASC").Find(&order_tag_list)
 	core.HandleError(err)
 
@@ -136,7 +138,7 @@ func (c ErpOrderHold) ListData() revel.Result {
 	if hold_type_id != 0 {
 		filter = core.SqlAnd(filter, fmt.Sprintf("o.hold_type_id = %d", hold_type_id))
 	} else { // 如果没选Hold类型，就不显示那四个特殊个Hold类型
-		filter = core.SqlAnd(filter, fmt.Sprintf("o.hold_type_id <> %d AND o.hold_type_id <> %d AND o.hold_type_id <> %d AND o.hold_type_id <> %d", models.ORDER_HOLD_TYPE_INTERNATIONAL, models.ORDER_HOLD_TYPE_EXPRESS, models.ORDER_HOLD_TYPE_PICK_UP, models.ORDER_HOLD_TYPE_ENVELOPE))
+		filter = core.SqlAnd(filter, fmt.Sprintf("o.hold_type_id <> %d AND o.hold_type_id <> %d AND o.hold_type_id <> %d AND o.hold_type_id <> %d", ddpz_models.ORDER_HOLD_TYPE_INTERNATIONAL, ddpz_models.ORDER_HOLD_TYPE_EXPRESS, ddpz_models.ORDER_HOLD_TYPE_PICK_UP, ddpz_models.ORDER_HOLD_TYPE_ENVELOPE))
 	}
 
 	if batch_code != 0 {
@@ -169,17 +171,17 @@ func (c ErpOrderHold) Processed() revel.Result {
 	order_id_list := make([]int64, 0)
 	c.Params.Bind(&order_id_list, "id_list")
 
-	var order_list = make([]models.OrderInfo, 0)
+	var order_list = make([]ddlc_models.OrderInfo, 0)
 	err := db_session.In("id", order_id_list).Find(&order_list)
 	core.HandleError(err)
 
 	for _, order := range order_list {
 		if order.StatusId != models.ORDER_STATUS_HOLD ||
 			( order.StatusId == models.ORDER_STATUS_HOLD &&
-				(order.HoldTypeId.Int64 == models.ORDER_HOLD_TYPE_ENVELOPE ||
-					order.HoldTypeId.Int64 == models.ORDER_HOLD_TYPE_EXPRESS ||
-					order.HoldTypeId.Int64 == models.ORDER_HOLD_TYPE_INTERNATIONAL ||
-					order.HoldTypeId.Int64 == models.ORDER_HOLD_TYPE_PICK_UP)) {
+				(order.HoldTypeId.Int64 == ddpz_models.ORDER_HOLD_TYPE_ENVELOPE ||
+					order.HoldTypeId.Int64 == ddpz_models.ORDER_HOLD_TYPE_EXPRESS ||
+					order.HoldTypeId.Int64 == ddpz_models.ORDER_HOLD_TYPE_INTERNATIONAL ||
+					order.HoldTypeId.Int64 == ddpz_models.ORDER_HOLD_TYPE_PICK_UP)) {
 			return c.RenderJson(map[string]interface{}{
 				"success": false,
 				"message": "订单当前状态或Hold类型不能搬至已处理Hold状态！",

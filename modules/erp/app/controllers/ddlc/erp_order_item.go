@@ -8,10 +8,10 @@ import (
 	"matrix/core"
 	"matrix/modules/auth/pass_res"
 	"matrix/modules/auth/service/pass_service"
-	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/order_service"
 	"matrix/modules/erp/service/inventory_service"
 	"matrix/modules/erp/models/kcgl_models"
+	"matrix/modules/erp/models/ddlc_models"
 )
 
 type ErpOrderItem struct {
@@ -29,7 +29,7 @@ func (c ErpOrderItem) DetailData() revel.Result {
 
 	var db_session = c.DbSession
 
-	var order_item models.OrderItemInfo
+	var order_item ddlc_models.OrderItemInfo
 	_, err := db_session.Id(item_id).Get(&order_item)
 	core.HandleError(err)
 
@@ -63,7 +63,7 @@ func (c ErpOrderItem) Save() revel.Result {
 	core.HandleError(err)
 
 	// 判断订单当前状态是不是可以修改
-	var order models.OrderInfo
+	var order ddlc_models.OrderInfo
 	_, err = db_session.Id(order_item_form.OrderId).Get(&order)
 	core.HandleError(err)
 
@@ -82,7 +82,7 @@ func (c ErpOrderItem) Save() revel.Result {
 	}
 
 	// 获得当前订单的仓库
-	var order_logistics models.OrderLogisticsInfo
+	var order_logistics ddlc_models.OrderLogisticsInfo
 	_, err = db_session.Where("order_id = ?", order.Id).Get(&order_logistics)
 	core.HandleError(err)
 
@@ -100,7 +100,7 @@ func (c ErpOrderItem) Save() revel.Result {
 		})
 	}
 
-	var order_item models.OrderItemInfo
+	var order_item ddlc_models.OrderItemInfo
 	if order_item_form.ItemId != 0 {
 		_, err = db_session.Id(order_item_form.ItemId).Get(&order_item)
 		core.HandleError(err)
@@ -145,11 +145,11 @@ func (c ErpOrderItem) Delete() revel.Result {
 	var db_session = c.DbSession
 
 	//判断订单当前状态是不是可以修改
-	var order_item models.OrderItemInfo
+	var order_item ddlc_models.OrderItemInfo
 	_, err := db_session.Id(item_id).Get(&order_item)
 	core.HandleError(err)
 
-	var order models.OrderInfo
+	var order ddlc_models.OrderInfo
 	_, err = db_session.Id(order_item.OrderId).Get(&order)
 	core.HandleError(err)
 
@@ -160,7 +160,7 @@ func (c ErpOrderItem) Delete() revel.Result {
 		})
 	}
 
-	_, err = db_session.Id(item_id).Delete(new(models.OrderItemInfo))
+	_, err = db_session.Id(item_id).Delete(new(ddlc_models.OrderItemInfo))
 	core.HandleError(err)
 
 	return c.RenderJson(map[string]interface{}{

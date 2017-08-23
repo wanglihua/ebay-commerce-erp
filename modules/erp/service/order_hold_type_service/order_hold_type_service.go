@@ -3,14 +3,13 @@ package order_hold_type_service
 import (
 	"github.com/go-xorm/xorm"
 	"matrix/core"
-	"matrix/modules/erp/models"
+	"matrix/modules/erp/models/ddpz_models"
 )
 
-func Get_order_hold_type_id_name_map( db_session *xorm.Session) map[int64]string {
+func Get_order_hold_type_id_name_map(db_session *xorm.Session) map[int64]string {
 	var hold_type_id_name_map = make(map[int64]string)
 
-
-	var hold_type_list = make([]models.OrderHoldTypeInfo, 0)
+	var hold_type_list = make([]ddpz_models.OrderHoldTypeInfo, 0)
 	err := db_session.Find(&hold_type_list)
 	core.HandleError(err)
 

@@ -6,19 +6,19 @@ import (
 	"strings"
 	"github.com/go-xorm/xorm"
 	"github.com/revel/revel"
-	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/pick_fee_service"
 	"fmt"
 	"matrix/core"
 	"time"
 	"runtime/debug"
 	"matrix/modules/erp/models/ddpz_models"
+	"matrix/modules/erp/models/ddlc_models"
 )
 
 var db_driver string
 var db_url string
 
-func (p_ol *OrderLogisticsService) match_logistics_mode_logic(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t) {
+func (p_ol *OrderLogisticsService) match_logistics_mode_logic(p_order *ddlc_models.OrderInfo, p_order_logistics_data *order_logistics_data_t) {
 
 	defer func() {
 		if err := recover(); err != nil {
@@ -379,7 +379,7 @@ func (p_ol *OrderLogisticsService) match_logistics_mode_logic(p_order *models.Or
 
 func save_order_logistics_logic(p_ol *OrderLogisticsService, match_result match_logistics_mode_result, db_session *xorm.Session) {
 	// 匹配成功，记录匹配成功数据
-	var order_logistics_logic models.OrderLogisticsLogicInfo
+	var order_logistics_logic ddlc_models.OrderLogisticsLogicInfo
 	has, err := db_session.Where(fmt.Sprintf("order_id = %d", match_result.order_id)).Get(&order_logistics_logic)
 	core.HandleError(err)
 
@@ -412,7 +412,7 @@ func save_order_logistics_logic(p_ol *OrderLogisticsService, match_result match_
 
 func save_special_hold_order_logistics_logic(p_ol *OrderLogisticsService, order_id int64, p_order_logistics_data *order_logistics_data_t, db_session *xorm.Session) {
 
-	var order_logistics_logic models.OrderLogisticsLogicInfo
+	var order_logistics_logic ddlc_models.OrderLogisticsLogicInfo
 	has, err := db_session.Where("order_id = ?", order_id).Get(&order_logistics_logic)
 	core.HandleError(err)
 

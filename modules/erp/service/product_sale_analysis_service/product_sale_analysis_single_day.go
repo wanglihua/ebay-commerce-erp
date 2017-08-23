@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/models/kcgl_models"
+	"matrix/modules/erp/models/ddlc_models"
 )
 
 func ProductSaleAnalyzeSingleDay() {
@@ -136,7 +137,7 @@ ORDER BY oi.item_product_id ASC;`
 			for _, product_sale := range product_sale_list {
 				// 实际仓统计 stock_id != 0
 
-				var order_logistics models.OrderLogisticsInfo
+				var order_logistics ddlc_models.OrderLogisticsInfo
 				has, err := db_session.Where(fmt.Sprintf("order_id = %d", product_sale.OrderId)).Get(&order_logistics)
 				core.HandleError(err)
 
@@ -200,7 +201,7 @@ ORDER BY oi.item_product_id ASC;`
 			for _, product_sale := range product_sale_list {
 				// 逻辑仓统计 stock_id != 0
 
-				var order_logistics_logic models.OrderLogisticsLogicInfo
+				var order_logistics_logic ddlc_models.OrderLogisticsLogicInfo
 				has, err := db_session.Where(fmt.Sprintf("order_id = %d", product_sale.OrderId)).Get(&order_logistics_logic)
 				core.HandleError(err)
 

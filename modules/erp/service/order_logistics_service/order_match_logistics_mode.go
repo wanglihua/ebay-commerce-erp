@@ -8,18 +8,18 @@ import (
 	"github.com/go-xorm/xorm"
 	"github.com/revel/revel"
 	"matrix/core"
-	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/pick_fee_service"
 	"matrix/modules/erp/models/ddpz_models"
+	"matrix/modules/erp/models/ddlc_models"
 )
 
 /*
-func (p_ol *OrderLogistics) match_logistics_mode(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, perfer_stock_id int64, db_session *xorm.Session) (success_return bool, order_logistics_return models.OrderLogisticsInfo) {
+func (p_ol *OrderLogistics) match_logistics_mode(p_order *ddlc_models.OrderInfo, p_order_logistics_data *order_logistics_data_t, perfer_stock_id int64, db_session *xorm.Session) (success_return bool, order_logistics_return ddlc_models.OrderLogisticsInfo) {
 	return p_ol.match_logistics_mode_with_prefer_stock(p_order, p_order_logistics_data, 0, db_session)
 }
 */
 
-func (p_ol *OrderLogisticsService) match_logistics_mode_with_option(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, match_option Match_option_t, db_session *xorm.Session) (success_return bool, order_logistics_return models.OrderLogisticsInfo, is_envelope_hold_return bool) {
+func (p_ol *OrderLogisticsService) match_logistics_mode_with_option(p_order *ddlc_models.OrderInfo, p_order_logistics_data *order_logistics_data_t, match_option Match_option_t, db_session *xorm.Session) (success_return bool, order_logistics_return ddlc_models.OrderLogisticsInfo, is_envelope_hold_return bool) {
 
 	// 在这里面只考虑最佳仓库的库存情况，次佳仓库有货的情况，别的地方已经考虑并 hold
 
@@ -76,7 +76,7 @@ func (p_ol *OrderLogisticsService) match_logistics_mode_with_option(p_order *mod
 
 		// 如果指定了 物流方式，并且指定的物流方式是 信封， 就设置为信封Hold，并且匹配信封费率
 		if match_option.Prefer_mode_id != 0 && match_option.Prefer_mode_id == logistics_mode.Id && logistics_mode.TypeId == ddpz_models.LOGISTICS_MODE_TYPE_ENVELOPE {
-			p_ol.update_order_to_hold_type(p_order, models.ORDER_HOLD_TYPE_ENVELOPE, db_session)
+			p_ol.update_order_to_hold_type(p_order, ddpz_models.ORDER_HOLD_TYPE_ENVELOPE, db_session)
 			var match_envelope_success = p_ol.match_envelope_fee_rate(p_order, p_order_logistics_data, db_session)
 			if match_envelope_success == false {
 				// 强制匹配为信封，但是费率没有匹配成功，就是长宽高重量没有符合信封的要求，就把费用最大的那个信封费率设置为最后匹配成功的费率
@@ -555,7 +555,7 @@ func (p_ol *OrderLogisticsService) match_logistics_mode_with_option(p_order *mod
 		}
 	} // for _, logistics_mode := range logistics_mode_list {
 
-	var order_logistics models.OrderLogisticsInfo
+	var order_logistics ddlc_models.OrderLogisticsInfo
 
 	if is_envelope_hold == true {
 		return false, order_logistics, true
@@ -570,9 +570,9 @@ func (p_ol *OrderLogisticsService) match_logistics_mode_with_option(p_order *mod
 	if final_result.has_stock == false {
 		if len(match_result_has_stock_list) != 0 {
 			// 最后匹配的仓库没有货，但是存在匹配的有货的仓库
-			p_ol.update_order_to_hold_type(p_order, models.ORDER_HOLD_TYPE_OOS_BEST_STOCK, db_session)
+			p_ol.update_order_to_hold_type(p_order, ddpz_models.ORDER_HOLD_TYPE_OOS_BEST_STOCK, db_session)
 		} else {
-			p_ol.update_order_to_hold_type(p_order, models.ORDER_HOLD_TYPE_OOS_ALL_STOCK, db_session) // 缺货的Hold，后面的 Hold check 会把它进一步更新成 在途才有货等等。
+			p_ol.update_order_to_hold_type(p_order, ddpz_models.ORDER_HOLD_TYPE_OOS_ALL_STOCK, db_session) // 缺货的Hold，后面的 Hold check 会把它进一步更新成 在途才有货等等。
 		}
 	} else {
 		var product_info_list = p_order_logistics_data.order_product_info_list

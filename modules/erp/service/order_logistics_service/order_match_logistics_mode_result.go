@@ -1,16 +1,16 @@
 package order_logistics_service
 
 import (
-	"matrix/modules/erp/models"
 	"matrix/modules/erp/models/ddpz_models"
 	"matrix/modules/erp/models/sppz_models"
+	"matrix/modules/erp/models/ddlc_models"
 )
 
 type match_logistics_mode_result struct {
 	order_id      int64
 	order_code    string
 	address_id    int64
-	address       models.OrderShippingAddressInfo
+	address       ddlc_models.OrderShippingAddressInfo
 	company_id    int64
 	company       ddpz_models.LogisticsCompanyInfo
 	stock_id      int64

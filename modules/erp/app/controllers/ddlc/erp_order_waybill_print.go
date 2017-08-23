@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"github.com/revel/revel"
-	"matrix/modules/erp/models"
 	"github.com/go-xorm/xorm"
 	"fmt"
 	"matrix/modules/erp/service/order_service"
@@ -10,6 +9,7 @@ import (
 	"matrix/modules/erp/service/stock_service"
 	"sort"
 	"matrix/modules/erp/models/ddpz_models"
+	"matrix/modules/erp/models/ddlc_models"
 )
 
 type ErpOrderWaybillPrint struct {
@@ -56,12 +56,12 @@ func (c ErpOrderWaybillPrint) Preview() revel.Result {
 	for _, order_id := range order_id_list {
 		var print_order Print_order_t
 
-		var order models.OrderInfo
+		var order ddlc_models.OrderInfo
 		_, err := db_session.Id(order_id).Get(&order)
 		core.HandleError(err)
 		print_order.Order = order
 
-		var order_shipping_address models.OrderShippingAddressInfo
+		var order_shipping_address ddlc_models.OrderShippingAddressInfo
 		_, err = db_session.Id(order.AddressId).Get(&order_shipping_address)
 		core.HandleError(err)
 		print_order.Address = order_shipping_address
@@ -150,12 +150,12 @@ func (c ErpOrderWaybillPrint) Print() revel.Result {
 	for _, order_id := range order_id_list {
 		var print_order Print_order_t
 
-		var order models.OrderInfo
+		var order ddlc_models.OrderInfo
 		_, err := db_session.Id(order_id).Get(&order)
 		core.HandleError(err)
 		print_order.Order = order
 
-		var order_shipping_address models.OrderShippingAddressInfo
+		var order_shipping_address ddlc_models.OrderShippingAddressInfo
 		_, err = db_session.Id(order.AddressId).Get(&order_shipping_address)
 		core.HandleError(err)
 		print_order.Address = order_shipping_address
@@ -227,9 +227,9 @@ func (c ErpOrderWaybillPrint) Print() revel.Result {
 }
 
 type Print_order_t struct {
-	Order   models.OrderInfo
-	Address models.OrderShippingAddressInfo
-	//OrderLogistics       models.OrderLogisticsInfo
+	Order   ddlc_models.OrderInfo
+	Address ddlc_models.OrderShippingAddressInfo
+	//OrderLogistics       ddlc_models.OrderLogisticsInfo
 	LogisticsCompanyName string
 	SkuQtyLocList        []string
 	PcsCount             int64

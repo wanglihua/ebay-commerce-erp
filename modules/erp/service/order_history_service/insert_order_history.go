@@ -4,10 +4,11 @@ import (
 	"github.com/go-xorm/xorm"
 	"matrix/modules/erp/models"
 	"matrix/core"
+	"matrix/modules/erp/models/ddlc_models"
 )
 
-func Insert_order_history(order models.OrderInfo, login_user_id int64, description string, db_session *xorm.Session) {
-	var order_history models.OrderHistoryInfo
+func Insert_order_history(order ddlc_models.OrderInfo, login_user_id int64, description string, db_session *xorm.Session) {
+	var order_history ddlc_models.OrderHistoryInfo
 
 	order_history.OrderId = order.Id
 	order_history.OrderCode = order.Code

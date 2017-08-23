@@ -21,6 +21,7 @@ import (
 	"matrix/modules/erp/models/xtpz_models"
 	"matrix/modules/erp/models/sppz_models"
 	"matrix/modules/erp/models/ddpz_models"
+	"matrix/modules/erp/models/ddlc_models"
 )
 
 type OrderLogisticsService struct {
@@ -155,7 +156,7 @@ SELECT o.* FROM erp_order o WHERE o.batch_code = 0
 	var sql_import_batch_order = `SELECT o.* FROM erp_order o WHERE o.batch_code = %d AND o.status_id <> %d ORDER BY o.paid_time ASC, o.id ASC`
 	sql_import_batch_order = fmt.Sprintf(sql_import_batch_order, batch_code, models.ORDER_STATUS_YQX)
 
-	var order_list = make([]models.OrderInfo, 0)
+	var order_list = make([]ddlc_models.OrderInfo, 0)
 	err = db_session.Sql(sql_import_batch_order).Find(&order_list)
 	core.HandleError(err)
 
@@ -184,7 +185,7 @@ type Interface interface {
 }
  */
 // 按 id 从小到大 进行排序
-type order_slice_t []models.OrderInfo
+type order_slice_t []ddlc_models.OrderInfo
 
 func (s order_slice_t) Len() int {
 	return len(s)
@@ -198,7 +199,7 @@ func (s order_slice_t) Swap(i int, j int) {
 	s[i], s[j] = s[j], s[i]
 }
 
-func (p_ol *OrderLogisticsService) CalculateList(order_list []models.OrderInfo, db_session *xorm.Session) error {
+func (p_ol *OrderLogisticsService) CalculateList(order_list []ddlc_models.OrderInfo, db_session *xorm.Session) error {
 	var match_option Match_option_t
 	match_option.Prefer_stock_id = 0
 	match_option.Prefer_mode_id = 0
@@ -215,7 +216,7 @@ type Match_option_t struct {
 
 // 匹配前要判断一下订单的状态，订单不是已支付状态的话，不能匹配
 // 计算订单的物流方式 和 Hold 类型，调用这个函数的时候应该  “开启数据库事务“， 调用完成后，订单的状态就是 Hold 或者 待配货
-func (p_ol *OrderLogisticsService) CalculateListWithOption(order_list []models.OrderInfo, match_option Match_option_t, db_session *xorm.Session) error {
+func (p_ol *OrderLogisticsService) CalculateListWithOption(order_list []ddlc_models.OrderInfo, match_option Match_option_t, db_session *xorm.Session) error {
 	/*
 	defer func() {
 		if err := recover(); err != nil {
@@ -280,10 +281,10 @@ func (p_ol *OrderLogisticsService) CalculateListWithOption(order_list []models.O
 		}
 
 		var is_previous_hold = order.StatusId == models.ORDER_STATUS_HOLD &&
-			order.HoldTypeId.Int64 != models.ORDER_HOLD_TYPE_ENVELOPE &&
-			order.HoldTypeId.Int64 != models.ORDER_HOLD_TYPE_EXPRESS &&
-			order.HoldTypeId.Int64 != models.ORDER_HOLD_TYPE_INTERNATIONAL &&
-			order.HoldTypeId.Int64 != models.ORDER_HOLD_TYPE_PICK_UP
+			order.HoldTypeId.Int64 != ddpz_models.ORDER_HOLD_TYPE_ENVELOPE &&
+			order.HoldTypeId.Int64 != ddpz_models.ORDER_HOLD_TYPE_EXPRESS &&
+			order.HoldTypeId.Int64 != ddpz_models.ORDER_HOLD_TYPE_INTERNATIONAL &&
+			order.HoldTypeId.Int64 != ddpz_models.ORDER_HOLD_TYPE_PICK_UP
 
 		var pre_hold_type_id = order.HoldTypeId.Int64
 
@@ -347,7 +348,7 @@ func (p_ol *OrderLogisticsService) CalculateListWithOption(order_list []models.O
 		}
 
 		// 如果匹配过程中， 匹配成快递 就不继续 hold 了。但别的 最佳仓无货，缺货等都还可以继续Hold。
-		if order.StatusId == models.ORDER_STATUS_HOLD && order.HoldTypeId.Int64 == models.ORDER_HOLD_TYPE_EXPRESS {
+		if order.StatusId == models.ORDER_STATUS_HOLD && order.HoldTypeId.Int64 == ddpz_models.ORDER_HOLD_TYPE_EXPRESS {
 			continue
 		}
 
@@ -429,10 +430,10 @@ func (p_ol *OrderLogisticsService) CalculateListWithOption(order_list []models.O
 }
 
 // 用于单条物流的匹配
-func (p_ol *OrderLogisticsService) CalculateSingle(order models.OrderInfo, db_session *xorm.Session) error {
-	return p_ol.CalculateList([]models.OrderInfo{order}, db_session)
+func (p_ol *OrderLogisticsService) CalculateSingle(order ddlc_models.OrderInfo, db_session *xorm.Session) error {
+	return p_ol.CalculateList([]ddlc_models.OrderInfo{order}, db_session)
 }
 
-func (p_ol *OrderLogisticsService) CalculateSingleWithOption(order models.OrderInfo, match_option Match_option_t, db_session *xorm.Session) error {
-	return p_ol.CalculateListWithOption([]models.OrderInfo{order}, match_option, db_session)
+func (p_ol *OrderLogisticsService) CalculateSingleWithOption(order ddlc_models.OrderInfo, match_option Match_option_t, db_session *xorm.Session) error {
+	return p_ol.CalculateListWithOption([]ddlc_models.OrderInfo{order}, match_option, db_session)
 }

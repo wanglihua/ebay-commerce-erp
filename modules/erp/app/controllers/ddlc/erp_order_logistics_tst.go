@@ -5,8 +5,8 @@ import (
 
 	"github.com/revel/revel"
 	"matrix/core"
-	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/order_logistics_service"
+	"matrix/modules/erp/models/ddlc_models"
 )
 
 type ErpOrderLogisticsTest struct {
@@ -26,7 +26,7 @@ func (c ErpOrderLogisticsTest) Match() revel.Result {
 
 	var order_code_list = strings.Split(order_codes, ",")
 
-	var order_list = make([]models.OrderInfo, 0)
+	var order_list = make([]ddlc_models.OrderInfo, 0)
 	err := db_session.In("code", order_code_list).Find(&order_list)
 	core.HandleError(err)
 

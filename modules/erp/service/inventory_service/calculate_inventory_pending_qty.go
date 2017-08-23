@@ -8,6 +8,7 @@ import (
 	"matrix/core"
 	"fmt"
 	"matrix/modules/erp/models"
+	"matrix/modules/erp/models/ddpz_models"
 )
 
 // 计算更新库存的 待发货 数量
@@ -78,7 +79,7 @@ UPDATE erp_inventory nvt INNER JOIN
     pending_nvt
         ON nvt.stock_id = pending_nvt.stock_id AND nvt.product_id = pending_nvt.product_id
 SET nvt.pending_qty = pending_nvt.qty;`
-	sql_update_inventory_pending_qty = fmt.Sprintf(sql_update_inventory_pending_qty, models.ORDER_STATUS_DPH, models.ORDER_STATUS_PHZ, models.ORDER_STATUS_PROCESSED_HOLD, models.ORDER_STATUS_HOLD, models.ORDER_HOLD_TYPE_PICK_UP, models.ORDER_HOLD_TYPE_ENVELOPE, models.ORDER_HOLD_TYPE_EXPRESS, models.ORDER_HOLD_TYPE_INTERNATIONAL)
+	sql_update_inventory_pending_qty = fmt.Sprintf(sql_update_inventory_pending_qty, models.ORDER_STATUS_DPH, models.ORDER_STATUS_PHZ, models.ORDER_STATUS_PROCESSED_HOLD, models.ORDER_STATUS_HOLD, ddpz_models.ORDER_HOLD_TYPE_PICK_UP, ddpz_models.ORDER_HOLD_TYPE_ENVELOPE, ddpz_models.ORDER_HOLD_TYPE_EXPRESS, ddpz_models.ORDER_HOLD_TYPE_INTERNATIONAL)
 
 	_, err = db_session.Exec(sql_update_inventory_pending_qty)
 	core.HandleError(err)

@@ -6,8 +6,8 @@ import (
 	"matrix/core"
 	"matrix/modules/auth/pass_res"
 	"matrix/modules/auth/service/pass_service"
-	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/order_service"
+	"matrix/modules/erp/models/ddlc_models"
 )
 
 type ErpOrderShippingAddress struct {
@@ -19,7 +19,7 @@ func (c ErpOrderShippingAddress) Save() revel.Result {
 
 	db_session := c.DbSession
 
-	var order_shipping_address models.OrderShippingAddressInfo
+	var order_shipping_address ddlc_models.OrderShippingAddressInfo
 	err := json.Unmarshal(c.GetRequestBody(), &order_shipping_address)
 	core.HandleError(err)
 
@@ -40,11 +40,11 @@ func (c ErpOrderShippingAddress) Save() revel.Result {
 		core.HandleError(err)
 	} else {
 		//判断订单当前状态是不是可以修改
-		var order_address_in_db models.OrderShippingAddressInfo
+		var order_address_in_db ddlc_models.OrderShippingAddressInfo
 		_, err := db_session.Id(order_shipping_address.Id).Get(&order_address_in_db)
 		core.HandleError(err)
 
-		var order models.OrderInfo
+		var order ddlc_models.OrderInfo
 		_, err = db_session.Id(order_address_in_db.OrderId).Get(&order)
 		core.HandleError(err)
 
@@ -60,7 +60,7 @@ func (c ErpOrderShippingAddress) Save() revel.Result {
 		core.HandleError(err)
 
 		if affected == 0 {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！" })
+			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！"})
 		}
 	}
 

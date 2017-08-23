@@ -5,7 +5,7 @@ import (
 	"matrix/core"
 	"matrix/modules/auth/pass_res"
 	"matrix/modules/auth/service/pass_service"
-	"matrix/modules/erp/models"
+	"matrix/modules/erp/models/ddlc_models"
 )
 
 type ErpOrderLog struct {
@@ -35,12 +35,12 @@ func (c ErpOrderLog) ListData() revel.Result {
 		data_query = *data_query.Asc("id")
 	}
 
-	order_log_list := make([]models.OrderLogInfo, 0, limit)
+	order_log_list := make([]ddlc_models.OrderLogInfo, 0, limit)
 	err := data_query.Limit(limit, offset).Find(&order_log_list)
 	core.HandleError(err)
 
 	count_query := *query
-	count, err := count_query.Count(new(models.OrderLogInfo))
+	count, err := count_query.Count(new(ddlc_models.OrderLogInfo))
 	core.HandleError(err)
 
 	return c.RenderJson(core.GridResult{

@@ -9,14 +9,14 @@ import (
 	"github.com/go-xorm/xorm"
 	"github.com/revel/revel"
 	"matrix/core"
-	"matrix/modules/erp/models"
 	"matrix/modules/erp/models/xtpz_models"
+	"matrix/modules/erp/models/ddlc_models"
 )
 
 const log_response_xml_to_file = true
 
 func Get_order_paypal_shipping_address(db_session *xorm.Session, order_id int64) string {
-	var order models.OrderInfo
+	var order ddlc_models.OrderInfo
 	_, err := db_session.Id(order_id).Get(&order)
 	core.HandleError(err)
 

@@ -8,6 +8,7 @@ import (
 	"matrix/core"
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/status_service"
+	"matrix/modules/erp/models/ddpz_models"
 )
 
 type ErpOrderCustomType struct {
@@ -19,7 +20,7 @@ func (c ErpOrderCustomType) Index() revel.Result {
 }
 
 type ErpOrderCustomTypeViewItem struct {
-	models.OrderCustomTypeInfo `xorm:"extends" json:"t"`
+	ddpz_models.OrderCustomTypeInfo `xorm:"extends" json:"t"`
 	models.StatusInfo          `xorm:"extends" json:"s"`
 }
 
@@ -64,7 +65,7 @@ func (c ErpOrderCustomType) ListData() revel.Result {
 }
 
 type OrderCustomTypeDetailForm struct {
-	OrderCustomType models.OrderCustomTypeInfo `json:"order_type"`
+	OrderCustomType ddpz_models.OrderCustomTypeInfo `json:"order_type"`
 	StatusList      []models.StatusInfo        `json:"status_list"`
 }
 
@@ -94,7 +95,7 @@ func (c ErpOrderCustomType) DetailData() revel.Result {
 	var order_custom_type_id int64
 	c.Params.Bind(&order_custom_type_id, "id")
 
-	var order_custom_type models.OrderCustomTypeInfo
+	var order_custom_type ddpz_models.OrderCustomTypeInfo
 	if order_custom_type_id != 0 {
 		has, err := db_session.Id(order_custom_type_id).Get(&order_custom_type)
 		core.HandleError(err)
@@ -147,7 +148,7 @@ func (c ErpOrderCustomType) Delete() revel.Result {
 	order_custom_type_id_list := make([]int64, 0)
 	c.Params.Bind(&order_custom_type_id_list, "id_list")
 
-	affected, err := db_session.In("id", order_custom_type_id_list).Delete(new(models.OrderCustomTypeInfo))
+	affected, err := db_session.In("id", order_custom_type_id_list).Delete(new(ddpz_models.OrderCustomTypeInfo))
 	core.HandleError(err)
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})

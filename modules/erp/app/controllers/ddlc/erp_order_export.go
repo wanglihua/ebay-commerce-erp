@@ -14,6 +14,7 @@ import (
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/erp/models/ddpz_models"
 	"matrix/modules/erp/models/sppz_models"
+	"matrix/modules/erp/models/ddlc_models"
 )
 
 type ErpOrderExport struct {
@@ -98,8 +99,8 @@ func (c ErpOrderExport) Export() revel.Result {
 }
 
 type order_code_num_export_view_t struct {
-	Order    models.OrderInfo          `xorm:"extends" json:"o"`
-	HoldType models.OrderHoldTypeInfo  `xorm:"extends" json:"ht"`
+	Order    ddlc_models.OrderInfo          `xorm:"extends" json:"o"`
+	HoldType ddpz_models.OrderHoldTypeInfo  `xorm:"extends" json:"ht"`
 }
 
 func (c ErpOrderExport) get_export_excel(db_session *xorm.Session, filter string, status_id int64) *xlsx.File {
@@ -245,7 +246,7 @@ WHERE `
 
 		if status_id == models.ORDER_STATUS_HOLD {
 
-			var order_logistics_logic models.OrderLogisticsLogicInfo
+			var order_logistics_logic ddlc_models.OrderLogisticsLogicInfo
 			_, err := db_session.Where(fmt.Sprintf("order_id = %d", order.Order.Id)).Get(&order_logistics_logic)
 			core.HandleError(err)
 
@@ -293,8 +294,8 @@ func (c ErpOrderExport) ExportLogistics() revel.Result {
 func (c ErpOrderExport) get_export_logisics_excel(db_session *xorm.Session) *xlsx.File {
 
 	type order_logistics_view_item_t struct {
-		OrderLogistics   models.OrderLogisticsInfo    `xorm:"extends" json:"ol"`
-		Order            models.OrderInfo             `xorm:"extends" json:"o"`
+		OrderLogistics   ddlc_models.OrderLogisticsInfo    `xorm:"extends" json:"ol"`
+		Order            ddlc_models.OrderInfo             `xorm:"extends" json:"o"`
 		Stock            sppz_models.StockInfo             `xorm:"extends" json:"s"`
 		LogisticsCompany ddpz_models.LogisticsCompanyInfo  `xorm:"extends" json:"lc"`
 		LogisticsMode    ddpz_models.LogisticsModeInfo     `xorm:"extends" json:"lm"`
@@ -338,19 +339,19 @@ WHERE ol.stock_id = 0 AND ol.company_id = 0
 	core.HandleError(err)
 
 	for index, order_logistics := range order_logistics_list {
-		if order_logistics.Order.HoldTypeId.Int64 == models.ORDER_HOLD_TYPE_PICK_UP {
+		if order_logistics.Order.HoldTypeId.Int64 == ddpz_models.ORDER_HOLD_TYPE_PICK_UP {
 			order_logistics_list[index].LogisticsMode.Name = "PICK UP"
 		}
 
-		if order_logistics.Order.HoldTypeId.Int64 == models.ORDER_HOLD_TYPE_ENVELOPE {
+		if order_logistics.Order.HoldTypeId.Int64 == ddpz_models.ORDER_HOLD_TYPE_ENVELOPE {
 			order_logistics_list[index].LogisticsMode.Name = "信封"
 		}
 
-		if order_logistics.Order.HoldTypeId.Int64 == models.ORDER_HOLD_TYPE_EXPRESS {
+		if order_logistics.Order.HoldTypeId.Int64 == ddpz_models.ORDER_HOLD_TYPE_EXPRESS {
 			order_logistics_list[index].LogisticsMode.Name = "快递"
 		}
 
-		if order_logistics.Order.HoldTypeId.Int64 == models.ORDER_HOLD_TYPE_INTERNATIONAL {
+		if order_logistics.Order.HoldTypeId.Int64 == ddpz_models.ORDER_HOLD_TYPE_INTERNATIONAL {
 			order_logistics_list[index].LogisticsMode.Name = "国际件"
 		}
 	}

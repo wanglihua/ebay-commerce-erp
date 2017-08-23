@@ -29,13 +29,14 @@ import (
 	"matrix/modules/erp/models/xtpz_models"
 	"matrix/modules/erp/models/ddpz_models"
 	"matrix/modules/erp/models/sppz_models"
+	"matrix/modules/erp/models/ddlc_models"
 )
 
 type ErpOrder struct {
 	*revel.Controller
 }
 
-var special_hold_type_id_list = []int64{models.ORDER_HOLD_TYPE_ENVELOPE, models.ORDER_HOLD_TYPE_EXPRESS, models.ORDER_HOLD_TYPE_INTERNATIONAL, models.ORDER_HOLD_TYPE_PICK_UP}
+var special_hold_type_id_list = []int64{ddpz_models.ORDER_HOLD_TYPE_ENVELOPE, ddpz_models.ORDER_HOLD_TYPE_EXPRESS, ddpz_models.ORDER_HOLD_TYPE_INTERNATIONAL, ddpz_models.ORDER_HOLD_TYPE_PICK_UP}
 
 func (c ErpOrder) Index(status string) revel.Result {
 	var db_session = c.DbSession
@@ -228,7 +229,7 @@ func (c ErpOrder) PageData() revel.Result {
 
 	shop_list := shop_service.Get_shop_select_item_list(db_session)
 
-	var order_type_list = make([]models.OrderTypeInfo, 0)
+	var order_type_list = make([]ddpz_models.OrderTypeInfo, 0)
 	err := db_session.Find(&order_type_list)
 	core.HandleError(err)
 
@@ -237,17 +238,17 @@ func (c ErpOrder) PageData() revel.Result {
 	core.HandleError(err)
 
 	// pick up hold任何权限的人都可以看到
-	var special_hold_type_list = make([]models.OrderHoldTypeInfo, 0)
+	var special_hold_type_list = make([]ddpz_models.OrderHoldTypeInfo, 0)
 	var can_view_special_hold_ = can_view_special_hold(c.Session, db_session)
 	if can_view_special_hold_ {
 		err = db_session.In("id", special_hold_type_id_list).Find(&special_hold_type_list)
 	} else {
-		var special_hold_type_id_list_only_pick_up = []int64{models.ORDER_HOLD_TYPE_PICK_UP}
+		var special_hold_type_id_list_only_pick_up = []int64{ddpz_models.ORDER_HOLD_TYPE_PICK_UP}
 		err = db_session.In("id", special_hold_type_id_list_only_pick_up).Find(&special_hold_type_list)
 	}
 	core.HandleError(err)
 
-	var order_tag_list = make([]models.OrderTagInfo, 0)
+	var order_tag_list = make([]ddpz_models.OrderTagInfo, 0)
 	err = db_session.OrderBy("name ASC").Find(&order_tag_list)
 	core.HandleError(err)
 
@@ -387,7 +388,7 @@ func (c ErpOrder) ListData() revel.Result {
 		status_id == models.ORDER_STATUS_YWC ||
 		(
 			status_id == models.ORDER_STATUS_HOLD &&
-				hold_type_id == models.ORDER_HOLD_TYPE_PICK_UP) {
+				hold_type_id == ddpz_models.ORDER_HOLD_TYPE_PICK_UP) {
 		// 不同的仓库拣货人员可以看到不同的订单，管理员、销售、客服 除外
 		var login_user = core.GetLoginUser(c.Session)
 		var is_admin = pass_service.Is_user_admin(login_user.UserId)                   // 是不是管理员
@@ -468,7 +469,7 @@ func (c ErpOrder) ListData() revel.Result {
 		// 如果是待配货状态，除了显示待配货状态的订单外，还要显示特殊 hold 类型的 hold 状态的订单，但如果是只有仓库拣货人员的权限的话，就只能由墨尔本仓库的拣货人员来查看
 		if status_id == models.ORDER_STATUS_DPH {
 
-			if can_view_special_hold(c.Session, db_session) || hold_type_id == models.ORDER_HOLD_TYPE_PICK_UP { // 是待配货状态，且也有权限查看 hold, // pickup 的任何人员都可以看到
+			if can_view_special_hold(c.Session, db_session) || hold_type_id == ddpz_models.ORDER_HOLD_TYPE_PICK_UP { // 是待配货状态，且也有权限查看 hold, // pickup 的任何人员都可以看到
 				// -1 表示不选中任何 hold
 				if hold_type_id == -1 { // 不选中任何 hold 时，只显示 DPH 的订单
 					filter = core.SqlAnd(filter, fmt.Sprintf("o.status_id = %d", models.ORDER_STATUS_DPH))
@@ -604,7 +605,7 @@ func (c ErpOrder) Detail(order_id int64) revel.Result {
 
 	pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_VIEW_DETAIL, c.Session)
 
-	var order models.OrderInfo
+	var order ddlc_models.OrderInfo
 	_, err := db_session.Id(order_id).Get(&order)
 	core.HandleError(err)
 
@@ -625,13 +626,13 @@ func (c ErpOrder) Detail(order_id int64) revel.Result {
 	c.RenderArgs["can_edit_waybill_number"] = order_service.Can_order_modify_waybill_number(&order)
 
 	var is_pickup = false
-	if order.HoldTypeId.Int64 == models.ORDER_HOLD_TYPE_PICK_UP {
+	if order.HoldTypeId.Int64 == ddpz_models.ORDER_HOLD_TYPE_PICK_UP {
 		is_pickup = true
 	}
 	c.RenderArgs["is_pickup"] = is_pickup
 
 	var is_express = false
-	if order.HoldTypeId.Int64 == models.ORDER_HOLD_TYPE_EXPRESS {
+	if order.HoldTypeId.Int64 == ddpz_models.ORDER_HOLD_TYPE_EXPRESS {
 		is_express = true
 	}
 	c.RenderArgs["is_express"] = is_express
@@ -658,7 +659,7 @@ func (c ErpOrder) DetailData() revel.Result {
 
 	revel.TRACE.Println("order_id:", order_id)
 
-	var order models.OrderInfo
+	var order ddlc_models.OrderInfo
 	has_order, err := db_session.Id(order_id).Get(&order)
 	core.HandleError(err)
 	if has_order == false {
@@ -676,18 +677,18 @@ func (c ErpOrder) DetailData() revel.Result {
 	_, err = db_session.Id(order.ShopId).Get(&shop)
 	core.HandleError(err)
 
-	var order_type models.OrderTypeInfo
+	var order_type ddpz_models.OrderTypeInfo
 	_, err = db_session.Id(order.TypeId).Get(&order_type)
 	core.HandleError(err)
 
-	var order_hold_type models.OrderHoldTypeInfo
+	var order_hold_type ddpz_models.OrderHoldTypeInfo
 	_, err = db_session.Id(order.HoldTypeId).Get(&order_hold_type)
 	core.HandleError(err)
 
-	var shipping_address models.OrderShippingAddressInfo // 取 ebay_shipping_address 中的一个， 优先取 paypal_shipping_address
+	var shipping_address ddlc_models.OrderShippingAddressInfo // 取 ebay_shipping_address 中的一个， 优先取 paypal_shipping_address
 
 	// 这里面取得是平台的地址  eBay
-	var ebay_shipping_address models.OrderShippingAddressInfo
+	var ebay_shipping_address ddlc_models.OrderShippingAddressInfo
 	has, err := db_session.Where(fmt.Sprintf("order_id = %d AND address_owner='eBay'", order_id)).OrderBy("update_time DESC").Limit(1, 0).Get(&ebay_shipping_address)
 	core.HandleError(err)
 	if has == true {
@@ -695,7 +696,7 @@ func (c ErpOrder) DetailData() revel.Result {
 	}
 
 	// 这里面取得是PayPal的地址  PayPal
-	var paypal_shipping_address models.OrderShippingAddressInfo
+	var paypal_shipping_address ddlc_models.OrderShippingAddressInfo
 	has, err = db_session.Where(fmt.Sprintf("order_id = %d AND address_owner='PayPal'", order_id)).OrderBy("update_time DESC").Limit(1, 0).Get(&paypal_shipping_address)
 	core.HandleError(err)
 	if has == true {
@@ -705,7 +706,7 @@ func (c ErpOrder) DetailData() revel.Result {
 	shipping_address.OrderId = order.Id //如果地址是空的，也先给一个 order_id
 
 	type order_item_view_t struct {
-		OrderItem         models.OrderItemInfo          `xorm:"extends" json:"oi"`
+		OrderItem         ddlc_models.OrderItemInfo          `xorm:"extends" json:"oi"`
 		Product           kcgl_models.ProductInfo            `xorm:"extends" json:"p"`
 		ProductSotoreItem models.ProductStoreItemInfo   `xorm:"extends" json:"psi"`
 	}
@@ -728,16 +729,16 @@ WHERE oi.order_id = %d;`
 		inventory_list = append(inventory_list, inventory_single_product_list...)
 	}
 
-	var order_logistics models.OrderLogisticsInfo
+	var order_logistics ddlc_models.OrderLogisticsInfo
 	_, err = db_session.Where(fmt.Sprintf("order_id = %d", order_id)).Get(&order_logistics)
 	core.HandleError(err)
 
 	var logistics_mode ddpz_models.LogisticsModeInfo
 	if !(order.StatusId == models.ORDER_STATUS_HOLD && order.HoldTypeId.Valid == true &&
-		(order.HoldTypeId.Int64 == models.ORDER_HOLD_TYPE_ENVELOPE ||
-			order.HoldTypeId.Int64 == models.ORDER_HOLD_TYPE_LOGISTICS_NO_MATCH ||
-			order.HoldTypeId.Int64 == models.ORDER_HOLD_TYPE_INTERNATIONAL ||
-			order.HoldTypeId.Int64 == models.ORDER_HOLD_TYPE_PRODUCT_INFO_MISS)) {
+		(order.HoldTypeId.Int64 == ddpz_models.ORDER_HOLD_TYPE_ENVELOPE ||
+			order.HoldTypeId.Int64 == ddpz_models.ORDER_HOLD_TYPE_LOGISTICS_NO_MATCH ||
+			order.HoldTypeId.Int64 == ddpz_models.ORDER_HOLD_TYPE_INTERNATIONAL ||
+			order.HoldTypeId.Int64 == ddpz_models.ORDER_HOLD_TYPE_PRODUCT_INFO_MISS)) {
 		//如果是Hold状态且是信封Hold的就不显示匹配的物流，因为这些信息可以是前一次匹配时遗留的，后来指定了 Hold
 		_, err = db_session.Id(order_logistics.ModeId).Get(&logistics_mode)
 		core.HandleError(err)
@@ -745,10 +746,10 @@ WHERE oi.order_id = %d;`
 
 	var logistics_stock sppz_models.StockInfo
 	if !(order.StatusId == models.ORDER_STATUS_HOLD && order.HoldTypeId.Valid == true &&
-		(order.HoldTypeId.Int64 == models.ORDER_HOLD_TYPE_ENVELOPE ||
-			order.HoldTypeId.Int64 == models.ORDER_HOLD_TYPE_LOGISTICS_NO_MATCH ||
-			order.HoldTypeId.Int64 == models.ORDER_HOLD_TYPE_INTERNATIONAL ||
-			order.HoldTypeId.Int64 == models.ORDER_HOLD_TYPE_PRODUCT_INFO_MISS)) {
+		(order.HoldTypeId.Int64 == ddpz_models.ORDER_HOLD_TYPE_ENVELOPE ||
+			order.HoldTypeId.Int64 == ddpz_models.ORDER_HOLD_TYPE_LOGISTICS_NO_MATCH ||
+			order.HoldTypeId.Int64 == ddpz_models.ORDER_HOLD_TYPE_INTERNATIONAL ||
+			order.HoldTypeId.Int64 == ddpz_models.ORDER_HOLD_TYPE_PRODUCT_INFO_MISS)) {
 		//如果是Hold状态且是信封Hold的就不显示匹配的物流，因为这些信息可以是前一次匹配时遗留的，后来指定了 Hold
 		_, err = db_session.Id(order_logistics.StockId).Get(&logistics_stock)
 		core.HandleError(err)
@@ -794,7 +795,7 @@ WHERE oi.order_id = %d;`
 	core.HandleError(db_session.In("id", []int64{models.PICKUP_PAY_METHOD_CARD, models.PICKUP_PAY_METHOD_CASH}).Find(&pickup_actual_pay_method_list))
 
 	var pickup_order models.PickupOrderInfo
-	if order.HoldTypeId.Int64 == models.ORDER_HOLD_TYPE_PICK_UP {
+	if order.HoldTypeId.Int64 == ddpz_models.ORDER_HOLD_TYPE_PICK_UP {
 		_, err := db_session.Where("order_id = ?", order.Id).Get(&pickup_order)
 		core.HandleError(err)
 		pickup_order.OrderId = order.Id
@@ -853,7 +854,7 @@ func (c ErpOrder) ReMatchHoldOrderLogistics() revel.Result {
 		is_unlock_express = true
 	}
 
-	var order_list = make([]models.OrderInfo, 0)
+	var order_list = make([]ddlc_models.OrderInfo, 0)
 	err := db_session.In("id", order_id_list).Find(&order_list)
 	core.HandleError(err)
 
@@ -918,7 +919,7 @@ func (c ErpOrder) SavePickupActual() revel.Result {
 		core.HandleError(err)
 	}
 
-	var order models.OrderInfo
+	var order ddlc_models.OrderInfo
 	_, err = db_session.Id(pickup_order.OrderId).Get(&order)
 	core.HandleError(err)
 
@@ -938,7 +939,7 @@ func (c ErpOrder) SavePickupActual() revel.Result {
 	core.HandleError(err)
 
 	// 获得当前订单的物流信息
-	var order_logistics models.OrderLogisticsInfo
+	var order_logistics ddlc_models.OrderLogisticsInfo
 	_, err = db_session.Where("order_id = ?", order.Id).Get(&order_logistics)
 	core.HandleError(err)
 
@@ -999,17 +1000,17 @@ func (c ErpOrder) DaiPeiHuo() revel.Result {
 	order_id_list := make([]int64, 0)
 	c.Params.Bind(&order_id_list, "id_list")
 
-	var order_list = make([]models.OrderInfo, 0)
+	var order_list = make([]ddlc_models.OrderInfo, 0)
 	err := db_session.In("id", order_id_list).Find(&order_list)
 	core.HandleError(err)
 
 	for _, order := range order_list {
 		if order.StatusId != models.ORDER_STATUS_HOLD ||
 			( order.StatusId == models.ORDER_STATUS_HOLD &&
-				(order.HoldTypeId.Int64 == models.ORDER_HOLD_TYPE_ENVELOPE ||
-					order.HoldTypeId.Int64 == models.ORDER_HOLD_TYPE_EXPRESS ||
-					order.HoldTypeId.Int64 == models.ORDER_HOLD_TYPE_INTERNATIONAL ||
-					order.HoldTypeId.Int64 == models.ORDER_HOLD_TYPE_PICK_UP)) {
+				(order.HoldTypeId.Int64 == ddpz_models.ORDER_HOLD_TYPE_ENVELOPE ||
+					order.HoldTypeId.Int64 == ddpz_models.ORDER_HOLD_TYPE_EXPRESS ||
+					order.HoldTypeId.Int64 == ddpz_models.ORDER_HOLD_TYPE_INTERNATIONAL ||
+					order.HoldTypeId.Int64 == ddpz_models.ORDER_HOLD_TYPE_PICK_UP)) {
 			return c.RenderJson(map[string]interface{}{
 				"success": false,
 				"message": "订单当前状态或Hold类型不能搬至待配货状态！",
@@ -1048,11 +1049,11 @@ func (c ErpOrder) PickupDaiPeiHuo() revel.Result {
 		})
 	}
 
-	var order_list = make([]models.OrderInfo, 0)
+	var order_list = make([]ddlc_models.OrderInfo, 0)
 	core.HandleError(db_session.In("id", order_id_list).Find(&order_list))
 
 	for _, order := range order_list {
-		if order.StatusId != models.ORDER_STATUS_YZF || order.HoldTypeId.Int64 != models.ORDER_HOLD_TYPE_PICK_UP {
+		if order.StatusId != models.ORDER_STATUS_YZF || order.HoldTypeId.Int64 != ddpz_models.ORDER_HOLD_TYPE_PICK_UP {
 			return c.RenderJson(map[string]interface{}{
 				"success": false,
 				"message": "当前选择订单不全是已支付状态的PICKUP订单！",
@@ -1089,7 +1090,7 @@ func (c ErpOrder) PeiHuo() revel.Result {
 	order_id_list := make([]int64, 0)
 	c.Params.Bind(&order_id_list, "id_list")
 
-	count, err := db_session.Where(fmt.Sprintf("status_id = %d", models.ORDER_STATUS_PHZ)).Count(&models.OrderInfo{})
+	count, err := db_session.Where(fmt.Sprintf("status_id = %d", models.ORDER_STATUS_PHZ)).Count(&ddlc_models.OrderInfo{})
 	core.HandleError(err)
 
 	if count != 0 {
@@ -1099,7 +1100,7 @@ func (c ErpOrder) PeiHuo() revel.Result {
 		})
 	}
 
-	var order_list = make([]models.OrderInfo, 0)
+	var order_list = make([]ddlc_models.OrderInfo, 0)
 
 	if len(order_id_list) != 0 {
 		err = db_session.In("id", order_id_list).Find(&order_list)
@@ -1112,10 +1113,10 @@ func (c ErpOrder) PeiHuo() revel.Result {
 	for _, order := range order_list {
 		if order.StatusId != models.ORDER_STATUS_DPH &&
 			(!(order.StatusId == models.ORDER_STATUS_HOLD && order.HoldTypeId.Valid &&
-				(order.HoldTypeId.Int64 == models.ORDER_HOLD_TYPE_ENVELOPE ||
-					order.HoldTypeId.Int64 == models.ORDER_HOLD_TYPE_EXPRESS ||
-					order.HoldTypeId.Int64 == models.ORDER_HOLD_TYPE_INTERNATIONAL ||
-					order.HoldTypeId.Int64 == models.ORDER_HOLD_TYPE_PICK_UP))) {
+				(order.HoldTypeId.Int64 == ddpz_models.ORDER_HOLD_TYPE_ENVELOPE ||
+					order.HoldTypeId.Int64 == ddpz_models.ORDER_HOLD_TYPE_EXPRESS ||
+					order.HoldTypeId.Int64 == ddpz_models.ORDER_HOLD_TYPE_INTERNATIONAL ||
+					order.HoldTypeId.Int64 == ddpz_models.ORDER_HOLD_TYPE_PICK_UP))) {
 			return c.RenderJson(map[string]interface{}{
 				"success": false,
 				"message": "订单当前状态不能配货！",
@@ -1146,7 +1147,7 @@ func (c ErpOrder) ForcePeiHuo() revel.Result {
 	order_id_list := make([]int64, 0)
 	c.Params.Bind(&order_id_list, "id_list")
 
-	var order_list = make([]models.OrderInfo, 0)
+	var order_list = make([]ddlc_models.OrderInfo, 0)
 
 	if len(order_id_list) != 0 {
 		err := db_session.In("id", order_id_list).Find(&order_list)
@@ -1159,10 +1160,10 @@ func (c ErpOrder) ForcePeiHuo() revel.Result {
 	for _, order := range order_list {
 		if order.StatusId != models.ORDER_STATUS_DPH &&
 			(!(order.StatusId == models.ORDER_STATUS_HOLD && order.HoldTypeId.Valid &&
-				(order.HoldTypeId.Int64 == models.ORDER_HOLD_TYPE_ENVELOPE ||
-					order.HoldTypeId.Int64 == models.ORDER_HOLD_TYPE_EXPRESS ||
-					order.HoldTypeId.Int64 == models.ORDER_HOLD_TYPE_INTERNATIONAL ||
-					order.HoldTypeId.Int64 == models.ORDER_HOLD_TYPE_PICK_UP))) {
+				(order.HoldTypeId.Int64 == ddpz_models.ORDER_HOLD_TYPE_ENVELOPE ||
+					order.HoldTypeId.Int64 == ddpz_models.ORDER_HOLD_TYPE_EXPRESS ||
+					order.HoldTypeId.Int64 == ddpz_models.ORDER_HOLD_TYPE_INTERNATIONAL ||
+					order.HoldTypeId.Int64 == ddpz_models.ORDER_HOLD_TYPE_PICK_UP))) {
 			return c.RenderJson(map[string]interface{}{
 				"success": false,
 				"message": "订单当前状态不能配货！",
@@ -1201,17 +1202,17 @@ func (c ErpOrder) FaHuo() revel.Result {
 	order_id_list := make([]int64, 0)
 	c.Params.Bind(&order_id_list, "id_list")
 
-	var order_list = make([]models.OrderInfo, 0)
+	var order_list = make([]ddlc_models.OrderInfo, 0)
 	err := db_session.In("id", order_id_list).Find(&order_list)
 	core.HandleError(err)
 
 	for _, order := range order_list {
 		if (order.StatusId != models.ORDER_STATUS_PHZ && order.StatusId != models.ORDER_STATUS_HOLD) ||
 			(order.StatusId == models.ORDER_STATUS_HOLD && (
-				order.HoldTypeId.Int64 != models.ORDER_HOLD_TYPE_ENVELOPE &&
-					order.HoldTypeId.Int64 != models.ORDER_HOLD_TYPE_EXPRESS &&
-					order.HoldTypeId.Int64 != models.ORDER_HOLD_TYPE_INTERNATIONAL &&
-					order.HoldTypeId.Int64 != models.ORDER_HOLD_TYPE_PICK_UP)) {
+				order.HoldTypeId.Int64 != ddpz_models.ORDER_HOLD_TYPE_ENVELOPE &&
+					order.HoldTypeId.Int64 != ddpz_models.ORDER_HOLD_TYPE_EXPRESS &&
+					order.HoldTypeId.Int64 != ddpz_models.ORDER_HOLD_TYPE_INTERNATIONAL &&
+					order.HoldTypeId.Int64 != ddpz_models.ORDER_HOLD_TYPE_PICK_UP)) {
 			return c.RenderJson(map[string]interface{}{
 				"success": false,
 				"message": "订单当前状态不是配货中或特殊hold状态，不能发货！",
@@ -1220,7 +1221,7 @@ func (c ErpOrder) FaHuo() revel.Result {
 	}
 
 	for _, order := range order_list {
-		if order.HoldTypeId.Int64 == models.ORDER_HOLD_TYPE_PICK_UP {
+		if order.HoldTypeId.Int64 == ddpz_models.ORDER_HOLD_TYPE_PICK_UP {
 			var pickup_order_info models.PickupOrderInfo
 			_, err := db_session.Where("order_id = ?", order.Id).Get(&pickup_order_info)
 			core.HandleError(err)
@@ -1237,7 +1238,7 @@ func (c ErpOrder) FaHuo() revel.Result {
 	var mel_stock_id = stock_service.Get_mel_stock_id(db_session)
 
 	for _, order := range order_list {
-		if order.StatusId == models.ORDER_STATUS_HOLD && order.HoldTypeId.Int64 != models.ORDER_HOLD_TYPE_PICK_UP {
+		if order.StatusId == models.ORDER_STATUS_HOLD && order.HoldTypeId.Int64 != ddpz_models.ORDER_HOLD_TYPE_PICK_UP {
 			// 是Hold直接发货的，把 Hold订单的仓库直接设置为墨尔本的仓库，但 pickup 的有自己的仓库
 			order.StockId = mel_stock_id
 			_, err = db_session.Id(order.Id).Cols("stock_id").Update(&order)
@@ -1249,7 +1250,7 @@ func (c ErpOrder) FaHuo() revel.Result {
 
 	/*
 	// 前面更新过之后，version 就会改变所以再取一下
-	order_list = make([]models.OrderInfo, 0)
+	order_list = make([]ddlc_models.OrderInfo, 0)
 	err = db_session.In("id", order_id_list).Find(&order_list)
 	core.HandleError(err)
 	*/
@@ -1296,17 +1297,17 @@ func (c ErpOrder) ShiJiWuHuo() revel.Result {
 	order_id_list := make([]int64, 0)
 	c.Params.Bind(&order_id_list, "id_list")
 
-	var order_list = make([]models.OrderInfo, 0)
+	var order_list = make([]ddlc_models.OrderInfo, 0)
 	err := db_session.In("id", order_id_list).Find(&order_list)
 	core.HandleError(err)
 
 	for _, order := range order_list {
 		if (order.StatusId != models.ORDER_STATUS_PHZ && order.StatusId != models.ORDER_STATUS_HOLD) ||
 			(order.StatusId == models.ORDER_STATUS_HOLD && (
-				order.HoldTypeId.Int64 != models.ORDER_HOLD_TYPE_ENVELOPE &&
-					order.HoldTypeId.Int64 != models.ORDER_HOLD_TYPE_EXPRESS &&
-					order.HoldTypeId.Int64 != models.ORDER_HOLD_TYPE_INTERNATIONAL &&
-					order.HoldTypeId.Int64 != models.ORDER_HOLD_TYPE_PICK_UP)) {
+				order.HoldTypeId.Int64 != ddpz_models.ORDER_HOLD_TYPE_ENVELOPE &&
+					order.HoldTypeId.Int64 != ddpz_models.ORDER_HOLD_TYPE_EXPRESS &&
+					order.HoldTypeId.Int64 != ddpz_models.ORDER_HOLD_TYPE_INTERNATIONAL &&
+					order.HoldTypeId.Int64 != ddpz_models.ORDER_HOLD_TYPE_PICK_UP)) {
 			return c.RenderJson(map[string]interface{}{
 				"success": false,
 				"message": "订单当前状态不是配货中或hold，不能设置实际无货！",
@@ -1318,7 +1319,7 @@ func (c ErpOrder) ShiJiWuHuo() revel.Result {
 
 	for _, order := range order_list {
 		order.StatusId = models.ORDER_STATUS_HOLD
-		order.HoldTypeId = core.MakeNullInt(models.ORDER_HOLD_TYPE_OOS_ACTUAL_STOCK, true)
+		order.HoldTypeId = core.MakeNullInt(ddpz_models.ORDER_HOLD_TYPE_OOS_ACTUAL_STOCK, true)
 		_, err = db_session.Id(order.Id).Cols("status_id", "hold_type_id").Update(&order)
 		core.HandleError(err)
 
@@ -1358,17 +1359,17 @@ func (c ErpOrder) SpecialNotShip() revel.Result {
 		})
 	}
 
-	var order_list = make([]models.OrderInfo, 0)
+	var order_list = make([]ddlc_models.OrderInfo, 0)
 	err := db_session.In("id", order_id_list).Find(&order_list)
 	core.HandleError(err)
 
 	for _, order := range order_list {
 		if (order.StatusId != models.ORDER_STATUS_PHZ && order.StatusId != models.ORDER_STATUS_HOLD) ||
 			(order.StatusId == models.ORDER_STATUS_HOLD && (
-				order.HoldTypeId.Int64 != models.ORDER_HOLD_TYPE_ENVELOPE &&
-					order.HoldTypeId.Int64 != models.ORDER_HOLD_TYPE_EXPRESS &&
-					order.HoldTypeId.Int64 != models.ORDER_HOLD_TYPE_INTERNATIONAL &&
-					order.HoldTypeId.Int64 != models.ORDER_HOLD_TYPE_PICK_UP)) {
+				order.HoldTypeId.Int64 != ddpz_models.ORDER_HOLD_TYPE_ENVELOPE &&
+					order.HoldTypeId.Int64 != ddpz_models.ORDER_HOLD_TYPE_EXPRESS &&
+					order.HoldTypeId.Int64 != ddpz_models.ORDER_HOLD_TYPE_INTERNATIONAL &&
+					order.HoldTypeId.Int64 != ddpz_models.ORDER_HOLD_TYPE_PICK_UP)) {
 			return c.RenderJson(map[string]interface{}{
 				"success": false,
 				"message": "订单当前状态不是配货中或hold，不能设置 特殊情况实际未发货！",
@@ -1380,7 +1381,7 @@ func (c ErpOrder) SpecialNotShip() revel.Result {
 
 	for _, order := range order_list {
 		order.StatusId = models.ORDER_STATUS_HOLD
-		order.HoldTypeId = core.MakeNullInt(models.ORDER_HOLD_TYPE_SPECIAL_NOT_SHIP, true)
+		order.HoldTypeId = core.MakeNullInt(ddpz_models.ORDER_HOLD_TYPE_SPECIAL_NOT_SHIP, true)
 
 		if order.Desc.Valid == false {
 			order.Desc = core.MakeNullString(desc, true)
@@ -1427,17 +1428,17 @@ func (c ErpOrder) SpecialHoldSpecialNotShip() revel.Result {
 		})
 	}
 
-	var order_list = make([]models.OrderInfo, 0)
+	var order_list = make([]ddlc_models.OrderInfo, 0)
 	err := db_session.In("id", order_id_list).Find(&order_list)
 	core.HandleError(err)
 
 	for _, order := range order_list {
 		if (order.StatusId != models.ORDER_STATUS_HOLD) ||
 			(order.StatusId == models.ORDER_STATUS_HOLD && (
-				order.HoldTypeId.Int64 != models.ORDER_HOLD_TYPE_ENVELOPE &&
-					order.HoldTypeId.Int64 != models.ORDER_HOLD_TYPE_EXPRESS &&
-					order.HoldTypeId.Int64 != models.ORDER_HOLD_TYPE_INTERNATIONAL &&
-					order.HoldTypeId.Int64 != models.ORDER_HOLD_TYPE_PICK_UP)) {
+				order.HoldTypeId.Int64 != ddpz_models.ORDER_HOLD_TYPE_ENVELOPE &&
+					order.HoldTypeId.Int64 != ddpz_models.ORDER_HOLD_TYPE_EXPRESS &&
+					order.HoldTypeId.Int64 != ddpz_models.ORDER_HOLD_TYPE_INTERNATIONAL &&
+					order.HoldTypeId.Int64 != ddpz_models.ORDER_HOLD_TYPE_PICK_UP)) {
 			return c.RenderJson(map[string]interface{}{
 				"success": false,
 				"message": "订单当前状态不是特殊hold，不能设置 特殊Hold特殊情况实际未发货！",
@@ -1449,7 +1450,7 @@ func (c ErpOrder) SpecialHoldSpecialNotShip() revel.Result {
 
 	for _, order := range order_list {
 		order.StatusId = models.ORDER_STATUS_HOLD
-		order.HoldTypeId = core.MakeNullInt(models.ORDER_HOLD_TYPE_SPECIAL_HOLD_SPECIAL_NOT_SHIP, true)
+		order.HoldTypeId = core.MakeNullInt(ddpz_models.ORDER_HOLD_TYPE_SPECIAL_HOLD_SPECIAL_NOT_SHIP, true)
 
 		if order.Desc.Valid == false {
 			order.Desc = core.MakeNullString(desc, true)
@@ -1479,7 +1480,7 @@ func (c ErpOrder) WanCheng() revel.Result {
 	order_id_list := make([]int64, 0)
 	c.Params.Bind(&order_id_list, "id_list")
 
-	var order_list = make([]models.OrderInfo, 0)
+	var order_list = make([]ddlc_models.OrderInfo, 0)
 	err := db_session.In("id", order_id_list).Find(&order_list)
 	core.HandleError(err)
 
@@ -1533,11 +1534,11 @@ func (c ErpOrder) Pickup() revel.Result {
 	c.Params.Bind(&stock_id, "stock_id")
 	revel.TRACE.Println("stock_id", stock_id)
 
-	var order_list = make([]models.OrderInfo, 0)
+	var order_list = make([]ddlc_models.OrderInfo, 0)
 	core.HandleError(db_session.In("id", order_id_list).Find(&order_list))
 
 	for _, order := range order_list {
-		if order.StatusId == models.ORDER_STATUS_HOLD && order.HoldTypeId.Int64 == models.ORDER_HOLD_TYPE_PICK_UP {
+		if order.StatusId == models.ORDER_STATUS_HOLD && order.HoldTypeId.Int64 == ddpz_models.ORDER_HOLD_TYPE_PICK_UP {
 			return c.RenderJson(map[string]interface{}{
 				"success": false,
 				"message": fmt.Sprintf("订单 %s 当前状态 已经是 PICK UP", order.Code),
@@ -1558,7 +1559,7 @@ func (c ErpOrder) Pickup() revel.Result {
 
 	for _, order := range order_list {
 		order.StatusId = models.ORDER_STATUS_HOLD
-		order.HoldTypeId = core.MakeNullInt(models.ORDER_HOLD_TYPE_PICK_UP, true)
+		order.HoldTypeId = core.MakeNullInt(ddpz_models.ORDER_HOLD_TYPE_PICK_UP, true)
 		order.StockId = stock_id
 		order.CompanyId = 0
 		order.ModeId = 0
@@ -1567,7 +1568,7 @@ func (c ErpOrder) Pickup() revel.Result {
 		core.HandleError(err)
 
 		// order logistics
-		var order_logistics models.OrderLogisticsInfo
+		var order_logistics ddlc_models.OrderLogisticsInfo
 		has, err := db_session.Where(fmt.Sprintf("order_id = %d", order.Id)).Get(&order_logistics)
 		core.HandleError(err)
 
@@ -1620,7 +1621,7 @@ func (c ErpOrder) QuXiao() revel.Result {
 	order_id_list := make([]int64, 0)
 	c.Params.Bind(&order_id_list, "id_list")
 
-	var order_list = make([]models.OrderInfo, 0)
+	var order_list = make([]ddlc_models.OrderInfo, 0)
 	err := db_session.In("id", order_id_list).Find(&order_list)
 	core.HandleError(err)
 

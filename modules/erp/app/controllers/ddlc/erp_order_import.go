@@ -20,6 +20,8 @@ import (
 	"time"
 	"matrix/modules/erp/service/inventory_service"
 	"matrix/modules/erp/models/xtpz_models"
+	"matrix/modules/erp/models/ddpz_models"
+	"matrix/modules/erp/models/ddlc_models"
 )
 
 type ErpOrderImport struct {
@@ -71,9 +73,9 @@ func (c ErpOrderImport) ListData() revel.Result {
 	buyer_email_query = strings.TrimSpace(buyer_email_query)
 
 	type order_import_view_item_t struct {
-		models.OrderInfo              `xorm:"extends" json:"o"`
-		models.OrderTypeInfo          `xorm:"extends" json:"ot"`
-		models.OrderHoldTypeInfo      `xorm:"extends" json:"ht"`
+		ddlc_models.OrderInfo              `xorm:"extends" json:"o"`
+		ddpz_models.OrderTypeInfo          `xorm:"extends" json:"ot"`
+		ddpz_models.OrderHoldTypeInfo      `xorm:"extends" json:"ht"`
 		xtpz_models.ECommercePlatformInfo  `xorm:"extends" json:"pf"`
 		xtpz_models.ShopAccountInfo        `xorm:"extends" json:"sa"`
 		models.StatusInfo             `xorm:"extends" json:"s"`
@@ -554,7 +556,7 @@ SELECT sa.id AS shop_id, sa.name AS shop_name FROM erp_shop_account sa;
 		var order_import_same_code_list = order_import_list_map[order_code]
 
 		// 订单
-		var order models.OrderInfo
+		var order ddlc_models.OrderInfo
 
 		if len(order_import_same_code_list) >= 1 {
 			var order_import = order_import_same_code_list[0]
@@ -583,7 +585,7 @@ SELECT sa.id AS shop_id, sa.name AS shop_name FROM erp_shop_account sa;
 			order.ExpressFee = order_import.Yfsr
 			order.BuyerUserId = order_import.Khzh
 			order.BuyerEmail = order_import.Khyx
-			order.TypeId = models.ORDER_TYPE_DRDD // 导入订单
+			order.TypeId = ddpz_models.ORDER_TYPE_DRDD // 导入订单
 			order.StatusId = models.ORDER_STATUS_YZF
 			order.BatchCode = import_batch_code // 导入批次
 
@@ -598,7 +600,7 @@ SELECT sa.id AS shop_id, sa.name AS shop_name FROM erp_shop_account sa;
 			order_history_service.Insert_order_history(order, login_user.UserId, fmt.Sprintf("订单导入新增订单，工号：%s", login_user.LoginName), db_session)
 
 			// 地址
-			var order_shipping_address models.OrderShippingAddressInfo
+			var order_shipping_address ddlc_models.OrderShippingAddressInfo
 			order_shipping_address.OrderId = order.Id
 			order_shipping_address.Name = order_import.Khxm
 			order_shipping_address.PostalCode = order_import.Yzbm
@@ -617,7 +619,7 @@ SELECT sa.id AS shop_id, sa.name AS shop_name FROM erp_shop_account sa;
 			core.HandleError(err)
 
 			// 订单详细
-			var order_item models.OrderItemInfo
+			var order_item ddlc_models.OrderItemInfo
 			order_item.OrderId = order.Id
 			order_item.ItemProductId = order_import.product_id
 			order_item.ItemSku = order_import.Spbh
@@ -665,7 +667,7 @@ SELECT sa.id AS shop_id, sa.name AS shop_name FROM erp_shop_account sa;
 				*/
 
 				// 订单详细
-				var order_item models.OrderItemInfo
+				var order_item ddlc_models.OrderItemInfo
 				order_item.OrderId = order.Id
 				order_item.ItemProductId = order_import.product_id
 				order_item.ItemSku = order_import.Spbh
@@ -778,19 +780,19 @@ func (c ErpOrderImport) Delete() revel.Result {
 	}
 
 	// 删除 订单物流信息
-	_, err = db_session.In("order_id", order_id_list).Delete(new(models.OrderLogisticsInfo))
+	_, err = db_session.In("order_id", order_id_list).Delete(new(ddlc_models.OrderLogisticsInfo))
 	core.HandleError(err)
 
 	// 删除 订单明细信息
-	_, err = db_session.In("order_id", order_id_list).Delete(new(models.OrderItemInfo))
+	_, err = db_session.In("order_id", order_id_list).Delete(new(ddlc_models.OrderItemInfo))
 	core.HandleError(err)
 
 	// 删除 订单收货地址信息
-	_, err = db_session.In("order_id", order_id_list).Delete(new(models.OrderShippingAddressInfo))
+	_, err = db_session.In("order_id", order_id_list).Delete(new(ddlc_models.OrderShippingAddressInfo))
 	core.HandleError(err)
 
 	// 删除 订单信息
-	_, err = db_session.In("id", order_id_list).Delete(new(models.OrderInfo))
+	_, err = db_session.In("id", order_id_list).Delete(new(ddlc_models.OrderInfo))
 	core.HandleError(err)
 
 	return c.RenderJson(map[string]interface{}{
