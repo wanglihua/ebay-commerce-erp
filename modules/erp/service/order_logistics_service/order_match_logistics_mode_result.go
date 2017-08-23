@@ -1,6 +1,10 @@
 package order_logistics_service
 
-import "matrix/modules/erp/models"
+import (
+	"matrix/modules/erp/models"
+	"matrix/modules/erp/models/ddpz_models"
+	"matrix/modules/erp/models/sppz_models"
+)
 
 type match_logistics_mode_result struct {
 	order_id      int64
@@ -8,13 +12,13 @@ type match_logistics_mode_result struct {
 	address_id    int64
 	address       models.OrderShippingAddressInfo
 	company_id    int64
-	company       models.LogisticsCompanyInfo
+	company       ddpz_models.LogisticsCompanyInfo
 	stock_id      int64
-	stock         models.StockInfo
+	stock         sppz_models.StockInfo
 	mode_id       int64
-	mode          models.LogisticsModeInfo
+	mode          ddpz_models.LogisticsModeInfo
 	fee_rate_id   int64
-	fee_rate      models.LogisticsFeeRateInfo
+	fee_rate      ddpz_models.LogisticsFeeRateInfo
 	length        float64
 	width         float64
 	height        float64

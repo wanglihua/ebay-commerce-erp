@@ -12,6 +12,7 @@ import (
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/setting"
+	"matrix/modules/erp/models/ddpz_models"
 )
 
 type ErpLogisticsCompany struct {
@@ -31,7 +32,7 @@ func (c ErpLogisticsCompany) ListData() revel.Result {
 	db_session := c.DbSession
 
 	type logitics_company_view_item_t struct {
-		models.LogisticsCompanyInfo  `xorm:"extends" json:"lc"`
+		ddpz_models.LogisticsCompanyInfo  `xorm:"extends" json:"lc"`
 		models.StatusInfo            `xorm:"extends" json:"s"`
 	}
 
@@ -78,7 +79,7 @@ FROM erp_logistics_company lc
 }
 
 type LogisticsCompanyDetailForm struct {
-	LogisticsCompany models.LogisticsCompanyInfo `json:"logistics_company"`
+	LogisticsCompany ddpz_models.LogisticsCompanyInfo `json:"logistics_company"`
 	StatusList       []models.StatusInfo         `json:"status_list"`
 }
 
@@ -110,7 +111,7 @@ func (c ErpLogisticsCompany) DetailData() revel.Result {
 	var logistics_company_id int64
 	c.Params.Bind(&logistics_company_id, "id")
 
-	var logistics_company models.LogisticsCompanyInfo
+	var logistics_company ddpz_models.LogisticsCompanyInfo
 	if logistics_company_id != 0 {
 		has, err := db_session.Id(logistics_company_id).Get(&logistics_company)
 		core.HandleError(err)
@@ -149,26 +150,26 @@ func (c ErpLogisticsCompany) Save() revel.Result {
 
 	var affected int64
 	if detail_form.IsCreate() {
-		name_count, err := db_session.Where("name = ?", logistics_company.Name).Count(new(models.LogisticsCompanyInfo))
+		name_count, err := db_session.Where("name = ?", logistics_company.Name).Count(new(ddpz_models.LogisticsCompanyInfo))
 		core.HandleError(err)
 		if name_count != 0 {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，名称已存在！" })
+			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，名称已存在！"})
 		}
 
 		affected, err = db_session.Insert(&logistics_company)
 		core.HandleError(err)
 	} else {
-		name_count, err := db_session.Where("id <> ? and name = ?", logistics_company.Id, logistics_company.Name).Count(new(models.LogisticsCompanyInfo))
+		name_count, err := db_session.Where("id <> ? and name = ?", logistics_company.Id, logistics_company.Name).Count(new(ddpz_models.LogisticsCompanyInfo))
 		core.HandleError(err)
 		if name_count != 0 {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，名称已存在！" })
+			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，名称已存在！"})
 		}
 
 		affected, err = db_session.Id(logistics_company.Id).Update(&logistics_company)
 		core.HandleError(err)
 
 		if affected == 0 {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！" })
+			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！"})
 		}
 	}
 
@@ -206,7 +207,7 @@ func (c ErpLogisticsCompany) Delete() revel.Result {
 		})
 	}
 
-	affected, err := db_session.In("id", logistics_company_id_list).Delete(new(models.LogisticsCompanyInfo))
+	affected, err := db_session.In("id", logistics_company_id_list).Delete(new(ddpz_models.LogisticsCompanyInfo))
 	core.HandleError(err)
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})

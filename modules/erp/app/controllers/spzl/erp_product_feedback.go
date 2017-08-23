@@ -6,7 +6,6 @@ import (
 	"github.com/revel/revel"
 
 	"matrix/core"
-	"matrix/modules/erp/models"
 	"fmt"
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/auth/pass_res"
@@ -14,6 +13,7 @@ import (
 	"time"
 	"matrix/modules/erp/models/kcgl_models"
 	"matrix/modules/erp/models/spzl_models"
+	"matrix/modules/erp/models/sppz_models"
 )
 
 type ErpProductFeedback struct {
@@ -135,7 +135,7 @@ WHERE pf.product_id = %d)`
 	filter_cate = fmt.Sprintf(filter_cate, product_id)
 	core.HandleError(db_session.Where(filter_cate).Find(&feedback_cate_list))
 
-	var feedback_supplier_list = make([]models.SupplierInfo, 0)
+	var feedback_supplier_list = make([]sppz_models.SupplierInfo, 0)
 	var filter_supplier = `id IN (SELECT DISTINCT supplier_id
 FROM erp_product_feedback pf
 WHERE pf.product_id = %d)`
@@ -171,7 +171,7 @@ func (c ErpProductFeedback) ListData() revel.Result {
 		ProductFeedback     spzl_models.ProductFeedbackInfo     `xorm:"extends" json:"pf"`
 		ProductFeedbackCate spzl_models.ProductFeedbackCateInfo `xorm:"extends" json:"c"`
 		Product             kcgl_models.ProductInfo             `xorm:"extends" json:"p"`
-		Supplier            models.SupplierInfo            `xorm:"extends" json:"sup"`
+		Supplier            sppz_models.SupplierInfo            `xorm:"extends" json:"sup"`
 	}
 
 	/*
@@ -319,7 +319,7 @@ func (c ErpProductFeedback) DetailData() revel.Result {
 	var product_feedback_cate_list = make([]spzl_models.ProductFeedbackCateInfo, 0)
 	core.HandleError(db_session.OrderBy("id ASC").Find(&product_feedback_cate_list))
 
-	var supplier_list = make([]models.SupplierInfo, 0)
+	var supplier_list = make([]sppz_models.SupplierInfo, 0)
 	core.HandleError(db_session.OrderBy("id ASC").Find(&supplier_list))
 
 	return c.RenderJson(map[string]interface{}{

@@ -11,6 +11,7 @@ import (
 	"matrix/modules/auth/pass_res"
 	"fmt"
 	"matrix/modules/erp/models/kcgl_models"
+	"matrix/modules/erp/models/sppz_models"
 )
 
 type ErpProductSaleAnalysis struct {
@@ -38,8 +39,8 @@ func (c ErpProductSaleAnalysis) PageData() revel.Result {
 
 	var db_session = c.DbSession
 
-	var stock_list = make([]models.StockInfo, 0)
-	core.HandleError(db_session.Where(fmt.Sprintf("stock_type_id = %d", models.STOCK_TYPE_AU)).Find(&stock_list))
+	var stock_list = make([]sppz_models.StockInfo, 0)
+	core.HandleError(db_session.Where(fmt.Sprintf("stock_type_id = %d", sppz_models.STOCK_TYPE_AU)).Find(&stock_list))
 
 	return c.RenderJson(map[string]interface{}{
 		"analysis_type_id": 0,
@@ -79,7 +80,7 @@ func (c ErpProductSaleAnalysis) ListData() revel.Result {
 
 	type product_sale_analysis_item_t struct {
 		ProductSaleAnalysis models.ProductSaleAnalysisInfo `xorm:"extends" json:"sa"`
-		Stock               models.StockInfo               `xorm:"extends" json:"s"`
+		Stock               sppz_models.StockInfo               `xorm:"extends" json:"s"`
 	}
 
 	/*

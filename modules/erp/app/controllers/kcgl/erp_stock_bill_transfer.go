@@ -14,6 +14,7 @@ import (
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/bill_service"
+	"matrix/modules/erp/models/sppz_models"
 )
 
 type ErpStockBillTransfer struct {
@@ -28,8 +29,8 @@ func (c ErpStockBillTransfer) Index() revel.Result {
 
 type ErpStockBillTransferViewItem struct {
 	models.StockBillInfo       `xorm:"extends" json:"sb"`
-	SrcStock  models.StockInfo `xorm:"extends" json:"sc"`
-	DestStock models.StockInfo `xorm:"extends" json:"dc"`
+	SrcStock  sppz_models.StockInfo `xorm:"extends" json:"sc"`
+	DestStock sppz_models.StockInfo `xorm:"extends" json:"dc"`
 	auth_models.UserInfo       `xorm:"extends" json:"u"`
 }
 
@@ -83,7 +84,7 @@ func (c ErpStockBillTransfer) ListData() revel.Result {
 
 type StockBillTransferDetailForm struct {
 	StockBill models.StockBillInfo `json:"stock_bill"`
-	StockList []models.StockInfo   `json:"stock_list"`
+	StockList []sppz_models.StockInfo   `json:"stock_list"`
 }
 
 func (f *StockBillTransferDetailForm) IsCreate() bool {
@@ -132,7 +133,7 @@ func (c ErpStockBillTransfer) DetailData() revel.Result {
 		stock_bill.Date = core.Date(time.Now())
 	}
 
-	var stock_list []models.StockInfo
+	var stock_list []sppz_models.StockInfo
 	err := db_session.Find(&stock_list)
 	core.HandleError(err)
 
@@ -168,11 +169,11 @@ func (c ErpStockBillTransfer) Save() revel.Result {
 		stock_bill.UserId = loginuser.UserId
 
 		// 检查是不是在途调拨单
-		var stock models.StockInfo
+		var stock sppz_models.StockInfo
 		_, err := db_session.Id(stock_bill.StockId).Get(&stock)
 		core.HandleError(err)
 
-		if stock.StockTypeId == models.STOCK_TYPE_ZT {
+		if stock.StockTypeId == sppz_models.STOCK_TYPE_ZT {
 			stock_bill.TypeId = models.STOCK_BILL_TYPE_TRANSFER_ZT
 		} else {
 			stock_bill.TypeId = models.STOCK_BILL_TYPE_TRANSFER

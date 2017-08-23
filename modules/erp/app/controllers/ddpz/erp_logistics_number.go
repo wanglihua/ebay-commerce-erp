@@ -8,6 +8,7 @@ import (
 	"matrix/core"
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/status_service"
+	"matrix/modules/erp/models/ddpz_models"
 )
 
 // 弃用
@@ -21,8 +22,8 @@ func (c ErpLogisticsNumber) Index() revel.Result {
 }
 
 type ErpLogisticsNumberViewItem struct {
-	models.LogisticsNumberInfo `xorm:"extends" json:"n"`
-	models.LogisticsModeInfo   `xorm:"extends" json:"m"`
+	ddpz_models.LogisticsNumberInfo `xorm:"extends" json:"n"`
+	ddpz_models.LogisticsModeInfo   `xorm:"extends" json:"m"`
 	models.StatusInfo          `xorm:"extends" json:"s"`
 }
 
@@ -69,8 +70,8 @@ func (c ErpLogisticsNumber) ListData() revel.Result {
 }
 
 type LogisticsNumberDetailForm struct {
-	LogisticsNumber   models.LogisticsNumberInfo `json:"logistics_number"`
-	LogisticsModeList []models.LogisticsModeInfo `json:"logistics_mode_list"`
+	LogisticsNumber   ddpz_models.LogisticsNumberInfo `json:"logistics_number"`
+	LogisticsModeList []ddpz_models.LogisticsModeInfo `json:"logistics_mode_list"`
 	StatusList        []models.StatusInfo        `json:"status_list"`
 }
 
@@ -99,7 +100,7 @@ func (c ErpLogisticsNumber) DetailData() revel.Result {
 	var logistics_number_id int64
 	c.Params.Bind(&logistics_number_id, "id")
 
-	var logistics_number models.LogisticsNumberInfo
+	var logistics_number ddpz_models.LogisticsNumberInfo
 	if logistics_number_id != 0 {
 		has, err := db_session.Id(logistics_number_id).Get(&logistics_number)
 		core.HandleError(err)
@@ -108,7 +109,7 @@ func (c ErpLogisticsNumber) DetailData() revel.Result {
 		}
 	}
 
-	var logistics_mode_list = make([]models.LogisticsModeInfo, 0)
+	var logistics_mode_list = make([]ddpz_models.LogisticsModeInfo, 0)
 	err := db_session.Find(&logistics_mode_list)
 	core.HandleError(err)
 
@@ -157,7 +158,7 @@ func (c ErpLogisticsNumber) Delete() revel.Result {
 	logistics_number_id_list := make([]int64, 0)
 	c.Params.Bind(&logistics_number_id_list, "id_list")
 
-	affected, err := db_session.In("id", logistics_number_id_list).Delete(new(models.LogisticsNumberInfo))
+	affected, err := db_session.In("id", logistics_number_id_list).Delete(new(ddpz_models.LogisticsNumberInfo))
 	core.HandleError(err)
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})

@@ -19,6 +19,7 @@ import (
 	"github.com/go-xorm/xorm"
 	"github.com/tealeg/xlsx"
 	"strings"
+	"matrix/modules/erp/models/ddpz_models"
 )
 
 type ErpOrderLogisticsFeeDiff struct {
@@ -51,7 +52,7 @@ func (c ErpOrderLogisticsFeeDiff) PageData() revel.Result {
 
 	var stock_list = stock_service.Get_login_user_stock_list(db_session, c.Session)
 
-	var logistics_company_list = make([]models.LogisticsCompanyInfo, 0)
+	var logistics_company_list = make([]ddpz_models.LogisticsCompanyInfo, 0)
 	err := db_session.OrderBy("ord asc").Find(&logistics_company_list)
 	core.HandleError(err)
 

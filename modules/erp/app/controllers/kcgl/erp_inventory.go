@@ -14,7 +14,6 @@ import (
 	"matrix/core"
 	"matrix/modules/auth/pass_res"
 	"matrix/modules/auth/service/pass_service"
-	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/product_service"
 	"matrix/modules/erp/service/stock_pick_crew_service"
 	"matrix/modules/erp/service/stock_service"
@@ -22,6 +21,7 @@ import (
 	"matrix/modules/erp/service/inventory_service"
 	"matrix/modules/erp/service/inventory_history_service"
 	"matrix/modules/erp/models/kcgl_models"
+	"matrix/modules/erp/models/sppz_models"
 )
 
 type ErpInventory struct {
@@ -44,7 +44,7 @@ func (c ErpInventory) Index() revel.Result {
 
 func (c ErpInventory) PageData() revel.Result {
 	var db_session = c.DbSession
-	var stock_list = make([]models.StockInfo, 0)
+	var stock_list = make([]sppz_models.StockInfo, 0)
 	err := db_session.Find(&stock_list)
 	core.HandleError(err)
 
@@ -59,8 +59,8 @@ func (c ErpInventory) PageData() revel.Result {
 
 type InventoryViewItem struct {
 	Inventory  kcgl_models.InventoryInfo  `xorm:"extends" json:"ivt"`
-	Stock      models.StockInfo      `xorm:"extends" json:"st"`
-	StorageLoc models.StorageLocInfo `xorm:"extends" json:"loc"`
+	Stock      sppz_models.StockInfo      `xorm:"extends" json:"st"`
+	StorageLoc sppz_models.StorageLocInfo `xorm:"extends" json:"loc"`
 	Product    kcgl_models.ProductInfo    `xorm:"extends" json:"prd"`
 }
 
@@ -161,8 +161,8 @@ ivt.id IN (
 
 type InventoryDetailForm struct {
 	Inventory      kcgl_models.InventoryInfo     `json:"inventory"`
-	StockList      []models.StockInfo       `json:"stock_list"`
-	StorageLocList []models.StorageLocInfo  `json:"storage_loc_list"`
+	StockList      []sppz_models.StockInfo       `json:"stock_list"`
+	StorageLocList []sppz_models.StorageLocInfo  `json:"storage_loc_list"`
 	ProductSku     string                   `json:"product_sku"`
 	IsNew          bool                     `json:"is_new"`
 }
@@ -191,7 +191,7 @@ func (c ErpInventory) DetailData() revel.Result {
 	var inventory_id int64
 	c.Params.Bind(&inventory_id, "id")
 
-	var stock_list = make([]models.StockInfo, 0)
+	var stock_list = make([]sppz_models.StockInfo, 0)
 	err := db_session.Find(&stock_list)
 	core.HandleError(err)
 
@@ -206,7 +206,7 @@ func (c ErpInventory) DetailData() revel.Result {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "指定的商品库存不存在！"})
 		}
 
-		var storage_loc_list = make([]models.StorageLocInfo, 0)
+		var storage_loc_list = make([]sppz_models.StorageLocInfo, 0)
 		//err = db_session.Where(fmt.Sprintf("stock_id = %d", inventory.StockId)).Find(&storage_loc_list)
 		err = db_session.Id(inventory.StorageLocId).Find(&storage_loc_list) // 修改不是新增时不能改仓位，所以取一个就够了，那列表实在太大了
 		core.HandleError(err)
@@ -262,7 +262,7 @@ func (c ErpInventory) Save() revel.Result {
 
 	var qty_before = inventory_in_db.Qty
 
-	var stock models.StockInfo
+	var stock sppz_models.StockInfo
 	_, err = db_session.Id(inventory.StockId).Get(&stock)
 	core.HandleError(err)
 
@@ -270,7 +270,7 @@ func (c ErpInventory) Save() revel.Result {
 
 	var affected int64
 	if inventory_in_db.Id == 0 { //创建数据库记录
-		if stock.StockTypeId == models.STOCK_TYPE_AU {
+		if stock.StockTypeId == sppz_models.STOCK_TYPE_AU {
 			inventory_count, err := db_session.Where("stock_id = ? AND storage_loc_id = ?", inventory.StockId, inventory.StorageLocId).Count(new(kcgl_models.InventoryInfo))
 			core.HandleError(err)
 			if inventory_count != 0 {
@@ -512,7 +512,7 @@ func (c ErpInventory) Import() revel.Result {
 
 		// 检查 仓库名称
 		stock_id, type_id := stock_service.Get_stock_id_type_by_name(inventory_import.StockName, db_session)
-		if type_id != models.STOCK_TYPE_CN {
+		if type_id != sppz_models.STOCK_TYPE_CN {
 			return c.RenderJson(map[string]interface{}{
 				"success": false,
 				"message": "只能导入中国仓的成本！",
@@ -989,7 +989,7 @@ func (c ErpInventory) ImportProductStorageLoc() revel.Result {
 		inventory_import_list[index].stock_type_id = stock_type_id
 		inventory_import_list[index].storage_loc_id = storage_loc_id
 
-		if stock_type_id == models.STOCK_TYPE_AU {
+		if stock_type_id == sppz_models.STOCK_TYPE_AU {
 			au_stock_id_map[stock_id] = stock_id
 			au_stock_import_list = append(au_stock_import_list, inventory_import)
 		}
@@ -1110,7 +1110,7 @@ FROM
 		var storage_loc_id = inventory_import.storage_loc_id
 		var product_id = inventory_import.product_id
 
-		if stock_type_id == models.STOCK_TYPE_AU {
+		if stock_type_id == sppz_models.STOCK_TYPE_AU {
 			// 一个SKU一个仓位
 			var inventory kcgl_models.InventoryInfo
 			has, err := db_session.Where(fmt.Sprintf("stock_id = %d AND product_id = %d", stock_id, product_id)).Get(&inventory) //这里只能保证一个SKU一个仓位
@@ -1918,7 +1918,7 @@ func (c ErpInventory) ImportInventoryPrice() revel.Result {
 
 		// 检查 仓库名称
 		stock_id, type_id := stock_service.Get_stock_id_type_by_name(inventory_import.StockName, db_session)
-		if type_id != models.STOCK_TYPE_CN {
+		if type_id != sppz_models.STOCK_TYPE_CN {
 			return c.RenderJson(map[string]interface{}{
 				"success": false,
 				"message": "只能导入中国仓的成本！",

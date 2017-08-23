@@ -1,4 +1,4 @@
-package models
+package ddpz_models
 
 type MelTollSeviceIdInfo struct {
 	Postcode  int64             `xorm:"nvarchar(50) notnull pk 'postcode'" json:"postcode"`

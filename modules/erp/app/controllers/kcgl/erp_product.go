@@ -18,6 +18,7 @@ import (
 	"matrix/modules/erp/service/product_service"
 	"matrix/modules/erp/service/status_service"
 	"matrix/modules/erp/models/kcgl_models"
+	"matrix/modules/erp/models/sppz_models"
 )
 
 type ErpProduct struct {
@@ -36,7 +37,7 @@ func (c ErpProduct) Index() revel.Result {
 type ErpProductViewItem struct {
 	Product         kcgl_models.ProductInfo           `xorm:"extends" json:"prd"`
 	ProductCate     kcgl_models.ProductCateInfo       `xorm:"extends" json:"cate"`
-	Supplier        models.SupplierInfo          `xorm:"extends" json:"sup"`
+	Supplier        sppz_models.SupplierInfo          `xorm:"extends" json:"sup"`
 	PackageMaterial models.PackageMaterialInfo   `xorm:"extends" json:"pm"`
 	Status          models.StatusInfo            `xorm:"extends" json:"st"`
 	InventoryList   []inventory_service.Product_inventory_view_item_t `xorm:"-" json:"inventory_list"`
@@ -136,7 +137,7 @@ FROM erp_product prd
 type ProductDetailForm struct {
 	Product                   kcgl_models.ProductInfo                                          `json:"product"`
 	ProductImageList          []kcgl_models.ProductImageInfo                                   `json:"product_image_list"`
-	SupplierList              []models.SupplierInfo                                       `json:"supplier_list"`
+	SupplierList              []sppz_models.SupplierInfo                                       `json:"supplier_list"`
 	ProductCateSelectItemList []product_cate_service.ProductCateSelectItem                `json:"product_cate_list"`
 	PackageMaterialList       []models.PackageMaterialInfo                                `json:"package_material_list"`
 	StatusList                []models.StatusInfo                                         `json:"status_list"`
@@ -213,7 +214,7 @@ func (c ErpProduct) DetailData() revel.Result {
 		core.HandleError(err)
 	}
 
-	var supplier_list []models.SupplierInfo
+	var supplier_list []sppz_models.SupplierInfo
 	err := db_session.Asc("name").Find(&supplier_list)
 	core.HandleError(err)
 

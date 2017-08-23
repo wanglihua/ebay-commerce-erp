@@ -15,6 +15,7 @@ import (
 	"matrix/modules/erp/service/order_service"
 	"matrix/modules/erp/service/order_history_service"
 	"matrix/modules/erp/models/xtpz_models"
+	"matrix/modules/erp/models/sppz_models"
 )
 
 // 1 地址有特殊字段的
@@ -67,7 +68,7 @@ func (p_ol *OrderLogisticsService) hold_check_buyer_checkout_message(p_order *mo
 func (p_ol *OrderLogisticsService) hold_check_oss_all_stock(p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, db_session *xorm.Session) (is_hold_return bool) {
 	// 只检查不是 中国仓 的仓库
 	var fun_is_not_cn_stock = func(stock_type_id int64) bool {
-		if stock_type_id != models.STOCK_TYPE_CN {
+		if stock_type_id != sppz_models.STOCK_TYPE_CN {
 			return true
 		} else {
 			return false
@@ -91,7 +92,7 @@ func (p_ol *OrderLogisticsService) hold_check_oss_au_stock_but_zt_stock_has(p_or
 	// todo: 这里还有点问题，应该是检查对应的在途仓库？,先不考虑这个问题了
 
 	var fun_is_au_stock = func(stock_type_id int64) bool {
-		if stock_type_id == models.STOCK_TYPE_AU {
+		if stock_type_id == sppz_models.STOCK_TYPE_AU {
 			return true
 		} else {
 			return false
@@ -99,7 +100,7 @@ func (p_ol *OrderLogisticsService) hold_check_oss_au_stock_but_zt_stock_has(p_or
 	}
 
 	var fun_is_zt_stock = func(stock_type_id int64) bool {
-		if stock_type_id == models.STOCK_TYPE_ZT {
+		if stock_type_id == sppz_models.STOCK_TYPE_ZT {
 			return true
 		} else {
 			return false
@@ -159,7 +160,7 @@ func (p_ol *OrderLogisticsService) hold_check_has_some_product(p_order *models.O
 	var get_product_stock_id_list = func() []int64 {
 		var stock_id_set = collections.NewIntSet()
 		for _, product_stock_qty := range products_stock_qty_list {
-			if product_stock_qty.StockTypeId == models.STOCK_TYPE_AU { // 只取符合要求的仓库类型。比如，匹配订单的时候，只取澳洲的仓库什么的
+			if product_stock_qty.StockTypeId == sppz_models.STOCK_TYPE_AU { // 只取符合要求的仓库类型。比如，匹配订单的时候，只取澳洲的仓库什么的
 				stock_id_set.Add(product_stock_qty.StockId)
 			}
 		}

@@ -12,6 +12,8 @@ import (
 	"matrix/modules/erp/models"
 	"strings"
 	"matrix/modules/auth/service/pass_service"
+	"matrix/modules/erp/models/ddpz_models"
+	"matrix/modules/erp/models/sppz_models"
 )
 
 type ErpOrderExport struct {
@@ -249,7 +251,7 @@ WHERE `
 
 			// 最佳仓
 
-			var stock models.StockInfo
+			var stock sppz_models.StockInfo
 			_, err = db_session.Id(order_logistics_logic.StockId).Get(&stock)
 			core.HandleError(err)
 
@@ -258,7 +260,7 @@ WHERE `
 			cell.Value = stock.Name
 
 			// 最佳物流
-			var mode models.LogisticsModeInfo
+			var mode ddpz_models.LogisticsModeInfo
 			_, err = db_session.Id(order_logistics_logic.ModeId).Get(&mode)
 			core.HandleError(err)
 
@@ -293,9 +295,9 @@ func (c ErpOrderExport) get_export_logisics_excel(db_session *xorm.Session) *xls
 	type order_logistics_view_item_t struct {
 		OrderLogistics   models.OrderLogisticsInfo    `xorm:"extends" json:"ol"`
 		Order            models.OrderInfo             `xorm:"extends" json:"o"`
-		Stock            models.StockInfo             `xorm:"extends" json:"s"`
-		LogisticsCompany models.LogisticsCompanyInfo  `xorm:"extends" json:"lc"`
-		LogisticsMode    models.LogisticsModeInfo     `xorm:"extends" json:"lm"`
+		Stock            sppz_models.StockInfo             `xorm:"extends" json:"s"`
+		LogisticsCompany ddpz_models.LogisticsCompanyInfo  `xorm:"extends" json:"lc"`
+		LogisticsMode    ddpz_models.LogisticsModeInfo     `xorm:"extends" json:"lm"`
 	}
 
 	/*

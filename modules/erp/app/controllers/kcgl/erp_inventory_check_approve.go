@@ -10,6 +10,7 @@ import (
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/models/kcgl_models"
+	"matrix/modules/erp/models/sppz_models"
 )
 
 type ErpInventoryCheckApprove struct {
@@ -24,7 +25,7 @@ func (c ErpInventoryCheckApprove) Index() revel.Result {
 
 type ErpInventoryCheckApproveViewItem struct {
 	kcgl_models.InventoryCheckInfo `xorm:"extends" json:"ic"`
-	models.StockInfo          `xorm:"extends" json:"st"`
+	sppz_models.StockInfo          `xorm:"extends" json:"st"`
 	CheckUser   auth_models.UserInfo `xorm:"extends" json:"cu"`
 	ApproveUser auth_models.UserInfo `xorm:"extends" json:"au"`
 	models.StatusInfo         `xorm:"extends" json:"ss"`

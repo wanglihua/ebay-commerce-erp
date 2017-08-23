@@ -5,15 +5,15 @@ import (
 	"strings"
 	"github.com/go-xorm/xorm"
 	"matrix/core"
-	"matrix/modules/erp/models"
 	"matrix/modules/erp/models/kcgl_models"
+	"matrix/modules/erp/models/sppz_models"
 )
 
 type Product_inventory_view_item_t struct {
 	kcgl_models.InventoryInfo   `xorm:"extends" json:"nvt"`
 	kcgl_models.ProductInfo     `xorm:"extends" json:"p"`
-	models.StockInfo       `xorm:"extends" json:"st"`
-	models.StorageLocInfo  `xorm:"extends" json:"sl"`
+	sppz_models.StockInfo       `xorm:"extends" json:"st"`
+	sppz_models.StorageLocInfo  `xorm:"extends" json:"sl"`
 }
 
 func get_inventory_list_sql_builder() *core.SqlBuilder {

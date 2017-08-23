@@ -14,6 +14,7 @@ import (
 	"strings"
 	"time"
 	"matrix/modules/erp/service/order_history_service"
+	"matrix/modules/erp/models/sppz_models"
 )
 
 type ErpOrderHold struct {
@@ -55,8 +56,8 @@ func (c ErpOrderHold) PageData() revel.Result {
 	err := db_session.OrderBy("ord ASC").Find(&hold_type_list)
 	core.HandleError(err)
 
-	var au_stock_list = make([]models.StockInfo, 0)
-	err = db_session.Where(fmt.Sprintf("stock_type_id = %d", models.STOCK_TYPE_AU)).Find(&au_stock_list)
+	var au_stock_list = make([]sppz_models.StockInfo, 0)
+	err = db_session.Where(fmt.Sprintf("stock_type_id = %d", sppz_models.STOCK_TYPE_AU)).Find(&au_stock_list)
 	core.HandleError(err)
 
 	var order_tag_list = make([]models.OrderTagInfo, 0)

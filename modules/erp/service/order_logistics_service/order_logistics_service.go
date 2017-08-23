@@ -19,17 +19,19 @@ import (
 	"matrix/modules/erp/service/order_history_service"
 	"matrix/modules/erp/service/order_item_service"
 	"matrix/modules/erp/models/xtpz_models"
+	"matrix/modules/erp/models/sppz_models"
+	"matrix/modules/erp/models/ddpz_models"
 )
 
 type OrderLogisticsService struct {
-	au_stock_list                     []models.StockInfo                      // 所有澳洲仓库列表
+	au_stock_list                     []sppz_models.StockInfo                      // 所有澳洲仓库列表
 	aud_exchange_rate                 float64                                 // 澳币汇率
-	logistics_setting                 models.LogisticsSettingInfo             // 物流设置
-	pick_fee_setting                  models.PickFeeInfo                      // 拣货费用设置
+	logistics_setting                 ddpz_models.LogisticsSettingInfo             // 物流设置
+	pick_fee_setting                  ddpz_models.PickFeeInfo                      // 拣货费用设置
 	address_special_word_list_setting []string                                // 收货地址特殊字段
-	logistics_company_list            []models.LogisticsCompanyInfo           // 物流公司列表
-	logistics_mode_list               []models.LogisticsModeInfo              // 物流方式列表
-	logistics_fee_rate_map            map[int64][]models.LogisticsFeeRateInfo // 物流费率列表的映射，映射的 key 是， 物流方式的 id
+	logistics_company_list            []ddpz_models.LogisticsCompanyInfo           // 物流公司列表
+	logistics_mode_list               []ddpz_models.LogisticsModeInfo              // 物流方式列表
+	logistics_fee_rate_map            map[int64][]ddpz_models.LogisticsFeeRateInfo // 物流费率列表的映射，映射的 key 是， 物流方式的 id
 	envelope_fee_rate_list            []models.EnvelopeFeeRateInfo            // 信封物流费率， 按费用从小到大排序
 	shop_list                         []xtpz_models.ShopAccountInfo           // 店铺列表，系统中的店铺列表
 	special_product_list              []models.SpecialProductInfo             // 特殊商品SKU列表
@@ -40,8 +42,8 @@ type OrderLogisticsService struct {
 
 func (p_ol *OrderLogisticsService) init_data(db_session *xorm.Session) {
 	// 加载所有仓库
-	var au_stock_list = make([]models.StockInfo, 0)
-	err := db_session.Where(fmt.Sprintf("stock_type_id = %d", models.STOCK_TYPE_AU)).Find(&au_stock_list)
+	var au_stock_list = make([]sppz_models.StockInfo, 0)
+	err := db_session.Where(fmt.Sprintf("stock_type_id = %d", sppz_models.STOCK_TYPE_AU)).Find(&au_stock_list)
 	core.HandleError(err)
 
 	p_ol.au_stock_list = au_stock_list
@@ -68,7 +70,7 @@ func (p_ol *OrderLogisticsService) init_data(db_session *xorm.Session) {
 	p_ol.address_special_word_list_setting = address_special_word_list_setting
 
 	// 加载物流公司
-	var logistics_company_list = make([]models.LogisticsCompanyInfo, 0)
+	var logistics_company_list = make([]ddpz_models.LogisticsCompanyInfo, 0)
 	err = db_session.Find(&logistics_company_list)
 	core.HandleError(err)
 	p_ol.logistics_company_list = logistics_company_list
@@ -84,7 +86,7 @@ func (p_ol *OrderLogisticsService) init_data(db_session *xorm.Session) {
 	var logistics_fee_rate_all_list = logistics_fee_rate_service.Get_logistics_fee_rate_enabled(db_session)
 
 	// 考虑到数据量的问题，就不采用中间变量了 var logistics_fee_rate_map = make(map[int64][]models.LogisticsFeeRateInfo)
-	p_ol.logistics_fee_rate_map = make(map[int64][]models.LogisticsFeeRateInfo)
+	p_ol.logistics_fee_rate_map = make(map[int64][]ddpz_models.LogisticsFeeRateInfo)
 	for _, logistics_fee_rate := range logistics_fee_rate_all_list {
 		logistics_fee_rate_list, found := p_ol.logistics_fee_rate_map[logistics_fee_rate.ModeId]
 		if found {

@@ -4,11 +4,11 @@ import (
 	"github.com/revel/revel"
 
 	"matrix/core"
-	"matrix/modules/erp/models"
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/auth/pass_res"
 	"fmt"
 	"matrix/modules/erp/models/kcgl_models"
+	"matrix/modules/erp/models/sppz_models"
 )
 
 type ErpInventoryHistory struct {
@@ -28,8 +28,8 @@ func (c ErpInventoryHistory) Index() revel.Result {
 
 type InventoryHistoryViewItem struct {
 	InventoryHistory kcgl_models.InventoryHistoryInfo  `xorm:"extends" json:"his"`
-	Stock            models.StockInfo             `xorm:"extends" json:"st"`
-	StorageLoc       models.StorageLocInfo        `xorm:"extends" json:"loc"`
+	Stock            sppz_models.StockInfo             `xorm:"extends" json:"st"`
+	StorageLoc       sppz_models.StorageLocInfo        `xorm:"extends" json:"loc"`
 	Product          kcgl_models.ProductInfo           `xorm:"extends" json:"prd"`
 }
 

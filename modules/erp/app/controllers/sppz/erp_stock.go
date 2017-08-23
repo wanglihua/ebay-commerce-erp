@@ -13,6 +13,7 @@ import (
 	"matrix/modules/erp/models/hgbg_models"
 	"matrix/modules/erp/service/status_service"
 	"matrix/modules/erp/setting"
+	"matrix/modules/erp/models/sppz_models"
 )
 
 type ErpStock struct {
@@ -27,8 +28,8 @@ func (c ErpStock) Index() revel.Result {
 }
 
 type ErpStockViewItem struct {
-	models.StockInfo     `xorm:"extends" json:"stock"`
-	models.StockTypeInfo `xorm:"extends" json:"stock_type"`
+	sppz_models.StockInfo     `xorm:"extends" json:"stock"`
+	sppz_models.StockTypeInfo `xorm:"extends" json:"stock_type"`
 	models.StatusInfo    `xorm:"extends" json:"status"`
 }
 
@@ -79,9 +80,9 @@ FROM erp_stock stock
 }
 
 type StockDetailForm struct {
-	Stock           models.StockInfo                       `json:"stock"`
-	StockTypeList   []models.StockTypeInfo                 `json:"stock_type_list"`
-	TargetStockList []models.StockInfo                     `json:"target_stock_list"`
+	Stock           sppz_models.StockInfo                       `json:"stock"`
+	StockTypeList   []sppz_models.StockTypeInfo                 `json:"stock_type_list"`
+	TargetStockList []sppz_models.StockInfo                     `json:"target_stock_list"`
 	StatusList      []models.StatusInfo                    `json:"status_list"`
 	DestPortList    []hgbg_models.ContainerTransferDestPortInfo `json:"dest_port_list"`
 }
@@ -140,7 +141,7 @@ func (c ErpStock) DetailData() revel.Result {
 	var stock_id int64
 	c.Params.Bind(&stock_id, "id")
 
-	var stock models.StockInfo
+	var stock sppz_models.StockInfo
 	if stock_id != 0 {
 		has, err := db_session.Id(stock_id).Get(&stock)
 		core.HandleError(err)
@@ -149,13 +150,13 @@ func (c ErpStock) DetailData() revel.Result {
 		}
 	} else {
 		stock.StatusId = models.STOCK_STATUS_ENABLED
-		stock.StockTypeId = models.STOCK_TYPE_CN
+		stock.StockTypeId = sppz_models.STOCK_TYPE_CN
 	}
 
 	status_list := status_service.Get_status_list(db_session, models.STATUS_TYPE_STOCK)
 
-	var target_stock_list = make([]models.StockInfo, 0)
-	err := db_session.Where(fmt.Sprintf("stock_type_id = %d", models.STOCK_TYPE_AU)).Find(&target_stock_list)
+	var target_stock_list = make([]sppz_models.StockInfo, 0)
+	err := db_session.Where(fmt.Sprintf("stock_type_id = %d", sppz_models.STOCK_TYPE_AU)).Find(&target_stock_list)
 	core.HandleError(err)
 
 	var dest_port_list = make([]hgbg_models.ContainerTransferDestPortInfo, 0)
@@ -164,7 +165,7 @@ func (c ErpStock) DetailData() revel.Result {
 
 	var detail_form StockDetailForm
 	detail_form.Stock = stock
-	detail_form.StockTypeList = models.GetStockTypeList(db_session)
+	detail_form.StockTypeList = sppz_models.GetStockTypeList(db_session)
 	detail_form.TargetStockList = target_stock_list
 	detail_form.StatusList = status_list
 	detail_form.DestPortList = dest_port_list
@@ -188,26 +189,26 @@ func (c ErpStock) Save() revel.Result {
 	stock := detail_form.Stock
 
 	// 不是在途仓，并且目的仓库有设置
-	if stock.StockTypeId != models.STOCK_TYPE_ZT && (stock.TargetStockId.Valid == true && stock.TargetStockId.Int64 != 0) {
+	if stock.StockTypeId != sppz_models.STOCK_TYPE_ZT && (stock.TargetStockId.Valid == true && stock.TargetStockId.Int64 != 0) {
 		return c.RenderJson(core.JsonResult{Success: false, Message: "在途仓库才会有目的仓库！"})
 	}
 
-	if stock.StockTypeId == models.STOCK_TYPE_ZT && (stock.TargetStockId.Valid == false || stock.TargetStockId.Int64 == 0) {
+	if stock.StockTypeId == sppz_models.STOCK_TYPE_ZT && (stock.TargetStockId.Valid == false || stock.TargetStockId.Int64 == 0) {
 		return c.RenderJson(core.JsonResult{Success: false, Message: "在途仓库需要设置目的仓库！"})
 	}
 
 	// 不是在途仓，并且目的港口有设置
-	if stock.StockTypeId != models.STOCK_TYPE_ZT && (stock.DestPortId != 0) {
+	if stock.StockTypeId != sppz_models.STOCK_TYPE_ZT && (stock.DestPortId != 0) {
 		return c.RenderJson(core.JsonResult{Success: false, Message: "在途仓库才会有目的港口！"})
 	}
 
-	if stock.StockTypeId == models.STOCK_TYPE_ZT && (stock.DestPortId == 0) {
+	if stock.StockTypeId == sppz_models.STOCK_TYPE_ZT && (stock.DestPortId == 0) {
 		return c.RenderJson(core.JsonResult{Success: false, Message: "在途仓库需要设置目的港口！"})
 	}
 
 	var affected int64
 	if detail_form.IsCreate() {
-		name_count, err := db_session.Where("name = ?", stock.Name).Count(new(models.StockInfo))
+		name_count, err := db_session.Where("name = ?", stock.Name).Count(new(sppz_models.StockInfo))
 		core.HandleError(err)
 		if name_count != 0 {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，名称已存在！"})
@@ -216,7 +217,7 @@ func (c ErpStock) Save() revel.Result {
 		affected, err = db_session.Insert(&stock)
 		core.HandleError(err)
 	} else {
-		name_count, err := db_session.Where("id <> ? and name = ?", stock.Id, stock.Name).Count(new(models.StockInfo))
+		name_count, err := db_session.Where("id <> ? and name = ?", stock.Id, stock.Name).Count(new(sppz_models.StockInfo))
 		core.HandleError(err)
 		if name_count != 0 {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，名称已存在！"})
@@ -241,7 +242,7 @@ func (c ErpStock) Delete() revel.Result {
 	stock_id_list := make([]int64, 0)
 	c.Params.Bind(&stock_id_list, "id_list")
 
-	affected, err := db_session.In("id", stock_id_list).Delete(new(models.StockInfo))
+	affected, err := db_session.In("id", stock_id_list).Delete(new(sppz_models.StockInfo))
 	core.HandleError(err)
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})

@@ -1,4 +1,4 @@
-package models
+package sppz_models
 
 const REGION_ROOT_ID = 1
 

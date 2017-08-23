@@ -9,6 +9,7 @@ import (
 	"github.com/revel/revel"
 	"matrix/modules/erp/service/inventory_history_service"
 	"matrix/modules/erp/models/kcgl_models"
+	"matrix/modules/erp/models/sppz_models"
 )
 
 func UpdateStockInventory(container_transfer hgbg_models.ContainerTransferInfo, web_session revel.Session, db_session *xorm.Session) {
@@ -57,7 +58,7 @@ func get_cn_stock_id(db_session *xorm.Session) int64 {
 		WHERE s.stock_type_id = %d
 		LIMIT 1;`
 
-	sql = fmt.Sprintf(sql, models.STOCK_TYPE_CN)
+	sql = fmt.Sprintf(sql, sppz_models.STOCK_TYPE_CN)
 
 	_, err := db_session.Sql(sql).Get(&cn_stock_id_struct)
 	core.HandleError(err)
@@ -96,7 +97,7 @@ func get_zt_au_stock_id(transfer_id int64, db_session *xorm.Session) (zt_stock_i
 	)
 	LIMIT 1;`
 
-	sql = fmt.Sprintf(sql, models.STOCK_TYPE_ZT, transfer_id)
+	sql = fmt.Sprintf(sql, sppz_models.STOCK_TYPE_ZT, transfer_id)
 	_, err := db_session.Sql(sql).Get(&zt_au_stock_id_struct)
 	core.HandleError(err)
 

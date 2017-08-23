@@ -12,6 +12,7 @@ import (
 	"matrix/modules/erp/models/kcgl_models"
 	"matrix/modules/erp/models/spzl_models"
 	"matrix/modules/erp/models/xtpz_models"
+	"matrix/modules/erp/models/ddpz_models"
 )
 
 type Home struct {
@@ -58,7 +59,25 @@ func (c Home) SyncDbPost() revel.Result {
 	model_list = append(model_list, &auth_models.SettingInfo{})
 	model_list = append(model_list, &auth_models.UserInfo{})
 
+	model_list = append(model_list, &ddpz_models.LogisticsCompanyInfo{})
+	model_list = append(model_list, &ddpz_models.LogisticsFeeRateInfo{})
+	model_list = append(model_list, &ddpz_models.LogisticsModeInfo{})
+	model_list = append(model_list, &ddpz_models.LogisticsModeTypeInfo{})
+	model_list = append(model_list, &ddpz_models.LogisticsNumberBatchInfo{})
+	model_list = append(model_list, &ddpz_models.LogisticsNumberInfo{})
+	model_list = append(model_list, &ddpz_models.LogisticsNumberLogInfo{})
+	model_list = append(model_list, &ddpz_models.LogisticsSettingInfo{})
+	model_list = append(model_list, &ddpz_models.MelTollSeviceIdInfo{})
+	model_list = append(model_list, &ddpz_models.PickFeeInfo{})
+
 	model_list = append(model_list, &sppz_models.BrandInfo{})
+	model_list = append(model_list, &sppz_models.ProductStyleInfo{})
+	model_list = append(model_list, &sppz_models.RegionInfo{})
+	model_list = append(model_list, &sppz_models.StockInfo{})
+	model_list = append(model_list, &sppz_models.StockPickCrewInfo{})
+	model_list = append(model_list, &sppz_models.StockTypeInfo{})
+	model_list = append(model_list, &sppz_models.StorageLocInfo{})
+	model_list = append(model_list, &sppz_models.SupplierInfo{})
 
 	model_list = append(model_list, &hgbg_models.ContainerTransferInfo{})
 	model_list = append(model_list, &hgbg_models.ContainerTransferDestPortInfo{})
@@ -102,15 +121,6 @@ func (c Home) SyncDbPost() revel.Result {
 
 	model_list = append(model_list, &erp_models.LittleIconInfo{})
 	model_list = append(model_list, &erp_models.LoginLogInfo{})
-	model_list = append(model_list, &erp_models.LogisticsCompanyInfo{})
-	model_list = append(model_list, &erp_models.LogisticsFeeRateInfo{})
-	model_list = append(model_list, &erp_models.LogisticsModeInfo{})
-	model_list = append(model_list, &erp_models.LogisticsModeTypeInfo{})
-	model_list = append(model_list, &erp_models.LogisticsNumberBatchInfo{})
-	model_list = append(model_list, &erp_models.LogisticsNumberInfo{})
-	model_list = append(model_list, &erp_models.LogisticsNumberLogInfo{})
-	model_list = append(model_list, &erp_models.LogisticsSettingInfo{})
-	model_list = append(model_list, &erp_models.MelTollSeviceIdInfo{})
 	model_list = append(model_list, &erp_models.MessageInfo{})
 	model_list = append(model_list, &erp_models.OrderCustomTypeInfo{})
 	model_list = append(model_list, &erp_models.OrderHoldTypeInfo{})
@@ -127,7 +137,6 @@ func (c Home) SyncDbPost() revel.Result {
 	model_list = append(model_list, &erp_models.PackageMaterialInfo{})
 
 	model_list = append(model_list, &erp_models.PaypalReconInfo{})
-	model_list = append(model_list, &erp_models.PickFeeInfo{})
 	model_list = append(model_list, &erp_models.PickupOrderInfo{})
 	model_list = append(model_list, &erp_models.PickupPayMethodInfo{})
 	model_list = append(model_list, &erp_models.PlatformLogisticsModeInfo{})
@@ -137,10 +146,8 @@ func (c Home) SyncDbPost() revel.Result {
 	model_list = append(model_list, &erp_models.ProductSaleAnalysisSettingInfo{})
 
 	model_list = append(model_list, &erp_models.ProductStoreItemInfo{})
-	model_list = append(model_list, &erp_models.ProductStyleInfo{})
 	model_list = append(model_list, &erp_models.PurchaseBillEntryInfo{})
 	model_list = append(model_list, &erp_models.PurchaseBillInfo{})
-	model_list = append(model_list, &erp_models.RegionInfo{})
 	model_list = append(model_list, &erp_models.SalesManagerInfo{})
 	model_list = append(model_list, &erp_models.SeaContainerCostInfo{})
 
@@ -149,11 +156,6 @@ func (c Home) SyncDbPost() revel.Result {
 	model_list = append(model_list, &erp_models.StockBillEntryInfo{})
 	model_list = append(model_list, &erp_models.StockBillInfo{})
 	model_list = append(model_list, &erp_models.StockBillTypeInfo{})
-	model_list = append(model_list, &erp_models.StockInfo{})
-	model_list = append(model_list, &erp_models.StockPickCrewInfo{})
-	model_list = append(model_list, &erp_models.StockTypeInfo{})
-	model_list = append(model_list, &erp_models.StorageLocInfo{})
-	model_list = append(model_list, &erp_models.SupplierInfo{})
 	//model_list = append(model_list, &erp_models.TestInfo{}) // 为什么这一句打开就不行
 
 	model_list = append(model_list, &track_modes.IssueAttachInfo{})

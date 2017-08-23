@@ -1,4 +1,4 @@
-package models
+package ddpz_models
 
 import (
 	"github.com/go-xorm/xorm"

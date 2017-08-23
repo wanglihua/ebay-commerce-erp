@@ -9,8 +9,8 @@ import (
 
 	"runtime/debug"
 	"matrix/core"
-	"matrix/modules/erp/models"
 	"matrix/modules/erp/models/kcgl_models"
+	"matrix/modules/erp/models/sppz_models"
 )
 
 func Update_au_stock_cost() {
@@ -53,7 +53,7 @@ UPDATE erp_inventory SET cost_price = 0 WHERE product_id = 0 AND (SELECT s.stock
 	var get_cn_inventory_list = `SELECT nvt.* FROM erp_inventory nvt
     INNER JOIN erp_stock s ON s.id = nvt.stock_id
 WHERE s.stock_type_id = %d;`
-	get_cn_inventory_list = fmt.Sprintf(get_cn_inventory_list, models.STOCK_TYPE_CN)
+	get_cn_inventory_list = fmt.Sprintf(get_cn_inventory_list, sppz_models.STOCK_TYPE_CN)
 
 	err = db_session.Sql(get_cn_inventory_list).Find(&inventory_cn_list)
 	core.HandleError(err)
@@ -64,8 +64,8 @@ WHERE s.stock_type_id = %d;`
 		// 不用汇率换算了，仓库的成本都是RMB的
 		var sea_container_cost = sea_container_cost_service.Get_sea_container_cost(db_session)
 
-		var au_stock_list = make([]models.StockInfo, 0)
-		core.HandleError(db_session.Where("stock_type_id = ?", models.STOCK_TYPE_AU).Find(&au_stock_list))
+		var au_stock_list = make([]sppz_models.StockInfo, 0)
+		core.HandleError(db_session.Where("stock_type_id = ?", sppz_models.STOCK_TYPE_AU).Find(&au_stock_list))
 
 		// 汇率换算
 		//var aud_exchange_rate = exchange_rate_service.Get_aud_exchange_rate(db_session)
@@ -101,7 +101,7 @@ WHERE s.stock_type_id = %d;`
 			var avg_sea_shipping_cost = float64(sea_container_cost.Cost) * product.Length * product.Width * product.Height / float64(sea_container_cost.Volume)
 
 			var update_au_inventory_sql = `UPDATE erp_inventory SET cost_price = %f WHERE product_id = %d AND (SELECT s.stock_type_id FROM erp_stock s WHERE s.id = erp_inventory.stock_id) = %d;`
-			update_au_inventory_sql = fmt.Sprintf(update_au_inventory_sql, cn_cost_price+avg_sea_shipping_cost, cn_inventory.ProductId, models.STOCK_TYPE_AU)
+			update_au_inventory_sql = fmt.Sprintf(update_au_inventory_sql, cn_cost_price+avg_sea_shipping_cost, cn_inventory.ProductId, sppz_models.STOCK_TYPE_AU)
 			_, err = db_session.Exec(update_au_inventory_sql)
 			core.HandleError(err)
 		}
@@ -109,8 +109,8 @@ WHERE s.stock_type_id = %d;`
 
 	// 自动添加不存在的对应的在途仓记录
 	{
-		var zt_stock_list = make([]models.StockInfo, 0)
-		core.HandleError(db_session.Where("stock_type_id = ?", models.STOCK_TYPE_ZT).Find(&zt_stock_list))
+		var zt_stock_list = make([]sppz_models.StockInfo, 0)
+		core.HandleError(db_session.Where("stock_type_id = ?", sppz_models.STOCK_TYPE_ZT).Find(&zt_stock_list))
 
 		// 汇率换算
 		//var aud_exchange_rate = exchange_rate_service.Get_aud_exchange_rate(db_session)

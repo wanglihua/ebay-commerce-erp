@@ -17,6 +17,8 @@ import (
 	"matrix/modules/erp/service/stock_service"
 	"sort"
 	"matrix/modules/erp/models/xtpz_models"
+	"matrix/modules/erp/models/ddpz_models"
+	"matrix/modules/erp/models/sppz_models"
 )
 
 type ErpOrderLogisticsCompanyExport struct {
@@ -75,7 +77,7 @@ func (s order_logistics_eparcel_view_item_slice) Less(i, j int) bool { return s[
 type order_logistics_fastway_view_item_t struct {
 	OrderLogistics models.OrderLogisticsInfo    `xorm:"extends" json:"ol"`
 	Order          models.OrderInfo             `xorm:"extends" json:"o"`
-	LogisticsMode  models.LogisticsModeInfo     `xorm:"extends" json:"lm"`
+	LogisticsMode  ddpz_models.LogisticsModeInfo     `xorm:"extends" json:"lm"`
 	ShopAccount    xtpz_models.ShopAccountInfo       `xorm:"extends" json:"sa"`
 	sku_qty_loc    string                       `xorm:"-"`
 	loc_name       string                       `xorm:"-"`
@@ -90,7 +92,7 @@ func (s order_logistics_fastway_view_item_slice) Less(i, j int) bool { return s[
 type order_logistics_toll_view_item_t struct {
 	OrderLogistics models.OrderLogisticsInfo    `xorm:"extends" json:"ol"`
 	Order          models.OrderInfo             `xorm:"extends" json:"o"`
-	LogisticsMode  models.LogisticsModeInfo     `xorm:"extends" json:"lm"`
+	LogisticsMode  ddpz_models.LogisticsModeInfo     `xorm:"extends" json:"lm"`
 	ShopAccount    xtpz_models.ShopAccountInfo       `xorm:"extends" json:"sa"`
 	sku_qty_loc    string                       `xorm:"-"`
 	loc_name       string                       `xorm:"-"`
@@ -149,7 +151,7 @@ func (c ErpOrderLogisticsCompanyExport) ExportExcel() revel.Result {
 	// toll_mel.xlsx
 
 	// the stock selected is mel or bne?
-	var stock models.StockInfo
+	var stock sppz_models.StockInfo
 	_, err := db_session.Id(stock_id).Get(&stock)
 	core.HandleError(err)
 
@@ -678,7 +680,7 @@ func get_toll_order_sku_for_export(order_id int64, db_session *xorm.Session) (or
 	}
 }
 
-func get_fastway_packaging_code(logistics_mode models.LogisticsModeInfo) string {
+func get_fastway_packaging_code(logistics_mode ddpz_models.LogisticsModeInfo) string {
 	/*
 		FASTWAY
 		字段    代码
@@ -806,7 +808,7 @@ aus    act	  ACT
 }
 
 func get_mel_toll_service_id(postcode string, db_session *xorm.Session) string {
-	var mel_toll_service_id models.MelTollSeviceIdInfo
+	var mel_toll_service_id ddpz_models.MelTollSeviceIdInfo
 	postcode_without_prefix_zero := strings.TrimPrefix(postcode, "0")
 	_, err := db_session.Where(fmt.Sprintf("postcode = '%s' OR postcode = '%s'", postcode, postcode_without_prefix_zero)).Get(&mel_toll_service_id)
 	core.HandleError(err)

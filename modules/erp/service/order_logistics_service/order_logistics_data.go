@@ -5,6 +5,7 @@ import (
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/inventory_service"
 	"matrix/modules/erp/service/order_service"
+	"matrix/modules/erp/models/sppz_models"
 )
 
 type order_logistics_data_t struct {
@@ -12,7 +13,7 @@ type order_logistics_data_t struct {
 	order_shipping_address  models.OrderShippingAddressInfo
 	order_product_info_list []order_service.Order_product_info_t
 	products_stock_qty_list []inventory_service.Product_stock_qty
-	stock_list              []models.StockInfo
+	stock_list              []sppz_models.StockInfo
 }
 
 // 一次性全部加载

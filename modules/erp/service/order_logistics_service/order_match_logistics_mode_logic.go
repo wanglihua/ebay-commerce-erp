@@ -12,6 +12,7 @@ import (
 	"matrix/core"
 	"time"
 	"runtime/debug"
+	"matrix/modules/erp/models/ddpz_models"
 )
 
 var db_driver string
@@ -278,7 +279,7 @@ func (p_ol *OrderLogisticsService) match_logistics_mode_logic(p_order *models.Or
 		}
 
 		mode_result.fee_rate_id = 0
-		mode_result.fee_rate = models.LogisticsFeeRateInfo{}
+		mode_result.fee_rate = ddpz_models.LogisticsFeeRateInfo{}
 		var total_fee_in_fee_rate float64 = 10000000 //非超重部分的费用，初始为一个很大的不可能的数字， 澳币
 		for _, logistics_fee_rate := range logistics_fee_rate_list {
 

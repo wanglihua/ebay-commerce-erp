@@ -8,8 +8,8 @@ import (
 	"matrix/core"
 	"matrix/modules/auth/pass_res"
 	"matrix/modules/auth/service/pass_service"
-	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/pick_fee_service"
+	"matrix/modules/erp/models/ddpz_models"
 )
 
 type ErpPickFee struct {
@@ -23,7 +23,7 @@ func (c ErpPickFee) Index() revel.Result {
 }
 
 type PickFeeDetailForm struct {
-	PickFee models.PickFeeInfo `json:"pick_fee"`
+	PickFee ddpz_models.PickFeeInfo `json:"pick_fee"`
 }
 
 func (f *PickFeeDetailForm) Valid(validation *revel.Validation) bool {

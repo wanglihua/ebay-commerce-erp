@@ -3,7 +3,7 @@ package logistics_company_service
 import (
 	"github.com/go-xorm/xorm"
 	"matrix/core"
-	"matrix/modules/erp/models"
+	"matrix/modules/erp/models/ddpz_models"
 )
 
 func Get_company_id_name_map(company_id_list []int64, db_session *xorm.Session) map[int64]string {
@@ -13,7 +13,7 @@ func Get_company_id_name_map(company_id_list []int64, db_session *xorm.Session) 
 		return company_id_name_map
 	}
 
-	var company_list = make([]models.LogisticsCompanyInfo, 0)
+	var company_list = make([]ddpz_models.LogisticsCompanyInfo, 0)
 	err := db_session.In("id", company_id_list).Find(&company_list)
 	core.HandleError(err)
 

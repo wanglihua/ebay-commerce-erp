@@ -11,6 +11,7 @@ import (
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/models/kcgl_models"
+	"matrix/modules/erp/models/sppz_models"
 )
 
 type ErpStockBillTransferEntry struct {
@@ -56,8 +57,8 @@ WHERE sbe.bill_id = 0;
 	type StockBillTransferViewItem struct {
 		models.StockBillEntryInfo `xorm:"extends" json:"sbe"`
 		models.StockBillInfo      `xorm:"extends" json:"sb"`
-		models.StockInfo          `xorm:"extends" json:"s"`
-		models.StorageLocInfo     `xorm:"extends" json:"sl"`
+		sppz_models.StockInfo          `xorm:"extends" json:"s"`
+		sppz_models.StorageLocInfo     `xorm:"extends" json:"sl"`
 		kcgl_models.ProductInfo        `xorm:"extends" json:"p"`
 	}
 
@@ -107,7 +108,7 @@ type StockBillEntryTransferDetailForm struct {
 	StockBillEntry models.StockBillEntryInfo   `json:"bill_entry"`
 	ProductName    string                      `json:"product_name"`
 	StockName      string                      `json:"stock_name"`
-	StorageLocList []models.StorageLocInfo     `json:"storage_loc_list"`
+	StorageLocList []sppz_models.StorageLocInfo     `json:"storage_loc_list"`
 }
 
 func (f *StockBillEntryTransferDetailForm) IsCreate() bool {
@@ -142,10 +143,10 @@ func (c ErpStockBillTransferEntry) DetailData() revel.Result {
 		return c.RenderJson(core.JsonResult{Success: false, Message: "指定的调拨单不存在！"})
 	}
 
-	var stock models.StockInfo
+	var stock sppz_models.StockInfo
 	_, err = db_session.Id(stock_bill.StockId).Get(&stock)
 
-	storage_loc_list := make([]models.StorageLocInfo, 0)
+	storage_loc_list := make([]sppz_models.StorageLocInfo, 0)
 	err = db_session.Where(fmt.Sprintf("stock_id = %d", stock_bill.StockId)).OrderBy("name asc").Find(&storage_loc_list)
 	core.HandleError(err)
 
@@ -241,7 +242,7 @@ func (c ErpStockBillTransferEntry) ProductSelectListData() revel.Result {
 	type ErpProductViewItem struct {
 		kcgl_models.ProductInfo          `xorm:"extends" json:"prd"`
 		kcgl_models.ProductCateInfo      `xorm:"extends" json:"cate"`
-		models.SupplierInfo         `xorm:"extends" json:"sup"`
+		sppz_models.SupplierInfo         `xorm:"extends" json:"sup"`
 		models.PackageMaterialInfo  `xorm:"extends" json:"pm"`
 		models.StatusInfo           `xorm:"extends" json:"st"`
 	}

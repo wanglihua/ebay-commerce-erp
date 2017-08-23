@@ -1,4 +1,4 @@
-package models
+package sppz_models
 
 import (
 	"github.com/go-xorm/xorm"

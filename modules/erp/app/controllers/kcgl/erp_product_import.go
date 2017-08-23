@@ -15,6 +15,7 @@ import (
 	"matrix/modules/erp/service/product_import_batch_service"
 	"matrix/modules/erp/service/status_service"
 	"matrix/modules/erp/models/kcgl_models"
+	"matrix/modules/erp/models/sppz_models"
 )
 
 type ErpProductImport struct {
@@ -60,7 +61,7 @@ func (c ErpProductImport) ListData() revel.Result {
 	type product_view_item_t struct {
 		Product         kcgl_models.ProductInfo           `xorm:"extends" json:"prd"`
 		ProductCate     kcgl_models.ProductCateInfo       `xorm:"extends" json:"cate"`
-		Supplier        models.SupplierInfo          `xorm:"extends" json:"sup"`
+		Supplier        sppz_models.SupplierInfo          `xorm:"extends" json:"sup"`
 		PackageMaterial models.PackageMaterialInfo   `xorm:"extends" json:"pm"`
 		Status          models.StatusInfo            `xorm:"extends" json:"st"`
 	}

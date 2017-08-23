@@ -13,6 +13,7 @@ import (
 	"matrix/modules/erp/service/order_history_service"
 	"time"
 	"matrix/modules/erp/models/xtpz_models"
+	"matrix/modules/erp/models/sppz_models"
 )
 
 type ErpOrderNew struct {
@@ -50,7 +51,7 @@ func (c ErpOrderNew) CreateData() revel.Result {
 	var user_list = make([]auth_models.UserInfo, 0)
 	core.HandleError(db_session.Find(&user_list))
 
-	var au_stock_list = make([]models.StockInfo, 0)
+	var au_stock_list = make([]sppz_models.StockInfo, 0)
 
 	var login_user = core.GetLoginUser(c.Session)
 
@@ -83,10 +84,10 @@ WHERE s.stock_type_id = 300 AND spc.user_id = 22;
 FROM erp_stock_pick_crew spc
     INNER JOIN erp_stock s ON s.id = spc.stock_id
 WHERE s.stock_type_id = %d AND spc.user_id = %d;`
-		stock_list_sql = fmt.Sprintf(stock_list_sql, models.STOCK_TYPE_AU, login_user.UserId)
+		stock_list_sql = fmt.Sprintf(stock_list_sql, sppz_models.STOCK_TYPE_AU, login_user.UserId)
 		core.HandleError(db_session.Sql(stock_list_sql).Find(&au_stock_list))
 	} else {
-		core.HandleError(db_session.Where("stock_type_id = ?", models.STOCK_TYPE_AU).Find(&au_stock_list))
+		core.HandleError(db_session.Where("stock_type_id = ?", sppz_models.STOCK_TYPE_AU).Find(&au_stock_list))
 	}
 
 	var stock_id int64 = 0

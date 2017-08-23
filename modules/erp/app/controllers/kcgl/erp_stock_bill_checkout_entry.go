@@ -11,6 +11,7 @@ import (
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/models/kcgl_models"
+	"matrix/modules/erp/models/sppz_models"
 )
 
 type ErpStockBillCheckoutEntry struct {
@@ -34,7 +35,7 @@ func (c ErpStockBillCheckoutEntry) Index(bill_id int64) revel.Result {
 	_, err = db_session.Id(stock_bill.StatusId).Get(&bill_status)
 	core.HandleError(err)
 
-	var stock models.StockInfo
+	var stock sppz_models.StockInfo
 	_, err = db_session.Id(stock_bill.StockId).Get(&stock)
 	core.HandleError(err)
 
@@ -48,7 +49,7 @@ func (c ErpStockBillCheckoutEntry) Index(bill_id int64) revel.Result {
 type ErpStockBillCheckoutEntryViewItem struct {
 	models.StockBillEntryInfo `xorm:"extends" json:"sbe"`
 	models.StockBillInfo      `xorm:"extends" json:"sb"`
-	models.StorageLocInfo     `xorm:"extends" json:"sl"`
+	sppz_models.StorageLocInfo     `xorm:"extends" json:"sl"`
 	kcgl_models.ProductInfo        `xorm:"extends" json:"p"`
 }
 

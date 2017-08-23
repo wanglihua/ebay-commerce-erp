@@ -6,7 +6,7 @@ import (
 	"strconv"
 
 	"matrix/core"
-	"matrix/modules/erp/models"
+	"matrix/modules/erp/models/ddpz_models"
 )
 
 // 弃用
@@ -34,12 +34,12 @@ func (c ErpLogisticsNumberLog) ListData() revel.Result {
 		data_query = *data_query.Asc("id")
 	}
 
-	logistics_number_log_list := make([]models.LogisticsNumberLogInfo, 0, limit)
+	logistics_number_log_list := make([]ddpz_models.LogisticsNumberLogInfo, 0, limit)
 	err := data_query.Limit(limit, offset).Find(&logistics_number_log_list)
 	core.HandleError(err)
 
 	count_query := *query
-	count, err := count_query.Count(new(models.LogisticsNumberLogInfo))
+	count, err := count_query.Count(new(ddpz_models.LogisticsNumberLogInfo))
 	core.HandleError(err)
 
 	return c.RenderJson(core.GridResult{
@@ -49,7 +49,7 @@ func (c ErpLogisticsNumberLog) ListData() revel.Result {
 }
 
 type LogisticsNumberLogDetailForm struct {
-	LogisticsNumberLog models.LogisticsNumberLogInfo `json:"number_log"`
+	LogisticsNumberLog ddpz_models.LogisticsNumberLogInfo `json:"number_log"`
 }
 
 func (f *LogisticsNumberLogDetailForm) IsCreate() bool {
@@ -80,7 +80,7 @@ func (c ErpLogisticsNumberLog) DetailData() revel.Result {
 	var logistics_number_log_id int64
 	c.Params.Bind(&logistics_number_log_id, "id")
 
-	var logistics_number_log models.LogisticsNumberLogInfo
+	var logistics_number_log ddpz_models.LogisticsNumberLogInfo
 	if logistics_number_log_id != 0 {
 		has, err := db_session.Id(logistics_number_log_id).Get(&logistics_number_log)
 		core.HandleError(err)
@@ -130,7 +130,7 @@ func (c ErpLogisticsNumberLog) Delete() revel.Result {
 	logistics_number_log_id_list := make([]int64, 0)
 	c.Params.Bind(&logistics_number_log_id_list, "id_list")
 
-	affected, err := db_session.In("id", logistics_number_log_id_list).Delete(new(models.LogisticsNumberLogInfo))
+	affected, err := db_session.In("id", logistics_number_log_id_list).Delete(new(ddpz_models.LogisticsNumberLogInfo))
 	core.HandleError(err)
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})

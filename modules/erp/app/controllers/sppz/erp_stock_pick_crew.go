@@ -11,7 +11,7 @@ import (
 	auth_models "matrix/modules/auth/models"
 	"matrix/modules/auth/pass_res"
 	"matrix/modules/auth/service/pass_service"
-	"matrix/modules/erp/models"
+	"matrix/modules/erp/models/sppz_models"
 )
 
 type ErpStockPickCrew struct {
@@ -29,7 +29,7 @@ func (c ErpStockPickCrew) PageData() revel.Result {
 
 	var db_session = c.DbSession
 
-	var stock_list = make([]models.StockInfo, 0)
+	var stock_list = make([]sppz_models.StockInfo, 0)
 	err := db_session.Find(&stock_list)
 	core.HandleError(err)
 
@@ -64,8 +64,8 @@ func (c ErpStockPickCrew) ListData() revel.Result {
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
 	type stock_pick_crew_view_item_t struct {
-		models.StockPickCrewInfo  `xorm:"extends" json:"spc"`
-		models.StockInfo          `xorm:"extends" json:"s"`
+		sppz_models.StockPickCrewInfo  `xorm:"extends" json:"spc"`
+		sppz_models.StockInfo          `xorm:"extends" json:"s"`
 		auth_models.UserInfo      `xorm:"extends" json:"u"`
 	}
 
@@ -127,8 +127,8 @@ WHERE spc.stock_id = 0 AND u.login_name LIKE '%abc%' AND u.nick_name LIKE '%abc%
 }
 
 type StockPickCrewDetailForm struct {
-	StockPickCrew models.StockPickCrewInfo  `json:"stock_pick_crew"`
-	StockList     []models.StockInfo        `json:"stock_list"`
+	StockPickCrew sppz_models.StockPickCrewInfo  `json:"stock_pick_crew"`
+	StockList     []sppz_models.StockInfo        `json:"stock_list"`
 	UserLoginName string                    `json:"user_login_name"`
 }
 
@@ -159,7 +159,7 @@ func (c ErpStockPickCrew) DetailData() revel.Result {
 
 	var detail_form StockPickCrewDetailForm
 
-	var stock_pick_crew models.StockPickCrewInfo
+	var stock_pick_crew sppz_models.StockPickCrewInfo
 	if stock_pick_crew_id != 0 {
 		has, err := db_session.Id(stock_pick_crew_id).Get(&stock_pick_crew)
 		core.HandleError(err)
@@ -179,7 +179,7 @@ func (c ErpStockPickCrew) DetailData() revel.Result {
 		stock_pick_crew.IsManager = -1 // 否，不是管理员
 	}
 
-	var stock_list = make([]models.StockInfo, 0)
+	var stock_list = make([]sppz_models.StockInfo, 0)
 	err := db_session.Find(&stock_list)
 	core.HandleError(err)
 
@@ -250,7 +250,7 @@ func (c ErpStockPickCrew) Save() revel.Result {
 		core.HandleError(err)
 
 		if affected == 0 {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！" })
+			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！"})
 		}
 	}
 
@@ -265,7 +265,7 @@ func (c ErpStockPickCrew) Delete() revel.Result {
 	stock_pick_crew_id_list := make([]int64, 0)
 	c.Params.Bind(&stock_pick_crew_id_list, "id_list")
 
-	affected, err := db_session.In("id", stock_pick_crew_id_list).Delete(new(models.StockPickCrewInfo))
+	affected, err := db_session.In("id", stock_pick_crew_id_list).Delete(new(sppz_models.StockPickCrewInfo))
 	core.HandleError(err)
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})

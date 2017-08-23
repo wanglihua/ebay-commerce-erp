@@ -7,7 +7,7 @@ import (
 	"github.com/revel/revel"
 	"matrix/core"
 	"matrix/modules/auth/service/pass_service"
-	"matrix/modules/erp/models"
+	"matrix/modules/erp/models/sppz_models"
 )
 
 func Get_stock_id_type_by_name(stock_name string, db_session *xorm.Session) (id_return int64, type_return int64) {
@@ -36,7 +36,7 @@ func Get_stock_id_name_map(stock_id_list []int64, db_session *xorm.Session) map[
 		return stock_id_name_map
 	}
 
-	var stock_list = make([]models.StockInfo, 0)
+	var stock_list = make([]sppz_models.StockInfo, 0)
 	err := db_session.In("id", stock_id_list).Find(&stock_list)
 	core.HandleError(err)
 
@@ -48,14 +48,14 @@ func Get_stock_id_name_map(stock_id_list []int64, db_session *xorm.Session) map[
 }
 
 // 获取人员的仓库列表，如果是拣货人员的话，只获取有权限的仓库
-func Get_login_user_stock_list(db_session *xorm.Session, web_session revel.Session) []models.StockInfo {
+func Get_login_user_stock_list(db_session *xorm.Session, web_session revel.Session) []sppz_models.StockInfo {
 	/*
 	SELECT * FROM erp_stock WHERE stock_type_id = 1 AND id IN (SELECT spc.stock_id FROM erp_stock_pick_crew spc WHERE spc.user_id = 1)
 	 */
 
-	var stock_list = make([]models.StockInfo, 0)
+	var stock_list = make([]sppz_models.StockInfo, 0)
 
-	var stock_list_filter = fmt.Sprintf("stock_type_id = %d", models.STOCK_TYPE_AU) //只取澳洲的仓库
+	var stock_list_filter = fmt.Sprintf("stock_type_id = %d", sppz_models.STOCK_TYPE_AU) //只取澳洲的仓库
 	var login_user = core.GetLoginUser(web_session)
 	if login_user.IsSuperAdmin == false && pass_service.Is_user_admin(login_user.UserId) == false {
 		var is_user_custom_service = pass_service.Is_user_custom_service(login_user.UserId)

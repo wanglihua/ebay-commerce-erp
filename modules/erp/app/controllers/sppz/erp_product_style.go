@@ -6,9 +6,9 @@ import (
 	"github.com/revel/revel"
 
 	"matrix/core"
-	"matrix/modules/erp/models"
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/auth/pass_res"
+	"matrix/modules/erp/models/sppz_models"
 )
 
 type ErpProductStyle struct {
@@ -38,12 +38,12 @@ func (c ErpProductStyle) ListData() revel.Result {
 		data_query = *data_query.Asc("id")
 	}
 
-	product_style_list := make([]models.ProductStyleInfo, 0, limit)
+	product_style_list := make([]sppz_models.ProductStyleInfo, 0, limit)
 	err := data_query.Limit(limit, offset).Find(&product_style_list)
 	core.HandleError(err)
 
 	count_query := *query
-	count, err := count_query.Count(new(models.ProductStyleInfo))
+	count, err := count_query.Count(new(sppz_models.ProductStyleInfo))
 	core.HandleError(err)
 
 	return c.RenderJson(core.GridResult{
@@ -53,7 +53,7 @@ func (c ErpProductStyle) ListData() revel.Result {
 }
 
 type ProductStyleDetailForm struct {
-	ProductStyle models.ProductStyleInfo `json:"product_style"`
+	ProductStyle sppz_models.ProductStyleInfo `json:"product_style"`
 }
 
 func (f *ProductStyleDetailForm) IsCreate() bool {
@@ -84,7 +84,7 @@ func (c ErpProductStyle) DetailData() revel.Result {
 	var product_style_id int64
 	c.Params.Bind(&product_style_id, "id")
 
-	var product_style models.ProductStyleInfo
+	var product_style sppz_models.ProductStyleInfo
 	if product_style_id != 0 {
 		has, err := db_session.Id(product_style_id).Get(&product_style)
 		core.HandleError(err)
@@ -132,13 +132,13 @@ func (c ErpProductStyle) Save() revel.Result {
 
 func (c ErpProductStyle) Delete() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.SPPZ_PRODUCT_STYLE, c.Session)
-	
+
 	db_session := c.DbSession
 
 	product_style_id_list := make([]int64, 0)
 	c.Params.Bind(&product_style_id_list, "id_list")
 
-	affected, err := db_session.In("id", product_style_id_list).Delete(new(models.ProductStyleInfo))
+	affected, err := db_session.In("id", product_style_id_list).Delete(new(sppz_models.ProductStyleInfo))
 	core.HandleError(err)
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})

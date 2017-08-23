@@ -13,6 +13,7 @@ import (
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/bill_service"
+	"matrix/modules/erp/models/sppz_models"
 )
 
 type ErpStockBillCheckout struct {
@@ -27,7 +28,7 @@ func (c ErpStockBillCheckout) Index() revel.Result {
 
 type ErpStockBillCheckoutViewItem struct {
 	models.StockBillInfo `xorm:"extends" json:"sb"`
-	models.StockInfo     `xorm:"extends" json:"s"`
+	sppz_models.StockInfo     `xorm:"extends" json:"s"`
 	auth_models.UserInfo `xorm:"extends" json:"u"`
 	models.StatusInfo    `xorm:"extends" json:"st"`
 }
@@ -89,7 +90,7 @@ WHERE sb.type_id = 100;
 
 type StockBillCheckoutDetailForm struct {
 	StockBill models.StockBillInfo `json:"stock_bill"`
-	StockList []models.StockInfo   `json:"stock_list"`
+	StockList []sppz_models.StockInfo   `json:"stock_list"`
 }
 
 func (f *StockBillCheckoutDetailForm) IsCreate() bool {
@@ -134,7 +135,7 @@ func (c ErpStockBillCheckout) DetailData() revel.Result {
 		stock_bill.Date = core.Date(time.Now())
 	}
 
-	var stock_list []models.StockInfo
+	var stock_list []sppz_models.StockInfo
 	err := db_session.Find(&stock_list)
 	core.HandleError(err)
 

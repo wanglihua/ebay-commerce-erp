@@ -6,7 +6,7 @@ import (
 
 	"github.com/go-xorm/xorm"
 	"matrix/core"
-	"matrix/modules/erp/models"
+	"matrix/modules/erp/models/sppz_models"
 )
 
 type Region_t struct {
@@ -20,7 +20,7 @@ func Get_province_list(db_session *xorm.Session) []Region_t {
 	 */
 
 	var sql_province_list = `SELECT r.id AS id, r.province AS name FROM erp_region r WHERE r.parent = %d ORDER BY r.id ASC`
-	sql_province_list = fmt.Sprintf(sql_province_list, models.REGION_ROOT_ID)
+	sql_province_list = fmt.Sprintf(sql_province_list, sppz_models.REGION_ROOT_ID)
 
 	var province_list = make([]Region_t, 0)
 	err := db_session.Sql(sql_province_list).Find(&province_list)
@@ -59,7 +59,7 @@ func Get_region_full_name(region_id int64, db_session *xorm.Session) string {
 	var region_full_name = ""
 
 	var parent_id int64 = math.MaxInt64
-	for parent_id > models.REGION_ROOT_ID {
+	for parent_id > sppz_models.REGION_ROOT_ID {
 		var region_name_parent_id region_name_parent_id_t
 		var sql = fmt.Sprintf(sql_template, region_id)
 		_, err := db_session.Sql(sql).Get(&region_name_parent_id)

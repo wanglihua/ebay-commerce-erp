@@ -12,6 +12,8 @@ import (
 	"matrix/modules/auth/pass_res"
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/erp/models"
+	"matrix/modules/erp/models/ddpz_models"
+	"matrix/modules/erp/models/sppz_models"
 )
 
 type ErpLogisticsMode struct {
@@ -32,9 +34,9 @@ func (c ErpLogisticsMode) ListData() revel.Result {
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
 	type logistics_mode_view_item_t struct {
-		models.LogisticsModeInfo          `xorm:"extends" json:"m"`
-		models.LogisticsCompanyInfo       `xorm:"extends" json:"c"`
-		models.StockInfo                  `xorm:"extends" json:"sk"`
+		ddpz_models.LogisticsModeInfo          `xorm:"extends" json:"m"`
+		ddpz_models.LogisticsCompanyInfo       `xorm:"extends" json:"c"`
+		sppz_models.StockInfo                  `xorm:"extends" json:"sk"`
 		models.StatusInfo                 `xorm:"extends" json:"st"`
 	}
 
@@ -85,10 +87,10 @@ func (c ErpLogisticsMode) ListData() revel.Result {
 }
 
 type LogisticsModeDetailForm struct {
-	LogisticsMode         models.LogisticsModeInfo       `json:"logistics_mode"`
-	LogisticsCompanyList  []models.LogisticsCompanyInfo  `json:"logistics_company_list"`
-	StockList             []models.StockInfo             `json:"stock_list"`
-	LogisticsModeTypeList []models.LogisticsModeTypeInfo `json:"logistics_mode_type_list"`
+	LogisticsMode         ddpz_models.LogisticsModeInfo       `json:"logistics_mode"`
+	LogisticsCompanyList  []ddpz_models.LogisticsCompanyInfo  `json:"logistics_company_list"`
+	StockList             []sppz_models.StockInfo             `json:"stock_list"`
+	LogisticsModeTypeList []ddpz_models.LogisticsModeTypeInfo `json:"logistics_mode_type_list"`
 	StatusList            []models.StatusInfo            `json:"status_list"`
 }
 
@@ -120,7 +122,7 @@ func (c ErpLogisticsMode) DetailData() revel.Result {
 	var logistics_mode_id int64
 	c.Params.Bind(&logistics_mode_id, "id")
 
-	var logistics_mode models.LogisticsModeInfo
+	var logistics_mode ddpz_models.LogisticsModeInfo
 	if logistics_mode_id != 0 {
 		has, err := db_session.Id(logistics_mode_id).Get(&logistics_mode)
 		core.HandleError(err)
@@ -130,22 +132,22 @@ func (c ErpLogisticsMode) DetailData() revel.Result {
 	} else {
 		logistics_mode.Tjzysjzqx = 1
 		logistics_mode.StatusId = models.LOGISTICS_MODE_ENABLED
-		logistics_mode.TypeId = models.LOGISTICS_MODE_TYPE_PACKAGE
+		logistics_mode.TypeId = ddpz_models.LOGISTICS_MODE_TYPE_PACKAGE
 	}
 
-	var logistics_company_list = make([]models.LogisticsCompanyInfo, 0)
+	var logistics_company_list = make([]ddpz_models.LogisticsCompanyInfo, 0)
 	err := db_session.Find(&logistics_company_list)
 	core.HandleError(err)
 
-	var stock_list = make([]models.StockInfo, 0)
-	err = db_session.Where(fmt.Sprintf("stock_type_id = %d", models.STOCK_TYPE_AU)).Find(&stock_list)
+	var stock_list = make([]sppz_models.StockInfo, 0)
+	err = db_session.Where(fmt.Sprintf("stock_type_id = %d", sppz_models.STOCK_TYPE_AU)).Find(&stock_list)
 	core.HandleError(err)
 
 	var status_list = make([]models.StatusInfo, 0)
 	err = db_session.Where(fmt.Sprintf("type = %d", models.STATUS_TYPE_LOGISTICS_MODE)).Find(&status_list)
 	core.HandleError(err)
 
-	var logistics_mode_type_list = make([]models.LogisticsModeTypeInfo, 0)
+	var logistics_mode_type_list = make([]ddpz_models.LogisticsModeTypeInfo, 0)
 	err = db_session.OrderBy("id ASC").Find(&logistics_mode_type_list)
 	core.HandleError(err)
 
@@ -176,19 +178,19 @@ func (c ErpLogisticsMode) Save() revel.Result {
 
 	var affected int64
 	if detail_form.IsCreate() {
-		name_count, err := db_session.Where(fmt.Sprintf("company_id = %d AND name = '%s'", logistics_mode.CompanyId, logistics_mode.Name)).Count(new(models.LogisticsModeInfo))
+		name_count, err := db_session.Where(fmt.Sprintf("company_id = %d AND name = '%s'", logistics_mode.CompanyId, logistics_mode.Name)).Count(new(ddpz_models.LogisticsModeInfo))
 		core.HandleError(err)
 		if name_count != 0 {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，名称已存在！" })
+			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，名称已存在！"})
 		}
 
 		affected, err = db_session.Insert(&logistics_mode)
 		core.HandleError(err)
 	} else {
-		name_count, err := db_session.Where(fmt.Sprintf("id <> %d AND company_id = %d AND name = '%s'", logistics_mode.Id, logistics_mode.CompanyId, logistics_mode.Name)).Count(new(models.LogisticsModeInfo))
+		name_count, err := db_session.Where(fmt.Sprintf("id <> %d AND company_id = %d AND name = '%s'", logistics_mode.Id, logistics_mode.CompanyId, logistics_mode.Name)).Count(new(ddpz_models.LogisticsModeInfo))
 		core.HandleError(err)
 		if name_count != 0 {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，名称已存在！" })
+			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，名称已存在！"})
 		}
 
 		affected, err = db_session.Id(logistics_mode.Id).Update(&logistics_mode)
@@ -275,10 +277,10 @@ func (c ErpLogisticsMode) Delete() revel.Result {
 	*/
 
 	// 一并删除物流费率
-	_, err := db_session.In("mode_id", logistics_mode_id_list).Delete(new(models.LogisticsFeeRateInfo))
+	_, err := db_session.In("mode_id", logistics_mode_id_list).Delete(new(ddpz_models.LogisticsFeeRateInfo))
 	core.HandleError(err)
 
-	_, err = db_session.In("id", logistics_mode_id_list).Delete(new(models.LogisticsModeInfo))
+	_, err = db_session.In("id", logistics_mode_id_list).Delete(new(ddpz_models.LogisticsModeInfo))
 	core.HandleError(err)
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: "数据删除成功!"})
@@ -304,7 +306,7 @@ func (c ErpLogisticsMode) Import() revel.Result {
 	type logistics_mode_t struct {
 		CompanyName   string
 		StockName     string
-		LogisticsMode models.LogisticsModeInfo
+		LogisticsMode ddpz_models.LogisticsModeInfo
 	}
 
 	logistics_mode_list := make([]logistics_mode_t, 0)
@@ -524,7 +526,7 @@ func (c ErpLogisticsMode) Import() revel.Result {
 		var logistics_mode = logistics_mode_import.LogisticsMode
 
 		// 物流公司
-		var logistics_company models.LogisticsCompanyInfo
+		var logistics_company ddpz_models.LogisticsCompanyInfo
 		has, err := db_session.Where(fmt.Sprintf("name = '%s'", logistics_mode_import.CompanyName)).Get(&logistics_company)
 		core.HandleError(err)
 
@@ -539,7 +541,7 @@ func (c ErpLogisticsMode) Import() revel.Result {
 		logistics_mode.CompanyId = logistics_company.Id
 
 		// 仓库
-		var stock models.StockInfo
+		var stock sppz_models.StockInfo
 		has, err = db_session.Where(fmt.Sprintf("name = '%s'", logistics_mode_import.StockName)).Get(&stock)
 		core.HandleError(err)
 		if has == false {
@@ -573,7 +575,7 @@ func (c ErpLogisticsMode) GetListByStock() revel.Result {
 	var stock_id int64
 	c.Params.Bind(&stock_id, "stock_id")
 
-	var model_list = make([]models.LogisticsModeInfo, 0)
+	var model_list = make([]ddpz_models.LogisticsModeInfo, 0)
 	err := db_session.Where(fmt.Sprintf("stock_id = %d", stock_id)).Find(&model_list)
 	core.HandleError(err)
 

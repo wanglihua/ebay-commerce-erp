@@ -9,6 +9,7 @@ import (
 	"matrix/core"
 	"matrix/modules/erp/service/stock_service"
 	"sort"
+	"matrix/modules/erp/models/ddpz_models"
 )
 
 type ErpOrderWaybillPrint struct {
@@ -65,7 +66,7 @@ func (c ErpOrderWaybillPrint) Preview() revel.Result {
 		core.HandleError(err)
 		print_order.Address = order_shipping_address
 
-		var logistics_company models.LogisticsCompanyInfo
+		var logistics_company ddpz_models.LogisticsCompanyInfo
 		_, err = db_session.Id(order.CompanyId).Get(&logistics_company)
 		core.HandleError(err)
 		print_order.LogisticsCompanyName = logistics_company.Name
@@ -159,7 +160,7 @@ func (c ErpOrderWaybillPrint) Print() revel.Result {
 		core.HandleError(err)
 		print_order.Address = order_shipping_address
 
-		var logistics_company models.LogisticsCompanyInfo
+		var logistics_company ddpz_models.LogisticsCompanyInfo
 		_, err = db_session.Id(order.CompanyId).Get(&logistics_company)
 		core.HandleError(err)
 		print_order.LogisticsCompanyName = logistics_company.Name

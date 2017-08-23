@@ -12,6 +12,7 @@ import (
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/models/kcgl_models"
 	"matrix/modules/erp/models/xtpz_models"
+	"matrix/modules/erp/models/sppz_models"
 )
 
 type ErpSalesManager struct {
@@ -266,7 +267,7 @@ func (c ErpSalesManager) ProductSelectListData() revel.Result {
 	type ErpProductViewItem struct {
 		kcgl_models.ProductInfo          `xorm:"extends" json:"prd"`
 		kcgl_models.ProductCateInfo      `xorm:"extends" json:"cate"`
-		models.SupplierInfo         `xorm:"extends" json:"sup"`
+		sppz_models.SupplierInfo         `xorm:"extends" json:"sup"`
 		models.PackageMaterialInfo  `xorm:"extends" json:"pm"`
 		models.StatusInfo           `xorm:"extends" json:"st"`
 	}

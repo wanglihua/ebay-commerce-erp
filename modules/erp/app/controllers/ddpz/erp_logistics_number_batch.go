@@ -8,6 +8,7 @@ import (
 	"matrix/core"
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/status_service"
+	"matrix/modules/erp/models/ddpz_models"
 )
 
 // 弃用
@@ -21,8 +22,8 @@ func (c ErpLogisticsNumberBatch) Index() revel.Result {
 }
 
 type ErpLogisticsNumberBatchViewItem struct {
-	models.LogisticsNumberBatchInfo `xorm:"extends" json:"b"`
-	models.LogisticsModeInfo        `xorm:"extends" json:"m"`
+	ddpz_models.LogisticsNumberBatchInfo `xorm:"extends" json:"b"`
+	ddpz_models.LogisticsModeInfo        `xorm:"extends" json:"m"`
 	models.StatusInfo               `xorm:"extends" json:"s"`
 }
 
@@ -69,8 +70,8 @@ func (c ErpLogisticsNumberBatch) ListData() revel.Result {
 }
 
 type LogisticsNumberBatchDetailForm struct {
-	LogisticsNumberBatch models.LogisticsNumberBatchInfo `json:"number_batch"`
-	LogisticsModeList    []models.LogisticsModeInfo      `json:"logistics_mode_list"`
+	LogisticsNumberBatch ddpz_models.LogisticsNumberBatchInfo `json:"number_batch"`
+	LogisticsModeList    []ddpz_models.LogisticsModeInfo      `json:"logistics_mode_list"`
 	StatusList           []models.StatusInfo             `json:"status_list"`
 }
 
@@ -104,7 +105,7 @@ func (c ErpLogisticsNumberBatch) DetailData() revel.Result {
 	var logistics_number_batch_id int64
 	c.Params.Bind(&logistics_number_batch_id, "id")
 
-	var logistics_number_batch models.LogisticsNumberBatchInfo
+	var logistics_number_batch ddpz_models.LogisticsNumberBatchInfo
 	if logistics_number_batch_id != 0 {
 		has, err := db_session.Id(logistics_number_batch_id).Get(&logistics_number_batch)
 		core.HandleError(err)
@@ -113,7 +114,7 @@ func (c ErpLogisticsNumberBatch) DetailData() revel.Result {
 		}
 	}
 
-	var logistics_mode_list = make([]models.LogisticsModeInfo, 0)
+	var logistics_mode_list = make([]ddpz_models.LogisticsModeInfo, 0)
 	err := db_session.Find(&logistics_mode_list)
 	core.HandleError(err)
 
@@ -164,7 +165,7 @@ func (c ErpLogisticsNumberBatch) Delete() revel.Result {
 	logistics_number_batch_id_list := make([]int64, 0)
 	c.Params.Bind(&logistics_number_batch_id_list, "id_list")
 
-	affected, err := db_session.In("id", logistics_number_batch_id_list).Delete(new(models.LogisticsNumberBatchInfo))
+	affected, err := db_session.In("id", logistics_number_batch_id_list).Delete(new(ddpz_models.LogisticsNumberBatchInfo))
 	core.HandleError(err)
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})

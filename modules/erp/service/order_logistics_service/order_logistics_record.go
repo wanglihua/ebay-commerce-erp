@@ -9,6 +9,7 @@ import (
 	"matrix/modules/erp/service/order_history_service"
 	"matrix/modules/erp/service/order_service"
 	"matrix/modules/erp/service/pick_fee_service"
+	"matrix/modules/erp/models/ddpz_models"
 )
 
 func save_order_logistics(p_ol *OrderLogisticsService, p_order *models.OrderInfo, p_order_logistics_data *order_logistics_data_t, match_result match_logistics_mode_result, unlock_express bool, login_user core.LoginUser, db_session *xorm.Session) models.OrderLogisticsInfo {
@@ -46,7 +47,7 @@ func save_order_logistics(p_ol *OrderLogisticsService, p_order *models.OrderInfo
 	var update_col_list = []string{"status_id", "stock_id", "address_id", "company_id", "mode_id", "hold_type_id", "profit_au", "profit_rmb"}
 
 	if match_result.has_stock == true {
-		if match_result.mode.TypeId == models.LOGISTICS_MODE_TYPE_EXPRESS && unlock_express == false { // 匹配出来是快递，并且当前不解锁快递，就可以设置为快递 hold
+		if match_result.mode.TypeId == ddpz_models.LOGISTICS_MODE_TYPE_EXPRESS && unlock_express == false { // 匹配出来是快递，并且当前不解锁快递，就可以设置为快递 hold
 			// 把订单状态修改为 Hold
 			p_order.HoldTypeId = core.MakeNullInt(models.ORDER_HOLD_TYPE_EXPRESS, true)
 			p_order.StatusId = models.ORDER_STATUS_HOLD // 修改订单状态为 hold 状态

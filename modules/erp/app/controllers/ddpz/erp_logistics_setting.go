@@ -9,8 +9,8 @@ import (
 	"matrix/core"
 	"matrix/modules/auth/pass_res"
 	"matrix/modules/auth/service/pass_service"
-	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/logistics_setting_service"
+	"matrix/modules/erp/models/ddpz_models"
 )
 
 type ErpLogisticsSetting struct {
@@ -24,7 +24,7 @@ func (c ErpLogisticsSetting) Index() revel.Result {
 }
 
 type LogisticsSettingDetailForm struct {
-	LogisticsSetting models.LogisticsSettingInfo `json:"logistics_setting"`
+	LogisticsSetting ddpz_models.LogisticsSettingInfo `json:"logistics_setting"`
 }
 
 func (f *LogisticsSettingDetailForm) Valid(validation *revel.Validation) bool {

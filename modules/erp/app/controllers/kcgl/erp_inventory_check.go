@@ -13,6 +13,7 @@ import (
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/bill_service"
 	"matrix/modules/erp/models/kcgl_models"
+	"matrix/modules/erp/models/sppz_models"
 )
 
 type ErpInventoryCheck struct {
@@ -27,7 +28,7 @@ func (c ErpInventoryCheck) Index() revel.Result {
 
 type ErpInventoryCheckViewItem struct {
 	kcgl_models.InventoryCheckInfo        `xorm:"extends" json:"ic"`
-	models.StockInfo                 `xorm:"extends" json:"st"`
+	sppz_models.StockInfo                 `xorm:"extends" json:"st"`
 	CheckUser   auth_models.UserInfo `xorm:"extends" json:"cu"`
 	ApproveUser auth_models.UserInfo `xorm:"extends" json:"au"`
 	models.StatusInfo                `xorm:"extends" json:"ss"`
@@ -83,7 +84,7 @@ func (c ErpInventoryCheck) ListData() revel.Result {
 
 type InventoryCheckDetailForm struct {
 	InventoryCheck kcgl_models.InventoryCheckInfo `json:"inventory_check"`
-	StockList      []models.StockInfo        `json:"stock_list"`
+	StockList      []sppz_models.StockInfo        `json:"stock_list"`
 }
 
 func (f *InventoryCheckDetailForm) IsCreate() bool {
@@ -130,7 +131,7 @@ func (c ErpInventoryCheck) DetailData() revel.Result {
 		inventory_check.CheckDate = core.Date(time.Now())
 	}
 
-	var stock_list []models.StockInfo
+	var stock_list []sppz_models.StockInfo
 	err := db_session.Find(&stock_list)
 	core.HandleError(err)
 

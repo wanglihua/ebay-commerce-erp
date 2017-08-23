@@ -27,6 +27,8 @@ import (
 	"matrix/modules/erp/service/order_item_service"
 	"matrix/modules/erp/models/kcgl_models"
 	"matrix/modules/erp/models/xtpz_models"
+	"matrix/modules/erp/models/ddpz_models"
+	"matrix/modules/erp/models/sppz_models"
 )
 
 type ErpOrder struct {
@@ -730,7 +732,7 @@ WHERE oi.order_id = %d;`
 	_, err = db_session.Where(fmt.Sprintf("order_id = %d", order_id)).Get(&order_logistics)
 	core.HandleError(err)
 
-	var logistics_mode models.LogisticsModeInfo
+	var logistics_mode ddpz_models.LogisticsModeInfo
 	if !(order.StatusId == models.ORDER_STATUS_HOLD && order.HoldTypeId.Valid == true &&
 		(order.HoldTypeId.Int64 == models.ORDER_HOLD_TYPE_ENVELOPE ||
 			order.HoldTypeId.Int64 == models.ORDER_HOLD_TYPE_LOGISTICS_NO_MATCH ||
@@ -741,7 +743,7 @@ WHERE oi.order_id = %d;`
 		core.HandleError(err)
 	}
 
-	var logistics_stock models.StockInfo
+	var logistics_stock sppz_models.StockInfo
 	if !(order.StatusId == models.ORDER_STATUS_HOLD && order.HoldTypeId.Valid == true &&
 		(order.HoldTypeId.Int64 == models.ORDER_HOLD_TYPE_ENVELOPE ||
 			order.HoldTypeId.Int64 == models.ORDER_HOLD_TYPE_LOGISTICS_NO_MATCH ||
@@ -752,7 +754,7 @@ WHERE oi.order_id = %d;`
 		core.HandleError(err)
 	}
 
-	var logistics_setting models.LogisticsSettingInfo
+	var logistics_setting ddpz_models.LogisticsSettingInfo
 	_, err = db_session.Limit(1, 0).Get(&logistics_setting)
 	core.HandleError(err)
 
@@ -781,8 +783,8 @@ WHERE oi.order_id = %d;`
 		core.HandleError(err)
 	}
 
-	var au_stock_list = make([]models.StockInfo, 0)
-	err = db_session.Where(fmt.Sprintf("stock_type_id = %d", models.STOCK_TYPE_AU)).Find(&au_stock_list)
+	var au_stock_list = make([]sppz_models.StockInfo, 0)
+	err = db_session.Where(fmt.Sprintf("stock_type_id = %d", sppz_models.STOCK_TYPE_AU)).Find(&au_stock_list)
 	core.HandleError(err)
 
 	var pickup_pay_method_list = make([]models.PickupPayMethodInfo, 0)
@@ -1509,8 +1511,8 @@ func (c ErpOrder) WanCheng() revel.Result {
 func (c ErpOrder) PickupOptionData() revel.Result {
 	var db_session = c.DbSession
 
-	var stock_list = make([]models.StockInfo, 0)
-	core.HandleError(db_session.Where(fmt.Sprintf("stock_type_id = %d", models.STOCK_TYPE_AU)).Find(&stock_list))
+	var stock_list = make([]sppz_models.StockInfo, 0)
+	core.HandleError(db_session.Where(fmt.Sprintf("stock_type_id = %d", sppz_models.STOCK_TYPE_AU)).Find(&stock_list))
 
 	return c.RenderJson(map[string]interface{}{
 		"success":    true,

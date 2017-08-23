@@ -6,6 +6,8 @@ import (
 	"github.com/revel/revel"
 	"matrix/core"
 	"matrix/modules/erp/models"
+	"matrix/modules/erp/models/ddpz_models"
+	"matrix/modules/erp/models/sppz_models"
 )
 
 type ErpOrderLogisticsMatchDebug struct {
@@ -18,11 +20,11 @@ func (c ErpOrderLogisticsMatchDebug) Index() revel.Result {
 
 type logistics_match_debug_view_item_t struct {
 	OrderLogisticsMatchDebug models.OrderLogisticsMatchDebugInfo `xorm:"extends" json:"md"`
-	Stock                    models.StockInfo                    `xorm:"extends" json:"s"`
+	Stock                    sppz_models.StockInfo                    `xorm:"extends" json:"s"`
 	OrderShippingAddress     models.OrderShippingAddressInfo     `xorm:"extends" json:"osa"`
-	LogisticsCompany         models.LogisticsCompanyInfo         `xorm:"extends" json:"lc"`
-	LogisticsMode            models.LogisticsModeInfo            `xorm:"extends" json:"lm"`
-	LogisticsFeeRate         models.LogisticsFeeRateInfo         `xorm:"extends" json:"lfr"`
+	LogisticsCompany         ddpz_models.LogisticsCompanyInfo         `xorm:"extends" json:"lc"`
+	LogisticsMode            ddpz_models.LogisticsModeInfo            `xorm:"extends" json:"lm"`
+	LogisticsFeeRate         ddpz_models.LogisticsFeeRateInfo         `xorm:"extends" json:"lfr"`
 }
 
 func (c ErpOrderLogisticsMatchDebug) ListData() revel.Result {

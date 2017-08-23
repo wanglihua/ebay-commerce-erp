@@ -10,6 +10,7 @@ import (
 	"matrix/core"
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/pick_fee_service"
+	"matrix/modules/erp/models/ddpz_models"
 )
 
 /*
@@ -74,7 +75,7 @@ func (p_ol *OrderLogisticsService) match_logistics_mode_with_option(p_order *mod
 		}
 
 		// 如果指定了 物流方式，并且指定的物流方式是 信封， 就设置为信封Hold，并且匹配信封费率
-		if match_option.Prefer_mode_id != 0 && match_option.Prefer_mode_id == logistics_mode.Id && logistics_mode.TypeId == models.LOGISTICS_MODE_TYPE_ENVELOPE {
+		if match_option.Prefer_mode_id != 0 && match_option.Prefer_mode_id == logistics_mode.Id && logistics_mode.TypeId == ddpz_models.LOGISTICS_MODE_TYPE_ENVELOPE {
 			p_ol.update_order_to_hold_type(p_order, models.ORDER_HOLD_TYPE_ENVELOPE, db_session)
 			var match_envelope_success = p_ol.match_envelope_fee_rate(p_order, p_order_logistics_data, db_session)
 			if match_envelope_success == false {
@@ -88,7 +89,7 @@ func (p_ol *OrderLogisticsService) match_logistics_mode_with_option(p_order *mod
 		}
 
 		// 如果是解锁快递，并且当前的物流方式是快递的，就排除掉
-		if match_option.Unlock_express == true && logistics_mode.TypeId == models.LOGISTICS_MODE_TYPE_EXPRESS {
+		if match_option.Unlock_express == true && logistics_mode.TypeId == ddpz_models.LOGISTICS_MODE_TYPE_EXPRESS {
 			continue
 		}
 
@@ -382,7 +383,7 @@ func (p_ol *OrderLogisticsService) match_logistics_mode_with_option(p_order *mod
 		}
 
 		mode_result.fee_rate_id = 0
-		mode_result.fee_rate = models.LogisticsFeeRateInfo{}
+		mode_result.fee_rate = ddpz_models.LogisticsFeeRateInfo{}
 		var total_fee_in_fee_rate float64 = 10000000 //非超重部分的费用，初始为一个很大的不可能的数字， 澳币
 		for _, logistics_fee_rate := range logistics_fee_rate_list {
 

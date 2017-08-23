@@ -8,10 +8,10 @@ import (
 	"matrix/core"
 	"matrix/modules/auth/pass_res"
 	"matrix/modules/auth/service/pass_service"
-	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/region_service"
 	"fmt"
 	"strings"
+	"matrix/modules/erp/models/sppz_models"
 )
 
 type ErpSupplier struct {
@@ -25,8 +25,8 @@ func (c ErpSupplier) Index() revel.Result {
 }
 
 type supplier_view_item_t struct {
-	Supplier models.SupplierInfo `xorm:"extends" json:"s"`
-	Region   models.RegionInfo   `xorm:"extends" json:"r"`
+	Supplier sppz_models.SupplierInfo `xorm:"extends" json:"s"`
+	Region   sppz_models.RegionInfo   `xorm:"extends" json:"r"`
 }
 
 func (c ErpSupplier) ListData() revel.Result {
@@ -76,7 +76,7 @@ FROM erp_supplier s
 }
 
 type SupplierDetailForm struct {
-	Supplier     models.SupplierInfo       `json:"supplier"`
+	Supplier     sppz_models.SupplierInfo       `json:"supplier"`
 	ProvinceId   int64                     `json:"province_id"`
 	ProvinceList []region_service.Region_t `json:"province_list"`
 	CityList     []region_service.Region_t `json:"city_list"`
@@ -140,7 +140,7 @@ func (c ErpSupplier) DetailData() revel.Result {
 	var province_list = region_service.Get_province_list(db_session)
 	detail_form.ProvinceList = province_list
 
-	var supplier models.SupplierInfo
+	var supplier sppz_models.SupplierInfo
 	if supplier_id != 0 {
 		has, err := db_session.Id(supplier_id).Get(&supplier)
 		core.HandleError(err)
@@ -177,7 +177,7 @@ func (c ErpSupplier) Save() revel.Result {
 
 	var affected int64
 	if detail_form.IsCreate() {
-		name_count, err := db_session.Where("name = ?", supplier.Name).Count(new(models.SupplierInfo))
+		name_count, err := db_session.Where("name = ?", supplier.Name).Count(new(sppz_models.SupplierInfo))
 		core.HandleError(err)
 		if name_count != 0 {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，名称已存在！"})
@@ -186,7 +186,7 @@ func (c ErpSupplier) Save() revel.Result {
 		affected, err = db_session.Insert(&supplier)
 		core.HandleError(err)
 	} else {
-		name_count, err := db_session.Where("id <> ? and name = ?", supplier.Id, supplier.Name).Count(new(models.SupplierInfo))
+		name_count, err := db_session.Where("id <> ? and name = ?", supplier.Id, supplier.Name).Count(new(sppz_models.SupplierInfo))
 		core.HandleError(err)
 		if name_count != 0 {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，名称已存在！"})
@@ -240,7 +240,7 @@ WHERE pf.supplier_id IN (%s);`
 
 	// todo: 检查在商品详情中的使用
 
-	affected, err := db_session.In("id", supplier_id_list).Delete(new(models.SupplierInfo))
+	affected, err := db_session.In("id", supplier_id_list).Delete(new(sppz_models.SupplierInfo))
 	core.HandleError(err)
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})

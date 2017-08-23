@@ -11,7 +11,7 @@ import (
 	"matrix/core"
 	"matrix/modules/auth/pass_res"
 	"matrix/modules/auth/service/pass_service"
-	"matrix/modules/erp/models"
+	"matrix/modules/erp/models/ddpz_models"
 )
 
 type ErpLogisticsFeeRate struct {
@@ -46,9 +46,9 @@ func (c ErpLogisticsFeeRate) ListData() revel.Result {
 	c.Params.Bind(&postcode_query, "postcode_query")
 
 	type logistics_fee_rate_view_item_t struct {
-		models.LogisticsFeeRateInfo  `xorm:"extends" json:"fr"`
-		models.LogisticsModeInfo     `xorm:"extends" json:"lm"`
-		models.LogisticsCompanyInfo  `xorm:"extends" json:"lc"`
+		ddpz_models.LogisticsFeeRateInfo  `xorm:"extends" json:"fr"`
+		ddpz_models.LogisticsModeInfo     `xorm:"extends" json:"lm"`
+		ddpz_models.LogisticsCompanyInfo  `xorm:"extends" json:"lc"`
 	}
 
 	/*
@@ -106,9 +106,9 @@ func (c ErpLogisticsFeeRate) ListData() revel.Result {
 }
 
 type LogisticsFeeRateDetailForm struct {
-	LogisticsFeeRate     models.LogisticsFeeRateInfo   `json:"logistics_fee_rate"`
-	LogisticsCompanyList []models.LogisticsCompanyInfo `json:"logistics_company_list"`
-	LogisticsModeList    []models.LogisticsModeInfo    `json:"logistics_mode_list"`
+	LogisticsFeeRate     ddpz_models.LogisticsFeeRateInfo   `json:"logistics_fee_rate"`
+	LogisticsCompanyList []ddpz_models.LogisticsCompanyInfo `json:"logistics_company_list"`
+	LogisticsModeList    []ddpz_models.LogisticsModeInfo    `json:"logistics_mode_list"`
 	CompanyId            int64                         `json:"company_id"`
 }
 
@@ -158,7 +158,7 @@ func (c ErpLogisticsFeeRate) DetailData() revel.Result {
 	var logistics_fee_rate_id int64
 	c.Params.Bind(&logistics_fee_rate_id, "id")
 
-	var logistics_fee_rate models.LogisticsFeeRateInfo
+	var logistics_fee_rate ddpz_models.LogisticsFeeRateInfo
 	if logistics_fee_rate_id != 0 {
 		has, err := db_session.Id(logistics_fee_rate_id).Get(&logistics_fee_rate)
 		core.HandleError(err)
@@ -170,7 +170,7 @@ func (c ErpLogisticsFeeRate) DetailData() revel.Result {
 	var detail_form LogisticsFeeRateDetailForm
 	detail_form.LogisticsFeeRate = logistics_fee_rate
 
-	var logistics_company_list = make([]models.LogisticsCompanyInfo, 0)
+	var logistics_company_list = make([]ddpz_models.LogisticsCompanyInfo, 0)
 	err := db_session.Find(&logistics_company_list)
 	core.HandleError(err)
 	detail_form.LogisticsCompanyList = logistics_company_list
@@ -178,7 +178,7 @@ func (c ErpLogisticsFeeRate) DetailData() revel.Result {
 	if logistics_fee_rate_id == 0 {
 		if len(logistics_company_list) != 0 {
 			var selected_company_id = logistics_company_list[0].Id
-			var logistics_mode_list = make([]models.LogisticsModeInfo, 0)
+			var logistics_mode_list = make([]ddpz_models.LogisticsModeInfo, 0)
 			err = db_session.Where(fmt.Sprintf("company_id = %d", selected_company_id)).Find(&logistics_mode_list)
 			core.HandleError(err)
 
@@ -188,13 +188,13 @@ func (c ErpLogisticsFeeRate) DetailData() revel.Result {
 	} else {
 		//get company id from database
 		var mode_id = logistics_fee_rate.ModeId
-		var logistics_mode models.LogisticsModeInfo
+		var logistics_mode ddpz_models.LogisticsModeInfo
 		_, err = db_session.Id(mode_id).Get(&logistics_mode)
 		core.HandleError(err)
 		var company_id = logistics_mode.CompanyId
 
 		//get mode list from database
-		var logistics_mode_list = make([]models.LogisticsModeInfo, 0)
+		var logistics_mode_list = make([]ddpz_models.LogisticsModeInfo, 0)
 		err = db_session.Where(fmt.Sprintf("company_id = %d", company_id)).Find(&logistics_mode_list)
 		core.HandleError(err)
 
@@ -231,7 +231,7 @@ func (c ErpLogisticsFeeRate) Save() revel.Result {
 		core.HandleError(err)
 
 		if affected == 0 {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！" })
+			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！"})
 		}
 	}
 
@@ -246,7 +246,7 @@ func (c ErpLogisticsFeeRate) Delete() revel.Result {
 	logistics_fee_rate_id_list := make([]int64, 0)
 	c.Params.Bind(&logistics_fee_rate_id_list, "id_list")
 
-	affected, err := db_session.In("id", logistics_fee_rate_id_list).Delete(new(models.LogisticsFeeRateInfo))
+	affected, err := db_session.In("id", logistics_fee_rate_id_list).Delete(new(ddpz_models.LogisticsFeeRateInfo))
 	core.HandleError(err)
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})
@@ -272,7 +272,7 @@ func (c ErpLogisticsFeeRate) Import() revel.Result {
 	type logistics_fee_rate_import_t struct {
 		CompanyName      string
 		ModeName         string
-		LogisticsFeeRate models.LogisticsFeeRateInfo
+		LogisticsFeeRate ddpz_models.LogisticsFeeRateInfo
 	}
 
 	logistics_fee_rate_list := make([]logistics_fee_rate_import_t, 0)
@@ -502,7 +502,7 @@ func (c ErpLogisticsFeeRate) GetLogisticsModeListByCompanyId() revel.Result {
 	var company_id int64
 	c.Params.Bind(&company_id, "company_id")
 
-	var logistics_mode_list = make([]models.LogisticsModeInfo, 0)
+	var logistics_mode_list = make([]ddpz_models.LogisticsModeInfo, 0)
 	err := db_session.Where(fmt.Sprintf("company_id = %d", company_id)).Find(&logistics_mode_list)
 	core.HandleError(err)
 

@@ -14,9 +14,9 @@ import (
 	"matrix/core"
 	"matrix/modules/auth/pass_res"
 	"matrix/modules/auth/service/pass_service"
-	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/stock_service"
 	"matrix/modules/erp/service/storage_loc_service"
+	"matrix/modules/erp/models/sppz_models"
 )
 
 type ErpStorageLoc struct {
@@ -30,8 +30,8 @@ func (c ErpStorageLoc) Index() revel.Result {
 }
 
 type ErpStorageLocViewItem struct {
-	models.StorageLocInfo `xorm:"extends" json:"l"`
-	models.StockInfo      `xorm:"extends" json:"s"`
+	sppz_models.StorageLocInfo `xorm:"extends" json:"l"`
+	sppz_models.StockInfo      `xorm:"extends" json:"s"`
 }
 
 func (c ErpStorageLoc) ListData() revel.Result {
@@ -77,8 +77,8 @@ func (c ErpStorageLoc) ListData() revel.Result {
 }
 
 type StorageLocDetailForm struct {
-	StorageLoc models.StorageLocInfo `json:"storage_loc"`
-	StockList  []models.StockInfo    `json:"stock_list"`
+	StorageLoc sppz_models.StorageLocInfo `json:"storage_loc"`
+	StockList  []sppz_models.StockInfo    `json:"stock_list"`
 }
 
 func (f *StorageLocDetailForm) IsCreate() bool {
@@ -121,7 +121,7 @@ func (c ErpStorageLoc) DetailData() revel.Result {
 	var storage_loc_id int64
 	c.Params.Bind(&storage_loc_id, "id")
 
-	var storage_loc models.StorageLocInfo
+	var storage_loc sppz_models.StorageLocInfo
 	if storage_loc_id != 0 {
 		has, err := db_session.Id(storage_loc_id).Get(&storage_loc)
 		core.HandleError(err)
@@ -130,7 +130,7 @@ func (c ErpStorageLoc) DetailData() revel.Result {
 		}
 	}
 
-	var stock_list = make([]models.StockInfo, 0)
+	var stock_list = make([]sppz_models.StockInfo, 0)
 	err := db_session.Find(&stock_list)
 	core.HandleError(err)
 
@@ -158,7 +158,7 @@ func (c ErpStorageLoc) Save() revel.Result {
 
 	var affected int64
 	if detail_form.IsCreate() {
-		stockId_count, err := db_session.Where("stock_id = ? and name = ?", storage_loc.StockId, storage_loc.Name).Count(new(models.StorageLocInfo))
+		stockId_count, err := db_session.Where("stock_id = ? and name = ?", storage_loc.StockId, storage_loc.Name).Count(new(sppz_models.StorageLocInfo))
 		core.HandleError(err)
 		if stockId_count != 0 {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，仓库、名称已存在！"})
@@ -167,7 +167,7 @@ func (c ErpStorageLoc) Save() revel.Result {
 		affected, err = db_session.Insert(&storage_loc)
 		core.HandleError(err)
 	} else {
-		stockId_count, err := db_session.Where("id <> ? and stock_id = ? and name = ?", storage_loc.Id, storage_loc.StockId, storage_loc.Name).Count(new(models.StorageLocInfo))
+		stockId_count, err := db_session.Where("id <> ? and stock_id = ? and name = ?", storage_loc.Id, storage_loc.StockId, storage_loc.Name).Count(new(sppz_models.StorageLocInfo))
 		core.HandleError(err)
 		if stockId_count != 0 {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，仓库、名称已存在！"})
@@ -192,7 +192,7 @@ func (c ErpStorageLoc) Delete() revel.Result {
 	storage_loc_id_list := make([]int64, 0)
 	c.Params.Bind(&storage_loc_id_list, "id_list")
 
-	affected, err := db_session.In("id", storage_loc_id_list).Delete(new(models.StorageLocInfo))
+	affected, err := db_session.In("id", storage_loc_id_list).Delete(new(sppz_models.StorageLocInfo))
 	core.HandleError(err)
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})
@@ -337,7 +337,7 @@ func (c ErpStorageLoc) Import() revel.Result {
 
 	for _, storage_loc_import := range storage_loc_import_list {
 		revel.TRACE.Println("storage_loc_import.stock_id", storage_loc_import.stock_id)
-		var storage_loc models.StorageLocInfo
+		var storage_loc sppz_models.StorageLocInfo
 		storage_loc.StockId = storage_loc_import.stock_id
 		storage_loc.Name = storage_loc_import.StorageLocName
 		storage_loc.Desc = core.MakeNullString(storage_loc_import.StorageLocDesc, true)
@@ -385,8 +385,8 @@ func (c ErpStorageLoc) get_export_excel(db_session *xorm.Session) *xlsx.File {
 	}
 
 	type storage_loc_export_item_t struct {
-		StorageLoc models.StorageLocInfo `xorm:"extends" json:"sl"`
-		Stock      models.StockInfo      `xorm:"extends" json:"s"`
+		StorageLoc sppz_models.StorageLocInfo `xorm:"extends" json:"sl"`
+		Stock      sppz_models.StockInfo      `xorm:"extends" json:"s"`
 	}
 
 	/*
@@ -542,7 +542,7 @@ func (c ErpStorageLoc) GetStorageLocList() revel.Result {
 	var stock_id int64
 	c.Params.Bind(&stock_id, "stock_id")
 
-	var storage_loc_list = make([]models.StorageLocInfo, 0)
+	var storage_loc_list = make([]sppz_models.StorageLocInfo, 0)
 	err := db_session.Where(fmt.Sprintf("stock_id = %d", stock_id)).Find(&storage_loc_list)
 	core.HandleError(err)
 

@@ -24,6 +24,8 @@ import (
 	"matrix/modules/erp/service/stock_service"
 	"matrix/modules/erp/setting"
 	"matrix/modules/erp/models/xtpz_models"
+	"matrix/modules/erp/models/ddpz_models"
+	"matrix/modules/erp/models/sppz_models"
 )
 
 type ErpOrderLogistics struct {
@@ -55,7 +57,7 @@ func (c ErpOrderLogistics) PageData() revel.Result {
 
 	var stock_list = stock_service.Get_login_user_stock_list(db_session, c.Session)
 
-	var logistics_company_list = make([]models.LogisticsCompanyInfo, 0)
+	var logistics_company_list = make([]ddpz_models.LogisticsCompanyInfo, 0)
 	//err = db_session.Where(fmt.Sprintf("status_id = %d", models.LOGISTICS_COMPANY_ENABLED)).OrderBy("ord asc").Find(&logistics_company_list)
 	err := db_session.OrderBy("ord asc").Find(&logistics_company_list)
 	core.HandleError(err)
@@ -497,9 +499,9 @@ func (c ErpOrderLogistics) get_export_excel1(db_session *xorm.Session) *xlsx.Fil
 	type order_logistics_view_item_t struct {
 		OrderLogistics   models.OrderLogisticsInfo    `xorm:"extends" json:"ol"`
 		Order            models.OrderInfo             `xorm:"extends" json:"o"`
-		Stock            models.StockInfo             `xorm:"extends" json:"s"`
-		LogisticsCompany models.LogisticsCompanyInfo  `xorm:"extends" json:"lc"`
-		LogisticsMode    models.LogisticsModeInfo     `xorm:"extends" json:"lm"`
+		Stock            sppz_models.StockInfo             `xorm:"extends" json:"s"`
+		LogisticsCompany ddpz_models.LogisticsCompanyInfo  `xorm:"extends" json:"lc"`
+		LogisticsMode    ddpz_models.LogisticsModeInfo     `xorm:"extends" json:"lm"`
 	}
 
 	/*
@@ -727,9 +729,9 @@ func (c ErpOrderLogistics) get_export_excel2(db_session *xorm.Session) *xlsx.Fil
 	type order_logistics_view_item_t struct {
 		OrderLogistics       models.OrderLogisticsInfo          `xorm:"extends" json:"ol"`
 		Order                models.OrderInfo                   `xorm:"extends" json:"o"`
-		Stock                models.StockInfo                   `xorm:"extends" json:"s"`
-		LogisticsCompany     models.LogisticsCompanyInfo        `xorm:"extends" json:"lc"`
-		LogisticsMode        models.LogisticsModeInfo           `xorm:"extends" json:"lm"`
+		Stock                sppz_models.StockInfo                   `xorm:"extends" json:"s"`
+		LogisticsCompany     ddpz_models.LogisticsCompanyInfo        `xorm:"extends" json:"lc"`
+		LogisticsMode        ddpz_models.LogisticsModeInfo           `xorm:"extends" json:"lm"`
 		OrderShippingAddress models.OrderShippingAddressInfo    `xorm:"extends" json:"osa"`
 		ShopAccount          xtpz_models.ShopAccountInfo             `xorm:"extends" json:"sa"`
 	}
