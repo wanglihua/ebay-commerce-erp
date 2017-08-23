@@ -15,6 +15,7 @@ import (
 	"matrix/modules/erp/models/ddpz_models"
 	"matrix/modules/erp/models/ddlc_models"
 	"matrix/modules/erp/models/spbb_models"
+	"matrix/modules/erp/models/site_models"
 )
 
 type Home struct {
@@ -134,13 +135,13 @@ func (c Home) SyncDbPost() revel.Result {
 	model_list = append(model_list, &ddlc_models.OrderLogisticsMatchDebugInfo{})
 	model_list = append(model_list, &ddlc_models.OrderShippingAddressInfo{})
 
-	model_list = append(model_list, &erp_models.EntityCodeInfo{})
+	model_list = append(model_list, &site_models.EntityCodeInfo{})
 	model_list = append(model_list, &ddpz_models.EnvelopeFeeRateInfo{})
 	model_list = append(model_list, &sppz_models.EubGoodsTypeInfo{})
 	model_list = append(model_list, &sppz_models.EubInsuranceTypeInfo{})
 
-	model_list = append(model_list, &erp_models.LittleIconInfo{})
-	model_list = append(model_list, &erp_models.LoginLogInfo{})
+	model_list = append(model_list, &site_models.LittleIconInfo{})
+	model_list = append(model_list, &site_models.LoginLogInfo{})
 	model_list = append(model_list, &erp_models.MessageInfo{})
 
 	model_list = append(model_list, &sppz_models.PackageMaterialInfo{})
@@ -148,7 +149,7 @@ func (c Home) SyncDbPost() revel.Result {
 	model_list = append(model_list, &erp_models.PaypalReconInfo{})
 	model_list = append(model_list, &ddlc_models.PickupOrderInfo{})
 	model_list = append(model_list, &ddpz_models.PickupPayMethodInfo{})
-	model_list = append(model_list, &erp_models.PlatformLogisticsModeInfo{})
+	model_list = append(model_list, &xtpz_models.PlatformLogisticsModeInfo{})
 	model_list = append(model_list, &sppz_models.ProductCertInfo{})
 	model_list = append(model_list, &spbb_models.ProductSaleDayAnalysisInfo{})
 	model_list = append(model_list, &spbb_models.ProductSaleAnalysisInfo{})

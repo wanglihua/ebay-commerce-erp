@@ -1,4 +1,4 @@
-package models
+package site_models
 
 import (
 	"matrix/core"

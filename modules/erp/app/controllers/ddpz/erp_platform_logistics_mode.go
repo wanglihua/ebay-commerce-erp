@@ -6,7 +6,6 @@ import (
 	"github.com/revel/revel"
 
 	"matrix/core"
-	"matrix/modules/erp/models"
 	"matrix/modules/erp/models/xtpz_models"
 )
 
@@ -19,7 +18,7 @@ func (c ErpPlatformLogisticsMode) Index() revel.Result {
 }
 
 type ErpPlatformLogisticsViewItem struct {
-	models.PlatformLogisticsModeInfo        `xorm:"extends" json:"m"`
+	xtpz_models.PlatformLogisticsModeInfo        `xorm:"extends" json:"m"`
 	xtpz_models.ECommercePlatformInfo            `xorm:"extends" json:"p"`
 }
 
@@ -64,7 +63,7 @@ func (c ErpPlatformLogisticsMode) ListData() revel.Result {
 }
 
 type PlatformLogisticsModeDetailForm struct {
-	PlatformLogisticsMode models.PlatformLogisticsModeInfo  `json:"platform_logistics_mode"`
+	PlatformLogisticsMode xtpz_models.PlatformLogisticsModeInfo  `json:"platform_logistics_mode"`
 	PlatformList          []xtpz_models.ECommercePlatformInfo    `json:"platform_list"`
 }
 
@@ -96,7 +95,7 @@ func (c ErpPlatformLogisticsMode) DetailData() revel.Result {
 	var platform_logistics_mode_id int64
 	c.Params.Bind(&platform_logistics_mode_id, "id")
 
-	var platform_logistics_mode models.PlatformLogisticsModeInfo
+	var platform_logistics_mode xtpz_models.PlatformLogisticsModeInfo
 	if platform_logistics_mode_id != 0 {
 		has, err := db_session.Id(platform_logistics_mode_id).Get(&platform_logistics_mode)
 		core.HandleError(err)
@@ -131,26 +130,26 @@ func (c ErpPlatformLogisticsMode) Save() revel.Result {
 
 	var affected int64
 	if detail_form.IsCreate() {
-		name_count, err := db_session.Where("name = ?", platform_logistics_mode.Name).Count(new(models.PlatformLogisticsModeInfo))
+		name_count, err := db_session.Where("name = ?", platform_logistics_mode.Name).Count(new(xtpz_models.PlatformLogisticsModeInfo))
 		core.HandleError(err)
 		if name_count != 0 {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，名称已存在！" })
+			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，名称已存在！"})
 		}
 
 		affected, err = db_session.Insert(&platform_logistics_mode)
 		core.HandleError(err)
 	} else {
-		name_count, err := db_session.Where("id <> ? and name = ?", platform_logistics_mode.Id, platform_logistics_mode.Name).Count(new(models.PlatformLogisticsModeInfo))
+		name_count, err := db_session.Where("id <> ? and name = ?", platform_logistics_mode.Id, platform_logistics_mode.Name).Count(new(xtpz_models.PlatformLogisticsModeInfo))
 		core.HandleError(err)
 		if name_count != 0 {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，名称已存在！" })
+			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，名称已存在！"})
 		}
 
 		affected, err = db_session.Id(platform_logistics_mode.Id).Update(&platform_logistics_mode)
 		core.HandleError(err)
 
 		if affected == 0 {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！" })
+			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！"})
 		}
 	}
 
@@ -163,7 +162,7 @@ func (c ErpPlatformLogisticsMode) Delete() revel.Result {
 	platform_logistics_mode_id_list := make([]int64, 0)
 	c.Params.Bind(&platform_logistics_mode_id_list, "id_list")
 
-	affected, err := db_session.In("id", platform_logistics_mode_id_list).Delete(new(models.PlatformLogisticsModeInfo))
+	affected, err := db_session.In("id", platform_logistics_mode_id_list).Delete(new(xtpz_models.PlatformLogisticsModeInfo))
 	core.HandleError(err)
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})

@@ -13,7 +13,7 @@ import (
 	"matrix/core/requests"
 	auth_models "matrix/modules/auth/models"
 	"matrix/modules/auth/service/auth_setting_service"
-	"matrix/modules/erp/models"
+	"matrix/modules/erp/models/site_models"
 )
 
 type online_user_t struct {
@@ -27,7 +27,7 @@ var online_user_list_expire = time.Hour * 720
 
 func Log_login(user auth_models.UserInfo, ip_address string, web_session revel.Session, db_session *xorm.Session) {
 	//login log
-	var login_log models.LoginLogInfo
+	var login_log site_models.LoginLogInfo
 	login_log.UserId = user.Id
 	login_log.LoginName = user.LoginName
 
@@ -63,7 +63,7 @@ func Log_logout(session_key string, db_session *xorm.Session) {
 	 */
 	var sql = `SELECT * FROM erp_login_log WHERE user_id = %d AND session_key = '%s' ORDER BY create_time DESC LIMIT 0, 1`
 	sql = fmt.Sprintf(sql, login_user.UserId, session_key)
-	var login_log models.LoginLogInfo
+	var login_log site_models.LoginLogInfo
 	has, err := db_session.Sql(sql).Get(&login_log)
 	if has && err == nil {
 		login_log.LogoutTime = core.Time(time.Now())
