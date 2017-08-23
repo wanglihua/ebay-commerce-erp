@@ -11,6 +11,7 @@ import (
 	auth_models "matrix/modules/auth/models"
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/models/kcgl_models"
+	"matrix/modules/erp/models/xtpz_models"
 )
 
 type ErpSalesManager struct {
@@ -28,8 +29,8 @@ func (c ErpSalesManager) ListData() revel.Result {
 
 	type ErpSalesManagerListViewItem struct {
 		models.SalesManagerInfo       `xorm:"extends" json:"sm"`
-		models.ShopAccountInfo        `xorm:"extends" json:"sa"`
-		models.ECommercePlatformInfo  `xorm:"extends" json:"ep"`
+		xtpz_models.ShopAccountInfo        `xorm:"extends" json:"sa"`
+		xtpz_models.ECommercePlatformInfo  `xorm:"extends" json:"ep"`
 		kcgl_models.ProductInfo            `xorm:"extends" json:"p"`
 		auth_models.UserInfo          `xorm:"extends" json:"u"`
 	}
@@ -107,8 +108,8 @@ func (c ErpSalesManager) DetailData() revel.Result {
 	var sales_manager_id int64
 	c.Params.Bind(&sales_manager_id, "id")
 
-	var platform models.ECommercePlatformInfo
-	var shop_account models.ShopAccountInfo
+	var platform xtpz_models.ECommercePlatformInfo
+	var shop_account xtpz_models.ShopAccountInfo
 	//var product models.ProductInfo
 	var user auth_models.UserInfo
 	var sales_manager models.SalesManagerInfo
@@ -211,8 +212,8 @@ func (c ErpSalesManager) ShopAccountSelectListData() revel.Result {
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
 	type ShopAccountViewItem struct {
-		models.ShopAccountInfo        `xorm:"extends" json:"a"`
-		models.ECommercePlatformInfo  `xorm:"extends" json:"p"`
+		xtpz_models.ShopAccountInfo        `xorm:"extends" json:"a"`
+		xtpz_models.ECommercePlatformInfo  `xorm:"extends" json:"p"`
 		models.StatusInfo             `xorm:"extends" json:"s"`
 	}
 

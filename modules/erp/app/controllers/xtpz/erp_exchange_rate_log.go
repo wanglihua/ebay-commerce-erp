@@ -5,7 +5,7 @@ import (
 	"matrix/core"
 	"matrix/modules/auth/pass_res"
 	"matrix/modules/auth/service/pass_service"
-	"matrix/modules/erp/models"
+	"matrix/modules/erp/models/xtpz_models"
 )
 
 type ErpExchangeRateLog struct {
@@ -35,12 +35,12 @@ func (c ErpExchangeRateLog) ListData() revel.Result {
 		data_query = *data_query.Asc("id")
 	}
 
-	exchange_rate_log_list := make([]models.ExchangeRateLogInfo, 0, limit)
+	exchange_rate_log_list := make([]xtpz_models.ExchangeRateLogInfo, 0, limit)
 	err := data_query.Limit(limit, offset).Find(&exchange_rate_log_list)
 	core.HandleError(err)
 
 	count_query := *query
-	count, err := count_query.Count(new(models.ExchangeRateLogInfo))
+	count, err := count_query.Count(new(xtpz_models.ExchangeRateLogInfo))
 	core.HandleError(err)
 
 	return c.RenderJson(core.GridResult{

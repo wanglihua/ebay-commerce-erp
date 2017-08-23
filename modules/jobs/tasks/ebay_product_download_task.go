@@ -12,7 +12,7 @@ import (
 	"github.com/revel/revel"
 	"matrix/core"
 	"matrix/ebay"
-	"matrix/modules/erp/models"
+	"matrix/modules/erp/models/xtpz_models"
 )
 
 /*
@@ -148,7 +148,7 @@ func (t EBayProductDownloadTask) Run() {
 	revel.TRACE.Println("eBay GetSellerList time duration: ", job_duration.Seconds(), "seconds")
 }
 
-func (t EBayProductDownloadTask) fetch_product_list(config models.EBayAPIConfigInfo, page_number int) ebay.GetSellerListResponse {
+func (t EBayProductDownloadTask) fetch_product_list(config xtpz_models.EBayAPIConfigInfo, page_number int) ebay.GetSellerListResponse {
 
 	number_of_days := 120 - 1
 

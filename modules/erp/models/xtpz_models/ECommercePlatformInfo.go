@@ -1,4 +1,4 @@
-package models
+package xtpz_models
 
 //ECommercePlatformInfo
 

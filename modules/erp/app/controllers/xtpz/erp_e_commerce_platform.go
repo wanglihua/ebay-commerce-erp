@@ -5,7 +5,7 @@ import (
 	"matrix/core"
 	"matrix/modules/auth/pass_res"
 	"matrix/modules/auth/service/pass_service"
-	"matrix/modules/erp/models"
+	"matrix/modules/erp/models/xtpz_models"
 )
 
 type ErpECommercePlatform struct {
@@ -35,12 +35,12 @@ func (c ErpECommercePlatform) ListData() revel.Result {
 		data_query = *data_query.Asc("id")
 	}
 
-	e_commerce_platform_list := make([]models.ECommercePlatformInfo, 0, limit)
+	e_commerce_platform_list := make([]xtpz_models.ECommercePlatformInfo, 0, limit)
 	err := data_query.Limit(limit, offset).Find(&e_commerce_platform_list)
 	core.HandleError(err)
 
 	count_query := *query
-	count, err := count_query.Count(new(models.ECommercePlatformInfo))
+	count, err := count_query.Count(new(xtpz_models.ECommercePlatformInfo))
 	core.HandleError(err)
 
 	return c.RenderJson(core.GridResult{

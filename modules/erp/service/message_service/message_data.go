@@ -8,12 +8,13 @@ import (
 	"matrix/core"
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/models/kcgl_models"
+	"matrix/modules/erp/models/xtpz_models"
 )
 
 type Message_view_item_t struct {
 	models.MessageInfo           `xorm:"extends" json:"msg"`
-	models.ShopAccountInfo       `xorm:"extends" json:"sa"`
-	models.ECommercePlatformInfo `xorm:"extends" json:"pf"`
+	xtpz_models.ShopAccountInfo       `xorm:"extends" json:"sa"`
+	xtpz_models.ECommercePlatformInfo `xorm:"extends" json:"pf"`
 	kcgl_models.ProductInfo           `xorm:"extends" json:"p"`
 	models.StatusInfo            `xorm:"extends" json:"s"`
 }

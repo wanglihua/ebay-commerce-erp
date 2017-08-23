@@ -12,6 +12,7 @@ import (
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/status_service"
+	"matrix/modules/erp/models/xtpz_models"
 )
 
 type ErpExchangeRate struct {
@@ -25,8 +26,8 @@ func (c ErpExchangeRate) Index() revel.Result {
 }
 
 type ErpExchangeRateViewItem struct {
-	models.ExchangeRateInfo `xorm:"extends" json:"r"`
-	models.CurrencyInfo     `xorm:"extends" json:"c"`
+	xtpz_models.ExchangeRateInfo `xorm:"extends" json:"r"`
+	xtpz_models.CurrencyInfo     `xorm:"extends" json:"c"`
 	models.StatusInfo       `xorm:"extends" json:"s"`
 }
 
@@ -79,9 +80,9 @@ FROM erp_exchange_rate r
 }
 
 type ExchangeRateDetailForm struct {
-	ExchangeRate models.ExchangeRateInfo `json:"exchange_rate"`
+	ExchangeRate xtpz_models.ExchangeRateInfo `json:"exchange_rate"`
 	StatusList   []models.StatusInfo     `json:"status_list"`
-	CurrencyList []models.CurrencyInfo   `json:"currency_list"`
+	CurrencyList []xtpz_models.CurrencyInfo   `json:"currency_list"`
 }
 
 func (f *ExchangeRateDetailForm) IsCreate() bool {
@@ -104,7 +105,7 @@ func (c ErpExchangeRate) DetailData() revel.Result {
 	var exchange_rate_id int64
 	c.Params.Bind(&exchange_rate_id, "id")
 
-	var exchange_rate models.ExchangeRateInfo
+	var exchange_rate xtpz_models.ExchangeRateInfo
 	if exchange_rate_id != 0 {
 		has, err := db_session.Id(exchange_rate_id).Get(&exchange_rate)
 		core.HandleError(err)
@@ -118,8 +119,8 @@ func (c ErpExchangeRate) DetailData() revel.Result {
 
 	status_list := status_service.Get_status_list(db_session, models.STATUS_TYPE_EXCHANGE_RATE)
 
-	currency_list := make([]models.CurrencyInfo, 0)
-	err := db_session.Sql(fmt.Sprintf("SELECT * FROM erp_currency WHERE id <> %d", models.CURRENCY_RMB)).Find(&currency_list)
+	currency_list := make([]xtpz_models.CurrencyInfo, 0)
+	err := db_session.Sql(fmt.Sprintf("SELECT * FROM erp_currency WHERE id <> %d", xtpz_models.CURRENCY_RMB)).Find(&currency_list)
 	core.HandleError(err)
 
 	var detail_form ExchangeRateDetailForm
@@ -147,20 +148,20 @@ func (c ErpExchangeRate) Save() revel.Result {
 
 	var affected int64
 	if detail_form.IsCreate() {
-		currency_rate_count, err := db_session.Where("currency_id = ?", exchange_rate_from_ui.CurrencyId).Count(new(models.ExchangeRateInfo))
+		currency_rate_count, err := db_session.Where("currency_id = ?", exchange_rate_from_ui.CurrencyId).Count(new(xtpz_models.ExchangeRateInfo))
 		core.HandleError(err)
 		if currency_rate_count != 0 {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，货币汇率已存在！" })
+			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，货币汇率已存在！"})
 		}
 
 		affected, err = db_session.Insert(&exchange_rate_from_ui)
 		core.HandleError(err)
 
-		var currency models.CurrencyInfo
+		var currency xtpz_models.CurrencyInfo
 		_, err = db_session.Id(exchange_rate_from_ui.CurrencyId).Get(&currency)
 		core.HandleError(err)
 
-		var exchange_rate_log models.ExchangeRateLogInfo
+		var exchange_rate_log xtpz_models.ExchangeRateLogInfo
 		exchange_rate_log.Name = fmt.Sprintf("%s(%s)", currency.Name, currency.Code)
 		exchange_rate_log.Desc = fmt.Sprintf("新增数据 %.4f", exchange_rate_from_ui.Rate)
 		exchange_rate_log.LoginName = core.GetLoginUser(c.Session).LoginName
@@ -169,13 +170,13 @@ func (c ErpExchangeRate) Save() revel.Result {
 		core.HandleError(err)
 
 	} else {
-		currency_rate_count, err := db_session.Where("id <> ? and currency_id = ?", exchange_rate_from_ui.Id, exchange_rate_from_ui.CurrencyId).Count(new(models.ExchangeRateInfo))
+		currency_rate_count, err := db_session.Where("id <> ? and currency_id = ?", exchange_rate_from_ui.Id, exchange_rate_from_ui.CurrencyId).Count(new(xtpz_models.ExchangeRateInfo))
 		core.HandleError(err)
 		if currency_rate_count != 0 {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，货币汇率已存在！" })
+			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，货币汇率已存在！"})
 		}
 
-		var exchange_rate_in_db models.ExchangeRateInfo
+		var exchange_rate_in_db xtpz_models.ExchangeRateInfo
 		_, err = db_session.Id(exchange_rate_from_ui.Id).Get(&exchange_rate_in_db)
 		core.HandleError(err)
 
@@ -186,11 +187,11 @@ func (c ErpExchangeRate) Save() revel.Result {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！"})
 		}
 
-		var currency models.CurrencyInfo
+		var currency xtpz_models.CurrencyInfo
 		_, err = db_session.Id(exchange_rate_from_ui.CurrencyId).Get(&currency)
 		core.HandleError(err)
 
-		var exchange_rate_log models.ExchangeRateLogInfo
+		var exchange_rate_log xtpz_models.ExchangeRateLogInfo
 		exchange_rate_log.Name = fmt.Sprintf("%s(%s)", currency.Name, currency.Code)
 		exchange_rate_log.Desc = fmt.Sprintf("编辑数据 %.4f=>%.4f", exchange_rate_in_db.Rate, exchange_rate_from_ui.Rate)
 		exchange_rate_log.LoginName = core.GetLoginUser(c.Session).LoginName
@@ -211,12 +212,12 @@ func (c ErpExchangeRate) Delete() revel.Result {
 	c.Params.Bind(&exchange_rate_id_list, "id_list")
 
 	for _, exchange_rate_id := range exchange_rate_id_list {
-		var exchange_rate models.ExchangeRateInfo
+		var exchange_rate xtpz_models.ExchangeRateInfo
 		has, err := db_session.Id(exchange_rate_id).Get(&exchange_rate)
 		core.HandleError(err)
 
 		if has {
-			var exchange_rate_log models.ExchangeRateLogInfo
+			var exchange_rate_log xtpz_models.ExchangeRateLogInfo
 			currency := c.get_exchange_rate_currency(exchange_rate_id, db_session)
 			exchange_rate_log.Name = fmt.Sprintf("%s(%s)", currency.Name, currency.Code)
 			exchange_rate_log.Desc = "删除数据"
@@ -227,13 +228,13 @@ func (c ErpExchangeRate) Delete() revel.Result {
 		}
 	}
 
-	affected, err := db_session.In("id", exchange_rate_id_list).Delete(new(models.ExchangeRateInfo))
+	affected, err := db_session.In("id", exchange_rate_id_list).Delete(new(xtpz_models.ExchangeRateInfo))
 	core.HandleError(err)
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})
 }
 
-func (c ErpExchangeRate) get_exchange_rate_currency(exchange_rate_id int64, db_session *xorm.Session) models.CurrencyInfo {
+func (c ErpExchangeRate) get_exchange_rate_currency(exchange_rate_id int64, db_session *xorm.Session) xtpz_models.CurrencyInfo {
 	sql := `
 SELECT c.*
 FROM erp_exchange_rate r
@@ -242,7 +243,7 @@ WHERE r.id = %d
 `
 	sql = fmt.Sprintf(sql, exchange_rate_id)
 
-	var currency models.CurrencyInfo
+	var currency xtpz_models.CurrencyInfo
 	_, err := db_session.Sql(sql).Get(&currency)
 	core.HandleError(err)
 

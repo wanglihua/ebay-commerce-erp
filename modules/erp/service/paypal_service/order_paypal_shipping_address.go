@@ -10,6 +10,7 @@ import (
 	"github.com/revel/revel"
 	"matrix/core"
 	"matrix/modules/erp/models"
+	"matrix/modules/erp/models/xtpz_models"
 )
 
 const log_response_xml_to_file = true
@@ -22,7 +23,7 @@ func Get_order_paypal_shipping_address(db_session *xorm.Session, order_id int64)
 	item_id := "282369681238"
 	ebay_order_id := "282369681238-1645636260018"
 
-	var api_config models.EBayAPIConfigInfo
+	var api_config xtpz_models.EBayAPIConfigInfo
 	_, err = db_session.Where(fmt.Sprintf("shop_id = %d", order.ShopId)).Get(&api_config)
 	core.HandleError(err)
 

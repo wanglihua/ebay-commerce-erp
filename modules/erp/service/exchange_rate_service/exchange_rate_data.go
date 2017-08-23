@@ -3,12 +3,12 @@ package exchange_rate_service
 import (
 	"github.com/go-xorm/xorm"
 	"matrix/core"
-	"matrix/modules/erp/models"
+	"matrix/modules/erp/models/xtpz_models"
 )
 
 type Exchange_rate_view_item_t struct {
-	Currency     models.CurrencyInfo        `xorm:"extends" json:"c"`
-	ExchangeRate models.ExchangeRateInfo    `xorm:"extends" json:"er"`
+	Currency     xtpz_models.CurrencyInfo        `xorm:"extends" json:"c"`
+	ExchangeRate xtpz_models.ExchangeRateInfo    `xorm:"extends" json:"er"`
 }
 
 func Get_exchange_rate_list(db_session *xorm.Session) []Exchange_rate_view_item_t {

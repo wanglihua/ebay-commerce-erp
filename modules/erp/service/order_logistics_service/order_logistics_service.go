@@ -18,6 +18,7 @@ import (
 	"matrix/modules/erp/service/stock_service"
 	"matrix/modules/erp/service/order_history_service"
 	"matrix/modules/erp/service/order_item_service"
+	"matrix/modules/erp/models/xtpz_models"
 )
 
 type OrderLogisticsService struct {
@@ -30,7 +31,7 @@ type OrderLogisticsService struct {
 	logistics_mode_list               []models.LogisticsModeInfo              // 物流方式列表
 	logistics_fee_rate_map            map[int64][]models.LogisticsFeeRateInfo // 物流费率列表的映射，映射的 key 是， 物流方式的 id
 	envelope_fee_rate_list            []models.EnvelopeFeeRateInfo            // 信封物流费率， 按费用从小到大排序
-	shop_list                         []models.ShopAccountInfo                // 店铺列表，系统中的店铺列表
+	shop_list                         []xtpz_models.ShopAccountInfo           // 店铺列表，系统中的店铺列表
 	special_product_list              []models.SpecialProductInfo             // 特殊商品SKU列表
 	pending_keeper                    *pending_inventory_temp_keeper          // 设置过程全局变量，每次开始匹配计算的时候一定要记得初始化
 	mel_stock_id                      int64                                   // 墨尔本仓库 id
@@ -97,7 +98,7 @@ func (p_ol *OrderLogisticsService) init_data(db_session *xorm.Session) {
 
 	p_ol.envelope_fee_rate_list = envelope_fee_rate_service.Get_envelope_fee_rate_list(db_session)
 
-	var shop_list = make([]models.ShopAccountInfo, 0)
+	var shop_list = make([]xtpz_models.ShopAccountInfo, 0)
 	err = db_session.Find(&shop_list)
 	core.HandleError(err)
 	p_ol.shop_list = shop_list

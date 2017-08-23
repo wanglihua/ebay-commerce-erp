@@ -9,7 +9,7 @@ import (
 	"github.com/revel/revel"
 	"matrix/core"
 	"matrix/ebay"
-	"matrix/modules/erp/models"
+	"matrix/modules/erp/models/xtpz_models"
 )
 
 /*
@@ -78,7 +78,7 @@ response body:
 
  */
 
-func Get_token_status(config models.EBayAPIConfigInfo) ebay.GetTokenStatusResponse {
+func Get_token_status(config xtpz_models.EBayAPIConfigInfo) ebay.GetTokenStatusResponse {
 
 	var req_body = `<?xml version="1.0" encoding="utf-8"?>
 <GetTokenStatusRequest xmlns="urn:ebay:apis:eBLBaseComponents">

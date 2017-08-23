@@ -14,6 +14,7 @@ import (
 	"matrix/core"
 	"matrix/ebay"
 	"matrix/modules/erp/models"
+	"matrix/modules/erp/models/xtpz_models"
 )
 
 /*
@@ -234,7 +235,7 @@ WHERE psi.item_id = '%s'`
 	revel.TRACE.Println("eBay GetMemberMessages time duration: ", job_duration.Seconds(), "seconds")
 }
 
-func (t EBayMessageDownloadTask) fetch_messages(config models.EBayAPIConfigInfo, page_number int) ebay.GetMemberMessagesResponse {
+func (t EBayMessageDownloadTask) fetch_messages(config xtpz_models.EBayAPIConfigInfo, page_number int) ebay.GetMemberMessagesResponse {
 	/*
 
 	req_body := `<?xml version="1.0" encoding="utf-8"?>

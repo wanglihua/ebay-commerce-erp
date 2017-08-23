@@ -11,6 +11,7 @@ import (
 	"matrix/modules/erp/models/hgbg_models"
 	"matrix/modules/erp/models/kcgl_models"
 	"matrix/modules/erp/models/spzl_models"
+	"matrix/modules/erp/models/xtpz_models"
 )
 
 type Home struct {
@@ -81,16 +82,19 @@ func (c Home) SyncDbPost() revel.Result {
 	model_list = append(model_list, &spzl_models.ProductFeedbackSkuInfo{})
 	model_list = append(model_list, &spzl_models.ProductFeedbackInfo{})
 
-	model_list = append(model_list, &erp_models.CurrencyInfo{})
-	model_list = append(model_list, &erp_models.EBayAPIConfigInfo{})
-	model_list = append(model_list, &erp_models.ECommercePlatformInfo{})
+	model_list = append(model_list, &xtpz_models.ExchangeRateInfo{})
+	model_list = append(model_list, &xtpz_models.ExchangeRateLogInfo{})
+	model_list = append(model_list, &xtpz_models.CurrencyInfo{})
+	model_list = append(model_list, &xtpz_models.EBayAPIConfigInfo{})
+	model_list = append(model_list, &xtpz_models.ECommercePlatformInfo{})
+	model_list = append(model_list, &xtpz_models.PaypalAccountInfo{})
+	model_list = append(model_list, &xtpz_models.ShopAccountInfo{})
+	model_list = append(model_list, &xtpz_models.ShopAccountLogInfo{})
+
 	model_list = append(model_list, &erp_models.EntityCodeInfo{})
 	model_list = append(model_list, &erp_models.EnvelopeFeeRateInfo{})
 	model_list = append(model_list, &erp_models.EubGoodsTypeInfo{})
 	model_list = append(model_list, &erp_models.EubInsuranceTypeInfo{})
-	model_list = append(model_list, &erp_models.ExchangeRateInfo{})
-	model_list = append(model_list, &erp_models.ExchangeRateLogInfo{})
-
 	model_list = append(model_list, &erp_models.InventoryInfo{})
 	model_list = append(model_list, &erp_models.InventoryCheckInfo{})
 	model_list = append(model_list, &erp_models.InventoryCheckEntryInfo{})
@@ -120,7 +124,7 @@ func (c Home) SyncDbPost() revel.Result {
 	model_list = append(model_list, &erp_models.OrderTagInfo{})
 	model_list = append(model_list, &erp_models.OrderTypeInfo{})
 	model_list = append(model_list, &erp_models.PackageMaterialInfo{})
-	model_list = append(model_list, &erp_models.PaypalAccountInfo{})
+
 	model_list = append(model_list, &erp_models.PaypalReconInfo{})
 	model_list = append(model_list, &erp_models.PickFeeInfo{})
 	model_list = append(model_list, &erp_models.PickupOrderInfo{})
@@ -138,8 +142,7 @@ func (c Home) SyncDbPost() revel.Result {
 	model_list = append(model_list, &erp_models.RegionInfo{})
 	model_list = append(model_list, &erp_models.SalesManagerInfo{})
 	model_list = append(model_list, &erp_models.SeaContainerCostInfo{})
-	model_list = append(model_list, &erp_models.ShopAccountInfo{})
-	model_list = append(model_list, &erp_models.ShopAccountLogInfo{})
+
 	model_list = append(model_list, &erp_models.SpecialProductInfo{})
 	model_list = append(model_list, &erp_models.StatusInfo{})
 	model_list = append(model_list, &erp_models.StockBillEntryInfo{})

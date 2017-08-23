@@ -5,7 +5,7 @@ import (
 	"matrix/core"
 	"matrix/modules/auth/pass_res"
 	"matrix/modules/auth/service/pass_service"
-	"matrix/modules/erp/models"
+	"matrix/modules/erp/models/xtpz_models"
 )
 
 type ErpShopAccountLog struct {
@@ -35,12 +35,12 @@ func (c ErpShopAccountLog) ListData() revel.Result {
 		data_query = *data_query.Asc("id")
 	}
 
-	shop_account_log_list := make([]models.ShopAccountLogInfo, 0, limit)
+	shop_account_log_list := make([]xtpz_models.ShopAccountLogInfo, 0, limit)
 	err := data_query.Limit(limit, offset).Find(&shop_account_log_list)
 	core.HandleError(err)
 
 	count_query := *query
-	count, err := count_query.Count(new(models.ShopAccountLogInfo))
+	count, err := count_query.Count(new(xtpz_models.ShopAccountLogInfo))
 	core.HandleError(err)
 
 	return c.RenderJson(core.GridResult{

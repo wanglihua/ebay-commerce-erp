@@ -17,6 +17,7 @@ import (
 	"matrix/modules/erp/service/product_service"
 	"matrix/modules/erp/service/product_store_item_service"
 	"matrix/modules/erp/service/order_history_service"
+	"matrix/modules/erp/models/xtpz_models"
 )
 
 type EBayOrderDownloadTask struct {
@@ -117,7 +118,7 @@ func (t EBayOrderDownloadTask) Run() {
 				order_in_db.TranId = order_download.ShippingDetails.SellingManagerSalesRecordNumber
 				order_in_db.FullTranId = shop_account_config.Shop.Code + order_download.ShippingDetails.SellingManagerSalesRecordNumber
 
-				var shop models.ShopAccountInfo
+				var shop xtpz_models.ShopAccountInfo
 				_, err = db_session.Id(shop_account_config.APIConfig.ShopId).Get(&shop)
 				core.HandleError(err)
 
@@ -160,7 +161,7 @@ func (t EBayOrderDownloadTask) Run() {
 				// 获取当前的汇率设置
 				var exchange_rate_list = exchange_rate_service.Get_exchange_rate_list(db_session)
 
-				var exchange_rate_map = make(map[string]models.ExchangeRateInfo)
+				var exchange_rate_map = make(map[string]xtpz_models.ExchangeRateInfo)
 				for _, exchange_rate := range exchange_rate_list {
 					exchange_rate_map[exchange_rate.Currency.Code] = exchange_rate.ExchangeRate
 				}

@@ -4,12 +4,12 @@ import (
 	"github.com/go-xorm/xorm"
 	"github.com/revel/revel"
 	"matrix/core"
-	"matrix/modules/erp/models"
+	"matrix/modules/erp/models/xtpz_models"
 )
 
 // 插入店铺账户日志
-func Insert_shop_account_log(shop_account *models.ShopAccountInfo, operation_type core.Db_operation_type, db_session *xorm.Session, web_session revel.Session) {
-	var shop_log models.ShopAccountLogInfo
+func Insert_shop_account_log(shop_account *xtpz_models.ShopAccountInfo, operation_type core.Db_operation_type, db_session *xorm.Session, web_session revel.Session) {
+	var shop_log xtpz_models.ShopAccountLogInfo
 
 	login_user := core.GetLoginUser(web_session)
 	shop_log.ShopId = shop_account.Id
@@ -30,8 +30,8 @@ func Insert_shop_account_log(shop_account *models.ShopAccountInfo, operation_typ
 }
 
 // 插入店铺账户API的日志
-func Insert_shop_account_api_log(shop_account *models.ShopAccountInfo, operation_type core.Db_operation_type, db_session *xorm.Session, web_session revel.Session) {
-	var shop_log models.ShopAccountLogInfo
+func Insert_shop_account_api_log(shop_account *xtpz_models.ShopAccountInfo, operation_type core.Db_operation_type, db_session *xorm.Session, web_session revel.Session) {
+	var shop_log xtpz_models.ShopAccountLogInfo
 
 	login_user := core.GetLoginUser(web_session)
 	shop_log.ShopId = shop_account.Id

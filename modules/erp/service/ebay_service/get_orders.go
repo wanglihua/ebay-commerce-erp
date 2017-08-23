@@ -10,7 +10,7 @@ import (
 	"github.com/revel/revel"
 	"matrix/core"
 	"matrix/ebay"
-	"matrix/modules/erp/models"
+	"matrix/modules/erp/models/xtpz_models"
 )
 
 /*
@@ -67,7 +67,7 @@ response body:
 
  */
 
-func Get_orders(config models.EBayAPIConfigInfo, page_number int) ebay.GetOrdersResponse {
+func Get_orders(config xtpz_models.EBayAPIConfigInfo, page_number int) ebay.GetOrdersResponse {
 
 	number_of_days := 1
 

@@ -23,6 +23,7 @@ import (
 	"matrix/modules/erp/service/shop_service"
 	"matrix/modules/erp/service/stock_service"
 	"matrix/modules/erp/setting"
+	"matrix/modules/erp/models/xtpz_models"
 )
 
 type ErpOrderLogistics struct {
@@ -730,7 +731,7 @@ func (c ErpOrderLogistics) get_export_excel2(db_session *xorm.Session) *xlsx.Fil
 		LogisticsCompany     models.LogisticsCompanyInfo        `xorm:"extends" json:"lc"`
 		LogisticsMode        models.LogisticsModeInfo           `xorm:"extends" json:"lm"`
 		OrderShippingAddress models.OrderShippingAddressInfo    `xorm:"extends" json:"osa"`
-		ShopAccount          models.ShopAccountInfo             `xorm:"extends" json:"sa"`
+		ShopAccount          xtpz_models.ShopAccountInfo             `xorm:"extends" json:"sa"`
 	}
 
 	/*

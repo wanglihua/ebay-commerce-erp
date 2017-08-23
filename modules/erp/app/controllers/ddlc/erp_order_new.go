@@ -12,6 +12,7 @@ import (
 	"matrix/modules/erp/service/exchange_rate_service"
 	"matrix/modules/erp/service/order_history_service"
 	"time"
+	"matrix/modules/erp/models/xtpz_models"
 )
 
 type ErpOrderNew struct {
@@ -40,7 +41,7 @@ func (c ErpOrderNew) CreateData() revel.Result {
 	var hold_type_list = make([]models.OrderHoldTypeInfo, 0)
 	core.HandleError(db_session.In("id", []int64{models.ORDER_HOLD_TYPE_PICK_UP}).Find(&hold_type_list))
 
-	var shop_list = make([]models.ShopAccountInfo, 0)
+	var shop_list = make([]xtpz_models.ShopAccountInfo, 0)
 	core.HandleError(db_session.Find(&shop_list))
 
 	var pickup_pay_method_list = make([]models.PickupPayMethodInfo, 0)

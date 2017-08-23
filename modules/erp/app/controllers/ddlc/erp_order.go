@@ -26,6 +26,7 @@ import (
 	"sync"
 	"matrix/modules/erp/service/order_item_service"
 	"matrix/modules/erp/models/kcgl_models"
+	"matrix/modules/erp/models/xtpz_models"
 )
 
 type ErpOrder struct {
@@ -669,7 +670,7 @@ func (c ErpOrder) DetailData() revel.Result {
 	_, err = db_session.Id(order.StatusId).Get(&status)
 	core.HandleError(err)
 
-	var shop models.ShopAccountInfo
+	var shop xtpz_models.ShopAccountInfo
 	_, err = db_session.Id(order.ShopId).Get(&shop)
 	core.HandleError(err)
 

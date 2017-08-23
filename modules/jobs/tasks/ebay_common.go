@@ -11,13 +11,14 @@ import (
 	"matrix/ebay"
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/models/kcgl_models"
+	"matrix/modules/erp/models/xtpz_models"
 )
 
 const log_response_xml_to_file = false
 
 type Shop_account_api_info struct {
-	APIConfig models.EBayAPIConfigInfo `xorm:"extends"`
-	Shop      models.ShopAccountInfo   `xorm:"extends"`
+	APIConfig xtpz_models.EBayAPIConfigInfo `xorm:"extends"`
+	Shop      xtpz_models.ShopAccountInfo   `xorm:"extends"`
 }
 
 func get_ebay_api_config_list(db_session *xorm.Session) []Shop_account_api_info {
@@ -40,7 +41,7 @@ WHERE sa.status_id = %d`
 	return shop_account_api_list
 }
 
-func fetch_product_item(config models.EBayAPIConfigInfo, item_id string) ebay.GetItemResponse {
+func fetch_product_item(config xtpz_models.EBayAPIConfigInfo, item_id string) ebay.GetItemResponse {
 
 	req_body := `<?xml version="1.0" encoding="utf-8"?>
 <GetItemRequest xmlns="urn:ebay:apis:eBLBaseComponents">
@@ -173,7 +174,7 @@ type ItemPictureDetails struct {
 http://developer.ebay.com/devzone/xml/docs/Reference/eBay/GetItem.html
 
  */
-func fetch_product_item_to_db(config models.EBayAPIConfigInfo, db_session *xorm.Session, item_id string) (product_id_return int64, product_sku_return string, product_store_item_id_return int64) {
+func fetch_product_item_to_db(config xtpz_models.EBayAPIConfigInfo, db_session *xorm.Session, item_id string) (product_id_return int64, product_sku_return string, product_store_item_id_return int64) {
 
 	item_response := fetch_product_item(config, item_id)
 

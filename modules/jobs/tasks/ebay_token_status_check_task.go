@@ -7,8 +7,8 @@ import (
 	"github.com/go-xorm/xorm"
 	"github.com/revel/revel"
 	"matrix/core"
-	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/ebay_service"
+	"matrix/modules/erp/models/xtpz_models"
 )
 
 type EBayTokenStatusCheckTask struct {
@@ -68,7 +68,7 @@ func (t EBayTokenStatusCheckTask) Run() {
 
 		// update shop account token_result and token_expire
 
-		var shop_account models.ShopAccountInfo
+		var shop_account xtpz_models.ShopAccountInfo
 		_, err := db_session.Id(config.APIConfig.ShopId).Get(&shop_account)
 		core.HandleError(err)
 

@@ -11,6 +11,7 @@ import (
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/status_service"
+	"matrix/modules/erp/models/xtpz_models"
 )
 
 type ErpPaypalAccount struct {
@@ -24,7 +25,7 @@ func (c ErpPaypalAccount) Index() revel.Result {
 }
 
 type ErpPaypalAccountViewItem struct {
-	models.PaypalAccountInfo `xorm:"extends" json:"a"`
+	xtpz_models.PaypalAccountInfo `xorm:"extends" json:"a"`
 	models.StatusInfo        `xorm:"extends" json:"s"`
 }
 
@@ -70,7 +71,7 @@ func (c ErpPaypalAccount) ListData() revel.Result {
 }
 
 type PaypalAccountDetailForm struct {
-	PaypalAccount models.PaypalAccountInfo `json:"paypal_account"`
+	PaypalAccount xtpz_models.PaypalAccountInfo `json:"paypal_account"`
 	StatusList    []models.StatusInfo      `json:"status_list"`
 }
 
@@ -120,7 +121,7 @@ func (c ErpPaypalAccount) DetailData() revel.Result {
 	var paypal_account_id int64
 	c.Params.Bind(&paypal_account_id, "id")
 
-	var paypal_account models.PaypalAccountInfo
+	var paypal_account xtpz_models.PaypalAccountInfo
 	if paypal_account_id != 0 {
 		has, err := db_session.Id(paypal_account_id).Get(&paypal_account)
 		core.HandleError(err)
@@ -155,7 +156,7 @@ func (c ErpPaypalAccount) Save() revel.Result {
 
 	var affected int64
 	if detail_form.IsCreate() {
-		paypal_account_count, err := db_session.Where(fmt.Sprintf("paypal_account = '%s'", paypal_account.PaypalAccount)).Count(new(models.PaypalAccountInfo))
+		paypal_account_count, err := db_session.Where(fmt.Sprintf("paypal_account = '%s'", paypal_account.PaypalAccount)).Count(new(xtpz_models.PaypalAccountInfo))
 		if paypal_account_count != 0 {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，账号已存在！"})
 		}
@@ -163,7 +164,7 @@ func (c ErpPaypalAccount) Save() revel.Result {
 		affected, err = db_session.Insert(&paypal_account)
 		core.HandleError(err)
 	} else {
-		paypal_account_count, err := db_session.Where(fmt.Sprintf("id <> %d AND paypal_account = '%s'", paypal_account.Id, paypal_account.PaypalAccount)).Count(new(models.PaypalAccountInfo))
+		paypal_account_count, err := db_session.Where(fmt.Sprintf("id <> %d AND paypal_account = '%s'", paypal_account.Id, paypal_account.PaypalAccount)).Count(new(xtpz_models.PaypalAccountInfo))
 		if paypal_account_count != 0 {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，账号已存在！"})
 		}
@@ -187,7 +188,7 @@ func (c ErpPaypalAccount) Delete() revel.Result {
 	paypal_account_id_list := make([]int64, 0)
 	c.Params.Bind(&paypal_account_id_list, "id_list")
 
-	affected, err := db_session.In("id", paypal_account_id_list).Delete(new(models.PaypalAccountInfo))
+	affected, err := db_session.In("id", paypal_account_id_list).Delete(new(xtpz_models.PaypalAccountInfo))
 	core.HandleError(err)
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})

@@ -16,6 +16,7 @@ import (
 	"matrix/modules/erp/service/order_service"
 	"matrix/modules/erp/service/stock_service"
 	"sort"
+	"matrix/modules/erp/models/xtpz_models"
 )
 
 type ErpOrderLogisticsCompanyExport struct {
@@ -60,7 +61,7 @@ func (c ErpOrderLogisticsCompanyExport) ExportOptionData() revel.Result {
 type order_logistics_eparcel_view_item_t struct {
 	OrderLogistics models.OrderLogisticsInfo    `xorm:"extends" json:"ol"`
 	Order          models.OrderInfo             `xorm:"extends" json:"o"`
-	ShopAccount    models.ShopAccountInfo       `xorm:"extends" json:"sa"`
+	ShopAccount    xtpz_models.ShopAccountInfo       `xorm:"extends" json:"sa"`
 	sku_qty_loc    string                       `xorm:"-"`
 	loc_name       string                       `xorm:"-"`
 }
@@ -75,7 +76,7 @@ type order_logistics_fastway_view_item_t struct {
 	OrderLogistics models.OrderLogisticsInfo    `xorm:"extends" json:"ol"`
 	Order          models.OrderInfo             `xorm:"extends" json:"o"`
 	LogisticsMode  models.LogisticsModeInfo     `xorm:"extends" json:"lm"`
-	ShopAccount    models.ShopAccountInfo       `xorm:"extends" json:"sa"`
+	ShopAccount    xtpz_models.ShopAccountInfo       `xorm:"extends" json:"sa"`
 	sku_qty_loc    string                       `xorm:"-"`
 	loc_name       string                       `xorm:"-"`
 }
@@ -90,7 +91,7 @@ type order_logistics_toll_view_item_t struct {
 	OrderLogistics models.OrderLogisticsInfo    `xorm:"extends" json:"ol"`
 	Order          models.OrderInfo             `xorm:"extends" json:"o"`
 	LogisticsMode  models.LogisticsModeInfo     `xorm:"extends" json:"lm"`
-	ShopAccount    models.ShopAccountInfo       `xorm:"extends" json:"sa"`
+	ShopAccount    xtpz_models.ShopAccountInfo       `xorm:"extends" json:"sa"`
 	sku_qty_loc    string                       `xorm:"-"`
 	loc_name       string                       `xorm:"-"`
 	qty            int64                        `xorm:"-"`

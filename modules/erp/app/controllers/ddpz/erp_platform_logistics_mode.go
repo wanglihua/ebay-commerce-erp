@@ -7,6 +7,7 @@ import (
 
 	"matrix/core"
 	"matrix/modules/erp/models"
+	"matrix/modules/erp/models/xtpz_models"
 )
 
 type ErpPlatformLogisticsMode struct {
@@ -19,7 +20,7 @@ func (c ErpPlatformLogisticsMode) Index() revel.Result {
 
 type ErpPlatformLogisticsViewItem struct {
 	models.PlatformLogisticsModeInfo        `xorm:"extends" json:"m"`
-	models.ECommercePlatformInfo            `xorm:"extends" json:"p"`
+	xtpz_models.ECommercePlatformInfo            `xorm:"extends" json:"p"`
 }
 
 func (c ErpPlatformLogisticsMode) ListData() revel.Result {
@@ -64,7 +65,7 @@ func (c ErpPlatformLogisticsMode) ListData() revel.Result {
 
 type PlatformLogisticsModeDetailForm struct {
 	PlatformLogisticsMode models.PlatformLogisticsModeInfo  `json:"platform_logistics_mode"`
-	PlatformList          []models.ECommercePlatformInfo    `json:"platform_list"`
+	PlatformList          []xtpz_models.ECommercePlatformInfo    `json:"platform_list"`
 }
 
 func (f *PlatformLogisticsModeDetailForm) IsCreate() bool {
@@ -104,7 +105,7 @@ func (c ErpPlatformLogisticsMode) DetailData() revel.Result {
 		}
 	}
 
-	var platform_list = make([]models.ECommercePlatformInfo, 0)
+	var platform_list = make([]xtpz_models.ECommercePlatformInfo, 0)
 	err := db_session.Find(&platform_list)
 	core.HandleError(err)
 

@@ -14,6 +14,7 @@ import (
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/order_service"
 	"matrix/modules/erp/service/order_history_service"
+	"matrix/modules/erp/models/xtpz_models"
 )
 
 // 1 地址有特殊字段的
@@ -493,14 +494,14 @@ func (p_ol *OrderLogisticsService) hold_check_address_info_miss(p_order *models.
 func (p_ol *OrderLogisticsService) hold_check_paypal_account_not_match(p_order *models.OrderInfo, db_session *xorm.Session) (is_hold_return bool) {
 	var payment_method = p_order.PaymentMethods
 
-	var find_shop_in_shop_list = func(shop_id int64, shop_list []models.ShopAccountInfo) models.ShopAccountInfo {
+	var find_shop_in_shop_list = func(shop_id int64, shop_list []xtpz_models.ShopAccountInfo) xtpz_models.ShopAccountInfo {
 		for _, shop := range shop_list {
 			if shop.Id == shop_id {
 				return shop
 			}
 		}
 
-		return models.ShopAccountInfo{}
+		return xtpz_models.ShopAccountInfo{}
 	}
 
 	var shop = find_shop_in_shop_list(p_order.ShopId, p_ol.shop_list)

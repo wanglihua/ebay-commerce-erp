@@ -10,9 +10,9 @@ import (
 	"matrix/core"
 	"matrix/modules/auth/pass_res"
 	"matrix/modules/auth/service/pass_service"
-	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/ebay_service"
 	"matrix/modules/erp/service/shop_account_log_service"
+	"matrix/modules/erp/models/xtpz_models"
 )
 
 type ErpEBayAPIConfig struct {
@@ -20,7 +20,7 @@ type ErpEBayAPIConfig struct {
 }
 
 type EBayAPIConfigDetailForm struct {
-	EBayAPIConfig models.EBayAPIConfigInfo `json:"api_config"`
+	EBayAPIConfig xtpz_models.EBayAPIConfigInfo `json:"api_config"`
 	ShopName      string                   `json:"shop_name"`
 }
 
@@ -46,7 +46,7 @@ func (c ErpEBayAPIConfig) DetailData() revel.Result {
 	var shop_id int64
 	c.Params.Bind(&shop_id, "shop_id")
 
-	var ebay_api_config models.EBayAPIConfigInfo
+	var ebay_api_config xtpz_models.EBayAPIConfigInfo
 	if shop_id == 0 {
 		return c.RenderJson(map[string]interface{}{
 			"success": false,
@@ -98,7 +98,7 @@ func (c ErpEBayAPIConfig) Save() revel.Result {
 
 	ebay_api_config := detail_form.EBayAPIConfig
 
-	var shop_account models.ShopAccountInfo
+	var shop_account xtpz_models.ShopAccountInfo
 	_, err = db_session.Id(ebay_api_config.ShopId).Get(&shop_account)
 	core.HandleError(err)
 
@@ -115,7 +115,7 @@ func (c ErpEBayAPIConfig) Save() revel.Result {
 		shop_account_log_service.Insert_shop_account_api_log(&shop_account, core.Db_operation_types.Update, db_session, c.Session)
 
 		if affected == 0 {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！" })
+			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！"})
 		}
 	}
 
@@ -176,17 +176,17 @@ func (c ErpEBayAPIConfig) Delete() revel.Result {
 	var config_id int64
 	c.Params.Bind(&config_id, "id")
 
-	var ebay_api_config models.EBayAPIConfigInfo
+	var ebay_api_config xtpz_models.EBayAPIConfigInfo
 	_, err := db_session.Id(config_id).Get(&ebay_api_config)
 	core.HandleError(err)
 
-	var shop_account models.ShopAccountInfo
+	var shop_account xtpz_models.ShopAccountInfo
 	_, err = db_session.Id(ebay_api_config.ShopId).Get(&shop_account)
 	core.HandleError(err)
 
 	shop_account_log_service.Insert_shop_account_api_log(&shop_account, core.Db_operation_types.Delete, db_session, c.Session)
 
-	_, err = db_session.Id(config_id).Delete(new(models.EBayAPIConfigInfo))
+	_, err = db_session.Id(config_id).Delete(new(xtpz_models.EBayAPIConfigInfo))
 	core.HandleError(err)
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: "API配置数据删除成功!"})

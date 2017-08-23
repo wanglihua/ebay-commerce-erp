@@ -7,13 +7,14 @@ import (
 	"matrix/core"
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/models/kcgl_models"
+	"matrix/modules/erp/models/xtpz_models"
 )
 
 type Order_item_view_item_t struct {
 	OrderItem   models.OrderItemInfo       `xorm:"extends" json:"oi"`
 	Order       models.OrderInfo           `xorm:"extends" json:"o"`
-	ShopAccount models.ShopAccountInfo     `xorm:"extends" json:"sa"`
-	Platform    models.ShopAccountInfo     `xorm:"extends" json:"pf"`
+	ShopAccount xtpz_models.ShopAccountInfo     `xorm:"extends" json:"sa"`
+	Platform    xtpz_models.ShopAccountInfo     `xorm:"extends" json:"pf"`
 	Product     kcgl_models.ProductInfo         `xorm:"extends" json:"p"`
 	Status      models.StatusInfo          `xorm:"extends" json:"s"`
 	Stock       models.StockInfo           `xorm:"extends" json:"st"`

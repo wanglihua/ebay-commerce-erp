@@ -11,6 +11,7 @@ import (
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/shop_account_log_service"
 	"matrix/modules/erp/service/status_service"
+	"matrix/modules/erp/models/xtpz_models"
 )
 
 type ErpShopAccount struct {
@@ -24,8 +25,8 @@ func (c ErpShopAccount) Index() revel.Result {
 }
 
 type ErpShopAccountViewItem struct {
-	models.ShopAccountInfo        `xorm:"extends" json:"a"`
-	models.ECommercePlatformInfo  `xorm:"extends" json:"p"`
+	xtpz_models.ShopAccountInfo        `xorm:"extends" json:"a"`
+	xtpz_models.ECommercePlatformInfo  `xorm:"extends" json:"p"`
 	models.StatusInfo             `xorm:"extends" json:"s"`
 }
 
@@ -74,9 +75,9 @@ FROM erp_shop_account a
 }
 
 type ShopAccountDetailForm struct {
-	ShopAccount  models.ShopAccountInfo         `json:"shop_account"`
+	ShopAccount  xtpz_models.ShopAccountInfo         `json:"shop_account"`
 	StatusList   []models.StatusInfo            `json:"status_list"`
-	PlatformList []models.ECommercePlatformInfo `json:"platform_list"`
+	PlatformList []xtpz_models.ECommercePlatformInfo `json:"platform_list"`
 }
 
 func (f *ShopAccountDetailForm) IsCreate() bool {
@@ -118,7 +119,7 @@ func (c ErpShopAccount) DetailData() revel.Result {
 	var shop_account_id int64
 	c.Params.Bind(&shop_account_id, "id")
 
-	var shop_account models.ShopAccountInfo
+	var shop_account xtpz_models.ShopAccountInfo
 	if shop_account_id != 0 {
 		has, err := db_session.Id(shop_account_id).Get(&shop_account)
 		core.HandleError(err)
@@ -133,7 +134,7 @@ func (c ErpShopAccount) DetailData() revel.Result {
 
 	status_list := status_service.Get_status_list(db_session, models.STATUS_TYPE_SHOP_ACCOUNT)
 
-	platform_list := make([]models.ECommercePlatformInfo, 0)
+	platform_list := make([]xtpz_models.ECommercePlatformInfo, 0)
 	err := db_session.Find(&platform_list)
 	core.HandleError(err)
 
@@ -162,7 +163,7 @@ func (c ErpShopAccount) Save() revel.Result {
 
 	var affected int64
 	if detail_form.IsCreate() {
-		code_count, err := db_session.Where("code = ?", shop_account.Code).Count(new(models.ShopAccountInfo))
+		code_count, err := db_session.Where("code = ?", shop_account.Code).Count(new(xtpz_models.ShopAccountInfo))
 		core.HandleError(err)
 		if code_count != 0 {
 			return c.RenderJson(map[string]interface{}{
@@ -171,7 +172,7 @@ func (c ErpShopAccount) Save() revel.Result {
 			})
 		}
 
-		name_count, err := db_session.Where("platform_id = ? AND name = ?", shop_account.PlatformId, shop_account.Name).Count(new(models.ShopAccountInfo))
+		name_count, err := db_session.Where("platform_id = ? AND name = ?", shop_account.PlatformId, shop_account.Name).Count(new(xtpz_models.ShopAccountInfo))
 		core.HandleError(err)
 		if name_count != 0 {
 			return c.RenderJson(map[string]interface{}{
@@ -185,7 +186,7 @@ func (c ErpShopAccount) Save() revel.Result {
 
 		shop_account_log_service.Insert_shop_account_log(&shop_account, core.Db_operation_types.Insert, db_session, c.Session)
 	} else {
-		code_count, err := db_session.Where("id <> ? AND code = ?", shop_account.Id, shop_account.Code).Count(new(models.ShopAccountInfo))
+		code_count, err := db_session.Where("id <> ? AND code = ?", shop_account.Id, shop_account.Code).Count(new(xtpz_models.ShopAccountInfo))
 		core.HandleError(err)
 		if code_count != 0 {
 			return c.RenderJson(map[string]interface{}{
@@ -194,7 +195,7 @@ func (c ErpShopAccount) Save() revel.Result {
 			})
 		}
 
-		name_count, err := db_session.Where("id <> ? AND platform_id = ? AND name = ?", shop_account.Id, shop_account.PlatformId, shop_account.Name).Count(new(models.ShopAccountInfo))
+		name_count, err := db_session.Where("id <> ? AND platform_id = ? AND name = ?", shop_account.Id, shop_account.PlatformId, shop_account.Name).Count(new(xtpz_models.ShopAccountInfo))
 		core.HandleError(err)
 		if name_count != 0 {
 			return c.RenderJson(map[string]interface{}{
@@ -226,14 +227,14 @@ func (c ErpShopAccount) Delete() revel.Result {
 	c.Params.Bind(&shop_account_id_list, "id_list")
 
 	// 删除关联的 eBay API 配置
-	_, err := db_session.In("shop_id", shop_account_id_list).Delete(new(models.EBayAPIConfigInfo))
+	_, err := db_session.In("shop_id", shop_account_id_list).Delete(new(xtpz_models.EBayAPIConfigInfo))
 	core.HandleError(err)
 
 	// 删除店铺信息
-	_, err = db_session.In("id", shop_account_id_list).Delete(new(models.ShopAccountInfo))
+	_, err = db_session.In("id", shop_account_id_list).Delete(new(xtpz_models.ShopAccountInfo))
 	core.HandleError(err)
 
-	var shop_account_list = make([]models.ShopAccountInfo, 0)
+	var shop_account_list = make([]xtpz_models.ShopAccountInfo, 0)
 	err = db_session.In("id", shop_account_id_list).Find(&shop_account_list)
 	core.HandleError(err)
 
@@ -252,11 +253,11 @@ func (c ErpShopAccount) GetShopAccountInfo() revel.Result {
 	var shop_account_id int64
 	c.Params.Bind(&shop_account_id, "shop_account_id")
 
-	var shop_account models.ShopAccountInfo
+	var shop_account xtpz_models.ShopAccountInfo
 	_, err := db_session.Id(shop_account_id).Get(&shop_account)
 	core.HandleError(err)
 
-	var platform models.ECommercePlatformInfo
+	var platform xtpz_models.ECommercePlatformInfo
 	_, err = db_session.Id(shop_account.PlatformId).Get(&platform)
 	core.HandleError(err)
 

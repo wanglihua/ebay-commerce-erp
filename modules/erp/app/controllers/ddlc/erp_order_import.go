@@ -19,6 +19,7 @@ import (
 	"matrix/modules/erp/service/order_history_service"
 	"time"
 	"matrix/modules/erp/service/inventory_service"
+	"matrix/modules/erp/models/xtpz_models"
 )
 
 type ErpOrderImport struct {
@@ -73,8 +74,8 @@ func (c ErpOrderImport) ListData() revel.Result {
 		models.OrderInfo              `xorm:"extends" json:"o"`
 		models.OrderTypeInfo          `xorm:"extends" json:"ot"`
 		models.OrderHoldTypeInfo      `xorm:"extends" json:"ht"`
-		models.ECommercePlatformInfo  `xorm:"extends" json:"pf"`
-		models.ShopAccountInfo        `xorm:"extends" json:"sa"`
+		xtpz_models.ECommercePlatformInfo  `xorm:"extends" json:"pf"`
+		xtpz_models.ShopAccountInfo        `xorm:"extends" json:"sa"`
 		models.StatusInfo             `xorm:"extends" json:"s"`
 	}
 

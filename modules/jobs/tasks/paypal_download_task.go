@@ -13,7 +13,7 @@ import (
 	"github.com/logpacker/PayPal-Go-SDK"
 	"github.com/revel/revel"
 	"matrix/core"
-	"matrix/modules/erp/models"
+	"matrix/modules/erp/models/xtpz_models"
 )
 
 type PaypalDownloadTask struct {
@@ -57,7 +57,7 @@ func (t PaypalDownloadTask) Run() {
 		db_session.Close()
 	}()
 
-	paypal_account_list := make([]models.PaypalAccountInfo, 0)
+	paypal_account_list := make([]xtpz_models.PaypalAccountInfo, 0)
 	err = db_session.Find(&paypal_account_list)
 	core.HandleError(err)
 
