@@ -198,7 +198,7 @@ func (c ErpInventoryCheck) Delete() revel.Result {
 		}
 	}
 
-	_, err = db_session.In("check_id", inventory_check_id_list).Delete(new(models.StockBillEntryInfo))
+	_, err = db_session.In("check_id", inventory_check_id_list).Delete(new(kcgl_models.StockBillEntryInfo))
 	core.HandleError(err)
 
 	_, err = db_session.In("id", inventory_check_id_list).Delete(new(kcgl_models.InventoryCheckInfo))

@@ -9,6 +9,7 @@ import (
 	"matrix/modules/erp/service/bill_service"
 	"strconv"
 	"time"
+	"matrix/modules/erp/models/kcgl_models"
 )
 
 type ErpPurchaseBill struct {
@@ -20,7 +21,7 @@ func (c ErpPurchaseBill) Index() revel.Result {
 }
 
 type ErpPurchaseBillViewItem struct {
-	models.PurchaseBillInfo `xorm:"extends" json:"pb"`
+	kcgl_models.PurchaseBillInfo `xorm:"extends" json:"pb"`
 	auth_models.UserInfo    `xorm:"extends" json:"u"`
 	models.StatusInfo       `xorm:"extends" json:"s"`
 }
@@ -72,7 +73,7 @@ func (c ErpPurchaseBill) ListData() revel.Result {
 }
 
 type PurchaseBillDetailForm struct {
-	PurchaseBill models.PurchaseBillInfo `json:"purchase_bill"`
+	PurchaseBill kcgl_models.PurchaseBillInfo `json:"purchase_bill"`
 }
 
 func (f *PurchaseBillDetailForm) IsCreate() bool {
@@ -105,7 +106,7 @@ func (c ErpPurchaseBill) DetailData() revel.Result {
 	var purchase_bill_id int64
 	c.Params.Bind(&purchase_bill_id, "id")
 
-	var purchase_bill models.PurchaseBillInfo
+	var purchase_bill kcgl_models.PurchaseBillInfo
 	if purchase_bill_id != 0 {
 		has, err := db_session.Id(purchase_bill_id).Get(&purchase_bill)
 		core.HandleError(err)
@@ -162,10 +163,10 @@ func (c ErpPurchaseBill) Delete() revel.Result {
 	purchase_bill_id_list := make([]int64, 0)
 	c.Params.Bind(&purchase_bill_id_list, "id_list")
 
-	_, err := db_session.In("bill_id", purchase_bill_id_list).Delete(new(models.PurchaseBillEntryInfo))
+	_, err := db_session.In("bill_id", purchase_bill_id_list).Delete(new(kcgl_models.PurchaseBillEntryInfo))
 	core.HandleError(err)
 
-	_, err = db_session.In("id", purchase_bill_id_list).Delete(new(models.PurchaseBillInfo))
+	_, err = db_session.In("id", purchase_bill_id_list).Delete(new(kcgl_models.PurchaseBillInfo))
 	core.HandleError(err)
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: "数据删除成功!"})

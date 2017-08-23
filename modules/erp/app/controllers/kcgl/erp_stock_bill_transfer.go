@@ -12,9 +12,9 @@ import (
 	auth_models "matrix/modules/auth/models"
 	"matrix/modules/auth/pass_res"
 	"matrix/modules/auth/service/pass_service"
-	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/bill_service"
 	"matrix/modules/erp/models/sppz_models"
+	"matrix/modules/erp/models/kcgl_models"
 )
 
 type ErpStockBillTransfer struct {
@@ -28,7 +28,7 @@ func (c ErpStockBillTransfer) Index() revel.Result {
 }
 
 type ErpStockBillTransferViewItem struct {
-	models.StockBillInfo       `xorm:"extends" json:"sb"`
+	kcgl_models.StockBillInfo       `xorm:"extends" json:"sb"`
 	SrcStock  sppz_models.StockInfo `xorm:"extends" json:"sc"`
 	DestStock sppz_models.StockInfo `xorm:"extends" json:"dc"`
 	auth_models.UserInfo       `xorm:"extends" json:"u"`
@@ -56,7 +56,7 @@ func (c ErpStockBillTransfer) ListData() revel.Result {
 		Join("LEFT", []string{"erp_stock", "sc"}, "sb.src_stock_id = sc.id").
 		Join("INNER", []string{"erp_stock", "dc"}, "sb.stock_id = dc.id").
 		Join("INNER", []string{"auth_user", "u"}, "sb.user_id = u.id").
-		Where("(sb.type_id = ? OR sb.type_id = ?)", models.STOCK_BILL_TYPE_TRANSFER, models.STOCK_BILL_TYPE_TRANSFER_ZT).
+		Where("(sb.type_id = ? OR sb.type_id = ?)", kcgl_models.STOCK_BILL_TYPE_TRANSFER, kcgl_models.STOCK_BILL_TYPE_TRANSFER_ZT).
 		Where(filter)
 
 	//query extra filter here
@@ -83,7 +83,7 @@ func (c ErpStockBillTransfer) ListData() revel.Result {
 }
 
 type StockBillTransferDetailForm struct {
-	StockBill models.StockBillInfo `json:"stock_bill"`
+	StockBill kcgl_models.StockBillInfo `json:"stock_bill"`
 	StockList []sppz_models.StockInfo   `json:"stock_list"`
 }
 
@@ -121,7 +121,7 @@ func (c ErpStockBillTransfer) DetailData() revel.Result {
 	var stock_bill_id int64
 	c.Params.Bind(&stock_bill_id, "id")
 
-	var stock_bill models.StockBillInfo
+	var stock_bill kcgl_models.StockBillInfo
 	if stock_bill_id != 0 {
 		has, err := db_session.Id(stock_bill_id).Get(&stock_bill)
 		core.HandleError(err)
@@ -174,9 +174,9 @@ func (c ErpStockBillTransfer) Save() revel.Result {
 		core.HandleError(err)
 
 		if stock.StockTypeId == sppz_models.STOCK_TYPE_ZT {
-			stock_bill.TypeId = models.STOCK_BILL_TYPE_TRANSFER_ZT
+			stock_bill.TypeId = kcgl_models.STOCK_BILL_TYPE_TRANSFER_ZT
 		} else {
-			stock_bill.TypeId = models.STOCK_BILL_TYPE_TRANSFER
+			stock_bill.TypeId = kcgl_models.STOCK_BILL_TYPE_TRANSFER
 		}
 
 		affected, err = db_session.Insert(&stock_bill)
@@ -208,7 +208,7 @@ func (c ErpStockBillTransfer) Delete() revel.Result {
 		})
 	}
 
-	affected, err := db_session.In("id", stock_bill_id_list).Delete(new(models.StockBillInfo))
+	affected, err := db_session.In("id", stock_bill_id_list).Delete(new(kcgl_models.StockBillInfo))
 	core.HandleError(err)
 
 	//同时删除关联明细

@@ -47,7 +47,7 @@ func (c ErpOrderNew) CreateData() revel.Result {
 	var shop_list = make([]xtpz_models.ShopAccountInfo, 0)
 	core.HandleError(db_session.Find(&shop_list))
 
-	var pickup_pay_method_list = make([]models.PickupPayMethodInfo, 0)
+	var pickup_pay_method_list = make([]ddpz_models.PickupPayMethodInfo, 0)
 	core.HandleError(db_session.Find(&pickup_pay_method_list))
 
 	var user_list = make([]auth_models.UserInfo, 0)
@@ -224,7 +224,7 @@ func (c ErpOrderNew) Save() revel.Result {
 type OrderCreateForm struct {
 	Order           ddlc_models.OrderInfo                `json:"order"`
 	ShippingAddress ddlc_models.OrderShippingAddressInfo `json:"shipping_address"`
-	PickupInfo      models.PickupOrderInfo          `json:"pickup_info"`
+	PickupInfo      ddlc_models.PickupOrderInfo          `json:"pickup_info"`
 	StockId         int64                           `json:"stock_id"`
 }
 

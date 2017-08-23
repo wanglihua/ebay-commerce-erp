@@ -32,7 +32,7 @@ func (c ErpStockBillTransferEntry) ListData() revel.Result {
 	var bill_id int64
 	c.Params.Bind(&bill_id, "bill_id")
 
-	var stock_bill models.StockBillInfo
+	var stock_bill kcgl_models.StockBillInfo
 	if bill_id != 0 {
 		has, err := db_session.Id(bill_id).Get(&stock_bill)
 		core.HandleError(err)
@@ -55,8 +55,8 @@ WHERE sbe.bill_id = 0;
 	 */
 
 	type StockBillTransferViewItem struct {
-		models.StockBillEntryInfo `xorm:"extends" json:"sbe"`
-		models.StockBillInfo      `xorm:"extends" json:"sb"`
+		kcgl_models.StockBillEntryInfo `xorm:"extends" json:"sbe"`
+		kcgl_models.StockBillInfo      `xorm:"extends" json:"sb"`
 		sppz_models.StockInfo          `xorm:"extends" json:"s"`
 		sppz_models.StorageLocInfo     `xorm:"extends" json:"sl"`
 		kcgl_models.ProductInfo        `xorm:"extends" json:"p"`
@@ -104,8 +104,8 @@ WHERE sbe.bill_id = 0;
 }
 
 type StockBillEntryTransferDetailForm struct {
-	StockBill      models.StockBillInfo        `json:"stock_bill"`
-	StockBillEntry models.StockBillEntryInfo   `json:"bill_entry"`
+	StockBill      kcgl_models.StockBillInfo        `json:"stock_bill"`
+	StockBillEntry kcgl_models.StockBillEntryInfo   `json:"bill_entry"`
 	ProductName    string                      `json:"product_name"`
 	StockName      string                      `json:"stock_name"`
 	StorageLocList []sppz_models.StorageLocInfo     `json:"storage_loc_list"`
@@ -136,7 +136,7 @@ func (c ErpStockBillTransferEntry) DetailData() revel.Result {
 		return c.RenderJson(core.JsonResult{Success: false, Message: "请先选择调拨单！"})
 	}
 
-	var stock_bill models.StockBillInfo
+	var stock_bill kcgl_models.StockBillInfo
 	has, err := db_session.Id(bill_id).Get(&stock_bill)
 	core.HandleError(err)
 	if has == false {
@@ -153,7 +153,7 @@ func (c ErpStockBillTransferEntry) DetailData() revel.Result {
 	var bill_entry_id int64
 	c.Params.Bind(&bill_entry_id, "id")
 
-	var stock_bill_entry models.StockBillEntryInfo
+	var stock_bill_entry kcgl_models.StockBillEntryInfo
 	var product_name string
 	if bill_entry_id != 0 {
 		has, err := db_session.Id(bill_entry_id).Get(&stock_bill_entry)
@@ -196,7 +196,7 @@ func (c ErpStockBillTransferEntry) Save() revel.Result {
 	stock_bill_entry.BillId = detail_form.StockBill.Id
 
 	bill_id := detail_form.StockBill.Id
-	var stock_bill models.StockBillInfo
+	var stock_bill kcgl_models.StockBillInfo
 	_, err = db_session.Id(bill_id).Get(&stock_bill)
 	core.HandleError(err)
 
@@ -226,7 +226,7 @@ func (c ErpStockBillTransferEntry) Delete() revel.Result {
 	stock_bill_entry_id_list := make([]int64, 0)
 	c.Params.Bind(&stock_bill_entry_id_list, "id_list")
 
-	affected, err := db_session.In("id", stock_bill_entry_id_list).Delete(new(models.StockBillEntryInfo))
+	affected, err := db_session.In("id", stock_bill_entry_id_list).Delete(new(kcgl_models.StockBillEntryInfo))
 	core.HandleError(err)
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})

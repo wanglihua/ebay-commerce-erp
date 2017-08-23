@@ -4,13 +4,13 @@ import (
 	"github.com/revel/revel"
 
 	"matrix/core"
-	"matrix/modules/erp/models"
 	"fmt"
 	"matrix/modules/erp/service/product_sale_analysis_service"
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/auth/pass_res"
 	"matrix/modules/erp/models/kcgl_models"
 	"matrix/modules/erp/models/sppz_models"
+	"matrix/modules/erp/models/spbb_models"
 )
 
 type ErpProductSaleDayAnalysis struct {
@@ -35,15 +35,15 @@ func (c ErpProductSaleDayAnalysis) PageData() revel.Result {
 		"analysis_type_id": 0,
 		"analysis_type_list": []map[string]interface{}{
 			map[string]interface{}{
-				"id":   models.PRODUCT_SALE_ANALYSIS_TYPE_ACTUAL,
+				"id":   spbb_models.PRODUCT_SALE_ANALYSIS_TYPE_ACTUAL,
 				"name": "实际仓库发货",
 			},
 			map[string]interface{}{
-				"id":   models.PRODUCT_SALE_ANALYSIS_TYPE_LOGIC,
+				"id":   spbb_models.PRODUCT_SALE_ANALYSIS_TYPE_LOGIC,
 				"name": "理论仓库发货",
 			},
 			map[string]interface{}{
-				"id":   models.PRODUCT_SALE_ANALYSIS_TYPE_SKU,
+				"id":   spbb_models.PRODUCT_SALE_ANALYSIS_TYPE_SKU,
 				"name": "不分仓统计",
 			},
 		},
@@ -68,7 +68,7 @@ func (c ErpProductSaleDayAnalysis) ListData() revel.Result {
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
 	type product_sale_day_analysis_item_t struct {
-		ProductSaleDayAnalysis models.ProductSaleDayAnalysisInfo `xorm:"extends" json:"da"`
+		ProductSaleDayAnalysis spbb_models.ProductSaleDayAnalysisInfo `xorm:"extends" json:"da"`
 		Stock                  sppz_models.StockInfo                  `xorm:"extends" json:"s"`
 	}
 
@@ -117,15 +117,15 @@ FROM erp_product_sale_day_analysis da
 	core.HandleError(err)
 
 	for index, product_sale_day_analysis := range product_sale_day_analysis_list {
-		if product_sale_day_analysis.ProductSaleDayAnalysis.Type == models.PRODUCT_SALE_ANALYSIS_TYPE_ACTUAL {
+		if product_sale_day_analysis.ProductSaleDayAnalysis.Type == spbb_models.PRODUCT_SALE_ANALYSIS_TYPE_ACTUAL {
 			product_sale_day_analysis_list[index].ProductSaleDayAnalysis.TypeName = "实际仓库发货"
 		}
 
-		if product_sale_day_analysis.ProductSaleDayAnalysis.Type == models.PRODUCT_SALE_ANALYSIS_TYPE_LOGIC {
+		if product_sale_day_analysis.ProductSaleDayAnalysis.Type == spbb_models.PRODUCT_SALE_ANALYSIS_TYPE_LOGIC {
 			product_sale_day_analysis_list[index].ProductSaleDayAnalysis.TypeName = "理论仓库发货"
 		}
 
-		if product_sale_day_analysis.ProductSaleDayAnalysis.Type == models.PRODUCT_SALE_ANALYSIS_TYPE_SKU {
+		if product_sale_day_analysis.ProductSaleDayAnalysis.Type == spbb_models.PRODUCT_SALE_ANALYSIS_TYPE_SKU {
 			product_sale_day_analysis_list[index].ProductSaleDayAnalysis.TypeName = "不分仓统计"
 		}
 

@@ -46,7 +46,7 @@ func (c ErpInventoryCheckEntry) ListData() revel.Result {
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
 	type ErpInventoryCheckEntryViewItem struct {
-		models.StockBillEntryInfo `xorm:"extends" json:"ice"`
+		kcgl_models.StockBillEntryInfo `xorm:"extends" json:"ice"`
 		kcgl_models.InventoryCheckInfo      `xorm:"extends" json:"ic"`
 		sppz_models.StorageLocInfo          `xorm:"extends" json:"sl"`
 		kcgl_models.ProductInfo             `xorm:"extends" json:"p"`
@@ -266,7 +266,7 @@ func (c ErpInventoryCheckEntry) Delete() revel.Result {
 		return c.RenderJson(core.JsonResult{Success: false, Message: "当前盘点单不是已创建或未通过状态，明细信息不能删除！"})
 	}
 
-	affected, err := db_session.In("id", inventory_check_entry_id_list).Delete(new(models.StockBillEntryInfo))
+	affected, err := db_session.In("id", inventory_check_entry_id_list).Delete(new(kcgl_models.StockBillEntryInfo))
 	core.HandleError(err)
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})

@@ -7,8 +7,8 @@ import (
 	"matrix/core"
 	"matrix/modules/auth/pass_res"
 	"matrix/modules/auth/service/pass_service"
-	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/product_sale_analysis_setting_service"
+	"matrix/modules/erp/models/spbb_models"
 )
 
 type ErpProductSaleAnalysisSetting struct {
@@ -22,7 +22,7 @@ func (c ErpProductSaleAnalysisSetting) Index() revel.Result {
 }
 
 type ProductSaleAnalysisSettingDetailForm struct {
-	Setting models.ProductSaleAnalysisSettingInfo `json:"setting"`
+	Setting spbb_models.ProductSaleAnalysisSettingInfo `json:"setting"`
 }
 
 func (f *ProductSaleAnalysisSettingDetailForm) Valid(validation *revel.Validation) bool {

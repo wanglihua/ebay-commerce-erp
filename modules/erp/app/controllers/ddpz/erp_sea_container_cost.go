@@ -8,8 +8,8 @@ import (
 	"matrix/core"
 	"matrix/modules/auth/pass_res"
 	"matrix/modules/auth/service/pass_service"
-	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/sea_container_cost_service"
+	"matrix/modules/erp/models/sppz_models"
 )
 
 type ErpSeaContainerCost struct {
@@ -23,7 +23,7 @@ func (c ErpSeaContainerCost) Index() revel.Result {
 }
 
 type SeaContainerCostDetailForm struct {
-	SeaContainerCost models.SeaContainerCostInfo `json:"sea_container_cost"`
+	SeaContainerCost sppz_models.SeaContainerCostInfo `json:"sea_container_cost"`
 }
 
 func (f *SeaContainerCostDetailForm) Valid(validation *revel.Validation) bool {

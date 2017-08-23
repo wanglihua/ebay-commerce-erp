@@ -21,7 +21,7 @@ func (c ErpPurchaseBillEntry) Index() revel.Result {
 }
 
 type ErpPurchaseBillEntryViewItem struct {
-	models.PurchaseBillEntryInfo `xorm:"extends" json:"pbe"`
+	kcgl_models.PurchaseBillEntryInfo `xorm:"extends" json:"pbe"`
 	kcgl_models.ProductInfo           `xorm:"extends" json:"p"`
 	models.StatusInfo            `xorm:"extends" json:"s"`
 }
@@ -32,7 +32,7 @@ func (c ErpPurchaseBillEntry) ListData() revel.Result {
 	var purchase_bill_id int64
 	c.Params.Bind(&purchase_bill_id, "purchase_bill_id")
 
-	var purchase_bill models.PurchaseBillInfo
+	var purchase_bill kcgl_models.PurchaseBillInfo
 	if purchase_bill_id != 0 {
 		has, err := db_session.Id(purchase_bill_id).Get(&purchase_bill)
 		core.HandleError(err)
@@ -94,8 +94,8 @@ FROM erp_purchase_bill_entry pbe
 }
 
 type PurchaseBillEntryDetailForm struct {
-	PurchaseBill      models.PurchaseBillInfo      `json:"purchase_bill"`
-	PurchaseBillEntry models.PurchaseBillEntryInfo `json:"purchase_bill_entry"`
+	PurchaseBill      kcgl_models.PurchaseBillInfo      `json:"purchase_bill"`
+	PurchaseBillEntry kcgl_models.PurchaseBillEntryInfo `json:"purchase_bill_entry"`
 	ProductName       string                       `json:"product_name"`
 }
 
@@ -134,7 +134,7 @@ func (c ErpPurchaseBillEntry) DetailData() revel.Result {
 		return c.RenderJson(core.JsonResult{Success: false, Message: "请先选择采购单！"})
 	}
 
-	var purchase_bill models.PurchaseBillInfo
+	var purchase_bill kcgl_models.PurchaseBillInfo
 	has, err := db_session.Id(purchase_bill_id).Get(&purchase_bill)
 	core.HandleError(err)
 	if has == false {
@@ -144,7 +144,7 @@ func (c ErpPurchaseBillEntry) DetailData() revel.Result {
 	var purchase_bill_entry_id int64
 	c.Params.Bind(&purchase_bill_entry_id, "id")
 
-	var purchase_bill_entry models.PurchaseBillEntryInfo
+	var purchase_bill_entry kcgl_models.PurchaseBillEntryInfo
 	var product_name string
 	if purchase_bill_entry_id != 0 {
 		has, err := db_session.Id(purchase_bill_entry_id).Get(&purchase_bill_entry)
@@ -186,7 +186,7 @@ func (c ErpPurchaseBillEntry) Save() revel.Result {
 
 	var affected int64
 	if detail_form.IsCreate() {
-		billId_count, err := db_session.Where("bill_id = ? and product_id = ?", purchase_bill_entry.BillId, purchase_bill_entry.ProductId).Count(new(models.PurchaseBillEntryInfo))
+		billId_count, err := db_session.Where("bill_id = ? and product_id = ?", purchase_bill_entry.BillId, purchase_bill_entry.ProductId).Count(new(kcgl_models.PurchaseBillEntryInfo))
 		core.HandleError(err)
 		if billId_count != 0 {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，批次、商品已存在！"})
@@ -197,7 +197,7 @@ func (c ErpPurchaseBillEntry) Save() revel.Result {
 		affected, err = db_session.Insert(&purchase_bill_entry)
 		core.HandleError(err)
 	} else {
-		billId_count, err := db_session.Where("id <> ? and bill_id = ? and product_id = ?", purchase_bill_entry.Id, purchase_bill_entry.BillId, purchase_bill_entry.ProductId).Count(new(models.PurchaseBillEntryInfo))
+		billId_count, err := db_session.Where("id <> ? and bill_id = ? and product_id = ?", purchase_bill_entry.Id, purchase_bill_entry.BillId, purchase_bill_entry.ProductId).Count(new(kcgl_models.PurchaseBillEntryInfo))
 		core.HandleError(err)
 		if billId_count != 0 {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，批次、商品已存在！"})
@@ -220,7 +220,7 @@ func (c ErpPurchaseBillEntry) Delete() revel.Result {
 	purchase_bill_entry_id_list := make([]int64, 0)
 	c.Params.Bind(&purchase_bill_entry_id_list, "id_list")
 
-	affected, err := db_session.In("id", purchase_bill_entry_id_list).Delete(new(models.PurchaseBillEntryInfo))
+	affected, err := db_session.In("id", purchase_bill_entry_id_list).Delete(new(kcgl_models.PurchaseBillEntryInfo))
 	core.HandleError(err)
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})

@@ -1,4 +1,4 @@
-package models
+package spbb_models
 
 import (
 	"matrix/core"

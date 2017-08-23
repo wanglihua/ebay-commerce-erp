@@ -4,7 +4,6 @@ import (
 	"github.com/revel/revel"
 
 	"matrix/core"
-	"matrix/modules/erp/models"
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/auth/pass_res"
 	"encoding/json"
@@ -32,7 +31,7 @@ func (c ErpSpecialProduct) ListData() revel.Result {
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
 	type special_product_view_item_t struct {
-		SpecialProduct models.SpecialProductInfo `xorm:"extends" json:"sp"`
+		SpecialProduct kcgl_models.SpecialProductInfo `xorm:"extends" json:"sp"`
 		Product        kcgl_models.ProductInfo        `xorm:"extends" json:"p"`
 	}
 
@@ -94,7 +93,7 @@ func (c ErpSpecialProduct) DetailData() revel.Result {
 	var detail_form SpecialProductDetailForm
 
 	if id != 0 {
-		var special_product models.SpecialProductInfo
+		var special_product kcgl_models.SpecialProductInfo
 		_, err := db_session.Id(id).Get(&special_product)
 		core.HandleError(err)
 
@@ -137,21 +136,21 @@ func (c ErpSpecialProduct) Save() revel.Result {
 			return c.RenderJson(core.JsonResult{Success: false, Message: fmt.Sprintf("商品SKU %s 不存在！", sku)})
 		}
 
-		count, err := db_session.Where("product_id = ?", product.Id).Count(&models.SpecialProductInfo{})
+		count, err := db_session.Where("product_id = ?", product.Id).Count(&kcgl_models.SpecialProductInfo{})
 		core.HandleError(err)
 
 		if count != 0 {
 			return c.RenderJson(core.JsonResult{Success: false, Message: fmt.Sprintf("商品SKU %s 之前已经被设置为特殊SKU！", sku)})
 		}
 
-		var special_product models.SpecialProductInfo
+		var special_product kcgl_models.SpecialProductInfo
 		special_product.ProductId = product.Id
 		special_product.Description = detail_form.Description
 
 		_, err = db_session.Insert(&special_product)
 		core.HandleError(err)
 	} else {
-		var special_product models.SpecialProductInfo
+		var special_product kcgl_models.SpecialProductInfo
 		_, err := db_session.Where("id = ?", detail_form.SpecialId).Get(&special_product)
 		core.HandleError(err)
 
@@ -200,8 +199,8 @@ func (c ErpSpecialProduct) BatchAdd() revel.Result {
 				return c.RenderJson(core.JsonResult{Success: false, Message: fmt.Sprintf("商品SKU %s 不存在！", sku)})
 			}
 
-			var special_product models.SpecialProductInfo
-			count, err := db_session.Where("product_id = ?", product.Id).Count(&models.SpecialProductInfo{})
+			var special_product kcgl_models.SpecialProductInfo
+			count, err := db_session.Where("product_id = ?", product.Id).Count(&kcgl_models.SpecialProductInfo{})
 			core.HandleError(err)
 
 			if count != 0 {
@@ -225,7 +224,7 @@ func (c ErpSpecialProduct) Delete() revel.Result {
 	special_product_id_list := make([]int64, 0)
 	c.Params.Bind(&special_product_id_list, "id_list")
 
-	affected, err := db_session.In("id", special_product_id_list).Delete(new(models.SpecialProductInfo))
+	affected, err := db_session.In("id", special_product_id_list).Delete(new(kcgl_models.SpecialProductInfo))
 	core.HandleError(err)
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})

@@ -14,6 +14,7 @@ import (
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/bill_service"
 	"matrix/modules/erp/models/sppz_models"
+	"matrix/modules/erp/models/kcgl_models"
 )
 
 type ErpStockBillCheckin struct {
@@ -27,7 +28,7 @@ func (c ErpStockBillCheckin) Index() revel.Result {
 }
 
 type ErpStockBillCheckinViewItem struct {
-	models.StockBillInfo `xorm:"extends" json:"sb"`
+	kcgl_models.StockBillInfo `xorm:"extends" json:"sb"`
 	sppz_models.StockInfo     `xorm:"extends" json:"s"`
 	auth_models.UserInfo `xorm:"extends" json:"u"`
 	models.StatusInfo    `xorm:"extends" json:"st"`
@@ -59,7 +60,7 @@ WHERE sb.type_id = 100;
 		    INNER JOIN erp_status st ON sb.status_id = st.id
     `)
 
-	sb.Where(core.SqlAnd(filter, fmt.Sprintf("sb.type_id = %d", models.STOCK_BILL_TYPE_MANUAL_CHECKIN)))
+	sb.Where(core.SqlAnd(filter, fmt.Sprintf("sb.type_id = %d", kcgl_models.STOCK_BILL_TYPE_MANUAL_CHECKIN)))
 
 	//query extra filter here
 
@@ -89,7 +90,7 @@ WHERE sb.type_id = 100;
 }
 
 type StockBillCheckinDetailForm struct {
-	StockBill models.StockBillInfo `json:"stock_bill"`
+	StockBill kcgl_models.StockBillInfo `json:"stock_bill"`
 	StockList []sppz_models.StockInfo   `json:"stock_list"`
 }
 
@@ -123,7 +124,7 @@ func (c ErpStockBillCheckin) DetailData() revel.Result {
 	var stock_bill_id int64
 	c.Params.Bind(&stock_bill_id, "id")
 
-	var stock_bill models.StockBillInfo
+	var stock_bill kcgl_models.StockBillInfo
 	if stock_bill_id != 0 {
 		has, err := db_session.Id(stock_bill_id).Get(&stock_bill)
 		core.HandleError(err)
@@ -155,7 +156,7 @@ func (c ErpStockBillCheckin) Save() revel.Result {
 	err := json.Unmarshal(c.GetRequestBody(), &detail_form)
 	core.HandleError(err)
 
-	var stock_bill_in_db models.StockBillInfo
+	var stock_bill_in_db kcgl_models.StockBillInfo
 	_, err = db_session.Id(detail_form.StockBill.Id).Get(&stock_bill_in_db)
 	core.HandleError(err)
 
@@ -173,7 +174,7 @@ func (c ErpStockBillCheckin) Save() revel.Result {
 	if detail_form.IsCreate() {
 		loginuser := core.GetLoginUser(c.Session)
 		stock_bill.UserId = loginuser.UserId
-		stock_bill.TypeId = models.STOCK_BILL_TYPE_MANUAL_CHECKIN
+		stock_bill.TypeId = kcgl_models.STOCK_BILL_TYPE_MANUAL_CHECKIN
 		stock_bill.StatusId = models.STOCK_BILL_CHECKIN_STATUS_SAVE
 
 		affected, err = db_session.Insert(&stock_bill)
@@ -202,7 +203,7 @@ func (c ErpStockBillCheckin) Submit() revel.Result {
 	var bill_id int64
 	c.Params.Bind(&bill_id, "bill_id")
 
-	var stock_bill models.StockBillInfo
+	var stock_bill kcgl_models.StockBillInfo
 	has, err := db_session.Id(bill_id).Get(&stock_bill)
 	core.HandleError(err)
 
@@ -215,7 +216,7 @@ func (c ErpStockBillCheckin) Submit() revel.Result {
 	}
 
 	// 检查明细是不是空的
-	entry_count, err := db_session.Where(fmt.Sprintf("bill_id = %d", bill_id)).Count(new(models.StockBillEntryInfo))
+	entry_count, err := db_session.Where(fmt.Sprintf("bill_id = %d", bill_id)).Count(new(kcgl_models.StockBillEntryInfo))
 	core.HandleError(err)
 
 	if entry_count == 0 {
@@ -290,7 +291,7 @@ func (c ErpStockBillCheckin) Delete() revel.Result {
 		})
 	}
 
-	affected, err := db_session.In("id", stock_bill_id_list).Delete(new(models.StockBillInfo))
+	affected, err := db_session.In("id", stock_bill_id_list).Delete(new(kcgl_models.StockBillInfo))
 	core.HandleError(err)
 
 	//同时删除关联明细

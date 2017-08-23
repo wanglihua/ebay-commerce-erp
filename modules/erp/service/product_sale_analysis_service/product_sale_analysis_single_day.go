@@ -7,9 +7,9 @@ import (
 	"runtime/debug"
 	"github.com/revel/revel"
 	"fmt"
-	"matrix/modules/erp/models"
 	"matrix/modules/erp/models/kcgl_models"
 	"matrix/modules/erp/models/ddlc_models"
+	"matrix/modules/erp/models/spbb_models"
 )
 
 func ProductSaleAnalyzeSingleDay() {
@@ -81,9 +81,9 @@ ORDER BY oi.item_product_id ASC;`
 				{
 					// 不分仓统计
 
-					var product_sale_day_analysis models.ProductSaleDayAnalysisInfo
+					var product_sale_day_analysis spbb_models.ProductSaleDayAnalysisInfo
 					has, err := db_session.Where(fmt.Sprintf("type = %d AND product_id = %d AND day = '%s'",
-						models.PRODUCT_SALE_ANALYSIS_TYPE_SKU,
+						spbb_models.PRODUCT_SALE_ANALYSIS_TYPE_SKU,
 						product_sale.ProductId,
 						day_time_begin.Format("2006-01-02"))).
 						Get(&product_sale_day_analysis)
@@ -99,7 +99,7 @@ ORDER BY oi.item_product_id ASC;`
 						core.HandleError(err)
 
 						product_sale_day_analysis.StockId = 0
-						product_sale_day_analysis.Type = models.PRODUCT_SALE_ANALYSIS_TYPE_SKU
+						product_sale_day_analysis.Type = spbb_models.PRODUCT_SALE_ANALYSIS_TYPE_SKU
 						product_sale_day_analysis.ProductId = product_sale.ProductId
 						product_sale_day_analysis.Sku = product.Sku
 						product_sale_day_analysis.Qty = product_sale.Qty
@@ -144,9 +144,9 @@ ORDER BY oi.item_product_id ASC;`
 				var stock_id = order_logistics.StockId
 
 				if has == true && stock_id != 0 { // 如果有匹配的物流信息，并且仓库信息不为空
-					var product_sale_day_analysis models.ProductSaleDayAnalysisInfo
+					var product_sale_day_analysis spbb_models.ProductSaleDayAnalysisInfo
 					has, err := db_session.Where(fmt.Sprintf("type = %d AND stock_id = %d AND product_id = %d AND day = '%s'",
-						models.PRODUCT_SALE_ANALYSIS_TYPE_ACTUAL,
+						spbb_models.PRODUCT_SALE_ANALYSIS_TYPE_ACTUAL,
 						stock_id,
 						product_sale.ProductId,
 						day_time_begin.Format("2006-01-02"))).
@@ -163,7 +163,7 @@ ORDER BY oi.item_product_id ASC;`
 						core.HandleError(err)
 
 						product_sale_day_analysis.StockId = stock_id
-						product_sale_day_analysis.Type = models.PRODUCT_SALE_ANALYSIS_TYPE_ACTUAL
+						product_sale_day_analysis.Type = spbb_models.PRODUCT_SALE_ANALYSIS_TYPE_ACTUAL
 						product_sale_day_analysis.ProductId = product_sale.ProductId
 						product_sale_day_analysis.Sku = product.Sku
 						product_sale_day_analysis.Qty = product_sale.Qty
@@ -208,9 +208,9 @@ ORDER BY oi.item_product_id ASC;`
 				var stock_id = order_logistics_logic.StockId
 
 				if has == true && stock_id != 0 { // 如果有匹配的物流信息，并且仓库信息不为空
-					var product_sale_day_analysis models.ProductSaleDayAnalysisInfo
+					var product_sale_day_analysis spbb_models.ProductSaleDayAnalysisInfo
 					has, err := db_session.Where(fmt.Sprintf("type = %d AND stock_id = %d AND product_id = %d AND day = '%s'",
-						models.PRODUCT_SALE_ANALYSIS_TYPE_LOGIC,
+						spbb_models.PRODUCT_SALE_ANALYSIS_TYPE_LOGIC,
 						stock_id,
 						product_sale.ProductId,
 						day_time_begin.Format("2006-01-02"))).
@@ -227,7 +227,7 @@ ORDER BY oi.item_product_id ASC;`
 						core.HandleError(err)
 
 						product_sale_day_analysis.StockId = stock_id
-						product_sale_day_analysis.Type = models.PRODUCT_SALE_ANALYSIS_TYPE_LOGIC
+						product_sale_day_analysis.Type = spbb_models.PRODUCT_SALE_ANALYSIS_TYPE_LOGIC
 						product_sale_day_analysis.ProductId = product_sale.ProductId
 						product_sale_day_analysis.Sku = product.Sku
 						product_sale_day_analysis.Qty = product_sale.Qty

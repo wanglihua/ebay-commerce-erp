@@ -18,6 +18,7 @@ import (
 	"matrix/modules/erp/models/sppz_models"
 	"matrix/modules/erp/models/ddlc_models"
 	"matrix/modules/erp/models/ddpz_models"
+	"matrix/modules/erp/models/kcgl_models"
 )
 
 // 1 地址有特殊字段的
@@ -537,7 +538,7 @@ func (p_ol *OrderLogisticsService) hold_check_paypal_account_not_match(p_order *
 
 // 19.特殊商品SKU Hold
 func (p_ol *OrderLogisticsService) hold_check_special_sku(p_order *ddlc_models.OrderInfo, p_order_logistics_data *order_logistics_data_t, db_session *xorm.Session) (is_hold_return bool) {
-	var is_special_product_id = func(product_id int64, special_product_list []models.SpecialProductInfo) bool {
+	var is_special_product_id = func(product_id int64, special_product_list []kcgl_models.SpecialProductInfo) bool {
 		for _, special_product := range special_product_list {
 			if special_product.ProductId == product_id {
 				return true

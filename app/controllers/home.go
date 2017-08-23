@@ -14,6 +14,7 @@ import (
 	"matrix/modules/erp/models/xtpz_models"
 	"matrix/modules/erp/models/ddpz_models"
 	"matrix/modules/erp/models/ddlc_models"
+	"matrix/modules/erp/models/spbb_models"
 )
 
 type Home struct {
@@ -84,6 +85,7 @@ func (c Home) SyncDbPost() revel.Result {
 	model_list = append(model_list, &sppz_models.StorageLocInfo{})
 	model_list = append(model_list, &sppz_models.SupplierInfo{})
 
+
 	model_list = append(model_list, &hgbg_models.ContainerTransferInfo{})
 	model_list = append(model_list, &hgbg_models.ContainerTransferDestPortInfo{})
 	model_list = append(model_list, &hgbg_models.ContainerTransferEntryInfo{})
@@ -105,6 +107,11 @@ func (c Home) SyncDbPost() revel.Result {
 	model_list = append(model_list, &kcgl_models.ProductImportInfo{})
 	model_list = append(model_list, &kcgl_models.ProductInfo{})
 	model_list = append(model_list, &kcgl_models.ProductLogInfo{})
+	model_list = append(model_list, &kcgl_models.PurchaseBillEntryInfo{})
+	model_list = append(model_list, &kcgl_models.PurchaseBillInfo{})
+	model_list = append(model_list, &kcgl_models.StockBillEntryInfo{})
+	model_list = append(model_list, &kcgl_models.StockBillInfo{})
+	model_list = append(model_list, &kcgl_models.StockBillTypeInfo{})
 
 	model_list = append(model_list, &spzl_models.ProductFeedbackCateInfo{})
 	model_list = append(model_list, &spzl_models.ProductFeedbackSkuInfo{})
@@ -140,25 +147,21 @@ func (c Home) SyncDbPost() revel.Result {
 	model_list = append(model_list, &erp_models.PackageMaterialInfo{})
 
 	model_list = append(model_list, &erp_models.PaypalReconInfo{})
-	model_list = append(model_list, &erp_models.PickupOrderInfo{})
-	model_list = append(model_list, &erp_models.PickupPayMethodInfo{})
+	model_list = append(model_list, &ddlc_models.PickupOrderInfo{})
+	model_list = append(model_list, &ddpz_models.PickupPayMethodInfo{})
 	model_list = append(model_list, &erp_models.PlatformLogisticsModeInfo{})
-	model_list = append(model_list, &erp_models.ProductCertInfo{})
-	model_list = append(model_list, &erp_models.ProductSaleDayAnalysisInfo{})
-	model_list = append(model_list, &erp_models.ProductSaleAnalysisInfo{})
-	model_list = append(model_list, &erp_models.ProductSaleAnalysisSettingInfo{})
+	model_list = append(model_list, &sppz_models.ProductCertInfo{})
+	model_list = append(model_list, &spbb_models.ProductSaleDayAnalysisInfo{})
+	model_list = append(model_list, &spbb_models.ProductSaleAnalysisInfo{})
+	model_list = append(model_list, &spbb_models.ProductSaleAnalysisSettingInfo{})
 
 	model_list = append(model_list, &erp_models.ProductStoreItemInfo{})
-	model_list = append(model_list, &erp_models.PurchaseBillEntryInfo{})
-	model_list = append(model_list, &erp_models.PurchaseBillInfo{})
-	model_list = append(model_list, &erp_models.SalesManagerInfo{})
-	model_list = append(model_list, &erp_models.SeaContainerCostInfo{})
 
-	model_list = append(model_list, &erp_models.SpecialProductInfo{})
+	model_list = append(model_list, &erp_models.SalesManagerInfo{})
+	model_list = append(model_list, &sppz_models.SeaContainerCostInfo{})
+
+	model_list = append(model_list, &kcgl_models.SpecialProductInfo{})
 	model_list = append(model_list, &erp_models.StatusInfo{})
-	model_list = append(model_list, &erp_models.StockBillEntryInfo{})
-	model_list = append(model_list, &erp_models.StockBillInfo{})
-	model_list = append(model_list, &erp_models.StockBillTypeInfo{})
 	//model_list = append(model_list, &erp_models.TestInfo{}) // 为什么这一句打开就不行
 
 	model_list = append(model_list, &track_modes.IssueAttachInfo{})

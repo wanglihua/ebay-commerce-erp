@@ -23,7 +23,7 @@ func (c ErpStockBillCheckoutEntry) Index(bill_id int64) revel.Result {
 
 	db_session := c.DbSession
 
-	var stock_bill models.StockBillInfo
+	var stock_bill kcgl_models.StockBillInfo
 	has, err := db_session.Id(bill_id).Get(&stock_bill)
 	core.HandleError(err)
 
@@ -47,8 +47,8 @@ func (c ErpStockBillCheckoutEntry) Index(bill_id int64) revel.Result {
 }
 
 type ErpStockBillCheckoutEntryViewItem struct {
-	models.StockBillEntryInfo `xorm:"extends" json:"sbe"`
-	models.StockBillInfo      `xorm:"extends" json:"sb"`
+	kcgl_models.StockBillEntryInfo `xorm:"extends" json:"sbe"`
+	kcgl_models.StockBillInfo      `xorm:"extends" json:"sb"`
 	sppz_models.StorageLocInfo     `xorm:"extends" json:"sl"`
 	kcgl_models.ProductInfo        `xorm:"extends" json:"p"`
 }
@@ -167,7 +167,7 @@ func (c ErpStockBillCheckoutEntry) Save() revel.Result {
 	err := json.Unmarshal(c.GetRequestBody(), &detail_form)
 	core.HandleError(err)
 
-	var stock_bill models.StockBillInfo
+	var stock_bill kcgl_models.StockBillInfo
 	has, err := db_session.Id(detail_form.BillId).Get(&stock_bill)
 	core.HandleError(err)
 
@@ -228,7 +228,7 @@ WHERE v.storage_loc_id = ? AND v.product_id = ?
 		product_storage_loc_qty = qty.Qty.Int64
 	}
 
-	var stock_bill_entry models.StockBillEntryInfo
+	var stock_bill_entry kcgl_models.StockBillEntryInfo
 	stock_bill_entry.BillId = detail_form.BillId
 	stock_bill_entry.StorageLocId = storage_loc_id.StorageLocId.Int64
 	stock_bill_entry.ProductId = product_id.ProductId.Int64
@@ -305,7 +305,7 @@ WHERE sbe.id = %d
 		return c.RenderJson(core.JsonResult{Success: false, Message: "出库单已提交，不能更改！"})
 	}
 
-	_, err = db_session.Id(entry_id).Delete(new(models.StockBillEntryInfo))
+	_, err = db_session.Id(entry_id).Delete(new(kcgl_models.StockBillEntryInfo))
 	core.HandleError(err)
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: "出库单明细移除成功!"})

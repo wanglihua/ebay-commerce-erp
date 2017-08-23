@@ -638,7 +638,7 @@ func (c ErpOrder) Detail(order_id int64) revel.Result {
 	c.RenderArgs["is_express"] = is_express
 
 	var is_pickup_paid int64 = 0
-	var pickup_order models.PickupOrderInfo
+	var pickup_order ddlc_models.PickupOrderInfo
 	_, err = db_session.Where("order_id = ?", order_id).Get(&pickup_order)
 	core.HandleError(err)
 
@@ -788,13 +788,13 @@ WHERE oi.order_id = %d;`
 	err = db_session.Where(fmt.Sprintf("stock_type_id = %d", sppz_models.STOCK_TYPE_AU)).Find(&au_stock_list)
 	core.HandleError(err)
 
-	var pickup_pay_method_list = make([]models.PickupPayMethodInfo, 0)
+	var pickup_pay_method_list = make([]ddpz_models.PickupPayMethodInfo, 0)
 	core.HandleError(db_session.Find(&pickup_pay_method_list))
 
-	var pickup_actual_pay_method_list = make([]models.PickupPayMethodInfo, 0)
-	core.HandleError(db_session.In("id", []int64{models.PICKUP_PAY_METHOD_CARD, models.PICKUP_PAY_METHOD_CASH}).Find(&pickup_actual_pay_method_list))
+	var pickup_actual_pay_method_list = make([]ddpz_models.PickupPayMethodInfo, 0)
+	core.HandleError(db_session.In("id", []int64{ddpz_models.PICKUP_PAY_METHOD_CARD, ddpz_models.PICKUP_PAY_METHOD_CASH}).Find(&pickup_actual_pay_method_list))
 
-	var pickup_order models.PickupOrderInfo
+	var pickup_order ddlc_models.PickupOrderInfo
 	if order.HoldTypeId.Int64 == ddpz_models.ORDER_HOLD_TYPE_PICK_UP {
 		_, err := db_session.Where("order_id = ?", order.Id).Get(&pickup_order)
 		core.HandleError(err)
@@ -893,7 +893,7 @@ func (c ErpOrder) Save() revel.Result {
 func (c ErpOrder) SavePickupActual() revel.Result {
 	var db_session = c.DbSession
 
-	var pickup_order models.PickupOrderInfo
+	var pickup_order ddlc_models.PickupOrderInfo
 	err := json.Unmarshal(c.GetRequestBody(), &pickup_order)
 	core.HandleError(err)
 
@@ -904,7 +904,7 @@ func (c ErpOrder) SavePickupActual() revel.Result {
 		})
 	}
 
-	var pickup_order_in_db models.PickupOrderInfo
+	var pickup_order_in_db ddlc_models.PickupOrderInfo
 	has, err := db_session.Where("order_id = ?", pickup_order.OrderId).Get(&pickup_order_in_db)
 	core.HandleError(err)
 
@@ -1222,7 +1222,7 @@ func (c ErpOrder) FaHuo() revel.Result {
 
 	for _, order := range order_list {
 		if order.HoldTypeId.Int64 == ddpz_models.ORDER_HOLD_TYPE_PICK_UP {
-			var pickup_order_info models.PickupOrderInfo
+			var pickup_order_info ddlc_models.PickupOrderInfo
 			_, err := db_session.Where("order_id = ?", order.Id).Get(&pickup_order_info)
 			core.HandleError(err)
 
@@ -1588,7 +1588,7 @@ func (c ErpOrder) Pickup() revel.Result {
 		}
 
 		// pickup order
-		var pickup_order models.PickupOrderInfo
+		var pickup_order ddlc_models.PickupOrderInfo
 		has, err = db_session.Where(fmt.Sprintf("order_id = %d", order.Id)).Get(&pickup_order)
 		core.HandleError(err)
 
