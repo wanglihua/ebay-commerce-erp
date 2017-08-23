@@ -4,12 +4,12 @@ import (
 	"github.com/revel/revel"
 
 	"matrix/core"
-	"matrix/modules/erp/models"
 	"bytes"
 	"time"
 	"matrix/modules/erp/app/controllers/hgbg/container_transfer_excel_out"
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/auth/pass_res"
+	"matrix/modules/erp/models/hgbg_models"
 )
 
 type ErpContainerTransferExcelOut struct {
@@ -27,7 +27,7 @@ func (c ErpContainerTransferExcelOut) Export() revel.Result {
 	var company_code string // ozo, third, wzt
 	c.Params.Bind(&company_code, "company_code")
 
-	var containerTransfer models.ContainerTransferInfo
+	var containerTransfer hgbg_models.ContainerTransferInfo
 	_, err := db_session.Id(transfer_id).Get(&containerTransfer)
 	core.HandleError(err)
 

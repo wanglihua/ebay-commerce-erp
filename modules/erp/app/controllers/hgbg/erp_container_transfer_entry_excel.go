@@ -5,6 +5,7 @@ import (
 
 	"matrix/core"
 	"matrix/modules/erp/models"
+	"matrix/modules/erp/models/hgbg_models"
 	"fmt"
 	"github.com/tealeg/xlsx"
 	"strings"
@@ -31,7 +32,7 @@ func (c ErpContainerTransferEntryExcel) Import() revel.Result {
 	var transfer_id int64
 	c.Params.Bind(&transfer_id, "transfer_id")
 
-	var containerTransfer models.ContainerTransferInfo
+	var containerTransfer hgbg_models.ContainerTransferInfo
 	_, err := db_session.Id(transfer_id).Get(&containerTransfer)
 	core.HandleError(err)
 
@@ -55,8 +56,8 @@ func (c ErpContainerTransferEntryExcel) Import() revel.Result {
 		ErrorMessage string  `json:"error_message"`
 
 		product    models.ProductInfo            `json:"-"`
-		hs_code_au models.HsCodeAuDutyInfo       `json:"-"`
-		hs_code_cn models.HsCodeCnReportElemInfo `json:"-"`
+		hs_code_au hgbg_models.HsCodeAuDutyInfo       `json:"-"`
+		hs_code_cn hgbg_models.HsCodeCnReportElemInfo `json:"-"`
 		qty        int64                         `json:"-"`
 		box_qty    int64                         `json:"-"`
 		price      float64                       `json:"-"`
@@ -156,7 +157,7 @@ func (c ErpContainerTransferEntryExcel) Import() revel.Result {
 		if product.AuDeclName == "" {
 			buffer.WriteString("商品澳洲海关品名未设置")
 		} else {
-			var hsCodeAu models.HsCodeAuDutyInfo
+			var hsCodeAu hgbg_models.HsCodeAuDutyInfo
 			has, err := db_session.Where("en_name = ?", product.AuDeclName).Get(&hsCodeAu)
 			core.HandleError(err)
 
@@ -170,7 +171,7 @@ func (c ErpContainerTransferEntryExcel) Import() revel.Result {
 		if product.CnDeclName == "" {
 			buffer.WriteString("商品中国海关品名未设置！")
 		} else {
-			var hsCodeCn models.HsCodeCnReportElemInfo
+			var hsCodeCn hgbg_models.HsCodeCnReportElemInfo
 			has, err := db_session.Where("cn_name = ?", product.CnDeclName).Get(&hsCodeCn)
 			core.HandleError(err)
 
@@ -228,7 +229,7 @@ func (c ErpContainerTransferEntryExcel) Import() revel.Result {
 	}
 
 	for _, transfer_entry_import := range transfer_entry_import_list {
-		var transfer_entry models.ContainerTransferEntryInfo
+		var transfer_entry hgbg_models.ContainerTransferEntryInfo
 		transfer_entry.TransferId = transfer_id
 		transfer_entry.BatchCode = containerTransfer.BatchCode
 		transfer_entry.ProductId = transfer_entry_import.product.Id
@@ -263,7 +264,7 @@ func (c ErpContainerTransferEntryExcel) Import() revel.Result {
 }
 
 type cte_item_t struct {
-	ContainerTransferEntry models.ContainerTransferEntryInfo `xorm:"extends" json:"cte"`
+	ContainerTransferEntry hgbg_models.ContainerTransferEntryInfo `xorm:"extends" json:"cte"`
 	Product                models.ProductInfo                `xorm:"extends" json:"p"`
 }
 
@@ -275,7 +276,7 @@ func (c ErpContainerTransferEntryExcel) Export() revel.Result {
 	var transfer_id int64
 	c.Params.Bind(&transfer_id, "transfer_id")
 
-	var containerTransfer models.ContainerTransferInfo
+	var containerTransfer hgbg_models.ContainerTransferInfo
 	_, err := db_session.Id(transfer_id).Get(&containerTransfer)
 	core.HandleError(err)
 

@@ -7,6 +7,8 @@ import (
 	auth_models "matrix/modules/auth/models"
 	erp_models "matrix/modules/erp/models"
 	track_modes "matrix/modules/track/models"
+	"matrix/modules/erp/models/sppz_models"
+	"matrix/modules/erp/models/hgbg_models"
 )
 
 type Home struct {
@@ -53,12 +55,16 @@ func (c Home) SyncDbPost() revel.Result {
 	model_list = append(model_list, &auth_models.SettingInfo{})
 	model_list = append(model_list, &auth_models.UserInfo{})
 
-	model_list = append(model_list, &erp_models.BrandInfo{})
-	model_list = append(model_list, &erp_models.ContainerTransferInfo{})
-	model_list = append(model_list, &erp_models.ContainerTransferDestPortInfo{})
-	model_list = append(model_list, &erp_models.ContainerTransferEntryInfo{})
-	model_list = append(model_list, &erp_models.ContainerTransferLogInfo{})
-	model_list = append(model_list, &erp_models.ContainerTransferStartPortInfo{})
+	model_list = append(model_list, &sppz_models.BrandInfo{})
+
+	model_list = append(model_list, &hgbg_models.ContainerTransferInfo{})
+	model_list = append(model_list, &hgbg_models.ContainerTransferDestPortInfo{})
+	model_list = append(model_list, &hgbg_models.ContainerTransferEntryInfo{})
+	model_list = append(model_list, &hgbg_models.ContainerTransferLogInfo{})
+	model_list = append(model_list, &hgbg_models.ContainerTransferStartPortInfo{})
+	model_list = append(model_list, &hgbg_models.HsCodeAuDutyInfo{})
+	model_list = append(model_list, &hgbg_models.HsCodeCnReportElemInfo{})
+
 	model_list = append(model_list, &erp_models.CurrencyInfo{})
 	model_list = append(model_list, &erp_models.EBayAPIConfigInfo{})
 	model_list = append(model_list, &erp_models.ECommercePlatformInfo{})
@@ -68,8 +74,7 @@ func (c Home) SyncDbPost() revel.Result {
 	model_list = append(model_list, &erp_models.EubInsuranceTypeInfo{})
 	model_list = append(model_list, &erp_models.ExchangeRateInfo{})
 	model_list = append(model_list, &erp_models.ExchangeRateLogInfo{})
-	model_list = append(model_list, &erp_models.HsCodeAuDutyInfo{})
-	model_list = append(model_list, &erp_models.HsCodeCnReportElemInfo{})
+
 	model_list = append(model_list, &erp_models.InventoryInfo{})
 	model_list = append(model_list, &erp_models.InventoryCheckInfo{})
 	model_list = append(model_list, &erp_models.InventoryCheckEntryInfo{})

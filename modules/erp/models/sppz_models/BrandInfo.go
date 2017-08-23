@@ -1,7 +1,8 @@
-package models
+package sppz_models
 
 import (
 	"matrix/core"
+	"matrix/modules/erp/models"
 )
 
 type BrandInfo struct {
@@ -13,7 +14,7 @@ type BrandInfo struct {
 }
 
 func (e BrandInfo) TableName() string {
-	return TablePrefix + "brand"
+	return models.TablePrefix + "brand"
 }
 
 func (e BrandInfo) ModelDesc() string {

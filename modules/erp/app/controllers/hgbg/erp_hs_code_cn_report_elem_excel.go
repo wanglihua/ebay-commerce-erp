@@ -11,8 +11,8 @@ import (
 	"matrix/core"
 	"matrix/modules/auth/pass_res"
 	"matrix/modules/auth/service/pass_service"
-	"matrix/modules/erp/models"
 	"strings"
+	"matrix/modules/erp/models/hgbg_models"
 )
 
 type ErpHsCodeCnReportElemExcel struct {
@@ -251,7 +251,7 @@ func (c ErpHsCodeCnReportElemExcel) Import() revel.Result {
 	//todo: 验证导入的数据
 
 	for _, hs_code_import := range hs_code_import_list {
-		var hs_code models.HsCodeCnReportElemInfo
+		var hs_code hgbg_models.HsCodeCnReportElemInfo
 		has, err := db_session.Where(fmt.Sprintf("cn_name = '%s'", hs_code_import.cn_name)).Get(&hs_code)
 		core.HandleError(err)
 
@@ -305,7 +305,7 @@ func (c ErpHsCodeCnReportElemExcel) Export() revel.Result {
 		filter = core.SqlAnd(filter, fmt.Sprintf("id IN (%s)", strings.Join(id_str_list, ",")))
 	}
 
-	product_list := make([]models.HsCodeCnReportElemInfo, 0)
+	product_list := make([]hgbg_models.HsCodeCnReportElemInfo, 0)
 	err := db_session.Where(filter).Find(&product_list)
 	core.HandleError(err)
 
@@ -323,7 +323,7 @@ func (c ErpHsCodeCnReportElemExcel) Export() revel.Result {
 	return c.RenderBinary(reader, file_name, revel.Attachment, time.Now())
 }
 
-func (c ErpHsCodeCnReportElemExcel) export_hs_code_list_to_excel(db_session *xorm.Session, hs_code_list []models.HsCodeCnReportElemInfo) *xlsx.File {
+func (c ErpHsCodeCnReportElemExcel) export_hs_code_list_to_excel(db_session *xorm.Session, hs_code_list []hgbg_models.HsCodeCnReportElemInfo) *xlsx.File {
 
 	//统一设置标题单元格格式的函数
 	set_head_cell_style := func(cell *xlsx.Cell) {

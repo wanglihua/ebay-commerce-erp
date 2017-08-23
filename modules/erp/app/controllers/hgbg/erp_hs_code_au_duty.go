@@ -6,7 +6,7 @@ import (
 	"github.com/revel/revel"
 
 	"matrix/core"
-	"matrix/modules/erp/models"
+	"matrix/modules/erp/models/hgbg_models"
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/auth/pass_res"
 	"fmt"
@@ -39,12 +39,12 @@ func (c ErpHsCodeAuDuty) ListData() revel.Result {
 		data_query = *data_query.Asc("id")
 	}
 
-	hs_code_au_duty_list := make([]models.HsCodeAuDutyInfo, 0, limit)
+	hs_code_au_duty_list := make([]hgbg_models.HsCodeAuDutyInfo, 0, limit)
 	err := data_query.Limit(limit, offset).Find(&hs_code_au_duty_list)
 	core.HandleError(err)
 
 	count_query := *query
-	count, err := count_query.Count(new(models.HsCodeAuDutyInfo))
+	count, err := count_query.Count(new(hgbg_models.HsCodeAuDutyInfo))
 	core.HandleError(err)
 
 	return c.RenderJson(core.GridResult{
@@ -54,7 +54,7 @@ func (c ErpHsCodeAuDuty) ListData() revel.Result {
 }
 
 type HsCodeAuDutyDetailForm struct {
-	HsCodeAuDuty models.HsCodeAuDutyInfo `json:"hs_code_au"`
+	HsCodeAuDuty hgbg_models.HsCodeAuDutyInfo `json:"hs_code_au"`
 }
 
 func (f *HsCodeAuDutyDetailForm) IsCreate() bool {
@@ -87,7 +87,7 @@ func (c ErpHsCodeAuDuty) DetailData() revel.Result {
 	var hs_code_au_duty_id int64
 	c.Params.Bind(&hs_code_au_duty_id, "id")
 
-	var hs_code_au_duty models.HsCodeAuDutyInfo
+	var hs_code_au_duty hgbg_models.HsCodeAuDutyInfo
 	if hs_code_au_duty_id != 0 {
 		has, err := db_session.Id(hs_code_au_duty_id).Get(&hs_code_au_duty)
 		core.HandleError(err)
@@ -119,7 +119,7 @@ func (c ErpHsCodeAuDuty) Save() revel.Result {
 
 	var affected int64
 	if detail_form.IsCreate() {
-		var hs_code models.HsCodeAuDutyInfo
+		var hs_code hgbg_models.HsCodeAuDutyInfo
 		has, err := db_session.Where(fmt.Sprintf("en_name = '%s'", hs_code_au_duty.EnName)).Get(&hs_code)
 		core.HandleError(err)
 
@@ -130,7 +130,7 @@ func (c ErpHsCodeAuDuty) Save() revel.Result {
 		affected, err = db_session.Insert(&hs_code_au_duty)
 		core.HandleError(err)
 	} else {
-		var hs_code models.HsCodeAuDutyInfo
+		var hs_code hgbg_models.HsCodeAuDutyInfo
 		has, err := db_session.Where(fmt.Sprintf("id <> %d AND en_name = '%s'", hs_code_au_duty.Id, hs_code_au_duty.EnName)).Get(&hs_code)
 		core.HandleError(err)
 
@@ -157,7 +157,7 @@ func (c ErpHsCodeAuDuty) Delete() revel.Result {
 	hs_code_au_duty_id_list := make([]int64, 0)
 	c.Params.Bind(&hs_code_au_duty_id_list, "id_list")
 
-	affected, err := db_session.In("id", hs_code_au_duty_id_list).Delete(new(models.HsCodeAuDutyInfo))
+	affected, err := db_session.In("id", hs_code_au_duty_id_list).Delete(new(hgbg_models.HsCodeAuDutyInfo))
 	core.HandleError(err)
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})

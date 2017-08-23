@@ -6,9 +6,9 @@ import (
 
 	"github.com/revel/revel"
 	"matrix/core"
-	"matrix/modules/erp/models"
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/auth/pass_res"
+	"matrix/modules/erp/models/sppz_models"
 )
 
 type ErpBrand struct {
@@ -38,12 +38,12 @@ func (c ErpBrand) ListData() revel.Result {
 		data_query = *data_query.Asc("id")
 	}
 
-	brand_list := make([]models.BrandInfo, 0, limit)
+	brand_list := make([]sppz_models.BrandInfo, 0, limit)
 	err := data_query.Limit(limit, offset).Find(&brand_list)
 	core.HandleError(err)
 
 	count_query := *query
-	count, err := count_query.Count(new(models.BrandInfo))
+	count, err := count_query.Count(new(sppz_models.BrandInfo))
 	core.HandleError(err)
 
 	return c.RenderJson(core.GridResult{
@@ -53,7 +53,7 @@ func (c ErpBrand) ListData() revel.Result {
 }
 
 type BrandDetailForm struct {
-	Brand models.BrandInfo `json:"brand"`
+	Brand sppz_models.BrandInfo `json:"brand"`
 }
 
 func (f *BrandDetailForm) IsCreate() bool {
@@ -80,7 +80,7 @@ func (c ErpBrand) DetailData() revel.Result {
 	var brand_id int64
 	c.Params.Bind(&brand_id, "id")
 
-	var brand models.BrandInfo
+	var brand sppz_models.BrandInfo
 	if brand_id != 0 {
 		has, err := db_session.Id(brand_id).Get(&brand)
 		core.HandleError(err)
@@ -128,13 +128,13 @@ func (c ErpBrand) Save() revel.Result {
 
 func (c ErpBrand) Delete() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.SPPZ_BRAND, c.Session)
-	
+
 	db_session := c.DbSession
 
 	brand_id_list := make([]int64, 0)
 	c.Params.Bind(&brand_id_list, "id_list")
 
-	affected, err := db_session.In("id", brand_id_list).Delete(new(models.BrandInfo))
+	affected, err := db_session.In("id", brand_id_list).Delete(new(sppz_models.BrandInfo))
 	core.HandleError(err)
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})

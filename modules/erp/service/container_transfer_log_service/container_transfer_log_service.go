@@ -3,12 +3,12 @@ package container_transfer_log_service
 import (
 	"github.com/go-xorm/xorm"
 	"github.com/revel/revel"
-	"matrix/modules/erp/models"
+	"matrix/modules/erp/models/hgbg_models"
 	"matrix/core"
 )
 
-func Insert_container_transfer_log(container_transfer models.ContainerTransferInfo, operation string, db_session *xorm.Session, web_session revel.Session) {
-	var container_transfer_log models.ContainerTransferLogInfo
+func Insert_container_transfer_log(container_transfer hgbg_models.ContainerTransferInfo, operation string, db_session *xorm.Session, web_session revel.Session) {
+	var container_transfer_log hgbg_models.ContainerTransferLogInfo
 
 	container_transfer_log.TransferId = container_transfer.Id
 	container_transfer_log.BatchCode = container_transfer.BatchCode

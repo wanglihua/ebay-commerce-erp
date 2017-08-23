@@ -2,7 +2,7 @@ package container_transfer_excel_out
 
 import (
 	"github.com/go-xorm/xorm"
-	"matrix/modules/erp/models"
+	"matrix/modules/erp/models/hgbg_models"
 	"matrix/modules/erp/app/controllers/hgbg/container_transfer_excel_out/ozo"
 	"matrix/modules/erp/app/controllers/hgbg/container_transfer_excel_out/third_party"
 	"matrix/modules/erp/app/controllers/hgbg/container_transfer_excel_out/wzt"
@@ -10,8 +10,8 @@ import (
 )
 
 type ContainerTransferExcelOutExporter interface {
-	GetExcelFileName(p_transfer *models.ContainerTransferInfo) string
-	GetExcelFile(p_transfer *models.ContainerTransferInfo, db_session *xorm.Session) *excelize.File
+	GetExcelFileName(p_transfer *hgbg_models.ContainerTransferInfo) string
+	GetExcelFile(p_transfer *hgbg_models.ContainerTransferInfo, db_session *xorm.Session) *excelize.File
 }
 
 func GetExporter(company_code string) ContainerTransferExcelOutExporter {

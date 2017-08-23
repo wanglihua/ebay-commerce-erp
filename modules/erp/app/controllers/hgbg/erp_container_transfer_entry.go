@@ -7,6 +7,7 @@ import (
 
 	"matrix/core"
 	"matrix/modules/erp/models"
+	"matrix/modules/erp/models/hgbg_models"
 	"fmt"
 	"matrix/modules/erp/service/container_transfer_service"
 	"matrix/modules/erp/service/exchange_rate_service"
@@ -36,8 +37,8 @@ func (c ErpContainerTransferEntry) ListData() revel.Result {
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
 	type cte_item_t struct {
-		ContainerTransferEntry models.ContainerTransferEntryInfo `xorm:"extends" json:"cte"`
-		ContainerTransfer      models.ContainerTransferInfo      `xorm:"extends" json:"ct"`
+		ContainerTransferEntry hgbg_models.ContainerTransferEntryInfo `xorm:"extends" json:"cte"`
+		ContainerTransfer      hgbg_models.ContainerTransferInfo      `xorm:"extends" json:"ct"`
 		Product                models.ProductInfo                `xorm:"extends" json:"p"`
 	}
 
@@ -85,7 +86,7 @@ FROM erp_container_transfer_entry cte
 }
 
 type ContainerTransferEntryDetailForm struct {
-	ContainerTransferEntry models.ContainerTransferEntryInfo `json:"transfer_entry"`
+	ContainerTransferEntry hgbg_models.ContainerTransferEntryInfo `json:"transfer_entry"`
 }
 
 func (f *ContainerTransferEntryDetailForm) IsCreate() bool {
@@ -116,7 +117,7 @@ func (c ErpContainerTransferEntry) DetailData() revel.Result {
 	var container_transfer_entry_id int64
 	c.Params.Bind(&container_transfer_entry_id, "id")
 
-	var container_transfer_entry models.ContainerTransferEntryInfo
+	var container_transfer_entry hgbg_models.ContainerTransferEntryInfo
 	if container_transfer_entry_id != 0 {
 		has, err := db_session.Id(container_transfer_entry_id).Get(&container_transfer_entry)
 		core.HandleError(err)
@@ -140,7 +141,7 @@ func (c ErpContainerTransferEntry) Save() revel.Result {
 	err := json.Unmarshal(c.GetRequestBody(), &detail_form)
 	core.HandleError(err)
 
-	var ct models.ContainerTransferInfo
+	var ct hgbg_models.ContainerTransferInfo
 	_, err = db_session.Id(detail_form.ContainerTransferEntry.TransferId).Get(&ct)
 	core.HandleError(err)
 
@@ -185,7 +186,7 @@ func (c ErpContainerTransferEntry) Save() revel.Result {
 	if product.AuDeclName == "" {
 		return c.RenderJson(core.JsonResult{Success: false, Message: "商品澳洲海关申报名未设置！"})
 	} else {
-		var hsCodeAu models.HsCodeAuDutyInfo
+		var hsCodeAu hgbg_models.HsCodeAuDutyInfo
 		has, err := db_session.Where("en_name = ?", product.AuDeclName).Get(&hsCodeAu)
 		core.HandleError(err)
 
@@ -203,7 +204,7 @@ func (c ErpContainerTransferEntry) Save() revel.Result {
 	if product.CnDeclName == "" {
 		return c.RenderJson(core.JsonResult{Success: false, Message: "商品中国海关申报名未设置！"})
 	} else {
-		var hsCodeCn models.HsCodeCnReportElemInfo
+		var hsCodeCn hgbg_models.HsCodeCnReportElemInfo
 		has, err := db_session.Where("cn_name = ?", product.CnDeclName).Get(&hsCodeCn)
 		core.HandleError(err)
 
@@ -260,11 +261,11 @@ func (c ErpContainerTransferEntry) Delete() revel.Result {
 	}
 
 	var entry_id = container_transfer_entry_id_list[0]
-	var containerTransferEntry models.ContainerTransferEntryInfo
+	var containerTransferEntry hgbg_models.ContainerTransferEntryInfo
 	_, err := db_session.Id(entry_id).Get(&containerTransferEntry)
 	core.HandleError(err)
 
-	var ct models.ContainerTransferInfo
+	var ct hgbg_models.ContainerTransferInfo
 	_, err = db_session.Id(containerTransferEntry.TransferId).Get(&ct)
 	core.HandleError(err)
 
@@ -274,7 +275,7 @@ func (c ErpContainerTransferEntry) Delete() revel.Result {
 
 	container_transfer_log_service.Insert_container_transfer_log(ct, "删除调拨明细", db_session, c.Session)
 
-	affected, err := db_session.In("id", container_transfer_entry_id_list).Delete(new(models.ContainerTransferEntryInfo))
+	affected, err := db_session.In("id", container_transfer_entry_id_list).Delete(new(hgbg_models.ContainerTransferEntryInfo))
 	core.HandleError(err)
 
 	container_transfer_service.CalculateAndSaveWeightVolumeAmount(containerTransferEntry.TransferId, db_session)

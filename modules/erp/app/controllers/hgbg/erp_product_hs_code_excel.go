@@ -13,6 +13,7 @@ import (
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/erp/models"
 	"strings"
+	"matrix/modules/erp/models/hgbg_models"
 )
 
 type ErpProductHsCodeExcel struct {
@@ -149,14 +150,14 @@ func (c ErpProductHsCodeExcel) Import() revel.Result {
 			product_hs_code_import_list[index].product = product
 		}
 
-		var hs_code_cn models.HsCodeCnReportElemInfo
+		var hs_code_cn hgbg_models.HsCodeCnReportElemInfo
 		has, err = db_session.Where("cn_name = ?", product_hs_code_import.CnDeclName).Get(&hs_code_cn)
 		core.HandleError(err)
 		if has == false {
 			buffer.WriteString("中国海关申报品名不存在！")
 		}
 
-		var hs_code_au models.HsCodeAuDutyInfo
+		var hs_code_au hgbg_models.HsCodeAuDutyInfo
 		has, err = db_session.Where("en_name = ?", product_hs_code_import.AuDeclName).Get(&hs_code_au)
 		core.HandleError(err)
 		if has == false {

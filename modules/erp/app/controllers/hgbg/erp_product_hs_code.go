@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"matrix/core"
 	"matrix/modules/erp/models"
+	"matrix/modules/erp/models/hgbg_models"
 )
 
 type ErpProductHsCode struct {
@@ -120,7 +121,7 @@ func (c ErpProductHsCode) Save() revel.Result {
 		})
 	}
 
-	var hs_code_cn models.HsCodeCnReportElemInfo
+	var hs_code_cn hgbg_models.HsCodeCnReportElemInfo
 	has, err = db_session.Where("cn_name = ?", detail_form.Product.CnDeclName).Get(&hs_code_cn)
 	core.HandleError(err)
 	if has == false {
@@ -130,7 +131,7 @@ func (c ErpProductHsCode) Save() revel.Result {
 		})
 	}
 
-	var hs_code_au models.HsCodeAuDutyInfo
+	var hs_code_au hgbg_models.HsCodeAuDutyInfo
 	has, err = db_session.Where("en_name = ?", detail_form.Product.AuDeclName).Get(&hs_code_au)
 	core.HandleError(err)
 	if has == false {

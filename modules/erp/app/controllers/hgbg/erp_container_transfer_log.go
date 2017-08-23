@@ -6,8 +6,8 @@ import (
 	"matrix/core"
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/auth/pass_res"
-	"matrix/modules/erp/models"
 	"fmt"
+	"matrix/modules/erp/models/hgbg_models"
 )
 
 type ErpContainerTransferLog struct {
@@ -22,7 +22,7 @@ func (c ErpContainerTransferLog) Index() revel.Result {
 	var transfer_id int64
 	c.Params.Bind(&transfer_id, "transfer_id")
 
-	var ct models.ContainerTransferInfo
+	var ct hgbg_models.ContainerTransferInfo
 	_, err := db_session.Id(transfer_id).Get(&ct)
 	core.HandleError(err)
 
@@ -51,12 +51,12 @@ func (c ErpContainerTransferLog) ListData() revel.Result {
 	data_query := *query
 	data_query = *data_query.Desc("id")
 
-	container_transfer_log_list := make([]models.ContainerTransferLogInfo, 0, limit)
+	container_transfer_log_list := make([]hgbg_models.ContainerTransferLogInfo, 0, limit)
 	err := data_query.Limit(limit, offset).Find(&container_transfer_log_list)
 	core.HandleError(err)
 
 	count_query := *query
-	count, err := count_query.Count(new(models.ContainerTransferLogInfo))
+	count, err := count_query.Count(new(hgbg_models.ContainerTransferLogInfo))
 	core.HandleError(err)
 
 	return c.RenderJson(core.GridResult{

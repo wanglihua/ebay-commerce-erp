@@ -1,7 +1,7 @@
 package wzt
 
 import (
-	"matrix/modules/erp/models"
+	"matrix/modules/erp/models/hgbg_models"
 	"github.com/go-xorm/xorm"
 	"fmt"
 	"github.com/Luxurioust/excelize"
@@ -15,21 +15,21 @@ import (
 type Exporter struct {
 }
 
-func (c Exporter) GetExcelFileName(p_transfer *models.ContainerTransferInfo) string {
+func (c Exporter) GetExcelFileName(p_transfer *hgbg_models.ContainerTransferInfo) string {
 	return fmt.Sprintf("五洲通出口报关_%s.xlsx", p_transfer.BatchCode)
 }
 
-func (c Exporter) GetExcelFile(p_transfer *models.ContainerTransferInfo, db_session *xorm.Session) *excelize.File {
+func (c Exporter) GetExcelFile(p_transfer *hgbg_models.ContainerTransferInfo, db_session *xorm.Session) *excelize.File {
 	var excel_template_hgbg_out_dir = filepath.Join(revel.BasePath, "/static/excel-template/hgbg/out")
 
 	xlsx_file, err := excelize.OpenFile(filepath.Join(excel_template_hgbg_out_dir, "wzt.xlsx"))
 	core.HandleError(err)
 
-	var start_port models.ContainerTransferStartPortInfo
+	var start_port hgbg_models.ContainerTransferStartPortInfo
 	_, err = db_session.Id(p_transfer.StartPortId).Get(&start_port)
 	core.HandleError(err)
 
-	var dest_port models.ContainerTransferDestPortInfo
+	var dest_port hgbg_models.ContainerTransferDestPortInfo
 	_, err = db_session.Id(p_transfer.DestPortId).Get(&dest_port)
 	core.HandleError(err)
 
@@ -180,7 +180,7 @@ WHERE cte.transfer_id = %d AND p.need_invoice = 1 # 取开票的
 ORDER BY hcc.hs_code;`
 		sql = fmt.Sprintf(sql, p_transfer.Id)
 
-		var hs_code_cn_list = make([]models.HsCodeCnReportElemInfo, 0)
+		var hs_code_cn_list = make([]hgbg_models.HsCodeCnReportElemInfo, 0)
 		core.HandleError(db_session.Sql(sql).Find(&hs_code_cn_list))
 
 		// 92D050

@@ -3,15 +3,16 @@ package container_transfer_service
 import (
 	"github.com/go-xorm/xorm"
 	"matrix/modules/erp/models"
+	"matrix/modules/erp/models/hgbg_models"
 	"matrix/core"
 	"fmt"
 	"github.com/revel/revel"
 	"matrix/modules/erp/service/inventory_history_service"
 )
 
-func UpdateStockInventory(container_transfer models.ContainerTransferInfo, web_session revel.Session, db_session *xorm.Session) {
+func UpdateStockInventory(container_transfer hgbg_models.ContainerTransferInfo, web_session revel.Session, db_session *xorm.Session) {
 
-	var entry_list = make([]models.ContainerTransferEntryInfo, 0)
+	var entry_list = make([]hgbg_models.ContainerTransferEntryInfo, 0)
 	core.HandleError(db_session.Where("transfer_id = ?", container_transfer.Id).Find(&entry_list))
 
 	zt_stock_id, au_stock_id := get_zt_au_stock_id(container_transfer.Id, db_session)

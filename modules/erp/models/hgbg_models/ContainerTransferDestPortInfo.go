@@ -1,8 +1,9 @@
-package models
+package hgbg_models
 
 import (
 	"matrix/core"
 	"github.com/go-xorm/xorm"
+	"matrix/modules/erp/models"
 )
 
 const (
@@ -20,7 +21,7 @@ type ContainerTransferDestPortInfo struct {
 }
 
 func (e ContainerTransferDestPortInfo) TableName() string {
-	return TablePrefix + "container_transfer_dest_port"
+	return models.TablePrefix + "container_transfer_dest_port"
 }
 
 func (e ContainerTransferDestPortInfo) ModelDesc() string {

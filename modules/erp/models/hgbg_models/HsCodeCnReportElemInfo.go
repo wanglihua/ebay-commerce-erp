@@ -1,7 +1,8 @@
-package models
+package hgbg_models
 
 import (
 	"matrix/core"
+	"matrix/modules/erp/models"
 )
 
 type HsCodeCnReportElemInfo struct {
@@ -28,7 +29,7 @@ type HsCodeCnReportElemInfo struct {
 }
 
 func (e HsCodeCnReportElemInfo) TableName() string {
-	return TablePrefix + "hs_code_cn"
+	return models.TablePrefix + "hs_code_cn"
 }
 
 func (e HsCodeCnReportElemInfo) ModelDesc() string {

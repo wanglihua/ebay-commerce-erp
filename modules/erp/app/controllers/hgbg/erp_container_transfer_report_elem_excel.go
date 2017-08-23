@@ -4,7 +4,6 @@ import (
 	"github.com/revel/revel"
 
 	"matrix/core"
-	"matrix/modules/erp/models"
 	"fmt"
 	"github.com/tealeg/xlsx"
 	"bytes"
@@ -12,6 +11,7 @@ import (
 	"github.com/go-xorm/xorm"
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/auth/pass_res"
+	"matrix/modules/erp/models/hgbg_models"
 )
 
 type ErpContainerTransferReportElemExcel struct {
@@ -26,7 +26,7 @@ func (c ErpContainerTransferReportElemExcel) Export() revel.Result {
 	var transfer_id int64
 	c.Params.Bind(&transfer_id, "transfer_id")
 
-	var containerTransfer models.ContainerTransferInfo
+	var containerTransfer hgbg_models.ContainerTransferInfo
 	_, err := db_session.Id(transfer_id).Get(&containerTransfer)
 	core.HandleError(err)
 
@@ -65,7 +65,7 @@ WHERE cte.transfer_id = %d
 ORDER BY hcc.hs_code;`
 	sql = fmt.Sprintf(sql, transfer_id)
 
-	var hs_code_cn_list = make([]models.HsCodeCnReportElemInfo, 0)
+	var hs_code_cn_list = make([]hgbg_models.HsCodeCnReportElemInfo, 0)
 	core.HandleError(db_session.Sql(sql).Find(&hs_code_cn_list))
 
 	//统一设置标题单元格格式的函数

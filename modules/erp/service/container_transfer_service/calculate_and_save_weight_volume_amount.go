@@ -2,13 +2,13 @@ package container_transfer_service
 
 import (
 	"github.com/go-xorm/xorm"
-	"matrix/modules/erp/models"
+	"matrix/modules/erp/models/hgbg_models"
 	"fmt"
 	"matrix/core"
 )
 
 func CalculateAndSaveWeightVolumeAmount(transfer_id int64, db_session *xorm.Session) {
-	var container_transfer models.ContainerTransferInfo
+	var container_transfer hgbg_models.ContainerTransferInfo
 	_, err := db_session.Id(transfer_id).Get(&container_transfer)
 	core.HandleError(err)
 

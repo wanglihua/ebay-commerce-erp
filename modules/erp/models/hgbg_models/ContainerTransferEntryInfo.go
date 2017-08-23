@@ -1,6 +1,9 @@
-package models
+package hgbg_models
 
-import "matrix/core"
+import (
+	"matrix/core"
+	"matrix/modules/erp/models"
+)
 
 type ContainerTransferEntryInfo struct {
 	Id           int64           `xorm:"bigint notnull pk autoincr 'id'" json:"id"`
@@ -18,7 +21,7 @@ type ContainerTransferEntryInfo struct {
 	AuHsEnName   string          `xorm:"nvarchar(200) notnull 'au_hs_en_name'" json:"au_hs_en_name"` // 澳洲海关申报名
 	CnHsId       int64           `xorm:"bigint notnull 'cn_hs_id'" json:"cn_hs_id"`
 	CnHsCode     string          `xorm:"nvarchar(100) notnull 'cn_hs_code'" json:"cn_hs_code"`
-	CnHsCnName   string          `xorm:"nvarchar(200) notnull 'cn_hs_cn_name'" json:"cn_hs_cn_name"`  // 中国海关申报名
+	CnHsCnName   string          `xorm:"nvarchar(200) notnull 'cn_hs_cn_name'" json:"cn_hs_cn_name"` // 中国海关申报名
 	CnHsEnName   string          `xorm:"nvarchar(200) notnull 'cn_hs_en_name'" json:"cn_hs_en_name"`
 	NeedInvoice  int64           `xorm:"bigint notnull 'need_invoice' default(0)" json:"need_invoice"` // 是否开票
 	CreateTime   core.Time       `xorm:"created notnull 'create_time'" json:"create_time"`
@@ -29,7 +32,7 @@ type ContainerTransferEntryInfo struct {
 }
 
 func (e ContainerTransferEntryInfo) TableName() string {
-	return TablePrefix + "container_transfer_entry"
+	return models.TablePrefix + "container_transfer_entry"
 }
 
 func (e ContainerTransferEntryInfo) ModelDesc() string {

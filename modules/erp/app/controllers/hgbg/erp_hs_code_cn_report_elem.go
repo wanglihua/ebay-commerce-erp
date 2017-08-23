@@ -6,7 +6,7 @@ import (
 	"github.com/revel/revel"
 
 	"matrix/core"
-	"matrix/modules/erp/models"
+	"matrix/modules/erp/models/hgbg_models"
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/auth/pass_res"
 	"fmt"
@@ -39,12 +39,12 @@ func (c ErpHsCodeCnReportElem) ListData() revel.Result {
 		data_query = *data_query.Asc("id")
 	}
 
-	hs_code_cn_report_elem_list := make([]models.HsCodeCnReportElemInfo, 0, limit)
+	hs_code_cn_report_elem_list := make([]hgbg_models.HsCodeCnReportElemInfo, 0, limit)
 	err := data_query.Limit(limit, offset).Find(&hs_code_cn_report_elem_list)
 	core.HandleError(err)
 
 	count_query := *query
-	count, err := count_query.Count(new(models.HsCodeCnReportElemInfo))
+	count, err := count_query.Count(new(hgbg_models.HsCodeCnReportElemInfo))
 	core.HandleError(err)
 
 	return c.RenderJson(core.GridResult{
@@ -54,7 +54,7 @@ func (c ErpHsCodeCnReportElem) ListData() revel.Result {
 }
 
 type HsCodeCnReportElemDetailForm struct {
-	HsCodeCnReportElem models.HsCodeCnReportElemInfo `json:"hs_code_cn"`
+	HsCodeCnReportElem hgbg_models.HsCodeCnReportElemInfo `json:"hs_code_cn"`
 }
 
 func (f *HsCodeCnReportElemDetailForm) IsCreate() bool {
@@ -85,7 +85,7 @@ func (c ErpHsCodeCnReportElem) DetailData() revel.Result {
 	var hs_code_cn_report_elem_id int64
 	c.Params.Bind(&hs_code_cn_report_elem_id, "id")
 
-	var hs_code_cn_report_elem models.HsCodeCnReportElemInfo
+	var hs_code_cn_report_elem hgbg_models.HsCodeCnReportElemInfo
 	if hs_code_cn_report_elem_id != 0 {
 		has, err := db_session.Id(hs_code_cn_report_elem_id).Get(&hs_code_cn_report_elem)
 		core.HandleError(err)
@@ -117,7 +117,7 @@ func (c ErpHsCodeCnReportElem) Save() revel.Result {
 
 	var affected int64
 	if detail_form.IsCreate() {
-		var hs_code models.HsCodeCnReportElemInfo
+		var hs_code hgbg_models.HsCodeCnReportElemInfo
 		has, err := db_session.Where(fmt.Sprintf("cn_name = '%s'", hs_code_cn_report_elem.CnName)).Get(&hs_code)
 		core.HandleError(err)
 
@@ -128,7 +128,7 @@ func (c ErpHsCodeCnReportElem) Save() revel.Result {
 		affected, err = db_session.Insert(&hs_code_cn_report_elem)
 		core.HandleError(err)
 	} else {
-		var hs_code models.HsCodeCnReportElemInfo
+		var hs_code hgbg_models.HsCodeCnReportElemInfo
 		has, err := db_session.Where(fmt.Sprintf("id <> %d AND cn_name = '%s'", hs_code_cn_report_elem.Id, hs_code_cn_report_elem.CnName)).Get(&hs_code)
 		core.HandleError(err)
 
@@ -155,7 +155,7 @@ func (c ErpHsCodeCnReportElem) Delete() revel.Result {
 	hs_code_cn_report_elem_id_list := make([]int64, 0)
 	c.Params.Bind(&hs_code_cn_report_elem_id_list, "id_list")
 
-	affected, err := db_session.In("id", hs_code_cn_report_elem_id_list).Delete(new(models.HsCodeCnReportElemInfo))
+	affected, err := db_session.In("id", hs_code_cn_report_elem_id_list).Delete(new(hgbg_models.HsCodeCnReportElemInfo))
 	core.HandleError(err)
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})

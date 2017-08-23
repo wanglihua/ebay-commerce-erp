@@ -7,6 +7,7 @@ import (
 
 	"matrix/core"
 	"matrix/modules/erp/models"
+	"matrix/modules/erp/models/hgbg_models"
 	"matrix/modules/erp/service/container_transfer_service"
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/auth/pass_res"
@@ -49,7 +50,7 @@ func (c ErpContainerTransfer) ListData() revel.Result {
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
 	type container_transfer_view_item_t struct {
-		models.ContainerTransferInfo `xorm:"extends" json:"ct"`
+		hgbg_models.ContainerTransferInfo `xorm:"extends" json:"ct"`
 		models.StatusInfo            `xorm:"extends" json:"s"`
 	}
 
@@ -83,9 +84,9 @@ func (c ErpContainerTransfer) ListData() revel.Result {
 }
 
 type ContainerTransferDetailForm struct {
-	ContainerTransfer       models.ContainerTransferInfo              `json:"transfer"`
-	StartPortList           []models.ContainerTransferStartPortInfo   `json:"start_port_list"`
-	DestPortList            []models.ContainerTransferDestPortInfo    `json:"dest_port_list"`
+	ContainerTransfer       hgbg_models.ContainerTransferInfo              `json:"transfer"`
+	StartPortList           []hgbg_models.ContainerTransferStartPortInfo   `json:"start_port_list"`
+	DestPortList            []hgbg_models.ContainerTransferDestPortInfo    `json:"dest_port_list"`
 	LwhwZeroProductSkuList  []string                                  `json:"lwhw_zero_product_sku_list"`
 	LwhwZeroProductSkuCount int                                       `json:"lwhw_zero_product_sku_count"`
 }
@@ -145,7 +146,7 @@ func (c ErpContainerTransfer) Detail(id int64) revel.Result {
 	var db_session = c.DbSession
 
 	var transfer_id = id
-	var container_transfer models.ContainerTransferInfo
+	var container_transfer hgbg_models.ContainerTransferInfo
 	_, err := db_session.Id(transfer_id).Get(&container_transfer)
 	core.HandleError(err)
 
@@ -223,7 +224,7 @@ func (c ErpContainerTransfer) DetailData() revel.Result {
 	var container_transfer_id int64
 	c.Params.Bind(&container_transfer_id, "id")
 
-	var container_transfer models.ContainerTransferInfo
+	var container_transfer hgbg_models.ContainerTransferInfo
 	if container_transfer_id != 0 {
 		has, err := db_session.Id(container_transfer_id).Get(&container_transfer)
 		core.HandleError(err)
@@ -232,7 +233,7 @@ func (c ErpContainerTransfer) DetailData() revel.Result {
 		}
 	} else {
 		// 填入上次的
-		var last_container_transfer models.ContainerTransferInfo
+		var last_container_transfer hgbg_models.ContainerTransferInfo
 		_, err := db_session.Sql("SELECT ct.* FROM erp_container_transfer ct ORDER BY ct.id DESC LIMIT 1").Get(&last_container_transfer)
 		core.HandleError(err)
 
@@ -246,10 +247,10 @@ func (c ErpContainerTransfer) DetailData() revel.Result {
 		revel.TRACE.Println("container_transfer.CostUpRate", container_transfer.CostUpRate)
 	}
 
-	var start_port_list = make([]models.ContainerTransferStartPortInfo, 0)
+	var start_port_list = make([]hgbg_models.ContainerTransferStartPortInfo, 0)
 	core.HandleError(db_session.Find(&start_port_list))
 
-	var dest_port_list = make([]models.ContainerTransferDestPortInfo, 0)
+	var dest_port_list = make([]hgbg_models.ContainerTransferDestPortInfo, 0)
 	core.HandleError(db_session.Find(&dest_port_list))
 
 	var detail_form ContainerTransferDetailForm
@@ -269,7 +270,7 @@ func (c ErpContainerTransfer) Save() revel.Result {
 	err := json.Unmarshal(c.GetRequestBody(), &detail_form)
 	core.HandleError(err)
 
-	var ct_in_db models.ContainerTransferInfo
+	var ct_in_db hgbg_models.ContainerTransferInfo
 	_, err = db_session.Id(detail_form.ContainerTransfer.Id).Get(&ct_in_db)
 	core.HandleError(err)
 
@@ -295,12 +296,12 @@ func (c ErpContainerTransfer) Save() revel.Result {
 
 	container_transfer := detail_form.ContainerTransfer
 
-	var start_port models.ContainerTransferStartPortInfo
+	var start_port hgbg_models.ContainerTransferStartPortInfo
 	_, err = db_session.Id(container_transfer.StartPortId).Get(&start_port)
 	core.HandleError(err)
 	container_transfer.StartPortName = start_port.PortName
 
-	var dest_port models.ContainerTransferDestPortInfo
+	var dest_port hgbg_models.ContainerTransferDestPortInfo
 	_, err = db_session.Id(container_transfer.DestPortId).Get(&dest_port)
 	core.HandleError(err)
 	container_transfer.DestPortName = dest_port.PortName
@@ -364,7 +365,7 @@ func (c ErpContainerTransfer) Delete() revel.Result {
 	container_transfer_id_list := make([]int64, 0)
 	c.Params.Bind(&container_transfer_id_list, "id_list")
 
-	var container_transfer_list = make([]models.ContainerTransferInfo, 0)
+	var container_transfer_list = make([]hgbg_models.ContainerTransferInfo, 0)
 	core.HandleError(db_session.In("id", container_transfer_id_list).Find(&container_transfer_list))
 
 	for _, container_transfer := range container_transfer_list {
@@ -377,7 +378,7 @@ func (c ErpContainerTransfer) Delete() revel.Result {
 		container_transfer_log_service.Insert_container_transfer_log(container_transfer, "删除调拨单", db_session, c.Session)
 	}
 
-	affected, err := db_session.In("id", container_transfer_id_list).Delete(new(models.ContainerTransferInfo))
+	affected, err := db_session.In("id", container_transfer_id_list).Delete(new(hgbg_models.ContainerTransferInfo))
 	core.HandleError(err)
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})
@@ -391,11 +392,11 @@ func (c ErpContainerTransfer) Depart() revel.Result {
 	var transfer_id int64
 	c.Params.Bind(&transfer_id, "transfer_id")
 
-	var ct models.ContainerTransferInfo
+	var ct hgbg_models.ContainerTransferInfo
 	_, err := db_session.Id(transfer_id).Get(&ct)
 	core.HandleError(err)
 
-	count, err := db_session.Where(fmt.Sprintf("transfer_id = %d", transfer_id)).Count(new(models.ContainerTransferEntryInfo))
+	count, err := db_session.Where(fmt.Sprintf("transfer_id = %d", transfer_id)).Count(new(hgbg_models.ContainerTransferEntryInfo))
 	core.HandleError(err)
 
 	if count == 0 {
@@ -475,11 +476,11 @@ func (c ErpContainerTransfer) Stock() revel.Result {
 	var transfer_id int64
 	c.Params.Bind(&transfer_id, "transfer_id")
 
-	var ct models.ContainerTransferInfo
+	var ct hgbg_models.ContainerTransferInfo
 	_, err := db_session.Id(transfer_id).Get(&ct)
 	core.HandleError(err)
 
-	count, err := db_session.Where(fmt.Sprintf("transfer_id = %d", transfer_id)).Count(new(models.ContainerTransferEntryInfo))
+	count, err := db_session.Where(fmt.Sprintf("transfer_id = %d", transfer_id)).Count(new(hgbg_models.ContainerTransferEntryInfo))
 	core.HandleError(err)
 
 	if count == 0 {
@@ -518,14 +519,14 @@ func (c ErpContainerTransfer) Stock() revel.Result {
 	})
 }
 
-func container_transfer_can_modify(container_transfer models.ContainerTransferInfo) bool {
+func container_transfer_can_modify(container_transfer hgbg_models.ContainerTransferInfo) bool {
 	return container_transfer.StatusId == models.CONTAINER_TRANSFER_STATUS_NEW
 }
 
-func container_transfer_can_depart(container_transfer models.ContainerTransferInfo) bool {
+func container_transfer_can_depart(container_transfer hgbg_models.ContainerTransferInfo) bool {
 	return container_transfer.StatusId == models.CONTAINER_TRANSFER_STATUS_NEW
 }
 
-func container_transfer_can_stock(container_transfer models.ContainerTransferInfo) bool {
+func container_transfer_can_stock(container_transfer hgbg_models.ContainerTransferInfo) bool {
 	return container_transfer.StatusId == models.CONTAINER_TRANSFER_STATUS_DEPART
 }

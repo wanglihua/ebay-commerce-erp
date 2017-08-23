@@ -2,11 +2,12 @@ package container_transfer_service
 
 import (
 	"matrix/modules/erp/models"
+	"matrix/modules/erp/models/hgbg_models"
 	"github.com/go-xorm/xorm"
 	"matrix/core"
 )
 
-func EntryCombineAndPriceRateForAu(p_transfer *models.ContainerTransferInfo, entry_list []ContainerTransferEntryItem, db_session *xorm.Session) ([]ContainerTransferEntryItem) {
+func EntryCombineAndPriceRateForAu(p_transfer *hgbg_models.ContainerTransferInfo, entry_list []ContainerTransferEntryItem, db_session *xorm.Session) ([]ContainerTransferEntryItem) {
 	var find_entry_in_list = func(au_decl_name string, entry_list []ContainerTransferEntryItem) (index_ret int, entry_ret ContainerTransferEntryItem) {
 		for index, item := range entry_list {
 			if item.Product.AuDeclName == au_decl_name {

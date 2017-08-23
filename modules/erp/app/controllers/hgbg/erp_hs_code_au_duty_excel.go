@@ -11,7 +11,7 @@ import (
 	"matrix/core"
 	"matrix/modules/auth/pass_res"
 	"matrix/modules/auth/service/pass_service"
-	"matrix/modules/erp/models"
+	"matrix/modules/erp/models/hgbg_models"
 	"strings"
 	"strconv"
 )
@@ -144,7 +144,7 @@ func (c ErpHsCodeAuDutyExcel) Import() revel.Result {
 	}
 
 	for _, hs_code_au_import := range hs_code_au_import_list {
-		var hs_code_au models.HsCodeAuDutyInfo
+		var hs_code_au hgbg_models.HsCodeAuDutyInfo
 		has, err := db_session.Where(fmt.Sprintf("en_name = '%s'", hs_code_au_import.EnName)).Get(&hs_code_au)
 		core.HandleError(err)
 
@@ -184,7 +184,7 @@ func (c ErpHsCodeAuDutyExcel) Export() revel.Result {
 		filter = core.SqlAnd(filter, fmt.Sprintf("id IN (%s)", strings.Join(id_str_list, ",")))
 	}
 
-	hs_code_au_list := make([]models.HsCodeAuDutyInfo, 0)
+	hs_code_au_list := make([]hgbg_models.HsCodeAuDutyInfo, 0)
 
 	err := db_session.Where(filter).Find(&hs_code_au_list)
 	core.HandleError(err)
@@ -203,7 +203,7 @@ func (c ErpHsCodeAuDutyExcel) Export() revel.Result {
 	return c.RenderBinary(reader, file_name, revel.Attachment, time.Now())
 }
 
-func (c ErpHsCodeAuDutyExcel) export_hs_code_list_to_excel(db_session *xorm.Session, hs_code_au_list []models.HsCodeAuDutyInfo) *xlsx.File {
+func (c ErpHsCodeAuDutyExcel) export_hs_code_list_to_excel(db_session *xorm.Session, hs_code_au_list []hgbg_models.HsCodeAuDutyInfo) *xlsx.File {
 
 	//统一设置标题单元格格式的函数
 	set_head_cell_style := func(cell *xlsx.Cell) {

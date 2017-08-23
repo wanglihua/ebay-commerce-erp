@@ -1,7 +1,7 @@
 package giant_star
 
 import (
-	"matrix/modules/erp/models"
+	"matrix/modules/erp/models/hgbg_models"
 	"github.com/go-xorm/xorm"
 	"fmt"
 	"path/filepath"
@@ -15,11 +15,11 @@ import (
 type Exporter struct {
 }
 
-func (c Exporter) GetExcelFileName(p_transfer *models.ContainerTransferInfo) string {
+func (c Exporter) GetExcelFileName(p_transfer *hgbg_models.ContainerTransferInfo) string {
 	return fmt.Sprintf("Giant_Star_进口清关_%s.xlsx", p_transfer.BatchCode)
 }
 
-func (c Exporter) GetExcelFile(p_transfer *models.ContainerTransferInfo, db_session *xorm.Session) *excelize.File {
+func (c Exporter) GetExcelFile(p_transfer *hgbg_models.ContainerTransferInfo, db_session *xorm.Session) *excelize.File {
 	var excel_template_hgbg_in_dir = filepath.Join(revel.BasePath, "/static/excel-template/hgbg/in")
 
 	xlsx_file, err := excelize.OpenFile(filepath.Join(excel_template_hgbg_in_dir, "giant_star.xlsx"))
@@ -32,12 +32,12 @@ func (c Exporter) GetExcelFile(p_transfer *models.ContainerTransferInfo, db_sess
 	xlsx_file.SetCellStr(sheet1_name, "F5", p_transfer.BatchCode)
 	xlsx_file.SetCellStr(sheet1_name, "F7", time.Time(p_transfer.PackingTime).Format("2006-01-02"))
 
-	var start_port models.ContainerTransferStartPortInfo
+	var start_port hgbg_models.ContainerTransferStartPortInfo
 	_, err = db_session.Id(p_transfer.StartPortId).Get(&start_port)
 	core.HandleError(err)
 	xlsx_file.SetCellStr(sheet1_name, "C10", start_port.PortName)
 
-	var dest_port models.ContainerTransferDestPortInfo
+	var dest_port hgbg_models.ContainerTransferDestPortInfo
 	_, err = db_session.Id(p_transfer.DestPortId).Get(&dest_port)
 	core.HandleError(err)
 	xlsx_file.SetCellStr(sheet1_name, "C11", dest_port.PortName)
