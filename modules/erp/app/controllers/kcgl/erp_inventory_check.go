@@ -12,6 +12,7 @@ import (
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/bill_service"
+	"matrix/modules/erp/models/kcgl_models"
 )
 
 type ErpInventoryCheck struct {
@@ -25,7 +26,7 @@ func (c ErpInventoryCheck) Index() revel.Result {
 }
 
 type ErpInventoryCheckViewItem struct {
-	models.InventoryCheckInfo        `xorm:"extends" json:"ic"`
+	kcgl_models.InventoryCheckInfo        `xorm:"extends" json:"ic"`
 	models.StockInfo                 `xorm:"extends" json:"st"`
 	CheckUser   auth_models.UserInfo `xorm:"extends" json:"cu"`
 	ApproveUser auth_models.UserInfo `xorm:"extends" json:"au"`
@@ -81,7 +82,7 @@ func (c ErpInventoryCheck) ListData() revel.Result {
 }
 
 type InventoryCheckDetailForm struct {
-	InventoryCheck models.InventoryCheckInfo `json:"inventory_check"`
+	InventoryCheck kcgl_models.InventoryCheckInfo `json:"inventory_check"`
 	StockList      []models.StockInfo        `json:"stock_list"`
 }
 
@@ -117,7 +118,7 @@ func (c ErpInventoryCheck) DetailData() revel.Result {
 	var inventory_check_id int64
 	c.Params.Bind(&inventory_check_id, "id")
 
-	var inventory_check models.InventoryCheckInfo
+	var inventory_check kcgl_models.InventoryCheckInfo
 	if inventory_check_id != 0 {
 		has, err := db_session.Id(inventory_check_id).Get(&inventory_check)
 		core.HandleError(err)
@@ -186,7 +187,7 @@ func (c ErpInventoryCheck) Delete() revel.Result {
 	inventory_check_id_list := make([]int64, 0)
 	c.Params.Bind(&inventory_check_id_list, "id_list")
 
-	inventory_check_list := make([]models.InventoryCheckInfo, 0)
+	inventory_check_list := make([]kcgl_models.InventoryCheckInfo, 0)
 	err := db_session.In("check_id", inventory_check_id_list).Find(&inventory_check_list)
 	core.HandleError(err)
 
@@ -199,7 +200,7 @@ func (c ErpInventoryCheck) Delete() revel.Result {
 	_, err = db_session.In("check_id", inventory_check_id_list).Delete(new(models.StockBillEntryInfo))
 	core.HandleError(err)
 
-	_, err = db_session.In("id", inventory_check_id_list).Delete(new(models.InventoryCheckInfo))
+	_, err = db_session.In("id", inventory_check_id_list).Delete(new(kcgl_models.InventoryCheckInfo))
 	core.HandleError(err)
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: "数据删除成功!"})
@@ -213,7 +214,7 @@ func (c ErpInventoryCheck) Submit() revel.Result {
 	var check_id int64
 	c.Params.Bind(&check_id, "check_id")
 
-	var inventory_check models.InventoryCheckInfo
+	var inventory_check kcgl_models.InventoryCheckInfo
 	has, err := db_session.Id(check_id).Get(&inventory_check)
 	core.HandleError(err)
 	if has == false {
@@ -240,7 +241,7 @@ func (c ErpInventoryCheck) Back() revel.Result {
 	var check_id int64
 	c.Params.Bind(&check_id, "check_id")
 
-	var inventory_check models.InventoryCheckInfo
+	var inventory_check kcgl_models.InventoryCheckInfo
 	has, err := db_session.Id(check_id).Get(&inventory_check)
 	core.HandleError(err)
 	if has == false {

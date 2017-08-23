@@ -48,7 +48,7 @@ WHERE s.stock_type_id = 0;
 UPDATE erp_inventory SET cost_price = 0 WHERE product_id = 0 AND (SELECT s.stock_type_id FROM erp_stock s WHERE s.id = erp_inventory.stock_id) = 0;
  */
 
-	var inventory_cn_list = make([]models.InventoryInfo, 0)
+	var inventory_cn_list = make([]kcgl_models.InventoryInfo, 0)
 
 	var get_cn_inventory_list = `SELECT nvt.* FROM erp_inventory nvt
     INNER JOIN erp_stock s ON s.id = nvt.stock_id
@@ -80,7 +80,7 @@ WHERE s.stock_type_id = %d;`
 
 			// 如果澳仓库存不存的的，需要自动添加零库存的记录，方便记录澳仓成本。
 			for _, au_stock := range au_stock_list {
-				var au_stock_inventory models.InventoryInfo
+				var au_stock_inventory kcgl_models.InventoryInfo
 				has, err := db_session.Where("product_id = ? AND stock_id = ?", cn_inventory.ProductId, au_stock.Id).Get(&au_stock_inventory)
 				core.HandleError(err)
 
@@ -119,7 +119,7 @@ WHERE s.stock_type_id = %d;`
 
 			// 如果在途仓库存不存的的，需要自动添加零库存的记录。
 			for _, zt_stock := range zt_stock_list {
-				var zt_stock_inventory models.InventoryInfo
+				var zt_stock_inventory kcgl_models.InventoryInfo
 				has, err := db_session.Where("product_id = ? AND stock_id = ?", cn_inventory.ProductId, zt_stock.Id).Get(&zt_stock_inventory)
 				core.HandleError(err)
 

@@ -10,7 +10,7 @@ import (
 )
 
 type Product_inventory_view_item_t struct {
-	models.InventoryInfo   `xorm:"extends" json:"nvt"`
+	kcgl_models.InventoryInfo   `xorm:"extends" json:"nvt"`
 	kcgl_models.ProductInfo     `xorm:"extends" json:"p"`
 	models.StockInfo       `xorm:"extends" json:"st"`
 	models.StorageLocInfo  `xorm:"extends" json:"sl"`

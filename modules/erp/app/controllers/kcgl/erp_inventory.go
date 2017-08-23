@@ -58,7 +58,7 @@ func (c ErpInventory) PageData() revel.Result {
 }
 
 type InventoryViewItem struct {
-	Inventory  models.InventoryInfo  `xorm:"extends" json:"ivt"`
+	Inventory  kcgl_models.InventoryInfo  `xorm:"extends" json:"ivt"`
 	Stock      models.StockInfo      `xorm:"extends" json:"st"`
 	StorageLoc models.StorageLocInfo `xorm:"extends" json:"loc"`
 	Product    kcgl_models.ProductInfo    `xorm:"extends" json:"prd"`
@@ -160,7 +160,7 @@ ivt.id IN (
 }
 
 type InventoryDetailForm struct {
-	Inventory      models.InventoryInfo     `json:"inventory"`
+	Inventory      kcgl_models.InventoryInfo     `json:"inventory"`
 	StockList      []models.StockInfo       `json:"stock_list"`
 	StorageLocList []models.StorageLocInfo  `json:"storage_loc_list"`
 	ProductSku     string                   `json:"product_sku"`
@@ -198,7 +198,7 @@ func (c ErpInventory) DetailData() revel.Result {
 	var detail_form InventoryDetailForm
 	detail_form.StockList = stock_list
 
-	var inventory models.InventoryInfo
+	var inventory kcgl_models.InventoryInfo
 	if inventory_id != 0 {
 		has, err := db_session.Id(inventory_id).Get(&inventory)
 		core.HandleError(err)
@@ -254,7 +254,7 @@ func (c ErpInventory) Save() revel.Result {
 	inventory.ProductId = product_id
 
 	// 数据库中 stock_id, storage_loc_id, product_id 三者的组合应该是唯一的
-	var inventory_in_db models.InventoryInfo
+	var inventory_in_db kcgl_models.InventoryInfo
 	_, err = db_session.
 	Where("stock_id = ? AND storage_loc_id = ? AND product_id = ?", inventory.StockId, inventory.StorageLocId, inventory.ProductId).
 		Get(&inventory_in_db)
@@ -271,13 +271,13 @@ func (c ErpInventory) Save() revel.Result {
 	var affected int64
 	if inventory_in_db.Id == 0 { //创建数据库记录
 		if stock.StockTypeId == models.STOCK_TYPE_AU {
-			inventory_count, err := db_session.Where("stock_id = ? AND storage_loc_id = ?", inventory.StockId, inventory.StorageLocId).Count(new(models.InventoryInfo))
+			inventory_count, err := db_session.Where("stock_id = ? AND storage_loc_id = ?", inventory.StockId, inventory.StorageLocId).Count(new(kcgl_models.InventoryInfo))
 			core.HandleError(err)
 			if inventory_count != 0 {
 				return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，仓库仓位中SKU库存已存在，一个仓位只能一个SKU！"})
 			}
 
-			inventory_count, err = db_session.Where("stock_id = ? AND product_id = ?", inventory.StockId, inventory.ProductId).Count(new(models.InventoryInfo))
+			inventory_count, err = db_session.Where("stock_id = ? AND product_id = ?", inventory.StockId, inventory.ProductId).Count(new(kcgl_models.InventoryInfo))
 			core.HandleError(err)
 			if inventory_count != 0 {
 				return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，仓库中SKU的库存已存在，一个SKU只能一个仓位！"})
@@ -330,11 +330,11 @@ func (c ErpInventory) Delete() revel.Result {
 	inventory_id_list := make([]int64, 0)
 	c.Params.Bind(&inventory_id_list, "id_list")
 
-	var inventory_list = make([]models.InventoryInfo, 0)
+	var inventory_list = make([]kcgl_models.InventoryInfo, 0)
 	err := db_session.In("id", inventory_id_list).Find(&inventory_list)
 	core.HandleError(err)
 
-	affected, err := db_session.In("id", inventory_id_list).Delete(new(models.InventoryInfo))
+	affected, err := db_session.In("id", inventory_id_list).Delete(new(kcgl_models.InventoryInfo))
 	core.HandleError(err)
 
 	var login_user = core.GetLoginUser(c.Session)
@@ -574,7 +574,7 @@ func (c ErpInventory) Import() revel.Result {
 		var storage_loc_id = inventory_import.storage_loc_id
 		var product_id = inventory_import.product_id
 
-		var inventory models.InventoryInfo
+		var inventory kcgl_models.InventoryInfo
 		has, err := db_session.Where(fmt.Sprintf("stock_id = %d AND storage_loc_id = %d", stock_id, storage_loc_id)).Get(&inventory)
 		core.HandleError(err)
 
@@ -1112,7 +1112,7 @@ FROM
 
 		if stock_type_id == models.STOCK_TYPE_AU {
 			// 一个SKU一个仓位
-			var inventory models.InventoryInfo
+			var inventory kcgl_models.InventoryInfo
 			has, err := db_session.Where(fmt.Sprintf("stock_id = %d AND product_id = %d", stock_id, product_id)).Get(&inventory) //这里只能保证一个SKU一个仓位
 			core.HandleError(err)
 
@@ -1131,7 +1131,7 @@ FROM
 			}
 		} else {
 			// 中国仓和在途仓，一个仓位可以多个SKU，就是 stock_id, product_id 组合好后，一个仓库一个SKU，storage_loc_id随便填
-			var inventory models.InventoryInfo
+			var inventory kcgl_models.InventoryInfo
 			has, err := db_session.Where(fmt.Sprintf("stock_id = %d AND product_id = %d", stock_id, product_id)).Get(&inventory)
 			core.HandleError(err)
 
@@ -1546,7 +1546,7 @@ func (c ErpInventory) ImportInventoryQuantity() revel.Result {
 		//var storage_loc_id = inventory_import.storage_loc_id
 		var product_id = inventory_import.product_id
 
-		var inventory models.InventoryInfo
+		var inventory kcgl_models.InventoryInfo
 		has, err := db_session.Where(fmt.Sprintf("stock_id = %d AND product_id = %d", stock_id, product_id)).Get(&inventory)
 		core.HandleError(err)
 
@@ -1980,7 +1980,7 @@ func (c ErpInventory) ImportInventoryPrice() revel.Result {
 		//var storage_loc_id = inventory_import.storage_loc_id
 		var product_id = inventory_import.product_id
 
-		var inventory models.InventoryInfo
+		var inventory kcgl_models.InventoryInfo
 		has, err := db_session.Where(fmt.Sprintf("stock_id = %d AND product_id = %d", stock_id, product_id)).Get(&inventory)
 		core.HandleError(err)
 
@@ -2408,7 +2408,7 @@ func (c ErpInventory) ImportInventoryQuantityDiff() revel.Result {
 		//var storage_loc_id = inventory_import.storage_loc_id
 		var product_id = inventory_import.product_id
 
-		var inventory models.InventoryInfo
+		var inventory kcgl_models.InventoryInfo
 		has, err := db_session.Where(fmt.Sprintf("stock_id = %d AND product_id = %d", stock_id, product_id)).Get(&inventory)
 		core.HandleError(err)
 

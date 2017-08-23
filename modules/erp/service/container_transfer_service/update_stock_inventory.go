@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"github.com/revel/revel"
 	"matrix/modules/erp/service/inventory_history_service"
+	"matrix/modules/erp/models/kcgl_models"
 )
 
 func UpdateStockInventory(container_transfer hgbg_models.ContainerTransferInfo, web_session revel.Session, db_session *xorm.Session) {
@@ -103,7 +104,7 @@ func get_zt_au_stock_id(transfer_id int64, db_session *xorm.Session) (zt_stock_i
 }
 
 func update_stock_product_inventory(stock_id int64, product_id int64, qty_diff int64, web_session revel.Session, db_session *xorm.Session) {
-	var inventory models.InventoryInfo
+	var inventory kcgl_models.InventoryInfo
 	_, err := db_session.Where("stock_id = ? AND product_id = ?", stock_id, product_id).Get(&inventory)
 	core.HandleError(err)
 

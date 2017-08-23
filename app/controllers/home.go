@@ -68,6 +68,10 @@ func (c Home) SyncDbPost() revel.Result {
 	model_list = append(model_list, &hgbg_models.HsCodeAuDutyInfo{})
 	model_list = append(model_list, &hgbg_models.HsCodeCnReportElemInfo{})
 
+	model_list = append(model_list, &kcgl_models.InventoryInfo{})
+	model_list = append(model_list, &kcgl_models.InventoryCheckInfo{})
+	model_list = append(model_list, &kcgl_models.InventoryCheckEntryInfo{})
+	model_list = append(model_list, &kcgl_models.InventoryHistoryInfo{})
 	model_list = append(model_list, &kcgl_models.ProductBindInfo{})
 	model_list = append(model_list, &kcgl_models.ProductBindLogInfo{})
 	model_list = append(model_list, &kcgl_models.ProductCateInfo{})
@@ -95,10 +99,7 @@ func (c Home) SyncDbPost() revel.Result {
 	model_list = append(model_list, &erp_models.EnvelopeFeeRateInfo{})
 	model_list = append(model_list, &erp_models.EubGoodsTypeInfo{})
 	model_list = append(model_list, &erp_models.EubInsuranceTypeInfo{})
-	model_list = append(model_list, &erp_models.InventoryInfo{})
-	model_list = append(model_list, &erp_models.InventoryCheckInfo{})
-	model_list = append(model_list, &erp_models.InventoryCheckEntryInfo{})
-	model_list = append(model_list, &erp_models.InventoryHistoryInfo{})
+
 	model_list = append(model_list, &erp_models.LittleIconInfo{})
 	model_list = append(model_list, &erp_models.LoginLogInfo{})
 	model_list = append(model_list, &erp_models.LogisticsCompanyInfo{})

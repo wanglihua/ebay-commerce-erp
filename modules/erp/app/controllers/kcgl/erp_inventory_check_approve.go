@@ -9,6 +9,7 @@ import (
 	"matrix/modules/auth/pass_res"
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/erp/models"
+	"matrix/modules/erp/models/kcgl_models"
 )
 
 type ErpInventoryCheckApprove struct {
@@ -22,7 +23,7 @@ func (c ErpInventoryCheckApprove) Index() revel.Result {
 }
 
 type ErpInventoryCheckApproveViewItem struct {
-	models.InventoryCheckInfo `xorm:"extends" json:"ic"`
+	kcgl_models.InventoryCheckInfo `xorm:"extends" json:"ic"`
 	models.StockInfo          `xorm:"extends" json:"st"`
 	CheckUser   auth_models.UserInfo `xorm:"extends" json:"cu"`
 	ApproveUser auth_models.UserInfo `xorm:"extends" json:"au"`
@@ -87,7 +88,7 @@ func (c ErpInventoryCheckApprove) Approve() revel.Result {
 	var check_id int64
 	c.Params.Bind(&check_id, "check_id")
 
-	var inventory_check models.InventoryCheckInfo
+	var inventory_check kcgl_models.InventoryCheckInfo
 	_, err := db_session.Id(check_id).Get(&inventory_check)
 	core.HandleError(err)
 
@@ -101,12 +102,12 @@ func (c ErpInventoryCheckApprove) Approve() revel.Result {
 	core.HandleError(err)
 
 	//更新库存
-	inventory_check_entry_list := make([]models.InventoryCheckEntryInfo, 0)
+	inventory_check_entry_list := make([]kcgl_models.InventoryCheckEntryInfo, 0)
 	err = db_session.Sql(fmt.Sprintf("SELECT * FROM erp_inventory_check_entry WHERE check_id = %d", check_id)).Find(&inventory_check_entry_list)
 	core.HandleError(err)
 
 	for _, inventory_check_entry := range inventory_check_entry_list {
-		inventory := new(models.InventoryInfo)
+		inventory := new(kcgl_models.InventoryInfo)
 		// inventory.Qty = inventory_check_entry.CheckQty
 		inventory.Qty = inventory.Qty + inventory_check_entry.QtyDiff //利用库存差异来做应该更合理一些
 
@@ -118,7 +119,7 @@ func (c ErpInventoryCheckApprove) Approve() revel.Result {
 
 		// 如果不存在相对应的库存记录
 		if affected == 0 {
-			var inventory models.InventoryInfo
+			var inventory kcgl_models.InventoryInfo
 			inventory.StockId = inventory_check.StockId
 			inventory.StorageLocId = inventory_check_entry.StorageLocId
 			inventory.ProductId = inventory_check_entry.ProductId
@@ -145,7 +146,7 @@ func (c ErpInventoryCheckApprove) Back() revel.Result {
 	var check_id int64
 	c.Params.Bind(&check_id, "check_id")
 
-	var inventory_check models.InventoryCheckInfo
+	var inventory_check kcgl_models.InventoryCheckInfo
 	_, err := db_session.Id(check_id).Get(&inventory_check)
 	core.HandleError(err)
 

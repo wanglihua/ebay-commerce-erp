@@ -8,6 +8,7 @@ import (
 	"matrix/modules/erp/models"
 	"github.com/revel/revel"
 	"matrix/modules/erp/service/inventory_history_service"
+	"matrix/modules/erp/models/kcgl_models"
 )
 
 // 扣减订单库存
@@ -65,7 +66,7 @@ func Take_order_inventory(order models.OrderInfo, db_session *xorm.Session) bool
 		var sql_get_inventory_record = `SELECT * FROM erp_inventory WHERE stock_id = %d AND product_id = %d;`
 		sql_get_inventory_record = fmt.Sprintf(sql_get_inventory_record, stock_id, product_id)
 
-		var inventory models.InventoryInfo
+		var inventory kcgl_models.InventoryInfo
 		has, err := db_session.Sql(sql_get_inventory_record).Get(&inventory)
 		core.HandleError(err)
 

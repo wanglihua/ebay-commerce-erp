@@ -2,13 +2,13 @@ package inventory_history_service
 
 import (
 	"github.com/go-xorm/xorm"
-	"matrix/modules/erp/models"
 	"matrix/core"
+	"matrix/modules/erp/models/kcgl_models"
 )
 
-func Insert_inventory_history(inventory models.InventoryInfo, description string, db_session *xorm.Session) {
+func Insert_inventory_history(inventory kcgl_models.InventoryInfo, description string, db_session *xorm.Session) {
 
-	var inventory_history models.InventoryHistoryInfo
+	var inventory_history kcgl_models.InventoryHistoryInfo
 
 	inventory_history.StockId = inventory.StockId
 	inventory_history.StorageLocId = inventory.StorageLocId

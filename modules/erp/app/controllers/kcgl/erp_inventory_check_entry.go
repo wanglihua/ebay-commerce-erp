@@ -32,7 +32,7 @@ func (c ErpInventoryCheckEntry) ListData() revel.Result {
 	var bill_id int64
 	c.Params.Bind(&bill_id, "bill_id")
 
-	var inventory_check_bill models.InventoryCheckInfo
+	var inventory_check_bill kcgl_models.InventoryCheckInfo
 	if bill_id != 0 {
 		has, err := db_session.Id(bill_id).Get(&inventory_check_bill)
 		core.HandleError(err)
@@ -46,7 +46,7 @@ func (c ErpInventoryCheckEntry) ListData() revel.Result {
 
 	type ErpInventoryCheckEntryViewItem struct {
 		models.StockBillEntryInfo `xorm:"extends" json:"ice"`
-		models.InventoryCheckInfo      `xorm:"extends" json:"ic"`
+		kcgl_models.InventoryCheckInfo      `xorm:"extends" json:"ic"`
 		models.StorageLocInfo          `xorm:"extends" json:"sl"`
 		kcgl_models.ProductInfo             `xorm:"extends" json:"p"`
 	}
@@ -102,8 +102,8 @@ func (c ErpInventoryCheckEntry) ListData() revel.Result {
 }
 
 type InventoryCheckEntryDetailForm struct {
-	InventoryCheck      models.InventoryCheckInfo      `json:"inventory_check"`
-	InventoryCheckEntry models.InventoryCheckEntryInfo `json:"check_entry"`
+	InventoryCheck      kcgl_models.InventoryCheckInfo      `json:"inventory_check"`
+	InventoryCheckEntry kcgl_models.InventoryCheckEntryInfo `json:"check_entry"`
 	ProductName         string                         `json:"product_name"`
 	StockName           string                         `json:"stock_name"`
 	StorageLocList      []models.StorageLocInfo        `json:"storage_loc_list"`
@@ -141,7 +141,7 @@ func (c ErpInventoryCheckEntry) DetailData() revel.Result {
 		return c.RenderJson(core.JsonResult{Success: false, Message: "请先选择盘点单！"})
 	}
 
-	var inventory_check models.InventoryCheckInfo
+	var inventory_check kcgl_models.InventoryCheckInfo
 	has, err := db_session.Id(bill_id).Get(&inventory_check)
 	core.HandleError(err)
 	if has == false {
@@ -158,7 +158,7 @@ func (c ErpInventoryCheckEntry) DetailData() revel.Result {
 	var inventory_check_entry_id int64
 	c.Params.Bind(&inventory_check_entry_id, "id")
 
-	var inventory_check_entry models.InventoryCheckEntryInfo
+	var inventory_check_entry kcgl_models.InventoryCheckEntryInfo
 	var product_name string
 	if inventory_check_entry_id != 0 {
 		has, err := db_session.Id(inventory_check_entry_id).Get(&inventory_check_entry)
@@ -201,7 +201,7 @@ func (c ErpInventoryCheckEntry) Save() revel.Result {
 	inventory_check_entry.CheckId = detail_form.InventoryCheck.Id
 
 	check_id := detail_form.InventoryCheck.Id
-	var inventory_check models.InventoryCheckInfo
+	var inventory_check kcgl_models.InventoryCheckInfo
 	_, err = db_session.Id(check_id).Get(&inventory_check)
 	core.HandleError(err)
 
@@ -257,7 +257,7 @@ func (c ErpInventoryCheckEntry) Delete() revel.Result {
 	}
 
 	check_id := check_id_list[0]
-	var inventory_check models.InventoryCheckInfo
+	var inventory_check kcgl_models.InventoryCheckInfo
 	_, err = db_session.Id(check_id).Get(&inventory_check)
 	core.HandleError(err)
 

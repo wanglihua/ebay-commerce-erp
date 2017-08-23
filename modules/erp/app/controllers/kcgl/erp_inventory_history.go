@@ -27,7 +27,7 @@ func (c ErpInventoryHistory) Index() revel.Result {
 }
 
 type InventoryHistoryViewItem struct {
-	InventoryHistory models.InventoryHistoryInfo  `xorm:"extends" json:"his"`
+	InventoryHistory kcgl_models.InventoryHistoryInfo  `xorm:"extends" json:"his"`
 	Stock            models.StockInfo             `xorm:"extends" json:"st"`
 	StorageLoc       models.StorageLocInfo        `xorm:"extends" json:"loc"`
 	Product          kcgl_models.ProductInfo           `xorm:"extends" json:"prd"`
@@ -41,7 +41,7 @@ func (c ErpInventoryHistory) ListData() revel.Result {
 
 	db_session := c.DbSession
 
-	var inventory models.InventoryInfo
+	var inventory kcgl_models.InventoryInfo
 	_, err := db_session.Id(inventory_id).Get(&inventory)
 	core.HandleError(err)
 
