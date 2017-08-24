@@ -9,7 +9,7 @@ import (
 	"matrix/core"
 	"matrix/modules/auth/pass_res"
 	"matrix/modules/auth/service/pass_service"
-	"matrix/modules/erp/models/site_models"
+	"matrix/modules/erp/models/xtgl_models"
 )
 
 type ErpLoginLog struct {
@@ -58,7 +58,7 @@ func (c ErpLoginLog) ListData() revel.Result {
 		data_query = *data_query.Asc("id")
 	}
 
-	login_log_list := make([]site_models.LoginLogInfo, 0, limit)
+	login_log_list := make([]xtgl_models.LoginLogInfo, 0, limit)
 	err := data_query.Limit(limit, offset).Find(&login_log_list)
 	core.HandleError(err)
 
@@ -72,7 +72,7 @@ func (c ErpLoginLog) ListData() revel.Result {
 	}
 
 	count_query := *query
-	count, err := count_query.Count(new(site_models.LoginLogInfo))
+	count, err := count_query.Count(new(xtgl_models.LoginLogInfo))
 	core.HandleError(err)
 
 	return c.RenderJson(core.GridResult{

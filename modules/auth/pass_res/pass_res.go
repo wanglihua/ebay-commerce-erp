@@ -94,6 +94,7 @@ const (
 	SPPZ_PRODUCT_CATE       = 150600 // 商品目录
 	SPPZ_PSL_BATCH          = 150700 // 批量修改仓位
 	SPPZ_SUPPLIER           = 150800 // 供应商
+	SPPZ_SUPPLIER_DELETE    = 150850 // 供应商删除
 	SPPZ_PRODUCT_STATUS     = 150900 // 商品状态
 	SPPZ_SEA_CONTAINER_COST = 151000 // 商品状态
 	SPPZ_BRAND              = 151100 // 商品品牌
@@ -115,6 +116,10 @@ const (
 	SPBB_PRODUCT_SALE_DAY_ANALYSIS     = 170300 // 商品日销售分析
 
 	// 商品质量反馈 18
-	SPZL_PRODUCT_FEEDBACK_CATE = 180100 // 商品质量反馈类别
-	SPZL_PRODUCT_FEEDBACK      = 180200 // 商品质量反馈
+	SPZL_PRODUCT_FEEDBACK_CATE   = 180100 // 商品质量反馈类别
+	SPZL_PRODUCT_FEEDBACK        = 180200 // 商品质量反馈
+	SPZL_PRODUCT_FEEDBACK_DELETE = 180300 // 商品质量反馈删除
+
+	// 系统管理 19
+	XTGL_NOTICE = 190100 // 通知管理
 )

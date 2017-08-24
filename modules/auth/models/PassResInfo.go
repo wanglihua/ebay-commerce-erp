@@ -239,7 +239,7 @@ func (e PassResInfo) InitData(db_session *xorm.Session) {
 		pass.Name = "商品列表"
 		pass.Desc = core.MakeNullString("商品列表", true)
 		db_session.Insert(pass)
-		
+
 		pass = new(PassResInfo)
 		pass.Id = pass_res.KCGL_PRODUCT_DETAIL_SAVE
 		pass.CateId = pass_res_cate.KCGL
@@ -445,6 +445,13 @@ func (e PassResInfo) InitData(db_session *xorm.Session) {
 		db_session.Insert(pass)
 
 		pass = new(PassResInfo)
+		pass.Id = pass_res.SPPZ_SUPPLIER_DELETE
+		pass.CateId = pass_res_cate.SPPZ
+		pass.Name = "供应商删除"
+		pass.Desc = core.MakeNullString("供应商删除", true)
+		db_session.Insert(pass)
+
+		pass = new(PassResInfo)
 		pass.Id = pass_res.SPPZ_PRODUCT_STATUS
 		pass.CateId = pass_res_cate.SPPZ
 		pass.Name = "商品状态"
@@ -473,6 +480,13 @@ func (e PassResInfo) InitData(db_session *xorm.Session) {
 		pass.CateId = pass_res_cate.SPZL
 		pass.Name = "商品质量反馈"
 		pass.Desc = core.MakeNullString("商品质量反馈", true)
+		db_session.Insert(pass)
+
+		pass = new(PassResInfo)
+		pass.Id = pass_res.SPZL_PRODUCT_FEEDBACK_DELETE
+		pass.CateId = pass_res_cate.SPZL
+		pass.Name = "商品质量反馈删除"
+		pass.Desc = core.MakeNullString("商品质量反馈删除", true)
 		db_session.Insert(pass)
 	}
 
@@ -642,6 +656,16 @@ func (e PassResInfo) InitData(db_session *xorm.Session) {
 		pass.CateId = pass_res_cate.XTPZ
 		pass.Name = "图标管理"
 		pass.Desc = core.MakeNullString("图标管理", true)
+		db_session.Insert(pass)
+	}
+
+	// 系统管理
+	{
+		pass := new(PassResInfo)
+		pass.Id = pass_res.XTGL_NOTICE
+		pass.CateId = pass_res_cate.XTGL
+		pass.Name = "通知公告"
+		pass.Desc = core.MakeNullString("通知公告", true)
 		db_session.Insert(pass)
 	}
 }

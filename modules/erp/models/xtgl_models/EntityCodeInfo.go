@@ -1,4 +1,4 @@
-package site_models
+package xtgl_models
 
 import (
 	"matrix/core"

@@ -614,3 +614,9 @@ POST /product/feedback/delete             ErpProductFeedback.Delete
 
 POST /product/feedback/import             ErpProductFeedbackExcel.Import
 POST /product/feedback/export             ErpProductFeedbackExcel.Export
+
+GET  /notice                    ErpNotice.Index
+POST /notice/data/list          ErpNotice.ListData
+POST /notice/data/detail        ErpNotice.DetailData
+POST /notice/save               ErpNotice.Save
+POST /notice/delete             ErpNotice.Delete

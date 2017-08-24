@@ -12,7 +12,7 @@ import (
 	"matrix/modules/auth/pass_res"
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/erp/setting"
-	"matrix/modules/erp/models/site_models"
+	"matrix/modules/erp/models/xtgl_models"
 )
 
 type ErpLittleIcon struct {
@@ -43,12 +43,12 @@ func (c ErpLittleIcon) ListData() revel.Result {
 		dataQuery = *dataQuery.Asc("id")
 	}
 
-	little_icon_list := make([]site_models.LittleIconInfo, 0, limit)
+	little_icon_list := make([]xtgl_models.LittleIconInfo, 0, limit)
 	err := dataQuery.Limit(limit, offset).Find(&little_icon_list)
 	core.HandleError(err)
 
 	countQuery := *query
-	count, err := countQuery.Count(new(site_models.LittleIconInfo))
+	count, err := countQuery.Count(new(xtgl_models.LittleIconInfo))
 	core.HandleError(err)
 
 	return c.RenderJson(core.GridResult{
@@ -58,7 +58,7 @@ func (c ErpLittleIcon) ListData() revel.Result {
 }
 
 type LittleIconInfoForm struct {
-	LittleIcon site_models.LittleIconInfo
+	LittleIcon xtgl_models.LittleIconInfo
 }
 
 func (f *LittleIconInfoForm) IsCreate() bool {
@@ -79,7 +79,7 @@ func (c ErpLittleIcon) Detail() revel.Result {
 	var little_icon_id int64
 	c.Params.Bind(&little_icon_id, "id")
 
-	little_icon := new(site_models.LittleIconInfo)
+	little_icon := new(xtgl_models.LittleIconInfo)
 	if little_icon_id != 0 {
 		has, err := db_session.Id(little_icon_id).Get(little_icon)
 		core.HandleError(err)
@@ -136,11 +136,11 @@ func (c ErpLittleIcon) Delete() revel.Result {
 	little_icon_id_list := make([]int64, 0)
 	c.Params.Bind(&little_icon_id_list, "id_list")
 
-	var little_icon_list = make([]site_models.LittleIconInfo, 0)
+	var little_icon_list = make([]xtgl_models.LittleIconInfo, 0)
 	err := db_session.In("id", little_icon_id_list).Find(&little_icon_list)
 	core.HandleError(err)
 
-	affected, err := db_session.In("id", little_icon_id_list).Delete(new(site_models.LittleIconInfo))
+	affected, err := db_session.In("id", little_icon_id_list).Delete(new(xtgl_models.LittleIconInfo))
 	core.HandleError(err)
 
 	//同时删除文件

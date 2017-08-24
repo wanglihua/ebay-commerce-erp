@@ -15,7 +15,7 @@ import (
 	"matrix/modules/erp/models/ddpz_models"
 	"matrix/modules/erp/models/ddlc_models"
 	"matrix/modules/erp/models/spbb_models"
-	"matrix/modules/erp/models/site_models"
+	"matrix/modules/erp/models/xtgl_models"
 )
 
 type Home struct {
@@ -135,13 +135,13 @@ func (c Home) SyncDbPost() revel.Result {
 	model_list = append(model_list, &ddlc_models.OrderLogisticsMatchDebugInfo{})
 	model_list = append(model_list, &ddlc_models.OrderShippingAddressInfo{})
 
-	model_list = append(model_list, &site_models.EntityCodeInfo{})
+	model_list = append(model_list, &xtgl_models.EntityCodeInfo{})
 	model_list = append(model_list, &ddpz_models.EnvelopeFeeRateInfo{})
 	model_list = append(model_list, &sppz_models.EubGoodsTypeInfo{})
 	model_list = append(model_list, &sppz_models.EubInsuranceTypeInfo{})
 
-	model_list = append(model_list, &site_models.LittleIconInfo{})
-	model_list = append(model_list, &site_models.LoginLogInfo{})
+	model_list = append(model_list, &xtgl_models.LittleIconInfo{})
+	model_list = append(model_list, &xtgl_models.LoginLogInfo{})
 	model_list = append(model_list, &erp_models.MessageInfo{})
 
 	model_list = append(model_list, &sppz_models.PackageMaterialInfo{})
@@ -163,6 +163,8 @@ func (c Home) SyncDbPost() revel.Result {
 	model_list = append(model_list, &kcgl_models.SpecialProductInfo{})
 	model_list = append(model_list, &erp_models.StatusInfo{})
 	//model_list = append(model_list, &erp_models.TestInfo{}) // 为什么这一句打开就不行
+
+	model_list = append(model_list, &xtgl_models.NoticeInfo{})
 
 	model_list = append(model_list, &track_modes.IssueAttachInfo{})
 	model_list = append(model_list, &track_modes.IssueCateInfo{})
