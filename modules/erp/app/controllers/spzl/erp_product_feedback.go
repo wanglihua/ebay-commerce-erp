@@ -181,9 +181,9 @@ SELECT
     p.*,
     sup.*
 FROM erp_product_feedback pf
-    INNER JOIN erp_product_feedback_cate c ON c.id = pf.cate_id
     INNER JOIN erp_product p ON p.id = pf.product_id
-    INNER JOIN erp_supplier sup ON sup.id = pf.supplier_id
+    LEFT JOIN erp_product_feedback_cate c ON c.id = pf.cate_id
+    LEFT JOIN erp_supplier sup ON sup.id = pf.supplier_id
 	 */
 
 	var sb = core.NewSqlBuilder()
@@ -193,9 +193,9 @@ FROM erp_product_feedback pf
     sup.*`)
 	sb.Count("count(pf.id) AS feedback_count")
 	sb.From(`erp_product_feedback pf
-    INNER JOIN erp_product_feedback_cate c ON c.id = pf.cate_id
     INNER JOIN erp_product p ON p.id = pf.product_id
-    INNER JOIN erp_supplier sup ON sup.id = pf.supplier_id`)
+    LEFT JOIN erp_product_feedback_cate c ON c.id = pf.cate_id
+    LEFT JOIN erp_supplier sup ON sup.id = pf.supplier_id`)
 
 	filter = core.SqlAnd(filter, fmt.Sprintf("p.id = %d", product_id))
 
