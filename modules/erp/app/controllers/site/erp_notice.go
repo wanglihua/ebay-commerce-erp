@@ -15,6 +15,19 @@ type ErpNotice struct {
 	*revel.Controller
 }
 
+func (c ErpNotice) GetNoticeDataForHomePage() revel.Result {
+	// 这里没有权限限制
+
+	var db_session = c.DbSession
+
+	var notice_list = make([]xtgl_models.NoticeInfo, 0)
+	core.HandleError(db_session.OrderBy("create_time DESC").Find(&notice_list))
+
+	return c.RenderJson(map[string]interface{}{
+		"notice_list": notice_list,
+	})
+}
+
 func (c ErpNotice) Index() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.XTGL_NOTICE, c.Session)
 
