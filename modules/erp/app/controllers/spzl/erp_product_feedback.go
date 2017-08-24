@@ -400,6 +400,8 @@ func (c ErpProductFeedback) Save() revel.Result {
 func (c ErpProductFeedback) Delete() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.SPZL_PRODUCT_FEEDBACK, c.Session)
 
+	var has_delete_pass = pass_service.Is_login_user_has_pass(pass_res.SPZL_PRODUCT_FEEDBACK_DELETE, c.Session)
+
 	db_session := c.DbSession
 
 	product_feedback_id_list := make([]int64, 0)
@@ -418,9 +420,32 @@ func (c ErpProductFeedback) Delete() revel.Result {
 	_, err := db_session.Id(product_feedback_id).Get(&product_feedback)
 	core.HandleError(err)
 
+	// 检查删除权限
+	if has_delete_pass == false {
+		// 如果没有删除权限的，就只能删除自己当日创建的
+		var sql = `SELECT count(*) AS count
+FROM erp_product_feedback pf
+WHERE (pf.user_id <> %d) OR (pf.user_id = %d AND pf.create_time < '%s');`
+		var login_user = core.GetLoginUser(c.Session)
+		var time_now = time.Now()
+		sql = fmt.Sprintf(sql, login_user.UserId, login_user.UserId, fmt.Sprintf("%04d-%02d-%02d", time_now.Year(), int(time_now.Month()), time_now.Day()))
+		var count core.Count
+		_, err := db_session.Sql(sql).Get(&count)
+		core.HandleError(err)
+
+		if count.Count > 0 {
+			return c.RenderJson(map[string]interface{}{
+				"success": false,
+				"message": "只能删除本人今日创建的反馈！",
+			})
+		}
+	}
+
+	// 删除反馈
 	affected, err := db_session.In("id", product_feedback_id_list).Delete(new(spzl_models.ProductFeedbackInfo))
 	core.HandleError(err)
 
+	// 更改反馈SKU
 	// 一般删除的是同一个SKU下面的
 	var product_id = product_feedback.ProductId
 	count, err := db_session.Where("product_id = ?", product_id).Count(new(spzl_models.ProductFeedbackInfo))
