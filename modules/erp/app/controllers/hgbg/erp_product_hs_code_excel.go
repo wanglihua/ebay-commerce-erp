@@ -400,7 +400,7 @@ func (c ErpProductHsCodeExcel) export_product_list_to_excel(db_session *xorm.Ses
 
 		// 中文名
 		cell = row.AddCell()
-		set_text_cell_style(cell, "center")
+		set_text_cell_style(cell, "left")
 		cell.Value = product.CnName
 
 		// 中国申报品名
