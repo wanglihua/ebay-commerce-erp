@@ -103,6 +103,17 @@
                                     </div>
                                 </div>
 
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <label for="solution" class="col-xs-2 control-label">解决方案</label>
+                                            <div class="col-xs-10">
+                                                <textarea id="solution" name="detail.product_feedback.solution" rows="4" class="input-sm form-control" v-model="detail.product_feedback.solution"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
                             </form>
                         </div>
                     </div>
@@ -219,26 +230,11 @@
                 showMask("提交中...");
                 var form = $("#productFeedbackDetailForm");
                 var valid = validate(form, {
-                    'detail.product_feedback.cate_id': {
-                        required: true, digits: true
-                    },
                     'detail.product_feedback.sku': {
-                        required: true
-                    },
-                    'detail.product_feedback.supplier_id': {
-                        required: true, digits: true
-                    },
-                    'detail.product_feedback.code': {
                         required: true
                     },
                     'detail.product_feedback.description': {
                         required: false, maxlength: 800
-                    },
-                    'detail.product_feedback.user_id': {
-                        required: true, digits: true
-                    },
-                    'detail.product_feedback.user_login_name': {
-                        required: true, minlength: 2, maxlength: 100
                     }
                 });
 

@@ -328,26 +328,11 @@
                 showMask("提交中...");
                 var form = $("#productFeedbackDetailForm");
                 var valid = validate(form, {
-                    'detail.product_feedback.cate_id': {
-                        required: true, digits: true
-                    },
                     'detail.product_feedback.sku': {
-                        required: true
-                    },
-                    'detail.product_feedback.supplier_id': {
-                        required: true, digits: true
-                    },
-                    'detail.product_feedback.code': {
                         required: true
                     },
                     'detail.product_feedback.description': {
                         required: false, maxlength: 800
-                    },
-                    'detail.product_feedback.user_id': {
-                        required: true, digits: true
-                    },
-                    'detail.product_feedback.user_login_name': {
-                        required: true, minlength: 2, maxlength: 100
                     }
                 });
 
