@@ -79,10 +79,11 @@ FROM erp_supplier s
 }
 
 type SupplierDetailForm struct {
-	Supplier     sppz_models.SupplierInfo       `json:"supplier"`
-	ProvinceId   int64                     `json:"province_id"`
-	ProvinceList []region_service.Region_t `json:"province_list"`
-	CityList     []region_service.Region_t `json:"city_list"`
+	Supplier      sppz_models.SupplierInfo       `json:"supplier"`
+	ProvinceId    int64                     `json:"province_id"`
+	ProvinceList  []region_service.Region_t `json:"province_list"`
+	CityList      []region_service.Region_t `json:"city_list"`
+	PayMethodList []sppz_models.SupplierPayMethodInfo `json:"pay_method_list"`
 	// city_id 就是 supplier 中的 region_id
 }
 
@@ -142,6 +143,10 @@ func (c ErpSupplier) DetailData() revel.Result {
 	var detail_form SupplierDetailForm
 	var province_list = region_service.Get_province_list(db_session)
 	detail_form.ProvinceList = province_list
+
+	var pay_method_list = make([]sppz_models.SupplierPayMethodInfo, 0)
+	core.HandleError(db_session.Find(&pay_method_list))
+	detail_form.PayMethodList = pay_method_list
 
 	var supplier sppz_models.SupplierInfo
 	if supplier_id != 0 {

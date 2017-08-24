@@ -137,6 +137,22 @@
                                     </div>
                                 </div>
 
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <label for="pay_method_id" class="col-xs-2 control-label">付款方式</label>
+                                            <div class="col-xs-10">
+                                                <select id="pay_method_id" name="detail.supplier.pay_method_id" class="input-sm form-control" v-model="detail.supplier.pay_method_id">
+                                                    <option :value="0"></option>
+                                                    <template v-for="pay_method in detail.pay_method_list">
+                                                        <option :value="pay_method.id">{{pay_method.name}}</option>
+                                                    </template>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
                             </form>
                         </div>
                     </div>
@@ -162,7 +178,8 @@
                 "region_full_name": "",
                 "province_id": 0,
                 "province_list": [],
-                "city_list": []
+                "city_list": [],
+                "pay_method_list": []
             }
         },
         mounted: function () {
