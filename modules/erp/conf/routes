@@ -621,3 +621,4 @@ POST /notice/data/detail                  ErpNotice.DetailData
 POST /notice/save                         ErpNotice.Save
 POST /notice/delete                       ErpNotice.Delete
 POST /notice/get/data/for/home/page       ErpNotice.GetNoticeDataForHomePage
+GET  /notice/view/detail/:id              ErpNotice.ViewDetail

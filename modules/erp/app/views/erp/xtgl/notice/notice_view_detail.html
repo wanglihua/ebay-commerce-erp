@@ -1,0 +1,33 @@
+{%header "Home" .%}
+
+<div class="breadcrumbs" id="breadcrumbs">
+    <ul class="breadcrumb">
+        <li>
+            <a href='{%url "Home.Index"%}'><i class="ace-icon fa fa-home home-icon"></i></a>
+        </li>
+        <li class="active">Home</li>
+        <li>通知详情</li>
+    </ul>
+</div>
+<div class="page-content">
+    <div class="row">
+        <div id="page" class="col-xs-12" style="padding: 0;">
+            <div id="div_notice_detail">
+                <div id="notice_header">
+                    <div id="notice_title" style="font-weight: bold;font-size: 14px;margin: 10px;text-align: center;">
+                        {% .notice.Title %}
+                    </div>
+                    <div id="notice_info" style="text-align: center;font-size:8px;">
+                        <span>发布人：</span><span>{% .notice.LoginName %}</span>&nbsp;&nbsp;&nbsp;&nbsp;
+                        <span>发布时间：</span><span>{% .notice.CreateTime %}</span>&nbsp;&nbsp;&nbsp;&nbsp;
+                        <span>修改时间：</span><span>{% .notice.UpdateTime %}</span>
+                    </div>
+                </div>
+                <div id="notice_body" style="margin: 10px 20px;line-height: 1.5em;">
+                    {% .notice.Body %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{%footer%}

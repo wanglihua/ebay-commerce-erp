@@ -28,10 +28,23 @@ func (c ErpNotice) GetNoticeDataForHomePage() revel.Result {
 	})
 }
 
+func (c ErpNotice) ViewDetail(id int64) revel.Result {
+	var notice_id = id
+
+	var db_session = c.DbSession
+
+	var notice xtgl_models.NoticeInfo
+	_, err := db_session.Id(notice_id).Get(&notice)
+	core.HandleError(err)
+
+	c.RenderArgs["notice"] = notice
+	return c.RenderTemplate("erp/xtgl/notice/notice_view_detail.html")
+}
+
 func (c ErpNotice) Index() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.XTGL_NOTICE, c.Session)
 
-	return c.RenderTemplate("erp/site/notice/notice_index.html")
+	return c.RenderTemplate("erp/xtgl/notice/notice_index.html")
 }
 
 func (c ErpNotice) ListData() revel.Result {

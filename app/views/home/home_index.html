@@ -24,7 +24,7 @@
                     <tbody>
                     <template v-for="notice in notice_list">
                         <tr>
-                            <td>{{notice.title}}</td>
+                            <td><a :href='"/notice/view/detail/" + notice.id' target="notice_view_detail">{{notice.title}}</a></td>
                             <td>{{notice.login_name}}</td>
                             <td>{{notice.create_time}}</td>
                         </tr>
