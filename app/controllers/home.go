@@ -76,6 +76,8 @@ func (c Home) SyncDbPost() revel.Result {
 	model_list = append(model_list, &ddpz_models.PickFeeInfo{})
 	model_list = append(model_list, &ddpz_models.OrderTagInfo{})
 	model_list = append(model_list, &ddpz_models.OrderTypeInfo{})
+	model_list = append(model_list, &ddpz_models.EnvelopeFeeRateInfo{})
+	model_list = append(model_list, &ddpz_models.PickupPayMethodInfo{})
 
 	model_list = append(model_list, &sppz_models.BrandInfo{})
 	model_list = append(model_list, &sppz_models.ProductStyleInfo{})
@@ -85,6 +87,7 @@ func (c Home) SyncDbPost() revel.Result {
 	model_list = append(model_list, &sppz_models.StockTypeInfo{})
 	model_list = append(model_list, &sppz_models.StorageLocInfo{})
 	model_list = append(model_list, &sppz_models.SupplierInfo{})
+	model_list = append(model_list, &sppz_models.ProductCertInfo{})
 
 	model_list = append(model_list, &hgbg_models.ContainerTransferInfo{})
 	model_list = append(model_list, &hgbg_models.ContainerTransferDestPortInfo{})
@@ -112,6 +115,7 @@ func (c Home) SyncDbPost() revel.Result {
 	model_list = append(model_list, &kcgl_models.StockBillEntryInfo{})
 	model_list = append(model_list, &kcgl_models.StockBillInfo{})
 	model_list = append(model_list, &kcgl_models.StockBillTypeInfo{})
+	model_list = append(model_list, &kcgl_models.SpecialProductInfo{})
 
 	model_list = append(model_list, &spzl_models.ProductFeedbackCateInfo{})
 	model_list = append(model_list, &spzl_models.ProductFeedbackSkuInfo{})
@@ -125,6 +129,7 @@ func (c Home) SyncDbPost() revel.Result {
 	model_list = append(model_list, &xtpz_models.PaypalAccountInfo{})
 	model_list = append(model_list, &xtpz_models.ShopAccountInfo{})
 	model_list = append(model_list, &xtpz_models.ShopAccountLogInfo{})
+	model_list = append(model_list, &xtpz_models.PlatformLogisticsModeInfo{})
 
 	model_list = append(model_list, &ddlc_models.OrderInfo{})
 	model_list = append(model_list, &ddlc_models.OrderHistoryInfo{})
@@ -134,37 +139,28 @@ func (c Home) SyncDbPost() revel.Result {
 	model_list = append(model_list, &ddlc_models.OrderLogisticsLogicInfo{})
 	model_list = append(model_list, &ddlc_models.OrderLogisticsMatchDebugInfo{})
 	model_list = append(model_list, &ddlc_models.OrderShippingAddressInfo{})
+	model_list = append(model_list, &ddlc_models.PickupOrderInfo{})
 
 	model_list = append(model_list, &xtgl_models.EntityCodeInfo{})
-	model_list = append(model_list, &ddpz_models.EnvelopeFeeRateInfo{})
-	model_list = append(model_list, &sppz_models.EubGoodsTypeInfo{})
-	model_list = append(model_list, &sppz_models.EubInsuranceTypeInfo{})
-
 	model_list = append(model_list, &xtgl_models.LittleIconInfo{})
 	model_list = append(model_list, &xtgl_models.LoginLogInfo{})
-	model_list = append(model_list, &erp_models.MessageInfo{})
+	model_list = append(model_list, &xtgl_models.NoticeInfo{})
 
+	model_list = append(model_list, &sppz_models.EubGoodsTypeInfo{})
+	model_list = append(model_list, &sppz_models.EubInsuranceTypeInfo{})
 	model_list = append(model_list, &sppz_models.PackageMaterialInfo{})
+	model_list = append(model_list, &sppz_models.SeaContainerCostInfo{})
+	model_list = append(model_list, &sppz_models.ProductStoreItemInfo{})
 
-	model_list = append(model_list, &erp_models.PaypalReconInfo{})
-	model_list = append(model_list, &ddlc_models.PickupOrderInfo{})
-	model_list = append(model_list, &ddpz_models.PickupPayMethodInfo{})
-	model_list = append(model_list, &xtpz_models.PlatformLogisticsModeInfo{})
-	model_list = append(model_list, &sppz_models.ProductCertInfo{})
 	model_list = append(model_list, &spbb_models.ProductSaleDayAnalysisInfo{})
 	model_list = append(model_list, &spbb_models.ProductSaleAnalysisInfo{})
 	model_list = append(model_list, &spbb_models.ProductSaleAnalysisSettingInfo{})
 
-	model_list = append(model_list, &sppz_models.ProductStoreItemInfo{})
-
+	model_list = append(model_list, &erp_models.MessageInfo{})
+	model_list = append(model_list, &erp_models.PaypalReconInfo{})
 	model_list = append(model_list, &erp_models.SalesManagerInfo{})
-	model_list = append(model_list, &sppz_models.SeaContainerCostInfo{})
-
-	model_list = append(model_list, &kcgl_models.SpecialProductInfo{})
 	model_list = append(model_list, &erp_models.StatusInfo{})
 	//model_list = append(model_list, &erp_models.TestInfo{}) // 为什么这一句打开就不行
-
-	model_list = append(model_list, &xtgl_models.NoticeInfo{})
 
 	model_list = append(model_list, &track_modes.IssueAttachInfo{})
 	model_list = append(model_list, &track_modes.IssueCateInfo{})
