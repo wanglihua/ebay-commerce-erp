@@ -348,6 +348,12 @@ func (c ErpProductHsCodeExcel) export_product_list_to_excel(db_session *xorm.Ses
 		col_index++
 
 		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 50)
+		set_head_cell_style(cell)
+		cell.Value = "商品名称"
+		col_index++
+
+		cell = row.AddCell()
 		sheet.SetColWidth(col_index, col_index, 15)
 		set_head_cell_style(cell)
 		cell.Value = "中国申报品名"
@@ -391,6 +397,11 @@ func (c ErpProductHsCodeExcel) export_product_list_to_excel(db_session *xorm.Ses
 		cell = row.AddCell()
 		set_text_cell_style(cell, "center")
 		cell.Value = product.Sku
+
+		// 中文名
+		cell = row.AddCell()
+		set_text_cell_style(cell, "center")
+		cell.Value = product.CnName
 
 		// 中国申报品名
 		cell = row.AddCell()
