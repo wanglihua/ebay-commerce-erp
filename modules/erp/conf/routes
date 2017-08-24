@@ -622,3 +622,9 @@ POST /notice/save                         ErpNotice.Save
 POST /notice/delete                       ErpNotice.Delete
 POST /notice/get/data/for/home/page       ErpNotice.GetNoticeDataForHomePage
 GET  /notice/view/detail/:id              ErpNotice.ViewDetail
+
+GET  /supplier/pay/method                 ErpSupplierPayMethod.Index
+POST /supplier/pay/method/data/list       ErpSupplierPayMethod.ListData
+POST /supplier/pay/method/data/detail     ErpSupplierPayMethod.DetailData
+POST /supplier/pay/method/save            ErpSupplierPayMethod.Save
+POST /supplier/pay/method/delete          ErpSupplierPayMethod.Delete

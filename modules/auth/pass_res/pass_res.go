@@ -86,20 +86,21 @@ const (
 	KCGL_SPECIAL_SKU             = 141200 // 特殊SKU
 
 	// 商品配置 模块编号 15
-	SPPZ_PRODUCT_BATCH      = 150100 // 商品批量修改
-	SPPZ_PACKAGE_MATERIAL   = 150200 // 包材类型
-	SPPZ_STOCK              = 150300 // 仓库
-	SPPZ_STOCK_PICK_CREW    = 150400 // 仓库拣货人员
-	SPPZ_STORAGE_LOC        = 150500 // 仓位
-	SPPZ_PRODUCT_CATE       = 150600 // 商品目录
-	SPPZ_PSL_BATCH          = 150700 // 批量修改仓位
-	SPPZ_SUPPLIER           = 150800 // 供应商
-	SPPZ_SUPPLIER_DELETE    = 150850 // 供应商删除
-	SPPZ_PRODUCT_STATUS     = 150900 // 商品状态
-	SPPZ_SEA_CONTAINER_COST = 151000 // 商品状态
-	SPPZ_BRAND              = 151100 // 商品品牌
-	SPPZ_PRODUCT_CERT       = 151200 // 商品认证
-	SPPZ_PRODUCT_STYLE      = 151300 // 商品款式
+	SPPZ_PRODUCT_BATCH       = 150100 // 商品批量修改
+	SPPZ_PACKAGE_MATERIAL    = 150200 // 包材类型
+	SPPZ_STOCK               = 150300 // 仓库
+	SPPZ_STOCK_PICK_CREW     = 150400 // 仓库拣货人员
+	SPPZ_STORAGE_LOC         = 150500 // 仓位
+	SPPZ_PRODUCT_CATE        = 150600 // 商品目录
+	SPPZ_PSL_BATCH           = 150700 // 批量修改仓位
+	SPPZ_SUPPLIER            = 150800 // 供应商
+	SPPZ_SUPPLIER_DELETE     = 150850 // 供应商删除
+	SPPZ_PRODUCT_STATUS      = 150900 // 商品状态
+	SPPZ_SEA_CONTAINER_COST  = 151000 // 商品状态
+	SPPZ_BRAND               = 151100 // 商品品牌
+	SPPZ_PRODUCT_CERT        = 151200 // 商品认证
+	SPPZ_PRODUCT_STYLE       = 151300 // 商品款式
+	SPPZ_SUPPLIER_PAY_METHOD = 151400 // 供应商付款方式
 
 	// 海关报关
 	HGBG_PRODUCT_HS_CODE                = 160100 // 商品海关编码

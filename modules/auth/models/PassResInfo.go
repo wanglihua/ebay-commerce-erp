@@ -445,6 +445,13 @@ func (e PassResInfo) InitData(db_session *xorm.Session) {
 		db_session.Insert(pass)
 
 		pass = new(PassResInfo)
+		pass.Id = pass_res.SPPZ_SUPPLIER_PAY_METHOD
+		pass.CateId = pass_res_cate.SPPZ
+		pass.Name = "供应商付款方式"
+		pass.Desc = core.MakeNullString("供应商付款方式", true)
+		db_session.Insert(pass)
+
+		pass = new(PassResInfo)
 		pass.Id = pass_res.SPPZ_SUPPLIER_DELETE
 		pass.CateId = pass_res_cate.SPPZ
 		pass.Name = "供应商删除"

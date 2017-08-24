@@ -115,7 +115,6 @@ func GetSppzMenu(res_id_map map[int64]bool, web_session revel.Session) string {
 	</li>`)
 	}
 
-
 	/*
 
 	<li id="sppz-product-style-menu" class="">
@@ -154,6 +153,16 @@ func GetSppzMenu(res_id_map map[int64]bool, web_session revel.Session) string {
             </a>
             <b class="arrow"></b>
         </li>`)
+	}
+
+	if check_pass_res_menu(pass_res.SPPZ_SUPPLIER_PAY_METHOD) {
+		buffer.WriteString(`<li id="sppz-supplier-pay-method-menu" class="">
+			<a href="/supplier/pay/method">
+				<i class="menu-icon fa fa-caret-right"></i>
+				供应商付款方式
+			</a>
+			<b class="arrow"></b>
+		</li>`)
 	}
 
 	if check_pass_res_menu(pass_res.SPPZ_PRODUCT_STATUS) {
