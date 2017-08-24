@@ -21,6 +21,9 @@ type ErpSupplier struct {
 func (c ErpSupplier) Index() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.SPPZ_SUPPLIER, c.Session)
 
+	var has_delete_pass = pass_service.Is_login_user_has_pass(pass_res.SPPZ_SUPPLIER_DELETE, c.Session)
+	c.RenderArgs["has_delete_pass"] = has_delete_pass
+
 	return c.RenderTemplate("erp/sppz/supplier/supplier_index.html")
 }
 
@@ -204,7 +207,7 @@ func (c ErpSupplier) Save() revel.Result {
 }
 
 func (c ErpSupplier) Delete() revel.Result {
-	pass_service.Check_login_user_pass(pass_res.SPPZ_SUPPLIER, c.Session)
+	pass_service.Check_login_user_pass(pass_res.SPPZ_SUPPLIER_DELETE, c.Session)
 
 	db_session := c.DbSession
 
