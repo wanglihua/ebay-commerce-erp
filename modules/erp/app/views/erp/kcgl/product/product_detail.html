@@ -193,6 +193,8 @@
             </div>
         </div>
 
+        {% if not .is_create %}
+
         <div class="widget-box">
             <div class="widget-header">
                 <h4 class="smaller">商品库存</h4>
@@ -384,6 +386,8 @@
                 </div>
             </div>
         </div>
+
+        {% end %}
     </div>
 </div>
 {%template "erp/kcgl/product/product_detail.var" .%}

@@ -184,6 +184,9 @@ func (c ErpProduct) Detail(product_id int64) revel.Result {
 
 	//return c.RenderText(fmt.Sprintf("product_id %d", product_id))
 	c.RenderArgs["product_id"] = product_id
+
+	c.RenderArgs["is_create"] = product_id == 0
+
 	return c.RenderTemplate("erp/kcgl/product/product_detail.html")
 }
 
