@@ -21,11 +21,16 @@ type ProductInfo struct {
 	Height      float64         `xorm:"float notnull 'height'" json:"height" smith:"verbose_name=高度,min=0"`          //cm
 	Weight      float64         `xorm:"float notnull 'weight'" json:"weight" smith:"verbose_name=重量,min=0"`          //kg
 	BatchCode   int64           `xorm:"bigint null index 'batch_code'" json:"batch_code" smith:"verbose_name=导入批次号"` //导入的批次号
-	CnDeclName  string          `xorm:"nvarchar(300) notnull index 'cn_decl_name'" json:"cn_decl_name"`  // 中国海关申报名
-	AuDeclName  string          `xorm:"nvarchar(300) notnull index 'au_decl_name'" json:"au_decl_name"`  // 澳洲海关申报名
+	CnDeclName  string          `xorm:"nvarchar(300) notnull index 'cn_decl_name'" json:"cn_decl_name"`              // 中国海关申报名
+	AuDeclName  string          `xorm:"nvarchar(300) notnull index 'au_decl_name'" json:"au_decl_name"`              // 澳洲海关申报名
 	CnHsCode    string          `xorm:"nvarchar(100) notnull index 'cn_hs_code'" json:"cn_hs_code" smith:"verbose_name=中国海关编码,min=1,max=10"`
 	AuHsCode    string          `xorm:"nvarchar(100) notnull index 'au_hs_code'" json:"au_hs_code" smith:"verbose_name=澳洲海关编码,min=1,max=8"`
 	NeedInvoice int64           `xorm:"bigint notnull 'need_invoice'" json:"need_invoice"` // 是否开票
+	BrandId     int64           `xorm:"bigint notnull 'brand_id' default(0)" json:"brand_id"`
+	StyleId     int64           `xorm:"bigint notnull 'style_id' default(0)" json:"style_id"`
+	Cert1Id     int64           `xorm:"bigint notnull 'cert1_id' default(0)" json:"cert1_id"`
+	Cert2Id     int64           `xorm:"bigint notnull 'cert2_id' default(0)" json:"cert2_id"`
+	Cert3Id     int64           `xorm:"bigint notnull 'cert3_id' default(0)" json:"cert3_id"`
 	CreateTime  core.Time       `xorm:"created notnull 'create_time'" json:"create_time"`
 	UpdateTime  core.Time       `xorm:"updated notnull 'update_time'" json:"update_time"`
 }

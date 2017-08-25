@@ -135,15 +135,17 @@ FROM erp_product prd
 }
 
 type ProductDetailForm struct {
-	Product                   kcgl_models.ProductInfo                                          `json:"product"`
-	ProductImageList          []kcgl_models.ProductImageInfo                                   `json:"product_image_list"`
-	SupplierList              []sppz_models.SupplierInfo                                       `json:"supplier_list"`
+	Product                   kcgl_models.ProductInfo                                     `json:"product"`
+	ProductImageList          []kcgl_models.ProductImageInfo                              `json:"product_image_list"`
+	SupplierList              []sppz_models.SupplierInfo                                  `json:"supplier_list"`
 	ProductCateSelectItemList []product_cate_service.ProductCateSelectItem                `json:"product_cate_list"`
-	PackageMaterialList       []sppz_models.PackageMaterialInfo                                `json:"package_material_list"`
+	PackageMaterialList       []sppz_models.PackageMaterialInfo                           `json:"package_material_list"`
 	StatusList                []models.StatusInfo                                         `json:"status_list"`
+	ProductStyleList          []sppz_models.ProductStyleInfo                              `json:"product_style_list"`
+	ProductCertList           []sppz_models.ProductCertInfo                               `json:"product_cert_list"`
 	InventoryList             []inventory_service.Product_inventory_view_item_t           `json:"inventory_list"`
 	OrderItemList             []order_service.Order_item_view_item_t                      `json:"order_item_list"`
-	ProductLogList            []kcgl_models.ProductLogInfo                                     `json:"product_log_list"`
+	ProductLogList            []kcgl_models.ProductLogInfo                                `json:"product_log_list"`
 	MessageList               []message_service.Message_view_item_t                       `json:"message_list"`
 }
 
@@ -240,6 +242,12 @@ func (c ErpProduct) DetailData() revel.Result {
 
 	message_list := message_service.Get_message_list_data_by_product_id_top_n(db_session, product_id, 10)
 
+	var product_style_list = make([]sppz_models.ProductStyleInfo, 0)
+	core.HandleError(db_session.Find(&product_style_list))
+
+	var product_cert_list = make([]sppz_models.ProductCertInfo, 0)
+	core.HandleError(db_session.Find(&product_cert_list))
+
 	var detail_form ProductDetailForm
 	detail_form.Product = product
 	detail_form.ProductImageList = product_image_list
@@ -251,6 +259,8 @@ func (c ErpProduct) DetailData() revel.Result {
 	detail_form.OrderItemList = order_item_list
 	detail_form.ProductLogList = product_log_list
 	detail_form.MessageList = message_list
+	detail_form.ProductStyleList = product_style_list
+	detail_form.ProductCertList = product_cert_list
 
 	return c.RenderJson(detail_form)
 }
