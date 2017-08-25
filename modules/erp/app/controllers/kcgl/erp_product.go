@@ -141,6 +141,7 @@ type ProductDetailForm struct {
 	ProductCateSelectItemList []product_cate_service.ProductCateSelectItem                `json:"product_cate_list"`
 	PackageMaterialList       []sppz_models.PackageMaterialInfo                           `json:"package_material_list"`
 	StatusList                []models.StatusInfo                                         `json:"status_list"`
+	ProductBrandList          []sppz_models.BrandInfo                                     `json:"product_brand_list"`
 	ProductStyleList          []sppz_models.ProductStyleInfo                              `json:"product_style_list"`
 	ProductCertList           []sppz_models.ProductCertInfo                               `json:"product_cert_list"`
 	InventoryList             []inventory_service.Product_inventory_view_item_t           `json:"inventory_list"`
@@ -242,6 +243,9 @@ func (c ErpProduct) DetailData() revel.Result {
 
 	message_list := message_service.Get_message_list_data_by_product_id_top_n(db_session, product_id, 10)
 
+	var product_brand_list = make([]sppz_models.BrandInfo, 0)
+	core.HandleError(db_session.Find(&product_brand_list))
+
 	var product_style_list = make([]sppz_models.ProductStyleInfo, 0)
 	core.HandleError(db_session.Find(&product_style_list))
 
@@ -259,6 +263,7 @@ func (c ErpProduct) DetailData() revel.Result {
 	detail_form.OrderItemList = order_item_list
 	detail_form.ProductLogList = product_log_list
 	detail_form.MessageList = message_list
+	detail_form.ProductBrandList = product_brand_list
 	detail_form.ProductStyleList = product_style_list
 	detail_form.ProductCertList = product_cert_list
 
@@ -320,7 +325,7 @@ func (c ErpProduct) Save() revel.Result {
 		core.HandleError(err)
 
 		//update_cols := []string{"sku", "cn_name", "name", "cate_id", "supplier_id", "pkg_mtrl_id", "cost_price", "status_id", "desc", "weight", "need_invoice" }
-		update_cols := []string{"sku", "cn_name", "name", "cate_id", "supplier_id", "pkg_mtrl_id", "cost_price", "status_id", "desc", "weight"}
+		update_cols := []string{"sku", "cn_name", "name", "cate_id", "supplier_id", "pkg_mtrl_id", "cost_price", "status_id", "desc", "weight", "brand_id", "style_id", "cert1_id", "cert2_id", "cert3_id"}
 		affected, err = db_session.Id(product_from_ui.Id).Cols(update_cols...).Update(&product_from_ui)
 		core.HandleError(err)
 
