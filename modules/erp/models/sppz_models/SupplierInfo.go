@@ -13,7 +13,7 @@ type SupplierInfo struct {
 	Phone       core.NullString `xorm:"nvarchar(200) 'phone'" json:"phone" smith:"verbose_name=电话,min=2,max=100"`
 	Desc        core.NullString `xorm:"nvarchar(500) 'desc'" json:"desc" smith:"verbose_name=描述,max=500"`
 	RegionId    int64           `xorm:"bigint notnull 'region_id'" json:"region_id" smith:"verbose_name=区域,max=500"`
-	PayMethodId int64           `xorm:"bigint notnull 'pay_method_id'" json:"pay_method_id"`
+	PayMethodId int64           `xorm:"bigint notnull 'pay_method_id' default(0)" json:"pay_method_id"`
 	CreateTime  core.Time       `xorm:"created notnull 'create_time'" json:"create_time"`
 	UpdateTime  core.Time       `xorm:"updated notnull 'update_time'" json:"update_time"`
 }

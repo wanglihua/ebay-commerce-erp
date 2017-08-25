@@ -31,6 +31,7 @@ func EntryCombineAndPriceRateForAu(p_transfer *hgbg_models.ContainerTransferInfo
 		var net_weight_sum = product.Weight * float64(item.ContainerTransferEntry.Qty)
 		var vol_sum = (product.Length * product.Width * product.Height / 1000000) * float64(item.ContainerTransferEntry.Qty)
 
+		// 澳洲清关的都是合并的，不管开不开票。
 		if found_index < 0 {
 			item.ContainerTransferEntry.WeightSum = net_weight_sum
 			item.ContainerTransferEntry.VolumeSum = vol_sum

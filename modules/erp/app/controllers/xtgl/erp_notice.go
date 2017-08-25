@@ -59,9 +59,9 @@ func (c ErpNotice) ListData() revel.Result {
 
 	data_query := *query
 	if order != "" {
-		data_query = *data_query.OrderBy(order)
+		data_query = *data_query.OrderBy(" list_top desc, " + order)
 	} else {
-		data_query = *data_query.Asc("id")
+		data_query = *data_query.OrderBy("list_top desc, id desc")
 	}
 
 	notice_list := make([]xtgl_models.NoticeInfo, 0, limit)
@@ -140,7 +140,7 @@ func (c ErpNotice) Save() revel.Result {
 		affected, err = db_session.Insert(&notice)
 		core.HandleError(err)
 	} else {
-		affected, err = db_session.Id(notice.Id).Cols("title", "body").Update(&notice)
+		affected, err = db_session.Id(notice.Id).Cols("title", "body", "list_top", "important").Update(&notice)
 		core.HandleError(err)
 
 		if affected == 0 {
