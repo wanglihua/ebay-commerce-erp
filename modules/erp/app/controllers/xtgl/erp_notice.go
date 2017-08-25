@@ -21,7 +21,7 @@ func (c ErpNotice) GetNoticeDataForHomePage() revel.Result {
 	var db_session = c.DbSession
 
 	var notice_list = make([]xtgl_models.NoticeInfo, 0)
-	core.HandleError(db_session.OrderBy("create_time DESC").Find(&notice_list))
+	core.HandleError(db_session.OrderBy("list_top DESC, create_time DESC").Find(&notice_list))
 
 	return c.RenderJson(map[string]interface{}{
 		"notice_list": notice_list,

@@ -18,6 +18,8 @@
                         {% .notice.Title %}
                     </div>
                     <div id="notice_info" style="text-align: center;font-size:8px;">
+                        {% if eq .notice.ListTop 1%}<span>[置顶]</span>&nbsp;&nbsp;&nbsp;&nbsp;{% end %}
+                        {% if eq .notice.Important 1%}<span>[重要]</span>&nbsp;&nbsp;&nbsp;&nbsp;{% end %}
                         <span>发布人：</span><span>{% .notice.LoginName %}</span>&nbsp;&nbsp;&nbsp;&nbsp;
                         <span>发布时间：</span><span>{% .notice.CreateTime %}</span>&nbsp;&nbsp;&nbsp;&nbsp;
                         <span>修改时间：</span><span>{% .notice.UpdateTime %}</span>
