@@ -200,14 +200,13 @@ func (p_ol *OrderLogisticsService) match_logistics_mode_with_option(p_order *ddl
 				mt.Println("匹配前中边折率", logistics_setting.Ppqzbzl)
 				mt.Println("打折前的中边为", mid_length)
 
-				const MIN_FLOAT_DIFF = 0.0000000001
-				if math.Abs(mid_length-mode_result.length) < MIN_FLOAT_DIFF {
+				if math.Abs(mid_length-mode_result.length) < core.FLOAT_MIN_DIFF {
 					mode_result.length = mode_result.length * logistics_setting.Ppqzbzl
 					mt.Println("打折后的中边为", mode_result.length)
-				} else if math.Abs(mid_length-mode_result.width) < MIN_FLOAT_DIFF {
+				} else if math.Abs(mid_length-mode_result.width) < core.FLOAT_MIN_DIFF {
 					mode_result.width = mode_result.width * logistics_setting.Ppqzbzl
 					mt.Println("打折后的中边为", mode_result.width)
-				} else if math.Abs(mid_length-mode_result.height) < MIN_FLOAT_DIFF {
+				} else if math.Abs(mid_length-mode_result.height) < core.FLOAT_MIN_DIFF {
 					mode_result.height = mode_result.height * logistics_setting.Ppqzbzl
 					mt.Println("打折后的中边为", mode_result.height)
 				}
