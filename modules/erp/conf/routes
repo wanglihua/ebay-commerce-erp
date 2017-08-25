@@ -123,6 +123,7 @@ POST /logistics/fee/rate/mode/list/by/company  ErpLogisticsFeeRate.GetLogisticsM
 GET  /product                              ErpProduct.Index
 POST /product/data/list                    ErpProduct.ListData
 GET  /product/detail/:product_id           ErpProduct.Detail
+GET  /product/edit/:product_id             ErpProduct.Edit
 POST /product/data/detail                  ErpProduct.DetailData
 POST /product/save                         ErpProduct.Save
 POST /product/delete                       ErpProduct.Delete

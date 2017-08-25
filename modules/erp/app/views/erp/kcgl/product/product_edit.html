@@ -1,0 +1,380 @@
+{% site_header "商品编辑" . %}
+<div class="main-container" id="main-container">
+    <div id="product_detail" style="width: 1024px;margin-left: auto;margin-right: auto;">
+
+        <div class="widget-box">
+            <div class="widget-header">
+                <h4 class="smaller">商品信息</h4>
+            </div>
+            <div class="widget-body">
+                <div class="widget-main">
+                    <form class="form-horizontal" role="form" id="productDetailForm">
+
+                        <div class="row">
+                            <div class="col-xs-3">
+                                <div class="form-group">
+                                    <label for="product_sku" class="col-xs-4 control-label">SKU：</label>
+                                    <div class="col-xs-8">
+                                        <input id="product_sku" name="detail.product.sku" type="text" class="input-sm form-control" v-model="detail.product.sku"/>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-xs-3">
+                                <div class="form-group">
+                                    <label for="product_cnname" class="col-xs-4 control-label">名称：</label>
+                                    <div class="col-xs-8">
+                                        <input id="product_cnname" name="detail.product.cn_name" type="text" class="input-sm form-control" v-model="detail.product.cn_name"/>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-xs-6">
+                                <div class="form-group">
+                                    <label for="product_english_name" class="col-xs-2 control-label">英文名称：</label>
+                                    <div class="col-xs-10">
+                                        <input id="product_english_name" name="detail.product.name" type="text" class="input-sm form-control" v-model="detail.product.name"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+
+                            <div class="col-xs-3">
+                                <div class="form-group">
+                                    <label for="product_cate_id" class="col-xs-4 control-label">商品目录：</label>
+                                    <div class="col-xs-8">
+                                        <select id="product_cate_id" name="detail.product.cate_id" class="input-sm form-control" v-model.number="detail.product.cate_id">
+                                            <option value=""></option>
+                                            <template v-for="cate in detail.product_cate_list">
+                                                <option :value="cate.cate_id">{{cate.cate_name}}</option>
+                                            </template>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-xs-3">
+                                <div class="form-group">
+                                    <label for="product_supplier_id" class="col-xs-4 control-label">供应商：</label>
+                                    <div class="col-xs-8">
+                                        <select id="product_supplier_id" name="detail.product.supplier_id" class="input-sm form-control" v-model.number="detail.product.supplier_id">
+                                            <option value=""></option>
+                                            <template v-for="supplier in detail.supplier_list">
+                                                <option :value="supplier.id">{{supplier.name}}</option>
+                                            </template>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-xs-3">
+                                <div class="form-group">
+                                    <label for="product_package_mateiral_id" class="col-xs-4 control-label">包材类型：</label>
+                                    <div class="col-xs-8">
+                                        <select id="product_package_mateiral_id" name="detail.product.pkg_mtrl_id" class="input-sm form-control" v-model.number="detail.product.pkg_mtrl_id">
+                                            <option value=""></option>
+                                            <template v-for="package_material in detail.package_material_list">
+                                                <option :value="package_material.id">{{package_material.name}}</option>
+                                            </template>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-xs-3">
+                                <div class="form-group">
+                                    <label for="product_cost_price" class="col-xs-4 control-label">中国采购价：</label>
+                                    <div class="col-xs-8">
+                                        <input id="product_cost_price" name="detail.product.cost_price" type="text" class="input-sm form-control" v-model.number="detail.product.cost_price"/>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="row">
+
+                            <div class="col-xs-3">
+                                <div class="form-group">
+                                    <label for="product_brand_id" class="col-xs-4 control-label">商品品牌：</label>
+                                    <div class="col-xs-8">
+                                        <select id="product_brand_id" name="detail.product.brand_id" class="input-sm form-control" v-model.number="detail.product.brand_id">
+                                            <option value=""></option>
+                                            <template v-for="brand in detail.product_brand_list">
+                                                <option :value="brand.id">{{brand.name}}</option>
+                                            </template>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-xs-3">
+                                <div class="form-group">
+                                    <label for="product_cert1_id" class="col-xs-4 control-label">商品认证1：</label>
+                                    <div class="col-xs-8">
+                                        <select id="product_cert1_id" name="detail.product.cert1_id" class="input-sm form-control" v-model.number="detail.product.cert1_id">
+                                            <option value=""></option>
+                                            <template v-for="cert in detail.product_cert_list">
+                                                <option :value="cert.id">{{cert.name}}</option>
+                                            </template>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-xs-3">
+                                <div class="form-group">
+                                    <label for="product_cert2_id" class="col-xs-4 control-label">商品认证2：</label>
+                                    <div class="col-xs-8">
+                                        <select id="product_cert2_id" name="detail.product.cert2_id" class="input-sm form-control" v-model.number="detail.product.cert2_id">
+                                            <option value=""></option>
+                                            <template v-for="cert in detail.product_cert_list">
+                                                <option :value="cert.id">{{cert.name}}</option>
+                                            </template>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-xs-3">
+                                <div class="form-group">
+                                    <label for="product_cert3_id" class="col-xs-4 control-label">商品认证3：</label>
+                                    <div class="col-xs-8">
+                                        <select id="product_cert3_id" name="detail.product.cert3_id" class="input-sm form-control" v-model.number="detail.product.cert3_id">
+                                            <option value=""></option>
+                                            <template v-for="cert in detail.product_cert_list">
+                                                <option :value="cert.id">{{cert.name}}</option>
+                                            </template>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+
+                            <div class="col-xs-3">
+                                <div class="form-group">
+                                    <label for="length" class="col-xs-4 control-label">长(cm)</label>
+                                    <div class="col-xs-8">
+                                        <input id="length" name="detail.product.length" type="text" class="input-sm form-control" v-model.number="detail.product.length"/>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-xs-3">
+                                <div class="form-group">
+                                    <label for="width" class="col-xs-4 control-label">宽(cm)</label>
+                                    <div class="col-xs-8">
+                                        <input id="width" name="detail.product.width" type="text" class="input-sm form-control" v-model.number="detail.product.width"/>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-xs-3">
+                                <div class="form-group">
+                                    <label for="height" class="col-xs-4 control-label">高(cm)</label>
+                                    <div class="col-xs-8">
+                                        <input id="height" name="detail.product.height" type="text" class="input-sm form-control" v-model.number="detail.product.height"/>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-xs-3">
+                                <div class="form-group">
+                                    <label for="weight" class="col-xs-4 control-label">重量(kg)</label>
+                                    <div class="col-xs-8">
+                                        <input id="weight" name="detail.product.weight" type="text" class="input-sm form-control" v-model.number="detail.product.weight"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+
+                            <div class="col-xs-3">
+                                <div class="form-group">
+                                    <label for="product_style_id" class="col-xs-4 control-label">商品款式：</label>
+                                    <div class="col-xs-8">
+                                        <select id="product_style_id" name="detail.product.style_id" class="input-sm form-control" v-model.number="detail.product.style_id">
+                                            <option value=""></option>
+                                            <template v-for="style in detail.product_style_list">
+                                                <option :value="style.id">{{style.name}}</option>
+                                            </template>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-xs-3">
+                                <div class="form-group">
+                                    <label for="product_status_id" class="col-xs-4 control-label">状态：</label>
+                                    <div class="col-xs-8">
+                                        <select id="product_status_id" name="detail.product.status_id" class="input-sm form-control" v-model.number="detail.product.status_id">
+                                            <template v-for="status in detail.status_list">
+                                                <option :value="status.id">{{status.name}}</option>
+                                            </template>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {%/*
+                            <div class="col-xs-3">
+                                <div class="form-group">
+                                    <label for="need_invoice" class="col-xs-4 control-label">是否开票：</label>
+                                    <div class="col-xs-8">
+                                        <select id="need_invoice" name="detail.product.need_invoice" class="input-sm form-control" v-model.number="detail.product.need_invoice">
+                                            <option :value="0">否</option>
+                                            <option :value="1">是</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            */%}
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-6">
+                                <div class="form-group">
+                                    <label for="product_desc" class="col-xs-2 control-label">描述：</label>
+                                    <div class="col-xs-10">
+                                        <textarea id="product_desc" name="detail.product.desc" rows="3" class="input-sm form-control" v-model="detail.product.desc"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                    {% if .can_save %}
+                    <hr/>
+                    <div class="row">
+                        <div class="col-xs-12" style="text-align: right;">
+                            <button type="button" class="btn btn-success btn-sm" @click="saveProduct">
+                                <i class="ace-icon fa fa-floppy-o"></i>保存
+                            </button>
+                        </div>
+                    </div>
+                    {% end %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{%template "erp/kcgl/product/product_edit.var" .%}
+<script type="text/javascript">
+
+    var vm = new Vue({
+        el: "#product_detail",
+        data: {
+            "detail": {
+                "product": {},
+                "product_image_list": [],
+                "order_item_list": [],
+                "message_list": [],
+                "product_log_list": [],
+                "product_style_list": [],
+                "product_cert_list": []
+            }
+        },
+        mounted: function () {
+            var this_vm = this;
+
+            $.ajax(
+                {
+                    "type": "POST",
+                    "dataType": 'json',
+                    "url": '{% url "ErpProduct.DetailData"%}',
+                    "data": {
+                        "id": product_id
+                    },
+                    "success": function (data) {
+                        if (data.success == false) {
+                            $.msg.error(data.message);
+                            return;
+                        }
+                        this_vm.detail = data;
+
+                        this_vm.detail.product.length = parseFloat(dtFormatFloat(this_vm.detail.product.length));
+                        this_vm.detail.product.width = parseFloat(dtFormatFloat(this_vm.detail.product.width));
+                        this_vm.detail.product.height = parseFloat(dtFormatFloat(this_vm.detail.product.height));
+                        this_vm.detail.product.weight = parseFloat(dtFormatFloat(this_vm.detail.product.weight));
+                        this_vm.detail.product.cost_price = parseFloat(dtFormatFloat(this_vm.detail.product.cost_price));
+                    }
+                });
+        },
+        methods: {
+            saveProduct: function () {
+                showMask("提交中...");
+                var form = $("#productDetailForm");
+                var valid = validate(form, {
+                    'detail.product.sku': {
+                        required: true, minlength: 2, maxlength: 100
+                    },
+                    'detail.product.cn_name': {
+                        required: true, minlength: 2, maxlength: 100
+                    },
+                    'detail.product.name': {
+                        required: true, minlength: 2, maxlength: 100
+                    },
+                    'detail.product.cate_id': {
+                        required: false, digits: true
+                    },
+                    'detail.product.cost_price': {
+                        required: true, number: true
+                    },
+                    'detail.product.weight': {
+                        required: true, number: true
+                    },
+                    'detail.product.supplier_id': {
+                        required: false, digits: true
+                    },
+                    'detail.product.pkg_mtrl_id': {
+                        required: false, digits: true
+                    },
+                    'detail.product.status_id': {
+                        required: true, digits: true
+                    }
+                });
+
+                if (!valid) {
+                    hideMask();
+                } else {
+                    $.ajax({
+                            url: '{%url "ErpProduct.Save"%}',
+                            type: "POST",
+                            processData: false,
+                            contentType: 'application/json',
+                            data: JSON.stringify(vm.detail.product),
+                            success: function (data) {
+                                hideMask();
+                                if (data.success === false) {
+                                    $.msg.error(data.message);
+                                    //return;
+                                }
+                                else {
+                                    vm.detail.product = data.product;
+
+                                    vm.detail.product.length = parseFloat(dtFormatFloat(vm.detail.product.length));
+                                    vm.detail.product.width = parseFloat(dtFormatFloat(vm.detail.product.width));
+                                    vm.detail.product.height = parseFloat(dtFormatFloat(vm.detail.product.height));
+                                    vm.detail.product.weight = parseFloat(dtFormatFloat(vm.detail.product.weight));
+                                    vm.detail.product.cost_price = parseFloat(dtFormatFloat(vm.detail.product.cost_price));
+
+                                    $.msg.show(data.message);
+
+                                    if (data.is_create === true) {
+                                        setTimeout("window.location.href='/product/edit/" + data.product.id + "'", 1000) //重新打开已保存好的商品的编辑页面
+                                    }
+                                    //return;
+                                }
+                            }
+                        }
+                    );
+                }
+            }
+        }
+    });
+</script>
+{% site_footer %}
+

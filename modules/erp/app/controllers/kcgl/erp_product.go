@@ -30,6 +30,9 @@ func (c ErpProduct) Index() revel.Result {
 
 	db_session := c.DbSession
 	var product_cate_list = product_cate_service.GetProductCateSelectItemList(db_session)
+
+	c.RenderArgs["can_save"] = pass_service.Is_login_user_has_pass(pass_res.KCGL_PRODUCT_DETAIL_SAVE, c.Session)
+
 	c.RenderArgs["product_cate_list"] = product_cate_list
 	return c.RenderTemplate("erp/kcgl/product/product_index.html")
 }
@@ -191,6 +194,18 @@ func (c ErpProduct) Detail(product_id int64) revel.Result {
 	c.RenderArgs["is_create"] = product_id == 0
 
 	return c.RenderTemplate("erp/kcgl/product/product_detail.html")
+}
+
+func (c ErpProduct) Edit(product_id int64) revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_PRODUCT_DETAIL_SAVE, c.Session)
+
+	c.RenderArgs["can_save"] = pass_service.Is_login_user_has_pass(pass_res.KCGL_PRODUCT_DETAIL_SAVE, c.Session)
+
+	c.RenderArgs["product_id"] = product_id
+
+	c.RenderArgs["is_create"] = product_id == 0
+
+	return c.RenderTemplate("erp/kcgl/product/product_edit.html")
 }
 
 func (c ErpProduct) DetailData() revel.Result {

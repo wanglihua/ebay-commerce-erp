@@ -21,6 +21,12 @@
                         <i class="ace-icon fa fa-plus"></i>
                         新增
                     </button>
+                    {% if .can_save %}
+                    <button class="btn btn-pink btn-sm" @click="showProductEdit()">
+                        <i class="ace-icon fa fa-pencil"></i>
+                        编辑
+                    </button>
+                    {% end %}
                     <button class="btn btn-danger btn-sm" @click="deleteProduct()">
                         <i class="ace-icon fa fa-trash-o"></i>
                         删除
@@ -244,7 +250,25 @@
             },
             showProductDetail: function (product_id) {
                 var url = '{% url "ErpProduct.Detail" 0 %}';
-                window.open(url, "_blank");
+                window.open(url, "product_detail");
+            },
+            showProductEdit: function () {
+                var id_list = [];
+                $('#productList tbody tr>td:first-child input:checkbox').each(function () {
+                    if (this.checked) {
+                        id_list.push($(this).val());
+                    }
+                });
+
+                if (id_list.length !== 1) {
+                    $.msg.alert("请选择一条数据进行编辑！");
+                    return;
+                }
+
+                var product_id = id_list[0];
+
+                var url = '/product/edit/' + product_id;
+                window.open(url, "product_edit");
             },
             showProductLog: function () {
                 window.location.href = "/product/log";
