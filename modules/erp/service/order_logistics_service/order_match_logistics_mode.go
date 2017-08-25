@@ -486,12 +486,11 @@ func (p_ol *OrderLogisticsService) match_logistics_mode_with_option(p_order *ddl
 				side_length_slice.Sort()
 				var mid_length = side_length_slice[1] // 0, 1, 2 中间那条边
 
-				const MIN_FLOAT_DIFF = 0.0000000001
-				if (math.Abs(mid_length - mode_result.length)) < MIN_FLOAT_DIFF {
+				if (math.Abs(mid_length - mode_result.length)) < core.FLOAT_MIN_DIFF {
 					mode_result.length = mode_result.length * logistics_setting.Pphzbzl
-				} else if (math.Abs(mid_length - mode_result.width)) < MIN_FLOAT_DIFF {
+				} else if (math.Abs(mid_length - mode_result.width)) < core.FLOAT_MIN_DIFF {
 					mode_result.width = mode_result.width * logistics_setting.Pphzbzl
-				} else if (math.Abs(mid_length - mode_result.height)) < MIN_FLOAT_DIFF {
+				} else if (math.Abs(mid_length - mode_result.height)) < core.FLOAT_MIN_DIFF {
 					mode_result.height = mode_result.height * logistics_setting.Pphzbzl
 				}
 

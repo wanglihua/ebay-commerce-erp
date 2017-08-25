@@ -46,21 +46,19 @@ func Insert_product_log(product_from_ui *kcgl_models.ProductInfo /*更新操作�
 			operation_list = append(operation_list, fmt.Sprintf("描述: %s => %s", product_in_db.Desc.String, product_from_ui.Desc.String))
 		}
 
-		const float_diff = 0.0000001
-
-		if math.Abs(product_in_db.Length-product_from_ui.Length) > float_diff {
+		if math.Abs(product_in_db.Length-product_from_ui.Length) > core.FLOAT_MIN_DIFF {
 			operation_list = append(operation_list, fmt.Sprintf("长: %0.2f => %0.2f", product_in_db.Length, product_from_ui.Length))
 		}
 
-		if math.Abs(product_in_db.Width-product_from_ui.Width) > float_diff {
+		if math.Abs(product_in_db.Width-product_from_ui.Width) > core.FLOAT_MIN_DIFF {
 			operation_list = append(operation_list, fmt.Sprintf("宽: %0.2f => %0.2f", product_in_db.Width, product_from_ui.Width))
 		}
 
-		if math.Abs(product_in_db.Height-product_from_ui.Height) > float_diff {
+		if math.Abs(product_in_db.Height-product_from_ui.Height) > core.FLOAT_MIN_DIFF {
 			operation_list = append(operation_list, fmt.Sprintf("高: %0.2f => %0.2f", product_in_db.Height, product_from_ui.Height))
 		}
 
-		if math.Abs(product_in_db.Weight-product_from_ui.Weight) > float_diff {
+		if math.Abs(product_in_db.Weight-product_from_ui.Weight) > core.FLOAT_MIN_DIFF {
 			operation_list = append(operation_list, fmt.Sprintf("重量: %0.2f => %0.2f", product_in_db.Weight, product_from_ui.Weight))
 		}
 
