@@ -8,6 +8,7 @@ import (
 	"github.com/revel/revel"
 	"matrix/core"
 	"matrix/modules/erp/models/kcgl_models"
+	"math"
 )
 
 // 插入商品日志
@@ -25,7 +26,12 @@ func Insert_product_log(product_from_ui *kcgl_models.ProductInfo /*更新操作�
 		product_log.Operation = "删除数据"
 	} else if operation_type == core.Db_operation_types.Insert {
 		//获得详细的插入数据
-		product_log.Operation = "插入数据"
+		var operation_list = make([]string, 0)
+		operation_list = append(operation_list, fmt.Sprintf("长: %0.2f", product_from_ui.Length))
+		operation_list = append(operation_list, fmt.Sprintf("宽: %0.2f", product_from_ui.Width))
+		operation_list = append(operation_list, fmt.Sprintf("高: %0.2f", product_from_ui.Height))
+		operation_list = append(operation_list, fmt.Sprintf("重量: %0.2f", product_from_ui.Weight))
+		product_log.Operation = "插入数据， " + strings.Join(operation_list, ",")
 	} else if operation_type == core.Db_operation_types.Update {
 		//获得详细的字段修改数据
 		product_log.Operation = "更新数据。"
@@ -39,6 +45,25 @@ func Insert_product_log(product_from_ui *kcgl_models.ProductInfo /*更新操作�
 		if product_in_db.Desc != product_from_ui.Desc {
 			operation_list = append(operation_list, fmt.Sprintf("描述: %s => %s", product_in_db.Desc.String, product_from_ui.Desc.String))
 		}
+
+		const float_diff = 0.0000001
+
+		if math.Abs(product_in_db.Length-product_from_ui.Length) > float_diff {
+			operation_list = append(operation_list, fmt.Sprintf("长: %0.2f => %0.2f", product_in_db.Length, product_from_ui.Length))
+		}
+
+		if math.Abs(product_in_db.Width-product_from_ui.Width) > float_diff {
+			operation_list = append(operation_list, fmt.Sprintf("宽: %0.2f => %0.2f", product_in_db.Width, product_from_ui.Width))
+		}
+
+		if math.Abs(product_in_db.Height-product_from_ui.Height) > float_diff {
+			operation_list = append(operation_list, fmt.Sprintf("高: %0.2f => %0.2f", product_in_db.Height, product_from_ui.Height))
+		}
+
+		if math.Abs(product_in_db.Weight-product_from_ui.Weight) > float_diff {
+			operation_list = append(operation_list, fmt.Sprintf("重量: %0.2f => %0.2f", product_in_db.Weight, product_from_ui.Weight))
+		}
+
 		product_log.Operation += strings.Join(operation_list, ", ")
 
 		//todo: 可以继续补充其它详细信息

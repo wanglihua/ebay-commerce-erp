@@ -13,6 +13,7 @@ import (
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/models/kcgl_models"
+	"matrix/modules/erp/service/product_log_service"
 )
 
 type ErpProductWeight struct {
@@ -126,6 +127,8 @@ func (c ErpProductWeight) Save() revel.Result {
 		})
 	}
 
+	var product_in_db_befor_modify = product_in_db
+
 	product_in_db.Length = detail_form.Product.Length
 	product_in_db.Width = detail_form.Product.Width
 	product_in_db.Height = detail_form.Product.Height
@@ -141,6 +144,8 @@ func (c ErpProductWeight) Save() revel.Result {
 			"message": "商品长宽高重量数据未能更新！",
 		})
 	}
+
+	product_log_service.Insert_product_log(&detail_form.Product, &product_in_db_befor_modify, core.Db_operation_types.Update, db_session, c.Session)
 
 	return c.RenderJson(map[string]interface{}{
 		"success": true,
