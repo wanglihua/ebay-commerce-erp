@@ -250,6 +250,7 @@
                             </div>
                         </div>
                         <div class="row">
+
                             <div class="col-xs-6">
                                 <div class="form-group">
                                     <label for="product_desc" class="col-xs-2 control-label">描述：</label>
@@ -258,6 +259,16 @@
                                     </div>
                                 </div>
                             </div>
+
+                            <div class="col-xs-6">
+                                <div class="form-group">
+                                    <label for="postage_url" class="col-xs-2 control-label">Postage URL：</label>
+                                    <div class="col-xs-10">
+                                        <input id="postage_url" name="postage_url" type="text" class="input-sm form-control" :value="'http://wollongzone.cn/postage/' + detail.product.sku" disabled="disabled"/>
+                                    </div>
+                                </div>
+                            </div>
+
                         </div>
                     </form>
                 </div>
@@ -485,7 +496,7 @@
                         "id": product_id
                     },
                     "success": function (data) {
-                        if (data.success == false) {
+                        if (data.success === false) {
                             $.msg.error(data.message);
                             return;
                         }

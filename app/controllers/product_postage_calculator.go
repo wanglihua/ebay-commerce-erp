@@ -30,6 +30,13 @@ func (c ProductPostageCalculator) Post() revel.Result {
 	c.Params.Bind(&postcode, "postcode")
 	postcode = strings.TrimSpace(postcode)
 
+	if postcode == "" {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "please input postcode",
+		})
+	}
+
 	var err, fee = product_logistics_service.Match_product_postage(sku, postcode, db_session)
 
 	if err != nil {
