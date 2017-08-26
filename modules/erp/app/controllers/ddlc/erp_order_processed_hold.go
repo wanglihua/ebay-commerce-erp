@@ -51,7 +51,7 @@ func (c ErpOrderProcessedHold) PageData() revel.Result {
 	var db_session = c.DbSession
 
 	// 获得导入的批次列表
-	var batch_code_list = order_import_batch_service.Get_order_import_batch_code_list(models.ORDER_STATUS_PROCESSED_HOLD, db_session)
+	var batch_code_list = order_import_batch_service.Get_order_import_batch_code_list_limit_100(models.ORDER_STATUS_PROCESSED_HOLD, db_session)
 
 	// hold类型列表
 	var exclude_hold = fmt.Sprintf("%d,%d,%d,%d", ddpz_models.ORDER_HOLD_TYPE_ENVELOPE, ddpz_models.ORDER_HOLD_TYPE_EXPRESS, ddpz_models.ORDER_HOLD_TYPE_INTERNATIONAL, ddpz_models.ORDER_HOLD_TYPE_PICK_UP)

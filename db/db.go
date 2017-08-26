@@ -4,7 +4,7 @@ import (
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
-	//xorm_core "github.com/go-xorm/core"
+	xorm_core "github.com/go-xorm/core"
 	"github.com/go-xorm/xorm"
 	"github.com/revel/revel"
 	"runtime/debug"
@@ -34,11 +34,10 @@ func InitDatabase() {
 	Engine.SetMaxIdleConns(3)   //最小
 	Engine.SetMaxOpenConns(100) //最大
 
-	/*
 	if revel.DevMode == true {
 		Engine.ShowSQL()
 		Engine.ShowExecTime()
 		xorm_core.LogQuerySql = true
 	}
-	*/
+
 }

@@ -57,7 +57,7 @@ func (c ErpOrderLogisticsFeeDiff) PageData() revel.Result {
 	core.HandleError(err)
 
 	// 获得导入的批次列表
-	var batch_code_list = order_import_batch_service.Get_order_import_batch_code_list(0, db_session)
+	var batch_code_list = order_import_batch_service.Get_order_import_batch_code_list_limit_100(0, db_session)
 
 	var fee_diff_type_list = make([]fee_diff_type_t, 0)
 	fee_diff_type_list = append(fee_diff_type_list, fee_diff_type_t{Code: FEE_DIFF_ACTUAL_FEE_GREATER, Name: "实际费用大于预估"})

@@ -15,7 +15,6 @@ import (
 	"matrix/modules/erp/service/shop_service"
 	"matrix/modules/erp/service/status_service"
 	"matrix/modules/erp/service/stock_service"
-	"github.com/revel/revel"
 	"matrix/modules/erp/models/ddlc_models"
 	"matrix/modules/erp/models/ddpz_models"
 )
@@ -117,17 +116,17 @@ FROM erp_order o
 		order_list[index].TypeName = order_type_id_name_map[order.Order.TypeId]
 
 		// HoldTypeName 暂时两者共用吧，一般不会两者同时要用
-		revel.TRACE.Println("order.Order.PreHoldTypeId", order.Order.PreHoldTypeId)
+		// revel.TRACE.Println("order.Order.PreHoldTypeId", order.Order.PreHoldTypeId)
 		if order.Order.PreHoldTypeId != 0 {
 			order_list[index].HoldTypeName = hold_type_id_name_map[order.Order.PreHoldTypeId]
 		}
 
-		revel.TRACE.Println("order.Order.HoldTypeId.Int64", order.Order.HoldTypeId.Int64)
+		// revel.TRACE.Println("order.Order.HoldTypeId.Int64", order.Order.HoldTypeId.Int64)
 		if order.Order.HoldTypeId.Valid == true && order.Order.HoldTypeId.Int64 != 0 {
 			order_list[index].HoldTypeName = hold_type_id_name_map[order.Order.HoldTypeId.Int64]
 		}
 
-		revel.TRACE.Println("order_list[index].HoldTypeName", order_list[index].HoldTypeName)
+		// revel.TRACE.Println("order_list[index].HoldTypeName", order_list[index].HoldTypeName)
 
 		var platform_shop_name = platform_shop_id_name_map[order.Order.ShopId]
 		order_list[index].PlatformName = platform_shop_name.PlatformName
@@ -157,9 +156,9 @@ FROM erp_order o
 		}
 
 		if order_logistics.Id != 0 {
-			revel.TRACE.Println("order_logistics.ActualFee: ", order_logistics.ActualFee)
-			revel.TRACE.Println("order_logistics.TotalFee: ", order_logistics.TotalFee)
-			revel.TRACE.Println("order_logistics.ActualFee - order_logistics.TotalFee: ", order_logistics.ActualFee-order_logistics.TotalFee)
+			// revel.TRACE.Println("order_logistics.ActualFee: ", order_logistics.ActualFee)
+			// revel.TRACE.Println("order_logistics.TotalFee: ", order_logistics.TotalFee)
+			// revel.TRACE.Println("order_logistics.ActualFee - order_logistics.TotalFee: ", order_logistics.ActualFee-order_logistics.TotalFee)
 			if order_logistics.ActualFee != 0 {
 				order_list[index].FeeDiff = order_logistics.ActualFee - order_logistics.TotalFee
 			}

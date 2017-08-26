@@ -6,13 +6,14 @@ import (
 	"fmt"
 )
 
-func Get_order_import_batch_code_list(status_id int64, db_session *xorm.Session) []int64 {
+// 只取最近的 100 个批次
+func Get_order_import_batch_code_list_limit_100(status_id int64, db_session *xorm.Session) []int64 {
 	// 获得导入的批次列表
 	type batch_code_t struct {
 		BatchCode int64 `xorm:"'batch_code'"`
 	}
 
-	// SELECT DISTINCT batch_code FROM erp_order WHERE batch_code IS NOT NULL AND batch_code <> 0 AND status_id = 0 ORDER BY batch_code DESC;
+	// SELECT DISTINCT batch_code FROM erp_order WHERE batch_code IS NOT NULL AND batch_code <> 0 AND status_id = 0 ORDER BY batch_code DESC LIMIT 100;
 
 	var sb = core.NewSqlBuilder()
 	sb.Select("DISTINCT batch_code")
@@ -25,6 +26,7 @@ func Get_order_import_batch_code_list(status_id int64, db_session *xorm.Session)
 
 	sb.Where(filter)
 	sb.OrderBy("batch_code DESC")
+	sb.Limit(0, 100) // 只取最近的 100 个批次
 
 	var batch_code_t_list = make([]batch_code_t, 0)
 	err := db_session.Sql(sb.SqlList()).Find(&batch_code_t_list)

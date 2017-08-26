@@ -145,12 +145,23 @@
                                         <option :value="shop.id">{{shop.name}}</option>
                                     </template>
                                 </select>
+
                                 <select id="order_type_id" name="page.order_type_id" v-model.number="page.order_type_id" style="width:120px;">
                                     <option value="0">-订单类型-</option>
                                     <template v-for="order_type in page.order_type_list">
                                         <option :value="order_type.id">{{order_type.name}}</option>
                                     </template>
                                 </select>
+
+                                {% if eq .status "ywc"%}
+                                <select id="hold_type_id" name="page.hold_type_id" v-model.number="page.hold_type_id" style="width:120px;">
+                                    <option value="0">-Hold类型-</option>
+                                    <template v-for="hold_type in page.hold_type_list">
+                                        <option :value="hold_type.id">{{hold_type.name}}</option>
+                                    </template>
+                                </select>
+                                {% end %}
+
                                 {% if eq .status "all"%}
                                 <select id="status_id" name="page.status_id" v-model.number="page.status_id" style="width:120px;">
                                     <option value="0">-订单状态-</option>
@@ -159,6 +170,7 @@
                                     </template>
                                 </select>
                                 {% end %}
+
                                 {%/*
                                 <select id="batch_code" name="page.batch_code" v-model.number="page.batch_code" style="width: 135px;" @change="refreshList()">
                                     <option :value="0">-导入批次号-</option>
@@ -200,8 +212,8 @@
                             </div>
                             {% if eq .status "dph" %}
                             <div class="link_query_list" style="float: left;margin-left: 15px;margin-top: -3px;">
-                                <template v-for="hold_type in page.hold_type_list">
-                                    <a :class="page.hold_type_id == hold_type.id ? 'selected' : ''" href="#" @click="selectHoldType(hold_type.id)">&nbsp;<img style="border: none;height: 24px;" v-if="hold_type.icon_file != ''" :src="'{%.icon_path%}/' + hold_type.icon_file" :alt="hold_type.name" class="link_icon"/>{{hold_type.name}}</a>
+                                <template v-for="hold_type in page.special_hold_type_list">
+                                    <a :class="page.special_hold_type_id == hold_type.id ? 'selected' : ''" href="#" @click="selectHoldType(hold_type.id)">&nbsp;<img style="border: none;height: 24px;" v-if="hold_type.icon_file != ''" :src="'{%.icon_path%}/' + hold_type.icon_file" :alt="hold_type.name" class="link_icon"/>{{hold_type.name}}</a>
                                 </template>
                             </div>
                             {% end %}
@@ -469,8 +481,10 @@
                 "query_criteria_value": "",
                 "good_query_id": 0,
                 "good_query_list": [],
+                "special_hold_type_list": [],
+                "special_hold_type_id": -1,
                 "hold_type_list": [],
-                "hold_type_id": -1,
+                "hold_type_id": 0,
                 "query_begin_time": "",
                 "query_end_time": "",
                 "order_tag_id": 0,
@@ -725,6 +739,7 @@
                         aoData.push({'name': 'query_criteria_id', 'value': this_vm.page.query_criteria_id});
                         aoData.push({'name': 'query_criteria_value', 'value': this_vm.page.query_criteria_value});
                         aoData.push({'name': 'good_query_id', 'value': this_vm.page.good_query_id});
+                        aoData.push({'name': 'special_hold_type_id', 'value': this_vm.page.special_hold_type_id});
                         aoData.push({'name': 'hold_type_id', 'value': this_vm.page.hold_type_id});
                         //aoData.push({'name': 'query_begin_time', 'value': this_vm.page.query_begin_time});
                         //aoData.push({'name': 'query_end_time', 'value': this_vm.page.query_end_time});
@@ -853,12 +868,12 @@
                 refreshList("#orderList");
             },
             search: function () {
-                vm.page.hold_type_id = -1;
+                vm.page.special_hold_type_id = -1;
                 var tables = $("#orderList").dataTable().api();
                 tables.draw(true);
             },
             selectHoldType: function (selected_hold_type_id) {
-                vm.page.hold_type_id = selected_hold_type_id;
+                vm.page.special_hold_type_id = selected_hold_type_id;
                 vm.refreshList();
             },
             matchLogistics: function () {

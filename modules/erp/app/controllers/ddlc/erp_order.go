@@ -225,7 +225,7 @@ func (c ErpOrder) PageData() revel.Result {
 	db_session := c.DbSession
 
 	// 获得导入的批次列表
-	var batch_code_list = order_import_batch_service.Get_order_import_batch_code_list(status_id, db_session)
+	var batch_code_list = order_import_batch_service.Get_order_import_batch_code_list_limit_100(status_id, db_session)
 
 	shop_list := shop_service.Get_shop_select_item_list(db_session)
 
@@ -248,29 +248,34 @@ func (c ErpOrder) PageData() revel.Result {
 	}
 	core.HandleError(err)
 
+	var hold_type_list = make([]ddpz_models.OrderHoldTypeInfo, 0)
+	core.HandleError(db_session.Find(&hold_type_list))
+
 	var order_tag_list = make([]ddpz_models.OrderTagInfo, 0)
 	err = db_session.OrderBy("name ASC").Find(&order_tag_list)
 	core.HandleError(err)
 
 	return c.RenderJson(map[string]interface{}{
-		"shop_id":             0,
-		"shop_list":           shop_list,
-		"order_type_id":       0,
-		"order_type_list":     order_type_list,
-		"status_id":           0,
-		"status_list":         status_list,
-		"query_criteria_id":   0,
-		"query_criteria_list": c.get_order_query_criteria_list(),
-		"good_query_id":       0,
-		"good_query_list":     c.get_good_query_list(),
-		"hold_type_list":      special_hold_type_list,
-		"hold_type_id":        -1, // 表示不选择 hold
-		"batch_code":          0,
-		"batch_code_list":     batch_code_list,
-		"order_tag_id":        0,
-		"order_tag_list":      order_tag_list,
-		"time_query_id":       time_query_paid_time,
-		"time_query_list":     c.get_time_query_list(),
+		"shop_id":                0,
+		"shop_list":              shop_list,
+		"order_type_id":          0,
+		"order_type_list":        order_type_list,
+		"status_id":              0,
+		"status_list":            status_list,
+		"query_criteria_id":      0,
+		"query_criteria_list":    c.get_order_query_criteria_list(),
+		"good_query_id":          0,
+		"good_query_list":        c.get_good_query_list(),
+		"special_hold_type_list": special_hold_type_list,
+		"special_hold_type_id":   -1, // 表示不选择 hold
+		"hold_type_list":         hold_type_list,
+		"hold_type_id":           0,
+		"batch_code":             0,
+		"batch_code_list":        batch_code_list,
+		"order_tag_id":           0,
+		"order_tag_list":         order_tag_list,
+		"time_query_id":          time_query_paid_time,
+		"time_query_list":        c.get_time_query_list(),
 	})
 }
 
@@ -294,6 +299,9 @@ func (c ErpOrder) ListData() revel.Result {
 
 	var order_type_id int64 = 0
 	c.Params.Bind(&order_type_id, "order_type_id")
+
+	var special_hold_type_id int64 = 0
+	c.Params.Bind(&special_hold_type_id, "special_hold_type_id")
 
 	var hold_type_id int64 = 0
 	c.Params.Bind(&hold_type_id, "hold_type_id")
@@ -388,7 +396,7 @@ func (c ErpOrder) ListData() revel.Result {
 		status_id == models.ORDER_STATUS_YWC ||
 		(
 			status_id == models.ORDER_STATUS_HOLD &&
-				hold_type_id == ddpz_models.ORDER_HOLD_TYPE_PICK_UP) {
+				special_hold_type_id == ddpz_models.ORDER_HOLD_TYPE_PICK_UP) {
 		// 不同的仓库拣货人员可以看到不同的订单，管理员、销售、客服 除外
 		var login_user = core.GetLoginUser(c.Session)
 		var is_admin = pass_service.Is_user_admin(login_user.UserId)                   // 是不是管理员
@@ -456,12 +464,12 @@ func (c ErpOrder) ListData() revel.Result {
 
 	// hold 订单 有了一个专门的 hold状态， 也有专门的 hold 状态的页面，在这里就不用多考虑了  ??
 	/*
-	if hold_type_id == 0 { //取不是hold的订单
+	if special_hold_type_id == 0 { //取不是hold的订单
 		filter = core.SqlAnd(filter, "o.hold_type_id IS NULL")
-	} else if hold_type_id == -1 { //取hold的所有订单
+	} else if special_hold_type_id == -1 { //取hold的所有订单
 		filter = core.SqlAnd(filter, "o.hold_type_id IS NOT NULL")
 	} else { //取得具体 hold 的订单类型
-		filter = core.SqlAnd(filter, fmt.Sprintf("o.hold_type_id = %d", hold_type_id))
+		filter = core.SqlAnd(filter, fmt.Sprintf("o.hold_type_id = %d", special_hold_type_id))
 	}
 	*/
 
@@ -469,14 +477,14 @@ func (c ErpOrder) ListData() revel.Result {
 		// 如果是待配货状态，除了显示待配货状态的订单外，还要显示特殊 hold 类型的 hold 状态的订单，但如果是只有仓库拣货人员的权限的话，就只能由墨尔本仓库的拣货人员来查看
 		if status_id == models.ORDER_STATUS_DPH {
 
-			if can_view_special_hold(c.Session, db_session) || hold_type_id == ddpz_models.ORDER_HOLD_TYPE_PICK_UP { // 是待配货状态，且也有权限查看 hold, // pickup 的任何人员都可以看到
+			if can_view_special_hold(c.Session, db_session) || special_hold_type_id == ddpz_models.ORDER_HOLD_TYPE_PICK_UP { // 是待配货状态，且也有权限查看 hold, // pickup 的任何人员都可以看到
 				// -1 表示不选中任何 hold
-				if hold_type_id == -1 { // 不选中任何 hold 时，只显示 DPH 的订单
+				if special_hold_type_id == -1 { // 不选中任何 hold 时，只显示 DPH 的订单
 					filter = core.SqlAnd(filter, fmt.Sprintf("o.status_id = %d", models.ORDER_STATUS_DPH))
-				} else if hold_type_id == 0 { // 0 表示全选全部的 hold
+				} else if special_hold_type_id == 0 { // 0 表示全选全部的 hold
 					filter = core.SqlAnd(filter, fmt.Sprintf("o.status_id = %d AND o.hold_type_id IN (%s)", models.ORDER_STATUS_HOLD, strings.Join(core.Int_list_to_str_list(special_hold_type_id_list), ",")))
-				} else if hold_type_id > 0 { // 选中了具体的 hold类型
-					filter = core.SqlAnd(filter, fmt.Sprintf("o.status_id = %d AND o.hold_type_id = %d", models.ORDER_STATUS_HOLD, hold_type_id))
+				} else if special_hold_type_id > 0 { // 选中了具体的 hold类型
+					filter = core.SqlAnd(filter, fmt.Sprintf("o.status_id = %d AND o.hold_type_id = %d", models.ORDER_STATUS_HOLD, special_hold_type_id))
 				}
 			} else { // 是待配货状态，但没有权限查看 hold
 				filter = core.SqlAnd(filter, fmt.Sprintf("o.status_id = %d", status_id))
@@ -484,6 +492,14 @@ func (c ErpOrder) ListData() revel.Result {
 		} else {
 			// 不是 待配货状态
 			filter = core.SqlAnd(filter, fmt.Sprintf("o.status_id = %d", status_id))
+		}
+	}
+
+	revel.TRACE.Println("hold_type_id", hold_type_id)
+	if status_id == models.ORDER_STATUS_YWC {
+		revel.TRACE.Println("hold_type_id", hold_type_id)
+		if hold_type_id != 0 {
+			filter = core.SqlAnd(filter, fmt.Sprintf("o.hold_type_id = %d", hold_type_id))
 		}
 	}
 

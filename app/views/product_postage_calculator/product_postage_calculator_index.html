@@ -29,11 +29,12 @@
                 },
                 success: function (data) {
                     if (data.success === false) {
-                        alert(data.message);
+                        $("#postage").html(data.message);
                         return;
                     }
                     else {
                         $("#postage").html(data.fee);
+                        return;
                     }
                 }
             });

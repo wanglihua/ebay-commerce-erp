@@ -33,7 +33,7 @@ POST /code/gen/query       CodeGenerate.CodeQuery
 GET  /api/calc/logistics/fee      LogisticsFeeApi.Calc
 GET  /api/calc/logistics/fee/test LogisticsFeeApi.Test
 
-GET  /sku/postage/cal             ProductPostageCalculator.Index
+GET  /postage/:sku                ProductPostageCalculator.Index
 POST /sku/postage/cal/post        ProductPostageCalculator.Post
 
 # 禁用自动路由

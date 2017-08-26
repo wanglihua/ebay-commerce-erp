@@ -40,7 +40,7 @@ func (c ErpOrderImport) PageData() revel.Result {
 	var db_session = c.DbSession
 
 	// 获得导入的批次列表
-	var batch_code_list = order_import_batch_service.Get_order_import_batch_code_list(0, db_session)
+	var batch_code_list = order_import_batch_service.Get_order_import_batch_code_list_limit_100(0, db_session)
 
 	return c.RenderJson(map[string]interface{}{
 		"batch_code":      0,
