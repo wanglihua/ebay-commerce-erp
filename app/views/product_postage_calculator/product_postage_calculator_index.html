@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+    <meta charset="utf-8"/>
+    <title></title>
+    <script type="text/javascript" src="/static/ace/js/jquery.min.js"></script>
+</head>
+<body>
+<div>
+    <div>
+        <input id="postcode" name="postcode" placeholder="Enter Postcode"/>
+    </div>
+    <div>
+        <span id="postage"></span>
+    </div>
+    <div>
+        <button onclick="calculate_postage()">CALCULATE</button>
+    </div>
+
+    <script type="text/javascript">
+        function calculate_postage() {
+            $.ajax({
+                url: '{%url "ProductPostageCalculator.Post"%}',
+                type: "POST",
+                data: {
+                    "sku": sku,
+                    "postcode": $("#postcode").val()
+                },
+                success: function (data) {
+                    if (data.success === false) {
+                        alert(data.message);
+                        return;
+                    }
+                    else {
+                        $("#postage").html(data.fee);
+                    }
+                }
+            });
+        }
+    </script>
+
+</div>
+{%template "product_postage_calculator/product_postage_calculator_index.var" .%}
+</body>
+</html>
+

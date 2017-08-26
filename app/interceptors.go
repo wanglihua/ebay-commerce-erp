@@ -117,6 +117,10 @@ func userAuth(c *revel.Controller) revel.Result {
 		return nil
 	}
 
+	if c.Name == "ProductPostageCalculator" {
+		return nil
+	}
+
 	if c.Name == "Barcode" {
 		return nil
 	}
@@ -126,6 +130,10 @@ func userAuth(c *revel.Controller) revel.Result {
 		c.Action == "TrackIssue.ListData" ||
 		c.Action == "TrackIssue.Detail" ||
 		c.Action == "TrackIssue.DetailData" {
+		return nil
+	}
+
+	if c.Action == "Test.Index" {
 		return nil
 	}
 
