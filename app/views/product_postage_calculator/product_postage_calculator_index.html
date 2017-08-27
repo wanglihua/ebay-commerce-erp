@@ -9,47 +9,112 @@
     <script type="text/javascript" src="/static/ace/js/jquery.min.js"></script>
     <script type="text/javascript" src="/static/ace/js/bootstrap.min.js"></script>
 
+    <style type="text/css">
+        body {
+            font-family: "微软雅黑", "Helvetica Neue", Helvetica, Arial, sans-serif;
+            background: black;
+        }
+
+        div#content {
+            width: 300px;
+            margin: 150px auto;
+        }
+
+        div#content h3#title {
+            font-size: 20px;
+            text-align: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        div#content div#div_postcode {
+            margin: 5px 0;
+        }
+
+        div#content input#postcode {
+            width: 300px;
+            height: 40px;
+            line-height: 40px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        div#content div#waiting {
+            margin: 5px 0;
+            color: white;
+        }
+
+        div#content div#div_postage {
+            margin: 5px 0;
+            text-align: center;
+        }
+
+        div#content span#postage {
+            font-size: 18px;
+            color: white;
+        }
+
+        div#content div#div_btn_cal {
+            margin: 5px 0;
+        }
+
+        div#content #btn_cal {
+            width: 300px;
+            height: 40px;
+            line-height: 40px;
+            padding: 0;
+            font-size: 18px;
+            font-weight: bold;
+            background-color: #E46C0A;
+            color: white;
+            border: 0;
+        }
+    </style>
+
 </head>
 <body>
 <div>
-    <div>
-        <input id="postcode" name="postcode" placeholder="Enter Postcode"/>
+    <div id="content">
+        <h3 id="title">POSTAGE CALCULATOR</h3>
+        <div id="div_postcode">
+            <input id="postcode" name="postcode" placeholder="Enter Postcode"/>
+        </div>
+        <div id="waiting" style="display: none;">
+            <i class="fa fa-refresh fa-spin fa-2x fa-fw"></i>
+        </div>
+        <div id="div_postage">
+            <span id="postage"></span>
+        </div>
+        <div id="div_btn_cal">
+            <button id="btn_cal" onclick="calculate_postage()">CALCULATE</button>
+        </div>
     </div>
-    <div id="waiting" style="display: none;">
-        <i class="fa fa-refresh fa-spin fa-2x fa-fw"></i>
-        <span class="sr-only">Loading...</span>
-    </div>
-    <div>
-        <span id="postage"></span>
-    </div>
-    <div>
-        <button onclick="calculate_postage()">CALCULATE</button>
-    </div>
-
-    <script type="text/javascript">
-        function calculate_postage() {
-            $("#waiting").show();
-            $.ajax({
-                url: '{%url "ProductPostageCalculator.Post"%}',
-                type: "POST",
-                data: {
-                    "sku": sku,
-                    "postcode": $("#postcode").val()
-                },
-                success: function (data) {
-                    $("#waiting").hide();
-                    if (data.success === false) {
-                        $("#postage").html(data.message);
-                        return;
-                    }
-                    else {
-                        $("#postage").html(data.fee);
-                        return;
-                    }
+</div>
+<script type="text/javascript">
+    function calculate_postage() {
+        $("#waiting").show();
+        $.ajax({
+            url: '{%url "ProductPostageCalculator.Post"%}',
+            type: "POST",
+            data: {
+                "sku": sku,
+                "postcode": $("#postcode").val()
+            },
+            success: function (data) {
+                $("#waiting").hide();
+                if (data.success === false) {
+                    $("#postage").html(data.message);
+                    return;
                 }
-            });
-        }
-    </script>
+                else {
+                    $("#postage").html(data.fee);
+                    return;
+                }
+            }
+        });
+    }
+</script>
 
 </div>
 {%template "product_postage_calculator/product_postage_calculator_index.var" .%}

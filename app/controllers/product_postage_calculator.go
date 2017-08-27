@@ -49,12 +49,12 @@ func (c ProductPostageCalculator) Post() revel.Result {
 	if fee < 0 {
 		return c.RenderJson(map[string]interface{}{
 			"success": false,
-			"message": "non delivery",
+			"message": "N/A",
 		})
 	}
 
 	return c.RenderJson(map[string]interface{}{
 		"success": true,
-		"fee":     fmt.Sprintf("%0.2f", fee),
+		"fee":     fmt.Sprintf("$%0.2f", fee),
 	})
 }
