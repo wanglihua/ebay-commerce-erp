@@ -166,10 +166,11 @@ func (f *ProductDetailForm) Valid(validation *revel.Validation) bool {
 		validation.MaxSize(f.Product.Sku, 100).Message("SKU长度不能大于100！")
 	}
 
-	validation.Required(f.Product.Name).Message("名称不能为空！")
-	if f.Product.Name != "" {
-		validation.MinSize(f.Product.Name, 2).Message("名称长度不能小于2！")
-	}
+	//validation.Required(f.Product.Name).Message("名称不能为空！")
+	//if f.Product.Name != "" {
+	//	validation.MinSize(f.Product.Name, 2).Message("名称长度不能小于2！")
+	//}
+
 	if f.Product.Name != "" {
 		validation.MaxSize(f.Product.Name, 100).Message("名称长度不能大于100！")
 	}
