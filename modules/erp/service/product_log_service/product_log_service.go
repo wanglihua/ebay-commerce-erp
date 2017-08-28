@@ -15,8 +15,13 @@ import (
 func Insert_product_log(product_from_ui *kcgl_models.ProductInfo /*更新操作时使用*/ , product_in_db *kcgl_models.ProductInfo, operation_type core.Db_operation_type, db_session *xorm.Session, web_session revel.Session) {
 	var product_log kcgl_models.ProductLogInfo
 
-	product_log.ProductId = product_in_db.Id
-	product_log.ProductCode = product_in_db.Sku
+	if product_in_db != nil {
+		product_log.ProductId = product_in_db.Id
+		product_log.ProductCode = product_in_db.Sku
+	} else {
+		product_log.ProductId = product_from_ui.Id
+		product_log.ProductCode = product_from_ui.Sku
+	}
 
 	login_user := core.GetLoginUser(web_session)
 	product_log.UserId = login_user.UserId

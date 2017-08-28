@@ -322,7 +322,7 @@ func (c ErpProduct) Save() revel.Result {
 
 		product_id = product_from_ui.Id // 这是数据库保存后得到得到新生成的 id
 
-		product_log_service.Insert_product_log(nil, &product_from_ui, core.Db_operation_types.Insert, db_session, c.Session)
+		product_log_service.Insert_product_log(&product_from_ui, nil, core.Db_operation_types.Insert, db_session, c.Session)
 	} else {
 		sku_count, err := db_session.Where("id <> ? and sku = ?", product_from_ui.Id, product_from_ui.Sku).Count(new(kcgl_models.ProductInfo))
 		core.HandleError(err)
