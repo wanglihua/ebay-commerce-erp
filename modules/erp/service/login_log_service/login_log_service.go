@@ -65,6 +65,7 @@ func Log_logout(session_key string, db_session *xorm.Session) {
 	sql = fmt.Sprintf(sql, login_user.UserId, session_key)
 	var login_log xtgl_models.LoginLogInfo
 	has, err := db_session.Sql(sql).Get(&login_log)
+
 	if has && err == nil {
 		login_log.LogoutTime = core.Time(time.Now())
 		login_log.OnlineTime = time.Time(login_log.LogoutTime).Sub(time.Time(login_log.LoginTime)).Minutes()
@@ -94,15 +95,28 @@ func Check_user_active(db_session *xorm.Session) {
 
 	var to_remove_login_user_key_map = make(map[string]bool)
 
+	var online_user_key_list = make([]string, 0)
+	for _, online_user := range online_user_list {
+		online_user_key_list = append(online_user_key_list, fmt.Sprintf("'%s'", online_user.Login_user_key))
+	}
+
+	if len(online_user_key_list) != 0 {
+		// 每次检查都更新登出时间， 以免有时退出时登出时间未更新
+		var sql_update_logout_time = `UPDATE erp_login_log
+SET logout_time = now(),
+    online_time = timestampdiff(SECOND, login_time, now()) / 60
+WHERE session_key IN (%s);`
+
+		sql_update_logout_time = fmt.Sprintf(sql_update_logout_time, strings.Join(online_user_key_list, ","))
+		_, err := db_session.Exec(sql_update_logout_time)
+		core.HandleError(err)
+	}
+
 	for _, online_user := range online_user_list {
 		if time.Now().Sub(online_user.Active_time).Minutes() > float64(auth_setting.TimeOut) {
 			// 获得在线登录的用户
 			var login_user core.LoginUser
 			cache.Get(online_user.Login_user_key, &login_user)
-
-			if login_user.NickName == "王利华" {
-				continue
-			}
 
 			// 记录登出日志
 			Log_logout(online_user.Login_user_key, db_session)

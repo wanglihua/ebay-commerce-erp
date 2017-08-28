@@ -71,6 +71,7 @@ func init() {
 
 		// jobs.Now(tasks.PaypalDownloadTask{})
 		jobs.Every(5*time.Second, tasks.UserActiveCheckTask{})
+
 		jobs.Every(time.Second, tasks.SystemLogDateCheckTask{})
 
 		jobs.Every(10*time.Minute, tasks.SiteKeepHotTask{})
