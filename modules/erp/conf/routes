@@ -388,6 +388,8 @@ POST /order/logistics/export2                       ErpOrderLogistics.Export2
 POST /order/logistics/company/export/excel          ErpOrderLogisticsCompanyExport.ExportExcel
 POST /order/logistics/company/export/option/data    ErpOrderLogisticsCompanyExport.ExportOptionData
 
+POST /order/logistics/express/export/excel          ErpOrderLogisticsExpressExport.ExportExcel
+
 GET  /order/logistics/match/debug             ErpOrderLogisticsMatchDebug.Index
 POST /order/logistics/match/debug/data/list   ErpOrderLogisticsMatchDebug.ListData
 GET  /order/logistics/match/debug/detail/:id  ErpOrderLogisticsMatchDebug.Detail

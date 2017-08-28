@@ -116,6 +116,10 @@
                         <i class="ace-icon fa fa-file-excel-o"></i>
                         导出物流公司模板
                     </button>
+                    <button class="btn btn-pink btn-sm" @click="exportOrderLogisticsExpress()">
+                        <i class="ace-icon fa fa-file-excel-o"></i>
+                        导出快递类模板
+                    </button>
                     {% end %}
 
                     <div class="btn-group">
@@ -1403,6 +1407,24 @@
                 $("#company_export_order_id_list").val(order_id_list);
                 $("#formLogisticsCompanyExport").submit();
                 $('#logisticsCompanyExportOptionDialog').modal('hide');
+            },
+            exportOrderLogisticsExpress: function () {
+                var order_id_list = [];
+                $('#orderList tbody tr>td:first-child input:checkbox').each(function () {
+                    if (this.checked) {
+                        order_id_list.push($(this).val());
+                    }
+                });
+
+                if (order_id_list.length === 0) {
+                    $.msg.alert("请选择数据！");
+                    return;
+                }
+
+                var params = $.param({"batch_code": vm.page.batch_code, "order_id_list": order_id_list});
+                var url = '{%url "ErpOrderLogisticsExpressExport.ExportExcel"%}' + "?" + params;
+                $('<form method="post" action="' + url + '"></form>').appendTo('body').submit().remove();
+
             },
             exportOrderLogistics: function () {
                 var id_list = [];
