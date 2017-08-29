@@ -53,7 +53,7 @@
                         导出商品仓位
                     </button>
                     {% end %}
-                    {% if .has_sku_qty_res %}
+                    {% if .has_sku_qty_import_res %}
                     <button id="btnImportSkuQty" class="btn btn-info btn-sm">
                         <i class="ace-icon fa fa-file-excel-o"></i>
                         导入覆盖库存数量
@@ -62,6 +62,8 @@
                         <i class="ace-icon fa fa-file-excel-o"></i>
                         导入修正库存数量
                     </button>
+                    {% end %}
+                    {% if .has_sku_qty_export_res%}
                     <button class="btn btn-pink btn-sm" @click="exportSkuQty()">
                         <i class="ace-icon fa fa-file-excel-o"></i>
                         导出库存数量
@@ -82,23 +84,23 @@
                 <form id="formExport" method="post" action='{%url "ErpInventory.Export" %}'>
                     <input type="hidden" name="stock_id_query" v-model="page.stock_id_query"/>
                     <input type="hidden" name="product_code_query" v-model="page.product_code_query"/>
-                    <input id="formExportIdList" type="hidden" name="id_list" />
+                    <input id="formExportIdList" type="hidden" name="id_list"/>
                 </form>
                 */%}
                 <form id="formSkuLocExport" method="post" action='{%url "ErpInventory.ExportProductStorageLoc" %}'>
                     <input type="hidden" name="stock_id_query" v-model="page.stock_id_query"/>
                     <input type="hidden" name="product_code_query" v-model="page.product_code_query"/>
-                    <input id="formSkuLocExportIdList" type="hidden" name="id_list" />
+                    <input id="formSkuLocExportIdList" type="hidden" name="id_list"/>
                 </form>
                 <form id="formSkuQtyExport" method="post" action='{%url "ErpInventory.ExportInventoryQuantity" %}'>
                     <input type="hidden" name="stock_id_query" v-model="page.stock_id_query"/>
                     <input type="hidden" name="product_code_query" v-model="page.product_code_query"/>
-                    <input id="formSkuQtyExportIdList" type="hidden" name="id_list" />
+                    <input id="formSkuQtyExportIdList" type="hidden" name="id_list"/>
                 </form>
                 <form id="formSkuPriceExport" method="post" action='{%url "ErpInventory.ExportInventoryPrice" %}'>
                     <input type="hidden" name="stock_id_query" v-model="page.stock_id_query"/>
                     <input type="hidden" name="product_code_query" v-model="page.product_code_query"/>
-                    <input id="formSkuPriceExportIdList" type="hidden" name="id_list" />
+                    <input id="formSkuPriceExportIdList" type="hidden" name="id_list"/>
                 </form>
                 <div style="margin-top: 10px;">
                     {%/*

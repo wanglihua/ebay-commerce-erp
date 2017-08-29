@@ -95,6 +95,10 @@ func (f *NoticeDetailForm) Valid(validation *revel.Validation) bool {
 	return validation.HasErrors() == false
 }
 
+func (c ErpNotice) Detail(id int64) revel.Result {
+	return c.RenderTemplate("")
+}
+
 func (c ErpNotice) DetailData() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.XTGL_NOTICE, c.Session)
 
