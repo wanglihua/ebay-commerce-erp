@@ -595,6 +595,10 @@ o.id IN (
 		filter = core.SqlAnd(filter, fmt.Sprintf("o.tag_id = %d", order_tag_id))
 	}
 
+	if strings.Contains(order, "stock_name") {
+		order = strings.Replace(order, "`stock_name`", "o.stock_id", -1) // replace `stock_name`，不能是 stock_name
+	}
+
 	order_list, count := order_service.Get_order_data_list(db_session, filter, order, offset, limit)
 
 	return c.RenderJson(core.GridResult{
