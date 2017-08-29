@@ -96,7 +96,9 @@ func (f *NoticeDetailForm) Valid(validation *revel.Validation) bool {
 }
 
 func (c ErpNotice) Detail(id int64) revel.Result {
-	return c.RenderTemplate("")
+	var notice_id = id
+	c.RenderArgs["notice_id"] = notice_id
+	return c.RenderTemplate("erp/xtgl/notice/notice_detail.html")
 }
 
 func (c ErpNotice) DetailData() revel.Result {
@@ -137,8 +139,10 @@ func (c ErpNotice) Save() revel.Result {
 
 	notice := detail_form.Notice
 
+	var is_create = detail_form.IsCreate()
+
 	var affected int64
-	if detail_form.IsCreate() {
+	if is_create == true {
 		var login_user = core.GetLoginUser(c.Session)
 		notice.UserId = login_user.UserId
 		notice.LoginName = login_user.LoginName
@@ -154,7 +158,13 @@ func (c ErpNotice) Save() revel.Result {
 		}
 	}
 
-	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据保存成功!"})
+	//return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据保存成功!"})
+	return c.RenderJson(map[string]interface{}{
+		"success":   true,
+		"is_create": is_create,
+		"notice_id": notice.Id,
+		"message":   "数据保存成功！",
+	})
 }
 
 func (c ErpNotice) Delete() revel.Result {

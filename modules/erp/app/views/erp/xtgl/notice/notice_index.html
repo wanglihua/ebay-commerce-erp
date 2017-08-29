@@ -119,6 +119,10 @@
         var ue = UE.getEditor('body');
     });
 
+    function reloadNoticeList() {
+        reloadList('#noticeList');
+    }
+
     var vm = new Vue({
         el: "#page",
         data: {
@@ -172,6 +176,8 @@
                 reloadList('#noticeList');
             },
             showNoticeDetail: function (id) {
+                window.open("/notice/detail/" + id, "notice_detail");
+                /*
                 showMask("加载中...");
                 $("#noticeDetailForm").clearValidation();
                 $.ajax({
@@ -192,6 +198,7 @@
                         }
                     }
                 );
+                */
             },
             saveNotice: function () {
                 showMask("提交中...");

@@ -1,0 +1,3 @@
+<script type='text/javascript'>
+    var notice_id = {% .notice_id %};
+</script>

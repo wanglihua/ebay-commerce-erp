@@ -1,0 +1,190 @@
+{%header "通知公告" .%}
+<div id="page">
+    <div class="breadcrumbs" id="breadcrumbs">
+        <ul class="breadcrumb">
+            <li>
+                <a href='{%url "Home.Index"%}'><i class="ace-icon fa fa-home home-icon"></i></a>
+            </li>
+            <li class="parent" data-menu="xtgl-menu">系统管理</li>
+            <li class="active" data-menu="xtgl-notice-menu"><a href='{% url "ErpNotice.Index" %}'>通知公告</a></li>
+            <li>通知公告详细</li>
+        </ul>
+    </div>
+    <div class="page-content">
+        <div class="row">
+            <div class="col-xs-12" style="padding: 0;">
+                <div class="gridToolBar clearfix">
+                    <button class="btn btn-primary btn-sm" onclick="loadNoticeDetailData()">
+                        <i class="ace-icon fa fa-refresh"></i>
+                        刷新
+                    </button>
+                    <button type="button" class="btn btn-success btn-sm" onclick="saveNotice()">
+                        <i class="ace-icon fa fa-floppy-o"></i>保存
+                    </button>
+                </div>
+                <div style="margin-top: 25px;">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <form class="form-horizontal" role="form" id="noticeDetailForm">
+                                <input id="notice_id" name="detail.notice.id" type="hidden" v-model.number="detail.notice.id"/>
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <label for="title" class="col-xs-1 control-label">标题</label>
+                                            <div class="col-xs-11">
+                                                <input id="title" name="detail.notice.title" type="text" class="input-sm form-control" v-model="detail.notice.title"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="list_top" class="col-xs-2 control-label">置顶</label>
+                                            <div class="col-xs-10">
+                                                <select id="list_top" name="detail.notice.list_top" type="text" class="input-sm form-control" v-model="detail.notice.list_top">
+                                                    <option :value="0">否</option>
+                                                    <option :value="1">是</option>
+                                                </select>
+
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="important" class="col-xs-2 control-label">重要</label>
+                                            <div class="col-xs-10">
+                                                <select id="important" name="detail.notice.important" type="text" class="input-sm form-control" v-model="detail.notice.important">
+                                                    <option :value="0">否</option>
+                                                    <option :value="1">是</option>
+                                                </select>
+
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <label for="body" class="col-xs-1 control-label">内容</label>
+                                            <div class="col-xs-11">
+                                                <textarea id="body" name="detail.notice.body" style="padding: 0;border: 0; width: 694px;height: 400px;" rows="10" v-model="detail.notice.body"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{%template "erp/xtgl/notice/notice_detail.var" .%}
+<script type="text/javascript" charset="utf-8" src="/static/ueditor/ueditor.config.js"></script>
+<script type="text/javascript" charset="utf-8" src="/static/ueditor/ueditor.all.min.js"></script>
+<script type="text/javascript">
+    $(function () {
+
+        $("#body").width($("#title").width());
+
+        var ue = UE.getEditor('body');
+
+        loadNoticeDetailData();
+    });
+
+    function reloadNoticeList() {
+        window.opener.reloadNoticeList();
+    }
+
+    function loadNoticeDetailData() {
+        showMask("加载中...");
+        $("#noticeDetailForm").clearValidation();
+        $.ajax({
+                url: '{%url "ErpNotice.DetailData" %}',
+                type: "POST",
+                data: {
+                    "id": notice_id
+                },
+                success: function (result) {
+                    hideMask();
+                    if (result.success === false) {
+                        $.msg.error(result.message);
+                        return;
+                    }
+                    vm.detail = result;
+                    UE.getEditor('body').setContent(result.notice.body);
+                }
+            }
+        );
+    }
+
+    function saveNotice() {
+        showMask("提交中...");
+
+        vm.detail.notice.body = UE.getEditor('body').getContent();
+
+        var form = $("#noticeDetailForm");
+
+        var valid = validate(form, {
+            'detail.notice.title': {
+                required: true
+            },
+            'detail.notice.body': {
+                required: true
+            }
+        });
+
+        if (!valid) {
+            hideMask();
+        } else {
+            $.ajax({
+                    url: '{%url "ErpNotice.Save"%}',
+                    type: "POST",
+                    processData: false,
+                    contentType: 'application/json',
+                    data: JSON.stringify(vm.detail),
+                    success: function (data) {
+                        hideMask();
+                        if (data.success === false) {
+                            $.msg.error(data.message);
+                            //return;
+                        } else {
+                            $.msg.show(data.message);
+
+                            if (data.is_create === true) {
+                                setTimeout(function () {
+                                    window.location.href = "/notice/detail/" + data.notice_id;
+
+                                }, 1000);
+                            }
+
+                            reloadNoticeList();
+                            //return;
+                        }
+                    }
+                }
+            );
+        }
+    }
+
+    var vm = new Vue({
+        el: "#page",
+        data: {
+            "detail": {
+                "notice": {}
+            }
+        },
+        mounted: function () {
+        },
+        methods: {}
+    });
+</script>
+{%footer%}
+
