@@ -36,5 +36,7 @@ GET  /api/calc/logistics/fee/test LogisticsFeeApi.Test
 GET  /postage/:sku                ProductPostageCalculator.Index
 POST /sku/postage/cal/post        ProductPostageCalculator.Post
 
+GET  /ueditor/test                   UEditor.Test
+
 # 禁用自动路由
 # *    /:controller/:action       :controller.:action
