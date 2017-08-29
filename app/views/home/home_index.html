@@ -25,20 +25,20 @@
                     <template v-for="notice in notice_list">
                         <tr>
                             <td>
-                                <a :href='"/notice/view/detail/" + notice.id' target="notice_view_detail">
-                                    <span v-if="notice.list_top == 1">
+                                <a :href='"/notice/view/detail/" + notice.n.id' target="notice_view_detail">
+                                    <span v-if="notice.n.list_top == 1">
                                         [置顶]
                                     </span>
-                                    <span v-if="notice.important == 0">
-                                        {{notice.title}}
+                                    <span v-if="notice.n.important == 0">
+                                        {{notice.n.title}}
                                     </span>
                                     <span v-else style="color:red;">
-                                        {{notice.title}}
+                                        {{notice.n.title}}
                                     </span>
                                 </a>
                             </td>
-                            <td>{{notice.login_name}}</td>
-                            <td>{{notice.create_time}}</td>
+                            <td>{{notice.u.nick_name}}</td>
+                            <td>{{notice.n.create_time}}</td>
                         </tr>
                     </template>
                     </tbody>

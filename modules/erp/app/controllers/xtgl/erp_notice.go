@@ -10,6 +10,7 @@ import (
 	"matrix/modules/auth/pass_res"
 	"matrix/modules/erp/models/xtgl_models"
 	"html/template"
+	auth_models "matrix/modules/auth/models"
 )
 
 type ErpNotice struct {
@@ -21,8 +22,28 @@ func (c ErpNotice) GetNoticeDataForHomePage() revel.Result {
 
 	var db_session = c.DbSession
 
-	var notice_list = make([]xtgl_models.NoticeInfo, 0)
-	core.HandleError(db_session.OrderBy("list_top DESC, create_time DESC").Find(&notice_list))
+	/*
+SELECT n.*, u.*
+FROM erp_notice n
+    INNER JOIN auth_user u ON n.user_id = u.id
+ORDER BY n.list_top DESC, n.create_time DESC
+LIMIT 50;
+	 */
+
+	type notice_view_item_t struct {
+		Notice xtgl_models.NoticeInfo `xorm:"extends" json:"n"`
+		User   auth_models.UserInfo   `xorm:"extends" json:"u"`
+	}
+
+	var sql = `
+SELECT n.*, u.*
+FROM erp_notice n
+    INNER JOIN auth_user u ON n.user_id = u.id
+ORDER BY n.list_top DESC, n.create_time DESC
+LIMIT 50;
+	`
+	var notice_list = make([]notice_view_item_t, 0)
+	core.HandleError(db_session.Sql(sql).Find(&notice_list))
 
 	return c.RenderJson(map[string]interface{}{
 		"notice_list": notice_list,
