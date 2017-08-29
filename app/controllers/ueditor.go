@@ -40,16 +40,16 @@ func (c UEditor) Config() revel.Result {
 		/* 上传图片配置 */
 		"imageActionName": "uploadimage",
 		"imageUrlPrefix":  "",
-		"imagePath":       "/static/upload/ueditor",
+		"imagePath":       "/static/upload/ueditor/notice",
 		"imageFieldName":  "upfile",
 		"imageMaxSize":    2048,
 		"imageAllowFiles": []string{".png", ".jpg", ".jpeg", ".gif", ".bmp"},
 		/* 上传文件配置 */
-		"fileActionName": "uploadfile",             /* controller里,执行上传视频的action名称 */
-		"fileFieldName":  "upfile",                 /* 提交的文件表单名称 */
-		"filePathFormat": "/static/upload/ueditor", /* 上传保存路径,可以自定义保存路径和文件名格式 */
-		"fileUrlPrefix":  "",                       /* 文件访问路径前缀 */
-		"fileMaxSize":    51200000,                 /* 上传大小限制，单位B，默认50MB */
+		"fileActionName": "uploadfile",                    /* controller里,执行上传视频的action名称 */
+		"fileFieldName":  "upfile",                        /* 提交的文件表单名称 */
+		"filePathFormat": "/static/upload/ueditor/notice", /* 上传保存路径,可以自定义保存路径和文件名格式 */
+		"fileUrlPrefix":  "",                              /* 文件访问路径前缀 */
+		"fileMaxSize":    51200000,                        /* 上传大小限制，单位B，默认50MB */
 		"fileAllowFiles": []string{
 			".png", ".jpg", ".jpeg", ".gif", ".bmp",
 			".flv", ".swf", ".mkv", ".avi", ".rm", ".rmvb", ".mpeg", ".mpg",
@@ -69,10 +69,10 @@ func (c UEditor) UploadImage() revel.Result {
 
 	filename := strings.Replace(uuid.NewUUID().String(), "-", "", -1) + path.Ext(header.Filename)
 
-	err = os.MkdirAll(path.Join(revel.BasePath, "static", "upload", "ueditor"), 0775)
+	err = os.MkdirAll(path.Join(revel.BasePath, "static", "upload", "ueditor", "notice"), 0775)
 	core.HandleError(err)
 
-	outFile, err := os.Create(path.Join(revel.BasePath, "static", "upload", "ueditor", filename))
+	outFile, err := os.Create(path.Join(revel.BasePath, "static", "upload", "ueditor", "notice", filename))
 	core.HandleError(err)
 
 	defer outFile.Close()
@@ -80,10 +80,10 @@ func (c UEditor) UploadImage() revel.Result {
 	io.Copy(outFile, file)
 
 	return c.RenderJson(map[string]interface{}{
-		"url":      fmt.Sprintf("/static/upload/ueditor/%s", filename), //保存后的文件路径
-		"title":    "",                                                 //文件描述，对图片来说在前端会添加到title属性上
-		"original": header.Filename,                                    //原始文件名
-		"state":    "SUCCESS",                                          //上传状态，成功时返回SUCCESS,其他任何值将原样返回至图片上传框中
+		"url":      fmt.Sprintf("/static/upload/ueditor/notice/%s", filename), //保存后的文件路径
+		"title":    "",                                                        //文件描述，对图片来说在前端会添加到title属性上
+		"original": header.Filename,                                           //原始文件名
+		"state":    "SUCCESS",                                                 //上传状态，成功时返回SUCCESS,其他任何值将原样返回至图片上传框中
 	})
 }
 
@@ -96,10 +96,10 @@ func (c UEditor) UploadFile() revel.Result {
 
 	filename := strings.Replace(uuid.NewUUID().String(), "-", "", -1) + path.Ext(header.Filename)
 
-	err = os.MkdirAll(path.Join(revel.BasePath, "static", "upload", "ueditor"), 0775)
+	err = os.MkdirAll(path.Join(revel.BasePath, "static", "upload", "ueditor", "notice"), 0775)
 	core.HandleError(err)
 
-	outFile, err := os.Create(path.Join(revel.BasePath, "static", "upload", "ueditor", filename))
+	outFile, err := os.Create(path.Join(revel.BasePath, "static", "upload", "ueditor", "notice", filename))
 	core.HandleError(err)
 
 	defer outFile.Close()
@@ -107,9 +107,9 @@ func (c UEditor) UploadFile() revel.Result {
 	io.Copy(outFile, file)
 
 	return c.RenderJson(map[string]interface{}{
-		"url":      fmt.Sprintf("/static/upload/ueditor/%s", filename), //保存后的文件路径
-		"title":    "",                                                 //文件描述，对图片来说在前端会添加到title属性上
-		"original": header.Filename,                                    //原始文件名
-		"state":    "SUCCESS",                                          //上传状态，成功时返回SUCCESS,其他任何值将原样返回至图片上传框中
+		"url":      fmt.Sprintf("/static/upload/ueditor/notice/%s", filename), //保存后的文件路径
+		"title":    "",                                                        //文件描述，对图片来说在前端会添加到title属性上
+		"original": header.Filename,                                           //原始文件名
+		"state":    "SUCCESS",                                                 //上传状态，成功时返回SUCCESS,其他任何值将原样返回至图片上传框中
 	})
 }
