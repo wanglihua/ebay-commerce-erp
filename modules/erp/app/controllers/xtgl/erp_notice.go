@@ -9,6 +9,7 @@ import (
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/auth/pass_res"
 	"matrix/modules/erp/models/xtgl_models"
+	"html/template"
 )
 
 type ErpNotice struct {
@@ -38,6 +39,7 @@ func (c ErpNotice) ViewDetail(id int64) revel.Result {
 	core.HandleError(err)
 
 	c.RenderArgs["notice"] = notice
+	c.RenderArgs["notice_body"] = template.HTML(notice.Body)
 	return c.RenderTemplate("erp/xtgl/notice/notice_view_detail.html")
 }
 
