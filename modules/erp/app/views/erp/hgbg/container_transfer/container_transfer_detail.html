@@ -266,7 +266,7 @@
                                             <label for="packing_time" class="col-xs-4 control-label">装箱时间</label>
                                             <div class="col-xs-8">
                                                 {% if .is_new %}
-                                                <input id="packing_time" name="detail.transfer.packing_time" type="text" class="input-sm form-control" v-model="detail.transfer.packing_time"/>
+                                                <input id="packing_time" name="detail.transfer.packing_time" type="text" class="input-sm form-control" v-model="detail.transfer.packing_time" onblur="onDateTimeChanged()"/>
                                                 {% else %}
                                                 <input id="packing_time" name="detail.transfer.packing_time" type="text" class="input-sm form-control" v-model="detail.transfer.packing_time" disabled="disabled"/>
                                                 {% end %}
@@ -281,7 +281,7 @@
                                                 {% if .is_stock %}
                                                 <input id="departure_time" name="detail.transfer.departure_time" type="text" class="input-sm form-control" v-model="detail.transfer.departure_time" disabled="disabled"/>
                                                 {% else %}
-                                                <input id="departure_time" name="detail.transfer.departure_time" type="text" class="input-sm form-control" v-model="detail.transfer.departure_time"/>
+                                                <input id="departure_time" name="detail.transfer.departure_time" type="text" class="input-sm form-control" v-model="detail.transfer.departure_time" onblur="onDateTimeChanged()"/>
                                                 {% end %}
                                             </div>
                                         </div>
@@ -294,7 +294,7 @@
                                                 {% if .is_stock %}
                                                 <input id="stock_time" name="detail.transfer.stock_time" type="text" class="input-sm form-control" v-model="detail.transfer.stock_time" disabled="disabled"/>
                                                 {% else %}
-                                                <input id="stock_time" name="detail.transfer.stock_time" type="text" class="input-sm form-control" v-model="detail.transfer.stock_time"/>
+                                                <input id="stock_time" name="detail.transfer.stock_time" type="text" class="input-sm form-control" v-model="detail.transfer.stock_time" onblur="onDateTimeChanged()"/>
                                                 {% end %}
                                             </div>
                                         </div>
@@ -382,7 +382,7 @@
                                                 {% if .is_stock %}
                                                 <input id="au_hg_entry_date" name="detail.transfer.au_hg_entry_date" type="text" class="input-sm form-control" disabled="disabled" v-model="detail.transfer.au_hg_entry_date"/>
                                                 {% else %}
-                                                <input id="au_hg_entry_date" name="detail.transfer.au_hg_entry_date" type="text" class="input-sm form-control" v-model="detail.transfer.au_hg_entry_date"/>
+                                                <input id="au_hg_entry_date" name="detail.transfer.au_hg_entry_date" type="text" class="input-sm form-control" v-model="detail.transfer.au_hg_entry_date" onblur="onDateTimeChanged()"/>
                                                 {% end %}
                                                 <div class="help-block">
                                                     澳洲海关Entry日期
@@ -445,7 +445,7 @@
                                                 {% if .is_stock %}
                                                 <input id="au_hd_invoice_pay_time" name="detail.transfer.au_hd_invoice_pay_time" type="text" class="input-sm form-control" disabled="disabled" v-model="detail.transfer.au_hd_invoice_pay_time"/>
                                                 {% else %}
-                                                <input id="au_hd_invoice_pay_time" name="detail.transfer.au_hd_invoice_pay_time" type="text" class="input-sm form-control" v-model="detail.transfer.au_hd_invoice_pay_time"/>
+                                                <input id="au_hd_invoice_pay_time" name="detail.transfer.au_hd_invoice_pay_time" type="text" class="input-sm form-control" v-model="detail.transfer.au_hd_invoice_pay_time" onblur="onDateTimeChanged()"/>
                                                 {% end %}
                                                 <div class="help-block">
                                                     澳洲货代invoice支付时间
@@ -688,6 +688,14 @@
         },
         methods: {}
     });
+
+    function onDateTimeChanged() {
+//        detail_vm.detail.transfer.packing_time = $("#packing_time").val();
+//        detail_vm.detail.transfer.departure_time = $("#departure_time").val();
+//        detail_vm.detail.transfer.stock_time = $("#stock_time").val();
+//        detail_vm.detail.transfer.au_hg_entry_date = $("#au_hg_entry_date").val();
+//        detail_vm.detail.transfer.au_hd_invoice_pay_time = $("#au_hd_invoice_pay_time").val();
+    }
 
     $(function () {
 
