@@ -160,7 +160,7 @@ func (c ErpContainerTransfer) Detail(id int64) revel.Result {
 
 	c.RenderArgs["transfer_id"] = transfer_id
 	c.RenderArgs["status_name"] = status.Name
-	c.RenderArgs["can_modify"] = container_transfer_can_modify(container_transfer)
+	c.RenderArgs["is_new"] = container_transfer_is_new(container_transfer)
 	c.RenderArgs["can_depart"] = container_transfer_can_depart(container_transfer)
 	c.RenderArgs["can_stock"] = container_transfer_can_stock(container_transfer)
 	c.RenderArgs["is_not_new"] = transfer_id != 0
@@ -169,7 +169,7 @@ func (c ErpContainerTransfer) Detail(id int64) revel.Result {
 
 	/*
 	var can_modify_disabled template.HTML = ""
-	if container_transfer_can_modify(container_transfer) == false {
+	if container_transfer_is_new(container_transfer) == false {
 		can_modify_disabled = template.HTML(` disabled = "disabled" `)
 	}
 	c.RenderArgs["can_modify_disabled"] = can_modify_disabled
@@ -369,7 +369,7 @@ func (c ErpContainerTransfer) Delete() revel.Result {
 	core.HandleError(db_session.In("id", container_transfer_id_list).Find(&container_transfer_list))
 
 	for _, container_transfer := range container_transfer_list {
-		if container_transfer_can_modify(container_transfer) == false {
+		if container_transfer_is_new(container_transfer) == false {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "当前状态不能删除！"})
 		}
 	}
@@ -519,7 +519,7 @@ func (c ErpContainerTransfer) Stock() revel.Result {
 	})
 }
 
-func container_transfer_can_modify(container_transfer hgbg_models.ContainerTransferInfo) bool {
+func container_transfer_is_new(container_transfer hgbg_models.ContainerTransferInfo) bool {
 	return container_transfer.StatusId == models.CONTAINER_TRANSFER_STATUS_NEW
 }
 

@@ -42,7 +42,7 @@
                         </button>
                         {% end %}
 
-                        {% if .can_modify %}
+                        {% if .is_new %}
                         <button class="btn btn-danger btn-sm" onclick="deleteContainerTransfer()">
                             <i class="ace-icon fa fa-trash-o"></i>
                             删除
@@ -126,7 +126,7 @@
                                         <div class="form-group">
                                             <label for="batch_code" class="col-xs-4 control-label">批次号</label>
                                             <div class="col-xs-8">
-                                                {% if .can_modify %}
+                                                {% if .is_new %}
                                                 <input id="batch_code" name="detail.transfer.batch_code" type="text" class="input-sm form-control" v-model="detail.transfer.batch_code"/>
                                                 {% else %}
                                                 <input id="batch_code" name="detail.transfer.batch_code" type="text" class="input-sm form-control" v-model="detail.transfer.batch_code" disabled="disabled"/>
@@ -139,7 +139,7 @@
                                         <div class="form-group">
                                             <label for="container_code" class="col-xs-4 control-label">集装箱号</label>
                                             <div class="col-xs-8">
-                                                {% if .can_modify %}
+                                                {% if .is_new %}
                                                 <input id="container_code" name="detail.transfer.container_code" type="text" class="input-sm form-control" v-model="detail.transfer.container_code"/>
                                                 {% else %}
                                                 <input id="container_code" name="detail.transfer.container_code" type="text" class="input-sm form-control" v-model="detail.transfer.container_code" disabled="disabled"/>
@@ -152,7 +152,7 @@
                                         <div class="form-group">
                                             <label for="bl_no" class="col-xs-4 control-label">提单号</label>
                                             <div class="col-xs-8">
-                                                {% if .can_modify %}
+                                                {% if .is_new %}
                                                 <input id="bl_no" name="detail.transfer.bl_no" type="text" class="input-sm form-control" v-model="detail.transfer.bl_no"/>
                                                 {% else %}
                                                 <input id="bl_no" name="detail.transfer.bl_no" type="text" class="input-sm form-control" v-model="detail.transfer.bl_no" disabled="disabled"/>
@@ -165,7 +165,7 @@
                                         <div class="form-group">
                                             <label for="seal_no" class="col-xs-4 control-label">铅封号</label>
                                             <div class="col-xs-8">
-                                                {% if .can_modify %}
+                                                {% if .is_new %}
                                                 <input id="seal_no" name="detail.transfer.seal_no" type="text" class="input-sm form-control" v-model="detail.transfer.seal_no"/>
                                                 {% else %}
                                                 <input id="seal_no" name="detail.transfer.seal_no" type="text" class="input-sm form-control" v-model="detail.transfer.seal_no" disabled="disabled"/>
@@ -182,7 +182,7 @@
                                         <div class="form-group">
                                             <label for="start_port_id" class="col-xs-4 control-label">起始港</label>
                                             <div class="col-xs-8">
-                                                {% if .can_modify %}
+                                                {% if .is_new %}
                                                 <select id="start_port_id" name="detail.transfer.start_port_id" class="input-sm form-control" v-model.number="detail.transfer.start_port_id">
                                                     <template v-for="port in detail.start_port_list">
                                                         <option :value="port.id">{{port.port_name}}</option>
@@ -213,7 +213,7 @@
                                         <div class="form-group">
                                             <label for="price_down_rate" class="col-xs-4 control-label">征税品打折</label>
                                             <div class="col-xs-8">
-                                                {% if .can_modify %}
+                                                {% if .is_new %}
                                                 <input id="price_down_rate" name="detail.transfer.price_down_rate" type="text" class="input-sm form-control" v-model.number="detail.transfer.price_down_rate"/>
                                                 {% else %}
                                                 <input id="price_down_rate" name="detail.transfer.price_down_rate" type="text" class="input-sm form-control" v-model.number="detail.transfer.price_down_rate" disabled="disabled"/>
@@ -227,7 +227,7 @@
                                         <div class="form-group">
                                             <label for="cost_up_rate" class="col-xs-4 control-label">成本上调</label>
                                             <div class="col-xs-8">
-                                                {% if .can_modify %}
+                                                {% if .is_new %}
                                                 <input id="cost_up_rate" name="detail.transfer.cost_up_rate" type="text" class="input-sm form-control" v-model.number="detail.transfer.cost_up_rate"/>
                                                 {% else %}
                                                 <input id="cost_up_rate" name="detail.transfer.cost_up_rate" type="text" class="input-sm form-control" v-model.number="detail.transfer.cost_up_rate" disabled="disabled"/>
@@ -244,7 +244,7 @@
                                         <div class="form-group">
                                             <label for="dest_port_id" class="col-xs-4 control-label">目的港</label>
                                             <div class="col-xs-8">
-                                                {% if .can_modify %}
+                                                {% if .is_new %}
                                                 <select id="dest_port_id" name="detail.transfer.dest_port_id" class="input-sm form-control" v-model.number="detail.transfer.dest_port_id">
                                                     <template v-for="port in detail.dest_port_list">
                                                         <option :value="port.id">{{port.port_name}}</option>
@@ -265,7 +265,7 @@
                                         <div class="form-group">
                                             <label for="packing_time" class="col-xs-4 control-label">装箱时间</label>
                                             <div class="col-xs-8">
-                                                {% if .can_modify %}
+                                                {% if .is_new %}
                                                 <input id="packing_time" name="detail.transfer.packing_time" type="text" class="input-sm form-control" v-model="detail.transfer.packing_time"/>
                                                 {% else %}
                                                 <input id="packing_time" name="detail.transfer.packing_time" type="text" class="input-sm form-control" v-model="detail.transfer.packing_time" disabled="disabled"/>
@@ -349,7 +349,7 @@
                                         <div class="form-group">
                                             <label for="import_company_code" class="col-xs-4 control-label">澳洲清关公司</label>
                                             <div class="col-xs-8">
-                                                {% if .can_modify %}
+                                                {% if .is_new %}
                                                 <select id="import_company_code" name="detail.transfer.import_company_code" class="input-sm form-control" v-model="detail.transfer.import_company_code">
                                                     <option value="ozo">ozo e-store</option>
                                                     <option value="elife">elife pty ltd</option>
@@ -377,9 +377,13 @@
 
                                     <div class="col-xs-3">
                                         <div class="form-group">
-                                            <label for="au_hd" class="col-xs-4 control-label">Entry日期</label>
+                                            <label for="au_hg_entry_date" class="col-xs-4 control-label">Entry日期</label>
                                             <div class="col-xs-8">
-                                                <input id="au_hd" name="detail.transfer.au_hd" type="text" class="input-sm form-control" disabled="disabled" v-model="detail.transfer.au_hd"/>
+                                                {% if .is_stock %}
+                                                <input id="au_hg_entry_date" name="detail.transfer.au_hg_entry_date" type="text" class="input-sm form-control" disabled="disabled" v-model="detail.transfer.au_hg_entry_date"/>
+                                                {% else %}
+                                                <input id="au_hg_entry_date" name="detail.transfer.au_hg_entry_date" type="text" class="input-sm form-control" v-model="detail.transfer.au_hg_entry_date"/>
+                                                {% end %}
                                                 <div class="help-block">
                                                     澳洲海关Entry日期
                                                 </div>
@@ -394,15 +398,23 @@
                                         <div class="form-group">
                                             <label for="au_hd" class="col-xs-4 control-label">澳洲货代</label>
                                             <div class="col-xs-8">
+                                                {% if .is_stock %}
                                                 <input id="au_hd" name="detail.transfer.au_hd" type="text" class="input-sm form-control" disabled="disabled" v-model="detail.transfer.au_hd"/>
+                                                {% else %}
+                                                <input id="au_hd" name="detail.transfer.au_hd" type="text" class="input-sm form-control" v-model="detail.transfer.au_hd"/>
+                                                {% end %}
                                             </div>
                                         </div>
                                     </div>
                                     <div class="col-xs-3">
                                         <div class="form-group">
-                                            <label for="au_hd" class="col-xs-4 control-label">invoice No.</label>
+                                            <label for="au_hd_invoice_no" class="col-xs-4 control-label">invoice No.</label>
                                             <div class="col-xs-8">
-                                                <input id="au_hd" name="detail.transfer.au_hd" type="text" class="input-sm form-control" disabled="disabled" v-model="detail.transfer.au_hd"/>
+                                                {% if .is_stock %}
+                                                <input id="au_hd_invoice_no" name="detail.transfer.au_hd_invoice_no" type="text" class="input-sm form-control" disabled="disabled" v-model="detail.transfer.au_hd_invoice_no"/>
+                                                {% else %}
+                                                <input id="au_hd_invoice_no" name="detail.transfer.au_hd_invoice_no" type="text" class="input-sm form-control" v-model="detail.transfer.au_hd_invoice_no"/>
+                                                {% end %}
                                                 <div class="help-block">
                                                     澳洲货代invoice No.
                                                 </div>
@@ -412,9 +424,13 @@
 
                                     <div class="col-xs-3">
                                         <div class="form-group">
-                                            <label for="au_hd" class="col-xs-4 control-label">invoice金额</label>
+                                            <label for="au_hd_invoice_amount" class="col-xs-4 control-label">invoice金额</label>
                                             <div class="col-xs-8">
-                                                <input id="au_hd" name="detail.transfer.au_hd" type="text" class="input-sm form-control" disabled="disabled" v-model="detail.transfer.au_hd"/>
+                                                {% if .is_stock %}
+                                                <input id="au_hd_invoice_amount" name="detail.transfer.au_hd_invoice_amount" type="text" class="input-sm form-control" disabled="disabled" v-model.number="detail.transfer.au_hd_invoice_amount"/>
+                                                {% else %}
+                                                <input id="au_hd_invoice_amount" name="detail.transfer.au_hd_invoice_amount" type="text" class="input-sm form-control" v-model.number="detail.transfer.au_hd_invoice_amount"/>
+                                                {% end %}
                                                 <div class="help-block">
                                                     澳洲货代invoice金额
                                                 </div>
@@ -424,9 +440,13 @@
 
                                     <div class="col-xs-3">
                                         <div class="form-group">
-                                            <label for="au_hd" class="col-xs-4 control-label">invoice支付时间</label>
+                                            <label for="au_hd_invoice_pay_time" class="col-xs-4 control-label">invoice支付时间</label>
                                             <div class="col-xs-8">
-                                                <input id="au_hd" name="detail.transfer.au_hd" type="text" class="input-sm form-control" disabled="disabled" v-model="detail.transfer.au_hd"/>
+                                                {% if .is_stock %}
+                                                <input id="au_hd_invoice_pay_time" name="detail.transfer.au_hd_invoice_pay_time" type="text" class="input-sm form-control" disabled="disabled" v-model="detail.transfer.au_hd_invoice_pay_time"/>
+                                                {% else %}
+                                                <input id="au_hd_invoice_pay_time" name="detail.transfer.au_hd_invoice_pay_time" type="text" class="input-sm form-control" v-model="detail.transfer.au_hd_invoice_pay_time"/>
+                                                {% end %}
                                                 <div class="help-block">
                                                     澳洲货代invoice支付时间
                                                 </div>
@@ -451,7 +471,7 @@
                             <i class="ace-icon fa fa-refresh"></i>
                             刷新
                         </button>
-                        {% if .can_modify %}
+                        {% if .is_new %}
                         <button class="btn btn-success btn-sm" onclick="showEntryDetail(0)">
                             <i class="ace-icon fa fa-plus"></i>
                             新增
@@ -474,7 +494,7 @@
                             <i class="ace-icon fa fa-file-excel-o"></i>
                             导出
                         </button>
-                        {% if .can_modify %}
+                        {% if .is_new %}
                         <button class="btn btn-danger btn-sm" onclick="deleteEntry()">
                             <i class="ace-icon fa fa-trash-o"></i>
                             删除
@@ -803,6 +823,12 @@
                     detail_vm.detail.transfer.total_weight = parseFloat(dtFormatFloat(detail_vm.detail.transfer.total_weight));
                     detail_vm.detail.transfer.total_amount1 = parseFloat(dtFormatFloat(detail_vm.detail.transfer.total_amount1));
                     detail_vm.detail.transfer.total_amount2 = parseFloat(dtFormatFloat(detail_vm.detail.transfer.total_amount2));
+
+                    if (detail_vm.detail.transfer.au_hd_invoice_amount === 0) {
+                        detail_vm.detail.transfer.au_hd_invoice_amount = null;
+                    } else {
+                        detail_vm.detail.transfer.au_hd_invoice_amount = parseFloat(dtFormatFloat(detail_vm.detail.transfer.au_hd_invoice_amount));
+                    }
                 }
             }
         );
