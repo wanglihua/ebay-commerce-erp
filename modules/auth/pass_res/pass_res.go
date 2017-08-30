@@ -73,8 +73,8 @@ const (
 	KCGL_PRODUCT_EXPORT            = 140400 // 商品导出
 	KCGL_PRODUCT_LWHW              = 140401 // 商品长宽高重量
 	KCGL_INVENTORY                 = 140500 // 商品库存
-	KCGL_INVENTORY_IMPORT_QTY      = 140501 // 商品库存 导入库存数量
-	KCGL_INVENTORY_EXPORT_QTY      = 140502 // 商品库存 导出库存数量
+	KCGL_INVENTORY_IMPORT_QTY      = 140531 // 商品库存 导入库存数量
+	KCGL_INVENTORY_EXPORT_QTY      = 140532 // 商品库存 导出库存数量
 	//KCGL_INVENTORY_IMPORT_QTY_OVER = 140510 // 商品库存 导入覆盖库存数量
 	//KCGL_INVENTORY_IMPORT_QTY_DIFF = 140520 // 商品库存 导入修正库存数量
 	KCGL_INVENTORY_SKU_LOC         = 140501 // 商品库存 商品库位
