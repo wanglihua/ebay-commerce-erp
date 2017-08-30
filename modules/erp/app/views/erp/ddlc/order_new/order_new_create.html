@@ -305,10 +305,14 @@
     $(function () {
         $('#order_created_time').datetimepicker({
             locale: "zh-cn"
+        }).on('dp.change', function (ev) {
+            vm.detail.order.created_time = $("#order_created_time").val();
         });
 
         $('#order_paid_time').datetimepicker({
             locale: "zh-cn"
+        }).on('dp.change', function (ev) {
+            vm.detail.order.paid_time = $("#order_paid_time").val();
         });
 
         loadCreateData();
