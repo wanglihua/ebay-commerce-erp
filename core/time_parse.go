@@ -13,6 +13,10 @@ func Parse_time(str string) (time.Time, error) {
 	var failed_time = time.Time{}
 	var failed_error = errors.New(fmt.Sprintf("%s 不是有效的时间格式！", str))
 
+	if strings.TrimSpace(str) == "" {
+		return time.Time{}, nil
+	}
+
 	var date_time_buffer bytes.Buffer
 
 	var str_list = strings.Split(str, " ")

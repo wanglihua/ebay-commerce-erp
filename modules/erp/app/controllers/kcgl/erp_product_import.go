@@ -28,6 +28,9 @@ func (c ErpProductImport) Index() revel.Result {
 	var has_product_export_pass = pass_service.Is_login_user_has_pass(pass_res.KCGL_PRODUCT_EXPORT, c.Session)
 	c.RenderArgs["has_product_export_pass"] = has_product_export_pass
 
+	var has_product_import_pass = pass_service.Is_login_user_has_pass(pass_res.KCGL_PRODUCT_IMPORT, c.Session)
+	c.RenderArgs["has_product_import_pass"] = has_product_import_pass
+
 	return c.RenderTemplate("erp/kcgl/product_import/product_import.html")
 }
 

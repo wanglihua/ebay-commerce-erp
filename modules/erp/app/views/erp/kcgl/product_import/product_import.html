@@ -17,10 +17,12 @@
                         <i class="ace-icon fa fa-refresh"></i>
                         刷新
                     </button>
+                    {% if .has_product_import_pass %}
                     <button id="btnImport" class="btn btn-purple btn-sm">
                         <i class="ace-icon fa fa-file-excel-o"></i>
                         导入
                     </button>
+                    {% end %}
                     {% if .has_product_export_pass %}
                     <button class="btn btn-purple btn-sm" @click="exportProduct()">
                         <i class="ace-icon fa fa-file-excel-o"></i>
