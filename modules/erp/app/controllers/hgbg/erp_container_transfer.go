@@ -333,7 +333,9 @@ func (c ErpContainerTransfer) Save() revel.Result {
 		container_transfer_log_service.Insert_container_transfer_log(container_transfer, "新建调拨单", db_session, c.Session)
 	} else {
 		if ct_in_db.StatusId == models.CONTAINER_TRANSFER_STATUS_DEPART {
-			affected, err = db_session.Id(container_transfer.Id).Cols("departure_time", "stock_time").Update(&container_transfer)
+			affected, err = db_session.Id(container_transfer.Id).
+				Cols("departure_time", "stock_time", "au_hd", "au_hd_invoice_no", "au_hd_invoice_amount", "au_hg_entry_date", "au_hd_invoice_pay_time").
+				Update(&container_transfer)
 			core.HandleError(err)
 		} else {
 			affected, err = db_session.Id(container_transfer.Id).Update(&container_transfer)

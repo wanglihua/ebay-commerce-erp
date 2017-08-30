@@ -703,22 +703,32 @@
 
         $('#packing_time').datetimepicker({
             locale: "zh-cn"
+        }).on('dp.change', function (ev) {
+            detail_vm.detail.transfer.packing_time = $("#packing_time").val();
         });
 
         $('#departure_time').datetimepicker({
             locale: "zh-cn"
+        }).on('dp.change', function (ev) {
+            detail_vm.detail.transfer.departure_time = $("#departure_time").val();
         });
 
         $('#stock_time').datetimepicker({
             locale: "zh-cn"
+        }).on('dp.change', function (ev) {
+            detail_vm.detail.transfer.stock_time = $("#stock_time").val();
         });
 
         $('#au_hg_entry_date').datetimepicker({
             locale: "zh-cn"
+        }).on('dp.change', function (ev) {
+            detail_vm.detail.transfer.au_hg_entry_date = $("#au_hg_entry_date").val();
         });
 
         $('#au_hd_invoice_pay_time').datetimepicker({
             locale: "zh-cn"
+        }).on('dp.change', function (ev) {
+            detail_vm.detail.transfer.au_hd_invoice_pay_time = $("#au_hd_invoice_pay_time").val();
         });
 
         initDataTable(
@@ -832,7 +842,7 @@
                     detail_vm.detail.transfer.total_amount1 = parseFloat(dtFormatFloat(detail_vm.detail.transfer.total_amount1));
                     detail_vm.detail.transfer.total_amount2 = parseFloat(dtFormatFloat(detail_vm.detail.transfer.total_amount2));
 
-                    if (detail_vm.detail.transfer.au_hd_invoice_amount === 0) {
+                    if (detail_vm.detail.transfer.au_hd_invoice_amount === 0 || detail_vm.detail.transfer.au_hd_invoice_amount === "") {
                         detail_vm.detail.transfer.au_hd_invoice_amount = null;
                     } else {
                         detail_vm.detail.transfer.au_hd_invoice_amount = parseFloat(dtFormatFloat(detail_vm.detail.transfer.au_hd_invoice_amount));
