@@ -375,8 +375,65 @@
                                         </div>
                                     </div>
 
+                                    <div class="col-xs-3">
+                                        <div class="form-group">
+                                            <label for="au_hd" class="col-xs-4 control-label">Entry日期</label>
+                                            <div class="col-xs-8">
+                                                <input id="au_hd" name="detail.transfer.au_hd" type="text" class="input-sm form-control" disabled="disabled" v-model="detail.transfer.au_hd"/>
+                                                <div class="help-block">
+                                                    澳洲海关Entry日期
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                 </div>
 
+                                <div class="row">
+                                    <div class="col-xs-3">
+                                        <div class="form-group">
+                                            <label for="au_hd" class="col-xs-4 control-label">澳洲货代</label>
+                                            <div class="col-xs-8">
+                                                <input id="au_hd" name="detail.transfer.au_hd" type="text" class="input-sm form-control" disabled="disabled" v-model="detail.transfer.au_hd"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-3">
+                                        <div class="form-group">
+                                            <label for="au_hd" class="col-xs-4 control-label">invoice No.</label>
+                                            <div class="col-xs-8">
+                                                <input id="au_hd" name="detail.transfer.au_hd" type="text" class="input-sm form-control" disabled="disabled" v-model="detail.transfer.au_hd"/>
+                                                <div class="help-block">
+                                                    澳洲货代invoice No.
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xs-3">
+                                        <div class="form-group">
+                                            <label for="au_hd" class="col-xs-4 control-label">invoice金额</label>
+                                            <div class="col-xs-8">
+                                                <input id="au_hd" name="detail.transfer.au_hd" type="text" class="input-sm form-control" disabled="disabled" v-model="detail.transfer.au_hd"/>
+                                                <div class="help-block">
+                                                    澳洲货代invoice金额
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xs-3">
+                                        <div class="form-group">
+                                            <label for="au_hd" class="col-xs-4 control-label">invoice支付时间</label>
+                                            <div class="col-xs-8">
+                                                <input id="au_hd" name="detail.transfer.au_hd" type="text" class="input-sm form-control" disabled="disabled" v-model="detail.transfer.au_hd"/>
+                                                <div class="help-block">
+                                                    澳洲货代invoice支付时间
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </form>
                         </div>
                     </div>
@@ -628,6 +685,14 @@
             locale: "zh-cn"
         });
 
+        $('#au_hg_entry_date').datetimepicker({
+            locale: "zh-cn"
+        });
+
+        $('#au_hd_invoice_pay_time').datetimepicker({
+            locale: "zh-cn"
+        });
+
         initDataTable(
             '#entry_list',
             {
@@ -724,6 +789,12 @@
                     if (detail_vm.detail.transfer.stock_time < '2000-01-01 00:00') {
                         detail_vm.detail.transfer.stock_time = null;
                     }
+                    if (detail_vm.detail.transfer.au_hg_entry_date < '2000-01-01 00:00') {
+                        detail_vm.detail.transfer.au_hg_entry_date = null;
+                    }
+                    if (detail_vm.detail.transfer.au_hd_invoice_pay_time < '2000-01-01 00:00') {
+                        detail_vm.detail.transfer.au_hd_invoice_pay_time = null;
+                    }
 
                     detail_vm.detail.transfer.price_up_rate = parseFloat(dtFormatFloat(detail_vm.detail.transfer.price_up_rate));
                     detail_vm.detail.transfer.price_down_rate = parseFloat(dtFormatFloat(detail_vm.detail.transfer.price_down_rate));
@@ -810,6 +881,8 @@
             detail_vm.detail.transfer.packing_time = $("#packing_time").val();
             detail_vm.detail.transfer.departure_time = $("#departure_time").val();
             detail_vm.detail.transfer.stock_time = $("#stock_time").val();
+            detail_vm.detail.transfer.au_hg_entry_date = $("#au_hg_entry_date").val();
+            detail_vm.detail.transfer.au_hd_invoice_pay_time = $("#au_hd_invoice_pay_time").val();
 
             $.ajax({
                     url: '{%url "ErpContainerTransfer.Save"%}',
