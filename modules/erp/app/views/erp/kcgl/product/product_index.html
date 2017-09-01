@@ -181,6 +181,10 @@
                             "mDataProp": "prd.desc", "title": "备注", "bSearchable": true, "sClass": "wrap-word",
                             "render": function (data, type, row) {
                                 if (data) {
+                                    var max_length = 100;
+                                    if (data.length > max_length) {
+                                        data = data.substr(0, max_length - 3) + "...";
+                                    }
                                     return "<div>" + data + "</div>";
                                 }
                                 else {
