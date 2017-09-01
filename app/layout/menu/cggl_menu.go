@@ -3,11 +3,24 @@ package menu
 import (
 	"bytes"
 	"github.com/revel/revel"
+	"matrix/modules/auth/service/pass_service"
+	"matrix/core"
+	"matrix/modules/auth/pass_res"
 )
 
 func GetCgglMenu(res_id_map map[int64]bool, web_session revel.Session) string {
 	if _, found := revel.ModuleByName("erp"); found == false {
 		return ""
+	}
+
+	var login_user = core.GetLoginUser(web_session)
+	var is_admin = pass_service.Is_user_admin(login_user.UserId)
+
+	var check_pass_res_menu = func(pass_res_id int64) bool {
+		if v, ok := res_id_map[pass_res_id]; is_admin == true || (v == true && ok == true) {
+			return true
+		}
+		return false
 	}
 
 	var buffer bytes.Buffer
@@ -20,55 +33,67 @@ func GetCgglMenu(res_id_map map[int64]bool, web_session revel.Session) string {
         <b class="arrow fa fa-angle-down"></b>
     </a>
     <b class="arrow"></b>
-    <ul class="submenu">
+    <ul class="submenu">`)
 
-        <li id="cggl-aaaa-menu" class="">
+	if check_pass_res_menu(pass_res.CGGL_PRODUCT_SETTING) == true {
+		buffer.WriteString(`<li id="cggl-product-purchase-setting-menu" class="">
+            <a href="/product/purchase/setting">
+                <i class="menu-icon fa fa-caret-right"></i>
+                商品采购设置
+            </a>
+            <b class="arrow"></b>
+        </li>`)
+	}
+
+	buffer.WriteString(`<li id="cggl-aaaa-menu" class="">
             <a href="#">
                 <i class="menu-icon fa fa-caret-right"></i>
                 智能补货
             </a>
             <b class="arrow"></b>
-        </li>
+        </li>`)
 
-        <li id="cggl-purchasebill-menu" class="">
+	buffer.WriteString(`<li id="cggl-purchase-bill-menu" class="">
             <a href="/purchase/bill">
                 <i class="menu-icon fa fa-caret-right"></i>
                 采购管理
             </a>
             <b class="arrow"></b>
-        </li>
+        </li>`)
 
-        <li id="cggl-eeee-menu" class="">
+	buffer.WriteString(`<li id="cggl-eeee-menu" class="">
             <a href="#">
                 <i class="menu-icon fa fa-caret-right"></i>
                 财务管理
             </a>
             <b class="arrow"></b>
-        </li>
+        </li>`)
 
-        <li id="cggl-bbbb-menu" class="">
+	buffer.WriteString(`<li id="cggl-bbbb-menu" class="">
             <a href="#">
                 <i class="menu-icon fa fa-caret-right"></i>
                 入库管理
             </a>
             <b class="arrow"></b>
-        </li>
+        </li>`)
 
-        <li id="cggl-cccc-menu" class="">
+	buffer.WriteString(`<li id="cggl-cccc-menu" class="">
             <a href="#">
                 <i class="menu-icon fa fa-caret-right"></i>
                 异常采购单
             </a>
             <b class="arrow"></b>
-        </li>
+        </li>`)
 
-        <li id="cggl-dddd-menu" class="">
+	buffer.WriteString(`<li id="cggl-dddd-menu" class="">
             <a href="#">
                 <i class="menu-icon fa fa-caret-right"></i>
                 采购流水
             </a>
             <b class="arrow"></b>
-        </li>
+        </li>`)
+
+	buffer.WriteString(`
     </ul>
 </li>
 `)

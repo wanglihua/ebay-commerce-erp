@@ -37,15 +37,13 @@ func (c ErpProductPurchaseSettingExcel) Import() revel.Result {
 		})
 	}
 
-	type product_weight_t struct {
-		sku    string
-		length float64
-		width  float64
-		height float64
-		weight float64
+	type product_purchase_setting_t struct {
+		sku              string
+		purchase_days    int64
+		stock_alert_days int64
 	}
 
-	product_weight_list := make([]product_weight_t, 0)
+	var product_purchase_setting_list = make([]product_purchase_setting_t, 0)
 
 	xlsx_file, err := xlsx.OpenBinary(excel_file_bytes)
 	core.HandleError(err)
@@ -59,22 +57,26 @@ func (c ErpProductPurchaseSettingExcel) Import() revel.Result {
 		//revel.TRACE.Printf("max_row: %d\n", max_row)
 		//略过标题行
 		for row_index := 1; row_index < max_row; row_index ++ {
-			row := sheet.Rows[row_index]
-
 			var cell *xlsx.Cell
 			var cell_val string
 			var err error
 
-			var product_weight product_weight_t
+			var product_weight product_purchase_setting_t
 
-			col_index := 1 //从第二列开始导入，略去第一列的编号
+			col_index := 0 // 第一列是编号
 
-			if len(row.Cells) < 5 {
+			// 编号，只是判断一下是不是空的
+			cell = sheet.Cell(row_index, col_index)
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
+			if cell_val == "" {
 				break
 			}
+			col_index++
 
 			//SKU
-			cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
@@ -85,51 +87,29 @@ func (c ErpProductPurchaseSettingExcel) Import() revel.Result {
 			product_weight.sku = cell_val
 			col_index++
 
-			// length
-			cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			//revel.TRACE.Println(cell_val)
-			product_length, err := strconv.ParseFloat(cell_val, 64)
+			purchase_days, err := strconv.ParseInt(cell_val, 10, 64)
 			core.HandleError(err)
-			product_weight.length = product_length
+			product_weight.purchase_days = purchase_days
 			col_index++
 
-			// width
-			cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			//revel.TRACE.Println(cell_val)
-			product_width, err := strconv.ParseFloat(cell_val, 64)
+			stock_alert_days, err := strconv.ParseInt(cell_val, 10, 64)
 			core.HandleError(err)
-			product_weight.width = product_width
+			product_weight.stock_alert_days = stock_alert_days
 			col_index++
 
-			// height
-			cell = row.Cells[col_index]
-			cell_val, err = cell.String()
-			core.HandleError(err)
-			//revel.TRACE.Println(cell_val)
-			product_height, err := strconv.ParseFloat(cell_val, 64)
-			core.HandleError(err)
-			product_weight.height = product_height
-			col_index++
-
-			// weight
-			cell = row.Cells[col_index]
-			cell_val, err = cell.String()
-			core.HandleError(err)
-			//revel.TRACE.Println(cell_val)
-			weight, err := strconv.ParseFloat(cell_val, 64)
-			core.HandleError(err)
-			product_weight.weight = weight
-			col_index++
-
-			product_weight_list = append(product_weight_list, product_weight)
+			product_purchase_setting_list = append(product_purchase_setting_list, product_weight)
 		}
 	}
 
-	if len(product_weight_list) == 0 {
+	if len(product_purchase_setting_list) == 0 {
 		return c.RenderJson(map[string]interface{}{
 			"success": false,
 			"message": "Excel文件中导入商品列表为空！",
@@ -137,49 +117,31 @@ func (c ErpProductPurchaseSettingExcel) Import() revel.Result {
 	}
 
 	has_zero_data := false
-	for _, product_weight := range product_weight_list {
+	for _, product_purchase_setting := range product_purchase_setting_list {
 		var product kcgl_models.ProductInfo
-		has, err := db_session.Where(fmt.Sprintf("sku = '%s'", product_weight.sku)).Get(&product)
+		has, err := db_session.Where(fmt.Sprintf("sku = '%s'", product_purchase_setting.sku)).Get(&product)
 		core.HandleError(err)
 
-		product.Sku = product_weight.sku
-		product.Length = product_weight.length
-		product.Width = product_weight.width
-		product.Height = product_weight.height
-		product.Weight = product_weight.weight
+		product.Sku = product_purchase_setting.sku
+		product.PurchaseDays = product_purchase_setting.purchase_days
+		product.StockAlertDays = product_purchase_setting.stock_alert_days
 
-		if product_weight.length == 0 || product_weight.width == 0 || product_weight.height == 0 || product_weight.weight == 0 {
+		if product_purchase_setting.purchase_days == 0 || product_purchase_setting.stock_alert_days == 0 {
 			has_zero_data = true
 		}
 
 		if has == true {
-			update_col_list := []string{"length", "width", "height", "weight"}
+			update_col_list := []string{"purchase_days", "stock_alert_days"}
 			_, err = db_session.Id(product.Id).Cols(update_col_list...).Update(&product)
 			core.HandleError(err)
 		} else {
-			/*
-			// 这里只用于维护和更新长宽高数据，不进行数据的插入操作
-			return c.RenderJson(map[string]interface{}{
-				"success": true,
-				"message": "商品SKU数据库中不存在！",
-			})
-			*/
-
-			panic(fmt.Sprintf("商品SKU %s 数据库中不存在！", product_weight.sku))
-
-			/*
-			product.CnName = product.Sku
-			product.Name = product.Sku
-			product.StatusId = models.PRODUCT_STATUS_ZC
-			_, err = db_session.Insert(&product)
-			core.HandleError(err)
-			*/
+			panic(fmt.Sprintf("商品SKU %s 数据库中不存在！", product_purchase_setting.sku))
 		}
 	}
 
 	message := "数据导入成功！"
 	if has_zero_data == true {
-		message = "数据导入成功, 部分长宽高数据为零！"
+		message = "数据导入成功, 部分数据为零！"
 	}
 
 	return c.RenderJson(map[string]interface{}{
@@ -216,7 +178,7 @@ func (c ErpProductPurchaseSettingExcel) Export() revel.Result {
 
 	reader := bytes.NewReader(buffer.Bytes()) //bytes.Reader 实现了 io.Reader 接口
 
-	file_name := "商品长宽高重量导出.xlsx" //"file.xlsx" //可以根据参数生成文件名
+	file_name := "商品采购设置导出.xlsx" //"file.xlsx" //可以根据参数生成文件名
 
 	return c.RenderBinary(reader, file_name, revel.Attachment, time.Now())
 }
@@ -288,7 +250,7 @@ func (c ErpProductPurchaseSettingExcel) export_product_list_to_excel(db_session 
 	xlsx_file := xlsx.NewFile()
 
 	//添加工作表
-	sheet, err := xlsx_file.AddSheet("商品长宽高重量列表")
+	sheet, err := xlsx_file.AddSheet("商品采购设置")
 	core.HandleError(err)
 
 	//添加标题行
@@ -311,8 +273,6 @@ func (c ErpProductPurchaseSettingExcel) export_product_list_to_excel(db_session 
 		return ""
 	}
 
-	//序号	SKU	中文名称	产品长度（cm）	产品宽度（cm）	产品高度（cm）	实际重量(kg)	状态
-
 	{
 		cell := row.AddCell()
 		sheet.SetColWidth(col_index, col_index, 10)
@@ -321,13 +281,13 @@ func (c ErpProductPurchaseSettingExcel) export_product_list_to_excel(db_session 
 		col_index++
 
 		cell = row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 10)
+		sheet.SetColWidth(col_index, col_index, 20)
 		set_head_cell_style(cell)
 		cell.Value = "SKU"
 		col_index++
 
 		cell = row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 10)
+		sheet.SetColWidth(col_index, col_index, 50)
 		set_head_cell_style(cell)
 		cell.Value = "中文名称"
 		col_index++
@@ -335,25 +295,25 @@ func (c ErpProductPurchaseSettingExcel) export_product_list_to_excel(db_session 
 		cell = row.AddCell()
 		sheet.SetColWidth(col_index, col_index, 10)
 		set_head_cell_style(cell)
-		cell.Value = "产品长度（cm）"
+		cell.Value = "采购天数"
 		col_index++
 
 		cell = row.AddCell()
 		sheet.SetColWidth(col_index, col_index, 10)
 		set_head_cell_style(cell)
-		cell.Value = "产品宽度（cm）"
+		cell.Value = "库存警戒天数"
 		col_index++
 
 		cell = row.AddCell()
 		sheet.SetColWidth(col_index, col_index, 10)
 		set_head_cell_style(cell)
-		cell.Value = "产品高度（cm）"
+		cell.Value = "日均销量"
 		col_index++
 
 		cell = row.AddCell()
 		sheet.SetColWidth(col_index, col_index, 10)
 		set_head_cell_style(cell)
-		cell.Value = "实际重量(kg)"
+		cell.Value = "警戒库存"
 		col_index++
 
 		cell = row.AddCell()
@@ -374,37 +334,37 @@ func (c ErpProductPurchaseSettingExcel) export_product_list_to_excel(db_session 
 
 		// SKU
 		cell = row.AddCell()
-		set_text_cell_style(cell, "center")
+		set_text_cell_style(cell, "left")
 		cell.Value = product.Sku
 
 		// 中文名称
 		cell = row.AddCell()
-		set_text_cell_style(cell, "center")
+		set_text_cell_style(cell, "left")
 		cell.Value = product.CnName
 
-		// 	产品长度（cm）
+		// 采购天数
 		cell = row.AddCell()
-		set_text_cell_style(cell, "right")
-		cell.Value = fmt.Sprintf("%0.2f", product.Length)
+		set_text_cell_style(cell, "center")
+		cell.Value = fmt.Sprintf("%d", product.PurchaseDays)
 
-		// 产品宽度（cm）
+		// 库存警戒天数
 		cell = row.AddCell()
-		set_text_cell_style(cell, "right")
-		cell.Value = fmt.Sprintf("%0.2f", product.Width)
+		set_text_cell_style(cell, "center")
+		cell.Value = fmt.Sprintf("%d", product.StockAlertDays)
 
-		// 	产品高度（cm）
+		// 日均销量
 		cell = row.AddCell()
-		set_text_cell_style(cell, "right")
-		cell.Value = fmt.Sprintf("%0.2f", product.Height)
+		set_text_cell_style(cell, "center")
+		cell.Value = fmt.Sprintf("%0.2f", product.DailyMeanSales)
 
-		// 	实际重量(kg)
+		// 警戒库存
 		cell = row.AddCell()
-		set_text_cell_style(cell, "right")
-		cell.Value = fmt.Sprintf("%0.3f", product.Weight)
+		set_text_cell_style(cell, "center")
+		cell.Value = fmt.Sprintf("%d", product.StockAlertQty)
 
 		// 状态
 		cell = row.AddCell()
-		set_text_cell_style(cell, "right")
+		set_text_cell_style(cell, "center")
 		cell.Value = find_product_status_name(product.StatusId)
 	}
 

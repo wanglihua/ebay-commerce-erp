@@ -6,7 +6,7 @@
                 <a href='{%url "Home.Index"%}'><i class="ace-icon fa fa-home home-icon"></i></a>
             </li>
             <li class="parent" data-menu="cggl-menu">采购管理</li>
-            <li class="active" data-menu="cggl-product-weight-menu">商品采购设置</li>
+            <li class="active" data-menu="cggl-product-purchase-setting-menu">商品采购设置</li>
         </ul>
     </div>
     <div class="page-content">
@@ -51,7 +51,7 @@
         </div>
     </div>
     <div class="modal fade" id="productDetailDialog">
-        <div class="modal-dialog" style="width: 480px;">
+        <div class="modal-dialog" style="width: 580px;">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="True">&times;</button>
@@ -212,9 +212,14 @@
                             }
                             //<div class="tdSkuNameSup"><a href="/product/detail/' + row.prd.id + '" target="_blank">' + row.prd.sku + '</a></div>
                         },
-                        {"mDataProp": "p.cn_name", "title": "商品名称", "bSearchable": true},
                         {
-                            "mDataProp": "p.purchase_days", "title": "采购天数", "bSearchable": false, "width": 80,
+                            "mDataProp": "p.cn_name", "title": "商品名称", "bSearchable": true, "sClass": "wrap-word",
+                            "render": function (data, type, row) {
+                                return "<div>" + data + "</div>"
+                            }
+                        },
+                        {
+                            "mDataProp": "p.purchase_days", "title": "采购天数", "bSearchable": false, "width": 80, "sClass": "center",
                             "render": function (data, type, row) {
                                 if (data !== 0) {
                                     return data
@@ -225,7 +230,7 @@
                             }
                         },
                         {
-                            "mDataProp": "p.stock_alert_days", "title": "库存警戒天数", "bSearchable": false, "width": 80,
+                            "mDataProp": "p.stock_alert_days", "title": "库存警戒天数", "bSearchable": false, "width": 100, "sClass": "center",
                             "render": function (data, type, row) {
                                 if (data !== 0) {
                                     return data;
@@ -236,7 +241,7 @@
                             }
                         },
                         {
-                            "mDataProp": "p.daily_mean_sales", "title": "日均销量", "bSearchable": false, "width": 80,
+                            "mDataProp": "p.daily_mean_sales", "title": "日均销量", "bSearchable": false, "width": 80, "sClass": "center",
                             "render": function (data, type, row) {
                                 if (data !== 0) {
                                     return dtFormatFloat(data);
@@ -247,7 +252,7 @@
                             }
                         },
                         {
-                            "mDataProp": "p.stock_alert_qty", "title": "警戒库存", "bSearchable": false, "width": 80,
+                            "mDataProp": "p.stock_alert_qty", "title": "警戒库存", "bSearchable": false, "width": 80, "sClass": "center",
                             "render": function (data, type, row) {
                                 if (data !== 0) {
                                     return data;
@@ -371,7 +376,7 @@
                 var params = $.param({
                     "id_list": id_list
                 });
-                var url = '{%url "ErpProductPurchaseSettingExport.Export"%}' + "?" + params;
+                var url = '{%url "ErpProductPurchaseSettingExcel.Export"%}' + "?" + params;
                 $('<form method="post" action="' + url + '"></form>').appendTo('body').submit().remove();
             }
         }
