@@ -177,7 +177,17 @@
                                 return inventory_desc;
                             }
                         },
-                        {"mDataProp": "prd.desc", "title": "备注", "bSearchable": true},
+                        {
+                            "mDataProp": "prd.desc", "title": "备注", "bSearchable": true, "sClass": "wrap-word",
+                            "render": function (data, type, row) {
+                                if (data) {
+                                    return "<div>" + data + "</div>";
+                                }
+                                else {
+                                    return "";
+                                }
+                            }
+                        },
                         {"mDataProp": "st.name", "title": "状态", "bSearchable": false, "width": 60},
                         {
                             "mDataProp": "prd.create_time", "title": "创建时间", "bSearchable": false,

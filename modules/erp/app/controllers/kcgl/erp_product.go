@@ -311,11 +311,13 @@ func (c ErpProduct) Save() revel.Result {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，SKU已存在！"})
 		}
 
+		/*
 		name_count, err := db_session.Where("name = ?", product_from_ui.Name).Count(new(kcgl_models.ProductInfo))
 		core.HandleError(err)
 		if name_count != 0 {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，名称已存在！"})
 		}
+		*/
 
 		affected, err = db_session.Insert(&product_from_ui)
 		core.HandleError(err)
@@ -330,11 +332,15 @@ func (c ErpProduct) Save() revel.Result {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，SKU已存在！"})
 		}
 
-		name_count, err := db_session.Where("id <> ? and name = ?", product_from_ui.Id, product_from_ui.Name).Count(new(kcgl_models.ProductInfo))
-		core.HandleError(err)
-		if name_count != 0 {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，名称已存在！"})
+		/*
+		if strings.TrimSpace(product_from_ui.Name) != "" {
+			name_count, err := db_session.Where("id <> ? and name = ?", product_from_ui.Id, product_from_ui.Name).Count(new(kcgl_models.ProductInfo))
+			core.HandleError(err)
+			if name_count != 0 {
+				return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，名称已存在！"})
+			}
 		}
+		*/
 
 		var product_in_db kcgl_models.ProductInfo
 		_, err = db_session.Id(product_from_ui.Id).Get(&product_in_db)
