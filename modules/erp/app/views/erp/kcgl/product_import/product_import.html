@@ -155,7 +155,12 @@
                                 return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
                             }
                         },
-                        {"mDataProp": "prd.sku", "title": "商品SKU", "bSearchable": true, "width": 150},
+                        {
+                            "mDataProp": "prd.sku", "title": "商品SKU", "bSearchable": true, "width": 150,
+                            "render": function (data, type, row) {
+                                return '<a href="/product/detail/' + row.prd.id + '" target="product_detail">' + row.prd.sku + '</a>';
+                            }
+                        },
                         {"mDataProp": "prd.cn_name", "title": "商品名称", "bSearchable": true},
                         {
                             "mDataProp": "prd.cost_price", "title": "中国仓采购价", "bSearchable": false, "width": 80,

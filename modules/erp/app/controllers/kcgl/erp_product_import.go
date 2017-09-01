@@ -143,15 +143,17 @@ func (c ErpProductImport) Upload() revel.Result {
 
 	// 编号 SKU 中文名称  采购价（人民币元） 产品长度（cm） 产品宽度（cm） 产品高度（cm） 实际重量(kg) 状态
 	type product_import_t struct {
-		ord_num    string
-		sku        string
-		cn_name    string
-		cost_price float64
-		length     float64
-		width      float64
-		height     float64
-		weight     float64
-		status     string
+		ord_num     string
+		sku         string
+		cn_name     string
+		cost_price  float64
+		length      float64
+		width       float64
+		height      float64
+		weight      float64
+		status      string
+		supplier    string
+		description string
 	}
 
 	product_import_list := make([]product_import_t, 0)
@@ -168,7 +170,7 @@ func (c ErpProductImport) Upload() revel.Result {
 		//revel.TRACE.Printf("max_row: %d\n", max_row)
 		//略过标题行
 		for row_index := 1; row_index < max_row; row_index ++ {
-			row := sheet.Rows[row_index]
+			// row := sheet.Rows[row_index]
 
 			var cell *xlsx.Cell
 			var cell_val string
@@ -178,14 +180,10 @@ func (c ErpProductImport) Upload() revel.Result {
 
 			col_index := 0
 
-			if len(row.Cells) < 9 { // 数据有 9 列
-				break
-			}
-
 			// 编号 SKU 中文名称 采购价（人民币元） 产品长度（cm） 产品宽度（cm） 产品高度（cm） 实际重量(kg)
 
 			// 编号
-			cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
@@ -197,7 +195,7 @@ func (c ErpProductImport) Upload() revel.Result {
 			col_index++
 
 			//SKU
-			cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
@@ -206,7 +204,7 @@ func (c ErpProductImport) Upload() revel.Result {
 			col_index++
 
 			// 中文名称
-			cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
@@ -215,7 +213,7 @@ func (c ErpProductImport) Upload() revel.Result {
 			col_index++
 
 			// 采购价（人民币元）
-			cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			//revel.TRACE.Println(cell_val)
@@ -225,7 +223,7 @@ func (c ErpProductImport) Upload() revel.Result {
 			col_index++
 
 			// length
-			cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			//revel.TRACE.Println(cell_val)
@@ -235,7 +233,7 @@ func (c ErpProductImport) Upload() revel.Result {
 			col_index++
 
 			// width
-			cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			//revel.TRACE.Println(cell_val)
@@ -245,7 +243,7 @@ func (c ErpProductImport) Upload() revel.Result {
 			col_index++
 
 			// height
-			cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			//revel.TRACE.Println(cell_val)
@@ -255,7 +253,7 @@ func (c ErpProductImport) Upload() revel.Result {
 			col_index++
 
 			// weight
-			cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			//revel.TRACE.Println(cell_val)
@@ -265,12 +263,30 @@ func (c ErpProductImport) Upload() revel.Result {
 			col_index++
 
 			// 状态
-			cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
 			//revel.TRACE.Println(cell_val)
 			product_import.status = cell_val
+			col_index++
+
+			// 供应商
+			cell = sheet.Cell(row_index, col_index)
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
+			//revel.TRACE.Println(cell_val)
+			product_import.supplier = cell_val
+			col_index++
+
+			// 备注
+			cell = sheet.Cell(row_index, col_index)
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
+			//revel.TRACE.Println(cell_val)
+			product_import.description = cell_val
 			col_index++
 
 			product_import_list = append(product_import_list, product_import)
@@ -299,6 +315,19 @@ func (c ErpProductImport) Upload() revel.Result {
 		return 0
 	}
 
+	var supplier_list = make([]sppz_models.SupplierInfo, 0)
+	core.HandleError(db_session.Find(&supplier_list))
+
+	var get_supplier_id_by_name = func(supplier_name string) int64 {
+		for _, supplier := range supplier_list {
+			if supplier.Name == supplier_name {
+				return supplier.Id
+			}
+		}
+
+		return 0
+	}
+
 	has_zero_data := false
 	for _, product_import := range product_import_list {
 		var product kcgl_models.ProductInfo
@@ -313,6 +342,9 @@ func (c ErpProductImport) Upload() revel.Result {
 		product.Width = product_import.width
 		product.Height = product_import.height
 		product.Weight = product_import.weight
+		product.Desc = core.MakeNullString(product_import.description, true)
+
+		// status
 
 		var status_name = product_import.status
 		// 查看状态是否存在
@@ -331,6 +363,16 @@ func (c ErpProductImport) Upload() revel.Result {
 
 		product.StatusId = status_id
 
+		// supplier
+
+		var supplier_id = get_supplier_id_by_name(product_import.supplier)
+
+		if supplier_id == 0 {
+			panic(fmt.Sprintf("序号 %s 的供应商名称 %s 无效", product_import.ord_num, product_import.supplier))
+		}
+
+		product.SupplierId = core.MakeNullInt(supplier_id, true)
+
 		if product_import.length == 0 || product_import.width == 0 || product_import.height == 0 || product_import.weight == 0 {
 			has_zero_data = true
 		}
@@ -341,7 +383,7 @@ func (c ErpProductImport) Upload() revel.Result {
 			// panic(fmt.Sprintf("序号 %s 的商品SKU %s 已存在", product_import.ord_num, product_import.sku))
 
 			// 编号 SKU 中文名称 采购价（人民币元） 产品长度（cm） 产品宽度（cm） 产品高度（cm） 实际重量(kg)
-			update_col_list := []string{"sku", "cn_name", "cost_price", "length", "width", "height", "weight"} //这里不更新英文名称
+			update_col_list := []string{"sku", "cn_name", "cost_price", "length", "width", "height", "weight", "supplier_id", "desc"} //这里不更新英文名称
 			_, err = db_session.Id(product.Id).Cols(update_col_list...).Update(&product)
 			core.HandleError(err)
 		} else {
