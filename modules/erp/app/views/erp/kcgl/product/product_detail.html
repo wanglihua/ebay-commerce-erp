@@ -212,6 +212,46 @@
 
                             <div class="col-xs-3">
                                 <div class="form-group">
+                                    <label for="purchase_days" class="col-xs-4 control-label">采购天数</label>
+                                    <div class="col-xs-8">
+                                        <input id="purchase_days" name="detail.product.purchase_days" type="text" class="input-sm form-control" v-model.number="detail.product.purchase_days" disabled="disabled"/>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-xs-3">
+                                <div class="form-group">
+                                    <label for="stock_alert_days" class="col-xs-4 control-label">库存警戒天数</label>
+                                    <div class="col-xs-8">
+                                        <input id="stock_alert_days" name="detail.product.stock_alert_days" type="text" class="input-sm form-control" v-model.number="detail.product.stock_alert_days" disabled="disabled"/>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-xs-3">
+                                <div class="form-group">
+                                    <label for="stock_alert_qty" class="col-xs-4 control-label">日均销量</label>
+                                    <div class="col-xs-8">
+                                        <input id="stock_alert_qty" name="detail.product.stock_alert_qty" type="text" class="input-sm form-control" v-model.number="detail.product.stock_alert_qty" disabled="disabled"/>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-xs-3">
+                                <div class="form-group">
+                                    <label for="daily_mean_sales" class="col-xs-4 control-label">警戒库存</label>
+                                    <div class="col-xs-8">
+                                        <input id="daily_mean_sales" name="detail.product.daily_mean_sales" type="text" class="input-sm form-control" v-model.number="detail.product.daily_mean_sales" disabled="disabled"/>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="row">
+
+                            <div class="col-xs-3">
+                                <div class="form-group">
                                     <label for="product_style_id" class="col-xs-4 control-label">商品款式：</label>
                                     <div class="col-xs-8">
                                         <select id="product_style_id" name="detail.product.style_id" class="input-sm form-control" v-model.number="detail.product.style_id" disabled="disabled">
@@ -507,6 +547,7 @@
                         this_vm.detail.product.height = parseFloat(dtFormatFloat(this_vm.detail.product.height));
                         this_vm.detail.product.weight = parseFloat(dtFormatFloat(this_vm.detail.product.weight));
                         this_vm.detail.product.cost_price = parseFloat(dtFormatFloat(this_vm.detail.product.cost_price));
+                        this_vm.detail.product.daily_mean_sales = parseFloat(dtFormatFloat(this_vm.detail.product.daily_mean_sales));
                     }
                 });
         },
