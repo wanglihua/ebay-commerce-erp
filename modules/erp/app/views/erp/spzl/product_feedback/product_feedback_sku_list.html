@@ -27,7 +27,7 @@
                         <div class="col-xs-12">
                             <label for="feedback_sku">SKU</label>
                             <input id="feedback_sku" name="feedback_sku" v-model="page.feedback_sku" style="width: 130px;height: 28px;"/>&nbsp;&nbsp;
-                            <button class="btn btn-mini btn-primary" style="margin-bottom:3px;height: 30px;" @click="reloadList()">
+                            <button class="btn btn-mini btn-primary" style="margin-bottom:3px;height: 30px;" @click="refreshList()">
                                 &nbsp;<i class="ace-icon fa fa-search"></i>查&nbsp;询&nbsp;
                             </button>
                         </div>
@@ -204,6 +204,9 @@
         methods: {
             reloadList: function () {
                 reloadList('#productList');
+            },
+            refreshList: function () {
+                refreshList('#productList');
             },
             showProductFeedbackDetail: function () {
                 showMask("加载中...");

@@ -41,7 +41,7 @@
                             </select>&nbsp;&nbsp;
                             <label for="sku_query">商品编号查询</label>
                             <input id="sku_query" name="sku_query" style="width: 180px;height:30px;"/>
-                            <button class="btn btn-mini btn-primary" style="margin-bottom:3px;height: 30px;" @click="reloadList()">
+                            <button class="btn btn-mini btn-primary" style="margin-bottom:3px;height: 30px;" @click="refreshList()">
                                 &nbsp;<i class="ace-icon fa fa-search"></i>查&nbsp;询&nbsp;
                             </button>
                         </div>
@@ -111,6 +111,9 @@
         methods: {
             reloadList: function () {
                 reloadList('#productSaleDayAnalysisList');
+            },
+            refreshList: function () {
+                refreshList('#productSaleDayAnalysisList');
             },
             analyze: function () {
                 $.msg.confirm("将立即启动单日销售后台分析任务，分析近3天日销售情况", function () {

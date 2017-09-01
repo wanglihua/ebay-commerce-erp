@@ -22,10 +22,26 @@ func GetCgglMenu(res_id_map map[int64]bool, web_session revel.Session) string {
     <b class="arrow"></b>
     <ul class="submenu">
 
+        <li id="cggl-aaaa-menu" class="">
+            <a href="#">
+                <i class="menu-icon fa fa-caret-right"></i>
+                智能补货
+            </a>
+            <b class="arrow"></b>
+        </li>
+
         <li id="cggl-purchasebill-menu" class="">
             <a href="/purchase/bill">
                 <i class="menu-icon fa fa-caret-right"></i>
                 采购管理
+            </a>
+            <b class="arrow"></b>
+        </li>
+
+        <li id="cggl-eeee-menu" class="">
+            <a href="#">
+                <i class="menu-icon fa fa-caret-right"></i>
+                财务管理
             </a>
             <b class="arrow"></b>
         </li>
@@ -45,9 +61,28 @@ func GetCgglMenu(res_id_map map[int64]bool, web_session revel.Session) string {
             </a>
             <b class="arrow"></b>
         </li>
+
+        <li id="cggl-dddd-menu" class="">
+            <a href="#">
+                <i class="menu-icon fa fa-caret-right"></i>
+                采购流水
+            </a>
+            <b class="arrow"></b>
+        </li>
     </ul>
 </li>
 `)
 
 	return buffer.String()
 }
+
+/*
+
+智能补货
+采购管理
+财务管理
+入库管理
+异常采购管理
+采购流水
+
+ */

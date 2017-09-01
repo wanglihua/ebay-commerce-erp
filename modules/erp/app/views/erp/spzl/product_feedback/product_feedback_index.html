@@ -53,7 +53,7 @@
                                     <option :value="supplier.id">{{supplier.name}}</option>
                                 </template>
                             </select>&nbsp;&nbsp;
-                            <button class="btn btn-mini btn-primary" style="margin-bottom:3px;height: 30px;" @click="reloadList()">
+                            <button class="btn btn-mini btn-primary" style="margin-bottom:3px;height: 30px;" @click="refreshList()">
                                 &nbsp;<i class="ace-icon fa fa-search"></i>查&nbsp;询&nbsp;
                             </button>
                         </div>
@@ -294,6 +294,9 @@
         methods: {
             reloadList: function () {
                 reloadList('#productFeedbackList');
+            },
+            refreshList: function () {
+                refreshList('#productFeedbackList');
             },
             show_cate: function (cate_id) {
                 vm.page.feedback_cate_id = cate_id;
