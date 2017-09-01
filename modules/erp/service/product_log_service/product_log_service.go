@@ -67,6 +67,14 @@ func Insert_product_log(product_from_ui *kcgl_models.ProductInfo /*更新操作�
 			operation_list = append(operation_list, fmt.Sprintf("重量: %0.2f => %0.2f", product_in_db.Weight, product_from_ui.Weight))
 		}
 
+		if math.Abs(float64(product_in_db.PurchaseDays-product_from_ui.PurchaseDays)) > core.FLOAT_MIN_DIFF {
+			operation_list = append(operation_list, fmt.Sprintf("采购天数: %df => %df", product_in_db.PurchaseDays, product_from_ui.PurchaseDays))
+		}
+
+		if math.Abs(float64(product_in_db.StockAlertDays-product_from_ui.StockAlertDays)) > core.FLOAT_MIN_DIFF {
+			operation_list = append(operation_list, fmt.Sprintf("库存警戒天数: %df => %df", product_in_db.StockAlertDays, product_from_ui.StockAlertDays))
+		}
+
 		product_log.Operation += strings.Join(operation_list, ", ")
 
 		//todo: 可以继续补充其它详细信息

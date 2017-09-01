@@ -632,3 +632,11 @@ POST /supplier/pay/method/data/list       ErpSupplierPayMethod.ListData
 POST /supplier/pay/method/data/detail     ErpSupplierPayMethod.DetailData
 POST /supplier/pay/method/save            ErpSupplierPayMethod.Save
 POST /supplier/pay/method/delete          ErpSupplierPayMethod.Delete
+
+GET  /product/purchase/setting                  ErpProductPurchaseSetting.Index
+POST /product/purchase/setting/data/list        ErpProductPurchaseSetting.ListData
+POST /product/purchase/setting/data/detail      ErpProductPurchaseSetting.DetailData
+POST /product/purchase/setting/save             ErpProductPurchaseSetting.Save
+
+POST /product/purchase/setting/excel/import     ErpProductPurchaseSettingExcel.Import
+POST /product/purchase/setting/excel/export     ErpProductPurchaseSettingExcel.Export

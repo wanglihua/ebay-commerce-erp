@@ -10,15 +10,19 @@ const (
 
 	// 新的编号办法： 前两位是 模块编号，11 开始；后两位是菜单编号 01 开始；最后两位保留用于中间插入新的号码
 
-	// 系统配置  模块编号 11
-	// 订单配置  模块编号 12
-	// 订单流程  模块编号 13
-	// 库存管理  模块编号 14
-	// 商品配置  模块编号 15
-	// 海关报关  模块编号 16
-	// 商品报表  模块编号 17
+	// 系统配置        模块编号 11
+	// 订单配置        模块编号 12
+	// 订单流程        模块编号 13
+	// 库存管理        模块编号 14
+	// 商品配置        模块编号 15
+	// 海关报关        模块编号 16
+	// 商品报表        模块编号 17
+	// 商品质量反馈    模块编号 18
+	// 系统管理        模块编号 19
+	// 采购管理        模块编号 20
 
-	// 采购管理
+	// 采购管理 20
+	CGGL_PRODUCT_SETTING = 200100 // 商品采购设置
 
 	// 调拨管理
 
@@ -66,18 +70,18 @@ const (
 	DDLC_ORDER_FORCE_PEIHUO          = 131400 // 强制配货
 
 	// 库存管理 模块编号 14
-	KCGL_PRODUCT                   = 140100 // 商品列表
-	KCGL_PRODUCT_DETAIL_SAVE       = 140150 // 商品详细保存
-	KCGL_PRODUCT_BIND              = 140200 // 绑定商品
-	KCGL_PRODUCT_IMPORT            = 140300 // 商品导入
-	KCGL_PRODUCT_EXPORT            = 140400 // 商品导出
-	KCGL_PRODUCT_LWHW              = 140401 // 商品长宽高重量
-	KCGL_INVENTORY                 = 140500 // 商品库存
-	KCGL_INVENTORY_IMPORT_QTY      = 140531 // 商品库存 导入库存数量
-	KCGL_INVENTORY_EXPORT_QTY      = 140532 // 商品库存 导出库存数量
+	KCGL_PRODUCT              = 140100 // 商品列表
+	KCGL_PRODUCT_DETAIL_SAVE  = 140150 // 商品详细保存
+	KCGL_PRODUCT_BIND         = 140200 // 绑定商品
+	KCGL_PRODUCT_IMPORT       = 140300 // 商品导入
+	KCGL_PRODUCT_EXPORT       = 140400 // 商品导出
+	KCGL_PRODUCT_LWHW         = 140401 // 商品长宽高重量
+	KCGL_INVENTORY            = 140500 // 商品库存
+	KCGL_INVENTORY_IMPORT_QTY = 140531 // 商品库存 导入库存数量
+	KCGL_INVENTORY_EXPORT_QTY = 140532 // 商品库存 导出库存数量
 	//KCGL_INVENTORY_IMPORT_QTY_OVER = 140510 // 商品库存 导入覆盖库存数量
 	//KCGL_INVENTORY_IMPORT_QTY_DIFF = 140520 // 商品库存 导入修正库存数量
-	KCGL_INVENTORY_SKU_LOC         = 140501 // 商品库存 商品库位
+	KCGL_INVENTORY_SKU_LOC = 140501 // 商品库存 商品库位
 	//KCGL_INVENTORY_SKU_QTY         = 140502 // 商品库存 库存数量
 	KCGL_INVENTORY_SKU_PRICE     = 140503 // 商品库存 库存成本
 	KCGL_INVENTORY_CHECK         = 140600 // 库存盘点

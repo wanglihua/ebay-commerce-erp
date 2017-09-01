@@ -31,7 +31,7 @@ type ProductInfo struct {
 	Cert1Id        int64           `xorm:"bigint notnull 'cert1_id' default(0)" json:"cert1_id"`
 	Cert2Id        int64           `xorm:"bigint notnull 'cert2_id' default(0)" json:"cert2_id"`
 	Cert3Id        int64           `xorm:"bigint notnull 'cert3_id' default(0)" json:"cert3_id"`
-	StockAlertQty  int64           `xorm:"bigint notnull 'stock_alert_qty' default(0)" json:"stock_alert_qty"`          // 库存警戒库存，计算得到值
+	StockAlertQty  int64           `xorm:"bigint notnull 'stock_alert_qty' default(0)" json:"stock_alert_qty"`          // 警戒库存，计算得到值
 	StockAlertDays int64           `xorm:"bigint notnull 'stock_alert_days' default(0)" json:"stock_alert_days"`        // 库存警戒天数
 	DailyMeanSales float64         `xorm:"decimal(18,6) notnull 'daily_mean_sales' default(0)" json:"daily_mean_sales"` // 日均销量
 	PurchaseDays   int64           `xorm:"bigint notnull 'purchase_days' default(0)" json:"purchase_days"`              // 采购天数
