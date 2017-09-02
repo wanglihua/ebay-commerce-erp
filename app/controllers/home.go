@@ -143,6 +143,9 @@ func (c Home) SyncDbPost() revel.Result {
 	model_list = append(model_list, &ddlc_models.OrderShippingAddressInfo{})
 	model_list = append(model_list, &ddlc_models.PickupOrderInfo{})
 
+	model_list = append(model_list, &xsgl_models.SalesManagerInfo{})
+	model_list = append(model_list, &xsgl_models.ProductSaleSettingInfo{})
+
 	model_list = append(model_list, &xtgl_models.EntityCodeInfo{})
 	model_list = append(model_list, &xtgl_models.LittleIconInfo{})
 	model_list = append(model_list, &xtgl_models.LoginLogInfo{})
@@ -157,11 +160,10 @@ func (c Home) SyncDbPost() revel.Result {
 	model_list = append(model_list, &spbb_models.ProductSaleDayAnalysisInfo{})
 	model_list = append(model_list, &spbb_models.ProductSaleAnalysisInfo{})
 	model_list = append(model_list, &spbb_models.ProductSaleAnalysisSettingInfo{})
-
+	model_list = append(model_list, &erp_models.StatusInfo{})
 	model_list = append(model_list, &erp_models.MessageInfo{})
 	model_list = append(model_list, &erp_models.PaypalReconInfo{})
-	model_list = append(model_list, &xsgl_models.SalesManagerInfo{})
-	model_list = append(model_list, &erp_models.StatusInfo{})
+
 	//model_list = append(model_list, &erp_models.TestInfo{}) // 为什么这一句打开就不行
 
 	model_list = append(model_list, &track_modes.IssueAttachInfo{})

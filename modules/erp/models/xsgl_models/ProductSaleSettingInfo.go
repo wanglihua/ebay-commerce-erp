@@ -18,11 +18,3 @@ func (e ProductSaleSettingInfo) TableName() string {
 func (e ProductSaleSettingInfo) ModelDesc() string {
 	return "verbose_name=商品销售设置,entity_json=product_sale_setting,route=product/sale/setting"
 }
-
-/*
-
-todo: 改成按 Id 计算
-
-freight.iepoch.com.au
-
- */

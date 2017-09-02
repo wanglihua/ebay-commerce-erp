@@ -640,3 +640,7 @@ POST /product/purchase/setting/save             ErpProductPurchaseSetting.Save
 
 POST /product/purchase/setting/excel/import     ErpProductPurchaseSettingExcel.Import
 POST /product/purchase/setting/excel/export     ErpProductPurchaseSettingExcel.Export
+dadfasf
+GET  /product/sale/setting                      ErpProductSaleSetting.Index
+POST /product/sale/setting/data/detail          ErpProductSaleSetting.DetailData
+POST /product/sale/setting/save                 ErpProductSaleSetting.Save
