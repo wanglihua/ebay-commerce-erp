@@ -5,12 +5,9 @@ import (
 	"matrix/modules/erp/models/ddpz_models"
 	"matrix/modules/erp/models/kcgl_models"
 	"strings"
-	"matrix/modules/erp/service/logistics_setting_service"
 	"matrix/modules/erp/service/pick_fee_service"
 	"math"
-	"sort"
 	"github.com/revel/revel"
-	"matrix/core"
 )
 
 func Match_product_postage(sku string, postcode string, db_session *xorm.Session) (err error, fee float64) {
@@ -34,7 +31,7 @@ func Match_product_postage(sku string, postcode string, db_session *xorm.Session
 		panic("SKU不存在！")
 	}
 
-	var logistics_setting = logistics_setting_service.Get_logistics_setting(db_session)
+	//var logistics_setting = logistics_setting_service.Get_logistics_setting(db_session)
 
 	var logistics_mode_list = make([]ddpz_models.LogisticsModeInfo, 0)
 	err = db_session.Find(&logistics_mode_list)
@@ -61,6 +58,7 @@ func Match_product_postage(sku string, postcode string, db_session *xorm.Session
 
 		mode_result.length, mode_result.width, mode_result.height, mode_result.actual_weight = product.Length, product.Width, product.Height, product.Weight
 
+		/*
 		// 匹配前打折
 		{
 			// 匹配前重量打折
@@ -85,6 +83,7 @@ func Match_product_postage(sku string, postcode string, db_session *xorm.Session
 			} else {
 			}
 		}
+		*/
 
 		// 体积重是利用体积重公式计算得到的结果
 		// 只有这个参数大于零的时候才有意义
@@ -220,6 +219,7 @@ func Match_product_postage(sku string, postcode string, db_session *xorm.Session
 		var extra_fee_in_mode = math.Max(extra_weight_fee_in_mode, extra_length_fee_in_mode)
 		mode_result.total_fee = total_fee_in_fee_rate + extra_fee_in_mode
 
+		/*
 		// 匹配后打折
 		{
 			//这里的计算结果，不对物流的挑选产生影响，但会影响输出
@@ -249,6 +249,7 @@ func Match_product_postage(sku string, postcode string, db_session *xorm.Session
 				mode_result.dim_weight = mode_result.dim_weight * logistics_setting.Pphzbzl
 			}
 		}
+		*/
 
 		if mode_result.total_fee < final_result.total_fee {
 			final_result = mode_result
