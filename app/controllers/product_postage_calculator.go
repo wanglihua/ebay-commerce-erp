@@ -11,20 +11,17 @@ type ProductPostageCalculator struct {
 	*revel.Controller
 }
 
-func (c ProductPostageCalculator) Index(sku string) revel.Result {
-	sku = strings.TrimSpace(sku)
-
-	c.RenderArgs["sku"] = sku
-
+func (c ProductPostageCalculator) Index(id int64) revel.Result {
+	var product_id = id
+	c.RenderArgs["product_id"] = product_id
 	return c.RenderTemplate("product_postage_calculator/product_postage_calculator_index.html")
 }
 
 func (c ProductPostageCalculator) Post() revel.Result {
 	var db_session = c.DbSession
 
-	var sku string
-	c.Params.Bind(&sku, "sku")
-	sku = strings.TrimSpace(sku)
+	var product_id int64
+	c.Params.Bind(&product_id, "product_id")
 
 	var postcode string
 	c.Params.Bind(&postcode, "postcode")
@@ -37,7 +34,7 @@ func (c ProductPostageCalculator) Post() revel.Result {
 		})
 	}
 
-	var err, fee = product_logistics_service.Match_product_postage(sku, postcode, db_session)
+	var err, fee = product_logistics_service.Match_product_postage(product_id, postcode, db_session)
 
 	if err != nil {
 		return c.RenderJson(map[string]interface{}{

@@ -10,7 +10,7 @@ import (
 	"github.com/revel/revel"
 )
 
-func Match_product_postage(sku string, postcode string, db_session *xorm.Session) (err error, fee float64) {
+func Match_product_postage(product_id int64, postcode string, db_session *xorm.Session) (err error, fee float64) {
 
 	/*
 	defer func() {
@@ -22,7 +22,7 @@ func Match_product_postage(sku string, postcode string, db_session *xorm.Session
 	*/
 
 	var product kcgl_models.ProductInfo
-	has, err := db_session.Where("sku = ?", sku).Get(&product)
+	has, err := db_session.Where("id = ?", product_id).Get(&product)
 	if err != nil {
 		return err, 0
 	}

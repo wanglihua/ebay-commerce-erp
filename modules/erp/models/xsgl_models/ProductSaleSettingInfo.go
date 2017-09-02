@@ -21,6 +21,8 @@ func (e ProductSaleSettingInfo) ModelDesc() string {
 
 /*
 
-改成按IP计算
+todo: 改成按 Id 计算
+
+freight.iepoch.com.au
 
  */

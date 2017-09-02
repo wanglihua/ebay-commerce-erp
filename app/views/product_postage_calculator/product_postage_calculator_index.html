@@ -98,7 +98,7 @@
             url: '{%url "ProductPostageCalculator.Post"%}',
             type: "POST",
             data: {
-                "sku": sku,
+                "product_id": product_id,
                 "postcode": $("#postcode").val()
             },
             success: function (data) {

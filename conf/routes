@@ -33,7 +33,7 @@ POST /code/gen/query       CodeGenerate.CodeQuery
 GET  /api/calc/logistics/fee      LogisticsFeeApi.Calc
 GET  /api/calc/logistics/fee/test LogisticsFeeApi.Test
 
-GET  /postage/:sku                ProductPostageCalculator.Index
+GET  /postage/:id                ProductPostageCalculator.Index
 POST /sku/postage/cal/post        ProductPostageCalculator.Post
 
 GET  /ueditor/action                 UEditor.Index
