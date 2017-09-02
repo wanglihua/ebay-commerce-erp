@@ -59,6 +59,7 @@ func Match_product_postage(sku string, postcode string, db_session *xorm.Session
 		mode_result.length, mode_result.width, mode_result.height, mode_result.actual_weight = product.Length, product.Width, product.Height, product.Weight
 
 		/*
+		这里不需要打折
 		// 匹配前打折
 		{
 			// 匹配前重量打折
@@ -220,6 +221,7 @@ func Match_product_postage(sku string, postcode string, db_session *xorm.Session
 		mode_result.total_fee = total_fee_in_fee_rate + extra_fee_in_mode
 
 		/*
+		这里不需要打折
 		// 匹配后打折
 		{
 			//这里的计算结果，不对物流的挑选产生影响，但会影响输出

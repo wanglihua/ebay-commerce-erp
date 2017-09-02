@@ -13,6 +13,7 @@ import (
 	"matrix/modules/erp/models/kcgl_models"
 	"matrix/modules/erp/models/xtpz_models"
 	"matrix/modules/erp/models/sppz_models"
+	"matrix/modules/erp/models/xsgl_models"
 )
 
 type ErpSalesManager struct {
@@ -29,7 +30,7 @@ func (c ErpSalesManager) ListData() revel.Result {
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
 	type ErpSalesManagerListViewItem struct {
-		models.SalesManagerInfo       `xorm:"extends" json:"sm"`
+		xsgl_models.SalesManagerInfo       `xorm:"extends" json:"sm"`
 		xtpz_models.ShopAccountInfo        `xorm:"extends" json:"sa"`
 		xtpz_models.ECommercePlatformInfo  `xorm:"extends" json:"ep"`
 		kcgl_models.ProductInfo            `xorm:"extends" json:"p"`
@@ -81,7 +82,7 @@ FROM erp_sales_manager sm
 }
 
 type SalesManagerDetailForm struct {
-	SalesManager    models.SalesManagerInfo `json:"sales_manager"`
+	SalesManager    xsgl_models.SalesManagerInfo `json:"sales_manager"`
 	ShopAccountName string                  `json:"shop_account_name"`
 	ProductIdList   []int64                 `json:"product_id_list"`
 	UserName        string                  `json:"user_name"`
@@ -113,7 +114,7 @@ func (c ErpSalesManager) DetailData() revel.Result {
 	var shop_account xtpz_models.ShopAccountInfo
 	//var product models.ProductInfo
 	var user auth_models.UserInfo
-	var sales_manager models.SalesManagerInfo
+	var sales_manager xsgl_models.SalesManagerInfo
 	/*
 	if sales_manager_id != 0 {
 		has, err := db_session.Id(sales_manager_id).Get(&sales_manager)
@@ -157,14 +158,14 @@ func (c ErpSalesManager) Save() revel.Result {
 	var affected int64
 	if detail_form.IsCreate() {
 		for _, product_id := range detail_form.ProductIdList {
-			sales_manager_entry_count, err := db_session.Where("shop_id = ? and product_id = ? and user_id = ?", sales_manager.ShopId, product_id, sales_manager.UserId).Count(new(models.SalesManagerInfo))
+			sales_manager_entry_count, err := db_session.Where("shop_id = ? and product_id = ? and user_id = ?", sales_manager.ShopId, product_id, sales_manager.UserId).Count(new(xsgl_models.SalesManagerInfo))
 			core.HandleError(err)
 			if sales_manager_entry_count != 0 {
 				panic(errors.New("保存失败，店铺、商品、销售已存在！")) // 用 panic 而不是用下面的原来的return json success false的方式,是因为这样可以让事务回滚, 让前面插入的数据取消
 				//return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，店铺、商品、销售已存在！" })
 			}
 
-			var new_sales_manager models.SalesManagerInfo
+			var new_sales_manager xsgl_models.SalesManagerInfo
 			new_sales_manager = sales_manager
 			new_sales_manager.Id = 0
 			new_sales_manager.ProductId = product_id
@@ -174,7 +175,7 @@ func (c ErpSalesManager) Save() revel.Result {
 		}
 	} else {
 		// 不能更新, 只能插入和删除数据, 所以这里的更新实体的代码没用了
-		shopId_count, err := db_session.Where("id <> ? and shop_id = ? and product_id = ? and user_id = ?", sales_manager.Id, sales_manager.ShopId, sales_manager.ProductId, sales_manager.UserId).Count(new(models.SalesManagerInfo))
+		shopId_count, err := db_session.Where("id <> ? and shop_id = ? and product_id = ? and user_id = ?", sales_manager.Id, sales_manager.ShopId, sales_manager.ProductId, sales_manager.UserId).Count(new(xsgl_models.SalesManagerInfo))
 		core.HandleError(err)
 		if shopId_count != 0 {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，店铺、商品、销售已存在！"})
@@ -197,7 +198,7 @@ func (c ErpSalesManager) Delete() revel.Result {
 	sales_manager_id_list := make([]int64, 0)
 	c.Params.Bind(&sales_manager_id_list, "id_list")
 
-	affected, err := db_session.In("id", sales_manager_id_list).Delete(new(models.SalesManagerInfo))
+	affected, err := db_session.In("id", sales_manager_id_list).Delete(new(xsgl_models.SalesManagerInfo))
 	core.HandleError(err)
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})
