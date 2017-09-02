@@ -39,7 +39,7 @@
         </div>
     </div>
     <div class="modal fade" id="supplierDetailDialog">
-        <div class="modal-dialog" style="width: 580px;">
+        <div class="modal-dialog" style="width: 680px;">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="True">&times;</button>
@@ -203,7 +203,21 @@
                         {"mDataProp": "s.name", "title": "名称", "bSearchable": true, "width": 120},
                         {"mDataProp": "s.contact", "title": "联系人", "bSearchable": true, "width": 90},
                         {"mDataProp": "s.phone", "title": "电话", "bSearchable": true, "width": 140},
-                        {"mDataProp": "s.contact_info", "title": "联系方式", "bSearchable": true, "width": 200},
+                        {
+                            "mDataProp": "s.contact_info", "title": "联系方式", "bSearchable": true, "width": 200, "sClass": "wrap-word",
+                            "render": function (data, type, row) {
+                                if (data) {
+                                    var max_length = 150;
+                                    if (data.length > max_length) {
+                                        data = data.substr(0, max_length - 3) + "..."
+                                    }
+                                    return '<div>' + data + '</div>';
+                                }
+                                else {
+                                    return "";
+                                }
+                            }
+                        },
                         {
                             "mDataProp": "r.city", "title": "地区", "bSearchable": true, "width": 80,
                             "render": function (data, type, row) {
