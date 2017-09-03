@@ -14,7 +14,7 @@ func GetFooter() string {
             } catch (e) {
             }
         </script>
-        <div class="beian"><a href="http://www.miibeian.gov.cn/">浙ICP备17002068号-2	卧龙海外仓储</a></div>
+        <div class="beian"></div>
     </div>
 </div>
 </body>
@@ -27,7 +27,7 @@ func GetSiteFooter() string {
 	var footer_buffer bytes.Buffer
 
 	footer_buffer.WriteString(`
-	<div class="beian"><a href="http://www.miibeian.gov.cn/">浙ICP备17002068号-2	卧龙海外仓储</a></div>
+	<div class="beian"></div>
 </body>
 </html>
 `)
