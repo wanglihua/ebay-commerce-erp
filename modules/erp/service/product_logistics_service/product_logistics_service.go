@@ -9,9 +9,13 @@ import (
 	"math"
 	"github.com/revel/revel"
 	"matrix/modules/erp/service/product_sale_setting_service"
+	"errors"
+	"fmt"
 )
 
 func Match_product_postage(product_id int64, postcode string, db_session *xorm.Session) (err error, fee float64) {
+
+	postcode = strings.TrimSpace(postcode)
 
 	/*
 	defer func() {
@@ -29,7 +33,7 @@ func Match_product_postage(product_id int64, postcode string, db_session *xorm.S
 	}
 
 	if has == false {
-		panic("SKU不存在！")
+		return errors.New("product not exist!"), 0
 	}
 
 	//var logistics_setting = logistics_setting_service.Get_logistics_setting(db_session)
@@ -41,10 +45,12 @@ func Match_product_postage(product_id int64, postcode string, db_session *xorm.S
 	}
 
 	var logistics_fee_rate_list = make([]ddpz_models.LogisticsFeeRateInfo, 0)
-	err = db_session.Where("postcode = ? OR postcode = ?", postcode, strings.TrimPrefix(postcode, "0")).Find(&logistics_fee_rate_list)
+	err = db_session.Where(fmt.Sprintf("postcode = '%s' OR postcode = '%s'", postcode, strings.TrimPrefix(postcode, "0"))).Find(&logistics_fee_rate_list)
 	if err != nil {
 		return err, 0
 	}
+
+	postcode = strings.TrimPrefix(strings.TrimSpace(postcode), "0")
 
 	var pick_fee_setting = pick_fee_service.Get_pick_fee_setting(db_session)
 

@@ -39,14 +39,14 @@ func (c ProductPostageCalculator) Post() revel.Result {
 	if err != nil {
 		return c.RenderJson(map[string]interface{}{
 			"success": false,
-			"message": "something is wrong!",
+			"message": "Error，please contact customer service",
 		})
 	}
 
 	if fee < 0 {
 		return c.RenderJson(map[string]interface{}{
 			"success": false,
-			"message": "N/A",
+			"message": "Sorry, this area does not support",
 		})
 	}
 
