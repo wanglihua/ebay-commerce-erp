@@ -25,10 +25,15 @@
             text-align: center;
             color: white;
             font-weight: bold;
+            background-color: #FF4400;
+            margin-bottom: 0;
+            height: 45px;
+            line-height: 45px;
         }
 
         div#content div#div_postcode {
             margin: 5px 0;
+            margin-top: 0;
         }
 
         div#content input#postcode {
@@ -70,13 +75,18 @@
             color: white;
             border: 0;
         }
+
+        div#div_note {
+            text-align: center;
+            color: white;
+        }
     </style>
 
 </head>
 <body>
 <div>
     <div id="content">
-        <h3 id="title">POSTAGE CALCULATOR</h3>
+        <h3 id="title">DELIVERY CALCULATOR</h3>
         <div id="div_postcode">
             <input id="postcode" name="postcode" placeholder="Enter Postcode"/>
         </div>
@@ -88,6 +98,10 @@
         </div>
         <div id="div_btn_cal">
             <button id="btn_cal" onclick="calculate_postage()">CALCULATE</button>
+        </div>
+        <div id="div_note">
+            <div>If you are in trouble of purchasing or tracking,please contact customer service to checkout your order.</div>
+            <div>Working time :Monday to Friday</div>
         </div>
     </div>
 </div>
