@@ -27,22 +27,22 @@ import (
 
 type OrderLogisticsService struct {
 	au_stock_list                     []sppz_models.StockInfo                      // 所有澳洲仓库列表
-	aud_exchange_rate                 float64                                 // 澳币汇率
+	aud_exchange_rate                 float64                                      // 澳币汇率
 	logistics_setting                 ddpz_models.LogisticsSettingInfo             // 物流设置
 	pick_fee_setting                  ddpz_models.PickFeeInfo                      // 拣货费用设置
-	address_special_word_list_setting []string                                // 收货地址特殊字段
+	address_special_word_list_setting []string                                     // 收货地址特殊字段
 	logistics_company_list            []ddpz_models.LogisticsCompanyInfo           // 物流公司列表
 	logistics_mode_list               []ddpz_models.LogisticsModeInfo              // 物流方式列表
 	logistics_fee_rate_map            map[int64][]ddpz_models.LogisticsFeeRateInfo // 物流费率列表的映射，映射的 key 是， 物流方式的 id
 	envelope_fee_rate_list            []ddpz_models.EnvelopeFeeRateInfo            // 信封物流费率， 按费用从小到大排序
-	shop_list                         []xtpz_models.ShopAccountInfo           // 店铺列表，系统中的店铺列表
+	shop_list                         []xtpz_models.ShopAccountInfo                // 店铺列表，系统中的店铺列表
 	special_product_list              []kcgl_models.SpecialProductInfo             // 特殊商品SKU列表
-	pending_keeper                    *pending_inventory_temp_keeper          // 设置过程全局变量，每次开始匹配计算的时候一定要记得初始化
-	mel_stock_id                      int64                                   // 墨尔本仓库 id
+	pending_keeper                    *pending_inventory_temp_keeper               // 设置过程全局变量，每次开始匹配计算的时候一定要记得初始化
+	mel_stock_id                      int64                                        // 墨尔本仓库 id
 	LoginUser                         core.LoginUser
 }
 
-func (p_ol *OrderLogisticsService) init_data(db_session *xorm.Session) {
+func (p_ol *OrderLogisticsService) init_data(order_list []ddlc_models.OrderInfo, db_session *xorm.Session) {
 	// 加载所有仓库
 	var au_stock_list = make([]sppz_models.StockInfo, 0)
 	err := db_session.Where(fmt.Sprintf("stock_type_id = %d", sppz_models.STOCK_TYPE_AU)).Find(&au_stock_list)
@@ -85,7 +85,8 @@ func (p_ol *OrderLogisticsService) init_data(db_session *xorm.Session) {
 
 	// 加载 物流费率
 	// 只加载 物流公司处于启用状态的复溜费率
-	var logistics_fee_rate_all_list = logistics_fee_rate_service.Get_logistics_fee_rate_enabled(db_session)
+	// var logistics_fee_rate_all_list = logistics_fee_rate_service.Get_logistics_fee_rate_enabled(db_session)
+	var logistics_fee_rate_all_list = logistics_fee_rate_service.Get_logistics_fee_rate_enabled_and_orders_related(order_list, db_session)
 
 	// 考虑到数据量的问题，就不采用中间变量了 var logistics_fee_rate_map = make(map[int64][]models.LogisticsFeeRateInfo)
 	p_ol.logistics_fee_rate_map = make(map[int64][]ddpz_models.LogisticsFeeRateInfo)
@@ -230,7 +231,7 @@ func (p_ol *OrderLogisticsService) CalculateListWithOption(order_list []ddlc_mod
 		return errors.New("订单列表为空！")
 	}
 
-	p_ol.init_data(db_session)
+	p_ol.init_data(order_list, db_session)
 
 	{
 		// 检查信封限制的相关设置，要放在 init_data() 之后

@@ -73,11 +73,13 @@ func (p_ol *OrderLogisticsService) match_logistics_mode_logic(p_order *ddlc_mode
 
 	// 邮政编码信息不全 17 收货人信息不全的，比如 没有邮编等等
 	if p_ol.is_address_info_post_code_miss(p_order_logistics_data) == true {
+		revel.TRACE.Println("is_address_info_post_code_miss")
 		return
 	}
 
 	// 产品信息不全（长宽高重量不全或者有误），这个检查应该放在任何使用长宽高重量数据的检查之前。
 	if p_ol.is_product_info_miss(p_order, p_order_logistics_data) == true {
+		revel.TRACE.Println("is_product_info_miss")
 		return
 	}
 
