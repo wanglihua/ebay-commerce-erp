@@ -12,6 +12,7 @@ import (
 	"strings"
 )
 
+// 改用下面的更高效的方式
 func Get_logistics_fee_rate_enabled(db_session *xorm.Session) []ddpz_models.LogisticsFeeRateInfo {
 	/*
 	SELECT fr.*

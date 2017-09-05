@@ -1,4 +1,4 @@
-{%header "订单物流" .%}
+{%header "订单物流匹配调试" .%}
 <div id="page">
     <div class="breadcrumbs" id="breadcrumbs">
         <ul class="breadcrumb">
@@ -18,7 +18,7 @@
             </div>
             <div class="col-xs-12" style="padding: 0;">
                 <label for="order_codes">订单编号</label>
-                <input class="input-sm" id="order_codes" name="order_codes" placeholder="订单编号" type="text" v-model="page.order_codes" style="width: 250px;"/>
+                <textarea class="input-sm" id="order_codes" name="order_codes" placeholder="订单编号" rows="3" v-model="page.order_codes" style="width: 250px;"></textarea>
                 <button class="btn btn-mini btn-primary" @click="matchLogistics()">
                     &nbsp;<i class="ace-icon fa fa-search"></i>匹配物流
                 </button>

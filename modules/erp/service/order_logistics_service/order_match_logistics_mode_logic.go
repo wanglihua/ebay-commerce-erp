@@ -53,20 +53,32 @@ func (p_ol *OrderLogisticsService) match_logistics_mode_logic(p_order *ddlc_mode
 
 	// 下面的三个 Hold 也应该加上理论发货仓库的记录，方便进行理论仓发货的统计
 
+	// pick up
+	if p_order.HoldTypeId.Int64 == ddpz_models.ORDER_HOLD_TYPE_PICK_UP {
+		var order_logistics_logic ddlc_models.OrderLogisticsLogicInfo
+		order_logistics_logic.OrderId = p_order.Id
+		order_logistics_logic.StockId = p_order.StockId
+
+		_, err := db_session.Insert(order_logistics_logic)
+		core.HandleError(err)
+
+		return
+	}
+
 	// 信封的忽略
-	if p_ol.is_envelope(p_order, p_order_logistics_data) == true {
+	if p_order.HoldTypeId.Int64 == ddpz_models.ORDER_HOLD_TYPE_ENVELOPE || p_ol.is_envelope(p_order, p_order_logistics_data) == true {
 		save_special_hold_order_logistics_logic(p_ol, p_order.Id, p_order_logistics_data, db_session)
 		return
 	}
 
 	// 国际件的忽略
-	if p_ol.is_international_order(p_order, p_order_logistics_data) == true {
+	if p_order.HoldTypeId.Int64 == ddpz_models.ORDER_HOLD_TYPE_INTERNATIONAL || p_ol.is_international_order(p_order, p_order_logistics_data) == true {
 		save_special_hold_order_logistics_logic(p_ol, p_order.Id, p_order_logistics_data, db_session)
 		return
 	}
 
 	// 快递类的忽略
-	if p_ol.is_express(p_order, p_order_logistics_data) == true {
+	if p_order.HoldTypeId.Int64 == ddpz_models.ORDER_HOLD_TYPE_EXPRESS || p_ol.is_express(p_order, p_order_logistics_data) == true {
 		save_special_hold_order_logistics_logic(p_ol, p_order.Id, p_order_logistics_data, db_session)
 		return
 	}

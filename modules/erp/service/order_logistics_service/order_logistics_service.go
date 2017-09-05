@@ -254,7 +254,7 @@ func (p_ol *OrderLogisticsService) CalculateListWithOption(order_list []ddlc_mod
 
 	// todo: 拆分和合并订单的问题，在这之前就已经完成了？ 不是在这里做，就可以了，做完进入 hold ??
 
-	// todo 合并订单
+	// 合并订单，这个已经在这个调用的外面做了
 	// 同一买家，同一付款paypal，同一收货地址，同一店铺 的订单可以合并
 
 	// 可以先判断除收货地址外的其它信息是否一样，如果这些信息都不一样，就不用加载收货地址信息了
@@ -266,6 +266,13 @@ func (p_ol *OrderLogisticsService) CalculateListWithOption(order_list []ddlc_mod
 	p_ol.pending_keeper = new_pending_inventory_temp_keeper()
 
 	for _, order := range order_list {
+
+		var p_order_logistics_data = new(order_logistics_data_t)
+		//　一起加载需要的数据的方式，对性能的影响应该不会很大的
+		p_order_logistics_data.load_data(&order, p_ol, db_session)
+
+		go p_ol.match_logistics_mode_logic(&order, p_order_logistics_data)
+
 		//检查订单状态
 		//订单状态检查 这些要排除的
 		if order.StatusId == models.ORDER_STATUS_YCJ ||
@@ -292,13 +299,6 @@ func (p_ol *OrderLogisticsService) CalculateListWithOption(order_list []ddlc_mod
 
 		//移除订单原来匹配的物流信息。如果订单接下来被Hold这些信息可能还会被保留
 		//remove_order_logistics(order, db_session) //要禁用，否则会出错
-
-		var p_order_logistics_data = new(order_logistics_data_t)
-		//　一起加载需要的数据的方式，对性能的影响应该不会很大的
-		p_order_logistics_data.load_data(&order, p_ol, db_session)
-
-		// 匹配理论值
-		go p_ol.match_logistics_mode_logic(&order, p_order_logistics_data)
 
 		// 老鼠仓的检查
 		if p_ol.hold_check_paypal_account_not_match(&order, db_session) {
