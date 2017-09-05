@@ -12,6 +12,8 @@ import (
 	"matrix/modules/erp/models/spbb_models"
 )
 
+// 这是的所有统计都以已完成的订单为准，别的订单不统计
+
 func ProductSaleAnalyzeSingleDay() {
 	defer func() {
 		if err := recover(); err != nil {
@@ -49,7 +51,9 @@ func ProductSaleAnalyzeSingleDay() {
 		Qty       int64 `xorm:"'qty'"`
 	}
 
-	for i := 0; i < DaysToAnalyze; i++ {
+	var days_to_analyze = GetDaysToAnalyze(db_session)
+
+	for i := 0; i < days_to_analyze; i++ {
 		// 从前一天开始
 		var day_time_begin = today_date.AddDate(0, 0, -(i + 1))
 		var day_time_end = today_date.AddDate(0, 0, -i)
@@ -61,15 +65,17 @@ func ProductSaleAnalyzeSingleDay() {
 SELECT oi.item_product_id AS product_id, sum(oi.quantity) AS qty
 FROM erp_order_item oi
 	INNER JOIN erp_order o ON oi.order_id = o.id
-WHERE '2017-06-01' <= o.paid_time AND o.paid_time < '2017-06-02'
+WHERE '2017-06-01' <= o.paid_time AND o.paid_time < '2017-06-02' AND o.status_id = 4300 # 4300 已完成
 GROUP BY oi.item_product_id
 ORDER BY oi.item_product_id ASC;
 		 */
 
+			// 这里本来应该用的是 paid_time, 先改成 // 这里本来应该用的是 paid_time, 先改成 shipped_time，是统计数据统一，是统计数据统一
+
 			var sql = `SELECT oi.item_product_id AS product_id, sum(oi.quantity) AS qty
 FROM erp_order_item oi
     INNER JOIN erp_order o ON oi.order_id = o.id
-WHERE '%s' <= o.paid_time AND o.paid_time < '%s'
+WHERE '%s' <= o.shipped_time AND o.shipped_time < '%s' AND o.status_id = 4300 # 4300 已完成
 GROUP BY oi.item_product_id
 ORDER BY oi.item_product_id ASC;`
 			sql = fmt.Sprintf(sql, day_time_begin.Format("2006-01-02"), day_time_end.Format("2006-01-02"))
@@ -118,7 +124,7 @@ ORDER BY oi.item_product_id ASC;`
 SELECT oi.order_id AS order_id, oi.item_product_id AS product_id, sum(oi.quantity) AS qty
 FROM erp_order_item oi
 	INNER JOIN erp_order o ON oi.order_id = o.id
-WHERE '2017-06-01' <= o.shipped_time AND o.shipped_time < '2017-06-02'
+WHERE '2017-06-01' <= o.shipped_time AND o.shipped_time < '2017-06-02' AND o.status_id = 4300 # 4300 已完成
 GROUP BY oi.order_id, oi.item_product_id
 ORDER BY oi.item_product_id ASC;
 		 */
@@ -126,7 +132,7 @@ ORDER BY oi.item_product_id ASC;
 			var sql = `SELECT oi.order_id AS order_id, oi.item_product_id AS product_id, sum(oi.quantity) AS qty
 FROM erp_order_item oi
     INNER JOIN erp_order o ON oi.order_id = o.id
-WHERE '%s' <= o.shipped_time AND o.shipped_time < '%s'
+WHERE '%s' <= o.shipped_time AND o.shipped_time < '%s' AND o.status_id = 4300 # 4300 已完成
 GROUP BY oi.order_id, oi.item_product_id
 ORDER BY oi.item_product_id ASC;`
 			sql = fmt.Sprintf(sql, day_time_begin.Format("2006-01-02"), day_time_end.Format("2006-01-02"))
@@ -182,15 +188,17 @@ ORDER BY oi.item_product_id ASC;`
 SELECT oi.order_id AS order_id, oi.item_product_id AS product_id, sum(oi.quantity) AS qty
 FROM erp_order_item oi
 	INNER JOIN erp_order o ON oi.order_id = o.id
-WHERE '2017-06-01' <= o.paid_time AND o.paid_time < '2017-06-02'
+WHERE '2017-06-01' <= o.paid_time AND o.paid_time < '2017-06-02' AND o.status_id = 4300 # 4300 已完成
 GROUP BY oi.order_id, oi.item_product_id
 ORDER BY oi.item_product_id ASC;
 		 */
 
+			// 这里本来应该用的是 paid_time, 先改成 // 这里本来应该用的是 paid_time, 先改成 shipped_time，是统计数据统一，是统计数据统一
+
 			var sql = `SELECT oi.order_id AS order_id, oi.item_product_id AS product_id, sum(oi.quantity) AS qty
 FROM erp_order_item oi
     INNER JOIN erp_order o ON oi.order_id = o.id
-WHERE '%s' <= o.paid_time AND o.paid_time < '%s'
+WHERE '%s' <= o.shipped_time AND o.shipped_time < '%s' AND o.status_id = 4300 # 4300 已完成
 GROUP BY oi.order_id, oi.item_product_id
 ORDER BY oi.item_product_id ASC;`
 			sql = fmt.Sprintf(sql, day_time_begin.Format("2006-01-02"), day_time_end.Format("2006-01-02"))

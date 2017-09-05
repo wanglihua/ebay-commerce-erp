@@ -24,8 +24,8 @@ type OrderLogisticsLogicInfo struct {
 	CostAmount    float64      `xorm:"decimal(18,6) notnull 'cost_amount'" json:"cost_amount" smith:"verbose_name=商品成本"`        //商品成本，整个订单的商品成本总和
 	EnvelopeFeeId int64        `xorm:"bigint notnull index 'envelope_fee_id'" json:"envelope_fee_id" smith:"verbose_name=信封费率"` // 信封费率id，对于信封发货的，该字段才有设置
 	TrackingNum   string       `xorm:"nvarchar(100) null 'tracking_num'" json:"tracking_num" smith:"verbose_name=运单号"`
-	Ptfl          float64         `xorm:"decimal(18,6) notnull 'ptfl'" json:"ptfl"` // 平台费率
-	Jyfl          float64         `xorm:"decimal(18,6) notnull 'jyfl'" json:"jyfl"` // 交易费率
+	Ptfl          float64      `xorm:"decimal(18,6) notnull 'ptfl'" json:"ptfl"` // 平台费率
+	Jyfl          float64      `xorm:"decimal(18,6) notnull 'jyfl'" json:"jyfl"` // 交易费率
 	CreateTime    core.Time    `xorm:"created notnull 'create_time'" json:"create_time"`
 	UpdateTime    core.Time    `xorm:"updated notnull 'update_time'" json:"update_time"`
 }

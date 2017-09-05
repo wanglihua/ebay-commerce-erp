@@ -426,7 +426,7 @@ func (p_ol *OrderLogisticsService) is_international_order(p_order *ddlc_models.O
 // 16 判断是否是国际件，如果不是澳洲的就是国际件，一般就是新西兰的
 func (p_ol *OrderLogisticsService) hold_check_international(p_order *ddlc_models.OrderInfo, p_order_logistics_data *order_logistics_data_t, db_session *xorm.Session) (is_hold_return bool) {
 
-	if p_ol.is_international_order(p_order, p_order_logistics_data) == true { // != "" 是因为有时导入的时候没提供国家信息的，就默认是国内件了
+	if p_ol.is_international_order(p_order, p_order_logistics_data) == true {
 		p_ol.update_order_to_hold_type(p_order, ddpz_models.ORDER_HOLD_TYPE_INTERNATIONAL, db_session)
 
 		//设置发货仓库为墨尔本仓库
