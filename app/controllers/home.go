@@ -17,6 +17,7 @@ import (
 	"matrix/modules/erp/models/spbb_models"
 	"matrix/modules/erp/models/xtgl_models"
 	"matrix/modules/erp/models/xsgl_models"
+	"matrix/modules/erp/models/cggl_models"
 )
 
 type Home struct {
@@ -156,6 +157,8 @@ func (c Home) SyncDbPost() revel.Result {
 	model_list = append(model_list, &sppz_models.PackageMaterialInfo{})
 	model_list = append(model_list, &sppz_models.SeaContainerCostInfo{})
 	model_list = append(model_list, &sppz_models.ProductStoreItemInfo{})
+
+	model_list = append(model_list, &cggl_models.IntelReplInfo{})
 
 	model_list = append(model_list, &spbb_models.ProductSaleDayAnalysisInfo{})
 	model_list = append(model_list, &spbb_models.ProductSaleAnalysisInfo{})

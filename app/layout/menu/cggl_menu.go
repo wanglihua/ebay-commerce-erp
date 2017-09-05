@@ -45,8 +45,18 @@ func GetCgglMenu(res_id_map map[int64]bool, web_session revel.Session) string {
         </li>`)
 	}
 
-	buffer.WriteString(`<li id="cggl-aaaa-menu" class="">
-            <a href="#">
+	/*
+		<li id="cggl-intel-repl-menu" class="">
+			<a href="/erp/intel/repl">
+				<i class="menu-icon fa fa-caret-right"></i>
+				智能补货
+			</a>
+			<b class="arrow"></b>
+		</li>
+	 */
+
+	buffer.WriteString(`<li id="cggl-intel-repl-menu" class="">
+            <a href="/intel/repl">
                 <i class="menu-icon fa fa-caret-right"></i>
                 智能补货
             </a>

@@ -1,0 +1,294 @@
+{%header "智能补货" .%}
+<div id="page">
+    <div class="breadcrumbs" id="breadcrumbs">
+        <ul class="breadcrumb">
+            <li>
+                <a href='{%url "Home.Index"%}'><i class="ace-icon fa fa-home home-icon"></i></a>
+            </li>
+            <li class="parent" data-menu="cggl-menu">采购管理</li>
+            <li class="active" data-menu="cggl-intel-repl-menu">智能补货</li>
+        </ul>
+    </div>
+    <div class="page-content">
+        <div class="row">
+            <div class="col-xs-12" style="padding: 0;">
+                <div class="gridToolBar clearfix">
+                    <button class="btn btn-primary btn-sm" @click="reloadList('#intelReplList')">
+                        <i class="ace-icon fa fa-refresh"></i>
+                        刷新
+                    </button>
+                    <!--
+                    <button class="btn btn-success btn-sm" @click="showIntelReplDetail(0)">
+                        <i class="ace-icon fa fa-plus"></i>
+                        新增
+                    </button>
+                    -->
+                    <button class="btn btn-danger btn-sm" @click="deleteIntelRepl()">
+                        <i class="ace-icon fa fa-trash-o"></i>
+                        删除
+                    </button>
+                </div>
+                <div>
+                    <table id="intelReplList" class="table table-striped table-bordered table-hover"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="intelReplDetailDialog">
+        <div class="modal-dialog" style="width: 680px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="True">&times;</button>
+                    <h4 class="modal-title">智能补货详细</h4>
+                </div>
+                <div class="modal-body clearfix">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <form class="form-horizontal" role="form" id="intelReplDetailForm">
+                                <input id="intel_repl_id" name="detail.intel_repl.id" type="hidden" v-model.number="detail.intel_repl.id"/>
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="product_id" class="col-xs-2 control-label">商品</label>
+                                            <div class="col-xs-10">
+                                                <input id="product_id" name="detail.intel_repl.product_id" type="text" class="input-sm form-control" v-model.number="detail.intel_repl.product_id"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="stock_id" class="col-xs-2 control-label">仓库</label>
+                                            <div class="col-xs-10">
+                                                <input id="stock_id" name="detail.intel_repl.stock_id" type="text" class="input-sm form-control" v-model.number="detail.intel_repl.stock_id"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="qty" class="col-xs-2 control-label">数量</label>
+                                            <div class="col-xs-10">
+                                                <input id="qty" name="detail.intel_repl.qty" type="text" class="input-sm form-control" v-model.number="detail.intel_repl.qty"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="level1_profit" class="col-xs-2 control-label">1档毛利率</label>
+                                            <div class="col-xs-10">
+                                                <input id="level1_profit" name="detail.intel_repl.level1_profit" type="text" class="input-sm form-control" v-model.number="detail.intel_repl.level1_profit"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="level2_profit" class="col-xs-2 control-label">2档毛利率</label>
+                                            <div class="col-xs-10">
+                                                <input id="level2_profit" name="detail.intel_repl.level2_profit" type="text" class="input-sm form-control" v-model.number="detail.intel_repl.level2_profit"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="level3_profit" class="col-xs-2 control-label">3档毛利率</label>
+                                            <div class="col-xs-10">
+                                                <input id="level3_profit" name="detail.intel_repl.level3_profit" type="text" class="input-sm form-control" v-model.number="detail.intel_repl.level3_profit"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="status_id" class="col-xs-2 control-label">状态</label>
+                                            <div class="col-xs-10">
+                                                <input id="status_id" name="detail.intel_repl.status_id" type="text" class="input-sm form-control" v-model.number="detail.intel_repl.status_id"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success btn-sm" @click="saveIntelRepl()">
+                        <i class="ace-icon fa fa-floppy-o"></i>保存
+                    </button>
+                    <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">
+                        <i class="ace-icon fa fa-times"></i>关闭
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    var vm = new Vue({
+        el: "#page",
+        data: {
+            "detail": {
+                "intel_repl": {}
+            }
+        },
+        mounted: function () {
+            initDataTable(
+                '#intelReplList',
+                {
+                    "sAjaxSource": '{%url "ErpIntelRepl.ListData"%}',
+                    "aaSorting": [[1, "asc"]],
+                    "aoColumns": [
+                        {
+                            "mDataProp": "id", "bSearchable": false, "orderable": false, "sClass": "center", "width": 50,
+                            "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
+                            "render": function (data, type, row) {
+                                return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
+                            }
+                        },
+                        {"mDataProp": "product_id", "title": "商品", "bSearchable": false},
+                        {"mDataProp": "stock_id", "title": "仓库", "bSearchable": false},
+                        {"mDataProp": "qty", "title": "数量", "bSearchable": false},
+                        {"mDataProp": "level1_profit", "title": "1档毛利率", "bSearchable": false},
+                        {"mDataProp": "level2_profit", "title": "2档毛利率", "bSearchable": false},
+                        {"mDataProp": "level3_profit", "title": "3档毛利率", "bSearchable": false},
+                        {"mDataProp": "status_id", "title": "状态", "bSearchable": false},
+                        {"mDataProp": "create_time", "title": "创建时间", "bSearchable": false, "width": 120}
+                    ]
+                }
+            );
+
+            $('#intelReplList tbody').on('dblclick', 'tr', function () {
+                var id = $(this).find('td:first-child input:checkbox').val();
+                vm.showIntelReplDetail(id);
+            });
+        },
+        methods: {
+            reloadList: function () {
+                reloadList('#intelReplList');
+            },
+            showIntelReplDetail: function (id) {
+                showMask("加载中...");
+                $("#intelReplDetailForm").clearValidation();
+                $.ajax({
+                        url: '{%url "ErpIntelRepl.DetailData" %}',
+                        type: "POST",
+                        data: {
+                            "id": id
+                        },
+                        success: function (result) {
+                            hideMask();
+                            if (result.success == false) {
+                                $.msg.error(result.message);
+                                return;
+                            }
+                            vm.detail = result;
+                            $('#intelReplDetailDialog').modal(modalOptions);
+                        }
+                    }
+                );
+            },
+            saveIntelRepl: function () {
+                showMask("提交中...");
+                var form = $("#intelReplDetailForm");
+                var valid = validate(form, {
+                    'detail.intel_repl.product_id': {
+                        required: true, digits: true
+                    },
+                    'detail.intel_repl.stock_id': {
+                        required: true, digits: true
+                    },
+                    'detail.intel_repl.qty': {
+                        required: true, digits: true
+                    },
+                    'detail.intel_repl.level1_profit': {
+                        required: true, number: true
+                    },
+                    'detail.intel_repl.level2_profit': {
+                        required: true, number: true
+                    },
+                    'detail.intel_repl.level3_profit': {
+                        required: true, number: true
+                    },
+                    'detail.intel_repl.status_id': {
+                        required: true, digits: true
+                    }
+                });
+
+                if (!valid) {
+                    hideMask();
+                } else {
+                    $.ajax({
+                            url: '{%url "ErpIntelRepl.Save"%}',
+                            type: "POST",
+                            processData: false,
+                            contentType: 'application/json',
+                            data: JSON.stringify(vm.detail),
+                            success: function (data) {
+                                hideMask();
+                                if (data.success == false) {
+                                    $.msg.error(data.message);
+                                    //return;
+                                }
+                                else {
+                                    $.msg.show(data.message);
+                                    $('#intelReplDetailDialog').modal('hide');
+                                    vm.reloadList();
+                                    //return;
+                                }
+                            }
+                        }
+                    );
+                }
+            },
+            deleteIntelRepl: function () {
+                var id_list = [];
+                $('#intelReplList tbody tr>td:first-child input:checkbox').each(function () {
+                    if (this.checked) {
+                        id_list.push($(this).val());
+                    }
+                });
+
+                if (id_list.length == 0) {
+                    $.msg.alert("请选择数据！");
+                    return;
+                }
+
+                $.msg.confirm("确认要删除吗？", function () {
+                    $.ajax({
+                        url: '{%url "ErpIntelRepl.Delete"%}',
+                        type: "POST",
+                        data: {"id_list": id_list},
+                        success: function (data) {
+                            if (data.success == false) {
+                                $.msg.error(data.message);
+                                return;
+                            }
+                            else {
+                                $.msg.show(data.message);
+                            }
+                            vm.reloadList();
+                        }
+                    });
+                });
+            }
+        }
+    });
+</script>
+{%footer%}
+
