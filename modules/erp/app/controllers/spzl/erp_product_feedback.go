@@ -320,7 +320,7 @@ func (c ErpProductFeedback) DetailData() revel.Result {
 	core.HandleError(db_session.OrderBy("id ASC").Find(&product_feedback_cate_list))
 
 	var supplier_list = make([]sppz_models.SupplierInfo, 0)
-	core.HandleError(db_session.OrderBy("id ASC").Find(&supplier_list))
+	core.HandleError(db_session.OrderBy("name ASC").Find(&supplier_list))
 
 	return c.RenderJson(map[string]interface{}{
 		"detail":                     detail_form,
