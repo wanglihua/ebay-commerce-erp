@@ -87,8 +87,8 @@ func GetCgglMenu(res_id_map map[int64]bool, web_session revel.Session) string {
             <b class="arrow"></b>
         </li>`)
 
-	buffer.WriteString(`<li id="cggl-cccc-menu" class="">
-            <a href="#">
+	buffer.WriteString(`<li id="cggl-purchase-abnormal-menu" class="">
+            <a href="/purchase/abnormal">
                 <i class="menu-icon fa fa-caret-right"></i>
                 异常采购单
             </a>
