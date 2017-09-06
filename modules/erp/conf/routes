@@ -453,6 +453,9 @@ POST /purchase/bill/entry/product/select/data/list      ErpPurchaseBillEntry.Pro
 GET  /purchase/finance                     ErpPurchaseFinance.Index
 POST /purchase/finance/data/list           ErpPurchaseFinance.ListData
 
+GET  /purchase/checkin                     ErpPurchaseCheckin.Index
+POST /purchase/checkin/data/list           ErpPurchaseCheckin.ListData
+
 GET  /sales/manager                        ErpSalesManager.Index
 POST /sales/manager/data/list              ErpSalesManager.ListData
 POST /sales/manager/data/detail            ErpSalesManager.DetailData

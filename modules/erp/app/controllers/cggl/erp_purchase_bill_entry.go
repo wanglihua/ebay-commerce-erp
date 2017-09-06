@@ -20,10 +20,10 @@ func (c ErpPurchaseBillEntry) Index() revel.Result {
 	return c.RenderTemplate("erp/cggl/purchase_bill_entry/purchase_bill_entry_index.html")
 }
 
-type ErpPurchaseBillEntryViewItem struct {
+type PurchaseBillEntryViewItem struct {
 	kcgl_models.PurchaseBillEntryInfo `xorm:"extends" json:"pbe"`
 	kcgl_models.ProductInfo           `xorm:"extends" json:"p"`
-	models.StatusInfo            `xorm:"extends" json:"s"`
+	models.StatusInfo                 `xorm:"extends" json:"s"`
 }
 
 func (c ErpPurchaseBillEntry) ListData() revel.Result {
@@ -68,7 +68,7 @@ FROM erp_purchase_bill_entry pbe
 
 	sb.Limit(offset, limit)
 
-	purchase_bill_entry_list := make([]ErpPurchaseBillEntryViewItem, 0, limit)
+	purchase_bill_entry_list := make([]PurchaseBillEntryViewItem, 0, limit)
 	err := db_session.Sql(sb.SqlList()).Find(&purchase_bill_entry_list)
 	core.HandleError(err)
 
@@ -232,11 +232,11 @@ func (c ErpPurchaseBillEntry) ProductSelectListData() revel.Result {
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
 	type ErpProductViewItem struct {
-		kcgl_models.ProductInfo          `xorm:"extends" json:"prd"`
-		kcgl_models.ProductCateInfo      `xorm:"extends" json:"cate"`
-		sppz_models.SupplierInfo         `xorm:"extends" json:"sup"`
-		sppz_models.PackageMaterialInfo  `xorm:"extends" json:"pm"`
-		models.StatusInfo           `xorm:"extends" json:"st"`
+		kcgl_models.ProductInfo         `xorm:"extends" json:"prd"`
+		kcgl_models.ProductCateInfo     `xorm:"extends" json:"cate"`
+		sppz_models.SupplierInfo        `xorm:"extends" json:"sup"`
+		sppz_models.PackageMaterialInfo `xorm:"extends" json:"pm"`
+		models.StatusInfo               `xorm:"extends" json:"st"`
 	}
 
 	/*
