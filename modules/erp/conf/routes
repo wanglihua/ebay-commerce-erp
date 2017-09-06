@@ -450,6 +450,9 @@ POST /purchase/bill/entry/save             ErpPurchaseBillEntry.Save
 POST /purchase/bill/entry/delete           ErpPurchaseBillEntry.Delete
 POST /purchase/bill/entry/product/select/data/list      ErpPurchaseBillEntry.ProductSelectListData
 
+GET  /purchase/finance                     ErpPurchaseFinance.Index
+POST /purchase/finance/data/list           ErpPurchaseFinance.ListData
+
 GET  /sales/manager                        ErpSalesManager.Index
 POST /sales/manager/data/list              ErpSalesManager.ListData
 POST /sales/manager/data/detail            ErpSalesManager.DetailData
