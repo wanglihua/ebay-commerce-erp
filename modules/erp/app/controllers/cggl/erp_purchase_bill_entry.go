@@ -96,7 +96,7 @@ FROM erp_purchase_bill_entry pbe
 type PurchaseBillEntryDetailForm struct {
 	PurchaseBill      kcgl_models.PurchaseBillInfo      `json:"purchase_bill"`
 	PurchaseBillEntry kcgl_models.PurchaseBillEntryInfo `json:"purchase_bill_entry"`
-	ProductName       string                       `json:"product_name"`
+	ProductName       string                            `json:"product_name"`
 }
 
 func (f *PurchaseBillEntryDetailForm) IsCreate() bool {

@@ -119,6 +119,14 @@ func (t *NullDate) UnmarshalJSON(data []byte) error {
 	*/
 
 	//parsed_time, err := time.ParseInLocation("2006-01-02", strings.Trim(string(data), `"`), time.Local)
+
+	var str = strings.Trim(string(data), `"`)
+
+	if strings.TrimSpace(str) == "" || strings.TrimSpace(str) == "null" {
+		*t = MakeNullDate(time.Time{}, false)
+		return nil
+	}
+
 	parsed_time, err := Parse_time(strings.Trim(string(data), `"`))
 	if err != nil {
 		return err
@@ -270,7 +278,15 @@ func (t *NullTime) UnmarshalJSON(data []byte) error {
 	return err
 	*/
 	//parsed_time, err := time.ParseInLocation("2006-01-02", strings.Trim(string(data), `"`), time.Local)
-	parsed_time, err := Parse_time(strings.Trim(string(data), `"`))
+
+	var str = strings.Trim(string(data), `"`)
+
+	if strings.TrimSpace(str) == "" || strings.TrimSpace(str) == "null" {
+		*t = MakeNullTime(time.Time{}, false)
+		return nil
+	}
+
+	parsed_time, err := Parse_time(str)
 	if err != nil {
 		return err
 	}
