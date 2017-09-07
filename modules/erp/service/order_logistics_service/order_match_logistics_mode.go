@@ -130,11 +130,11 @@ func (p_ol *OrderLogisticsService) match_logistics_mode_with_option(p_order *ddl
 		mt.Println("物流方式数据库id", logistics_mode.Id, "物流方式名称：", logistics_mode.Name)
 		logistics_fee_rate_list, found := logistics_fee_rate_map[logistics_mode.Id]
 		if found == false {
-			mt.Println("没有找到物流方式对应的费率设置")
+			mt.Println("没有找到物流方式的对应邮编的费率设置")
 			mt.Println("匹配单个物流方式结束")
 
 			if mt.is_trace == true {
-				log_logistics_match_debug(mode_result, "无对应费率设置", mt.String(), db_session)
+				log_logistics_match_debug(mode_result, "无邮编对应费率设置", mt.String(), db_session)
 			}
 
 			continue

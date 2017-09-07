@@ -34,7 +34,6 @@ WHERE lc.status_id = %d`
 	return logistics_fee_rate_all_list
 }
 
-// todo 这个好像有点问题
 func Get_logistics_fee_rate_enabled_and_orders_related(order_list []ddlc_models.OrderInfo, db_session *xorm.Session) []ddpz_models.LogisticsFeeRateInfo {
 	/*
 SELECT DISTINCT osa.postal_code

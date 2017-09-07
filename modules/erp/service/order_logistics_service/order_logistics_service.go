@@ -92,12 +92,13 @@ func (p_ol *OrderLogisticsService) init_data(order_list []ddlc_models.OrderInfo,
 	p_ol.logistics_fee_rate_map = make(map[int64][]ddpz_models.LogisticsFeeRateInfo)
 	for _, logistics_fee_rate := range logistics_fee_rate_all_list {
 		logistics_fee_rate_list, found := p_ol.logistics_fee_rate_map[logistics_fee_rate.ModeId]
-		if found {
-			logistics_fee_rate_list = append(logistics_fee_rate_list, logistics_fee_rate)
-			p_ol.logistics_fee_rate_map[logistics_fee_rate.ModeId] = logistics_fee_rate_list
-		} else {
-			p_ol.logistics_fee_rate_map[logistics_fee_rate.ModeId] = logistics_fee_rate_list
+		if found == false {
+			logistics_fee_rate_list = make([]ddpz_models.LogisticsFeeRateInfo, 0)
 		}
+
+		logistics_fee_rate_list = append(logistics_fee_rate_list, logistics_fee_rate)
+		p_ol.logistics_fee_rate_map[logistics_fee_rate.ModeId] = logistics_fee_rate_list
+
 	}
 	// 不采用中间变量了 p_ol.logistics_fee_rate_map = logistics_fee_rate_map
 

@@ -10,10 +10,10 @@ import (
 )
 
 type Product_inventory_view_item_t struct {
-	kcgl_models.InventoryInfo   `xorm:"extends" json:"nvt"`
-	kcgl_models.ProductInfo     `xorm:"extends" json:"p"`
-	sppz_models.StockInfo       `xorm:"extends" json:"st"`
-	sppz_models.StorageLocInfo  `xorm:"extends" json:"sl"`
+	kcgl_models.InventoryInfo  `xorm:"extends" json:"nvt"`
+	kcgl_models.ProductInfo    `xorm:"extends" json:"p"`
+	sppz_models.StockInfo      `xorm:"extends" json:"st"`
+	sppz_models.StorageLocInfo `xorm:"extends" json:"sl"`
 }
 
 func get_inventory_list_sql_builder() *core.SqlBuilder {
@@ -30,6 +30,7 @@ func get_inventory_list_sql_builder() *core.SqlBuilder {
 func Get_product_inventory_list(db_session *xorm.Session, product_id int64) []Product_inventory_view_item_t {
 	sb := get_inventory_list_sql_builder()
 	sb.Where(fmt.Sprintf("nvt.product_id = %d", product_id))
+	sb.OrderBy("st.stock_type_id DESC, st.name ASC")
 
 	var product_inventory_list = make([]Product_inventory_view_item_t, 0)
 	err := db_session.Sql(sb.SqlList()).Find(&product_inventory_list)
@@ -61,12 +62,12 @@ func Get_inventory_by_product_list(db_session *xorm.Session, product_id_list []i
 }
 
 type Product_stock_qty struct {
-	ProductId   int64       `xorm:"'product_id'"`
-	StockId     int64       `xorm:"'stock_id'"`
-	StockTypeId int64       `xorm:"'stock_type_id'"`
-	Qty         int64       `xorm:"'qty'"`
-	PendingQty  int64       `xorm:"'pending_qty'"`
-	CostPrice   float64     `xorm:"'cost_price'"` //这个是RMB，但匹配是用的应该是澳币
+	ProductId   int64   `xorm:"'product_id'"`
+	StockId     int64   `xorm:"'stock_id'"`
+	StockTypeId int64   `xorm:"'stock_type_id'"`
+	Qty         int64   `xorm:"'qty'"`
+	PendingQty  int64   `xorm:"'pending_qty'"`
+	CostPrice   float64 `xorm:"'cost_price'"` //这个是RMB，但匹配是用的应该是澳币
 }
 
 // 获取包含"这个商品"的所有"产品库存数量记录"
