@@ -69,7 +69,7 @@ WHERE osa.order_id IN (%s)`
 
 		// 四位的以 0 开头的， 去掉 0， 放入列表
 		if utf8.RuneCountInString(postal_code_result.PostalCode) == 4 && strings.HasPrefix(postal_code_result.PostalCode, "0") {
-			postal_code_list = append(postal_code_list, fmt.Sprintf("'%s'", strings.TrimPrefix(postal_code_result.PostalCode, "0")))
+			postal_code_list = append(postal_code_list, fmt.Sprintf("'%s'", string(([]rune(postal_code_result.PostalCode))[1:])))
 		}
 	}
 
