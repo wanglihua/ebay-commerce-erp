@@ -531,6 +531,14 @@
                 var order_id = $(this).find('td:first-child input:checkbox').val();
                 show_simple_detail_dialog(order_id);
             });
+
+            $('#orderList tbody').on('click', 'tr', function () {
+                $('#orderList tbody tr').removeClass('hilight');
+                var tableRow = $(this);
+                if (tableRow.hasClass("selected") === false) {
+                    tableRow.addClass('hilight');
+                }
+            });
         },
         methods: {
             reloadList: function () {

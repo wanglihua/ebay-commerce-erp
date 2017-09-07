@@ -351,6 +351,7 @@ function showMask(text) {
     $("#huaduCover").show();
     $("#huaduProgressBar").html(text);
 }
+
 //隐藏遮照层
 function hideMask() {
     //$('body').css("overflow", "")
@@ -498,6 +499,8 @@ function initDataTable(table, options) {
         } else {
             tableRow.removeClass('selected');
         }
+
+        tableRow.removeClass('hilight');
     });
 
     return dataTable;

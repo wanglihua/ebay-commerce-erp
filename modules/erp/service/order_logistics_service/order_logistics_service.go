@@ -85,7 +85,7 @@ func (p_ol *OrderLogisticsService) init_data(order_list []ddlc_models.OrderInfo,
 
 	// 加载 物流费率
 	// 只加载 物流公司处于启用状态的复溜费率
-	// var logistics_fee_rate_all_list = logistics_fee_rate_service.Get_logistics_fee_rate_enabled(db_session)
+	//var logistics_fee_rate_all_list = logistics_fee_rate_service.Get_logistics_fee_rate_enabled(db_session)
 	var logistics_fee_rate_all_list = logistics_fee_rate_service.Get_logistics_fee_rate_enabled_and_orders_related(order_list, db_session)
 
 	// 考虑到数据量的问题，就不采用中间变量了 var logistics_fee_rate_map = make(map[int64][]models.LogisticsFeeRateInfo)
