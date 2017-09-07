@@ -8,196 +8,121 @@ import (
 const (
 	//状态类型 begin
 
-	// 仓库状态
-	STATUS_TYPE_STOCK = 100
-	// 仓库状态
-	STATUS_TYPE_EXCHANGE_RATE = 200
-	// 商品目录状态
-	STATUS_TYPE_PRODUCT_CATE = 300
-	// 商品状态
-	STATUS_TYPE_PRODUCT = 400
-	// 店铺账号状态
-	STATUS_TYPE_SHOP_ACCOUNT = 500
-	// Paypal账号状态
-	STATUS_TYPE_PAYPAL_ACCOUNT = 600
-	// 包材 状态
-	STATUS_TYPE_PACKAGE_MTRL = 700
-	// 库存盘点单状态
-	STATUS_TYPE_INVENTORY_CHECK = 800
-	// Paypal对账结果
-	STATUS_TYPE_PAYPAL_RECON = 900
-	// 订单自定义类型
-	STATUS_TYPE_ORDER_CUSTOM_TYPE = 1000
-	// 不规则订单运单号类型
-	STATUS_TYPE_LOGISTICS_NUMBER = 1100
-	// 不规则订单运单号类型
-	STATUS_TYPE_LOGISTICS_NUMBER_BATCH = 1200
-	// 绑定商品状态
-	STATUS_TYPE_PRODUCT_BIND = 1300
-	// 入库单状态
-	STATUS_TYPE_STOCK_BILL_CHECKIN = 1400
-	// 出库单状态
-	STATUS_TYPE_STOCK_BILL_CHECKOUT = 1500
-	// 调拨单状态
-	STATUS_TYPE_STOCK_BILL_TRANSFER = 1600
-	// 订单状态
-	STATUS_TYPE_ORDER = 1700
-	// 采购单状态
-	STATUS_TYPE_PURCHASE_BILL = 1800
-	// 消息状态
-	STATUS_TYPE_MESSAGE = 1900
-	// 物流公司状态
-	STATUS_TYPE_LOGISTICS_COMPANY = 2000
-	// 物流模式状态
-	STATUS_TYPE_LOGISTICS_MODE = 2100
-	// 集装箱调拨状态
-	STATUS_TYPE_CONTAINER_TRANSFER = 2200
+	STATUS_TYPE_STOCK                  = 100  // 仓库状态
+	STATUS_TYPE_EXCHANGE_RATE          = 200  // 仓库状态
+	STATUS_TYPE_PRODUCT_CATE           = 300  // 商品目录状态
+	STATUS_TYPE_PRODUCT                = 400  // 商品状态
+	STATUS_TYPE_SHOP_ACCOUNT           = 500  // 店铺账号状态
+	STATUS_TYPE_PAYPAL_ACCOUNT         = 600  // Paypal账号状态
+	STATUS_TYPE_PACKAGE_MTRL           = 700  // 包材 状态
+	STATUS_TYPE_INVENTORY_CHECK        = 800  // 库存盘点单状态
+	STATUS_TYPE_PAYPAL_RECON           = 900  // Paypal对账结果
+	STATUS_TYPE_ORDER_CUSTOM_TYPE      = 1000 // 订单自定义类型
+	STATUS_TYPE_LOGISTICS_NUMBER       = 1100 // 不规则订单运单号类型
+	STATUS_TYPE_LOGISTICS_NUMBER_BATCH = 1200 // 不规则订单运单号类型
+	STATUS_TYPE_PRODUCT_BIND           = 1300 // 绑定商品状态
+	STATUS_TYPE_STOCK_BILL_CHECKIN     = 1400 // 入库单状态
+	STATUS_TYPE_STOCK_BILL_CHECKOUT    = 1500 // 出库单状态
+	STATUS_TYPE_STOCK_BILL_TRANSFER    = 1600 // 调拨单状态
+	STATUS_TYPE_ORDER                  = 1700 // 订单状态
+	STATUS_TYPE_PURCHASE_BILL          = 1800 // 采购单状态
+	STATUS_TYPE_MESSAGE                = 1900 // 消息状态
+	STATUS_TYPE_LOGISTICS_COMPANY      = 2000 // 物流公司状态
+	STATUS_TYPE_LOGISTICS_MODE         = 2100 // 物流模式状态
+	STATUS_TYPE_CONTAINER_TRANSFER     = 2200 // 集装箱调拨状态
+	STATUS_TYPE_PURCHASE               = 2300 // 采购单状态
 
 	//状态类型 end
 
 	//状态 id begin
 
-	// 仓库状态 正常
-	STOCK_STATUS_ENABLED = 100
-	// 仓库状态 停用
-	STOCK_STATUS_DISABLED = 200
+	STOCK_STATUS_ENABLED  = 100 // 仓库状态 正常
+	STOCK_STATUS_DISABLED = 200 // 仓库状态 停用
 
-	// 货币汇率状态 正常
-	EXCHANGE_RATE_STATUS_ENABLED = 300
-	// 货币汇率状态 停用
-	EXCHANGE_RATE_STATUS_DISABLED = 400
+	EXCHANGE_RATE_STATUS_ENABLED  = 300 // 货币汇率状态 正常
+	EXCHANGE_RATE_STATUS_DISABLED = 400 // 货币汇率状态 停用
 
-	// 商品目录状态 正常
-	PRODUCT_CATE_STATUS_ENABLED = 500
-	// 商品目录状态 停用
-	PRODUCT_CATE_STATUS_DISABLED = 600
+	PRODUCT_CATE_STATUS_ENABLED  = 500 // 商品目录状态 正常
+	PRODUCT_CATE_STATUS_DISABLED = 600 // 商品目录状态 停用
 
-	// 商品状态 重点维护
-	PRODUCT_STATUS_ZDWH = 700
-	// 商品状态 待开发
-	PRODUCT_STATUS_DKF = 800
-	// 商品状态 正常
-	PRODUCT_STATUS_ZC = 900
-	// 商品状态 清仓
-	PRODUCT_STATUS_QC = 1000
-	// 商品状态 停产
-	PRODUCT_STATUS_TC = 1100
-	// 商品状态 自动创建
-	PRODUCT_STATUS_ZDCJ = 1200
-	// 商品状态 暂停销售
-	PRODUCT_STATUS_ZTXC = 1300
+	PRODUCT_STATUS_ZDWH = 700  // 商品状态 重点维护
+	PRODUCT_STATUS_DKF  = 800  // 商品状态 待开发
+	PRODUCT_STATUS_ZC   = 900  // 商品状态 正常
+	PRODUCT_STATUS_QC   = 1000 // 商品状态 清仓
+	PRODUCT_STATUS_TC   = 1100 // 商品状态 停产
+	PRODUCT_STATUS_ZDCJ = 1200 // 商品状态 自动创建
+	PRODUCT_STATUS_ZTXC = 1300 // 商品状态 暂停销售
 
-	// 店铺账号状态 正常
-	SHOP_ACCOUNT_STATUS_ENABLED = 1400
-	// 店铺账号状态 停用
-	SHOP_ACCOUNT_STATUS_DISABLED = 1500
+	SHOP_ACCOUNT_STATUS_ENABLED  = 1400 // 店铺账号状态 正常
+	SHOP_ACCOUNT_STATUS_DISABLED = 1500 // 店铺账号状态 停用
 
-	// Paypal账号状态 正常
-	PAYPAL_ACCOUNT_STATUS_ENABLED = 1600
-	// Paypal账号状态 停用
-	PAYPAL_ACCOUNT_STATUS_DISABLED = 1700
+	PAYPAL_ACCOUNT_STATUS_ENABLED  = 1600 // Paypal账号状态 正常
+	PAYPAL_ACCOUNT_STATUS_DISABLED = 1700 // Paypal账号状态 停用
 
-	// 包材状态 正常
-	PACKAGE_MTRL_STATUS_ENABLED = 1800
-	// 包材状态 停用
-	PACKAGE_MTRL_STATUS_DISABLED = 1900
+	PACKAGE_MTRL_STATUS_ENABLED  = 1800 // 包材状态 正常
+	PACKAGE_MTRL_STATUS_DISABLED = 1900 // 包材状态 停用
 
-	// 盘点单状态 已创建
-	INVENTORY_CHECK_STATUS_YCJ = 2000
-	// 盘点单状态 未通过
-	INVENTORY_CHECK_STATUS_WTG = 2050
-	// 盘点单状态 审核中
-	INVENTORY_CHECK_STATUS_SPZ = 2100
-	// 盘点单状态 已完成
-	INVENTORY_CHECK_STATUS_YWC = 2200
+	INVENTORY_CHECK_STATUS_YCJ = 2000 // 盘点单状态 已创建
+	INVENTORY_CHECK_STATUS_WTG = 2050 // 盘点单状态 未通过
+	INVENTORY_CHECK_STATUS_SPZ = 2100 // 盘点单状态 审核中
+	INVENTORY_CHECK_STATUS_YWC = 2200 // 盘点单状态 已完成
 
-	// Paypal对账 成功
-	PAYPAL_RECON_STATUS_SUCCESS = 2300
-	// Paypal对账 失败
-	PAYPAL_RECON_STATUS_FAILED = 2400
+	PAYPAL_RECON_STATUS_SUCCESS = 2300 // Paypal对账 成功
+	PAYPAL_RECON_STATUS_FAILED  = 2400 // Paypal对账 失败
 
-	// 订单自定义类型 正常
-	ORDER_CUSTOM_TYPE_STATUS_ENABLED = 2500
-	// 订单自定义类型 停用
-	ORDER_CUSTOM_TYPE_STATUS_DISABLED = 2600
+	ORDER_CUSTOM_TYPE_STATUS_ENABLED  = 2500 // 订单自定义类型 正常
+	ORDER_CUSTOM_TYPE_STATUS_DISABLED = 2600 // 订单自定义类型 停用
 
-	// 不规则订单运单号 已使用
-	LOGISTICS_NUMBER_STATUS_USED = 2700
-	// 不规则订单运单号 未使用
-	LOGISTICS_NUMBER_STATUS_NOT_USED = 2800
+	LOGISTICS_NUMBER_STATUS_USED     = 2700 // 不规则订单运单号 已使用
+	LOGISTICS_NUMBER_STATUS_NOT_USED = 2800 // 不规则订单运单号 未使用
 
-	// 订单运单号 正常
-	LOGISTICS_NUMBER_BATCH_STATUS_ENABLED = 2900
-	// 订单运单号 停用
-	LOGISTICS_NUMBER_BATCH_STATUS_DISABLED = 3000
+	LOGISTICS_NUMBER_BATCH_STATUS_ENABLED  = 2900 // 订单运单号 正常
+	LOGISTICS_NUMBER_BATCH_STATUS_DISABLED = 3000 // 订单运单号 停用
 
-	// 绑定商品状态 正常
-	PRODUCT_BIND_STATUS_NORMAL = 3100
-	// 绑定商品状态 停产
-	PRODUCT_BIND_STATUS_STOPPED = 3200
+	PRODUCT_BIND_STATUS_NORMAL  = 3100 // 绑定商品状态 正常
+	PRODUCT_BIND_STATUS_STOPPED = 3200 // 绑定商品状态 停产
 
-	// 入库单状态 暂存
-	STOCK_BILL_CHECKIN_STATUS_SAVE = 3300
-	// 入库单状态 提交
-	STOCK_BILL_CHECKIN_STATUS_SUBMIT = 3400
+	STOCK_BILL_CHECKIN_STATUS_SAVE   = 3300 // 入库单状态 暂存
+	STOCK_BILL_CHECKIN_STATUS_SUBMIT = 3400 // 入库单状态 提交
 
-	// 出库单状态 暂存
-	STOCK_BILL_CHECKOUT_STATUS_SAVE = 3500
-	// 出库单状态 提交
-	STOCK_BILL_CHECKOUT_STATUS_SUBMIT = 3600
+	STOCK_BILL_CHECKOUT_STATUS_SAVE   = 3500 // 出库单状态 暂存
+	STOCK_BILL_CHECKOUT_STATUS_SUBMIT = 3600 // 出库单状态 提交
 
-	// 调拨单状态 暂存
-	STOCK_BILL_TRANSFER_STATUS_SAVE = 3700
-	// 调拨单状态 提交
-	STOCK_BILL_TRANSFER_STATUS_SUBMIT = 3800
+	STOCK_BILL_TRANSFER_STATUS_SAVE   = 3700 // 调拨单状态 暂存
+	STOCK_BILL_TRANSFER_STATUS_SUBMIT = 3800 // 调拨单状态 提交
 
-	// 订单状态 已创建
-	ORDER_STATUS_YCJ = 3850
-	// 订单状态 已支付
-	ORDER_STATUS_YZF = 3900
-	// 订单状态 Hold
-	ORDER_STATUS_HOLD = 3950
-	// 订单状态 已处理Hold
-	ORDER_STATUS_PROCESSED_HOLD = 3975
-	// 订单状态 待配货
-	ORDER_STATUS_DPH = 4000
-	// 订单状态 配货中
-	ORDER_STATUS_PHZ = 4100
-	// 订单状态 已发货
-	ORDER_STATUS_YFH = 4200
-	// 订单状态 已完成
-	ORDER_STATUS_YWC = 4300
-	// 订单状态 已取消
-	ORDER_STATUS_YQX = 4350
+	ORDER_STATUS_YCJ            = 3850 // 订单状态 已创建
+	ORDER_STATUS_YZF            = 3900 // 订单状态 已支付
+	ORDER_STATUS_HOLD           = 3950 // 订单状态 Hold
+	ORDER_STATUS_PROCESSED_HOLD = 3975 // 订单状态 已处理Hold
+	ORDER_STATUS_DPH            = 4000 // 订单状态 待配货
+	ORDER_STATUS_PHZ            = 4100 // 订单状态 配货中
+	ORDER_STATUS_YFH            = 4200 // 订单状态 已发货
+	ORDER_STATUS_YWC            = 4300 // 订单状态 已完成
+	ORDER_STATUS_YQX            = 4350 // 订单状态 已取消
 
-	// 采购单状态 已创建
-	PURCHASE_BILL_STATUS_YCJ = 4400
-	// 采购单状态 已下单
-	PURCHASE_BILL_STATUS_YXD = 4500
-	// 采购单状态 采购中
-	PURCHASE_BILL_STATUS_CGZ = 4600
-	// 采购单状态 已入库
-	PURCHASE_BILL_STATUS_YRK = 4700
+	PURCHASE_BILL_STATUS_YCJ = 4400 // 采购单状态 已创建
+	PURCHASE_BILL_STATUS_YXD = 4500 // 采购单状态 已下单
+	PURCHASE_BILL_STATUS_CGZ = 4600 // 采购单状态 采购中
+	PURCHASE_BILL_STATUS_YRK = 4700 // 采购单状态 已入库
 
-	// 消息状态 已回复
-	MESSAGE_STATUS_ANSWERED = 4800
-	// 消息状态 未回复
-	MESSAGE_STATUS_UNANSWERED = 4900
+	MESSAGE_STATUS_ANSWERED   = 4800 // 消息状态 已回复
+	MESSAGE_STATUS_UNANSWERED = 4900 // 消息状态 未回复
 
-	// 物流公司启用
-	LOGISTICS_COMPANY_ENABLED = 5000
-	// 物流公司禁用
-	LOGISTICS_COMPANY_DISABLED = 5100
+	LOGISTICS_COMPANY_ENABLED  = 5000 // 物流公司启用
+	LOGISTICS_COMPANY_DISABLED = 5100 // 物流公司禁用
 
-	// 物流模式启用
-	LOGISTICS_MODE_ENABLED = 5200
-	// 物流模式禁用
-	LOGISTICS_MODE_DISABLED = 5300
+	LOGISTICS_MODE_ENABLED  = 5200 // 物流模式启用
+	LOGISTICS_MODE_DISABLED = 5300 // 物流模式禁用
 
-	// 集装箱调拨 已创建，已出发，已到仓
-	CONTAINER_TRANSFER_STATUS_NEW    = 5400
-	CONTAINER_TRANSFER_STATUS_DEPART = 5500
-	CONTAINER_TRANSFER_STATUS_STOCK  = 5600
+	CONTAINER_TRANSFER_STATUS_NEW    = 5400 // 集装箱调拨 已创建
+	CONTAINER_TRANSFER_STATUS_DEPART = 5500 // 集装箱调拨 已出发
+	CONTAINER_TRANSFER_STATUS_STOCK  = 5600 // 集装箱调拨 已到仓
+
+	STATUS_PURCHASE_NEW     = 6100 // 采购单 已创建
+	STATUS_PURCHASE_APPROVE = 6200 // 采购单 已审批
+	STATUS_PURCHASE_BUYING  = 6300 // 采购单 采购中
+	STATUS_PURCHASE_STOCK   = 6400 // 采购单 已入库
 
 	//状态 id end
 )
@@ -708,6 +633,37 @@ func (e StatusInfo) InitData(db_session *xorm.Session) {
 		status.Type = STATUS_TYPE_CONTAINER_TRANSFER
 		status.Name = "已到仓"
 		status.Desc = core.MakeNullString("集装箱调拨状态 已到仓", true)
+		db_session.Insert(status)
+	}
+
+	// 采购单状态
+	{
+		status := new(StatusInfo)
+		status.Id = STATUS_PURCHASE_NEW
+		status.Type = STATUS_TYPE_PURCHASE
+		status.Name = "已创建"
+		status.Desc = core.MakeNullString("采购单 已创建", true)
+		db_session.Insert(status)
+
+		status = new(StatusInfo)
+		status.Id = STATUS_PURCHASE_APPROVE
+		status.Type = STATUS_TYPE_PURCHASE
+		status.Name = "已审批"
+		status.Desc = core.MakeNullString("采购单 已审批", true)
+		db_session.Insert(status)
+
+		status = new(StatusInfo)
+		status.Id = STATUS_PURCHASE_BUYING
+		status.Type = STATUS_TYPE_PURCHASE
+		status.Name = "采购中"
+		status.Desc = core.MakeNullString("采购单 采购中", true)
+		db_session.Insert(status)
+
+		status = new(StatusInfo)
+		status.Id = STATUS_PURCHASE_STOCK
+		status.Type = STATUS_TYPE_PURCHASE
+		status.Name = "已入库"
+		status.Desc = core.MakeNullString("采购单 已入库", true)
 		db_session.Insert(status)
 	}
 }

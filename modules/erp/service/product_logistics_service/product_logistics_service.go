@@ -192,6 +192,8 @@ func Match_product_postage(product_id int64, postcode string, db_session *xorm.S
 
 			// 邮编要对上，忽略开头的 0
 			var postcode_in_fee_rate = strings.TrimPrefix(strings.TrimSpace(logistics_fee_rate.Postcode), "0")
+
+			// postcode 最前面可能的 0，已经在前面的代码里面去掉了，不能去第二次
 			if postcode == postcode_in_fee_rate {
 				var fee float64 = logistics_fee_rate.Qbj //起步价
 				if mode_result.weight-logistics_fee_rate.Qbjzl > 0 { //如果超过了起步重量，就算超过部分的费率；不超过，就不用算了
