@@ -30,7 +30,6 @@ const (
 	STATUS_TYPE_LOGISTICS_COMPANY      = 2000 // 物流公司状态
 	STATUS_TYPE_LOGISTICS_MODE         = 2100 // 物流模式状态
 	STATUS_TYPE_CONTAINER_TRANSFER     = 2200 // 集装箱调拨状态
-	STATUS_TYPE_PURCHASE               = 2300 // 采购单状态
 
 	//状态类型 end
 
@@ -102,7 +101,7 @@ const (
 	ORDER_STATUS_YQX            = 4350 // 订单状态 已取消
 
 	PURCHASE_BILL_STATUS_YCJ = 4400 // 采购单状态 已创建
-	PURCHASE_BILL_STATUS_YXD = 4500 // 采购单状态 已下单
+	PURCHASE_BILL_STATUS_YSP = 4500 // 采购单状态 已下单
 	PURCHASE_BILL_STATUS_CGZ = 4600 // 采购单状态 采购中
 	PURCHASE_BILL_STATUS_YRK = 4700 // 采购单状态 已入库
 
@@ -530,7 +529,7 @@ func (e StatusInfo) InitData(db_session *xorm.Session) {
 		db_session.Insert(status)
 	}
 
-	// 采购单状态 已创建，已下单，采购中，已入库
+	// 采购单状态 已创建，已审批，采购中，已入库
 	{
 		status := new(StatusInfo)
 		status.Id = PURCHASE_BILL_STATUS_YCJ
@@ -540,10 +539,10 @@ func (e StatusInfo) InitData(db_session *xorm.Session) {
 		db_session.Insert(status)
 
 		status = new(StatusInfo)
-		status.Id = PURCHASE_BILL_STATUS_YXD
+		status.Id = PURCHASE_BILL_STATUS_YSP
 		status.Type = STATUS_TYPE_PURCHASE_BILL
-		status.Name = "已下单"
-		status.Desc = core.MakeNullString("采购单状态 已下单", true)
+		status.Name = "已审批"
+		status.Desc = core.MakeNullString("采购单状态 已审批", true)
 		db_session.Insert(status)
 
 		status = new(StatusInfo)
@@ -633,37 +632,6 @@ func (e StatusInfo) InitData(db_session *xorm.Session) {
 		status.Type = STATUS_TYPE_CONTAINER_TRANSFER
 		status.Name = "已到仓"
 		status.Desc = core.MakeNullString("集装箱调拨状态 已到仓", true)
-		db_session.Insert(status)
-	}
-
-	// 采购单状态
-	{
-		status := new(StatusInfo)
-		status.Id = STATUS_PURCHASE_NEW
-		status.Type = STATUS_TYPE_PURCHASE
-		status.Name = "已创建"
-		status.Desc = core.MakeNullString("采购单 已创建", true)
-		db_session.Insert(status)
-
-		status = new(StatusInfo)
-		status.Id = STATUS_PURCHASE_APPROVE
-		status.Type = STATUS_TYPE_PURCHASE
-		status.Name = "已审批"
-		status.Desc = core.MakeNullString("采购单 已审批", true)
-		db_session.Insert(status)
-
-		status = new(StatusInfo)
-		status.Id = STATUS_PURCHASE_BUYING
-		status.Type = STATUS_TYPE_PURCHASE
-		status.Name = "采购中"
-		status.Desc = core.MakeNullString("采购单 采购中", true)
-		db_session.Insert(status)
-
-		status = new(StatusInfo)
-		status.Id = STATUS_PURCHASE_STOCK
-		status.Type = STATUS_TYPE_PURCHASE
-		status.Name = "已入库"
-		status.Desc = core.MakeNullString("采购单 已入库", true)
 		db_session.Insert(status)
 	}
 }
