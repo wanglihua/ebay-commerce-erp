@@ -38,11 +38,11 @@ func (c ErpProduct) Index() revel.Result {
 }
 
 type ErpProductViewItem struct {
-	Product         kcgl_models.ProductInfo           `xorm:"extends" json:"prd"`
-	ProductCate     kcgl_models.ProductCateInfo       `xorm:"extends" json:"cate"`
-	Supplier        sppz_models.SupplierInfo          `xorm:"extends" json:"sup"`
-	PackageMaterial sppz_models.PackageMaterialInfo   `xorm:"extends" json:"pm"`
-	Status          models.StatusInfo            `xorm:"extends" json:"st"`
+	Product         kcgl_models.ProductInfo                           `xorm:"extends" json:"prd"`
+	ProductCate     kcgl_models.ProductCateInfo                       `xorm:"extends" json:"cate"`
+	Supplier        sppz_models.SupplierInfo                          `xorm:"extends" json:"sup"`
+	PackageMaterial sppz_models.PackageMaterialInfo                   `xorm:"extends" json:"pm"`
+	Status          models.StatusInfo                                 `xorm:"extends" json:"st"`
 	InventoryList   []inventory_service.Product_inventory_view_item_t `xorm:"-" json:"inventory_list"`
 }
 
@@ -138,19 +138,19 @@ FROM erp_product prd
 }
 
 type ProductDetailForm struct {
-	Product                   kcgl_models.ProductInfo                                     `json:"product"`
-	ProductImageList          []kcgl_models.ProductImageInfo                              `json:"product_image_list"`
-	SupplierList              []sppz_models.SupplierInfo                                  `json:"supplier_list"`
-	ProductCateSelectItemList []product_cate_service.ProductCateSelectItem                `json:"product_cate_list"`
-	PackageMaterialList       []sppz_models.PackageMaterialInfo                           `json:"package_material_list"`
-	StatusList                []models.StatusInfo                                         `json:"status_list"`
-	ProductBrandList          []sppz_models.BrandInfo                                     `json:"product_brand_list"`
-	ProductStyleList          []sppz_models.ProductStyleInfo                              `json:"product_style_list"`
-	ProductCertList           []sppz_models.ProductCertInfo                               `json:"product_cert_list"`
-	InventoryList             []inventory_service.Product_inventory_view_item_t           `json:"inventory_list"`
-	OrderItemList             []order_service.Order_item_view_item_t                      `json:"order_item_list"`
-	ProductLogList            []kcgl_models.ProductLogInfo                                `json:"product_log_list"`
-	MessageList               []message_service.Message_view_item_t                       `json:"message_list"`
+	Product                   kcgl_models.ProductInfo                           `json:"product"`
+	ProductImageList          []kcgl_models.ProductImageInfo                    `json:"product_image_list"`
+	SupplierList              []sppz_models.SupplierInfo                        `json:"supplier_list"`
+	ProductCateSelectItemList []product_cate_service.ProductCateSelectItem      `json:"product_cate_list"`
+	PackageMaterialList       []sppz_models.PackageMaterialInfo                 `json:"package_material_list"`
+	StatusList                []models.StatusInfo                               `json:"status_list"`
+	ProductBrandList          []sppz_models.BrandInfo                           `json:"product_brand_list"`
+	ProductStyleList          []sppz_models.ProductStyleInfo                    `json:"product_style_list"`
+	ProductCertList           []sppz_models.ProductCertInfo                     `json:"product_cert_list"`
+	InventoryList             []inventory_service.Product_inventory_view_item_t `json:"inventory_list"`
+	OrderItemList             []order_service.Order_item_view_item_t            `json:"order_item_list"`
+	ProductLogList            []kcgl_models.ProductLogInfo                      `json:"product_log_list"`
+	MessageList               []message_service.Message_view_item_t             `json:"message_list"`
 }
 
 func (f *ProductDetailForm) IsCreate() bool {
@@ -225,6 +225,8 @@ func (c ErpProduct) DetailData() revel.Result {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "指定的商品不存在！"})
 		}
 	}
+
+	product.Volume = fmt.Sprintf("%0.6f", product.Length*product.Weight*product.Height/1000000)
 
 	if product.Id == 0 {
 		product.StatusId = models.PRODUCT_STATUS_ZC

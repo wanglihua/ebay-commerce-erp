@@ -15,14 +15,6 @@ type ErpProductPriceEstimate struct {
 func (c ErpProductPriceEstimate) Index() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.XSGL_PRODUCT_PRICE_ESTIMATE, c.Session)
 
-	/*
-	var product_price_estimate ProductPriceEstimate
-
-	product_price_estimate_json, err := json.Marshal(product_price_estimate)
-	core.HandleError(err)
-
-	c.RenderArgs["product_price_estimate"] = template.HTML(string(product_price_estimate_json))
-	*/
 	return c.RenderTemplate("erp/xsgl/product_price_estimate/product_price_estimate_index.html")
 }
 
