@@ -50,7 +50,7 @@
                                             <div class="form-group">
                                                 <label for="height" class="col-xs-6 control-label">高</label>
                                                 <div class="col-xs-6">
-                                                    <input id="height" name="product_price_estimate.height" type="text" class="input-sm form-control" v-model.number="product_price_estimate.width"/>
+                                                    <input id="height" name="product_price_estimate.height" type="text" class="input-sm form-control" v-model.number="product_price_estimate.height"/>
                                                     <div class="help-block">单位，cm</div>
                                                 </div>
                                             </div>
@@ -60,7 +60,7 @@
                                             <div class="form-group">
                                                 <label for="dim_weight" class="col-xs-6 control-label">体积重</label>
                                                 <div class="col-xs-6">
-                                                    <input id="dim_weight" name="product_price_estimate.dim_weight" type="text" class="input-sm form-control" v-model.number="product_price_estimate.dim_weight" disabled="disabled"/>
+                                                    <input id="dim_weight" name="product_price_estimate.dim_weight" type="text" class="input-sm form-control" v-model="product_price_estimate.dim_weight" disabled="disabled"/>
                                                     <div class="help-block">单位，kg</div>
                                                 </div>
                                             </div>
@@ -113,7 +113,7 @@
                                             <div class="form-group">
                                                 <label for="logistics_fee" class="col-xs-6 control-label">预估物流费</label>
                                                 <div class="col-xs-6">
-                                                    <input id="logistics_fee" name="product_price_estimate.logistics_fee" type="text" class="input-sm form-control" v-model.number="product_price_estimate.logistics_fee" disabled="disabled"/>
+                                                    <input id="logistics_fee" name="product_price_estimate.logistics_fee" type="text" class="input-sm form-control" v-model="product_price_estimate.logistics_fee" disabled="disabled"/>
                                                     <div class="help-block">单位，AUD</div>
                                                 </div>
                                             </div>
@@ -123,7 +123,7 @@
                                             <div class="form-group">
                                                 <label for="profit" class="col-xs-6 control-label">毛利</label>
                                                 <div class="col-xs-6">
-                                                    <input id="profit" name="product_price_estimate.profit" type="text" class="input-sm form-control" v-model.number="product_price_estimate.profit" disabled="disabled"/>
+                                                    <input id="profit" name="product_price_estimate.profit" type="text" class="input-sm form-control" v-model="product_price_estimate.profit" disabled="disabled"/>
                                                     <div class="help-block">单位，AUD</div>
                                                 </div>
                                             </div>
@@ -143,7 +143,8 @@
                                             <div class="form-group">
                                                 <label for="price" class="col-xs-6 control-label">预估售价</label>
                                                 <div class="col-xs-6">
-                                                    <input id="price" name="product_price_estimate.price" type="text" class="input-sm form-control" v-model.number="product_price_estimate.price" disabled="disabled"/>
+                                                    <input id="price" name="product_price_estimate.price" type="text" class="input-sm form-control" v-model="product_price_estimate.price" disabled="disabled"/>
+                                                    <div class="help-block">单位，AUD</div>
                                                 </div>
                                             </div>
                                         </div>
@@ -217,7 +218,9 @@
     var vm = new Vue({
         el: "#page",
         data: {
-            "product_price_estimate": {}
+            "product_price_estimate": {
+                "qty": 1
+            }
         },
         mounted: function () {
         },

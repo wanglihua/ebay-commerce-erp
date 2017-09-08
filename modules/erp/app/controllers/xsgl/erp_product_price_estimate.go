@@ -6,6 +6,12 @@ import (
 	"matrix/core"
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/auth/pass_res"
+	"matrix/modules/erp/service/product_sale_setting_service"
+	"fmt"
+	"matrix/modules/erp/models/kcgl_models"
+	"strings"
+	"matrix/modules/erp/service/sea_container_cost_service"
+	"matrix/modules/erp/service/exchange_rate_service"
 )
 
 type ErpProductPriceEstimate struct {
@@ -21,11 +27,121 @@ func (c ErpProductPriceEstimate) Index() revel.Result {
 func (c ErpProductPriceEstimate) Post() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.XSGL_PRODUCT_PRICE_ESTIMATE, c.Session)
 
+	var db_session = c.DbSession
+
 	var product_price_estimate ProductPriceEstimate
 	err := json.Unmarshal(c.GetRequestBody(), &product_price_estimate)
 	core.HandleError(err)
 
+	// check
+
 	// do estimate
+
+	var product_sale_setting = product_sale_setting_service.Get_product_sale_setting(db_session)
+
+	var dim_weight_formula = product_sale_setting.DimWeightFormula
+
+	if dim_weight_formula == 0 {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "体积重公式系数不能为零设置有误！",
+		})
+	}
+
+	if product_price_estimate.Qty == 0 {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "数量不能为零！",
+		})
+	}
+
+	var dim_weight = product_price_estimate.Length * product_price_estimate.Width * product_price_estimate.Height / product_sale_setting.DimWeightFormula
+	product_price_estimate.DimWeight = fmt.Sprintf("%0.2f", dim_weight)
+
+	if dim_weight == 0 {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "录入的长宽高不能为零！",
+		})
+	}
+
+	var actual_weight = product_price_estimate.ActualWeight
+	if actual_weight == 0 {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "录入的实际重量不能为零！",
+		})
+	}
+
+	/*
+SELECT p.*
+FROM erp_product p
+ORDER BY abs(p.length * p.width * p.height / 40000 - 100) + abs(p.weight - 100) ASC
+LIMIT 5;
+
+
+SELECT sum(ol.actual_fee) / sum(if(ol.actual_fee = 0, 0, oi.quantity)) AS avg_fee
+FROM erp_order_item oi INNER JOIN erp_order_logistics ol ON oi.order_id = ol.order_id
+WHERE oi.quantity = 1
+  AND (SELECT count(oi_inner.id)
+	   FROM erp_order_item oi_inner
+	   WHERE oi_inner.order_id = oi.order_id) = 1
+  AND oi.item_product_id IN (17578, 23332, 17632, 17583, 23539);
+ */
+
+	var sql_get_five_product = `SELECT p.*
+FROM erp_product p
+ORDER BY abs(p.length * p.width * p.height / 40000 - %f) + abs(p.weight - %f) ASC
+LIMIT 5;`
+
+	sql_get_five_product = fmt.Sprintf(sql_get_five_product, dim_weight, actual_weight)
+	var product_list = make([]kcgl_models.ProductInfo, 0)
+	core.HandleError(db_session.Sql(sql_get_five_product).Find(&product_list))
+
+	var product_actual_weight_sum float64 = 0
+	var product_count float64 = 0
+	for _, product := range product_list {
+		product_actual_weight_sum = product_actual_weight_sum + product.Weight
+		product_count += 1
+	}
+	var product_avg_actual_weight = product_actual_weight_sum / product_count
+
+	var product_id_str_list = make([]string, 0)
+	for _, product := range product_list {
+		product_id_str_list = append(product_id_str_list, fmt.Sprint(product.Id))
+	}
+
+	var sql_get_avg_fee = `SELECT sum(ol.actual_fee) / sum(if(ol.actual_fee = 0, 0, oi.quantity)) AS avg_fee
+FROM erp_order_item oi INNER JOIN erp_order_logistics ol ON oi.order_id = ol.order_id
+WHERE oi.quantity = 1
+  AND (SELECT count(oi_inner.id)
+	   FROM erp_order_item oi_inner
+	   WHERE oi_inner.order_id = oi.order_id) = 1
+  AND oi.item_product_id IN (%s);`
+	sql_get_avg_fee = fmt.Sprintf(sql_get_avg_fee, strings.Join(product_id_str_list, ","))
+
+	var avg_fee struct {
+		AvgFee float64 `xorm:"'avg_fee'"`
+	}
+	_, err = db_session.Sql(sql_get_avg_fee).Get(&avg_fee)
+	core.HandleError(err)
+
+	var logistics_fee = avg_fee.AvgFee / product_avg_actual_weight * product_price_estimate.ActualWeight * product_price_estimate.Qty
+	product_price_estimate.LogisticsFee = fmt.Sprintf("%0.2f", logistics_fee)
+
+	var sea_container_cost = sea_container_cost_service.Get_sea_container_cost(db_session)
+
+	// 计算商品体积，计算平摊海运成本
+	var avg_sea_shipping_cost = float64(sea_container_cost.Cost) * product_price_estimate.Length * product_price_estimate.Width * product_price_estimate.Height / float64(sea_container_cost.Volume)
+	var au_inventory_price float64 = product_price_estimate.CnInventoryPrice + avg_sea_shipping_cost
+
+	var aud_rate = exchange_rate_service.Get_aud_exchange_rate(db_session)
+
+	product_price_estimate.AuInventoryPrice = fmt.Sprintf("%0.2f", au_inventory_price)
+
+	var au_inventory_price_aud = au_inventory_price / aud_rate //转成澳币
+	product_price_estimate.Profit = fmt.Sprintf("%0.2f", (au_inventory_price_aud+logistics_fee)*product_price_estimate.ProfitRate)
+	product_price_estimate.Price = fmt.Sprintf("%0.2f", (au_inventory_price_aud+logistics_fee)*(1+product_price_estimate.ProfitRate))
 
 	return c.RenderJson(map[string]interface{}{
 		"success":                true,
@@ -38,13 +154,13 @@ type ProductPriceEstimate struct {
 	Length           float64 `json:"length"`             // 长 cm
 	Width            float64 `json:"width"`              // 宽 cm
 	Height           float64 `json:"height"`             // 高 cm
-	DimWeight        float64 `json:"dim_weight"`         // 体积重
+	DimWeight        string  `json:"dim_weight"`         // 体积重
 	ActualWeight     float64 `json:"actual_weight"`      // 实际重量 kg
 	CnInventoryPrice float64 `json:"cn_inventory_price"` // 中国仓采购价 RMB?
-	AuInventoryPrice float64 `json:"au_inventory_price"` // 预估澳仓成本 RMB?
+	AuInventoryPrice string  `json:"au_inventory_price"` // 预估澳仓成本 RMB?
 	Qty              float64 `json:"qty"`                // 数量
-	LogisticsFee     float64 `json:"logistics_fee"`      // 预估物流费（澳币）
-	Profit           float64 `json:"profit"`             // 毛利 （澳币）
+	LogisticsFee     string  `json:"logistics_fee"`      // 预估物流费（澳币）
+	Profit           string  `json:"profit"`             // 毛利 （澳币）
 	ProfitRate       float64 `json:"profit_rate"`        // 毛利率
-	Price            float64 `json:"price"`              // 预估售价（澳币）
+	Price            string  `json:"price"`              // 预估售价（澳币）
 }
