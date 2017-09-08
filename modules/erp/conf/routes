@@ -661,4 +661,4 @@ POST /intel/repl/save               ErpIntelRepl.Save
 POST /intel/repl/delete             ErpIntelRepl.Delete
 
 GET  /product/price/estimate        ErpProductPriceEstimate.Index
-GET  /product/price/estimate/post   ErpProductPriceEstimate.Post
+POST /product/price/estimate/post   ErpProductPriceEstimate.Post

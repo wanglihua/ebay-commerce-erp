@@ -710,5 +710,13 @@ func (e PassResInfo) InitData(db_session *xorm.Session) {
 		pass.Name = "商品销售设置"
 		pass.Desc = core.MakeNullString("商品销售设置", true)
 		db_session.Insert(pass)
+
+		pass = new(PassResInfo)
+		pass.Id = pass_res.XSGL_PRODUCT_PRICE_ESTIMATE
+		pass.CateId = pass_res_cate.XSGL
+		pass.Name = "商品售价预估"
+		pass.Desc = core.MakeNullString("商品售价预估", true)
+		db_session.Insert(pass)
+
 	}
 }

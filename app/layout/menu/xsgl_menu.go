@@ -45,6 +45,16 @@ func GetXsglMenu(res_id_map map[int64]bool, web_session revel.Session) string {
         </li>`)
 	}
 
+	if check_pass_res_menu(pass_res.XSGL_PRODUCT_PRICE_ESTIMATE) {
+		buffer.WriteString(`<li id="xsgl-product-price-estimate-menu" class="">
+            <a href="/product/price/estimate">
+                <i class="menu-icon fa fa-caret-right"></i>
+                商品售价预估
+            </a>
+            <b class="arrow"></b>
+        </li>`)
+	}
+
 	buffer.WriteString(`<li id="xsgl-salesmanager-menu" class="">
             <a href="/sales/manager">
                 <i class="menu-icon fa fa-caret-right"></i>

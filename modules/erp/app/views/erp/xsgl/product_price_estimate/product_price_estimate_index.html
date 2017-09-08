@@ -1,4 +1,4 @@
-{%header "商品销售设置" .%}
+{%header "商品售价预估" .%}
 <div id="page">
     <div class="breadcrumbs" id="breadcrumbs">
         <ul class="breadcrumb">
@@ -6,46 +6,144 @@
                 <a href='{%url "Home.Index"%}'><i class="ace-icon fa fa-home home-icon"></i></a>
             </li>
             <li class="parent" data-menu="xsgl-menu">销售管理</li>
-            <li class="active" data-menu="xsgl-product-sale-setting-menu">商品销售设置</li>
+            <li class="active" data-menu="xsgl-product-price-estimate-menu">商品售价预估</li>
         </ul>
     </div>
     <div class="page-content">
         <div class="row">
             <div class="col-xs-12" style="padding: 0;">
                 <div class="gridToolBar clearfix">
-                    <button class="btn btn-primary btn-sm" onclick="loadProductSaleSettingDetail()">
-                        <i class="ace-icon fa fa-refresh"></i>
-                        刷新
-                    </button>
-                    <button class="btn btn-success btn-sm" @click="saveProductSaleSetting()">
+                    <button class="btn btn-pink btn-sm" onclick="priceEstimate()">
                         <i class="ace-icon fa fa-floppy-o"></i>
-                        保存
+                        预估商品售价
                     </button>
                 </div>
                 <div>
-                    <div class="widget-box" style="border-style:none;width:780px; ">
+                    <div class="widget-box" style="border-style:none;width:920px; ">
                         <div class="widget-body">
                             <div class="widget-main">
-                                <form class="form-horizontal" role="form" id="ProductSaleSettingDetailForm">
-                                    <input id="product_sale_setting_id" name="detail.product_sale_setting.id" type="hidden" v-model.number="detail.product_sale_setting.id"/>
+                                <form class="form-horizontal" role="form" id="ProductPriceEstimateForm">
+                                    <input id="product_price_estimate_id" name="product_price_estimate.id" type="hidden" v-model.number="product_price_estimate.id"/>
 
                                     <div class="row">
-                                        <div class="col-xs-6">
+                                        <div class="col-xs-3">
                                             <div class="form-group">
-                                                <label for="postage_cal_weight" class="col-xs-4 control-label">运费权重</label>
-                                                <div class="col-xs-8">
-                                                    <input id="postage_cal_weight" name="detail.product_sale_setting.postage_cal_weight" type="text" class="input-sm form-control" v-model.number="detail.product_sale_setting.postage_cal_weight"/>
-                                                    <div class="help-block">客户端运费计算权重</div>
+                                                <label for="length" class="col-xs-6 control-label">长</label>
+                                                <div class="col-xs-6">
+                                                    <input id="length" name="product_price_estimate.length" type="text" class="input-sm form-control" v-model.number="product_price_estimate.length"/>
+                                                    <div class="help-block">单位，cm</div>
                                                 </div>
                                             </div>
                                         </div>
 
-                                        <div class="col-xs-6">
+                                        <div class="col-xs-3">
                                             <div class="form-group">
-                                                <label for="dim_weight_formula" class="col-xs-4 control-label">体积重公式分母</label>
-                                                <div class="col-xs-8">
-                                                    <input id="dim_weight_formula" name="detail.product_sale_setting.dim_weight_formula" type="text" class="input-sm form-control" v-model.number="detail.product_sale_setting.dim_weight_formula"/>
-                                                    <div class="help-block">通用的体积重公式分母，用于计算商品预估售价用</div>
+                                                <label for="width" class="col-xs-6 control-label">宽</label>
+                                                <div class="col-xs-6">
+                                                    <input id="width" name="product_price_estimate.width" type="text" class="input-sm form-control" v-model.number="product_price_estimate.width"/>
+                                                    <div class="help-block">单位，cm</div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-xs-3">
+                                            <div class="form-group">
+                                                <label for="height" class="col-xs-6 control-label">高</label>
+                                                <div class="col-xs-6">
+                                                    <input id="height" name="product_price_estimate.height" type="text" class="input-sm form-control" v-model.number="product_price_estimate.width"/>
+                                                    <div class="help-block">单位，cm</div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-xs-3">
+                                            <div class="form-group">
+                                                <label for="dim_weight" class="col-xs-6 control-label">体积重</label>
+                                                <div class="col-xs-6">
+                                                    <input id="dim_weight" name="product_price_estimate.dim_weight" type="text" class="input-sm form-control" v-model.number="product_price_estimate.dim_weight" disabled="disabled"/>
+                                                    <div class="help-block">单位，kg</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-xs-3">
+                                            <div class="form-group">
+                                                <label for="actual_weight" class="col-xs-6 control-label">实际重量</label>
+                                                <div class="col-xs-6">
+                                                    <input id="actual_weight" name="product_price_estimate.actual_weight" type="text" class="input-sm form-control" v-model.number="product_price_estimate.actual_weight"/>
+                                                    <div class="help-block">实际重量，kg</div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-xs-3">
+                                            <div class="form-group">
+                                                <label for="cn_inventory_price" class="col-xs-6 control-label">中国仓采购价</label>
+                                                <div class="col-xs-6">
+                                                    <input id="cn_inventory_price" name="product_price_estimate.cn_inventory_price" type="text" class="input-sm form-control" v-model.number="product_price_estimate.cn_inventory_price"/>
+                                                    <div class="help-block">单位，RMB</div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-xs-3">
+                                            <div class="form-group">
+                                                <label for="au_inventory_price" class="col-xs-6 control-label">预估澳仓成本</label>
+                                                <div class="col-xs-6">
+                                                    <input id="au_inventory_price" name="product_price_estimate.au_inventory_price" type="text" class="input-sm form-control" v-model.number="product_price_estimate.au_inventory_price" disabled="disabled"/>
+                                                    <div class="help-block">单位，RMB</div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-xs-3">
+                                            <div class="form-group">
+                                                <label for="qty" class="col-xs-6 control-label">数量</label>
+                                                <div class="col-xs-6">
+                                                    <input id="qty" name="product_price_estimate.qty" type="text" class="input-sm form-control" v-model.number="product_price_estimate.qty"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-xs-3">
+                                            <div class="form-group">
+                                                <label for="logistics_fee" class="col-xs-6 control-label">预估物流费</label>
+                                                <div class="col-xs-6">
+                                                    <input id="logistics_fee" name="product_price_estimate.logistics_fee" type="text" class="input-sm form-control" v-model.number="product_price_estimate.logistics_fee" disabled="disabled"/>
+                                                    <div class="help-block">单位，AUD</div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-xs-3">
+                                            <div class="form-group">
+                                                <label for="profit" class="col-xs-6 control-label">毛利</label>
+                                                <div class="col-xs-6">
+                                                    <input id="profit" name="product_price_estimate.profit" type="text" class="input-sm form-control" v-model.number="product_price_estimate.profit" disabled="disabled"/>
+                                                    <div class="help-block">单位，AUD</div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-xs-3">
+                                            <div class="form-group">
+                                                <label for="profit_rate" class="col-xs-6 control-label">毛利率</label>
+                                                <div class="col-xs-6">
+                                                    <input id="profit_rate" name="product_price_estimate.profit_rate" type="text" class="input-sm form-control" v-model.number="product_price_estimate.profit_rate"/>
+                                                    <div class="help-block"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-xs-3">
+                                            <div class="form-group">
+                                                <label for="price" class="col-xs-6 control-label">预估售价</label>
+                                                <div class="col-xs-6">
+                                                    <input id="price" name="product_price_estimate.price" type="text" class="input-sm form-control" v-model.number="product_price_estimate.price" disabled="disabled"/>
                                                 </div>
                                             </div>
                                         </div>
@@ -60,53 +158,70 @@
         </div>
     </div>
 </div>
-{%template "erp/xsgl/product_price_estimate/product_price_estimate_index.var" .%}
 <script type="text/javascript">
+
+    function priceEstimate() {
+        showMask("提交中...");
+        var form = $("#ProductPriceEstimateForm");
+        var valid = validate(form, {
+            'product_price_estimate.length': {
+                required: true, number: true
+            },
+            'product_price_estimate.width': {
+                required: true, number: true
+            },
+            'product_price_estimate.height': {
+                required: true, number: true
+            },
+            'product_price_estimate.actual_weight': {
+                required: true, number: true
+            },
+            'product_price_estimate.cn_inventory_price': {
+                required: true, number: true
+            },
+            'product_price_estimate.qty': {
+                required: true, number: true
+            },
+            'product_price_estimate.profit_rate': {
+                required: true, number: true
+            }
+        });
+
+        if (!valid) {
+            hideMask();
+        } else {
+            $.ajax(
+                {
+                    url: '{%url "ErpProductPriceEstimate.Post"%}',
+                    type: "POST",
+                    processData: false,
+                    contentType: 'application/json',
+                    data: JSON.stringify(vm.product_price_estimate),
+                    success: function (data) {
+                        hideMask();
+                        if (data.success === false) {
+                            $.msg.error(data.message);
+                            //return;
+                        }
+                        else {
+                            vm.product_price_estimate = data.product_price_estimate;
+                            $.msg.show(data.message);
+                            //return;
+                        }
+                    }
+                }
+            );
+        }
+    }
 
     var vm = new Vue({
         el: "#page",
         data: {
-            "product_price_estimate": product_price_estimate
+            "product_price_estimate": {}
         },
         mounted: function () {
         },
-        methods: {
-            priceEstimate: function () {
-                showMask("提交中...");
-                var form = $("#ProductSaleSettingDetailForm");
-                var valid = validate(form, {
-                    'detail.product_sale_setting.postage_cal_weight': {
-                        required: true, number: true
-                    }
-                });
-
-                if (!valid) {
-                    hideMask();
-                } else {
-                    $.ajax(
-                        {
-                            url: '{%url "ErpProductSaleSetting.Save"%}',
-                            type: "POST",
-                            processData: false,
-                            contentType: 'application/json',
-                            data: JSON.stringify(vm.detail),
-                            success: function (data) {
-                                hideMask();
-                                if (data.success === false) {
-                                    $.msg.error(data.message);
-                                    //return;
-                                }
-                                else {
-                                    vm.detail = data.detail;
-                                    $.msg.show(data.message);
-                                    //return;
-                                }
-                            }
-                        }
-                    );
-                }
-            }
-        }
+        methods: {}
     });
 </script>
 {%footer%}

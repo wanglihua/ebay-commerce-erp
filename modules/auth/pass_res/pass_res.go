@@ -26,7 +26,8 @@ const (
 	CGGL_PRODUCT_SETTING = 200100 // 商品采购设置
 
 	// 销售管理 21
-	XSGL_PRODUCT_SALE_SETTING = 210100 // 商品销售设置
+	XSGL_PRODUCT_SALE_SETTING   = 210100 // 商品销售设置
+	XSGL_PRODUCT_PRICE_ESTIMATE = 210200 // 商品售价预估
 
 	// 调拨管理
 
