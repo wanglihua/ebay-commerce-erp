@@ -1,0 +1,3 @@
+<script type="text/javascript">
+    var product_price_estimate = {% .product_price_estimate %};
+</script>

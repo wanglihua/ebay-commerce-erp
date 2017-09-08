@@ -1,0 +1,113 @@
+{%header "商品销售设置" .%}
+<div id="page">
+    <div class="breadcrumbs" id="breadcrumbs">
+        <ul class="breadcrumb">
+            <li>
+                <a href='{%url "Home.Index"%}'><i class="ace-icon fa fa-home home-icon"></i></a>
+            </li>
+            <li class="parent" data-menu="xsgl-menu">销售管理</li>
+            <li class="active" data-menu="xsgl-product-sale-setting-menu">商品销售设置</li>
+        </ul>
+    </div>
+    <div class="page-content">
+        <div class="row">
+            <div class="col-xs-12" style="padding: 0;">
+                <div class="gridToolBar clearfix">
+                    <button class="btn btn-primary btn-sm" onclick="loadProductSaleSettingDetail()">
+                        <i class="ace-icon fa fa-refresh"></i>
+                        刷新
+                    </button>
+                    <button class="btn btn-success btn-sm" @click="saveProductSaleSetting()">
+                        <i class="ace-icon fa fa-floppy-o"></i>
+                        保存
+                    </button>
+                </div>
+                <div>
+                    <div class="widget-box" style="border-style:none;width:780px; ">
+                        <div class="widget-body">
+                            <div class="widget-main">
+                                <form class="form-horizontal" role="form" id="ProductSaleSettingDetailForm">
+                                    <input id="product_sale_setting_id" name="detail.product_sale_setting.id" type="hidden" v-model.number="detail.product_sale_setting.id"/>
+
+                                    <div class="row">
+                                        <div class="col-xs-6">
+                                            <div class="form-group">
+                                                <label for="postage_cal_weight" class="col-xs-4 control-label">运费权重</label>
+                                                <div class="col-xs-8">
+                                                    <input id="postage_cal_weight" name="detail.product_sale_setting.postage_cal_weight" type="text" class="input-sm form-control" v-model.number="detail.product_sale_setting.postage_cal_weight"/>
+                                                    <div class="help-block">客户端运费计算权重</div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-xs-6">
+                                            <div class="form-group">
+                                                <label for="dim_weight_formula" class="col-xs-4 control-label">体积重公式分母</label>
+                                                <div class="col-xs-8">
+                                                    <input id="dim_weight_formula" name="detail.product_sale_setting.dim_weight_formula" type="text" class="input-sm form-control" v-model.number="detail.product_sale_setting.dim_weight_formula"/>
+                                                    <div class="help-block">通用的体积重公式分母，用于计算商品预估售价用</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{%template "erp/xsgl/product_price_estimate/product_price_estimate_index.var" .%}
+<script type="text/javascript">
+
+    var vm = new Vue({
+        el: "#page",
+        data: {
+            "product_price_estimate": product_price_estimate
+        },
+        mounted: function () {
+        },
+        methods: {
+            priceEstimate: function () {
+                showMask("提交中...");
+                var form = $("#ProductSaleSettingDetailForm");
+                var valid = validate(form, {
+                    'detail.product_sale_setting.postage_cal_weight': {
+                        required: true, number: true
+                    }
+                });
+
+                if (!valid) {
+                    hideMask();
+                } else {
+                    $.ajax(
+                        {
+                            url: '{%url "ErpProductSaleSetting.Save"%}',
+                            type: "POST",
+                            processData: false,
+                            contentType: 'application/json',
+                            data: JSON.stringify(vm.detail),
+                            success: function (data) {
+                                hideMask();
+                                if (data.success === false) {
+                                    $.msg.error(data.message);
+                                    //return;
+                                }
+                                else {
+                                    vm.detail = data.detail;
+                                    $.msg.show(data.message);
+                                    //return;
+                                }
+                            }
+                        }
+                    );
+                }
+            }
+        }
+    });
+</script>
+{%footer%}
+
