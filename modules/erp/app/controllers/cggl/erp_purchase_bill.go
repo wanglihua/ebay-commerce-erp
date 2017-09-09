@@ -10,6 +10,8 @@ import (
 	"strconv"
 	"time"
 	"matrix/modules/erp/models/kcgl_models"
+	"matrix/modules/auth/service/pass_service"
+	"matrix/modules/auth/pass_res"
 )
 
 type ErpPurchaseBill struct {
@@ -17,16 +19,20 @@ type ErpPurchaseBill struct {
 }
 
 func (c ErpPurchaseBill) Index() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.CGGL_PURCHASE_BILL, c.Session)
+
 	return c.RenderTemplate("erp/cggl/purchase_bill/purchase_bill_index.html")
 }
 
 type ErpPurchaseBillViewItem struct {
 	kcgl_models.PurchaseBillInfo `xorm:"extends" json:"pb"`
-	auth_models.UserInfo    `xorm:"extends" json:"u"`
-	models.StatusInfo       `xorm:"extends" json:"s"`
+	auth_models.UserInfo         `xorm:"extends" json:"u"`
+	models.StatusInfo            `xorm:"extends" json:"s"`
 }
 
 func (c ErpPurchaseBill) ListData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.CGGL_PURCHASE_BILL, c.Session)
+
 	db_session := c.DbSession
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
@@ -101,6 +107,8 @@ func (f *PurchaseBillDetailForm) Valid(validation *revel.Validation) bool {
 }
 
 func (c ErpPurchaseBill) DetailData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.CGGL_PURCHASE_BILL, c.Session)
+
 	db_session := c.DbSession
 
 	var purchase_bill_id int64
@@ -125,6 +133,8 @@ func (c ErpPurchaseBill) DetailData() revel.Result {
 }
 
 func (c ErpPurchaseBill) Save() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.CGGL_PURCHASE_BILL, c.Session)
+
 	db_session := c.DbSession
 
 	var detail_form PurchaseBillDetailForm
@@ -158,6 +168,8 @@ func (c ErpPurchaseBill) Save() revel.Result {
 }
 
 func (c ErpPurchaseBill) Delete() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.CGGL_PURCHASE_BILL, c.Session)
+
 	db_session := c.DbSession
 
 	purchase_bill_id_list := make([]int64, 0)

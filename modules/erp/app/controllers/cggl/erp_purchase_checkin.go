@@ -5,6 +5,8 @@ import (
 	"matrix/core"
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/models/kcgl_models"
+	"matrix/modules/auth/service/pass_service"
+	"matrix/modules/auth/pass_res"
 )
 
 type ErpPurchaseCheckin struct {
@@ -12,6 +14,8 @@ type ErpPurchaseCheckin struct {
 }
 
 func (c ErpPurchaseCheckin) Index() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.CGGL_PURCHASE_CHECKIN, c.Session)
+
 	return c.RenderTemplate("erp/cggl/purchase_checkin/purchase_checkin_index.html")
 }
 
@@ -22,6 +26,8 @@ type PurchaseCheckinViewItem struct {
 }
 
 func (c ErpPurchaseCheckin) ListData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.CGGL_PURCHASE_CHECKIN, c.Session)
+
 	db_session := c.DbSession
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)

@@ -700,6 +700,48 @@ func (e PassResInfo) InitData(db_session *xorm.Session) {
 		pass.Name = "商品采购设置"
 		pass.Desc = core.MakeNullString("商品采购设置", true)
 		db_session.Insert(pass)
+
+		pass = new(PassResInfo)
+		pass.Id = pass_res.CGGL_INTEL_REPL
+		pass.CateId = pass_res_cate.CGGL
+		pass.Name = "智能补货"
+		pass.Desc = core.MakeNullString("智能补货", true)
+		db_session.Insert(pass)
+
+		pass = new(PassResInfo)
+		pass.Id = pass_res.CGGL_PURCHASE_BILL
+		pass.CateId = pass_res_cate.CGGL
+		pass.Name = "采购管理"
+		pass.Desc = core.MakeNullString("采购管理", true)
+		db_session.Insert(pass)
+
+		pass = new(PassResInfo)
+		pass.Id = pass_res.CGGL_PURCHASE_FINANCE
+		pass.CateId = pass_res_cate.CGGL
+		pass.Name = "财务管理"
+		pass.Desc = core.MakeNullString("财务管理", true)
+		db_session.Insert(pass)
+
+		pass = new(PassResInfo)
+		pass.Id = pass_res.CGGL_PURCHASE_CHECKIN
+		pass.CateId = pass_res_cate.CGGL
+		pass.Name = "入库管理"
+		pass.Desc = core.MakeNullString("入库管理", true)
+		db_session.Insert(pass)
+
+		pass = new(PassResInfo)
+		pass.Id = pass_res.CGGL_PURCHASE_ABNORMAL
+		pass.CateId = pass_res_cate.CGGL
+		pass.Name = "异常采购单"
+		pass.Desc = core.MakeNullString("异常采购单", true)
+		db_session.Insert(pass)
+
+		pass = new(PassResInfo)
+		pass.Id = pass_res.CGGL_PURCHASE_FLOW
+		pass.CateId = pass_res_cate.CGGL
+		pass.Name = "采购流水"
+		pass.Desc = core.MakeNullString("采购流水", true)
+		db_session.Insert(pass)
 	}
 
 	// 销售管理

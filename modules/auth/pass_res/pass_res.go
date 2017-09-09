@@ -23,7 +23,13 @@ const (
 	// 销售管理        模块编号 21
 
 	// 采购管理 20
-	CGGL_PRODUCT_SETTING = 200100 // 商品采购设置
+	CGGL_PRODUCT_SETTING   = 200100 // 商品采购设置
+	CGGL_INTEL_REPL        = 200200 // 智能补货
+	CGGL_PURCHASE_BILL     = 200300 // 采购管理
+	CGGL_PURCHASE_FINANCE  = 200400 // 财务管理
+	CGGL_PURCHASE_CHECKIN  = 200500 // 入库管理
+	CGGL_PURCHASE_ABNORMAL = 200600 // 异常采购单
+	CGGL_PURCHASE_FLOW     = 200700 // 采购流水
 
 	// 销售管理 21
 	XSGL_PRODUCT_SALE_SETTING   = 210100 // 商品销售设置
@@ -75,19 +81,16 @@ const (
 	DDLC_ORDER_FORCE_PEIHUO          = 131400 // 强制配货
 
 	// 库存管理 模块编号 14
-	KCGL_PRODUCT              = 140100 // 商品列表
-	KCGL_PRODUCT_DETAIL_SAVE  = 140150 // 商品详细保存
-	KCGL_PRODUCT_BIND         = 140200 // 绑定商品
-	KCGL_PRODUCT_IMPORT       = 140300 // 商品导入
-	KCGL_PRODUCT_EXPORT       = 140400 // 商品导出
-	KCGL_PRODUCT_LWHW         = 140401 // 商品长宽高重量
-	KCGL_INVENTORY            = 140500 // 商品库存
-	KCGL_INVENTORY_IMPORT_QTY = 140531 // 商品库存 导入库存数量
-	KCGL_INVENTORY_EXPORT_QTY = 140532 // 商品库存 导出库存数量
-	//KCGL_INVENTORY_IMPORT_QTY_OVER = 140510 // 商品库存 导入覆盖库存数量
-	//KCGL_INVENTORY_IMPORT_QTY_DIFF = 140520 // 商品库存 导入修正库存数量
-	KCGL_INVENTORY_SKU_LOC = 140501 // 商品库存 商品库位
-	//KCGL_INVENTORY_SKU_QTY         = 140502 // 商品库存 库存数量
+	KCGL_PRODUCT                 = 140100 // 商品列表
+	KCGL_PRODUCT_DETAIL_SAVE     = 140150 // 商品详细保存
+	KCGL_PRODUCT_BIND            = 140200 // 绑定商品
+	KCGL_PRODUCT_IMPORT          = 140300 // 商品导入
+	KCGL_PRODUCT_EXPORT          = 140400 // 商品导出
+	KCGL_PRODUCT_LWHW            = 140401 // 商品长宽高重量
+	KCGL_INVENTORY               = 140500 // 商品库存
+	KCGL_INVENTORY_IMPORT_QTY    = 140531 // 商品库存 导入库存数量
+	KCGL_INVENTORY_EXPORT_QTY    = 140532 // 商品库存 导出库存数量
+	KCGL_INVENTORY_SKU_LOC       = 140501 // 商品库存 商品库位
 	KCGL_INVENTORY_SKU_PRICE     = 140503 // 商品库存 库存成本
 	KCGL_INVENTORY_CHECK         = 140600 // 库存盘点
 	KCGL_INVENTORY_CHECK_APPROVE = 140700 // 盘点审批
@@ -95,6 +98,10 @@ const (
 	KCGL_STOCKBILL_CHECKIN       = 141000 // 手工入库
 	KCGL_STOCKBILL_CHECKOUT      = 141100 // 手工出库
 	KCGL_SPECIAL_SKU             = 141200 // 特殊SKU
+
+	//KCGL_INVENTORY_IMPORT_QTY_OVER = 140510 // 商品库存 导入覆盖库存数量
+	//KCGL_INVENTORY_IMPORT_QTY_DIFF = 140520 // 商品库存 导入修正库存数量
+	//KCGL_INVENTORY_SKU_QTY         = 140502 // 商品库存 库存数量
 
 	// 商品配置 模块编号 15
 	SPPZ_PRODUCT_BATCH       = 150100 // 商品批量修改

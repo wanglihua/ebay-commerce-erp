@@ -6,6 +6,8 @@ import (
 	"matrix/core"
 	"matrix/modules/erp/models"
 	auth_models "matrix/modules/auth/models"
+	"matrix/modules/auth/service/pass_service"
+	"matrix/modules/auth/pass_res"
 )
 
 type ErpPurchaseFinance struct {
@@ -13,6 +15,8 @@ type ErpPurchaseFinance struct {
 }
 
 func (c ErpPurchaseFinance) Index() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.CGGL_PURCHASE_FINANCE, c.Session)
+
 	return c.RenderTemplate("erp/cggl/purchase_finance/purchase_finance_index.html")
 }
 
@@ -23,6 +27,8 @@ type ErpPurchaseFinanceViewItem struct {
 }
 
 func (c ErpPurchaseFinance) ListData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.CGGL_PURCHASE_FINANCE, c.Session)
+
 	db_session := c.DbSession
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
@@ -65,5 +71,14 @@ func (c ErpPurchaseFinance) ListData() revel.Result {
 	return c.RenderJson(core.GridResult{
 		Data:  purchase_bill_list,
 		Total: bill_count.Count,
+	})
+}
+
+func (c ErpPurchaseFinance) Purchase() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.CGGL_PURCHASE_FINANCE, c.Session)
+
+	return c.RenderJson(map[string]interface{}{
+		"success": true,
+		"message": "采购单下单成功！",
 	})
 }

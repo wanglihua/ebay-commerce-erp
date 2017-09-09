@@ -410,7 +410,7 @@ func (c ErpOrder) ListData() revel.Result {
 		status_id == models.ORDER_STATUS_PHZ ||
 		status_id == models.ORDER_STATUS_YFH ||
 		status_id == models.ORDER_STATUS_YWC ||
-		(
+		( // pick up 的 hold状态，也是分仓库查看的
 			status_id == models.ORDER_STATUS_HOLD &&
 				special_hold_type_id == ddpz_models.ORDER_HOLD_TYPE_PICK_UP) {
 		// 不同的仓库拣货人员可以看到不同的订单，管理员、销售、客服 除外
@@ -760,9 +760,9 @@ func (c ErpOrder) DetailData() revel.Result {
 	shipping_address.OrderId = order.Id //如果地址是空的，也先给一个 order_id
 
 	type order_item_view_t struct {
-		OrderItem         ddlc_models.OrderItemInfo          `xorm:"extends" json:"oi"`
-		Product           kcgl_models.ProductInfo            `xorm:"extends" json:"p"`
-		ProductSotoreItem sppz_models.ProductStoreItemInfo   `xorm:"extends" json:"psi"`
+		OrderItem         ddlc_models.OrderItemInfo        `xorm:"extends" json:"oi"`
+		Product           kcgl_models.ProductInfo          `xorm:"extends" json:"p"`
+		ProductSotoreItem sppz_models.ProductStoreItemInfo `xorm:"extends" json:"psi"`
 	}
 
 	sql := `

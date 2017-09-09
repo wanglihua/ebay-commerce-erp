@@ -7,6 +7,8 @@ import (
 
 	"matrix/core"
 	"matrix/modules/erp/models/cggl_models"
+	"matrix/modules/auth/service/pass_service"
+	"matrix/modules/auth/pass_res"
 )
 
 type ErpIntelRepl struct {
@@ -14,10 +16,14 @@ type ErpIntelRepl struct {
 }
 
 func (c ErpIntelRepl) Index() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.CGGL_INTEL_REPL, c.Session)
+
 	return c.RenderTemplate("erp/cggl/intel_repl/intel_repl_index.html")
 }
 
 func (c ErpIntelRepl) ListData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.CGGL_INTEL_REPL, c.Session)
+
 	db_session := c.DbSession
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
@@ -73,6 +79,8 @@ func (f *IntelReplDetailForm) Valid(validation *revel.Validation) bool {
 }
 
 func (c ErpIntelRepl) DetailData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.CGGL_INTEL_REPL, c.Session)
+
 	db_session := c.DbSession
 
 	var intel_repl_id int64
@@ -94,6 +102,8 @@ func (c ErpIntelRepl) DetailData() revel.Result {
 }
 
 func (c ErpIntelRepl) Save() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.CGGL_INTEL_REPL, c.Session)
+
 	db_session := c.DbSession
 
 	var detail_form IntelReplDetailForm
@@ -123,6 +133,8 @@ func (c ErpIntelRepl) Save() revel.Result {
 }
 
 func (c ErpIntelRepl) Delete() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.CGGL_INTEL_REPL, c.Session)
+
 	db_session := c.DbSession
 
 	intel_repl_id_list := make([]int64, 0)
