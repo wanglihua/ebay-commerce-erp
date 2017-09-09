@@ -23,6 +23,7 @@ import (
 	path "path/filepath"
 	"runtime"
 	"strings"
+	"github.com/lxn/walk"
 )
 
 type ListOpts []string
@@ -107,8 +108,14 @@ func runApp(cmd *Command, args []string) int {
 
 	notify_setup()
 
-	NewWatcher(paths, files)
+	// NewWatcher(paths, files) // 先禁用，这样可以
 	Autobuild(files)
+
+	mw, err := walk.NewMainWindow()
+	if err != nil {
+		log.Fatal(err)
+	}
+	mw.Run()
 
 	for {
 		select {

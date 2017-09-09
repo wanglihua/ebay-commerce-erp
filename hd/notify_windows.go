@@ -6,7 +6,7 @@ import (
 	"github.com/lxn/walk"
 )
 
-var notify_enabled = false
+var notify_enabled = true
 
 var notify_icon *walk.NotifyIcon
 
@@ -37,7 +37,22 @@ func notify_setup() {
 			log.Fatal(err)
 		}
 
-		//mw.Run()
+		notify_icon.MouseDown().Attach(func(x, y int, button walk.MouseButton) {
+			if button != walk.LeftButton {
+				return
+			}
+
+			files := []string{}
+			for _, arg := range mainFiles {
+				if len(arg) > 0 {
+					files = append(files, arg)
+				}
+			}
+
+			Autobuild(files)
+		})
+
+		// mw.Run()
 	}
 }
 
