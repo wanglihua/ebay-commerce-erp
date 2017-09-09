@@ -11,6 +11,8 @@ import (
 	"matrix/core"
 	"matrix/modules/erp/models/kcgl_models"
 	"matrix/modules/erp/models/sppz_models"
+	"matrix/modules/erp/service/inventory_history_service"
+	"math"
 )
 
 func Update_au_stock_cost() {
@@ -100,40 +102,68 @@ WHERE s.stock_type_id = %d;`
 			// 计算商品体积，计算平摊海运成本
 			var avg_sea_shipping_cost = float64(sea_container_cost.Cost) * product.Length * product.Width * product.Height / float64(sea_container_cost.Volume)
 
+			/*
 			var update_au_inventory_sql = `UPDATE erp_inventory SET cost_price = %f WHERE product_id = %d AND (SELECT s.stock_type_id FROM erp_stock s WHERE s.id = erp_inventory.stock_id) = %d;`
 			update_au_inventory_sql = fmt.Sprintf(update_au_inventory_sql, cn_cost_price+avg_sea_shipping_cost, cn_inventory.ProductId, sppz_models.STOCK_TYPE_AU)
 			_, err = db_session.Exec(update_au_inventory_sql)
 			core.HandleError(err)
+			*/
+
+			/*
+SELECT nvt.*
+FROM erp_inventory nvt
+    INNER JOIN erp_stock s ON nvt.stock_id = s.id
+WHERE s.stock_type_id = 300 AND nvt.product_id = 2;
+			 */
+			var sql_get_product_au_inventory = `SELECT nvt.*
+FROM erp_inventory nvt
+    INNER JOIN erp_stock s ON nvt.stock_id = s.id
+WHERE s.stock_type_id = %d AND nvt.product_id = %d;`
+
+			sql_get_product_au_inventory = fmt.Sprintf(sql_get_product_au_inventory, sppz_models.STOCK_TYPE_AU, product.Id)
+			var au_inventory_list = make([]kcgl_models.InventoryInfo, 0)
+			core.HandleError(db_session.Where("stock_id = %d AND product_id = %d").Find(&au_inventory_list))
+
+			for _, au_inventory := range au_inventory_list {
+				var price_before = au_inventory.CostPrice
+				au_inventory.CostPrice = cn_cost_price + avg_sea_shipping_cost
+				var price_after = au_inventory.CostPrice
+
+				if math.Abs(price_after-price_before) > core.FLOAT_MIN_DIFF {
+					_, err := db_session.Id(au_inventory.Id).Cols("cost_price").Update(&au_inventory)
+					core.HandleError(err)
+
+					inventory_history_service.Insert_inventory_history(au_inventory, fmt.Sprintf("自动更新澳仓成本。 %0.2f => %0.2f", price_before, price_after), db_session)
+				}
+			}
 		}
 	}
 
-	// 自动添加不存在的对应的在途仓记录
-	{
-		var zt_stock_list = make([]sppz_models.StockInfo, 0)
-		core.HandleError(db_session.Where("stock_type_id = ?", sppz_models.STOCK_TYPE_ZT).Find(&zt_stock_list))
+	// 自动添加不存在的对应的在途仓记录 {
+	var zt_stock_list = make([]sppz_models.StockInfo, 0)
+	core.HandleError(db_session.Where("stock_type_id = ?", sppz_models.STOCK_TYPE_ZT).Find(&zt_stock_list))
 
-		// 汇率换算
-		//var aud_exchange_rate = exchange_rate_service.Get_aud_exchange_rate(db_session)
+	// 汇率换算
+	//var aud_exchange_rate = exchange_rate_service.Get_aud_exchange_rate(db_session)
 
-		for _, cn_inventory := range inventory_cn_list {
+	for _, cn_inventory := range inventory_cn_list {
 
-			// 如果在途仓库存不存的的，需要自动添加零库存的记录。
-			for _, zt_stock := range zt_stock_list {
-				var zt_stock_inventory kcgl_models.InventoryInfo
-				has, err := db_session.Where("product_id = ? AND stock_id = ?", cn_inventory.ProductId, zt_stock.Id).Get(&zt_stock_inventory)
+		// 如果在途仓库存不存的的，需要自动添加零库存的记录。
+		for _, zt_stock := range zt_stock_list {
+			var zt_stock_inventory kcgl_models.InventoryInfo
+			has, err := db_session.Where("product_id = ? AND stock_id = ?", cn_inventory.ProductId, zt_stock.Id).Get(&zt_stock_inventory)
+			core.HandleError(err)
+
+			if has == false {
+				zt_stock_inventory.ProductId = cn_inventory.ProductId
+				zt_stock_inventory.StockId = zt_stock.Id
+				zt_stock_inventory.StorageLocId = 0
+				zt_stock_inventory.Qty = 0
+				zt_stock_inventory.PendingQty = 0
+				zt_stock_inventory.CostPrice = 0
+
+				_, err = db_session.Insert(&zt_stock_inventory)
 				core.HandleError(err)
-
-				if has == false {
-					zt_stock_inventory.ProductId = cn_inventory.ProductId
-					zt_stock_inventory.StockId = zt_stock.Id
-					zt_stock_inventory.StorageLocId = 0
-					zt_stock_inventory.Qty = 0
-					zt_stock_inventory.PendingQty = 0
-					zt_stock_inventory.CostPrice = 0
-
-					_, err = db_session.Insert(&zt_stock_inventory)
-					core.HandleError(err)
-				}
 			}
 		}
 	}
