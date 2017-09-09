@@ -666,48 +666,48 @@
                                 <tbody>
                                 <template v-for="inventory in detail.inventory_list">
                                     <tr v-if="inventory.st.id == detail.logistics_stock.id" style="background-color: #dde6f0;">
-                                        <td class="center">
+                                        <td class="center" style="vertical-align: middle">
                                             {{inventory.p.sku}}
                                         </td>
-                                        <td>
-                                            {{inventory.p.cn_name}}
+                                        <td class="wrap-word" style="vertical-align: middle">
+                                            <div>{{inventory.p.cn_name}}</div>
                                         </td>
-                                        <td class="center">
+                                        <td class="center" style="vertical-align: middle">
                                             {{inventory.st.name}}
                                         </td>
-                                        <td class="center">
+                                        <td class="center" style="vertical-align: middle">
                                             {{inventory.sl.name}}
                                         </td>
-                                        <td class="center">
+                                        <td class="center" style="vertical-align: middle">
                                             {{inventory.nvt.qty}}
                                         </td>
-                                        <td class="center">
+                                        <td class="center" style="vertical-align: middle">
                                             {{inventory.nvt.pending_qty}}
                                         </td>
-                                        <td class="center">
+                                        <td class="center" style="vertical-align: middle">
                                             {{ format_amount(inventory.nvt.cost_price)}}
                                         </td>
                                     </tr>
                                     <tr v-else>
-                                        <td class="center">
+                                        <td class="center" style="vertical-align: middle">
                                             {{inventory.p.sku}}
                                         </td>
-                                        <td>
-                                            {{inventory.p.cn_name}}
+                                        <td class="wrap-word" style="vertical-align: middle">
+                                            <div>{{inventory.p.cn_name}}</div>
                                         </td>
-                                        <td class="center">
+                                        <td class="center" style="vertical-align: middle">
                                             {{inventory.st.name}}
                                         </td>
-                                        <td class="center">
+                                        <td class="center" style="vertical-align: middle">
                                             {{inventory.sl.name}}
                                         </td>
-                                        <td class="center">
+                                        <td class="center" style="vertical-align: middle">
                                             {{inventory.nvt.qty}}
                                         </td>
-                                        <td class="center">
+                                        <td class="center" style="vertical-align: middle">
                                             {{inventory.nvt.pending_qty}}
                                         </td>
-                                        <td class="center">
+                                        <td class="center" style="vertical-align: middle">
                                             {{ format_amount(inventory.nvt.cost_price)}}
                                         </td>
                                     </tr>
