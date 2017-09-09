@@ -9,9 +9,10 @@ import (
 	"matrix/modules/erp/service/bill_service"
 	"strconv"
 	"time"
-	"matrix/modules/erp/models/kcgl_models"
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/auth/pass_res"
+	"fmt"
+	"matrix/modules/erp/models/cggl_models"
 )
 
 type ErpPurchaseBill struct {
@@ -25,7 +26,7 @@ func (c ErpPurchaseBill) Index() revel.Result {
 }
 
 type ErpPurchaseBillViewItem struct {
-	kcgl_models.PurchaseBillInfo `xorm:"extends" json:"pb"`
+	cggl_models.PurchaseBillInfo `xorm:"extends" json:"pb"`
 	auth_models.UserInfo         `xorm:"extends" json:"u"`
 	models.StatusInfo            `xorm:"extends" json:"s"`
 }
@@ -79,7 +80,7 @@ func (c ErpPurchaseBill) ListData() revel.Result {
 }
 
 type PurchaseBillDetailForm struct {
-	PurchaseBill kcgl_models.PurchaseBillInfo `json:"purchase_bill"`
+	PurchaseBill cggl_models.PurchaseBillInfo `json:"purchase_bill"`
 }
 
 func (f *PurchaseBillDetailForm) IsCreate() bool {
@@ -114,7 +115,7 @@ func (c ErpPurchaseBill) DetailData() revel.Result {
 	var purchase_bill_id int64
 	c.Params.Bind(&purchase_bill_id, "id")
 
-	var purchase_bill kcgl_models.PurchaseBillInfo
+	var purchase_bill cggl_models.PurchaseBillInfo
 	if purchase_bill_id != 0 {
 		has, err := db_session.Id(purchase_bill_id).Get(&purchase_bill)
 		core.HandleError(err)
@@ -175,11 +176,38 @@ func (c ErpPurchaseBill) Delete() revel.Result {
 	purchase_bill_id_list := make([]int64, 0)
 	c.Params.Bind(&purchase_bill_id_list, "id_list")
 
-	_, err := db_session.In("bill_id", purchase_bill_id_list).Delete(new(kcgl_models.PurchaseBillEntryInfo))
+	_, err := db_session.In("bill_id", purchase_bill_id_list).Delete(new(cggl_models.PurchaseBillEntryInfo))
 	core.HandleError(err)
 
-	_, err = db_session.In("id", purchase_bill_id_list).Delete(new(kcgl_models.PurchaseBillInfo))
+	_, err = db_session.In("id", purchase_bill_id_list).Delete(new(cggl_models.PurchaseBillInfo))
 	core.HandleError(err)
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: "数据删除成功!"})
+}
+
+func (c ErpPurchaseBill) Approve() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.CGGL_PURCHASE_BILL, c.Session) // 应该有个专门的审批权限
+
+	var db_session = c.DbSession
+
+	purchase_bill_id_list := make([]int64, 0)
+	c.Params.Bind(&purchase_bill_id_list, "id_list")
+
+	var purchase_bill_list = make([]cggl_models.PurchaseBillInfo, 0)
+	core.HandleError(db_session.In("id", purchase_bill_id_list).Find(&purchase_bill_list))
+
+	// 检查状态
+	for _, purchase_bill := range purchase_bill_list {
+		if purchase_bill.StatusId != models.STATUS_PURCHASE_NEW {
+			return c.RenderJson(map[string]interface{}{
+				"success": false,
+				"message": fmt.Sprintf("采购单 %s 当前状态不是已创建状态，不能进行审批！", purchase_bill.Code),
+			})
+		}
+	}
+
+	return c.RenderJson(map[string]interface{}{
+		"success": true,
+		"message": "采购单审批成功！",
+	})
 }

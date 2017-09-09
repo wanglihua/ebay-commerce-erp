@@ -28,7 +28,7 @@
                                 <template v-for="(order_item, index) in page.order_item_list">
                                     <tr>
                                         <td class="center">{{index + 1}}</td>
-                                        <td class="center">{{order_item.o.code}}</td>
+                                        <td class="center"><a :href='"/order/detail/" + order_item.o.id' target="order_detail">{{order_item.o.code}}</a></td>
                                         <td class="center">{{order_item.oi.quantity}}</td>
                                         <td class="center">{{order_item.oi.transaction_price_currency}}&nbsp;{{order_item.oi.transaction_price}}</td>
                                         <td class="center">{{order_item.o.paid_time}}</td>

@@ -2,12 +2,12 @@ package controllers
 
 import (
 	"github.com/revel/revel"
-	"matrix/modules/erp/models/kcgl_models"
 	"matrix/core"
 	"matrix/modules/erp/models"
 	auth_models "matrix/modules/auth/models"
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/auth/pass_res"
+	"matrix/modules/erp/models/cggl_models"
 )
 
 type ErpPurchaseFinance struct {
@@ -21,7 +21,7 @@ func (c ErpPurchaseFinance) Index() revel.Result {
 }
 
 type ErpPurchaseFinanceViewItem struct {
-	kcgl_models.PurchaseBillInfo `xorm:"extends" json:"pb"`
+	cggl_models.PurchaseBillInfo `xorm:"extends" json:"pb"`
 	auth_models.UserInfo         `xorm:"extends" json:"u"`
 	models.StatusInfo            `xorm:"extends" json:"s"`
 }

@@ -7,6 +7,7 @@ import (
 	"matrix/modules/erp/models/kcgl_models"
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/auth/pass_res"
+	"matrix/modules/erp/models/cggl_models"
 )
 
 type ErpPurchaseCheckin struct {
@@ -20,7 +21,7 @@ func (c ErpPurchaseCheckin) Index() revel.Result {
 }
 
 type PurchaseCheckinViewItem struct {
-	kcgl_models.PurchaseBillEntryInfo `xorm:"extends" json:"pbe"`
+	cggl_models.PurchaseBillEntryInfo `xorm:"extends" json:"pbe"`
 	kcgl_models.ProductInfo           `xorm:"extends" json:"p"`
 	models.StatusInfo                 `xorm:"extends" json:"s"`
 }

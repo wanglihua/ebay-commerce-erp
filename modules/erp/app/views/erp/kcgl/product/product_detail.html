@@ -340,25 +340,31 @@
                                     <th class="center" style="width: 120px;">仓库</th>
                                     <th class="center" style="width: 120px;">库位</th>
                                     <th class="center" style="width: 100px;">库存</th>
+                                    <th class="center" style="width: 80px;">成本价格</th>
                                 </tr>
                                 </thead>
                                 <tbody>
                                 <template v-for="inventory in detail.inventory_list">
                                     <tr>
-                                        <td class="center">
+                                        <td class="center" style="vertical-align: middle">
                                             {{inventory.p.sku}}
                                         </td>
-                                        <td>
-                                            {{inventory.p.cn_name}}
+                                        <td class="wrap-word" style="vertical-align: middle">
+                                            <div>
+                                                {{inventory.p.cn_name}}
+                                            </div>
                                         </td>
-                                        <td class="center">
+                                        <td class="center" style="vertical-align: middle">
                                             {{inventory.st.name}}
                                         </td>
-                                        <td class="center">
+                                        <td class="center" style="vertical-align: middle">
                                             {{inventory.sl.name}}
                                         </td>
-                                        <td class="center">
+                                        <td class="center" style="vertical-align: middle">
                                             {{inventory.nvt.qty}}
+                                        </td>
+                                        <td class="center" style="vertical-align: middle">
+                                            {{inventory.nvt.cost_price}}
                                         </td>
                                     </tr>
                                 </template>
@@ -403,7 +409,7 @@
                                 <template v-for="(order_item, index) in detail.order_item_list">
                                     <tr>
                                         <td class="center">{{index + 1}}</td>
-                                        <td class="center">{{order_item.o.code}}</td>
+                                        <td class="center"><a :href='"/order/detail/" + order_item.o.id' target="order_detail">{{order_item.o.code}}</a></td>
                                         <td class="center">{{order_item.oi.quantity}}</td>
                                         <td class="center">{{order_item.oi.transaction_price_currency}}&nbsp;{{order_item.oi.transaction_price}}</td>
                                         <td class="center">{{order_item.o.paid_time}}</td>

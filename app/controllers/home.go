@@ -113,8 +113,6 @@ func (c Home) SyncDbPost() revel.Result {
 	model_list = append(model_list, &kcgl_models.ProductImportInfo{})
 	model_list = append(model_list, &kcgl_models.ProductInfo{})
 	model_list = append(model_list, &kcgl_models.ProductLogInfo{})
-	model_list = append(model_list, &kcgl_models.PurchaseBillEntryInfo{})
-	model_list = append(model_list, &kcgl_models.PurchaseBillInfo{})
 	model_list = append(model_list, &kcgl_models.StockBillEntryInfo{})
 	model_list = append(model_list, &kcgl_models.StockBillInfo{})
 	model_list = append(model_list, &kcgl_models.StockBillTypeInfo{})
@@ -159,6 +157,8 @@ func (c Home) SyncDbPost() revel.Result {
 	model_list = append(model_list, &sppz_models.ProductStoreItemInfo{})
 
 	model_list = append(model_list, &cggl_models.IntelReplInfo{})
+	model_list = append(model_list, &cggl_models.PurchaseBillEntryInfo{})
+	model_list = append(model_list, &cggl_models.PurchaseBillInfo{})
 
 	model_list = append(model_list, &spbb_models.ProductSaleDayAnalysisInfo{})
 	model_list = append(model_list, &spbb_models.ProductSaleAnalysisInfo{})
