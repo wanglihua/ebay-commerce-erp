@@ -28,10 +28,10 @@ WHERE cte.transfer_id = 1;
 	type weight_volume_amount_t struct {
 		TotalWeight          float64 `xorm:"'total_weight'"`
 		TotalVolume          float64 `xorm:"'total_volume'"`
-		TotalAmount1         float64 `xorm:"'total_amount1'"`
-		TotalAmount2         float64 `xorm:"'total_amount2'"`
-		DutyAmountDiscounted float64 `xorm:"'duty_amount_discounted'"`
-		DutyFreeAmount       float64 `xorm:"'duty_free_amount'"`
+		TotalAmount1         float64 `xorm:"'total_amount1'"`          // 实际金额
+		TotalAmount2         float64 `xorm:"'total_amount2'"`          // 折算金额，成本上调后的总金额
+		DutyAmountDiscounted float64 `xorm:"'duty_amount_discounted'"` // 征税打折金额，成本上上调后的总金额对应的需要对征税商品的打折金额
+		DutyFreeAmount       float64 `xorm:"'duty_free_amount'"`       // 不征税金额，商品中不需要征税部分的总金额
 	}
 
 	var query_sql = `SELECT

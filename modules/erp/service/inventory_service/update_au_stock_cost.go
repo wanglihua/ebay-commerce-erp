@@ -18,7 +18,7 @@ import (
 func Update_au_stock_cost() {
 	defer func() {
 		if err := recover(); err != nil {
-			revel.ERROR.Printf("更新澳仓库存出现错误： %s\n", err)
+			revel.ERROR.Printf("更新澳仓成本出现错误： %s\n", err)
 			revel.ERROR.Println(string(debug.Stack()))
 		}
 	}()
@@ -131,7 +131,7 @@ WHERE s.stock_type_id = %d AND nvt.product_id = %d;`
 
 				if math.Abs(price_after-price_before) > core.FLOAT_MIN_DIFF {
 					_, err := db_session.Id(au_inventory.Id).Cols("cost_price").Update(&au_inventory)
-					core.HandleError(err)
+					core.HandleError(err) // todo: Error 1213: Deadlock found when trying to get lock; try restarting transaction
 
 					inventory_history_service.Insert_inventory_history(au_inventory, fmt.Sprintf("自动更新澳仓成本。 %0.2f => %0.2f", price_before, price_after), db_session)
 				}

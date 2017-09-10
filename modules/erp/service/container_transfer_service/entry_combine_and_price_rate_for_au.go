@@ -5,6 +5,7 @@ import (
 	"github.com/go-xorm/xorm"
 	"matrix/core"
 	"matrix/modules/erp/models/kcgl_models"
+	"math"
 )
 
 func EntryCombineAndPriceRateForAu(p_transfer *hgbg_models.ContainerTransferInfo, entry_list []ContainerTransferEntryItem, db_session *xorm.Session) ([]ContainerTransferEntryItem) {
@@ -49,10 +50,15 @@ func EntryCombineAndPriceRateForAu(p_transfer *hgbg_models.ContainerTransferInfo
 
 	// do price rate
 	for index, combined_entry := range combined_entry_list {
-		if combined_entry.ContainerTransferEntry.AuHsDutyRate == 0 {
-			combined_entry_list[index].ContainerTransferEntry.Price = combined_entry.ContainerTransferEntry.Price * (1 + p_transfer.PriceUpRate) // 不征税商品上调
+		if math.Abs(p_transfer.PriceUpRate) > core.FLOAT_MIN_DIFF { // 如果上调率不是零
+			if combined_entry.ContainerTransferEntry.AuHsDutyRate == 0 {
+				combined_entry_list[index].ContainerTransferEntry.Price = combined_entry.ContainerTransferEntry.Price * (1 + p_transfer.PriceUpRate) // 不征税商品上调
+			} else {
+				combined_entry_list[index].ContainerTransferEntry.Price = combined_entry.ContainerTransferEntry.Price * p_transfer.PriceDownRate // 征税商品打折
+			}
 		} else {
-			combined_entry_list[index].ContainerTransferEntry.Price = combined_entry.ContainerTransferEntry.Price * p_transfer.PriceDownRate // 征税商品打折
+			// 如果上调率是零
+			combined_entry_list[index].ContainerTransferEntry.Price = combined_entry.ContainerTransferEntry.Price
 		}
 	}
 
