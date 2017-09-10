@@ -122,7 +122,7 @@ WHERE s.stock_type_id = %d AND nvt.product_id = %d;`
 
 			sql_get_product_au_inventory = fmt.Sprintf(sql_get_product_au_inventory, sppz_models.STOCK_TYPE_AU, product.Id)
 			var au_inventory_list = make([]kcgl_models.InventoryInfo, 0)
-			core.HandleError(db_session.Where("stock_id = %d AND product_id = %d").Find(&au_inventory_list))
+			core.HandleError(db_session.Sql(sql_get_product_au_inventory).Find(&au_inventory_list))
 
 			for _, au_inventory := range au_inventory_list {
 				var price_before = au_inventory.CostPrice
