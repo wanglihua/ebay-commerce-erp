@@ -27,6 +27,11 @@
                         重新计算待发货数量
                     </button>
 
+                    <button class="btn btn-purple btn-sm" @click="updateAuInventoryCostPrice()">
+                        <i class="ace-icon fa fa-calculator"></i>
+                        立即更新澳仓成本
+                    </button>
+
                     {%/*
                     <button id="btnImport" class="btn btn-info btn-sm">
                         <i class="ace-icon fa fa-file-excel-o"></i>
@@ -800,6 +805,24 @@
             reCalPending: function () {
                 $.ajax({
                     url: '{%url "ErpInventory.ReCalPending"%}',
+                    type: "POST",
+
+                    success: function (data) {
+                        if (data.success === false) {
+                            $.msg.error(data.message);
+                            return;
+                        }
+                        else {
+                            $.msg.show(data.message);
+                            vm.reloadList();
+                            return;
+                        }
+                    }
+                });
+            },
+            updateAuInventoryCostPrice: function () {
+                $.ajax({
+                    url: '{%url "ErpInventory.UpdateAuInventoryCostPrice"%}',
                     type: "POST",
 
                     success: function (data) {

@@ -167,11 +167,11 @@ ivt.id IN (
 }
 
 type InventoryDetailForm struct {
-	Inventory      kcgl_models.InventoryInfo     `json:"inventory"`
-	StockList      []sppz_models.StockInfo       `json:"stock_list"`
-	StorageLocList []sppz_models.StorageLocInfo  `json:"storage_loc_list"`
-	ProductSku     string                   `json:"product_sku"`
-	IsNew          bool                     `json:"is_new"`
+	Inventory      kcgl_models.InventoryInfo    `json:"inventory"`
+	StockList      []sppz_models.StockInfo      `json:"stock_list"`
+	StorageLocList []sppz_models.StorageLocInfo `json:"storage_loc_list"`
+	ProductSku     string                       `json:"product_sku"`
+	IsNew          bool                         `json:"is_new"`
 }
 
 func (f *InventoryDetailForm) IsCreate() bool {
@@ -360,6 +360,16 @@ func (c ErpInventory) ReCalPending() revel.Result {
 	return c.RenderJson(map[string]interface{}{
 		"success": true,
 		"message": "更新待配货数量成功",
+	})
+}
+
+func (c ErpInventory) UpdateAuInventoryCostPrice() revel.Result {
+
+	go inventory_service.Update_au_stock_cost()
+
+	return c.RenderJson(map[string]interface{}{
+		"success": true,
+		"message": "启动澳仓成本更新后台任务成功！",
 	})
 }
 

@@ -202,6 +202,7 @@ POST /inventory/data/detail                      ErpInventory.DetailData
 POST /inventory/save                             ErpInventory.Save
 POST /inventory/delete                           ErpInventory.Delete
 POST /inventory/re/cal/pending                   ErpInventory.ReCalPending
+POST /inventory/update/au/cost/price             ErpInventory.UpdateAuInventoryCostPrice
 POST /inventory/import                           ErpInventory.Import
 POST /inventory/export                           ErpInventory.Export
 POST /inventory/import/product/storage/loc       ErpInventory.ImportProductStorageLoc
