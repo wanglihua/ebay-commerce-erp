@@ -158,6 +158,17 @@ func (c ErpOrderNew) Save() revel.Result {
 	order.TotalAmountRmb = order.AmountPaid * aud_exchange_rate_setting
 	order.StatusId = models.ORDER_STATUS_YZF
 
+	var order_in_db ddlc_models.OrderInfo
+	has, err := db_session.Where(fmt.Sprintf("code = '%s'", order.Code)).Get(&order_in_db)
+	core.HandleError(err)
+
+	if has == true {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "订单编号已存在！",
+		})
+	}
+
 	_, err = db_session.Insert(&order)
 	core.HandleError(err)
 
@@ -225,7 +236,7 @@ type OrderCreateForm struct {
 	Order           ddlc_models.OrderInfo                `json:"order"`
 	ShippingAddress ddlc_models.OrderShippingAddressInfo `json:"shipping_address"`
 	PickupInfo      ddlc_models.PickupOrderInfo          `json:"pickup_info"`
-	StockId         int64                           `json:"stock_id"`
+	StockId         int64                                `json:"stock_id"`
 }
 
 func (f *OrderCreateForm) Valid(validation *revel.Validation) bool {
