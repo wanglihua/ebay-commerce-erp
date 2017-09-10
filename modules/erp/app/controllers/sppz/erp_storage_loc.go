@@ -253,7 +253,8 @@ func (c ErpStorageLoc) Import() revel.Result {
 			// 序号	仓库名称	仓位名称	仓位描述
 
 			// 序号
-			cell = row.Cells[col_index]
+			// cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
@@ -264,7 +265,8 @@ func (c ErpStorageLoc) Import() revel.Result {
 			col_index++
 
 			// 仓库名称
-			cell = row.Cells[col_index]
+			// cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
@@ -272,7 +274,8 @@ func (c ErpStorageLoc) Import() revel.Result {
 			col_index++
 
 			// 仓位名称
-			cell = row.Cells[col_index]
+			// cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
@@ -281,7 +284,8 @@ func (c ErpStorageLoc) Import() revel.Result {
 
 			if len(row.Cells) > col_index { // 最后一列有数据
 				// 成本价
-				cell = row.Cells[col_index]
+				// cell = row.Cells[col_index]
+				cell = sheet.Cell(row_index, col_index)
 				cell_val, err = cell.String()
 				core.HandleError(err)
 				cell_val = strings.TrimSpace(cell_val)

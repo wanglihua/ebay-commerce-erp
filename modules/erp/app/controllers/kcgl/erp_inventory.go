@@ -436,7 +436,8 @@ func (c ErpInventory) Import() revel.Result {
 			}
 
 			// 序号
-			cell = row.Cells[col_index]
+			// cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
@@ -447,7 +448,8 @@ func (c ErpInventory) Import() revel.Result {
 			col_index++
 
 			// 商品编号
-			cell = row.Cells[col_index]
+			// cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
@@ -455,7 +457,8 @@ func (c ErpInventory) Import() revel.Result {
 			col_index++
 
 			// 仓库名称
-			cell = row.Cells[col_index]
+			// cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
@@ -463,7 +466,8 @@ func (c ErpInventory) Import() revel.Result {
 			col_index++
 
 			// 仓位名称
-			cell = row.Cells[col_index]
+			// cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
@@ -471,7 +475,8 @@ func (c ErpInventory) Import() revel.Result {
 			col_index++
 
 			// 库存
-			cell = row.Cells[col_index]
+			// cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
@@ -481,7 +486,8 @@ func (c ErpInventory) Import() revel.Result {
 
 			if len(row.Cells) > data_col_count-1 { // 最后一列有数据
 				// 成本价
-				cell = row.Cells[col_index]
+				// cell = row.Cells[col_index]
+				cell = sheet.Cell(row_index, col_index)
 				cell_val, err = cell.String()
 				core.HandleError(err)
 				cell_val = strings.TrimSpace(cell_val)
@@ -881,7 +887,7 @@ func (c ErpInventory) ImportProductStorageLoc() revel.Result {
 		max_row := sheet.MaxRow
 		//略过标题行
 		for row_index := 1; row_index < max_row; row_index ++ {
-			row := sheet.Rows[row_index]
+			// row := sheet.Rows[row_index]
 
 			var cell *xlsx.Cell
 			var cell_val string
@@ -892,7 +898,8 @@ func (c ErpInventory) ImportProductStorageLoc() revel.Result {
 			col_index := 0
 
 			// 序号
-			cell = row.Cells[col_index]
+			// cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
@@ -903,7 +910,8 @@ func (c ErpInventory) ImportProductStorageLoc() revel.Result {
 			col_index++
 
 			// 商品编号
-			cell = row.Cells[col_index]
+			// cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
@@ -911,7 +919,8 @@ func (c ErpInventory) ImportProductStorageLoc() revel.Result {
 			col_index++
 
 			// 仓库名称
-			cell = row.Cells[col_index]
+			// cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
@@ -919,7 +928,8 @@ func (c ErpInventory) ImportProductStorageLoc() revel.Result {
 			col_index++
 
 			// 仓位名称
-			cell = row.Cells[col_index]
+			// cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
@@ -1410,7 +1420,7 @@ func (c ErpInventory) ImportInventoryQuantity() revel.Result {
 		max_row := sheet.MaxRow
 		//略过标题行
 		for row_index := 1; row_index < max_row; row_index ++ {
-			row := sheet.Rows[row_index]
+			// row := sheet.Rows[row_index]
 
 			var cell *xlsx.Cell
 			var cell_val string
@@ -1421,7 +1431,8 @@ func (c ErpInventory) ImportInventoryQuantity() revel.Result {
 			col_index := 0
 
 			// 序号
-			cell = row.Cells[col_index]
+			// cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
@@ -1432,7 +1443,8 @@ func (c ErpInventory) ImportInventoryQuantity() revel.Result {
 			col_index++
 
 			// 商品编号
-			cell = row.Cells[col_index]
+			// cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
@@ -1440,7 +1452,8 @@ func (c ErpInventory) ImportInventoryQuantity() revel.Result {
 			col_index++
 
 			// 仓库名称
-			cell = row.Cells[col_index]
+			// cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
@@ -1458,7 +1471,8 @@ func (c ErpInventory) ImportInventoryQuantity() revel.Result {
 			*/
 
 			// 库存
-			cell = row.Cells[col_index]
+			// cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
@@ -1842,7 +1856,7 @@ func (c ErpInventory) ImportInventoryPrice() revel.Result {
 		max_row := sheet.MaxRow
 		//略过标题行
 		for row_index := 1; row_index < max_row; row_index ++ {
-			row := sheet.Rows[row_index]
+			// row := sheet.Rows[row_index]
 
 			var cell *xlsx.Cell
 			var cell_val string
@@ -1853,7 +1867,8 @@ func (c ErpInventory) ImportInventoryPrice() revel.Result {
 			col_index := 0
 
 			// 序号
-			cell = row.Cells[col_index]
+			// cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
@@ -1864,7 +1879,8 @@ func (c ErpInventory) ImportInventoryPrice() revel.Result {
 			col_index++
 
 			// 商品编号
-			cell = row.Cells[col_index]
+			// cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
@@ -1872,7 +1888,8 @@ func (c ErpInventory) ImportInventoryPrice() revel.Result {
 			col_index++
 
 			// 仓库名称
-			cell = row.Cells[col_index]
+			// cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
@@ -1890,7 +1907,8 @@ func (c ErpInventory) ImportInventoryPrice() revel.Result {
 			*/
 
 			// 成本价
-			cell = row.Cells[col_index]
+			// cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
@@ -2274,7 +2292,7 @@ func (c ErpInventory) ImportInventoryQuantityDiff() revel.Result {
 		max_row := sheet.MaxRow
 		//略过标题行
 		for row_index := 1; row_index < max_row; row_index ++ {
-			row := sheet.Rows[row_index]
+			// row := sheet.Rows[row_index]
 
 			var cell *xlsx.Cell
 			var cell_val string
@@ -2285,7 +2303,8 @@ func (c ErpInventory) ImportInventoryQuantityDiff() revel.Result {
 			col_index := 0
 
 			// 序号
-			cell = row.Cells[col_index]
+			// cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
@@ -2296,7 +2315,8 @@ func (c ErpInventory) ImportInventoryQuantityDiff() revel.Result {
 			col_index++
 
 			// 商品编号
-			cell = row.Cells[col_index]
+			// cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
@@ -2304,7 +2324,8 @@ func (c ErpInventory) ImportInventoryQuantityDiff() revel.Result {
 			col_index++
 
 			// 仓库名称
-			cell = row.Cells[col_index]
+			// cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
@@ -2322,7 +2343,8 @@ func (c ErpInventory) ImportInventoryQuantityDiff() revel.Result {
 			*/
 
 			// 库存
-			cell = row.Cells[col_index]
+			// cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)

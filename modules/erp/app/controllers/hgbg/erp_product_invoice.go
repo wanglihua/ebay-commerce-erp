@@ -163,7 +163,7 @@ func (c ErpProductInvoice) Import() revel.Result {
 
 		//略过标题行
 		for row_index := 1; row_index < max_row; row_index ++ {
-			row := sheet.Rows[row_index]
+			// row := sheet.Rows[row_index]
 
 			var cell *xlsx.Cell
 			var cell_val string
@@ -174,7 +174,8 @@ func (c ErpProductInvoice) Import() revel.Result {
 			col_index := 0 //从第二列开始导入，略去第一列的编号
 
 			//SKU
-			cell = row.Cells[col_index]
+			// cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
@@ -187,7 +188,8 @@ func (c ErpProductInvoice) Import() revel.Result {
 			col_index++
 
 			// length
-			cell = row.Cells[col_index]
+			// cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
 

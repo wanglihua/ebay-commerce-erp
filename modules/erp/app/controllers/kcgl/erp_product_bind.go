@@ -302,7 +302,8 @@ func (c ErpProductBind) Import() revel.Result {
 			}
 
 			// 序号
-			cell = row.Cells[col_index]
+			// cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
@@ -313,7 +314,8 @@ func (c ErpProductBind) Import() revel.Result {
 			col_index++
 
 			// 编号
-			cell = row.Cells[col_index]
+			// cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
@@ -321,7 +323,8 @@ func (c ErpProductBind) Import() revel.Result {
 			col_index++
 
 			// 名称
-			cell = row.Cells[col_index]
+			// cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
@@ -329,7 +332,8 @@ func (c ErpProductBind) Import() revel.Result {
 			col_index++
 
 			// 绑定列表
-			cell = row.Cells[col_index]
+			// cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)

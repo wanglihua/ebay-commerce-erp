@@ -302,7 +302,8 @@ func (c ErpLogisticsFeeRate) Import() revel.Result {
 			}
 
 			// 物流公司名称
-			cell = row.Cells[col_index]
+			// cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
@@ -313,7 +314,8 @@ func (c ErpLogisticsFeeRate) Import() revel.Result {
 			col_index++
 
 			// 物流方式名称
-			cell = row.Cells[col_index]
+			//cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
@@ -321,7 +323,8 @@ func (c ErpLogisticsFeeRate) Import() revel.Result {
 			col_index++
 
 			// 邮编
-			cell = row.Cells[col_index]
+			// cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
@@ -329,7 +332,8 @@ func (c ErpLogisticsFeeRate) Import() revel.Result {
 			col_index++
 
 			// 起步价(澳币)
-			cell = row.Cells[col_index]
+			// cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
@@ -337,7 +341,8 @@ func (c ErpLogisticsFeeRate) Import() revel.Result {
 			col_index++
 
 			// 起步价重量(Kg)
-			cell = row.Cells[col_index]
+			// cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
@@ -345,7 +350,8 @@ func (c ErpLogisticsFeeRate) Import() revel.Result {
 			col_index++
 
 			// 最低收费(澳币)
-			cell = row.Cells[col_index]
+			// cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
@@ -353,7 +359,8 @@ func (c ErpLogisticsFeeRate) Import() revel.Result {
 			col_index++
 
 			// 续重阶梯(Kg)
-			cell = row.Cells[col_index]
+			// cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
@@ -361,7 +368,8 @@ func (c ErpLogisticsFeeRate) Import() revel.Result {
 			col_index++
 
 			// 续重阶梯收费(澳币)
-			cell = row.Cells[col_index]
+			// cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
@@ -369,7 +377,8 @@ func (c ErpLogisticsFeeRate) Import() revel.Result {
 			col_index++
 
 			// 是否为偏远地区
-			cell = row.Cells[col_index]
+			// cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
 			core.HandleError(err)
 			cell_val, err = cell.String()
 			if strings.TrimSpace(cell_val) == "是" {
@@ -381,7 +390,8 @@ func (c ErpLogisticsFeeRate) Import() revel.Result {
 
 			// 偏远地区加收运费(澳币)
 			if col_index <= len(row.Cells)-1 {
-				cell = row.Cells[col_index]
+				// cell = row.Cells[col_index]
+				cell = sheet.Cell(row_index, col_index)
 				cell_val, err = cell.String()
 				core.HandleError(err)
 				cell_val = strings.TrimSpace(cell_val)

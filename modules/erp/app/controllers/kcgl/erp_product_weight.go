@@ -207,7 +207,8 @@ func (c ErpProductWeight) Import() revel.Result {
 			}
 
 			//SKU
-			cell = row.Cells[col_index]
+			// cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
@@ -219,7 +220,8 @@ func (c ErpProductWeight) Import() revel.Result {
 			col_index++
 
 			// length
-			cell = row.Cells[col_index]
+			// cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			//revel.TRACE.Println(cell_val)
@@ -229,7 +231,8 @@ func (c ErpProductWeight) Import() revel.Result {
 			col_index++
 
 			// width
-			cell = row.Cells[col_index]
+			// cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			//revel.TRACE.Println(cell_val)
@@ -239,7 +242,8 @@ func (c ErpProductWeight) Import() revel.Result {
 			col_index++
 
 			// height
-			cell = row.Cells[col_index]
+			// cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			//revel.TRACE.Println(cell_val)
@@ -249,7 +253,8 @@ func (c ErpProductWeight) Import() revel.Result {
 			col_index++
 
 			// weight
-			cell = row.Cells[col_index]
+			// cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			//revel.TRACE.Println(cell_val)
