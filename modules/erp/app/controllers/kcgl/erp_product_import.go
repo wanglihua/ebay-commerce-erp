@@ -62,11 +62,11 @@ func (c ErpProductImport) ListData() revel.Result {
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
 	type product_view_item_t struct {
-		Product         kcgl_models.ProductInfo           `xorm:"extends" json:"prd"`
-		ProductCate     kcgl_models.ProductCateInfo       `xorm:"extends" json:"cate"`
-		Supplier        sppz_models.SupplierInfo          `xorm:"extends" json:"sup"`
-		PackageMaterial sppz_models.PackageMaterialInfo   `xorm:"extends" json:"pm"`
-		Status          models.StatusInfo            `xorm:"extends" json:"st"`
+		Product         kcgl_models.ProductInfo         `xorm:"extends" json:"prd"`
+		ProductCate     kcgl_models.ProductCateInfo     `xorm:"extends" json:"cate"`
+		Supplier        sppz_models.SupplierInfo        `xorm:"extends" json:"sup"`
+		PackageMaterial sppz_models.PackageMaterialInfo `xorm:"extends" json:"pm"`
+		Status          models.StatusInfo               `xorm:"extends" json:"st"`
 	}
 
 	/*
@@ -365,13 +365,15 @@ func (c ErpProductImport) Upload() revel.Result {
 
 		// supplier
 
-		var supplier_id = get_supplier_id_by_name(product_import.supplier)
+		if strings.TrimSpace(product_import.supplier) != "" {
+			var supplier_id = get_supplier_id_by_name(product_import.supplier)
 
-		if supplier_id == 0 {
-			panic(fmt.Sprintf("序号 %s 的供应商名称 %s 无效", product_import.ord_num, product_import.supplier))
+			if supplier_id == 0 {
+				panic(fmt.Sprintf("序号 %s 的供应商名称 %s 无效", product_import.ord_num, product_import.supplier))
+			}
+
+			product.SupplierId = core.MakeNullInt(supplier_id, true)
 		}
-
-		product.SupplierId = core.MakeNullInt(supplier_id, true)
 
 		if product_import.length == 0 || product_import.width == 0 || product_import.height == 0 || product_import.weight == 0 {
 			has_zero_data = true
