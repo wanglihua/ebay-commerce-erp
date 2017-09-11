@@ -198,9 +198,31 @@
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
-                                            <label for="qty" class="col-xs-2 control-label">数量</label>
+                                            <label for="mel_qty" class="col-xs-2 control-label">MEL数量</label>
                                             <div class="col-xs-10">
-                                                <input id="qty" name="purchase_bill_entry_detail.purchase_bill_entry.qty" type="text" class="input-sm form-control" v-model.number="purchase_bill_entry_detail.purchase_bill_entry.qty"/>
+                                                <input id="mel_qty" name="purchase_bill_entry_detail.purchase_bill_entry.mel_qty" type="text" class="input-sm form-control" v-model.number="purchase_bill_entry_detail.purchase_bill_entry.mel_qty"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <label for="bne_qty" class="col-xs-2 control-label">BNE数量</label>
+                                            <div class="col-xs-10">
+                                                <input id="bne_qty" name="purchase_bill_entry_detail.purchase_bill_entry.bne_qty" type="text" class="input-sm form-control" v-model.number="purchase_bill_entry_detail.purchase_bill_entry.bne_qty"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <label for="qty" class="col-xs-2 control-label">总数量</label>
+                                            <div class="col-xs-10">
+                                                <input id="qty" name="purchase_bill_entry_detail.purchase_bill_entry.qty" type="text" class="input-sm form-control" v-model.number="purchase_bill_entry_detail.purchase_bill_entry.qty" disabled="disabled"/>
                                             </div>
                                         </div>
                                     </div>
@@ -352,9 +374,16 @@
                             }
                         },
                         {"mDataProp": "p.sku", "title": "SKU", "bSearchable": false},
-                        {"mDataProp": "p.name", "title": "商品名称", "bSearchable": false},
+                        {
+                            "mDataProp": "p.cn_name", "title": "商品名称", "bSearchable": false, "sClass": "word-wrap",
+                            "render": function (data, type, row) {
+                                return "<div>" + data + "</div>"
+                            }
+                        },
                         {"mDataProp": "pbe.price", "title": "单价", "bSearchable": false},
-                        {"mDataProp": "pbe.qty", "title": "数量", "bSearchable": false},
+                        {"mDataProp": "pbe.mel_qty", "title": "MEL数量", "bSearchable": false},
+                        {"mDataProp": "pbe.bne_qty", "title": "BNE数量", "bSearchable": false},
+                        {"mDataProp": "pbe.qty", "title": "总数量", "bSearchable": false},
                         {"mDataProp": "pbe.amount", "title": "金额", "bSearchable": false},
                         {"mDataProp": "pbe.purchase_date", "title": "采购日期", "bSearchable": false},
                         {"mDataProp": "pbe.checkin_date", "title": "入库日期", "bSearchable": false},
@@ -598,6 +627,12 @@
                         required: true, digits: true
                     },
                     'purchase_bill_entry_detail.purchase_bill_entry.product_id': {
+                        required: true, digits: true
+                    },
+                    'purchase_bill_entry_detail.purchase_bill_entry.mel_qty': {
+                        required: true, digits: true
+                    },
+                    'purchase_bill_entry_detail.purchase_bill_entry.bne_qty': {
                         required: true, digits: true
                     },
                     'purchase_bill_entry_detail.purchase_bill_entry.qty': {

@@ -22,6 +22,7 @@ func (c ErpPurchaseAbnormal) Index() revel.Result {
 
 type PurchaseAbnormalViewItem struct {
 	cggl_models.PurchaseBillEntryInfo `xorm:"extends" json:"pbe"`
+	cggl_models.PurchaseBillInfo      `xorm:"extends" json:"pb"`
 	kcgl_models.ProductInfo           `xorm:"extends" json:"p"`
 	models.StatusInfo                 `xorm:"extends" json:"s"`
 }
@@ -34,18 +35,20 @@ func (c ErpPurchaseAbnormal) ListData() revel.Result {
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
 	/*
-SELECT pbe.*, p.*, s.*
+SELECT pbe.*, pb.*, p.*, s.*
 FROM erp_purchase_bill_entry pbe
+    INNER JOIN erp_purchase_bill pb ON pbe.bill_id = pb.id
     INNER JOIN erp_product p ON pbe.product_id = p.id
     INNER JOIN erp_status s ON pbe.status_id = s.id
 	 */
 
 	sb := core.NewSqlBuilder()
-	sb.Select("pbe.*, p.*, s.*")
+	sb.Select("pbe.*, pb.*, p.*, s.*")
 	sb.Count("count(*) as entry_count")
 	sb.From(`erp_purchase_bill_entry pbe
+    INNER JOIN erp_purchase_bill pb ON pbe.bill_id = pb.id
     INNER JOIN erp_product p ON pbe.product_id = p.id
-    INNER JOIN erp_status s ON pbe.status_id = s.id	`)
+    INNER JOIN erp_status s ON pbe.status_id = s.id`)
 
 	sb.Where(filter)
 

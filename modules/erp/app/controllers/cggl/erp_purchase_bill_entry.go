@@ -193,7 +193,10 @@ func (c ErpPurchaseBillEntry) Save() revel.Result {
 	purchase_bill_entry := detail_form.PurchaseBillEntry
 	purchase_bill_entry.BillId = detail_form.PurchaseBill.Id
 
-	purchase_bill_entry.Amount = purchase_bill_entry.Price * float64(purchase_bill_entry.Qty)
+	var qty = purchase_bill_entry.MelQty + purchase_bill_entry.BneQty
+	purchase_bill_entry.Qty = qty
+
+	purchase_bill_entry.Amount = purchase_bill_entry.Price * float64(qty)
 
 	var affected int64
 	if detail_form.IsCreate() {
