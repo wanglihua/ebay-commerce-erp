@@ -140,13 +140,21 @@ WHERE oi.quantity = 1
 	product_price_estimate.AuInventoryPrice = fmt.Sprintf("%0.2f", au_inventory_price)
 
 	var au_inventory_price_aud = au_inventory_price / aud_rate //转成澳币
-	product_price_estimate.Profit = fmt.Sprintf("%0.2f", (au_inventory_price_aud+logistics_fee)*product_price_estimate.ProfitRate)
-	product_price_estimate.Price = fmt.Sprintf("%0.2f", (au_inventory_price_aud+logistics_fee)*(1+product_price_estimate.ProfitRate))
+
+	var price float64 = (au_inventory_price_aud + logistics_fee) / (1 - product_price_estimate.ProfitRate)
+	product_price_estimate.Price = fmt.Sprintf("%0.2f", price)
+	product_price_estimate.Profit = fmt.Sprintf("%0.2f", price*product_price_estimate.ProfitRate)
+
+	for index, product := range product_list {
+		var dim_weight = product.Length * product.Width * product.Height / product_sale_setting.DimWeightFormula
+		product_list[index].DimWeight = fmt.Sprintf("%0.2f", dim_weight)
+	}
 
 	return c.RenderJson(map[string]interface{}{
 		"success":                true,
 		"message":                "商品售价预估成功！",
 		"product_price_estimate": product_price_estimate,
+		"product_list":           product_list,
 	})
 }
 

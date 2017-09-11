@@ -36,6 +36,7 @@ type ProductInfo struct {
 	DailyMeanSales float64         `xorm:"decimal(18,6) notnull 'daily_mean_sales' default(0)" json:"daily_mean_sales"` // 日均销量
 	PurchaseDays   int64           `xorm:"bigint notnull 'purchase_days' default(0)" json:"purchase_days"`              // 采购天数
 	Volume         string          `xorm:"-" json:"volume"`                                                             // 体积， 立方米， 只是用于界面显示
+	DimWeight      string          `xorm:"-" json:"dim_weight"`                                                         // 体积重， Kg， 只是用于界面显示
 	CreateTime     core.Time       `xorm:"created notnull 'create_time'" json:"create_time"`
 	UpdateTime     core.Time       `xorm:"updated notnull 'update_time'" json:"update_time"`
 }
