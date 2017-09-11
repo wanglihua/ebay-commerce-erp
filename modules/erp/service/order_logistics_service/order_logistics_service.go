@@ -232,6 +232,9 @@ func (p_ol *OrderLogisticsService) CalculateListWithOption(order_list []ddlc_mod
 		return errors.New("订单列表为空！")
 	}
 
+	// 重新计算代发货数量
+	inventory_service.Calculate_inventory_pending_qty()
+
 	p_ol.init_data(order_list, db_session)
 
 	{

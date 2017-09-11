@@ -309,6 +309,7 @@ func (c ErpOrder) ListData() revel.Result {
 	c.Params.Bind(&query_criteria_id, "query_criteria_id")
 	var query_criteria_value string = ""
 	c.Params.Bind(&query_criteria_value, "query_criteria_value")
+	query_criteria_value = strings.TrimSpace(query_criteria_value)
 
 	var good_query_id int64 = 0
 	c.Params.Bind(&good_query_id, "good_query_id")
