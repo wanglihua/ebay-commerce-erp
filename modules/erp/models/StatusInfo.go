@@ -101,7 +101,7 @@ const (
 	ORDER_STATUS_YQX            = 4350 // 订单状态 已取消
 
 	PURCHASE_BILL_STATUS_YCJ = 4400 // 采购单状态 已创建
-	PURCHASE_BILL_STATUS_YSP = 4500 // 采购单状态 已下单
+	PURCHASE_BILL_STATUS_YSP = 4500 // 采购单状态 已审批
 	PURCHASE_BILL_STATUS_CGZ = 4600 // 采购单状态 采购中
 	PURCHASE_BILL_STATUS_YRK = 4700 // 采购单状态 已入库
 
@@ -117,11 +117,6 @@ const (
 	CONTAINER_TRANSFER_STATUS_NEW    = 5400 // 集装箱调拨 已创建
 	CONTAINER_TRANSFER_STATUS_DEPART = 5500 // 集装箱调拨 已出发
 	CONTAINER_TRANSFER_STATUS_STOCK  = 5600 // 集装箱调拨 已到仓
-
-	STATUS_PURCHASE_NEW     = 6100 // 采购单 已创建
-	STATUS_PURCHASE_APPROVE = 6200 // 采购单 已审批
-	STATUS_PURCHASE_BUYING  = 6300 // 采购单 采购中
-	STATUS_PURCHASE_STOCK   = 6400 // 采购单 已入库
 
 	//状态 id end
 )

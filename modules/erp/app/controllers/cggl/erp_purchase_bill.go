@@ -198,12 +198,19 @@ func (c ErpPurchaseBill) Approve() revel.Result {
 
 	// 检查状态
 	for _, purchase_bill := range purchase_bill_list {
-		if purchase_bill.StatusId != models.STATUS_PURCHASE_NEW {
+		if purchase_bill.StatusId != models.PURCHASE_BILL_STATUS_YCJ {
 			return c.RenderJson(map[string]interface{}{
 				"success": false,
 				"message": fmt.Sprintf("采购单 %s 当前状态不是已创建状态，不能进行审批！", purchase_bill.Code),
 			})
 		}
+	}
+
+	// 设置为已审批状态
+	for _, purchase_bill := range purchase_bill_list {
+		purchase_bill.StatusId = models.PURCHASE_BILL_STATUS_YSP
+		_, err := db_session.Id(purchase_bill.Id).Cols("status_id").Update(&purchase_bill)
+		core.HandleError(err)
 	}
 
 	return c.RenderJson(map[string]interface{}{

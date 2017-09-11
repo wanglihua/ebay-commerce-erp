@@ -17,7 +17,7 @@
                         <i class="ace-icon fa fa-refresh"></i>
                         刷新
                     </button>
-                    <button class="btn btn-pink btn-sm">
+                    <button class="btn btn-pink btn-sm" @click="purchase()">
                         <i class="ace-icon fa fa-share"></i>
                         下单
                     </button>
@@ -71,6 +71,38 @@
             // purchaseBillList
             reloadList: function () {
                 reloadList('#purchaseBillList');
+            },
+            purchase: function () {
+                var id_list = [];
+                $('#purchaseBillList tbody tr>td:first-child input:checkbox').each(function () {
+                    if (this.checked) {
+                        id_list.push($(this).val());
+                    }
+                });
+
+                if (id_list.length === 0) {
+                    $.msg.alert("请选择数据！");
+                    return;
+                }
+
+                $.msg.confirm("确认要下单吗？", function () {
+                    $.ajax({
+                        url: '{%url "ErpPurchaseFinance.Purchase"%}',
+                        type: "POST",
+                        data: {"id_list": id_list},
+                        success: function (data) {
+                            if (data.success === false) {
+                                $.msg.error(data.message);
+                                return;
+                            }
+                            else {
+                                $.msg.show(data.message);
+                                vm.reloadList();
+                                return;
+                            }
+                        }
+                    });
+                });
             }
         }
     });

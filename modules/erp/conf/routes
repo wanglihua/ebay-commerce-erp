@@ -443,6 +443,7 @@ POST /purchase/bill/data/list              ErpPurchaseBill.ListData
 POST /purchase/bill/data/detail            ErpPurchaseBill.DetailData
 POST /purchase/bill/save                   ErpPurchaseBill.Save
 POST /purchase/bill/delete                 ErpPurchaseBill.Delete
+POST /purchase/bill/approve                ErpPurchaseBill.Approve
 
 GET  /purchase/bill/entry                  ErpPurchaseBillEntry.Index
 POST /purchase/bill/entry/data/list        ErpPurchaseBillEntry.ListData
@@ -453,6 +454,7 @@ POST /purchase/bill/entry/product/select/data/list      ErpPurchaseBillEntry.Pro
 
 GET  /purchase/finance                     ErpPurchaseFinance.Index
 POST /purchase/finance/data/list           ErpPurchaseFinance.ListData
+POST /purchase/finance/purchase            ErpPurchaseFinance.Purchase
 
 GET  /purchase/checkin                     ErpPurchaseCheckin.Index
 POST /purchase/checkin/data/list           ErpPurchaseCheckin.ListData

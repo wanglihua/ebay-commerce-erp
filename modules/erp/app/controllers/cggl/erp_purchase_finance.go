@@ -8,6 +8,7 @@ import (
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/auth/pass_res"
 	"matrix/modules/erp/models/cggl_models"
+	"fmt"
 )
 
 type ErpPurchaseFinance struct {
@@ -47,6 +48,8 @@ func (c ErpPurchaseFinance) ListData() revel.Result {
     INNER JOIN auth_user u ON pb.user_id = u.id
     INNER JOIN erp_status s ON pb.status_id = s.id`)
 
+	filter = core.SqlAnd(filter, fmt.Sprintf("status_id = %d", models.PURCHASE_BILL_STATUS_YSP))
+
 	sql_builder.Where(filter)
 
 	if order != "" {
@@ -76,6 +79,31 @@ func (c ErpPurchaseFinance) ListData() revel.Result {
 
 func (c ErpPurchaseFinance) Purchase() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.CGGL_PURCHASE_FINANCE, c.Session)
+
+	var db_session = c.DbSession
+
+	purchase_bill_id_list := make([]int64, 0)
+	c.Params.Bind(&purchase_bill_id_list, "id_list")
+
+	var purchase_bill_list = make([]cggl_models.PurchaseBillInfo, 0)
+	core.HandleError(db_session.In("id", purchase_bill_id_list).Find(&purchase_bill_list))
+
+	// 检查状态
+	for _, purchase_bill := range purchase_bill_list {
+		if purchase_bill.StatusId != models.PURCHASE_BILL_STATUS_YSP {
+			return c.RenderJson(map[string]interface{}{
+				"success": false,
+				"message": fmt.Sprintf("采购单 %s 当前状态不是已审批状态，不能下单！", purchase_bill.Code),
+			})
+		}
+	}
+
+	// 设置为已下单状态
+	for _, purchase_bill := range purchase_bill_list {
+		purchase_bill.StatusId = models.PURCHASE_BILL_STATUS_CGZ
+		_, err := db_session.Id(purchase_bill.Id).Cols("status_id").Update(&purchase_bill)
+		core.HandleError(err)
+	}
 
 	return c.RenderJson(map[string]interface{}{
 		"success": true,

@@ -28,7 +28,7 @@
                         <i class="ace-icon fa fa-plus"></i>
                         新增
                     </button>
-                    <button class="btn btn-pink btn-sm">
+                    <button class="btn btn-pink btn-sm" @click="approvePurchaseBill()">
                         <i class="ace-icon fa fa-share"></i>
                         审批
                     </button>
@@ -375,7 +375,7 @@
                                 "data": aoData,
                                 "success": function (data) {
                                     hideMask();
-                                    if (data.success == false) {
+                                    if (data.success === false) {
                                         $.msg.error(data.message);
                                         return;
                                     }
@@ -441,7 +441,7 @@
                         },
                         success: function (result) {
                             hideMask();
-                            if (result.success == false) {
+                            if (result.success === false) {
                                 $.msg.error(result.message);
                                 return;
                             }
@@ -486,7 +486,7 @@
                             data: JSON.stringify(vm.purchase_bill_detail),
                             success: function (data) {
                                 hideMask();
-                                if (data.success == false) {
+                                if (data.success === false) {
                                     $.msg.error(data.message);
                                     //return;
                                 }
@@ -509,7 +509,7 @@
                     }
                 });
 
-                if (id_list.length == 0) {
+                if (id_list.length === 0) {
                     $.msg.alert("请选择数据！");
                     return;
                 }
@@ -520,7 +520,7 @@
                         type: "POST",
                         data: {"id_list": id_list},
                         success: function (data) {
-                            if (data.success == false) {
+                            if (data.success === false) {
                                 $.msg.error(data.message);
                                 return;
                             }
@@ -532,7 +532,38 @@
                     });
                 });
             },
+            approvePurchaseBill: function () {
+                var id_list = [];
+                $('#purchaseBillList tbody tr>td:first-child input:checkbox').each(function () {
+                    if (this.checked) {
+                        id_list.push($(this).val());
+                    }
+                });
 
+                if (id_list.length === 0) {
+                    $.msg.alert("请选择数据！");
+                    return;
+                }
+
+                $.msg.confirm("确认要审批吗？", function () {
+                    $.ajax({
+                        url: '{%url "ErpPurchaseBill.Approve"%}',
+                        type: "POST",
+                        data: {"id_list": id_list},
+                        success: function (data) {
+                            if (data.success === false) {
+                                $.msg.error(data.message);
+                                return;
+                            }
+                            else {
+                                $.msg.show(data.message);
+                                vm.reloadList();
+                                return;
+                            }
+                        }
+                    });
+                });
+            },
             // purchaseBillEntryList
             reloadEntryList: function () {
                 reloadList('#purchaseBillEntryList');
@@ -549,7 +580,7 @@
                         },
                         success: function (result) {
                             hideMask();
-                            if (result.success == false) {
+                            if (result.success === false) {
                                 $.msg.error(result.message);
                                 return;
                             }
@@ -600,7 +631,7 @@
                             data: JSON.stringify(vm.purchase_bill_entry_detail),
                             success: function (data) {
                                 hideMask();
-                                if (data.success == false) {
+                                if (data.success === false) {
                                     $.msg.error(data.message);
                                     //return;
                                 }
@@ -623,7 +654,7 @@
                     }
                 });
 
-                if (id_list.length == 0) {
+                if (id_list.length === 0) {
                     $.msg.alert("请选择数据！");
                     return;
                 }
@@ -634,7 +665,7 @@
                         type: "POST",
                         data: {"id_list": id_list},
                         success: function (data) {
-                            if (data.success == false) {
+                            if (data.success === false) {
                                 $.msg.error(data.message);
                                 return;
                             }
@@ -657,7 +688,7 @@
                     }
                 });
 
-                if (id_list.length == 0 || id_list.length > 1) {
+                if (id_list.length === 0 || id_list.length > 1) {
                     $.msg.alert("请选择一行数据！");
                     return;
                 }
