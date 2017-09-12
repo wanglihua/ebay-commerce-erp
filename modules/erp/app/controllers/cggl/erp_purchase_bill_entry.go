@@ -203,7 +203,7 @@ func (c ErpPurchaseBillEntry) Save() revel.Result {
 		billId_count, err := db_session.Where("bill_id = ? and product_id = ?", purchase_bill_entry.BillId, purchase_bill_entry.ProductId).Count(new(cggl_models.PurchaseBillEntryInfo))
 		core.HandleError(err)
 		if billId_count != 0 {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，批次、商品已存在！"})
+			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，批次中该商品已存在！"})
 		}
 
 		purchase_bill_entry.StatusId = models.PURCHASE_BILL_STATUS_YCJ

@@ -22,6 +22,26 @@ type ErpPurchaseBill struct {
 func (c ErpPurchaseBill) Index() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.CGGL_PURCHASE_BILL, c.Session)
 
+	var db_session = c.DbSession
+
+	var status_list = make([]models.StatusInfo, 0)
+	var status_id_list = []int64{
+		models.PURCHASE_BILL_STATUS_YCJ,
+		models.PURCHASE_BILL_STATUS_YSP,
+		models.PURCHASE_BILL_STATUS_CGZ,
+		models.PURCHASE_BILL_STATUS_YRK}
+	err := db_session.In("id", status_id_list).OrderBy("id ASC").Find(&status_list)
+	core.HandleError(err)
+
+	c.RenderArgs["status_list"] = status_list
+
+	/*
+	c.RenderArgs["status_ycj"] = models.PURCHASE_BILL_STATUS_YCJ
+	c.RenderArgs["status_ysp"] = models.PURCHASE_BILL_STATUS_YSP
+	c.RenderArgs["status_cgz"] = models.PURCHASE_BILL_STATUS_CGZ
+	c.RenderArgs["status_yrk"] = models.PURCHASE_BILL_STATUS_YRK
+	*/
+
 	return c.RenderTemplate("erp/cggl/purchase_bill/purchase_bill_index.html")
 }
 
