@@ -17,6 +17,12 @@ type ErpPurchaseCheckin struct {
 func (c ErpPurchaseCheckin) Index() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.CGGL_PURCHASE_CHECKIN, c.Session)
 
+	/*
+SELECT DISTINCT pb.code
+FROM erp_purchase_bill pb
+WHERE pb.status_id = 0;
+	 */
+
 	return c.RenderTemplate("erp/cggl/purchase_checkin/purchase_checkin_index.html")
 }
 
