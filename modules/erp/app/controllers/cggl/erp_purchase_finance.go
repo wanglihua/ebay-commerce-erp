@@ -9,6 +9,7 @@ import (
 	"matrix/modules/auth/pass_res"
 	"matrix/modules/erp/models/cggl_models"
 	"fmt"
+	"matrix/modules/erp/service/purchase_bill_service"
 )
 
 type ErpPurchaseFinance struct {
@@ -104,6 +105,8 @@ func (c ErpPurchaseFinance) Purchase() revel.Result {
 		_, err := db_session.Id(purchase_bill.Id).Cols("status_id").Update(&purchase_bill)
 		core.HandleError(err)
 	}
+
+	purchase_bill_service.SetEntriesStatus(purchase_bill_id_list, models.PURCHASE_BILL_STATUS_CGZ, db_session)
 
 	return c.RenderJson(map[string]interface{}{
 		"success": true,
