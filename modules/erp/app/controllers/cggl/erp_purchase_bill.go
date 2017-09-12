@@ -13,6 +13,7 @@ import (
 	"matrix/modules/auth/pass_res"
 	"fmt"
 	"matrix/modules/erp/models/cggl_models"
+	"strings"
 )
 
 type ErpPurchaseBill struct {
@@ -54,6 +55,18 @@ type ErpPurchaseBillViewItem struct {
 func (c ErpPurchaseBill) ListData() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.CGGL_PURCHASE_BILL, c.Session)
 
+	/*
+		aoData.push({'name': 'status_id_query', 'value': this_vm.page.status_id_query});
+		aoData.push({'name': 'code_query', 'value': this_vm.page.code_query});
+	 */
+
+	var status_id_query int64
+	c.Params.Bind(&status_id_query, "status_id_query")
+
+	var code_query string
+	c.Params.Bind(&code_query, "code_query")
+	code_query = strings.TrimSpace(code_query)
+
 	db_session := c.DbSession
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
@@ -71,6 +84,14 @@ func (c ErpPurchaseBill) ListData() revel.Result {
 	sql_builder.From(`erp_purchase_bill pb
     INNER JOIN auth_user u ON pb.user_id = u.id
     INNER JOIN erp_status s ON pb.status_id = s.id`)
+
+	if status_id_query != 0 {
+		filter = core.SqlAnd(filter, fmt.Sprintf("status_id = %d", status_id_query))
+	}
+
+	if code_query != "" {
+		filter = core.SqlAnd(filter, fmt.Sprintf("code = '%s'", code_query))
+	}
 
 	sql_builder.Where(filter)
 

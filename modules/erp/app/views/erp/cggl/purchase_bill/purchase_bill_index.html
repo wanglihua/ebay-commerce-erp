@@ -13,12 +13,16 @@
     <div class="page-content">
         <div style="margin-left: -5px; margin-right: -5px;">
             <div id="query" class="col-xs-12" style="line-height: 28px;">
-                <select id="status_id_query" style="width: 120px;" v-model.number="page.status_id_query">
-                    <option :value="0">采购单状态查询</option>
+                <select id="status_id_query" name="status_id_query" style="width: 120px;" v-model.number="page.status_id_query" @change="statusSelectChange()">
+                    <option :value="0">采购单状态</option>
                     {% range $index, $status := .status_list %}
                     <option :value="{% $status.Id %}">{% $status.Name %}</option>
                     {% end %}
                 </select>
+                <input id="code_query" name="code_query" type="text" v-model="page.code_query" placeholder="采购单批次号" style="height: 30px;"/>
+                <button class="btn btn-mini btn-primary" style="margin-bottom:3px;height: 30px;" onclick="search()">
+                    &nbsp;<i class="ace-icon fa fa-search"></i>查&nbsp;询&nbsp;
+                </button>
                 <hr style="margin-top:10px;margin-bottom:10px;"/>
             </div>
             <div class="col-xs-12">
@@ -292,6 +296,11 @@
     </div>
 </div>
 <script type="text/javascript">
+
+    function search() {
+        refreshList('#purchaseBillList');
+    }
+
     var vm = new Vue({
         el: "#page",
         data: {
@@ -341,7 +350,28 @@
                         {"mDataProp": "s.name", "title": "状态", "bSearchable": false, "width": 90},
                         {"mDataProp": "pb.create_time", "title": "创建时间", "bSearchable": false, "width": 120},
                         {"mDataProp": "pb.update_time", "title": "修改时间", "bSearchable": false, "width": 120}
-                    ]
+                    ],
+                    "fnServerData": function (sSource, aoData, fnCallback) {
+                        showMask("数据加载中，请稍候");
+
+                        aoData.push({'name': 'status_id_query', 'value': this_vm.page.status_id_query});
+                        aoData.push({'name': 'code_query', 'value': this_vm.page.code_query});
+
+                        $.ajax(
+                            {
+                                "dataType": 'json',
+                                "url": sSource,
+                                "data": aoData,
+                                "success": function (data) {
+                                    hideMask();
+                                    if (data.success === false) {
+                                        $.msg.error(data.message);
+                                        return;
+                                    }
+                                    fnCallback(data);
+                                }
+                            });
+                    }
                 }
             );
 
@@ -361,6 +391,7 @@
 
                 var tableRow = $(this);
                 var checkbox = tableRow.find('td:first-child input:checkbox')[0];
+
                 checkbox.checked = true;
                 tableRow.addClass('hilight');
 
@@ -472,6 +503,9 @@
             // purchaseBillList
             reloadList: function () {
                 reloadList('#purchaseBillList');
+            },
+            statusSelectChange: function () {
+                search();
             },
             showPurchaseBillDetail: function (id) {
                 showMask("加载中...");
