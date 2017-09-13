@@ -17,6 +17,10 @@
                         <i class="ace-icon fa fa-refresh"></i>
                         刷新
                     </button>
+					<button class="btn btn-pink btn-sm" @click="checkin()">
+                        <i class="ace-icon fa fa-share"></i>
+                        入库
+                    </button>
                 </div>
                 <div id="query" class="col-xs-12" style="line-height: 28px;">
                     <select id="bill_code_query" name="bill_code_query" style="width: 120px;" v-model.number="page.bill_code_query" @change="billCodeQuerySelectChange()">
@@ -90,7 +94,39 @@
             },
             billCodeQuerySelectChange: function () {
                 search();
-            }
+            },
+            checkin: function () {
+                var id_list = [];
+                $('#purchaseBillEntryList tbody tr>td:first-child input:checkbox').each(function () {
+                    if (this.checked) {
+                        id_list.push($(this).val());
+                    }
+                });
+
+                if (id_list.length === 0) {
+                    $.msg.alert("请选择数据！");
+                    return;
+                }
+
+                $.msg.confirm("确认要入库吗？", function () {
+                    $.ajax({
+                        url: '{%url "ErpPurchaseCheckin.Checkin"%}',
+                        type: "POST",
+                        data: {"id_list": id_list},
+                        success: function (data) {
+                            if (data.success === false) {
+                                $.msg.error(data.message);
+                                return;
+                            }
+                            else {
+                                $.msg.show(data.message);
+                                vm.reloadList();
+                                return;
+                            }
+                        }
+                    });
+                });
+            }			
         }
     });
 </script>

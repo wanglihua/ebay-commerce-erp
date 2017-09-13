@@ -458,6 +458,7 @@ POST /purchase/finance/purchase            ErpPurchaseFinance.Purchase
 
 GET  /purchase/checkin                     ErpPurchaseCheckin.Index
 POST /purchase/checkin/data/list           ErpPurchaseCheckin.ListData
+POST /purchase/checkin/post                ErpPurchaseCheckin.Checkin
 
 GET  /purchase/abnormal                    ErpPurchaseAbnormal.Index
 POST /purchase/abnormal/data/list          ErpPurchaseAbnormal.ListData
