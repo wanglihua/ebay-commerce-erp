@@ -1,14 +1,16 @@
 package controllers
 
 import (
-	"github.com/revel/revel"
 	"matrix/core"
-	"matrix/modules/erp/models"
-	"matrix/modules/erp/models/kcgl_models"
-	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/auth/pass_res"
+	"matrix/modules/auth/service/pass_service"
+	"matrix/modules/erp/models"
 	"matrix/modules/erp/models/cggl_models"
+	"matrix/modules/erp/models/kcgl_models"
 	"matrix/modules/erp/service/purchase_bill_service"
+
+	"github.com/revel/revel"
+	"fmt"
 )
 
 type ErpPurchaseCheckin struct {
@@ -18,11 +20,36 @@ type ErpPurchaseCheckin struct {
 func (c ErpPurchaseCheckin) Index() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.CGGL_PURCHASE_CHECKIN, c.Session)
 
+	var db_session = c.DbSession
+
+	// 获得有明细状态是 采购中 的所有采购单的批次号
 	/*
-SELECT DISTINCT pb.code
-FROM erp_purchase_bill pb
-WHERE pb.status_id = 0;
-	 */
+		SELECT DISTINCT pb.code AS bill_code
+		FROM erp_purchase_bill    pb
+		    INNER JOIN erp_purchase_bill_entry pbe ON pbe.bill_id = pb.id
+		WHERE pbe.status_id = 0;
+	*/
+	var sql_get_bill_code_list = `
+	SELECT DISTINCT pb.code AS bill_code
+	FROM erp_purchase_bill pb
+	    INNER JOIN erp_purchase_bill_entry pbe ON pbe.bill_id = pb.id
+	WHERE pbe.status_id = %d;`
+
+	sql_get_bill_code_list = fmt.Sprintf(sql_get_bill_code_list, models.PURCHASE_BILL_STATUS_CGZ)
+
+	type bill_code_struct struct {
+		BillCode string `xorm:"'bill_code'"`
+	}
+
+	var bill_code_struct_list = make([]bill_code_struct, 0)
+	core.HandleError(db_session.Sql(sql_get_bill_code_list).Find(&bill_code_struct_list))
+
+	var bill_code_list = make([]string, 0)
+	for _, bill_code_struct := range bill_code_struct_list {
+		bill_code_list = append(bill_code_list, bill_code_struct.BillCode)
+	}
+
+	c.RenderArgs["bill_code_list"] = bill_code_list
 
 	return c.RenderTemplate("erp/cggl/purchase_checkin/purchase_checkin_index.html")
 }
@@ -42,12 +69,12 @@ func (c ErpPurchaseCheckin) ListData() revel.Result {
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
 	/*
-SELECT pbe.*, pb.*, p.*, s.*
-FROM erp_purchase_bill_entry pbe
-    INNER JOIN erp_purchase_bill pb ON pbe.bill_id = pb.id
-    INNER JOIN erp_product p ON pbe.product_id = p.id
-    INNER JOIN erp_status s ON pbe.status_id = s.id
-	 */
+		SELECT pbe.*, pb.*, p.*, s.*
+		FROM erp_purchase_bill_entry pbe
+		    INNER JOIN erp_purchase_bill pb ON pbe.bill_id = pb.id
+		    INNER JOIN erp_product p ON pbe.product_id = p.id
+		    INNER JOIN erp_status s ON pbe.status_id = s.id
+	*/
 
 	sb := core.NewSqlBuilder()
 	sb.Select("pbe.*, pb.*, p.*, s.*")
@@ -109,9 +136,9 @@ func (c ErpPurchaseCheckin) Checkin() revel.Result {
 	for _, bill_entry := range bill_entry_list {
 
 		/*
-		bill_entry.StatusId = models.PURCHASE_BILL_STATUS_YRK
-		_, err := db_session.Id(bill_entry.Id).Cols("status_id").Update(&bill_entry)
-		core.HandleError(err)
+			bill_entry.StatusId = models.PURCHASE_BILL_STATUS_YRK
+			_, err := db_session.Id(bill_entry.Id).Cols("status_id").Update(&bill_entry)
+			core.HandleError(err)
 		*/
 
 		purchase_bill_service.SetEntryStatusAndUpdateBillStatus(bill_entry, models.PURCHASE_BILL_STATUS_YRK, db_session)
