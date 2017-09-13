@@ -12,6 +12,7 @@ import (
 	"github.com/revel/revel"
 	"fmt"
 	"strings"
+	"matrix/modules/erp/service/inventory_service"
 )
 
 type ErpPurchaseCheckin struct {
@@ -155,7 +156,7 @@ func (c ErpPurchaseCheckin) Checkin() revel.Result {
 
 	// 更新中国仓的库存数量
 	for _, bill_entry := range bill_entry_list {
-		_ = bill_entry
+		inventory_service.AddCnInventoryQty(bill_entry.ProductId, bill_entry.Qty, db_session)
 	}
 
 	return c.RenderJson(map[string]interface{}{
