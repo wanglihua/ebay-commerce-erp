@@ -11,6 +11,7 @@ import (
 	"github.com/go-xorm/xorm"
 	"matrix/modules/erp/service/order_history_service"
 	"matrix/modules/erp/models/ddlc_models"
+	"matrix/modules/erp/service/order_service"
 )
 
 type ErpOrderLogisticsImport struct {
@@ -38,9 +39,9 @@ func (c ErpOrderLogisticsImport) ImportTrackingNumber() revel.Result {
 	}
 
 	type tracking_number_import_t struct {
-		OrderNumber     string  `json:"order_number"`
-		TrackingNumber  string  `json:"tracking_number"`
-		ErrorMessage    string  `json:"error_message"`
+		OrderNumber     string `json:"order_number"`
+		TrackingNumber  string `json:"tracking_number"`
+		ErrorMessage    string `json:"error_message"`
 		order_logistics ddlc_models.OrderLogisticsInfo
 	}
 
@@ -174,10 +175,10 @@ func (c ErpOrderLogisticsImport) ImportActualFee() revel.Result {
 	}
 
 	type actual_fee_import_t struct {
-		OrderNumber     string   `json:"order_number"`
-		ActualFee       float64  `json:"actual_fee"`
-		ErrorMessage    string   `json:"error_message"`
-		ActualFeeStr    string   `json:"actual_fee_str"`
+		OrderNumber     string  `json:"order_number"`
+		ActualFee       float64 `json:"actual_fee"`
+		ErrorMessage    string  `json:"error_message"`
+		ActualFeeStr    string  `json:"actual_fee_str"`
 		order_logistics ddlc_models.OrderLogisticsInfo
 	}
 
@@ -285,9 +286,9 @@ func (c ErpOrderLogisticsImport) ImportActualFee() revel.Result {
 
 	var login_user = core.GetLoginUser(c.Session)
 
-	for _, order_import := range actual_fee_import_list {
-		var order_logistics = order_import.order_logistics
-		order_logistics.ActualFee = order_import.ActualFee
+	for _, actual_fee_import := range actual_fee_import_list {
+		var order_logistics = actual_fee_import.order_logistics
+		order_logistics.ActualFee = actual_fee_import.ActualFee
 		_, err := db_session.Id(order_logistics.Id).Cols("actual_fee").Update(&order_logistics)
 		core.HandleError(err)
 
@@ -295,7 +296,28 @@ func (c ErpOrderLogisticsImport) ImportActualFee() revel.Result {
 		_, err = db_session.Id(order_logistics.OrderId).Get(&order)
 		core.HandleError(err)
 
-		order_history_service.Insert_order_history(order, login_user.UserId, fmt.Sprintf("导入实际运费：%f，工号：%s", order_import.ActualFee, login_user.LoginName), db_session)
+		var order_profit_au = actual_fee_import.ActualFee
+		var order_profit_rmb = order_profit_au * order.ExchangeRate
+
+		order.ProfitAu = order_profit_au
+		order.ProfitRmb = order_profit_rmb
+		_, err = db_session.Id(order.Id).Cols("profit_au", "profit_rmb").Update(&order)
+		core.HandleError(err)
+
+		// 平均分配利润到订单项
+		var order_item_list = make([]ddlc_models.OrderItemInfo, 0)
+		core.HandleError(db_session.Where("order_id = ?", order.Id).Find(&order_item_list))
+
+		var order_cost_amount = order_service.GetOrderCostAmountSum(order.Id, db_session)
+
+		for _, oi := range order_item_list {
+			// 利润分配
+			oi.GrossProfit = oi.CostPrice * float64(oi.Quantity) * order.ProfitAu / order_cost_amount
+			_, err := db_session.Id(oi.Id).Cols("gross_profit").Update(&oi)
+			core.HandleError(err)
+		}
+
+		order_history_service.Insert_order_history(order, login_user.UserId, fmt.Sprintf("导入实际运费：%f，工号：%s", actual_fee_import.ActualFee, login_user.LoginName), db_session)
 	}
 
 	return c.RenderJson(map[string]interface{}{
