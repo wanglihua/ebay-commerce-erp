@@ -827,6 +827,7 @@ WHERE oi.order_id = %d;`
 	// gst 消费税
 	var order_gst float64 = order_service.Get_order_gst_fee(&order)
 
+	/*
 	// 毛利
 	var order_profit_au = order_service.CalculateOrderProfit(&order, &order_logistics)
 	var order_profit = order_profit_au * order.ExchangeRate
@@ -838,6 +839,7 @@ WHERE oi.order_id = %d;`
 		_, err := db_session.Id(order.Id).Cols("profit_au", "profit_rmb").Update(&order)
 		core.HandleError(err)
 	}
+	*/
 
 	var au_stock_list = make([]sppz_models.StockInfo, 0)
 	err = db_session.Where(fmt.Sprintf("stock_type_id = %d", sppz_models.STOCK_TYPE_AU)).Find(&au_stock_list)
@@ -874,7 +876,7 @@ WHERE oi.order_id = %d;`
 		"order_cost_amount":             order_cost_amount, // rmb
 		"logistics_fee":                 logistics_fee,     // rmb
 		"order_gst":                     order_gst,         // aud
-		"order_profit":                  order_profit,      //rmb
+		"order_profit":                  order.ProfitRmb,   // rmb
 		"au_stock_list":                 au_stock_list,
 		"logistics_stock":               logistics_stock,
 		"logistics_mode":                logistics_mode,

@@ -17,7 +17,7 @@
                         <i class="ace-icon fa fa-refresh"></i>
                         刷新
                     </button>
-					<button class="btn btn-pink btn-sm" @click="checkin()">
+                    <button class="btn btn-pink btn-sm" @click="checkin()">
                         <i class="ace-icon fa fa-share"></i>
                         入库
                     </button>
@@ -53,6 +53,8 @@
             "page": {}
         },
         mounted: function () {
+            var this_vm = this;
+
             initDataTable(
                 '#purchaseBillEntryList',
                 {
@@ -84,7 +86,27 @@
                         {"mDataProp": "pbe.desc", "title": "备注", "bSearchable": true},
                         {"mDataProp": "pbe.create_time", "title": "创建时间", "bSearchable": false, "width": 120},
                         {"mDataProp": "pbe.update_time", "title": "修改时间", "bSearchable": false, "width": 120}
-                    ]
+                    ],
+                    "fnServerData": function (sSource, aoData, fnCallback) {
+                        showMask("数据加载中，请稍候");
+
+                        aoData.push({'name': 'bill_code_query', 'value': this_vm.page.bill_code_query});
+
+                        $.ajax(
+                            {
+                                "dataType": 'json',
+                                "url": sSource,
+                                "data": aoData,
+                                "success": function (data) {
+                                    hideMask();
+                                    if (data.success === false) {
+                                        $.msg.error(data.message);
+                                        return;
+                                    }
+                                    fnCallback(data);
+                                }
+                            });
+                    }
                 }
             );
         },
@@ -126,7 +148,7 @@
                         }
                     });
                 });
-            }			
+            }
         }
     });
 </script>

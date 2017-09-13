@@ -11,6 +11,7 @@ import (
 
 	"github.com/revel/revel"
 	"fmt"
+	"strings"
 )
 
 type ErpPurchaseCheckin struct {
@@ -64,6 +65,10 @@ type PurchaseCheckinViewItem struct {
 func (c ErpPurchaseCheckin) ListData() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.CGGL_PURCHASE_CHECKIN, c.Session)
 
+	var bill_code_query string
+	c.Params.Bind(&bill_code_query, "bill_code_query")
+	bill_code_query = strings.TrimSpace(bill_code_query)
+
 	db_session := c.DbSession
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
@@ -83,6 +88,10 @@ func (c ErpPurchaseCheckin) ListData() revel.Result {
 	INNER JOIN erp_purchase_bill pb ON pbe.bill_id = pb.id
     INNER JOIN erp_product p ON pbe.product_id = p.id
     INNER JOIN erp_status s ON pbe.status_id = s.id`)
+
+	if bill_code_query != "" {
+		filter = core.SqlAnd(filter, fmt.Sprintf("pb.code = '%s'", bill_code_query))
+	}
 
 	sb.Where(filter)
 
@@ -132,7 +141,7 @@ func (c ErpPurchaseCheckin) Checkin() revel.Result {
 		}
 	}
 
-	// 设置为已入库状态
+	// 设置为已入库状态。更新明细的状态，如果一个采购单下面的所有明细都已入库状态，把采购单也置为已入库状态
 	for _, bill_entry := range bill_entry_list {
 
 		/*
@@ -144,7 +153,10 @@ func (c ErpPurchaseCheckin) Checkin() revel.Result {
 		purchase_bill_service.SetEntryStatusAndUpdateBillStatus(bill_entry, models.PURCHASE_BILL_STATUS_YRK, db_session)
 	}
 
-	purchase_bill_service.SetEntriesStatus(entry_id_list, models.PURCHASE_BILL_STATUS_CGZ, db_session)
+	// 更新中国仓的库存数量
+	for _, bill_entry := range bill_entry_list {
+		_ = bill_entry
+	}
 
 	return c.RenderJson(map[string]interface{}{
 		"success": true,
