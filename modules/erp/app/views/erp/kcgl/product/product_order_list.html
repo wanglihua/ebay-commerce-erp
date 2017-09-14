@@ -17,8 +17,14 @@
                                     <th class="center">订单编号</th>
                                     <th class="center">数量</th>
                                     <th class="center">售价</th>
-                                    <th class="center" style="width:120px;">下单时间</th>
-                                    <th class="center" style="width:120px;">发货时间</th>
+                                    <th class="center">
+                                        <div>毛利</div>
+                                        <div>毛利率</div>
+                                    </th>
+                                    <th class="center" style="width:120px;">
+                                        <div>下单时间</div>
+                                        <div>发货时间</div>
+                                    </th>
                                     <th class="center" style="width:120px;">发货仓库</th>
                                     <th class="center">成交店铺</th>
                                     <th class="center" style="width:60px;">状态</th>
@@ -27,15 +33,23 @@
                                 <tbody>
                                 <template v-for="(order_item, index) in page.order_item_list">
                                     <tr>
-                                        <td class="center">{{index + 1}}</td>
-                                        <td class="center"><a :href='"/order/detail/" + order_item.o.id' target="order_detail">{{order_item.o.code}}</a></td>
-                                        <td class="center">{{order_item.oi.quantity}}</td>
-                                        <td class="center">{{order_item.oi.transaction_price_currency}}&nbsp;{{order_item.oi.transaction_price}}</td>
-                                        <td class="center">{{order_item.o.paid_time}}</td>
-                                        <td class="center">{{order_item.o.shipped_time}}</td>
-                                        <td class="center">{{order_item.st.name}}</td>
-                                        <td class="center">{{order_item.pf.name}}&nbsp;{{order_item.sa.name}}</td>
-                                        <td class="center">{{order_item.s.name}}</td>
+                                        <td class="center" style="vertical-align: middle;">{{index + 1}}</td>
+                                        <td class="center" style="vertical-align: middle;"><a :href='"/order/detail/" + order_item.o.id' target="order_detail">{{order_item.o.code}}</a></td>
+                                        <td class="center" style="vertical-align: middle;">{{order_item.oi.quantity}}</td>
+                                        <td class="center" style="vertical-align: middle;">{{order_item.oi.transaction_price_currency}}&nbsp;{{order_item.oi.transaction_price}}</td>
+                                        <td class="center" style="vertical-align: middle;">
+                                            <div>{{order_item.oi.transaction_price_currency}}&nbsp;{{format_float(order_item.oi.gross_profit)}}</div>
+                                            <div>{{format_float(order_item.oi.gross_profit / order_item.oi.transaction_price * 100)}}%</div>
+                                        </td>
+                                        <td class="center" style="vertical-align: middle;">
+                                            <div v-if="order_item.o.paid_time != null">{{order_item.o.paid_time}}</div>
+                                            <div v-else>---</div>
+                                            <div v-if="order_item.o.shipped_time != null">{{order_item.o.shipped_time}}</div>
+                                            <div v-else>---</div>
+                                        </td>
+                                        <td class="center" style="vertical-align: middle;">{{order_item.st.name}}</td>
+                                        <td class="center" style="vertical-align: middle;">{{order_item.pf.name}}&nbsp;{{order_item.sa.name}}</td>
+                                        <td class="center" style="vertical-align: middle;">{{order_item.s.name}}</td>
                                     </tr>
                                 </template>
                                 </tbody>
@@ -77,7 +91,11 @@
                     }
                 });
         },
-        methods: {}
+        methods: {
+            format_float: function (data) {
+                return $.formatNumber(data, {format: "###0.00", locale: "cn"});
+            }
+        }
     });
 </script>
 {% site_footer %}
