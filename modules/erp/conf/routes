@@ -443,6 +443,7 @@ POST /purchase/bill/data/list              ErpPurchaseBill.ListData
 POST /purchase/bill/data/detail            ErpPurchaseBill.DetailData
 POST /purchase/bill/save                   ErpPurchaseBill.Save
 POST /purchase/bill/delete                 ErpPurchaseBill.Delete
+POST /purchase/bill/submit                 ErpPurchaseBill.Submit
 POST /purchase/bill/approve                ErpPurchaseBill.Approve
 
 GET  /purchase/bill/entry                  ErpPurchaseBillEntry.Index

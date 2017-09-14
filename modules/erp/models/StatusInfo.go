@@ -101,6 +101,7 @@ const (
 	ORDER_STATUS_YQX            = 4350 // 订单状态 已取消
 
 	PURCHASE_BILL_STATUS_YCJ = 4400 // 采购单状态 已创建
+	PURCHASE_BILL_STATUS_YTJ = 4450 // 采购单状态 已提交
 	PURCHASE_BILL_STATUS_YSP = 4500 // 采购单状态 已审批
 	PURCHASE_BILL_STATUS_CGZ = 4600 // 采购单状态 采购中
 	PURCHASE_BILL_STATUS_YRK = 4700 // 采购单状态 已入库
@@ -531,6 +532,13 @@ func (e StatusInfo) InitData(db_session *xorm.Session) {
 		status.Type = STATUS_TYPE_PURCHASE_BILL
 		status.Name = "已创建"
 		status.Desc = core.MakeNullString("采购单状态 已创建", true)
+		db_session.Insert(status)
+
+		status = new(StatusInfo)
+		status.Id = PURCHASE_BILL_STATUS_YTJ
+		status.Type = STATUS_TYPE_PURCHASE_BILL
+		status.Name = "已提交"
+		status.Desc = core.MakeNullString("采购单状态 已提交", true)
 		db_session.Insert(status)
 
 		status = new(StatusInfo)

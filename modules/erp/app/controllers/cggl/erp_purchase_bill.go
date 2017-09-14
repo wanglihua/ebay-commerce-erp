@@ -29,6 +29,7 @@ func (c ErpPurchaseBill) Index() revel.Result {
 	var status_list = make([]models.StatusInfo, 0)
 	var status_id_list = []int64{
 		models.PURCHASE_BILL_STATUS_YCJ,
+		models.PURCHASE_BILL_STATUS_YTJ,
 		models.PURCHASE_BILL_STATUS_YSP,
 		models.PURCHASE_BILL_STATUS_CGZ,
 		models.PURCHASE_BILL_STATUS_YRK}
@@ -36,13 +37,6 @@ func (c ErpPurchaseBill) Index() revel.Result {
 	core.HandleError(err)
 
 	c.RenderArgs["status_list"] = status_list
-
-	/*
-	c.RenderArgs["status_ycj"] = models.PURCHASE_BILL_STATUS_YCJ
-	c.RenderArgs["status_ysp"] = models.PURCHASE_BILL_STATUS_YSP
-	c.RenderArgs["status_cgz"] = models.PURCHASE_BILL_STATUS_CGZ
-	c.RenderArgs["status_yrk"] = models.PURCHASE_BILL_STATUS_YRK
-	*/
 
 	return c.RenderTemplate("erp/cggl/purchase_bill/purchase_bill_index.html")
 }
@@ -227,8 +221,8 @@ func (c ErpPurchaseBill) Delete() revel.Result {
 	return c.RenderJson(core.JsonResult{Success: true, Message: "数据删除成功!"})
 }
 
-func (c ErpPurchaseBill) Approve() revel.Result {
-	pass_service.Check_login_user_pass(pass_res.CGGL_PURCHASE_BILL, c.Session) // 应该有个专门的审批权限
+func (c ErpPurchaseBill) Submit() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.CGGL_PURCHASE_BILL, c.Session)
 
 	var db_session = c.DbSession
 
@@ -243,7 +237,43 @@ func (c ErpPurchaseBill) Approve() revel.Result {
 		if purchase_bill.StatusId != models.PURCHASE_BILL_STATUS_YCJ {
 			return c.RenderJson(map[string]interface{}{
 				"success": false,
-				"message": fmt.Sprintf("采购单 %s 当前状态不是已创建状态，不能进行审批！", purchase_bill.Code),
+				"message": fmt.Sprintf("采购单 %s 当前状态不是已创建状态，不能进行提交！", purchase_bill.Code),
+			})
+		}
+	}
+
+	// 设置为 已提交 状态
+	for _, purchase_bill := range purchase_bill_list {
+		purchase_bill.StatusId = models.PURCHASE_BILL_STATUS_YTJ
+		_, err := db_session.Id(purchase_bill.Id).Cols("status_id").Update(&purchase_bill)
+		core.HandleError(err)
+	}
+
+	purchase_bill_service.SetEntriesStatus(purchase_bill_id_list, models.PURCHASE_BILL_STATUS_YCJ, db_session)
+
+	return c.RenderJson(map[string]interface{}{
+		"success": true,
+		"message": "采购单提交成功！",
+	})
+}
+
+func (c ErpPurchaseBill) Approve() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.CGGL_PURCHASE_BILL, c.Session) // 应该有个专门的审批权限
+
+	var db_session = c.DbSession
+
+	purchase_bill_id_list := make([]int64, 0)
+	c.Params.Bind(&purchase_bill_id_list, "id_list")
+
+	var purchase_bill_list = make([]cggl_models.PurchaseBillInfo, 0)
+	core.HandleError(db_session.In("id", purchase_bill_id_list).Find(&purchase_bill_list))
+
+	// 检查状态
+	for _, purchase_bill := range purchase_bill_list {
+		if purchase_bill.StatusId != models.PURCHASE_BILL_STATUS_YTJ {
+			return c.RenderJson(map[string]interface{}{
+				"success": false,
+				"message": fmt.Sprintf("采购单 %s 当前状态不是已提交状态，不能进行审批！", purchase_bill.Code),
 			})
 		}
 	}
@@ -256,8 +286,6 @@ func (c ErpPurchaseBill) Approve() revel.Result {
 	}
 
 	purchase_bill_service.SetEntriesStatus(purchase_bill_id_list, models.PURCHASE_BILL_STATUS_YCJ, db_session)
-
-	// db_session.In("", purchase_bill_id_list).Update()
 
 	return c.RenderJson(map[string]interface{}{
 		"success": true,
