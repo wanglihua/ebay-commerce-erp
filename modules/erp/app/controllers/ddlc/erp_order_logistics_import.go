@@ -296,7 +296,7 @@ func (c ErpOrderLogisticsImport) ImportActualFee() revel.Result {
 		_, err = db_session.Id(order_logistics.OrderId).Get(&order)
 		core.HandleError(err)
 
-		var order_profit_au = actual_fee_import.ActualFee
+		var order_profit_au = order_service.CalculateOrderProfit(&order, &order_logistics)
 		var order_profit_rmb = order_profit_au * order.ExchangeRate
 
 		order.ProfitAu = order_profit_au
