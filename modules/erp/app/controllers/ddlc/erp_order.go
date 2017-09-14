@@ -30,6 +30,7 @@ import (
 	"matrix/modules/erp/models/ddpz_models"
 	"matrix/modules/erp/models/sppz_models"
 	"matrix/modules/erp/models/ddlc_models"
+	"math"
 )
 
 type ErpOrder struct {
@@ -827,19 +828,30 @@ WHERE oi.order_id = %d;`
 	// gst 消费税
 	var order_gst float64 = order_service.Get_order_gst_fee(&order)
 
-	/*
-	// 毛利
+	// 重新按实际运费计算毛利
 	var order_profit_au = order_service.CalculateOrderProfit(&order, &order_logistics)
 	var order_profit = order_profit_au * order.ExchangeRate
 
-	if order.ProfitAu == 0 { // 之前许多订单没有预先计算毛利，所以没计算的，这个机会计算一下
+	if math.Abs(order.ProfitAu-order_profit_au) > core.FLOAT_MIN_DIFF { // 之前许多订单没有按实际运费计算毛利的，这个机会计算一下
 		order.ProfitAu = order_profit_au
 		order.ProfitRmb = order_profit
 
 		_, err := db_session.Id(order.Id).Cols("profit_au", "profit_rmb").Update(&order)
 		core.HandleError(err)
+
+		// 平均分配利润到订单项
+		var order_item_list = make([]ddlc_models.OrderItemInfo, 0)
+		core.HandleError(db_session.Where("order_id = ?", order.Id).Find(&order_item_list))
+
+		var order_cost_amount = order_service.GetOrderCostAmountSum(order.Id, db_session)
+
+		for _, oi := range order_item_list {
+			// 利润分配
+			oi.GrossProfit = oi.CostPrice * float64(oi.Quantity) * order.ProfitAu / order_cost_amount
+			_, err := db_session.Id(oi.Id).Cols("gross_profit").Update(&oi)
+			core.HandleError(err)
+		}
 	}
-	*/
 
 	var au_stock_list = make([]sppz_models.StockInfo, 0)
 	err = db_session.Where(fmt.Sprintf("stock_type_id = %d", sppz_models.STOCK_TYPE_AU)).Find(&au_stock_list)
