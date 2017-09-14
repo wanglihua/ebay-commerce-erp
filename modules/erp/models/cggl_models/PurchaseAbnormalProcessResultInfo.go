@@ -15,11 +15,12 @@ const (
 )
 
 type PurchaseAbnormalProcessResultInfo struct {
-	Id          int64     `xorm:"bigint notnull pk 'id'" json:"id"`
-	Name        string    `xorm:"nvarchar(100) index 'name'" json:"name" smith:"verbose_name=名称"`
-	Description string    `xorm:"nvarchar(500) 'description'" json:"description" smith:"verbose_name=备注,min=2,max=400"`
-	CreateTime  core.Time `xorm:"created notnull 'create_time'" json:"create_time"`
-	UpdateTime  core.Time `xorm:"updated notnull 'update_time'" json:"update_time"`
+	Id           int64     `xorm:"bigint notnull pk 'id'" json:"id"`
+	Name         string    `xorm:"nvarchar(100) index 'name'" json:"name" smith:"verbose_name=名称"`
+	Description  string    `xorm:"nvarchar(500) 'description'" json:"description" smith:"verbose_name=备注,min=2,max=400"`
+	CheckinAgain int64     `xorm:"bigint notnull 'checkin_again'" json:"checkin_again" smith:"verbose_name=是否重新入库"`
+	CreateTime   core.Time `xorm:"created notnull 'create_time'" json:"create_time"`
+	UpdateTime   core.Time `xorm:"updated notnull 'update_time'" json:"update_time"`
 }
 
 func (e PurchaseAbnormalProcessResultInfo) TableName() string {
@@ -36,35 +37,41 @@ func (e PurchaseAbnormalProcessResultInfo) InitData(db_session *xorm.Session) {
 	process_result.Id = ABNORMAL_PROCESS_RESULT_WCL
 	process_result.Name = "未处理"
 	process_result.Description = "未处理"
+	process_result.CheckinAgain = 0
 	db_session.Insert(process_result)
 
 	process_result = new(PurchaseAbnormalProcessResultInfo)
 	process_result.Id = ABNORMAL_PROCESS_RESULT_YTK
 	process_result.Name = "已退款"
 	process_result.Description = "已退款"
+	process_result.CheckinAgain = 0
 	db_session.Insert(process_result)
 
 	process_result = new(PurchaseAbnormalProcessResultInfo)
 	process_result.Id = ABNORMAL_PROCESS_RESULT_YCXRK
 	process_result.Name = "已重新入库"
 	process_result.Description = "已重新入库"
+	process_result.CheckinAgain = 1
 	db_session.Insert(process_result)
 
 	process_result = new(PurchaseAbnormalProcessResultInfo)
 	process_result.Id = ABNORMAL_PROCESS_RESULT_ZCSH
 	process_result.Name = "正常损耗"
 	process_result.Description = "正常损耗"
+	process_result.CheckinAgain = 0
 	db_session.Insert(process_result)
 
 	process_result = new(PurchaseAbnormalProcessResultInfo)
 	process_result.Id = ABNORMAL_PROCESS_RESULT_YCXCG
 	process_result.Name = "已重新采购"
 	process_result.Description = "已重新采购"
+	process_result.CheckinAgain = 0
 	db_session.Insert(process_result)
 
 	process_result = new(PurchaseAbnormalProcessResultInfo)
 	process_result.Id = ABNORMAL_PROCESS_RESULT_QT
 	process_result.Name = "其它"
 	process_result.Description = "其它"
+	process_result.CheckinAgain = 0
 	db_session.Insert(process_result)
 }
