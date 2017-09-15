@@ -9,7 +9,7 @@ import (
 	"matrix/modules/auth/pass_res"
 	"matrix/modules/erp/models/cggl_models"
 	"fmt"
-	"matrix/modules/erp/service/purchase_bill_service"
+	"time"
 )
 
 type ErpPurchaseFinance struct {
@@ -106,7 +106,18 @@ func (c ErpPurchaseFinance) Purchase() revel.Result {
 		core.HandleError(err)
 	}
 
-	purchase_bill_service.SetEntriesStatus(purchase_bill_id_list, models.PURCHASE_BILL_STATUS_CGZ, db_session)
+	// 设置明细为已下单状态，并设置 下单日期 即 采购日期
+	// purchase_bill_service.SetEntriesStatus(purchase_bill_id_list, models.PURCHASE_BILL_STATUS_CGZ, db_session)
+	var bill_entry_list = make([]cggl_models.PurchaseBillEntryInfo, 0)
+	core.HandleError(db_session.In("bill_id", purchase_bill_id_list).Find(&bill_entry_list))
+
+	for _, bill_entry := range bill_entry_list {
+		bill_entry.StatusId = models.PURCHASE_BILL_STATUS_CGZ
+		bill_entry.CheckinDate = core.MakeNullDate(time.Now(), true)
+
+		_, err := db_session.Id(bill_entry.Id).Cols("status_id", "purchase_date").Update(&bill_entry)
+		core.HandleError(err)
+	}
 
 	return c.RenderJson(map[string]interface{}{
 		"success": true,
