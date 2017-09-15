@@ -14,6 +14,7 @@ import (
 	"strings"
 	"matrix/modules/erp/service/inventory_service"
 	"encoding/json"
+	"time"
 )
 
 type ErpPurchaseCheckin struct {
@@ -90,6 +91,8 @@ func (c ErpPurchaseCheckin) ListData() revel.Result {
 	INNER JOIN erp_purchase_bill pb ON pbe.bill_id = pb.id
     INNER JOIN erp_product p ON pbe.product_id = p.id
     INNER JOIN erp_status s ON pbe.status_id = s.id`)
+
+	filter = core.SqlAnd(filter, fmt.Sprintf("pbe.status_id = %d", models.PURCHASE_BILL_STATUS_CGZ))
 
 	if bill_code_query != "" {
 		filter = core.SqlAnd(filter, fmt.Sprintf("pb.code = '%s'", bill_code_query))
@@ -210,7 +213,7 @@ func (c ErpPurchaseCheckin) Checkin() revel.Result {
 	if bill_entry_in_db.StatusId != models.PURCHASE_BILL_STATUS_CGZ {
 		return c.RenderJson(map[string]interface{}{
 			"success": false,
-			"message": "选中的采购单明细当前状态不全是采购中状态，不能入库！",
+			"message": "采购单明细状态当前不是采购中状态，不能入库！",
 		})
 	}
 
@@ -218,7 +221,8 @@ func (c ErpPurchaseCheckin) Checkin() revel.Result {
 	bill_entry_in_db.StatusId = models.PURCHASE_BILL_STATUS_YRK
 	bill_entry_in_db.CheckinQty = bill_entry_from_ui.CheckinQty
 	bill_entry_in_db.AbnormalTypeId = bill_entry_from_ui.AbnormalTypeId
-	_, err = db_session.Id(bill_entry_in_db.Id).Cols("status_id", "checkin_qty", "abnormal_type_id").Update(bill_entry_in_db)
+	bill_entry_in_db.CheckinDate = core.MakeNullDate(time.Now(), true)
+	_, err = db_session.Id(bill_entry_in_db.Id).Cols("status_id", "checkin_qty", "abnormal_type_id", "checkin_date").Update(bill_entry_in_db)
 	core.HandleError(err)
 
 	// 设置为已入库状态。更新明细的状态，如果一个采购单下面的所有明细都已入库状态，把采购单也置为已入库状态
@@ -260,7 +264,8 @@ func (c ErpPurchaseCheckin) CheckinList() revel.Result {
 		bill_entry.StatusId = models.PURCHASE_BILL_STATUS_YRK
 		bill_entry.CheckinQty = bill_entry.Qty                   // 批量入库的时候只能这样默认了
 		bill_entry.AbnormalTypeId = cggl_models.ABNORMAL_TYPE_ZC // 批量入库的时候只能这样默认了
-		_, err := db_session.Id(bill_entry.Id).Cols("status_id", "checkin_qty", "abnormal_type_id").Update(bill_entry)
+		bill_entry.CheckinDate = core.MakeNullDate(time.Now(), true)
+		_, err := db_session.Id(bill_entry.Id).Cols("status_id", "checkin_qty", "abnormal_type_id", "checkin_date").Update(bill_entry)
 		core.HandleError(err)
 
 		purchase_bill_service.UpdateBillStatus(bill_entry, models.PURCHASE_BILL_STATUS_YRK, db_session)

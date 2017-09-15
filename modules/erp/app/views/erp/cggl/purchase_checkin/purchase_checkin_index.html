@@ -188,8 +188,7 @@
                         {"mDataProp": "pbe.purchase_date", "title": "采购日期", "bSearchable": false, "sClass": "center", "width": 120},
                         {"mDataProp": "pbe.checkin_date", "title": "入库日期", "bSearchable": false, "sClass": "center", "width": 120},
                         {"mDataProp": "pbe.desc", "title": "备注", "bSearchable": true},
-                        {"mDataProp": "pbe.create_time", "title": "创建时间", "bSearchable": false, "width": 120},
-                        {"mDataProp": "pbe.update_time", "title": "修改时间", "bSearchable": false, "width": 120}
+                        {"mDataProp": "s.name", "title": "状态", "bSearchable": true, "sClass": "center", "width": 60}
                     ],
                     "fnServerData": function (sSource, aoData, fnCallback) {
                         showMask("数据加载中，请稍候");
@@ -280,7 +279,7 @@
                     type: "POST",
                     processData: false,
                     contentType: 'application/json',
-                    data: JSON.stringify(vm.purchase_bill_detail),
+                    data: JSON.stringify(vm.purchase_bill_entry_detail),
                     success: function (data) {
                         hideMask();
                         if (data.success === false) {
