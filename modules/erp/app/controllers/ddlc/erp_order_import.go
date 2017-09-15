@@ -73,12 +73,12 @@ func (c ErpOrderImport) ListData() revel.Result {
 	buyer_email_query = strings.TrimSpace(buyer_email_query)
 
 	type order_import_view_item_t struct {
-		ddlc_models.OrderInfo              `xorm:"extends" json:"o"`
-		ddpz_models.OrderTypeInfo          `xorm:"extends" json:"ot"`
-		ddpz_models.OrderHoldTypeInfo      `xorm:"extends" json:"ht"`
-		xtpz_models.ECommercePlatformInfo  `xorm:"extends" json:"pf"`
-		xtpz_models.ShopAccountInfo        `xorm:"extends" json:"sa"`
-		models.StatusInfo             `xorm:"extends" json:"s"`
+		ddlc_models.OrderInfo             `xorm:"extends" json:"o"`
+		ddpz_models.OrderTypeInfo         `xorm:"extends" json:"ot"`
+		ddpz_models.OrderHoldTypeInfo     `xorm:"extends" json:"ht"`
+		xtpz_models.ECommercePlatformInfo `xorm:"extends" json:"pf"`
+		xtpz_models.ShopAccountInfo       `xorm:"extends" json:"sa"`
+		models.StatusInfo                 `xorm:"extends" json:"s"`
 	}
 
 	/*
@@ -761,7 +761,7 @@ func (c ErpOrderImport) Delete() revel.Result {
 
 	// 判断是不是导入的订单，如果不是导入的订单就不能删除
 	var order_import_count struct {
-		Count int64  `xorm:"'order_import_count'"`
+		Count int64 `xorm:"'order_import_count'"`
 	}
 	/*
 	SELECT count(o.batch_code) AS order_import_count FROM erp_order o WHERE o.id IN (2, 3, 4, 490, 491, 492);
@@ -777,6 +777,15 @@ func (c ErpOrderImport) Delete() revel.Result {
 			"success": false,
 			"message": "只能删除导入的订单！",
 		})
+	}
+
+	var order_list = make([]ddlc_models.OrderInfo, 0)
+	core.HandleError(db_session.In("id", order_id_list).Find(&order_list))
+
+	var login_user = core.GetLoginUser(c.Session)
+	for _, order := range order_list {
+		var description = fmt.Sprintf("订单删除，工号 %s", login_user.LoginName)
+		order_history_service.Insert_order_history(order, login_user.UserId, description, db_session)
 	}
 
 	// 删除 订单物流信息

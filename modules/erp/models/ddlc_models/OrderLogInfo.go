@@ -4,6 +4,7 @@ import (
 	"matrix/core"
 )
 
+// 这个表，现在相当于是弃用了的
 type OrderLogInfo struct {
 	Id         int64     `xorm:"bigint notnull pk autoincr 'id'" json:"id"`
 	OrderId    int64     `xorm:"bigint notnull index 'order_id'" json:"order_id" smith:"verbose_name=订单Id"`

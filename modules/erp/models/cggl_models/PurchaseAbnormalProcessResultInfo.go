@@ -24,11 +24,11 @@ type PurchaseAbnormalProcessResultInfo struct {
 }
 
 func (e PurchaseAbnormalProcessResultInfo) TableName() string {
-	return "erp_purchase_abnormal_type"
+	return "erp_purchase_abnormal_process_result"
 }
 
 func (e PurchaseAbnormalProcessResultInfo) ModelDesc() string {
-	return "verbose_name=采购异常类型,entity_json=purchase_abnormal_type,route=purchase/abnormal/type"
+	return "verbose_name=采购异常类型,entity_json=process_result,route=purchase/abnormal/process/result"
 }
 
 func (e PurchaseAbnormalProcessResultInfo) InitData(db_session *xorm.Session) {
