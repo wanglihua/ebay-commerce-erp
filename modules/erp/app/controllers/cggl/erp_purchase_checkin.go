@@ -121,6 +121,67 @@ func (c ErpPurchaseCheckin) ListData() revel.Result {
 	})
 }
 
+type PurchaseBillEntryCheckinDetailForm struct {
+	PurchaseBill      cggl_models.PurchaseBillInfo      `json:"purchase_bill"`
+	PurchaseBillEntry cggl_models.PurchaseBillEntryInfo `json:"purchase_bill_entry"`
+	ProductName       string                            `json:"product_name"`
+	CheckinQty        int64                             `json:"checkin_qty"`
+}
+
+func (f *PurchaseBillEntryCheckinDetailForm) IsCreate() bool {
+	return f.PurchaseBillEntry.Id == 0
+}
+
+func (f *PurchaseBillEntryCheckinDetailForm) Valid(validation *revel.Validation) bool {
+
+	/*
+	if f.CheckinQty <=0 || f.CheckinQty > f.PurchaseBillEntry.Qty {
+		validation.Error("入库数量输入有误！")
+	}
+	*/
+
+	// 也有可能订了 10 个，到货了 12 个，最终入库的是 12个
+	if f.CheckinQty <= 0 {
+		validation.Error("入库数量输入有误！")
+	}
+
+	return validation.HasErrors() == false
+}
+
+func (c ErpPurchaseCheckin) DetailData() revel.Result {
+	pass_service.Check_login_user_pass_or([]int64{pass_res.CGGL_PURCHASE_BILL, pass_res.CGGL_PURCHASE_CHECKIN}, c.Session)
+
+	db_session := c.DbSession
+
+	var purchase_bill_entry_id int64
+	c.Params.Bind(&purchase_bill_entry_id, "id")
+
+	var purchase_bill_entry cggl_models.PurchaseBillEntryInfo
+	has, err := db_session.Id(purchase_bill_entry_id).Get(&purchase_bill_entry)
+	core.HandleError(err)
+	if has == false {
+		return c.RenderJson(core.JsonResult{Success: false, Message: "指定的采购单明细不存在！"})
+	}
+
+	var purchase_bill cggl_models.PurchaseBillInfo
+	_, err = db_session.Id(purchase_bill_entry.BillId).Get(&purchase_bill)
+	core.HandleError(err)
+
+	var product kcgl_models.ProductInfo
+	product_id := purchase_bill_entry.ProductId
+	_, err = db_session.Id(product_id).Get(&product)
+	core.HandleError(err)
+	var product_name = product.Name
+
+	var detail_form PurchaseBillEntryCheckinDetailForm
+	detail_form.PurchaseBill = purchase_bill
+	detail_form.PurchaseBillEntry = purchase_bill_entry
+	detail_form.ProductName = product_name
+	detail_form.CheckinQty = purchase_bill_entry.Qty
+
+	return c.RenderJson(detail_form)
+}
+
 func (c ErpPurchaseCheckin) Checkin() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.CGGL_PURCHASE_CHECKIN, c.Session)
 
