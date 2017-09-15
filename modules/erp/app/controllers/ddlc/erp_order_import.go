@@ -716,6 +716,15 @@ func (c ErpOrderImport) BatchDelete() revel.Result {
 	var batch_code int64
 	c.Params.Bind(&batch_code, "batch_code")
 
+	var order_list = make([]ddlc_models.OrderInfo, 0)
+	core.HandleError(db_session.Where("batch_code = ?", batch_code).Find(&order_list))
+
+	var login_user = core.GetLoginUser(c.Session)
+	for _, order := range order_list {
+		var description = fmt.Sprintf("订单删除，工号 %s", login_user.LoginName)
+		order_history_service.Insert_order_delete_history(order, login_user.UserId, description, db_session)
+	}
+
 	/*
 DELETE o.*, ol.*, oi.*, osa.*
 FROM erp_order o
@@ -785,7 +794,7 @@ func (c ErpOrderImport) Delete() revel.Result {
 	var login_user = core.GetLoginUser(c.Session)
 	for _, order := range order_list {
 		var description = fmt.Sprintf("订单删除，工号 %s", login_user.LoginName)
-		order_history_service.Insert_order_history(order, login_user.UserId, description, db_session)
+		order_history_service.Insert_order_delete_history(order, login_user.UserId, description, db_session)
 	}
 
 	// 删除 订单物流信息

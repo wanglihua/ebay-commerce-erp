@@ -8,6 +8,14 @@ import (
 )
 
 func Insert_order_history(order ddlc_models.OrderInfo, login_user_id int64, description string, db_session *xorm.Session) {
+	insert_order_history_internal(order, login_user_id, description, 0, db_session)
+}
+
+func Insert_order_delete_history(order ddlc_models.OrderInfo, login_user_id int64, description string, db_session *xorm.Session) {
+	insert_order_history_internal(order, login_user_id, description, 1, db_session)
+}
+
+func insert_order_history_internal(order ddlc_models.OrderInfo, login_user_id int64, description string, is_delete int64, db_session *xorm.Session) {
 	var order_history ddlc_models.OrderHistoryInfo
 
 	order_history.OrderId = order.Id
@@ -21,6 +29,7 @@ func Insert_order_history(order ddlc_models.OrderInfo, login_user_id int64, desc
 	order_history.StatusName = order_status.Name
 	order_history.Description = description
 	order_history.UserId = login_user_id
+	order_history.IsDelete = is_delete
 
 	_, err = db_session.Insert(&order_history)
 	core.HandleError(err)
