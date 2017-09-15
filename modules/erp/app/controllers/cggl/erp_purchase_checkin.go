@@ -13,6 +13,7 @@ import (
 	"fmt"
 	"strings"
 	"matrix/modules/erp/service/inventory_service"
+	"encoding/json"
 )
 
 type ErpPurchaseCheckin struct {
@@ -122,10 +123,10 @@ func (c ErpPurchaseCheckin) ListData() revel.Result {
 }
 
 type PurchaseBillEntryCheckinDetailForm struct {
-	PurchaseBill      cggl_models.PurchaseBillInfo      `json:"purchase_bill"`
-	PurchaseBillEntry cggl_models.PurchaseBillEntryInfo `json:"purchase_bill_entry"`
-	ProductName       string                            `json:"product_name"`
-	CheckinQty        int64                             `json:"checkin_qty"`
+	PurchaseBill      cggl_models.PurchaseBillInfo           `json:"purchase_bill"`
+	PurchaseBillEntry cggl_models.PurchaseBillEntryInfo      `json:"purchase_bill_entry"`
+	ProductName       string                                 `json:"product_name"`
+	AbnormalTypeList  []cggl_models.PurchaseAbnormalTypeInfo `json:"abnormal_type_list"`
 }
 
 func (f *PurchaseBillEntryCheckinDetailForm) IsCreate() bool {
@@ -135,13 +136,13 @@ func (f *PurchaseBillEntryCheckinDetailForm) IsCreate() bool {
 func (f *PurchaseBillEntryCheckinDetailForm) Valid(validation *revel.Validation) bool {
 
 	/*
-	if f.CheckinQty <=0 || f.CheckinQty > f.PurchaseBillEntry.Qty {
+	if f.PurchaseBillEntry.CheckinQty <= 0 || f.PurchaseBillEntry.CheckinQty > f.PurchaseBillEntry.Qty {
 		validation.Error("入库数量输入有误！")
 	}
 	*/
 
 	// 也有可能订了 10 个，到货了 12 个，最终入库的是 12个
-	if f.CheckinQty <= 0 {
+	if f.PurchaseBillEntry.CheckinQty <= 0 {
 		validation.Error("入库数量输入有误！")
 	}
 
@@ -171,18 +172,68 @@ func (c ErpPurchaseCheckin) DetailData() revel.Result {
 	product_id := purchase_bill_entry.ProductId
 	_, err = db_session.Id(product_id).Get(&product)
 	core.HandleError(err)
-	var product_name = product.Name
+
+	var abnormal_type_list = make([]cggl_models.PurchaseAbnormalTypeInfo, 0)
+	core.HandleError(db_session.OrderBy("id ASC").Find(&abnormal_type_list))
 
 	var detail_form PurchaseBillEntryCheckinDetailForm
 	detail_form.PurchaseBill = purchase_bill
 	detail_form.PurchaseBillEntry = purchase_bill_entry
-	detail_form.ProductName = product_name
-	detail_form.CheckinQty = purchase_bill_entry.Qty
+	detail_form.PurchaseBillEntry.CheckinQty = purchase_bill_entry.Qty
+	detail_form.AbnormalTypeList = abnormal_type_list
+	detail_form.PurchaseBillEntry.AbnormalTypeId = cggl_models.ABNORMAL_TYPE_ZC
+	detail_form.ProductName = product.Name
 
 	return c.RenderJson(detail_form)
 }
 
 func (c ErpPurchaseCheckin) Checkin() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.CGGL_PURCHASE_CHECKIN, c.Session)
+
+	var db_session = c.DbSession
+
+	var detail_form PurchaseBillEntryCheckinDetailForm
+	err := json.Unmarshal(c.GetRequestBody(), &detail_form)
+	core.HandleError(err)
+
+	if detail_form.Valid(c.Validation) == false {
+		return c.RenderJson(core.JsonResult{Success: false, Message: c.GetValidationErrorMessage()})
+	}
+
+	var bill_entry_from_ui = detail_form.PurchaseBillEntry
+
+	var bill_entry_in_db cggl_models.PurchaseBillEntryInfo
+	_, err = db_session.Id(bill_entry_from_ui.Id).Get(&bill_entry_in_db)
+	core.HandleError(err)
+
+	// 检查状态
+	if bill_entry_in_db.StatusId != models.PURCHASE_BILL_STATUS_CGZ {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "选中的采购单明细当前状态不全是采购中状态，不能入库！",
+		})
+	}
+
+	// 更新明细的状态
+	bill_entry_in_db.StatusId = models.PURCHASE_BILL_STATUS_YRK
+	bill_entry_in_db.CheckinQty = bill_entry_from_ui.CheckinQty
+	bill_entry_in_db.AbnormalTypeId = bill_entry_from_ui.AbnormalTypeId
+	_, err = db_session.Id(bill_entry_in_db.Id).Cols("status_id", "checkin_qty", "abnormal_type_id").Update(bill_entry_in_db)
+	core.HandleError(err)
+
+	// 设置为已入库状态。更新明细的状态，如果一个采购单下面的所有明细都已入库状态，把采购单也置为已入库状态
+	purchase_bill_service.UpdateBillStatus(bill_entry_in_db, models.PURCHASE_BILL_STATUS_YRK, db_session)
+
+	// 更新中国仓的库存数量
+	inventory_service.AddCnInventoryQty(bill_entry_from_ui.ProductId, bill_entry_from_ui.CheckinQty, db_session)
+
+	return c.RenderJson(map[string]interface{}{
+		"success": true,
+		"message": "采购明细入库成功！",
+	})
+}
+
+func (c ErpPurchaseCheckin) CheckinList() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.CGGL_PURCHASE_CHECKIN, c.Session)
 
 	var db_session = c.DbSession
@@ -205,23 +256,23 @@ func (c ErpPurchaseCheckin) Checkin() revel.Result {
 
 	// 设置为已入库状态。更新明细的状态，如果一个采购单下面的所有明细都已入库状态，把采购单也置为已入库状态
 	for _, bill_entry := range bill_entry_list {
+		// 更新明细的状态
+		bill_entry.StatusId = models.PURCHASE_BILL_STATUS_YRK
+		bill_entry.CheckinQty = bill_entry.Qty                   // 批量入库的时候只能这样默认了
+		bill_entry.AbnormalTypeId = cggl_models.ABNORMAL_TYPE_ZC // 批量入库的时候只能这样默认了
+		_, err := db_session.Id(bill_entry.Id).Cols("status_id", "checkin_qty", "abnormal_type_id").Update(bill_entry)
+		core.HandleError(err)
 
-		/*
-			bill_entry.StatusId = models.PURCHASE_BILL_STATUS_YRK
-			_, err := db_session.Id(bill_entry.Id).Cols("status_id").Update(&bill_entry)
-			core.HandleError(err)
-		*/
-
-		purchase_bill_service.SetEntryStatusAndUpdateBillStatus(bill_entry, models.PURCHASE_BILL_STATUS_YRK, db_session)
+		purchase_bill_service.UpdateBillStatus(bill_entry, models.PURCHASE_BILL_STATUS_YRK, db_session)
 	}
 
 	// 更新中国仓的库存数量
 	for _, bill_entry := range bill_entry_list {
-		inventory_service.AddCnInventoryQty(bill_entry.ProductId, bill_entry.Qty, db_session)
+		inventory_service.AddCnInventoryQty(bill_entry.ProductId, bill_entry.CheckinQty, db_session)
 	}
 
 	return c.RenderJson(map[string]interface{}{
 		"success": true,
-		"message": "采购单下单成功！",
+		"message": "采购明细入库成功！",
 	})
 }

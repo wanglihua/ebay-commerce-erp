@@ -7,15 +7,8 @@ import (
 	"fmt"
 )
 
-func SetEntryStatusAndUpdateBillStatus(purchase_bill_entry cggl_models.PurchaseBillEntryInfo, status_id int64, db_session *xorm.Session) {
-
-	var entry_id = purchase_bill_entry.Id
-
-	// 更新明细的状态
-	purchase_bill_entry.StatusId = status_id
-	_, err := db_session.Id(entry_id).Cols("status_id").Update(purchase_bill_entry)
-	core.HandleError(err)
-
+func UpdateBillStatus(purchase_bill_entry cggl_models.PurchaseBillEntryInfo, status_id int64, db_session *xorm.Session) {
+	
 	// 查看同一个采购单的明细是不是都是当前设置的这个状态了
 	var bill_id = purchase_bill_entry.BillId
 	count, err := db_session.Where(fmt.Sprintf("bill_id = %d AND status_id <> %d", bill_id, status_id)).Count(new(cggl_models.PurchaseBillEntryInfo))

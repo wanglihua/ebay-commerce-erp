@@ -80,9 +80,35 @@
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
-                                            <label for="qty" class="col-xs-2 control-label">总数量</label>
+                                            <label for="qty" class="col-xs-2 control-label">采购数量</label>
                                             <div class="col-xs-10">
                                                 <input id="qty" name="purchase_bill_entry_detail.purchase_bill_entry.qty" type="text" class="input-sm form-control" v-model.number="purchase_bill_entry_detail.purchase_bill_entry.qty" disabled="disabled"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <label for="checkin_qty" class="col-xs-2 control-label">入库数量</label>
+                                            <div class="col-xs-10">
+                                                <input id="checkin_qty" name="purchase_bill_entry_detail.purchase_bill_entry.checkin_qty" type="text" class="input-sm form-control" v-model.number="purchase_bill_entry_detail.purchase_bill_entry.checkin_qty"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <label for="abnormal_type_id" class="col-xs-2 control-label">异常类型</label>
+                                            <div class="col-xs-10">
+                                                <select id="abnormal_type_id" name="purchase_bill_entry_detail.purchase_bill_entry.abnormal_type_id" class="input-sm form-control" v-model.number="purchase_bill_entry_detail.purchase_bill_entry.abnormal_type_id">
+                                                    <template v-for="abnormal_type in purchase_bill_entry_detail.abnormal_type_list">
+                                                        <option :value="abnormal_type.id">{{abnormal_type.name}}</option>
+                                                    </template>
+                                                </select>
                                             </div>
                                         </div>
                                     </div>
@@ -104,7 +130,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-success btn-sm" @click="acceptProductSelect()">
+                    <button type="button" class="btn btn-success btn-sm" onclick="checkin()">
                         <i class="ace-icon fa fa-floppy-o"></i>确认
                     </button>
                     <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">
@@ -194,38 +220,6 @@
             },
             billCodeQuerySelectChange: function () {
                 search();
-            },
-            checkin_old: function () {
-                var id_list = [];
-                $('#purchaseBillEntryList tbody tr>td:first-child input:checkbox').each(function () {
-                    if (this.checked) {
-                        id_list.push($(this).val());
-                    }
-                });
-
-                if (id_list.length === 0) {
-                    $.msg.alert("请选择数据！");
-                    return;
-                }
-
-                $.msg.confirm("确认要入库吗？", function () {
-                    $.ajax({
-                        url: '{%url "ErpPurchaseCheckin.Checkin"%}',
-                        type: "POST",
-                        data: {"id_list": id_list},
-                        success: function (data) {
-                            if (data.success === false) {
-                                $.msg.error(data.message);
-                                return;
-                            }
-                            else {
-                                $.msg.show(data.message);
-                                vm.reloadList();
-                                return;
-                            }
-                        }
-                    });
-                });
             }
         }
     });
@@ -270,23 +264,11 @@
         showMask("提交中...");
         var form = $("#purchaseCheckinForm");
         var valid = validate(form, {
-            'purchase_bill_detail.purchase_bill.code': {
-                required: false
-            },
-            'purchase_bill_detail.purchase_bill.desc': {
-                required: false, minlength: 2, maxlength: 400
-            },
-            'purchase_bill_detail.purchase_bill.date': {
-                required: true
-            },
-            'purchase_bill_detail.purchase_bill.user_id': {
+            'purchase_bill_entry_detail.purchase_bill_entry.checkin_qty': {
                 required: true, digits: true
             },
-            'purchase_bill_detail.purchase_bill.trans_expenses': {
-                required: true, number: true
-            },
-            'purchase_bill_detail.purchase_bill.status_id': {
-                required: true, digits: true
+            'purchase_bill_entry_detail.purchase_bill_entry.desc': {
+                required: false, maxlength: 400
             }
         });
 
