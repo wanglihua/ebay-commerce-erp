@@ -9,6 +9,7 @@ type PurchaseBillInfo struct {
 	Code          string          `xorm:"nvarchar(100) index 'code'" json:"code" smith:"verbose_name=批次号"`
 	Desc          core.NullString `xorm:"nvarchar(500) 'desc'" json:"desc" smith:"verbose_name=备注,min=2,max=400"`
 	Date          core.Date       `xorm:"datetime notnull 'date'" json:"date" smith:"verbose_name=日期"`
+	PurchaseDate  core.NullDate   `xorm:"datetime null 'purchase_date'" json:"purchase_date" smith:"verbose_name=采购日期"`
 	UserId        int64           `xorm:"bigint notnull 'user_id'" json:"user_id" smith:"verbose_name=操作人"`
 	TransExpenses float64         `xorm:"decimal(18,6) notnull 'trans_expenses'" json:"trans_expenses" smith:"verbose_name=运费"` //transportation expenses
 	StatusId      int64           `xorm:"bigint notnull index 'status_id'" json:"status_id" smith:"verbose_name=状态"`

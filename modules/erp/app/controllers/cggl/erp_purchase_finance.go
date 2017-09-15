@@ -99,10 +99,13 @@ func (c ErpPurchaseFinance) Purchase() revel.Result {
 		}
 	}
 
+	var purchase_date = core.MakeNullDate(time.Now(), true)
+
 	// 设置为已下单状态
 	for _, purchase_bill := range purchase_bill_list {
 		purchase_bill.StatusId = models.PURCHASE_BILL_STATUS_CGZ
-		_, err := db_session.Id(purchase_bill.Id).Cols("status_id").Update(&purchase_bill)
+		purchase_bill.PurchaseDate = purchase_date
+		_, err := db_session.Id(purchase_bill.Id).Cols("status_id", "purchase_date").Update(&purchase_bill)
 		core.HandleError(err)
 	}
 
@@ -113,7 +116,7 @@ func (c ErpPurchaseFinance) Purchase() revel.Result {
 
 	for _, bill_entry := range bill_entry_list {
 		bill_entry.StatusId = models.PURCHASE_BILL_STATUS_CGZ
-		bill_entry.CheckinDate = core.MakeNullDate(time.Now(), true)
+		bill_entry.CheckinDate = purchase_date
 
 		_, err := db_session.Id(bill_entry.Id).Cols("status_id", "purchase_date").Update(&bill_entry)
 		core.HandleError(err)
