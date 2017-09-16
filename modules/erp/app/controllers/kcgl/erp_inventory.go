@@ -28,6 +28,11 @@ type ErpInventory struct {
 	*revel.Controller
 }
 
+const (
+	PRODUCT_ONE_TO_ONE_STOCK_PRODUCT       = 100
+	PRODUCT_ONE_TO_ONE_STORAGE_LOC_PRODUCT = 200
+)
+
 func (c ErpInventory) Index() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.KCGL_INVENTORY, c.Session)
 
@@ -45,6 +50,8 @@ func (c ErpInventory) Index() revel.Result {
 	c.RenderArgs["has_sku_qty_import_res"] = has_sku_qty_import_res
 	c.RenderArgs["has_sku_qty_export_res"] = has_sku_qty_export_res
 	c.RenderArgs["has_sku_price_res"] = has_sku_price_res
+	c.RenderArgs["product_one_to_one_stock_product"] = PRODUCT_ONE_TO_ONE_STOCK_PRODUCT
+	c.RenderArgs["product_one_to_one_storage_loc_product"] = PRODUCT_ONE_TO_ONE_STORAGE_LOC_PRODUCT
 
 	return c.RenderTemplate("erp/kcgl/inventory/inventory_index.html")
 }
@@ -56,11 +63,11 @@ func (c ErpInventory) PageData() revel.Result {
 	core.HandleError(err)
 
 	return c.RenderJson(map[string]interface{}{
-		"stock_list":                  stock_list,
-		"stock_id_query":              0,
-		"product_code_query":          "",
-		"cost_price_zero_query":       0,
-		"stock_product_one2one_query": 0,
+		"stock_list":            stock_list,
+		"stock_id_query":        0,
+		"product_code_query":    "",
+		"cost_price_zero_query": 0,
+		"product_one2one_query": 0,
 	})
 }
 
@@ -88,9 +95,9 @@ func (c ErpInventory) ListData() revel.Result {
 	var cost_price_zero_query int64
 	c.Params.Bind(&cost_price_zero_query, "cost_price_zero_query")
 
-	//stock_product_one2one_query
-	var stock_product_one2one_query int64
-	c.Params.Bind(&stock_product_one2one_query, "stock_product_one2one_query")
+	//product_one2one_query
+	var product_one2one_query int64
+	c.Params.Bind(&product_one2one_query, "product_one2one_query")
 
 	/*
 		SELECT ivt.*, st.*, loc.*, prd.*
@@ -127,8 +134,11 @@ func (c ErpInventory) ListData() revel.Result {
 		filter = core.SqlAnd(filter, "ivt.cost_price = 0")
 	}
 
-	if stock_product_one2one_query != 0 {
-		filter = core.SqlAnd(filter, `
+	if product_one2one_query != 0 {
+
+		// 只显示 仓库商品 重复记录
+		if product_one2one_query == PRODUCT_ONE_TO_ONE_STOCK_PRODUCT {
+			filter = core.SqlAnd(filter, `
 ivt.id IN (
     SELECT id
     FROM erp_inventory n
@@ -138,6 +148,20 @@ ivt.id IN (
                        GROUP BY stock_id, product_id
                        HAVING count(*) > 1
                    ) r ON n.stock_id = r.stock_id AND n.product_id = r.product_id)`)
+		}
+
+		// 只显示 仓位商品 重复记录
+		if product_one2one_query == PRODUCT_ONE_TO_ONE_STORAGE_LOC_PRODUCT {
+			filter = core.SqlAnd(filter, fmt.Sprintf(`
+ivt.storage_loc_id IN (
+	SELECT nvt.storage_loc_id
+	FROM erp_inventory nvt
+		INNER JOIN erp_storage_loc sl ON nvt.storage_loc_id = sl.id
+		INNER JOIN erp_stock s ON sl.stock_id = s.id
+	WHERE s.stock_type_id = %d AND nvt.storage_loc_id <> 0
+	GROUP BY nvt.storage_loc_id
+	HAVING count(nvt.product_id) > 1)`, sppz_models.STOCK_TYPE_AU))
+		}
 	}
 
 	sb.Where(filter)

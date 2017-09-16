@@ -137,10 +137,11 @@
                             <option :value="0">显示全部成本价记录</option>
                             <option :value="1">只显示零成本价记录</option>
                         </select>
-                        <label class="control-label no-padding-right" for="stock_product_one2one_query">唯一性过滤</label>
-                        <select id="stock_product_one2one_query" name="stock_product_one2one_query" v-model.number="page.stock_product_one2one_query" style="width: 140px;">
+                        <label class="control-label no-padding-right" for="product_one2one_query">唯一性过滤</label>
+                        <select id="product_one2one_query" name="product_one2one_query" v-model.number="page.product_one2one_query" style="width: 170px;">
                             <option :value="0">显示全部库存记录</option>
-                            <option :value="1">只显示仓位商品重复记录</option>
+                            <option :value="{% .product_one_to_one_stock_product %}">只显示 仓库商品 重复记录</option>
+                            <option :value="{% .product_one_to_one_storage_loc_product %}">只显示 仓位商品 重复记录</option>
                         </select>
                         <button class="btn btn-mini btn-primary" @click="refreshList()">
                             &nbsp;<i class="ace-icon fa fa-search"></i>查&nbsp;询&nbsp;
@@ -528,7 +529,7 @@
                 "stock_list": [],
                 "product_code_query": "",
                 "cost_price_zero_query": 0,
-                "stock_product_one2one_query": 0
+                "product_one2one_query": 0
             },
             "detail": {
                 "inventory": {},
@@ -557,29 +558,35 @@
                                 return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
                             }
                         },
-                        {"mDataProp": "st.name", "title": "仓库", "bSearchable": false, "width": 180},
-                        {"mDataProp": "loc.name", "title": "仓位", "bSearchable": false, "width": 180},
-                        {"mDataProp": "prd.sku", "title": "商品", "bSearchable": false},
+                        {"mDataProp": "st.name", "title": "仓库", "bSearchable": true, "width": 120},
+                        {"mDataProp": "loc.name", "title": "仓位", "bSearchable": true, "width": 100},
+                        {"mDataProp": "prd.sku", "title": "SKU", "bSearchable": true, "width": 120},
+                        {
+                            "mDataProp": "prd.cn_name", "title": "商品名称", "bSearchable": true, "sClass": "wrap-word",
+                            "render": function (data, type, row) {
+                                return "<div>" + data + "</div>"
+                            }
+                        },
                         {
                             "mDataProp": "ivt.qty",
                             "title": "数量",
                             "sClass": "dtRight",
                             "bSearchable": false,
-                            "width": 120
+                            "width": 60
                         },
                         {
                             "mDataProp": "ivt.pending_qty",
                             "title": "待发货",
                             "sClass": "dtRight",
                             "bSearchable": false,
-                            "width": 120
+                            "width": 60
                         },
                         {
                             "mDataProp": "ivt.cost_price",
                             "title": "成本价",
                             "sClass": "dtRight",
                             "bSearchable": false,
-                            "width": 120,
+                            "width": 80,
                             "render": function (data, type, row) {
                                 return dtFormatFloat(data);
                             }
@@ -602,7 +609,7 @@
                         aoData.push({'name': 'stock_id_query', 'value': this_vm.page.stock_id_query});
                         aoData.push({'name': 'product_code_query', 'value': this_vm.page.product_code_query});
                         aoData.push({'name': 'cost_price_zero_query', 'value': this_vm.page.cost_price_zero_query});
-                        aoData.push({'name': 'stock_product_one2one_query', 'value': this_vm.page.stock_product_one2one_query});
+                        aoData.push({'name': 'product_one2one_query', 'value': this_vm.page.product_one2one_query});
 
                         $.ajax({
                             "dataType": 'json',
