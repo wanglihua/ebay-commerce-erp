@@ -36,6 +36,8 @@ const (
 func (c ErpInventory) Index() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.KCGL_INVENTORY, c.Session)
 
+	var db_session = c.DbSession
+
 	var has_sku_loc_res = pass_service.Is_login_user_has_pass(pass_res.KCGL_INVENTORY_SKU_LOC, c.Session)
 	//var has_sku_qty_res = pass_service.Is_login_user_has_pass(pass_res.KCGL_INVENTORY_IMPORT_QTY_OVER, c.Session) || pass_service.Is_login_user_has_pass(pass_res.KCGL_INVENTORY_IMPORT_QTY_DIFF, c.Session)
 
@@ -45,6 +47,9 @@ func (c ErpInventory) Index() revel.Result {
 	var has_sku_qty_import_res = pass_service.Is_login_user_has_pass(pass_res.KCGL_INVENTORY_IMPORT_QTY, c.Session)
 	var has_sku_qty_export_res = pass_service.Is_login_user_has_pass(pass_res.KCGL_INVENTORY_EXPORT_QTY, c.Session)
 
+	var stock_product_repeat_count = inventory_service.GetProductOneToOneStockProductMismatchCount(db_session)
+	var storage_loc_product_repeat_count = inventory_service.GetProductOneToOneStorageLocProductMismatchCount(db_session)
+
 	c.RenderArgs["has_sku_loc_res"] = has_sku_loc_res
 	//c.RenderArgs["has_sku_qty_res"] = has_sku_qty_res
 	c.RenderArgs["has_sku_qty_import_res"] = has_sku_qty_import_res
@@ -52,6 +57,8 @@ func (c ErpInventory) Index() revel.Result {
 	c.RenderArgs["has_sku_price_res"] = has_sku_price_res
 	c.RenderArgs["product_one_to_one_stock_product"] = PRODUCT_ONE_TO_ONE_STOCK_PRODUCT
 	c.RenderArgs["product_one_to_one_storage_loc_product"] = PRODUCT_ONE_TO_ONE_STORAGE_LOC_PRODUCT
+	c.RenderArgs["stock_product_repeat_count"] = stock_product_repeat_count
+	c.RenderArgs["storage_loc_product_repeat_count"] = storage_loc_product_repeat_count
 
 	return c.RenderTemplate("erp/kcgl/inventory/inventory_index.html")
 }

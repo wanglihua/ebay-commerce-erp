@@ -149,6 +149,14 @@
                     </div>
                 </div>
                 <div>
+                    {% if ne .stock_product_repeat_count 0 %}
+                    <span style="color: red;font-weight:bold;">数据库中存在仓库和商品不一一对应的库存记录。</span>
+                    {% end %}
+                    {% if ne .storage_loc_product_repeat_count 0 %}
+                    <span style="color: red;font-weight:bold;">数据库中存在库位和商品不一一对应的库存记录。</span>
+                    {% end %}
+                </div>
+                <div>
                     <table id="inventoryList" class="table table-striped table-bordered table-hover"></table>
                     <table id="error_data_list" class="table table-striped table-bordered table-hover" style="display: none;">
                         <caption>错误列表</caption>
