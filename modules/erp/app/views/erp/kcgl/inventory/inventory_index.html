@@ -140,8 +140,8 @@
                         <label class="control-label no-padding-right" for="product_one2one_query">唯一性过滤</label>
                         <select id="product_one2one_query" name="product_one2one_query" v-model.number="page.product_one2one_query" style="width: 170px;">
                             <option :value="0">显示全部库存记录</option>
-                            <option :value="{% .product_one_to_one_stock_product %}">只显示 仓库商品 重复记录</option>
-                            <option :value="{% .product_one_to_one_storage_loc_product %}">只显示 仓位商品 重复记录</option>
+                            <option :value="{% .product_one_to_one_stock_product %}">只显示澳仓 仓库商品 重复记录（可能存在仓位商品多对一）</option>
+                            <option :value="{% .product_one_to_one_storage_loc_product %}">只显示澳仓 仓位商品 一对多记录</option>
                         </select>
                         <button class="btn btn-mini btn-primary" @click="refreshList()">
                             &nbsp;<i class="ace-icon fa fa-search"></i>查&nbsp;询&nbsp;
@@ -150,10 +150,10 @@
                 </div>
                 <div>
                     {% if ne .stock_product_repeat_count 0 %}
-                    <span style="color: red;font-weight:bold;">数据库中存在仓库和商品不一一对应的库存记录。</span>
+                    <span style="color: red;font-weight:bold;">澳洲仓库中存在 仓库和商品 重复的库存记录，也可能存在仓位商品多对一的情况。</span>
                     {% end %}
                     {% if ne .storage_loc_product_repeat_count 0 %}
-                    <span style="color: red;font-weight:bold;">数据库中存在库位和商品不一一对应的库存记录。</span>
+                    <span style="color: red;font-weight:bold;">澳洲仓库中存在 仓位和商品 一对多的库存记录。</span>
                     {% end %}
                 </div>
                 <div>
