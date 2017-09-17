@@ -189,6 +189,15 @@ func (c ErpOrderHold) Processed() revel.Result {
 		}
 	}
 
+	for _, order := range order_list {
+		if order.StockId == 0 {
+			return c.RenderJson(map[string]interface{}{
+				"success": false,
+				"message": "订单当前没有关联发货仓库不能搬至已处理Hold状态！",
+			})
+		}
+	}
+
 	var login_user = core.GetLoginUser(c.Session)
 
 	for _, order := range order_list {
