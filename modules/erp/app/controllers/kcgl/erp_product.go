@@ -470,8 +470,6 @@ func (c ErpProduct) ProductLogListData() revel.Result {
 }
 
 func (c ErpProduct) GetProductInfo() revel.Result {
-	pass_service.Check_login_user_pass(pass_res.KCGL_PRODUCT, c.Session)
-
 	db_session := c.DbSession
 
 	var product_id int64

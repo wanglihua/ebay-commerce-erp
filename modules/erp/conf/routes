@@ -32,6 +32,7 @@ POST /supplier/data/list                   ErpSupplier.ListData
 POST /supplier/data/detail                 ErpSupplier.DetailData
 POST /supplier/save                        ErpSupplier.Save
 POST /supplier/delete                      ErpSupplier.Delete
+POST /supplier/get/info                    ErpSupplier.GetSupplierInfo
 
 POST /supplier/import                      ErpSupplierExcel.Import
 POST /supplier/export                      ErpSupplierExcel.Export
@@ -445,6 +446,7 @@ POST /purchase/bill/save                   ErpPurchaseBill.Save
 POST /purchase/bill/delete                 ErpPurchaseBill.Delete
 POST /purchase/bill/submit                 ErpPurchaseBill.Submit
 POST /purchase/bill/approve                ErpPurchaseBill.Approve
+POST /purchase/bill/supplier/select/list/data      ErpPurchaseBill.SupplierSelectListData
 
 GET  /purchase/bill/entry                  ErpPurchaseBillEntry.Index
 POST /purchase/bill/entry/data/list        ErpPurchaseBillEntry.ListData

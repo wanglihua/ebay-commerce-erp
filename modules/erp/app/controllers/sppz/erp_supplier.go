@@ -79,10 +79,10 @@ FROM erp_supplier s
 }
 
 type SupplierDetailForm struct {
-	Supplier      sppz_models.SupplierInfo       `json:"supplier"`
-	ProvinceId    int64                     `json:"province_id"`
-	ProvinceList  []region_service.Region_t `json:"province_list"`
-	CityList      []region_service.Region_t `json:"city_list"`
+	Supplier      sppz_models.SupplierInfo            `json:"supplier"`
+	ProvinceId    int64                               `json:"province_id"`
+	ProvinceList  []region_service.Region_t           `json:"province_list"`
+	CityList      []region_service.Region_t           `json:"city_list"`
 	PayMethodList []sppz_models.SupplierPayMethodInfo `json:"pay_method_list"`
 	// city_id 就是 supplier 中的 region_id
 }
@@ -252,4 +252,19 @@ WHERE pf.supplier_id IN (%s);`
 	core.HandleError(err)
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})
+}
+
+func (c ErpSupplier) GetSupplierInfo() revel.Result {
+	db_session := c.DbSession
+
+	var supplier_id int64
+	c.Params.Bind(&supplier_id, "supplier_id")
+
+	var supplier sppz_models.SupplierInfo
+	_, err := db_session.Id(supplier_id).Get(&supplier)
+	core.HandleError(err)
+
+	return c.RenderJson(map[string]interface{}{
+		"supplier": supplier,
+	})
 }

@@ -14,6 +14,7 @@ import (
 	"matrix/modules/erp/models/cggl_models"
 	"strings"
 	"matrix/modules/erp/service/purchase_bill_service"
+	"matrix/modules/erp/models/sppz_models"
 )
 
 type ErpPurchaseBill struct {
@@ -42,6 +43,7 @@ func (c ErpPurchaseBill) Index() revel.Result {
 
 type ErpPurchaseBillViewItem struct {
 	cggl_models.PurchaseBillInfo `xorm:"extends" json:"pb"`
+	sppz_models.SupplierInfo     `xorm:"extends" json:"sup"`
 	auth_models.UserInfo         `xorm:"extends" json:"u"`
 	models.StatusInfo            `xorm:"extends" json:"s"`
 }
@@ -66,16 +68,18 @@ func (c ErpPurchaseBill) ListData() revel.Result {
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
 	/*
-	SELECT pb.*, u.*, s.*
-	FROM erp_purchase_bill pb
-	    INNER JOIN auth_user u ON pb.user_id = u.id
-	    INNER JOIN erp_status s ON pb.status_id = s.id
+SELECT pb.*, sup.*, u.*, s.*
+FROM erp_purchase_bill pb
+    INNER JOIN erp_supplier sup ON sup.id = pb.supplier_id
+    INNER JOIN auth_user u ON pb.user_id = u.id
+    INNER JOIN erp_status s ON pb.status_id = s.id
 	*/
 
 	sql_builder := core.NewSqlBuilder()
-	sql_builder.Select("pb.*, u.*, s.*")
+	sql_builder.Select("pb.*, sup.*, u.*, s.*")
 	sql_builder.Count("count(pb.id) as bill_count")
 	sql_builder.From(`erp_purchase_bill pb
+	INNER JOIN erp_supplier sup ON sup.id = pb.supplier_id
     INNER JOIN auth_user u ON pb.user_id = u.id
     INNER JOIN erp_status s ON pb.status_id = s.id`)
 
@@ -116,6 +120,7 @@ func (c ErpPurchaseBill) ListData() revel.Result {
 
 type PurchaseBillDetailForm struct {
 	PurchaseBill cggl_models.PurchaseBillInfo `json:"purchase_bill"`
+	SupplierName string                       `json:"supplier_name"`
 }
 
 func (f *PurchaseBillDetailForm) IsCreate() bool {
@@ -148,6 +153,7 @@ func (c ErpPurchaseBill) DetailData() revel.Result {
 	var purchase_bill_id int64
 	c.Params.Bind(&purchase_bill_id, "id")
 
+	var supplier_name string
 	var purchase_bill cggl_models.PurchaseBillInfo
 	if purchase_bill_id != 0 {
 		has, err := db_session.Id(purchase_bill_id).Get(&purchase_bill)
@@ -155,12 +161,18 @@ func (c ErpPurchaseBill) DetailData() revel.Result {
 		if has == false {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "指定的采购单不存在！"})
 		}
+
+		var supplier sppz_models.SupplierInfo
+		_, err = db_session.Id(purchase_bill.SupplierId).Get(&supplier)
+		core.HandleError(err)
+
 	} else {
 		purchase_bill.Code = bill_service.GetNextBillNo(db_session)
 	}
 
 	var detail_form PurchaseBillDetailForm
 	detail_form.PurchaseBill = purchase_bill
+	detail_form.SupplierName = supplier_name
 
 	return c.RenderJson(detail_form)
 }
@@ -298,5 +310,56 @@ func (c ErpPurchaseBill) Approve() revel.Result {
 	return c.RenderJson(map[string]interface{}{
 		"success": true,
 		"message": "采购单审批成功！",
+	})
+}
+
+func (c ErpPurchaseBill) SupplierSelectListData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.CGGL_PURCHASE_BILL, c.Session)
+
+	db_session := c.DbSession
+
+	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
+
+	type supplier_view_item_t struct {
+		Supplier sppz_models.SupplierInfo `xorm:"extends" json:"s"`
+		Region   sppz_models.RegionInfo   `xorm:"extends" json:"r"`
+	}
+
+	/*
+SELECT s.*, r.*
+FROM erp_supplier s
+    LEFT JOIN erp_region r ON s.region_id = r.id
+	 */
+
+	var sb = core.NewSqlBuilder()
+	sb.Select("s.*, r.*")
+	sb.Count("count(s.id) AS supplier_count")
+	sb.From(`erp_supplier s
+    LEFT JOIN erp_region r ON s.region_id = r.id`)
+
+	sb.Where(filter)
+
+	if order != "" {
+		sb.OrderBy(order)
+	} else {
+		sb.OrderBy("o.id ASC")
+	}
+
+	sb.Limit(offset, limit)
+
+	supplier_list := make([]supplier_view_item_t, 0, limit)
+	err := db_session.Sql(sb.SqlList()).Find(&supplier_list)
+	core.HandleError(err)
+
+	var supplier_count struct {
+		Count int64 `xorm:"'supplier_count'"`
+	}
+
+	_, err = db_session.Sql(sb.SqlCount()).Get(&supplier_count)
+	core.HandleError(err)
+
+	return c.RenderJson(core.GridResult{
+		Data:  supplier_list,
+		Total: supplier_count.Count,
 	})
 }
