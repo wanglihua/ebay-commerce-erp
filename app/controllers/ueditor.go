@@ -56,7 +56,7 @@ func (c UEditor) Config() revel.Result {
 			".ogg", ".ogv", ".mov", ".wmv", ".mp4", ".webm", ".mp3", ".wav", ".mid",
 			".rar", ".zip", ".tar", ".gz", ".7z", ".bz2", ".cab", ".iso",
 			".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx", ".pdf", ".txt", ".md", ".xml",
-		}, /* 上传文件格式显示 */
+		},                                                 /* 上传文件格式显示 */
 	})
 }
 
@@ -94,12 +94,13 @@ func (c UEditor) UploadFile() revel.Result {
 
 	defer file.Close()
 
-	filename := strings.Replace(uuid.NewUUID().String(), "-", "", -1) + path.Ext(header.Filename)
+	subdir := strings.Replace(uuid.NewUUID().String(), "-", "", -1) + path.Ext(header.Filename)
+	file_name := header.Filename
 
-	err = os.MkdirAll(path.Join(revel.BasePath, "static", "upload", "ueditor", "notice"), 0775)
+	err = os.MkdirAll(path.Join(revel.BasePath, "static", "upload", "ueditor", "notice", subdir), 0775)
 	core.HandleError(err)
 
-	outFile, err := os.Create(path.Join(revel.BasePath, "static", "upload", "ueditor", "notice", filename))
+	outFile, err := os.Create(path.Join(revel.BasePath, "static", "upload", "ueditor", "notice", subdir, file_name))
 	core.HandleError(err)
 
 	defer outFile.Close()
@@ -107,9 +108,9 @@ func (c UEditor) UploadFile() revel.Result {
 	io.Copy(outFile, file)
 
 	return c.RenderJson(map[string]interface{}{
-		"url":      fmt.Sprintf("/static/upload/ueditor/notice/%s", filename), //保存后的文件路径
-		"title":    "",                                                        //文件描述，对图片来说在前端会添加到title属性上
-		"original": header.Filename,                                           //原始文件名
-		"state":    "SUCCESS",                                                 //上传状态，成功时返回SUCCESS,其他任何值将原样返回至图片上传框中
+		"url":      fmt.Sprintf("/static/upload/ueditor/notice/%s/%s", subdir, file_name), //保存后的文件路径
+		"title":    "",                                                                    //文件描述，对图片来说在前端会添加到title属性上
+		"original": header.Filename,                                                       //原始文件名
+		"state":    "SUCCESS",                                                             //上传状态，成功时返回SUCCESS,其他任何值将原样返回至图片上传框中
 	})
 }
