@@ -36,6 +36,10 @@ func (c ErpContainerTransferEntryExcel) Import() revel.Result {
 	_, err := db_session.Id(transfer_id).Get(&containerTransfer)
 	core.HandleError(err)
 
+	if container_transfer_is_new(containerTransfer) == false {
+		return c.RenderJson(core.JsonResult{Success: false, Message: "调拨单当前状态不能导入明细！"})
+	}
+
 	excel_file_bytes := make([]byte, 0)
 	c.Params.Bind(&excel_file_bytes, "excel_file")
 
@@ -49,18 +53,18 @@ func (c ErpContainerTransferEntryExcel) Import() revel.Result {
 	}
 
 	type transfer_entry_import_t struct {
-		ProductSku   string  `json:"product_sku"`
-		Qty          string  `json:"qty"`
-		BoxQty       string  `json:"box_qty"`
-		NeedInvoice  string  `json:"need_invoice"`
-		ErrorMessage string  `json:"error_message"`
+		ProductSku   string `json:"product_sku"`
+		Qty          string `json:"qty"`
+		BoxQty       string `json:"box_qty"`
+		NeedInvoice  string `json:"need_invoice"`
+		ErrorMessage string `json:"error_message"`
 
 		product    kcgl_models.ProductInfo            `json:"-"`
 		hs_code_au hgbg_models.HsCodeAuDutyInfo       `json:"-"`
 		hs_code_cn hgbg_models.HsCodeCnReportElemInfo `json:"-"`
-		qty        int64                         `json:"-"`
-		box_qty    int64                         `json:"-"`
-		price      float64                       `json:"-"`
+		qty        int64                              `json:"-"`
+		box_qty    int64                              `json:"-"`
+		price      float64                            `json:"-"`
 	}
 
 	transfer_entry_import_list := make([]transfer_entry_import_t, 0)

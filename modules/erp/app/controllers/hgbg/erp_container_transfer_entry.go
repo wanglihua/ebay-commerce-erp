@@ -146,7 +146,7 @@ func (c ErpContainerTransferEntry) Save() revel.Result {
 	core.HandleError(err)
 
 	if container_transfer_is_new(ct) == false {
-		return c.RenderJson(core.JsonResult{Success: false, Message: "当前状态不能修改！"})
+		return c.RenderJson(core.JsonResult{Success: false, Message: "调拨单当前状态不能修改！"})
 	}
 
 	if detail_form.Valid(c.Validation) == false {
