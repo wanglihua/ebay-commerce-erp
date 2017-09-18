@@ -212,6 +212,18 @@ func (c ErpPurchaseBill) Delete() revel.Result {
 	purchase_bill_id_list := make([]int64, 0)
 	c.Params.Bind(&purchase_bill_id_list, "id_list")
 
+	var purchase_bill_list = make([]cggl_models.PurchaseBillInfo, 0)
+	core.HandleError(db_session.In("bill_id", purchase_bill_id_list).Find(&purchase_bill_list))
+
+	for _, purchase_bill := range purchase_bill_list {
+		if purchase_bill.StatusId != models.PURCHASE_BILL_STATUS_YCJ && purchase_bill.StatusId != models.PURCHASE_BILL_STATUS_YTJ {
+			return c.RenderJson(map[string]interface{}{
+				"success": false,
+				"message": "采购单当前状态不能删除！",
+			})
+		}
+	}
+
 	_, err := db_session.In("bill_id", purchase_bill_id_list).Delete(new(cggl_models.PurchaseBillEntryInfo))
 	core.HandleError(err)
 
@@ -285,7 +297,7 @@ func (c ErpPurchaseBill) Approve() revel.Result {
 		core.HandleError(err)
 	}
 
-	purchase_bill_service.SetEntriesStatus(purchase_bill_id_list, models.PURCHASE_BILL_STATUS_YCJ, db_session)
+	purchase_bill_service.SetEntriesStatus(purchase_bill_id_list, models.PURCHASE_BILL_STATUS_YSP, db_session)
 
 	return c.RenderJson(map[string]interface{}{
 		"success": true,
