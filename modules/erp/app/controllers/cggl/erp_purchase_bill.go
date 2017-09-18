@@ -249,7 +249,7 @@ func (c ErpPurchaseBill) Submit() revel.Result {
 		core.HandleError(err)
 	}
 
-	purchase_bill_service.SetEntriesStatus(purchase_bill_id_list, models.PURCHASE_BILL_STATUS_YCJ, db_session)
+	purchase_bill_service.SetEntriesStatus(purchase_bill_id_list, models.PURCHASE_BILL_STATUS_YTJ, db_session)
 
 	return c.RenderJson(map[string]interface{}{
 		"success": true,

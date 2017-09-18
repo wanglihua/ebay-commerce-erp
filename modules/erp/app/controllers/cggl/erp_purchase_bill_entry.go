@@ -193,10 +193,21 @@ func (c ErpPurchaseBillEntry) Save() revel.Result {
 	purchase_bill_entry := detail_form.PurchaseBillEntry
 	purchase_bill_entry.BillId = detail_form.PurchaseBill.Id
 
+	var purchase_bill cggl_models.PurchaseBillInfo
+	_, err = db_session.Id(purchase_bill_entry.BillId).Get(&purchase_bill)
+	core.HandleError(err)
+
 	var qty = purchase_bill_entry.MelQty + purchase_bill_entry.BneQty
 	purchase_bill_entry.Qty = qty
 
 	purchase_bill_entry.Amount = purchase_bill_entry.Price * float64(qty)
+
+	if purchase_bill_entry.ProductId == 0 {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "请先选择商品SKU！",
+		})
+	}
 
 	var affected int64
 	if detail_form.IsCreate() {
@@ -206,7 +217,7 @@ func (c ErpPurchaseBillEntry) Save() revel.Result {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，批次中该商品已存在！"})
 		}
 
-		purchase_bill_entry.StatusId = models.PURCHASE_BILL_STATUS_YCJ
+		purchase_bill_entry.StatusId = purchase_bill.StatusId // 设置成采购单的当前状态
 
 		affected, err = db_session.Insert(&purchase_bill_entry)
 		core.HandleError(err)
