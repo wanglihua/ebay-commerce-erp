@@ -14,8 +14,8 @@ type PurchaseBillEntryInfo struct {
 	CheckinQty              int64           `xorm:"bigint notnull 'checkin_qty' default(0)" json:"checkin_qty" smith:"verbose_name=入库数量"` // 最终入库的数量
 	Price                   float64         `xorm:"decimal(18,6) notnull 'price'" json:"price" smith:"verbose_name=单价"`
 	Amount                  float64         `xorm:"decimal(18,6) notnull 'amount'" json:"amount" smith:"verbose_name=金额"`
-	PurchaseDate            core.NullDate   `xorm:"datetime null 'purchase_date'" json:"purchase_date" smith:"verbose_name=采购日期"`
-	CheckinDate             core.NullDate   `xorm:"datetime null 'checkin_date'" json:"checkin_date" smith:"verbose_name=入库日期"`
+	PurchaseTime            core.NullTime   `xorm:"datetime null 'purchase_time'" json:"purchase_time" smith:"verbose_name=采购时间"`
+	CheckinTime             core.NullTime   `xorm:"datetime null 'checkin_time'" json:"checkin_time" smith:"verbose_name=入库时间"`
 	Desc                    core.NullString `xorm:"nvarchar(500) 'desc'" json:"desc" smith:"verbose_name=备注,min=2,max=400"`
 	StatusId                int64           `xorm:"bigint notnull index 'status_id'" json:"status_id" smith:"verbose_name=状态"`
 	AbnormalTypeId          int64           `xorm:"bigint notnull index 'abnormal_type_id' default(0)" json:"abnormal_type_id" smith:"verbose_name=异常类型"`

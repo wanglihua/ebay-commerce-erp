@@ -353,7 +353,6 @@
                                 return "<div>" + data + "</div>";
                             }
                         },
-                        {"mDataProp": "pb.date", "title": "日期", "bSearchable": false, "width": 85},
                         {"mDataProp": "u.nick_name", "title": "操作人", "bSearchable": false, "width": 75},
                         {"mDataProp": "pb.trans_expenses", "title": "运费", "bSearchable": false, "width": 75},
                         {"mDataProp": "s.name", "title": "状态", "bSearchable": false, "width": 90},
@@ -439,8 +438,8 @@
                         {"mDataProp": "pbe.bne_qty", "title": "BNE数量", "bSearchable": false},
                         {"mDataProp": "pbe.qty", "title": "总数量", "bSearchable": false},
                         {"mDataProp": "pbe.amount", "title": "金额", "bSearchable": false},
-                        {"mDataProp": "pbe.purchase_date", "title": "采购日期", "bSearchable": false},
-                        {"mDataProp": "pbe.checkin_date", "title": "入库日期", "bSearchable": false},
+                        {"mDataProp": "pbe.purchase_time", "title": "采购时间", "bSearchable": false},
+                        {"mDataProp": "pbe.checkin_time", "title": "入库时间", "bSearchable": false},
                         {"mDataProp": "pbe.desc", "title": "备注", "bSearchable": true},
                         {"mDataProp": "s.name", "title": "状态", "bSearchable": true},
                         {"mDataProp": "pbe.create_time", "title": "创建时间", "bSearchable": false, "width": 120},
@@ -734,10 +733,10 @@
                     'purchase_bill_entry_detail.purchase_bill_entry.amount': {
                         required: true, number: true
                     },
-                    'purchase_bill_entry_detail.purchase_bill_entry.purchase_date': {
+                    'purchase_bill_entry_detail.purchase_bill_entry.purchase_time': {
                         required: false
                     },
-                    'purchase_bill_entry_detail.purchase_bill_entry.checkin_date': {
+                    'purchase_bill_entry_detail.purchase_bill_entry.checkin_time': {
                         required: false
                     },
                     'purchase_bill_entry_detail.purchase_bill_entry.desc': {

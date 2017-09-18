@@ -99,26 +99,26 @@ func (c ErpPurchaseFinance) Purchase() revel.Result {
 		}
 	}
 
-	var purchase_date = core.MakeNullDate(time.Now(), true)
+	var purchase_time = core.MakeNullTime(time.Now(), true)
 
 	// 设置为已下单状态
 	for _, purchase_bill := range purchase_bill_list {
 		purchase_bill.StatusId = models.PURCHASE_BILL_STATUS_CGZ
-		purchase_bill.PurchaseDate = purchase_date
-		_, err := db_session.Id(purchase_bill.Id).Cols("status_id", "purchase_date").Update(&purchase_bill)
+		purchase_bill.PurchaseTime = purchase_time
+		_, err := db_session.Id(purchase_bill.Id).Cols("status_id", "purchase_time").Update(&purchase_bill)
 		core.HandleError(err)
 	}
 
-	// 设置明细为已下单状态，并设置 下单日期 即 采购日期
+	// 设置明细为已下单状态，并设置 下单日期 即 采购时间
 	// purchase_bill_service.SetEntriesStatus(purchase_bill_id_list, models.PURCHASE_BILL_STATUS_CGZ, db_session)
 	var bill_entry_list = make([]cggl_models.PurchaseBillEntryInfo, 0)
 	core.HandleError(db_session.In("bill_id", purchase_bill_id_list).Find(&bill_entry_list))
 
 	for _, bill_entry := range bill_entry_list {
 		bill_entry.StatusId = models.PURCHASE_BILL_STATUS_CGZ
-		bill_entry.CheckinDate = purchase_date
+		bill_entry.CheckinTime = purchase_time
 
-		_, err := db_session.Id(bill_entry.Id).Cols("status_id", "purchase_date").Update(&bill_entry)
+		_, err := db_session.Id(bill_entry.Id).Cols("status_id", "purchase_time").Update(&bill_entry)
 		core.HandleError(err)
 	}
 

@@ -102,9 +102,9 @@
                                 <div class="row">
                                     <div class="col-xs-6">
                                         <div class="form-group">
-                                            <label for="purchase_date" class="col-xs-2 control-label">采购日期</label>
+                                            <label for="purchase_time" class="col-xs-2 control-label">采购时间</label>
                                             <div class="col-xs-10">
-                                                <input id="purchase_date" name="detail.purchase_bill_entry.purchase_date" type="text" class="input-sm form-control" v-model="detail.purchase_bill_entry.purchase_date"/>
+                                                <input id="purchase_time" name="detail.purchase_bill_entry.purchase_time" type="text" class="input-sm form-control" v-model="detail.purchase_bill_entry.purchase_time"/>
                                             </div>
                                         </div>
                                     </div>
@@ -113,9 +113,9 @@
                                 <div class="row">
                                     <div class="col-xs-6">
                                         <div class="form-group">
-                                            <label for="checkin_date" class="col-xs-2 control-label">入库日期</label>
+                                            <label for="checkin_time" class="col-xs-2 control-label">入库时间</label>
                                             <div class="col-xs-10">
-                                                <input id="checkin_date" name="detail.purchase_bill_entry.checkin_date" type="text" class="input-sm form-control" v-model="detail.purchase_bill_entry.checkin_date"/>
+                                                <input id="checkin_time" name="detail.purchase_bill_entry.checkin_time" type="text" class="input-sm form-control" v-model="detail.purchase_bill_entry.checkin_time"/>
                                             </div>
                                         </div>
                                     </div>
@@ -179,8 +179,8 @@
                         {"mDataProp": "qty", "title": "数量", "bSearchable": false},
                         {"mDataProp": "price", "title": "单价", "bSearchable": false},
                         {"mDataProp": "amount", "title": "金额", "bSearchable": false},
-                        {"mDataProp": "purchase_date", "title": "采购日期", "bSearchable": false},
-                        {"mDataProp": "checkin_date", "title": "入库日期", "bSearchable": false},
+                        {"mDataProp": "purchase_time", "title": "采购时间", "bSearchable": false},
+                        {"mDataProp": "checkin_time", "title": "入库时间", "bSearchable": false},
                         {"mDataProp": "desc", "title": "备注", "bSearchable": true},
                         {"mDataProp": "create_time", "title": "创建时间", "bSearchable": false, "width": 120},
                         {"mDataProp": "update_time", "title": "修改时间", "bSearchable": false, "width": 120}
@@ -237,10 +237,10 @@
                     'detail.purchase_bill_entry.amount': {
                         required: true, number: true
                     },
-                    'detail.purchase_bill_entry.purchase_date': {
+                    'detail.purchase_bill_entry.purchase_time': {
                         required: false
                     },
-                    'detail.purchase_bill_entry.checkin_date': {
+                    'detail.purchase_bill_entry.checkin_time': {
                         required: false
                     },
                     'detail.purchase_bill_entry.desc': {

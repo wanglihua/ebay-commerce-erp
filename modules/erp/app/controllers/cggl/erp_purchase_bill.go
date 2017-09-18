@@ -8,7 +8,6 @@ import (
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/bill_service"
 	"strconv"
-	"time"
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/auth/pass_res"
 	"fmt"
@@ -132,8 +131,6 @@ func (f *PurchaseBillDetailForm) Valid(validation *revel.Validation) bool {
 		validation.MaxSize(f.PurchaseBill.Desc.String, 400).Message("备注长度不能大于400！")
 	}
 
-	validation.Required(f.PurchaseBill.Date).Message("日期不能为空！")
-
 	validation.Required(f.PurchaseBill.UserId).Message("操作人不能为空！")
 
 	validation.Required(f.PurchaseBill.TransExpenses).Message("运费不能为空！")
@@ -160,7 +157,6 @@ func (c ErpPurchaseBill) DetailData() revel.Result {
 		}
 	} else {
 		purchase_bill.Code = bill_service.GetNextBillNo(db_session)
-		purchase_bill.Date = core.Date(time.Now())
 	}
 
 	var detail_form PurchaseBillDetailForm

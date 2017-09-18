@@ -221,8 +221,8 @@ func (c ErpPurchaseCheckin) Checkin() revel.Result {
 	bill_entry_in_db.StatusId = models.PURCHASE_BILL_STATUS_YRK
 	bill_entry_in_db.CheckinQty = bill_entry_from_ui.CheckinQty
 	bill_entry_in_db.AbnormalTypeId = bill_entry_from_ui.AbnormalTypeId
-	bill_entry_in_db.CheckinDate = core.MakeNullDate(time.Now(), true)
-	_, err = db_session.Id(bill_entry_in_db.Id).Cols("status_id", "checkin_qty", "abnormal_type_id", "checkin_date").Update(bill_entry_in_db)
+	bill_entry_in_db.CheckinTime = core.MakeNullTime(time.Now(), true)
+	_, err = db_session.Id(bill_entry_in_db.Id).Cols("status_id", "checkin_qty", "abnormal_type_id", "checkin_time").Update(bill_entry_in_db)
 	core.HandleError(err)
 
 	// 设置为已入库状态。更新明细的状态，如果一个采购单下面的所有明细都已入库状态，把采购单也置为已入库状态
@@ -264,8 +264,8 @@ func (c ErpPurchaseCheckin) CheckinList() revel.Result {
 		bill_entry.StatusId = models.PURCHASE_BILL_STATUS_YRK
 		bill_entry.CheckinQty = bill_entry.Qty                   // 批量入库的时候只能这样默认了
 		bill_entry.AbnormalTypeId = cggl_models.ABNORMAL_TYPE_ZC // 批量入库的时候只能这样默认了
-		bill_entry.CheckinDate = core.MakeNullDate(time.Now(), true)
-		_, err := db_session.Id(bill_entry.Id).Cols("status_id", "checkin_qty", "abnormal_type_id", "checkin_date").Update(bill_entry)
+		bill_entry.CheckinTime = core.MakeNullTime(time.Now(), true)
+		_, err := db_session.Id(bill_entry.Id).Cols("status_id", "checkin_qty", "abnormal_type_id", "checkin_time").Update(bill_entry)
 		core.HandleError(err)
 
 		purchase_bill_service.UpdateBillStatus(bill_entry, models.PURCHASE_BILL_STATUS_YRK, db_session)
