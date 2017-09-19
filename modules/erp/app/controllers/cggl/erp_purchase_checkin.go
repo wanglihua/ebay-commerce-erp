@@ -217,6 +217,14 @@ func (c ErpPurchaseCheckin) Checkin() revel.Result {
 		})
 	}
 
+	// 检查是不是选择了异常类型
+	if bill_entry_from_ui.CheckinQty < bill_entry_in_db.Qty && bill_entry_from_ui.AbnormalTypeId == cggl_models.ABNORMAL_TYPE_ZC {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "请选择异常类型！",
+		})
+	}
+
 	// 更新明细的状态
 	bill_entry_in_db.StatusId = models.PURCHASE_BILL_STATUS_YRK
 	bill_entry_in_db.CheckinQty = bill_entry_from_ui.CheckinQty
