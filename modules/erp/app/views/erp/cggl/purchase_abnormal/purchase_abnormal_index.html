@@ -112,11 +112,11 @@
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
-                                            <label for="abnormal_type_id" class="col-xs-2 control-label">异常类型</label>
+                                            <label for="abnormal_process_result_id" class="col-xs-2 control-label">处理结果</label>
                                             <div class="col-xs-10">
-                                                <select id="abnormal_type_id" name="purchase_bill_entry_detail.purchase_bill_entry.abnormal_type_id" class="input-sm form-control" v-model.number="purchase_bill_entry_detail.purchase_bill_entry.abnormal_type_id">
-                                                    <template v-for="abnormal_type in purchase_bill_entry_detail.abnormal_type_list">
-                                                        <option :value="abnormal_type.id">{{abnormal_type.name}}</option>
+                                                <select id="abnormal_process_result_id" name="purchase_bill_entry_detail.purchase_bill_entry.abnormal_process_result_id" class="input-sm form-control" v-model.number="purchase_bill_entry_detail.purchase_bill_entry.abnormal_process_result_id">
+                                                    <template v-for="abnormal_process_result in purchase_bill_entry_detail.abnormal_process_result_list">
+                                                        <option :value="abnormal_process_result.id">{{abnormal_process_result.name}}</option>
                                                     </template>
                                                 </select>
                                             </div>
