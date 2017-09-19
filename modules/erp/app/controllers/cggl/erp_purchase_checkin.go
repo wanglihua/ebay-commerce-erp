@@ -153,7 +153,7 @@ func (f *PurchaseBillEntryCheckinDetailForm) Valid(validation *revel.Validation)
 }
 
 func (c ErpPurchaseCheckin) DetailData() revel.Result {
-	pass_service.Check_login_user_pass_or([]int64{pass_res.CGGL_PURCHASE_BILL, pass_res.CGGL_PURCHASE_CHECKIN}, c.Session)
+	pass_service.Check_login_user_pass(pass_res.CGGL_PURCHASE_CHECKIN, c.Session)
 
 	db_session := c.DbSession
 
@@ -217,8 +217,10 @@ func (c ErpPurchaseCheckin) Checkin() revel.Result {
 		})
 	}
 
+	var is_abnormal = bill_entry_from_ui.CheckinQty < bill_entry_in_db.Qty && bill_entry_from_ui.AbnormalTypeId == cggl_models.ABNORMAL_TYPE_ZC
+
 	// 检查是不是选择了异常类型
-	if bill_entry_from_ui.CheckinQty < bill_entry_in_db.Qty && bill_entry_from_ui.AbnormalTypeId == cggl_models.ABNORMAL_TYPE_ZC {
+	if is_abnormal == true {
 		return c.RenderJson(map[string]interface{}{
 			"success": false,
 			"message": "请选择异常类型！",
@@ -227,14 +229,37 @@ func (c ErpPurchaseCheckin) Checkin() revel.Result {
 
 	// 更新明细的状态
 	bill_entry_in_db.StatusId = models.PURCHASE_BILL_STATUS_YRK
+	if is_abnormal == true {
+		bill_entry_in_db.StatusId = models.PURCHASE_BILL_STATUS_YC
+	}
+
 	bill_entry_in_db.CheckinQty = bill_entry_from_ui.CheckinQty
 	bill_entry_in_db.AbnormalTypeId = bill_entry_from_ui.AbnormalTypeId
 	bill_entry_in_db.CheckinTime = core.MakeNullTime(time.Now(), true)
-	_, err = db_session.Id(bill_entry_in_db.Id).Cols("status_id", "checkin_qty", "abnormal_type_id", "checkin_time").Update(bill_entry_in_db)
+	_, err = db_session.Id(bill_entry_in_db.Id).Cols("status_id", "checkin_qty", "abnormal_type_id", "checkin_time").Update(&bill_entry_in_db)
 	core.HandleError(err)
 
-	// 设置为已入库状态。更新明细的状态，如果一个采购单下面的所有明细都已入库状态，把采购单也置为已入库状态
-	purchase_bill_service.UpdateBillStatus(bill_entry_in_db, models.PURCHASE_BILL_STATUS_YRK, db_session)
+	// 查看同一个采购单的明细是不是都是 已入库， 异常， 异常已处理 的这个状态了
+	var bill_id = bill_entry_in_db.BillId
+	count, err := db_session.
+	Where(fmt.Sprintf("bill_id = %d AND status_id <> %d AND status_id <> %d AND status_id <> %d",
+		bill_id,
+		models.PURCHASE_BILL_STATUS_YRK,
+		models.PURCHASE_BILL_STATUS_YC,
+		models.PURCHASE_BILL_STATUS_YCL)).
+		Count(new(cggl_models.PurchaseBillEntryInfo))
+	core.HandleError(err)
+
+	// 如果都是当前设置的这个状态了， 就更新采购单的状态
+	if count == 0 {
+		var purchase_bill cggl_models.PurchaseBillInfo
+		_, err = db_session.Id(bill_id).Get(&purchase_bill)
+		core.HandleError(err)
+
+		purchase_bill.StatusId = models.PURCHASE_BILL_STATUS_YRK
+		_, err = db_session.Id(purchase_bill.Id).Cols("status_id").Update(&purchase_bill)
+		core.HandleError(err)
+	}
 
 	// 更新中国仓的库存数量
 	inventory_service.AddCnInventoryQty(bill_entry_from_ui.ProductId, bill_entry_from_ui.CheckinQty, db_session)

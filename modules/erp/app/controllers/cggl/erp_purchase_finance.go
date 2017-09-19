@@ -120,7 +120,7 @@ func (c ErpPurchaseFinance) Purchase() revel.Result {
 
 	for _, bill_entry := range bill_entry_list {
 		bill_entry.StatusId = models.PURCHASE_BILL_STATUS_CGZ
-		bill_entry.CheckinTime = purchase_time
+		bill_entry.PurchaseTime = purchase_time
 
 		_, err := db_session.Id(bill_entry.Id).Cols("status_id", "purchase_time").Update(&bill_entry)
 		core.HandleError(err)
