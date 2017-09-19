@@ -10,6 +10,7 @@ import (
 	"matrix/modules/erp/models/cggl_models"
 	"fmt"
 	"time"
+	"matrix/modules/erp/models/sppz_models"
 )
 
 type ErpPurchaseFinance struct {
@@ -24,6 +25,7 @@ func (c ErpPurchaseFinance) Index() revel.Result {
 
 type ErpPurchaseFinanceViewItem struct {
 	cggl_models.PurchaseBillInfo `xorm:"extends" json:"pb"`
+	sppz_models.SupplierInfo     `xorm:"extends" json:"sup"`
 	auth_models.UserInfo         `xorm:"extends" json:"u"`
 	models.StatusInfo            `xorm:"extends" json:"s"`
 }
@@ -36,16 +38,18 @@ func (c ErpPurchaseFinance) ListData() revel.Result {
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
 	/*
-	SELECT pb.*, u.*, s.*
-	FROM erp_purchase_bill pb
-	    INNER JOIN auth_user u ON pb.user_id = u.id
-	    INNER JOIN erp_status s ON pb.status_id = s.id
+SELECT pb.*, sup.*, u.*, s.*
+FROM erp_purchase_bill pb
+    INNER JOIN erp_supplier sup ON sup.id = pb.supplier_id
+    INNER JOIN auth_user u ON pb.user_id = u.id
+    INNER JOIN erp_status s ON pb.status_id = s.id
 	*/
 
 	sql_builder := core.NewSqlBuilder()
-	sql_builder.Select("pb.*, u.*, s.*")
+	sql_builder.Select("pb.*, sup.*, u.*, s.*")
 	sql_builder.Count("count(pb.id) as bill_count")
 	sql_builder.From(`erp_purchase_bill pb
+	INNER JOIN erp_supplier sup ON sup.id = pb.supplier_id
     INNER JOIN auth_user u ON pb.user_id = u.id
     INNER JOIN erp_status s ON pb.status_id = s.id`)
 

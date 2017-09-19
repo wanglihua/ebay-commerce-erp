@@ -221,7 +221,7 @@ func (c ErpPurchaseBill) Delete() revel.Result {
 	c.Params.Bind(&purchase_bill_id_list, "id_list")
 
 	var purchase_bill_list = make([]cggl_models.PurchaseBillInfo, 0)
-	core.HandleError(db_session.In("bill_id", purchase_bill_id_list).Find(&purchase_bill_list))
+	core.HandleError(db_session.In("id", purchase_bill_id_list).Find(&purchase_bill_list))
 
 	for _, purchase_bill := range purchase_bill_list {
 		if purchase_bill.StatusId != models.PURCHASE_BILL_STATUS_YCJ && purchase_bill.StatusId != models.PURCHASE_BILL_STATUS_YTJ {
