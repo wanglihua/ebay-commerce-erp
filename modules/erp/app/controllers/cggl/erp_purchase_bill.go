@@ -252,6 +252,18 @@ func (c ErpPurchaseBill) Submit() revel.Result {
 	var purchase_bill_list = make([]cggl_models.PurchaseBillInfo, 0)
 	core.HandleError(db_session.In("id", purchase_bill_id_list).Find(&purchase_bill_list))
 
+	for _, purchase_bill := range purchase_bill_list {
+		count, err := db_session.Where(fmt.Sprintf("bill_id = %d", purchase_bill.Id)).Count(new(cggl_models.PurchaseBillEntryInfo))
+		core.HandleError(err)
+
+		if count == 0 {
+			return c.RenderJson(map[string]interface{}{
+				"success": false,
+				"message": fmt.Sprintf("采购单 %s 当前明细列表为空，不能进行提交！", purchase_bill.Code),
+			})
+		}
+	}
+
 	// 检查状态
 	for _, purchase_bill := range purchase_bill_list {
 		if purchase_bill.StatusId != models.PURCHASE_BILL_STATUS_YCJ {
@@ -314,8 +326,6 @@ func (c ErpPurchaseBill) Approve() revel.Result {
 }
 
 func (c ErpPurchaseBill) SupplierSelectListData() revel.Result {
-	pass_service.Check_login_user_pass(pass_res.CGGL_PURCHASE_BILL, c.Session)
-
 	db_session := c.DbSession
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)

@@ -209,6 +209,13 @@ func (c ErpPurchaseBillEntry) Save() revel.Result {
 		})
 	}
 
+	if qty == 0 {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "采购数量不能为零！",
+		})
+	}
+
 	var affected int64
 	if detail_form.IsCreate() {
 		billId_count, err := db_session.Where("bill_id = ? and product_id = ?", purchase_bill_entry.BillId, purchase_bill_entry.ProductId).Count(new(cggl_models.PurchaseBillEntryInfo))

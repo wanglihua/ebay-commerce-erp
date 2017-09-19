@@ -127,15 +127,20 @@
                                         <div class="form-group">
                                             <label for="supplier_id" class="col-xs-2 control-label">供应商</label>
                                             <div class="col-xs-10">
-                                                <select id="supplier_id" name="detail.product_feedback.supplier_id" class="input-sm form-control" v-model.number="detail.product_feedback.supplier_id">
-                                                    <template v-for="supplier in supplier_list">
-                                                        <option :value="supplier.id">{{supplier.name}}</option>
-                                                    </template>
-                                                </select>
+                                                <div class="input-group">
+                                                    <input id="supplier_id" name="detail.product_feedback.supplier_id" type="hidden" class="input-sm form-control" v-model.number="detail.product_feedback.supplier_id"/>
+                                                    <input id="supplier_name" name="detail.supplier_name" type="text" class="input-sm form-control" readonly="readonly" v-model="detail.supplier_name"/>
+                                                    <span class="input-group-btn">
+                                                        <button type="button" class="btn btn-purple btn-sm" onclick="showSupplierSelect()">
+                                                            <span class="ace-icon fa fa-search icon-on-right"></span>&nbsp;选择
+                                                        </button>
+                                                    </span>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
+
 
                                 <div class="row">
                                     <div class="col-xs-12">
@@ -166,6 +171,31 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-success btn-sm" @click="saveProductFeedback()">
                         <i class="ace-icon fa fa-floppy-o"></i>保存
+                    </button>
+                    <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">
+                        <i class="ace-icon fa fa-times"></i>关闭
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="supplierSelectDialog">
+        <div class="modal-dialog" style="width: 680px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="True">&times;</button>
+                    <h4 class="modal-title">供应商选择</h4>
+                </div>
+                <div class="modal-body clearfix">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <table id="supplierList" class="table table-striped table-bordered table-hover"></table>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success btn-sm" onclick="acceptSupplierSelect()">
+                        <i class="ace-icon fa fa-floppy-o"></i>选择
                     </button>
                     <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">
                         <i class="ace-icon fa fa-times"></i>关闭
@@ -253,6 +283,31 @@
             var id = $(this).find('td:first-child input:checkbox').val();
             vm.showProductFeedbackDetail(id);
         });
+
+        initSingleSelectDataTable(
+            '#supplierList',
+            {
+                "sAjaxSource": '{%url "ErpProductFeedback.SupplierSelectListData"%}',
+                "aaSorting": [[1, "asc"]],
+                "aoColumns": [
+                    {
+                        "mDataProp": "s.id",
+                        "bSearchable": false,
+                        "orderable": false,
+                        "sClass": "center",
+                        "width": 50,
+                        "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
+                        "render": function (data, type, row) {
+                            return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
+                        }
+                    },
+                    {"mDataProp": "s.name", "title": "名称", "bSearchable": true},
+                    {"mDataProp": "s.contact", "title": "联系人", "bSearchable": true, "width": 90},
+                    {"mDataProp": "s.create_time", "title": "创建时间", "bSearchable": false, "width": 120},
+                    {"mDataProp": "s.update_time", "title": "修改时间", "bSearchable": false, "width": 120}
+                ]
+            }
+        );
     });
 
     function loadPageData() {
@@ -283,10 +338,10 @@
                 "feedback_supplier_list": []
             },
             "detail": {
+                "supplier_name": "",
                 "product_feedback": {}
             },
             "product_feedback_cate_list": [],
-            "supplier_list": [],
             "cate_sum_list": []
         },
         mounted: function () {
@@ -320,7 +375,6 @@
                             }
                             vm.detail = result.detail;
                             vm.product_feedback_cate_list = result.product_feedback_cate_list;
-                            vm.supplier_list = result.supplier_list;
 
                             $('#productFeedbackDetailDialog').modal(modalOptions);
                         }
@@ -398,6 +452,39 @@
             }
         }
     });
+
+    function showSupplierSelect() {
+        $('#supplierSelectDialog').modal(modalOptions);
+    }
+
+    function acceptSupplierSelect() {
+        var id_list = [];
+        $('#supplierList tbody tr>td:first-child input:checkbox').each(function () {
+            if (this.checked) {
+                id_list.push($(this).val());
+            }
+        });
+
+        if (id_list.length === 0 || id_list.length > 1) {
+            $.msg.alert("请选择一行数据！");
+            return;
+        }
+
+        var supplier_id = parseInt(id_list[0]);
+        vm.detail.product_feedback.supplier_id = supplier_id;
+
+        $.ajax({
+            url: '{%url "ErpSupplier.GetSupplierInfo"%}',
+            type: "POST",
+            data: {"supplier_id": supplier_id},
+            success: function (data) {
+                vm.detail.supplier_name = data.supplier.name;
+                //$("#supplier_name").val(data.supplier.name);
+            }
+        });
+
+        $('#supplierSelectDialog').modal('hide');
+    }
 </script>
 {%footer%}
 

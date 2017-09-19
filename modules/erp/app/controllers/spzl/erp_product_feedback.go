@@ -38,8 +38,8 @@ func (c ErpProductFeedback) SkuListData() revel.Result {
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
 	type product_feedback_sku_view_item_t struct {
-		Product            kcgl_models.ProductInfo             `xorm:"extends" json:"p"`
-		ProductFeedbackSku spzl_models.ProductFeedbackSkuInfo  `xorm:"extends" json:"pfu"`
+		Product            kcgl_models.ProductInfo            `xorm:"extends" json:"p"`
+		ProductFeedbackSku spzl_models.ProductFeedbackSkuInfo `xorm:"extends" json:"pfu"`
 	}
 
 	/*
@@ -266,7 +266,8 @@ GROUP BY pf.cate_id;`
 }
 
 type ProductFeedbackDetailForm struct {
-	ProductFeedback spzl_models.ProductFeedbackInfo      `json:"product_feedback"`
+	ProductFeedback spzl_models.ProductFeedbackInfo `json:"product_feedback"`
+	SupplierName    string                          `json:"supplier_name"`
 }
 
 func (f *ProductFeedbackDetailForm) IsCreate() bool {
@@ -313,19 +314,20 @@ func (c ErpProductFeedback) DetailData() revel.Result {
 
 	product_feedback.Sku = product.Sku
 
+	var supplier sppz_models.SupplierInfo
+	_, err = db_session.Id(product_feedback.SupplierId).Get(&supplier)
+	core.HandleError(err)
+
 	var detail_form ProductFeedbackDetailForm
 	detail_form.ProductFeedback = product_feedback
+	detail_form.SupplierName = supplier.Name
 
 	var product_feedback_cate_list = make([]spzl_models.ProductFeedbackCateInfo, 0)
 	core.HandleError(db_session.OrderBy("id ASC").Find(&product_feedback_cate_list))
 
-	var supplier_list = make([]sppz_models.SupplierInfo, 0)
-	core.HandleError(db_session.OrderBy("name ASC").Find(&supplier_list))
-
 	return c.RenderJson(map[string]interface{}{
 		"detail":                     detail_form,
 		"product_feedback_cate_list": product_feedback_cate_list,
-		"supplier_list":              supplier_list,
 	})
 }
 
@@ -467,4 +469,53 @@ WHERE (pf.user_id <> %d) OR (pf.user_id = %d AND pf.create_time < '%s');`
 	}
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})
+}
+
+func (c ErpProductFeedback) SupplierSelectListData() revel.Result {
+	db_session := c.DbSession
+
+	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
+
+	type supplier_view_item_t struct {
+		Supplier sppz_models.SupplierInfo `xorm:"extends" json:"s"`
+		Region   sppz_models.RegionInfo   `xorm:"extends" json:"r"`
+	}
+
+	/*
+SELECT s.*, r.*
+FROM erp_supplier s
+    LEFT JOIN erp_region r ON s.region_id = r.id
+	 */
+
+	var sb = core.NewSqlBuilder()
+	sb.Select("s.*, r.*")
+	sb.Count("count(s.id) AS supplier_count")
+	sb.From(`erp_supplier s
+    LEFT JOIN erp_region r ON s.region_id = r.id`)
+
+	sb.Where(filter)
+
+	if order != "" {
+		sb.OrderBy(order)
+	} else {
+		sb.OrderBy("o.id ASC")
+	}
+
+	sb.Limit(offset, limit)
+
+	supplier_list := make([]supplier_view_item_t, 0, limit)
+	err := db_session.Sql(sb.SqlList()).Find(&supplier_list)
+	core.HandleError(err)
+
+	var supplier_count struct {
+		Count int64 `xorm:"'supplier_count'"`
+	}
+
+	_, err = db_session.Sql(sb.SqlCount()).Get(&supplier_count)
+	core.HandleError(err)
+
+	return c.RenderJson(core.GridResult{
+		Data:  supplier_list,
+		Total: supplier_count.Count,
+	})
 }
