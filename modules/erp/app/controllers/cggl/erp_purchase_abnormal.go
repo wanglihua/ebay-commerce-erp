@@ -9,6 +9,8 @@ import (
 	"matrix/modules/auth/pass_res"
 	"matrix/modules/erp/models/cggl_models"
 	"fmt"
+	"encoding/json"
+	"matrix/modules/erp/service/inventory_service"
 )
 
 type ErpPurchaseAbnormal struct {
@@ -54,8 +56,7 @@ FROM erp_purchase_bill_entry pbe
     INNER JOIN erp_purchase_abnormal_type at ON pbe.abnormal_type_id = at.id
     INNER JOIN erp_status s ON pbe.status_id = s.id`)
 
-
-    filter = core.SqlAnd(filter, fmt.Sprintf("pbe.status_id "))
+	filter = core.SqlAnd(filter, fmt.Sprintf("pbe.status_id = %d OR pbe.status_id = %d", models.PURCHASE_BILL_STATUS_YC, models.PURCHASE_BILL_STATUS_YCL)) // 异常 和 异常已处理
 
 	sb.Where(filter)
 
@@ -134,4 +135,55 @@ func (c ErpPurchaseAbnormal) DetailData() revel.Result {
 	detail_form.ProductName = product.Name
 
 	return c.RenderJson(detail_form)
+}
+
+func (c ErpPurchaseAbnormal) Process() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.CGGL_PURCHASE_ABNORMAL, c.Session)
+
+	var db_session = c.DbSession
+
+	var detail_form PurchaseBillEntryAbnormalProcessDetailForm
+	err := json.Unmarshal(c.GetRequestBody(), &detail_form)
+	core.HandleError(err)
+
+	if detail_form.Valid(c.Validation) == false {
+		return c.RenderJson(core.JsonResult{Success: false, Message: c.GetValidationErrorMessage()})
+	}
+
+	var bill_entry_from_ui = detail_form.PurchaseBillEntry
+
+	var bill_entry_in_db cggl_models.PurchaseBillEntryInfo
+	_, err = db_session.Id(bill_entry_from_ui.Id).Get(&bill_entry_in_db)
+	core.HandleError(err)
+
+	// 检查状态
+	if bill_entry_in_db.StatusId != models.PURCHASE_BILL_STATUS_YC {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "采购单明细状态当前不是异常状态，不用进行处理！",
+		})
+	}
+
+	// 更新明细的状态
+	bill_entry_in_db.StatusId = models.PURCHASE_BILL_STATUS_YCL
+
+	if bill_entry_from_ui.AbnormalProcessResultId == cggl_models.ABNORMAL_PROCESS_RESULT_YCXRK {
+		// 更新中国仓的库存数量
+		inventory_service.AddCnInventoryQty(bill_entry_from_ui.ProductId, bill_entry_in_db.Qty-bill_entry_in_db.CheckinQty, db_session)
+		bill_entry_in_db.CheckinQty = bill_entry_in_db.Qty
+	}
+
+	bill_entry_in_db.CheckinQty = bill_entry_from_ui.CheckinQty
+	_, err = db_session.Id(bill_entry_in_db.Id).Cols("status_id", "abnormal_process_result_id", "checkin_qty", "desc").Update(&bill_entry_in_db)
+	core.HandleError(err)
+
+	return c.RenderJson(map[string]interface{}{
+		"success": true,
+		"message": "采购明细入库成功！",
+	})
+
+	return c.RenderJson(map[string]interface{}{
+		"success": true,
+		"message": "采购单异常处理成功！",
+	})
 }

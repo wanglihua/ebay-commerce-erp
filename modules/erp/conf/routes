@@ -467,6 +467,8 @@ POST /purchase/checkin/list                ErpPurchaseCheckin.CheckinList
 
 GET  /purchase/abnormal                    ErpPurchaseAbnormal.Index
 POST /purchase/abnormal/data/list          ErpPurchaseAbnormal.ListData
+POST /purchase/abnormal/detail/data        ErpPurchaseAbnormal.DetailData
+POST /purchase/abnormal/process            ErpPurchaseAbnormal.Process
 
 GET  /sales/manager                        ErpSalesManager.Index
 POST /sales/manager/data/list              ErpSalesManager.ListData
