@@ -19,12 +19,6 @@ type ErpProductPostageCalWeight struct {
 	*revel.Controller
 }
 
-func (c ErpProductPostageCalWeight) Index() revel.Result {
-	pass_service.Check_login_user_pass(pass_res.XSGL_PRODUCT_SALE_SETTING, c.Session)
-
-	return c.RenderTemplate("erp/kcgl/product_weight/product_weight_index.html")
-}
-
 func (c ErpProductPostageCalWeight) ListData() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.XSGL_PRODUCT_SALE_SETTING, c.Session)
 
@@ -150,15 +144,12 @@ func (c ErpProductPostageCalWeight) Import() revel.Result {
 		})
 	}
 
-	type product_weight_t struct {
-		sku    string
-		length float64
-		width  float64
-		height float64
-		weight float64
+	type product_postage_cal_weight_t struct {
+		sku                string
+		postage_cal_weight float64
 	}
 
-	product_weight_list := make([]product_weight_t, 0)
+	product_postage_cal_weight_list := make([]product_postage_cal_weight_t, 0)
 
 	xlsx_file, err := xlsx.OpenBinary(excel_file_bytes)
 	core.HandleError(err)
@@ -172,19 +163,15 @@ func (c ErpProductPostageCalWeight) Import() revel.Result {
 		//revel.TRACE.Printf("max_row: %d\n", max_row)
 		//略过标题行
 		for row_index := 1; row_index < max_row; row_index ++ {
-			row := sheet.Rows[row_index]
+			// row := sheet.Rows[row_index]
 
 			var cell *xlsx.Cell
 			var cell_val string
 			var err error
 
-			var product_weight product_weight_t
+			var product_postage_cal_weight product_postage_cal_weight_t
 
 			col_index := 1 //从第二列开始导入，略去第一列的编号
-
-			if len(row.Cells) < 5 {
-				break
-			}
 
 			//SKU
 			// cell = row.Cells[col_index]
@@ -196,7 +183,7 @@ func (c ErpProductPostageCalWeight) Import() revel.Result {
 				break
 			}
 			//revel.TRACE.Println(cell_val)
-			product_weight.sku = cell_val
+			product_postage_cal_weight.sku = cell_val
 			col_index++
 
 			// length
@@ -205,103 +192,40 @@ func (c ErpProductPostageCalWeight) Import() revel.Result {
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			//revel.TRACE.Println(cell_val)
-			product_length, err := strconv.ParseFloat(cell_val, 64)
+			postage_cal_weight, err := strconv.ParseFloat(cell_val, 64)
 			core.HandleError(err)
-			product_weight.length = product_length
+			product_postage_cal_weight.postage_cal_weight = postage_cal_weight
 			col_index++
 
-			// width
-			// cell = row.Cells[col_index]
-			cell = sheet.Cell(row_index, col_index)
-			cell_val, err = cell.String()
-			core.HandleError(err)
-			//revel.TRACE.Println(cell_val)
-			product_width, err := strconv.ParseFloat(cell_val, 64)
-			core.HandleError(err)
-			product_weight.width = product_width
-			col_index++
-
-			// height
-			// cell = row.Cells[col_index]
-			cell = sheet.Cell(row_index, col_index)
-			cell_val, err = cell.String()
-			core.HandleError(err)
-			//revel.TRACE.Println(cell_val)
-			product_height, err := strconv.ParseFloat(cell_val, 64)
-			core.HandleError(err)
-			product_weight.height = product_height
-			col_index++
-
-			// weight
-			// cell = row.Cells[col_index]
-			cell = sheet.Cell(row_index, col_index)
-			cell_val, err = cell.String()
-			core.HandleError(err)
-			//revel.TRACE.Println(cell_val)
-			weight, err := strconv.ParseFloat(cell_val, 64)
-			core.HandleError(err)
-			product_weight.weight = weight
-			col_index++
-
-			product_weight_list = append(product_weight_list, product_weight)
+			product_postage_cal_weight_list = append(product_postage_cal_weight_list, product_postage_cal_weight)
 		}
 	}
 
-	if len(product_weight_list) == 0 {
+	if len(product_postage_cal_weight_list) == 0 {
 		return c.RenderJson(map[string]interface{}{
 			"success": false,
 			"message": "Excel文件中导入商品列表为空！",
 		})
 	}
 
-	has_zero_data := false
-	for _, product_weight := range product_weight_list {
+	for _, product_weight := range product_postage_cal_weight_list {
 		var product kcgl_models.ProductInfo
 		has, err := db_session.Where(fmt.Sprintf("sku = '%s'", product_weight.sku)).Get(&product)
 		core.HandleError(err)
 
 		product.Sku = product_weight.sku
-		product.Length = product_weight.length
-		product.Width = product_weight.width
-		product.Height = product_weight.height
-		product.Weight = product_weight.weight
-
-		if product_weight.length == 0 || product_weight.width == 0 || product_weight.height == 0 || product_weight.weight == 0 {
-			has_zero_data = true
-		}
+		product.PostageCalWeight = product_weight.postage_cal_weight
 
 		if has == true {
-			update_col_list := []string{"length", "width", "height", "weight"}
-			_, err = db_session.Id(product.Id).Cols(update_col_list...).Update(&product)
+			_, err = db_session.Id(product.Id).Cols("postage_cal_weight").Update(&product)
 			core.HandleError(err)
 		} else {
-			/*
-			// 这里只用于维护和更新长宽高数据，不进行数据的插入操作
-			return c.RenderJson(map[string]interface{}{
-				"success": true,
-				"message": "商品SKU数据库中不存在！",
-			})
-			*/
-
 			panic(fmt.Sprintf("商品SKU %s 数据库中不存在！", product_weight.sku))
-
-			/*
-			product.CnName = product.Sku
-			product.Name = product.Sku
-			product.StatusId = models.PRODUCT_STATUS_ZC
-			_, err = db_session.Insert(&product)
-			core.HandleError(err)
-			*/
 		}
-	}
-
-	message := "数据导入成功！"
-	if has_zero_data == true {
-		message = "数据导入成功, 部分长宽高数据为零！"
 	}
 
 	return c.RenderJson(map[string]interface{}{
 		"success": true,
-		"message": message,
+		"message": "数据导入成功！",
 	})
 }
