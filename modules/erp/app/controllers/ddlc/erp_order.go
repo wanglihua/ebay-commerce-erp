@@ -1159,24 +1159,56 @@ func (c ErpOrder) PeiHuo() revel.Result {
 	order_id_list := make([]int64, 0)
 	c.Params.Bind(&order_id_list, "id_list")
 
-	count, err := db_session.Where(fmt.Sprintf("status_id = %d", models.ORDER_STATUS_PHZ)).Count(&ddlc_models.OrderInfo{})
-	core.HandleError(err)
-
-	if count != 0 {
-		return c.RenderJson(map[string]interface{}{
-			"success": false,
-			"message": "有订单还在配货中，不能搬至已配货！",
-		})
-	}
-
 	var order_list = make([]ddlc_models.OrderInfo, 0)
 
 	if len(order_id_list) != 0 {
-		err = db_session.In("id", order_id_list).Find(&order_list)
+		err := db_session.In("id", order_id_list).Find(&order_list)
 		core.HandleError(err)
 	} else {
-		err = db_session.Where(fmt.Sprintf("status_id = %d", models.ORDER_STATUS_DPH)).Find(&order_list)
+		err := db_session.Where(fmt.Sprintf("status_id = %d", models.ORDER_STATUS_DPH)).Find(&order_list)
 		core.HandleError(err)
+	}
+
+	var login_user_stock_id_list = stock_pick_crew_service.Get_login_user_stock_id_list(db_session, c.Session)
+
+	// 检查用户对发货仓库是否有查看权限
+	for _, order := range order_list {
+		var has_stock = false
+		for _, stock_id := range login_user_stock_id_list {
+			if order.StockId == stock_id {
+				has_stock = true
+				break
+			}
+		}
+
+		if has_stock == false {
+			return c.RenderJson(map[string]interface{}{
+				"success": false,
+				"message": "有的订单的发货仓库，当前用户没权限查看！",
+			})
+		}
+	}
+
+	// 检查有权限的仓库当前是不是有配货中的订单
+
+	if len(login_user_stock_id_list) != 0 {
+		count, err := db_session.
+		In("stock_id", login_user_stock_id_list).
+			Where(fmt.Sprintf("status_id = %d", models.ORDER_STATUS_PHZ)).
+			Count(&ddlc_models.OrderInfo{})
+		core.HandleError(err)
+
+		if count != 0 {
+			return c.RenderJson(map[string]interface{}{
+				"success": false,
+				"message": "有订单还在配货中，不能搬至已配货！",
+			})
+		}
+	} else {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "当前用户没权限查看任何仓库，不能搬动订单至配货中！",
+		})
 	}
 
 	for _, order := range order_list {
@@ -1196,7 +1228,7 @@ func (c ErpOrder) PeiHuo() revel.Result {
 
 	for _, order := range order_list {
 		order.StatusId = models.ORDER_STATUS_PHZ
-		_, err = db_session.Id(order.Id).Cols("status_id").Update(&order)
+		_, err := db_session.Id(order.Id).Cols("status_id").Update(&order)
 		core.HandleError(err)
 
 		order_history_service.Insert_order_history(order, login_user.UserId, fmt.Sprintf("订单配货， 工号： %s", login_user.LoginName), db_session)

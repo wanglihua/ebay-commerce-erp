@@ -71,9 +71,9 @@ func get_login_user_stock_id_t_list(db_session *xorm.Session, web_session revel.
 	var is_custom_service = pass_service.Is_user_custom_service(login_user.UserId) // 是不是客服
 
 	var get_stock_id_list_sql = ``
-	if login_user.IsSuperAdmin == false && is_admin == false && is_custom_service == false && is_sales == false { // 管理员，客服，销售 可以看到所有仓库的订单
+	if login_user.IsSuperAdmin == false && is_admin == false && is_custom_service == false && is_sales == false {
 		get_stock_id_list_sql = fmt.Sprintf(`SELECT spc.stock_id AS stock_id FROM erp_stock_pick_crew spc WHERE spc.user_id = %d`, login_user.UserId)
-	} else {
+	} else { // 管理员，客服，销售 可以看到所有仓库的订单
 		get_stock_id_list_sql = `SELECT s.id AS stock_id FROM erp_stock s`
 	}
 
