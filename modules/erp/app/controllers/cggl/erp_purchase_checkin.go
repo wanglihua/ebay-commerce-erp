@@ -92,7 +92,8 @@ func (c ErpPurchaseCheckin) ListData() revel.Result {
     INNER JOIN erp_product p ON pbe.product_id = p.id
     INNER JOIN erp_status s ON pbe.status_id = s.id`)
 
-	filter = core.SqlAnd(filter, fmt.Sprintf("pbe.status_id = %d", models.PURCHASE_BILL_STATUS_CGZ))
+	filter = core.SqlAnd(filter, fmt.Sprintf("pbe.status_id = %d OR pbe.status_id = %d OR pbe.status_id = %d ",
+		models.PURCHASE_BILL_STATUS_CGZ, models.PURCHASE_BILL_STATUS_YRK, models.PURCHASE_BILL_STATUS_YC))
 
 	if bill_code_query != "" {
 		filter = core.SqlAnd(filter, fmt.Sprintf("pb.code = '%s'", bill_code_query))

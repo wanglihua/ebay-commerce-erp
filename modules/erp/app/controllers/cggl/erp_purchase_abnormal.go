@@ -166,21 +166,28 @@ func (c ErpPurchaseAbnormal) Process() revel.Result {
 
 	// 更新明细的状态
 	bill_entry_in_db.StatusId = models.PURCHASE_BILL_STATUS_YCL
+	bill_entry_in_db.AbnormalProcessResultId = bill_entry_from_ui.AbnormalProcessResultId
+	bill_entry_in_db.Desc = bill_entry_from_ui.Desc
 
-	if bill_entry_from_ui.AbnormalProcessResultId == cggl_models.ABNORMAL_PROCESS_RESULT_YCXRK {
+	if bill_entry_from_ui.AbnormalProcessResultId == cggl_models.ABNORMAL_PROCESS_RESULT_WCL {
+		_, err = db_session.Id(bill_entry_in_db.Id).Cols("desc").Update(&bill_entry_in_db)
+		core.HandleError(err)
+
+		return c.RenderJson(map[string]interface{}{
+			"success": true,
+			"message": "采购单异常未处理！",
+		})
+	}
+
+	if bill_entry_from_ui.AbnormalProcessResultId == cggl_models.ABNORMAL_PROCESS_RESULT_YCXRK { // 已重新入库
 		// 更新中国仓的库存数量
 		inventory_service.AddCnInventoryQty(bill_entry_from_ui.ProductId, bill_entry_in_db.Qty-bill_entry_in_db.CheckinQty, db_session)
 		bill_entry_in_db.CheckinQty = bill_entry_in_db.Qty
 	}
 
 	bill_entry_in_db.CheckinQty = bill_entry_from_ui.CheckinQty
-	_, err = db_session.Id(bill_entry_in_db.Id).Cols("status_id", "abnormal_process_result_id", "checkin_qty", "desc").Update(&bill_entry_in_db)
+	_, err = db_session.Id(bill_entry_in_db.Id).Cols("status_id", "abnormal_process_result_id", "desc", "checkin_qty").Update(&bill_entry_in_db)
 	core.HandleError(err)
-
-	return c.RenderJson(map[string]interface{}{
-		"success": true,
-		"message": "采购明细入库成功！",
-	})
 
 	return c.RenderJson(map[string]interface{}{
 		"success": true,

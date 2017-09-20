@@ -53,7 +53,7 @@ FROM erp_purchase_bill pb
     INNER JOIN auth_user u ON pb.user_id = u.id
     INNER JOIN erp_status s ON pb.status_id = s.id`)
 
-	filter = core.SqlAnd(filter, fmt.Sprintf("status_id = %d", models.PURCHASE_BILL_STATUS_YSP))
+	filter = core.SqlAnd(filter, fmt.Sprintf("pb.status_id = %d OR pb.status_id =%d", models.PURCHASE_BILL_STATUS_YSP, models.PURCHASE_BILL_STATUS_CGZ))
 
 	sql_builder.Where(filter)
 

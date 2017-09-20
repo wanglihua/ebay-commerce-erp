@@ -103,7 +103,7 @@
                                         <div class="form-group">
                                             <label for="checkin_qty" class="col-xs-2 control-label">入库数量</label>
                                             <div class="col-xs-10">
-                                                <input id="checkin_qty" name="purchase_bill_entry_detail.purchase_bill_entry.checkin_qty" type="text" class="input-sm form-control" v-model.number="purchase_bill_entry_detail.purchase_bill_entry.checkin_qty"/>
+                                                <input id="checkin_qty" name="purchase_bill_entry_detail.purchase_bill_entry.checkin_qty" type="text" class="input-sm form-control" v-model.number="purchase_bill_entry_detail.purchase_bill_entry.checkin_qty" disabled="disabled"/>
                                             </div>
                                         </div>
                                     </div>
@@ -140,7 +140,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-success btn-sm" onclick="checkin()">
+                    <button type="button" class="btn btn-success btn-sm" onclick="process()">
                         <i class="ace-icon fa fa-floppy-o"></i>确认
                     </button>
                     <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">
@@ -188,7 +188,7 @@
                                 return "<div>" + data + "</div>";
                             }
                         },
-                        {"mDataProp": "pbe.qty", "title": "数量", "bSearchable": false, "width": 80},
+                        {"mDataProp": "pbe.qty", "title": "数量", "bSearchable": false, "sClass": "center", "width": 60},
                         {"mDataProp": "pbe.purchase_time", "title": "采购时间", "bSearchable": false, "width": 120},
                         {"mDataProp": "pbe.checkin_time", "title": "入库时间", "bSearchable": false, "width": 120},
                         {

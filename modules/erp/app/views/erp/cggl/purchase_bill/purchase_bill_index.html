@@ -460,22 +460,31 @@
                                 return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
                             }
                         },
-                        {"mDataProp": "p.sku", "title": "SKU", "bSearchable": false, "width": 100},
+                        {"mDataProp": "p.sku", "title": "SKU", "bSearchable": false, "width": 150},
                         {
                             "mDataProp": "p.cn_name", "title": "商品名称", "bSearchable": false, "sClass": "word-wrap",
                             "render": function (data, type, row) {
                                 return "<div>" + data + "</div>"
                             }
                         },
-                        {"mDataProp": "pbe.price", "title": "单价", "bSearchable": false},
-                        {"mDataProp": "pbe.mel_qty", "title": "MEL数量", "bSearchable": false},
-                        {"mDataProp": "pbe.bne_qty", "title": "BNE数量", "bSearchable": false},
-                        {"mDataProp": "pbe.qty", "title": "总数量", "bSearchable": false},
-                        {"mDataProp": "pbe.amount", "title": "金额", "bSearchable": false},
-                        {"mDataProp": "pbe.purchase_time", "title": "采购时间", "bSearchable": false},
-                        {"mDataProp": "pbe.checkin_time", "title": "入库时间", "bSearchable": false},
-                        {"mDataProp": "pbe.desc", "title": "备注", "bSearchable": true},
-                        {"mDataProp": "s.name", "title": "状态", "bSearchable": true},
+                        {"mDataProp": "pbe.price", "title": "单价", "bSearchable": false, "sClass": "center", "width": 50},
+                        {"mDataProp": "pbe.mel_qty", "title": "MEL数量", "bSearchable": false, "sClass": "center", "width": 80},
+                        {"mDataProp": "pbe.bne_qty", "title": "BNE数量", "bSearchable": false, "sClass": "center", "width": 80},
+                        {"mDataProp": "pbe.qty", "title": "总数量", "bSearchable": false, "sClass": "center", "width": 70},
+                        {"mDataProp": "pbe.amount", "title": "金额", "bSearchable": false, "sClass": "center", "width": 50},
+                        {"mDataProp": "pbe.purchase_time", "title": "采购时间", "bSearchable": false, "sClass": "center", "width": 120},
+                        {"mDataProp": "pbe.checkin_time", "title": "入库时间", "bSearchable": false, "sClass": "center", "width": 120},
+                        {
+                            "mDataProp": "pbe.desc", "title": "备注", "bSearchable": true, "sClass": "word-wrap",
+                            "render": function (data, type, row) {
+                                if (data === null) {
+                                    return "";
+                                } else {
+                                    return "<div>" + data + "</div>"
+                                }
+                            }
+                        },
+                        {"mDataProp": "s.name", "title": "状态", "bSearchable": true, "sClass": "center", "width": 50},
                         {"mDataProp": "pbe.create_time", "title": "创建时间", "bSearchable": false, "width": 120},
                         {"mDataProp": "pbe.update_time", "title": "修改时间", "bSearchable": false, "width": 120}
                     ],
