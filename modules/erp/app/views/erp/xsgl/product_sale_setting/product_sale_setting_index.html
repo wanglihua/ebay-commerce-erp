@@ -179,7 +179,12 @@
                         }
                         //<div class="tdSkuNameSup"><a href="/product/detail/' + row.prd.id + '" target="_blank">' + row.prd.sku + '</a></div>
                     },
-                    {"mDataProp": "p.cn_name", "title": "商品名称", "bSearchable": true},
+                    {
+                        "mDataProp": "p.cn_name", "title": "商品名称", "bSearchable": true, "sClass": "wrap-word",
+                        "render": function (data, type, row) {
+                            return "<div>" + data + "</div>";
+                        }
+                    },
                     {
                         "mDataProp": "p.postage_cal_weight", "title": "运费权重", "bSearchable": false, "width": 80, "sClass": "center",
                         "render": function (data, type, row) {

@@ -373,7 +373,7 @@ func (c ErpProductPostageCalWeight) export_product_list_to_excel(db_session *xor
 		col_index++
 
 		cell = row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 30)
+		sheet.SetColWidth(col_index, col_index, 50)
 		set_head_cell_style(cell)
 		cell.Value = "中文名称"
 		col_index++
@@ -402,13 +402,13 @@ func (c ErpProductPostageCalWeight) export_product_list_to_excel(db_session *xor
 
 		// 中文名称
 		cell = row.AddCell()
-		set_text_cell_style(cell, "center")
+		set_text_cell_style(cell, "left")
 		cell.Value = product.CnName
 
 		// 运费权重
 		cell = row.AddCell()
 		set_text_cell_style(cell, "right")
-		cell.Value = fmt.Sprintf("%0.2f", product.Length)
+		cell.Value = fmt.Sprintf("%0.2f", product.PostageCalWeight)
 
 		// 状态
 		cell = row.AddCell()
