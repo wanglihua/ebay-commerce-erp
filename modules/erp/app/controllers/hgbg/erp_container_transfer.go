@@ -51,7 +51,7 @@ func (c ErpContainerTransfer) ListData() revel.Result {
 
 	type container_transfer_view_item_t struct {
 		hgbg_models.ContainerTransferInfo `xorm:"extends" json:"ct"`
-		models.StatusInfo            `xorm:"extends" json:"s"`
+		models.StatusInfo                 `xorm:"extends" json:"s"`
 	}
 
 	query := db_session.
@@ -84,11 +84,11 @@ func (c ErpContainerTransfer) ListData() revel.Result {
 }
 
 type ContainerTransferDetailForm struct {
-	ContainerTransfer       hgbg_models.ContainerTransferInfo              `json:"transfer"`
-	StartPortList           []hgbg_models.ContainerTransferStartPortInfo   `json:"start_port_list"`
-	DestPortList            []hgbg_models.ContainerTransferDestPortInfo    `json:"dest_port_list"`
-	LwhwZeroProductSkuList  []string                                  `json:"lwhw_zero_product_sku_list"`
-	LwhwZeroProductSkuCount int                                       `json:"lwhw_zero_product_sku_count"`
+	ContainerTransfer       hgbg_models.ContainerTransferInfo            `json:"transfer"`
+	StartPortList           []hgbg_models.ContainerTransferStartPortInfo `json:"start_port_list"`
+	DestPortList            []hgbg_models.ContainerTransferDestPortInfo  `json:"dest_port_list"`
+	LwhwZeroProductSkuList  []string                                     `json:"lwhw_zero_product_sku_list"`
+	LwhwZeroProductSkuCount int                                          `json:"lwhw_zero_product_sku_count"`
 }
 
 func (f *ContainerTransferDetailForm) IsCreate() bool {
@@ -334,7 +334,7 @@ func (c ErpContainerTransfer) Save() revel.Result {
 	} else {
 		if ct_in_db.StatusId == models.CONTAINER_TRANSFER_STATUS_DEPART {
 			affected, err = db_session.Id(container_transfer.Id).
-				Cols("departure_time", "stock_time", "au_hd", "au_hd_invoice_no", "au_hd_invoice_amount", "au_hg_entry_date", "au_hd_invoice_pay_time").
+				Cols("departure_time", "stock_time", "au_hd", "au_hd_invoice_no", "au_hd_invoice_amount", "au_hg_entry_date", "au_hd_invoice_pay_time", "description").
 				Update(&container_transfer)
 			core.HandleError(err)
 		} else {

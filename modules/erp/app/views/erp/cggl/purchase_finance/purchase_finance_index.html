@@ -67,7 +67,11 @@
                         {
                             "mDataProp": "pb.desc", "title": "备注", "bSearchable": true, "sClass": "wrap-word",
                             "render": function (data, type, row) {
-                                return "<div>" + data + "</div>";
+                                if (data === null) {
+                                    return "";
+                                } else {
+                                    return "<div>" + data + "</div>";
+                                }
                             }
                         },
                         {"mDataProp": "u.nick_name", "title": "操作人", "bSearchable": false, "width": 75},

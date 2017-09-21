@@ -145,6 +145,12 @@ POST /product/weight/import                ErpProductWeight.Import
 
 POST /product/weight/export                ErpProductWeightExport.Export
 
+POST /product/postage/cal/weight/data/list      ErpProductPostageCalWeight.ListData
+POST /product/postage/cal/weight/data/detail    ErpProductPostageCalWeight.DetailData
+POST /product/postage/cal/weight/save           ErpProductPostageCalWeight.Save
+POST /product/postage/cal/weight/import         ErpProductPostageCalWeight.Import
+POST /product/postage/cal/weight/export         ErpProductPostageCalWeight.Export
+
 GET  /product/import                       ErpProductImport.Index
 POST /product/import/data/page             ErpProductImport.PageData
 POST /product/import/data/list             ErpProductImport.ListData
