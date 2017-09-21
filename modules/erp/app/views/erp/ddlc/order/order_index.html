@@ -183,14 +183,24 @@
                                     </template>
                                 </select>
                                 */%}
-                                <select id="query_criteria_id" name="page.query_criteria_id" v-model.number="page.query_criteria_id" style="width:120px;">
-                                    <option value="0">-查询条件-</option>
+
+                                <select id="query_criteria_id1" name="page.query_criteria_id1" v-model.number="page.query_criteria_id1" style="width:120px;">
+                                    <option value="0">-查询条件1-</option>
                                     <template v-for="criteria in page.query_criteria_list">
                                         <option :value="criteria.id">{{criteria.name}}</option>
                                     </template>
                                 </select>
-                                <input id="query_criteria_value" name="query_criteria_value" v-model="page.query_criteria_value" style="width: 120px;height:30px;"/>
-                                <select id="good_query_id" name="page.query_criteria_id" v-model.number="page.good_query_id" style="width:120px;">
+                                <input id="query_criteria_value1" name="query_criteria_value1" v-model="page.query_criteria_value1" style="width: 120px;height:30px;" placeholder="查询条件1"/>
+
+                                <select id="query_criteria_id2" name="page.query_criteria_id2" v-model.number="page.query_criteria_id2" style="width:120px;">
+                                    <option value="0">-查询条件2-</option>
+                                    <template v-for="criteria in page.query_criteria_list">
+                                        <option :value="criteria.id">{{criteria.name}}</option>
+                                    </template>
+                                </select>
+                                <input id="query_criteria_value2" name="query_criteria_value2" v-model="page.query_criteria_value2" style="width: 120px;height:30px;" placeholder="查询条件2"/>
+
+                                <select id="good_query_id" name="page.good_query_id" v-model.number="page.good_query_id" style="width:120px;">
                                     <option value="0">-优化查询-</option>
                                     <template v-for="query in page.good_query_list">
                                         <option :value="query.id">{{query.name}}</option>
@@ -480,9 +490,11 @@
                 "order_type_list": [],
                 "status_id": 0,
                 "status_list": [],
-                "query_criteria_id": 0,
+                "query_criteria_id1": 0,
+                "query_criteria_id2": 0,
                 "query_criteria_list": [],
-                "query_criteria_value": "",
+                "query_criteria_value1": "",
+                "query_criteria_value2": "",
                 "good_query_id": 0,
                 "good_query_list": [],
                 "special_hold_type_list": [],
@@ -738,8 +750,10 @@
                         aoData.push({'name': 'shop_id', 'value': this_vm.page.shop_id});
                         aoData.push({'name': 'order_type_id', 'value': this_vm.page.order_type_id});
                         aoData.push({'name': 'status_id', 'value': this_vm.page.status_id});
-                        aoData.push({'name': 'query_criteria_id', 'value': this_vm.page.query_criteria_id});
-                        aoData.push({'name': 'query_criteria_value', 'value': this_vm.page.query_criteria_value});
+                        aoData.push({'name': 'query_criteria_id1', 'value': this_vm.page.query_criteria_id1});
+                        aoData.push({'name': 'query_criteria_id2', 'value': this_vm.page.query_criteria_id2});
+                        aoData.push({'name': 'query_criteria_value1', 'value': this_vm.page.query_criteria_value1});
+                        aoData.push({'name': 'query_criteria_value2', 'value': this_vm.page.query_criteria_value2});
                         aoData.push({'name': 'good_query_id', 'value': this_vm.page.good_query_id});
                         aoData.push({'name': 'special_hold_type_id', 'value': this_vm.page.special_hold_type_id});
                         aoData.push({'name': 'hold_type_id', 'value': this_vm.page.hold_type_id});

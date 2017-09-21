@@ -279,7 +279,8 @@ func (c ErpOrder) PageData() revel.Result {
 		"order_type_list":        order_type_list,
 		"status_id":              0,
 		"status_list":            status_list,
-		"query_criteria_id":      0,
+		"query_criteria_id1":     0,
+		"query_criteria_id2":     0,
 		"query_criteria_list":    c.get_order_query_criteria_list(),
 		"good_query_id":          0,
 		"good_query_list":        c.get_good_query_list(),
@@ -306,11 +307,17 @@ func (c ErpOrder) ListData() revel.Result {
 	var status string //all，yzf, dph, phz, yfh, ywc
 	c.Params.Bind(&status, "status")
 
-	var query_criteria_id int64 = 0
-	c.Params.Bind(&query_criteria_id, "query_criteria_id")
-	var query_criteria_value string = ""
-	c.Params.Bind(&query_criteria_value, "query_criteria_value")
-	query_criteria_value = strings.TrimSpace(query_criteria_value)
+	var query_criteria_id1 int64 = 0
+	c.Params.Bind(&query_criteria_id1, "query_criteria_id1")
+	var query_criteria_value1 string = ""
+	c.Params.Bind(&query_criteria_value1, "query_criteria_value1")
+	query_criteria_value1 = strings.TrimSpace(query_criteria_value1)
+
+	var query_criteria_id2 int64 = 0
+	c.Params.Bind(&query_criteria_id2, "query_criteria_id2")
+	var query_criteria_value2 string = ""
+	c.Params.Bind(&query_criteria_value2, "query_criteria_value2")
+	query_criteria_value2 = strings.TrimSpace(query_criteria_value2)
 
 	var good_query_id int64 = 0
 	c.Params.Bind(&good_query_id, "good_query_id")
@@ -443,13 +450,13 @@ func (c ErpOrder) ListData() revel.Result {
 		filter = core.SqlAnd(filter, fmt.Sprintf("o.type_id = %d", order_type_id))
 	}
 
-	if query_criteria_id != 0 {
-		if query_criteria_id == order_query_criteria_order_code {
-			filter = core.SqlAnd(filter, fmt.Sprintf("o.code like '%%%s%%'", query_criteria_value))
-		} else if query_criteria_id == order_query_criteria_order_number {
-			filter = core.SqlAnd(filter, fmt.Sprintf("o.full_tran_id like '%%%s%%'", query_criteria_value))
-		} else if query_criteria_id == order_query_criteria_product_sku {
-			order_id_list := order_service.Get_order_id_list_by_product_sku_query(db_session, query_criteria_value)
+	if query_criteria_id1 != 0 {
+		if query_criteria_id1 == order_query_criteria_order_code {
+			filter = core.SqlAnd(filter, fmt.Sprintf("o.code like '%%%s%%'", query_criteria_value1))
+		} else if query_criteria_id1 == order_query_criteria_order_number {
+			filter = core.SqlAnd(filter, fmt.Sprintf("o.full_tran_id like '%%%s%%'", query_criteria_value1))
+		} else if query_criteria_id1 == order_query_criteria_product_sku {
+			order_id_list := order_service.Get_order_id_list_by_product_sku_query(db_session, query_criteria_value1)
 
 			var order_id_strs = "0"
 			if len(order_id_list) != 0 {
@@ -457,8 +464,8 @@ func (c ErpOrder) ListData() revel.Result {
 				order_id_strs = strings.Join(order_id_str_list, ",")
 			}
 			filter = core.SqlAnd(filter, fmt.Sprintf("o.id IN (%s)", order_id_strs))
-		} else if query_criteria_id == order_query_criteria_product_name {
-			order_id_list := order_service.Get_order_id_list_by_product_name_query(db_session, query_criteria_value)
+		} else if query_criteria_id1 == order_query_criteria_product_name {
+			order_id_list := order_service.Get_order_id_list_by_product_name_query(db_session, query_criteria_value1)
 
 			var order_id_strs = "0"
 			if len(order_id_list) != 0 {
@@ -466,33 +473,86 @@ func (c ErpOrder) ListData() revel.Result {
 				order_id_strs = strings.Join(order_id_str_list, ",")
 			}
 			filter = core.SqlAnd(filter, fmt.Sprintf("o.id IN (%s)", order_id_strs))
-		} else if query_criteria_id == order_query_criteria_buyer_user_id {
-			filter = core.SqlAnd(filter, fmt.Sprintf("o.buyer_user_id like '%%%s%%'", query_criteria_value))
-		} else if query_criteria_id == order_query_criteria_stock_name {
+		} else if query_criteria_id1 == order_query_criteria_buyer_user_id {
+			filter = core.SqlAnd(filter, fmt.Sprintf("o.buyer_user_id like '%%%s%%'", query_criteria_value1))
+		} else if query_criteria_id1 == order_query_criteria_stock_name {
 			// SELECT * FROM erp_order o WHERE o.stock_id IN (SELECT s.id FROM erp_stock s WHERE s.name LIKE '%name%')
-			filter = core.SqlAnd(filter, fmt.Sprintf("o.stock_id IN (SELECT s.id FROM erp_stock s WHERE s.name LIKE '%%%s%%')", query_criteria_value))
-		} else if query_criteria_id == order_query_criteria_logistics_mode_name {
+			filter = core.SqlAnd(filter, fmt.Sprintf("o.stock_id IN (SELECT s.id FROM erp_stock s WHERE s.name LIKE '%%%s%%')", query_criteria_value1))
+		} else if query_criteria_id1 == order_query_criteria_logistics_mode_name {
 			// SELECT * FROM erp_order o WHERE o.mode_id IN (SELECT lm.id FROM erp_logistics_mode lm WHERE lm.name LIKE '%name%')
-			filter = core.SqlAnd(filter, fmt.Sprintf("o.mode_id IN (SELECT lm.id FROM erp_logistics_mode lm WHERE lm.name LIKE '%%%s%%')", query_criteria_value))
-		} else if query_criteria_id == order_query_criteria_waybill_number {
+			filter = core.SqlAnd(filter, fmt.Sprintf("o.mode_id IN (SELECT lm.id FROM erp_logistics_mode lm WHERE lm.name LIKE '%%%s%%')", query_criteria_value1))
+		} else if query_criteria_id1 == order_query_criteria_waybill_number {
 			//waybill_number
-			filter = core.SqlAnd(filter, fmt.Sprintf("o.waybill_number like '%%%s%%'", query_criteria_value))
-		} else if query_criteria_id == order_query_criteria_buyer_email {
-			filter = core.SqlAnd(filter, fmt.Sprintf("o.buyer_email like '%%%s%%'", query_criteria_value))
-		} else if query_criteria_id == order_query_criteria_buyer_email_accurate {
-			filter = core.SqlAnd(filter, fmt.Sprintf("o.buyer_email = '%s'", query_criteria_value))
-		} else if query_criteria_id == order_query_criteria_buyer_phone {
+			filter = core.SqlAnd(filter, fmt.Sprintf("o.waybill_number like '%%%s%%'", query_criteria_value1))
+		} else if query_criteria_id1 == order_query_criteria_buyer_email {
+			filter = core.SqlAnd(filter, fmt.Sprintf("o.buyer_email like '%%%s%%'", query_criteria_value1))
+		} else if query_criteria_id1 == order_query_criteria_buyer_email_accurate {
+			filter = core.SqlAnd(filter, fmt.Sprintf("o.buyer_email = '%s'", query_criteria_value1))
+		} else if query_criteria_id1 == order_query_criteria_buyer_phone {
 			// SELECT osa.order_id FROM erp_order_shipping_address osa WHERE osa.phone LIKE '%123%';
-			filter = core.SqlAnd(filter, fmt.Sprintf("o.id IN (SELECT osa.order_id FROM erp_order_shipping_address osa WHERE osa.phone LIKE '%%%s%%')", query_criteria_value))
-		} else if query_criteria_id == order_query_criteria_buyer_phone_accurate {
+			filter = core.SqlAnd(filter, fmt.Sprintf("o.id IN (SELECT osa.order_id FROM erp_order_shipping_address osa WHERE osa.phone LIKE '%%%s%%')", query_criteria_value1))
+		} else if query_criteria_id1 == order_query_criteria_buyer_phone_accurate {
 			// SELECT osa.order_id FROM erp_order_shipping_address osa WHERE osa.phone = '123';
-			filter = core.SqlAnd(filter, fmt.Sprintf("o.id IN (SELECT osa.order_id FROM erp_order_shipping_address osa WHERE osa.phone = '%s')", query_criteria_value))
-		} else if query_criteria_id == order_query_criteria_buyer_name {
+			filter = core.SqlAnd(filter, fmt.Sprintf("o.id IN (SELECT osa.order_id FROM erp_order_shipping_address osa WHERE osa.phone = '%s')", query_criteria_value1))
+		} else if query_criteria_id1 == order_query_criteria_buyer_name {
 			// SELECT osa.order_id FROM erp_order_shipping_address osa WHERE osa.name LIKE '%123%';
-			filter = core.SqlAnd(filter, fmt.Sprintf("o.id IN (SELECT osa.order_id FROM erp_order_shipping_address osa WHERE osa.name LIKE '%%%s%%')", query_criteria_value))
-		} else if query_criteria_id == order_query_criteria_buyer_name_accurate {
+			filter = core.SqlAnd(filter, fmt.Sprintf("o.id IN (SELECT osa.order_id FROM erp_order_shipping_address osa WHERE osa.name LIKE '%%%s%%')", query_criteria_value1))
+		} else if query_criteria_id1 == order_query_criteria_buyer_name_accurate {
 			// SELECT osa.order_id FROM erp_order_shipping_address osa WHERE osa.name = '123';
-			filter = core.SqlAnd(filter, fmt.Sprintf("o.id IN (SELECT osa.order_id FROM erp_order_shipping_address osa WHERE osa.name = '%s')", query_criteria_value))
+			filter = core.SqlAnd(filter, fmt.Sprintf("o.id IN (SELECT osa.order_id FROM erp_order_shipping_address osa WHERE osa.name = '%s')", query_criteria_value1))
+		}
+	}
+
+	if query_criteria_id2 != 0 {
+		if query_criteria_id2 == order_query_criteria_order_code {
+			filter = core.SqlAnd(filter, fmt.Sprintf("o.code like '%%%s%%'", query_criteria_value2))
+		} else if query_criteria_id2 == order_query_criteria_order_number {
+			filter = core.SqlAnd(filter, fmt.Sprintf("o.full_tran_id like '%%%s%%'", query_criteria_value2))
+		} else if query_criteria_id2 == order_query_criteria_product_sku {
+			order_id_list := order_service.Get_order_id_list_by_product_sku_query(db_session, query_criteria_value2)
+
+			var order_id_strs = "0"
+			if len(order_id_list) != 0 {
+				order_id_str_list := core.Int_list_to_str_list(order_id_list)
+				order_id_strs = strings.Join(order_id_str_list, ",")
+			}
+			filter = core.SqlAnd(filter, fmt.Sprintf("o.id IN (%s)", order_id_strs))
+		} else if query_criteria_id2 == order_query_criteria_product_name {
+			order_id_list := order_service.Get_order_id_list_by_product_name_query(db_session, query_criteria_value2)
+
+			var order_id_strs = "0"
+			if len(order_id_list) != 0 {
+				order_id_str_list := core.Int_list_to_str_list(order_id_list)
+				order_id_strs = strings.Join(order_id_str_list, ",")
+			}
+			filter = core.SqlAnd(filter, fmt.Sprintf("o.id IN (%s)", order_id_strs))
+		} else if query_criteria_id2 == order_query_criteria_buyer_user_id {
+			filter = core.SqlAnd(filter, fmt.Sprintf("o.buyer_user_id like '%%%s%%'", query_criteria_value2))
+		} else if query_criteria_id2 == order_query_criteria_stock_name {
+			// SELECT * FROM erp_order o WHERE o.stock_id IN (SELECT s.id FROM erp_stock s WHERE s.name LIKE '%name%')
+			filter = core.SqlAnd(filter, fmt.Sprintf("o.stock_id IN (SELECT s.id FROM erp_stock s WHERE s.name LIKE '%%%s%%')", query_criteria_value2))
+		} else if query_criteria_id2 == order_query_criteria_logistics_mode_name {
+			// SELECT * FROM erp_order o WHERE o.mode_id IN (SELECT lm.id FROM erp_logistics_mode lm WHERE lm.name LIKE '%name%')
+			filter = core.SqlAnd(filter, fmt.Sprintf("o.mode_id IN (SELECT lm.id FROM erp_logistics_mode lm WHERE lm.name LIKE '%%%s%%')", query_criteria_value2))
+		} else if query_criteria_id2 == order_query_criteria_waybill_number {
+			//waybill_number
+			filter = core.SqlAnd(filter, fmt.Sprintf("o.waybill_number like '%%%s%%'", query_criteria_value2))
+		} else if query_criteria_id2 == order_query_criteria_buyer_email {
+			filter = core.SqlAnd(filter, fmt.Sprintf("o.buyer_email like '%%%s%%'", query_criteria_value2))
+		} else if query_criteria_id2 == order_query_criteria_buyer_email_accurate {
+			filter = core.SqlAnd(filter, fmt.Sprintf("o.buyer_email = '%s'", query_criteria_value2))
+		} else if query_criteria_id2 == order_query_criteria_buyer_phone {
+			// SELECT osa.order_id FROM erp_order_shipping_address osa WHERE osa.phone LIKE '%123%';
+			filter = core.SqlAnd(filter, fmt.Sprintf("o.id IN (SELECT osa.order_id FROM erp_order_shipping_address osa WHERE osa.phone LIKE '%%%s%%')", query_criteria_value2))
+		} else if query_criteria_id2 == order_query_criteria_buyer_phone_accurate {
+			// SELECT osa.order_id FROM erp_order_shipping_address osa WHERE osa.phone = '123';
+			filter = core.SqlAnd(filter, fmt.Sprintf("o.id IN (SELECT osa.order_id FROM erp_order_shipping_address osa WHERE osa.phone = '%s')", query_criteria_value2))
+		} else if query_criteria_id2 == order_query_criteria_buyer_name {
+			// SELECT osa.order_id FROM erp_order_shipping_address osa WHERE osa.name LIKE '%123%';
+			filter = core.SqlAnd(filter, fmt.Sprintf("o.id IN (SELECT osa.order_id FROM erp_order_shipping_address osa WHERE osa.name LIKE '%%%s%%')", query_criteria_value2))
+		} else if query_criteria_id2 == order_query_criteria_buyer_name_accurate {
+			// SELECT osa.order_id FROM erp_order_shipping_address osa WHERE osa.name = '123';
+			filter = core.SqlAnd(filter, fmt.Sprintf("o.id IN (SELECT osa.order_id FROM erp_order_shipping_address osa WHERE osa.name = '%s')", query_criteria_value2))
 		}
 	}
 
