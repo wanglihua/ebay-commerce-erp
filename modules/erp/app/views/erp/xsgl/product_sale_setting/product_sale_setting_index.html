@@ -181,10 +181,10 @@
                     },
                     {"mDataProp": "p.cn_name", "title": "商品名称", "bSearchable": true},
                     {
-                        "mDataProp": "p.postage_cal_weight", "title": "运费权重", "bSearchable": false, "width": 80,
+                        "mDataProp": "p.postage_cal_weight", "title": "运费权重", "bSearchable": false, "width": 80, "sClass": "center",
                         "render": function (data, type, row) {
                             if (data !== 0) {
-                                return dtFormatFloat2(data);
+                                return dtFormatFloat(data);
                             }
                             else {
                                 return "";
@@ -305,7 +305,7 @@
                     type: "POST",
                     processData: false,
                     contentType: 'application/json',
-                    data: JSON.stringify(vm.detail),
+                    data: JSON.stringify(vm.product_detail),
                     success: function (data) {
                         hideMask();
                         if (data.success === false) {

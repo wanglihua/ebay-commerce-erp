@@ -272,8 +272,14 @@ func Match_product_postage(product_id int64, postcode string, db_session *xorm.S
 		return nil, -1 // 如果返回的费用小于零就表示，没有匹配的物流方式和费率，不能送达
 	}
 
-	var product_sale_setting = product_sale_setting_service.Get_product_sale_setting(db_session)
-	var total_amount = (final_result.total_fee + final_pick_fee) * product_sale_setting.PostageCalWeight
+	var postage_cal_weight = product.PostageCalWeight
+
+	if postage_cal_weight == 0 {
+		var product_sale_setting = product_sale_setting_service.Get_product_sale_setting(db_session)
+		postage_cal_weight = product_sale_setting.PostageCalWeight
+	}
+
+	var total_amount = (final_result.total_fee + final_pick_fee) * postage_cal_weight
 
 	return nil, total_amount
 }
