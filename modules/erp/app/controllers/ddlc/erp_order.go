@@ -1169,6 +1169,20 @@ func (c ErpOrder) PeiHuo() revel.Result {
 		core.HandleError(err)
 	}
 
+	var order_id_str_list = make([]string, 0)
+	for _, order := range order_list {
+		order_id_str_list = append(order_id_str_list, fmt.Sprint(order.Id))
+	}
+
+	for _, order := range order_list {
+		if order.StockId == 0 {
+			return c.RenderJson(map[string]interface{}{
+				"success": false,
+				"message": "有的订单的发货仓库未设置！",
+			})
+		}
+	}
+
 	var login_user_stock_id_list = stock_pick_crew_service.Get_login_user_stock_id_list(db_session, c.Session)
 
 	// 检查用户对发货仓库是否有查看权限
@@ -1189,6 +1203,7 @@ func (c ErpOrder) PeiHuo() revel.Result {
 		}
 	}
 
+	/*
 	// 检查有权限的仓库当前是不是有配货中的订单
 
 	if len(login_user_stock_id_list) != 0 {
@@ -1210,6 +1225,7 @@ func (c ErpOrder) PeiHuo() revel.Result {
 			"message": "当前用户没权限查看任何仓库，不能搬动订单至配货中！",
 		})
 	}
+	*/
 
 	for _, order := range order_list {
 		if order.StatusId != models.ORDER_STATUS_DPH &&
@@ -1224,6 +1240,47 @@ func (c ErpOrder) PeiHuo() revel.Result {
 			})
 		}
 	}
+
+	type stock_id_t struct {
+		StockId int64 `xorm:"'stock_id'"`
+	}
+
+	/*
+SELECT DISTINCT stock_id
+FROM erp_order o
+WHERE o.status_id = 0;
+
+
+SELECT DISTINCT stock_id
+FROM erp_order o
+WHERE o.id IN (-1, -2, -3);
+	*/
+
+	var phz_stock_id_list = make([]stock_id_t, 0)
+	var sql_phz_stock_id_list = `SELECT DISTINCT stock_id
+FROM erp_order o
+WHERE o.status_id = %d;`
+	sql_phz_stock_id_list = fmt.Sprintf(sql_phz_stock_id_list, models.ORDER_STATUS_PHZ)
+	core.HandleError(db_session.Sql(sql_phz_stock_id_list).Find(&phz_stock_id_list))
+
+	var ph_stock_id_list = make([]stock_id_t, 0)
+	var sql_ph_stock_id_list = `SELECT DISTINCT stock_id
+FROM erp_order o
+WHERE o.id IN (%s);`
+	sql_ph_stock_id_list = fmt.Sprintf(sql_ph_stock_id_list, strings.Join(order_id_str_list, ","))
+	core.HandleError(db_session.Sql(sql_ph_stock_id_list).Find(&ph_stock_id_list))
+
+	for _, phz_stock_id := range phz_stock_id_list {
+		for _, ph_stock_id := range ph_stock_id_list {
+			if phz_stock_id == ph_stock_id {
+				return c.RenderJson(map[string]interface{}{
+					"success": false,
+					"message": "有订单还在配货中，不能搬至已配货！",
+				})
+			}
+		}
+	}
+
 	var login_user = core.GetLoginUser(c.Session)
 
 	for _, order := range order_list {

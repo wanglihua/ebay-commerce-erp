@@ -171,7 +171,7 @@ func (c ErpProductPostageCalWeight) Import() revel.Result {
 
 			var product_postage_cal_weight product_postage_cal_weight_t
 
-			col_index := 1 //从第二列开始导入，略去第一列的编号
+			col_index := 0 //从第二列开始导入，略去第一列的编号
 
 			//SKU
 			// cell = row.Cells[col_index]
@@ -192,9 +192,15 @@ func (c ErpProductPostageCalWeight) Import() revel.Result {
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			//revel.TRACE.Println(cell_val)
-			postage_cal_weight, err := strconv.ParseFloat(cell_val, 64)
-			core.HandleError(err)
-			product_postage_cal_weight.postage_cal_weight = postage_cal_weight
+			if strings.TrimSpace(cell_val) == "" {
+				product_postage_cal_weight.postage_cal_weight = 0
+			} else {
+				postage_cal_weight, err := strconv.ParseFloat(cell_val, 64)
+				if err != nil {
+					panic("运费权重录入格式有错！")
+				}
+				product_postage_cal_weight.postage_cal_weight = postage_cal_weight
+			}
 			col_index++
 
 			product_postage_cal_weight_list = append(product_postage_cal_weight_list, product_postage_cal_weight)

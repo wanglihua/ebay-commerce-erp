@@ -56,6 +56,29 @@
                         </div>
                     </div>
                 </div>
+                <hr/>
+                <div>
+                    <div>
+                        <button class="btn btn-primary btn-sm" @click="reloadList('#productList')" style="border-width: 4px;">
+                            <i class="ace-icon fa fa-refresh"></i>
+                            刷新
+                        </button>
+                        <button id="btnImport" class="btn btn-success btn-sm">
+                            <i class="ace-icon fa fa-plus"></i>
+                            导入
+                        </button>
+                        <button class="btn btn-purple btn-sm" @click="exportProduct()">
+                            <i class="ace-icon fa fa-file-excel-o"></i>
+                            导出
+                        </button>
+                        <div style="margin-top: 10px;">
+                            <a href="/static/excel-template/product_postage_cal_weight_import.xlsx">下载商品运费权重导入Excel模板</a>
+                        </div>
+                    </div>
+                    <div>
+                        <table id="productList" class="table table-striped table-bordered table-hover"></table>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
