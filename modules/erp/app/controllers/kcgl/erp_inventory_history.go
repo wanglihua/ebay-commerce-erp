@@ -65,7 +65,6 @@ func (c ErpInventoryHistory) ListData() revel.Result {
 
 	if inventory_id != 0 {
 		filter = core.SqlAnd(filter, fmt.Sprintf("his.stock_id = %d", inventory.StockId))
-		filter = core.SqlAnd(filter, fmt.Sprintf("his.storage_loc_id = %d", inventory.StorageLocId))
 		filter = core.SqlAnd(filter, fmt.Sprintf("his.product_id = %d", inventory.ProductId))
 	}
 
