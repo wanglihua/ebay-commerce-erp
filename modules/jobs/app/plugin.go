@@ -25,6 +25,7 @@ func init() {
 		*/
 
 		var schedule_task_enabled = revel.Config.BoolDefault("schedule.task.enabled", false) // 临时禁用或启用定时任务
+		revel.TRACE.Println("schedule_task_enabled", schedule_task_enabled)
 
 		if schedule_task_enabled == true {
 			cron_ebay_download_order, found := revel.Config.String("cron.ebay_download_order")
