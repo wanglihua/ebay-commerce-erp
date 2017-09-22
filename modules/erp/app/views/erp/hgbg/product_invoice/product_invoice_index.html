@@ -21,6 +21,10 @@
                         <i class="ace-icon fa fa-plus"></i>
                         导入
                     </button>
+                    <button class="btn btn-purple btn-sm" @click="exportProduct()">
+                        <i class="ace-icon fa fa-file-excel-o"></i>
+                        导出
+                    </button>
                     <div style="margin-top: 10px;">
                         <a href="/static/excel-template/hgbg/product_invoice.xlsx">下载商品是否开票导入Excel模板</a>
                     </div>
@@ -276,6 +280,20 @@
                         }
                     );
                 }
+            },
+            exportProduct: function () {
+                var id_list = [];
+                $('#productList tbody tr>td:first-child input:checkbox').each(function () {
+                    if (this.checked) {
+                        id_list.push($(this).val());
+                    }
+                });
+
+                var params = $.param({
+                    "id_list": id_list
+                });
+                var url = '{%url "ErpProductInvoice.Export"%}' + "?" + params;
+                $('<form method="post" action="' + url + '"></form>').appendTo('body').submit().remove();
             }
         }
     });

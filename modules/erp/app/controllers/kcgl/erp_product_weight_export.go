@@ -153,13 +153,13 @@ func (c ErpProductWeightExport) export_product_list_to_excel(db_session *xorm.Se
 		col_index++
 
 		cell = row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 10)
+		sheet.SetColWidth(col_index, col_index, 15)
 		set_head_cell_style(cell)
 		cell.Value = "SKU"
 		col_index++
 
 		cell = row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 10)
+		sheet.SetColWidth(col_index, col_index, 30)
 		set_head_cell_style(cell)
 		cell.Value = "中文名称"
 		col_index++
@@ -211,7 +211,7 @@ func (c ErpProductWeightExport) export_product_list_to_excel(db_session *xorm.Se
 
 		// 中文名称
 		cell = row.AddCell()
-		set_text_cell_style(cell, "center")
+		set_text_cell_style(cell, "left")
 		cell.Value = product.CnName
 
 		// 	产品长度（cm）

@@ -599,6 +599,7 @@ POST /product/invoice/data/list            ErpProductInvoice.ListData
 POST /product/invoice/data/detail          ErpProductInvoice.DetailData
 POST /product/invoice/save                 ErpProductInvoice.Save
 POST /product/invoice/import               ErpProductInvoice.Import
+POST /product/invoice/export               ErpProductInvoice.Export
 
 GET  /product/sale/day/analysis            ErpProductSaleDayAnalysis.Index
 POST /product/sale/day/analysis/page/data  ErpProductSaleDayAnalysis.PageData
