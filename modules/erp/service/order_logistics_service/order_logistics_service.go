@@ -23,7 +23,6 @@ import (
 	"matrix/modules/erp/models/ddpz_models"
 	"matrix/modules/erp/models/ddlc_models"
 	"matrix/modules/erp/models/kcgl_models"
-	"github.com/revel/revel"
 )
 
 type OrderLogisticsService struct {
@@ -276,11 +275,15 @@ func (p_ol *OrderLogisticsService) CalculateListWithOption(order_list []ddlc_mod
 		//　一起加载需要的数据的方式，对性能的影响应该不会很大的
 		p_order_logistics_data.load_data(&order, p_ol, db_session)
 
+		go p_ol.match_logistics_mode_logic(&order, p_order_logistics_data)
+
+		/*
 		if revel.DevMode == false {
 			go p_ol.match_logistics_mode_logic(&order, p_order_logistics_data)
 		} else {
 			p_ol.match_logistics_mode_logic(&order, p_order_logistics_data) // 临时不用 go routine，方便调试
 		}
+		*/
 
 		//检查订单状态
 		//订单状态检查 这些要排除的

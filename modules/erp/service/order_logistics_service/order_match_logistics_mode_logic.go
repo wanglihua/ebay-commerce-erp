@@ -442,6 +442,8 @@ func save_order_logistics_logic(p_ol *OrderLogisticsService, match_result match_
 	order_logistics_logic.FeeRateIdSecond = match_result_second.fee_rate_id
 	if match_result_second.fee_rate_id != 0 {
 		order_logistics_logic.TotalFeeSecond = match_result_second.total_fee
+
+		order_logistics_logic.FeeDiff = match_result_second.total_fee - match_result.total_fee
 	}
 
 	revel.TRACE.Println("order_logistics_logic.FeeRateIdSecond", order_logistics_logic.FeeRateIdSecond)

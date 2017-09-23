@@ -31,6 +31,7 @@ type OrderLogisticsLogicInfo struct {
 	ModeIdSecond    int64   `xorm:"bigint notnull index default(0) 'mode_id_second'" json:"mode_id_second" smith:"verbose_name=次佳物流方式"`
 	FeeRateIdSecond int64   `xorm:"bigint notnull index default(0) 'fee_rate_id_second'" json:"fee_rate_id_second" smith:"verbose_name=次佳物流费率"`
 	TotalFeeSecond  float64 `xorm:"decimal(18,6) notnull default(0) 'total_fee_second'" json:"total_fee_second" smith:"verbose_name=次佳物流费用"`
+	FeeDiff         float64 `xorm:"decimal(18,6) notnull default(0) 'fee_diff'" json:"fee_diff" smith:"verbose_name=费用偏差"`
 
 	CreateTime core.Time `xorm:"created notnull 'create_time'" json:"create_time"`
 	UpdateTime core.Time `xorm:"updated notnull 'update_time'" json:"update_time"`
