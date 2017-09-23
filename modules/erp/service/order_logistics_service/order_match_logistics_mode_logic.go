@@ -13,6 +13,7 @@ import (
 	"runtime/debug"
 	"matrix/modules/erp/models/ddpz_models"
 	"matrix/modules/erp/models/ddlc_models"
+	xorm_core "github.com/go-xorm/core"
 )
 
 var db_driver string
@@ -43,6 +44,12 @@ func (p_ol *OrderLogisticsService) match_logistics_mode_logic(p_order *ddlc_mode
 	db_engine.TZLocation = time.Local
 	db_engine.SetMaxIdleConns(3)
 	db_engine.SetMaxOpenConns(100)
+
+	if revel.DevMode == true {
+		db_engine.ShowSQL()
+		db_engine.ShowExecTime()
+		xorm_core.LogQuerySql = true
+	}
 
 	db_session := db_engine.NewSession()
 	db_session = db_session.NoAutoCondition(true)
@@ -119,10 +126,13 @@ func (p_ol *OrderLogisticsService) match_logistics_mode_logic(p_order *ddlc_mode
 	var logistics_fee_rate_map = p_ol.logistics_fee_rate_map
 
 	var final_result match_logistics_mode_result
+	var final_result_second match_logistics_mode_result // 次佳仓的记录
+
 	final_result.order_id = p_order.Id
 	final_result.order_code = p_order.Code
 
 	var lowest_total_fee = math.MaxFloat64 // 初始化为一个很大的不可能的值，澳币，
+	final_result_second.total_fee = math.MaxFloat64
 
 	// 匹配的结果中，有库存记录的那些记录列表
 	for _, logistics_mode := range logistics_mode_list {
@@ -324,7 +334,7 @@ func (p_ol *OrderLogisticsService) match_logistics_mode_logic(p_order *ddlc_mode
 					mode_result.fee_rate = logistics_fee_rate
 				}
 			}
-		} // for _, logistics_fee_rate := range logistics_fee_rate_list {
+		}                                            // for _, logistics_fee_rate := range logistics_fee_rate_list {
 
 		if mode_result.fee_rate_id == 0 { //没有费率匹配成功, 比如说，还没有开通该地区的物流
 			continue // 排除该物流方式
@@ -367,16 +377,29 @@ func (p_ol *OrderLogisticsService) match_logistics_mode_logic(p_order *ddlc_mode
 
 		var total_fee_diff = lowest_total_fee - mode_result.total_fee // 就是当前模式比之前的省了多少钱
 
+		/*
 		// 三个区间 final_total_amount-mode_result.total_amount，后来改用 fee了，不考虑 库存的cost_price，因为没有库存的也参与筛选
 		// 负无穷大 到 -p_ol.logistics_setting.FeeMaxDiff， -p_ol.logistics_setting.FeeMaxDiff到+p_ol.logistics_setting.FeeMaxDiff, +p_ol.logistics_setting.FeeMaxDiff 到 正无穷大
 		if total_fee_diff > p_ol.logistics_setting.FeeMaxDiff { // 取得更优的模式方案，挑选最优解时，把商品的到仓成本也考虑进去   +p_ol.logistics_setting.FeeMaxDiff 到 正无穷大
+			final_result_second = final_result // 先把结果给次佳仓
 			final_result = mode_result
 		} else if math.Abs(total_fee_diff) <= p_ol.logistics_setting.FeeMaxDiff { // 运费偏差在最大允许范围内，其实还是算上了澳仓成本的  -p_ol.logistics_setting.FeeMaxDiff到+p_ol.logistics_setting.FeeMaxDiff,
 			//取优先级高的仓库
 
 			if mode_result.stock.Priority > final_result.stock.Priority { // 当前的仓库的优先级要高
+				final_result_second = final_result // 先把结果给次佳仓
 				final_result = mode_result
 			}
+		}
+		*/
+
+		if total_fee_diff > 0 { // final_result.total_fee > mode_result.total_fee 这里就不考虑允许偏差范围了
+			if final_result.fee_rate_id != 0 {
+				final_result_second = final_result // 如果最佳仓已经有结果，就先把结果给次佳仓
+			}
+			final_result = mode_result
+		} else if final_result_second.total_fee > mode_result.total_fee { // 如果最佳仓的匹配，没 “看上” 当前物流方式的匹配结果，就看看次佳仓是不是可以 “看得上” 当前物流方式的结果
+			final_result_second = mode_result
 		}
 
 		if mode_result.total_fee < lowest_total_fee {
@@ -386,10 +409,10 @@ func (p_ol *OrderLogisticsService) match_logistics_mode_logic(p_order *ddlc_mode
 	} // for _, logistics_mode := range logistics_mode_list {
 
 	// 保存最后的匹配结果
-	save_order_logistics_logic(p_ol, final_result, db_session)
+	save_order_logistics_logic(p_ol, final_result, final_result_second, db_session)
 }
 
-func save_order_logistics_logic(p_ol *OrderLogisticsService, match_result match_logistics_mode_result, db_session *xorm.Session) {
+func save_order_logistics_logic(p_ol *OrderLogisticsService, match_result match_logistics_mode_result, match_result_second match_logistics_mode_result, db_session *xorm.Session) {
 	// 匹配成功，记录匹配成功数据
 	var order_logistics_logic ddlc_models.OrderLogisticsLogicInfo
 	has, err := db_session.Where(fmt.Sprintf("order_id = %d", match_result.order_id)).Get(&order_logistics_logic)
@@ -413,7 +436,18 @@ func save_order_logistics_logic(p_ol *OrderLogisticsService, match_result match_
 	order_logistics_logic.Ptfl = p_ol.logistics_setting.Ptfl
 	order_logistics_logic.Jyfl = p_ol.logistics_setting.Jyfl
 
+	order_logistics_logic.CompanyIdSecond = match_result_second.company_id
+	order_logistics_logic.StockIdSecond = match_result_second.stock_id
+	order_logistics_logic.ModeIdSecond = match_result_second.mode_id
+	order_logistics_logic.FeeRateIdSecond = match_result_second.fee_rate_id
+	if match_result_second.fee_rate_id != 0 {
+		order_logistics_logic.TotalFeeSecond = match_result_second.total_fee
+	}
+
+	revel.TRACE.Println("order_logistics_logic.FeeRateIdSecond", order_logistics_logic.FeeRateIdSecond)
+
 	if has == true {
+		revel.TRACE.Println("order_logistics_logic.FeeRateIdSecond", order_logistics_logic.FeeRateIdSecond)
 		_, err := db_session.Id(order_logistics_logic.Id).Update(&order_logistics_logic)
 		core.HandleError(err)
 	} else {
@@ -423,6 +457,8 @@ func save_order_logistics_logic(p_ol *OrderLogisticsService, match_result match_
 }
 
 func save_special_hold_order_logistics_logic(p_ol *OrderLogisticsService, order_id int64, p_order_logistics_data *order_logistics_data_t, db_session *xorm.Session) {
+
+	revel.TRACE.Println("save_special_hold_order_logistics_logic")
 
 	var order_logistics_logic ddlc_models.OrderLogisticsLogicInfo
 	has, err := db_session.Where("order_id = ?", order_id).Get(&order_logistics_logic)
