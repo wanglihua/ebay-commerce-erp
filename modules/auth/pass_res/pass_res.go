@@ -79,6 +79,7 @@ const (
 	DDLC_ORDER_LOGISTICS_MATCH_DEBUG = 131200 // 订单物流匹配调试
 	DDLC_ORDER_LOGISTICS_MATCH       = 131300 // 订单物流匹配
 	DDLC_ORDER_FORCE_PEIHUO          = 131400 // 强制配货
+	DDLC_ORDER_LOGISTICS_DIFF        = 131500 // 最佳次佳物流偏差
 
 	// 库存管理 模块编号 14
 	KCGL_PRODUCT                 = 140100 // 商品列表

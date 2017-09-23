@@ -162,6 +162,13 @@ func (e PassResInfo) InitData(db_session *xorm.Session) {
 		pass.Name = "订单流程取消波次限制配货"
 		pass.Desc = core.MakeNullString("订单流程取消波次限制配货", true)
 		db_session.Insert(pass)
+
+		pass = new(PassResInfo)
+		pass.Id = pass_res.DDLC_ORDER_LOGISTICS_DIFF
+		pass.CateId = pass_res_cate.DDLC
+		pass.Name = "最佳次佳物流偏差"
+		pass.Desc = core.MakeNullString("最佳次佳物流偏差", true)
+		db_session.Insert(pass)
 	}
 
 	// 订单配置
