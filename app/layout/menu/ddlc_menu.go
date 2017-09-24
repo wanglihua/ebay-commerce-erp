@@ -169,7 +169,7 @@ func GetDdlcMenu(res_id_map map[int64]bool, web_session revel.Session) string {
 		buffer.WriteString(`<li id="ddlc-order-logistics-diff-menu" class="">
             <a href="/order/logistics/diff">
                 <i class="menu-icon fa fa-caret-right"></i>
-                最佳次佳物流偏差
+                最佳仓次佳仓偏差
             </a>
             <b class="arrow"></b>
         </li>`)

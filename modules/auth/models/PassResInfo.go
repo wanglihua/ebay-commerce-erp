@@ -166,8 +166,8 @@ func (e PassResInfo) InitData(db_session *xorm.Session) {
 		pass = new(PassResInfo)
 		pass.Id = pass_res.DDLC_ORDER_LOGISTICS_DIFF
 		pass.CateId = pass_res_cate.DDLC
-		pass.Name = "最佳次佳物流偏差"
-		pass.Desc = core.MakeNullString("最佳次佳物流偏差", true)
+		pass.Name = "最佳仓次佳仓偏差"
+		pass.Desc = core.MakeNullString("最佳仓次佳仓偏差", true)
 		db_session.Insert(pass)
 	}
 

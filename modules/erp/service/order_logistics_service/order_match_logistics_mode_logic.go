@@ -126,13 +126,12 @@ func (p_ol *OrderLogisticsService) match_logistics_mode_logic(p_order *ddlc_mode
 	var logistics_fee_rate_map = p_ol.logistics_fee_rate_map
 
 	var final_result match_logistics_mode_result
-	var final_result_second match_logistics_mode_result // 次佳仓的记录
+	var match_result_list = make([]match_logistics_mode_result, 0)
 
 	final_result.order_id = p_order.Id
 	final_result.order_code = p_order.Code
 
 	var lowest_total_fee = math.MaxFloat64 // 初始化为一个很大的不可能的值，澳币，
-	final_result_second.total_fee = math.MaxFloat64
 
 	// 匹配的结果中，有库存记录的那些记录列表
 	for _, logistics_mode := range logistics_mode_list {
@@ -394,19 +393,28 @@ func (p_ol *OrderLogisticsService) match_logistics_mode_logic(p_order *ddlc_mode
 		*/
 
 		if total_fee_diff > 0 { // final_result.total_fee > mode_result.total_fee 这里就不考虑允许偏差范围了
-			if final_result.fee_rate_id != 0 {
-				final_result_second = final_result // 如果最佳仓已经有结果，就先把结果给次佳仓
-			}
 			final_result = mode_result
-		} else if final_result_second.total_fee > mode_result.total_fee { // 如果最佳仓的匹配，没 “看上” 当前物流方式的匹配结果，就看看次佳仓是不是可以 “看得上” 当前物流方式的结果
-			final_result_second = mode_result
 		}
+
+		match_result_list = append(match_result_list, mode_result) // 所有匹配结果都放入列表
 
 		if mode_result.total_fee < lowest_total_fee {
 			lowest_total_fee = mode_result.total_fee
 		}
 
 	} // for _, logistics_mode := range logistics_mode_list {
+
+	var final_result_second match_logistics_mode_result
+
+	if final_result.fee_rate_id != 0 { // 最佳物流方式里面有值
+		for _, match_result := range match_result_list {
+			if final_result.stock_id != match_result.stock_id { // 和最佳物流不是同一个仓库的
+				if final_result_second.fee_rate_id == 0 || (final_result_second.total_fee > match_result.total_fee && match_result.fee_rate_id != 0) { // 如果次佳仓还没有值，或者次佳仓的费用比当前匹配值要高
+					final_result_second = match_result
+				}
+			}
+		}
+	}
 
 	// 保存最后的匹配结果
 	save_order_logistics_logic(p_ol, final_result, final_result_second, db_session)
