@@ -68,12 +68,12 @@
                         },
                         {
                             "mDataProp": "lm.name",
-                            "title": "最佳物流",
+                            "title": "最佳仓物流",
                             "bSearchable": false,
                             "bSortable": false
                         },
                         {
-                            "mDataProp": "oll.total_fee", "title": "最佳物流费用", "bSearchable": false, "width": 100,
+                            "mDataProp": "oll.total_fee", "title": "最佳仓费用", "bSearchable": false, "width": 100,
                             "render": function (data, type, row) {
                                 if (data !== "" && data !== 0) {
                                     return "AU " + dtFormatFloat(data);
@@ -85,12 +85,12 @@
                         },
                         {
                             "mDataProp": "lm_sec.name",
-                            "title": "次佳物流",
+                            "title": "次佳仓物流",
                             "bSearchable": false,
                             "bSortable": false
                         },
                         {
-                            "mDataProp": "oll.total_fee_second", "title": "次佳物流费用", "bSearchable": false, "width": 100,
+                            "mDataProp": "oll.total_fee_second", "title": "次佳仓费用", "bSearchable": false, "width": 100,
                             "render": function (data, type, row) {
                                 if (data !== "" && data !== 0) {
                                     return "AU " + dtFormatFloat(data);
