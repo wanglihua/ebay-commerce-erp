@@ -44,8 +44,3 @@ func (e OrderLogisticsLogicInfo) TableName() string {
 func (e OrderLogisticsLogicInfo) ModelDesc() string {
 	return "verbose_name=订单物流理论值,entity_json=order_logistics,route=order/logistics/logic"
 }
-
-/*
-ALTER TABLE erp_order_logistics_logic
-    DROP actual_fee;
- */

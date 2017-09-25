@@ -17,6 +17,7 @@
                     <thead>
                     <tr>
                         <th>标题</th>
+                        <th style="width:60px;text-align: center;">阅读</th>
                         <th style="width: 100px;">发布人</th>
                         <th style="width: 120px;">发布时间</th>
                     </tr>
@@ -36,6 +37,10 @@
                                         {{notice.n.title}}
                                     </span>
                                 </a>
+                            </td>
+                            <td style="text-align: center;">
+                                <span v-if="notice.n.is_read" style="color: blue;">已阅</span>
+                                <span v-else="notice.n.is_read" style="color:red;">未阅</span>
                             </td>
                             <td>{{notice.u.nick_name}}</td>
                             <td>{{notice.n.create_time}}</td>

@@ -11,6 +11,7 @@ import (
 	"matrix/modules/erp/models/xtgl_models"
 	"html/template"
 	auth_models "matrix/modules/auth/models"
+	"matrix/modules/erp/service/notice_read_service"
 )
 
 type ErpNotice struct {
@@ -45,6 +46,24 @@ LIMIT 50;
 	var notice_list = make([]notice_view_item_t, 0)
 	core.HandleError(db_session.Sql(sql).Find(&notice_list))
 
+	var login_user = core.GetLoginUser(c.Session)
+	var notice_read_list = make([]xtgl_models.NoticeReadInfo, 0)
+	core.HandleError(db_session.Where("user_id = ?", login_user.UserId).Find(&notice_read_list))
+
+	var is_notice_read = func(notice_id int64) bool {
+		for _, notice_read := range notice_read_list {
+			if notice_read.NoticeId == notice_id {
+				return true
+			}
+		}
+
+		return false
+	}
+
+	for index, notice := range notice_list {
+		notice_list[index].Notice.IsRead = is_notice_read(notice.Notice.Id)
+	}
+
 	return c.RenderJson(map[string]interface{}{
 		"notice_list": notice_list,
 	})
@@ -58,6 +77,12 @@ func (c ErpNotice) ViewDetail(id int64) revel.Result {
 	var notice xtgl_models.NoticeInfo
 	_, err := db_session.Id(notice_id).Get(&notice)
 	core.HandleError(err)
+
+	var login_user = core.GetLoginUser(c.Session)
+	var login_user_id = login_user.UserId
+
+	// 将当前用户的
+	notice_read_service.MarkNoticeUserRead(login_user_id, notice_id, db_session)
 
 	c.RenderArgs["notice"] = notice
 	c.RenderArgs["notice_body"] = template.HTML(notice.Body)
@@ -118,6 +143,7 @@ func (f *NoticeDetailForm) Valid(validation *revel.Validation) bool {
 
 func (c ErpNotice) Detail(id int64) revel.Result {
 	var notice_id = id
+
 	c.RenderArgs["notice_id"] = notice_id
 	return c.RenderTemplate("erp/xtgl/notice/notice_detail.html")
 }
