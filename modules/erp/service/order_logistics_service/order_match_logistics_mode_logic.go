@@ -429,7 +429,8 @@ func save_order_logistics_logic(p_ol *OrderLogisticsService, match_result match_
 	order_logistics_logic.Height = match_result.height
 	order_logistics_logic.DimWeight = match_result.dim_weight
 	order_logistics_logic.Sfkltjz = match_result.sfkltjz
-	order_logistics_logic.Weight = match_result.actual_weight
+	order_logistics_logic.ActualWeight = match_result.actual_weight
+	order_logistics_logic.Weight = match_result.weight
 	order_logistics_logic.TotalFee = match_result.total_fee
 	order_logistics_logic.PickFee = match_result.pick_fee
 	order_logistics_logic.CostAmount = match_result.cost_amount

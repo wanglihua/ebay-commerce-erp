@@ -255,43 +255,55 @@ func (c ErpOrderLogisticsDiff) export_product_list_to_excel(db_session *xorm.Ses
 		col_index++
 
 		cell = row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 20)
+		sheet.SetColWidth(col_index, col_index, 10)
+		set_head_cell_style(cell)
+		cell.Value = "邮编"
+		col_index++
+
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 10)
+		set_head_cell_style(cell)
+		cell.Value = "计费重量"
+		col_index++
+
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 10)
 		set_head_cell_style(cell)
 		cell.Value = "最佳仓"
 		col_index++
 
 		cell = row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 30)
+		sheet.SetColWidth(col_index, col_index, 20)
 		set_head_cell_style(cell)
 		cell.Value = "最佳仓物流"
 		col_index++
 
 		cell = row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 20)
+		sheet.SetColWidth(col_index, col_index, 10)
 		set_head_cell_style(cell)
 		cell.Value = "最佳仓费用"
 		col_index++
 
 		cell = row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 20)
+		sheet.SetColWidth(col_index, col_index, 10)
 		set_head_cell_style(cell)
 		cell.Value = "次佳仓"
 		col_index++
 
 		cell = row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 30)
+		sheet.SetColWidth(col_index, col_index, 20)
 		set_head_cell_style(cell)
 		cell.Value = "次佳仓物流"
 		col_index++
 
 		cell = row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 20)
+		sheet.SetColWidth(col_index, col_index, 10)
 		set_head_cell_style(cell)
 		cell.Value = "次佳仓费用"
 		col_index++
 
 		cell = row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 20)
+		sheet.SetColWidth(col_index, col_index, 10)
 		set_head_cell_style(cell)
 		cell.Value = "费用偏差"
 		col_index++
@@ -312,6 +324,14 @@ func (c ErpOrderLogisticsDiff) export_product_list_to_excel(db_session *xorm.Ses
 		cell = row.AddCell()
 		set_text_cell_style(cell, "left")
 		cell.Value = logistics_diff.Order.FullTranId
+
+		cell = row.AddCell()
+		set_text_cell_style(cell, "left")
+		cell.Value = logistics_diff.OrderShippingAddress.PostalCode
+
+		cell = row.AddCell()
+		set_text_cell_style(cell, "left")
+		cell.Value = fmt.Sprintf("%0.2f", logistics_diff.OrderLogisticsLogic.Weight)
 
 		cell = row.AddCell()
 		set_text_cell_style(cell, "left")

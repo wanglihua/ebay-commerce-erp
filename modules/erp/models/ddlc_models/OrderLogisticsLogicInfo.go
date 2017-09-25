@@ -15,7 +15,8 @@ type OrderLogisticsLogicInfo struct {
 	Length        float64 `xorm:"float notnull 'length'" json:"length" smith:"verbose_name=长度,min=0"`                      // cm
 	Width         float64 `xorm:"float notnull 'width'" json:"width" smith:"verbose_name=宽度,min=0"`                        // cm
 	Height        float64 `xorm:"float notnull 'height'" json:"height" smith:"verbose_name=高度,min=0"`                      // cm
-	Weight        float64 `xorm:"float notnull 'weight'" json:"weight" smith:"verbose_name=重量,min=0"`                      // kg 就是实际重量
+	Weight        float64 `xorm:"float notnull 'weight'" json:"weight" smith:"verbose_name=重量,min=0"`                      // kg 计费重量
+	ActualWeight  float64 `xorm:"float notnull 'actual_weight'" json:"actual_weight" smith:"verbose_name=实际重量,min=0"`      // kg 就是实际重量
 	DimWeight     float64 `xorm:"float notnull 'dim_weight'" json:"dim_weight" smith:"verbose_name=体积重,min=0"`             // kg
 	Sfkltjz       int64   `xorm:"bigint notnull 'sfkltjz'" json:"sfkltjz" smith:"verbose_name=是否考虑体积重"`                    // -1 否， 1 是
 	TotalFee      float64 `xorm:"decimal(18,6) notnull 'total_fee'" json:"total_fee" smith:"verbose_name=物流费用"`            // 由上面的 物流方式和物流费率，计算出来的物流费用，不包括拣货费用
