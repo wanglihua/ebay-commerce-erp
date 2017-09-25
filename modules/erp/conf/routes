@@ -378,7 +378,9 @@ POST /order/save/pickup/actual             ErpOrder.SavePickupActual
 POST /order/shipping/address/save           ErpOrderShippingAddress.Save
 POST /order/waybill/number/save             ErpOrderWaybillNumber.Save
 
-POST /erp/order/history/data/list          ErpOrderHistory.ListData
+POST /order/history/data/list          ErpOrderHistory.ListData
+GET  /order/history/delete             ErpOrderHistory.DeleteHistory
+POST /order/history/delete/data/list   ErpOrderHistory.DeleteHistoryListData
 
 POST /order/item/data/detail                ErpOrderItem.DetailData
 POST /order/item/save                       ErpOrderItem.Save

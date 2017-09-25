@@ -33,6 +33,10 @@
                         <i class="ace-icon fa fa-trash"></i>
                         删除批次
                     </button>
+                    <button class="btn btn-pink btn-sm" onclick="showOrderDeleteHistory()">
+                        <i class="ace-icon fa fa-list"></i>
+                        订单删除日志
+                    </button>
                 </div>
                 <div style="margin-top: 10px;">
                     <a href="/static/excel-template/order_import.xlsx">下载订单导入Excel模板</a>
@@ -363,6 +367,10 @@
 
     function loadVmPageData() {
         loadPageData(vm);
+    }
+
+    function showOrderDeleteHistory() {
+        window.location.href = '{% url "ErpOrderHistory.DeleteHistory" %}';
     }
 </script>
 {%footer%}
