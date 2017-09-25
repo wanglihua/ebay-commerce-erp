@@ -4,7 +4,6 @@ import (
 	"github.com/revel/revel"
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/auth/pass_res"
-	"matrix/modules/erp/setting"
 	"matrix/core"
 	"matrix/modules/erp/models/ddlc_models"
 	"matrix/modules/erp/models/ddpz_models"
@@ -24,10 +23,16 @@ type ErpOrderLogisticsDiff struct {
 func (c ErpOrderLogisticsDiff) Index() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_LOGISTICS_DIFF, c.Session)
 
-	c.RenderArgs["icon_path"] = setting.ICON_PATH
+	var db_session = c.DbSession
+
+	var stock_list = make([]sppz_models.StockInfo, 0)
+	core.HandleError(db_session.Where("stock_type_id = ?", sppz_models.STOCK_TYPE_AU).Find(&stock_list))
+
+	c.RenderArgs["stock_list"] = stock_list
 	return c.RenderTemplate("erp/ddlc/order_logistics_diff/order_logistics_diff_index.html")
 }
 
+/*
 func (c ErpOrderLogisticsDiff) PageData() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_LOGISTICS_DIFF, c.Session)
 
@@ -35,11 +40,26 @@ func (c ErpOrderLogisticsDiff) PageData() revel.Result {
 		"success": true,
 	})
 }
+*/
 
 func (c ErpOrderLogisticsDiff) ListData() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_LOGISTICS_DIFF, c.Session)
 
 	var db_session = c.DbSession
+
+	var stock_query int64
+	c.Params.Bind(&stock_query, "stock_query")
+
+	var stock_second_query int64
+	c.Params.Bind(&stock_second_query, "stock_second_query")
+
+	var shipped_time_begin_query_str string
+	c.Params.Bind(&shipped_time_begin_query_str, "shipped_time_begin_query")
+	shipped_time_begin_query, shipped_time_begin_query_err := core.Parse_time(shipped_time_begin_query_str)
+
+	var shipped_time_end_query_str string
+	c.Params.Bind(&shipped_time_end_query_str, "shipped_time_end_query")
+	shipped_time_end_query, shipped_time_end_query_err := core.Parse_time(shipped_time_end_query_str)
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
@@ -69,9 +89,24 @@ FROM erp_order_logistics_logic oll
     INNER JOIN erp_logistics_mode lm ON lm.id = oll.mode_id
     LEFT JOIN erp_logistics_mode lm_sec ON lm_sec.id = oll.mode_id_second`)
 
-	sb.Where(filter)
+	if stock_query != 0 {
+		filter = core.SqlAnd(filter, fmt.Sprintf("lm.stock_id = %d", stock_query))
+	}
 
-	//query extra filter here
+	if stock_second_query != 0 {
+		filter = core.SqlAnd(filter, fmt.Sprintf("lm_sec.stock_id = %d", stock_second_query))
+	}
+
+	if shipped_time_begin_query_err == nil {
+		filter = core.SqlAnd(filter, fmt.Sprintf("o.shipped_time >= '%04d-%02d-%02d'", shipped_time_begin_query.Year(), shipped_time_begin_query.Month(), shipped_time_begin_query.Day()))
+	}
+
+	if shipped_time_end_query_err == nil {
+		shipped_time_end_query = shipped_time_end_query.Add(time.Hour * 24)
+		filter = core.SqlAnd(filter, fmt.Sprintf("o.shipped_time < '%04d-%02d-%02d'", shipped_time_end_query.Year(), shipped_time_end_query.Month(), shipped_time_end_query.Day()))
+	}
+
+	sb.Where(filter)
 
 	if order != "" {
 		sb.OrderBy(order)
@@ -118,6 +153,37 @@ func (c ErpOrderLogisticsDiff) Export() revel.Result {
 	if len(id_list) != 0 {
 		var id_str_list = core.Int_list_to_str_list(id_list)
 		filter = core.SqlAnd(filter, fmt.Sprintf("oll.id IN (%s)", strings.Join(id_str_list, ",")))
+	}
+
+	var stock_query int64
+	c.Params.Bind(&stock_query, "stock_query")
+
+	var stock_second_query int64
+	c.Params.Bind(&stock_second_query, "stock_second_query")
+
+	var shipped_time_begin_query_str string
+	c.Params.Bind(&shipped_time_begin_query_str, "shipped_time_begin_query")
+	shipped_time_begin_query, shipped_time_begin_query_err := core.Parse_time(shipped_time_begin_query_str)
+
+	var shipped_time_end_query_str string
+	c.Params.Bind(&shipped_time_end_query_str, "shipped_time_end_query")
+	shipped_time_end_query, shipped_time_end_query_err := core.Parse_time(shipped_time_end_query_str)
+
+	if stock_query != 0 {
+		filter = core.SqlAnd(filter, fmt.Sprintf("lm.stock_id = %d", stock_query))
+	}
+
+	if stock_second_query != 0 {
+		filter = core.SqlAnd(filter, fmt.Sprintf("lm_sec.stock_id = %d", stock_second_query))
+	}
+
+	if shipped_time_begin_query_err == nil {
+		filter = core.SqlAnd(filter, fmt.Sprintf("o.shipped_time >= '%04d-%02d-%02d'", shipped_time_begin_query.Year(), shipped_time_begin_query.Month(), shipped_time_begin_query.Day()))
+	}
+
+	if shipped_time_end_query_err == nil {
+		shipped_time_end_query = shipped_time_end_query.Add(time.Hour * 24)
+		filter = core.SqlAnd(filter, fmt.Sprintf("o.shipped_time < '%04d-%02d-%02d'", shipped_time_end_query.Year(), shipped_time_end_query.Month(), shipped_time_end_query.Day()))
 	}
 
 	/*
@@ -307,6 +373,18 @@ func (c ErpOrderLogisticsDiff) export_product_list_to_excel(db_session *xorm.Ses
 		set_head_cell_style(cell)
 		cell.Value = "费用偏差"
 		col_index++
+
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 15)
+		set_head_cell_style(cell)
+		cell.Value = "匹配时间"
+		col_index++
+
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 15)
+		set_head_cell_style(cell)
+		cell.Value = "发货时间"
+		col_index++
 	}
 
 	for index, logistics_diff := range logistics_diff_list {
@@ -360,6 +438,18 @@ func (c ErpOrderLogisticsDiff) export_product_list_to_excel(db_session *xorm.Ses
 		cell = row.AddCell()
 		set_text_cell_style(cell, "center")
 		cell.Value = fmt.Sprintf("%0.2f", logistics_diff.OrderLogisticsLogic.FeeDiff)
+
+		cell = row.AddCell()
+		set_text_cell_style(cell, "center")
+		cell.Value = fmt.Sprintf("%s", logistics_diff.OrderLogisticsLogic.UpdateTime.String())
+
+		cell = row.AddCell()
+		set_text_cell_style(cell, "center")
+		if logistics_diff.Order.ShippedTime.Valid {
+			cell.Value = fmt.Sprintf("%s", logistics_diff.Order.ShippedTime.Time.Format("2006-01-02 15:04:05"))
+		} else {
+			cell.Value = ""
+		}
 	}
 
 	return xlsx_file

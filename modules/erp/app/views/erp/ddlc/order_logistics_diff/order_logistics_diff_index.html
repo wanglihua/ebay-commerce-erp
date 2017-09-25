@@ -23,6 +23,33 @@
                     </button>
                 </div>
                 <div>
+                    <div id="query" class="col-xs-12 query" style="margin-top: 10px;margin-bottom: 10px;">
+
+                        <label for="stock_query" class="control-label no-padding-right">最佳仓</label>
+                        <select id="stock_query" name="stock_query" class="input-sm" style="width: 120px;">
+                            <option value="0">最佳仓</option>
+                            {% range $index, $stock := .stock_list %}
+                            <option value="{% $stock.Id%}">{% $stock.Name %}</option>
+                            {% end %}
+                        </select>
+
+                        <label for="stock_second_query" class="control-label no-padding-right">次佳仓</label>
+                        <select id="stock_second_query" name="stock_second_query" class="input-sm" style="width: 120px;">
+                            <option value="0">次佳仓</option>
+                            {% range $index, $stock := .stock_list %}
+                            <option value="{% $stock.Id%}">{% $stock.Name %}</option>
+                            {% end %}
+                        </select>
+
+                        <label for="shipped_time_begin_query" class="control-label no-padding-right">发货时间</label>
+                        <input id="shipped_time_begin_query" name="shipped_time_begin_query" placeholder="发货时间开始" type="text" class="input-sm" style="width: 135px;height: 30px;"/>
+                        <input id="shipped_time_end_query" name="shipped_time_end_query" placeholder="发货时间结束" type="text" class="input-sm" style="width: 135px;height: 30px;"/>
+                        <button class="btn btn-mini btn-primary" @click="refreshList()">
+                            &nbsp;<i class="ace-icon fa fa-search"></i>查&nbsp;询&nbsp;
+                        </button>
+                    </div>
+                </div>
+                <div>
                     <table id="orderLogisticsList" class="table table-striped table-bordered table-hover"></table>
                 </div>
             </div>
@@ -32,128 +59,141 @@
 <script type="text/javascript">
 
     $(function () {
+        $('#shipped_time_begin_query').datetimepicker({
+            locale: "zh-cn"
+        });
 
+        $('#shipped_time_end_query').datetimepicker({
+            locale: "zh-cn"
+        });
+
+        initDataTable(
+            '#orderLogisticsList',
+            {
+                "sAjaxSource": '{%url "ErpOrderLogisticsDiff.ListData"%}',
+                "aaSorting": [[0, "desc"]],
+                "aoColumns": [
+                    {
+                        "mDataProp": "oll.id",
+                        "bSearchable": false,
+                        "orderable": true,
+                        "sClass": "center",
+                        "width": 50,
+                        "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
+                        "render": function (data, type, row) {
+                            return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
+                        }
+                    },
+                    {
+                        "mDataProp": "o.code", "title": "订单编号", "bSearchable": true, "width": 120,
+                        "render": function (data, type, row) {
+                            return "<div style='min-width: 100px;white-space:normal; word-break: break-all; word-wrap:break-word;'><a href='/order/detail/" + row.o.id + "' target='_blank'>" + data + "</a></div>";
+                        }
+                    },
+                    {
+                        "mDataProp": "o.full_tran_id", "title": "订单代码", "bSearchable": true, "width": 120,
+                        "render": function (data, type, row) {
+                            return "<div style='min-width: 80px;white-space:normal; word-break: break-all; word-wrap:break-word;'>" + data + "</div>";
+                        }
+                    },
+                    {
+                        "mDataProp": "osa.postal_code",
+                        "title": "邮编",
+                        "bSearchable": true,
+                        "bSortable": true,
+                        "width": 60
+                    },
+                    {
+                        "mDataProp": "oll.weight",
+                        "title": "计费重量",
+                        "bSearchable": false,
+                        "bSortable": true,
+                        "width": 80
+                    },
+                    {
+                        "mDataProp": "lm.name",
+                        "title": "最佳仓物流",
+                        "bSearchable": true,
+                        "bSortable": true
+                    },
+                    {
+                        "mDataProp": "oll.total_fee", "title": "最佳仓费用", "bSearchable": false, "width": 100,
+                        "render": function (data, type, row) {
+                            if (data !== "" && data !== 0) {
+                                return "AU " + dtFormatFloat(data);
+                            }
+                            else {
+                                return "";
+                            }
+                        }
+                    },
+                    {
+                        "mDataProp": "lm_sec.name",
+                        "title": "次佳仓物流",
+                        "bSearchable": true,
+                        "bSortable": true
+                    },
+                    {
+                        "mDataProp": "oll.total_fee_second", "title": "次佳仓费用", "bSearchable": false, "width": 100,
+                        "render": function (data, type, row) {
+                            if (data !== "" && data !== 0) {
+                                return "AU " + dtFormatFloat(data);
+                            }
+                            else {
+                                return "";
+                            }
+                        }
+                    },
+                    {
+                        "mDataProp": "oll.fee_diff", "title": "费用偏差", "bSearchable": false, "width": 100,
+                        "render": function (data, type, row) {
+                            if (data !== "" && data !== 0) {
+                                return "AU " + dtFormatFloat(data);
+                            }
+                            else {
+                                return "";
+                            }
+                        }
+                    },
+                    {
+                        "mDataProp": "oll.update_time", "title": "匹配时间", "bSearchable": false, "width": 120
+                    },
+                    {
+                        "mDataProp": "o.shipped_time", "title": "发货时间", "bSearchable": false, "width": 120
+                    }
+                ],
+                "fnServerData": function (sSource, aoData, fnCallback) {
+                    showMask("数据加载中，请稍候");
+
+                    aoData.push({'name': 'stock_query', 'value': $("#stock_query").val()});
+                    aoData.push({'name': 'stock_second_query', 'value': $("#stock_second_query").val()});
+                    aoData.push({'name': 'shipped_time_begin_query', 'value': $("#shipped_time_begin_query").val()});
+                    aoData.push({'name': 'shipped_time_end_query', 'value': $("#shipped_time_end_query").val()});
+
+                    $.ajax({
+                        "dataType": 'json',
+                        "url": sSource,
+                        "data": aoData,
+                        "success": function (data) {
+                            hideMask();
+
+                            if (data.success === false) {
+                                $.msg.error(data.message);
+                                return;
+                            }
+
+                            fnCallback(data);
+                        }
+                    });
+                }
+            }
+        );
     });
 
     var vm = new Vue({
         el: "#page",
         data: {},
         mounted: function () {
-            var this_vm = this;
-
-            initDataTable(
-                '#orderLogisticsList',
-                {
-                    "sAjaxSource": '{%url "ErpOrderLogisticsDiff.ListData"%}',
-                    "aaSorting": [[0, "desc"]],
-                    "aoColumns": [
-                        {
-                            "mDataProp": "oll.id",
-                            "bSearchable": false,
-                            "orderable": true,
-                            "sClass": "center",
-                            "width": 50,
-                            "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
-                            "render": function (data, type, row) {
-                                return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
-                            }
-                        },
-                        {
-                            "mDataProp": "o.code", "title": "订单编号", "bSearchable": true, "width": 120,
-                            "render": function (data, type, row) {
-                                return "<div style='min-width: 100px;white-space:normal; word-break: break-all; word-wrap:break-word;'><a href='/order/detail/" + row.o.id + "' target='_blank'>" + data + "</a></div>";
-                            }
-                        },
-                        {
-                            "mDataProp": "o.full_tran_id", "title": "订单代码", "bSearchable": true, "width": 120,
-                            "render": function (data, type, row) {
-                                return "<div style='min-width: 80px;white-space:normal; word-break: break-all; word-wrap:break-word;'>" + data + "</div>";
-                            }
-                        },
-                        {
-                            "mDataProp": "osa.postal_code",
-                            "title": "邮编",
-                            "bSearchable": true,
-                            "bSortable": true,
-                            "width": 60
-                        },
-                        {
-                            "mDataProp": "oll.weight",
-                            "title": "计费重量",
-                            "bSearchable": false,
-                            "bSortable": true,
-                            "width": 80
-                        },
-                        {
-                            "mDataProp": "lm.name",
-                            "title": "最佳仓物流",
-                            "bSearchable": true,
-                            "bSortable": true
-                        },
-                        {
-                            "mDataProp": "oll.total_fee", "title": "最佳仓费用", "bSearchable": false, "width": 100,
-                            "render": function (data, type, row) {
-                                if (data !== "" && data !== 0) {
-                                    return "AU " + dtFormatFloat(data);
-                                }
-                                else {
-                                    return "";
-                                }
-                            }
-                        },
-                        {
-                            "mDataProp": "lm_sec.name",
-                            "title": "次佳仓物流",
-                            "bSearchable": true,
-                            "bSortable": true
-                        },
-                        {
-                            "mDataProp": "oll.total_fee_second", "title": "次佳仓费用", "bSearchable": false, "width": 100,
-                            "render": function (data, type, row) {
-                                if (data !== "" && data !== 0) {
-                                    return "AU " + dtFormatFloat(data);
-                                }
-                                else {
-                                    return "";
-                                }
-                            }
-                        },
-                        {
-                            "mDataProp": "oll.fee_diff", "title": "费用偏差", "bSearchable": false, "width": 100,
-                            "render": function (data, type, row) {
-                                if (data !== "" && data !== 0) {
-                                    return "AU " + dtFormatFloat(data);
-                                }
-                                else {
-                                    return "";
-                                }
-                            }
-                        },
-                        {
-                            "mDataProp": "oll.update_time", "title": "匹配时间", "bSearchable": false, "width": 120
-                        }
-                    ],
-                    "fnServerData": function (sSource, aoData, fnCallback) {
-                        showMask("数据加载中，请稍候");
-
-                        $.ajax({
-                            "dataType": 'json',
-                            "url": sSource,
-                            "data": aoData,
-                            "success": function (data) {
-                                hideMask();
-
-                                if (data.success === false) {
-                                    $.msg.error(data.message);
-                                    return;
-                                }
-
-                                fnCallback(data);
-                            }
-                        });
-                    }
-                }
-            );
         },
         methods: {
             reloadList: function () {
@@ -173,8 +213,18 @@
             }
         });
 
+        /*
+                    'stock_query', 'value': $("#stock_query").val()});
+                    'stock_second_query', 'value': $("#stock_second_query").val()});
+                    'shipped_time_begin_query', 'value': $("#shipped_time_begin_query").val()});
+                    'shipped_time_end_query', 'value': $("#shipped_time_end_query").val()});
+         */
         var params = $.param({
-            "id_list": id_list
+            "id_list": id_list,
+            "stock_query": $("#stock_query").val(),
+            "stock_second_query": $("#stock_second_query").val(),
+            "shipped_time_begin_query": $("#shipped_time_begin_query").val(),
+            "shipped_time_end_query": $("#shipped_time_end_query").val()
         });
         var url = '{%url "ErpOrderLogisticsDiff.Export"%}' + "?" + params;
         $('<form method="post" action="' + url + '"></form>').appendTo('body').submit().remove();
