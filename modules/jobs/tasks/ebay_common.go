@@ -185,7 +185,6 @@ func fetch_product_item_to_db(config xtpz_models.EBayAPIConfigInfo, db_session *
 	core.HandleError(err)
 
 	product.Sku = item_response.Item.Sku
-	product.Name = item_response.Item.Title
 	product.ImageUrl = core.MakeNullString(item_response.Item.PictureDetails.GalleryUrl, true)
 
 	if product.StatusId == 0 {
@@ -194,6 +193,7 @@ func fetch_product_item_to_db(config xtpz_models.EBayAPIConfigInfo, db_session *
 
 	if has_product == false {
 		// do insert
+		product.Name = item_response.Item.Title
 		product.CnName = product.Sku
 		_, err = db_session.Insert(&product)
 		core.HandleError(err)
