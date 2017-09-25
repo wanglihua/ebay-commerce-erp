@@ -376,24 +376,16 @@ func (p_ol *OrderLogisticsService) match_logistics_mode_logic(p_order *ddlc_mode
 
 		var total_fee_diff = lowest_total_fee - mode_result.total_fee // 就是当前模式比之前的省了多少钱
 
-		/*
 		// 三个区间 final_total_amount-mode_result.total_amount，后来改用 fee了，不考虑 库存的cost_price，因为没有库存的也参与筛选
 		// 负无穷大 到 -p_ol.logistics_setting.FeeMaxDiff， -p_ol.logistics_setting.FeeMaxDiff到+p_ol.logistics_setting.FeeMaxDiff, +p_ol.logistics_setting.FeeMaxDiff 到 正无穷大
 		if total_fee_diff > p_ol.logistics_setting.FeeMaxDiff { // 取得更优的模式方案，挑选最优解时，把商品的到仓成本也考虑进去   +p_ol.logistics_setting.FeeMaxDiff 到 正无穷大
-			final_result_second = final_result // 先把结果给次佳仓
 			final_result = mode_result
 		} else if math.Abs(total_fee_diff) <= p_ol.logistics_setting.FeeMaxDiff { // 运费偏差在最大允许范围内，其实还是算上了澳仓成本的  -p_ol.logistics_setting.FeeMaxDiff到+p_ol.logistics_setting.FeeMaxDiff,
 			//取优先级高的仓库
 
 			if mode_result.stock.Priority > final_result.stock.Priority { // 当前的仓库的优先级要高
-				final_result_second = final_result // 先把结果给次佳仓
 				final_result = mode_result
 			}
-		}
-		*/
-
-		if total_fee_diff > 0 { // final_result.total_fee > mode_result.total_fee 这里就不考虑允许偏差范围了
-			final_result = mode_result
 		}
 
 		match_result_list = append(match_result_list, mode_result) // 所有匹配结果都放入列表
