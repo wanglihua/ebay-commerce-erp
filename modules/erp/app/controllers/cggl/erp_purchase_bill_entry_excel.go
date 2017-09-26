@@ -4,7 +4,6 @@ import (
 	"github.com/revel/revel"
 
 	"matrix/core"
-	"matrix/modules/erp/models/hgbg_models"
 	"fmt"
 	"github.com/tealeg/xlsx"
 	"strings"
@@ -196,6 +195,8 @@ func (c ErpPurchaseBillEntryExcel) Import() revel.Result {
 			purchase_bill_entry.Desc = core.MakeNullString(purchase_bill_entry_import.Desc, true)
 		}
 
+		purchase_bill_entry.StatusId = purchase_bill.StatusId
+
 		_, err := db_session.Insert(&purchase_bill_entry)
 		core.HandleError(err)
 	}
@@ -206,9 +207,10 @@ func (c ErpPurchaseBillEntryExcel) Import() revel.Result {
 	})
 }
 
-type cte_item_t struct {
-	ContainerTransferEntry hgbg_models.ContainerTransferEntryInfo `xorm:"extends" json:"cte"`
-	Product                kcgl_models.ProductInfo                `xorm:"extends" json:"p"`
+type purchase_bill_entry_item_t struct {
+	PurchaseBillEntry cggl_models.PurchaseBillEntryInfo `xorm:"extends" json:"pbe"`
+	Product           kcgl_models.ProductInfo           `xorm:"extends" json:"p"`
+	Status            models.StatusInfo                 `xorm:"extends" json:"s"`
 }
 
 func (c ErpPurchaseBillEntryExcel) Export() revel.Result {
@@ -224,23 +226,26 @@ func (c ErpPurchaseBillEntryExcel) Export() revel.Result {
 	core.HandleError(err)
 
 	/*
-		SELECT cte.*, p.*
-			FROM erp_container_transfer_entry cte
-		INNER JOIN erp_product p ON cte.product_id = p.id
+		SELECT pbe.*, p.*, s.*
+		FROM erp_purchase_bill_entry pbe
+			INNER JOIN erp_product p ON p.id = pbe.product_id
+			INNER JOIN erp_status s ON s.id = pbe.status_id;
 	*/
 
 	var sb = core.NewSqlBuilder()
-	sb.Select("cte.*, p.*")
+	sb.Select("pbe.*, p.*, s.*")
 	sb.Count("count(*) as entry_count")
-	sb.From(`erp_container_transfer_entry cte
-    INNER JOIN erp_product p ON cte.product_id = p.id`)
+	sb.From(`erp_purchase_bill_entry pbe
+			INNER JOIN erp_product p ON p.id = pbe.product_id
+			INNER JOIN erp_status s ON s.id = pbe.status_id`)
 
-	var filter = fmt.Sprintf("cte.bill_id = %d", bill_id)
+	var filter = fmt.Sprintf("pbe.bill_id = %d", bill_id)
+
 	sb.Where(filter)
 
-	sb.OrderBy("cte.id asc")
+	sb.OrderBy("pbe.id asc")
 
-	entry_list := make([]cte_item_t, 0)
+	entry_list := make([]purchase_bill_entry_item_t, 0)
 	err = db_session.Sql(sb.SqlList()).Find(&entry_list)
 	core.HandleError(err)
 
@@ -253,12 +258,12 @@ func (c ErpPurchaseBillEntryExcel) Export() revel.Result {
 
 	reader := bytes.NewReader(buffer.Bytes()) //bytes.Reader 实现了 io.Reader 接口
 
-	file_name := fmt.Sprintf("集装箱调拨明细导出_%s.xlsx", purchase_bill.Code)
+	file_name := fmt.Sprintf("采购单明细导出_%s.xlsx", purchase_bill.Code)
 
 	return c.RenderBinary(reader, file_name, revel.Attachment, time.Now())
 }
 
-func (c ErpPurchaseBillEntryExcel) export_entry_list_to_excel(db_session *xorm.Session, entry_list []cte_item_t) *xlsx.File {
+func (c ErpPurchaseBillEntryExcel) export_entry_list_to_excel(db_session *xorm.Session, entry_list []purchase_bill_entry_item_t) *xlsx.File {
 
 	//统一设置标题单元格格式的函数
 	set_head_cell_style := func(cell *xlsx.Cell) {
@@ -325,7 +330,7 @@ func (c ErpPurchaseBillEntryExcel) export_entry_list_to_excel(db_session *xorm.S
 	xlsx_file := xlsx.NewFile()
 
 	//添加工作表
-	sheet, err := xlsx_file.AddSheet("集装箱调拨明细")
+	sheet, err := xlsx_file.AddSheet("采购单明细")
 	core.HandleError(err)
 
 	//添加标题行
@@ -335,10 +340,6 @@ func (c ErpPurchaseBillEntryExcel) export_entry_list_to_excel(db_session *xorm.S
 	col_index := 0
 
 	{
-		/*
-            SKU，数量，箱数，价格
-		 */
-
 		cell := row.AddCell()
 		sheet.SetColWidth(col_index, col_index, 12)
 		set_head_cell_style(cell)
@@ -352,31 +353,46 @@ func (c ErpPurchaseBillEntryExcel) export_entry_list_to_excel(db_session *xorm.S
 		col_index++
 
 		cell = row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 8)
+		sheet.SetColWidth(col_index, col_index, 10)
 		set_head_cell_style(cell)
-		cell.Value = "数量"
-		col_index++
-
-		cell = row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 8)
-		set_head_cell_style(cell)
-		cell.Value = "箱数"
-		col_index++
-
-		/*
-
-		cell = row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 8)
-		set_head_cell_style(cell)
-		cell.Value = "开票"
+		cell.Value = "价格"
 		col_index++
 
 		cell = row.AddCell()
 		sheet.SetColWidth(col_index, col_index, 10)
 		set_head_cell_style(cell)
-		cell.Value = "价格"
+		cell.Value = "MEL数量"
 		col_index++
-		*/
+
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 10)
+		set_head_cell_style(cell)
+		cell.Value = "BNE数量"
+		col_index++
+
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 10)
+		set_head_cell_style(cell)
+		cell.Value = "数量"
+		col_index++
+
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 10)
+		set_head_cell_style(cell)
+		cell.Value = "金额"
+		col_index++
+
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 10)
+		set_head_cell_style(cell)
+		cell.Value = "描述"
+		col_index++
+
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 10)
+		set_head_cell_style(cell)
+		cell.Value = "状态"
+		col_index++
 	}
 
 	for _, entry := range entry_list {
@@ -388,40 +404,45 @@ func (c ErpPurchaseBillEntryExcel) export_entry_list_to_excel(db_session *xorm.S
 		set_text_cell_style(cell, "center")
 		cell.Value = entry.Product.Sku
 
-		// SKU
+		// 名称
 		cell = row.AddCell()
 		set_text_cell_style(cell, "left")
 		cell.Value = entry.Product.CnName
 
-		// 数量
-		cell = row.AddCell()
-		set_text_cell_style(cell, "right")
-		cell.SetInt64(entry.ContainerTransferEntry.Qty)
-
-		// 箱数
-		cell = row.AddCell()
-		set_text_cell_style(cell, "right")
-		cell.SetInt64(entry.ContainerTransferEntry.BoxQty)
-
-		/*
-		// 开票
-		cell = row.AddCell()
-		set_text_cell_style(cell, "center")
-		cell.Value = func() string {
-			if entry.ContainerTransferEntry.NeedInvoice == 0 {
-				return "否"
-			} else {
-				return "是"
-			}
-		}()
-		*/
-
-		/*
 		// 价格
 		cell = row.AddCell()
 		set_text_cell_style(cell, "right")
-		cell.SetFloat(entry.Price)
-		*/
+		cell.SetFloatWithFormat(entry.PurchaseBillEntry.Price, "0.00")
+
+		// MEL数量
+		cell = row.AddCell()
+		set_text_cell_style(cell, "right")
+		cell.SetInt64(entry.PurchaseBillEntry.MelQty)
+
+		// BNE数量
+		cell = row.AddCell()
+		set_text_cell_style(cell, "right")
+		cell.SetInt64(entry.PurchaseBillEntry.BneQty)
+
+		// 数量
+		cell = row.AddCell()
+		set_text_cell_style(cell, "right")
+		cell.SetInt64(entry.PurchaseBillEntry.Qty)
+
+		// 金额
+		cell = row.AddCell()
+		set_text_cell_style(cell, "right")
+		cell.SetFloatWithFormat(entry.PurchaseBillEntry.Amount, "0.00")
+
+		// 描述
+		cell = row.AddCell()
+		set_text_cell_style(cell, "left")
+		cell.Value = entry.PurchaseBillEntry.Desc.String
+
+		// 状态
+		cell = row.AddCell()
+		set_text_cell_style(cell, "left")
+		cell.Value = entry.Status.Name
 	}
 
 	return xlsx_file
