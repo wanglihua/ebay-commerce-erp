@@ -352,7 +352,7 @@ func (p_ol *OrderLogisticsService) CalculateListWithOption(order_list []ddlc_mod
 			continue
 		}
 
-		match_success, order_logistics, is_envelope_hold := p_ol.match_logistics_mode_with_option(&order, p_order_logistics_data, match_option, db_session)
+		match_success, order_logistics, is_envelope_hold := p_ol.match_logistics_mode_with_option(&order, p_order_logistics_data, match_option, is_previous_hold, db_session)
 
 		// 如果通过指定的物流的方式在匹配时进行了信封 Hold，就跳过
 		if is_envelope_hold == true {

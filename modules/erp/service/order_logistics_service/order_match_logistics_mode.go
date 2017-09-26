@@ -19,7 +19,7 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *ddlc_models.OrderInfo,
 }
 */
 
-func (p_ol *OrderLogisticsService) match_logistics_mode_with_option(p_order *ddlc_models.OrderInfo, p_order_logistics_data *order_logistics_data_t, match_option Match_option_t, db_session *xorm.Session) (success_return bool, order_logistics_return ddlc_models.OrderLogisticsInfo, is_envelope_hold_return bool) {
+func (p_ol *OrderLogisticsService) match_logistics_mode_with_option(p_order *ddlc_models.OrderInfo, p_order_logistics_data *order_logistics_data_t, match_option Match_option_t, is_previous_hold bool, db_session *xorm.Session) (success_return bool, order_logistics_return ddlc_models.OrderLogisticsInfo, is_envelope_hold_return bool) {
 
 	// 在这里面只考虑最佳仓库的库存情况，次佳仓库有货的情况，别的地方已经考虑并 hold
 
@@ -445,7 +445,7 @@ func (p_ol *OrderLogisticsService) match_logistics_mode_with_option(p_order *ddl
 				mt.PrintlnIndent(1, "匹配单个费率结束")
 				mt.Println()
 			}
-		} // for _, logistics_fee_rate := range logistics_fee_rate_list {
+		}                                            // for _, logistics_fee_rate := range logistics_fee_rate_list {
 
 		if mode_result.fee_rate_id == 0 { //没有费率匹配成功, 比如说，还没有开通该地区的物流
 			mt.Println("该物流方式下没有匹配的物流费率，弃用当前物流方式")
@@ -563,7 +563,7 @@ func (p_ol *OrderLogisticsService) match_logistics_mode_with_option(p_order *ddl
 		return false, order_logistics, false
 	}
 
-	order_logistics = save_order_logistics(p_ol, p_order, p_order_logistics_data, final_result, match_option.Unlock_express, p_ol.LoginUser, db_session)
+	order_logistics = save_order_logistics(p_ol, p_order, p_order_logistics_data, final_result, match_option.Unlock_express, p_ol.LoginUser, is_previous_hold, db_session)
 
 	if final_result.has_stock == false {
 		if len(match_result_has_stock_list) != 0 {

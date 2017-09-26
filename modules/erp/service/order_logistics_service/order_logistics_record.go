@@ -13,7 +13,7 @@ import (
 	"matrix/modules/erp/models/ddlc_models"
 )
 
-func save_order_logistics(p_ol *OrderLogisticsService, p_order *ddlc_models.OrderInfo, p_order_logistics_data *order_logistics_data_t, match_result match_logistics_mode_result, unlock_express bool, login_user core.LoginUser, db_session *xorm.Session) ddlc_models.OrderLogisticsInfo {
+func save_order_logistics(p_ol *OrderLogisticsService, p_order *ddlc_models.OrderInfo, p_order_logistics_data *order_logistics_data_t, match_result match_logistics_mode_result, unlock_express bool, login_user core.LoginUser, is_previous_hold bool, db_session *xorm.Session) ddlc_models.OrderLogisticsInfo {
 	// 匹配成功，记录匹配成功数据
 	var order_logistics ddlc_models.OrderLogisticsInfo
 	has, err := db_session.Where(fmt.Sprintf("order_id = %d", match_result.order_id)).Get(&order_logistics)
@@ -61,15 +61,20 @@ func save_order_logistics(p_ol *OrderLogisticsService, p_order *ddlc_models.Orde
 			order_history_service.Insert_order_history(*p_order, login_user_id, fmt.Sprintf("匹配物流订单Hold 快递类，工号：%s", login_name), db_session)
 		} else {
 			// 把订单状态修改为 待配货
-			p_order.HoldTypeId = core.MakeNullInt(0, false)
-			p_order.StatusId = models.ORDER_STATUS_DPH
-
 			var login_user_id = login_user.UserId
 			var login_name = login_user.LoginName
 			if login_name == "" {
 				login_name = "自动任务"
 			}
-			order_history_service.Insert_order_history(*p_order, login_user_id, fmt.Sprintf("匹配物流订单待配货，工号：%s", login_name), db_session)
+
+			if is_previous_hold == true {
+				p_order.StatusId = models.ORDER_STATUS_PROCESSED_HOLD
+				order_history_service.Insert_order_history(*p_order, login_user_id, fmt.Sprintf("匹配物流订单 Hold 转 已处理Hold， 工号：%s", login_name), db_session)
+			} else {
+				p_order.HoldTypeId = core.MakeNullInt(0, false)
+				p_order.StatusId = models.ORDER_STATUS_DPH
+				order_history_service.Insert_order_history(*p_order, login_user_id, fmt.Sprintf("匹配物流订单待配货，工号：%s", login_name), db_session)
+			}
 		}
 	}
 
