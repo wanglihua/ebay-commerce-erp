@@ -30,6 +30,8 @@ func (c ErpPurchaseBillEntryExcel) Import() revel.Result {
 	var bill_id int64
 	c.Params.Bind(&bill_id, "bill_id")
 
+	revel.TRACE.Println("bill_id", bill_id)
+
 	var purchase_bill cggl_models.PurchaseBillInfo
 	_, err := db_session.Id(bill_id).Get(&purchase_bill)
 	core.HandleError(err)
@@ -150,6 +152,14 @@ func (c ErpPurchaseBillEntryExcel) Import() revel.Result {
 			purchase_bill_entry_import_list[index].product = product
 		}
 
+		var purchase_bill_entry cggl_models.PurchaseBillEntryInfo
+		has, err = db_session.Where("product_id = ?", product.Id).Get(&purchase_bill_entry)
+		core.HandleError(err)
+
+		if has == true {
+			buffer.WriteString(fmt.Sprintf("当前采购单的 商品 %s 的明细已存在！", product.Sku))
+		}
+
 		price, err := strconv.ParseFloat(purchase_bill_entry_import.Price, 64)
 		if err != nil {
 			buffer.WriteString("价格格式输入不对！")
@@ -176,7 +186,7 @@ func (c ErpPurchaseBillEntryExcel) Import() revel.Result {
 		if error_str != "" {
 			return c.RenderJson(map[string]interface{}{
 				"success": false,
-				"message": fmt.Sprintf("导入出现错误，详细：%s！", error_str),
+				"message": fmt.Sprintf("导入出现错误，详细：%s", error_str),
 			})
 		}
 	}
@@ -188,6 +198,8 @@ func (c ErpPurchaseBillEntryExcel) Import() revel.Result {
 		purchase_bill_entry.Price = purchase_bill_entry_import.price
 		purchase_bill_entry.MelQty = purchase_bill_entry_import.mel_qty
 		purchase_bill_entry.BneQty = purchase_bill_entry_import.bne_qty
+		purchase_bill_entry.Qty = purchase_bill_entry_import.mel_qty + purchase_bill_entry_import.bne_qty
+		purchase_bill_entry.Amount = purchase_bill_entry.Price * float64(purchase_bill_entry.Qty)
 
 		if purchase_bill_entry_import.Desc == "" {
 			purchase_bill_entry.Desc = core.MakeNullString("", false)
