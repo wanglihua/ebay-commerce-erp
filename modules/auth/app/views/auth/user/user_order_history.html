@@ -26,12 +26,12 @@
             '#orderHistoryList',
             {
                 "sAjaxSource": '{%url "ErpOrderHistory.ListData"%}',
-                "aaSorting": [[3, "desc"]],
+                "aaSorting": [[3, "asc"]],
                 "aoColumns": [
                     {"mDataProp": "order_code", "title": "订单编码", "bSearchable": true, "bSortable": false, "width": 120},
                     {"mDataProp": "status_name", "title": "状态名称", "bSearchable": true, "bSortable": false, "width": 120},
                     {"mDataProp": "description", "title": "描述", "bSearchable": true, "bSortable": false},
-                    {"mDataProp": "create_time", "title": "操作时间", "bSearchable": false, "width": 120}
+                    {"mDataProp": "create_time", "title": "操作时间", "bSearchable": false, "bSortable": false, "width": 120}
                 ],
                 "fnServerData": function (sSource, aoData, fnCallback) {
                     showMask("数据加载中，请稍候");

@@ -50,10 +50,12 @@ func GetHeader(title string, db_session *xorm.Session, web_session revel.Session
 	header_buffer.WriteString(sys_name)
 
 	if strings.Contains(strings.ToLower(db.DbUrl), strings.ToLower("ozoerp_test")) {
-		header_buffer.WriteString("测试环境")
+		header_buffer.WriteString("&nbsp;<span style='color:red;'>测试环境</span>")
 	}
 
-	header_buffer.WriteString(`</small>
+	header_buffer.WriteString(`</small>`);
+	header_buffer.WriteString(`<span style="color:red;font-size:12px;"><span>`);
+	header_buffer.WriteString(`
             </a>
             </div>
         <div class="navbar-buttons navbar-header pull-right" role="navigation">

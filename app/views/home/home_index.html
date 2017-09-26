@@ -40,7 +40,7 @@
                             </td>
                             <td style="text-align: center;">
                                 <span v-if="notice.n.is_read" style="color: blue;">已阅</span>
-                                <span v-else="notice.n.is_read" style="color:red;">未阅</span>
+                                <span v-else="notice.n.is_read" style="color:red;font-weight: bold;"><i class="fa fa-sticky-note"></i>&nbsp;未阅</span>
                             </td>
                             <td>{{notice.u.nick_name}}</td>
                             <td>{{notice.n.create_time}}</td>

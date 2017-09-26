@@ -71,7 +71,7 @@
             '#orderLogisticsList',
             {
                 "sAjaxSource": '{%url "ErpOrderLogisticsDiff.ListData"%}',
-                "aaSorting": [[10, "desc"]],
+                "aaSorting": [[0, "desc"]],
                 "aoColumns": [
                     {
                         "mDataProp": "oll.id",
@@ -155,9 +155,11 @@
                             }
                         }
                     },
+                    /*
                     {
                         "mDataProp": "oll.update_time", "title": "匹配时间", "bSearchable": false, "width": 120
                     },
+                    */
                     {
                         "mDataProp": "o.shipped_time", "title": "发货时间", "bSearchable": false, "width": 120
                     }
