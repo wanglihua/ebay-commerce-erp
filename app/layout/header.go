@@ -12,6 +12,7 @@ import (
 	"matrix/modules/auth/service/pass_service"
 	"strings"
 	"matrix/db"
+	"matrix/modules/erp/service/notice_read_service"
 )
 
 func GetHeader(title string, db_session *xorm.Session, web_session revel.Session) string {
@@ -54,7 +55,7 @@ func GetHeader(title string, db_session *xorm.Session, web_session revel.Session
 	}
 
 	header_buffer.WriteString(`</small>`);
-	header_buffer.WriteString(`<span style="color:red;font-size:12px;"><span>`);
+	header_buffer.WriteString(fmt.Sprintf(`&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:red;font-size:12px;">您有 %d 条未阅读的通知公告！<span>`, notice_read_service.GetUserUnreadNoticeCount(login_user.UserId, db_session)));
 	header_buffer.WriteString(`
             </a>
             </div>
