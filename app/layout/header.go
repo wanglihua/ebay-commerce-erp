@@ -55,7 +55,11 @@ func GetHeader(title string, db_session *xorm.Session, web_session revel.Session
 	}
 
 	header_buffer.WriteString(`</small>`);
-	header_buffer.WriteString(fmt.Sprintf(`&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:red;font-size:12px;">您有 %d 条未阅读的通知公告！<span>`, notice_read_service.GetUserUnreadNoticeCount(login_user.UserId, db_session)));
+	var unread_notice_count = notice_read_service.GetUserUnreadNoticeCount(login_user.UserId, db_session)
+	if unread_notice_count != 0 {
+		header_buffer.WriteString(fmt.Sprintf(`&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:red;font-size:12px;">您有 %d 条未阅读的通知公告！<span>`, unread_notice_count));
+	}
+
 	header_buffer.WriteString(`
             </a>
             </div>
