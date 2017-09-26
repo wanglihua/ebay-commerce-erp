@@ -140,6 +140,8 @@ func (c ErpContainerTransferEntryExcel) Import() revel.Result {
 		})
 	}
 
+	var au_exchange_rate = exchange_rate_service.Get_aud_exchange_rate(db_session)
+
 	//验证导入的数据
 	var container_transfer_entry_import_error_list = make([]transfer_entry_import_t, 0)
 
@@ -204,7 +206,6 @@ func (c ErpContainerTransferEntryExcel) Import() revel.Result {
 		//	buffer.WriteString("是否开票输入不对！")
 		//}
 
-		var au_exchange_rate = exchange_rate_service.Get_aud_exchange_rate(db_session)
 		//transfer_entry_import_list[index].price = inventory_service.GetProductCnStockCostPrice(product.Id, db_session) / au_exchange_rate
 		//transfer_entry_import_list[index].price = product_service.GetProductPrice(product.Id, db_session) / au_exchange_rate
 		transfer_entry_import_list[index].price = product.CostPrice / au_exchange_rate

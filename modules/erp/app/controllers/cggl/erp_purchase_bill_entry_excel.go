@@ -12,7 +12,6 @@ import (
 	"time"
 	"github.com/go-xorm/xorm"
 	"strconv"
-	"matrix/modules/erp/service/exchange_rate_service"
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/auth/pass_res"
 	"matrix/modules/erp/models/kcgl_models"
@@ -52,42 +51,35 @@ func (c ErpPurchaseBillEntryExcel) Import() revel.Result {
 		})
 	}
 
-	type transfer_entry_import_t struct {
-		ProductSku   string `json:"product_sku"`
-		Qty          string `json:"qty"`
-		BoxQty       string `json:"box_qty"`
-		NeedInvoice  string `json:"need_invoice"`
-		ErrorMessage string `json:"error_message"`
-
-		product    kcgl_models.ProductInfo            `json:"-"`
-		hs_code_au hgbg_models.HsCodeAuDutyInfo       `json:"-"`
-		hs_code_cn hgbg_models.HsCodeCnReportElemInfo `json:"-"`
-		qty        int64                              `json:"-"`
-		box_qty    int64                              `json:"-"`
-		price      float64                            `json:"-"`
+	type purchase_bill_entry_import_t struct {
+		ProductSku string                  `json:"product_sku"`
+		Price      string                  `json:"price"`
+		MelQty     string                  `json:"mel_qty"`
+		BneQty     string                  `json:"bne_qty"`
+		Desc       string                  `json:"desc"`
+		product    kcgl_models.ProductInfo `json:"-"`
+		price      float64                 `json:"-"`
+		mel_qty    int64                   `json:"-"`
+		bne_qty    int64                   `json:"-"`
 	}
 
-	transfer_entry_import_list := make([]transfer_entry_import_t, 0)
+	purchase_bill_entry_import_list := make([]purchase_bill_entry_import_t, 0)
 
 	xlsx_file, err := xlsx.OpenBinary(excel_file_bytes)
 	core.HandleError(err)
 
 	// 会导入所有 sheets
 	sheet_count := len(xlsx_file.Sheets)
-	//revel.TRACE.Printf("sheet_count: %d\n", sheet_count)
 	for sheet_index := 0; sheet_index < sheet_count; sheet_index ++ {
 		sheet := xlsx_file.Sheets[sheet_index]
 		max_row := sheet.MaxRow
-		//revel.TRACE.Printf("max_row: %d\n", max_row)
 		//略过标题行
 		for row_index := 1; row_index < max_row; row_index ++ {
-			//row := sheet.Rows[row_index]
-
 			var cell *xlsx.Cell
 			var cell_val string
 			var err error
 
-			var transfer_entry_import transfer_entry_import_t
+			var purchase_bill_entry_import purchase_bill_entry_import_t
 
 			col_index := 0
 
@@ -99,161 +91,112 @@ func (c ErpPurchaseBillEntryExcel) Import() revel.Result {
 			if cell_val == "" {
 				break
 			}
-			//revel.TRACE.Println(cell_val)
-			transfer_entry_import.ProductSku = cell_val
+			purchase_bill_entry_import.ProductSku = cell_val
 			col_index++
 
-			// qty
-			// cell = row.Cells[col_index]
+			// Price
 			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
-			transfer_entry_import.Qty = cell_val
+			purchase_bill_entry_import.Price = cell_val
 			col_index++
 
-			// box_qty
-			//cell = row.Cells[col_index]
+			// MelQty
 			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
-			transfer_entry_import.BoxQty = cell_val
+			purchase_bill_entry_import.MelQty = cell_val
 			col_index++
 
-			// 是否开票
+			// BneQty
 			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
-			transfer_entry_import.NeedInvoice = cell_val
+			purchase_bill_entry_import.BneQty = cell_val
 			col_index++
 
-			transfer_entry_import_list = append(transfer_entry_import_list, transfer_entry_import)
+			// 备注
+			cell = sheet.Cell(row_index, col_index)
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
+			purchase_bill_entry_import.Desc = cell_val
+			col_index++
+
+			purchase_bill_entry_import_list = append(purchase_bill_entry_import_list, purchase_bill_entry_import)
 		}
 	}
 
-	if len(transfer_entry_import_list) == 0 {
+	if len(purchase_bill_entry_import_list) == 0 {
 		return c.RenderJson(map[string]interface{}{
 			"success": false,
 			"message": "Excel文件中导入列表为空！",
 		})
 	}
 
-	//验证导入的数据
-	var container_transfer_entry_import_error_list = make([]transfer_entry_import_t, 0)
-
-	for index, transfer_entry_import := range transfer_entry_import_list {
+	for index, purchase_bill_entry_import := range purchase_bill_entry_import_list {
 		var buffer bytes.Buffer
 
 		var product kcgl_models.ProductInfo
-		has, err := db_session.Where(fmt.Sprintf("sku = '%s'", transfer_entry_import.ProductSku)).Get(&product)
+		has, err := db_session.Where(fmt.Sprintf("sku = '%s'", purchase_bill_entry_import.ProductSku)).Get(&product)
 		core.HandleError(err)
 
 		if has == false {
 			buffer.WriteString("商品SKU不存在！")
 
 		} else {
-			transfer_entry_import_list[index].product = product
+			purchase_bill_entry_import_list[index].product = product
 		}
 
-		//if product.AuHsCode == "" {
-		if product.AuDeclName == "" {
-			buffer.WriteString("商品澳洲海关品名未设置")
-		} else {
-			var hsCodeAu hgbg_models.HsCodeAuDutyInfo
-			has, err := db_session.Where("en_name = ?", product.AuDeclName).Get(&hsCodeAu)
-			core.HandleError(err)
-
-			if has == false {
-				buffer.WriteString("商品澳洲海关品名已设置，但该澳洲海关品名不存在！")
-			} else {
-				transfer_entry_import_list[index].hs_code_au = hsCodeAu
-			}
-		}
-
-		if product.CnDeclName == "" {
-			buffer.WriteString("商品中国海关品名未设置！")
-		} else {
-			var hsCodeCn hgbg_models.HsCodeCnReportElemInfo
-			has, err := db_session.Where("cn_name = ?", product.CnDeclName).Get(&hsCodeCn)
-			core.HandleError(err)
-
-			if has == false {
-				buffer.WriteString("商品中国海关品名已设置，但该中国海关品名不存在！")
-			} else {
-				transfer_entry_import_list[index].hs_code_cn = hsCodeCn
-			}
-		}
-
-		qty, err := strconv.ParseInt(transfer_entry_import.Qty, 10, 64)
+		price, err := strconv.ParseFloat(purchase_bill_entry_import.Price, 64)
 		if err != nil {
-			buffer.WriteString("数量格式输入不对！")
+			buffer.WriteString("价格格式输入不对！")
 		} else {
-			transfer_entry_import_list[index].qty = qty
+			purchase_bill_entry_import_list[index].price = price
 		}
 
-		box_qty, err := strconv.ParseInt(transfer_entry_import.BoxQty, 10, 64)
+		mel_qty, err := strconv.ParseInt(purchase_bill_entry_import.MelQty, 10, 64)
 		if err != nil {
-			buffer.WriteString("箱数格式输入不对！")
+			buffer.WriteString("MEL数量格式输入不对！")
 		} else {
-			transfer_entry_import_list[index].box_qty = box_qty
+			purchase_bill_entry_import_list[index].mel_qty = mel_qty
 		}
 
-		//if transfer_entry_import.NeedInvoice != "是" && transfer_entry_import.NeedInvoice != "否" {
-		//	buffer.WriteString("是否开票输入不对！")
-		//}
-
-		var au_exchange_rate = exchange_rate_service.Get_aud_exchange_rate(db_session)
-		//transfer_entry_import_list[index].price = inventory_service.GetProductCnStockCostPrice(product.Id, db_session) / au_exchange_rate
-		//transfer_entry_import_list[index].price = product_service.GetProductPrice(product.Id, db_session) / au_exchange_rate
-		transfer_entry_import_list[index].price = product.CostPrice / au_exchange_rate
-
-		if product.CostPrice == 0 {
-			buffer.WriteString("商品的采购价为零！")
+		bne_qty, err := strconv.ParseInt(purchase_bill_entry_import.BneQty, 10, 64)
+		if err != nil {
+			buffer.WriteString("BNE数量格式输入不对！")
+		} else {
+			purchase_bill_entry_import_list[index].bne_qty = bne_qty
 		}
 
-		if product.Length == 0 || product.Width == 0 || product.Height == 0 || product.Weight == 0 {
-			buffer.WriteString("商品长宽高重量数据有为零！")
-		}
+		var error_str = buffer.String()
 
-		transfer_entry_import.ErrorMessage = buffer.String()
-
-		if transfer_entry_import.ErrorMessage != "" {
-			container_transfer_entry_import_error_list = append(container_transfer_entry_import_error_list, transfer_entry_import)
+		if error_str != "" {
+			return c.RenderJson(map[string]interface{}{
+				"success": false,
+				"message": fmt.Sprintf("导入出现错误，详细：%s！", error_str),
+			})
 		}
 	}
 
-	if len(container_transfer_entry_import_error_list) != 0 {
-		return c.RenderJson(map[string]interface{}{
-			"success":         false,
-			"message":         "导入出现错误，详细请查看页面下部列表！",
-			"error_data_list": container_transfer_entry_import_error_list,
-		})
-	}
+	for _, purchase_bill_entry_import := range purchase_bill_entry_import_list {
+		var purchase_bill_entry cggl_models.PurchaseBillEntryInfo
+		purchase_bill_entry.BillId = bill_id
+		purchase_bill_entry.ProductId = purchase_bill_entry_import.product.Id
+		purchase_bill_entry.Price = purchase_bill_entry_import.price
+		purchase_bill_entry.MelQty = purchase_bill_entry_import.mel_qty
+		purchase_bill_entry.BneQty = purchase_bill_entry_import.bne_qty
 
-	for _, transfer_entry_import := range transfer_entry_import_list {
-		var transfer_entry hgbg_models.ContainerTransferEntryInfo
-		transfer_entry.TransferId = bill_id
-		transfer_entry.BatchCode = purchase_bill.Code
-		transfer_entry.ProductId = transfer_entry_import.product.Id
-		transfer_entry.ProductSku = transfer_entry_import.ProductSku
-		transfer_entry.Qty = transfer_entry_import.qty
-		transfer_entry.BoxQty = transfer_entry_import.box_qty
-		transfer_entry.Price = transfer_entry_import.price
+		if purchase_bill_entry_import.Desc == "" {
+			purchase_bill_entry.Desc = core.MakeNullString("", false)
+		} else {
+			purchase_bill_entry.Desc = core.MakeNullString(purchase_bill_entry_import.Desc, true)
+		}
 
-		transfer_entry.AuHsId = transfer_entry_import.hs_code_au.Id
-		transfer_entry.AuHsCode = transfer_entry_import.hs_code_au.HsCode
-		transfer_entry.AuHsDutyRate = transfer_entry_import.hs_code_au.DutyRate
-		transfer_entry.AuHsCnName = transfer_entry_import.hs_code_au.CnName
-		transfer_entry.AuHsEnName = transfer_entry_import.hs_code_au.EnName
-
-		transfer_entry.CnHsId = transfer_entry_import.hs_code_cn.Id
-		transfer_entry.CnHsCode = transfer_entry_import.hs_code_cn.HsCode
-		transfer_entry.CnHsCnName = transfer_entry_import.hs_code_cn.CnName
-		transfer_entry.CnHsEnName = transfer_entry_import.hs_code_cn.EnName
-
-		_, err := db_session.Insert(&transfer_entry)
+		_, err := db_session.Insert(&purchase_bill_entry)
 		core.HandleError(err)
 	}
 

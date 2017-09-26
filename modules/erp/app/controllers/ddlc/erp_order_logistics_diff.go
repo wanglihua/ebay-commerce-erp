@@ -14,6 +14,7 @@ import (
 	"github.com/go-xorm/xorm"
 	"github.com/tealeg/xlsx"
 	"matrix/modules/erp/models/sppz_models"
+	"matrix/modules/erp/models"
 )
 
 type ErpOrderLogisticsDiff struct {
@@ -106,6 +107,8 @@ FROM erp_order_logistics_logic oll
 		filter = core.SqlAnd(filter, fmt.Sprintf("o.shipped_time < '%04d-%02d-%02d'", shipped_time_end_query.Year(), shipped_time_end_query.Month(), shipped_time_end_query.Day()))
 	}
 
+	filter = core.SqlAnd(filter, fmt.Sprintf("o.status_id = %d", models.ORDER_STATUS_YFH)) // 只有显示已发货的
+
 	sb.Where(filter)
 
 	if order != "" {
@@ -185,6 +188,8 @@ func (c ErpOrderLogisticsDiff) Export() revel.Result {
 		shipped_time_end_query = shipped_time_end_query.Add(time.Hour * 24)
 		filter = core.SqlAnd(filter, fmt.Sprintf("o.shipped_time < '%04d-%02d-%02d'", shipped_time_end_query.Year(), shipped_time_end_query.Month(), shipped_time_end_query.Day()))
 	}
+
+	filter = core.SqlAnd(filter, fmt.Sprintf("o.status_id = %d", models.ORDER_STATUS_YFH)) // 只导出已发货的
 
 	/*
 SELECT oll.*, o.*, osa.*, s.*, lm.*, s_sec.*, lm_sec.*
