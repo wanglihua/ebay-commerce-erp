@@ -94,7 +94,7 @@ func (c UEditor) UploadFile() revel.Result {
 
 	defer file.Close()
 
-	subdir := strings.Replace(uuid.NewUUID().String(), "-", "", -1) + path.Ext(header.Filename)
+	subdir := strings.Replace(uuid.NewUUID().String(), "-", "", -1)
 	file_name := header.Filename
 
 	err = os.MkdirAll(path.Join(revel.BasePath, "static", "upload", "ueditor", "notice", subdir), 0775)
