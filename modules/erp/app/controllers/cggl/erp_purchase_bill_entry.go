@@ -237,7 +237,7 @@ func (c ErpPurchaseBillEntry) Save() revel.Result {
 		affected, err = db_session.Insert(&purchase_bill_entry)
 		core.HandleError(err)
 
-		purchase_bill_log_service.Insert_purchase_bill_log(purchase_bill, "新增采购明细", db_session, c.Session)
+		purchase_bill_log_service.Insert_purchase_bill_log(purchase_bill, "采购明细新增", db_session, c.Session)
 	} else {
 		billId_count, err := db_session.Where("id <> ? and bill_id = ? and product_id = ?", purchase_bill_entry.Id, purchase_bill_entry.BillId, purchase_bill_entry.ProductId).Count(new(cggl_models.PurchaseBillEntryInfo))
 		core.HandleError(err)
@@ -248,7 +248,7 @@ func (c ErpPurchaseBillEntry) Save() revel.Result {
 		affected, err = db_session.Id(purchase_bill_entry.Id).Update(&purchase_bill_entry)
 		core.HandleError(err)
 
-		purchase_bill_log_service.Insert_purchase_bill_log(purchase_bill, "修改采购明细", db_session, c.Session)
+		purchase_bill_log_service.Insert_purchase_bill_log(purchase_bill, "采购明细修改", db_session, c.Session)
 
 		if affected == 0 {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！"})
@@ -284,7 +284,7 @@ func (c ErpPurchaseBillEntry) Delete() revel.Result {
 
 	//todo 检查采购单当前状态， 某些状态下不能删除明细
 
-	purchase_bill_log_service.Insert_purchase_bill_log(purchase_bill, "删除采购单明细", db_session, c.Session)
+	purchase_bill_log_service.Insert_purchase_bill_log(purchase_bill, "采购单明细删除", db_session, c.Session)
 
 	affected, err := db_session.In("id", purchase_bill_entry_id_list).Delete(new(cggl_models.PurchaseBillEntryInfo))
 	core.HandleError(err)

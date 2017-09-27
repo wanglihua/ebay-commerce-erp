@@ -214,7 +214,7 @@ func (c ErpPurchaseBillEntryExcel) Import() revel.Result {
 		core.HandleError(err)
 	}
 
-	purchase_bill_log_service.Insert_purchase_bill_log(purchase_bill, "导入采购单明细", db_session, c.Session)
+	purchase_bill_log_service.Insert_purchase_bill_log(purchase_bill, "采购单明细导入", db_session, c.Session)
 
 	return c.RenderJson(map[string]interface{}{
 		"success": true,

@@ -16,6 +16,7 @@ import (
 	"matrix/modules/erp/service/purchase_bill_service"
 	"matrix/modules/erp/models/sppz_models"
 	"time"
+	"matrix/modules/erp/service/purchase_bill_log_service"
 )
 
 type ErpPurchaseBill struct {
@@ -201,9 +202,13 @@ func (c ErpPurchaseBill) Save() revel.Result {
 
 		affected, err = db_session.Insert(&purchase_bill)
 		core.HandleError(err)
+
+		purchase_bill_log_service.Insert_purchase_bill_log(purchase_bill, "采购单新建", db_session, c.Session)
 	} else {
 		affected, err = db_session.Id(purchase_bill.Id).Update(&purchase_bill)
 		core.HandleError(err)
+
+		purchase_bill_log_service.Insert_purchase_bill_log(purchase_bill, "采购单修改", db_session, c.Session)
 
 		if affected == 0 {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！"})
@@ -234,7 +239,7 @@ func (c ErpPurchaseBill) Delete() revel.Result {
 	}
 
 	for _, purchase_bill := range purchase_bill_list {
-		_ = purchase_bill
+		purchase_bill_log_service.Insert_purchase_bill_log(purchase_bill, "采购单删除", db_session, c.Session)
 	}
 
 	_, err := db_session.In("bill_id", purchase_bill_id_list).Delete(new(cggl_models.PurchaseBillEntryInfo))
@@ -288,6 +293,10 @@ func (c ErpPurchaseBill) Submit() revel.Result {
 
 	purchase_bill_service.SetEntriesStatus(purchase_bill_id_list, models.PURCHASE_BILL_STATUS_YTJ, db_session)
 
+	for _, purchase_bill := range purchase_bill_list {
+		purchase_bill_log_service.Insert_purchase_bill_log(purchase_bill, "采购单提交", db_session, c.Session)
+	}
+
 	return c.RenderJson(map[string]interface{}{
 		"success": true,
 		"message": "采购单提交成功！",
@@ -334,6 +343,10 @@ func (c ErpPurchaseBill) Approve() revel.Result {
 
 		_, err := db_session.Id(bill_entry.Id).Cols("status_id", "purchase_time").Update(&bill_entry)
 		core.HandleError(err)
+	}
+
+	for _, purchase_bill := range purchase_bill_list {
+		purchase_bill_log_service.Insert_purchase_bill_log(purchase_bill, "采购单审批", db_session, c.Session)
 	}
 
 	return c.RenderJson(map[string]interface{}{

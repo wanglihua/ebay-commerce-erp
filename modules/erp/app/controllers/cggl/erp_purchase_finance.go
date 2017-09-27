@@ -12,6 +12,7 @@ import (
 	"time"
 	"matrix/modules/erp/models/sppz_models"
 	"matrix/modules/erp/service/purchase_bill_service"
+	"matrix/modules/erp/service/purchase_bill_log_service"
 )
 
 type ErpPurchaseFinance struct {
@@ -112,6 +113,10 @@ func (c ErpPurchaseFinance) Purchase() revel.Result {
 		purchase_bill.PayTime = pay_time
 		_, err := db_session.Id(purchase_bill.Id).Cols("status_id", "pay_time").Update(&purchase_bill)
 		core.HandleError(err)
+	}
+
+	for _, purchase_bill := range purchase_bill_list {
+		purchase_bill_log_service.Insert_purchase_bill_log(purchase_bill, "采购单下单", db_session, c.Session)
 	}
 
 	purchase_bill_service.SetEntriesStatus(purchase_bill_id_list, models.PURCHASE_BILL_STATUS_CGZ, db_session)
