@@ -467,7 +467,18 @@
                         {"mDataProp": "pb.trans_expenses", "title": "运费", "bSearchable": false, "width": 75},
                         {"mDataProp": "s.name", "title": "状态", "bSearchable": false, "width": 90},
                         {"mDataProp": "pb.create_time", "title": "创建时间", "bSearchable": false, "width": 120},
-                        {"mDataProp": "pb.update_time", "title": "修改时间", "bSearchable": false, "width": 120}
+                        {"mDataProp": "pb.update_time", "title": "修改时间", "bSearchable": false, "width": 120},
+                        {
+                            "mDataProp": "pb.id",
+                            "bSearchable": false,
+                            "orderable": false,
+                            "sClass": "center",
+                            "width": 100,
+                            "title": '操作',
+                            "render": function (data, type, row) {
+                                return "<a class='btn btn-xs btn-info btn-inline pull-left' onclick='show_log_dialog(" + data + ");' ><i class='ace-icon fa fa-list'></i>查看历史</a>";
+                            }
+                        }
                     ],
                     "fnServerData": function (sSource, aoData, fnCallback) {
                         showMask("数据加载中，请稍候");
@@ -1038,5 +1049,68 @@
         var url = '{%url "ErpPurchaseBillEntryExcel.Export"%}' + "?" + params;
         $('<form method="post" action="' + url + '"></form>').appendTo('body').submit().remove();
     }
+
+    function show_log_dialog(bill_id) {
+        function load_purchase_bill_log(bill_id) {
+            var history_vm = new Vue({
+                el: "#purchase_bill_log_dialog",
+                data: {}
+            });
+
+            initDataTable(
+                '#purchaseBillLogList',
+                {
+                    "sAjaxSource": '{%url "ErpPurchaseBillLog.ListData"%}',
+                    "aaSorting": [[0, "desc"]],
+                    "aoColumns": [
+                        {"mDataProp": "create_time", "title": "时间", "sClass": "center", "bSearchable": false, "bSortable": false, "width": 120},
+                        {"mDataProp": "login_name", "title": "工号", "sClass": "center", "bSearchable": false, "bSortable": false, "width": 120},
+                        {
+                            "mDataProp": "operation", "title": "描述", "bSearchable": true, "bSortable": false,
+                            "render": function (data, type, row) {
+                                return "<div style='white-space:normal; word-break: break-all; word-wrap:break-word;'>" + data + "</div>";
+                            }
+                        }
+
+                    ],
+                    "fnServerData": function (sSource, aoData, fnCallback) {
+                        showMask("数据加载中，请稍候");
+
+                        aoData.push({'name': 'bill_id', 'value': bill_id});
+
+                        $.ajax({
+                            "dataType": 'json',
+                            "url": sSource,
+                            "data": aoData,
+                            "success": function (data) {
+                                hideMask();
+
+                                if (data.success === false) {
+                                    $.msg.error(data.message);
+                                    return;
+                                }
+
+                                fnCallback(data);
+                            }
+                        });
+                    }
+                }
+            );
+        }
+
+        $("#purchase_bill_log_wrapper").html("");
+
+        $.ajax({
+            url: '{%url "ErpPurchaseBillLog.Index" %}',
+            type: "POST",
+            data: {"bill_id": bill_id},
+            success: function (result) {
+                $("#purchase_bill_log_wrapper").html(result);
+                load_purchase_bill_log(bill_id);
+                $("#purchase_bill_log_dialog").modal();
+            }
+        });
+    }
 </script>
+<div id="purchase_bill_log_wrapper"></div>
 {%footer%}

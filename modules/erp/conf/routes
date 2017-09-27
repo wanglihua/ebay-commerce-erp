@@ -470,6 +470,9 @@ POST /purchase/bill/entry/product/select/data/list      ErpPurchaseBillEntry.Pro
 POST  /purchase/bill/excel/import          ErpPurchaseBillEntryExcel.Import
 POST  /purchase/bill/excel/export          ErpPurchaseBillEntryExcel.Export
 
+POST /purchase/bill/log                    ErpPurchaseBillLog.Index
+POST /purchase/bill/log/list/data          ErpPurchaseBillLog.ListData
+
 GET  /purchase/finance                     ErpPurchaseFinance.Index
 POST /purchase/finance/data/list           ErpPurchaseFinance.ListData
 POST /purchase/finance/purchase            ErpPurchaseFinance.Purchase
