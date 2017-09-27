@@ -349,7 +349,7 @@ func (c ErpProduct) Save() revel.Result {
 		core.HandleError(err)
 
 		//update_cols := []string{"sku", "cn_name", "name", "cate_id", "supplier_id", "pkg_mtrl_id", "cost_price", "status_id", "desc", "weight", "need_invoice" }
-		update_cols := []string{"sku", "cn_name", "name", "cate_id", "supplier_id", "pkg_mtrl_id", "cost_price", "status_id", "desc", "weight",
+		update_cols := []string{"sku", "cn_name", "name", "cate_id", "supplier_id", "pkg_mtrl_id", "cost_price", "status_id", "desc", "length", "width", "height", "weight",
 			"brand_id", "style_id", "cert1_id", "cert2_id", "cert3_id", "stock_alert_days", "purchase_days"}
 		affected, err = db_session.Id(product_from_ui.Id).Cols(update_cols...).Update(&product_from_ui)
 		core.HandleError(err)

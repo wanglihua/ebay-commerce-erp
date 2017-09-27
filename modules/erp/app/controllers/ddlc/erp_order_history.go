@@ -43,7 +43,7 @@ func (c ErpOrderHistory) ListData() revel.Result {
 		data_query = *data_query.Asc("id")
 	}
 	*/
-	data_query = *data_query.Asc("id")
+	data_query = *data_query.Desc("id")
 
 	order_history_list := make([]ddlc_models.OrderHistoryInfo, 0)
 	//err := data_query.Limit(limit, offset).Find(&order_history_list)

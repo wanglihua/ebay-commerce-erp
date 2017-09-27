@@ -233,6 +233,10 @@ func (c ErpPurchaseBill) Delete() revel.Result {
 		}
 	}
 
+	for _, purchase_bill := range purchase_bill_list {
+		_ = purchase_bill
+	}
+
 	_, err := db_session.In("bill_id", purchase_bill_id_list).Delete(new(cggl_models.PurchaseBillEntryInfo))
 	core.HandleError(err)
 

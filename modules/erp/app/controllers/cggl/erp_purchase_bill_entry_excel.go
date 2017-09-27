@@ -16,6 +16,7 @@ import (
 	"matrix/modules/erp/models/kcgl_models"
 	"matrix/modules/erp/models/cggl_models"
 	"matrix/modules/erp/models"
+	"matrix/modules/erp/service/purchase_bill_log_service"
 )
 
 type ErpPurchaseBillEntryExcel struct {
@@ -212,6 +213,8 @@ func (c ErpPurchaseBillEntryExcel) Import() revel.Result {
 		_, err := db_session.Insert(&purchase_bill_entry)
 		core.HandleError(err)
 	}
+
+	purchase_bill_log_service.Insert_purchase_bill_log(purchase_bill, "导入采购单明细", db_session, c.Session)
 
 	return c.RenderJson(map[string]interface{}{
 		"success": true,

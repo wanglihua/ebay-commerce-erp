@@ -160,6 +160,7 @@ func (c Home) SyncDbPost() revel.Result {
 	model_list = append(model_list, &cggl_models.IntelReplInfo{})
 	model_list = append(model_list, &cggl_models.PurchaseBillEntryInfo{})
 	model_list = append(model_list, &cggl_models.PurchaseBillInfo{})
+	model_list = append(model_list, &cggl_models.PurchaseBillLogInfo{})
 	model_list = append(model_list, &cggl_models.PurchaseAbnormalTypeInfo{})
 	model_list = append(model_list, &cggl_models.PurchaseAbnormalProcessResultInfo{})
 

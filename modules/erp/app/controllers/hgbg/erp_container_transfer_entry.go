@@ -229,7 +229,6 @@ func (c ErpContainerTransferEntry) Save() revel.Result {
 
 		container_transfer_log_service.Insert_container_transfer_log(ct, "新增调拨明细", db_session, c.Session)
 	} else {
-		//todo: 哪些字段需要更新
 		affected, err = db_session.Id(container_transfer_entry.Id).Update(&container_transfer_entry)
 		core.HandleError(err)
 

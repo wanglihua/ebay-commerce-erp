@@ -13,6 +13,7 @@ import (
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/auth/pass_res"
 	"matrix/modules/erp/models/cggl_models"
+	"matrix/modules/erp/service/purchase_bill_log_service"
 )
 
 type ErpPurchaseBillEntry struct {
@@ -235,6 +236,8 @@ func (c ErpPurchaseBillEntry) Save() revel.Result {
 
 		affected, err = db_session.Insert(&purchase_bill_entry)
 		core.HandleError(err)
+
+		purchase_bill_log_service.Insert_purchase_bill_log(purchase_bill, "新增采购明细", db_session, c.Session)
 	} else {
 		billId_count, err := db_session.Where("id <> ? and bill_id = ? and product_id = ?", purchase_bill_entry.Id, purchase_bill_entry.BillId, purchase_bill_entry.ProductId).Count(new(cggl_models.PurchaseBillEntryInfo))
 		core.HandleError(err)
@@ -244,6 +247,8 @@ func (c ErpPurchaseBillEntry) Save() revel.Result {
 
 		affected, err = db_session.Id(purchase_bill_entry.Id).Update(&purchase_bill_entry)
 		core.HandleError(err)
+
+		purchase_bill_log_service.Insert_purchase_bill_log(purchase_bill, "修改采购明细", db_session, c.Session)
 
 		if affected == 0 {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！"})
@@ -260,6 +265,26 @@ func (c ErpPurchaseBillEntry) Delete() revel.Result {
 
 	purchase_bill_entry_id_list := make([]int64, 0)
 	c.Params.Bind(&purchase_bill_entry_id_list, "id_list")
+
+	if len(purchase_bill_entry_id_list) == 0 {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "请选择要删除的数据!",
+		})
+	}
+
+	var entry_id = purchase_bill_entry_id_list[0]
+	var purchase_bill_entry cggl_models.PurchaseBillEntryInfo
+	_, err := db_session.Id(entry_id).Get(&purchase_bill_entry)
+	core.HandleError(err)
+
+	var purchase_bill cggl_models.PurchaseBillInfo
+	_, err = db_session.Id(purchase_bill_entry.BillId).Get(&purchase_bill)
+	core.HandleError(err)
+
+	//todo 检查采购单当前状态， 某些状态下不能删除明细
+
+	purchase_bill_log_service.Insert_purchase_bill_log(purchase_bill, "删除采购单明细", db_session, c.Session)
 
 	affected, err := db_session.In("id", purchase_bill_entry_id_list).Delete(new(cggl_models.PurchaseBillEntryInfo))
 	core.HandleError(err)
