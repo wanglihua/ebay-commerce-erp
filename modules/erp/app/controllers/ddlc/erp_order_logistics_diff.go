@@ -107,14 +107,14 @@ FROM erp_order_logistics_logic oll
 		filter = core.SqlAnd(filter, fmt.Sprintf("o.shipped_time < '%04d-%02d-%02d'", shipped_time_end_query.Year(), shipped_time_end_query.Month(), shipped_time_end_query.Day()))
 	}
 
-	filter = core.SqlAnd(filter, fmt.Sprintf("o.status_id = %d", models.ORDER_STATUS_YFH)) // 只有显示已发货的
+	filter = core.SqlAnd(filter, fmt.Sprintf("o.status_id = %d OR o.status_id = %d ", models.ORDER_STATUS_YFH, models.ORDER_STATUS_YWC)) // 只显示已发货和已完成的
 
 	sb.Where(filter)
 
 	if order != "" {
 		sb.OrderBy(order)
 	} else {
-		sb.OrderBy("oll.id ASC")
+		sb.OrderBy("oll.id DESC")
 	}
 
 	sb.Limit(offset, limit)
@@ -189,7 +189,7 @@ func (c ErpOrderLogisticsDiff) Export() revel.Result {
 		filter = core.SqlAnd(filter, fmt.Sprintf("o.shipped_time < '%04d-%02d-%02d'", shipped_time_end_query.Year(), shipped_time_end_query.Month(), shipped_time_end_query.Day()))
 	}
 
-	filter = core.SqlAnd(filter, fmt.Sprintf("o.status_id = %d", models.ORDER_STATUS_YFH)) // 只导出已发货的
+	filter = core.SqlAnd(filter, fmt.Sprintf("o.status_id = %d OR o.status_id = %d ", models.ORDER_STATUS_YFH, models.ORDER_STATUS_YWC)) // 只导出已发货和已完成的
 
 	/*
 SELECT oll.*, o.*, osa.*, s.*, lm.*, s_sec.*, lm_sec.*
