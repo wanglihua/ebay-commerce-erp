@@ -84,8 +84,12 @@ func (c ErpNotice) ViewDetail(id int64) revel.Result {
 	// 将当前用户的
 	notice_read_service.MarkNoticeUserRead(login_user_id, notice_id, db_session)
 
+	var notice_read_user_list = notice_read_service.GetNoticeReadUserList(notice_id, db_session)
+
 	c.RenderArgs["notice"] = notice
 	c.RenderArgs["notice_body"] = template.HTML(notice.Body)
+	c.RenderArgs["notice_read_user_list"] = notice_read_user_list
+	c.RenderArgs["notice_read_user_list_max_index"] = len(notice_read_user_list) - 1
 	return c.RenderTemplate("erp/xtgl/notice/notice_view_detail.html")
 }
 

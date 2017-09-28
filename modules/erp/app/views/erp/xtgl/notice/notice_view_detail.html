@@ -28,6 +28,15 @@
                 <div id="notice_body" style="margin: 10px 20px;line-height: 1.5em;">
                     {% .notice_body %}
                 </div>
+                <div id="notice_read_user_list" style="line-height: 25px;">
+                    <div style="font-weight:bold;">已阅人员：</div>
+                    {% range $index, $notice_read_user := .notice_read_user_list %}
+                    <span>
+                        {% $notice_read_user.UserName %}({% $notice_read_user.ReadTime %})
+                        {% if ne $index $.notice_read_user_list_max_index %},{% end %}
+                    </span>
+                    {% end %}
+                </div>
             </div>
         </div>
     </div>
