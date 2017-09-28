@@ -5,9 +5,10 @@ import (
 	"matrix/core"
 	"time"
 	"fmt"
+	"github.com/revel/revel"
 )
 
-func GetNextBillNo(db_session *xorm.Session) string {
+func GetNextBillNo(db_session *xorm.Session, web_session revel.Session) string {
 	sql_proc := `
 CREATE PROCEDURE erp_get_next_bill_serial_v0001()
     BEGIN
@@ -40,5 +41,7 @@ CREATE PROCEDURE erp_get_next_bill_serial_v0001()
 	_, err := db_session.Sql(sql).Get(&bill_next_serial)
 	core.HandleError(err)
 
-	return fmt.Sprintf("%s%04d", time.Now().Format("20060102"), bill_next_serial.NextSerial)
+	var login_user = core.GetLoginUser(web_session)
+
+	return fmt.Sprintf("%s%02d-%s", time.Now().Format("20060102"), bill_next_serial.NextSerial, login_user.LoginName)
 }

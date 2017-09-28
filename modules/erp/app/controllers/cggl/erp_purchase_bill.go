@@ -169,7 +169,7 @@ func (c ErpPurchaseBill) DetailData() revel.Result {
 		core.HandleError(err)
 
 	} else {
-		purchase_bill.Code = bill_service.GetNextBillNo(db_session)
+		purchase_bill.Code = bill_service.GetNextBillNo(db_session, c.Session)
 	}
 
 	var detail_form PurchaseBillDetailForm

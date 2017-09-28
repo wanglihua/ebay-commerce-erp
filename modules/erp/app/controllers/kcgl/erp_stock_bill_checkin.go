@@ -132,7 +132,7 @@ func (c ErpStockBillCheckin) DetailData() revel.Result {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "指定的出入库单不存在！"})
 		}
 	} else {
-		stock_bill.Code = bill_service.GetNextBillNo(db_session)
+		stock_bill.Code = bill_service.GetNextBillNo(db_session, c.Session)
 		stock_bill.Date = core.Date(time.Now())
 	}
 
