@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"encoding/json"
 	"matrix/modules/erp/service/inventory_service"
+	"strings"
 )
 
 type ErpPurchaseAbnormal struct {
@@ -19,6 +20,49 @@ type ErpPurchaseAbnormal struct {
 
 func (c ErpPurchaseAbnormal) Index() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.CGGL_PURCHASE_ABNORMAL, c.Session)
+
+	var db_session = c.DbSession
+
+	// 批次号的列表
+	/*
+		SELECT DISTINCT pb.code AS bill_code, s.name AS bill_status
+		FROM erp_purchase_bill pb
+			INNER JOIN erp_status s ON s.id = pb.status_id
+			INNER JOIN erp_purchase_bill_entry pbe ON pbe.bill_id = pb.id
+		WHERE pbe.status_id = 0;
+	*/
+	var sql_get_bill_code_list = `
+	SELECT DISTINCT pb.code AS bill_code, s.name AS bill_status
+	FROM erp_purchase_bill pb
+		INNER JOIN erp_status s ON s.id = pb.status_id
+		INNER JOIN erp_purchase_bill_entry pbe ON pbe.bill_id = pb.id
+	WHERE pbe.status_id = %d OR pbe.status_id = %d;`
+
+	sql_get_bill_code_list = fmt.Sprintf(sql_get_bill_code_list,
+		models.PURCHASE_BILL_STATUS_YC,
+		models.PURCHASE_BILL_STATUS_YCL)
+
+	type bill_query_struct struct {
+		BillCode   string `xorm:"'bill_code'"`
+		BillStatus string `xorm:"'bill_status'"`
+	}
+
+	var bill_code_struct_list = make([]bill_query_struct, 0)
+	core.HandleError(db_session.Sql(sql_get_bill_code_list).Find(&bill_code_struct_list))
+
+	var bill_query_list = make([]bill_query_struct, 0)
+	for _, bill_query_struct := range bill_code_struct_list {
+		bill_query_list = append(bill_query_list, bill_query_struct)
+	}
+
+	// 状态的列表， 采购单明细的状态的列表
+	var status_list = make([]models.StatusInfo, 0)
+	core.HandleError(db_session.In("id", []int64{
+		models.PURCHASE_BILL_STATUS_YC,
+		models.PURCHASE_BILL_STATUS_YCL}).Find(&status_list))
+
+	c.RenderArgs["bill_query_list"] = bill_query_list
+	c.RenderArgs["status_list"] = status_list
 
 	return c.RenderTemplate("erp/cggl/purchase_abnormal/purchase_abnormal_index.html")
 }
@@ -35,6 +79,13 @@ func (c ErpPurchaseAbnormal) ListData() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.CGGL_PURCHASE_ABNORMAL, c.Session)
 
 	db_session := c.DbSession
+
+	var bill_code_query string
+	c.Params.Bind(&bill_code_query, "bill_code_query")
+	bill_code_query = strings.TrimSpace(bill_code_query)
+
+	var status_id_query int64
+	c.Params.Bind(&status_id_query, "status_id_query")
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
@@ -57,6 +108,14 @@ FROM erp_purchase_bill_entry pbe
     INNER JOIN erp_status s ON pbe.status_id = s.id`)
 
 	filter = core.SqlAnd(filter, fmt.Sprintf("pbe.status_id = %d OR pbe.status_id = %d", models.PURCHASE_BILL_STATUS_YC, models.PURCHASE_BILL_STATUS_YCL)) // 异常 和 异常已处理
+
+	if bill_code_query != "" {
+		filter = core.SqlAnd(filter, fmt.Sprintf("pb.code = '%s'", bill_code_query))
+	}
+
+	if status_id_query != 0 {
+		filter = core.SqlAnd(filter, fmt.Sprintf("pb.status_id = %d", status_id_query))
+	}
 
 	sb.Where(filter)
 

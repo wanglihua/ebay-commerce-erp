@@ -22,6 +22,17 @@ type ErpPurchaseFinance struct {
 func (c ErpPurchaseFinance) Index() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.CGGL_PURCHASE_FINANCE, c.Session)
 
+	var db_session = c.DbSession
+
+	// 状态的列表， 采购单的状态的列表
+	var status_list = make([]models.StatusInfo, 0)
+	core.HandleError(db_session.In("id", []int64{
+		models.PURCHASE_BILL_STATUS_YSP,
+		models.PURCHASE_BILL_STATUS_CGZ,
+		models.PURCHASE_BILL_STATUS_YRK}).Find(&status_list))
+
+	c.RenderArgs["status_list"] = status_list
+
 	return c.RenderTemplate("erp/cggl/purchase_finance/purchase_finance_index.html")
 }
 
@@ -36,6 +47,9 @@ func (c ErpPurchaseFinance) ListData() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.CGGL_PURCHASE_FINANCE, c.Session)
 
 	db_session := c.DbSession
+
+	var status_id_query int64
+	c.Params.Bind(&status_id_query, "status_id_query")
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
@@ -55,7 +69,12 @@ FROM erp_purchase_bill pb
     INNER JOIN auth_user u ON pb.user_id = u.id
     INNER JOIN erp_status s ON pb.status_id = s.id`)
 
-	filter = core.SqlAnd(filter, fmt.Sprintf("pb.status_id = %d OR pb.status_id =%d", models.PURCHASE_BILL_STATUS_YSP, models.PURCHASE_BILL_STATUS_CGZ))
+	filter = core.SqlAnd(filter, fmt.Sprintf("pb.status_id = %d OR pb.status_id =%d OR pb.status_id =%d",
+		models.PURCHASE_BILL_STATUS_YSP, models.PURCHASE_BILL_STATUS_CGZ, models.PURCHASE_BILL_STATUS_YRK))
+
+	if status_id_query != 0 {
+		filter = core.SqlAnd(filter, fmt.Sprintf("pb.status_id = %d", status_id_query))
+	}
 
 	sql_builder.Where(filter)
 

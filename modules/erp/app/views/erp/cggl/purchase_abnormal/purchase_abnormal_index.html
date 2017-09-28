@@ -22,6 +22,24 @@
                         处理异常
                     </button>
                 </div>
+                <div id="query" class="col-xs-12" style="line-height: 28px;">
+                    <select id="bill_code_query" name="bill_code_query" style="width: 140px;" v-model.number="page.bill_code_query" @change="querySelectChange()">
+                        <option :value="0">采购单批次号查询</option>
+                        {% range $index, $bill_query := .bill_query_list %}
+                        <option :value="{% $bill_query.BillCode %}">{% $bill_query.BillCode %}({% $bill_query.BillStatus %})</option>
+                        {% end %}
+                    </select>
+                    <select id="status_id_query" name="status_id_query" style="width: 130px;" v-model.number="page.status_id_query" @change="querySelectChange()">
+                        <option :value="0">采购项目状态查询</option>
+                        {% range $index, $status := .status_list %}
+                        <option :value="{% $status.Id %}">{% $status.Name %}</option>
+                        {% end %}
+                    </select>
+                    <button class="btn btn-mini btn-primary" style="margin-bottom:3px;height: 30px;" onclick="search()">
+                        &nbsp;<i class="ace-icon fa fa-search"></i>查&nbsp;询&nbsp;
+                    </button>
+                    <hr style="margin-top:10px;margin-bottom:10px;"/>
+                </div>
                 <div>
                     <table id="purchaseBillEntryList" class="table table-striped table-bordered table-hover"></table>
                 </div>
@@ -152,15 +170,26 @@
     </div>
 </div>
 <script type="text/javascript">
+
+    function search() {
+        refreshList("#purchaseBillEntryList");
+    }
+
     var vm = new Vue({
         el: "#page",
         data: {
+            "page": {
+                "bill_code_query": "0",
+                "status_id_query": 0
+            },
             "purchase_bill_entry_detail": {
                 "purchase_bill_entry": {},
                 "purchase_bill": {}
             }
         },
         mounted: function () {
+            var this_vm = this;
+
             initDataTable(
                 '#purchaseBillEntryList',
                 {
@@ -202,13 +231,37 @@
                                 }
                             }
                         }
-                    ]
+                    ],
+                    "fnServerData": function (sSource, aoData, fnCallback) {
+                        showMask("数据加载中，请稍候");
+
+                        aoData.push({'name': 'bill_code_query', 'value': this_vm.page.bill_code_query});
+                        aoData.push({'name': 'status_id_query', 'value': this_vm.page.status_id_query});
+
+                        $.ajax(
+                            {
+                                "dataType": 'json',
+                                "url": sSource,
+                                "data": aoData,
+                                "success": function (data) {
+                                    hideMask();
+                                    if (data.success === false) {
+                                        $.msg.error(data.message);
+                                        return;
+                                    }
+                                    fnCallback(data);
+                                }
+                            });
+                    }
                 }
             );
         },
         methods: {
             reloadEntryList: function () {
                 reloadList('#purchaseBillEntryList');
+            },
+            querySelectChange: function () {
+                search();
             }
         }
     });

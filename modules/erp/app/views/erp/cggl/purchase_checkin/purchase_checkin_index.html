@@ -23,14 +23,14 @@
                     </button>
                 </div>
                 <div id="query" class="col-xs-12" style="line-height: 28px;">
-                    <select id="bill_code_query" name="bill_code_query" style="width: 140px;" v-model.number="page.bill_code_query" @change="billCodeQuerySelectChange()">
+                    <select id="bill_code_query" name="bill_code_query" style="width: 140px;" v-model.number="page.bill_code_query" @change="querySelectChange()">
                         <option :value="0">采购单批次号查询</option>
                         {% range $index, $bill_query := .bill_query_list %}
                         <option :value="{% $bill_query.BillCode %}">{% $bill_query.BillCode %}({% $bill_query.BillStatus %})</option>
                         {% end %}
                     </select>
-                    <select id="status_id_query" name="status_id_query" style="width: 120px;" v-model.number="page.status_id_query" @change="billCodeQuerySelectChange()">
-                        <option :value="0">采购单状态查询</option>
+                    <select id="status_id_query" name="status_id_query" style="width: 130px;" v-model.number="page.status_id_query" @change="querySelectChange()">
+                        <option :value="0">采购项目状态查询</option>
                         {% range $index, $status := .status_list %}
                         <option :value="{% $status.Id %}">{% $status.Name %}</option>
                         {% end %}
@@ -251,7 +251,7 @@
             reloadEntryList: function () {
                 reloadList('#purchaseBillEntryList');
             },
-            billCodeQuerySelectChange: function () {
+            querySelectChange: function () {
                 search();
             }
         }
