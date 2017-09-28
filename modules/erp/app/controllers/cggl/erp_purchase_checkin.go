@@ -24,36 +24,64 @@ type ErpPurchaseCheckin struct {
 func (c ErpPurchaseCheckin) Index() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.CGGL_PURCHASE_CHECKIN, c.Session)
 
+	/*
+	PURCHASE_BILL_STATUS_YCJ = 4400 // 采购单状态 已创建
+	PURCHASE_BILL_STATUS_YTJ = 4450 // 采购单状态 已提交
+	PURCHASE_BILL_STATUS_YSP = 4500 // 采购单状态 已审批
+	PURCHASE_BILL_STATUS_CGZ = 4600 // 采购单状态 采购中
+	PURCHASE_BILL_STATUS_YRK = 4700 // 采购单状态 已入库
+	PURCHASE_BILL_STATUS_YC  = 4710 // 采购单状态 异常
+	PURCHASE_BILL_STATUS_YCL = 4720 // 采购单状态 异常已处理
+	 */
+
 	var db_session = c.DbSession
 
-	// 获得有明细状态是 采购中 的所有采购单的批次号
+	// 获得有明细状态是 采购中, 已入库， 异常，异常已处理 的所有采购单的批次号。 这时获得的采购单的状态只有两个 采购中，已入库
+
+	// 批次号的列表
 	/*
-		SELECT DISTINCT pb.code AS bill_code
-		FROM erp_purchase_bill    pb
-		    INNER JOIN erp_purchase_bill_entry pbe ON pbe.bill_id = pb.id
+		SELECT DISTINCT pb.code AS bill_code, s.name AS bill_status
+		FROM erp_purchase_bill pb
+			INNER JOIN erp_status s ON s.id = pb.status_id
+			INNER JOIN erp_purchase_bill_entry pbe ON pbe.bill_id = pb.id
 		WHERE pbe.status_id = 0;
 	*/
 	var sql_get_bill_code_list = `
-	SELECT DISTINCT pb.code AS bill_code
+	SELECT DISTINCT pb.code AS bill_code, s.name AS bill_status
 	FROM erp_purchase_bill pb
-	    INNER JOIN erp_purchase_bill_entry pbe ON pbe.bill_id = pb.id
-	WHERE pbe.status_id = %d;`
+		INNER JOIN erp_status s ON s.id = pb.status_id
+		INNER JOIN erp_purchase_bill_entry pbe ON pbe.bill_id = pb.id
+	WHERE pbe.status_id = %d OR pbe.status_id = %d OR pbe.status_id = %d OR pbe.status_id = %d;`
 
-	sql_get_bill_code_list = fmt.Sprintf(sql_get_bill_code_list, models.PURCHASE_BILL_STATUS_CGZ)
+	sql_get_bill_code_list = fmt.Sprintf(sql_get_bill_code_list,
+		models.PURCHASE_BILL_STATUS_CGZ,
+		models.PURCHASE_BILL_STATUS_YRK,
+		models.PURCHASE_BILL_STATUS_YC,
+		models.PURCHASE_BILL_STATUS_YCL)
 
-	type bill_code_struct struct {
-		BillCode string `xorm:"'bill_code'"`
+	type bill_query_struct struct {
+		BillCode   string `xorm:"'bill_code'"`
+		BillStatus string `xorm:"'bill_status'"`
 	}
 
-	var bill_code_struct_list = make([]bill_code_struct, 0)
+	var bill_code_struct_list = make([]bill_query_struct, 0)
 	core.HandleError(db_session.Sql(sql_get_bill_code_list).Find(&bill_code_struct_list))
 
-	var bill_code_list = make([]string, 0)
-	for _, bill_code_struct := range bill_code_struct_list {
-		bill_code_list = append(bill_code_list, bill_code_struct.BillCode)
+	var bill_query_list = make([]bill_query_struct, 0)
+	for _, bill_query_struct := range bill_code_struct_list {
+		bill_query_list = append(bill_query_list, bill_query_struct)
 	}
 
-	c.RenderArgs["bill_code_list"] = bill_code_list
+	// 状态的列表， 采购单明细的状态的列表
+	var status_list = make([]models.StatusInfo, 0)
+	core.HandleError(db_session.In("id", []int64{
+		models.PURCHASE_BILL_STATUS_CGZ,
+		models.PURCHASE_BILL_STATUS_YRK,
+		models.PURCHASE_BILL_STATUS_YC,
+		models.PURCHASE_BILL_STATUS_YCL}).Find(&status_list))
+
+	c.RenderArgs["bill_query_list"] = bill_query_list
+	c.RenderArgs["status_list"] = status_list
 
 	return c.RenderTemplate("erp/cggl/purchase_checkin/purchase_checkin_index.html")
 }
@@ -71,6 +99,9 @@ func (c ErpPurchaseCheckin) ListData() revel.Result {
 	var bill_code_query string
 	c.Params.Bind(&bill_code_query, "bill_code_query")
 	bill_code_query = strings.TrimSpace(bill_code_query)
+
+	var status_id_query int64
+	c.Params.Bind(&status_id_query, "status_id_query")
 
 	db_session := c.DbSession
 
@@ -97,6 +128,10 @@ func (c ErpPurchaseCheckin) ListData() revel.Result {
 
 	if bill_code_query != "" {
 		filter = core.SqlAnd(filter, fmt.Sprintf("pb.code = '%s'", bill_code_query))
+	}
+
+	if status_id_query != 0 {
+		filter = core.SqlAnd(filter, fmt.Sprintf("pb.status_id = %d", status_id_query))
 	}
 
 	sb.Where(filter)

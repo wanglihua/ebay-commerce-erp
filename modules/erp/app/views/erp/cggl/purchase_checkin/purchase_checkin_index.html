@@ -23,10 +23,16 @@
                     </button>
                 </div>
                 <div id="query" class="col-xs-12" style="line-height: 28px;">
-                    <select id="bill_code_query" name="bill_code_query" style="width: 120px;" v-model.number="page.bill_code_query" @change="billCodeQuerySelectChange()">
-                        <option :value="0">采购单批次号</option>
-                        {% range $index, $bill_code := .bill_code_list %}
-                        <option :value="{% $bill_code %}">{% $bill_code %}</option>
+                    <select id="bill_code_query" name="bill_code_query" style="width: 140px;" v-model.number="page.bill_code_query" @change="billCodeQuerySelectChange()">
+                        <option :value="0">采购单批次号查询</option>
+                        {% range $index, $bill_query := .bill_query_list %}
+                        <option :value="{% $bill_query.BillCode %}">{% $bill_query.BillCode %}({% $bill_query.BillStatus %})</option>
+                        {% end %}
+                    </select>
+                    <select id="status_id_query" name="status_id_query" style="width: 120px;" v-model.number="page.status_id_query" @change="billCodeQuerySelectChange()">
+                        <option :value="0">采购单状态查询</option>
+                        {% range $index, $status := .status_list %}
+                        <option :value="{% $status.Id %}">{% $status.Name %}</option>
                         {% end %}
                     </select>
                     <button class="btn btn-mini btn-primary" style="margin-bottom:3px;height: 30px;" onclick="search()">
@@ -172,7 +178,10 @@
     var vm = new Vue({
         el: "#page",
         data: {
-            "page": {},
+            "page": {
+                "bill_code_query": "0",
+                "status_id_query": 0
+            },
             "purchase_bill_entry_detail": {
                 "purchase_bill_entry": {},
                 "purchase_bill": {}
@@ -198,10 +207,10 @@
                                 return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
                             }
                         },
-                        {"mDataProp": "pb.code", "title": "采购批次号", "bSearchable": false, "width": 120},
-                        {"mDataProp": "p.sku", "title": "SKU", "bSearchable": false, "width": 160},
+                        {"mDataProp": "pb.code", "title": "采购批次号", "bSearchable": true, "width": 120},
+                        {"mDataProp": "p.sku", "title": "SKU", "bSearchable": true, "width": 160},
                         {
-                            "mDataProp": "p.cn_name", "title": "名称", "bSearchable": false, "sClass": "word-wrap", "width": 200,
+                            "mDataProp": "p.cn_name", "title": "名称", "bSearchable": true, "sClass": "word-wrap", "width": 200,
                             "render": function (data, type, row) {
                                 return "<div>" + data + "</div>"
                             }
@@ -218,6 +227,7 @@
                         showMask("数据加载中，请稍候");
 
                         aoData.push({'name': 'bill_code_query', 'value': this_vm.page.bill_code_query});
+                        aoData.push({'name': 'status_id_query', 'value': this_vm.page.status_id_query});
 
                         $.ajax(
                             {
