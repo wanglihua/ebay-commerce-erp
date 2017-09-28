@@ -38,7 +38,10 @@ func (c ErpPurchaseBill) Index() revel.Result {
 	err := db_session.In("id", status_id_list).OrderBy("id ASC").Find(&status_list)
 	core.HandleError(err)
 
+	var user_has_approve_pass = pass_service.Is_login_user_has_pass(pass_res.CGGL_PURCHASE_APPROVE, c.Session)
+
 	c.RenderArgs["status_list"] = status_list
+	c.RenderArgs["user_has_approve_pass"] = user_has_approve_pass
 
 	return c.RenderTemplate("erp/cggl/purchase_bill/purchase_bill_index.html")
 }
@@ -205,6 +208,14 @@ func (c ErpPurchaseBill) Save() revel.Result {
 
 		purchase_bill_log_service.Insert_purchase_bill_log(purchase_bill, "采购单新建", db_session, c.Session)
 	} else {
+		var purchase_bill_in_db cggl_models.PurchaseBillInfo
+		_, err := db_session.Id(purchase_bill.Id).Get(&purchase_bill_in_db)
+		core.HandleError(err)
+
+		if purchase_bill_service.CanPurchaseBillModify(purchase_bill_in_db, c.Session) == false {
+			return c.RenderJson(core.JsonResult{Success: false, Message: "采购单当前状态不能被修改！"})
+		}
+
 		affected, err = db_session.Id(purchase_bill.Id).Update(&purchase_bill)
 		core.HandleError(err)
 
@@ -230,7 +241,7 @@ func (c ErpPurchaseBill) Delete() revel.Result {
 	core.HandleError(db_session.In("id", purchase_bill_id_list).Find(&purchase_bill_list))
 
 	for _, purchase_bill := range purchase_bill_list {
-		if purchase_bill.StatusId != models.PURCHASE_BILL_STATUS_YCJ && purchase_bill.StatusId != models.PURCHASE_BILL_STATUS_YTJ {
+		if purchase_bill_service.CanPurchaseBillModify(purchase_bill, c.Session) == false {
 			return c.RenderJson(map[string]interface{}{
 				"success": false,
 				"message": "采购单当前状态不能删除！",
@@ -304,7 +315,7 @@ func (c ErpPurchaseBill) Submit() revel.Result {
 }
 
 func (c ErpPurchaseBill) Approve() revel.Result {
-	pass_service.Check_login_user_pass(pass_res.CGGL_PURCHASE_BILL, c.Session) // 应该有个专门的审批权限
+	pass_service.Check_login_user_pass(pass_res.CGGL_PURCHASE_APPROVE, c.Session)
 
 	var db_session = c.DbSession
 

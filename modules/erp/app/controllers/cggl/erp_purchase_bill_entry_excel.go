@@ -17,6 +17,7 @@ import (
 	"matrix/modules/erp/models/cggl_models"
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/purchase_bill_log_service"
+	"matrix/modules/erp/service/purchase_bill_service"
 )
 
 type ErpPurchaseBillEntryExcel struct {
@@ -37,8 +38,11 @@ func (c ErpPurchaseBillEntryExcel) Import() revel.Result {
 	_, err := db_session.Id(bill_id).Get(&purchase_bill)
 	core.HandleError(err)
 
-	if purchase_bill.StatusId != models.PURCHASE_BILL_STATUS_YCJ && purchase_bill.StatusId != models.PURCHASE_BILL_STATUS_YTJ {
-		return c.RenderJson(core.JsonResult{Success: false, Message: "采购单当前状态不能导入明细！"})
+	if purchase_bill_service.CanPurchaseBillModify(purchase_bill, c.Session) == false {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "采购单当前状态不能导入明细！",
+		})
 	}
 
 	excel_file_bytes := make([]byte, 0)

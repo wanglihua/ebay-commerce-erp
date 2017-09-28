@@ -46,10 +46,12 @@
                         <i class="ace-icon fa fa-arrow-circle-up"></i>
                         提交
                     </button>
+                    {% if .user_has_approve_pass %}
                     <button class="btn btn-pink btn-sm" @click="approvePurchaseBill()">
                         <i class="ace-icon fa fa-share"></i>
                         审批
                     </button>
+                    {% end %}
                     <button class="btn btn-danger btn-sm" @click="deletePurchaseBill()">
                         <i class="ace-icon fa fa-trash-o"></i>
                         删除

@@ -749,6 +749,13 @@ func (e PassResInfo) InitData(db_session *xorm.Session) {
 		pass.Name = "采购流水"
 		pass.Desc = core.MakeNullString("采购流水", true)
 		db_session.Insert(pass)
+
+		pass = new(PassResInfo)
+		pass.Id = pass_res.CGGL_PURCHASE_APPROVE
+		pass.CateId = pass_res_cate.CGGL
+		pass.Name = "采购审批"
+		pass.Desc = core.MakeNullString("采购审批", true)
+		db_session.Insert(pass)
 	}
 
 	// 销售管理

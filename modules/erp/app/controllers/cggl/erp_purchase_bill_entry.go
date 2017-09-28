@@ -14,6 +14,7 @@ import (
 	"matrix/modules/auth/pass_res"
 	"matrix/modules/erp/models/cggl_models"
 	"matrix/modules/erp/service/purchase_bill_log_service"
+	"matrix/modules/erp/service/purchase_bill_service"
 )
 
 type ErpPurchaseBillEntry struct {
@@ -198,6 +199,13 @@ func (c ErpPurchaseBillEntry) Save() revel.Result {
 	_, err = db_session.Id(purchase_bill_entry.BillId).Get(&purchase_bill)
 	core.HandleError(err)
 
+	if purchase_bill_service.CanPurchaseBillModify(purchase_bill, c.Session) == false {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "采购单当前状态不能新增和修改明细！",
+		})
+	}
+
 	var qty = purchase_bill_entry.MelQty + purchase_bill_entry.BneQty
 	purchase_bill_entry.Qty = qty
 
@@ -282,7 +290,12 @@ func (c ErpPurchaseBillEntry) Delete() revel.Result {
 	_, err = db_session.Id(purchase_bill_entry.BillId).Get(&purchase_bill)
 	core.HandleError(err)
 
-	//todo 检查采购单当前状态， 某些状态下不能删除明细
+	if purchase_bill_service.CanPurchaseBillModify(purchase_bill, c.Session) == false {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "采购单当前状态不能删除明细！",
+		})
+	}
 
 	purchase_bill_log_service.Insert_purchase_bill_log(purchase_bill, "采购单明细删除", db_session, c.Session)
 
