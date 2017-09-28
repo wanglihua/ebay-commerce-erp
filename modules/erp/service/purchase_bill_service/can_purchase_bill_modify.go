@@ -27,7 +27,9 @@ func CanPurchaseBillModify(purchase_bill cggl_models.PurchaseBillInfo, web_sessi
 		} else {
 			return false
 		}
-	} else {
+	} else if purchase_bill.StatusId == models.PURCHASE_BILL_STATUS_CGZ || purchase_bill.StatusId == models.PURCHASE_BILL_STATUS_YRK {
 		return false
 	}
+
+	return false
 }
