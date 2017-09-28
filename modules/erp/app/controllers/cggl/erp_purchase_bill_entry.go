@@ -22,8 +22,19 @@ type ErpPurchaseBillEntry struct {
 }
 
 func (c ErpPurchaseBillEntry) Index() revel.Result {
-	pass_service.Check_login_user_pass(pass_res.CGGL_PURCHASE_BILL, c.Session)
+	// pass_service.Check_login_user_pass(pass_res.CGGL_PURCHASE_BILL, c.Session)
+	pass_service.Check_login_user_pass_or([]int64{pass_res.CGGL_PURCHASE_BILL, pass_res.CGGL_PURCHASE_FINANCE}, c.Session)
 
+	var db_session = c.DbSession
+
+	var purchase_bill_id int64
+	c.Params.Bind(&purchase_bill_id, "purchase_bill_id")
+
+	var purchase_bill cggl_models.PurchaseBillInfo
+	_, err := db_session.Id(purchase_bill_id).Get(&purchase_bill)
+	core.HandleError(err)
+
+	c.RenderArgs["bill_code"] = purchase_bill.Code
 	return c.RenderTemplate("erp/cggl/purchase_bill_entry/purchase_bill_entry_index.html")
 }
 
@@ -34,7 +45,8 @@ type PurchaseBillEntryViewItem struct {
 }
 
 func (c ErpPurchaseBillEntry) ListData() revel.Result {
-	pass_service.Check_login_user_pass(pass_res.CGGL_PURCHASE_BILL, c.Session)
+	// pass_service.Check_login_user_pass(pass_res.CGGL_PURCHASE_BILL, c.Session)
+	pass_service.Check_login_user_pass_or([]int64{pass_res.CGGL_PURCHASE_BILL, pass_res.CGGL_PURCHASE_FINANCE}, c.Session)
 
 	db_session := c.DbSession
 

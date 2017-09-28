@@ -460,7 +460,7 @@ POST /purchase/bill/submit                 ErpPurchaseBill.Submit
 POST /purchase/bill/approve                ErpPurchaseBill.Approve
 POST /purchase/bill/supplier/select/list/data      ErpPurchaseBill.SupplierSelectListData
 
-GET  /purchase/bill/entry                  ErpPurchaseBillEntry.Index
+POST /purchase/bill/entry                  ErpPurchaseBillEntry.Index
 POST /purchase/bill/entry/data/list        ErpPurchaseBillEntry.ListData
 POST /purchase/bill/entry/data/detail      ErpPurchaseBillEntry.DetailData
 POST /purchase/bill/entry/save             ErpPurchaseBillEntry.Save

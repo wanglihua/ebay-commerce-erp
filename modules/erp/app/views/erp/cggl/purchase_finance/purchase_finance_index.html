@@ -99,7 +99,18 @@
                         {"mDataProp": "pb.trans_expenses", "title": "运费", "bSearchable": false, "width": 75},
                         {"mDataProp": "s.name", "title": "状态", "bSearchable": false, "width": 90},
                         {"mDataProp": "pb.create_time", "title": "创建时间", "bSearchable": false, "width": 120},
-                        {"mDataProp": "pb.update_time", "title": "修改时间", "bSearchable": false, "width": 120}
+                        {"mDataProp": "pb.update_time", "title": "修改时间", "bSearchable": false, "width": 120},
+                        {
+                            "mDataProp": "pb.id",
+                            "bSearchable": false,
+                            "orderable": false,
+                            "sClass": "center",
+                            "width": 100,
+                            "title": '操作',
+                            "render": function (data, type, row) {
+                                return "<a class='btn btn-xs btn-info btn-inline pull-left' onclick='show_entry_list_dialog(" + data + ");' ><i class='ace-icon fa fa-list'></i>查看明细</a>";
+                            }
+                        }
                     ],
                     "fnServerData": function (sSource, aoData, fnCallback) {
                         showMask("数据加载中，请稍候");
@@ -165,5 +176,92 @@
             }
         }
     });
+
+    function show_entry_list_dialog(bill_id) {
+        function load_purchase_bill_entry_list(bill_id) {
+            var history_vm = new Vue({
+                el: "#purchase_bill_entry_list_dialog",
+                data: {}
+            });
+
+            initDataTable(
+                '#purchaseBillEntryList',
+                {
+                    "sAjaxSource": '{%url "ErpPurchaseBillEntry.ListData"%}',
+                    "aaSorting": [[0, "asc"]],
+                    "aoColumns": [
+                        {
+                            "mDataProp": "pbe.id",
+                            "bSearchable": false,
+                            "orderable": false,
+                            "sClass": "center",
+                            "width": 50,
+                            "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
+                            "render": function (data, type, row) {
+                                return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
+                            }
+                        },
+                        {"mDataProp": "p.sku", "title": "SKU", "bSearchable": false, "width": 150},
+                        {
+                            "mDataProp": "p.cn_name", "title": "商品名称", "bSearchable": false, "sClass": "word-wrap",
+                            "render": function (data, type, row) {
+                                return "<div>" + data + "</div>"
+                            }
+                        },
+                        {"mDataProp": "pbe.price", "title": "单价", "bSearchable": false, "sClass": "center", "width": 50},
+                        {"mDataProp": "pbe.qty", "title": "总数量", "bSearchable": false, "sClass": "center", "width": 70},
+                        {"mDataProp": "pbe.amount", "title": "金额", "bSearchable": false, "sClass": "center", "width": 50},
+                        {
+                            "mDataProp": "pbe.desc", "title": "备注", "bSearchable": true, "sClass": "word-wrap",
+                            "render": function (data, type, row) {
+                                if (data === null) {
+                                    return "";
+                                } else {
+                                    return "<div>" + data + "</div>"
+                                }
+                            }
+                        },
+                        {"mDataProp": "s.name", "title": "状态", "bSearchable": true, "sClass": "center", "width": 50}
+                    ],
+                    "fnServerData": function (sSource, aoData, fnCallback) {
+                        showMask("数据加载中，请稍候");
+
+                        aoData.push({'name': 'purchase_bill_id', 'value': bill_id});
+
+                        $.ajax(
+                            {
+                                "dataType": 'json',
+                                "url": sSource,
+                                "data": aoData,
+                                "success": function (data) {
+                                    hideMask();
+                                    if (data.success === false) {
+                                        $.msg.error(data.message);
+                                        return;
+                                    }
+                                    fnCallback(data.list_data);
+
+                                    vm.purchase_bill_code = data.purchase_bill_code
+                                }
+                            });
+                    }
+                }
+            );
+        }
+
+        $("#purchase_bill_entry_list_wrapper").html("");
+
+        $.ajax({
+            url: '{%url "ErpPurchaseBillEntry.Index" %}',
+            type: "POST",
+            data: {"purchase_bill_id": bill_id},
+            success: function (result) {
+                $("#purchase_bill_entry_list_wrapper").html(result);
+                load_purchase_bill_entry_list(bill_id);
+                $("#purchase_bill_entry_list_dialog").modal();
+            }
+        });
+    }
 </script>
+<div id="purchase_bill_entry_list_wrapper"></div>
 {%footer%}
