@@ -20,6 +20,7 @@ type PurchaseBillEntryInfo struct {
 	StatusId                int64           `xorm:"bigint notnull index 'status_id'" json:"status_id" smith:"verbose_name=状态"`
 	AbnormalTypeId          int64           `xorm:"bigint notnull index 'abnormal_type_id' default(0)" json:"abnormal_type_id" smith:"verbose_name=异常类型"`
 	AbnormalProcessResultId int64           `xorm:"bigint notnull index 'abnormal_process_result_id' default(0)" json:"abnormal_process_result_id" smith:"verbose_name=异常处理结果"`
+	CheckinUserId           int64           `xorm:"bigint notnull 'checkin_user_id' default(0)" json:"checkin_user_id" smith:"verbose_name=入库人"`
 	CreateTime              core.Time       `xorm:"created notnull 'create_time'" json:"create_time"`
 	UpdateTime              core.Time       `xorm:"updated notnull 'update_time'" json:"update_time"`
 }

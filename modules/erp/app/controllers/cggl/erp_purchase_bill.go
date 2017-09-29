@@ -141,10 +141,6 @@ func (f *PurchaseBillDetailForm) Valid(validation *revel.Validation) bool {
 		validation.MaxSize(f.PurchaseBill.Desc.String, 400).Message("备注长度不能大于400！")
 	}
 
-	validation.Required(f.PurchaseBill.UserId).Message("操作人不能为空！")
-
-	validation.Required(f.PurchaseBill.TransExpenses).Message("运费不能为空！")
-
 	validation.Required(f.PurchaseBill.StatusId).Message("状态不能为空！")
 
 	return validation.HasErrors() == false
@@ -200,7 +196,7 @@ func (c ErpPurchaseBill) Save() revel.Result {
 	var affected int64
 	if detail_form.IsCreate() {
 		loginuser := core.GetLoginUser(c.Session)
-		purchase_bill.UserId = loginuser.UserId
+		purchase_bill.ApplyUserId = loginuser.UserId
 		purchase_bill.StatusId = models.PURCHASE_BILL_STATUS_YCJ
 
 		affected, err = db_session.Insert(&purchase_bill)
