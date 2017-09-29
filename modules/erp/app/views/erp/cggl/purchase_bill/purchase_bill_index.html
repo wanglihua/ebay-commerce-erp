@@ -103,7 +103,7 @@
         </div>
     </div>
     <div class="modal fade" id="purchaseBillDetailDialog">
-        <div class="modal-dialog" style="width: 480px;">
+        <div class="modal-dialog" style="width: 880px;">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="True">&times;</button>
@@ -115,7 +115,7 @@
                             <form class="form-horizontal" role="form" id="purchaseBillDetailForm">
                                 <input id="purchase_bill_id" name="purchase_bill_detail.purchase_bill.id" type="hidden" v-model.number="purchase_bill_detail.purchase_bill.id"/>
                                 <div class="row">
-                                    <div class="col-xs-12">
+                                    <div class="col-xs-6">
                                         <div class="form-group">
                                             <label for="code" class="col-xs-2 control-label">批次号</label>
                                             <div class="col-xs-10">
@@ -123,10 +123,8 @@
                                             </div>
                                         </div>
                                     </div>
-                                </div>
 
-                                <div class="row">
-                                    <div class="col-xs-12">
+                                    <div class="col-xs-6">
                                         <div class="form-group">
                                             <label for="supplier_id" class="col-xs-2 control-label">供应商</label>
                                             <div class="col-xs-10">
@@ -145,10 +143,57 @@
                                 </div>
 
                                 <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="total_amount" class="col-xs-2 control-label">总金额</label>
+                                            <div class="col-xs-10">
+                                                <input id="total_amount" name="purchase_bill_detail.purchase_bill.total_amount" type="text" class="input-sm form-control" disabled="disabled" v-model="purchase_bill_detail.purchase_bill.total_amount"/>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="pay_method_id" class="col-xs-2 control-label">付款方式</label>
+                                            <div class="col-xs-10">
+                                                <select id="pay_method_id" name="purchase_bill_detail.purchase_bill.pay_method_id" class="input-sm form-control" v-model="purchase_bill_detail.purchase_bill.pay_method_id">
+                                                    <option :value="0"></option>
+                                                    <template v-for="pay_method in purchase_bill_detail.pay_method_list">
+                                                        <option :value="pay_method.id">{{pay_method.name}}</option>
+                                                    </template>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="advance_amount" class="col-xs-2 control-label">预付款</label>
+                                            <div class="col-xs-10">
+                                                <input id="advance_amount" name="purchase_bill_detail.purchase_bill.advance_amount" type="text" class="input-sm form-control" v-model="purchase_bill_detail.purchase_bill.advance_amount"/>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <div class="form-group">
+                                                <label for="final_amount" class="col-xs-2 control-label">尾款</label>
+                                                <div class="col-xs-10">
+                                                    <input id="final_amount" name="purchase_bill_detail.purchase_bill.final_amount" type="text" class="input-sm form-control" v-model="purchase_bill_detail.purchase_bill.final_amount"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
-                                            <label for="purchase_bill_desc" class="col-xs-2 control-label">备注</label>
-                                            <div class="col-xs-10">
+                                            <label for="purchase_bill_desc" class="col-xs-1 control-label">备注</label>
+                                            <div class="col-xs-11">
                                                 <textarea id="purchase_bill_desc" name="purchase_bill_detail.purchase_bill.desc" rows="2" class="input-sm form-control" v-model="purchase_bill_detail.purchase_bill.desc"></textarea>
                                             </div>
                                         </div>
@@ -411,7 +456,8 @@
             "purchase_bill_code": "",
             "purchase_bill_detail": {
                 "purchase_bill": {},
-                "supplier_name": ""
+                "supplier_name": "",
+                "pay_method_list": []
             },
             "purchase_bill_entry_detail": {
                 "purchase_bill": {},

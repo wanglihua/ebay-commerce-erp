@@ -10,7 +10,7 @@ type PurchaseBillInfo struct {
 	Desc            core.NullString `xorm:"nvarchar(500) 'desc'" json:"desc" smith:"verbose_name=备注,min=2,max=400"`
 	SupplierId      int64           `xorm:"bigint notnull 'supplier_id'" json:"supplier_id" smith:"verbose_name=供应商"`
 	TotalAmount     float64         `xorm:"decimal(18,6) notnull 'total_amount'" json:"total_amount" smith:"verbose_name=总金额"`
-	AdvanceAmount   float64         `xorm:"decimal(18,6) notnull 'advance_amount'" json:"advance_amount" smith:"verbose_name=预付运费"`
+	AdvanceAmount   float64         `xorm:"decimal(18,6) notnull 'advance_amount'" json:"advance_amount" smith:"verbose_name=预付款"`
 	FinalAmount     float64         `xorm:"decimal(18,6) notnull 'final_amount'" json:"final_amount" smith:"verbose_name=尾款"`
 	AdvanceExpenses float64         `xorm:"decimal(18,6) notnull 'advance_expenses'" json:"advance_expenses" smith:"verbose_name=预付运费"` //transportation expenses
 	FinalExpenses   float64         `xorm:"decimal(18,6) notnull 'final_expenses'" json:"final_expenses" smith:"verbose_name=提货费"`      // 就是运费的尾款

@@ -133,8 +133,9 @@ FROM erp_purchase_bill pb
 }
 
 type PurchaseBillDetailForm struct {
-	PurchaseBill cggl_models.PurchaseBillInfo `json:"purchase_bill"`
-	SupplierName string                       `json:"supplier_name"`
+	PurchaseBill  cggl_models.PurchaseBillInfo        `json:"purchase_bill"`
+	SupplierName  string                              `json:"supplier_name"`
+	PayMethodList []sppz_models.SupplierPayMethodInfo `json:"pay_method_list"`
 }
 
 func (f *PurchaseBillDetailForm) IsCreate() bool {
@@ -175,14 +176,19 @@ func (c ErpPurchaseBill) DetailData() revel.Result {
 		var supplier sppz_models.SupplierInfo
 		_, err = db_session.Id(purchase_bill.SupplierId).Get(&supplier)
 		core.HandleError(err)
+		supplier_name = supplier.Name
 
 	} else {
 		purchase_bill.Code = bill_service.GetNextBillNo(db_session, c.Session)
 	}
 
+	var pay_method_list = make([]sppz_models.SupplierPayMethodInfo, 0)
+	core.HandleError(db_session.Find(&pay_method_list))
+
 	var detail_form PurchaseBillDetailForm
 	detail_form.PurchaseBill = purchase_bill
 	detail_form.SupplierName = supplier_name
+	detail_form.PayMethodList = pay_method_list
 
 	return c.RenderJson(detail_form)
 }
