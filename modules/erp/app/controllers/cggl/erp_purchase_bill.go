@@ -367,9 +367,7 @@ func (c ErpPurchaseBill) Approve() revel.Result {
 
 	for _, bill_entry := range bill_entry_list {
 		bill_entry.StatusId = models.PURCHASE_BILL_STATUS_YSP
-		bill_entry.PurchaseTime = approve_time
-
-		_, err := db_session.Id(bill_entry.Id).Cols("status_id", "approve_time").Update(&bill_entry)
+		_, err := db_session.Id(bill_entry.Id).Cols("status_id").Update(&bill_entry)
 		core.HandleError(err)
 	}
 

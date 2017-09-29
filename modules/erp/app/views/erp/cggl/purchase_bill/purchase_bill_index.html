@@ -543,8 +543,38 @@
                                 return "<div>" + data + "</div>";
                             }
                         },
-                        {"mDataProp": "pb.pay_time", "title": "付款时间", "bSearchable": false, "sClass": "center", "width": 120},
-                        {"mDataProp": "ayu.nick_name", "title": "操作人", "bSearchable": false, "width": 75},
+                        {
+                            "mDataProp": "pb.id", "title": "流程信息", "bSearchable": false, "bSortable": false, "sClass": "center", "width": 200,
+                            "render": function (data, type, row) {
+                                var flow_info = "<table>";
+
+                                flow_info += "<tr><td>申请：</td><td>" + row.ayu.nick_name;
+                                if (row.pb.apply_time != null) {
+                                    flow_info += "&nbsp;" + row.pb.apply_time;
+                                }
+                                flow_info += "</td></tr>";
+
+                                flow_info += "<tr><td>审批：</td><td>";
+                                if (row.pb.approve_time != null) {
+                                    flow_info += +row.avu.nick_name + "&nbsp;" + row.pb.apply_time;
+                                } else {
+                                    flow_info += "---";
+                                }
+                                flow_info += "</td></tr>";
+
+                                flow_info += "<tr><td>入库：</td><td>";
+                                if (row.pb.checkin_time != null) {
+                                    flow_info += +row.cu.nick_name + "&nbsp;" + row.pb.checkin_time;
+                                } else {
+                                    flow_info += "---";
+                                }
+                                flow_info += "</td></tr>";
+
+                                flow_info += "</table>";
+
+                                return flow_info;
+                            }
+                        },
                         {"mDataProp": "s.name", "title": "状态", "bSearchable": false, "width": 90},
                         {"mDataProp": "pb.create_time", "title": "创建时间", "bSearchable": false, "width": 120},
                         {"mDataProp": "pb.update_time", "title": "修改时间", "bSearchable": false, "width": 120},
@@ -594,19 +624,22 @@
                 $("#purchaseBillList").find('tbody tr').each(function () {
                     var tableRow = $(this).closest('tr');
                     var checkbox = tableRow.find('td:first-child input:checkbox')[0];
-                    checkbox.checked = false;
-                    tableRow.removeClass('hilight');
+                    if (checkbox) {
+                        checkbox.checked = false;
+                        tableRow.removeClass('hilight');
+                    }
                 });
 
                 var tableRow = $(this);
                 var checkbox = tableRow.find('td:first-child input:checkbox')[0];
+                if (checkbox) {
+                    checkbox.checked = true;
+                    tableRow.addClass('hilight');
 
-                checkbox.checked = true;
-                tableRow.addClass('hilight');
-
-                var id = $(this).find('td:first-child input:checkbox').val();
-                vm.purchase_bill_id = id;
-                vm.reloadEntryList();
+                    var id = $(this).find('td:first-child input:checkbox').val();
+                    vm.purchase_bill_id = id;
+                    vm.reloadEntryList();
+                }
             });
 
             initDataTable(
@@ -638,7 +671,6 @@
                         {"mDataProp": "pbe.bne_qty", "title": "BNE数量", "bSearchable": false, "sClass": "center", "width": 80},
                         {"mDataProp": "pbe.qty", "title": "总数量", "bSearchable": false, "sClass": "center", "width": 70},
                         {"mDataProp": "pbe.amount", "title": "金额", "bSearchable": false, "sClass": "center", "width": 50},
-                        {"mDataProp": "pbe.purchase_time", "title": "采购时间", "bSearchable": false, "sClass": "center", "width": 120},
                         {"mDataProp": "pbe.checkin_time", "title": "入库时间", "bSearchable": false, "sClass": "center", "width": 120},
                         {
                             "mDataProp": "pbe.desc", "title": "备注", "bSearchable": true, "sClass": "word-wrap",
