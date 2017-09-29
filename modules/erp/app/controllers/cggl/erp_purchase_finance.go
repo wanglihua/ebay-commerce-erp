@@ -124,13 +124,15 @@ func (c ErpPurchaseFinance) Purchase() revel.Result {
 		}
 	}
 
+	var login_user = core.GetLoginUser(c.Session)
 	var pay_time = core.MakeNullTime(time.Now(), true)
 
 	// 设置为已下单状态
 	for _, purchase_bill := range purchase_bill_list {
 		purchase_bill.StatusId = models.PURCHASE_BILL_STATUS_CGZ
 		purchase_bill.PayTime = pay_time
-		_, err := db_session.Id(purchase_bill.Id).Cols("status_id", "pay_time").Update(&purchase_bill)
+		purchase_bill.PayUserId = login_user.UserId
+		_, err := db_session.Id(purchase_bill.Id).Cols("status_id", "pay_time", "pay_user_id").Update(&purchase_bill)
 		core.HandleError(err)
 	}
 

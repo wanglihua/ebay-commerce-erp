@@ -21,11 +21,9 @@ type PurchaseBillInfo struct {
 	ApplyUserId     int64           `xorm:"bigint notnull 'apply_user_id' default(0)" json:"apply_user_id" smith:"verbose_name=申请人"`
 	ApplyTime       core.NullTime   `xorm:"datetime null 'apply_time'" json:"apply_time" smith:"verbose_name=申请时间"`
 	ApproveUserId   int64           `xorm:"bigint notnull 'approve_user_id' default(0)" json:"approve_user_id" smith:"verbose_name=审批人"`
-	ApproveTime     core.NullTime   `xorm:"datetime null 'approve_time'" json:"approve_time" smith:"verbose_name=审批时间"`
-	PurchaseUserId  int64           `xorm:"bigint notnull 'purchase_user_id' default(0)" json:"purchase_user_id" smith:"verbose_name=下单人"`
-	PurchaseTime    core.NullTime   `xorm:"datetime null 'purchase_time'" json:"purchase_time" smith:"verbose_name=下单时间"`
+	ApproveTime     core.NullTime   `xorm:"datetime null 'approve_time'" json:"approve_time" smith:"verbose_name=审批时间"` // 也就是采购时间
 	PayUserId       int64           `xorm:"bigint notnull 'pay_user_id' default(0)" json:"pay_user_id" smith:"verbose_name=付款人"`
-	PayTime         core.NullTime   `xorm:"datetime null 'pay_time'" json:"pay_time" smith:"verbose_name=付款时间"`
+	PayTime         core.NullTime   `xorm:"datetime null 'pay_time'" json:"pay_time" smith:"verbose_name=付款时间"`  // 也就是下单时间
 	CheckinUserId   int64           `xorm:"bigint notnull 'checkin_user_id' default(0)" json:"checkin_user_id" smith:"verbose_name=入库人"`
 	CheckinTime     core.NullTime   `xorm:"datetime null 'checkin_time'" json:"checkin_time" smith:"verbose_name=入库时间"`
 	CreateTime      core.Time       `xorm:"created notnull 'create_time'" json:"create_time"`

@@ -291,10 +291,14 @@ func (c ErpPurchaseBill) Submit() revel.Result {
 		}
 	}
 
+	var login_user = core.GetLoginUser(c.Session)
+
 	// 设置为 已提交 状态
 	for _, purchase_bill := range purchase_bill_list {
 		purchase_bill.StatusId = models.PURCHASE_BILL_STATUS_YTJ
-		_, err := db_session.Id(purchase_bill.Id).Cols("status_id").Update(&purchase_bill)
+		purchase_bill.ApplyUserId = login_user.UserId
+		purchase_bill.ApplyTime = core.MakeNullTime(time.Now(), true)
+		_, err := db_session.Id(purchase_bill.Id).Cols("status_id", "apply_user_id", "apply_time").Update(&purchase_bill)
 		core.HandleError(err)
 	}
 
@@ -331,13 +335,15 @@ func (c ErpPurchaseBill) Approve() revel.Result {
 		}
 	}
 
-	var purchase_time = core.MakeNullTime(time.Now(), true)
+	var login_user = core.GetLoginUser(c.Session)
+	var approve_time = core.MakeNullTime(time.Now(), true)
 
 	// 设置为已审批状态
 	for _, purchase_bill := range purchase_bill_list {
 		purchase_bill.StatusId = models.PURCHASE_BILL_STATUS_YSP
-		purchase_bill.PurchaseTime = purchase_time // 已审批时填入 采购时间
-		_, err := db_session.Id(purchase_bill.Id).Cols("status_id", "purchase_time").Update(&purchase_bill)
+		purchase_bill.ApproveTime = approve_time // 已审批时填入 采购时间
+		purchase_bill.ApproveUserId = login_user.UserId
+		_, err := db_session.Id(purchase_bill.Id).Cols("status_id", "approve_time").Update(&purchase_bill)
 		core.HandleError(err)
 	}
 
@@ -346,9 +352,9 @@ func (c ErpPurchaseBill) Approve() revel.Result {
 
 	for _, bill_entry := range bill_entry_list {
 		bill_entry.StatusId = models.PURCHASE_BILL_STATUS_YSP
-		bill_entry.PurchaseTime = purchase_time
+		bill_entry.PurchaseTime = approve_time
 
-		_, err := db_session.Id(bill_entry.Id).Cols("status_id", "purchase_time").Update(&bill_entry)
+		_, err := db_session.Id(bill_entry.Id).Cols("status_id", "approve_time").Update(&bill_entry)
 		core.HandleError(err)
 	}
 

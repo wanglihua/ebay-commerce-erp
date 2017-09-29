@@ -289,12 +289,17 @@ func (c ErpPurchaseCheckin) Checkin() revel.Result {
 
 	// 如果都是当前设置的这个状态了， 就更新采购单的状态
 	if count == 0 {
+
+		var login_user = core.GetLoginUser(c.Session)
+
 		var purchase_bill cggl_models.PurchaseBillInfo
 		_, err = db_session.Id(bill_id).Get(&purchase_bill)
 		core.HandleError(err)
 
 		purchase_bill.StatusId = models.PURCHASE_BILL_STATUS_YRK
-		_, err = db_session.Id(purchase_bill.Id).Cols("status_id").Update(&purchase_bill)
+		purchase_bill.CheckinUserId = login_user.UserId
+		purchase_bill.CheckinTime = core.MakeNullTime(time.Now(), true)
+		_, err = db_session.Id(purchase_bill.Id).Cols("status_id", "checkin_user_id", "checkin_time").Update(&purchase_bill)
 		core.HandleError(err)
 	}
 
