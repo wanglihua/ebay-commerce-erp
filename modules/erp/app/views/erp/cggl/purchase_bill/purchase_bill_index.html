@@ -172,7 +172,7 @@
                                         <div class="form-group">
                                             <label for="advance_amount" class="col-xs-2 control-label">预付款</label>
                                             <div class="col-xs-10">
-                                                <input id="advance_amount" name="purchase_bill_detail.purchase_bill.advance_amount" type="text" class="input-sm form-control" v-model="purchase_bill_detail.purchase_bill.advance_amount"/>
+                                                <input id="advance_amount" name="purchase_bill_detail.purchase_bill.advance_amount" type="text" class="input-sm form-control" v-model.number="purchase_bill_detail.purchase_bill.advance_amount"/>
                                             </div>
                                         </div>
                                     </div>
@@ -182,7 +182,51 @@
                                             <div class="form-group">
                                                 <label for="final_amount" class="col-xs-2 control-label">尾款</label>
                                                 <div class="col-xs-10">
-                                                    <input id="final_amount" name="purchase_bill_detail.purchase_bill.final_amount" type="text" class="input-sm form-control" v-model="purchase_bill_detail.purchase_bill.final_amount"/>
+                                                    <input id="final_amount" name="purchase_bill_detail.purchase_bill.final_amount" type="text" class="input-sm form-control" v-model.number="purchase_bill_detail.purchase_bill.final_amount"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="advance_expenses" class="col-xs-2 control-label">预付运费</label>
+                                            <div class="col-xs-10">
+                                                <input id="advance_expenses" name="purchase_bill_detail.purchase_bill.advance_expenses" type="text" class="input-sm form-control" v-model.number="purchase_bill_detail.purchase_bill.advance_expenses"/>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <div class="form-group">
+                                                <label for="final_expenses" class="col-xs-2 control-label">提货费</label>
+                                                <div class="col-xs-10">
+                                                    <input id="final_expenses" name="purchase_bill_detail.purchase_bill.final_expenses" type="text" class="input-sm form-control" v-model.number="purchase_bill_detail.purchase_bill.final_expenses"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="arrival_days" class="col-xs-2 control-label">到货天数</label>
+                                            <div class="col-xs-10">
+                                                <input id="arrival_days" name="purchase_bill_detail.purchase_bill.arrival_days" type="text" class="input-sm form-control" v-model.number="purchase_bill_detail.purchase_bill.arrival_days"/>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <div class="form-group">
+                                                <label for="pay_days" class="col-xs-2 control-label">账期</label>
+                                                <div class="col-xs-10">
+                                                    <input id="pay_days" name="purchase_bill_detail.purchase_bill.pay_days" type="text" class="input-sm form-control" v-model.number="purchase_bill_detail.purchase_bill.pay_days"/>
                                                 </div>
                                             </div>
                                         </div>
