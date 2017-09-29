@@ -260,11 +260,11 @@
         </div>
     </div>
     <div class="modal fade" id="purchaseBillEntryDetailDialog">
-        <div class="modal-dialog" style="width: 480px;">
+        <div class="modal-dialog" style="width: 880px;">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="True">&times;</button>
-                    <h4 class="modal-title">采购单详细</h4>
+                    <h4 class="modal-title">采购单明细详细</h4>
                 </div>
                 <div class="modal-body clearfix">
                     <div class="row">
@@ -272,7 +272,7 @@
                             <form class="form-horizontal" role="form" id="purchaseBillEntryDetailForm">
                                 <input id="purchase_bill_entry_id" name="purchase_bill_entry_detail.purchase_bill_entry.id" type="hidden" v-model.number="purchase_bill_entry_detail.purchase_bill_entry.id"/>
                                 <div class="row">
-                                    <div class="col-xs-12">
+                                    <div class="col-xs-6">
                                         <div class="form-group">
                                             <label for="bill_id" class="col-xs-2 control-label">批次</label>
                                             <div class="col-xs-10">
@@ -281,10 +281,8 @@
                                             </div>
                                         </div>
                                     </div>
-                                </div>
 
-                                <div class="row">
-                                    <div class="col-xs-12">
+                                    <div class="col-xs-6">
                                         <div class="form-group">
                                             <label for="product_id" class="col-xs-2 control-label">商品</label>
                                             <div class="col-xs-10">
@@ -303,18 +301,7 @@
                                 </div>
 
                                 <div class="row">
-                                    <div class="col-xs-12">
-                                        <div class="form-group">
-                                            <label for="price" class="col-xs-2 control-label">单价</label>
-                                            <div class="col-xs-10">
-                                                <input id="price" name="purchase_bill_entry_detail.purchase_bill_entry.price" type="text" class="input-sm form-control" v-model.number="purchase_bill_entry_detail.purchase_bill_entry.price"/>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-xs-12">
+                                    <div class="col-xs-6">
                                         <div class="form-group">
                                             <label for="mel_qty" class="col-xs-2 control-label">MEL数量</label>
                                             <div class="col-xs-10">
@@ -322,10 +309,8 @@
                                             </div>
                                         </div>
                                     </div>
-                                </div>
 
-                                <div class="row">
-                                    <div class="col-xs-12">
+                                    <div class="col-xs-6">
                                         <div class="form-group">
                                             <label for="bne_qty" class="col-xs-2 control-label">BNE数量</label>
                                             <div class="col-xs-10">
@@ -336,11 +321,83 @@
                                 </div>
 
                                 <div class="row">
-                                    <div class="col-xs-12">
+                                    <div class="col-xs-6">
                                         <div class="form-group">
                                             <label for="qty" class="col-xs-2 control-label">总数量</label>
                                             <div class="col-xs-10">
                                                 <input id="qty" name="purchase_bill_entry_detail.purchase_bill_entry.qty" type="text" class="input-sm form-control" v-model.number="purchase_bill_entry_detail.purchase_bill_entry.qty" disabled="disabled"/>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="price" class="col-xs-2 control-label">单价</label>
+                                            <div class="col-xs-10">
+                                                <input id="price" name="purchase_bill_entry_detail.purchase_bill_entry.price" type="text" class="input-sm form-control" v-model.number="purchase_bill_entry_detail.purchase_bill_entry.price"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="need_invoice" class="col-xs-2 control-label">是否开票</label>
+                                            <div class="col-xs-10">
+                                                <select id="need_invoice" name="purchase_bill_entry_detail.purchase_bill_entry.need_invoice" class="input-sm form-control" v-model.number="purchase_bill_entry_detail.purchase_bill_entry.need_invoice">
+                                                    <option :value="0">否</option>
+                                                    <option :value="1">是</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="tax_point" class="col-xs-2 control-label">收税点</label>
+                                            <div class="col-xs-10">
+                                                <input id="tax_point" name="purchase_bill_entry_detail.purchase_bill_entry.tax_point" type="text" class="input-sm form-control" v-model.number="purchase_bill_entry_detail.purchase_bill_entry.tax_point"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="drawback_point" class="col-xs-2 control-label">退税点</label>
+                                            <div class="col-xs-10">
+                                                <input id="drawback_point" name="purchase_bill_entry_detail.purchase_bill_entry.drawback_point" type="text" class="input-sm form-control" v-model.number="purchase_bill_entry_detail.purchase_bill_entry.drawback_point"/>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="drawback_amount" class="col-xs-2 control-label">退税额</label>
+                                            <div class="col-xs-10">
+                                                <input id="drawback_amount" name="purchase_bill_entry_detail.purchase_bill_entry.drawback_amount" type="text" class="input-sm form-control" v-model.number="purchase_bill_entry_detail.purchase_bill_entry.drawback_amount" disabled="disabled"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="fitting_cost" class="col-xs-2 control-label">配件费用</label>
+                                            <div class="col-xs-10">
+                                                <input id="fitting_cost" name="purchase_bill_entry_detail.purchase_bill_entry.fitting_cost" type="text" class="input-sm form-control" v-model.number="purchase_bill_entry_detail.purchase_bill_entry.fitting_cost"/>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="other_cost" class="col-xs-2 control-label">其它费用</label>
+                                            <div class="col-xs-10">
+                                                <input id="other_cost" name="purchase_bill_entry_detail.purchase_bill_entry.other_cost" type="text" class="input-sm form-control" v-model.number="purchase_bill_entry_detail.purchase_bill_entry.other_cost"/>
                                             </div>
                                         </div>
                                     </div>
@@ -349,8 +406,8 @@
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
-                                            <label for="purchase_bill_entry_desc" class="col-xs-2 control-label">备注</label>
-                                            <div class="col-xs-10">
+                                            <label for="purchase_bill_entry_desc" class="col-xs-1 control-label">备注</label>
+                                            <div class="col-xs-11">
                                                 <textarea id="purchase_bill_entry_desc" name="purchase_bill_entry_detail.purchase_bill_entry.desc" rows="2" class="input-sm form-control" v-model="purchase_bill_entry_detail.purchase_bill_entry.desc"></textarea>
                                             </div>
                                         </div>
