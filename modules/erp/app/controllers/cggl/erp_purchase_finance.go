@@ -37,10 +37,13 @@ func (c ErpPurchaseFinance) Index() revel.Result {
 }
 
 type ErpPurchaseFinanceViewItem struct {
-	cggl_models.PurchaseBillInfo `xorm:"extends" json:"pb"`
-	sppz_models.SupplierInfo     `xorm:"extends" json:"sup"`
-	auth_models.UserInfo         `xorm:"extends" json:"u"`
-	models.StatusInfo            `xorm:"extends" json:"s"`
+	PurchaseBill cggl_models.PurchaseBillInfo `xorm:"extends" json:"pb"`
+	Supplier     sppz_models.SupplierInfo     `xorm:"extends" json:"sup"`
+	Status       models.StatusInfo            `xorm:"extends" json:"s"`
+	ApplyUser    auth_models.UserInfo         `xorm:"extends" json:"ayu"`
+	ApproveUser  auth_models.UserInfo         `xorm:"extends" json:"avu"`
+	PayUser      auth_models.UserInfo         `xorm:"extends" json:"pu"`
+	CheckinUser  auth_models.UserInfo         `xorm:"extends" json:"cu"`
 }
 
 func (c ErpPurchaseFinance) ListData() revel.Result {
@@ -54,20 +57,26 @@ func (c ErpPurchaseFinance) ListData() revel.Result {
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
 	/*
-SELECT pb.*, sup.*, u.*, s.*
+SELECT pb.*, sup.*, s.*, ayu.*, avu.*, pu.*, cu.*
 FROM erp_purchase_bill pb
     INNER JOIN erp_supplier sup ON sup.id = pb.supplier_id
-    INNER JOIN auth_user u ON pb.user_id = u.id
     INNER JOIN erp_status s ON pb.status_id = s.id
+    INNER JOIN auth_user ayu ON pb.apply_user_id = ayu.id
+    LEFT JOIN auth_user avu ON pb.approve_user_id = avu.id
+    LEFT JOIN auth_user pu ON pb.pay_user_id = pu.id
+    LEFT JOIN auth_user cu ON pb.checkin_user_id = cu.id
 	*/
 
 	sql_builder := core.NewSqlBuilder()
-	sql_builder.Select("pb.*, sup.*, u.*, s.*")
+	sql_builder.Select("pb.*, sup.*, s.*, ayu.*, avu.*, pu.*, cu.*")
 	sql_builder.Count("count(pb.id) as bill_count")
 	sql_builder.From(`erp_purchase_bill pb
-	INNER JOIN erp_supplier sup ON sup.id = pb.supplier_id
-    INNER JOIN auth_user u ON pb.user_id = u.id
-    INNER JOIN erp_status s ON pb.status_id = s.id`)
+    INNER JOIN erp_supplier sup ON sup.id = pb.supplier_id
+    INNER JOIN erp_status s ON pb.status_id = s.id
+    INNER JOIN auth_user ayu ON pb.apply_user_id = ayu.id
+    LEFT JOIN auth_user avu ON pb.approve_user_id = avu.id
+    LEFT JOIN auth_user pu ON pb.pay_user_id = pu.id
+    LEFT JOIN auth_user cu ON pb.checkin_user_id = cu.id`)
 
 	filter = core.SqlAnd(filter, fmt.Sprintf("pb.status_id = %d OR pb.status_id =%d OR pb.status_id =%d",
 		models.PURCHASE_BILL_STATUS_YSP, models.PURCHASE_BILL_STATUS_CGZ, models.PURCHASE_BILL_STATUS_YRK))
