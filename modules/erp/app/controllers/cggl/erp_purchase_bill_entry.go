@@ -275,6 +275,9 @@ func (c ErpPurchaseBillEntry) Save() revel.Result {
 		}
 	}
 
+	// 更新采购单总金额
+	purchase_bill_service.UpdatePurchaseBillTotalAmount(purchase_bill.Id, db_session)
+
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据保存成功!"})
 }
 
@@ -313,6 +316,9 @@ func (c ErpPurchaseBillEntry) Delete() revel.Result {
 
 	affected, err := db_session.In("id", purchase_bill_entry_id_list).Delete(new(cggl_models.PurchaseBillEntryInfo))
 	core.HandleError(err)
+
+	// 更新采购单总金额
+	purchase_bill_service.UpdatePurchaseBillTotalAmount(purchase_bill.Id, db_session)
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})
 }
