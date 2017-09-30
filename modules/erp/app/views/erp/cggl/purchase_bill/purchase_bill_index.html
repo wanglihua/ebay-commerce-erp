@@ -605,7 +605,7 @@
                             "render": function (data, type, row) {
                                 var flow_info = "<table>";
 
-                                flow_info += "<tr><td>申请：</td><td>" + row.ayu.nick_name;
+                                flow_info += "<tr><td>申请：</td><td>&nbsp;" + row.ayu.nick_name;
                                 if (row.pb.apply_time != null) {
                                     flow_info += "&nbsp;" + row.pb.apply_time;
                                 }
@@ -613,7 +613,15 @@
 
                                 flow_info += "<tr><td>审批：</td><td>";
                                 if (row.pb.approve_time != null) {
-                                    flow_info += +row.avu.nick_name + "&nbsp;" + row.pb.apply_time;
+                                    flow_info += "&nbsp;" + row.avu.nick_name + "&nbsp;" + row.pb.approve_time;
+                                } else {
+                                    flow_info += "---";
+                                }
+                                flow_info += "</td></tr>";
+
+                                flow_info += "<tr><td>付款：</td><td>";
+                                if (row.pb.pay_time != null) {
+                                    flow_info += "&nbsp;" + row.pu.nick_name + "&nbsp;" + row.pb.pay_time;
                                 } else {
                                     flow_info += "---";
                                 }
@@ -621,7 +629,7 @@
 
                                 flow_info += "<tr><td>入库：</td><td>";
                                 if (row.pb.checkin_time != null) {
-                                    flow_info += +row.cu.nick_name + "&nbsp;" + row.pb.checkin_time;
+                                    flow_info += "&nbsp;" + row.cu.nick_name + "&nbsp;" + row.pb.checkin_time;
                                 } else {
                                     flow_info += "---";
                                 }

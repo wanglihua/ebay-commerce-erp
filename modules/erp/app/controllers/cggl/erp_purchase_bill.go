@@ -358,7 +358,7 @@ func (c ErpPurchaseBill) Approve() revel.Result {
 		purchase_bill.StatusId = models.PURCHASE_BILL_STATUS_YSP
 		purchase_bill.ApproveTime = approve_time // 已审批时填入 采购时间
 		purchase_bill.ApproveUserId = login_user.UserId
-		_, err := db_session.Id(purchase_bill.Id).Cols("status_id", "approve_time").Update(&purchase_bill)
+		_, err := db_session.Id(purchase_bill.Id).Cols("status_id", "approve_user_id", "approve_time").Update(&purchase_bill)
 		core.HandleError(err)
 	}
 
