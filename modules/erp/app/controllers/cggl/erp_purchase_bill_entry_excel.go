@@ -214,6 +214,8 @@ func (c ErpPurchaseBillEntryExcel) Import() revel.Result {
 
 		purchase_bill_entry.StatusId = purchase_bill.StatusId
 
+		purchase_bill_entry.DrawbackAmount = purchase_bill_service.CalculateBillEntryDrawbackAmount(purchase_bill_entry)
+
 		_, err := db_session.Insert(&purchase_bill_entry)
 		core.HandleError(err)
 	}
@@ -407,6 +409,42 @@ func (c ErpPurchaseBillEntryExcel) export_entry_list_to_excel(db_session *xorm.S
 		cell = row.AddCell()
 		sheet.SetColWidth(col_index, col_index, 10)
 		set_head_cell_style(cell)
+		cell.Value = "是否开票"
+		col_index++
+
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 10)
+		set_head_cell_style(cell)
+		cell.Value = "收税点"
+		col_index++
+
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 10)
+		set_head_cell_style(cell)
+		cell.Value = "退税点"
+		col_index++
+
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 10)
+		set_head_cell_style(cell)
+		cell.Value = "退税额"
+		col_index++
+
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 10)
+		set_head_cell_style(cell)
+		cell.Value = "配件费用"
+		col_index++
+
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 10)
+		set_head_cell_style(cell)
+		cell.Value = "其它费用"
+		col_index++
+
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 10)
+		set_head_cell_style(cell)
 		cell.Value = "描述"
 		col_index++
 
@@ -455,6 +493,40 @@ func (c ErpPurchaseBillEntryExcel) export_entry_list_to_excel(db_session *xorm.S
 		cell = row.AddCell()
 		set_text_cell_style(cell, "right")
 		cell.SetFloatWithFormat(entry.PurchaseBillEntry.Amount, "0.00")
+
+		// 是否开票
+		cell = row.AddCell()
+		set_text_cell_style(cell, "right")
+		if entry.PurchaseBillEntry.NeedInvoice == 0 {
+			cell.SetString("否")
+		} else {
+			cell.SetString("是")
+		}
+
+		// 收税点
+		cell = row.AddCell()
+		set_text_cell_style(cell, "right")
+		cell.SetFloatWithFormat(entry.PurchaseBillEntry.TaxPoint, "0.00")
+
+		// 退税点
+		cell = row.AddCell()
+		set_text_cell_style(cell, "right")
+		cell.SetFloatWithFormat(entry.PurchaseBillEntry.DrawbackPoint, "0.00")
+
+		// 退税额
+		cell = row.AddCell()
+		set_text_cell_style(cell, "right")
+		cell.SetFloatWithFormat(entry.PurchaseBillEntry.DrawbackAmount, "0.00")
+
+		// 配件费用
+		cell = row.AddCell()
+		set_text_cell_style(cell, "right")
+		cell.SetFloatWithFormat(entry.PurchaseBillEntry.FittingCost, "0.00")
+
+		// 其它费用
+		cell = row.AddCell()
+		set_text_cell_style(cell, "right")
+		cell.SetFloatWithFormat(entry.PurchaseBillEntry.OtherCost, "0.00")
 
 		// 描述
 		cell = row.AddCell()

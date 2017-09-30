@@ -257,6 +257,8 @@ func (c ErpPurchaseBillEntry) Save() revel.Result {
 		affected, err = db_session.Insert(&purchase_bill_entry)
 		core.HandleError(err)
 
+		purchase_bill_entry.DrawbackAmount = purchase_bill_service.CalculateBillEntryDrawbackAmount(purchase_bill_entry)
+
 		purchase_bill_log_service.Insert_purchase_bill_log(purchase_bill, "采购明细新增", db_session, c.Session)
 	} else {
 		billId_count, err := db_session.Where("id <> ? and bill_id = ? and product_id = ?", purchase_bill_entry.Id, purchase_bill_entry.BillId, purchase_bill_entry.ProductId).Count(new(cggl_models.PurchaseBillEntryInfo))
@@ -264,6 +266,8 @@ func (c ErpPurchaseBillEntry) Save() revel.Result {
 		if billId_count != 0 {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，批次、商品已存在！"})
 		}
+
+		purchase_bill_entry.DrawbackAmount = purchase_bill_service.CalculateBillEntryDrawbackAmount(purchase_bill_entry)
 
 		affected, err = db_session.Id(purchase_bill_entry.Id).Update(&purchase_bill_entry)
 		core.HandleError(err)
