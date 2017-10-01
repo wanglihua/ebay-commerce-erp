@@ -127,7 +127,7 @@ func (c ErpPurchaseCheckin) ListData() revel.Result {
 	filter = core.SqlAnd(filter, fmt.Sprintf("pbe.status_id = %d OR pbe.status_id = %d OR pbe.status_id = %d ",
 		models.PURCHASE_BILL_STATUS_CGZ, models.PURCHASE_BILL_STATUS_YRK, models.PURCHASE_BILL_STATUS_YC))
 
-	if bill_code_query != "" {
+	if bill_code_query != "" && bill_code_query != "0" {
 		filter = core.SqlAnd(filter, fmt.Sprintf("pb.code = '%s'", bill_code_query))
 	}
 

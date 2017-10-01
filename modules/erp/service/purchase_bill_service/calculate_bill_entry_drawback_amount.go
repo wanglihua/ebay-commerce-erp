@@ -9,5 +9,5 @@ func CalculateBillEntryDrawbackAmount(bill_entry cggl_models.PurchaseBillEntryIn
 		return 0
 	}
 
-	return (bill_entry.Price / 1.17) * bill_entry.DrawbackPoint
+	return ((bill_entry.Price * float64(bill_entry.Qty)) / 1.17) * bill_entry.DrawbackPoint
 }
