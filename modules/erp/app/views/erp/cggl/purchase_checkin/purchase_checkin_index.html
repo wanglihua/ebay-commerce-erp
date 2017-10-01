@@ -23,10 +23,10 @@
                     </button>
                 </div>
                 <div id="query" class="col-xs-12" style="line-height: 28px;">
-                    <select id="bill_code_query" name="bill_code_query" style="width: 140px;" v-model.number="page.bill_code_query" @change="querySelectChange()">
-                        <option :value="0">采购单批次号查询</option>
+                    <select id="bill_code_query" name="bill_code_query" style="width: 140px;" v-model="page.bill_code_query" @change="querySelectChange()">
+                        <option value="">采购单批次号查询</option>
                         {% range $index, $bill_query := .bill_query_list %}
-                        <option :value="{% $bill_query.BillCode %}">{% $bill_query.BillCode %}({% $bill_query.BillStatus %})</option>
+                        <option value="{% $bill_query.BillCode %}">{% $bill_query.BillCode %}({% $bill_query.BillStatus %})</option>
                         {% end %}
                     </select>
                     <select id="status_id_query" name="status_id_query" style="width: 130px;" v-model.number="page.status_id_query" @change="querySelectChange()">
@@ -179,7 +179,7 @@
         el: "#page",
         data: {
             "page": {
-                "bill_code_query": "0",
+                "bill_code_query": "",
                 "status_id_query": 0
             },
             "purchase_bill_entry_detail": {
