@@ -58,15 +58,26 @@ func (c ErpPurchaseBillEntryExcel) Import() revel.Result {
 	}
 
 	type purchase_bill_entry_import_t struct {
-		ProductSku string                  `json:"product_sku"`
-		Price      string                  `json:"price"`
-		MelQty     string                  `json:"mel_qty"`
-		BneQty     string                  `json:"bne_qty"`
-		Desc       string                  `json:"desc"`
-		product    kcgl_models.ProductInfo `json:"-"`
-		price      float64                 `json:"-"`
-		mel_qty    int64                   `json:"-"`
-		bne_qty    int64                   `json:"-"`
+		ProductSku    string `json:"product_sku"`
+		Price         string `json:"price"`
+		MelQty        string `json:"mel_qty"`
+		BneQty        string `json:"bne_qty"`
+		NeedInvoice   string `json:"need_invoice"`
+		TaxPoint      string `json:"tax_point"`
+		DrawbackPoint string `json:"drawback_point"`
+		FittingCost   string `json:"fitting_cost"`
+		OtherCost     string `json:"other_cost"`
+		Desc          string `json:"desc"`
+
+		product        kcgl_models.ProductInfo `json:"-"`
+		price          float64                 `json:"-"`
+		mel_qty        int64                   `json:"-"`
+		bne_qty        int64                   `json:"-"`
+		need_invoice   int64                   `json:"-"`
+		tax_point      float64                 `json:"-"`
+		drawback_point float64                 `json:"-"`
+		fitting_cost   float64                 `json:"-"`
+		other_cost     float64                 `json:"-"`
 	}
 
 	purchase_bill_entry_import_list := make([]purchase_bill_entry_import_t, 0)
@@ -122,6 +133,46 @@ func (c ErpPurchaseBillEntryExcel) Import() revel.Result {
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
 			purchase_bill_entry_import.BneQty = cell_val
+			col_index++
+
+			// NeedInvoice
+			cell = sheet.Cell(row_index, col_index)
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
+			purchase_bill_entry_import.NeedInvoice = cell_val
+			col_index++
+
+			// TaxPoint
+			cell = sheet.Cell(row_index, col_index)
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
+			purchase_bill_entry_import.TaxPoint = cell_val
+			col_index++
+
+			// DrawbackPoint
+			cell = sheet.Cell(row_index, col_index)
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
+			purchase_bill_entry_import.DrawbackPoint = cell_val
+			col_index++
+
+			// FittingCost
+			cell = sheet.Cell(row_index, col_index)
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
+			purchase_bill_entry_import.FittingCost = cell_val
+			col_index++
+
+			// OtherCost
+			cell = sheet.Cell(row_index, col_index)
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
+			purchase_bill_entry_import.OtherCost = cell_val
 			col_index++
 
 			// 备注
@@ -186,6 +237,40 @@ func (c ErpPurchaseBillEntryExcel) Import() revel.Result {
 			purchase_bill_entry_import_list[index].bne_qty = bne_qty
 		}
 
+		if strings.TrimSpace(purchase_bill_entry_import.NeedInvoice) == "是" {
+			purchase_bill_entry_import.need_invoice = 1
+		} else {
+			purchase_bill_entry_import.need_invoice = 0
+		}
+
+		tax_point, err := strconv.ParseFloat(purchase_bill_entry_import.TaxPoint, 64)
+		if err != nil {
+			buffer.WriteString("收税点格式输入不对！")
+		} else {
+			purchase_bill_entry_import_list[index].tax_point = tax_point
+		}
+
+		drawback_point, err := strconv.ParseFloat(purchase_bill_entry_import.DrawbackPoint, 64)
+		if err != nil {
+			buffer.WriteString("退税点格式输入不对！")
+		} else {
+			purchase_bill_entry_import_list[index].drawback_point = drawback_point
+		}
+
+		fitting_cost, err := strconv.ParseFloat(purchase_bill_entry_import.FittingCost, 64)
+		if err != nil {
+			buffer.WriteString("配件费用格式输入不对！")
+		} else {
+			purchase_bill_entry_import_list[index].fitting_cost = fitting_cost
+		}
+
+		other_cost, err := strconv.ParseFloat(purchase_bill_entry_import.OtherCost, 64)
+		if err != nil {
+			buffer.WriteString("其它费用格式输入不对！")
+		} else {
+			purchase_bill_entry_import_list[index].other_cost = other_cost
+		}
+
 		var error_str = buffer.String()
 
 		if error_str != "" {
@@ -205,6 +290,11 @@ func (c ErpPurchaseBillEntryExcel) Import() revel.Result {
 		purchase_bill_entry.BneQty = purchase_bill_entry_import.bne_qty
 		purchase_bill_entry.Qty = purchase_bill_entry_import.mel_qty + purchase_bill_entry_import.bne_qty
 		purchase_bill_entry.Amount = purchase_bill_entry.Price * float64(purchase_bill_entry.Qty)
+		purchase_bill_entry.NeedInvoice = purchase_bill_entry_import.need_invoice
+		purchase_bill_entry.TaxPoint = purchase_bill_entry_import.tax_point
+		purchase_bill_entry.DrawbackPoint = purchase_bill_entry_import.drawback_point
+		purchase_bill_entry.FittingCost = purchase_bill_entry_import.fitting_cost
+		purchase_bill_entry.OtherCost = purchase_bill_entry_import.other_cost
 
 		if purchase_bill_entry_import.Desc == "" {
 			purchase_bill_entry.Desc = core.MakeNullString("", false)
