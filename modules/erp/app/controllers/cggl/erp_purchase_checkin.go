@@ -15,6 +15,7 @@ import (
 	"matrix/modules/erp/service/inventory_service"
 	"encoding/json"
 	"time"
+	"matrix/modules/erp/service/purchase_bill_log_service"
 )
 
 type ErpPurchaseCheckin struct {
@@ -245,6 +246,14 @@ func (c ErpPurchaseCheckin) Checkin() revel.Result {
 	_, err = db_session.Id(bill_entry_from_ui.Id).Get(&bill_entry_in_db)
 	core.HandleError(err)
 
+	var purchase_bill cggl_models.PurchaseBillInfo
+	_, err = db_session.Id(bill_entry_in_db.BillId).Get(&purchase_bill)
+	core.HandleError(err)
+
+	var product kcgl_models.ProductInfo
+	_, err = db_session.Id(bill_entry_in_db.ProductId).Get(&product)
+	core.HandleError(err)
+
 	// 检查状态
 	if bill_entry_in_db.StatusId != models.PURCHASE_BILL_STATUS_CGZ {
 		return c.RenderJson(map[string]interface{}{
@@ -268,6 +277,13 @@ func (c ErpPurchaseCheckin) Checkin() revel.Result {
 	if is_abnormal == true {
 		bill_entry_in_db.StatusId = models.PURCHASE_BILL_STATUS_YC
 		bill_entry_in_db.AbnormalProcessResultId = cggl_models.ABNORMAL_PROCESS_RESULT_WCL
+
+		// 插入采购单历史 异常
+		// TODO： 可以写明 多少数量入库，多少数量异常
+		purchase_bill_log_service.Insert_purchase_bill_log(purchase_bill, fmt.Sprintf("采购单明细SKU:%s 异常", product.Sku), db_session, c.Session)
+	} else {
+		// 插入采购单历史，入库
+		purchase_bill_log_service.Insert_purchase_bill_log(purchase_bill, fmt.Sprintf("采购单明细SKU:%s 入库", product.Sku), db_session, c.Session)
 	}
 
 	bill_entry_in_db.CheckinQty = bill_entry_from_ui.CheckinQty

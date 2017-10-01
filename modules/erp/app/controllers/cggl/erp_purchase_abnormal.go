@@ -12,6 +12,7 @@ import (
 	"encoding/json"
 	"matrix/modules/erp/service/inventory_service"
 	"strings"
+	"matrix/modules/erp/service/purchase_bill_log_service"
 )
 
 type ErpPurchaseAbnormal struct {
@@ -215,6 +216,14 @@ func (c ErpPurchaseAbnormal) Process() revel.Result {
 	_, err = db_session.Id(bill_entry_from_ui.Id).Get(&bill_entry_in_db)
 	core.HandleError(err)
 
+	var purchase_bill cggl_models.PurchaseBillInfo
+	_, err = db_session.Id(bill_entry_in_db.BillId).Get(&purchase_bill)
+	core.HandleError(err)
+
+	var product kcgl_models.ProductInfo
+	_, err = db_session.Id(bill_entry_in_db.ProductId).Get(&product)
+	core.HandleError(err)
+
 	// 检查状态
 	if bill_entry_in_db.StatusId != models.PURCHASE_BILL_STATUS_YC {
 		return c.RenderJson(map[string]interface{}{
@@ -247,6 +256,8 @@ func (c ErpPurchaseAbnormal) Process() revel.Result {
 	bill_entry_in_db.CheckinQty = bill_entry_from_ui.CheckinQty
 	_, err = db_session.Id(bill_entry_in_db.Id).Cols("status_id", "abnormal_process_result_id", "desc", "checkin_qty").Update(&bill_entry_in_db)
 	core.HandleError(err)
+
+	purchase_bill_log_service.Insert_purchase_bill_log(purchase_bill, fmt.Sprintf("采购单明细SKU:%s 入库", product.Sku), db_session, c.Session)
 
 	return c.RenderJson(map[string]interface{}{
 		"success": true,
