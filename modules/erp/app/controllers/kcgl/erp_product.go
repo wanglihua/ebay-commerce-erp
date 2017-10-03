@@ -19,6 +19,8 @@ import (
 	"matrix/modules/erp/service/status_service"
 	"matrix/modules/erp/models/kcgl_models"
 	"matrix/modules/erp/models/sppz_models"
+	"matrix/modules/erp/models/cggl_models"
+	"github.com/go-xorm/xorm"
 )
 
 type ErpProduct struct {
@@ -150,6 +152,7 @@ type ProductDetailForm struct {
 	InventoryList             []inventory_service.Product_inventory_view_item_t `json:"inventory_list"`
 	OrderItemList             []order_service.Order_item_view_item_t            `json:"order_item_list"`
 	ProductLogList            []kcgl_models.ProductLogInfo                      `json:"product_log_list"`
+	ProductPurchaseList       []ProductPurchaseListItem                         `json:"product_purchase_list"`
 	MessageList               []message_service.Message_view_item_t             `json:"message_list"`
 }
 
@@ -270,6 +273,8 @@ func (c ErpProduct) DetailData() revel.Result {
 	var product_cert_list = make([]sppz_models.ProductCertInfo, 0)
 	core.HandleError(db_session.Find(&product_cert_list))
 
+	var product_purchase_list = c.GetProductPurchaseListData(product_id, 10, db_session)
+
 	var detail_form ProductDetailForm
 	detail_form.Product = product
 	detail_form.ProductImageList = product_image_list
@@ -284,6 +289,7 @@ func (c ErpProduct) DetailData() revel.Result {
 	detail_form.ProductBrandList = product_brand_list
 	detail_form.ProductStyleList = product_style_list
 	detail_form.ProductCertList = product_cert_list
+	detail_form.ProductPurchaseList = product_purchase_list
 
 	return c.RenderJson(detail_form)
 }
@@ -463,10 +469,77 @@ func (c ErpProduct) ProductLogListData() revel.Result {
 	var product_log_list = make([]kcgl_models.ProductLogInfo, 0)
 	err = db_session.Where(fmt.Sprintf("product_id = %d", product_id)).OrderBy("id DESC").Find(&product_log_list)
 	core.HandleError(err)
+
 	return c.RenderJson(map[string]interface{}{
 		"product":          product,
 		"product_log_list": product_log_list,
 	})
+}
+
+func (c ErpProduct) ProductPurchaseList(product_id int64) revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_PRODUCT, c.Session)
+
+	c.RenderArgs["product_id"] = product_id
+	return c.RenderTemplate("erp/kcgl/product/product_purchase_list.html")
+}
+
+func (c ErpProduct) ProductPurchaseListData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_PRODUCT, c.Session)
+
+	db_session := c.DbSession
+
+	var product_id int64
+	c.Params.Bind(&product_id, "id")
+
+	var product kcgl_models.ProductInfo
+	_, err := db_session.Id(product_id).Get(&product)
+	core.HandleError(err)
+
+	var product_purchase_list = c.GetProductPurchaseListData(product_id, 0, db_session)
+
+	return c.RenderJson(map[string]interface{}{
+		"product":               product,
+		"product_purchase_list": product_purchase_list,
+	})
+}
+
+type ProductPurchaseListItem struct {
+	cggl_models.PurchaseBillEntryInfo `xorm:"extends" json:"pbe"`
+	cggl_models.PurchaseBillInfo      `xorm:"extends" json:"pb"`
+	kcgl_models.ProductInfo           `xorm:"extends" json:"p"`
+	models.StatusInfo                 `xorm:"extends" json:"s"`
+}
+
+func (c ErpProduct) GetProductPurchaseListData(product_id int64, limit int64, db_session *xorm.Session) []ProductPurchaseListItem {
+
+	/*
+SELECT pbe.*, pb.*, p.*, s.*
+FROM erp_purchase_bill_entry pbe
+    INNER JOIN erp_purchase_bill pb ON pbe.bill_id = pb.id
+    INNER JOIN erp_product p ON pbe.product_id = p.id
+    INNER JOIN erp_status s ON pbe.status_id = s.id
+	 */
+
+	sb := core.NewSqlBuilder()
+	sb.Select("pbe.*, pb.*, p.*, s.*")
+	sb.From(`erp_purchase_bill_entry pbe
+    INNER JOIN erp_purchase_bill pb ON pbe.bill_id = pb.id
+    INNER JOIN erp_product p ON pbe.product_id = p.id
+    INNER JOIN erp_status s ON pbe.status_id = s.id`)
+
+	sb.Where(fmt.Sprintf("pbe.product_id = %d", product_id))
+
+	sb.OrderBy("pbe.id DESC")
+
+	if limit > 0 {
+		sb.Limit(0, limit)
+	}
+
+	product_purchase_list := make([]ProductPurchaseListItem, 0, limit)
+	err := db_session.Sql(sb.SqlList()).Find(&product_purchase_list)
+	core.HandleError(err)
+
+	return product_purchase_list
 }
 
 func (c ErpProduct) GetProductInfo() revel.Result {

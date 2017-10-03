@@ -136,6 +136,8 @@ GET  /product/message/list/:product_id     ErpProduct.ProductMessageList
 POST /product/message/list/data            ErpProduct.ProductMessageListData
 GET  /product/log/list/:product_id         ErpProduct.ProductLogList
 POST /product/log/list/data                ErpProduct.ProductLogListData
+GET  /product/purchase/list/:product_id    ErpProduct.ProductPurchaseList
+POST /product/purchase/list/data           ErpProduct.ProductPurchaseListData
 
 GET  /product/weight                       ErpProductWeight.Index
 POST /product/weight/data/list             ErpProductWeight.ListData
