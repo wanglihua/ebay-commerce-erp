@@ -667,6 +667,7 @@ POST /notice/detail/data                  ErpNotice.DetailData
 POST /notice/save                         ErpNotice.Save
 POST /notice/delete                       ErpNotice.Delete
 POST /notice/get/data/for/home/page       ErpNotice.GetNoticeDataForHomePage
+POST /notice/get/list/data/for/home/page  ErpNotice.GetNoticeListDataForHomePage
 GET  /notice/view/detail/:id              ErpNotice.ViewDetail
 
 GET  /supplier/pay/method                 ErpSupplierPayMethod.Index

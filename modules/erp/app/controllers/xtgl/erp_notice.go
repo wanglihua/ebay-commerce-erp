@@ -69,6 +69,65 @@ LIMIT 50;
 	})
 }
 
+func (c ErpNotice) GetNoticeListDataForHomePage() revel.Result {
+	// 这里没有权限限制
+
+	var db_session = c.DbSession
+
+	_, _, offset, limit := core.GetGridRequestParam(c.Request)
+
+	/*
+SELECT n.*, u.*
+FROM erp_notice n
+    INNER JOIN auth_user u ON n.user_id = u.id
+ORDER BY n.list_top DESC, n.create_time DESC
+LIMIT 50;
+	 */
+
+	type notice_view_item_t struct {
+		Notice xtgl_models.NoticeInfo `xorm:"extends" json:"n"`
+		User   auth_models.UserInfo   `xorm:"extends" json:"u"`
+	}
+
+	var sb = core.NewSqlBuilder()
+	sb.Select("n.*, u.*")
+	sb.Count("count(n.id) AS count")
+	sb.From(`erp_notice n
+    INNER JOIN auth_user u ON n.user_id = u.id`)
+	sb.OrderBy(`n.list_top DESC, n.create_time DESC`)
+	sb.Limit(offset, limit)
+
+	var notice_list = make([]notice_view_item_t, 0)
+	core.HandleError(db_session.Sql(sb.SqlList()).Find(&notice_list))
+
+	var count core.Count
+	_, err := db_session.Sql(sb.SqlCount()).Get(&count)
+	core.HandleError(err)
+
+	var login_user = core.GetLoginUser(c.Session)
+	var notice_read_list = make([]xtgl_models.NoticeReadInfo, 0)
+	core.HandleError(db_session.Where("user_id = ?", login_user.UserId).Find(&notice_read_list))
+
+	var is_notice_read = func(notice_id int64) bool {
+		for _, notice_read := range notice_read_list {
+			if notice_read.NoticeId == notice_id {
+				return true
+			}
+		}
+
+		return false
+	}
+
+	for index, notice := range notice_list {
+		notice_list[index].Notice.IsRead = is_notice_read(notice.Notice.Id)
+	}
+
+	return c.RenderJson(core.GridResult{
+		Data:  notice_list,
+		Total: count.Count,
+	})
+}
+
 func (c ErpNotice) ViewDetail(id int64) revel.Result {
 	var notice_id = id
 
