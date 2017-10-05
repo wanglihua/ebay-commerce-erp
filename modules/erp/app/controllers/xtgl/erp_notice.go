@@ -24,6 +24,17 @@ func (c ErpNotice) GetNoticeDataForHomePage() revel.Result {
 	var db_session = c.DbSession
 
 	/*
+UPDATE erp_notice
+SET list_top = 0, important = 0
+WHERE (list_top = 1 OR important = 1) AND (datediff(DATE(now()), DATE(update_time)) > 10);
+	 */
+	var sql_update = `UPDATE erp_notice
+SET list_top = 0, important = 0
+WHERE (list_top = 1 OR important = 1) AND (datediff(DATE(now()), DATE(update_time)) > 10);`
+	_, err := db_session.Exec(sql_update)
+	core.HandleError(err)
+
+	/*
 SELECT n.*, u.*
 FROM erp_notice n
     INNER JOIN auth_user u ON n.user_id = u.id
@@ -74,6 +85,17 @@ func (c ErpNotice) GetNoticeListDataForHomePage() revel.Result {
 
 	var db_session = c.DbSession
 
+	/*
+UPDATE erp_notice
+SET list_top = 0, important = 0
+WHERE (list_top = 1 OR important = 1) AND (datediff(DATE(now()), DATE(update_time)) > 10);
+	 */
+	var sql_update = `UPDATE erp_notice
+SET list_top = 0, important = 0
+WHERE (list_top = 1 OR important = 1) AND (datediff(DATE(now()), DATE(update_time)) > 10);`
+	_, err := db_session.Exec(sql_update)
+	core.HandleError(err)
+
 	_, _, offset, limit := core.GetGridRequestParam(c.Request)
 
 	/*
@@ -101,7 +123,7 @@ LIMIT 50;
 	core.HandleError(db_session.Sql(sb.SqlList()).Find(&notice_list))
 
 	var count core.Count
-	_, err := db_session.Sql(sb.SqlCount()).Get(&count)
+	_, err = db_session.Sql(sb.SqlCount()).Get(&count)
 	core.HandleError(err)
 
 	var login_user = core.GetLoginUser(c.Session)

@@ -7,8 +7,8 @@ import (
 type NoticeInfo struct {
 	Id         int64     `xorm:"bigint notnull pk autoincr 'id'" json:"id"`
 	Title      string    `xorm:"nvarchar(300) notnull 'title'" json:"title"`
-	ListTop    int64     `xorm:"bigint notnull 'list_top' default(0)" json:"list_top"`
-	Important  int64     `xorm:"bigint notnull 'important' default(0)" json:"important"`
+	ListTop    int64     `xorm:"bigint notnull index 'list_top' default(0)" json:"list_top"`
+	Important  int64     `xorm:"bigint notnull index 'important' default(0)" json:"important"`
 	Body       string    `xorm:"text notnull 'body'" json:"body"`
 	UserId     int64     `xorm:"biging notnull index 'user_id'" json:"user_id" smith:"verbose_name=用户id"`
 	LoginName  string    `xorm:"nvarchar(255) notnull index 'login_name'" json:"login_name" smith:"verbose_name=工号"`
