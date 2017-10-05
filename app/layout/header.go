@@ -54,6 +54,10 @@ func GetHeader(title string, db_session *xorm.Session, web_session revel.Session
 		header_buffer.WriteString("&nbsp;<span style='color:red;'>测试环境</span>")
 	}
 
+	if revel.DevMode == true {
+		header_buffer.WriteString("&nbsp;<span style='color:red;'>开发环境</span>")
+	}
+
 	header_buffer.WriteString(`</small>`);
 	var unread_notice_count = notice_read_service.GetUserUnreadNoticeCount(login_user.UserId, db_session)
 	if unread_notice_count != 0 {

@@ -260,21 +260,20 @@
                     aoData.push({'name': 'feedback_cate_id', 'value': vm.page.feedback_cate_id});
                     aoData.push({'name': 'feedback_supplier_id', 'value': vm.page.feedback_supplier_id});
 
-                    $.ajax(
-                        {
-                            "dataType": 'json',
-                            "url": sSource,
-                            "data": aoData,
-                            "success": function (data) {
-                                hideMask();
-                                if (data.success === false) {
-                                    $.msg.error(data.message);
-                                    return;
-                                }
-                                fnCallback(data.grid_data);
-                                vm.cate_sum_list = data.cate_sum_list;
+                    $.ajax({
+                        "dataType": 'json',
+                        "url": sSource,
+                        "data": aoData,
+                        "success": function (data) {
+                            hideMask();
+                            if (data.success === false) {
+                                $.msg.error(data.message);
+                                return;
                             }
-                        });
+                            fnCallback(data.grid_data);
+                            vm.cate_sum_list = data.cate_sum_list;
+                        }
+                    });
                 }
             }
         );
