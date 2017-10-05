@@ -39,11 +39,11 @@
                         &nbsp;<i class="ace-icon fa fa-search"></i>查&nbsp;询&nbsp;
                     </button>
 
-                    {% if lt .purchase_bill_to_arrival_count 0 %}
-                    <div>
+                    {% if gt .purchase_bill_to_arrival_count 0 %}
+                    <div style="color:red;margin: 5px 0;">
                         <span>下列采购批次号到货天数即将到期或已到期：</span>
                         {% range $index, $purchase_bill := .purchase_bill_to_arrival_list %}
-                        <span>{% $purchase_bill.code %}</span>
+                        <span>{% $purchase_bill.Code %}</span>
                         {% if ne $index $.purchase_bill_to_arrival_max_index %}
                         <span>,</span>
                         {% end %}
