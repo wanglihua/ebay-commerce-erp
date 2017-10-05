@@ -26,6 +26,7 @@ type PurchaseBillEntryInfo struct {
 	DrawbackAmount          float64         `xorm:"decimal(18,6) notnull 'drawback_amount' default(0)" json:"drawback_amount" smith:"verbose_name=退税额"`
 	FittingCost             float64         `xorm:"decimal(18,6) notnull 'fitting_cost' default(0)" json:"fitting_cost" smith:"verbose_name=配件费用"`
 	OtherCost               float64         `xorm:"decimal(18,6) notnull 'other_cost' default(0)" json:"other_cost" smith:"verbose_name=其它费用"`
+	InventoryCost           float64         `xorm:"decimal(18,6) notnull 'inventory_cost' default(0)" json:"inventory_cost" smith:"verbose_name=中国仓成本"`
 	CreateTime              core.Time       `xorm:"created notnull 'create_time'" json:"create_time"`
 	UpdateTime              core.Time       `xorm:"updated notnull 'update_time'" json:"update_time"`
 }
