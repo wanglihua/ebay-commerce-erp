@@ -99,6 +99,12 @@
                         {"mDataProp": "pb.approve_time", "title": "采购时间", "bSearchable": false, "sClass": "center", "width": 120},
                         {"mDataProp": "pb.pay_time", "title": "付款时间", "bSearchable": false, "sClass": "center", "width": 120},
                         {
+                            "mDataProp": "pb.pay_days", "title": "账期", "bSearchable": false, "sClass": "center", "width": 80,
+                            "render": function (data, type, row) {
+                                return data + '&nbsp;天';
+                            }
+                        },
+                        {
                             "mDataProp": "pb.desc", "title": "备注", "bSearchable": true, "sClass": "wrap-word",
                             "render": function (data, type, row) {
                                 if (data === null) {
