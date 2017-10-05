@@ -81,8 +81,27 @@ func (c ErpPurchaseCheckin) Index() revel.Result {
 		models.PURCHASE_BILL_STATUS_YC,
 		models.PURCHASE_BILL_STATUS_YCL}).Find(&status_list))
 
+	// 获取账期快到的采购单列表
+	/*
+
+SELECT *
+FROM erp_purchase_bill pb
+WHERE pb.status_id = 4600 AND (datediff(DATE(date_add(pb.pay_time, INTERVAL pb.arrival_days DAY)), DATE(now())) <= 7);
+
+	*/
+
+	var sql_purchase_bill_to_arrival = `SELECT *
+FROM erp_purchase_bill pb
+WHERE pb.status_id = %d AND (datediff(DATE(date_add(pb.pay_time, INTERVAL pb.arrival_days DAY)), DATE(now())) <= 7);`
+	sql_purchase_bill_to_arrival = fmt.Sprintf(sql_purchase_bill_to_arrival, models.PURCHASE_BILL_STATUS_CGZ)
+
+	var purchase_bill_to_arrival_list = make([]cggl_models.PurchaseBillInfo, 0)
+	core.HandleError(db_session.Sql(sql_purchase_bill_to_arrival).Find(&purchase_bill_to_arrival_list))
+
 	c.RenderArgs["bill_query_list"] = bill_query_list
 	c.RenderArgs["status_list"] = status_list
+	c.RenderArgs["purchase_bill_to_arrival_list"] = purchase_bill_to_arrival_list
+	c.RenderArgs["purchase_bill_to_arrival_count"] = len(purchase_bill_to_arrival_list)
 
 	return c.RenderTemplate("erp/cggl/purchase_checkin/purchase_checkin_index.html")
 }

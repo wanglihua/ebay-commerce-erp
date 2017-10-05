@@ -31,7 +31,26 @@ func (c ErpPurchaseFinance) Index() revel.Result {
 		models.PURCHASE_BILL_STATUS_CGZ,
 		models.PURCHASE_BILL_STATUS_YRK}).Find(&status_list))
 
+	// 获取账期快到的采购单列表
+	/*
+
+SELECT *
+FROM erp_purchase_bill pb
+WHERE pb.status_id = 4600 AND (datediff(DATE(date_add(pb.pay_time, INTERVAL pb.pay_days DAY)), DATE(now())) <= 7);
+
+	*/
+
+	var sql_purchase_bill_to_pay = `SELECT *
+FROM erp_purchase_bill pb
+WHERE pb.status_id = %d AND (datediff(DATE(date_add(pb.pay_time, INTERVAL pb.pay_days DAY)), DATE(now())) <= 7);`
+	sql_purchase_bill_to_pay = fmt.Sprintf(sql_purchase_bill_to_pay, models.PURCHASE_BILL_STATUS_CGZ)
+
+	var purchase_bill_to_pay_list = make([]cggl_models.PurchaseBillInfo, 0)
+	core.HandleError(db_session.Sql(sql_purchase_bill_to_pay).Find(&purchase_bill_to_pay_list))
+
 	c.RenderArgs["status_list"] = status_list
+	c.RenderArgs["purchase_bill_to_pay_list"] = purchase_bill_to_pay_list
+	c.RenderArgs["purchase_bill_to_pay_count"] = len(purchase_bill_to_pay_list)
 
 	return c.RenderTemplate("erp/cggl/purchase_finance/purchase_finance_index.html")
 }
