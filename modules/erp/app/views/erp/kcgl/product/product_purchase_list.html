@@ -14,12 +14,11 @@
                                 <thead>
                                 <tr>
                                     <th class="center" style="width: 100px;">批次号</th>
-                                    <th class="center">单价</th>
+                                    <th class="center">采购单价</th>
                                     <th class="center">数量</th>
-                                    <th class="center">金额</th>
                                     <th class="center" style="width:60px;">状态</th>
-                                    <th class="center" style="width:120px;">创建时间</th>
-                                    <th class="center" style="width:120px;">更新时间</th>
+                                    <th class="center" style="width:120px;">付款时间</th>
+                                    <th class="center" style="width:120px;">入库时间</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -28,10 +27,9 @@
                                         <td class="center" style="vertical-align: middle;">{{product_purchase.pb.code}}</td>
                                         <td class="center" style="vertical-align: middle;">{{product_purchase.pbe.price}}</td>
                                         <td class="center" style="vertical-align: middle;">{{product_purchase.pbe.qty}}</td>
-                                        <td class="center" style="vertical-align: middle;">{{product_purchase.pbe.amount}}</td>
                                         <td class="center" style="vertical-align: middle;">{{product_purchase.s.name}}</td>
-                                        <td class="center" style="vertical-align: middle;">{{product_purchase.pbe.create_time}}</td>
-                                        <td class="center" style="vertical-align: middle;">{{product_purchase.pbe.update_time}}</td>
+                                        <td class="center" style="vertical-align: middle;">{{product_purchase.pb.pay_time}}</td>
+                                        <td class="center" style="vertical-align: middle;">{{product_purchase.pbe.checkin_time}}</td>
                                     </tr>
                                 </template>
                                 </tbody>
