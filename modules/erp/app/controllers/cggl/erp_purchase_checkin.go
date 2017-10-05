@@ -102,6 +102,7 @@ WHERE pb.status_id = %d AND (datediff(DATE(date_add(pb.pay_time, INTERVAL pb.arr
 	c.RenderArgs["status_list"] = status_list
 	c.RenderArgs["purchase_bill_to_arrival_list"] = purchase_bill_to_arrival_list
 	c.RenderArgs["purchase_bill_to_arrival_count"] = len(purchase_bill_to_arrival_list)
+	c.RenderArgs["purchase_bill_to_arrival_max_index"] = len(purchase_bill_to_arrival_list) - 1
 
 	return c.RenderTemplate("erp/cggl/purchase_checkin/purchase_checkin_index.html")
 }

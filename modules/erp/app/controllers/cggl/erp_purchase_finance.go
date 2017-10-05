@@ -51,6 +51,7 @@ WHERE pb.status_id = %d AND (datediff(DATE(date_add(pb.pay_time, INTERVAL pb.pay
 	c.RenderArgs["status_list"] = status_list
 	c.RenderArgs["purchase_bill_to_pay_list"] = purchase_bill_to_pay_list
 	c.RenderArgs["purchase_bill_to_pay_count"] = len(purchase_bill_to_pay_list)
+	c.RenderArgs["purchase_bill_to_pay_max_index"] = len(purchase_bill_to_pay_list) - 1
 
 	return c.RenderTemplate("erp/cggl/purchase_finance/purchase_finance_index.html")
 }

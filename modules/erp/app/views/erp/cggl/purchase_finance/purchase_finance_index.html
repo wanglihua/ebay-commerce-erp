@@ -32,6 +32,19 @@
                     <button class="btn btn-mini btn-primary" style="margin-bottom:3px;height: 30px;" onclick="search()">
                         &nbsp;<i class="ace-icon fa fa-search"></i>查&nbsp;询&nbsp;
                     </button>
+
+                    {% if lt .purchase_bill_to_pay_count 0 %}
+                    <div>
+                        <span>下列采购批次号账期即将到期或已到期：</span>
+                        {% range $index, $purchase_bill := .purchase_bill_to_pay_list %}
+                        <span>{% $purchase_bill.code %}</span>
+                        {% if ne $index $.purchase_bill_to_pay_max_index %}
+                        <span>,</span>
+                        {% end %}
+                        {% end %}
+                    </div>
+                    {% end %}
+
                     <hr style="margin-top:10px;margin-bottom:10px;"/>
                 </div>
                 <div>
