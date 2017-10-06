@@ -13,6 +13,7 @@ import (
 	"matrix/modules/erp/service/inventory_service"
 	"strings"
 	"matrix/modules/erp/service/purchase_bill_log_service"
+	"matrix/modules/erp/service/purchase_bill_service"
 )
 
 type ErpPurchaseAbnormal struct {
@@ -256,6 +257,9 @@ func (c ErpPurchaseAbnormal) Process() revel.Result {
 	bill_entry_in_db.CheckinQty = bill_entry_from_ui.CheckinQty
 	_, err = db_session.Id(bill_entry_in_db.Id).Cols("status_id", "abnormal_process_result_id", "desc", "checkin_qty").Update(&bill_entry_in_db)
 	core.HandleError(err)
+
+	// 计算中国仓成本价
+	purchase_bill_service.CalculateBillEntryCnInventoryCost(purchase_bill.Id, db_session)
 
 	purchase_bill_log_service.Insert_purchase_bill_log(purchase_bill, fmt.Sprintf("采购单明细SKU:%s 入库", product.Sku), db_session, c.Session)
 

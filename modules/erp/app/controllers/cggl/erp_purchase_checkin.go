@@ -339,6 +339,9 @@ func (c ErpPurchaseCheckin) Checkin() revel.Result {
 		core.HandleError(err)
 	}
 
+	// 计算中国仓成本价
+	purchase_bill_service.CalculateBillEntryCnInventoryCost(purchase_bill.Id, db_session)
+
 	// 更新中国仓的库存数量
 	inventory_service.AddCnInventoryQty(bill_entry_from_ui.ProductId, bill_entry_from_ui.CheckinQty, db_session)
 
@@ -382,8 +385,11 @@ func (c ErpPurchaseCheckin) CheckinList() revel.Result {
 		purchase_bill_service.UpdateBillStatus(bill_entry, models.PURCHASE_BILL_STATUS_YRK, db_session)
 	}
 
-	// 更新中国仓的库存数量
 	for _, bill_entry := range bill_entry_list {
+		// 计算中国仓成本价
+		purchase_bill_service.CalculateBillEntryCnInventoryCost(bill_entry.BillId, db_session)
+
+		// 更新中国仓的库存数量
 		inventory_service.AddCnInventoryQty(bill_entry.ProductId, bill_entry.CheckinQty, db_session)
 	}
 
