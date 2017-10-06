@@ -39,10 +39,10 @@ func (c ErpProductFeedbackQuery) PageData() revel.Result {
 	 */
 
 	var feedback_cate_list = make([]spzl_models.ProductFeedbackCateInfo, 0)
-	core.HandleError(db_session.OrderBy("name DESC").Find(&feedback_cate_list))
+	core.HandleError(db_session.OrderBy("convert(name using gbk) ASC").Find(&feedback_cate_list))
 
 	var supplier_list = make([]sppz_models.SupplierInfo, 0)
-	core.HandleError(db_session.OrderBy("name ASC").Find(&supplier_list))
+	core.HandleError(db_session.OrderBy("convert(name using gbk) ASC").Find(&supplier_list))
 
 	return c.RenderJson(map[string]interface{}{
 		"success":            true,
@@ -86,10 +86,7 @@ func (c ErpProductFeedbackQuery) ListData() revel.Result {
 
 	/*
 SELECT
-    pf.*,
-    c.*,
-    p.*,
-    sup.*
+    pf.*, c.*, p.*, sup.*
 FROM erp_product_feedback pf
     INNER JOIN erp_product p ON p.id = pf.product_id
     LEFT JOIN erp_product_feedback_cate c ON c.id = pf.cate_id
@@ -97,17 +94,14 @@ FROM erp_product_feedback pf
 	 */
 
 	var sb = core.NewSqlBuilder()
-	sb.Select(`pf.*,
-    c.*,
-    p.*,
-    sup.*`)
+	sb.Select(`pf.*, c.*, p.*, sup.*`)
 	sb.Count("count(pf.id) AS feedback_count")
 	sb.From(`erp_product_feedback pf
     INNER JOIN erp_product p ON p.id = pf.product_id
     LEFT JOIN erp_product_feedback_cate c ON c.id = pf.cate_id
     LEFT JOIN erp_supplier sup ON sup.id = pf.supplier_id`)
 
-	if sku == "" {
+	if sku != "" {
 		filter = core.SqlAnd(filter, fmt.Sprintf("p.id = %d", product.Id))
 	}
 
@@ -124,7 +118,7 @@ FROM erp_product_feedback pf
 	if order != "" {
 		sb.OrderBy(order)
 	} else {
-		sb.OrderBy("pf.id ASC")
+		sb.OrderBy("pf.id DESC")
 	}
 
 	sb.Limit(offset, limit)

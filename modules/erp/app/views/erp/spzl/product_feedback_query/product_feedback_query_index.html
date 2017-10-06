@@ -34,7 +34,7 @@
                             <label for="feedback_supplier_id">供应商</label>
                             <select id="feedback_supplier_id" name="feedback_supplier_id" v-model.number="page.feedback_supplier_id" style="width: 180px;height: 28px;" @change="reloadList()">
                                 <option :value="0">供应商</option>
-                                <template v-for="supplier in page.feedback_supplier_list">
+                                <template v-for="supplier in page.supplier_list">
                                     <option :value="supplier.id">{{supplier.name}}</option>
                                 </template>
                             </select>&nbsp;&nbsp;
@@ -59,8 +59,8 @@
         initDataTable(
             '#productFeedbackList',
             {
-                "sAjaxSource": '{%url "ErpProductFeedback.ListData"%}',
-                "aaSorting": [[0, "asc"]],
+                "sAjaxSource": '{%url "ErpProductFeedbackQuery.ListData"%}',
+                "aaSorting": [[0, "desc"]],
                 "aoColumns": [
                     {
                         "mDataProp": "pf.id", "bSearchable": false, "orderable": false, "sClass": "center", "width": 50,
@@ -101,7 +101,7 @@
                 "fnServerData": function (sSource, aoData, fnCallback) {
                     showMask("数据加载中，请稍候");
 
-                    aoData.push({'name': 'product_id', 'value': product_id});
+                    aoData.push({'name': 'sku', 'value': vm.page.sku});
                     aoData.push({'name': 'feedback_cate_id', 'value': vm.page.feedback_cate_id});
                     aoData.push({'name': 'feedback_supplier_id', 'value': vm.page.feedback_supplier_id});
 
@@ -115,8 +115,7 @@
                                 $.msg.error(data.message);
                                 return;
                             }
-                            fnCallback(data.grid_data);
-                            vm.cate_sum_list = data.cate_sum_list;
+                            fnCallback(data);
                         }
                     });
                 }
@@ -126,11 +125,9 @@
 
     function loadPageData() {
         $.ajax({
-                url: '{%url "ErpProductFeedback.PageData" %}',
+                url: '{%url "ErpProductFeedbackQuery.PageData" %}',
                 type: "POST",
-                data: {
-                    "product_id": product_id
-                },
+                data: {},
                 success: function (result) {
                     if (result.success === false) {
                         $.msg.error(result.message);
