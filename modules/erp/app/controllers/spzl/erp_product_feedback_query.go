@@ -10,6 +10,7 @@ import (
 	"matrix/modules/erp/models/kcgl_models"
 	"matrix/modules/erp/models/spzl_models"
 	"matrix/modules/erp/models/sppz_models"
+	"strings"
 )
 
 type ErpProductFeedbackQuery struct {
@@ -17,13 +18,13 @@ type ErpProductFeedbackQuery struct {
 }
 
 func (c ErpProductFeedbackQuery) Index() revel.Result {
-	pass_service.Check_login_user_pass(pass_res.SPZL_PRODUCT_FEEDBACK, c.Session)
+	pass_service.Check_login_user_pass(pass_res.SPZL_PRODUCT_FEEDBACK_QUERY, c.Session)
 
 	return c.RenderTemplate("erp/spzl/product_feedback_query/product_feedback_query_index.html")
 }
 
 func (c ErpProductFeedbackQuery) PageData() revel.Result {
-	pass_service.Check_login_user_pass(pass_res.SPZL_PRODUCT_FEEDBACK, c.Session)
+	pass_service.Check_login_user_pass(pass_res.SPZL_PRODUCT_FEEDBACK_QUERY, c.Session)
 
 	var db_session = c.DbSession
 
@@ -45,6 +46,7 @@ func (c ErpProductFeedbackQuery) PageData() revel.Result {
 
 	return c.RenderJson(map[string]interface{}{
 		"success":            true,
+		"sku":                "",
 		"feedback_cate_id":   0,
 		"feedback_cate_list": feedback_cate_list,
 		"supplier_id":        0,
@@ -53,10 +55,11 @@ func (c ErpProductFeedbackQuery) PageData() revel.Result {
 }
 
 func (c ErpProductFeedbackQuery) ListData() revel.Result {
-	pass_service.Check_login_user_pass(pass_res.SPZL_PRODUCT_FEEDBACK, c.Session)
+	pass_service.Check_login_user_pass(pass_res.SPZL_PRODUCT_FEEDBACK_QUERY, c.Session)
 
 	var sku string
 	c.Params.Bind(&sku, "sku")
+	sku = strings.TrimSpace(sku)
 
 	var feedback_cate_id int64
 	c.Params.Bind(&feedback_cate_id, "feedback_cate_id")
@@ -67,8 +70,10 @@ func (c ErpProductFeedbackQuery) ListData() revel.Result {
 	var db_session = c.DbSession
 
 	var product kcgl_models.ProductInfo
-	_, err := db_session.Where("sku = ?", sku).Get(&product)
-	core.HandleError(err)
+	if sku != "" {
+		_, err := db_session.Where("sku = ?", sku).Get(&product)
+		core.HandleError(err)
+	}
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
@@ -102,7 +107,9 @@ FROM erp_product_feedback pf
     LEFT JOIN erp_product_feedback_cate c ON c.id = pf.cate_id
     LEFT JOIN erp_supplier sup ON sup.id = pf.supplier_id`)
 
-	filter = core.SqlAnd(filter, fmt.Sprintf("p.id = %d", product.Id))
+	if sku == "" {
+		filter = core.SqlAnd(filter, fmt.Sprintf("p.id = %d", product.Id))
+	}
 
 	if feedback_cate_id != 0 {
 		filter = core.SqlAnd(filter, fmt.Sprintf("pf.cate_id = %d", feedback_cate_id))
@@ -123,7 +130,7 @@ FROM erp_product_feedback pf
 	sb.Limit(offset, limit)
 
 	product_feedback_list := make([]product_feedback_view_item_t, 0, limit)
-	err = db_session.Sql(sb.SqlList()).Find(&product_feedback_list)
+	err := db_session.Sql(sb.SqlList()).Find(&product_feedback_list)
 	core.HandleError(err)
 
 	var feedback_count struct {

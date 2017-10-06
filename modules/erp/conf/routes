@@ -657,9 +657,9 @@ POST /product/feedback/save               ErpProductFeedback.Save
 POST /product/feedback/delete             ErpProductFeedback.Delete
 POST /product/feedback/select/supplier/list/data      ErpProductFeedback.SupplierSelectListData
 
-GET  /product/feedback/index              ErpProductFeedbackQuery.Index
-POST /product/feedback/detail/data        ErpProductFeedbackQuery.DetailData
-POST /product/feedback/list/data          ErpProductFeedbackQuery.ListData
+GET  /product/feedback/query              ErpProductFeedbackQuery.Index
+POST /product/feedback/query/page/data    ErpProductFeedbackQuery.PageData
+POST /product/feedback/query/list/data    ErpProductFeedbackQuery.ListData
 
 POST /product/feedback/import             ErpProductFeedbackExcel.Import
 POST /product/feedback/export             ErpProductFeedbackExcel.Export

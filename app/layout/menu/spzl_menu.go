@@ -55,6 +55,16 @@ func GetSpzlMenu(res_id_map map[int64]bool, web_session revel.Session) string {
         </li>`)
 	}
 
+	if check_pass_res_menu(pass_res.SPZL_PRODUCT_FEEDBACK_QUERY) {
+		buffer.WriteString(`<li id="spzl-product-feedback-query-menu" class="">
+            <a href="/product/feedback/query">
+                <i class="menu-icon fa fa-caret-right"></i>
+                商品质量反馈查询
+            </a>
+            <b class="arrow"></b>
+        </li>`)
+	}
+
 	buffer.WriteString(`</ul>
 </li>
 `)

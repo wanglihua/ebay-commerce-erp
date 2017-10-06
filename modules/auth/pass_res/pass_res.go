@@ -140,6 +140,7 @@ const (
 	SPZL_PRODUCT_FEEDBACK_CATE   = 180100 // 商品质量反馈类别
 	SPZL_PRODUCT_FEEDBACK        = 180200 // 商品质量反馈
 	SPZL_PRODUCT_FEEDBACK_DELETE = 180300 // 商品质量反馈删除
+	SPZL_PRODUCT_FEEDBACK_QUERY  = 180400 // 商品质量反馈查询导出
 
 	// 系统管理 19
 	XTGL_NOTICE = 190100 // 通知管理
