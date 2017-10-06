@@ -23,7 +23,7 @@ type PurchaseBillEntryInfo struct {
 	NeedInvoice             int64           `xorm:"bigint notnull 'need_invoice' default(0)" json:"need_invoice" smith:"verbose_name=是否开票"`
 	TaxPoint                float64         `xorm:"decimal(18,6) notnull 'tax_point' default(0)" json:"tax_point" smith:"verbose_name=收取税点"`
 	DrawbackPoint           float64         `xorm:"decimal(18,6) notnull 'drawback_point' default(0)" json:"drawback_point" smith:"verbose_name=退税点"`
-	DrawbackAmount          float64         `xorm:"decimal(18,6) notnull 'drawback_amount' default(0)" json:"drawback_amount" smith:"verbose_name=退税额"`
+	DrawbackAmount          float64         `xorm:"decimal(18,6) notnull 'drawback_amount' default(0)" json:"drawback_amount" smith:"verbose_name=退税额"` // 这是单个商品的退税额
 	FittingCost             float64         `xorm:"decimal(18,6) notnull 'fitting_cost' default(0)" json:"fitting_cost" smith:"verbose_name=配件费用"`
 	OtherCost               float64         `xorm:"decimal(18,6) notnull 'other_cost' default(0)" json:"other_cost" smith:"verbose_name=其它费用"`
 	InventoryCost           float64         `xorm:"decimal(18,6) notnull 'inventory_cost' default(0)" json:"inventory_cost" smith:"verbose_name=中国仓成本"`
