@@ -211,7 +211,7 @@ func (c ErpProductFeedbackExcel) export_product_feedback_list_to_excel(db_sessio
 		col_index++
 
 		cell = row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 20)
+		sheet.SetColWidth(col_index, col_index, 15)
 		set_head_cell_style(cell)
 		cell.Value = "SKU"
 		col_index++
@@ -247,13 +247,13 @@ func (c ErpProductFeedbackExcel) export_product_feedback_list_to_excel(db_sessio
 		col_index++
 
 		cell = row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 20)
+		sheet.SetColWidth(col_index, col_index, 15)
 		set_head_cell_style(cell)
 		cell.Value = "创建时间"
 		col_index++
 
 		cell = row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 20)
+		sheet.SetColWidth(col_index, col_index, 15)
 		set_head_cell_style(cell)
 		cell.Value = "修改时间"
 		col_index++
