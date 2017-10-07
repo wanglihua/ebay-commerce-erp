@@ -12,6 +12,7 @@ import (
 	"strings"
 	"matrix/modules/erp/service/sea_container_cost_service"
 	"matrix/modules/erp/service/exchange_rate_service"
+	"matrix/modules/erp/service/inventory_service"
 )
 
 type ErpProductPriceEstimate struct {
@@ -24,7 +25,41 @@ func (c ErpProductPriceEstimate) Index() revel.Result {
 	return c.RenderTemplate("erp/xsgl/product_price_estimate/product_price_estimate_index.html")
 }
 
-func (c ErpProductPriceEstimate) Post() revel.Result {
+func (c ErpProductPriceEstimate) GetSkuInfo() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.XSGL_PRODUCT_PRICE_ESTIMATE, c.Session)
+
+	var db_session = c.DbSession
+
+	var product_price_estimate ProductPriceEstimate
+	err := json.Unmarshal(c.GetRequestBody(), &product_price_estimate)
+	core.HandleError(err)
+
+	var product kcgl_models.ProductInfo
+	has, err := db_session.Where("sku = ?", product_price_estimate.Sku).Get(&product)
+	core.HandleError(err)
+
+	if has == false {
+		return c.RenderJson(map[string]interface{}{
+			"success":                false,
+			"message":                "SKU信息不存在！",
+			"product_price_estimate": nil,
+		})
+	}
+
+	product_price_estimate.Length = product.Length
+	product_price_estimate.Width = product.Width
+	product_price_estimate.Height = product.Height
+	product_price_estimate.ActualWeight = product.Weight
+	product_price_estimate.CnInventoryPrice = inventory_service.GetProductCnStockCostPrice(product.Id, db_session)
+
+	return c.RenderJson(map[string]interface{}{
+		"success":                true,
+		"message":                "获取SKU信息成功！",
+		"product_price_estimate": product_price_estimate,
+	})
+}
+
+func (c ErpProductPriceEstimate) Estimate() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.XSGL_PRODUCT_PRICE_ESTIMATE, c.Session)
 
 	var db_session = c.DbSession
@@ -205,6 +240,7 @@ GROUP BY item_product_id;`
 }
 
 type ProductPriceEstimate struct {
+	Sku              string  `json:"sku"`                // sku
 	Length           float64 `json:"length"`             // 长 cm
 	Width            float64 `json:"width"`              // 宽 cm
 	Height           float64 `json:"height"`             // 高 cm
