@@ -283,8 +283,14 @@
                         }
                         else {
                             vm.product_price_estimate = data.product_price_estimate;
+
                             vm.product_list = data.product_list;
-                            $("#product_list").show();
+                            if (data.product_list != null) {
+                                $("#product_list").show();
+                            } else {
+                                $("#product_list").hide();
+                            }
+
                             $.msg.show(data.message);
                             //return;
                         }

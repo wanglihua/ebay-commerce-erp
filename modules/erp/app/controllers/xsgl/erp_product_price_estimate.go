@@ -68,16 +68,63 @@ func (c ErpProductPriceEstimate) Estimate() revel.Result {
 	err := json.Unmarshal(c.GetRequestBody(), &product_price_estimate)
 	core.HandleError(err)
 
-	var product kcgl_models.ProductInfo
-	has, err := db_session.Where("sku = ?", product_price_estimate.Sku).Get(&product)
-	core.HandleError(err)
+	product_price_estimate.Sku = strings.TrimSpace(product_price_estimate.Sku)
+	if product_price_estimate.Sku != "" {
+		var product kcgl_models.ProductInfo
+		has, err := db_session.Where("sku = ?", product_price_estimate.Sku).Get(&product)
+		core.HandleError(err)
 
-	if has == false {
-		return c.RenderJson(map[string]interface{}{
-			"success":                false,
-			"message":                "SKU信息不存在！",
-			"product_price_estimate": product_price_estimate,
-		})
+		if has == false {
+			return c.RenderJson(map[string]interface{}{
+				"success":                false,
+				"message":                "SKU信息不存在！",
+				"product_price_estimate": product_price_estimate,
+			})
+		}
+
+		/*
+			然后对应历史订单100单及以上的则跳出该SKU的实际平均运费，没有满100单的则提取wollongzone系统体积重、实际重 最接近的5个SKU的平均运费/平均重量 得出每公斤费率。
+		 */
+
+		var product_order_item_fee_avg struct {
+			ItemCount int64   `xorm:"'item_count'"`
+			AvgFee    float64 `xorm:"'avg_fee'"`
+		}
+
+		/*
+	SELECT count(*) AS item_count, sum(ol.actual_fee) / sum(if(ol.actual_fee = 0, 0, oi.quantity)) AS avg_fee
+	FROM erp_order_item oi
+	   INNER JOIN erp_order_logistics ol ON oi.order_id = ol.order_id
+	WHERE oi.quantity = 1
+		 AND (SELECT count(oi_inner.id)
+			  FROM erp_order_item oi_inner
+			  WHERE oi_inner.order_id = oi.order_id) = 1
+		 AND oi.item_product_id = 17578;
+		 */
+
+		var sql_get_product_order_item_fee_avg = `SELECT count(*) AS item_count, sum(ol.actual_fee) / sum(if(ol.actual_fee = 0, 0, oi.quantity)) AS avg_fee
+FROM erp_order_item oi
+   INNER JOIN erp_order_logistics ol ON oi.order_id = ol.order_id
+WHERE oi.quantity = 1
+	 AND (SELECT count(oi_inner.id)
+		  FROM erp_order_item oi_inner
+		  WHERE oi_inner.order_id = oi.order_id) = 1
+	 AND oi.item_product_id = %d;`
+		sql_get_product_order_item_fee_avg = fmt.Sprintf(sql_get_product_order_item_fee_avg, product.Id)
+
+		_, err = db_session.Sql(sql_get_product_order_item_fee_avg).Get(&product_order_item_fee_avg)
+		core.HandleError(err)
+
+		if product_order_item_fee_avg.ItemCount >= 100 { // 如果有100个符合条件的物流记录的，就显示这100个的平均值
+			product_price_estimate.LogisticsFee = fmt.Sprintf("%0.2f", product_order_item_fee_avg.AvgFee)
+
+			return c.RenderJson(map[string]interface{}{
+				"success":                true,
+				"message":                "获取商品历史运费成功！",
+				"product_price_estimate": product_price_estimate,
+				"product_list":           nil,
+			})
+		}
 	}
 
 	// check
@@ -117,50 +164,6 @@ func (c ErpProductPriceEstimate) Estimate() revel.Result {
 		return c.RenderJson(map[string]interface{}{
 			"success": false,
 			"message": "录入的实际重量不能为零！",
-		})
-	}
-
-	/*
-		然后对应历史订单100单及以上的则跳出该SKU的实际平均运费，没有满100单的则提取wollongzone系统体积重、实际重 最接近的5个SKU的平均运费/平均重量 得出每公斤费率。
-	 */
-
-	var product_order_item_fee_avg struct {
-		ItemCount int64   `xorm:"'item_count'"`
-		AvgFee    float64 `xorm:"'avg_fee'"`
-	}
-
-	/*
-SELECT count(*) AS item_count, sum(ol.actual_fee) / sum(if(ol.actual_fee = 0, 0, oi.quantity)) AS avg_fee
-FROM erp_order_item oi
-   INNER JOIN erp_order_logistics ol ON oi.order_id = ol.order_id
-WHERE oi.quantity = 1
-	 AND (SELECT count(oi_inner.id)
-		  FROM erp_order_item oi_inner
-		  WHERE oi_inner.order_id = oi.order_id) = 1
-	 AND oi.item_product_id = 17578;
-	 */
-
-	var sql_get_product_order_item_fee_avg = `SELECT count(*) AS item_count, sum(ol.actual_fee) / sum(if(ol.actual_fee = 0, 0, oi.quantity)) AS avg_fee
-FROM erp_order_item oi
-   INNER JOIN erp_order_logistics ol ON oi.order_id = ol.order_id
-WHERE oi.quantity = 1
-	 AND (SELECT count(oi_inner.id)
-		  FROM erp_order_item oi_inner
-		  WHERE oi_inner.order_id = oi.order_id) = 1
-	 AND oi.item_product_id = %d;`
-	sql_get_product_order_item_fee_avg = fmt.Sprintf(sql_get_product_order_item_fee_avg, product.Id)
-
-	_, err = db_session.Sql(sql_get_product_order_item_fee_avg).Get(&product_order_item_fee_avg)
-	core.HandleError(err)
-
-	if product_order_item_fee_avg.ItemCount >= 100 {
-		product_price_estimate.LogisticsFee = fmt.Sprintf("%0.2f", product_order_item_fee_avg.AvgFee)
-
-		return c.RenderJson(map[string]interface{}{
-			"success":                true,
-			"message":                "获取商品历史运费成功！",
-			"product_price_estimate": product_price_estimate,
-			"product_list":           nil,
 		})
 	}
 
@@ -289,7 +292,7 @@ GROUP BY item_product_id;`
 
 	return c.RenderJson(map[string]interface{}{
 		"success":                true,
-		"message":                "商品售价预估成功！",
+		"message":                "根据同类商品，售价预估成功！",
 		"product_price_estimate": product_price_estimate,
 		"product_list":           product_list,
 	})
