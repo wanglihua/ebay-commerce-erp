@@ -37,6 +37,7 @@ type ProductInfo struct {
 	PurchaseDays     int64           `xorm:"bigint notnull 'purchase_days' default(0)" json:"purchase_days"`                                               // 采购天数
 	Volume           string          `xorm:"-" json:"volume"`                                                                                              // 体积， 立方米， 只是用于界面显示
 	DimWeight        string          `xorm:"-" json:"dim_weight"`                                                                                          // 体积重， Kg， 只是用于界面显示
+	AvgFee           string          `xorm:"-" json:"avg_fee"`                                                                                             // 平均费用
 	PostageCalWeight float64         `xorm:"decimal(18,6) notnull 'postage_cal_weight' default(0)" json:"postage_cal_weight" smith:"verbose_name=客户端运费权重"` // 客户端运费计算权重
 	CreateTime       core.Time       `xorm:"created notnull 'create_time'" json:"create_time"`
 	UpdateTime       core.Time       `xorm:"updated notnull 'update_time'" json:"update_time"`

@@ -89,6 +89,7 @@ WHERE oi.quantity = 1
   AND oi.item_product_id IN (17578, 23332, 17632, 17583, 23539);
  */
 
+	// 获得最接近的 5 个商品的列表
 	var sql_get_five_product = `SELECT p.*
 FROM erp_product p
 ORDER BY abs(p.length * p.width * p.height / 40000 - %f) + abs(p.weight - %f) ASC
@@ -111,6 +112,7 @@ LIMIT 5;`
 		product_id_str_list = append(product_id_str_list, fmt.Sprint(product.Id))
 	}
 
+	// 获得接近的 5 个商品的平均运费
 	var sql_get_avg_fee = `SELECT sum(ol.actual_fee) / sum(if(ol.actual_fee = 0, 0, oi.quantity)) AS avg_fee
 FROM erp_order_item oi INNER JOIN erp_order_logistics ol ON oi.order_id = ol.order_id
 WHERE oi.quantity = 1
@@ -125,6 +127,8 @@ WHERE oi.quantity = 1
 	}
 	_, err = db_session.Sql(sql_get_avg_fee).Get(&avg_fee)
 	core.HandleError(err)
+
+	// 预估
 
 	var logistics_fee = avg_fee.AvgFee / product_avg_actual_weight * product_price_estimate.ActualWeight * product_price_estimate.Qty
 	product_price_estimate.LogisticsFee = fmt.Sprintf("%0.2f", logistics_fee)
@@ -145,9 +149,51 @@ WHERE oi.quantity = 1
 	product_price_estimate.Price = fmt.Sprintf("%0.2f", price)
 	product_price_estimate.Profit = fmt.Sprintf("%0.2f", price*product_price_estimate.ProfitRate)
 
+	// 获取各个商品的平均运费，是分立的平均
+
+	/*
+SELECT oi.item_product_id AS product_id, sum(ol.actual_fee) / sum(if(ol.actual_fee = 0, 0, oi.quantity)) AS avg_fee
+FROM erp_order_item oi INNER JOIN erp_order_logistics ol ON oi.order_id = ol.order_id
+WHERE oi.quantity = 1
+      AND (SELECT count(oi_inner.id)
+           FROM erp_order_item oi_inner
+           WHERE oi_inner.order_id = oi.order_id) = 1
+      AND oi.item_product_id IN (%s)
+GROUP BY item_product_id;
+	 */
+
+	var sql_get_product_avg_fee = `SELECT oi.item_product_id AS product_id, sum(ol.actual_fee) / sum(if(ol.actual_fee = 0, 0, oi.quantity)) AS avg_fee
+FROM erp_order_item oi INNER JOIN erp_order_logistics ol ON oi.order_id = ol.order_id
+WHERE oi.quantity = 1
+      AND (SELECT count(oi_inner.id)
+           FROM erp_order_item oi_inner
+           WHERE oi_inner.order_id = oi.order_id) = 1
+      AND oi.item_product_id IN (%s)
+GROUP BY item_product_id;`
+	sql_get_product_avg_fee = fmt.Sprintf(sql_get_product_avg_fee, strings.Join(product_id_str_list, ","))
+
+	type producct_avg_fee_item_t struct {
+		ProductId int64   `xorm:"'product_id'"`
+		AvgFee    float64 `xorm:"'avg_fee'"`
+	}
+
+	var product_avg_fee_list = make([]producct_avg_fee_item_t, 0)
+	core.HandleError(db_session.Sql(sql_get_product_avg_fee).Find(&product_avg_fee_list))
+
+	var product_avg_fee_map = make(map[int64]float64)
+	for _, product_avg_fee := range product_avg_fee_list {
+		product_avg_fee_map[product_avg_fee.ProductId] = product_avg_fee.AvgFee
+	}
+
+	// 计算 5 个商品的体积重
+	// 设置 5 个商品的平均运费
 	for index, product := range product_list {
+		// 计算商品的体积重
 		var dim_weight = product.Length * product.Width * product.Height / product_sale_setting.DimWeightFormula
 		product_list[index].DimWeight = fmt.Sprintf("%0.2f", dim_weight)
+
+		// 设置商品的平均运费
+		product_list[index].AvgFee = fmt.Sprintf("%0.2f", product_avg_fee_map[product.Id])
 	}
 
 	return c.RenderJson(map[string]interface{}{
