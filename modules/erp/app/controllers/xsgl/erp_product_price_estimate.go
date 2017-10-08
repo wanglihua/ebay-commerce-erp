@@ -34,6 +34,15 @@ func (c ErpProductPriceEstimate) GetSkuInfo() revel.Result {
 	err := json.Unmarshal(c.GetRequestBody(), &product_price_estimate)
 	core.HandleError(err)
 
+	product_price_estimate.Sku = strings.TrimSpace(product_price_estimate.Sku)
+
+	if product_price_estimate.Sku == "" {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "请输入商品SKU！",
+		})
+	}
+
 	var product kcgl_models.ProductInfo
 	has, err := db_session.Where("sku = ?", product_price_estimate.Sku).Get(&product)
 	core.HandleError(err)
@@ -185,9 +194,9 @@ WHERE oi.quantity = 1
 
 	// 获得最接近的 5 个商品的列表
 	var sql_get_five_product = `SELECT p.*
-FROM erp_product p
-ORDER BY abs(p.length * p.width * p.height / 40000 - %f) + abs(p.weight - %f) ASC
-LIMIT 5;`
+   FROM erp_product p
+   ORDER BY abs(p.length * p.width * p.height / 40000 - %f) + abs(p.weight - %f) ASC
+   LIMIT 5;`
 
 	sql_get_five_product = fmt.Sprintf(sql_get_five_product, dim_weight, actual_weight)
 	var product_list = make([]kcgl_models.ProductInfo, 0)
@@ -208,12 +217,12 @@ LIMIT 5;`
 
 	// 获得接近的 5 个商品的平均运费
 	var sql_get_avg_fee = `SELECT sum(ol.actual_fee) / sum(if(ol.actual_fee = 0, 0, oi.quantity)) AS avg_fee
-FROM erp_order_item oi INNER JOIN erp_order_logistics ol ON oi.order_id = ol.order_id
-WHERE oi.quantity = 1
-  AND (SELECT count(oi_inner.id)
-	   FROM erp_order_item oi_inner
-	   WHERE oi_inner.order_id = oi.order_id) = 1
-  AND oi.item_product_id IN (%s);`
+   FROM erp_order_item oi INNER JOIN erp_order_logistics ol ON oi.order_id = ol.order_id
+   WHERE oi.quantity = 1
+	 AND (SELECT count(oi_inner.id)
+		  FROM erp_order_item oi_inner
+		  WHERE oi_inner.order_id = oi.order_id) = 1
+	 AND oi.item_product_id IN (%s);`
 	sql_get_avg_fee = fmt.Sprintf(sql_get_avg_fee, strings.Join(product_id_str_list, ","))
 
 	var avg_fee struct {
@@ -226,6 +235,34 @@ WHERE oi.quantity = 1
 
 	var logistics_fee = avg_fee.AvgFee / product_avg_actual_weight * product_price_estimate.ActualWeight * product_price_estimate.Qty
 	product_price_estimate.LogisticsFee = fmt.Sprintf("%0.2f", logistics_fee)
+
+	/*
+	// 感觉这个方案更好，但是还没能获取商品的列表
+
+	var logistics_fee_rate_result struct {
+		LogisticsFeeRate float64 `xorm:"'logistics_fee_rate'"` //用于计算费率的系数
+	}
+
+	var sql_get_logistics_fee_rate = `SELECT sum(ol.actual_fee) / sum(if(ol.actual_fee = 0, 0, oi.quantity)) / avg(p.weight) AS logistics_fee_rate
+FROM erp_order_item oi
+    INNER JOIN erp_order_logistics ol ON oi.order_id = ol.order_id
+    INNER JOIN erp_product p ON oi.item_product_id = p.id
+WHERE oi.quantity = 1
+      AND (SELECT count(oi_inner.id)
+           FROM erp_order_item oi_inner
+           WHERE oi_inner.order_id = oi.order_id) = 1
+      AND ol.actual_fee <> 0
+ORDER BY abs(p.length * p.width * p.height / 40000 - %f) + abs(p.weight - %f) ASC
+LIMIT 5;`
+
+	sql_get_logistics_fee_rate = fmt.Sprintf(sql_get_logistics_fee_rate, dim_weight, actual_weight)
+
+	_, err = db_session.Sql(sql_get_logistics_fee_rate).Get(&logistics_fee_rate_result)
+	core.HandleError(err)
+
+	var logistics_fee = logistics_fee_rate_result.LogisticsFeeRate * product_price_estimate.ActualWeight * product_price_estimate.Qty
+	product_price_estimate.LogisticsFee = fmt.Sprintf("%0.2f", logistics_fee)
+	*/
 
 	var sea_container_cost = sea_container_cost_service.Get_sea_container_cost(db_session)
 
