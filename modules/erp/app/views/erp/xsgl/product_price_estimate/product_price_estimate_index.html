@@ -156,6 +156,34 @@
                                         </div>
                                     </div>
 
+                                    <div class="row">
+                                        <div class="col-xs-3">
+                                        </div>
+
+                                        <div class="col-xs-3">
+                                        </div>
+
+                                        <div class="col-xs-3">
+                                            <div class="form-group">
+                                                <label for="deno_rate" class="col-xs-6 control-label">分母系数</label>
+                                                <div class="col-xs-6">
+                                                    <input id="deno_rate" name="product_price_estimate.deno_rate" type="text" class="input-sm form-control" v-model.number="product_price_estimate.deno_rate"/>
+                                                    <div class="help-block">数字</div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-xs-3">
+                                            <div class="form-group">
+                                                <label for="sale_price" class="col-xs-6 control-label">建议售价</label>
+                                                <div class="col-xs-6">
+                                                    <input id="sale_price" name="product_price_estimate.sale_price" type="text" class="input-sm form-control" v-model="product_price_estimate.sale_price" disabled="disabled"/>
+                                                    <div class="help-block">单位，AUD</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                 </form>
                             </div>
                         </div>
@@ -262,6 +290,9 @@
             },
             'product_price_estimate.profit_rate': {
                 required: true, number: true
+            },
+            'product_price_estimate.deno_rate': {
+                required: true, number: true
             }
         });
 
@@ -304,7 +335,8 @@
         el: "#page",
         data: {
             "product_price_estimate": {
-                "qty": 1
+                "qty": 1,
+                "deno_rate": 1
             },
             "product_list": []
         },

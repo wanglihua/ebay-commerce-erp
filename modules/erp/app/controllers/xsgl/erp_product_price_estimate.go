@@ -13,6 +13,7 @@ import (
 	"matrix/modules/erp/service/sea_container_cost_service"
 	"matrix/modules/erp/service/exchange_rate_service"
 	"matrix/modules/erp/service/inventory_service"
+	"github.com/go-xorm/xorm"
 )
 
 type ErpProductPriceEstimate struct {
@@ -76,6 +77,48 @@ func (c ErpProductPriceEstimate) Estimate() revel.Result {
 	var product_price_estimate ProductPriceEstimate
 	err := json.Unmarshal(c.GetRequestBody(), &product_price_estimate)
 	core.HandleError(err)
+	var product_sale_setting = product_sale_setting_service.Get_product_sale_setting(db_session)
+
+	var dim_weight_formula = product_sale_setting.DimWeightFormula
+
+	if dim_weight_formula == 0 {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "体积重公式系数不能为零设置有误！",
+		})
+	}
+
+	if product_price_estimate.Qty == 0 {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "数量不能为零！",
+		})
+	}
+
+	var dim_weight = product_price_estimate.Length * product_price_estimate.Width * product_price_estimate.Height / product_sale_setting.DimWeightFormula
+	product_price_estimate.DimWeight = fmt.Sprintf("%0.2f", dim_weight)
+
+	if dim_weight == 0 {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "录入的长宽高不能为零！",
+		})
+	}
+
+	var actual_weight = product_price_estimate.ActualWeight
+	if actual_weight == 0 {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "录入的实际重量不能为零！",
+		})
+	}
+
+	if product_price_estimate.DenoRate == 0 {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "分母系数不能为零！",
+		})
+	}
 
 	product_price_estimate.Sku = strings.TrimSpace(product_price_estimate.Sku)
 	if product_price_estimate.Sku != "" {
@@ -127,6 +170,9 @@ WHERE oi.quantity = 1
 		if product_order_item_fee_avg.ItemCount >= 100 { // 如果有100个符合条件的物流记录的，就显示这100个的平均值
 			product_price_estimate.LogisticsFee = fmt.Sprintf("%0.2f", product_order_item_fee_avg.AvgFee)
 
+			// 计算售价和利润
+			product_price_estimate = calculate_price_profit(product_order_item_fee_avg.AvgFee, product_price_estimate, db_session)
+
 			return c.RenderJson(map[string]interface{}{
 				"success":                true,
 				"message":                "获取商品历史运费成功！",
@@ -139,42 +185,6 @@ WHERE oi.quantity = 1
 	// check
 
 	// do estimate
-
-	var product_sale_setting = product_sale_setting_service.Get_product_sale_setting(db_session)
-
-	var dim_weight_formula = product_sale_setting.DimWeightFormula
-
-	if dim_weight_formula == 0 {
-		return c.RenderJson(map[string]interface{}{
-			"success": false,
-			"message": "体积重公式系数不能为零设置有误！",
-		})
-	}
-
-	if product_price_estimate.Qty == 0 {
-		return c.RenderJson(map[string]interface{}{
-			"success": false,
-			"message": "数量不能为零！",
-		})
-	}
-
-	var dim_weight = product_price_estimate.Length * product_price_estimate.Width * product_price_estimate.Height / product_sale_setting.DimWeightFormula
-	product_price_estimate.DimWeight = fmt.Sprintf("%0.2f", dim_weight)
-
-	if dim_weight == 0 {
-		return c.RenderJson(map[string]interface{}{
-			"success": false,
-			"message": "录入的长宽高不能为零！",
-		})
-	}
-
-	var actual_weight = product_price_estimate.ActualWeight
-	if actual_weight == 0 {
-		return c.RenderJson(map[string]interface{}{
-			"success": false,
-			"message": "录入的实际重量不能为零！",
-		})
-	}
 
 	/*
 SELECT p.*
@@ -264,21 +274,8 @@ LIMIT 5;`
 	product_price_estimate.LogisticsFee = fmt.Sprintf("%0.2f", logistics_fee)
 	*/
 
-	var sea_container_cost = sea_container_cost_service.Get_sea_container_cost(db_session)
-
-	// 计算商品体积，计算平摊海运成本
-	var avg_sea_shipping_cost = float64(sea_container_cost.Cost) * product_price_estimate.Length * product_price_estimate.Width * product_price_estimate.Height / float64(sea_container_cost.Volume)
-	var au_inventory_price float64 = product_price_estimate.CnInventoryPrice + avg_sea_shipping_cost
-
-	var aud_rate = exchange_rate_service.Get_aud_exchange_rate(db_session)
-
-	product_price_estimate.AuInventoryPrice = fmt.Sprintf("%0.2f", au_inventory_price)
-
-	var au_inventory_price_aud = au_inventory_price / aud_rate //转成澳币
-
-	var price float64 = (au_inventory_price_aud + logistics_fee) / (1 - product_price_estimate.ProfitRate)
-	product_price_estimate.Price = fmt.Sprintf("%0.2f", price)
-	product_price_estimate.Profit = fmt.Sprintf("%0.2f", price*product_price_estimate.ProfitRate)
+	// 计算售价和利润
+	product_price_estimate = calculate_price_profit(logistics_fee, product_price_estimate, db_session)
 
 	// 获取各个商品的平均运费，是分立的平均
 
@@ -349,4 +346,30 @@ type ProductPriceEstimate struct {
 	Profit           string  `json:"profit"`             // 毛利 （澳币）
 	ProfitRate       float64 `json:"profit_rate"`        // 毛利率
 	Price            string  `json:"price"`              // 预估售价（澳币）
+	DenoRate         float64 `json:"deno_rate"`          // denominator rate 分母系数
+	SalePrice        string  `json:"sale_price"`         // 建议零售价
+	// sale price
+}
+
+// 计算售价和利润
+func calculate_price_profit(logistics_fee float64, product_price_estimate ProductPriceEstimate, db_session *xorm.Session) ProductPriceEstimate {
+	var sea_container_cost = sea_container_cost_service.Get_sea_container_cost(db_session)
+
+	// 计算商品体积，计算平摊海运成本
+	var avg_sea_shipping_cost = float64(sea_container_cost.Cost) * product_price_estimate.Length * product_price_estimate.Width * product_price_estimate.Height / float64(sea_container_cost.Volume)
+	var au_inventory_price float64 = product_price_estimate.CnInventoryPrice + avg_sea_shipping_cost
+
+	var aud_rate = exchange_rate_service.Get_aud_exchange_rate(db_session)
+
+	product_price_estimate.AuInventoryPrice = fmt.Sprintf("%0.2f", au_inventory_price)
+
+	var au_inventory_price_aud = au_inventory_price / aud_rate //转成澳币
+
+	// 计算售价和利润
+	var price float64 = (au_inventory_price_aud + logistics_fee) / (1 - product_price_estimate.ProfitRate)
+	product_price_estimate.Price = fmt.Sprintf("%0.2f", price)
+	product_price_estimate.Profit = fmt.Sprintf("%0.2f", price*product_price_estimate.ProfitRate)
+	product_price_estimate.SalePrice = fmt.Sprintf("%0.2f", price/product_price_estimate.DenoRate)
+
+	return product_price_estimate
 }
