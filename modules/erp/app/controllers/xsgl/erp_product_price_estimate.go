@@ -31,13 +31,11 @@ func (c ErpProductPriceEstimate) GetSkuInfo() revel.Result {
 
 	var db_session = c.DbSession
 
-	var product_price_estimate ProductPriceEstimate
-	err := json.Unmarshal(c.GetRequestBody(), &product_price_estimate)
-	core.HandleError(err)
+	var sku string
+	c.Params.Bind(&sku, "sku")
+	sku = strings.TrimSpace(sku)
 
-	product_price_estimate.Sku = strings.TrimSpace(product_price_estimate.Sku)
-
-	if product_price_estimate.Sku == "" {
+	if sku == "" {
 		return c.RenderJson(map[string]interface{}{
 			"success": false,
 			"message": "请输入商品SKU！",
@@ -45,7 +43,7 @@ func (c ErpProductPriceEstimate) GetSkuInfo() revel.Result {
 	}
 
 	var product kcgl_models.ProductInfo
-	has, err := db_session.Where("sku = ?", product_price_estimate.Sku).Get(&product)
+	has, err := db_session.Where("sku = ?", sku).Get(&product)
 	core.HandleError(err)
 
 	if has == false {
@@ -56,11 +54,19 @@ func (c ErpProductPriceEstimate) GetSkuInfo() revel.Result {
 		})
 	}
 
+	var product_price_estimate ProductPriceEstimate
+	product_price_estimate.Sku = sku
 	product_price_estimate.Length = product.Length
 	product_price_estimate.Width = product.Width
 	product_price_estimate.Height = product.Height
 	product_price_estimate.ActualWeight = product.Weight
 	product_price_estimate.CnInventoryPrice = inventory_service.GetProductCnStockCostPrice(product.Id, db_session)
+	product_price_estimate.Qty = 1
+	product_price_estimate.DenoRate = 1
+
+	var product_sale_setting = product_sale_setting_service.Get_product_sale_setting(db_session)
+	var dim_weight = product_price_estimate.Length * product_price_estimate.Width * product_price_estimate.Height / product_sale_setting.DimWeightFormula
+	product_price_estimate.DimWeight = fmt.Sprintf("%0.2f", dim_weight)
 
 	return c.RenderJson(map[string]interface{}{
 		"success":                true,

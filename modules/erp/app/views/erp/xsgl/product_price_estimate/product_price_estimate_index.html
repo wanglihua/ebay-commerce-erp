@@ -247,9 +247,9 @@
             $.ajax({
                 url: '{%url "ErpProductPriceEstimate.GetSkuInfo"%}',
                 type: "POST",
-                processData: false,
-                contentType: 'application/json',
-                data: JSON.stringify(vm.product_price_estimate),
+                data: {
+                    'sku': vm.product_price_estimate.sku
+                },
                 success: function (data) {
                     hideMask();
                     if (data.success === false) {
