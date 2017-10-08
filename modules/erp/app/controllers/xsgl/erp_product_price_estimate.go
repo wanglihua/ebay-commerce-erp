@@ -181,7 +181,7 @@ WHERE oi.quantity = 1
 
 			return c.RenderJson(map[string]interface{}{
 				"success":                true,
-				"message":                "获取商品历史运费成功！",
+				"message":                "根据商品历史运费，售价预估成功！",
 				"product_price_estimate": product_price_estimate,
 				"product_list":           nil,
 			})
@@ -332,7 +332,7 @@ GROUP BY item_product_id;`
 
 	return c.RenderJson(map[string]interface{}{
 		"success":                true,
-		"message":                "根据同类商品，售价预估成功！",
+		"message":                "根据同类商品运费，售价预估成功！",
 		"product_price_estimate": product_price_estimate,
 		"product_list":           product_list,
 	})
