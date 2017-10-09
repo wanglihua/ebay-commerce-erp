@@ -273,9 +273,10 @@ func (c ErpNotice) Save() revel.Result {
 
 	var is_create = detail_form.IsCreate()
 
+	var login_user = core.GetLoginUser(c.Session)
+
 	var affected int64
 	if is_create == true {
-		var login_user = core.GetLoginUser(c.Session)
 		notice.UserId = login_user.UserId
 		notice.LoginName = login_user.LoginName
 
@@ -289,6 +290,8 @@ func (c ErpNotice) Save() revel.Result {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！"})
 		}
 	}
+
+	notice_read_service.MarkNoticeUserRead(login_user.UserId, notice.Id, db_session)
 
 	//return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据保存成功!"})
 	return c.RenderJson(map[string]interface{}{
