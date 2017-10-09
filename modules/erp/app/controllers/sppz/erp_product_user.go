@@ -8,7 +8,6 @@ import (
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/models/kcgl_models"
-	"matrix/modules/erp/service/product_log_service"
 )
 
 type ErpProductUser struct {
@@ -24,7 +23,7 @@ func (c ErpProductUser) Index() revel.Result {
 func (c ErpProductUser) ListData() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.KCGL_PRODUCT_USER, c.Session)
 
-	db_session := c.DbSession
+	var db_session = c.DbSession
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
 	var filter_type int64
@@ -86,7 +85,7 @@ type product_user_detail_form_t struct {
 func (c ErpProductUser) DetailData() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.KCGL_PRODUCT_USER, c.Session)
 
-	db_session := c.DbSession
+	var db_session = c.DbSession
 
 	var product_id int64
 	c.Params.Bind(&product_id, "id")
@@ -104,7 +103,7 @@ func (c ErpProductUser) DetailData() revel.Result {
 func (c ErpProductUser) Save() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.KCGL_PRODUCT_USER, c.Session)
 
-	db_session := c.DbSession
+	var db_session = c.DbSession
 
 	var detail_form product_user_detail_form_t
 	err := json.Unmarshal(c.GetRequestBody(), &detail_form)
@@ -122,7 +121,7 @@ func (c ErpProductUser) Save() revel.Result {
 		})
 	}
 
-	var product_in_db_befor_modify = product_in_db
+	// var product_in_db_befor_modify = product_in_db
 
 	product_in_db.SaleUserId = detail_form.Product.SaleUserId
 	product_in_db.ServiceUserId = detail_form.Product.ServiceUserId
@@ -138,8 +137,6 @@ func (c ErpProductUser) Save() revel.Result {
 			"message": "商品人员数据未能更新！",
 		})
 	}
-
-	product_log_service.Insert_product_log(&detail_form.Product, &product_in_db_befor_modify, core.Db_operation_types.Update, db_session, c.Session)
 
 	return c.RenderJson(map[string]interface{}{
 		"success": true,

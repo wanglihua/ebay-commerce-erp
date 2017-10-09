@@ -1,0 +1,398 @@
+{%header "商品负责人" .%}
+<div id="page">
+    <div class="breadcrumbs" id="breadcrumbs">
+        <ul class="breadcrumb">
+            <li>
+                <a href='{%url "Home.Index"%}'><i class="ace-icon fa fa-home home-icon"></i></a>
+            </li>
+            <li class="parent" data-menu="sppz-menu">商品配置</li>
+            <li class="active" data-menu="sppz-product-user-menu">商品负责人</li>
+        </ul>
+    </div>
+    <div class="page-content">
+        <div class="row">
+            <div class="col-xs-12" style="padding: 0;">
+                <div class="gridToolBar clearfix">
+                    <div class="btn-group">
+                        <button data-toggle="dropdown" class="btn btn-info btn-sm dropdown-toggle" aria-expanded="false" style="border-width: 4px;">
+                            <i class="ace-icon fa fa-filter"></i><span id="dataFilter" data-status="0">全部</span>
+                            <span class="ace-icon fa fa-caret-down icon-on-right"></span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-danger">
+                            <li>
+                                <a onclick="filterByZeroData('0','全部')" style="cursor: pointer;">全部</a>
+                            </li>
+                            <li>
+                                <a onclick="filterByZeroData('1', '有空数据记录')" style="cursor: pointer;">有空数据记录</a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <button class="btn btn-primary btn-sm" @click="reloadList('#productList')" style="border-width: 4px;">
+                        <i class="ace-icon fa fa-refresh"></i>
+                        刷新
+                    </button>
+                    <button id="btnImport" class="btn btn-success btn-sm">
+                        <i class="ace-icon fa fa-plus"></i>
+                        导入
+                    </button>
+                    <button class="btn btn-purple btn-sm" @click="exportProduct()">
+                        <i class="ace-icon fa fa-file-excel-o"></i>
+                        导出
+                    </button>
+                    <div style="margin-top: 10px;">
+                        <a href="/static/excel-template/product_user_import.xlsx">下载商品负责人导入Excel模板</a>
+                    </div>
+                </div>
+                <div>
+                    <table id="productList" class="table table-striped table-bordered table-hover"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="productDetailDialog">
+        <div class="modal-dialog" style="width: 480px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="True">&times;</button>
+                    <h4 class="modal-title">商品负责人详细</h4>
+                </div>
+                <div class="modal-body clearfix">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <form class="form-horizontal" role="form" id="productDetailForm">
+                                <input id="product_id" name="detail.product.id" type="hidden" v-model.number="detail.product.id"/>
+
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <label for="sku" class="col-xs-2 control-label">商品SKU</label>
+                                            <div class="col-xs-10">
+                                                <input id="sku" name="detail.product.sku" type="text" class="input-sm form-control" disabled="disabled" v-model.number="detail.product.sku"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <label for="cn_name" class="col-xs-2 control-label">商品名称</label>
+                                            <div class="col-xs-10">
+                                                <input id="cn_name" name="detail.product.cn_name" type="text" class="input-sm form-control" disabled="disabled" v-model="detail.product.cn_name"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <label for="sale_user_id" class="col-xs-2 control-label">销售人员</label>
+                                            <div class="col-xs-10">
+                                                <input id="sale_user_id" name="detail.product.sale_user_id" type="text" class="input-sm form-control" v-model.number="detail.product.sale_user_id"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <label for="service_user_id" class="col-xs-2 control-label">客服人员</label>
+                                            <div class="col-xs-10">
+                                                <input id="service_user_id" name="detail.product.service_user_id" type="text" class="input-sm form-control" v-model.number="detail.product.service_user_id"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <label for="dev_user_id" class="col-xs-2 control-label">开发人员</label>
+                                            <div class="col-xs-10">
+                                                <input id="dev_user_id" name="detail.product.dev_user_id" type="text" class="input-sm form-control" v-model.number="detail.product.dev_user_id"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success btn-sm" @click="saveProductWeight()">
+                        <i class="ace-icon fa fa-floppy-o"></i>保存
+                    </button>
+                    <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">
+                        <i class="ace-icon fa fa-times"></i>关闭
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" src="/static/lib/plupload/moxie.min.js"></script>
+<script type="text/javascript" src="/static/lib/plupload/plupload.min.js"></script>
+<script type="text/javascript" src="/static/lib/plupload/zh_CN.js"></script>
+
+<script type="text/javascript">
+
+    function filterByZeroData(filter_type, filter_name) {
+        vm.filter_type = filter_type;
+        var dataFilter = $("#dataFilter");
+        dataFilter.html(filter_name);
+        reloadList('#productList');
+    }
+
+    function init_uploader() {
+        var uploader = new plupload.Uploader({
+            runtimes: 'html5,flash,html4',
+            multi_selection: false,
+
+            browse_button: 'btnImport',
+            file_data_name: "excel_file",
+
+            url: '{%url "ErpProductUser.Import"%}',
+            max_file_size: '10000kb',
+
+            filters: [
+                {title: "Excel文件", extensions: "xlsx"}
+            ],
+
+            flash_swf_url: '/plupload/js/Moxie.swf',
+
+            init: {
+                FilesAdded: function () {
+                    showMask("上传中，请稍候...");
+                    uploader.start();
+                },
+                FileUploaded: function (up, file, response) {
+                    hideMask();
+                    var result = JSON.parse(response.response);
+                    if (result.success !== true) {
+                        $.msg.error(result.message);
+                    } else {
+                        reloadList('#productList');
+                        $.msg.show(result.message);
+                    }
+                },
+                Error: function (up, err) {
+                    $.msg.error("上传发生错误：" + err.code + ", " + err.message);
+                }
+            }
+        });
+
+        uploader.init();
+    }
+
+    var vm = new Vue({
+        el: "#page",
+        data: {
+            "filter_type": 0, // 0：全部数据； 1: 有空值的数据
+            "detail": {
+                "product": {}
+            }
+        },
+        mounted: function () {
+            var this_vm = this;
+
+            initDataTable(
+                '#productList',
+                {
+                    "sAjaxSource": '{%url "ErpProductUser.ListData"%}',
+                    "aaSorting": [[1, "asc"]],
+                    "aoColumns": [
+                        {
+                            "mDataProp": "p.id",
+                            "bSearchable": false,
+                            "orderable": false,
+                            "sClass": "center",
+                            "width": 50,
+                            "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
+                            "render": function (data, type, row) {
+                                return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
+                            }
+                        },
+                        {
+                            "mDataProp": "p.sku", "title": "商品SKU", "bSearchable": true, "width": 150,
+                            "render": function (data, type, row) {
+                                return '<a href="/product/detail/' + row.p.id + '" target="product_detail">' + row.p.sku + '</a>';
+                            }
+                            //<div class="tdSkuNameSup"><a href="/product/detail/' + row.prd.id + '" target="_blank">' + row.prd.sku + '</a></div>
+                        },
+                        {"mDataProp": "p.cn_name", "title": "商品名称", "bSearchable": true},
+                        {
+                            "mDataProp": "p.length", "title": "长度", "bSearchable": false, "width": 80,
+                            "render": function (data, type, row) {
+                                if (data !== 0) {
+                                    return dtFormatFloat1(data) + " cm";
+                                }
+                                else {
+                                    return "";
+                                }
+                            }
+                        },
+                        {
+                            "mDataProp": "p.width", "title": "销售人员", "bSearchable": false, "width": 80,
+                            "render": function (data, type, row) {
+                                if (data !== 0) {
+                                    return dtFormatFloat1(data) + " cm";
+                                }
+                                else {
+                                    return "";
+                                }
+                            }
+                        },
+                        {
+                            "mDataProp": "p.height", "title": "高度", "bSearchable": false, "width": 80,
+                            "render": function (data, type, row) {
+                                if (data !== 0) {
+                                    return dtFormatFloat1(data) + " cm";
+                                }
+                                else {
+                                    return "";
+                                }
+                            }
+                        },
+                        {
+                            "mDataProp": "p.weight", "title": "重量", "bSearchable": false, "width": 80,
+                            "render": function (data, type, row) {
+                                if (data !== 0) {
+                                    return dtFormatFloat3(data) + " kg";
+                                }
+                                else {
+                                    return "";
+                                }
+                            }
+                        },
+                        {"mDataProp": "s.name", "title": "状态", "bSearchable": true, "width": 80},
+                        {"mDataProp": "p.create_time", "title": "创建时间", "bSearchable": false, "width": 120},
+                        {"mDataProp": "p.update_time", "title": "修改时间", "bSearchable": false, "width": 120}
+                    ],
+                    "fnServerData": function (sSource, aoData, fnCallback) {
+                        showMask("数据加载中，请稍候");
+
+                        aoData.push({name: 'filter_type', value: this_vm.filter_type});
+
+                        $.ajax(
+                            {
+                                "dataType": 'json',
+                                "url": sSource,
+                                "data": aoData,
+                                "success": function (data) {
+                                    hideMask();
+
+                                    if (data.success === false) {
+                                        $.msg.error(data.message);
+                                        return;
+                                    }
+                                    fnCallback(data);
+                                }
+                            });
+                    }
+                }
+            );
+
+            $('#productList tbody').on('dblclick', 'tr', function () {
+                var id = $(this).find('td:first-child input:checkbox').val();
+                vm.showProductDetail(id);
+            });
+
+            init_uploader();
+        },
+        methods: {
+            reloadList: function () {
+                reloadList('#productList');
+            },
+            showProductDetail: function (product_id) {
+                showMask("加载中...");
+                $("#productDetailDialog").clearValidation();
+                $.ajax({
+                        url: '{%url "ErpProductWeight.DetailData" %}',
+                        type: "POST",
+                        data: {
+                            "id": product_id
+                        },
+                        success: function (result) {
+                            hideMask();
+                            if (result.success == false) {
+                                $.msg.error(result.message);
+                                return;
+                            }
+                            vm.detail = result;
+                            vm.detail.product.length = parseFloat(dtFormatFloat1(result.product.length));
+                            vm.detail.product.width = parseFloat(dtFormatFloat1(result.product.width));
+                            vm.detail.product.height = parseFloat(dtFormatFloat1(result.product.height));
+                            vm.detail.product.weight = parseFloat(dtFormatFloat3(result.product.weight));
+
+                            $('#productDetailDialog').modal(modalOptions);
+                        }
+                    }
+                );
+            },
+            saveProductWeight: function () {
+                showMask("提交中...");
+                var form = $("#productDetailForm");
+                var valid = validate(form, {
+                    'detail.product.length': {
+                        required: false, number: true
+                    },
+                    'detail.product.width': {
+                        required: false, number: true
+                    },
+                    'detail.product.height': {
+                        required: false, number: true
+                    },
+                    'detail.product.weight': {
+                        required: false, number: true
+                    }
+                });
+
+                if (!valid) {
+                    hideMask();
+                } else {
+                    $.ajax({
+                            url: '{%url "ErpProductWeight.Save"%}',
+                            type: "POST",
+                            processData: false,
+                            contentType: 'application/json',
+                            data: JSON.stringify(vm.detail),
+                            success: function (data) {
+                                hideMask();
+                                if (data.success == false) {
+                                    $.msg.error(data.message);
+                                    //return;
+                                }
+                                else {
+                                    $.msg.show(data.message);
+                                    $('#productDetailDialog').modal('hide');
+                                    vm.reloadList();
+                                    //return;
+                                }
+                            }
+                        }
+                    );
+                }
+            },
+            exportProduct: function () {
+                var id_list = [];
+                $('#productList tbody tr>td:first-child input:checkbox').each(function () {
+                    if (this.checked) {
+                        id_list.push($(this).val());
+                    }
+                });
+
+                var params = $.param({
+                    "id_list": id_list
+                });
+                var url = '{%url "ErpProductWeightExport.Export"%}' + "?" + params;
+                $('<form method="post" action="' + url + '"></form>').appendTo('body').submit().remove();
+            }
+        }
+    });
+</script>
+{%footer%}
+

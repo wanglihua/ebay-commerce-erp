@@ -15,7 +15,7 @@ WHERE pb.id = 1
 GROUP BY pbe.bill_id;
 
 UPDATE erp_purchase_bill_entry
-SET inventory_cost = price - if(need_invoice = 0, 0, drawback_amount) + price * 0.4
+SET inventory_cost = price - if(need_invoice = 0, 0, drawback_amount) + fitting_cost + other_cost + price * 0.4
 WHERE bill_id = 1;
 	 */
 
@@ -37,7 +37,7 @@ GROUP BY pbe.bill_id;`
 	// 2
 	// 利用计算点数，计算每个明细的中国仓成本价
 	var sql_update_inventory_cost = `UPDATE erp_purchase_bill_entry
-SET inventory_cost = price - if(need_invoice = 0, 0, drawback_amount) + price * %f
+SET inventory_cost = price - if(need_invoice = 0, 0, drawback_amount) + fitting_cost + other_cost + price * %f
 WHERE bill_id = %d;`
 	sql_update_inventory_cost = fmt.Sprintf(sql_update_inventory_cost, fee_point.FeePoint, purchase_bill_id)
 	_, err = db_session.Exec(sql_update_inventory_cost)

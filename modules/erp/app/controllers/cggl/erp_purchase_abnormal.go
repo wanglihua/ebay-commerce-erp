@@ -111,7 +111,7 @@ FROM erp_purchase_bill_entry pbe
 
 	filter = core.SqlAnd(filter, fmt.Sprintf("pbe.status_id = %d OR pbe.status_id = %d", models.PURCHASE_BILL_STATUS_YC, models.PURCHASE_BILL_STATUS_YCL)) // 异常 和 异常已处理
 
-	if bill_code_query != "" {
+	if bill_code_query != "" && bill_code_query != "0" {
 		filter = core.SqlAnd(filter, fmt.Sprintf("pb.code = '%s'", bill_code_query))
 	}
 
