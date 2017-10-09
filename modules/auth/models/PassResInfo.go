@@ -285,8 +285,8 @@ func (e PassResInfo) InitData(db_session *xorm.Session) {
 		pass = new(PassResInfo)
 		pass.Id = pass_res.KCGL_PRODUCT_USER
 		pass.CateId = pass_res_cate.KCGL
-		pass.Name = "商品相关人员"
-		pass.Desc = core.MakeNullString("商品相关人员", true)
+		pass.Name = "商品负责人"
+		pass.Desc = core.MakeNullString("商品负责人", true)
 		db_session.Insert(pass)
 
 		pass = new(PassResInfo)

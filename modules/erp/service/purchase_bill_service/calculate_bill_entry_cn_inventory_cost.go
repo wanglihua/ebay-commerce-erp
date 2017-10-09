@@ -30,7 +30,7 @@ FROM erp_purchase_bill pb
     INNER JOIN erp_purchase_bill_entry pbe ON pbe.bill_id = pb.id
 WHERE pb.id = %d
 GROUP BY pbe.bill_id;`
-	sql_get_fee_point = fmt.Sprint(sql_get_fee_point, purchase_bill_id)
+	sql_get_fee_point = fmt.Sprintf(sql_get_fee_point, purchase_bill_id)
 	_, err := db_session.Sql(sql_get_fee_point).Get(&fee_point)
 	core.HandleError(err)
 

@@ -39,11 +39,11 @@ func (c ErpProductUserExcel) Import() revel.Result {
 	}
 
 	type product_user_t struct {
-		sku    string
-		length float64
-		width  float64
-		height float64
-		weight float64
+		sku          string
+		sale_user_id float64
+		width        float64
+		height       float64
+		weight       float64
 	}
 
 	product_user_list := make([]product_user_t, 0)
@@ -87,15 +87,15 @@ func (c ErpProductUserExcel) Import() revel.Result {
 			product_user.sku = cell_val
 			col_index++
 
-			// length
+			// sale_user_id
 			// cell = row.Cells[col_index]
 			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			//revel.TRACE.Println(cell_val)
-			product_length, err := strconv.ParseFloat(cell_val, 64)
+			product_sale_user_id, err := strconv.ParseFloat(cell_val, 64)
 			core.HandleError(err)
-			product_user.length = product_length
+			product_user.sale_user_id = product_sale_user_id
 			col_index++
 
 			// width
@@ -138,7 +138,7 @@ func (c ErpProductUserExcel) Import() revel.Result {
 	if len(product_user_list) == 0 {
 		return c.RenderJson(map[string]interface{}{
 			"success": false,
-			"message": "Excel文件中导入商品列表为空！",
+			"message": "Excel文件中导入商品负责人列表为空！",
 		})
 	}
 
@@ -149,17 +149,17 @@ func (c ErpProductUserExcel) Import() revel.Result {
 		core.HandleError(err)
 
 		product.Sku = product_user.sku
-		product.Length = product_user.length
+		product.Length = product_user.sale_user_id
 		product.Width = product_user.width
 		product.Height = product_user.height
 		product.Weight = product_user.weight
 
-		if product_user.length == 0 || product_user.width == 0 || product_user.height == 0 || product_user.weight == 0 {
+		if product_user.sale_user_id == 0 || product_user.width == 0 || product_user.height == 0 || product_user.weight == 0 {
 			has_zero_data = true
 		}
 
 		if has == true {
-			update_col_list := []string{"length", "width", "height", "weight"}
+			update_col_list := []string{"sale_user_id", "width", "height", "weight"}
 			_, err = db_session.Id(product.Id).Cols(update_col_list...).Update(&product)
 			core.HandleError(err)
 		} else {
@@ -222,7 +222,7 @@ func (c ErpProductUserExcel) Export() revel.Result {
 
 	reader := bytes.NewReader(buffer.Bytes()) //bytes.Reader 实现了 io.Reader 接口
 
-	file_name := "商品长宽高重量导出.xlsx" //"file.xlsx" //可以根据参数生成文件名
+	file_name := "商品负责人导出.xlsx" //"file.xlsx" //可以根据参数生成文件名
 
 	return c.RenderBinary(reader, file_name, revel.Attachment, time.Now())
 }
@@ -294,7 +294,7 @@ func (c ErpProductUserExcel) export_product_list_to_excel(db_session *xorm.Sessi
 	xlsx_file := xlsx.NewFile()
 
 	//添加工作表
-	sheet, err := xlsx_file.AddSheet("商品长宽高重量列表")
+	sheet, err := xlsx_file.AddSheet("商品负责人列表")
 	core.HandleError(err)
 
 	//添加标题行

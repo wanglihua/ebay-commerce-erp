@@ -242,7 +242,16 @@
                                 return data + '&nbsp;天';
                             }
                         },
-                        {"mDataProp": "pbe.desc", "title": "备注", "bSearchable": true},
+                        {
+                            "mDataProp": "pbe.desc", "title": "备注", "bSearchable": true, "sClass": "wrap-word",
+                            "render": function (data, type, row) {
+                                if (data === null) {
+                                    return "";
+                                } else {
+                                    return "<div>" + data + "</div>"
+                                }
+                            }
+                        },
                         {"mDataProp": "s.name", "title": "状态", "bSearchable": true, "sClass": "center", "width": 60}
                     ],
                     "fnServerData": function (sSource, aoData, fnCallback) {
