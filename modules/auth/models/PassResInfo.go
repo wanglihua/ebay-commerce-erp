@@ -283,6 +283,13 @@ func (e PassResInfo) InitData(db_session *xorm.Session) {
 		db_session.Insert(pass)
 
 		pass = new(PassResInfo)
+		pass.Id = pass_res.KCGL_PRODUCT_USER
+		pass.CateId = pass_res_cate.KCGL
+		pass.Name = "商品相关人员"
+		pass.Desc = core.MakeNullString("商品相关人员", true)
+		db_session.Insert(pass)
+
+		pass = new(PassResInfo)
 		pass.Id = pass_res.KCGL_INVENTORY
 		pass.CateId = pass_res_cate.KCGL
 		pass.Name = "商品库存"

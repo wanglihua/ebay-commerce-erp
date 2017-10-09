@@ -11,18 +11,18 @@ import (
 	"matrix/modules/erp/service/product_log_service"
 )
 
-type ErpProductWeight struct {
+type ErpProductUser struct {
 	*revel.Controller
 }
 
-func (c ErpProductWeight) Index() revel.Result {
-	pass_service.Check_login_user_pass(pass_res.KCGL_PRODUCT_LWHW, c.Session)
+func (c ErpProductUser) Index() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_PRODUCT_USER, c.Session)
 
 	return c.RenderTemplate("erp/sppz/product_user/product_user_index.html")
 }
 
-func (c ErpProductWeight) ListData() revel.Result {
-	pass_service.Check_login_user_pass(pass_res.KCGL_PRODUCT_LWHW, c.Session)
+func (c ErpProductUser) ListData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_PRODUCT_USER, c.Session)
 
 	db_session := c.DbSession
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
@@ -48,7 +48,7 @@ func (c ErpProductWeight) ListData() revel.Result {
 		    INNER JOIN erp_status s ON s.id = p.status_id`)
 
 	if filter_type == 1 { // 未设置人员数据的记录
-		filter_has_zero_data := core.SqlOr("length = 0", "width = 0", "height = 0", "weight = 0")
+		filter_has_zero_data := core.SqlOr("sale_user_id = 0", "width = 0", "height = 0", "weight = 0")
 		filter = core.SqlAnd(filter, filter_has_zero_data)
 	}
 
@@ -83,8 +83,8 @@ type product_user_detail_form_t struct {
 	Product kcgl_models.ProductInfo `json:"product"`
 }
 
-func (c ErpProductWeight) DetailData() revel.Result {
-	pass_service.Check_login_user_pass(pass_res.KCGL_PRODUCT_LWHW, c.Session)
+func (c ErpProductUser) DetailData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_PRODUCT_USER, c.Session)
 
 	db_session := c.DbSession
 
@@ -101,8 +101,8 @@ func (c ErpProductWeight) DetailData() revel.Result {
 	return c.RenderJson(detail_form)
 }
 
-func (c ErpProductWeight) Save() revel.Result {
-	pass_service.Check_login_user_pass(pass_res.KCGL_PRODUCT_LWHW, c.Session)
+func (c ErpProductUser) Save() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.KCGL_PRODUCT_USER, c.Session)
 
 	db_session := c.DbSession
 
@@ -124,12 +124,12 @@ func (c ErpProductWeight) Save() revel.Result {
 
 	var product_in_db_befor_modify = product_in_db
 
-	product_in_db.Length = detail_form.Product.Length
+	product_in_db.SaleUserId = detail_form.Product.SaleUserId
 	product_in_db.Width = detail_form.Product.Width
 	product_in_db.Height = detail_form.Product.Height
 	product_in_db.Weight = detail_form.Product.Weight
 
-	updata_col_List := []string{"length", "width", "height", "weight"}
+	updata_col_List := []string{"sale_user_id", "width", "height", "weight"}
 	affected_count, err := db_session.Id(product_id).Cols(updata_col_List...).Update(&product_in_db)
 	core.HandleError(err)
 

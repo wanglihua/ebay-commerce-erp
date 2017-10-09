@@ -11,5 +11,5 @@ func CalculateBillEntryDrawbackAmount(bill_entry cggl_models.PurchaseBillEntryIn
 
 	// return ((bill_entry.Price * float64(bill_entry.Qty)) / 1.17) * bill_entry.DrawbackPoint
 	// 退税额，只需计算单个商品的就可以了，不用考虑数量的
-	return (bill_entry.Price / 1.17) * bill_entry.DrawbackPoint
+	return (bill_entry.Price / 1.17) * bill_entry.DrawbackPoint / 100
 }
