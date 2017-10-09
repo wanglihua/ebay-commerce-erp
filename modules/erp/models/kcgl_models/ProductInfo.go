@@ -39,6 +39,9 @@ type ProductInfo struct {
 	DimWeight        string          `xorm:"-" json:"dim_weight"`                                                                                          // 体积重， Kg， 只是用于界面显示
 	AvgFee           string          `xorm:"-" json:"avg_fee"`                                                                                             // 平均费用
 	PostageCalWeight float64         `xorm:"decimal(18,6) notnull 'postage_cal_weight' default(0)" json:"postage_cal_weight" smith:"verbose_name=客户端运费权重"` // 客户端运费计算权重
+	SaleUserId       int64           `xorm:"bigint notnull index 'sale_user_id' default(0)" json:"sale_user_id" smith:"verbose_name=销售人员"`
+	ServiceUserId    int64           `xorm:"bigint notnull index 'service_user_id' default(0)" json:"service_user_id" smith:"verbose_name=客服人员"`
+	DevUserId        int64           `xorm:"bigint notnull index 'dev_user_id' default(0)" json:"dev_user_id" smith:"verbose_name=开发人员"`
 	CreateTime       core.Time       `xorm:"created notnull 'create_time'" json:"create_time"`
 	UpdateTime       core.Time       `xorm:"updated notnull 'update_time'" json:"update_time"`
 }
