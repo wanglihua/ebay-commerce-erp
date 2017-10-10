@@ -357,9 +357,11 @@ func (c ErpProductFeedback) Save() revel.Result {
 
 	product_feedback.ProductId = product.Id
 
+	var login_user = core.GetLoginUser(c.Session)
+
 	var affected int64
 	if detail_form.IsCreate() {
-		var login_user = core.GetLoginUser(c.Session)
+
 		product_feedback.UserId = login_user.UserId
 		product_feedback.UserLoginName = login_user.LoginName
 
