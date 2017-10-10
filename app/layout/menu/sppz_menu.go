@@ -115,6 +115,16 @@ func GetSppzMenu(res_id_map map[int64]bool, web_session revel.Session) string {
 	</li>`)
 	}
 
+	if check_pass_res_menu(pass_res.SPPZ_PRODUCT_USER) {
+		buffer.WriteString(`<li id="sppz-product-user-menu" class="">
+		<a href="/product/user">
+			<i class="menu-icon fa fa-caret-right"></i>
+			商品负责人
+		</a>
+		<b class="arrow"></b>
+	</li>`)
+	}
+
 	/*
 
 	<li id="sppz-product-style-menu" class="">

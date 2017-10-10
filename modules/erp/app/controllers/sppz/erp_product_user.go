@@ -16,13 +16,13 @@ type ErpProductUser struct {
 }
 
 func (c ErpProductUser) Index() revel.Result {
-	pass_service.Check_login_user_pass(pass_res.KCGL_PRODUCT_USER, c.Session)
+	pass_service.Check_login_user_pass(pass_res.SPPZ_PRODUCT_USER, c.Session)
 
 	return c.RenderTemplate("erp/sppz/product_user/product_user_index.html")
 }
 
 func (c ErpProductUser) ListData() revel.Result {
-	pass_service.Check_login_user_pass(pass_res.KCGL_PRODUCT_USER, c.Session)
+	pass_service.Check_login_user_pass(pass_res.SPPZ_PRODUCT_USER, c.Session)
 
 	var db_session = c.DbSession
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
@@ -93,7 +93,7 @@ type product_user_detail_form_t struct {
 }
 
 func (c ErpProductUser) DetailData() revel.Result {
-	pass_service.Check_login_user_pass(pass_res.KCGL_PRODUCT_USER, c.Session)
+	pass_service.Check_login_user_pass(pass_res.SPPZ_PRODUCT_USER, c.Session)
 
 	var db_session = c.DbSession
 
@@ -111,7 +111,7 @@ func (c ErpProductUser) DetailData() revel.Result {
 }
 
 func (c ErpProductUser) Save() revel.Result {
-	pass_service.Check_login_user_pass(pass_res.KCGL_PRODUCT_USER, c.Session)
+	pass_service.Check_login_user_pass(pass_res.SPPZ_PRODUCT_USER, c.Session)
 
 	var db_session = c.DbSession
 

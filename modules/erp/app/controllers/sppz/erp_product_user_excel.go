@@ -21,7 +21,7 @@ type ErpProductUserExcel struct {
 }
 
 func (c ErpProductUserExcel) Import() revel.Result {
-	pass_service.Check_login_user_pass(pass_res.KCGL_PRODUCT_USER, c.Session)
+	pass_service.Check_login_user_pass(pass_res.SPPZ_PRODUCT_USER, c.Session)
 
 	db_session := c.DbSession
 
@@ -178,7 +178,7 @@ func (c ErpProductUserExcel) Import() revel.Result {
 }
 
 func (c ErpProductUserExcel) Export() revel.Result {
-	pass_service.Check_login_user_pass(pass_res.KCGL_PRODUCT_USER, c.Session)
+	pass_service.Check_login_user_pass(pass_res.SPPZ_PRODUCT_USER, c.Session)
 
 	db_session := c.DbSession
 

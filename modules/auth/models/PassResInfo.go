@@ -283,13 +283,6 @@ func (e PassResInfo) InitData(db_session *xorm.Session) {
 		db_session.Insert(pass)
 
 		pass = new(PassResInfo)
-		pass.Id = pass_res.KCGL_PRODUCT_USER
-		pass.CateId = pass_res_cate.KCGL
-		pass.Name = "商品负责人"
-		pass.Desc = core.MakeNullString("商品负责人", true)
-		db_session.Insert(pass)
-
-		pass = new(PassResInfo)
 		pass.Id = pass_res.KCGL_INVENTORY
 		pass.CateId = pass_res_cate.KCGL
 		pass.Name = "商品库存"
@@ -493,6 +486,13 @@ func (e PassResInfo) InitData(db_session *xorm.Session) {
 		pass.CateId = pass_res_cate.SPPZ
 		pass.Name = "商品状态"
 		pass.Desc = core.MakeNullString("商品状态", true)
+		db_session.Insert(pass)
+
+		pass = new(PassResInfo)
+		pass.Id = pass_res.SPPZ_PRODUCT_USER
+		pass.CateId = pass_res_cate.SPPZ
+		pass.Name = "商品负责人"
+		pass.Desc = core.MakeNullString("商品负责人", true)
 		db_session.Insert(pass)
 
 		pass = new(PassResInfo)

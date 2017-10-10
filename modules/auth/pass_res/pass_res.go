@@ -89,7 +89,6 @@ const (
 	KCGL_PRODUCT_IMPORT          = 140300 // 商品导入
 	KCGL_PRODUCT_EXPORT          = 140400 // 商品导出
 	KCGL_PRODUCT_LWHW            = 140401 // 商品长宽高重量
-	KCGL_PRODUCT_USER            = 140402 // 商品负责人
 	KCGL_INVENTORY               = 140500 // 商品库存
 	KCGL_INVENTORY_IMPORT_QTY    = 140531 // 商品库存 导入库存数量
 	KCGL_INVENTORY_EXPORT_QTY    = 140532 // 商品库存 导出库存数量
@@ -122,6 +121,7 @@ const (
 	SPPZ_PRODUCT_CERT        = 151200 // 商品认证
 	SPPZ_PRODUCT_STYLE       = 151300 // 商品款式
 	SPPZ_SUPPLIER_PAY_METHOD = 151400 // 供应商付款方式
+	SPPZ_PRODUCT_USER        = 151500 // 商品负责人
 
 	// 海关报关
 	HGBG_PRODUCT_HS_CODE                = 160100 // 商品海关编码
