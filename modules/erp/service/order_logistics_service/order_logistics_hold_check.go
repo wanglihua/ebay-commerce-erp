@@ -558,6 +558,27 @@ func (p_ol *OrderLogisticsService) hold_check_special_sku(p_order *ddlc_models.O
 	return false
 }
 
+func (p_ol *OrderLogisticsService) hold_check_mel_temp_sku(p_order *ddlc_models.OrderInfo, p_order_logistics_data *order_logistics_data_t, db_session *xorm.Session) (is_hold_return bool) {
+	var is_special_product_id = func(product_id int64, special_product_list []kcgl_models.ProductMelTempSkuInfo) bool {
+		for _, special_product := range special_product_list {
+			if special_product.ProductId == product_id {
+				return true
+			}
+		}
+
+		return false
+	}
+
+	for _, order_product_info := range p_order_logistics_data.order_product_info_list {
+		if is_special_product_id(order_product_info.ProductId, p_ol.product_mel_temp_sku_list) == true {
+			p_ol.update_order_to_hold_type(p_order, ddpz_models.ORDER_HOLD_TYPE_MEL_TEMP_SKU, db_session)
+			return true
+		}
+	}
+
+	return false
+}
+
 func (p_ol *OrderLogisticsService) update_order_to_hold_type(p_order *ddlc_models.OrderInfo, hold_type_id int64, db_session *xorm.Session) {
 	p_order.HoldTypeId = core.MakeNullInt(hold_type_id, true)
 	p_order.StatusId = models.ORDER_STATUS_HOLD // 修改订单状态为 hold 状态

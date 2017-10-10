@@ -6,13 +6,13 @@ import (
 )
 
 type OrderHoldTypeInfo struct {
-	Id         int64               `xorm:"bigint notnull pk 'id'" json:"id"`
-	Name       string              `xorm:"nvarchar(200) notnull index unique 'name'" json:"name" smith:"verbose_name=名称"`
-	Desc       string              `xorm:"nvarchar(500) notnull 'desc'" json:"desc" smith:"verbose_name=备注"`
-	IconFile   string              `xorm:"nvarchar(200) null 'icon_file'" json:"icon_file" smith:"verbose_name=图标"`
-	Ord        int64               `xorm:"bigint null 'ord'" json:"ord" smith:"verbose_name=排序"`
-	CreateTime core.Time           `xorm:"created notnull 'create_time'" json:"create_time"`
-	UpdateTime core.Time           `xorm:"updated notnull 'update_time'" json:"update_time"`
+	Id         int64     `xorm:"bigint notnull pk 'id'" json:"id"`
+	Name       string    `xorm:"nvarchar(200) notnull index unique 'name'" json:"name" smith:"verbose_name=名称"`
+	Desc       string    `xorm:"nvarchar(500) notnull 'desc'" json:"desc" smith:"verbose_name=备注"`
+	IconFile   string    `xorm:"nvarchar(200) null 'icon_file'" json:"icon_file" smith:"verbose_name=图标"`
+	Ord        int64     `xorm:"bigint null 'ord'" json:"ord" smith:"verbose_name=排序"`
+	CreateTime core.Time `xorm:"created notnull 'create_time'" json:"create_time"`
+	UpdateTime core.Time `xorm:"updated notnull 'update_time'" json:"update_time"`
 }
 
 func (e OrderHoldTypeInfo) TableName() string {
@@ -45,6 +45,7 @@ const (
 	ORDER_HOLD_TYPE_INTERNATIONAL                 int64 = 10160 // 国际件。对于非澳大利亚的订单，直接到国际件模块
 	ORDER_HOLD_TYPE_ADDRESS_INFO_MISS             int64 = 10170 // 收货人信息不全的，比如没有手机号，没有邮编等等
 	ORDER_HOLD_TYPE_SPECIAL_PRODUCT               int64 = 10180 // 特殊SKU
+	ORDER_HOLD_TYPE_MEL_TEMP_SKU                  int64 = 10185 // MEL临时SKU
 	ORDER_HOLD_TYPE_SPECIAL_NOT_SHIP              int64 = 10190 // 特殊情况实际未发货
 	ORDER_HOLD_TYPE_SPECIAL_HOLD_SPECIAL_NOT_SHIP int64 = 10200 // 特殊Hold特殊情况实际未发货
 )
@@ -199,7 +200,14 @@ func (e OrderHoldTypeInfo) InitData(db_session *xorm.Session) {
 	order_hold_type.Desc = "特殊的商品SKU"
 	db_session.Insert(order_hold_type)
 
-	// ORDER_HOLD_TYPE_SPECIAL_NOT_SHIP      int64 = 10190 // 特殊情况实际未发货
+	// ORDER_HOLD_TYPE_MEL_TEMP_SKU           int64 = 10185 // MEL临时SKU
+	order_hold_type = new(OrderHoldTypeInfo)
+	order_hold_type.Id = ORDER_HOLD_TYPE_MEL_TEMP_SKU
+	order_hold_type.Name = "MEL临时SKU"
+	order_hold_type.Desc = "MEL临时商品SKU"
+	db_session.Insert(order_hold_type)
+
+	// ORDER_HOLD_TYPE_SPECIAL_NOT_SHIP       int64 = 10190 // 特殊情况实际未发货
 	order_hold_type = new(OrderHoldTypeInfo)
 	order_hold_type.Id = ORDER_HOLD_TYPE_SPECIAL_NOT_SHIP
 	order_hold_type.Name = "特殊情况实际未发货"
