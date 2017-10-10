@@ -202,6 +202,13 @@ POST /special/product/save                 ErpSpecialProduct.Save
 POST /special/product/batch/add            ErpSpecialProduct.BatchAdd
 POST /special/product/delete               ErpSpecialProduct.Delete
 
+GET  /product/mel/temp/sku                 ErpProductMelTempSku.Index
+POST /product/mel/temp/sku/data/list       ErpProductMelTempSku.ListData
+POST /product/mel/temp/sku/data/detail     ErpProductMelTempSku.DetailData
+POST /product/mel/temp/sku/save            ErpProductMelTempSku.Save
+POST /product/mel/temp/sku/batch/add       ErpProductMelTempSku.BatchAdd
+POST /product/mel/temp/sku/delete          ErpProductMelTempSku.Delete
+
 GET  /product/sale/analysis/setting              ErpProductSaleAnalysisSetting.Index
 POST /product/sale/analysis/setting/data/detail  ErpProductSaleAnalysisSetting.DetailData
 POST /product/sale/analysis/setting/save         ErpProductSaleAnalysisSetting.Save

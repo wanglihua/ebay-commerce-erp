@@ -100,6 +100,7 @@ const (
 	KCGL_STOCKBILL_CHECKIN       = 141000 // 手工入库
 	KCGL_STOCKBILL_CHECKOUT      = 141100 // 手工出库
 	KCGL_SPECIAL_SKU             = 141200 // 特殊SKU
+	KCGL_MEL_TEMP_SKU            = 141300 // 墨尔本临时SKU
 
 	//KCGL_INVENTORY_IMPORT_QTY_OVER = 140510 // 商品库存 导入覆盖库存数量
 	//KCGL_INVENTORY_IMPORT_QTY_DIFF = 140520 // 商品库存 导入修正库存数量
