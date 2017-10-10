@@ -51,10 +51,10 @@ func (c ErpProductUser) ListData() revel.Result {
 	sb.Select("p.*, sale_user.*, service_user.*, dev_user.*, s.*")
 	sb.Count("count(p.id) AS product_count")
 	sb.From(`erp_product p
-			INNER JOIN erp_status s ON s.id = p.status_id
-			LEFT JOIN auth_user sale_user ON sale_user.id = p.sale_user_id
-			LEFT JOIN auth_user service_user ON service_user.id = p.service_user_id
-			LEFT JOIN auth_user dev_user ON dev_user.id = p.dev_user_id`)
+		INNER JOIN erp_status s ON s.id = p.status_id
+		LEFT JOIN auth_user sale_user ON sale_user.id = p.sale_user_id
+		LEFT JOIN auth_user service_user ON service_user.id = p.service_user_id
+		LEFT JOIN auth_user dev_user ON dev_user.id = p.dev_user_id`)
 
 	if filter_type == 1 { // 未设置人员数据的记录
 		filter_has_zero_data := core.SqlOr("p.sale_user_id = 0", "p.service_user_id = 0", "p.dev_user_id = 0")

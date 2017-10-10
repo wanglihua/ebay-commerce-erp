@@ -236,21 +236,33 @@
                             }
                         },
                         {
-                            "mDataProp": "sale_user.id", "title": "销售人员", "bSearchable": false, "width": 80,
+                            "mDataProp": "sale_user.id", "title": "销售人员", "bSearchable": false, "sClass": "center", "width": 120,
                             "render": function (data, type, row) {
-                                return row.sale_user.login_name + "(" + row.sale_user.nick_name + ")";
+                                if (data !== 0) {
+                                    return row.sale_user.login_name + "(" + row.sale_user.nick_name + ")";
+                                } else {
+                                    return "";
+                                }
                             }
                         },
                         {
-                            "mDataProp": "service_user.id", "title": "客服人员", "bSearchable": false, "width": 80,
+                            "mDataProp": "service_user.id", "title": "客服人员", "bSearchable": false, "sClass": "center", "width": 120,
                             "render": function (data, type, row) {
-                                return row.service_user.login_name + "(" + row.service_user.nick_name + ")";
+                                if (data !== 0) {
+                                    return row.service_user.login_name + "(" + row.service_user.nick_name + ")";
+                                } else {
+                                    return "";
+                                }
                             }
                         },
                         {
-                            "mDataProp": "dev_user.id", "title": "开发人员", "bSearchable": false, "width": 80,
+                            "mDataProp": "dev_user.id", "title": "开发人员", "bSearchable": false, "sClass": "center", "width": 120,
                             "render": function (data, type, row) {
-                                return row.dev_user.login_name + "(" + row.dev_user.nick_name + ")";
+                                if (data !== 0) {
+                                    return row.dev_user.login_name + "(" + row.dev_user.nick_name + ")";
+                                } else {
+                                    return "";
+                                }
                             }
                         },
                         {"mDataProp": "s.name", "title": "状态", "bSearchable": true, "width": 80},
