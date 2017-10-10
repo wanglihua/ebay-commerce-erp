@@ -107,7 +107,15 @@ func (c ErpProductUser) DetailData() revel.Result {
 	var detail_form product_user_detail_form_t
 	detail_form.Product = product
 
-	return c.RenderJson(detail_form)
+	var user_list = make([]auth_models.UserInfo, 0)
+	core.HandleError(db_session.OrderBy("login_name ASC").Find(&user_list))
+
+	return c.RenderJson(map[string]interface{}{
+		"detail":            detail_form,
+		"sale_user_list":    user_list,
+		"service_user_list": user_list,
+		"dev_user_list":     user_list,
+	})
 }
 
 func (c ErpProductUser) Save() revel.Result {

@@ -90,7 +90,12 @@
                                         <div class="form-group">
                                             <label for="sale_user_id" class="col-xs-2 control-label">销售人员</label>
                                             <div class="col-xs-10">
-                                                <input id="sale_user_id" name="detail.product.sale_user_id" type="text" class="input-sm form-control" v-model.number="detail.product.sale_user_id"/>
+                                                <select id="sale_user_id" name="detail.product.sale_user_id" type="text" class="input-sm form-control" v-model.number="detail.product.sale_user_id">
+                                                    <option :value="0"></option>
+                                                    <template v-for="user in sale_user_list">
+                                                        <option :value="user.id">{{user.login_name}}({{user.nick_name}})</option>
+                                                    </template>
+                                                </select>
                                             </div>
                                         </div>
                                     </div>
@@ -101,7 +106,12 @@
                                         <div class="form-group">
                                             <label for="service_user_id" class="col-xs-2 control-label">客服人员</label>
                                             <div class="col-xs-10">
-                                                <input id="service_user_id" name="detail.product.service_user_id" type="text" class="input-sm form-control" v-model.number="detail.product.service_user_id"/>
+                                                <select id="service_user_id" name="detail.product.service_user_id" type="text" class="input-sm form-control" v-model.number="detail.product.service_user_id">
+                                                    <option :value="0"></option>
+                                                    <template v-for="user in service_user_list">
+                                                        <option :value="user.id">{{user.login_name}}({{user.nick_name}})</option>
+                                                    </template>
+                                                </select>
                                             </div>
                                         </div>
                                     </div>
@@ -112,7 +122,12 @@
                                         <div class="form-group">
                                             <label for="dev_user_id" class="col-xs-2 control-label">开发人员</label>
                                             <div class="col-xs-10">
-                                                <input id="dev_user_id" name="detail.product.dev_user_id" type="text" class="input-sm form-control" v-model.number="detail.product.dev_user_id"/>
+                                                <select id="dev_user_id" name="detail.product.dev_user_id" type="text" class="input-sm form-control" v-model.number="detail.product.dev_user_id">
+                                                    <option :value="0"></option>
+                                                    <template v-for="user in dev_user_list">
+                                                        <option :value="user.id">{{user.login_name}}({{user.nick_name}})</option>
+                                                    </template>
+                                                </select>
                                             </div>
                                         </div>
                                     </div>
@@ -194,7 +209,10 @@
             "filter_type": 0, // 0：全部数据； 1: 有空值的数据
             "detail": {
                 "product": {}
-            }
+            },
+            "sale_user_list": [],
+            "service_user_list": [],
+            "dev_user_list": []
         },
         mounted: function () {
             var this_vm = this;
@@ -224,17 +242,6 @@
                             //<div class="tdSkuNameSup"><a href="/product/detail/' + row.prd.id + '" target="_blank">' + row.prd.sku + '</a></div>
                         },
                         {"mDataProp": "p.cn_name", "title": "商品名称", "bSearchable": true},
-                        {
-                            "mDataProp": "p.length", "title": "长度", "bSearchable": false, "width": 80,
-                            "render": function (data, type, row) {
-                                if (data !== 0) {
-                                    return dtFormatFloat1(data) + " cm";
-                                }
-                                else {
-                                    return "";
-                                }
-                            }
-                        },
                         {
                             "mDataProp": "sale_user.id", "title": "销售人员", "bSearchable": false, "sClass": "center", "width": 120,
                             "render": function (data, type, row) {
@@ -319,7 +326,10 @@
                                 $.msg.error(result.message);
                                 return;
                             }
-                            vm.detail = result;
+                            vm.detail = result.detail;
+                            vm.sale_user_list = result.sale_user_list;
+                            vm.service_user_list = result.service_user_list;
+                            vm.dev_user_list = result.dev_user_list;
                             $('#productDetailDialog').modal(modalOptions);
                         }
                     }
@@ -329,16 +339,13 @@
                 showMask("提交中...");
                 var form = $("#productDetailForm");
                 var valid = validate(form, {
-                    'detail.product.length': {
+                    'detail.product.sale_user_id': {
                         required: false, number: true
                     },
-                    'detail.product.width': {
+                    'detail.product.service_user_id': {
                         required: false, number: true
                     },
-                    'detail.product.height': {
-                        required: false, number: true
-                    },
-                    'detail.product.weight': {
+                    'detail.product.dev_user_id': {
                         required: false, number: true
                     }
                 });
