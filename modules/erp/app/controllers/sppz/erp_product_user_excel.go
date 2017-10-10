@@ -344,7 +344,25 @@ func (c ErpProductUserExcel) export_product_list_to_excel(db_session *xorm.Sessi
 		cell = row.AddCell()
 		sheet.SetColWidth(col_index, col_index, 10)
 		set_head_cell_style(cell)
+		cell.Value = "销售人员"
+		col_index++
+
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 10)
+		set_head_cell_style(cell)
 		cell.Value = "客服人员"
+		col_index++
+
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 10)
+		set_head_cell_style(cell)
+		cell.Value = "客服人员"
+		col_index++
+
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 10)
+		set_head_cell_style(cell)
+		cell.Value = "开发人员"
 		col_index++
 
 		cell = row.AddCell()
@@ -380,19 +398,38 @@ func (c ErpProductUserExcel) export_product_list_to_excel(db_session *xorm.Sessi
 		cell.Value = product.CnName
 
 		// 销售人员
+
+		var sale_user = find_user(product.SaleUserId)
+
 		cell = row.AddCell()
 		set_text_cell_style(cell, "center")
-		cell.Value = find_user(product.SaleUserId).LoginName
+		cell.Value = sale_user.LoginName
+
+		cell = row.AddCell()
+		set_text_cell_style(cell, "center")
+		cell.Value = sale_user.NickName
 
 		// 客服人员
+		var service_user = find_user(product.ServiceUserId)
+
 		cell = row.AddCell()
 		set_text_cell_style(cell, "center")
-		cell.Value = find_user(product.ServiceUserId).LoginName
+		cell.Value = service_user.LoginName
+
+		cell = row.AddCell()
+		set_text_cell_style(cell, "center")
+		cell.Value = service_user.NickName
 
 		// 开发人员
+		var dev_user = find_user(product.DevUserId)
+
 		cell = row.AddCell()
 		set_text_cell_style(cell, "center")
-		cell.Value = find_user(product.DevUserId).LoginName
+		cell.Value = dev_user.LoginName
+
+		cell = row.AddCell()
+		set_text_cell_style(cell, "center")
+		cell.Value = dev_user.NickName
 
 		// 状态
 		cell = row.AddCell()
