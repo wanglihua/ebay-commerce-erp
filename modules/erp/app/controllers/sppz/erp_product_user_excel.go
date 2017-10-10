@@ -1,20 +1,19 @@
 package controllers
 
 import (
-	"bytes"
 	"fmt"
-	"time"
-
 	"github.com/go-xorm/xorm"
 	"github.com/revel/revel"
 	"github.com/tealeg/xlsx"
 	"matrix/core"
 	"matrix/modules/auth/pass_res"
 	"matrix/modules/auth/service/pass_service"
-	"matrix/modules/erp/models"
 	"strings"
 	"matrix/modules/erp/models/kcgl_models"
-	"strconv"
+	"bytes"
+	"time"
+	auth_models "matrix/modules/auth/models"
+	"matrix/modules/erp/models"
 )
 
 type ErpProductUserExcel struct {
@@ -22,7 +21,7 @@ type ErpProductUserExcel struct {
 }
 
 func (c ErpProductUserExcel) Import() revel.Result {
-	pass_service.Check_login_user_pass(pass_res.KCGL_PRODUCT_LWHW, c.Session)
+	pass_service.Check_login_user_pass(pass_res.KCGL_PRODUCT_USER, c.Session)
 
 	db_session := c.DbSession
 
@@ -39,11 +38,14 @@ func (c ErpProductUserExcel) Import() revel.Result {
 	}
 
 	type product_user_t struct {
-		sku          string
-		sale_user_id float64
-		width        float64
-		height       float64
-		weight       float64
+		sku                     string
+		sale_user_login_name    string
+		service_user_login_name string
+		dev_user_login_name     string
+		product                 kcgl_models.ProductInfo
+		sale_user_id            int64
+		service_user_id         int64
+		dev_user_id             int64
 	}
 
 	product_user_list := make([]product_user_t, 0)
@@ -60,7 +62,7 @@ func (c ErpProductUserExcel) Import() revel.Result {
 		//revel.TRACE.Printf("max_row: %d\n", max_row)
 		//略过标题行
 		for row_index := 1; row_index < max_row; row_index ++ {
-			row := sheet.Rows[row_index]
+			// row := sheet.Rows[row_index]
 
 			var cell *xlsx.Cell
 			var cell_val string
@@ -70,12 +72,7 @@ func (c ErpProductUserExcel) Import() revel.Result {
 
 			col_index := 1 //从第二列开始导入，略去第一列的编号
 
-			if len(row.Cells) < 5 {
-				break
-			}
-
 			//SKU
-			// cell = row.Cells[col_index]
 			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
@@ -83,52 +80,28 @@ func (c ErpProductUserExcel) Import() revel.Result {
 			if cell_val == "" {
 				break
 			}
-			//revel.TRACE.Println(cell_val)
 			product_user.sku = cell_val
 			col_index++
 
-			// sale_user_id
-			// cell = row.Cells[col_index]
+			// sale_user_login_name
 			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
-			//revel.TRACE.Println(cell_val)
-			product_sale_user_id, err := strconv.ParseFloat(cell_val, 64)
-			core.HandleError(err)
-			product_user.sale_user_id = product_sale_user_id
+			product_user.sale_user_login_name = cell_val
 			col_index++
 
-			// width
-			// cell = row.Cells[col_index]
+			// service_user_login_name
 			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
-			//revel.TRACE.Println(cell_val)
-			product_width, err := strconv.ParseFloat(cell_val, 64)
-			core.HandleError(err)
-			product_user.width = product_width
+			product_user.service_user_login_name = cell_val
 			col_index++
 
-			// height
-			// cell = row.Cells[col_index]
+			// dev_user_login_name
 			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
-			//revel.TRACE.Println(cell_val)
-			product_height, err := strconv.ParseFloat(cell_val, 64)
-			core.HandleError(err)
-			product_user.height = product_height
-			col_index++
-
-			// weight
-			// cell = row.Cells[col_index]
-			cell = sheet.Cell(row_index, col_index)
-			cell_val, err = cell.String()
-			core.HandleError(err)
-			//revel.TRACE.Println(cell_val)
-			weight, err := strconv.ParseFloat(cell_val, 64)
-			core.HandleError(err)
-			product_user.weight = weight
+			product_user.dev_user_login_name = cell_val
 			col_index++
 
 			product_user_list = append(product_user_list, product_user)
@@ -142,60 +115,70 @@ func (c ErpProductUserExcel) Import() revel.Result {
 		})
 	}
 
-	has_zero_data := false
-	for _, product_user := range product_user_list {
+	for index, product_user := range product_user_list {
 		var product kcgl_models.ProductInfo
 		has, err := db_session.Where(fmt.Sprintf("sku = '%s'", product_user.sku)).Get(&product)
 		core.HandleError(err)
 
-		product.Sku = product_user.sku
-		product.Length = product_user.sale_user_id
-		product.Width = product_user.width
-		product.Height = product_user.height
-		product.Weight = product_user.weight
-
-		if product_user.sale_user_id == 0 || product_user.width == 0 || product_user.height == 0 || product_user.weight == 0 {
-			has_zero_data = true
+		if has == false {
+			panic(fmt.Sprintf("商品SKU %s 数据库中不存在！", product_user.sku))
 		}
 
-		if has == true {
-			update_col_list := []string{"sale_user_id", "width", "height", "weight"}
-			_, err = db_session.Id(product.Id).Cols(update_col_list...).Update(&product)
-			core.HandleError(err)
+		product_user_list[index].product = product
+
+		// 销售人员
+		var sale_user auth_models.UserInfo
+		has, err = db_session.Where("login_name = ?", product_user.sale_user_login_name).Get(&sale_user)
+		core.HandleError(err)
+
+		if has == false {
+			panic(fmt.Sprintf("指定的销售人员工号数据库中不存在！"))
 		} else {
-			/*
-			// 这里只用于维护和更新长宽高数据，不进行数据的插入操作
-			return c.RenderJson(map[string]interface{}{
-				"success": true,
-				"message": "商品SKU数据库中不存在！",
-			})
-			*/
+			product_user_list[index].sale_user_id = sale_user.Id
+		}
 
-			panic(fmt.Sprintf("商品SKU %s 数据库中不存在！", product_user.sku))
+		// 客服人员
+		var service_user auth_models.UserInfo
+		has, err = db_session.Where("login_name = ?", product_user.service_user_login_name).Get(&service_user)
+		core.HandleError(err)
 
-			/*
-			product.CnName = product.Sku
-			product.Name = product.Sku
-			product.StatusId = models.PRODUCT_STATUS_ZC
-			_, err = db_session.Insert(&product)
-			core.HandleError(err)
-			*/
+		if has == false {
+			panic(fmt.Sprintf("指定的客服人员工号数据库中不存在！"))
+		} else {
+			product_user_list[index].service_user_id = service_user.Id
+		}
+
+		// 开发人员
+		var dev_user auth_models.UserInfo
+		has, err = db_session.Where("login_name = ?", product_user.dev_user_login_name).Get(&dev_user)
+		core.HandleError(err)
+
+		if has == false {
+			panic(fmt.Sprintf("指定的开发人员工号数据库中不存在！"))
+		} else {
+			product_user_list[index].dev_user_id = dev_user.Id
 		}
 	}
 
-	message := "数据导入成功！"
-	if has_zero_data == true {
-		message = "数据导入成功, 部分长宽高数据为零！"
+	for _, product_user := range product_user_list {
+		var product = product_user.product
+		product.SaleUserId = product_user.sale_user_id
+		product.ServiceUserId = product_user.service_user_id
+		product.DevUserId = product_user.dev_user_id
+
+		update_col_list := []string{"sale_user_id", "service_user_id", "dev_user_id"}
+		_, err = db_session.Id(product.Id).Cols(update_col_list...).Update(&product)
+		core.HandleError(err)
 	}
 
 	return c.RenderJson(map[string]interface{}{
 		"success": true,
-		"message": message,
+		"message": "数据导入成功！",
 	})
 }
 
 func (c ErpProductUserExcel) Export() revel.Result {
-	pass_service.Check_login_user_pass(pass_res.KCGL_PRODUCT_LWHW, c.Session)
+	pass_service.Check_login_user_pass(pass_res.KCGL_PRODUCT_USER, c.Session)
 
 	db_session := c.DbSession
 
@@ -227,7 +210,8 @@ func (c ErpProductUserExcel) Export() revel.Result {
 	return c.RenderBinary(reader, file_name, revel.Attachment, time.Now())
 }
 
-func (c ErpProductUserExcel) export_product_list_to_excel(db_session *xorm.Session, product_list []kcgl_models.ProductInfo) *xlsx.File {
+func (c ErpProductUserExcel) export_product_list_to_excel(db_session *xorm.Session,
+	product_list []kcgl_models.ProductInfo) *xlsx.File {
 
 	//统一设置标题单元格格式的函数
 	set_head_cell_style := func(cell *xlsx.Cell) {
@@ -317,6 +301,19 @@ func (c ErpProductUserExcel) export_product_list_to_excel(db_session *xorm.Sessi
 		return ""
 	}
 
+	var user_list = make([]auth_models.UserInfo, 0)
+	core.HandleError(db_session.Find(&user_list))
+
+	var find_user = func(user_id int64) auth_models.UserInfo {
+		for _, user := range user_list {
+			if user.Id == user_id {
+				return user
+			}
+		}
+
+		return auth_models.UserInfo{}
+	}
+
 	//序号	SKU	中文名称	产品长度（cm）	产品宽度（cm）	产品高度（cm）	实际重量(kg)	状态
 
 	{
@@ -341,25 +338,19 @@ func (c ErpProductUserExcel) export_product_list_to_excel(db_session *xorm.Sessi
 		cell = row.AddCell()
 		sheet.SetColWidth(col_index, col_index, 10)
 		set_head_cell_style(cell)
-		cell.Value = "产品长度（cm）"
+		cell.Value = "销售人员"
 		col_index++
 
 		cell = row.AddCell()
 		sheet.SetColWidth(col_index, col_index, 10)
 		set_head_cell_style(cell)
-		cell.Value = "产品宽度（cm）"
+		cell.Value = "客服人员"
 		col_index++
 
 		cell = row.AddCell()
 		sheet.SetColWidth(col_index, col_index, 10)
 		set_head_cell_style(cell)
-		cell.Value = "产品高度（cm）"
-		col_index++
-
-		cell = row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 10)
-		set_head_cell_style(cell)
-		cell.Value = "实际重量(kg)"
+		cell.Value = "开发人员"
 		col_index++
 
 		cell = row.AddCell()
@@ -388,25 +379,20 @@ func (c ErpProductUserExcel) export_product_list_to_excel(db_session *xorm.Sessi
 		set_text_cell_style(cell, "left")
 		cell.Value = product.CnName
 
-		// 	产品长度（cm）
+		// 销售人员
 		cell = row.AddCell()
-		set_text_cell_style(cell, "right")
-		cell.Value = fmt.Sprintf("%0.2f", product.Length)
+		set_text_cell_style(cell, "center")
+		cell.Value = find_user(product.SaleUserId).LoginName
 
-		// 产品宽度（cm）
+		// 客服人员
 		cell = row.AddCell()
-		set_text_cell_style(cell, "right")
-		cell.Value = fmt.Sprintf("%0.2f", product.Width)
+		set_text_cell_style(cell, "center")
+		cell.Value = find_user(product.ServiceUserId).LoginName
 
-		// 	产品高度（cm）
+		// 开发人员
 		cell = row.AddCell()
-		set_text_cell_style(cell, "right")
-		cell.Value = fmt.Sprintf("%0.2f", product.Height)
-
-		// 	实际重量(kg)
-		cell = row.AddCell()
-		set_text_cell_style(cell, "right")
-		cell.Value = fmt.Sprintf("%0.3f", product.Weight)
+		set_text_cell_style(cell, "center")
+		cell.Value = find_user(product.DevUserId).LoginName
 
 		// 状态
 		cell = row.AddCell()

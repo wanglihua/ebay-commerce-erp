@@ -123,7 +123,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-success btn-sm" @click="saveProductWeight()">
+                    <button type="button" class="btn btn-success btn-sm" @click="saveProductUser()">
                         <i class="ace-icon fa fa-floppy-o"></i>保存
                     </button>
                     <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">
@@ -155,7 +155,7 @@
             browse_button: 'btnImport',
             file_data_name: "excel_file",
 
-            url: '{%url "ErpProductUser.Import"%}',
+            url: '{%url "ErpProductUserExcel.Import"%}',
             max_file_size: '10000kb',
 
             filters: [
@@ -257,17 +257,6 @@
                                 }
                             }
                         },
-                        {
-                            "mDataProp": "p.weight", "title": "重量", "bSearchable": false, "width": 80,
-                            "render": function (data, type, row) {
-                                if (data !== 0) {
-                                    return dtFormatFloat3(data) + " kg";
-                                }
-                                else {
-                                    return "";
-                                }
-                            }
-                        },
                         {"mDataProp": "s.name", "title": "状态", "bSearchable": true, "width": 80},
                         {"mDataProp": "p.create_time", "title": "创建时间", "bSearchable": false, "width": 120},
                         {"mDataProp": "p.update_time", "title": "修改时间", "bSearchable": false, "width": 120}
@@ -311,29 +300,24 @@
                 showMask("加载中...");
                 $("#productDetailDialog").clearValidation();
                 $.ajax({
-                        url: '{%url "ErpProductWeight.DetailData" %}',
+                        url: '{%url "ErpProductUser.DetailData" %}',
                         type: "POST",
                         data: {
                             "id": product_id
                         },
                         success: function (result) {
                             hideMask();
-                            if (result.success == false) {
+                            if (result.success === false) {
                                 $.msg.error(result.message);
                                 return;
                             }
                             vm.detail = result;
-                            vm.detail.product.length = parseFloat(dtFormatFloat1(result.product.length));
-                            vm.detail.product.width = parseFloat(dtFormatFloat1(result.product.width));
-                            vm.detail.product.height = parseFloat(dtFormatFloat1(result.product.height));
-                            vm.detail.product.weight = parseFloat(dtFormatFloat3(result.product.weight));
-
                             $('#productDetailDialog').modal(modalOptions);
                         }
                     }
                 );
             },
-            saveProductWeight: function () {
+            saveProductUser: function () {
                 showMask("提交中...");
                 var form = $("#productDetailForm");
                 var valid = validate(form, {
@@ -355,14 +339,14 @@
                     hideMask();
                 } else {
                     $.ajax({
-                            url: '{%url "ErpProductWeight.Save"%}',
+                            url: '{%url "ErpProductUser.Save"%}',
                             type: "POST",
                             processData: false,
                             contentType: 'application/json',
                             data: JSON.stringify(vm.detail),
                             success: function (data) {
                                 hideMask();
-                                if (data.success == false) {
+                                if (data.success === false) {
                                     $.msg.error(data.message);
                                     //return;
                                 }
@@ -388,7 +372,7 @@
                 var params = $.param({
                     "id_list": id_list
                 });
-                var url = '{%url "ErpProductWeightExport.Export"%}' + "?" + params;
+                var url = '{%url "ErpProductUserExcel.Export"%}' + "?" + params;
                 $('<form method="post" action="' + url + '"></form>').appendTo('body').submit().remove();
             }
         }
