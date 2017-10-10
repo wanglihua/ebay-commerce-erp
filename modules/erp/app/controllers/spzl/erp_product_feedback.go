@@ -372,7 +372,23 @@ func (c ErpProductFeedback) Save() revel.Result {
 		//_, err = db_session.Id(product_feedback.Id).Cols("code").Update(&product_feedback)
 		//core.HandleError(err)
 	} else {
-		affected, err = db_session.Id(product_feedback.Id).Cols("cate_id", "product_id", "supplier_id", "description", "solution").Update(&product_feedback)
+		var update_col_list = make([]string, 0)
+
+		update_col_list = append(update_col_list, "cate_id")
+		update_col_list = append(update_col_list, "product_id")
+		update_col_list = append(update_col_list, "supplier_id")
+		update_col_list = append(update_col_list, "description")
+		update_col_list = append(update_col_list, "solution")
+
+		if product_feedback.Solution != "" {
+			product_feedback.SluUserId = login_user.UserId
+			product_feedback.SluUserLoginName = login_user.LoginName
+
+			update_col_list = append(update_col_list, "slu_user_id")
+			update_col_list = append(update_col_list, "slu_user_login_name")
+		}
+
+		affected, err = db_session.Id(product_feedback.Id).Cols(update_col_list...).Update(&product_feedback)
 		core.HandleError(err)
 
 		if affected == 0 {
