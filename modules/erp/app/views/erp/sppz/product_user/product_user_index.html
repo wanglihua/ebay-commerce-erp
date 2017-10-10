@@ -236,25 +236,21 @@
                             }
                         },
                         {
-                            "mDataProp": "p.width", "title": "销售人员", "bSearchable": false, "width": 80,
+                            "mDataProp": "sale_user.id", "title": "销售人员", "bSearchable": false, "width": 80,
                             "render": function (data, type, row) {
-                                if (data !== 0) {
-                                    return dtFormatFloat1(data) + " cm";
-                                }
-                                else {
-                                    return "";
-                                }
+                                return row.sale_user.login_name + "(" + row.sale_user.nick_name + ")";
                             }
                         },
                         {
-                            "mDataProp": "p.height", "title": "高度", "bSearchable": false, "width": 80,
+                            "mDataProp": "service_user.id", "title": "客服人员", "bSearchable": false, "width": 80,
                             "render": function (data, type, row) {
-                                if (data !== 0) {
-                                    return dtFormatFloat1(data) + " cm";
-                                }
-                                else {
-                                    return "";
-                                }
+                                return row.service_user.login_name + "(" + row.service_user.nick_name + ")";
+                            }
+                        },
+                        {
+                            "mDataProp": "dev_user.id", "title": "开发人员", "bSearchable": false, "width": 80,
+                            "render": function (data, type, row) {
+                                return row.dev_user.login_name + "(" + row.dev_user.nick_name + ")";
                             }
                         },
                         {"mDataProp": "s.name", "title": "状态", "bSearchable": true, "width": 80},
