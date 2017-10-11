@@ -323,6 +323,7 @@ func (c ErpPurchaseBillEntryExcel) Import() revel.Result {
 
 type purchase_bill_entry_item_t struct {
 	PurchaseBillEntry cggl_models.PurchaseBillEntryInfo `xorm:"extends" json:"pbe"`
+	PurchaseBill      cggl_models.PurchaseBillInfo      `xorm:"extends" json:"pb"`
 	Product           kcgl_models.ProductInfo           `xorm:"extends" json:"p"`
 	Status            models.StatusInfo                 `xorm:"extends" json:"s"`
 }
@@ -340,16 +341,17 @@ func (c ErpPurchaseBillEntryExcel) Export() revel.Result {
 	core.HandleError(err)
 
 	/*
-		SELECT pbe.*, p.*, s.*
+		SELECT pbe.*, pb.*, p.*, s.*
 		FROM erp_purchase_bill_entry pbe
+			INNER JOIN erp_purchase_bill pb ON pb.id = pbe.bill_id
 			INNER JOIN erp_product p ON p.id = pbe.product_id
 			INNER JOIN erp_status s ON s.id = pbe.status_id;
 	*/
 
 	var sb = core.NewSqlBuilder()
-	sb.Select("pbe.*, p.*, s.*")
-	sb.Count("count(*) as entry_count")
+	sb.Select("pbe.*, pb.*, p.*, s.*")
 	sb.From(`erp_purchase_bill_entry pbe
+			INNER JOIN erp_purchase_bill pb ON pb.id = pbe.bill_id
 			INNER JOIN erp_product p ON p.id = pbe.product_id
 			INNER JOIN erp_status s ON s.id = pbe.status_id`)
 
@@ -457,6 +459,12 @@ func (c ErpPurchaseBillEntryExcel) export_entry_list_to_excel(db_session *xorm.S
 		cell := row.AddCell()
 		sheet.SetColWidth(col_index, col_index, 12)
 		set_head_cell_style(cell)
+		cell.Value = "批次号"
+		col_index++
+
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 12)
+		set_head_cell_style(cell)
 		cell.Value = "SKU"
 		col_index++
 
@@ -549,8 +557,13 @@ func (c ErpPurchaseBillEntryExcel) export_entry_list_to_excel(db_session *xorm.S
 		row = sheet.AddRow()
 		row.SetHeightCM(common_row_height)
 
-		// SKU
+		// 批次号
 		cell := row.AddCell()
+		set_text_cell_style(cell, "center")
+		cell.Value = entry.PurchaseBill.Code
+
+		// SKU
+		cell = row.AddCell()
 		set_text_cell_style(cell, "center")
 		cell.Value = entry.Product.Sku
 
@@ -561,32 +574,32 @@ func (c ErpPurchaseBillEntryExcel) export_entry_list_to_excel(db_session *xorm.S
 
 		// 价格
 		cell = row.AddCell()
-		set_text_cell_style(cell, "right")
+		set_text_cell_style(cell, "center")
 		cell.SetFloatWithFormat(entry.PurchaseBillEntry.Price, "0.00")
 
 		// MEL数量
 		cell = row.AddCell()
-		set_text_cell_style(cell, "right")
+		set_text_cell_style(cell, "center")
 		cell.SetInt64(entry.PurchaseBillEntry.MelQty)
 
 		// BNE数量
 		cell = row.AddCell()
-		set_text_cell_style(cell, "right")
+		set_text_cell_style(cell, "center")
 		cell.SetInt64(entry.PurchaseBillEntry.BneQty)
 
 		// 数量
 		cell = row.AddCell()
-		set_text_cell_style(cell, "right")
+		set_text_cell_style(cell, "center")
 		cell.SetInt64(entry.PurchaseBillEntry.Qty)
 
 		// 金额
 		cell = row.AddCell()
-		set_text_cell_style(cell, "right")
+		set_text_cell_style(cell, "center")
 		cell.SetFloatWithFormat(entry.PurchaseBillEntry.Amount, "0.00")
 
 		// 是否开票
 		cell = row.AddCell()
-		set_text_cell_style(cell, "right")
+		set_text_cell_style(cell, "center")
 		if entry.PurchaseBillEntry.NeedInvoice == 0 {
 			cell.SetString("否")
 		} else {
@@ -595,27 +608,27 @@ func (c ErpPurchaseBillEntryExcel) export_entry_list_to_excel(db_session *xorm.S
 
 		// 收税点
 		cell = row.AddCell()
-		set_text_cell_style(cell, "right")
+		set_text_cell_style(cell, "center")
 		cell.SetFloatWithFormat(entry.PurchaseBillEntry.TaxPoint, "0.00")
 
 		// 退税点
 		cell = row.AddCell()
-		set_text_cell_style(cell, "right")
+		set_text_cell_style(cell, "center")
 		cell.SetFloatWithFormat(entry.PurchaseBillEntry.DrawbackPoint, "0.00")
 
 		// 退税额
 		cell = row.AddCell()
-		set_text_cell_style(cell, "right")
+		set_text_cell_style(cell, "center")
 		cell.SetFloatWithFormat(entry.PurchaseBillEntry.DrawbackAmount, "0.00")
 
 		// 配件费用
 		cell = row.AddCell()
-		set_text_cell_style(cell, "right")
+		set_text_cell_style(cell, "center")
 		cell.SetFloatWithFormat(entry.PurchaseBillEntry.FittingCost, "0.00")
 
 		// 其它费用
 		cell = row.AddCell()
-		set_text_cell_style(cell, "right")
+		set_text_cell_style(cell, "center")
 		cell.SetFloatWithFormat(entry.PurchaseBillEntry.OtherCost, "0.00")
 
 		// 描述
@@ -625,7 +638,7 @@ func (c ErpPurchaseBillEntryExcel) export_entry_list_to_excel(db_session *xorm.S
 
 		// 状态
 		cell = row.AddCell()
-		set_text_cell_style(cell, "left")
+		set_text_cell_style(cell, "center")
 		cell.Value = entry.Status.Name
 	}
 
