@@ -65,6 +65,10 @@
                         <i class="ace-icon fa fa-trash-o"></i>
                         删除
                     </button>
+                    <button class="btn btn-purple btn-sm" onclick="exportBillsEntryList()">
+                        <i class="ace-icon fa fa-file-excel-o"></i>
+                        导出
+                    </button>
                 </div>
                 <div>
                     <table id="purchaseBillList" class="table table-striped table-bordered table-hover"></table>
@@ -1286,28 +1290,38 @@
         $('#supplierSelectDialog').modal('hide');
     }
 
+    function exportBillsEntryList() {
+        if (!vm.purchase_bill_id || vm.purchase_bill_id === 0) {
+            $.msg.error("请先选择采购单！");
+            return;
+        }
+
+        var bill_id_list = [];
+        $('#purchaseBillList tbody tr>td:first-child input:checkbox').each(function () {
+            if (this.checked) {
+                bill_id_list.push($(this).val());
+            }
+        });
+
+        var params = $.param({
+            "bill_id_list": bill_id_list
+        });
+
+        var url = '{%url "ErpPurchaseBillEntryExcel.Export"%}' + "?" + params;
+        $('<form method="post" action="' + url + '"></form>').appendTo('body').submit().remove();
+    }
+
     function exportEntryList() {
         if (!vm.purchase_bill_id || vm.purchase_bill_id === 0) {
             $.msg.error("请先选择采购单！");
             return;
         }
 
-        /*
-        var id_list = [];
-        $('#purchaseBillEntryList tbody tr>td:first-child input:checkbox').each(function () {
-            if (this.checked) {
-                id_list.push($(this).val());
-            }
-        });
+        var bill_id_list = [];
+        bill_id_list.push(vm.purchase_bill_id);
 
         var params = $.param({
-            "bill_id": vm.purchase_bill_id,
-            "id_list": id_list
-        });
-        */
-
-        var params = $.param({
-            "bill_id": vm.purchase_bill_id
+            "bill_id_list": bill_id_list
         });
 
         var url = '{%url "ErpPurchaseBillEntryExcel.Export"%}' + "?" + params;

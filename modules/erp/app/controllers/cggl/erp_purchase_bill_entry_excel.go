@@ -331,14 +331,30 @@ type purchase_bill_entry_item_t struct {
 func (c ErpPurchaseBillEntryExcel) Export() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.CGGL_PURCHASE_BILL, c.Session)
 
-	db_session := c.DbSession
+	var db_session = c.DbSession
 
-	var bill_id int64
-	c.Params.Bind(&bill_id, "bill_id")
+	var bill_id_list = make([]int64, 0)
+	c.Params.Bind(&bill_id_list, "bill_id_list")
 
-	var purchase_bill cggl_models.PurchaseBillInfo
-	_, err := db_session.Id(bill_id).Get(&purchase_bill)
-	core.HandleError(err)
+	if len(bill_id_list) == 0 {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "未指定导出采购单！",
+		})
+	}
+
+	var bill_id_str_list = make([]string, 0)
+	for _, bill_id := range bill_id_list {
+		bill_id_str_list = append(bill_id_str_list, fmt.Sprint(bill_id))
+	}
+
+	var purchase_bill_list = make([]cggl_models.PurchaseBillInfo, 0)
+	core.HandleError(db_session.In("id", bill_id_list).Find(&purchase_bill_list))
+
+	var bill_code_list = make([]string, 0)
+	for _, bill := range purchase_bill_list {
+		bill_code_list = append(bill_code_list, bill.Code)
+	}
 
 	/*
 		SELECT pbe.*, pb.*, p.*, s.*
@@ -355,14 +371,14 @@ func (c ErpPurchaseBillEntryExcel) Export() revel.Result {
 			INNER JOIN erp_product p ON p.id = pbe.product_id
 			INNER JOIN erp_status s ON s.id = pbe.status_id`)
 
-	var filter = fmt.Sprintf("pbe.bill_id = %d", bill_id)
+	var filter = fmt.Sprintf("pbe.bill_id IN (%s)", strings.Join(bill_id_str_list, ","))
 
 	sb.Where(filter)
 
-	sb.OrderBy("pbe.id asc")
+	sb.OrderBy("pbe.bill_id ASC, pbe.id ASC")
 
 	entry_list := make([]purchase_bill_entry_item_t, 0)
-	err = db_session.Sql(sb.SqlList()).Find(&entry_list)
+	err := db_session.Sql(sb.SqlList()).Find(&entry_list)
 	core.HandleError(err)
 
 	xlsx_file := c.export_entry_list_to_excel(db_session, entry_list)
@@ -374,7 +390,7 @@ func (c ErpPurchaseBillEntryExcel) Export() revel.Result {
 
 	reader := bytes.NewReader(buffer.Bytes()) //bytes.Reader 实现了 io.Reader 接口
 
-	file_name := fmt.Sprintf("采购单明细导出_%s.xlsx", purchase_bill.Code)
+	file_name := fmt.Sprintf("采购单明细导出_%s.xlsx", strings.Join(bill_code_list, "_"))
 
 	return c.RenderBinary(reader, file_name, revel.Attachment, time.Now())
 }
