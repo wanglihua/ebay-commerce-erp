@@ -71,6 +71,30 @@ func (c ErpPurchaseBill) ListData() revel.Result {
 	c.Params.Bind(&code_query, "code_query")
 	code_query = strings.TrimSpace(code_query)
 
+	var apply_time_begin_str string
+	c.Params.Bind(&apply_time_begin_str, "apply_time_begin")
+	apply_time_begin, apply_time_begin_err := core.Parse_time(apply_time_begin_str)
+
+	var apply_time_end_str string
+	c.Params.Bind(&apply_time_end_str, "apply_time_end")
+	apply_time_end, apply_time_end_err := core.Parse_time(apply_time_end_str)
+
+	var pay_time_begin_str string
+	c.Params.Bind(&pay_time_begin_str, "pay_time_begin")
+	pay_time_begin, pay_time_begin_err := core.Parse_time(pay_time_begin_str)
+
+	var pay_time_end_str string
+	c.Params.Bind(&pay_time_end_str, "pay_time_end")
+	pay_time_end, pay_time_end_err := core.Parse_time(pay_time_end_str)
+
+	var checkin_time_begin_str string
+	c.Params.Bind(&checkin_time_begin_str, "checkin_time_begin")
+	checkin_time_begin, checkin_time_begin_err := core.Parse_time(checkin_time_begin_str)
+
+	var checkin_time_end_str string
+	c.Params.Bind(&checkin_time_end_str, "checkin_time_end")
+	checkin_time_end, checkin_time_end_err := core.Parse_time(checkin_time_end_str)
+
 	db_session := c.DbSession
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
@@ -103,6 +127,30 @@ FROM erp_purchase_bill pb
 
 	if code_query != "" {
 		filter = core.SqlAnd(filter, fmt.Sprintf("pb.code = '%s'", code_query))
+	}
+
+	if apply_time_begin_err == nil {
+		filter = core.SqlAnd(filter, fmt.Sprintf("pb.apply_time >= '%s'", apply_time_begin.Format("2006-01-02 15:04")))
+	}
+
+	if apply_time_end_err == nil {
+		filter = core.SqlAnd(filter, fmt.Sprintf("pb.apply_time <= '%s'", apply_time_end.Format("2006-01-02 15:04")))
+	}
+
+	if pay_time_begin_err == nil {
+		filter = core.SqlAnd(filter, fmt.Sprintf("pb.pay_time >= '%s'", pay_time_begin.Format("2006-01-02 15:04")))
+	}
+
+	if pay_time_end_err == nil {
+		filter = core.SqlAnd(filter, fmt.Sprintf("pb.pay_time <= '%s'", pay_time_end.Format("2006-01-02 15:04")))
+	}
+
+	if checkin_time_begin_err == nil {
+		filter = core.SqlAnd(filter, fmt.Sprintf("pb.checkin_time >= '%s'", checkin_time_begin.Format("2006-01-02 15:04")))
+	}
+
+	if checkin_time_end_err == nil {
+		filter = core.SqlAnd(filter, fmt.Sprintf("pb.checkin_time <= '%s'", checkin_time_end.Format("2006-01-02 15:04")))
 	}
 
 	sql_builder.Where(filter)
