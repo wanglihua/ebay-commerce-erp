@@ -799,15 +799,18 @@
                         },
                         {"mDataProp": "p.sku", "title": "SKU", "bSearchable": false, "width": 150},
                         {
-                            "mDataProp": "p.cn_name", "title": "商品名称", "bSearchable": false, "sClass": "word-wrap",
+                            "mDataProp": "p.cn_name", "title": "商品名称", "bSearchable": false, "sClass": "wrap-word",
                             "render": function (data, type, row) {
                                 return "<div>" + data + "</div>"
                             }
                         },
                         {"mDataProp": "pbe.price", "title": "单价", "bSearchable": false, "sClass": "center", "width": 50},
-                        {"mDataProp": "pbe.mel_qty", "title": "MEL数量", "bSearchable": false, "sClass": "center", "width": 80},
-                        {"mDataProp": "pbe.bne_qty", "title": "BNE数量", "bSearchable": false, "sClass": "center", "width": 80},
-                        {"mDataProp": "pbe.qty", "title": "总数量", "bSearchable": false, "sClass": "center", "width": 70},
+                        {
+                            "mDataProp": "pbe.qty", "title": "总数量", "bSearchable": false, "sClass": "center", "width": 80,
+                            "render": function (data, type, row) {
+                                return "" + row.pbe.mel_qty + "&nbsp;MEL" + " + " + row.pbe.bne_qty + "&nbsp;BNE" + " = " + row.pbe.qty;
+                            }
+                        },
                         {"mDataProp": "pbe.amount", "title": "金额", "bSearchable": false, "sClass": "center", "width": 50},
                         {"mDataProp": "pbe.checkin_time", "title": "入库时间", "bSearchable": false, "sClass": "center", "width": 120},
                         {
