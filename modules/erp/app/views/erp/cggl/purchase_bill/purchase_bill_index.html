@@ -709,8 +709,12 @@
                             }
                         },
                         {"mDataProp": "s.name", "title": "状态", "bSearchable": false, "width": 90},
-                        {"mDataProp": "pb.create_time", "title": "创建时间", "bSearchable": false, "width": 120},
-                        {"mDataProp": "pb.update_time", "title": "修改时间", "bSearchable": false, "width": 120},
+                        {
+                            "mDataProp": "pb.create_time", "title": "创建时间<br />修改时间", "bSearchable": false, "width": 120,
+                            "render": function (data, type, row) {
+                                return "<div>" + row.pb.create_time + "</div><div>" + row.pb.update_time + "</div>";
+                            }
+                        },
                         {
                             "mDataProp": "pb.id",
                             "bSearchable": false,
@@ -824,8 +828,12 @@
                             }
                         },
                         {"mDataProp": "s.name", "title": "状态", "bSearchable": true, "sClass": "center", "width": 50},
-                        {"mDataProp": "pbe.create_time", "title": "创建时间", "bSearchable": false, "width": 120},
-                        {"mDataProp": "pbe.update_time", "title": "修改时间", "bSearchable": false, "width": 120}
+                        {
+                            "mDataProp": "pbe.create_time", "title": "创建时间<br/>修改时间", "bSearchable": false, "width": 120,
+                            "render": function (data, type, row) {
+                                return "<div>" + row.pbe.create_time + "</div><div>" + row.pbe.update_time + "</div>";
+                            }
+                        }
                     ],
                     "fnServerData": function (sSource, aoData, fnCallback) {
                         showMask("数据加载中，请稍候");
@@ -964,6 +972,12 @@
                     },
                     'purchase_bill_detail.purchase_bill.status_id': {
                         required: true, digits: true
+                    },
+                    'purchase_bill_detail.purchase_bill.supplier_id': {
+                        required: true, digits: true
+                    },
+                    'purchase_bill_detail.purchase_bill.supplier_name': {
+                        required: true
                     }
                 });
 

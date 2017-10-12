@@ -316,6 +316,13 @@ func (c ErpPurchaseBill) Save() revel.Result {
 		return c.RenderJson(core.JsonResult{Success: false, Message: c.GetValidationErrorMessage()})
 	}
 
+	if detail_form.PurchaseBill.SupplierId == 0 {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "请选择供应商！",
+		})
+	}
+
 	purchase_bill := detail_form.PurchaseBill
 
 	var affected int64
