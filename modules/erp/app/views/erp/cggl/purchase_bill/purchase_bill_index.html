@@ -20,15 +20,14 @@
                     {% end %}
                 </select>
                 <input id="code_query" name="code_query" type="text" v-model="page.code_query" placeholder="采购单批次号" style="height: 30px;"/>
-                <label for="apply_time_begin">采购时间</label>
-                <input id="apply_time_begin" name="apply_time_begin" style="width: 120px;height:30px;" v-model="page.apply_time_begin" placeholder="采购时间开始"/>&nbsp;
-                <input id="apply_time_end" name="apply_time_end" style="width: 120px;height:30px;" v-model="page.apply_time_end" placeholder="采购时间结束"/>
-                <label for="pay_time_begin">下单时间</label>
-                <input id="pay_time_begin" name="pay_time_begin" style="width: 120px;height:30px;" v-model="page.pay_time_begin" placeholder="下单时间开始"/>&nbsp;
-                <input id="pay_time_end" name="pay_time_end" style="width: 120px;height:30px;" v-model="page.pay_time_end" placeholder="下单时间结束"/>
-                <label for="checkin_time_begin">入库时间</label>
-                <input id="checkin_time_begin" name="checkin_time_begin" style="width: 120px;height:30px;" v-model="page.checkin_time_begin" placeholder="入库时间开始"/>&nbsp;
-                <input id="checkin_time_end" name="checkin_time_end" style="width: 120px;height:30px;" v-model="page.checkin_time_end" placeholder="入库时间结束"/>
+                <select id="time_query_id" name="time_query_id" v-model="page.time_query_id" style="height: 30px;">
+                    <option :value="0">时间段查询</option>
+                    {% range $index, $time_query := .time_query_list %}
+                    <option :value="{% $time_query.Id %}">{% $time_query.Name %}</option>
+                    {% end %}
+                </select>
+                <input id="query_time_begin" name="query_time_begin" style="width: 120px;height:30px;" v-model="page.query_time_begin" placeholder="查询时间开始"/>&nbsp;
+                <input id="query_time_end" name="query_time_end" style="width: 120px;height:30px;" v-model="page.query_time_end" placeholder="查询时间结束"/>
                 <button class="btn btn-mini btn-primary" style="margin-bottom:3px;height: 30px;" onclick="search()"> &nbsp;
                     &nbsp;<i class="ace-icon fa fa-search"></i>查&nbsp;询&nbsp;
                 </button>
@@ -523,51 +522,17 @@
     $(function () {
         init_uploader();
 
-        /*
-        $('#departure_time').datetimepicker({
+        // 查询时间
+        $('#query_time_begin').datetimepicker({
             locale: "zh-cn"
         }).on('dp.change', function (ev) {
-            detail_vm.detail.transfer.departure_time = $("#departure_time").val();
-        });
-        */
-
-        // 采购时间
-        $('#apply_time_begin').datetimepicker({
-            locale: "zh-cn"
-        }).on('dp.change', function (ev) {
-            vm.page.apply_time_begin = $("#apply_time_begin").val();
+            vm.page.query_time_begin = $("#query_time_begin").val();
         });
 
-        $('#apply_time_end').datetimepicker({
+        $('#query_time_end').datetimepicker({
             locale: "zh-cn"
         }).on('dp.change', function (ev) {
-            vm.page.apply_time_end = $("#apply_time_end").val();
-        });
-
-        // 下单时间
-        $('#pay_time_begin').datetimepicker({
-            locale: "zh-cn"
-        }).on('dp.change', function (ev) {
-            vm.page.pay_time_begin = $("#pay_time_begin").val();
-        });
-
-        $('#pay_time_end').datetimepicker({
-            locale: "zh-cn"
-        }).on('dp.change', function (ev) {
-            vm.page.pay_time_end = $("#pay_time_end").val();
-        });
-
-        // 入库时间
-        $('#checkin_time_begin').datetimepicker({
-            locale: "zh-cn"
-        }).on('dp.change', function (ev) {
-            vm.page.checkin_time_begin = $("#checkin_time_begin").val();
-        });
-
-        $('#checkin_time_end').datetimepicker({
-            locale: "zh-cn"
-        }).on('dp.change', function (ev) {
-            vm.page.checkin_time_end = $("#checkin_time_end").val();
+            vm.page.query_time_end = $("#query_time_end").val();
         });
     });
 
@@ -649,12 +614,9 @@
             },
             "page": {
                 "status_id_query": 0,
-                "apply_time_begin": '',
-                "apply_time_end": '',
-                "pay_time_begin": '',
-                "pay_time_end": '',
-                "checkin_time_begin": '',
-                "checkin_time_end": ''
+                "time_query_id": 0,
+                "query_time_begin": '',
+                "query_time_end": ''
             }
         },
         mounted: function () {
@@ -746,12 +708,9 @@
 
                         aoData.push({'name': 'status_id_query', 'value': this_vm.page.status_id_query});
                         aoData.push({'name': 'code_query', 'value': this_vm.page.code_query});
-                        aoData.push({'name': 'apply_time_begin', 'value': this_vm.page.apply_time_begin});
-                        aoData.push({'name': 'apply_time_end', 'value': this_vm.page.apply_time_end});
-                        aoData.push({'name': 'pay_time_begin', 'value': this_vm.page.pay_time_begin});
-                        aoData.push({'name': 'pay_time_end', 'value': this_vm.page.pay_time_end});
-                        aoData.push({'name': 'checkin_time_begin', 'value': this_vm.page.checkin_time_begin});
-                        aoData.push({'name': 'checkin_time_end', 'value': this_vm.page.checkin_time_end});
+                        aoData.push({'name': 'time_query_id', 'value': this_vm.page.time_query_id});
+                        aoData.push({'name': 'query_time_begin', 'value': this_vm.page.query_time_begin});
+                        aoData.push({'name': 'query_time_end', 'value': this_vm.page.query_time_end});
 
                         $.ajax({
                             "dataType": 'json',

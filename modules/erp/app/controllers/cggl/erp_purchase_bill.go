@@ -23,6 +23,27 @@ type ErpPurchaseBill struct {
 	*revel.Controller
 }
 
+const (
+	TIME_QUERY_APPLY_TIME   int64 = 100 // 采购时间
+	TIME_QUERY_PAY_TIME     int64 = 200 // 下单时间
+	TIME_QUERY_CHECKIN_TIME int64 = 300 // 入库时间
+)
+
+type time_query struct {
+	Id   int64  `json:"id"`
+	Name string `json:"name"`
+}
+
+func (c ErpPurchaseBill) get_time_query_list() []time_query {
+	var time_query_list = make([]time_query, 0)
+
+	time_query_list = append(time_query_list, time_query{Id: TIME_QUERY_APPLY_TIME, Name: "采购时间"})
+	time_query_list = append(time_query_list, time_query{Id: TIME_QUERY_PAY_TIME, Name: "下单时间"})
+	time_query_list = append(time_query_list, time_query{Id: TIME_QUERY_CHECKIN_TIME, Name: "入库时间"})
+
+	return time_query_list
+}
+
 func (c ErpPurchaseBill) Index() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.CGGL_PURCHASE_BILL, c.Session)
 
@@ -42,6 +63,7 @@ func (c ErpPurchaseBill) Index() revel.Result {
 
 	c.RenderArgs["status_list"] = status_list
 	c.RenderArgs["user_has_approve_pass"] = user_has_approve_pass
+	c.RenderArgs["time_query_list"] = c.get_time_query_list()
 
 	return c.RenderTemplate("erp/cggl/purchase_bill/purchase_bill_index.html")
 }
@@ -71,29 +93,17 @@ func (c ErpPurchaseBill) ListData() revel.Result {
 	c.Params.Bind(&code_query, "code_query")
 	code_query = strings.TrimSpace(code_query)
 
-	var apply_time_begin_str string
-	c.Params.Bind(&apply_time_begin_str, "apply_time_begin")
-	apply_time_begin, apply_time_begin_err := core.Parse_time(apply_time_begin_str)
+	// time_query_id
+	var time_query_id int64
+	c.Params.Bind(&time_query_id, "time_query_id")
 
-	var apply_time_end_str string
-	c.Params.Bind(&apply_time_end_str, "apply_time_end")
-	apply_time_end, apply_time_end_err := core.Parse_time(apply_time_end_str)
+	var query_time_begin_str string
+	c.Params.Bind(&query_time_begin_str, "query_time_begin")
+	query_time_begin, query_time_begin_err := core.Parse_time(query_time_begin_str)
 
-	var pay_time_begin_str string
-	c.Params.Bind(&pay_time_begin_str, "pay_time_begin")
-	pay_time_begin, pay_time_begin_err := core.Parse_time(pay_time_begin_str)
-
-	var pay_time_end_str string
-	c.Params.Bind(&pay_time_end_str, "pay_time_end")
-	pay_time_end, pay_time_end_err := core.Parse_time(pay_time_end_str)
-
-	var checkin_time_begin_str string
-	c.Params.Bind(&checkin_time_begin_str, "checkin_time_begin")
-	checkin_time_begin, checkin_time_begin_err := core.Parse_time(checkin_time_begin_str)
-
-	var checkin_time_end_str string
-	c.Params.Bind(&checkin_time_end_str, "checkin_time_end")
-	checkin_time_end, checkin_time_end_err := core.Parse_time(checkin_time_end_str)
+	var query_time_end_str string
+	c.Params.Bind(&query_time_end_str, "query_time_end")
+	query_time_end, query_time_end_err := core.Parse_time(query_time_end_str)
 
 	db_session := c.DbSession
 
@@ -129,28 +139,29 @@ FROM erp_purchase_bill pb
 		filter = core.SqlAnd(filter, fmt.Sprintf("pb.code = '%s'", code_query))
 	}
 
-	if apply_time_begin_err == nil {
-		filter = core.SqlAnd(filter, fmt.Sprintf("pb.apply_time >= '%s'", apply_time_begin.Format("2006-01-02 15:04")))
+	if query_time_begin_err == nil {
+		if time_query_id == TIME_QUERY_APPLY_TIME {
+			filter = core.SqlAnd(filter, fmt.Sprintf("pb.apply_time >= '%s'", query_time_begin.Format("2006-01-02 15:04")))
+		} else if time_query_id == TIME_QUERY_PAY_TIME {
+			filter = core.SqlAnd(filter, fmt.Sprintf("pb.pay_time >= '%s'", query_time_begin.Format("2006-01-02 15:04")))
+		} else if time_query_id == TIME_QUERY_CHECKIN_TIME {
+			filter = core.SqlAnd(filter, fmt.Sprintf("pb.checkin_time >= '%s'", query_time_begin.Format("2006-01-02 15:04")))
+		} else {
+			filter = core.SqlAnd(filter, fmt.Sprintf("pb.apply_time >= '%s'", query_time_begin.Format("2006-01-02 15:04")))
+		}
 	}
 
-	if apply_time_end_err == nil {
-		filter = core.SqlAnd(filter, fmt.Sprintf("pb.apply_time <= '%s'", apply_time_end.Format("2006-01-02 15:04")))
-	}
+	if query_time_end_err == nil {
 
-	if pay_time_begin_err == nil {
-		filter = core.SqlAnd(filter, fmt.Sprintf("pb.pay_time >= '%s'", pay_time_begin.Format("2006-01-02 15:04")))
-	}
-
-	if pay_time_end_err == nil {
-		filter = core.SqlAnd(filter, fmt.Sprintf("pb.pay_time <= '%s'", pay_time_end.Format("2006-01-02 15:04")))
-	}
-
-	if checkin_time_begin_err == nil {
-		filter = core.SqlAnd(filter, fmt.Sprintf("pb.checkin_time >= '%s'", checkin_time_begin.Format("2006-01-02 15:04")))
-	}
-
-	if checkin_time_end_err == nil {
-		filter = core.SqlAnd(filter, fmt.Sprintf("pb.checkin_time <= '%s'", checkin_time_end.Format("2006-01-02 15:04")))
+		if time_query_id == TIME_QUERY_APPLY_TIME {
+			filter = core.SqlAnd(filter, fmt.Sprintf("pb.apply_time <= '%s'", query_time_end.Format("2006-01-02 15:04")))
+		} else if time_query_id == TIME_QUERY_PAY_TIME {
+			filter = core.SqlAnd(filter, fmt.Sprintf("pb.pay_time <= '%s'", query_time_end.Format("2006-01-02 15:04")))
+		} else if time_query_id == TIME_QUERY_CHECKIN_TIME {
+			filter = core.SqlAnd(filter, fmt.Sprintf("pb.checkin_time <= '%s'", query_time_end.Format("2006-01-02 15:04")))
+		} else {
+			filter = core.SqlAnd(filter, fmt.Sprintf("pb.apply_time <= '%s'", query_time_end.Format("2006-01-02 15:04")))
+		}
 	}
 
 	sql_builder.Where(filter)
