@@ -48,7 +48,25 @@
                     <hr style="margin-top:10px;margin-bottom:10px;"/>
                 </div>
                 <div>
-                    <table id="purchaseBillList" class="table table-striped table-bordered table-hover"></table>
+                    <table id="purchaseBillList" class="table table-striped table-bordered table-hover">
+                        <thead>
+                        <tr>
+                            <th>id</th>
+                            <th>批次号</th>
+                            <th>供应商</th>
+                            <th>账期</th>
+                            <th>备注</th>
+                            <th>操作人</th>
+                            <th>金额</th>
+                            <th>状态</th>
+                            <th id="th_apply_time">采购时间</th>
+                            <th id="th_pay_time">付款时间</th>
+                            <th id="th_create_time">创建时间</th>
+                            <th id="th_update_time">修改时间</th>
+                            <th>操作</th>
+                        </tr>
+                        </thead>
+                    </table>
                 </div>
             </div>
         </div>
@@ -96,8 +114,6 @@
                                 return "<div>" + data + "</div>";
                             }
                         },
-                        {"mDataProp": "pb.apply_time", "title": "采购时间", "bSearchable": false, "sClass": "center", "width": 120},
-                        {"mDataProp": "pb.pay_time", "title": "付款时间", "bSearchable": false, "sClass": "center", "width": 120},
                         {
                             "mDataProp": "pb.pay_days", "title": "账期", "bSearchable": false, "sClass": "center", "width": 80,
                             "render": function (data, type, row) {
@@ -117,8 +133,30 @@
                         {"mDataProp": "ayu.nick_name", "title": "操作人", "bSearchable": false, "width": 75},
                         {"mDataProp": "pb.total_amount", "title": "金额", "bSearchable": false, "width": 75},
                         {"mDataProp": "s.name", "title": "状态", "bSearchable": false, "width": 90},
-                        {"mDataProp": "pb.create_time", "title": "创建时间", "bSearchable": false, "width": 120},
-                        {"mDataProp": "pb.update_time", "title": "修改时间", "bSearchable": false, "width": 120},
+                        {
+                            "mDataProp": "pb.apply_time", "title": "采购时间", "bSearchable": false, "sClass": "center", "width": 120,
+                            "render": function (data, type, row) {
+                                return "<div class='div_apply_time'>" + row.pb.apply_time + "</div><div>" + row.pb.pay_time + "</div><div>" + row.pb.create_time + "</div><div>" + row.pb.update_time + "</div>";
+                            }
+                        },
+                        {
+                            "mDataProp": "pb.pay_time", "title": "付款时间", "bSearchable": false, "sClass": "center", "width": 120,
+                            "render": function (data, type, row) {
+                                return "<div class='div_pay_time'>" + data + "</div>";
+                            }
+                        },
+                        {
+                            "mDataProp": "pb.create_time", "title": "创建时间", "bSearchable": false, "sClass": "center", "width": 120,
+                            "render": function (data, type, row) {
+                                return "<div class='div_create_time'>" + data + "</div>";
+                            }
+                        },
+                        {
+                            "mDataProp": "pb.update_time", "title": "修改时间", "bSearchable": false, "sClass": "center", "width": 120,
+                            "render": function (data, type, row) {
+                                return "<div class='div_update_time'>" + data + "</div>";
+                            }
+                        },
                         {
                             "mDataProp": "pb.id",
                             "bSearchable": false,
@@ -148,11 +186,23 @@
                                         return;
                                     }
                                     fnCallback(data);
+
+                                    $("#purchaseBillList div.div_apply_time").parent().css("width", "120px");
+                                    $("#purchaseBillList div.div_pay_time").parent().css("display", "none");
+                                    $("#purchaseBillList div.div_create_time").parent().css("display", "none");
+                                    $("#purchaseBillList div.div_update_time").parent().css("display", "none");
                                 }
                             });
                     }
                 }
             );
+
+            $("#th_apply_time").before("<th id='th_apply_time_ext'></th>");
+            $("#th_apply_time").wrap("<div id='div_apply_time'></div>");
+            $("#th_pay_time").wrap("<div id='div_pay_time'></div>");
+            $("#th_create_time").wrap("<div id='div_create_time'></div>");
+            $("#th_update_time").wrap("<div id='div_update_time'></div>");
+            $("#th_apply_time_ext").append($("#div_apply_time")).append($("#div_pay_time")).append($("#div_create_time")).append($("#div_update_time"));
         },
         methods: {
             reloadList: function () {
