@@ -88,6 +88,8 @@ func (c ErpPurchaseBill) Index() revel.Result {
 	c.RenderArgs["status_list"] = status_list
 	c.RenderArgs["user_has_approve_pass"] = user_has_approve_pass
 	c.RenderArgs["time_query_list"] = c.get_time_query_list()
+	c.RenderArgs["user_query_id"] = 0
+	c.RenderArgs["user_query_value"] = 0
 	c.RenderArgs["user_query_list"] = c.get_user_query_list()
 	c.RenderArgs["user_list"] = user_list
 
@@ -123,6 +125,12 @@ func (c ErpPurchaseBill) ListData() revel.Result {
 	var supplier_query string
 	c.Params.Bind(&supplier_query, "supplier_query")
 	supplier_query = strings.TrimSpace(supplier_query)
+
+	var user_query_id int64
+	c.Params.Bind(&user_query_id, "user_query_id")
+
+	var user_query_value int64
+	c.Params.Bind(&user_query_value, "user_query_value")
 
 	// time_query_id
 	var time_query_id int64
@@ -172,6 +180,14 @@ FROM erp_purchase_bill pb
 
 	if supplier_query != "" {
 		filter = core.SqlAnd(filter, fmt.Sprintf("sup.name LIKE '%%%s%%'", supplier_query))
+	}
+
+	if user_query_id == USER_QUERY_APPLY {
+		filter = core.SqlAnd(filter, fmt.Sprintf("pb.apply_user_id = %d", user_query_value))
+	} else if user_query_id == USER_QUERY_PAY {
+		filter = core.SqlAnd(filter, fmt.Sprintf("pb.pay_user_id = %d", user_query_value))
+	} else if user_query_id == USER_QUERY_CHECKIN {
+		filter = core.SqlAnd(filter, fmt.Sprintf("pb.checkin_user_id = %d", user_query_value))
 	}
 
 	if query_time_begin_err == nil {
