@@ -18,6 +18,8 @@ import (
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/purchase_bill_log_service"
 	"matrix/modules/erp/service/purchase_bill_service"
+	"matrix/modules/erp/models/sppz_models"
+	auth_models "matrix/modules/auth/models"
 )
 
 type ErpPurchaseBillEntryExcel struct {
@@ -324,6 +326,8 @@ func (c ErpPurchaseBillEntryExcel) Import() revel.Result {
 type purchase_bill_entry_item_t struct {
 	PurchaseBillEntry cggl_models.PurchaseBillEntryInfo `xorm:"extends" json:"pbe"`
 	PurchaseBill      cggl_models.PurchaseBillInfo      `xorm:"extends" json:"pb"`
+	Supplier          sppz_models.SupplierInfo          `xorm:"extends" json:"sup"`
+	ApplyUser         auth_models.UserInfo              `xorm:"extends" json:"ayu"`
 	Product           kcgl_models.ProductInfo           `xorm:"extends" json:"p"`
 	Status            models.StatusInfo                 `xorm:"extends" json:"s"`
 }
@@ -357,17 +361,21 @@ func (c ErpPurchaseBillEntryExcel) Export() revel.Result {
 	}
 
 	/*
-		SELECT pbe.*, pb.*, p.*, s.*
+		SELECT pbe.*, pb.*, sup.*, ayu.*, p.*, s.*
 		FROM erp_purchase_bill_entry pbe
 			INNER JOIN erp_purchase_bill pb ON pb.id = pbe.bill_id
+			INNER JOIN erp_supplier sup ON sup.id = pb.supplier_id
+			INNER JOIN auth_user ayu ON ayu.id = pb.apply_user_id
 			INNER JOIN erp_product p ON p.id = pbe.product_id
 			INNER JOIN erp_status s ON s.id = pbe.status_id;
 	*/
 
 	var sb = core.NewSqlBuilder()
-	sb.Select("pbe.*, pb.*, p.*, s.*")
+	sb.Select("pbe.*, pb.*, sup.*, ayu.*, p.*, s.*")
 	sb.From(`erp_purchase_bill_entry pbe
 			INNER JOIN erp_purchase_bill pb ON pb.id = pbe.bill_id
+			INNER JOIN erp_supplier sup ON sup.id = pb.supplier_id
+			INNER JOIN auth_user ayu ON ayu.id = pb.apply_user_id
 			INNER JOIN erp_product p ON p.id = pbe.product_id
 			INNER JOIN erp_status s ON s.id = pbe.status_id`)
 
@@ -473,9 +481,15 @@ func (c ErpPurchaseBillEntryExcel) export_entry_list_to_excel(db_session *xorm.S
 
 	{
 		cell := row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 12)
+		sheet.SetColWidth(col_index, col_index, 15)
 		set_head_cell_style(cell)
 		cell.Value = "批次号"
+		col_index++
+
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 30)
+		set_head_cell_style(cell)
+		cell.Value = "供应商"
 		col_index++
 
 		cell = row.AddCell()
@@ -499,18 +513,6 @@ func (c ErpPurchaseBillEntryExcel) export_entry_list_to_excel(db_session *xorm.S
 		cell = row.AddCell()
 		sheet.SetColWidth(col_index, col_index, 10)
 		set_head_cell_style(cell)
-		cell.Value = "MEL数量"
-		col_index++
-
-		cell = row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 10)
-		set_head_cell_style(cell)
-		cell.Value = "BNE数量"
-		col_index++
-
-		cell = row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 10)
-		set_head_cell_style(cell)
 		cell.Value = "数量"
 		col_index++
 
@@ -518,6 +520,12 @@ func (c ErpPurchaseBillEntryExcel) export_entry_list_to_excel(db_session *xorm.S
 		sheet.SetColWidth(col_index, col_index, 10)
 		set_head_cell_style(cell)
 		cell.Value = "金额"
+		col_index++
+
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 10)
+		set_head_cell_style(cell)
+		cell.Value = "运费"
 		col_index++
 
 		cell = row.AddCell()
@@ -559,6 +567,30 @@ func (c ErpPurchaseBillEntryExcel) export_entry_list_to_excel(db_session *xorm.S
 		cell = row.AddCell()
 		sheet.SetColWidth(col_index, col_index, 10)
 		set_head_cell_style(cell)
+		cell.Value = "申请人"
+		col_index++
+
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 15)
+		set_head_cell_style(cell)
+		cell.Value = "采购时间"
+		col_index++
+
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 15)
+		set_head_cell_style(cell)
+		cell.Value = "下单时间"
+		col_index++
+
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 15)
+		set_head_cell_style(cell)
+		cell.Value = "入库时间"
+		col_index++
+
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 10)
+		set_head_cell_style(cell)
 		cell.Value = "描述"
 		col_index++
 
@@ -578,6 +610,11 @@ func (c ErpPurchaseBillEntryExcel) export_entry_list_to_excel(db_session *xorm.S
 		set_text_cell_style(cell, "center")
 		cell.Value = entry.PurchaseBill.Code
 
+		// 供应商
+		cell = row.AddCell()
+		set_text_cell_style(cell, "left")
+		cell.Value = entry.Supplier.Name
+
 		// SKU
 		cell = row.AddCell()
 		set_text_cell_style(cell, "center")
@@ -593,16 +630,6 @@ func (c ErpPurchaseBillEntryExcel) export_entry_list_to_excel(db_session *xorm.S
 		set_text_cell_style(cell, "center")
 		cell.SetFloatWithFormat(entry.PurchaseBillEntry.Price, "0.00")
 
-		// MEL数量
-		cell = row.AddCell()
-		set_text_cell_style(cell, "center")
-		cell.SetInt64(entry.PurchaseBillEntry.MelQty)
-
-		// BNE数量
-		cell = row.AddCell()
-		set_text_cell_style(cell, "center")
-		cell.SetInt64(entry.PurchaseBillEntry.BneQty)
-
 		// 数量
 		cell = row.AddCell()
 		set_text_cell_style(cell, "center")
@@ -612,6 +639,11 @@ func (c ErpPurchaseBillEntryExcel) export_entry_list_to_excel(db_session *xorm.S
 		cell = row.AddCell()
 		set_text_cell_style(cell, "center")
 		cell.SetFloatWithFormat(entry.PurchaseBillEntry.Amount, "0.00")
+
+		// 运费
+		cell = row.AddCell()
+		set_text_cell_style(cell, "center")
+		cell.SetFloatWithFormat(entry.PurchaseBill.AdvanceExpenses+entry.PurchaseBill.FinalExpenses, "0.00")
 
 		// 是否开票
 		cell = row.AddCell()
@@ -646,6 +678,38 @@ func (c ErpPurchaseBillEntryExcel) export_entry_list_to_excel(db_session *xorm.S
 		cell = row.AddCell()
 		set_text_cell_style(cell, "center")
 		cell.SetFloatWithFormat(entry.PurchaseBillEntry.OtherCost, "0.00")
+
+		// 申请人
+		cell = row.AddCell()
+		set_text_cell_style(cell, "center")
+		cell.SetString(entry.ApplyUser.LoginName)
+
+		// 采购时间
+		cell = row.AddCell()
+		set_text_cell_style(cell, "center")
+		if entry.PurchaseBill.ApplyTime.Valid == false {
+			cell.SetString("")
+		} else {
+			cell.SetString(entry.PurchaseBill.ApplyTime.Time.Format("2006-01-02 15:03"))
+		}
+
+		// 下单时间
+		cell = row.AddCell()
+		set_text_cell_style(cell, "center")
+		if entry.PurchaseBill.PayTime.Valid == false {
+			cell.SetString("")
+		} else {
+			cell.SetString(entry.PurchaseBill.PayTime.Time.Format("2006-01-02 15:03"))
+		}
+
+		// 入库时间
+		cell = row.AddCell()
+		set_text_cell_style(cell, "center")
+		if entry.PurchaseBill.CheckinTime.Valid == false {
+			cell.SetString("")
+		} else {
+			cell.SetString(entry.PurchaseBill.CheckinTime.Time.Format("2006-01-02 15:03"))
+		}
 
 		// 描述
 		cell = row.AddCell()
