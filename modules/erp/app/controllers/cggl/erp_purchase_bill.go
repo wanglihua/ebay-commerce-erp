@@ -44,6 +44,27 @@ func (c ErpPurchaseBill) get_time_query_list() []time_query {
 	return time_query_list
 }
 
+const (
+	USER_QUERY_APPLY   int64 = 100 // 采购人
+	USER_QUERY_PAY     int64 = 200 // 下单人
+	USER_QUERY_CHECKIN int64 = 300 // 入库人
+)
+
+type user_query struct {
+	Id   int64  `json:"id"`
+	Name string `json:"name"`
+}
+
+func (c ErpPurchaseBill) get_user_query_list() []user_query {
+	var user_query_list = make([]user_query, 0)
+
+	user_query_list = append(user_query_list, user_query{Id: USER_QUERY_APPLY, Name: "采购人"})
+	user_query_list = append(user_query_list, user_query{Id: USER_QUERY_PAY, Name: "下单人"})
+	user_query_list = append(user_query_list, user_query{Id: USER_QUERY_CHECKIN, Name: "入库人"})
+
+	return user_query_list
+}
+
 func (c ErpPurchaseBill) Index() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.CGGL_PURCHASE_BILL, c.Session)
 
@@ -61,9 +82,14 @@ func (c ErpPurchaseBill) Index() revel.Result {
 
 	var user_has_approve_pass = pass_service.Is_login_user_has_pass(pass_res.CGGL_PURCHASE_APPROVE, c.Session)
 
+	var user_list = make([]auth_models.UserInfo, 0)
+	core.HandleError(db_session.Find(&user_list))
+
 	c.RenderArgs["status_list"] = status_list
 	c.RenderArgs["user_has_approve_pass"] = user_has_approve_pass
 	c.RenderArgs["time_query_list"] = c.get_time_query_list()
+	c.RenderArgs["user_query_list"] = c.get_user_query_list()
+	c.RenderArgs["user_list"] = user_list
 
 	return c.RenderTemplate("erp/cggl/purchase_bill/purchase_bill_index.html")
 }
