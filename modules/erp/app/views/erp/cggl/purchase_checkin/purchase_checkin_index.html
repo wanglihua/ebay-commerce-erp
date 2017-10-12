@@ -54,7 +54,22 @@
                     <hr style="margin-top:10px;margin-bottom:10px;"/>
                 </div>
                 <div>
-                    <table id="purchaseBillEntryList" class="table table-striped table-bordered table-hover"></table>
+                    <table id="purchaseBillEntryList" class="table table-striped table-bordered table-hover">
+                        <thead>
+                        <tr>
+                            <th>id</th>
+                            <th>采购批次号</th>
+                            <th>SKU</th>
+                            <th>名称</th>
+                            <th>数量</th>
+                            <th id="th_apply_time">采购时间</th>
+                            <th id="th_checkin_time">入库时间</th>
+                            <th>到货天数</th>
+                            <th>备注</th>
+                            <th>状态</th>
+                        </tr>
+                        </thead>
+                    </table>
                 </div>
             </div>
         </div>
@@ -234,8 +249,18 @@
                                 return "" + row.pbe.mel_qty + "&nbsp;MEL" + " + " + row.pbe.bne_qty + "&nbsp;BNE" + " = " + row.pbe.qty;
                             }
                         },
-                        {"mDataProp": "pb.apply_time", "title": "采购时间", "bSearchable": false, "sClass": "center", "width": 120},
-                        {"mDataProp": "pbe.checkin_time", "title": "入库时间", "bSearchable": false, "sClass": "center", "width": 120},
+                        {
+                            "mDataProp": "pb.apply_time", "title": "采购时间", "bSearchable": false, "sClass": "center", "width": 120,
+                            "render": function (data, type, row) {
+                                return "<div class='div_apply_time'>" + row.pb.apply_time + "</div><div>" + row.pbe.checkin_time + "</div>";
+                            }
+                        },
+                        {
+                            "mDataProp": "pbe.checkin_time", "title": "入库时间", "bSearchable": false, "sClass": "center", "width": 120,
+                            "render": function (data, type, row) {
+                                return "<div class='div_checkin_time'>" + data + "</div>";
+                            }
+                        },
                         {
                             "mDataProp": "pb.arrival_days", "title": "到货天数", "bSearchable": false, "sClass": "center", "width": 90,
                             "render": function (data, type, row) {
@@ -260,23 +285,30 @@
                         aoData.push({'name': 'bill_code_query', 'value': this_vm.page.bill_code_query});
                         aoData.push({'name': 'status_id_query', 'value': this_vm.page.status_id_query});
 
-                        $.ajax(
-                            {
-                                "dataType": 'json',
-                                "url": sSource,
-                                "data": aoData,
-                                "success": function (data) {
-                                    hideMask();
-                                    if (data.success === false) {
-                                        $.msg.error(data.message);
-                                        return;
-                                    }
-                                    fnCallback(data);
+                        $.ajax({
+                            "dataType": 'json',
+                            "url": sSource,
+                            "data": aoData,
+                            "success": function (data) {
+                                hideMask();
+                                if (data.success === false) {
+                                    $.msg.error(data.message);
+                                    return;
                                 }
-                            });
+                                fnCallback(data);
+
+                                $("#purchaseBillEntryList div.div_apply_time").parent().css("width", "120px");
+                                $("#purchaseBillEntryList div.div_checkin_time").parent().css("display", "none");
+                            }
+                        });
                     }
                 }
             );
+            $("#th_apply_time").before("<th id='th_apply_time_ext'></th>");
+            $("#th_apply_time").wrap("<div id='div_apply_time'></div>");
+            $("#th_checkin_time").wrap("<div id='div_checkin_time'></div>");
+            $("#th_apply_time_ext").append($("#div_apply_time")).append($("#div_checkin_time"));
+
         },
         methods: {
             reloadEntryList: function () {
