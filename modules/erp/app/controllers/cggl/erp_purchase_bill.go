@@ -93,6 +93,11 @@ func (c ErpPurchaseBill) ListData() revel.Result {
 	c.Params.Bind(&code_query, "code_query")
 	code_query = strings.TrimSpace(code_query)
 
+	// supplier_query
+	var supplier_query string
+	c.Params.Bind(&supplier_query, "supplier_query")
+	supplier_query = strings.TrimSpace(supplier_query)
+
 	// time_query_id
 	var time_query_id int64
 	c.Params.Bind(&time_query_id, "time_query_id")
@@ -137,6 +142,10 @@ FROM erp_purchase_bill pb
 
 	if code_query != "" {
 		filter = core.SqlAnd(filter, fmt.Sprintf("pb.code = '%s'", code_query))
+	}
+
+	if supplier_query != "" {
+		filter = core.SqlAnd(filter, fmt.Sprintf("sup.name LIKE '%%%s%%'", supplier_query))
 	}
 
 	if query_time_begin_err == nil {

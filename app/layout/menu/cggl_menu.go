@@ -95,13 +95,14 @@ func GetCgglMenu(res_id_map map[int64]bool, web_session revel.Session) string {
             <b class="arrow"></b>
         </li>`)
 
+	/*
 	buffer.WriteString(`<li id="cggl-dddd-menu" class="">
-            <a href="#">
-                <i class="menu-icon fa fa-caret-right"></i>
-                采购流水
-            </a>
-            <b class="arrow"></b>
-        </li>`)
+		<a href="#">
+			<i class="menu-icon fa fa-caret-right"></i>
+			采购流水
+		</a>
+		<b class="arrow"></b>
+	</li>`)*/
 
 	buffer.WriteString(`
     </ul>
