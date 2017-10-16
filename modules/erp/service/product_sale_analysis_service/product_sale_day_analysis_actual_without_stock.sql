@@ -7,7 +7,7 @@
 	PRODUCT_SALE_ANALYSIS_TYPE_SKU int64 = 300
  */
 
-DROP PROCEDURE product_sale_day_analysis_actual_without_stock;
+DROP PROCEDURE IF EXISTS product_sale_day_analysis_actual_without_stock;
 
 CREATE PROCEDURE product_sale_day_analysis_actual_without_stock()
     BEGIN
@@ -19,6 +19,7 @@ CREATE PROCEDURE product_sale_day_analysis_actual_without_stock()
         DECLARE v_sku VARCHAR(200);
         DECLARE v_qty BIGINT;
         DECLARE da_count INT;
+        DECLARE da_type BIGINT;
 
         -- 遍历数据结束标志
         DECLARE done INT DEFAULT FALSE;
@@ -36,6 +37,8 @@ CREATE PROCEDURE product_sale_day_analysis_actual_without_stock()
 
         -- 将结束标志绑定到游标
         DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+
+        SET da_type = 300; # 300 不分仓库统计
 
         # 获取需要分析的开始时间
         SELECT da.day
@@ -68,15 +71,16 @@ CREATE PROCEDURE product_sale_day_analysis_actual_without_stock()
             SELECT count(*)
             INTO da_count
             FROM erp_product_sale_day_analysis da
-            WHERE da.day = v_shipped_day AND da.product_id = v_product_id AND da.stock_id = 0 AND da.type = 300; # 300 不分仓库统计
+            WHERE da.day = v_shipped_day AND da.product_id = v_product_id AND da.stock_id = 0 AND da.type = da_type; # 300 不分仓库统计
 
             IF da_count = 0
             THEN
-                INSERT INTO erp_product_sale_day_analysis (stock_id, product_id, sku, day, qty, type, create_time, update_time) VALUES (0, product_id, sku, v_shipped_day, qty, 300, now(), now());
+                INSERT INTO erp_product_sale_day_analysis (stock_id, product_id, sku, day, qty, type, create_time, update_time)
+                VALUES (0, v_product_id, v_sku, v_shipped_day, v_qty, da_type, now(), now());
             ELSE
                 UPDATE erp_product_sale_day_analysis
                 SET sku = v_sku, qty = v_qty, update_time = now()
-                WHERE day = v_shipped_day AND product_id = v_product_id AND stock_id = 0 AND type = 300;
+                WHERE day = v_shipped_day AND product_id = v_product_id AND stock_id = 0 AND type = da_type;
             END IF;
 
         END LOOP;
