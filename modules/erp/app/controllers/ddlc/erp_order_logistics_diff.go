@@ -15,6 +15,9 @@ import (
 	"github.com/tealeg/xlsx"
 	"matrix/modules/erp/models/sppz_models"
 	"matrix/modules/erp/models"
+	"matrix/modules/erp/service/order_logistics_service"
+	"runtime/debug"
+	xorm_core "github.com/go-xorm/core"
 )
 
 type ErpOrderLogisticsDiff struct {
@@ -130,6 +133,62 @@ FROM erp_order_logistics_logic oll
 	return c.RenderJson(core.GridResult{
 		Data:  logistics_mode_list,
 		Total: count.Count,
+	})
+}
+
+func (c ErpOrderLogisticsDiff) Match() revel.Result {
+
+	go func() {
+		defer func() {
+			if err := recover(); err != nil {
+				revel.ERROR.Printf("匹配订单物流理论值出现错误： %s\n", err)
+				revel.ERROR.Println(string(debug.Stack()))
+			}
+		}()
+
+		// get db driver and db url
+		db_driver, _ := revel.Config.String("db.driver")
+		db_url, _ := revel.Config.String("db.url")
+
+		db_engine, err := xorm.NewEngine(db_driver, db_url)
+		core.HandleError(err)
+
+		db_engine.TZLocation = time.Local
+		db_engine.SetMaxIdleConns(3)
+		db_engine.SetMaxOpenConns(100)
+
+		if revel.DevMode == true {
+			db_engine.ShowSQL()
+			db_engine.ShowExecTime()
+			xorm_core.LogQuerySql = true
+		}
+
+		db_session := db_engine.NewSession()
+		db_session = db_session.NoAutoCondition(true)
+
+		defer func() {
+			db_session.Close()
+		}()
+
+		var order_list = make([]ddlc_models.OrderInfo, 0)
+
+		var sql = `SELECT *
+FROM erp_order o
+WHERE o.id NOT IN (
+    SELECT oll.order_id
+    FROM erp_order_logistics_logic oll
+)`
+		core.HandleError(db_session.Sql(sql).Find(&order_list))
+
+		if len(order_list) > 0 {
+			var p_order_logistics = new(order_logistics_service.OrderLogisticsService)
+			p_order_logistics.CalculateListLogic(order_list, db_session)
+		}
+	}()
+
+	return c.RenderJson(map[string]interface{}{
+		"success": true,
+		"message": "启动订单理论物流匹配成功！",
 	})
 }
 

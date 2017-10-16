@@ -17,11 +17,11 @@ type order_logistics_data_t struct {
 }
 
 // 一次性全部加载
-func (p_d *order_logistics_data_t) load_data(p_order *ddlc_models.OrderInfo, p_order_logistics *OrderLogisticsService, db_session *xorm.Session) {
-	p_d.load_exchange_rate(p_order, p_order_logistics)
-	p_d.load_order_shipping_address(p_order.Id, db_session)
-	p_d.load_order_product_info_list(p_order.Id, db_session)
-	p_d.load_products_stock_qty_list(p_order.Id, db_session)
+func (p_d *order_logistics_data_t) load_data(order ddlc_models.OrderInfo, p_order_logistics *OrderLogisticsService, db_session *xorm.Session) {
+	p_d.load_exchange_rate(&order, p_order_logistics)
+	p_d.load_order_shipping_address(order.Id, db_session)
+	p_d.load_order_product_info_list(order.Id, db_session)
+	p_d.load_products_stock_qty_list(order.Id, db_session)
 }
 
 func (p_d *order_logistics_data_t) load_exchange_rate(p_order *ddlc_models.OrderInfo, p_order_logistics *OrderLogisticsService) {

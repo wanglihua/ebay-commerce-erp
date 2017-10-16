@@ -21,6 +21,10 @@
                         <i class="ace-icon fa fa-file-excel-o"></i>
                         导出
                     </button>
+                    <button class="btn btn-success btn-sm" onclick="matchLogic()">
+                        <i class="ace-icon fa fa-file-excel-o"></i>
+                        匹配
+                    </button>
                 </div>
                 <div>
                     <div id="query" class="col-xs-12 query" style="margin-top: 10px;margin-bottom: 10px;">
@@ -230,6 +234,23 @@
         });
         var url = '{%url "ErpOrderLogisticsDiff.Export"%}' + "?" + params;
         $('<form method="post" action="' + url + '"></form>').appendTo('body').submit().remove();
+    }
+
+    function matchLogic() {
+        $.ajax({
+            url: '{%url "ErpOrderLogistics.DetailData" %}',
+            type: "POST",
+            success: function (result) {
+                hideMask();
+                if (result.success === false) {
+                    $.msg.error(result.message);
+                    return;
+                } else {
+                    $.msg.show(result.message);
+                    return;
+                }
+            }
+        });
     }
 </script>
 {%footer%}

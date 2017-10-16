@@ -278,9 +278,9 @@ func (p_ol *OrderLogisticsService) CalculateListWithOption(order_list []ddlc_mod
 
 		var p_order_logistics_data = new(order_logistics_data_t)
 		//　一起加载需要的数据的方式，对性能的影响应该不会很大的
-		p_order_logistics_data.load_data(&order, p_ol, db_session)
+		p_order_logistics_data.load_data(order, p_ol, db_session)
 
-		go p_ol.match_logistics_mode_logic(&order, p_order_logistics_data)
+		go p_ol.match_logistics_mode_logic(order, p_order_logistics_data, nil)
 
 		/*
 		if revel.DevMode == false {
@@ -460,4 +460,16 @@ func (p_ol *OrderLogisticsService) CalculateSingle(order ddlc_models.OrderInfo, 
 
 func (p_ol *OrderLogisticsService) CalculateSingleWithOption(order ddlc_models.OrderInfo, match_option Match_option_t, db_session *xorm.Session) error {
 	return p_ol.CalculateListWithOption([]ddlc_models.OrderInfo{order}, match_option, db_session)
+}
+
+func (p_ol *OrderLogisticsService) CalculateListLogic(order_list []ddlc_models.OrderInfo, db_session *xorm.Session) {
+
+	p_ol.init_data(order_list, db_session)
+
+	for _, order := range order_list {
+		var p_order_logistics_data = new(order_logistics_data_t)
+		p_order_logistics_data.load_data(order, p_ol, db_session)
+
+		p_ol.match_logistics_mode_logic(order, p_order_logistics_data, db_session)
+	}
 }

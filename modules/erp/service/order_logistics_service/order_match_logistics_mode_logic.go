@@ -19,7 +19,7 @@ import (
 var db_driver string
 var db_url string
 
-func (p_ol *OrderLogisticsService) match_logistics_mode_logic(p_order *ddlc_models.OrderInfo, p_order_logistics_data *order_logistics_data_t) {
+func (p_ol *OrderLogisticsService) match_logistics_mode_logic(order ddlc_models.OrderInfo, p_order_logistics_data *order_logistics_data_t, db_session *xorm.Session) {
 
 	defer func() {
 		if err := recover(); err != nil {
@@ -28,43 +28,45 @@ func (p_ol *OrderLogisticsService) match_logistics_mode_logic(p_order *ddlc_mode
 		}
 	}()
 
-	// get db driver and db url
+	if db_session == nil {
+		// get db driver and db url
 
-	if db_driver == "" {
-		db_driver, _ = revel.Config.String("db.driver")
+		if db_driver == "" {
+			db_driver, _ = revel.Config.String("db.driver")
+		}
+
+		if db_url == "" {
+			db_url, _ = revel.Config.String("db.url")
+		}
+
+		db_engine, err := xorm.NewEngine(db_driver, db_url)
+		core.HandleError(err)
+
+		db_engine.TZLocation = time.Local
+		db_engine.SetMaxIdleConns(3)
+		db_engine.SetMaxOpenConns(100)
+
+		if revel.DevMode == true {
+			db_engine.ShowSQL()
+			db_engine.ShowExecTime()
+			xorm_core.LogQuerySql = true
+		}
+
+		db_session = db_engine.NewSession()
+		db_session = db_session.NoAutoCondition(true)
+
+		defer func() {
+			db_session.Close()
+		}()
 	}
-
-	if db_url == "" {
-		db_url, _ = revel.Config.String("db.url")
-	}
-
-	db_engine, err := xorm.NewEngine(db_driver, db_url)
-	core.HandleError(err)
-
-	db_engine.TZLocation = time.Local
-	db_engine.SetMaxIdleConns(3)
-	db_engine.SetMaxOpenConns(100)
-
-	if revel.DevMode == true {
-		db_engine.ShowSQL()
-		db_engine.ShowExecTime()
-		xorm_core.LogQuerySql = true
-	}
-
-	db_session := db_engine.NewSession()
-	db_session = db_session.NoAutoCondition(true)
-
-	defer func() {
-		db_session.Close()
-	}()
 
 	// 下面的三个 Hold 也应该加上理论发货仓库的记录，方便进行理论仓发货的统计
 
 	// pick up
-	if p_order.HoldTypeId.Int64 == ddpz_models.ORDER_HOLD_TYPE_PICK_UP {
+	if order.HoldTypeId.Int64 == ddpz_models.ORDER_HOLD_TYPE_PICK_UP {
 		var order_logistics_logic ddlc_models.OrderLogisticsLogicInfo
-		order_logistics_logic.OrderId = p_order.Id
-		order_logistics_logic.StockId = p_order.StockId
+		order_logistics_logic.OrderId = order.Id
+		order_logistics_logic.StockId = order.StockId
 
 		_, err := db_session.Insert(order_logistics_logic)
 		core.HandleError(err)
@@ -73,20 +75,20 @@ func (p_ol *OrderLogisticsService) match_logistics_mode_logic(p_order *ddlc_mode
 	}
 
 	// 信封的忽略
-	if p_order.HoldTypeId.Int64 == ddpz_models.ORDER_HOLD_TYPE_ENVELOPE || p_ol.is_envelope(p_order, p_order_logistics_data) == true {
-		save_special_hold_order_logistics_logic(p_ol, p_order.Id, p_order_logistics_data, db_session)
+	if order.HoldTypeId.Int64 == ddpz_models.ORDER_HOLD_TYPE_ENVELOPE || p_ol.is_envelope(&order, p_order_logistics_data) == true {
+		save_special_hold_order_logistics_logic(p_ol, order.Id, p_order_logistics_data, db_session)
 		return
 	}
 
 	// 国际件的忽略
-	if p_order.HoldTypeId.Int64 == ddpz_models.ORDER_HOLD_TYPE_INTERNATIONAL || p_ol.is_international_order(p_order, p_order_logistics_data) == true {
-		save_special_hold_order_logistics_logic(p_ol, p_order.Id, p_order_logistics_data, db_session)
+	if order.HoldTypeId.Int64 == ddpz_models.ORDER_HOLD_TYPE_INTERNATIONAL || p_ol.is_international_order(&order, p_order_logistics_data) == true {
+		save_special_hold_order_logistics_logic(p_ol, order.Id, p_order_logistics_data, db_session)
 		return
 	}
 
 	// 快递类的忽略
-	if p_order.HoldTypeId.Int64 == ddpz_models.ORDER_HOLD_TYPE_EXPRESS || p_ol.is_express(p_order, p_order_logistics_data) == true {
-		save_special_hold_order_logistics_logic(p_ol, p_order.Id, p_order_logistics_data, db_session)
+	if order.HoldTypeId.Int64 == ddpz_models.ORDER_HOLD_TYPE_EXPRESS || p_ol.is_express(&order, p_order_logistics_data) == true {
+		save_special_hold_order_logistics_logic(p_ol, order.Id, p_order_logistics_data, db_session)
 		return
 	}
 
@@ -97,7 +99,7 @@ func (p_ol *OrderLogisticsService) match_logistics_mode_logic(p_order *ddlc_mode
 	}
 
 	// 产品信息不全（长宽高重量不全或者有误），这个检查应该放在任何使用长宽高重量数据的检查之前。
-	if p_ol.is_product_info_miss(p_order, p_order_logistics_data) == true {
+	if p_ol.is_product_info_miss(&order, p_order_logistics_data) == true {
 		revel.TRACE.Println("is_product_info_miss")
 		return
 	}
@@ -115,8 +117,8 @@ func (p_ol *OrderLogisticsService) match_logistics_mode_logic(p_order *ddlc_mode
 	var stock_id_has_products_map = make(map[int64]stock_has_product_and_cost_amount_t)
 	for _, stock := range au_stock_list {
 		var stock_has_product_and_cost_amount stock_has_product_and_cost_amount_t
-		has_product, cost_amount := check_stock_has_order_products_and_get_cost_amount(p_ol, p_order, stock.Id, p_order_logistics_data, false) // 最后的 true false 都无所谓的，因为不关心数量
-		stock_has_product_and_cost_amount.has_product = has_product                                                                            // 仓库有没有全部的商品数量的库存
+		has_product, cost_amount := check_stock_has_order_products_and_get_cost_amount(p_ol, &order, stock.Id, p_order_logistics_data, false) // 最后的 true false 都无所谓的，因为不关心数量
+		stock_has_product_and_cost_amount.has_product = has_product                                                                           // 仓库有没有全部的商品数量的库存
 		stock_has_product_and_cost_amount.cost_amount = cost_amount
 
 		stock_id_has_products_map[stock.Id] = stock_has_product_and_cost_amount
@@ -128,16 +130,16 @@ func (p_ol *OrderLogisticsService) match_logistics_mode_logic(p_order *ddlc_mode
 	var final_result match_logistics_mode_result
 	var match_result_list = make([]match_logistics_mode_result, 0)
 
-	final_result.order_id = p_order.Id
-	final_result.order_code = p_order.Code
+	final_result.order_id = order.Id
+	final_result.order_code = order.Code
 
 	var lowest_total_fee = math.MaxFloat64 // 初始化为一个很大的不可能的值，澳币，
 
 	// 匹配的结果中，有库存记录的那些记录列表
 	for _, logistics_mode := range logistics_mode_list {
 		var mode_result match_logistics_mode_result
-		mode_result.order_id = p_order.Id
-		mode_result.order_code = p_order.Code
+		mode_result.order_id = order.Id
+		mode_result.order_code = order.Code
 		mode_result.address_id = p_order_logistics_data.order_shipping_address.Id
 		mode_result.address = p_order_logistics_data.order_shipping_address
 		mode_result.company_id = logistics_mode.CompanyId

@@ -429,6 +429,7 @@ POST /order/logistics/fee/diff/export      ErpOrderLogisticsFeeDiff.Export
 
 GET  /order/logistics/diff             ErpOrderLogisticsDiff.Index
 POST /order/logistics/diff/data/list   ErpOrderLogisticsDiff.ListData
+POST /order/logistics/diff/match       ErpOrderLogisticsDiff.Match
 POST /order/logistics/diff/export      ErpOrderLogisticsDiff.Export
 
 GET  /order/logistics/test                 ErpOrderLogisticsTest.Index
