@@ -72,6 +72,7 @@ func ProductSaleAnalyzeMultipleDay() {
 
 	var today_date_str = time.Now().Format("2006-01-02")
 
+	/*
 	type product_sale_analysis_t struct {
 		ProductId int64  `xorm:"'product_id'"`
 		Sku       string `xorm:"'sku'"`
@@ -84,6 +85,7 @@ func ProductSaleAnalyzeMultipleDay() {
 		Sku       string `xorm:"'sku'"`
 		Qty       int64  `xorm:"'qty'"`
 	}
+	*/
 
 	/*
 UPDATE erp_product_sale_analysis sa
