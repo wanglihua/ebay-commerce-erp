@@ -6,10 +6,6 @@ import (
 	"matrix/core"
 	"runtime/debug"
 	"github.com/revel/revel"
-	"fmt"
-	"matrix/modules/erp/models/kcgl_models"
-	"matrix/modules/erp/models/ddlc_models"
-	"matrix/modules/erp/models/spbb_models"
 )
 
 // 这是的所有统计都以已完成的订单为准，别的订单不统计
@@ -40,6 +36,12 @@ func ProductSaleAnalyzeSingleDay() {
 		db_session.Close()
 	}()
 
+	_, err = db_session.Exec("CALL product_sale_day_analysis();")
+	core.HandleError(err)
+
+	// 下面的代码是之前的做的不太好的代码，现在的代码改成存储过程了
+
+	/*
 	// 按单日统计
 
 	var time_now = time.Now()
@@ -61,14 +63,14 @@ func ProductSaleAnalyzeSingleDay() {
 		// 不分仓统计
 		{
 
-			/*
+			/ *
 SELECT oi.item_product_id AS product_id, sum(oi.quantity) AS qty
 FROM erp_order_item oi
 	INNER JOIN erp_order o ON oi.order_id = o.id
 WHERE '2017-06-01' <= o.paid_time AND o.paid_time < '2017-06-02' AND o.status_id = 4300 # 4300 已完成
 GROUP BY oi.item_product_id
 ORDER BY oi.item_product_id ASC;
-		 */
+		 * /
 
 			// 这里本来应该用的是 paid_time, 先改成 // 这里本来应该用的是 paid_time, 先改成 shipped_time，是统计数据统一，是统计数据统一
 
@@ -120,14 +122,14 @@ ORDER BY oi.item_product_id ASC;`
 
 		// 分仓统计 实际仓统计 已发货时间为准
 		{
-			/*
+			/ *
 SELECT oi.order_id AS order_id, oi.item_product_id AS product_id, sum(oi.quantity) AS qty
 FROM erp_order_item oi
 	INNER JOIN erp_order o ON oi.order_id = o.id
 WHERE '2017-06-01' <= o.shipped_time AND o.shipped_time < '2017-06-02' AND o.status_id = 4300 # 4300 已完成
 GROUP BY oi.order_id, oi.item_product_id
 ORDER BY oi.item_product_id ASC;
-		 */
+		 * /
 
 			var sql = `SELECT oi.order_id AS order_id, oi.item_product_id AS product_id, sum(oi.quantity) AS qty
 FROM erp_order_item oi
@@ -184,14 +186,14 @@ ORDER BY oi.item_product_id ASC;`
 
 		// 分仓统计 理论仓统计 以支付时间为准
 		{
-			/*
+			/ *
 SELECT oi.order_id AS order_id, oi.item_product_id AS product_id, sum(oi.quantity) AS qty
 FROM erp_order_item oi
 	INNER JOIN erp_order o ON oi.order_id = o.id
 WHERE '2017-06-01' <= o.paid_time AND o.paid_time < '2017-06-02' AND o.status_id = 4300 # 4300 已完成
 GROUP BY oi.order_id, oi.item_product_id
 ORDER BY oi.item_product_id ASC;
-		 */
+		 * /
 
 			// 这里本来应该用的是 paid_time, 先改成 // 这里本来应该用的是 paid_time, 先改成 shipped_time，是统计数据统一，是统计数据统一
 
@@ -248,4 +250,5 @@ ORDER BY oi.item_product_id ASC;`
 			}
 		}
 	}
+	*/
 }
