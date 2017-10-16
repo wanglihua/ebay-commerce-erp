@@ -150,16 +150,14 @@ FROM erp_product_sale_day_analysis da
 }
 
 func (c ErpProductSaleDayAnalysis) Analyze() revel.Result {
-	var db_session = c.DbSession
-
 	pass_service.Check_login_user_pass(pass_res.SPBB_PRODUCT_SALE_DAY_ANALYSIS, c.Session)
 
 	go product_sale_analysis_service.ProductSaleAnalyzeSingleDay()
 
-	var days_to_analyze = product_sale_analysis_service.GetDaysToAnalyze(db_session)
+	// var days_to_analyze = product_sale_analysis_service.GetDaysToAnalyze(db_session)
 
 	return c.RenderJson(map[string]interface{}{
 		"success": true,
-		"message": fmt.Sprintf("立即启动 近%d天日销售情况单日分析任务成功！", days_to_analyze),
+		"message": "立即启动 近日销售情况单日分析任务成功！",
 	})
 }
