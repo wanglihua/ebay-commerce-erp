@@ -238,7 +238,7 @@
 
     function matchLogic() {
         $.ajax({
-            url: '{%url "ErpOrderLogistics.DetailData" %}',
+            url: '{%url "ErpOrderLogisticsDiff.Match" %}',
             type: "POST",
             success: function (result) {
                 hideMask();
