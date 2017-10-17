@@ -280,6 +280,14 @@ func (p_ol *OrderLogisticsService) CalculateListWithOption(order_list []ddlc_mod
 		//　一起加载需要的数据的方式，对性能的影响应该不会很大的
 		p_order_logistics_data.load_data(order, p_ol, db_session)
 
+		if len(p_order_logistics_data.order_product_info_list) == 0 {
+			var order ddlc_models.OrderInfo
+			_, err := db_session.Id(order.Id).Get(&order)
+			core.HandleError(err)
+
+			panic(fmt.Sprintf("订单 %s 明细为空！", order.Code))
+		}
+
 		go p_ol.match_logistics_mode_logic(order, p_order_logistics_data, nil)
 
 		/*
@@ -470,6 +478,8 @@ func (p_ol *OrderLogisticsService) CalculateListLogic(order_list []ddlc_models.O
 		var p_order_logistics_data = new(order_logistics_data_t)
 		p_order_logistics_data.load_data(order, p_ol, db_session)
 
-		p_ol.match_logistics_mode_logic(order, p_order_logistics_data, db_session)
+		if len(p_order_logistics_data.order_product_info_list) > 0 {
+			p_ol.match_logistics_mode_logic(order, p_order_logistics_data, db_session)
+		}
 	}
 }

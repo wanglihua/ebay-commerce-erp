@@ -676,6 +676,26 @@ func check_stock_has_order_products_and_get_cost_amount(p_ol *OrderLogisticsServ
 	}
 }
 
+// 检查仓库是否有订单中的所有商品数量的库存。这里的有货就理解成这个仓库有订单的所有的商品；这里的缺货也理解成是，没有一个仓库能凑齐所有商品的所有数量。同时返回订单的商品总成本
+// consider_temp_pending_for_this_order 是否考虑当前订单被pending的数量
+func get_product_cost_amount(p_ol *OrderLogisticsService, stock_id int64, p_order_logistics_data *order_logistics_data_t) (cost_amount_return float64) {
+	var products_stock_qty_list = p_order_logistics_data.products_stock_qty_list //库存为零的也包含，只要有记录的都会包含，可以从里面取得仓库的成本价，就算库存为零也能取得成本价
+	var order_product_info_list = p_order_logistics_data.order_product_info_list //保存物流的时候要从这里面取 澳仓成本 cost_price
+
+	// 计算总的澳仓成本
+	var cost_amount float64 = 0
+	for _, order_product_info := range order_product_info_list {
+		for _, product_stock_qty := range products_stock_qty_list {
+			if product_stock_qty.StockId == stock_id && product_stock_qty.ProductId == order_product_info.ProductId {
+				//这里的 cost_amount = cost_amount + 实际也不是累加，因为只运行一次
+				cost_amount = cost_amount + float64(order_product_info.Qty)*product_stock_qty.CostPrice/p_ol.aud_exchange_rate // 库存成本换算成澳币，仓库成本都是RMB的
+			}
+		}
+	}
+
+	return cost_amount
+}
+
 func check_stock_has_some_order_products(p_ol *OrderLogisticsService, stock_id int64, p_order_logistics_data *order_logistics_data_t) (has_some_return bool) {
 	var products_stock_qty_list = p_order_logistics_data.products_stock_qty_list
 	var order_product_info_list = p_order_logistics_data.order_product_info_list
