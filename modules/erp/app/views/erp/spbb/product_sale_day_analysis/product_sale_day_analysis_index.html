@@ -116,7 +116,7 @@
                 refreshList('#productSaleDayAnalysisList');
             },
             analyze: function () {
-                $.msg.confirm("将立即启动单日销售后台分析任务，分析近3天日销售情况", function () {
+                $.msg.confirm("将立即启动单日销售后台分析任务，分析近日销售情况", function () {
                     $.ajax({
                         "dataType": 'json',
                         "url": '{% url "ErpProductSaleDayAnalysis.Analyze" %}',

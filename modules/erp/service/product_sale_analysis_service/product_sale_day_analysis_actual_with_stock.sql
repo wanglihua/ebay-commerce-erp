@@ -42,15 +42,20 @@ CREATE PROCEDURE product_sale_day_analysis_actual_with_stock()
         SET da_type = 100; # 100 实际分仓统计
 
         # 获取需要分析的开始时间
-        SELECT da.day
-        INTO analysis_begin_time
+        SELECT count(*)
+        INTO da_count
         FROM erp_product_sale_day_analysis da
-        ORDER BY da.day DESC
-        LIMIT 1;
+        WHERE da.type = da_type;
 
-        IF analysis_begin_time IS NULL
+        IF da_count = 0
         THEN
             SET analysis_begin_time = '2017-01-01';
+        ELSE
+            SELECT da.day
+            INTO analysis_begin_time
+            FROM erp_product_sale_day_analysis da
+            ORDER BY da.day DESC
+            LIMIT 1;
         END IF;
 
         -- 打开游标
