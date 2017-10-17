@@ -299,6 +299,7 @@ func (c ErpInventory) Save() revel.Result {
 	core.HandleError(err)
 
 	var qty_before = inventory_in_db.Qty
+	var cost_price_before = inventory_in_db.CostPrice
 
 	var stock sppz_models.StockInfo
 	_, err = db_session.Id(inventory.StockId).Get(&stock)
@@ -325,7 +326,7 @@ func (c ErpInventory) Save() revel.Result {
 		affected, err = db_session.Insert(&inventory)
 		core.HandleError(err)
 
-		inventory_history_service.Insert_inventory_history(inventory, fmt.Sprintf("手工新增库存， 工号：%s", login_user.LoginName), db_session)
+		inventory_history_service.Insert_inventory_history(inventory, fmt.Sprintf("手工新增库存 %d, 成本价 %f， 工号：%s", inventory.Qty, inventory.CostPrice, login_user.LoginName), db_session)
 	} else { // 更新数据库记录
 		inventory.Id = inventory_in_db.Id
 
@@ -349,12 +350,13 @@ func (c ErpInventory) Save() revel.Result {
 		core.HandleError(err)
 
 		var qty_after = inventory.Qty
+		var cost_price_after = inventory.CostPrice
 
 		if affected == 0 {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！"})
 		}
 
-		inventory_history_service.Insert_inventory_history(inventory, fmt.Sprintf("手工编辑库存 %d => %d，工号：%s", qty_before, qty_after, login_user.LoginName), db_session)
+		inventory_history_service.Insert_inventory_history(inventory, fmt.Sprintf("手工编辑库存 %d => %d，成本价 %f=> %f，工号：%s", qty_before, qty_after, cost_price_before, cost_price_after, login_user.LoginName), db_session)
 	}
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据保存成功!"})
@@ -635,24 +637,29 @@ func (c ErpInventory) Import() revel.Result {
 		inventory.StockId = stock_id
 		inventory.StorageLocId = storage_loc_id
 		inventory.ProductId = product_id
+
 		// inventory.Qty += inventory_import.Qty // 如果是插入的话， 开始时 inventory.Qty
 		var qty_before = inventory.Qty
+		var cost_price_before = inventory.CostPrice
+
 		inventory.Qty = inventory_import.Qty // 这里采用覆盖原来库存的方式
-		var qty_after = inventory.Qty
 		inventory.CostPrice = inventory_import.CostPrice
+
+		var qty_after = inventory.Qty
+		var cost_price_after = inventory.CostPrice
 
 		if has == false {
 			// 插入
 			_, err = db_session.Insert(&inventory)
 			core.HandleError(err)
 
-			inventory_history_service.Insert_inventory_history(inventory, fmt.Sprintf("导入新增库存, 工号：%s", login_user.LoginName), db_session)
+			inventory_history_service.Insert_inventory_history(inventory, fmt.Sprintf("导入新增库存 %d, 工号：%s", inventory.Qty, login_user.LoginName), db_session)
 		} else {
 			// 更新
 			_, err := db_session.Id(inventory.Id).Cols("product_id", "qty", "cost_price").Update(&inventory)
 			core.HandleError(err)
 
-			inventory_history_service.Insert_inventory_history(inventory, fmt.Sprintf("导入更新库存 %d => %d, 工号：%s", qty_before, qty_after, login_user.LoginName), db_session)
+			inventory_history_service.Insert_inventory_history(inventory, fmt.Sprintf("导入更新库存 %d => %d， 成本价 %f => %f, 工号：%s", qty_before, qty_after, cost_price_before, cost_price_after, login_user.LoginName), db_session)
 		}
 	}
 
@@ -1623,9 +1630,9 @@ func (c ErpInventory) ImportInventoryQuantity() revel.Result {
 		if has == false {
 			// 插入
 			_, err = db_session.Insert(&inventory)
+			core.HandleError(err)
 
 			inventory_history_service.Insert_inventory_history(inventory, fmt.Sprintf("导入新增库存, 工号：%s", login_user.LoginName), db_session)
-			core.HandleError(err)
 		} else {
 			// 更新
 			_, err := db_session.Id(inventory.Id).Cols("qty").Update(&inventory)
@@ -2055,16 +2062,24 @@ func (c ErpInventory) ImportInventoryPrice() revel.Result {
 		inventory.StockId = stock_id
 		// inventory.StorageLocId = storage_loc_id
 		inventory.ProductId = product_id
+		var cost_price_before = inventory.CostPrice
 		inventory.CostPrice = inventory_import.CostPrice
+		var cost_price_after = inventory.CostPrice
+
+		var login_user = core.GetLoginUser(c.Session)
 
 		if has == false {
 			// 插入
 			_, err = db_session.Insert(&inventory)
 			core.HandleError(err)
+
+			inventory_history_service.Insert_inventory_history(inventory, fmt.Sprintf("导入新增库存 %d, 成本价 %f, 工号：%s", inventory.Qty, inventory.CostPrice, login_user.LoginName), db_session)
 		} else {
 			// 更新
 			_, err := db_session.Id(inventory.Id).Cols("cost_price").Update(&inventory)
 			core.HandleError(err)
+
+			inventory_history_service.Insert_inventory_history(inventory, fmt.Sprintf("导入更新库存成本价 %f => %f，工号：%s", cost_price_before, cost_price_after, login_user.LoginName), db_session)
 		}
 	}
 
