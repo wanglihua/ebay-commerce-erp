@@ -24,6 +24,7 @@ func init() {
 		   jobs.Every(24 * time.Hour,    TestTask{})
 		*/
 
+		// 其实只是下载任务
 		var schedule_task_enabled = revel.Config.BoolDefault("schedule.task.enabled", false) // 临时禁用或启用定时任务
 		revel.TRACE.Println("schedule_task_enabled", schedule_task_enabled)
 
@@ -88,6 +89,9 @@ func init() {
 
 		// 商品销售分析
 		jobs.Every(2*time.Hour, tasks.ProductSaleAnalysisTask{})
+
+		// 智能补货
+		jobs.Every(4*time.Hour, tasks.IntelReplTask{})
 	})
 }
 
