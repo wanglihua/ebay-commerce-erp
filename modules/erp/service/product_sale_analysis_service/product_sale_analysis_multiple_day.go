@@ -8,6 +8,8 @@ import (
 	"github.com/revel/revel"
 	"fmt"
 	"matrix/modules/erp/service/product_sale_analysis_setting_service"
+	"bytes"
+	"matrix/modules/erp/models/spbb_models"
 )
 
 func ProductSaleAnalyzeMultipleDay() {
@@ -197,4 +199,66 @@ SET sa.level5_qty = da_sum.qty;`
 		_, err = db_session.Exec(sql)
 		core.HandleError(err)
 	}
+
+	/*
+
+UPDATE erp_product p1
+    INNER JOIN (
+                   SELECT p2.id AS product_id, (cast(sa.level1_qty / 90 * 0.2 + sa.level2_qty / 60 * 0.3 AS DECIMAL(18, 6))) AS ds # 多档计算
+                   FROM erp_product_sale_analysis sa
+                       INNER JOIN erp_product p2 ON sa.product_id = p2.id
+               ) ps
+        ON p1.id = ps.product_id
+SET p1.daily_mean_sales = ps.ds;
+
+	 */
+
+	var update_product_daily_mean_sales_sql = `UPDATE erp_product p1
+    INNER JOIN (
+                   SELECT p2.id AS product_id, (cast(%s AS DECIMAL(18, 6))) AS ds
+                   FROM erp_product_sale_analysis sa
+                       INNER JOIN erp_product p2 ON sa.product_id = p2.id
+               ) ps
+        ON p1.id = ps.product_id
+SET p1.daily_mean_sales = ps.ds;`
+	update_product_daily_mean_sales_sql = fmt.Sprintf(update_product_daily_mean_sales_sql, get_product_dialy_mean_sales_sql_expression(analysis_setting))
+
+	_, err = db_session.Exec(update_product_daily_mean_sales_sql)
+	core.HandleError(err)
+}
+
+func get_product_dialy_mean_sales_sql_expression(product_sale_analysis_setting spbb_models.ProductSaleAnalysisSettingInfo) string {
+	var buffer bytes.Buffer
+
+	if product_sale_analysis_setting.Level1Days != 0 {
+		buffer.WriteString(fmt.Sprintf("sa.level1_qty / %d * %f", product_sale_analysis_setting.Level1Days, product_sale_analysis_setting.Level1Weight))
+	} else {
+		return "0"
+	}
+
+	if product_sale_analysis_setting.Level2Days != 0 {
+		buffer.WriteString(fmt.Sprintf("+ sa.level2_qty / %d * %f", product_sale_analysis_setting.Level2Days, product_sale_analysis_setting.Level2Weight))
+	} else {
+		return buffer.String()
+	}
+
+	if product_sale_analysis_setting.Level3Days != 0 {
+		buffer.WriteString(fmt.Sprintf("+ sa.level3_qty / %d * %f", product_sale_analysis_setting.Level3Days, product_sale_analysis_setting.Level3Weight))
+	} else {
+		return buffer.String()
+	}
+
+	if product_sale_analysis_setting.Level4Days != 0 {
+		buffer.WriteString(fmt.Sprintf("+ sa.level4_qty / %d * %f", product_sale_analysis_setting.Level4Days, product_sale_analysis_setting.Level4Weight))
+	} else {
+		return buffer.String()
+	}
+
+	if product_sale_analysis_setting.Level5Days != 0 {
+		buffer.WriteString(fmt.Sprintf("+ sa.level5_qty / %d * %f", product_sale_analysis_setting.Level5Days, product_sale_analysis_setting.Level5Weight))
+	} else {
+		return buffer.String()
+	}
+
+	return buffer.String()
 }
