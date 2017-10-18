@@ -1,4 +1,4 @@
-{%header "商品长宽高重量" .%}
+{%header "商品采购设置" .%}
 <div id="page">
     <div class="breadcrumbs" id="breadcrumbs">
         <ul class="breadcrumb">
@@ -234,17 +234,6 @@
                             "render": function (data, type, row) {
                                 if (data !== 0) {
                                     return data;
-                                }
-                                else {
-                                    return "";
-                                }
-                            }
-                        },
-                        {
-                            "mDataProp": "p.daily_mean_sales", "title": "日均销量", "bSearchable": false, "width": 80, "sClass": "center",
-                            "render": function (data, type, row) {
-                                if (data !== 0) {
-                                    return dtFormatFloat(data);
                                 }
                                 else {
                                     return "";

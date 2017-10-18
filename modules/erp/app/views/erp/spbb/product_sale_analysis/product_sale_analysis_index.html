@@ -97,6 +97,18 @@
             if ("{% .level5_days %}" !== "0") {
                 column_list.push({"mDataProp": "sa.level5_qty", "title": "{% .level5_days %}天&nbsp;销量", "bSearchable": false, "sClass": "center", "width": 80});
             }
+            
+            column_list.push({
+                "mDataProp": "p.daily_mean_sales", "title": "日均销量", "bSearchable": false, "width": 80, "sClass": "center",
+                "render": function (data, type, row) {
+                    if (data !== 0) {
+                        return dtFormatFloat(data);
+                    }
+                    else {
+                        return "";
+                    }
+                }
+            });
 
             initDataTable(
                 '#productSaleAnalysisList',

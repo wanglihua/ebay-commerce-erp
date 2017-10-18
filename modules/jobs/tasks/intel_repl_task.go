@@ -6,6 +6,7 @@ import (
 	"runtime/debug"
 	"github.com/revel/revel"
 	"matrix/core"
+	"matrix/modules/erp/service/intel_repl_service"
 )
 
 type IntelReplTask struct {
@@ -47,5 +48,6 @@ func (t IntelReplTask) Run() {
 		db_session.Close()
 	}()
 
-	//todo: 生成商品只能补货条目
+	// 生成商品智能补货条目
+	intel_repl_service.Calculate_intel_repl(db_session)
 }

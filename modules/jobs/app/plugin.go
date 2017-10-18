@@ -91,7 +91,7 @@ func init() {
 		jobs.Every(2*time.Hour, tasks.ProductSaleAnalysisTask{})
 
 		// 智能补货
-		jobs.Every(4*time.Hour, tasks.IntelReplTask{})
+		jobs.Every(1*time.Hour, tasks.IntelReplTask{})
 	})
 }
 

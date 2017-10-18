@@ -30,6 +30,7 @@ const (
 	STATUS_TYPE_LOGISTICS_COMPANY      = 2000 // 物流公司状态
 	STATUS_TYPE_LOGISTICS_MODE         = 2100 // 物流模式状态
 	STATUS_TYPE_CONTAINER_TRANSFER     = 2200 // 集装箱调拨状态
+	STATUS_TYPE_INTEL_REPL             = 2300 // 智能补货
 
 	//状态类型 end
 
@@ -120,6 +121,9 @@ const (
 	CONTAINER_TRANSFER_STATUS_NEW    = 5400 // 集装箱调拨 已创建
 	CONTAINER_TRANSFER_STATUS_DEPART = 5500 // 集装箱调拨 已出发
 	CONTAINER_TRANSFER_STATUS_STOCK  = 5600 // 集装箱调拨 已到仓
+
+	INTEL_REPL_STATUS_XSC = 100 // 新生成
+	INTEL_REPL_STATUS_YCG = 200 // 已采购
 
 	//状态 id end
 )
@@ -651,6 +655,23 @@ func (e StatusInfo) InitData(db_session *xorm.Session) {
 		status.Type = STATUS_TYPE_CONTAINER_TRANSFER
 		status.Name = "已到仓"
 		status.Desc = core.MakeNullString("集装箱调拨状态 已到仓", true)
+		db_session.Insert(status)
+	}
+
+	// 智能补货状态
+	{
+		status := new(StatusInfo)
+		status.Id = INTEL_REPL_STATUS_XSC
+		status.Type = STATUS_TYPE_INTEL_REPL
+		status.Name = "新生成"
+		status.Desc = core.MakeNullString("智能补货状态 新生成", true)
+		db_session.Insert(status)
+
+		status = new(StatusInfo)
+		status.Id = INTEL_REPL_STATUS_YCG
+		status.Type = STATUS_TYPE_INTEL_REPL
+		status.Name = "已采购"
+		status.Desc = core.MakeNullString("智能补货状态 已采购", true)
 		db_session.Insert(status)
 	}
 }
