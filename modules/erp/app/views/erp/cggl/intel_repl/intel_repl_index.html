@@ -82,31 +82,9 @@
                                 <div class="row">
                                     <div class="col-xs-6">
                                         <div class="form-group">
-                                            <label for="level1_profit" class="col-xs-2 control-label">1档毛利率</label>
+                                            <label for="profit" class="col-xs-2 control-label">毛利率</label>
                                             <div class="col-xs-10">
-                                                <input id="level1_profit" name="detail.intel_repl.level1_profit" type="text" class="input-sm form-control" v-model.number="detail.intel_repl.level1_profit"/>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-xs-6">
-                                        <div class="form-group">
-                                            <label for="level2_profit" class="col-xs-2 control-label">2档毛利率</label>
-                                            <div class="col-xs-10">
-                                                <input id="level2_profit" name="detail.intel_repl.level2_profit" type="text" class="input-sm form-control" v-model.number="detail.intel_repl.level2_profit"/>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-xs-6">
-                                        <div class="form-group">
-                                            <label for="level3_profit" class="col-xs-2 control-label">3档毛利率</label>
-                                            <div class="col-xs-10">
-                                                <input id="level3_profit" name="detail.intel_repl.level3_profit" type="text" class="input-sm form-control" v-model.number="detail.intel_repl.level3_profit"/>
+                                                <input id="profit" name="detail.intel_repl.profit" type="text" class="input-sm form-control" v-model.number="detail.intel_repl.profit"/>
                                             </div>
                                         </div>
                                     </div>
@@ -164,9 +142,7 @@
                         {"mDataProp": "product_id", "title": "商品", "bSearchable": false},
                         {"mDataProp": "stock_id", "title": "仓库", "bSearchable": false},
                         {"mDataProp": "qty", "title": "数量", "bSearchable": false},
-                        {"mDataProp": "level1_profit", "title": "1档毛利率", "bSearchable": false},
-                        {"mDataProp": "level2_profit", "title": "2档毛利率", "bSearchable": false},
-                        {"mDataProp": "level3_profit", "title": "3档毛利率", "bSearchable": false},
+                        {"mDataProp": "profit", "title": "毛利率", "bSearchable": false},
                         {"mDataProp": "status_id", "title": "状态", "bSearchable": false},
                         {"mDataProp": "create_time", "title": "创建时间", "bSearchable": false, "width": 120}
                     ]

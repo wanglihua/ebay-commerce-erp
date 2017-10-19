@@ -67,11 +67,7 @@ func (f *IntelReplDetailForm) Valid(validation *revel.Validation) bool {
 
 	validation.Required(f.IntelRepl.Qty).Message("数量不能为空！")
 
-	validation.Required(f.IntelRepl.Level1Profit).Message("1档毛利率不能为空！")
-
-	validation.Required(f.IntelRepl.Level2Profit).Message("2档毛利率不能为空！")
-
-	validation.Required(f.IntelRepl.Level3Profit).Message("3档毛利率不能为空！")
+	validation.Required(f.IntelRepl.Profit).Message("毛利率不能为空！")
 
 	validation.Required(f.IntelRepl.StatusId).Message("状态不能为空！")
 
