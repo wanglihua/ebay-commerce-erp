@@ -92,6 +92,11 @@ func init() {
 
 		// 智能补货
 		jobs.Every(1*time.Hour, tasks.IntelReplTask{})
+
+		// 计算商品采购价
+		// 先不启用吧
+		// jobs.Every(4*time.Hour, tasks.CalculateProductPriceTask{})
+
 	})
 }
 
