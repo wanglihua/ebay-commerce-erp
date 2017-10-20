@@ -281,7 +281,7 @@ func (c ErpIntelRepl) Purchase() revel.Result {
 	// 生成采购单明细
 	for _, intel_repl := range intel_repl_list {
 		var purchase_bill_entry cggl_models.PurchaseBillEntryInfo
-		has, err := db_session.Where("bill_id = %d AND product_id = %d", purchase_bill.Id, intel_repl.ProductId).Get(&purchase_bill_entry)
+		has, err := db_session.Where(fmt.Sprintf("bill_id = %d AND product_id = %d", purchase_bill.Id, intel_repl.ProductId)).Get(&purchase_bill_entry)
 		core.HandleError(err)
 
 		purchase_bill_entry.BillId = purchase_bill.Id
@@ -306,6 +306,10 @@ func (c ErpIntelRepl) Purchase() revel.Result {
 			_, err = db_session.Insert(&purchase_bill_entry)
 			core.HandleError(err)
 		}
+
+		intel_repl.StatusId = models.INTEL_REPL_STATUS_YCG
+		_, err = db_session.Id(intel_repl.Id).Cols("status_id").Update(&intel_repl)
+		core.HandleError(err)
 	}
 
 	return c.RenderJson(map[string]interface{}{

@@ -43,7 +43,7 @@ CREATE PROCEDURE erp_get_next_bill_serial_v0002(p_entity_id INT)
 	}
 
 	var bill_next_serial BillNextSerial
-	sql := `CALL erp_get_next_bill_serial_v0002();`
+	sql := fmt.Sprintf(`CALL erp_get_next_bill_serial_v0002(%d);`, entity_id)
 	_, err := db_session.Sql(sql).Get(&bill_next_serial)
 	core.HandleError(err)
 

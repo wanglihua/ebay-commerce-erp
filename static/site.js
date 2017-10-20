@@ -328,6 +328,9 @@ $.msg = {
     confirm: function (text, fn) {
         $.messager.confirm("确认", '<div class="huaduConfirm"><i class="fa fa-question-circle fa-5x orange2"></i></br></br> ' + text + '</div>', fn);
     },
+    tip: function (text) {
+        $.messager.alert("确认", '<div class="huaduConfirm"><i class="fa fa-exclamation-circle fa-5x blue"></i></br></br>' + text + '</div>');
+    },
     show: function (text) {
         $.messager.popup("<span style='color:green;font-weight:bold;'>" + text + "</span>");
     }

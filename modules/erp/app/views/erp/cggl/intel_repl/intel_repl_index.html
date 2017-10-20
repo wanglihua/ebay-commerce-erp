@@ -17,12 +17,10 @@
                         <i class="ace-icon fa fa-refresh"></i>
                         刷新
                     </button>
-                    <!--
-                    <button class="btn btn-success btn-sm" @click="showIntelReplDetail(0)">
+                    <button class="btn btn-success btn-sm" onclick="genPurchaseBill()">
                         <i class="ace-icon fa fa-plus"></i>
-                        新增
+                        生成采购单
                     </button>
-                    -->
                     <button class="btn btn-danger btn-sm" @click="deleteIntelRepl()">
                         <i class="ace-icon fa fa-trash-o"></i>
                         删除
@@ -141,6 +139,39 @@
 
     function search() {
         refreshList('#intelReplList');
+    }
+
+    function genPurchaseBill() {
+        var id_list = [];
+        $('#intelReplList tbody tr>td:first-child input:checkbox').each(function () {
+            if (this.checked) {
+                id_list.push($(this).val());
+            }
+        });
+
+        if (id_list.length === 0) {
+            $.msg.alert("请选择数据！");
+            return;
+        }
+
+        $.msg.confirm("确认要生成采购单吗？", function () {
+            $.ajax({
+                url: '{%url "ErpIntelRepl.Purchase"%}',
+                type: "POST",
+                data: {"id_list": id_list},
+                success: function (data) {
+                    if (data.success === false) {
+                        $.msg.error(data.message);
+                        return;
+                    }
+                    else {
+                        $.msg.tip(data.message);
+                        vm.reloadList();
+                        return;
+                    }
+                }
+            });
+        });
     }
 
     var vm = new Vue({
