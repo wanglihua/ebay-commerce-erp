@@ -11,6 +11,9 @@ import (
 	"matrix/modules/auth/pass_res"
 	"matrix/modules/erp/models/sppz_models"
 	"fmt"
+	"matrix/modules/erp/models/kcgl_models"
+	"matrix/modules/erp/models"
+	"strings"
 )
 
 type ErpIntelRepl struct {
@@ -30,34 +33,123 @@ func (c ErpIntelRepl) Index() revel.Result {
 	return c.RenderTemplate("erp/cggl/intel_repl/intel_repl_index.html")
 }
 
+type intel_repl_view_item_t struct {
+	IntelRepl cggl_models.IntelReplInfo `xorm:"extends" json:"ir"`
+	Product   kcgl_models.ProductInfo   `xorm:"extends" json:"p"`
+	Status    models.StatusInfo         `xorm:"extends" json:"s"`
+}
+
 func (c ErpIntelRepl) ListData() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.CGGL_INTEL_REPL, c.Session)
 
 	db_session := c.DbSession
 
-	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
-	query := db_session.Where(filter)
+	/*
+sku_query:
+stock_id_query:0
+min_profit_query:
+max_profit_query:
+	 */
 
-	//query extra filter here
+	var sku_query string
+	c.Params.Bind(&sku_query, "sku_query")
+	sku_query = strings.TrimSpace(sku_query)
 
-	data_query := *query
-	if order != "" {
-		data_query = *data_query.OrderBy(order)
-	} else {
-		data_query = *data_query.Asc("id")
+	var stock_id_query int64
+	c.Params.Bind(&stock_id_query, "stock_id_query")
+
+	var min_profit_query_str string
+	c.Params.Bind(&min_profit_query_str, "min_profit_query")
+	min_profit_query_str = strings.TrimSpace(min_profit_query_str)
+	var min_profit_query float64
+	var err error
+	if min_profit_query_str != "" {
+		min_profit_query, err = strconv.ParseFloat(min_profit_query_str, 64)
+		if err != nil {
+			return c.RenderJson(map[string]interface{}{
+				"success": false,
+				"message": "最小利润率输入有误！",
+			})
+		}
 	}
 
-	intel_repl_list := make([]cggl_models.IntelReplInfo, 0, limit)
-	err := data_query.Limit(limit, offset).Find(&intel_repl_list)
-	core.HandleError(err)
+	var max_profit_query_str string
+	c.Params.Bind(&max_profit_query_str, "max_profit_query")
+	max_profit_query_str = strings.TrimSpace(max_profit_query_str)
+	var max_profit_query float64
 
-	count_query := *query
-	count, err := count_query.Count(new(cggl_models.IntelReplInfo))
+	if max_profit_query_str != "" {
+		max_profit_query, err = strconv.ParseFloat(max_profit_query_str, 64)
+		if err != nil {
+			return c.RenderJson(map[string]interface{}{
+				"success": false,
+				"message": "最大利润率输入有误！",
+			})
+		}
+	}
+
+	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
+
+	/*
+
+SELECT ir.*, p.*, st.*, s.*
+FROM erp_intel_repl ir
+    INNER JOIN erp_product p ON ir.product_id = p.id
+    INNER JOIN erp_stock st on ir.stock_id = st.id
+    INNER JOIN erp_status s ON ir.status_id = s.id;
+
+SELECT count(ir.id) AS count
+FROM erp_intel_repl ir
+    INNER JOIN erp_product p ON ir.product_id = p.id
+    INNER JOIN erp_stock st on ir.stock_id = st.id
+    INNER JOIN erp_status s ON ir.status_id = s.id;
+
+	 */
+
+	var sb = core.NewSqlBuilder()
+	sb.Select("ir.*, p.*, s.*")
+	sb.Count("count(ir.id) AS count")
+	sb.From(`erp_intel_repl ir
+    INNER JOIN erp_product p ON ir.product_id = p.id
+    INNER JOIN erp_stock st on ir.stock_id = st.id
+    INNER JOIN erp_status s ON ir.status_id = s.id`)
+
+	if sku_query != "" {
+		filter = core.SqlAnd(filter, fmt.Sprintf("p.sku = '%s'", sku_query))
+	}
+
+	if stock_id_query != 0 {
+		filter = core.SqlAnd(filter, fmt.Sprintf("ir.stock_id = %d", stock_id_query))
+	}
+
+	if min_profit_query != 0 {
+		filter = core.SqlAnd(filter, fmt.Sprintf("ir.profit >= %f", min_profit_query))
+	}
+
+	if max_profit_query != 0 {
+		filter = core.SqlAnd(filter, fmt.Sprintf("ir.profit <= %f", max_profit_query))
+	}
+
+	sb.Where(filter)
+
+	sb.Limit(offset, limit)
+
+	if order != "" {
+		sb.OrderBy(order)
+	} else {
+		sb.OrderBy("ir.id DESC")
+	}
+
+	var intel_repl_list = make([]intel_repl_view_item_t, 0)
+	core.HandleError(db_session.Sql(sb.SqlList()).Find(&intel_repl_list))
+
+	var count core.Count
+	_, err = db_session.Sql(sb.SqlCount()).Get(&count)
 	core.HandleError(err)
 
 	return c.RenderJson(core.GridResult{
 		Data:  intel_repl_list,
-		Total: count,
+		Total: count.Count,
 	})
 }
 

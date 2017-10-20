@@ -32,7 +32,7 @@
                     <label for="sku_query">SKU</label>
                     <input id="sku_query" name="sku_query" style="width: 120px;height: 30px;" placeholder="SKU查询"/>
                     &nbsp;
-                    <label for="stock_id_query"></label>
+                    <label for="stock_id_query">仓库</label>
                     <select id="stock_id_query" name="stock_id_query" style="height: 30px;">
                         <option :value="0">仓库列表</option>
                         {% range $index, $stock := .stock_list %}
@@ -43,8 +43,8 @@
                     <label for="min_profit_query">毛利率区间</label>
                     <input id="min_profit_query" name="min_profit_query" style="width: 70px;height:30px;" placeholder="最小毛利率"/>~
                     <input id="max_profit_query" name="max_profit_query" style="width: 70px;height:30px;" placeholder="最大毛利率"/>
-                    <button class="btn btn-mini btn-primary" style="margin-bottom:3px;height: 30px;" onclick="search()"> &nbsp;
-                        &nbsp;<i class="ace-icon fa fa-search"></i>查&nbsp;询&nbsp;
+                    &nbsp;
+                    <button class="btn btn-mini btn-primary" style="margin-bottom:3px;height: 30px;" onclick="search()"> &nbsp;<i class="ace-icon fa fa-search"></i>查&nbsp;询&nbsp;
                     </button>
                     <hr style="margin-top:10px;margin-bottom:10px;"/>
                 </div>
@@ -158,19 +158,42 @@
                     "aaSorting": [[1, "asc"]],
                     "aoColumns": [
                         {
-                            "mDataProp": "id", "bSearchable": false, "orderable": false, "sClass": "center", "width": 50,
+                            "mDataProp": "ir.id", "bSearchable": false, "orderable": false, "sClass": "center", "width": 50,
                             "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
                             "render": function (data, type, row) {
                                 return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
                             }
                         },
-                        {"mDataProp": "product_id", "title": "商品", "bSearchable": false},
-                        {"mDataProp": "stock_id", "title": "仓库", "bSearchable": false},
-                        {"mDataProp": "qty", "title": "数量", "bSearchable": false},
-                        {"mDataProp": "profit", "title": "毛利率", "bSearchable": false},
-                        {"mDataProp": "status_id", "title": "状态", "bSearchable": false},
-                        {"mDataProp": "create_time", "title": "创建时间", "bSearchable": false, "width": 120}
-                    ]
+                        {"mDataProp": "p.sku", "title": "SKU", "bSearchable": true, "width": 150},
+                        {"mDataProp": "p.cn_name", "title": "商品", "bSearchable": true},
+                        {"mDataProp": "st.name", "title": "仓库", "bSearchable": true, "width": 150},
+                        {"mDataProp": "ir.qty", "title": "数量", "bSearchable": false, "width": 80},
+                        {"mDataProp": "ir.profit", "title": "毛利率", "bSearchable": false, "width": 80},
+                        {"mDataProp": "s.name", "title": "状态", "bSearchable": true, "width": 80},
+                        {"mDataProp": "ir.create_time", "title": "创建时间", "bSearchable": false, "width": 120}
+                    ],
+                    "fnServerData": function (sSource, aoData, fnCallback) {
+                        showMask("数据加载中，请稍候");
+
+                        aoData.push({'name': 'sku_query', 'value': $("#sku_query").val()});
+                        aoData.push({'name': 'stock_id_query', 'value': $("#stock_id_query").val()});
+                        aoData.push({'name': 'min_profit_query', 'value': $("#min_profit_query").val()});
+                        aoData.push({'name': 'max_profit_query', 'value': $("#max_profit_query").val()});
+
+                        $.ajax({
+                            "dataType": 'json',
+                            "url": sSource,
+                            "data": aoData,
+                            "success": function (data) {
+                                hideMask();
+                                if (data.success === false) {
+                                    $.msg.error(data.message);
+                                    return;
+                                }
+                                fnCallback(data);
+                            }
+                        });
+                    }
                 }
             );
 
@@ -194,7 +217,7 @@
                         },
                         success: function (result) {
                             hideMask();
-                            if (result.success == false) {
+                            if (result.success === false) {
                                 $.msg.error(result.message);
                                 return;
                             }
@@ -242,7 +265,7 @@
                             data: JSON.stringify(vm.detail),
                             success: function (data) {
                                 hideMask();
-                                if (data.success == false) {
+                                if (data.success === false) {
                                     $.msg.error(data.message);
                                     //return;
                                 }
@@ -265,7 +288,7 @@
                     }
                 });
 
-                if (id_list.length == 0) {
+                if (id_list.length === 0) {
                     $.msg.alert("请选择数据！");
                     return;
                 }
@@ -276,7 +299,7 @@
                         type: "POST",
                         data: {"id_list": id_list},
                         success: function (data) {
-                            if (data.success == false) {
+                            if (data.success === false) {
                                 $.msg.error(data.message);
                                 return;
                             }
