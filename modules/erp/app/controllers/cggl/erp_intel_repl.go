@@ -9,6 +9,8 @@ import (
 	"matrix/modules/erp/models/cggl_models"
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/auth/pass_res"
+	"matrix/modules/erp/models/sppz_models"
+	"fmt"
 )
 
 type ErpIntelRepl struct {
@@ -17,6 +19,13 @@ type ErpIntelRepl struct {
 
 func (c ErpIntelRepl) Index() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.CGGL_INTEL_REPL, c.Session)
+
+	var db_session = c.DbSession
+
+	var stock_list = make([]sppz_models.StockInfo, 0)
+	core.HandleError(db_session.Where(fmt.Sprintf("stock_type_id = %d", sppz_models.STOCK_TYPE_AU)).Find(&stock_list))
+
+	c.RenderArgs["stock_list"] = stock_list
 
 	return c.RenderTemplate("erp/cggl/intel_repl/intel_repl_index.html")
 }

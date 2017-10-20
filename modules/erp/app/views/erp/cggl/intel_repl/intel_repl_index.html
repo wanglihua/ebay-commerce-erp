@@ -28,6 +28,26 @@
                         删除
                     </button>
                 </div>
+                <div id="query" style="line-height: 28px;">
+                    <label for="sku_query">SKU</label>
+                    <input id="sku_query" name="sku_query" style="width: 120px;height: 30px;" placeholder="SKU查询"/>
+                    &nbsp;
+                    <label for="stock_id_query"></label>
+                    <select id="stock_id_query" name="stock_id_query" style="height: 30px;">
+                        <option :value="0">仓库列表</option>
+                        {% range $index, $stock := .stock_list %}
+                        <option :value="{% $stock.Id %}">{% $stock.Name %}</option>
+                        {% end %}
+                    </select>
+                    &nbsp;
+                    <label for="min_profit_query">毛利率区间</label>
+                    <input id="min_profit_query" name="min_profit_query" style="width: 70px;height:30px;" placeholder="最小毛利率"/>~
+                    <input id="max_profit_query" name="max_profit_query" style="width: 70px;height:30px;" placeholder="最大毛利率"/>
+                    <button class="btn btn-mini btn-primary" style="margin-bottom:3px;height: 30px;" onclick="search()"> &nbsp;
+                        &nbsp;<i class="ace-icon fa fa-search"></i>查&nbsp;询&nbsp;
+                    </button>
+                    <hr style="margin-top:10px;margin-bottom:10px;"/>
+                </div>
                 <div>
                     <table id="intelReplList" class="table table-striped table-bordered table-hover"></table>
                 </div>
@@ -118,6 +138,11 @@
     </div>
 </div>
 <script type="text/javascript">
+
+    function search() {
+        refreshList('#intelReplList');
+    }
+
     var vm = new Vue({
         el: "#page",
         data: {
