@@ -14,6 +14,8 @@ import (
 	"matrix/modules/erp/models/kcgl_models"
 	"matrix/modules/erp/models"
 	"strings"
+	"matrix/modules/erp/service/stock_service"
+	"matrix/modules/erp/service/bill_service"
 )
 
 type ErpIntelRepl struct {
@@ -36,6 +38,7 @@ func (c ErpIntelRepl) Index() revel.Result {
 type intel_repl_view_item_t struct {
 	IntelRepl cggl_models.IntelReplInfo `xorm:"extends" json:"ir"`
 	Product   kcgl_models.ProductInfo   `xorm:"extends" json:"p"`
+	Stock     sppz_models.StockInfo     `xorm:"extends" json:"st"`
 	Status    models.StatusInfo         `xorm:"extends" json:"s"`
 }
 
@@ -107,7 +110,7 @@ FROM erp_intel_repl ir
 	 */
 
 	var sb = core.NewSqlBuilder()
-	sb.Select("ir.*, p.*, s.*")
+	sb.Select("ir.*, p.*, st.*, s.*")
 	sb.Count("count(ir.id) AS count")
 	sb.From(`erp_intel_repl ir
     INNER JOIN erp_product p ON ir.product_id = p.id
@@ -241,4 +244,72 @@ func (c ErpIntelRepl) Delete() revel.Result {
 	core.HandleError(err)
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})
+}
+
+func (c ErpIntelRepl) Purchase() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.CGGL_INTEL_REPL, c.Session)
+
+	var db_session = c.DbSession
+
+	var intel_repl_id_list = make([]int64, 0)
+	c.Params.Bind(&intel_repl_id_list, "id_list")
+
+	var intel_repl_list = make([]cggl_models.IntelReplInfo, 0)
+	core.HandleError(db_session.In("id", intel_repl_id_list).Find(&intel_repl_list))
+
+	if len(intel_repl_id_list) == 0 {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "请选择智能补货条目！",
+		})
+	}
+
+	var mel_stock_id = stock_service.Get_mel_stock_id(db_session)
+	var bne_stock_id = stock_service.Get_bne_stock_id(db_session)
+
+	var login_user = core.GetLoginUser(c.Session)
+
+	// 生成采购单
+	var purchase_bill cggl_models.PurchaseBillInfo
+	purchase_bill.Code = bill_service.GetNextBillNo(bill_service.ENTITY_ID_PURCHASE_BILL, db_session, c.Session)
+	purchase_bill.StatusId = models.PURCHASE_BILL_STATUS_YCJ
+	purchase_bill.ApplyUserId = login_user.UserId
+
+	_, err := db_session.Insert(&purchase_bill)
+	core.HandleError(err)
+
+	// 生成采购单明细
+	for _, intel_repl := range intel_repl_list {
+		var purchase_bill_entry cggl_models.PurchaseBillEntryInfo
+		has, err := db_session.Where("bill_id = %d AND product_id = %d", purchase_bill.Id, intel_repl.ProductId).Get(&purchase_bill_entry)
+		core.HandleError(err)
+
+		purchase_bill_entry.BillId = purchase_bill.Id
+		purchase_bill_entry.ProductId = intel_repl.ProductId
+
+		if intel_repl.StockId == mel_stock_id {
+			purchase_bill_entry.MelQty = intel_repl.Qty
+		}
+
+		if intel_repl.StockId == bne_stock_id {
+			purchase_bill_entry.BneQty = intel_repl.Qty
+		}
+
+		purchase_bill_entry.Qty = purchase_bill_entry.MelQty + purchase_bill_entry.BneQty
+		purchase_bill_entry.StatusId = purchase_bill.StatusId
+
+		if has == true {
+			var col_list = []string{"bill_id", "product_id", "mel_qty", "bne_qty", "qty", "status_id"}
+			_, err = db_session.Id(purchase_bill_entry.Id).Cols(col_list...).Update(&purchase_bill_entry)
+			core.HandleError(err)
+		} else {
+			_, err = db_session.Insert(&purchase_bill_entry)
+			core.HandleError(err)
+		}
+	}
+
+	return c.RenderJson(map[string]interface{}{
+		"success": true,
+		"message": fmt.Sprintf("生成采购单 %s 成功！", purchase_bill.Code),
+	})
 }

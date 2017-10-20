@@ -713,6 +713,7 @@ POST /intel/repl/data/list          ErpIntelRepl.ListData
 POST /intel/repl/data/detail        ErpIntelRepl.DetailData
 POST /intel/repl/save               ErpIntelRepl.Save
 POST /intel/repl/delete             ErpIntelRepl.Delete
+POST /intel/repl/purchase           ErpIntelRepl.Purchase
 
 GET  /product/price/estimate            ErpProductPriceEstimate.Index
 POST /product/price/estimate/sku/info   ErpProductPriceEstimate.GetSkuInfo

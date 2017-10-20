@@ -30,8 +30,8 @@ func (c ErpStockBillCheckout) Index() revel.Result {
 type ErpStockBillCheckoutViewItem struct {
 	kcgl_models.StockBillInfo `xorm:"extends" json:"sb"`
 	sppz_models.StockInfo     `xorm:"extends" json:"s"`
-	auth_models.UserInfo `xorm:"extends" json:"u"`
-	models.StatusInfo    `xorm:"extends" json:"st"`
+	auth_models.UserInfo      `xorm:"extends" json:"u"`
+	models.StatusInfo         `xorm:"extends" json:"st"`
 }
 
 func (c ErpStockBillCheckout) ListData() revel.Result {
@@ -132,7 +132,7 @@ func (c ErpStockBillCheckout) DetailData() revel.Result {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "指定的出库单不存在！"})
 		}
 	} else {
-		stock_bill.Code = bill_service.GetNextBillNo(db_session, c.Session)
+		stock_bill.Code = bill_service.GetNextBillNo(bill_service.ENTITY_ID_STOCK_BILL_CHECK_OUT, db_session, c.Session)
 		stock_bill.Date = core.Date(time.Now())
 	}
 

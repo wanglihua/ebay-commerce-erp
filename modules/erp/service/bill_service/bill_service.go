@@ -8,36 +8,42 @@ import (
 	"github.com/revel/revel"
 )
 
-func GetNextBillNo(db_session *xorm.Session, web_session revel.Session) string {
+const (
+	ENTITY_ID_INVENTORY_CHECK      = 10001 // 盘点单
+	ENTITY_ID_STOCK_BILL_CHECK_IN  = 10002 // 入库单
+	ENTITY_ID_STOCK_BILL_CHECK_OUT = 10003 // 出库单
+	ENTITY_ID_STOCK_BILL_TRANSFER  = 10004 // 调拨单
+	ENTITY_ID_PURCHASE_BILL        = 10005 // 采购单
+)
+
+func GetNextBillNo(entity_id int64, db_session *xorm.Session, web_session revel.Session) string {
 	sql_proc := `
-CREATE PROCEDURE erp_get_next_bill_serial_v0001()
+CREATE PROCEDURE erp_get_next_bill_serial_v0002(p_entity_id INT)
     BEGIN
-        DECLARE ENTITY_ID_BILL INT;
         DECLARE v_today DATETIME;
         DECLARE v_count INT;
 
-        SET ENTITY_ID_BILL = 100100;
         SET v_today = date(now());
 
-        SELECT count(*) INTO v_count FROM erp_entity_code WHERE entity_id = ENTITY_ID_BILL AND date = v_today;
+        SELECT count(*) INTO v_count FROM erp_entity_code WHERE entity_id = p_entity_id AND date = v_today;
 
         IF v_count = 0 THEN
-            INSERT INTO erp_entity_code (entity_id, serial, date) VALUES (ENTITY_ID_BILL, 1, v_today);
+            INSERT INTO erp_entity_code (entity_id, serial, date) VALUES (p_entity_id, 1, v_today);
         ELSE
-            UPDATE erp_entity_code SET serial = erp_entity_code.serial + 1 WHERE entity_id = ENTITY_ID_BILL AND date = v_today;
+            UPDATE erp_entity_code SET serial = erp_entity_code.serial + 1 WHERE entity_id = p_entity_id AND date = v_today;
         END IF;
 
-        SELECT serial AS next_serial FROM erp_entity_code WHERE entity_id = ENTITY_ID_BILL AND date = v_today;
+        SELECT serial AS next_serial FROM erp_entity_code WHERE entity_id = p_entity_id AND date = v_today;
     END;
 	`
-	core.CreateProc("erp_get_next_bill_serial_v0001", sql_proc, db_session)
+	core.CreateProc("erp_get_next_bill_serial_v0002", sql_proc, db_session)
 
 	type BillNextSerial struct {
 		NextSerial int64 `xorm:"'next_serial'" json:"next_serial"`
 	}
 
 	var bill_next_serial BillNextSerial
-	sql := `CALL erp_get_next_bill_serial_v0001();`
+	sql := `CALL erp_get_next_bill_serial_v0002();`
 	_, err := db_session.Sql(sql).Get(&bill_next_serial)
 	core.HandleError(err)
 

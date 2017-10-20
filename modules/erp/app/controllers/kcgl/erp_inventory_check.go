@@ -127,7 +127,7 @@ func (c ErpInventoryCheck) DetailData() revel.Result {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "指定的库存盘点不存在！"})
 		}
 	} else {
-		inventory_check.Code = bill_service.GetNextBillNo(db_session, c.Session)
+		inventory_check.Code = bill_service.GetNextBillNo(bill_service.ENTITY_ID_INVENTORY_CHECK, db_session, c.Session)
 		inventory_check.CheckDate = core.Date(time.Now())
 	}
 

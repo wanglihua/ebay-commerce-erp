@@ -151,7 +151,7 @@ func (c ErpPurchaseBill) ListData() revel.Result {
 	/*
 SELECT pb.*, sup.*, s.*, ayu.*, avu.*, pu.*, cu.*
 FROM erp_purchase_bill pb
-    INNER JOIN erp_supplier sup ON sup.id = pb.supplier_id
+    LEFT JOIN erp_supplier sup ON sup.id = pb.supplier_id
     INNER JOIN erp_status s ON pb.status_id = s.id
     INNER JOIN auth_user ayu ON pb.apply_user_id = ayu.id
     LEFT JOIN auth_user avu ON pb.approve_user_id = avu.id
@@ -163,7 +163,7 @@ FROM erp_purchase_bill pb
 	sql_builder.Select("pb.*, sup.*, s.*, ayu.*, avu.*, pu.*, cu.*")
 	sql_builder.Count("count(pb.id) as bill_count")
 	sql_builder.From(`erp_purchase_bill pb
-    INNER JOIN erp_supplier sup ON sup.id = pb.supplier_id
+    LEFT JOIN erp_supplier sup ON sup.id = pb.supplier_id
     INNER JOIN erp_status s ON pb.status_id = s.id
     INNER JOIN auth_user ayu ON pb.apply_user_id = ayu.id
     LEFT JOIN auth_user avu ON pb.approve_user_id = avu.id
@@ -289,7 +289,7 @@ func (c ErpPurchaseBill) DetailData() revel.Result {
 		supplier_name = supplier.Name
 
 	} else {
-		purchase_bill.Code = bill_service.GetNextBillNo(db_session, c.Session)
+		purchase_bill.Code = bill_service.GetNextBillNo(bill_service.ENTITY_ID_PURCHASE_BILL, db_session, c.Session)
 	}
 
 	var pay_method_list = make([]sppz_models.SupplierPayMethodInfo, 0)
