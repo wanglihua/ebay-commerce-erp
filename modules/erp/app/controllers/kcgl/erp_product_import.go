@@ -216,50 +216,75 @@ func (c ErpProductImport) Upload() revel.Result {
 			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
 			//revel.TRACE.Println(cell_val)
-			cost_price, err := strconv.ParseFloat(cell_val, 64)
-			core.HandleError(err)
-			product_import.cost_price = cost_price
+			if cell_val != "" {
+				cost_price, err := strconv.ParseFloat(cell_val, 64)
+				core.HandleError(err)
+				product_import.cost_price = cost_price
+			} else {
+				product_import.cost_price = 0
+			}
 			col_index++
 
 			// length
 			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
 			//revel.TRACE.Println(cell_val)
-			product_length, err := strconv.ParseFloat(cell_val, 64)
-			core.HandleError(err)
-			product_import.length = product_length
+			if cell_val != "" {
+				product_length, err := strconv.ParseFloat(cell_val, 64)
+				core.HandleError(err)
+				product_import.length = product_length
+			} else {
+				product_import.length = 0
+			}
 			col_index++
 
 			// width
 			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
 			//revel.TRACE.Println(cell_val)
-			product_width, err := strconv.ParseFloat(cell_val, 64)
-			core.HandleError(err)
-			product_import.width = product_width
+			if cell_val != "" {
+				product_width, err := strconv.ParseFloat(cell_val, 64)
+				core.HandleError(err)
+				product_import.width = product_width
+			} else {
+				product_import.width = 0
+			}
 			col_index++
 
 			// height
 			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
 			//revel.TRACE.Println(cell_val)
-			product_height, err := strconv.ParseFloat(cell_val, 64)
-			core.HandleError(err)
-			product_import.height = product_height
+			if cell_val != "" {
+				product_height, err := strconv.ParseFloat(cell_val, 64)
+				core.HandleError(err)
+				product_import.height = product_height
+			} else {
+				product_import.height = 0
+			}
 			col_index++
 
 			// weight
 			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
 			//revel.TRACE.Println(cell_val)
-			weight, err := strconv.ParseFloat(cell_val, 64)
-			core.HandleError(err)
-			product_import.weight = weight
+			if cell_val != "" {
+				weight, err := strconv.ParseFloat(cell_val, 64)
+				core.HandleError(err)
+				product_import.weight = weight
+			} else {
+				product_import.weight = 0
+			}
 			col_index++
 
 			// 状态
