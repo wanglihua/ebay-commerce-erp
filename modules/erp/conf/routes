@@ -718,3 +718,9 @@ POST /intel/repl/purchase           ErpIntelRepl.Purchase
 GET  /product/price/estimate            ErpProductPriceEstimate.Index
 POST /product/price/estimate/sku/info   ErpProductPriceEstimate.GetSkuInfo
 POST /product/price/estimate/post       ErpProductPriceEstimate.Estimate
+
+GET  /fav/stock/time/range                ErpFavStockTimeRange.Index
+POST /fav/stock/time/range/data/list      ErpFavStockTimeRange.ListData
+POST /fav/stock/time/range/data/detail    ErpFavStockTimeRange.DetailData
+POST /fav/stock/time/range/save           ErpFavStockTimeRange.Save
+POST /fav/stock/time/range/delete         ErpFavStockTimeRange.Delete

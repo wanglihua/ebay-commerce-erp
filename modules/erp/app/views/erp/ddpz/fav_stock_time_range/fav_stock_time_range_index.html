@@ -1,0 +1,263 @@
+{%header "优先仓库时间段" .%}
+<div id="page">
+   <div class="breadcrumbs" id="breadcrumbs">
+       <ul class="breadcrumb">
+           <li>
+               <a href='{%url "Home.Index"%}'><i class="ace-icon fa fa-home home-icon"></i></a>
+           </li>
+           <li class="parent" data-menu="erp-menu">ERP</li>
+           <li class="active" data-menu="erp-favstocktimerange-menu">优先仓库时间段</li>
+       </ul>
+   </div>
+   <div class="page-content">
+       <div class="row">
+           <div class="col-xs-12" style="padding: 0;">
+               <div class="gridToolBar clearfix">
+                   <button class="btn btn-primary btn-sm" @click="reloadList('#favStockTimeRangeList')">
+                       <i class="ace-icon fa fa-refresh"></i>
+                       刷新
+                   </button>
+                   <button class="btn btn-success btn-sm" @click="showFavStockTimeRangeDetail(0)">
+                       <i class="ace-icon fa fa-plus"></i>
+                       新增
+                   </button>
+                   <button class="btn btn-danger btn-sm" @click="deleteFavStockTimeRange()">
+                       <i class="ace-icon fa fa-trash-o"></i>
+                       删除
+                   </button>
+               </div>
+               <div>
+                   <table id="favStockTimeRangeList" class="table table-striped table-bordered table-hover"></table>
+               </div>
+           </div>
+       </div>
+   </div>
+    <div class="modal fade" id="favStockTimeRangeDetailDialog">
+        <div class="modal-dialog" style="width: 680px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="True">&times;</button>
+                    <h4 class="modal-title">优先仓库时间段详细</h4>
+                </div>
+                <div class="modal-body clearfix">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <form class="form-horizontal" role="form" id="favStockTimeRangeDetailForm">
+                                <input id="fav_stock_time_range_id" name="detail.fav_stock_time_range.id" type="hidden" v-model.number="detail.fav_stock_time_range.id"/>
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="weekday" class="col-xs-2 control-label">星期</label>
+                                            <div class="col-xs-10">
+                                                <input id="weekday" name="detail.fav_stock_time_range.weekday" type="text" class="input-sm form-control" v-model.number="detail.fav_stock_time_range.weekday"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="begin_hour" class="col-xs-2 control-label">开始小时</label>
+                                            <div class="col-xs-10">
+                                                <input id="begin_hour" name="detail.fav_stock_time_range.begin_hour" type="text" class="input-sm form-control" v-model.number="detail.fav_stock_time_range.begin_hour"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="begin_minute" class="col-xs-2 control-label">开始分钟</label>
+                                            <div class="col-xs-10">
+                                                <input id="begin_minute" name="detail.fav_stock_time_range.begin_minute" type="text" class="input-sm form-control" v-model.number="detail.fav_stock_time_range.begin_minute"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="end_hour" class="col-xs-2 control-label">结束小时</label>
+                                            <div class="col-xs-10">
+                                                <input id="end_hour" name="detail.fav_stock_time_range.end_hour" type="text" class="input-sm form-control" v-model.number="detail.fav_stock_time_range.end_hour"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="end_minute" class="col-xs-2 control-label">结束分钟</label>
+                                            <div class="col-xs-10">
+                                                <input id="end_minute" name="detail.fav_stock_time_range.end_minute" type="text" class="input-sm form-control" v-model.number="detail.fav_stock_time_range.end_minute"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success btn-sm" @click="saveFavStockTimeRange()">
+                        <i class="ace-icon fa fa-floppy-o"></i>保存
+                    </button>
+                    <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">
+                        <i class="ace-icon fa fa-times"></i>关闭
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    var vm = new Vue({
+        el: "#page",
+        data: {
+            "detail": {
+                "fav_stock_time_range": {}
+            }
+        },
+        mounted: function () {
+            initDataTable(
+                    '#favStockTimeRangeList',
+                    {
+                        "sAjaxSource": '{%url "ErpFavStockTimeRange.ListData"%}',
+                        "aaSorting": [[1, "asc"]],
+                        "aoColumns": [
+                            {
+                                "mDataProp": "id", "bSearchable": false, "orderable": false, "sClass": "center", "width": 50,
+                                "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
+                                "render": function (data, type, row) {
+                                    return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
+                                }
+                            },
+                            {"mDataProp": "weekday", "title": "星期", "bSearchable": false },
+                            {"mDataProp": "begin_hour", "title": "开始小时", "bSearchable": false },
+                            {"mDataProp": "begin_minute", "title": "开始分钟", "bSearchable": false },
+                            {"mDataProp": "end_hour", "title": "结束小时", "bSearchable": false },
+                            {"mDataProp": "end_minute", "title": "结束分钟", "bSearchable": false },
+                            {"mDataProp": "create_time", "title": "创建时间", "bSearchable": false, "width": 120 },
+                            {"mDataProp": "update_time", "title": "修改时间", "bSearchable": false, "width": 120 }
+                        ]
+                   }
+            );
+
+            $('#favStockTimeRangeList tbody').on('dblclick', 'tr', function () {
+                var id = $(this).find('td:first-child input:checkbox').val();
+                vm.showFavStockTimeRangeDetail(id);
+            });
+        },
+        methods: {
+            reloadList: function () {
+                reloadList('#favStockTimeRangeList');
+            },
+            showFavStockTimeRangeDetail: function (id) {
+                showMask("加载中...");
+                $("#favStockTimeRangeDetailForm").clearValidation();
+                $.ajax({
+                           url: '{%url "ErpFavStockTimeRange.DetailData" %}',
+                           type: "POST",
+                           data: {
+                               "id": id
+                           },
+                           success: function (result) {
+                               hideMask();
+                               if (result.success === false) {
+                                   $.msg.error(result.message);
+                                   return;
+                               }
+                               vm.detail = result;
+                               $('#favStockTimeRangeDetailDialog').modal(modalOptions);
+                           }
+                       }
+                );
+            },
+            saveFavStockTimeRange: function () {
+                showMask("提交中...");
+                var form = $("#favStockTimeRangeDetailForm");
+                var valid = validate(form, {  
+                    'detail.fav_stock_time_range.weekday': {
+                        required: true, digits: true
+                    },
+                    'detail.fav_stock_time_range.begin_hour': {
+                        required: true, digits: true
+                    },
+                    'detail.fav_stock_time_range.begin_minute': {
+                        required: true, digits: true
+                    },
+                    'detail.fav_stock_time_range.end_hour': {
+                        required: true, digits: true
+                    },
+                    'detail.fav_stock_time_range.end_minute': {
+                        required: true, digits: true
+                    }
+                });
+
+                if (!valid) {
+                    hideMask();
+                } else {
+                    $.ajax({
+                               url: '{%url "ErpFavStockTimeRange.Save"%}',
+                               type: "POST",
+                               processData: false,
+                               contentType: 'application/json',
+                               data: JSON.stringify(vm.detail),
+                               success: function (data) {
+                                   hideMask();
+                                   if (data.success === false) {
+                                       $.msg.error(data.message);
+                                       //return;
+                                   }
+                                   else {
+                                       $.msg.show(data.message);
+                                       $('#favStockTimeRangeDetailDialog').modal('hide');
+                                       vm.reloadList();
+                                       //return;
+                                   }
+                               }
+                           }
+                    );
+                }
+            },
+            deleteFavStockTimeRange: function () {
+                var id_list = [];
+                $('#favStockTimeRangeList tbody tr>td:first-child input:checkbox').each(function () {
+                    if (this.checked) {
+                        id_list.push($(this).val());
+                    }
+                });
+
+                if (id_list.length === 0) {
+                    $.msg.alert("请选择数据！");
+                    return;
+                }
+
+                $.msg.confirm("确认要删除吗？", function () {
+                    $.ajax({
+                               url: '{%url "ErpFavStockTimeRange.Delete"%}',
+                               type: "POST",
+                               data: {"id_list": id_list},
+                               success: function (data) {
+                                   if (data.success === false) {
+                                       $.msg.error(data.message);
+                                       return;
+                                   }
+                                   else {
+                                       $.msg.show(data.message);
+                                   }
+                                   vm.reloadList();
+                               }
+                           });
+                });
+            }
+        }
+    });
+</script>
+{%footer%}
+
