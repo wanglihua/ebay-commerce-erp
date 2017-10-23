@@ -618,6 +618,10 @@ func (p_ol *OrderLogisticsService) is_now_fav_stock_time() bool {
 
 	var time_total_minutes = int64(time_now.Hour()*60 + time_now.Minute())
 
+	if len(fav_stock_time_range_list) == 0 {
+		return false
+	}
+
 	for _, time_range := range fav_stock_time_range_list {
 		if time_total_minutes >= time_range.BeginHour*60+time_range.BeginMinute && time_total_minutes <= time_range.EndHour*60+time_range.EndMinute {
 			return true
