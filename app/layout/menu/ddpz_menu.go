@@ -115,7 +115,7 @@ func GetDdpzMenu(res_id_map map[int64]bool, web_session revel.Session) string {
         </li>`)
 	}
 
-	buffer.WriteString(`<li id="erp-favstocktimerange-menu" class="">
+	buffer.WriteString(`<li id="ddpz-fav-stock-time-range-menu" class="">
 			<a href="/fav/stock/time/range">
 				<i class="menu-icon fa fa-caret-right"></i>
 				优先仓库时间段
