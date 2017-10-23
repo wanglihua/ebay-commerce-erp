@@ -36,6 +36,36 @@ func (c ErpFavStockTimeRange) ListData() revel.Result {
 	err := data_query.Limit(limit, offset).Find(&fav_stock_time_range_list)
 	core.HandleError(err)
 
+	for index, time_range := range fav_stock_time_range_list {
+		if time_range.Weekday == 1 {
+			fav_stock_time_range_list[index].WeekdayName = "星期一"
+		}
+
+		if time_range.Weekday == 2 {
+			fav_stock_time_range_list[index].WeekdayName = "星期二"
+		}
+
+		if time_range.Weekday == 3 {
+			fav_stock_time_range_list[index].WeekdayName = "星期三"
+		}
+
+		if time_range.Weekday == 4 {
+			fav_stock_time_range_list[index].WeekdayName = "星期四"
+		}
+
+		if time_range.Weekday == 5 {
+			fav_stock_time_range_list[index].WeekdayName = "星期五"
+		}
+
+		if time_range.Weekday == 6 {
+			fav_stock_time_range_list[index].WeekdayName = "星期六"
+		}
+
+		if time_range.Weekday == 7 {
+			fav_stock_time_range_list[index].WeekdayName = "星期日"
+		}
+	}
+
 	count_query := *query
 	count, err := count_query.Count(new(ddpz_models.FavStockTimeRangeInfo))
 	core.HandleError(err)

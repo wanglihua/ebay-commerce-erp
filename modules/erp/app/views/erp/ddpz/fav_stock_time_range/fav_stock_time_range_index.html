@@ -62,7 +62,7 @@
                                 <div class="row">
                                     <div class="col-xs-6">
                                         <div class="form-group">
-                                            <label for="begin_hour" class="col-xs-6 control-label">开始小时</label>
+                                            <label for="begin_hour" class="col-xs-6 control-label">开始时间小时</label>
                                             <div class="col-xs-6">
                                                 <select id="begin_hour" name="detail.fav_stock_time_range.begin_hour" type="text" class="input-sm form-control" v-model.number="detail.fav_stock_time_range.begin_hour">
                                                     <template v-for="hour in hour_list">
@@ -75,7 +75,7 @@
 
                                     <div class="col-xs-6">
                                         <div class="form-group">
-                                            <label for="begin_minute" class="col-xs-6 control-label">开始分钟</label>
+                                            <label for="begin_minute" class="col-xs-6 control-label">开始时间分钟</label>
                                             <div class="col-xs-6">
                                                 <select id="begin_minute" name="detail.fav_stock_time_range.begin_minute" type="text" class="input-sm form-control" v-model.number="detail.fav_stock_time_range.begin_minute">
                                                     <template v-for="minute in minute_list">
@@ -90,7 +90,7 @@
                                 <div class="row">
                                     <div class="col-xs-6">
                                         <div class="form-group">
-                                            <label for="end_hour" class="col-xs-6 control-label">结束小时</label>
+                                            <label for="end_hour" class="col-xs-6 control-label">结束时间小时</label>
                                             <div class="col-xs-6">
                                                 <select id="end_hour" name="detail.fav_stock_time_range.end_hour" type="text" class="input-sm form-control" v-model.number="detail.fav_stock_time_range.end_hour">
                                                     <template v-for="hour in hour_list">
@@ -103,13 +103,25 @@
 
                                     <div class="col-xs-6">
                                         <div class="form-group">
-                                            <label for="end_minute" class="col-xs-6 control-label">结束分钟</label>
+                                            <label for="end_minute" class="col-xs-6 control-label">结束时间分钟</label>
                                             <div class="col-xs-6">
                                                 <select id="end_minute" name="detail.fav_stock_time_range.end_minute" type="text" class="input-sm form-control" v-model.number="detail.fav_stock_time_range.end_minute">
                                                     <template v-for="minute in minute_list">
                                                         <option :value="minute">{{minute}}</option>
                                                     </template>
                                                 </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <label for="description" class="col-xs-3 control-label">描述</label>
+                                            <div class="col-xs-9">
+                                                <textarea id="description" name="detail.fav_stock_time_range.description" rows="3" class="input-sm form-control" v-model="detail.fav_stock_time_range.description">
+                                                </textarea>
                                             </div>
                                         </div>
                                     </div>
@@ -156,13 +168,30 @@
                                 return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
                             }
                         },
-                        {"mDataProp": "weekday", "title": "星期", "bSearchable": false},
-                        {"mDataProp": "begin_hour", "title": "开始小时", "bSearchable": false},
-                        {"mDataProp": "begin_minute", "title": "开始分钟", "bSearchable": false},
-                        {"mDataProp": "end_hour", "title": "结束小时", "bSearchable": false},
-                        {"mDataProp": "end_minute", "title": "结束分钟", "bSearchable": false},
-                        {"mDataProp": "create_time", "title": "创建时间", "bSearchable": false, "width": 120},
-                        {"mDataProp": "update_time", "title": "修改时间", "bSearchable": false, "width": 120}
+                        {
+                            "mDataProp": "weekday", "title": "星期", "bSearchable": false, "width": 100,
+                            "render": function (data, type, row) {
+                                return row.weekday_name;
+                            }
+                        },
+                        {
+                            "mDataProp": "begin_hour", "title": "开始时间", "bSearchable": false, 'bSortable': false, "width": 120,
+                            "render": function (data, type, row) {
+                                return row.begin_hour + ' 时 ' + row.begin_minute + ' 分';
+                            }
+                        },
+                        {
+                            "mDataProp": "end_hour", "title": "结束时间", "bSearchable": false, 'bSortable': false, "width": 120,
+                            "render": function (data, type, row) {
+                                return row.end_hour + ' 时 ' + row.end_minute + ' 分';
+                            }
+                        },
+                        {
+                            "mDataProp": "description", "title": "描述", "bSearchable": true, 'bSortable': true, "sClass": "wrap-word",
+                            "render": function (data, type, row) {
+                                return "<div>" + data + "</div>";
+                            }
+                        }
                     ]
                 }
             );
