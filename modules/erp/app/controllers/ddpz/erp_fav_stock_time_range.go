@@ -81,12 +81,43 @@ func (c ErpFavStockTimeRange) DetailData() revel.Result {
 		if has == false {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "指定的优先仓库时间段不存在！"})
 		}
+	} else {
+		fav_stock_time_range.Weekday = 1
 	}
 
 	var detail_form FavStockTimeRangeDetailForm
 	detail_form.FavStockTimeRange = fav_stock_time_range
 
-	return c.RenderJson(detail_form)
+	type value_name_item struct {
+		Value int64  `json:"value"`
+		Name  string `json:"name"`
+	}
+
+	var weekday_list = make([]value_name_item, 0)
+	weekday_list = append(weekday_list, value_name_item{Value: 1, Name: "星期一"})
+	weekday_list = append(weekday_list, value_name_item{Value: 2, Name: "星期二"})
+	weekday_list = append(weekday_list, value_name_item{Value: 3, Name: "星期三"})
+	weekday_list = append(weekday_list, value_name_item{Value: 4, Name: "星期四"})
+	weekday_list = append(weekday_list, value_name_item{Value: 5, Name: "星期五"})
+	weekday_list = append(weekday_list, value_name_item{Value: 6, Name: "星期六"})
+	weekday_list = append(weekday_list, value_name_item{Value: 7, Name: "星期日"})
+
+	var hour_list = make([]int64, 0)
+	for i := 0; i < 24; i++ {
+		hour_list = append(hour_list, int64(i))
+	}
+
+	var minute_list = make([]int64, 0)
+	for i := 0; i < 60; i++ {
+		minute_list = append(minute_list, int64(i))
+	}
+
+	return c.RenderJson(map[string]interface{}{
+		"detail":       detail_form,
+		"weekday_list": weekday_list,
+		"hour_list":    hour_list,
+		"minute_list":  minute_list,
+	})
 }
 
 func (c ErpFavStockTimeRange) Save() revel.Result {
@@ -101,6 +132,15 @@ func (c ErpFavStockTimeRange) Save() revel.Result {
 	}
 
 	fav_stock_time_range := detail_form.FavStockTimeRange
+
+	var begin = fav_stock_time_range.BeginHour*60 + fav_stock_time_range.BeginMinute
+	var end = fav_stock_time_range.EndHour*60 + fav_stock_time_range.EndMinute
+	if begin >= end {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "时间段开始应该早于时间段结束！",
+		})
+	}
 
 	var affected int64
 	if detail_form.IsCreate() {
