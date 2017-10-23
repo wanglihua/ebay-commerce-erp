@@ -15,6 +15,7 @@ import (
 	"matrix/modules/erp/service/container_transfer_log_service"
 	"fmt"
 	"matrix/modules/erp/service/exchange_rate_service"
+	"sync"
 )
 
 type ErpContainerTransfer struct {
@@ -386,7 +387,14 @@ func (c ErpContainerTransfer) Delete() revel.Result {
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})
 }
 
+var depart_mutex sync.Mutex
+
 func (c ErpContainerTransfer) Depart() revel.Result {
+	depart_mutex.Lock()
+	defer func() {
+		depart_mutex.Unlock()
+	}()
+
 	pass_service.Check_login_user_pass(pass_res.HGBG_CONTAINER_TRANSFER_TO_ZT_STOCK, c.Session)
 
 	db_session := c.DbSession
@@ -470,7 +478,14 @@ WHERE cte.transfer_id = %d AND (p.length = 0 OR p.width = 0 OR p.height = 0 OR p
 	})
 }
 
+var stock_mutex sync.Mutex
+
 func (c ErpContainerTransfer) Stock() revel.Result {
+	stock_mutex.Lock()
+	defer func() {
+		stock_mutex.Unlock()
+	}()
+
 	pass_service.Check_login_user_pass(pass_res.HGBG_CONTAINER_TRANSFER_TO_AU_STOCK, c.Session)
 
 	db_session := c.DbSession
