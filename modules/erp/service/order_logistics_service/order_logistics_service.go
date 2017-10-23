@@ -41,6 +41,7 @@ type OrderLogisticsService struct {
 	pending_keeper                    *pending_inventory_temp_keeper               // 设置过程全局变量，每次开始匹配计算的时候一定要记得初始化
 	mel_stock_id                      int64                                        // 墨尔本仓库 id
 	LoginUser                         core.LoginUser
+	fav_stock_time_range_list         []ddpz_models.FavStockTimeRangeInfo
 }
 
 func (p_ol *OrderLogisticsService) init_data(order_list []ddlc_models.OrderInfo, db_session *xorm.Session) {
@@ -120,6 +121,10 @@ func (p_ol *OrderLogisticsService) init_data(order_list []ddlc_models.OrderInfo,
 	p_ol.product_mel_temp_sku_list = product_mel_temp_sku_list
 
 	p_ol.mel_stock_id = stock_service.Get_mel_stock_id(db_session)
+
+	var fav_stock_time_range_list = make([]ddpz_models.FavStockTimeRangeInfo, 0)
+	core.HandleError(db_session.Find(&fav_stock_time_range_list))
+	p_ol.fav_stock_time_range_list = fav_stock_time_range_list
 }
 
 func (p_ol *OrderLogisticsService) CalculateListPaidOrders(user core.LoginUser, db_session *xorm.Session) error {

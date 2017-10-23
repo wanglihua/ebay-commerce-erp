@@ -11,6 +11,7 @@ import (
 	"matrix/modules/erp/service/pick_fee_service"
 	"matrix/modules/erp/models/ddpz_models"
 	"matrix/modules/erp/models/ddlc_models"
+	"time"
 )
 
 /*
@@ -584,4 +585,24 @@ func (p_ol *OrderLogisticsService) match_logistics_mode_with_option(p_order *ddl
 	// 多个商品时，考虑拆包的方式
 
 	// 多个商品时，能不能分仓库发货的？
+}
+
+func (p_ol *OrderLogisticsService) is_now_fav_stock_time() bool {
+	var time_now = time.Now()
+	var fav_stock_time_range_list = p_ol.fav_stock_time_range_list
+
+	var weekday_num = int64(time_now.Weekday())
+	if weekday_num == 0 {
+		weekday_num = 7
+	}
+
+	var time_total_minutes = int64(time_now.Hour()*60 + time_now.Minute())
+
+	for _, time_range := range fav_stock_time_range_list {
+		if time_total_minutes >= time_range.BeginHour*60+time_range.BeginMinute && time_total_minutes <= time_range.EndHour*60+time_range.EndMinute {
+			return true
+		}
+	}
+
+	return false
 }
