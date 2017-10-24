@@ -290,7 +290,7 @@ func (p_ol *OrderLogisticsService) CalculateListWithOption(order_list []ddlc_mod
 			// panic(fmt.Sprintf("订单 %d %s 明细为空！", order.Id, order.Code))
 			// 只是略过明细为空的订单， 记录错误， 而不是报出异常
 
-			revel.ERROR.Println(fmt.Sprintf("订单 %d %s 明细为空！", order.Id, order.Code))
+			revel.ERROR.Println(fmt.Sprintf("订单 id: %d, code: %s 明细为空！", order.Id, order.Code))
 			continue
 		}
 
