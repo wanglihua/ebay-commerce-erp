@@ -24,6 +24,7 @@ import (
 	"matrix/modules/erp/models/ddlc_models"
 	"matrix/modules/erp/models/kcgl_models"
 	"github.com/revel/revel"
+	"time"
 )
 
 type OrderLogisticsService struct {
@@ -280,6 +281,46 @@ func (p_ol *OrderLogisticsService) CalculateListWithOption(order_list []ddlc_mod
 
 	p_ol.pending_keeper = new_pending_inventory_temp_keeper()
 
+	// 理论匹配
+	go func() {
+		if db_driver == "" {
+			db_driver, _ = revel.Config.String("db.driver")
+		}
+
+		if db_url == "" {
+			db_url, _ = revel.Config.String("db.url")
+		}
+
+		db_engine, err := xorm.NewEngine(db_driver, db_url)
+		core.HandleError(err)
+
+		db_engine.TZLocation = time.Local
+		db_engine.SetMaxIdleConns(3)
+		db_engine.SetMaxOpenConns(100)
+
+		if revel.DevMode == true {
+			db_engine.ShowSQL()
+			db_engine.ShowExecTime()
+		}
+
+		// 这个函数外面已经有一个 db_session 了，所以最好还是把函数里面的重命名为别的名字
+		var db_session_match_logic = db_engine.NewSession()
+		db_session_match_logic = db_session_match_logic.NoAutoCondition(true)
+
+		defer func() {
+			db_session_match_logic.Close()
+		}()
+
+		for _, order := range order_list {
+			var p_order_logistics_data = new(order_logistics_data_t)
+			p_order_logistics_data.load_data(order, p_ol, db_session_match_logic)
+
+			if len(p_order_logistics_data.order_product_info_list) > 0 {
+				p_ol.match_logistics_mode_logic(order, p_order_logistics_data, db_session_match_logic)
+			}
+		}
+	}()
+
 	for _, order := range order_list {
 
 		var p_order_logistics_data = new(order_logistics_data_t)
@@ -294,7 +335,8 @@ func (p_ol *OrderLogisticsService) CalculateListWithOption(order_list []ddlc_mod
 			continue
 		}
 
-		go p_ol.match_logistics_mode_logic(order, p_order_logistics_data, nil)
+		// 放在这里进行理论匹配会出现 "Error 1040: Too many connections" 的错误
+		// go p_ol.match_logistics_mode_logic(order, p_order_logistics_data, nil)
 
 		/*
 		if revel.DevMode == false {
