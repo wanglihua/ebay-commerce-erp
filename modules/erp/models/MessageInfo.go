@@ -21,7 +21,7 @@ type MessageInfo struct {
 	SenderEmail      string            `xorm:"nvarchar(200) notnull 'sender_email'" json:"sender_email"`
 	SenderId         string            `xorm:"nvarchar(100) notnull 'sender_id'" json:"sender_id"`
 	Subject          string            `xorm:"nvarchar(500) notnull 'subject'" json:"subject"`
-	Body             string            `xorm:"nvarchar(5000) notnull 'body'" json:"body"`
+	Body             string            `xorm:"text notnull 'body'" json:"body"`
 	StatusId         int64             `xorm:"bigint notnull index 'status_id'" json:"status_id"`
 	CreateTime       core.Time         `xorm:"created notnull 'create_time'" json:"create_time"`
 	UpdateTime       core.Time         `xorm:"updated notnull 'update_time'" json:"update_time"`

@@ -202,7 +202,7 @@ func Match_product_postage(product_id int64, postcode string, db_session *xorm.S
 						var xz_fee = math.Ceil(extra_weight_in_fee_rate/logistics_fee_rate.Xzjt) * logistics_fee_rate.Xzjtsf
 						fee = fee + xz_fee
 					} else {
-						revel.ERROR.Println("续重阶梯设置有误，不能计算超重费用！", logistics_fee_rate.Xzjt)
+						revel.ERROR.Println(fmt.Sprintf("费率 %d 续重阶梯设置有误，不能计算超重费用！", logistics_fee_rate.Id), logistics_fee_rate.Xzjt)
 					}
 				}
 				// 计算最低费用的时候，还不考虑偏远地区的费用
