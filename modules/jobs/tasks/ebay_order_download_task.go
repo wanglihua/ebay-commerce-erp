@@ -349,7 +349,7 @@ func (t EBayOrderDownloadTask) Run() {
 					if is_product_bind_sku == true {
 						product_bind_sku_list := product_bind_service.Get_product_bind_skus(item_sku, db_session)
 
-						//todo: 这里还要做一个根据各个商品的加权平均，计算商品利润的情况
+						//todo: 这里还要做一个根据各个商品的加权平均，计算商品利润的情况。PS，不用了，这个可以在匹配的时候做
 						for _, product_bind_sku := range product_bind_sku_list {
 							product_sku := product_bind_sku.Sku
 							product_sku_count := product_bind_sku.Count

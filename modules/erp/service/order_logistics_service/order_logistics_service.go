@@ -23,6 +23,7 @@ import (
 	"matrix/modules/erp/models/ddpz_models"
 	"matrix/modules/erp/models/ddlc_models"
 	"matrix/modules/erp/models/kcgl_models"
+	"github.com/revel/revel"
 )
 
 type OrderLogisticsService struct {
@@ -286,11 +287,11 @@ func (p_ol *OrderLogisticsService) CalculateListWithOption(order_list []ddlc_mod
 		p_order_logistics_data.load_data(order, p_ol, db_session)
 
 		if len(p_order_logistics_data.order_product_info_list) == 0 {
-			var order ddlc_models.OrderInfo
-			_, err := db_session.Id(order.Id).Get(&order)
-			core.HandleError(err)
+			// panic(fmt.Sprintf("订单 %d %s 明细为空！", order.Id, order.Code))
+			// 只是略过明细为空的订单， 记录错误， 而不是报出异常
 
-			panic(fmt.Sprintf("订单 %s 明细为空！", order.Code))
+			revel.ERROR.Println(fmt.Sprintf("订单 %d %s 明细为空！", order.Id, order.Code))
+			continue
 		}
 
 		go p_ol.match_logistics_mode_logic(order, p_order_logistics_data, nil)
