@@ -37,15 +37,15 @@ func (c ErpProductBatchEdit) EditAttrList() revel.Result {
 
 	edit_attr_list := make([]edit_attr, 0)
 	edit_attr_list = append(edit_attr_list, edit_attr{AttrId: EDIT_ATTR_NAME, AttrName: "名称"})
-	edit_attr_list = append(edit_attr_list, edit_attr{AttrId: EDIT_ATTR_COST_PRICE, AttrName: "成本价"})
+	edit_attr_list = append(edit_attr_list, edit_attr{AttrId: EDIT_ATTR_COST_PRICE, AttrName: "采购价"})
 	edit_attr_list = append(edit_attr_list, edit_attr{AttrId: EDIT_ATTR_WEIGHT, AttrName: "重量"})
 
 	return c.RenderJson(edit_attr_list)
 }
 
 type BatchEditProductDetailForm struct {
-	EditAttr       int64    `json:"edit_attr"`
-	EditAttrValues string   `json:"edit_attr_values"`
+	EditAttr       int64  `json:"edit_attr"`
+	EditAttrValues string `json:"edit_attr_values"`
 }
 
 func (f *BatchEditProductDetailForm) Valid(validation *revel.Validation) bool {
@@ -122,7 +122,7 @@ SELECT count(*) AS product_count FROM erp_product WHERE sku = '%s'
 			attr_value := sku_attr_value.attr_value
 
 			sql_update_name := `
-UPDATE erp_product SET name = '%s' WHERE sku = '%s';
+UPDATE erp_product SET cn_name = '%s' WHERE sku = '%s';
 `
 			sql_update_name = fmt.Sprintf(sql_update_name, attr_value, sku)
 
