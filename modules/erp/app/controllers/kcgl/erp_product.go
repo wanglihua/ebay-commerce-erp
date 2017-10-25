@@ -21,6 +21,7 @@ import (
 	"matrix/modules/erp/models/sppz_models"
 	"matrix/modules/erp/models/cggl_models"
 	"github.com/go-xorm/xorm"
+	auth_models "matrix/modules/auth/models"
 )
 
 type ErpProduct struct {
@@ -230,6 +231,30 @@ func (c ErpProduct) DetailData() revel.Result {
 	}
 
 	product.Volume = fmt.Sprintf("%0.6f", product.Length*product.Weight*product.Height/1000000)
+
+	if product.SaleUserId != 0 {
+		var sale_user auth_models.UserInfo
+		_, err := db_session.Id(product.SaleUserId).Get(&sale_user)
+		core.HandleError(err)
+
+		product.SaleUser = fmt.Sprintf("%s(%s)", sale_user.LoginName, sale_user.NickName)
+	}
+
+	if product.ServiceUserId != 0 {
+		var service_user auth_models.UserInfo
+		_, err := db_session.Id(product.ServiceUserId).Get(&service_user)
+		core.HandleError(err)
+
+		product.ServiceUser = fmt.Sprintf("%s(%s)", service_user.LoginName, service_user.NickName)
+	}
+
+	if product.DevUserId != 0 {
+		var dev_user auth_models.UserInfo
+		_, err := db_session.Id(product.DevUserId).Get(&dev_user)
+		core.HandleError(err)
+
+		product.DevUser = fmt.Sprintf("%s(%s)", dev_user.LoginName, dev_user.NickName)
+	}
 
 	if product.Id == 0 {
 		product.StatusId = models.PRODUCT_STATUS_ZC

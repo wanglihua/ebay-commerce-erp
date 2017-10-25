@@ -230,19 +230,63 @@
 
                             <div class="col-xs-3">
                                 <div class="form-group">
-                                    <label for="stock_alert_qty" class="col-xs-4 control-label">日均销量</label>
+                                    <label for="daily_mean_sales" class="col-xs-4 control-label">警戒库存</label>
                                     <div class="col-xs-8">
-                                        <input id="stock_alert_qty" name="detail.product.stock_alert_qty" type="text" class="input-sm form-control" v-model.number="detail.product.stock_alert_qty" disabled="disabled"/>
+                                        <input id="daily_mean_sales" name="detail.product.stock_alert_qty" type="text" class="input-sm form-control" v-model.number="detail.product.stock_alert_qty" disabled="disabled"/>
                                     </div>
                                 </div>
                             </div>
 
                             <div class="col-xs-3">
                                 <div class="form-group">
-                                    <label for="daily_mean_sales" class="col-xs-4 control-label">警戒库存</label>
+                                    <!--
+                                    <label for="stock_alert_qty" class="col-xs-4 control-label">日均销量</label>
                                     <div class="col-xs-8">
-                                        <input id="daily_mean_sales" name="detail.product.daily_mean_sales" type="text" class="input-sm form-control" v-model.number="detail.product.daily_mean_sales" disabled="disabled"/>
+                                        <input id="stock_alert_qty" name="detail.product.stock_alert_qty" type="text" class="input-sm form-control" v-model.number="detail.product.stock_alert_qty" disabled="disabled"/>
                                     </div>
+                                    -->
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="row">
+
+                            <div class="col-xs-3">
+                                <div class="form-group">
+                                    <label for="sale_user" class="col-xs-4 control-label">销售负责人</label>
+                                    <div class="col-xs-8">
+                                        <input id="sale_user" name="detail.product.sale_user" type="text" class="input-sm form-control" v-model.number="detail.product.sale_user" disabled="disabled"/>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-xs-3">
+                                <div class="form-group">
+                                    <label for="service_user" class="col-xs-4 control-label">客服负责人</label>
+                                    <div class="col-xs-8">
+                                        <input id="service_user" name="detail.product.service_user" type="text" class="input-sm form-control" v-model.number="detail.product.service_user" disabled="disabled"/>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-xs-3">
+                                <div class="form-group">
+                                    <label for="dev_user" class="col-xs-4 control-label">开发负责人</label>
+                                    <div class="col-xs-8">
+                                        <input id="dev_user" name="detail.product.dev_user" type="text" class="input-sm form-control" v-model.number="detail.product.dev_user" disabled="disabled"/>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-xs-3">
+                                <div class="form-group">
+                                    <!--
+                                    <label for="stock_alert_qty" class="col-xs-4 control-label">日均销量</label>
+                                    <div class="col-xs-8">
+                                        <input id="stock_alert_qty" name="detail.product.stock_alert_qty" type="text" class="input-sm form-control" v-model.number="detail.product.stock_alert_qty" disabled="disabled"/>
+                                    </div>
+                                    -->
                                 </div>
                             </div>
 

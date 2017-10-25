@@ -87,6 +87,7 @@ func (c ErpProductUserExcel) Import() revel.Result {
 			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
 			product_user.sale_user_login_name = cell_val
 			col_index++
 
@@ -94,6 +95,7 @@ func (c ErpProductUserExcel) Import() revel.Result {
 			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
 			product_user.service_user_login_name = cell_val
 			col_index++
 
@@ -101,6 +103,7 @@ func (c ErpProductUserExcel) Import() revel.Result {
 			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
 			product_user.dev_user_login_name = cell_val
 			col_index++
 
@@ -127,36 +130,48 @@ func (c ErpProductUserExcel) Import() revel.Result {
 		product_user_list[index].product = product
 
 		// 销售人员
-		var sale_user auth_models.UserInfo
-		has, err = db_session.Where("login_name = ?", product_user.sale_user_login_name).Get(&sale_user)
-		core.HandleError(err)
-
-		if has == false {
-			panic(fmt.Sprintf("指定的销售人员工号数据库中不存在！"))
+		if product_user.sale_user_login_name == "" {
+			product_user_list[index].sale_user_id = 0
 		} else {
-			product_user_list[index].sale_user_id = sale_user.Id
+			var sale_user auth_models.UserInfo
+			has, err = db_session.Where("login_name = ?", product_user.sale_user_login_name).Get(&sale_user)
+			core.HandleError(err)
+
+			if has == false {
+				panic(fmt.Sprintf("指定的销售人员工号数据库中不存在！"))
+			} else {
+				product_user_list[index].sale_user_id = sale_user.Id
+			}
 		}
 
 		// 客服人员
-		var service_user auth_models.UserInfo
-		has, err = db_session.Where("login_name = ?", product_user.service_user_login_name).Get(&service_user)
-		core.HandleError(err)
-
-		if has == false {
-			panic(fmt.Sprintf("指定的客服人员工号数据库中不存在！"))
+		if product_user.service_user_login_name == "" {
+			product_user_list[index].service_user_id = 0
 		} else {
-			product_user_list[index].service_user_id = service_user.Id
+			var service_user auth_models.UserInfo
+			has, err = db_session.Where("login_name = ?", product_user.service_user_login_name).Get(&service_user)
+			core.HandleError(err)
+
+			if has == false {
+				panic(fmt.Sprintf("指定的客服人员工号数据库中不存在！"))
+			} else {
+				product_user_list[index].service_user_id = service_user.Id
+			}
 		}
 
 		// 开发人员
-		var dev_user auth_models.UserInfo
-		has, err = db_session.Where("login_name = ?", product_user.dev_user_login_name).Get(&dev_user)
-		core.HandleError(err)
-
-		if has == false {
-			panic(fmt.Sprintf("指定的开发人员工号数据库中不存在！"))
+		if product_user.dev_user_login_name == "" {
+			product_user_list[index].dev_user_id = 0
 		} else {
-			product_user_list[index].dev_user_id = dev_user.Id
+			var dev_user auth_models.UserInfo
+			has, err = db_session.Where("login_name = ?", product_user.dev_user_login_name).Get(&dev_user)
+			core.HandleError(err)
+
+			if has == false {
+				panic(fmt.Sprintf("指定的开发人员工号数据库中不存在！"))
+			} else {
+				product_user_list[index].dev_user_id = dev_user.Id
+			}
 		}
 	}
 
