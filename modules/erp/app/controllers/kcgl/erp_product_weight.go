@@ -37,7 +37,7 @@ func (c ErpProductWeight) ListData() revel.Result {
 
 	type product_weight_view_item_t struct {
 		Product kcgl_models.ProductInfo `xorm:"extends" json:"p"`
-		Status  models.StatusInfo  `xorm:"extends" json:"s"`
+		Status  models.StatusInfo       `xorm:"extends" json:"s"`
 	}
 
 	/*
@@ -303,6 +303,7 @@ func (c ErpProductWeight) Import() revel.Result {
 			})
 			*/
 
+			// 用 panic 的方式可以让前面这次导入的商品也回滚
 			panic(fmt.Sprintf("商品SKU %s 数据库中不存在！", product_weight.sku))
 
 			/*
