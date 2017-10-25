@@ -38,13 +38,13 @@ func (c ErpHsCodeAuDutyExcel) Import() revel.Result {
 	}
 
 	type hs_code_au_import_t struct {
-		HsCode       string  `json:"hs_code"`
-		CnName       string  `json:"cn_name"`
-		EnName       string  `json:"en_name"`
-		DutyRate     string  `json:"duty_rate"`
-		ErrorMessage string  `json:"error_message"`
+		HsCode       string `json:"hs_code"`
+		CnName       string `json:"cn_name"`
+		EnName       string `json:"en_name"`
+		DutyRate     string `json:"duty_rate"`
+		ErrorMessage string `json:"error_message"`
 
-		duty_rate float64  `json:"-"`
+		duty_rate float64 `json:"-"`
 	}
 
 	hs_code_au_import_list := make([]hs_code_au_import_t, 0)
@@ -145,7 +145,7 @@ func (c ErpHsCodeAuDutyExcel) Import() revel.Result {
 
 	for _, hs_code_au_import := range hs_code_au_import_list {
 		var hs_code_au hgbg_models.HsCodeAuDutyInfo
-		has, err := db_session.Where(fmt.Sprintf("en_name = '%s'", hs_code_au_import.EnName)).Get(&hs_code_au)
+		has, err := db_session.Where("en_name = ?", hs_code_au_import.EnName).Get(&hs_code_au)
 		core.HandleError(err)
 
 		hs_code_au.HsCode = hs_code_au_import.HsCode

@@ -7,6 +7,7 @@ import (
 	"matrix/modules/auth/service/pass_service"
 	"fmt"
 	"matrix/modules/erp/models/ddlc_models"
+	"unicode/utf8"
 )
 
 type ErpOrderWaybillNumber struct {
@@ -29,6 +30,13 @@ func (c ErpOrderWaybillNumber) Save() revel.Result {
 
 	if c.Validation.HasErrors() {
 		return c.RenderJson(core.JsonResult{Success: false, Message: c.GetValidationErrorMessage()})
+	}
+
+	if utf8.RuneCountInString(waybill_number) > 50 {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "录入的运单号太长了！",
+		})
 	}
 
 	// order

@@ -9,7 +9,6 @@ import (
 	"matrix/modules/erp/models/hgbg_models"
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/auth/pass_res"
-	"fmt"
 )
 
 type ErpHsCodeAuDuty struct {
@@ -120,7 +119,7 @@ func (c ErpHsCodeAuDuty) Save() revel.Result {
 	var affected int64
 	if detail_form.IsCreate() {
 		var hs_code hgbg_models.HsCodeAuDutyInfo
-		has, err := db_session.Where(fmt.Sprintf("en_name = '%s'", hs_code_au_duty.EnName)).Get(&hs_code)
+		has, err := db_session.Where("en_name = ?", hs_code_au_duty.EnName).Get(&hs_code)
 		core.HandleError(err)
 
 		if has == true {
@@ -131,7 +130,7 @@ func (c ErpHsCodeAuDuty) Save() revel.Result {
 		core.HandleError(err)
 	} else {
 		var hs_code hgbg_models.HsCodeAuDutyInfo
-		has, err := db_session.Where(fmt.Sprintf("id <> %d AND en_name = '%s'", hs_code_au_duty.Id, hs_code_au_duty.EnName)).Get(&hs_code)
+		has, err := db_session.Where("id <> ? AND en_name = ?", hs_code_au_duty.Id, hs_code_au_duty.EnName).Get(&hs_code)
 		core.HandleError(err)
 
 		if has == true {
