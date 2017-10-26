@@ -32,7 +32,7 @@
                             <i class="ace-icon fa fa-plus"></i>
                             新增
                         </button>
-                        {% if .is_stock %}
+                        {% if .is_stock_action %}
                         <button class="btn btn-success btn-sm" onclick="saveContainerTransfer()" disabled="disabled">
                             <i class="ace-icon fa fa-floppy-o"></i>保存
                         </button>
@@ -278,7 +278,7 @@
                                         <div class="form-group">
                                             <label for="departure_time" class="col-xs-4 control-label">预计到港时间</label>
                                             <div class="col-xs-8">
-                                                {% if .is_stock %}
+                                                {% if .is_stock_edit %}
                                                 <input id="departure_time" name="detail.transfer.departure_time" type="text" class="input-sm form-control" v-model="detail.transfer.departure_time" disabled="disabled"/>
                                                 {% else %}
                                                 <input id="departure_time" name="detail.transfer.departure_time" type="text" class="input-sm form-control" v-model="detail.transfer.departure_time"/>
@@ -291,7 +291,7 @@
                                         <div class="form-group">
                                             <label for="stock_time" class="col-xs-4 control-label">预计到仓时间</label>
                                             <div class="col-xs-8">
-                                                {% if .is_stock %}
+                                                {% if .is_stock_edit %}
                                                 <input id="stock_time" name="detail.transfer.stock_time" type="text" class="input-sm form-control" v-model="detail.transfer.stock_time" disabled="disabled"/>
                                                 {% else %}
                                                 <input id="stock_time" name="detail.transfer.stock_time" type="text" class="input-sm form-control" v-model="detail.transfer.stock_time"/>
@@ -379,7 +379,7 @@
                                         <div class="form-group">
                                             <label for="au_hg_entry_date" class="col-xs-4 control-label">Entry日期</label>
                                             <div class="col-xs-8">
-                                                {% if .is_stock %}
+                                                {% if .is_stock_edit %}
                                                 <input id="au_hg_entry_date" name="detail.transfer.au_hg_entry_date" type="text" class="input-sm form-control" disabled="disabled" v-model="detail.transfer.au_hg_entry_date"/>
                                                 {% else %}
                                                 <input id="au_hg_entry_date" name="detail.transfer.au_hg_entry_date" type="text" class="input-sm form-control" v-model="detail.transfer.au_hg_entry_date"/>
@@ -398,7 +398,7 @@
                                         <div class="form-group">
                                             <label for="au_hd" class="col-xs-4 control-label">澳洲货代</label>
                                             <div class="col-xs-8">
-                                                {% if .is_stock %}
+                                                {% if .is_stock_edit %}
                                                 <input id="au_hd" name="detail.transfer.au_hd" type="text" class="input-sm form-control" disabled="disabled" v-model="detail.transfer.au_hd"/>
                                                 {% else %}
                                                 <input id="au_hd" name="detail.transfer.au_hd" type="text" class="input-sm form-control" v-model="detail.transfer.au_hd"/>
@@ -410,7 +410,7 @@
                                         <div class="form-group">
                                             <label for="au_hd_invoice_no" class="col-xs-4 control-label">invoice No.</label>
                                             <div class="col-xs-8">
-                                                {% if .is_stock %}
+                                                {% if .is_stock_edit %}
                                                 <input id="au_hd_invoice_no" name="detail.transfer.au_hd_invoice_no" type="text" class="input-sm form-control" disabled="disabled" v-model="detail.transfer.au_hd_invoice_no"/>
                                                 {% else %}
                                                 <input id="au_hd_invoice_no" name="detail.transfer.au_hd_invoice_no" type="text" class="input-sm form-control" v-model="detail.transfer.au_hd_invoice_no"/>
@@ -426,7 +426,7 @@
                                         <div class="form-group">
                                             <label for="au_hd_invoice_amount" class="col-xs-4 control-label">invoice金额</label>
                                             <div class="col-xs-8">
-                                                {% if .is_stock %}
+                                                {% if .is_stock_edit %}
                                                 <input id="au_hd_invoice_amount" name="detail.transfer.au_hd_invoice_amount" type="text" class="input-sm form-control" disabled="disabled" v-model.number="detail.transfer.au_hd_invoice_amount"/>
                                                 {% else %}
                                                 <input id="au_hd_invoice_amount" name="detail.transfer.au_hd_invoice_amount" type="text" class="input-sm form-control" v-model.number="detail.transfer.au_hd_invoice_amount"/>
@@ -442,7 +442,7 @@
                                         <div class="form-group">
                                             <label for="au_hd_invoice_pay_time" class="col-xs-4 control-label">invoice支付时间</label>
                                             <div class="col-xs-8">
-                                                {% if .is_stock %}
+                                                {% if .is_stock_edit %}
                                                 <input id="au_hd_invoice_pay_time" name="detail.transfer.au_hd_invoice_pay_time" type="text" class="input-sm form-control" disabled="disabled" v-model="detail.transfer.au_hd_invoice_pay_time"/>
                                                 {% else %}
                                                 <input id="au_hd_invoice_pay_time" name="detail.transfer.au_hd_invoice_pay_time" type="text" class="input-sm form-control" v-model="detail.transfer.au_hd_invoice_pay_time"/>

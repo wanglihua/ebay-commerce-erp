@@ -165,7 +165,10 @@ func (c ErpContainerTransfer) Detail(id int64) revel.Result {
 	c.RenderArgs["can_depart"] = container_transfer_can_depart(container_transfer)
 	c.RenderArgs["can_stock"] = container_transfer_can_stock(container_transfer)
 	c.RenderArgs["is_not_new"] = transfer_id != 0
-	c.RenderArgs["is_stock"] = container_transfer.StatusId == models.CONTAINER_TRANSFER_STATUS_STOCK
+	// c.RenderArgs["is_stock_action"] = container_transfer.StatusId == models.CONTAINER_TRANSFER_STATUS_STOCK
+	c.RenderArgs["is_stock_action"] = false // 总是可以编辑，即使已到仓入库
+	// c.RenderArgs["is_stock_edit"] = container_transfer.StatusId == models.CONTAINER_TRANSFER_STATUS_STOCK
+	c.RenderArgs["is_stock_edit"] = false // 总是可以编辑，即使已到仓入库
 	c.RenderArgs["import_company_code"] = container_transfer.ImportCompanyCode
 
 	/*
@@ -275,9 +278,11 @@ func (c ErpContainerTransfer) Save() revel.Result {
 	_, err = db_session.Id(detail_form.ContainerTransfer.Id).Get(&ct_in_db)
 	core.HandleError(err)
 
+	/* 暂时取消对完成状态的编辑控制
 	if ct_in_db.StatusId == models.CONTAINER_TRANSFER_STATUS_STOCK {
 		return c.RenderJson(core.JsonResult{Success: false, Message: "当前状态不能修改！"})
 	}
+	*/
 
 	if detail_form.Valid(c.Validation) == false {
 		return c.RenderJson(core.JsonResult{Success: false, Message: c.GetValidationErrorMessage()})
