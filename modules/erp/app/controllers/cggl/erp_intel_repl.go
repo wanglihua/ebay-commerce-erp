@@ -17,6 +17,7 @@ import (
 	"matrix/modules/erp/service/stock_service"
 	"matrix/modules/erp/service/bill_service"
 	auth_models "matrix/modules/auth/models"
+	"matrix/modules/erp/service/intel_repl_service"
 )
 
 type ErpIntelRepl struct {
@@ -349,5 +350,18 @@ func (c ErpIntelRepl) Purchase() revel.Result {
 	return c.RenderJson(map[string]interface{}{
 		"success": true,
 		"message": fmt.Sprintf("生成采购单 %s 成功！", purchase_bill.Code),
+	})
+}
+
+func (c ErpIntelRepl) Calculate() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.CGGL_INTEL_REPL, c.Session)
+
+	var db_session = c.DbSession
+
+	intel_repl_service.Calculate_intel_repl(db_session)
+
+	return c.RenderJson(map[string]interface{}{
+		"success": true,
+		"message": "智能补货计算完成！",
 	})
 }

@@ -25,6 +25,10 @@
                         <i class="ace-icon fa fa-trash-o"></i>
                         删除
                     </button>
+                    <button class="btn btn-pink btn-sm" @click="calculate()">
+                        <i class="ace-icon fa fa-refresh"></i>
+                        立即计算智能补货
+                    </button>
                 </div>
                 <div id="query" style="line-height: 28px;">
                     <label for="sku_query">SKU</label>
@@ -362,6 +366,22 @@
                             vm.reloadList();
                         }
                     });
+                });
+            },
+            calculate: function () {
+                $.ajax({
+                    "dataType": 'json',
+                    "url": '{% url "ErpIntelRepl.Calculate" %}',
+                    "success": function (data) {
+                        if (data.success === false) {
+                            $.msg.error(data.message);
+                            return;
+                        }
+                        else {
+                            $.msg.show(data.message);
+                            return;
+                        }
+                    }
                 });
             }
         }
