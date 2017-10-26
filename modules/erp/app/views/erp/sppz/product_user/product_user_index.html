@@ -44,6 +44,35 @@
                         <a href="/static/excel-template/product_user_import.xlsx">下载商品负责人导入Excel模板</a>
                     </div>
                 </div>
+                <div style="margin: 15px 0;">
+                    <label for="sale_user_id_query">销售负责人</label>
+                    <select id="sale_user_id_query" name="sale_user_id_query" style="height: 30px; width: 130px;">
+                        <option value="0">销售负责人</option>
+                        {% range $index, $user := .sale_user_list %}
+                        <option value="{% $user.Id %}">{% $user.LoginName %}（{% $user.NickName %}）</option>
+                        {% end %}
+                    </select>
+                    &nbsp;&nbsp;
+                    <label for="service_user_id_query">客服负责人</label>
+                    <select id="service_user_id_query" name="service_user_id_query" style="height: 30px; width: 130px;">
+                        <option value="0">客服负责人</option>
+                        {% range $index, $user := .service_user_list %}
+                        <option value="{% $user.Id %}">{% $user.LoginName %}（{% $user.NickName %}）</option>
+                        {% end %}
+                    </select>
+                    &nbsp;&nbsp;
+                    <label for="dev_user_id_query">开发负责人</label>
+                    <select id="dev_user_id_query" name="dev_user_id_query" style="height: 30px; width: 130px;">
+                        <option value="0">开发负责人</option>
+                        {% range $index, $user := .dev_user_list %}
+                        <option value="{% $user.Id %}">{% $user.LoginName %}（{% $user.NickName %}）</option>
+                        {% end %}
+                    </select>
+                    &nbsp;&nbsp;
+                    <button class="btn btn-mini btn-primary" style="margin-bottom: 3px; height: 30px;">
+                        &nbsp;<i class="ace-icon fa fa-search"></i>查&nbsp;询&nbsp;
+                    </button>
+                </div>
                 <div>
                     <table id="productList" class="table table-striped table-bordered table-hover"></table>
                 </div>

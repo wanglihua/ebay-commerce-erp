@@ -18,6 +18,26 @@ type ErpProductUser struct {
 func (c ErpProductUser) Index() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.SPPZ_PRODUCT_USER, c.Session)
 
+	var db_session = c.DbSession
+
+	/*
+
+	var user_list = make([]auth_models.UserInfo, 0)
+	core.HandleError(db_session.OrderBy("login_name ASC").Find(&user_list))
+
+		"sale_user_list":    user_list,
+		"service_user_list": user_list,
+		"dev_user_list":     user_list,
+
+	 */
+
+	var user_list = make([]auth_models.UserInfo, 0)
+	core.HandleError(db_session.OrderBy("login_name ASC").Find(&user_list))
+
+	c.RenderArgs["sale_user_list"] = user_list
+	c.RenderArgs["service_user_list"] = user_list
+	c.RenderArgs["dev_user_list"] = user_list
+
 	return c.RenderTemplate("erp/sppz/product_user/product_user_index.html")
 }
 
