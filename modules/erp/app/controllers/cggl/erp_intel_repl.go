@@ -278,7 +278,7 @@ func (c ErpIntelRepl) Purchase() revel.Result {
 	_, err := db_session.Insert(&purchase_bill)
 	core.HandleError(err)
 
-	// 生成采购单明细
+	// 生成采购单明细，这个循环过程中会自动实现 MEL，BNE 仓库条目的合并
 	for _, intel_repl := range intel_repl_list {
 		var purchase_bill_entry cggl_models.PurchaseBillEntryInfo
 		has, err := db_session.Where(fmt.Sprintf("bill_id = %d AND product_id = %d", purchase_bill.Id, intel_repl.ProductId)).Get(&purchase_bill_entry)

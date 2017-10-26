@@ -14,6 +14,7 @@ import (
 	"matrix/core"
 	"matrix/modules/erp/models"
 	"strconv"
+	"math"
 )
 
 type ErpProductPurchaseSettingExcel struct {
@@ -125,13 +126,14 @@ func (c ErpProductPurchaseSettingExcel) Import() revel.Result {
 		product.Sku = product_purchase_setting.sku
 		product.PurchaseDays = product_purchase_setting.purchase_days
 		product.StockAlertDays = product_purchase_setting.stock_alert_days
+		product.StockAlertQty = int64(math.Floor(float64(product.StockAlertDays)*product.DailyMeanSales + 0.5))
 
 		if product_purchase_setting.purchase_days == 0 || product_purchase_setting.stock_alert_days == 0 {
 			has_zero_data = true
 		}
 
 		if has == true {
-			update_col_list := []string{"purchase_days", "stock_alert_days"}
+			update_col_list := []string{"purchase_days", "stock_alert_days", "stock_alert_qty"}
 			_, err = db_session.Id(product.Id).Cols(update_col_list...).Update(&product)
 			core.HandleError(err)
 		} else {

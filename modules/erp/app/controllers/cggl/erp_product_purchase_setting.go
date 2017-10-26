@@ -9,6 +9,7 @@ import (
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/models/kcgl_models"
 	"matrix/modules/erp/service/product_log_service"
+	"math"
 )
 
 type ErpProductPurchaseSetting struct {
@@ -32,7 +33,7 @@ func (c ErpProductPurchaseSetting) ListData() revel.Result {
 
 	type product_weight_view_item_t struct {
 		Product kcgl_models.ProductInfo `xorm:"extends" json:"p"`
-		Status  models.StatusInfo  `xorm:"extends" json:"s"`
+		Status  models.StatusInfo       `xorm:"extends" json:"s"`
 	}
 
 	/*
@@ -126,8 +127,9 @@ func (c ErpProductPurchaseSetting) Save() revel.Result {
 
 	product_in_db.PurchaseDays = detail_form.Product.PurchaseDays
 	product_in_db.StockAlertDays = detail_form.Product.StockAlertDays
+	product_in_db.StockAlertQty = int64(math.Floor(float64(detail_form.Product.StockAlertDays)*product_in_db.DailyMeanSales + 0.5))
 
-	updata_col_List := []string{"stock_alert_days", "purchase_days"}
+	updata_col_List := []string{"purchase_days", "stock_alert_days", "stock_alert_qty"}
 	affected_count, err := db_session.Id(product_id).Cols(updata_col_List...).Update(&product_in_db)
 	core.HandleError(err)
 

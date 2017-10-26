@@ -207,11 +207,24 @@ SET daily_mean_sales = cast(level1_qty / 90 * 0.2 + level2_qty / 60 * 0.3 AS DEC
 
 	 */
 
-	var update_product_daily_mean_sales_sql = `UPDATE erp_product_sale_analysis
+	var update_analysis_daily_mean_sales_sql = `UPDATE erp_product_sale_analysis
 SET daily_mean_sales = cast(%s AS DECIMAL(18, 6));`
-	update_product_daily_mean_sales_sql = fmt.Sprintf(update_product_daily_mean_sales_sql, get_product_dialy_mean_sales_sql_expression(analysis_setting))
+	update_analysis_daily_mean_sales_sql = fmt.Sprintf(update_analysis_daily_mean_sales_sql, get_product_dialy_mean_sales_sql_expression(analysis_setting))
 
-	_, err = db_session.Exec(update_product_daily_mean_sales_sql)
+	_, err = db_session.Exec(update_analysis_daily_mean_sales_sql)
+	core.HandleError(err)
+
+	// 更新商品的日均销量和警戒库存
+	/*
+UPDATE erp_product p
+    INNER JOIN erp_product_sale_analysis sa ON sa.product_id = p.id AND sa.type = 300 # 不分仓统计
+SET p.daily_mean_sales = sa.daily_mean_sales, p.stock_alert_qty = p.stock_alert_days * sa.daily_mean_sales;
+	 */
+	var update_product_dialy_mean_sales_sql = `UPDATE erp_product p
+    INNER JOIN erp_product_sale_analysis sa ON sa.product_id = p.id AND sa.type = 300 # 不分仓统计
+SET p.daily_mean_sales = sa.daily_mean_sales, p.stock_alert_qty = p.stock_alert_days * sa.daily_mean_sales;`
+
+	_, err = db_session.Exec(update_product_dialy_mean_sales_sql)
 	core.HandleError(err)
 }
 

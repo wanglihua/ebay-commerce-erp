@@ -241,6 +241,17 @@
                             }
                         },
                         {
+                            "mDataProp": "p.daily_mean_sales", "title": "日均销量", "bSearchable": false, "width": 100, "sClass": "center",
+                            "render": function (data, type, row) {
+                                if (data !== 0) {
+                                    return data;
+                                }
+                                else {
+                                    return "";
+                                }
+                            }
+                        },
+                        {
                             "mDataProp": "p.stock_alert_qty", "title": "警戒库存", "bSearchable": false, "width": 80, "sClass": "center",
                             "render": function (data, type, row) {
                                 if (data !== 0) {
