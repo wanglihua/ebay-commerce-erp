@@ -16,6 +16,7 @@ import (
 	"strings"
 	"matrix/modules/erp/service/stock_service"
 	"matrix/modules/erp/service/bill_service"
+	auth_models "matrix/modules/auth/models"
 )
 
 type ErpIntelRepl struct {
@@ -31,6 +32,17 @@ func (c ErpIntelRepl) Index() revel.Result {
 	core.HandleError(db_session.Where(fmt.Sprintf("stock_type_id = %d", sppz_models.STOCK_TYPE_AU)).Find(&stock_list))
 
 	c.RenderArgs["stock_list"] = stock_list
+
+	var status_list = make([]models.StatusInfo, 0)
+	core.HandleError(db_session.Where(fmt.Sprintf("type = %d", models.STATUS_TYPE_INTEL_REPL)).Find(&status_list))
+
+	c.RenderArgs["status_list"] = status_list
+
+	var user_list = make([]auth_models.UserInfo, 0)
+	core.HandleError(db_session.OrderBy("login_name ASC").Find(&user_list))
+
+	c.RenderArgs["sale_user_list"] = user_list
+	c.RenderArgs["dev_user_list"] = user_list
 
 	return c.RenderTemplate("erp/cggl/intel_repl/intel_repl_index.html")
 }
@@ -52,6 +64,7 @@ sku_query:
 stock_id_query:0
 min_profit_query:
 max_profit_query:
+status_id_query
 	 */
 
 	var sku_query string
@@ -90,6 +103,15 @@ max_profit_query:
 			})
 		}
 	}
+
+	var status_id_query int64
+	c.Params.Bind(&status_id_query, "status_id_query")
+
+	var sale_user_id_query int64
+	c.Params.Bind(&sale_user_id_query, "sale_user_id_query")
+
+	var dev_user_id_query int64
+	c.Params.Bind(&dev_user_id_query, "dev_user_id_query")
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
@@ -131,6 +153,18 @@ FROM erp_intel_repl ir
 
 	if max_profit_query != 0 {
 		filter = core.SqlAnd(filter, fmt.Sprintf("ir.profit <= %f", max_profit_query))
+	}
+
+	if status_id_query != 0 {
+		filter = core.SqlAnd(filter, fmt.Sprintf("ir.status_id = %d", status_id_query))
+	}
+
+	if sale_user_id_query != 0 {
+		filter = core.SqlAnd(filter, fmt.Sprintf("p.sale_user_id = %d", sale_user_id_query))
+	}
+
+	if dev_user_id_query != 0 {
+		filter = core.SqlAnd(filter, fmt.Sprintf("p.dev_user_id = %d", dev_user_id_query))
 	}
 
 	sb.Where(filter)
