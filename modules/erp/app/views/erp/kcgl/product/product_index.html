@@ -50,6 +50,32 @@
                         <input class="input-sm" id="product_sku_query" name="product_sku_query" placeholder="SKU查询" type="text" style="width: 130px;"/>
                         <label class="control-label no-padding-right" for="product_name_query">商品名称</label>
                         <input class="input-sm" id="product_name_query" name="product_name_query" placeholder="商品名称查询" type="text" style="width: 130px;"/>
+
+                        <label for="sale_user_id_query">销售负责人</label>
+                        <select id="sale_user_id_query" name="sale_user_id_query" style="height: 30px; width: 130px;">
+                            <option value="0">销售负责人</option>
+                            {% range $index, $user := .sale_user_list %}
+                            <option value="{% $user.Id %}">{% $user.LoginName %}（{% $user.NickName %}）</option>
+                            {% end %}
+                        </select>
+                        &nbsp;&nbsp;
+                        <label for="service_user_id_query">客服负责人</label>
+                        <select id="service_user_id_query" name="service_user_id_query" style="height: 30px; width: 130px;">
+                            <option value="0">客服负责人</option>
+                            {% range $index, $user := .service_user_list %}
+                            <option value="{% $user.Id %}">{% $user.LoginName %}（{% $user.NickName %}）</option>
+                            {% end %}
+                        </select>
+                        &nbsp;&nbsp;
+                        <label for="dev_user_id_query">开发负责人</label>
+                        <select id="dev_user_id_query" name="dev_user_id_query" style="height: 30px; width: 130px;">
+                            <option value="0">开发负责人</option>
+                            {% range $index, $user := .dev_user_list %}
+                            <option value="{% $user.Id %}">{% $user.LoginName %}（{% $user.NickName %}）</option>
+                            {% end %}
+                        </select>
+                        &nbsp;&nbsp;
+                        
                         <button class="btn btn-mini btn-primary" @click="refreshList()">
                             &nbsp;<i class="ace-icon fa fa-search"></i>查&nbsp;询&nbsp;
                         </button>
@@ -251,6 +277,10 @@
                         aoData.push({'name': 'product_cate_query', 'value': $('#product_cate_query').val()});
                         aoData.push({'name': 'product_sku_query', 'value': $('#product_sku_query').val()});
                         aoData.push({'name': 'product_name_query', 'value': $('#product_name_query').val()});
+
+                        aoData.push({name: 'sale_user_id_query', value: $("#sale_user_id_query").val()});
+                        aoData.push({name: 'service_user_id_query', value: $("#service_user_id_query").val()});
+                        aoData.push({name: 'dev_user_id_query', value: $("#dev_user_id_query").val()});
 
                         $.ajax(
                             {

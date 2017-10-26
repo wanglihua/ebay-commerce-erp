@@ -37,6 +37,14 @@ func (c ErpProduct) Index() revel.Result {
 	c.RenderArgs["can_save"] = pass_service.Is_login_user_has_pass(pass_res.KCGL_PRODUCT_DETAIL_SAVE, c.Session)
 
 	c.RenderArgs["product_cate_list"] = product_cate_list
+
+	var user_list = make([]auth_models.UserInfo, 0)
+	core.HandleError(db_session.OrderBy("login_name ASC").Find(&user_list))
+
+	c.RenderArgs["sale_user_list"] = user_list
+	c.RenderArgs["service_user_list"] = user_list
+	c.RenderArgs["dev_user_list"] = user_list
+
 	return c.RenderTemplate("erp/kcgl/product/product_index.html")
 }
 
@@ -62,6 +70,15 @@ func (c ErpProduct) ListData() revel.Result {
 
 	var product_name_query string
 	c.Params.Bind(&product_name_query, "product_name_query")
+
+	var sale_user_id_query int64
+	c.Params.Bind(&sale_user_id_query, "sale_user_id_query")
+
+	var service_user_id_query int64
+	c.Params.Bind(&service_user_id_query, "service_user_id_query")
+
+	var dev_user_id_query int64
+	c.Params.Bind(&dev_user_id_query, "dev_user_id_query")
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
@@ -94,6 +111,18 @@ FROM erp_product prd
 
 	if strings.TrimSpace(product_name_query) != "" {
 		filter = core.SqlAnd(filter, fmt.Sprintf("prd.cn_name LIKE '%%%s%%'", product_name_query))
+	}
+
+	if sale_user_id_query != 0 {
+		filter = core.SqlAnd(filter, fmt.Sprintf("prd.sale_user_id = %d", sale_user_id_query))
+	}
+
+	if service_user_id_query != 0 {
+		filter = core.SqlAnd(filter, fmt.Sprintf("prd.service_user_id = %d", service_user_id_query))
+	}
+
+	if dev_user_id_query != 0 {
+		filter = core.SqlAnd(filter, fmt.Sprintf("prd.dev_user_id = %d", dev_user_id_query))
 	}
 
 	sql_builder.Where(filter)
