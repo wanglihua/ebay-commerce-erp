@@ -110,6 +110,25 @@ FROM erp_product prd
 	err := db_session.Sql(sql_builder.SqlList()).Find(&product_list)
 	core.HandleError(err)
 
+	var user_list = make([]auth_models.UserInfo, 0)
+	core.HandleError(db_session.Find(&user_list))
+
+	var get_user_desc_in_user_list = func(user_id int64) string {
+		for _, user := range user_list {
+			if user.Id == user_id {
+				return fmt.Sprintf("%s（%s）", user.LoginName, user.NickName)
+			}
+		}
+
+		return ""
+	}
+
+	for index, product := range product_list {
+		product_list[index].Product.SaleUser = get_user_desc_in_user_list(product.Product.SaleUserId)
+		product_list[index].Product.ServiceUser = get_user_desc_in_user_list(product.Product.ServiceUserId)
+		product_list[index].Product.DevUser = get_user_desc_in_user_list(product.Product.DevUserId)
+	}
+
 	var product_id_list = make([]int64, 0)
 	for _, product := range product_list {
 		product_id_list = append(product_id_list, product.Product.Id)
