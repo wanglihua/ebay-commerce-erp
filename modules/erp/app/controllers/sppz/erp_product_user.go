@@ -9,6 +9,7 @@ import (
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/models/kcgl_models"
 	auth_models "matrix/modules/auth/models"
+	"fmt"
 )
 
 type ErpProductUser struct {
@@ -50,6 +51,15 @@ func (c ErpProductUser) ListData() revel.Result {
 	var filter_type int64
 	c.Params.Bind(&filter_type, "filter_type")
 
+	var sale_user_id_query int64
+	c.Params.Bind(&sale_user_id_query, "sale_user_id_query")
+
+	var service_user_id_query int64
+	c.Params.Bind(&service_user_id_query, "service_user_id_query")
+
+	var dev_user_id_query int64
+	c.Params.Bind(&dev_user_id_query, "dev_user_id_query")
+
 	type product_user_view_item_t struct {
 		Product     kcgl_models.ProductInfo `xorm:"extends" json:"p"`
 		SaleUser    auth_models.UserInfo    `xorm:"extends" json:"sale_user"`
@@ -79,6 +89,18 @@ func (c ErpProductUser) ListData() revel.Result {
 	if filter_type == 1 { // 未设置人员数据的记录
 		filter_has_zero_data := core.SqlOr("p.sale_user_id = 0", "p.service_user_id = 0", "p.dev_user_id = 0")
 		filter = core.SqlAnd(filter, filter_has_zero_data)
+	}
+
+	if sale_user_id_query != 0 {
+		filter = core.SqlAnd(filter, fmt.Sprintf("p.sale_user_id = %d", sale_user_id_query))
+	}
+
+	if service_user_id_query != 0 {
+		filter = core.SqlAnd(filter, fmt.Sprintf("p.service_user_id = %d", service_user_id_query))
+	}
+
+	if dev_user_id_query != 0 {
+		filter = core.SqlAnd(filter, fmt.Sprintf("p.dev_user_id = %d", dev_user_id_query))
 	}
 
 	sb.Where(filter)

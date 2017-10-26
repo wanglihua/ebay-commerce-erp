@@ -69,7 +69,7 @@
                         {% end %}
                     </select>
                     &nbsp;&nbsp;
-                    <button class="btn btn-mini btn-primary" style="margin-bottom: 3px; height: 30px;">
+                    <button class="btn btn-mini btn-primary" style="margin-bottom: 3px; height: 30px;" onclick="search()">
                         &nbsp;<i class="ace-icon fa fa-search"></i>查&nbsp;询&nbsp;
                     </button>
                 </div>
@@ -188,7 +188,11 @@
         vm.filter_type = filter_type;
         var dataFilter = $("#dataFilter");
         dataFilter.html(filter_name);
-        reloadList('#productList');
+        refreshList('#productList');
+    }
+
+    function search() {
+        refreshList("#productList");
     }
 
     function init_uploader() {
@@ -312,6 +316,9 @@
                         showMask("数据加载中，请稍候");
 
                         aoData.push({name: 'filter_type', value: this_vm.filter_type});
+                        aoData.push({name: 'sale_user_id_query', value: $("#sale_user_id_query").val()});
+                        aoData.push({name: 'service_user_id_query', value: $("#service_user_id_query").val()});
+                        aoData.push({name: 'dev_user_id_query', value: $("#dev_user_id_query").val()});
 
                         $.ajax(
                             {
