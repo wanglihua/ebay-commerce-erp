@@ -537,7 +537,7 @@ func (c ErpLogisticsFeeRate) Export() revel.Result {
 
 	if len(id_list) != 0 {
 		var id_str_list = core.Int_list_to_str_list(id_list)
-		filter = core.SqlAnd(filter, fmt.Sprintf("id IN (%s)", strings.Join(id_str_list, ",")))
+		filter = core.SqlAnd(filter, fmt.Sprintf("fr.id IN (%s)", strings.Join(id_str_list, ",")))
 	}
 
 	/*
