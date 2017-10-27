@@ -74,7 +74,12 @@
                     }
                 },
                 {"mDataProp": "s.name", "title": "仓库", "bSearchable": true, "sClass": "center", "width": 200},
-                {"mDataProp": "sa.sku", "title": "SKU", "bSearchable": true, "width": 200},
+                {
+                    "mDataProp": "sa.sku", "title": "SKU", "bSearchable": true, "width": 200,
+                    "render": function (data, type, row) {
+                        return '<a href="/product/detail/' + row.sa.product_id + '" target="product_detail">' + row.sa.sku + '</a>';
+                    }
+                },
                 {"mDataProp": "sa.product_name", "title": "商品名称", "bSearchable": false, "bSortable": false}
             ];
 
