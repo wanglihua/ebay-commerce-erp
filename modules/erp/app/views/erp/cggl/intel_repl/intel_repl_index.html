@@ -34,6 +34,14 @@
                     <label for="sku_query">SKU</label>
                     <input id="sku_query" name="sku_query" style="width: 120px;height: 30px;" placeholder="SKU查询"/>
                     &nbsp;
+                    <label for="product_status_id_query">商品状态</label>
+                    <select id="product_status_id_query" name="product_status_id_query" style="height: 30px;">
+                        <option :value="0">商品状态</option>
+                        {% range $index, $status := .product_status_list %}
+                        <option :value="{% $status.Id %}">{% $status.Name %}</option>
+                        {% end %}
+                    </select>
+                    &nbsp;
                     <label for="stock_id_query">仓库</label>
                     <select id="stock_id_query" name="stock_id_query" style="height: 30px;">
                         <option :value="0">仓库列表</option>
@@ -230,6 +238,7 @@
                             }
                         },
                         {"mDataProp": "p.cn_name", "title": "商品", "bSearchable": true},
+                        {"mDataProp": "ps.name", "title": "商品状态", "bSearchable": true, "width": 80},
                         {"mDataProp": "st.name", "title": "仓库", "bSearchable": true, "width": 150},
                         {"mDataProp": "ir.qty", "title": "数量", "bSearchable": false, "width": 80},
                         {"mDataProp": "ir.profit", "title": "毛利率", "bSearchable": false, "width": 80},
@@ -243,6 +252,7 @@
                         aoData.push({'name': 'stock_id_query', 'value': $("#stock_id_query").val()});
                         aoData.push({'name': 'min_profit_query', 'value': $("#min_profit_query").val()});
                         aoData.push({'name': 'max_profit_query', 'value': $("#max_profit_query").val()});
+                        aoData.push({'name': 'product_status_id_query', 'value': $("#product_status_id_query").val()});
                         aoData.push({'name': 'status_id_query', 'value': $("#status_id_query").val()});
 
                         aoData.push({name: 'sale_user_id_query', value: $("#sale_user_id_query").val()});

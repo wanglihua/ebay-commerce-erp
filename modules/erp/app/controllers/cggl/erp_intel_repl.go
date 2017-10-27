@@ -31,13 +31,15 @@ func (c ErpIntelRepl) Index() revel.Result {
 
 	var stock_list = make([]sppz_models.StockInfo, 0)
 	core.HandleError(db_session.Where(fmt.Sprintf("stock_type_id = %d", sppz_models.STOCK_TYPE_AU)).Find(&stock_list))
-
 	c.RenderArgs["stock_list"] = stock_list
 
 	var status_list = make([]models.StatusInfo, 0)
 	core.HandleError(db_session.Where(fmt.Sprintf("type = %d", models.STATUS_TYPE_INTEL_REPL)).Find(&status_list))
-
 	c.RenderArgs["status_list"] = status_list
+
+	var product_status_list = make([]models.StatusInfo, 0)
+	core.HandleError(db_session.Where(fmt.Sprintf("type = %d", models.STATUS_TYPE_PRODUCT)).Find(&product_status_list))
+	c.RenderArgs["product_status_list"] = product_status_list
 
 	var user_list = make([]auth_models.UserInfo, 0)
 	core.HandleError(db_session.OrderBy("login_name ASC").Find(&user_list))
@@ -49,10 +51,11 @@ func (c ErpIntelRepl) Index() revel.Result {
 }
 
 type intel_repl_view_item_t struct {
-	IntelRepl cggl_models.IntelReplInfo `xorm:"extends" json:"ir"`
-	Product   kcgl_models.ProductInfo   `xorm:"extends" json:"p"`
-	Stock     sppz_models.StockInfo     `xorm:"extends" json:"st"`
-	Status    models.StatusInfo         `xorm:"extends" json:"s"`
+	IntelRepl     cggl_models.IntelReplInfo `xorm:"extends" json:"ir"`
+	Product       kcgl_models.ProductInfo   `xorm:"extends" json:"p"`
+	ProductStatus models.StatusInfo         `xorm:"extends" json:"ps"`
+	Stock         sppz_models.StockInfo     `xorm:"extends" json:"st"`
+	Status        models.StatusInfo         `xorm:"extends" json:"s"`
 }
 
 func (c ErpIntelRepl) ListData() revel.Result {
@@ -105,6 +108,9 @@ status_id_query
 		}
 	}
 
+	var product_status_id_query int64
+	c.Params.Bind(&product_status_id_query, "product_status_id_query")
+
 	var status_id_query int64
 	c.Params.Bind(&status_id_query, "status_id_query")
 
@@ -118,26 +124,29 @@ status_id_query
 
 	/*
 
-SELECT ir.*, p.*, st.*, s.*
+SELECT ir.*, p.*, ps.*, st.*, s.*
 FROM erp_intel_repl ir
     INNER JOIN erp_product p ON ir.product_id = p.id
-    INNER JOIN erp_stock st on ir.stock_id = st.id
+    INNER JOIN erp_status ps ON p.status_id = ps.id
+    INNER JOIN erp_stock st ON ir.stock_id = st.id
     INNER JOIN erp_status s ON ir.status_id = s.id;
 
 SELECT count(ir.id) AS count
 FROM erp_intel_repl ir
     INNER JOIN erp_product p ON ir.product_id = p.id
-    INNER JOIN erp_stock st on ir.stock_id = st.id
+    INNER JOIN erp_status ps ON p.status_id = ps.id
+    INNER JOIN erp_stock st ON ir.stock_id = st.id
     INNER JOIN erp_status s ON ir.status_id = s.id;
 
 	 */
 
 	var sb = core.NewSqlBuilder()
-	sb.Select("ir.*, p.*, st.*, s.*")
+	sb.Select("ir.*, p.*, ps.*, st.*, s.*")
 	sb.Count("count(ir.id) AS count")
 	sb.From(`erp_intel_repl ir
     INNER JOIN erp_product p ON ir.product_id = p.id
-    INNER JOIN erp_stock st on ir.stock_id = st.id
+    INNER JOIN erp_status ps ON p.status_id = ps.id
+    INNER JOIN erp_stock st ON ir.stock_id = st.id
     INNER JOIN erp_status s ON ir.status_id = s.id`)
 
 	if sku_query != "" {
@@ -154,6 +163,10 @@ FROM erp_intel_repl ir
 
 	if max_profit_query != 0 {
 		filter = core.SqlAnd(filter, fmt.Sprintf("ir.profit <= %f", max_profit_query))
+	}
+
+	if product_status_id_query != 0 {
+		filter = core.SqlAnd(filter, fmt.Sprintf("p.status_id = %d", product_status_id_query))
 	}
 
 	if status_id_query != 0 {
