@@ -12,6 +12,10 @@ import (
 	"matrix/modules/auth/pass_res"
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/erp/models/ddpz_models"
+	"bytes"
+	"time"
+	"github.com/go-xorm/xorm"
+	"matrix/modules/erp/models"
 )
 
 type ErpLogisticsFeeRate struct {
@@ -22,6 +26,12 @@ func (c ErpLogisticsFeeRate) Index() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.DDPZ_LOGISTICS_FEE_RATE, c.Session)
 
 	return c.RenderTemplate("erp/ddpz/logistics_fee_rate/logistics_fee_rate_index.html")
+}
+
+type logistics_fee_rate_view_item_t struct {
+	LogisticsFeeRate ddpz_models.LogisticsFeeRateInfo `xorm:"extends" json:"fr"`
+	LogisticsMode    ddpz_models.LogisticsModeInfo    `xorm:"extends" json:"lm"`
+	LogisticsCompany ddpz_models.LogisticsCompanyInfo `xorm:"extends" json:"lc"`
 }
 
 func (c ErpLogisticsFeeRate) ListData() revel.Result {
@@ -44,12 +54,6 @@ func (c ErpLogisticsFeeRate) ListData() revel.Result {
 	c.Params.Bind(&logistics_company_query, "logistics_company_query")
 	c.Params.Bind(&logistics_mode_query, "logistics_mode_query")
 	c.Params.Bind(&postcode_query, "postcode_query")
-
-	type logistics_fee_rate_view_item_t struct {
-		ddpz_models.LogisticsFeeRateInfo  `xorm:"extends" json:"fr"`
-		ddpz_models.LogisticsModeInfo     `xorm:"extends" json:"lm"`
-		ddpz_models.LogisticsCompanyInfo  `xorm:"extends" json:"lc"`
-	}
 
 	/*
 		SELECT fr.*, lm.*, lc.*
@@ -109,7 +113,7 @@ type LogisticsFeeRateDetailForm struct {
 	LogisticsFeeRate     ddpz_models.LogisticsFeeRateInfo   `json:"logistics_fee_rate"`
 	LogisticsCompanyList []ddpz_models.LogisticsCompanyInfo `json:"logistics_company_list"`
 	LogisticsModeList    []ddpz_models.LogisticsModeInfo    `json:"logistics_mode_list"`
-	CompanyId            int64                         `json:"company_id"`
+	CompanyId            int64                              `json:"company_id"`
 }
 
 func (f *LogisticsFeeRateDetailForm) IsCreate() bool {
@@ -250,6 +254,22 @@ func (c ErpLogisticsFeeRate) Delete() revel.Result {
 	core.HandleError(err)
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})
+}
+
+// 这个的权限检查就不用加上了，别的多个地方会调用
+func (c ErpLogisticsFeeRate) GetLogisticsModeListByCompanyId() revel.Result {
+	db_session := c.DbSession
+
+	var company_id int64
+	c.Params.Bind(&company_id, "company_id")
+
+	var logistics_mode_list = make([]ddpz_models.LogisticsModeInfo, 0)
+	err := db_session.Where(fmt.Sprintf("company_id = %d", company_id)).Find(&logistics_mode_list)
+	core.HandleError(err)
+
+	return c.RenderJson(map[string]interface{}{
+		"mode_list": logistics_mode_list,
+	})
 }
 
 func (c ErpLogisticsFeeRate) Import() revel.Result {
@@ -424,9 +444,9 @@ FROM erp_logistics_mode lm
 	 */
 
 	type logistics_company_and_mode_t struct {
-		CompanyName string  `xorm:"'company_name'"`
-		ModeId      int64   `xorm:"'mode_id'"`
-		ModeName    string  `xorm:"'mode_name'"`
+		CompanyName string `xorm:"'company_name'"`
+		ModeId      int64  `xorm:"'mode_id'"`
+		ModeName    string `xorm:"'mode_name'"`
 	}
 
 	sql := `SELECT
@@ -505,18 +525,283 @@ WHERE lc.name = '%s' AND lm.name = '%s'`
 	})
 }
 
-// 这个的权限检查就不用加上了，别的多个地方会调用
-func (c ErpLogisticsFeeRate) GetLogisticsModeListByCompanyId() revel.Result {
+func (c ErpLogisticsFeeRate) Export() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.DDPZ_LOGISTICS_FEE_RATE, c.Session)
+
 	db_session := c.DbSession
 
-	var company_id int64
-	c.Params.Bind(&company_id, "company_id")
+	var id_list = make([]int64, 0)
+	c.Params.Bind(&id_list, "id_list")
 
-	var logistics_mode_list = make([]ddpz_models.LogisticsModeInfo, 0)
-	err := db_session.Where(fmt.Sprintf("company_id = %d", company_id)).Find(&logistics_mode_list)
+	var filter = "1=1"
+
+	if len(id_list) != 0 {
+		var id_str_list = core.Int_list_to_str_list(id_list)
+		filter = core.SqlAnd(filter, fmt.Sprintf("id IN (%s)", strings.Join(id_str_list, ",")))
+	}
+
+	/*
+		aoData.push({'name': 'logistics_company_query', 'value': $('#logistics_company_query').val()});
+		aoData.push({'name': 'logistics_mode_query', 'value': $('#logistics_mode_query').val()});
+		aoData.push({'name': 'postcode_query', 'value': $('#postcode_query').val()});
+	 */
+
+	var logistics_company_query string
+	var logistics_mode_query string
+	var postcode_query string
+
+	c.Params.Bind(&logistics_company_query, "logistics_company_query")
+	c.Params.Bind(&logistics_mode_query, "logistics_mode_query")
+	c.Params.Bind(&postcode_query, "postcode_query")
+
+	/*
+		SELECT fr.*, lm.*, lc.*
+		FROM erp_logistics_fee_rate fr
+		    INNER JOIN erp_logistics_mode lm ON lm.id = fr.mode_id
+		    INNER JOIN erp_logistics_company lc ON lc.id = lm.company_id
+		WHERE lc.name LIKE '%abc%' AND lm.name LIKE '%bcd%' AND fr.postcode LIKE '%123%'
+	 */
+
+	sb := core.NewSqlBuilder()
+	sb.Select("fr.*, lm.*, lc.*")
+	sb.Count("count(fr.id) AS fee_rate_count")
+	sb.From(`erp_logistics_fee_rate fr
+    INNER JOIN erp_logistics_mode lm ON lm.id = fr.mode_id
+    INNER JOIN erp_logistics_company lc ON lc.id = lm.company_id`)
+
+	if strings.TrimSpace(logistics_company_query) != "" {
+		filter = core.SqlAnd(filter, fmt.Sprintf("lc.name LIKE '%%%s%%'", logistics_company_query))
+	}
+
+	if strings.TrimSpace(logistics_mode_query) != "" {
+		filter = core.SqlAnd(filter, fmt.Sprintf("lm.name LIKE '%%%s%%'", logistics_mode_query))
+	}
+
+	if strings.TrimSpace(postcode_query) != "" {
+		filter = core.SqlAnd(filter, fmt.Sprintf("fr.postcode LIKE '%%%s%%'", postcode_query))
+	}
+
+	sb.Where(filter)
+	sb.OrderBy("fr.id ASC")
+
+	logistics_fee_rate_list := make([]logistics_fee_rate_view_item_t, 0)
+	err := db_session.Sql(sb.SqlList()).Find(&logistics_fee_rate_list)
 	core.HandleError(err)
 
-	return c.RenderJson(map[string]interface{}{
-		"mode_list": logistics_mode_list,
-	})
+	xlsx_file := c.export_fee_rate_list_to_excel(db_session, logistics_fee_rate_list)
+
+	//先把文件内容写到buffer中，再从中读取
+	var buffer bytes.Buffer
+	err = xlsx_file.Write(&buffer)
+	core.HandleError(err)
+
+	reader := bytes.NewReader(buffer.Bytes()) //bytes.Reader 实现了 io.Reader 接口
+
+	file_name := "物流费率导出.xlsx" //"file.xlsx" //可以根据参数生成文件名
+
+	return c.RenderBinary(reader, file_name, revel.Attachment, time.Now())
+}
+
+func (c ErpLogisticsFeeRate) export_fee_rate_list_to_excel(db_session *xorm.Session, logistics_fee_rate_list []logistics_fee_rate_view_item_t) *xlsx.File {
+
+	//统一设置标题单元格格式的函数
+	set_head_cell_style := func(cell *xlsx.Cell) {
+		style := xlsx.NewStyle()
+
+		font := *xlsx.NewFont(9, "微软雅黑")
+		font.Bold = true
+		font.Italic = false
+		font.Underline = false
+		style.Font = font
+		style.ApplyBorder = true
+
+		fill := *xlsx.NewFill("solid", "00CCFFCC", "00000000") //CCFFCC
+		style.Fill = fill
+		style.ApplyFill = true
+
+		border := *xlsx.NewBorder("thin", "thin", "thin", "thin")
+		style.Border = border
+		style.ApplyBorder = true
+
+		alignment := *new(xlsx.Alignment)
+		alignment.Horizontal = "center"
+		alignment.Vertical = "center"
+		alignment.WrapText = true
+		style.Alignment = alignment
+		style.ApplyAlignment = true
+
+		cell.SetStyle(style)
+	}
+
+	//统一设置内容单元格格式的函数
+	set_text_cell_style := func(cell *xlsx.Cell, horizontal_align string) {
+		style := xlsx.NewStyle()
+
+		font := *xlsx.NewFont(9, "微软雅黑")
+		font.Bold = false
+		font.Italic = false
+		font.Underline = false
+		style.Font = font
+		style.ApplyBorder = true
+
+		fill := *xlsx.NewFill("solid", "00FFFFFF", "00000000") //CCFFCC
+		style.Fill = fill
+		style.ApplyFill = true
+
+		border := *xlsx.NewBorder("thin", "thin", "thin", "thin")
+		style.Border = border
+		style.ApplyBorder = true
+
+		alignment := *new(xlsx.Alignment)
+		alignment.Horizontal = horizontal_align
+		alignment.Vertical = "center"
+		alignment.WrapText = true
+		style.Alignment = alignment
+		style.ApplyAlignment = true
+
+		cell.SetStyle(style)
+	}
+
+	head_row_height := 0.8
+	common_row_height := 0.6
+
+	//创建工作薄
+	xlsx_file := xlsx.NewFile()
+
+	//添加工作表
+	sheet, err := xlsx_file.AddSheet("物流费率")
+	core.HandleError(err)
+
+	//添加标题行
+	row := sheet.AddRow()
+	row.SetHeightCM(head_row_height)
+
+	col_index := 0
+
+	var product_status_list = make([]models.StatusInfo, 0)
+	err = db_session.Where(fmt.Sprintf("type = %d", models.STATUS_TYPE_PRODUCT)).Find(&product_status_list)
+	core.HandleError(err)
+
+	{
+		cell := row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 10)
+		set_head_cell_style(cell)
+		cell.Value = "物流公司"
+		col_index++
+
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 30)
+		set_head_cell_style(cell)
+		cell.Value = "物流方式"
+		col_index++
+
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 10)
+		set_head_cell_style(cell)
+		cell.Value = "邮编"
+		col_index++
+
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 10)
+		set_head_cell_style(cell)
+		cell.Value = "起步价(澳币)"
+		col_index++
+
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 10)
+		set_head_cell_style(cell)
+		cell.Value = "起步价重量(Kg)"
+		col_index++
+
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 10)
+		set_head_cell_style(cell)
+		cell.Value = "最低收费(澳币)"
+		col_index++
+
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 10)
+		set_head_cell_style(cell)
+		cell.Value = "续重阶梯(Kg)"
+		col_index++
+
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 15)
+		set_head_cell_style(cell)
+		cell.Value = "续重阶梯收费(澳币)"
+		col_index++
+
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 10)
+		set_head_cell_style(cell)
+		cell.Value = "是否为偏远地区"
+		col_index++
+
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 15)
+		set_head_cell_style(cell)
+		cell.Value = "偏远地区加收运费(澳币)"
+		col_index++
+	}
+
+	for _, fee_rate := range logistics_fee_rate_list {
+		row = sheet.AddRow()
+		row.SetHeightCM(common_row_height)
+
+		// 物流公司
+		cell := row.AddCell()
+		set_text_cell_style(cell, "center")
+		cell.Value = fee_rate.LogisticsCompany.Name
+
+		// 物流方式
+		cell = row.AddCell()
+		set_text_cell_style(cell, "center")
+		cell.Value = fee_rate.LogisticsMode.Name
+
+		// 邮编
+		cell = row.AddCell()
+		set_text_cell_style(cell, "center")
+		cell.Value = fee_rate.LogisticsFeeRate.Postcode
+
+		// 起步价(澳币)
+		cell = row.AddCell()
+		set_text_cell_style(cell, "right")
+		cell.Value = fmt.Sprintf("%0.2f", fee_rate.LogisticsFeeRate.Qbj)
+
+		//  起步价重量(Kg)
+		cell = row.AddCell()
+		set_text_cell_style(cell, "right")
+		cell.Value = fmt.Sprintf("%0.3f", fee_rate.LogisticsFeeRate.Qbjzl)
+
+		// 最低收费(澳币)
+		cell = row.AddCell()
+		set_text_cell_style(cell, "right")
+		cell.Value = fmt.Sprintf("%0.2f", fee_rate.LogisticsFeeRate.Zdsf)
+
+		// 续重阶梯(Kg)
+		cell = row.AddCell()
+		set_text_cell_style(cell, "right")
+		cell.Value = fmt.Sprintf("%0.3f", fee_rate.LogisticsFeeRate.Xzjt)
+
+		// 续重阶梯收费(澳币)
+		cell = row.AddCell()
+		set_text_cell_style(cell, "right")
+		cell.Value = fmt.Sprintf("%0.2f", fee_rate.LogisticsFeeRate.Xzjtsf)
+
+		// 是否为偏远地区
+		cell = row.AddCell()
+		set_text_cell_style(cell, "right")
+		if fee_rate.LogisticsFeeRate.Sfpydq == 1 {
+			cell.Value = "是"
+		} else {
+			cell.Value = "否"
+		}
+
+		// 偏远地区加收运费(澳币)
+		cell = row.AddCell()
+		set_text_cell_style(cell, "right")
+		cell.Value = fmt.Sprintf("%0.2f", fee_rate.LogisticsFeeRate.Pydqjsyf)
+	}
+
+	return xlsx_file
 }
