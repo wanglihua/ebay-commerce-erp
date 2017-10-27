@@ -22,13 +22,13 @@ SELECT
          INNER JOIN erp_order o ON o.id = oi.order_id AND o.status_id = 4300 # 订单状态 已完成
      WHERE oi.item_product_id = psa.product_id)                                                                                                                                                                                  AS profit,
     # 新生成
-    100                                                                                                                                                                                                                          AS status_id,
+    5700                                                                                                                                                                                                                      AS status_id,
     now()                                                                                                                                                                                                                        AS create_time,
     now()                                                                                                                                                                                                                        AS update_time
 FROM erp_product_sale_analysis psa
     INNER JOIN erp_inventory nvt ON nvt.product_id = psa.product_id AND nvt.stock_id = psa.stock_id AND psa.type = 200
     INNER JOIN erp_product p ON p.id = psa.product_id
-    LEFT JOIN erp_intel_repl ir ON ir.stock_id = psa.stock_id AND ir.product_id = psa.product_id AND ir.status_id = 100 # 100 新生成
+    LEFT JOIN erp_intel_repl ir ON ir.stock_id = psa.stock_id AND ir.product_id = psa.product_id AND ir.status_id = 5700 # 5700 新生成
 WHERE ir.stock_id IS NULL AND psa.daily_mean_sales * (p.purchase_days + p.stock_alert_days) - nvt.qty - nvt.pending_qty - ifnull((SELECT sum(pbe.qty)
                                                                                                                                   FROM erp_purchase_bill_entry pbe
                                                                                                                                   WHERE pbe.status_id <> 4700 AND pbe.status_id <> 4710 AND pbe.status_id <> 4720 AND pbe.product_id = psa.product_id), 0) > 0;
@@ -52,7 +52,7 @@ UPDATE erp_intel_repl ir
                                                                                                                              FROM erp_purchase_bill_entry pbe
                                                                                                                              WHERE pbe.status_id <> 4700 AND pbe.status_id <> 4710 AND pbe.status_id <> 4720 AND pbe.product_id = psa.product_id), 0) > 0
                ) sa
-        ON ir.status_id = 100 AND ir.stock_id = sa.stock_id AND ir.product_id = sa.product_id
+        ON ir.status_id = 5700 AND ir.stock_id = sa.stock_id AND ir.product_id = sa.product_id
 SET ir.qty = sa.qty, ir.profit = sa.profit, ir.update_time = now();
 
 	 */
@@ -73,13 +73,13 @@ SELECT
          INNER JOIN erp_order o ON o.id = oi.order_id AND o.status_id = 4300 # 订单状态 已完成
      WHERE oi.item_product_id = psa.product_id)                                                                                                                                                                                  AS profit,
     # 新生成
-    100                                                                                                                                                                                                                          AS status_id,
+    5700                                                                                                                                                                                                                          AS status_id,
     now()                                                                                                                                                                                                                        AS create_time,
     now()                                                                                                                                                                                                                        AS update_time
 FROM erp_product_sale_analysis psa
     INNER JOIN erp_inventory nvt ON nvt.product_id = psa.product_id AND nvt.stock_id = psa.stock_id AND psa.type = 200
     INNER JOIN erp_product p ON p.id = psa.product_id
-    LEFT JOIN erp_intel_repl ir ON ir.stock_id = psa.stock_id AND ir.product_id = psa.product_id AND ir.status_id = 100 # 100 新生成
+    LEFT JOIN erp_intel_repl ir ON ir.stock_id = psa.stock_id AND ir.product_id = psa.product_id AND ir.status_id = 5700 # 5700 新生成
 WHERE ir.stock_id IS NULL AND psa.daily_mean_sales * (p.purchase_days + p.stock_alert_days) - nvt.qty - nvt.pending_qty - ifnull((SELECT sum(pbe.qty)
                                                                                                                                   FROM erp_purchase_bill_entry pbe
                                                                                                                                   WHERE pbe.status_id <> 4700 AND pbe.status_id <> 4710 AND pbe.status_id <> 4720 AND pbe.product_id = psa.product_id), 0) > 0;`
@@ -106,7 +106,7 @@ WHERE ir.stock_id IS NULL AND psa.daily_mean_sales * (p.purchase_days + p.stock_
                                                                                                                              FROM erp_purchase_bill_entry pbe
                                                                                                                              WHERE pbe.status_id <> 4700 AND pbe.status_id <> 4710 AND pbe.status_id <> 4720 AND pbe.product_id = psa.product_id), 0) > 0
                ) sa
-        ON ir.status_id = 100 AND ir.stock_id = sa.stock_id AND ir.product_id = sa.product_id
+        ON ir.status_id = 5700 AND ir.stock_id = sa.stock_id AND ir.product_id = sa.product_id
 SET ir.qty = sa.qty, ir.profit = sa.profit, ir.update_time = now();`
 
 	_, err = db_session.Exec(sql_intel_repl_update)
