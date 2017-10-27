@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"encoding/json"
 	"strconv"
 	"github.com/revel/revel"
 
@@ -226,6 +225,7 @@ func (f *IntelReplDetailForm) Valid(validation *revel.Validation) bool {
 	return validation.HasErrors() == false
 }
 
+/*
 func (c ErpIntelRepl) DetailData() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.CGGL_INTEL_REPL, c.Session)
 
@@ -279,6 +279,7 @@ func (c ErpIntelRepl) Save() revel.Result {
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据保存成功!"})
 }
+*/
 
 func (c ErpIntelRepl) Delete() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.CGGL_INTEL_REPL, c.Session)
@@ -310,6 +311,15 @@ func (c ErpIntelRepl) Purchase() revel.Result {
 			"success": false,
 			"message": "请选择智能补货条目！",
 		})
+	}
+
+	for _, intel_repl := range intel_repl_list {
+		if intel_repl.StatusId == models.INTEL_REPL_STATUS_YCG {
+			return c.RenderJson(map[string]interface{}{
+				"success": false,
+				"message": "已采购状态的智能补货条目不能再次采购！",
+			})
+		}
 	}
 
 	var mel_stock_id = stock_service.Get_mel_stock_id(db_session)

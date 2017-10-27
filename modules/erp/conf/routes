@@ -711,8 +711,8 @@ POST /product/sale/setting/save                 ErpProductSaleSetting.Save
 
 GET  /intel/repl                    ErpIntelRepl.Index
 POST /intel/repl/data/list          ErpIntelRepl.ListData
-POST /intel/repl/data/detail        ErpIntelRepl.DetailData
-POST /intel/repl/save               ErpIntelRepl.Save
+# POST /intel/repl/data/detail        ErpIntelRepl.DetailData
+# POST /intel/repl/save               ErpIntelRepl.Save
 POST /intel/repl/delete             ErpIntelRepl.Delete
 POST /intel/repl/purchase           ErpIntelRepl.Purchase
 POST /intel/repl/calculate          ErpIntelRepl.Calculate
