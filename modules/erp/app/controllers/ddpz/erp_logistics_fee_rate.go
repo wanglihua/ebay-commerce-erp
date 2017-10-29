@@ -226,11 +226,41 @@ func (c ErpLogisticsFeeRate) Save() revel.Result {
 
 	logistics_fee_rate := detail_form.LogisticsFeeRate
 
+	var logistics_fee_rate_in_db ddpz_models.LogisticsFeeRateInfo
+
 	var affected int64
 	if detail_form.IsCreate() {
+		has, err := db_session.Where("mode_id = ? AND postcode = ?", logistics_fee_rate.ModeId, logistics_fee_rate.Postcode).Limit(1).Get(&logistics_fee_rate_in_db)
+		core.HandleError(err)
+
+		if has == true {
+			var logistics_mode ddpz_models.LogisticsModeInfo
+			_, err := db_session.Id(logistics_fee_rate.ModeId).Get(&logistics_mode)
+			core.HandleError(err)
+
+			return c.RenderJson(map[string]interface{}{
+				"success": false,
+				"message": fmt.Sprintf("物流方式 %s, 邮编为 %s 的费率已存在！", logistics_mode.Name, logistics_fee_rate.Postcode),
+			})
+		}
+
 		affected, err = db_session.Insert(&logistics_fee_rate)
 		core.HandleError(err)
 	} else {
+		has, err := db_session.Where("id <> ? AND mode_id = ? AND postcode = ?", logistics_fee_rate.Id, logistics_fee_rate.ModeId, logistics_fee_rate.Postcode).Limit(1).Get(&logistics_fee_rate_in_db)
+		core.HandleError(err)
+
+		if has == true {
+			var logistics_mode ddpz_models.LogisticsModeInfo
+			_, err := db_session.Id(logistics_fee_rate.ModeId).Get(&logistics_mode)
+			core.HandleError(err)
+
+			return c.RenderJson(map[string]interface{}{
+				"success": false,
+				"message": fmt.Sprintf("物流方式 %s, 邮编为 %s 的费率已存在！", logistics_mode.Name, logistics_fee_rate.Postcode),
+			})
+		}
+
 		affected, err = db_session.Id(logistics_fee_rate.Id).Update(&logistics_fee_rate)
 		core.HandleError(err)
 
@@ -514,9 +544,17 @@ WHERE lc.name = '%s' AND lm.name = '%s'`
 
 		logistics_fee_rate.ModeId = mode_id
 
-		_, err = db_session.Insert(&logistics_fee_rate)
+		var logistics_fee_rate_in_db ddpz_models.LogisticsFeeRateInfo
+		has, err := db_session.Where("mode_id = ? AND postcode = ?", logistics_fee_rate.ModeId, logistics_fee_rate.Postcode).Limit(1).Get(&logistics_fee_rate_in_db)
 		core.HandleError(err)
 
+		if has == false {
+			_, err = db_session.Insert(&logistics_fee_rate)
+			core.HandleError(err)
+		} else {
+			_, err = db_session.Where("mode_id = ? AND postcode = ?", logistics_fee_rate.ModeId, logistics_fee_rate.Postcode).Update(&logistics_fee_rate)
+			core.HandleError(err)
+		}
 	}
 
 	return c.RenderJson(map[string]interface{}{
