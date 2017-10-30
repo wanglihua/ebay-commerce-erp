@@ -42,20 +42,12 @@
                         {% end %}
                     </select>
                     &nbsp;
-                    <label for="stock_id_query">仓库</label>
-                    <select id="stock_id_query" name="stock_id_query" style="height: 30px;">
-                        <option :value="0">仓库列表</option>
-                        {% range $index, $stock := .stock_list %}
-                        <option :value="{% $stock.Id %}">{% $stock.Name %}</option>
-                        {% end %}
-                    </select>
-                    &nbsp;
                     <label for="min_profit_query">毛利率区间</label>
                     <input id="min_profit_query" name="min_profit_query" style="width: 70px;height:30px;" placeholder="最小毛利率"/>~
                     <input id="max_profit_query" name="max_profit_query" style="width: 70px;height:30px;" placeholder="最大毛利率"/>
                     &nbsp;
-                    <label for="stock_id_query">状态</label>
-                    <select id="status_id_query" name="stock_id_query" style="height: 30px;">
+                    <label for="status_id_query">状态</label>
+                    <select id="status_id_query" name="status_id_query" style="height: 30px;">
                         <option :value="0">状态</option>
                         {% range $index, $status := .status_list %}
                         <option :value="{% $status.Id %}">{% $status.Name %}</option>
@@ -239,7 +231,6 @@
                         },
                         {"mDataProp": "p.cn_name", "title": "商品", "bSearchable": true},
                         {"mDataProp": "ps.name", "title": "商品状态", "bSearchable": true, "width": 80},
-                        {"mDataProp": "st.name", "title": "仓库", "bSearchable": true, "width": 150},
                         {"mDataProp": "ir.qty", "title": "数量", "bSearchable": false, "width": 80},
                         {"mDataProp": "ir.profit", "title": "毛利率", "bSearchable": false, "width": 80},
                         {"mDataProp": "s.name", "title": "状态", "bSearchable": true, "width": 80},
@@ -249,7 +240,6 @@
                         showMask("数据加载中，请稍候");
 
                         aoData.push({'name': 'sku_query', 'value': $("#sku_query").val()});
-                        aoData.push({'name': 'stock_id_query', 'value': $("#stock_id_query").val()});
                         aoData.push({'name': 'min_profit_query', 'value': $("#min_profit_query").val()});
                         aoData.push({'name': 'max_profit_query', 'value': $("#max_profit_query").val()});
                         aoData.push({'name': 'product_status_id_query', 'value': $("#product_status_id_query").val()});

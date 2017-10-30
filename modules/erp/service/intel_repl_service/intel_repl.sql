@@ -35,7 +35,7 @@ CREATE PROCEDURE intel_repl()
         DECLARE v_bne_zt_nvt_qty BIGINT;
         DECLARE v_mel_pc_qty BIGINT; # MEL 采购中数量
         DECLARE v_bne_pc_qty BIGINT; # BNE 采购中数量
-        DECLARE v_pc_qty BIGINT; # 采购中的总数量，不是从上面的两个相加而来。直接从采购单的总数量来。
+        # DECLARE v_pc_qty BIGINT; # 采购中的总数量，不是从上面的两个相加而来。直接从采购单的总数量来。
         DECLARE v_cn_nvt_qty BIGINT;
         DECLARE v_profit DECIMAL(18, 6); # 利润
         DECLARE v_mel_qty BIGINT; # 补货单 MEL 数量
@@ -90,8 +90,8 @@ CREATE PROCEDURE intel_repl()
         WHERE s.target_stock_id = v_bne_stock_id AND s.stock_type_id = 200; # 200 在途仓库
 
 
-        # 有问题
-        TRUNCATE TABLE erp_intel_repl;
+        # 有问题，会把已采购的记录清楚掉，找不回来
+        # TRUNCATE TABLE erp_intel_repl;
 
         -- 打开游标
         OPEN cur;
@@ -190,12 +190,14 @@ CREATE PROCEDURE intel_repl()
 
             # MEL AND BNE
 
+            /*
             # 获取 总的 采购数量
             SET v_pc_qty = 0;
             SELECT ifnull(sum(pbe.qty), 0)
             INTO v_pc_qty
             FROM erp_purchase_bill_entry pbe
             WHERE pbe.status_id <> 4700 AND pbe.status_id <> 4710 AND pbe.status_id <> 4720 AND pbe.product_id = v_product_id;
+            */
 
             # 获取 中国仓库 数量
             SET v_cn_nvt_qty = 0;
@@ -212,32 +214,45 @@ CREATE PROCEDURE intel_repl()
                 INNER JOIN erp_order o ON o.id = oi.order_id AND o.status_id = 4300 # 订单状态 已完成
             WHERE oi.item_product_id = v_product_id;
 
-            # 生成或更新 智能补货单
-            SET v_count = 0;
-            SELECT count(*)
-            INTO v_count
-            FROM erp_intel_repl ir
-            WHERE ir.product_id = v_product_id AND ir.status_id = 5700; # 5700 新生成的智能补货单
-
             # 计算智能补货单的参数
             SET v_mel_qty = v_mel_daily_mean_sales * (v_purchase_days + v_stock_alert_days) - v_mel_nvt_qty - v_mel_nvt_pending_qty - v_mel_pc_qty - (v_mel_daily_mean_sales / (v_mel_daily_mean_sales + v_bne_daily_mean_sales)) * v_cn_nvt_qty;
             SET v_bne_qty = v_bne_daily_mean_sales * (v_purchase_days + v_stock_alert_days) - v_bne_nvt_qty - v_bne_nvt_pending_qty - v_bne_pc_qty - (v_bne_daily_mean_sales / (v_mel_daily_mean_sales + v_bne_daily_mean_sales)) * v_cn_nvt_qty;
-            SET v_qty = (v_mel_daily_mean_sales * (v_purchase_days + v_stock_alert_days) - v_mel_nvt_qty - v_mel_nvt_pending_qty) + (v_bne_daily_mean_sales * (v_purchase_days + v_stock_alert_days) - v_bne_nvt_qty - v_bne_nvt_pending_qty) - v_pc_qty - v_cn_nvt_qty;
 
-            IF v_count = 0
+            IF v_mel_qty < 0
             THEN
-                # 新增
-                INSERT INTO erp_intel_repl (product_id, qty, mel_qty, bne_qty, profit, status_id, create_time, update_time)
-                VALUES (v_product_id, v_qty, v_mel_qty, v_bne_qty, v_profit, 5700, now(), now()); # 5700 新生成的智能补货单
-            ELSE
-                # 更新
-                UPDATE erp_intel_repl
-                SET qty = v_qty, mel_qty = v_mel_qty, bne_qty = v_bne_qty, profit = v_profit, update_time = now()
-                WHERE product_id = v_product_id AND status_id = 5700; # 5700 新生成的智能补货单
+                SET v_mel_qty = 0;
+            END IF;
+
+            IF v_bne_qty < 0
+            THEN
+                SET v_bne_qty = 0;
+            END IF;
+
+            SET v_qty = v_mel_qty + v_bne_qty;
+
+            IF v_qty > 0
+            THEN
+                # 生成或更新 智能补货单
+                SET v_count = 0;
+                SELECT count(*)
+                INTO v_count
+                FROM erp_intel_repl ir
+                WHERE ir.product_id = v_product_id AND ir.status_id = 5700; # 5700 新生成的智能补货单
+
+                IF v_count = 0
+                THEN
+                    # 新增
+                    INSERT INTO erp_intel_repl (product_id, qty, mel_qty, bne_qty, profit, status_id, create_time, update_time)
+                    VALUES (v_product_id, v_qty, v_mel_qty, v_bne_qty, v_profit, 5700, now(), now()); # 5700 新生成的智能补货单
+                ELSE
+                    # 更新
+                    UPDATE erp_intel_repl
+                    SET qty = v_qty, mel_qty = v_mel_qty, bne_qty = v_bne_qty, profit = v_profit, update_time = now()
+                    WHERE product_id = v_product_id AND status_id = 5700; # 5700 新生成的智能补货单
+                END IF;
             END IF;
 
         END LOOP;
         -- 关闭游标
         CLOSE cur;
     END
-

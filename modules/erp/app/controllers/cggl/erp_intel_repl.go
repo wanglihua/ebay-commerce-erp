@@ -8,12 +8,10 @@ import (
 	"matrix/modules/erp/models/cggl_models"
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/auth/pass_res"
-	"matrix/modules/erp/models/sppz_models"
 	"fmt"
 	"matrix/modules/erp/models/kcgl_models"
 	"matrix/modules/erp/models"
 	"strings"
-	"matrix/modules/erp/service/stock_service"
 	"matrix/modules/erp/service/bill_service"
 	auth_models "matrix/modules/auth/models"
 	"matrix/modules/erp/service/intel_repl_service"
@@ -28,9 +26,11 @@ func (c ErpIntelRepl) Index() revel.Result {
 
 	var db_session = c.DbSession
 
+	/*
 	var stock_list = make([]sppz_models.StockInfo, 0)
 	core.HandleError(db_session.Where(fmt.Sprintf("stock_type_id = %d", sppz_models.STOCK_TYPE_AU)).Find(&stock_list))
 	c.RenderArgs["stock_list"] = stock_list
+	*/
 
 	var status_list = make([]models.StatusInfo, 0)
 	core.HandleError(db_session.Where(fmt.Sprintf("type = %d", models.STATUS_TYPE_INTEL_REPL)).Find(&status_list))
@@ -53,7 +53,6 @@ type intel_repl_view_item_t struct {
 	IntelRepl     cggl_models.IntelReplInfo `xorm:"extends" json:"ir"`
 	Product       kcgl_models.ProductInfo   `xorm:"extends" json:"p"`
 	ProductStatus models.StatusInfo         `xorm:"extends" json:"ps"`
-	Stock         sppz_models.StockInfo     `xorm:"extends" json:"st"`
 	Status        models.StatusInfo         `xorm:"extends" json:"s"`
 }
 
@@ -64,7 +63,6 @@ func (c ErpIntelRepl) ListData() revel.Result {
 
 	/*
 sku_query:
-stock_id_query:0
 min_profit_query:
 max_profit_query:
 status_id_query
@@ -73,9 +71,6 @@ status_id_query
 	var sku_query string
 	c.Params.Bind(&sku_query, "sku_query")
 	sku_query = strings.TrimSpace(sku_query)
-
-	var stock_id_query int64
-	c.Params.Bind(&stock_id_query, "stock_id_query")
 
 	var min_profit_query_str string
 	c.Params.Bind(&min_profit_query_str, "min_profit_query")
@@ -123,37 +118,30 @@ status_id_query
 
 	/*
 
-SELECT ir.*, p.*, ps.*, st.*, s.*
+SELECT ir.*, p.*, ps.*, s.*
 FROM erp_intel_repl ir
     INNER JOIN erp_product p ON ir.product_id = p.id
     INNER JOIN erp_status ps ON p.status_id = ps.id
-    INNER JOIN erp_stock st ON ir.stock_id = st.id
     INNER JOIN erp_status s ON ir.status_id = s.id;
 
 SELECT count(ir.id) AS count
 FROM erp_intel_repl ir
     INNER JOIN erp_product p ON ir.product_id = p.id
     INNER JOIN erp_status ps ON p.status_id = ps.id
-    INNER JOIN erp_stock st ON ir.stock_id = st.id
     INNER JOIN erp_status s ON ir.status_id = s.id;
 
 	 */
 
 	var sb = core.NewSqlBuilder()
-	sb.Select("ir.*, p.*, ps.*, st.*, s.*")
+	sb.Select("ir.*, p.*, ps.*, s.*")
 	sb.Count("count(ir.id) AS count")
 	sb.From(`erp_intel_repl ir
     INNER JOIN erp_product p ON ir.product_id = p.id
     INNER JOIN erp_status ps ON p.status_id = ps.id
-    INNER JOIN erp_stock st ON ir.stock_id = st.id
     INNER JOIN erp_status s ON ir.status_id = s.id`)
 
 	if sku_query != "" {
 		filter = core.SqlAnd(filter, fmt.Sprintf("p.sku = '%s'", sku_query))
-	}
-
-	if stock_id_query != 0 {
-		filter = core.SqlAnd(filter, fmt.Sprintf("ir.stock_id = %d", stock_id_query))
 	}
 
 	if min_profit_query != 0 {
@@ -213,8 +201,6 @@ func (f *IntelReplDetailForm) IsCreate() bool {
 
 func (f *IntelReplDetailForm) Valid(validation *revel.Validation) bool {
 	validation.Required(f.IntelRepl.ProductId).Message("商品不能为空！")
-
-	validation.Required(f.IntelRepl.StockId).Message("仓库不能为空！")
 
 	validation.Required(f.IntelRepl.Qty).Message("数量不能为空！")
 
@@ -322,8 +308,8 @@ func (c ErpIntelRepl) Purchase() revel.Result {
 		}
 	}
 
-	var mel_stock_id = stock_service.Get_mel_stock_id(db_session)
-	var bne_stock_id = stock_service.Get_bne_stock_id(db_session)
+	// var mel_stock_id = stock_service.Get_mel_stock_id(db_session)
+	// var bne_stock_id = stock_service.Get_bne_stock_id(db_session)
 
 	var login_user = core.GetLoginUser(c.Session)
 
@@ -345,18 +331,13 @@ func (c ErpIntelRepl) Purchase() revel.Result {
 		purchase_bill_entry.BillId = purchase_bill.Id
 		purchase_bill_entry.ProductId = intel_repl.ProductId
 
-		if intel_repl.StockId == mel_stock_id {
-			purchase_bill_entry.MelQty = intel_repl.Qty
-		}
+		purchase_bill_entry.MelQty = intel_repl.MelQty
+		purchase_bill_entry.BneQty = intel_repl.BneQty
+		purchase_bill_entry.Qty = intel_repl.Qty
 
-		if intel_repl.StockId == bne_stock_id {
-			purchase_bill_entry.BneQty = intel_repl.Qty
-		}
-
-		purchase_bill_entry.Qty = purchase_bill_entry.MelQty + purchase_bill_entry.BneQty
 		purchase_bill_entry.StatusId = purchase_bill.StatusId
 
-		if has == true {
+		if has == true { // 现在改为一个SKU一个智能补货条目，这个条件一般不会有机会执行
 			var col_list = []string{"bill_id", "product_id", "mel_qty", "bne_qty", "qty", "status_id"}
 			_, err = db_session.Id(purchase_bill_entry.Id).Cols(col_list...).Update(&purchase_bill_entry)
 			core.HandleError(err)
