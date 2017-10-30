@@ -539,7 +539,7 @@
 
                 $.msg.confirm("确认要批量删除费率吗？", function () {
                     $.ajax({
-                        url: '{%url "ErpLogisticsFeeRate.Delete"%}',
+                        url: '{%url "ErpLogisticsFeeRate.BatchDelete"%}',
                         type: "POST",
                         data: {
                             "logistics_company": logistics_company,

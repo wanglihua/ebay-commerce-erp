@@ -309,12 +309,13 @@ func (c ErpLogisticsFeeRate) BatchDelete() revel.Result {
 	var sql_get_logistics_mode = `SELECT m.*
 FROM erp_logistics_mode m
     INNER JOIN erp_logistics_company c ON c.id = m.company_id
-WHERE c.name = '%s' AND m.name = '%s';`
+WHERE c.name = '%s' AND m.name = '%s'
+LIMIT 1;`
 
 	sql_get_logistics_mode = fmt.Sprintf(sql_get_logistics_mode, logistics_company_name, logistics_mode_name)
 
 	var logistics_mode ddpz_models.LogisticsModeInfo
-	has, err := db_session.Where(sql_get_logistics_mode).Limit(1).Get(&logistics_mode)
+	has, err := db_session.Sql(sql_get_logistics_mode).Get(&logistics_mode)
 	core.HandleError(err)
 
 	if has == false {
