@@ -90,6 +90,7 @@ CREATE PROCEDURE intel_repl()
         WHERE s.target_stock_id = v_bne_stock_id AND s.stock_type_id = 200; # 200 在途仓库
 
 
+        # 有问题
         TRUNCATE TABLE erp_intel_repl;
 
         -- 打开游标
@@ -150,7 +151,7 @@ CREATE PROCEDURE intel_repl()
 
             # 获取 MEL 采购中的 数量
             SET v_mel_pc_qty = 0;
-            SELECT sum(pbe.mel_qty)
+            SELECT ifnull(sum(pbe.mel_qty), 0)
             INTO v_mel_pc_qty
             FROM erp_purchase_bill_entry pbe
             WHERE pbe.status_id <> 4700 AND pbe.status_id <> 4710 AND pbe.status_id <> 4720 AND pbe.product_id = v_product_id;
@@ -182,7 +183,7 @@ CREATE PROCEDURE intel_repl()
 
             # 获取 BNE 采购中的 数量
             SET v_bne_pc_qty = 0;
-            SELECT sum(pbe.bne_qty)
+            SELECT ifnull(sum(pbe.bne_qty), 0)
             INTO v_bne_pc_qty
             FROM erp_purchase_bill_entry pbe
             WHERE pbe.status_id <> 4700 AND pbe.status_id <> 4710 AND pbe.status_id <> 4720 AND pbe.product_id = v_product_id;
@@ -191,7 +192,7 @@ CREATE PROCEDURE intel_repl()
 
             # 获取 总的 采购数量
             SET v_pc_qty = 0;
-            SELECT sum(pbe.qty)
+            SELECT ifnull(sum(pbe.qty), 0)
             INTO v_pc_qty
             FROM erp_purchase_bill_entry pbe
             WHERE pbe.status_id <> 4700 AND pbe.status_id <> 4710 AND pbe.status_id <> 4720 AND pbe.product_id = v_product_id;
