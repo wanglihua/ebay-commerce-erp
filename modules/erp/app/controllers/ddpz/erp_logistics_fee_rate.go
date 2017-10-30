@@ -286,6 +286,50 @@ func (c ErpLogisticsFeeRate) Delete() revel.Result {
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})
 }
 
+func (c ErpLogisticsFeeRate) BatchDelete() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.DDPZ_LOGISTICS_FEE_RATE, c.Session)
+
+	var logistics_company_name string
+	c.Params.Bind(&logistics_company_name, "logistics_company")
+	logistics_company_name = strings.TrimSpace(logistics_company_name)
+
+	var logistics_mode_name string
+	c.Params.Bind(&logistics_mode_name, "logistics_mode")
+	logistics_mode_name = strings.TrimSpace(logistics_mode_name)
+
+	if logistics_company_name == "" || logistics_mode_name == "" {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "请指定 物流公司 和 物流方式！",
+		})
+	}
+
+	var db_session = c.DbSession
+
+	var sql_get_logistics_mode = `SELECT m.*
+FROM erp_logistics_mode m
+    INNER JOIN erp_logistics_company c ON c.id = m.company_id
+WHERE c.name = '%s' AND m.name = '%s';`
+
+	sql_get_logistics_mode = fmt.Sprintf(sql_get_logistics_mode, logistics_company_name, logistics_mode_name)
+
+	var logistics_mode ddpz_models.LogisticsModeInfo
+	has, err := db_session.Where(sql_get_logistics_mode).Limit(1).Get(&logistics_mode)
+	core.HandleError(err)
+
+	if has == false {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "指定的 物流公司 物流方式 不存在！",
+		})
+	}
+
+	_, err = db_session.Where("mode_id = ?", logistics_mode.Id).Delete(new(ddpz_models.LogisticsFeeRateInfo))
+	core.HandleError(err)
+
+	return c.RenderJson(core.JsonResult{Success: true, Message: fmt.Sprintf("物流方式 %s 所有费率数据删除成功!", logistics_mode.Name)})
+}
+
 // 这个的权限检查就不用加上了，别的多个地方会调用
 func (c ErpLogisticsFeeRate) GetLogisticsModeListByCompanyId() revel.Result {
 	db_session := c.DbSession

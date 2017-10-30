@@ -25,6 +25,10 @@
                         <i class="ace-icon fa fa-trash-o"></i>
                         删除
                     </button>
+                    <button class="btn btn-danger btn-sm" @click="batchDeleteLogisticsFeeRate()">
+                        <i class="ace-icon fa fa-trash-o"></i>
+                        批量删除
+                    </button>
                     <button id="btnImport" class="btn btn-success btn-sm">
                         <i class="ace-icon fa fa-plus"></i>
                         导入
@@ -501,7 +505,7 @@
                     }
                 });
 
-                if (id_list.length == 0) {
+                if (id_list.length === 0) {
                     $.msg.alert("请选择数据！");
                     return;
                 }
@@ -512,7 +516,37 @@
                         type: "POST",
                         data: {"id_list": id_list},
                         success: function (data) {
-                            if (data.success == false) {
+                            if (data.success === false) {
+                                $.msg.error(data.message);
+                                return;
+                            }
+                            else {
+                                $.msg.show(data.message);
+                            }
+                            vm.reloadList();
+                        }
+                    });
+                });
+            },
+            batchDeleteLogisticsFeeRate: function () {
+                var logistics_company = $("#logistics_company_query").val();
+                var logistics_mode = $("#logistics_mode_query").val();
+
+                if (logistics_company === "" || logistics_mode === "") {
+                    $.msg.error("请选择要批量删除费率的物流公司和物流方式！");
+                    return;
+                }
+
+                $.msg.confirm("确认要批量删除费率吗？", function () {
+                    $.ajax({
+                        url: '{%url "ErpLogisticsFeeRate.Delete"%}',
+                        type: "POST",
+                        data: {
+                            "logistics_company": logistics_company,
+                            "logistics_mode": logistics_mode
+                        },
+                        success: function (data) {
+                            if (data.success === false) {
                                 $.msg.error(data.message);
                                 return;
                             }
@@ -530,7 +564,7 @@
                     type: "POST",
                     data: {"company_id": vm.detail.company_id},
                     success: function (data) {
-                        if (data.success == false) {
+                        if (data.success === false) {
                             $.msg.error(data.message);
                             return;
                         }
