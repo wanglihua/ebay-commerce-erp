@@ -36,6 +36,11 @@ CREATE PROCEDURE intel_repl()
         DECLARE v_mel_pc_qty BIGINT; # MEL 采购中数量
         DECLARE v_bne_pc_qty BIGINT; # BNE 采购中数量
         DECLARE v_pc_qty BIGINT; # 采购中的总数量，不是从上面的两个相加而来。直接从采购单的总数量来。
+        DECLARE v_cn_nvt_qty BIGINT;
+        DECLARE v_profit DECIMAL(18, 6); # 利润
+        DECLARE v_mel_qty BIGINT; # 补货单 MEL 数量
+        DECLARE v_bne_qty BIGINT; # 补货单 BNE 数量
+        DECLARE v_qty BIGINT; # 补货单 数量
 
         DECLARE v_count INT;
 
@@ -188,6 +193,21 @@ CREATE PROCEDURE intel_repl()
             FROM erp_purchase_bill_entry pbe
             WHERE pbe.status_id <> 4700 AND pbe.status_id <> 4710 AND pbe.status_id <> 4720 AND pbe.product_id = v_product_id;
 
+            # 获取 中国仓库 数量
+            SET v_cn_nvt_qty = 0;
+            SELECT nvt.qty
+            INTO v_cn_nvt_qty
+            FROM erp_inventory nvt
+            WHERE nvt.product_id = v_product_id AND nvt.stock_id = v_cn_stock_id;
+
+            # 获取商品利润
+            SET v_profit = 0;
+            SELECT cast(avg(oi.gross_profit / (oi.transaction_price * oi.quantity)) AS DECIMAL(18, 6))
+            INTO v_profit
+            FROM erp_order_item oi
+                INNER JOIN erp_order o ON o.id = oi.order_id AND o.status_id = 4300 # 订单状态 已完成
+            WHERE oi.item_product_id = v_product_id;
+
             # 生成或更新 智能补货单
             SET v_count = 0;
             SELECT count(*)
@@ -195,65 +215,25 @@ CREATE PROCEDURE intel_repl()
             FROM erp_intel_repl ir
             WHERE ir.product_id = v_product_id AND ir.status_id = 5700; # 5700 新生成的智能补货单
 
+            # 计算智能补货单的参数
+            SET v_mel_qty = v_mel_daily_mean_sales * (v_purchase_days + v_stock_alert_days) - v_mel_nvt_qty - v_mel_nvt_pending_qty - v_mel_pc_qty - (v_mel_daily_mean_sales / (v_mel_daily_mean_sales + v_bne_daily_mean_sales)) * v_cn_nvt_qty;
+            SET v_bne_qty = v_bne_daily_mean_sales * (v_purchase_days + v_stock_alert_days) - v_bne_nvt_qty - v_bne_nvt_pending_qty - v_bne_pc_qty - (v_bne_daily_mean_sales / (v_mel_daily_mean_sales + v_bne_daily_mean_sales)) * v_cn_nvt_qty;
+            SET v_qty = (v_mel_daily_mean_sales * (v_purchase_days + v_stock_alert_days) - v_mel_nvt_qty - v_mel_nvt_pending_qty) + (v_bne_daily_mean_sales * (v_purchase_days + v_stock_alert_days) - v_bne_nvt_qty - v_bne_nvt_pending_qty) - v_pc_qty - v_qty;
+
             IF v_count = 0
             THEN
-            # 新增
+                # 新增
+                INSERT INTO erp_intel_repl (product_id, qty, mel_qty, bne_qty, profit, status_id, create_time, update_time)
+                VALUES (v_product_id, v_qty, v_mel_qty, v_bne_qty, v_profit, 5700, now(), now()); # 5700 新生成的智能补货单
             ELSE
-            # 更新
+                # 更新
+                UPDATE erp_intel_repl
+                SET qty = v_qty, mel_qty = v_mel_qty, bne_qty = v_bne_qty, profit = v_profit, update_time = now()
+                WHERE product_id = v_product_id AND status_id = 5700; # 5700 新生成的智能补货单
             END IF;
 
         END LOOP;
         -- 关闭游标
         CLOSE cur;
-
-        /*
-
-        INSERT INTO erp_intel_repl (product_id, stock_id, qty, profit, status_id, create_time, update_time)
-            SELECT
-                psa.product_id                                                                                                                                                                                                               AS product_id,
-                psa.stock_id                                                                                                                                                                                                                 AS stock_id,
-                psa.daily_mean_sales * (p.purchase_days + p.stock_alert_days) - nvt.qty - nvt.pending_qty - ifnull((SELECT sum(pbe.qty)
-                                                                                                                    FROM erp_purchase_bill_entry pbe
-                                                                                                                    WHERE pbe.status_id <> 4700 AND pbe.status_id <> 4710 AND pbe.status_id <> 4720 AND pbe.product_id = psa.product_id), 0) AS qty,
-                ifnull((SELECT cast(avg(oi.gross_profit / (oi.transaction_price * oi.quantity)) AS DECIMAL(18, 6))
-                        FROM erp_order_item oi
-                            INNER JOIN erp_order o ON o.id = oi.order_id AND o.status_id = 4300 # 订单状态 已完成
-                        WHERE oi.item_product_id = psa.product_id), 0)                                                                                                                                                                       AS profit,
-                # 新生成
-                5700                                                                                                                                                                                                                         AS status_id,
-                now()                                                                                                                                                                                                                        AS create_time,
-                now()                                                                                                                                                                                                                        AS update_time
-            FROM erp_product_sale_analysis psa
-                INNER JOIN erp_inventory nvt ON nvt.product_id = psa.product_id AND nvt.stock_id = psa.stock_id AND psa.type = 200
-                INNER JOIN erp_product p ON p.id = psa.product_id
-                LEFT JOIN erp_intel_repl ir ON ir.stock_id = psa.stock_id AND ir.product_id = psa.product_id AND ir.status_id = 5700 # 5700 新生成
-            WHERE ir.stock_id IS NULL AND psa.daily_mean_sales * (p.purchase_days + p.stock_alert_days) - nvt.qty - nvt.pending_qty - ifnull((SELECT sum(pbe.qty)
-                                                                                                                                              FROM erp_purchase_bill_entry pbe
-                                                                                                                                              WHERE pbe.status_id <> 4700 AND pbe.status_id <> 4710 AND pbe.status_id <> 4720 AND pbe.product_id = psa.product_id), 0) > 0;
-
-        UPDATE erp_intel_repl ir
-            INNER JOIN (
-                           SELECT
-                               psa.product_id                                                                                                                                                                                                               AS product_id,
-                               psa.stock_id                                                                                                                                                                                                                 AS stock_id,
-                               psa.daily_mean_sales * (p.purchase_days + p.stock_alert_days) - nvt.qty - nvt.pending_qty - ifnull((SELECT sum(pbe.qty)
-                                                                                                                                   FROM erp_purchase_bill_entry pbe
-                                                                                                                                   WHERE pbe.status_id <> 4700 AND pbe.status_id <> 4710 AND pbe.status_id <> 4720 AND pbe.product_id = psa.product_id), 0) AS qty,
-                               ifnull((SELECT cast(avg(oi.gross_profit / (oi.transaction_price * oi.quantity)) AS DECIMAL(18, 6))
-                                       FROM erp_order_item oi
-                                           INNER JOIN erp_order o ON o.id = oi.order_id AND o.status_id = 4300 # 订单状态 已完成
-                                       WHERE oi.item_product_id = psa.product_id), 0)                                                                                                                                                                       AS profit
-                           FROM erp_product_sale_analysis psa
-                               INNER JOIN erp_inventory nvt ON nvt.product_id = psa.product_id AND nvt.stock_id = psa.stock_id AND psa.type = 200
-                               INNER JOIN erp_product p ON p.id = psa.product_id
-                           WHERE psa.daily_mean_sales * (p.purchase_days + p.stock_alert_days) - nvt.qty - nvt.pending_qty - ifnull((SELECT sum(pbe.qty)
-                                                                                                                                     FROM erp_purchase_bill_entry pbe
-                                                                                                                                     WHERE pbe.status_id <> 4700 AND pbe.status_id <> 4710 AND pbe.status_id <> 4720 AND pbe.product_id = psa.product_id), 0) > 0
-                       ) sa
-                ON ir.status_id = 5700 AND ir.stock_id = sa.stock_id AND ir.product_id = sa.product_id
-        SET ir.qty = sa.qty, ir.profit = sa.profit, ir.update_time = now();
-
-         */
-
     END
 
