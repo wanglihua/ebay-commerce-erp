@@ -149,6 +149,7 @@ CREATE PROCEDURE intel_repl()
             WHERE nvt.product_id = v_product_id AND nvt.stock_id = v_mel_zt_stock_id;
 
             # 获取 MEL 采购中的 数量
+            SET v_mel_pc_qty = 0;
             SELECT sum(pbe.mel_qty)
             INTO v_mel_pc_qty
             FROM erp_purchase_bill_entry pbe
@@ -180,6 +181,7 @@ CREATE PROCEDURE intel_repl()
             WHERE nvt.product_id = v_product_id AND nvt.stock_id = v_bne_zt_stock_id;
 
             # 获取 BNE 采购中的 数量
+            SET v_bne_pc_qty = 0;
             SELECT sum(pbe.bne_qty)
             INTO v_bne_pc_qty
             FROM erp_purchase_bill_entry pbe
@@ -188,6 +190,7 @@ CREATE PROCEDURE intel_repl()
             # MEL AND BNE
 
             # 获取 总的 采购数量
+            SET v_pc_qty = 0;
             SELECT sum(pbe.qty)
             INTO v_pc_qty
             FROM erp_purchase_bill_entry pbe
@@ -218,7 +221,7 @@ CREATE PROCEDURE intel_repl()
             # 计算智能补货单的参数
             SET v_mel_qty = v_mel_daily_mean_sales * (v_purchase_days + v_stock_alert_days) - v_mel_nvt_qty - v_mel_nvt_pending_qty - v_mel_pc_qty - (v_mel_daily_mean_sales / (v_mel_daily_mean_sales + v_bne_daily_mean_sales)) * v_cn_nvt_qty;
             SET v_bne_qty = v_bne_daily_mean_sales * (v_purchase_days + v_stock_alert_days) - v_bne_nvt_qty - v_bne_nvt_pending_qty - v_bne_pc_qty - (v_bne_daily_mean_sales / (v_mel_daily_mean_sales + v_bne_daily_mean_sales)) * v_cn_nvt_qty;
-            SET v_qty = (v_mel_daily_mean_sales * (v_purchase_days + v_stock_alert_days) - v_mel_nvt_qty - v_mel_nvt_pending_qty) + (v_bne_daily_mean_sales * (v_purchase_days + v_stock_alert_days) - v_bne_nvt_qty - v_bne_nvt_pending_qty) - v_pc_qty - v_qty;
+            SET v_qty = (v_mel_daily_mean_sales * (v_purchase_days + v_stock_alert_days) - v_mel_nvt_qty - v_mel_nvt_pending_qty) + (v_bne_daily_mean_sales * (v_purchase_days + v_stock_alert_days) - v_bne_nvt_qty - v_bne_nvt_pending_qty) - v_pc_qty - v_cn_nvt_qty;
 
             IF v_count = 0
             THEN
