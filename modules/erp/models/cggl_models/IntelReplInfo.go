@@ -1,8 +1,6 @@
 package cggl_models
 
-import (
-	"matrix/core"
-)
+import "matrix/core"
 
 /*
 	智能补货
@@ -12,7 +10,8 @@ import (
 type IntelReplInfo struct {
 	Id         int64     `xorm:"bigint notnull pk autoincr 'id'" json:"id"`
 	ProductId  int64     `xorm:"bigint notnull index 'product_id'" json:"product_id" smith:"verbose_name=商品"`
-	StockId    int64     `xorm:"bigint notnull index 'stock_id'" json:"stock_id" smith:"verbose_name=仓库"`
+	MelQty     int64     `xorm:"bigint notnull 'mel_qty'" json:"mel_qty" smith:"verbose_name=MEL数量"`
+	BneQty     int64     `xorm:"bigint notnull 'bne_qty'" json:"bne_qty" smith:"verbose_name=BNE数量"`
 	Qty        int64     `xorm:"bigint notnull  'qty'" json:"qty" smith:"verbose_name=数量"`
 	Profit     float64   `xorm:"decimal(18,6) notnull 'profit'" json:"profit" smith:"verbose_name=毛利率 "`
 	StatusId   int       `xorm:"bigint notnull 'status_id'" json:"status_id" smith:"verbose_name=状态"` // 新生成，已采购 等
