@@ -229,7 +229,18 @@
                                 return '<a href="/product/detail/' + row.p.id + '" target="product_detail">' + row.p.sku + '</a>';
                             }
                         },
-                        {"mDataProp": "p.cn_name", "title": "商品", "bSearchable": true},
+                        {
+                            "mDataProp": "p.cn_name", "title": "商品", "bSearchable": true, "sClass": "wrap-word",
+                            "render": function (data, type, row) {
+                                return "<div>" + data + "</div>";
+                            }
+                        },
+                        {
+                            "mDataProp": "sup.name", "title": "供应商", "bSearchable": true, "sClass": "wrap-word", "width": 150,
+                            "render": function (data, type, row) {
+                                return "<div>" + data + "</div>";
+                            }
+                        },
                         {"mDataProp": "ps.name", "title": "商品状态", "bSearchable": true, "width": 80},
                         {"mDataProp": "ir.qty", "title": "数量", "bSearchable": false, "width": 80},
                         {"mDataProp": "ir.profit", "title": "毛利率", "bSearchable": false, "width": 80},

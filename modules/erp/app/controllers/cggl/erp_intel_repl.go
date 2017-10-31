@@ -15,6 +15,7 @@ import (
 	"matrix/modules/erp/service/bill_service"
 	auth_models "matrix/modules/auth/models"
 	"matrix/modules/erp/service/intel_repl_service"
+	"matrix/modules/erp/models/sppz_models"
 )
 
 type ErpIntelRepl struct {
@@ -54,6 +55,7 @@ type intel_repl_view_item_t struct {
 	Product       kcgl_models.ProductInfo   `xorm:"extends" json:"p"`
 	ProductStatus models.StatusInfo         `xorm:"extends" json:"ps"`
 	Status        models.StatusInfo         `xorm:"extends" json:"s"`
+	Supplier      sppz_models.SupplierInfo  `xorm:"extends" json:"sup"`
 }
 
 func (c ErpIntelRepl) ListData() revel.Result {
@@ -118,27 +120,30 @@ status_id_query
 
 	/*
 
-SELECT ir.*, p.*, ps.*, s.*
+SELECT ir.*, p.*, ps.*, s.*, sup.*
 FROM erp_intel_repl ir
     INNER JOIN erp_product p ON ir.product_id = p.id
     INNER JOIN erp_status ps ON p.status_id = ps.id
-    INNER JOIN erp_status s ON ir.status_id = s.id;
+    INNER JOIN erp_status s ON ir.status_id = s.id
+    LEFT JOIN erp_supplier sup ON p.supplier_id = sup.id;
 
 SELECT count(ir.id) AS count
 FROM erp_intel_repl ir
     INNER JOIN erp_product p ON ir.product_id = p.id
     INNER JOIN erp_status ps ON p.status_id = ps.id
-    INNER JOIN erp_status s ON ir.status_id = s.id;
+    INNER JOIN erp_status s ON ir.status_id = s.id
+    LEFT JOIN erp_supplier sup ON p.supplier_id = sup.id;
 
 	 */
 
 	var sb = core.NewSqlBuilder()
-	sb.Select("ir.*, p.*, ps.*, s.*")
+	sb.Select("ir.*, p.*, ps.*, s.*, sup.*")
 	sb.Count("count(ir.id) AS count")
 	sb.From(`erp_intel_repl ir
     INNER JOIN erp_product p ON ir.product_id = p.id
     INNER JOIN erp_status ps ON p.status_id = ps.id
-    INNER JOIN erp_status s ON ir.status_id = s.id`)
+    INNER JOIN erp_status s ON ir.status_id = s.id
+	LEFT JOIN erp_supplier sup ON p.supplier_id = sup.id`)
 
 	if sku_query != "" {
 		filter = core.SqlAnd(filter, fmt.Sprintf("p.sku = '%s'", sku_query))
