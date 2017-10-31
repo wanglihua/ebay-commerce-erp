@@ -252,6 +252,7 @@ CREATE PROCEDURE intel_repl()
                 END IF;
             END IF;
 
+            SET done = FALSE;
         END LOOP;
         -- 关闭游标
         CLOSE cur;
