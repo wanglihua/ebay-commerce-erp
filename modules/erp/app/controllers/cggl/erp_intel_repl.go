@@ -313,6 +313,33 @@ func (c ErpIntelRepl) Purchase() revel.Result {
 		}
 	}
 
+	/*
+		SELECT count(DISTINCT ifnull(p.supplier_id, 0))
+		FROM erp_product p
+		WHERE p.id IN (23879, 23876, 17920);
+	 */
+
+	var product_id_str_list = make([]string, 0)
+	for _, intel_repl := range intel_repl_list {
+		product_id_str_list = append(product_id_str_list, fmt.Sprint(intel_repl.ProductId))
+	}
+
+	var sql_supplier_count = `SELECT count(DISTINCT ifnull(p.supplier_id, 0)) AS count
+FROM erp_product p
+WHERE p.id IN (%s);`
+	sql_supplier_count = fmt.Sprintf(sql_supplier_count, strings.Join(product_id_str_list, ","))
+
+	var count core.Count
+	_, err := db_session.Sql(sql_supplier_count).Get(&count)
+	core.HandleError(err)
+
+	if count.Count != 1 {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "商品的供应商不是同一供应商的，不能生成一个采购单！",
+		})
+	}
+
 	// var mel_stock_id = stock_service.Get_mel_stock_id(db_session)
 	// var bne_stock_id = stock_service.Get_bne_stock_id(db_session)
 
@@ -324,7 +351,7 @@ func (c ErpIntelRepl) Purchase() revel.Result {
 	purchase_bill.StatusId = models.PURCHASE_BILL_STATUS_YCJ
 	purchase_bill.ApplyUserId = login_user.UserId
 
-	_, err := db_session.Insert(&purchase_bill)
+	_, err = db_session.Insert(&purchase_bill)
 	core.HandleError(err)
 
 	// 生成采购单明细，这个循环过程中会自动实现 MEL，BNE 仓库条目的合并
