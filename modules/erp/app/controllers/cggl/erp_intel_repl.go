@@ -314,7 +314,7 @@ func (c ErpIntelRepl) Purchase() revel.Result {
 	}
 
 	/*
-		SELECT count(DISTINCT ifnull(p.supplier_id, 0))
+		SELECT count(DISTINCT ifnull(p.supplier_id, 0)) AS count
 		FROM erp_product p
 		WHERE p.id IN (23879, 23876, 17920);
 	 */
