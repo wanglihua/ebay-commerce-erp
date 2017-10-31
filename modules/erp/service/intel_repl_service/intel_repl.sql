@@ -208,7 +208,7 @@ CREATE PROCEDURE intel_repl()
 
             # 获取商品利润
             SET v_profit = 0;
-            SELECT cast(avg(oi.gross_profit / (oi.transaction_price * oi.quantity)) AS DECIMAL(18, 6))
+            SELECT ifnull(cast(avg(oi.gross_profit / (oi.transaction_price * oi.quantity)) AS DECIMAL(18, 6)), 0)
             INTO v_profit
             FROM erp_order_item oi
                 INNER JOIN erp_order o ON o.id = oi.order_id AND o.status_id = 4300 # 订单状态 已完成
