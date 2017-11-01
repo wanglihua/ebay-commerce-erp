@@ -348,19 +348,19 @@ func (c ErpProductSaleAnalysis) export_analysis_to_excel(db_session *xorm.Sessio
 		col_index++
 
 		cell = row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 20)
+		sheet.SetColWidth(col_index, col_index, 15)
 		set_head_cell_style(cell)
 		cell.Value = "仓库"
 		col_index++
 
 		cell = row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 10)
+		sheet.SetColWidth(col_index, col_index, 15)
 		set_head_cell_style(cell)
 		cell.Value = "SKU"
 		col_index++
 
 		cell = row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 30)
+		sheet.SetColWidth(col_index, col_index, 40)
 		set_head_cell_style(cell)
 		cell.Value = "商品名称"
 		col_index++

@@ -21,6 +21,10 @@
                         <i class="ace-icon fa fa-refresh"></i>
                         立即分析销售情况
                     </button>
+                    <button class="btn btn-purple btn-sm" @click="exportProductSaleAnalysis()">
+                        <i class="ace-icon fa fa-file-excel-o"></i>
+                        导出
+                    </button>
                 </div>
                 <div id="query" class="col-xs-12" style="line-height: 28px;">
                     <div class="col-xs-12" style="margin-top: 20px;margin-bottom: 20px;">
@@ -179,12 +183,6 @@
                             id_list.push($(this).val());
                         }
                     });
-
-                    /*
-                            aoData.push({'name': 'sku_query', 'value': $("#sku_query").val()});
-                            aoData.push({'name': 'analysis_type_id', 'value': $("#analysis_type_id").val()});
-                            aoData.push({'name': 'stock_id', 'value': $("#stock_id").val()});
-                     */
 
                     var params = $.param({
                         "sku_query": $("#sku_query").val(),
