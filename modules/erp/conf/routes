@@ -642,6 +642,7 @@ GET  /product/sale/analysis                ErpProductSaleAnalysis.Index
 POST /product/sale/analysis/page/data      ErpProductSaleAnalysis.PageData
 POST /product/sale/analysis/data/list      ErpProductSaleAnalysis.ListData
 POST /product/sale/analysis/analyze        ErpProductSaleAnalysis.Analyze
+POST /product/sale/analysis/export         ErpProductSaleAnalysis.Export
 
 GET  /order/new/create           ErpOrderNew.Create
 POST /order/new/create/data      ErpOrderNew.CreateData
