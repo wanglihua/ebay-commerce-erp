@@ -263,6 +263,14 @@
                                             </div>
                                         </div>
                                     </div>
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="sender_id" class="col-xs-6 control-label">代码</label>
+                                            <div class="col-xs-6">
+                                                <input id="sender_id" name="detail.logistics_mode.sender_id" type="text" class="input-sm form-control" v-model="detail.logistics_mode.sender_id"/>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <div class="row">
@@ -351,7 +359,7 @@
                 FileUploaded: function (up, file, response) {
                     hideMask();
                     var result = JSON.parse(response.response);
-                    if (result.success != true) {
+                    if (result.success !== true) {
                         $.msg.error(result.message);
                     } else {
                         reloadList('#logisticsModeList');
@@ -399,7 +407,7 @@
                         {
                             "mDataProp": "m.sfkltjz", "title": "考虑体积重", "bSearchable": false, "width": 120,
                             "render": function (data, type, row) {
-                                if (data == 0) {
+                                if (data === 0) {
                                     return "否";
                                 }
                                 else {
@@ -410,7 +418,7 @@
                         {
                             "mDataProp": "m.zcbsfyxz", "title": "最长边是否有限制", "bSearchable": false, "width": 130,
                             "render": function (data, type, row) {
-                                if (data == 0) {
+                                if (data === 0) {
                                     return "否";
                                 }
                                 else {
@@ -421,7 +429,7 @@
                         {
                             "mDataProp": "m.zlsfyxz", "title": "重量是否有限制", "bSearchable": false, "width": 120,
                             "render": function (data, type, row) {
-                                if (data == 0) {
+                                if (data === 0) {
                                     return "否";
                                 }
                                 else {
@@ -432,7 +440,7 @@
                         {
                             "mDataProp": "m.sfyxcc", "title": "是否允许超长", "bSearchable": false, "width": 120,
                             "render": function (data, type, row) {
-                                if (data == 0) {
+                                if (data === 0) {
                                     return "否";
                                 }
                                 else {
@@ -443,7 +451,7 @@
                         {
                             "mDataProp": "m.sfyxcz", "title": "是否允许超重", "bSearchable": false, "width": 120,
                             "render": function (data, type, row) {
-                                if (data == 0) {
+                                if (data === 0) {
                                     return "否";
                                 }
                                 else {
@@ -463,6 +471,7 @@
                          {"mDataProp": "m.czjsyf", "title": "超重加收多少运费（澳币）", "bSearchable": false },
                          {"mDataProp": "m.desc", "title": "描述", "bSearchable": true},
                          */
+                        {"mDataProp": "m.sender_id", "title": "代码", "bSearchable": true, "width": 80},
                         {"mDataProp": "st.name", "title": "状态", "bSearchable": true, "width": 80},
                         {"mDataProp": "m.create_time", "title": "创建时间", "bSearchable": false, "width": 120},
                         {"mDataProp": "m.update_time", "title": "修改时间", "bSearchable": false, "width": 120}
@@ -492,7 +501,7 @@
                         },
                         success: function (result) {
                             hideMask();
-                            if (result.success == false) {
+                            if (result.success === false) {
                                 $.msg.error(result.message);
                                 return;
                             }
@@ -567,7 +576,7 @@
                             data: JSON.stringify(vm.detail),
                             success: function (data) {
                                 hideMask();
-                                if (data.success == false) {
+                                if (data.success === false) {
                                     $.msg.error(data.message);
                                     //return;
                                 }
@@ -590,7 +599,7 @@
                     }
                 });
 
-                if (id_list.length == 0) {
+                if (id_list.length === 0) {
                     $.msg.alert("请选择数据！");
                     return;
                 }
@@ -601,7 +610,7 @@
                         type: "POST",
                         data: {"id_list": id_list},
                         success: function (data) {
-                            if (data.success == false) {
+                            if (data.success === false) {
                                 $.msg.error(data.message);
                                 return;
                             }
@@ -619,7 +628,7 @@
                         type: "POST",
                         data: {"id_list": id_list},
                         success: function (data) {
-                            if (data.success == false) {
+                            if (data.success === false) {
                                 //使用中，再次确认
                                 $.msg.confirm(data.message, function () {
                                     delete_mode();

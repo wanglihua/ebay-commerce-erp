@@ -27,6 +27,7 @@ type LogisticsModeInfo struct {
 	Desc       core.NullString `xorm:"nvarchar(500) 'desc'" json:"desc" smith:"verbose_name=描述,max=500"`
 	TypeId     int64           `xorm:"bigint notnull index 'type_id'" json:"type_id" smith:"verbose_name=物流方式类型"` // LogisticsModeTypeInfo 的主键
 	StatusId   int64           `xorm:"bigint notnull index 'status_id'" json:"status_id" smith:"verbose_name=状态"`
+	SenderId   string          `xorm:"nvarchar(100) null 'sender_id'" json:"sender_id"` // sender id 后来加的一个字段
 	CreateTime core.Time       `xorm:"created notnull 'create_time'" json:"create_time"`
 	UpdateTime core.Time       `xorm:"updated notnull 'update_time'" json:"update_time"`
 }
