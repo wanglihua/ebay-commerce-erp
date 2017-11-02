@@ -34,10 +34,10 @@ func (c ErpLogisticsMode) ListData() revel.Result {
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
 	type logistics_mode_view_item_t struct {
-		ddpz_models.LogisticsModeInfo          `xorm:"extends" json:"m"`
-		ddpz_models.LogisticsCompanyInfo       `xorm:"extends" json:"c"`
-		sppz_models.StockInfo                  `xorm:"extends" json:"sk"`
-		models.StatusInfo                 `xorm:"extends" json:"st"`
+		ddpz_models.LogisticsModeInfo    `xorm:"extends" json:"m"`
+		ddpz_models.LogisticsCompanyInfo `xorm:"extends" json:"c"`
+		sppz_models.StockInfo            `xorm:"extends" json:"sk"`
+		models.StatusInfo                `xorm:"extends" json:"st"`
 	}
 
 	/*
@@ -91,7 +91,7 @@ type LogisticsModeDetailForm struct {
 	LogisticsCompanyList  []ddpz_models.LogisticsCompanyInfo  `json:"logistics_company_list"`
 	StockList             []sppz_models.StockInfo             `json:"stock_list"`
 	LogisticsModeTypeList []ddpz_models.LogisticsModeTypeInfo `json:"logistics_mode_type_list"`
-	StatusList            []models.StatusInfo            `json:"status_list"`
+	StatusList            []models.StatusInfo                 `json:"status_list"`
 }
 
 func (f *LogisticsModeDetailForm) IsCreate() bool {
@@ -321,7 +321,7 @@ func (c ErpLogisticsMode) Import() revel.Result {
 		max_row := sheet.MaxRow
 		//略过标题行
 		for row_index := 1; row_index < max_row; row_index ++ {
-			row := sheet.Rows[row_index]
+			// row := sheet.Rows[row_index]
 
 			var cell *xlsx.Cell
 			var cell_val string
@@ -330,11 +330,6 @@ func (c ErpLogisticsMode) Import() revel.Result {
 			var logistics_mode logistics_mode_t
 
 			col_index := 0
-
-			//todo 这里也有可能会出现问题的，如果最后几列用户没有填怎么办
-			if len(row.Cells) < 18 {
-				break
-			}
 
 			// 物流公司名称
 			// cell = row.Cells[col_index]
@@ -526,6 +521,15 @@ func (c ErpLogisticsMode) Import() revel.Result {
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
 			logistics_mode.LogisticsMode.Czjsyf, _ = strconv.ParseFloat(cell_val, 64)
+			col_index++
+
+			// 代码
+			// cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
+			logistics_mode.LogisticsMode.SenderId = cell_val
 			col_index++
 
 			logistics_mode_list = append(logistics_mode_list, logistics_mode)
