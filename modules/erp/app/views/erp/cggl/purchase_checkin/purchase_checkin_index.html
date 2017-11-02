@@ -62,6 +62,7 @@
                             <th>SKU</th>
                             <th>名称</th>
                             <th>数量</th>
+                            <th>金额</th>
                             <th id="th_apply_time">采购时间</th>
                             <th id="th_checkin_time">入库时间</th>
                             <th>到货天数</th>
@@ -247,6 +248,12 @@
                             "mDataProp": "pbe.qty", "title": "数量", "bSearchable": false, "width": 80, "sClass": "dtRight",
                             "render": function (data, type, row) {
                                 return "" + row.pbe.mel_qty + "&nbsp;MEL" + " + " + row.pbe.bne_qty + "&nbsp;BNE" + " = " + row.pbe.qty;
+                            }
+                        },
+                        {
+                            "mDataProp": "pbe.amount", "title": "金额", "bSearchable": false, "width": 60, "sClass": "dtRight",
+                            "render": function (data, type, row) {
+                                return data;
                             }
                         },
                         {
