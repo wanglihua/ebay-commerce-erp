@@ -187,7 +187,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-success btn-sm" onclick="checkin()">
+                    <button id="btnCheckin" type="button" class="btn btn-success btn-sm">
                         <i class="ace-icon fa fa-floppy-o"></i>确认
                     </button>
                     <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">
@@ -348,22 +348,62 @@
         showMask("加载中...");
         $("#purchaseCheckinForm").clearValidation();
         $.ajax({
-                url: '{%url "ErpPurchaseCheckin.DetailData" %}',
-                type: "POST",
-                data: {
-                    "id": id
-                },
-                success: function (result) {
-                    hideMask();
-                    if (result.success === false) {
-                        $.msg.error(result.message);
-                        return;
-                    }
-                    vm.purchase_bill_entry_detail = result;
-                    $('#purchaseCheckinDialog').modal(modalOptions);
+            url: '{%url "ErpPurchaseCheckin.DetailData" %}',
+            type: "POST",
+            data: {
+                "id": id
+            },
+            success: function (result) {
+                hideMask();
+                if (result.success === false) {
+                    $.msg.error(result.message);
+                    return;
                 }
+                vm.purchase_bill_entry_detail = result;
+
+                $("#abnormal_type_id").removeAttr("disabled");
+                $("#btnCheckin").attr("onclick", "checkin();");
+                $('#purchaseCheckinDialog').modal(modalOptions);
             }
-        );
+        });
+    }
+
+    function showCheckinInTurn() {
+        var id_list = [];
+        $('#purchaseBillEntryList tbody tr>td:first-child input:checkbox').each(function () {
+            if (this.checked) {
+                id_list.push($(this).val());
+            }
+        });
+
+        if (id_list.length !== 1) {
+            $.msg.alert("请选择一行数据，进行入库！");
+            return;
+        }
+
+        var id = id_list[0];
+
+        showMask("加载中...");
+        $("#purchaseCheckinForm").clearValidation();
+        $.ajax({
+            url: '{%url "ErpPurchaseCheckin.DetailData" %}',
+            type: "POST",
+            data: {
+                "id": id
+            },
+            success: function (result) {
+                hideMask();
+                if (result.success === false) {
+                    $.msg.error(result.message);
+                    return;
+                }
+                vm.purchase_bill_entry_detail = result;
+
+                $("#abnormal_type_id").attr("disabled", "disabled");
+                $("#btnCheckin").attr("onclick", "checkinInTurn();");
+                $('#purchaseCheckinDialog').modal(modalOptions);
+            }
+        });
     }
 
     function checkin() {
@@ -382,26 +422,63 @@
             hideMask();
         } else {
             $.ajax({
-                    url: '{%url "ErpPurchaseCheckin.Checkin"%}',
-                    type: "POST",
-                    processData: false,
-                    contentType: 'application/json',
-                    data: JSON.stringify(vm.purchase_bill_entry_detail),
-                    success: function (data) {
-                        hideMask();
-                        if (data.success === false) {
-                            $.msg.error(data.message);
-                            //return;
-                        }
-                        else {
-                            $.msg.show(data.message);
-                            $('#purchaseCheckinDialog').modal('hide');
-                            vm.reloadEntryList();
-                            //return;
-                        }
+                url: '{%url "ErpPurchaseCheckin.Checkin"%}',
+                type: "POST",
+                processData: false,
+                contentType: 'application/json',
+                data: JSON.stringify(vm.purchase_bill_entry_detail),
+                success: function (data) {
+                    hideMask();
+                    if (data.success === false) {
+                        $.msg.error(data.message);
+                        //return;
+                    }
+                    else {
+                        $.msg.show(data.message);
+                        $('#purchaseCheckinDialog').modal('hide');
+                        vm.reloadEntryList();
+                        //return;
                     }
                 }
-            );
+            });
+        }
+    }
+
+    function checkinInTurn() {
+        showMask("提交中...");
+        var form = $("#purchaseCheckinForm");
+        var valid = validate(form, {
+            'purchase_bill_entry_detail.purchase_bill_entry.checkin_qty': {
+                required: true, digits: true
+            },
+            'purchase_bill_entry_detail.purchase_bill_entry.desc': {
+                required: false, maxlength: 400
+            }
+        });
+
+        if (!valid) {
+            hideMask();
+        } else {
+            $.ajax({
+                url: '{%url "ErpPurchaseCheckin.CheckinInTurn"%}',
+                type: "POST",
+                processData: false,
+                contentType: 'application/json',
+                data: JSON.stringify(vm.purchase_bill_entry_detail),
+                success: function (data) {
+                    hideMask();
+                    if (data.success === false) {
+                        $.msg.error(data.message);
+                        //return;
+                    }
+                    else {
+                        $.msg.show(data.message);
+                        $('#purchaseCheckinDialog').modal('hide');
+                        vm.reloadEntryList();
+                        //return;
+                    }
+                }
+            });
         }
     }
 
