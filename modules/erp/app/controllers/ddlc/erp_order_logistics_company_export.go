@@ -62,11 +62,11 @@ func (c ErpOrderLogisticsCompanyExport) ExportOptionData() revel.Result {
 }
 
 type order_logistics_eparcel_view_item_t struct {
-	OrderLogistics ddlc_models.OrderLogisticsInfo    `xorm:"extends" json:"ol"`
-	Order          ddlc_models.OrderInfo             `xorm:"extends" json:"o"`
-	ShopAccount    xtpz_models.ShopAccountInfo       `xorm:"extends" json:"sa"`
-	sku_qty_loc    string                       `xorm:"-"`
-	loc_name       string                       `xorm:"-"`
+	OrderLogistics ddlc_models.OrderLogisticsInfo `xorm:"extends" json:"ol"`
+	Order          ddlc_models.OrderInfo          `xorm:"extends" json:"o"`
+	ShopAccount    xtpz_models.ShopAccountInfo    `xorm:"extends" json:"sa"`
+	sku_qty_loc    string                         `xorm:"-"`
+	loc_name       string                         `xorm:"-"`
 }
 
 type order_logistics_eparcel_view_item_slice []order_logistics_eparcel_view_item_t
@@ -76,12 +76,12 @@ func (s order_logistics_eparcel_view_item_slice) Swap(i, j int)      { s[i], s[j
 func (s order_logistics_eparcel_view_item_slice) Less(i, j int) bool { return s[i].loc_name < s[j].loc_name }
 
 type order_logistics_fastway_view_item_t struct {
-	OrderLogistics ddlc_models.OrderLogisticsInfo    `xorm:"extends" json:"ol"`
-	Order          ddlc_models.OrderInfo             `xorm:"extends" json:"o"`
-	LogisticsMode  ddpz_models.LogisticsModeInfo     `xorm:"extends" json:"lm"`
-	ShopAccount    xtpz_models.ShopAccountInfo       `xorm:"extends" json:"sa"`
-	sku_qty_loc    string                       `xorm:"-"`
-	loc_name       string                       `xorm:"-"`
+	OrderLogistics ddlc_models.OrderLogisticsInfo `xorm:"extends" json:"ol"`
+	Order          ddlc_models.OrderInfo          `xorm:"extends" json:"o"`
+	LogisticsMode  ddpz_models.LogisticsModeInfo  `xorm:"extends" json:"lm"`
+	ShopAccount    xtpz_models.ShopAccountInfo    `xorm:"extends" json:"sa"`
+	sku_qty_loc    string                         `xorm:"-"`
+	loc_name       string                         `xorm:"-"`
 }
 
 type order_logistics_fastway_view_item_slice []order_logistics_fastway_view_item_t
@@ -91,13 +91,13 @@ func (s order_logistics_fastway_view_item_slice) Swap(i, j int)      { s[i], s[j
 func (s order_logistics_fastway_view_item_slice) Less(i, j int) bool { return s[i].loc_name < s[j].loc_name }
 
 type order_logistics_toll_view_item_t struct {
-	OrderLogistics ddlc_models.OrderLogisticsInfo    `xorm:"extends" json:"ol"`
-	Order          ddlc_models.OrderInfo             `xorm:"extends" json:"o"`
-	LogisticsMode  ddpz_models.LogisticsModeInfo     `xorm:"extends" json:"lm"`
-	ShopAccount    xtpz_models.ShopAccountInfo       `xorm:"extends" json:"sa"`
-	sku_qty_loc    string                       `xorm:"-"`
-	loc_name       string                       `xorm:"-"`
-	qty            int64                        `xorm:"-"`
+	OrderLogistics ddlc_models.OrderLogisticsInfo `xorm:"extends" json:"ol"`
+	Order          ddlc_models.OrderInfo          `xorm:"extends" json:"o"`
+	LogisticsMode  ddpz_models.LogisticsModeInfo  `xorm:"extends" json:"lm"`
+	ShopAccount    xtpz_models.ShopAccountInfo    `xorm:"extends" json:"sa"`
+	sku_qty_loc    string                         `xorm:"-"`
+	loc_name       string                         `xorm:"-"`
+	qty            int64                          `xorm:"-"`
 }
 
 type order_logistics_toll_view_item_slice []order_logistics_toll_view_item_t
@@ -521,7 +521,8 @@ WHERE o.status_id = %d AND ol.mode_id IN (%s) AND ol.stock_id = %d`
 		sheet := xlsx_file.Sheets[0] // 模板里面应该至少有一个sheet
 		for index, order_logistics := range order_logistics_list {
 			var order_shipping_address = order_service.Get_order_shipping_address(order_logistics.Order.Id, db_session)
-			sheet.Cell(index+1, excel_col_label_to_index("A")).Value = "IPEC"
+			sheet.Cell(index+1, excel_col_label_to_index("A")).Value = order_logistics.LogisticsMode.SenderId
+			sheet.Cell(index+1, excel_col_label_to_index("B")).Value = "IPEC"
 
 			// TOLL 的 导出模板，B列 service ID。如果是墨尔本仓库，邮编第一个数字是“3”的话，填充2，否则填充4 。 如果是布里斯班仓库，邮编第一个数字是“4”的话，填充2，否则填充4 。
 			//var service_id string = get_toll_service_id(stock_code, order_shipping_address)
@@ -537,40 +538,40 @@ WHERE o.status_id = %d AND ol.mode_id IN (%s) AND ol.stock_id = %d`
 				service_id = get_toll_service_id(excel_export_stock_bne_code, order_shipping_address)
 			}
 
-			sheet.Cell(index+1, excel_col_label_to_index("B")).Value = service_id
+			sheet.Cell(index+1, excel_col_label_to_index("C")).Value = service_id
 
-			sheet.Cell(index+1, excel_col_label_to_index("C")).Value = order_shipping_address.Name
-			sheet.Cell(index+1, excel_col_label_to_index("D")).Value = order_shipping_address.Name // 和 Ｃ　是一样的？
+			sheet.Cell(index+1, excel_col_label_to_index("D")).Value = order_shipping_address.Name
+			sheet.Cell(index+1, excel_col_label_to_index("E")).Value = order_shipping_address.Name // 和 Ｃ　是一样的？
 
 			var full_address = order_shipping_address.Street1 + order_shipping_address.Street2
 			address1, address2 := split_long_string(full_address, 25)
-			sheet.Cell(index+1, excel_col_label_to_index("E")).Value = address1
-			sheet.Cell(index+1, excel_col_label_to_index("F")).Value = address2
-			sheet.Cell(index+1, excel_col_label_to_index("G")).Value = order_shipping_address.CityName
-			sheet.Cell(index+1, excel_col_label_to_index("H")).Value = get_state_short_name(order_shipping_address.Province)
-			sheet.Cell(index+1, excel_col_label_to_index("I")).Value = order_shipping_address.PostalCode
-			sheet.Cell(index+1, excel_col_label_to_index("K")).Value = "CARTON"
-			sheet.Cell(index+1, excel_col_label_to_index("L")).Value = get_toll_packaging_code(order_logistics.OrderLogistics) // 包裹类型要计算
-			sheet.Cell(index+1, excel_col_label_to_index("M")).Value = fmt.Sprint(order_logistics.qty)
-			sheet.Cell(index+1, excel_col_label_to_index("N")).Value = fmt.Sprintf("%0.1f", order_logistics.OrderLogistics.Length)
-			sheet.Cell(index+1, excel_col_label_to_index("O")).Value = fmt.Sprintf("%0.1f", order_logistics.OrderLogistics.Width)
-			sheet.Cell(index+1, excel_col_label_to_index("P")).Value = fmt.Sprintf("%0.1f", order_logistics.OrderLogistics.Height/float64(order_logistics.qty))
-			sheet.Cell(index+1, excel_col_label_to_index("Q")).Value = fmt.Sprintf("%0.1f", order_logistics.OrderLogistics.DimWeight/float64(order_logistics.qty))
+			sheet.Cell(index+1, excel_col_label_to_index("F")).Value = address1
+			sheet.Cell(index+1, excel_col_label_to_index("G")).Value = address2
+			sheet.Cell(index+1, excel_col_label_to_index("H")).Value = order_shipping_address.CityName
+			sheet.Cell(index+1, excel_col_label_to_index("I")).Value = get_state_short_name(order_shipping_address.Province)
+			sheet.Cell(index+1, excel_col_label_to_index("J")).Value = order_shipping_address.PostalCode
+			sheet.Cell(index+1, excel_col_label_to_index("L")).Value = "CARTON"
+			sheet.Cell(index+1, excel_col_label_to_index("M")).Value = get_toll_packaging_code(order_logistics.OrderLogistics) // 包裹类型要计算
+			sheet.Cell(index+1, excel_col_label_to_index("N")).Value = fmt.Sprint(order_logistics.qty)
+			sheet.Cell(index+1, excel_col_label_to_index("O")).Value = fmt.Sprintf("%0.1f", order_logistics.OrderLogistics.Length)
+			sheet.Cell(index+1, excel_col_label_to_index("P")).Value = fmt.Sprintf("%0.1f", order_logistics.OrderLogistics.Width)
+			sheet.Cell(index+1, excel_col_label_to_index("Q")).Value = fmt.Sprintf("%0.1f", order_logistics.OrderLogistics.Height/float64(order_logistics.qty))
+			sheet.Cell(index+1, excel_col_label_to_index("R")).Value = fmt.Sprintf("%0.1f", order_logistics.OrderLogistics.DimWeight/float64(order_logistics.qty))
 
 			if order_logistics.OrderLogistics.Weight/float64(order_logistics.qty) >= 1 {
-				sheet.Cell(index+1, excel_col_label_to_index("R")).Value = fmt.Sprintf("%0.1f", order_logistics.OrderLogistics.Weight/float64(order_logistics.qty))
+				sheet.Cell(index+1, excel_col_label_to_index("S")).Value = fmt.Sprintf("%0.1f", order_logistics.OrderLogistics.Weight/float64(order_logistics.qty))
 			} else {
-				sheet.Cell(index+1, excel_col_label_to_index("R")).Value = fmt.Sprintf("%0.1f", math.Ceil(order_logistics.OrderLogistics.Weight/float64(order_logistics.qty)))
+				sheet.Cell(index+1, excel_col_label_to_index("S")).Value = fmt.Sprintf("%0.1f", math.Ceil(order_logistics.OrderLogistics.Weight/float64(order_logistics.qty)))
 			}
 
-			sheet.Cell(index+1, excel_col_label_to_index("S")).Value = order_logistics.Order.FullTranId
-			sheet.Cell(index+1, excel_col_label_to_index("T")).Value = fmt.Sprintf("FROM:%s", order_logistics.ShopAccount.Name)
-			sheet.Cell(index+1, excel_col_label_to_index("U")).Value = "ATL at safe place"
-			sheet.Cell(index+1, excel_col_label_to_index("V")).Value = order_logistics.sku_qty_loc
-			sheet.Cell(index+1, excel_col_label_to_index("W")).Value = order_logistics.Order.FullTranId // 和 S 一样的？
+			sheet.Cell(index+1, excel_col_label_to_index("T")).Value = order_logistics.Order.FullTranId
+			sheet.Cell(index+1, excel_col_label_to_index("U")).Value = fmt.Sprintf("FROM:%s", order_logistics.ShopAccount.Name)
+			sheet.Cell(index+1, excel_col_label_to_index("V")).Value = "ATL at safe place"
+			sheet.Cell(index+1, excel_col_label_to_index("W")).Value = order_logistics.sku_qty_loc
+			sheet.Cell(index+1, excel_col_label_to_index("X")).Value = order_logistics.Order.FullTranId // 和 S 一样的？
 
-			sheet.Cell(index+1, excel_col_label_to_index("X")).Value = order_shipping_address.Phone
-			sheet.Cell(index+1, excel_col_label_to_index("Y")).Value = order_logistics.Order.BuyerEmail
+			sheet.Cell(index+1, excel_col_label_to_index("Y")).Value = order_shipping_address.Phone
+			sheet.Cell(index+1, excel_col_label_to_index("Z")).Value = order_logistics.Order.BuyerEmail
 		}
 	} else {
 		return c.RenderJson(map[string]interface{}{
