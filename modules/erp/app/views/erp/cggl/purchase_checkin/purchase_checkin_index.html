@@ -21,6 +21,10 @@
                         <i class="ace-icon fa fa-share"></i>
                         入库
                     </button>
+                    <button class="btn btn-purple btn-sm" onclick="showCheckinInTurn()">
+                        <i class="ace-icon fa fa-share"></i>
+                        分批入库
+                    </button>
                 </div>
                 <div id="query" class="col-xs-12" style="line-height: 28px;">
                     <select id="bill_code_query" name="bill_code_query" style="width: 140px;" v-model="page.bill_code_query" @change="querySelectChange()">

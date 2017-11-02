@@ -6,8 +6,8 @@ import (
 
 type PurchaseBillEntryInfo struct {
 	Id                      int64           `xorm:"bigint notnull pk autoincr 'id'" json:"id"`
-	BillId                  int64           `xorm:"bigint notnull index unique(unq_purchase_bill_prd) 'bill_id'" json:"bill_id" smith:"verbose_name=批次"`
-	ProductId               int64           `xorm:"bigint notnull index unique(unq_purchase_bill_prd) 'product_id'" json:"product_id" smith:"verbose_name=商品"`
+	BillId                  int64           `xorm:"bigint notnull index 'bill_id'" json:"bill_id" smith:"verbose_name=批次"`
+	ProductId               int64           `xorm:"bigint notnull index 'product_id'" json:"product_id" smith:"verbose_name=商品"`
 	Qty                     int64           `xorm:"bigint notnull 'qty'" json:"qty" smith:"verbose_name=总数量"`                             // 所有仓库的采购数量，各个仓库加起来的总和
 	MelQty                  int64           `xorm:"bigint notnull default(0) 'mel_qty'" json:"mel_qty" smith:"verbose_name=墨尔本数量"`        // 墨尔本仓库采购数量
 	BneQty                  int64           `xorm:"bigint notnull default(0) 'bne_qty'" json:"bne_qty" smith:"verbose_name=布里斯班数量"`       // 墨尔本仓库采购数量

@@ -486,6 +486,10 @@ func (c ErpPurchaseCheckin) CheckinInTurn() revel.Result {
 	_, err = db_session.Insert(&new_bill_entry)
 	core.HandleError(err)
 
+	purchase_bill.FinalAmount = purchase_bill.FinalAmount - new_bill_entry.Amount
+	_, err = db_session.Id(purchase_bill.Id).Cols("final_amount").Update(&purchase_bill)
+	core.HandleError(err)
+
 	// 计算中国仓成本价
 	purchase_bill_service.CalculateBillEntryCnInventoryCost(purchase_bill.Id, db_session)
 
