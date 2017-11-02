@@ -398,3 +398,102 @@ func (c ErpPurchaseCheckin) CheckinList() revel.Result {
 		"message": "采购明细入库成功！",
 	})
 }
+
+func (c ErpPurchaseCheckin) CheckinInTurn() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.CGGL_PURCHASE_CHECKIN, c.Session)
+
+	var db_session = c.DbSession
+
+	var detail_form PurchaseBillEntryCheckinDetailForm
+	err := json.Unmarshal(c.GetRequestBody(), &detail_form)
+	core.HandleError(err)
+
+	if detail_form.Valid(c.Validation) == false {
+		return c.RenderJson(core.JsonResult{Success: false, Message: c.GetValidationErrorMessage()})
+	}
+
+	var bill_entry_from_ui = detail_form.PurchaseBillEntry
+
+	var bill_entry_in_db cggl_models.PurchaseBillEntryInfo
+	_, err = db_session.Id(bill_entry_from_ui.Id).Get(&bill_entry_in_db)
+	core.HandleError(err)
+
+	var purchase_bill cggl_models.PurchaseBillInfo
+	_, err = db_session.Id(bill_entry_in_db.BillId).Get(&purchase_bill)
+	core.HandleError(err)
+
+	var product kcgl_models.ProductInfo
+	_, err = db_session.Id(bill_entry_in_db.ProductId).Get(&product)
+	core.HandleError(err)
+
+	// 检查状态
+	if bill_entry_in_db.StatusId != models.PURCHASE_BILL_STATUS_CGZ {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "采购单明细状态当前不是采购中状态，不能入库！",
+		})
+	}
+
+	var is_all_checkin = bill_entry_from_ui.CheckinQty == bill_entry_in_db.Qty
+
+	// 检查是不是分批入库
+	if is_all_checkin == true {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "全部数量入库，请使用正常入库而不是分批入库！",
+		})
+	}
+
+	// 插入采购单历史，入库
+	purchase_bill_log_service.Insert_purchase_bill_log(purchase_bill, fmt.Sprintf("采购单明细SKU:%s 分批入库，%d个", product.Sku, bill_entry_from_ui.CheckinQty), db_session, c.Session)
+
+	var qty_before = bill_entry_in_db.Qty
+	var fitting_cost_before = bill_entry_in_db.FittingCost
+	var other_cost_before = bill_entry_in_db.OtherCost
+
+	bill_entry_in_db.Qty = bill_entry_in_db.Qty - bill_entry_from_ui.CheckinQty
+	bill_entry_in_db.Amount = bill_entry_in_db.Price * float64(bill_entry_in_db.Qty)
+	bill_entry_in_db.Desc = core.MakeNullString("部分数量已分批入库", true)
+	bill_entry_in_db.FittingCost = (float64(bill_entry_in_db.Qty) / float64(qty_before)) * fitting_cost_before
+	bill_entry_in_db.OtherCost = (float64(bill_entry_in_db.Qty) / float64(qty_before)) * other_cost_before
+	_, err = db_session.Id(bill_entry_in_db.Id).Cols("qty", "amount", "desc", "fitting_cost", "other_cost").Update(&bill_entry_in_db)
+	core.HandleError(err)
+
+	var login_user = core.GetLoginUser(c.Session)
+
+	var new_bill_entry cggl_models.PurchaseBillEntryInfo
+
+	new_bill_entry.BillId = bill_entry_in_db.BillId
+	new_bill_entry.ProductId = bill_entry_in_db.ProductId
+	new_bill_entry.Qty = bill_entry_from_ui.CheckinQty
+	new_bill_entry.Price = bill_entry_from_ui.Price
+	new_bill_entry.Amount = new_bill_entry.Price * float64(new_bill_entry.Qty)
+	new_bill_entry.Desc = core.MakeNullString(fmt.Sprintf("分批入库，原数量 %d", qty_before), true)
+	new_bill_entry.StatusId = models.PURCHASE_BILL_STATUS_YRK
+	new_bill_entry.MelQty = bill_entry_in_db.MelQty
+	new_bill_entry.BneQty = bill_entry_in_db.BneQty
+	new_bill_entry.CheckinQty = new_bill_entry.Qty
+	new_bill_entry.CheckinTime = core.MakeNullTime(time.Now(), true)
+	new_bill_entry.InventoryCost = bill_entry_in_db.InventoryCost
+	new_bill_entry.CheckinUserId = login_user.UserId
+	new_bill_entry.NeedInvoice = bill_entry_in_db.NeedInvoice
+	new_bill_entry.TaxPoint = bill_entry_in_db.TaxPoint
+	new_bill_entry.DrawbackPoint = bill_entry_in_db.DrawbackPoint
+	new_bill_entry.DrawbackAmount = bill_entry_in_db.DrawbackAmount
+	new_bill_entry.FittingCost = (float64(new_bill_entry.Qty) / float64(qty_before)) * fitting_cost_before
+	new_bill_entry.OtherCost = (float64(new_bill_entry.Qty) / float64(qty_before)) * other_cost_before
+
+	_, err = db_session.Insert(&new_bill_entry)
+	core.HandleError(err)
+
+	// 计算中国仓成本价
+	purchase_bill_service.CalculateBillEntryCnInventoryCost(purchase_bill.Id, db_session)
+
+	// 更新中国仓的库存数量
+	inventory_service.AddCnInventoryQty(bill_entry_from_ui.ProductId, bill_entry_from_ui.CheckinQty, db_session)
+
+	return c.RenderJson(map[string]interface{}{
+		"success": true,
+		"message": "采购明细分批入库成功！",
+	})
+}
