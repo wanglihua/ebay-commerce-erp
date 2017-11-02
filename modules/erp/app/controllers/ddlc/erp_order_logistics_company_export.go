@@ -568,7 +568,7 @@ WHERE o.status_id = %d AND ol.mode_id IN (%s) AND ol.stock_id = %d`
 			sheet.Cell(index+1, excel_col_label_to_index("U")).Value = fmt.Sprintf("FROM:%s", order_logistics.ShopAccount.Name)
 			sheet.Cell(index+1, excel_col_label_to_index("V")).Value = "ATL at safe place"
 			sheet.Cell(index+1, excel_col_label_to_index("W")).Value = order_logistics.sku_qty_loc
-			sheet.Cell(index+1, excel_col_label_to_index("X")).Value = order_logistics.Order.FullTranId // 和 S 一样的？
+			sheet.Cell(index+1, excel_col_label_to_index("X")).Value = order_logistics.Order.FullTranId // 和 T 一样的？
 
 			sheet.Cell(index+1, excel_col_label_to_index("Y")).Value = order_shipping_address.Phone
 			sheet.Cell(index+1, excel_col_label_to_index("Z")).Value = order_logistics.Order.BuyerEmail

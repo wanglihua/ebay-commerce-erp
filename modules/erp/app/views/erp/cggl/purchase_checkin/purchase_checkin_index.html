@@ -252,7 +252,11 @@
                         {
                             "mDataProp": "pb.apply_time", "title": "采购时间", "bSearchable": false, "sClass": "center", "width": 120,
                             "render": function (data, type, row) {
-                                return "<div class='div_apply_time'>" + row.pb.apply_time + "</div><div>" + row.pbe.checkin_time + "</div>";
+                                var checkin_time = row.pbe.checkin_time;
+                                if (checkin_time === null) {
+                                    checkin_time = '---';
+                                }
+                                return "<div class='div_apply_time'>" + row.pb.apply_time + "</div><div>" + checkin_time + "</div>";
                             }
                         },
                         {
