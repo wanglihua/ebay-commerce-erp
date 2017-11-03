@@ -469,6 +469,7 @@ func (c ErpPurchaseCheckin) CheckinInTurn() revel.Result {
 	var other_cost_before = bill_entry_in_db.OtherCost
 	var checkin_qty = bill_entry_from_ui.CheckinQty
 	var checkin_rate = float64(checkin_qty) / float64(qty_before)
+	var pay_amount = bill_entry_from_ui.PayAmount
 
 	bill_entry_in_db.Qty = qty_before - checkin_qty
 	bill_entry_in_db.MelQty = bill_entry_in_db.MelQty - int64(math.Floor(float64(mel_qty_before)*checkin_rate+0.5)) // 四舍五入
@@ -491,6 +492,7 @@ func (c ErpPurchaseCheckin) CheckinInTurn() revel.Result {
 	new_bill_entry.BneQty = checkin_qty - new_bill_entry.MelQty
 	new_bill_entry.Price = bill_entry_in_db.Price
 	new_bill_entry.Amount = new_bill_entry.Price * float64(new_bill_entry.Qty)
+	new_bill_entry.PayAmount = pay_amount
 	new_bill_entry.Desc = core.MakeNullString(bill_entry_from_ui.Desc.String+fmt.Sprintf(" 分批入库，原数量 %d", qty_before), true)
 	new_bill_entry.StatusId = models.PURCHASE_BILL_STATUS_YRK
 	new_bill_entry.CheckinQty = checkin_qty
@@ -507,7 +509,8 @@ func (c ErpPurchaseCheckin) CheckinInTurn() revel.Result {
 	_, err = db_session.Insert(&new_bill_entry)
 	core.HandleError(err)
 
-	purchase_bill.FinalAmount = purchase_bill.FinalAmount - new_bill_entry.Amount
+	// 更新尾款
+	purchase_bill.FinalAmount = purchase_bill.FinalAmount - pay_amount
 	_, err = db_session.Id(purchase_bill.Id).Cols("final_amount").Update(&purchase_bill)
 	core.HandleError(err)
 

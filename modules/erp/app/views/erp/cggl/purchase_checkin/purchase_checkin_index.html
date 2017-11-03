@@ -160,6 +160,17 @@
                                     </div>
                                 </div>
 
+                                <div id="div_pay_amount" class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <label for="pay_amount" class="col-xs-2 control-label">付款金额</label>
+                                            <div class="col-xs-10">
+                                                <input id="pay_amount" name="purchase_bill_entry_detail.purchase_bill_entry.pay_amount" type="text" class="input-sm form-control" v-model.number="purchase_bill_entry_detail.purchase_bill_entry.pay_amount"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
@@ -367,6 +378,7 @@
 
                 $("#abnormal_type_id").removeAttr("disabled");
                 $("#btnCheckin").attr("onclick", "checkin();");
+                $("#div_pay_amount").attr("disabled", "disabled");
                 $('#purchaseCheckinDialog').modal(modalOptions);
             }
         });
@@ -405,6 +417,7 @@
 
                 $("#abnormal_type_id").attr("disabled", "disabled");
                 $("#btnCheckin").attr("onclick", "checkinInTurn();");
+                $("#div_pay_amount").removeAttr("disabled");
                 $('#purchaseCheckinDialog').modal(modalOptions);
             }
         });
