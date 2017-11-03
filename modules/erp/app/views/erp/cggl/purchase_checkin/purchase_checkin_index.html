@@ -67,6 +67,7 @@
                             <th>名称</th>
                             <th>数量</th>
                             <th>金额</th>
+                            <th>付款</th>
                             <th id="th_apply_time">采购时间</th>
                             <th id="th_checkin_time">入库时间</th>
                             <th>到货天数</th>
@@ -85,7 +86,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="True">&times;</button>
-                    <h4 class="modal-title">采购商品入库</h4>
+                    <h4 id="checkinDialogTitle" class="modal-title">采购商品入库</h4>
                 </div>
                 <div class="modal-body clearfix">
                     <div class="row">
@@ -272,6 +273,12 @@
                             }
                         },
                         {
+                            "mDataProp": "pbe.pay_amount", "title": "付款", "bSearchable": false, "width": 60, "sClass": "dtRight",
+                            "render": function (data, type, row) {
+                                return data;
+                            }
+                        },
+                        {
                             "mDataProp": "pb.apply_time", "title": "采购时间", "bSearchable": false, "sClass": "center", "width": 120,
                             "render": function (data, type, row) {
                                 var checkin_time = row.pbe.checkin_time;
@@ -378,7 +385,8 @@
 
                 $("#abnormal_type_id").removeAttr("disabled");
                 $("#btnCheckin").attr("onclick", "checkin();");
-                $("#div_pay_amount").attr("disabled", "disabled");
+                $("#div_pay_amount").hide();
+                $("#checkinDialogTitle").text("采购商品入库");
                 $('#purchaseCheckinDialog').modal(modalOptions);
             }
         });
@@ -417,7 +425,8 @@
 
                 $("#abnormal_type_id").attr("disabled", "disabled");
                 $("#btnCheckin").attr("onclick", "checkinInTurn();");
-                $("#div_pay_amount").removeAttr("disabled");
+                $("#div_pay_amount").show();
+                $("#checkinDialogTitle").text("采购商品分批入库");
                 $('#purchaseCheckinDialog').modal(modalOptions);
             }
         });
