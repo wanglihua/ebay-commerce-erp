@@ -282,6 +282,13 @@ func (c ErpPurchaseCheckin) Checkin() revel.Result {
 		})
 	}
 
+	if bill_entry_from_ui.CheckinQty > bill_entry_in_db.Qty {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "入库数量不能大于采购数量！",
+		})
+	}
+
 	var is_abnormal = bill_entry_from_ui.CheckinQty < bill_entry_in_db.Qty
 
 	// 检查是不是选择了异常类型
@@ -431,6 +438,13 @@ func (c ErpPurchaseCheckin) CheckinInTurn() revel.Result {
 		return c.RenderJson(map[string]interface{}{
 			"success": false,
 			"message": "采购单明细状态当前不是采购中状态，不能入库！",
+		})
+	}
+
+	if bill_entry_from_ui.CheckinQty > bill_entry_in_db.Qty {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "入库数量不能大于采购数量！",
 		})
 	}
 

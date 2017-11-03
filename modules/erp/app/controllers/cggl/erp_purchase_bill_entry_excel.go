@@ -245,18 +245,26 @@ func (c ErpPurchaseBillEntryExcel) Import() revel.Result {
 			purchase_bill_entry_import.need_invoice = 0
 		}
 
-		tax_point, err := strconv.ParseFloat(purchase_bill_entry_import.TaxPoint, 64)
-		if err != nil {
-			buffer.WriteString("收税点格式输入不对！")
+		if purchase_bill_entry_import.TaxPoint == "" {
+			purchase_bill_entry_import_list[index].tax_point = 0
 		} else {
-			purchase_bill_entry_import_list[index].tax_point = tax_point
+			tax_point, err := strconv.ParseFloat(purchase_bill_entry_import.TaxPoint, 64)
+			if err != nil {
+				buffer.WriteString("收税点格式输入不对！")
+			} else {
+				purchase_bill_entry_import_list[index].tax_point = tax_point
+			}
 		}
 
-		drawback_point, err := strconv.ParseFloat(purchase_bill_entry_import.DrawbackPoint, 64)
-		if err != nil {
-			buffer.WriteString("退税点格式输入不对！")
+		if purchase_bill_entry_import.DrawbackPoint == "" {
+			purchase_bill_entry_import_list[index].drawback_point = 0
 		} else {
-			purchase_bill_entry_import_list[index].drawback_point = drawback_point
+			drawback_point, err := strconv.ParseFloat(purchase_bill_entry_import.DrawbackPoint, 64)
+			if err != nil {
+				buffer.WriteString("退税点格式输入不对！")
+			} else {
+				purchase_bill_entry_import_list[index].drawback_point = drawback_point
+			}
 		}
 
 		fitting_cost, err := strconv.ParseFloat(purchase_bill_entry_import.FittingCost, 64)
