@@ -103,10 +103,14 @@
     $(function () {
         $('#begin_time_query').datetimepicker({
             locale: "zh-cn"
+        }).on('dp.change', function (ev) {
+            vm.page.begin_time_query = $("#begin_time_query").val();
         });
 
         $('#end_time_query').datetimepicker({
             locale: "zh-cn"
+        }).on('dp.change', function (ev) {
+            vm.page.end_time_query = $("#end_time_query").val();
         });
     });
 
