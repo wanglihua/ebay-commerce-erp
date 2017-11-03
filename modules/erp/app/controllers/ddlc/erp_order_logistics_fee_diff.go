@@ -38,6 +38,7 @@ const (
 	FEE_DIFF_ACTUAL_FEE_SMALLER int64 = 200
 	FEE_DIFF_ACTUAL_FEE_EQUAL   int64 = 300
 	FEE_DIFF_ACTUAL_FEE_MISS    int64 = 400
+	FEE_DIFF_ACTUAL_FEE_EXIST   int64 = 500
 )
 
 type fee_diff_type_t struct {
@@ -64,6 +65,7 @@ func (c ErpOrderLogisticsFeeDiff) PageData() revel.Result {
 	fee_diff_type_list = append(fee_diff_type_list, fee_diff_type_t{Code: FEE_DIFF_ACTUAL_FEE_SMALLER, Name: "实际费用小于预估"})
 	fee_diff_type_list = append(fee_diff_type_list, fee_diff_type_t{Code: FEE_DIFF_ACTUAL_FEE_EQUAL, Name: "实际费用等于预估"})
 	fee_diff_type_list = append(fee_diff_type_list, fee_diff_type_t{Code: FEE_DIFF_ACTUAL_FEE_MISS, Name: "实际费用未导入"})
+	fee_diff_type_list = append(fee_diff_type_list, fee_diff_type_t{Code: FEE_DIFF_ACTUAL_FEE_EXIST, Name: "实际费用已导入"})
 
 	return c.RenderJson(map[string]interface{}{
 		"stock_id":               0,
@@ -347,11 +349,11 @@ func (c ErpOrderLogisticsFeeDiff) get_export_excel(db_session *xorm.Session) *xl
 }
 
 type order_logistics_view_item_t struct {
-	OrderLogistics ddlc_models.OrderLogisticsInfo  `xorm:"extends" json:"ol"`
-	Order          ddlc_models.OrderInfo           `xorm:"extends" json:"o"`
-	StockName      string                     `json:"stock_name"`
-	CompanyName    string                     `json:"company_name"`
-	ModeName       string                     `json:"mode_name"`
+	OrderLogistics ddlc_models.OrderLogisticsInfo `xorm:"extends" json:"ol"`
+	Order          ddlc_models.OrderInfo          `xorm:"extends" json:"o"`
+	StockName      string                         `json:"stock_name"`
+	CompanyName    string                         `json:"company_name"`
+	ModeName       string                         `json:"mode_name"`
 }
 
 func (c ErpOrderLogisticsFeeDiff) get_list_data(is_for_export bool) (list_data_return []order_logistics_view_item_t, count_return int64) {
@@ -446,6 +448,8 @@ WHERE ol.stock_id = 0 AND ol.company_id = 0
 				filter = core.SqlAnd(filter, "ol.actual_fee = ol.total_fee AND ol.actual_fee <> 0")
 			} else if fee_diff_type_code == FEE_DIFF_ACTUAL_FEE_MISS {
 				filter = core.SqlAnd(filter, "ol.actual_fee = 0")
+			} else if fee_diff_type_code == FEE_DIFF_ACTUAL_FEE_MISS {
+				filter = core.SqlAnd(filter, "ol.actual_fee <> 0")
 			}
 		}
 	} else {
