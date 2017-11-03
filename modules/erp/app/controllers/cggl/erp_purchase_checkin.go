@@ -16,6 +16,7 @@ import (
 	"encoding/json"
 	"time"
 	"matrix/modules/erp/service/purchase_bill_log_service"
+	"math"
 )
 
 type ErpPurchaseCheckin struct {
@@ -462,15 +463,21 @@ func (c ErpPurchaseCheckin) CheckinInTurn() revel.Result {
 	purchase_bill_log_service.Insert_purchase_bill_log(purchase_bill, fmt.Sprintf("采购单明细SKU:%s 分批入库，%d个", product.Sku, bill_entry_from_ui.CheckinQty), db_session, c.Session)
 
 	var qty_before = bill_entry_in_db.Qty
+	var mel_qty_before = bill_entry_in_db.MelQty
+	// var bne_qty_before = bill_entry_in_db.BneQty
 	var fitting_cost_before = bill_entry_in_db.FittingCost
 	var other_cost_before = bill_entry_in_db.OtherCost
+	var checkin_qty = bill_entry_from_ui.CheckinQty
+	var checkin_rate = float64(checkin_qty) / float64(qty_before)
 
-	bill_entry_in_db.Qty = bill_entry_in_db.Qty - bill_entry_from_ui.CheckinQty
+	bill_entry_in_db.Qty = qty_before - checkin_qty
+	bill_entry_in_db.MelQty = bill_entry_in_db.MelQty - int64(math.Floor(float64(mel_qty_before)*checkin_rate+0.5)) // 四舍五入
+	bill_entry_in_db.BneQty = bill_entry_in_db.Qty - bill_entry_in_db.MelQty
 	bill_entry_in_db.Amount = bill_entry_in_db.Price * float64(bill_entry_in_db.Qty)
 	bill_entry_in_db.Desc = core.MakeNullString(bill_entry_in_db.Desc.String+" 部分数量已分批入库", true)
 	bill_entry_in_db.FittingCost = (float64(bill_entry_in_db.Qty) / float64(qty_before)) * fitting_cost_before
 	bill_entry_in_db.OtherCost = (float64(bill_entry_in_db.Qty) / float64(qty_before)) * other_cost_before
-	_, err = db_session.Id(bill_entry_in_db.Id).Cols("qty", "amount", "desc", "fitting_cost", "other_cost").Update(&bill_entry_in_db)
+	_, err = db_session.Id(bill_entry_in_db.Id).Cols("qty", "mel_qty", "bne_qty", "amount", "desc", "fitting_cost", "other_cost").Update(&bill_entry_in_db)
 	core.HandleError(err)
 
 	var login_user = core.GetLoginUser(c.Session)
@@ -479,14 +486,14 @@ func (c ErpPurchaseCheckin) CheckinInTurn() revel.Result {
 
 	new_bill_entry.BillId = bill_entry_in_db.BillId
 	new_bill_entry.ProductId = bill_entry_in_db.ProductId
-	new_bill_entry.Qty = bill_entry_from_ui.CheckinQty
-	new_bill_entry.Price = bill_entry_from_ui.Price
+	new_bill_entry.Qty = checkin_qty
+	new_bill_entry.MelQty = mel_qty_before - bill_entry_in_db.MelQty
+	new_bill_entry.BneQty = checkin_qty - new_bill_entry.MelQty
+	new_bill_entry.Price = bill_entry_in_db.Price
 	new_bill_entry.Amount = new_bill_entry.Price * float64(new_bill_entry.Qty)
 	new_bill_entry.Desc = core.MakeNullString(bill_entry_from_ui.Desc.String+fmt.Sprintf(" 分批入库，原数量 %d", qty_before), true)
 	new_bill_entry.StatusId = models.PURCHASE_BILL_STATUS_YRK
-	new_bill_entry.MelQty = bill_entry_in_db.MelQty
-	new_bill_entry.BneQty = bill_entry_in_db.BneQty
-	new_bill_entry.CheckinQty = new_bill_entry.Qty
+	new_bill_entry.CheckinQty = checkin_qty
 	new_bill_entry.CheckinTime = core.MakeNullTime(time.Now(), true)
 	new_bill_entry.InventoryCost = bill_entry_in_db.InventoryCost
 	new_bill_entry.CheckinUserId = login_user.UserId
@@ -494,8 +501,8 @@ func (c ErpPurchaseCheckin) CheckinInTurn() revel.Result {
 	new_bill_entry.TaxPoint = bill_entry_in_db.TaxPoint
 	new_bill_entry.DrawbackPoint = bill_entry_in_db.DrawbackPoint
 	new_bill_entry.DrawbackAmount = bill_entry_in_db.DrawbackAmount
-	new_bill_entry.FittingCost = (float64(new_bill_entry.Qty) / float64(qty_before)) * fitting_cost_before
-	new_bill_entry.OtherCost = (float64(new_bill_entry.Qty) / float64(qty_before)) * other_cost_before
+	new_bill_entry.FittingCost = (float64(checkin_qty) / float64(qty_before)) * fitting_cost_before
+	new_bill_entry.OtherCost = (float64(checkin_qty) / float64(qty_before)) * other_cost_before
 
 	_, err = db_session.Insert(&new_bill_entry)
 	core.HandleError(err)
