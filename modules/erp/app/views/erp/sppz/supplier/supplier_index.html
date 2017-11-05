@@ -184,71 +184,77 @@
         },
         mounted: function () {
             initDataTable(
-                '#supplierList',
-                {
-                    "sAjaxSource": '{%url "ErpSupplier.ListData"%}',
-                    "aaSorting": [[1, "asc"]],
-                    "aoColumns": [
-                        {
-                            "mDataProp": "s.id",
-                            "bSearchable": false,
-                            "orderable": false,
-                            "sClass": "center",
-                            "width": 50,
-                            "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
-                            "render": function (data, type, row) {
-                                return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
-                            }
-                        },
-                        {"mDataProp": "s.name", "title": "名称", "bSearchable": true, "width": 120},
-                        {"mDataProp": "s.contact", "title": "联系人", "bSearchable": true, "width": 90},
-                        {"mDataProp": "s.phone", "title": "电话", "bSearchable": true, "width": 140},
-                        {
-                            "mDataProp": "s.contact_info", "title": "联系方式", "bSearchable": true, "width": 200, "sClass": "wrap-word",
-                            "render": function (data, type, row) {
-                                if (data) {
-                                    var max_length = 150;
-                                    if (data.length > max_length) {
-                                        data = data.substr(0, max_length - 3) + "..."
+                    '#supplierList',
+                    {
+                        "sAjaxSource": '{%url "ErpSupplier.ListData"%}',
+                        "aaSorting": [[1, "asc"]],
+                        "aoColumns": [
+                            {
+                                "mDataProp": "s.id",
+                                "bSearchable": false,
+                                "orderable": false,
+                                "sClass": "center",
+                                "width": 50,
+                                "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
+                                "render": function (data, type, row) {
+                                    return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
+                                }
+                            },
+                            {"mDataProp": "s.name", "title": "名称", "bSearchable": true, "width": 120},
+                            {
+                                "mDataProp": "s.contact", "title": "联系人", "bSearchable": true, "width": 90,
+                                "render": function (data, type, row) {
+                                    var phone = '';
+                                    if (row.s.phone !== null) {
+                                        phone = row.s.phone;
                                     }
-                                    return '<div>' + data + '</div>';
+                                    return "<div>" + row.s.contact + "</div><div>" + phone + "</div>";
                                 }
-                                else {
-                                    return "";
+                            },
+                            {
+                                "mDataProp": "s.contact_info", "title": "联系方式", "bSearchable": true, "width": 200, "sClass": "wrap-word",
+                                "render": function (data, type, row) {
+                                    if (data) {
+                                        var max_length = 150;
+                                        if (data.length > max_length) {
+                                            data = data.substr(0, max_length - 3) + "..."
+                                        }
+                                        return '<div>' + data + '</div>';
+                                    }
+                                    else {
+                                        return "";
+                                    }
+                                }
+                            },
+                            {
+                                "mDataProp": "r.city", "title": "地区", "bSearchable": true, "width": 80,
+                                "render": function (data, type, row) {
+                                    return row.r.city + row.r.district;
+                                }
+                            },
+                            {
+                                "mDataProp": "s.address", "title": "地址", "bSearchable": true, "width": 200, "sClass": "wrap-word",
+                                "render": function (data, type, row) {
+                                    if (data) {
+                                        return '<div>' + data + '</div>';
+                                    } else {
+                                        return "";
+                                    }
+                                }
+                            },
+                            {
+                                "mDataProp": "s.desc", "title": "描述", "bSearchable": true, "sClass": "wrap-word",
+                                "render": function (data, type, row) {
+                                    if (data) {
+                                        return '<div>' + data + '</div>';
+                                    }
+                                    else {
+                                        return "";
+                                    }
                                 }
                             }
-                        },
-                        {
-                            "mDataProp": "r.city", "title": "地区", "bSearchable": true, "width": 80,
-                            "render": function (data, type, row) {
-                                return row.r.city + row.r.district;
-                            }
-                        },
-                        {
-                            "mDataProp": "s.address", "title": "地址", "bSearchable": true, "width": 200, "sClass": "wrap-word",
-                            "render": function (data, type, row) {
-                                if (data) {
-                                    return '<div>' + data + '</div>';
-                                } else {
-                                    return "";
-                                }
-                            }
-                        },
-                        {
-                            "mDataProp": "s.desc", "title": "描述", "bSearchable": true, "sClass": "wrap-word",
-                            "render": function (data, type, row) {
-                                if (data) {
-                                    return '<div>' + data + '</div>';
-                                }
-                                else {
-                                    return "";
-                                }
-                            }
-                        },
-                        {"mDataProp": "s.create_time", "title": "创建时间", "bSearchable": false, "width": 120},
-                        {"mDataProp": "s.update_time", "title": "修改时间", "bSearchable": false, "width": 120}
-                    ]
-                }
+                        ]
+                    }
             );
 
             $('#supplierList tbody').on('dblclick', 'tr', function () {
@@ -265,21 +271,21 @@
                 showMask("加载中...");
                 $("#supplierDetailForm").clearValidation();
                 $.ajax({
-                        url: '{%url "ErpSupplier.DetailData" %}',
-                        type: "POST",
-                        data: {
-                            "id": id
-                        },
-                        success: function (result) {
-                            hideMask();
-                            if (result.success === false) {
-                                $.msg.error(result.message);
-                                return;
+                            url: '{%url "ErpSupplier.DetailData" %}',
+                            type: "POST",
+                            data: {
+                                "id": id
+                            },
+                            success: function (result) {
+                                hideMask();
+                                if (result.success === false) {
+                                    $.msg.error(result.message);
+                                    return;
+                                }
+                                vm.detail = result;
+                                $('#supplierDetailDialog').modal(modalOptions);
                             }
-                            vm.detail = result;
-                            $('#supplierDetailDialog').modal(modalOptions);
                         }
-                    }
                 );
             }
             ,
@@ -311,25 +317,25 @@
                     hideMask();
                 } else {
                     $.ajax({
-                            url: '{%url "ErpSupplier.Save"%}',
-                            type: "POST",
-                            processData: false,
-                            contentType: 'application/json',
-                            data: JSON.stringify(vm.detail),
-                            success: function (data) {
-                                hideMask();
-                                if (data.success === false) {
-                                    $.msg.error(data.message);
-                                    //return;
-                                }
-                                else {
-                                    $.msg.show(data.message);
-                                    $('#supplierDetailDialog').modal('hide');
-                                    vm.reloadList();
-                                    //return;
+                                url: '{%url "ErpSupplier.Save"%}',
+                                type: "POST",
+                                processData: false,
+                                contentType: 'application/json',
+                                data: JSON.stringify(vm.detail),
+                                success: function (data) {
+                                    hideMask();
+                                    if (data.success === false) {
+                                        $.msg.error(data.message);
+                                        //return;
+                                    }
+                                    else {
+                                        $.msg.show(data.message);
+                                        $('#supplierDetailDialog').modal('hide');
+                                        vm.reloadList();
+                                        //return;
+                                    }
                                 }
                             }
-                        }
                     );
                 }
             }
