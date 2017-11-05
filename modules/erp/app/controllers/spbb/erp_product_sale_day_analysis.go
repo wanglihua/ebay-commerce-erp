@@ -65,6 +65,11 @@ func (c ErpProductSaleDayAnalysis) ListData() revel.Result {
 	var stock_id int64
 	c.Params.Bind(&stock_id, "stock_id")
 
+	var begin_time_query core.NullLongTime
+	var end_time_query core.NullLongTime
+	c.Params.Bind(&begin_time_query, "begin_time_query")
+	c.Params.Bind(&end_time_query, "end_time_query")
+
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
 	type product_sale_day_analysis_item_t struct {
@@ -100,6 +105,16 @@ FROM erp_product_sale_day_analysis da
 	if stock_id != 0 {
 		filter = core.SqlAnd(filter, "da.stock_id = ?")
 		sql_args = append(sql_args, stock_id)
+	}
+
+	if begin_time_query.Valid == true {
+		filter = core.SqlAnd(filter, "da.day >= ?")
+		sql_args = append(sql_args, begin_time_query.Time.Format("2006-01-02"))
+	}
+
+	if end_time_query.Valid == true {
+		filter = core.SqlAnd(filter, "da.day < ?")
+		sql_args = append(sql_args, end_time_query.Time.AddDate(0, 0, 1).Format("2006-01-02"))
 	}
 
 	sb.Where(filter)

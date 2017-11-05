@@ -41,6 +41,10 @@
                             </select>&nbsp;&nbsp;
                             <label for="sku_query">商品编号查询</label>
                             <input id="sku_query" name="sku_query" style="width: 180px;height:30px;"/>
+                            <label class="control-label no-padding-right" for="begin_time_query">日期开始</label>
+                            <input class="input-sm" id="begin_time_query" name="begin_time_query" placeholder="日期开始" type="text" style="width: 80px;"/>
+                            <label class="control-label no-padding-right" for="end_time_query">日期结束</label>
+                            <input class="input-sm" id="end_time_query" name="end_time_query" placeholder="日期结束" type="text" style="width: 80px;"/>
                             <button class="btn btn-mini btn-primary" style="margin-bottom:3px;height: 30px;" @click="refreshList()">
                                 &nbsp;<i class="ace-icon fa fa-search"></i>查&nbsp;询&nbsp;
                             </button>
@@ -56,61 +60,73 @@
     </div>
 </div>
 <script type="text/javascript">
+
+    $(function () {
+        $('#begin_time_query').datetimepicker({
+            locale: "zh-cn"
+        });
+
+        $('#end_time_query').datetimepicker({
+            locale: "zh-cn"
+        });
+    });
+
     var vm = new Vue({
         el: "#page",
         data: {
             "page": {
-                "analysis_type_id": 0,
                 "analysis_type_list": []
             }
         },
         mounted: function () {
             initDataTable(
-                '#productSaleDayAnalysisList',
-                {
-                    "sAjaxSource": '{%url "ErpProductSaleDayAnalysis.ListData"%}',
-                    "aaSorting": [[1, "asc"]],
-                    "aoColumns": [
-                        {
-                            "mDataProp": "da.type", "title": "统计类型", "bSearchable": false, "sClass": "center", "width": 120,
-                            "render": function (data, type, row) {
-                                return row.da.type_name;
-                            }
-                        },
-                        {"mDataProp": "s.name", "title": "仓库", "bSearchable": true, "sClass": "center", "width": 200},
-                        {
-                            "mDataProp": "da.sku", "title": "SKU", "bSearchable": true, "width": 200,
-                            "render": function (data, type, row) {
-                                return '<a href="/product/detail/' + row.da.product_id + '" target="product_detail">' + row.da.sku + '</a>';
-                            }
-                        },
-                        {"mDataProp": "da.day", "title": "日期", "bSearchable": false, "sClass": "center", "width": 120},
-                        {"mDataProp": "da.qty", "title": "销售数量", "bSearchable": false, "sClass": "center", "width": 80},
-                        {"mDataProp": "da.product_name", "title": "商品名称", "bSearchable": false, "bSortable": false}
-                    ],
-                    "fnServerData": function (sSource, aoData, fnCallback) {
-                        showMask("数据加载中，请稍候");
-                        aoData.push({'name': 'sku_query', 'value': $("#sku_query").val()});
-                        aoData.push({'name': 'analysis_type_id', 'value': $("#analysis_type_id").val()});
-                        aoData.push({'name': 'stock_id', 'value': $("#stock_id").val()});
-
-                        $.ajax({
-                            "dataType": 'json',
-                            "url": sSource,
-                            "data": aoData,
-                            "success": function (data) {
-                                hideMask();
-
-                                if (data.success === false) {
-                                    $.msg.error(data.message);
-                                    return;
+                    '#productSaleDayAnalysisList',
+                    {
+                        "sAjaxSource": '{%url "ErpProductSaleDayAnalysis.ListData"%}',
+                        "aaSorting": [[1, "asc"]],
+                        "aoColumns": [
+                            {
+                                "mDataProp": "da.type", "title": "统计类型", "bSearchable": false, "sClass": "center", "width": 120,
+                                "render": function (data, type, row) {
+                                    return row.da.type_name;
                                 }
+                            },
+                            {"mDataProp": "s.name", "title": "仓库", "bSearchable": true, "sClass": "center", "width": 200},
+                            {
+                                "mDataProp": "da.sku", "title": "SKU", "bSearchable": true, "width": 200,
+                                "render": function (data, type, row) {
+                                    return '<a href="/product/detail/' + row.da.product_id + '" target="product_detail">' + row.da.sku + '</a>';
+                                }
+                            },
+                            {"mDataProp": "da.day", "title": "日期", "bSearchable": false, "sClass": "center", "width": 120},
+                            {"mDataProp": "da.qty", "title": "销售数量", "bSearchable": false, "sClass": "center", "width": 80},
+                            {"mDataProp": "da.product_name", "title": "商品名称", "bSearchable": false, "bSortable": false}
+                        ],
+                        "fnServerData": function (sSource, aoData, fnCallback) {
+                            showMask("数据加载中，请稍候");
+                            aoData.push({'name': 'sku_query', 'value': $("#sku_query").val()});
+                            aoData.push({'name': 'analysis_type_id', 'value': $("#analysis_type_id").val()});
+                            aoData.push({'name': 'stock_id', 'value': $("#stock_id").val()});
+                            aoData.push({'name': 'begin_time_query', 'value': $("#begin_time_query").val()});
+                            aoData.push({'name': 'end_time_query', 'value': $("#end_time_query").val()});
 
-                                fnCallback(data);
-                            }
-                        });
+                            $.ajax({
+                                "dataType": 'json',
+                                "url": sSource,
+                                "data": aoData,
+                                "success": function (data) {
+                                    hideMask();
+
+                                    if (data.success === false) {
+                                        $.msg.error(data.message);
+                                        return;
+                                    }
+
+                                    fnCallback(data);
+                                }
+                            });
+                        }
                     }
-                }
             );
         },
         methods: {
