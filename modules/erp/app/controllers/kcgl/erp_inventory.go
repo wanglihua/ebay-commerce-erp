@@ -294,7 +294,7 @@ func (c ErpInventory) Save() revel.Result {
 	// 数据库中 stock_id, storage_loc_id, product_id 三者的组合应该是唯一的
 	var inventory_in_db kcgl_models.InventoryInfo
 	_, err = db_session.
-	Where("stock_id = ? AND storage_loc_id = ? AND product_id = ?", inventory.StockId, inventory.StorageLocId, inventory.ProductId).
+		Where("stock_id = ? AND storage_loc_id = ? AND product_id = ?", inventory.StockId, inventory.StorageLocId, inventory.ProductId).
 		Get(&inventory_in_db)
 	core.HandleError(err)
 
@@ -1376,6 +1376,12 @@ func (c ErpInventory) get_export_product_storage_loc_excel(db_session *xorm.Sess
 
 		col_index++
 		cell = header_row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 45)
+		set_head_cell_style(cell)
+		cell.Value = "商品名称"
+
+		col_index++
+		cell = header_row.AddCell()
 		sheet.SetColWidth(col_index, col_index, 22)
 		set_head_cell_style(cell)
 		cell.Value = "仓库"
@@ -1398,6 +1404,10 @@ func (c ErpInventory) get_export_product_storage_loc_excel(db_session *xorm.Sess
 		cell = row.AddCell()
 		set_text_cell_style(cell, "left")
 		cell.Value = inventory_view.Product.Sku
+
+		cell = row.AddCell()
+		set_text_cell_style(cell, "left")
+		cell.Value = inventory_view.Product.CnName
 
 		cell = row.AddCell()
 		set_text_cell_style(cell, "left")
@@ -1803,6 +1813,12 @@ func (c ErpInventory) get_export_inventory_quantity_excel(db_session *xorm.Sessi
 
 		col_index++
 		cell = header_row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 45)
+		set_head_cell_style(cell)
+		cell.Value = "商品名称"
+
+		col_index++
+		cell = header_row.AddCell()
 		sheet.SetColWidth(col_index, col_index, 22)
 		set_head_cell_style(cell)
 		cell.Value = "仓库"
@@ -1831,6 +1847,10 @@ func (c ErpInventory) get_export_inventory_quantity_excel(db_session *xorm.Sessi
 		cell = row.AddCell()
 		set_text_cell_style(cell, "left")
 		cell.Value = inventory_view.Product.Sku
+
+		cell = row.AddCell()
+		set_text_cell_style(cell, "left")
+		cell.Value = inventory_view.Product.CnName
 
 		cell = row.AddCell()
 		set_text_cell_style(cell, "left")
@@ -2246,6 +2266,12 @@ func (c ErpInventory) get_export_inventory_price_excel(db_session *xorm.Session)
 
 		col_index++
 		cell = header_row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 45)
+		set_head_cell_style(cell)
+		cell.Value = "商品名称"
+
+		col_index++
+		cell = header_row.AddCell()
 		sheet.SetColWidth(col_index, col_index, 22)
 		set_head_cell_style(cell)
 		cell.Value = "仓库"
@@ -2274,6 +2300,10 @@ func (c ErpInventory) get_export_inventory_price_excel(db_session *xorm.Session)
 		cell = row.AddCell()
 		set_text_cell_style(cell, "left")
 		cell.Value = inventory_view.Product.Sku
+
+		cell = row.AddCell()
+		set_text_cell_style(cell, "left")
+		cell.Value = inventory_view.Product.CnName
 
 		cell = row.AddCell()
 		set_text_cell_style(cell, "left")
