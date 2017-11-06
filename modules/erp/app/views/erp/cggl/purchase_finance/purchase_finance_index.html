@@ -291,29 +291,34 @@
                                     }
                                 }
                             },
-                            {"mDataProp": "s.name", "title": "状态", "bSearchable": true, "sClass": "center", "width": 50}
+                            {"mDataProp": "s.name", "title": "状态", "bSearchable": true, "sClass": "center", "width": 50},
+                            {
+                                "mDataProp": "pbe.id", "title": "操作", "bSearchable": true, "sClass": "center", "width": 80,
+                                "render": function (data, type, row) {
+                                    return "<a class='btn btn-xs btn-info btn-inline pull-left' onclick='show_entry_pay_amount_dialog(" + data + ");' ><i class='ace-icon fa fa-list'></i>付款金额</a>";
+                                }
+                            }
                         ],
                         "fnServerData": function (sSource, aoData, fnCallback) {
                             showMask("数据加载中，请稍候");
 
                             aoData.push({'name': 'purchase_bill_id', 'value': bill_id});
 
-                            $.ajax(
-                                    {
-                                        "dataType": 'json',
-                                        "url": sSource,
-                                        "data": aoData,
-                                        "success": function (data) {
-                                            hideMask();
-                                            if (data.success === false) {
-                                                $.msg.error(data.message);
-                                                return;
-                                            }
-                                            fnCallback(data.list_data);
+                            $.ajax({
+                                "dataType": 'json',
+                                "url": sSource,
+                                "data": aoData,
+                                "success": function (data) {
+                                    hideMask();
+                                    if (data.success === false) {
+                                        $.msg.error(data.message);
+                                        return;
+                                    }
+                                    fnCallback(data.list_data);
 
-                                            vm.purchase_bill_code = data.purchase_bill_code
-                                        }
-                                    });
+                                    vm.purchase_bill_code = data.purchase_bill_code
+                                }
+                            });
                         }
                     }
             );
@@ -339,31 +344,48 @@
             type: "POST",
             data: {"entry_id": entry_id},
             success: function (result) {
-                $("#purchase_entry_pay_amount_wrapper").html(result);
-                $("#purchase_entry_pay_amount").modal(modalOptions);
+                $("#purchase_entry_pay_amount_dialog_wrapper").html(result);
+                $("#purchase_entry_pay_amount_dialog").modal(modalOptions);
             }
         });
     }
 
     function save_entry_pay_amount() {
-        $.ajax({
-            url: '{%url "ErpPurchaseFinance.EntryPayAmountSave"%}',
-            type: "POST",
-            data: {"id_list": id_list},
-            success: function (data) {
-                if (data.success === false) {
-                    $.msg.error(data.message);
-                    // return;
-                }
-                else {
-                    $.msg.show(data.message);
-                    reloadList("#purchaseBillEntryList");
-                    // return;
-                }
+        showMask("提交中...");
+        var form = $("#purchase_entry_pay_amount_form");
+        var valid = validate(form, {
+            'pay_amount': {
+                required: true, number: true
             }
         });
+
+        if (!valid) {
+            hideMask();
+        } else {
+            $.ajax({
+                url: '{%url "ErpPurchaseFinance.EntryPayAmountSave"%}',
+                type: "POST",
+                data: {
+                    "entry_id": $("#entry_id").val(),
+                    "pay_amount": $("#pay_amount").val()
+                },
+                success: function (data) {
+                    hideMask();
+                    if (data.success === false) {
+                        $.msg.error(data.message);
+                        // return;
+                    }
+                    else {
+                        $.msg.show(data.message);
+                        reloadList("#purchaseBillEntryList");
+                        $("#purchase_entry_pay_amount_dialog").modal('hide');
+                        // return;
+                    }
+                }
+            });
+        }
     }
 </script>
 <div id="purchase_bill_entry_list_wrapper"></div>
-<div id="purchase_entry_pay_amount_wrapper"></div>
+<div id="purchase_entry_pay_amount_dialog_wrapper"></div>
 {%footer%}

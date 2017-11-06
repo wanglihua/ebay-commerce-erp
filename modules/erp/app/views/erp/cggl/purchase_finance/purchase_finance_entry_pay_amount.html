@@ -1,5 +1,5 @@
-<div class="modal fade" id="purchase_entry_pay_amount">
-    <div class="modal-dialog" style="width: 480px;">
+<div class="modal fade" id="purchase_entry_pay_amount_dialog">
+    <div class="modal-dialog" style="width: 380px;">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="True">&times;</button>
@@ -9,14 +9,14 @@
                 <div class="row">
                     <div class="col-xs-12">
                         <form class="form-horizontal" role="form" id="purchase_entry_pay_amount_form">
-                            <input id="purchase_bill_entry_id" name="purchase_bill_entry_id" type="hidden"/>
+                            <input id="entry_id" name="entry_id" type="hidden" value="{% .entry.Id %}"/>
 
                             <div class="row">
                                 <div class="col-xs-12">
                                     <div class="form-group">
                                         <label for="pay_amount" class="col-xs-2 control-label">付款金额</label>
                                         <div class="col-xs-10">
-                                            <input id="pay_amount" name="pay_amount" type="text" class="input-sm form-control"/>
+                                            <input id="pay_amount" name="pay_amount" type="text" class="input-sm form-control" value="{% .entry.PayAmount %}"/>
                                         </div>
                                     </div>
                                 </div>
@@ -27,7 +27,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button id="btnSave" type="button" class="btn btn-success btn-sm">
+                <button type="button" class="btn btn-success btn-sm" onclick="save_entry_pay_amount()">
                     <i class="ace-icon fa fa-floppy-o"></i>确认
                 </button>
                 <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">
