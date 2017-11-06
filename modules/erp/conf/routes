@@ -493,9 +493,12 @@ POST  /purchase/bill/excel/export          ErpPurchaseBillEntryExcel.Export
 POST /purchase/bill/log                    ErpPurchaseBillLog.Index
 POST /purchase/bill/log/list/data          ErpPurchaseBillLog.ListData
 
-GET  /purchase/finance                     ErpPurchaseFinance.Index
-POST /purchase/finance/data/list           ErpPurchaseFinance.ListData
-POST /purchase/finance/purchase            ErpPurchaseFinance.Purchase
+GET  /purchase/finance                        ErpPurchaseFinance.Index
+POST /purchase/finance/data/list              ErpPurchaseFinance.ListData
+POST /purchase/finance/purchase               ErpPurchaseFinance.Purchase
+POST /purchase/finance/entry/list             ErpPurchaseFinance.EntryList
+POST /purchase/finance/entry/pay/amount       ErpPurchaseFinance.EntryPayAmount
+POST /purchase/finance/entry/pay/amount/save  ErpPurchaseFinance.EntryPayAmountSave
 
 GET  /purchase/checkin                     ErpPurchaseCheckin.Index
 POST /purchase/checkin/data/list           ErpPurchaseCheckin.ListData

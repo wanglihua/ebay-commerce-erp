@@ -1,0 +1,39 @@
+<div class="modal fade" id="purchase_entry_pay_amount">
+    <div class="modal-dialog" style="width: 480px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="True">&times;</button>
+                <h4 class="modal-title">分批付款金额</h4>
+            </div>
+            <div class="modal-body clearfix">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <form class="form-horizontal" role="form" id="purchase_entry_pay_amount_form">
+                            <input id="purchase_bill_entry_id" name="purchase_bill_entry_id" type="hidden"/>
+
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <div class="form-group">
+                                        <label for="pay_amount" class="col-xs-2 control-label">付款金额</label>
+                                        <div class="col-xs-10">
+                                            <input id="pay_amount" name="pay_amount" type="text" class="input-sm form-control"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="btnSave" type="button" class="btn btn-success btn-sm">
+                    <i class="ace-icon fa fa-floppy-o"></i>确认
+                </button>
+                <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">
+                    <i class="ace-icon fa fa-times"></i>关闭
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

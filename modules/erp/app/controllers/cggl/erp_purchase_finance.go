@@ -176,3 +176,62 @@ func (c ErpPurchaseFinance) Purchase() revel.Result {
 		"message": "采购单下单成功！",
 	})
 }
+
+func (c ErpPurchaseFinance) EntryList() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.CGGL_PURCHASE_FINANCE, c.Session)
+
+	var db_session = c.DbSession
+
+	var purchase_bill_id int64
+	c.Params.Bind(&purchase_bill_id, "purchase_bill_id")
+
+	var purchase_bill cggl_models.PurchaseBillInfo
+	_, err := db_session.Id(purchase_bill_id).Get(&purchase_bill)
+	core.HandleError(err)
+
+	c.RenderArgs["bill_code"] = purchase_bill.Code
+	return c.RenderTemplate("erp/cggl/purchase_finance/purchase_finance_entry_list.html")
+}
+
+func (c ErpPurchaseFinance) EntryPayAmount() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.CGGL_PURCHASE_FINANCE, c.Session)
+
+	var db_session = c.DbSession
+
+	var entry_id int64
+	c.Params.Bind(&entry_id, "entry_id")
+
+	var purchase_bill_entry cggl_models.PurchaseBillEntryInfo
+	_, err := db_session.Id(entry_id).Get(&purchase_bill_entry)
+	core.HandleError(err)
+
+	c.RenderArgs["entry"] = purchase_bill_entry
+
+	return c.RenderTemplate("erp/cggl/purchase_finance/purchase_finance_entry_pay_amount.html")
+}
+
+func (c ErpPurchaseFinance) EntryPayAmountSave() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.CGGL_PURCHASE_FINANCE, c.Session)
+
+	var db_session = c.DbSession
+
+	var entry_id int64
+	c.Params.Bind(&entry_id, "entry_id")
+
+	var pay_amount float64
+	c.Params.Bind(&pay_amount, "pay_amount")
+
+	var purchase_bill_entry cggl_models.PurchaseBillEntryInfo
+	_, err := db_session.Id(entry_id).Get(&purchase_bill_entry)
+	core.HandleError(err)
+
+	purchase_bill_entry.PayAmount = pay_amount
+
+	_, err = db_session.Id(entry_id).Cols("pay_amount").Update(&purchase_bill_entry)
+	core.HandleError(err)
+
+	return c.RenderJson(map[string]interface{}{
+		"success": true,
+		"message": "采购明细更新付款金额成功！",
+	})
+}
