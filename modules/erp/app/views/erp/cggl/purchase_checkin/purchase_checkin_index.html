@@ -161,6 +161,7 @@
                                     </div>
                                 </div>
 
+                                {%/*
                                 <div id="div_pay_amount" class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
@@ -171,6 +172,7 @@
                                         </div>
                                     </div>
                                 </div>
+                                */%}
 
                                 <div class="row">
                                     <div class="col-xs-12">
@@ -236,106 +238,106 @@
             var this_vm = this;
 
             initDataTable(
-                '#purchaseBillEntryList',
-                {
-                    "sAjaxSource": '{%url "ErpPurchaseCheckin.ListData"%}',
-                    "aaSorting": [[1, "asc"]],
-                    "aoColumns": [
-                        {
-                            "mDataProp": "pbe.id",
-                            "bSearchable": false,
-                            "orderable": false,
-                            "sClass": "center",
-                            "width": 50,
-                            "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
-                            "render": function (data, type, row) {
-                                return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
-                            }
-                        },
-                        {"mDataProp": "pb.code", "title": "采购批次号", "bSearchable": true, "width": 120},
-                        {"mDataProp": "p.sku", "title": "SKU", "bSearchable": true, "width": 160},
-                        {
-                            "mDataProp": "p.cn_name", "title": "名称", "bSearchable": true, "sClass": "wrap-word", "width": 200,
-                            "render": function (data, type, row) {
-                                return "<div>" + data + "</div>"
-                            }
-                        },
-                        {
-                            "mDataProp": "pbe.qty", "title": "数量", "bSearchable": false, "width": 80, "sClass": "dtRight",
-                            "render": function (data, type, row) {
-                                return "" + row.pbe.mel_qty + "&nbsp;MEL" + " + " + row.pbe.bne_qty + "&nbsp;BNE" + " = " + row.pbe.qty;
-                            }
-                        },
-                        {
-                            "mDataProp": "pbe.amount", "title": "金额", "bSearchable": false, "width": 60, "sClass": "dtRight",
-                            "render": function (data, type, row) {
-                                return data;
-                            }
-                        },
-                        {
-                            "mDataProp": "pbe.pay_amount", "title": "付款", "bSearchable": false, "width": 60, "sClass": "dtRight",
-                            "render": function (data, type, row) {
-                                return data;
-                            }
-                        },
-                        {
-                            "mDataProp": "pb.apply_time", "title": "采购时间", "bSearchable": false, "sClass": "center", "width": 120,
-                            "render": function (data, type, row) {
-                                var checkin_time = row.pbe.checkin_time;
-                                if (checkin_time === null) {
-                                    checkin_time = '---';
+                    '#purchaseBillEntryList',
+                    {
+                        "sAjaxSource": '{%url "ErpPurchaseCheckin.ListData"%}',
+                        "aaSorting": [[1, "asc"]],
+                        "aoColumns": [
+                            {
+                                "mDataProp": "pbe.id",
+                                "bSearchable": false,
+                                "orderable": false,
+                                "sClass": "center",
+                                "width": 50,
+                                "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
+                                "render": function (data, type, row) {
+                                    return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
                                 }
-                                return "<div class='div_apply_time'>" + row.pb.apply_time + "</div><div>" + checkin_time + "</div>";
-                            }
-                        },
-                        {
-                            "mDataProp": "pbe.checkin_time", "title": "入库时间", "bSearchable": false, "sClass": "center", "width": 120,
-                            "render": function (data, type, row) {
-                                return "<div class='div_checkin_time'>" + data + "</div>";
-                            }
-                        },
-                        {
-                            "mDataProp": "pb.arrival_days", "title": "到货天数", "bSearchable": false, "sClass": "center", "width": 90,
-                            "render": function (data, type, row) {
-                                return data + '&nbsp;天';
-                            }
-                        },
-                        {
-                            "mDataProp": "pbe.desc", "title": "备注", "bSearchable": true, "sClass": "wrap-word",
-                            "render": function (data, type, row) {
-                                if (data === null) {
-                                    return "";
-                                } else {
+                            },
+                            {"mDataProp": "pb.code", "title": "采购批次号", "bSearchable": true, "width": 120},
+                            {"mDataProp": "p.sku", "title": "SKU", "bSearchable": true, "width": 160},
+                            {
+                                "mDataProp": "p.cn_name", "title": "名称", "bSearchable": true, "sClass": "wrap-word", "width": 200,
+                                "render": function (data, type, row) {
                                     return "<div>" + data + "</div>"
                                 }
-                            }
-                        },
-                        {"mDataProp": "s.name", "title": "状态", "bSearchable": true, "sClass": "center", "width": 60}
-                    ],
-                    "fnServerData": function (sSource, aoData, fnCallback) {
-                        showMask("数据加载中，请稍候");
-
-                        aoData.push({'name': 'bill_code_query', 'value': this_vm.page.bill_code_query});
-                        aoData.push({'name': 'status_id_query', 'value': this_vm.page.status_id_query});
-
-                        $.ajax({
-                            "dataType": 'json',
-                            "url": sSource,
-                            "data": aoData,
-                            "success": function (data) {
-                                hideMask();
-                                if (data.success === false) {
-                                    $.msg.error(data.message);
-                                    return;
+                            },
+                            {
+                                "mDataProp": "pbe.qty", "title": "数量", "bSearchable": false, "width": 80, "sClass": "dtRight",
+                                "render": function (data, type, row) {
+                                    return "" + row.pbe.mel_qty + "&nbsp;MEL" + " + " + row.pbe.bne_qty + "&nbsp;BNE" + " = " + row.pbe.qty;
                                 }
-                                fnCallback(data);
+                            },
+                            {
+                                "mDataProp": "pbe.amount", "title": "金额", "bSearchable": false, "width": 60, "sClass": "dtRight",
+                                "render": function (data, type, row) {
+                                    return data;
+                                }
+                            },
+                            {
+                                "mDataProp": "pbe.pay_amount", "title": "付款", "bSearchable": false, "width": 60, "sClass": "dtRight",
+                                "render": function (data, type, row) {
+                                    return data;
+                                }
+                            },
+                            {
+                                "mDataProp": "pb.apply_time", "title": "采购时间", "bSearchable": false, "sClass": "center", "width": 120,
+                                "render": function (data, type, row) {
+                                    var checkin_time = row.pbe.checkin_time;
+                                    if (checkin_time === null) {
+                                        checkin_time = '---';
+                                    }
+                                    return "<div class='div_apply_time'>" + row.pb.apply_time + "</div><div>" + checkin_time + "</div>";
+                                }
+                            },
+                            {
+                                "mDataProp": "pbe.checkin_time", "title": "入库时间", "bSearchable": false, "sClass": "center", "width": 120,
+                                "render": function (data, type, row) {
+                                    return "<div class='div_checkin_time'>" + data + "</div>";
+                                }
+                            },
+                            {
+                                "mDataProp": "pb.arrival_days", "title": "到货天数", "bSearchable": false, "sClass": "center", "width": 90,
+                                "render": function (data, type, row) {
+                                    return data + '&nbsp;天';
+                                }
+                            },
+                            {
+                                "mDataProp": "pbe.desc", "title": "备注", "bSearchable": true, "sClass": "wrap-word",
+                                "render": function (data, type, row) {
+                                    if (data === null) {
+                                        return "";
+                                    } else {
+                                        return "<div>" + data + "</div>"
+                                    }
+                                }
+                            },
+                            {"mDataProp": "s.name", "title": "状态", "bSearchable": true, "sClass": "center", "width": 60}
+                        ],
+                        "fnServerData": function (sSource, aoData, fnCallback) {
+                            showMask("数据加载中，请稍候");
 
-                                $("#purchaseBillEntryList div.div_apply_time").parent().css("width", "120px");
-                                $("#purchaseBillEntryList div.div_checkin_time").parent().css("display", "none");
-                            }
-                        });
+                            aoData.push({'name': 'bill_code_query', 'value': this_vm.page.bill_code_query});
+                            aoData.push({'name': 'status_id_query', 'value': this_vm.page.status_id_query});
+
+                            $.ajax({
+                                "dataType": 'json',
+                                "url": sSource,
+                                "data": aoData,
+                                "success": function (data) {
+                                    hideMask();
+                                    if (data.success === false) {
+                                        $.msg.error(data.message);
+                                        return;
+                                    }
+                                    fnCallback(data);
+
+                                    $("#purchaseBillEntryList div.div_apply_time").parent().css("width", "120px");
+                                    $("#purchaseBillEntryList div.div_checkin_time").parent().css("display", "none");
+                                }
+                            });
+                        }
                     }
-                }
             );
             $("#th_apply_time").before("<th id='th_apply_time_ext'></th>");
             $("#th_apply_time").wrap("<div id='div_apply_time'></div>");
@@ -385,7 +387,7 @@
 
                 $("#abnormal_type_id").removeAttr("disabled");
                 $("#btnCheckin").attr("onclick", "checkin();");
-                $("#div_pay_amount").hide();
+                // $("#div_pay_amount").hide();
                 $("#checkinDialogTitle").text("采购商品入库");
                 $('#purchaseCheckinDialog').modal(modalOptions);
             }
@@ -425,7 +427,7 @@
 
                 $("#abnormal_type_id").attr("disabled", "disabled");
                 $("#btnCheckin").attr("onclick", "checkinInTurn();");
-                $("#div_pay_amount").show();
+                // $("#div_pay_amount").show();
                 $("#checkinDialogTitle").text("采购商品分批入库");
                 $('#purchaseCheckinDialog').modal(modalOptions);
             }

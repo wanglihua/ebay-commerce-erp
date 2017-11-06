@@ -323,7 +323,7 @@ func (c ErpPurchaseCheckin) Checkin() revel.Result {
 	// 查看同一个采购单的明细是不是都是 已入库， 异常， 异常已处理 的这个状态了
 	var bill_id = bill_entry_in_db.BillId
 	count, err := db_session.
-	Where(fmt.Sprintf("bill_id = %d AND status_id <> %d AND status_id <> %d AND status_id <> %d",
+		Where(fmt.Sprintf("bill_id = %d AND status_id <> %d AND status_id <> %d AND status_id <> %d",
 		bill_id,
 		models.PURCHASE_BILL_STATUS_YRK,
 		models.PURCHASE_BILL_STATUS_YC,
@@ -469,7 +469,7 @@ func (c ErpPurchaseCheckin) CheckinInTurn() revel.Result {
 	var other_cost_before = bill_entry_in_db.OtherCost
 	var checkin_qty = bill_entry_from_ui.CheckinQty
 	var checkin_rate = float64(checkin_qty) / float64(qty_before)
-	var pay_amount = bill_entry_from_ui.PayAmount
+	// var pay_amount = bill_entry_from_ui.PayAmount // 付款由财务在财务管理维护
 
 	bill_entry_in_db.Qty = qty_before - checkin_qty
 	bill_entry_in_db.MelQty = bill_entry_in_db.MelQty - int64(math.Floor(float64(mel_qty_before)*checkin_rate+0.5)) // 四舍五入
@@ -492,7 +492,7 @@ func (c ErpPurchaseCheckin) CheckinInTurn() revel.Result {
 	new_bill_entry.BneQty = checkin_qty - new_bill_entry.MelQty
 	new_bill_entry.Price = bill_entry_in_db.Price
 	new_bill_entry.Amount = new_bill_entry.Price * float64(new_bill_entry.Qty)
-	new_bill_entry.PayAmount = pay_amount
+	// new_bill_entry.PayAmount = pay_amount // 付款由财务在财务管理维护
 	new_bill_entry.Desc = core.MakeNullString(bill_entry_from_ui.Desc.String+fmt.Sprintf(" 分批入库，原数量 %d", qty_before), true)
 	new_bill_entry.StatusId = models.PURCHASE_BILL_STATUS_YRK
 	new_bill_entry.CheckinQty = checkin_qty
@@ -509,10 +509,12 @@ func (c ErpPurchaseCheckin) CheckinInTurn() revel.Result {
 	_, err = db_session.Insert(&new_bill_entry)
 	core.HandleError(err)
 
-	// 更新尾款
+	// 更新尾款 // 付款由财务在财务管理维护, 更新尾款也放到那边
+	/*
 	purchase_bill.FinalAmount = purchase_bill.FinalAmount - pay_amount
 	_, err = db_session.Id(purchase_bill.Id).Cols("final_amount").Update(&purchase_bill)
 	core.HandleError(err)
+	*/
 
 	// 计算中国仓成本价
 	purchase_bill_service.CalculateBillEntryCnInventoryCost(purchase_bill.Id, db_session)
