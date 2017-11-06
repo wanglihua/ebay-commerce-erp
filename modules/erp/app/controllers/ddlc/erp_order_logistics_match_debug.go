@@ -8,6 +8,7 @@ import (
 	"matrix/modules/erp/models/ddpz_models"
 	"matrix/modules/erp/models/sppz_models"
 	"matrix/modules/erp/models/ddlc_models"
+	"time"
 )
 
 type ErpOrderLogisticsMatchDebug struct {
@@ -69,6 +70,15 @@ WHERE md.order_code = '2053968244015'
 	}
 	*/
 
+	/*
+		DELETE FROM erp_order_logistics_match_debug WHERE update_time < '2017-11-06 11:30:00';
+	 */
+
+	var sql_delete = `DELETE FROM erp_order_logistics_match_debug WHERE update_time < '%s';`
+	sql_delete = fmt.Sprintf(sql_delete, time.Now().Add(-48 * time.Hour).Format("2006-01-02 15:04:05"))
+	_, err := db_session.Exec(sql_delete)
+	core.HandleError(err)
+
 	var sb = core.NewSqlBuilder()
 	sb.Select("id, order_code, address_postal_code, stock_name, company_name, mode_name, fee_rate_post_code, total_fee, total_cost, match_result, create_time")
 	sb.Count("count(1) as match_debug_count")
@@ -89,13 +99,17 @@ WHERE md.order_code = '2053968244015'
 	sb.Limit(offset, limit)
 
 	order_logistics_match_debug_list := make([]ddlc_models.OrderLogisticsMatchDebugInfo, 0, limit)
-	err := db_session.Sql(sb.SqlList()).Find(&order_logistics_match_debug_list)
+	err = db_session.Sql(sb.SqlList()).Find(&order_logistics_match_debug_list)
 	core.HandleError(err)
 
 	var match_debug_count struct {
 		Count int64 `xorm:"'match_debug_count'"`
 	}
 
+	_, err = db_session.Sql(sb.SqlCount()).Get(&match_debug_count)
+	core.HandleError(err)
+
+	/*
 	if order_code_query != "" {
 		_, err = db_session.Sql(sb.SqlCount()).Get(&match_debug_count)
 		core.HandleError(err)
@@ -104,6 +118,7 @@ WHERE md.order_code = '2053968244015'
 		_, err = db_session.Sql(sql_count).Get(&match_debug_count)
 		core.HandleError(err)
 	}
+	*/
 
 	return c.RenderJson(core.GridResult{
 		Data:  order_logistics_match_debug_list,
@@ -146,10 +161,7 @@ WHERE md.id = %d;`
 func (c ErpOrderLogisticsMatchDebug) Clear() revel.Result {
 	var db_session = c.DbSession
 
-	_, err := db_session.Exec("DROP TABLE erp_order_logistics_match_debug;")
-	core.HandleError(err)
-
-	err = db_session.Sync2(new(ddlc_models.OrderLogisticsMatchDebugInfo))
+	_, err := db_session.Exec("TRUNCATE TABLE erp_order_logistics_match_debug;")
 	core.HandleError(err)
 
 	return c.RenderJson(map[string]interface{}{
