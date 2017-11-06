@@ -644,116 +644,116 @@
 
             // purchaseBillList
             initDataTable(
-                '#purchaseBillList',
-                {
-                    "sAjaxSource": '{%url "ErpPurchaseBill.ListData"%}',
-                    "aaSorting": [[1, "desc"]],
-                    "iDisplayLength": 5,
-                    "aoColumns": [
-                        {
-                            "mDataProp": "pb.id",
-                            "bSearchable": false,
-                            "orderable": false,
-                            "sClass": "center",
-                            "width": 50,
-                            "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
-                            "render": function (data, type, row) {
-                                return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
-                            }
-                        },
-                        {"mDataProp": "pb.code", "title": "批次号", "bSearchable": true, "width": 120},
-                        {
-                            "mDataProp": "sup.name", "title": "供应商", "bSearchable": true, "sClass": "wrap-word",
-                            "render": function (data, type, row) {
-                                return "<div>" + data + "</div>";
-                            }
-                        },
-                        {
-                            "mDataProp": "pb.id", "title": "流程信息", "bSearchable": false, "bSortable": false, "sClass": "center", "width": 200,
-                            "render": function (data, type, row) {
-                                var flow_info = "<table>";
-
-                                flow_info += "<tr><td>申请：</td><td>&nbsp;" + row.ayu.nick_name;
-                                if (row.pb.apply_time != null) {
-                                    flow_info += "&nbsp;" + row.pb.apply_time;
+                    '#purchaseBillList',
+                    {
+                        "sAjaxSource": '{%url "ErpPurchaseBill.ListData"%}',
+                        "aaSorting": [[1, "desc"]],
+                        "iDisplayLength": 5,
+                        "aoColumns": [
+                            {
+                                "mDataProp": "pb.id",
+                                "bSearchable": false,
+                                "orderable": false,
+                                "sClass": "center",
+                                "width": 50,
+                                "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
+                                "render": function (data, type, row) {
+                                    return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
                                 }
-                                flow_info += "</td></tr>";
-
-                                flow_info += "<tr><td>审批：</td><td>";
-                                if (row.pb.approve_time != null) {
-                                    flow_info += "&nbsp;" + row.avu.nick_name + "&nbsp;" + row.pb.approve_time;
-                                } else {
-                                    flow_info += "---";
+                            },
+                            {"mDataProp": "pb.code", "title": "批次号", "bSearchable": true, "width": 120},
+                            {
+                                "mDataProp": "sup.name", "title": "供应商", "bSearchable": true, "sClass": "wrap-word",
+                                "render": function (data, type, row) {
+                                    return "<div>" + data + "</div>";
                                 }
-                                flow_info += "</td></tr>";
+                            },
+                            {
+                                "mDataProp": "pb.id", "title": "流程信息", "bSearchable": false, "bSortable": false, "sClass": "center", "width": 200,
+                                "render": function (data, type, row) {
+                                    var flow_info = "<table>";
 
-                                flow_info += "<tr><td>付款：</td><td>";
-                                if (row.pb.pay_time != null) {
-                                    flow_info += "&nbsp;" + row.pu.nick_name + "&nbsp;" + row.pb.pay_time;
-                                } else {
-                                    flow_info += "---";
+                                    flow_info += "<tr><td>申请：</td><td>&nbsp;" + row.ayu.nick_name;
+                                    if (row.pb.apply_time != null) {
+                                        flow_info += "&nbsp;" + row.pb.apply_time;
+                                    }
+                                    flow_info += "</td></tr>";
+
+                                    flow_info += "<tr><td>审批：</td><td>";
+                                    if (row.pb.approve_time != null) {
+                                        flow_info += "&nbsp;" + row.avu.nick_name + "&nbsp;" + row.pb.approve_time;
+                                    } else {
+                                        flow_info += "---";
+                                    }
+                                    flow_info += "</td></tr>";
+
+                                    flow_info += "<tr><td>付款：</td><td>";
+                                    if (row.pb.pay_time != null) {
+                                        flow_info += "&nbsp;" + row.pu.nick_name + "&nbsp;" + row.pb.pay_time;
+                                    } else {
+                                        flow_info += "---";
+                                    }
+                                    flow_info += "</td></tr>";
+
+                                    flow_info += "<tr><td>入库：</td><td>";
+                                    if (row.pb.checkin_time != null) {
+                                        flow_info += "&nbsp;" + row.cu.nick_name + "&nbsp;" + row.pb.checkin_time;
+                                    } else {
+                                        flow_info += "---";
+                                    }
+                                    flow_info += "</td></tr>";
+
+                                    flow_info += "</table>";
+
+                                    return flow_info;
                                 }
-                                flow_info += "</td></tr>";
-
-                                flow_info += "<tr><td>入库：</td><td>";
-                                if (row.pb.checkin_time != null) {
-                                    flow_info += "&nbsp;" + row.cu.nick_name + "&nbsp;" + row.pb.checkin_time;
-                                } else {
-                                    flow_info += "---";
+                            },
+                            {"mDataProp": "s.name", "title": "状态", "bSearchable": false, "width": 90},
+                            {
+                                "mDataProp": "pb.create_time", "title": "创建时间<br />修改时间", "bSearchable": false, "width": 120,
+                                "render": function (data, type, row) {
+                                    return "<div>" + row.pb.create_time + "</div><div>" + row.pb.update_time + "</div>";
                                 }
-                                flow_info += "</td></tr>";
+                            },
+                            {
+                                "mDataProp": "pb.id",
+                                "bSearchable": false,
+                                "orderable": false,
+                                "sClass": "center",
+                                "width": 100,
+                                "title": '操作',
+                                "render": function (data, type, row) {
+                                    return "<a class='btn btn-xs btn-info btn-inline pull-left' onclick='show_log_dialog(" + data + ");' ><i class='ace-icon fa fa-list'></i>查看历史</a>";
+                                }
+                            }
+                        ],
+                        "fnServerData": function (sSource, aoData, fnCallback) {
+                            showMask("数据加载中，请稍候");
 
-                                flow_info += "</table>";
+                            aoData.push({'name': 'status_id_query', 'value': this_vm.page.status_id_query});
+                            aoData.push({'name': 'code_query', 'value': this_vm.page.code_query});
+                            aoData.push({'name': 'supplier_query', 'value': this_vm.page.supplier_query});
+                            aoData.push({'name': 'user_query_id', 'value': this_vm.page.user_query_id});
+                            aoData.push({'name': 'user_query_value', 'value': this_vm.page.user_query_value});
+                            aoData.push({'name': 'time_query_id', 'value': this_vm.page.time_query_id});
+                            aoData.push({'name': 'query_time_begin', 'value': this_vm.page.query_time_begin});
+                            aoData.push({'name': 'query_time_end', 'value': this_vm.page.query_time_end});
 
-                                return flow_info;
-                            }
-                        },
-                        {"mDataProp": "s.name", "title": "状态", "bSearchable": false, "width": 90},
-                        {
-                            "mDataProp": "pb.create_time", "title": "创建时间<br />修改时间", "bSearchable": false, "width": 120,
-                            "render": function (data, type, row) {
-                                return "<div>" + row.pb.create_time + "</div><div>" + row.pb.update_time + "</div>";
-                            }
-                        },
-                        {
-                            "mDataProp": "pb.id",
-                            "bSearchable": false,
-                            "orderable": false,
-                            "sClass": "center",
-                            "width": 100,
-                            "title": '操作',
-                            "render": function (data, type, row) {
-                                return "<a class='btn btn-xs btn-info btn-inline pull-left' onclick='show_log_dialog(" + data + ");' ><i class='ace-icon fa fa-list'></i>查看历史</a>";
-                            }
+                            $.ajax({
+                                "dataType": 'json',
+                                "url": sSource,
+                                "data": aoData,
+                                "success": function (data) {
+                                    hideMask();
+                                    if (data.success === false) {
+                                        $.msg.error(data.message);
+                                        return;
+                                    }
+                                    fnCallback(data);
+                                }
+                            });
                         }
-                    ],
-                    "fnServerData": function (sSource, aoData, fnCallback) {
-                        showMask("数据加载中，请稍候");
-
-                        aoData.push({'name': 'status_id_query', 'value': this_vm.page.status_id_query});
-                        aoData.push({'name': 'code_query', 'value': this_vm.page.code_query});
-                        aoData.push({'name': 'supplier_query', 'value': this_vm.page.supplier_query});
-                        aoData.push({'name': 'user_query_id', 'value': this_vm.page.user_query_id});
-                        aoData.push({'name': 'user_query_value', 'value': this_vm.page.user_query_value});
-                        aoData.push({'name': 'time_query_id', 'value': this_vm.page.time_query_id});
-                        aoData.push({'name': 'query_time_begin', 'value': this_vm.page.query_time_begin});
-                        aoData.push({'name': 'query_time_end', 'value': this_vm.page.query_time_end});
-
-                        $.ajax({
-                            "dataType": 'json',
-                            "url": sSource,
-                            "data": aoData,
-                            "success": function (data) {
-                                hideMask();
-                                if (data.success === false) {
-                                    $.msg.error(data.message);
-                                    return;
-                                }
-                                fnCallback(data);
-                            }
-                        });
                     }
-                }
             );
 
             $('#purchaseBillList tbody').on('dblclick', 'tr', function () {
@@ -785,79 +785,80 @@
             });
 
             initDataTable(
-                '#purchaseBillEntryList',
-                {
-                    "sAjaxSource": '{%url "ErpPurchaseBillEntry.ListData"%}',
-                    "aaSorting": [[0, "asc"]],
-                    "aoColumns": [
-                        {
-                            "mDataProp": "pbe.id",
-                            "bSearchable": false,
-                            "orderable": false,
-                            "sClass": "center",
-                            "width": 50,
-                            "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
-                            "render": function (data, type, row) {
-                                return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
-                            }
-                        },
-                        {"mDataProp": "p.sku", "title": "SKU", "bSearchable": false, "width": 150},
-                        {
-                            "mDataProp": "p.cn_name", "title": "商品名称", "bSearchable": false, "sClass": "wrap-word",
-                            "render": function (data, type, row) {
-                                return "<div>" + data + "</div>"
-                            }
-                        },
-                        {"mDataProp": "pbe.price", "title": "单价", "bSearchable": false, "sClass": "center", "width": 50},
-                        {
-                            "mDataProp": "pbe.qty", "title": "总数量", "bSearchable": false, "sClass": "center", "width": 80,
-                            "render": function (data, type, row) {
-                                return "" + row.pbe.mel_qty + "&nbsp;MEL" + " + " + row.pbe.bne_qty + "&nbsp;BNE" + " = " + row.pbe.qty;
-                            }
-                        },
-                        {"mDataProp": "pbe.amount", "title": "金额", "bSearchable": false, "sClass": "center", "width": 50},
-                        {"mDataProp": "pbe.checkin_time", "title": "入库时间", "bSearchable": false, "sClass": "center", "width": 120},
-                        {
-                            "mDataProp": "pbe.desc", "title": "备注", "bSearchable": true, "sClass": "wrap-word",
-                            "render": function (data, type, row) {
-                                if (data === null) {
-                                    return "";
-                                } else {
+                    '#purchaseBillEntryList',
+                    {
+                        "sAjaxSource": '{%url "ErpPurchaseBillEntry.ListData"%}',
+                        "aaSorting": [[0, "asc"]],
+                        "aoColumns": [
+                            {
+                                "mDataProp": "pbe.id",
+                                "bSearchable": false,
+                                "orderable": false,
+                                "sClass": "center",
+                                "width": 50,
+                                "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
+                                "render": function (data, type, row) {
+                                    return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
+                                }
+                            },
+                            {"mDataProp": "p.sku", "title": "SKU", "bSearchable": false, "width": 150},
+                            {
+                                "mDataProp": "p.cn_name", "title": "商品名称", "bSearchable": false, "sClass": "wrap-word",
+                                "render": function (data, type, row) {
                                     return "<div>" + data + "</div>"
                                 }
-                            }
-                        },
-                        {"mDataProp": "s.name", "title": "状态", "bSearchable": true, "sClass": "center", "width": 50},
-                        {
-                            "mDataProp": "pbe.create_time", "title": "创建时间<br/>修改时间", "bSearchable": false, "width": 120,
-                            "render": function (data, type, row) {
-                                return "<div>" + row.pbe.create_time + "</div><div>" + row.pbe.update_time + "</div>";
-                            }
-                        }
-                    ],
-                    "fnServerData": function (sSource, aoData, fnCallback) {
-                        showMask("数据加载中，请稍候");
-
-                        aoData.push({'name': 'purchase_bill_id', 'value': this_vm.purchase_bill_id});
-
-                        $.ajax(
+                            },
+                            {"mDataProp": "pbe.price", "title": "单价", "bSearchable": false, "sClass": "center", "width": 50},
                             {
-                                "dataType": 'json',
-                                "url": sSource,
-                                "data": aoData,
-                                "success": function (data) {
-                                    hideMask();
-                                    if (data.success === false) {
-                                        $.msg.error(data.message);
-                                        return;
-                                    }
-                                    fnCallback(data.list_data);
-
-                                    vm.purchase_bill_code = data.purchase_bill_code
+                                "mDataProp": "pbe.qty", "title": "总数量", "bSearchable": false, "sClass": "center", "width": 80,
+                                "render": function (data, type, row) {
+                                    return "" + row.pbe.mel_qty + "&nbsp;MEL" + " + " + row.pbe.bne_qty + "&nbsp;BNE" + " = " + row.pbe.qty;
                                 }
-                            });
+                            },
+                            {"mDataProp": "pbe.amount", "title": "金额", "bSearchable": false, "sClass": "center", "width": 50},
+                            {"mDataProp": "pbe.pay_amount", "title": "付款", "bSearchable": false, "sClass": "center", "width": 50},
+                            {"mDataProp": "pbe.checkin_time", "title": "入库时间", "bSearchable": false, "sClass": "center", "width": 120},
+                            {
+                                "mDataProp": "pbe.desc", "title": "备注", "bSearchable": true, "sClass": "wrap-word",
+                                "render": function (data, type, row) {
+                                    if (data === null) {
+                                        return "";
+                                    } else {
+                                        return "<div>" + data + "</div>"
+                                    }
+                                }
+                            },
+                            {"mDataProp": "s.name", "title": "状态", "bSearchable": true, "sClass": "center", "width": 50},
+                            {
+                                "mDataProp": "pbe.create_time", "title": "创建时间<br/>修改时间", "bSearchable": false, "width": 120,
+                                "render": function (data, type, row) {
+                                    return "<div>" + row.pbe.create_time + "</div><div>" + row.pbe.update_time + "</div>";
+                                }
+                            }
+                        ],
+                        "fnServerData": function (sSource, aoData, fnCallback) {
+                            showMask("数据加载中，请稍候");
+
+                            aoData.push({'name': 'purchase_bill_id', 'value': this_vm.purchase_bill_id});
+
+                            $.ajax(
+                                    {
+                                        "dataType": 'json',
+                                        "url": sSource,
+                                        "data": aoData,
+                                        "success": function (data) {
+                                            hideMask();
+                                            if (data.success === false) {
+                                                $.msg.error(data.message);
+                                                return;
+                                            }
+                                            fnCallback(data.list_data);
+
+                                            vm.purchase_bill_code = data.purchase_bill_code
+                                        }
+                                    });
+                        }
                     }
-                }
             );
 
             $('#purchaseBillEntryList tbody').on('dblclick', 'tr', function () {
@@ -867,58 +868,58 @@
 
             // Product
             initSingleSelectDataTable(
-                '#productList',
-                {
-                    "sAjaxSource": '{%url "ErpPurchaseBillEntry.ProductSelectListData"%}',
-                    "aaSorting": [[1, "asc"]],
-                    "aoColumns": [
-                        {
-                            "mDataProp": "prd.id",
-                            "bSearchable": false,
-                            "orderable": false,
-                            "sClass": "center",
-                            "width": 50,
-                            "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
-                            "render": function (data, type, row) {
-                                return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
-                            }
-                        },
-                        {"mDataProp": "prd.sku", "title": "SKU", "bSearchable": true, "width": 150},
-                        {
-                            "mDataProp": "prd.cn_name", "title": "商品名称", "bSearchable": true,
-                            "render": function (data, type, row) {
-                                return data;
-                                //return "<div style='min-width: 280px;white-space:normal; word-break: break-all; word-wrap:break-word;'>" + row.prd.cn_name + "<br/>" + row.prd.name + "</div>";
-                            }
-                        },
-                        {"mDataProp": "st.name", "title": "状态", "bSearchable": false, "width": 80}
-                    ]
-                }
+                    '#productList',
+                    {
+                        "sAjaxSource": '{%url "ErpPurchaseBillEntry.ProductSelectListData"%}',
+                        "aaSorting": [[1, "asc"]],
+                        "aoColumns": [
+                            {
+                                "mDataProp": "prd.id",
+                                "bSearchable": false,
+                                "orderable": false,
+                                "sClass": "center",
+                                "width": 50,
+                                "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
+                                "render": function (data, type, row) {
+                                    return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
+                                }
+                            },
+                            {"mDataProp": "prd.sku", "title": "SKU", "bSearchable": true, "width": 150},
+                            {
+                                "mDataProp": "prd.cn_name", "title": "商品名称", "bSearchable": true,
+                                "render": function (data, type, row) {
+                                    return data;
+                                    //return "<div style='min-width: 280px;white-space:normal; word-break: break-all; word-wrap:break-word;'>" + row.prd.cn_name + "<br/>" + row.prd.name + "</div>";
+                                }
+                            },
+                            {"mDataProp": "st.name", "title": "状态", "bSearchable": false, "width": 80}
+                        ]
+                    }
             );
 
             initSingleSelectDataTable(
-                '#supplierList',
-                {
-                    "sAjaxSource": '{%url "ErpPurchaseBill.SupplierSelectListData"%}',
-                    "aaSorting": [[1, "asc"]],
-                    "aoColumns": [
-                        {
-                            "mDataProp": "s.id",
-                            "bSearchable": false,
-                            "orderable": false,
-                            "sClass": "center",
-                            "width": 50,
-                            "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
-                            "render": function (data, type, row) {
-                                return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
-                            }
-                        },
-                        {"mDataProp": "s.name", "title": "名称", "bSearchable": true},
-                        {"mDataProp": "s.contact", "title": "联系人", "bSearchable": true, "width": 90},
-                        {"mDataProp": "s.create_time", "title": "创建时间", "bSearchable": false, "width": 120},
-                        {"mDataProp": "s.update_time", "title": "修改时间", "bSearchable": false, "width": 120}
-                    ]
-                }
+                    '#supplierList',
+                    {
+                        "sAjaxSource": '{%url "ErpPurchaseBill.SupplierSelectListData"%}',
+                        "aaSorting": [[1, "asc"]],
+                        "aoColumns": [
+                            {
+                                "mDataProp": "s.id",
+                                "bSearchable": false,
+                                "orderable": false,
+                                "sClass": "center",
+                                "width": 50,
+                                "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
+                                "render": function (data, type, row) {
+                                    return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
+                                }
+                            },
+                            {"mDataProp": "s.name", "title": "名称", "bSearchable": true},
+                            {"mDataProp": "s.contact", "title": "联系人", "bSearchable": true, "width": 90},
+                            {"mDataProp": "s.create_time", "title": "创建时间", "bSearchable": false, "width": 120},
+                            {"mDataProp": "s.update_time", "title": "修改时间", "bSearchable": false, "width": 120}
+                        ]
+                    }
             );
 
         },
@@ -934,21 +935,21 @@
                 showMask("加载中...");
                 $("#purchaseBillDetailForm").clearValidation();
                 $.ajax({
-                        url: '{%url "ErpPurchaseBill.DetailData" %}',
-                        type: "POST",
-                        data: {
-                            "id": id
-                        },
-                        success: function (result) {
-                            hideMask();
-                            if (result.success === false) {
-                                $.msg.error(result.message);
-                                return;
+                            url: '{%url "ErpPurchaseBill.DetailData" %}',
+                            type: "POST",
+                            data: {
+                                "id": id
+                            },
+                            success: function (result) {
+                                hideMask();
+                                if (result.success === false) {
+                                    $.msg.error(result.message);
+                                    return;
+                                }
+                                vm.purchase_bill_detail = result;
+                                $('#purchaseBillDetailDialog').modal(modalOptions);
                             }
-                            vm.purchase_bill_detail = result;
-                            $('#purchaseBillDetailDialog').modal(modalOptions);
                         }
-                    }
                 );
             },
             savePurchaseBill: function () {
@@ -985,25 +986,25 @@
                     hideMask();
                 } else {
                     $.ajax({
-                            url: '{%url "ErpPurchaseBill.Save"%}',
-                            type: "POST",
-                            processData: false,
-                            contentType: 'application/json',
-                            data: JSON.stringify(vm.purchase_bill_detail),
-                            success: function (data) {
-                                hideMask();
-                                if (data.success === false) {
-                                    $.msg.error(data.message);
-                                    //return;
-                                }
-                                else {
-                                    $.msg.show(data.message);
-                                    $('#purchaseBillDetailDialog').modal('hide');
-                                    vm.reloadList();
-                                    //return;
+                                url: '{%url "ErpPurchaseBill.Save"%}',
+                                type: "POST",
+                                processData: false,
+                                contentType: 'application/json',
+                                data: JSON.stringify(vm.purchase_bill_detail),
+                                success: function (data) {
+                                    hideMask();
+                                    if (data.success === false) {
+                                        $.msg.error(data.message);
+                                        //return;
+                                    }
+                                    else {
+                                        $.msg.show(data.message);
+                                        $('#purchaseBillDetailDialog').modal('hide');
+                                        vm.reloadList();
+                                        //return;
+                                    }
                                 }
                             }
-                        }
                     );
                 }
             },
@@ -1111,22 +1112,22 @@
                 showMask("加载中...");
                 $("#purchaseBillEntryDetailForm").clearValidation();
                 $.ajax({
-                        url: '{%url "ErpPurchaseBillEntry.DetailData" %}',
-                        type: "POST",
-                        data: {
-                            "id": id,
-                            "purchase_bill_id": vm.purchase_bill_id
-                        },
-                        success: function (result) {
-                            hideMask();
-                            if (result.success === false) {
-                                $.msg.error(result.message);
-                                return;
+                            url: '{%url "ErpPurchaseBillEntry.DetailData" %}',
+                            type: "POST",
+                            data: {
+                                "id": id,
+                                "purchase_bill_id": vm.purchase_bill_id
+                            },
+                            success: function (result) {
+                                hideMask();
+                                if (result.success === false) {
+                                    $.msg.error(result.message);
+                                    return;
+                                }
+                                vm.purchase_bill_entry_detail = result;
+                                $('#purchaseBillEntryDetailDialog').modal(modalOptions);
                             }
-                            vm.purchase_bill_entry_detail = result;
-                            $('#purchaseBillEntryDetailDialog').modal(modalOptions);
                         }
-                    }
                 );
             },
             savePurchaseBillEntry: function () {
@@ -1169,25 +1170,25 @@
                     hideMask();
                 } else {
                     $.ajax({
-                            url: '{%url "ErpPurchaseBillEntry.Save"%}',
-                            type: "POST",
-                            processData: false,
-                            contentType: 'application/json',
-                            data: JSON.stringify(vm.purchase_bill_entry_detail),
-                            success: function (data) {
-                                hideMask();
-                                if (data.success === false) {
-                                    $.msg.error(data.message);
-                                    //return;
-                                }
-                                else {
-                                    $.msg.show(data.message);
-                                    $('#purchaseBillEntryDetailDialog').modal('hide');
-                                    vm.reloadEntryList();
-                                    //return;
+                                url: '{%url "ErpPurchaseBillEntry.Save"%}',
+                                type: "POST",
+                                processData: false,
+                                contentType: 'application/json',
+                                data: JSON.stringify(vm.purchase_bill_entry_detail),
+                                success: function (data) {
+                                    hideMask();
+                                    if (data.success === false) {
+                                        $.msg.error(data.message);
+                                        //return;
+                                    }
+                                    else {
+                                        $.msg.show(data.message);
+                                        $('#purchaseBillEntryDetailDialog').modal('hide');
+                                        vm.reloadEntryList();
+                                        //return;
+                                    }
                                 }
                             }
-                        }
                     );
                 }
             },
@@ -1335,43 +1336,43 @@
             });
 
             initDataTable(
-                '#purchaseBillLogList',
-                {
-                    "sAjaxSource": '{%url "ErpPurchaseBillLog.ListData"%}',
-                    "aaSorting": [[0, "desc"]],
-                    "aoColumns": [
-                        {"mDataProp": "create_time", "title": "时间", "sClass": "center", "bSearchable": false, "bSortable": false, "width": 120},
-                        {"mDataProp": "login_name", "title": "工号", "sClass": "center", "bSearchable": false, "bSortable": false, "width": 120},
-                        {
-                            "mDataProp": "operation", "title": "描述", "bSearchable": true, "bSortable": false,
-                            "render": function (data, type, row) {
-                                return "<div style='white-space:normal; word-break: break-all; word-wrap:break-word;'>" + data + "</div>";
-                            }
-                        }
-
-                    ],
-                    "fnServerData": function (sSource, aoData, fnCallback) {
-                        showMask("数据加载中，请稍候");
-
-                        aoData.push({'name': 'bill_id', 'value': bill_id});
-
-                        $.ajax({
-                            "dataType": 'json',
-                            "url": sSource,
-                            "data": aoData,
-                            "success": function (data) {
-                                hideMask();
-
-                                if (data.success === false) {
-                                    $.msg.error(data.message);
-                                    return;
+                    '#purchaseBillLogList',
+                    {
+                        "sAjaxSource": '{%url "ErpPurchaseBillLog.ListData"%}',
+                        "aaSorting": [[0, "desc"]],
+                        "aoColumns": [
+                            {"mDataProp": "create_time", "title": "时间", "sClass": "center", "bSearchable": false, "bSortable": false, "width": 120},
+                            {"mDataProp": "login_name", "title": "工号", "sClass": "center", "bSearchable": false, "bSortable": false, "width": 120},
+                            {
+                                "mDataProp": "operation", "title": "描述", "bSearchable": true, "bSortable": false,
+                                "render": function (data, type, row) {
+                                    return "<div style='white-space:normal; word-break: break-all; word-wrap:break-word;'>" + data + "</div>";
                                 }
-
-                                fnCallback(data);
                             }
-                        });
+
+                        ],
+                        "fnServerData": function (sSource, aoData, fnCallback) {
+                            showMask("数据加载中，请稍候");
+
+                            aoData.push({'name': 'bill_id', 'value': bill_id});
+
+                            $.ajax({
+                                "dataType": 'json',
+                                "url": sSource,
+                                "data": aoData,
+                                "success": function (data) {
+                                    hideMask();
+
+                                    if (data.success === false) {
+                                        $.msg.error(data.message);
+                                        return;
+                                    }
+
+                                    fnCallback(data);
+                                }
+                            });
+                        }
                     }
-                }
             );
         }
 
