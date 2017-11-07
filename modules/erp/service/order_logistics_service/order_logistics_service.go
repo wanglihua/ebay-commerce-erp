@@ -321,6 +321,16 @@ func (p_ol *OrderLogisticsService) CalculateListWithOption(order_list []ddlc_mod
 		}
 	}()
 
+	// 清除 48 小时前的匹配信息
+	/*
+	DELETE FROM erp_order_logistics_match_debug WHERE update_time < '2017-11-06 11:30:00';
+    */
+
+	var sql_delete = `DELETE FROM erp_order_logistics_match_debug WHERE update_time < '%s';`
+	sql_delete = fmt.Sprintf(sql_delete, time.Now().Add(-48 * time.Hour).Format("2006-01-02 15:04:05"))
+	_, err := db_session.Exec(sql_delete)
+	core.HandleError(err)
+
 	for _, order := range order_list {
 
 		var p_order_logistics_data = new(order_logistics_data_t)
