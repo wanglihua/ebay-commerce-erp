@@ -958,7 +958,7 @@ func (c ErpInventory) get_export_excel(db_session *xorm.Session) *xlsx.File {
 
 		cell = row.AddCell()
 		set_text_cell_style(cell, "left")
-		cell.Value = inventory_view.Product.Name
+		cell.Value = inventory_view.Product.CnName
 
 		cell = row.AddCell()
 		set_text_cell_style(cell, "left")
