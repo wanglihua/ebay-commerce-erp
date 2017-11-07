@@ -70,6 +70,20 @@ func (c ErpProductExport) Export() revel.Result {
 	if len(id_list) != 0 {
 		var id_str_list = core.Int_list_to_str_list(id_list)
 		filter = core.SqlAnd(filter, fmt.Sprintf("id IN (%s)", strings.Join(id_str_list, ",")))
+	} else {
+		var batch_code int64
+		c.Params.Bind(&batch_code, "batch_code")
+
+		var product_sku_query string
+		c.Params.Bind(&product_sku_query, "product_sku_query")
+
+		if strings.TrimSpace(product_sku_query) != "" {
+			filter = core.SqlAnd(filter, fmt.Sprintf("sku LIKE '%%%s%%'", product_sku_query))
+		}
+
+		if batch_code != 0 {
+			filter = core.SqlAnd(filter, fmt.Sprintf("batch_code = %d", batch_code))
+		}
 	}
 
 	product_list := make([]kcgl_models.ProductInfo, 0)
@@ -191,19 +205,19 @@ func (c ErpProductExport) export_product_list_to_excel(db_session *xorm.Session,
 		col_index++
 
 		cell = row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 10)
+		sheet.SetColWidth(col_index, col_index, 15)
 		set_head_cell_style(cell)
 		cell.Value = "SKU"
 		col_index++
 
 		cell = row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 10)
+		sheet.SetColWidth(col_index, col_index, 30)
 		set_head_cell_style(cell)
 		cell.Value = "中文名称"
 		col_index++
 
 		cell = row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 10)
+		sheet.SetColWidth(col_index, col_index, 15)
 		set_head_cell_style(cell)
 		cell.Value = "采购价（人民币元）"
 		col_index++
