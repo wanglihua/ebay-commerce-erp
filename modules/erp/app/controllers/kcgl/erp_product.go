@@ -41,9 +41,14 @@ func (c ErpProduct) Index() revel.Result {
 	var user_list = make([]auth_models.UserInfo, 0)
 	core.HandleError(db_session.OrderBy("login_name ASC").Find(&user_list))
 
+	var product_status_list = make([]models.StatusInfo, 0)
+	core.HandleError(db_session.Where("type = ?", models.STATUS_TYPE_PRODUCT).OrderBy("id").Find(&product_status_list))
+
 	c.RenderArgs["sale_user_list"] = user_list
 	c.RenderArgs["service_user_list"] = user_list
 	c.RenderArgs["dev_user_list"] = user_list
+
+	c.RenderArgs["product_status_list"] = product_status_list
 
 	return c.RenderTemplate("erp/kcgl/product/product_index.html")
 }
@@ -70,6 +75,9 @@ func (c ErpProduct) ListData() revel.Result {
 
 	var product_name_query string
 	c.Params.Bind(&product_name_query, "product_name_query")
+
+	var product_status_query int64
+	c.Params.Bind(&product_status_query, "product_status_query")
 
 	var sale_user_id_query int64
 	c.Params.Bind(&sale_user_id_query, "sale_user_id_query")
@@ -103,6 +111,10 @@ FROM erp_product prd
 	//query extra filter here
 	if product_cate_query != 0 {
 		filter = core.SqlAnd(filter, fmt.Sprintf("prd.cate_id = %d", product_cate_query))
+	}
+
+	if product_status_query != 0 {
+		filter = core.SqlAnd(filter, fmt.Sprintf("prd.status_id = %d", product_status_query))
 	}
 
 	if strings.TrimSpace(product_sku_query) != "" {

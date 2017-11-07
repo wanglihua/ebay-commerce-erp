@@ -50,10 +50,17 @@
                         <input class="input-sm" id="product_sku_query" name="product_sku_query" placeholder="SKU查询" type="text" style="width: 130px;"/>
                         <label class="control-label no-padding-right" for="product_name_query">商品名称</label>
                         <input class="input-sm" id="product_name_query" name="product_name_query" placeholder="商品名称查询" type="text" style="width: 130px;"/>
+                        <label class="control-label no-padding-right" for="product_status_query">商品状态</label>
+                        <select class="input-sm" id="product_status_query" name="product_status_query" type="text" style="width: 130px;">
+                            <option value="0">--所有状态--</option>
+                            {% range .product_status_list %}
+                            <option value="{%.Id%}">{%.Name%}</option>
+                            {% end %}
+                        </select>
 
                         <label for="sale_user_id_query">销售负责人</label>
                         <select id="sale_user_id_query" name="sale_user_id_query" style="height: 30px; width: 130px;">
-                            <option value="0">销售负责人</option>
+                            <option value="0">--销售负责人--</option>
                             {% range $index, $user := .sale_user_list %}
                             <option value="{% $user.Id %}">{% $user.LoginName %}（{% $user.NickName %}）</option>
                             {% end %}
@@ -61,7 +68,7 @@
                         &nbsp;&nbsp;
                         <label for="service_user_id_query">客服负责人</label>
                         <select id="service_user_id_query" name="service_user_id_query" style="height: 30px; width: 130px;">
-                            <option value="0">客服负责人</option>
+                            <option value="0">--客服负责人--</option>
                             {% range $index, $user := .service_user_list %}
                             <option value="{% $user.Id %}">{% $user.LoginName %}（{% $user.NickName %}）</option>
                             {% end %}
@@ -69,13 +76,13 @@
                         &nbsp;&nbsp;
                         <label for="dev_user_id_query">开发负责人</label>
                         <select id="dev_user_id_query" name="dev_user_id_query" style="height: 30px; width: 130px;">
-                            <option value="0">开发负责人</option>
+                            <option value="0">--开发负责人--</option>
                             {% range $index, $user := .dev_user_list %}
                             <option value="{% $user.Id %}">{% $user.LoginName %}（{% $user.NickName %}）</option>
                             {% end %}
                         </select>
                         &nbsp;&nbsp;
-                        
+
                         <button class="btn btn-mini btn-primary" @click="refreshList()">
                             &nbsp;<i class="ace-icon fa fa-search"></i>查&nbsp;询&nbsp;
                         </button>
@@ -117,195 +124,196 @@
         },
         mounted: function () {
             initDataTable(
-                '#productList',
-                {
-                    "sAjaxSource": '{%url "ErpProduct.ListData"%}',
-                    "aaSorting": [[1, "asc"]],
-                    "aoColumns": [
-                        {
-                            "mDataProp": "prd.id",
-                            "bSearchable": false,
-                            "orderable": false,
-                            "sClass": "center",
-                            "width": 50,
-                            "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
-                            "render": function (data, type, row) {
-                                return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
-                            }
-                        },
-                        {
-                            "mDataProp": "prd.image_url",
-                            "title": "图片",
-                            "bSearchable": false,
-                            "width": 80,
-                            "bSortable": false,
-                            "render": function (data, type, row) {
-                                if (data !== null) {
-                                    return '<a href="' + data + '" target="_blank"><img style="width:60px;height:60px;" src="' + data + '" alt="" /></a>';
-                                }
-                                else {
-                                    return '<img style="width:60px;height:60px;" src="/static/images/no_img.jpg" alt="no image" />';
-                                }
-                            }
-                        },
-                        {
-                            "mDataProp": "prd.sku", "title": "SKU", "bSearchable": true, "sClass": "wrap-word",
-                            "render": function (data, type, row) {
-                                var sup_name = "暂无供应商";
-                                if (row.sup.name !== "") {
-                                    sup_name = row.sup.name;
-                                }
-                                return '<div class="tdSkuNameSup"><a href="/product/detail/' + row.prd.id + '" target="product_detail">' + row.prd.sku + '</a></div><div>' + row.prd.cn_name + '</div><div>' + sup_name + '</div>';
-                            }
-                        },
-                        {
-                            "mDataProp": "prd.name", "title": "商品名称", "bSearchable": true,
-                            "render": function (data, type, row) {
-                                return '<span class="spanProductName"></span>';
-                            }
-                        },
-                        {
-                            "mDataProp": "sup.name", "title": "供应商", "bSearchable": false,
-                            "render": function (data, type, row) {
-                                return '<span class="spanSupName"></span>';
-                            }
-                        },
-                        {
-                            "mDataProp": "cate.full_name", "title": "商品目录<br/>销售人员<br/>客服人员<br/>开发人员", "bSearchable": false, "bSortable": false, "width": 150,
-                            "render": function (data, type, row) {
-                                var str = "";
-
-                                if (row.cate.full_name === "") {
-                                    str += "------";
-                                }
-                                else {
-                                    str += row.cate.full_name;
-                                }
-                                str += "<br/>";
-
-                                if (row.prd.sale_user === "") {
-                                    str += "------";
-                                }
-                                else {
-                                    str += row.prd.sale_user;
-                                }
-                                str += "<br/>";
-
-                                if (row.prd.service_user === "") {
-                                    str += "------";
-                                }
-                                else {
-                                    str += row.prd.service_user;
-                                }
-                                str += "<br/>";
-
-                                if (row.prd.dev_user === "") {
-                                    str += "------";
-                                }
-                                else {
-                                    str += row.prd.dev_user;
-                                }
-                                str += "<br/>";
-
-                                return str;
-                            }
-                        },
-                        {
-                            "mDataProp": "prd.cost_price",
-                            "title": "中国仓<br/>采购价(RMB)",
-                            "bSearchable": false,
-                            "width": 130,
-                            "render": function (data, type, row) {
-                                return dtFormatFloat(data);
-                            }
-                        },
-                        {
-                            "mDataProp": "prd.id",
-                            "title": "仓库库位&nbsp;/&nbsp;库存&nbsp;/&nbsp;待发货&nbsp;/&nbsp;成本价",
-                            "bSearchable": false,
-                            "bSortable": false,
-                            "width": 200,
-                            "render": function (data, type, row) {
-                                var inventory_list = row.inventory_list;
-                                if (inventory_list.length === 0) {
-                                    return "";
-                                }
-
-                                var inventory_desc = "<table class='inline-inventory'><tbody>";
-                                for (var index in inventory_list) {
-                                    inventory_desc += "<tr>";
-                                    var inventory = inventory_list[index];
-                                    inventory_desc += "<td class='sl'>" + inventory.st.name + " " + inventory.sl.name + "</td><td class='qty'>" + inventory.nvt.qty + "</td><td class='pending-qty'>" + inventory.nvt.pending_qty + "</td><td class='price'>" + dtFormatFloat(inventory.nvt.cost_price) + "</td>";
-                                    inventory_desc += "</tr>";
-                                }
-                                inventory_desc += "</tbody></table>";
-                                return inventory_desc;
-                            }
-                        },
-                        {
-                            "mDataProp": "prd.desc", "title": "备注", "bSearchable": true, "sClass": "wrap-word",
-                            "render": function (data, type, row) {
-                                if (data) {
-                                    var max_length = 100;
-                                    if (data.length > max_length) {
-                                        data = data.substr(0, max_length - 3) + "...";
-                                    }
-                                    return "<div>" + data + "</div>";
-                                }
-                                else {
-                                    return "";
-                                }
-                            }
-                        },
-                        {"mDataProp": "st.name", "title": "状态", "bSearchable": false, "width": 60},
-                        {
-                            "mDataProp": "prd.create_time", "title": "创建时间", "bSearchable": false,
-                            "render": function (data, type, row) {
-                                return '<div class="tdCreateTime">' + row.prd.create_time + '</div><div>' + row.prd.update_time + '</div>';
-                            }
-                        },
-                        {
-                            "mDataProp": "prd.update_time", "title": "修改时间", "bSearchable": false,
-                            "render": function (data, type, row) {
-                                return '<span class="spanUpdateTime"></span>';
-                            }
-                        }
-                    ],
-                    "fnServerData": function (sSource, aoData, fnCallback) {
-                        showMask("数据加载中，请稍候");
-
-                        aoData.push({'name': 'product_cate_query', 'value': $('#product_cate_query').val()});
-                        aoData.push({'name': 'product_sku_query', 'value': $('#product_sku_query').val()});
-                        aoData.push({'name': 'product_name_query', 'value': $('#product_name_query').val()});
-
-                        aoData.push({name: 'sale_user_id_query', value: $("#sale_user_id_query").val()});
-                        aoData.push({name: 'service_user_id_query', value: $("#service_user_id_query").val()});
-                        aoData.push({name: 'dev_user_id_query', value: $("#dev_user_id_query").val()});
-
-                        $.ajax(
+                    '#productList',
+                    {
+                        "sAjaxSource": '{%url "ErpProduct.ListData"%}',
+                        "aaSorting": [[1, "asc"]],
+                        "aoColumns": [
                             {
-                                "dataType": 'json',
-                                "url": sSource,
-                                "data": aoData,
-                                "success": function (data) {
-                                    hideMask();
-
-                                    if (data.success === false) {
-                                        $.msg.error(data.message);
-                                        return;
-                                    }
-                                    fnCallback(data);
-
-                                    $(".spanProductName").parent().css("display", "none");
-                                    $(".spanSupName").parent().css("display", "none");
-                                    $(".tdSkuNameSup").parent().css("width", "200px");
-
-                                    $(".spanUpdateTime").parent().css("display", "none");
-                                    $(".tdCreateTime").parent().css("width", "120px");
+                                "mDataProp": "prd.id",
+                                "bSearchable": false,
+                                "orderable": false,
+                                "sClass": "center",
+                                "width": 50,
+                                "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
+                                "render": function (data, type, row) {
+                                    return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
                                 }
-                            });
+                            },
+                            {
+                                "mDataProp": "prd.image_url",
+                                "title": "图片",
+                                "bSearchable": false,
+                                "width": 80,
+                                "bSortable": false,
+                                "render": function (data, type, row) {
+                                    if (data !== null) {
+                                        return '<a href="' + data + '" target="_blank"><img style="width:60px;height:60px;" src="' + data + '" alt="" /></a>';
+                                    }
+                                    else {
+                                        return '<img style="width:60px;height:60px;" src="/static/images/no_img.jpg" alt="no image" />';
+                                    }
+                                }
+                            },
+                            {
+                                "mDataProp": "prd.sku", "title": "SKU", "bSearchable": true, "sClass": "wrap-word",
+                                "render": function (data, type, row) {
+                                    var sup_name = "暂无供应商";
+                                    if (row.sup.name !== "") {
+                                        sup_name = row.sup.name;
+                                    }
+                                    return '<div class="tdSkuNameSup"><a href="/product/detail/' + row.prd.id + '" target="product_detail">' + row.prd.sku + '</a></div><div>' + row.prd.cn_name + '</div><div>' + sup_name + '</div>';
+                                }
+                            },
+                            {
+                                "mDataProp": "prd.name", "title": "商品名称", "bSearchable": true,
+                                "render": function (data, type, row) {
+                                    return '<span class="spanProductName"></span>';
+                                }
+                            },
+                            {
+                                "mDataProp": "sup.name", "title": "供应商", "bSearchable": false,
+                                "render": function (data, type, row) {
+                                    return '<span class="spanSupName"></span>';
+                                }
+                            },
+                            {
+                                "mDataProp": "cate.full_name", "title": "商品目录<br/>销售人员<br/>客服人员<br/>开发人员", "bSearchable": false, "bSortable": false, "width": 150,
+                                "render": function (data, type, row) {
+                                    var str = "";
+
+                                    if (row.cate.full_name === "") {
+                                        str += "------";
+                                    }
+                                    else {
+                                        str += row.cate.full_name;
+                                    }
+                                    str += "<br/>";
+
+                                    if (row.prd.sale_user === "") {
+                                        str += "------";
+                                    }
+                                    else {
+                                        str += row.prd.sale_user;
+                                    }
+                                    str += "<br/>";
+
+                                    if (row.prd.service_user === "") {
+                                        str += "------";
+                                    }
+                                    else {
+                                        str += row.prd.service_user;
+                                    }
+                                    str += "<br/>";
+
+                                    if (row.prd.dev_user === "") {
+                                        str += "------";
+                                    }
+                                    else {
+                                        str += row.prd.dev_user;
+                                    }
+                                    str += "<br/>";
+
+                                    return str;
+                                }
+                            },
+                            {
+                                "mDataProp": "prd.cost_price",
+                                "title": "中国仓<br/>采购价(RMB)",
+                                "bSearchable": false,
+                                "width": 130,
+                                "render": function (data, type, row) {
+                                    return dtFormatFloat(data);
+                                }
+                            },
+                            {
+                                "mDataProp": "prd.id",
+                                "title": "仓库库位&nbsp;/&nbsp;库存&nbsp;/&nbsp;待发货&nbsp;/&nbsp;成本价",
+                                "bSearchable": false,
+                                "bSortable": false,
+                                "width": 200,
+                                "render": function (data, type, row) {
+                                    var inventory_list = row.inventory_list;
+                                    if (inventory_list.length === 0) {
+                                        return "";
+                                    }
+
+                                    var inventory_desc = "<table class='inline-inventory'><tbody>";
+                                    for (var index in inventory_list) {
+                                        inventory_desc += "<tr>";
+                                        var inventory = inventory_list[index];
+                                        inventory_desc += "<td class='sl'>" + inventory.st.name + " " + inventory.sl.name + "</td><td class='qty'>" + inventory.nvt.qty + "</td><td class='pending-qty'>" + inventory.nvt.pending_qty + "</td><td class='price'>" + dtFormatFloat(inventory.nvt.cost_price) + "</td>";
+                                        inventory_desc += "</tr>";
+                                    }
+                                    inventory_desc += "</tbody></table>";
+                                    return inventory_desc;
+                                }
+                            },
+                            {
+                                "mDataProp": "prd.desc", "title": "备注", "bSearchable": true, "sClass": "wrap-word",
+                                "render": function (data, type, row) {
+                                    if (data) {
+                                        var max_length = 100;
+                                        if (data.length > max_length) {
+                                            data = data.substr(0, max_length - 3) + "...";
+                                        }
+                                        return "<div>" + data + "</div>";
+                                    }
+                                    else {
+                                        return "";
+                                    }
+                                }
+                            },
+                            {"mDataProp": "st.name", "title": "状态", "bSearchable": false, "width": 60},
+                            {
+                                "mDataProp": "prd.create_time", "title": "创建时间", "bSearchable": false,
+                                "render": function (data, type, row) {
+                                    return '<div class="tdCreateTime">' + row.prd.create_time + '</div><div>' + row.prd.update_time + '</div>';
+                                }
+                            },
+                            {
+                                "mDataProp": "prd.update_time", "title": "修改时间", "bSearchable": false,
+                                "render": function (data, type, row) {
+                                    return '<span class="spanUpdateTime"></span>';
+                                }
+                            }
+                        ],
+                        "fnServerData": function (sSource, aoData, fnCallback) {
+                            showMask("数据加载中，请稍候");
+
+                            aoData.push({'name': 'product_cate_query', 'value': $('#product_cate_query').val()});
+                            aoData.push({'name': 'product_sku_query', 'value': $('#product_sku_query').val()});
+                            aoData.push({'name': 'product_name_query', 'value': $('#product_name_query').val()});
+                            aoData.push({'name': 'product_status_query', 'value': $('#product_status_query').val()});
+
+                            aoData.push({name: 'sale_user_id_query', value: $("#sale_user_id_query").val()});
+                            aoData.push({name: 'service_user_id_query', value: $("#service_user_id_query").val()});
+                            aoData.push({name: 'dev_user_id_query', value: $("#dev_user_id_query").val()});
+
+                            $.ajax(
+                                    {
+                                        "dataType": 'json',
+                                        "url": sSource,
+                                        "data": aoData,
+                                        "success": function (data) {
+                                            hideMask();
+
+                                            if (data.success === false) {
+                                                $.msg.error(data.message);
+                                                return;
+                                            }
+                                            fnCallback(data);
+
+                                            $(".spanProductName").parent().css("display", "none");
+                                            $(".spanSupName").parent().css("display", "none");
+                                            $(".tdSkuNameSup").parent().css("width", "200px");
+
+                                            $(".spanUpdateTime").parent().css("display", "none");
+                                            $(".tdCreateTime").parent().css("width", "120px");
+                                        }
+                                    });
+                        }
                     }
-                }
             );
 
             $("#thSku").before("<th id='thSkuNameSup'></th>");
@@ -394,25 +402,25 @@
                     hideMask();
                 } else {
                     $.ajax({
-                            url: '{%url "ErpProduct.Save"%}',
-                            type: "POST",
-                            processData: false,
-                            contentType: 'application/json',
-                            data: JSON.stringify(vm.detail),
-                            success: function (data) {
-                                hideMask();
-                                if (data.success === false) {
-                                    $.msg.error(data.message);
-                                    //return;
-                                }
-                                else {
-                                    $.msg.show(data.message);
-                                    $('#productDetailDialog').modal('hide');
-                                    vm.reloadList();
-                                    //return;
+                                url: '{%url "ErpProduct.Save"%}',
+                                type: "POST",
+                                processData: false,
+                                contentType: 'application/json',
+                                data: JSON.stringify(vm.detail),
+                                success: function (data) {
+                                    hideMask();
+                                    if (data.success === false) {
+                                        $.msg.error(data.message);
+                                        //return;
+                                    }
+                                    else {
+                                        $.msg.show(data.message);
+                                        $('#productDetailDialog').modal('hide');
+                                        vm.reloadList();
+                                        //return;
+                                    }
                                 }
                             }
-                        }
                     );
                 }
             },
