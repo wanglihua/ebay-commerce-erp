@@ -215,6 +215,128 @@ ivt.storage_loc_id IN (
 	})
 }
 
+func (c ErpInventory) get_inventory_list_for_export() []InventoryViewItem {
+	var db_session = c.DbSession
+
+	filter := "1=1"
+
+	var stock_id_query int64
+	c.Params.Bind(&stock_id_query, "stock_id_query")
+
+	var product_code_query string
+	c.Params.Bind(&product_code_query, "product_code_query")
+	product_code_query = strings.TrimSpace(product_code_query)
+
+	var product_status_query int64
+	c.Params.Bind(&product_status_query, "product_status_query")
+
+	var cost_price_zero_query int64
+	c.Params.Bind(&cost_price_zero_query, "cost_price_zero_query")
+
+	//product_one2one_query
+	var product_one2one_query int64
+	c.Params.Bind(&product_one2one_query, "product_one2one_query")
+
+	var id_list_str string
+	c.Params.Bind(&id_list_str, "id_list")
+
+	var id_list = make([]int64, 0)
+	if strings.TrimSpace(id_list_str) != "" {
+		id_str_list := strings.Split(id_list_str, ",")
+		for _, id_str := range id_str_list {
+			var ivt_id int64
+			ivt_id, _ = strconv.ParseInt(strings.TrimSpace(id_str), 10, 64)
+			id_list = append(id_list, ivt_id)
+		}
+	}
+
+	/*
+		SELECT ivt.*, st.*, loc.*, prd.*, s.*
+		FROM erp_inventory ivt
+			INNER JOIN erp_stock st ON ivt.stock_id = st.id
+			LEFT JOIN erp_storage_loc loc ON ivt.storage_loc_id = loc.id
+			INNER JOIN erp_product prd ON ivt.product_id = prd.id
+			INNER JOIN erp_status s ON prd.status_id = s.id
+	*/
+
+	var sb = core.NewSqlBuilder()
+	sb.Select(`ivt.*, st.*, loc.*, prd.*, s.*`)
+	sb.Count(`count(ivt.id) AS ivt_count`)
+	sb.From(`erp_inventory ivt
+		    INNER JOIN erp_stock st ON ivt.stock_id = st.id
+		    LEFT JOIN erp_storage_loc loc ON ivt.storage_loc_id = loc.id
+		    INNER JOIN erp_product prd ON ivt.product_id = prd.id
+			INNER JOIN erp_status s ON prd.status_id = s.id`)
+
+	if len(id_list) != 0 {
+		var id_str_list = core.Int_list_to_str_list(id_list)
+		filter = core.SqlAnd(filter, fmt.Sprintf("ivt.id IN (%s)", strings.Join(id_str_list, ",")))
+	} else {
+		if stock_id_query != 0 {
+			filter = core.SqlAnd(filter, fmt.Sprintf("st.id = %d", stock_id_query))
+		}
+
+		if product_code_query != "" {
+			filter = core.SqlAnd(filter, fmt.Sprintf("prd.sku LIKE '%%%s%%'", product_code_query))
+		}
+
+		if product_status_query != 0 {
+			filter = core.SqlAnd(filter, fmt.Sprintf("prd.status_id = %d", product_status_query))
+		}
+
+		var stock_id_str_list = stock_pick_crew_service.Get_login_user_stock_id_str_list(db_session, c.Session)
+		if len(stock_id_str_list) != 0 {
+			filter = core.SqlAnd(filter, fmt.Sprintf("st.id IN (%s)", strings.Join(stock_id_str_list, ",")))
+		} else {
+			filter = core.SqlAnd(filter, "st.id IN (0)")
+		}
+
+		if cost_price_zero_query != 0 {
+			filter = core.SqlAnd(filter, "ivt.cost_price = 0")
+		}
+
+		if product_one2one_query != 0 {
+
+			// 只显示 仓库商品 重复记录
+			if product_one2one_query == PRODUCT_ONE_TO_ONE_STOCK_PRODUCT {
+				filter = core.SqlAnd(filter, `
+ivt.id IN (
+    SELECT id
+    FROM erp_inventory n
+        INNER JOIN (
+                       SELECT stock_id, product_id
+                       FROM erp_inventory
+                       GROUP BY stock_id, product_id
+                       HAVING count(*) > 1
+                   ) r ON n.stock_id = r.stock_id AND n.product_id = r.product_id)`)
+			}
+
+			// 只显示 仓位商品 重复记录
+			if product_one2one_query == PRODUCT_ONE_TO_ONE_STORAGE_LOC_PRODUCT {
+				filter = core.SqlAnd(filter, fmt.Sprintf(`
+ivt.storage_loc_id IN (
+	SELECT nvt.storage_loc_id
+	FROM erp_inventory nvt
+		INNER JOIN erp_storage_loc sl ON nvt.storage_loc_id = sl.id
+		INNER JOIN erp_stock s ON sl.stock_id = s.id
+	WHERE s.stock_type_id = %d AND nvt.storage_loc_id <> 0
+	GROUP BY nvt.storage_loc_id
+	HAVING count(nvt.product_id) > 1)`, sppz_models.STOCK_TYPE_AU))
+			}
+		}
+	}
+
+	sb.Where(filter)
+
+	sb.OrderBy("ivt.id ASC")
+
+	inventory_list := make([]InventoryViewItem, 0)
+	err := db_session.Sql(sb.SqlList()).Find(&inventory_list)
+	core.HandleError(err)
+
+	return inventory_list
+}
+
 type InventoryDetailForm struct {
 	Inventory      kcgl_models.InventoryInfo    `json:"inventory"`
 	StockList      []sppz_models.StockInfo      `json:"stock_list"`
@@ -707,55 +829,7 @@ func (c ErpInventory) Export() revel.Result {
 }
 
 func (c ErpInventory) get_export_excel(db_session *xorm.Session) *xlsx.File {
-	var stock_id_query int64
-	c.Params.Bind(&stock_id_query, "stock_id_query")
-
-	var product_code_query string
-	c.Params.Bind(&product_code_query, "product_code_query")
-	product_code_query = strings.TrimSpace(product_code_query)
-
-	var id_list = make([]int64, 0)
-	c.Params.Bind(&id_list, "id_list")
-
-	/*
-	SELECT ivt.*, st.*, loc.*, prd.*
-	FROM erp_inventory ivt
-		INNER JOIN erp_stock st ON ivt.stock_id = st.id
-		LEFT JOIN erp_storage_loc loc ON ivt.storage_loc_id = loc.id
-		INNER JOIN erp_product prd ON ivt.product_id = prd.id
-	*/
-
-	var sb = core.NewSqlBuilder()
-	sb.Select("ivt.*, st.*, loc.*, prd.*")
-	sb.Count("count(ivt.id) AS ivt_count")
-	sb.From(`erp_inventory ivt
-		    INNER JOIN erp_stock st ON ivt.stock_id = st.id
-		    LEFT JOIN erp_storage_loc loc ON ivt.storage_loc_id = loc.id
-		    INNER JOIN erp_product prd ON ivt.product_id = prd.id`)
-
-	//query extra filter here
-	var stock_id_str_list = stock_pick_crew_service.Get_login_user_stock_id_str_list(db_session, c.Session)
-	var filter = fmt.Sprintf("st.id IN (%s)", strings.Join(stock_id_str_list, ","))
-
-	if len(id_list) == 0 {
-		if stock_id_query != 0 {
-			filter = core.SqlAnd(filter, fmt.Sprintf("st.id = %d", stock_id_query))
-		}
-
-		if product_code_query != "" {
-			filter = core.SqlAnd(filter, fmt.Sprintf("prd.sku LIKE '%%%s%%'", product_code_query))
-		}
-	} else {
-		var id_str_list = core.Int_list_to_str_list(id_list)
-		filter = core.SqlAnd(filter, fmt.Sprintf("ivt.id IN (%s)", strings.Join(id_str_list, ",")))
-	}
-
-	sb.Where(filter)
-	sb.OrderBy("ivt.id")
-
-	inventory_list := make([]InventoryViewItem, 0)
-	err := db_session.Sql(sb.SqlList()).Find(&inventory_list)
-	core.HandleError(err)
+	var inventory_list = c.get_inventory_list_for_export()
 
 	//创建工作薄
 	xlsx_file := xlsx.NewFile()
@@ -1260,55 +1334,7 @@ func (c ErpInventory) ExportProductStorageLoc() revel.Result {
 }
 
 func (c ErpInventory) get_export_product_storage_loc_excel(db_session *xorm.Session) *xlsx.File {
-	var stock_id_query int64
-	c.Params.Bind(&stock_id_query, "stock_id_query")
-
-	var product_code_query string
-	c.Params.Bind(&product_code_query, "product_code_query")
-	product_code_query = strings.TrimSpace(product_code_query)
-
-	var id_list = make([]int64, 0)
-	c.Params.Bind(&id_list, "id_list")
-
-	/*
-	SELECT ivt.*, st.*, loc.*, prd.*
-	FROM erp_inventory ivt
-		INNER JOIN erp_stock st ON ivt.stock_id = st.id
-		LEFT JOIN erp_storage_loc loc ON ivt.storage_loc_id = loc.id
-		INNER JOIN erp_product prd ON ivt.product_id = prd.id
-	*/
-
-	var sb = core.NewSqlBuilder()
-	sb.Select("ivt.*, st.*, loc.*, prd.*")
-	sb.Count("count(ivt.id) AS ivt_count")
-	sb.From(`erp_inventory ivt
-		    INNER JOIN erp_stock st ON ivt.stock_id = st.id
-		    LEFT JOIN erp_storage_loc loc ON ivt.storage_loc_id = loc.id
-		    INNER JOIN erp_product prd ON ivt.product_id = prd.id`)
-
-	//query extra filter here
-	var stock_id_str_list = stock_pick_crew_service.Get_login_user_stock_id_str_list(db_session, c.Session)
-	var filter = fmt.Sprintf("st.id IN (%s)", strings.Join(stock_id_str_list, ","))
-
-	if len(id_list) == 0 {
-		if stock_id_query != 0 {
-			filter = core.SqlAnd(filter, fmt.Sprintf("st.id = %d", stock_id_query))
-		}
-
-		if product_code_query != "" {
-			filter = core.SqlAnd(filter, fmt.Sprintf("prd.sku LIKE '%%%s%%'", product_code_query))
-		}
-	} else {
-		var id_str_list = core.Int_list_to_str_list(id_list)
-		filter = core.SqlAnd(filter, fmt.Sprintf("ivt.id IN (%s)", strings.Join(id_str_list, ",")))
-	}
-
-	sb.Where(filter)
-	sb.OrderBy("ivt.id")
-
-	inventory_list := make([]InventoryViewItem, 0)
-	err := db_session.Sql(sb.SqlList()).Find(&inventory_list)
-	core.HandleError(err)
+	var inventory_list = c.get_inventory_list_for_export()
 
 	//创建工作薄
 	xlsx_file := xlsx.NewFile()
@@ -1697,55 +1723,8 @@ func (c ErpInventory) ExportInventoryQuantity() revel.Result {
 }
 
 func (c ErpInventory) get_export_inventory_quantity_excel(db_session *xorm.Session) *xlsx.File {
-	var stock_id_query int64
-	c.Params.Bind(&stock_id_query, "stock_id_query")
 
-	var product_code_query string
-	c.Params.Bind(&product_code_query, "product_code_query")
-	product_code_query = strings.TrimSpace(product_code_query)
-
-	var id_list = make([]int64, 0)
-	c.Params.Bind(&id_list, "id_list")
-
-	/*
-	SELECT ivt.*, st.*, loc.*, prd.*
-	FROM erp_inventory ivt
-		INNER JOIN erp_stock st ON ivt.stock_id = st.id
-		LEFT JOIN erp_storage_loc loc ON ivt.storage_loc_id = loc.id
-		INNER JOIN erp_product prd ON ivt.product_id = prd.id
-	*/
-
-	var sb = core.NewSqlBuilder()
-	sb.Select("ivt.*, st.*, loc.*, prd.*")
-	sb.Count("count(ivt.id) AS ivt_count")
-	sb.From(`erp_inventory ivt
-		    INNER JOIN erp_stock st ON ivt.stock_id = st.id
-		    LEFT JOIN erp_storage_loc loc ON ivt.storage_loc_id = loc.id
-		    INNER JOIN erp_product prd ON ivt.product_id = prd.id`)
-
-	//query extra filter here
-	var stock_id_str_list = stock_pick_crew_service.Get_login_user_stock_id_str_list(db_session, c.Session)
-	var filter = fmt.Sprintf("st.id IN (%s)", strings.Join(stock_id_str_list, ","))
-
-	if len(id_list) == 0 {
-		if stock_id_query != 0 {
-			filter = core.SqlAnd(filter, fmt.Sprintf("st.id = %d", stock_id_query))
-		}
-
-		if product_code_query != "" {
-			filter = core.SqlAnd(filter, fmt.Sprintf("prd.sku LIKE '%%%s%%'", product_code_query))
-		}
-	} else {
-		var id_str_list = core.Int_list_to_str_list(id_list)
-		filter = core.SqlAnd(filter, fmt.Sprintf("ivt.id IN (%s)", strings.Join(id_str_list, ",")))
-	}
-
-	sb.Where(filter)
-	sb.OrderBy("ivt.id")
-
-	inventory_list := make([]InventoryViewItem, 0)
-	err := db_session.Sql(sb.SqlList()).Find(&inventory_list)
-	core.HandleError(err)
+	var inventory_list = c.get_inventory_list_for_export()
 
 	//创建工作薄
 	xlsx_file := xlsx.NewFile()
@@ -2150,55 +2129,8 @@ func (c ErpInventory) ExportInventoryPrice() revel.Result {
 }
 
 func (c ErpInventory) get_export_inventory_price_excel(db_session *xorm.Session) *xlsx.File {
-	var stock_id_query int64
-	c.Params.Bind(&stock_id_query, "stock_id_query")
 
-	var product_code_query string
-	c.Params.Bind(&product_code_query, "product_code_query")
-	product_code_query = strings.TrimSpace(product_code_query)
-
-	var id_list = make([]int64, 0)
-	c.Params.Bind(&id_list, "id_list")
-
-	/*
-	SELECT ivt.*, st.*, loc.*, prd.*
-	FROM erp_inventory ivt
-		INNER JOIN erp_stock st ON ivt.stock_id = st.id
-		LEFT JOIN erp_storage_loc loc ON ivt.storage_loc_id = loc.id
-		INNER JOIN erp_product prd ON ivt.product_id = prd.id
-	*/
-
-	var sb = core.NewSqlBuilder()
-	sb.Select("ivt.*, st.*, loc.*, prd.*")
-	sb.Count("count(ivt.id) AS ivt_count")
-	sb.From(`erp_inventory ivt
-		    INNER JOIN erp_stock st ON ivt.stock_id = st.id
-		    LEFT JOIN erp_storage_loc loc ON ivt.storage_loc_id = loc.id
-		    INNER JOIN erp_product prd ON ivt.product_id = prd.id`)
-
-	//query extra filter here
-	var stock_id_str_list = stock_pick_crew_service.Get_login_user_stock_id_str_list(db_session, c.Session)
-	var filter = fmt.Sprintf("st.id IN (%s)", strings.Join(stock_id_str_list, ","))
-
-	if len(id_list) == 0 {
-		if stock_id_query != 0 {
-			filter = core.SqlAnd(filter, fmt.Sprintf("st.id = %d", stock_id_query))
-		}
-
-		if product_code_query != "" {
-			filter = core.SqlAnd(filter, fmt.Sprintf("prd.sku LIKE '%%%s%%'", product_code_query))
-		}
-	} else {
-		var id_str_list = core.Int_list_to_str_list(id_list)
-		filter = core.SqlAnd(filter, fmt.Sprintf("ivt.id IN (%s)", strings.Join(id_str_list, ",")))
-	}
-
-	sb.Where(filter)
-	sb.OrderBy("ivt.id")
-
-	inventory_list := make([]InventoryViewItem, 0)
-	err := db_session.Sql(sb.SqlList()).Find(&inventory_list)
-	core.HandleError(err)
+	var inventory_list = c.get_inventory_list_for_export()
 
 	//创建工作薄
 	xlsx_file := xlsx.NewFile()

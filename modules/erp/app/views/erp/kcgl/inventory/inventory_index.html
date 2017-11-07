@@ -37,10 +37,6 @@
                         <i class="ace-icon fa fa-file-excel-o"></i>
                         导入
                     </button>
-                    <button class="btn btn-pink btn-sm" @click="exportInventory()">
-                        <i class="ace-icon fa fa-file-excel-o"></i>
-                        导出
-                    </button>
                     */%}
                     <button class="btn btn-danger btn-sm" @click="deleteInventory()">
                         <i class="ace-icon fa fa-trash-o"></i>
@@ -84,27 +80,41 @@
                         导出库存价格
                     </button>
                     {% end %}
+                    <button class="btn btn-pink btn-sm" @click="exportInventory()">
+                        <i class="ace-icon fa fa-file-excel-o"></i>
+                        导出库存信息
+                    </button>
                 </div>
-                {%/*
                 <form id="formExport" method="post" action='{%url "ErpInventory.Export" %}'>
                     <input type="hidden" name="stock_id_query" v-model="page.stock_id_query"/>
                     <input type="hidden" name="product_code_query" v-model="page.product_code_query"/>
+                    <input type="hidden" name="product_status_query" v-model="page.product_status_query"/>
+                    <input type="hidden" name="cost_price_zero_query" v-model="page.cost_price_zero_query"/>
+                    <input type="hidden" name="product_one2one_query" v-model="page.product_one2one_query"/>
                     <input id="formExportIdList" type="hidden" name="id_list"/>
                 </form>
-                */%}
                 <form id="formSkuLocExport" method="post" action='{%url "ErpInventory.ExportProductStorageLoc" %}'>
                     <input type="hidden" name="stock_id_query" v-model="page.stock_id_query"/>
                     <input type="hidden" name="product_code_query" v-model="page.product_code_query"/>
+                    <input type="hidden" name="product_status_query" v-model="page.product_status_query"/>
+                    <input type="hidden" name="cost_price_zero_query" v-model="page.cost_price_zero_query"/>
+                    <input type="hidden" name="product_one2one_query" v-model="page.product_one2one_query"/>
                     <input id="formSkuLocExportIdList" type="hidden" name="id_list"/>
                 </form>
                 <form id="formSkuQtyExport" method="post" action='{%url "ErpInventory.ExportInventoryQuantity" %}'>
                     <input type="hidden" name="stock_id_query" v-model="page.stock_id_query"/>
                     <input type="hidden" name="product_code_query" v-model="page.product_code_query"/>
+                    <input type="hidden" name="product_status_query" v-model="page.product_status_query"/>
+                    <input type="hidden" name="cost_price_zero_query" v-model="page.cost_price_zero_query"/>
+                    <input type="hidden" name="product_one2one_query" v-model="page.product_one2one_query"/>
                     <input id="formSkuQtyExportIdList" type="hidden" name="id_list"/>
                 </form>
                 <form id="formSkuPriceExport" method="post" action='{%url "ErpInventory.ExportInventoryPrice" %}'>
                     <input type="hidden" name="stock_id_query" v-model="page.stock_id_query"/>
                     <input type="hidden" name="product_code_query" v-model="page.product_code_query"/>
+                    <input type="hidden" name="product_status_query" v-model="page.product_status_query"/>
+                    <input type="hidden" name="cost_price_zero_query" v-model="page.cost_price_zero_query"/>
+                    <input type="hidden" name="product_one2one_query" v-model="page.product_one2one_query"/>
                     <input id="formSkuPriceExportIdList" type="hidden" name="id_list"/>
                 </form>
                 <div style="margin-top: 10px;">
@@ -715,26 +725,25 @@
                     hideMask();
                 } else {
                     $.ajax({
-                                url: '{%url "ErpInventory.Save"%}',
-                                type: "POST",
-                                processData: false,
-                                contentType: 'application/json',
-                                data: JSON.stringify(post_data),
-                                success: function (data) {
-                                    hideMask();
-                                    if (data.success === false) {
-                                        $.msg.error(data.message);
-                                        //return;
-                                    }
-                                    else {
-                                        $.msg.show(data.message);
-                                        $('#inventoryDetailDialog').modal('hide');
-                                        vm.reloadList();
-                                        //return;
-                                    }
-                                }
+                        url: '{%url "ErpInventory.Save"%}',
+                        type: "POST",
+                        processData: false,
+                        contentType: 'application/json',
+                        data: JSON.stringify(post_data),
+                        success: function (data) {
+                            hideMask();
+                            if (data.success === false) {
+                                $.msg.error(data.message);
+                                //return;
                             }
-                    );
+                            else {
+                                $.msg.show(data.message);
+                                $('#inventoryDetailDialog').modal('hide');
+                                vm.reloadList();
+                                //return;
+                            }
+                        }
+                    });
                 }
             },
             deleteInventory: function () {
