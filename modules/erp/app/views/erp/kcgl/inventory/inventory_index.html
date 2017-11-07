@@ -132,6 +132,13 @@
                         </select>
                         <label class="control-label no-padding-right" for="product_code_query">商品编号</label>
                         <input id="product_code_query" class="input-sm" name="product_code_query" placeholder="商品编号查询" type="text" v-model="page.product_code_query" style="width: 100px;"/>
+                        <label class="control-label no-padding-right" for="product_status_query">商品状态</label>
+                        <select id="product_status_query" name="page.product_status_query" v-model.number="page.product_status_query" style="width: 135px;" @change="refreshList()">
+                            <option :value="0">-所有状态-</option>
+                            <template v-for="status in page.product_status_list">
+                                <option :value="status.id">{{status.name}}</option>
+                            </template>
+                        </select>
                         <label class="control-label no-padding-right" for="cost_price_zero_query">成本价过滤</label>
                         <select id="cost_price_zero_query" name="cost_price_zero_query" v-model.number="page.cost_price_zero_query" style="width: 140px;">
                             <option :value="0">显示全部成本价记录</option>
@@ -512,16 +519,16 @@
 
     function loadPageData(this_vm) {
         $.ajax({
-                url: '{%url "ErpInventory.PageData" %}',
-                type: "POST",
-                success: function (result) {
-                    if (result.success === false) {
-                        $.msg.error(result.message);
-                        return;
+                    url: '{%url "ErpInventory.PageData" %}',
+                    type: "POST",
+                    success: function (result) {
+                        if (result.success === false) {
+                            $.msg.error(result.message);
+                            return;
+                        }
+                        this_vm.page = result;
                     }
-                    this_vm.page = result;
                 }
-            }
         );
     }
 
@@ -535,6 +542,8 @@
             "page": {
                 "stock_id_query": 0,
                 "stock_list": [],
+                "product_status_query": 0,
+                "product_status_list": [],
                 "product_code_query": "",
                 "cost_price_zero_query": 0,
                 "product_one2one_query": 0
@@ -550,92 +559,99 @@
             loadPageData(this_vm);
 
             initDataTable(
-                '#inventoryList',
-                {
-                    "sAjaxSource": '{%url "ErpInventory.ListData"%}',
-                    "aaSorting": [[1, "asc"]],
-                    "aoColumns": [
-                        {
-                            "mDataProp": "ivt.id",
-                            "bSearchable": false,
-                            "orderable": false,
-                            "sClass": "center",
-                            "width": 50,
-                            "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
-                            "render": function (data, type, row) {
-                                return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
-                            }
-                        },
-                        {"mDataProp": "st.name", "title": "仓库", "bSearchable": true, "width": 120},
-                        {"mDataProp": "loc.name", "title": "仓位", "bSearchable": true, "width": 100},
-                        {"mDataProp": "prd.sku", "title": "SKU", "bSearchable": true, "width": 120},
-                        {
-                            "mDataProp": "prd.cn_name", "title": "商品名称", "bSearchable": true, "sClass": "wrap-word",
-                            "render": function (data, type, row) {
-                                return "<div>" + data + "</div>"
-                            }
-                        },
-                        {
-                            "mDataProp": "ivt.qty",
-                            "title": "数量",
-                            "sClass": "dtRight",
-                            "bSearchable": false,
-                            "width": 60
-                        },
-                        {
-                            "mDataProp": "ivt.pending_qty",
-                            "title": "待发货",
-                            "sClass": "dtRight",
-                            "bSearchable": false,
-                            "width": 60
-                        },
-                        {
-                            "mDataProp": "ivt.cost_price",
-                            "title": "成本价",
-                            "sClass": "dtRight",
-                            "bSearchable": false,
-                            "width": 80,
-                            "render": function (data, type, row) {
-                                return dtFormatFloat(data);
-                            }
-                        },
-                        {
-                            "mDataProp": "ivt.id",
-                            "bSearchable": false,
-                            "orderable": false,
-                            "sClass": "center",
-                            "width": 100,
-                            "title": '操作',
-                            "render": function (data, type, row) {
-                                return "<a class='btn btn-xs btn-info btn-inline pull-left' onclick='show_inventory_history_dialog(" + data + ");' ><i class='ace-icon fa fa-list'></i>查看历史</a>";
-                            }
-                        }
-                    ],
-                    "fnServerData": function (sSource, aoData, fnCallback) {
-                        showMask("数据加载中，请稍候");
-
-                        aoData.push({'name': 'stock_id_query', 'value': this_vm.page.stock_id_query});
-                        aoData.push({'name': 'product_code_query', 'value': this_vm.page.product_code_query});
-                        aoData.push({'name': 'cost_price_zero_query', 'value': this_vm.page.cost_price_zero_query});
-                        aoData.push({'name': 'product_one2one_query', 'value': this_vm.page.product_one2one_query});
-
-                        $.ajax({
-                            "dataType": 'json',
-                            "url": sSource,
-                            "data": aoData,
-                            "success": function (data) {
-                                hideMask();
-
-                                if (data.success === false) {
-                                    $.msg.error(data.message);
-                                    return;
+                    '#inventoryList',
+                    {
+                        "sAjaxSource": '{%url "ErpInventory.ListData"%}',
+                        "aaSorting": [[1, "asc"]],
+                        "aoColumns": [
+                            {
+                                "mDataProp": "ivt.id",
+                                "bSearchable": false,
+                                "orderable": false,
+                                "sClass": "center",
+                                "width": 50,
+                                "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
+                                "render": function (data, type, row) {
+                                    return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
                                 }
-
-                                fnCallback(data);
+                            },
+                            {"mDataProp": "st.name", "title": "仓库", "bSearchable": true, "width": 120},
+                            {"mDataProp": "loc.name", "title": "仓位", "bSearchable": true, "width": 100},
+                            {"mDataProp": "prd.sku", "title": "SKU", "bSearchable": true, "width": 120},
+                            {
+                                "mDataProp": "prd.cn_name", "title": "商品名称", "bSearchable": true, "sClass": "wrap-word",
+                                "render": function (data, type, row) {
+                                    return "<div>" + data + "</div>"
+                                }
+                            },
+                            {
+                                "mDataProp": "s.name", "title": "状态", "bSearchable": true, "width": 60,
+                                "render": function (data, type, row) {
+                                    return "<div>" + data + "</div>"
+                                }
+                            },
+                            {
+                                "mDataProp": "ivt.qty",
+                                "title": "数量",
+                                "sClass": "dtRight",
+                                "bSearchable": false,
+                                "width": 60
+                            },
+                            {
+                                "mDataProp": "ivt.pending_qty",
+                                "title": "待发货",
+                                "sClass": "dtRight",
+                                "bSearchable": false,
+                                "width": 60
+                            },
+                            {
+                                "mDataProp": "ivt.cost_price",
+                                "title": "成本价",
+                                "sClass": "dtRight",
+                                "bSearchable": false,
+                                "width": 80,
+                                "render": function (data, type, row) {
+                                    return dtFormatFloat(data);
+                                }
+                            },
+                            {
+                                "mDataProp": "ivt.id",
+                                "bSearchable": false,
+                                "orderable": false,
+                                "sClass": "center",
+                                "width": 100,
+                                "title": '操作',
+                                "render": function (data, type, row) {
+                                    return "<a class='btn btn-xs btn-info btn-inline pull-left' onclick='show_inventory_history_dialog(" + data + ");' ><i class='ace-icon fa fa-list'></i>查看历史</a>";
+                                }
                             }
-                        });
+                        ],
+                        "fnServerData": function (sSource, aoData, fnCallback) {
+                            showMask("数据加载中，请稍候");
+
+                            aoData.push({'name': 'stock_id_query', 'value': this_vm.page.stock_id_query});
+                            aoData.push({'name': 'product_code_query', 'value': this_vm.page.product_code_query});
+                            aoData.push({'name': 'product_status_query', 'value': this_vm.page.product_status_query});
+                            aoData.push({'name': 'cost_price_zero_query', 'value': this_vm.page.cost_price_zero_query});
+                            aoData.push({'name': 'product_one2one_query', 'value': this_vm.page.product_one2one_query});
+
+                            $.ajax({
+                                "dataType": 'json',
+                                "url": sSource,
+                                "data": aoData,
+                                "success": function (data) {
+                                    hideMask();
+
+                                    if (data.success === false) {
+                                        $.msg.error(data.message);
+                                        return;
+                                    }
+
+                                    fnCallback(data);
+                                }
+                            });
+                        }
                     }
-                }
             );
 
             $('#inventoryList tbody').on('dblclick', 'tr', function () {
@@ -656,21 +672,21 @@
                 showMask("加载中...");
                 $("#inventoryDetailForm").clearValidation();
                 $.ajax({
-                        url: '{%url "ErpInventory.DetailData" %}',
-                        type: "POST",
-                        data: {
-                            "id": id
-                        },
-                        success: function (result) {
-                            hideMask();
-                            if (result.success === false) {
-                                $.msg.error(result.message);
-                                return;
+                            url: '{%url "ErpInventory.DetailData" %}',
+                            type: "POST",
+                            data: {
+                                "id": id
+                            },
+                            success: function (result) {
+                                hideMask();
+                                if (result.success === false) {
+                                    $.msg.error(result.message);
+                                    return;
+                                }
+                                vm.detail = result;
+                                $('#inventoryDetailDialog').modal(modalOptions);
                             }
-                            vm.detail = result;
-                            $('#inventoryDetailDialog').modal(modalOptions);
                         }
-                    }
                 );
             },
             saveInventory: function () {
@@ -699,25 +715,25 @@
                     hideMask();
                 } else {
                     $.ajax({
-                            url: '{%url "ErpInventory.Save"%}',
-                            type: "POST",
-                            processData: false,
-                            contentType: 'application/json',
-                            data: JSON.stringify(post_data),
-                            success: function (data) {
-                                hideMask();
-                                if (data.success === false) {
-                                    $.msg.error(data.message);
-                                    //return;
-                                }
-                                else {
-                                    $.msg.show(data.message);
-                                    $('#inventoryDetailDialog').modal('hide');
-                                    vm.reloadList();
-                                    //return;
+                                url: '{%url "ErpInventory.Save"%}',
+                                type: "POST",
+                                processData: false,
+                                contentType: 'application/json',
+                                data: JSON.stringify(post_data),
+                                success: function (data) {
+                                    hideMask();
+                                    if (data.success === false) {
+                                        $.msg.error(data.message);
+                                        //return;
+                                    }
+                                    else {
+                                        $.msg.show(data.message);
+                                        $('#inventoryDetailDialog').modal('hide');
+                                        vm.reloadList();
+                                        //return;
+                                    }
                                 }
                             }
-                        }
                     );
                 }
             },
@@ -865,47 +881,47 @@
             });
 
             initDataTable(
-                '#inventoryHistoryList',
-                {
-                    "sAjaxSource": '{%url "ErpInventoryHistory.ListData"%}',
-                    "aaSorting": [[0, "desc"]],
-                    "aoColumns": [
-                        {"mDataProp": "his.create_time", "title": "时间", "sClass": "center", "bSearchable": false, "bSortable": false, "width": 120},
-                        {"mDataProp": "st.name", "title": "仓库", "sClass": "center", "bSearchable": false, "bSortable": false},
-                        {"mDataProp": "loc.name", "title": "库位", "sClass": "center", "bSearchable": false, "bSortable": false},
-                        {"mDataProp": "prd.sku", "title": "商品", "sClass": "center", "bSearchable": false, "bSortable": false},
-                        {"mDataProp": "his.price", "title": "价格", "sClass": "center", "bSearchable": false, "bSortable": false},
-                        {"mDataProp": "his.qty", "title": "数量", "sClass": "center", "bSearchable": false, "bSortable": false},
-                        {
-                            "mDataProp": "his.description", "title": "描述", "bSearchable": true, "bSortable": false,
-                            "render": function (data, type, row) {
-                                return "<div style='white-space:normal; word-break: break-all; word-wrap:break-word;'>" + data + "</div>";
-                            }
-                        }
-
-                    ],
-                    "fnServerData": function (sSource, aoData, fnCallback) {
-                        showMask("数据加载中，请稍候");
-
-                        aoData.push({'name': 'inventory_id', 'value': inventory_id});
-
-                        $.ajax({
-                            "dataType": 'json',
-                            "url": sSource,
-                            "data": aoData,
-                            "success": function (data) {
-                                hideMask();
-
-                                if (data.success === false) {
-                                    $.msg.error(data.message);
-                                    return;
+                    '#inventoryHistoryList',
+                    {
+                        "sAjaxSource": '{%url "ErpInventoryHistory.ListData"%}',
+                        "aaSorting": [[0, "desc"]],
+                        "aoColumns": [
+                            {"mDataProp": "his.create_time", "title": "时间", "sClass": "center", "bSearchable": false, "bSortable": false, "width": 120},
+                            {"mDataProp": "st.name", "title": "仓库", "sClass": "center", "bSearchable": false, "bSortable": false},
+                            {"mDataProp": "loc.name", "title": "库位", "sClass": "center", "bSearchable": false, "bSortable": false},
+                            {"mDataProp": "prd.sku", "title": "商品", "sClass": "center", "bSearchable": false, "bSortable": false},
+                            {"mDataProp": "his.price", "title": "价格", "sClass": "center", "bSearchable": false, "bSortable": false},
+                            {"mDataProp": "his.qty", "title": "数量", "sClass": "center", "bSearchable": false, "bSortable": false},
+                            {
+                                "mDataProp": "his.description", "title": "描述", "bSearchable": true, "bSortable": false,
+                                "render": function (data, type, row) {
+                                    return "<div style='white-space:normal; word-break: break-all; word-wrap:break-word;'>" + data + "</div>";
                                 }
-
-                                fnCallback(data);
                             }
-                        });
+
+                        ],
+                        "fnServerData": function (sSource, aoData, fnCallback) {
+                            showMask("数据加载中，请稍候");
+
+                            aoData.push({'name': 'inventory_id', 'value': inventory_id});
+
+                            $.ajax({
+                                "dataType": 'json',
+                                "url": sSource,
+                                "data": aoData,
+                                "success": function (data) {
+                                    hideMask();
+
+                                    if (data.success === false) {
+                                        $.msg.error(data.message);
+                                        return;
+                                    }
+
+                                    fnCallback(data);
+                                }
+                            });
+                        }
                     }
-                }
             );
         }
 

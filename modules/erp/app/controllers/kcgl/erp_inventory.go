@@ -22,6 +22,7 @@ import (
 	"matrix/modules/erp/service/inventory_history_service"
 	"matrix/modules/erp/models/kcgl_models"
 	"matrix/modules/erp/models/sppz_models"
+	"matrix/modules/erp/models"
 )
 
 type ErpInventory struct {
@@ -65,12 +66,19 @@ func (c ErpInventory) Index() revel.Result {
 
 func (c ErpInventory) PageData() revel.Result {
 	var db_session = c.DbSession
+
 	var stock_list = make([]sppz_models.StockInfo, 0)
 	err := db_session.Find(&stock_list)
 	core.HandleError(err)
 
+	var product_status_list = make([]models.StatusInfo, 0)
+	err = db_session.Where("type = ?", models.STATUS_TYPE_PRODUCT).OrderBy("id").Find(&product_status_list)
+	core.HandleError(err)
+
 	return c.RenderJson(map[string]interface{}{
 		"stock_list":            stock_list,
+		"product_status_query":  0,
+		"product_status_list":   product_status_list,
 		"stock_id_query":        0,
 		"product_code_query":    "",
 		"cost_price_zero_query": 0,
@@ -83,6 +91,7 @@ type InventoryViewItem struct {
 	Stock      sppz_models.StockInfo      `xorm:"extends" json:"st"`
 	StorageLoc sppz_models.StorageLocInfo `xorm:"extends" json:"loc"`
 	Product    kcgl_models.ProductInfo    `xorm:"extends" json:"prd"`
+	Status     models.StatusInfo          `xorm:"extends" json:"s"`
 }
 
 func (c ErpInventory) ListData() revel.Result {
@@ -99,6 +108,9 @@ func (c ErpInventory) ListData() revel.Result {
 	c.Params.Bind(&product_code_query, "product_code_query")
 	product_code_query = strings.TrimSpace(product_code_query)
 
+	var product_status_query int64
+	c.Params.Bind(&product_status_query, "product_status_query")
+
 	var cost_price_zero_query int64
 	c.Params.Bind(&cost_price_zero_query, "cost_price_zero_query")
 
@@ -107,20 +119,22 @@ func (c ErpInventory) ListData() revel.Result {
 	c.Params.Bind(&product_one2one_query, "product_one2one_query")
 
 	/*
-		SELECT ivt.*, st.*, loc.*, prd.*
+		SELECT ivt.*, st.*, loc.*, prd.*, s.*
 		FROM erp_inventory ivt
-		    INNER JOIN erp_stock st ON ivt.stock_id = st.id
-		    LEFT JOIN erp_storage_loc loc ON ivt.storage_loc_id = loc.id
-		    INNER JOIN erp_product prd ON ivt.product_id = prd.id
+			INNER JOIN erp_stock st ON ivt.stock_id = st.id
+			LEFT JOIN erp_storage_loc loc ON ivt.storage_loc_id = loc.id
+			INNER JOIN erp_product prd ON ivt.product_id = prd.id
+			INNER JOIN erp_status s ON prd.status_id = s.id
 	*/
 
 	var sb = core.NewSqlBuilder()
-	sb.Select(`ivt.*, st.*, loc.*, prd.*`)
+	sb.Select(`ivt.*, st.*, loc.*, prd.*, s.*`)
 	sb.Count(`count(ivt.id) AS ivt_count`)
 	sb.From(`erp_inventory ivt
 		    INNER JOIN erp_stock st ON ivt.stock_id = st.id
 		    LEFT JOIN erp_storage_loc loc ON ivt.storage_loc_id = loc.id
-		    INNER JOIN erp_product prd ON ivt.product_id = prd.id`)
+		    INNER JOIN erp_product prd ON ivt.product_id = prd.id
+			INNER JOIN erp_status s ON prd.status_id = s.id`)
 
 	if stock_id_query != 0 {
 		filter = core.SqlAnd(filter, fmt.Sprintf("st.id = %d", stock_id_query))
@@ -128,6 +142,10 @@ func (c ErpInventory) ListData() revel.Result {
 
 	if product_code_query != "" {
 		filter = core.SqlAnd(filter, fmt.Sprintf("prd.sku LIKE '%%%s%%'", product_code_query))
+	}
+
+	if product_status_query != 0 {
+		filter = core.SqlAnd(filter, fmt.Sprintf("prd.status_id = %d", product_status_query))
 	}
 
 	var stock_id_str_list = stock_pick_crew_service.Get_login_user_stock_id_str_list(db_session, c.Session)
