@@ -915,6 +915,12 @@ func (c ErpInventory) get_export_excel(db_session *xorm.Session) *xlsx.File {
 
 		col_index++
 		cell = header_row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 45)
+		set_head_cell_style(cell)
+		cell.Value = "商品名称"
+
+		col_index++
+		cell = header_row.AddCell()
 		sheet.SetColWidth(col_index, col_index, 22)
 		set_head_cell_style(cell)
 		cell.Value = "仓库"
@@ -949,6 +955,10 @@ func (c ErpInventory) get_export_excel(db_session *xorm.Session) *xlsx.File {
 		cell = row.AddCell()
 		set_text_cell_style(cell, "left")
 		cell.Value = inventory_view.Product.Sku
+
+		cell = row.AddCell()
+		set_text_cell_style(cell, "left")
+		cell.Value = inventory_view.Product.Name
 
 		cell = row.AddCell()
 		set_text_cell_style(cell, "left")
