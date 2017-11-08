@@ -362,6 +362,20 @@ func (p_ol *OrderLogisticsService) is_express(p_order *ddlc_models.OrderInfo, p_
 
 	// 这里假定都是澳币
 	if p_order.ExpressFee >= p_ol.logistics_setting.MinExpressFee {
+
+		// 判断是否符合快递物流方式的 长度和重量的限制
+		whole_length, _, _, whole_weight := get_order_products_whole_logistics_data(p_order_logistics_data)
+
+		if p_ol.express_logistics_mode.Zcbsfyxz == 1 && whole_length > p_ol.express_logistics_mode.Zcbxzcd {
+			// 超过了快递的最长边限制
+			return false
+		}
+
+		if p_ol.express_logistics_mode.Zlsfyxz == 1 && whole_weight > p_ol.express_logistics_mode.Zlbncg {
+			// 超过了快递的最大重量
+			return false
+		}
+
 		return true
 	}
 
@@ -371,7 +385,7 @@ func (p_ol *OrderLogisticsService) is_express(p_order *ddlc_models.OrderInfo, p_
 // 15 快递类。需要在基础设置里面有 收到快递费金额的设置功能，比如收到的运费高于什么金额，视为快递。否则就算收了快递费也视为普通包裹
 func (p_ol *OrderLogisticsService) hold_check_express(p_order *ddlc_models.OrderInfo, p_order_logistics_data *order_logistics_data_t, db_session *xorm.Session) (is_hold_return bool) {
 
-	// 快递的物流信息保存有点复杂，一个可以是通过匹配物流得到的快递Hold，一个可以是单纯的Hold住的快递Hold。\
+	// 快递的物流信息保存有点复杂，一个可以是通过匹配物流得到的快递Hold，一个可以是单纯的Hold住的快递Hold。
 	// 其实通过匹配物流得到的快递Hold，不会走这个方法这里的，是直接把状态设置成为  ddpz_models.ORDER_HOLD_TYPE_EXPRESS 的
 
 	// 这里假定都是澳币

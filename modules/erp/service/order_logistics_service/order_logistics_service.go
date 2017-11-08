@@ -42,8 +42,9 @@ type OrderLogisticsService struct {
 	product_mel_temp_sku_list         []kcgl_models.ProductMelTempSkuInfo          // MEL临时SKU列表
 	pending_keeper                    *pending_inventory_temp_keeper               // 设置过程全局变量，每次开始匹配计算的时候一定要记得初始化
 	mel_stock_id                      int64                                        // 墨尔本仓库 id
-	LoginUser                         core.LoginUser
-	fav_stock_time_range_list         []ddpz_models.FavStockTimeRangeInfo
+	LoginUser                         core.LoginUser                               //
+	fav_stock_time_range_list         []ddpz_models.FavStockTimeRangeInfo          //
+	express_logistics_mode            ddpz_models.LogisticsModeInfo                // 系统内的配置的物流快递方式，一般只有一个，用于express的hold的判断
 }
 
 func (p_ol *OrderLogisticsService) init_data(order_list []ddlc_models.OrderInfo, db_session *xorm.Session) {
@@ -124,9 +125,29 @@ func (p_ol *OrderLogisticsService) init_data(order_list []ddlc_models.OrderInfo,
 
 	p_ol.mel_stock_id = stock_service.Get_mel_stock_id(db_session)
 
+	// 加载使用优先仓库时间段
 	var fav_stock_time_range_list = make([]ddpz_models.FavStockTimeRangeInfo, 0)
 	core.HandleError(db_session.Find(&fav_stock_time_range_list))
 	p_ol.fav_stock_time_range_list = fav_stock_time_range_list
+
+	// 加载快递物流方式
+	/*
+SELECT lm.*
+FROM erp_logistics_mode lm
+WHERE lm.type_id = 200
+ORDER BY lm.id ASC
+LIMIT 1;
+	 */
+	var sql_get_express_logistics_mode = `SELECT lm.*
+FROM erp_logistics_mode lm
+WHERE lm.type_id = %d
+ORDER BY lm.id ASC
+LIMIT 1;`
+	sql_get_express_logistics_mode = fmt.Sprintf(sql_get_express_logistics_mode, ddpz_models.LOGISTICS_MODE_TYPE_EXPRESS)
+	var express_logistics_mode ddpz_models.LogisticsModeInfo
+	_, err = db_session.Sql(sql_get_express_logistics_mode).Get(&express_logistics_mode)
+	core.HandleError(err)
+	p_ol.express_logistics_mode = express_logistics_mode
 }
 
 func (p_ol *OrderLogisticsService) CalculateListPaidOrders(user core.LoginUser, db_session *xorm.Session) error {
