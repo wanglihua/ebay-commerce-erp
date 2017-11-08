@@ -91,13 +91,15 @@ func (s order_logistics_fastway_view_item_slice) Swap(i, j int)      { s[i], s[j
 func (s order_logistics_fastway_view_item_slice) Less(i, j int) bool { return s[i].loc_name < s[j].loc_name }
 
 type order_logistics_toll_view_item_t struct {
-	OrderLogistics ddlc_models.OrderLogisticsInfo `xorm:"extends" json:"ol"`
-	Order          ddlc_models.OrderInfo          `xorm:"extends" json:"o"`
-	LogisticsMode  ddpz_models.LogisticsModeInfo  `xorm:"extends" json:"lm"`
-	ShopAccount    xtpz_models.ShopAccountInfo    `xorm:"extends" json:"sa"`
-	sku_qty_loc    string                         `xorm:"-"`
-	loc_name       string                         `xorm:"-"`
-	qty            int64                          `xorm:"-"`
+	OrderLogistics         ddlc_models.OrderLogisticsInfo       `xorm:"extends" json:"ol"`
+	Order                  ddlc_models.OrderInfo                `xorm:"extends" json:"o"`
+	LogisticsMode          ddpz_models.LogisticsModeInfo        `xorm:"extends" json:"lm"`
+	ShopAccount            xtpz_models.ShopAccountInfo          `xorm:"extends" json:"sa"`
+	sku_qty_loc            string                               `xorm:"-"`
+	loc_name               string                               `xorm:"-"`
+	qty                    int64                                `xorm:"-"`
+	service_id             string                               `xorm:"-"`
+	order_shipping_address ddlc_models.OrderShippingAddressInfo `xorm:"-"`
 }
 
 type order_logistics_toll_view_item_slice []order_logistics_toll_view_item_t
@@ -505,24 +507,17 @@ WHERE o.status_id = %d AND ol.mode_id IN (%s) AND ol.stock_id = %d`
 			sql_get_logistics_list = sql_get_logistics_list + fmt.Sprintf(" AND o.id IN(%s)", order_id_list_str)
 		}
 
-		var order_logistics_list = make([]order_logistics_toll_view_item_t, 0)
-		err = db_session.Sql(sql_get_logistics_list).Find(&order_logistics_list)
+		var order_logistics_list_in_db = make([]order_logistics_toll_view_item_t, 0)
+		err = db_session.Sql(sql_get_logistics_list).Find(&order_logistics_list_in_db)
 		core.HandleError(err)
 
-		for index, order_logistics := range order_logistics_list {
-			order_logistics_list[index].sku_qty_loc, order_logistics_list[index].loc_name, order_logistics_list[index].qty = get_toll_order_sku_for_export(order_logistics.Order.Id, db_session)
-		}
+		var order_logistics_list = make([]order_logistics_toll_view_item_t, 0)
+		for _, order_logistics := range order_logistics_list_in_db {
+			var ol = order_logistics
+			ol.sku_qty_loc, ol.loc_name, ol.qty = get_toll_order_sku_for_export(order_logistics.Order.Id, db_session)
 
-		var order_logistics_list_slice = order_logistics_toll_view_item_slice(order_logistics_list)
-		sort.Sort(order_logistics_list_slice)
-
-		order_logistics_list = []order_logistics_toll_view_item_t(order_logistics_list_slice)
-
-		sheet := xlsx_file.Sheets[0] // 模板里面应该至少有一个sheet
-		for index, order_logistics := range order_logistics_list {
 			var order_shipping_address = order_service.Get_order_shipping_address(order_logistics.Order.Id, db_session)
-			sheet.Cell(index+1, excel_col_label_to_index("A")).Value = order_logistics.LogisticsMode.SenderId
-			sheet.Cell(index+1, excel_col_label_to_index("B")).Value = "IPEC"
+			ol.order_shipping_address = order_shipping_address
 
 			// TOLL 的 导出模板，B列 service ID。如果是墨尔本仓库，邮编第一个数字是“3”的话，填充2，否则填充4 。 如果是布里斯班仓库，邮编第一个数字是“4”的话，填充2，否则填充4 。
 			//var service_id string = get_toll_service_id(stock_code, order_shipping_address)
@@ -537,11 +532,35 @@ WHERE o.status_id = %d AND ol.mode_id IN (%s) AND ol.stock_id = %d`
 			if stock_code == excel_export_stock_bne_code {
 				service_id = get_toll_service_id(excel_export_stock_bne_code, order_shipping_address)
 			}
+			ol.service_id = service_id
 
+			order_logistics_list = append(order_logistics_list, ol)
+		}
+
+		var order_logistics_list_slice = order_logistics_toll_view_item_slice(order_logistics_list)
+		sort.Sort(order_logistics_list_slice)
+
+		order_logistics_list = []order_logistics_toll_view_item_t(order_logistics_list_slice)
+
+		sheet := xlsx_file.Sheets[0] // 模板里面应该至少有一个sheet
+		for index, order_logistics := range order_logistics_list {
+
+			var service_id = order_logistics.service_id
+			var order_shipping_address = order_logistics.order_shipping_address
+
+			/*
+			if service_id == "4" {
+				// service_id 为 4 的要拆包
+
+			} else {
+				// service_id 不为 4 的不拆包
+			*/
+
+			sheet.Cell(index+1, excel_col_label_to_index("A")).Value = order_logistics.LogisticsMode.SenderId
+			sheet.Cell(index+1, excel_col_label_to_index("B")).Value = "IPEC"
 			sheet.Cell(index+1, excel_col_label_to_index("C")).Value = service_id
-
 			sheet.Cell(index+1, excel_col_label_to_index("D")).Value = order_shipping_address.Name
-			sheet.Cell(index+1, excel_col_label_to_index("E")).Value = order_shipping_address.Name // 和 Ｃ　是一样的？
+			sheet.Cell(index+1, excel_col_label_to_index("E")).Value = order_shipping_address.Name // 和 D　是一样的？
 
 			var full_address = order_shipping_address.Street1 + order_shipping_address.Street2
 			address1, address2 := split_long_string(full_address, 25)
@@ -572,6 +591,7 @@ WHERE o.status_id = %d AND ol.mode_id IN (%s) AND ol.stock_id = %d`
 
 			sheet.Cell(index+1, excel_col_label_to_index("Y")).Value = order_shipping_address.Phone
 			sheet.Cell(index+1, excel_col_label_to_index("Z")).Value = order_logistics.Order.BuyerEmail
+			//}
 		}
 	} else {
 		return c.RenderJson(map[string]interface{}{
