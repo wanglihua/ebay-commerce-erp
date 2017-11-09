@@ -548,14 +548,6 @@ WHERE o.status_id = %d AND ol.mode_id IN (%s) AND ol.stock_id = %d`
 			var service_id = order_logistics.service_id
 			var order_shipping_address = order_logistics.order_shipping_address
 
-			/*
-			if service_id == "4" {
-				// service_id 为 4 的要拆包
-
-			} else {
-				// service_id 不为 4 的不拆包
-			*/
-
 			sheet.Cell(index+1, excel_col_label_to_index("A")).Value = order_logistics.LogisticsMode.SenderId
 			sheet.Cell(index+1, excel_col_label_to_index("B")).Value = "IPEC"
 			sheet.Cell(index+1, excel_col_label_to_index("C")).Value = service_id
@@ -571,7 +563,15 @@ WHERE o.status_id = %d AND ol.mode_id IN (%s) AND ol.stock_id = %d`
 			sheet.Cell(index+1, excel_col_label_to_index("J")).Value = order_shipping_address.PostalCode
 			sheet.Cell(index+1, excel_col_label_to_index("L")).Value = "CARTON"
 			sheet.Cell(index+1, excel_col_label_to_index("M")).Value = get_toll_packaging_code(order_logistics.OrderLogistics) // 包裹类型要计算
-			sheet.Cell(index+1, excel_col_label_to_index("N")).Value = fmt.Sprint(order_logistics.qty)
+
+			if service_id == "2" && stock_code == excel_export_stock_mel_code {
+				// service_id 为 2 的不拆包
+				sheet.Cell(index+1, excel_col_label_to_index("N")).Value = "1"
+			} else {
+				// service_id 不为 2 的要拆包
+				sheet.Cell(index+1, excel_col_label_to_index("N")).Value = fmt.Sprint(order_logistics.qty)
+			}
+
 			sheet.Cell(index+1, excel_col_label_to_index("O")).Value = fmt.Sprintf("%0.1f", order_logistics.OrderLogistics.Length)
 			sheet.Cell(index+1, excel_col_label_to_index("P")).Value = fmt.Sprintf("%0.1f", order_logistics.OrderLogistics.Width)
 			sheet.Cell(index+1, excel_col_label_to_index("Q")).Value = fmt.Sprintf("%0.1f", order_logistics.OrderLogistics.Height/float64(order_logistics.qty))
@@ -591,7 +591,6 @@ WHERE o.status_id = %d AND ol.mode_id IN (%s) AND ol.stock_id = %d`
 
 			sheet.Cell(index+1, excel_col_label_to_index("Y")).Value = order_shipping_address.Phone
 			sheet.Cell(index+1, excel_col_label_to_index("Z")).Value = order_logistics.Order.BuyerEmail
-			//}
 		}
 	} else {
 		return c.RenderJson(map[string]interface{}{
