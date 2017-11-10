@@ -32,6 +32,10 @@ func (c Home) Loading() revel.Result {
 	return c.RenderTemplate("home/home_loading.html")
 }
 
+func (c Home) PkiValidation() revel.Result {
+	return c.RenderText("201711100144282kw5u6n8x4f84dubbtxtsligmqfgt2lyps6wgov3yvara4359a")
+}
+
 func (c Home) Hotload() revel.Result {
 	db_session := c.DbSession
 

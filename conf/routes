@@ -16,6 +16,8 @@ GET  /hotload                   Home.Hotload
 GET  /syncdb                    Home.SyncDb
 POST /syncdb/post               Home.SyncDbPost
 
+GET  /.well-known/pki-validation/fileauth.txt   Home.PkiValidation
+
 GET  /test                      Test.Index
 
 GET  /captcha/image             Captcha.Image

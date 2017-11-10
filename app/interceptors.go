@@ -105,7 +105,7 @@ func userAuth(c *revel.Controller) revel.Result {
 		return nil
 	}
 
-	if c.Action == "Home.SyncDb" || c.Action == "Home.SyncDbPost" {
+	if c.Action == "Home.SyncDb" || c.Action == "Home.SyncDbPost" || c.Action == "Home.PkiValidation" {
 		return nil
 	}
 
