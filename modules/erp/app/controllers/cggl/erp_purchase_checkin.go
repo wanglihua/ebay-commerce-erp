@@ -407,6 +407,7 @@ func (c ErpPurchaseCheckin) CheckinList() revel.Result {
 	})
 }
 
+// 这个函数后来就不用了，因为在采购管理里面进行了分批
 func (c ErpPurchaseCheckin) CheckinInTurn() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.CGGL_PURCHASE_CHECKIN, c.Session)
 

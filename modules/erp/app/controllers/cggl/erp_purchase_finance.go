@@ -31,6 +31,13 @@ func (c ErpPurchaseFinance) Index() revel.Result {
 		models.PURCHASE_BILL_STATUS_CGZ,
 		models.PURCHASE_BILL_STATUS_YRK}).Find(&status_list))
 
+	c.RenderArgs["status_list"] = status_list
+
+	var pay_method_list = make([]sppz_models.SupplierPayMethodInfo, 0)
+	core.HandleError(db_session.Find(&pay_method_list))
+
+	c.RenderArgs["pay_method_list"] = pay_method_list
+
 	// 获取账期快到的采购单列表
 	/*
 
@@ -48,7 +55,6 @@ WHERE pb.pay_days <> 0 AND pb.status_id = %d AND (datediff(DATE(date_add(pb.pay_
 	var purchase_bill_to_pay_list = make([]cggl_models.PurchaseBillInfo, 0)
 	core.HandleError(db_session.Sql(sql_purchase_bill_to_pay).Find(&purchase_bill_to_pay_list))
 
-	c.RenderArgs["status_list"] = status_list
 	c.RenderArgs["purchase_bill_to_pay_list"] = purchase_bill_to_pay_list
 	c.RenderArgs["purchase_bill_to_pay_count"] = len(purchase_bill_to_pay_list)
 	c.RenderArgs["purchase_bill_to_pay_max_index"] = len(purchase_bill_to_pay_list) - 1
@@ -57,13 +63,14 @@ WHERE pb.pay_days <> 0 AND pb.status_id = %d AND (datediff(DATE(date_add(pb.pay_
 }
 
 type ErpPurchaseFinanceViewItem struct {
-	PurchaseBill cggl_models.PurchaseBillInfo `xorm:"extends" json:"pb"`
-	Supplier     sppz_models.SupplierInfo     `xorm:"extends" json:"sup"`
-	Status       models.StatusInfo            `xorm:"extends" json:"s"`
-	ApplyUser    auth_models.UserInfo         `xorm:"extends" json:"ayu"`
-	ApproveUser  auth_models.UserInfo         `xorm:"extends" json:"avu"`
-	PayUser      auth_models.UserInfo         `xorm:"extends" json:"pu"`
-	CheckinUser  auth_models.UserInfo         `xorm:"extends" json:"cu"`
+	PurchaseBill cggl_models.PurchaseBillInfo      `xorm:"extends" json:"pb"`
+	Supplier     sppz_models.SupplierInfo          `xorm:"extends" json:"sup"`
+	PayMethod    sppz_models.SupplierPayMethodInfo `xorm:"extends" json:"pm"`
+	Status       models.StatusInfo                 `xorm:"extends" json:"s"`
+	ApplyUser    auth_models.UserInfo              `xorm:"extends" json:"ayu"`
+	ApproveUser  auth_models.UserInfo              `xorm:"extends" json:"avu"`
+	PayUser      auth_models.UserInfo              `xorm:"extends" json:"pu"`
+	CheckinUser  auth_models.UserInfo              `xorm:"extends" json:"cu"`
 }
 
 func (c ErpPurchaseFinance) ListData() revel.Result {
@@ -74,24 +81,29 @@ func (c ErpPurchaseFinance) ListData() revel.Result {
 	var status_id_query int64
 	c.Params.Bind(&status_id_query, "status_id_query")
 
+	var pay_method_query int64
+	c.Params.Bind(&pay_method_query, "pay_method_query")
+
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
 	/*
-SELECT pb.*, sup.*, s.*, ayu.*, avu.*, pu.*, cu.*
+SELECT pb.*, sup.*, pm.*, s.*, ayu.*, avu.*, pu.*, cu.*
 FROM erp_purchase_bill pb
     INNER JOIN erp_supplier sup ON sup.id = pb.supplier_id
+    LEFT JOIN erp_supplier_pay_method pm ON pm.id = pb.pay_method_id
     INNER JOIN erp_status s ON pb.status_id = s.id
     INNER JOIN auth_user ayu ON pb.apply_user_id = ayu.id
     LEFT JOIN auth_user avu ON pb.approve_user_id = avu.id
     LEFT JOIN auth_user pu ON pb.pay_user_id = pu.id
-    LEFT JOIN auth_user cu ON pb.checkin_user_id = cu.id
+    LEFT JOIN auth_user cu ON pb.checkin_user_id = cu.id;
 	*/
 
 	sql_builder := core.NewSqlBuilder()
-	sql_builder.Select("pb.*, sup.*, s.*, ayu.*, avu.*, pu.*, cu.*")
+	sql_builder.Select("pb.*, sup.*, pm.*, s.*, ayu.*, avu.*, pu.*, cu.*")
 	sql_builder.Count("count(pb.id) as bill_count")
 	sql_builder.From(`erp_purchase_bill pb
     INNER JOIN erp_supplier sup ON sup.id = pb.supplier_id
+    LEFT JOIN erp_supplier_pay_method pm ON pm.id = pb.pay_method_id
     INNER JOIN erp_status s ON pb.status_id = s.id
     INNER JOIN auth_user ayu ON pb.apply_user_id = ayu.id
     LEFT JOIN auth_user avu ON pb.approve_user_id = avu.id
@@ -103,6 +115,10 @@ FROM erp_purchase_bill pb
 
 	if status_id_query != 0 {
 		filter = core.SqlAnd(filter, fmt.Sprintf("pb.status_id = %d", status_id_query))
+	}
+
+	if pay_method_query != 0 {
+		filter = core.SqlAnd(filter, fmt.Sprintf("pb.pay_method_id = %d", pay_method_query))
 	}
 
 	sql_builder.Where(filter)

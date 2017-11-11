@@ -24,9 +24,15 @@
                 </div>
                 <div id="query" class="col-xs-12" style="line-height: 28px;">
                     <select id="status_id_query" name="status_id_query" style="width: 120px;" v-model.number="page.status_id_query" @change="querySelectChange()">
-                        <option :value="0">采购单状态查询</option>
+                        <option :value="0">--采购单状态--</option>
                         {% range $index, $status := .status_list %}
                         <option :value="{% $status.Id %}">{% $status.Name %}</option>
+                        {% end %}
+                    </select>
+                    <select id="pay_method_query" name="pay_method_query" style="width: 120px;" v-model.number="page.pay_method_query" @change="querySelectChange()">
+                        <option :value="0">--付款方式--</option>
+                        {% range $index, $pay_method := .pay_method_list %}
+                        <option :value="{% $pay_method.Id %}">{% $pay_method.Name %}</option>
                         {% end %}
                     </select>
                     <button class="btn btn-mini btn-primary" style="margin-bottom:3px;height: 30px;" onclick="search()">
@@ -58,6 +64,7 @@
                             <th>备注</th>
                             <th>操作人</th>
                             <th>金额</th>
+                            <th>付款方式</th>
                             <th>状态</th>
                             <th id="th_apply_time">采购时间</th>
                             <th id="th_pay_time">付款时间</th>
@@ -82,7 +89,8 @@
         el: "#page",
         data: {
             "page": {
-                "status_id_query": 0
+                "status_id_query": 0,
+                "pay_method_query": 0
             }
         },
         mounted: function () {
@@ -132,6 +140,7 @@
                             },
                             {"mDataProp": "ayu.nick_name", "title": "操作人", "bSearchable": false, "width": 75},
                             {"mDataProp": "pb.total_amount", "title": "金额", "bSearchable": false, "width": 75},
+                            {"mDataProp": "pm.name", "title": "付款方式", "bSearchable": false, "width": 75},
                             {"mDataProp": "s.name", "title": "状态", "bSearchable": false, "width": 90},
                             {
                                 "mDataProp": "pb.apply_time", "title": "采购时间", "bSearchable": false, "sClass": "center", "width": 120,
@@ -173,26 +182,26 @@
                             showMask("数据加载中，请稍候");
 
                             aoData.push({'name': 'status_id_query', 'value': this_vm.page.status_id_query});
+                            aoData.push({'name': 'pay_method_query', 'value': this_vm.page.pay_method_query});
 
-                            $.ajax(
-                                    {
-                                        "dataType": 'json',
-                                        "url": sSource,
-                                        "data": aoData,
-                                        "success": function (data) {
-                                            hideMask();
-                                            if (data.success === false) {
-                                                $.msg.error(data.message);
-                                                return;
-                                            }
-                                            fnCallback(data);
+                            $.ajax({
+                                "dataType": 'json',
+                                "url": sSource,
+                                "data": aoData,
+                                "success": function (data) {
+                                    hideMask();
+                                    if (data.success === false) {
+                                        $.msg.error(data.message);
+                                        return;
+                                    }
+                                    fnCallback(data);
 
-                                            $("#purchaseBillList div.div_apply_time").parent().css("width", "120px");
-                                            $("#purchaseBillList div.div_pay_time").parent().css("display", "none");
-                                            $("#purchaseBillList div.div_create_time").parent().css("display", "none");
-                                            $("#purchaseBillList div.div_update_time").parent().css("display", "none");
-                                        }
-                                    });
+                                    $("#purchaseBillList div.div_apply_time").parent().css("width", "120px");
+                                    $("#purchaseBillList div.div_pay_time").parent().css("display", "none");
+                                    $("#purchaseBillList div.div_create_time").parent().css("display", "none");
+                                    $("#purchaseBillList div.div_update_time").parent().css("display", "none");
+                                }
+                            });
                         }
                     }
             );
