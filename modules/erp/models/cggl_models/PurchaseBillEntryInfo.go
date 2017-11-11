@@ -27,7 +27,8 @@ type PurchaseBillEntryInfo struct {
 	FittingCost             float64         `xorm:"decimal(18,6) notnull 'fitting_cost' default(0)" json:"fitting_cost" smith:"verbose_name=配件费用"`
 	OtherCost               float64         `xorm:"decimal(18,6) notnull 'other_cost' default(0)" json:"other_cost" smith:"verbose_name=其它费用"`
 	InventoryCost           float64         `xorm:"decimal(18,6) notnull 'inventory_cost' default(0)" json:"inventory_cost" smith:"verbose_name=中国仓成本"`
-	PayAmount               float64         `xorm:"decimal(18,6) null 'pay_amount'" json:"pay_amount" smith:"verbose_name=付款金额"` // 分批入库是的付款金额
+	PayAmount               float64         `xorm:"decimal(18,6) null 'pay_amount'" json:"pay_amount" smith:"verbose_name=付款金额"`            // 分批入库是的付款金额
+	TypeId                  int64           `xorm:"bigint notnull index 'type_id' default(100)" json:"type_id" smith:"verbose_name=采购明细类型"` // 默认是正常明细类型
 	CreateTime              core.Time       `xorm:"created notnull 'create_time'" json:"create_time"`
 	UpdateTime              core.Time       `xorm:"updated notnull 'update_time'" json:"update_time"`
 }
