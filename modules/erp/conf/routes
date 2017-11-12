@@ -500,6 +500,7 @@ POST /purchase/finance/purchase               ErpPurchaseFinance.Purchase
 POST /purchase/finance/entry/list             ErpPurchaseFinance.EntryList
 POST /purchase/finance/entry/pay/amount       ErpPurchaseFinance.EntryPayAmount
 POST /purchase/finance/entry/pay/amount/save  ErpPurchaseFinance.EntryPayAmountSave
+POST /purchase/finance/entry/purchase         ErpPurchaseFinance.PurchaseEntry
 
 GET  /purchase/checkin                     ErpPurchaseCheckin.Index
 POST /purchase/checkin/data/list           ErpPurchaseCheckin.ListData

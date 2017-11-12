@@ -304,7 +304,11 @@
                             {
                                 "mDataProp": "pbe.id", "title": "操作", "bSearchable": true, "sClass": "center", "width": 80,
                                 "render": function (data, type, row) {
-                                    return "<a class='btn btn-xs btn-info btn-inline pull-left' onclick='show_entry_pay_amount_dialog(" + data + ");' ><i class='ace-icon fa fa-list'></i>付款金额</a>";
+                                    if (row.pbe.status_id === 4500 && row.pbe.type_id === 200) {
+                                        return "<a class='btn btn-xs btn-info btn-inline pull-left' onclick='entry_purchase(" + data + ");' ><i class='ace-icon fa fa-share'></i>下单</a>";
+                                    } else {
+                                        return "";
+                                    }
                                 }
                             }
                         ],
@@ -393,6 +397,27 @@
                 }
             });
         }
+    }
+
+    function entry_purchase(id) {
+        $.ajax({
+            url: '{%url "ErpPurchaseFinance.PurchaseEntry"%}',
+            type: "POST",
+            data: {
+                "entry_id": id
+            },
+            success: function (data) {
+                if (data.success === false) {
+                    $.msg.error(data.message);
+                    // return;
+                }
+                else {
+                    $.msg.show(data.message);
+                    reloadList("#purchaseBillEntryList");
+                    // return;
+                }
+            }
+        });
     }
 </script>
 <div id="purchase_bill_entry_list_wrapper"></div>

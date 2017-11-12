@@ -209,6 +209,7 @@ func (c ErpPurchaseFinance) EntryList() revel.Result {
 	return c.RenderTemplate("erp/cggl/purchase_finance/purchase_finance_entry_list.html")
 }
 
+// 这个后来不使用了，付款金额在采购管理进行维护了
 func (c ErpPurchaseFinance) EntryPayAmount() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.CGGL_PURCHASE_FINANCE, c.Session)
 
@@ -226,6 +227,7 @@ func (c ErpPurchaseFinance) EntryPayAmount() revel.Result {
 	return c.RenderTemplate("erp/cggl/purchase_finance/purchase_finance_entry_pay_amount.html")
 }
 
+// 这个后来不使用了，付款金额在采购管理进行维护了
 func (c ErpPurchaseFinance) EntryPayAmountSave() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.CGGL_PURCHASE_FINANCE, c.Session)
 
@@ -249,5 +251,36 @@ func (c ErpPurchaseFinance) EntryPayAmountSave() revel.Result {
 	return c.RenderJson(map[string]interface{}{
 		"success": true,
 		"message": "采购明细更新付款金额成功！",
+	})
+}
+
+// 用于分批采购中的，采购明细审批
+func (c ErpPurchaseFinance) PurchaseEntry() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.CGGL_PURCHASE_FINANCE, c.Session)
+
+	var db_session = c.DbSession
+
+	var entry_id int64
+	c.Params.Bind(&entry_id, "entry_id")
+
+	var purchase_bill_entry cggl_models.PurchaseBillEntryInfo
+	_, err := db_session.Id(entry_id).Get(&purchase_bill_entry)
+	core.HandleError(err)
+
+	if purchase_bill_entry.StatusId != models.PURCHASE_BILL_STATUS_YSP || purchase_bill_entry.TypeId != cggl_models.PURCHASE_BILL_TYPE_IN_TURN {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "只有已审批的分批采购的明细单才能下单！",
+		})
+	}
+
+	purchase_bill_entry.StatusId = models.PURCHASE_BILL_STATUS_CGZ
+
+	_, err = db_session.Id(entry_id).Cols("status_id").Update(&purchase_bill_entry)
+	core.HandleError(err)
+
+	return c.RenderJson(map[string]interface{}{
+		"success": true,
+		"message": "采购单明细分批采购下单成功！",
 	})
 }
