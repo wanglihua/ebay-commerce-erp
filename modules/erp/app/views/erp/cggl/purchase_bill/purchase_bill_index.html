@@ -610,9 +610,9 @@
                                 <div class="row">
                                     <div class="col-xs-6">
                                         <div class="form-group">
-                                            <label for="amount" class="col-xs-2 control-label">金额</label>
+                                            <label for="checkin_qty" class="col-xs-2 control-label">采购数量</label>
                                             <div class="col-xs-10">
-                                                <input id="amount" name="purchase_bill_entry_detail.purchase_bill_entry.amount" type="text" class="input-sm form-control" v-model.number="purchase_bill_entry_detail.purchase_bill_entry.amount" disabled="disabled"/>
+                                                <input id="checkin_qty" name="purchase_bill_entry_detail.purchase_bill_entry.checkin_qty" type="text" class="input-sm form-control" v-model.number="purchase_bill_entry_detail.purchase_bill_entry.checkin_qty"/>
                                             </div>
                                         </div>
                                     </div>
@@ -625,7 +625,6 @@
                                             </div>
                                         </div>
                                     </div>
-
                                 </div>
 
                                 <div class="row">
@@ -1552,6 +1551,41 @@
                 $('#purchaseBillEntryPurchaseInTurnDialog').modal(modalOptions);
             }
         });
+    }
+
+    function purchase_in_turn() {
+        showMask("提交中...");
+        var form = $("#purchaseBillPurchaseInTurnForm");
+        var valid = validate(form, {
+            'purchase_bill_entry_detail.purchase_bill_entry.desc': {
+                required: false, minlength: 2, maxlength: 400
+            }
+        });
+
+        if (!valid) {
+            hideMask();
+        } else {
+            $.ajax({
+                url: '{%url "ErpPurchaseBillEntry.PurchaseInTurn"%}',
+                type: "POST",
+                processData: false,
+                contentType: 'application/json',
+                data: JSON.stringify(vm.purchase_bill_entry_detail),
+                success: function (data) {
+                    hideMask();
+                    if (data.success === false) {
+                        $.msg.error(data.message);
+                        //return;
+                    }
+                    else {
+                        $.msg.show(data.message);
+                        $('#purchaseBillEntryInTurnDialog').modal('hide');
+                        vm.reloadEntryList();
+                        //return;
+                    }
+                }
+            });
+        }
     }
 </script>
 <div id="purchase_bill_log_wrapper"></div>

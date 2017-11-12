@@ -421,6 +421,14 @@ func (c ErpPurchaseBillEntry) PurchaseInTurn() revel.Result {
 	_, err = db_session.Id(bill_entry_in_db.ProductId).Get(&product)
 	core.HandleError(err)
 
+	// 检查类型
+	if bill_entry_in_db.TypeId == cggl_models.PURCHASE_BILL_TYPE_IN_TURN {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "采购单明细类型当前已经是分批采购类型，不能再进行分批采购！",
+		})
+	}
+
 	// 检查状态
 	if bill_entry_in_db.StatusId != models.PURCHASE_BILL_STATUS_CGZ {
 		return c.RenderJson(map[string]interface{}{
