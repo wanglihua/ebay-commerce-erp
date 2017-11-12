@@ -51,6 +51,12 @@
                     </div>
                     {% end %}
 
+                    {%if ne .entry_purchase_code_strs_len 0 %}
+                    <div style="margin:5px; color:red;">
+                        采购单&nbsp;&nbsp;<span>{% .entry_purchase_code_strs %}</span>&nbsp;&nbsp;明细中有分批采购需要下单！
+                    </div>
+                    {%end%}
+
                     <hr style="margin-top:10px;margin-bottom:10px;"/>
                 </div>
                 <div>
@@ -400,23 +406,25 @@
     }
 
     function entry_purchase(id) {
-        $.ajax({
-            url: '{%url "ErpPurchaseFinance.PurchaseEntry"%}',
-            type: "POST",
-            data: {
-                "entry_id": id
-            },
-            success: function (data) {
-                if (data.success === false) {
-                    $.msg.error(data.message);
-                    // return;
+        $.msg.confirm("确认要下单吗？", function () {
+            $.ajax({
+                url: '{%url "ErpPurchaseFinance.PurchaseEntry"%}',
+                type: "POST",
+                data: {
+                    "entry_id": id
+                },
+                success: function (data) {
+                    if (data.success === false) {
+                        $.msg.error(data.message);
+                        // return;
+                    }
+                    else {
+                        $.msg.show(data.message);
+                        reloadList("#purchaseBillEntryList");
+                        // return;
+                    }
                 }
-                else {
-                    $.msg.show(data.message);
-                    reloadList("#purchaseBillEntryList");
-                    // return;
-                }
-            }
+            });
         });
     }
 </script>

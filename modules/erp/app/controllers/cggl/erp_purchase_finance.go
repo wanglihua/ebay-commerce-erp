@@ -13,6 +13,7 @@ import (
 	"matrix/modules/erp/models/sppz_models"
 	"matrix/modules/erp/service/purchase_bill_service"
 	"matrix/modules/erp/service/purchase_bill_log_service"
+	"unicode/utf8"
 )
 
 type ErpPurchaseFinance struct {
@@ -58,6 +59,27 @@ WHERE pb.pay_days <> 0 AND pb.status_id = %d AND (datediff(DATE(date_add(pb.pay_
 	c.RenderArgs["purchase_bill_to_pay_list"] = purchase_bill_to_pay_list
 	c.RenderArgs["purchase_bill_to_pay_count"] = len(purchase_bill_to_pay_list)
 	c.RenderArgs["purchase_bill_to_pay_max_index"] = len(purchase_bill_to_pay_list) - 1
+
+	/*
+SELECT group_concat(DISTINCT pb.code) AS code_list_str
+FROM erp_purchase_bill_entry pbe
+    INNER JOIN erp_purchase_bill pb ON pbe.bill_id = pb.id
+WHERE pbe.status_id = 4500 AND pbe.type_id = 200;
+	 */
+
+	var sql_entry_to_purchase_code = `SELECT group_concat(DISTINCT pb.code) AS code_list_str
+FROM erp_purchase_bill_entry pbe
+    INNER JOIN erp_purchase_bill pb ON pbe.bill_id = pb.id
+WHERE pbe.status_id = %d AND pbe.type_id = %d;`
+	sql_entry_to_purchase_code = fmt.Sprintf(sql_entry_to_purchase_code, models.PURCHASE_BILL_STATUS_YSP, cggl_models.PURCHASE_BILL_TYPE_IN_TURN)
+	var entry_purchase_code_strs struct {
+		CodeListStr string `xorm:"'code_list_str'"`
+	}
+	_, err := db_session.Sql(sql_entry_to_purchase_code).Get(&entry_purchase_code_strs)
+	core.HandleError(err)
+
+	c.RenderArgs["entry_purchase_code_strs_len"] = int64(utf8.RuneCountInString(entry_purchase_code_strs.CodeListStr))
+	c.RenderArgs["entry_purchase_code_strs"] = entry_purchase_code_strs.CodeListStr
 
 	return c.RenderTemplate("erp/cggl/purchase_finance/purchase_finance_index.html")
 }
