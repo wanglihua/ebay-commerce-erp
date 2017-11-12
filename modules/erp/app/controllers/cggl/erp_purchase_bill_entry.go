@@ -15,6 +15,9 @@ import (
 	"matrix/modules/erp/models/cggl_models"
 	"matrix/modules/erp/service/purchase_bill_log_service"
 	"matrix/modules/erp/service/purchase_bill_service"
+	"math"
+	"time"
+	"strings"
 )
 
 type ErpPurchaseBillEntry struct {
@@ -39,9 +42,10 @@ func (c ErpPurchaseBillEntry) Index() revel.Result {
 }
 
 type PurchaseBillEntryViewItem struct {
-	cggl_models.PurchaseBillEntryInfo `xorm:"extends" json:"pbe"`
-	kcgl_models.ProductInfo           `xorm:"extends" json:"p"`
-	models.StatusInfo                 `xorm:"extends" json:"s"`
+	cggl_models.PurchaseBillEntryInfo     `xorm:"extends" json:"pbe"`
+	cggl_models.PurchaseBillEntryTypeInfo `xorm:"extends" json:"et"`
+	kcgl_models.ProductInfo               `xorm:"extends" json:"p"`
+	models.StatusInfo                     `xorm:"extends" json:"s"`
 }
 
 func (c ErpPurchaseBillEntry) ListData() revel.Result {
@@ -66,18 +70,20 @@ func (c ErpPurchaseBillEntry) ListData() revel.Result {
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
 	/*
-SELECT pbe.*, p.*, s.*
+SELECT pbe.*, et.*, p.*, s.*
 FROM erp_purchase_bill_entry pbe
+    INNER JOIN erp_purchase_bill_entry_type et ON et.id = pbe.type_id
     INNER JOIN erp_product p ON pbe.product_id = p.id
     INNER JOIN erp_status s ON pbe.status_id = s.id
 	 */
 
 	sb := core.NewSqlBuilder()
-	sb.Select("pbe.*, p.*, s.*")
+	sb.Select("pbe.*, et.*, p.*, s.*")
 	sb.Count("count(*) as entry_count")
 	sb.From(`erp_purchase_bill_entry pbe
+    INNER JOIN erp_purchase_bill_entry_type et ON et.id = pbe.type_id
     INNER JOIN erp_product p ON pbe.product_id = p.id
-    INNER JOIN erp_status s ON pbe.status_id = s.id	`)
+    INNER JOIN erp_status s ON pbe.status_id = s.id`)
 
 	sb.Where(core.SqlAnd(filter, fmt.Sprintf("bill_id = %d", purchase_bill_id)))
 
@@ -180,7 +186,7 @@ func (c ErpPurchaseBillEntry) DetailData() revel.Result {
 		product_id := purchase_bill_entry.ProductId
 		_, err = db_session.Id(product_id).Get(&product)
 		core.HandleError(err)
-		product_name = product.Name
+		product_name = product.CnName
 	}
 
 	var detail_form PurchaseBillEntryDetailForm
@@ -385,5 +391,127 @@ FROM erp_product prd
 	return c.RenderJson(core.GridResult{
 		Data:  product_list,
 		Total: product_count.Count,
+	})
+}
+
+func (c ErpPurchaseBillEntry) PurchaseInTurn() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.CGGL_PURCHASE_BILL, c.Session)
+
+	var db_session = c.DbSession
+
+	var detail_form PurchaseBillEntryDetailForm
+	err := json.Unmarshal(c.GetRequestBody(), &detail_form)
+	core.HandleError(err)
+
+	if detail_form.Valid(c.Validation) == false {
+		return c.RenderJson(core.JsonResult{Success: false, Message: c.GetValidationErrorMessage()})
+	}
+
+	var bill_entry_from_ui = detail_form.PurchaseBillEntry
+
+	var bill_entry_in_db cggl_models.PurchaseBillEntryInfo
+	_, err = db_session.Id(bill_entry_from_ui.Id).Get(&bill_entry_in_db)
+	core.HandleError(err)
+
+	var purchase_bill cggl_models.PurchaseBillInfo
+	_, err = db_session.Id(bill_entry_in_db.BillId).Get(&purchase_bill)
+	core.HandleError(err)
+
+	var product kcgl_models.ProductInfo
+	_, err = db_session.Id(bill_entry_in_db.ProductId).Get(&product)
+	core.HandleError(err)
+
+	// 检查状态
+	if bill_entry_in_db.StatusId != models.PURCHASE_BILL_STATUS_CGZ {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "采购单明细状态当前不是采购中状态，不能进行分批采购！",
+		})
+	}
+
+	if bill_entry_from_ui.CheckinQty > bill_entry_in_db.Qty { // 从界面上获取的分批采购的数量大于原采明细的数量
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "分批采购数量不能大于原采购数量！",
+		})
+	}
+
+	var is_all_checkin = bill_entry_from_ui.CheckinQty == bill_entry_in_db.Qty
+
+	// 检查是不是分批入库
+	if is_all_checkin == true {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "全部数量采购，请使用正常采购流程而不是分批采购！",
+		})
+	}
+
+	// 插入采购单历史，入库
+	purchase_bill_log_service.Insert_purchase_bill_log(purchase_bill, fmt.Sprintf("采购单明细SKU:%s 分批采购，%d个", product.Sku, bill_entry_from_ui.CheckinQty), db_session, c.Session)
+
+	var qty_before = bill_entry_in_db.Qty
+	var mel_qty_before = bill_entry_in_db.MelQty
+	// var bne_qty_before = bill_entry_in_db.BneQty
+	var fitting_cost_before = bill_entry_in_db.FittingCost
+	var other_cost_before = bill_entry_in_db.OtherCost
+	var checkin_qty = bill_entry_from_ui.CheckinQty
+	var checkin_rate = float64(checkin_qty) / float64(qty_before)
+	var pay_amount = bill_entry_from_ui.PayAmount // 付款金额这里输入，财务下单
+
+	bill_entry_in_db.Qty = qty_before - checkin_qty
+	bill_entry_in_db.MelQty = bill_entry_in_db.MelQty - int64(math.Floor(float64(mel_qty_before)*checkin_rate+0.5)) // 四舍五入
+	bill_entry_in_db.BneQty = bill_entry_in_db.Qty - bill_entry_in_db.MelQty
+	bill_entry_in_db.Amount = bill_entry_in_db.Price * float64(bill_entry_in_db.Qty)
+
+	var purchase_in_turn_desc = " 部分数量已分批采购"
+	if strings.Contains(bill_entry_in_db.Desc.String, purchase_in_turn_desc) == false {
+		bill_entry_in_db.Desc = core.MakeNullString(bill_entry_in_db.Desc.String+purchase_in_turn_desc, true)
+	}
+	bill_entry_in_db.FittingCost = (float64(bill_entry_in_db.Qty) / float64(qty_before)) * fitting_cost_before
+	bill_entry_in_db.OtherCost = (float64(bill_entry_in_db.Qty) / float64(qty_before)) * other_cost_before
+	_, err = db_session.Id(bill_entry_in_db.Id).Cols("qty", "mel_qty", "bne_qty", "amount", "desc", "fitting_cost", "other_cost").Update(&bill_entry_in_db)
+	core.HandleError(err)
+
+	var login_user = core.GetLoginUser(c.Session)
+
+	var new_bill_entry cggl_models.PurchaseBillEntryInfo
+
+	new_bill_entry.BillId = bill_entry_in_db.BillId
+	new_bill_entry.ProductId = bill_entry_in_db.ProductId
+	new_bill_entry.Qty = checkin_qty
+	new_bill_entry.MelQty = mel_qty_before - bill_entry_in_db.MelQty
+	new_bill_entry.BneQty = checkin_qty - new_bill_entry.MelQty
+	new_bill_entry.Price = bill_entry_in_db.Price
+	new_bill_entry.Amount = new_bill_entry.Price * float64(new_bill_entry.Qty)
+	new_bill_entry.PayAmount = pay_amount // 付款金额这里输入，财务下单
+	new_bill_entry.Desc = core.MakeNullString(bill_entry_from_ui.Desc.String+fmt.Sprintf(" 分批采购，原数量 %d", qty_before), true)
+	new_bill_entry.StatusId = models.PURCHASE_BILL_STATUS_YSP // 已审批
+	new_bill_entry.CheckinQty = checkin_qty
+	new_bill_entry.CheckinTime = core.MakeNullTime(time.Now(), true)
+	new_bill_entry.InventoryCost = bill_entry_in_db.InventoryCost
+	new_bill_entry.CheckinUserId = login_user.UserId
+	new_bill_entry.NeedInvoice = bill_entry_in_db.NeedInvoice
+	new_bill_entry.TaxPoint = bill_entry_in_db.TaxPoint
+	new_bill_entry.DrawbackPoint = bill_entry_in_db.DrawbackPoint
+	new_bill_entry.DrawbackAmount = bill_entry_in_db.DrawbackAmount
+	new_bill_entry.FittingCost = (float64(checkin_qty) / float64(qty_before)) * fitting_cost_before
+	new_bill_entry.OtherCost = (float64(checkin_qty) / float64(qty_before)) * other_cost_before
+
+	_, err = db_session.Insert(&new_bill_entry)
+	core.HandleError(err)
+
+	// 更新尾款 // 付款由财务在财务管理维护, 更新尾款也放到那边 // 付款在采购管理里面做，扣除尾款在财务管理里面进行
+	/*
+	purchase_bill.FinalAmount = purchase_bill.FinalAmount - pay_amount
+	_, err = db_session.Id(purchase_bill.Id).Cols("final_amount").Update(&purchase_bill)
+	core.HandleError(err)
+	*/
+
+	// 计算中国仓成本价
+	purchase_bill_service.CalculateBillEntryCnInventoryCost(purchase_bill.Id, db_session)
+
+	return c.RenderJson(map[string]interface{}{
+		"success": true,
+		"message": "采购明细分批采购成功！",
 	})
 }

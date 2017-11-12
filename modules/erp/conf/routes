@@ -480,12 +480,13 @@ POST /purchase/bill/submit                 ErpPurchaseBill.Submit
 POST /purchase/bill/approve                ErpPurchaseBill.Approve
 POST /purchase/bill/supplier/select/list/data      ErpPurchaseBill.SupplierSelectListData
 
-POST /purchase/bill/entry                  ErpPurchaseBillEntry.Index
-POST /purchase/bill/entry/data/list        ErpPurchaseBillEntry.ListData
-POST /purchase/bill/entry/data/detail      ErpPurchaseBillEntry.DetailData
-POST /purchase/bill/entry/save             ErpPurchaseBillEntry.Save
-POST /purchase/bill/entry/delete           ErpPurchaseBillEntry.Delete
-POST /purchase/bill/entry/product/select/data/list      ErpPurchaseBillEntry.ProductSelectListData
+POST /purchase/bill/entry                            ErpPurchaseBillEntry.Index
+POST /purchase/bill/entry/data/list                  ErpPurchaseBillEntry.ListData
+POST /purchase/bill/entry/data/detail                ErpPurchaseBillEntry.DetailData
+POST /purchase/bill/entry/save                       ErpPurchaseBillEntry.Save
+POST /purchase/bill/entry/delete                     ErpPurchaseBillEntry.Delete
+POST /purchase/bill/entry/product/select/data/list   ErpPurchaseBillEntry.ProductSelectListData
+POST /purchase/bill/entry/purchase/in/turn           ErpPurchaseBillEntry.PurchaseInTurn
 
 POST  /purchase/bill/excel/import          ErpPurchaseBillEntryExcel.Import
 POST  /purchase/bill/excel/export          ErpPurchaseBillEntryExcel.Export

@@ -11,7 +11,7 @@ type PurchaseBillEntryInfo struct {
 	Qty                     int64           `xorm:"bigint notnull 'qty'" json:"qty" smith:"verbose_name=总数量"`                             // 所有仓库的采购数量，各个仓库加起来的总和
 	MelQty                  int64           `xorm:"bigint notnull default(0) 'mel_qty'" json:"mel_qty" smith:"verbose_name=墨尔本数量"`        // 墨尔本仓库采购数量
 	BneQty                  int64           `xorm:"bigint notnull default(0) 'bne_qty'" json:"bne_qty" smith:"verbose_name=布里斯班数量"`       // 墨尔本仓库采购数量
-	CheckinQty              int64           `xorm:"bigint notnull 'checkin_qty' default(0)" json:"checkin_qty" smith:"verbose_name=入库数量"` // 最终入库的数量
+	CheckinQty              int64           `xorm:"bigint notnull 'checkin_qty' default(0)" json:"checkin_qty" smith:"verbose_name=入库数量"` // 最终入库的数量，或者分批采购时从界面上获取的数量s
 	Price                   float64         `xorm:"decimal(18,6) notnull 'price'" json:"price" smith:"verbose_name=单价"`
 	Amount                  float64         `xorm:"decimal(18,6) notnull 'amount'" json:"amount" smith:"verbose_name=金额"`
 	Desc                    core.NullString `xorm:"nvarchar(500) 'desc'" json:"desc" smith:"verbose_name=备注,min=2,max=400"`
