@@ -628,6 +628,20 @@
                                 </div>
 
                                 <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="pay_amount" class="col-xs-2 control-label">付款金额</label>
+                                            <div class="col-xs-10">
+                                                <input id="pay_amount" name="purchase_bill_entry_detail.purchase_bill_entry.pay_amount" type="text" class="input-sm form-control" v-model.number="purchase_bill_entry_detail.purchase_bill_entry.pay_amount"/>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xs-6">
+                                    </div>
+                                </div>
+
+                                <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
                                             <label for="purchase_bill_entry_desc" class="col-xs-1 control-label">备注</label>
@@ -643,7 +657,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-success btn-sm" @click="savePurchaseBillEntry()">
+                    <button type="button" class="btn btn-success btn-sm" onclick="purchase_in_turn()">
                         <i class="ace-icon fa fa-floppy-o"></i>保存
                     </button>
                     <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">
@@ -1113,26 +1127,25 @@
                     hideMask();
                 } else {
                     $.ajax({
-                                url: '{%url "ErpPurchaseBill.Save"%}',
-                                type: "POST",
-                                processData: false,
-                                contentType: 'application/json',
-                                data: JSON.stringify(vm.purchase_bill_detail),
-                                success: function (data) {
-                                    hideMask();
-                                    if (data.success === false) {
-                                        $.msg.error(data.message);
-                                        //return;
-                                    }
-                                    else {
-                                        $.msg.show(data.message);
-                                        $('#purchaseBillDetailDialog').modal('hide');
-                                        vm.reloadList();
-                                        //return;
-                                    }
-                                }
+                        url: '{%url "ErpPurchaseBill.Save"%}',
+                        type: "POST",
+                        processData: false,
+                        contentType: 'application/json',
+                        data: JSON.stringify(vm.purchase_bill_detail),
+                        success: function (data) {
+                            hideMask();
+                            if (data.success === false) {
+                                $.msg.error(data.message);
+                                //return;
                             }
-                    );
+                            else {
+                                $.msg.show(data.message);
+                                $('#purchaseBillDetailDialog').modal('hide');
+                                vm.reloadList();
+                                //return;
+                            }
+                        }
+                    });
                 }
             },
             deletePurchaseBill: function () {
@@ -1239,23 +1252,22 @@
                 showMask("加载中...");
                 $("#purchaseBillEntryDetailForm").clearValidation();
                 $.ajax({
-                            url: '{%url "ErpPurchaseBillEntry.DetailData" %}',
-                            type: "POST",
-                            data: {
-                                "id": id,
-                                "purchase_bill_id": vm.purchase_bill_id
-                            },
-                            success: function (result) {
-                                hideMask();
-                                if (result.success === false) {
-                                    $.msg.error(result.message);
-                                    return;
-                                }
-                                vm.purchase_bill_entry_detail = result;
-                                $('#purchaseBillEntryDetailDialog').modal(modalOptions);
-                            }
+                    url: '{%url "ErpPurchaseBillEntry.DetailData" %}',
+                    type: "POST",
+                    data: {
+                        "id": id,
+                        "purchase_bill_id": vm.purchase_bill_id
+                    },
+                    success: function (result) {
+                        hideMask();
+                        if (result.success === false) {
+                            $.msg.error(result.message);
+                            return;
                         }
-                );
+                        vm.purchase_bill_entry_detail = result;
+                        $('#purchaseBillEntryDetailDialog').modal(modalOptions);
+                    }
+                });
             },
             savePurchaseBillEntry: function () {
                 showMask("提交中...");
@@ -1297,26 +1309,25 @@
                     hideMask();
                 } else {
                     $.ajax({
-                                url: '{%url "ErpPurchaseBillEntry.Save"%}',
-                                type: "POST",
-                                processData: false,
-                                contentType: 'application/json',
-                                data: JSON.stringify(vm.purchase_bill_entry_detail),
-                                success: function (data) {
-                                    hideMask();
-                                    if (data.success === false) {
-                                        $.msg.error(data.message);
-                                        //return;
-                                    }
-                                    else {
-                                        $.msg.show(data.message);
-                                        $('#purchaseBillEntryDetailDialog').modal('hide');
-                                        vm.reloadEntryList();
-                                        //return;
-                                    }
-                                }
+                        url: '{%url "ErpPurchaseBillEntry.Save"%}',
+                        type: "POST",
+                        processData: false,
+                        contentType: 'application/json',
+                        data: JSON.stringify(vm.purchase_bill_entry_detail),
+                        success: function (data) {
+                            hideMask();
+                            if (data.success === false) {
+                                $.msg.error(data.message);
+                                //return;
                             }
-                    );
+                            else {
+                                $.msg.show(data.message);
+                                $('#purchaseBillEntryDetailDialog').modal('hide');
+                                vm.reloadEntryList();
+                                //return;
+                            }
+                        }
+                    });
                 }
             },
             deletePurchaseBillEntry: function () {
@@ -1533,7 +1544,7 @@
         var id = id_list[0];
 
         showMask("加载中...");
-        $("#purchaseBillPurchaseInTurnForm").clearValidation();
+        $("#purchaseBillEntryPurchaseInTurnForm").clearValidation();
         $.ajax({
             url: '{%url "ErpPurchaseBillEntry.DetailData" %}',
             type: "POST",
@@ -1555,8 +1566,11 @@
 
     function purchase_in_turn() {
         showMask("提交中...");
-        var form = $("#purchaseBillPurchaseInTurnForm");
+        var form = $("#purchaseBillEntryPurchaseInTurnForm");
         var valid = validate(form, {
+            'purchase_bill_entry_detail.purchase_bill_entry.checkin_qty': {
+                required: true, min: 1
+            },
             'purchase_bill_entry_detail.purchase_bill_entry.desc': {
                 required: false, minlength: 2, maxlength: 400
             }

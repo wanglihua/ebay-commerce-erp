@@ -141,9 +141,12 @@ func (f *PurchaseBillEntryDetailForm) Valid(validation *revel.Validation) bool {
 
 	validation.Required(f.PurchaseBillEntry.Amount).Message("金额不能为空！")
 
+	/*
 	if f.PurchaseBillEntry.Desc.Valid == true {
-		validation.MinSize(f.PurchaseBillEntry.Desc.String, 2).Message("备注长度不能小于2！")
+		validation.MinSize(f.PurchaseBillEntry.Desc.String, 0).Message("备注长度不能小于0！")
 	}
+	*/
+
 	if f.PurchaseBillEntry.Desc.Valid == true {
 		validation.MaxSize(f.PurchaseBillEntry.Desc.String, 400).Message("备注长度不能大于400！")
 	}
@@ -437,6 +440,13 @@ func (c ErpPurchaseBillEntry) PurchaseInTurn() revel.Result {
 		})
 	}
 
+	if bill_entry_from_ui.CheckinQty <= 0 { // 从界面上获取的分批采购的数量 不能 小于等于 0
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "分批采购数量应该大于零！",
+		})
+	}
+
 	if bill_entry_from_ui.CheckinQty > bill_entry_in_db.Qty { // 从界面上获取的分批采购的数量大于原采明细的数量
 		return c.RenderJson(map[string]interface{}{
 			"success": false,
@@ -492,7 +502,7 @@ func (c ErpPurchaseBillEntry) PurchaseInTurn() revel.Result {
 	new_bill_entry.Price = bill_entry_in_db.Price
 	new_bill_entry.Amount = new_bill_entry.Price * float64(new_bill_entry.Qty)
 	new_bill_entry.PayAmount = pay_amount // 付款金额这里输入，财务下单
-	new_bill_entry.Desc = core.MakeNullString(bill_entry_from_ui.Desc.String+fmt.Sprintf(" 分批采购，原数量 %d", qty_before), true)
+	new_bill_entry.Desc = core.MakeNullString(fmt.Sprintf("分批采购，原数量 %d", qty_before), true)
 	new_bill_entry.StatusId = models.PURCHASE_BILL_STATUS_YSP // 已审批
 	new_bill_entry.CheckinQty = checkin_qty
 	new_bill_entry.CheckinTime = core.MakeNullTime(time.Now(), true)
@@ -504,6 +514,7 @@ func (c ErpPurchaseBillEntry) PurchaseInTurn() revel.Result {
 	new_bill_entry.DrawbackAmount = bill_entry_in_db.DrawbackAmount
 	new_bill_entry.FittingCost = (float64(checkin_qty) / float64(qty_before)) * fitting_cost_before
 	new_bill_entry.OtherCost = (float64(checkin_qty) / float64(qty_before)) * other_cost_before
+	new_bill_entry.TypeId = cggl_models.PURCHASE_BILL_TYPE_IN_TURN
 
 	_, err = db_session.Insert(&new_bill_entry)
 	core.HandleError(err)
