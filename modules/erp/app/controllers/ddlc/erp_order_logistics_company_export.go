@@ -575,13 +575,14 @@ WHERE o.status_id = %d AND ol.mode_id IN (%s) AND ol.stock_id = %d`
 			}
 			*/
 
-			if get_toll_packaged(service_id, stock_code) == false {
-				// service_id 为 2 的不拆包
-				sheet.Cell(index+1, excel_col_label_to_index("N")).Value = "1"
-			} else {
-				// service_id 不为 2 的要拆包
-				sheet.Cell(index+1, excel_col_label_to_index("N")).Value = fmt.Sprint(order_logistics.qty)
-			}
+			// 后来又改为拆包的模式
+			// if get_toll_packaged(service_id, stock_code) == false {
+			// service_id 为 2 的不拆包
+			// sheet.Cell(index+1, excel_col_label_to_index("N")).Value = "1"
+			// } else {
+			// service_id 不为 2 的要拆包
+			sheet.Cell(index+1, excel_col_label_to_index("N")).Value = fmt.Sprint(order_logistics.qty)
+			// }
 
 			sheet.Cell(index+1, excel_col_label_to_index("O")).Value = fmt.Sprintf("%0.1f", order_logistics.OrderLogistics.Length)
 			sheet.Cell(index+1, excel_col_label_to_index("P")).Value = fmt.Sprintf("%0.1f", order_logistics.OrderLogistics.Width)
@@ -712,13 +713,14 @@ func get_toll_order_sku_for_export(order_id int64, service_id string, stock_code
 		if order_sku_quantity.Quantity == 1 {
 			return fmt.Sprintf("%s %d [%s]", order_sku_quantity.Sku, order_sku_quantity.Quantity, order_sku_quantity.StorageLocName), order_sku_quantity.StorageLocName, order_sku_quantity.Quantity
 		} else if order_sku_quantity.Quantity > 1 {
-			if get_toll_packaged(service_id, stock_code) == false {
-				// service_id 为 2 的不拆包
-				return fmt.Sprintf("%s DOG%d [%s]", order_sku_quantity.Sku, order_sku_quantity.Quantity, order_sku_quantity.StorageLocName), order_sku_quantity.StorageLocName, order_sku_quantity.Quantity
-			} else {
-				// service_id 不为 2 的要拆包
-				return fmt.Sprintf("%s DOG [%s]", order_sku_quantity.Sku, order_sku_quantity.StorageLocName), order_sku_quantity.StorageLocName, order_sku_quantity.Quantity
-			}
+			// 后来又改为都需要拆包
+			//if get_toll_packaged(service_id, stock_code) == false {
+			// service_id 为 2 的不拆包
+			//	return fmt.Sprintf("%s DOG%d [%s]", order_sku_quantity.Sku, order_sku_quantity.Quantity, order_sku_quantity.StorageLocName), order_sku_quantity.StorageLocName, order_sku_quantity.Quantity
+			//} else {
+			// service_id 不为 2 的要拆包
+			return fmt.Sprintf("%s DOG [%s]", order_sku_quantity.Sku, order_sku_quantity.StorageLocName), order_sku_quantity.StorageLocName, order_sku_quantity.Quantity
+			//}
 
 		} else {
 			return "", "", 0
@@ -791,6 +793,7 @@ func get_toll_packaging_code(order_logistics ddlc_models.OrderLogisticsInfo) str
 	}
 }
 
+// 主要用于 BNE 的 service id
 func get_toll_service_id(stock_code int, order_shipping_address ddlc_models.OrderShippingAddressInfo) string {
 	var service_id string = ""
 	var postalcode_rune_list = []rune(order_shipping_address.PostalCode)
