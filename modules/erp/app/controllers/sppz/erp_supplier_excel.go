@@ -25,7 +25,7 @@ func (c ErpSupplierExcel) Import() revel.Result {
 }
 
 func (c ErpSupplierExcel) Export() revel.Result {
-	pass_service.Check_login_user_pass(pass_res.SPPZ_SUPPLIER, c.Session)
+	pass_service.Check_login_user_pass(pass_res.SPPZ_SUPPLIER_EXPORT, c.Session)
 
 	db_session := c.DbSession
 

@@ -27,10 +27,12 @@
                         删除
                     </button>
                     {% end %}
+                    {% if .has_export_pass %}
                     <button class="btn btn-pink btn-sm" onclick="exportSupplier()">
                         <i class="ace-icon fa fa-file-excel-o"></i>
                         导出
                     </button>
+                    {% end %}
                 </div>
                 <div>
                     <table id="supplierList" class="table table-striped table-bordered table-hover"></table>

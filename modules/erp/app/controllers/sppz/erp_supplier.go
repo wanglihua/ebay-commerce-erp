@@ -24,6 +24,9 @@ func (c ErpSupplier) Index() revel.Result {
 	var has_delete_pass = pass_service.Is_login_user_has_pass(pass_res.SPPZ_SUPPLIER_DELETE, c.Session)
 	c.RenderArgs["has_delete_pass"] = has_delete_pass
 
+	var has_export_pass = pass_service.Is_login_user_has_pass(pass_res.SPPZ_SUPPLIER_EXPORT, c.Session)
+	c.RenderArgs["has_export_pass"] = has_export_pass
+
 	return c.RenderTemplate("erp/sppz/supplier/supplier_index.html")
 }
 
