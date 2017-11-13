@@ -116,6 +116,7 @@ const (
 	SPPZ_PSL_BATCH           = 150700 // 批量修改仓位
 	SPPZ_SUPPLIER            = 150800 // 供应商
 	SPPZ_SUPPLIER_DELETE     = 150850 // 供应商删除
+	SPPZ_SUPPLIER_EXPORT     = 150875 // 供应商导出
 	SPPZ_PRODUCT_STATUS      = 150900 // 商品状态
 	SPPZ_SEA_CONTAINER_COST  = 151000 // 商品状态
 	SPPZ_BRAND               = 151100 // 商品品牌
