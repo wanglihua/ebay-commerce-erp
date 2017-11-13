@@ -9,6 +9,7 @@ import (
 	"matrix/core"
 	"matrix/modules/auth/pass_res"
 	"matrix/modules/auth/service/pass_service"
+	"matrix/modules/erp/models"
 )
 
 type ErpProductBatchEdit struct {
@@ -19,6 +20,7 @@ const (
 	EDIT_ATTR_NAME       = 1001
 	EDIT_ATTR_COST_PRICE = 1002
 	EDIT_ATTR_WEIGHT     = 1003
+	EDIT_ATTR_STATUS     = 1004
 )
 
 func (c ErpProductBatchEdit) Index() revel.Result {
@@ -39,6 +41,9 @@ func (c ErpProductBatchEdit) EditAttrList() revel.Result {
 	edit_attr_list = append(edit_attr_list, edit_attr{AttrId: EDIT_ATTR_NAME, AttrName: "名称"})
 	edit_attr_list = append(edit_attr_list, edit_attr{AttrId: EDIT_ATTR_COST_PRICE, AttrName: "采购价"})
 	edit_attr_list = append(edit_attr_list, edit_attr{AttrId: EDIT_ATTR_WEIGHT, AttrName: "重量"})
+	edit_attr_list = append(edit_attr_list, edit_attr{AttrId: EDIT_ATTR_STATUS, AttrName: "状态"})
+
+	// EDIT_ATTR_STATUS
 
 	return c.RenderJson(edit_attr_list)
 }
@@ -157,6 +162,29 @@ UPDATE erp_product SET weight = %s WHERE sku = '%s';
 			sql_update_cost_price = fmt.Sprintf(sql_update_cost_price, attr_value, sku)
 
 			_, err := db_session.Exec(sql_update_cost_price)
+			core.HandleError(err)
+		}
+	}
+
+	if detail_form.EditAttr == EDIT_ATTR_STATUS {
+		for _, sku_attr_value := range sku_attr_value_list {
+			sku := sku_attr_value.sku
+			attr_value := sku_attr_value.attr_value
+
+			var status models.StatusInfo
+			has, err := db_session.Where("type = ? AND name = ?", models.STATUS_TYPE_PRODUCT, attr_value).Get(&status)
+			core.HandleError(err)
+
+			if has == false {
+				return c.RenderJson(core.JsonResult{Success: false, Message: "商品状态名称不存在！"})
+			}
+
+			sql_update_status_id := `
+UPDATE erp_product SET status_id = %d WHERE sku = '%s';
+`
+			sql_update_status_id = fmt.Sprintf(sql_update_status_id, status.Id, sku)
+
+			_, err = db_session.Exec(sql_update_status_id)
 			core.HandleError(err)
 		}
 	}
