@@ -122,6 +122,14 @@ func (c ErpOrder) Index(status string) revel.Result {
 		is_button_quxiao_visible = true
 	}
 
+	var has_pass_order_huifu = pass_service.Is_login_user_has_pass(pass_res.DDLC_ORDER_HUIFU, c.Session)
+	var is_button_huifu_visible = false
+	if has_pass_order_huifu == true &&
+		status_id == models.ORDER_STATUS_YQX {
+
+		is_button_huifu_visible = true
+	}
+
 	c.RenderArgs["active_menu_html"] = template.HTML(active_menu_html)
 	c.RenderArgs["status"] = status
 	c.RenderArgs["status_id"] = status_id
@@ -130,6 +138,8 @@ func (c ErpOrder) Index(status string) revel.Result {
 	c.RenderArgs["icon_path"] = setting.ICON_PATH
 	c.RenderArgs["has_pass_order_new"] = has_pass_order_new
 	c.RenderArgs["is_button_quxiao_visible"] = is_button_quxiao_visible
+	c.RenderArgs["is_button_huifu_visible"] = is_button_huifu_visible
+
 	return c.RenderTemplate("erp/ddlc/order/order_index.html")
 }
 
