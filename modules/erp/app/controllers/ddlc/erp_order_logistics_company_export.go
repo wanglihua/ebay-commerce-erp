@@ -514,7 +514,6 @@ WHERE o.status_id = %d AND ol.mode_id IN (%s) AND ol.stock_id = %d`
 		var order_logistics_list = make([]order_logistics_toll_view_item_t, 0)
 		for _, order_logistics := range order_logistics_list_in_db {
 			var ol = order_logistics
-			ol.sku_qty_loc, ol.loc_name, ol.qty = get_toll_order_sku_for_export(order_logistics.Order.Id, db_session)
 
 			var order_shipping_address = order_service.Get_order_shipping_address(order_logistics.Order.Id, db_session)
 			ol.order_shipping_address = order_shipping_address
@@ -533,6 +532,8 @@ WHERE o.status_id = %d AND ol.mode_id IN (%s) AND ol.stock_id = %d`
 				service_id = get_toll_service_id(excel_export_stock_bne_code, order_shipping_address)
 			}
 			ol.service_id = service_id
+
+			ol.sku_qty_loc, ol.loc_name, ol.qty = get_toll_order_sku_for_export(order_logistics.Order.Id, service_id, stock_code, db_session)
 
 			order_logistics_list = append(order_logistics_list, ol)
 		}
@@ -564,7 +565,17 @@ WHERE o.status_id = %d AND ol.mode_id IN (%s) AND ol.stock_id = %d`
 			sheet.Cell(index+1, excel_col_label_to_index("L")).Value = "CARTON"
 			sheet.Cell(index+1, excel_col_label_to_index("M")).Value = get_toll_packaging_code(order_logistics.OrderLogistics) // 包裹类型要计算
 
+			/*
 			if service_id == "2" && stock_code == excel_export_stock_mel_code {
+				// service_id 为 2 的不拆包
+				sheet.Cell(index+1, excel_col_label_to_index("N")).Value = "1"
+			} else {
+				// service_id 不为 2 的要拆包
+				sheet.Cell(index+1, excel_col_label_to_index("N")).Value = fmt.Sprint(order_logistics.qty)
+			}
+			*/
+
+			if get_toll_packaged(service_id, stock_code) == false {
 				// service_id 为 2 的不拆包
 				sheet.Cell(index+1, excel_col_label_to_index("N")).Value = "1"
 			} else {
@@ -677,7 +688,20 @@ func get_order_sku_for_export(order_id int64, db_session *xorm.Session) (order_s
 	}
 }
 
-func get_toll_order_sku_for_export(order_id int64, db_session *xorm.Session) (order_sku_qty_loc_return string, loc_name_return string, qty_return int64) {
+// 返回 false 表示 不拆包， 返回 true 表示 拆包
+func get_toll_packaged(service_id string, stock_code int) bool {
+	if service_id == "2" && stock_code == excel_export_stock_mel_code {
+		// service_id 为 2 的 MEL的 不拆包
+		// sheet.Cell(index+1, excel_col_label_to_index("N")).Value = "1"
+		return false
+	} else {
+		// service_id 不为 2 的要拆包
+		// sheet.Cell(index+1, excel_col_label_to_index("N")).Value = fmt.Sprint(order_logistics.qty)
+		return true
+	}
+}
+
+func get_toll_order_sku_for_export(order_id int64, service_id string, stock_code int, db_session *xorm.Session) (order_sku_qty_loc_return string, loc_name_return string, qty_return int64) {
 	var order_sku_quantity_list = order_service.Get_order_sku_qty_loc_list(order_id, db_session)
 
 	var order_sku_quantity_list_len = len(order_sku_quantity_list)
@@ -688,7 +712,14 @@ func get_toll_order_sku_for_export(order_id int64, db_session *xorm.Session) (or
 		if order_sku_quantity.Quantity == 1 {
 			return fmt.Sprintf("%s %d [%s]", order_sku_quantity.Sku, order_sku_quantity.Quantity, order_sku_quantity.StorageLocName), order_sku_quantity.StorageLocName, order_sku_quantity.Quantity
 		} else if order_sku_quantity.Quantity > 1 {
-			return fmt.Sprintf("%s DOG [%s]", order_sku_quantity.Sku, order_sku_quantity.StorageLocName), order_sku_quantity.StorageLocName, order_sku_quantity.Quantity
+			if get_toll_packaged(service_id, stock_code) == false {
+				// service_id 为 2 的不拆包
+				return fmt.Sprintf("%s DOG%d [%s]", order_sku_quantity.Sku, order_sku_quantity.Quantity, order_sku_quantity.StorageLocName), order_sku_quantity.StorageLocName, order_sku_quantity.Quantity
+			} else {
+				// service_id 不为 2 的要拆包
+				return fmt.Sprintf("%s DOG [%s]", order_sku_quantity.Sku, order_sku_quantity.StorageLocName), order_sku_quantity.StorageLocName, order_sku_quantity.Quantity
+			}
+
 		} else {
 			return "", "", 0
 		}
