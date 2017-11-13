@@ -1846,8 +1846,9 @@ func (c ErpOrder) QuXiao() revel.Result {
 	var login_user = core.GetLoginUser(c.Session)
 
 	for _, order := range order_list {
+		order.CancelStatusId = order.StatusId
 		order.StatusId = models.ORDER_STATUS_YQX // 已取消
-		_, err = db_session.Id(order.Id).Cols("status_id").Update(&order)
+		_, err = db_session.Id(order.Id).Cols("status_id", "cancel_status_id").Update(&order)
 		core.HandleError(err)
 
 		order_history_service.Insert_order_history(order, login_user.UserId, fmt.Sprintf("订单取消， 工号： %s", login_user.LoginName), db_session)
@@ -1856,5 +1857,61 @@ func (c ErpOrder) QuXiao() revel.Result {
 	return c.RenderJson(map[string]interface{}{
 		"success": true,
 		"message": "订单取消成功！",
+	})
+}
+
+func (c ErpOrder) HuiFu() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_HUIFU, c.Session)
+
+	db_session := c.DbSession
+
+	order_id_list := make([]int64, 0)
+	c.Params.Bind(&order_id_list, "id_list")
+
+	var order_list = make([]ddlc_models.OrderInfo, 0)
+	err := db_session.In("id", order_id_list).Find(&order_list)
+	core.HandleError(err)
+
+	var login_user = core.GetLoginUser(c.Session)
+
+	for _, order := range order_list {
+
+		/*
+	ORDER_STATUS_YCJ            = 3850 // 订单状态 已创建
+	ORDER_STATUS_YZF            = 3900 // 订单状态 已支付
+	ORDER_STATUS_HOLD           = 3950 // 订单状态 Hold
+	ORDER_STATUS_PROCESSED_HOLD = 3975 // 订单状态 已处理Hold
+	ORDER_STATUS_DPH            = 4000 // 订单状态 待配货
+	ORDER_STATUS_PHZ            = 4100 // 订单状态 配货中
+	ORDER_STATUS_YFH            = 4200 // 订单状态 已发货
+	ORDER_STATUS_YWC            = 4300 // 订单状态 已完成
+	ORDER_STATUS_YQX            = 4350 // 订单状态 已取消
+		 */
+
+		if order.CancelStatusId != models.ORDER_STATUS_YCJ &&
+			order.CancelStatusId != models.ORDER_STATUS_YZF &&
+			order.CancelStatusId != models.ORDER_STATUS_HOLD &&
+			order.CancelStatusId != models.ORDER_STATUS_PROCESSED_HOLD &&
+			order.CancelStatusId != models.ORDER_STATUS_DPH &&
+			order.CancelStatusId != models.ORDER_STATUS_PHZ &&
+			order.CancelStatusId != models.ORDER_STATUS_YFH &&
+			order.CancelStatusId != models.ORDER_STATUS_YWC &&
+			order.CancelStatusId != models.ORDER_STATUS_YQX {
+			return c.RenderJson(map[string]interface{}{
+				"success": false,
+				"message": "订单取消前的记录的订单状态不合法！",
+			})
+		}
+
+		order.StatusId = order.CancelStatusId
+		_, err = db_session.Id(order.Id).Cols("status_id").Update(&order)
+		core.HandleError(err)
+
+		order_history_service.Insert_order_history(order, login_user.UserId, fmt.Sprintf("订单取消， 工号： %s", login_user.LoginName), db_session)
+	}
+
+	return c.RenderJson(map[string]interface{}{
+		"success": true,
+		"message": "订单恢复成功！",
 	})
 }

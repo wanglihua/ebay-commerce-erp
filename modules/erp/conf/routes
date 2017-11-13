@@ -388,6 +388,7 @@ POST /order/special/hold/not/ship          ErpOrder.SpecialHoldSpecialNotShip
 
 POST /order/wan/cheng                      ErpOrder.WanCheng
 POST /order/qu/xiao                        ErpOrder.QuXiao
+POST /order/hui/fu                         ErpOrder.HuiFu
 POST /order/pick/up/option/data            ErpOrder.PickupOptionData
 POST /order/pick/up                        ErpOrder.Pickup
 POST /order/rematch/hold/order/logistics   ErpOrder.ReMatchHoldOrderLogistics
