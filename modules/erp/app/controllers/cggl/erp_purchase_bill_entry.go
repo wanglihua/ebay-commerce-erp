@@ -261,7 +261,8 @@ func (c ErpPurchaseBillEntry) Save() revel.Result {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，批次中该商品已存在！"})
 		}
 
-		purchase_bill_entry.StatusId = purchase_bill.StatusId // 设置成采购单的当前状态
+		purchase_bill_entry.StatusId = purchase_bill.StatusId              // 设置成采购单的当前状态
+		purchase_bill_entry.TypeId = cggl_models.PURCHASE_BILL_TYPE_NORMAL // 正常的不分批采购的明细
 
 		affected, err = db_session.Insert(&purchase_bill_entry)
 		core.HandleError(err)
