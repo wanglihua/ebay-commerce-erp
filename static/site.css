@@ -445,10 +445,6 @@ div.gridToolBar .dropdown-menu > li > a:hover {
 }
 
 .wrap-word {
-    min-width: 80px;
-    white-space: normal;
-    word-break: break-all;
-    word-wrap: break-word;
 }
 
 .wrap-word div {

@@ -1109,7 +1109,22 @@
                     'purchase_bill_detail.purchase_bill.user_id': {
                         required: true, digits: true
                     },
-                    'purchase_bill_detail.purchase_bill.trans_expenses': {
+                    'purchase_bill_detail.purchase_bill.advance_amount': {
+                        required: true, number: true
+                    },
+                    'purchase_bill_detail.purchase_bill.final_amount': {
+                        required: true, number: true
+                    },
+                    'purchase_bill_detail.purchase_bill.advance_expenses': {
+                        required: true, number: true
+                    },
+                    'purchase_bill_detail.purchase_bill.final_expenses': {
+                        required: true, number: true
+                    },
+                    'purchase_bill_detail.purchase_bill.arrival_days': {
+                        required: true, number: true
+                    },
+                    'purchase_bill_detail.purchase_bill.pay_days': {
                         required: true, number: true
                     },
                     'purchase_bill_detail.purchase_bill.status_id': {
@@ -1292,6 +1307,18 @@
                         required: true, number: true
                     },
                     'purchase_bill_entry_detail.purchase_bill_entry.amount': {
+                        required: true, number: true
+                    },
+                    'purchase_bill_entry_detail.purchase_bill_entry.tax_point': {
+                        required: true, number: true
+                    },
+                    'purchase_bill_entry_detail.purchase_bill_entry.drawback_point': {
+                        required: true, number: true
+                    },
+                    'purchase_bill_entry_detail.purchase_bill_entry.fitting_cost': {
+                        required: true, number: true
+                    },
+                    'purchase_bill_entry_detail.purchase_bill_entry.other_cost': {
                         required: true, number: true
                     },
                     'purchase_bill_entry_detail.purchase_bill_entry.purchase_time': {
