@@ -368,6 +368,7 @@ WHERE p.id IN (%s);`
 		purchase_bill_entry.Qty = intel_repl.Qty
 
 		purchase_bill_entry.StatusId = purchase_bill.StatusId
+		purchase_bill_entry.TypeId = cggl_models.PURCHASE_BILL_TYPE_NORMAL
 
 		if has == true { // 现在改为一个SKU一个智能补货条目，这个条件一般不会有机会执行
 			var col_list = []string{"bill_id", "product_id", "mel_qty", "bne_qty", "qty", "status_id"}
