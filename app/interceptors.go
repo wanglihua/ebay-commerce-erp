@@ -7,7 +7,6 @@ import (
 
 	"github.com/revel/revel"
 	"github.com/revel/revel/cache"
-	"matrix/app/routes"
 	"matrix/core"
 	"matrix/core/lic"
 	"matrix/db"
@@ -166,7 +165,8 @@ func userAuth(c *revel.Controller) revel.Result {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "操作失败，未登陆或没相应权限！"})
 		} else {
 			//c.Result = c.Redirect(routes.Login.Index())
-			return c.Redirect(routes.Login.Index())
+			// return c.Redirect("/login")
+			return c.Redirect(revel.MainRouter.Reverse("Login.Index", make(map[string]string)).Url)
 		}
 	} else {
 		// 更新用户在线活动时间

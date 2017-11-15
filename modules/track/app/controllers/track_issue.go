@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/revel/revel"
-	"matrix/app/routes"
 	"matrix/core"
 	auth_models "matrix/modules/auth/models"
 	"matrix/modules/track/models"
@@ -62,7 +61,7 @@ FROM track_issue ti
 	core.HandleError(err)
 
 	var issue_count struct {
-		Count int64  `xorm:"'issue_count'"`
+		Count int64 `xorm:"'issue_count'"`
 	}
 
 	_, err = db_session.Sql(sb.SqlCount()).Get(&issue_count)
@@ -200,7 +199,7 @@ func (c TrackIssue) Save() revel.Result {
 		core.HandleError(err)
 
 		if affected == 0 {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！" })
+			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！"})
 		}
 	}
 
@@ -256,9 +255,13 @@ func (c TrackIssue) AddRedirect() revel.Result {
 	var added_issue_id int64
 	c.Params.Bind(&added_issue_id, "added_issue_id")
 
-	return c.Redirect(routes.TrackIssue.Detail(added_issue_id))
+	// return c.Redirect(routes.TrackIssue.Detail(added_issue_id))
+	args := make(map[string]string)
+	revel.Unbind(args, "issue_id", added_issue_id)
+	return c.Redirect(revel.MainRouter.Reverse("TrackIssue.Detail", args).Url)
 }
 
 func (c TrackIssue) DeleteRedirect() revel.Result {
-	return c.Redirect(routes.TrackIssue.Add())
+	// return c.Redirect(routes.TrackIssue.Add())
+	return c.Redirect(revel.MainRouter.Reverse("TrackIssue.Add", make(map[string]string)).Url)
 }
