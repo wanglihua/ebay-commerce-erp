@@ -10,7 +10,7 @@ type ProductInfo struct {
 	CnName           string          `xorm:"nvarchar(200) notnull index 'cn_name'" json:"cn_name" smith:"verbose_name=名称,min=2,max=100"`
 	Name             string          `xorm:"nvarchar(400) notnull index 'name'" json:"name" smith:"verbose_name=名称,min=2,max=100"`
 	CateId           core.NullInt    `xorm:"bigint index 'cate_id'" json:"cate_id" smith:"verbose_name=商品目录"`
-	CostPrice        float64         `xorm:"float notnull 'cost_price'" json:"cost_price" smith:"verbose_name=成本价,min=0"` //其实就是采购价，是 RMB
+	CostPrice        float64         `xorm:"float notnull 'cost_price'" json:"cost_price" smith:"verbose_name=采购价,min=0"` //其实就是采购价，是 RMB
 	SupplierId       core.NullInt    `xorm:"bigint index 'supplier_id'" json:"supplier_id" smith:"verbose_name=供应商"`
 	PkgMtrlId        core.NullInt    `xorm:"bigint index 'pkg_mtrl_id'" json:"pkg_mtrl_id" smith:"verbose_name=包材"`
 	ImageUrl         core.NullString `xorm:"nvarchar(500) 'image_url'" json:"image_url" smith:"verbose_name=图片地址"` // 许多图片中的一个图片，用于商品列表中的图片显示，存储的是某个店铺的图片地址

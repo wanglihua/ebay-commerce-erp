@@ -377,6 +377,12 @@ WHERE p.id IN (%s);`
 		purchase_bill_entry.StatusId = purchase_bill.StatusId
 		purchase_bill_entry.TypeId = cggl_models.PURCHASE_BILL_TYPE_NORMAL
 
+		// 获得商品的采购价
+		var product kcgl_models.ProductInfo
+		_, err = db_session.Id(intel_repl.ProductId).Get(&product)
+		core.HandleError(err)
+		purchase_bill_entry.Price = product.CostPrice
+
 		if has == true { // 现在改为一个SKU一个智能补货条目，这个条件一般不会有机会执行
 			var col_list = []string{"bill_id", "product_id", "mel_qty", "bne_qty", "qty", "status_id"}
 			_, err = db_session.Id(purchase_bill_entry.Id).Cols(col_list...).Update(&purchase_bill_entry)
