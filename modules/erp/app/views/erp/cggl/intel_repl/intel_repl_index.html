@@ -211,69 +211,74 @@
         },
         mounted: function () {
             initDataTable(
-                '#intelReplList',
-                {
-                    "sAjaxSource": '{%url "ErpIntelRepl.ListData"%}',
-                    "aaSorting": [[1, "asc"]],
-                    "aoColumns": [
-                        {
-                            "mDataProp": "ir.id", "bSearchable": false, "orderable": false, "sClass": "center", "width": 50,
-                            "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
-                            "render": function (data, type, row) {
-                                return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
-                            }
-                        },
-                        {
-                            "mDataProp": "p.sku", "title": "SKU", "bSearchable": true, "width": 150,
-                            "render": function (data, type, row) {
-                                return '<a href="/product/detail/' + row.p.id + '" target="product_detail">' + row.p.sku + '</a>';
-                            }
-                        },
-                        {
-                            "mDataProp": "p.cn_name", "title": "商品", "bSearchable": true, "sClass": "wrap-word",
-                            "render": function (data, type, row) {
-                                return "<div>" + data + "</div>";
-                            }
-                        },
-                        {
-                            "mDataProp": "sup.name", "title": "供应商", "bSearchable": true, "sClass": "wrap-word", "width": 150,
-                            "render": function (data, type, row) {
-                                return "<div>" + data + "</div>";
-                            }
-                        },
-                        {"mDataProp": "ps.name", "title": "商品状态", "bSearchable": true, "width": 80},
-                        {"mDataProp": "ir.qty", "title": "数量", "bSearchable": false, "width": 80},
-                        {"mDataProp": "ir.profit", "title": "毛利率", "bSearchable": false, "width": 80},
-                        {"mDataProp": "s.name", "title": "状态", "bSearchable": true, "width": 80},
-                        {"mDataProp": "ir.create_time", "title": "创建时间", "bSearchable": false, "width": 120}
-                    ],
-                    "fnServerData": function (sSource, aoData, fnCallback) {
-                        showMask("数据加载中，请稍候");
-
-                        aoData.push({'name': 'sku_query', 'value': $("#sku_query").val()});
-                        aoData.push({'name': 'min_profit_query', 'value': $("#min_profit_query").val()});
-                        aoData.push({'name': 'max_profit_query', 'value': $("#max_profit_query").val()});
-                        aoData.push({'name': 'product_status_id_query', 'value': $("#product_status_id_query").val()});
-                        aoData.push({'name': 'status_id_query', 'value': $("#status_id_query").val()});
-
-                        aoData.push({name: 'sale_user_id_query', value: $("#sale_user_id_query").val()});
-                        aoData.push({name: 'dev_user_id_query', value: $("#dev_user_id_query").val()});
-
-                        $.ajax({
-                            "dataType": 'json',
-                            "url": sSource,
-                            "data": aoData,
-                            "success": function (data) {
-                                hideMask();
-                                if (data.success === false) {
-                                    $.msg.error(data.message);
-                                    return;
+                    '#intelReplList',
+                    {
+                        "sAjaxSource": '{%url "ErpIntelRepl.ListData"%}',
+                        "aaSorting": [[1, "asc"]],
+                        "aoColumns": [
+                            {
+                                "mDataProp": "ir.id", "bSearchable": false, "orderable": false, "sClass": "center", "width": 50,
+                                "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
+                                "render": function (data, type, row) {
+                                    return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
                                 }
-                                fnCallback(data);
-                            }
-                        });
+                            },
+                            {
+                                "mDataProp": "p.sku", "title": "SKU", "bSearchable": true, "width": 150,
+                                "render": function (data, type, row) {
+                                    return '<a href="/product/detail/' + row.p.id + '" target="product_detail">' + row.p.sku + '</a>';
+                                }
+                            },
+                            {
+                                "mDataProp": "p.cn_name", "title": "商品", "bSearchable": true, "sClass": "wrap-word",
+                                "render": function (data, type, row) {
+                                    return "<div>" + data + "</div>";
+                                }
+                            },
+                            {
+                                "mDataProp": "sup.name", "title": "供应商", "bSearchable": true, "sClass": "wrap-word", "width": 150,
+                                "render": function (data, type, row) {
+                                    return "<div>" + data + "</div>";
+                                }
+                            },
+                            {"mDataProp": "ps.name", "title": "商品状态", "bSearchable": true, "width": 80},
+                            {"mDataProp": "ir.qty", "title": "数量", "bSearchable": false, "width": 80},
+                            {
+                                "mDataProp": "ir.profit", "title": "毛利率", "bSearchable": false, "width": 80,
+                                "render": function (data, type, row) {
+                                    return dtFormatFloat(data);
+                                }
+                            },
+                            {"mDataProp": "s.name", "title": "状态", "bSearchable": true, "width": 80},
+                            {"mDataProp": "ir.create_time", "title": "创建时间", "bSearchable": false, "width": 120}
+                        ],
+                        "fnServerData": function (sSource, aoData, fnCallback) {
+                            showMask("数据加载中，请稍候");
+
+                            aoData.push({'name': 'sku_query', 'value': $("#sku_query").val()});
+                            aoData.push({'name': 'min_profit_query', 'value': $("#min_profit_query").val()});
+                            aoData.push({'name': 'max_profit_query', 'value': $("#max_profit_query").val()});
+                            aoData.push({'name': 'product_status_id_query', 'value': $("#product_status_id_query").val()});
+                            aoData.push({'name': 'status_id_query', 'value': $("#status_id_query").val()});
+
+                            aoData.push({name: 'sale_user_id_query', value: $("#sale_user_id_query").val()});
+                            aoData.push({name: 'dev_user_id_query', value: $("#dev_user_id_query").val()});
+
+                            $.ajax({
+                                "dataType": 'json',
+                                "url": sSource,
+                                "data": aoData,
+                                "success": function (data) {
+                                    hideMask();
+                                    if (data.success === false) {
+                                        $.msg.error(data.message);
+                                        return;
+                                    }
+                                    fnCallback(data);
+                                }
+                            });
+                        }
                     }
-                }
             );
 
             /*

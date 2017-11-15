@@ -56,7 +56,7 @@ func (c ErpContainerTransfer) ListData() revel.Result {
 	}
 
 	query := db_session.
-	Select("ct.*, s.*").
+		Select("ct.*, s.*").
 		Table("erp_container_transfer").Alias("ct").
 		Join("inner", []string{"erp_status", "s"}, "ct.status_id = s.id").
 		Where(filter)
@@ -485,6 +485,7 @@ WHERE cte.transfer_id = %d AND (p.length = 0 OR p.width = 0 OR p.height = 0 OR p
 
 var stock_mutex sync.Mutex
 
+// 为什么这个 Action 还是可以被调用两次？？？
 func (c ErpContainerTransfer) Stock() revel.Result {
 	stock_mutex.Lock()
 	defer func() {

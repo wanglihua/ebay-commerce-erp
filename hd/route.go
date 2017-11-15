@@ -85,7 +85,7 @@ func generateRouteForImportPath(import_path string) {
 	//harness.GenSource("tmp", "main.go", harness.MAIN, templateArgs)
 
 	mainCode := revel.ExecuteTemplate(
-		template.Must(template.New("").Parse(MAIN_TEMPLATE)),
+		template.Must(template.New("main_template").Parse(MAIN_TEMPLATE)),
 		templateArgs)
 
 	// Create the main file
@@ -99,11 +99,12 @@ func generateRouteForImportPath(import_path string) {
 		revel.ERROR.Fatalf("Failed to write to file: %v", mainError)
 	}
 
+	/*
 	//harness.GenSource("routes", "routes.go", harness.ROUTES, templateArgs)
 
 	var routesDir = "routes"
 	sourceCode := revel.ExecuteTemplate(
-		template.Must(template.New("").Parse(ROUTES_TEMPLATE)),
+		template.Must(template.New("routes").Parse(ROUTES_TEMPLATE)),
 		templateArgs)
 
 	// Create a fresh dir.
@@ -125,8 +126,11 @@ func generateRouteForImportPath(import_path string) {
 	if routesError != nil {
 		revel.ERROR.Fatalf("Failed to write to file: %v", routesError)
 	}
+	*/
 
-	fmt.Println("Generate main.go routes.go success!")
+	// fmt.Println("Generate main.go routes.go success!")
+
+	fmt.Println("Generate main.go success!")
 }
 
 func cleanDir(dir string) {
