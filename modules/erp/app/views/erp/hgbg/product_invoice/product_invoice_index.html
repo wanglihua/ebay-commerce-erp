@@ -226,13 +226,13 @@
                             {
                                 "mDataProp": "p.tax_point", "title": "收取税点", "bSearchable": false, "width": 80, "sClass": "center",
                                 "render": function (data, type, row) {
-                                    return dtFormatFloat(data);
+                                    return dtFormatFloat(data) + "%";
                                 }
                             },
                             {
                                 "mDataProp": "p.drawback_point", "title": "退税点", "bSearchable": false, "width": 80, "sClass": "center",
                                 "render": function (data, type, row) {
-                                    return dtFormatFloat(data);
+                                    return dtFormatFloat(data) + "%";
                                 }
                             },
                             {"mDataProp": "s.name", "title": "状态", "bSearchable": true, "width": 80}

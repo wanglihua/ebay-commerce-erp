@@ -122,6 +122,8 @@ func (c ErpProductInvoice) Save() revel.Result {
 	}
 
 	product_in_db.NeedInvoice = detail_form.Product.NeedInvoice
+	product_in_db.TaxPoint = detail_form.Product.TaxPoint
+	product_in_db.DrawbackPoint = detail_form.Product.DrawbackPoint
 
 	updata_col_List := []string{"need_invoice", "tax_point", "drawback_point"}
 	_, err = db_session.Id(product_id).Cols(updata_col_List...).Update(&product_in_db)
@@ -258,9 +260,11 @@ func (c ErpProductInvoice) Import() revel.Result {
 
 		product.Sku = product_invoice.sku
 		product.NeedInvoice = product_invoice.need_invoice
+		product.TaxPoint = product_invoice.tax_point
+		product.DrawbackPoint = product_invoice.drawback_point
 
 		if has == true {
-			_, err = db_session.Id(product.Id).Cols("need_invoice").Update(&product)
+			_, err = db_session.Id(product.Id).Cols("need_invoice", "tax_point", "drawback_point").Update(&product)
 			core.HandleError(err)
 		} else {
 			panic(fmt.Sprintf("商品SKU %s 数据库中不存在！", product_invoice.sku))
@@ -426,13 +430,13 @@ func (c ErpProductInvoice) export_product_list_to_excel(db_session *xorm.Session
 		cell = row.AddCell()
 		sheet.SetColWidth(col_index, col_index, 10)
 		set_head_cell_style(cell)
-		cell.Value = "收取税点"
+		cell.Value = "收取税点(1表示1%)"
 		col_index++
 
 		cell = row.AddCell()
 		sheet.SetColWidth(col_index, col_index, 10)
 		set_head_cell_style(cell)
-		cell.Value = "退税点"
+		cell.Value = "退税点(1表示1%)"
 		col_index++
 
 		cell = row.AddCell()
