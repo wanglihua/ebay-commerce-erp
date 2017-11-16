@@ -87,7 +87,7 @@
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
-                                            <label for="tax_point" class="col-xs-2 control-label">收税点</label>
+                                            <label for="tax_point" class="col-xs-2 control-label">收取税点</label>
                                             <div class="col-xs-10">
                                                 <div class="input-group">
                                                     <input id="tax_point" name="detail.product.tax_point" type="text" class="input-sm form-control" v-model.number="detail.product.tax_point"/>
@@ -240,21 +240,20 @@
                         "fnServerData": function (sSource, aoData, fnCallback) {
                             showMask("数据加载中，请稍候");
 
-                            $.ajax(
-                                    {
-                                        "dataType": 'json',
-                                        "url": sSource,
-                                        "data": aoData,
-                                        "success": function (data) {
-                                            hideMask();
+                            $.ajax({
+                                "dataType": 'json',
+                                "url": sSource,
+                                "data": aoData,
+                                "success": function (data) {
+                                    hideMask();
 
-                                            if (data.success === false) {
-                                                $.msg.error(data.message);
-                                                return;
-                                            }
-                                            fnCallback(data);
-                                        }
-                                    });
+                                    if (data.success === false) {
+                                        $.msg.error(data.message);
+                                        return;
+                                    }
+                                    fnCallback(data);
+                                }
+                            });
                         }
                     }
             );
@@ -274,23 +273,22 @@
                 showMask("加载中...");
                 $("#productDetailDialog").clearValidation();
                 $.ajax({
-                            url: '{%url "ErpProductInvoice.DetailData" %}',
-                            type: "POST",
-                            data: {
-                                "id": product_id
-                            },
-                            success: function (result) {
-                                hideMask();
-                                if (result.success === false) {
-                                    $.msg.error(result.message);
-                                    return;
-                                }
-                                vm.detail = result;
-
-                                $('#productDetailDialog').modal(modalOptions);
-                            }
+                    url: '{%url "ErpProductInvoice.DetailData" %}',
+                    type: "POST",
+                    data: {
+                        "id": product_id
+                    },
+                    success: function (result) {
+                        hideMask();
+                        if (result.success === false) {
+                            $.msg.error(result.message);
+                            return;
                         }
-                );
+                        vm.detail = result;
+
+                        $('#productDetailDialog').modal(modalOptions);
+                    }
+                });
             },
             saveProductNeedInvoice: function () {
                 showMask("提交中...");
@@ -308,26 +306,25 @@
                     hideMask();
                 } else {
                     $.ajax({
-                                url: '{%url "ErpProductInvoice.Save"%}',
-                                type: "POST",
-                                processData: false,
-                                contentType: 'application/json',
-                                data: JSON.stringify(vm.detail),
-                                success: function (data) {
-                                    hideMask();
-                                    if (data.success === false) {
-                                        $.msg.error(data.message);
-                                        //return;
-                                    }
-                                    else {
-                                        $.msg.show(data.message);
-                                        $('#productDetailDialog').modal('hide');
-                                        vm.reloadList();
-                                        //return;
-                                    }
-                                }
+                        url: '{%url "ErpProductInvoice.Save"%}',
+                        type: "POST",
+                        processData: false,
+                        contentType: 'application/json',
+                        data: JSON.stringify(vm.detail),
+                        success: function (data) {
+                            hideMask();
+                            if (data.success === false) {
+                                $.msg.error(data.message);
+                                //return;
                             }
-                    );
+                            else {
+                                $.msg.show(data.message);
+                                $('#productDetailDialog').modal('hide');
+                                vm.reloadList();
+                                //return;
+                            }
+                        }
+                    });
                 }
             },
             exportProduct: function () {

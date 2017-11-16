@@ -250,6 +250,45 @@
 
                             <div class="col-xs-3">
                                 <div class="form-group">
+                                    <label for="need_invoice" class="col-xs-4 control-label">是否开票：</label>
+                                    <div class="col-xs-8">
+                                        <select id="need_invoice" name="detail.product.need_invoice" class="input-sm form-control" v-model.number="detail.product.need_invoice" disabled="disabled">
+                                            <option :value="0">否</option>
+                                            <option :value="1">是</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-xs-3">
+                                <div class="form-group">
+                                    <label for="tax_point" class="col-xs-4 control-label">收取税点</label>
+                                    <div class="col-xs-8">
+                                        <div class="input-group">
+                                            <input id="tax_point" name="detail.product.tax_point" type="text" class="input-sm form-control" v-model.number="detail.product.tax_point"/>
+                                            <span class="input-group-addon">%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-xs-3">
+                                <div class="form-group">
+                                    <label for="drawback_point" class="col-xs-4 control-label">退税点</label>
+                                    <div class="col-xs-8">
+                                        <div class="input-group">
+                                            <input id="drawback_point" name="detail.product.drawback_point" type="text" class="input-sm form-control" v-model.number="detail.product.drawback_point"/>
+                                            <span class="input-group-addon">%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+
+                            <div class="col-xs-3">
+                                <div class="form-group">
                                     <label for="product_status_id" class="col-xs-4 control-label">状态：</label>
                                     <div class="col-xs-8">
                                         <select id="product_status_id" name="detail.product.status_id" class="input-sm form-control" v-model.number="detail.product.status_id">
@@ -261,20 +300,8 @@
                                 </div>
                             </div>
 
-                            {%/*
-                            <div class="col-xs-3">
-                                <div class="form-group">
-                                    <label for="need_invoice" class="col-xs-4 control-label">是否开票：</label>
-                                    <div class="col-xs-8">
-                                        <select id="need_invoice" name="detail.product.need_invoice" class="input-sm form-control" v-model.number="detail.product.need_invoice">
-                                            <option :value="0">否</option>
-                                            <option :value="1">是</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                            */%}
                         </div>
+
                         <div class="row">
                             <div class="col-xs-6">
                                 <div class="form-group">
@@ -321,28 +348,28 @@
             var this_vm = this;
 
             $.ajax(
-                {
-                    "type": "POST",
-                    "dataType": 'json',
-                    "url": '{% url "ErpProduct.DetailData"%}',
-                    "data": {
-                        "id": product_id
-                    },
-                    "success": function (data) {
-                        if (data.success == false) {
-                            $.msg.error(data.message);
-                            return;
-                        }
-                        this_vm.detail = data;
+                    {
+                        "type": "POST",
+                        "dataType": 'json',
+                        "url": '{% url "ErpProduct.DetailData"%}',
+                        "data": {
+                            "id": product_id
+                        },
+                        "success": function (data) {
+                            if (data.success === false) {
+                                $.msg.error(data.message);
+                                return;
+                            }
+                            this_vm.detail = data;
 
-                        this_vm.detail.product.length = parseFloat(dtFormatFloat(this_vm.detail.product.length));
-                        this_vm.detail.product.width = parseFloat(dtFormatFloat(this_vm.detail.product.width));
-                        this_vm.detail.product.height = parseFloat(dtFormatFloat(this_vm.detail.product.height));
-                        this_vm.detail.product.weight = parseFloat(dtFormatFloat(this_vm.detail.product.weight));
-                        this_vm.detail.product.cost_price = parseFloat(dtFormatFloat(this_vm.detail.product.cost_price));
-                        this_vm.detail.product.daily_mean_sales = parseFloat(dtFormatFloat(this_vm.detail.product.daily_mean_sales));
-                    }
-                });
+                            this_vm.detail.product.length = parseFloat(dtFormatFloat(this_vm.detail.product.length));
+                            this_vm.detail.product.width = parseFloat(dtFormatFloat(this_vm.detail.product.width));
+                            this_vm.detail.product.height = parseFloat(dtFormatFloat(this_vm.detail.product.height));
+                            this_vm.detail.product.weight = parseFloat(dtFormatFloat(this_vm.detail.product.weight));
+                            this_vm.detail.product.cost_price = parseFloat(dtFormatFloat(this_vm.detail.product.cost_price));
+                            this_vm.detail.product.daily_mean_sales = parseFloat(dtFormatFloat(this_vm.detail.product.daily_mean_sales));
+                        }
+                    });
         },
         methods: {
             saveProduct: function () {
@@ -379,36 +406,36 @@
                     hideMask();
                 } else {
                     $.ajax({
-                            url: '{%url "ErpProduct.Save"%}',
-                            type: "POST",
-                            processData: false,
-                            contentType: 'application/json',
-                            data: JSON.stringify(vm.detail.product),
-                            success: function (data) {
-                                hideMask();
-                                if (data.success === false) {
-                                    $.msg.error(data.message);
-                                    //return;
-                                }
-                                else {
-                                    vm.detail.product = data.product;
-
-                                    vm.detail.product.length = parseFloat(dtFormatFloat(vm.detail.product.length));
-                                    vm.detail.product.width = parseFloat(dtFormatFloat(vm.detail.product.width));
-                                    vm.detail.product.height = parseFloat(dtFormatFloat(vm.detail.product.height));
-                                    vm.detail.product.weight = parseFloat(dtFormatFloat(vm.detail.product.weight));
-                                    vm.detail.product.cost_price = parseFloat(dtFormatFloat(vm.detail.product.cost_price));
-                                    vm.detail.product.daily_mean_sales = parseFloat(dtFormatFloat(vm.detail.product.daily_mean_sales));
-
-                                    $.msg.show(data.message);
-
-                                    if (data.is_create === true) {
-                                        setTimeout("window.location.href='/product/edit/" + data.product.id + "'", 1000) //重新打开已保存好的商品的编辑页面
+                                url: '{%url "ErpProduct.Save"%}',
+                                type: "POST",
+                                processData: false,
+                                contentType: 'application/json',
+                                data: JSON.stringify(vm.detail.product),
+                                success: function (data) {
+                                    hideMask();
+                                    if (data.success === false) {
+                                        $.msg.error(data.message);
+                                        //return;
                                     }
-                                    //return;
+                                    else {
+                                        vm.detail.product = data.product;
+
+                                        vm.detail.product.length = parseFloat(dtFormatFloat(vm.detail.product.length));
+                                        vm.detail.product.width = parseFloat(dtFormatFloat(vm.detail.product.width));
+                                        vm.detail.product.height = parseFloat(dtFormatFloat(vm.detail.product.height));
+                                        vm.detail.product.weight = parseFloat(dtFormatFloat(vm.detail.product.weight));
+                                        vm.detail.product.cost_price = parseFloat(dtFormatFloat(vm.detail.product.cost_price));
+                                        vm.detail.product.daily_mean_sales = parseFloat(dtFormatFloat(vm.detail.product.daily_mean_sales));
+
+                                        $.msg.show(data.message);
+
+                                        if (data.is_create === true) {
+                                            setTimeout("window.location.href='/product/edit/" + data.product.id + "'", 1000) //重新打开已保存好的商品的编辑页面
+                                        }
+                                        //return;
+                                    }
                                 }
                             }
-                        }
                     );
                 }
             }
