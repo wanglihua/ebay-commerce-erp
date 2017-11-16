@@ -982,22 +982,21 @@
 
                             aoData.push({'name': 'purchase_bill_id', 'value': this_vm.purchase_bill_id});
 
-                            $.ajax(
-                                    {
-                                        "dataType": 'json',
-                                        "url": sSource,
-                                        "data": aoData,
-                                        "success": function (data) {
-                                            hideMask();
-                                            if (data.success === false) {
-                                                $.msg.error(data.message);
-                                                return;
-                                            }
-                                            fnCallback(data.list_data);
+                            $.ajax({
+                                "dataType": 'json',
+                                "url": sSource,
+                                "data": aoData,
+                                "success": function (data) {
+                                    hideMask();
+                                    if (data.success === false) {
+                                        $.msg.error(data.message);
+                                        return;
+                                    }
+                                    fnCallback(data.list_data);
 
-                                            vm.purchase_bill_code = data.purchase_bill_code
-                                        }
-                                    });
+                                    vm.purchase_bill_code = data.purchase_bill_code
+                                }
+                            });
                         }
                     }
             );

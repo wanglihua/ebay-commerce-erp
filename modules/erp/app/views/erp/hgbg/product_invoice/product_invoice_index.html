@@ -62,12 +62,51 @@
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
+                                            <label for="cn_name" class="col-xs-2 control-label">商品名称</label>
+                                            <div class="col-xs-10">
+                                                <input id="sku" name="detail.product.cn_name" type="text" class="input-sm form-control" disabled="disabled" v-model="detail.product.cn_name"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
                                             <label for="need_invoice" class="col-xs-2 control-label">是否开票：</label>
                                             <div class="col-xs-10">
                                                 <select id="need_invoice" name="detail.product.need_invoice" class="input-sm form-control" v-model.number="detail.product.need_invoice">
                                                     <option :value="0">否</option>
                                                     <option :value="1">是</option>
                                                 </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <label for="tax_point" class="col-xs-2 control-label">收税点</label>
+                                            <div class="col-xs-10">
+                                                <div class="input-group">
+                                                    <input id="tax_point" name="detail.product.tax_point" type="text" class="input-sm form-control" v-model.number="detail.product.tax_point"/>
+                                                    <span class="input-group-addon">%</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <label for="drawback_point" class="col-xs-2 control-label">退税点</label>
+                                            <div class="col-xs-10">
+                                                <div class="input-group">
+                                                    <input id="drawback_point" name="detail.product.drawback_point" type="text" class="input-sm form-control" v-model.number="detail.product.drawback_point"/>
+                                                    <span class="input-group-addon">%</span>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -155,59 +194,69 @@
             var this_vm = this;
 
             initDataTable(
-                '#productList',
-                {
-                    "sAjaxSource": '{%url "ErpProductInvoice.ListData"%}',
-                    "aaSorting": [[1, "asc"]],
-                    "aoColumns": [
-                        {
-                            "mDataProp": "p.id",
-                            "bSearchable": false,
-                            "orderable": false,
-                            "sClass": "center",
-                            "width": 50,
-                            "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
-                            "render": function (data, type, row) {
-                                return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
-                            }
-                        },
-                        {"mDataProp": "p.sku", "title": "商品SKU", "bSearchable": true, "width": 150},
-                        {"mDataProp": "p.cn_name", "title": "商品名称", "bSearchable": true},
-                        {
-                            "mDataProp": "p.need_invoice", "title": "是否开票", "bSearchable": false, "width": 80,
-                            "render": function (data, type, row) {
-                                if (data === 0) {
-                                    return "否"
-                                }
-                                else {
-                                    return "是";
-                                }
-                            }
-                        },
-                        {"mDataProp": "s.name", "title": "状态", "bSearchable": true, "width": 80},
-                        {"mDataProp": "p.create_time", "title": "创建时间", "bSearchable": false, "width": 120},
-                        {"mDataProp": "p.update_time", "title": "修改时间", "bSearchable": false, "width": 120}
-                    ],
-                    "fnServerData": function (sSource, aoData, fnCallback) {
-                        showMask("数据加载中，请稍候");
-
-                        $.ajax(
+                    '#productList',
+                    {
+                        "sAjaxSource": '{%url "ErpProductInvoice.ListData"%}',
+                        "aaSorting": [[1, "asc"]],
+                        "aoColumns": [
                             {
-                                "dataType": 'json',
-                                "url": sSource,
-                                "data": aoData,
-                                "success": function (data) {
-                                    hideMask();
-
-                                    if (data.success === false) {
-                                        $.msg.error(data.message);
-                                        return;
-                                    }
-                                    fnCallback(data);
+                                "mDataProp": "p.id",
+                                "bSearchable": false,
+                                "orderable": false,
+                                "sClass": "center",
+                                "width": 50,
+                                "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
+                                "render": function (data, type, row) {
+                                    return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
                                 }
-                            });
+                            },
+                            {"mDataProp": "p.sku", "title": "商品SKU", "bSearchable": true, "width": 150},
+                            {"mDataProp": "p.cn_name", "title": "商品名称", "bSearchable": true},
+                            {
+                                "mDataProp": "p.need_invoice", "title": "是否开票", "bSearchable": false, "width": 80, "sClass": "center",
+                                "render": function (data, type, row) {
+                                    if (data === 0) {
+                                        return "否"
+                                    }
+                                    else {
+                                        return "是";
+                                    }
+                                }
+                            },
+                            {
+                                "mDataProp": "p.tax_point", "title": "收取税点", "bSearchable": false, "width": 80, "sClass": "center",
+                                "render": function (data, type, row) {
+                                    return dtFormatFloat(data);
+                                }
+                            },
+                            {
+                                "mDataProp": "p.drawback_point", "title": "退税点", "bSearchable": false, "width": 80, "sClass": "center",
+                                "render": function (data, type, row) {
+                                    return dtFormatFloat(data);
+                                }
+                            },
+                            {"mDataProp": "s.name", "title": "状态", "bSearchable": true, "width": 80}
+                        ],
+                        "fnServerData": function (sSource, aoData, fnCallback) {
+                            showMask("数据加载中，请稍候");
+
+                            $.ajax(
+                                    {
+                                        "dataType": 'json',
+                                        "url": sSource,
+                                        "data": aoData,
+                                        "success": function (data) {
+                                            hideMask();
+
+                                            if (data.success === false) {
+                                                $.msg.error(data.message);
+                                                return;
+                                            }
+                                            fnCallback(data);
+                                        }
+                                    });
+                        }
                     }
-                }
             );
 
             $('#productList tbody').on('dblclick', 'tr', function () {
@@ -225,22 +274,22 @@
                 showMask("加载中...");
                 $("#productDetailDialog").clearValidation();
                 $.ajax({
-                        url: '{%url "ErpProductInvoice.DetailData" %}',
-                        type: "POST",
-                        data: {
-                            "id": product_id
-                        },
-                        success: function (result) {
-                            hideMask();
-                            if (result.success === false) {
-                                $.msg.error(result.message);
-                                return;
-                            }
-                            vm.detail = result;
+                            url: '{%url "ErpProductInvoice.DetailData" %}',
+                            type: "POST",
+                            data: {
+                                "id": product_id
+                            },
+                            success: function (result) {
+                                hideMask();
+                                if (result.success === false) {
+                                    $.msg.error(result.message);
+                                    return;
+                                }
+                                vm.detail = result;
 
-                            $('#productDetailDialog').modal(modalOptions);
+                                $('#productDetailDialog').modal(modalOptions);
+                            }
                         }
-                    }
                 );
             },
             saveProductNeedInvoice: function () {
@@ -259,25 +308,25 @@
                     hideMask();
                 } else {
                     $.ajax({
-                            url: '{%url "ErpProductInvoice.Save"%}',
-                            type: "POST",
-                            processData: false,
-                            contentType: 'application/json',
-                            data: JSON.stringify(vm.detail),
-                            success: function (data) {
-                                hideMask();
-                                if (data.success === false) {
-                                    $.msg.error(data.message);
-                                    //return;
-                                }
-                                else {
-                                    $.msg.show(data.message);
-                                    $('#productDetailDialog').modal('hide');
-                                    vm.reloadList();
-                                    //return;
+                                url: '{%url "ErpProductInvoice.Save"%}',
+                                type: "POST",
+                                processData: false,
+                                contentType: 'application/json',
+                                data: JSON.stringify(vm.detail),
+                                success: function (data) {
+                                    hideMask();
+                                    if (data.success === false) {
+                                        $.msg.error(data.message);
+                                        //return;
+                                    }
+                                    else {
+                                        $.msg.show(data.message);
+                                        $('#productDetailDialog').modal('hide');
+                                        vm.reloadList();
+                                        //return;
+                                    }
                                 }
                             }
-                        }
                     );
                 }
             },

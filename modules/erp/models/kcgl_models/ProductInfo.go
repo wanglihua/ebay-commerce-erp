@@ -26,6 +26,8 @@ type ProductInfo struct {
 	CnHsCode         string          `xorm:"nvarchar(100) notnull index 'cn_hs_code'" json:"cn_hs_code" smith:"verbose_name=中国海关编码,min=1,max=10"`
 	AuHsCode         string          `xorm:"nvarchar(100) notnull index 'au_hs_code'" json:"au_hs_code" smith:"verbose_name=澳洲海关编码,min=1,max=8"`
 	NeedInvoice      int64           `xorm:"bigint notnull 'need_invoice'" json:"need_invoice"` // 是否开票
+	TaxPoint         float64         `xorm:"decimal(18,6) notnull 'tax_point' default(0)" json:"tax_point" smith:"verbose_name=收取税点"`
+	DrawbackPoint    float64         `xorm:"decimal(18,6) notnull 'drawback_point' default(0)" json:"drawback_point" smith:"verbose_name=退税点"`
 	BrandId          int64           `xorm:"bigint notnull 'brand_id' default(0)" json:"brand_id"`
 	StyleId          int64           `xorm:"bigint notnull 'style_id' default(0)" json:"style_id"`
 	Cert1Id          int64           `xorm:"bigint notnull 'cert1_id' default(0)" json:"cert1_id"`

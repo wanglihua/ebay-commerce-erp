@@ -122,7 +122,7 @@ func (c ErpProductInvoice) Save() revel.Result {
 
 	product_in_db.NeedInvoice = detail_form.Product.NeedInvoice
 
-	updata_col_List := []string{"need_invoice"}
+	updata_col_List := []string{"need_invoice", "tax_point", "drawback_point"}
 	_, err = db_session.Id(product_id).Cols(updata_col_List...).Update(&product_in_db)
 	core.HandleError(err)
 
