@@ -346,6 +346,14 @@ WHERE p.id IN (%s);`
 
 	var supplier_id = supplier_id_list[0].SupplierId
 
+	// 供应商不能为空
+	if supplier_id == 0 {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "采购单的供应商不能为空，请先设置SKU供应商！",
+		})
+	}
+
 	// var mel_stock_id = stock_service.Get_mel_stock_id(db_session)
 	// var bne_stock_id = stock_service.Get_bne_stock_id(db_session)
 
