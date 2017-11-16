@@ -15,6 +15,7 @@ import (
 	"bytes"
 	"time"
 	"github.com/go-xorm/xorm"
+	"strconv"
 )
 
 type ErpProductInvoice struct {
@@ -150,8 +151,10 @@ func (c ErpProductInvoice) Import() revel.Result {
 	}
 
 	type product_invoice_t struct {
-		sku          string
-		need_invoice int64
+		sku            string
+		need_invoice   int64
+		tax_point      float64
+		drawback_point float64
 	}
 
 	product_invoice_list := make([]product_invoice_t, 0)
@@ -172,7 +175,7 @@ func (c ErpProductInvoice) Import() revel.Result {
 			var cell_val string
 			var err error
 
-			var product_weight product_invoice_t
+			var product_invoice product_invoice_t
 
 			col_index := 0 //从第二列开始导入，略去第一列的编号
 
@@ -187,24 +190,57 @@ func (c ErpProductInvoice) Import() revel.Result {
 			}
 
 			//revel.TRACE.Println(cell_val)
-			product_weight.sku = cell_val
+			product_invoice.sku = cell_val
 			col_index++
 
-			// length
+			// 是否开票
 			// cell = row.Cells[col_index]
 			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
 
 			if strings.TrimSpace(cell_val) == "是" {
-				product_weight.need_invoice = 1
+				product_invoice.need_invoice = 1
 			} else {
-				product_weight.need_invoice = 0
+				product_invoice.need_invoice = 0
 			}
 
 			col_index++
 
-			product_invoice_list = append(product_invoice_list, product_weight)
+			// 收取税点
+			cell = sheet.Cell(row_index, col_index)
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
+
+			if cell_val != "" {
+				tax_point, err := strconv.ParseFloat(cell_val, 64)
+				core.HandleError(err)
+				product_invoice.tax_point = tax_point
+			} else {
+				product_invoice.tax_point = 0
+			}
+
+			col_index++
+
+			// 退税点
+			cell = sheet.Cell(row_index, col_index)
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
+
+			if cell_val != "" {
+				drawback_point, err := strconv.ParseFloat(cell_val, 64)
+				core.HandleError(err)
+				product_invoice.drawback_point = drawback_point
+			} else {
+				product_invoice.tax_point = 0
+			}
+
+			col_index++
+
+			product_invoice_list = append(product_invoice_list, product_invoice)
 		}
 	}
 
@@ -390,6 +426,18 @@ func (c ErpProductInvoice) export_product_list_to_excel(db_session *xorm.Session
 		cell = row.AddCell()
 		sheet.SetColWidth(col_index, col_index, 10)
 		set_head_cell_style(cell)
+		cell.Value = "收取税点"
+		col_index++
+
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 10)
+		set_head_cell_style(cell)
+		cell.Value = "退税点"
+		col_index++
+
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 10)
+		set_head_cell_style(cell)
 		cell.Value = "状态"
 		col_index++
 	}
@@ -421,6 +469,16 @@ func (c ErpProductInvoice) export_product_list_to_excel(db_session *xorm.Session
 		} else {
 			cell.Value = "否"
 		}
+
+		// 收取税点
+		cell = row.AddCell()
+		set_text_cell_style(cell, "center")
+		cell.Value = fmt.Sprintf("%0.2f", product.TaxPoint)
+
+		// 退税点
+		cell = row.AddCell()
+		set_text_cell_style(cell, "center")
+		cell.Value = fmt.Sprintf("%0.2f", product.DrawbackPoint)
 
 		// 状态
 		cell = row.AddCell()
