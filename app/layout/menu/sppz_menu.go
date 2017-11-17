@@ -165,6 +165,16 @@ func GetSppzMenu(res_id_map map[int64]bool, web_session revel.Session) string {
         </li>`)
 	}
 
+	if check_pass_res_menu(pass_res.SPPZ_PRODUCT_SUPPLIER) {
+		buffer.WriteString(`<li id="sppz-product-supplier-menu" class="">
+			<a href="/product/supplier">
+				<i class="menu-icon fa fa-caret-right"></i>
+				商品供应商
+			</a>
+			<b class="arrow"></b>
+		</li>`)
+	}
+
 	if check_pass_res_menu(pass_res.SPPZ_SUPPLIER_PAY_METHOD) {
 		buffer.WriteString(`<li id="sppz-supplier-pay-method-menu" class="">
 			<a href="/supplier/pay/method">

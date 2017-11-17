@@ -32,7 +32,7 @@
                 </div>
                 <div style="margin: 15px 0;">
                     <label for="supplier_name_query">供应商</label>
-                    <input type="text" id="supplier_name_query" name="supplier_name_query" style="height: 30px; width: 130px;"/>
+                    <input type="text" id="supplier_name_query" name="supplier_name_query" style="height: 30px; width: 230px;"/>
                     &nbsp;&nbsp;
                     <button class="btn btn-mini btn-primary" style="margin-bottom: 3px; height: 30px;" onclick="search()">
                         &nbsp;<i class="ace-icon fa fa-search"></i>查&nbsp;询&nbsp;
@@ -136,7 +136,7 @@
             browse_button: 'btnImport',
             file_data_name: "excel_file",
 
-            url: '{%url "ErpProductUserExcel.Import"%}',
+            url: '{%url "ErpProductSupplierExcel.Import"%}',
             max_file_size: '10000kb',
 
             filters: [
@@ -186,7 +186,7 @@
             initDataTable(
                     '#productList',
                     {
-                        "sAjaxSource": '{%url "ErpProductUser.ListData"%}',
+                        "sAjaxSource": '{%url "ErpProductSupplier.ListData"%}',
                         "aaSorting": [[1, "asc"]],
                         "aoColumns": [
                             {
@@ -259,7 +259,7 @@
                 showMask("加载中...");
                 $("#productDetailDialog").clearValidation();
                 $.ajax({
-                    url: '{%url "ErpProductUser.DetailData" %}',
+                    url: '{%url "ErpProductSupplier.DetailData" %}',
                     type: "POST",
                     data: {
                         "id": product_id

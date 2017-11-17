@@ -153,7 +153,7 @@ func (c ErpSupplierExcel) Import() revel.Result {
 		// 设置 region_id, 实际是 city_id
 		if supplier_import.CityName != "" {
 			var region sppz_models.RegionInfo
-			has, err := db_session.Where("city = ?", supplier_import.CityName).Get(&region)
+			has, err := db_session.Where("city = ? OR district = ?", supplier_import.CityName, supplier_import.CityName).Get(&region)
 			core.HandleError(err)
 			if has == false {
 				panic(fmt.Sprintf("指定的地区 %s 不存在！", supplier_import.CityName))

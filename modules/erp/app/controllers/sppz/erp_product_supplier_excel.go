@@ -148,7 +148,7 @@ func (c ErpProductSupplierExcel) Export() revel.Result {
 	/*
 SELECT p.*, sup.*, s.*
 FROM erp_product p
-    INNER JOIN erp_supplier sup ON sup.id = p.supplier_id
+    LEFT JOIN erp_supplier sup ON sup.id = p.supplier_id
     INNER JOIN erp_status s ON s.id = p.status_id;
 	 */
 
@@ -163,14 +163,16 @@ FROM erp_product p
 	} else {
 		var supplier_name_query string
 		c.Params.Bind(&supplier_name_query, "supplier_name_query")
-
-		filter = core.SqlAnd(filter, fmt.Sprintf("sup.name LIKE '%%%s%%'", supplier_name_query))
+		supplier_name_query = strings.TrimSpace(supplier_name_query)
+		if supplier_name_query != "" {
+			filter = core.SqlAnd(filter, fmt.Sprintf("sup.name LIKE '%%%s%%'", supplier_name_query))
+		}
 	}
 
 	var sb = core.NewSqlBuilder()
 	sb.Select("p.*, sup.*, s.*")
 	sb.From(`erp_product p
-    INNER JOIN erp_supplier sup ON sup.id = p.supplier_id
+    LEFT JOIN erp_supplier sup ON sup.id = p.supplier_id
     INNER JOIN erp_status s ON s.id = p.status_id`)
 
 	sb.Where(filter)
@@ -195,9 +197,9 @@ FROM erp_product p
 }
 
 type product_supplier_export_t struct {
-	Product  kcgl_models.ProductInfo  `xorm:"'p'"`
-	Supplier sppz_models.SupplierInfo `xorm:"'sup'"`
-	Status   models.StatusInfo        `xorm:"'s'"`
+	Product  kcgl_models.ProductInfo  `xorm:"extends"`
+	Supplier sppz_models.SupplierInfo `xorm:"extends"`
+	Status   models.StatusInfo        `xorm:"extends"`
 }
 
 func (c ErpProductSupplierExcel) export_product_list_to_excel(db_session *xorm.Session, product_supplier_list []product_supplier_export_t) *xlsx.File {
@@ -275,10 +277,6 @@ func (c ErpProductSupplierExcel) export_product_list_to_excel(db_session *xorm.S
 	row.SetHeightCM(head_row_height)
 
 	col_index := 0
-
-	var product_status_list = make([]models.StatusInfo, 0)
-	err = db_session.Where(fmt.Sprintf("type = %d", models.STATUS_TYPE_PRODUCT)).Find(&product_status_list)
-	core.HandleError(err)
 
 	// SKU 中文名称 供应商名称 状态
 	{

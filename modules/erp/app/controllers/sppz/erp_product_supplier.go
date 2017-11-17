@@ -42,7 +42,7 @@ func (c ErpProductSupplier) ListData() revel.Result {
 	/*
 SELECT p.*, sup.*, s.*
 FROM erp_product p
-    INNER JOIN erp_supplier sup ON sup.id = p.supplier_id
+    LEFT JOIN erp_supplier sup ON sup.id = p.supplier_id
     INNER JOIN erp_status s ON s.id = p.status_id
 	 */
 
@@ -50,11 +50,11 @@ FROM erp_product p
 	sb.Select("p.*, sup.*, s.*")
 	sb.Count("count(p.id) AS product_count")
 	sb.From(`erp_product p
-    INNER JOIN erp_supplier sup ON sup.id = p.supplier_id
+    LEFT JOIN erp_supplier sup ON sup.id = p.supplier_id
     INNER JOIN erp_status s ON s.id = p.status_id`)
 
 	if supplier_name_query != "" {
-		filter = core.SqlAnd(filter, fmt.Sprintf("sup.name LIKE '%%s%'", supplier_name_query))
+		filter = core.SqlAnd(filter, fmt.Sprintf("sup.name LIKE '%%%s%%'", supplier_name_query))
 	}
 
 	sb.Where(filter)
@@ -67,8 +67,8 @@ FROM erp_product p
 
 	sb.Limit(offset, limit)
 
-	var product_list = make([]product_supplier_view_item_t, 0, limit)
-	err := db_session.Sql(sb.SqlList()).Find(&product_list)
+	var product_supplier_list = make([]product_supplier_view_item_t, 0, limit)
+	err := db_session.Sql(sb.SqlList()).Find(&product_supplier_list)
 	core.HandleError(err)
 
 	type product_count_t struct {
@@ -79,7 +79,7 @@ FROM erp_product p
 	core.HandleError(err)
 
 	return c.RenderJson(core.GridResult{
-		Data:  product_list,
+		Data:  product_supplier_list,
 		Total: product_count.Count,
 	})
 }
