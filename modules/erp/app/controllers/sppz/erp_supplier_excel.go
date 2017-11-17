@@ -12,6 +12,7 @@ import (
 	"matrix/core"
 	"matrix/modules/erp/models"
 	"strings"
+	"matrix/modules/erp/models/sppz_models"
 )
 
 type ErpSupplierExcel struct {
@@ -21,7 +22,176 @@ type ErpSupplierExcel struct {
 func (c ErpSupplierExcel) Import() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.SPPZ_SUPPLIER, c.Session)
 
-	return c.RenderEmpty()
+	db_session := c.DbSession
+
+	excel_file_bytes := make([]byte, 0)
+	c.Params.Bind(&excel_file_bytes, "excel_file")
+
+	c.Validation.Required(excel_file_bytes).Message("指定文件内容未成功上传！")
+
+	if c.Validation.HasErrors() {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": c.GetValidationErrorMessage(),
+		})
+	}
+
+	type supplier_import_t struct {
+		Supplier sppz_models.SupplierInfo
+		CityName string
+	}
+
+	supplier_import_list := make([]supplier_import_t, 0)
+
+	xlsx_file, err := xlsx.OpenBinary(excel_file_bytes)
+	core.HandleError(err)
+
+	// 会导入所有 sheets
+	sheet_count := len(xlsx_file.Sheets)
+	//revel.TRACE.Printf("sheet_count: %d\n", sheet_count)
+	for sheet_index := 0; sheet_index < sheet_count; sheet_index ++ {
+		sheet := xlsx_file.Sheets[sheet_index]
+		max_row := sheet.MaxRow
+		//revel.TRACE.Printf("max_row: %d\n", max_row)
+		//略过标题行
+		for row_index := 1; row_index < max_row; row_index ++ {
+			row := sheet.Rows[row_index]
+
+			var cell *xlsx.Cell
+			var cell_val string
+			var err error
+
+			var supplier_import supplier_import_t
+
+			col_index := 0
+
+			if len(row.Cells) < 5 {
+				break
+			}
+
+			// *名称 联系人 电话 联系方式 地区 地址 描述
+
+			// 名称
+			// cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
+			if cell_val == "" {
+				break
+			}
+			//revel.TRACE.Println(cell_val)
+			supplier_import.Supplier.Name = cell_val
+			col_index++
+
+			// 名称 *联系人 电话 联系方式 地区 地址 描述
+			// cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
+			supplier_import.Supplier.Contact = core.MakeNullString(cell_val, true)
+			col_index++
+
+			// 名称 联系人 *电话 联系方式 地区 地址 描述
+			// cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
+			supplier_import.Supplier.Phone = core.MakeNullString(cell_val, true)
+			col_index++
+
+			// 名称 联系人 电话 *联系方式 地区 地址 描述
+			// cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
+			supplier_import.Supplier.Contact = core.MakeNullString(cell_val, true)
+			col_index++
+
+			// 名称 联系人 电话 联系方式 *地区 地址 描述
+			// cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
+			supplier_import.CityName = cell_val
+			col_index++
+
+			// 名称 联系人 电话 联系方式 地区 *地址 描述
+			// cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
+			supplier_import.Supplier.Address = core.MakeNullString(cell_val, true)
+			col_index++
+
+			// 名称 联系人 电话 联系方式 地区 地址 *描述
+			// cell = row.Cells[col_index]
+			cell = sheet.Cell(row_index, col_index)
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
+			supplier_import.Supplier.Desc = core.MakeNullString(cell_val, true)
+			col_index++
+
+			supplier_import_list = append(supplier_import_list, supplier_import)
+		}
+	}
+
+	if len(supplier_import_list) == 0 {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "Excel文件中导入供应商列表为空！",
+		})
+	}
+
+	for index, supplier_import := range supplier_import_list {
+		// 设置 region_id, 实际是 city_id
+		if supplier_import.CityName != "" {
+			var region sppz_models.RegionInfo
+			has, err := db_session.Where("city = ?", supplier_import.CityName).Get(&region)
+			core.HandleError(err)
+			if has == false {
+				panic(fmt.Sprintf("指定的地区 %s 不存在！", supplier_import.CityName))
+			}
+
+			supplier_import_list[index].Supplier.RegionId = region.Id
+		} else {
+			supplier_import.Supplier.RegionId = 0
+		}
+	}
+
+	for _, supplier_import := range supplier_import_list {
+		var supplier sppz_models.SupplierInfo
+		has, err := db_session.Where(fmt.Sprintf("name = '%s'", supplier_import.Supplier.Name)).Get(&supplier)
+		core.HandleError(err)
+
+		supplier.Name = supplier_import.Supplier.Name
+		supplier.Contact = supplier_import.Supplier.Contact
+		supplier.ContactInfo = supplier_import.Supplier.ContactInfo
+		supplier.Address = supplier_import.Supplier.Address
+		supplier.Phone = supplier_import.Supplier.Phone
+		supplier.Desc = supplier_import.Supplier.Desc
+		supplier.RegionId = supplier_import.Supplier.RegionId
+
+		if has == true {
+			update_col_list := []string{"name", "contact", "contact_info", "address", "phone", "desc", "region_id"}
+			_, err = db_session.Id(supplier.Id).Cols(update_col_list...).Update(&supplier)
+			core.HandleError(err)
+		} else {
+			_, err = db_session.Insert(&supplier)
+			core.HandleError(err)
+		}
+	}
+
+	return c.RenderJson(map[string]interface{}{
+		"success": true,
+		"message": "供应商数据导入成功！",
+	})
 }
 
 func (c ErpSupplierExcel) Export() revel.Result {
@@ -154,7 +324,7 @@ func (c ErpSupplierExcel) export_supplier_list_to_excel(db_session *xorm.Session
 
 	{
 		cell := row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 15)
+		sheet.SetColWidth(col_index, col_index, 25)
 		set_head_cell_style(cell)
 		cell.Value = "名称"
 		col_index++
@@ -166,7 +336,7 @@ func (c ErpSupplierExcel) export_supplier_list_to_excel(db_session *xorm.Session
 		col_index++
 
 		cell = row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 10)
+		sheet.SetColWidth(col_index, col_index, 15)
 		set_head_cell_style(cell)
 		cell.Value = "电话"
 		col_index++
@@ -184,13 +354,13 @@ func (c ErpSupplierExcel) export_supplier_list_to_excel(db_session *xorm.Session
 		col_index++
 
 		cell = row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 20)
+		sheet.SetColWidth(col_index, col_index, 30)
 		set_head_cell_style(cell)
 		cell.Value = "地址"
 		col_index++
 
 		cell = row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 25)
+		sheet.SetColWidth(col_index, col_index, 45)
 		set_head_cell_style(cell)
 		cell.Value = "描述"
 		col_index++
