@@ -157,6 +157,14 @@ POST /product/user/save                    ErpProductUser.Save
 POST /product/user/excel/import            ErpProductUserExcel.Import
 POST /product/user/excel/export            ErpProductUserExcel.Export
 
+GET  /product/supplier                         ErpProductSupplier.Index
+POST /product/supplier/data/list               ErpProductSupplier.ListData
+POST /product/supplier/data/detail             ErpProductSupplier.DetailData
+POST /product/supplier/save                    ErpProductSupplier.Save
+
+POST /product/supplier/excel/import            ErpProductSupplierExcel.Import
+POST /product/supplier/excel/export            ErpProductSupplierExcel.Export
+
 POST /product/postage/cal/weight/data/list      ErpProductPostageCalWeight.ListData
 POST /product/postage/cal/weight/data/detail    ErpProductPostageCalWeight.DetailData
 POST /product/postage/cal/weight/save           ErpProductPostageCalWeight.Save

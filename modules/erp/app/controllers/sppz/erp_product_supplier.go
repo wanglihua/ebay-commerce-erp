@@ -1,0 +1,205 @@
+package controllers
+
+import (
+	"encoding/json"
+	"github.com/revel/revel"
+	"matrix/core"
+	"matrix/modules/auth/pass_res"
+	"matrix/modules/auth/service/pass_service"
+	"matrix/modules/erp/models"
+	"matrix/modules/erp/models/kcgl_models"
+	auth_models "matrix/modules/auth/models"
+	"fmt"
+)
+
+type ErpProductSupplier struct {
+	*revel.Controller
+}
+
+func (c ErpProductSupplier) Index() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.SPPZ_PRODUCT_USER, c.Session)
+
+	var db_session = c.DbSession
+
+	/*
+
+	var user_list = make([]auth_models.UserInfo, 0)
+	core.HandleError(db_session.OrderBy("login_name ASC").Find(&user_list))
+
+		"sale_user_list":    user_list,
+		"service_user_list": user_list,
+		"dev_user_list":     user_list,
+
+	 */
+
+	var user_list = make([]auth_models.UserInfo, 0)
+	core.HandleError(db_session.OrderBy("login_name ASC").Find(&user_list))
+
+	c.RenderArgs["sale_user_list"] = user_list
+	c.RenderArgs["service_user_list"] = user_list
+	c.RenderArgs["dev_user_list"] = user_list
+
+	return c.RenderTemplate("erp/sppz/product_user/product_user_index.html")
+}
+
+func (c ErpProductSupplier) ListData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.SPPZ_PRODUCT_USER, c.Session)
+
+	var db_session = c.DbSession
+	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
+
+	var filter_type int64
+	c.Params.Bind(&filter_type, "filter_type")
+
+	var sale_user_id_query int64
+	c.Params.Bind(&sale_user_id_query, "sale_user_id_query")
+
+	var service_user_id_query int64
+	c.Params.Bind(&service_user_id_query, "service_user_id_query")
+
+	var dev_user_id_query int64
+	c.Params.Bind(&dev_user_id_query, "dev_user_id_query")
+
+	type product_user_view_item_t struct {
+		Product     kcgl_models.ProductInfo `xorm:"extends" json:"p"`
+		SaleUser    auth_models.UserInfo    `xorm:"extends" json:"sale_user"`
+		ServiceUser auth_models.UserInfo    `xorm:"extends" json:"service_user"`
+		DevUser     auth_models.UserInfo    `xorm:"extends" json:"dev_user"`
+		Status      models.StatusInfo       `xorm:"extends" json:"s"`
+	}
+
+	/*
+		SELECT p.*, sale_user.*, service_user.*, dev_user.*, s.*
+		FROM erp_product p
+			INNER JOIN erp_status s ON s.id = p.status_id
+			LEFT JOIN auth_user sale_user ON sale_user.id = p.sale_user_id
+			LEFT JOIN auth_user service_user ON service_user.id = p.service_user_id
+			LEFT JOIN auth_user dev_user ON dev_user.id = p.dev_user_id
+	 */
+
+	sb := core.NewSqlBuilder()
+	sb.Select("p.*, sale_user.*, service_user.*, dev_user.*, s.*")
+	sb.Count("count(p.id) AS product_count")
+	sb.From(`erp_product p
+		INNER JOIN erp_status s ON s.id = p.status_id
+		LEFT JOIN auth_user sale_user ON sale_user.id = p.sale_user_id
+		LEFT JOIN auth_user service_user ON service_user.id = p.service_user_id
+		LEFT JOIN auth_user dev_user ON dev_user.id = p.dev_user_id`)
+
+	if filter_type == 1 { // 未设置人员数据的记录
+		filter_has_zero_data := core.SqlOr("p.sale_user_id = 0", "p.service_user_id = 0", "p.dev_user_id = 0")
+		filter = core.SqlAnd(filter, filter_has_zero_data)
+	}
+
+	if sale_user_id_query != 0 {
+		filter = core.SqlAnd(filter, fmt.Sprintf("p.sale_user_id = %d", sale_user_id_query))
+	}
+
+	if service_user_id_query != 0 {
+		filter = core.SqlAnd(filter, fmt.Sprintf("p.service_user_id = %d", service_user_id_query))
+	}
+
+	if dev_user_id_query != 0 {
+		filter = core.SqlAnd(filter, fmt.Sprintf("p.dev_user_id = %d", dev_user_id_query))
+	}
+
+	sb.Where(filter)
+
+	if order != "" {
+		sb.OrderBy(order)
+	} else {
+		sb.OrderBy("p.id ASC")
+	}
+
+	sb.Limit(offset, limit)
+
+	var product_list = make([]product_user_view_item_t, 0, limit)
+	err := db_session.Sql(sb.SqlList()).Find(&product_list)
+	core.HandleError(err)
+
+	type product_count_t struct {
+		Count int64 `xorm:"'product_count'"`
+	}
+	var product_count product_count_t
+	_, err = db_session.Sql(sb.SqlCount()).Get(&product_count)
+	core.HandleError(err)
+
+	return c.RenderJson(core.GridResult{
+		Data:  product_list,
+		Total: product_count.Count,
+	})
+}
+
+type product_supplier_detail_form_t struct {
+	Product kcgl_models.ProductInfo `json:"product"`
+}
+
+func (c ErpProductSupplier) DetailData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.SPPZ_PRODUCT_USER, c.Session)
+
+	var db_session = c.DbSession
+
+	var product_id int64
+	c.Params.Bind(&product_id, "id")
+
+	var product kcgl_models.ProductInfo
+	_, err := db_session.Id(product_id).Get(&product)
+	core.HandleError(err)
+
+	var detail_form product_supplier_detail_form_t
+	detail_form.Product = product
+
+	var user_list = make([]auth_models.UserInfo, 0)
+	core.HandleError(db_session.OrderBy("login_name ASC").Find(&user_list))
+
+	return c.RenderJson(map[string]interface{}{
+		"detail":            detail_form,
+		"sale_user_list":    user_list,
+		"service_user_list": user_list,
+		"dev_user_list":     user_list,
+	})
+}
+
+func (c ErpProductSupplier) Save() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.SPPZ_PRODUCT_USER, c.Session)
+
+	var db_session = c.DbSession
+
+	var detail_form product_supplier_detail_form_t
+	err := json.Unmarshal(c.GetRequestBody(), &detail_form)
+	core.HandleError(err)
+
+	var product_id = detail_form.Product.Id
+
+	var product_in_db kcgl_models.ProductInfo
+	has, err := db_session.Id(product_id).Get(&product_in_db)
+	core.HandleError(err)
+	if has == false {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "商品不存在！",
+		})
+	}
+
+	// var product_in_db_befor_modify = product_in_db
+
+	product_in_db.SaleUserId = detail_form.Product.SaleUserId
+	product_in_db.ServiceUserId = detail_form.Product.ServiceUserId
+	product_in_db.DevUserId = detail_form.Product.DevUserId
+
+	updata_col_List := []string{"sale_user_id", "service_user_id", "dev_user_id"}
+	affected_count, err := db_session.Id(product_id).Cols(updata_col_List...).Update(&product_in_db)
+	core.HandleError(err)
+
+	if affected_count == 0 {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "商品人员数据未能更新！",
+		})
+	}
+
+	return c.RenderJson(map[string]interface{}{
+		"success": true,
+		"message": "保存成功！",
+	})
+}
