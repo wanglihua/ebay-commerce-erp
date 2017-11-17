@@ -8,8 +8,9 @@ import (
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/models/kcgl_models"
-	auth_models "matrix/modules/auth/models"
 	"fmt"
+	"matrix/modules/erp/models/sppz_models"
+	"strings"
 )
 
 type ErpProductSupplier struct {
@@ -17,90 +18,43 @@ type ErpProductSupplier struct {
 }
 
 func (c ErpProductSupplier) Index() revel.Result {
-	pass_service.Check_login_user_pass(pass_res.SPPZ_PRODUCT_USER, c.Session)
+	pass_service.Check_login_user_pass(pass_res.SPPZ_PRODUCT_SUPPLIER, c.Session)
 
-	var db_session = c.DbSession
-
-	/*
-
-	var user_list = make([]auth_models.UserInfo, 0)
-	core.HandleError(db_session.OrderBy("login_name ASC").Find(&user_list))
-
-		"sale_user_list":    user_list,
-		"service_user_list": user_list,
-		"dev_user_list":     user_list,
-
-	 */
-
-	var user_list = make([]auth_models.UserInfo, 0)
-	core.HandleError(db_session.OrderBy("login_name ASC").Find(&user_list))
-
-	c.RenderArgs["sale_user_list"] = user_list
-	c.RenderArgs["service_user_list"] = user_list
-	c.RenderArgs["dev_user_list"] = user_list
-
-	return c.RenderTemplate("erp/sppz/product_user/product_user_index.html")
+	return c.RenderTemplate("erp/sppz/product_supplier/product_supplier_index.html")
 }
 
 func (c ErpProductSupplier) ListData() revel.Result {
-	pass_service.Check_login_user_pass(pass_res.SPPZ_PRODUCT_USER, c.Session)
+	pass_service.Check_login_user_pass(pass_res.SPPZ_PRODUCT_SUPPLIER, c.Session)
 
 	var db_session = c.DbSession
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
-	var filter_type int64
-	c.Params.Bind(&filter_type, "filter_type")
+	var supplier_name_query string
+	c.Params.Bind(&supplier_name_query, "supplier_name_query")
+	supplier_name_query = strings.TrimSpace(supplier_name_query)
 
-	var sale_user_id_query int64
-	c.Params.Bind(&sale_user_id_query, "sale_user_id_query")
-
-	var service_user_id_query int64
-	c.Params.Bind(&service_user_id_query, "service_user_id_query")
-
-	var dev_user_id_query int64
-	c.Params.Bind(&dev_user_id_query, "dev_user_id_query")
-
-	type product_user_view_item_t struct {
-		Product     kcgl_models.ProductInfo `xorm:"extends" json:"p"`
-		SaleUser    auth_models.UserInfo    `xorm:"extends" json:"sale_user"`
-		ServiceUser auth_models.UserInfo    `xorm:"extends" json:"service_user"`
-		DevUser     auth_models.UserInfo    `xorm:"extends" json:"dev_user"`
-		Status      models.StatusInfo       `xorm:"extends" json:"s"`
+	type product_supplier_view_item_t struct {
+		Product  kcgl_models.ProductInfo  `xorm:"extends" json:"p"`
+		Supplier sppz_models.SupplierInfo `xorm:"extends" json:"sup"`
+		Status   models.StatusInfo        `xorm:"extends" json:"s"`
 	}
 
 	/*
-		SELECT p.*, sale_user.*, service_user.*, dev_user.*, s.*
-		FROM erp_product p
-			INNER JOIN erp_status s ON s.id = p.status_id
-			LEFT JOIN auth_user sale_user ON sale_user.id = p.sale_user_id
-			LEFT JOIN auth_user service_user ON service_user.id = p.service_user_id
-			LEFT JOIN auth_user dev_user ON dev_user.id = p.dev_user_id
+SELECT p.*, sup.*, s.*
+FROM erp_product p
+    INNER JOIN erp_supplier sup ON sup.id = p.supplier_id
+    INNER JOIN erp_status s ON s.id = p.status_id
 	 */
 
 	sb := core.NewSqlBuilder()
-	sb.Select("p.*, sale_user.*, service_user.*, dev_user.*, s.*")
+	sb.Select("p.*, sup.*, s.*")
 	sb.Count("count(p.id) AS product_count")
 	sb.From(`erp_product p
-		INNER JOIN erp_status s ON s.id = p.status_id
-		LEFT JOIN auth_user sale_user ON sale_user.id = p.sale_user_id
-		LEFT JOIN auth_user service_user ON service_user.id = p.service_user_id
-		LEFT JOIN auth_user dev_user ON dev_user.id = p.dev_user_id`)
+    INNER JOIN erp_supplier sup ON sup.id = p.supplier_id
+    INNER JOIN erp_status s ON s.id = p.status_id`)
 
-	if filter_type == 1 { // 未设置人员数据的记录
-		filter_has_zero_data := core.SqlOr("p.sale_user_id = 0", "p.service_user_id = 0", "p.dev_user_id = 0")
-		filter = core.SqlAnd(filter, filter_has_zero_data)
-	}
-
-	if sale_user_id_query != 0 {
-		filter = core.SqlAnd(filter, fmt.Sprintf("p.sale_user_id = %d", sale_user_id_query))
-	}
-
-	if service_user_id_query != 0 {
-		filter = core.SqlAnd(filter, fmt.Sprintf("p.service_user_id = %d", service_user_id_query))
-	}
-
-	if dev_user_id_query != 0 {
-		filter = core.SqlAnd(filter, fmt.Sprintf("p.dev_user_id = %d", dev_user_id_query))
+	if supplier_name_query != "" {
+		filter = core.SqlAnd(filter, fmt.Sprintf("sup.name LIKE '%%s%'", supplier_name_query))
 	}
 
 	sb.Where(filter)
@@ -113,7 +67,7 @@ func (c ErpProductSupplier) ListData() revel.Result {
 
 	sb.Limit(offset, limit)
 
-	var product_list = make([]product_user_view_item_t, 0, limit)
+	var product_list = make([]product_supplier_view_item_t, 0, limit)
 	err := db_session.Sql(sb.SqlList()).Find(&product_list)
 	core.HandleError(err)
 
@@ -135,7 +89,7 @@ type product_supplier_detail_form_t struct {
 }
 
 func (c ErpProductSupplier) DetailData() revel.Result {
-	pass_service.Check_login_user_pass(pass_res.SPPZ_PRODUCT_USER, c.Session)
+	pass_service.Check_login_user_pass(pass_res.SPPZ_PRODUCT_SUPPLIER, c.Session)
 
 	var db_session = c.DbSession
 
@@ -149,19 +103,17 @@ func (c ErpProductSupplier) DetailData() revel.Result {
 	var detail_form product_supplier_detail_form_t
 	detail_form.Product = product
 
-	var user_list = make([]auth_models.UserInfo, 0)
-	core.HandleError(db_session.OrderBy("login_name ASC").Find(&user_list))
+	var supplier_list = make([]sppz_models.SupplierInfo, 0)
+	core.HandleError(db_session.OrderBy("convert(login_name using gbk) ASC").Find(&supplier_list))
 
 	return c.RenderJson(map[string]interface{}{
-		"detail":            detail_form,
-		"sale_user_list":    user_list,
-		"service_user_list": user_list,
-		"dev_user_list":     user_list,
+		"detail":        detail_form,
+		"supplier_list": supplier_list,
 	})
 }
 
 func (c ErpProductSupplier) Save() revel.Result {
-	pass_service.Check_login_user_pass(pass_res.SPPZ_PRODUCT_USER, c.Session)
+	pass_service.Check_login_user_pass(pass_res.SPPZ_PRODUCT_SUPPLIER, c.Session)
 
 	var db_session = c.DbSession
 
@@ -183,18 +135,16 @@ func (c ErpProductSupplier) Save() revel.Result {
 
 	// var product_in_db_befor_modify = product_in_db
 
-	product_in_db.SaleUserId = detail_form.Product.SaleUserId
-	product_in_db.ServiceUserId = detail_form.Product.ServiceUserId
-	product_in_db.DevUserId = detail_form.Product.DevUserId
+	product_in_db.SupplierId = detail_form.Product.SupplierId
 
-	updata_col_List := []string{"sale_user_id", "service_user_id", "dev_user_id"}
+	updata_col_List := []string{"supplier_id"}
 	affected_count, err := db_session.Id(product_id).Cols(updata_col_List...).Update(&product_in_db)
 	core.HandleError(err)
 
 	if affected_count == 0 {
 		return c.RenderJson(map[string]interface{}{
 			"success": false,
-			"message": "商品人员数据未能更新！",
+			"message": "商品供应商未能更新！",
 		})
 	}
 

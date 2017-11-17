@@ -125,6 +125,7 @@ const (
 	SPPZ_PRODUCT_STYLE       = 151300 // 商品款式
 	SPPZ_SUPPLIER_PAY_METHOD = 151400 // 供应商付款方式
 	SPPZ_PRODUCT_USER        = 151500 // 商品负责人
+	SPPZ_PRODUCT_SUPPLIER    = 151600 // 商品供应商
 
 	// 海关报关
 	HGBG_PRODUCT_HS_CODE                = 160100 // 商品海关编码

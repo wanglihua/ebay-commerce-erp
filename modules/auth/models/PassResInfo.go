@@ -519,6 +519,13 @@ func (e PassResInfo) InitData(db_session *xorm.Session) {
 		db_session.Insert(pass)
 
 		pass = new(PassResInfo)
+		pass.Id = pass_res.SPPZ_PRODUCT_SUPPLIER
+		pass.CateId = pass_res_cate.SPPZ
+		pass.Name = "商品供应商"
+		pass.Desc = core.MakeNullString("商品供应商", true)
+		db_session.Insert(pass)
+
+		pass = new(PassResInfo)
 		pass.Id = pass_res.SPPZ_SEA_CONTAINER_COST
 		pass.CateId = pass_res_cate.SPPZ
 		pass.Name = "海运集装箱成本"
