@@ -307,7 +307,7 @@ func (c ErpSupplierExcel) export_supplier_list_to_excel(db_session *xorm.Session
 	xlsx_file := xlsx.NewFile()
 
 	//添加工作表
-	sheet, err := xlsx_file.AddSheet("商品海关编码列表")
+	sheet, err := xlsx_file.AddSheet("商品供应商")
 	core.HandleError(err)
 
 	//添加标题行

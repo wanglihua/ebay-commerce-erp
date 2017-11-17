@@ -207,6 +207,8 @@ func (c ErpProductSupplierExcel) Export() revel.Result {
 		filter = core.SqlAnd(filter, fmt.Sprintf("id IN (%s)", strings.Join(id_str_list, ",")))
 	}
 
+	// supplier_name_query 的过滤查询
+
 	product_list := make([]kcgl_models.ProductInfo, 0)
 	err := db_session.Where(filter).Find(&product_list)
 	core.HandleError(err)

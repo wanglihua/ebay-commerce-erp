@@ -1,4 +1,4 @@
-{%header "商品负责人" .%}
+{%header "商品供应商" .%}
 <div id="page">
     <div class="breadcrumbs" id="breadcrumbs">
         <ul class="breadcrumb">
@@ -6,27 +6,13 @@
                 <a href='{%url "Home.Index"%}'><i class="ace-icon fa fa-home home-icon"></i></a>
             </li>
             <li class="parent" data-menu="sppz-menu">商品配置</li>
-            <li class="active" data-menu="sppz-product-user-menu">商品负责人</li>
+            <li class="active" data-menu="sppz-product-supplier-menu">商品供应商</li>
         </ul>
     </div>
     <div class="page-content">
         <div class="row">
             <div class="col-xs-12" style="padding: 0;">
                 <div class="gridToolBar clearfix">
-                    <div class="btn-group">
-                        <button data-toggle="dropdown" class="btn btn-info btn-sm dropdown-toggle" aria-expanded="false" style="border-width: 4px;">
-                            <i class="ace-icon fa fa-filter"></i><span id="dataFilter" data-status="0">全部</span>
-                            <span class="ace-icon fa fa-caret-down icon-on-right"></span>
-                        </button>
-                        <ul class="dropdown-menu dropdown-danger">
-                            <li>
-                                <a onclick="filterByZeroData('0','全部')" style="cursor: pointer;">全部</a>
-                            </li>
-                            <li>
-                                <a onclick="filterByZeroData('1', '有空数据记录')" style="cursor: pointer;">有空数据记录</a>
-                            </li>
-                        </ul>
-                    </div>
 
                     <button class="btn btn-primary btn-sm" @click="reloadList('#productList')" style="border-width: 4px;">
                         <i class="ace-icon fa fa-refresh"></i>
@@ -41,33 +27,12 @@
                         导出
                     </button>
                     <div style="margin-top: 10px;">
-                        <a href="/static/excel-template/product_user_import.xlsx">下载商品负责人导入Excel模板</a>
+                        <a href="/static/excel-template/product_supplier_import.xlsx">下载商品供应商导入Excel模板</a>
                     </div>
                 </div>
                 <div style="margin: 15px 0;">
-                    <label for="sale_user_id_query">销售负责人</label>
-                    <select id="sale_user_id_query" name="sale_user_id_query" style="height: 30px; width: 130px;">
-                        <option value="0">销售负责人</option>
-                        {% range $index, $user := .sale_user_list %}
-                        <option value="{% $user.Id %}">{% $user.LoginName %}（{% $user.NickName %}）</option>
-                        {% end %}
-                    </select>
-                    &nbsp;&nbsp;
-                    <label for="service_user_id_query">客服负责人</label>
-                    <select id="service_user_id_query" name="service_user_id_query" style="height: 30px; width: 130px;">
-                        <option value="0">客服负责人</option>
-                        {% range $index, $user := .service_user_list %}
-                        <option value="{% $user.Id %}">{% $user.LoginName %}（{% $user.NickName %}）</option>
-                        {% end %}
-                    </select>
-                    &nbsp;&nbsp;
-                    <label for="dev_user_id_query">开发负责人</label>
-                    <select id="dev_user_id_query" name="dev_user_id_query" style="height: 30px; width: 130px;">
-                        <option value="0">开发负责人</option>
-                        {% range $index, $user := .dev_user_list %}
-                        <option value="{% $user.Id %}">{% $user.LoginName %}（{% $user.NickName %}）</option>
-                        {% end %}
-                    </select>
+                    <label for="supplier_name_query">供应商</label>
+                    <input type="text" id="supplier_name_query" name="supplier_name_query" style="height: 30px; width: 130px;"/>
                     &nbsp;&nbsp;
                     <button class="btn btn-mini btn-primary" style="margin-bottom: 3px; height: 30px;" onclick="search()">
                         &nbsp;<i class="ace-icon fa fa-search"></i>查&nbsp;询&nbsp;
@@ -84,7 +49,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="True">&times;</button>
-                    <h4 class="modal-title">商品负责人详细</h4>
+                    <h4 class="modal-title">供应商详细</h4>
                 </div>
                 <div class="modal-body clearfix">
                     <div class="row">
@@ -130,44 +95,12 @@
                                     </div>
                                 </div>
 
-                                <div class="row">
-                                    <div class="col-xs-12">
-                                        <div class="form-group">
-                                            <label for="service_user_id" class="col-xs-2 control-label">客服人员</label>
-                                            <div class="col-xs-10">
-                                                <select id="service_user_id" name="detail.product.service_user_id" type="text" class="input-sm form-control" v-model.number="detail.product.service_user_id">
-                                                    <option :value="0"></option>
-                                                    <template v-for="user in service_user_list">
-                                                        <option :value="user.id">{{user.login_name}}({{user.nick_name}})</option>
-                                                    </template>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-xs-12">
-                                        <div class="form-group">
-                                            <label for="dev_user_id" class="col-xs-2 control-label">开发人员</label>
-                                            <div class="col-xs-10">
-                                                <select id="dev_user_id" name="detail.product.dev_user_id" type="text" class="input-sm form-control" v-model.number="detail.product.dev_user_id">
-                                                    <option :value="0"></option>
-                                                    <template v-for="user in dev_user_list">
-                                                        <option :value="user.id">{{user.login_name}}({{user.nick_name}})</option>
-                                                    </template>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
                             </form>
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-success btn-sm" @click="saveProductUser()">
+                    <button type="button" class="btn btn-success btn-sm" @click="saveProductSupplier()">
                         <i class="ace-icon fa fa-floppy-o"></i>保存
                     </button>
                     <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">
@@ -251,77 +184,49 @@
             var this_vm = this;
 
             initDataTable(
-                '#productList',
-                {
-                    "sAjaxSource": '{%url "ErpProductUser.ListData"%}',
-                    "aaSorting": [[1, "asc"]],
-                    "aoColumns": [
-                        {
-                            "mDataProp": "p.id",
-                            "bSearchable": false,
-                            "orderable": false,
-                            "sClass": "center",
-                            "width": 50,
-                            "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
-                            "render": function (data, type, row) {
-                                return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
-                            }
-                        },
-                        {
-                            "mDataProp": "p.sku", "title": "商品SKU", "bSearchable": true, "width": 150,
-                            "render": function (data, type, row) {
-                                return '<a href="/product/detail/' + row.p.id + '" target="product_detail">' + row.p.sku + '</a>';
-                            }
-                            //<div class="tdSkuNameSup"><a href="/product/detail/' + row.prd.id + '" target="_blank">' + row.prd.sku + '</a></div>
-                        },
-                        {
-                            "mDataProp": "p.cn_name", "title": "商品名称", "bSearchable": true, "sClass": "wrap-word",
-                            "render": function (data, type, row) {
-                                return "<div>" + data + "</div>";
-                            }
-                        },
-                        {
-                            "mDataProp": "sale_user.id", "title": "销售人员", "bSearchable": false, "sClass": "center", "width": 120,
-                            "render": function (data, type, row) {
-                                if (data !== 0) {
-                                    return row.sale_user.login_name + "(" + row.sale_user.nick_name + ")";
-                                } else {
-                                    return "";
-                                }
-                            }
-                        },
-                        {
-                            "mDataProp": "service_user.id", "title": "客服人员", "bSearchable": false, "sClass": "center", "width": 120,
-                            "render": function (data, type, row) {
-                                if (data !== 0) {
-                                    return row.service_user.login_name + "(" + row.service_user.nick_name + ")";
-                                } else {
-                                    return "";
-                                }
-                            }
-                        },
-                        {
-                            "mDataProp": "dev_user.id", "title": "开发人员", "bSearchable": false, "sClass": "center", "width": 120,
-                            "render": function (data, type, row) {
-                                if (data !== 0) {
-                                    return row.dev_user.login_name + "(" + row.dev_user.nick_name + ")";
-                                } else {
-                                    return "";
-                                }
-                            }
-                        },
-                        {"mDataProp": "s.name", "title": "状态", "bSearchable": true, "width": 80}
-                    ],
-                    "fnServerData": function (sSource, aoData, fnCallback) {
-                        showMask("数据加载中，请稍候");
-
-                        aoData.push({name: 'filter_type', value: this_vm.filter_type});
-                        aoData.push({name: 'sale_user_id_query', value: $("#sale_user_id_query").val()});
-                        aoData.push({name: 'service_user_id_query', value: $("#service_user_id_query").val()});
-                        aoData.push({name: 'dev_user_id_query', value: $("#dev_user_id_query").val()});
-
-                        $.ajax(
+                    '#productList',
+                    {
+                        "sAjaxSource": '{%url "ErpProductUser.ListData"%}',
+                        "aaSorting": [[1, "asc"]],
+                        "aoColumns": [
                             {
+                                "mDataProp": "p.id",
+                                "bSearchable": false,
+                                "orderable": false,
+                                "sClass": "center",
+                                "width": 50,
+                                "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
+                                "render": function (data, type, row) {
+                                    return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
+                                }
+                            },
+                            {
+                                "mDataProp": "p.sku", "title": "商品SKU", "bSearchable": true, "width": 150,
+                                "render": function (data, type, row) {
+                                    return '<a href="/product/detail/' + row.p.id + '" target="product_detail">' + row.p.sku + '</a>';
+                                }
+                                //<div class="tdSkuNameSup"><a href="/product/detail/' + row.prd.id + '" target="_blank">' + row.prd.sku + '</a></div>
+                            },
+                            {
+                                "mDataProp": "p.cn_name", "title": "商品名称", "bSearchable": true, "sClass": "wrap-word", "width": 280,
+                                "render": function (data, type, row) {
+                                    return "<div>" + data + "</div>";
+                                }
+                            },
+                            {
+                                "mDataProp": "sup.name", "title": "供应商", "bSearchable": false, "sClass": "wrap-word",
+                                "render": function (data, type, row) {
+                                    return "<div>" + data + "</div>";
+                                }
+                            },
+                            {"mDataProp": "s.name", "title": "状态", "bSearchable": true, "width": 80}
+                        ],
+                        "fnServerData": function (sSource, aoData, fnCallback) {
+                            showMask("数据加载中，请稍候");
+
+                            aoData.push({name: 'supplier_name_query', value: $("#supplier_name_query").val()});
+
+                            $.ajax({
                                 "dataType": 'json',
                                 "url": sSource,
                                 "data": aoData,
@@ -335,8 +240,8 @@
                                     fnCallback(data);
                                 }
                             });
+                        }
                     }
-                }
             );
 
             $('#productList tbody').on('dblclick', 'tr', function () {
@@ -354,38 +259,29 @@
                 showMask("加载中...");
                 $("#productDetailDialog").clearValidation();
                 $.ajax({
-                        url: '{%url "ErpProductUser.DetailData" %}',
-                        type: "POST",
-                        data: {
-                            "id": product_id
-                        },
-                        success: function (result) {
-                            hideMask();
-                            if (result.success === false) {
-                                $.msg.error(result.message);
-                                return;
-                            }
-                            vm.detail = result.detail;
-                            vm.sale_user_list = result.sale_user_list;
-                            vm.service_user_list = result.service_user_list;
-                            vm.dev_user_list = result.dev_user_list;
-                            $('#productDetailDialog').modal(modalOptions);
+                    url: '{%url "ErpProductUser.DetailData" %}',
+                    type: "POST",
+                    data: {
+                        "id": product_id
+                    },
+                    success: function (result) {
+                        hideMask();
+                        if (result.success === false) {
+                            $.msg.error(result.message);
+                            return;
                         }
+                        vm.detail = result.detail;
+                        vm.supplier_list = result.supplier_list;
+                        $('#productDetailDialog').modal(modalOptions);
                     }
-                );
+                });
             },
-            saveProductUser: function () {
+            saveProductSupplier: function () {
                 showMask("提交中...");
                 var form = $("#productDetailForm");
                 var valid = validate(form, {
-                    'detail.product.sale_user_id': {
-                        required: false, number: true
-                    },
-                    'detail.product.service_user_id': {
-                        required: false, number: true
-                    },
-                    'detail.product.dev_user_id': {
-                        required: false, number: true
+                    'detail.product.supplier_id': {
+                        required: true, number: true
                     }
                 });
 
@@ -393,26 +289,25 @@
                     hideMask();
                 } else {
                     $.ajax({
-                            url: '{%url "ErpProductUser.Save"%}',
-                            type: "POST",
-                            processData: false,
-                            contentType: 'application/json',
-                            data: JSON.stringify(vm.detail),
-                            success: function (data) {
-                                hideMask();
-                                if (data.success === false) {
-                                    $.msg.error(data.message);
-                                    //return;
-                                }
-                                else {
-                                    $.msg.show(data.message);
-                                    $('#productDetailDialog').modal('hide');
-                                    vm.reloadList();
-                                    //return;
-                                }
+                        url: '{%url "ErpProductSupplier.Save"%}',
+                        type: "POST",
+                        processData: false,
+                        contentType: 'application/json',
+                        data: JSON.stringify(vm.detail),
+                        success: function (data) {
+                            hideMask();
+                            if (data.success === false) {
+                                $.msg.error(data.message);
+                                //return;
+                            }
+                            else {
+                                $.msg.show(data.message);
+                                $('#productDetailDialog').modal('hide');
+                                vm.reloadList();
+                                //return;
                             }
                         }
-                    );
+                    });
                 }
             },
             exportProduct: function () {
@@ -424,9 +319,10 @@
                 });
 
                 var params = $.param({
-                    "id_list": id_list
+                    "id_list": id_list,
+                    "supplier_name_query": $("#supplier_name_query").val()
                 });
-                var url = '{%url "ErpProductUserExcel.Export"%}' + "?" + params;
+                var url = '{%url "ErpProductSupplierExcel.Export"%}' + "?" + params;
                 $('<form method="post" action="' + url + '"></form>').appendTo('body').submit().remove();
             }
         }
