@@ -53,9 +53,14 @@ func (c ErpOrderHold) PageData() revel.Result {
 	// 获得导入的批次列表
 	var batch_code_list = order_import_batch_service.Get_order_import_batch_code_list_limit_100(models.ORDER_STATUS_HOLD, db_session)
 
+	/*
+	现做不显示这两个的 Hold
+	ORDER_HOLD_TYPE_MULTI_STOCK_LOW_FEE           int64 = 10090 // 多数量或多产品，虽不缺货，但拆分订单发货，运费更便宜
+	ORDER_HOLD_TYPE_ONO_STOCK_EASY                int64 = 10100 // 多数量或多产品，虽不缺货，但拆分订单发货，运费虽然便宜，但仓库拣货更方便
+	 */
 	// hold类型列表
 	var hold_type_list = make([]ddpz_models.OrderHoldTypeInfo, 0)
-	err := db_session.OrderBy("ord ASC").Find(&hold_type_list)
+	err := db_session.Where("id <> ? AND id <> ?", ddpz_models.ORDER_HOLD_TYPE_MULTI_STOCK_LOW_FEE, ddpz_models.ORDER_HOLD_TYPE_ONO_STOCK_EASY).OrderBy("ord ASC").Find(&hold_type_list)
 	core.HandleError(err)
 
 	var au_stock_list = make([]sppz_models.StockInfo, 0)
