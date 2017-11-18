@@ -191,10 +191,13 @@ func (c ErpPurchaseBillEntry) DetailData() revel.Result {
 		core.HandleError(err)
 		product_name = product.CnName
 
+		// 这里可以不用设置的，这些都在新建的时候选着SKU的时候设置
+		/*
 		purchase_bill_entry.NeedInvoice = product.NeedInvoice
 		purchase_bill_entry.TaxPoint = product.TaxPoint
 		purchase_bill_entry.DrawbackPoint = product.DrawbackPoint
 		purchase_bill_entry.DrawbackAmount = purchase_bill_service.CalculateBillEntryDrawbackAmount(purchase_bill_entry)
+		*/
 	}
 
 	var detail_form PurchaseBillEntryDetailForm

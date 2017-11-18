@@ -384,11 +384,12 @@ WHERE p.id IN (%s);`
 		purchase_bill_entry.StatusId = purchase_bill.StatusId
 		purchase_bill_entry.TypeId = cggl_models.PURCHASE_BILL_TYPE_NORMAL
 
-		// 获得商品的采购价
+		// 获得商品的建议采购价
+		purchase_bill_entry.Price = purchase_bill_service.Get_propose_purchase_price(intel_repl.ProductId, db_session)
+
 		var product kcgl_models.ProductInfo
 		_, err = db_session.Id(intel_repl.ProductId).Get(&product)
 		core.HandleError(err)
-		purchase_bill_entry.Price = product.CostPrice
 
 		purchase_bill_entry.NeedInvoice = product.NeedInvoice
 		purchase_bill_entry.TaxPoint = product.TaxPoint
