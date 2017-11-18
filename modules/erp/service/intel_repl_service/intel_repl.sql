@@ -117,9 +117,7 @@ CREATE PROCEDURE intel_repl()
 
             # 获取商品的相关配置
             SET v_purchase_days = 0, v_stock_alert_days = 0;
-            SELECT
-                p.purchase_days,
-                p.stock_alert_days
+            SELECT p.purchase_days, p.stock_alert_days
             INTO v_purchase_days, v_stock_alert_days
             FROM erp_product p
             WHERE p.id = v_product_id;
@@ -135,9 +133,7 @@ CREATE PROCEDURE intel_repl()
 
             # 获取 MEL 仓库的 数量和待发货数量
             SET v_mel_nvt_qty = 0, v_mel_nvt_pending_qty = 0;
-            SELECT
-                nvt.qty,
-                nvt.pending_qty
+            SELECT nvt.qty, nvt.pending_qty
             INTO v_mel_nvt_qty, v_mel_nvt_pending_qty
             FROM erp_inventory nvt
             WHERE nvt.product_id = v_product_id AND nvt.stock_id = v_mel_stock_id;
@@ -167,9 +163,7 @@ CREATE PROCEDURE intel_repl()
 
             # 获取 BNE 仓库的 数量和待发货数量
             SET v_bne_nvt_qty = 0, v_bne_nvt_pending_qty = 0;
-            SELECT
-                nvt.qty,
-                nvt.pending_qty
+            SELECT nvt.qty, nvt.pending_qty
             INTO v_bne_nvt_qty, v_bne_nvt_pending_qty
             FROM erp_inventory nvt
             WHERE nvt.product_id = v_product_id AND nvt.stock_id = v_bne_stock_id;
@@ -215,8 +209,8 @@ CREATE PROCEDURE intel_repl()
             WHERE oi.item_product_id = v_product_id;
 
             # 计算智能补货单的参数
-            SET v_mel_qty = v_mel_daily_mean_sales * (v_purchase_days + v_stock_alert_days) - v_mel_nvt_qty - v_mel_nvt_pending_qty - v_mel_pc_qty - (v_mel_daily_mean_sales / (v_mel_daily_mean_sales + v_bne_daily_mean_sales)) * v_cn_nvt_qty;
-            SET v_bne_qty = v_bne_daily_mean_sales * (v_purchase_days + v_stock_alert_days) - v_bne_nvt_qty - v_bne_nvt_pending_qty - v_bne_pc_qty - (v_bne_daily_mean_sales / (v_mel_daily_mean_sales + v_bne_daily_mean_sales)) * v_cn_nvt_qty;
+            SET v_mel_qty = round(v_mel_daily_mean_sales * (v_purchase_days + v_stock_alert_days) - (v_mel_nvt_qty - v_mel_nvt_pending_qty) - v_mel_zt_nvt_qty - v_mel_pc_qty - (v_mel_daily_mean_sales / (v_mel_daily_mean_sales + v_bne_daily_mean_sales)) * v_cn_nvt_qty);
+            SET v_bne_qty = round(v_bne_daily_mean_sales * (v_purchase_days + v_stock_alert_days) - (v_bne_nvt_qty - v_bne_nvt_pending_qty) - v_bne_zt_nvt_qty - v_bne_pc_qty - (v_bne_daily_mean_sales / (v_mel_daily_mean_sales + v_bne_daily_mean_sales)) * v_cn_nvt_qty);
 
             IF v_mel_qty < 0
             THEN
