@@ -945,7 +945,12 @@
                                     return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
                                 }
                             },
-                            {"mDataProp": "p.sku", "title": "SKU", "bSearchable": false, "width": 150},
+                            {
+                                "mDataProp": "p.sku", "title": "SKU", "bSearchable": false, "width": 150,
+                                "render": function (data, type, row) {
+                                    return "<a target='product_detail' href='/product/detail/" + row.p.id + "'>" + data + "</a>"
+                                }
+                            },
                             {
                                 "mDataProp": "p.cn_name", "title": "商品名称", "bSearchable": false, "sClass": "wrap-word",
                                 "render": function (data, type, row) {

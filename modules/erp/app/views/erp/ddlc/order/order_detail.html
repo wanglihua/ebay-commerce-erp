@@ -317,12 +317,10 @@
                                         AUD {{ format_amount(detail.order_gst) }}
                                     </td>
                                     <td class="dtRight">
-                                        AUD {{ format_amount(detail.order.amount_paid *
-                                        detail.logistics_setting.ptfl) }}
+                                        AUD {{ format_amount(detail.order.amount_paid * detail.logistics_setting.ptfl) }}
                                     </td>
                                     <td class="dtRight">
-                                        AUD {{ format_amount(detail.order.amount_paid *
-                                        detail.logistics_setting.jyfl) }}
+                                        AUD {{ format_amount(detail.order.amount_paid * detail.logistics_setting.jyfl) }}
                                     </td>
                                     <td class="dtRight">
                                         AUD {{ format_amount(detail.order_logistics.pick_fee) }}
@@ -433,7 +431,7 @@
                                                 {{order_item.p.cn_name}}
                                             </div>
                                             <div>
-                                                <a :href="'/product/detail/' + order_item.p.id" target="_blank">
+                                                <a :href="'/product/detail/' + order_item.p.id" target="product_detail">
                                                     {{order_item.p.sku}}
                                                 </a>
                                             </div>
