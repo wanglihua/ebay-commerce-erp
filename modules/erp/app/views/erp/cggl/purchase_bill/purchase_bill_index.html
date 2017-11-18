@@ -1436,11 +1436,16 @@
         vm.purchase_bill_entry_detail.purchase_bill_entry.product_id = product_id;
 
         $.ajax({
-            url: '{%url "ErpProduct.GetProductInfo"%}',
+            url: '{%url "ErpPurchaseBillEntry.GetProductInfo"%}',
             type: "POST",
             data: {"product_id": product_id},
             success: function (data) {
                 vm.purchase_bill_entry_detail.product_name = data.product.sku + "  " + data.product.cn_name;
+                vm.purchase_bill_entry_detail.purchase_bill_entry.price = data.price;
+                vm.purchase_bill_entry_detail.purchase_bill_entry.need_invoice = data.product.need_invoice;
+                vm.purchase_bill_entry_detail.purchase_bill_entry.tax_point = data.product.tax_point;
+                vm.purchase_bill_entry_detail.purchase_bill_entry.drawback_point = data.product.drawback_point;
+                vm.purchase_bill_entry_detail.purchase_bill_entry.drawback_amount = data.drawback_amount;
             }
         });
 

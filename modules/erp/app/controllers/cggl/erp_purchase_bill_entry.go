@@ -554,3 +554,24 @@ func (c ErpPurchaseBillEntry) PurchaseInTurn() revel.Result {
 		"message": "采购明细分批采购成功！",
 	})
 }
+
+func (c ErpPurchaseBillEntry) GetProductInfo() revel.Result {
+	var db_session = c.DbSession
+
+	var product_id int64
+	c.Params.Bind(&product_id, "product_id")
+
+	var product kcgl_models.ProductInfo
+	_, err := db_session.Id(product_id).Get(&product)
+	core.HandleError(err)
+
+	var price = purchase_bill_service.Get_propose_purchase_price(product_id, db_session)
+
+	var drawback_amount = purchase_bill_service.CalculateProductDrawbackAmount(product, price)
+
+	return c.RenderJson(map[string]interface{}{
+		"product":         product,
+		"price":           price,
+		"drawback_amount": drawback_amount,
+	})
+}
