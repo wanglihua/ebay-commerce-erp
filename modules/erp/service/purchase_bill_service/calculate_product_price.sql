@@ -49,6 +49,7 @@ CREATE PROCEDURE calculate_product_price()
                 LIMIT 6)
             WHERE id = v_product_id;
 
+            SET done = FALSE;
         END LOOP;
 
         -- 关闭游标

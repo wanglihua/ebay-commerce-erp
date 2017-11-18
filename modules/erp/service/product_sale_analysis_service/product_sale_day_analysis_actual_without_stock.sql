@@ -88,6 +88,7 @@ CREATE PROCEDURE product_sale_day_analysis_actual_without_stock()
                 WHERE day = v_shipped_day AND product_id = v_product_id AND stock_id = 0 AND type = da_type;
             END IF;
 
+            SET done = FALSE;
         END LOOP;
         -- 关闭游标
         CLOSE cur;

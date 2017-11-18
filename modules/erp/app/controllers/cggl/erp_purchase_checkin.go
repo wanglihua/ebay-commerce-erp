@@ -517,7 +517,7 @@ func (c ErpPurchaseCheckin) CheckinInTurn() revel.Result {
 	core.HandleError(err)
 	*/
 
-	// 计算中国仓成本价
+	// 计算采购单明细的中国仓成本价
 	purchase_bill_service.CalculateBillEntryCnInventoryCost(purchase_bill.Id, db_session)
 
 	// 更新中国仓的库存数量
