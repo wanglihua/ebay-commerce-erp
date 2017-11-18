@@ -569,9 +569,22 @@ func (c ErpPurchaseBillEntry) GetProductInfo() revel.Result {
 
 	var drawback_amount = purchase_bill_service.CalculateProductDrawbackAmount(product, price)
 
+	// 获得最近一次采购的配件费用和其它费用
+	var sql_get_purchase_cost = `SELECT pbe.*
+FROM erp_purchase_bill_entry pbe
+WHERE pbe.product_id = %d
+ORDER BY pbe.create_time DESC
+LIMIT 1;`
+	sql_get_purchase_cost = fmt.Sprintf(sql_get_purchase_cost, product_id)
+	var product_bill_entry cggl_models.PurchaseBillEntryInfo
+	_, err = db_session.Sql(sql_get_purchase_cost).Get(&product_bill_entry)
+	core.HandleError(err)
+
 	return c.RenderJson(map[string]interface{}{
 		"product":         product,
 		"price":           price,
 		"drawback_amount": drawback_amount,
+		"fitting_cost":    product_bill_entry.FittingCost,
+		"other_cost":      product_bill_entry.OtherCost,
 	})
 }
