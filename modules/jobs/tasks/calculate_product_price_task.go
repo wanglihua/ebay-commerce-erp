@@ -42,13 +42,13 @@ type CalculateProductPriceTask struct {
 }
 
 func (t CalculateProductPriceTask) Name() string {
-	return "计算商品采购价"
+	return "计算商品采购价和中国仓成本价"
 }
 
 func (t CalculateProductPriceTask) Run() {
 	defer func() {
 		if err := recover(); err != nil {
-			revel.ERROR.Printf("计算商品采购价出现错误： %s\n", err)
+			revel.ERROR.Printf("计算商品采购价和中国仓成本价出现错误： %s\n", err)
 			revel.ERROR.Println(string(debug.Stack()))
 		}
 	}()

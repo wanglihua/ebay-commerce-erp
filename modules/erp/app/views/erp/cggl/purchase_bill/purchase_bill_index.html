@@ -85,6 +85,10 @@
                         <i class="ace-icon fa fa-file-excel-o"></i>
                         导出
                     </button>
+                    <button class="btn btn-pink btn-sm" onclick="update_product_inventory_price()">
+                        <i class="ace-icon fa fa-refresh"></i>
+                        更新商品采购价和中国仓成本价
+                    </button>
                 </div>
                 <div>
                     <table id="purchaseBillList" class="table table-striped table-bordered table-hover"></table>
@@ -1656,6 +1660,30 @@
                 }
             });
         }
+    }
+
+    function update_product_inventory_price() {
+        showMask("提交中...");
+        $.ajax({
+            url: '{%url "ErpPurchaseBill.UpdateProductPriceAndCnInventoryCostPrice"%}',
+            type: "POST",
+            processData: false,
+            contentType: 'application/json',
+            data: JSON.stringify(vm.purchase_bill_entry_detail),
+            success: function (data) {
+                hideMask();
+                if (data.success === false) {
+                    $.msg.error(data.message);
+                    //return;
+                }
+                else {
+                    $.msg.show(data.message);
+                    $('#purchaseBillEntryPurchaseInTurnDialog').modal('hide');
+                    vm.reloadEntryList();
+                    //return;
+                }
+            }
+        });
     }
 </script>
 <div id="purchase_bill_log_wrapper"></div>

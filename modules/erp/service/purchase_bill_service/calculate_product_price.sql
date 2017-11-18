@@ -3,6 +3,9 @@
 根据 6 次采购的平均价格，更新商品的采购价
 没有采购记录的商品，不用进行 采购价 更新
 
+根据 6 次采购的平均库存价格，更新商品的中国仓成本价
+没有采购记录的商品，不用进行 中国仓的成本价 更新
+
 */
 
 DROP PROCEDURE IF EXISTS calculate_product_price;
@@ -11,6 +14,7 @@ CREATE PROCEDURE calculate_product_price()
     BEGIN
 
         DECLARE v_product_id BIGINT;
+        DECLARE v_cn_stock_id BIGINT;
 
         -- 遍历数据结束标志
         DECLARE done INT DEFAULT FALSE;
@@ -23,6 +27,17 @@ CREATE PROCEDURE calculate_product_price()
 
         -- 将结束标志绑定到游标
         DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+
+        /*
+            // STOCK_TYPE_CN 国内仓库
+            STOCK_TYPE_CN int64 = 100
+         */
+
+        SELECT s.id
+        INTO v_cn_stock_id
+        FROM erp_stock s
+        WHERE s.stock_type_id = 100 # 100 国内仓库
+        LIMIT 1;
 
         -- 打开游标
         OPEN cur;
@@ -48,6 +63,14 @@ CREATE PROCEDURE calculate_product_price()
                 WHERE pbe.product_id = v_product_id AND pbe.status_id = 4700 # 已入库
                 LIMIT 6)
             WHERE id = v_product_id;
+
+            UPDATE erp_inventory
+            SET cost_price = (
+                SELECT avg(pbe.inventory_cost) AS inventory_cost
+                FROM erp_purchase_bill_entry pbe
+                WHERE pbe.product_id = v_product_id AND pbe.status_id = 4700 # 已入库
+                LIMIT 6)
+            WHERE product_id = v_product_id AND stock_id = v_cn_stock_id;
 
             SET done = FALSE;
         END LOOP;

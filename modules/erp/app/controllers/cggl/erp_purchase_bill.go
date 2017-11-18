@@ -546,3 +546,15 @@ FROM erp_supplier s
 		Total: supplier_count.Count,
 	})
 }
+
+func (c ErpPurchaseBill) UpdateProductPriceAndCnInventoryCostPrice() revel.Result {
+	var db_session = c.DbSession
+
+	_, err := db_session.Exec("CALL calculate_product_price();")
+	core.HandleError(err)
+
+	return c.RenderJson(map[string]interface{}{
+		"success": true,
+		"message": "根据采购历史更新商品采购价和中国仓成本价成功！",
+	})
+}
