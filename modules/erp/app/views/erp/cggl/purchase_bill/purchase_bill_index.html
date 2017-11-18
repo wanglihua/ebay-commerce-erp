@@ -392,7 +392,7 @@
                                         <div class="form-group">
                                             <label for="need_invoice" class="col-xs-2 control-label">是否开票</label>
                                             <div class="col-xs-10">
-                                                <select id="need_invoice" name="purchase_bill_entry_detail.purchase_bill_entry.need_invoice" class="input-sm form-control" v-model.number="purchase_bill_entry_detail.purchase_bill_entry.need_invoice">
+                                                <select id="need_invoice" name="purchase_bill_entry_detail.purchase_bill_entry.need_invoice" class="input-sm form-control" v-model.number="purchase_bill_entry_detail.purchase_bill_entry.need_invoice" disabled="disabled">
                                                     <option :value="0">否</option>
                                                     <option :value="1">是</option>
                                                 </select>
@@ -405,7 +405,7 @@
                                             <label for="tax_point" class="col-xs-2 control-label">收税点</label>
                                             <div class="col-xs-10">
                                                 <div class="input-group">
-                                                    <input id="tax_point" name="purchase_bill_entry_detail.purchase_bill_entry.tax_point" type="text" class="input-sm form-control" v-model.number="purchase_bill_entry_detail.purchase_bill_entry.tax_point"/>
+                                                    <input id="tax_point" name="purchase_bill_entry_detail.purchase_bill_entry.tax_point" type="text" class="input-sm form-control" v-model.number="purchase_bill_entry_detail.purchase_bill_entry.tax_point" disabled="disabled"/>
                                                     <span class="input-group-addon">%</span>
                                                 </div>
                                             </div>
@@ -419,7 +419,7 @@
                                             <label for="drawback_point" class="col-xs-2 control-label">退税点</label>
                                             <div class="col-xs-10">
                                                 <div class="input-group">
-                                                    <input id="drawback_point" name="purchase_bill_entry_detail.purchase_bill_entry.drawback_point" type="text" class="input-sm form-control" v-model.number="purchase_bill_entry_detail.purchase_bill_entry.drawback_point"/>
+                                                    <input id="drawback_point" name="purchase_bill_entry_detail.purchase_bill_entry.drawback_point" type="text" class="input-sm form-control" v-model.number="purchase_bill_entry_detail.purchase_bill_entry.drawback_point" disabled="disabled"/>
                                                     <span class="input-group-addon">%</span>
                                                 </div>
                                             </div>

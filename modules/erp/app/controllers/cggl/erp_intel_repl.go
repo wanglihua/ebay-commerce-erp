@@ -16,6 +16,7 @@ import (
 	auth_models "matrix/modules/auth/models"
 	"matrix/modules/erp/service/intel_repl_service"
 	"matrix/modules/erp/models/sppz_models"
+	"matrix/modules/erp/service/purchase_bill_service"
 )
 
 type ErpIntelRepl struct {
@@ -372,8 +373,6 @@ WHERE p.id IN (%s);`
 	// 生成采购单明细，这个循环过程中会自动实现 MEL，BNE 仓库条目的合并
 	for _, intel_repl := range intel_repl_list {
 		var purchase_bill_entry cggl_models.PurchaseBillEntryInfo
-		has, err := db_session.Where(fmt.Sprintf("bill_id = %d AND product_id = %d", purchase_bill.Id, intel_repl.ProductId)).Get(&purchase_bill_entry)
-		core.HandleError(err)
 
 		purchase_bill_entry.BillId = purchase_bill.Id
 		purchase_bill_entry.ProductId = intel_repl.ProductId
@@ -391,14 +390,14 @@ WHERE p.id IN (%s);`
 		core.HandleError(err)
 		purchase_bill_entry.Price = product.CostPrice
 
-		if has == true { // 现在改为一个SKU一个智能补货条目，这个条件一般不会有机会执行
-			var col_list = []string{"bill_id", "product_id", "mel_qty", "bne_qty", "qty", "status_id"}
-			_, err = db_session.Id(purchase_bill_entry.Id).Cols(col_list...).Update(&purchase_bill_entry)
-			core.HandleError(err)
-		} else {
-			_, err = db_session.Insert(&purchase_bill_entry)
-			core.HandleError(err)
-		}
+		purchase_bill_entry.NeedInvoice = product.NeedInvoice
+		purchase_bill_entry.TaxPoint = product.TaxPoint
+		purchase_bill_entry.DrawbackPoint = product.DrawbackPoint
+		purchase_bill_entry.DrawbackAmount = purchase_bill_service.CalculateBillEntryDrawbackAmount(purchase_bill_entry)
+
+		// 保存采购明细
+		_, err = db_session.Insert(&purchase_bill_entry)
+		core.HandleError(err)
 
 		intel_repl.StatusId = models.INTEL_REPL_STATUS_YCG
 		_, err = db_session.Id(intel_repl.Id).Cols("status_id").Update(&intel_repl)
