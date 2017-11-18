@@ -1026,17 +1026,42 @@
                             },
                             {"mDataProp": "prd.sku", "title": "SKU", "bSearchable": true, "width": 150},
                             {
-                                "mDataProp": "prd.cn_name", "title": "商品名称", "bSearchable": true,
+                                "mDataProp": "prd.cn_name", "title": "商品名称", "bSearchable": true, "sClass": "wrap-word", "width": 250,
                                 "render": function (data, type, row) {
                                     return data;
-                                    //return "<div style='min-width: 280px;white-space:normal; word-break: break-all; word-wrap:break-word;'>" + row.prd.cn_name + "<br/>" + row.prd.name + "</div>";
+                                }
+                            },
+                            {
+                                "mDataProp": "sup.name", "title": "供应商", "bSearchable": true, "sClass": "wrap-word",
+                                "render": function (data, type, row) {
+                                    return data;
                                 }
                             },
                             {"mDataProp": "st.name", "title": "状态", "bSearchable": false, "width": 80}
-                        ]
+                        ],
+                        "fnServerData": function (sSource, aoData, fnCallback) {
+                            showMask("数据加载中，请稍候");
+
+                            aoData.push({'name': 'purchase_bill_id', 'value': this_vm.purchase_bill_id});
+
+                            $.ajax({
+                                "dataType": 'json',
+                                "url": sSource,
+                                "data": aoData,
+                                "success": function (data) {
+                                    hideMask();
+                                    if (data.success === false) {
+                                        $.msg.error(data.message);
+                                        return;
+                                    }
+                                    fnCallback(data.list_data);
+                                }
+                            });
+                        }
                     }
             );
 
+            // Supplier
             initSingleSelectDataTable(
                     '#supplierList',
                     {

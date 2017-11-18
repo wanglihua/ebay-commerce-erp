@@ -352,6 +352,15 @@ func (c ErpPurchaseBillEntry) ProductSelectListData() revel.Result {
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
+	var purchase_bill_id int64
+	c.Params.Bind(&purchase_bill_id, "purchase_bill_id")
+
+	var purchase_bill cggl_models.PurchaseBillInfo
+	_, err := db_session.Id(purchase_bill_id).Get(&purchase_bill)
+	core.HandleError(err)
+
+	var supplier_id = purchase_bill.SupplierId
+
 	type ErpProductViewItem struct {
 		kcgl_models.ProductInfo         `xorm:"extends" json:"prd"`
 		kcgl_models.ProductCateInfo     `xorm:"extends" json:"cate"`
@@ -378,9 +387,11 @@ FROM erp_product prd
     LEFT JOIN erp_package_material pm ON prd.pkg_mtrl_id = pm.id
     INNER JOIN erp_status st ON prd.status_id = st.id`)
 
-	sql_builder.Where(filter)
+	if supplier_id != 0 {
+		filter = core.SqlAnd(filter, fmt.Sprintf("prd.supplier_id = %d OR prd.supplier_id = 0 OR prd.supplier_id IS NULL", supplier_id))
+	}
 
-	//query extra filter here
+	sql_builder.Where(filter)
 
 	if order != "" {
 		sql_builder.OrderBy(order)
@@ -391,7 +402,7 @@ FROM erp_product prd
 	sql_builder.Limit(offset, limit)
 
 	product_list := make([]ErpProductViewItem, 0, limit)
-	err := db_session.Sql(sql_builder.SqlList()).Find(&product_list)
+	err = db_session.Sql(sql_builder.SqlList()).Find(&product_list)
 	core.HandleError(err)
 
 	var product_count struct {
