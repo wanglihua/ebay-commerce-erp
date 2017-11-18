@@ -212,12 +212,12 @@ CREATE PROCEDURE intel_repl()
             SET v_mel_qty = round(v_mel_daily_mean_sales * (v_purchase_days + v_stock_alert_days) - (v_mel_nvt_qty - v_mel_nvt_pending_qty) - v_mel_zt_nvt_qty - v_mel_pc_qty - (v_mel_daily_mean_sales / (v_mel_daily_mean_sales + v_bne_daily_mean_sales)) * v_cn_nvt_qty);
             SET v_bne_qty = round(v_bne_daily_mean_sales * (v_purchase_days + v_stock_alert_days) - (v_bne_nvt_qty - v_bne_nvt_pending_qty) - v_bne_zt_nvt_qty - v_bne_pc_qty - (v_bne_daily_mean_sales / (v_mel_daily_mean_sales + v_bne_daily_mean_sales)) * v_cn_nvt_qty);
 
-            IF v_mel_qty < 0
+            IF v_mel_qty < 0 OR v_mel_qty IS NULL
             THEN
                 SET v_mel_qty = 0;
             END IF;
 
-            IF v_bne_qty < 0
+            IF v_bne_qty < 0 OR v_bne_qty IS NULL
             THEN
                 SET v_bne_qty = 0;
             END IF;
