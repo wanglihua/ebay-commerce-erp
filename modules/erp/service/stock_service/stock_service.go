@@ -134,3 +134,28 @@ LIMIT 1;`
 
 	return stock_id.StockId
 }
+
+// 获取样品间仓库的仓库id
+func Get_sample_stock_id(db_session *xorm.Session) int64 {
+
+	var stock_id struct {
+		StockId int64 `xorm:"'stock_id'"`
+	}
+
+	/*
+SELECT s.id AS stock_id
+FROM erp_stock s
+WHERE s.stock_type_id = 400
+LIMIT 1;
+	 */
+
+	var sql = `SELECT s.id AS stock_id
+FROM erp_stock s
+WHERE s.stock_type_id = %d
+LIMIT 1;`
+	sql = fmt.Sprintf(sql, sppz_models.STOCK_TYPE_SAMPLE)
+	_, err := db_session.Sql(sql).Get(&stock_id)
+	core.HandleError(err)
+
+	return stock_id.StockId
+}

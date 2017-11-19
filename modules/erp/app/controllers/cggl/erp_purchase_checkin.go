@@ -17,6 +17,7 @@ import (
 	"time"
 	"matrix/modules/erp/service/purchase_bill_log_service"
 	"math"
+	"matrix/modules/erp/models/sppz_models"
 )
 
 type ErpPurchaseCheckin struct {
@@ -188,6 +189,8 @@ type PurchaseBillEntryCheckinDetailForm struct {
 	PurchaseBillEntry cggl_models.PurchaseBillEntryInfo      `json:"purchase_bill_entry"`
 	ProductName       string                                 `json:"product_name"`
 	AbnormalTypeList  []cggl_models.PurchaseAbnormalTypeInfo `json:"abnormal_type_list"`
+	StockTypeId       int64                                  `json:"stock_type_id"`
+	StockTypeList     []sppz_models.StockTypeInfo            `json:"stock_type_list"`
 }
 
 func (f *PurchaseBillEntryCheckinDetailForm) IsCreate() bool {
@@ -237,6 +240,9 @@ func (c ErpPurchaseCheckin) DetailData() revel.Result {
 	var abnormal_type_list = make([]cggl_models.PurchaseAbnormalTypeInfo, 0)
 	core.HandleError(db_session.OrderBy("id ASC").Find(&abnormal_type_list))
 
+	var stock_type_list = make([]sppz_models.StockTypeInfo, 0)
+	core.HandleError(db_session.In("id", []int64{sppz_models.STOCK_TYPE_CN, sppz_models.STOCK_TYPE_SAMPLE}).OrderBy("id ASC").Find(&stock_type_list))
+
 	var detail_form PurchaseBillEntryCheckinDetailForm
 	detail_form.PurchaseBill = purchase_bill
 	detail_form.PurchaseBillEntry = purchase_bill_entry
@@ -244,6 +250,8 @@ func (c ErpPurchaseCheckin) DetailData() revel.Result {
 	detail_form.AbnormalTypeList = abnormal_type_list
 	detail_form.PurchaseBillEntry.AbnormalTypeId = cggl_models.ABNORMAL_TYPE_ZC
 	detail_form.ProductName = product.Name
+	detail_form.StockTypeList = stock_type_list
+	detail_form.StockTypeId = sppz_models.STOCK_TYPE_CN
 
 	return c.RenderJson(detail_form)
 }
@@ -350,8 +358,13 @@ func (c ErpPurchaseCheckin) Checkin() revel.Result {
 	// 计算中国仓成本价
 	purchase_bill_service.CalculateBillEntryCnInventoryCost(purchase_bill.Id, db_session)
 
-	// 更新中国仓的库存数量
-	inventory_service.AddCnInventoryQty(bill_entry_from_ui.ProductId, bill_entry_from_ui.CheckinQty, db_session)
+	if detail_form.StockTypeId == sppz_models.STOCK_TYPE_SAMPLE {
+		// 更新样品间的库存数量
+		inventory_service.AddSampleInventoryQty(bill_entry_from_ui.ProductId, bill_entry_from_ui.CheckinQty, db_session)
+	} else {
+		// 更新中国仓的库存数量
+		inventory_service.AddCnInventoryQty(bill_entry_from_ui.ProductId, bill_entry_from_ui.CheckinQty, db_session)
+	}
 
 	return c.RenderJson(map[string]interface{}{
 		"success": true,

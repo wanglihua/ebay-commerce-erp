@@ -6,6 +6,9 @@ import (
 )
 
 const (
+	// STOCK_TYPE_SAMPLE 样品间
+	STOCK_TYPE_SAMPLE int64 = 50
+
 	// STOCK_TYPE_CN 国内仓库
 	STOCK_TYPE_CN int64 = 100
 
@@ -14,9 +17,6 @@ const (
 
 	// STOCK_TYPE_AU 澳洲仓库
 	STOCK_TYPE_AU int64 = 300
-
-	// STOCK_TYPE_SAMPLE 样品间
-	STOCK_TYPE_SAMPLE int64 = 400
 )
 
 type StockTypeInfo struct {

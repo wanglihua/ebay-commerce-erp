@@ -151,7 +151,11 @@
                             {
                                 "mDataProp": "pb.apply_time", "title": "采购时间", "bSearchable": false, "sClass": "center", "width": 120,
                                 "render": function (data, type, row) {
-                                    return "<div class='div_apply_time'>" + row.pb.apply_time + "</div><div>" + row.pb.pay_time + "</div><div>" + row.pb.create_time + "</div><div>" + row.pb.update_time + "</div>";
+                                    var pay_time = '--';
+                                    if (row.pb.pay_time != null) {
+                                        pay_time = row.pb.pay_time;
+                                    }
+                                    return "<div class='div_apply_time'>" + row.pb.apply_time + "</div><div>" + pay_time + "</div><div>" + row.pb.create_time + "</div><div>" + row.pb.update_time + "</div>";
                                 }
                             },
                             {

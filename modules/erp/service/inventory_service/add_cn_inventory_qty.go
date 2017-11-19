@@ -43,3 +43,38 @@ WHERE s.stock_type_id = %d AND nvt.product_id = %d;`
 		core.HandleError(err)
 	}
 }
+
+// 添加样品间仓库的库存
+func AddSampleInventoryQty(product_id int64, qty_added int64, db_session *xorm.Session) {
+
+	/*
+SELECT nvt.*
+FROM erp_inventory nvt
+    INNER JOIN erp_stock s ON nvt.stock_id = s.id
+WHERE s.stock_type_id = 400 AND nvt.product_id = 1;
+	 */
+
+	var sql_get_product_cn_inventory = `SELECT nvt.*
+FROM erp_inventory nvt
+    INNER JOIN erp_stock s ON nvt.stock_id = s.id
+WHERE s.stock_type_id = %d AND nvt.product_id = %d;`
+
+	sql_get_product_cn_inventory = fmt.Sprintf(sql_get_product_cn_inventory, sppz_models.STOCK_TYPE_SAMPLE, product_id)
+	var inventory kcgl_models.InventoryInfo
+	has, err := db_session.Sql(sql_get_product_cn_inventory).Get(&inventory)
+	core.HandleError(err)
+
+	if has == true {
+		inventory.Qty = inventory.Qty + qty_added
+		_, err = db_session.Id(inventory.Id).Cols("qty").Update(&inventory)
+		core.HandleError(err)
+	} else {
+		var sample_stock_id = stock_service.Get_sample_stock_id(db_session)
+		inventory.StockId = sample_stock_id
+		inventory.ProductId = product_id
+		inventory.Qty = qty_added
+
+		_, err = db_session.Insert(&inventory)
+		core.HandleError(err)
+	}
+}

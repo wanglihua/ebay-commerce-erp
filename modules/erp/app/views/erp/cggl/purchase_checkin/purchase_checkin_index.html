@@ -163,6 +163,21 @@
                                     </div>
                                 </div>
 
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <label for="stock_type_id" class="col-xs-2 control-label">入库仓库</label>
+                                            <div class="col-xs-10">
+                                                <select id="stock_type_id" name="purchase_bill_entry_detail.stock_type_id" class="input-sm form-control" v-model.number="purchase_bill_entry_detail.stock_type_id">
+                                                    <template v-for="stock_type in purchase_bill_entry_detail.stock_type_list">
+                                                        <option :value="stock_type.id">{{stock_type.name}}</option>
+                                                    </template>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 {%/*
                                 <div id="div_pay_amount" class="row">
                                     <div class="col-xs-12">
