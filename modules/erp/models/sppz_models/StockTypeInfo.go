@@ -14,14 +14,17 @@ const (
 
 	// STOCK_TYPE_AU 澳洲仓库
 	STOCK_TYPE_AU int64 = 300
+
+	// STOCK_TYPE_SAMPLE 样品间
+	STOCK_TYPE_SAMPLE int64 = 400
 )
 
 type StockTypeInfo struct {
-	Id         int64           `xorm:"bigint notnull pk 'id'" json:"id"`
-	Name       string          `xorm:"nvarchar(200) notnull index unique 'name'" json:"name"`
-	Desc       string          `xorm:"nvarchar(500) notnull 'desc'" json:"desc"`
-	CreateTime core.Time       `xorm:"created notnull 'create_time'" json:"create_time"`
-	UpdateTime core.Time       `xorm:"updated notnull 'update_time'" json:"update_time"`
+	Id         int64     `xorm:"bigint notnull pk 'id'" json:"id"`
+	Name       string    `xorm:"nvarchar(200) notnull index unique 'name'" json:"name"`
+	Desc       string    `xorm:"nvarchar(500) notnull 'desc'" json:"desc"`
+	CreateTime core.Time `xorm:"created notnull 'create_time'" json:"create_time"`
+	UpdateTime core.Time `xorm:"updated notnull 'update_time'" json:"update_time"`
 }
 
 func (e StockTypeInfo) TableName() string {
@@ -50,6 +53,12 @@ func (e StockTypeInfo) InitData(db_session *xorm.Session) {
 	stock_type_au.Name = "澳洲仓库"
 	stock_type_au.Desc = "澳洲仓库"
 	db_session.Insert(&stock_type_au)
+
+	var stock_type_sample StockTypeInfo
+	stock_type_sample.Id = STOCK_TYPE_SAMPLE
+	stock_type_sample.Name = "样品间"
+	stock_type_sample.Desc = "样品间"
+	db_session.Insert(&stock_type_sample)
 }
 
 func GetStockTypeList(db_session *xorm.Session) []StockTypeInfo {
