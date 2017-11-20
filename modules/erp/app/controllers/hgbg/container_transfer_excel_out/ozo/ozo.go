@@ -47,9 +47,9 @@ func (c Exporter) GetExcelFile(p_transfer *hgbg_models.ContainerTransferInfo, db
 		xlsx_file.SetCellStr(sheet1_name, "E1", p_transfer.BatchCode)
 		xlsx_file.SetCellStr(sheet1_name, "E2", time.Time(p_transfer.PackingTime).Format("2006-01-02"))
 
-		xlsx_file.SetCellStr(sheet1_name, "B125", start_port.TradeItem)
-		xlsx_file.SetCellStr(sheet1_name, "E125", dest_port.PortName)
-		xlsx_file.SetCellValue(sheet1_name, "C132", p_transfer.BatchCode)
+		xlsx_file.SetCellStr(sheet1_name, "B225", start_port.TradeItem)
+		xlsx_file.SetCellStr(sheet1_name, "E225", dest_port.PortName)
+		xlsx_file.SetCellValue(sheet1_name, "C232", p_transfer.BatchCode)
 
 		var total_amount float64 = 0
 		for index, item := range item_list {
@@ -63,9 +63,9 @@ func (c Exporter) GetExcelFile(p_transfer *hgbg_models.ContainerTransferInfo, db
 			total_amount += amount
 		}
 
-		xlsx_file.SetCellValue(sheet1_name, "F112", total_amount)
-		xlsx_file.SetCellValue(sheet1_name, "F115", total_amount)
-		xlsx_file.SetCellValue(sheet1_name, "F117", total_amount)
+		xlsx_file.SetCellValue(sheet1_name, "F212", total_amount)
+		xlsx_file.SetCellValue(sheet1_name, "F215", total_amount)
+		xlsx_file.SetCellValue(sheet1_name, "F217", total_amount)
 	}
 
 	{
@@ -93,8 +93,8 @@ func (c Exporter) GetExcelFile(p_transfer *hgbg_models.ContainerTransferInfo, db
 			total_amount += amount
 		}
 
-		xlsx_file.SetCellValue(sheet2_name, "D114", total_qty)
-		xlsx_file.SetCellValue(sheet2_name, "F114", total_amount)
+		xlsx_file.SetCellValue(sheet2_name, "D214", total_qty)
+		xlsx_file.SetCellValue(sheet2_name, "F214", total_amount)
 	}
 
 	{
@@ -136,11 +136,11 @@ func (c Exporter) GetExcelFile(p_transfer *hgbg_models.ContainerTransferInfo, db
 
 		xlsx_file.SetCellValue(sheet3_name, "I14", total_vol)
 
-		xlsx_file.SetCellValue(sheet3_name, "D114", total_qty)
-		xlsx_file.SetCellValue(sheet3_name, "E114", total_pkgs)
-		xlsx_file.SetCellValue(sheet3_name, "F114", total_net_weight)
-		xlsx_file.SetCellValue(sheet3_name, "G114", total_gross_weight)
-		xlsx_file.SetCellValue(sheet3_name, "H114", total_vol)
+		xlsx_file.SetCellValue(sheet3_name, "D214", total_qty)
+		xlsx_file.SetCellValue(sheet3_name, "E214", total_pkgs)
+		xlsx_file.SetCellValue(sheet3_name, "F214", total_net_weight)
+		xlsx_file.SetCellValue(sheet3_name, "G214", total_gross_weight)
+		xlsx_file.SetCellValue(sheet3_name, "H214", total_vol)
 	}
 
 	{
