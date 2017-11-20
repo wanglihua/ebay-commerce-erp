@@ -512,7 +512,7 @@
         </div>
     </div>
     <div class="modal fade" id="productSelectDialog">
-        <div class="modal-dialog" style="width: 680px;">
+        <div class="modal-dialog" style="width: 880px;">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="True">&times;</button>
@@ -1033,9 +1033,9 @@
                                     return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
                                 }
                             },
-                            {"mDataProp": "prd.sku", "title": "SKU", "bSearchable": true, "width": 150},
+                            {"mDataProp": "prd.sku", "title": "SKU", "bSearchable": true, "width": 100},
                             {
-                                "mDataProp": "prd.cn_name", "title": "商品名称", "bSearchable": true, "sClass": "wrap-word", "width": 250,
+                                "mDataProp": "prd.cn_name", "title": "商品名称", "bSearchable": true, "sClass": "wrap-word", "width": 100,
                                 "render": function (data, type, row) {
                                     return data;
                                 }
@@ -1046,7 +1046,7 @@
                                     return data;
                                 }
                             },
-                            {"mDataProp": "st.name", "title": "状态", "bSearchable": false, "width": 80}
+                            {"mDataProp": "st.name", "title": "状态", "bSearchable": false, "width": 60}
                         ],
                         "fnServerData": function (sSource, aoData, fnCallback) {
                             showMask("数据加载中，请稍候");
@@ -1063,7 +1063,7 @@
                                         $.msg.error(data.message);
                                         return;
                                     }
-                                    fnCallback(data.list_data);
+                                    fnCallback(data);
                                 }
                             });
                         }
@@ -1435,6 +1435,7 @@
     });
 
     function showProductSelect() {
+        reloadList("#productList");
         $('#productSelectDialog').modal(modalOptions);
     }
 
@@ -1474,6 +1475,7 @@
     }
 
     function showSupplierSelect() {
+        reloadList("#supplierList");
         $('#supplierSelectDialog').modal(modalOptions);
     }
 
