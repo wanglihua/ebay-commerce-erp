@@ -211,7 +211,7 @@ func (c ErpPurchaseBillEntryExcel) Import() revel.Result {
 		}
 
 		var purchase_bill_entry cggl_models.PurchaseBillEntryInfo
-		has, err = db_session.Where("product_id = ?", product.Id).Get(&purchase_bill_entry)
+		has, err = db_session.Where("bill_id = ? AND product_id = ?", bill_id, product.Id).Get(&purchase_bill_entry)
 		core.HandleError(err)
 
 		if has == true {
