@@ -387,6 +387,9 @@ WHERE p.id IN (%s);`
 		// 获得商品的建议采购价
 		purchase_bill_entry.Price = purchase_bill_service.Get_propose_purchase_price(intel_repl.ProductId, db_session)
 
+		// 计算金额
+		purchase_bill_entry.Amount = purchase_bill_entry.Price * float64(purchase_bill_entry.Qty)
+
 		var product kcgl_models.ProductInfo
 		_, err = db_session.Id(intel_repl.ProductId).Get(&product)
 		core.HandleError(err)

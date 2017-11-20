@@ -190,6 +190,9 @@ func (c ErpPurchaseBillEntry) DetailData() revel.Result {
 		_, err = db_session.Id(product_id).Get(&product)
 		core.HandleError(err)
 		product_name = product.CnName
+	} else {
+		// 如果是新建的采购明细，付款金额就默认是金额
+		// purchase_bill_entry.PayAmount =
 
 		// 这里可以不用设置的，这些都在新建的时候选着SKU的时候设置
 		/*
@@ -579,7 +582,6 @@ LIMIT 1;`
 	var product_bill_entry cggl_models.PurchaseBillEntryInfo
 	_, err = db_session.Sql(sql_get_purchase_cost).Get(&product_bill_entry)
 	core.HandleError(err)
-
 	return c.RenderJson(map[string]interface{}{
 		"product":         product,
 		"price":           price,

@@ -3,6 +3,7 @@ package purchase_bill_service
 import (
 	"matrix/modules/erp/models/cggl_models"
 	"matrix/modules/erp/models/kcgl_models"
+	"math"
 )
 
 func CalculateBillEntryDrawbackAmount(bill_entry cggl_models.PurchaseBillEntryInfo) float64 {
@@ -22,5 +23,7 @@ func CalculateProductDrawbackAmount(product kcgl_models.ProductInfo, purchase_pr
 
 	// return ((bill_entry.Price * float64(bill_entry.Qty)) / 1.17) * bill_entry.DrawbackPoint
 	// 退税额，只需计算单个商品的就可以了，不用考虑数量的
-	return (purchase_price / 1.17) * product.DrawbackPoint / 100
+
+	var drawback_amount = (purchase_price / 1.17) * product.DrawbackPoint / 100
+	return math.Floor(drawback_amount*100+0.5) / 100
 }
