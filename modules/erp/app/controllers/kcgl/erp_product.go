@@ -180,7 +180,7 @@ FROM erp_product prd
 	for index, _ := range product_list {
 		inventory_list_product := make([]inventory_service.Product_inventory_view_item_t, 0)
 		for _, inventory := range inventory_list_product_list {
-			if inventory.ProductId == product_list[index].Product.Id {
+			if inventory.Inventory.ProductId == product_list[index].Product.Id {
 				inventory_list_product = append(inventory_list_product, inventory)
 			}
 		}

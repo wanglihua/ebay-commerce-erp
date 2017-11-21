@@ -11,6 +11,7 @@ import (
 	"matrix/core/lic"
 	"matrix/db"
 	"matrix/modules/erp/service/login_log_service"
+	"math/rand"
 )
 
 func BeforeInterceptor(c *revel.Controller) revel.Result {
@@ -151,7 +152,8 @@ func userAuth(c *revel.Controller) revel.Result {
 
 	//检查软件授权
 	if lic.Is_lic_expire == true {
-		return c.RenderText("something error! code: 1905689")
+		rand.Seed(int64(time.Now().Nanosecond()))
+		return c.RenderText(fmt.Sprintf("error code: %d", rand.Int()%10000))
 	}
 
 	loginuser := core.GetLoginUser(c.Session)

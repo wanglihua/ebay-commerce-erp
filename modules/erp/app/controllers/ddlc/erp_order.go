@@ -855,6 +855,13 @@ WHERE oi.order_id = %d;`
 		inventory_list = append(inventory_list, inventory_single_product_list...)
 	}
 
+	for index, inventory := range inventory_list {
+		if inventory.Stock.StockTypeId == sppz_models.STOCK_TYPE_ZT {
+			// 在途仓获取到港时间
+			inventory_list[index].DeptTime = inventory_service.Get_zt_stock_product_dept_time(inventory.Stock.Id, inventory.Product.Id, db_session)
+		}
+	}
+
 	var order_logistics ddlc_models.OrderLogisticsInfo
 	_, err = db_session.Where(fmt.Sprintf("order_id = %d", order_id)).Get(&order_logistics)
 	core.HandleError(err)
