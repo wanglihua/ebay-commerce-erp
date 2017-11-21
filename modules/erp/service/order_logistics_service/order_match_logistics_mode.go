@@ -20,7 +20,14 @@ func (p_ol *OrderLogistics) match_logistics_mode(p_order *ddlc_models.OrderInfo,
 }
 */
 
-func (p_ol *OrderLogisticsService) match_logistics_mode_with_option(p_order *ddlc_models.OrderInfo, p_order_logistics_data *order_logistics_data_t, match_option Match_option_t, is_previous_hold bool, db_session *xorm.Session) (success_return bool, order_logistics_return ddlc_models.OrderLogisticsInfo, is_envelope_hold_return bool) {
+type match_return_t struct {
+	success          bool                           // 就是看有没有匹配的物流方式
+	order_logistics  ddlc_models.OrderLogisticsInfo // 匹配的订单物流信息
+	is_envelope_hold bool                           // 是否信封HOLD
+	has_stock        bool                           // 匹配时仓库是否有库存
+}
+
+func (p_ol *OrderLogisticsService) match_logistics_mode_with_option(p_order *ddlc_models.OrderInfo, p_order_logistics_data *order_logistics_data_t, match_option Match_option_t, is_previous_hold bool, db_session *xorm.Session) match_return_t {
 
 	// 在这里面只考虑最佳仓库的库存情况，次佳仓库有货的情况，别的地方已经考虑并 hold
 
@@ -576,12 +583,24 @@ func (p_ol *OrderLogisticsService) match_logistics_mode_with_option(p_order *ddl
 
 	var order_logistics ddlc_models.OrderLogisticsInfo
 
-	if is_envelope_hold == true {
-		return false, order_logistics, true
+	if final_result.mode_id == 0 || final_result.fee_rate_id == 0 { // 匹配失败
+		var match_return match_return_t
+		match_return.success = false
+		match_return.order_logistics = order_logistics
+		match_return.is_envelope_hold = false
+		match_return.has_stock = false
+
+		return match_return
 	}
 
-	if final_result.mode_id == 0 || final_result.fee_rate_id == 0 { // 匹配失败
-		return false, order_logistics, false
+	if is_envelope_hold == true {
+		var match_return match_return_t
+		match_return.success = true
+		match_return.order_logistics = ddlc_models.OrderLogisticsInfo{} // 前面已经保存 order_Logistics， 这里就随便给个值就行
+		match_return.is_envelope_hold = true
+		match_return.has_stock = true
+
+		return match_return
 	}
 
 	order_logistics = save_order_logistics(p_ol, p_order, p_order_logistics_data, final_result, match_option.Unlock_express, p_ol.LoginUser, is_previous_hold, db_session)
@@ -593,15 +612,28 @@ func (p_ol *OrderLogisticsService) match_logistics_mode_with_option(p_order *ddl
 		} else {
 			p_ol.update_order_to_hold_type(p_order, ddpz_models.ORDER_HOLD_TYPE_OOS_ALL_STOCK, db_session) // 缺货的Hold，后面的 Hold check 会把它进一步更新成 在途才有货等等。
 		}
+
+		var match_return match_return_t
+		match_return.success = true
+		match_return.order_logistics = order_logistics
+		match_return.is_envelope_hold = false
+		match_return.has_stock = true
+
+		return match_return
 	} else {
 		var product_info_list = p_order_logistics_data.order_product_info_list
 		for _, product_info := range product_info_list {
 			p_ol.pending_keeper.add(order_logistics.StockId, product_info.ProductId, product_info.Qty)
 		}
+
+		var match_return match_return_t
+		match_return.success = true
+		match_return.order_logistics = order_logistics
+		match_return.is_envelope_hold = false
+		match_return.has_stock = false
+
+		return match_return
 	}
-
-	return true, order_logistics, false
-
 	// 多个商品时，考虑拆包的方式
 
 	// 多个商品时，能不能分仓库发货的？

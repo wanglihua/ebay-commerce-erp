@@ -444,10 +444,11 @@ func (p_ol *OrderLogisticsService) CalculateListWithOption(order_list []ddlc_mod
 			continue
 		}
 
-		match_success, order_logistics, is_envelope_hold := p_ol.match_logistics_mode_with_option(&order, p_order_logistics_data, match_option, is_previous_hold, db_session)
+		// match_success, order_logistics, is_envelope_hold := p_ol.match_logistics_mode_with_option(&order, p_order_logistics_data, match_option, is_previous_hold, db_session)
+		var match_result = p_ol.match_logistics_mode_with_option(&order, p_order_logistics_data, match_option, is_previous_hold, db_session)
 
 		// 如果通过指定的物流的方式在匹配时进行了信封 Hold，就跳过
-		if is_envelope_hold == true {
+		if match_result.is_envelope_hold == true {
 			//移除刚刚匹配的物流方式
 			//remove_order_logistics(order, db_session) //要禁用，否则会出错
 			continue
@@ -459,19 +460,19 @@ func (p_ol *OrderLogisticsService) CalculateListWithOption(order_list []ddlc_mod
 		}
 
 		// 11 无匹配的物流方式（长宽高重量没有物流满足）
-		if p_ol.hold_check_no_match_logistics_mode(&order, match_success, db_session) {
+		if p_ol.hold_check_no_match_logistics_mode(&order, match_result.success, db_session) {
 			continue
 		}
 
-		if match_success == true {
+		if match_result.success == true {
 			// 13 匹配最佳仓库及物流后订单亏损。需要在基础设置里面有设置亏损额或者亏损率的设置功能，超过设置范围了，自动到订单亏损 hold
-			if p_ol.hold_check_great_deficit(&order, p_order_logistics_data, order_logistics, db_session) {
+			if p_ol.hold_check_great_deficit(&order, p_order_logistics_data, match_result.order_logistics, db_session) {
 				//把亏损的尽量放在前面
 				continue
 			}
 
 			// 1 地址有特殊字段的， 因为要查看匹配的物流方式，所以就放在这里了，放在匹配物流方式之后
-			if p_ol.hold_check_address_special_word(&order, p_order_logistics_data, order_logistics, db_session) {
+			if p_ol.hold_check_address_special_word(&order, p_order_logistics_data, match_result.order_logistics, db_session) {
 				continue
 			}
 		}
@@ -496,7 +497,7 @@ func (p_ol *OrderLogisticsService) CalculateListWithOption(order_list []ddlc_mod
 		}
 
 		// 5. 系统显示所有仓都缺货（中国仓除外）
-		if p_ol.hold_check_oss_all_stock(&order, p_order_logistics_data, db_session) {
+		if p_ol.hold_check_oss_all_stock(match_result.has_stock, &order, p_order_logistics_data, db_session) {
 			//部分商品有货的检查，放在所有仓库都缺货的后面
 			if p_ol.hold_check_has_some_product(&order, p_order_logistics_data, db_session) {
 				continue
@@ -506,7 +507,7 @@ func (p_ol *OrderLogisticsService) CalculateListWithOption(order_list []ddlc_mod
 		}
 
 		// 6. 系统显示 在途才有货
-		if p_ol.hold_check_oss_au_stock_but_zt_stock_has(&order, p_order_logistics_data, db_session) {
+		if p_ol.hold_check_oss_au_stock_but_zt_stock_has(match_result.has_stock, &order, p_order_logistics_data, db_session) {
 			continue
 		}
 

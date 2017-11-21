@@ -39,6 +39,6 @@ func (mt *match_trace) PrintlnIndent(indent_level int64, a ...interface{}) {
 	}
 }
 
-func (mt *match_trace) String(a ...interface{}) string {
+func (mt *match_trace) String() string {
 	return mt.match_debug.String()
 }

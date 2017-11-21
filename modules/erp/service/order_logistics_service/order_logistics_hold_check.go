@@ -68,17 +68,17 @@ func (p_ol *OrderLogisticsService) hold_check_buyer_checkout_message(p_order *dd
 // todo: 4 PICK UP  -- 一般都是手工创建的订单，做一个 PICK UP的订单类型？
 
 // 5 系统显示所有仓都缺货（中国仓除外）
-func (p_ol *OrderLogisticsService) hold_check_oss_all_stock(p_order *ddlc_models.OrderInfo, p_order_logistics_data *order_logistics_data_t, db_session *xorm.Session) (is_hold_return bool) {
+func (p_ol *OrderLogisticsService) hold_check_oss_all_stock(match_has_stock bool, p_order *ddlc_models.OrderInfo, p_order_logistics_data *order_logistics_data_t, db_session *xorm.Session) (is_hold_return bool) {
 	// 只检查不是 中国仓 的仓库
 	var fun_is_not_cn_stock = func(stock_type_id int64) bool {
-		if stock_type_id != sppz_models.STOCK_TYPE_CN {
+		if stock_type_id == sppz_models.STOCK_TYPE_AU || stock_type_id == sppz_models.STOCK_TYPE_ZT {
 			return true
 		} else {
 			return false
 		}
 	}
 
-	if p_ol.hold_check_oss_by_stock_type(p_order, p_order_logistics_data, fun_is_not_cn_stock, db_session) {
+	if p_ol.hold_check_oss_by_stock_type(match_has_stock, p_order, p_order_logistics_data, fun_is_not_cn_stock, db_session) {
 		p_ol.update_order_to_hold_type(p_order, ddpz_models.ORDER_HOLD_TYPE_OOS_ALL_STOCK, db_session)
 		return true
 	}
@@ -90,7 +90,7 @@ func (p_ol *OrderLogisticsService) hold_check_oss_all_stock(p_order *ddlc_models
 // 这个在需求上有更改，不用这个了
 // 后来改成在途才有货
 
-func (p_ol *OrderLogisticsService) hold_check_oss_au_stock_but_zt_stock_has(p_order *ddlc_models.OrderInfo, p_order_logistics_data *order_logistics_data_t, db_session *xorm.Session) (is_hold_return bool) {
+func (p_ol *OrderLogisticsService) hold_check_oss_au_stock_but_zt_stock_has(match_has_stock bool, p_order *ddlc_models.OrderInfo, p_order_logistics_data *order_logistics_data_t, db_session *xorm.Session) (is_hold_return bool) {
 	// 检查 澳洲 的仓库
 	// todo: 这里还有点问题，应该是检查对应的在途仓库？,先不考虑这个问题了
 
@@ -110,9 +110,16 @@ func (p_ol *OrderLogisticsService) hold_check_oss_au_stock_but_zt_stock_has(p_or
 		}
 	}
 
+	// 澳仓有没有货
+	var is_au_stock_oss = p_ol.hold_check_oss_by_stock_type(match_has_stock, p_order, p_order_logistics_data, fun_is_au_stock, db_session)
+	revel.TRACE.Println("is_au_stock_oss: ", is_au_stock_oss)
+
+	// 在途有没有货
+	var is_zt_stock_oss = p_ol.hold_check_oss_by_stock_type(match_has_stock, p_order, p_order_logistics_data, fun_is_zt_stock, db_session)
+	revel.TRACE.Println("is_zt_stock_oss: ", is_zt_stock_oss)
+
 	// 澳洲仓库缺货，但在途仓库有货
-	if p_ol.hold_check_oss_by_stock_type(p_order, p_order_logistics_data, fun_is_au_stock, db_session) == true &&
-		p_ol.hold_check_oss_by_stock_type(p_order, p_order_logistics_data, fun_is_zt_stock, db_session) == false {
+	if is_au_stock_oss == true && is_zt_stock_oss == false {
 		p_ol.update_order_to_hold_type(p_order, ddpz_models.ORDER_HOLD_TYPE_OOS_AU_STOCK_ZT_HAS, db_session)
 		return true
 	}
@@ -124,11 +131,10 @@ func (p_ol *OrderLogisticsService) hold_check_oss_au_stock_but_zt_stock_has(p_or
 type fun_stock_type_filter_t func(stock_type_id int64) bool
 
 // 订单商品库存检查，用于给 5 和 6 的调用
-func (p_ol *OrderLogisticsService) hold_check_oss_by_stock_type(p_order *ddlc_models.OrderInfo, p_order_logistics_data *order_logistics_data_t, fun_stock_type_filter fun_stock_type_filter_t, db_session *xorm.Session) (is_oss_return bool) {
-	var products_stock_qty_list = p_order_logistics_data.products_stock_qty_list
-
+func (p_ol *OrderLogisticsService) hold_check_oss_by_stock_type(match_has_stock bool, p_order *ddlc_models.OrderInfo, p_order_logistics_data *order_logistics_data_t, fun_stock_type_filter fun_stock_type_filter_t, db_session *xorm.Session) (is_oss_return bool) {
 	// 找出所有包含这些商品库存的仓库id列表
 	var get_product_stock_id_list = func() []int64 {
+		var products_stock_qty_list = p_order_logistics_data.products_stock_qty_list
 		var stock_id_set = collections.NewIntSet()
 		for _, product_stock_qty := range products_stock_qty_list {
 			if fun_stock_type_filter(product_stock_qty.StockTypeId) { // 只取符合要求的仓库类型。比如，匹配订单的时候，只取澳洲的仓库什么的
@@ -144,7 +150,8 @@ func (p_ol *OrderLogisticsService) hold_check_oss_by_stock_type(p_order *ddlc_mo
 
 	// 对每一个仓库循环，看是不是这个仓库里面, 这些商品都有货
 	for _, stock_id := range product_stock_id_list {
-		var stock_has_all_product, _ = check_stock_has_order_products_and_get_cost_amount(p_ol, p_order, stock_id, p_order_logistics_data, false) // 由于 hold 是在匹配物流之后，所以 这时就不考虑当前被 temp pending 的当前订单的数量
+		//var stock_has_all_product, _ = check_stock_has_order_products_and_get_cost_amount(p_ol, p_order, stock_id, p_order_logistics_data, false) // 由于 hold 是在匹配物流之后，所以 这时就不考虑当前被 temp pending 的当前订单的数量 // ????
+		var stock_has_all_product, _ = check_stock_has_order_products_and_get_cost_amount(p_ol, p_order, stock_id, p_order_logistics_data, match_has_stock) // 由于 hold 是在匹配物流之后，所以 这时就不考虑当前被 temp pending 的当前订单的数量 // ????
 
 		// 找到仓库全部商品都有货了，就退出；如果这个仓库里面不是全部商品都有货，就继续找
 		if stock_has_all_product {
