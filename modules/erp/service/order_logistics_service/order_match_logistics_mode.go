@@ -583,22 +583,23 @@ func (p_ol *OrderLogisticsService) match_logistics_mode_with_option(p_order *ddl
 
 	var order_logistics ddlc_models.OrderLogisticsInfo
 
-	if final_result.mode_id == 0 || final_result.fee_rate_id == 0 { // 匹配失败
-		var match_return match_return_t
-		match_return.success = false
-		match_return.order_logistics = order_logistics
-		match_return.is_envelope_hold = false
-		match_return.has_stock = false
-
-		return match_return
-	}
-
+	// 这个要放在 匹配失败的判断的前面，否则信封也会返回匹配失败
 	if is_envelope_hold == true {
 		var match_return match_return_t
 		match_return.success = true
 		match_return.order_logistics = ddlc_models.OrderLogisticsInfo{} // 前面已经保存 order_Logistics， 这里就随便给个值就行
 		match_return.is_envelope_hold = true
 		match_return.has_stock = true
+
+		return match_return
+	}
+
+	if final_result.mode_id == 0 || final_result.fee_rate_id == 0 { // 匹配失败
+		var match_return match_return_t
+		match_return.success = false
+		match_return.order_logistics = order_logistics
+		match_return.is_envelope_hold = false
+		match_return.has_stock = false
 
 		return match_return
 	}
