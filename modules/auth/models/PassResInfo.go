@@ -662,8 +662,8 @@ func (e PassResInfo) InitData(db_session *xorm.Session) {
 		pass = new(PassResInfo)
 		pass.Id = pass_res.AUTH_PASS
 		pass.CateId = pass_res_cate.AUTH
-		pass.Name = "授权管理"
-		pass.Desc = core.MakeNullString("授权管理", true)
+		pass.Name = "用户权限"
+		pass.Desc = core.MakeNullString("用户权限", true)
 		db_session.Insert(pass)
 
 		pass = new(PassResInfo)
@@ -676,8 +676,8 @@ func (e PassResInfo) InitData(db_session *xorm.Session) {
 		pass = new(PassResInfo)
 		pass.Id = pass_res.AUTH_SETTING
 		pass.CateId = pass_res_cate.AUTH
-		pass.Name = "授权配置"
-		pass.Desc = core.MakeNullString("授权配置", true)
+		pass.Name = "授权设置"
+		pass.Desc = core.MakeNullString("授权设置", true)
 		db_session.Insert(pass)
 	}
 
