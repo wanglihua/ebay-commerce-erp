@@ -29,16 +29,20 @@
                     */%}
                 </div>
                 <div id="query" class="col-xs-12" style="line-height: 28px;">
-                    <select id="bill_code_query" name="bill_code_query" style="width: 140px;" v-model="page.bill_code_query" @change="querySelectChange()">
+                    <select id="bill_code_query" name="bill_code_query" style="width: 140px;" @change="querySelectChange()">
                         <option value="">采购单批次号查询</option>
                         {% range $index, $bill_query := .bill_query_list %}
                         <option value="{% $bill_query.BillCode %}">{% $bill_query.BillCode %}({% $bill_query.BillStatus %})</option>
                         {% end %}
                     </select>
-                    <select id="status_id_query" name="status_id_query" style="width: 130px;" v-model.number="page.status_id_query" @change="querySelectChange()">
+                    <select id="status_id_query" name="status_id_query" style="width: 130px;" @change="querySelectChange()">
                         <option :value="0">采购项目状态查询</option>
                         {% range $index, $status := .status_list %}
+                        {% if eq $status.Id $.status_id %}
+                        <option :value="{% $status.Id %}" selected="selected">{% $status.Name %}</option>
+                        {% else %}
                         <option :value="{% $status.Id %}">{% $status.Name %}</option>
+                        {% end %}
                         {% end %}
                     </select>
                     <button class="btn btn-mini btn-primary" style="margin-bottom:3px;height: 30px;" onclick="search()">
@@ -242,10 +246,6 @@
     var vm = new Vue({
         el: "#page",
         data: {
-            "page": {
-                "bill_code_query": "",
-                "status_id_query": 0
-            },
             "purchase_bill_entry_detail": {
                 "purchase_bill_entry": {},
                 "purchase_bill": {}
@@ -334,8 +334,8 @@
                         "fnServerData": function (sSource, aoData, fnCallback) {
                             showMask("数据加载中，请稍候");
 
-                            aoData.push({'name': 'bill_code_query', 'value': this_vm.page.bill_code_query});
-                            aoData.push({'name': 'status_id_query', 'value': this_vm.page.status_id_query});
+                            aoData.push({'name': 'bill_code_query', 'value': $("#bill_code_query").val()});
+                            aoData.push({'name': 'status_id_query', 'value': $("#status_id_query").val()});
 
                             $.ajax({
                                 "dataType": 'json',
@@ -356,7 +356,7 @@
                         }
                     }
             );
-            $("#th_apply_time").before("<th id='th_apply_time_ext'></th>");
+            $("#th_apply_time").before("<th id='th_apply_time_ext' style='width: 120px;'></th>");
             $("#th_apply_time").wrap("<div id='div_apply_time'></div>");
             $("#th_checkin_time").wrap("<div id='div_checkin_time'></div>");
             $("#th_apply_time_ext").append($("#div_apply_time")).append($("#div_checkin_time"));

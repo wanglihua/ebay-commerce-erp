@@ -101,6 +101,7 @@ WHERE pb.pay_days <> 0 AND pb.status_id = %d AND (datediff(DATE(date_add(pb.pay_
 	core.HandleError(db_session.Sql(sql_purchase_bill_to_arrival).Find(&purchase_bill_to_arrival_list))
 
 	c.RenderArgs["bill_query_list"] = bill_query_list
+	c.RenderArgs["status_id"] = models.PURCHASE_BILL_STATUS_CGZ
 	c.RenderArgs["status_list"] = status_list
 	c.RenderArgs["purchase_bill_to_arrival_list"] = purchase_bill_to_arrival_list
 	c.RenderArgs["purchase_bill_to_arrival_count"] = len(purchase_bill_to_arrival_list)
