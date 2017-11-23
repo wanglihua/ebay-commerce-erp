@@ -14,6 +14,8 @@ import (
 	"matrix/modules/erp/models"
 	"strings"
 	"matrix/modules/erp/models/kcgl_models"
+	"matrix/modules/erp/models/sppz_models"
+	auth_models "matrix/modules/auth/models"
 )
 
 type ErpProductExport struct {
@@ -69,7 +71,7 @@ func (c ErpProductExport) Export() revel.Result {
 
 	if len(id_list) != 0 {
 		var id_str_list = core.Int_list_to_str_list(id_list)
-		filter = core.SqlAnd(filter, fmt.Sprintf("id IN (%s)", strings.Join(id_str_list, ",")))
+		filter = core.SqlAnd(filter, fmt.Sprintf("p.id IN (%s)", strings.Join(id_str_list, ",")))
 	} else {
 		var batch_code int64
 		c.Params.Bind(&batch_code, "batch_code")
@@ -78,20 +80,35 @@ func (c ErpProductExport) Export() revel.Result {
 		c.Params.Bind(&product_sku_query, "product_sku_query")
 
 		if strings.TrimSpace(product_sku_query) != "" {
-			filter = core.SqlAnd(filter, fmt.Sprintf("sku LIKE '%%%s%%'", product_sku_query))
+			filter = core.SqlAnd(filter, fmt.Sprintf("p.sku LIKE '%%%s%%'", product_sku_query))
 		}
 
 		if batch_code != 0 {
-			filter = core.SqlAnd(filter, fmt.Sprintf("batch_code = %d", batch_code))
+			filter = core.SqlAnd(filter, fmt.Sprintf("p.batch_code = %d", batch_code))
 		}
 	}
 
-	product_list := make([]kcgl_models.ProductInfo, 0)
+	/*
+SELECT p.*, sup.*, su.*, du.*
+FROM erp_product p
+    LEFT JOIN erp_supplier sup ON p.supplier_id = sup.id
+    LEFT JOIN auth_user su ON p.sale_user_id = su.id
+    LEFT JOIN auth_user du ON p.dev_user_id = du.id
+	 */
 
-	err := db_session.Where(filter).Find(&product_list)
+	var sb = core.NewSqlBuilder()
+	sb.Select("p.*, sup.*, su.*, du.*")
+	sb.From(`erp_product p
+    LEFT JOIN erp_supplier sup ON p.supplier_id = sup.id
+    LEFT JOIN auth_user su ON p.sale_user_id = su.id
+    LEFT JOIN auth_user du ON p.dev_user_id = du.id`)
+	sb.Where(filter)
+
+	var product_export_list = make([]product_export_item_t, 0)
+	err := db_session.Sql(sb.SqlList()).Find(&product_export_list)
 	core.HandleError(err)
 
-	xlsx_file := c.export_product_list_to_excel(db_session, product_list)
+	xlsx_file := c.export_product_list_to_excel(db_session, product_export_list)
 
 	//先把文件内容写到buffer中，再从中读取
 	var buffer bytes.Buffer
@@ -105,7 +122,14 @@ func (c ErpProductExport) Export() revel.Result {
 	return c.RenderBinary(reader, file_name, revel.Attachment, time.Now())
 }
 
-func (c ErpProductExport) export_product_list_to_excel(db_session *xorm.Session, product_list []kcgl_models.ProductInfo) *xlsx.File {
+type product_export_item_t struct {
+	Product  kcgl_models.ProductInfo  `xorm:"extends"`
+	Supplier sppz_models.SupplierInfo `xorm:"extends"`
+	SaleUser auth_models.UserInfo     `xorm:"extends"`
+	DevUser  auth_models.UserInfo     `xorm:"extends"`
+}
+
+func (c ErpProductExport) export_product_list_to_excel(db_session *xorm.Session, product_list []product_export_item_t) *xlsx.File {
 
 	//统一设置标题单元格格式的函数
 	set_head_cell_style := func(cell *xlsx.Cell) {
@@ -219,6 +243,24 @@ func (c ErpProductExport) export_product_list_to_excel(db_session *xorm.Session,
 		cell = row.AddCell()
 		sheet.SetColWidth(col_index, col_index, 15)
 		set_head_cell_style(cell)
+		cell.Value = "销售员"
+		col_index++
+
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 15)
+		set_head_cell_style(cell)
+		cell.Value = "开发员"
+		col_index++
+
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 35)
+		set_head_cell_style(cell)
+		cell.Value = "供应商"
+		col_index++
+
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 15)
+		set_head_cell_style(cell)
 		cell.Value = "采购价（人民币元）"
 		col_index++
 
@@ -265,42 +307,65 @@ func (c ErpProductExport) export_product_list_to_excel(db_session *xorm.Session,
 		// SKU
 		cell = row.AddCell()
 		set_text_cell_style(cell, "center")
-		cell.Value = product.Sku
+		cell.Value = product.Product.Sku
 
 		// 中文名称
 		cell = row.AddCell()
 		set_text_cell_style(cell, "center")
-		cell.Value = product.CnName
+		cell.Value = product.Product.CnName
+
+		// 销售员
+		cell = row.AddCell()
+		set_text_cell_style(cell, "center")
+		if product.SaleUser.LoginName != "" {
+			cell.Value = fmt.Sprintf("%s(%s)", product.SaleUser.NickName, product.SaleUser.LoginName)
+		} else {
+			cell.Value = ""
+		}
+
+		// 开发员
+		cell = row.AddCell()
+		set_text_cell_style(cell, "center")
+		if product.DevUser.LoginName != "" {
+			cell.Value = fmt.Sprintf("%s(%s)", product.DevUser.NickName, product.DevUser.LoginName)
+		} else {
+			cell.Value = ""
+		}
+
+		// 供应商
+		cell = row.AddCell()
+		set_text_cell_style(cell, "center")
+		cell.Value = product.Supplier.Name
 
 		// 采购价（人民币元）
 		cell = row.AddCell()
 		set_text_cell_style(cell, "right")
-		cell.Value = fmt.Sprintf("%0.2f", product.CostPrice)
+		cell.Value = fmt.Sprintf("%0.2f", product.Product.CostPrice)
 
 		// 	产品长度（cm）
 		cell = row.AddCell()
 		set_text_cell_style(cell, "right")
-		cell.Value = fmt.Sprintf("%0.2f", product.Length)
+		cell.Value = fmt.Sprintf("%0.2f", product.Product.Length)
 
 		// 产品宽度（cm）
 		cell = row.AddCell()
 		set_text_cell_style(cell, "right")
-		cell.Value = fmt.Sprintf("%0.2f", product.Width)
+		cell.Value = fmt.Sprintf("%0.2f", product.Product.Width)
 
 		// 	产品高度（cm）
 		cell = row.AddCell()
 		set_text_cell_style(cell, "right")
-		cell.Value = fmt.Sprintf("%0.2f", product.Height)
+		cell.Value = fmt.Sprintf("%0.2f", product.Product.Height)
 
 		// 	实际重量(kg)
 		cell = row.AddCell()
 		set_text_cell_style(cell, "right")
-		cell.Value = fmt.Sprintf("%0.3f", product.Weight)
+		cell.Value = fmt.Sprintf("%0.3f", product.Product.Weight)
 
 		// 状态
 		cell = row.AddCell()
 		set_text_cell_style(cell, "right")
-		cell.Value = find_product_status_name(product.StatusId)
+		cell.Value = find_product_status_name(product.Product.StatusId)
 	}
 
 	return xlsx_file
