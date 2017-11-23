@@ -144,6 +144,10 @@ func (c ErpPurchaseBill) ListData() revel.Result {
 	c.Params.Bind(&query_time_end_str, "query_time_end")
 	query_time_end, query_time_end_err := core.Parse_time(query_time_end_str)
 
+	var sku_query string
+	c.Params.Bind(&sku_query, "sku_query")
+	sku_query = strings.TrimSpace(sku_query)
+
 	db_session := c.DbSession
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
@@ -213,6 +217,33 @@ FROM erp_purchase_bill pb
 		} else {
 			filter = core.SqlAnd(filter, fmt.Sprintf("pb.apply_time <= '%s'", query_time_end.Format("2006-01-02 15:04")))
 		}
+	}
+
+	if sku_query != "" {
+		/*
+		SELECT *
+		FROM erp_purchase_bill pb
+		WHERE pb.id IN (
+			SELECT pbe.bill_id
+			FROM erp_purchase_bill_entry pbe
+			WHERE pbe.product_id IN (
+				SELECT p.id
+				FROM erp_product p
+				WHERE p.sku = '124'
+			)
+		)
+		 */
+		var sku_filter = `pb.id IN (
+			SELECT pbe.bill_id
+			FROM erp_purchase_bill_entry pbe
+			WHERE pbe.product_id IN (
+				SELECT p.id
+				FROM erp_product p
+				WHERE p.sku = '%s'
+			)
+		)`
+		sku_filter = fmt.Sprintf(sku_filter, sku_query)
+		filter = core.SqlAnd(filter, sku_filter)
 	}
 
 	sql_builder.Where(filter)

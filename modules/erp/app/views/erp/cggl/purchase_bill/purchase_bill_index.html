@@ -45,6 +45,8 @@
                 </select>
                 <input id="query_time_begin" name="query_time_begin" style="width: 120px;height:30px;" v-model="page.query_time_begin" placeholder="查询时间开始"/>&nbsp;
                 <input id="query_time_end" name="query_time_end" style="width: 120px;height:30px;" v-model="page.query_time_end" placeholder="查询时间结束"/>
+                <label for="sku_query">SKU查询</label>
+                <input id="sku_query" name="sku_query" style="width: 120px;height: 30px;" v-model="page.sku_query" placeholder="SKU查询"/>
                 <button class="btn btn-mini btn-primary" style="margin-bottom:3px;height: 30px;" onclick="search()"> &nbsp;
                     &nbsp;<i class="ace-icon fa fa-search"></i>查&nbsp;询&nbsp;
                 </button>
@@ -787,7 +789,8 @@
                 "user_query_value": 0,
                 "time_query_id": 0,
                 "query_time_begin": '',
-                "query_time_end": ''
+                "query_time_end": '',
+                "sku_query": ''
             }
         },
         mounted: function () {
@@ -889,6 +892,7 @@
                             aoData.push({'name': 'time_query_id', 'value': this_vm.page.time_query_id});
                             aoData.push({'name': 'query_time_begin', 'value': this_vm.page.query_time_begin});
                             aoData.push({'name': 'query_time_end', 'value': this_vm.page.query_time_end});
+                            aoData.push({'name': 'sku_query', 'value': this_vm.page.sku_query});
 
                             $.ajax({
                                 "dataType": 'json',
