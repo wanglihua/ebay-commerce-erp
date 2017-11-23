@@ -66,7 +66,7 @@ func (c ErpProductSupplierExcel) Import() revel.Result {
 
 			var product_supplier product_supplier_t
 
-			col_index := 1
+			col_index := 0
 
 			// SKU
 			cell = sheet.Cell(row_index, col_index)
@@ -118,7 +118,7 @@ func (c ErpProductSupplierExcel) Import() revel.Result {
 			core.HandleError(err)
 
 			if has == false {
-				panic(fmt.Sprintf("指定的供应商名称数据库中不存在！"))
+				panic(fmt.Sprintf("指定的供应商名称 %s 数据库中不存在！", product_supplier.supplier_name))
 			} else {
 				product_supplier_list[index].supplier_id = supplier.Id
 			}
