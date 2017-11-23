@@ -284,6 +284,9 @@ func (c ErpPurchaseCheckin) Checkin() revel.Result {
 	_, err = db_session.Id(bill_entry_in_db.ProductId).Get(&product)
 	core.HandleError(err)
 
+	var checkin_qty = bill_entry_from_ui.CheckinQty
+	revel.TRACE.Println("checkin_qty: ", checkin_qty)
+
 	// 检查状态
 	if bill_entry_in_db.StatusId != models.PURCHASE_BILL_STATUS_CGZ {
 		return c.RenderJson(map[string]interface{}{
@@ -292,14 +295,14 @@ func (c ErpPurchaseCheckin) Checkin() revel.Result {
 		})
 	}
 
-	if bill_entry_from_ui.CheckinQty > bill_entry_in_db.Qty {
+	if checkin_qty > bill_entry_in_db.Qty {
 		return c.RenderJson(map[string]interface{}{
 			"success": false,
 			"message": "入库数量不能大于采购数量！",
 		})
 	}
 
-	var is_abnormal = bill_entry_from_ui.CheckinQty < bill_entry_in_db.Qty
+	var is_abnormal = checkin_qty < bill_entry_in_db.Qty
 
 	// 检查是不是选择了异常类型
 	if is_abnormal == true && bill_entry_from_ui.AbnormalTypeId == cggl_models.ABNORMAL_TYPE_ZC {
@@ -323,7 +326,7 @@ func (c ErpPurchaseCheckin) Checkin() revel.Result {
 		purchase_bill_log_service.Insert_purchase_bill_log(purchase_bill, fmt.Sprintf("采购单明细SKU:%s 入库", product.Sku), db_session, c.Session)
 	}
 
-	bill_entry_in_db.CheckinQty = bill_entry_from_ui.CheckinQty
+	bill_entry_in_db.CheckinQty = checkin_qty
 	bill_entry_in_db.AbnormalTypeId = bill_entry_from_ui.AbnormalTypeId
 	bill_entry_in_db.CheckinTime = core.MakeNullTime(time.Now(), true)
 	_, err = db_session.Id(bill_entry_in_db.Id).Cols("status_id", "abnormal_process_result_id", "checkin_qty", "abnormal_type_id", "checkin_time").Update(&bill_entry_in_db)
@@ -342,7 +345,6 @@ func (c ErpPurchaseCheckin) Checkin() revel.Result {
 
 	// 如果都是当前设置的这个状态了， 就更新采购单的状态
 	if count == 0 {
-
 		var login_user = core.GetLoginUser(c.Session)
 
 		var purchase_bill cggl_models.PurchaseBillInfo
@@ -361,10 +363,10 @@ func (c ErpPurchaseCheckin) Checkin() revel.Result {
 
 	if detail_form.StockTypeId == sppz_models.STOCK_TYPE_SAMPLE {
 		// 更新样品间的库存数量
-		inventory_service.AddSampleInventoryQty(bill_entry_from_ui.ProductId, bill_entry_from_ui.CheckinQty, db_session)
+		inventory_service.AddSampleInventoryQty(bill_entry_from_ui.ProductId, checkin_qty, db_session, c.Session)
 	} else {
 		// 更新中国仓的库存数量
-		inventory_service.AddCnInventoryQty(bill_entry_from_ui.ProductId, bill_entry_from_ui.CheckinQty, db_session)
+		inventory_service.AddCnInventoryQty(bill_entry_from_ui.ProductId, checkin_qty, db_session, c.Session)
 	}
 
 	return c.RenderJson(map[string]interface{}{
@@ -412,7 +414,7 @@ func (c ErpPurchaseCheckin) CheckinList() revel.Result {
 		purchase_bill_service.CalculateBillEntryCnInventoryCost(bill_entry.BillId, db_session)
 
 		// 更新中国仓的库存数量
-		inventory_service.AddCnInventoryQty(bill_entry.ProductId, bill_entry.CheckinQty, db_session)
+		inventory_service.AddCnInventoryQty(bill_entry.ProductId, bill_entry.CheckinQty, db_session, c.Session)
 	}
 
 	return c.RenderJson(map[string]interface{}{
@@ -449,6 +451,8 @@ func (c ErpPurchaseCheckin) CheckinInTurn() revel.Result {
 	_, err = db_session.Id(bill_entry_in_db.ProductId).Get(&product)
 	core.HandleError(err)
 
+	var checkin_qty = bill_entry_from_ui.CheckinQty
+
 	// 检查状态
 	if bill_entry_in_db.StatusId != models.PURCHASE_BILL_STATUS_CGZ {
 		return c.RenderJson(map[string]interface{}{
@@ -457,14 +461,14 @@ func (c ErpPurchaseCheckin) CheckinInTurn() revel.Result {
 		})
 	}
 
-	if bill_entry_from_ui.CheckinQty > bill_entry_in_db.Qty {
+	if checkin_qty > bill_entry_in_db.Qty {
 		return c.RenderJson(map[string]interface{}{
 			"success": false,
 			"message": "入库数量不能大于采购数量！",
 		})
 	}
 
-	var is_all_checkin = bill_entry_from_ui.CheckinQty == bill_entry_in_db.Qty
+	var is_all_checkin = checkin_qty == bill_entry_in_db.Qty
 
 	// 检查是不是分批入库
 	if is_all_checkin == true {
@@ -475,14 +479,13 @@ func (c ErpPurchaseCheckin) CheckinInTurn() revel.Result {
 	}
 
 	// 插入采购单历史，入库
-	purchase_bill_log_service.Insert_purchase_bill_log(purchase_bill, fmt.Sprintf("采购单明细SKU:%s 分批入库，%d个", product.Sku, bill_entry_from_ui.CheckinQty), db_session, c.Session)
+	purchase_bill_log_service.Insert_purchase_bill_log(purchase_bill, fmt.Sprintf("采购单明细SKU:%s 分批入库，%d个", product.Sku, checkin_qty), db_session, c.Session)
 
 	var qty_before = bill_entry_in_db.Qty
 	var mel_qty_before = bill_entry_in_db.MelQty
 	// var bne_qty_before = bill_entry_in_db.BneQty
 	var fitting_cost_before = bill_entry_in_db.FittingCost
 	var other_cost_before = bill_entry_in_db.OtherCost
-	var checkin_qty = bill_entry_from_ui.CheckinQty
 	var checkin_rate = float64(checkin_qty) / float64(qty_before)
 	// var pay_amount = bill_entry_from_ui.PayAmount // 付款由财务在财务管理维护
 
@@ -535,7 +538,7 @@ func (c ErpPurchaseCheckin) CheckinInTurn() revel.Result {
 	purchase_bill_service.CalculateBillEntryCnInventoryCost(purchase_bill.Id, db_session)
 
 	// 更新中国仓的库存数量
-	inventory_service.AddCnInventoryQty(bill_entry_from_ui.ProductId, bill_entry_from_ui.CheckinQty, db_session)
+	inventory_service.AddCnInventoryQty(bill_entry_from_ui.ProductId, checkin_qty, db_session, c.Session)
 
 	return c.RenderJson(map[string]interface{}{
 		"success": true,

@@ -30,13 +30,13 @@
                 </div>
                 <div id="query" class="col-xs-12" style="line-height: 28px;">
                     <select id="bill_code_query" name="bill_code_query" style="width: 140px;" @change="querySelectChange()">
-                        <option value="">采购单批次号查询</option>
+                        <option value="">--采购单批次号--</option>
                         {% range $index, $bill_query := .bill_query_list %}
                         <option value="{% $bill_query.BillCode %}">{% $bill_query.BillCode %}({% $bill_query.BillStatus %})</option>
                         {% end %}
                     </select>
                     <select id="status_id_query" name="status_id_query" style="width: 130px;" @change="querySelectChange()">
-                        <option :value="0">采购项目状态查询</option>
+                        <option :value="0">--采购项目状态--</option>
                         {% range $index, $status := .status_list %}
                         {% if eq $status.Id $.status_id %}
                         <option :value="{% $status.Id %}" selected="selected">{% $status.Name %}</option>
@@ -72,6 +72,7 @@
                             <th>SKU</th>
                             <th>名称</th>
                             <th>数量</th>
+                            <th>入库数量</th>
                             <th>金额</th>
                             <th>付款</th>
                             <th id="th_apply_time">采购时间</th>
@@ -272,7 +273,12 @@
                                 }
                             },
                             {"mDataProp": "pb.code", "title": "采购批次号", "bSearchable": true, "width": 120},
-                            {"mDataProp": "p.sku", "title": "SKU", "bSearchable": true, "width": 160},
+                            {
+                                "mDataProp": "p.sku", "title": "SKU", "bSearchable": true, "width": 160,
+                                "render": function (data, type, row) {
+                                    return "<a href='/product/detail/" + row.p.id + "' target='product_detail'>" + data + "</a>"
+                                }
+                            },
                             {
                                 "mDataProp": "p.cn_name", "title": "名称", "bSearchable": true, "sClass": "wrap-word", "width": 200,
                                 "render": function (data, type, row) {
@@ -283,6 +289,12 @@
                                 "mDataProp": "pbe.qty", "title": "数量", "bSearchable": false, "width": 80, "sClass": "dtRight",
                                 "render": function (data, type, row) {
                                     return "" + row.pbe.mel_qty + "&nbsp;MEL" + " + " + row.pbe.bne_qty + "&nbsp;BNE" + " = " + row.pbe.qty;
+                                }
+                            },
+                            {
+                                "mDataProp": "pbe.checkin_qty", "title": "入库数", "bSearchable": false, "width": 60, "sClass": "dtRight",
+                                "render": function (data, type, row) {
+                                    return data;
                                 }
                             },
                             {

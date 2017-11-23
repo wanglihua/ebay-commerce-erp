@@ -250,7 +250,7 @@ func (c ErpPurchaseAbnormal) Process() revel.Result {
 
 	if bill_entry_from_ui.AbnormalProcessResultId == cggl_models.ABNORMAL_PROCESS_RESULT_YCXRK { // 已重新入库
 		// 更新中国仓的库存数量
-		inventory_service.AddCnInventoryQty(bill_entry_from_ui.ProductId, bill_entry_in_db.Qty-bill_entry_in_db.CheckinQty, db_session)
+		inventory_service.AddCnInventoryQty(bill_entry_from_ui.ProductId, bill_entry_in_db.Qty-bill_entry_in_db.CheckinQty, db_session, c.Session)
 		bill_entry_in_db.CheckinQty = bill_entry_in_db.Qty
 	}
 
