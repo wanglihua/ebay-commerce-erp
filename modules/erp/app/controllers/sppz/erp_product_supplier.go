@@ -104,7 +104,7 @@ func (c ErpProductSupplier) DetailData() revel.Result {
 	detail_form.Product = product
 
 	var supplier_list = make([]sppz_models.SupplierInfo, 0)
-	core.HandleError(db_session.OrderBy("convert(login_name using gbk) ASC").Find(&supplier_list))
+	core.HandleError(db_session.OrderBy("convert(name using gbk) ASC").Find(&supplier_list))
 
 	return c.RenderJson(map[string]interface{}{
 		"detail":        detail_form,

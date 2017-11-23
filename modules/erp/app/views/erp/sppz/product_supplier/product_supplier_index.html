@@ -82,12 +82,12 @@
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
-                                            <label for="sale_user_id" class="col-xs-2 control-label">销售人员</label>
+                                            <label for="supplier_id" class="col-xs-2 control-label">供应商</label>
                                             <div class="col-xs-10">
-                                                <select id="sale_user_id" name="detail.product.sale_user_id" type="text" class="input-sm form-control" v-model.number="detail.product.sale_user_id">
+                                                <select id="supplier_id" name="detail.product.supplier_id" type="text" class="input-sm form-control" v-model.number="detail.product.supplier_id">
                                                     <option :value="0"></option>
-                                                    <template v-for="user in sale_user_list">
-                                                        <option :value="user.id">{{user.login_name}}({{user.nick_name}})</option>
+                                                    <template v-for="supplier in supplier_list">
+                                                        <option :value="supplier.id">{{supplier.name}}</option>
                                                     </template>
                                                 </select>
                                             </div>
