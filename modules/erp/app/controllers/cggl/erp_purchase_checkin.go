@@ -111,10 +111,11 @@ WHERE pb.pay_days <> 0 AND pb.status_id = %d AND (datediff(DATE(date_add(pb.pay_
 }
 
 type PurchaseCheckinViewItem struct {
-	cggl_models.PurchaseBillEntryInfo `xorm:"extends" json:"pbe"`
-	cggl_models.PurchaseBillInfo      `xorm:"extends" json:"pb"`
-	kcgl_models.ProductInfo           `xorm:"extends" json:"p"`
-	models.StatusInfo                 `xorm:"extends" json:"s"`
+	PurchaseBillEntry cggl_models.PurchaseBillEntryInfo `xorm:"extends" json:"pbe"`
+	PurchaseBill      cggl_models.PurchaseBillInfo      `xorm:"extends" json:"pb"`
+	Product           kcgl_models.ProductInfo           `xorm:"extends" json:"p"`
+	Status            models.StatusInfo                 `xorm:"extends" json:"s"`
+	ArrivalExpireDays int64                             `xorm:"'arrival_expire_days'" json:"arrival_expire_days"`
 }
 
 func (c ErpPurchaseCheckin) ListData() revel.Result {
@@ -132,15 +133,16 @@ func (c ErpPurchaseCheckin) ListData() revel.Result {
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
 	/*
-		SELECT pbe.*, pb.*, p.*, s.*
-		FROM erp_purchase_bill_entry pbe
-		    INNER JOIN erp_purchase_bill pb ON pbe.bill_id = pb.id
-		    INNER JOIN erp_product p ON pbe.product_id = p.id
-		    INNER JOIN erp_status s ON pbe.status_id = s.id
+	SELECT pbe.*, pb.*, p.*, s.*, if(pb.status_id <> 4600, 500000, datediff(DATE(date_add(ifnull(pb.pay_time, '3000-01-01'), INTERVAL pb.arrival_days DAY)), DATE(now()))) AS arrival_expire_days
+	FROM erp_purchase_bill_entry pbe
+		INNER JOIN erp_purchase_bill pb ON pbe.bill_id = pb.id
+		INNER JOIN erp_product p ON pbe.product_id = p.id
+		INNER JOIN erp_status s ON pbe.status_id = s.id
+	ORDER BY arrival_expire_days ASC;
 	*/
 
 	sb := core.NewSqlBuilder()
-	sb.Select("pbe.*, pb.*, p.*, s.*")
+	sb.Select("pbe.*, pb.*, p.*, s.*, if(pb.status_id <> 4600, 500000, datediff(DATE(date_add(ifnull(pb.pay_time, '3000-01-01'), INTERVAL pb.arrival_days DAY)), DATE(now()))) AS arrival_expire_days")
 	sb.Count("count(*) as entry_count")
 	sb.From(`erp_purchase_bill_entry pbe
 	INNER JOIN erp_purchase_bill pb ON pbe.bill_id = pb.id
