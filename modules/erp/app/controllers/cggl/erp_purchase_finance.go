@@ -85,14 +85,15 @@ WHERE pbe.status_id = %d AND pbe.type_id = %d;`
 }
 
 type ErpPurchaseFinanceViewItem struct {
-	PurchaseBill cggl_models.PurchaseBillInfo      `xorm:"extends" json:"pb"`
-	Supplier     sppz_models.SupplierInfo          `xorm:"extends" json:"sup"`
-	PayMethod    sppz_models.SupplierPayMethodInfo `xorm:"extends" json:"pm"`
-	Status       models.StatusInfo                 `xorm:"extends" json:"s"`
-	ApplyUser    auth_models.UserInfo              `xorm:"extends" json:"ayu"`
-	ApproveUser  auth_models.UserInfo              `xorm:"extends" json:"avu"`
-	PayUser      auth_models.UserInfo              `xorm:"extends" json:"pu"`
-	CheckinUser  auth_models.UserInfo              `xorm:"extends" json:"cu"`
+	PurchaseBill  cggl_models.PurchaseBillInfo      `xorm:"extends" json:"pb"`
+	Supplier      sppz_models.SupplierInfo          `xorm:"extends" json:"sup"`
+	PayMethod     sppz_models.SupplierPayMethodInfo `xorm:"extends" json:"pm"`
+	Status        models.StatusInfo                 `xorm:"extends" json:"s"`
+	ApplyUser     auth_models.UserInfo              `xorm:"extends" json:"ayu"`
+	ApproveUser   auth_models.UserInfo              `xorm:"extends" json:"avu"`
+	PayUser       auth_models.UserInfo              `xorm:"extends" json:"pu"`
+	CheckinUser   auth_models.UserInfo              `xorm:"extends" json:"cu"`
+	PayExpireDays int64                             `xorm:"'pay_expire_days'" json:"pay_expire_days"`
 }
 
 func (c ErpPurchaseFinance) ListData() revel.Result {
@@ -109,7 +110,17 @@ func (c ErpPurchaseFinance) ListData() revel.Result {
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
 	/*
-SELECT pb.*, sup.*, pm.*, s.*, ayu.*, avu.*, pu.*, cu.*
+	PURCHASE_BILL_STATUS_YCJ = 4400 // 采购单状态 已创建
+	PURCHASE_BILL_STATUS_YTJ = 4450 // 采购单状态 已提交
+	PURCHASE_BILL_STATUS_YSP = 4500 // 采购单状态 已审批
+	PURCHASE_BILL_STATUS_CGZ = 4600 // 采购单状态 采购中
+	PURCHASE_BILL_STATUS_YRK = 4700 // 采购单状态 已入库
+	PURCHASE_BILL_STATUS_YC  = 4710 // 采购单状态 异常
+	PURCHASE_BILL_STATUS_YCL = 4720 // 采购单状态 异常已处理
+ 	*/
+
+	/*
+SELECT pb.*, sup.*, pm.*, s.*, ayu.*, avu.*, pu.*, cu.*, pb.pay_time, if(pb.status_id <> 4600, 500000, datediff(DATE(date_add(ifnull(pb.pay_time, '3000-01-01'), INTERVAL pb.pay_days DAY)), DATE(now()))) AS pay_expire_days
 FROM erp_purchase_bill pb
     INNER JOIN erp_supplier sup ON sup.id = pb.supplier_id
     LEFT JOIN erp_supplier_pay_method pm ON pm.id = pb.pay_method_id
@@ -117,11 +128,12 @@ FROM erp_purchase_bill pb
     INNER JOIN auth_user ayu ON pb.apply_user_id = ayu.id
     LEFT JOIN auth_user avu ON pb.approve_user_id = avu.id
     LEFT JOIN auth_user pu ON pb.pay_user_id = pu.id
-    LEFT JOIN auth_user cu ON pb.checkin_user_id = cu.id;
+    LEFT JOIN auth_user cu ON pb.checkin_user_id = cu.id
+ORDER BY pay_expire_days DESC;
 	*/
 
 	sql_builder := core.NewSqlBuilder()
-	sql_builder.Select("pb.*, sup.*, pm.*, s.*, ayu.*, avu.*, pu.*, cu.*")
+	sql_builder.Select("pb.*, sup.*, pm.*, s.*, ayu.*, avu.*, pu.*, cu.*, pb.pay_time, if(pb.status_id <> 4600, 500000, datediff(DATE(date_add(ifnull(pb.pay_time, '3000-01-01'), INTERVAL pb.pay_days DAY)), DATE(now()))) AS pay_expire_days")
 	sql_builder.Count("count(pb.id) as bill_count")
 	sql_builder.From(`erp_purchase_bill pb
     INNER JOIN erp_supplier sup ON sup.id = pb.supplier_id

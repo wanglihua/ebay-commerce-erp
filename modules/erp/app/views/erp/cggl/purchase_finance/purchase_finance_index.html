@@ -71,6 +71,7 @@
                             <th>批次号</th>
                             <th>供应商</th>
                             <th>账期</th>
+                            <th>付款到期</th>
                             <th>备注</th>
                             <th>操作人</th>
                             <th>金额</th>
@@ -136,6 +137,18 @@
                                 "mDataProp": "pb.pay_days", "title": "账期", "bSearchable": false, "sClass": "center", "width": 80,
                                 "render": function (data, type, row) {
                                     return data + '&nbsp;天';
+                                }
+                            },
+                            {
+                                "mDataProp": "pay_expire_days", "title": "付款到期", "bSearchable": false, "sClass": "center", "width": 80,
+                                "render": function (data, type, row) {
+                                    if (data > 10000) {
+                                        return "";
+                                    } else if (data <= 7) {
+                                        return "<span style='color:red;'>" + data + '&nbsp;天' + "</span>";
+                                    } else {
+                                        return data + '&nbsp;天';
+                                    }
                                 }
                             },
                             {
