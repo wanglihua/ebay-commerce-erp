@@ -327,7 +327,7 @@ func (c ErpProduct) DetailData() revel.Result {
 	}
 
 	var supplier_list []sppz_models.SupplierInfo
-	err := db_session.Asc("name").Find(&supplier_list)
+	err := db_session.OrderBy("convert(name using gbk) ASC").Find(&supplier_list)
 	core.HandleError(err)
 	//convert(name using gbk) ASC
 

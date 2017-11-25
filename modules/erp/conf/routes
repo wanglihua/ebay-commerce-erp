@@ -161,6 +161,7 @@ GET  /product/supplier                         ErpProductSupplier.Index
 POST /product/supplier/data/list               ErpProductSupplier.ListData
 POST /product/supplier/data/detail             ErpProductSupplier.DetailData
 POST /product/supplier/save                    ErpProductSupplier.Save
+POST /product/supplier/select/list/data        ErpProductSupplier.SupplierSelectListData
 
 POST /product/supplier/excel/import            ErpProductSupplierExcel.Import
 POST /product/supplier/excel/export            ErpProductSupplierExcel.Export

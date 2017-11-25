@@ -85,7 +85,8 @@ FROM erp_product p
 }
 
 type product_supplier_detail_form_t struct {
-	Product kcgl_models.ProductInfo `json:"product"`
+	Product      kcgl_models.ProductInfo `json:"product"`
+	SupplierName string                  `json:"supplier_name"`
 }
 
 func (c ErpProductSupplier) DetailData() revel.Result {
@@ -100,8 +101,13 @@ func (c ErpProductSupplier) DetailData() revel.Result {
 	_, err := db_session.Id(product_id).Get(&product)
 	core.HandleError(err)
 
+	var supplier sppz_models.SupplierInfo
+	_, err = db_session.Id(product.SupplierId).Get(&supplier)
+	core.HandleError(err)
+
 	var detail_form product_supplier_detail_form_t
 	detail_form.Product = product
+	detail_form.SupplierName = supplier.Name
 
 	var supplier_list = make([]sppz_models.SupplierInfo, 0)
 	core.HandleError(db_session.OrderBy("convert(name using gbk) ASC").Find(&supplier_list))
@@ -151,5 +157,54 @@ func (c ErpProductSupplier) Save() revel.Result {
 	return c.RenderJson(map[string]interface{}{
 		"success": true,
 		"message": "保存成功！",
+	})
+}
+
+func (c ErpProductSupplier) SupplierSelectListData() revel.Result {
+	db_session := c.DbSession
+
+	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
+
+	type supplier_view_item_t struct {
+		Supplier sppz_models.SupplierInfo `xorm:"extends" json:"s"`
+		Region   sppz_models.RegionInfo   `xorm:"extends" json:"r"`
+	}
+
+	/*
+SELECT s.*, r.*
+FROM erp_supplier s
+    LEFT JOIN erp_region r ON s.region_id = r.id
+	 */
+
+	var sb = core.NewSqlBuilder()
+	sb.Select("s.*, r.*")
+	sb.Count("count(s.id) AS supplier_count")
+	sb.From(`erp_supplier s
+    LEFT JOIN erp_region r ON s.region_id = r.id`)
+
+	sb.Where(filter)
+
+	if order != "" {
+		sb.OrderBy(order)
+	} else {
+		sb.OrderBy("o.id ASC")
+	}
+
+	sb.Limit(offset, limit)
+
+	supplier_list := make([]supplier_view_item_t, 0, limit)
+	err := db_session.Sql(sb.SqlList()).Find(&supplier_list)
+	core.HandleError(err)
+
+	var supplier_count struct {
+		Count int64 `xorm:"'supplier_count'"`
+	}
+
+	_, err = db_session.Sql(sb.SqlCount()).Get(&supplier_count)
+	core.HandleError(err)
+
+	return c.RenderJson(core.GridResult{
+		Data:  supplier_list,
+		Total: supplier_count.Count,
 	})
 }
