@@ -447,6 +447,7 @@ func (c ErpPurchaseBillEntry) PurchaseInTurn() revel.Result {
 	_, err = db_session.Id(bill_entry_in_db.ProductId).Get(&product)
 	core.HandleError(err)
 
+	/*
 	// 检查类型
 	if bill_entry_in_db.TypeId == cggl_models.PURCHASE_BILL_TYPE_IN_TURN {
 		return c.RenderJson(map[string]interface{}{
@@ -454,9 +455,10 @@ func (c ErpPurchaseBillEntry) PurchaseInTurn() revel.Result {
 			"message": "采购单明细类型当前已经是分批采购类型，不能再进行分批采购！",
 		})
 	}
+	*/
 
 	// 检查状态
-	if bill_entry_in_db.StatusId != models.PURCHASE_BILL_STATUS_CGZ {
+	if bill_entry_in_db.StatusId != models.PURCHASE_BILL_STATUS_YSP {
 		return c.RenderJson(map[string]interface{}{
 			"success": false,
 			"message": "采购单明细状态当前不是采购中状态，不能进行分批采购！",
@@ -503,6 +505,7 @@ func (c ErpPurchaseBillEntry) PurchaseInTurn() revel.Result {
 	bill_entry_in_db.MelQty = bill_entry_in_db.MelQty - int64(math.Floor(float64(mel_qty_before)*checkin_rate+0.5)) // 四舍五入
 	bill_entry_in_db.BneQty = bill_entry_in_db.Qty - bill_entry_in_db.MelQty
 	bill_entry_in_db.Amount = bill_entry_in_db.Price * float64(bill_entry_in_db.Qty)
+	bill_entry_in_db.TypeId = cggl_models.PURCHASE_BILL_TYPE_IN_TURN
 
 	var purchase_in_turn_desc = " 部分数量已分批采购"
 	if strings.Contains(bill_entry_in_db.Desc.String, purchase_in_turn_desc) == false {
@@ -510,7 +513,8 @@ func (c ErpPurchaseBillEntry) PurchaseInTurn() revel.Result {
 	}
 	bill_entry_in_db.FittingCost = (float64(bill_entry_in_db.Qty) / float64(qty_before)) * fitting_cost_before
 	bill_entry_in_db.OtherCost = (float64(bill_entry_in_db.Qty) / float64(qty_before)) * other_cost_before
-	_, err = db_session.Id(bill_entry_in_db.Id).Cols("qty", "mel_qty", "bne_qty", "amount", "desc", "fitting_cost", "other_cost").Update(&bill_entry_in_db)
+	var col_list = []string{"qty", "mel_qty", "bne_qty", "amount", "desc", "fitting_cost", "other_cost", "type_id"}
+	_, err = db_session.Id(bill_entry_in_db.Id).Cols(col_list...).Update(&bill_entry_in_db)
 	core.HandleError(err)
 
 	var login_user = core.GetLoginUser(c.Session)
