@@ -605,7 +605,9 @@ SELECT sa.id AS shop_id, sa.name AS shop_name FROM erp_shop_account sa;
 			order_shipping_address.Name = order_import.Khxm
 			order_shipping_address.PostalCode = order_import.Yzbm
 			order_shipping_address.Street1 = order_import.Yjdz
+			revel.TRACE.Println("order_import.Dh", order_import.Dh)
 			order_shipping_address.Phone = order_shipping_address_service.Normalize_phone(order_import.Dh) // 整理电话号码 "1234 5666"
+			revel.TRACE.Println("order_shipping_address.Phone", order_shipping_address.Phone)
 			order_shipping_address.CountryName = order_import.Guojia
 			order_shipping_address.Province = order_import.Ssdq
 			order_shipping_address.CityName = order_import.Sscs

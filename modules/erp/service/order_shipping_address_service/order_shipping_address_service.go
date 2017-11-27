@@ -56,9 +56,15 @@ func Get_order_shipping_address_id_info_map(address_id_list []int64, db_session 
 func Normalize_phone(phone string) string {
 	if phone != "" {
 		phone = strings.Replace(phone, " ", "", -1)
+		var phone_in_rune = []rune(phone)
+		if len(phone_in_rune) > 4 {
+			return string(phone_in_rune[0:4]) + " " + string(phone_in_rune[4:])
+		}
+		/*
 		if len(phone) > 4 {
 			return phone[0:4] + " " + phone[4:]
 		}
+		*/
 	}
 
 	return phone
