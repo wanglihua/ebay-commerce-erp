@@ -194,6 +194,7 @@ type PurchaseBillEntryCheckinDetailForm struct {
 	AbnormalTypeList  []cggl_models.PurchaseAbnormalTypeInfo `json:"abnormal_type_list"`
 	StockTypeId       int64                                  `json:"stock_type_id"`
 	StockTypeList     []sppz_models.StockTypeInfo            `json:"stock_type_list"`
+	IsInTurn          bool                                   `json:"is_in_turn"`
 }
 
 func (f *PurchaseBillEntryCheckinDetailForm) IsCreate() bool {
@@ -252,9 +253,10 @@ func (c ErpPurchaseCheckin) DetailData() revel.Result {
 	detail_form.PurchaseBillEntry.CheckinQty = purchase_bill_entry.Qty
 	detail_form.AbnormalTypeList = abnormal_type_list
 	detail_form.PurchaseBillEntry.AbnormalTypeId = cggl_models.ABNORMAL_TYPE_ZC
-	detail_form.ProductName = product.Name
+	detail_form.ProductName = product.CnName
 	detail_form.StockTypeList = stock_type_list
 	detail_form.StockTypeId = sppz_models.STOCK_TYPE_CN
+	detail_form.IsInTurn = purchase_bill_entry.TypeId == cggl_models.PURCHASE_BILL_TYPE_IN_TURN
 
 	return c.RenderJson(detail_form)
 }
@@ -331,7 +333,9 @@ func (c ErpPurchaseCheckin) Checkin() revel.Result {
 	bill_entry_in_db.CheckinQty = checkin_qty
 	bill_entry_in_db.AbnormalTypeId = bill_entry_from_ui.AbnormalTypeId
 	bill_entry_in_db.CheckinTime = core.MakeNullTime(time.Now(), true)
-	_, err = db_session.Id(bill_entry_in_db.Id).Cols("status_id", "abnormal_process_result_id", "checkin_qty", "abnormal_type_id", "checkin_time").Update(&bill_entry_in_db)
+	bill_entry_in_db.FinalExpenses = bill_entry_from_ui.FinalExpenses
+	var update_col_list = []string{"status_id", "abnormal_process_result_id", "checkin_qty", "abnormal_type_id", "checkin_time", "final_expenses"}
+	_, err = db_session.Id(bill_entry_in_db.Id).Cols(update_col_list...).Update(&bill_entry_in_db)
 	core.HandleError(err)
 
 	// 查看同一个采购单的明细是不是都是 已入库， 异常， 异常已处理 的这个状态了

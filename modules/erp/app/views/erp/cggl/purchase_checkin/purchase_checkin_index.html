@@ -75,6 +75,7 @@
                             <th>入库数量</th>
                             <th>金额</th>
                             <th>付款</th>
+                            <th>提货费</th>
                             <th id="th_apply_time">采购时间</th>
                             <th id="th_checkin_time">入库时间</th>
                             <th>到货天数</th>
@@ -179,6 +180,17 @@
                                                         <option :value="stock_type.id">{{stock_type.name}}</option>
                                                     </template>
                                                 </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div id="div_final_expenses" class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <label for="final_expenses" class="col-xs-2 control-label">提货费</label>
+                                            <div class="col-xs-10">
+                                                <input id="final_expenses" name="purchase_bill_entry_detail.purchase_bill_entry.final_expenses" type="text" class="input-sm form-control" v-model.number="purchase_bill_entry_detail.purchase_bill_entry.final_expenses"/>
                                             </div>
                                         </div>
                                     </div>
@@ -311,6 +323,12 @@
                                 }
                             },
                             {
+                                "mDataProp": "pbe.final_expenses", "title": "提货费", "bSearchable": false, "width": 60, "sClass": "dtRight",
+                                "render": function (data, type, row) {
+                                    return data;
+                                }
+                            },
+                            {
                                 "mDataProp": "pb.apply_time", "title": "采购时间", "bSearchable": false, "sClass": "center", "width": 120,
                                 "render": function (data, type, row) {
                                     var checkin_time = row.pbe.checkin_time;
@@ -426,6 +444,12 @@
                     return;
                 }
                 vm.purchase_bill_entry_detail = result;
+
+                if (result.is_in_turn === true) {
+                    $("#div_final_expenses").show();
+                } else {
+                    $("#div_final_expenses").hide();
+                }
 
                 $("#abnormal_type_id").removeAttr("disabled");
                 $("#btnCheckin").attr("onclick", "checkin();");
