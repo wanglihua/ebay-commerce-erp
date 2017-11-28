@@ -659,7 +659,7 @@
                                     <th class="center" style="width: 80px;">库存</th>
                                     <th class="center" style="width: 80px;">待发货</th>
                                     <th class="center" style="width: 100px;">成本</th>
-                                    <th class="center" style="width: 80px;">到港时间</th>
+                                    <th class="center" style="width: 80px;">到仓时间</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -687,7 +687,7 @@
                                             {{ format_amount(inventory.nvt.cost_price)}}
                                         </td>
                                         <td class="center" style="vertical-align: middle">
-                                            {{ inventory.dept_time }}
+                                            {{ inventory.stock_time }}
                                         </td>
                                     </tr>
                                     <tr v-else>
@@ -713,7 +713,7 @@
                                             {{ format_amount(inventory.nvt.cost_price)}}
                                         </td>
                                         <td class="center" style="vertical-align: middle">
-                                            {{ inventory.dept_time }}
+                                            {{ inventory.stock_time }}
                                         </td>
                                     </tr>
                                 </template>

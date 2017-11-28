@@ -14,7 +14,8 @@ type Product_inventory_view_item_t struct {
 	Product    kcgl_models.ProductInfo    `xorm:"extends" json:"p"`
 	Stock      sppz_models.StockInfo      `xorm:"extends" json:"st"`
 	StorageLoc sppz_models.StorageLocInfo `xorm:"extends" json:"sl"`
-	DeptTime   string                     `xorm:"extends" json:"dept_time"` // 在途仓的到港时间，订单界面显示在途仓到港时间的时候用
+	DeptTime   string                     `xorm:"extends" json:"dept_time"`  // 在途仓的到港时间，订单界面显示在途仓到港时间的时候用
+	StockTime  string                     `xorm:"extends" json:"stock_time"` // 在途仓的到仓时间，订单界面显示在途仓到仓时间的时候用
 }
 
 func get_inventory_list_sql_builder() *core.SqlBuilder {

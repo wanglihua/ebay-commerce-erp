@@ -858,7 +858,10 @@ WHERE oi.order_id = %d;`
 	for index, inventory := range inventory_list {
 		if inventory.Stock.StockTypeId == sppz_models.STOCK_TYPE_ZT {
 			// 在途仓获取到港时间
-			inventory_list[index].DeptTime = inventory_service.Get_zt_stock_product_dept_time(inventory.Stock.Id, inventory.Product.Id, db_session)
+			//inventory_list[index].DeptTime = inventory_service.Get_zt_stock_product_dept_time(inventory.Stock.Id, inventory.Product.Id, db_session)
+
+			// 在途仓获取到仓时间
+			inventory_list[index].StockTime = inventory_service.Get_zt_stock_product_stock_time(inventory.Stock.Id, inventory.Product.Id, db_session)
 		}
 	}
 
