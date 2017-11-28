@@ -72,127 +72,140 @@
         });
 
         initDataTable(
-            '#orderLogisticsList',
-            {
-                "sAjaxSource": '{%url "ErpOrderLogisticsDiff.ListData"%}',
-                "aaSorting": [[0, "desc"]],
-                "aoColumns": [
-                    {
-                        "mDataProp": "oll.id",
-                        "bSearchable": false,
-                        "orderable": false,
-                        "sClass": "center",
-                        "width": 50,
-                        "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
-                        "render": function (data, type, row) {
-                            return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
-                        }
-                    },
-                    {
-                        "mDataProp": "o.code", "title": "订单编号", "bSearchable": true, "width": 120,
-                        "render": function (data, type, row) {
-                            return "<div style='min-width: 100px;white-space:normal; word-break: break-all; word-wrap:break-word;'><a href='/order/detail/" + row.o.id + "' target='_blank'>" + data + "</a></div>";
-                        }
-                    },
-                    {
-                        "mDataProp": "o.full_tran_id", "title": "订单代码", "bSearchable": true, "width": 120,
-                        "render": function (data, type, row) {
-                            return "<div style='min-width: 80px;white-space:normal; word-break: break-all; word-wrap:break-word;'>" + data + "</div>";
-                        }
-                    },
-                    {
-                        "mDataProp": "osa.postal_code",
-                        "title": "邮编",
-                        "bSearchable": true,
-                        "bSortable": true,
-                        "width": 60
-                    },
-                    {
-                        "mDataProp": "oll.weight",
-                        "title": "计费重量",
-                        "bSearchable": false,
-                        "bSortable": true,
-                        "width": 80
-                    },
-                    {
-                        "mDataProp": "lm.name",
-                        "title": "最佳仓物流",
-                        "bSearchable": true,
-                        "bSortable": true
-                    },
-                    {
-                        "mDataProp": "oll.total_fee", "title": "最佳仓费用", "bSearchable": false, "width": 100,
-                        "render": function (data, type, row) {
-                            if (data !== "" && data !== 0) {
-                                return "AU " + dtFormatFloat(data);
+                '#orderLogisticsList',
+                {
+                    "sAjaxSource": '{%url "ErpOrderLogisticsDiff.ListData"%}',
+                    "aaSorting": [[0, "desc"]],
+                    "aoColumns": [
+                        {
+                            "mDataProp": "oll.id",
+                            "bSearchable": false,
+                            "orderable": false,
+                            "sClass": "center",
+                            "width": 50,
+                            "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
+                            "render": function (data, type, row) {
+                                return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
                             }
-                            else {
-                                return "";
+                        },
+                        {
+                            "mDataProp": "o.code", "title": "订单编号", "bSearchable": true, "width": 120,
+                            "render": function (data, type, row) {
+                                return "<div style='min-width: 100px;white-space:normal; word-break: break-all; word-wrap:break-word;'><a href='/order/detail/" + row.o.id + "' target='_blank'>" + data + "</a></div>";
                             }
+                        },
+                        {
+                            "mDataProp": "o.full_tran_id", "title": "订单代码", "bSearchable": true, "width": 120,
+                            "render": function (data, type, row) {
+                                return "<div style='min-width: 80px;white-space:normal; word-break: break-all; word-wrap:break-word;'>" + data + "</div>";
+                            }
+                        },
+                        {
+                            "mDataProp": "osa.postal_code",
+                            "title": "邮编",
+                            "bSearchable": true,
+                            "bSortable": true,
+                            "width": 60
+                        },
+                        {
+                            "mDataProp": "oll.weight",
+                            "title": "计费重量",
+                            "bSearchable": false,
+                            "bSortable": true,
+                            "width": 80
+                        },
+                        {
+                            "mDataProp": "ht.name",
+                            "title": "Hold类型",
+                            "bSearchable": true,
+                            "bSortable": true,
+                            "render": function (data, type, row) {
+                                if (row.lm.id === 0) {
+                                    return data;
+                                } else {
+                                    return "";
+                                }
+                            }
+                        },
+                        {
+                            "mDataProp": "lm.name",
+                            "title": "最佳仓物流",
+                            "bSearchable": true,
+                            "bSortable": true
+                        },
+                        {
+                            "mDataProp": "oll.total_fee", "title": "最佳仓费用", "bSearchable": false, "width": 100,
+                            "render": function (data, type, row) {
+                                if (data !== "" && data !== 0) {
+                                    return "AU " + dtFormatFloat(data);
+                                }
+                                else {
+                                    return "";
+                                }
+                            }
+                        },
+                        {
+                            "mDataProp": "lm_sec.name",
+                            "title": "次佳仓物流",
+                            "bSearchable": true,
+                            "bSortable": true
+                        },
+                        {
+                            "mDataProp": "oll.total_fee_second", "title": "次佳仓费用", "bSearchable": false, "width": 100,
+                            "render": function (data, type, row) {
+                                if (data !== "" && data !== 0) {
+                                    return "AU " + dtFormatFloat(data);
+                                }
+                                else {
+                                    return "";
+                                }
+                            }
+                        },
+                        {
+                            "mDataProp": "oll.fee_diff", "title": "费用偏差", "bSearchable": false, "width": 100,
+                            "render": function (data, type, row) {
+                                if (data !== "" && data !== 0) {
+                                    return "AU " + dtFormatFloat(data);
+                                }
+                                else {
+                                    return "";
+                                }
+                            }
+                        },
+                        /*
+                        {
+                            "mDataProp": "oll.update_time", "title": "匹配时间", "bSearchable": false, "width": 120
+                        },
+                        */
+                        {
+                            "mDataProp": "o.shipped_time", "title": "发货时间", "bSearchable": false, "width": 120
                         }
-                    },
-                    {
-                        "mDataProp": "lm_sec.name",
-                        "title": "次佳仓物流",
-                        "bSearchable": true,
-                        "bSortable": true
-                    },
-                    {
-                        "mDataProp": "oll.total_fee_second", "title": "次佳仓费用", "bSearchable": false, "width": 100,
-                        "render": function (data, type, row) {
-                            if (data !== "" && data !== 0) {
-                                return "AU " + dtFormatFloat(data);
+                    ],
+                    "fnServerData": function (sSource, aoData, fnCallback) {
+                        showMask("数据加载中，请稍候");
+
+                        aoData.push({'name': 'stock_query', 'value': $("#stock_query").val()});
+                        aoData.push({'name': 'stock_second_query', 'value': $("#stock_second_query").val()});
+                        aoData.push({'name': 'shipped_time_begin_query', 'value': $("#shipped_time_begin_query").val()});
+                        aoData.push({'name': 'shipped_time_end_query', 'value': $("#shipped_time_end_query").val()});
+
+                        $.ajax({
+                            "dataType": 'json',
+                            "url": sSource,
+                            "data": aoData,
+                            "success": function (data) {
+                                hideMask();
+
+                                if (data.success === false) {
+                                    $.msg.error(data.message);
+                                    return;
+                                }
+
+                                fnCallback(data);
                             }
-                            else {
-                                return "";
-                            }
-                        }
-                    },
-                    {
-                        "mDataProp": "oll.fee_diff", "title": "费用偏差", "bSearchable": false, "width": 100,
-                        "render": function (data, type, row) {
-                            if (data !== "" && data !== 0) {
-                                return "AU " + dtFormatFloat(data);
-                            }
-                            else {
-                                return "";
-                            }
-                        }
-                    },
-                    /*
-                    {
-                        "mDataProp": "oll.update_time", "title": "匹配时间", "bSearchable": false, "width": 120
-                    },
-                    */
-                    {
-                        "mDataProp": "o.shipped_time", "title": "发货时间", "bSearchable": false, "width": 120
+                        });
                     }
-                ],
-                "fnServerData": function (sSource, aoData, fnCallback) {
-                    showMask("数据加载中，请稍候");
-
-                    aoData.push({'name': 'stock_query', 'value': $("#stock_query").val()});
-                    aoData.push({'name': 'stock_second_query', 'value': $("#stock_second_query").val()});
-                    aoData.push({'name': 'shipped_time_begin_query', 'value': $("#shipped_time_begin_query").val()});
-                    aoData.push({'name': 'shipped_time_end_query', 'value': $("#shipped_time_end_query").val()});
-
-                    $.ajax({
-                        "dataType": 'json',
-                        "url": sSource,
-                        "data": aoData,
-                        "success": function (data) {
-                            hideMask();
-
-                            if (data.success === false) {
-                                $.msg.error(data.message);
-                                return;
-                            }
-
-                            fnCallback(data);
-                        }
-                    });
                 }
-            }
         );
     });
 

@@ -71,25 +71,28 @@ func (c ErpOrderLogisticsDiff) ListData() revel.Result {
 		OrderLogisticsLogic  ddlc_models.OrderLogisticsLogicInfo  `xorm:"extends" json:"oll"`
 		Order                ddlc_models.OrderInfo                `xorm:"extends" json:"o"`
 		OrderShippingAddress ddlc_models.OrderShippingAddressInfo `xorm:"extends" json:"osa"`
+		OrderHoldType        ddpz_models.OrderHoldTypeInfo        `xorm:"extends" json:"ht"`
 		LogisticsMode        ddpz_models.LogisticsModeInfo        `xorm:"extends" json:"lm"`
 		LogisticsModeSecond  ddpz_models.LogisticsModeInfo        `xorm:"extends" json:"lm_sec"`
 	}
 
 	/*
-SELECT oll.*, o.*, osa.*, lm.*, lm_sec.*
+SELECT oll.*, o.*, osa.*, ht.*, lm.*, lm_sec.*
 FROM erp_order_logistics_logic oll
     INNER JOIN erp_order o ON o.id = oll.order_id
     INNER JOIN erp_order_shipping_address osa ON osa.id = oll.address_id
-    INNER JOIN erp_logistics_mode lm ON lm.id = oll.mode_id
-    LEFT JOIN erp_logistics_mode lm_sec ON lm_sec.id = oll.mode_id_second
+    LEFT JOIN erp_order_hold_type ht ON ht.id = o.hold_type_id
+    LEFT JOIN erp_logistics_mode lm ON lm.id = oll.mode_id
+    LEFT JOIN erp_logistics_mode lm_sec ON lm_sec.id = oll.mode_id_second;
 	 */
 
 	sb := core.NewSqlBuilder()
-	sb.Select("oll.*, o.*, osa.*, lm.*, lm_sec.*")
+	sb.Select("oll.*, o.*, osa.*, ht.*, lm.*, lm_sec.*")
 	sb.Count("count(oll.id) as count")
 	sb.From(`erp_order_logistics_logic oll
     INNER JOIN erp_order o ON o.id = oll.order_id
     INNER JOIN erp_order_shipping_address osa ON osa.id = oll.address_id
+    LEFT JOIN erp_order_hold_type ht ON ht.id = o.hold_type_id
     LEFT JOIN erp_logistics_mode lm ON lm.id = oll.mode_id
     LEFT JOIN erp_logistics_mode lm_sec ON lm_sec.id = oll.mode_id_second`)
 
