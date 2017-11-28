@@ -238,11 +238,23 @@ CREATE PROCEDURE intel_repl()
                     # 新增
                     INSERT INTO erp_intel_repl (product_id, qty, mel_qty, bne_qty, profit, status_id, create_time, update_time)
                     VALUES (v_product_id, v_qty, v_mel_qty, v_bne_qty, v_profit, 5700, now(), now()); # 5700 新生成的智能补货单
+                ELSEIF v_count = 1
+                    THEN
+                        # 更新
+                        UPDATE erp_intel_repl
+                        SET qty = v_qty, mel_qty = v_mel_qty, bne_qty = v_bne_qty, profit = v_profit, update_time = now()
+                        WHERE product_id = v_product_id AND status_id = 5700; # 5700 新生成的智能补货单
                 ELSE
-                    # 更新
-                    UPDATE erp_intel_repl
-                    SET qty = v_qty, mel_qty = v_mel_qty, bne_qty = v_bne_qty, profit = v_profit, update_time = now()
+                    # v_count 大于 1 说明之前生成的数据中错误地生成了多条，在这里进行更正
+
+                    # 先删除
+                    DELETE FROM erp_intel_repl
                     WHERE product_id = v_product_id AND status_id = 5700; # 5700 新生成的智能补货单
+
+                    # 再新增
+                    INSERT INTO erp_intel_repl (product_id, qty, mel_qty, bne_qty, profit, status_id, create_time, update_time)
+                    VALUES (v_product_id, v_qty, v_mel_qty, v_bne_qty, v_profit, 5700, now(), now()); # 5700 新生成的智能补货单
+
                 END IF;
             END IF;
 

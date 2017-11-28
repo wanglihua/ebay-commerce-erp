@@ -90,11 +90,11 @@ FROM erp_order_logistics_logic oll
 	sb.From(`erp_order_logistics_logic oll
     INNER JOIN erp_order o ON o.id = oll.order_id
     INNER JOIN erp_order_shipping_address osa ON osa.id = oll.address_id
-    INNER JOIN erp_logistics_mode lm ON lm.id = oll.mode_id
+    LEFT JOIN erp_logistics_mode lm ON lm.id = oll.mode_id
     LEFT JOIN erp_logistics_mode lm_sec ON lm_sec.id = oll.mode_id_second`)
 
 	if stock_query != 0 {
-		filter = core.SqlAnd(filter, fmt.Sprintf("lm.stock_id = %d", stock_query))
+		filter = core.SqlAnd(filter, fmt.Sprintf("oll.stock_id = %d", stock_query))
 	}
 
 	if stock_second_query != 0 {
