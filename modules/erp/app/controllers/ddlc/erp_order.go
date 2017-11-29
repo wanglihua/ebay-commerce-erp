@@ -861,7 +861,12 @@ WHERE oi.order_id = %d;`
 			//inventory_list[index].DeptTime = inventory_service.Get_zt_stock_product_dept_time(inventory.Stock.Id, inventory.Product.Id, db_session)
 
 			// 在途仓获取到仓时间
-			inventory_list[index].StockTime = inventory_service.Get_zt_stock_product_stock_time(inventory.Stock.Id, inventory.Product.Id, db_session)
+			var zt_product_info = inventory_service.Get_zt_stock_product_stock_time(inventory.Stock.Id, inventory.Product.Id, db_session)
+			inventory_list[index].TransferId = zt_product_info.TransferId
+			inventory_list[index].BatchCode = zt_product_info.BatchCode
+			inventory_list[index].StockTime = zt_product_info.StockTime.Format("2006-01-02")
+
+			// inventory_list[index].BatchCode, inventory_list[index].StockTime = inventory_service.Get_zt_stock_product_stock_time(inventory.Stock.Id, inventory.Product.Id, db_session)
 		}
 	}
 

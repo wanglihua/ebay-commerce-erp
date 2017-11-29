@@ -16,7 +16,7 @@ import (
 
 # 获取某个商品的在途仓库的库存的到港时间
 
-SELECT ct.stock_time AS stock_time
+SELECT ct.id AS transfer_id, ct.batch_code AS batch_code, ct.stock_time AS stock_time
 FROM erp_container_transfer ct
 WHERE ct.status_id = 5500 AND ct.id IN (
     SELECT cte.transfer_id
@@ -32,8 +32,14 @@ LIMIT 1;
 
 */
 
-func Get_zt_stock_product_stock_time(stock_id int64, product_id int64, db_session *xorm.Session) string {
-	var sql = `SELECT ct.stock_time AS stock_time
+type ZtProductInfo struct {
+	TransferId int64     `xorm:"'transfer_id'"`
+	BatchCode  string    `xorm:"'batch_code'"`
+	StockTime  time.Time `xorm:"'stock_time'"`
+}
+
+func Get_zt_stock_product_stock_time(stock_id int64, product_id int64, db_session *xorm.Session) ZtProductInfo {
+	var sql = `SELECT ct.id AS transfer_id, ct.batch_code AS batch_code, ct.stock_time AS stock_time
 FROM erp_container_transfer ct
 WHERE ct.status_id = %d AND ct.id IN (
     SELECT cte.transfer_id
@@ -48,15 +54,9 @@ ORDER BY ct.stock_time ASC
 LIMIT 1;`
 	sql = fmt.Sprintf(sql, models.CONTAINER_TRANSFER_STATUS_DEPART, product_id, sppz_models.STOCK_TYPE_ZT, stock_id)
 
-	var stock_time struct {
-		StockTime time.Time `xorm:"'stock_time'"`
-	}
-	has, err := db_session.Sql(sql).Get(&stock_time)
+	var zt_product_info ZtProductInfo
+	_, err := db_session.Sql(sql).Get(&zt_product_info)
 	core.HandleError(err)
 
-	if has == false {
-		return ""
-	}
-
-	return stock_time.StockTime.Format("2006-01-02")
+	return zt_product_info
 }

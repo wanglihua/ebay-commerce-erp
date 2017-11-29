@@ -713,7 +713,9 @@
                                             {{ format_amount(inventory.nvt.cost_price)}}
                                         </td>
                                         <td class="center" style="vertical-align: middle">
-                                            {{ inventory.stock_time }}
+                                            <div v-if="inventory.transfer_id != 0">
+                                                <a :href="'/container/transfer/detail/' + inventory.transfer_id" target="_blank">{{ inventory.stock_time }}</a>
+                                            </div>
                                         </td>
                                     </tr>
                                 </template>
