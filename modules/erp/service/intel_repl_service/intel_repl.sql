@@ -31,6 +31,7 @@ CREATE PROCEDURE intel_repl()
         DECLARE v_mel_nvt_pending_qty BIGINT;
         DECLARE v_bne_nvt_qty BIGINT;
         DECLARE v_bne_nvt_pending_qty BIGINT;
+        DECLARE v_stock_alert_qty BIGINT;
         DECLARE v_mel_zt_nvt_qty BIGINT;
         DECLARE v_bne_zt_nvt_qty BIGINT;
         DECLARE v_mel_pc_qty BIGINT; # MEL 采购中数量
@@ -116,9 +117,9 @@ CREATE PROCEDURE intel_repl()
             # 计算 中国仓部分， MEL 和 BNE 要按比例分开
 
             # 获取商品的相关配置
-            SET v_purchase_days = 0, v_stock_alert_days = 0;
-            SELECT p.purchase_days, p.stock_alert_days
-            INTO v_purchase_days, v_stock_alert_days
+            SET v_purchase_days = 0, v_stock_alert_days = 0, v_stock_alert_qty = 0;
+            SELECT p.purchase_days, p.stock_alert_days, p.stock_alert_qty
+            INTO v_purchase_days, v_stock_alert_days, v_stock_alert_qty
             FROM erp_product p
             WHERE p.id = v_product_id;
 
@@ -205,12 +206,13 @@ CREATE PROCEDURE intel_repl()
             SELECT ifnull(cast(avg(oi.gross_profit / (oi.transaction_price * oi.quantity)) AS DECIMAL(18, 6)), 0)
             INTO v_profit
             FROM erp_order_item oi
-                INNER JOIN erp_order o ON o.id = oi.order_id AND o.status_id = 4300 # 订单状态 已完成
+                INNER JOIN erp_order o
+                    ON o.id = oi.order_id AND o.status_id = 4300 # 订单状态 已完成
             WHERE oi.item_product_id = v_product_id;
 
             # 计算智能补货单的参数
-            SET v_mel_qty = round(v_mel_daily_mean_sales * (v_purchase_days + v_stock_alert_days) - (v_mel_nvt_qty - v_mel_nvt_pending_qty) - v_mel_zt_nvt_qty - v_mel_pc_qty - (v_mel_daily_mean_sales / (v_mel_daily_mean_sales + v_bne_daily_mean_sales)) * v_cn_nvt_qty);
-            SET v_bne_qty = round(v_bne_daily_mean_sales * (v_purchase_days + v_stock_alert_days) - (v_bne_nvt_qty - v_bne_nvt_pending_qty) - v_bne_zt_nvt_qty - v_bne_pc_qty - (v_bne_daily_mean_sales / (v_mel_daily_mean_sales + v_bne_daily_mean_sales)) * v_cn_nvt_qty);
+            SET v_mel_qty = round(v_mel_daily_mean_sales * (v_purchase_days + v_stock_alert_days) - (v_mel_nvt_qty - v_mel_nvt_pending_qty) - v_mel_zt_nvt_qty - v_mel_pc_qty - (v_mel_daily_mean_sales / (v_mel_daily_mean_sales + v_bne_daily_mean_sales)) * (v_cn_nvt_qty - v_stock_alert_qty));
+            SET v_bne_qty = round(v_bne_daily_mean_sales * (v_purchase_days + v_stock_alert_days) - (v_bne_nvt_qty - v_bne_nvt_pending_qty) - v_bne_zt_nvt_qty - v_bne_pc_qty - (v_bne_daily_mean_sales / (v_mel_daily_mean_sales + v_bne_daily_mean_sales)) * (v_cn_nvt_qty - v_stock_alert_qty));
 
             IF v_mel_qty < 0 OR v_mel_qty IS NULL
             THEN
@@ -256,6 +258,11 @@ CREATE PROCEDURE intel_repl()
                     VALUES (v_product_id, v_qty, v_mel_qty, v_bne_qty, v_profit, 5700, now(), now()); # 5700 新生成的智能补货单
 
                 END IF;
+            ELSE
+                # 如果计算出来的补货数小于零应该把现在存在的新建状态的补货条目删除掉
+                # 删除
+                DELETE FROM erp_intel_repl
+                WHERE product_id = v_product_id AND status_id = 5700; # 5700 新生成的智能补货单
             END IF;
 
             SET done = FALSE;
