@@ -1044,6 +1044,30 @@ func (c ErpOrder) Save() revel.Result {
 	return c.RenderEmpty()
 }
 
+func (c ErpOrder) SaveDesc() revel.Result {
+	var db_session = c.DbSession
+
+	var order_id int64
+	c.Params.Bind(&order_id, "order_id")
+
+	var order_desc string
+	c.Params.Bind(&order_desc, "order_desc")
+
+	var order ddlc_models.OrderInfo
+	_, err := db_session.Id(order_id).Get(&order)
+	core.HandleError(err)
+
+	order.Desc = core.MakeNullString(order_desc, true)
+
+	_, err = db_session.Id(order_id).Cols("desc").Update(&order)
+	core.HandleError(err)
+
+	return c.RenderJson(map[string]interface{}{
+		"success": true,
+		"message": "订单描述保存成功！",
+	})
+}
+
 func (c ErpOrder) SavePickupActual() revel.Result {
 	var db_session = c.DbSession
 
