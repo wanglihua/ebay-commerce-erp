@@ -22,6 +22,9 @@ import (
 	"matrix/modules/erp/models/xtpz_models"
 	"matrix/modules/erp/models/ddpz_models"
 	"matrix/modules/erp/models/ddlc_models"
+	"matrix/modules/erp/models/kcgl_models"
+	"matrix/modules/erp/service/product_bind_service"
+	"matrix/modules/erp/service/product_service"
 )
 
 type ErpOrderImport struct {
@@ -400,6 +403,9 @@ SELECT sa.id AS shop_id, sa.name AS shop_name FROM erp_shop_account sa;
 		ShopName string `xorm:"'shop_name'"`
 	}
 
+	var product_bind_list = make([]kcgl_models.ProductBindInfo, 0)
+	core.HandleError(db_session.Find(&product_bind_list))
+
 	var sql_product = `SELECT p.id AS product_id, p.sku AS product_sku FROM erp_product p`
 	var product_id_and_sku_list = make([]product_id_and_sku_t, 0)
 	err = db_session.Sql(sql_product).Find(&product_id_and_sku_list)
@@ -428,10 +434,22 @@ SELECT sa.id AS shop_id, sa.name AS shop_name FROM erp_shop_account sa;
 		return false, 0
 	}
 
+	var is_bind_product_sku = func(product_sku string) bool {
+		for _, product_bind := range product_bind_list {
+			if product_bind.Code == product_sku {
+				return true
+			}
+		}
+
+		return false
+	}
+
 	var order_import_error_list = make([]order_import_t, 0)
 
+	var order_import_extract_list = make([]order_import_t, 0) // 考虑了绑定SKU的拆解的订单导入列表
+
 	// 错误检查
-	for index, order_import := range order_import_list {
+	for _, order_import := range order_import_list {
 		// 检查导入的订单编号是否存在，订单编号检查放在最前面
 		/*
 		SELECT count(o.id) AS order_count FROM erp_order o WHERE o.code = '123'
@@ -457,38 +475,40 @@ SELECT sa.id AS shop_id, sa.name AS shop_name FROM erp_shop_account sa;
 			order_import_error_list = append(order_import_error_list, order_import)
 		}
 
-		// 商品SKU是否存在
-		has, product_id := is_product_sku_exist(order_import.Spbh)
-		if has == false {
-			/*
-			感觉不自动插入商品，提示商品不存在更合适，因为还有商品导入的功能
+		order_import.shop_id = shop_id
+		order_import.shop_code = shop_code
 
-			// 如果没有的话，插入商品
-			var product models.ProductInfo
-			product.Sku = order_import.Spbh
-			product.CnName = order_import.Spbh
-			product.Name = order_import.Spbh
+		if is_bind_product_sku(order_import.Spbh) {
+			// 如果是绑定的商品
+			var product_bind_sku_list = product_bind_service.Get_product_bind_skus(order_import.Spbh, db_session)
+			for _, product_bind_sku := range product_bind_sku_list {
+				var product_sku = product_bind_sku.Sku
+				var product_sku_count = product_bind_sku.Count
+				var product_id = product_service.Get_product_id_by_sku(product_sku, db_session)
 
-			_, err := db_session.Insert(&product)
-			core.HandleError(err)
+				var order_import_extract = order_import
+				order_import_extract.product_id = product_id
+				order_import_extract.Spsl = int(product_sku_count) * order_import.Spsl
 
-			product_id = product.Id
-
-			// 数据库里面新增加的也放到 刚刚预先加载的列表里面去
-			var product_id_and_sku product_id_and_sku_t
-			product_id_and_sku.ProductId = product_id
-			product_id_and_sku.ProductSku = product.Sku
-
-			product_id_and_sku_list = append(product_id_and_sku_list, product_id_and_sku)
-			*/
-
-			order_import.ErrorMessage = fmt.Sprintf("编号为 %s 的订单中的商品编号 %s 不存在！", order_import.Ddbh, order_import.Spbh)
-			order_import_error_list = append(order_import_error_list, order_import)
+				order_import_extract_list = append(order_import_extract_list, order_import_extract)
+			}
+		} else {
+			// 商品SKU是否存在
+			has, product_id := is_product_sku_exist(order_import.Spbh)
+			if has == false {
+				order_import.ErrorMessage = fmt.Sprintf("编号为 %s 的订单中的商品编号 %s 不存在！", order_import.Ddbh, order_import.Spbh)
+				order_import_error_list = append(order_import_error_list, order_import)
+			} else {
+				order_import.product_id = product_id
+				order_import_extract_list = append(order_import_extract_list, order_import)
+			}
 		}
 
+		/*
 		order_import_list[index].shop_id = shop_id
 		order_import_list[index].shop_code = shop_code
 		order_import_list[index].product_id = product_id
+		*/
 	}
 
 	if len(order_import_error_list) != 0 {
@@ -499,12 +519,11 @@ SELECT sa.id AS shop_id, sa.name AS shop_name FROM erp_shop_account sa;
 		})
 	}
 
-	revel.TRACE.Println("order_import_list", len(order_import_list))
 	// 合并订单，马帮对于多SKU的订单导出的时候，会根据SKU对订单进行拆解。比如一个订单有3个SKU，那么马帮订单导出的时候，会拆解成3条记录，这个时候需要根据同一订单编号在wollongzone对订单进行合并。
 	// 马帮导出的拆解订单，每一行的收款都是总金额，所以这里金额不用累加
 	var order_import_list_map = make(map[string][]order_import_t)
 
-	for _, order_import := range order_import_list {
+	for _, order_import := range order_import_extract_list {
 		order_import_same_code_list, found := order_import_list_map[order_import.Ddbh]
 		if found == false {
 			order_import_same_code_list = make([]order_import_t, 0)
@@ -520,7 +539,6 @@ SELECT sa.id AS shop_id, sa.name AS shop_name FROM erp_shop_account sa;
 	// 计算售价，成本价，毛利
 	for order_code := range order_import_list_map {
 		var order_import_same_code_list = order_import_list_map[order_code]
-		_ = order_import_same_code_list
 
 		var cost_price_total float64 = 0
 		for index, order_import := range order_import_same_code_list {

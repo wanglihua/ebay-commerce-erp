@@ -377,6 +377,7 @@ func (t EBayOrderDownloadTask) Run() {
 							has_product_store_item, _, product_store_item_id := product_store_item_service.Query_product_store_item(transaction.Item.ItemID, db_session)
 							if has_product_store_item == false {
 								//download product
+								// todo: 这里可能会出错的，应该拆分开的商品可能没在该商店销售，造成下载失败
 								_, _, product_store_item_id = fetch_product_item_to_db(shop_account_config.APIConfig, db_session, transaction.Item.ItemID)
 							}
 

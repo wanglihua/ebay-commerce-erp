@@ -74,7 +74,7 @@ func Get_product_bind_skus(product_bind_code string, db_session *xorm.Session) [
 	sql = fmt.Sprint(sql, product_bind_code)
 
 	var product_bind_list struct {
-		BindList string  `xorm:"'bind_list'"`
+		BindList string `xorm:"'bind_list'"`
 	}
 
 	_, err := db_session.Sql(sql).Get(&product_bind_list)
