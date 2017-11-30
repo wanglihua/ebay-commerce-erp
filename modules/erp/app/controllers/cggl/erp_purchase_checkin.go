@@ -157,7 +157,7 @@ func (c ErpPurchaseCheckin) ListData() revel.Result {
 	}
 
 	if status_id_query != 0 {
-		filter = core.SqlAnd(filter, fmt.Sprintf("pb.status_id = %d", status_id_query))
+		filter = core.SqlAnd(filter, fmt.Sprintf("pbe.status_id = %d", status_id_query))
 	}
 
 	sb.Where(filter)

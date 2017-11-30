@@ -117,7 +117,7 @@ CREATE PROCEDURE intel_repl()
 
             # 获取商品的相关配置
             SET v_purchase_days = 0, v_stock_alert_days = 0 = 0;
-            SELECT p.purchase_days, p.stock_alert_days, p.stock_alert_qty
+            SELECT p.purchase_days, p.stock_alert_days
             INTO v_purchase_days, v_stock_alert_days
             FROM erp_product p
             WHERE p.id = v_product_id;
