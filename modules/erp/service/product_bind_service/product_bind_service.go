@@ -8,6 +8,8 @@ import (
 
 	"github.com/go-xorm/xorm"
 	"matrix/core"
+	"matrix/modules/erp/models/kcgl_models"
+	"matrix/modules/erp/models"
 )
 
 // 暂时先写在这里
@@ -47,8 +49,8 @@ func Check_product_bind_valid(bind_product_list string, db_session *xorm.Session
 
 // 是否是绑定商品的sku，就是虚拟的那个sku。是否是在商品绑定的数据库里面存在。
 func Is_product_bind_sku(product_bind_sku string, db_session *xorm.Session) bool {
-	sql := `SELECT count(pb.id) AS product_bind_count FROM erp_product_bind pb WHERE pb.code = '%s'`
-	sql = fmt.Sprintf(sql, product_bind_sku)
+	sql := `SELECT count(pb.id) AS product_bind_count FROM erp_product_bind pb WHERE pb.code = '%s' AND status_id = %d`
+	sql = fmt.Sprintf(sql, product_bind_sku, models.PRODUCT_BIND_STATUS_NORMAL)
 
 	var product_bind_count struct {
 		Count int64 `xorm:"'product_bind_count'"`
@@ -70,6 +72,7 @@ type Product_bind_sku_t struct {
 
 // 解析绑定 sku， product_bind_code 就是绑定商品的虚拟 sku
 func Get_product_bind_skus(product_bind_code string, db_session *xorm.Session) []Product_bind_sku_t {
+	/*
 	sql := `SELECT pb.bind_list FROM erp_product_bind pb WHERE pb.code = '%s'`
 	sql = fmt.Sprint(sql, product_bind_code)
 
@@ -79,10 +82,15 @@ func Get_product_bind_skus(product_bind_code string, db_session *xorm.Session) [
 
 	_, err := db_session.Sql(sql).Get(&product_bind_list)
 	core.HandleError(err)
+	*/
+
+	var product_bind kcgl_models.ProductBindInfo
+	_, err := db_session.Where("code = ? AND status_id = ?", product_bind_code, models.PRODUCT_BIND_STATUS_NORMAL).Get(&product_bind)
+	core.HandleError(err)
 
 	var product_bind_sku_list = make([]Product_bind_sku_t, 0)
 
-	product_sku_with_number_list := strings.Split(product_bind_list.BindList, ",")
+	product_sku_with_number_list := strings.Split(product_bind.BindList, ",")
 	for _, product_sku_with_number := range product_sku_with_number_list {
 		product_sku_number_slice := strings.Split(product_sku_with_number, "*")
 
@@ -97,7 +105,7 @@ func Get_product_bind_skus(product_bind_code string, db_session *xorm.Session) [
 		product_bind_sku_list = append(product_bind_sku_list, product_bind_sku)
 	}
 
-	return nil
+	return product_bind_sku_list
 }
 
 // 检查SKU的正确性，是否是合法的数据库中存在的SKU

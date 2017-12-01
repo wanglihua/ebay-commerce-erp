@@ -372,8 +372,6 @@ func (c ErpOrderImport) Upload() revel.Result {
 
 			order_import_list = append(order_import_list, order_import)
 		}
-
-		revel.TRACE.Println("sheet.MaxRow", sheet.MaxRow)
 	}
 
 	if len(order_import_list) == 0 {
@@ -481,6 +479,7 @@ SELECT sa.id AS shop_id, sa.name AS shop_name FROM erp_shop_account sa;
 		if is_bind_product_sku(order_import.Spbh) {
 			// 如果是绑定的商品
 			var product_bind_sku_list = product_bind_service.Get_product_bind_skus(order_import.Spbh, db_session)
+			revel.TRACE.Println("product_bind_sku_list", product_bind_sku_list)
 			for _, product_bind_sku := range product_bind_sku_list {
 				var product_sku = product_bind_sku.Sku
 				var product_sku_count = product_bind_sku.Count
@@ -518,6 +517,8 @@ SELECT sa.id AS shop_id, sa.name AS shop_name FROM erp_shop_account sa;
 			"error_data_list": order_import_error_list,
 		})
 	}
+
+	revel.TRACE.Println("len(order_import_extract_list):", len(order_import_extract_list))
 
 	// 合并订单，马帮对于多SKU的订单导出的时候，会根据SKU对订单进行拆解。比如一个订单有3个SKU，那么马帮订单导出的时候，会拆解成3条记录，这个时候需要根据同一订单编号在wollongzone对订单进行合并。
 	// 马帮导出的拆解订单，每一行的收款都是总金额，所以这里金额不用累加
