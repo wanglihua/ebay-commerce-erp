@@ -171,9 +171,11 @@ func (c Home) SyncDbPost() revel.Result {
 	model_list = append(model_list, &cggl_models.PurchaseAbnormalTypeInfo{})
 	model_list = append(model_list, &cggl_models.PurchaseAbnormalProcessResultInfo{})
 
+	model_list = append(model_list, &spbb_models.ProductSaleAnalysisTimeRangeInfo{})
 	model_list = append(model_list, &spbb_models.ProductSaleDayAnalysisInfo{})
 	model_list = append(model_list, &spbb_models.ProductSaleAnalysisInfo{})
 	model_list = append(model_list, &spbb_models.ProductSaleAnalysisSettingInfo{})
+
 	model_list = append(model_list, &erp_models.StatusInfo{})
 	model_list = append(model_list, &erp_models.MessageInfo{})
 	model_list = append(model_list, &erp_models.PaypalReconInfo{})
