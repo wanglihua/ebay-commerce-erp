@@ -9,7 +9,7 @@ const (
 	PRODUCT_SALE_ANALYSIS_TYPE_ACTUAL int64 = 100
 	// 统计理论值
 	PRODUCT_SALE_ANALYSIS_TYPE_LOGIC int64 = 200
-	// 只统计SKU，不分仓库统计
+	// 只统计SKU，不分仓库统计，实际值的不分仓统计
 	PRODUCT_SALE_ANALYSIS_TYPE_SKU int64 = 300
 )
 
