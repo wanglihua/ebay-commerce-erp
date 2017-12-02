@@ -14,6 +14,8 @@ CREATE PROCEDURE create_product_sale_analysis_time_range()
         SET v_time_begin = '2016-01-01';
         SET v_time_end = '2050-12-31';
 
+        SET v_time_range_begin = v_time_begin;
+
         WHILE v_time_range_begin < v_time_end DO
             SET v_time_range_end = date_add(v_time_range_begin, INTERVAL 10 DAY);
 
@@ -23,6 +25,7 @@ CREATE PROCEDURE create_product_sale_analysis_time_range()
 
             IF v_range_count = 0
             THEN
+                # 时间取  v_time_range_begin =< time < v_time_range_end
                 INSERT INTO erp_product_sale_analysis_time_range (type_id, begin_time, end_time) VALUES (100, v_time_range_begin, v_time_range_end);
             END IF;
 
