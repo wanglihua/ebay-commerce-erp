@@ -13,12 +13,6 @@ CREATE PROCEDURE product_sale_trend_analysis()
         DECLARE v_range_end_time DATETIME;
         DECLARE v_range_qty BIGINT;
 
-        # 10 天一个间隔
-        # TIME_RANGE_TYPE_TEN_DAYS int64 = 100
-        SET const_time_range_type = 100;
-
-        SET v_current_date = current_date();
-
         -- 遍历数据结束标志
         DECLARE done INT DEFAULT FALSE;
 
@@ -32,6 +26,13 @@ CREATE PROCEDURE product_sale_trend_analysis()
 
         -- 将结束标志绑定到游标
         DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+
+        # 10 天一个间隔
+        # TIME_RANGE_TYPE_TEN_DAYS int64 = 100
+        SET const_time_range_type = 100;
+
+        # SELECT current_date() INTO v_current_date FROM dual;
+        SET v_current_date = current_date();
 
         -- 打开游标
         OPEN product_id_cur;
