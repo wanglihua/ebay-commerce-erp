@@ -99,6 +99,7 @@ CREATE PROCEDURE intel_repl()
         -- 开始循环
         read_loop: LOOP
             -- 提取游标里的数据
+            SET done = FALSE;
             FETCH cur
             INTO v_product_id;
 
@@ -225,6 +226,7 @@ CREATE PROCEDURE intel_repl()
 
             SET v_qty = v_mel_qty + v_bne_qty;
 
+            /* 把生成是负的智能补货单也显示在里面
             IF v_qty > 0
             THEN
                 # 生成或更新 智能补货单
@@ -263,8 +265,39 @@ CREATE PROCEDURE intel_repl()
                 DELETE FROM erp_intel_repl
                 WHERE product_id = v_product_id AND status_id = 5700; # 5700 新生成的智能补货单
             END IF;
+            */
 
-            SET done = FALSE;
+            # 生成或更新 智能补货单
+            SET v_count = 0;
+            SELECT count(*)
+            INTO v_count
+            FROM erp_intel_repl ir
+            WHERE ir.product_id = v_product_id AND ir.status_id = 5700; # 5700 新生成的智能补货单
+
+            IF v_count = 0
+            THEN
+                # 新增
+                INSERT INTO erp_intel_repl (product_id, qty, mel_qty, bne_qty, profit, status_id, create_time, update_time)
+                VALUES (v_product_id, v_qty, v_mel_qty, v_bne_qty, v_profit, 5700, now(), now()); # 5700 新生成的智能补货单
+            ELSEIF v_count = 1
+                THEN
+                    # 更新
+                    UPDATE erp_intel_repl
+                    SET qty = v_qty, mel_qty = v_mel_qty, bne_qty = v_bne_qty, profit = v_profit, update_time = now()
+                    WHERE product_id = v_product_id AND status_id = 5700; # 5700 新生成的智能补货单
+            ELSE
+                # v_count 大于 1 说明之前生成的数据中错误地生成了多条，在这里进行更正
+
+                # 先删除
+                DELETE FROM erp_intel_repl
+                WHERE product_id = v_product_id AND status_id = 5700; # 5700 新生成的智能补货单
+
+                # 再新增
+                INSERT INTO erp_intel_repl (product_id, qty, mel_qty, bne_qty, profit, status_id, create_time, update_time)
+                VALUES (v_product_id, v_qty, v_mel_qty, v_bne_qty, v_profit, 5700, now(), now()); # 5700 新生成的智能补货单
+
+            END IF;
+
         END LOOP;
         -- 关闭游标
         CLOSE cur;
