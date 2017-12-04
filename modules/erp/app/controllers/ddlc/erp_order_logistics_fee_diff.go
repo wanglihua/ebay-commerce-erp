@@ -448,7 +448,7 @@ WHERE ol.stock_id = 0 AND ol.company_id = 0
 				filter = core.SqlAnd(filter, "ol.actual_fee = ol.total_fee AND ol.actual_fee <> 0")
 			} else if fee_diff_type_code == FEE_DIFF_ACTUAL_FEE_MISS {
 				filter = core.SqlAnd(filter, "ol.actual_fee = 0")
-			} else if fee_diff_type_code == FEE_DIFF_ACTUAL_FEE_MISS {
+			} else if fee_diff_type_code == FEE_DIFF_ACTUAL_FEE_EXIST {
 				filter = core.SqlAnd(filter, "ol.actual_fee <> 0")
 			}
 		}
