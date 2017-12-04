@@ -58,7 +58,7 @@ CREATE PROCEDURE product_sale_trend_analysis()
 
             IF v_latest_begin_time IS NULL
             THEN
-                SET v_latest_begin_time = '2006-01-01';
+                SET v_latest_begin_time = '2005-12-31';
             END IF;
 
             -- 打开游标
