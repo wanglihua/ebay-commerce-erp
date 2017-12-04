@@ -22,7 +22,7 @@ CREATE PROCEDURE product_sale_trend_analysis()
 
         DECLARE time_range_cur CURSOR FOR
             SELECT tr.id, tr.type_id, tr.begin_time, tr.end_time FROM erp_product_sale_analysis_time_range tr
-            WHERE v_latest_begin_time <= tr.begin_time AND tr.begin_time <= v_current_date; # todo 是不是需要取等号 还要考虑一下
+            WHERE v_latest_begin_time <= tr.begin_time AND tr.end_time < v_current_date; # todo 是不是需要取等号 还要考虑一下
 
         -- 将结束标志绑定到游标
         DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
@@ -40,9 +40,9 @@ CREATE PROCEDURE product_sale_trend_analysis()
         -- 开始循环
         product_id_loop: LOOP
             -- 提取游标里的数据
+            SET done = FALSE;
             FETCH product_id_cur INTO v_product_id;
 
-            -- 声明结束的时候
             IF done
             THEN
                 LEAVE product_id_loop;
@@ -67,9 +67,9 @@ CREATE PROCEDURE product_sale_trend_analysis()
             -- 开始循环
             time_range_id_loop: LOOP
                 -- 提取游标里的数据
+                SET done = FALSE;
                 FETCH time_range_cur INTO v_time_range_id, v_time_range_type_id, v_range_begin_time, v_range_end_time;
 
-                -- 声明结束的时候
                 IF done
                 THEN
                     LEAVE time_range_id_loop;
@@ -88,20 +88,16 @@ CREATE PROCEDURE product_sale_trend_analysis()
 
                 # 时间范围前一个是 <= 后一个是 <
                 # 取按日分析的不分仓的数据
-                SELECT sum(da.qty) INTO v_range_qty
+                SELECT ifnull(sum(da.qty), 0) INTO v_range_qty
                 FROM erp_product_sale_day_analysis da
                 WHERE da.product_id = v_product_id AND v_range_begin_time <= da.day AND da.day < v_range_end_time AND type = 300;
 
                 # 插入数量分析结果
                 INSERT INTO erp_product_sale_trend_analysis (time_range_id, type_id, begin_time, end_time, product_id, qty)
                 VALUES (v_time_range_id, v_time_range_type_id, v_range_begin_time, v_range_end_time, v_product_id, v_range_qty);
-
-                SET done = FALSE;
             END LOOP;
             -- 关闭游标
             CLOSE time_range_cur;
-
-            SET done = FALSE;
         END LOOP;
         -- 关闭游标
         CLOSE product_id_cur;
