@@ -1,3 +1,5 @@
+# CALL  create_product_sale_analysis_time_range();
+
 DROP PROCEDURE IF EXISTS create_product_sale_analysis_time_range;
 
 # 10 天一个间隔

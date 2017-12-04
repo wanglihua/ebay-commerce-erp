@@ -22,7 +22,7 @@ CREATE PROCEDURE product_sale_trend_analysis()
 
         DECLARE time_range_cur CURSOR FOR
             SELECT tr.id, tr.type_id, tr.begin_time, tr.end_time FROM erp_product_sale_analysis_time_range tr
-            WHERE v_latest_begin_time <= tr.begin_time AND tr.end_time < v_current_date; # todo 是不是需要取等号 还要考虑一下
+            WHERE v_latest_begin_time < tr.begin_time AND tr.end_time < v_current_date; # todo 是不是需要取等号 还要考虑一下
 
         -- 将结束标志绑定到游标
         DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
