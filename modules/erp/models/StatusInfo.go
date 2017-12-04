@@ -123,7 +123,7 @@ const (
 	CONTAINER_TRANSFER_STATUS_STOCK  = 5600 // 集装箱调拨 已到仓
 
 	INTEL_REPL_STATUS_XSC = 5700 // 新生成
-	INTEL_REPL_STATUS_YCG = 5800 // 已采购
+	INTEL_REPL_STATUS_YCN = 5800 // 已采纳
 
 	//状态 id end
 )
@@ -668,10 +668,10 @@ func (e StatusInfo) InitData(db_session *xorm.Session) {
 		db_session.Insert(status)
 
 		status = new(StatusInfo)
-		status.Id = INTEL_REPL_STATUS_YCG
+		status.Id = INTEL_REPL_STATUS_YCN
 		status.Type = STATUS_TYPE_INTEL_REPL
-		status.Name = "已采购"
-		status.Desc = core.MakeNullString("智能补货状态 已采购", true)
+		status.Name = "已采纳"
+		status.Desc = core.MakeNullString("智能补货状态 已采纳", true)
 		db_session.Insert(status)
 	}
 }

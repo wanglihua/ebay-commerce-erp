@@ -306,7 +306,7 @@ func (c ErpIntelRepl) Purchase() revel.Result {
 	}
 
 	for _, intel_repl := range intel_repl_list {
-		if intel_repl.StatusId == models.INTEL_REPL_STATUS_YCG {
+		if intel_repl.StatusId == models.INTEL_REPL_STATUS_YCN {
 			return c.RenderJson(map[string]interface{}{
 				"success": false,
 				"message": "已采购状态的智能补货条目不能再次采购！",
@@ -403,7 +403,7 @@ WHERE p.id IN (%s);`
 		_, err = db_session.Insert(&purchase_bill_entry)
 		core.HandleError(err)
 
-		intel_repl.StatusId = models.INTEL_REPL_STATUS_YCG
+		intel_repl.StatusId = models.INTEL_REPL_STATUS_YCN
 		_, err = db_session.Id(intel_repl.Id).Cols("status_id").Update(&intel_repl)
 		core.HandleError(err)
 	}
