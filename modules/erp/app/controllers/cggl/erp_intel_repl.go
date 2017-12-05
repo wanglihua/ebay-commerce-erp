@@ -117,6 +117,19 @@ status_id_query
 	var dev_user_id_query int64
 	c.Params.Bind(&dev_user_id_query, "dev_user_id_query")
 
+	// aoData.push({name: 'query_begin_time', value: $("#query_begin_time").val()});
+	var query_begin_time_str string
+	c.Params.Bind(&query_begin_time_str, "query_begin_time")
+	query_begin_time_str = strings.TrimSpace(query_begin_time_str)
+
+	query_begin_time, query_begin_time_err := core.Parse_time(query_begin_time_str)
+
+	var query_end_time_str string
+	c.Params.Bind(&query_end_time_str, "query_end_time")
+	query_end_time_str = strings.TrimSpace(query_end_time_str)
+
+	query_end_time, query_end_time_err := core.Parse_time(query_end_time_str)
+
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
 	/*
@@ -172,6 +185,14 @@ FROM erp_intel_repl ir
 
 	if dev_user_id_query != 0 {
 		filter = core.SqlAnd(filter, fmt.Sprintf("p.dev_user_id = %d", dev_user_id_query))
+	}
+
+	if query_begin_time_err == nil {
+		filter = core.SqlAnd(filter, fmt.Sprintf("ir.update_time >= '%s'", query_begin_time.Format("2006-01-02 15:04")))
+	}
+
+	if query_end_time_err == nil {
+		filter = core.SqlAnd(filter, fmt.Sprintf("ir.update_time <= '%s'", query_end_time.Format("2006-01-02 15:04")))
 	}
 
 	sb.Where(filter)

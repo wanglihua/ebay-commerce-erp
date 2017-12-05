@@ -69,6 +69,8 @@
                         <option value="{% $user.Id %}">{% $user.LoginName %}（{% $user.NickName %}）</option>
                         {% end %}
                     </select>
+                    <input id="query_begin_time" name="query_begin_time" style="width: 135px;height:30px;" placeholder="开始时间如2016-01-02"/>
+                    <input id="query_end_time" name="query_end_time" style="width: 135px;height:30px;" placeholder="结束时间如2016-01-02"/>
                     &nbsp;
                     <button class="btn btn-mini btn-primary" style="margin-bottom:3px;height: 30px;" onclick="search()"> &nbsp;<i class="ace-icon fa fa-search"></i>查&nbsp;询&nbsp;
                     </button>
@@ -165,6 +167,16 @@
 </div>
 <script type="text/javascript">
 
+    $(function () {
+        $('#query_begin_time').datetimepicker({
+            locale: "zh-cn"
+        });
+
+        $('#query_end_time').datetimepicker({
+            locale: "zh-cn"
+        });
+    });
+
     function search() {
         refreshList('#intelReplList');
     }
@@ -214,7 +226,7 @@
                     '#intelReplList',
                     {
                         "sAjaxSource": '{%url "ErpIntelRepl.ListData"%}',
-                        "aaSorting": [[1, "asc"]],
+                        "aaSorting": [[8, "desc"]],
                         "aoColumns": [
                             {
                                 "mDataProp": "ir.id", "bSearchable": false, "orderable": false, "sClass": "center", "width": 50,
@@ -250,7 +262,7 @@
                                 }
                             },
                             {"mDataProp": "s.name", "title": "状态", "bSearchable": true, "width": 80},
-                            {"mDataProp": "ir.create_time", "title": "创建时间", "bSearchable": false, "width": 120}
+                            {"mDataProp": "ir.update_time", "title": "生成时间", "bSearchable": false, "width": 120}
                         ],
                         "fnServerData": function (sSource, aoData, fnCallback) {
                             showMask("数据加载中，请稍候");
@@ -263,6 +275,11 @@
 
                             aoData.push({name: 'sale_user_id_query', value: $("#sale_user_id_query").val()});
                             aoData.push({name: 'dev_user_id_query', value: $("#dev_user_id_query").val()});
+
+                            aoData.push({name: 'query_begin_time', value: $("#query_begin_time").val()});
+                            aoData.push({name: 'query_end_time', value: $("#query_end_time").val()});
+
+                            //query_begin_time
 
                             $.ajax({
                                 "dataType": 'json',
