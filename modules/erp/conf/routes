@@ -665,6 +665,12 @@ POST /product/sale/analysis/data/list      ErpProductSaleAnalysis.ListData
 POST /product/sale/analysis/analyze        ErpProductSaleAnalysis.Analyze
 POST /product/sale/analysis/export         ErpProductSaleAnalysis.Export
 
+GET  /product/sale/rank                    ErpProductSaleRank.Index
+POST /product/sale/rank/page/data          ErpProductSaleRank.PageData
+POST /product/sale/rank/data/list          ErpProductSaleRank.ListData
+POST /product/sale/rank/analyze            ErpProductSaleRank.Analyze
+POST /product/sale/rank/export             ErpProductSaleRank.Export
+
 GET  /order/new/create           ErpOrderNew.Create
 POST /order/new/create/data      ErpOrderNew.CreateData
 POST /order/new/save             ErpOrderNew.Save

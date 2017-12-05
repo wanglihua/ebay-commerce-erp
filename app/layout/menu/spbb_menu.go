@@ -77,26 +77,5 @@ func GetSpbbMenu(res_id_map map[int64]bool, web_session revel.Session) string {
 </li>
 `)
 
-	/*
-
-	商品销售统计设置
-
-        <li id="spbb-packagematerial-menu" class="">
-            <a href="#">
-                <i class="menu-icon fa fa-caret-right"></i>
-                库存报表
-            </a>
-            <b class="arrow"></b>
-        </li>
-
-        <li id="spbb-stock-menu" class="">
-            <a href="#">
-                <i class="menu-icon fa fa-caret-right"></i>
-                盘点查询
-            </a>
-            <b class="arrow"></b>
-        </li>
-	 */
-
 	return buffer.String()
 }
