@@ -26,7 +26,7 @@ type ProductSaleAnalysisInfo struct {
 	Level5Qty      int64     `xorm:"bigint notnull 'level5_qty'" json:"level5_qty" smith:"verbose_name=5档数量"`
 	Type           int64     `xorm:"bigint notnull 'type'" json:"type" smith:"verbose_name=统计类型"`
 	TypeName       string    `xorm:"-" json:"type_name"`
-	DailyMeanSales float64   `xorm:"decimal(18,6) notnull 'daily_mean_sales' default(0)" json:"daily_mean_sales"`
+	DailyMeanSales float64   `xorm:"decimal(18,6) notnull index 'daily_mean_sales' default(0)" json:"daily_mean_sales"`
 	CreateTime     core.Time `xorm:"created notnull 'create_time'" json:"create_time"`
 	UpdateTime     core.Time `xorm:"updated notnull 'update_time'" json:"update_time"`
 }
