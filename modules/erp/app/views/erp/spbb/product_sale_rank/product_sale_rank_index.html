@@ -60,7 +60,7 @@
                     '#productSaleRankList',
                     {
                         "sAjaxSource": '{%url "ErpProductSaleRank.ListData"%}',
-                        "aaSorting": [[2, "desc"]],
+                        "aaSorting": [[2, "asc"]],
                         "aoColumns": [
                             {
                                 "mDataProp": "sa.sku", "title": "SKU", "bSearchable": true, "width": 200,
@@ -69,6 +69,7 @@
                                 }
                             },
                             {"mDataProp": "sa.product_name", "title": "商品名称", "bSearchable": false, "bSortable": false},
+                            {"mDataProp": "sa.rank", "title": "排名", "bSearchable": false, "bSortable": true, "width": 80},
                             {
                                 "mDataProp": "sa.daily_mean_sales", "title": "日均销量", "bSearchable": false, "width": 80, "sClass": "center",
                                 "render": function (data, type, row) {

@@ -138,7 +138,7 @@ func (c ErpProductSaleRank) Analyze() revel.Result {
 
 	return c.RenderJson(map[string]interface{}{
 		"success": true,
-		"message": "立即启动分档多日销售情况析任务成功！",
+		"message": "立即启动销售分析后台任务成功！",
 	})
 }
 
