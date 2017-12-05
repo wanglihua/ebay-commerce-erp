@@ -23,23 +23,14 @@ type ErpProductSaleRank struct {
 }
 
 func (c ErpProductSaleRank) Index() revel.Result {
-	pass_service.Check_login_user_pass(pass_res.SPBB_PRODUCT_SALE_ANALYSIS, c.Session)
+	pass_service.Check_login_user_pass(pass_res.SPBB_PRODUCT_SALE_RANK, c.Session)
 
-	var db_session = c.DbSession
-
-	var product_sale_analysis_setting = product_sale_analysis_setting_service.Get_product_sale_analysis_setting(db_session)
-
-	c.RenderArgs["level1_days"] = product_sale_analysis_setting.Level1Days
-	c.RenderArgs["level2_days"] = product_sale_analysis_setting.Level2Days
-	c.RenderArgs["level3_days"] = product_sale_analysis_setting.Level3Days
-	c.RenderArgs["level4_days"] = product_sale_analysis_setting.Level4Days
-	c.RenderArgs["level5_days"] = product_sale_analysis_setting.Level5Days
-
-	return c.RenderTemplate("erp/spbb/product_sale_analysis/product_sale_analysis_index.html")
+	return c.RenderTemplate("erp/spbb/product_sale_rank/product_sale_rank_index.html")
 }
 
+// 这个函数在这里没有被用到，因为查询条件比较简单
 func (c ErpProductSaleRank) PageData() revel.Result {
-	pass_service.Check_login_user_pass(pass_res.SPBB_PRODUCT_SALE_ANALYSIS, c.Session)
+	pass_service.Check_login_user_pass(pass_res.SPBB_PRODUCT_SALE_RANK, c.Session)
 
 	var db_session = c.DbSession
 
@@ -72,18 +63,12 @@ type product_sale_analysis_rank_t struct {
 }
 
 func (c ErpProductSaleRank) ListData() revel.Result {
-	pass_service.Check_login_user_pass(pass_res.SPBB_PRODUCT_SALE_ANALYSIS, c.Session)
+	pass_service.Check_login_user_pass(pass_res.SPBB_PRODUCT_SALE_RANK, c.Session)
 
 	db_session := c.DbSession
 
 	var sku_query string
 	c.Params.Bind(&sku_query, "sku_query")
-
-	var analysis_type_id int64
-	c.Params.Bind(&analysis_type_id, "analysis_type_id")
-
-	var stock_id int64
-	c.Params.Bind(&stock_id, "stock_id")
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
@@ -107,15 +92,9 @@ FROM erp_product_sale_analysis sa
 		sql_args = append(sql_args, sku_query)
 	}
 
-	if analysis_type_id != 0 {
-		filter = core.SqlAnd(filter, "sa.type = ?")
-		sql_args = append(sql_args, analysis_type_id)
-	}
-
-	if stock_id != 0 {
-		filter = core.SqlAnd(filter, "sa.stock_id = ?")
-		sql_args = append(sql_args, stock_id)
-	}
+	// 只取不分仓统计的数据
+	filter = core.SqlAnd(filter, "sa.type = ?")
+	sql_args = append(sql_args, spbb_models.PRODUCT_SALE_ANALYSIS_TYPE_SKU)
 
 	sb.Where(filter)
 
@@ -132,18 +111,6 @@ FROM erp_product_sale_analysis sa
 	core.HandleError(err)
 
 	for index, product_sale_day_analysis := range product_sale_analysis_list {
-		if product_sale_day_analysis.ProductSaleAnalysis.Type == spbb_models.PRODUCT_SALE_ANALYSIS_TYPE_ACTUAL {
-			product_sale_analysis_list[index].ProductSaleAnalysis.TypeName = "实际仓库发货"
-		}
-
-		if product_sale_day_analysis.ProductSaleAnalysis.Type == spbb_models.PRODUCT_SALE_ANALYSIS_TYPE_LOGIC {
-			product_sale_analysis_list[index].ProductSaleAnalysis.TypeName = "理论仓库发货"
-		}
-
-		if product_sale_day_analysis.ProductSaleAnalysis.Type == spbb_models.PRODUCT_SALE_ANALYSIS_TYPE_SKU {
-			product_sale_analysis_list[index].ProductSaleAnalysis.TypeName = "不分仓统计"
-		}
-
 		var product kcgl_models.ProductInfo
 		_, err := db_session.Id(product_sale_day_analysis.ProductSaleAnalysis.ProductId).Get(&product)
 		core.HandleError(err)
@@ -165,7 +132,7 @@ FROM erp_product_sale_analysis sa
 }
 
 func (c ErpProductSaleRank) Analyze() revel.Result {
-	pass_service.Check_login_user_pass(pass_res.SPBB_PRODUCT_SALE_ANALYSIS, c.Session)
+	pass_service.Check_login_user_pass(pass_res.SPBB_PRODUCT_SALE_RANK, c.Session)
 
 	go product_sale_analysis_service.ProductSaleAnalyze()
 
@@ -176,7 +143,7 @@ func (c ErpProductSaleRank) Analyze() revel.Result {
 }
 
 func (c ErpProductSaleRank) Export() revel.Result {
-	pass_service.Check_login_user_pass(pass_res.SPBB_PRODUCT_SALE_ANALYSIS, c.Session)
+	pass_service.Check_login_user_pass(pass_res.SPBB_PRODUCT_SALE_RANK, c.Session)
 
 	var db_session = c.DbSession
 
