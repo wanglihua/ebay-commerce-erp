@@ -41,6 +41,8 @@ CREATE PROCEDURE intel_repl()
         DECLARE v_mel_qty BIGINT; # 补货单 MEL 数量
         DECLARE v_bne_qty BIGINT; # 补货单 BNE 数量
         DECLARE v_qty BIGINT; # 补货单 数量
+        DECLARE v_old_mel_qty BIGINT;
+        DECLARE v_old_bne_qty BIGINT;
 
         DECLARE v_count INT;
 
@@ -281,10 +283,23 @@ CREATE PROCEDURE intel_repl()
                 VALUES (v_product_id, v_qty, v_mel_qty, v_bne_qty, v_profit, 5700, now(), now()); # 5700 新生成的智能补货单
             ELSEIF v_count = 1
                 THEN
-                    # 更新
-                    UPDATE erp_intel_repl
-                    SET qty = v_qty, mel_qty = v_mel_qty, bne_qty = v_bne_qty, profit = v_profit, update_time = now()
-                    WHERE product_id = v_product_id AND status_id = 5700; # 5700 新生成的智能补货单
+                    # 获取原来的数量
+                    SELECT ir.mel_qty, ir.bne_qty INTO v_old_mel_qty, v_old_bne_qty
+                    FROM erp_intel_repl ir
+                    WHERE ir.product_id = v_product_id AND ir.status_id = 5700; # 5700 新生成的智能补货单
+
+                    IF v_mel_qty = v_old_mel_qty AND v_bne_qty = v_old_bne_qty
+                    THEN
+                        # 数量没变，更新时间不变
+                        UPDATE erp_intel_repl
+                        SET profit = v_profit
+                        WHERE product_id = v_product_id AND status_id = 5700; # 5700 新生成的智能补货单
+                    ELSE
+                        # 数量有变，更新时间改变
+                        UPDATE erp_intel_repl
+                        SET qty = v_qty, mel_qty = v_mel_qty, bne_qty = v_bne_qty, profit = v_profit, update_time = now()
+                        WHERE product_id = v_product_id AND status_id = 5700; # 5700 新生成的智能补货单
+                    END IF;
             ELSE
                 # v_count 大于 1 说明之前生成的数据中错误地生成了多条，在这里进行更正
 
