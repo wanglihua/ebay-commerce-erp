@@ -137,9 +137,10 @@ const (
 	HGBG_PRODUCT_INVOICE                = 160500 // 商品是否开票
 
 	// 商品报表
-	SPBB_PRODUCT_SALE_ANALYSIS_SETTING = 170100 // 商品销售分析设置
-	SPBB_PRODUCT_SALE_ANALYSIS         = 170200 // 商品销售分析
-	SPBB_PRODUCT_SALE_DAY_ANALYSIS     = 170300 // 商品日销售分析
+	SPBB_PRODUCT_SALE_ANALYSIS_SETTING = 170100  // 商品销售分析设置
+	SPBB_PRODUCT_SALE_ANALYSIS         = 170200  // 商品销售分析
+	SPBB_PRODUCT_SALE_DAY_ANALYSIS     = 170300  // 商品日销售分析
+	SPBB_PRODUCT_SALE_RANK             = 1702400 // 商品销售排名
 
 	// 商品质量反馈 18
 	SPZL_PRODUCT_FEEDBACK_CATE   = 180100 // 商品质量反馈类别
