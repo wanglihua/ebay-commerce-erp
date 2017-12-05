@@ -179,37 +179,19 @@ FROM erp_product_sale_analysis sa
 		sql_args = append(sql_args, sku_query)
 	}
 
-	if analysis_type_id != 0 {
-		filter = core.SqlAnd(filter, "sa.type = ?")
-		sql_args = append(sql_args, analysis_type_id)
-	}
-
-	if stock_id != 0 {
-		filter = core.SqlAnd(filter, "sa.stock_id = ?")
-		sql_args = append(sql_args, stock_id)
-	}
+	// 只取不分仓统计的数据
+	filter = core.SqlAnd(filter, "sa.type = ?")
+	sql_args = append(sql_args, spbb_models.PRODUCT_SALE_ANALYSIS_TYPE_SKU)
 
 	sb.Where(filter)
 
-	sb.OrderBy("sa.daily_mean_sales ASC")
+	sb.OrderBy("sa.rank ASC")
 
 	product_sale_analysis_list := make([]product_sale_analysis_rank_t, 0)
 	err := db_session.Sql(sb.SqlList(), sql_args...).Find(&product_sale_analysis_list)
 	core.HandleError(err)
 
 	for index, product_sale_day_analysis := range product_sale_analysis_list {
-		if product_sale_day_analysis.ProductSaleAnalysis.Type == spbb_models.PRODUCT_SALE_ANALYSIS_TYPE_ACTUAL {
-			product_sale_analysis_list[index].ProductSaleAnalysis.TypeName = "实际仓库发货"
-		}
-
-		if product_sale_day_analysis.ProductSaleAnalysis.Type == spbb_models.PRODUCT_SALE_ANALYSIS_TYPE_LOGIC {
-			product_sale_analysis_list[index].ProductSaleAnalysis.TypeName = "理论仓库发货"
-		}
-
-		if product_sale_day_analysis.ProductSaleAnalysis.Type == spbb_models.PRODUCT_SALE_ANALYSIS_TYPE_SKU {
-			product_sale_analysis_list[index].ProductSaleAnalysis.TypeName = "不分仓统计"
-		}
-
 		var product kcgl_models.ProductInfo
 		_, err := db_session.Id(product_sale_day_analysis.ProductSaleAnalysis.ProductId).Get(&product)
 		core.HandleError(err)
@@ -226,7 +208,7 @@ FROM erp_product_sale_analysis sa
 
 	reader := bytes.NewReader(buffer.Bytes()) //bytes.Reader 实现了 io.Reader 接口
 
-	file_name := "商品销售分析导出.xlsx" //"file.xlsx" //可以根据参数生成文件名
+	file_name := "商品销售排名导出.xlsx" //"file.xlsx" //可以根据参数生成文件名
 
 	return c.RenderBinary(reader, file_name, revel.Attachment, time.Now())
 }
@@ -309,18 +291,6 @@ func (c ErpProductSaleRank) export_analysis_to_excel(db_session *xorm.Session, a
 
 	{
 		cell := row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 10)
-		set_head_cell_style(cell)
-		cell.Value = "统计类型"
-		col_index++
-
-		cell = row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 15)
-		set_head_cell_style(cell)
-		cell.Value = "仓库"
-		col_index++
-
-		cell = row.AddCell()
 		sheet.SetColWidth(col_index, col_index, 15)
 		set_head_cell_style(cell)
 		cell.Value = "SKU"
@@ -332,47 +302,11 @@ func (c ErpProductSaleRank) export_analysis_to_excel(db_session *xorm.Session, a
 		cell.Value = "商品名称"
 		col_index++
 
-		// 90天销量 60天销量 30天销量 15天销量
-
-		if product_sale_analysis_setting.Level1Days != 0 {
-			cell = row.AddCell()
-			sheet.SetColWidth(col_index, col_index, 10)
-			set_head_cell_style(cell)
-			cell.Value = fmt.Sprintf("%d天销量", product_sale_analysis_setting.Level1Days)
-			col_index++
-		}
-
-		if product_sale_analysis_setting.Level2Days != 0 {
-			cell = row.AddCell()
-			sheet.SetColWidth(col_index, col_index, 10)
-			set_head_cell_style(cell)
-			cell.Value = fmt.Sprintf("%d天销量", product_sale_analysis_setting.Level2Days)
-			col_index++
-		}
-
-		if product_sale_analysis_setting.Level3Days != 0 {
-			cell = row.AddCell()
-			sheet.SetColWidth(col_index, col_index, 10)
-			set_head_cell_style(cell)
-			cell.Value = fmt.Sprintf("%d天销量", product_sale_analysis_setting.Level3Days)
-			col_index++
-		}
-
-		if product_sale_analysis_setting.Level4Days != 0 {
-			cell = row.AddCell()
-			sheet.SetColWidth(col_index, col_index, 10)
-			set_head_cell_style(cell)
-			cell.Value = fmt.Sprintf("%d天销量", product_sale_analysis_setting.Level4Days)
-			col_index++
-		}
-
-		if product_sale_analysis_setting.Level5Days != 0 {
-			cell = row.AddCell()
-			sheet.SetColWidth(col_index, col_index, 10)
-			set_head_cell_style(cell)
-			cell.Value = fmt.Sprintf("%d天销量", product_sale_analysis_setting.Level5Days)
-			col_index++
-		}
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 10)
+		set_head_cell_style(cell)
+		cell.Value = "排名"
+		col_index++
 
 		cell = row.AddCell()
 		sheet.SetColWidth(col_index, col_index, 10)
@@ -385,18 +319,8 @@ func (c ErpProductSaleRank) export_analysis_to_excel(db_session *xorm.Session, a
 		row = sheet.AddRow()
 		row.SetHeightCM(common_row_height)
 
-		// 统计类型
-		cell := row.AddCell()
-		set_text_cell_style(cell, "left")
-		cell.Value = analysis.ProductSaleAnalysis.TypeName
-
-		// 仓库
-		cell = row.AddCell()
-		set_text_cell_style(cell, "left")
-		cell.Value = analysis.Stock.Name
-
 		// SKU
-		cell = row.AddCell()
+		cell := row.AddCell()
 		set_text_cell_style(cell, "left")
 		cell.Value = analysis.ProductSaleAnalysis.Sku
 
@@ -405,35 +329,10 @@ func (c ErpProductSaleRank) export_analysis_to_excel(db_session *xorm.Session, a
 		set_text_cell_style(cell, "left")
 		cell.Value = analysis.ProductSaleAnalysis.ProductName
 
-		if product_sale_analysis_setting.Level1Days != 0 {
-			cell = row.AddCell()
-			set_text_cell_style(cell, "center")
-			cell.Value = fmt.Sprint(analysis.ProductSaleAnalysis.Level1Qty)
-		}
-
-		if product_sale_analysis_setting.Level2Days != 0 {
-			cell = row.AddCell()
-			set_text_cell_style(cell, "center")
-			cell.Value = fmt.Sprint(analysis.ProductSaleAnalysis.Level2Qty)
-		}
-
-		if product_sale_analysis_setting.Level3Days != 0 {
-			cell = row.AddCell()
-			set_text_cell_style(cell, "center")
-			cell.Value = fmt.Sprint(analysis.ProductSaleAnalysis.Level3Qty)
-		}
-
-		if product_sale_analysis_setting.Level4Days != 0 {
-			cell = row.AddCell()
-			set_text_cell_style(cell, "center")
-			cell.Value = fmt.Sprint(analysis.ProductSaleAnalysis.Level4Qty)
-		}
-
-		if product_sale_analysis_setting.Level5Days != 0 {
-			cell = row.AddCell()
-			set_text_cell_style(cell, "center")
-			cell.Value = fmt.Sprint(analysis.ProductSaleAnalysis.Level5Qty)
-		}
+		// 排名
+		cell = row.AddCell()
+		set_text_cell_style(cell, "center")
+		cell.Value = fmt.Sprintf("%d", analysis.ProductSaleAnalysis.Rank)
 
 		// 日均销量
 		cell = row.AddCell()
