@@ -167,11 +167,11 @@ FROM erp_product_sale_analysis sa
 func (c ErpProductSaleAnalysis) Analyze() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.SPBB_PRODUCT_SALE_ANALYSIS, c.Session)
 
-	go product_sale_analysis_service.ProductSaleAnalyzeMultipleDay()
+	go product_sale_analysis_service.ProductSaleAnalyze()
 
 	return c.RenderJson(map[string]interface{}{
 		"success": true,
-		"message": "立即启动分档多日销售情况析任务成功！",
+		"message": "启动销售情况后台分析任务成功！",
 	})
 }
 

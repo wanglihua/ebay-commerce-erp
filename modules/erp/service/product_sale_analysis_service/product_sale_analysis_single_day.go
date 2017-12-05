@@ -10,7 +10,7 @@ import (
 
 // 这是的所有统计都以已完成的订单为准，别的订单不统计
 
-func ProductSaleAnalyzeSingleDay() {
+func product_sale_analyze_single_day() {
 	defer func() {
 		if err := recover(); err != nil {
 			revel.ERROR.Printf("商品销售单日分析出现错误： %s\n", err)

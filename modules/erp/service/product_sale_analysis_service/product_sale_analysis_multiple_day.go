@@ -12,7 +12,7 @@ import (
 	"matrix/modules/erp/models/spbb_models"
 )
 
-func ProductSaleAnalyzeMultipleDay() {
+func product_sale_analyze_multiple_day() {
 	defer func() {
 		if err := recover(); err != nil {
 			revel.ERROR.Printf("商品销售多日分析出现错误： %s\n", err)

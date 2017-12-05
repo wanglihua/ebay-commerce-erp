@@ -1,0 +1,220 @@
+{%header "商品销售排名" .%}
+<div id="page">
+    <div class="breadcrumbs" id="breadcrumbs">
+        <ul class="breadcrumb">
+            <li>
+                <a href='{%url "Home.Index"%}'><i class="ace-icon fa fa-home home-icon"></i></a>
+            </li>
+            <li class="parent" data-menu="spbb-menu">商品报表</li>
+            <li class="active" data-menu="spbb-product-sale-rank-menu">商品销售排名</li>
+        </ul>
+    </div>
+    <div class="page-content">
+        <div class="row">
+            <div class="col-xs-12" style="padding: 0;">
+                <div class="gridToolBar clearfix">
+                    <button class="btn btn-primary btn-sm" @click="reloadList('#productSaleAnalysisList')">
+                        <i class="ace-icon fa fa-refresh"></i>
+                        刷新
+                    </button>
+                    <button class="btn btn-pink btn-sm" @click="analyze()">
+                        <i class="ace-icon fa fa-refresh"></i>
+                        立即分析销售情况
+                    </button>
+                    <button class="btn btn-purple btn-sm" @click="exportProductSaleAnalysis()">
+                        <i class="ace-icon fa fa-file-excel-o"></i>
+                        导出
+                    </button>
+                </div>
+                <div id="query" class="col-xs-12" style="line-height: 28px;">
+                    <div class="col-xs-12" style="margin-top: 20px;margin-bottom: 20px;">
+                        <div style="float: left;">
+                            <label for="analysis_type_id">统计类型</label>
+                            <select id="analysis_type_id" name="analysis_type_id" style="width: 150px;" @change="reloadList()">
+                                <option :value="0">统计类型</option>
+                                <template v-for="analysis_type in page.analysis_type_list">
+                                    <option :value="analysis_type.id">{{analysis_type.name}}</option>
+                                </template>
+                            </select>&nbsp;&nbsp;
+                            <label for="stock_id">仓库</label>
+                            <select id="stock_id" name="stock_id" style="width: 150px;" @change="reloadList()">
+                                <option :value="0">仓库查询</option>
+                                <template v-for="stock in page.stock_list">
+                                    <option :value="stock.id">{{stock.name}}</option>
+                                </template>
+                            </select>&nbsp;&nbsp;
+                            <label for="sku_query">商品编号查询</label>
+                            <input id="sku_query" name="sku_query" style="width: 180px;height:30px;"/>
+                            <button class="btn btn-mini btn-primary" style="margin-bottom:3px;height: 30px;" @click="refreshList()">
+                                &nbsp;<i class="ace-icon fa fa-search"></i>查&nbsp;询&nbsp;
+                            </button>
+                        </div>
+                        <div style="clear: both;"></div>
+                    </div>
+                </div>
+                <div>
+                    <table id="productSaleAnalysisList" class="table table-striped table-bordered table-hover"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    var vm = new Vue({
+                el: "#page",
+                data: {
+                    "page": {
+                        "analysis_type_id": 0,
+                        "analysis_type_list": []
+                    }
+                },
+                mounted: function () {
+
+                    var column_list = [
+                        {
+                            "mDataProp": "sa.type", "title": "统计类型", "bSearchable": false, "sClass": "center", "width": 120,
+                            "render": function (data, type, row) {
+                                return row.sa.type_name;
+                            }
+                        },
+                        {"mDataProp": "s.name", "title": "仓库", "bSearchable": true, "sClass": "center", "width": 200},
+                        {
+                            "mDataProp": "sa.sku", "title": "SKU", "bSearchable": true, "width": 200,
+                            "render": function (data, type, row) {
+                                return '<a href="/product/detail/' + row.sa.product_id + '" target="product_detail">' + row.sa.sku + '</a>';
+                            }
+                        },
+                        {"mDataProp": "sa.product_name", "title": "商品名称", "bSearchable": false, "bSortable": false}
+                    ];
+
+                    if ("{% .level1_days %}" !== "0") {
+                        column_list.push({"mDataProp": "sa.level1_qty", "title": "{% .level1_days %}天&nbsp;销量", "bSearchable": false, "sClass": "center", "width": 80});
+                    }
+
+                    if ("{% .level2_days %}" !== "0") {
+                        column_list.push({"mDataProp": "sa.level2_qty", "title": "{% .level2_days %}天&nbsp;销量", "bSearchable": false, "sClass": "center", "width": 80});
+                    }
+
+                    if ("{% .level3_days %}" !== "0") {
+                        column_list.push({"mDataProp": "sa.level3_qty", "title": "{% .level3_days %}天&nbsp;销量", "bSearchable": false, "sClass": "center", "width": 80});
+                    }
+
+                    if ("{% .level4_days %}" !== "0") {
+                        column_list.push({"mDataProp": "sa.level4_qty", "title": "{% .level4_days %}天&nbsp;销量", "bSearchable": false, "sClass": "center", "width": 80});
+                    }
+
+                    if ("{% .level5_days %}" !== "0") {
+                        column_list.push({"mDataProp": "sa.level5_qty", "title": "{% .level5_days %}天&nbsp;销量", "bSearchable": false, "sClass": "center", "width": 80});
+                    }
+
+                    column_list.push({
+                        "mDataProp": "sa.daily_mean_sales", "title": "日均销量", "bSearchable": false, "width": 80, "sClass": "center",
+                        "render": function (data, type, row) {
+                            if (data !== 0) {
+                                return dtFormatFloat(data);
+                            }
+                            else {
+                                return "";
+                            }
+                        }
+                    });
+
+                    initDataTable(
+                            '#productSaleAnalysisList',
+                            {
+                                "sAjaxSource": '{%url "ErpProductSaleAnalysis.ListData"%}',
+                                "aaSorting": [[2, "asc"]],
+                                "aoColumns": column_list,
+                                "fnServerData": function (sSource, aoData, fnCallback) {
+                                    showMask("数据加载中，请稍候");
+                                    aoData.push({'name': 'sku_query', 'value': $("#sku_query").val()});
+                                    aoData.push({'name': 'analysis_type_id', 'value': $("#analysis_type_id").val()});
+                                    aoData.push({'name': 'stock_id', 'value': $("#stock_id").val()});
+
+                                    $.ajax({
+                                        "dataType": 'json',
+                                        "url": sSource,
+                                        "data": aoData,
+                                        "success": function (data) {
+                                            hideMask();
+
+                                            if (data.success === false) {
+                                                $.msg.error(data.message);
+                                                return;
+                                            }
+
+                                            fnCallback(data);
+                                        }
+                                    });
+                                }
+                            }
+                    );
+                },
+                methods: {
+                    reloadList: function () {
+                        reloadList('#productSaleAnalysisList');
+                    },
+                    refreshList: function () {
+                        refreshList('#productSaleAnalysisList');
+                    },
+                    analyze: function () {
+                        $.msg.confirm("将立即启动销售后台分析任务，分析各档多日销售情况。数据建立在已计算好的日销售数据之上。", function () {
+                            $.ajax({
+                                "dataType": 'json',
+                                "url": '{% url "ErpProductSaleAnalysis.Analyze" %}',
+                                "success": function (data) {
+
+                                    if (data.success === false) {
+                                        $.msg.error(data.message);
+                                        return;
+                                    }
+                                    else {
+                                        $.msg.show(data.message);
+                                        return;
+                                    }
+                                }
+                            });
+                        });
+                    },
+                    exportProductSaleAnalysis: function () {
+                        var id_list = [];
+                        $('#productSaleAnalysisList tbody tr>td:first-child input:checkbox').each(function () {
+                            if (this.checked) {
+                                id_list.push($(this).val());
+                            }
+                        });
+
+                        var params = $.param({
+                            "sku_query": $("#sku_query").val(),
+                            "analysis_type_id": $("#analysis_type_id").val(),
+                            "stock_id": $("#stock_id").val()
+                        });
+                        var url = '{%url "ErpProductSaleAnalysis.Export"%}' + "?" + params;
+                        $('<form method="post" action="' + url + '"></form>').appendTo('body').submit().remove();
+                    }
+                }
+            })
+    ;
+
+    function loadPageData() {
+        $.ajax({
+            "dataType": 'json',
+            "url": '{% url "ErpProductSaleAnalysis.PageData" %}',
+            "success": function (data) {
+
+                if (data.success === false) {
+                    $.msg.error(data.message);
+                    return;
+                }
+
+                vm.page = data;
+            }
+        });
+    }
+
+    $(function () {
+        loadPageData();
+    });
+</script>
+{%footer%}
+

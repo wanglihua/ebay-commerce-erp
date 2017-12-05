@@ -167,12 +167,12 @@ FROM erp_product_sale_day_analysis da
 func (c ErpProductSaleDayAnalysis) Analyze() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.SPBB_PRODUCT_SALE_DAY_ANALYSIS, c.Session)
 
-	go product_sale_analysis_service.ProductSaleAnalyzeSingleDay()
+	go product_sale_analysis_service.ProductSaleAnalyze()
 
 	// var days_to_analyze = product_sale_analysis_service.GetDaysToAnalyze(db_session)
 
 	return c.RenderJson(map[string]interface{}{
 		"success": true,
-		"message": "立即启动 近日销售情况单日分析任务成功！",
+		"message": "启动销售情况后台分析任务成功！",
 	})
 }
