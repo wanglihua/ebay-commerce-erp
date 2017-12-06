@@ -189,7 +189,7 @@ func (c ErpOrderNew) Save() revel.Result {
 
 		if pickup_info.IsPaid == 1 {
 			// 如果PICK UP下面选择了已收款，则建单时间默认为支付时间
-			order.PaidTime = order.CreatedTime
+			order.PaidTime = core.MakeNullLongTime(time.Time(order.CreateTime), true)
 			_, err := db_session.Id(order.Id).Cols("paid_time").Update(&order)
 			core.HandleError(err)
 
