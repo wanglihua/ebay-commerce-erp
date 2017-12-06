@@ -268,6 +268,12 @@ func (c ErpOrderLogisticsFeeDiff) get_export_excel(db_session *xorm.Session) *xl
 		sheet.SetColWidth(col_index, col_index, 10)
 		set_head_cell_style(cell)
 		cell.Value = "支付时间"
+
+		col_index++
+		cell = header_row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 10)
+		set_head_cell_style(cell)
+		cell.Value = "发货时间"
 	}
 
 	order_logistics_view_list, _ := c.get_list_data(true)
@@ -353,9 +359,17 @@ func (c ErpOrderLogisticsFeeDiff) get_export_excel(db_session *xorm.Session) *xl
 		// 支付时间
 		cell = row.AddCell()
 		set_text_cell_style(cell, "center")
-
 		if order_logistics_view.Order.PaidTime.Valid {
 			cell.Value = order_logistics_view.Order.PaidTime.Time.Format("2006-01-02 15:04")
+		} else {
+			cell.Value = ""
+		}
+
+		// 发货时间
+		cell = row.AddCell()
+		set_text_cell_style(cell, "center")
+		if order_logistics_view.Order.ShippedTime.Valid {
+			cell.Value = order_logistics_view.Order.ShippedTime.Time.Format("2006-01-02 15:04")
 		} else {
 			cell.Value = ""
 		}
