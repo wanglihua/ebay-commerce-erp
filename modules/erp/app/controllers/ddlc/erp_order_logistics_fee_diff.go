@@ -265,13 +265,13 @@ func (c ErpOrderLogisticsFeeDiff) get_export_excel(db_session *xorm.Session) *xl
 
 		col_index++
 		cell = header_row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 10)
+		sheet.SetColWidth(col_index, col_index, 18)
 		set_head_cell_style(cell)
 		cell.Value = "支付时间"
 
 		col_index++
 		cell = header_row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 10)
+		sheet.SetColWidth(col_index, col_index, 18)
 		set_head_cell_style(cell)
 		cell.Value = "发货时间"
 	}
