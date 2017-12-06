@@ -1,0 +1,147 @@
+{%header "商品销售趋势分析" .%}
+<div id="page">
+    <div class="breadcrumbs" id="breadcrumbs">
+        <ul class="breadcrumb">
+            <li>
+                <a href='{%url "Home.Index"%}'><i class="ace-icon fa fa-home home-icon"></i></a>
+            </li>
+            <li class="parent" data-menu="spbb-menu">商品报表</li>
+            <li class="active" data-menu="spbb-product-sale-rank-menu">商品销售趋势分析</li>
+        </ul>
+    </div>
+    <div class="page-content">
+        <div class="row">
+            <div class="col-xs-12" style="padding: 0;">
+                <div class="gridToolBar clearfix">
+                    <button class="btn btn-primary btn-sm" @click="reloadList('#productSaleRankList')">
+                        <i class="ace-icon fa fa-refresh"></i>
+                        刷新
+                    </button>
+                </div>
+                <div>
+                    <table id="productSaleRankList" class="table table-striped table-bordered table-hover"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    var vm = new Vue({
+        el: "#page",
+        data: {
+            "page": {
+                "analysis_type_id": 0,
+                "analysis_type_list": []
+            }
+        },
+        mounted: function () {
+
+            initDataTable(
+                    '#productSaleRankList',
+                    {
+                        "sAjaxSource": '{%url "ErpProductSaleRank.ListData"%}',
+                        "aaSorting": [[2, "asc"]],
+                        "aoColumns": [
+                            {
+                                "mDataProp": "sa.product_id",
+                                "bSearchable": false,
+                                "orderable": false,
+                                "sClass": "center",
+                                "width": 50,
+                                "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
+                                "render": function (data, type, row) {
+                                    return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
+                                }
+                            },
+                            {
+                                "mDataProp": "sa.sku", "title": "SKU", "bSearchable": true, "width": 200,
+                                "render": function (data, type, row) {
+                                    return '<a href="/product/detail/' + row.sa.product_id + '" target="product_detail">' + row.sa.sku + '</a>';
+                                }
+                            },
+                            {"mDataProp": "sa.product_name", "title": "商品名称", "bSearchable": false, "bSortable": false},
+                            {"mDataProp": "sa.rank", "title": "排名", "bSearchable": false, "bSortable": true, "width": 80},
+                            {
+                                "mDataProp": "sa.daily_mean_sales", "title": "日均销量", "bSearchable": false, "width": 80, "sClass": "center",
+                                "render": function (data, type, row) {
+                                    if (data !== 0) {
+                                        return dtFormatFloat(data);
+                                    }
+                                    else {
+                                        return "";
+                                    }
+                                }
+                            }
+                        ],
+                        "fnServerData": function (sSource, aoData, fnCallback) {
+                            showMask("数据加载中，请稍候");
+                            aoData.push({'name': 'sku_query', 'value': $("#sku_query").val()});
+                            aoData.push({'name': 'analysis_type_id', 'value': $("#analysis_type_id").val()});
+                            aoData.push({'name': 'stock_id', 'value': $("#stock_id").val()});
+
+                            $.ajax({
+                                "dataType": 'json',
+                                "url": sSource,
+                                "data": aoData,
+                                "success": function (data) {
+                                    hideMask();
+
+                                    if (data.success === false) {
+                                        $.msg.error(data.message);
+                                        return;
+                                    }
+
+                                    fnCallback(data);
+                                }
+                            });
+                        }
+                    }
+            );
+        },
+        methods: {
+            reloadList: function () {
+                reloadList('#productSaleRankList');
+            },
+            refreshList: function () {
+                refreshList('#productSaleRankList');
+            },
+            analyze: function () {
+                $.msg.confirm("将立即启动销售后台分析任务！", function () {
+                    $.ajax({
+                        "dataType": 'json',
+                        "url": '{% url "ErpProductSaleRank.Analyze" %}',
+                        "success": function (data) {
+
+                            if (data.success === false) {
+                                $.msg.error(data.message);
+                                return;
+                            }
+                            else {
+                                $.msg.show(data.message);
+                                return;
+                            }
+                        }
+                    });
+                });
+            },
+            exportProductSaleRank: function () {
+                var id_list = [];
+                $('#productSaleRankList tbody tr>td:first-child input:checkbox').each(function () {
+                    if (this.checked) {
+                        id_list.push($(this).val());
+                    }
+                });
+
+                var params = $.param({
+                    "sku_query": $("#sku_query").val(),
+                    "analysis_type_id": $("#analysis_type_id").val(),
+                    "stock_id": $("#stock_id").val()
+                });
+                var url = '{%url "ErpProductSaleRank.Export"%}' + "?" + params;
+                $('<form method="post" action="' + url + '"></form>').appendTo('body').submit().remove();
+            }
+        }
+    });
+</script>
+{%footer%}
+

@@ -671,6 +671,9 @@ POST /product/sale/rank/data/list          ErpProductSaleRank.ListData
 POST /product/sale/rank/analyze            ErpProductSaleRank.Analyze
 POST /product/sale/rank/export             ErpProductSaleRank.Export
 
+GET  /product/sale/trend                    ErpProductSaleTrend.Index
+POST /product/sale/trend/data/list          ErpProductSaleTrend.ListData
+
 GET  /order/new/create           ErpOrderNew.Create
 POST /order/new/create/data      ErpOrderNew.CreateData
 POST /order/new/save             ErpOrderNew.Save
