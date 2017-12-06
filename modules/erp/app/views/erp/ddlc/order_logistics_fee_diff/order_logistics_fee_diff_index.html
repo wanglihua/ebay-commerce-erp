@@ -138,183 +138,188 @@
 
             //请求页面数据
             $.ajax({
-                    url: '{%url "ErpOrderLogisticsFeeDiff.PageData" %}',
-                    type: "POST",
-                    success: function (result) {
-                        if (result.success == false) {
-                            $.msg.error(result.message);
-                            return;
-                        }
-                        this_vm.page = result;
+                url: '{%url "ErpOrderLogisticsFeeDiff.PageData" %}',
+                type: "POST",
+                success: function (result) {
+                    if (result.success === false) {
+                        $.msg.error(result.message);
+                        return;
                     }
+                    this_vm.page = result;
                 }
-            );
+            });
 
             initDataTable(
-                '#orderLogisticsList',
-                {
-                    "sAjaxSource": '{%url "ErpOrderLogisticsFeeDiff.ListData"%}',
-                    "aaSorting": [[0, "desc"]],
-                    "aoColumns": [
-                        {
-                            "mDataProp": "ol.id",
-                            "bSearchable": false,
-                            "orderable": false,
-                            "sClass": "center",
-                            "width": 50,
-                            "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
-                            "render": function (data, type, row) {
-                                return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
+                    '#orderLogisticsList',
+                    {
+                        "sAjaxSource": '{%url "ErpOrderLogisticsFeeDiff.ListData"%}',
+                        "aaSorting": [[0, "desc"]],
+                        "aoColumns": [
+                            {
+                                "mDataProp": "ol.id",
+                                "bSearchable": false,
+                                "orderable": false,
+                                "sClass": "center",
+                                "width": 50,
+                                "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
+                                "render": function (data, type, row) {
+                                    return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
+                                }
+                            },
+                            {
+                                "mDataProp": "o.code", "title": "订单编号", "bSearchable": true, "width": 100,
+                                "render": function (data, type, row) {
+                                    return "<div style='min-width: 100px;white-space:normal; word-break: break-all; word-wrap:break-word;'><a href='/order/detail/" + row.o.id + "' target='_blank'>" + data + "</a></div>";
+                                }
+                            },
+                            {
+                                "mDataProp": "o.full_tran_id", "title": "订单代码", "bSearchable": true, "width": 80,
+                                "render": function (data, type, row) {
+                                    return "<div style='min-width: 80px;white-space:normal; word-break: break-all; word-wrap:break-word;'>" + data + "</div>";
+                                }
+                            },
+                            // {"mDataProp": "stock_name", "title": "发货仓库", "bSearchable": false, "bSortable": false, "width": 90},
+                            // {"mDataProp": "company_name", "title": "物流公司", "bSearchable": false, "bSortable": false, "width": 90},
+                            {
+                                "mDataProp": "mode_name",
+                                "title": "物流方式",
+                                "bSearchable": false,
+                                "bSortable": false
+                            },
+                            {
+                                "mDataProp": "ol.length", "title": "长度", "bSearchable": false, "width": 65,
+                                "render": function (data, type, row) {
+                                    if (data !== "" && data !== 0) {
+                                        return dtFormatFloat(data) + " cm";
+                                    }
+                                    else {
+                                        return "";
+                                    }
+                                }
+                            },
+                            {
+                                "mDataProp": "ol.width", "title": "宽度", "bSearchable": false, "width": 65,
+                                "render": function (data, type, row) {
+                                    if (data !== "" && data !== 0) {
+                                        return dtFormatFloat(data) + " cm";
+                                    }
+                                    else {
+                                        return "";
+                                    }
+                                }
+                            },
+                            {
+                                "mDataProp": "ol.height", "title": "高度", "bSearchable": false, "width": 65,
+                                "render": function (data, type, row) {
+                                    if (data !== "" && data !== 0) {
+                                        return dtFormatFloat(data) + " cm";
+                                    }
+                                    else {
+                                        return "";
+                                    }
+                                }
+                            },
+                            {
+                                "mDataProp": "ol.dim_weight", "title": "体积重", "bSearchable": false, "width": 65,
+                                "render": function (data, type, row) {
+                                    if (data !== "" && data !== 0) {
+                                        return dtFormatFloat(data) + " kg";
+                                    }
+                                    else {
+                                        return "";
+                                    }
+                                }
+                            },
+                            {
+                                "mDataProp": "ol.weight", "title": "实际重", "bSearchable": false, "width": 65,
+                                "render": function (data, type, row) {
+                                    if (data !== "" && data !== 0) {
+                                        return dtFormatFloat(data) + " kg";
+                                    }
+                                    else {
+                                        return "";
+                                    }
+                                }
+                            },
+                            {
+                                "mDataProp": "ol.sfkltjz", "title": "是否考虑体积重", "bSearchable": false, "width": 65,
+                                "render": function (data, type, row) {
+                                    if (data === 0) {
+                                        return "";
+                                    } else if (data === -1) {
+                                        return "否";
+                                    } else if (data === 1) {
+                                        return "是"
+                                    }
+                                }
+                            },
+                            {
+                                "mDataProp": "ol.pick_fee", "title": "拣货费用", "bSearchable": false, "width": 75,
+                                "render": function (data, type, row) {
+                                    if (data !== "" && data !== 0) {
+                                        return "AU " + dtFormatFloat(data);
+                                    }
+                                    else {
+                                        return "";
+                                    }
+                                }
+                            },
+                            {
+                                "mDataProp": "ol.total_fee", "title": "预估物流费用", "bSearchable": false, "width": 100,
+                                "render": function (data, type, row) {
+                                    if (data !== "" && data !== 0) {
+                                        return "AU " + dtFormatFloat(data);
+                                    }
+                                    else {
+                                        return "";
+                                    }
+                                }
+                            },
+                            {
+                                "mDataProp": "ol.actual_fee", "title": "实际物流费用", "bSearchable": false, "width": 100,
+                                "render": function (data, type, row) {
+                                    if (data !== "" && data !== 0) {
+                                        return "AU " + dtFormatFloat(data);
+                                    }
+                                    else {
+                                        return "";
+                                    }
+                                }
+                            },
+                            {
+                                "mDataProp": "o.paid_time", "title": "支付时间", "bSearchable": false, "width": 120,
+                                "render": function (data, type, row) {
+                                    return data;
+                                }
                             }
-                        },
-                        {
-                            "mDataProp": "o.code", "title": "订单编号", "bSearchable": true, "width": 100,
-                            "render": function (data, type, row) {
-                                return "<div style='min-width: 100px;white-space:normal; word-break: break-all; word-wrap:break-word;'><a href='/order/detail/" + row.o.id + "' target='_blank'>" + data + "</a></div>";
-                            }
-                        },
-                        {
-                            "mDataProp": "o.full_tran_id", "title": "订单代码", "bSearchable": true, "width": 80,
-                            "render": function (data, type, row) {
-                                return "<div style='min-width: 80px;white-space:normal; word-break: break-all; word-wrap:break-word;'>" + data + "</div>";
-                            }
-                        },
-                        // {"mDataProp": "stock_name", "title": "发货仓库", "bSearchable": false, "bSortable": false, "width": 90},
-                        // {"mDataProp": "company_name", "title": "物流公司", "bSearchable": false, "bSortable": false, "width": 90},
-                        {
-                            "mDataProp": "mode_name",
-                            "title": "物流方式",
-                            "bSearchable": false,
-                            "bSortable": false
-                        },
-                        {
-                            "mDataProp": "ol.length", "title": "长度", "bSearchable": false, "width": 65,
-                            "render": function (data, type, row) {
-                                if (data != "" && data != 0) {
-                                    return dtFormatFloat(data) + " cm";
+                        ],
+                        "fnServerData": function (sSource, aoData, fnCallback) {
+                            showMask("数据加载中，请稍候");
+
+                            aoData.push({'name': 'stock_id', 'value': this_vm.page.stock_id});
+                            aoData.push({'name': 'logistics_company_id', 'value': this_vm.page.logistics_company_id});
+                            aoData.push({'name': 'batch_code', 'value': this_vm.page.batch_code});
+                            aoData.push({'name': 'begin_time_query', 'value': $("#begin_time_query").val()});
+                            aoData.push({'name': 'end_time_query', 'value': $("#end_time_query").val()});
+                            aoData.push({'name': 'fee_diff_type_code', 'value': this_vm.page.fee_diff_type_code});
+
+                            $.ajax({
+                                "dataType": 'json',
+                                "url": sSource,
+                                "data": aoData,
+                                "success": function (data) {
+                                    hideMask();
+
+                                    if (data.success === false) {
+                                        $.msg.error(data.message);
+                                        return;
+                                    }
+
+                                    fnCallback(data);
                                 }
-                                else {
-                                    return "";
-                                }
-                            }
-                        },
-                        {
-                            "mDataProp": "ol.width", "title": "宽度", "bSearchable": false, "width": 65,
-                            "render": function (data, type, row) {
-                                if (data != "" && data != 0) {
-                                    return dtFormatFloat(data) + " cm";
-                                }
-                                else {
-                                    return "";
-                                }
-                            }
-                        },
-                        {
-                            "mDataProp": "ol.height", "title": "高度", "bSearchable": false, "width": 65,
-                            "render": function (data, type, row) {
-                                if (data != "" && data != 0) {
-                                    return dtFormatFloat(data) + " cm";
-                                }
-                                else {
-                                    return "";
-                                }
-                            }
-                        },
-                        {
-                            "mDataProp": "ol.dim_weight", "title": "体积重", "bSearchable": false, "width": 65,
-                            "render": function (data, type, row) {
-                                if (data != "" && data != 0) {
-                                    return dtFormatFloat(data) + " kg";
-                                }
-                                else {
-                                    return "";
-                                }
-                            }
-                        },
-                        {
-                            "mDataProp": "ol.weight", "title": "实际重", "bSearchable": false, "width": 65,
-                            "render": function (data, type, row) {
-                                if (data != "" && data != 0) {
-                                    return dtFormatFloat(data) + " kg";
-                                }
-                                else {
-                                    return "";
-                                }
-                            }
-                        },
-                        {
-                            "mDataProp": "ol.sfkltjz", "title": "是否考虑体积重", "bSearchable": false, "width": 65,
-                            "render": function (data, type, row) {
-                                if (data === 0) {
-                                    return "";
-                                } else if (data === -1) {
-                                    return "否";
-                                } else if (data === 1) {
-                                    return "是"
-                                }
-                            }
-                        },
-                        {
-                            "mDataProp": "ol.pick_fee", "title": "拣货费用", "bSearchable": false, "width": 75,
-                            "render": function (data, type, row) {
-                                if (data != "" && data != 0) {
-                                    return "AU " + dtFormatFloat(data);
-                                }
-                                else {
-                                    return "";
-                                }
-                            }
-                        },
-                        {
-                            "mDataProp": "ol.total_fee", "title": "预估物流费用", "bSearchable": false, "width": 100,
-                            "render": function (data, type, row) {
-                                if (data != "" && data != 0) {
-                                    return "AU " + dtFormatFloat(data);
-                                }
-                                else {
-                                    return "";
-                                }
-                            }
-                        },
-                        {
-                            "mDataProp": "ol.actual_fee", "title": "实际物流费用", "bSearchable": false, "width": 100,
-                            "render": function (data, type, row) {
-                                if (data != "" && data != 0) {
-                                    return "AU " + dtFormatFloat(data);
-                                }
-                                else {
-                                    return "";
-                                }
-                            }
+                            });
                         }
-                    ],
-                    "fnServerData": function (sSource, aoData, fnCallback) {
-                        showMask("数据加载中，请稍候");
-
-                        aoData.push({'name': 'stock_id', 'value': this_vm.page.stock_id});
-                        aoData.push({'name': 'logistics_company_id', 'value': this_vm.page.logistics_company_id});
-                        aoData.push({'name': 'batch_code', 'value': this_vm.page.batch_code});
-                        aoData.push({'name': 'begin_time_query', 'value': $("#begin_time_query").val()});
-                        aoData.push({'name': 'end_time_query', 'value': $("#end_time_query").val()});
-                        aoData.push({'name': 'fee_diff_type_code', 'value': this_vm.page.fee_diff_type_code});
-
-                        $.ajax({
-                            "dataType": 'json',
-                            "url": sSource,
-                            "data": aoData,
-                            "success": function (data) {
-                                hideMask();
-
-                                if (data.success == false) {
-                                    $.msg.error(data.message);
-                                    return;
-                                }
-
-                                fnCallback(data);
-                            }
-                        });
                     }
-                }
             );
         },
         methods: {
@@ -336,14 +341,6 @@
     });
 
     function export_excel() {
-        /*
-         aoData.push({'name': 'stock_id', 'value': this_vm.page.stock_id});
-         aoData.push({'name': 'logistics_company_id', 'value': this_vm.page.logistics_company_id});
-         aoData.push({'name': 'batch_code', 'value': this_vm.page.batch_code});
-         aoData.push({'name': 'begin_time_query', 'value': this_vm.page.begin_time_query});
-         aoData.push({'name': 'end_time_query', 'value': this_vm.page.end_time_query});
-         */
-
         var id_list = [];
         $('#orderLogisticsList tbody tr>td:first-child input:checkbox').each(function () {
             if (this.checked) {
