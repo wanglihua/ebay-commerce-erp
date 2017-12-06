@@ -9,6 +9,7 @@ import (
 	"matrix/modules/erp/models/kcgl_models"
 	"matrix/modules/erp/models/sppz_models"
 	"matrix/modules/erp/models/spbb_models"
+	"strings"
 )
 
 type ErpProductSaleTrend struct {
@@ -17,6 +18,22 @@ type ErpProductSaleTrend struct {
 
 func (c ErpProductSaleTrend) Index() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.SPBB_PRODUCT_SALE_RANK, c.Session)
+
+	var db_session = c.DbSession
+
+	var product_id_list = make([]int64, 0)
+	c.Params.Bind(&product_id_list, "product_id_list")
+
+	// 显示当前趋势分析的商品名
+	var product_list = make([]kcgl_models.ProductInfo, 0)
+	core.HandleError(db_session.In("id", product_id_list).Find(&product_list))
+
+	var product_name_list = make([]string, 0)
+	for _, product := range product_list {
+		product_name_list = append(product_name_list, product.CnName)
+	}
+
+	c.RenderArgs["product_names"] = strings.Join(product_name_list, ",")
 
 	return c.RenderTemplate("erp/spbb/product_sale_trend/product_sale_trend_index.html")
 }
