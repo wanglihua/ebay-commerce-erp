@@ -468,10 +468,10 @@ func (c ErpPurchaseBillEntry) PurchaseInTurn() revel.Result {
 	 */
 
 	// 检查状态
-	if bill_entry_in_db.StatusId == models.PURCHASE_BILL_STATUS_YCJ || bill_entry_in_db.StatusId == models.PURCHASE_BILL_STATUS_YTJ {
+	if bill_entry_in_db.StatusId != models.PURCHASE_BILL_STATUS_YTJ && bill_entry_in_db.StatusId != models.PURCHASE_BILL_STATUS_YSP && bill_entry_in_db.StatusId != models.PURCHASE_BILL_STATUS_CGZ {
 		return c.RenderJson(map[string]interface{}{
 			"success": false,
-			"message": "采购单明细还没审批，不能进行分批采购！",
+			"message": "采购单明细还没提交或已入库，不能进行分批采购！",
 		})
 	}
 
