@@ -457,11 +457,21 @@ func (c ErpPurchaseBillEntry) PurchaseInTurn() revel.Result {
 	}
 	*/
 
+	/*
+	PURCHASE_BILL_STATUS_YCJ = 4400 // 采购单状态 已创建
+	PURCHASE_BILL_STATUS_YTJ = 4450 // 采购单状态 已提交
+	PURCHASE_BILL_STATUS_YSP = 4500 // 采购单状态 已审批
+	PURCHASE_BILL_STATUS_CGZ = 4600 // 采购单状态 采购中
+	PURCHASE_BILL_STATUS_YRK = 4700 // 采购单状态 已入库
+	PURCHASE_BILL_STATUS_YC  = 4710 // 采购单状态 异常
+	PURCHASE_BILL_STATUS_YCL = 4720 // 采购单状态 异常已处理
+	 */
+
 	// 检查状态
-	if bill_entry_in_db.StatusId != models.PURCHASE_BILL_STATUS_YSP {
+	if bill_entry_in_db.StatusId == models.PURCHASE_BILL_STATUS_YCJ || bill_entry_in_db.StatusId == models.PURCHASE_BILL_STATUS_YTJ {
 		return c.RenderJson(map[string]interface{}{
 			"success": false,
-			"message": "采购单明细状态当前不是采购中状态，不能进行分批采购！",
+			"message": "采购单明细还没审批，不能进行分批采购！",
 		})
 	}
 
