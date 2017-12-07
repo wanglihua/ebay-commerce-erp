@@ -445,11 +445,15 @@
                 }
                 vm.purchase_bill_entry_detail = result;
 
+                /* 不换是不是分批入库的都要输入提货费
                 if (result.is_in_turn === true) {
                     $("#div_final_expenses").show();
                 } else {
                     $("#div_final_expenses").hide();
                 }
+                */
+
+                $("#div_final_expenses").show();
 
                 $("#abnormal_type_id").removeAttr("disabled");
                 $("#btnCheckin").attr("onclick", "checkin();");
