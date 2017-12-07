@@ -10,6 +10,7 @@ import (
 	"matrix/modules/erp/models/sppz_models"
 	"matrix/modules/erp/models/spbb_models"
 	"strings"
+	"fmt"
 )
 
 type ErpProductSaleTrend struct {
@@ -24,16 +25,27 @@ func (c ErpProductSaleTrend) Index() revel.Result {
 	var product_id_list = make([]int64, 0)
 	c.Params.Bind(&product_id_list, "product_id_list")
 
-	// 显示当前趋势分析的商品名
-	var product_list = make([]kcgl_models.ProductInfo, 0)
-	core.HandleError(db_session.In("id", product_id_list).Find(&product_list))
+	if len(product_id_list) != 0 {
 
-	var product_name_list = make([]string, 0)
-	for _, product := range product_list {
-		product_name_list = append(product_name_list, product.CnName)
+		// 显示当前趋势分析的商品名
+		var product_list = make([]kcgl_models.ProductInfo, 0)
+		core.HandleError(db_session.In("id", product_id_list).Find(&product_list))
+
+		var product_name_list = make([]string, 0)
+		for _, product := range product_list {
+			product_name_list = append(product_name_list, product.CnName)
+		}
+
+		c.RenderArgs["product_names"] = strings.Join(product_name_list, ",")
+	} else {
+		c.RenderArgs["product_names"] = ""
 	}
 
-	c.RenderArgs["product_names"] = strings.Join(product_name_list, ",")
+	var product_id_str_list = make([]string, 0)
+	for _, product_id := range product_id_list {
+		product_id_str_list = append(product_id_str_list, fmt.Sprint(product_id))
+	}
+	c.RenderArgs["product_id_strs"] = strings.Join(product_id_str_list, ",")
 
 	return c.RenderTemplate("erp/spbb/product_sale_trend/product_sale_trend_index.html")
 }
