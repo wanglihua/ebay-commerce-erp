@@ -60,7 +60,7 @@ func (c ErpProductSaleTrend) ListData() revel.Result {
 	c.Params.Bind(&product_id_strs, "product_ids")
 
 	var time_now = time.Now()
-	var today_date = time.Date(time_now.Year(), time_now.Month(), time_now.Day(), 0, 0, 0, 0, nil)
+	var today_date = time.Date(time_now.Year(), time_now.Month(), time_now.Day(), 0, 0, 0, 0, time.Local)
 
 	var query_begin_time string
 	c.Params.Bind(&query_begin_time, "query_begin_time")
@@ -136,12 +136,12 @@ func (c ErpProductSaleTrend) ListData() revel.Result {
 SELECT ifnull(ta.qty, 0) AS qty
 FROM erp_product_sale_analysis_time_range tr
     LEFT JOIN erp_product_sale_trend_analysis ta ON tr.id = ta.time_range_id
-WHERE tr.begin_time > ?
-      AND tr.end_time < ?
+WHERE tr.begin_time >= ?
+      AND tr.end_time <= ?
       AND (ta.product_id IS NULL OR ta.product_id = ?)
 ORDER BY tr.begin_time ASC;`
 		var item_qty_list = make([]item_qty_t, 0)
-		core.HandleError(db_session.Sql(sql_product_range_qty, query_begin_time, query_end_time, product.Id).Find(&item_qty_list))
+		core.HandleError(db_session.Sql(sql_product_range_qty, query_begin_date, query_end_date, product.Id).Find(&item_qty_list))
 
 		var qty_list = make([]int64, 0)
 		for _, item_qty := range item_qty_list {
