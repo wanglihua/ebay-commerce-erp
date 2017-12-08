@@ -127,64 +127,55 @@ func (c ErpProductSaleTrend) ListData() revel.Result {
 
 	var series = make([]interface{}, 0)
 
+	type item_qty_t struct {
+		Qty int64 `xorm:"'qty'"`
+	}
+
 	for _, product := range product_list {
-		_ = product
-	}
+		var sql_product_range_qty = `
+SELECT ifnull(ta.qty, 0) AS qty
+FROM erp_product_sale_analysis_time_range tr
+    LEFT JOIN erp_product_sale_trend_analysis ta ON tr.id = ta.time_range_id
+WHERE tr.begin_time > ?
+      AND tr.end_time < ?
+      AND (ta.product_id IS NULL OR ta.product_id = ?)
+ORDER BY tr.begin_time ASC;`
+		var item_qty_list = make([]item_qty_t, 0)
+		core.HandleError(db_session.Sql(sql_product_range_qty, query_begin_time, query_end_time, product.Id).Find(&item_qty_list))
 
-	var high_temp_data = map[string]interface{}{
-		"name": "最高气温",
-		"type": "line",
-		"data": []int64{11, 11, 15, 13, 12, 13, 10},
-		"markPoint": map[string]interface{}{
-			"data": []interface{}{
-				map[string]interface{}{
-					"type": "max",
-					"name": "最大值",
-				},
-				map[string]interface{}{
-					"type": "min",
-					"name": "最小值",
-				},
-			},
-		},
-		"markLine": map[string]interface{}{
-			"data": []interface{}{
-				map[string]interface{}{
-					"type": "average",
-					"name": "平均值",
-				},
-			},
-		},
-	}
+		var qty_list = make([]int64, 0)
+		for _, item_qty := range item_qty_list {
+			qty_list = append(qty_list, item_qty.Qty)
+		}
 
-	var low_temp_data = map[string]interface{}{
-		"name": "最低气温",
-		"type": "line",
-		"data": []int64{1, -2, 2, 5, 3, 2, 0},
-		"markPoint": map[string]interface{}{
-			"data": []interface{}{
-				map[string]interface{}{
-					"type": "max",
-					"name": "最大值",
-				},
-				map[string]interface{}{
-					"type": "min",
-					"name": "最小值",
-				},
-			},
-		},
-		"markLine": map[string]interface{}{
-			"data": []interface{}{
-				map[string]interface{}{
-					"type": "average",
-					"name": "平均值",
+		var serie_data = map[string]interface{}{
+			"name": product.Sku,
+			"type": "line",
+			"data": qty_list,
+			"markPoint": map[string]interface{}{
+				"data": []interface{}{
+					map[string]interface{}{
+						"type": "max",
+						"name": "最大值",
+					},
+					map[string]interface{}{
+						"type": "min",
+						"name": "最小值",
+					},
 				},
 			},
-		},
-	}
+			"markLine": map[string]interface{}{
+				"data": []interface{}{
+					map[string]interface{}{
+						"type": "average",
+						"name": "平均值",
+					},
+				},
+			},
+		}
 
-	series = append(series, high_temp_data)
-	series = append(series, low_temp_data)
+		series = append(series, serie_data)
+	}
 
 	var options = map[string]interface{}{
 		"title": map[string]interface{}{
