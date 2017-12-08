@@ -50,7 +50,7 @@
                             <th>异常类型</th>
                             <th>SKU</th>
                             <th>名称</th>
-                            <th>数量</th>
+                            <th>数量/入库数量/异常数量</th>
                             <th id="th_apply_time">采购时间</th>
                             <th id="th_checkin_time">入库时间</th>
                             <th>备注</th>
@@ -206,82 +206,87 @@
             var this_vm = this;
 
             initDataTable(
-                '#purchaseBillEntryList',
-                {
-                    "sAjaxSource": '{%url "ErpPurchaseAbnormal.ListData"%}',
-                    "aaSorting": [[1, "asc"]],
-                    "aoColumns": [
-                        {
-                            "mDataProp": "pbe.id",
-                            "bSearchable": false,
-                            "orderable": false,
-                            "sClass": "center",
-                            "width": 50,
-                            "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
-                            "render": function (data, type, row) {
-                                return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
-                            }
-                        },
-                        {"mDataProp": "pb.code", "title": "采购批次号", "bSearchable": true, "width": 100},
-                        {"mDataProp": "s.name", "title": "状态", "bSearchable": true, "width": 60},
-                        {"mDataProp": "at.name", "title": "异常类型", "bSearchable": true, "width": 80},
-                        {"mDataProp": "p.sku", "title": "SKU", "bSearchable": true, "width": 100},
-                        {
-                            "mDataProp": "p.cn_name", "title": "名称", "bSearchable": true, "sClass": "wrap-word",
-                            "render": function (data, type, row) {
-                                return "<div>" + data + "</div>";
-                            }
-                        },
-                        {"mDataProp": "pbe.qty", "title": "数量", "bSearchable": false, "sClass": "center", "width": 60},
-                        {
-                            "mDataProp": "pb.apply_time", "title": "采购时间", "bSearchable": false, "width": 120, "sClass": "center",
-                            "render": function (data, type, row) {
-                                return "<div class='div_apply_time'>" + row.pb.apply_time + "</div><div>" + row.pbe.checkin_time + "</div>";
-                            }
-                        },
-                        {
-                            "mDataProp": "pbe.checkin_time", "title": "入库时间", "bSearchable": false, "width": 120, "sClass": "center",
-                            "render": function (data, type, row) {
-                                return "<div class='div_checkin_time'>" + data + "</div>";
-                            }
-                        },
-                        {
-                            "mDataProp": "pbe.desc", "title": "备注", "bSearchable": true, "sClass": "wrap-word",
-                            "render": function (data, type, row) {
-                                if (data === null) {
-                                    return ""
+                    '#purchaseBillEntryList',
+                    {
+                        "sAjaxSource": '{%url "ErpPurchaseAbnormal.ListData"%}',
+                        "aaSorting": [[1, "asc"]],
+                        "aoColumns": [
+                            {
+                                "mDataProp": "pbe.id",
+                                "bSearchable": false,
+                                "orderable": false,
+                                "sClass": "center",
+                                "width": 50,
+                                "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
+                                "render": function (data, type, row) {
+                                    return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
                                 }
-                                else {
+                            },
+                            {"mDataProp": "pb.code", "title": "采购批次号", "bSearchable": true, "width": 100},
+                            {"mDataProp": "s.name", "title": "状态", "bSearchable": true, "width": 60},
+                            {"mDataProp": "at.name", "title": "异常类型", "bSearchable": true, "width": 80},
+                            {"mDataProp": "p.sku", "title": "SKU", "bSearchable": true, "width": 100},
+                            {
+                                "mDataProp": "p.cn_name", "title": "名称", "bSearchable": true, "sClass": "wrap-word",
+                                "render": function (data, type, row) {
                                     return "<div>" + data + "</div>";
                                 }
-                            }
-                        }
-                    ],
-                    "fnServerData": function (sSource, aoData, fnCallback) {
-                        showMask("数据加载中，请稍候");
-
-                        aoData.push({'name': 'bill_code_query', 'value': this_vm.page.bill_code_query});
-                        aoData.push({'name': 'status_id_query', 'value': this_vm.page.status_id_query});
-
-                        $.ajax(
+                            },
                             {
-                                "dataType": 'json',
-                                "url": sSource,
-                                "data": aoData,
-                                "success": function (data) {
-                                    hideMask();
-                                    if (data.success === false) {
-                                        $.msg.error(data.message);
-                                        return;
-                                    }
-                                    fnCallback(data);
-
-                                    $("#purchaseBillEntryList div.div_apply_time").parent().css("width", "120px");
-                                    $("#purchaseBillEntryList div.div_checkin_time").parent().css("display", "none");
+                                "mDataProp": "pbe.qty", "title": "数量/入库数量/异常数量", "bSearchable": false, "sClass": "center", "width": 160,
+                                "render": function (data, type, row) {
+                                    return "<div>" + data + "/" + row.pbe.checkin_qty + "/" + (row.pbe.qty - row.pbe.checkin_qty) + "</div>";
                                 }
-                            });
+                            },
+                            {
+                                "mDataProp": "pb.apply_time", "title": "采购时间", "bSearchable": false, "width": 120, "sClass": "center",
+                                "render": function (data, type, row) {
+                                    return "<div class='div_apply_time'>" + row.pb.apply_time + "</div><div>" + row.pbe.checkin_time + "</div>";
+                                }
+                            },
+                            {
+                                "mDataProp": "pbe.checkin_time", "title": "入库时间", "bSearchable": false, "width": 120, "sClass": "center",
+                                "render": function (data, type, row) {
+                                    return "<div class='div_checkin_time'>" + data + "</div>";
+                                }
+                            },
+                            {
+                                "mDataProp": "pbe.desc", "title": "备注", "bSearchable": true, "sClass": "wrap-word",
+                                "render": function (data, type, row) {
+                                    if (data === null) {
+                                        return ""
+                                    }
+                                    else {
+                                        return "<div>" + data + "</div>";
+                                    }
+                                }
+                            }
+                        ],
+                        "fnServerData": function (sSource, aoData, fnCallback) {
+                            showMask("数据加载中，请稍候");
+
+                            aoData.push({'name': 'bill_code_query', 'value': this_vm.page.bill_code_query});
+                            aoData.push({'name': 'status_id_query', 'value': this_vm.page.status_id_query});
+
+                            $.ajax(
+                                    {
+                                        "dataType": 'json',
+                                        "url": sSource,
+                                        "data": aoData,
+                                        "success": function (data) {
+                                            hideMask();
+                                            if (data.success === false) {
+                                                $.msg.error(data.message);
+                                                return;
+                                            }
+                                            fnCallback(data);
+
+                                            $("#purchaseBillEntryList div.div_apply_time").parent().css("width", "120px");
+                                            $("#purchaseBillEntryList div.div_checkin_time").parent().css("display", "none");
+                                        }
+                                    });
+                        }
                     }
-                }
             );
             $("#th_apply_time").before("<th id='th_apply_time_ext'></th>");
             $("#th_apply_time").wrap("<div id='div_apply_time'></div>");
@@ -317,21 +322,21 @@
         showMask("加载中...");
         $("#purchaseProcessForm").clearValidation();
         $.ajax({
-                url: '{%url "ErpPurchaseAbnormal.DetailData" %}',
-                type: "POST",
-                data: {
-                    "id": id
-                },
-                success: function (result) {
-                    hideMask();
-                    if (result.success === false) {
-                        $.msg.error(result.message);
-                        return;
+                    url: '{%url "ErpPurchaseAbnormal.DetailData" %}',
+                    type: "POST",
+                    data: {
+                        "id": id
+                    },
+                    success: function (result) {
+                        hideMask();
+                        if (result.success === false) {
+                            $.msg.error(result.message);
+                            return;
+                        }
+                        vm.purchase_bill_entry_detail = result;
+                        $('#purchaseProcessDialog').modal(modalOptions);
                     }
-                    vm.purchase_bill_entry_detail = result;
-                    $('#purchaseProcessDialog').modal(modalOptions);
                 }
-            }
         );
     }
 
@@ -351,25 +356,25 @@
             hideMask();
         } else {
             $.ajax({
-                    url: '{%url "ErpPurchaseAbnormal.Process"%}',
-                    type: "POST",
-                    processData: false,
-                    contentType: 'application/json',
-                    data: JSON.stringify(vm.purchase_bill_entry_detail),
-                    success: function (data) {
-                        hideMask();
-                        if (data.success === false) {
-                            $.msg.error(data.message);
-                            //return;
-                        }
-                        else {
-                            $.msg.show(data.message);
-                            $('#purchaseProcessDialog').modal('hide');
-                            vm.reloadEntryList();
-                            //return;
+                        url: '{%url "ErpPurchaseAbnormal.Process"%}',
+                        type: "POST",
+                        processData: false,
+                        contentType: 'application/json',
+                        data: JSON.stringify(vm.purchase_bill_entry_detail),
+                        success: function (data) {
+                            hideMask();
+                            if (data.success === false) {
+                                $.msg.error(data.message);
+                                //return;
+                            }
+                            else {
+                                $.msg.show(data.message);
+                                $('#purchaseProcessDialog').modal('hide');
+                                vm.reloadEntryList();
+                                //return;
+                            }
                         }
                     }
-                }
             );
         }
     }
