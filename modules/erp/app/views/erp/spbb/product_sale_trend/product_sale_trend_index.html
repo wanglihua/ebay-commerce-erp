@@ -7,20 +7,25 @@
             </li>
             <li class="parent" data-menu="spbb-menu">商品报表</li>
             <li class="active" data-menu="spbb-product-sale-rank-menu"><a href='{% url "ErpProductSaleRank.Index"%}'>商品销售排名</a></li>
-            <li>商品销售趋势分析（{% .product_names %}）</li>
+            <li>商品销售趋势分析</li>
         </ul>
     </div>
     <div class="page-content">
         <div class="row">
             <div class="col-xs-12" style="padding: 0;">
                 <div class="gridToolBar clearfix">
-                    <button class="btn btn-primary btn-sm" @click="reloadList('#productSaleRankList')">
+                    <button class="btn btn-primary btn-sm" onclick="refreshChartData()">
                         <i class="ace-icon fa fa-refresh"></i>
                         刷新
                     </button>
                 </div>
                 <div>
-                    <div id="chart" style="width: 600px;height:400px;"></div>
+                    <div style="padding: 10px 0;font-weight: bold;line-height: 20px;">
+                        {% range $index, $product_name := .product_name_list %}
+                        {% $product_name %}<br/>
+                        {% end %}
+                    </div>
+                    <div id="chart" style="width:800px;height:600px;"></div>
                 </div>
             </div>
         </div>
@@ -29,118 +34,34 @@
 <script type="text/javascript" src="/static/lib/echarts/echarts.min.js"></script>
 <script type="text/javascript">
 
-    /*
-$.get('data.json').done(function (data) {
-    myChart.setOption({
-        title: {
-            text: '异步数据加载示例'
-        },
-        tooltip: {},
-        legend: {
-            data:['销量']
-        },
-        xAxis: {
-            data: ["衬衫","羊毛衫","雪纺衫","裤子","高跟鞋","袜子"]
-        },
-        yAxis: {},
-        series: [{
-            name: '销量',
-            type: 'bar',
-            data: [5, 20, 36, 10, 10, 20]
-        }]
-    });
-});
-     */
-
     $(function () {
+        refreshChartData();
+    });
+
+    function refreshChartData() {
+        var url = '{% url "ErpProductSaleTrend.ListData"%}';
+
         var chart = echarts.init(document.getElementById('chart'));
 
-        var option = {
-            title: {
-                text: '未来一周气温变化',
-                subtext: '纯属虚构'
+        showMask("数据加载中，请稍候");
+        $.ajax({
+            "dataType": 'json',
+            "url": url,
+            "data": {
+                'product_ids': '{% .product_id_strs %}'
             },
-            tooltip: {
-                trigger: 'axis'
-            },
-            legend: {
-                data: ['最高气温', '最低气温']
-            },
-            toolbox: {
-                show: true,
-                feature: {
-                    dataZoom: {
-                        yAxisIndex: 'none'
-                    },
-                    dataView: {readOnly: false},
-                    magicType: {type: ['line', 'bar']},
-                    restore: {},
-                    saveAsImage: {}
-                }
-            },
-            xAxis: {
-                type: 'category',
-                boundaryGap: false,
-                data: ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
-            },
-            yAxis: {
-                type: 'value',
-                axisLabel: {
-                    formatter: '{value} °C'
-                }
-            },
-            series: [
-                {
-                    name: '最高气温',
-                    type: 'line',
-                    data: [11, 11, 15, 13, 12, 13, 10],
-                    markPoint: {
-                        data: [
-                            {type: 'max', name: '最大值'},
-                            {type: 'min', name: '最小值'}
-                        ]
-                    },
-                    markLine: {
-                        data: [
-                            {type: 'average', name: '平均值'}
-                        ]
-                    }
-                },
-                {
-                    name: '最低气温',
-                    type: 'line',
-                    data: [1, -2, 2, 5, 3, 2, 0],
-                    markPoint: {
-                        data: [
-                            {name: '周最低', value: -2, xAxis: 1, yAxis: -1.5}
-                        ]
-                    },
-                    markLine: {
-                        data: [
-                            {type: 'average', name: '平均值'},
-                            [{
-                                symbol: 'none',
-                                x: '90%',
-                                yAxis: 'max'
-                            }, {
-                                symbol: 'circle',
-                                label: {
-                                    normal: {
-                                        position: 'start',
-                                        formatter: '最大值'
-                                    }
-                                },
-                                type: 'max',
-                                name: '最高点'
-                            }]
-                        ]
-                    }
-                }
-            ]
-        };
+            "success": function (data) {
+                hideMask();
 
-        chart.setOption(option);
-    });
+                if (data.success === false) {
+                    $.msg.error(data.message);
+                    return;
+                }
+
+                chart.setOption(data);
+            }
+        });
+    }
 
 </script>
 {%footer%}

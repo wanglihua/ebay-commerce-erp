@@ -17,6 +17,10 @@
                         <i class="ace-icon fa fa-refresh"></i>
                         刷新
                     </button>
+                    <button class="btn btn-success btn-sm" onclick="showProductSaleTrend()">
+                        <i class="ace-icon fa fa-line-chart"></i>
+                        销量趋势
+                    </button>
                     <button class="btn btn-pink btn-sm" @click="analyze()">
                         <i class="ace-icon fa fa-refresh"></i>
                         立即分析销售情况
@@ -46,6 +50,26 @@
     </div>
 </div>
 <script type="text/javascript">
+
+    function showProductSaleTrend() {
+        var id_list = [];
+        $('#productSaleRankList tbody tr>td:first-child input:checkbox').each(function () {
+            if (this.checked) {
+                id_list.push($(this).val());
+            }
+        });
+
+        if (id_list.length === 0) {
+            $.msg.alert("请选择一个或多个要查看的SKU！");
+        }
+
+        var params = $.param({
+            "product_id_list": id_list
+        });
+        var url = '{%url "ErpProductSaleTrend.Index"%}?' + params;
+        window.open(url, "product_sale_trend");
+    }
+
     var vm = new Vue({
         el: "#page",
         data: {
