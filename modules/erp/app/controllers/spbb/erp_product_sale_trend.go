@@ -11,6 +11,8 @@ import (
 	"matrix/modules/erp/models/spbb_models"
 	"strings"
 	"fmt"
+	"strconv"
+	"time"
 )
 
 type ErpProductSaleTrend struct {
@@ -54,140 +56,80 @@ type product_sale_analysis_trend_t struct {
 func (c ErpProductSaleTrend) ListData() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.SPBB_PRODUCT_SALE_RANK, c.Session)
 
-	/*
-	db_session := c.DbSession
+	var product_id_strs string
+	c.Params.Bind(&product_id_strs, "product_ids")
 
-	var sku_query string
-	c.Params.Bind(&sku_query, "sku_query")
+	var time_now = time.Now()
+	var today_date = time.Date(time_now.Year(), time_now.Month(), time_now.Day(), 0, 0, 0, 0, nil)
 
-	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
-
-	var sb = core.NewSqlBuilder()
-
-	sb.Select("sa.*, s.*")
-	sb.Count("count(1) AS sa_count")
-	sb.From(`erp_product_sale_analysis sa
-    LEFT JOIN erp_stock s ON sa.stock_id = s.id`)
-
-	var sql_args = make([]interface{}, 0)
-
-	if sku_query != "" {
-		filter = core.SqlAnd(filter, "sa.sku = ?")
-		sql_args = append(sql_args, sku_query)
+	var query_begin_time string
+	c.Params.Bind(&query_begin_time, "query_begin_time")
+	query_begin_date, query_begin_date_err := core.Parse_time(query_begin_time)
+	if query_begin_date_err != nil {
+		query_begin_date = today_date.Add(-100 * 24 * time.Hour) // 当前日期回退100天
 	}
 
-	// 只取不分仓统计的数据
-	filter = core.SqlAnd(filter, "sa.type = ?")
-	sql_args = append(sql_args, spbb_models.PRODUCT_SALE_ANALYSIS_TYPE_SKU)
-
-	sb.Where(filter)
-
-	if order != "" {
-		sb.OrderBy(order)
-	} else {
-		sb.OrderBy("sa.id ASC")
+	var query_end_time string
+	c.Params.Bind(&query_end_time, "query_end_time")
+	query_end_date, query_end_date_err := core.Parse_time(query_end_time)
+	if query_end_date_err != nil {
+		query_end_date = today_date
 	}
 
-	sb.Limit(offset, limit)
+	var product_id_str_list = strings.Split(product_id_strs, ",")
+	if len(product_id_str_list) == 0 {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "商品id参数错误！",
+		})
+	}
 
-	product_sale_analysis_list := make([]product_sale_analysis_trend_t, 0, limit)
-	err := db_session.Sql(sb.SqlList(), sql_args...).Find(&product_sale_analysis_list)
-	core.HandleError(err)
+	var db_session = c.DbSession
 
-	for index, product_sale_day_analysis := range product_sale_analysis_list {
+	var product_list = make([]kcgl_models.ProductInfo, 0)
+	for _, product_id_str := range product_id_str_list {
+		product_id, err := strconv.ParseInt(product_id_str, 10, 64)
+		if err != nil {
+			return c.RenderJson(map[string]interface{}{
+				"success": false,
+				"message": "商品id参数错误！",
+			})
+		}
+
 		var product kcgl_models.ProductInfo
-		_, err := db_session.Id(product_sale_day_analysis.ProductSaleAnalysis.ProductId).Get(&product)
-		core.HandleError(err)
+		has, _ := db_session.Id(product_id).Get(&product)
+		if has == false {
+			return c.RenderJson(map[string]interface{}{
+				"success": false,
+				"message": "指定的商品id不存在！",
+			})
+		}
 
-		product_sale_analysis_list[index].ProductSaleAnalysis.ProductName = product.CnName
+		product_list = append(product_list, product)
 	}
 
-	var sa_count struct {
-		Count int64 `xorm:"'sa_count'"`
+	var product_sku_list = make([]string, 0)
+	for _, product := range product_list {
+		product_sku_list = append(product_sku_list, product.Sku)
 	}
 
-	_, err = db_session.Sql(sb.SqlCount(), sql_args...).Get(&sa_count)
+	var time_range_list = make([]spbb_models.ProductSaleAnalysisTimeRangeInfo, 0)
+	err := db_session.
+		Where("begin_time >= ? AND end_time <= ?", query_begin_date, query_end_date).
+		OrderBy("begin_time ASC").
+		Find(&time_range_list)
 	core.HandleError(err)
 
-	return c.RenderJson(core.GridResult{
-		Data:  product_sale_analysis_list,
-		Total: sa_count.Count,
-	})
-	*/
-
-	/*
-			var option = {
-				title: {
-					text: '未来一周气温变化',
-					subtext: '纯属虚构'
-				},
-				tooltip: {
-					trigger: 'axis'
-				},
-				legend: {
-					data: ['最高气温', '最低气温']
-				},
-				toolbox: {
-					show: true,
-					feature: {
-						dataZoom: {
-							yAxisIndex: 'none'
-						},
-						dataView: {readOnly: false},
-						magicType: {type: ['line', 'bar']},
-						restore: {},
-						saveAsImage: {}
-					}
-				},
-				xAxis: {
-					type: 'category',
-					boundaryGap: false,
-					data: ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
-				},
-				yAxis: {
-					type: 'value',
-					axisLabel: {
-						formatter: '{value} °C'
-					}
-				},
-				series: [
-					{
-						name: '最高气温',
-						type: 'line',
-						data: [11, 11, 15, 13, 12, 13, 10],
-						markPoint: {
-							data: [
-								{type: 'max', name: '最大值'},
-								{type: 'min', name: '最小值'}
-							]
-						},
-						markLine: {
-							data: [
-								{type: 'average', name: '平均值'}
-							]
-						}
-					},
-					{
-						name: '最低气温',
-						type: 'line',
-						data: [1, -2, 2, 5, 3, 2, 0],
-						markPoint: {
-							data: [
-								{type: 'max', name: '最大值'},
-								{type: 'min', name: '最小值'}
-							]
-						},
-						markLine: {
-							data: [
-								{type: 'average', name: '平均值'}
-							]
-						}
-					}
-				]
-			};
-	 */
+	var time_str_list = make([]string, 0)
+	for _, time_range := range time_range_list {
+		time_str_list = append(time_str_list, time.Time(time_range.BeginTime).Format("2006-01-02"))
+	}
 
 	var series = make([]interface{}, 0)
+
+	for _, product := range product_list {
+		_ = product
+	}
 
 	var high_temp_data = map[string]interface{}{
 		"name": "最高气温",
@@ -246,14 +188,14 @@ func (c ErpProductSaleTrend) ListData() revel.Result {
 
 	var options = map[string]interface{}{
 		"title": map[string]interface{}{
-			"text":    "未来一周气温变化",
-			"subtext": "纯属虚构",
+			"text":    "商品每10天销量",
+			"subtext": fmt.Sprintf("%s至%s", query_begin_date.Format("2006-01-02"), query_end_date.Format("2006-01-02")), // 时间范围
 		},
 		"tooltip": map[string]interface{}{
 			"trigger": "axis",
 		},
 		"legend": map[string]interface{}{
-			"data": []string{"最高气温", "最低气温"},
+			"data": product_sku_list,
 		},
 		"toolbox": map[string]interface{}{
 			"show": true,
@@ -274,12 +216,12 @@ func (c ErpProductSaleTrend) ListData() revel.Result {
 		"xAxis": map[string]interface{}{
 			"type":        "category",
 			"boundaryGap": false,
-			"data":        []string{"周一", "周二", "周三", "周四", "周五", "周六", "周日"},
+			"data":        time_str_list, // time list
 		},
 		"yAxis": map[string]interface{}{
 			"type": "value",
 			"axisLabel": map[string]interface{}{
-				"formatter": "{value} °C",
+				"formatter": "{value} 件",
 			},
 		},
 		"series": series,

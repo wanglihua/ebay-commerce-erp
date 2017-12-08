@@ -210,9 +210,11 @@ func (f *PurchaseBillEntryCheckinDetailForm) Valid(validation *revel.Validation)
 	*/
 
 	// 也有可能订了 10 个，到货了 12 个，最终入库的是 12个
+	/*
 	if f.PurchaseBillEntry.CheckinQty <= 0 {
 		validation.Error("入库数量输入有误！")
 	}
+	*/
 
 	return validation.HasErrors() == false
 }
