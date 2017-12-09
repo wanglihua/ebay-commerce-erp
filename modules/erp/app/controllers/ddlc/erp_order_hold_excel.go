@@ -7,6 +7,7 @@ import (
 	"bytes"
 	"time"
 	"matrix/core"
+	"fmt"
 )
 
 type ErpOrderHoldExcel struct {
@@ -168,37 +169,37 @@ ORDER BY o.paid_time ASC;`
 
 		col_index++
 		cell = header_row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 20)
+		sheet.SetColWidth(col_index, col_index, 14)
 		set_head_cell_style(cell)
 		cell.Value = "支付时间"
 
 		col_index++
 		cell = header_row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 20)
+		sheet.SetColWidth(col_index, col_index, 14)
 		set_head_cell_style(cell)
 		cell.Value = "发货时间"
 
 		col_index++
 		cell = header_row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 20)
+		sheet.SetColWidth(col_index, col_index, 12)
 		set_head_cell_style(cell)
 		cell.Value = "仓库"
 
 		col_index++
 		cell = header_row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 20)
+		sheet.SetColWidth(col_index, col_index, 15)
 		set_head_cell_style(cell)
 		cell.Value = "商品SKU"
 
 		col_index++
 		cell = header_row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 20)
+		sheet.SetColWidth(col_index, col_index, 35)
 		set_head_cell_style(cell)
 		cell.Value = "商品名称"
 
 		col_index++
 		cell = header_row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 10)
+		sheet.SetColWidth(col_index, col_index, 6)
 		set_head_cell_style(cell)
 		cell.Value = "数量"
 
@@ -224,6 +225,53 @@ ORDER BY o.paid_time ASC;`
 		set_text_cell_style(cell, "left")
 		cell.Value = item.OrderCode
 
+		// 支付时间
+		cell = row.AddCell()
+		set_text_cell_style(cell, "center")
+		if item.OrderPaidTime.Valid {
+			cell.Value = item.OrderPaidTime.Time.Format("2006-01-02 15:04")
+		} else {
+			cell.Value = ""
+		}
+
+		// 发货时间
+		cell = row.AddCell()
+		set_text_cell_style(cell, "center")
+		if item.OrderShippedTime.Valid {
+			cell.Value = item.OrderShippedTime.Time.Format("2006-01-02 15:04")
+		} else {
+			cell.Value = ""
+		}
+
+		// 仓库
+		cell = row.AddCell()
+		set_text_cell_style(cell, "left")
+		cell.Value = item.StockName
+
+		// 商品SKU
+		cell = row.AddCell()
+		set_text_cell_style(cell, "left")
+		cell.Value = item.ProductSku
+
+		// 商品名称
+		cell = row.AddCell()
+		set_text_cell_style(cell, "left")
+		cell.Value = item.ProductName
+
+		// 数量
+		cell = row.AddCell()
+		set_text_cell_style(cell, "center")
+		cell.Value = fmt.Sprint(item.ProductQty)
+
+		// 价格
+		cell = row.AddCell()
+		set_text_cell_style(cell, "center")
+		cell.Value = fmt.Sprintf("%0.2f", item.Price)
+
+		// 状态
+		cell = row.AddCell()
+		set_text_cell_style(cell, "center")
+		cell.Value = item.StatusName
 	}
 
 	return xlsx_file

@@ -566,6 +566,8 @@ POST /order/import/batch/delete          ErpOrderImport.BatchDelete
 POST /order/import/delete                ErpOrderImport.Delete
 POST /order/import/match/logistics       ErpOrderImport.MatchLogistics
 
+POST /order/hold/excel/export/best/stock/oos    ErpOrderHoldExcel.ExportBestStockOos
+
 POST /order/export/export                ErpOrderExport.Export
 POST /order/export/logistics             ErpOrderExport.ExportLogistics
 
