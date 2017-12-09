@@ -117,7 +117,10 @@
                         <i class="ace-icon fa fa-file-excel-o"></i>
                         导出订单编码代码
                     </button>
-
+                    <button class="btn btn-info btn-sm" @click="exportBestStockOos()">
+                        <i class="ace-icon fa fa-file-excel-o"></i>
+                        导出最佳仓缺货SKU
+                    </button>
                     {% if eq .status "dph" %}
                     <button class="btn btn-pink btn-sm" @click="showExportOrderLogisticsCompany()">
                         <i class="ace-icon fa fa-file-excel-o"></i>
@@ -1378,6 +1381,10 @@
 
                 var params = $.param({"status": "{%.status%}", "batch_code": vm.page.batch_code, "id_list": id_list});
                 var url = '{%url "ErpOrderExport.Export"%}' + "?" + params;
+                $('<form method="post" action="' + url + '"></form>').appendTo('body').submit().remove();
+            },
+            exportBestStockOos: function () {
+                var url = '{%url "ErpOrderHoldExcel.ExportBestStockOos"%}';
                 $('<form method="post" action="' + url + '"></form>').appendTo('body').submit().remove();
             },
             apply_order_tag: function (order_tag_id) {

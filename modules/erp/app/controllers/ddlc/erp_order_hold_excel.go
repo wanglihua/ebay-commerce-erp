@@ -193,7 +193,7 @@ ORDER BY o.paid_time ASC;`
 
 		col_index++
 		cell = header_row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 35)
+		sheet.SetColWidth(col_index, col_index, 45)
 		set_head_cell_style(cell)
 		cell.Value = "商品名称"
 
