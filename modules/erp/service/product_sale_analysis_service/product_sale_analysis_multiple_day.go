@@ -226,6 +226,8 @@ SET p.daily_mean_sales = sa.daily_mean_sales, p.stock_alert_qty = p.stock_alert_
 
 	_, err = db_session.Exec(update_product_dialy_mean_sales_sql)
 	core.HandleError(err)
+
+	revel.TRACE.Println("商品销售多日分析完成！");
 }
 
 func get_product_dialy_mean_sales_sql_expression(product_sale_analysis_setting spbb_models.ProductSaleAnalysisSettingInfo) string {

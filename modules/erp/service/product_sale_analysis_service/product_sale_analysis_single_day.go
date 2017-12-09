@@ -39,7 +39,7 @@ func product_sale_analyze_single_day() {
 	_, err = db_session.Exec("CALL product_sale_day_analysis();")
 	core.HandleError(err)
 
-	revel.TRACE.Println("商品销售日分析完成！");
+	revel.TRACE.Println("商品销售单日分析完成！");
 
 	// 下面的代码是之前的做的不太好的代码，现在的代码改成存储过程了
 
