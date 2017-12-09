@@ -99,8 +99,8 @@ func (c ErpOrderExport) Export() revel.Result {
 }
 
 type order_code_num_export_view_t struct {
-	Order    ddlc_models.OrderInfo          `xorm:"extends" json:"o"`
-	HoldType ddpz_models.OrderHoldTypeInfo  `xorm:"extends" json:"ht"`
+	Order    ddlc_models.OrderInfo         `xorm:"extends" json:"o"`
+	HoldType ddpz_models.OrderHoldTypeInfo `xorm:"extends" json:"ht"`
 }
 
 func (c ErpOrderExport) get_export_excel(db_session *xorm.Session, filter string, status_id int64) *xlsx.File {
@@ -294,11 +294,11 @@ func (c ErpOrderExport) ExportLogistics() revel.Result {
 func (c ErpOrderExport) get_export_logisics_excel(db_session *xorm.Session) *xlsx.File {
 
 	type order_logistics_view_item_t struct {
-		OrderLogistics   ddlc_models.OrderLogisticsInfo    `xorm:"extends" json:"ol"`
-		Order            ddlc_models.OrderInfo             `xorm:"extends" json:"o"`
-		Stock            sppz_models.StockInfo             `xorm:"extends" json:"s"`
-		LogisticsCompany ddpz_models.LogisticsCompanyInfo  `xorm:"extends" json:"lc"`
-		LogisticsMode    ddpz_models.LogisticsModeInfo     `xorm:"extends" json:"lm"`
+		OrderLogistics   ddlc_models.OrderLogisticsInfo   `xorm:"extends" json:"ol"`
+		Order            ddlc_models.OrderInfo            `xorm:"extends" json:"o"`
+		Stock            sppz_models.StockInfo            `xorm:"extends" json:"s"`
+		LogisticsCompany ddpz_models.LogisticsCompanyInfo `xorm:"extends" json:"lc"`
+		LogisticsMode    ddpz_models.LogisticsModeInfo    `xorm:"extends" json:"lm"`
 	}
 
 	/*
@@ -328,7 +328,7 @@ WHERE ol.stock_id = 0 AND ol.company_id = 0
 
 	var filter = "(1=1)"
 
-	filter = c.apply_query_filter(filter)
+	filter = c.apply_export_logisics_query_filter(filter)
 
 	sb.Where(filter)
 
@@ -522,7 +522,7 @@ WHERE ol.stock_id = 0 AND ol.company_id = 0
 	return xlsx_file
 }
 
-func (c ErpOrderExport) apply_query_filter(filter string) string {
+func (c ErpOrderExport) apply_export_logisics_query_filter(filter string) string {
 	var stock_id int64
 	c.Params.Bind(&stock_id, "stock_id")
 
