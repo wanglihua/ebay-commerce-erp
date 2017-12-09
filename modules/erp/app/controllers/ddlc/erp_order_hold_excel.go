@@ -32,6 +32,18 @@ func (c ErpOrderHoldExcel) ExportBestStockOos() revel.Result {
 
 func (c ErpOrderHoldExcel) get_export_best_stock_oos_excel(db_session *xorm.Session) *xlsx.File {
 
+	type order_hold_export_item_t struct {
+		OrderCode        string            `xorm:"'order_code'"`
+		OrderPaidTime    core.NullLongTime `xorm:"'order_paid_time'"`
+		OrderShippedTime core.NullLongTime `xorm:"'order_shipped_time'"`
+		StockName        string            `xorm:"'stock_name'"`
+		ProductSku       string            `xorm:"'product_sku'"`
+		ProductName      string            `xorm:"'product_name'"`
+		ProductQty       int64             `xorm:"'product_qty'"`
+		Price            float64           `xorm:"'price'"`
+		StatusName       string            `xorm:"'status_name'"`
+	}
+
 	/*
 SELECT
     o.code                         AS order_code,
