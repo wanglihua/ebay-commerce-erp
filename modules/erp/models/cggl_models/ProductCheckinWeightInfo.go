@@ -8,8 +8,8 @@ import "matrix/core"
 
 type ProductCheckinWeightInfo struct {
 	Id         int64     `xorm:"bigint notnull pk autoincr 'id'" json:"id"`
-	BillId     int       `xorm:"bigint notnull index 'bill_id'" json:"bill_id" smith:"verbose_name=采购单"`
-	EntryId    int       `xorm:"bigint notnull index 'entry_id'" json:"entry_id" smith:"verbose_name=采购单明细"`
+	BillId     int64     `xorm:"bigint notnull index 'bill_id'" json:"bill_id" smith:"verbose_name=采购单"`
+	EntryId    int64     `xorm:"bigint notnull index 'entry_id'" json:"entry_id" smith:"verbose_name=采购单明细"`
 	ProductId  int64     `xorm:"bigint notnull index 'product_id'" json:"product_id" smith:"verbose_name=商品"`
 	Length     float64   `xorm:"float notnull 'length' default(0)" json:"length" smith:"verbose_name=长度,min=0"` //cm
 	Width      float64   `xorm:"float notnull 'width' default(0)" json:"width" smith:"verbose_name=宽度,min=0"`   //cm

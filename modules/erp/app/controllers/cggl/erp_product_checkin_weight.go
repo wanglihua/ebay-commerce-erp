@@ -125,6 +125,14 @@ func (c ErpProductCheckinWeight) DetailData() revel.Result {
 	_, err := db_session.Where("entry_id = ?", entry_id).Get(&product_checkin_weight)
 	core.HandleError(err)
 
+	var purchase_entry cggl_models.PurchaseBillEntryInfo
+	_, err = db_session.Id(entry_id).Get(&purchase_entry)
+	core.HandleError(err)
+
+	product_checkin_weight.BillId = purchase_entry.BillId
+	product_checkin_weight.EntryId = purchase_entry.Id
+	product_checkin_weight.ProductId = purchase_entry.ProductId
+
 	var detail_form ProductCheckinWeightDetailForm
 	detail_form.ProductCheckinWeight = product_checkin_weight
 
@@ -148,6 +156,14 @@ func (c ErpProductCheckinWeight) Save() revel.Result {
 	var product_checkin_weight cggl_models.ProductCheckinWeightInfo
 	has, err := db_session.Where("entry_id = ?", entry_id).Get(&product_checkin_weight)
 	core.HandleError(err)
+
+	product_checkin_weight.BillId = product_checkin_weight_from_ui.BillId
+	product_checkin_weight.EntryId = product_checkin_weight_from_ui.EntryId
+	product_checkin_weight.ProductId = product_checkin_weight_from_ui.ProductId
+	product_checkin_weight.Length = product_checkin_weight_from_ui.Length
+	product_checkin_weight.Width = product_checkin_weight_from_ui.Width
+	product_checkin_weight.Height = product_checkin_weight_from_ui.Height
+	product_checkin_weight.Weight = product_checkin_weight_from_ui.Weight
 
 	var affected int64
 	if !has {
