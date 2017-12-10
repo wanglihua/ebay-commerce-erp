@@ -18,11 +18,11 @@ type ProductInfo struct {
 	StatusId         int64           `xorm:"bigint notnull index 'status_id'" json:"status_id" smith:"verbose_name=状态"`
 	Length           float64         `xorm:"float notnull 'length' default(0)" json:"length" smith:"verbose_name=长度,min=0"`          //cm
 	Width            float64         `xorm:"float notnull 'width' default(0)" json:"width" smith:"verbose_name=宽度,min=0"`            //cm
-	Height           float64         `xorm:"float notnull 'height'" json:"height" smith:"verbose_name=高度,min=0"`                     //cm
+	Height           float64         `xorm:"float notnull 'height' default(0)" json:"height" smith:"verbose_name=高度,min=0"`          //cm
 	Weight           float64         `xorm:"float notnull 'weight' default(0)" json:"weight" smith:"verbose_name=重量,min=0"`          //kg
 	BatchCode        int64           `xorm:"bigint null index 'batch_code' default(0)" json:"batch_code" smith:"verbose_name=导入批次号"` //导入的批次号
-	CnDeclName       string          `xorm:"nvarchar(300) notnull index 'cn_decl_name' default('')" json:"cn_decl_name"`                         // 中国海关申报名
-	AuDeclName       string          `xorm:"nvarchar(300) notnull index 'au_decl_name' default('')" json:"au_decl_name"`                         // 澳洲海关申报名
+	CnDeclName       string          `xorm:"nvarchar(300) notnull index 'cn_decl_name' default('')" json:"cn_decl_name"`             // 中国海关申报名
+	AuDeclName       string          `xorm:"nvarchar(300) notnull index 'au_decl_name' default('')" json:"au_decl_name"`             // 澳洲海关申报名
 	CnHsCode         string          `xorm:"nvarchar(100) notnull index 'cn_hs_code'" json:"cn_hs_code" smith:"verbose_name=中国海关编码,min=1,max=10"`
 	AuHsCode         string          `xorm:"nvarchar(100) notnull index 'au_hs_code'" json:"au_hs_code" smith:"verbose_name=澳洲海关编码,min=1,max=8"`
 	NeedInvoice      int64           `xorm:"bigint notnull 'need_invoice' default(0)" json:"need_invoice"` // 是否开票
