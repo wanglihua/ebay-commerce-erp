@@ -762,6 +762,6 @@ POST /fav/stock/time/range/save           ErpFavStockTimeRange.Save
 POST /fav/stock/time/range/delete         ErpFavStockTimeRange.Delete
 
 POST /product/checkin/weight/data/list          ErpProductCheckinWeight.ListData
-POST /product/checkin/weight/detail/:entry_id   ErpProductCheckinWeight.Detail
+POST /product/checkin/weight/detail             ErpProductCheckinWeight.Detail
 POST /product/checkin/weight/data/detail        ErpProductCheckinWeight.DetailData
 POST /product/checkin/weight/save               ErpProductCheckinWeight.Save

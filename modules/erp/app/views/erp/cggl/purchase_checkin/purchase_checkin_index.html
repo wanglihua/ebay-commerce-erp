@@ -82,6 +82,7 @@
                             <th>到货到期</th>
                             <th>备注</th>
                             <th>状态</th>
+                            <th>操作</th>
                         </tr>
                         </thead>
                     </table>
@@ -251,7 +252,26 @@
         </div>
     </div>
 </div>
+<div id="productCheckinWeightDetailDialogWrapper"></div>
 <script type="text/javascript">
+
+    function showProductCheckinWeightDetailDialog(entry_id) {
+        $.ajax({
+            url: '{%url "ErpProductCheckinWeight.Detail" %}',
+            type: "POST",
+            data: {
+                "entry_id": entry_id
+            },
+            success: function (result) {
+                if (result.success === false) {
+                    $.msg.error(result.message);
+                    return;
+                }
+                $("#productCheckinWeightDetailDialogWrapper").html(result);
+                $('#productCheckinWeightDetailDialog').modal(modalOptions);
+            }
+        });
+    }
 
     function search() {
         refreshList("#purchaseBillEntryList");
@@ -372,7 +392,13 @@
                                     }
                                 }
                             },
-                            {"mDataProp": "s.name", "title": "状态", "bSearchable": true, "sClass": "center", "width": 60}
+                            {"mDataProp": "s.name", "title": "状态", "bSearchable": true, "sClass": "center", "width": 60},
+                            {
+                                "mDataProp": "pbe.id", "title": "操作", "bSearchable": true, "sClass": "center", "width": 60,
+                                "render": function (data, type, row) {
+                                    return "<a class='btn btn-xs btn-info btn-inline pull-left' onclick='showProductCheckinWeightDetailDialog(" + data + ");' ><i class='ace-icon fa fa-list'></i>物流参数</a>";
+                                }
+                            }
                         ],
                         "fnServerData": function (sSource, aoData, fnCallback) {
                             showMask("数据加载中，请稍候");

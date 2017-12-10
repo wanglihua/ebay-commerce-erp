@@ -16,7 +16,7 @@ type ErpProductCheckinWeight struct {
 }
 
 func (c ErpProductCheckinWeight) Index() revel.Result {
-	return c.RenderTemplate("erp/product_checkin_weight/product_checkin_weight_index.html")
+	return c.RenderTemplate("erp/cggl/product_checkin_weight/product_checkin_weight_index.html")
 }
 
 func (c ErpProductCheckinWeight) ListData() revel.Result {
@@ -87,8 +87,11 @@ func (f *ProductCheckinWeightDetailForm) Valid(validation *revel.Validation) boo
 	return validation.HasErrors() == false
 }
 
-func (c ErpProductCheckinWeight) Detail(entry_id int64) revel.Result {
+func (c ErpProductCheckinWeight) Detail() revel.Result {
 	var db_session = c.DbSession
+
+	var entry_id int64
+	c.Params.Bind(&entry_id, "entry_id")
 
 	/*
 SELECT p.*
@@ -109,7 +112,7 @@ WHERE be.id = %d;`
 
 	c.RenderArgs["entry_id"] = entry_id
 	c.RenderArgs["product"] = product
-	return c.RenderTemplate("erp/product_checkin_weight/product_checkin_weight_detail.html")
+	return c.RenderTemplate("erp/cggl/product_checkin_weight/product_checkin_weight_detail.html")
 }
 
 func (c ErpProductCheckinWeight) DetailData() revel.Result {
@@ -119,13 +122,8 @@ func (c ErpProductCheckinWeight) DetailData() revel.Result {
 	c.Params.Bind(&entry_id, "entry_id")
 
 	var product_checkin_weight cggl_models.ProductCheckinWeightInfo
-	if entry_id != 0 {
-		has, err := db_session.Where("entry_id = ?", entry_id).Get(&product_checkin_weight)
-		core.HandleError(err)
-		if has == false {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "指定的商品入库长宽高重量不存在！"})
-		}
-	}
+	_, err := db_session.Where("entry_id = ?", entry_id).Get(&product_checkin_weight)
+	core.HandleError(err)
 
 	var detail_form ProductCheckinWeightDetailForm
 	detail_form.ProductCheckinWeight = product_checkin_weight
