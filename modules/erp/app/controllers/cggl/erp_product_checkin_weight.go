@@ -7,6 +7,8 @@ import (
 
 	"matrix/core"
 	"matrix/modules/erp/models/cggl_models"
+	"fmt"
+	"matrix/modules/erp/models/kcgl_models"
 )
 
 type ErpProductCheckinWeight struct {
@@ -18,31 +20,49 @@ func (c ErpProductCheckinWeight) Index() revel.Result {
 }
 
 func (c ErpProductCheckinWeight) ListData() revel.Result {
-	db_session := c.DbSession
+	var db_session = c.DbSession
 
-	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
-	query := db_session.Where(filter)
-
-	//query extra filter here
-
-	data_query := *query
-	if order != "" {
-		data_query = *data_query.OrderBy(order)
-	} else {
-		data_query = *data_query.Asc("id")
+	type product_checkin_weight_item_t struct {
+		PurchaseBill         cggl_models.PurchaseBillInfo         `xorm:"extends" json:"pb"`
+		ProductCheckinWeight cggl_models.ProductCheckinWeightInfo `xorm:"extends" json:"cw"`
 	}
 
-	product_checkin_weight_list := make([]cggl_models.ProductCheckinWeightInfo, 0, limit)
-	err := data_query.Limit(limit, offset).Find(&product_checkin_weight_list)
+	/*
+SELECT
+    pb.*, cw.*
+FROM erp_product_checkin_weight cw
+    INNER JOIN erp_purchase_bill_entry be ON cw.entry_id = be.id
+    INNER JOIN erp_purchase_bill pb ON be.bill_id = pb.id;
+	 */
+
+	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
+
+	var sb = core.NewSqlBuilder()
+	sb.Select("pb.*, cw.*")
+	sb.Count("count(pb.id) AS count")
+	sb.From(`erp_product_checkin_weight cw
+    INNER JOIN erp_purchase_bill_entry be ON cw.entry_id = be.id
+    INNER JOIN erp_purchase_bill pb ON be.bill_id = pb.id`)
+	sb.Where(filter)
+	sb.Limit(offset, limit)
+
+	if order != "" {
+		sb.OrderBy(order)
+	} else {
+		sb.OrderBy("id ASC")
+	}
+
+	var product_checkin_weight_list = make([]product_checkin_weight_item_t, 0, limit)
+	err := db_session.Sql(sb.SqlList()).Find(&product_checkin_weight_list)
 	core.HandleError(err)
 
-	count_query := *query
-	count, err := count_query.Count(new(cggl_models.ProductCheckinWeightInfo))
+	var count core.Count
+	_, err = db_session.Sql(sb.SqlCount()).Get(&count)
 	core.HandleError(err)
 
 	return c.RenderJson(core.GridResult{
 		Data:  product_checkin_weight_list,
-		Total: count,
+		Total: count.Count,
 	})
 }
 
@@ -56,36 +76,51 @@ func (f *ProductCheckinWeightDetailForm) IsCreate() bool {
 
 func (f *ProductCheckinWeightDetailForm) Valid(validation *revel.Validation) bool {
 	validation.Required(f.ProductCheckinWeight.BillId).Message("采购单不能为空！")
-
 	validation.Required(f.ProductCheckinWeight.EntryId).Message("采购单明细不能为空！")
-
 	validation.Required(f.ProductCheckinWeight.ProductId).Message("商品不能为空！")
 
-	validation.Required(f.ProductCheckinWeight.Length).Message("长度不能为空！")
-
-	validation.Required(f.ProductCheckinWeight.Width).Message("宽度不能为空！")
-
-	validation.Required(f.ProductCheckinWeight.Height).Message("高度不能为空！")
-
-	validation.Required(f.ProductCheckinWeight.Weight).Message("重量不能为空！")
+	// validation.Required(f.ProductCheckinWeight.Length).Message("长度不能为空！")
+	// validation.Required(f.ProductCheckinWeight.Width).Message("宽度不能为空！")
+	// validation.Required(f.ProductCheckinWeight.Height).Message("高度不能为空！")
+	// validation.Required(f.ProductCheckinWeight.Weight).Message("重量不能为空！")
 
 	return validation.HasErrors() == false
 }
 
 func (c ErpProductCheckinWeight) Detail(entry_id int64) revel.Result {
+	var db_session = c.DbSession
+
+	/*
+SELECT p.*
+FROM erp_purchase_bill_entry be
+    INNER JOIN erp_product p ON be.product_id = p.id
+WHERE be.id = 123;
+	 */
+	var sql_get_product = `
+SELECT p.*
+FROM erp_purchase_bill_entry be
+    INNER JOIN erp_product p ON be.product_id = p.id
+WHERE be.id = %d;`
+	sql_get_product = fmt.Sprintf(sql_get_product, entry_id)
+
+	var product kcgl_models.ProductInfo
+	_, err := db_session.Sql(sql_get_product).Get(&product)
+	core.HandleError(err)
+
 	c.RenderArgs["entry_id"] = entry_id
+	c.RenderArgs["product"] = product
 	return c.RenderTemplate("erp/product_checkin_weight/product_checkin_weight_detail.html")
 }
 
 func (c ErpProductCheckinWeight) DetailData() revel.Result {
-	db_session := c.DbSession
+	var db_session = c.DbSession
 
-	var product_checkin_weight_id int64
-	c.Params.Bind(&product_checkin_weight_id, "id")
+	var entry_id int64
+	c.Params.Bind(&entry_id, "entry_id")
 
 	var product_checkin_weight cggl_models.ProductCheckinWeightInfo
-	if product_checkin_weight_id != 0 {
-		has, err := db_session.Id(product_checkin_weight_id).Get(&product_checkin_weight)
+	if entry_id != 0 {
+		has, err := db_session.Where("entry_id = ?", entry_id).Get(&product_checkin_weight)
 		core.HandleError(err)
 		if has == false {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "指定的商品入库长宽高重量不存在！"})
@@ -109,14 +144,19 @@ func (c ErpProductCheckinWeight) Save() revel.Result {
 		return c.RenderJson(core.JsonResult{Success: false, Message: c.GetValidationErrorMessage()})
 	}
 
-	product_checkin_weight := detail_form.ProductCheckinWeight
+	var product_checkin_weight_from_ui = detail_form.ProductCheckinWeight
+
+	var entry_id = product_checkin_weight_from_ui.EntryId
+	var product_checkin_weight cggl_models.ProductCheckinWeightInfo
+	has, err := db_session.Where("entry_id = ?", entry_id).Get(&product_checkin_weight)
+	core.HandleError(err)
 
 	var affected int64
-	if detail_form.IsCreate() {
+	if !has {
 		affected, err = db_session.Insert(&product_checkin_weight)
 		core.HandleError(err)
 	} else {
-		affected, err = db_session.Id(product_checkin_weight.Id).Update(&product_checkin_weight)
+		affected, err = db_session.Where("entry_id = ?", product_checkin_weight_from_ui.EntryId).Update(&product_checkin_weight)
 		core.HandleError(err)
 
 		if affected == 0 {

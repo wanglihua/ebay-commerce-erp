@@ -3,7 +3,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="True">&times;</button>
-                <h4 class="modal-title">商品入库长宽高重量详细</h4>
+                <h4 class="modal-title">商品入库长宽高重量（{% .product.Sku %}）</h4>
             </div>
             <div class="modal-body clearfix">
                 <div class="row">
@@ -13,6 +13,7 @@
                             <input id="product_checkin_weight_bill_id" name="detail.product_checkin_weight.bill_id" type="hidden" v-model.number="detail.product_checkin_weight.bill_id"/>
                             <input id="product_checkin_weight_entry_id" name="detail.product_checkin_weight.entry_id" type="hidden" v-model.number="detail.product_checkin_weight.entry_id"/>
                             <input id="product_checkin_weight_product_id" name="detail.product_checkin_weight.product_id" type="hidden" v-model.number="detail.product_checkin_weight.product_id"/>
+
                             <div class="row">
                                 <div class="col-xs-6">
                                     <div class="form-group">
@@ -52,6 +53,7 @@
                                     </div>
                                 </div>
                             </div>
+
                         </form>
                     </div>
                     <div class="col-xs-12">
@@ -110,13 +112,13 @@
                         "aaSorting": [[5, "desc"]],
                         "iDisplayLength": 5,
                         "aoColumns": [
-                            {"mDataProp": "bill_id", "title": "采购单", "bSearchable": false, "bSortable": false, "width": 120},
-                            {"mDataProp": "length", "title": "长度", "bSearchable": false, "bSortable": false, "width": 80},
-                            {"mDataProp": "width", "title": "宽度", "bSearchable": false, "bSortable": false, "width": 80},
-                            {"mDataProp": "height", "title": "高度", "bSearchable": false, "bSortable": false, "width": 80},
-                            {"mDataProp": "weight", "title": "重量", "bSearchable": false, "bSortable": false, "width": 80},
-                            {"mDataProp": "create_time", "title": "创建时间", "bSearchable": false, "width": 120},
-                            {"mDataProp": "update_time", "title": "修改时间", "bSearchable": false, "width": 120}
+                            {"mDataProp": "pb.code", "title": "采购单", "bSearchable": false, "bSortable": false, "width": 120},
+                            {"mDataProp": "cw.length", "title": "长度", "bSearchable": false, "bSortable": false, "width": 80},
+                            {"mDataProp": "cw.width", "title": "宽度", "bSearchable": false, "bSortable": false, "width": 80},
+                            {"mDataProp": "cw.height", "title": "高度", "bSearchable": false, "bSortable": false, "width": 80},
+                            {"mDataProp": "cw.weight", "title": "重量", "bSearchable": false, "bSortable": false, "width": 80},
+                            {"mDataProp": "cw.create_time", "title": "创建时间", "bSearchable": false, "width": 120},
+                            {"mDataProp": "cw.update_time", "title": "修改时间", "bSearchable": false, "width": 120}
                         ]
                     }
             );
@@ -181,5 +183,3 @@
         }
     });
 </script>
-{%footer%}
-
