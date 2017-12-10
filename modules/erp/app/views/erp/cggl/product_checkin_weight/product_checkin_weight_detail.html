@@ -1,0 +1,185 @@
+<div class="modal fade" id="productCheckinWeightDetailDialog">
+    <div class="modal-dialog" style="width: 680px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="True">&times;</button>
+                <h4 class="modal-title">商品入库长宽高重量详细</h4>
+            </div>
+            <div class="modal-body clearfix">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <form class="form-horizontal" role="form" id="productCheckinWeightDetailForm">
+                            <input id="product_checkin_weight_id" name="detail.product_checkin_weight.id" type="hidden" v-model.number="detail.product_checkin_weight.id"/>
+                            <input id="product_checkin_weight_bill_id" name="detail.product_checkin_weight.bill_id" type="hidden" v-model.number="detail.product_checkin_weight.bill_id"/>
+                            <input id="product_checkin_weight_entry_id" name="detail.product_checkin_weight.entry_id" type="hidden" v-model.number="detail.product_checkin_weight.entry_id"/>
+                            <input id="product_checkin_weight_product_id" name="detail.product_checkin_weight.product_id" type="hidden" v-model.number="detail.product_checkin_weight.product_id"/>
+                            <div class="row">
+                                <div class="col-xs-6">
+                                    <div class="form-group">
+                                        <label for="length" class="col-xs-4 control-label">长度</label>
+                                        <div class="col-xs-8">
+                                            <input id="length" name="detail.product_checkin_weight.length" type="text" class="input-sm form-control" v-model.number="detail.product_checkin_weight.length"/>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-xs-6">
+                                    <div class="form-group">
+                                        <label for="width" class="col-xs-4 control-label">宽度</label>
+                                        <div class="col-xs-8">
+                                            <input id="width" name="detail.product_checkin_weight.width" type="text" class="input-sm form-control" v-model.number="detail.product_checkin_weight.width"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-xs-6">
+                                    <div class="form-group">
+                                        <label for="height" class="col-xs-4 control-label">高度</label>
+                                        <div class="col-xs-8">
+                                            <input id="height" name="detail.product_checkin_weight.height" type="text" class="input-sm form-control" v-model.number="detail.product_checkin_weight.height"/>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-xs-6">
+                                    <div class="form-group">
+                                        <label for="weight" class="col-xs-4 control-label">重量</label>
+                                        <div class="col-xs-8">
+                                            <input id="weight" name="detail.product_checkin_weight.weight" type="text" class="input-sm form-control" v-model.number="detail.product_checkin_weight.weight"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="col-xs-12">
+                        <table id="productCheckinWeightList" class="table table-striped table-bordered table-hover"></table>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success btn-sm" @click="saveProductCheckinWeight()">
+                    <i class="ace-icon fa fa-floppy-o"></i>保存
+                </button>
+                <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">
+                    <i class="ace-icon fa fa-times"></i>关闭
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{%template "erp/cggl/product_checkin_weight/product_checkin_weight_detail.var" .%}
+<script type="text/javascript">
+
+    function loadProductCheckinWeightDetailData() {
+        showMask("加载中...");
+        $("#productCheckinWeightDetailForm").clearValidation();
+        $.ajax({
+            url: '{%url "ErpProductCheckinWeight.DetailData" %}',
+            type: "POST",
+            data: {
+                "entry_id": entry_id
+            },
+            success: function (result) {
+                hideMask();
+                if (result.success === false) {
+                    $.msg.error(result.message);
+                    return;
+                }
+                vm.detail = result;
+            }
+        });
+    }
+
+    var vm = new Vue({
+        el: "#productCheckinWeightDetailDialog",
+        data: {
+            "detail": {
+                "product_checkin_weight": {}
+            }
+        },
+        mounted: function () {
+            loadProductCheckinWeightDetailData();
+
+            initDataTable(
+                    '#productCheckinWeightList',
+                    {
+                        "sAjaxSource": '{%url "ErpProductCheckinWeight.ListData"%}',
+                        "aaSorting": [[5, "desc"]],
+                        "iDisplayLength": 5,
+                        "aoColumns": [
+                            {"mDataProp": "bill_id", "title": "采购单", "bSearchable": false, "bSortable": false, "width": 120},
+                            {"mDataProp": "length", "title": "长度", "bSearchable": false, "bSortable": false, "width": 80},
+                            {"mDataProp": "width", "title": "宽度", "bSearchable": false, "bSortable": false, "width": 80},
+                            {"mDataProp": "height", "title": "高度", "bSearchable": false, "bSortable": false, "width": 80},
+                            {"mDataProp": "weight", "title": "重量", "bSearchable": false, "bSortable": false, "width": 80},
+                            {"mDataProp": "create_time", "title": "创建时间", "bSearchable": false, "width": 120},
+                            {"mDataProp": "update_time", "title": "修改时间", "bSearchable": false, "width": 120}
+                        ]
+                    }
+            );
+        },
+        methods: {
+            reloadList: function () {
+                reloadList('#productCheckinWeightList');
+            },
+            saveProductCheckinWeight: function () {
+                showMask("提交中...");
+                var form = $("#productCheckinWeightDetailForm");
+                var valid = validate(form, {
+                    'detail.product_checkin_weight.bill_id': {
+                        required: true, digits: true
+                    },
+                    'detail.product_checkin_weight.entry_id': {
+                        required: true, digits: true
+                    },
+                    'detail.product_checkin_weight.product_id': {
+                        required: true, digits: true
+                    },
+                    'detail.product_checkin_weight.length': {
+                        required: true, number: true
+                    },
+                    'detail.product_checkin_weight.width': {
+                        required: true, number: true
+                    },
+                    'detail.product_checkin_weight.height': {
+                        required: true, number: true
+                    },
+                    'detail.product_checkin_weight.weight': {
+                        required: true, number: true
+                    }
+                });
+
+                if (!valid) {
+                    hideMask();
+                } else {
+                    $.ajax({
+                        url: '{%url "ErpProductCheckinWeight.Save"%}',
+                        type: "POST",
+                        processData: false,
+                        contentType: 'application/json',
+                        data: JSON.stringify(vm.detail),
+                        success: function (data) {
+                            hideMask();
+                            if (data.success === false) {
+                                $.msg.error(data.message);
+                                //return;
+                            }
+                            else {
+                                $.msg.show(data.message);
+                                reloadList('#productCheckinWeightList');
+                                //$('#productCheckinWeightDetailDialog').modal('hide');
+                                vm.reloadList();
+                                //return;
+                            }
+                        }
+                    });
+                }
+            }
+        }
+    });
+</script>
+{%footer%}
+

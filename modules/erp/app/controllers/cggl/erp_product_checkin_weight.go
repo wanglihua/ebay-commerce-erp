@@ -72,6 +72,11 @@ func (f *ProductCheckinWeightDetailForm) Valid(validation *revel.Validation) boo
 	return validation.HasErrors() == false
 }
 
+func (c ErpProductCheckinWeight) Detail(entry_id int64) revel.Result {
+	c.RenderArgs["entry_id"] = entry_id
+	return c.RenderTemplate("erp/product_checkin_weight/product_checkin_weight_detail.html")
+}
+
 func (c ErpProductCheckinWeight) DetailData() revel.Result {
 	db_session := c.DbSession
 

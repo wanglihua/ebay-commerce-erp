@@ -1,0 +1,3 @@
+<script type='text/javascript'>
+    var entry_id = {% .entry_id %};
+</script>

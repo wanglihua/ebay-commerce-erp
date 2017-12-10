@@ -516,7 +516,7 @@ function initSingleSelectDataTable(table, options) {
     htmlTable.on('click', 'tbody tr', function () {
         var tableRow = $(this);
         var checkbox = tableRow.find('td:first-child input:checkbox')[0];
-        if (checkbox != undefined) {
+        if (checkbox !== undefined) {
             clearSelected(htmlTable);
             checkbox.checked = true;
             if (checkbox.checked) {
@@ -539,7 +539,7 @@ function initSingleSelectDataTable(table, options) {
         htmlTable.find('tbody tr').removeClass('selected');
         htmlTable.find('tbody td:first-child input:checkbox').each(function () {
             var checkbox = $(this)[0];
-            if (exceptedCheckbox != checkbox) {
+            if (exceptedCheckbox !== checkbox) {
                 checkbox.checked = false;
             }
         });
@@ -586,54 +586,50 @@ $.extend($.validator.messages, {
 });
 
 function validate(form, rules, errorPlacement) {
-    if (errorPlacement == undefined) {
-        form.validate(
-            {
-                submitHandler: function () {
-                },
-                rules: rules,
-                highlight: function (e) {
-                    $(e).closest('.form-group').addClass('has-error');
-                },
-                success: function (e) {
-                    $(e).closest('.form-group').removeClass('has-error');
-                    $(e).remove();
-                },
-                errorElement: 'div',
-                errorClass: 'help-block inline err-div',
-                focusInvalid: false,
-                ignore: "",
-                errorPlacement: function (error, element) {
-                    //var parent = element.parent("div");
-                    var parent = element.parent("div[class!='input-group']");
-                    //if(!parent){
-                    //    parent = element.parent().parent();
-                    //}
-                    error.appendTo(parent);
-                }
+    if (errorPlacement === undefined) {
+        form.validate({
+            submitHandler: function () {
+            },
+            rules: rules,
+            highlight: function (e) {
+                $(e).closest('.form-group').addClass('has-error');
+            },
+            success: function (e) {
+                $(e).closest('.form-group').removeClass('has-error');
+                $(e).remove();
+            },
+            errorElement: 'div',
+            errorClass: 'help-block inline err-div',
+            focusInvalid: false,
+            ignore: "",
+            errorPlacement: function (error, element) {
+                //var parent = element.parent("div");
+                var parent = element.parent("div[class!='input-group']");
+                //if(!parent){
+                //    parent = element.parent().parent();
+                //}
+                error.appendTo(parent);
             }
-        );
+        });
     }
     else {
-        form.validate(
-            {
-                submitHandler: function () {
-                },
-                rules: rules,
-                highlight: function (e) {
-                    $(e).closest('.form-group').addClass('has-error');
-                },
-                success: function (e) {
-                    $(e).closest('.form-group').removeClass('has-error');
-                    $(e).remove();
-                },
-                errorElement: 'div',
-                errorClass: 'help-block inline err-div',
-                focusInvalid: false,
-                ignore: "",
-                errorPlacement: errorPlacement
-            }
-        );
+        form.validate({
+            submitHandler: function () {
+            },
+            rules: rules,
+            highlight: function (e) {
+                $(e).closest('.form-group').addClass('has-error');
+            },
+            success: function (e) {
+                $(e).closest('.form-group').removeClass('has-error');
+                $(e).remove();
+            },
+            errorElement: 'div',
+            errorClass: 'help-block inline err-div',
+            focusInvalid: false,
+            ignore: "",
+            errorPlacement: errorPlacement
+        });
     }
 
     return form.valid();
@@ -685,7 +681,7 @@ $.fn.clearValidation = function () {
  */
 
 function isEmptyStr(str) {
-    if (!str || str.length === 0 || str === "" || typeof str == 'undefined' || !/[^\s]/.test(str) || /^\s*$/.test(str) || str.replace(/\s/g, "") === "") {
+    if (!str || str.length === 0 || str === "" || typeof str === 'undefined' || !/[^\s]/.test(str) || /^\s*$/.test(str) || str.replace(/\s/g, "") === "") {
         return true;
     } else {
         return false;
