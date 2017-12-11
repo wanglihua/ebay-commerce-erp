@@ -948,7 +948,7 @@
             success: function (result) {
                 $("#inventory_history_wrapper").html(result);
                 load_inventory_history(inventory_id);
-                $("#inventory_history_dialog").modal();
+                $("#inventory_history_dialog").modal(modalOptions);
             }
         });
     }

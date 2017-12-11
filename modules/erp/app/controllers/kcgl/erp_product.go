@@ -201,21 +201,21 @@ FROM erp_product prd
 }
 
 type ProductDetailForm struct {
-	Product                     kcgl_models.ProductInfo                           `json:"product"`
-	ProductImageList            []kcgl_models.ProductImageInfo                    `json:"product_image_list"`
-	SupplierList                []sppz_models.SupplierInfo                        `json:"supplier_list"`
-	ProductCateSelectItemList   []product_cate_service.ProductCateSelectItem      `json:"product_cate_list"`
-	PackageMaterialList         []sppz_models.PackageMaterialInfo                 `json:"package_material_list"`
-	StatusList                  []models.StatusInfo                               `json:"status_list"`
-	ProductBrandList            []sppz_models.BrandInfo                           `json:"product_brand_list"`
-	ProductStyleList            []sppz_models.ProductStyleInfo                    `json:"product_style_list"`
-	ProductCertList             []sppz_models.ProductCertInfo                     `json:"product_cert_list"`
-	InventoryList               []inventory_service.Product_inventory_view_item_t `json:"inventory_list"`
-	OrderItemList               []order_service.Order_item_view_item_t            `json:"order_item_list"`
-	ProductLogList              []kcgl_models.ProductLogInfo                      `json:"product_log_list"`
-	ProductPurchaseList         []ProductPurchaseListItem                         `json:"product_purchase_list"`
-	ProductInventoryHistoryList []ProductInventoryHistoryViewItem                 `json:"product_inventory_history_list"`
-	MessageList                 []message_service.Message_view_item_t             `json:"message_list"`
+	Product                   kcgl_models.ProductInfo                           `json:"product"`
+	ProductImageList          []kcgl_models.ProductImageInfo                    `json:"product_image_list"`
+	SupplierList              []sppz_models.SupplierInfo                        `json:"supplier_list"`
+	ProductCateSelectItemList []product_cate_service.ProductCateSelectItem      `json:"product_cate_list"`
+	PackageMaterialList       []sppz_models.PackageMaterialInfo                 `json:"package_material_list"`
+	StatusList                []models.StatusInfo                               `json:"status_list"`
+	ProductBrandList          []sppz_models.BrandInfo                           `json:"product_brand_list"`
+	ProductStyleList          []sppz_models.ProductStyleInfo                    `json:"product_style_list"`
+	ProductCertList           []sppz_models.ProductCertInfo                     `json:"product_cert_list"`
+	InventoryList             []inventory_service.Product_inventory_view_item_t `json:"inventory_list"`
+	OrderItemList             []order_service.Order_item_view_item_t            `json:"order_item_list"`
+	ProductLogList            []kcgl_models.ProductLogInfo                      `json:"product_log_list"`
+	ProductPurchaseList       []ProductPurchaseListItem                         `json:"product_purchase_list"`
+	//ProductInventoryHistoryList []ProductInventoryHistoryViewItem                 `json:"product_inventory_history_list"`
+	MessageList []message_service.Message_view_item_t `json:"message_list"`
 }
 
 func (f *ProductDetailForm) IsCreate() bool {
@@ -362,7 +362,7 @@ func (c ErpProduct) DetailData() revel.Result {
 
 	var product_purchase_list = c.GetProductPurchaseListData(product_id, 10, db_session)
 
-	var product_inventory_history_list = c.GetProductInventoryHistoryListData(product_id, 10, db_session)
+	// var product_inventory_history_list = c.GetProductInventoryHistoryListData(product_id, 10, db_session)
 
 	var detail_form ProductDetailForm
 	detail_form.Product = product
@@ -379,7 +379,7 @@ func (c ErpProduct) DetailData() revel.Result {
 	detail_form.ProductStyleList = product_style_list
 	detail_form.ProductCertList = product_cert_list
 	detail_form.ProductPurchaseList = product_purchase_list
-	detail_form.ProductInventoryHistoryList = product_inventory_history_list
+	// detail_form.ProductInventoryHistoryList = product_inventory_history_list
 
 	return c.RenderJson(detail_form)
 }
@@ -639,6 +639,7 @@ func (c ErpProduct) InventoryHistoryList(product_id int64) revel.Result {
 	return c.RenderTemplate("erp/kcgl/product/inventory_history_list.html")
 }
 
+/*
 // 这个到后来用另外一种方式实现了，但代码先放着好了
 func (c ErpProduct) InventoryHistoryListData() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.KCGL_PRODUCT, c.Session)
@@ -669,13 +670,12 @@ type ProductInventoryHistoryViewItem struct {
 
 func (c ErpProduct) GetProductInventoryHistoryListData(product_id int64, limit int64, db_session *xorm.Session) []ProductInventoryHistoryViewItem {
 
-	/*
-		SELECT his.*, st.*, loc.*, prd.*
-		FROM erp_inventory_history his
-		    INNER JOIN erp_stock st ON his.stock_id = st.id
-		    LEFT JOIN erp_storage_loc loc ON his.storage_loc_id = loc.id
-		    INNER JOIN erp_product prd ON his.product_id = prd.id
-	*/
+
+		//SELECT his.*, st.*, loc.*, prd.*
+		//FROM erp_inventory_history his
+		//    INNER JOIN erp_stock st ON his.stock_id = st.id
+		//    LEFT JOIN erp_storage_loc loc ON his.storage_loc_id = loc.id
+		//    INNER JOIN erp_product prd ON his.product_id = prd.id
 
 	var sb = core.NewSqlBuilder()
 	sb.Select(`his.*, st.*, loc.*, prd.*`)
@@ -698,6 +698,7 @@ func (c ErpProduct) GetProductInventoryHistoryListData(product_id int64, limit i
 
 	return inventory_history_list
 }
+*/
 
 func (c ErpProduct) GetProductInfo() revel.Result {
 	db_session := c.DbSession

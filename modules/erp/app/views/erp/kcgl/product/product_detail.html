@@ -431,6 +431,7 @@
                                         <th class="center" style="width: 120px;">库位</th>
                                         <th class="center" style="width: 100px;">库存</th>
                                         <th class="center" style="width: 80px;">成本价格</th>
+                                        <th class="center" style="width: 85px">操作</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -455,6 +456,9 @@
                                             </td>
                                             <td class="center" style="vertical-align: middle">
                                                 {{inventory.nvt.cost_price}}
+                                            </td>
+                                            <td>
+                                                <a class='btn btn-xs btn-info btn-inline pull-left' :onclick='"show_inventory_history_dialog(" + inventory.nvt.id + ");"' ><i class='ace-icon fa fa-list'></i>查看历史</a>
                                             </td>
                                         </tr>
                                     </template>
@@ -685,6 +689,7 @@
         </div>
     </div>
 </div>
+<div id="inventory_history_wrapper"></div>
 {%template "erp/kcgl/product/product_detail.var" .%}
 <script type="text/javascript">
     var vm = new Vue({
@@ -733,6 +738,72 @@
             }
         }
     });
+
+
+function show_inventory_history_dialog(inventory_id) {
+    function load_inventory_history(inventory_id) {
+        var history_vm = new Vue({
+            el: "#inventory_history_dialog",
+            data: {}
+        });
+
+        initDataTable(
+            '#inventoryHistoryList',
+            {
+                "sAjaxSource": '{%url "ErpInventoryHistory.ListData"%}',
+                "aaSorting": [[0, "desc"]],
+                "aoColumns": [
+                    {"mDataProp": "his.create_time", "title": "时间", "sClass": "center", "bSearchable": false, "bSortable": false, "width": 120},
+                    {"mDataProp": "st.name", "title": "仓库", "sClass": "center", "bSearchable": false, "bSortable": false},
+                    {"mDataProp": "loc.name", "title": "库位", "sClass": "center", "bSearchable": false, "bSortable": false},
+                    {"mDataProp": "prd.sku", "title": "商品", "sClass": "center", "bSearchable": false, "bSortable": false},
+                    {"mDataProp": "his.price", "title": "价格", "sClass": "center", "bSearchable": false, "bSortable": false},
+                    {"mDataProp": "his.qty", "title": "数量", "sClass": "center", "bSearchable": false, "bSortable": false},
+                    {
+                        "mDataProp": "his.description", "title": "描述", "bSearchable": true, "bSortable": false,
+                        "render": function (data, type, row) {
+                            return "<div style='white-space:normal; word-break: break-all; word-wrap:break-word;'>" + data + "</div>";
+                        }
+                    }
+                ],
+                "fnServerData": function (sSource, aoData, fnCallback) {
+                    showMask("数据加载中，请稍候");
+
+                    aoData.push({'name': 'inventory_id', 'value': inventory_id});
+
+                    $.ajax({
+                        "dataType": 'json',
+                        "url": sSource,
+                        "data": aoData,
+                        "success": function (data) {
+                            hideMask();
+
+                            if (data.success === false) {
+                                $.msg.error(data.message);
+                                return;
+                            }
+
+                            fnCallback(data);
+                        }
+                    });
+                }
+            }
+        );
+    }
+
+    $("#inventory_history_wrapper").html("");
+
+    $.ajax({
+        url: '{%url "ErpInventoryHistory.Index" %}',
+        type: "POST",
+        data: {"inventory_id": inventory_id},
+        success: function (result) {
+            $("#inventory_history_wrapper").html(result);
+            load_inventory_history(inventory_id);
+            $("#inventory_history_dialog").modal(modalOptions);
+        }
+    });
+}
 
 </script>
 {% site_footer %}
