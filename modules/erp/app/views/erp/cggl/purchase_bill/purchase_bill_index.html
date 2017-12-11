@@ -403,7 +403,12 @@
                                         <div class="form-group">
                                             <label for="final_amount" class="col-xs-2 control-label">尾款金额</label>
                                             <div class="col-xs-10">
-                                                <input id="amount" name="purchase_bill_entry_detail.purchase_bill_entry.final_amount" type="text" class="input-sm form-control" v-model.number="purchase_bill_entry_detail.purchase_bill_entry.final_amount"/>
+                                                <div v-if="purchase_bill_entry_detail.purchase_bill_entry.final_amount_status_id == 5900">
+                                                    <input id="amount" name="purchase_bill_entry_detail.purchase_bill_entry.final_amount" type="text" class="input-sm form-control" v-model.number="purchase_bill_entry_detail.purchase_bill_entry.final_amount"/>
+                                                </div>
+                                                <div v-else>
+                                                    <input id="amount" name="purchase_bill_entry_detail.purchase_bill_entry.final_amount" type="text" class="input-sm form-control" v-model.number="purchase_bill_entry_detail.purchase_bill_entry.final_amount" disabled="disabled"/>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
