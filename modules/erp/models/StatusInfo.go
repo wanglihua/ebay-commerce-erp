@@ -8,29 +8,30 @@ import (
 const (
 	//状态类型 begin
 
-	STATUS_TYPE_STOCK                  = 100  // 仓库状态
-	STATUS_TYPE_EXCHANGE_RATE          = 200  // 仓库状态
-	STATUS_TYPE_PRODUCT_CATE           = 300  // 商品目录状态
-	STATUS_TYPE_PRODUCT                = 400  // 商品状态
-	STATUS_TYPE_SHOP_ACCOUNT           = 500  // 店铺账号状态
-	STATUS_TYPE_PAYPAL_ACCOUNT         = 600  // Paypal账号状态
-	STATUS_TYPE_PACKAGE_MTRL           = 700  // 包材 状态
-	STATUS_TYPE_INVENTORY_CHECK        = 800  // 库存盘点单状态
-	STATUS_TYPE_PAYPAL_RECON           = 900  // Paypal对账结果
-	STATUS_TYPE_ORDER_CUSTOM_TYPE      = 1000 // 订单自定义类型
-	STATUS_TYPE_LOGISTICS_NUMBER       = 1100 // 不规则订单运单号类型
-	STATUS_TYPE_LOGISTICS_NUMBER_BATCH = 1200 // 不规则订单运单号类型
-	STATUS_TYPE_PRODUCT_BIND           = 1300 // 绑定商品状态
-	STATUS_TYPE_STOCK_BILL_CHECKIN     = 1400 // 入库单状态
-	STATUS_TYPE_STOCK_BILL_CHECKOUT    = 1500 // 出库单状态
-	STATUS_TYPE_STOCK_BILL_TRANSFER    = 1600 // 调拨单状态
-	STATUS_TYPE_ORDER                  = 1700 // 订单状态
-	STATUS_TYPE_PURCHASE_BILL          = 1800 // 采购单状态
-	STATUS_TYPE_MESSAGE                = 1900 // 消息状态
-	STATUS_TYPE_LOGISTICS_COMPANY      = 2000 // 物流公司状态
-	STATUS_TYPE_LOGISTICS_MODE         = 2100 // 物流模式状态
-	STATUS_TYPE_CONTAINER_TRANSFER     = 2200 // 集装箱调拨状态
-	STATUS_TYPE_INTEL_REPL             = 2300 // 智能补货
+	STATUS_TYPE_STOCK                            = 100  // 仓库状态
+	STATUS_TYPE_EXCHANGE_RATE                    = 200  // 仓库状态
+	STATUS_TYPE_PRODUCT_CATE                     = 300  // 商品目录状态
+	STATUS_TYPE_PRODUCT                          = 400  // 商品状态
+	STATUS_TYPE_SHOP_ACCOUNT                     = 500  // 店铺账号状态
+	STATUS_TYPE_PAYPAL_ACCOUNT                   = 600  // Paypal账号状态
+	STATUS_TYPE_PACKAGE_MTRL                     = 700  // 包材 状态
+	STATUS_TYPE_INVENTORY_CHECK                  = 800  // 库存盘点单状态
+	STATUS_TYPE_PAYPAL_RECON                     = 900  // Paypal对账结果
+	STATUS_TYPE_ORDER_CUSTOM_TYPE                = 1000 // 订单自定义类型
+	STATUS_TYPE_LOGISTICS_NUMBER                 = 1100 // 不规则订单运单号类型
+	STATUS_TYPE_LOGISTICS_NUMBER_BATCH           = 1200 // 不规则订单运单号类型
+	STATUS_TYPE_PRODUCT_BIND                     = 1300 // 绑定商品状态
+	STATUS_TYPE_STOCK_BILL_CHECKIN               = 1400 // 入库单状态
+	STATUS_TYPE_STOCK_BILL_CHECKOUT              = 1500 // 出库单状态
+	STATUS_TYPE_STOCK_BILL_TRANSFER              = 1600 // 调拨单状态
+	STATUS_TYPE_ORDER                            = 1700 // 订单状态
+	STATUS_TYPE_PURCHASE_BILL                    = 1800 // 采购单状态
+	STATUS_TYPE_MESSAGE                          = 1900 // 消息状态
+	STATUS_TYPE_LOGISTICS_COMPANY                = 2000 // 物流公司状态
+	STATUS_TYPE_LOGISTICS_MODE                   = 2100 // 物流模式状态
+	STATUS_TYPE_CONTAINER_TRANSFER               = 2200 // 集装箱调拨状态
+	STATUS_TYPE_INTEL_REPL                       = 2300 // 智能补货
+	STATUS_TYPE_PURCHASE_BILL_ENTRY_FINAL_AMOUNT = 2400 // 采购单明细尾款状态
 
 	//状态类型 end
 
@@ -124,6 +125,9 @@ const (
 
 	INTEL_REPL_STATUS_XSC = 5700 // 新生成
 	INTEL_REPL_STATUS_YCN = 5800 // 已采纳
+
+	PURCHASE_BILL_ENTRY_FINAL_AMOUNT_STATUS_WZF = 5900 // 采购单明细尾款 未支付
+	PURCHASE_BILL_ENTRY_FINAL_AMOUNT_STATUS_YZF = 6000 // 采购单明细尾款 已支付
 
 	//状态 id end
 )
@@ -672,6 +676,23 @@ func (e StatusInfo) InitData(db_session *xorm.Session) {
 		status.Type = STATUS_TYPE_INTEL_REPL
 		status.Name = "已采纳"
 		status.Desc = core.MakeNullString("智能补货状态 已采纳", true)
+		db_session.Insert(status)
+	}
+
+	// 采购单明细尾款状态
+	{
+		status := new(StatusInfo)
+		status.Id = PURCHASE_BILL_ENTRY_FINAL_AMOUNT_STATUS_WZF
+		status.Type = STATUS_TYPE_PURCHASE_BILL_ENTRY_FINAL_AMOUNT
+		status.Name = "未支付"
+		status.Desc = core.MakeNullString("采购单明细尾款状态 未支付", true)
+		db_session.Insert(status)
+
+		status = new(StatusInfo)
+		status.Id = PURCHASE_BILL_ENTRY_FINAL_AMOUNT_STATUS_YZF
+		status.Type = STATUS_TYPE_PURCHASE_BILL_ENTRY_FINAL_AMOUNT
+		status.Name = "已支付"
+		status.Desc = core.MakeNullString("采购单明细尾款状态 已支付", true)
 		db_session.Insert(status)
 	}
 }
