@@ -401,6 +401,30 @@
                                 <div class="row">
                                     <div class="col-xs-6">
                                         <div class="form-group">
+                                            <label for="final_amount" class="col-xs-2 control-label">尾款金额</label>
+                                            <div class="col-xs-10">
+                                                <input id="amount" name="purchase_bill_entry_detail.purchase_bill_entry.final_amount" type="text" class="input-sm form-control" v-model.number="purchase_bill_entry_detail.purchase_bill_entry.final_amount"/>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="pay_amount" class="col-xs-2 control-label">尾款状态</label>
+                                            <div class="col-xs-10">
+                                                <select id="final_amount_status_id" name="purchase_bill_entry_detail.purchase_bill_entry.final_amount_status_id" class="input-sm form-control" v-model.number="purchase_bill_entry_detail.purchase_bill_entry.final_amount_status_id" disabled="disabled">
+                                                    <template v-for="status in purchase_bill_entry_detail.final_amount_status_list">
+                                                        <option :value="status.id">{{status.name}}</option>
+                                                    </template>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
                                             <label for="need_invoice" class="col-xs-2 control-label">是否开票</label>
                                             <div class="col-xs-10">
                                                 <select id="need_invoice" name="purchase_bill_entry_detail.purchase_bill_entry.need_invoice" class="input-sm form-control" v-model.number="purchase_bill_entry_detail.purchase_bill_entry.need_invoice" disabled="disabled">
@@ -983,6 +1007,15 @@
                             },
                             {"mDataProp": "pbe.amount", "title": "金额", "bSearchable": false, "sClass": "center", "width": 50},
                             {"mDataProp": "pbe.pay_amount", "title": "付款", "bSearchable": false, "sClass": "center", "width": 50},
+                            {
+                                "mDataProp": "pbe.final_amount", "title": "尾款", "bSearchable": false, "sClass": "center", "width": 50,
+                                "render": function (data, type, row) {
+                                    if (data === 0) {
+                                        return "";
+                                    }
+                                    return data + "(" + row.fas.name + ")";
+                                }
+                            },
                             {"mDataProp": "pbe.final_expenses", "title": "提货费", "bSearchable": false, "sClass": "center", "width": 60},
                             {"mDataProp": "pbe.checkin_time", "title": "入库时间", "bSearchable": false, "sClass": "center", "width": 120},
                             {
@@ -1368,6 +1401,9 @@
                         required: true, number: true
                     },
                     'purchase_bill_entry_detail.purchase_bill_entry.amount': {
+                        required: true, number: true
+                    },
+                    'purchase_bill_entry_detail.purchase_bill_entry.final_amount': {
                         required: true, number: true
                     },
                     'purchase_bill_entry_detail.purchase_bill_entry.tax_point': {

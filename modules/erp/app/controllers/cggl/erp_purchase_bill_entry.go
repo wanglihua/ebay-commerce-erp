@@ -42,10 +42,11 @@ func (c ErpPurchaseBillEntry) Index() revel.Result {
 }
 
 type PurchaseBillEntryViewItem struct {
-	cggl_models.PurchaseBillEntryInfo     `xorm:"extends" json:"pbe"`
-	cggl_models.PurchaseBillEntryTypeInfo `xorm:"extends" json:"et"`
-	kcgl_models.ProductInfo               `xorm:"extends" json:"p"`
-	models.StatusInfo                     `xorm:"extends" json:"s"`
+	PurchaseBillEntry     cggl_models.PurchaseBillEntryInfo     `xorm:"extends" json:"pbe"`
+	PurchaseBillEntryType cggl_models.PurchaseBillEntryTypeInfo `xorm:"extends" json:"et"`
+	Product               kcgl_models.ProductInfo               `xorm:"extends" json:"p"`
+	Status                models.StatusInfo                     `xorm:"extends" json:"s"`
+	FinalAmountStatus     models.StatusInfo                     `xorm:"extends" json:"fas"`
 }
 
 func (c ErpPurchaseBillEntry) ListData() revel.Result {
@@ -70,20 +71,22 @@ func (c ErpPurchaseBillEntry) ListData() revel.Result {
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
 	/*
-SELECT pbe.*, et.*, p.*, s.*
+SELECT pbe.*, et.*, p.*, s.*, fas.*
 FROM erp_purchase_bill_entry pbe
     INNER JOIN erp_purchase_bill_entry_type et ON et.id = pbe.type_id
     INNER JOIN erp_product p ON pbe.product_id = p.id
     INNER JOIN erp_status s ON pbe.status_id = s.id
+    LEFT JOIN erp_status fas ON pbe.final_amount_status_id = fas.id
 	 */
 
 	sb := core.NewSqlBuilder()
-	sb.Select("pbe.*, et.*, p.*, s.*")
+	sb.Select("pbe.*, et.*, p.*, s.*, fas.*")
 	sb.Count("count(*) as entry_count")
 	sb.From(`erp_purchase_bill_entry pbe
     INNER JOIN erp_purchase_bill_entry_type et ON et.id = pbe.type_id
     INNER JOIN erp_product p ON pbe.product_id = p.id
-    INNER JOIN erp_status s ON pbe.status_id = s.id`)
+    INNER JOIN erp_status s ON pbe.status_id = s.id
+	LEFT JOIN erp_status fas ON pbe.final_amount_status_id = fas.id`)
 
 	sb.Where(core.SqlAnd(filter, fmt.Sprintf("bill_id = %d", purchase_bill_id)))
 
@@ -121,9 +124,10 @@ FROM erp_purchase_bill_entry pbe
 }
 
 type PurchaseBillEntryDetailForm struct {
-	PurchaseBill      cggl_models.PurchaseBillInfo      `json:"purchase_bill"`
-	PurchaseBillEntry cggl_models.PurchaseBillEntryInfo `json:"purchase_bill_entry"`
-	ProductName       string                            `json:"product_name"`
+	PurchaseBill          cggl_models.PurchaseBillInfo      `json:"purchase_bill"`
+	PurchaseBillEntry     cggl_models.PurchaseBillEntryInfo `json:"purchase_bill_entry"`
+	ProductName           string                            `json:"product_name"`
+	FinalAmountStatusList []models.StatusInfo               `json:"final_amount_status_list"`
 }
 
 func (f *PurchaseBillEntryDetailForm) IsCreate() bool {
@@ -203,10 +207,14 @@ func (c ErpPurchaseBillEntry) DetailData() revel.Result {
 		*/
 	}
 
+	var final_amount_status_list = make([]models.StatusInfo, 0)
+	core.HandleError(db_session.Where("type = ?", models.STATUS_TYPE_PURCHASE_BILL_ENTRY_FINAL_AMOUNT).Find(&final_amount_status_list))
+
 	var detail_form PurchaseBillEntryDetailForm
 	detail_form.PurchaseBill = purchase_bill
 	detail_form.PurchaseBillEntry = purchase_bill_entry
 	detail_form.ProductName = product_name
+	detail_form.FinalAmountStatusList = final_amount_status_list
 
 	return c.RenderJson(detail_form)
 }
