@@ -318,3 +318,26 @@ func (c ErpPurchaseFinance) PurchaseEntry() revel.Result {
 		"message": "采购单明细分批采购下单成功！",
 	})
 }
+
+func (c ErpPurchaseFinance) PayFinalAmount() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.CGGL_PURCHASE_FINANCE, c.Session)
+
+	var db_session = c.DbSession
+
+	var entry_id int64
+	c.Params.Bind(&entry_id, "entry_id")
+
+	var purchase_bill_entry cggl_models.PurchaseBillEntryInfo
+	_, err := db_session.Id(entry_id).Get(&purchase_bill_entry)
+	core.HandleError(err)
+
+	purchase_bill_entry.FinalAmountStatusId = models.PURCHASE_BILL_ENTRY_FINAL_AMOUNT_STATUS_YZF
+
+	_, err = db_session.Id(entry_id).Cols("final_amount_status_id").Update(&purchase_bill_entry)
+	core.HandleError(err)
+
+	return c.RenderJson(map[string]interface{}{
+		"success": true,
+		"message": "采购单明细支付尾款成功！",
+	})
+}

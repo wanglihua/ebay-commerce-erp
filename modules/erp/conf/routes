@@ -514,6 +514,7 @@ POST /purchase/finance/entry/list             ErpPurchaseFinance.EntryList
 POST /purchase/finance/entry/pay/amount       ErpPurchaseFinance.EntryPayAmount
 POST /purchase/finance/entry/pay/amount/save  ErpPurchaseFinance.EntryPayAmountSave
 POST /purchase/finance/entry/purchase         ErpPurchaseFinance.PurchaseEntry
+POST /purchase/finance/pay/final/amount       ErpPurchaseFinance.PayFinalAmount
 
 POST /purchase/finance/excel/export           ErpPurchaseFinanceExcel.Export
 

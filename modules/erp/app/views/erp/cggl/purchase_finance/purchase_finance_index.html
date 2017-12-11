@@ -318,6 +318,15 @@
                             {"mDataProp": "pbe.amount", "title": "金额", "bSearchable": false, "sClass": "center", "width": 50},
                             {"mDataProp": "pbe.pay_amount", "title": "付款", "bSearchable": false, "sClass": "center", "width": 50},
                             {
+                                "mDataProp": "pbe.final_amount", "title": "尾款", "bSearchable": false, "width": 50, "sClass": "dtRight",
+                                "render": function (data, type, row) {
+                                    if (data === 0) {
+                                        return "";
+                                    }
+                                    return data + "(" + row.fas.name + ")";
+                                }
+                            },
+                            {
                                 "mDataProp": "pbe.desc", "title": "备注", "bSearchable": true, "sClass": "wrap-word",
                                 "render": function (data, type, row) {
                                     if (data === null) {
@@ -331,11 +340,14 @@
                             {
                                 "mDataProp": "pbe.id", "title": "操作", "bSearchable": true, "sClass": "center", "width": 80,
                                 "render": function (data, type, row) {
+                                    var btn_str = "";
                                     if (row.pbe.status_id === 4500 && row.pbe.type_id === 200) {
-                                        return "<a class='btn btn-xs btn-info btn-inline pull-left' onclick='entry_purchase(" + data + ");' ><i class='ace-icon fa fa-share'></i>下单</a>";
-                                    } else {
-                                        return "";
+                                        btn_str += "<a class='btn btn-xs btn-info btn-inline pull-left' onclick='entry_purchase(" + data + ");' ><i class='ace-icon fa fa-share'></i>下单</a>";
                                     }
+                                    if (row.pbe.final_amount !== 0 && row.pbe.final_amount_status_id === 5900) {
+                                        btn_str += "<a class='btn btn-xs btn-primary btn-inline pull-left' onclick='entry_pay_final_amount(" + data + ");' ><i class='ace-icon fa fa-share'></i>支付尾款</a>";
+                                    }
+                                    return btn_str;
                                 }
                             }
                         ],
@@ -440,6 +452,28 @@
                         // return;
                     }
                     else {
+                        $.msg.show(data.message);
+                        reloadList("#purchaseBillEntryList");
+                        // return;
+                    }
+                }
+            });
+        });
+    }
+
+    function entry_pay_final_amount(id) {
+        $.msg.confirm("确认要支付尾款吗？", function () {
+            $.ajax({
+                url: '{%url "ErpPurchaseFinance.PayFinalAmount"%}',
+                type: "POST",
+                data: {
+                    "entry_id": id
+                },
+                success: function (data) {
+                    if (data.success === false) {
+                        $.msg.error(data.message);
+                        // return;
+                    } else {
                         $.msg.show(data.message);
                         reloadList("#purchaseBillEntryList");
                         // return;
