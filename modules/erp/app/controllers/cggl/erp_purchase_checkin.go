@@ -278,6 +278,8 @@ func (c ErpPurchaseCheckin) Checkin() revel.Result {
 
 	var bill_entry_from_ui = detail_form.PurchaseBillEntry
 
+	var entry_id = bill_entry_from_ui.Id
+
 	var bill_entry_in_db cggl_models.PurchaseBillEntryInfo
 	_, err = db_session.Id(bill_entry_from_ui.Id).Get(&bill_entry_in_db)
 	core.HandleError(err)
@@ -292,6 +294,19 @@ func (c ErpPurchaseCheckin) Checkin() revel.Result {
 
 	var checkin_qty = bill_entry_from_ui.CheckinQty
 	revel.TRACE.Println("checkin_qty: ", checkin_qty)
+
+	if checkin_qty != 0 {
+		var product_checkin_weight cggl_models.ProductCheckinWeightInfo
+		has, err := db_session.Where("entry_id = ?", entry_id).Get(&product_checkin_weight)
+		core.HandleError(err)
+
+		if has == false {
+			return c.RenderJson(map[string]interface{}{
+				"success": false,
+				"message": "请先录入入库商品长宽高重量参数！",
+			})
+		}
+	}
 
 	// 检查状态
 	if bill_entry_in_db.StatusId != models.PURCHASE_BILL_STATUS_CGZ {
@@ -383,6 +398,7 @@ func (c ErpPurchaseCheckin) Checkin() revel.Result {
 	})
 }
 
+// 这个方法现在没用起来
 func (c ErpPurchaseCheckin) CheckinList() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.CGGL_PURCHASE_CHECKIN, c.Session)
 
@@ -447,6 +463,8 @@ func (c ErpPurchaseCheckin) CheckinInTurn() revel.Result {
 
 	var bill_entry_from_ui = detail_form.PurchaseBillEntry
 
+	var entry_id = bill_entry_from_ui.Id
+
 	var bill_entry_in_db cggl_models.PurchaseBillEntryInfo
 	_, err = db_session.Id(bill_entry_from_ui.Id).Get(&bill_entry_in_db)
 	core.HandleError(err)
@@ -460,6 +478,19 @@ func (c ErpPurchaseCheckin) CheckinInTurn() revel.Result {
 	core.HandleError(err)
 
 	var checkin_qty = bill_entry_from_ui.CheckinQty
+
+	if checkin_qty != 0 {
+		var product_checkin_weight cggl_models.ProductCheckinWeightInfo
+		has, err := db_session.Where("entry_id = ?", entry_id).Get(&product_checkin_weight)
+		core.HandleError(err)
+
+		if has == false {
+			return c.RenderJson(map[string]interface{}{
+				"success": false,
+				"message": "请先录入入库商品长宽高重量参数！",
+			})
+		}
+	}
 
 	// 检查状态
 	if bill_entry_in_db.StatusId != models.PURCHASE_BILL_STATUS_CGZ {
