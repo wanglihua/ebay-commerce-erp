@@ -26,13 +26,6 @@ func (c ErpInventoryHistory) Index() revel.Result {
 	return c.RenderTemplate("erp/kcgl/inventory_history/inventory_history_index.html")
 }
 
-type InventoryHistoryViewItem struct {
-	InventoryHistory kcgl_models.InventoryHistoryInfo  `xorm:"extends" json:"his"`
-	Stock            sppz_models.StockInfo             `xorm:"extends" json:"st"`
-	StorageLoc       sppz_models.StorageLocInfo        `xorm:"extends" json:"loc"`
-	Product          kcgl_models.ProductInfo           `xorm:"extends" json:"prd"`
-}
-
 func (c ErpInventoryHistory) ListData() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.KCGL_INVENTORY, c.Session)
 
@@ -46,6 +39,13 @@ func (c ErpInventoryHistory) ListData() revel.Result {
 	core.HandleError(err)
 
 	filter, _, offset, limit := core.GetGridRequestParam(c.Request)
+
+	type InventoryHistoryViewItem struct {
+		InventoryHistory kcgl_models.InventoryHistoryInfo `xorm:"extends" json:"his"`
+		Stock            sppz_models.StockInfo            `xorm:"extends" json:"st"`
+		StorageLoc       sppz_models.StorageLocInfo       `xorm:"extends" json:"loc"`
+		Product          kcgl_models.ProductInfo          `xorm:"extends" json:"prd"`
+	}
 
 	/*
 		SELECT his.*, st.*, loc.*, prd.*
