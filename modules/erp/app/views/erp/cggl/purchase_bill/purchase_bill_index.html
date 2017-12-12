@@ -681,9 +681,9 @@
 
                                     <div class="col-xs-6">
                                         <div class="form-group">
-                                            <label for="advance_expenses" class="col-xs-2 control-label">提货费</label>
+                                            <label for="freight_charge" class="col-xs-2 control-label">运费</label>
                                             <div class="col-xs-10">
-                                                <input id="advance_expenses" name="purchase_bill_entry_detail.purchase_bill_entry.advance_expenses" type="text" class="input-sm form-control" v-model.number="purchase_bill_entry_detail.purchase_bill_entry.advance_expenses"/>
+                                                <input id="freight_charge" name="purchase_bill_entry_detail.purchase_bill_entry.freight_charge" type="text" class="input-sm form-control" v-model.number="purchase_bill_entry_detail.purchase_bill_entry.freight_charge"/>
                                             </div>
                                         </div>
                                     </div>
@@ -1021,7 +1021,7 @@
                                     return data + "(" + row.fas.name + ")";
                                 }
                             },
-                            {"mDataProp": "pbe.final_expenses", "title": "提货费", "bSearchable": false, "sClass": "center", "width": 60},
+                            {"mDataProp": "pbe.freight_charge", "title": "运费", "bSearchable": false, "sClass": "center", "width": 60},
                             {"mDataProp": "pbe.checkin_time", "title": "入库时间", "bSearchable": false, "sClass": "center", "width": 120},
                             {
                                 "mDataProp": "pbe.desc", "title": "备注", "bSearchable": true, "sClass": "wrap-word",
@@ -1409,6 +1409,9 @@
                         required: true, number: true
                     },
                     'purchase_bill_entry_detail.purchase_bill_entry.final_amount': {
+                        required: true, number: true
+                    },
+                    'purchase_bill_entry_detail.purchase_bill_entry.freight_charge': {
                         required: true, number: true
                     },
                     'purchase_bill_entry_detail.purchase_bill_entry.tax_point': {
