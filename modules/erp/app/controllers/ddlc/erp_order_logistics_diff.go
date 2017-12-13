@@ -80,7 +80,7 @@ func (c ErpOrderLogisticsDiff) ListData() revel.Result {
 SELECT oll.*, o.*, osa.*, ht.*, lm.*, lm_sec.*
 FROM erp_order_logistics_logic oll
     INNER JOIN erp_order o ON o.id = oll.order_id
-    INNER JOIN erp_order_shipping_address osa ON osa.id = oll.address_id
+    LEFT JOIN erp_order_shipping_address osa ON osa.id = oll.address_id
     LEFT JOIN erp_order_hold_type ht ON ht.id = o.hold_type_id
     LEFT JOIN erp_logistics_mode lm ON lm.id = oll.mode_id
     LEFT JOIN erp_logistics_mode lm_sec ON lm_sec.id = oll.mode_id_second;
@@ -91,7 +91,7 @@ FROM erp_order_logistics_logic oll
 	sb.Count("count(oll.id) as count")
 	sb.From(`erp_order_logistics_logic oll
     INNER JOIN erp_order o ON o.id = oll.order_id
-    INNER JOIN erp_order_shipping_address osa ON osa.id = oll.address_id
+    LEFT JOIN erp_order_shipping_address osa ON osa.id = oll.address_id
     LEFT JOIN erp_order_hold_type ht ON ht.id = o.hold_type_id
     LEFT JOIN erp_logistics_mode lm ON lm.id = oll.mode_id
     LEFT JOIN erp_logistics_mode lm_sec ON lm_sec.id = oll.mode_id_second`)
