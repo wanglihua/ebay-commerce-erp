@@ -235,7 +235,7 @@ func (c ErpOrderLogisticsDiff) Export() revel.Result {
 	shipped_time_end_query, shipped_time_end_query_err := core.Parse_time(shipped_time_end_query_str)
 
 	if stock_query != 0 {
-		filter = core.SqlAnd(filter, fmt.Sprintf("lm.stock_id = %d", stock_query))
+		filter = core.SqlAnd(filter, fmt.Sprintf("oll.stock_id = %d", stock_query))
 	}
 
 	if stock_second_query != 0 {
@@ -257,9 +257,9 @@ func (c ErpOrderLogisticsDiff) Export() revel.Result {
 SELECT oll.*, o.*, osa.*, s.*, lm.*, s_sec.*, lm_sec.*
 FROM erp_order_logistics_logic oll
     INNER JOIN erp_order o ON o.id = oll.order_id
-    INNER JOIN erp_order_shipping_address osa ON osa.id = oll.address_id
-    INNER JOIN erp_stock s ON s.id = oll.stock_id
-    INNER JOIN erp_logistics_mode lm ON lm.id = oll.mode_id
+    LEFT JOIN erp_order_shipping_address osa ON osa.id = oll.address_id
+    LEFT JOIN erp_stock s ON s.id = oll.stock_id
+    LEFT JOIN erp_logistics_mode lm ON lm.id = oll.mode_id
     LEFT JOIN erp_stock s_sec ON s_sec.id = oll.stock_id_second
     LEFT JOIN erp_logistics_mode lm_sec ON lm_sec.id = oll.mode_id_second
 	 */
@@ -268,9 +268,9 @@ FROM erp_order_logistics_logic oll
 	sb.Select("oll.*, o.*, osa.*, s.*, lm.*, s_sec.*, lm_sec.*")
 	sb.From(`erp_order_logistics_logic oll
     INNER JOIN erp_order o ON o.id = oll.order_id
-    INNER JOIN erp_order_shipping_address osa ON osa.id = oll.address_id
-    INNER JOIN erp_stock s ON s.id = oll.stock_id
-    INNER JOIN erp_logistics_mode lm ON lm.id = oll.mode_id
+    LEFT JOIN erp_order_shipping_address osa ON osa.id = oll.address_id
+    LEFT JOIN erp_stock s ON s.id = oll.stock_id
+    LEFT JOIN erp_logistics_mode lm ON lm.id = oll.mode_id
     LEFT JOIN erp_stock s_sec ON s_sec.id = oll.stock_id_second
     LEFT JOIN erp_logistics_mode lm_sec ON lm_sec.id = oll.mode_id_second`)
 	sb.Where(filter)
