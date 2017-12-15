@@ -346,8 +346,8 @@ POST /product/bind/import                  ErpProductBind.Import
 GET  /product/bind/log                     ErpProductBindLog.Index
 POST /product/bind/log/data/list           ErpProductBindLog.ListData
 
-GET  /diary/income/report                  ErpDiaryIncomeReport.Index
-GET  /diary/sales/report                   ErpDiarySalesReport.Index
+GET  /diary/income/amount/report           ErpDiaryIncomeAmountReport.Index
+GET  /diary/sales/amount/report            ErpDiarySalesAmountReport.Index
 GET  /month/sales/amount/report            ErpMonthSalesAmountReport.Index
 GET  /hot/sales/product/rank               ErpHotSalesProductRank.Index
 GET  /hot/sales/store/rank                 ErpHotSalesStoreRank.Index
