@@ -4,6 +4,7 @@ import (
 	"github.com/go-xorm/xorm"
 	"matrix/core"
 	"matrix/modules/erp/models/ddlc_models"
+	"matrix/modules/erp/models/ddpz_models"
 )
 
 func Update_order_logistics_cost_amount_and_order_profit_and_order_item_price_profit(order ddlc_models.OrderInfo, order_logistics ddlc_models.OrderLogisticsInfo, db_session *xorm.Session) {
@@ -33,16 +34,26 @@ func Update_order_logistics_cost_amount_and_order_profit_and_order_item_price_pr
 	order_import_same_code_list[index].gross_profit = (order_import_same_code_list[index].price_rmb - order_import_same_code_list[index].cost_price) * float64(order_import.Spsl)
 	 */
 
+	var order_item_update_cols = []string{"gross_profit"}
+
+	// 手工创建的订单不自动计算价格和分配，其它的订单计算
+	if order.TypeId != ddpz_models.ORDER_TYPE_SGCJ {
+		order_item_update_cols = append(order_item_update_cols, "transaction_price", "transaction_price_currency", "transaction_price_rmb")
+	}
+
 	for _, oi := range order_item_list {
-		// 价格分配
-		oi.TransactionPrice = oi.CostPrice * float64(oi.Quantity) * order.AmountPaid / order_cost_amount / float64(oi.Quantity)
-		oi.TransactionPriceCurrency = "AUD"
-		oi.TransactionPriceRmb = oi.TransactionPrice * order.ExchangeRate
+		// 手工创建的订单不自动计算价格和分配，其它的订单计算
+		if order.TypeId != ddpz_models.ORDER_TYPE_SGCJ {
+			// 价格分配
+			oi.TransactionPrice = oi.CostPrice * float64(oi.Quantity) * order.AmountPaid / order_cost_amount / float64(oi.Quantity)
+			oi.TransactionPriceCurrency = "AUD"
+			oi.TransactionPriceRmb = oi.TransactionPrice * order.ExchangeRate
+		}
 
 		// 利润分配
 		oi.GrossProfit = oi.CostPrice * float64(oi.Quantity) * order.ProfitAu / order_cost_amount
 
-		_, err := db_session.Id(oi.Id).Cols("transaction_price", "transaction_price_currency", "transaction_price_rmb", "gross_profit").Update(&oi)
+		_, err := db_session.Id(oi.Id).Cols(order_item_update_cols...).Update(&oi)
 		core.HandleError(err)
 	}
 }

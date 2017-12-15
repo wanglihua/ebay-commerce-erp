@@ -13,7 +13,6 @@ import (
 	"matrix/modules/erp/models/kcgl_models"
 	"matrix/modules/erp/models/ddlc_models"
 	"matrix/modules/erp/models/ddpz_models"
-	"matrix/modules/erp/service/exchange_rate_service"
 )
 
 type ErpOrderItem struct {
@@ -115,7 +114,7 @@ func (c ErpOrderItem) Save() revel.Result {
 		core.HandleError(err)
 	}
 
-	var exchange_rate = exchange_rate_service.Get_aud_exchange_rate(db_session)
+	var exchange_rate = order.ExchangeRate
 
 	order_item.OrderId = order_item_form.OrderId
 	order_item.TransactionPriceCurrency = "AUD"
