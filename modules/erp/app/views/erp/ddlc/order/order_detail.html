@@ -359,12 +359,10 @@
                                         RMB {{ format_amount(detail.order_logistics.pick_fee*detail.order.exchange_rate) }}
                                     </td>
                                     <td class="dtRight">
-                                        RMB {{ format_amount(detail.order_logistics.total_fee
-                                        *detail.order.exchange_rate) }}
+                                        RMB {{ format_amount(detail.order_logistics.total_fee*detail.order.exchange_rate) }}
                                     </td>
                                     <td class="dtRight">
-                                        RMB {{ format_amount(detail.order_logistics.actual_fee
-                                        *detail.order.exchange_rate) }}
+                                        RMB {{ format_amount(detail.order_logistics.actual_fee*detail.order.exchange_rate) }}
                                     </td>
                                 </tr>
                                 </tbody>
@@ -932,6 +930,17 @@
                                                 </div>
                                             </div>
                                         </div>
+                                    </div>
+                                    <div class="row" v-if="order_item_detail.is_order_sgcj">
+                                        <div class="col-xs-6">
+                                            <div class="form-group">
+                                                <label for="price" class="col-xs-4 control-label">价格（AUD）</label>
+                                                <div class="col-xs-8">
+                                                    <input id="price" name="order_item_detail.price" type="text" class="input-sm form-control" v-model.number="order_item_detail.price"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-xs-6"></div>
                                     </div>
                                 </form>
                             </div>

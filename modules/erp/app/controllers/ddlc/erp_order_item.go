@@ -12,6 +12,8 @@ import (
 	"matrix/modules/erp/service/inventory_service"
 	"matrix/modules/erp/models/kcgl_models"
 	"matrix/modules/erp/models/ddlc_models"
+	"matrix/modules/erp/models/ddpz_models"
+	"matrix/modules/erp/service/exchange_rate_service"
 )
 
 type ErpOrderItem struct {
@@ -29,8 +31,12 @@ func (c ErpOrderItem) DetailData() revel.Result {
 
 	var db_session = c.DbSession
 
+	var order ddlc_models.OrderInfo
+	_, err := db_session.Id(order_id).Get(&order)
+	core.HandleError(err)
+
 	var order_item ddlc_models.OrderItemInfo
-	_, err := db_session.Id(item_id).Get(&order_item)
+	_, err = db_session.Id(item_id).Get(&order_item)
 	core.HandleError(err)
 
 	var order_item_form OrderItemForm
@@ -38,6 +44,8 @@ func (c ErpOrderItem) DetailData() revel.Result {
 	order_item_form.OrderId = order_id
 	order_item_form.Sku = order_item.ItemSku
 	order_item_form.Qty = order_item.Quantity
+	order_item_form.Price = order_item.TransactionPrice
+	order_item_form.IsOrderSgcj = order.TypeId == ddpz_models.ORDER_TYPE_SGCJ
 
 	return c.RenderJson(map[string]interface{}{
 		"success":           true,
@@ -46,14 +54,15 @@ func (c ErpOrderItem) DetailData() revel.Result {
 }
 
 type OrderItemForm struct {
-	ItemId  int64  `json:"item_id"` //这是 order_item 表的主键
-	OrderId int64  `json:"order_id"`
-	Sku     string `json:"sku"`
-	Qty     int    `json:"qty"`
+	ItemId      int64   `json:"item_id"` //这是 order_item 表的主键
+	OrderId     int64   `json:"order_id"`
+	Sku         string  `json:"sku"`
+	Qty         int     `json:"qty"`
+	Price       float64 `json:"price"`
+	IsOrderSgcj bool    `json:"is_order_sgcj"` // 是否是手工创建的订单
 }
 
 func (c ErpOrderItem) Save() revel.Result {
-
 	pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_VIEW_DETAIL, c.Session)
 
 	var db_session = c.DbSession
@@ -106,11 +115,15 @@ func (c ErpOrderItem) Save() revel.Result {
 		core.HandleError(err)
 	}
 
+	var exchange_rate = exchange_rate_service.Get_aud_exchange_rate(db_session)
+
 	order_item.OrderId = order_item_form.OrderId
 	order_item.TransactionPriceCurrency = "AUD"
 	order_item.ItemProductId = product.Id
 	order_item.ItemSku = order_item_form.Sku
 	order_item.Quantity = order_item_form.Qty
+	order_item.TransactionPrice = order_item_form.Price
+	order_item.TransactionPriceRmb = order_item_form.Price * exchange_rate
 
 	//获取成本价 AUD
 	if stock_id == 0 {
@@ -124,6 +137,10 @@ func (c ErpOrderItem) Save() revel.Result {
 		core.HandleError(err)
 	} else {
 		var update_cols = []string{"item_product_id", "item_sku", "quantity", "cost_price", "transaction_price_currency"}
+		if order.TypeId == ddpz_models.ORDER_TYPE_SGCJ {
+			update_cols = append(update_cols, "transaction_price", "transaction_price_rmb")
+		}
+
 		_, err = db_session.Id(order_item_form.ItemId).Cols(update_cols...).Update(&order_item)
 		core.HandleError(err)
 	}
