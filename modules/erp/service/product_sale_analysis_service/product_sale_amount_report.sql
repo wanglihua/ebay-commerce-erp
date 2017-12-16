@@ -34,17 +34,7 @@ CREATE PROCEDURE product_sale_amount_report()
                 LEAVE product_id_loop;
             END IF;
 
-            -- 这里做你想做的循环的事件
 
-            /*
-            SELECT count(sd.id) INTO v_count
-            FROM erp_sale_report_time_day sd
-            WHERE sa.type = 300 AND sa.daily_mean_sales > v_daily_mean_sales;
-
-            UPDATE erp_sale_report_time_day
-            SET rank = v_count + 1
-            WHERE id = v_sa_id;
-            */
 
         END LOOP;
 
