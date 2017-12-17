@@ -119,7 +119,27 @@
                             {"mDataProp": "cw.weight", "title": "重量", "bSearchable": false, "bSortable": false, "width": 80},
                             {"mDataProp": "cw.create_time", "title": "创建时间", "bSearchable": false, "width": 120},
                             {"mDataProp": "cw.update_time", "title": "修改时间", "bSearchable": false, "width": 120}
-                        ]
+                        ],
+                        "fnServerData": function (sSource, aoData, fnCallback) {
+                            showMask("数据加载中，请稍候");
+
+                            aoData.push({'name': 'entry_id', 'value': entry_id});
+
+                            $.ajax(
+                                    {
+                                        "dataType": 'json',
+                                        "url": sSource,
+                                        "data": aoData,
+                                        "success": function (data) {
+                                            hideMask();
+                                            if (data.success === false) {
+                                                $.msg.error(data.message);
+                                                return;
+                                            }
+                                            fnCallback(data);
+                                        }
+                                    });
+                        }
                     }
             );
         },

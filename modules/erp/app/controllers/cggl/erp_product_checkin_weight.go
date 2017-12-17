@@ -22,6 +22,9 @@ func (c ErpProductCheckinWeight) Index() revel.Result {
 func (c ErpProductCheckinWeight) ListData() revel.Result {
 	var db_session = c.DbSession
 
+	var entry_id int64
+	c.Params.Bind(&entry_id, "entry_id")
+
 	type product_checkin_weight_item_t struct {
 		PurchaseBill         cggl_models.PurchaseBillInfo         `xorm:"extends" json:"pb"`
 		ProductCheckinWeight cggl_models.ProductCheckinWeightInfo `xorm:"extends" json:"cw"`
@@ -43,6 +46,9 @@ FROM erp_product_checkin_weight cw
 	sb.From(`erp_product_checkin_weight cw
     INNER JOIN erp_purchase_bill_entry be ON cw.entry_id = be.id
     INNER JOIN erp_purchase_bill pb ON be.bill_id = pb.id`)
+
+	filter = core.SqlAnd(filter, fmt.Sprintf("be.id = %d", entry_id))
+
 	sb.Where(filter)
 	sb.Limit(offset, limit)
 
