@@ -538,6 +538,59 @@
 
         <div class="widget-box">
             <div class="widget-header">
+                <h4 class="smaller widget-title">商品入库长宽高重量</h4>
+                <div class="widget-toolbar">
+                </div>
+            </div>
+            <div class="widget-body">
+                <div class="widget-main">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <table id="product_purchase_data_list" class="table table-striped table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th class="center" style="width: 100px;">采购批次号</th>
+                                        <th class="center">采购单价</th>
+                                        <th class="center">中国仓成本价</th>
+                                        <th class="center">数量</th>
+                                        <th class="center">是否开票</th>
+                                        <th class="center" style="width:60px;">状态</th>
+                                        <th class="center" style="width:120px;">采购时间</th>
+                                        <th class="center" style="width:120px;">付款时间</th>
+                                        <th class="center" style="width:120px;">入库时间</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <template v-for="(checkin_weight, index) in detail.product_purchase_checkin_weight_list">
+                                        <tr>
+                                            <td class="center" style="vertical-align: middle;">{{product_purchase.pb.code}}</td>
+                                            <td class="center" style="vertical-align: middle;">{{product_purchase.pbe.price}}</td>
+                                            <td class="center" style="vertical-align: middle;">{{product_purchase.pbe.inventory_cost}}</td>
+                                            <td class="center" style="vertical-align: middle;">{{product_purchase.pbe.qty}}</td>
+                                            <td class="center" style="vertical-align: middle;">
+                                                <span v-if="product_purchase.pbe.need_invoice == 0">
+                                                否
+                                            </span>
+                                                <span v-else>
+                                                是
+                                            </span>
+                                            </td>
+                                            <td class="center" style="vertical-align: middle;">{{product_purchase.s.name}}</td>
+                                            <td class="center" style="vertical-align: middle;">{{product_purchase.pb.apply_time}}</td>
+                                            <td class="center" style="vertical-align: middle;">{{product_purchase.pb.pay_time}}</td>
+                                            <td class="center" style="vertical-align: middle;">{{product_purchase.pbe.checkin_time}}</td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="widget-box">
+            <div class="widget-header">
                 <h4 class="smaller widget-title">采购记录</h4>
                 <div class="widget-toolbar">
                     <label>
@@ -592,7 +645,7 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div>        
 
         <div class="widget-box">
             <div class="widget-header">

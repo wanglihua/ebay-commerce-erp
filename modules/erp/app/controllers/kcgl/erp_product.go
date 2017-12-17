@@ -200,22 +200,28 @@ FROM erp_product prd
 	})
 }
 
+type product_purchase_checkin_weight_list_item_t struct {
+	cggl_models.PurchaseBillInfo         `xorm:"extends" json:"pb"`
+	cggl_models.ProductCheckinWeightInfo `xorm:"extends" json:"cw"`
+}
+
 type ProductDetailForm struct {
-	Product                   kcgl_models.ProductInfo                           `json:"product"`
-	ProductImageList          []kcgl_models.ProductImageInfo                    `json:"product_image_list"`
-	SupplierList              []sppz_models.SupplierInfo                        `json:"supplier_list"`
-	ProductCateSelectItemList []product_cate_service.ProductCateSelectItem      `json:"product_cate_list"`
-	PackageMaterialList       []sppz_models.PackageMaterialInfo                 `json:"package_material_list"`
-	StatusList                []models.StatusInfo                               `json:"status_list"`
-	ProductBrandList          []sppz_models.BrandInfo                           `json:"product_brand_list"`
-	ProductStyleList          []sppz_models.ProductStyleInfo                    `json:"product_style_list"`
-	ProductCertList           []sppz_models.ProductCertInfo                     `json:"product_cert_list"`
-	InventoryList             []inventory_service.Product_inventory_view_item_t `json:"inventory_list"`
-	OrderItemList             []order_service.Order_item_view_item_t            `json:"order_item_list"`
-	ProductLogList            []kcgl_models.ProductLogInfo                      `json:"product_log_list"`
-	ProductPurchaseList       []ProductPurchaseListItem                         `json:"product_purchase_list"`
+	Product                          kcgl_models.ProductInfo                           `json:"product"`
+	ProductImageList                 []kcgl_models.ProductImageInfo                    `json:"product_image_list"`
+	SupplierList                     []sppz_models.SupplierInfo                        `json:"supplier_list"`
+	ProductCateSelectItemList        []product_cate_service.ProductCateSelectItem      `json:"product_cate_list"`
+	PackageMaterialList              []sppz_models.PackageMaterialInfo                 `json:"package_material_list"`
+	StatusList                       []models.StatusInfo                               `json:"status_list"`
+	ProductBrandList                 []sppz_models.BrandInfo                           `json:"product_brand_list"`
+	ProductStyleList                 []sppz_models.ProductStyleInfo                    `json:"product_style_list"`
+	ProductCertList                  []sppz_models.ProductCertInfo                     `json:"product_cert_list"`
+	InventoryList                    []inventory_service.Product_inventory_view_item_t `json:"inventory_list"`
+	OrderItemList                    []order_service.Order_item_view_item_t            `json:"order_item_list"`
+	ProductLogList                   []kcgl_models.ProductLogInfo                      `json:"product_log_list"`
+	ProductPurchaseList              []ProductPurchaseListItem                         `json:"product_purchase_list"`
+	MessageList                      []message_service.Message_view_item_t             `json:"message_list"`
+	ProductPurchaseCheckinWeightList []product_purchase_checkin_weight_list_item_t     `json:"product_purchase_checkin_weight_list"`
 	//ProductInventoryHistoryList []ProductInventoryHistoryViewItem                 `json:"product_inventory_history_list"`
-	MessageList []message_service.Message_view_item_t `json:"message_list"`
 }
 
 func (f *ProductDetailForm) IsCreate() bool {
@@ -362,6 +368,27 @@ func (c ErpProduct) DetailData() revel.Result {
 
 	var product_purchase_list = c.GetProductPurchaseListData(product_id, 10, db_session)
 
+	/*
+SELECT pb.*, cw.*
+FROM erp_product_checkin_weight cw
+    INNER JOIN erp_purchase_bill pb ON cw.bill_id = pb.id
+WHERE cw.product_id = 17580
+ORDER BY cw.update_time DESC
+LIMIT 10;
+	 */
+
+	var product_purchase_checkin_weight_list_sql = `
+SELECT pb.*, cw.*
+FROM erp_product_checkin_weight cw
+    INNER JOIN erp_purchase_bill pb ON cw.bill_id = pb.id
+WHERE cw.product_id = %d
+ORDER BY cw.update_time DESC
+LIMIT 10;`
+	product_purchase_checkin_weight_list_sql = fmt.Sprintf(product_purchase_checkin_weight_list_sql, product_id)
+
+	var product_purchase_checkin_weight_list = make([]product_purchase_checkin_weight_list_item_t, 0)
+	core.HandleError(db_session.Sql(product_purchase_checkin_weight_list_sql).Find(&product_purchase_checkin_weight_list))
+
 	// var product_inventory_history_list = c.GetProductInventoryHistoryListData(product_id, 10, db_session)
 
 	var detail_form ProductDetailForm
@@ -380,6 +407,7 @@ func (c ErpProduct) DetailData() revel.Result {
 	detail_form.ProductCertList = product_cert_list
 	detail_form.ProductPurchaseList = product_purchase_list
 	// detail_form.ProductInventoryHistoryList = product_inventory_history_list
+	detail_form.ProductPurchaseCheckinWeightList = product_purchase_checkin_weight_list
 
 	return c.RenderJson(detail_form)
 }
