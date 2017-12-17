@@ -201,8 +201,8 @@ FROM erp_product prd
 }
 
 type product_purchase_checkin_weight_list_item_t struct {
-	cggl_models.PurchaseBillInfo         `xorm:"extends" json:"pb"`
-	cggl_models.ProductCheckinWeightInfo `xorm:"extends" json:"cw"`
+	PurchaseBill         cggl_models.PurchaseBillInfo         `xorm:"extends" json:"pb"`
+	ProductCheckinWeight cggl_models.ProductCheckinWeightInfo `xorm:"extends" json:"cw"`
 }
 
 type ProductDetailForm struct {

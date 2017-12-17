@@ -550,35 +550,24 @@
                                 <thead>
                                     <tr>
                                         <th class="center" style="width: 100px;">采购批次号</th>
-                                        <th class="center">采购单价</th>
-                                        <th class="center">中国仓成本价</th>
-                                        <th class="center">数量</th>
-                                        <th class="center">是否开票</th>
-                                        <th class="center" style="width:60px;">状态</th>
-                                        <th class="center" style="width:120px;">采购时间</th>
-                                        <th class="center" style="width:120px;">付款时间</th>
-                                        <th class="center" style="width:120px;">入库时间</th>
+                                        <th class="center" style="width:80px;">长</th>
+                                        <th class="center" style="width:80px;">宽</th>
+                                        <th class="center" style="width:80px;">高</th>
+                                        <th class="center" style="width:120px;">重量</th>
+                                        <th class="center" style="width:120px;">创建时间</th>
+                                        <th class="center" style="width:120px;">更新时间</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <template v-for="(checkin_weight, index) in detail.product_purchase_checkin_weight_list">
                                         <tr>
-                                            <td class="center" style="vertical-align: middle;">{{product_purchase.pb.code}}</td>
-                                            <td class="center" style="vertical-align: middle;">{{product_purchase.pbe.price}}</td>
-                                            <td class="center" style="vertical-align: middle;">{{product_purchase.pbe.inventory_cost}}</td>
-                                            <td class="center" style="vertical-align: middle;">{{product_purchase.pbe.qty}}</td>
-                                            <td class="center" style="vertical-align: middle;">
-                                                <span v-if="product_purchase.pbe.need_invoice == 0">
-                                                否
-                                            </span>
-                                                <span v-else>
-                                                是
-                                            </span>
-                                            </td>
-                                            <td class="center" style="vertical-align: middle;">{{product_purchase.s.name}}</td>
-                                            <td class="center" style="vertical-align: middle;">{{product_purchase.pb.apply_time}}</td>
-                                            <td class="center" style="vertical-align: middle;">{{product_purchase.pb.pay_time}}</td>
-                                            <td class="center" style="vertical-align: middle;">{{product_purchase.pbe.checkin_time}}</td>
+                                            <td class="center" style="vertical-align: middle;">{{checkin_weight.pb.code}}</td>
+                                            <td class="center" style="vertical-align: middle;">{{checkin_weight.cw.length}}</td>
+                                            <td class="center" style="vertical-align: middle;">{{checkin_weight.cw.width}}</td>
+                                            <td class="center" style="vertical-align: middle;">{{checkin_weight.cw.height}}</td>
+                                            <td class="center" style="vertical-align: middle;">{{checkin_weight.cw.weight}}</td>
+                                            <td class="center" style="vertical-align: middle;">{{checkin_weight.cw.create_time}}</td>
+                                            <td class="center" style="vertical-align: middle;">{{checkin_weight.cw.update_time}}</td>
                                         </tr>
                                     </template>
                                 </tbody>
@@ -645,7 +634,7 @@
                     </div>
                 </div>
             </div>
-        </div>        
+        </div>
 
         <div class="widget-box">
             <div class="widget-header">
