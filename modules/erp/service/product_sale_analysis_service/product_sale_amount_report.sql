@@ -17,6 +17,8 @@ CREATE PROCEDURE product_sale_amount_report()
             FROM erp_product p
             ORDER BY p.id;
 
+
+
         -- 将结束标志绑定到游标
         DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
@@ -33,6 +35,7 @@ CREATE PROCEDURE product_sale_amount_report()
             THEN
                 LEAVE product_id_loop;
             END IF;
+
 
 
 
