@@ -90,7 +90,9 @@ status_id_query
 
 	query_end_time, query_end_time_err := core.Parse_time(query_end_time_str)
 
-	filter, order, _, _ := core.GetGridRequestParam(c.Request)
+	_, order, _, _ := core.GetGridRequestParam(c.Request)
+
+	var filter = "1=1";
 
 	/*
 
@@ -256,19 +258,19 @@ func (c ErpIntelReplExcel) get_export_excel_content(db_session *xorm.Session, it
 		col_index++
 
 		cell = row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 30)
+		sheet.SetColWidth(col_index, col_index, 50)
 		set_head_cell_style(cell)
 		cell.Value = "商品"
 		col_index++
 
 		cell = row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 12)
+		sheet.SetColWidth(col_index, col_index, 30)
 		set_head_cell_style(cell)
 		cell.Value = "供应商"
 		col_index++
 
 		cell = row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 35)
+		sheet.SetColWidth(col_index, col_index, 12)
 		set_head_cell_style(cell)
 		cell.Value = "商品状态"
 		col_index++
@@ -292,7 +294,7 @@ func (c ErpIntelReplExcel) get_export_excel_content(db_session *xorm.Session, it
 		col_index++
 
 		cell = row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 10)
+		sheet.SetColWidth(col_index, col_index, 20)
 		set_head_cell_style(cell)
 		cell.Value = "生成时间"
 		col_index++
@@ -302,9 +304,9 @@ func (c ErpIntelReplExcel) get_export_excel_content(db_session *xorm.Session, it
 		row = sheet.AddRow()
 		row.SetHeightCM(common_row_height)
 
-		// 批次号
+		// SKU
 		cell := row.AddCell()
-		set_text_cell_style(cell, "center")
+		set_text_cell_style(cell, "left")
 		cell.Value = item.Product.Sku
 
 		// 商品
@@ -314,7 +316,7 @@ func (c ErpIntelReplExcel) get_export_excel_content(db_session *xorm.Session, it
 
 		// 供应商
 		cell = row.AddCell()
-		set_text_cell_style(cell, "center")
+		set_text_cell_style(cell, "left")
 		cell.Value = item.Supplier.Name
 
 		// 商品状态

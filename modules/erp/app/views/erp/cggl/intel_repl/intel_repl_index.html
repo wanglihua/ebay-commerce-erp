@@ -29,6 +29,10 @@
                         <i class="ace-icon fa fa-refresh"></i>
                         立即计算智能补货
                     </button>
+                    <button class="btn btn-purple btn-sm" onclick="exportIntelReplList()">
+                        <i class="ace-icon fa fa-file-excel-o"></i>
+                        导出
+                    </button>
                 </div>
                 <div id="query" style="line-height: 28px;">
                     <label for="sku_query">SKU</label>
@@ -166,6 +170,23 @@
     </div>
 </div>
 <script type="text/javascript">
+
+    function exportIntelReplList() {
+        var params = $.param({
+            "sku_query": $("#sku_query").val(),
+            "min_profit_query": $("#min_profit_query").val(),
+            "max_profit_query": $("#max_profit_query").val(),
+            "product_status_id_query": $("#product_status_id_query").val(),
+            "status_id_query": $("#status_id_query").val(),
+            "sale_user_id_query": $("#sale_user_id_query").val(),
+            "dev_user_id_query": $("#dev_user_id_query").val(),
+            "query_begin_time": $("#query_begin_time").val(),
+            "query_end_time": $("#query_end_time").val()
+        });
+
+        var url = '{%url "ErpIntelReplExcel.Export"%}' + "?" + params;
+        $('<form method="post" action="' + url + '"></form>').appendTo('body').submit().remove();
+    }
 
     $(function () {
         $('#query_begin_time').datetimepicker({
