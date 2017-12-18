@@ -301,70 +301,46 @@ func (c ErpIntelReplExcel) get_export_excel_content(db_session *xorm.Session, it
 	for _, item := range item_list {
 		row = sheet.AddRow()
 		row.SetHeightCM(common_row_height)
-		//
-		//// 批次号
-		//cell := row.AddCell()
-		//set_text_cell_style(cell, "center")
-		//cell.Value = entry.PurchaseBill.Code
-		//
-		//// 供应商
-		//cell = row.AddCell()
-		//set_text_cell_style(cell, "left")
-		//cell.Value = entry.Supplier.Name
-		//
-		//// SKU
-		//cell = row.AddCell()
-		//set_text_cell_style(cell, "center")
-		//cell.Value = entry.Product.Sku
-		//
-		//// 名称
-		//cell = row.AddCell()
-		//set_text_cell_style(cell, "left")
-		//cell.Value = entry.Product.CnName
-		//
-		//// 价格
-		//cell = row.AddCell()
-		//set_text_cell_style(cell, "center")
-		//cell.SetFloatWithFormat(entry.PurchaseBillEntry.Price, "0.00")
-		//
-		//// 数量
-		//cell = row.AddCell()
-		//set_text_cell_style(cell, "center")
-		//cell.SetInt64(entry.PurchaseBillEntry.Qty)
-		//
-		//// 金额
-		//cell = row.AddCell()
-		//set_text_cell_style(cell, "center")
-		//cell.SetFloatWithFormat(entry.PurchaseBillEntry.Amount, "0.00")
-		//
-		//// 运费
-		//cell = row.AddCell()
-		//set_text_cell_style(cell, "center")
-		//cell.SetFloatWithFormat(entry.PurchaseBill.AdvanceExpenses+entry.PurchaseBill.FinalExpenses, "0.00")
-		//
-		//// 是否开票
-		//cell = row.AddCell()
-		//set_text_cell_style(cell, "center")
-		//if entry.PurchaseBillEntry.NeedInvoice == 0 {
-		//	cell.SetString("否")
-		//} else {
-		//	cell.SetString("是")
-		//}
-		//
-		//// 收税点
-		//cell = row.AddCell()
-		//set_text_cell_style(cell, "center")
-		//cell.SetFloatWithFormat(entry.PurchaseBillEntry.TaxPoint, "0.00")
-		//
-		//// 退税点
-		//cell = row.AddCell()
-		//set_text_cell_style(cell, "center")
-		//cell.SetFloatWithFormat(entry.PurchaseBillEntry.DrawbackPoint, "0.00")
-		//
-		//// 退税额
-		//cell = row.AddCell()
-		//set_text_cell_style(cell, "center")
-		//cell.SetFloatWithFormat(entry.PurchaseBillEntry.DrawbackAmount, "0.00")
+
+		// 批次号
+		cell := row.AddCell()
+		set_text_cell_style(cell, "center")
+		cell.Value = item.Product.Sku
+
+		// 商品
+		cell = row.AddCell()
+		set_text_cell_style(cell, "left")
+		cell.Value = item.Product.CnName
+
+		// 供应商
+		cell = row.AddCell()
+		set_text_cell_style(cell, "center")
+		cell.Value = item.Supplier.Name
+
+		// 商品状态
+		cell = row.AddCell()
+		set_text_cell_style(cell, "left")
+		cell.Value = item.ProductStatus.Name
+
+		// 数量
+		cell = row.AddCell()
+		set_text_cell_style(cell, "center")
+		cell.SetInt64(item.IntelRepl.Qty)
+
+		// 毛利率
+		cell = row.AddCell()
+		set_text_cell_style(cell, "center")
+		cell.SetFloatWithFormat(item.IntelRepl.Profit, "0.00")
+
+		// 状态
+		cell = row.AddCell()
+		set_text_cell_style(cell, "center")
+		cell.Value = item.Status.Name
+
+		// 生成时间
+		cell = row.AddCell()
+		set_text_cell_style(cell, "center")
+		cell.Value = item.IntelRepl.UpdateTime.String()
 	}
 
 	return xlsx_file
