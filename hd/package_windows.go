@@ -74,8 +74,8 @@ func packageApp(cmd *Command, args []string) int {
 	cur_path_list := strings.Split(currentDir, string(os.PathSeparator))
 	import_path := cur_path_list[len(cur_path_list)-1]
 
-	os.MkdirAll("d:\\publish", 0777)
-	destFile := "d:\\publish\\" + web_app_name + "_" + time.Now().Format("200601021504") + ".zip"
+	os.MkdirAll("c:\\publish", 0777)
+	destFile := "c:\\publish\\" + web_app_name + "_" + time.Now().Format("200601021504") + ".zip"
 
 	archiveName := mustZipDir(destFile, currentDir, web_app_name, import_path)
 
