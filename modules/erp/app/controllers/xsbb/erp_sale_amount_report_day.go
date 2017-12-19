@@ -5,6 +5,7 @@ import (
 
 	"matrix/core"
 	"matrix/modules/erp/models/xsbb_models"
+	"fmt"
 )
 
 type ErpSaleAmountReportDay struct {
@@ -18,7 +19,22 @@ func (c ErpSaleAmountReportDay) Index() revel.Result {
 func (c ErpSaleAmountReportDay) ListData() revel.Result {
 	db_session := c.DbSession
 
+	var begin_time_query core.NullLongTime
+	c.Params.Bind(&begin_time_query, "begin_time_query")
+
+	var end_time_query core.NullLongTime
+	c.Params.Bind(&end_time_query, "end_time_query")
+
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
+
+	if begin_time_query.Valid == true {
+		filter = core.SqlAnd(filter, fmt.Sprintf("report_day >= '%s'", begin_time_query.Time.Format("2006-01-02")))
+	}
+
+	if end_time_query.Valid == true {
+		filter = core.SqlAnd(filter, fmt.Sprintf("report_day < '%s'", end_time_query.Time.AddDate(0, 0, 1).Format("2006-01-02")))
+	}
+
 	query := db_session.Where(filter)
 
 	//query extra filter here
