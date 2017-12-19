@@ -28,8 +28,8 @@ func BeforeInterceptor(c *revel.Controller) revel.Result {
 		//c.DbSession = db.Engine.NoAutoCondition() 这个不行，xorm会有问题
 		c.RenderArgs["dbsession"] = dbSession
 
-		err := c.DbSession.Begin()
-		core.HandleError(err)
+		// err := c.DbSession.Begin()
+		// core.HandleError(err)
 
 		authResult := userAuth(c)
 		if authResult != nil {
@@ -42,8 +42,8 @@ func BeforeInterceptor(c *revel.Controller) revel.Result {
 
 func FinallyInterceptor(c *revel.Controller) revel.Result {
 	if isStaticRequest(c) == false {
-		err := c.DbSession.Commit()
-		core.HandleError(err)
+		// err := c.DbSession.Commit()
+		// core.HandleError(err)
 
 		c.DbSession.Close() //模板tags中的数据库访问请自行开启 db session
 
@@ -62,8 +62,8 @@ func FinallyInterceptor(c *revel.Controller) revel.Result {
 
 func PanicInterceptor(c *revel.Controller) revel.Result {
 	if isStaticRequest(c) == false {
-		err := c.DbSession.Rollback()
-		core.HandleError(err)
+		// err := c.DbSession.Rollback()
+		// core.HandleError(err)
 
 		// 这里也要 close 吧
 		c.DbSession.Close();
