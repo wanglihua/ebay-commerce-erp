@@ -1,3 +1,5 @@
+# CALL product_sale_amount_report();
+
 DROP PROCEDURE IF EXISTS product_sale_amount_report;
 
 CREATE PROCEDURE product_sale_amount_report()
@@ -92,6 +94,11 @@ CREATE PROCEDURE product_sale_amount_report()
                       AND o.shipped_time >= v_time_begin
                       AND o.shipped_time < v_time_end;
 
+                IF v_amount IS NULL
+                THEN
+                    SET v_amount = 0;
+                END IF;
+
                 SELECT count(rd.id) INTO v_count
                 FROM erp_sale_amount_report_day rd
                 WHERE rd.product_id = v_product_id
@@ -154,6 +161,11 @@ CREATE PROCEDURE product_sale_amount_report()
                 WHERE oi.item_product_id = v_product_id
                       AND o.shipped_time >= v_time_begin
                       AND o.shipped_time < v_time_end;
+
+                IF v_amount IS NULL
+                THEN
+                    SET v_amount = 0;
+                END IF;
 
                 SELECT count(rd.id) INTO v_count
                 FROM erp_sale_amount_report_month rd
