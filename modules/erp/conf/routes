@@ -769,3 +769,6 @@ POST /intel/repl/excel/export             ErpIntelReplExcel.Export
 
 GET  /sale/amount/report/day                    ErpSaleAmountReportDay.Index
 POST /sale/amount/report/day/data/list          ErpSaleAmountReportDay.ListData
+
+GET  /sale/amount/report/month                  ErpSaleAmountReportMonth.Index
+POST /sale/amount/report/month/data/list        ErpSaleAmountReportMonth.ListData

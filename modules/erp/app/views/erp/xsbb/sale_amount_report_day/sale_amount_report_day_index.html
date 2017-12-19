@@ -28,11 +28,7 @@
 <script type="text/javascript">
     var vm = new Vue({
         el: "#page",
-        data: {
-            "detail": {
-                "sale_amount_report_day": {}
-            }
-        },
+        data: {},
         mounted: function () {
             initDataTable(
                     '#saleAmountReportDayList',
@@ -48,7 +44,7 @@
                                 }
                             },
                             {
-                                "mDataProp": "report_day", "title": "日期", "bSearchable": false, "width": 100,
+                                "mDataProp": "report_day", "title": "日期", "bSearchable": false, "sClass": "center", "width": 100,
                                 "render": function (data, type, row) {
                                     return dtFormatDate(data);
                                 }
