@@ -9,19 +9,19 @@ import (
 	"matrix/modules/erp/models"
 	smith_core "matrix/smith/core"
 	"matrix/smith/core/template"
-	"matrix/modules/erp/models/cggl_models"
+	"matrix/modules/erp/models/xsbb_models"
 )
 
 //var output_base_dir = "/home/wanglihua/gopath/src/matrix"
 //var output_base_dir = "z:/GoPath/src/matrix"
-var output_base_dir = "z:/code_gen"
+var output_base_dir = "c:/code_gen"
 var import_path = "matrix"
 var module_title_name = models.ModuleTitleName
 var module_lower_case = models.ModuleLowerCase
 var module_chinese = models.ModuleChinese
 var table_prefix = "erp_"
 var model_list = []interface{}{
-	cggl_models.ProductCheckinWeightInfo{},
+	xsbb_models.SaleAmountReportDayInfo{},
 }
 
 /*

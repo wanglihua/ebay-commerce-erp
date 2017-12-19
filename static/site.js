@@ -251,6 +251,14 @@
 })(jQuery);
 
 
+function dtFormatMonth(data) {
+    if (!data) {
+        return "";
+    }
+    data = data.replace(/T|Z/g, ' ');
+    return stringToDate(data).format("yyyy-MM");
+}
+
 function dtFormatDate(data) {
     if (!data) {
         return "";
