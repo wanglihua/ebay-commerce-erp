@@ -14,6 +14,8 @@ CREATE PROCEDURE product_sale_amount_report()
         DECLARE v_product_id BIGINT;
         DECLARE v_count BIGINT;
         DECLARE v_amount DECIMAL(18, 2);
+        DECLARE v_day_time_end DATETIME;
+        DECLARE v_month_time_end DATETIME;
 
         -- 遍历数据结束标志
         DECLARE done INT DEFAULT FALSE;
@@ -27,15 +29,18 @@ CREATE PROCEDURE product_sale_amount_report()
         DECLARE time_day_id_cur CURSOR FOR
             SELECT td.id AS time_day_id
             FROM erp_sale_report_time_day td
-            WHERE td.id > v_latest_time_day_id;
+            WHERE td.id > v_latest_time_day_id AND td.report_day < v_day_time_end;
 
         DECLARE time_month_id_cur CURSOR FOR
             SELECT tm.id AS time_month_id
             FROM erp_sale_report_time_month tm
-            WHERE tm.id > v_latest_time_month_id;
+            WHERE tm.id > v_latest_time_month_id AND tm.report_month < v_month_time_end;
 
         -- 将结束标志绑定到游标
         DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+
+        SET v_day_time_end = date_add(now(), INTERVAL -1 DAY);
+        SET v_month_time_end = date_add(now(), INTERVAL -1 MONTH);
 
         -- 打开游标
         OPEN product_id_cur;
