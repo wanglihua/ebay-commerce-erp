@@ -30,7 +30,7 @@ CREATE PROCEDURE product_sale_amount_report()
             WHERE td.id > v_latest_time_day_id;
 
         DECLARE time_month_id_cur CURSOR FOR
-            SELECT *
+            SELECT tm.id AS time_month_id
             FROM erp_sale_report_time_month tm
             WHERE tm.id > v_latest_time_month_id;
 
@@ -86,7 +86,7 @@ CREATE PROCEDURE product_sale_amount_report()
 
                 SET v_time_end = date_add(v_time_begin, INTERVAL 1 DAY);
 
-                SELECT oi.transaction_price * oi.quantity AS amount
+                SELECT sum(oi.transaction_price * oi.quantity) AS amount
                 INTO v_amount
                 FROM erp_order_item oi
                     INNER JOIN erp_order o ON o.id = oi.order_id
@@ -154,7 +154,7 @@ CREATE PROCEDURE product_sale_amount_report()
 
                 SET v_time_end = date_add(v_time_begin, INTERVAL 1 MONTH);
 
-                SELECT oi.transaction_price * oi.quantity AS amount
+                SELECT sum(oi.transaction_price * oi.quantity) AS amount
                 INTO v_amount
                 FROM erp_order_item oi
                     INNER JOIN erp_order o ON o.id = oi.order_id
