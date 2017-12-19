@@ -145,20 +145,22 @@ func (c ErpOrder) Index(status string) revel.Result {
 
 // 查询条件定义 开始
 const (
-	order_query_criteria_order_code           int64 = 1000
-	order_query_criteria_order_number         int64 = 1100
-	order_query_criteria_product_sku          int64 = 1200
-	order_query_criteria_product_name         int64 = 1300
-	order_query_criteria_buyer_user_id        int64 = 1400
-	order_query_criteria_stock_name           int64 = 1500
-	order_query_criteria_logistics_mode_name  int64 = 1600
-	order_query_criteria_waybill_number       int64 = 1700
-	order_query_criteria_buyer_email          int64 = 1800
-	order_query_criteria_buyer_email_accurate int64 = 1900
-	order_query_criteria_buyer_phone          int64 = 2000
-	order_query_criteria_buyer_phone_accurate int64 = 2100
-	order_query_criteria_buyer_name           int64 = 2200
-	order_query_criteria_buyer_name_accurate  int64 = 2300
+	order_query_criteria_order_code                 int64 = 1000
+	order_query_criteria_order_number               int64 = 1100
+	order_query_criteria_product_sku                int64 = 1200
+	order_query_criteria_product_name               int64 = 1300
+	order_query_criteria_buyer_user_id              int64 = 1400
+	order_query_criteria_stock_name                 int64 = 1500
+	order_query_criteria_logistics_mode_name        int64 = 1600
+	order_query_criteria_waybill_number             int64 = 1700
+	order_query_criteria_buyer_email                int64 = 1800
+	order_query_criteria_buyer_email_accurate       int64 = 1900
+	order_query_criteria_buyer_phone                int64 = 2000
+	order_query_criteria_buyer_phone_accurate       int64 = 2100
+	order_query_criteria_buyer_name                 int64 = 2200
+	order_query_criteria_buyer_name_accurate        int64 = 2300
+	order_query_criteria_buyer_postal_code          int64 = 2400
+	order_query_criteria_buyer_postal_code_accurate int64 = 2500
 
 	// accurate
 )
@@ -186,6 +188,8 @@ func (c ErpOrder) get_order_query_criteria_list() []order_query_criteria {
 	order_query_criteria_list = append(order_query_criteria_list, order_query_criteria{Id: order_query_criteria_buyer_phone_accurate, Name: "买家电话（精确）"})
 	order_query_criteria_list = append(order_query_criteria_list, order_query_criteria{Id: order_query_criteria_buyer_name, Name: "买家姓名"})
 	order_query_criteria_list = append(order_query_criteria_list, order_query_criteria{Id: order_query_criteria_buyer_name_accurate, Name: "买家姓名（精确）"})
+	order_query_criteria_list = append(order_query_criteria_list, order_query_criteria{Id: order_query_criteria_buyer_postal_code, Name: "买家邮编"})
+	order_query_criteria_list = append(order_query_criteria_list, order_query_criteria{Id: order_query_criteria_buyer_postal_code_accurate, Name: "买家邮编（精确）"})
 
 	return order_query_criteria_list
 }
@@ -510,6 +514,12 @@ func (c ErpOrder) ListData() revel.Result {
 		} else if query_criteria_id1 == order_query_criteria_buyer_name_accurate {
 			// SELECT osa.order_id FROM erp_order_shipping_address osa WHERE osa.name = '123';
 			filter = core.SqlAnd(filter, fmt.Sprintf("o.id IN (SELECT osa.order_id FROM erp_order_shipping_address osa WHERE osa.name = '%s')", query_criteria_value1))
+		} else if query_criteria_id1 == order_query_criteria_buyer_postal_code {
+			// SELECT osa.order_id FROM erp_order_shipping_address osa WHERE osa.postal_code LIKE '%123%';
+			filter = core.SqlAnd(filter, fmt.Sprintf("o.id IN (SELECT osa.order_id FROM erp_order_shipping_address osa WHERE osa.postal_code LIKE '%%%s%%')", query_criteria_value1))
+		} else if query_criteria_id1 == order_query_criteria_buyer_postal_code_accurate {
+			// SELECT osa.order_id FROM erp_order_shipping_address osa WHERE osa.postal_code = '123';
+			filter = core.SqlAnd(filter, fmt.Sprintf("o.id IN (SELECT osa.order_id FROM erp_order_shipping_address osa WHERE osa.postal_code = '%s')", query_criteria_value1))
 		}
 	}
 
@@ -563,6 +573,12 @@ func (c ErpOrder) ListData() revel.Result {
 		} else if query_criteria_id2 == order_query_criteria_buyer_name_accurate {
 			// SELECT osa.order_id FROM erp_order_shipping_address osa WHERE osa.name = '123';
 			filter = core.SqlAnd(filter, fmt.Sprintf("o.id IN (SELECT osa.order_id FROM erp_order_shipping_address osa WHERE osa.name = '%s')", query_criteria_value2))
+		} else if query_criteria_id2 == order_query_criteria_buyer_postal_code {
+			// SELECT osa.order_id FROM erp_order_shipping_address osa WHERE osa.postal_code LIKE '%123%';
+			filter = core.SqlAnd(filter, fmt.Sprintf("o.id IN (SELECT osa.order_id FROM erp_order_shipping_address osa WHERE osa.postal_code LIKE '%%%s%%')", query_criteria_value1))
+		} else if query_criteria_id2 == order_query_criteria_buyer_postal_code_accurate {
+			// SELECT osa.order_id FROM erp_order_shipping_address osa WHERE osa.postal_code = '123';
+			filter = core.SqlAnd(filter, fmt.Sprintf("o.id IN (SELECT osa.order_id FROM erp_order_shipping_address osa WHERE osa.postal_code = '%s')", query_criteria_value1))
 		}
 	}
 
