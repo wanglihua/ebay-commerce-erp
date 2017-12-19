@@ -8,7 +8,7 @@ import (
 	"github.com/revel/revel"
 )
 
-func calculate_sale_amount_report() {
+func CalculateSaleAmountReport() {
 	defer func() {
 		if err := recover(); err != nil {
 			revel.ERROR.Printf("销售额报表日统计出现错误： %s\n", err)

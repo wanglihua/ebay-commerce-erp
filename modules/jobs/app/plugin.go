@@ -90,6 +90,9 @@ func init() {
 		// 商品销售分析
 		jobs.Every(2*time.Hour, tasks.ProductSaleAnalysisTask{})
 
+		// 销售分析
+		jobs.Every(4*time.Hour, tasks.ProductSaleAnalysisTask{})
+
 		// 智能补货
 		jobs.Every(1*time.Hour, tasks.IntelReplTask{})
 
