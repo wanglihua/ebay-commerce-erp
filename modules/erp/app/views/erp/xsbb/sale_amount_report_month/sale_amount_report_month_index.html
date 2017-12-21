@@ -17,6 +17,10 @@
                         <i class="ace-icon fa fa-refresh"></i>
                         刷新
                     </button>
+                    <button class="btn btn-purple btn-sm" @click="viewChart()">
+                        <i class="ace-icon fa fa-line-chart"></i>
+                        图表分析
+                    </button>
                     <button class="btn btn-pink btn-sm" @click="calculate()">
                         <i class="ace-icon fa fa-refresh"></i>
                         立即分析销售情况
@@ -64,6 +68,10 @@
             },
             refreshList: function () {
                 refreshList('#saleAmountReportMonthList');
+            },
+            viewChart: function () {
+                var url = '{% url "ErpSaleAmountReportMonth.Chart" %}';
+                window.open(url, "sale_amount_report_month_chart");
             },
             calculate: function () {
                 $.msg.confirm("将立即启动销售后台分析任务！", function () {

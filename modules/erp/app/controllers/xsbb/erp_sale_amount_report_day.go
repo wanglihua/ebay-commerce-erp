@@ -168,7 +168,7 @@ func (c ErpSaleAmountReportDay) ChartData() revel.Result {
 		"yAxis": map[string]interface{}{
 			"type": "value",
 			"axisLabel": map[string]interface{}{
-				"formatter": "{value} 件",
+				"formatter": "{value}",
 			},
 		},
 		"series": series,
