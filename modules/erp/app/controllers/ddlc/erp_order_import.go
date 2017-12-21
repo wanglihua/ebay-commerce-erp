@@ -165,6 +165,7 @@ func (c ErpOrderImport) Upload() revel.Result {
 	defer func() {
 		if err := recover(); err != nil {
 			db_session.Rollback()
+			panic(err)
 		}
 	}()
 
