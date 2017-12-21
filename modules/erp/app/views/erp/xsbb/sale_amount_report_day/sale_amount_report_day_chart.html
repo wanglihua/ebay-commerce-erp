@@ -33,6 +33,7 @@
                         <div style="clear: both;"></div>
                     </div>
                 </div>
+                <div>&nbsp;</div>
                 <div>
                     <div id="chart" style="width:800px;height:600px;"></div>
                 </div>
@@ -62,7 +63,7 @@
 
         showMask("数据加载中，请稍候");
         $.ajax({
-            "dataType": 'json',
+            "type": "POST",
             "url": url,
             "data": {
                 'query_begin_time': $("#query_begin_time").val(),
