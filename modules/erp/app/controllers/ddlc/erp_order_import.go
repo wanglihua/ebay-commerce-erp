@@ -162,6 +162,14 @@ func (c ErpOrderImport) Upload() revel.Result {
 
 	db_session := c.DbSession
 
+	defer func() {
+		if err := recover(); err != nil {
+			db_session.Rollback()
+		}
+	}()
+
+	db_session.Begin()
+
 	excel_file_bytes := make([]byte, 0)
 	c.Params.Bind(&excel_file_bytes, "excel_file")
 
@@ -722,6 +730,8 @@ SELECT sa.id AS shop_id, sa.name AS shop_name FROM erp_shop_account sa;
 			*/
 		}
 	}
+
+	db_session.Commit()
 
 	return c.RenderJson(map[string]interface{}{
 		"success": true,
