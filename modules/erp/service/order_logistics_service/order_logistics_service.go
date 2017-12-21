@@ -200,12 +200,14 @@ SELECT o.* FROM erp_order o WHERE o.batch_code = 0
 		return errors.New("订单列表为空！")
 	}
 
+	/*
 	//先判断订单状态
 	for _, order := range order_list {
 		if order.StatusId != models.ORDER_STATUS_YZF {
 			return errors.New("订单状态为已支付状态的，才能匹配物流！")
 		}
 	}
+	*/
 
 	return p_ol.CalculateList(order_list, db_session)
 }
