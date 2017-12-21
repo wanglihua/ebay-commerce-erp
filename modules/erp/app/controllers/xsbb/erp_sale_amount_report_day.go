@@ -6,6 +6,7 @@ import (
 	"matrix/core"
 	"matrix/modules/erp/models/xsbb_models"
 	"fmt"
+	"matrix/modules/erp/service/sale_report_service"
 )
 
 type ErpSaleAmountReportDay struct {
@@ -57,5 +58,15 @@ func (c ErpSaleAmountReportDay) ListData() revel.Result {
 	return c.RenderJson(core.GridResult{
 		Data:  sale_amount_report_day_list,
 		Total: count,
+	})
+}
+
+func (c ErpSaleAmountReportDay) Calculate() revel.Result {
+
+	go sale_report_service.CalculateSaleAmountReport()
+
+	return c.RenderJson(map[string]interface{}{
+		"success": true,
+		"message": "启动销售情况后台分析任务成功！",
 	})
 }

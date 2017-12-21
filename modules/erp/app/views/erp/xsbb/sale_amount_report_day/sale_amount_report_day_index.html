@@ -17,6 +17,10 @@
                         <i class="ace-icon fa fa-refresh"></i>
                         刷新
                     </button>
+                    <button class="btn btn-pink btn-sm" @click="calculate()">
+                        <i class="ace-icon fa fa-refresh"></i>
+                        立即分析销售情况
+                    </button>
                 </div>
                 <div id="query" class="col-xs-12" style="line-height: 28px;">
                     <div class="col-xs-12" style="margin-top: 20px;margin-bottom: 20px;">
@@ -108,6 +112,25 @@
             },
             refreshList: function () {
                 refreshList('#saleAmountReportDayList');
+            },
+            calculate: function () {
+                $.msg.confirm("将立即启动销售后台分析任务！", function () {
+                    $.ajax({
+                        "dataType": 'json',
+                        "url": '{% url "ErpSaleAmountReportDay.Calculate" %}',
+                        "success": function (data) {
+
+                            if (data.success === false) {
+                                $.msg.error(data.message);
+                                return;
+                            }
+                            else {
+                                $.msg.show(data.message);
+                                return;
+                            }
+                        }
+                    });
+                });
             }
         }
     });
