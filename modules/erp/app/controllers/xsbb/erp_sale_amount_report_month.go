@@ -92,7 +92,7 @@ func (c ErpSaleAmountReportMonth) ChartData() revel.Result {
 	}
 
 	var serie_data = map[string]interface{}{
-		"name": "商品月销量",
+		"name": "商品月销售额",
 		"type": "line",
 		"data": amount_list,
 		"markPoint": map[string]interface{}{
