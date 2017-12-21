@@ -61,6 +61,14 @@ func (c ErpSaleAmountReportDay) ListData() revel.Result {
 	})
 }
 
+func (c ErpSaleAmountReportDay) Chart() revel.Result {
+	return c.RenderTemplate("erp/xsbb/sale_amount_report_day/sale_amount_report_day_chart.html")
+}
+
+func (c ErpSaleAmountReportDay) ChartData() revel.Result {
+	return c.RenderJson(true)
+}
+
 func (c ErpSaleAmountReportDay) Calculate() revel.Result {
 
 	go sale_report_service.CalculateSaleAmountReport()

@@ -37,5 +37,5 @@ func CalculateSaleAmountReport() {
 	_, err = db_session.Exec("CALL sale_amount_report();")
 	core.HandleError(err)
 
-	revel.TRACE.Println("销售额报表日统计完成！");
+	revel.TRACE.Println("销售额报表日统计完成！")
 }

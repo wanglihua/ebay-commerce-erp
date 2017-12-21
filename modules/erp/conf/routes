@@ -770,7 +770,11 @@ POST /intel/repl/excel/export             ErpIntelReplExcel.Export
 GET  /sale/amount/report/day                    ErpSaleAmountReportDay.Index
 POST /sale/amount/report/day/data/list          ErpSaleAmountReportDay.ListData
 POST /sale/amount/report/day/calculate          ErpSaleAmountReportDay.Calculate
+GET  /sale/amount/report/day/chart              ErpSaleAmountReportDay.Chart
+POST /sale/amount/report/day/chart/data         ErpSaleAmountReportDay.ChartData
 
 GET  /sale/amount/report/month                  ErpSaleAmountReportMonth.Index
 POST /sale/amount/report/month/data/list        ErpSaleAmountReportMonth.ListData
 POST /sale/amount/report/month/calculate        ErpSaleAmountReportMonth.Calculate
+GET  /sale/amount/report/month/chart            ErpSaleAmountReportMonth.Chart
+POST /sale/amount/report/month/chart/data       ErpSaleAmountReportMonth.ChartData

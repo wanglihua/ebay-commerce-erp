@@ -1,0 +1,86 @@
+{%header "日销售额报表" .%}
+<div id="page">
+    <div class="breadcrumbs" id="breadcrumbs">
+        <ul class="breadcrumb">
+            <li>
+                <a href='{%url "Home.Index"%}'><i class="ace-icon fa fa-home home-icon"></i></a>
+            </li>
+            <li class="parent" data-menu="xsbb-menu">销售报表</li>
+            <li class="active" data-menu="xsbb-sale-amount-report-day-menu">日销售额报表</li>
+            <li>日销售额报表图表</li>
+        </ul>
+    </div>
+    <div class="page-content">
+        <div class="row">
+            <div class="col-xs-12" style="padding: 0;">
+                <div class="gridToolBar clearfix">
+                    <button class="btn btn-primary btn-sm" onclick="refreshChartData()">
+                        <i class="ace-icon fa fa-refresh"></i>
+                        刷新
+                    </button>
+                </div>
+                <div id="query" class="col-xs-12" style="line-height: 28px;">
+                    <div class="col-xs-12" style="margin-top: 20px;margin-bottom: 20px;">
+                        <div style="float: left;">
+                            <label class="control-label no-padding-right" for="begin_time_query">日期开始</label>
+                            <input class="input-sm" id="begin_time_query" name="begin_time_query" placeholder="日期开始" type="text" style="width: 80px;"/>
+                            <label class="control-label no-padding-right" for="end_time_query">日期结束</label>
+                            <input class="input-sm" id="end_time_query" name="end_time_query" placeholder="日期结束" type="text" style="width: 80px;"/>
+                            <button class="btn btn-mini btn-primary" style="margin-bottom:3px;height: 30px;" onclick="refreshChartData()">
+                                &nbsp;<i class="ace-icon fa fa-search"></i>查&nbsp;询&nbsp;
+                            </button>
+                        </div>
+                        <div style="clear: both;"></div>
+                    </div>
+                </div>
+                <div>
+                    <div id="chart" style="width:800px;height:600px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" src="/static/lib/echarts/echarts.min.js"></script>
+<script type="text/javascript">
+
+    $(function () {
+        $('#begin_time_query').datetimepicker({
+            locale: "zh-cn"
+        });
+
+        $('#end_time_query').datetimepicker({
+            locale: "zh-cn"
+        });
+
+        refreshChartData();
+    });
+
+    function refreshChartData() {
+        var url = '{% url "ErpSaleAmountReportDay.ChartData"%}';
+
+        var chart = echarts.init(document.getElementById('chart'));
+
+        showMask("数据加载中，请稍候");
+        $.ajax({
+            "dataType": 'json',
+            "url": url,
+            "data": {
+                'query_begin_time': $("#query_begin_time").val(),
+                'query_end_time': $("#query_end_time").val()
+            },
+            "success": function (data) {
+                hideMask();
+
+                if (data.success === false) {
+                    $.msg.error(data.message);
+                    return;
+                }
+
+                chart.setOption(data);
+            }
+        });
+    }
+
+</script>
+{%footer%}
+
