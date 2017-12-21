@@ -17,6 +17,10 @@
                         <i class="ace-icon fa fa-refresh"></i>
                         刷新
                     </button>
+                    <button class="btn btn-purple btn-sm" @click="viewChart()">
+                        <i class="ace-icon fa fa-line-chart"></i>
+                        图表分析
+                    </button>
                     <button class="btn btn-pink btn-sm" @click="calculate()">
                         <i class="ace-icon fa fa-refresh"></i>
                         立即分析销售情况
@@ -24,16 +28,15 @@
                 </div>
                 <div id="query" class="col-xs-12" style="line-height: 28px;">
                     <div class="col-xs-12" style="margin-top: 20px;margin-bottom: 20px;">
-                        <div style="float: left;">
+                        <div>
                             <label class="control-label no-padding-right" for="begin_time_query">日期开始</label>
                             <input class="input-sm" id="begin_time_query" name="begin_time_query" placeholder="日期开始" type="text" style="width: 80px;"/>
                             <label class="control-label no-padding-right" for="end_time_query">日期结束</label>
                             <input class="input-sm" id="end_time_query" name="end_time_query" placeholder="日期结束" type="text" style="width: 80px;"/>
-                            <button class="btn btn-mini btn-primary" style="margin-bottom:3px;height: 30px;" @click="refreshList()">
-                                &nbsp;<i class="ace-icon fa fa-search"></i>查&nbsp;询&nbsp;
+                            <button class="btn btn-mini btn-primary" style="margin-bottom:3px;height: 30px;" @click="viewChart()">
+                                &nbsp;<i class="ace-icon fa fa-search"></i>显&nbsp;示&nbsp;
                             </button>
                         </div>
-                        <div style="clear: both;"></div>
                     </div>
                 </div>
                 <div>
@@ -112,6 +115,10 @@
             },
             refreshList: function () {
                 refreshList('#saleAmountReportDayList');
+            },
+            viewChart: function () {
+                var url = '{% url "ErpSaleAmountReportDay.Chart" %}';
+                window.open(url, "sale_amount_report_day_chart");
             },
             calculate: function () {
                 $.msg.confirm("将立即启动销售后台分析任务！", function () {
