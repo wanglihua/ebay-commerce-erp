@@ -53,8 +53,28 @@ func (c ErpSaleAmountReportMonth) Chart() revel.Result {
 func (c ErpSaleAmountReportMonth) ChartData() revel.Result {
 	var db_session = c.DbSession
 
+	var time_now = time.Now()
+	var today_date = time.Date(time_now.Year(), time_now.Month(), time_now.Day(), 0, 0, 0, 0, time.Local)
+
+	var query_begin_time string
+	c.Params.Bind(&query_begin_time, "query_begin_time")
+	query_begin_date, query_begin_date_err := core.Parse_time(query_begin_time)
+	if query_begin_date_err != nil {
+		query_begin_date = today_date.Add(-400 * 24 * time.Hour) // 当前日期回退400天
+	} else {
+		query_begin_date = time.Date(query_begin_date.Year(), query_begin_date.Month(), 1, 0, 0, 0, 0, time.Local)
+	}
+
+	var query_end_time string
+	c.Params.Bind(&query_end_time, "query_end_time")
+	query_end_date, query_end_date_err := core.Parse_time(query_end_time)
+	if query_end_date_err != nil {
+		query_end_date = today_date
+	}
+
 	var sale_amount_report_month_list = make([]xsbb_models.SaleAmountReportMonthInfo, 0)
 	err := db_session.
+		Where("report_month >= ? AND report_month <= ?", query_begin_date, query_end_date).
 		OrderBy("report_month ASC").
 		Find(&sale_amount_report_month_list);
 	core.HandleError(err)

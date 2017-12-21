@@ -19,6 +19,21 @@
                         刷新
                     </button>
                 </div>
+                <div id="query" class="col-xs-12" style="line-height: 28px;">
+                    <div class="col-xs-12" style="margin-top: 20px;margin-bottom: 20px;">
+                        <div style="float: left;">
+                            <label class="control-label no-padding-right" for="begin_time_query">开始时间</label>
+                            <input class="input-sm" id="begin_time_query" name="begin_time_query" placeholder="日期开始" type="text" style="width: 80px;"/>
+                            <label class="control-label no-padding-right" for="end_time_query">结束时间</label>
+                            <input class="input-sm" id="end_time_query" name="end_time_query" placeholder="日期结束" type="text" style="width: 80px;"/>
+                            <button class="btn btn-mini btn-primary" style="margin-bottom:3px;height: 30px;" onclick="refreshChartData()">
+                                &nbsp;<i class="ace-icon fa fa-search"></i>查&nbsp;询&nbsp;
+                            </button>
+                        </div>
+                        <div style="clear: both;"></div>
+                    </div>
+                </div>
+                <div>&nbsp;</div>
                 <div>
                     <div id="chart" style="width:800px;height:600px;"></div>
                 </div>
@@ -30,6 +45,14 @@
 <script type="text/javascript">
 
     $(function () {
+        $('#begin_time_query').datetimepicker({
+            locale: "zh-cn"
+        });
+
+        $('#end_time_query').datetimepicker({
+            locale: "zh-cn"
+        });
+
         refreshChartData();
     });
 
@@ -42,7 +65,10 @@
         $.ajax({
             "type": "POST",
             "url": url,
-            "data": {},
+            "data": {
+                'query_begin_time': $("#begin_time_query").val(),
+                'query_end_time': $("#end_time_query").val()
+            },
             "success": function (data) {
                 hideMask();
 
