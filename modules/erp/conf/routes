@@ -778,3 +778,6 @@ POST /sale/amount/report/month/data/list        ErpSaleAmountReportMonth.ListDat
 POST /sale/amount/report/month/calculate        ErpSaleAmountReportMonth.Calculate
 GET  /sale/amount/report/month/chart            ErpSaleAmountReportMonth.Chart
 POST /sale/amount/report/month/chart/data       ErpSaleAmountReportMonth.ChartData
+
+POST /sale/amount/report/day/excel/export       ErpSaleAmountReportDayExcel.Export
+POST /sale/amount/report/month/excel/export     ErpSaleAmountReportMonthExcel.Export
