@@ -33,7 +33,7 @@
                             <input class="input-sm" id="begin_time_query" name="begin_time_query" placeholder="日期开始" type="text" style="width: 80px;"/>
                             <label class="control-label no-padding-right" for="end_time_query">日期结束</label>
                             <input class="input-sm" id="end_time_query" name="end_time_query" placeholder="日期结束" type="text" style="width: 80px;"/>
-                            <button class="btn btn-mini btn-primary" style="margin-bottom:3px;height: 30px;" @click="viewChart()">
+                            <button class="btn btn-mini btn-primary" style="margin-bottom:3px;height: 30px;" @click="reloadList()">
                                 &nbsp;<i class="ace-icon fa fa-search"></i>显&nbsp;示&nbsp;
                             </button>
                         </div>
@@ -81,7 +81,73 @@
                                     return dtFormatDate(data);
                                 }
                             },
-                            {"mDataProp": "amount", "title": "销售额", "bSearchable": false}
+                            {
+                                "mDataProp": "paid_amount", "title": "交易金额", "bSearchable": false, "width": 100,
+                                "render": function (data, type, row) {
+                                    return data + " AUD";
+                                }
+                            },
+                            {
+                                "mDataProp": "express_fee", "title": "运费收入", "bSearchable": false, "width": 100,
+                                "render": function (data, type, row) {
+                                    return data + " AUD";
+                                }
+                            },
+                            {
+                                "mDataProp": "cost_price", "title": "商品澳仓成本", "bSearchable": false, "width": 100,
+                                "render": function (data, type, row) {
+                                    return data + " AUD";
+                                }
+                            },
+                            {
+                                "mDataProp": "estimate_logistics_fee", "title": "预估运费", "bSearchable": false, "width": 100,
+                                "render": function (data, type, row) {
+                                    return data + " AUD";
+                                }
+                            },
+                            {
+                                "mDataProp": "actual_logistics_fee", "title": "实际运费", "bSearchable": false, "width": 100,
+                                "render": function (data, type, row) {
+                                    return data + " AUD";
+                                }
+                            },
+                            {
+                                "mDataProp": "jyfy_amount", "title": "交易费用", "bSearchable": false, "width": 100,
+                                "render": function (data, type, row) {
+                                    return data + " AUD";
+                                }
+                            },
+                            {
+                                "mDataProp": "ptfy_amount", "title": "平台费用", "bSearchable": false, "width": 100,
+                                "render": function (data, type, row) {
+                                    return data + " AUD";
+                                }
+                            },
+                            {
+                                "mDataProp": "pick_fee", "title": "拣货费", "bSearchable": false, "width": 100,
+                                "render": function (data, type, row) {
+                                    return data + " AUD";
+                                }
+                            },
+                            {
+                                "mDataProp": "gst_fee", "title": "GST费用", "bSearchable": false, "width": 100,
+                                "render": function (data, type, row) {
+                                    return data + " AUD";
+                                }
+                            },
+                            {
+                                "mDataProp": "product_qty", "title": "商品销量", "bSearchable": false, "width": 100,
+                                "render": function (data, type, row) {
+                                    return data + " 件";
+                                }
+                            },
+                            {
+                                "mDataProp": "profit", "title": "利润", "bSearchable": false, "width": 100,
+                                "render": function (data, type, row) {
+                                    return data + " AUD";
+                                }
+                            }
+
                         ],
                         "fnServerData": function (sSource, aoData, fnCallback) {
                             showMask("数据加载中，请稍候");
