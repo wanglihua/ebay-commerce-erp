@@ -243,7 +243,7 @@ CREATE PROCEDURE sale_amount_report()
             FROM erp_sale_report_time_month td
             WHERE td.id = v_time_month_id;
 
-            SET v_time_end = date_add(v_time_begin, INTERVAL 1 DAY);
+            SET v_time_end = date_add(v_time_begin, INTERVAL 1 MONTH);
 
             # 商品销售额， 运费收入, 预估运费, 实际运费, 拣货费, 交易费用, 平台费用, GST费用, 利润
             SELECT
