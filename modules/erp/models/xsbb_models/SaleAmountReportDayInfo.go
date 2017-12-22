@@ -16,6 +16,7 @@ type SaleAmountReportDayInfo struct {
 	PickFee              float64   `xorm:"decimal(18,2) notnull 'pick_fee' default(0)" json:"pick_fee"`
 	GstFee               float64   `xorm:"decimal(18,2) notnull 'gst_fee' default(0)" json:"gst_fee"`
 	Profit               float64   `xorm:"decimal(18,2) notnull 'profit' default(0)" json:"profit"`
+	ProfitRate           float64   `xorm:"decimal(18,2) notnull 'profit_rate' default(0)" json:"profit_rate"`
 	ProductQty           float64   `xorm:"decimal(18,2) notnull 'product_qty' default(0)" json:"product_qty"`
 }
 

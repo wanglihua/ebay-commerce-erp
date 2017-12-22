@@ -23,6 +23,7 @@ CREATE PROCEDURE sale_amount_report()
         DECLARE v_pick_fee DECIMAL(18, 2); # 拣货费 AUD
         DECLARE v_gst_fee DECIMAL(18, 2); # GST费用 AUD
         DECLARE v_profit DECIMAL(18, 2); # 利润 AUD
+        DECLARE v_profit_rate DECIMAL(18, 2); # 利润 AUD
         DECLARE v_product_qty INT; # 商品数量
 
 
@@ -161,6 +162,12 @@ CREATE PROCEDURE sale_amount_report()
 
             SET v_profit = v_paid_amount + v_express_fee - v_cost_price - v_logistics_fee - v_pick_fee - v_jyfy_amount - v_ptfy_amount - v_gst_fee;
 
+            SET v_profit_rate = 0;
+            IF v_paid_amount <> 0
+            THEN
+                SET v_profit_rate = v_profit / v_paid_amount * 100;
+            END IF;
+
             # 商品澳仓成本, 商品数量
             SELECT ifnull(sum(oi.quantity), 0)
             INTO v_product_qty
@@ -180,8 +187,8 @@ CREATE PROCEDURE sale_amount_report()
 
             IF v_count = 0
             THEN
-                INSERT INTO erp_sale_amount_report_day (report_day_id, report_day, paid_amount, express_fee, cost_price, estimate_logistics_fee, actual_logistics_fee, jyfy_amount, ptfy_amount, pick_fee, gst_fee, profit, product_qty)
-                VALUES (v_time_day_id, v_time_begin, v_paid_amount, v_express_fee, v_cost_price, v_estimate_logistics_fee, v_actual_logistics_fee, v_jyfy_amount, v_ptfy_amount, v_pick_fee, v_gst_fee, v_profit, v_product_qty);
+                INSERT INTO erp_sale_amount_report_day (report_day_id, report_day, paid_amount, express_fee, cost_price, estimate_logistics_fee, actual_logistics_fee, jyfy_amount, ptfy_amount, pick_fee, gst_fee, profit, profit_rate, product_qty)
+                VALUES (v_time_day_id, v_time_begin, v_paid_amount, v_express_fee, v_cost_price, v_estimate_logistics_fee, v_actual_logistics_fee, v_jyfy_amount, v_ptfy_amount, v_pick_fee, v_gst_fee, v_profit, v_profit_rate, v_product_qty);
             ELSE
                 UPDATE erp_sale_amount_report_day
                 SET report_day             = v_time_begin,
@@ -195,6 +202,7 @@ CREATE PROCEDURE sale_amount_report()
                     pick_fee               = v_pick_fee,
                     gst_fee                = v_gst_fee,
                     profit                 = v_profit,
+                    profit_rate            = v_profit_rate,
                     product_qty            = v_product_qty
                 WHERE report_day_id = v_time_day_id;
             END IF;
@@ -315,6 +323,12 @@ CREATE PROCEDURE sale_amount_report()
 
             SET v_profit = v_paid_amount + v_express_fee - v_cost_price - v_logistics_fee - v_pick_fee - v_jyfy_amount - v_ptfy_amount - v_gst_fee;
 
+            SET v_profit_rate = 0;
+            IF v_paid_amount <> 0
+            THEN
+                SET v_profit_rate = v_profit / v_paid_amount * 100;
+            END IF;
+
             # 商品澳仓成本, 商品数量
             SELECT ifnull(sum(oi.quantity), 0)
             INTO v_product_qty
@@ -334,8 +348,8 @@ CREATE PROCEDURE sale_amount_report()
 
             IF v_count = 0
             THEN
-                INSERT INTO erp_sale_amount_report_month (report_month_id, report_month, paid_amount, express_fee, cost_price, estimate_logistics_fee, actual_logistics_fee, jyfy_amount, ptfy_amount, pick_fee, gst_fee, profit, product_qty)
-                VALUES (v_time_month_id, v_time_begin, v_paid_amount, v_express_fee, v_cost_price, v_estimate_logistics_fee, v_actual_logistics_fee, v_jyfy_amount, v_ptfy_amount, v_pick_fee, v_gst_fee, v_profit, v_product_qty);
+                INSERT INTO erp_sale_amount_report_month (report_month_id, report_month, paid_amount, express_fee, cost_price, estimate_logistics_fee, actual_logistics_fee, jyfy_amount, ptfy_amount, pick_fee, gst_fee, profit, profit_rate, product_qty)
+                VALUES (v_time_month_id, v_time_begin, v_paid_amount, v_express_fee, v_cost_price, v_estimate_logistics_fee, v_actual_logistics_fee, v_jyfy_amount, v_ptfy_amount, v_pick_fee, v_gst_fee, v_profit, v_profit_rate, v_product_qty);
             ELSE
                 UPDATE erp_sale_amount_report_month
                 SET report_month           = v_time_begin,
@@ -349,6 +363,7 @@ CREATE PROCEDURE sale_amount_report()
                     pick_fee               = v_pick_fee,
                     gst_fee                = v_gst_fee,
                     profit                 = v_profit,
+                    profit_rate            = v_profit_rate,
                     product_qty            = v_product_qty
                 WHERE report_month_id = v_time_month_id;
             END IF;
