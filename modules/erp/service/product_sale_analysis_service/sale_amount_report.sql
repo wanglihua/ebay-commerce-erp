@@ -15,6 +15,7 @@ CREATE PROCEDURE sale_amount_report()
         DECLARE v_paid_amount DECIMAL(18, 2); # 交易金额 AUD
         DECLARE v_express_fee DECIMAL(18, 2); # 运费收入 AUD
         DECLARE v_cost_price DECIMAL(18, 2); # 商品澳仓成本 RMB
+        DECLARE v_logistics_fee DECIMAL(18, 2); # 最终的运费 AUD
         DECLARE v_estimate_logistics_fee DECIMAL(18, 2); # 预估运费 AUD
         DECLARE v_actual_logistics_fee DECIMAL(18, 2); # 实际运费 AUD
         DECLARE v_jyfy_amount DECIMAL(18, 2); # 交易费用 AUD
@@ -82,26 +83,26 @@ CREATE PROCEDURE sale_amount_report()
 
             SET v_time_end = date_add(v_time_begin, INTERVAL 1 DAY);
 
-            # 商品销售额， 运费收入, 预估运费, 实际运费, 拣货费, 交易费用, 平台费用, GST费用, 利润
+            # 商品销售额， 运费收入, 商品澳仓成本, 预估运费, 实际运费, 拣货费, 交易费用, 平台费用, GST费用, 利润
             SELECT
                 ifnull(sum(o.amount_paid), 0),
                 ifnull(sum(o.express_fee), 0),
+                ifnull(sum(ol.cost_amount), 0),
                 ifnull(sum(ol.total_fee), 0),
                 ifnull(sum(ol.actual_fee), 0),
                 ifnull(sum(ol.pick_fee), 0),
                 ifnull(sum(o.amount_paid * ol.jyfl), 0),
                 ifnull(sum(o.amount_paid * ol.ptfl), 0),
-                ifnull(sum(o.amount_paid * 0.1), 0),
-                ifnull(sum(o.profit_au), 0)
+                ifnull(sum(o.amount_paid * 0.1), 0)
             INTO v_paid_amount,
                 v_express_fee,
+                v_cost_price,
                 v_estimate_logistics_fee,
                 v_actual_logistics_fee,
                 v_pick_fee,
                 v_jyfy_amount,
                 v_ptfy_amount,
-                v_gst_fee,
-                v_profit
+                v_gst_fee
             FROM erp_order o
                 INNER JOIN erp_order_logistics ol ON ol.order_id = o.id
             WHERE o.paid_time >= v_time_begin
@@ -115,6 +116,11 @@ CREATE PROCEDURE sale_amount_report()
             IF v_express_fee IS NULL
             THEN
                 SET v_express_fee = 0;
+            END IF;
+
+            IF v_cost_price IS NULL
+            THEN
+                SET v_cost_price = 0;
             END IF;
 
             IF v_estimate_logistics_fee IS NULL
@@ -147,27 +153,21 @@ CREATE PROCEDURE sale_amount_report()
                 SET v_gst_fee = 0;
             END IF;
 
-            IF v_profit IS NULL
+            SET v_logistics_fee = v_estimate_logistics_fee;
+            IF v_actual_logistics_fee <> 0
             THEN
-                SET v_profit = 0;
+                SET v_logistics_fee = v_actual_logistics_fee;
             END IF;
 
+            SET v_profit = v_paid_amount + v_express_fee - v_cost_price - v_logistics_fee - v_pick_fee - v_jyfy_amount - v_ptfy_amount - v_gst_fee;
+
             # 商品澳仓成本, 商品数量
-            SELECT
-                # 把澳仓成本的 RMB 转成 AUD
-                ifnull(sum(oi.cost_price * oi.quantity), 0) / o.exchange_rate,
-                ifnull(sum(oi.quantity), 0)
-            INTO v_cost_price,
-                v_product_qty
+            SELECT ifnull(sum(oi.quantity), 0)
+            INTO v_product_qty
             FROM erp_order_item oi
                 INNER JOIN erp_order o ON o.id = oi.order_id
             WHERE o.paid_time >= v_time_begin
                   AND o.paid_time < v_time_end;
-
-            IF v_cost_price IS NULL
-            THEN
-                SET v_cost_price = 0;
-            END IF;
 
             IF v_product_qty IS NULL
             THEN
@@ -241,22 +241,22 @@ CREATE PROCEDURE sale_amount_report()
             SELECT
                 ifnull(sum(o.amount_paid), 0),
                 ifnull(sum(o.express_fee), 0),
+                ifnull(sum(ol.cost_amount), 0),
                 ifnull(sum(ol.total_fee), 0),
                 ifnull(sum(ol.actual_fee), 0),
                 ifnull(sum(ol.pick_fee), 0),
                 ifnull(sum(o.amount_paid * ol.jyfl), 0),
                 ifnull(sum(o.amount_paid * ol.ptfl), 0),
-                ifnull(sum(o.amount_paid * 0.1), 0),
-                ifnull(sum(o.profit_au), 0)
+                ifnull(sum(o.amount_paid * 0.1), 0)
             INTO v_paid_amount,
                 v_express_fee,
+                v_cost_price,
                 v_estimate_logistics_fee,
                 v_actual_logistics_fee,
                 v_pick_fee,
                 v_jyfy_amount,
                 v_ptfy_amount,
-                v_gst_fee,
-                v_profit
+                v_gst_fee
             FROM erp_order o
                 INNER JOIN erp_order_logistics ol ON ol.order_id = o.id
             WHERE o.paid_time >= v_time_begin
@@ -270,6 +270,11 @@ CREATE PROCEDURE sale_amount_report()
             IF v_express_fee IS NULL
             THEN
                 SET v_express_fee = 0;
+            END IF;
+
+            IF v_cost_price IS NULL
+            THEN
+                SET v_cost_price = 0;
             END IF;
 
             IF v_estimate_logistics_fee IS NULL
@@ -302,27 +307,21 @@ CREATE PROCEDURE sale_amount_report()
                 SET v_gst_fee = 0;
             END IF;
 
-            IF v_profit IS NULL
+            SET v_logistics_fee = v_estimate_logistics_fee;
+            IF v_actual_logistics_fee <> 0
             THEN
-                SET v_profit = 0;
+                SET v_logistics_fee = v_actual_logistics_fee;
             END IF;
 
+            SET v_profit = v_paid_amount + v_express_fee - v_cost_price - v_logistics_fee - v_pick_fee - v_jyfy_amount - v_ptfy_amount - v_gst_fee;
+
             # 商品澳仓成本, 商品数量
-            SELECT
-                # 把澳仓成本的 RMB 转成 AUD
-                ifnull(sum(oi.cost_price * oi.quantity), 0) / o.exchange_rate,
-                ifnull(sum(oi.quantity), 0)
-            INTO v_cost_price,
-                v_product_qty
+            SELECT ifnull(sum(oi.quantity), 0)
+            INTO v_product_qty
             FROM erp_order_item oi
                 INNER JOIN erp_order o ON o.id = oi.order_id
             WHERE o.paid_time >= v_time_begin
                   AND o.paid_time < v_time_end;
-
-            IF v_cost_price IS NULL
-            THEN
-                SET v_cost_price = 0;
-            END IF;
 
             IF v_product_qty IS NULL
             THEN

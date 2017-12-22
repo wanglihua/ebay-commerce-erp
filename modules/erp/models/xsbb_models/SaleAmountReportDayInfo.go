@@ -8,7 +8,7 @@ type SaleAmountReportDayInfo struct {
 	ReportDay            core.Time `xorm:"datetime notnull index 'report_day' default(0)" json:"report_day"`
 	PaidAmount           float64   `xorm:"decimal(18,2) notnull 'paid_amount' default(0)" json:"paid_amount"`
 	ExpressFee           float64   `xorm:"decimal(18,2) notnull 'express_fee' default(0)" json:"express_fee"`
-	CostPrice            float64   `xorm:"decimal(18,2) notnull 'cost_price' default(0)" json:"cost_price"` // AUD，其他的也都是 AUD
+	CostPrice            float64   `xorm:"decimal(18,2) notnull 'cost_price' default(0)" json:"cost_price"` // AUD，其他的也都是 AUD， cost_amount 更合适
 	EstimateLogisticsFee float64   `xorm:"decimal(18,2) notnull 'estimate_logistics_fee' default(0)" json:"estimate_logistics_fee"`
 	ActualLogisticsFee   float64   `xorm:"decimal(18,2) notnull 'actual_logistics_fee' default(0)" json:"actual_logistics_fee"`
 	JyfyAmount           float64   `xorm:"decimal(18,2) notnull 'jyfy_amount' default(0)" json:"jyfy_amount"`
