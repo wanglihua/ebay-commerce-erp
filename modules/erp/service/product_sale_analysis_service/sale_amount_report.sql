@@ -109,7 +109,8 @@ CREATE PROCEDURE sale_amount_report()
 
             # 商品澳仓成本, 商品数量
             SELECT
-                ifnull(sum(oi.cost_price * oi.quantity), 0),
+                # 把澳仓成本的 RMB 转成 AUD
+                ifnull(sum(oi.cost_price * oi.quantity), 0) / o.exchange_rate,
                 ifnull(sum(oi.quantity), 0)
             INTO v_cost_price,
                 v_product_qty
