@@ -125,11 +125,11 @@ CREATE PROCEDURE sale_amount_report()
 
             IF v_count = 0
             THEN
-                INSERT INTO erp_sale_amount_report_day (report_day_id, report_day, amount)
+                INSERT INTO erp_sale_amount_report_day (report_day_id, report_day, paid_amount)
                 VALUES (v_time_day_id, v_time_begin, v_paid_amount);
             ELSE
                 UPDATE erp_sale_amount_report_day
-                SET report_day = v_time_begin, amount = v_paid_amount
+                SET report_day = v_time_begin, paid_amount = v_paid_amount
                 WHERE report_day_id = v_time_day_id;
             END IF;
 

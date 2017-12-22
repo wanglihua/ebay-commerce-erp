@@ -102,7 +102,7 @@ func (c ErpSaleAmountReportDay) ChartData() revel.Result {
 
 	var amount_list = make([]float64, 0)
 	for _, report := range sale_amount_report_day_list {
-		amount_list = append(amount_list, report.Amount)
+		amount_list = append(amount_list, report.PaidAmount)
 	}
 
 	var serie_data = map[string]interface{}{
