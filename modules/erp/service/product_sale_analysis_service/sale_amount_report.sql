@@ -12,17 +12,17 @@ CREATE PROCEDURE sale_amount_report()
         DECLARE v_latest_time_day_id BIGINT; # 用于存储销售统计的最近已经统计的时间天ID
         DECLARE v_latest_time_month_id BIGINT; # 用于存储销售统计的最近已经统计的时间月ID
         DECLARE v_count BIGINT;
-        DECLARE v_paid_amount DECIMAL(18, 2); # 交易金额 澳币
-        DECLARE v_express_fee DECIMAL(18, 2); # 运费收入 澳币
-        DECLARE v_au_cost_price DECIMAL(18, 2);
-        DECLARE v_estimate_logistics_fee DECIMAL(18, 2);
-        DECLARE v_actual_logistics_fee DECIMAL(18, 2);
-        DECLARE v_plfy DECIMAL(18, 2);
-        DECLARE v_ptfy DECIMAL(18, 2);
-        DECLARE v_pick_fee DECIMAL(18, 2);
-        DECLARE v_gst_fee DECIMAL(18, 2);
-        DECLARE v_profit DECIMAL(18, 2);
-        DECLARE v_product_qty INT;
+        DECLARE v_paid_amount DECIMAL(18, 2); # 交易金额 AUD
+        DECLARE v_express_fee DECIMAL(18, 2); # 运费收入 AUD
+        DECLARE v_cost_price DECIMAL(18, 2); # 商品澳仓成本 RMB
+        DECLARE v_estimate_logistics_fee DECIMAL(18, 2); # 预估运费 AUD
+        DECLARE v_actual_logistics_fee DECIMAL(18, 2); # 实际运费 AUD
+        DECLARE v_jyfy_amount DECIMAL(18, 2); # 交易费用 AUD
+        DECLARE v_ptfy_amount DECIMAL(18, 2); # 平台费用 AUD
+        DECLARE v_pick_fee DECIMAL(18, 2); # 拣货费 AUD
+        DECLARE v_gst_fee DECIMAL(18, 2); # GST费用 AUD
+        DECLARE v_profit DECIMAL(18, 2); # 利润 AUD
+        DECLARE v_product_qty INT; # 商品数量
 
 
         DECLARE v_day_time_end DATETIME;
@@ -82,42 +82,41 @@ CREATE PROCEDURE sale_amount_report()
 
             SET v_time_end = date_add(v_time_begin, INTERVAL 1 DAY);
 
-            # 商品销售额， 运费收入
-            SELECT sum(o.amount_paid), sum(o.express_fee)
-            INTO v_paid_amount, v_express_fee
+            # 商品销售额， 运费收入, 预估运费, 实际运费, 拣货费, 交易费用, 平台费用, GST费用, 利润
+            SELECT
+                ifnull(sum(o.amount_paid), 0),
+                ifnull(sum(o.express_fee), 0),
+                ifnull(sum(ol.total_fee), 0),
+                ifnull(sum(ol.actual_fee), 0),
+                ifnull(sum(ol.pick_fee), 0),
+                ifnull(sum(o.amount_paid * ol.jyfl), 0),
+                ifnull(sum(o.amount_paid * ol.ptfl), 0),
+                ifnull(sum(o.amount_paid * 0.1), 0),
+                ifnull(sum(o.profit_au), 0)
+            INTO v_paid_amount,
+                v_express_fee,
+                v_estimate_logistics_fee,
+                v_actual_logistics_fee,
+                v_pick_fee,
+                v_jyfy_amount,
+                v_ptfy_amount,
+                v_gst_fee,
+                v_profit
             FROM erp_order o
                 INNER JOIN erp_order_logistics ol ON ol.order_id = o.id
             WHERE o.paid_time >= v_time_begin
                   AND o.paid_time < v_time_end;
 
-            IF v_paid_amount IS NULL
-            THEN
-                SET v_paid_amount = 0;
-            END IF;
-
-            IF v_express_fee IS NULL
-            THEN
-                SET v_express_fee = 0;
-            END IF;
-
-            # 商品成本, 商品数量
-            SELECT sum(oi.cost_price * oi.quantity), sum(oi.quantity)
-            INTO v_au_cost_price, v_product_qty
+            # 商品澳仓成本, 商品数量
+            SELECT
+                ifnull(sum(oi.cost_price * oi.quantity), 0),
+                ifnull(sum(oi.quantity), 0)
+            INTO v_cost_price,
+                v_product_qty
             FROM erp_order_item oi
                 INNER JOIN erp_order o ON o.id = oi.order_id
             WHERE o.paid_time >= v_time_begin
                   AND o.paid_time < v_time_end;
-
-            IF v_au_cost_price IS NULL
-            THEN
-                SET v_au_cost_price = 0;
-            END IF;
-
-            IF v_product_qty IS NULL
-            THEN
-                SET v_product_qty = 0;
-            END IF;
-
 
             SELECT count(rd.id) INTO v_count
             FROM erp_sale_amount_report_day rd
