@@ -21,6 +21,10 @@
                         <i class="ace-icon fa fa-line-chart"></i>
                         图表分析
                     </button>
+                    <button class="btn btn-success btn-sm" onclick="exportReport()">
+                        <i class="ace-icon fa fa-file-excel-o"></i>
+                        导出
+                    </button>
                     <button class="btn btn-pink btn-sm" @click="calculate()">
                         <i class="ace-icon fa fa-refresh"></i>
                         立即分析销售情况
@@ -212,6 +216,12 @@
             }
         }
     });
+
+    function exportReport() {
+        var params = $.param({});
+        var url = '{%url "ErpSaleAmountReportDayExcel.Export"%}' + "?" + params;
+        $('<form method="post" action="' + url + '"></form>').appendTo('body').submit().remove();
+    }
 </script>
 {%footer%}
 

@@ -119,7 +119,7 @@ func (c ErpSaleAmountReportMonthExcel) export_sale_amount_report_to_excel(db_ses
 		cell.SetStyle(style)
 	}
 
-	head_row_height := 0.8
+	head_row_height := 1.6
 	common_row_height := 0.6
 
 	//创建工作薄
@@ -143,37 +143,37 @@ func (c ErpSaleAmountReportMonthExcel) export_sale_amount_report_to_excel(db_ses
 		col_index++
 
 		cell = row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 20)
+		sheet.SetColWidth(col_index, col_index, 10)
 		set_head_cell_style(cell)
 		cell.Value = "交易金额（AUD）"
 		col_index++
 
 		cell = row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 15)
+		sheet.SetColWidth(col_index, col_index, 10)
 		set_head_cell_style(cell)
 		cell.Value = "运费收入（AUD）"
 		col_index++
 
 		cell = row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 40)
+		sheet.SetColWidth(col_index, col_index, 10)
 		set_head_cell_style(cell)
 		cell.Value = "商品澳仓成本（AUD）"
 		col_index++
 
 		cell = row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 40)
+		sheet.SetColWidth(col_index, col_index, 10)
 		set_head_cell_style(cell)
 		cell.Value = "预估运费（AUD）"
 		col_index++
 
 		cell = row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 50)
+		sheet.SetColWidth(col_index, col_index, 10)
 		set_head_cell_style(cell)
 		cell.Value = "实际运费（AUD）"
 		col_index++
 
 		cell = row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 50)
+		sheet.SetColWidth(col_index, col_index, 10)
 		set_head_cell_style(cell)
 		cell.Value = "交易费用（AUD）"
 		col_index++
@@ -185,31 +185,31 @@ func (c ErpSaleAmountReportMonthExcel) export_sale_amount_report_to_excel(db_ses
 		col_index++
 
 		cell = row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 15)
+		sheet.SetColWidth(col_index, col_index, 10)
 		set_head_cell_style(cell)
 		cell.Value = "拣货费（AUD）"
 		col_index++
 
 		cell = row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 15)
+		sheet.SetColWidth(col_index, col_index, 10)
 		set_head_cell_style(cell)
 		cell.Value = "GST费用（AUD）"
 		col_index++
 
 		cell = row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 15)
+		sheet.SetColWidth(col_index, col_index, 10)
 		set_head_cell_style(cell)
 		cell.Value = "商品数量（件）"
 		col_index++
 
 		cell = row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 15)
+		sheet.SetColWidth(col_index, col_index, 10)
 		set_head_cell_style(cell)
 		cell.Value = "利润（AUD）"
 		col_index++
 
 		cell = row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 15)
+		sheet.SetColWidth(col_index, col_index, 10)
 		set_head_cell_style(cell)
 		cell.Value = "利润率"
 		col_index++
@@ -277,7 +277,7 @@ func (c ErpSaleAmountReportMonthExcel) export_sale_amount_report_to_excel(db_ses
 		// 利润
 		cell = row.AddCell()
 		set_text_cell_style(cell, "right")
-		cell.Value = fmt.Sprintf("%0.2f", report.Profit)
+		cell.Value = fmt.Sprintf("%0.0f", report.Profit)
 
 		// 利润率
 		cell = row.AddCell()
