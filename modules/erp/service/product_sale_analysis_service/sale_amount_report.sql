@@ -125,11 +125,22 @@ CREATE PROCEDURE sale_amount_report()
 
             IF v_count = 0
             THEN
-                INSERT INTO erp_sale_amount_report_day (report_day_id, report_day, paid_amount)
-                VALUES (v_time_day_id, v_time_begin, v_paid_amount);
+                INSERT INTO erp_sale_amount_report_day (report_day_id, report_day, paid_amount, express_fee, cost_price, estimate_logistics_fee, actual_logistics_fee, jyfy_amount, ptfy_amount, pick_fee, gst_fee, profit, product_qty)
+                VALUES (v_time_day_id, v_time_begin, v_paid_amount, v_express_fee, v_cost_price, v_estimate_logistics_fee, v_actual_logistics_fee, v_jyfy_amount, v_ptfy_amount, v_pick_fee, v_gst_fee, v_profit, v_product_qty);
             ELSE
                 UPDATE erp_sale_amount_report_day
-                SET report_day = v_time_begin, paid_amount = v_paid_amount
+                SET report_day             = v_time_begin,
+                    paid_amount            = v_paid_amount,
+                    express_fee            = v_express_fee,
+                    cost_price             = v_cost_price,
+                    estimate_logistics_fee = v_estimate_logistics_fee,
+                    actual_logistics_fee   = v_actual_logistics_fee,
+                    jyfy_amount            = v_jyfy_amount,
+                    ptfy_amount            = v_ptfy_amount,
+                    pick_fee               = v_pick_fee,
+                    gst_fee                = v_gst_fee,
+                    profit                 = v_profit,
+                    product_qty            = v_product_qty
                 WHERE report_day_id = v_time_day_id;
             END IF;
 
@@ -169,19 +180,44 @@ CREATE PROCEDURE sale_amount_report()
             FROM erp_sale_report_time_month td
             WHERE td.id = v_time_month_id;
 
-            SET v_time_end = date_add(v_time_begin, INTERVAL 1 MONTH);
+            SET v_time_end = date_add(v_time_begin, INTERVAL 1 DAY);
 
-            SELECT sum(oi.transaction_price * oi.quantity) AS amount
-            INTO v_paid_amount
+            # 商品销售额， 运费收入, 预估运费, 实际运费, 拣货费, 交易费用, 平台费用, GST费用, 利润
+            SELECT
+                ifnull(sum(o.amount_paid), 0),
+                ifnull(sum(o.express_fee), 0),
+                ifnull(sum(ol.total_fee), 0),
+                ifnull(sum(ol.actual_fee), 0),
+                ifnull(sum(ol.pick_fee), 0),
+                ifnull(sum(o.amount_paid * ol.jyfl), 0),
+                ifnull(sum(o.amount_paid * ol.ptfl), 0),
+                ifnull(sum(o.amount_paid * 0.1), 0),
+                ifnull(sum(o.profit_au), 0)
+            INTO v_paid_amount,
+                v_express_fee,
+                v_estimate_logistics_fee,
+                v_actual_logistics_fee,
+                v_pick_fee,
+                v_jyfy_amount,
+                v_ptfy_amount,
+                v_gst_fee,
+                v_profit
+            FROM erp_order o
+                INNER JOIN erp_order_logistics ol ON ol.order_id = o.id
+            WHERE o.paid_time >= v_time_begin
+                  AND o.paid_time < v_time_end;
+
+            # 商品澳仓成本, 商品数量
+            SELECT
+                # 把澳仓成本的 RMB 转成 AUD
+                ifnull(sum(oi.cost_price * oi.quantity), 0) / o.exchange_rate,
+                ifnull(sum(oi.quantity), 0)
+            INTO v_cost_price,
+                v_product_qty
             FROM erp_order_item oi
                 INNER JOIN erp_order o ON o.id = oi.order_id
             WHERE o.paid_time >= v_time_begin
                   AND o.paid_time < v_time_end;
-
-            IF v_paid_amount IS NULL
-            THEN
-                SET v_paid_amount = 0;
-            END IF;
 
             SELECT count(rd.id) INTO v_count
             FROM erp_sale_amount_report_month rd
@@ -189,11 +225,22 @@ CREATE PROCEDURE sale_amount_report()
 
             IF v_count = 0
             THEN
-                INSERT INTO erp_sale_amount_report_month (report_month_id, report_month, amount)
-                VALUES (v_time_month_id, v_time_begin, v_paid_amount);
+                INSERT INTO erp_sale_amount_report_month (report_month_id, report_month, paid_amount, express_fee, cost_price, estimate_logistics_fee, actual_logistics_fee, jyfy_amount, ptfy_amount, pick_fee, gst_fee, profit, product_qty)
+                VALUES (v_time_month_id, v_time_begin, v_paid_amount, v_express_fee, v_cost_price, v_estimate_logistics_fee, v_actual_logistics_fee, v_jyfy_amount, v_ptfy_amount, v_pick_fee, v_gst_fee, v_profit, v_product_qty);
             ELSE
                 UPDATE erp_sale_amount_report_month
-                SET report_month = v_time_begin, amount = v_paid_amount
+                SET report_month           = v_time_begin,
+                    paid_amount            = v_paid_amount,
+                    express_fee            = v_express_fee,
+                    cost_price             = v_cost_price,
+                    estimate_logistics_fee = v_estimate_logistics_fee,
+                    actual_logistics_fee   = v_actual_logistics_fee,
+                    jyfy_amount            = v_jyfy_amount,
+                    ptfy_amount            = v_ptfy_amount,
+                    pick_fee               = v_pick_fee,
+                    gst_fee                = v_gst_fee,
+                    profit                 = v_profit,
+                    product_qty            = v_product_qty
                 WHERE report_month_id = v_time_month_id;
             END IF;
 
