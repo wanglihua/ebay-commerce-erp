@@ -262,6 +262,51 @@ CREATE PROCEDURE sale_amount_report()
             WHERE o.paid_time >= v_time_begin
                   AND o.paid_time < v_time_end;
 
+            IF v_paid_amount IS NULL
+            THEN
+                SET v_paid_amount = 0;
+            END IF;
+
+            IF v_express_fee IS NULL
+            THEN
+                SET v_express_fee = 0;
+            END IF;
+
+            IF v_estimate_logistics_fee IS NULL
+            THEN
+                SET v_estimate_logistics_fee = 0;
+            END IF;
+
+            IF v_actual_logistics_fee IS NULL
+            THEN
+                SET v_actual_logistics_fee = 0;
+            END IF;
+
+            IF v_pick_fee IS NULL
+            THEN
+                SET v_pick_fee = 0;
+            END IF;
+
+            IF v_jyfy_amount IS NULL
+            THEN
+                SET v_jyfy_amount = 0;
+            END IF;
+
+            IF v_ptfy_amount IS NULL
+            THEN
+                SET v_ptfy_amount = 0;
+            END IF;
+
+            IF v_gst_fee IS NULL
+            THEN
+                SET v_gst_fee = 0;
+            END IF;
+
+            IF v_profit IS NULL
+            THEN
+                SET v_profit = 0;
+            END IF;
+
             # 商品澳仓成本, 商品数量
             SELECT
                 # 把澳仓成本的 RMB 转成 AUD
@@ -273,6 +318,16 @@ CREATE PROCEDURE sale_amount_report()
                 INNER JOIN erp_order o ON o.id = oi.order_id
             WHERE o.paid_time >= v_time_begin
                   AND o.paid_time < v_time_end;
+
+            IF v_cost_price IS NULL
+            THEN
+                SET v_cost_price = 0;
+            END IF;
+
+            IF v_product_qty IS NULL
+            THEN
+                SET v_product_qty = 0;
+            END IF;
 
             SELECT count(rd.id) INTO v_count
             FROM erp_sale_amount_report_month rd
