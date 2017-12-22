@@ -57,7 +57,78 @@
                                     return dtFormatMonth(data);
                                 }
                             },
-                            {"mDataProp": "amount", "title": "销售额", "bSearchable": false}
+                            {
+                                "mDataProp": "paid_amount", "title": "交易金额", "bSearchable": false, "width": 100,
+                                "render": function (data, type, row) {
+                                    return data + " AUD";
+                                }
+                            },
+                            {
+                                "mDataProp": "express_fee", "title": "运费收入", "bSearchable": false, "width": 100,
+                                "render": function (data, type, row) {
+                                    return data + " AUD";
+                                }
+                            },
+                            {
+                                "mDataProp": "cost_price", "title": "商品澳仓成本", "bSearchable": false, "width": 100,
+                                "render": function (data, type, row) {
+                                    return data + " AUD";
+                                }
+                            },
+                            {
+                                "mDataProp": "estimate_logistics_fee", "title": "预估运费", "bSearchable": false, "width": 100,
+                                "render": function (data, type, row) {
+                                    return data + " AUD";
+                                }
+                            },
+                            {
+                                "mDataProp": "actual_logistics_fee", "title": "实际运费", "bSearchable": false, "width": 100,
+                                "render": function (data, type, row) {
+                                    return data + " AUD";
+                                }
+                            },
+                            {
+                                "mDataProp": "jyfy_amount", "title": "交易费用", "bSearchable": false, "width": 100,
+                                "render": function (data, type, row) {
+                                    return data + " AUD";
+                                }
+                            },
+                            {
+                                "mDataProp": "ptfy_amount", "title": "平台费用", "bSearchable": false, "width": 100,
+                                "render": function (data, type, row) {
+                                    return data + " AUD";
+                                }
+                            },
+                            {
+                                "mDataProp": "pick_fee", "title": "拣货费", "bSearchable": false, "width": 100,
+                                "render": function (data, type, row) {
+                                    return data + " AUD";
+                                }
+                            },
+                            {
+                                "mDataProp": "gst_fee", "title": "GST费用", "bSearchable": false, "width": 100,
+                                "render": function (data, type, row) {
+                                    return data + " AUD";
+                                }
+                            },
+                            {
+                                "mDataProp": "product_qty", "title": "商品销量", "bSearchable": false, "width": 100,
+                                "render": function (data, type, row) {
+                                    return data + " 件";
+                                }
+                            },
+                            {
+                                "mDataProp": "profit", "title": "利润", "bSearchable": false, "width": 100,
+                                "render": function (data, type, row) {
+                                    return data + " AUD";
+                                }
+                            },
+                            {
+                                "mDataProp": "profit_rate", "title": "利润率", "bSearchable": false, "width": 100,
+                                "render": function (data, type, row) {
+                                    return data + "%";
+                                }
+                            }
                         ]
                     }
             );

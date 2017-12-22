@@ -146,8 +146,13 @@
                                 "render": function (data, type, row) {
                                     return data + " AUD";
                                 }
+                            },
+                            {
+                                "mDataProp": "profit_rate", "title": "利润率", "bSearchable": false, "width": 100,
+                                "render": function (data, type, row) {
+                                    return data + "%";
+                                }
                             }
-
                         ],
                         "fnServerData": function (sSource, aoData, fnCallback) {
                             showMask("数据加载中，请稍候");
