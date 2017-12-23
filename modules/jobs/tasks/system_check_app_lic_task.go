@@ -40,27 +40,26 @@ func (t SystemCheckAppLicTask) Run() {
 func get_current_time() time.Time {
 	var time_layout = "Mon, 02 Jan 2006 15:04:05 GMT"
 
-	response, err := http.Head("http://www.taobao.com")
-	if err == nil {
-		time_taobao, err := time.Parse(time_layout, response.Header.Get("Date"))
-		if err == nil {
-			return time_taobao.Local()
-		}
+	var time_site_list = []string{
+		"http://www.taobao.com",
+		"http://www.qq.com",
+		"http://www.baidu.com",
+		"http://www.sina.com.cn",
+		"http://www.youku.com",
+		"http://www.58.com",
+		"https://www.jd.com",
+		"https://www.toutiao.com",
+		"https://www.ebay.com",
+		"https://www.paypal.com",
 	}
 
-	response, err = http.Head("http://www.qq.com")
-	if err == nil {
-		time_qq, err := time.Parse(time_layout, response.Header.Get("Date"))
+	for _, time_site := range time_site_list {
+		response, err := http.Head(time_site)
 		if err == nil {
-			return time_qq.Local()
-		}
-	}
-
-	response, err = http.Head("http://www.baidu.com")
-	if err == nil {
-		time_baidu, err := time.Parse(time_layout, response.Header.Get("Date"))
-		if err == nil {
-			return time_baidu.Local()
+			time_internet, err := time.Parse(time_layout, response.Header.Get("Date"))
+			if err == nil {
+				return time_internet.Local()
+			}
 		}
 	}
 
