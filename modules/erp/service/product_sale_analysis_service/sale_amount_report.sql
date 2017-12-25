@@ -35,6 +35,18 @@ CREATE PROCEDURE sale_amount_report()
         DECLARE v_sale_amount_report_count INT;
         DECLARE v_item_price DECIMAL(18, 6);
         DECLARE v_item_qty INT;
+        DECLARE v_item_total_amount DECIMAL(18, 6);
+        DECLARE v_item_paid_amount DECIMAL(18, 2);
+        DECLARE v_item_express_fee DECIMAL(18, 2);
+        DECLARE v_item_income DECIMAL(18, 2);
+        DECLARE v_item_cost_amount DECIMAL(18, 2);
+        DECLARE v_item_estimate_logistics_fee DECIMAL(18, 2);
+        DECLARE v_item_actual_logistics_fee DECIMAL(18, 2);
+        DECLARE v_item_jyfy_amount DECIMAL(18, 2);
+        DECLARE v_item_ptfy_amount DECIMAL(18, 2);
+        DECLARE v_item_pick_fee DECIMAL(18, 2);
+        DECLARE v_item_gst_fee DECIMAL(18, 2);
+        DECLARE v_item_outcome DECIMAL(18, 2);
 
         -- 遍历数据结束标志
         DECLARE done INT DEFAULT FALSE;
@@ -55,6 +67,7 @@ CREATE PROCEDURE sale_amount_report()
 
         DECLARE order_item_cur CURSOR FOR
             SELECT
+                oi.id                AS order_item_id,
                 oi.item_product_id   AS product_id,
                 oi.transaction_price AS item_price,
                 oi.quantity          AS item_qty
@@ -226,19 +239,96 @@ CREATE PROCEDURE sale_amount_report()
                         WHERE order_item_id = v_order_item_id;
                     END IF;
             ELSE
+
+                SELECT sum(oi.transaction_price * oi.quantity) AS item_total_amount
+                INTO v_item_total_amount
+                FROM erp_order_item oi
+                WHERE oi.order_id = v_order_id;
+
+                IF v_item_total_amount = 0
+                THEN
+                    LEAVE order_loop;
+                END IF;
+
                 OPEN order_item_cur;
 
                 order_item_loop: LOOP
 
                     SET done = FALSE;
-                    FETCH order_item_cur INTO v_product_id, v_item_price, v_item_qty;
+                    FETCH order_item_cur INTO v_order_item_id, v_product_id, v_item_price, v_item_qty;
 
                     IF done
                     THEN
                         LEAVE order_item_loop;
                     END IF;
 
+                    SELECT
+                        p.sale_user_id,
+                        p.service_user_id,
+                        p.dev_user_id
+                    INTO
+                        v_sale_user_id,
+                        v_service_user_id,
+                        v_dev_user_id
+                    FROM erp_product p
+                    WHERE p.id = v_product_id;
 
+                    SELECT count(sar.id) AS sale_amount_report_count
+                    INTO v_sale_amount_report_count
+                    FROM erp_sale_amount_report sar
+                    WHERE sar.order_item_id = v_order_item_id;
+
+                    SET v_item_paid_amount = v_item_price * v_item_qty;
+                    SET v_item_express_fee = v_express_fee * v_item_paid_amount / v_item_total_amount;
+                    SET v_item_income = v_item_paid_amount + v_item_express_fee;
+                    SET v_item_cost_amount = v_cost_amount * v_item_paid_amount / v_item_total_amount;
+                    SET v_item_estimate_logistics_fee = v_estimate_logistics_fee * v_item_paid_amount / v_item_total_amount;
+                    SET v_item_actual_logistics_fee = v_actual_logistics_fee * v_item_paid_amount / v_item_total_amount;
+                    SET v_item_jyfy_amount = v_jyfy_amount * v_item_paid_amount / v_item_total_amount;
+                    SET v_item_ptfy_amount = v_ptfy_amount * v_item_paid_amount / v_item_total_amount;
+                    SET v_item_pick_fee = v_pick_fee * v_item_paid_amount / v_item_total_amount;
+                    SET v_item_gst_fee = v_gst_fee * v_item_paid_amount / v_item_total_amount;
+
+                    SET v_logistics_fee = v_item_estimate_logistics_fee;
+                    IF v_item_actual_logistics_fee IS NOT NULL AND v_item_actual_logistics_fee <> 0
+                    THEN
+                        SET v_logistics_fee = v_actual_logistics_fee;
+                    END IF;
+
+                    SET v_item_outcome = v_item_cost_amount + v_logistics_fee + v_item_pick_fee + v_item_jyfy_amount + v_item_ptfy_amount + v_item_gst_fee;
+                    SET v_profit = v_item_income - v_item_outcome;
+                    SET v_profit_rate = v_profit / v_item_paid_amount * 100;
+
+                    IF v_sale_amount_report_count = 0
+                    THEN
+                        INSERT INTO erp_sale_amount_report
+                        (paid_time, platform_id, shop_id, order_id, order_item_id, paid_amount, express_fee, income, cost_amount, estimate_logistics_fee, actual_logistics_fee, jyfy_amount, ptfy_amount, pick_fee, gst_fee, outcome, profit, profit_rate, product_id, sale_user_id, service_user_id, dev_user_id)
+                        VALUES (v_paid_time, v_platform_id, v_shop_id, v_order_id, v_order_item_id, v_item_paid_amount, v_item_express_fee, v_item_income, v_item_cost_amount, v_item_estimate_logistics_fee, v_item_actual_logistics_fee, v_item_jyfy_amount, v_item_ptfy_amount, v_item_pick_fee, v_item_gst_fee, v_item_outcome, v_profit, v_profit_rate, v_product_id, v_sale_user_id, v_service_user_id, v_dev_user_id);
+                    ELSE
+                        UPDATE erp_sale_amount_report
+                        SET paid_time              = v_paid_time,
+                            platform_id            = v_platform_id,
+                            shop_id                = v_shop_id,
+                            order_id               = v_order_id,
+                            paid_amount            = v_item_paid_amount,
+                            express_fee            = v_item_express_fee,
+                            income                 = v_item_income,
+                            cost_amount            = v_item_cost_amount,
+                            estimate_logistics_fee = v_item_estimate_logistics_fee,
+                            actual_logistics_fee   = v_item_actual_logistics_fee,
+                            jyfy_amount            = v_item_jyfy_amount,
+                            ptfy_amount            = v_item_ptfy_amount,
+                            pick_fee               = v_item_pick_fee,
+                            gst_fee                = v_item_gst_fee,
+                            outcome                = v_item_outcome,
+                            profit                 = v_profit,
+                            profit_rate            = v_profit_rate,
+                            product_id             = v_product_id,
+                            sale_user_id           = v_sale_user_id,
+                            service_user_id        = v_service_user_id,
+                            dev_user_id            = v_dev_user_id
+                        WHERE order_item_id = v_order_item_id;
+                    END IF;
 
                 END LOOP;
 
