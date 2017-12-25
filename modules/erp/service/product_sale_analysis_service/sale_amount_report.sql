@@ -58,8 +58,7 @@ CREATE PROCEDURE sale_amount_report()
                 o.paid_time   AS paid_time,
                 o.shop_id     AS shop_id,
                 o.amount_paid AS paid_amount,
-                o.express_fee AS express_fee,
-                o.profit_au   AS profit
+                o.express_fee AS express_fee
             FROM erp_order o
             WHERE (o.status_id = 4200 OR o.status_id = 4300)
                   AND o.paid_time >= v_latest_reported_paid_time;
@@ -93,7 +92,7 @@ CREATE PROCEDURE sale_amount_report()
         order_loop: LOOP
 
             SET done = FALSE;
-            FETCH order_cur INTO v_order_id, v_paid_time, v_shop_id, v_paid_amount, v_express_fee, v_profit;
+            FETCH order_cur INTO v_order_id, v_paid_time, v_shop_id, v_paid_amount, v_express_fee;
 
             IF done
             THEN
@@ -160,6 +159,8 @@ CREATE PROCEDURE sale_amount_report()
             SET v_jyfy_amount = v_paid_amount * v_jyfl;
             SET v_ptfy_amount = v_paid_amount * v_ptfl;
 
+            SET v_gst_fee = v_paid_amount * 0.1;
+
             SELECT count(oi.id) AS item_count
             INTO v_order_item_count
             FROM erp_order_item oi
@@ -179,6 +180,8 @@ CREATE PROCEDURE sale_amount_report()
                     END IF;
 
                     SET v_outcome = v_cost_amount + v_logistics_fee + v_pick_fee + v_jyfy_amount + v_ptfy_amount + v_gst_fee;
+                    SET v_profit = v_income - v_outcome;
+                    SET v_profit_rate = v_profit / v_paid_amount * 100;
 
                     SELECT
                         oi.id              AS order_item_id,
@@ -200,8 +203,6 @@ CREATE PROCEDURE sale_amount_report()
                         v_dev_user_id
                     FROM erp_product p
                     WHERE p.id = v_product_id;
-
-                    SET v_profit_rate = v_profit / v_paid_amount * 100;
 
                     SELECT count(sar.id) AS sale_amount_report_count
                     INTO v_sale_amount_report_count
