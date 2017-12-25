@@ -211,6 +211,8 @@ func (c ErpOrderNew) Save() revel.Result {
 		order_logistics.StockId = stock_id
 		order_logistics.AddressId = shipping_address.Id
 
+		// pick_fee_service.Get_product_pick_fee(whole_weight, p_ol.pick_fee_setting)
+
 		_, err = db_session.Insert(&order_logistics)
 		core.HandleError(err)
 

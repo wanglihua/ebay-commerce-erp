@@ -33,6 +33,8 @@ CREATE PROCEDURE sale_amount_report()
         DECLARE v_dev_user_id BIGINT;
         DECLARE v_order_item_count INT;
         DECLARE v_sale_amount_report_count INT;
+        DECLARE v_item_price DECIMAL(18, 6);
+        DECLARE v_item_qty INT;
 
         -- 遍历数据结束标志
         DECLARE done INT DEFAULT FALSE;
@@ -51,6 +53,14 @@ CREATE PROCEDURE sale_amount_report()
                   AND o.paid_time >= v_latest_reported_paid_time;
         # 条件里面要加上 =，防止可能的有多个相同的 支付时间 的情况
 
+        DECLARE order_item_cur CURSOR FOR
+            SELECT
+                oi.item_product_id   AS product_id,
+                oi.transaction_price AS item_price,
+                oi.quantity          AS item_qty
+            FROM erp_order_item oi
+            WHERE oi.order_id = v_order_id;
+
         -- 将结束标志绑定到游标
         DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
@@ -67,14 +77,14 @@ CREATE PROCEDURE sale_amount_report()
 
         OPEN order_cur;
 
-        order_id_loop: LOOP
+        order_loop: LOOP
 
             SET done = FALSE;
             FETCH order_cur INTO v_order_id, v_paid_time, v_shop_id, v_paid_amount, v_express_fee, v_profit;
 
             IF done
             THEN
-                LEAVE order_id_loop;
+                LEAVE order_loop;
             END IF;
 
             SELECT sa.platform_id AS platform_id
@@ -144,7 +154,7 @@ CREATE PROCEDURE sale_amount_report()
 
             IF v_order_item_count = 0
             THEN
-                LEAVE order_id_loop;
+                LEAVE order_loop;
             ELSEIF v_order_item_count = 1
                 THEN
                     SET v_income = v_paid_amount + v_express_fee;
@@ -216,7 +226,23 @@ CREATE PROCEDURE sale_amount_report()
                         WHERE order_item_id = v_order_item_id;
                     END IF;
             ELSE
+                OPEN order_item_cur;
 
+                order_item_loop: LOOP
+
+                    SET done = FALSE;
+                    FETCH order_item_cur INTO v_product_id, v_item_price, v_item_qty;
+
+                    IF done
+                    THEN
+                        LEAVE order_item_loop;
+                    END IF;
+
+
+
+                END LOOP;
+
+                CLOSE order_item_cur;
             END IF;
 
         END LOOP;
