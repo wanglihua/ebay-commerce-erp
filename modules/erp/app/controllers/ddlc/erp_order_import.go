@@ -206,7 +206,7 @@ func (c ErpOrderImport) Upload() revel.Result {
 		product_id   int64
 		price_rmb    float64
 		price_au     float64
-		cost_price   float64
+		cost_price   float64 // 不是单个商品的成本价，是总体的数量的成本价
 		gross_profit float64
 	}
 

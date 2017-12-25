@@ -20,20 +20,20 @@ import (
 )
 
 type Order_view_item_t struct {
-	Order                ddlc_models.OrderInfo                  `xorm:"extends" json:"o"`
-	TypeName             string                            `json:"type_name"`
-	HoldTypeName         string                            `json:"hold_type_name"`
-	PlatformName         string                            `json:"platform_name"`
-	ShopCode             string                            `json:"shop_code"`
-	ShopName             string                            `json:"shop_name"`
-	StatusName           string                            `json:"status_name"`
-	StockName            string                            `json:"stock_name"`
-	OrderLogistics       ddlc_models.OrderLogisticsInfo         `json:"ol"`
-	OrderShippingAddress ddlc_models.OrderShippingAddressInfo   `json:"ad"`
-	CompanyName          string                            `json:"company_name"`
-	ModeName             string                            `json:"mode_name"`
-	FeeDiff              float64                           `json:"fee_diff"`
-	OrderTag             ddpz_models.OrderTagInfo               `json:"order_tag"`
+	Order                ddlc_models.OrderInfo                `xorm:"extends" json:"o"`
+	TypeName             string                               `json:"type_name"`
+	HoldTypeName         string                               `json:"hold_type_name"`
+	PlatformName         string                               `json:"platform_name"`
+	ShopCode             string                               `json:"shop_code"`
+	ShopName             string                               `json:"shop_name"`
+	StatusName           string                               `json:"status_name"`
+	StockName            string                               `json:"stock_name"`
+	OrderLogistics       ddlc_models.OrderLogisticsInfo       `json:"ol"`
+	OrderShippingAddress ddlc_models.OrderShippingAddressInfo `json:"ad"`
+	CompanyName          string                               `json:"company_name"`
+	ModeName             string                               `json:"mode_name"`
+	FeeDiff              float64                              `json:"fee_diff"`
+	OrderTag             ddpz_models.OrderTagInfo             `json:"order_tag"`
 }
 
 func Get_order_data_list(db_session *xorm.Session, filter string, order string, offset int64, limit int64) ([]Order_view_item_t, int64) {
@@ -237,17 +237,17 @@ func Get_paid_order_list(db_session *xorm.Session) []ddlc_models.OrderInfo {
 }
 
 type Order_product_info_t struct {
-	OrderId   int64    `xorm:"'order_id'"`
-	ItemId    int64    `xorm:"'item_id'"` // 订单明细的主键
-	ProductId int64    `xorm:"'product_id'"`
-	Price     float64  `xorm:"'price'"` // 方便后面的运费计算啥的，这里面的价格是 澳币。后来这个价格在匹配物流的时候，好像也没用到
-	Qty       int64    `xorm:"'qty'"`
-	Length    float64  `xorm:"'length'"`
-	Width     float64  `xorm:"'width'"`
-	Height    float64  `xorm:"'height'"`
-	Weight    float64  `xorm:"'weight'"`
+	OrderId   int64   `xorm:"'order_id'"`
+	ItemId    int64   `xorm:"'item_id'"` // 订单明细的主键
+	ProductId int64   `xorm:"'product_id'"`
+	Price     float64 `xorm:"'price'"` // 方便后面的运费计算啥的，这里面的价格是 澳币。后来这个价格在匹配物流的时候，好像也没用到
+	Qty       int64   `xorm:"'qty'"`
+	Length    float64 `xorm:"'length'"`
+	Width     float64 `xorm:"'width'"`
+	Height    float64 `xorm:"'height'"`
+	Weight    float64 `xorm:"'weight'"`
 
-	CostPrice float64  `xorm:"-"` // 这个用于在物流匹配过程中，把澳仓的成本暂时记录下来，保存物流的时候，可以记录到订单明细(order_item)里面，也用于订单利润在个订单明细里面的分配的权重。是整个明细的 澳仓成本价，不是单个商品的，是这个明细里面的所以数量的总和的澳仓成本
+	CostPrice float64 `xorm:"-"` // 这个用于在物流匹配过程中，把澳仓的成本暂时记录下来，保存物流的时候，可以记录到订单明细(order_item)里面，也用于订单利润在个订单明细里面的分配的权重。是整个明细的 澳仓成本价，不是单个商品的，是这个明细里面的所以数量的总和的澳仓成本 cost_amount 更合适
 	//Profit    float64  `xorm:"-"` // 这个用于在计算分配订单利润的时候用到，用于暂存。这个跟CostPrice一样，也是整个明细的毛利，不是单个商品的，是整个数量的毛利。
 }
 
