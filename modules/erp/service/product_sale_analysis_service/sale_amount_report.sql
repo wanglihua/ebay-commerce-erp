@@ -102,6 +102,36 @@ CREATE PROCEDURE sale_amount_report()
             FROM erp_order_logistics ol
             WHERE ol.order_id = v_order_id;
 
+            IF v_cost_amount IS NULL
+            THEN
+                SET v_cost_amount = 0;
+            END IF;
+
+            IF v_estimate_logistics_fee IS NULL
+            THEN
+                SET v_estimate_logistics_fee = 0;
+            END IF;
+
+            IF v_actual_logistics_fee IS NULL
+            THEN
+                SET v_actual_logistics_fee = 0;
+            END IF;
+
+            IF v_jyfl IS NULL
+            THEN
+                SET v_jyfl = 0;
+            END IF;
+
+            IF v_ptfl IS NULL
+            THEN
+                SET v_ptfl = 0;
+            END IF;
+
+            IF v_pick_fee IS NULL
+            THEN
+                SET v_pick_fee = 0;
+            END IF;
+
             SELECT count(oi.id) AS item_count
             INTO v_order_item_count
             FROM erp_order_item oi
