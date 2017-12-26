@@ -389,12 +389,12 @@ func (c ErpSaleAmountReportMonthExcel) export_sale_amount_report_to_excel(db_ses
 		// 订单数量
 		cell = row.AddCell()
 		set_text_cell_style(cell, "right")
-		cell.Value = fmt.Sprintf("%0.0f", report.OrderQty)
+		cell.Value = fmt.Sprint(report.OrderQty)
 
 		// 商品数量
 		cell = row.AddCell()
 		set_text_cell_style(cell, "right")
-		cell.Value = fmt.Sprintf("%0.0f", report.ProductQty)
+		cell.Value = fmt.Sprint(report.ProductQty)
 
 		// 利润
 		cell = row.AddCell()
