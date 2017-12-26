@@ -25,7 +25,9 @@ SELECT
     sum(r.gst_fee)                                  AS gst_fee,
     sum(r.outcome)                                  AS outcome,
     sum(r.income - r.outcome)                       AS profit,
-    sum(r.income - r.outcome) / sum(r.income) * 100 AS profit_rate
+    sum(r.income - r.outcome) / sum(r.income) * 100 AS profit_rate,
+    count(DISTINCT r.order_id)                      AS order_qty,
+    sum(r.product_qty)                              AS product_qty
 FROM erp_sale_amount_report r
 WHERE r.platform_id = 0
       AND r.shop_id = 0
@@ -60,6 +62,7 @@ func (c ErpSaleAmountReportDay) Index() revel.Result {
 	user_query_type_list = append(user_query_type_list, user_query_type{Id: user_query_type_sale, Name: "销售人员"})
 	user_query_type_list = append(user_query_type_list, user_query_type{Id: user_query_type_service, Name: "服务人员"})
 	user_query_type_list = append(user_query_type_list, user_query_type{Id: user_query_type_dev, Name: "开发人员"})
+
 	return c.RenderTemplate("erp/xsbb/sale_amount_report_day/sale_amount_report_day_index.html")
 }
 
@@ -132,7 +135,9 @@ func (c ErpSaleAmountReportDay) ListData() revel.Result {
 		sum(r.gst_fee)                                  AS gst_fee,
 		sum(r.outcome)                                  AS outcome,
 		sum(r.income - r.outcome)                       AS profit,
-		sum(r.income - r.outcome) / sum(r.income) * 100 AS profit_rate
+		sum(r.income - r.outcome) / sum(r.income) * 100 AS profit_rate,
+	    count(DISTINCT r.order_id)                      AS order_qty,
+    	sum(r.product_qty)                              AS product_qty
 	FROM erp_sale_amount_report r
 	WHERE r.platform_id = 0
 		  AND r.shop_id = 0
@@ -177,7 +182,9 @@ SELECT
     sum(r.gst_fee)                                  AS gst_fee,
     sum(r.outcome)                                  AS outcome,
     sum(r.income - r.outcome)                       AS profit,
-    sum(r.income - r.outcome) / sum(r.income) * 100 AS profit_rate
+    sum(r.income - r.outcome) / sum(r.income) * 100 AS profit_rate,
+    count(DISTINCT r.order_id)                      AS order_qty,
+    sum(r.product_qty)                              AS product_qty
 FROM erp_sale_amount_report r
 WHERE %s
 GROUP BY date_format(r.paid_time, '%%Y-%%m-%%d')

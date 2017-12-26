@@ -16,6 +16,8 @@ type SaleAmountReportInfo struct {
 	Outcome              float64 `xorm:"'outcome'" json:"outcome"`
 	Profit               float64 `xorm:"'profit'" json:"profit"`
 	ProfitRate           float64 `xorm:"'profit_rate'" json:"profit_rate"`
+	OrderQty             int64   `xorm:"'order_qty'" json:"order_qty"`
+	ProductQty           int64   `xorm:"'product_qty'" json:"product_qty"`
 }
 
 /*
@@ -34,7 +36,9 @@ SELECT
     sum(r.gst_fee)                                  AS gst_fee,
     sum(r.outcome)                                  AS outcome,
     sum(r.income - r.outcome)                       AS profit,
-    sum(r.income - r.outcome) / sum(r.income) * 100 AS profit_rate
+    sum(r.income - r.outcome) / sum(r.income) * 100 AS profit_rate,
+    count(DISTINCT r.order_id)                      AS order_qty,
+    sum(r.product_qty)                              AS product_qty
 FROM erp_sale_amount_report r
 WHERE r.platform_id = 0
       AND r.shop_id = 0
