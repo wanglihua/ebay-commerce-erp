@@ -9,6 +9,35 @@ import (
 	"time"
 )
 
+/*
+SELECT
+    date_format(r.paid_time, '%Y-%m')               AS paid_time,
+    sum(r.paid_amount)                              AS paid_amount,
+    sum(r.express_fee)                              AS express_fee,
+    sum(r.income)                                   AS income,
+    sum(r.cost_amount)                              AS cost_amount,
+    sum(r.estimate_logistics_fee)                   AS estimate_logistics_fee,
+    sum(r.actual_logistics_fee)                     AS actual_logistics_fee,
+    sum(r.jyfy_amount)                              AS jyfy_amount,
+    sum(r.ptfy_amount)                              AS ptfy_amount,
+    sum(r.pick_fee)                                 AS pick_fee,
+    sum(r.gst_fee)                                  AS gst_fee,
+    sum(r.outcome)                                  AS outcome,
+    sum(r.income - r.outcome)                       AS profit,
+    sum(r.income - r.outcome) / sum(r.income) * 100 AS profit_rate
+
+FROM erp_sale_amount_report r
+WHERE r.platform_id = 0
+      AND r.shop_id = 0
+      AND r.paid_time >= '2006-01-01'
+      AND r.paid_time < '2017-12-30'
+      AND r.product_id = 0
+      AND r.sale_user_id = 0
+      AND r.service_user_id = 0
+      AND r.dev_user_id = 0
+GROUP BY date_format(r.paid_time, '%Y-%m');
+ */
+
 type ErpSaleAmountReportMonth struct {
 	*revel.Controller
 }

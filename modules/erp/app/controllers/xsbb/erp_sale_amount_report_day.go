@@ -26,7 +26,6 @@ SELECT
     sum(r.outcome)                                  AS outcome,
     sum(r.income - r.outcome)                       AS profit,
     sum(r.income - r.outcome) / sum(r.income) * 100 AS profit_rate
-
 FROM erp_sale_amount_report r
 WHERE r.platform_id = 0
       AND r.shop_id = 0
@@ -36,14 +35,31 @@ WHERE r.platform_id = 0
       AND r.sale_user_id = 0
       AND r.service_user_id = 0
       AND r.dev_user_id = 0
-GROUP BY date_format(r.paid_time, '%Y-%m-%d');
+GROUP BY date_format(r.paid_time, '%Y-%m-%d')
+ORDER BY paid_time DESC;
  */
 
 type ErpSaleAmountReportDay struct {
 	*revel.Controller
 }
 
+type user_query_type struct {
+	Id   int64  `json:"id"`
+	Name string `json:"name"`
+}
+
+const (
+	user_query_type_sale    int64 = 1000
+	user_query_type_service int64 = 2000
+	user_query_type_dev     int64 = 3000
+)
+
 func (c ErpSaleAmountReportDay) Index() revel.Result {
+
+	var user_query_type_list = make([]user_query_type, 0)
+	user_query_type_list = append(user_query_type_list, user_query_type{Id: user_query_type_sale, Name: "销售人员"})
+	user_query_type_list = append(user_query_type_list, user_query_type{Id: user_query_type_service, Name: "服务人员"})
+	user_query_type_list = append(user_query_type_list, user_query_type{Id: user_query_type_dev, Name: "开发人员"})
 	return c.RenderTemplate("erp/xsbb/sale_amount_report_day/sale_amount_report_day_index.html")
 }
 
@@ -56,38 +72,126 @@ func (c ErpSaleAmountReportDay) ListData() revel.Result {
 	var end_time_query core.NullLongTime
 	c.Params.Bind(&end_time_query, "end_time_query")
 
+	var platform_id_query int64
+	c.Params.Bind(&platform_id_query, "platform_id_query")
+
+	var shop_id_query int64
+	c.Params.Bind(&shop_id_query, "shop_id_query")
+
+	var user_query_type int64
+	c.Params.Bind(&user_query_type, "user_query_type")
+
+	var user_query_type_value int64
+	c.Params.Bind(&user_query_type_value, "user_query_type_value")
+
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
 	if begin_time_query.Valid == true {
-		filter = core.SqlAnd(filter, fmt.Sprintf("report_day >= '%s'", begin_time_query.Time.Format("2006-01-02")))
+		filter = core.SqlAnd(filter, fmt.Sprintf("r.paid_time >= '%s'", begin_time_query.Time.Format("2006-01-02")))
 	}
 
 	if end_time_query.Valid == true {
-		filter = core.SqlAnd(filter, fmt.Sprintf("report_day < '%s'", end_time_query.Time.AddDate(0, 0, 1).Format("2006-01-02")))
+		filter = core.SqlAnd(filter, fmt.Sprintf("r.paid_time < '%s'", end_time_query.Time.AddDate(0, 0, 1).Format("2006-01-02")))
 	}
 
-	query := db_session.Where(filter)
+	if user_query_type != 0 && user_query_type_value != 0 {
 
-	//query extra filter here
-
-	data_query := *query
-	if order != "" {
-		data_query = *data_query.OrderBy(order)
-	} else {
-		data_query = *data_query.Asc("id")
 	}
 
-	sale_amount_report_day_list := make([]xsbb_models.SaleAmountReportDayInfo, 0, limit)
-	err := data_query.Limit(limit, offset).Find(&sale_amount_report_day_list)
-	core.HandleError(err)
+	/*
 
-	count_query := *query
-	count, err := count_query.Count(new(xsbb_models.SaleAmountReportDayInfo))
+	SELECT
+		date_format(r.paid_time, '%Y-%m-%d')            AS paid_time,
+		sum(r.paid_amount)                              AS paid_amount,
+		sum(r.express_fee)                              AS express_fee,
+		sum(r.income)                                   AS income,
+		sum(r.cost_amount)                              AS cost_amount,
+		sum(r.estimate_logistics_fee)                   AS estimate_logistics_fee,
+		sum(r.actual_logistics_fee)                     AS actual_logistics_fee,
+		sum(r.jyfy_amount)                              AS jyfy_amount,
+		sum(r.ptfy_amount)                              AS ptfy_amount,
+		sum(r.pick_fee)                                 AS pick_fee,
+		sum(r.gst_fee)                                  AS gst_fee,
+		sum(r.outcome)                                  AS outcome,
+		sum(r.income - r.outcome)                       AS profit,
+		sum(r.income - r.outcome) / sum(r.income) * 100 AS profit_rate
+	FROM erp_sale_amount_report r
+	WHERE r.platform_id = 0
+		  AND r.shop_id = 0
+		  AND r.paid_time >= '2006-01-01'
+		  AND r.paid_time < '2017-12-30'
+		  AND r.product_id = 0
+		  AND r.sale_user_id = 0
+		  AND r.service_user_id = 0
+		  AND r.dev_user_id = 0
+	GROUP BY date_format(r.paid_time, '%Y-%m-%d')
+	ORDER BY paid_time DESC;
+
+	SELECT count(*)
+	FROM (
+			 SELECT date_format(r.paid_time, '%Y-%m-%d') AS paid_time
+			 FROM erp_sale_amount_report r
+			 WHERE r.platform_id = 0
+				   AND r.shop_id = 0
+				   AND r.paid_time >= '2006-01-01'
+				   AND r.paid_time < '2017-12-30'
+				   AND r.product_id = 0
+				   AND r.sale_user_id = 0
+				   AND r.service_user_id = 0
+				   AND r.dev_user_id = 0
+			 GROUP BY date_format(r.paid_time, '%Y-%m-%d')
+		 ) sale_amount_report;
+
+	 */
+
+	var sql_list = `
+SELECT
+    date_format(r.paid_time, '%Y-%m-%d')            AS paid_time,
+    sum(r.paid_amount)                              AS paid_amount,
+    sum(r.express_fee)                              AS express_fee,
+    sum(r.income)                                   AS income,
+    sum(r.cost_amount)                              AS cost_amount,
+    sum(r.estimate_logistics_fee)                   AS estimate_logistics_fee,
+    sum(r.actual_logistics_fee)                     AS actual_logistics_fee,
+    sum(r.jyfy_amount)                              AS jyfy_amount,
+    sum(r.ptfy_amount)                              AS ptfy_amount,
+    sum(r.pick_fee)                                 AS pick_fee,
+    sum(r.gst_fee)                                  AS gst_fee,
+    sum(r.outcome)                                  AS outcome,
+    sum(r.income - r.outcome)                       AS profit,
+    sum(r.income - r.outcome) / sum(r.income) * 100 AS profit_rate
+FROM erp_sale_amount_report r
+WHERE %s
+GROUP BY date_format(r.paid_time, '%Y-%m-%d')
+ORDER BY %s
+LIMIT %d, %d;
+`
+	if order == "" {
+		order = "paid_time DESC"
+	}
+
+	sql_list = fmt.Sprintf(sql_list, filter, order, offset, limit)
+
+	var sale_amount_report_list = make([]xsbb_models.SaleAmountReportInfo, 0, limit)
+	core.HandleError(db_session.Sql(sql_list).Find(&sale_amount_report_list))
+
+	var sql_count = `
+SELECT count(*) AS count
+FROM (
+		 SELECT date_format(r.paid_time, '%Y-%m-%d') AS paid_time
+		 FROM erp_sale_amount_report r
+		 WHERE %s
+		 GROUP BY date_format(r.paid_time, '%Y-%m-%d')
+	 ) sale_amount_report;
+`
+
+	var count core.Count
+	_, err := db_session.Sql(sql_count).Get(&count)
 	core.HandleError(err)
 
 	return c.RenderJson(core.GridResult{
-		Data:  sale_amount_report_day_list,
-		Total: count,
+		Data:  sale_amount_report_list,
+		Total: count.Count,
 	})
 }
 
