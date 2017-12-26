@@ -80,7 +80,7 @@
                                 }
                             },
                             {
-                                "mDataProp": "report_day", "title": "日期", "bSearchable": false, "sClass": "center", "width": 100,
+                                "mDataProp": "paid_time", "title": "日期", "bSearchable": false, "sClass": "center", "width": 100,
                                 "render": function (data, type, row) {
                                     return dtFormatDate(data);
                                 }
@@ -98,7 +98,13 @@
                                 }
                             },
                             {
-                                "mDataProp": "cost_price", "title": "商品澳仓成本(澳币)", "bSearchable": false, "sClass": "dtRight", "width": 100,
+                                "mDataProp": "income", "title": "收入小计", "bSearchable": false, "sClass": "dtRight", "width": 100,
+                                "render": function (data, type, row) {
+                                    return dtFormatFloat(data);
+                                }
+                            },
+                            {
+                                "mDataProp": "cost_amount", "title": "商品澳仓成本(澳币)", "bSearchable": false, "sClass": "dtRight", "width": 100,
                                 "render": function (data, type, row) {
                                     return dtFormatFloat(data);
                                 }
@@ -140,9 +146,9 @@
                                 }
                             },
                             {
-                                "mDataProp": "product_qty", "title": "商品销量(件)", "bSearchable": false, "sClass": "dtRight", "width": 100,
+                                "mDataProp": "outcome", "title": "支出小计", "bSearchable": false, "sClass": "dtRight", "width": 100,
                                 "render": function (data, type, row) {
-                                    return data;
+                                    return dtFormatFloat(data);
                                 }
                             },
                             {

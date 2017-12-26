@@ -94,8 +94,26 @@ func (c ErpSaleAmountReportDay) ListData() revel.Result {
 		filter = core.SqlAnd(filter, fmt.Sprintf("r.paid_time < '%s'", end_time_query.Time.AddDate(0, 0, 1).Format("2006-01-02")))
 	}
 
-	if user_query_type != 0 && user_query_type_value != 0 {
+	if platform_id_query != 0 {
+		filter = core.SqlAnd(filter, fmt.Sprintf("r.platform_id = %d", platform_id_query))
+	}
 
+	if shop_id_query != 0 {
+		filter = core.SqlAnd(filter, fmt.Sprintf("r.shop_id = %d", shop_id_query))
+	}
+
+	if user_query_type != 0 && user_query_type_value != 0 {
+		if user_query_type == user_query_type_sale {
+			filter = core.SqlAnd(filter, fmt.Sprintf("r.sale_user_id = %d", user_query_type_value))
+		}
+
+		if user_query_type == user_query_type_service {
+			filter = core.SqlAnd(filter, fmt.Sprintf("r.service_user_id = %d", user_query_type_value))
+		}
+
+		if user_query_type == user_query_type_dev {
+			filter = core.SqlAnd(filter, fmt.Sprintf("r.dev_user_id = %d", user_query_type_value))
+		}
 	}
 
 	/*
@@ -146,7 +164,7 @@ func (c ErpSaleAmountReportDay) ListData() revel.Result {
 
 	var sql_list = `
 SELECT
-    date_format(r.paid_time, '%Y-%m-%d')            AS paid_time,
+    date_format(r.paid_time, '%%Y-%%m-%%d')         AS paid_time,
     sum(r.paid_amount)                              AS paid_amount,
     sum(r.express_fee)                              AS express_fee,
     sum(r.income)                                   AS income,
@@ -162,7 +180,7 @@ SELECT
     sum(r.income - r.outcome) / sum(r.income) * 100 AS profit_rate
 FROM erp_sale_amount_report r
 WHERE %s
-GROUP BY date_format(r.paid_time, '%Y-%m-%d')
+GROUP BY date_format(r.paid_time, '%%Y-%%m-%%d')
 ORDER BY %s
 LIMIT %d, %d;
 `
@@ -178,12 +196,13 @@ LIMIT %d, %d;
 	var sql_count = `
 SELECT count(*) AS count
 FROM (
-		 SELECT date_format(r.paid_time, '%Y-%m-%d') AS paid_time
+		 SELECT date_format(r.paid_time, '%%Y-%%m-%%d') AS paid_time
 		 FROM erp_sale_amount_report r
 		 WHERE %s
-		 GROUP BY date_format(r.paid_time, '%Y-%m-%d')
+		 GROUP BY date_format(r.paid_time, '%%Y-%%m-%%d')
 	 ) sale_amount_report;
 `
+	sql_count = fmt.Sprintf(sql_count, filter)
 
 	var count core.Count
 	_, err := db_session.Sql(sql_count).Get(&count)

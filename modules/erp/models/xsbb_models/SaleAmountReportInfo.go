@@ -2,20 +2,20 @@ package xsbb_models
 
 // 这个 SaleAmountReportInfo 只用来接收查询结果，不创建数据库表
 type SaleAmountReportInfo struct {
-	PaidTime             string  `xorm:"'paid_time'"`
-	PaidAmount           float64 `xorm:"'paid_amount'"`
-	ExpressFee           float64 `xorm:"'express_fee'"`
-	Income               float64 `xorm:"'income'"`
-	CostAmount           float64 `xorm:"'cost_amount'"`
-	EstimateLogisticsFee float64 `xorm:"'estimate_logistics_fee'"`
-	ActualLogisticsFee   float64 `xorm:"'actual_logistics_fee'"`
-	JyfyAmount           float64 `xorm:"'jyfy_amount'"`
-	PtfyAmount           float64 `xorm:"'ptfy_amount'"`
-	PickFee              float64 `xorm:"'pick_fee'"`
-	GstFee               float64 `xorm:"'gst_fee'"`
-	Outcome              float64 `xorm:"'outcome'"`
-	Profit               float64 `xorm:"'profit'"`
-	ProfitRate           float64 `xorm:"'profit_rate'"`
+	PaidTime             string  `xorm:"'paid_time'" json:"paid_time"`
+	PaidAmount           float64 `xorm:"'paid_amount'" json:"paid_amount"`
+	ExpressFee           float64 `xorm:"'express_fee'" json:"express_fee"`
+	Income               float64 `xorm:"'income'" json:"income"`
+	CostAmount           float64 `xorm:"'cost_amount'" json:"cost_amount"`
+	EstimateLogisticsFee float64 `xorm:"'estimate_logistics_fee'" json:"estimate_logistics_fee"`
+	ActualLogisticsFee   float64 `xorm:"'actual_logistics_fee'" json:"actual_logistics_fee"`
+	JyfyAmount           float64 `xorm:"'jyfy_amount'" json:"jyfy_amount"`
+	PtfyAmount           float64 `xorm:"'ptfy_amount'" json:"ptfy_amount"`
+	PickFee              float64 `xorm:"'pick_fee'" json:"pick_fee"`
+	GstFee               float64 `xorm:"'gst_fee'" json:"gst_fee"`
+	Outcome              float64 `xorm:"'outcome'" json:"outcome"`
+	Profit               float64 `xorm:"'profit'" json:"profit"`
+	ProfitRate           float64 `xorm:"'profit_rate'" json:"profit_rate"`
 }
 
 /*
