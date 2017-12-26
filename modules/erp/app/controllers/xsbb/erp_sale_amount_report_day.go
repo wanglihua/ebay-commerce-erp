@@ -8,6 +8,8 @@ import (
 	"fmt"
 	"matrix/modules/erp/service/sale_report_service"
 	"time"
+	"matrix/modules/erp/models/xtpz_models"
+	"matrix/modules/auth/models"
 )
 
 /*
@@ -58,10 +60,26 @@ const (
 
 func (c ErpSaleAmountReportDay) Index() revel.Result {
 
-	var user_query_type_list = make([]user_query_type, 0)
-	user_query_type_list = append(user_query_type_list, user_query_type{Id: user_query_type_sale, Name: "销售人员"})
-	user_query_type_list = append(user_query_type_list, user_query_type{Id: user_query_type_service, Name: "服务人员"})
-	user_query_type_list = append(user_query_type_list, user_query_type{Id: user_query_type_dev, Name: "开发人员"})
+	var db_session = c.DbSession
+
+	var user_type_list = make([]user_query_type, 0)
+	user_type_list = append(user_type_list, user_query_type{Id: user_query_type_sale, Name: "销售人员"})
+	user_type_list = append(user_type_list, user_query_type{Id: user_query_type_service, Name: "服务人员"})
+	user_type_list = append(user_type_list, user_query_type{Id: user_query_type_dev, Name: "开发人员"})
+
+	// 先不用平台查询
+	var platform_list = make([]xtpz_models.ECommercePlatformInfo, 0)
+	core.HandleError(db_session.Find(&platform_list))
+
+	var shop_list = make([]xtpz_models.ShopAccountInfo, 0)
+	core.HandleError(db_session.OrderBy("id ASC").Find(&shop_list))
+
+	var user_list = make([]models.UserInfo, 0)
+	core.HandleError(db_session.OrderBy("login_name ASC").Find(&user_list))
+
+	c.RenderArgs["user_type_list"] = user_type_list
+	c.RenderArgs["shop_list"] = shop_list
+	c.RenderArgs["user_list"] = user_list
 
 	return c.RenderTemplate("erp/xsbb/sale_amount_report_day/sale_amount_report_day_index.html")
 }
@@ -81,11 +99,11 @@ func (c ErpSaleAmountReportDay) ListData() revel.Result {
 	var shop_id_query int64
 	c.Params.Bind(&shop_id_query, "shop_id_query")
 
-	var user_query_type int64
-	c.Params.Bind(&user_query_type, "user_query_type")
+	var user_type_query int64
+	c.Params.Bind(&user_type_query, "user_type_query")
 
-	var user_query_type_value int64
-	c.Params.Bind(&user_query_type_value, "user_query_type_value")
+	var user_id_query int64
+	c.Params.Bind(&user_id_query, "user_id_query")
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
@@ -105,17 +123,17 @@ func (c ErpSaleAmountReportDay) ListData() revel.Result {
 		filter = core.SqlAnd(filter, fmt.Sprintf("r.shop_id = %d", shop_id_query))
 	}
 
-	if user_query_type != 0 && user_query_type_value != 0 {
-		if user_query_type == user_query_type_sale {
-			filter = core.SqlAnd(filter, fmt.Sprintf("r.sale_user_id = %d", user_query_type_value))
+	if user_type_query != 0 && user_id_query != 0 {
+		if user_type_query == user_query_type_sale {
+			filter = core.SqlAnd(filter, fmt.Sprintf("r.sale_user_id = %d", user_id_query))
 		}
 
-		if user_query_type == user_query_type_service {
-			filter = core.SqlAnd(filter, fmt.Sprintf("r.service_user_id = %d", user_query_type_value))
+		if user_type_query == user_query_type_service {
+			filter = core.SqlAnd(filter, fmt.Sprintf("r.service_user_id = %d", user_id_query))
 		}
 
-		if user_query_type == user_query_type_dev {
-			filter = core.SqlAnd(filter, fmt.Sprintf("r.dev_user_id = %d", user_query_type_value))
+		if user_type_query == user_query_type_dev {
+			filter = core.SqlAnd(filter, fmt.Sprintf("r.dev_user_id = %d", user_id_query))
 		}
 	}
 

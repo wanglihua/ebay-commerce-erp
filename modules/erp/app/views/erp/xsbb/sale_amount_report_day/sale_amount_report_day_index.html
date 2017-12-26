@@ -37,6 +37,31 @@
                             <input class="input-sm" id="begin_time_query" name="begin_time_query" placeholder="日期开始" type="text" style="width: 80px;"/>
                             <label class="control-label no-padding-right" for="end_time_query">日期结束</label>
                             <input class="input-sm" id="end_time_query" name="end_time_query" placeholder="日期结束" type="text" style="width: 80px;"/>
+
+                            <label class="control-label no-padding-right" for="shop_id_query">店铺</label>
+                            <select id="shop_id_query" class="input-sm">
+                                <option value="0">--店铺--</option>
+                                {% range $index, $shop := .shop_list%}
+                                <option value="{% $shop.Id %}">{% $shop.Name %}</option>
+                                {%end%}
+                            </select>
+
+                            <label class="control-label no-padding-right" for="user_type_query">人员类型</label>
+                            <select id="user_type_query" class="input-sm">
+                                <option value="0">--人员类型--</option>
+                                {% range $index, $user_type := .user_type_list%}
+                                <option value="{% $user_type.Id %}">{% $user_type.Name %}</option>
+                                {% end %}
+                            </select>
+
+                            <label class="control-label no-padding-right" for="user_id_query">人员</label>
+                            <select id="user_id_query" class="input-sm">
+                                <option value="0">--人员--</option>
+                                {% range $index, $user := .user_list %}
+                                <option value="{% $user.Id %}">{% $user.LoginName %}（{% $user.NickName %}）</option>
+                                {% end %}
+                            </select>
+
                             <button class="btn btn-mini btn-primary" style="margin-bottom:3px;height: 30px;" @click="reloadList()">
                                 &nbsp;<i class="ace-icon fa fa-search"></i>显&nbsp;示&nbsp;
                             </button>
@@ -154,13 +179,13 @@
                             {
                                 "mDataProp": "order_qty", "title": "订单数量", "bSearchable": false, "sClass": "dtRight", "width": 100,
                                 "render": function (data, type, row) {
-                                    return dtFormatFloat(data);
+                                    return data;
                                 }
                             },
                             {
                                 "mDataProp": "product_qty", "title": "商品数量", "bSearchable": false, "sClass": "dtRight", "width": 100,
                                 "render": function (data, type, row) {
-                                    return dtFormatFloat(data);
+                                    return data;
                                 }
                             },
                             {
@@ -181,6 +206,10 @@
 
                             aoData.push({'name': 'begin_time_query', 'value': $("#begin_time_query").val()});
                             aoData.push({'name': 'end_time_query', 'value': $("#end_time_query").val()});
+                            aoData.push({'name': 'platform_id_query', 'value': $("#platform_id_query").val()});
+                            aoData.push({'name': 'shop_id_query', 'value': $("#shop_id_query").val()});
+                            aoData.push({'name': 'user_type_query', 'value': $("#user_type_query").val()});
+                            aoData.push({'name': 'user_id_query', 'value': $("#user_id_query").val()});
 
                             $.ajax({
                                 "dataType": 'json',
