@@ -285,6 +285,11 @@ CREATE PROCEDURE sale_amount_report()
                     WHERE sar.order_item_id = v_order_item_id;
 
                     SET v_item_paid_amount = v_item_price * v_item_qty;
+                    IF v_item_paid_amount = 0
+                    THEN
+                        ITERATE order_item_loop;
+                    END IF;
+
                     SET v_item_express_fee = v_express_fee * v_item_paid_amount / v_item_total_amount;
                     SET v_item_income = v_item_paid_amount + v_item_express_fee;
                     SET v_item_cost_amount = v_cost_amount * v_item_paid_amount / v_item_total_amount;
