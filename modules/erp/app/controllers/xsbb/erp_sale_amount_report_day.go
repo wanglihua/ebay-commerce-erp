@@ -9,7 +9,7 @@ import (
 	"matrix/modules/erp/service/sale_report_service"
 	"time"
 	"matrix/modules/erp/models/xtpz_models"
-	"matrix/modules/auth/models"
+	auth_models "matrix/modules/auth/models"
 )
 
 /*
@@ -59,7 +59,6 @@ const (
 )
 
 func (c ErpSaleAmountReportDay) Index() revel.Result {
-
 	var db_session = c.DbSession
 
 	var user_type_list = make([]user_query_type, 0)
@@ -74,7 +73,7 @@ func (c ErpSaleAmountReportDay) Index() revel.Result {
 	var shop_list = make([]xtpz_models.ShopAccountInfo, 0)
 	core.HandleError(db_session.OrderBy("id ASC").Find(&shop_list))
 
-	var user_list = make([]models.UserInfo, 0)
+	var user_list = make([]auth_models.UserInfo, 0)
 	core.HandleError(db_session.OrderBy("login_name ASC").Find(&user_list))
 
 	c.RenderArgs["user_type_list"] = user_type_list
@@ -85,7 +84,7 @@ func (c ErpSaleAmountReportDay) Index() revel.Result {
 }
 
 func (c ErpSaleAmountReportDay) ListData() revel.Result {
-	db_session := c.DbSession
+	var db_session = c.DbSession
 
 	var begin_time_query core.NullLongTime
 	c.Params.Bind(&begin_time_query, "begin_time_query")

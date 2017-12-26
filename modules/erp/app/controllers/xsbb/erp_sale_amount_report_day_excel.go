@@ -215,7 +215,7 @@ func (c ErpSaleAmountReportDayExcel) export_sale_amount_report_to_excel(db_sessi
 	xlsx_file := xlsx.NewFile()
 
 	//添加工作表
-	sheet, err := xlsx_file.AddSheet("商品质量反馈")
+	sheet, err := xlsx_file.AddSheet("商品日销售额")
 	core.HandleError(err)
 
 	//添加标题行
