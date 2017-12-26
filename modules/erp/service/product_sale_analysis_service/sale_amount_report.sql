@@ -99,6 +99,11 @@ CREATE PROCEDURE sale_amount_report()
                 LEAVE order_loop;
             END IF;
 
+            IF v_paid_amount = 0
+            THEN
+                ITERATE order_loop;
+            END IF;
+
             SELECT sa.platform_id AS platform_id
             INTO v_platform_id
             FROM erp_shop_account sa
@@ -168,7 +173,7 @@ CREATE PROCEDURE sale_amount_report()
 
             IF v_order_item_count = 0
             THEN
-                LEAVE order_loop;
+                ITERATE order_loop;
             ELSEIF v_order_item_count = 1
                 THEN
                     SET v_income = v_paid_amount + v_express_fee;
@@ -248,7 +253,7 @@ CREATE PROCEDURE sale_amount_report()
 
                 IF v_item_total_amount = 0
                 THEN
-                    LEAVE order_loop;
+                    ITERATE order_loop;
                 END IF;
 
                 OPEN order_item_cur;
