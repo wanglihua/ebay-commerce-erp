@@ -107,7 +107,7 @@
                             {
                                 "mDataProp": "paid_time", "title": "日期", "bSearchable": false, "sClass": "center", "width": 100,
                                 "render": function (data, type, row) {
-                                    return dtFormatDate(data);
+                                    return data;
                                 }
                             },
                             {
@@ -183,7 +183,7 @@
                                 }
                             },
                             {
-                                "mDataProp": "product_qty", "title": "商品数量", "bSearchable": false, "sClass": "dtRight", "width": 100,
+                                "mDataProp": "product_qty", "title": "商品销量", "bSearchable": false, "sClass": "dtRight", "width": 100,
                                 "render": function (data, type, row) {
                                     return data;
                                 }
@@ -227,7 +227,6 @@
                                 }
                             });
                         }
-
                     }
             );
         },
