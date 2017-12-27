@@ -766,12 +766,13 @@ POST /product/checkin/weight/save               ErpProductCheckinWeight.Save
 
 POST /intel/repl/excel/export             ErpIntelReplExcel.Export
 
-
 GET  /sale/amount/report/day                    ErpSaleAmountReportDay.Index
 POST /sale/amount/report/day/data/list          ErpSaleAmountReportDay.ListData
 POST /sale/amount/report/day/calculate          ErpSaleAmountReportDay.Calculate
 GET  /sale/amount/report/day/chart              ErpSaleAmountReportDay.Chart
 POST /sale/amount/report/day/chart/data         ErpSaleAmountReportDay.ChartData
+
+POST /sale/amount/report/day/excel/export       ErpSaleAmountReportDayExcel.Export
 
 GET  /sale/amount/report/month                  ErpSaleAmountReportMonth.Index
 POST /sale/amount/report/month/data/list        ErpSaleAmountReportMonth.ListData
@@ -779,5 +780,12 @@ POST /sale/amount/report/month/calculate        ErpSaleAmountReportMonth.Calcula
 GET  /sale/amount/report/month/chart            ErpSaleAmountReportMonth.Chart
 POST /sale/amount/report/month/chart/data       ErpSaleAmountReportMonth.ChartData
 
-POST /sale/amount/report/day/excel/export       ErpSaleAmountReportDayExcel.Export
 POST /sale/amount/report/month/excel/export     ErpSaleAmountReportMonthExcel.Export
+
+GET  /sale/income/report/day                    ErpSaleIncomeReportDay.Index
+POST /sale/income/report/day/data/list          ErpSaleIncomeReportDay.ListData
+POST /sale/income/report/day/calculate          ErpSaleIncomeReportDay.Calculate
+GET  /sale/income/report/day/chart              ErpSaleIncomeReportDay.Chart
+POST /sale/income/report/day/chart/data         ErpSaleIncomeReportDay.ChartData
+
+POST /sale/income/report/day/excel/export       ErpSaleIncomeReportDayExcel.Export

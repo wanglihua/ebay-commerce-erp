@@ -21,6 +21,13 @@ func GetXsbbMenu(res_id_map map[int64]bool, web_session revel.Session) string {
     </a>
     <b class="arrow"></b>
     <ul class="submenu">
+		<li id="xsbb-sale-income-report-day-menu" class="">
+			<a href="/sale/income/report/day">
+				<i class="menu-icon fa fa-caret-right"></i>
+				日收入报表
+			</a>
+			<b class="arrow"></b>
+		</li>
 		<li id="xsbb-sale-amount-report-day-menu" class="">
 			<a href="/sale/amount/report/day">
 				<i class="menu-icon fa fa-caret-right"></i>
