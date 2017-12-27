@@ -61,8 +61,8 @@ CREATE PROCEDURE sale_amount_report()
                 o.express_fee AS express_fee
             FROM erp_order o
             WHERE (o.status_id = 4200 OR o.status_id = 4300)
-                  AND o.paid_time >= v_latest_reported_paid_time;
-        # 条件里面要加上 =，防止可能的有多个相同的 支付时间 的情况
+                  AND o.paid_time >= date_add(v_latest_reported_paid_time, INTERVAL -15 DAY);
+        # 退后 15 天是等待后面的实际物流数据的录入
 
         DECLARE order_item_cur CURSOR FOR
             SELECT
