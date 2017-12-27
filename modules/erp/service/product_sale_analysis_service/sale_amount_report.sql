@@ -11,22 +11,22 @@ CREATE PROCEDURE sale_amount_report()
         DECLARE v_shop_id BIGINT;
         DECLARE v_order_id BIGINT;
         DECLARE v_order_item_id BIGINT;
-        DECLARE v_paid_amount DECIMAL(18, 2);
-        DECLARE v_express_fee DECIMAL(18, 2);
-        DECLARE v_income DECIMAL(18, 2);
-        DECLARE v_cost_amount DECIMAL(18, 2);
-        DECLARE v_logistics_fee DECIMAL(18, 2);
-        DECLARE v_estimate_logistics_fee DECIMAL(18, 2);
-        DECLARE v_actual_logistics_fee DECIMAL(18, 2);
-        DECLARE v_jyfl DECIMAL(18, 2);
-        DECLARE v_ptfl DECIMAL(18, 2);
-        DECLARE v_jyfy_amount DECIMAL(18, 2);
-        DECLARE v_ptfy_amount DECIMAL(18, 2);
-        DECLARE v_pick_fee DECIMAL(18, 2);
-        DECLARE v_gst_fee DECIMAL(18, 2);
-        DECLARE v_outcome DECIMAL(18, 2);
-        DECLARE v_profit DECIMAL(18, 2);
-        DECLARE v_profit_rate DECIMAL(18, 2);
+        DECLARE v_paid_amount DECIMAL(18, 6);
+        DECLARE v_express_fee DECIMAL(18, 6);
+        DECLARE v_income DECIMAL(18, 6);
+        DECLARE v_cost_amount DECIMAL(18, 6);
+        DECLARE v_logistics_fee DECIMAL(18, 6);
+        DECLARE v_estimate_logistics_fee DECIMAL(18, 6);
+        DECLARE v_actual_logistics_fee DECIMAL(18, 6);
+        DECLARE v_jyfl DECIMAL(18, 6);
+        DECLARE v_ptfl DECIMAL(18, 6);
+        DECLARE v_jyfy_amount DECIMAL(18, 6);
+        DECLARE v_ptfy_amount DECIMAL(18, 6);
+        DECLARE v_pick_fee DECIMAL(18, 6);
+        DECLARE v_gst_fee DECIMAL(18, 6);
+        DECLARE v_outcome DECIMAL(18, 6);
+        DECLARE v_profit DECIMAL(18, 6);
+        DECLARE v_profit_rate DECIMAL(18, 6);
         DECLARE v_product_id BIGINT;
         DECLARE v_sale_user_id BIGINT;
         DECLARE v_service_user_id BIGINT;
@@ -36,17 +36,17 @@ CREATE PROCEDURE sale_amount_report()
         DECLARE v_item_price DECIMAL(18, 6);
         DECLARE v_item_qty INT;
         DECLARE v_item_total_amount DECIMAL(18, 6);
-        DECLARE v_item_paid_amount DECIMAL(18, 2);
-        DECLARE v_item_express_fee DECIMAL(18, 2);
-        DECLARE v_item_income DECIMAL(18, 2);
-        DECLARE v_item_cost_amount DECIMAL(18, 2);
-        DECLARE v_item_estimate_logistics_fee DECIMAL(18, 2);
-        DECLARE v_item_actual_logistics_fee DECIMAL(18, 2);
-        DECLARE v_item_jyfy_amount DECIMAL(18, 2);
-        DECLARE v_item_ptfy_amount DECIMAL(18, 2);
-        DECLARE v_item_pick_fee DECIMAL(18, 2);
-        DECLARE v_item_gst_fee DECIMAL(18, 2);
-        DECLARE v_item_outcome DECIMAL(18, 2);
+        DECLARE v_item_paid_amount DECIMAL(18, 6);
+        DECLARE v_item_express_fee DECIMAL(18, 6);
+        DECLARE v_item_income DECIMAL(18, 6);
+        DECLARE v_item_cost_amount DECIMAL(18, 6);
+        DECLARE v_item_estimate_logistics_fee DECIMAL(18, 6);
+        DECLARE v_item_actual_logistics_fee DECIMAL(18, 6);
+        DECLARE v_item_jyfy_amount DECIMAL(18, 6);
+        DECLARE v_item_ptfy_amount DECIMAL(18, 6);
+        DECLARE v_item_pick_fee DECIMAL(18, 6);
+        DECLARE v_item_gst_fee DECIMAL(18, 6);
+        DECLARE v_item_outcome DECIMAL(18, 6);
 
         -- 遍历数据结束标志
         DECLARE done INT DEFAULT FALSE;
@@ -364,19 +364,19 @@ CREATE TABLE erp_sale_amount_report (
     shop_id                BIGINT         NOT NULL,
     order_id               BIGINT         NOT NULL,
     order_item_id          BIGINT         NOT NULL,
-    paid_amount            DECIMAL(18, 2) NOT NULL,
-    express_fee            DECIMAL(18, 2) NOT NULL,
-    income                 DECIMAL(18, 2) NOT NULL,
-    cost_amount            DECIMAL(18, 2) NOT NULL,
-    estimate_logistics_fee DECIMAL(18, 2) NOT NULL,
-    actual_logistics_fee   DECIMAL(18, 2) NOT NULL,
-    jyfy_amount            DECIMAL(18, 2) NOT NULL,
-    ptfy_amount            DECIMAL(18, 2) NOT NULL,
-    pick_fee               DECIMAL(18, 2) NOT NULL,
-    gst_fee                DECIMAL(18, 2) NOT NULL,
-    outcome                DECIMAL(18, 2) NOT NULL,
-    profit                 DECIMAL(18, 2) NOT NULL,
-    profit_rate            DECIMAL(18, 2) NOT NULL,
+    paid_amount            DECIMAL(18, 6) NOT NULL,
+    express_fee            DECIMAL(18, 6) NOT NULL,
+    income                 DECIMAL(18, 6) NOT NULL,
+    cost_amount            DECIMAL(18, 6) NOT NULL,
+    estimate_logistics_fee DECIMAL(18, 6) NOT NULL,
+    actual_logistics_fee   DECIMAL(18, 6) NOT NULL,
+    jyfy_amount            DECIMAL(18, 6) NOT NULL,
+    ptfy_amount            DECIMAL(18, 6) NOT NULL,
+    pick_fee               DECIMAL(18, 6) NOT NULL,
+    gst_fee                DECIMAL(18, 6) NOT NULL,
+    outcome                DECIMAL(18, 6) NOT NULL,
+    profit                 DECIMAL(18, 6) NOT NULL,
+    profit_rate            DECIMAL(18, 6) NOT NULL,
     product_id             BIGINT         NOT NULL,
     product_qty            BIGINT         NOT NULL,
     sale_user_id           BIGINT         NOT NULL,
