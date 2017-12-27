@@ -35,6 +35,7 @@ CREATE PROCEDURE sale_amount_report()
         DECLARE v_sale_amount_report_count INT;
         DECLARE v_item_price DECIMAL(18, 6);
         DECLARE v_item_qty INT;
+        DECLARE v_item_amount DECIMAL(18, 6);
         DECLARE v_item_total_amount DECIMAL(18, 6);
         DECLARE v_item_paid_amount DECIMAL(18, 6);
         DECLARE v_item_express_fee DECIMAL(18, 6);
@@ -287,21 +288,22 @@ CREATE PROCEDURE sale_amount_report()
                     FROM erp_sale_amount_report sar
                     WHERE sar.order_item_id = v_order_item_id;
 
-                    SET v_item_paid_amount = v_item_price * v_item_qty;
-                    IF v_item_paid_amount = 0
+                    SET v_item_amount = v_item_price * v_item_qty;
+                    IF v_item_amount = 0
                     THEN
                         ITERATE order_item_loop;
                     END IF;
 
-                    SET v_item_express_fee = v_express_fee * v_item_paid_amount / v_item_total_amount;
+                    SET v_item_paid_amount = v_paid_amount * v_item_amount / v_item_total_amount;
+                    SET v_item_express_fee = v_express_fee * v_item_amount / v_item_total_amount;
                     SET v_item_income = v_item_paid_amount + v_item_express_fee;
-                    SET v_item_cost_amount = v_cost_amount * v_item_paid_amount / v_item_total_amount;
-                    SET v_item_estimate_logistics_fee = v_estimate_logistics_fee * v_item_paid_amount / v_item_total_amount;
-                    SET v_item_actual_logistics_fee = v_actual_logistics_fee * v_item_paid_amount / v_item_total_amount;
-                    SET v_item_jyfy_amount = v_jyfy_amount * v_item_paid_amount / v_item_total_amount;
-                    SET v_item_ptfy_amount = v_ptfy_amount * v_item_paid_amount / v_item_total_amount;
-                    SET v_item_pick_fee = v_pick_fee * v_item_paid_amount / v_item_total_amount;
-                    SET v_item_gst_fee = v_gst_fee * v_item_paid_amount / v_item_total_amount;
+                    SET v_item_cost_amount = v_cost_amount * v_item_amount / v_item_total_amount;
+                    SET v_item_estimate_logistics_fee = v_estimate_logistics_fee * v_item_amount / v_item_total_amount;
+                    SET v_item_actual_logistics_fee = v_actual_logistics_fee * v_item_amount / v_item_total_amount;
+                    SET v_item_jyfy_amount = v_jyfy_amount * v_item_amount / v_item_total_amount;
+                    SET v_item_ptfy_amount = v_ptfy_amount * v_item_amount / v_item_total_amount;
+                    SET v_item_pick_fee = v_pick_fee * v_item_amount / v_item_total_amount;
+                    SET v_item_gst_fee = v_gst_fee * v_item_amount / v_item_total_amount;
 
                     SET v_logistics_fee = v_item_estimate_logistics_fee;
                     IF v_item_actual_logistics_fee IS NOT NULL AND v_item_actual_logistics_fee <> 0
