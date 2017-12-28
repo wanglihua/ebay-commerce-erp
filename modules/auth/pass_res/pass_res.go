@@ -17,26 +17,11 @@ const (
 	// 商品配置        模块编号 15
 	// 海关报关        模块编号 16
 	// 商品报表        模块编号 17
-	// 商品质量反馈    模块编号 18
+	// 商品质量反馈     模块编号 18
 	// 系统管理        模块编号 19
 	// 采购管理        模块编号 20
 	// 销售管理        模块编号 21
-
-	// 采购管理 20
-	CGGL_PRODUCT_SETTING   = 200100 // 商品采购设置
-	CGGL_INTEL_REPL        = 200200 // 智能补货
-	CGGL_PURCHASE_BILL     = 200300 // 采购管理
-	CGGL_PURCHASE_FINANCE  = 200400 // 财务管理
-	CGGL_PURCHASE_CHECKIN  = 200500 // 入库管理
-	CGGL_PURCHASE_ABNORMAL = 200600 // 异常采购单
-	CGGL_PURCHASE_FLOW     = 200700 // 采购流水
-	CGGL_PURCHASE_APPROVE  = 200800 // 采购审批
-
-	// 销售管理 21
-	XSGL_PRODUCT_SALE_SETTING   = 210100 // 商品销售设置
-	XSGL_PRODUCT_PRICE_ESTIMATE = 210200 // 商品售价预估
-
-	// 调拨管理
+	// 销售报表        模块编号 22
 
 	// 订单报表
 
@@ -151,8 +136,23 @@ const (
 	// 系统管理 19
 	XTGL_NOTICE = 190100 // 通知管理
 
-	XSBB_SALE_INCOME_REPORT_DAY     = 200100 // 日收入报表
-	XSBB_SALE_AMOUNT_REPORT_DAY     = 200200 // 日销售额报表
-	XSBB_SALE_AMOUNT_REPORT_MONTH   = 200300 // 月销售额报表
-	XSBB_SALE_AMOUNT_REPORT_PRODUCT = 200400 // 热销商品排名
+	// 采购管理 20
+	CGGL_PRODUCT_SETTING   = 200100 // 商品采购设置
+	CGGL_INTEL_REPL        = 200200 // 智能补货
+	CGGL_PURCHASE_BILL     = 200300 // 采购管理
+	CGGL_PURCHASE_FINANCE  = 200400 // 财务管理
+	CGGL_PURCHASE_CHECKIN  = 200500 // 入库管理
+	CGGL_PURCHASE_ABNORMAL = 200600 // 异常采购单
+	CGGL_PURCHASE_FLOW     = 200700 // 采购流水
+	CGGL_PURCHASE_APPROVE  = 200800 // 采购审批
+
+	// 销售管理 21
+	XSGL_PRODUCT_SALE_SETTING   = 210100 // 商品销售设置
+	XSGL_PRODUCT_PRICE_ESTIMATE = 210200 // 商品售价预估
+
+	// 销售报表 22
+	XSBB_SALE_INCOME_REPORT_DAY     = 220100 // 日收入报表
+	XSBB_SALE_AMOUNT_REPORT_DAY     = 220200 // 日销售额报表
+	XSBB_SALE_AMOUNT_REPORT_MONTH   = 220300 // 月销售额报表
+	XSBB_SALE_AMOUNT_REPORT_PRODUCT = 220400 // 热销商品排名
 )
