@@ -10,6 +10,8 @@ import (
 	"time"
 	"matrix/modules/erp/models/xtpz_models"
 	auth_models "matrix/modules/auth/models"
+	"matrix/modules/auth/service/pass_service"
+	"matrix/modules/auth/pass_res"
 )
 
 /*
@@ -48,6 +50,8 @@ type ErpSaleAmountReportProduct struct {
 }
 
 func (c ErpSaleAmountReportProduct) Index() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.XSBB_SALE_AMOUNT_REPORT_PRODUCT, c.Session)
+
 	var db_session = c.DbSession
 
 	var user_type_list = make([]user_query_type, 0)
@@ -73,6 +77,8 @@ func (c ErpSaleAmountReportProduct) Index() revel.Result {
 }
 
 func (c ErpSaleAmountReportProduct) ListData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.XSBB_SALE_AMOUNT_REPORT_PRODUCT, c.Session)
+
 	var db_session = c.DbSession
 
 	var begin_time_query core.NullLongTime
@@ -228,10 +234,13 @@ FROM (
 }
 
 func (c ErpSaleAmountReportProduct) Chart() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.XSBB_SALE_AMOUNT_REPORT_PRODUCT, c.Session)
+
 	return c.RenderTemplate("erp/xsbb/sale_amount_report_product/sale_amount_report_product_chart.html")
 }
 
 func (c ErpSaleAmountReportProduct) ChartData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.XSBB_SALE_AMOUNT_REPORT_PRODUCT, c.Session)
 
 	var time_now = time.Now()
 	var today_date = time.Date(time_now.Year(), time_now.Month(), time_now.Day(), 0, 0, 0, 0, time.Local)
@@ -343,6 +352,7 @@ func (c ErpSaleAmountReportProduct) ChartData() revel.Result {
 }
 
 func (c ErpSaleAmountReportProduct) Calculate() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.XSBB_SALE_AMOUNT_REPORT_PRODUCT, c.Session)
 
 	go sale_report_service.CalculateSaleAmountReport()
 

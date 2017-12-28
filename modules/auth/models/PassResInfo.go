@@ -828,4 +828,35 @@ func (e PassResInfo) InitData(db_session *xorm.Session) {
 		db_session.Insert(pass)
 
 	}
+
+	// 销售报表
+	{
+		pass := new(PassResInfo)
+		pass.Id = pass_res.XSBB_SALE_INCOME_REPORT_DAY
+		pass.CateId = pass_res_cate.XSBB
+		pass.Name = "日收入报表"
+		pass.Desc = core.MakeNullString("日收入报表", true)
+		db_session.Insert(pass)
+
+		pass = new(PassResInfo)
+		pass.Id = pass_res.XSBB_SALE_AMOUNT_REPORT_DAY
+		pass.CateId = pass_res_cate.XSBB
+		pass.Name = "日销售额报表"
+		pass.Desc = core.MakeNullString("日销售额报表", true)
+		db_session.Insert(pass)
+
+		pass = new(PassResInfo)
+		pass.Id = pass_res.XSBB_SALE_AMOUNT_REPORT_MONTH
+		pass.CateId = pass_res_cate.XSBB
+		pass.Name = "月销售额报表"
+		pass.Desc = core.MakeNullString("月销售额报表", true)
+		db_session.Insert(pass)
+
+		pass = new(PassResInfo)
+		pass.Id = pass_res.XSBB_SALE_AMOUNT_REPORT_PRODUCT
+		pass.CateId = pass_res_cate.XSBB
+		pass.Name = "热销商品排名"
+		pass.Desc = core.MakeNullString("热销商品排名", true)
+		db_session.Insert(pass)
+	}
 }

@@ -10,6 +10,8 @@ import (
 	"bytes"
 	"github.com/go-xorm/xorm"
 	"github.com/tealeg/xlsx"
+	"matrix/modules/auth/service/pass_service"
+	"matrix/modules/auth/pass_res"
 )
 
 type ErpSaleAmountReportDayExcel struct {
@@ -17,6 +19,7 @@ type ErpSaleAmountReportDayExcel struct {
 }
 
 func (c ErpSaleAmountReportDayExcel) Export() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.XSBB_SALE_AMOUNT_REPORT_DAY, c.Session)
 
 	db_session := c.DbSession
 
