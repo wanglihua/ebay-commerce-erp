@@ -70,8 +70,8 @@ func GetXsbbMenu(res_id_map map[int64]bool, web_session revel.Session) string {
 
 	if check_pass_res_menu(pass_res.XSBB_SALE_AMOUNT_REPORT_PRODUCT) {
 		buffer.WriteString(`
-        <li id="xsbb-hot-sales-product-rank-menu" class="">
-            <a href="/hot/sales/product/rank">
+        <li id="xsbb-sale-amount-report-product-menu" class="">
+            <a href="/sale/amount/report/product">
                 <i class="menu-icon fa fa-caret-right"></i>
                 热销商品排名
             </a>

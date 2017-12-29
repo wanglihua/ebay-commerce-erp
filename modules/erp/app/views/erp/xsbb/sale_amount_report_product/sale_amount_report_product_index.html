@@ -96,7 +96,7 @@
             initDataTable(
                     '#saleAmountReportProductList',
                     {
-                        "sAjaxSource": '{%url "ErpSaleAmountReportDay.ListData"%}',
+                        "sAjaxSource": '{%url "ErpSaleAmountReportProduct.ListData"%}',
                         "aaSorting": [[1, "desc"]],
                         "aoColumns": [
                             {
@@ -119,27 +119,27 @@
                                 }
                             },
                             {
-                                "mDataProp": "sale_user_name", "title": "销售员", "bSearchable": true, "width": 80,
+                                "mDataProp": "sale_user_name", "title": "销售员", "bSearchable": true, "width": 60,
                                 "render": function (data, type, row) {
                                     return data;
                                 }
                             },
                             {
-                                "mDataProp": "dev_user_name", "title": "采购员", "bSearchable": true, "width": 80,
+                                "mDataProp": "dev_user_name", "title": "采购员", "bSearchable": true, "width": 60,
                                 "render": function (data, type, row) {
                                     return data;
                                 }
                             },
                             {
-                                "mDataProp": "product_weight", "title": "重量", "bSearchable": true, "sClass": "dtRight", "width": 80,
+                                "mDataProp": "product_weight", "title": "重量", "bSearchable": true, "sClass": "dtRight", "width": 50,
                                 "render": function (data, type, row) {
-                                    return data;
+                                    return dtFormatFloat(data);
                                 }
                             },
                             {
-                                "mDataProp": "cost_price", "title": "成本", "bSearchable": true, "sClass": "dtRight", "width": 80,
+                                "mDataProp": "cost_price", "title": "成本", "bSearchable": true, "sClass": "dtRight", "width": 50,
                                 "render": function (data, type, row) {
-                                    return data;
+                                    return dtFormatFloat(data);
                                 }
                             },
                             {
@@ -270,14 +270,14 @@
                 refreshList('#saleAmountReportProductList');
             },
             viewChart: function () {
-                var url = '{% url "ErpSaleAmountReportDay.Chart" %}';
+                var url = '{% url "ErpSaleAmountReportProduct.Chart" %}';
                 window.open(url, "sale_amount_report_day_chart");
             },
             calculate: function () {
                 $.msg.confirm("将立即启动销售后台分析任务！", function () {
                     $.ajax({
                         "dataType": 'json',
-                        "url": '{% url "ErpSaleAmountReportDay.Calculate" %}',
+                        "url": '{% url "ErpSaleAmountReportProduct.Calculate" %}',
                         "success": function (data) {
 
                             if (data.success === false) {
@@ -297,7 +297,7 @@
 
     function exportReport() {
         var params = $.param({});
-        var url = '{%url "ErpSaleAmountReportDayExcel.Export"%}' + "?" + params;
+        var url = '{%url "ErpSaleAmountReportProductExcel.Export"%}' + "?" + params;
         $('<form method="post" action="' + url + '"></form>').appendTo('body').submit().remove();
     }
 </script>
