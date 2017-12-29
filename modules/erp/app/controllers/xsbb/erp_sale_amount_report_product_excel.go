@@ -20,7 +20,7 @@ type ErpSaleAmountReportProductExcel struct {
 
 func (c ErpSaleAmountReportProductExcel) Export() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.XSBB_SALE_AMOUNT_REPORT_PRODUCT, c.Session)
-	
+
 	db_session := c.DbSession
 
 	var begin_time_query core.NullLongTime
@@ -75,40 +75,87 @@ func (c ErpSaleAmountReportProductExcel) Export() revel.Result {
 
 	/*
 
-	SELECT
-		date_format(r.paid_time, '%Y-%m-%d')            AS paid_time,
-		sum(r.paid_amount)                              AS paid_amount,
-		sum(r.express_fee)                              AS express_fee,
-		sum(r.income)                                   AS income,
-		sum(r.cost_amount)                              AS cost_amount,
-		sum(r.estimate_logistics_fee)                   AS estimate_logistics_fee,
-		sum(r.actual_logistics_fee)                     AS actual_logistics_fee,
-		sum(r.jyfy_amount)                              AS jyfy_amount,
-		sum(r.ptfy_amount)                              AS ptfy_amount,
-		sum(r.pick_fee)                                 AS pick_fee,
-		sum(r.gst_fee)                                  AS gst_fee,
-		sum(r.outcome)                                  AS outcome,
-		sum(r.income - r.outcome)                       AS profit,
-		sum(r.income - r.outcome) / sum(r.income) * 100 AS profit_rate,
-	    count(DISTINCT r.order_id)                      AS order_qty,
-    	sum(r.product_qty)                              AS product_qty
-	FROM erp_sale_amount_report r
-	WHERE r.platform_id = 0
-		  AND r.shop_id = 0
-		  AND r.paid_time >= '2006-01-01'
-		  AND r.paid_time < '2017-12-30'
-		  AND r.product_id = 0
-		  AND r.sale_user_id = 0
-		  AND r.service_user_id = 0
-		  AND r.dev_user_id = 0
-	GROUP BY date_format(r.paid_time, '%Y-%m-%d')
-	ORDER BY paid_time DESC;
+SELECT
+    r.product_id                                    AS product_id,
+    (SELECT p.sku FROM erp_product p
+    WHERE p.id = r.product_id)                      AS product_sku,
+    (SELECT p.cn_name FROM erp_product p
+    WHERE p.id = r.product_id)                      AS product_name,
+    (SELECT p.weight FROM erp_product p
+    WHERE p.id = r.product_id)                      AS product_weight,
+    (SELECT avg(nvt.cost_price) AS cost_price
+     FROM erp_inventory nvt
+         INNER JOIN erp_stock stk ON stk.id = nvt.stock_id
+     WHERE stk.stock_type_id = 300
+           AND nvt.product_id = r.product_id)       AS cost_price,
+    r.sale_user_id                                  AS sale_user_id,
+    (SELECT concat(u.login_name, ' ', u.nick_name)
+     FROM auth_user u
+     WHERE u.id = r.sale_user_id)                   AS sale_user_name,
+    r.service_user_id                               AS service_user_id,
+    (SELECT concat(u.login_name, ' ', u.nick_name)
+     FROM auth_user u
+     WHERE u.id = r.service_user_id)                AS service_user_name,
+    r.dev_user_id                                   AS dev_user_id,
+    (SELECT concat(u.login_name, ' ', u.nick_name)
+     FROM auth_user u
+     WHERE u.id = r.dev_user_id)                    AS dev_user_name,
+    sum(r.paid_amount)                              AS paid_amount,
+    sum(r.express_fee)                              AS express_fee,
+    sum(r.income)                                   AS income,
+    sum(r.cost_amount)                              AS cost_amount,
+    sum(r.estimate_logistics_fee)                   AS estimate_logistics_fee,
+    sum(r.actual_logistics_fee)                     AS actual_logistics_fee,
+    sum(r.jyfy_amount)                              AS jyfy_amount,
+    sum(r.ptfy_amount)                              AS ptfy_amount,
+    sum(r.pick_fee)                                 AS pick_fee,
+    sum(r.gst_fee)                                  AS gst_fee,
+    sum(r.outcome)                                  AS outcome,
+    sum(r.income - r.outcome)                       AS profit,
+    sum(r.income - r.outcome) / sum(r.income) * 100 AS profit_rate,
+    count(DISTINCT r.order_id)                      AS order_qty,
+    sum(r.product_qty)                              AS product_qty
+FROM erp_sale_amount_report r
+WHERE r.platform_id = 0
+      AND r.shop_id = 0
+      AND r.paid_time >= '2006-01-01'
+      AND r.paid_time < '2017-12-30'
+      AND r.product_id = 0
+      AND r.sale_user_id = 0
+      AND r.service_user_id = 0
+      AND r.dev_user_id = 0
+GROUP BY r.product_id
+ORDER BY product_id
+LIMIT 1, 10;
 
 	 */
 
 	var sql_list = `
 SELECT
-    date_format(r.paid_time, '%%Y-%%m-%%d')         AS paid_time,
+    r.product_id                                    AS product_id,
+    (SELECT p.sku FROM erp_product p
+    WHERE p.id = r.product_id)                      AS product_sku,
+    (SELECT p.cn_name FROM erp_product p
+    WHERE p.id = r.product_id)                      AS product_name,
+    (SELECT p.weight FROM erp_product p
+    WHERE p.id = r.product_id)                      AS product_weight,
+    (SELECT avg(nvt.cost_price) AS cost_price
+     FROM erp_inventory nvt
+         INNER JOIN erp_stock stk ON stk.id = nvt.stock_id
+     WHERE stk.stock_type_id = 300
+           AND nvt.product_id = r.product_id)       AS cost_price,
+    r.sale_user_id                                  AS sale_user_id,
+    (SELECT concat(u.login_name, ' ', u.nick_name)
+     FROM auth_user u
+     WHERE u.id = r.sale_user_id)                   AS sale_user_name,
+    r.service_user_id                               AS service_user_id,
+    (SELECT concat(u.login_name, ' ', u.nick_name)
+     FROM auth_user u
+     WHERE u.id = r.service_user_id)                AS service_user_name,
+    r.dev_user_id                                   AS dev_user_id,
+    (SELECT concat(u.login_name, ' ', u.nick_name)
+     FROM auth_user u
+     WHERE u.id = r.dev_user_id)                    AS dev_user_name,
     sum(r.paid_amount)                              AS paid_amount,
     sum(r.express_fee)                              AS express_fee,
     sum(r.income)                                   AS income,
@@ -126,15 +173,15 @@ SELECT
     sum(r.product_qty)                              AS product_qty
 FROM erp_sale_amount_report r
 WHERE %s
-GROUP BY date_format(r.paid_time, '%%Y-%%m-%%d')
+GROUP BY r.product_id
 ORDER BY %s;
 `
 
-	var order = "paid_time DESC"
+	var order = "product_sku ASC"
 
 	sql_list = fmt.Sprintf(sql_list, filter, order)
 
-	var sale_amount_report_list = make([]xsbb_models.SaleAmountReportInfo, 0)
+	var sale_amount_report_list = make([]xsbb_models.SaleAmountReportProductInfo, 0)
 	core.HandleError(db_session.Sql(sql_list).Find(&sale_amount_report_list))
 
 	var xlsx_file = c.export_sale_amount_report_to_excel(db_session, sale_amount_report_list)
@@ -151,7 +198,7 @@ ORDER BY %s;
 	return c.RenderBinary(reader, file_name, revel.Attachment, time.Now())
 }
 
-func (c ErpSaleAmountReportProductExcel) export_sale_amount_report_to_excel(db_session *xorm.Session, sale_amount_report_day_list []xsbb_models.SaleAmountReportInfo) *xlsx.File {
+func (c ErpSaleAmountReportProductExcel) export_sale_amount_report_to_excel(db_session *xorm.Session, sale_amount_report_day_list []xsbb_models.SaleAmountReportProductInfo) *xlsx.File {
 
 	//统一设置标题单元格格式的函数
 	set_head_cell_style := func(cell *xlsx.Cell) {
@@ -231,7 +278,37 @@ func (c ErpSaleAmountReportProductExcel) export_sale_amount_report_to_excel(db_s
 		cell := row.AddCell()
 		sheet.SetColWidth(col_index, col_index, 10)
 		set_head_cell_style(cell)
-		cell.Value = "日期"
+		cell.Value = "商品编号"
+		col_index++
+
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 10)
+		set_head_cell_style(cell)
+		cell.Value = "商品名称"
+		col_index++
+
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 10)
+		set_head_cell_style(cell)
+		cell.Value = "销售员"
+		col_index++
+
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 10)
+		set_head_cell_style(cell)
+		cell.Value = "采购员"
+		col_index++
+
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 10)
+		set_head_cell_style(cell)
+		cell.Value = "重量"
+		col_index++
+
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 10)
+		set_head_cell_style(cell)
+		cell.Value = "成本"
 		col_index++
 
 		cell = row.AddCell()
@@ -329,10 +406,35 @@ func (c ErpSaleAmountReportProductExcel) export_sale_amount_report_to_excel(db_s
 		row = sheet.AddRow()
 		row.SetHeightCM(common_row_height)
 
-		// 日期
+		// 商品编号
 		cell := row.AddCell()
-		set_text_cell_style(cell, "center")
-		cell.Value = report.PaidTime
+		set_text_cell_style(cell, "left")
+		cell.Value = report.ProductSku
+
+		// 商品名称
+		cell = row.AddCell()
+		set_text_cell_style(cell, "left")
+		cell.Value = report.ProductName
+
+		// 销售员
+		cell = row.AddCell()
+		set_text_cell_style(cell, "left")
+		cell.Value = report.SaleUserName
+
+		// 采购员
+		cell = row.AddCell()
+		set_text_cell_style(cell, "left")
+		cell.Value = report.DevUserName
+
+		// 重量
+		cell = row.AddCell()
+		set_text_cell_style(cell, "right")
+		cell.Value = fmt.Sprintf("%0.2f", report.ProductWeight)
+
+		// 成本
+		cell = row.AddCell()
+		set_text_cell_style(cell, "right")
+		cell.Value = fmt.Sprintf("%0.2f", report.CostPrice)
 
 		// 交易金额
 		cell = row.AddCell()

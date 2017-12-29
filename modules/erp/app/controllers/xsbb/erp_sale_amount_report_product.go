@@ -208,7 +208,8 @@ WHERE r.platform_id = 0
       AND r.service_user_id = 0
       AND r.dev_user_id = 0
 GROUP BY r.product_id
-ORDER BY product_id;
+ORDER BY product_id
+LIMIT 1, 10;
 
 
 SELECT count(*) AS count
@@ -230,7 +231,30 @@ FROM (
 
 	var sql_list = `
 SELECT
-    date_format(r.paid_time, '%%Y-%%m-%%d')         AS paid_time,
+    r.product_id                                    AS product_id,
+    (SELECT p.sku FROM erp_product p
+    WHERE p.id = r.product_id)                      AS product_sku,
+    (SELECT p.cn_name FROM erp_product p
+    WHERE p.id = r.product_id)                      AS product_name,
+    (SELECT p.weight FROM erp_product p
+    WHERE p.id = r.product_id)                      AS product_weight,
+    (SELECT avg(nvt.cost_price) AS cost_price
+     FROM erp_inventory nvt
+         INNER JOIN erp_stock stk ON stk.id = nvt.stock_id
+     WHERE stk.stock_type_id = 300
+           AND nvt.product_id = r.product_id)       AS cost_price,
+    r.sale_user_id                                  AS sale_user_id,
+    (SELECT concat(u.login_name, ' ', u.nick_name)
+     FROM auth_user u
+     WHERE u.id = r.sale_user_id)                   AS sale_user_name,
+    r.service_user_id                               AS service_user_id,
+    (SELECT concat(u.login_name, ' ', u.nick_name)
+     FROM auth_user u
+     WHERE u.id = r.service_user_id)                AS service_user_name,
+    r.dev_user_id                                   AS dev_user_id,
+    (SELECT concat(u.login_name, ' ', u.nick_name)
+     FROM auth_user u
+     WHERE u.id = r.dev_user_id)                    AS dev_user_name,
     sum(r.paid_amount)                              AS paid_amount,
     sum(r.express_fee)                              AS express_fee,
     sum(r.income)                                   AS income,
@@ -248,7 +272,7 @@ SELECT
     sum(r.product_qty)                              AS product_qty
 FROM erp_sale_amount_report r
 WHERE %s
-GROUP BY date_format(r.paid_time, '%%Y-%%m-%%d')
+GROUP BY r.product_id
 ORDER BY %s
 LIMIT %d, %d;
 `
@@ -258,17 +282,17 @@ LIMIT %d, %d;
 
 	sql_list = fmt.Sprintf(sql_list, filter, order, offset, limit)
 
-	var sale_amount_report_list = make([]xsbb_models.SaleAmountReportInfo, 0, limit)
+	var sale_amount_report_list = make([]xsbb_models.SaleAmountReportProductInfo, 0, limit)
 	core.HandleError(db_session.Sql(sql_list).Find(&sale_amount_report_list))
 
 	var sql_count = `
 SELECT count(*) AS count
 FROM (
-		 SELECT date_format(r.paid_time, '%%Y-%%m-%%d') AS paid_time
-		 FROM erp_sale_amount_report r
-		 WHERE %s
-		 GROUP BY date_format(r.paid_time, '%%Y-%%m-%%d')
-	 ) sale_amount_report;
+         SELECT r.product_id AS product_id
+         FROM erp_sale_amount_report r
+         WHERE %s
+         GROUP BY r.product_id
+     ) sale_amount_report;;
 `
 	sql_count = fmt.Sprintf(sql_count, filter)
 
