@@ -51,7 +51,7 @@ func Update_order_logistics_cost_amount_and_order_profit_and_order_item_price_pr
 		}
 
 		// 利润分配
-		oi.GrossProfit = oi.CostPrice * order.ProfitAu / order_cost_amount
+		oi.GrossProfit = oi.CostPrice * float64(oi.Quantity) * order.ProfitAu / order_cost_amount
 
 		_, err := db_session.Id(oi.Id).Cols(order_item_update_cols...).Update(&oi)
 		core.HandleError(err)
