@@ -28,6 +28,7 @@ CREATE PROCEDURE sale_amount_report()
         DECLARE v_profit DECIMAL(18, 6);
         DECLARE v_profit_rate DECIMAL(18, 6);
         DECLARE v_exchange_rate DECIMAL(18, 6);
+        DECLARE v_product_count BIGINT;
         DECLARE v_product_id BIGINT;
         DECLARE v_sale_user_id BIGINT;
         DECLARE v_service_user_id BIGINT;
@@ -203,6 +204,16 @@ CREATE PROCEDURE sale_amount_report()
                     WHERE oi.order_id = v_order_id
                     LIMIT 1;
 
+                    SELECT count(*) AS count
+                    INTO v_product_count
+                    FROM erp_product p
+                    WHERE p.id = v_product_id;
+
+                    IF v_product_count = 0
+                    THEN
+                        ITERATE order_loop;
+                    END IF;
+
                     SELECT
                         p.sale_user_id,
                         p.service_user_id,
@@ -273,6 +284,16 @@ CREATE PROCEDURE sale_amount_report()
                     IF done
                     THEN
                         LEAVE order_item_loop;
+                    END IF;
+
+                    SELECT count(*) AS count
+                    INTO v_product_count
+                    FROM erp_product p
+                    WHERE p.id = v_product_id;
+
+                    IF v_product_count = 0
+                    THEN
+                        ITERATE order_item_loop;
                     END IF;
 
                     SELECT
@@ -383,12 +404,12 @@ CREATE TABLE erp_sale_amount_report (
     outcome                DECIMAL(18, 6) NOT NULL,
     profit                 DECIMAL(18, 6) NOT NULL,
     profit_rate            DECIMAL(18, 6) NOT NULL,
+    exchange_rate          DECIMAL(18, 6) DEFAULT 5 NOT NULL,
     product_id             BIGINT         NOT NULL,
     product_qty            BIGINT         NOT NULL,
     sale_user_id           BIGINT         NOT NULL,
     service_user_id        BIGINT         NOT NULL,
-    dev_user_id            BIGINT         NOT NULL,
-    exchange_rate          DECIMAL(18, 6) DEFAULT 5 NOT NULL;
+    dev_user_id            BIGINT         NOT NULL
 );
 
 CREATE INDEX IDX_erp_sale_amount_report_paid_time ON erp_sale_amount_report (paid_time);
