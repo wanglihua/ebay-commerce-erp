@@ -103,7 +103,6 @@ func (c ErpSaleIncomeReportDay) ListData() revel.Result {
 	/*
 
 	SELECT
-	    r.id                                            AS id,
 		date_format(r.paid_time, '%Y-%m-%d')            AS paid_time,
 		sum(r.paid_amount)                              AS paid_amount,
 		sum(r.express_fee)                              AS express_fee,
@@ -151,7 +150,6 @@ func (c ErpSaleIncomeReportDay) ListData() revel.Result {
 
 	var sql_list = `
 SELECT
-    r.id                                            AS id,
     date_format(r.paid_time, '%%Y-%%m-%%d')         AS paid_time,
     sum(r.paid_amount)                              AS paid_amount,
     sum(r.express_fee)                              AS express_fee,
