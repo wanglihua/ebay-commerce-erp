@@ -2,6 +2,7 @@ package xsbb_models
 
 // 这个 SaleAmountReportInfo 只用来接收查询结果，不创建数据库表
 type SaleAmountReportProductInfo struct {
+	Id                   int64   `xorm:"'id'" json:"id"`
 	ProductId            int64   `xorm:"'product_id'" json:"product_id"`
 	ProductSku           string  `xorm:"'product_sku'" json:"product_sku"`
 	ProductName          string  `xorm:"'product_name'" json:"product_name"`

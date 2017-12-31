@@ -20,7 +20,7 @@ type ErpSaleIncomeReportDayExcel struct {
 
 func (c ErpSaleIncomeReportDayExcel) Export() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.XSBB_SALE_INCOME_REPORT_DAY, c.Session)
-	
+
 	db_session := c.DbSession
 
 	var begin_time_query core.NullLongTime
@@ -76,6 +76,7 @@ func (c ErpSaleIncomeReportDayExcel) Export() revel.Result {
 	/*
 
 	SELECT
+        r.id                                            AS id,
 		date_format(r.paid_time, '%Y-%m-%d')            AS paid_time,
 		sum(r.paid_amount)                              AS paid_amount,
 		sum(r.express_fee)                              AS express_fee,
@@ -108,6 +109,7 @@ func (c ErpSaleIncomeReportDayExcel) Export() revel.Result {
 
 	var sql_list = `
 SELECT
+    r.id                                            AS id,
     date_format(r.paid_time, '%%Y-%%m-%%d')         AS paid_time,
     sum(r.paid_amount)                              AS paid_amount,
     sum(r.express_fee)                              AS express_fee,

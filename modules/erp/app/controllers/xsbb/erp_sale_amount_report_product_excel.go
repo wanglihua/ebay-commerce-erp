@@ -76,6 +76,7 @@ func (c ErpSaleAmountReportProductExcel) Export() revel.Result {
 	/*
 
 SELECT
+	r.id                                            AS id,
     r.product_id                                    AS product_id,
     (SELECT p.sku FROM erp_product p
     WHERE p.id = r.product_id)                      AS product_sku,
@@ -132,6 +133,7 @@ LIMIT 1, 10;
 
 	var sql_list = `
 SELECT
+    r.id                                            AS id,
     r.product_id                                    AS product_id,
     (SELECT p.sku FROM erp_product p
     WHERE p.id = r.product_id)                      AS product_sku,
