@@ -11,7 +11,7 @@ import (
 func CalculateSaleAmountReport() {
 	defer func() {
 		if err := recover(); err != nil {
-			revel.ERROR.Printf("销售额报表日统计出现错误： %s\n", err)
+			revel.ERROR.Printf("销售额报表统计出现错误： %s\n", err)
 			revel.ERROR.Println(string(debug.Stack()))
 		}
 	}()
@@ -37,5 +37,5 @@ func CalculateSaleAmountReport() {
 	_, err = db_session.Exec("CALL sale_amount_report();")
 	core.HandleError(err)
 
-	revel.TRACE.Println("销售额报表日统计完成！")
+	revel.TRACE.Println("销售额报表统计完成！")
 }
