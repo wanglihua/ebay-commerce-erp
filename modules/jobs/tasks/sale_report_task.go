@@ -12,5 +12,5 @@ func (t SaleReportTask) Name() string {
 }
 
 func (t SaleReportTask) Run() {
-	sale_report_service.CalculateSaleAmountReport()
+	sale_report_service.CalculateSaleReport()
 }

@@ -1,6 +1,7 @@
 package xsbb_models
 
 // 这个 SaleAmountReportInfo 只用来接收查询结果，不创建数据库表
+// SaleIncomeReportInfo 也用这个
 type SaleAmountReportInfo struct {
 	PaidTime             string  `xorm:"'paid_time'" json:"paid_time"`
 	PaidAmount           float64 `xorm:"'paid_amount'" json:"paid_amount"`

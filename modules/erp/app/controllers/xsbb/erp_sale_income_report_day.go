@@ -119,7 +119,7 @@ func (c ErpSaleIncomeReportDay) ListData() revel.Result {
 		sum(r.income - r.outcome) / sum(r.income) * 100 AS profit_rate,
 	    count(DISTINCT r.order_id)                      AS order_qty,
     	sum(r.product_qty)                              AS product_qty
-	FROM erp_sale_amount_report r
+	FROM erp_sale_income_report r
 	WHERE r.platform_id = 0
 		  AND r.shop_id = 0
 		  AND r.paid_time >= '2006-01-01'
@@ -134,7 +134,7 @@ func (c ErpSaleIncomeReportDay) ListData() revel.Result {
 	SELECT count(*)
 	FROM (
 			 SELECT date_format(r.paid_time, '%Y-%m-%d') AS paid_time
-			 FROM erp_sale_amount_report r
+			 FROM erp_sale_income_report r
 			 WHERE r.platform_id = 0
 				   AND r.shop_id = 0
 				   AND r.paid_time >= '2006-01-01'
@@ -144,7 +144,7 @@ func (c ErpSaleIncomeReportDay) ListData() revel.Result {
 				   AND r.service_user_id = 0
 				   AND r.dev_user_id = 0
 			 GROUP BY date_format(r.paid_time, '%Y-%m-%d')
-		 ) sale_amount_report;
+		 ) sale_income_report;
 
 	 */
 
@@ -166,7 +166,7 @@ SELECT
     sum(r.income - r.outcome) / sum(r.income) * 100 AS profit_rate,
     count(DISTINCT r.order_id)                      AS order_qty,
     sum(r.product_qty)                              AS product_qty
-FROM erp_sale_amount_report r
+FROM erp_sale_income_report r
 WHERE %s
 GROUP BY date_format(r.paid_time, '%%Y-%%m-%%d')
 ORDER BY %s
@@ -178,17 +178,17 @@ LIMIT %d, %d;
 
 	sql_list = fmt.Sprintf(sql_list, filter, order, offset, limit)
 
-	var sale_amount_report_list = make([]xsbb_models.SaleAmountReportInfo, 0, limit)
-	core.HandleError(db_session.Sql(sql_list).Find(&sale_amount_report_list))
+	var sale_income_report_list = make([]xsbb_models.SaleAmountReportInfo, 0, limit)
+	core.HandleError(db_session.Sql(sql_list).Find(&sale_income_report_list))
 
 	var sql_count = `
 SELECT count(*) AS count
 FROM (
 		 SELECT date_format(r.paid_time, '%%Y-%%m-%%d') AS paid_time
-		 FROM erp_sale_amount_report r
+		 FROM erp_sale_income_report r
 		 WHERE %s
 		 GROUP BY date_format(r.paid_time, '%%Y-%%m-%%d')
-	 ) sale_amount_report;
+	 ) sale_income_report;
 `
 	sql_count = fmt.Sprintf(sql_count, filter)
 
@@ -197,7 +197,7 @@ FROM (
 	core.HandleError(err)
 
 	return c.RenderJson(core.GridResult{
-		Data:  sale_amount_report_list,
+		Data:  sale_income_report_list,
 		Total: count.Count,
 	})
 }
@@ -230,21 +230,21 @@ func (c ErpSaleIncomeReportDay) ChartData() revel.Result {
 
 	var db_session = c.DbSession
 
-	var sale_amount_report_day_list = make([]xsbb_models.SaleAmountReportDayInfo, 0)
+	var sale_income_report_day_list = make([]xsbb_models.SaleAmountReportDayInfo, 0)
 	err := db_session.Where("report_day >= ? AND report_day <= ?", query_begin_date, query_end_date).
 		OrderBy("report_day ASC").
-		Find(&sale_amount_report_day_list);
+		Find(&sale_income_report_day_list);
 	core.HandleError(err)
 
 	var time_str_list = make([]string, 0)
-	for _, report := range sale_amount_report_day_list {
+	for _, report := range sale_income_report_day_list {
 		time_str_list = append(time_str_list, time.Time(report.ReportDay).Format("2006-01-02"))
 	}
 
 	var series = make([]interface{}, 0)
 
 	var amount_list = make([]float64, 0)
-	for _, report := range sale_amount_report_day_list {
+	for _, report := range sale_income_report_day_list {
 		amount_list = append(amount_list, report.PaidAmount)
 	}
 
@@ -323,7 +323,7 @@ func (c ErpSaleIncomeReportDay) ChartData() revel.Result {
 func (c ErpSaleIncomeReportDay) Calculate() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.XSBB_SALE_INCOME_REPORT_DAY, c.Session)
 
-	go sale_report_service.CalculateSaleAmountReport()
+	go sale_report_service.CalculateSaleIncomeReport()
 
 	return c.RenderJson(map[string]interface{}{
 		"success": true,
