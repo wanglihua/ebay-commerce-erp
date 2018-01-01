@@ -36,19 +36,16 @@ func (c ErpOrderExport) Export() revel.Result {
 
 	var db_session = c.DbSession
 
+	status = strings.ToLower(status) //大小写
 	var status_id int64 = 0
-	if status == "dph" {
+	if status == "all" {
+		status_id = 0
+	} else if status == "dph" {
 		status_id = models.ORDER_STATUS_DPH
 	} else if status == "phz" {
 		status_id = models.ORDER_STATUS_PHZ
 	} else if status == "hold" {
 		status_id = models.ORDER_STATUS_HOLD
-	}
-
-	// 先看 URL 里面的状态分类
-	status = strings.ToLower(status) //大小写
-	if status == "all" {
-		status_id = 0
 	} else if status == "ycj" {
 		status_id = models.ORDER_STATUS_YCJ
 	} else if status == "yzf" {
@@ -98,27 +95,90 @@ func (c ErpOrderExport) Export() revel.Result {
 	return c.RenderBinary(reader, file_name, revel.Attachment, time.Now())
 }
 
-type order_code_num_export_view_t struct {
-	Order    ddlc_models.OrderInfo         `xorm:"extends" json:"o"`
-	HoldType ddpz_models.OrderHoldTypeInfo `xorm:"extends" json:"ht"`
-}
-
 func (c ErpOrderExport) get_export_excel(db_session *xorm.Session, filter string, status_id int64) *xlsx.File {
 
+	// 订单编号，订单代码，订单店铺，买家账号，收款金额，收款运费，商品成本，GST税，平台费，付款交易费，拣货费，预估运费，实际运费，毛利，订单状态
+
+	type order_export_item_t struct {
+		OrderId      int64   `xorm:"'order_id'"`
+		OrderCode    string  `xorm:"'order_code'"`
+		FullTranId   string  `xorm:"'full_tran_id'"`
+		ShopName     string  `xorm:"'shop_name'"`
+		BuyerUserId  string  `xorm:"'buyer_user_id'"`
+		PaidAmount   float64 `xorm:"'paid_amount'"`
+		ExpressFee   float64 `xorm:"'express_fee'"`
+		CostAmount   float64 `xorm:"'cost_amount'"`
+		GstFee       float64 `xorm:"'gst_fee'"`
+		Ptfy         float64 `xorm:"'ptfy'"`
+		Jyfy         float64 `xorm:"'jyfy'"`
+		PickFee      float64 `xorm:"'pick_fee'"`
+		TotalFee     float64 `xorm:"'total_fee'"`
+		ActualFee    float64 `xorm:"'actual_fee'"`
+		Profit       float64 `xorm:"'profit'"`
+		HoldTypeName string  `xorm:"'hold_type_name'"`
+		StatusName   string  `xorm:"'status_name'"`
+	}
 	/*
-SELECT o.*, ht.*
+
+SELECT
+    o.id                           AS order_id,
+    o.code                         AS order_code,
+    o.full_tran_id                 AS full_tran_id,
+    (SELECT sa.name
+     FROM erp_shop_account sa
+     WHERE sa.id = o.shop_id)      AS shop_name,
+    o.buyer_user_id                AS buyer_user_id,
+    o.amount_paid                  AS paid_amount,
+    o.express_fee                  AS express_fee,
+    ol.cost_amount                 AS cost_amount,
+    o.amount_paid * 0.1            AS gst_fee,
+    ol.ptfl * o.amount_paid        AS ptfy,
+    ol.jyfl * o.amount_paid        AS jyfy,
+    ol.pick_fee                    AS pick_fee,
+    ol.total_fee                   AS total_fee,
+    ol.actual_fee                  AS actual_fee,
+    o.profit_au                    AS profit,
+    (SELECT ht.name
+     FROM erp_order_hold_type ht
+     WHERE ht.id = o.hold_type_id) AS hold_type_name,
+    (SELECT s.name FROM erp_status s
+    WHERE s.id = o.status_id)      AS status_name
 FROM erp_order o
-    LEFT JOIN erp_order_hold_type ht ON ht.id = o.hold_type_id
+    LEFT JOIN erp_order_logistics ol ON ol.order_id = o.id;
+
 	 */
 
-	var sql = `SELECT o.*, ht.*
+	var sql = `
+SELECT
+    o.id                           AS order_id,
+    o.code                         AS order_code,
+    o.full_tran_id                 AS full_tran_id,
+    (SELECT sa.name
+     FROM erp_shop_account sa
+     WHERE sa.id = o.shop_id)      AS shop_name,
+    o.buyer_user_id                AS buyer_user_id,
+    o.amount_paid                  AS paid_amount,
+    o.express_fee                  AS express_fee,
+    ol.cost_amount                 AS cost_amount,
+    o.amount_paid * 0.1            AS gst_fee,
+    ol.ptfl * o.amount_paid        AS ptfy,
+    ol.jyfl * o.amount_paid        AS jyfy,
+    ol.pick_fee                    AS pick_fee,
+    ol.total_fee                   AS total_fee,
+    ol.actual_fee                  AS actual_fee,
+    o.profit_au                    AS profit,
+    (SELECT ht.name
+     FROM erp_order_hold_type ht
+     WHERE ht.id = o.hold_type_id) AS hold_type_name,
+    (SELECT s.name FROM erp_status s
+    WHERE s.id = o.status_id)      AS status_name
 FROM erp_order o
-    LEFT JOIN erp_order_hold_type ht ON ht.id = o.hold_type_id
+    LEFT JOIN erp_order_logistics ol ON ol.order_id = o.id
 WHERE `
 
 	sql = sql + filter
 
-	var order_list = make([]order_code_num_export_view_t, 0)
+	var order_list = make([]order_export_item_t, 0)
 	err := db_session.Sql(sql).Find(&order_list)
 	core.HandleError(err)
 
@@ -188,6 +248,7 @@ WHERE `
 	row_height := 0.6
 
 	{
+		// 订单编号，订单代码，订单店铺，买家账号，收款金额，收款运费，商品成本，GST税，平台费，付款交易费，拣货费，预估运费，实际运费，毛利，订单状态
 		header_row := sheet.AddRow()
 		header_row.SetHeightCM(row_height)
 
@@ -200,13 +261,91 @@ WHERE `
 
 		col_index++
 		cell = header_row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 20)
+		sheet.SetColWidth(col_index, col_index, 12)
 		set_head_cell_style(cell)
 		cell.Value = "订单代码"
 
 		col_index++
 		cell = header_row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 20)
+		sheet.SetColWidth(col_index, col_index, 10)
+		set_head_cell_style(cell)
+		cell.Value = "订单店铺"
+
+		col_index++
+		cell = header_row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 15)
+		set_head_cell_style(cell)
+		cell.Value = "买家账号"
+
+		col_index++
+		cell = header_row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 8)
+		set_head_cell_style(cell)
+		cell.Value = "收款金额"
+
+		col_index++
+		cell = header_row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 8)
+		set_head_cell_style(cell)
+		cell.Value = "收款运费"
+
+		col_index++
+		cell = header_row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 8)
+		set_head_cell_style(cell)
+		cell.Value = "商品成本"
+
+		col_index++
+		cell = header_row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 8)
+		set_head_cell_style(cell)
+		cell.Value = "GST税"
+
+		col_index++
+		cell = header_row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 8)
+		set_head_cell_style(cell)
+		cell.Value = "平台费"
+
+		col_index++
+		cell = header_row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 8)
+		set_head_cell_style(cell)
+		cell.Value = "交易费"
+
+		col_index++
+		cell = header_row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 8)
+		set_head_cell_style(cell)
+		cell.Value = "拣货费"
+
+		col_index++
+		cell = header_row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 8)
+		set_head_cell_style(cell)
+		cell.Value = "预估运费"
+
+		col_index++
+		cell = header_row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 8)
+		set_head_cell_style(cell)
+		cell.Value = "实际运费"
+
+		col_index++
+		cell = header_row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 8)
+		set_head_cell_style(cell)
+		cell.Value = "毛利"
+
+		col_index++
+		cell = header_row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 8)
+		set_head_cell_style(cell)
+		cell.Value = "订单状态"
+
+		col_index++
+		cell = header_row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 8)
 		set_head_cell_style(cell)
 		cell.Value = "hold原因"
 
@@ -232,22 +371,87 @@ WHERE `
 		// 订单编码
 		var cell = row.AddCell()
 		set_text_cell_style(cell, "left")
-		cell.Value = order.Order.Code
+		cell.Value = order.OrderCode
 
 		// 订单代码
 		cell = row.AddCell()
 		set_text_cell_style(cell, "left")
-		cell.Value = order.Order.FullTranId
+		cell.Value = order.FullTranId
+
+		// 订单店铺
+		cell = row.AddCell()
+		set_text_cell_style(cell, "left")
+		cell.Value = order.ShopName
+
+		// 买家账号
+		cell = row.AddCell()
+		set_text_cell_style(cell, "left")
+		cell.Value = order.BuyerUserId
+
+		// 收款金额
+		cell = row.AddCell()
+		set_text_cell_style(cell, "right")
+		cell.Value = fmt.Sprintf("%0.2f", order.PaidAmount)
+
+		// 收款运费
+		cell = row.AddCell()
+		set_text_cell_style(cell, "right")
+		cell.Value = fmt.Sprintf("%0.2f", order.ExpressFee)
+
+		// 商品成本
+		cell = row.AddCell()
+		set_text_cell_style(cell, "right")
+		cell.Value = fmt.Sprintf("%0.2f", order.CostAmount)
+
+		// GST税
+		cell = row.AddCell()
+		set_text_cell_style(cell, "right")
+		cell.Value = fmt.Sprintf("%0.2f", order.GstFee)
+
+		// 平台费
+		cell = row.AddCell()
+		set_text_cell_style(cell, "right")
+		cell.Value = fmt.Sprintf("%0.2f", order.Ptfy)
+
+		// 交易费
+		cell = row.AddCell()
+		set_text_cell_style(cell, "right")
+		cell.Value = fmt.Sprintf("%0.2f", order.Jyfy)
+
+		// 拣货费
+		cell = row.AddCell()
+		set_text_cell_style(cell, "right")
+		cell.Value = fmt.Sprintf("%0.2f", order.PickFee)
+
+		// 预估运费
+		cell = row.AddCell()
+		set_text_cell_style(cell, "right")
+		cell.Value = fmt.Sprintf("%0.2f", order.TotalFee)
+
+		// 实际运费
+		cell = row.AddCell()
+		set_text_cell_style(cell, "right")
+		cell.Value = fmt.Sprintf("%0.2f", order.ActualFee)
+
+		// 毛利
+		cell = row.AddCell()
+		set_text_cell_style(cell, "right")
+		cell.Value = fmt.Sprintf("%0.2f", order.Profit)
+
+		// 订单状态
+		cell = row.AddCell()
+		set_text_cell_style(cell, "center")
+		cell.Value = order.StatusName
 
 		// hold原因
 		cell = row.AddCell()
 		set_text_cell_style(cell, "left")
-		cell.Value = order.HoldType.Name
+		cell.Value = order.HoldTypeName
 
 		if status_id == models.ORDER_STATUS_HOLD {
 
 			var order_logistics_logic ddlc_models.OrderLogisticsLogicInfo
-			_, err := db_session.Where(fmt.Sprintf("order_id = %d", order.Order.Id)).Get(&order_logistics_logic)
+			_, err := db_session.Where(fmt.Sprintf("order_id = %d", order.OrderId)).Get(&order_logistics_logic)
 			core.HandleError(err)
 
 			// 最佳仓
