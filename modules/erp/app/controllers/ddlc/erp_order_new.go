@@ -204,24 +204,24 @@ func (c ErpOrderNew) Save() revel.Result {
 		_, err = db_session.Insert(&pickup_info)
 		core.HandleError(err)
 
-		var stock_id = form.StockId
-
-		var order_logistics ddlc_models.OrderLogisticsInfo
-		order_logistics.OrderId = order.Id
-		order_logistics.StockId = stock_id
-		order_logistics.AddressId = shipping_address.Id
-
-		// pick_fee_service.Get_product_pick_fee(whole_weight, p_ol.pick_fee_setting)
-
-		_, err = db_session.Insert(&order_logistics)
-		core.HandleError(err)
-
-		order.AddressId = shipping_address.Id
-		order.StockId = stock_id
-		_, err = db_session.Id(order.Id).Cols("address_id", "stock_id").Update(&order)
-		core.HandleError(err)
-
 	}
+
+	var stock_id = form.StockId
+
+	var order_logistics ddlc_models.OrderLogisticsInfo
+	order_logistics.OrderId = order.Id
+	order_logistics.StockId = stock_id
+	order_logistics.AddressId = shipping_address.Id
+
+	// pick_fee_service.Get_product_pick_fee(whole_weight, p_ol.pick_fee_setting)
+
+	_, err = db_session.Insert(&order_logistics)
+	core.HandleError(err)
+
+	order.AddressId = shipping_address.Id
+	order.StockId = stock_id
+	_, err = db_session.Id(order.Id).Cols("address_id", "stock_id").Update(&order)
+	core.HandleError(err)
 
 	var login_user = core.GetLoginUser(c.Session)
 

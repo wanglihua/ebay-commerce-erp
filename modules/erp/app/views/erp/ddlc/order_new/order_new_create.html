@@ -87,7 +87,7 @@
                                 <div class="form-group">
                                     <label for="amount_paid" class="col-xs-4 control-label">收款澳币：</label>
                                     <div class="col-xs-8">
-                                        <input id="amount_paid" name="detail.order.amount_paid" class="input-sm form-control" v-model.number="detail.order.amount_paid"/>
+                                        <input id="amount_paid" name="detail.order.amount_paid" class="input-sm form-control" v-model.number="detail.order.amount_paid" disabled="disabled"/>
                                     </div>
                                 </div>
                             </div>
@@ -454,28 +454,28 @@
             vm.detail.order.paid_time = $("#order_paid_time").val();
 
             $.ajax({
-                    url: '{%url "ErpOrderNew.Save"%}',
-                    type: "POST",
-                    processData: false,
-                    contentType: 'application/json',
-                    data: JSON.stringify(vm.detail),
-                    success: function (data) {
-                        hideMask();
-                        if (data.success === false) {
-                            $.msg.error(data.message);
-                            //return;
-                        }
-                        else {
-                            $.msg.show(data.message);
-                            //重定向至 订单详细
-                            //window.location.href = "/order/detail/" + data.order_id;
-                            setTimeout(function () {
-                                window.location.href = '/order/detail/' + data.order_id;
-                            }, 1000);
-                            //return;
+                        url: '{%url "ErpOrderNew.Save"%}',
+                        type: "POST",
+                        processData: false,
+                        contentType: 'application/json',
+                        data: JSON.stringify(vm.detail),
+                        success: function (data) {
+                            hideMask();
+                            if (data.success === false) {
+                                $.msg.error(data.message);
+                                //return;
+                            }
+                            else {
+                                $.msg.show(data.message);
+                                //重定向至 订单详细
+                                //window.location.href = "/order/detail/" + data.order_id;
+                                setTimeout(function () {
+                                    window.location.href = '/order/detail/' + data.order_id;
+                                }, 1000);
+                                //return;
+                            }
                         }
                     }
-                }
             );
         }
     }

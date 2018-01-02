@@ -70,9 +70,11 @@ func (c ErpOrderItem) Save() revel.Result {
 	err := json.Unmarshal(c.GetRequestBody(), &order_item_form)
 	core.HandleError(err)
 
+	var order_id = order_item_form.OrderId
+
 	// 判断订单当前状态是不是可以修改
 	var order ddlc_models.OrderInfo
-	_, err = db_session.Id(order_item_form.OrderId).Get(&order)
+	_, err = db_session.Id(order_id).Get(&order)
 	core.HandleError(err)
 
 	if order_service.Can_order_modify(&order) == false {
@@ -141,6 +143,46 @@ func (c ErpOrderItem) Save() revel.Result {
 		}
 
 		_, err = db_session.Id(order_item_form.ItemId).Cols(update_cols...).Update(&order_item)
+		core.HandleError(err)
+	}
+
+	// 如果是 手工创建的的订单的，需要更新收款金额
+	if order.TypeId == ddpz_models.ORDER_TYPE_SGCJ {
+		type order_item_total_amount_t struct {
+			TotalAmount float64 `xorm:"'total_amount'"`
+		}
+
+		/*
+		SELECT sum(oi.transaction_price * oi.quantity) AS total_amount
+		FROM erp_order_item oi
+		WHERE oi.order_id = 0;
+		*/
+		var sql_item_total_amount = `
+SELECT sum(oi.transaction_price * oi.quantity) AS total_amount
+FROM erp_order_item oi
+WHERE oi.order_id = %d;
+`
+		sql_item_total_amount = fmt.Sprintf(sql_item_total_amount, order_id)
+		var order_item_total_amount order_item_total_amount_t
+		_, err := db_session.Sql(sql_item_total_amount).Get(&order_item_total_amount)
+		core.HandleError(err)
+
+		order.AmountPaid = order_item_total_amount.TotalAmount
+		order.AmountPaidRmb = order_item_total_amount.TotalAmount * order.ExchangeRate
+		order.AmountPaidCurrency = "AUD"
+		order.TotalAmount = order_item_total_amount.TotalAmount
+		order.TotalAmountRmb = order_item_total_amount.TotalAmount * order.ExchangeRate
+		order.TotalAmountCurrency = "AUD"
+		order.AdjustmentAmount = order_item_total_amount.TotalAmount
+		order.AdjustmentAmountRmb = order_item_total_amount.TotalAmount * order.ExchangeRate
+		order.AdjustmentAmountCurrency = "AUD"
+
+		var update_cols = []string{
+			"amount_paid", "amount_paid_rmb", "amount_paid_currency",
+			"total_amount", "total_amount_rmb", "total_amount_currency",
+			"adjustment_amount", "adjustment_amount_rmb", "adjustment_amount_currency",
+		}
+		_, err = db_session.Id(order_id).Cols(update_cols...).Update(&order)
 		core.HandleError(err)
 	}
 
