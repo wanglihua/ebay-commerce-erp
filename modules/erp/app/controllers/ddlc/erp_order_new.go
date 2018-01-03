@@ -16,6 +16,7 @@ import (
 	"matrix/modules/erp/models/sppz_models"
 	"matrix/modules/erp/models/ddpz_models"
 	"matrix/modules/erp/models/ddlc_models"
+	"matrix/modules/erp/service/logistics_setting_service"
 )
 
 type ErpOrderNew struct {
@@ -208,10 +209,14 @@ func (c ErpOrderNew) Save() revel.Result {
 
 	var stock_id = form.StockId
 
+	var logistics_setting = logistics_setting_service.Get_logistics_setting(db_session)
+
 	var order_logistics ddlc_models.OrderLogisticsInfo
 	order_logistics.OrderId = order.Id
 	order_logistics.StockId = stock_id
 	order_logistics.AddressId = shipping_address.Id
+	order_logistics.Ptfl = 0
+	order_logistics.Jyfl = logistics_setting.Jyfl
 
 	// pick_fee_service.Get_product_pick_fee(whole_weight, p_ol.pick_fee_setting)
 
