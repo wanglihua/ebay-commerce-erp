@@ -57,7 +57,7 @@ func (c Exporter) GetExcelFile(p_transfer *hgbg_models.ContainerTransferInfo, db
 		total_amount += amount
 	}
 
-	xlsx_file.SetCellValue(sheet1_name, "H122", total_amount)
+	xlsx_file.SetCellValue(sheet1_name, "H222", total_amount)
 
 	// --------------------------------------------------------------------------------------------------------
 	var sheet2_name = "Sheet2"
@@ -93,12 +93,12 @@ func (c Exporter) GetExcelFile(p_transfer *hgbg_models.ContainerTransferInfo, db
 
 	xlsx_file.SetCellValue(sheet2_name, "I19", total_vol)
 
-	xlsx_file.SetCellValue(sheet2_name, "D119", total_qty)
-	xlsx_file.SetCellValue(sheet2_name, "E119", total_pkgs)
-	xlsx_file.SetCellValue(sheet2_name, "F119", total_net_weight)
-	xlsx_file.SetCellValue(sheet2_name, "G119", total_vol)
-	xlsx_file.SetCellValue(sheet2_name, "H119", total_gross_weight)
-	xlsx_file.SetCellValue(sheet2_name, "I119", total_vol)
+	xlsx_file.SetCellValue(sheet2_name, "D219", total_qty)
+	xlsx_file.SetCellValue(sheet2_name, "E219", total_pkgs)
+	xlsx_file.SetCellValue(sheet2_name, "F219", total_net_weight)
+	xlsx_file.SetCellValue(sheet2_name, "G219", total_vol)
+	xlsx_file.SetCellValue(sheet2_name, "H219", total_gross_weight)
+	xlsx_file.SetCellValue(sheet2_name, "I219", total_vol)
 
 	return xlsx_file
 }
