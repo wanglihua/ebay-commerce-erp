@@ -312,7 +312,7 @@ func (c ErpOrderLogisticsImport) ImportActualFee() revel.Result {
 
 		for _, oi := range order_item_list {
 			// 利润分配
-			oi.GrossProfit = oi.CostPrice * order.ProfitAu / order_cost_amount
+			oi.GrossProfit = oi.CostPrice * float64(oi.Quantity) * order.ProfitAu / order_cost_amount
 			_, err := db_session.Id(oi.Id).Cols("gross_profit").Update(&oi)
 			core.HandleError(err)
 		}

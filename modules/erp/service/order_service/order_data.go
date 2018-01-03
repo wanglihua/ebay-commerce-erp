@@ -247,7 +247,7 @@ type Order_product_info_t struct {
 	Height    float64 `xorm:"'height'"`
 	Weight    float64 `xorm:"'weight'"`
 
-	CostPrice float64 `xorm:"-"` // 这个用于在物流匹配过程中，把澳仓的成本暂时记录下来，保存物流的时候，可以记录到订单明细(order_item)里面，也用于订单利润在个订单明细里面的分配的权重。是整个明细的 澳仓成本价，不是单个商品的，是这个明细里面的所以数量的总和的澳仓成本 cost_amount 更合适
+	CostPrice float64 `xorm:"-"` // 这个用于在物流匹配过程中，把澳仓的成本暂时记录下来，单个商品的成本价
 	//Profit    float64  `xorm:"-"` // 这个用于在计算分配订单利润的时候用到，用于暂存。这个跟CostPrice一样，也是整个明细的毛利，不是单个商品的，是整个数量的毛利。
 }
 

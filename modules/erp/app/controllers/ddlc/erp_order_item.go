@@ -128,9 +128,9 @@ func (c ErpOrderItem) Save() revel.Result {
 
 	//获取成本价 AUD
 	if stock_id == 0 {
-		order_item.CostPrice = inventory_service.GetProductCnStockCostPrice(product.Id, db_session) * float64(order_item.Quantity) / order.ExchangeRate
+		order_item.CostPrice = inventory_service.GetProductCnStockCostPrice(product.Id, db_session) / order.ExchangeRate
 	} else {
-		order_item.CostPrice = inventory_service.GetProductStockCostPrice(stock_id, product.Id, db_session) * float64(order_item.Quantity) / order.ExchangeRate
+		order_item.CostPrice = inventory_service.GetProductStockCostPrice(stock_id, product.Id, db_session) / order.ExchangeRate
 	}
 
 	if order_item_form.ItemId == 0 {

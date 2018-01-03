@@ -555,9 +555,9 @@ SELECT sa.id AS shop_id, sa.name AS shop_name FROM erp_shop_account sa;
 			var cost_price = inventory_service.GetProductCnStockCostPrice(order_import.product_id, db_session)
 
 			if cost_price != 0 {
-				order_import_same_code_list[index].cost_price = cost_price * float64(order_import.Spsl) / aud_exchange_rate_setting
+				order_import_same_code_list[index].cost_price = cost_price / aud_exchange_rate_setting
 			} else {
-				order_import_same_code_list[index].cost_price = 0.00001 * float64(order_import.Spsl) // 是零的时候，随便给个数
+				order_import_same_code_list[index].cost_price = 0.01 // 是零的时候，随便给个数
 			}
 
 			cost_price_total = cost_price_total + order_import_same_code_list[index].cost_price*(float64(order_import.Spsl))

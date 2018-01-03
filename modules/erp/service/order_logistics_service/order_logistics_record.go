@@ -93,15 +93,15 @@ func save_order_logistics(p_ol *OrderLogisticsService, p_order *ddlc_models.Orde
 
 	// 保存成本价和分配利润
 	//var order_profit = order_service.CalculateOrderProfit(p_order, &order_logistics)
-	var cost_price_total float64 = 0
+	var cost_amount_total float64 = 0
 	var product_info_list = p_order_logistics_data.order_product_info_list
 	for _, product_info := range product_info_list {
-		cost_price_total = cost_price_total + product_info.CostPrice*float64(product_info.Qty)
+		cost_amount_total = cost_amount_total + product_info.CostPrice*float64(product_info.Qty)
 	}
 
-	if cost_price_total != 0 {
+	if cost_amount_total != 0 {
 		for _, product_info := range product_info_list {
-			var item_profit = product_info.CostPrice * float64(product_info.Qty) * order_profit / cost_price_total
+			var item_profit = product_info.CostPrice * float64(product_info.Qty) * order_profit / cost_amount_total
 
 			var order_item ddlc_models.OrderItemInfo
 			order_item.CostPrice = product_info.CostPrice
@@ -170,15 +170,15 @@ func save_special_hold_order_logistics(p_ol *OrderLogisticsService, p_order *ddl
 
 	// 保存成本价和分配利润
 	//var order_profit = order_service.CalculateOrderProfit(p_order, &order_logistics)
-	var cost_price_total float64 = 0
+	var cost_amount_total float64 = 0
 	// var product_info_list = p_order_logistics_data.order_product_info_list
 	for _, product_info := range product_info_list {
-		cost_price_total = cost_price_total + product_info.CostPrice*float64(product_info.Qty)
+		cost_amount_total = cost_amount_total + product_info.CostPrice*float64(product_info.Qty)
 	}
 
-	if cost_price_total != 0 {
+	if cost_amount_total != 0 {
 		for _, product_info := range product_info_list {
-			var item_profit = product_info.CostPrice * float64(product_info.Qty) * order_profit / cost_price_total
+			var item_profit = product_info.CostPrice * float64(product_info.Qty) * order_profit / cost_amount_total
 
 			var order_item ddlc_models.OrderItemInfo
 			order_item.CostPrice = product_info.CostPrice
