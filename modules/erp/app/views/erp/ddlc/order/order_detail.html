@@ -350,10 +350,10 @@
                                         RMB {{ format_amount(detail.order_gst * detail.order.exchange_rate) }}
                                     </td>
                                     <td class="dtRight">
-                                        RMB {{ format_amount(detail.order.amount_paid_rmb* detail.logistics_setting.ptfl) }}
+                                        RMB {{ format_amount(detail.order.amount_paid_rmb* detail.order_logistics.ptfl) }}
                                     </td>
                                     <td class="dtRight">
-                                        RMB {{ format_amount(detail.order.amount_paid_rmb*detail.logistics_setting.jyfl) }}
+                                        RMB {{ format_amount(detail.order.amount_paid_rmb*detail.order_logistics.jyfl) }}
                                     </td>
                                     <td class="dtRight">
                                         RMB {{ format_amount(detail.order_logistics.pick_fee*detail.order.exchange_rate) }}
