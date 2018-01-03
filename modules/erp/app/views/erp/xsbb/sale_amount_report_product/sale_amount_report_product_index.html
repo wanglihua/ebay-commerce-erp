@@ -107,27 +107,15 @@
                                 }
                             },
                             {
-                                "mDataProp": "product_sku", "title": "商品编号", "bSearchable": true, "width": 100,
+                                "mDataProp": "product_sku", "title": "<div>商品编号</div><div>商品名称</div>", "bSearchable": true, "sClass": "wrap-word",
                                 "render": function (data, type, row) {
-                                    return data;
+                                    return "<div>" + row.product_sku + "</div><div>" + row.product_name + "</div>";
                                 }
                             },
                             {
-                                "mDataProp": "product_name", "title": "商品名称", "bSearchable": true, "sClass": "wrap-word", "width": 150,
+                                "mDataProp": "sale_user_name", "title": "<div>销售员</div><div>采购员</div>", "bSearchable": true, "bSortable": false, "width": 60,
                                 "render": function (data, type, row) {
-                                    return "<div>" + data + "</div>";
-                                }
-                            },
-                            {
-                                "mDataProp": "sale_user_name", "title": "销售员", "bSearchable": true, "width": 60,
-                                "render": function (data, type, row) {
-                                    return data;
-                                }
-                            },
-                            {
-                                "mDataProp": "dev_user_name", "title": "采购员", "bSearchable": true, "width": 60,
-                                "render": function (data, type, row) {
-                                    return data;
+                                    return "<div>" + row.sale_user_name + "</div><div>" + row.dev_user_name + "</div>";
                                 }
                             },
                             {
@@ -143,91 +131,79 @@
                                 }
                             },
                             {
-                                "mDataProp": "paid_amount", "title": "交易金额(澳币)", "bSearchable": false, "sClass": "dtRight", "width": 100,
+                                "mDataProp": "paid_amount", "title": "交易金额(澳币)", "bSearchable": false, "sClass": "dtRight", "width": 60,
                                 "render": function (data, type, row) {
                                     return dtFormatFloat(data);
                                 }
                             },
                             {
-                                "mDataProp": "express_fee", "title": "运费收入(澳币)", "bSearchable": false, "sClass": "dtRight", "width": 100,
+                                "mDataProp": "express_fee", "title": "运费收入(澳币)", "bSearchable": false, "sClass": "dtRight", "width": 60,
                                 "render": function (data, type, row) {
                                     return dtFormatFloat(data);
                                 }
                             },
                             {
-                                "mDataProp": "income", "title": "收入小计", "bSearchable": false, "sClass": "dtRight", "width": 100,
+                                "mDataProp": "income", "title": "收入小计", "bSearchable": false, "sClass": "dtRight", "width": 60,
                                 "render": function (data, type, row) {
                                     return dtFormatFloat(data);
                                 }
                             },
                             {
-                                "mDataProp": "cost_amount", "title": "商品澳仓成本(澳币)", "bSearchable": false, "sClass": "dtRight", "width": 100,
+                                "mDataProp": "cost_amount", "title": "商品澳仓成本(澳币)", "bSearchable": false, "sClass": "dtRight", "width": 60,
                                 "render": function (data, type, row) {
                                     return dtFormatFloat(data);
                                 }
                             },
                             {
-                                "mDataProp": "estimate_logistics_fee", "title": "预估运费(澳币)", "bSearchable": false, "sClass": "dtRight", "width": 100,
+                                "mDataProp": "actual_logistics_fee", "title": "预估/实际运费(澳币)", "bSearchable": false, "sClass": "dtRight", "width": 60,
+                                "render": function (data, type, row) {
+                                    return "<div>" + dtFormatFloat(row.estimate_logistics_fee) + "</div><div>" + dtFormatFloat(row.actual_logistics_fee) + "</div>";
+                                }
+                            },
+                            {
+                                "mDataProp": "jyfy_amount", "title": "交易/平台费用(澳币)", "bSearchable": false, "sClass": "dtRight", "bSortable": false, "width": 60,
+                                "render": function (data, type, row) {
+                                    return "<div>" + dtFormatFloat(row.jyfy_amount) + "</div><div>" + dtFormatFloat(row.ptfy_amount) + "</div>";
+                                }
+                            },
+                            {
+                                "mDataProp": "pick_fee", "title": "拣货费(澳币)", "bSearchable": false, "sClass": "dtRight", "width": 60,
                                 "render": function (data, type, row) {
                                     return dtFormatFloat(data);
                                 }
                             },
                             {
-                                "mDataProp": "actual_logistics_fee", "title": "实际运费(澳币)", "bSearchable": false, "sClass": "dtRight", "width": 100,
+                                "mDataProp": "gst_fee", "title": "GST费用(澳币)", "bSearchable": false, "sClass": "dtRight", "width": 60,
                                 "render": function (data, type, row) {
                                     return dtFormatFloat(data);
                                 }
                             },
                             {
-                                "mDataProp": "jyfy_amount", "title": "交易费用(澳币)", "bSearchable": false, "sClass": "dtRight", "width": 100,
+                                "mDataProp": "outcome", "title": "支出小计", "bSearchable": false, "sClass": "dtRight", "width": 60,
                                 "render": function (data, type, row) {
                                     return dtFormatFloat(data);
                                 }
                             },
                             {
-                                "mDataProp": "ptfy_amount", "title": "平台费用(澳币)", "bSearchable": false, "sClass": "dtRight", "width": 100,
-                                "render": function (data, type, row) {
-                                    return dtFormatFloat(data);
-                                }
-                            },
-                            {
-                                "mDataProp": "pick_fee", "title": "拣货费(澳币)", "bSearchable": false, "sClass": "dtRight", "width": 100,
-                                "render": function (data, type, row) {
-                                    return dtFormatFloat(data);
-                                }
-                            },
-                            {
-                                "mDataProp": "gst_fee", "title": "GST费用(澳币)", "bSearchable": false, "sClass": "dtRight", "width": 100,
-                                "render": function (data, type, row) {
-                                    return dtFormatFloat(data);
-                                }
-                            },
-                            {
-                                "mDataProp": "outcome", "title": "支出小计", "bSearchable": false, "sClass": "dtRight", "width": 100,
-                                "render": function (data, type, row) {
-                                    return dtFormatFloat(data);
-                                }
-                            },
-                            {
-                                "mDataProp": "order_qty", "title": "订单数量", "bSearchable": false, "sClass": "dtRight", "width": 100,
+                                "mDataProp": "order_qty", "title": "订单数量", "bSearchable": false, "sClass": "dtRight", "width": 50,
                                 "render": function (data, type, row) {
                                     return data;
                                 }
                             },
                             {
-                                "mDataProp": "product_qty", "title": "商品销量", "bSearchable": false, "sClass": "dtRight", "width": 100,
+                                "mDataProp": "product_qty", "title": "商品销量", "bSearchable": false, "sClass": "dtRight", "width": 50,
                                 "render": function (data, type, row) {
                                     return data;
                                 }
                             },
                             {
-                                "mDataProp": "profit", "title": "利润(澳币)", "bSearchable": false, "sClass": "dtRight", "width": 100,
+                                "mDataProp": "profit", "title": "利润(澳币)", "bSearchable": false, "sClass": "dtRight", "width": 60,
                                 "render": function (data, type, row) {
                                     return dtFormatFloat(data);
                                 }
                             },
                             {
-                                "mDataProp": "profit_rate", "title": "利润率", "bSearchable": false, "sClass": "dtRight", "width": 100,
+                                "mDataProp": "profit_rate", "title": "利润率", "bSearchable": false, "sClass": "dtRight", "width": 60,
                                 "render": function (data, type, row) {
                                     return dtFormatFloat(data) + "%";
                                 }
