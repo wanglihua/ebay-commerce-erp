@@ -307,7 +307,9 @@ func (p_ol *OrderLogisticsService) match_logistics_mode_with_option(p_order *ddl
 
 		// 接下来计算都是针对 final_weight_in_mode 来做，不管前面有没有考虑体积重, 后来就是 mode_result.weight
 
-		var extra_weight_fee_in_mode float64 = 0 // 超重的费用， 澳币
+		// var extra_weight_fee_in_mode float64 = 0 // 超重的费用， 澳币
+
+		/* 换种算法，按单个来算
 		// 重量是否有限制
 		if logistics_mode.Zlsfyxz == 1 { //如果有限制
 			mt.Println("重量是否有限制", "是")
@@ -343,10 +345,13 @@ func (p_ol *OrderLogisticsService) match_logistics_mode_with_option(p_order *ddl
 		} else {
 			mt.Println("重量是否有限制", "否")
 		}
+		*/
 
-		var extra_length_fee_in_mode float64 = 0 // 超长的费用， 澳币
+		// var extra_length_fee_in_mode float64 = 0 // 超长的费用， 澳币
+
 		// 最长边是否有限制
 
+		/* 换种算法，按单个来算
 		// 长度是否有限制
 		if logistics_mode.Zcbsfyxz == 1 { // 如果有限制
 			mt.Println("长度是否有限制", "是")
@@ -387,6 +392,108 @@ func (p_ol *OrderLogisticsService) match_logistics_mode_with_option(p_order *ddl
 			// 如果没有超过限长，就不需要继续考虑
 		} else {
 			mt.Println("长度是否有限制", "否")
+		}
+		*/
+
+		// 重量是否有限制
+		if logistics_mode.Zlsfyxz == 1 { //如果有限制
+			mt.Println("重量是否有限制", "是")
+		} else {
+			mt.Println("重量是否有限制", "否")
+		}
+
+		// 长度是否有限制
+		if logistics_mode.Zcbsfyxz == 1 { // 如果有限制
+			mt.Println("长度是否有限制", "是")
+		} else {
+			mt.Println("长度是否有限制", "否")
+		}
+
+		var extra_weight_fee_in_mode float64 = 0 // 超重的费用， 澳币
+		var extra_length_fee_in_mode float64 = 0 // 超长的费用， 澳币
+
+		var weight_not_allowed = 0
+		var length_not_allowed = 0
+
+		for _, order_product_info := range p_order_logistics_data.order_product_info_list {
+			mt.Println("当前商品id", order_product_info.ProductId)
+
+			// 单个SKU，商品超重费用，可能会有多个数量
+			var product_extra_weight_fee float64 = 0
+
+			var product_actual_weight = order_product_info.Weight // 先初始化为实际重量
+
+			var product_weight = product_actual_weight
+
+			// 体积重问题
+			if logistics_mode.Sfkltjz == 1 { // 是否考虑体积重
+				var product_dim_weight float64 = 0
+
+				if logistics_mode.Tjzgs > 0 {
+					product_dim_weight = order_product_info.Length * order_product_info.Width * order_product_info.Height / logistics_mode.Tjzgs
+				}
+
+				if logistics_mode.Tjzxs > 0 { // 如果 体积重系数 有设置的值
+					product_dim_weight = product_dim_weight / logistics_mode.Tjzxs // 这里是除以体积重系数
+				}
+
+				if logistics_mode.Tjzysjzqx == 1 { // 取大
+					product_weight = math.Max(product_actual_weight, product_dim_weight)
+				} else if logistics_mode.Tjzysjzqx == 2 { // 取小
+					product_weight = math.Min(product_actual_weight, product_dim_weight)
+				}
+			}
+
+			var extra_weight = product_weight - logistics_mode.Zlbncg
+			if extra_weight > 0 {
+				// 查看是否允许超重
+				if logistics_mode.Sfyxcz == 0 { // 不允许超重
+					weight_not_allowed = 1
+					continue // 不允许超重，需要排除当前物流方式
+				}
+
+				// 允许超重 计算超重费用
+				var extra_weight_step float64 = 25 // 每 25 kg一个超重阶梯
+				// 超重加收运费
+				var cz_step_count = math.Ceil(extra_weight / extra_weight_step) // 这个除数不可能为零
+				product_extra_weight_fee = cz_step_count * logistics_mode.Czjsyf
+				product_extra_weight_fee = product_extra_weight_fee * float64(order_product_info.Qty)
+			}
+
+			// 取得商品的最长边
+			var product_max_length = math.Max(math.Max(order_product_info.Length, order_product_info.Width), order_product_info.Height)
+
+			var max_length = math.Max(math.Max(mode_result.length, mode_result.width), mode_result.height)
+			mt.Println("这时的边长分别是", mode_result.length, mode_result.width, mode_result.height)
+			mt.Println("这时的最长边是", max_length)
+			mt.Println("最长边限制 长度", logistics_mode.Zcbxzcd)
+			var extra_length = max_length - logistics_mode.Zcbxzcd
+			if extra_length > 0 { // 长度不能超过，如果最长边有限制，物流方式里面一般都有最长边超长限制
+				if logistics_mode.Sfyxcc == 0 { // 如果不允许超长
+
+					continue
+				}
+
+				// 允许超长，计算超长费用
+				var extra_length_step float64 = logistics_mode.Ccsfjt
+				if extra_length_step > 0 {
+					mt.Println("超长阶梯", logistics_mode.Ccsfjt)
+					var cc_step_count = math.Ceil(extra_length / extra_length_step)
+					mt.Println("超长阶梯数量", cc_step_count)
+					mt.Println("超长阶梯收费", logistics_mode.Ccjsyf)
+					extra_length_fee_in_mode = cc_step_count * logistics_mode.Ccjsyf
+					mt.Println("超长收费", extra_length_fee_in_mode)
+				} else {
+					revel.ERROR.Printf("id 为 %d 名称为 %s 的物流方式的超长收费阶梯设置有误！\n", logistics_mode.Id, logistics_mode.Name)
+				}
+			} else {
+				mt.Println("没有超过限长")
+			}
+
+		}
+
+		if weight_not_allowed > 0 || length_not_allowed > 0 {
+			continue
 		}
 
 		mode_result.fee_rate_id = 0
