@@ -109,7 +109,7 @@
                             {
                                 "mDataProp": "product_sku", "title": "<div>商品编号</div><div>商品名称</div>", "bSearchable": true, "sClass": "wrap-word",
                                 "render": function (data, type, row) {
-                                    return "<div>" + row.product_sku + "</div><div>" + row.product_name + "</div>";
+                                    return "<div><a target='product_detail' href='/product/detail/" + row.product_id + "' >" + row.product_sku + "</a></div><div>" + row.product_name + "</div>";
                                 }
                             },
                             {
