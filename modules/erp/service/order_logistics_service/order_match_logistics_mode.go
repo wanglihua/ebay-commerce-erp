@@ -409,8 +409,7 @@ func (p_ol *OrderLogisticsService) match_logistics_mode_with_option(p_order *ddl
 			mt.Println("长度是否有限制", "否")
 		}
 
-		var extra_weight_fee_in_mode float64 = 0 // 超重的费用， 澳币
-		var extra_length_fee_in_mode float64 = 0 // 超长的费用， 澳币
+		var extra_fee_in_mode float64 = 0 // 超重 超长 的费用， 澳币
 
 		var weight_not_allowed = 0
 		var length_not_allowed = 0
@@ -418,12 +417,14 @@ func (p_ol *OrderLogisticsService) match_logistics_mode_with_option(p_order *ddl
 		for _, order_product_info := range p_order_logistics_data.order_product_info_list {
 			mt.Println("当前商品id", order_product_info.ProductId)
 
+			// 1. 考虑超重
+
 			// 单个SKU，商品超重费用，可能会有多个数量
 			var product_extra_weight_fee float64 = 0
 
-			var product_actual_weight = order_product_info.Weight // 先初始化为实际重量
+			var product_actual_weight = order_product_info.Weight
 
-			var product_weight = product_actual_weight
+			var product_weight = product_actual_weight // 先初始化为实际重量
 
 			// 体积重问题
 			if logistics_mode.Sfkltjz == 1 { // 是否考虑体积重
@@ -460,41 +461,48 @@ func (p_ol *OrderLogisticsService) match_logistics_mode_with_option(p_order *ddl
 				product_extra_weight_fee = product_extra_weight_fee * float64(order_product_info.Qty)
 			}
 
+			// 2. 考虑超长
+
+			var product_extra_length_fee float64 = 0
+
 			// 取得商品的最长边
 			var product_max_length = math.Max(math.Max(order_product_info.Length, order_product_info.Width), order_product_info.Height)
-
-			var max_length = math.Max(math.Max(mode_result.length, mode_result.width), mode_result.height)
-			mt.Println("这时的边长分别是", mode_result.length, mode_result.width, mode_result.height)
-			mt.Println("这时的最长边是", max_length)
-			mt.Println("最长边限制 长度", logistics_mode.Zcbxzcd)
-			var extra_length = max_length - logistics_mode.Zcbxzcd
+			var extra_length = product_max_length - logistics_mode.Zcbxzcd
 			if extra_length > 0 { // 长度不能超过，如果最长边有限制，物流方式里面一般都有最长边超长限制
 				if logistics_mode.Sfyxcc == 0 { // 如果不允许超长
-
+					length_not_allowed = 1
 					continue
 				}
 
 				// 允许超长，计算超长费用
 				var extra_length_step float64 = logistics_mode.Ccsfjt
 				if extra_length_step > 0 {
-					mt.Println("超长阶梯", logistics_mode.Ccsfjt)
 					var cc_step_count = math.Ceil(extra_length / extra_length_step)
-					mt.Println("超长阶梯数量", cc_step_count)
-					mt.Println("超长阶梯收费", logistics_mode.Ccjsyf)
-					extra_length_fee_in_mode = cc_step_count * logistics_mode.Ccjsyf
-					mt.Println("超长收费", extra_length_fee_in_mode)
-				} else {
-					revel.ERROR.Printf("id 为 %d 名称为 %s 的物流方式的超长收费阶梯设置有误！\n", logistics_mode.Id, logistics_mode.Name)
+					product_extra_length_fee = cc_step_count * logistics_mode.Ccjsyf
+					product_extra_length_fee = product_extra_length_fee * float64(order_product_info.Qty)
 				}
-			} else {
-				mt.Println("没有超过限长")
 			}
 
+			var product_extra_fee = math.Max(product_extra_weight_fee, product_extra_length_fee) // 两个钟选择费用大的那个
+			mt.Println("当前商品物流方式综合后的超重超长的费用为：", product_extra_fee)
+
+			extra_fee_in_mode = extra_fee_in_mode + product_extra_fee // 累加
 		}
 
 		if weight_not_allowed > 0 || length_not_allowed > 0 {
+			mt.Println("当前商品物流方式不允许超长超重，忽略当前物流方式。")
 			continue
 		}
+
+		mt.Println("当前物流方式下各商品综合后的超重超长的费用为：", extra_fee_in_mode)
+
+		// 超重 和 超长 费用中， 取一个， 取大的一个
+		/*
+		mt.Println("物流方式超重费用", extra_weight_fee_in_mode)
+		mt.Println("物流方式超长费用", extra_length_fee_in_mode)
+		var extra_fee_in_mode = math.Max(extra_weight_fee_in_mode, extra_length_fee_in_mode)
+		mt.Println("物流方式超重和超长，取大的一个的结果", extra_fee_in_mode)
+		*/
 
 		mode_result.fee_rate_id = 0
 		mode_result.fee_rate = ddpz_models.LogisticsFeeRateInfo{}
@@ -573,13 +581,8 @@ func (p_ol *OrderLogisticsService) match_logistics_mode_with_option(p_order *ddl
 			continue // 排除该物流方式
 		}
 
-		// 超重 和 超长 费用中， 取一个， 取大的一个
-		mt.Println("物流方式超重费用", extra_weight_fee_in_mode)
-		mt.Println("物流方式超长费用", extra_length_fee_in_mode)
-		var extra_fee_in_mode = math.Max(extra_weight_fee_in_mode, extra_length_fee_in_mode)
-		mt.Println("物流方式超重和超长，取大的一个的结果", extra_fee_in_mode)
 		mode_result.total_fee = total_fee_in_fee_rate + extra_fee_in_mode
-		mt.Println("物流方式中物流费率费用加上物流方式超重超长大的一个后的结果", mode_result.total_fee)
+		mt.Println("物流方式中物流费率费用加上物流方式超重超长的结果", mode_result.total_fee)
 		mode_result.total_amount = mode_result.total_fee + mode_result.cost_amount
 		mt.Println("考虑澳仓成本后的，物流方式总费用", mode_result.total_amount)
 
