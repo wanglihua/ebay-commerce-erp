@@ -69,8 +69,8 @@ func get_cn_stock_id(db_session *xorm.Session) int64 {
 func get_zt_au_stock_id(transfer_id int64, db_session *xorm.Session) (zt_stock_id_ret, au_stock_id_ret int64) {
 
 	var zt_au_stock_id_struct struct {
-		ZtStockId int64  `xorm:"'zt_stock_id'"`
-		AuStockId int64  `xorm:"'au_stock_id'"`
+		ZtStockId int64 `xorm:"'zt_stock_id'"`
+		AuStockId int64 `xorm:"'au_stock_id'"`
 	}
 	/*
 	SELECT
@@ -115,7 +115,8 @@ func update_stock_product_inventory(stock_id int64, product_id int64, qty_diff i
 		var qty_before = inventory.Qty
 		inventory.Qty = inventory.Qty + qty_diff
 		var qty_after = inventory.Qty
-		db_session.Id(inventory.Id).Cols("qty").Update(&inventory)
+		_, err = db_session.Id(inventory.Id).Cols("qty").Update(&inventory)
+		core.HandleError(err)
 
 		inventory_history_service.Insert_inventory_history(inventory, fmt.Sprintf("集装箱调拨更新库存 %d => %d, 工号：%s", qty_before, qty_after, login_user.LoginName), db_session)
 	} else {
