@@ -127,6 +127,7 @@
                                     </div>
                                 </div>
 
+                                {%/*
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
@@ -144,6 +145,29 @@
                                             <label for="bne_qty" class="col-xs-2 control-label">BNE数量</label>
                                             <div class="col-xs-10">
                                                 <input id="bne_qty" name="purchase_bill_entry_detail.purchase_bill_entry.bne_qty" type="text" class="input-sm form-control" v-model.number="purchase_bill_entry_detail.purchase_bill_entry.bne_qty" disabled="disabled"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                */%}
+
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <label for="mel_qty_desc" class="col-xs-2 control-label">MEL数量</label>
+                                            <div class="col-xs-10">
+                                                <input id="mel_qty_desc" name="purchase_bill_entry_detail.mel_qty_desc" type="text" class="input-sm form-control" v-model="purchase_bill_entry_detail.mel_qty_desc" disabled="disabled"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <label for="bne_qty_desc" class="col-xs-2 control-label">BNE数量</label>
+                                            <div class="col-xs-10">
+                                                <input id="bne_qty_desc" name="purchase_bill_entry_detail.bne_qty_desc" type="text" class="input-sm form-control" v-model="purchase_bill_entry_detail.bne_qty_desc" disabled="disabled"/>
                                             </div>
                                         </div>
                                     </div>

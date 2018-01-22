@@ -195,6 +195,8 @@ type PurchaseBillEntryCheckinDetailForm struct {
 	StockTypeId       int64                                  `json:"stock_type_id"`
 	StockTypeList     []sppz_models.StockTypeInfo            `json:"stock_type_list"`
 	IsInTurn          bool                                   `json:"is_in_turn"`
+	MelQtyDesc        string                                 `json:"mel_qty_desc"`
+	BneQtyDesc        string                                 `json:"bne_qty_desc"`
 }
 
 func (f *PurchaseBillEntryCheckinDetailForm) IsCreate() bool {
@@ -259,6 +261,10 @@ func (c ErpPurchaseCheckin) DetailData() revel.Result {
 	detail_form.StockTypeList = stock_type_list
 	detail_form.StockTypeId = sppz_models.STOCK_TYPE_CN
 	detail_form.IsInTurn = purchase_bill_entry.TypeId == cggl_models.PURCHASE_BILL_TYPE_IN_TURN
+
+	new_mel_qty, new_bne_qty := purchase_bill_service.Get_new_checkin_stock_qty(purchase_bill_entry, purchase_bill_entry.Qty, db_session)
+	detail_form.MelQtyDesc = fmt.Sprintf("%d (按最新 %d)", purchase_bill_entry.MelQty, new_mel_qty)
+	detail_form.BneQtyDesc = fmt.Sprintf("%d (按最新 %d)", purchase_bill_entry.BneQty, new_bne_qty)
 
 	return c.RenderJson(detail_form)
 }
@@ -351,7 +357,12 @@ func (c ErpPurchaseCheckin) Checkin() revel.Result {
 	bill_entry_in_db.AbnormalTypeId = bill_entry_from_ui.AbnormalTypeId
 	bill_entry_in_db.CheckinTime = core.MakeNullTime(time.Now(), true)
 	bill_entry_in_db.FinalExpenses = bill_entry_from_ui.FinalExpenses
-	var update_col_list = []string{"status_id", "abnormal_process_result_id", "checkin_qty", "abnormal_type_id", "checkin_time", "final_expenses"}
+
+	new_mel_qty, new_bne_qty := purchase_bill_service.Get_new_checkin_stock_qty(bill_entry_in_db, checkin_qty, db_session)
+	bill_entry_in_db.MelQty = new_mel_qty
+	bill_entry_in_db.BneQty = new_bne_qty
+
+	var update_col_list = []string{"status_id", "abnormal_process_result_id", "checkin_qty", "mel_qty", "bne_qty", "abnormal_type_id", "checkin_time", "final_expenses"}
 	_, err = db_session.Id(bill_entry_in_db.Id).Cols(update_col_list...).Update(&bill_entry_in_db)
 	core.HandleError(err)
 
@@ -562,6 +573,10 @@ func (c ErpPurchaseCheckin) CheckinInTurn() revel.Result {
 	new_bill_entry.DrawbackAmount = bill_entry_in_db.DrawbackAmount
 	new_bill_entry.FittingCost = (float64(checkin_qty) / float64(qty_before)) * fitting_cost_before
 	new_bill_entry.OtherCost = (float64(checkin_qty) / float64(qty_before)) * other_cost_before
+
+	new_mel_qty, new_bne_qty := purchase_bill_service.Get_new_checkin_stock_qty(new_bill_entry, checkin_qty, db_session)
+	new_bill_entry.MelQty = new_mel_qty
+	new_bill_entry.BneQty = new_bne_qty
 
 	_, err = db_session.Insert(&new_bill_entry)
 	core.HandleError(err)
