@@ -163,6 +163,7 @@ func (p_ol *OrderLogisticsService) hold_check_oss_by_stock_type(match_has_stock 
 	return all_product_oss
 }
 
+// 这个检查放在所有商品都缺货的后面
 func (p_ol *OrderLogisticsService) hold_check_has_some_product(p_order *ddlc_models.OrderInfo, p_order_logistics_data *order_logistics_data_t, db_session *xorm.Session) (is_hold_return bool) {
 	var products_stock_qty_list = p_order_logistics_data.products_stock_qty_list
 
