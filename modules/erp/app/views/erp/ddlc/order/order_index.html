@@ -911,15 +911,30 @@
                 vm.refreshList();
             },
             matchLogistics: function () {
-                $.msg.confirm("确认要对所有已支付订单匹配物流吗？", function () {
+                var id_list = [];
+                $('#orderList tbody tr>td:first-child input:checkbox').each(function () {
+                    if (this.checked) {
+                        id_list.push($(this).val());
+                    }
+                });
+
+                var message = "确认要对选择的订单匹配物流吗？";
+                if (id_list.length === 0) {
+                    message = "确认要对所有已支付订单匹配物流吗？";
+                }
+
+                $.msg.confirm(message, function () {
                     showMask("物流匹配中，请稍候...");
                     $.ajax({
                         url: '{%url "ErpOrder.MatchLogistics"%}',
                         type: "POST",
-                        data: {"batch_code": vm.page.batch_code},
+                        data: {
+                            "batch_code": vm.page.batch_code, //感觉这个参数没有用起来
+                            "id_list": id_list
+                        },
                         success: function (data) {
                             hideMask();
-                            if (data.success == false) {
+                            if (data.success === false) {
                                 $.msg.error(data.message);
                                 return;
                             }

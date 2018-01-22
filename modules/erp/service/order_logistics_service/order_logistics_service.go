@@ -179,6 +179,37 @@ func (p_ol *OrderLogisticsService) CalculateListPaidOrders(user core.LoginUser, 
 	return p_ol.CalculateList(order_list, db_session)
 }
 
+func (p_ol *OrderLogisticsService) CalculateListWithUser(order_list []ddlc_models.OrderInfo, user core.LoginUser, db_session *xorm.Session) error {
+
+	if len(order_list) == 0 {
+		return errors.New("订单列表为空！")
+	}
+
+	var order_id_str_list = make([]string, 0)
+	for _, order := range order_list {
+		order_id_str_list = append(order_id_str_list, fmt.Sprint(order.Id))
+	}
+
+	// 需要先合并
+	err := Combine_orders(fmt.Sprintf("o.id IN (%s)", strings.Join(order_id_str_list, ",")), user, db_session)
+	core.HandleError(err)
+
+	//先判断订单状态
+	for _, order := range order_list {
+		if order.StatusId != models.ORDER_STATUS_YZF {
+			return errors.New("订单状态为已支付状态的，才能匹配物流！")
+		}
+	}
+
+	var order_item_zero_count = order_item_service.Get_order_item_zero_count_in_order_list(order_list, db_session)
+
+	if order_item_zero_count > 0 {
+		return errors.New("订单明细不能为空！")
+	}
+
+	return p_ol.CalculateList(order_list, db_session)
+}
+
 func (p_ol *OrderLogisticsService) CalculateListImportBatch(batch_code int64, user core.LoginUser, db_session *xorm.Session) error {
 
 	// 先合并
