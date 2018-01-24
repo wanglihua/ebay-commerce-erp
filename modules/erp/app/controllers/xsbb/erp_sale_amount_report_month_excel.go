@@ -108,7 +108,7 @@ func (c ErpSaleAmountReportMonthExcel) Export() revel.Result {
 
 	var sql_list = `
 SELECT
-    date_format(r.paid_time, '%%Y-%%m-%%d')         AS paid_time,
+    date_format(r.paid_time, '%%Y-%%m')             AS paid_time,
     sum(r.paid_amount)                              AS paid_amount,
     sum(r.express_fee)                              AS express_fee,
     sum(r.income)                                   AS income,
@@ -126,7 +126,7 @@ SELECT
     sum(r.product_qty)                              AS product_qty
 FROM erp_sale_amount_report r
 WHERE %s
-GROUP BY date_format(r.paid_time, '%%Y-%%m-%%d')
+GROUP BY date_format(r.paid_time, '%%Y-%%m')
 ORDER BY %s;
 `
 
@@ -146,7 +146,7 @@ ORDER BY %s;
 
 	reader := bytes.NewReader(buffer.Bytes()) //bytes.Reader 实现了 io.Reader 接口
 
-	file_name := "日销售额报表.xlsx" //"file.xlsx" //可以根据参数生成文件名
+	file_name := "月销售额报表.xlsx" //"file.xlsx" //可以根据参数生成文件名
 
 	return c.RenderBinary(reader, file_name, revel.Attachment, time.Now())
 }

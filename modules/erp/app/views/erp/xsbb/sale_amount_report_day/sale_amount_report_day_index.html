@@ -266,7 +266,15 @@
     });
 
     function exportReport() {
-        var params = $.param({});
+        var params = $.param({
+            "begin_time_query": $("#begin_time_query").val(),
+            "end_time_query": $("#end_time_query").val(),
+            "platform_id_query": $("#platform_id_query").val(),
+            "shop_id_query": $("#shop_id_query").val(),
+            "user_type_query": $("#user_type_query").val(),
+            "user_id_query": $("#user_id_query").val()
+        });
+
         var url = '{%url "ErpSaleAmountReportDayExcel.Export"%}' + "?" + params;
         $('<form method="post" action="' + url + '"></form>').appendTo('body').submit().remove();
     }
