@@ -25,7 +25,7 @@
                                         <td class="center">{{index + 1}}</td>
                                         <td>
                                             {{message.pf.name}}&nbsp;{{message.sa.name}}<br/>
-                                            {{ message.msg.item_id }}<br/>
+                                            <a :href="message.psi.view_item_url" target="_blank">{{ message.msg.item_id }}</a><br/>
                                             {{message.msg.creation_date}}<br/>
                                             {{message.msg.last_modified_date}}
                                         </td>

@@ -44,6 +44,10 @@ div.dataTables_wrapper div.dataTables_filter input {
     color: #307ECC;
 }
 
+.dataTable > thead > tr > th[class*="sorting_"] {
+    color: #707070;
+}
+
 .dataTable > thead > tr > th > div > th[class*=sort] {
     cursor: pointer;
 }

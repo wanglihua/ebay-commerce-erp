@@ -9,14 +9,17 @@ import (
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/models/kcgl_models"
 	"matrix/modules/erp/models/xtpz_models"
+	"matrix/modules/erp/models/sppz_models"
+	"strings"
 )
 
 type Message_view_item_t struct {
-	models.MessageInfo           `xorm:"extends" json:"msg"`
+	models.MessageInfo                `xorm:"extends" json:"msg"`
 	xtpz_models.ShopAccountInfo       `xorm:"extends" json:"sa"`
 	xtpz_models.ECommercePlatformInfo `xorm:"extends" json:"pf"`
 	kcgl_models.ProductInfo           `xorm:"extends" json:"p"`
-	models.StatusInfo            `xorm:"extends" json:"s"`
+	sppz_models.ProductStoreItemInfo  `xorm:"extends" json:"psi"`
+	models.StatusInfo                 `xorm:"extends" json:"s"`
 }
 
 var msg_count struct {
@@ -24,23 +27,25 @@ var msg_count struct {
 }
 
 /*
-SELECT msg.*, sa.*, pf.*, p.*, s.*
-	FROM erp_message msg
-		INNER JOIN erp_shop_account sa ON sa.id = msg.shop_id
-		INNER JOIN erp_ecommerce_platform pf ON pf.id = sa.platform_id
-		INNER JOIN erp_product p ON p.id = msg.product_id
-		INNER JOIN erp_status s ON s.id = msg.status_id
+SELECT msg.*, sa.*, pf.*, p.*, psi.*, s.*
+FROM erp_message msg
+    INNER JOIN erp_shop_account sa ON sa.id = msg.shop_id
+    INNER JOIN erp_ecommerce_platform pf ON pf.id = sa.platform_id
+    INNER JOIN erp_product p ON p.id = msg.product_id
+    INNER JOIN erp_product_store_item psi on psi.product_id = p.id and psi.item_id = msg.item_id
+    INNER JOIN erp_status s ON s.id = msg.status_id;
  */
 
 func get_message_list_sql_builder() *core.SqlBuilder {
 	sb := core.NewSqlBuilder()
-	sb.Select("msg.*, sa.*, pf.*, p.*, s.*")
+	sb.Select("msg.*, sa.*, pf.*, p.*, psi.*, s.*")
 	sb.Count("count(msg.id) as msg_count")
 	sb.From(`
 erp_message msg
     INNER JOIN erp_shop_account sa ON sa.id = msg.shop_id
     INNER JOIN erp_ecommerce_platform pf ON pf.id = sa.platform_id
     INNER JOIN erp_product p ON p.id = msg.product_id
+    INNER JOIN erp_product_store_item psi ON psi.product_id = p.id AND psi.item_id = msg.item_id
     INNER JOIN erp_status s ON s.id = msg.status_id`)
 
 	sb.OrderBy("msg.id DESC")
@@ -48,9 +53,44 @@ erp_message msg
 	return sb
 }
 
-func Get_message_list_data(db_session *xorm.Session, request *revel.Request) (message_list []Message_view_item_t, count int64) {
+func Get_message_list_data(db_session *xorm.Session, request *revel.Request, params *revel.Params) (message_list []Message_view_item_t, count int64) {
 
 	filter, order, offset, limit := core.GetGridRequestParam(request)
+
+	var shop_id_query int64
+	params.Bind(&shop_id_query, "shop_id_query")
+
+	var item_id_query string
+	params.Bind(&item_id_query, "item_id_query")
+
+	var sku_query string
+	params.Bind(&sku_query, "sku_query")
+
+	var sender_id_query string
+	params.Bind(&sender_id_query, "sender_id_query")
+
+	var recipient_id_query string
+	params.Bind(&recipient_id_query, "recipient_id_query")
+
+	if shop_id_query != 0 {
+		filter = core.SqlAnd(filter, fmt.Sprintf("msg.shop_id = %d", shop_id_query))
+	}
+
+	if strings.TrimSpace(item_id_query) != "" {
+		filter = core.SqlAnd(filter, fmt.Sprintf("msg.item_id = '%s'", item_id_query))
+	}
+
+	if strings.TrimSpace(sku_query) != "" {
+		filter = core.SqlAnd(filter, fmt.Sprintf("msg.sku = '%s'", sku_query))
+	}
+
+	if strings.TrimSpace(sender_id_query) != "" {
+		filter = core.SqlAnd(filter, fmt.Sprintf("msg.sender_id = '%s'", sender_id_query))
+	}
+
+	if strings.TrimSpace(recipient_id_query) != "" {
+		filter = core.SqlAnd(filter, fmt.Sprintf("msg.recipient_id = '%s'", recipient_id_query))
+	}
 
 	sb := get_message_list_sql_builder()
 

@@ -18,7 +18,7 @@ func (c ErpMessage) Index() revel.Result {
 func (c ErpMessage) ListData() revel.Result {
 	db_session := c.DbSession
 
-	message_list, msg_count := message_service.Get_message_list_data(db_session, c.Request)
+	message_list, msg_count := message_service.Get_message_list_data(db_session, c.Request, c.Params)
 
 	return c.RenderJson(core.GridResult{
 		Data:  message_list,
