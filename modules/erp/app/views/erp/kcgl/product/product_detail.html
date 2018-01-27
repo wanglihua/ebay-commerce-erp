@@ -653,30 +653,36 @@
                         <div class="col-xs-12">
                             <table id="message_list" class="table table-striped table-bordered">
                                 <thead>
-                                    <tr>
-                                        <th class="center" style="width:50px;">编号</th>
-                                        <th style="width: 100px;">店铺</th>
-                                        <th class="center" style="width:120px;">时间</th>
-                                        <th>内容</th>
-                                        <th class="center" style="width:60px;">状态</th>
-                                    </tr>
+                                <tr>
+                                    <th class="center" style="width:50px;">编号</th>
+                                    <th style="width: 100px;">平台店铺/item id/创建/修改时间</th>
+                                    <th>主题/内容</th>
+                                    <th class="center" style="width:60px;">状态/发送者/接收者</th>
+                                </tr>
                                 </thead>
                                 <tbody>
-                                    <template v-for="(message, index) in detail.message_list">
-                                        <tr>
-                                            <td class="center">{{index + 1}}</td>
-                                            <td>
-                                                {{message.pf.name}}<br/>{{message.sa.name}}
-                                            </td>
-                                            <td class="center">{{message.msg.creation_date}}</td>
-                                            <td>
-                                                <div style="min-width: 280px;white-space:normal; word-break: break-all; word-wrap:break-word;">
-                                                    {{message.msg.subject}}<br/><br/> {{message.msg.body}}
-                                                </div>
-                                            </td>
-                                            <td class="center">{{message.s.name}}</td>
-                                        </tr>
-                                    </template>
+                                <template v-for="(message, index) in detail.message_list">
+                                    <tr>
+                                        <td class="center">{{index + 1}}</td>
+                                        <td>
+                                            {{message.pf.name}}&nbsp;{{message.sa.name}}<br/>
+                                            {{ message.msg.item_id }}<br/>
+                                            {{message.msg.creation_date}}<br/>
+                                            {{message.msg.last_modified_date}}
+                                        </td>
+                                        <td>
+                                            <div style="min-width: 280px;white-space:normal; word-break: break-all; word-wrap:break-word;">
+                                                {{message.msg.subject}}<br/><br/>
+                                                {{message.msg.body}}
+                                            </div>
+                                        </td>
+                                        <td class="center">
+                                            {{message.s.name}}<br/>
+                                            {{message.msg.sender_id}}<br/>
+                                            {{message.msg.recipient_id}}
+                                        </td>
+                                    </tr>
+                                </template>
                                 </tbody>
                             </table>
                         </div>
