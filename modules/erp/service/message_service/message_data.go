@@ -32,7 +32,7 @@ FROM erp_message msg
     INNER JOIN erp_shop_account sa ON sa.id = msg.shop_id
     INNER JOIN erp_ecommerce_platform pf ON pf.id = sa.platform_id
     INNER JOIN erp_product p ON p.id = msg.product_id
-    INNER JOIN erp_product_store_item psi on psi.product_id = p.id and psi.item_id = msg.item_id
+    LEFT JOIN erp_product_store_item psi on psi.product_id = p.id and psi.item_id = msg.item_id
     INNER JOIN erp_status s ON s.id = msg.status_id;
  */
 
@@ -45,7 +45,7 @@ erp_message msg
     INNER JOIN erp_shop_account sa ON sa.id = msg.shop_id
     INNER JOIN erp_ecommerce_platform pf ON pf.id = sa.platform_id
     INNER JOIN erp_product p ON p.id = msg.product_id
-    INNER JOIN erp_product_store_item psi ON psi.product_id = p.id AND psi.item_id = msg.item_id
+    LEFT JOIN erp_product_store_item psi ON psi.product_id = p.id AND psi.item_id = msg.item_id
     INNER JOIN erp_status s ON s.id = msg.status_id`)
 
 	sb.OrderBy("msg.id DESC")
