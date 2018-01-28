@@ -539,7 +539,7 @@ func (p_ol *OrderLogisticsService) hold_check_paypal_account_not_match(p_order *
 		shop_paypal_email_list := strings.Split(shop.PaypalAccount, ",")
 
 		// 之前订单下载和导入时，已经把SellerEmail放入订单中
-		seller_email := p_order.SellerEmail //是用SellerEmail来判断老鼠仓吗？
+		seller_email := p_order.SellerEmail //是用SellerEmail来判断老鼠仓吗？ todo:通过palpay接口获得订单的paypal卖家信息进行更准确的判断
 
 		seller_email_in_list := false
 		for _, shop_paypal_email := range shop_paypal_email_list {
