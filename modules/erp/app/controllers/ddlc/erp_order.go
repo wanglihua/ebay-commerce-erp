@@ -1268,12 +1268,22 @@ func (c ErpOrder) PickupDaiPeiHuo() revel.Result {
 		}
 	}
 
+	/*
 	var order_item_zero_count = order_item_service.Get_order_item_zero_count_in_order_list(order_list, db_session)
 
 	if order_item_zero_count > 0 {
 		return c.RenderJson(map[string]interface{}{
 			"success": false,
 			"message": "订单明细不能为空！",
+		})
+	}
+	*/
+
+	var order_code_list = order_item_service.Get_order_item_zero_code_list_in_order_list(order_list, db_session)
+	if len(order_code_list) != 0 {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "订单明细不能为空！订单号： " + strings.Join(order_code_list, ","),
 		})
 	}
 

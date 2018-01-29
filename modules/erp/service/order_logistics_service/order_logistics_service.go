@@ -170,10 +170,17 @@ func (p_ol *OrderLogisticsService) CalculateListPaidOrders(user core.LoginUser, 
 		}
 	}
 
+	/*
 	var order_item_zero_count = order_item_service.Get_order_item_zero_count_in_order_list(order_list, db_session)
 
 	if order_item_zero_count > 0 {
 		return errors.New("订单明细不能为空！")
+	}
+	*/
+
+	var order_code_list = order_item_service.Get_order_item_zero_code_list_in_order_list(order_list, db_session)
+	if len(order_code_list) != 0 {
+		return errors.New("订单明细不能为空！订单号： " + strings.Join(order_code_list, ","))
 	}
 
 	return p_ol.CalculateList(order_list, db_session)
@@ -201,10 +208,17 @@ func (p_ol *OrderLogisticsService) CalculateListWithUser(order_list []ddlc_model
 		}
 	}
 
+	/*
 	var order_item_zero_count = order_item_service.Get_order_item_zero_count_in_order_list(order_list, db_session)
 
 	if order_item_zero_count > 0 {
 		return errors.New("订单明细不能为空！")
+	}
+	*/
+
+	var order_code_list = order_item_service.Get_order_item_zero_code_list_in_order_list(order_list, db_session)
+	if len(order_code_list) != 0 {
+		return errors.New("订单明细不能为空！订单号： " + strings.Join(order_code_list, ","))
 	}
 
 	return p_ol.CalculateList(order_list, db_session)
