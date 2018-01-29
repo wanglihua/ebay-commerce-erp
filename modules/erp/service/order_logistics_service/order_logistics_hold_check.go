@@ -436,7 +436,7 @@ func (p_ol *OrderLogisticsService) is_international_order(p_order *ddlc_models.O
 	var country_name = p_order_logistics_data.order_shipping_address.CountryName
 	country_name = strings.TrimSpace(country_name)
 
-	if (country != "" && strings.ToLower(country) != strings.ToLower("AU")) ||
+	if (country != "" && strings.ToLower(country) != strings.ToLower("Australia") && strings.ToLower(country) != strings.ToLower("AU")) ||
 		(country_name != "" && strings.ToLower(country_name) != strings.ToLower("Australia") && strings.ToLower(country_name) != strings.ToLower("AU")) { // != "" 是因为有时导入的时候没提供国家信息的，就默认是国内件了
 
 		return true
