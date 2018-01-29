@@ -11,7 +11,6 @@ import (
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/order_logistics_service"
 	"matrix/modules/erp/models/ddlc_models"
-	"matrix/modules/erp/models/ddpz_models"
 )
 
 type OrderLogisticsMatchTask struct {
@@ -52,7 +51,8 @@ func (t OrderLogisticsMatchTask) Run() {
 	}()
 
 	// 先进行合并
-	err = order_logistics_service.Combine_orders(fmt.Sprintf("o.type_id <> %d AND o.status_id = %d", ddpz_models.ORDER_TYPE_DRDD, models.ORDER_STATUS_YZF), core.LoginUser{}, db_session)
+	// err = order_logistics_service.Combine_orders(fmt.Sprintf("o.type_id <> %d AND o.status_id = %d", ddpz_models.ORDER_TYPE_DRDD, models.ORDER_STATUS_YZF), core.LoginUser{}, db_session)
+	err = order_logistics_service.Combine_orders(fmt.Sprintf("o.status_id = %d", models.ORDER_STATUS_YZF), core.LoginUser{}, db_session)
 	core.HandleError(err)
 
 	// 获得不是导入的且已支付的订单列表
@@ -61,11 +61,11 @@ func (t OrderLogisticsMatchTask) Run() {
 	 */
 
 	var paid_download_order_list = make([]ddlc_models.OrderInfo, 0)
-	err = db_session.Sql(fmt.Sprintf("SELECT * FROM erp_order o WHERE o.type_id <> %d AND o.status_id = %d ORDER BY o.paid_time ASC, o.id ASC", ddpz_models.ORDER_TYPE_DRDD, models.ORDER_STATUS_YZF)).Find(&paid_download_order_list)
+	// err = db_session.Sql(fmt.Sprintf("SELECT * FROM erp_order o WHERE o.type_id <> %d AND o.status_id = %d ORDER BY o.paid_time ASC, o.id ASC", ddpz_models.ORDER_TYPE_DRDD, models.ORDER_STATUS_YZF)).Find(&paid_download_order_list)\
+	err = db_session.Sql(fmt.Sprintf("SELECT * FROM erp_order o WHERE o.status_id = %d ORDER BY o.paid_time ASC, o.id ASC", models.ORDER_STATUS_YZF)).Find(&paid_download_order_list)
 	core.HandleError(err)
 
 	if len(paid_download_order_list) != 0 {
-
 		var p_order_logistics = new(order_logistics_service.OrderLogisticsService)
 		p_order_logistics.LoginUser = core.LoginUser{} // 自动任务 操作历史不记录工号
 		err = p_order_logistics.CalculateList(paid_download_order_list, db_session)
