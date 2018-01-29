@@ -267,6 +267,7 @@
                             <th id="th_express_fee">原运费金额</th>
                             <th id="th_profit">订单利润</th>
 
+                            <th id="th_created_time">建单时间</th>
                             <th id="th_paid_time">支付时间</th>
                             <th id="th_shipped_time">发货时间</th>
 
@@ -656,8 +657,13 @@
                                 }
                             },
                             {
-                                "mDataProp": "o.paid_time", "title": "支付时间", "bSearchable": false,
+                                "mDataProp": "o.created_time", "title": "建单时间", "bSearchable": false,
                                 "render": function (data, type, row) {
+                                    var order_created_time = "--";
+                                    if (row.o.created_time) {
+                                        order_created_time = row.o.created_time;
+                                    }
+
                                     var order_paid_time = "--";
                                     if (row.o.paid_time) {
                                         order_paid_time = row.o.paid_time;
@@ -667,7 +673,13 @@
                                         order_shipped_time = row.o.shipped_time;
                                     }
 
-                                    return '<div class="div_paid_time">' + order_paid_time + '</div><div>' + order_shipped_time + '</div>';
+                                    return '<div class="div_created_time">' + order_created_time + '</div><div>' + order_paid_time + '</div><div>' + order_shipped_time + '</div>';
+                                }
+                            },
+                            {
+                                "mDataProp": "o.paid_time", "title": "支付时间", "bSearchable": false,
+                                "render": function (data, type, row) {
+                                    return '<div class="div_paid_time"></div>';
                                 }
                             },
                             {
@@ -806,7 +818,8 @@
                                     $("#orderList div.div_express_fee").parent().css("display", "none");
                                     $("#orderList div.div_profit").parent().css("display", "none");
 
-                                    $("#orderList div.div_paid_time").parent().css("width", "130px");
+                                    $("#orderList div.div_created_time").parent().css("width", "130px");
+                                    $("#orderList div.div_paid_time").parent().css("display", "none");
                                     $("#orderList div.div_shipped_time").parent().css("display", "none");
 
                                     $("#orderList div.div_logistics_company").parent().css("width", "100px");
@@ -853,10 +866,11 @@
             $("#th_profit").wrap("<div id='div_profit'></div>");
             $("#th_total_paid_amount").append($("#div_total_amount")).append($("#div_total_amount_rmb")).append($("#div_express_fee")).append($("#div_profit"));
 
-            $("#th_paid_time").before("<th id='th_paid_time_shipped_time'></th>");
+            $("#th_created_time").before("<th id='th_created_time_paid_time_shipped_time'></th>");
+            $("#th_created_time").wrap("<div id='div_created_time'></div>");
             $("#th_paid_time").wrap("<div id='div_paid_time'></div>");
             $("#th_shipped_time").wrap("<div id='div_shipped_time'></div>");
-            $("#th_paid_time_shipped_time").append($("#div_paid_time")).append($("#div_shipped_time"));
+            $("#th_created_time_paid_time_shipped_time").append($("#div_created_time")).append($("#div_paid_time")).append($("#div_shipped_time"));
 
             $("#th_logistics_company").before("<th id='th_logistics_company_ext'></th>");
             $("#th_logistics_company").wrap("<div id='div_logistics_company'></div>");
