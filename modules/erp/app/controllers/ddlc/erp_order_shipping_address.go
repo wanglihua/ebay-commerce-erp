@@ -8,6 +8,8 @@ import (
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/erp/service/order_service"
 	"matrix/modules/erp/models/ddlc_models"
+	"matrix/modules/erp/service/order_history_service"
+	"fmt"
 )
 
 type ErpOrderShippingAddress struct {
@@ -34,18 +36,22 @@ func (c ErpOrderShippingAddress) Save() revel.Result {
 		return c.RenderJson(core.JsonResult{Success: false, Message: c.GetValidationErrorMessage()})
 	}
 
+	var order ddlc_models.OrderInfo
+	_, err = db_session.Id(order_shipping_address.OrderId).Get(&order)
+	core.HandleError(err)
+
+	var login_user = core.GetLoginUser(c.Session)
+
 	var affected int64
 	if order_shipping_address.Id == 0 {
 		affected, err = db_session.Insert(&order_shipping_address)
 		core.HandleError(err)
+
+		order_history_service.Insert_order_history(order, login_user.UserId, fmt.Sprintf("订单地址新增， 工号： %s", login_user.LoginName), db_session)
 	} else {
 		//判断订单当前状态是不是可以修改
 		var order_address_in_db ddlc_models.OrderShippingAddressInfo
 		_, err := db_session.Id(order_shipping_address.Id).Get(&order_address_in_db)
-		core.HandleError(err)
-
-		var order ddlc_models.OrderInfo
-		_, err = db_session.Id(order_address_in_db.OrderId).Get(&order)
 		core.HandleError(err)
 
 		if order_service.Can_order_modify(&order) == false {
@@ -65,7 +71,7 @@ func (c ErpOrderShippingAddress) Save() revel.Result {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！"})
 		}
 
-		//todo: 地址修改近订单历史，SKU修改也一样进订单历史
+		order_history_service.Insert_order_history(order, login_user.UserId, fmt.Sprintf("订单地址修改， 工号： %s", login_user.LoginName), db_session)
 	}
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: "数据保存成功!"})
