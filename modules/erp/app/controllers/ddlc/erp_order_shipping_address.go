@@ -55,13 +55,17 @@ func (c ErpOrderShippingAddress) Save() revel.Result {
 			})
 		}
 
-		var update_cols = []string{"name", "street1", "street2", "city_name", "province", "country", "country_name", "postal_code", "phone"}
+		order_shipping_address.Modified = 1
+
+		var update_cols = []string{"name", "street1", "street2", "city_name", "province", "country", "country_name", "postal_code", "phone", "modified"}
 		affected, err = db_session.Id(order_shipping_address.Id).Cols(update_cols...).Update(&order_shipping_address)
 		core.HandleError(err)
 
 		if affected == 0 {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！"})
 		}
+
+		//todo: 地址修改近订单历史，SKU修改也一样进订单历史
 	}
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: "数据保存成功!"})
