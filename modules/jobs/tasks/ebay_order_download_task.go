@@ -22,6 +22,7 @@ import (
 	"matrix/modules/erp/models/ddpz_models"
 )
 
+// 已经废弃不用
 type EBayOrderDownloadTask struct {
 }
 

@@ -13,6 +13,7 @@ import (
 	"matrix/modules/erp/models/kcgl_models"
 	"matrix/modules/erp/models/xtpz_models"
 	"matrix/modules/erp/models/sppz_models"
+	"matrix/modules/erp/service/product_bind_service"
 )
 
 const log_response_xml_to_file = false
@@ -180,28 +181,48 @@ func fetch_product_item_to_db(config xtpz_models.EBayAPIConfigInfo, db_session *
 	item_response := fetch_product_item(config, item_id)
 
 	item_sku := item_response.Item.Sku
-	var product kcgl_models.ProductInfo
-	has_product, err := db_session.Where(fmt.Sprintf("sku = '%s'", item_sku)).Get(&product)
-	core.HandleError(err)
 
-	product.Sku = item_response.Item.Sku
-	product.ImageUrl = core.MakeNullString(item_response.Item.PictureDetails.GalleryUrl, true)
+	var product_id int64 = 0
+	var product_bind_id int64 = 0
 
-	if product.StatusId == 0 {
-		product.StatusId = models.PRODUCT_STATUS_ZC
-	}
+	var is_bind_sku = product_bind_service.Is_product_bind_sku(item_sku, db_session)
 
-	if has_product == false {
-		// do insert
-		product.Name = item_response.Item.Title
-		product.CnName = product.Sku
-		_, err = db_session.Insert(&product)
+	if is_bind_sku {
+		// 如果是绑定的SKU
+		// 这时不需要新增或者更新商品SKU
+		var product_bind kcgl_models.ProductBindInfo
+		_, err := db_session.Where("code = ?", item_sku).Get(&product_bind)
 		core.HandleError(err)
+
+		product_bind_id = product_bind.Id
 	} else {
-		// do update
-		update_col_list := []string{"sku", "name", "image_url"}
-		_, err = db_session.Id(product.Id).Cols(update_col_list...).Update(&product)
+		// 如果不是绑定的SKU
+
+		var product kcgl_models.ProductInfo
+		has_product, err := db_session.Where(fmt.Sprintf("sku = '%s'", item_sku)).Get(&product)
 		core.HandleError(err)
+
+		product.Sku = item_response.Item.Sku
+		product.ImageUrl = core.MakeNullString(item_response.Item.PictureDetails.GalleryUrl, true)
+
+		if product.StatusId == 0 {
+			product.StatusId = models.PRODUCT_STATUS_ZC
+		}
+
+		if has_product == false {
+			// do insert
+			product.Name = item_response.Item.Title
+			product.CnName = product.Sku
+			_, err = db_session.Insert(&product)
+			core.HandleError(err)
+		} else {
+			// do update
+			update_col_list := []string{"sku", "name", "image_url"}
+			_, err = db_session.Id(product.Id).Cols(update_col_list...).Update(&product)
+			core.HandleError(err)
+		}
+
+		product_id = product.Id
 	}
 
 	//todo: ebay_common.go:198: Error 1364: Field 'length' doesn't have a default value 错误来之服务器日志
@@ -212,7 +233,8 @@ func fetch_product_item_to_db(config xtpz_models.EBayAPIConfigInfo, db_session *
 	has_product_store_item, err := db_session.Where(fmt.Sprintf("shop_id = %d AND item_id = '%s'", config.ShopId, item_response.Item.ItemId)).Get(&product_store_item)
 	core.HandleError(err)
 
-	product_store_item.ProductId = product.Id
+	product_store_item.ProductId = product_id
+	product_store_item.ProductBindId = product_bind_id
 	product_store_item.ShopId = config.ShopId
 	product_store_item.ItemId = item_response.Item.ItemId
 	product_store_item.ViewItemUrl = item_response.Item.ListingDetails.ViewItemUrl
@@ -228,50 +250,53 @@ func fetch_product_item_to_db(config xtpz_models.EBayAPIConfigInfo, db_session *
 
 	// product store item end
 
-	// 同步商品图片 begin
+	if is_bind_sku == false {
+		// 同步商品图片 begin
 
-	// 插入商品图片，注意有时是更新图片不是插入图片
-	// 如果这个商品的这个图片URL已经存在，就不做插入了
+		// 插入商品图片，注意有时是更新图片不是插入图片
+		// 如果这个商品的这个图片URL已经存在，就不做插入了
 
-	// 获得这个商品的所有图片
-	var product_image_list_in_db = make([]kcgl_models.ProductImageInfo, 0)
-	err = db_session.Where(fmt.Sprintf("product_id = %d", product.Id)).Find(&product_image_list_in_db)
-	core.HandleError(err)
+		// 获得这个商品的所有图片
+		var product_image_list_in_db = make([]kcgl_models.ProductImageInfo, 0)
+		err = db_session.Where(fmt.Sprintf("product_id = %d", product_id)).Find(&product_image_list_in_db)
+		core.HandleError(err)
 
-	// 插入数据库中没有的图片
-	var product_image_url_map_in_db = make(map[string]int)
-	for _, product_image_in_db := range product_image_list_in_db {
-		product_image_url_map_in_db[product_image_in_db.Url] = 1
-	}
-
-	for _, product_image_url_download := range item_response.Item.PictureDetails.PictureUrls {
-		if _, found := product_image_url_map_in_db[product_image_url_download]; found == false {
-
-			var product_image kcgl_models.ProductImageInfo
-			product_image.ProductId = product.Id
-			product_image.ProductCode = product.Sku
-			product_image.TypeId = kcgl_models.PRODUCT_IMAGE_TYPE_CCTP
-			product_image.ShopId = config.ShopId
-			product_image.Url = product_image_url_download
-
-			_, err := db_session.Insert(product_image)
-			core.HandleError(err)
+		// 插入数据库中没有的图片
+		var product_image_url_map_in_db = make(map[string]int)
+		for _, product_image_in_db := range product_image_list_in_db {
+			product_image_url_map_in_db[product_image_in_db.Url] = 1
 		}
-	}
 
-	// 删除数据库中多余的图片
-	var product_image_url_map_download = make(map[string]int)
-	for _, product_image_url_download := range item_response.Item.PictureDetails.PictureUrls {
-		product_image_url_map_download[product_image_url_download] = 1
-	}
+		for _, product_image_url_download := range item_response.Item.PictureDetails.PictureUrls {
+			if _, found := product_image_url_map_in_db[product_image_url_download]; found == false {
 
-	for _, product_image_in_db := range product_image_list_in_db {
-		if _, found := product_image_url_map_download[product_image_in_db.Url]; found == false {
-			db_session.Id(product_image_in_db.Id).Delete(new(kcgl_models.ProductImageInfo))
+				var product_image kcgl_models.ProductImageInfo
+				product_image.ProductId = product_id
+				product_image.ProductCode = item_sku
+				product_image.TypeId = kcgl_models.PRODUCT_IMAGE_TYPE_CCTP
+				product_image.ShopId = config.ShopId
+				product_image.Url = product_image_url_download
+
+				_, err := db_session.Insert(product_image)
+				core.HandleError(err)
+			}
 		}
+
+		// 删除数据库中多余的图片
+		var product_image_url_map_download = make(map[string]int)
+		for _, product_image_url_download := range item_response.Item.PictureDetails.PictureUrls {
+			product_image_url_map_download[product_image_url_download] = 1
+		}
+
+		for _, product_image_in_db := range product_image_list_in_db {
+			if _, found := product_image_url_map_download[product_image_in_db.Url]; found == false {
+				db_session.Id(product_image_in_db.Id).Delete(new(kcgl_models.ProductImageInfo))
+			}
+		}
+
+		// 同步商品图片 end
+
 	}
 
-	// 同步商品图片 end
-
-	return product.Id, product.Sku, product_store_item.Id
+	return product_id, item_sku, product_store_item.Id
 }
