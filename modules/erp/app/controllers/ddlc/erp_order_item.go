@@ -13,6 +13,7 @@ import (
 	"matrix/modules/erp/models/kcgl_models"
 	"matrix/modules/erp/models/ddlc_models"
 	"matrix/modules/erp/models/ddpz_models"
+	"matrix/modules/erp/service/order_history_service"
 )
 
 type ErpOrderItem struct {
@@ -133,9 +134,13 @@ func (c ErpOrderItem) Save() revel.Result {
 		order_item.CostPrice = inventory_service.GetProductStockCostPrice(stock_id, product.Id, db_session) / order.ExchangeRate
 	}
 
+	var login_user = core.GetLoginUser(c.Session)
+
 	if order_item_form.ItemId == 0 {
 		_, err = db_session.Insert(&order_item)
 		core.HandleError(err)
+
+		order_history_service.Insert_order_history(order, login_user.UserId, fmt.Sprintf("新增订单明细， SKU: %s, 工号： %s", order_item.ItemSku, login_user.LoginName), db_session)
 	} else {
 		var update_cols = []string{"item_product_id", "item_sku", "quantity", "cost_price", "transaction_price_currency"}
 		if order.TypeId == ddpz_models.ORDER_TYPE_SGCJ {
@@ -144,6 +149,8 @@ func (c ErpOrderItem) Save() revel.Result {
 
 		_, err = db_session.Id(order_item_form.ItemId).Cols(update_cols...).Update(&order_item)
 		core.HandleError(err)
+
+		order_history_service.Insert_order_history(order, login_user.UserId, fmt.Sprintf("修改订单明细， SKU: %s, 工号： %s", order_item.ItemSku, login_user.LoginName), db_session)
 	}
 
 	// 如果是 手工创建的的订单的，需要更新收款金额
@@ -220,6 +227,9 @@ func (c ErpOrderItem) Delete() revel.Result {
 
 	_, err = db_session.Id(item_id).Delete(new(ddlc_models.OrderItemInfo))
 	core.HandleError(err)
+
+	var login_user = core.GetLoginUser(c.Session)
+	order_history_service.Insert_order_history(order, login_user.UserId, fmt.Sprintf("删除订单明细，SKU: %s， 工号： %s", order_item.ItemSku, login_user.LoginName), db_session)
 
 	return c.RenderJson(map[string]interface{}{
 		"success": true,
