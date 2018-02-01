@@ -31,6 +31,7 @@ import (
 	"matrix/modules/erp/models/sppz_models"
 	"matrix/modules/erp/models/ddlc_models"
 	"math"
+	"strconv"
 )
 
 type ErpOrder struct {
@@ -2001,5 +2002,84 @@ func (c ErpOrder) HuiFu() revel.Result {
 	return c.RenderJson(map[string]interface{}{
 		"success": true,
 		"message": "订单恢复成功！",
+	})
+}
+
+func (c ErpOrder) ReShip() revel.Result {
+	var db_session = c.DbSession
+
+	var order_id int64
+	c.Params.Bind(&order_id, "order_id")
+
+	// 1 复制订单
+	// 1.1 获取现在的订单
+	var order ddlc_models.OrderInfo
+	has, err := db_session.Id(order_id).Get(&order)
+	core.HandleError(err)
+
+	if (has == false) {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "指定的订单id不存在！",
+		})
+	}
+
+	// 1.2 生成新的订单的编号
+	var new_order_code = ""
+	if strings.Contains(order.Code, "-") {
+		var order_code_splits = strings.Split(order.Code, "-")
+		code_num, err := strconv.ParseInt(order_code_splits[1], 10, 64)
+		core.HandleError(err)
+		new_order_code = fmt.Sprintf("%s-%d", order_code_splits[0], code_num+1)
+	}
+
+	// 1.3 保存新的订单信息
+	var new_order ddlc_models.OrderInfo
+	new_order = order
+	new_order.Code = new_order_code // 使用新的订单编号
+
+	// 重发复制订单时， 收款，平台交易费，付款交易费都没有，但有拣货费
+	new_order.AmountPaid = 0
+	new_order.AmountPaidRmb = 0
+	new_order.TotalAmount = 0
+	new_order.TotalAmountRmb = 0
+	new_order.AdjustmentAmount = 0
+	new_order.AdjustmentAmountRmb = 0
+	new_order.Ptfy = 0
+	new_order.Jyfy = 0
+
+	new_order.AddressId = 0 // 先把地址置空，等会儿再填入新的地址id
+
+	new_order.StatusId = models.ORDER_STATUS_YCJ // 设置重发订单的初始状态为已创建
+
+	_, err = db_session.Insert(&new_order)
+	core.HandleError(err)
+
+	var new_order_id int64 = new_order.Id
+
+	// 2 复制明细
+
+	// 2.1 获取原来订单的明细列表
+	var order_item_list = make([]ddlc_models.OrderItemInfo, 0)
+	err = db_session.Where("order_id = ?", order_id).Find(&order_item_list)
+	core.HandleError(err)
+
+	// 2.2 保存为新的订单的明细
+	for _, order_item := range order_item_list {
+		order_item.Id = 0                 // 置空 id 让数据库重新生成id
+		order_item.OrderId = new_order_id //设置为新的订单的订单 id
+
+		_, err = db_session.Insert(&order_item)
+		core.HandleError(err)
+	}
+
+	// 3 复制地址
+
+	// 4 复制订单物流
+
+	return c.RenderJson(map[string]interface{}{
+		"success":      true,
+		"message":      "订单重发复制成功！",
+		"new_order_id": new_order_id, // 重发复制后的 “新” 的订单id
 	})
 }
