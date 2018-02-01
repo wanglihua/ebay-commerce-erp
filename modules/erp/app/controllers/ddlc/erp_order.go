@@ -2028,9 +2028,19 @@ func (c ErpOrder) ReShip() revel.Result {
 	}
 
 	// 1.2 生成新的订单的编号
-	var new_order_code = ""
+	var code_prefix string = order.Code
 	if strings.Contains(order.Code, "-") {
 		var order_code_splits = strings.Split(order.Code, "-")
+		code_prefix = order_code_splits[0]
+	}
+
+	var max_code_order ddlc_models.OrderInfo
+	_, err = db_session.Where(fmt.Sprintf("code LIKE '%s%%'", code_prefix)).OrderBy("code DESC").Limit(1).Get(&max_code_order)
+	core.HandleError(err)
+
+	var new_order_code = fmt.Sprintf("%s-1", max_code_order.Code)
+	if strings.Contains(max_code_order.Code, "-") {
+		var order_code_splits = strings.Split(max_code_order.Code, "-")
 		code_num, err := strconv.ParseInt(order_code_splits[1], 10, 64)
 		core.HandleError(err)
 		new_order_code = fmt.Sprintf("%s-%d", order_code_splits[0], code_num+1)
@@ -2039,6 +2049,7 @@ func (c ErpOrder) ReShip() revel.Result {
 	// 1.3 保存新的订单信息
 	var new_order ddlc_models.OrderInfo
 	new_order = order
+	new_order.Id = 0                // 置空 id 让数据库重新生成id
 	new_order.Code = new_order_code // 使用新的订单编号
 
 	// 重发复制订单时， 收款，平台交易费，付款交易费都没有，但有拣货费， 利润先置零

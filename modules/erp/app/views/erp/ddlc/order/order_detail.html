@@ -87,16 +87,16 @@
                     </div>
 
                     <hr style="margin-top: 5px;margin-bottom: 5px;"/>
-					
-					<div class="row">
-						<div class="col-xs-12" style="text-align:right; margin-top: 5px;">
-							<button class="btn btn-sm" style="border-width: 2px; padding: 3px 5px;" onclick="save_order_desc()">保存描述</button>
-							{% if .can_reship %}
+
+                    <div class="row">
+                        <div class="col-xs-12" style="text-align:right; margin-top: 5px;">
+                            <button class="btn btn-sm" style="border-width: 2px; padding: 3px 5px;" onclick="save_order_desc()">保存描述</button>
+                            {% if .can_reship %}
                             <button class="btn btn-sm btn-primary" style="border-width: 2px; padding: 3px 5px;" onclick="reship_order()">重发订单</button>
-							{% end %}
-						</div>
-					</div>
-					
+                            {% end %}
+                        </div>
+                    </div>
+
                     <div class="row">
                         <div class="col-xs-12" style="text-align: right;">
                             {% if or .is_hold .is_dph %}
@@ -1277,11 +1277,11 @@
             }
         }
     });
-	
+
     function reship_order() {
         $.ajax({
             "dataType": 'json',
-			"type": "POST",
+            "type": "POST",
             "url": '{% url "ErpOrder.ReShip"%}',
             "data": {
                 "order_id": order_id
@@ -1291,12 +1291,12 @@
                     $.msg.error(data.message);
                     return;
                 }
-                vm.detail = data;
-                vm.order_item_detail = {};
-                vm.order_item_detail.order_id = order_id;
+
+                setTimeout("window.location.href = '/order/detail/" + data.new_order_id + "'", 1000);
+                $.msg.show(data.message)
             }
         });
-    }	
+    }
 
     function load_order_detail() {
         $.ajax({
@@ -1310,8 +1310,10 @@
                     $.msg.error(data.message);
                     return;
                 }
-				setTimeout("window.location.href = '/order/detail/" + data.new_order_id + "'", 1000);
-				$.msg.show(data.message)
+
+                vm.detail = data;
+                vm.order_item_detail = {};
+                vm.order_item_detail.order_id = order_id;
             }
         });
     }
