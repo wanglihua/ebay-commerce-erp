@@ -789,6 +789,9 @@ func (c ErpOrder) Detail(order_id int64) revel.Result {
 
 	c.RenderArgs["is_pickup_paid"] = is_pickup_paid
 
+	var can_reship = order.StatusId == models.ORDER_STATUS_YFH || order.StatusId == models.ORDER_STATUS_YWC
+	c.RenderArgs["can_reship"] = can_reship
+
 	return c.RenderTemplate("erp/ddlc/order/order_detail.html")
 }
 

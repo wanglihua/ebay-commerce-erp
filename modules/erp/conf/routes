@@ -401,6 +401,7 @@ POST /order/rematch/hold/order/logistics   ErpOrder.ReMatchHoldOrderLogistics
 POST /order/pickup/dai/pei/huo             ErpOrder.PickupDaiPeiHuo
 POST /order/save/pickup/actual             ErpOrder.SavePickupActual
 POST /order/save/desc                      ErpOrder.SaveDesc
+POST /order/reship                         ErpOrder.ReShip
 
 POST /order/shipping/address/save           ErpOrderShippingAddress.Save
 POST /order/waybill/number/save             ErpOrderWaybillNumber.Save
