@@ -259,7 +259,7 @@ func (p_ol *OrderLogisticsService) hold_check_great_deficit(p_order *ddlc_models
 	var cost_amount = order_logistics.CostAmount                     // 到仓总成本，澳币
 	*/
 
-	//设置一下 order_logistics 的 ptfl 和 jyfl
+	//设置一下 order_logistics 的 ptfl 和 jyfl，后来这些费用都是下载的了，设置了ptfl,jyfl也没用得了
 	order_logistics.Ptfl = p_ol.logistics_setting.Ptfl
 	order_logistics.Jyfl = p_ol.logistics_setting.Jyfl
 

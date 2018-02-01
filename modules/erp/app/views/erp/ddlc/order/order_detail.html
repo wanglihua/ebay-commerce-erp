@@ -320,10 +320,10 @@
                                         AUD {{ format_amount(detail.order_gst) }}
                                     </td>
                                     <td class="dtRight">
-                                        AUD {{ format_amount(detail.order.amount_paid * detail.order_logistics.ptfl) }}
+                                        AUD {{ format_amount(detail.order.ptfy) }}
                                     </td>
                                     <td class="dtRight">
-                                        AUD {{ format_amount(detail.order.amount_paid * detail.order_logistics.jyfl) }}
+                                        AUD {{ format_amount(detail.order.jyfy) }}
                                     </td>
                                     <td class="dtRight">
                                         AUD {{ format_amount(detail.order_logistics.pick_fee) }}
@@ -350,10 +350,10 @@
                                         RMB {{ format_amount(detail.order_gst * detail.order.exchange_rate) }}
                                     </td>
                                     <td class="dtRight">
-                                        RMB {{ format_amount(detail.order.amount_paid_rmb* detail.order_logistics.ptfl) }}
+                                        RMB {{ format_amount(detail.order.ptfy) }}
                                     </td>
                                     <td class="dtRight">
-                                        RMB {{ format_amount(detail.order.amount_paid_rmb*detail.order_logistics.jyfl) }}
+                                        RMB {{ format_amount(detail.order.jyfy) }}
                                     </td>
                                     <td class="dtRight">
                                         RMB {{ format_amount(detail.order_logistics.pick_fee*detail.order.exchange_rate) }}

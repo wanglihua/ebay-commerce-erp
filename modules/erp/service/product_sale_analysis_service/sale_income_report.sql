@@ -18,8 +18,8 @@ CREATE PROCEDURE sale_income_report()
         DECLARE v_logistics_fee DECIMAL(18, 6);
         DECLARE v_estimate_logistics_fee DECIMAL(18, 6);
         DECLARE v_actual_logistics_fee DECIMAL(18, 6);
-        DECLARE v_jyfl DECIMAL(18, 6);
-        DECLARE v_ptfl DECIMAL(18, 6);
+        DECLARE v_jyfl DECIMAL(18, 6); # 后来没有使用这里面的值
+        DECLARE v_ptfl DECIMAL(18, 6); # 后来没有使用这里面的值
         DECLARE v_jyfy_amount DECIMAL(18, 6);
         DECLARE v_ptfy_amount DECIMAL(18, 6);
         DECLARE v_pick_fee DECIMAL(18, 6);
@@ -62,7 +62,9 @@ CREATE PROCEDURE sale_income_report()
                 o.shop_id       AS shop_id,
                 o.amount_paid   AS paid_amount,
                 o.express_fee   AS express_fee,
-                o.exchange_rate AS exchange_rate
+                o.exchange_rate AS exchange_rate,
+                o.ptfy          AS ptfy,
+                o.jyfy          AS jyfy
             FROM erp_order o
             WHERE o.paid_time >= date_add(v_latest_reported_paid_time, INTERVAL -3 DAY);
         # 退后 15 天是等待后面的实际物流数据的录入
@@ -95,7 +97,7 @@ CREATE PROCEDURE sale_income_report()
         order_loop: LOOP
 
             SET done = FALSE;
-            FETCH order_cur INTO v_order_id, v_paid_time, v_shop_id, v_paid_amount, v_express_fee, v_exchange_rate;
+            FETCH order_cur INTO v_order_id, v_paid_time, v_shop_id, v_paid_amount, v_express_fee, v_exchange_rate, v_ptfy_amount, v_jyfy_amount;
 
             IF done
             THEN
@@ -164,8 +166,9 @@ CREATE PROCEDURE sale_income_report()
                 SET v_pick_fee = 0;
             END IF;
 
-            SET v_jyfy_amount = v_paid_amount * v_jyfl;
-            SET v_ptfy_amount = v_paid_amount * v_ptfl;
+            # 采用新的处理方式
+            # SET v_jyfy_amount = v_paid_amount * v_jyfl;
+            # SET v_ptfy_amount = v_paid_amount * v_ptfl;
 
             SET v_gst_fee = v_paid_amount * 0.1;
 

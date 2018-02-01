@@ -222,6 +222,7 @@
 
                                     <hr/>
 
+                                    {%/*
                                     <div class="row">
                                         <div class="col-xs-6">
                                             <div class="form-group">
@@ -243,7 +244,7 @@
                                             </div>
                                         </div>
                                     </div>
-
+                                    */%}
                                     <div class="row">
                                         <div class="col-xs-6">
                                             <div class="form-group">
@@ -312,23 +313,23 @@
         showMask("加载中...");
         $("#logisticsSettingDetailForm").clearValidation();
         $.ajax({
-                url: '{%url "ErpLogisticsSetting.DetailData" %}',
-                type: "POST",
-                success: function (result) {
-                    hideMask();
-                    if (result.success == false) {
-                        $.msg.error(result.message);
-                        return;
-                    }
+                    url: '{%url "ErpLogisticsSetting.DetailData" %}',
+                    type: "POST",
+                    success: function (result) {
+                        hideMask();
+                        if (result.success == false) {
+                            $.msg.error(result.message);
+                            return;
+                        }
 
-                    if (this_vm === void(0) || this_vm.detail === void(0)) {
-                        vm.detail = result;
-                    }
-                    else {
-                        this_vm.detail = result;
+                        if (this_vm === void(0) || this_vm.detail === void(0)) {
+                            vm.detail = result;
+                        }
+                        else {
+                            this_vm.detail = result;
+                        }
                     }
                 }
-            }
         );
     }
 
@@ -389,25 +390,25 @@
                     hideMask();
                 } else {
                     $.ajax(
-                        {
-                            url: '{%url "ErpLogisticsSetting.Save"%}',
-                            type: "POST",
-                            processData: false,
-                            contentType: 'application/json',
-                            data: JSON.stringify(vm.detail),
-                            success: function (data) {
-                                hideMask();
-                                if (data.success === false) {
-                                    $.msg.error(data.message);
-                                    //return;
-                                }
-                                else {
-                                    vm.detail = data.detail;
-                                    $.msg.show(data.message);
-                                    //return;
+                            {
+                                url: '{%url "ErpLogisticsSetting.Save"%}',
+                                type: "POST",
+                                processData: false,
+                                contentType: 'application/json',
+                                data: JSON.stringify(vm.detail),
+                                success: function (data) {
+                                    hideMask();
+                                    if (data.success === false) {
+                                        $.msg.error(data.message);
+                                        //return;
+                                    }
+                                    else {
+                                        vm.detail = data.detail;
+                                        $.msg.show(data.message);
+                                        //return;
+                                    }
                                 }
                             }
-                        }
                     );
                 }
             }
