@@ -2017,7 +2017,7 @@ func (c ErpOrder) ReShip() revel.Result {
 	has, err := db_session.Id(order_id).Get(&order)
 	core.HandleError(err)
 
-	if (has == false) {
+	if has == false {
 		return c.RenderJson(map[string]interface{}{
 			"success": false,
 			"message": "指定的订单id不存在！",
@@ -2038,7 +2038,7 @@ func (c ErpOrder) ReShip() revel.Result {
 	new_order = order
 	new_order.Code = new_order_code // 使用新的订单编号
 
-	// 重发复制订单时， 收款，平台交易费，付款交易费都没有，但有拣货费
+	// 重发复制订单时， 收款，平台交易费，付款交易费都没有，但有拣货费， 利润先置零
 	new_order.AmountPaid = 0
 	new_order.AmountPaidRmb = 0
 	new_order.TotalAmount = 0
@@ -2047,6 +2047,8 @@ func (c ErpOrder) ReShip() revel.Result {
 	new_order.AdjustmentAmountRmb = 0
 	new_order.Ptfy = 0
 	new_order.Jyfy = 0
+	new_order.ProfitAu = 0
+	new_order.ProfitRmb = 0
 
 	new_order.AddressId = 0 // 先把地址置空，等会儿再填入新的地址id
 
@@ -2075,7 +2077,42 @@ func (c ErpOrder) ReShip() revel.Result {
 
 	// 3 复制地址
 
+	// 3.1 获取原来订单的地址
+	var order_shipping_address_list = make([]ddlc_models.OrderShippingAddressInfo, 0)
+	err = db_session.Where("order_id = ?", order_id).Find(&order_shipping_address_list)
+	core.HandleError(err)
+
+	// 3.2 保存为新的订单地址
+	var order_shipping_address_id int64 = 0
+	for _, order_shipping_address := range order_shipping_address_list {
+		order_shipping_address.Id = 0                 // 置空 id 让数据库重新生成id
+		order_shipping_address.OrderId = new_order_id //设置为新的订单的订单 id
+
+		_, err = db_session.Insert(&order_shipping_address)
+		core.HandleError(err)
+
+		if order_shipping_address_id == 0 {
+			order_shipping_address_id = order_shipping_address.Id
+		}
+	}
+
+	// 3.3 更新订单地址id
+	new_order.AddressId = order_shipping_address_id
+	_, err = db_session.Id(new_order_id).Cols("address_id").Update(&new_order)
+	core.HandleError(err)
+
 	// 4 复制订单物流
+	var order_logistics_list = make([]ddlc_models.OrderLogisticsInfo, 0) // 用列表的方式，其实总是只有一个数据
+	err = db_session.Where("order_id = ?", order_id).Find(&order_logistics_list)
+	core.HandleError(err)
+
+	for _, order_logistics := range order_logistics_list {
+		order_logistics.Id = 0                 // 置空 id 让数据库重新生成id
+		order_logistics.OrderId = new_order_id //设置为新的订单的订单 id
+
+		_, err = db_session.Insert(&order_logistics)
+		core.HandleError(err)
+	}
 
 	return c.RenderJson(map[string]interface{}{
 		"success":      true,
