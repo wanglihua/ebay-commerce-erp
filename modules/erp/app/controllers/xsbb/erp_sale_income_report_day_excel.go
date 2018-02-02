@@ -92,7 +92,7 @@ func (c ErpSaleIncomeReportDayExcel) Export() revel.Result {
 		sum(r.income - r.outcome) / sum(r.income) * 100 AS profit_rate,
 	    count(DISTINCT r.order_id)                      AS order_qty,
     	sum(r.product_qty)                              AS product_qty
-	FROM erp_sale_amount_report r
+	FROM erp_sale_income_report r
 	WHERE r.platform_id = 0
 		  AND r.shop_id = 0
 		  AND r.paid_time >= '2006-01-01'
@@ -124,7 +124,7 @@ SELECT
     sum(r.income - r.outcome) / sum(r.income) * 100 AS profit_rate,
     count(DISTINCT r.order_id)                      AS order_qty,
     sum(r.product_qty)                              AS product_qty
-FROM erp_sale_amount_report r
+FROM erp_sale_income_report r
 WHERE %s
 GROUP BY date_format(r.paid_time, '%%Y-%%m-%%d')
 ORDER BY %s;
@@ -146,7 +146,7 @@ ORDER BY %s;
 
 	reader := bytes.NewReader(buffer.Bytes()) //bytes.Reader 实现了 io.Reader 接口
 
-	file_name := "日销售额报表.xlsx" //"file.xlsx" //可以根据参数生成文件名
+	file_name := "日收入报表.xlsx" //"file.xlsx" //可以根据参数生成文件名
 
 	return c.RenderBinary(reader, file_name, revel.Attachment, time.Now())
 }
