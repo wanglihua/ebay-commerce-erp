@@ -57,14 +57,14 @@ CREATE PROCEDURE sale_income_report()
         -- 游标
         DECLARE order_cur CURSOR FOR
             SELECT
-                o.id            AS order_id,
-                o.paid_time     AS paid_time,
-                o.shop_id       AS shop_id,
-                o.amount_paid   AS paid_amount,
-                o.express_fee   AS express_fee,
-                o.exchange_rate AS exchange_rate,
-                o.ptfy          AS ptfy,
-                o.jyfy          AS jyfy
+                o.id              AS order_id,
+                o.paid_time       AS paid_time,
+                o.shop_id         AS shop_id,
+                o.amount_paid     AS paid_amount,
+                o.express_fee     AS express_fee,
+                o.exchange_rate   AS exchange_rate,
+                ifnull(o.ptfy, 0) AS ptfy,
+                ifnull(o.jyfy, 0) AS jyfy
             FROM erp_order o
             WHERE o.paid_time >= date_add(v_latest_reported_paid_time, INTERVAL -3 DAY);
         # 退后 15 天是等待后面的实际物流数据的录入
