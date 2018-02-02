@@ -11,6 +11,7 @@ const (
 	ORDER_TYPE_CFDD = 1030 // 拆分订单
 	ORDER_TYPE_HBDD = 1040 // 合并订单
 	ORDER_TYPE_DRDD = 1050 // 导入订单
+	ORDER_TYPE_RSDD = 1060 // 重发订单 ReShip
 )
 
 type OrderTypeInfo struct {
@@ -59,5 +60,11 @@ func (e OrderTypeInfo) InitData(db_session *xorm.Session) {
 	order_type.Id = ORDER_TYPE_DRDD
 	order_type.Name = "导入订单"
 	order_type.Desc = core.MakeNullString("订单类型 导入订单", true)
+	db_session.Insert(order_type)
+
+	order_type = new(OrderTypeInfo)
+	order_type.Id = ORDER_TYPE_RSDD
+	order_type.Name = "重发订单"
+	order_type.Desc = core.MakeNullString("订单类型 重发订单", true)
 	db_session.Insert(order_type)
 }

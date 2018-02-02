@@ -2051,6 +2051,11 @@ func (c ErpOrder) ReShip() revel.Result {
 	new_order = order
 	new_order.Id = 0                // 置空 id 让数据库重新生成id
 	new_order.Code = new_order_code // 使用新的订单编号
+	var time_now = core.NullLongTimeFrom(time.Now())
+	new_order.CreatedTime = time_now
+	new_order.PaidTime = time_now
+	new_order.CreateTime = core.Time(time.Now())
+	new_order.UpdateTime = core.Time(time.Now())
 
 	// 重发复制订单时， 收款，平台交易费，付款交易费都没有，但有拣货费， 利润先置零
 	new_order.AmountPaid = 0
@@ -2066,7 +2071,8 @@ func (c ErpOrder) ReShip() revel.Result {
 
 	new_order.AddressId = 0 // 先把地址置空，等会儿再填入新的地址id
 
-	new_order.StatusId = models.ORDER_STATUS_YCJ // 设置重发订单的初始状态为已创建
+	new_order.StatusId = models.ORDER_STATUS_YZF   // 设置重发订单的初始状态为已支付
+	new_order.TypeId = ddpz_models.ORDER_TYPE_RSDD // 设置重发订单的初始状态为已支付
 
 	_, err = db_session.Insert(&new_order)
 	core.HandleError(err)
