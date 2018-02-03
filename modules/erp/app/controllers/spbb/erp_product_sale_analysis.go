@@ -191,7 +191,7 @@ func (c ErpProductSaleAnalysis) Export() revel.Result {
 
 	var product_sale_analysis_setting = product_sale_analysis_setting_service.Get_product_sale_analysis_setting(db_session)
 
-	var filter = "1=1";
+	var filter = "1=1"
 
 	/*
 SELECT sa.*, s.*
