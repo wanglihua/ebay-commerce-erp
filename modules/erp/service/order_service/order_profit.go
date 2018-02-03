@@ -17,5 +17,6 @@ func CalculateOrderProfit(p_order *ddlc_models.OrderInfo, p_order_logistics *ddl
 
 	// return p_order.AmountPaid + p_order.ExpressFee - p_order.AmountPaid*(p_order_logistics.Ptfl+p_order_logistics.Jyfl) - order_logistics_total_fee - p_order_logistics.PickFee - order_gst - p_order_logistics.CostAmount
 
-	return p_order.AmountPaid + p_order.ExpressFee - p_order.Ptfy - p_order.Jyfy - order_logistics_total_fee - p_order_logistics.PickFee - order_gst - p_order_logistics.CostAmount
+	// return p_order.AmountPaid + p_order.ExpressFee - p_order.Ptfy - p_order.Jyfy - order_logistics_total_fee - p_order_logistics.PickFee - order_gst - p_order_logistics.CostAmount
+	return p_order.AmountPaid - p_order.Ptfy - p_order.Jyfy - order_logistics_total_fee - p_order_logistics.PickFee - order_gst - p_order_logistics.CostAmount
 }

@@ -249,7 +249,7 @@ func (p_ol *OrderLogisticsService) hold_check_product_info_miss(p_order *ddlc_mo
 // 13 // 匹配最佳仓库及物流后订单亏损。需要在基础设置里面有设置亏损额或者亏损率的设置功能，超过设置范围了，自动到订单亏损hold
 func (p_ol *OrderLogisticsService) hold_check_great_deficit(p_order *ddlc_models.OrderInfo, p_order_logistics_data *order_logistics_data_t, order_logistics ddlc_models.OrderLogisticsInfo, db_session *xorm.Session) (is_hold_return bool) {
 	var amount_paid = p_order.AmountPaid //收款金额，澳币
-	var express_fee = p_order.ExpressFee // 运费收入，澳币
+	// var express_fee = p_order.ExpressFee // 运费收入，澳币
 	/*
 	var order_gst float64 = order_service.Get_order_gst_fee(p_order) // GST消费税，澳币
 	var platform_fee = amount_paid * p_ol.logistics_setting.Ptfl     // 平台交易费， 澳币
@@ -266,7 +266,7 @@ func (p_ol *OrderLogisticsService) hold_check_great_deficit(p_order *ddlc_models
 	var profit = order_service.CalculateOrderProfit(p_order, &order_logistics)
 
 	// 利润小于零，并且亏损价格大于最大价格或者亏损率大于最大亏损率
-	if profit < 0 && ((math.Abs(profit) > p_ol.logistics_setting.MaxDeficitPrice) || (math.Abs(profit)/(amount_paid+express_fee) > p_ol.logistics_setting.MaxDeficitRate)) {
+	if profit < 0 && ((math.Abs(profit) > p_ol.logistics_setting.MaxDeficitPrice) || (math.Abs(profit)/amount_paid > p_ol.logistics_setting.MaxDeficitRate)) {
 		p_ol.update_order_to_hold_type(p_order, ddpz_models.ORDER_HOLD_TYPE_GREAT_DEFICIT, db_session)
 		return true
 	}

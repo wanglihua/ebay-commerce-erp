@@ -598,19 +598,28 @@ SELECT sa.id AS shop_id, sa.name AS shop_name FROM erp_shop_account sa;
 			var amount_currency = "AUD"                            // 澳币的也设置一下
 			var amount_rmb = amount_au * aud_exchange_rate_setting // 汇率换算
 
-			order.AmountPaidRmb = amount_rmb
+			var express_fee float64 = order_import.Yfsr
+			var amount_total_au = amount_au + express_fee
+			var amount_total_rmb = amount_total_au * aud_exchange_rate_setting
+
+			order.AmountPaidRmb = amount_total_rmb
 			order.AmountPaidCurrency = amount_currency
-			order.AmountPaid = amount_au
+			order.AmountPaid = amount_total_au
 
-			order.TotalAmountRmb = amount_rmb
+			order.TotalAmountRmb = amount_total_rmb
 			order.TotalAmountCurrency = amount_currency
-			order.TotalAmount = amount_au
+			order.TotalAmount = amount_total_au
 
-			order.AdjustmentAmountRmb = amount_rmb
+			order.AdjustmentAmountRmb = amount_total_rmb
 			order.AdjustmentAmountCurrency = amount_currency
-			order.AdjustmentAmount = amount_au
+			order.AdjustmentAmount = amount_total_au
 
-			order.ExpressFee = order_import.Yfsr
+			order.SubTotalAmount = amount_au
+			order.SubTotalAmountCurrency = amount_currency
+			order.SubTotalAmountRmb = amount_rmb
+
+			order.ExpressFee = express_fee
+
 			order.BuyerUserId = order_import.Khzh
 			order.BuyerEmail = order_import.Khyx
 			order.TypeId = ddpz_models.ORDER_TYPE_DRDD // 导入订单

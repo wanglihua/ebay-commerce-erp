@@ -45,7 +45,7 @@ func Update_order_logistics_cost_amount_and_order_profit_and_order_item_price_pr
 		// 手工创建的订单不自动计算价格和分配，其它的订单计算
 		if order.TypeId != ddpz_models.ORDER_TYPE_SGCJ {
 			// 价格分配
-			oi.TransactionPrice = oi.CostPrice * float64(oi.Quantity) * order.AmountPaid / order_cost_amount / float64(oi.Quantity)
+			oi.TransactionPrice = oi.CostPrice * float64(oi.Quantity) * order.SubTotalAmount / order_cost_amount / float64(oi.Quantity)
 			oi.TransactionPriceCurrency = "AUD"
 			oi.TransactionPriceRmb = oi.TransactionPrice * order.ExchangeRate
 		}

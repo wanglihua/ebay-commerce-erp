@@ -157,6 +157,11 @@ func (c ErpOrderNew) Save() revel.Result {
 	order.TotalAmount = order.AmountPaid
 	order.TotalAmountCurrency = "AUD"
 	order.TotalAmountRmb = order.AmountPaid * aud_exchange_rate_setting
+
+	order.SubTotalAmount = order.AmountPaid
+	order.SubTotalAmountCurrency = "AUD"
+	order.SubTotalAmountRmb = order.AmountPaid * aud_exchange_rate_setting
+
 	order.StatusId = models.ORDER_STATUS_YZF
 
 	var order_in_db ddlc_models.OrderInfo
