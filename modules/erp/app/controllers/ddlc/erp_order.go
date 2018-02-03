@@ -2034,23 +2034,42 @@ func (c ErpOrder) ReShip() revel.Result {
 		code_prefix = order_code_splits[0]
 	}
 
+	// 订单代码
+	var tran_id_prefix string = order.TranId
+	if strings.Contains(order.TranId, "-") {
+		var tran_id_splits = strings.Split(order.TranId, "-")
+		tran_id_prefix = tran_id_splits[0]
+	}
+
+	var full_tran_id_prefix string = order.FullTranId
+	if strings.Contains(order.FullTranId, "-") {
+		var full_tran_id_splits = strings.Split(order.FullTranId, "-")
+		full_tran_id_prefix = full_tran_id_splits[0]
+	}
+
 	var max_code_order ddlc_models.OrderInfo
 	_, err = db_session.Where(fmt.Sprintf("code LIKE '%s%%'", code_prefix)).OrderBy("code DESC").Limit(1).Get(&max_code_order)
 	core.HandleError(err)
 
-	var new_order_code = fmt.Sprintf("%s-1", max_code_order.Code)
+	var code_num int64 = 0
 	if strings.Contains(max_code_order.Code, "-") {
 		var order_code_splits = strings.Split(max_code_order.Code, "-")
-		code_num, err := strconv.ParseInt(order_code_splits[1], 10, 64)
+		var err error
+		code_num, err = strconv.ParseInt(order_code_splits[len(order_code_splits)-1], 10, 64)
 		core.HandleError(err)
-		new_order_code = fmt.Sprintf("%s-%d", order_code_splits[0], code_num+1)
 	}
+
+	var new_order_code = fmt.Sprintf("%s-%d", code_prefix, code_num+1)
+	var new_tran_id = fmt.Sprintf("%s-%d", tran_id_prefix, code_num+1)
+	var new_full_tran_id = fmt.Sprintf("%s-%d", full_tran_id_prefix, code_num+1)
 
 	// 1.3 保存新的订单信息
 	var new_order ddlc_models.OrderInfo
 	new_order = order
 	new_order.Id = 0                // 置空 id 让数据库重新生成id
 	new_order.Code = new_order_code // 使用新的订单编号
+	new_order.TranId = new_tran_id
+	new_order.FullTranId = new_full_tran_id
 	var time_now = core.NullLongTimeFrom(time.Now())
 	new_order.CreatedTime = time_now
 	new_order.PaidTime = time_now
