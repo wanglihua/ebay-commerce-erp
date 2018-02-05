@@ -18,6 +18,28 @@
                         刷新
                     </button>
                 </div>
+                <div class="row" style="margin-top: 20px;margin-bottom: 20px;">
+                    <div id="query" class="col-xs-12" style="line-height: 28px;">
+                        <div class="col-xs-12">
+                            <label class="control-label no-padding-right" for="item_id_query">Item Id</label>
+                            <input class="input-sm" id="item_id_query" name="item_id_query" placeholder="Item Id" type="text" style="width: 130px;"/>
+
+                            <label class="control-label no-padding-right" for="sku_query">SKU</label>
+                            <input class="input-sm" id="sku_query" name="sku_query" placeholder="SKU" type="text" style="width: 130px;"/>
+
+                            <label class="control-label no-padding-right" for="sender_id_query">发送者</label>
+                            <input class="input-sm" id="sender_id_query" name="sender_id_query" placeholder="发送者" type="text" style="width: 130px;"/>
+
+                            <label class="control-label no-padding-right" for="recipient_id_query">接收者</label>
+                            <input class="input-sm" id="recipient_id_query" name="recipient_id_query" placeholder="接收者" type="text" style="width: 130px;"/>
+
+                            <button class="btn btn-primary btn-sm" @click="refreshList();">
+                                <i class="ace-icon fa fa-search"></i>
+                                查询
+                            </button>
+                        </div>
+                    </div>
+                </div>
                 <div>
                     <table id="messageList" class="table table-striped table-bordered table-hover"></table>
                 </div>
@@ -28,14 +50,7 @@
 <script type="text/javascript">
     var vm = new Vue({
         el: "#page",
-        data: {
-            "page": {
-                "shop_id_query": 0
-            },
-            "detail": {
-                "message": {}
-            }
-        },
+        data: {},
         mounted: function () {
             var this_vm = this;
 
@@ -59,7 +74,12 @@
                             {
                                 "mDataProp": "msg.last_modified_date", "title": "店铺/item id/sku<br/>创建/修改时间", "bSearchable": false, "bSortable": false, "sClass": "center", "width": 120,
                                 "render": function (data, type, row) {
-                                    return "<div>" + row.pf.name + "&nbsp;" + row.sa.name + "</div><div><a href='" + row.psi.view_item_url + "' target='_blank'>" + row.msg.item_id + "</a></div><div><a href='/product/detail/" + row.p.id + "' target='product_detail'>" + row.msg.sku + "</a></div>" + row.msg.creation_date + "</div><div>" + row.msg.last_modified_date + "</div>";
+                                    var view_item_url = row.psi.view_item_url;
+                                    if (view_item_url === "") {
+                                        return "<div>" + row.pf.name + "&nbsp;" + row.sa.name + "</div><div>" + row.msg.item_id + "</div><div><a href='/product/detail/" + row.p.id + "' target='product_detail'>" + row.msg.sku + "</a></div>" + row.msg.creation_date + "</div><div>" + row.msg.last_modified_date + "</div>";
+                                    } else {
+                                        return "<div>" + row.pf.name + "&nbsp;" + row.sa.name + "</div><div><a href='" + view_item_url + "' target='_blank'>" + row.msg.item_id + "</a></div><div><a href='/product/detail/" + row.p.id + "' target='product_detail'>" + row.msg.sku + "</a></div>" + row.msg.creation_date + "</div><div>" + row.msg.last_modified_date + "</div>";
+                                    }
                                 }
                             },
                             {
@@ -76,11 +96,11 @@
                             }
                         ],
                         "fnServerData": function (sSource, aoData, fnCallback) {
-                            aoData.push({'name': 'shop_id_query', 'value': this_vm.page.shop_id_query});
-                            aoData.push({'name': 'item_id_query', 'value': this_vm.page.item_id_query});
-                            aoData.push({'name': 'sku_query', 'value': this_vm.page.sku_query});
-                            aoData.push({'name': 'sender_id_query', 'value': this_vm.page.sender_id_query});
-                            aoData.push({'name': 'recipient_id_query', 'value': this_vm.page.recipient_id_query});
+                            aoData.push({'name': 'shop_id_query', 'value': $("#shop_id_query").val()});
+                            aoData.push({'name': 'item_id_query', 'value': $("#item_id_query").val()});
+                            aoData.push({'name': 'sku_query', 'value': $("#sku_query").val()});
+                            aoData.push({'name': 'sender_id_query', 'value': $("#sender_id_query").val()});
+                            aoData.push({'name': 'recipient_id_query', 'value': $("#recipient_id_query").val()});
 
                             showMask("数据加载中，请稍候");
                             $.ajax({
@@ -104,6 +124,9 @@
         methods: {
             reloadList: function () {
                 reloadList('#messageList');
+            },
+            refreshList: function () {
+                refreshList('#messageList');
             }
         }
     });
