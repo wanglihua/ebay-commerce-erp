@@ -2083,6 +2083,8 @@ func (c ErpOrder) ReShip() revel.Result {
 	new_order.TotalAmountRmb = 0
 	new_order.AdjustmentAmount = 0
 	new_order.AdjustmentAmountRmb = 0
+	new_order.SubTotalAmount = 0
+	new_order.SubTotalAmountRmb = 0
 	new_order.Ptfy = 0
 	new_order.Jyfy = 0
 	new_order.ProfitAu = 0
