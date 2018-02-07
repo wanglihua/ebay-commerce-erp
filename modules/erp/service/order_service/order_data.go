@@ -294,7 +294,7 @@ WHERE oi.order_id = %d`
 // PayPal地址优先，再接下来是 eBay 地址，再是其他地址
 func Get_order_shipping_address(order_id int64, db_session *xorm.Session) ddlc_models.OrderShippingAddressInfo {
 	var order_shipping_address_list = make([]ddlc_models.OrderShippingAddressInfo, 0)
-	err := db_session.Where(fmt.Sprintf("order_id = %d", order_id)).OrderBy("address_owner DESC").Find(&order_shipping_address_list)
+	err := db_session.Where(fmt.Sprintf("order_id = %d", order_id)).OrderBy("update_time DESC").Find(&order_shipping_address_list)
 	core.HandleError(err)
 
 	for _, order_shipping_address := range order_shipping_address_list {
