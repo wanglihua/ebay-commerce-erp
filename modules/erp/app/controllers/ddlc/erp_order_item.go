@@ -180,6 +180,9 @@ WHERE oi.order_id = %d;
 		order.TotalAmount = order_item_total_amount.TotalAmount
 		order.TotalAmountRmb = order_item_total_amount.TotalAmount * order.ExchangeRate
 		order.TotalAmountCurrency = "AUD"
+		order.SubTotalAmount = order_item_total_amount.TotalAmount
+		order.SubTotalAmountRmb = order_item_total_amount.TotalAmount * order.ExchangeRate
+		order.SubTotalAmountCurrency = "AUD"
 		order.AdjustmentAmount = order_item_total_amount.TotalAmount
 		order.AdjustmentAmountRmb = order_item_total_amount.TotalAmount * order.ExchangeRate
 		order.AdjustmentAmountCurrency = "AUD"
@@ -187,7 +190,8 @@ WHERE oi.order_id = %d;
 		var update_cols = []string{
 			"amount_paid", "amount_paid_rmb", "amount_paid_currency",
 			"total_amount", "total_amount_rmb", "total_amount_currency",
-			"adjustment_amount", "adjustment_amount_rmb", "adjustment_amount_currency",
+			"total_amount", "total_amount_rmb", "total_amount_currency",
+			"subtotal_amount", "subtotal_amount_rmb", "subtotal_amount_currency",
 		}
 		_, err = db_session.Id(order_id).Cols(update_cols...).Update(&order)
 		core.HandleError(err)
