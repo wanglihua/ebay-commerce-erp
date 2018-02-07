@@ -18,13 +18,13 @@ func Is_pick_crew_has_mel_stock(user_id int64, db_session *xorm.Session) bool {
 SELECT count(spc.id) AS stock_pick_crew_count
 FROM erp_stock_pick_crew spc
 WHERE spc.user_id = 0
-      AND spc.stock_id = (SELECT s.id AS stock_id FROM erp_stock s WHERE s.short_name = 'MEL' AND s.name LIKE '%墨尔本%')
+      AND spc.stock_id = (SELECT s.id AS stock_id FROM erp_stock s WHERE s.short_name = 'MEL')
 	 */
 	var sql_is_mel_pick_screw = `
 SELECT count(spc.id) AS stock_pick_crew_count
 FROM erp_stock_pick_crew spc
 WHERE spc.user_id = %d
-      AND spc.stock_id = (SELECT s.id AS stock_id FROM erp_stock s WHERE s.short_name = 'MEL' AND s.name LIKE '%%墨尔本%%')`
+      AND spc.stock_id = (SELECT s.id AS stock_id FROM erp_stock s WHERE s.short_name = 'MEL')`
 	sql_is_mel_pick_screw = fmt.Sprintf(sql_is_mel_pick_screw, user_id)
 
 	_, err := db_session.Sql(sql_is_mel_pick_screw).Get(&stock_pick_crew_count)

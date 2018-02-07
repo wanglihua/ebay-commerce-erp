@@ -83,10 +83,10 @@ func Get_mel_stock_id(db_session *xorm.Session) int64 {
 	}
 
 	/*
-	SELECT s.id AS stock_id FROM erp_stock s WHERE s.short_name = 'MEL' AND s.name LIKE '%墨尔本%';
+	SELECT s.id AS stock_id FROM erp_stock s WHERE s.short_name = 'MEL';
 	 */
 
-	var sql = `SELECT s.id AS stock_id FROM erp_stock s WHERE s.short_name = 'MEL' AND s.name LIKE '%墨尔本%'`
+	var sql = `SELECT s.id AS stock_id FROM erp_stock s WHERE s.short_name = 'MEL'`
 	_, err := db_session.Sql(sql).Get(&stock_id)
 	core.HandleError(err)
 
@@ -101,10 +101,10 @@ func Get_bne_stock_id(db_session *xorm.Session) int64 {
 	}
 
 	/*
-	SELECT s.id AS stock_id FROM erp_stock s WHERE s.short_name = 'BNE' AND s.name LIKE '%布里斯班%';
+	SELECT s.id AS stock_id FROM erp_stock s WHERE s.short_name = 'BNE';
 	 */
 
-	var sql = `SELECT s.id AS stock_id FROM erp_stock s WHERE s.short_name = 'BNE' AND s.name LIKE '%布里斯班%'`
+	var sql = `SELECT s.id AS stock_id FROM erp_stock s WHERE s.short_name = 'BNE'`
 	_, err := db_session.Sql(sql).Get(&stock_id)
 	core.HandleError(err)
 

@@ -71,13 +71,13 @@ CREATE PROCEDURE intel_repl()
         SELECT s.id
         INTO v_mel_stock_id
         FROM erp_stock s
-        WHERE s.short_name = 'MEL' AND s.name LIKE '%墨尔本%' AND s.stock_type_id = 300; # 300 澳洲仓库
+        WHERE s.short_name = 'MEL' AND s.stock_type_id = 300; # 300 澳洲仓库
 
         # 确定 BNE 仓库的 stock_id
         SELECT s.id
         INTO v_bne_stock_id
         FROM erp_stock s
-        WHERE s.short_name = 'BNE' AND s.name LIKE '%布里斯班%' AND s.stock_type_id = 300; # 300 澳洲仓库
+        WHERE s.short_name = 'BNE' AND s.stock_type_id = 300; # 300 澳洲仓库
 
         # 确定 MEL 在途库 的 stock_id
         SELECT s.id
@@ -120,7 +120,9 @@ CREATE PROCEDURE intel_repl()
 
             # 获取商品的相关配置
             SET v_purchase_days = 0, v_stock_alert_days = 0 = 0;
-            SELECT p.purchase_days, p.stock_alert_days
+            SELECT
+                p.purchase_days,
+                p.stock_alert_days
             INTO v_purchase_days, v_stock_alert_days
             FROM erp_product p
             WHERE p.id = v_product_id;
@@ -136,7 +138,9 @@ CREATE PROCEDURE intel_repl()
 
             # 获取 MEL 仓库的 数量和待发货数量
             SET v_mel_nvt_qty = 0, v_mel_nvt_pending_qty = 0;
-            SELECT nvt.qty, nvt.pending_qty
+            SELECT
+                nvt.qty,
+                nvt.pending_qty
             INTO v_mel_nvt_qty, v_mel_nvt_pending_qty
             FROM erp_inventory nvt
             WHERE nvt.product_id = v_product_id AND nvt.stock_id = v_mel_stock_id;
@@ -166,7 +170,9 @@ CREATE PROCEDURE intel_repl()
 
             # 获取 BNE 仓库的 数量和待发货数量
             SET v_bne_nvt_qty = 0, v_bne_nvt_pending_qty = 0;
-            SELECT nvt.qty, nvt.pending_qty
+            SELECT
+                nvt.qty,
+                nvt.pending_qty
             INTO v_bne_nvt_qty, v_bne_nvt_pending_qty
             FROM erp_inventory nvt
             WHERE nvt.product_id = v_product_id AND nvt.stock_id = v_bne_stock_id;
@@ -284,7 +290,9 @@ CREATE PROCEDURE intel_repl()
             ELSEIF v_count = 1
                 THEN
                     # 获取原来的数量
-                    SELECT ir.mel_qty, ir.bne_qty INTO v_old_mel_qty, v_old_bne_qty
+                    SELECT
+                        ir.mel_qty,
+                        ir.bne_qty INTO v_old_mel_qty, v_old_bne_qty
                     FROM erp_intel_repl ir
                     WHERE ir.product_id = v_product_id AND ir.status_id = 5700; # 5700 新生成的智能补货单
 
