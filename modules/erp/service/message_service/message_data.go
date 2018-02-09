@@ -11,6 +11,7 @@ import (
 	"matrix/modules/erp/models/xtpz_models"
 	"matrix/modules/erp/models/sppz_models"
 	"strings"
+	auth_models "matrix/modules/auth/models"
 )
 
 type Message_view_item_t struct {
@@ -18,6 +19,7 @@ type Message_view_item_t struct {
 	xtpz_models.ShopAccountInfo       `xorm:"extends" json:"sa"`
 	xtpz_models.ECommercePlatformInfo `xorm:"extends" json:"pf"`
 	kcgl_models.ProductInfo           `xorm:"extends" json:"p"`
+	auth_models.UserInfo              `xorm:"extends" json:"psu"`
 	sppz_models.ProductStoreItemInfo  `xorm:"extends" json:"psi"`
 	models.StatusInfo                 `xorm:"extends" json:"s"`
 }
@@ -27,24 +29,26 @@ var msg_count struct {
 }
 
 /*
-SELECT msg.*, sa.*, pf.*, p.*, psi.*, s.*
+SELECT msg.*, sa.*, pf.*, p.*, psu.*, psi.*, s.*
 FROM erp_message msg
     INNER JOIN erp_shop_account sa ON sa.id = msg.shop_id
     INNER JOIN erp_ecommerce_platform pf ON pf.id = sa.platform_id
     INNER JOIN erp_product p ON p.id = msg.product_id
-    LEFT JOIN erp_product_store_item psi on psi.product_id = p.id and psi.item_id = msg.item_id
+    LEFT JOIN auth_user psu ON psu.id = p.service_user_id
+    LEFT JOIN erp_product_store_item psi ON psi.product_id = p.id AND psi.item_id = msg.item_id
     INNER JOIN erp_status s ON s.id = msg.status_id;
  */
 
 func get_message_list_sql_builder() *core.SqlBuilder {
 	sb := core.NewSqlBuilder()
-	sb.Select("msg.*, sa.*, pf.*, p.*, psi.*, s.*")
+	sb.Select("msg.*, sa.*, pf.*, p.*, psu.*, psi.*, s.*")
 	sb.Count("count(msg.id) as msg_count")
 	sb.From(`
 erp_message msg
     INNER JOIN erp_shop_account sa ON sa.id = msg.shop_id
     INNER JOIN erp_ecommerce_platform pf ON pf.id = sa.platform_id
     INNER JOIN erp_product p ON p.id = msg.product_id
+    LEFT JOIN auth_user psu ON psu.id = p.service_user_id
     LEFT JOIN erp_product_store_item psi ON psi.product_id = p.id AND psi.item_id = msg.item_id
     INNER JOIN erp_status s ON s.id = msg.status_id`)
 
@@ -72,6 +76,9 @@ func Get_message_list_data(db_session *xorm.Session, request *revel.Request, par
 	var recipient_id_query string
 	params.Bind(&recipient_id_query, "recipient_id_query")
 
+	var service_user_id_query int64
+	params.Bind(&service_user_id_query, "service_user_id_query")
+
 	if shop_id_query != 0 {
 		filter = core.SqlAnd(filter, fmt.Sprintf("msg.shop_id = %d", shop_id_query))
 	}
@@ -90,6 +97,10 @@ func Get_message_list_data(db_session *xorm.Session, request *revel.Request, par
 
 	if strings.TrimSpace(recipient_id_query) != "" {
 		filter = core.SqlAnd(filter, fmt.Sprintf("msg.recipient_id = '%s'", recipient_id_query))
+	}
+
+	if service_user_id_query != 0 {
+		filter = core.SqlAnd(filter, fmt.Sprintf("psu.id = %d", service_user_id_query))
 	}
 
 	sb := get_message_list_sql_builder()

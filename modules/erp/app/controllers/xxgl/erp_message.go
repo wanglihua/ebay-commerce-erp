@@ -5,6 +5,7 @@ import (
 
 	"matrix/core"
 	"matrix/modules/erp/service/message_service"
+	auth_models "matrix/modules/auth/models"
 )
 
 type ErpMessage struct {
@@ -12,6 +13,14 @@ type ErpMessage struct {
 }
 
 func (c ErpMessage) Index() revel.Result {
+
+	var db_session = c.DbSession
+
+	var user_list = make([]auth_models.UserInfo, 0)
+	core.HandleError(db_session.OrderBy("login_name ASC").Find(&user_list))
+
+	c.RenderArgs["service_user_list"] = user_list
+
 	return c.RenderTemplate("erp/xxgl/message/message_index.html")
 }
 
