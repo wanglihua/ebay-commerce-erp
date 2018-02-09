@@ -6,6 +6,11 @@ import (
 	"matrix/core"
 	"matrix/modules/erp/service/message_service"
 	auth_models "matrix/modules/auth/models"
+	"net/http"
+	"net/url"
+	"fmt"
+	"io/ioutil"
+	"encoding/json"
 )
 
 type ErpMessage struct {
@@ -36,11 +41,14 @@ func (c ErpMessage) ListData() revel.Result {
 }
 
 func (c ErpMessage) ShowReply() revel.Result {
+	var db_session = c.DbSession
 
-	var message_id string
+	var message_id int64
 	c.Params.Bind(&message_id, "message_id")
 
-	c.RenderArgs["message_id"] = message_id
+	var message = message_service.Get_message_data(message_id, db_session)
+
+	c.RenderArgs["message"] = message
 
 	return c.RenderTemplate("erp/xxgl/message/message_reply.html")
 }
@@ -53,14 +61,14 @@ func (c ErpMessage) Reply() revel.Result {
 	var message_body string
 	c.Params.Bind(&message_body, "message_body")
 
-	/*
-
-	resp, err := http.PostForm("http://localhost:8001/message/reply", url.Values{"messageId": {fmt.Sprint(message_id)}, "messageBody": {message_body}})
+	resp, err := http.PostForm("http://localhost:8080/ozosync/message/reply", url.Values{"messageId": {fmt.Sprint(message_id)}, "messageBody": {message_body}})
 	core.HandleError(err)
 
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	core.HandleError(err)
+
+	fmt.Println(string(body))
 
 	var result core.JsonResult
 	err = json.Unmarshal(body, &result)
@@ -72,7 +80,6 @@ func (c ErpMessage) Reply() revel.Result {
 			"message": "消息回复失败！",
 		})
 	}
-	*/
 
 	return c.RenderJson(map[string]interface{}{
 		"success": true,

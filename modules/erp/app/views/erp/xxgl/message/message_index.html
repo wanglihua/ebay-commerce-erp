@@ -114,6 +114,7 @@
                             aoData.push({'name': 'shop_id_query', 'value': $("#shop_id_query").val()});
                             aoData.push({'name': 'item_id_query', 'value': $("#item_id_query").val()});
                             aoData.push({'name': 'sku_query', 'value': $("#sku_query").val()});
+                            aoData.push({'name': 'service_user_id_query', 'value': $("#service_user_id_query").val()});
                             aoData.push({'name': 'sender_id_query', 'value': $("#sender_id_query").val()});
                             aoData.push({'name': 'recipient_id_query', 'value': $("#recipient_id_query").val()});
 
@@ -162,6 +163,7 @@
                 messageReplyDialogWrapper.html("");
                 messageReplyDialogWrapper.html(data);
 
+                $("#messageReplyDialog").modal(modalOptions);
             }
         });
     }
@@ -183,6 +185,7 @@
                     return;
                 }
                 else {
+                    $("#messageReplyDialog").modal("hide");
                     vm.reloadList();
                     $.msg.show(data.message);
                     return;

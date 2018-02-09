@@ -15,13 +15,13 @@ import (
 )
 
 type Message_view_item_t struct {
-	models.MessageInfo                `xorm:"extends" json:"msg"`
-	xtpz_models.ShopAccountInfo       `xorm:"extends" json:"sa"`
-	xtpz_models.ECommercePlatformInfo `xorm:"extends" json:"pf"`
-	kcgl_models.ProductInfo           `xorm:"extends" json:"p"`
-	auth_models.UserInfo              `xorm:"extends" json:"psu"`
-	sppz_models.ProductStoreItemInfo  `xorm:"extends" json:"psi"`
-	models.StatusInfo                 `xorm:"extends" json:"s"`
+	Message           models.MessageInfo                `xorm:"extends" json:"msg"`
+	ShopAccount       xtpz_models.ShopAccountInfo       `xorm:"extends" json:"sa"`
+	ECommercePlatform xtpz_models.ECommercePlatformInfo `xorm:"extends" json:"pf"`
+	Product           kcgl_models.ProductInfo           `xorm:"extends" json:"p"`
+	ServiceUser       auth_models.UserInfo              `xorm:"extends" json:"psu"`
+	ProductStoreItem  sppz_models.ProductStoreItemInfo  `xorm:"extends" json:"psi"`
+	Status            models.StatusInfo                 `xorm:"extends" json:"s"`
 }
 
 var msg_count struct {
@@ -123,6 +123,21 @@ func Get_message_list_data(db_session *xorm.Session, request *revel.Request, par
 	core.HandleError(err)
 
 	return message_list, msg_count.Count
+}
+
+func Get_message_data(message_id int64, db_session *xorm.Session) Message_view_item_t {
+
+	var filter = fmt.Sprintf("msg.id = %d", message_id)
+
+	sb := get_message_list_sql_builder()
+	sb.Where(filter)
+
+	var message_view_item Message_view_item_t
+
+	_, err := db_session.Sql(sb.SqlGet()).Get(&message_view_item)
+	core.HandleError(err)
+
+	return message_view_item
 }
 
 func Get_message_list_data_by_product_id(db_session *xorm.Session, product_id int64) []Message_view_item_t {
