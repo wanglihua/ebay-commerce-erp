@@ -47,6 +47,7 @@
         </div>
     </div>
 </div>
+<div id="messageReplyDialogWrapper"></div>
 <script type="text/javascript">
     var vm = new Vue({
         el: "#page",
@@ -91,7 +92,8 @@
                             {
                                 "mDataProp": "s.name", "title": "状态<br/>发送者/接收者", "bSearchable": true, "sClass": "center", "width": 120,
                                 "render": function (data, type, row) {
-                                    return "<div>" + row.s.name + "</div><div>" + row.msg.sender_id + "</div><div>" + row.msg.recipient_id + "</div>";
+                                    //"<a class='btn btn-xs btn-info btn-inline pull-left' onclick='showReply(" + row.msg.id + ");' ><i class='ace-icon fa fa-reply'></i>回复</a>"
+                                    return "<div>" + row.s.name + "&nbsp;<a class='btn btn-xs btn-info btn-inline' onclick='showReply(" + row.msg.id + ");' ><i class='ace-icon fa fa-reply'></i>回复</a></div><div>" + row.msg.sender_id + "</div><div>" + row.msg.recipient_id + "</div>";
                                 }
                             }
                         ],
@@ -131,6 +133,49 @@
         }
     });
 
+    function showReply(message_id) {
+        $.ajax({
+            "url": '{% url "ErpMessage.ShowReply" %}',
+            "data": {
+                "message_id": message_id
+            },
+            "success": function (data) {
+                if (data.success === false) {
+                    $.msg.error(data.message);
+                    return;
+                }
+
+                var messageReplyDialogWrapper = $("#messageReplyDialogWrapper");
+                messageReplyDialogWrapper.html("");
+                messageReplyDialogWrapper.html(data);
+            }
+        });
+    }
+
+    function reply() {
+        var message_id = $("#message_id").val();
+        var message_body = $("#message_body").val();
+
+        $.ajax({
+            "dataType": 'json',
+            "url": '{% url "ErpMessage.Reply" %}',
+            "data": {
+                "message_id": message_id,
+                "message_body": message_body
+            },
+            "success": function (data) {
+                if (data.success === false) {
+                    $.msg.error(data.message);
+                    return;
+                }
+                else {
+                    vm.reloadList();
+                    $.msg.show(data.message);
+                    return;
+                }
+            }
+        });
+    }
 
 </script>
 {%footer%}

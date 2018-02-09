@@ -546,6 +546,8 @@ POST /ebay/api/config/delete             ErpEBayAPIConfig.Delete
 
 GET  /message                            ErpMessage.Index
 POST /message/data/list                  ErpMessage.ListData
+POST /message/reply                      ErpMessage.Reply
+POST /message/show/reply                 ErpMessage.ShowReply
 
 GET  /schedule/task                      ErpScheduleTask.Index
 POST /schedule/task/data                 ErpScheduleTask.TaskData

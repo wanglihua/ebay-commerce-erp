@@ -1,0 +1,49 @@
+<div class="modal fade" id="messageReplyDialog">
+    <div class="modal-dialog" style="width: 680px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="True">&times;</button>
+                <h4 class="modal-title">智能补货详细</h4>
+            </div>
+            <div class="modal-body clearfix">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <form class="form-horizontal" role="form" id="messageReplyForm">
+                            <input id="message_id" name="message_id" type="hidden" value="123456"/>
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <div class="form-group">
+                                        <label for="product_id" class="col-xs-2 control-label">商品</label>
+                                        <div class="col-xs-10">
+                                            <input id="product_id" name="product_id" type="text" class="input-sm form-control"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <div class="form-group">
+                                        <label for="message_body" class="col-xs-2 control-label">仓库</label>
+                                        <div class="col-xs-10">
+                                            <textarea id="message_body" name="message_body" rows="3" class="input-sm form-control"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success btn-sm" onclick="reply()">
+                    <i class="ace-icon fa fa-floppy-o"></i>回复
+                </button>
+                <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">
+                    <i class="ace-icon fa fa-times"></i>关闭
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

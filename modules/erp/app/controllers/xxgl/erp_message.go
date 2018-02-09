@@ -25,3 +25,48 @@ func (c ErpMessage) ListData() revel.Result {
 		Total: msg_count,
 	})
 }
+
+func (c ErpMessage) ShowReply() revel.Result {
+
+	var message_id string
+	c.Params.Bind(&message_id, "message_id")
+
+	c.RenderArgs["message_id"] = message_id
+
+	return c.RenderTemplate("erp/xxgl/message/message_reply.html")
+}
+
+func (c ErpMessage) Reply() revel.Result {
+
+	var message_id int64
+	c.Params.Bind(&message_id, "message_id")
+
+	var message_body string
+	c.Params.Bind(&message_body, "message_body")
+
+	/*
+
+	resp, err := http.PostForm("http://localhost:8001/message/reply", url.Values{"messageId": {fmt.Sprint(message_id)}, "messageBody": {message_body}})
+	core.HandleError(err)
+
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	core.HandleError(err)
+
+	var result core.JsonResult
+	err = json.Unmarshal(body, &result)
+	core.HandleError(err)
+
+	if result.Success == false {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "消息回复失败！",
+		})
+	}
+	*/
+
+	return c.RenderJson(map[string]interface{}{
+		"success": true,
+		"message": "消息回复成功！",
+	})
+}
