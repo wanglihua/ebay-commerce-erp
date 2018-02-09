@@ -770,27 +770,33 @@ func get_fastway_packaging_code(logistics_mode ddpz_models.LogisticsModeInfo) st
 }
 
 func get_toll_packaging_code(order_logistics ddlc_models.OrderLogisticsInfo) string {
+
+	// 临时改成都返回 C
+	return "C"
+
 	/*
 		包裹类型    代表
 		C         TOLL < 25KG
-		LC        TOLL >25KG
+		LC        TOLL > 25KG
 		VL        TOLL > 50KG
-		XL        TOLL >100KG
+		XL        TOLL > 100KG
 		这个是打折后的体积重 与 实际重 取大值 判断
 	 */
 
-	var weight = math.Max(order_logistics.DimWeight, order_logistics.Weight)
-	if weight <= 25 {
-		return "C"
-	} else if weight > 25 && weight <= 50 {
-		return "LC"
-	} else if weight > 50 && weight <= 100 {
-		return "VL"
-	} else if weight > 100 {
-		return "XL"
-	} else {
-		return ""
-	}
+	/*
+   var weight = math.Max(order_logistics.DimWeight, order_logistics.Weight)
+   if weight <= 25 {
+	   return "C"
+   } else if weight > 25 && weight <= 50 {
+	   return "LC"
+   } else if weight > 50 && weight <= 100 {
+	   return "VL"
+   } else if weight > 100 {
+	   return "XL"
+   } else {
+	   return ""
+   }
+	*/
 }
 
 // 主要用于 BNE 的 service id
