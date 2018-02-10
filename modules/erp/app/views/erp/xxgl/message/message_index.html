@@ -178,6 +178,18 @@
     }
 
     function reply() {
+
+        var form = $("#messageReplyForm");
+        var valid = validate(form, {
+            'message_body': {
+                required: true, minlength: 2
+            }
+        });
+
+        if (!valid) {
+            return;
+        }
+
         var message_id = $("#message_id").val();
         var message_body = $("#message_body").val();
 
