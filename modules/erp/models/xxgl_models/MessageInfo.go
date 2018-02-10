@@ -1,4 +1,4 @@
-package models
+package xxgl_models
 
 import (
 	"matrix/core"

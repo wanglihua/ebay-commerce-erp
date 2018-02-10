@@ -61,7 +61,8 @@ func (c ErpMessage) Reply() revel.Result {
 	var message_body string
 	c.Params.Bind(&message_body, "message_body")
 
-	resp, err := http.PostForm("http://localhost:8080/ozosync/message/reply", url.Values{"messageId": {fmt.Sprint(message_id)}, "messageBody": {message_body}})
+	ozosync_app_base_url, _ := revel.Config.String("ozosync.app")
+	resp, err := http.PostForm(ozosync_app_base_url+"/message/reply", url.Values{"messageId": {fmt.Sprint(message_id)}, "messageBody": {message_body}})
 	core.HandleError(err)
 
 	defer resp.Body.Close()

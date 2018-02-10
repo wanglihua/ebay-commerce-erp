@@ -19,6 +19,7 @@ import (
 	"matrix/modules/erp/models/xsgl_models"
 	"matrix/modules/erp/models/cggl_models"
 	"matrix/modules/erp/models/xsbb_models"
+	"matrix/modules/erp/models/xxgl_models"
 )
 
 type Home struct {
@@ -184,8 +185,9 @@ func (c Home) SyncDbPost() revel.Result {
 	model_list = append(model_list, &spbb_models.ProductSaleAnalysisInfo{})
 	model_list = append(model_list, &spbb_models.ProductSaleAnalysisSettingInfo{})
 
+	model_list = append(model_list, &xxgl_models.MessageInfo{})
+
 	model_list = append(model_list, &erp_models.StatusInfo{})
-	model_list = append(model_list, &erp_models.MessageInfo{})
 	model_list = append(model_list, &erp_models.PaypalReconInfo{})
 
 	//model_list = append(model_list, &erp_models.TestInfo{}) // 为什么这一句打开就不行

@@ -106,7 +106,16 @@
                             {
                                 "mDataProp": "s.name", "title": "状态<br/>发送者/接收者", "bSearchable": true, "sClass": "center", "width": 120,
                                 "render": function (data, type, row) {
-                                    return "<div>" + row.s.name + "&nbsp;<a class='btn btn-xs btn-info btn-inline' onclick='showReply(" + row.msg.id + ");' ><i class='ace-icon fa fa-reply'></i>回复</a></div><div>" + row.msg.sender_id + "</div><div>" + row.msg.recipient_id + "</div>";
+                                    /*
+                                        MESSAGE_STATUS_ANSWERED   = 4800 // 消息状态 已回复
+                                        MESSAGE_STATUS_UNANSWERED = 4900 // 消息状态 未回复
+                                     */
+
+                                    if (row.s.id === 4900) {
+                                        return "<div>" + row.s.name + "&nbsp;<a class='btn btn-xs btn-info btn-inline' onclick='showReply(" + row.msg.id + ");' ><i class='ace-icon fa fa-reply'></i>回复</a></div><div>" + row.msg.sender_id + "</div><div>" + row.msg.recipient_id + "</div>";
+                                    } else {
+                                        return "<div>" + row.s.name + "</div><div>" + row.msg.sender_id + "</div><div>" + row.msg.recipient_id + "</div>";
+                                    }
                                 }
                             }
                         ],

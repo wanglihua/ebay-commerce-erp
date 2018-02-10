@@ -15,6 +15,7 @@ import (
 	"matrix/ebay"
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/models/xtpz_models"
+	"matrix/modules/erp/models/xxgl_models"
 )
 
 /*
@@ -126,7 +127,7 @@ func (t EBayMessageDownloadTask) Run() {
 
 				message_id := message_download.Question.MessageId
 
-				var message_in_db models.MessageInfo
+				var message_in_db xxgl_models.MessageInfo
 				message_in_db.ShopId = config.APIConfig.ShopId
 
 				has_message, err := db_session.Where(fmt.Sprintf("message_id = '%s'", message_id)).Get(&message_in_db)
@@ -136,7 +137,7 @@ func (t EBayMessageDownloadTask) Run() {
 
 				// 如果这时产品不存在会怎样，下载产品
 				var product_result struct {
-					ProductId  int64 `xorm:"'product_id'"`
+					ProductId  int64  `xorm:"'product_id'"`
 					ProductSku string `xorm:"'product_sku'"`
 				}
 

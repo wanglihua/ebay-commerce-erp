@@ -12,10 +12,11 @@ import (
 	"matrix/modules/erp/models/sppz_models"
 	"strings"
 	auth_models "matrix/modules/auth/models"
+	"matrix/modules/erp/models/xxgl_models"
 )
 
 type Message_view_item_t struct {
-	Message           models.MessageInfo                `xorm:"extends" json:"msg"`
+	Message           xxgl_models.MessageInfo           `xorm:"extends" json:"msg"`
 	ShopAccount       xtpz_models.ShopAccountInfo       `xorm:"extends" json:"sa"`
 	ECommercePlatform xtpz_models.ECommercePlatformInfo `xorm:"extends" json:"pf"`
 	Product           kcgl_models.ProductInfo           `xorm:"extends" json:"p"`
