@@ -16,6 +16,7 @@ import (
 	"fmt"
 	"matrix/modules/erp/service/exchange_rate_service"
 	"sync"
+	"strings"
 )
 
 type ErpContainerTransfer struct {
@@ -49,6 +50,15 @@ func (c ErpContainerTransfer) ListData() revel.Result {
 	db_session := c.DbSession
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
+
+	var sku_query string
+	c.Params.Bind(&sku_query, "sku_query")
+
+	if strings.TrimSpace(sku_query) != "" {
+		filter = core.SqlAnd(filter, fmt.Sprintf(`ct.id IN (SELECT cte.transfer_id
+FROM erp_container_transfer_entry cte
+WHERE cte.product_sku = '%s')`, sku_query))
+	}
 
 	type container_transfer_view_item_t struct {
 		hgbg_models.ContainerTransferInfo `xorm:"extends" json:"ct"`

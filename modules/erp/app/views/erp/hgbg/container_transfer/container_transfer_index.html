@@ -34,6 +34,14 @@
                         调拨至澳洲仓
                     </button>
                 </div>
+                <div id="query" class="col-xs-12" style="line-height: 28px;margin-top: 10px;">
+                    <label for="sku_query">SKU查询</label>
+                    <input id="sku_query" name="sku_query" style="width: 180px;height: 30px;" placeholder="SKU查询"/>
+                    <button class="btn btn-mini btn-primary" style="margin-bottom:3px;height: 30px;" onclick="search()"> &nbsp;
+                        &nbsp;<i class="ace-icon fa fa-search"></i>查&nbsp;询&nbsp;
+                    </button>
+                    <hr style="margin-top:10px;margin-bottom:10px;"/>
+                </div>
                 <div>
                     <table id="containerTransferList" class="table table-striped table-bordered table-hover"></table>
                 </div>
@@ -51,54 +59,75 @@
         },
         mounted: function () {
             initDataTable(
-                '#containerTransferList',
-                {
-                    "sAjaxSource": '{%url "ErpContainerTransfer.ListData"%}',
-                    "aaSorting": [[7, "desc"]],
-                    "aoColumns": [
-                        {
-                            "mDataProp": "ct.id", "bSearchable": false, "orderable": false, "sClass": "center", "width": 50,
-                            "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
-                            "render": function (data, type, row) {
-                                return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
-                            }
-                        },
-                        {
-                            "mDataProp": "ct.batch_code", "title": "批次号", "bSearchable": true,
-                            "render": function (data, type, row) {
-                                return "<a href='javascript:showContainerTransferDetail(" + row.ct.id + ")'>" + data + "</a>";
-                            }
-                        },
-                        {"mDataProp": "ct.import_company_name", "title": "澳洲清关公司", "bSearchable": true, "width": 150},
-                        {"mDataProp": "ct.start_port_name", "title": "起始港口", "bSearchable": true, "width": 150},
-                        {"mDataProp": "ct.dest_port_name", "title": "目的港口", "bSearchable": true, "width": 150},
-                        {"mDataProp": "ct.packing_time", "title": "装箱时间", "bSearchable": false, "width": 120},
-                        {
-                            "mDataProp": "ct.au_hg_entry_date", "title": "澳洲海关<br />Entry日期", "bSearchable": false, "width": 120,
-                            "render": function (data, type, row) {
-                                if (data < '2001-01-01') {
-                                    return "";
-                                } else {
-                                    return data;
+                    '#containerTransferList',
+                    {
+                        "sAjaxSource": '{%url "ErpContainerTransfer.ListData"%}',
+                        "aaSorting": [[7, "desc"]],
+                        "aoColumns": [
+                            {
+                                "mDataProp": "ct.id", "bSearchable": false, "orderable": false, "sClass": "center", "width": 50,
+                                "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
+                                "render": function (data, type, row) {
+                                    return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
+                                }
+                            },
+                            {
+                                "mDataProp": "ct.batch_code", "title": "批次号", "bSearchable": true,
+                                "render": function (data, type, row) {
+                                    return "<a href='javascript:showContainerTransferDetail(" + row.ct.id + ")'>" + data + "</a>";
+                                }
+                            },
+                            {"mDataProp": "ct.import_company_name", "title": "澳洲清关公司", "bSearchable": true, "width": 150},
+                            {"mDataProp": "ct.start_port_name", "title": "起始港口", "bSearchable": true, "width": 150},
+                            {"mDataProp": "ct.dest_port_name", "title": "目的港口", "bSearchable": true, "width": 150},
+                            {"mDataProp": "ct.packing_time", "title": "装箱时间", "bSearchable": false, "width": 120},
+                            {
+                                "mDataProp": "ct.au_hg_entry_date", "title": "澳洲海关<br />Entry日期", "bSearchable": false, "width": 120,
+                                "render": function (data, type, row) {
+                                    if (data < '2001-01-01') {
+                                        return "";
+                                    } else {
+                                        return data;
+                                    }
+                                }
+                            },
+                            {"mDataProp": "ct.departure_time", "title": "预计到港时间", "bSearchable": false, "width": 120},
+                            {"mDataProp": "ct.stock_time", "title": "预计到仓时间", "bSearchable": false, "width": 120},
+                            {"mDataProp": "s.name", "title": "状态", "bSearchable": true, "width": 80},
+                            {
+                                "mDataProp": "ct.id",
+                                "bSearchable": false,
+                                "orderable": false,
+                                "sClass": "center",
+                                "width": 100,
+                                "title": '操作',
+                                "render": function (data, type, row) {
+                                    return "<a class='btn btn-xs btn-info btn-inline pull-left' onclick='show_log_dialog(" + data + ");' ><i class='ace-icon fa fa-list'></i>查看历史</a>";
                                 }
                             }
-                        },
-                        {"mDataProp": "ct.departure_time", "title": "预计到港时间", "bSearchable": false, "width": 120},
-                        {"mDataProp": "ct.stock_time", "title": "预计到仓时间", "bSearchable": false, "width": 120},
-                        {"mDataProp": "s.name", "title": "状态", "bSearchable": true, "width": 80},
-                        {
-                            "mDataProp": "ct.id",
-                            "bSearchable": false,
-                            "orderable": false,
-                            "sClass": "center",
-                            "width": 100,
-                            "title": '操作',
-                            "render": function (data, type, row) {
-                                return "<a class='btn btn-xs btn-info btn-inline pull-left' onclick='show_log_dialog(" + data + ");' ><i class='ace-icon fa fa-list'></i>查看历史</a>";
-                            }
+                        ],
+                        "fnServerData": function (sSource, aoData, fnCallback) {
+                            showMask("数据加载中，请稍候");
+
+                            aoData.push({'name': 'sku_query', 'value': $("#sku_query").val()});
+
+                            $.ajax({
+                                "dataType": 'json',
+                                "url": sSource,
+                                "data": aoData,
+                                "success": function (data) {
+                                    hideMask();
+
+                                    if (data.success === false) {
+                                        $.msg.error(data.message);
+                                        return;
+                                    }
+
+                                    fnCallback(data);
+                                }
+                            });
                         }
-                    ]
-                }
+                    }
             );
 
             $('#containerTransferList tbody').on('dblclick', 'tr', function () {
@@ -226,43 +255,43 @@
             });
 
             initDataTable(
-                '#containerTransferLogList',
-                {
-                    "sAjaxSource": '{%url "ErpContainerTransferLog.ListData"%}',
-                    "aaSorting": [[0, "desc"]],
-                    "aoColumns": [
-                        {"mDataProp": "create_time", "title": "时间", "sClass": "center", "bSearchable": false, "bSortable": false, "width": 120},
-                        {"mDataProp": "login_name", "title": "工号", "sClass": "center", "bSearchable": false, "bSortable": false, "width": 120},
-                        {
-                            "mDataProp": "operation", "title": "描述", "bSearchable": true, "bSortable": false,
-                            "render": function (data, type, row) {
-                                return "<div style='white-space:normal; word-break: break-all; word-wrap:break-word;'>" + data + "</div>";
-                            }
-                        }
-
-                    ],
-                    "fnServerData": function (sSource, aoData, fnCallback) {
-                        showMask("数据加载中，请稍候");
-
-                        aoData.push({'name': 'transfer_id', 'value': transfer_id});
-
-                        $.ajax({
-                            "dataType": 'json',
-                            "url": sSource,
-                            "data": aoData,
-                            "success": function (data) {
-                                hideMask();
-
-                                if (data.success === false) {
-                                    $.msg.error(data.message);
-                                    return;
+                    '#containerTransferLogList',
+                    {
+                        "sAjaxSource": '{%url "ErpContainerTransferLog.ListData"%}',
+                        "aaSorting": [[0, "desc"]],
+                        "aoColumns": [
+                            {"mDataProp": "create_time", "title": "时间", "sClass": "center", "bSearchable": false, "bSortable": false, "width": 120},
+                            {"mDataProp": "login_name", "title": "工号", "sClass": "center", "bSearchable": false, "bSortable": false, "width": 120},
+                            {
+                                "mDataProp": "operation", "title": "描述", "bSearchable": true, "bSortable": false,
+                                "render": function (data, type, row) {
+                                    return "<div style='white-space:normal; word-break: break-all; word-wrap:break-word;'>" + data + "</div>";
                                 }
-
-                                fnCallback(data);
                             }
-                        });
+
+                        ],
+                        "fnServerData": function (sSource, aoData, fnCallback) {
+                            showMask("数据加载中，请稍候");
+
+                            aoData.push({'name': 'transfer_id', 'value': transfer_id});
+
+                            $.ajax({
+                                "dataType": 'json',
+                                "url": sSource,
+                                "data": aoData,
+                                "success": function (data) {
+                                    hideMask();
+
+                                    if (data.success === false) {
+                                        $.msg.error(data.message);
+                                        return;
+                                    }
+
+                                    fnCallback(data);
+                                }
+                            });
+                        }
                     }
-                }
             );
         }
 
@@ -278,6 +307,10 @@
                 $("#container_transfer_log_dialog").modal();
             }
         });
+    }
+
+    function search() {
+        refreshList("#containerTransferList");
     }
 </script>
 <div id="container_transfer_log_wrapper"></div>
