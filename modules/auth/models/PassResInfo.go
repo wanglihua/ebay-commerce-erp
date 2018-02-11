@@ -859,4 +859,14 @@ func (e PassResInfo) InitData(db_session *xorm.Session) {
 		pass.Desc = core.MakeNullString("热销商品排名", true)
 		db_session.Insert(pass)
 	}
+
+	// 消息管理
+	{
+		pass := new(PassResInfo)
+		pass.Id = pass_res.XXGL_MESSAGE_ALL
+		pass.CateId = pass_res_cate.XXGL
+		pass.Name = "所有消息"
+		pass.Desc = core.MakeNullString("所有消息", true)
+		db_session.Insert(pass)
+	}
 }

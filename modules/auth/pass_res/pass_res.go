@@ -22,6 +22,7 @@ const (
 	// 采购管理        模块编号 20
 	// 销售管理        模块编号 21
 	// 销售报表        模块编号 22
+	// 消息管理        模块编号 23
 
 	// 订单报表
 
@@ -155,4 +156,8 @@ const (
 	XSBB_SALE_AMOUNT_REPORT_DAY     = 220200 // 日销售额报表
 	XSBB_SALE_AMOUNT_REPORT_MONTH   = 220300 // 月销售额报表
 	XSBB_SALE_AMOUNT_REPORT_PRODUCT = 220400 // 热销商品排名
+
+	// 消息管理 23
+	XXGL_MESSAGE_ALL = 230100 // 所有消息
+
 )

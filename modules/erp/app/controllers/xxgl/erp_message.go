@@ -11,6 +11,8 @@ import (
 	"fmt"
 	"io/ioutil"
 	"encoding/json"
+	"matrix/modules/auth/service/pass_service"
+	"matrix/modules/auth/pass_res"
 )
 
 type ErpMessage struct {
@@ -18,6 +20,7 @@ type ErpMessage struct {
 }
 
 func (c ErpMessage) Index() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.XXGL_MESSAGE_ALL, c.Session)
 
 	var db_session = c.DbSession
 
@@ -30,6 +33,8 @@ func (c ErpMessage) Index() revel.Result {
 }
 
 func (c ErpMessage) ListData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.XXGL_MESSAGE_ALL, c.Session)
+
 	db_session := c.DbSession
 
 	message_list, msg_count := message_service.Get_message_list_data(db_session, c.Request, c.Params)
@@ -41,6 +46,8 @@ func (c ErpMessage) ListData() revel.Result {
 }
 
 func (c ErpMessage) ShowReply() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.XXGL_MESSAGE_ALL, c.Session)
+
 	var db_session = c.DbSession
 
 	var message_id int64
@@ -54,6 +61,7 @@ func (c ErpMessage) ShowReply() revel.Result {
 }
 
 func (c ErpMessage) Reply() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.XXGL_MESSAGE_ALL, c.Session)
 
 	var message_id int64
 	c.Params.Bind(&message_id, "message_id")
