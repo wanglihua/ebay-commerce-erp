@@ -117,6 +117,9 @@ func (c ErpOrderExport) get_export_excel(db_session *xorm.Session, filter string
 		Profit       float64 `xorm:"'profit'"`
 		HoldTypeName string  `xorm:"'hold_type_name'"`
 		StatusName   string  `xorm:"'status_name'"`
+		ProductSku   string  `xorm:"'product_sku'"`
+		ItemId       string  `xorm:"'item_id'"`
+		Qty          string  `xorm:"'qty'"`
 	}
 	/*
 
@@ -142,9 +145,14 @@ SELECT
      FROM erp_order_hold_type ht
      WHERE ht.id = o.hold_type_id) AS hold_type_name,
     (SELECT s.name FROM erp_status s
-    WHERE s.id = o.status_id)      AS status_name
+    WHERE s.id = o.status_id)      AS status_name,
+    oi.item_sku                    AS product_sku,
+    oi.item_id                     AS item_id,
+    oi.quantity                    AS qty
 FROM erp_order o
-    LEFT JOIN erp_order_logistics ol ON ol.order_id = o.id;
+    INNER JOIN erp_order_item oi ON oi.order_id = o.id
+    LEFT JOIN erp_order_logistics ol ON ol.order_id = o.id
+ORDER BY o.id ASC;
 
 	 */
 
@@ -171,12 +179,18 @@ SELECT
      FROM erp_order_hold_type ht
      WHERE ht.id = o.hold_type_id) AS hold_type_name,
     (SELECT s.name FROM erp_status s
-    WHERE s.id = o.status_id)      AS status_name
+    WHERE s.id = o.status_id)      AS status_name,
+    oi.item_sku                    AS product_sku,
+    oi.item_id                     AS item_id,
+    oi.quantity                    AS qty
 FROM erp_order o
+    INNER JOIN erp_order_item oi ON oi.order_id = o.id
     LEFT JOIN erp_order_logistics ol ON ol.order_id = o.id
 WHERE `
 
-	sql = sql + filter
+	sql = sql + filter + `
+ORDER BY o.id ASC;
+`
 
 	var order_list = make([]order_export_item_t, 0)
 	err := db_session.Sql(sql).Find(&order_list)
@@ -248,7 +262,7 @@ WHERE `
 	row_height := 0.6
 
 	{
-		// 订单编号，订单代码，订单店铺，买家账号，收款金额，收款运费，商品成本，GST税，平台费，付款交易费，拣货费，预估运费，实际运费，毛利，订单状态
+		// 订单编号，订单代码，订单店铺，买家账号，收款金额，收款运费，商品成本，GST税，平台费，付款交易费，拣货费，预估运费，实际运费，毛利，订单状态， SKU， ItemID， 数量
 		header_row := sheet.AddRow()
 		header_row.SetHeightCM(row_height)
 
@@ -362,6 +376,26 @@ WHERE `
 			set_head_cell_style(cell)
 			cell.Value = "最佳物流"
 		}
+
+		// SKU， ItemID， 数量
+
+		col_index++
+		cell = header_row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 20)
+		set_head_cell_style(cell)
+		cell.Value = "SKU"
+
+		col_index++
+		cell = header_row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 20)
+		set_head_cell_style(cell)
+		cell.Value = "ItemID"
+
+		col_index++
+		cell = header_row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 10)
+		set_head_cell_style(cell)
+		cell.Value = "数量"
 	}
 
 	for _, order := range order_list {
@@ -473,6 +507,21 @@ WHERE `
 			set_text_cell_style(cell, "left")
 			cell.Value = mode.Name
 		}
+
+		// SKU
+		cell = row.AddCell()
+		set_text_cell_style(cell, "left")
+		cell.Value = order.ProductSku
+
+		// ItemID
+		cell = row.AddCell()
+		set_text_cell_style(cell, "left")
+		cell.Value = order.ItemId
+
+		// 数量
+		cell = row.AddCell()
+		set_text_cell_style(cell, "center")
+		cell.Value = order.Qty
 	}
 
 	return xlsx_file
