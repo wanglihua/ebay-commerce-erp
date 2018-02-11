@@ -941,6 +941,12 @@ func (c ErpInventory) get_export_excel(db_session *xorm.Session) *xlsx.File {
 		cell = header_row.AddCell()
 		sheet.SetColWidth(col_index, col_index, 10)
 		set_head_cell_style(cell)
+		cell.Value = "待发货"
+
+		col_index++
+		cell = header_row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 10)
+		set_head_cell_style(cell)
 		cell.Value = "成本价"
 	}
 
@@ -974,7 +980,11 @@ func (c ErpInventory) get_export_excel(db_session *xorm.Session) *xlsx.File {
 
 		cell = row.AddCell()
 		set_text_cell_style(cell, "center")
-		cell.Value = fmt.Sprint(inventory_view.Inventory.CostPrice)
+		cell.Value = fmt.Sprint(inventory_view.Inventory.PendingQty)
+
+		cell = row.AddCell()
+		set_text_cell_style(cell, "center")
+		cell.Value = fmt.Sprintf("%0.2f", inventory_view.Inventory.CostPrice)
 	}
 
 	return xlsx_file

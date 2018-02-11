@@ -14,6 +14,7 @@ import (
 	"matrix/modules/erp/models/xtpz_models"
 	"matrix/modules/erp/models/sppz_models"
 	"matrix/modules/erp/service/product_bind_service"
+	"strings"
 )
 
 const log_response_xml_to_file = false
@@ -182,6 +183,16 @@ func fetch_product_item_to_db(config xtpz_models.EBayAPIConfigInfo, db_session *
 
 	item_sku := item_response.Item.Sku
 
+	/*
+	if (itemSku.contains("AU-")) {
+		itemSku = itemSku.substring(0, itemSku.indexOf("AU-") + 2); // 123489AU-DG => 123489AU
+	}
+	 */
+
+	if strings.Contains(item_sku, "AU-") {
+		item_sku = core.SubString(item_sku, 0, strings.Index(item_sku, "AU-")+2) // 123489AU-DG => 123489AU
+	}
+
 	var product_id int64 = 0
 	var product_bind_id int64 = 0
 
@@ -202,7 +213,7 @@ func fetch_product_item_to_db(config xtpz_models.EBayAPIConfigInfo, db_session *
 		has_product, err := db_session.Where(fmt.Sprintf("sku = '%s'", item_sku)).Get(&product)
 		core.HandleError(err)
 
-		product.Sku = item_response.Item.Sku
+		product.Sku = item_sku
 		product.ImageUrl = core.MakeNullString(item_response.Item.PictureDetails.GalleryUrl, true)
 
 		if product.StatusId == 0 {
