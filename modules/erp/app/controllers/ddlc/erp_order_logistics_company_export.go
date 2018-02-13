@@ -33,6 +33,7 @@ var (
 	excel_export_company_eparcel_code int = 100
 	excel_export_company_fastway_code int = 200
 	excel_export_company_toll_code    int = 300
+	excel_export_company_elife_code   int = 400
 )
 
 func (c ErpOrderLogisticsCompanyExport) ExportOptionData() revel.Result {
@@ -43,6 +44,10 @@ func (c ErpOrderLogisticsCompanyExport) ExportOptionData() revel.Result {
 		map[string]interface{}{
 			"code": excel_export_company_eparcel_code,
 			"name": "AU POST eParcel",
+		},
+		map[string]interface{}{
+			"code": excel_export_company_elife_code,
+			"name": "ELIFE AU POST eParcel",
 		},
 		map[string]interface{}{
 			"code": excel_export_company_fastway_code,
@@ -253,7 +258,7 @@ WHERE o.status_id = %d AND ol.mode_id IN (%s) AND ol.stock_id = %d`
 		if stock_code == excel_export_stock_mel_code {
 			xlsx_file, err = xlsx.OpenFile(filepath.Join(excel_template_logistics_export_dir, "eparcel_mel.xlsx"))
 			core.HandleError(err)
-			export_excel_file_name = "eParcel 墨尔本"
+			export_excel_file_name = "eParcel MEL"
 
 			sheet := xlsx_file.Sheets[0] // 模板里面应该至少有一个sheet
 			for index, order_logistics := range order_logistics_list {
@@ -290,6 +295,8 @@ WHERE o.status_id = %d AND ol.mode_id IN (%s) AND ol.stock_id = %d`
 				sheet.Cell(index+2, excel_col_label_to_index("AJ")).Value = "VIC"
 				sheet.Cell(index+2, excel_col_label_to_index("AK")).Value = "3175"
 				sheet.Cell(index+2, excel_col_label_to_index("AL")).Value = "AU" // 固定
+				sheet.Cell(index+2, excel_col_label_to_index("AM")).Value = "iepoch MEL (3PL)"
+				sheet.Cell(index+2, excel_col_label_to_index("AN")).Value = "iepoch MEL (3PL)"
 				sheet.Cell(index+2, excel_col_label_to_index("AX")).Value = order_logistics.Order.BuyerEmail
 				sheet.Cell(index+2, excel_col_label_to_index("AY")).Value = "TRACKADV"
 				sheet.Cell(index+2, excel_col_label_to_index("BI")).Value = fmt.Sprintf("%0.1f", order_logistics.OrderLogistics.Weight)
@@ -300,7 +307,7 @@ WHERE o.status_id = %d AND ol.mode_id IN (%s) AND ol.stock_id = %d`
 		} else if stock_code == excel_export_stock_bne_code {
 			xlsx_file, err = xlsx.OpenFile(filepath.Join(excel_template_logistics_export_dir, "eparcel_bne.xlsx"))
 			core.HandleError(err)
-			export_excel_file_name = "eParcel 布里斯班"
+			export_excel_file_name = "eParcel BNE"
 
 			sheet := xlsx_file.Sheets[0] // 模板里面应该至少有一个sheet
 			for index, order_logistics := range order_logistics_list {
@@ -337,6 +344,8 @@ WHERE o.status_id = %d AND ol.mode_id IN (%s) AND ol.stock_id = %d`
 				sheet.Cell(index+2, excel_col_label_to_index("AJ")).Value = "QLD"
 				sheet.Cell(index+2, excel_col_label_to_index("AK")).Value = "4105"
 				sheet.Cell(index+2, excel_col_label_to_index("AL")).Value = "AU" // 固定
+				sheet.Cell(index+2, excel_col_label_to_index("AM")).Value = "iepoch BNE (3PL)"
+				sheet.Cell(index+2, excel_col_label_to_index("AN")).Value = "iepoch BNE (3PL)"
 				sheet.Cell(index+2, excel_col_label_to_index("AX")).Value = order_logistics.Order.BuyerEmail
 				sheet.Cell(index+2, excel_col_label_to_index("AY")).Value = "TRACKADV"
 				sheet.Cell(index+2, excel_col_label_to_index("BI")).Value = fmt.Sprintf("%0.1f", order_logistics.OrderLogistics.Weight)
@@ -349,9 +358,9 @@ WHERE o.status_id = %d AND ol.mode_id IN (%s) AND ol.stock_id = %d`
 		core.HandleError(err)
 
 		if stock_code == excel_export_stock_mel_code {
-			export_excel_file_name = "FASTWAY 墨尔本"
+			export_excel_file_name = "FASTWAY MEL"
 		} else if stock_code == excel_export_stock_bne_code {
-			export_excel_file_name = "FASTWAY 布里斯班"
+			export_excel_file_name = "FASTWAY BNE"
 		}
 
 		type ModeId struct {
@@ -455,9 +464,9 @@ WHERE  o.status_id = %d AND ol.mode_id IN (%s) AND ol.stock_id = %d`
 		xlsx_file, err = xlsx.OpenFile(filepath.Join(excel_template_logistics_export_dir, "toll.xlsx"))
 		core.HandleError(err)
 		if stock_code == excel_export_stock_mel_code {
-			export_excel_file_name = "TOLL 墨尔本"
+			export_excel_file_name = "TOLL MEL"
 		} else if stock_code == excel_export_stock_bne_code {
-			export_excel_file_name = "TOLL 布里斯班"
+			export_excel_file_name = "TOLL BNE"
 		}
 
 		type ModeId struct {
