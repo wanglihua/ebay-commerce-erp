@@ -43,7 +43,7 @@ func (c ErpOrderLogisticsCompanyExport) ExportOptionData() revel.Result {
 	var excel_export_company_list = [](map[string]interface{}){
 		map[string]interface{}{
 			"code": excel_export_company_eparcel_code,
-			"name": "AU POST eParcel",
+			"name": "GIANT AU POST eParcel",
 		},
 		map[string]interface{}{
 			"code": excel_export_company_elife_code,
@@ -202,7 +202,7 @@ func (c ErpOrderLogisticsCompanyExport) ExportExcel() revel.Result {
 		}
 
 		var mode_id_list = make([]ModeId, 0)
-		sql_get_mode_id_list := `SELECT lm.id AS mode_id FROM erp_logistics_mode lm WHERE lm.stock_id = %d AND lm.name LIKE '%%eParcel%%';`
+		sql_get_mode_id_list := `SELECT lm.id AS mode_id FROM erp_logistics_mode lm WHERE lm.stock_id = %d AND lm.name LIKE '%%Giant eParcel%%';`
 		sql_get_mode_id_list = fmt.Sprintf(sql_get_mode_id_list, stock_id)
 		err := db_session.Sql(sql_get_mode_id_list).Find(&mode_id_list)
 		core.HandleError(err)
@@ -351,6 +351,171 @@ WHERE o.status_id = %d AND ol.mode_id IN (%s) AND ol.stock_id = %d`
 				sheet.Cell(index+2, excel_col_label_to_index("BI")).Value = fmt.Sprintf("%0.1f", order_logistics.OrderLogistics.Weight)
 				sheet.Cell(index+2, excel_col_label_to_index("BO")).Value = "FALSE"
 				sheet.Cell(index+2, excel_col_label_to_index("BP")).Value = "FALSE"
+			}
+		}
+	} else if company_code == excel_export_company_elife_code && (stock_code == excel_export_stock_mel_code || stock_code == excel_export_stock_bne_code ) {
+		type ModeId struct {
+			ModeId int64 `xorm:"'mode_id'" json:"mode_id"`
+		}
+
+		var mode_id_list = make([]ModeId, 0)
+		sql_get_mode_id_list := `SELECT lm.id AS mode_id FROM erp_logistics_mode lm WHERE lm.stock_id = %d AND lm.name LIKE '%%Elife eParcel%%';`
+		sql_get_mode_id_list = fmt.Sprintf(sql_get_mode_id_list, stock_id)
+		err := db_session.Sql(sql_get_mode_id_list).Find(&mode_id_list)
+		core.HandleError(err)
+
+		var mode_id_str_list = make([]string, 0)
+		for _, mode_id := range mode_id_list {
+			mode_id_str_list = append(mode_id_str_list, fmt.Sprint(mode_id.ModeId))
+		}
+
+		/*
+SELECT ol.*, o.*, sa.*
+FROM erp_order_logistics ol
+    INNER JOIN erp_order o ON o.id = ol.order_id
+    LEFT JOIN erp_shop_account sa ON sa.id = o.shop_id
+WHERE ol.mode_id IN (0) AND ol.stock_id = 0
+		 */
+
+		sql_get_logistics_list := `SELECT ol.*, o.*, sa.*
+FROM erp_order_logistics ol
+    INNER JOIN erp_order o ON o.id = ol.order_id
+    LEFT JOIN erp_shop_account sa ON sa.id = o.shop_id
+WHERE o.status_id = %d AND ol.mode_id IN (%s) AND ol.stock_id = %d`
+
+		if export_type == 0 {
+			sql_get_logistics_list = fmt.Sprintf(sql_get_logistics_list, models.ORDER_STATUS_PHZ, strings.Join(mode_id_str_list, ","), stock_id)
+		}
+
+		if export_type == 1 {
+			sql_get_logistics_list = fmt.Sprintf(sql_get_logistics_list, models.ORDER_STATUS_DPH, strings.Join(mode_id_str_list, ","), stock_id)
+		}
+
+		if batch_code != 0 {
+			sql_get_logistics_list += fmt.Sprintf(" AND o.batch_code = %d", batch_code)
+		}
+
+		if export_type == 1 { //待配货的导出
+			sql_get_logistics_list = sql_get_logistics_list + fmt.Sprintf(" AND o.id IN(%s)", order_id_list_str)
+		}
+
+		var order_logistics_list = make([]order_logistics_eparcel_view_item_t, 0)
+		err = db_session.Sql(sql_get_logistics_list).Find(&order_logistics_list)
+		core.HandleError(err)
+
+		for index, order_logistics := range order_logistics_list {
+			order_logistics_list[index].sku_qty_loc, order_logistics_list[index].loc_name = get_order_sku_for_export(order_logistics.Order.Id, db_session)
+		}
+
+		var order_logistics_list_slice = order_logistics_eparcel_view_item_slice(order_logistics_list)
+		sort.Sort(order_logistics_list_slice)
+
+		order_logistics_list = []order_logistics_eparcel_view_item_t(order_logistics_list_slice)
+
+		if stock_code == excel_export_stock_mel_code {
+			xlsx_file, err = xlsx.OpenFile(filepath.Join(excel_template_logistics_export_dir, "elife_ep_mel.xlsx"))
+			core.HandleError(err)
+			export_excel_file_name = "eParcel MEL"
+
+			sheet := xlsx_file.Sheets[0] // 模板里面应该至少有一个sheet
+			for index, order_logistics := range order_logistics_list {
+				var order_shipping_address = order_service.Get_order_shipping_address(order_logistics.Order.Id, db_session)
+				sheet.Cell(index+2, excel_col_label_to_index("C")).Value = "7D53"
+				sheet.Cell(index+2, excel_col_label_to_index("D")).Value = order_logistics.Order.FullTranId
+
+				name1, name2 := split_long_string(order_shipping_address.Name, 35)
+				sheet.Cell(index+2, excel_col_label_to_index("E")).Value = name1
+				sheet.Cell(index+2, excel_col_label_to_index("F")).Value = name2
+
+				var full_address = order_shipping_address.Street1 + order_shipping_address.Street2
+				address1, address2 := split_long_string(full_address, 35)
+				sheet.Cell(index+2, excel_col_label_to_index("G")).Value = address1
+				sheet.Cell(index+2, excel_col_label_to_index("H")).Value = address2
+				sheet.Cell(index+2, excel_col_label_to_index("K")).Value = order_shipping_address.CityName
+				sheet.Cell(index+2, excel_col_label_to_index("L")).Value = get_state_short_name(order_shipping_address.Province)
+				sheet.Cell(index+2, excel_col_label_to_index("M")).Value = order_shipping_address.PostalCode
+				//sheet.Cell(index+2, excel_col_label_to_index("N")).Value = order_shipping_address.CountryName
+				sheet.Cell(index+2, excel_col_label_to_index("N")).Value = "AU" // 固定
+				sheet.Cell(index+2, excel_col_label_to_index("O")).Value = order_shipping_address.Phone
+				sheet.Cell(index+2, excel_col_label_to_index("P")).Value = "FALSE"
+				sheet.Cell(index+2, excel_col_label_to_index("S")).Value = "N"
+				sheet.Cell(index+2, excel_col_label_to_index("V")).Value = "N"
+				sheet.Cell(index+2, excel_col_label_to_index("X")).Value = fmt.Sprintf("%s FROM:%s", order_logistics.Order.FullTranId, order_logistics.ShopAccount.Name)
+				sheet.Cell(index+2, excel_col_label_to_index("Y")).Value = "FALSE"
+				sheet.Cell(index+2, excel_col_label_to_index("Z")).Value = order_logistics.sku_qty_loc
+				sheet.Cell(index+2, excel_col_label_to_index("AA")).Value = "FALSE"
+				sheet.Cell(index+2, excel_col_label_to_index("AC")).Value = "FALSE"
+				sheet.Cell(index+2, excel_col_label_to_index("AD")).Value = "iepoch MEL (3PL)"
+				sheet.Cell(index+2, excel_col_label_to_index("AE")).Value = "2 Venture Court"
+				sheet.Cell(index+2, excel_col_label_to_index("AI")).Value = "DANDENONG SOUTH"
+				sheet.Cell(index+2, excel_col_label_to_index("AJ")).Value = "VIC"
+				sheet.Cell(index+2, excel_col_label_to_index("AK")).Value = "3175"
+				sheet.Cell(index+2, excel_col_label_to_index("AL")).Value = "AU" // 固定
+				sheet.Cell(index+2, excel_col_label_to_index("AM")).Value = "iepoch MEL (3PL)"
+				sheet.Cell(index+2, excel_col_label_to_index("AN")).Value = "iepoch MEL (3PL)"
+				sheet.Cell(index+2, excel_col_label_to_index("AX")).Value = order_logistics.Order.BuyerEmail
+				sheet.Cell(index+2, excel_col_label_to_index("AY")).Value = "TRACKADV"
+				sheet.Cell(index+2, excel_col_label_to_index("BI")).Value = fmt.Sprintf("%0.1f", order_logistics.OrderLogistics.Weight)
+				sheet.Cell(index+2, excel_col_label_to_index("BV")).Value = "FALSE"
+				sheet.Cell(index+2, excel_col_label_to_index("BW")).Value = fmt.Sprintf("%0.2f", order_logistics.OrderLogistics.Weight)
+				sheet.Cell(index+2, excel_col_label_to_index("BX")).Value = fmt.Sprintf("%0.2f", order_logistics.OrderLogistics.Length)
+				sheet.Cell(index+2, excel_col_label_to_index("BY")).Value = fmt.Sprintf("%0.2f", order_logistics.OrderLogistics.Width)
+				sheet.Cell(index+2, excel_col_label_to_index("BZ")).Value = fmt.Sprintf("%0.2f", order_logistics.OrderLogistics.Height)
+				sheet.Cell(index+2, excel_col_label_to_index("CC")).Value = "FALSE"
+				sheet.Cell(index+2, excel_col_label_to_index("CD")).Value = "FALSE"
+			}
+
+		} else if stock_code == excel_export_stock_bne_code {
+			xlsx_file, err = xlsx.OpenFile(filepath.Join(excel_template_logistics_export_dir, "elife_ep_bne.xlsx"))
+			core.HandleError(err)
+			export_excel_file_name = "eParcel BNE"
+
+			sheet := xlsx_file.Sheets[0] // 模板里面应该至少有一个sheet
+			for index, order_logistics := range order_logistics_list {
+				var order_shipping_address = order_service.Get_order_shipping_address(order_logistics.Order.Id, db_session)
+				sheet.Cell(index+2, excel_col_label_to_index("C")).Value = "7D53"
+				sheet.Cell(index+2, excel_col_label_to_index("D")).Value = order_logistics.Order.FullTranId
+
+				name1, name2 := split_long_string(order_shipping_address.Name, 35)
+				sheet.Cell(index+2, excel_col_label_to_index("E")).Value = name1
+				sheet.Cell(index+2, excel_col_label_to_index("F")).Value = name2
+
+				var full_address = order_shipping_address.Street1 + order_shipping_address.Street2
+				address1, address2 := split_long_string(full_address, 35)
+				sheet.Cell(index+2, excel_col_label_to_index("G")).Value = address1
+				sheet.Cell(index+2, excel_col_label_to_index("H")).Value = address2
+				sheet.Cell(index+2, excel_col_label_to_index("K")).Value = order_shipping_address.CityName
+				sheet.Cell(index+2, excel_col_label_to_index("L")).Value = get_state_short_name(order_shipping_address.Province)
+				sheet.Cell(index+2, excel_col_label_to_index("M")).Value = order_shipping_address.PostalCode
+				//sheet.Cell(index+2, excel_col_label_to_index("N")).Value = order_shipping_address.CountryName
+				sheet.Cell(index+2, excel_col_label_to_index("N")).Value = "AU" // 固定
+				sheet.Cell(index+2, excel_col_label_to_index("O")).Value = order_shipping_address.Phone
+				sheet.Cell(index+2, excel_col_label_to_index("P")).Value = "FALSE"
+				sheet.Cell(index+2, excel_col_label_to_index("S")).Value = "N"
+				sheet.Cell(index+2, excel_col_label_to_index("V")).Value = "N"
+				sheet.Cell(index+2, excel_col_label_to_index("X")).Value = fmt.Sprintf("%s FROM:%s", order_logistics.Order.FullTranId, order_logistics.ShopAccount.Name)
+				sheet.Cell(index+2, excel_col_label_to_index("Y")).Value = "FALSE"
+				sheet.Cell(index+2, excel_col_label_to_index("Z")).Value = order_logistics.sku_qty_loc
+				sheet.Cell(index+2, excel_col_label_to_index("AA")).Value = "FALSE"
+				sheet.Cell(index+2, excel_col_label_to_index("AC")).Value = "FALSE"
+				sheet.Cell(index+2, excel_col_label_to_index("AD")).Value = "iepoch BNE (3PL)"
+				sheet.Cell(index+2, excel_col_label_to_index("AE")).Value = "Basement 2/30 Gow Street"
+				sheet.Cell(index+2, excel_col_label_to_index("AI")).Value = "MOOROOKA"
+				sheet.Cell(index+2, excel_col_label_to_index("AJ")).Value = "QLD"
+				sheet.Cell(index+2, excel_col_label_to_index("AK")).Value = "4105"
+				sheet.Cell(index+2, excel_col_label_to_index("AL")).Value = "AU" // 固定
+				sheet.Cell(index+2, excel_col_label_to_index("AM")).Value = "iepoch BNE (3PL)"
+				sheet.Cell(index+2, excel_col_label_to_index("AN")).Value = "iepoch BNE (3PL)"
+				sheet.Cell(index+2, excel_col_label_to_index("AX")).Value = order_logistics.Order.BuyerEmail
+				sheet.Cell(index+2, excel_col_label_to_index("AY")).Value = "TRACKADV"
+				sheet.Cell(index+2, excel_col_label_to_index("BI")).Value = fmt.Sprintf("%0.1f", order_logistics.OrderLogistics.Weight)
+				sheet.Cell(index+2, excel_col_label_to_index("BV")).Value = "FALSE"
+				sheet.Cell(index+2, excel_col_label_to_index("BW")).Value = fmt.Sprintf("%0.2f", order_logistics.OrderLogistics.Weight)
+				sheet.Cell(index+2, excel_col_label_to_index("BX")).Value = fmt.Sprintf("%0.2f", order_logistics.OrderLogistics.Length)
+				sheet.Cell(index+2, excel_col_label_to_index("BY")).Value = fmt.Sprintf("%0.2f", order_logistics.OrderLogistics.Width)
+				sheet.Cell(index+2, excel_col_label_to_index("BZ")).Value = fmt.Sprintf("%0.2f", order_logistics.OrderLogistics.Height)
+				sheet.Cell(index+2, excel_col_label_to_index("CC")).Value = "FALSE"
+				sheet.Cell(index+2, excel_col_label_to_index("CD")).Value = "FALSE"
 			}
 		}
 	} else if company_code == excel_export_company_fastway_code && (stock_code == excel_export_stock_mel_code || stock_code == excel_export_stock_bne_code) {
