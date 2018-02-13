@@ -2100,6 +2100,8 @@ func (c ErpOrder) ReShip() revel.Result {
 
 	new_order.AddressId = 0 // 先把地址置空，等会儿再填入新的地址id
 
+	new_order.WaybillNumber = "" // 不复制货运单号
+
 	new_order.StatusId = models.ORDER_STATUS_YZF   // 设置重发订单的初始状态为已支付
 	new_order.TypeId = ddpz_models.ORDER_TYPE_RSDD // 设置重发订单的初始状态为已支付
 
