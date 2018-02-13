@@ -258,7 +258,7 @@ WHERE o.status_id = %d AND ol.mode_id IN (%s) AND ol.stock_id = %d`
 		if stock_code == excel_export_stock_mel_code {
 			xlsx_file, err = xlsx.OpenFile(filepath.Join(excel_template_logistics_export_dir, "eparcel_mel.xlsx"))
 			core.HandleError(err)
-			export_excel_file_name = "eParcel MEL"
+			export_excel_file_name = "GIANT eParcel MEL"
 
 			sheet := xlsx_file.Sheets[0] // 模板里面应该至少有一个sheet
 			for index, order_logistics := range order_logistics_list {
@@ -307,7 +307,7 @@ WHERE o.status_id = %d AND ol.mode_id IN (%s) AND ol.stock_id = %d`
 		} else if stock_code == excel_export_stock_bne_code {
 			xlsx_file, err = xlsx.OpenFile(filepath.Join(excel_template_logistics_export_dir, "eparcel_bne.xlsx"))
 			core.HandleError(err)
-			export_excel_file_name = "eParcel BNE"
+			export_excel_file_name = "GIANT eParcel BNE"
 
 			sheet := xlsx_file.Sheets[0] // 模板里面应该至少有一个sheet
 			for index, order_logistics := range order_logistics_list {
@@ -415,7 +415,7 @@ WHERE o.status_id = %d AND ol.mode_id IN (%s) AND ol.stock_id = %d`
 		if stock_code == excel_export_stock_mel_code {
 			xlsx_file, err = xlsx.OpenFile(filepath.Join(excel_template_logistics_export_dir, "elife_ep_mel.xlsx"))
 			core.HandleError(err)
-			export_excel_file_name = "eParcel MEL"
+			export_excel_file_name = "ELIFE eParcel MEL"
 
 			sheet := xlsx_file.Sheets[0] // 模板里面应该至少有一个sheet
 			for index, order_logistics := range order_logistics_list {
@@ -458,9 +458,9 @@ WHERE o.status_id = %d AND ol.mode_id IN (%s) AND ol.stock_id = %d`
 				sheet.Cell(index+2, excel_col_label_to_index("BI")).Value = fmt.Sprintf("%0.1f", order_logistics.OrderLogistics.Weight)
 				sheet.Cell(index+2, excel_col_label_to_index("BV")).Value = "FALSE"
 				sheet.Cell(index+2, excel_col_label_to_index("BW")).Value = fmt.Sprintf("%0.2f", order_logistics.OrderLogistics.Weight)
-				sheet.Cell(index+2, excel_col_label_to_index("BX")).Value = fmt.Sprintf("%0.2f", order_logistics.OrderLogistics.Length)
-				sheet.Cell(index+2, excel_col_label_to_index("BY")).Value = fmt.Sprintf("%0.2f", order_logistics.OrderLogistics.Width)
-				sheet.Cell(index+2, excel_col_label_to_index("BZ")).Value = fmt.Sprintf("%0.2f", order_logistics.OrderLogistics.Height)
+				sheet.Cell(index+2, excel_col_label_to_index("BX")).Value = fmt.Sprintf("%0.0f", order_logistics.OrderLogistics.Length)
+				sheet.Cell(index+2, excel_col_label_to_index("BY")).Value = fmt.Sprintf("%0.0f", order_logistics.OrderLogistics.Width)
+				sheet.Cell(index+2, excel_col_label_to_index("BZ")).Value = fmt.Sprintf("%0.0f", order_logistics.OrderLogistics.Height)
 				sheet.Cell(index+2, excel_col_label_to_index("CC")).Value = "FALSE"
 				sheet.Cell(index+2, excel_col_label_to_index("CD")).Value = "FALSE"
 			}
@@ -468,7 +468,7 @@ WHERE o.status_id = %d AND ol.mode_id IN (%s) AND ol.stock_id = %d`
 		} else if stock_code == excel_export_stock_bne_code {
 			xlsx_file, err = xlsx.OpenFile(filepath.Join(excel_template_logistics_export_dir, "elife_ep_bne.xlsx"))
 			core.HandleError(err)
-			export_excel_file_name = "eParcel BNE"
+			export_excel_file_name = "ELIFE eParcel BNE"
 
 			sheet := xlsx_file.Sheets[0] // 模板里面应该至少有一个sheet
 			for index, order_logistics := range order_logistics_list {
@@ -511,9 +511,9 @@ WHERE o.status_id = %d AND ol.mode_id IN (%s) AND ol.stock_id = %d`
 				sheet.Cell(index+2, excel_col_label_to_index("BI")).Value = fmt.Sprintf("%0.1f", order_logistics.OrderLogistics.Weight)
 				sheet.Cell(index+2, excel_col_label_to_index("BV")).Value = "FALSE"
 				sheet.Cell(index+2, excel_col_label_to_index("BW")).Value = fmt.Sprintf("%0.2f", order_logistics.OrderLogistics.Weight)
-				sheet.Cell(index+2, excel_col_label_to_index("BX")).Value = fmt.Sprintf("%0.2f", order_logistics.OrderLogistics.Length)
-				sheet.Cell(index+2, excel_col_label_to_index("BY")).Value = fmt.Sprintf("%0.2f", order_logistics.OrderLogistics.Width)
-				sheet.Cell(index+2, excel_col_label_to_index("BZ")).Value = fmt.Sprintf("%0.2f", order_logistics.OrderLogistics.Height)
+				sheet.Cell(index+2, excel_col_label_to_index("BX")).Value = fmt.Sprintf("%0.0f", order_logistics.OrderLogistics.Length)
+				sheet.Cell(index+2, excel_col_label_to_index("BY")).Value = fmt.Sprintf("%0.0f", order_logistics.OrderLogistics.Width)
+				sheet.Cell(index+2, excel_col_label_to_index("BZ")).Value = fmt.Sprintf("%0.0f", order_logistics.OrderLogistics.Height)
 				sheet.Cell(index+2, excel_col_label_to_index("CC")).Value = "FALSE"
 				sheet.Cell(index+2, excel_col_label_to_index("CD")).Value = "FALSE"
 			}

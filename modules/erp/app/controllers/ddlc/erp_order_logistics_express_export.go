@@ -24,11 +24,11 @@ type ErpOrderLogisticsExpressExport struct {
 }
 
 type order_logistics_express_view_item_t struct {
-	OrderLogistics ddlc_models.OrderLogisticsInfo    `xorm:"extends" json:"ol"`
-	Order          ddlc_models.OrderInfo             `xorm:"extends" json:"o"`
-	ShopAccount    xtpz_models.ShopAccountInfo       `xorm:"extends" json:"sa"`
-	sku_qty_loc    string                       `xorm:"-"`
-	loc_name       string                       `xorm:"-"`
+	OrderLogistics ddlc_models.OrderLogisticsInfo `xorm:"extends" json:"ol"`
+	Order          ddlc_models.OrderInfo          `xorm:"extends" json:"o"`
+	ShopAccount    xtpz_models.ShopAccountInfo    `xorm:"extends" json:"sa"`
+	sku_qty_loc    string                         `xorm:"-"`
+	loc_name       string                         `xorm:"-"`
 }
 
 type order_logistics_express_view_item_slice []order_logistics_express_view_item_t
@@ -114,12 +114,14 @@ WHERE o.status_id = %d AND o.hold_type_id = %d AND ol.stock_id = %d`
 
 	order_logistics_list = []order_logistics_express_view_item_t(order_logistics_list_slice)
 
-	xlsx_file, err = xlsx.OpenFile(filepath.Join(excel_template_logistics_export_dir, "eparcel_mel.xlsx"))
+	// xlsx_file, err = xlsx.OpenFile(filepath.Join(excel_template_logistics_export_dir, "eparcel_mel.xlsx"))
+	xlsx_file, err = xlsx.OpenFile(filepath.Join(excel_template_logistics_export_dir, "elife_ep_mel_express.xlsx"))
 	core.HandleError(err)
 
 	sheet := xlsx_file.Sheets[0] // 模板里面应该至少有一个sheet
 	for index, order_logistics := range order_logistics_list {
 		var order_shipping_address = order_service.Get_order_shipping_address(order_logistics.Order.Id, db_session)
+		/*
 		sheet.Cell(index+2, excel_col_label_to_index("C")).Value = "7J85"
 		sheet.Cell(index+2, excel_col_label_to_index("D")).Value = order_logistics.Order.FullTranId
 
@@ -157,6 +159,50 @@ WHERE o.status_id = %d AND o.hold_type_id = %d AND ol.stock_id = %d`
 		sheet.Cell(index+2, excel_col_label_to_index("BI")).Value = fmt.Sprintf("%0.1f", order_logistics.OrderLogistics.Weight)
 		sheet.Cell(index+2, excel_col_label_to_index("BO")).Value = "FALSE"
 		sheet.Cell(index+2, excel_col_label_to_index("BP")).Value = "FALSE"
+		*/
+
+		sheet.Cell(index+2, excel_col_label_to_index("C")).Value = "7J53"
+		sheet.Cell(index+2, excel_col_label_to_index("D")).Value = order_logistics.Order.FullTranId
+
+		name1, name2 := split_long_string(order_shipping_address.Name, 35)
+		sheet.Cell(index+2, excel_col_label_to_index("E")).Value = name1
+		sheet.Cell(index+2, excel_col_label_to_index("F")).Value = name2
+
+		var full_address = order_shipping_address.Street1 + order_shipping_address.Street2
+		address1, address2 := split_long_string(full_address, 35)
+		sheet.Cell(index+2, excel_col_label_to_index("G")).Value = address1
+		sheet.Cell(index+2, excel_col_label_to_index("H")).Value = address2
+		sheet.Cell(index+2, excel_col_label_to_index("K")).Value = order_shipping_address.CityName
+		sheet.Cell(index+2, excel_col_label_to_index("L")).Value = get_state_short_name(order_shipping_address.Province)
+		sheet.Cell(index+2, excel_col_label_to_index("M")).Value = order_shipping_address.PostalCode
+		//sheet.Cell(index+2, excel_col_label_to_index("N")).Value = order_shipping_address.CountryName
+		sheet.Cell(index+2, excel_col_label_to_index("N")).Value = "AU" // 固定
+		sheet.Cell(index+2, excel_col_label_to_index("O")).Value = order_shipping_address.Phone
+		sheet.Cell(index+2, excel_col_label_to_index("P")).Value = "FALSE"
+		sheet.Cell(index+2, excel_col_label_to_index("S")).Value = "N"
+		sheet.Cell(index+2, excel_col_label_to_index("V")).Value = "N"
+		sheet.Cell(index+2, excel_col_label_to_index("X")).Value = fmt.Sprintf("%s FROM:%s", order_logistics.Order.FullTranId, order_logistics.ShopAccount.Name)
+		sheet.Cell(index+2, excel_col_label_to_index("Y")).Value = "FALSE"
+		sheet.Cell(index+2, excel_col_label_to_index("Z")).Value = order_logistics.sku_qty_loc
+		sheet.Cell(index+2, excel_col_label_to_index("AA")).Value = "FALSE"
+		sheet.Cell(index+2, excel_col_label_to_index("AC")).Value = "FALSE"
+		sheet.Cell(index+2, excel_col_label_to_index("AD")).Value = "iepoch MEL (3PL)"
+		sheet.Cell(index+2, excel_col_label_to_index("AE")).Value = "2 Venture Court"
+		sheet.Cell(index+2, excel_col_label_to_index("AI")).Value = "DANDENONG SOUTH"
+		sheet.Cell(index+2, excel_col_label_to_index("AJ")).Value = "VIC"
+		sheet.Cell(index+2, excel_col_label_to_index("AK")).Value = "3175"
+		sheet.Cell(index+2, excel_col_label_to_index("AL")).Value = "AU" // 固定
+		sheet.Cell(index+2, excel_col_label_to_index("AM")).Value = "iepoch MEL (3PL)"
+		sheet.Cell(index+2, excel_col_label_to_index("AN")).Value = "iepoch MEL (3PL)"
+		sheet.Cell(index+2, excel_col_label_to_index("AX")).Value = order_logistics.Order.BuyerEmail
+		sheet.Cell(index+2, excel_col_label_to_index("AY")).Value = "TRACKADV"
+		sheet.Cell(index+2, excel_col_label_to_index("BV")).Value = "FALSE"
+		sheet.Cell(index+2, excel_col_label_to_index("BW")).Value = fmt.Sprintf("%0.2f", order_logistics.OrderLogistics.Weight)
+		sheet.Cell(index+2, excel_col_label_to_index("BX")).Value = fmt.Sprintf("%0.0f", order_logistics.OrderLogistics.Length)
+		sheet.Cell(index+2, excel_col_label_to_index("BY")).Value = fmt.Sprintf("%0.0f", order_logistics.OrderLogistics.Width)
+		sheet.Cell(index+2, excel_col_label_to_index("BZ")).Value = fmt.Sprintf("%0.0f", order_logistics.OrderLogistics.Height)
+		sheet.Cell(index+2, excel_col_label_to_index("CC")).Value = "FALSE"
+		sheet.Cell(index+2, excel_col_label_to_index("CD")).Value = "FALSE"
 	}
 
 	//先把文件内容写到buffer中，再从中读取
