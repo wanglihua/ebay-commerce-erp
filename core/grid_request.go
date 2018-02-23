@@ -84,3 +84,11 @@ type gridColumn struct {
 	ColSearchable string
 	ColSortable   string
 }
+
+func GetGridRequestSearch(request *revel.Request) (search string) {
+	if len(request.Form["sSearch"]) == 0 {
+		return ""
+	}
+
+	return request.Form["sSearch"][0]
+}

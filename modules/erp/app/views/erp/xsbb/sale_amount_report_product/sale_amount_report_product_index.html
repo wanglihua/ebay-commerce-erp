@@ -100,20 +100,20 @@
                         "aaSorting": [[1, "desc"]],
                         "aoColumns": [
                             {
-                                "mDataProp": "product_id", "bSearchable": false, "orderable": false, "sClass": "center", "width": 50,
+                                "mDataProp": "product_id", "bSearchable": true, "orderable": false, "sClass": "center", "width": 50,
                                 "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
                                 "render": function (data, type, row) {
                                     return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
                                 }
                             },
                             {
-                                "mDataProp": "product_sku", "title": "<div>商品编号</div><div>商品名称</div>", "bSearchable": false, "sClass": "wrap-word",
+                                "mDataProp": "product_sku", "title": "<div>商品编号</div><div>商品名称</div>", "bSearchable": true, "sClass": "wrap-word",
                                 "render": function (data, type, row) {
                                     return "<div><a target='product_detail' href='/product/detail/" + row.product_id + "' >" + row.product_sku + "</a></div><div>" + row.product_name + "</div>";
                                 }
                             },
                             {
-                                "mDataProp": "sale_user_name", "title": "<div>销售员</div><div>采购员</div>", "bSearchable": false, "bSortable": false, "width": 60,
+                                "mDataProp": "sale_user_name", "title": "<div>销售员</div><div>采购员</div>", "bSearchable": true, "bSortable": false, "width": 60,
                                 "render": function (data, type, row) {
                                     return "<div>" + row.sale_user_name + "</div><div>" + row.dev_user_name + "</div>";
                                 }

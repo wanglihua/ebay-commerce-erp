@@ -12,6 +12,7 @@ import (
 	auth_models "matrix/modules/auth/models"
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/auth/pass_res"
+	"strings"
 )
 
 type ErpSaleAmountReportProduct struct {
@@ -68,7 +69,9 @@ func (c ErpSaleAmountReportProduct) ListData() revel.Result {
 	var user_id_query int64
 	c.Params.Bind(&user_id_query, "user_id_query")
 
-	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
+	_, order, offset, limit := core.GetGridRequestParam(c.Request)
+
+	var filter = "1=1"
 
 	if begin_time_query.Valid == true {
 		filter = core.SqlAnd(filter, fmt.Sprintf("r.paid_time >= '%s'", begin_time_query.Time.Format("2006-01-02")))
@@ -98,6 +101,19 @@ func (c ErpSaleAmountReportProduct) ListData() revel.Result {
 		if user_type_query == user_query_type_dev {
 			filter = core.SqlAnd(filter, fmt.Sprintf("r.dev_user_id = %d", user_id_query))
 		}
+	}
+
+	var search = core.GetGridRequestSearch(c.Request)
+	search = strings.TrimSpace(search)
+	if search != "" {
+		var search_filter = `(r.sale_user_id IN (SELECT u.id FROM auth_user u
+          WHERE u.login_name LIKE '%%%s%%' OR u.nick_name LIKE '%%%s%%'))
+          OR (r.dev_user_id IN (SELECT u.id FROM auth_user u
+          WHERE u.login_name LIKE '%%%s%%' OR u.nick_name LIKE '%%%s%%'))
+          OR (r.product_id IN (SELECT p.id FROM erp_product p
+          WHERE p.sku LIKE '%%%s%%' OR p.cn_name LIKE '%%%s%%'))`
+
+		filter = core.SqlAnd(filter, fmt.Sprintf(search_filter, search, search, search, search, search, search))
 	}
 
 	/*
@@ -151,9 +167,17 @@ WHERE r.platform_id = 0
       AND r.sale_user_id = 0
       AND r.service_user_id = 0
       AND r.dev_user_id = 0
+      AND (
+          (r.sale_user_id IN (SELECT u.id FROM auth_user u
+          WHERE u.login_name LIKE '%abc%' OR u.nick_name LIKE '%abc%'))
+          OR (r.dev_user_id IN (SELECT u.id FROM auth_user u
+          WHERE u.login_name LIKE '%abc%' OR u.nick_name LIKE '%abc%'))
+          OR (r.product_id IN (SELECT p.id FROM erp_product p
+          WHERE p.sku LIKE '%abc%' OR p.cn_name LIKE '%abc%'))
+      )
 GROUP BY r.product_id
 ORDER BY product_id
-LIMIT 1, 10;
+LIMIT 0, 10;
 
 
 SELECT count(*) AS count
