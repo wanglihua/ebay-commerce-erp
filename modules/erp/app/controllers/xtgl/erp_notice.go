@@ -96,7 +96,7 @@ WHERE (list_top = 1 OR important = 1) AND (datediff(DATE(now()), DATE(update_tim
 	_, err := db_session.Exec(sql_update)
 	core.HandleError(err)
 
-	_, _, offset, limit := core.GetGridRequestParam(c.Request)
+	filter, _, offset, limit := core.GetGridRequestParam(c.Request)
 
 	/*
 SELECT n.*, u.*
@@ -116,6 +116,7 @@ LIMIT 50;
 	sb.Count("count(n.id) AS count")
 	sb.From(`erp_notice n
     INNER JOIN auth_user u ON n.user_id = u.id`)
+	sb.Where(filter)
 	sb.OrderBy(`n.list_top DESC, n.create_time DESC`)
 	sb.Limit(offset, limit)
 
