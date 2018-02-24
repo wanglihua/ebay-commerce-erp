@@ -54,7 +54,7 @@ func packageApp(cmd *Command, args []string) int {
 	build_args := []string{"build"}
 	build_args = append(build_args, "-o", appName)
 
-	build_args = append(build_args, "-ldflags", `"-w"`) //-w去掉DWARF调试信息，得到的程序就不能用gdb调试了
+	// build_args = append(build_args, "-ldflags", `"-w"`) //-w去掉DWARF调试信息，得到的程序就不能用gdb调试了
 
 	if buildTags != "" {
 		build_args = append(build_args, "-tags", buildTags)
@@ -156,6 +156,22 @@ func filterPathFiles(srcPath string) bool {
 	}
 
 	if strings.Contains(srcPath, "\\smith\\") {
+		return true
+	}
+
+	if strings.Contains(srcPath, "\\static\\upload\\") {
+		return true
+	}
+
+	if strings.Contains(srcPath, "\\static\\ace\\") {
+		return true
+	}
+
+	if strings.Contains(srcPath, "\\static\\lib\\") {
+		return true
+	}
+
+	if strings.Contains(srcPath, "\\static\\ueditor\\") {
 		return true
 	}
 

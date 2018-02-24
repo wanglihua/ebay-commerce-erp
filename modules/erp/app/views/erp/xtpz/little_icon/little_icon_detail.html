@@ -27,15 +27,14 @@
                                 <label class="col-xs-2 control-label no-padding-right"></label>
                                 <div class="col-xs-10">
                                     {%if .is_create %}
-                                    <img style="max-width: 200px;max-height: 200px;" id='{%"little_image"%}' src="/static/images/icons/noimg.png" alt="" />
+                                    <img style="max-width: 200px;max-height: 200px;" id='{%"little_image"%}' src="/static/images/icons/noimg.png" alt=""/>
                                     {%else%}
-                                    <img style="max-width: 200px;max-height: 200px;" id="little_image" src="{%.icon_path%}/{%.form_LittleIcon_IconFile%}" alt="" />
+                                    <img style="max-width: 200px;max-height: 200px;" id="little_image" src="{%.icon_path%}/{%.form_LittleIcon_IconFile%}" alt=""/>
                                     {%end%}
                                 </div>
                             </div>
                         </form>
-
-                    </div>``
+                    </div>
                 </div>
             </div>
             <div class="modal-footer">
@@ -105,24 +104,23 @@
             hideMask();
         } else {
             $.ajax({
-                       url: '{%url "ErpLittleIcon.Save"%}',
-                       type: "POST",
-                       data: form.serialize(),
-                       success: function (data) {
-                           hideMask();
-                           if (data.success == false) {
-                               $.msg.error(data.message);
-                               //return;
-                           }
-                           else {
-                               $.msg.show(data.message);
-                               $('#littleIconDetailDialog').modal('hide');
-                               reloadList('#littleIconList');
-                               //return;
-                           }
-                       }
-                   }
-            );
+                url: '{%url "ErpLittleIcon.Save"%}',
+                type: "POST",
+                data: form.serialize(),
+                success: function (data) {
+                    hideMask();
+                    if (data.success === false) {
+                        $.msg.error(data.message);
+                        //return;
+                    }
+                    else {
+                        $.msg.show(data.message);
+                        $('#littleIconDetailDialog').modal('hide');
+                        reloadList('#littleIconList');
+                        //return;
+                    }
+                }
+            });
         }
     }
 </script>
