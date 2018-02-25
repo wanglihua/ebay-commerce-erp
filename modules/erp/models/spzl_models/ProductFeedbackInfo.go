@@ -16,6 +16,8 @@ type ProductFeedbackInfo struct {
 	UserLoginName    string    `xorm:"nvarchar(200) notnull 'user_login_name'" json:"user_login_name" smith:"verbose_name=反馈人工号,min=2,max=100"`
 	SluUserId        int64     `xorm:"bigint notnull index default(0) 'slu_user_id'" json:"slu_user_id" smith:"verbose_name=解决人id"`
 	SluUserLoginName string    `xorm:"nvarchar(200) notnull default('') 'slu_user_login_name'" json:"slu_user_login_name" smith:"verbose_name=解决人工号,min=2,max=100"`
+	ImageFile        string    `xorm:"nvarchar(300) notnull default('') 'image_file'" json:"image_file"` // 图片文件名
+	ImageFileFull    string    `xorm:"-" json:"image_file_full"`                                         // 图片文件名
 	CreateTime       core.Time `xorm:"created notnull 'create_time'" json:"create_time"`
 	UpdateTime       core.Time `xorm:"updated notnull 'update_time'" json:"update_time"`
 }

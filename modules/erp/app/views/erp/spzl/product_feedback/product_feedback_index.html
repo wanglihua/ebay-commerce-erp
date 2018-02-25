@@ -163,7 +163,36 @@
                                         </div>
                                     </div>
                                 </div>
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <label for="image_file" class="col-xs-2 control-label no-padding-right">图片</label>
+                                            <div class="col-xs-10">
+                                                <div class="input-group">
+                                                    <input id="image_file" name="detail.product_feedback.image_file" type="text" class="input-sm form-control" readonly="readonly" v-model="detail.product_feedback.image_file"/>
+                                                    <span class="input-group-btn">
+                                                        <button id="btnUpload" class="btn btn-sm btn-purple" type="button">
+                                                            <i class="ace-icon fa fa-upload"></i>上传
+                                                        </button>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
 
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <label class="col-xs-2 control-label no-padding-right"></label>
+                                            <div class="col-xs-10">
+
+                                                <img v-if="detail.create" style="max-width: 200px;max-height: 200px;" id='{%"image_file_full"%}' src="/static/images/icons/noimg.png" alt=""/>
+                                                <img v-else style="max-width: 200px;max-height: 200px;" id="image_file_full" :src="detail.product_feedback.image_file_full" alt=""/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </form>
                         </div>
                     </div>
@@ -205,78 +234,125 @@
         </div>
     </div>
 </div>
+
+<script type="text/javascript" src="/static/lib/plupload/moxie.min.js"></script>
+<script type="text/javascript" src="/static/lib/plupload/plupload.min.js"></script>
+<script type="text/javascript" src="/static/lib/plupload/zh_CN.js"></script>
+
 {%template "erp/spzl/product_feedback/product_feedback_index.var" .%}
 <script type="text/javascript">
+
+    $(function () {
+        var uploader = new plupload.Uploader({
+            runtimes: 'html5,flash,html4',
+
+            browse_button: 'btnUpload',
+            file_data_name: "image_file",
+
+            url: '{%url "ErpProductFeedback.Upload"%}',
+
+            filters: {
+                max_file_size: '500kb',
+                mime_types: [
+                    {title: "图像文件", extensions: "jpg,png"}
+                ]
+            },
+
+            flash_swf_url: '/plupload/js/Moxie.swf',
+
+            init: {
+                FilesAdded: function () {
+                    showMask("上传中，请稍候...");
+                    uploader.start();
+                },
+                FileUploaded: function (up, file, response) {
+                    hideMask();
+                    var result = JSON.parse(response.response);
+                    if (result.success !== true) {
+                        $.msg.error(result.message);
+                    } else {
+                        vm.detail.product_feedback.image_file = result.image_file;
+                        vm.detail.product_feedback.image_file_full = result.image_file_full;
+                    }
+                },
+                Error: function (up, err) {
+                    $.msg.error("上传发生错误：" + err.code + ", " + err.message);
+                }
+            }
+        });
+
+        uploader.init();
+    });
 
     $(function () {
         loadPageData();
 
         initDataTable(
-            '#productFeedbackList',
-            {
-                "sAjaxSource": '{%url "ErpProductFeedback.ListData"%}',
-                "aaSorting": [[0, "asc"]],
-                "aoColumns": [
-                    {
-                        "mDataProp": "pf.id", "bSearchable": false, "orderable": false, "sClass": "center", "width": 50,
-                        "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
-                        "render": function (data, type, row) {
-                            return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
-                        }
-                    },
-                    {
-                        "mDataProp": "c.name", "title": "反馈类别", "bSearchable": false, "sClass": "wrap-word", "width": 100,
-                        "render": function (data, type, row) {
-                            return "<div>" + data + "</div>";
-                        }
-                    },
-
-                    {
-                        "mDataProp": "sup.name", "title": "供应商", "bSearchable": false, "sClass": "wrap-word", "width": 100,
-                        "render": function (data, type, row) {
-                            return "<div>" + data + "</div>";
-                        }
-                    },
-                    {
-                        "mDataProp": "pf.description", "title": "描述", "bSearchable": true, "sClass": "wrap-word",
-                        "render": function (data, type, row) {
-                            return "<div>" + data + "</div>";
-                        }
-                    },
-                    {"mDataProp": "pf.user_login_name", "title": "反馈人", "bSearchable": true, "sClass": "center", "width": 80},
-                    {
-                        "mDataProp": "pf.solution", "title": "解决方案", "bSearchable": true, "sClass": "wrap-word",
-                        "render": function (data, type, row) {
-                            return "<div>" + data + "</div>";
-                        }
-                    },
-                    {"mDataProp": "pf.slu_user_login_name", "title": "解决人", "bSearchable": true, "sClass": "center", "width": 80},
-                    {"mDataProp": "pf.create_time", "title": "创建时间", "bSearchable": false, "width": 120},
-                    {"mDataProp": "pf.update_time", "title": "修改时间", "bSearchable": false, "width": 120}
-                ],
-                "fnServerData": function (sSource, aoData, fnCallback) {
-                    showMask("数据加载中，请稍候");
-
-                    aoData.push({'name': 'product_id', 'value': product_id});
-                    aoData.push({'name': 'feedback_cate_id', 'value': vm.page.feedback_cate_id});
-                    aoData.push({'name': 'feedback_supplier_id', 'value': vm.page.feedback_supplier_id});
-
-                    $.ajax({
-                        "dataType": 'json',
-                        "url": sSource,
-                        "data": aoData,
-                        "success": function (data) {
-                            hideMask();
-                            if (data.success === false) {
-                                $.msg.error(data.message);
-                                return;
+                '#productFeedbackList',
+                {
+                    "sAjaxSource": '{%url "ErpProductFeedback.ListData"%}',
+                    "aaSorting": [[0, "asc"]],
+                    "aoColumns": [
+                        {
+                            "mDataProp": "pf.id", "bSearchable": false, "orderable": false, "sClass": "center", "width": 50,
+                            "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
+                            "render": function (data, type, row) {
+                                return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
                             }
-                            fnCallback(data.grid_data);
-                            vm.cate_sum_list = data.cate_sum_list;
-                        }
-                    });
+                        },
+                        {
+                            "mDataProp": "c.name", "title": "反馈类别", "bSearchable": false, "sClass": "wrap-word", "width": 100,
+                            "render": function (data, type, row) {
+                                return "<div>" + data + "</div>";
+                            }
+                        },
+
+                        {
+                            "mDataProp": "sup.name", "title": "供应商", "bSearchable": false, "sClass": "wrap-word", "width": 100,
+                            "render": function (data, type, row) {
+                                return "<div>" + data + "</div>";
+                            }
+                        },
+                        {
+                            "mDataProp": "pf.description", "title": "描述", "bSearchable": true, "sClass": "wrap-word",
+                            "render": function (data, type, row) {
+                                return "<div>" + data + "</div>";
+                            }
+                        },
+                        {"mDataProp": "pf.user_login_name", "title": "反馈人", "bSearchable": true, "sClass": "center", "width": 80},
+                        {
+                            "mDataProp": "pf.solution", "title": "解决方案", "bSearchable": true, "sClass": "wrap-word",
+                            "render": function (data, type, row) {
+                                return "<div>" + data + "</div>";
+                            }
+                        },
+                        {"mDataProp": "pf.slu_user_login_name", "title": "解决人", "bSearchable": true, "sClass": "center", "width": 80},
+                        {"mDataProp": "pf.create_time", "title": "创建时间", "bSearchable": false, "width": 120},
+                        {"mDataProp": "pf.update_time", "title": "修改时间", "bSearchable": false, "width": 120}
+                    ],
+                    "fnServerData": function (sSource, aoData, fnCallback) {
+                        showMask("数据加载中，请稍候");
+
+                        aoData.push({'name': 'product_id', 'value': product_id});
+                        aoData.push({'name': 'feedback_cate_id', 'value': vm.page.feedback_cate_id});
+                        aoData.push({'name': 'feedback_supplier_id', 'value': vm.page.feedback_supplier_id});
+
+                        $.ajax({
+                            "dataType": 'json',
+                            "url": sSource,
+                            "data": aoData,
+                            "success": function (data) {
+                                hideMask();
+                                if (data.success === false) {
+                                    $.msg.error(data.message);
+                                    return;
+                                }
+                                fnCallback(data.grid_data);
+                                vm.cate_sum_list = data.cate_sum_list;
+                            }
+                        });
+                    }
                 }
-            }
         );
 
         $('#productFeedbackList tbody').on('dblclick', 'tr', function () {
@@ -285,46 +361,46 @@
         });
 
         initSingleSelectDataTable(
-            '#supplierList',
-            {
-                "sAjaxSource": '{%url "ErpProductFeedback.SupplierSelectListData"%}',
-                "aaSorting": [[1, "asc"]],
-                "aoColumns": [
-                    {
-                        "mDataProp": "s.id",
-                        "bSearchable": false,
-                        "orderable": false,
-                        "sClass": "center",
-                        "width": 50,
-                        "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
-                        "render": function (data, type, row) {
-                            return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
-                        }
-                    },
-                    {"mDataProp": "s.name", "title": "名称", "bSearchable": true},
-                    {"mDataProp": "s.contact", "title": "联系人", "bSearchable": true, "width": 90},
-                    {"mDataProp": "s.create_time", "title": "创建时间", "bSearchable": false, "width": 120},
-                    {"mDataProp": "s.update_time", "title": "修改时间", "bSearchable": false, "width": 120}
-                ]
-            }
+                '#supplierList',
+                {
+                    "sAjaxSource": '{%url "ErpProductFeedback.SupplierSelectListData"%}',
+                    "aaSorting": [[1, "asc"]],
+                    "aoColumns": [
+                        {
+                            "mDataProp": "s.id",
+                            "bSearchable": false,
+                            "orderable": false,
+                            "sClass": "center",
+                            "width": 50,
+                            "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
+                            "render": function (data, type, row) {
+                                return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
+                            }
+                        },
+                        {"mDataProp": "s.name", "title": "名称", "bSearchable": true},
+                        {"mDataProp": "s.contact", "title": "联系人", "bSearchable": true, "width": 90},
+                        {"mDataProp": "s.create_time", "title": "创建时间", "bSearchable": false, "width": 120},
+                        {"mDataProp": "s.update_time", "title": "修改时间", "bSearchable": false, "width": 120}
+                    ]
+                }
         );
     });
 
     function loadPageData() {
         $.ajax({
-                url: '{%url "ErpProductFeedback.PageData" %}',
-                type: "POST",
-                data: {
-                    "product_id": product_id
-                },
-                success: function (result) {
-                    if (result.success === false) {
-                        $.msg.error(result.message);
-                        return;
+                    url: '{%url "ErpProductFeedback.PageData" %}',
+                    type: "POST",
+                    data: {
+                        "product_id": product_id
+                    },
+                    success: function (result) {
+                        if (result.success === false) {
+                            $.msg.error(result.message);
+                            return;
+                        }
+                        vm.page = result;
                     }
-                    vm.page = result;
                 }
-            }
         );
     }
 
@@ -361,24 +437,24 @@
                 showMask("加载中...");
                 $("#productFeedbackDetailForm").clearValidation();
                 $.ajax({
-                        url: '{%url "ErpProductFeedback.DetailData" %}',
-                        type: "POST",
-                        data: {
-                            "id": id,
-                            "product_id": product_id
-                        },
-                        success: function (result) {
-                            hideMask();
-                            if (result.success === false) {
-                                $.msg.error(result.message);
-                                return;
-                            }
-                            vm.detail = result.detail;
-                            vm.product_feedback_cate_list = result.product_feedback_cate_list;
+                            url: '{%url "ErpProductFeedback.DetailData" %}',
+                            type: "POST",
+                            data: {
+                                "id": id,
+                                "product_id": product_id
+                            },
+                            success: function (result) {
+                                hideMask();
+                                if (result.success === false) {
+                                    $.msg.error(result.message);
+                                    return;
+                                }
+                                vm.detail = result.detail;
+                                vm.product_feedback_cate_list = result.product_feedback_cate_list;
 
-                            $('#productFeedbackDetailDialog').modal(modalOptions);
+                                $('#productFeedbackDetailDialog').modal(modalOptions);
+                            }
                         }
-                    }
                 );
             },
             saveProductFeedback: function () {
@@ -397,25 +473,25 @@
                     hideMask();
                 } else {
                     $.ajax({
-                            url: '{%url "ErpProductFeedback.Save"%}',
-                            type: "POST",
-                            processData: false,
-                            contentType: 'application/json',
-                            data: JSON.stringify(vm.detail),
-                            success: function (data) {
-                                hideMask();
-                                if (data.success === false) {
-                                    $.msg.error(data.message);
-                                    //return;
-                                }
-                                else {
-                                    $.msg.show(data.message);
-                                    $('#productFeedbackDetailDialog').modal('hide');
-                                    vm.reloadList();
-                                    //return;
+                                url: '{%url "ErpProductFeedback.Save"%}',
+                                type: "POST",
+                                processData: false,
+                                contentType: 'application/json',
+                                data: JSON.stringify(vm.detail),
+                                success: function (data) {
+                                    hideMask();
+                                    if (data.success === false) {
+                                        $.msg.error(data.message);
+                                        //return;
+                                    }
+                                    else {
+                                        $.msg.show(data.message);
+                                        $('#productFeedbackDetailDialog').modal('hide');
+                                        vm.reloadList();
+                                        //return;
+                                    }
                                 }
                             }
-                        }
                     );
                 }
             },

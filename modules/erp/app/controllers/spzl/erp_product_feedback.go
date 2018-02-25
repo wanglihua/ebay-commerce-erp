@@ -14,6 +14,10 @@ import (
 	"matrix/modules/erp/models/kcgl_models"
 	"matrix/modules/erp/models/spzl_models"
 	"matrix/modules/erp/models/sppz_models"
+	"github.com/pborman/uuid"
+	"path/filepath"
+	"matrix/modules/erp/setting"
+	"os"
 )
 
 type ErpProductFeedback struct {
@@ -106,6 +110,8 @@ func (c ErpProductFeedback) Index(id int64) revel.Result {
 	_, err := db_session.Id(product_id).Get(&product)
 	core.HandleError(err)
 	c.RenderArgs["product"] = product
+
+	c.RenderArgs["product_feedback_image_path"] = setting.PRODUCT_FEEDBACK_IMAGE_PATH
 
 	return c.RenderTemplate("erp/spzl/product_feedback/product_feedback_index.html")
 }
@@ -268,6 +274,7 @@ GROUP BY pf.cate_id;`
 type ProductFeedbackDetailForm struct {
 	ProductFeedback spzl_models.ProductFeedbackInfo `json:"product_feedback"`
 	SupplierName    string                          `json:"supplier_name"`
+	Create          bool                            `json:"create"`
 }
 
 func (f *ProductFeedbackDetailForm) IsCreate() bool {
@@ -314,6 +321,12 @@ func (c ErpProductFeedback) DetailData() revel.Result {
 
 	product_feedback.Sku = product.Sku
 
+	if product_feedback.ImageFile != "" {
+		product_feedback.ImageFileFull = filepath.Join(setting.PRODUCT_FEEDBACK_IMAGE_PATH, product_feedback.ImageFile)
+	} else {
+		product_feedback.ImageFileFull = "/static/images/icons/noimg.png"
+	}
+
 	var supplier sppz_models.SupplierInfo
 	_, err = db_session.Id(product_feedback.SupplierId).Get(&supplier)
 	core.HandleError(err)
@@ -324,6 +337,8 @@ func (c ErpProductFeedback) DetailData() revel.Result {
 
 	var product_feedback_cate_list = make([]spzl_models.ProductFeedbackCateInfo, 0)
 	core.HandleError(db_session.OrderBy("id ASC").Find(&product_feedback_cate_list))
+
+	detail_form.Create = detail_form.IsCreate()
 
 	return c.RenderJson(map[string]interface{}{
 		"detail":                     detail_form,
@@ -379,6 +394,7 @@ func (c ErpProductFeedback) Save() revel.Result {
 		update_col_list = append(update_col_list, "supplier_id")
 		update_col_list = append(update_col_list, "description")
 		update_col_list = append(update_col_list, "solution")
+		update_col_list = append(update_col_list, "image_file")
 
 		if product_feedback.Solution != "" {
 			product_feedback.SluUserId = login_user.UserId
@@ -461,9 +477,18 @@ WHERE (pf.user_id <> %d) OR (pf.user_id = %d AND pf.create_time < '%s');`
 		}
 	}
 
+	var product_feedback_list = make([]spzl_models.ProductFeedbackInfo, 0)
+	err = db_session.In("id", product_feedback_id_list).Find(&product_feedback_list)
+	core.HandleError(err)
+
 	// 删除反馈
 	affected, err := db_session.In("id", product_feedback_id_list).Delete(new(spzl_models.ProductFeedbackInfo))
 	core.HandleError(err)
+
+	// 同时删除上传的图片
+	for _, product_feedback := range product_feedback_list {
+		os.Remove(filepath.Join(revel.BasePath, setting.PRODUCT_FEEDBACK_IMAGE_PATH, product_feedback.ImageFile))
+	}
 
 	// 更改反馈SKU
 	// 一般删除的是同一个SKU下面的
@@ -535,5 +560,60 @@ FROM erp_supplier s
 	return c.RenderJson(core.GridResult{
 		Data:  supplier_list,
 		Total: supplier_count.Count,
+	})
+}
+
+const (
+	_      = iota
+	KB int = 1 << (10 * iota)
+	MB 
+	GB 
+)
+
+func (c ErpProductFeedback) Upload() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.XTPZ_LITTLE_ICON, c.Session)
+
+	imageFileBytes := make([]byte, 0)
+	c.Params.Bind(&imageFileBytes, "image_file")
+
+	upload_file, header, err := c.Request.FormFile("image_file")
+	core.HandleError(err)
+	defer upload_file.Close()
+
+	var upload_file_name = header.Filename
+	var file_ext = filepath.Ext(upload_file_name)
+
+	c.Validation.Required(imageFileBytes).Message("指定文件内容未成功上传！")
+	c.Validation.MinSize(imageFileBytes, 800).Message("上传的文件太小了！")
+	c.Validation.MaxSize(imageFileBytes, 300*KB).Message("上传的文件太大了！")
+
+	if c.Validation.HasErrors() {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": c.GetValidationErrorMessage(),
+		})
+	}
+
+	//保存文件内容到指定文件夹
+	//fileName := time.Now().Format("20060102150405")
+	new_file_name := strings.Replace(uuid.NewUUID().String(), "-", "", -1)
+
+	feedback_image_path := filepath.Join(revel.BasePath, setting.PRODUCT_FEEDBACK_IMAGE_PATH)
+
+	if core.IsDirExists(feedback_image_path) == false {
+		err := os.MkdirAll(feedback_image_path, 0777)
+		core.HandleError(err)
+	}
+
+	imageFile, err := os.Create(filepath.Join(feedback_image_path, new_file_name+file_ext))
+	defer imageFile.Close()
+
+	imageFile.Write(imageFileBytes)
+
+	return c.RenderJson(map[string]interface{}{
+		"success":         true,
+		"message":         "图片上传成功！",
+		"image_file":      new_file_name + file_ext,
+		"image_file_full": filepath.Join(setting.PRODUCT_FEEDBACK_IMAGE_PATH, new_file_name+file_ext),
 	})
 }
