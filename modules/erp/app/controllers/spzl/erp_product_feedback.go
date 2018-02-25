@@ -274,7 +274,6 @@ GROUP BY pf.cate_id;`
 type ProductFeedbackDetailForm struct {
 	ProductFeedback spzl_models.ProductFeedbackInfo `json:"product_feedback"`
 	SupplierName    string                          `json:"supplier_name"`
-	Create          bool                            `json:"create"`
 }
 
 func (f *ProductFeedbackDetailForm) IsCreate() bool {
@@ -337,8 +336,6 @@ func (c ErpProductFeedback) DetailData() revel.Result {
 
 	var product_feedback_cate_list = make([]spzl_models.ProductFeedbackCateInfo, 0)
 	core.HandleError(db_session.OrderBy("id ASC").Find(&product_feedback_cate_list))
-
-	detail_form.Create = detail_form.IsCreate()
 
 	return c.RenderJson(map[string]interface{}{
 		"detail":                     detail_form,
@@ -566,8 +563,8 @@ FROM erp_supplier s
 const (
 	_      = iota
 	KB int = 1 << (10 * iota)
-	MB 
-	GB 
+	MB
+	GB
 )
 
 func (c ErpProductFeedback) Upload() revel.Result {
