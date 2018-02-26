@@ -25,6 +25,7 @@ import (
 	"matrix/modules/erp/models/kcgl_models"
 	"matrix/modules/erp/service/product_bind_service"
 	"matrix/modules/erp/service/product_service"
+	"matrix/modules/erp/service/logistics_setting_service"
 )
 
 type ErpOrderImport struct {
@@ -576,6 +577,8 @@ SELECT sa.id AS shop_id, sa.name AS shop_name FROM erp_shop_account sa;
 	var login_user = core.GetLoginUser(c.Session)
 	var import_batch_code int64 = import_batch_code_service.Get_import_batch_code(login_user.LoginName)
 
+	var logistics_setting = logistics_setting_service.Get_logistics_setting(db_session)
+
 	var order_code_count = 0
 	for order_code := range order_import_list_map {
 		order_code_count++
@@ -629,6 +632,9 @@ SELECT sa.id AS shop_id, sa.name AS shop_name FROM erp_shop_account sa;
 			order.ExchangeRate = aud_exchange_rate_setting
 
 			order.PaidTime = core.MakeNullLongTime(time.Now(), true)
+			
+			order.Jyfy = order.AmountPaid * logistics_setting.Jyfl
+			order.Ptfy = order.AmountPaid * logistics_setting.Ptfl
 
 			_, err = db_session.Insert(&order)
 			core.HandleError(err)
