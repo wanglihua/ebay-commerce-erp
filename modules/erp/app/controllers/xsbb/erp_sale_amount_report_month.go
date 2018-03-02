@@ -196,9 +196,39 @@ FROM (
 	_, err := db_session.Sql(sql_count).Get(&count)
 	core.HandleError(err)
 
-	return c.RenderJson(core.GridResult{
-		Data:  sale_amount_report_list,
-		Total: count.Count,
+	var sql_total = `
+	SELECT
+		''                                              AS paid_time,
+		sum(r.paid_amount)                              AS paid_amount,
+		sum(r.express_fee)                              AS express_fee,
+		sum(r.income)                                   AS income,
+		sum(r.cost_amount)                              AS cost_amount,
+		sum(r.estimate_logistics_fee)                   AS estimate_logistics_fee,
+		sum(r.actual_logistics_fee)                     AS actual_logistics_fee,
+		sum(r.jyfy_amount)                              AS jyfy_amount,
+		sum(r.ptfy_amount)                              AS ptfy_amount,
+		sum(r.pick_fee)                                 AS pick_fee,
+		sum(r.gst_fee)                                  AS gst_fee,
+		sum(r.outcome)                                  AS outcome,
+		sum(r.income - r.outcome)                       AS profit,
+		sum(r.income - r.outcome) / sum(r.income) * 100 AS profit_rate,
+	    count(DISTINCT r.order_id)                      AS order_qty,
+    	sum(r.product_qty)                              AS product_qty
+	FROM erp_sale_amount_report r
+	WHERE %s;
+`
+	sql_total = fmt.Sprintf(sql_total, filter)
+
+	var total xsbb_models.SaleAmountReportInfo
+	_, err = db_session.Sql(sql_total).Get(&total)
+	core.HandleError(err)
+
+	return c.RenderJson(map[string]interface{}{
+		"grid": core.GridResult{
+			Data:  sale_amount_report_list,
+			Total: count.Count,
+		},
+		"total": total,
 	})
 }
 
