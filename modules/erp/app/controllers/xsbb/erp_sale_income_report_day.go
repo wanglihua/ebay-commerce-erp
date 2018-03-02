@@ -290,7 +290,7 @@ func (c ErpSaleIncomeReportDay) ChartData() revel.Result {
 	var sale_income_report_day_list = make([]xsbb_models.SaleAmountReportDayInfo, 0)
 	err := db_session.Where("report_day >= ? AND report_day <= ?", query_begin_date, query_end_date).
 		OrderBy("report_day ASC").
-		Find(&sale_income_report_day_list);
+		Find(&sale_income_report_day_list)
 	core.HandleError(err)
 
 	var time_str_list = make([]string, 0)

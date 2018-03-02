@@ -78,41 +78,41 @@
                         <thead>
                         <tr>
                             <th style="text-align: center; width:100px;"></th>
-                            <th style="width:100px;">交易金额(澳币)</th>
-                            <th style="width:100px;">运费收入(澳币)</th>
-                            <th style="width:100px;">收入小计</th>
-                            <th style="width:100px;">商品澳仓成本(澳币)</th>
-                            <th style="width:100px;">预估运费(澳币)</th>
-                            <th style="width:100px;">实际运费(澳币)</th>
-                            <th style="width:100px;">交易费用(澳币)</th>
-                            <th style="width:100px;">平台费用(澳币)</th>
-                            <th style="width:100px;">拣货费(澳币)</th>
-                            <th style="width:100px;">GST费用(澳币)</th>
-                            <th style="width:100px;">支出小计</th>
-                            <th style="width:100px;">订单数量</th>
-                            <th style="width:100px;">商品销量</th>
-                            <th style="width:100px;">利润(澳币)</th>
-                            <th style="width:100px;">利润率</th>
+                            <th style="text-align: right;width:100px;">交易金额(澳币)</th>
+                            <th style="text-align: right;width:100px;">运费收入(澳币)</th>
+                            <th style="text-align: right;width:100px;">收入小计</th>
+                            <th style="text-align: right;width:100px;">商品澳仓成本(澳币)</th>
+                            <th style="text-align: right;width:100px;">预估运费(澳币)</th>
+                            <th style="text-align: right;width:100px;">实际运费(澳币)</th>
+                            <th style="text-align: right;width:100px;">交易费用(澳币)</th>
+                            <th style="text-align: right;width:100px;">平台费用(澳币)</th>
+                            <th style="text-align: right;width:100px;">拣货费(澳币)</th>
+                            <th style="text-align: right;width:100px;">GST费用(澳币)</th>
+                            <th style="text-align: right;width:100px;">支出小计</th>
+                            <th style="text-align: right;width:100px;">订单数量</th>
+                            <th style="text-align: right;width:100px;">商品销量</th>
+                            <th style="text-align: right;width:100px;">利润(澳币)</th>
+                            <th style="text-align: right;width:100px;">利润率</th>
                         </tr>
                         </thead>
                         <tbody>
                         <tr style="text-align: right;">
                             <td style="text-align: center;">合计</td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
+                            <td style="text-align: right;">{{formatFloat(total.paid_amount)}}</td>
+                            <td style="text-align: right;">{{formatFloat(total.express_fee)}}</td>
+                            <td style="text-align: right;">{{formatFloat(total.income)}}</td>
+                            <td style="text-align: right;">{{formatFloat(total.cost_amount)}}</td>
+                            <td style="text-align: right;">{{formatFloat(total.estimate_logistics_fee)}}</td>
+                            <td style="text-align: right;">{{formatFloat(total.actual_logistics_fee)}}</td>
+                            <td style="text-align: right;">{{formatFloat(total.jyfy_amount)}}</td>
+                            <td style="text-align: right;">{{formatFloat(total.ptfy_amount)}}</td>
+                            <td style="text-align: right;">{{formatFloat(total.pick_fee)}}</td>
+                            <td style="text-align: right;">{{formatFloat(total.gst_fee)}}</td>
+                            <td style="text-align: right;">{{formatFloat(total.outcome)}}</td>
+                            <td style="text-align: right;">{{formatFloat(total.order_qty)}}</td>
+                            <td style="text-align: right;">{{formatFloat(total.product_qty)}}</td>
+                            <td style="text-align: right;">{{formatFloat(total.profit)}}</td>
+                            <td style="text-align: right;">{{formatFloat(total.profit_rate)}}%</td>
                         </tr>
                         </tbody>
                     </table>
@@ -311,6 +311,9 @@
                         }
                     });
                 });
+            },
+            formatFloat: function (data) {
+                return dtFormatFloat(data);
             }
         }
     });
