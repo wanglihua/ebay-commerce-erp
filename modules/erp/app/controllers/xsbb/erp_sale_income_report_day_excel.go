@@ -137,11 +137,38 @@ ORDER BY %s;
 	var sale_amount_report_list = make([]xsbb_models.SaleAmountReportInfo, 0)
 	core.HandleError(db_session.Sql(sql_list).Find(&sale_amount_report_list))
 
-	var xlsx_file = c.export_sale_amount_report_to_excel(db_session, sale_amount_report_list)
+	var sql_total = `
+	SELECT
+		''                                              AS paid_time,
+		sum(r.paid_amount)                              AS paid_amount,
+		sum(r.express_fee)                              AS express_fee,
+		sum(r.income)                                   AS income,
+		sum(r.cost_amount)                              AS cost_amount,
+		sum(r.estimate_logistics_fee)                   AS estimate_logistics_fee,
+		sum(r.actual_logistics_fee)                     AS actual_logistics_fee,
+		sum(r.jyfy_amount)                              AS jyfy_amount,
+		sum(r.ptfy_amount)                              AS ptfy_amount,
+		sum(r.pick_fee)                                 AS pick_fee,
+		sum(r.gst_fee)                                  AS gst_fee,
+		sum(r.outcome)                                  AS outcome,
+		sum(r.income - r.outcome)                       AS profit,
+		sum(r.income - r.outcome) / sum(r.income) * 100 AS profit_rate,
+	    count(DISTINCT r.order_id)                      AS order_qty,
+    	sum(r.product_qty)                              AS product_qty
+	FROM erp_sale_income_report r
+	WHERE %s;
+`
+	sql_total = fmt.Sprintf(sql_total, filter)
+
+	var total xsbb_models.SaleAmountReportInfo
+	_, err := db_session.Sql(sql_total).Get(&total)
+	core.HandleError(err)
+
+	var xlsx_file = c.export_sale_amount_report_to_excel(db_session, sale_amount_report_list, total)
 
 	//先把文件内容写到buffer中，再从中读取
 	var buffer bytes.Buffer
-	err := xlsx_file.Write(&buffer)
+	err = xlsx_file.Write(&buffer)
 	core.HandleError(err)
 
 	reader := bytes.NewReader(buffer.Bytes()) //bytes.Reader 实现了 io.Reader 接口
@@ -151,7 +178,7 @@ ORDER BY %s;
 	return c.RenderBinary(reader, file_name, revel.Attachment, time.Now())
 }
 
-func (c ErpSaleIncomeReportDayExcel) export_sale_amount_report_to_excel(db_session *xorm.Session, sale_amount_report_day_list []xsbb_models.SaleAmountReportInfo) *xlsx.File {
+func (c ErpSaleIncomeReportDayExcel) export_sale_amount_report_to_excel(db_session *xorm.Session, sale_amount_report_day_list []xsbb_models.SaleAmountReportInfo, total xsbb_models.SaleAmountReportInfo) *xlsx.File {
 
 	//统一设置标题单元格格式的函数
 	set_head_cell_style := func(cell *xlsx.Cell) {
@@ -408,6 +435,91 @@ func (c ErpSaleIncomeReportDayExcel) export_sale_amount_report_to_excel(db_sessi
 		cell = row.AddCell()
 		set_text_cell_style(cell, "right")
 		cell.Value = fmt.Sprintf("%0.2f%%", report.ProfitRate)
+	}
+
+	{
+		row = sheet.AddRow()
+		row.SetHeightCM(common_row_height)
+
+		// 日期
+		cell := row.AddCell()
+		set_text_cell_style(cell, "center")
+		cell.Value = "合计"
+
+		// 交易金额
+		cell = row.AddCell()
+		set_text_cell_style(cell, "right")
+		cell.Value = fmt.Sprintf("%0.2f", total.PaidAmount)
+
+		// 运费收入
+		cell = row.AddCell()
+		set_text_cell_style(cell, "right")
+		cell.Value = fmt.Sprintf("%0.2f", total.ExpressFee)
+
+		// 收入小计
+		cell = row.AddCell()
+		set_text_cell_style(cell, "right")
+		cell.Value = fmt.Sprintf("%0.2f", total.Income)
+
+		// 商品澳仓成本
+		cell = row.AddCell()
+		set_text_cell_style(cell, "right")
+		cell.Value = fmt.Sprintf("%0.2f", total.CostAmount)
+
+		// 预估运费
+		cell = row.AddCell()
+		set_text_cell_style(cell, "right")
+		cell.Value = fmt.Sprintf("%0.2f", total.EstimateLogisticsFee)
+
+		// 实际运费
+		cell = row.AddCell()
+		set_text_cell_style(cell, "right")
+		cell.Value = fmt.Sprintf("%0.2f", total.ActualLogisticsFee)
+
+		// 交易费用
+		cell = row.AddCell()
+		set_text_cell_style(cell, "right")
+		cell.Value = fmt.Sprintf("%0.2f", total.JyfyAmount)
+
+		// 平台费用
+		cell = row.AddCell()
+		set_text_cell_style(cell, "right")
+		cell.Value = fmt.Sprintf("%0.2f", total.PtfyAmount)
+
+		// 拣货费
+		cell = row.AddCell()
+		set_text_cell_style(cell, "right")
+		cell.Value = fmt.Sprintf("%0.2f", total.PickFee)
+
+		// GST费用
+		cell = row.AddCell()
+		set_text_cell_style(cell, "right")
+		cell.Value = fmt.Sprintf("%0.2f", total.GstFee)
+
+		// 支出小计
+		cell = row.AddCell()
+		set_text_cell_style(cell, "right")
+		cell.Value = fmt.Sprintf("%0.2f", total.Outcome)
+
+		// 订单数量
+		cell = row.AddCell()
+		set_text_cell_style(cell, "right")
+		cell.Value = fmt.Sprint(total.OrderQty)
+
+		// 商品数量
+		cell = row.AddCell()
+		set_text_cell_style(cell, "right")
+		cell.Value = fmt.Sprint(total.ProductQty)
+
+		// 利润
+		cell = row.AddCell()
+		set_text_cell_style(cell, "right")
+		cell.Value = fmt.Sprintf("%0.2f", total.Profit)
+
+		// 利润率
+		cell = row.AddCell()
+		set_text_cell_style(cell, "right")
+		cell.Value = fmt.Sprintf("%0.2f%%", total.ProfitRate)
 	}
 
 	return xlsx_file
