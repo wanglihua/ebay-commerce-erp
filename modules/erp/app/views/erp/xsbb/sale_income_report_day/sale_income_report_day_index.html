@@ -73,6 +73,32 @@
                 <div>
                     <table id="saleIncomeReportDayList" class="table table-striped table-bordered table-hover"></table>
                 </div>
+                <div style="margin-top: 20px;">
+                    <table class="table table-bordered">
+                        <thead>
+                        <tr>
+                            <th style="text-align: center; width:50px;"></th>
+                            <th style="text-align: right;width:100px;">交易金额(澳币)</th>
+                            <th style="text-align: right;width:100px;">运费收入(澳币)</th>
+                            <th style="text-align: right;width:100px;">收入小计</th>
+                            <th style="text-align: right;width:100px;">商品澳仓成本(澳币)</th>
+                            <th style="text-align: right;width:100px;">商品销量</th>
+                            <th style="text-align: right;width:100px;">订单数量</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr style="text-align: right;">
+                            <td style="text-align: center;">合计</td>
+                            <td>{{formatFloat(total.paid_amount)}}</td>
+                            <td>{{formatFloat(total.express_fee)}}</td>
+                            <td>{{formatFloat(total.income)}}</td>
+                            <td>{{formatFloat(total.cost_amount)}}</td>
+                            <td>{{formatFloat(total.product_qty)}}</td>
+                            <td>{{formatFloat(total.order_qty)}}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
@@ -91,8 +117,11 @@
 
     var vm = new Vue({
         el: "#page",
-        data: {},
+        data: {
+            "total": {}
+        },
         mounted: function () {
+            var this_vm = this;
             initDataTable(
                     '#saleIncomeReportDayList',
                     {
@@ -171,7 +200,8 @@
                                         return;
                                     }
 
-                                    fnCallback(data);
+                                    fnCallback(data.grid);
+                                    this_vm.total = data.total;
                                 }
                             });
                         }
@@ -207,6 +237,9 @@
                         }
                     });
                 });
+            },
+            formatFloat: function (data) {
+                return dtFormatFloat(data);
             }
         }
     });
