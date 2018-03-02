@@ -135,8 +135,13 @@
 
     var vm = new Vue({
         el: "#page",
-        data: {},
+        data: {
+            "total": {}
+        },
         mounted: function () {
+
+            var this_vm = this;
+
             initDataTable(
                     '#saleAmountReportDayList',
                     {
@@ -269,7 +274,8 @@
                                         return;
                                     }
 
-                                    fnCallback(data);
+                                    fnCallback(data.grid);
+                                    this_vm.total = data.total;
                                 }
                             });
                         }
