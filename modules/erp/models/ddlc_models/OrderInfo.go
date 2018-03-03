@@ -6,8 +6,8 @@ import (
 
 type OrderInfo struct {
 	Id                       int64             `xorm:"bigint notnull pk autoincr 'id'" json:"id"`
-	ShopId                   int64             `xorm:"bigint notnull index 'shop_id'" json:"shop_id" smith:"verbose_name=店铺"`
 	EbayOrderId              string            `xorm:"nvarchar(100) null 'ebay_order_id'" json:"ebay_order_id"`
+	ShopId                   int64             `xorm:"bigint notnull index 'shop_id'" json:"shop_id" smith:"verbose_name=店铺"`
 	Code                     string            `xorm:"nvarchar(200) notnull index unique 'code'" json:"code" smith:"verbose_name=编码"`
 	TranId                   string            `xorm:"nvarchar(200) notnull 'tran_id'" json:"tran_id" smith:"verbose_name=交易号"`
 	FullTranId               string            `xorm:"nvarchar(200) notnull 'full_tran_id'" json:"full_tran_id" smith:"verbose_name=交易号"` //交易号，是把店铺号也放进去后的交易号
