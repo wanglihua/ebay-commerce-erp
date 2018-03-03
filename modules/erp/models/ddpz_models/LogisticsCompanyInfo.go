@@ -8,6 +8,7 @@ import (
 type LogisticsCompanyInfo struct {
 	Id                 int64           `xorm:"bigint notnull pk autoincr 'id'" json:"id"`
 	Name               string          `xorm:"nvarchar(200) notnull index unique 'name'" json:"name" smith:"verbose_name=名称,min=2,max=100"`
+	EbayName           string          `xorm:"nvarchar(200) null 'ebay_name'" json:"ebay_name"`
 	AddressSpecialWord int             `xorm:"int notnull 'address_special_word'" json:"address_special_word" smith:"verbose_name=地址特殊字段"` // 地址特殊字段 0 否， 1 是
 	Desc               core.NullString `xorm:"nvarchar(500) 'desc'" json:"desc" smith:"verbose_name=描述,max=500"`
 	StatusId           int64           `xorm:"bigint notnull index 'status_id'" json:"status_id" smith:"verbose_name=状态"`

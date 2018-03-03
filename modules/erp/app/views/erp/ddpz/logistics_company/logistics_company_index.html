@@ -58,6 +58,17 @@
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
+                                            <label for="name" class="col-xs-2 control-label">eBay名称</label>
+                                            <div class="col-xs-10">
+                                                <input id="name" name="detail.logistics_company.ebay_name" type="text" class="input-sm form-control" v-model="detail.logistics_company.ebay_name"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
                                             <label for="desc" class="col-xs-2 control-label">描述</label>
                                             <div class="col-xs-10">
                                                 <textarea id="desc" name="detail.logistics_company.desc" rows="3" class="input-sm form-control" v-model="detail.logistics_company.desc"></textarea>
@@ -177,57 +188,58 @@
         },
         mounted: function () {
             initDataTable(
-                '#logisticsCompanyList',
-                {
-                    "sAjaxSource": '{%url "ErpLogisticsCompany.ListData"%}',
-                    "aaSorting": [[6, "asc"], [1, "asc"]],
-                    "aoColumns": [
-                        {
-                            "mDataProp": "lc.id",
-                            "bSearchable": false,
-                            "orderable": false,
-                            "sClass": "center",
-                            "width": 50,
-                            "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
-                            "render": function (data, type, row) {
-                                return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
-                            }
-                        },
-                        {"mDataProp": "lc.name", "title": "名称", "bSearchable": true, "width": 250},
-                        {"mDataProp": "lc.desc", "title": "描述", "bSearchable": true},
-                        {
-                            "mDataProp": "lc.address_special_word",
-                            "title": "地址特殊字段",
-                            "bSearchable": true,
-                            "width": 110,
-                            "render": function (data, type, row) {
-                                if (data == 1) {
-                                    return "是";
+                    '#logisticsCompanyList',
+                    {
+                        "sAjaxSource": '{%url "ErpLogisticsCompany.ListData"%}',
+                        "aaSorting": [[6, "asc"], [1, "asc"]],
+                        "aoColumns": [
+                            {
+                                "mDataProp": "lc.id",
+                                "bSearchable": false,
+                                "orderable": false,
+                                "sClass": "center",
+                                "width": 50,
+                                "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
+                                "render": function (data, type, row) {
+                                    return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
                                 }
-                                return "否";
-                            }
-                        },
-                        {"mDataProp": "s.name", "title": "状态", "bSearchable": true, "width": 80},
-                        {
-                            "mDataProp": "lc.icon_file",
-                            "title": "图标",
-                            "bSearchable": false,
-                            "orderable": false,
-                            "sClass": "center",
-                            "width": 120,
-                            "render": function (data, type, row) {
-                                if (data == "") {
-                                    return '<img style="height:24px;" src="/static/images/icons/noimg.png"  alt="" />'
-                                } else {
-                                    return '<img style="height:24px;" src="{% .icon_path %}/' + data + '"  alt="" />'
+                            },
+                            {"mDataProp": "lc.name", "title": "名称", "bSearchable": true, "width": 250},
+                            {"mDataProp": "lc.ebay_name", "title": "eBay名称", "bSearchable": true, "width": 250},
+                            {"mDataProp": "lc.desc", "title": "描述", "bSearchable": true},
+                            {
+                                "mDataProp": "lc.address_special_word",
+                                "title": "地址特殊字段",
+                                "bSearchable": true,
+                                "width": 110,
+                                "render": function (data, type, row) {
+                                    if (data == 1) {
+                                        return "是";
+                                    }
+                                    return "否";
                                 }
-                            }
-                        },
-                        {"mDataProp": "lc.ord", "title": "排序", "bSearchable": false, "sClass": "center", "width": 60},
-                        {"mDataProp": "lc.create_time", "title": "创建时间", "bSearchable": false, "width": 120},
-                        {"mDataProp": "lc.update_time", "title": "修改时间", "bSearchable": false, "width": 120}
-                    ]
-                }
+                            },
+                            {"mDataProp": "s.name", "title": "状态", "bSearchable": true, "width": 80},
+                            {
+                                "mDataProp": "lc.icon_file",
+                                "title": "图标",
+                                "bSearchable": false,
+                                "orderable": false,
+                                "sClass": "center",
+                                "width": 120,
+                                "render": function (data, type, row) {
+                                    if (data == "") {
+                                        return '<img style="height:24px;" src="/static/images/icons/noimg.png"  alt="" />'
+                                    } else {
+                                        return '<img style="height:24px;" src="{% .icon_path %}/' + data + '"  alt="" />'
+                                    }
+                                }
+                            },
+                            {"mDataProp": "lc.ord", "title": "排序", "bSearchable": false, "sClass": "center", "width": 60},
+                            {"mDataProp": "lc.create_time", "title": "创建时间", "bSearchable": false, "width": 120},
+                            {"mDataProp": "lc.update_time", "title": "修改时间", "bSearchable": false, "width": 120}
+                        ]
+                    }
             );
 
             $('#logisticsCompanyList tbody').on('dblclick', 'tr', function () {
@@ -236,37 +248,37 @@
             });
 
             initSingleSelectDataTable(
-                '#selectIconList',
-                {
-                    "sAjaxSource": '{%url "ErpLittleIcon.ListData"%}',
-                    "aaSorting": [[1, "asc"]],
-                    "aoColumns": [
-                        {
-                            "mDataProp": "id",
-                            "bSearchable": false,
-                            "orderable": false,
-                            "sClass": "center",
-                            "width": 50,
-                            "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
-                            "render": function (data, type, row) {
-                                return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>'
-                                    + '<input type="hidden" class="icon-file-data" value="' + row.icon_file + '"/>';
+                    '#selectIconList',
+                    {
+                        "sAjaxSource": '{%url "ErpLittleIcon.ListData"%}',
+                        "aaSorting": [[1, "asc"]],
+                        "aoColumns": [
+                            {
+                                "mDataProp": "id",
+                                "bSearchable": false,
+                                "orderable": false,
+                                "sClass": "center",
+                                "width": 50,
+                                "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
+                                "render": function (data, type, row) {
+                                    return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>'
+                                            + '<input type="hidden" class="icon-file-data" value="' + row.icon_file + '"/>';
+                                }
+                            },
+                            {
+                                "mDataProp": "icon_file", "title": "图标", "bSearchable": true,
+                                "render": function (data, type, row) {
+                                    return '<img style="height:24px;" src="{%.icon_path%}/' + data + '" alt="' + data + '" />&nbsp;&nbsp;' + data;
+                                }
+                            },
+                            {
+                                "mDataProp": "create_time",
+                                "title": "创建时间",
+                                "bSearchable": false,
+                                "width": 120
                             }
-                        },
-                        {
-                            "mDataProp": "icon_file", "title": "图标", "bSearchable": true,
-                            "render": function (data, type, row) {
-                                return '<img style="height:24px;" src="{%.icon_path%}/' + data + '" alt="' + data + '" />&nbsp;&nbsp;' + data;
-                            }
-                        },
-                        {
-                            "mDataProp": "create_time",
-                            "title": "创建时间",
-                            "bSearchable": false,
-                            "width": 120
-                        }
-                    ]
-                }
+                        ]
+                    }
             );
 
             $('#selectIconList tbody').on('dblclick', 'tr', function () {
@@ -281,22 +293,21 @@
                 showMask("加载中...");
                 $("#logisticsCompanyDetailForm").clearValidation();
                 $.ajax({
-                        url: '{%url "ErpLogisticsCompany.DetailData" %}',
-                        type: "POST",
-                        data: {
-                            "id": id
-                        },
-                        success: function (result) {
-                            hideMask();
-                            if (result.success == false) {
-                                $.msg.error(result.message);
-                                return;
-                            }
-                            vm.detail = result;
-                            $('#logisticsCompanyDetailDialog').modal(modalOptions);
+                    url: '{%url "ErpLogisticsCompany.DetailData" %}',
+                    type: "POST",
+                    data: {
+                        "id": id
+                    },
+                    success: function (result) {
+                        hideMask();
+                        if (result.success == false) {
+                            $.msg.error(result.message);
+                            return;
                         }
+                        vm.detail = result;
+                        $('#logisticsCompanyDetailDialog').modal(modalOptions);
                     }
-                );
+                });
             },
             saveLogisticsCompany: function () {
                 showMask("提交中...");
@@ -314,26 +325,25 @@
                     hideMask();
                 } else {
                     $.ajax({
-                            url: '{%url "ErpLogisticsCompany.Save"%}',
-                            type: "POST",
-                            processData: false,
-                            contentType: 'application/json',
-                            data: JSON.stringify(vm.detail),
-                            success: function (data) {
-                                hideMask();
-                                if (data.success == false) {
-                                    $.msg.error(data.message);
-                                    //return;
-                                }
-                                else {
-                                    $.msg.show(data.message);
-                                    $('#logisticsCompanyDetailDialog').modal('hide');
-                                    vm.reloadList();
-                                    //return;
-                                }
+                        url: '{%url "ErpLogisticsCompany.Save"%}',
+                        type: "POST",
+                        processData: false,
+                        contentType: 'application/json',
+                        data: JSON.stringify(vm.detail),
+                        success: function (data) {
+                            hideMask();
+                            if (data.success == false) {
+                                $.msg.error(data.message);
+                                //return;
+                            }
+                            else {
+                                $.msg.show(data.message);
+                                $('#logisticsCompanyDetailDialog').modal('hide');
+                                vm.reloadList();
+                                //return;
                             }
                         }
-                    );
+                    });
                 }
             },
             deleteLogisticsCompany: function () {
