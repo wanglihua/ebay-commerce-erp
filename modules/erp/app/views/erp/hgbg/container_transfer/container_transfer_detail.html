@@ -724,60 +724,65 @@
         });
 
         initDataTable(
-            '#entry_list',
-            {
-                "sAjaxSource": '{%url "ErpContainerTransferEntry.ListData"%}',
-                "aaSorting": [[1, "asc"]],
-                "aoColumns": [
-                    {
-                        "mDataProp": "cte.id", "bSearchable": false, "orderable": false, "sClass": "center", "width": 50,
-                        "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
-                        "render": function (data, type, row) {
-                            return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
-                        }
-                    },
-                    {"mDataProp": "cte.product_sku", "title": "SKU", "bSearchable": true, "width": 120},
-                    {
-                        "mDataProp": "p.cn_name", "title": "名称", "bSearchable": true, "sClass": "wrap-word",
-                        "render": function (data, type, row) {
-                            return "<div>" + data + "</div>"
-                        }
-                    },
-                    {"mDataProp": "cte.cn_hs_cn_name", "title": "中国海关申报名", "bSearchable": true, "width": 120},
-                    {"mDataProp": "cte.au_hs_en_name", "title": "澳洲海关申报名", "bSearchable": true, "width": 120},
-                    {
-                        "mDataProp": "cte.price", "title": "价格", "bSearchable": false, "width": 70, "sClass": "center",
-                        "render": function (data, type, row) {
-                            return "RMB " + $.formatNumber(data * row.ct.exchange_rate, {format: "###0.00", locale: "cn"});
-                        }
-                    },
-                    {"mDataProp": "cte.qty", "title": "数量", "bSearchable": false, "width": 70, "sClass": "center"},
-                    {"mDataProp": "cte.box_qty", "title": "箱数", "bSearchable": false, "width": 70, "sClass": "center"},
-                    {"mDataProp": "cte.create_time", "title": "创建时间", "bSearchable": false, "width": 120},
-                    {"mDataProp": "cte.update_time", "title": "修改时间", "bSearchable": false, "width": 120}
-                ],
-                "fnServerData": function (sSource, aoData, fnCallback) {
-                    showMask("数据加载中，请稍候");
-
-                    aoData.push({'name': 'transfer_id', 'value': transfer_id});
-
-                    $.ajax({
-                        "dataType": 'json',
-                        "url": sSource,
-                        "data": aoData,
-                        "success": function (data) {
-                            hideMask();
-
-                            if (data.success === false) {
-                                $.msg.error(data.message);
-                                return;
+                '#entry_list',
+                {
+                    "sAjaxSource": '{%url "ErpContainerTransferEntry.ListData"%}',
+                    "aaSorting": [[1, "asc"]],
+                    "aoColumns": [
+                        {
+                            "mDataProp": "cte.id", "bSearchable": false, "orderable": false, "sClass": "center", "width": 50,
+                            "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
+                            "render": function (data, type, row) {
+                                return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
                             }
+                        },
+                        {
+                            "mDataProp": "cte.product_sku", "title": "SKU", "bSearchable": true, "width": 120,
+                            "render": function (data, type, row) {
+                                return "<a target='product_detail' href='/product/detail/" + row.cte.product_id + "'>" + data + "</a>"
+                            }
+                        },
+                        {
+                            "mDataProp": "p.cn_name", "title": "名称", "bSearchable": true, "sClass": "wrap-word",
+                            "render": function (data, type, row) {
+                                return "<div>" + data + "</div>"
+                            }
+                        },
+                        {"mDataProp": "cte.cn_hs_cn_name", "title": "中国海关申报名", "bSearchable": true, "width": 120},
+                        {"mDataProp": "cte.au_hs_en_name", "title": "澳洲海关申报名", "bSearchable": true, "width": 120},
+                        {
+                            "mDataProp": "cte.price", "title": "价格", "bSearchable": false, "width": 70, "sClass": "center",
+                            "render": function (data, type, row) {
+                                return "RMB " + $.formatNumber(data * row.ct.exchange_rate, {format: "###0.00", locale: "cn"});
+                            }
+                        },
+                        {"mDataProp": "cte.qty", "title": "数量", "bSearchable": false, "width": 70, "sClass": "center"},
+                        {"mDataProp": "cte.box_qty", "title": "箱数", "bSearchable": false, "width": 70, "sClass": "center"},
+                        {"mDataProp": "cte.create_time", "title": "创建时间", "bSearchable": false, "width": 120},
+                        {"mDataProp": "cte.update_time", "title": "修改时间", "bSearchable": false, "width": 120}
+                    ],
+                    "fnServerData": function (sSource, aoData, fnCallback) {
+                        showMask("数据加载中，请稍候");
 
-                            fnCallback(data);
-                        }
-                    });
+                        aoData.push({'name': 'transfer_id', 'value': transfer_id});
+
+                        $.ajax({
+                            "dataType": 'json',
+                            "url": sSource,
+                            "data": aoData,
+                            "success": function (data) {
+                                hideMask();
+
+                                if (data.success === false) {
+                                    $.msg.error(data.message);
+                                    return;
+                                }
+
+                                fnCallback(data);
+                            }
+                        });
+                    }
                 }
-            }
         );
 
         $('#entry_list tbody').on('dblclick', 'tr', function () {
@@ -798,67 +803,67 @@
     function reloadTransferDetail() {
         //详细
         $.ajax({
-                url: '{%url "ErpContainerTransfer.DetailData" %}',
-                type: "POST",
-                data: {
-                    "id": transfer_id
-                },
-                success: function (result) {
-                    if (result.success === false) {
-                        $.msg.error(result.message);
-                        return;
-                    }
-                    detail_vm.detail = result;
+                    url: '{%url "ErpContainerTransfer.DetailData" %}',
+                    type: "POST",
+                    data: {
+                        "id": transfer_id
+                    },
+                    success: function (result) {
+                        if (result.success === false) {
+                            $.msg.error(result.message);
+                            return;
+                        }
+                        detail_vm.detail = result;
 
-                    if (detail_vm.detail.transfer.packing_time < '2000-01-01 00:00') {
-                        detail_vm.detail.transfer.packing_time = null;
-                    }
-                    if (detail_vm.detail.transfer.departure_time < '2000-01-01 00:00') {
-                        detail_vm.detail.transfer.departure_time = null;
-                    }
-                    if (detail_vm.detail.transfer.stock_time < '2000-01-01 00:00') {
-                        detail_vm.detail.transfer.stock_time = null;
-                    }
-                    if (detail_vm.detail.transfer.au_hg_entry_date < '2000-01-01 00:00') {
-                        detail_vm.detail.transfer.au_hg_entry_date = null;
-                    }
-                    if (detail_vm.detail.transfer.au_hd_invoice_pay_time < '2000-01-01 00:00') {
-                        detail_vm.detail.transfer.au_hd_invoice_pay_time = null;
-                    }
+                        if (detail_vm.detail.transfer.packing_time < '2000-01-01 00:00') {
+                            detail_vm.detail.transfer.packing_time = null;
+                        }
+                        if (detail_vm.detail.transfer.departure_time < '2000-01-01 00:00') {
+                            detail_vm.detail.transfer.departure_time = null;
+                        }
+                        if (detail_vm.detail.transfer.stock_time < '2000-01-01 00:00') {
+                            detail_vm.detail.transfer.stock_time = null;
+                        }
+                        if (detail_vm.detail.transfer.au_hg_entry_date < '2000-01-01 00:00') {
+                            detail_vm.detail.transfer.au_hg_entry_date = null;
+                        }
+                        if (detail_vm.detail.transfer.au_hd_invoice_pay_time < '2000-01-01 00:00') {
+                            detail_vm.detail.transfer.au_hd_invoice_pay_time = null;
+                        }
 
-                    detail_vm.detail.transfer.price_up_rate = parseFloat(dtFormatFloat(detail_vm.detail.transfer.price_up_rate));
-                    detail_vm.detail.transfer.price_down_rate = parseFloat(dtFormatFloat(detail_vm.detail.transfer.price_down_rate));
-                    detail_vm.detail.transfer.cost_up_rate = parseFloat(dtFormatFloat(detail_vm.detail.transfer.cost_up_rate));
-                    detail_vm.detail.transfer.total_volumn = parseFloat(dtFormatFloat(detail_vm.detail.transfer.total_volumn));
-                    detail_vm.detail.transfer.total_weight = parseFloat(dtFormatFloat(detail_vm.detail.transfer.total_weight));
-                    detail_vm.detail.transfer.total_amount1 = parseFloat(dtFormatFloat(detail_vm.detail.transfer.total_amount1));
-                    detail_vm.detail.transfer.total_amount2 = parseFloat(dtFormatFloat(detail_vm.detail.transfer.total_amount2));
+                        detail_vm.detail.transfer.price_up_rate = parseFloat(dtFormatFloat(detail_vm.detail.transfer.price_up_rate));
+                        detail_vm.detail.transfer.price_down_rate = parseFloat(dtFormatFloat(detail_vm.detail.transfer.price_down_rate));
+                        detail_vm.detail.transfer.cost_up_rate = parseFloat(dtFormatFloat(detail_vm.detail.transfer.cost_up_rate));
+                        detail_vm.detail.transfer.total_volumn = parseFloat(dtFormatFloat(detail_vm.detail.transfer.total_volumn));
+                        detail_vm.detail.transfer.total_weight = parseFloat(dtFormatFloat(detail_vm.detail.transfer.total_weight));
+                        detail_vm.detail.transfer.total_amount1 = parseFloat(dtFormatFloat(detail_vm.detail.transfer.total_amount1));
+                        detail_vm.detail.transfer.total_amount2 = parseFloat(dtFormatFloat(detail_vm.detail.transfer.total_amount2));
 
-                    if (detail_vm.detail.transfer.au_hd_invoice_amount === 0 || detail_vm.detail.transfer.au_hd_invoice_amount === "") {
-                        detail_vm.detail.transfer.au_hd_invoice_amount = null;
-                    } else {
-                        detail_vm.detail.transfer.au_hd_invoice_amount = parseFloat(dtFormatFloat(detail_vm.detail.transfer.au_hd_invoice_amount));
+                        if (detail_vm.detail.transfer.au_hd_invoice_amount === 0 || detail_vm.detail.transfer.au_hd_invoice_amount === "") {
+                            detail_vm.detail.transfer.au_hd_invoice_amount = null;
+                        } else {
+                            detail_vm.detail.transfer.au_hd_invoice_amount = parseFloat(dtFormatFloat(detail_vm.detail.transfer.au_hd_invoice_amount));
+                        }
                     }
                 }
-            }
         );
     }
 
     function getSkuNeedInvoice() {
         $.ajax({
-                url: '{%url "ErpContainerTransferEntry.GetSkuNeedInvoice" %}',
-                type: "POST",
-                data: {
-                    "sku": entries_vm.detail.transfer_entry.product_sku
-                },
-                success: function (result) {
-                    if (result.success === false) {
-                        $.msg.error(result.message);
-                        return;
+                    url: '{%url "ErpContainerTransferEntry.GetSkuNeedInvoice" %}',
+                    type: "POST",
+                    data: {
+                        "sku": entries_vm.detail.transfer_entry.product_sku
+                    },
+                    success: function (result) {
+                        if (result.success === false) {
+                            $.msg.error(result.message);
+                            return;
+                        }
+                        entries_vm.detail.transfer_entry.need_invoice = result.need_invoice;
                     }
-                    entries_vm.detail.transfer_entry.need_invoice = result.need_invoice;
                 }
-            }
         );
     }
 
@@ -924,34 +929,34 @@
             detail_vm.detail.transfer.au_hd_invoice_pay_time = $("#au_hd_invoice_pay_time").val();
 
             $.ajax({
-                    url: '{%url "ErpContainerTransfer.Save"%}',
-                    type: "POST",
-                    processData: false,
-                    contentType: 'application/json',
-                    data: JSON.stringify(detail_vm.detail),
-                    success: function (data) {
-                        hideMask();
-                        if (data.success === false) {
-                            $.msg.error(data.message);
-                            //return;
-                        }
-                        else {
-                            $.msg.show(data.message);
-
-                            reloadContainerTransferList();
-
-                            if (data.is_create === true) {
-                                setTimeout("window.location.href = '/container/transfer/detail/" + data.transfer_id + "';", 1000);
+                        url: '{%url "ErpContainerTransfer.Save"%}',
+                        type: "POST",
+                        processData: false,
+                        contentType: 'application/json',
+                        data: JSON.stringify(detail_vm.detail),
+                        success: function (data) {
+                            hideMask();
+                            if (data.success === false) {
+                                $.msg.error(data.message);
                                 //return;
                             }
                             else {
-                                //reloadPageData();
-                                window.location.reload();
-                                //return;
+                                $.msg.show(data.message);
+
+                                reloadContainerTransferList();
+
+                                if (data.is_create === true) {
+                                    setTimeout("window.location.href = '/container/transfer/detail/" + data.transfer_id + "';", 1000);
+                                    //return;
+                                }
+                                else {
+                                    //reloadPageData();
+                                    window.location.reload();
+                                    //return;
+                                }
                             }
                         }
                     }
-                }
             );
         }
     }
@@ -997,22 +1002,22 @@
         showMask("加载中...");
         $("#containerTransferEntryDetailForm").clearValidation();
         $.ajax({
-                url: '{%url "ErpContainerTransferEntry.DetailData" %}',
-                type: "POST",
-                data: {
-                    "id": id
-                },
-                success: function (result) {
-                    hideMask();
-                    if (result.success === false) {
-                        $.msg.error(result.message);
-                        return;
+                    url: '{%url "ErpContainerTransferEntry.DetailData" %}',
+                    type: "POST",
+                    data: {
+                        "id": id
+                    },
+                    success: function (result) {
+                        hideMask();
+                        if (result.success === false) {
+                            $.msg.error(result.message);
+                            return;
+                        }
+                        entries_vm.detail = result;
+                        entries_vm.detail.transfer_entry.transfer_id = transfer_id; // 每次加载数据就设置 这个 transfer_id
+                        $('#containerTransferEntryDetailDialog').modal(modalOptions);
                     }
-                    entries_vm.detail = result;
-                    entries_vm.detail.transfer_entry.transfer_id = transfer_id; // 每次加载数据就设置 这个 transfer_id
-                    $('#containerTransferEntryDetailDialog').modal(modalOptions);
                 }
-            }
         );
     }
 
@@ -1041,25 +1046,25 @@
             hideMask();
         } else {
             $.ajax({
-                    url: '{%url "ErpContainerTransferEntry.Save"%}',
-                    type: "POST",
-                    processData: false,
-                    contentType: 'application/json',
-                    data: JSON.stringify(entries_vm.detail),
-                    success: function (data) {
-                        hideMask();
-                        if (data.success === false) {
-                            $.msg.error(data.message);
-                            //return;
-                        }
-                        else {
-                            $.msg.show(data.message);
-                            $('#containerTransferEntryDetailDialog').modal('hide');
-                            reloadPageData();
-                            //return;
+                        url: '{%url "ErpContainerTransferEntry.Save"%}',
+                        type: "POST",
+                        processData: false,
+                        contentType: 'application/json',
+                        data: JSON.stringify(entries_vm.detail),
+                        success: function (data) {
+                            hideMask();
+                            if (data.success === false) {
+                                $.msg.error(data.message);
+                                //return;
+                            }
+                            else {
+                                $.msg.show(data.message);
+                                $('#containerTransferEntryDetailDialog').modal('hide');
+                                reloadPageData();
+                                //return;
+                            }
                         }
                     }
-                }
             );
         }
     }
