@@ -11,7 +11,7 @@ CREATE PROCEDURE sale_amount_report()
         DECLARE v_shop_id BIGINT;
         DECLARE v_order_id BIGINT;
         DECLARE v_order_item_id BIGINT;
-        DECLARE v_paid_amount DECIMAL(18, 6);
+        DECLARE v_subtotal_amount DECIMAL(18, 6);
         DECLARE v_express_fee DECIMAL(18, 6);
         DECLARE v_income DECIMAL(18, 6);
         DECLARE v_cost_amount DECIMAL(18, 6);
@@ -39,7 +39,7 @@ CREATE PROCEDURE sale_amount_report()
         DECLARE v_item_qty INT;
         DECLARE v_item_amount DECIMAL(18, 6);
         DECLARE v_item_total_amount DECIMAL(18, 6);
-        DECLARE v_item_paid_amount DECIMAL(18, 6);
+        DECLARE v_item_subtotal_amount DECIMAL(18, 6);
         DECLARE v_item_express_fee DECIMAL(18, 6);
         DECLARE v_item_income DECIMAL(18, 6);
         DECLARE v_item_cost_amount DECIMAL(18, 6);
@@ -60,7 +60,7 @@ CREATE PROCEDURE sale_amount_report()
                 o.id              AS order_id,
                 o.paid_time       AS paid_time,
                 o.shop_id         AS shop_id,
-                o.amount_paid     AS paid_amount,
+                o.subtotal_amount AS subtotal_amount,
                 o.express_fee     AS express_fee,
                 o.exchange_rate   AS exchange_rate,
                 ifnull(o.ptfy, 0) AS ptfy,
@@ -98,14 +98,14 @@ CREATE PROCEDURE sale_amount_report()
         order_loop: LOOP
 
             SET done = FALSE;
-            FETCH order_cur INTO v_order_id, v_paid_time, v_shop_id, v_paid_amount, v_express_fee, v_exchange_rate, v_ptfy_amount, v_jyfy_amount;
+            FETCH order_cur INTO v_order_id, v_paid_time, v_shop_id, v_subtotal_amount, v_express_fee, v_exchange_rate, v_ptfy_amount, v_jyfy_amount;
 
             IF done
             THEN
                 LEAVE order_loop;
             END IF;
 
-            IF v_paid_amount = 0
+            IF v_subtotal_amount = 0
             THEN
                 ITERATE order_loop;
             END IF;
@@ -168,10 +168,10 @@ CREATE PROCEDURE sale_amount_report()
             END IF;
 
             # 用新的处理方式
-            # SET v_jyfy_amount = v_paid_amount * v_jyfl;
-            # SET v_ptfy_amount = v_paid_amount * v_ptfl;
+            # SET v_jyfy_amount = v_subtotal_amount * v_jyfl;
+            # SET v_ptfy_amount = v_subtotal_amount * v_ptfl;
 
-            SET v_gst_fee = v_paid_amount * 0.1;
+            SET v_gst_fee = v_subtotal_amount * 0.1;
 
             SELECT count(oi.id) AS item_count
             INTO v_order_item_count
@@ -183,8 +183,8 @@ CREATE PROCEDURE sale_amount_report()
                 ITERATE order_loop;
             ELSEIF v_order_item_count = 1
                 THEN
-                    # SET v_income = v_paid_amount + v_express_fee;
-                    SET v_income = v_paid_amount;
+                    # SET v_income = v_subtotal_amount + v_express_fee;
+                    SET v_income = v_subtotal_amount;
 
                     SET v_logistics_fee = v_estimate_logistics_fee;
                     IF v_actual_logistics_fee IS NOT NULL AND v_actual_logistics_fee <> 0
@@ -194,7 +194,7 @@ CREATE PROCEDURE sale_amount_report()
 
                     SET v_outcome = v_cost_amount + v_logistics_fee + v_pick_fee + v_jyfy_amount + v_ptfy_amount + v_gst_fee;
                     SET v_profit = v_income - v_outcome;
-                    SET v_profit_rate = v_profit / v_paid_amount * 100;
+                    SET v_profit_rate = v_profit / v_subtotal_amount * 100;
 
                     SELECT
                         oi.id              AS order_item_id,
@@ -238,14 +238,14 @@ CREATE PROCEDURE sale_amount_report()
                     THEN
                         INSERT INTO erp_sale_amount_report
                         (paid_time, platform_id, shop_id, order_id, order_item_id, paid_amount, express_fee, income, cost_amount, estimate_logistics_fee, actual_logistics_fee, jyfy_amount, ptfy_amount, pick_fee, gst_fee, outcome, profit, profit_rate, exchange_rate, product_id, product_qty, sale_user_id, service_user_id, dev_user_id)
-                        VALUES (v_paid_time, v_platform_id, v_shop_id, v_order_id, v_order_item_id, v_paid_amount, v_express_fee, v_income, v_cost_amount, v_estimate_logistics_fee, v_actual_logistics_fee, v_jyfy_amount, v_ptfy_amount, v_pick_fee, v_gst_fee, v_outcome, v_profit, v_exchange_rate, v_profit_rate, v_product_id, v_item_qty, v_sale_user_id, v_service_user_id, v_dev_user_id);
+                        VALUES (v_paid_time, v_platform_id, v_shop_id, v_order_id, v_order_item_id, v_subtotal_amount, v_express_fee, v_income, v_cost_amount, v_estimate_logistics_fee, v_actual_logistics_fee, v_jyfy_amount, v_ptfy_amount, v_pick_fee, v_gst_fee, v_outcome, v_profit, v_exchange_rate, v_profit_rate, v_product_id, v_item_qty, v_sale_user_id, v_service_user_id, v_dev_user_id);
                     ELSE
                         UPDATE erp_sale_amount_report
                         SET paid_time              = v_paid_time,
                             platform_id            = v_platform_id,
                             shop_id                = v_shop_id,
                             order_id               = v_order_id,
-                            paid_amount            = v_paid_amount,
+                            paid_amount            = v_subtotal_amount,
                             express_fee            = v_express_fee,
                             income                 = v_income,
                             cost_amount            = v_cost_amount,
@@ -322,9 +322,9 @@ CREATE PROCEDURE sale_amount_report()
                         ITERATE order_item_loop;
                     END IF;
 
-                    SET v_item_paid_amount = v_paid_amount * v_item_amount / v_item_total_amount;
+                    SET v_item_subtotal_amount = v_subtotal_amount * v_item_amount / v_item_total_amount;
                     SET v_item_express_fee = v_express_fee * v_item_amount / v_item_total_amount;
-                    SET v_item_income = v_item_paid_amount + v_item_express_fee;
+                    SET v_item_income = v_item_subtotal_amount + v_item_express_fee;
                     SET v_item_cost_amount = v_cost_amount * v_item_amount / v_item_total_amount;
                     SET v_item_estimate_logistics_fee = v_estimate_logistics_fee * v_item_amount / v_item_total_amount;
                     SET v_item_actual_logistics_fee = v_actual_logistics_fee * v_item_amount / v_item_total_amount;
@@ -336,25 +336,25 @@ CREATE PROCEDURE sale_amount_report()
                     SET v_logistics_fee = v_item_estimate_logistics_fee;
                     IF v_item_actual_logistics_fee IS NOT NULL AND v_item_actual_logistics_fee <> 0
                     THEN
-                        SET v_logistics_fee = v_actual_logistics_fee;
+                        SET v_logistics_fee = v_item_actual_logistics_fee;
                     END IF;
 
                     SET v_item_outcome = v_item_cost_amount + v_logistics_fee + v_item_pick_fee + v_item_jyfy_amount + v_item_ptfy_amount + v_item_gst_fee;
                     SET v_profit = v_item_income - v_item_outcome;
-                    SET v_profit_rate = v_profit / v_item_paid_amount * 100;
+                    SET v_profit_rate = v_profit / v_item_subtotal_amount * 100;
 
                     IF v_sale_amount_report_count = 0
                     THEN
                         INSERT INTO erp_sale_amount_report
                         (paid_time, platform_id, shop_id, order_id, order_item_id, paid_amount, express_fee, income, cost_amount, estimate_logistics_fee, actual_logistics_fee, jyfy_amount, ptfy_amount, pick_fee, gst_fee, outcome, profit, profit_rate, product_id, exchange_rate, product_qty, sale_user_id, service_user_id, dev_user_id)
-                        VALUES (v_paid_time, v_platform_id, v_shop_id, v_order_id, v_order_item_id, v_item_paid_amount, v_item_express_fee, v_item_income, v_item_cost_amount, v_item_estimate_logistics_fee, v_item_actual_logistics_fee, v_item_jyfy_amount, v_item_ptfy_amount, v_item_pick_fee, v_item_gst_fee, v_item_outcome, v_profit, v_profit_rate, v_exchange_rate, v_product_id, v_item_qty, v_sale_user_id, v_service_user_id, v_dev_user_id);
+                        VALUES (v_paid_time, v_platform_id, v_shop_id, v_order_id, v_order_item_id, v_item_subtotal_amount, v_item_express_fee, v_item_income, v_item_cost_amount, v_item_estimate_logistics_fee, v_item_actual_logistics_fee, v_item_jyfy_amount, v_item_ptfy_amount, v_item_pick_fee, v_item_gst_fee, v_item_outcome, v_profit, v_profit_rate, v_exchange_rate, v_product_id, v_item_qty, v_sale_user_id, v_service_user_id, v_dev_user_id);
                     ELSE
                         UPDATE erp_sale_amount_report
                         SET paid_time              = v_paid_time,
                             platform_id            = v_platform_id,
                             shop_id                = v_shop_id,
                             order_id               = v_order_id,
-                            paid_amount            = v_item_paid_amount,
+                            paid_amount            = v_item_subtotal_amount,
                             express_fee            = v_item_express_fee,
                             income                 = v_item_income,
                             cost_amount            = v_item_cost_amount,
