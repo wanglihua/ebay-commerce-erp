@@ -171,7 +171,7 @@ CREATE PROCEDURE sale_amount_report()
             # SET v_jyfy_amount = v_subtotal_amount * v_jyfl;
             # SET v_ptfy_amount = v_subtotal_amount * v_ptfl;
 
-            SET v_gst_fee = v_subtotal_amount * 0.1;
+            SET v_gst_fee = (v_subtotal_amount + v_express_fee) * 0.1;
 
             SELECT count(oi.id) AS item_count
             INTO v_order_item_count
@@ -194,7 +194,7 @@ CREATE PROCEDURE sale_amount_report()
 
                     SET v_outcome = v_cost_amount + v_logistics_fee + v_pick_fee + v_jyfy_amount + v_ptfy_amount + v_gst_fee;
                     SET v_profit = v_income - v_outcome;
-                    SET v_profit_rate = v_profit / v_subtotal_amount * 100;
+                    SET v_profit_rate = v_profit / v_income * 100;
 
                     SELECT
                         oi.id              AS order_item_id,
@@ -341,7 +341,7 @@ CREATE PROCEDURE sale_amount_report()
 
                     SET v_item_outcome = v_item_cost_amount + v_logistics_fee + v_item_pick_fee + v_item_jyfy_amount + v_item_ptfy_amount + v_item_gst_fee;
                     SET v_profit = v_item_income - v_item_outcome;
-                    SET v_profit_rate = v_profit / v_item_subtotal_amount * 100;
+                    SET v_profit_rate = v_profit / v_item_income * 100;
 
                     IF v_sale_amount_report_count = 0
                     THEN
