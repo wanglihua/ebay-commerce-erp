@@ -150,6 +150,13 @@ func (e PassResInfo) InitData(db_session *xorm.Session) {
 		db_session.Insert(pass)
 
 		pass = new(PassResInfo)
+		pass.Id = pass_res.DDLC_ORDER_FHSC
+		pass.CateId = pass_res_cate.DDLC
+		pass.Name = "发货上传"
+		pass.Desc = core.MakeNullString("发货上传", true)
+		db_session.Insert(pass)
+
+		pass = new(PassResInfo)
 		pass.Id = pass_res.DDLC_ORDER_LOGISTICS_MATCH_DEBUG
 		pass.CateId = pass_res_cate.DDLC
 		pass.Name = "订单物流匹配调试"

@@ -132,6 +132,14 @@ func (c ErpOrder) Index(status string) revel.Result {
 		is_button_huifu_visible = true
 	}
 
+	// is_button_upload_ebay_ship_visible
+
+	var has_pass_upload_ebay_ship = pass_service.Is_login_user_has_pass(pass_res.DDLC_ORDER_FHSC, c.Session)
+	var is_button_upload_ebay_ship_visible = false
+	if has_pass_upload_ebay_ship && (status_id == models.ORDER_STATUS_DPH || status_id == models.ORDER_STATUS_PHZ || status_id == models.ORDER_STATUS_YFH ) {
+		is_button_upload_ebay_ship_visible = true
+	}
+
 	c.RenderArgs["active_menu_html"] = template.HTML(active_menu_html)
 	c.RenderArgs["status"] = status
 	c.RenderArgs["status_id"] = status_id
@@ -141,6 +149,7 @@ func (c ErpOrder) Index(status string) revel.Result {
 	c.RenderArgs["has_pass_order_new"] = has_pass_order_new
 	c.RenderArgs["is_button_quxiao_visible"] = is_button_quxiao_visible
 	c.RenderArgs["is_button_huifu_visible"] = is_button_huifu_visible
+	c.RenderArgs["is_button_upload_ebay_ship_visible"] = is_button_upload_ebay_ship_visible
 
 	return c.RenderTemplate("erp/ddlc/order/order_index.html")
 }
@@ -1621,7 +1630,7 @@ func (c ErpOrder) FaHuo() revel.Result {
 }
 
 func (c ErpOrder) UploadEbayStatus() revel.Result {
-	pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_PHZ, c.Session) //todo 暂时定为配货中的权限检查
+	pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_FHSC, c.Session)
 
 	order_id_list := make([]int64, 0)
 	c.Params.Bind(&order_id_list, "id_list")

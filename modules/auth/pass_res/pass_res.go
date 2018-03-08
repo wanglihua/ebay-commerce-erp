@@ -64,6 +64,7 @@ const (
 	DDLC_ORDER_LOGISTICS_FEE_DIFF    = 131000 // 订单物流费用偏差
 	DDLC_ORDER_QUXIAO                = 131100 // 订单取消，是指取消订单这个动作， 不是指查看已取消的订单
 	DDLC_ORDER_HUIFU                 = 131150 // 订单恢复，恢复取消的订单
+	DDLC_ORDER_FHSC                  = 131175 // 发货上传
 	DDLC_ORDER_LOGISTICS_MATCH_DEBUG = 131200 // 订单物流匹配调试
 	DDLC_ORDER_LOGISTICS_MATCH       = 131300 // 订单物流匹配
 	DDLC_ORDER_FORCE_PEIHUO          = 131400 // 强制配货
