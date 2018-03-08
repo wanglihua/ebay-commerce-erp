@@ -1621,7 +1621,7 @@ func (c ErpOrder) FaHuo() revel.Result {
 }
 
 func (c ErpOrder) UploadEbayStatus() revel.Result {
-	pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_PHZ, c.Session) // 暂时定为配货中的权限检查
+	pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_PHZ, c.Session) //todo 暂时定为配货中的权限检查
 
 	order_id_list := make([]int64, 0)
 	c.Params.Bind(&order_id_list, "id_list")

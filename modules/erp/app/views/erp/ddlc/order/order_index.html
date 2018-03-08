@@ -563,7 +563,13 @@
                             {
                                 "mDataProp": "o.code", "title": "订单编号", "bSearchable": true, "sClass": "wrap-word",
                                 "render": function (data, type, row) {
-                                    return "<div class='div_order_code'><a href='/order/detail/" + row.o.id + "' target='_blank'>" + data + "</a></div><div>" + row.status_name + "</div><div>" + row.type_name + "&nbsp;<span style='background-color:" + row.order_tag.bg_color + ";'>" + row.order_tag.name + "</span>" + "</div>";
+                                    var status_name = row.status_name;
+
+                                    if (row.o.is_ebay_ship === 1) {
+                                        status_name = status_name + "(发货已上传)";
+                                    }
+
+                                    return "<div class='div_order_code'><a href='/order/detail/" + row.o.id + "' target='_blank'>" + data + "</a></div><div>" + status_name + "</div><div>" + row.type_name + "&nbsp;<span style='background-color:" + row.order_tag.bg_color + ";'>" + row.order_tag.name + "</span>" + "</div>";
                                 }
                             },
                             {
