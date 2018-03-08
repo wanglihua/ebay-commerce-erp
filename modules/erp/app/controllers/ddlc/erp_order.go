@@ -32,6 +32,7 @@ import (
 	"matrix/modules/erp/models/ddlc_models"
 	"math"
 	"strconv"
+	"matrix/modules/erp/service/order_ebay_service"
 )
 
 type ErpOrder struct {
@@ -772,6 +773,7 @@ func (c ErpOrder) Detail(order_id int64) revel.Result {
 	if order.HoldTypeId.Int64 == ddpz_models.ORDER_HOLD_TYPE_PICK_UP {
 		is_pickup = true
 	}
+
 	c.RenderArgs["is_pickup"] = is_pickup
 
 	var is_express = false
@@ -1591,6 +1593,17 @@ func (c ErpOrder) FaHuo() revel.Result {
 		order_history_service.Insert_order_history(order, login_user.UserId, fmt.Sprintf("订单发货， 工号： %s", login_user.LoginName), db_session)
 	}
 
+	// 上传 ebay 发货状态
+	go order_ebay_service.Upload_order_ebay_status(order_id_list)
+
+	/*
+	var upload_order_ebay_status_result = order_ebay_service.Upload_order_ebay_status(order_id_list)
+
+	if upload_order_ebay_status_result.Success == false {
+		return c.RenderJson(upload_order_ebay_status_result)
+	}
+	*/
+
 	// 更新库存待配货数量
 	go inventory_service.Calculate_inventory_pending_qty()
 
@@ -1605,6 +1618,24 @@ func (c ErpOrder) FaHuo() revel.Result {
 			"message": "订单发货成功，但部分库存扣减失败！",
 		})
 	}
+}
+
+func (c ErpOrder) UploadEbayStatus() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_PHZ, c.Session) // 暂时定为配货中的权限检查
+
+	order_id_list := make([]int64, 0)
+	c.Params.Bind(&order_id_list, "id_list")
+
+	var upload_order_ebay_status_result = order_ebay_service.Upload_order_ebay_status(order_id_list)
+
+	if upload_order_ebay_status_result.Success == false {
+		return c.RenderJson(upload_order_ebay_status_result)
+	}
+
+	return c.RenderJson(map[string]interface{}{
+		"success": true,
+		"message": "订单发货信息上传ebay成功！",
+	})
 }
 
 func (c ErpOrder) ShiJiWuHuo() revel.Result {

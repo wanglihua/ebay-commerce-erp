@@ -57,6 +57,7 @@ type OrderInfo struct {
 	ProfitRmb                float64           `xorm:"decimal(18,6) notnull 'profit_rmb'" json:"profit_rmb" smith:"verbose_name=毛利（人民币）"`
 	Ptfy                     float64           `xorm:"decimal(18,6) notnull 'ptfy'" json:"ptfy"` // 平台费用，订单下载的时候存在这里，把之前的 order logistics 中的 ptfl 禁用掉
 	Jyfy                     float64           `xorm:"decimal(18,6) notnull 'jyfy'" json:"jyfy"` // 平台费用，订单下载的时候存在这里，把之前的 order logistics 中的 jyfy 禁用掉
+	IsEbayShip               int64             `xorm:"bigint null 'is_ebay_ship'" json:"is_ebay_ship"`
 	CreateTime               core.Time         `xorm:"created notnull 'create_time'" json:"create_time"`
 	UpdateTime               core.Time         `xorm:"updated notnull 'update_time'" json:"update_time"`
 }
