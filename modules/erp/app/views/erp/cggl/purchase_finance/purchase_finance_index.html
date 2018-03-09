@@ -129,7 +129,15 @@
         data: {
             "page": {
                 "status_id_query": 0,
-                "pay_method_query": 0
+                "pay_method_query": 0,
+                "code_query": "",
+                "supplier_query": "",
+                "user_query_id": 0,
+                "user_query_value": 0,
+                "time_query_id": 0,
+                "query_time_begin": '',
+                "query_time_end": '',
+                "sku_query": ''
             }
         },
         mounted: function () {
@@ -238,6 +246,14 @@
 
                             aoData.push({'name': 'status_id_query', 'value': this_vm.page.status_id_query});
                             aoData.push({'name': 'pay_method_query', 'value': this_vm.page.pay_method_query});
+                            aoData.push({'name': 'code_query', 'value': this_vm.page.code_query});
+                            aoData.push({'name': 'supplier_query', 'value': this_vm.page.supplier_query});
+                            aoData.push({'name': 'user_query_id', 'value': this_vm.page.user_query_id});
+                            aoData.push({'name': 'user_query_value', 'value': this_vm.page.user_query_value});
+                            aoData.push({'name': 'time_query_id', 'value': this_vm.page.time_query_id});
+                            aoData.push({'name': 'query_time_begin', 'value': this_vm.page.query_time_begin});
+                            aoData.push({'name': 'query_time_end', 'value': this_vm.page.query_time_end});
+                            aoData.push({'name': 'sku_query', 'value': this_vm.page.sku_query});
 
                             $.ajax({
                                 "dataType": 'json',

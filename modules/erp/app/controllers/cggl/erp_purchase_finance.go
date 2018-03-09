@@ -14,6 +14,7 @@ import (
 	"matrix/modules/erp/service/purchase_bill_service"
 	"matrix/modules/erp/service/purchase_bill_log_service"
 	"unicode/utf8"
+	"strings"
 )
 
 type ErpPurchaseFinance struct {
@@ -117,6 +118,37 @@ func (c ErpPurchaseFinance) ListData() revel.Result {
 	var pay_method_query int64
 	c.Params.Bind(&pay_method_query, "pay_method_query")
 
+	var code_query string
+	c.Params.Bind(&code_query, "code_query")
+	code_query = strings.TrimSpace(code_query)
+
+	// supplier_query
+	var supplier_query string
+	c.Params.Bind(&supplier_query, "supplier_query")
+	supplier_query = strings.TrimSpace(supplier_query)
+
+	var user_query_id int64
+	c.Params.Bind(&user_query_id, "user_query_id")
+
+	var user_query_value int64
+	c.Params.Bind(&user_query_value, "user_query_value")
+
+	// time_query_id
+	var time_query_id int64
+	c.Params.Bind(&time_query_id, "time_query_id")
+
+	var query_time_begin_str string
+	c.Params.Bind(&query_time_begin_str, "query_time_begin")
+	query_time_begin, query_time_begin_err := core.Parse_time(query_time_begin_str)
+
+	var query_time_end_str string
+	c.Params.Bind(&query_time_end_str, "query_time_end")
+	query_time_end, query_time_end_err := core.Parse_time(query_time_end_str)
+
+	var sku_query string
+	c.Params.Bind(&sku_query, "sku_query")
+	sku_query = strings.TrimSpace(sku_query)
+
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
 	/*
@@ -163,6 +195,74 @@ ORDER BY pay_expire_days DESC;
 
 	if pay_method_query != 0 {
 		filter = core.SqlAnd(filter, fmt.Sprintf("pb.pay_method_id = %d", pay_method_query))
+	}
+
+	if code_query != "" {
+		filter = core.SqlAnd(filter, fmt.Sprintf("pb.code = '%s'", code_query))
+	}
+
+	if supplier_query != "" {
+		filter = core.SqlAnd(filter, fmt.Sprintf("sup.name LIKE '%%%s%%'", supplier_query))
+	}
+
+	if user_query_id == USER_QUERY_APPLY {
+		filter = core.SqlAnd(filter, fmt.Sprintf("pb.apply_user_id = %d", user_query_value))
+	} else if user_query_id == USER_QUERY_PAY {
+		filter = core.SqlAnd(filter, fmt.Sprintf("pb.pay_user_id = %d", user_query_value))
+	} else if user_query_id == USER_QUERY_CHECKIN {
+		filter = core.SqlAnd(filter, fmt.Sprintf("pb.checkin_user_id = %d", user_query_value))
+	}
+
+	if query_time_begin_err == nil {
+		if time_query_id == TIME_QUERY_APPLY_TIME {
+			filter = core.SqlAnd(filter, fmt.Sprintf("pb.apply_time >= '%s'", query_time_begin.Format("2006-01-02 15:04")))
+		} else if time_query_id == TIME_QUERY_PAY_TIME {
+			filter = core.SqlAnd(filter, fmt.Sprintf("pb.pay_time >= '%s'", query_time_begin.Format("2006-01-02 15:04")))
+		} else if time_query_id == TIME_QUERY_CHECKIN_TIME {
+			filter = core.SqlAnd(filter, fmt.Sprintf("pb.checkin_time >= '%s'", query_time_begin.Format("2006-01-02 15:04")))
+		} else {
+			filter = core.SqlAnd(filter, fmt.Sprintf("pb.apply_time >= '%s'", query_time_begin.Format("2006-01-02 15:04")))
+		}
+	}
+
+	if query_time_end_err == nil {
+
+		if time_query_id == TIME_QUERY_APPLY_TIME {
+			filter = core.SqlAnd(filter, fmt.Sprintf("pb.apply_time <= '%s'", query_time_end.Format("2006-01-02 15:04")))
+		} else if time_query_id == TIME_QUERY_PAY_TIME {
+			filter = core.SqlAnd(filter, fmt.Sprintf("pb.pay_time <= '%s'", query_time_end.Format("2006-01-02 15:04")))
+		} else if time_query_id == TIME_QUERY_CHECKIN_TIME {
+			filter = core.SqlAnd(filter, fmt.Sprintf("pb.checkin_time <= '%s'", query_time_end.Format("2006-01-02 15:04")))
+		} else {
+			filter = core.SqlAnd(filter, fmt.Sprintf("pb.apply_time <= '%s'", query_time_end.Format("2006-01-02 15:04")))
+		}
+	}
+
+	if sku_query != "" {
+		/*
+		SELECT *
+		FROM erp_purchase_bill pb
+		WHERE pb.id IN (
+			SELECT pbe.bill_id
+			FROM erp_purchase_bill_entry pbe
+			WHERE pbe.product_id IN (
+				SELECT p.id
+				FROM erp_product p
+				WHERE p.sku = '124'
+			)
+		)
+		 */
+		var sku_filter = `pb.id IN (
+			SELECT pbe.bill_id
+			FROM erp_purchase_bill_entry pbe
+			WHERE pbe.product_id IN (
+				SELECT p.id
+				FROM erp_product p
+				WHERE p.sku = '%s'
+			)
+		)`
+		sku_filter = fmt.Sprintf(sku_filter, sku_query)
+		filter = core.SqlAnd(filter, sku_filter)
 	}
 
 	sql_builder.Where(filter)
