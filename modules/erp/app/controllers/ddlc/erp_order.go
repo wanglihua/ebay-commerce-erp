@@ -1603,7 +1603,9 @@ func (c ErpOrder) FaHuo() revel.Result {
 	}
 
 	// 上传 ebay 发货状态
+	/* 临时取消这个操作，通过手工完成，手工成熟后，再启用
 	go order_ebay_service.Upload_order_ebay_status(order_id_list)
+	*/
 
 	/*
 	var upload_order_ebay_status_result = order_ebay_service.Upload_order_ebay_status(order_id_list)
