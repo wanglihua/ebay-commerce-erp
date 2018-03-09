@@ -389,7 +389,7 @@ $.ajaxSetup(
 
 //扩展dataTable默认值
 $.extend($.fn.dataTable.defaults, {
-    "sDom": "<'row'<'col-xs-6'l><'col-xs-6'f>r><'row'<'col-xs-12't>><'row'<'col-xs-6'i><'col-xs-6'p>>",
+    "sDom": "<'row'<'col-xs-6'i><'col-xs-6'f>r><'row'<'col-xs-12't>><'row'<'col-xs-3'i><'col-xs-3'l><'col-xs-6'p>>",
     //"bAutoWidth": true,
     //"sScrollX": "100%",
     //"bScrollCollapse": true,
