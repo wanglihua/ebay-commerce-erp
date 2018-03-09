@@ -86,6 +86,16 @@ div.dataTables_wrapper div.dataTables_filter input {
     color: #307ECC;
 }
 
+.dataTables_wrapper label {
+    margin-top: 1px;
+    display: inline-block;
+    font-size: 12px;
+}
+
+.dataTables_wrapper .right-padding-20 {
+    margin-right: 20px;
+}
+
 .dataTables_wrapper {
     margin-top: 15px !important;
     border-top-style: none !important;

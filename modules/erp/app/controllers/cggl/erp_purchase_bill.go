@@ -34,7 +34,7 @@ type time_query struct {
 	Name string `json:"name"`
 }
 
-func (c ErpPurchaseBill) get_time_query_list() []time_query {
+func get_time_query_list() []time_query {
 	var time_query_list = make([]time_query, 0)
 
 	time_query_list = append(time_query_list, time_query{Id: TIME_QUERY_APPLY_TIME, Name: "采购时间"})
@@ -55,7 +55,7 @@ type user_query struct {
 	Name string `json:"name"`
 }
 
-func (c ErpPurchaseBill) get_user_query_list() []user_query {
+func get_user_query_list() []user_query {
 	var user_query_list = make([]user_query, 0)
 
 	user_query_list = append(user_query_list, user_query{Id: USER_QUERY_APPLY, Name: "采购人"})
@@ -87,10 +87,10 @@ func (c ErpPurchaseBill) Index() revel.Result {
 
 	c.RenderArgs["status_list"] = status_list
 	c.RenderArgs["user_has_approve_pass"] = user_has_approve_pass
-	c.RenderArgs["time_query_list"] = c.get_time_query_list()
+	c.RenderArgs["time_query_list"] = get_time_query_list()
 	c.RenderArgs["user_query_id"] = 0
 	c.RenderArgs["user_query_value"] = 0
-	c.RenderArgs["user_query_list"] = c.get_user_query_list()
+	c.RenderArgs["user_query_list"] = get_user_query_list()
 	c.RenderArgs["user_list"] = user_list
 
 	return c.RenderTemplate("erp/cggl/purchase_bill/purchase_bill_index.html")

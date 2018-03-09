@@ -389,7 +389,7 @@ $.ajaxSetup(
 
 //扩展dataTable默认值
 $.extend($.fn.dataTable.defaults, {
-    "sDom": "<'row'<'col-xs-6'i><'col-xs-6'f>r><'row'<'col-xs-12't>><'row'<'col-xs-3'i><'col-xs-3'l><'col-xs-6'p>>",
+    "sDom": "<'row'<'col-xs-6'i><'pull-right'f><'pull-right right-padding-20'l>r><'row'<'col-xs-12't>><'row'<'col-xs-6'i><'col-xs-6'p>>",
     //"bAutoWidth": true,
     //"sScrollX": "100%",
     //"bScrollCollapse": true,
@@ -409,7 +409,7 @@ $.extend($.fn.dataTable.defaults, {
     "oLanguage": {
         "sLengthMenu": "每页显示 _MENU_ 条记录",
         "sZeroRecords": "没有匹配数据",
-        "sInfo": "当前显示第 _START_ 至 _END_ 条，共 _TOTAL_ 条记录",
+        "sInfo": "第 _START_ 至 _END_ 条，共 _TOTAL_ 条记录",
         "sInfoEmpty": "显示第 0 至 0 项结果，共 0 项",
         "sInfoFiltered": "(从 _MAX_ 条记录中过滤)",
         "sInfoPostFix": "",

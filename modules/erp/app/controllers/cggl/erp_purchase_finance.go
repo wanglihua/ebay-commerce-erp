@@ -81,6 +81,16 @@ WHERE pbe.status_id = %d AND pbe.type_id = %d;`
 	c.RenderArgs["entry_purchase_code_strs_len"] = int64(utf8.RuneCountInString(entry_purchase_code_strs.CodeListStr))
 	c.RenderArgs["entry_purchase_code_strs"] = entry_purchase_code_strs.CodeListStr
 
+	var user_list = make([]auth_models.UserInfo, 0)
+	core.HandleError(db_session.Find(&user_list))
+
+	c.RenderArgs["status_list"] = status_list
+	c.RenderArgs["time_query_list"] = get_time_query_list()
+	c.RenderArgs["user_query_id"] = 0
+	c.RenderArgs["user_query_value"] = 0
+	c.RenderArgs["user_query_list"] = get_user_query_list()
+	c.RenderArgs["user_list"] = user_list
+
 	return c.RenderTemplate("erp/cggl/purchase_finance/purchase_finance_index.html")
 }
 
