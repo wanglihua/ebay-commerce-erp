@@ -157,12 +157,16 @@
     });
 
     function showReply(message_id) {
+        showMask("数据加载中，请稍候");
+
         $.ajax({
             "url": '{% url "ErpMessage.ShowReply" %}',
             "data": {
                 "message_id": message_id
             },
             "success": function (data) {
+                hideMask();
+
                 if (data.success === false) {
                     $.msg.error(data.message);
                     return;
@@ -193,6 +197,8 @@
         var message_id = $("#message_id").val();
         var message_body = $("#message_body").val();
 
+        showMask("操作进行中，请稍候");
+
         $.ajax({
             "dataType": 'json',
             "url": '{% url "ErpMessage.Reply" %}',
@@ -201,6 +207,8 @@
                 "message_body": message_body
             },
             "success": function (data) {
+                hideMask();
+
                 if (data.success === false) {
                     $.msg.error(data.message);
                     return;
