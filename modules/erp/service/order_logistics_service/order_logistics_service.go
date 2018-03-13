@@ -25,6 +25,7 @@ import (
 	"matrix/modules/erp/models/kcgl_models"
 	"github.com/revel/revel"
 	"time"
+	"matrix/modules/erp/service/order_combine_service"
 )
 
 type OrderLogisticsService struct {
@@ -153,7 +154,7 @@ LIMIT 1;`
 func (p_ol *OrderLogisticsService) CalculateListPaidOrders(user core.LoginUser, db_session *xorm.Session) error {
 
 	// 需要先合并
-	err := Combine_orders(fmt.Sprintf("o.status_id = %d", models.ORDER_STATUS_YZF), user, db_session)
+	err := order_combine_service.Combine_orders(fmt.Sprintf("o.status_id = %d OR o.status_id = %d OR o.status_id = %d ", models.ORDER_STATUS_YZF, models.ORDER_STATUS_DPH, models.ORDER_STATUS_HOLD), user, db_session)
 	core.HandleError(err)
 
 	// 获取 已支付 状态的订单, 匹配完成后，订单的状态就是 Hold 或者 待配货
@@ -198,7 +199,7 @@ func (p_ol *OrderLogisticsService) CalculateListWithUser(order_list []ddlc_model
 	}
 
 	// 需要先合并
-	err := Combine_orders(fmt.Sprintf("o.id IN (%s)", strings.Join(order_id_str_list, ",")), user, db_session)
+	err := order_combine_service.Combine_orders(fmt.Sprintf("o.id IN (%s)", strings.Join(order_id_str_list, ",")), user, db_session)
 	core.HandleError(err)
 
 	//先判断订单状态
@@ -227,7 +228,7 @@ func (p_ol *OrderLogisticsService) CalculateListWithUser(order_list []ddlc_model
 func (p_ol *OrderLogisticsService) CalculateListImportBatch(batch_code int64, user core.LoginUser, db_session *xorm.Session) error {
 
 	// 先合并
-	err := Combine_orders(fmt.Sprintf("o.batch_code = %d", batch_code), user, db_session)
+	err := order_combine_service.Combine_orders(fmt.Sprintf("o.batch_code = %d", batch_code), user, db_session)
 	core.HandleError(err)
 
 	//获得该批次号的订单列表

@@ -29,7 +29,12 @@ func insert_combine_order_from_first_order(first_order_id int64, order_id_str_li
 	combine_order.TypeId = ddpz_models.ORDER_TYPE_HBDD // 合并订单
 	combine_order.StatusId = models.ORDER_STATUS_YZF   // 只有 已支付的，待配货的 订单才会被合并，合并后的订单的状态设置为 已支付
 
-	_, err = db_session.Insert(combine_order)
+	combine_order.TagId = 0
+	combine_order.StockId = 0
+	combine_order.CompanyId = 0
+	combine_order.ModeId = 0
+
+	_, err = db_session.Insert(&combine_order)
 	core.HandleError(err)
 
 	var combine_order_id = combine_order.Id
@@ -49,7 +54,7 @@ func insert_combine_order_from_first_order(first_order_id int64, order_id_str_li
 		combine_order_info.SubOrderCode = combined_order.Code
 		combine_order_info.CreateTime = core.Time(time.Now())
 
-		_, err := db_session.Insert(combine_order_info)
+		_, err := db_session.Insert(&combine_order_info)
 		core.HandleError(err)
 	}
 

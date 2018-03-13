@@ -11,6 +11,7 @@ import (
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/order_logistics_service"
 	"matrix/modules/erp/models/ddlc_models"
+	"matrix/modules/erp/service/order_combine_service"
 )
 
 type OrderLogisticsMatchTask struct {
@@ -52,7 +53,7 @@ func (t OrderLogisticsMatchTask) Run() {
 
 	// 先进行合并
 	// err = order_logistics_service.Combine_orders(fmt.Sprintf("o.type_id <> %d AND o.status_id = %d", ddpz_models.ORDER_TYPE_DRDD, models.ORDER_STATUS_YZF), core.LoginUser{}, db_session)
-	err = order_logistics_service.Combine_orders(fmt.Sprintf("o.status_id = %d", models.ORDER_STATUS_YZF), core.LoginUser{}, db_session)
+	err = order_combine_service.Combine_orders(fmt.Sprintf("o.status_id = %d OR o.status_id = %d OR o.status_id = %d ", models.ORDER_STATUS_YZF, models.ORDER_STATUS_DPH, models.ORDER_STATUS_HOLD), core.LoginUser{}, db_session)
 	core.HandleError(err)
 
 	// 获得不是导入的且已支付的订单列表
