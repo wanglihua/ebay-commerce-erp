@@ -4,9 +4,10 @@ import (
 	"github.com/go-xorm/xorm"
 	"fmt"
 	"matrix/core"
+	"strings"
 )
 
-func update_combine_order_amount(combine_order_id int64, order_ids string, db_session *xorm.Session) {
+func update_combine_order_amount(combine_order_id int64, order_id_str_list []string, db_session *xorm.Session) {
 
 	// 修改 合并后的 order 各种款项
 	/*
@@ -60,7 +61,7 @@ SET combine_order.adjustment_amount     = s.adjustment_amount_sum,
     combine_order.subtotal_amount       = s.subtotal_amount_sum,
     combine_order.subtotal_amount_rmb   = s.subtotal_amount_sum * combine_order.exchange_rate
 WHERE id = %d`
-	sql_sum_amount = fmt.Sprintf(sql_sum_amount, order_ids, combine_order_id)
+	sql_sum_amount = fmt.Sprintf(sql_sum_amount, strings.Join(order_id_str_list, ","), combine_order_id)
 	_, err := db_session.Exec(sql_sum_amount)
 	core.HandleError(err)
 }

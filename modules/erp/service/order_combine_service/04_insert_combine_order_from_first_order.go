@@ -7,11 +7,12 @@ import (
 	"matrix/modules/erp/models/ddlc_models"
 	"matrix/modules/erp/models/ddpz_models"
 	"time"
+	"strings"
 )
 
 var order_code_seq int64 = 1
 
-func insert_combine_order_from_first_order(first_order_id int64, order_ids string, db_session *xorm.Session) int64 {
+func insert_combine_order_from_first_order(first_order_id int64, order_id_str_list []string, db_session *xorm.Session) int64 {
 	// 获取被合并订单中的第一个订单
 	var first_order ddlc_models.OrderInfo
 	_, err := db_session.Id(first_order_id).Get(&first_order)
@@ -37,7 +38,7 @@ WHERE id IN (-1, -2, -3);
 	var sql_update_order_type = `
 UPDATE erp_order SET type_id = %d
 WHERE id IN (%s);`
-	sql_update_order_type = fmt.Sprintf(sql_update_order_type, order_ids)
+	sql_update_order_type = fmt.Sprintf(sql_update_order_type, ddpz_models.ORDER_TYPE_BHDD, strings.Join(order_id_str_list, ","))
 
 	_, err = db_session.Exec(sql_update_order_type)
 	core.HandleError(err)
