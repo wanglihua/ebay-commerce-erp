@@ -19,7 +19,7 @@ func Combine_orders(order_filter string, user core.LoginUser, db_session *xorm.S
 	var order_ids_list = get_order_ids_list_to_combine(order_filter, db_session)
 
 	for _, order_ids := range order_ids_list {
-		combine_order_list(order_ids, user, db_session)
+		combine_order(order_ids, user, db_session)
 	}
 
 	return nil
