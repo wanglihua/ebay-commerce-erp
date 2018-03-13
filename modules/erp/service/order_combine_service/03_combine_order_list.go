@@ -21,16 +21,12 @@ func combine_order_list(order_ids string, user core.LoginUser, db_session *xorm.
 
 	var first_order_id = order_id_list[0]
 
-	var combine_order_id = insert_combine_order_from_first_order(first_order_id, db_session)
+	var combine_order_id = insert_combine_order_from_first_order(first_order_id, order_ids, db_session)
 
 	insert_combine_order_address_from_first_order(combine_order_id, first_order_id, db_session)
 
 	update_combine_order_amount(combine_order_id, order_ids, db_session)
 
-	// 把原来的订单全部设置成 被合并订单
-	var sql_update_type = `
-   
-   `
 
 	/*
 INSERT INTO erp_order_item (order_id, order_line_item_id, quantity, transaction_id, transaction_price_currency, transaction_price, transaction_price_rmb, product_store_item_id, item_id, item_product_id, item_sku, item_title, item_condition_id, item_condition_display_name, created_date, `desc`, create_time, update_time)
