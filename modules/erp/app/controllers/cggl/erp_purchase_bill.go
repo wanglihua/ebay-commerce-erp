@@ -201,9 +201,9 @@ FROM erp_purchase_bill pb
 			filter = core.SqlAnd(filter, fmt.Sprintf("pb.pay_time >= '%s'", query_time_begin.Format("2006-01-02 15:04")))
 		} else if time_query_id == TIME_QUERY_CHECKIN_TIME {
 			filter = core.SqlAnd(filter, fmt.Sprintf("pb.checkin_time >= '%s'", query_time_begin.Format("2006-01-02 15:04")))
-		} else {
+		} /* else {
 			filter = core.SqlAnd(filter, fmt.Sprintf("pb.apply_time >= '%s'", query_time_begin.Format("2006-01-02 15:04")))
-		}
+		}*/
 	}
 
 	if query_time_end_err == nil {
@@ -214,9 +214,9 @@ FROM erp_purchase_bill pb
 			filter = core.SqlAnd(filter, fmt.Sprintf("pb.pay_time <= '%s'", query_time_end.Format("2006-01-02 15:04")))
 		} else if time_query_id == TIME_QUERY_CHECKIN_TIME {
 			filter = core.SqlAnd(filter, fmt.Sprintf("pb.checkin_time <= '%s'", query_time_end.Format("2006-01-02 15:04")))
-		} else {
+		} /* else {
 			filter = core.SqlAnd(filter, fmt.Sprintf("pb.apply_time <= '%s'", query_time_end.Format("2006-01-02 15:04")))
-		}
+		} */
 	}
 
 	if sku_query != "" {
