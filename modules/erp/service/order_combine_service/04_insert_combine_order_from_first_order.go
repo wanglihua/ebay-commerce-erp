@@ -33,6 +33,7 @@ func insert_combine_order_from_first_order(first_order_id int64, order_id_str_li
 	combine_order.StockId = 0
 	combine_order.CompanyId = 0
 	combine_order.ModeId = 0
+	combine_order.EbayOrderId = ""
 
 	_, err = db_session.Insert(&combine_order)
 	core.HandleError(err)
