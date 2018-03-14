@@ -1199,11 +1199,7 @@ func (c ErpOrder) MatchLogistics() revel.Result {
 	if len(id_list) == 0 {
 		err = p_order_logistics.CalculateListPaidOrders(login_user, db_session)
 	} else {
-		var order_list = make([]ddlc_models.OrderInfo, 0)
-		err = db_session.In("id", id_list).Find(&order_list)
-		core.HandleError(err)
-
-		err = p_order_logistics.CalculateListWithUser(order_list, login_user, db_session)
+		err = p_order_logistics.CalculateListWithUser(id_list, login_user, db_session)
 	}
 
 	// core.HandleError(err)

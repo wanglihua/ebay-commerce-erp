@@ -187,19 +187,23 @@ func (p_ol *OrderLogisticsService) CalculateListPaidOrders(user core.LoginUser, 
 	return p_ol.CalculateList(order_list, db_session)
 }
 
-func (p_ol *OrderLogisticsService) CalculateListWithUser(order_list []ddlc_models.OrderInfo, user core.LoginUser, db_session *xorm.Session) error {
+func (p_ol *OrderLogisticsService) CalculateListWithUser(order_id_list []int64, user core.LoginUser, db_session *xorm.Session) error {
 
-	if len(order_list) == 0 {
-		return errors.New("订单列表为空！")
+	if len(order_id_list) == 0 {
+		return errors.New("订单id列表为空！")
 	}
 
 	var order_id_str_list = make([]string, 0)
-	for _, order := range order_list {
-		order_id_str_list = append(order_id_str_list, fmt.Sprint(order.Id))
+	for _, order_id := range order_id_list {
+		order_id_str_list = append(order_id_str_list, fmt.Sprint(order_id))
 	}
 
 	// 需要先合并
 	err := order_combine_service.Combine_orders(fmt.Sprintf("o.id IN (%s)", strings.Join(order_id_str_list, ",")), user, db_session)
+	core.HandleError(err)
+
+	var order_list = make([]ddlc_models.OrderInfo, 0)
+	err = db_session.In("id", order_id_list).Find(&order_list)
 	core.HandleError(err)
 
 	//先判断订单状态

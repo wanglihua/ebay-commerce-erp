@@ -14,6 +14,7 @@ import (
 	"matrix/modules/erp/models/ddpz_models"
 	"matrix/modules/erp/models/ddlc_models"
 	xorm_core "github.com/go-xorm/core"
+	"matrix/modules/erp/models"
 )
 
 var db_driver string
@@ -58,6 +59,10 @@ func (p_ol *OrderLogisticsService) match_logistics_mode_logic(order ddlc_models.
 		defer func() {
 			db_session.Close()
 		}()
+	}
+
+	if order.StatusId == models.ORDER_STATUS_YQX {
+		return
 	}
 
 	// 下面的三个 Hold 也应该加上理论发货仓库的记录，方便进行理论仓发货的统计
