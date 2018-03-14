@@ -171,7 +171,7 @@ CREATE PROCEDURE sale_amount_report()
             # SET v_jyfy_amount = v_subtotal_amount * v_jyfl;
             # SET v_ptfy_amount = v_subtotal_amount * v_ptfl;
 
-            SET v_gst_fee = (v_subtotal_amount + v_express_fee) * 0.1;
+            SET v_gst_fee = ((v_subtotal_amount + v_express_fee) / 1.1) * 0.1;
 
             SELECT count(oi.id) AS item_count
             INTO v_order_item_count

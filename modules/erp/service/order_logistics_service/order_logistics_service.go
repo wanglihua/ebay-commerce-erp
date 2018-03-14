@@ -203,7 +203,7 @@ func (p_ol *OrderLogisticsService) CalculateListWithUser(order_id_list []int64, 
 	core.HandleError(err)
 
 	var order_list = make([]ddlc_models.OrderInfo, 0)
-	err = db_session.In("id", order_id_list).Find(&order_list)
+	err = db_session.In("id", order_id_list).Where("status_id <> ?", models.ORDER_STATUS_YQX).Find(&order_list)
 	core.HandleError(err)
 
 	//先判断订单状态

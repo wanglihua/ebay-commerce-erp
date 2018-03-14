@@ -170,7 +170,7 @@ CREATE PROCEDURE sale_income_report()
             # SET v_jyfy_amount = v_paid_amount * v_jyfl;
             # SET v_ptfy_amount = v_paid_amount * v_ptfl;
 
-            SET v_gst_fee = v_paid_amount * 0.1;
+            SET v_gst_fee = (v_paid_amount / 1.1) * 0.1;
 
             SELECT count(oi.id) AS item_count
             INTO v_order_item_count
