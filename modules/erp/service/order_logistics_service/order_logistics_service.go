@@ -154,8 +154,7 @@ LIMIT 1;`
 func (p_ol *OrderLogisticsService) CalculateListPaidOrders(user core.LoginUser, db_session *xorm.Session) error {
 
 	// 需要先合并
-	err := order_combine_service.Combine_orders(fmt.Sprintf("o.status_id = %d OR o.status_id = %d OR o.status_id = %d ", models.ORDER_STATUS_YZF, models.ORDER_STATUS_DPH, models.ORDER_STATUS_HOLD), user, db_session)
-	core.HandleError(err)
+	order_combine_service.Combine_orders(fmt.Sprintf("o.status_id = %d OR o.status_id = %d OR o.status_id = %d ", models.ORDER_STATUS_YZF, models.ORDER_STATUS_DPH, models.ORDER_STATUS_HOLD), user, db_session)
 
 	// 获取 已支付 状态的订单, 匹配完成后，订单的状态就是 Hold 或者 待配货
 	var order_list = order_service.Get_paid_order_list(db_session)
@@ -199,11 +198,14 @@ func (p_ol *OrderLogisticsService) CalculateListWithUser(order_id_list []int64, 
 	}
 
 	// 需要先合并
-	err := order_combine_service.Combine_orders(fmt.Sprintf("o.id IN (%s)", strings.Join(order_id_str_list, ",")), user, db_session)
-	core.HandleError(err)
+	var combine_order_id_list = order_combine_service.Combine_orders(fmt.Sprintf("o.id IN (%s)", strings.Join(order_id_str_list, ",")), user, db_session)
+
+	for _, order_id := range combine_order_id_list {
+		order_id_list = append(order_id_list, order_id)
+	}
 
 	var order_list = make([]ddlc_models.OrderInfo, 0)
-	err = db_session.In("id", order_id_list).Where("status_id <> ?", models.ORDER_STATUS_YQX).Find(&order_list)
+	err := db_session.In("id", order_id_list).Where("status_id <> ?", models.ORDER_STATUS_YQX).Find(&order_list)
 	core.HandleError(err)
 
 	//先判断订单状态
@@ -232,8 +234,7 @@ func (p_ol *OrderLogisticsService) CalculateListWithUser(order_id_list []int64, 
 func (p_ol *OrderLogisticsService) CalculateListImportBatch(batch_code int64, user core.LoginUser, db_session *xorm.Session) error {
 
 	// 先合并
-	err := order_combine_service.Combine_orders(fmt.Sprintf("o.batch_code = %d", batch_code), user, db_session)
-	core.HandleError(err)
+	order_combine_service.Combine_orders(fmt.Sprintf("o.batch_code = %d", batch_code), user, db_session)
 
 	//获得该批次号的订单列表
 	/*
@@ -243,7 +244,7 @@ SELECT o.* FROM erp_order o WHERE o.batch_code = 0
 	sql_import_batch_order = fmt.Sprintf(sql_import_batch_order, batch_code, models.ORDER_STATUS_YQX)
 
 	var order_list = make([]ddlc_models.OrderInfo, 0)
-	err = db_session.Sql(sql_import_batch_order).Find(&order_list)
+	err := db_session.Sql(sql_import_batch_order).Find(&order_list)
 	core.HandleError(err)
 
 	if len(order_list) == 0 {

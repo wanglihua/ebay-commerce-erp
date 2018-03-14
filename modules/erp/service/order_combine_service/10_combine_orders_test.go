@@ -34,6 +34,5 @@ func TestCombineOrders(t *testing.T) {
 		db_session.Close()
 	}()
 
-	err = Combine_orders(fmt.Sprintf("o.status_id = %d OR o.status_id = %d OR o.status_id = %d ", models.ORDER_STATUS_YZF, models.ORDER_STATUS_DPH, models.ORDER_STATUS_HOLD), core.LoginUser{}, db_session)
-	core.HandleError(err)
+	Combine_orders(fmt.Sprintf("o.status_id = %d OR o.status_id = %d OR o.status_id = %d ", models.ORDER_STATUS_YZF, models.ORDER_STATUS_DPH, models.ORDER_STATUS_HOLD), core.LoginUser{}, db_session)
 }

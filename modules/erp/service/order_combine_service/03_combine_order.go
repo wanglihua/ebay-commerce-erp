@@ -7,7 +7,7 @@ import (
 	"matrix/core"
 )
 
-func combine_order(order_ids string, user core.LoginUser, db_session *xorm.Session) {
+func combine_order(order_ids string, user core.LoginUser, db_session *xorm.Session) int64 {
 	var order_id_list = make([]int64, 0)
 	var order_id_str_list = strings.Split(order_ids, ",")
 	for _, order_id_str := range order_id_str_list {
@@ -28,4 +28,6 @@ func combine_order(order_ids string, user core.LoginUser, db_session *xorm.Sessi
 	cancel_combined_orders(order_id_str_list, db_session)
 
 	insert_order_history(combine_order_id, order_id_list, user, db_session)
+
+	return combine_order_id
 }
