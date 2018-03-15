@@ -405,26 +405,6 @@ func (p_ol *OrderLogisticsService) hold_check_express(p_order *ddlc_models.Order
 		// 这里就不保存了，使用前面匹配中保存的结果，这里只是把这个标记为快递，是否为解锁快递为调用这个函数的外部会调用
 		// save_special_hold_order_logistics(p_ol, p_order, p_order_logistics_data, 0, 0, db_session)
 
-		/*
-		var order_logistics ddlc_models.OrderLogisticsInfo
-		has, err := db_session.Where("order_id = ?", p_order.Id).Get(&order_logistics)
-		core.HandleError(err)
-
-		order_logistics.StockId = p_ol.mel_stock_id
-
-		if has == true {
-			_, err := db_session.Id(order_logistics.Id).Cols("stock_id").Update(&order_logistics)
-			core.HandleError(err)
-		} else {
-			_, err := db_session.Insert(&order_logistics)
-			core.HandleError(err)
-		}
-
-		p_order.StockId = p_ol.mel_stock_id
-		_, err = db_session.Id(p_order.Id).Cols("stock_id").Update(p_order)
-		core.HandleError(err)
-		*/
-
 		return true
 	}
 
@@ -451,27 +431,6 @@ func (p_ol *OrderLogisticsService) hold_check_international(p_order *ddlc_models
 
 	if p_ol.is_international_order(p_order, p_order_logistics_data) == true {
 		p_ol.update_order_to_hold_type(p_order, ddpz_models.ORDER_HOLD_TYPE_INTERNATIONAL, db_session)
-
-		//设置发货仓库为墨尔本仓库
-		/*
-		var order_logistics ddlc_models.OrderLogisticsInfo
-		has, err := db_session.Where("order_id = ?", p_order.Id).Get(&order_logistics)
-		core.HandleError(err)
-
-		order_logistics.StockId = p_ol.mel_stock_id
-
-		if has == true {
-			_, err := db_session.Id(order_logistics.Id).Cols("stock_id").Update(&order_logistics)
-			core.HandleError(err)
-		} else {
-			_, err := db_session.Insert(&order_logistics)
-			core.HandleError(err)
-		}
-
-		p_order.StockId = p_ol.mel_stock_id
-		_, err = db_session.Id(p_order.Id).Cols("stock_id").Update(p_order)
-		core.HandleError(err)
-		*/
 
 		save_special_hold_order_logistics(p_ol, p_order, p_order_logistics_data, 0, 0, db_session)
 
