@@ -71,7 +71,15 @@ func (p_ol *OrderLogisticsService) match_logistics_mode_with_option(p_order *ddl
 	// 匹配的结果中，有库存记录的那些记录列表
 	var match_result_has_stock_list = make([]match_logistics_mode_result, 0)
 	var is_envelope_hold = false
+	var is_express = p_ol.is_express(p_order, p_order_logistics_data) // 根据付款的快递费判断是不是快递
 	for _, logistics_mode := range logistics_mode_list {
+
+		if match_option.Unlock_express == false && is_express == true { // 根据付款的快递费判断是快递，但不是解锁快递的话，就只匹配快递的物流方式
+			if logistics_mode.TypeId != ddpz_models.LOGISTICS_MODE_TYPE_EXPRESS {
+				continue
+			}
+		}
+
 		// 如果指定了仓库，并且和指定的仓库不同，就忽略
 		if match_option.Prefer_stock_id != 0 && match_option.Prefer_stock_id != logistics_mode.StockId {
 			continue
@@ -776,7 +784,7 @@ func (p_ol *OrderLogisticsService) match_logistics_mode_with_option(p_order *ddl
 				log_logistics_match_debug(mode_result, "无对应库存", mt.String(), db_session)
 			}
 		}
-	} // for _, logistics_mode := range logistics_mode_list {
+	}                                                                 // for _, logistics_mode := range logistics_mode_list {
 
 	var order_logistics ddlc_models.OrderLogisticsInfo
 

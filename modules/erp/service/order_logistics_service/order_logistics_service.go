@@ -530,6 +530,7 @@ func (p_ol *OrderLogisticsService) CalculateListWithOption(order_list []ddlc_mod
 			}
 		}
 
+		/* 快递也采用匹配的方式实现，匹配结果中有物流费
 		if match_option.Unlock_express == false {
 			// 15 判断是否是快递
 			if p_ol.hold_check_express(&order, p_order_logistics_data, db_session) {
@@ -538,6 +539,7 @@ func (p_ol *OrderLogisticsService) CalculateListWithOption(order_list []ddlc_mod
 				continue
 			}
 		}
+		*/
 
 		// 17 收货人信息不全的，比如没有手机号，没有邮编等等，没有邮编前面也检查了的
 		if p_ol.hold_check_address_info_miss(&order, p_order_logistics_data, db_session) {

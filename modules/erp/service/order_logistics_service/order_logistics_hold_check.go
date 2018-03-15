@@ -402,7 +402,8 @@ func (p_ol *OrderLogisticsService) hold_check_express(p_order *ddlc_models.Order
 
 		//设置发货仓库为墨尔本仓库
 
-		save_special_hold_order_logistics(p_ol, p_order, p_order_logistics_data, 0, 0, db_session)
+		// 这里就不保存了，使用前面匹配中保存的结果，这里只是把这个标记为快递，是否为解锁快递为调用这个函数的外部会调用
+		// save_special_hold_order_logistics(p_ol, p_order, p_order_logistics_data, 0, 0, db_session)
 
 		/*
 		var order_logistics ddlc_models.OrderLogisticsInfo
