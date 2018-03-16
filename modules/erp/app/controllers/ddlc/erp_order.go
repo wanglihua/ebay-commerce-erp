@@ -788,11 +788,14 @@ func (c ErpOrder) Detail(order_id int64) revel.Result {
 
 	c.RenderArgs["is_pickup"] = is_pickup
 
+	/* 暂时先设置为总是可以解锁快递
 	var is_express = false
 	if order.HoldTypeId.Int64 == ddpz_models.ORDER_HOLD_TYPE_EXPRESS {
 		is_express = true
 	}
 	c.RenderArgs["is_express"] = is_express
+	*/
+	c.RenderArgs["is_express"] = true
 
 	var is_pickup_paid int64 = 0
 	var pickup_order ddlc_models.PickupOrderInfo
