@@ -133,10 +133,13 @@ func (c ErpOrder) Index(status string) revel.Result {
 	}
 
 	// is_button_upload_ebay_ship_visible
-
 	var has_pass_upload_ebay_ship = pass_service.Is_login_user_has_pass(pass_res.DDLC_ORDER_FHSC, c.Session)
 	var is_button_upload_ebay_ship_visible = false
-	if has_pass_upload_ebay_ship && (status_id == models.ORDER_STATUS_DPH || status_id == models.ORDER_STATUS_PHZ || status_id == models.ORDER_STATUS_YFH ) {
+	if has_pass_upload_ebay_ship &&
+		(status_id == models.ORDER_STATUS_DPH ||
+			status_id == models.ORDER_STATUS_PHZ ||
+			status_id == models.ORDER_STATUS_YFH ||
+			status_id == models.ORDER_STATUS_YWC) {
 		is_button_upload_ebay_ship_visible = true
 	}
 
