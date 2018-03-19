@@ -10,8 +10,8 @@ import (
 // order_filter: o.batch_code = '20170428120352'
 func Combine_orders(order_filter string, user core.LoginUser, db_session *xorm.Session) []int64 {
 	// 不合并订单，就可以先返回
-	var temp = make([]int64, 0)
-	return temp
+	// var temp = make([]int64, 0)
+	// return temp
 
 	if len(order_filter) == 0 {
 		panic(errors.New("未提供订单过滤条件！"))
