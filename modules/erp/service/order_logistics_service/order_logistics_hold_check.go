@@ -503,7 +503,7 @@ func (p_ol *OrderLogisticsService) hold_check_paypal_account_not_match(p_order *
 
 		seller_email_in_list := false
 		for _, shop_paypal_email := range shop_paypal_email_list {
-			if strings.ToLower(seller_email) == strings.ToLower(shop_paypal_email) {
+			if strings.ToLower(strings.TrimSpace(seller_email)) == strings.ToLower(strings.TrimSpace(shop_paypal_email)) {
 				seller_email_in_list = true
 			}
 		}
