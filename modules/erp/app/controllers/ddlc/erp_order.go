@@ -1636,6 +1636,8 @@ func (c ErpOrder) FaHuo() revel.Result {
 func (c ErpOrder) UploadEbayStatus() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_FHSC, c.Session)
 
+	var db_session = c.DbSession
+
 	order_id_list := make([]int64, 0)
 	c.Params.Bind(&order_id_list, "id_list")
 
@@ -1643,6 +1645,19 @@ func (c ErpOrder) UploadEbayStatus() revel.Result {
 
 	if upload_order_ebay_status_result.Success == false {
 		return c.RenderJson(upload_order_ebay_status_result)
+	}
+
+	var order_list = make([]ddlc_models.OrderInfo, 0)
+	err := db_session.In("id", order_id_list).Find(&order_list)
+	core.HandleError(err)
+
+	var login_user = core.GetLoginUser(c.Session)
+
+	for _, order := range order_list {
+		var logistics_company ddpz_models.LogisticsCompanyInfo
+		_, err := db_session.Id(order.CompanyId).Get(&logistics_company)
+		core.HandleError(err)
+		order_history_service.Insert_order_history(order, login_user.UserId, fmt.Sprintf("订单发货信息上传ebay, 物流公司：%s 运单号：%s，工号： %s", logistics_company.EbayName, order.WaybillNumber, login_user.LoginName), db_session)
 	}
 
 	return c.RenderJson(map[string]interface{}{
