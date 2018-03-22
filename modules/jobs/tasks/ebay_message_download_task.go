@@ -159,15 +159,19 @@ FROM
     INNER JOIN erp_product p ON p.id = psi.product_id
 WHERE psi.item_id = '%s'`
 
-				has_item_product, err := db_session.Sql(fmt.Sprintf(sql, message_download.Item.ItemId)).Get(&product_result)
+				// has_item_product, err := db_session.Sql(fmt.Sprintf(sql, message_download.Item.ItemId)).Get(&product_result)
+				_, err = db_session.Sql(fmt.Sprintf(sql, message_download.Item.ItemId)).Get(&product_result)
 				core.HandleError(err)
 
 				product_id := product_result.ProductId
 				product_sku := product_result.ProductSku
+
+				/* 不再管是否存在商品，假设都存在
 				if has_item_product == false {
 					// download product
 					product_id, product_sku, _ = fetch_product_item_to_db(config.APIConfig, db_session, message_download.Item.ItemId)
 				}
+				*/
 
 				message_in_db.ProductId = product_id
 				message_in_db.Sku = product_sku

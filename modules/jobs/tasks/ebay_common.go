@@ -220,6 +220,7 @@ func fetch_product_item_to_db(config xtpz_models.EBayAPIConfigInfo, db_session *
 			product.StatusId = models.PRODUCT_STATUS_ZC
 		}
 
+		/*
 		if has_product == false {
 			// do insert
 			product.Name = item_response.Item.Title
@@ -229,6 +230,14 @@ func fetch_product_item_to_db(config xtpz_models.EBayAPIConfigInfo, db_session *
 		} else {
 			// do update
 			update_col_list := []string{"sku", "name", "image_url"}
+			_, err = db_session.Id(product.Id).Cols(update_col_list...).Update(&product)
+			core.HandleError(err)
+		}
+		*/
+
+		if has_product == true {
+			// do update
+			update_col_list := []string{"name", "image_url"}
 			_, err = db_session.Id(product.Id).Cols(update_col_list...).Update(&product)
 			core.HandleError(err)
 		}
