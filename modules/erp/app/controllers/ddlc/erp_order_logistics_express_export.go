@@ -129,7 +129,7 @@ WHERE o.status_id = %d AND o.hold_type_id = %d AND ol.stock_id = %d`
 		sheet.Cell(index+2, excel_col_label_to_index("E")).Value = name1
 		sheet.Cell(index+2, excel_col_label_to_index("F")).Value = name2
 
-		var full_address = order_shipping_address.Street1 + order_shipping_address.Street2
+		var full_address = order_shipping_address.Street1 + "," + order_shipping_address.Street2
 		address1, address2 := split_long_string(full_address, 35)
 		sheet.Cell(index+2, excel_col_label_to_index("G")).Value = address1
 		sheet.Cell(index+2, excel_col_label_to_index("H")).Value = address2
@@ -168,7 +168,7 @@ WHERE o.status_id = %d AND o.hold_type_id = %d AND ol.stock_id = %d`
 		sheet.Cell(index+2, excel_col_label_to_index("E")).Value = name1
 		sheet.Cell(index+2, excel_col_label_to_index("F")).Value = name2
 
-		var full_address = order_shipping_address.Street1 + order_shipping_address.Street2
+		var full_address = order_shipping_address.Street1 + "," + order_shipping_address.Street2
 		address1, address2 := split_long_string(full_address, 35)
 		sheet.Cell(index+2, excel_col_label_to_index("G")).Value = address1
 		sheet.Cell(index+2, excel_col_label_to_index("H")).Value = address2

@@ -270,7 +270,7 @@ WHERE o.status_id = %d AND ol.mode_id IN (%s) AND ol.stock_id = %d`
 				sheet.Cell(index+2, excel_col_label_to_index("E")).Value = name1
 				sheet.Cell(index+2, excel_col_label_to_index("F")).Value = name2
 
-				var full_address = order_shipping_address.Street1 + order_shipping_address.Street2
+				var full_address = order_shipping_address.Street1 + "," + order_shipping_address.Street2
 				address1, address2 := split_long_string(full_address, 35)
 				sheet.Cell(index+2, excel_col_label_to_index("G")).Value = address1
 				sheet.Cell(index+2, excel_col_label_to_index("H")).Value = address2
@@ -319,7 +319,7 @@ WHERE o.status_id = %d AND ol.mode_id IN (%s) AND ol.stock_id = %d`
 				sheet.Cell(index+2, excel_col_label_to_index("E")).Value = name1
 				sheet.Cell(index+2, excel_col_label_to_index("F")).Value = name2
 
-				var full_address = order_shipping_address.Street1 + order_shipping_address.Street2
+				var full_address = order_shipping_address.Street1 + "," + order_shipping_address.Street2
 				address1, address2 := split_long_string(full_address, 35)
 				sheet.Cell(index+2, excel_col_label_to_index("G")).Value = address1
 				sheet.Cell(index+2, excel_col_label_to_index("H")).Value = address2
@@ -427,7 +427,7 @@ WHERE o.status_id = %d AND ol.mode_id IN (%s) AND ol.stock_id = %d`
 				sheet.Cell(index+2, excel_col_label_to_index("E")).Value = name1
 				sheet.Cell(index+2, excel_col_label_to_index("F")).Value = name2
 
-				var full_address = order_shipping_address.Street1 + order_shipping_address.Street2
+				var full_address = order_shipping_address.Street1 + "," + order_shipping_address.Street2
 				address1, address2 := split_long_string(full_address, 35)
 				sheet.Cell(index+2, excel_col_label_to_index("G")).Value = address1
 				sheet.Cell(index+2, excel_col_label_to_index("H")).Value = address2
@@ -480,7 +480,7 @@ WHERE o.status_id = %d AND ol.mode_id IN (%s) AND ol.stock_id = %d`
 				sheet.Cell(index+2, excel_col_label_to_index("E")).Value = name1
 				sheet.Cell(index+2, excel_col_label_to_index("F")).Value = name2
 
-				var full_address = order_shipping_address.Street1 + order_shipping_address.Street2
+				var full_address = order_shipping_address.Street1 + "," + order_shipping_address.Street2
 				address1, address2 := split_long_string(full_address, 35)
 				sheet.Cell(index+2, excel_col_label_to_index("G")).Value = address1
 				sheet.Cell(index+2, excel_col_label_to_index("H")).Value = address2
@@ -609,7 +609,7 @@ WHERE  o.status_id = %d AND ol.mode_id IN (%s) AND ol.stock_id = %d`
 			set_cell_style(d_cell)
 
 			sheet.Cell(index+1, excel_col_label_to_index("H")).Value = order_shipping_address.Name
-			var full_address = order_shipping_address.Street1 + order_shipping_address.Street2
+			var full_address = order_shipping_address.Street1 + "," + order_shipping_address.Street2
 			address1, address2 := split_long_string(full_address, 25)
 			sheet.Cell(index+1, excel_col_label_to_index("I")).Value = address1
 			sheet.Cell(index+1, excel_col_label_to_index("J")).Value = address2
@@ -729,7 +729,7 @@ WHERE o.status_id = %d AND ol.mode_id IN (%s) AND ol.stock_id = %d`
 			sheet.Cell(index+1, excel_col_label_to_index("D")).Value = order_shipping_address.Name
 			sheet.Cell(index+1, excel_col_label_to_index("E")).Value = order_shipping_address.Name // 和 D　是一样的？
 
-			var full_address = order_shipping_address.Street1 + order_shipping_address.Street2
+			var full_address = order_shipping_address.Street1 + "," + order_shipping_address.Street2
 			address1, address2 := split_long_string(full_address, 25)
 			sheet.Cell(index+1, excel_col_label_to_index("F")).Value = address1
 			sheet.Cell(index+1, excel_col_label_to_index("G")).Value = address2
