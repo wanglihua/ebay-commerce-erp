@@ -315,6 +315,7 @@ func (c ErpPurchaseBillEntryExcel) Import() revel.Result {
 		purchase_bill_entry.StatusId = purchase_bill.StatusId
 
 		purchase_bill_entry.DrawbackAmount = purchase_bill_service.CalculateBillEntryDrawbackAmount(purchase_bill_entry)
+		purchase_bill_entry.TypeId = cggl_models.PURCHASE_BILL_TYPE_NORMAL
 
 		_, err := db_session.Insert(&purchase_bill_entry)
 		core.HandleError(err)
