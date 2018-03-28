@@ -195,6 +195,18 @@ func (c ErpOrderLogisticsFeeDiff) get_export_excel(db_session *xorm.Session) *xl
 		cell = header_row.AddCell()
 		sheet.SetColWidth(col_index, col_index, 20)
 		set_head_cell_style(cell)
+		cell.Value = "城市"
+
+		col_index++
+		cell = header_row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 20)
+		set_head_cell_style(cell)
+		cell.Value = "邮编"
+
+		col_index++
+		cell = header_row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 20)
+		set_head_cell_style(cell)
 		cell.Value = "发货仓库"
 
 		col_index++
@@ -292,6 +304,16 @@ func (c ErpOrderLogisticsFeeDiff) get_export_excel(db_session *xorm.Session) *xl
 		set_text_cell_style(cell, "center")
 		cell.Value = order_logistics_view.Order.FullTranId
 
+		// 城市
+		cell = row.AddCell()
+		set_text_cell_style(cell, "center")
+		cell.Value = order_logistics_view.OrderShippingAddress.CityName
+
+		// 邮编
+		cell = row.AddCell()
+		set_text_cell_style(cell, "center")
+		cell.Value = order_logistics_view.OrderShippingAddress.PostalCode
+
 		// 发货仓库
 		cell = row.AddCell()
 		set_text_cell_style(cell, "center")
@@ -379,11 +401,12 @@ func (c ErpOrderLogisticsFeeDiff) get_export_excel(db_session *xorm.Session) *xl
 }
 
 type order_logistics_view_item_t struct {
-	OrderLogistics ddlc_models.OrderLogisticsInfo `xorm:"extends" json:"ol"`
-	Order          ddlc_models.OrderInfo          `xorm:"extends" json:"o"`
-	StockName      string                         `json:"stock_name"`
-	CompanyName    string                         `json:"company_name"`
-	ModeName       string                         `json:"mode_name"`
+	OrderLogistics       ddlc_models.OrderLogisticsInfo       `xorm:"extends" json:"ol"`
+	Order                ddlc_models.OrderInfo                `xorm:"extends" json:"o"`
+	OrderShippingAddress ddlc_models.OrderShippingAddressInfo `xorm:"extends" json:"osa"`
+	StockName            string                               `json:"stock_name"`
+	CompanyName          string                               `json:"company_name"`
+	ModeName             string                               `json:"mode_name"`
 }
 
 func (c ErpOrderLogisticsFeeDiff) get_list_data(is_for_export bool) (list_data_return []order_logistics_view_item_t, count_return int64) {
@@ -415,9 +438,10 @@ func (c ErpOrderLogisticsFeeDiff) get_list_data(is_for_export bool) (list_data_r
 	c.Params.Bind(&id_list, "id_list")
 
 	/*
-SELECT ol.*, o.*
+SELECT ol.*, o.*, osa.*
 FROM erp_order_logistics ol
     INNER JOIN erp_order o ON o.id = ol.order_id
+    INNER JOIN erp_order_shipping_address osa ON osa.id = ol.address_id
 WHERE ol.stock_id = 0 AND ol.company_id = 0
       AND o.batch_code = 0
       AND o.paid_time > '2017-01-01' AND o.paid_time < '2017-04-30'
@@ -435,10 +459,11 @@ WHERE ol.stock_id = 0 AND ol.company_id = 0
 	}
 
 	var sb = core.NewSqlBuilder()
-	sb.Select("ol.*, o.*")
+	sb.Select("ol.*, o.*, osa.*")
 	sb.Count("count(ol.id) AS order_logistics_count")
 	sb.From(`erp_order_logistics ol
-    INNER JOIN erp_order o ON o.id = ol.order_id`)
+    INNER JOIN erp_order o ON o.id = ol.order_id
+    INNER JOIN erp_order_shipping_address osa ON osa.id = ol.address_id`)
 
 	if len(id_list) == 0 {
 		if stock_id != 0 {
