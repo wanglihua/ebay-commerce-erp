@@ -64,6 +64,7 @@ func (c ErpPurchaseBillEntryExcel) Import() revel.Result {
 		Price         string `json:"price"`
 		MelQty        string `json:"mel_qty"`
 		BneQty        string `json:"bne_qty"`
+		PayAmount     string `json:"pay_amount"`
 		NeedInvoice   string `json:"need_invoice"`
 		TaxPoint      string `json:"tax_point"`
 		DrawbackPoint string `json:"drawback_point"`
@@ -75,6 +76,7 @@ func (c ErpPurchaseBillEntryExcel) Import() revel.Result {
 		price          float64                 `json:"-"`
 		mel_qty        int64                   `json:"-"`
 		bne_qty        int64                   `json:"-"`
+		pay_amount     float64                 `json:"-"`
 		need_invoice   int64                   `json:"-"`
 		tax_point      float64                 `json:"-"`
 		drawback_point float64                 `json:"-"`
@@ -135,6 +137,14 @@ func (c ErpPurchaseBillEntryExcel) Import() revel.Result {
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
 			purchase_bill_entry_import.BneQty = cell_val
+			col_index++
+
+			// PayAmount
+			cell = sheet.Cell(row_index, col_index)
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
+			purchase_bill_entry_import.PayAmount = cell_val
 			col_index++
 
 			// NeedInvoice
@@ -239,6 +249,13 @@ func (c ErpPurchaseBillEntryExcel) Import() revel.Result {
 			purchase_bill_entry_import_list[index].bne_qty = bne_qty
 		}
 
+		pay_amount, err := strconv.ParseFloat(purchase_bill_entry_import.PayAmount, 64)
+		if err != nil {
+			buffer.WriteString("付款格式输入不对！")
+		} else {
+			purchase_bill_entry_import_list[index].pay_amount = pay_amount
+		}
+
 		if strings.TrimSpace(purchase_bill_entry_import.NeedInvoice) == "是" {
 			purchase_bill_entry_import.need_invoice = 1
 		} else {
@@ -300,6 +317,7 @@ func (c ErpPurchaseBillEntryExcel) Import() revel.Result {
 		purchase_bill_entry.BneQty = purchase_bill_entry_import.bne_qty
 		purchase_bill_entry.Qty = purchase_bill_entry_import.mel_qty + purchase_bill_entry_import.bne_qty
 		purchase_bill_entry.Amount = purchase_bill_entry.Price * float64(purchase_bill_entry.Qty)
+		purchase_bill_entry.PayAmount = purchase_bill_entry_import.pay_amount
 		purchase_bill_entry.NeedInvoice = purchase_bill_entry_import.need_invoice
 		purchase_bill_entry.TaxPoint = purchase_bill_entry_import.tax_point
 		purchase_bill_entry.DrawbackPoint = purchase_bill_entry_import.drawback_point
@@ -534,6 +552,12 @@ func (c ErpPurchaseBillEntryExcel) export_entry_list_to_excel(db_session *xorm.S
 		cell = row.AddCell()
 		sheet.SetColWidth(col_index, col_index, 10)
 		set_head_cell_style(cell)
+		cell.Value = "付款"
+		col_index++
+
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 10)
+		set_head_cell_style(cell)
 		cell.Value = "运费"
 		col_index++
 
@@ -648,6 +672,11 @@ func (c ErpPurchaseBillEntryExcel) export_entry_list_to_excel(db_session *xorm.S
 		cell = row.AddCell()
 		set_text_cell_style(cell, "center")
 		cell.SetFloatWithFormat(entry.PurchaseBillEntry.Amount, "0.00")
+
+		// 付款
+		cell = row.AddCell()
+		set_text_cell_style(cell, "center")
+		cell.SetFloatWithFormat(entry.PurchaseBillEntry.PayAmount, "0.00")
 
 		// 运费
 		cell = row.AddCell()
