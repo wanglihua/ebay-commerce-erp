@@ -9,6 +9,7 @@ import (
 	"time"
 	"strings"
 	"matrix/modules/erp/models"
+	"matrix/modules/erp/models/xtpz_models"
 )
 
 var order_code_seq int64 = 1
@@ -23,7 +24,9 @@ func insert_combine_order_from_first_order(first_order_id int64, order_id_str_li
 	var combine_order ddlc_models.OrderInfo = first_order
 	combine_order.Id = 0
 
-	combine_order.Code = time.Now().Format("200601021504") + fmt.Sprintf("%02d", order_code_seq)
+	var order_code = time.Now().Format("200601021504") + fmt.Sprintf("%02d", order_code_seq)
+
+	combine_order.Code = order_code
 	order_code_seq = (order_code_seq + 1) % 100 // 加一个序列号
 
 	combine_order.TypeId = ddpz_models.ORDER_TYPE_HBDD // 合并订单
@@ -34,6 +37,15 @@ func insert_combine_order_from_first_order(first_order_id int64, order_id_str_li
 	combine_order.CompanyId = 0
 	combine_order.ModeId = 0
 	combine_order.EbayOrderId = ""
+
+	var tran_id = order_code
+	combine_order.TranId = tran_id
+
+	var shop_account xtpz_models.ShopAccountInfo
+	_, err = db_session.Id(combine_order.ShopId).Get(&shop_account)
+	core.HandleError(err)
+
+	combine_order.FullTranId = shop_account.Code + tran_id
 
 	_, err = db_session.Insert(&combine_order)
 	core.HandleError(err)
