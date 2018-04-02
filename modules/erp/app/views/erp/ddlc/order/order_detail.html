@@ -479,6 +479,7 @@
                             <button class="btn btn-sm btn-success" @click="add_order_item">添加</button>
                             <button class="btn btn-sm btn-purple" @click="show_order_item">修改</button>
                             <button class="btn btn-sm btn-danger" @click="delete_order_item">删除</button>
+                            <button class="btn btn-sm btn-pink" onclick="showOrderSplit()">拆分</button>
                         </div>
                     </div>
                     {% end %}
@@ -965,6 +966,7 @@
         </div>
     </div>
 </div>
+<div id="orderSplitDialogWrapper"></div>
 {%template "erp/ddlc/order/order_detail.var" .%}
 <script type="text/javascript">
     var vm = new Vue({
@@ -1417,6 +1419,44 @@
             }
         );
     });
+
+    function showOrderSplit() {
+        $.ajax({
+            url: '{%url "ErpOrderSplit.Show" %}',
+            type: "POST",
+            data: {
+                "order_id": vm.detail.order.id
+            },
+            success: function (result) {
+                if (result.success === false) {
+                    $.msg.error(result.message);
+                    return;
+                }
+                $("#orderSplitDialogWrapper").html(result);
+                $('#orderSplitDialog').modal(modalOptions);
+            }
+        });
+    }
+
+    function saveOrderSplit() {
+        var form = $("#orderSplitForm");
+
+        showMask("数据加载中，请稍候");
+        $.ajax({
+            "dataType": 'json',
+            "url": '{% url "ErpOrderSplit.Save"%}',
+            "data": form.serialize(),
+            "success": function (data) {
+                hideMask();
+                if (data.success === false) {
+                    $.msg.error(data.message);
+                    return;
+                }
+
+                load_order_detail();
+            }
+        });
+    }
 
 </script>
 {% site_footer %}

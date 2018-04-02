@@ -803,3 +803,5 @@ POST /sale/amount/report/product/chart/data     ErpSaleAmountReportProduct.Chart
 
 POST /sale/amount/report/product/excel/export   ErpSaleAmountReportProductExcel.Export
 
+POST /order/split/show                          ErpOrderSplit.Show
+POST /order/split/save                          ErpOrderSplit.Save
