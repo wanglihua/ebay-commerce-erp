@@ -183,6 +183,14 @@ func (e PassResInfo) InitData(db_session *xorm.Session) {
 		pass.Name = "最佳仓次佳仓偏差"
 		pass.Desc = core.MakeNullString("最佳仓次佳仓偏差", true)
 		db_session.Insert(pass)
+
+		// INSERT INTO auth_pass_res (id, cate_id, name, `desc`, create_time, update_time) VALUES (131600, 10500, '订单分割', '订单分割', now(), now());
+		pass = new(PassResInfo)
+		pass.Id = pass_res.DDLC_ORDER_SPLIT
+		pass.CateId = pass_res_cate.DDLC
+		pass.Name = "订单分割"
+		pass.Desc = core.MakeNullString("订单分割", true)
+		db_session.Insert(pass)
 	}
 
 	// 订单配置
