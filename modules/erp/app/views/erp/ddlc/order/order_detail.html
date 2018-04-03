@@ -1453,7 +1453,9 @@
                     return;
                 }
 
+                $('#orderSplitDialog').modal("hide");
                 load_order_detail();
+                $.msg.show(data.message);
             }
         });
     }
