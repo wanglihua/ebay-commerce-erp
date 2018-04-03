@@ -342,7 +342,7 @@ func (c ErpPurchaseBillEntryExcel) Import() revel.Result {
 	purchase_bill_log_service.Insert_purchase_bill_log(purchase_bill, "采购单明细导入", db_session, c.Session)
 
 	// 更新采购单总金额
-	purchase_bill_service.UpdatePurchaseBillTotalAmount(purchase_bill.Id, db_session)
+	purchase_bill_service.UpdatePurchaseBillAmount(purchase_bill.Id, db_session)
 
 	return c.RenderJson(map[string]interface{}{
 		"success": true,
