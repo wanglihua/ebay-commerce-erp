@@ -160,6 +160,18 @@
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
+                                            <label for="diff_amount" class="col-xs-2 control-label">偏差金额</label>
+                                            <div class="col-xs-10">
+                                                <input id="diff_amount" name="purchase_bill_entry_detail.purchase_bill_entry.diff_amount" type="text" class="input-sm form-control" v-model.number="purchase_bill_entry_detail.purchase_bill_entry.diff_amount"/>
+                                                <div class="help-block">如果是供应商退款，输入正数的金额；如果是损失，输入负数的金额。</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
                                             <label for="purchase_bill_entry_desc" class="col-xs-2 control-label">备注</label>
                                             <div class="col-xs-10">
                                                 <textarea id="purchase_bill_entry_desc" name="purchase_bill_entry_detail.purchase_bill_entry.desc" rows="2" class="input-sm form-control" v-model="purchase_bill_entry_detail.purchase_bill_entry.desc"></textarea>

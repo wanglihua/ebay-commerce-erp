@@ -34,6 +34,7 @@ type PurchaseBillEntryInfo struct {
 	FreightCharge           float64         `xorm:"decimal(18,6) notnull 'freight_charge' default(0)" json:"freight_charge" smith:"verbose_name=运费"`            // 搞不清，为什么要加个运费，前面都已经有提货费
 	TypeId                  int64           `xorm:"bigint notnull index 'type_id' default(100)" json:"type_id" smith:"verbose_name=采购明细类型"`                     // 分批 或 正常，默认是正常明细类型
 	ArrivalDays             int64           `xorm:"bigint null 'arrival_days'" json:"arrival_days"`                                                             // 到货天数
+	DiffAmount              float64         `xorm:"decimal(18,6) null 'diff_amount'" json:"diff_amount" smith:"verbose_name=金额"`                                // 异常处理是的差异金额，正数表示退款
 	CreateTime              core.Time       `xorm:"created notnull 'create_time'" json:"create_time"`
 	UpdateTime              core.Time       `xorm:"updated notnull 'update_time'" json:"update_time"`
 }
