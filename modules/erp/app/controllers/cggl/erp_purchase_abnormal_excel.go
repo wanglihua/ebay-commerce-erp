@@ -186,61 +186,73 @@ func (c ErpPurchaseAbnormalExcel) export_excel(db_session *xorm.Session, entry_l
 		col_index++
 
 		cell = row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 10)
+		sheet.SetColWidth(col_index, col_index, 8)
 		set_head_cell_style(cell)
 		cell.Value = "状态"
 		col_index++
 
 		cell = row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 10)
+		sheet.SetColWidth(col_index, col_index, 8)
 		set_head_cell_style(cell)
 		cell.Value = "异常类型"
 		col_index++
 
 		cell = row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 30)
+		sheet.SetColWidth(col_index, col_index, 15)
 		set_head_cell_style(cell)
 		cell.Value = "SKU"
 		col_index++
 
 		cell = row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 12)
+		sheet.SetColWidth(col_index, col_index, 35)
 		set_head_cell_style(cell)
 		cell.Value = "名称"
 		col_index++
 
 		cell = row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 15)
+		sheet.SetColWidth(col_index, col_index, 8)
 		set_head_cell_style(cell)
 		cell.Value = "数量"
 		col_index++
 
 		cell = row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 12)
+		sheet.SetColWidth(col_index, col_index, 8)
 		set_head_cell_style(cell)
 		cell.Value = "入库数量"
 		col_index++
 
 		cell = row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 35)
+		sheet.SetColWidth(col_index, col_index, 8)
 		set_head_cell_style(cell)
 		cell.Value = "异常数量"
 		col_index++
 
 		cell = row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 10)
+		sheet.SetColWidth(col_index, col_index, 15)
 		set_head_cell_style(cell)
 		cell.Value = "采购时间"
 		col_index++
 
 		cell = row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 10)
+		sheet.SetColWidth(col_index, col_index, 15)
 		set_head_cell_style(cell)
 		cell.Value = "入库时间"
 		col_index++
 
 		cell = row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 10)
+		sheet.SetColWidth(col_index, col_index, 8)
+		set_head_cell_style(cell)
+		cell.Value = "偏差金额"
+		col_index++
+
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 15)
+		set_head_cell_style(cell)
+		cell.Value = "处理结果"
+		col_index++
+
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 38)
 		set_head_cell_style(cell)
 		cell.Value = "备注"
 		col_index++
@@ -299,6 +311,23 @@ func (c ErpPurchaseAbnormalExcel) export_excel(db_session *xorm.Session, entry_l
 		cell = row.AddCell()
 		set_text_cell_style(cell, "center")
 		cell.Value = entry.PurchaseBill.CheckinTime.Time.Format("2006-01-02 15:03")
+
+		// 偏差金额
+		cell = row.AddCell()
+		set_text_cell_style(cell, "right")
+		cell.SetFloatWithFormat(entry.PurchaseBillEntry.DiffAmount, "0.00")
+
+		// 处理结果
+		cell = row.AddCell()
+		set_text_cell_style(cell, "left")
+		cell.Value = ""
+
+		if entry.PurchaseBillEntry.AbnormalProcessResultId != 0 {
+			var purchase_abnormal_process_result cggl_models.PurchaseAbnormalProcessResultInfo
+			_, err = db_session.Id(entry.PurchaseBillEntry.AbnormalProcessResultId).Get(&purchase_abnormal_process_result)
+			core.HandleError(err)
+			cell.Value = purchase_abnormal_process_result.Name
+		}
 
 		// 备注
 		cell = row.AddCell()
