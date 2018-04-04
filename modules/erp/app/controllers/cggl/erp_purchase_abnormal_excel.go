@@ -63,7 +63,7 @@ FROM erp_purchase_bill_entry pbe
 			bill_code_list = append(bill_code_list, bill.Code)
 		}
 
-		filter = core.SqlAnd(filter, fmt.Sprintf("pbe.bill_id IN (%s)", strings.Join(bill_id_str_list, ",")))
+		filter = core.SqlAnd(filter, fmt.Sprintf("pbe.id IN (%s)", strings.Join(bill_id_str_list, ",")))
 	} else {
 		var bill_code_query string
 		c.Params.Bind(&bill_code_query, "bill_code_query")
