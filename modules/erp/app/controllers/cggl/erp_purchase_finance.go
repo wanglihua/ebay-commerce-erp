@@ -31,7 +31,8 @@ func (c ErpPurchaseFinance) Index() revel.Result {
 	core.HandleError(db_session.In("id", []int64{
 		models.PURCHASE_BILL_STATUS_YSP,
 		models.PURCHASE_BILL_STATUS_CGZ,
-		models.PURCHASE_BILL_STATUS_YRK}).Find(&status_list))
+		models.PURCHASE_BILL_STATUS_YRK,
+		models.PURCHASE_BILL_STATUS_YWJ}).Find(&status_list))
 
 	c.RenderArgs["status_list"] = status_list
 
@@ -186,8 +187,8 @@ ORDER BY pay_expire_days DESC;
     LEFT JOIN auth_user pu ON pb.pay_user_id = pu.id
     LEFT JOIN auth_user cu ON pb.checkin_user_id = cu.id`)
 
-	filter = core.SqlAnd(filter, fmt.Sprintf("pb.status_id = %d OR pb.status_id =%d OR pb.status_id =%d",
-		models.PURCHASE_BILL_STATUS_YSP, models.PURCHASE_BILL_STATUS_CGZ, models.PURCHASE_BILL_STATUS_YRK))
+	filter = core.SqlAnd(filter, fmt.Sprintf("pb.status_id = %d OR pb.status_id =%d OR pb.status_id =%d OR pb.status_id =%d",
+		models.PURCHASE_BILL_STATUS_YSP, models.PURCHASE_BILL_STATUS_CGZ, models.PURCHASE_BILL_STATUS_YRK, models.PURCHASE_BILL_STATUS_YWJ))
 
 	if status_id_query != 0 {
 		filter = core.SqlAnd(filter, fmt.Sprintf("pb.status_id = %d", status_id_query))
@@ -449,5 +450,52 @@ func (c ErpPurchaseFinance) PayFinalAmount() revel.Result {
 	return c.RenderJson(map[string]interface{}{
 		"success": true,
 		"message": "采购单明细支付尾款成功！",
+	})
+}
+
+func (c ErpPurchaseFinance) Complete() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.CGGL_PURCHASE_FINANCE, c.Session)
+
+	var db_session = c.DbSession
+
+	purchase_bill_id_list := make([]int64, 0)
+	c.Params.Bind(&purchase_bill_id_list, "id_list")
+
+	var purchase_bill_list = make([]cggl_models.PurchaseBillInfo, 0)
+	core.HandleError(db_session.In("id", purchase_bill_id_list).Find(&purchase_bill_list))
+
+	// 检查状态
+	for _, purchase_bill := range purchase_bill_list {
+		if purchase_bill.StatusId != models.PURCHASE_BILL_STATUS_YRK {
+			return c.RenderJson(map[string]interface{}{
+				"success": false,
+				"message": fmt.Sprintf("采购单 %s 当前状态不是已入库状态，不能完结！", purchase_bill.Code),
+			})
+		}
+	}
+
+	// 设置为已完结状态
+	for _, purchase_bill := range purchase_bill_list {
+		purchase_bill.StatusId = models.PURCHASE_BILL_STATUS_YWJ
+		_, err := db_session.Id(purchase_bill.Id).Cols("status_id").Update(&purchase_bill)
+		core.HandleError(err)
+	}
+
+	var bill_entry_list = make([]cggl_models.PurchaseBillEntryInfo, 0)
+	core.HandleError(db_session.In("bill_id", purchase_bill_id_list).Find(&bill_entry_list))
+
+	for _, bill_entry := range bill_entry_list {
+		bill_entry.StatusId = models.PURCHASE_BILL_STATUS_YWJ
+		_, err := db_session.Id(bill_entry.Id).Cols("status_id").Update(&bill_entry)
+		core.HandleError(err)
+	}
+
+	for _, purchase_bill := range purchase_bill_list {
+		purchase_bill_log_service.Insert_purchase_bill_log(purchase_bill, "采购单完结", db_session, c.Session)
+	}
+
+	return c.RenderJson(map[string]interface{}{
+		"success": true,
+		"message": "采购单完结成功！",
 	})
 }

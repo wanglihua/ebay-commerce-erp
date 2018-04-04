@@ -21,6 +21,10 @@
                         <i class="ace-icon fa fa-share"></i>
                         下单
                     </button>
+                    <button class="btn btn-pink btn-sm" @click="complete()">
+                        <i class="ace-icon fa fa-calendar-check-o"></i>
+                        完结
+                    </button>
                     <button class="btn btn-purple btn-sm" onclick="exportPurchase()">
                         <i class="ace-icon fa fa-file-excel-o"></i>
                         导出
@@ -322,6 +326,38 @@
                 $.msg.confirm("确认要下单吗？", function () {
                     $.ajax({
                         url: '{%url "ErpPurchaseFinance.Purchase"%}',
+                        type: "POST",
+                        data: {"id_list": id_list},
+                        success: function (data) {
+                            if (data.success === false) {
+                                $.msg.error(data.message);
+                                return;
+                            }
+                            else {
+                                $.msg.show(data.message);
+                                vm.reloadList();
+                                return;
+                            }
+                        }
+                    });
+                });
+            },
+            complete: function () {
+                var id_list = [];
+                $('#purchaseBillList tbody tr>td:first-child input:checkbox').each(function () {
+                    if (this.checked) {
+                        id_list.push($(this).val());
+                    }
+                });
+
+                if (id_list.length === 0) {
+                    $.msg.alert("请选择数据！");
+                    return;
+                }
+
+                $.msg.confirm("确认要完结采购单吗？", function () {
+                    $.ajax({
+                        url: '{%url "ErpPurchaseFinance.Complete"%}',
                         type: "POST",
                         data: {"id_list": id_list},
                         success: function (data) {
