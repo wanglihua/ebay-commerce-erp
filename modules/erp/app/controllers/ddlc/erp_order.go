@@ -1107,6 +1107,9 @@ func (c ErpOrder) SaveDesc() revel.Result {
 	_, err = db_session.Id(order_id).Cols("desc").Update(&order)
 	core.HandleError(err)
 
+	var login_user = core.GetLoginUser(c.Session)
+	order_history_service.Insert_order_history(order, login_user.UserId, fmt.Sprintf("订单修改描述， 工号： %s", login_user.LoginName), db_session)
+
 	return c.RenderJson(map[string]interface{}{
 		"success": true,
 		"message": "订单描述保存成功！",
