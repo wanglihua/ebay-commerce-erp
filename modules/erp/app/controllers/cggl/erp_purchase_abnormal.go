@@ -70,11 +70,11 @@ func (c ErpPurchaseAbnormal) Index() revel.Result {
 }
 
 type PurchaseAbnormalViewItem struct {
-	cggl_models.PurchaseBillEntryInfo    `xorm:"extends" json:"pbe"`
-	cggl_models.PurchaseBillInfo         `xorm:"extends" json:"pb"`
-	kcgl_models.ProductInfo              `xorm:"extends" json:"p"`
-	cggl_models.PurchaseAbnormalTypeInfo `xorm:"extends" json:"at"`
-	models.StatusInfo                    `xorm:"extends" json:"s"`
+	PurchaseBillEntry    cggl_models.PurchaseBillEntryInfo    `xorm:"extends" json:"pbe"`
+	PurchaseBill         cggl_models.PurchaseBillInfo         `xorm:"extends" json:"pb"`
+	Product              kcgl_models.ProductInfo              `xorm:"extends" json:"p"`
+	PurchaseAbnormalType cggl_models.PurchaseAbnormalTypeInfo `xorm:"extends" json:"at"`
+	Status               models.StatusInfo                    `xorm:"extends" json:"s"`
 }
 
 func (c ErpPurchaseAbnormal) ListData() revel.Result {
@@ -116,7 +116,7 @@ FROM erp_purchase_bill_entry pbe
 	}
 
 	if status_id_query != 0 {
-		filter = core.SqlAnd(filter, fmt.Sprintf("pb.status_id = %d", status_id_query))
+		filter = core.SqlAnd(filter, fmt.Sprintf("pbe.status_id = %d", status_id_query))
 	}
 
 	sb.Where(filter)

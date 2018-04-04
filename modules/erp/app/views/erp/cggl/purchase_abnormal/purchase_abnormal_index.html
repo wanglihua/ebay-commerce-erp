@@ -21,6 +21,10 @@
                         <i class="ace-icon fa fa-share"></i>
                         处理异常
                     </button>
+                    <button class="btn btn-purple btn-sm" onclick="exportAbnormal()">
+                        <i class="ace-icon fa fa-file-excel-o"></i>
+                        导出
+                    </button>
                 </div>
                 <div id="query" class="col-xs-12" style="line-height: 28px;">
                     <select id="bill_code_query" name="bill_code_query" style="width: 140px;" v-model.number="page.bill_code_query" @change="querySelectChange()">
@@ -389,6 +393,23 @@
                     }
             );
         }
+    }
+
+    function exportAbnormal() {
+        var bill_id_list = [];
+        $('#purchaseBillEntryList tbody tr>td:first-child input:checkbox').each(function () {
+            if (this.checked) {
+                bill_id_list.push($(this).val());
+            }
+        });
+
+        var params = $.param({
+            "bill_id_list": bill_id_list,
+            "bill_code_query": vm.page.bill_code_query,
+            "status_id_query": vm.page.status_id_query
+        });
+        var url = '{%url "ErpPurchaseAbnormalExcel.Export"%}' + "?" + params;
+        $('<form method="post" action="' + url + '"></form>').appendTo('body').submit().remove();
     }
 </script>
 {%footer%}
