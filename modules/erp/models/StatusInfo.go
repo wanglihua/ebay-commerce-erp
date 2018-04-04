@@ -109,6 +109,7 @@ const (
 	PURCHASE_BILL_STATUS_YRK = 4700 // 采购单状态 已入库
 	PURCHASE_BILL_STATUS_YC  = 4710 // 采购单状态 异常
 	PURCHASE_BILL_STATUS_YCL = 4720 // 采购单状态 异常已处理
+	PURCHASE_BILL_STATUS_YWJ = 4730 // 已完结
 
 	MESSAGE_STATUS_ANSWERED   = 4800 // 消息状态 已回复
 	MESSAGE_STATUS_UNANSWERED = 4900 // 消息状态 未回复
@@ -584,6 +585,13 @@ func (e StatusInfo) InitData(db_session *xorm.Session) {
 		status.Type = STATUS_TYPE_PURCHASE_BILL
 		status.Name = "已处理"
 		status.Desc = core.MakeNullString("采购单状态 异常已处理，只用于明细的状态", true)
+		db_session.Insert(status)
+
+		status = new(StatusInfo)
+		status.Id = PURCHASE_BILL_STATUS_YWJ
+		status.Type = STATUS_TYPE_PURCHASE_BILL
+		status.Name = "已完结"
+		status.Desc = core.MakeNullString("采购单状态 已完结", true)
 		db_session.Insert(status)
 	}
 
