@@ -107,8 +107,9 @@
                             <th>备注</th>
                             <th>操作人</th>
                             <th>金额</th>
-                            <th>付款方式</th>
-                            <th>状态</th>
+                            <th>已付款</th>
+                            <th>尾款</th>
+                            <th>付款方式状态</th>
                             <th id="th_apply_time">采购时间</th>
                             <th id="th_pay_time">付款时间</th>
                             <th id="th_create_time">创建时间</th>
@@ -217,9 +218,15 @@
                                 }
                             },
                             {"mDataProp": "ayu.nick_name", "title": "操作人", "bSearchable": false, "width": 75},
-                            {"mDataProp": "pb.total_amount", "title": "金额", "bSearchable": false, "width": 75},
-                            {"mDataProp": "pm.name", "title": "付款方式", "bSearchable": false, "width": 75},
-                            {"mDataProp": "s.name", "title": "状态", "bSearchable": false, "width": 90},
+                            {"mDataProp": "pb.total_amount", "title": "金额", "bSearchable": false, "width": 60},
+                            {"mDataProp": "pb.advance_amount", "title": "已付款", "bSearchable": false, "width": 60},
+                            {"mDataProp": "pb.final_amount", "title": "尾款", "bSearchable": false, "width": 60},
+                            {
+                                "mDataProp": "pm.name", "title": "付款方式/状态", "bSearchable": false, "orderable": false, "width": 75,
+                                "render": function (data, type, row) {
+                                    return "<div>" + row.pm.name + "</div><div>" + row.s.name + "</div>";
+                                }
+                            },
                             {
                                 "mDataProp": "pb.apply_time", "title": "采购时间", "bSearchable": false, "sClass": "center", "width": 120,
                                 "render": function (data, type, row) {
