@@ -525,10 +525,13 @@ func (c ErpPurchaseBillEntry) PurchaseInTurn() revel.Result {
 	bill_entry_in_db.Amount = bill_entry_in_db.Price * float64(bill_entry_in_db.Qty)
 	bill_entry_in_db.TypeId = cggl_models.PURCHASE_BILL_TYPE_IN_TURN
 
-	var purchase_in_turn_desc = " 部分数量已分批采购"
-	if strings.Contains(bill_entry_in_db.Desc.String, purchase_in_turn_desc) == false {
-		bill_entry_in_db.Desc = core.MakeNullString(bill_entry_in_db.Desc.String+purchase_in_turn_desc, true)
+	// var purchase_in_turn_desc = " 部分数量已分批采购"
+	var purchase_in_turn_desc = bill_entry_in_db.Desc.String
+	if strings.Contains(bill_entry_in_db.Desc.String, "拆分分批") == false {
+		purchase_in_turn_desc = purchase_in_turn_desc + "拆分分批"
 	}
+	bill_entry_in_db.Desc = core.MakeNullString(purchase_in_turn_desc+fmt.Sprintf(",%d-%d=%d", qty_before, checkin_qty, qty_before-checkin_qty), true)
+
 	bill_entry_in_db.FittingCost = (float64(bill_entry_in_db.Qty) / float64(qty_before)) * fitting_cost_before
 	bill_entry_in_db.OtherCost = (float64(bill_entry_in_db.Qty) / float64(qty_before)) * other_cost_before
 	var col_list = []string{"qty", "mel_qty", "bne_qty", "amount", "desc", "fitting_cost", "other_cost", "type_id"}
