@@ -548,7 +548,8 @@ func (c ErpPurchaseBillEntry) PurchaseInTurn() revel.Result {
 	new_bill_entry.Amount = new_bill_entry.Price * float64(new_bill_entry.Qty)
 	new_bill_entry.PayAmount = pay_amount // 付款金额这里输入，财务下单
 	new_bill_entry.Desc = core.MakeNullString(fmt.Sprintf("分批采购，原数量 %d", qty_before), true)
-	new_bill_entry.StatusId = models.PURCHASE_BILL_STATUS_YSP // 已审批
+	// new_bill_entry.StatusId = models.PURCHASE_BILL_STATUS_YSP // 已审批
+	new_bill_entry.StatusId = models.PURCHASE_BILL_STATUS_YTJ // 已提交
 	new_bill_entry.CheckinQty = checkin_qty
 	new_bill_entry.CheckinTime = core.MakeNullTime(time.Now(), true)
 	new_bill_entry.InventoryCost = bill_entry_in_db.InventoryCost
@@ -577,6 +578,75 @@ func (c ErpPurchaseBillEntry) PurchaseInTurn() revel.Result {
 	return c.RenderJson(map[string]interface{}{
 		"success": true,
 		"message": "采购明细分批采购成功！",
+	})
+}
+
+func (c ErpPurchaseBillEntry) Approve() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.CGGL_PURCHASE_APPROVE, c.Session)
+
+	var db_session = c.DbSession
+
+	bill_entry_id_list := make([]int64, 0)
+	c.Params.Bind(&bill_entry_id_list, "id_list")
+
+	if len(bill_entry_id_list) == 0 {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "请选择要审批的采购单明细！",
+		})
+	}
+
+	var bill_entry_list = make([]cggl_models.PurchaseBillEntryInfo, 0)
+	core.HandleError(db_session.In("id", bill_entry_id_list).Find(&bill_entry_list))
+
+	var bill_id = bill_entry_list[0].BillId
+
+	// 检查采购单的状态
+	var purchase_bill cggl_models.PurchaseBillInfo
+	_, err := db_session.Id(bill_id).Get(&purchase_bill)
+	core.HandleError(err)
+
+	if purchase_bill.StatusId != models.PURCHASE_BILL_STATUS_YTJ && purchase_bill.StatusId != models.PURCHASE_BILL_STATUS_YSP {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "采购单当前状态不是已提交或已审批的状态，不能进行审批！",
+		})
+	}
+
+	// 检查明细的状态
+	for _, bill_entry := range bill_entry_list {
+		if bill_entry.StatusId != models.PURCHASE_BILL_STATUS_YTJ {
+			return c.RenderJson(map[string]interface{}{
+				"success": false,
+				"message": "采购单明细 当前状态不是已提交状态，不能进行审批！",
+			})
+		}
+	}
+	/*
+	var login_user = core.GetLoginUser(c.Session)
+	var approve_time = core.MakeNullTime(time.Now(), true)
+
+	// 设置为已审批状态
+	for _, bill_entry := range bill_entry_list {
+		bill_entry.StatusId = models.PURCHASE_BILL_STATUS_YSP
+		_entry.ApproveTime = approve_time // 已审批时填入 采购时间
+		bill_entry.ApproveUserId = login_user.UserId
+		_, err := db_session.Id(bill_entry.Id).Cols("status_id", "approve_user_id", "approve_time").Update(&bill_entry)
+		core.HandleError(err)
+	}
+	*/
+
+	for _, bill_entry := range bill_entry_list {
+		bill_entry.StatusId = models.PURCHASE_BILL_STATUS_YSP
+		_, err := db_session.Id(bill_entry.Id).Cols("status_id").Update(&bill_entry)
+		core.HandleError(err)
+	}
+
+	purchase_bill_log_service.Insert_purchase_bill_log(purchase_bill, "采购单明细审批", db_session, c.Session)
+
+	return c.RenderJson(map[string]interface{}{
+		"success": true,
+		"message": "采购单明细审批成功！",
 	})
 }
 

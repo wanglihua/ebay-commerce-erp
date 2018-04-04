@@ -498,6 +498,7 @@ POST /purchase/bill/entry/save                       ErpPurchaseBillEntry.Save
 POST /purchase/bill/entry/delete                     ErpPurchaseBillEntry.Delete
 POST /purchase/bill/entry/product/select/data/list   ErpPurchaseBillEntry.ProductSelectListData
 POST /purchase/bill/entry/purchase/in/turn           ErpPurchaseBillEntry.PurchaseInTurn
+POST /purchase/bill/entry/approve                    ErpPurchaseBillEntry.Approve
 POST /purchase/bill/entry/get/product/info           ErpPurchaseBillEntry.GetProductInfo
 
 POST  /purchase/bill/excel/import          ErpPurchaseBillEntryExcel.Import
