@@ -448,7 +448,7 @@
                                 "render": function (data, type, row) {
                                     var btn_str = "";
                                     if (row.pbe.status_id === 4500) {
-                                        btn_str += "<a class='btn btn-xs btn-info btn-inline pull-left' style='margin-right: 3px;' onclick='show_entry_price_dialog(" + data + ");' ><i class='ace-icon fa fa-money'></i>单价</a>";
+                                        btn_str += "<a class='btn btn-xs btn-info btn-inline pull-left' style='margin-right: 3px;' onclick='show_entry_price_dialog(" + data + ");' ><i class='ace-icon fa fa-money'></i>单价与付款</a>";
                                         btn_str += "<a class='btn btn-xs btn-info btn-inline pull-left' style='margin-right: 3px;' onclick='entry_purchase(" + data + ");' ><i class='ace-icon fa fa-share'></i>下单</a>";
                                     }
                                     if (row.pbe.final_amount !== 0 && row.pbe.final_amount_status_id === 5900) {
@@ -563,6 +563,9 @@
         var valid = validate(form, {
             'price': {
                 required: true, number: true
+            },
+            'pay_amount': {
+                required: true, number: true
             }
         });
 
@@ -574,7 +577,8 @@
                 type: "POST",
                 data: {
                     "entry_id": $("#entry_id").val(),
-                    "price": $("#price").val()
+                    "price": $("#price").val(),
+                    "pay_amount": $("#pay_amount").val()
                 },
                 success: function (data) {
                     hideMask();

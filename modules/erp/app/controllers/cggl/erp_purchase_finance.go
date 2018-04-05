@@ -437,15 +437,19 @@ func (c ErpPurchaseFinance) EntryPriceSave() revel.Result {
 	var price float64
 	c.Params.Bind(&price, "price")
 
+	var pay_amount float64
+	c.Params.Bind(&pay_amount, "pay_amount")
+
 	var purchase_bill_entry cggl_models.PurchaseBillEntryInfo
 	_, err := db_session.Id(entry_id).Get(&purchase_bill_entry)
 	core.HandleError(err)
 
 	purchase_bill_entry.Price = price
 	purchase_bill_entry.Amount = purchase_bill_entry.Price * float64(purchase_bill_entry.Qty)
+	purchase_bill_entry.PayAmount = pay_amount
 	purchase_bill_entry.DrawbackAmount = purchase_bill_service.CalculateBillEntryDrawbackAmount(purchase_bill_entry)
 
-	_, err = db_session.Id(entry_id).Cols("price", "amount", "drawback_amount").Update(&purchase_bill_entry)
+	_, err = db_session.Id(entry_id).Cols("price", "amount", "pay_amount", "drawback_amount").Update(&purchase_bill_entry)
 	core.HandleError(err)
 
 	var bill_id = purchase_bill_entry.BillId
