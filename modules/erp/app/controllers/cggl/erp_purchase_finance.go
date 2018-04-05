@@ -470,7 +470,7 @@ func (c ErpPurchaseFinance) PurchaseEntry() revel.Result {
 	_, err := db_session.Id(entry_id).Get(&purchase_bill_entry)
 	core.HandleError(err)
 
-	if purchase_bill_entry.StatusId != models.PURCHASE_BILL_STATUS_YSP || purchase_bill_entry.TypeId != cggl_models.PURCHASE_BILL_TYPE_IN_TURN {
+	if purchase_bill_entry.StatusId != models.PURCHASE_BILL_STATUS_YSP {
 		return c.RenderJson(map[string]interface{}{
 			"success": false,
 			"message": "只有已审批的分批采购的明细单才能下单！",
