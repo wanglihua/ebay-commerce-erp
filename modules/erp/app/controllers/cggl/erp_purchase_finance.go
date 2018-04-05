@@ -29,6 +29,7 @@ func (c ErpPurchaseFinance) Index() revel.Result {
 	// 状态的列表， 采购单的状态的列表
 	var status_list = make([]models.StatusInfo, 0)
 	core.HandleError(db_session.In("id", []int64{
+		models.PURCHASE_BILL_STATUS_YTJ,
 		models.PURCHASE_BILL_STATUS_YSP,
 		models.PURCHASE_BILL_STATUS_CGZ,
 		models.PURCHASE_BILL_STATUS_YRK,
@@ -189,6 +190,12 @@ ORDER BY pay_expire_days DESC;
 
 	filter = core.SqlAnd(filter, fmt.Sprintf("pb.status_id = %d OR pb.status_id =%d OR pb.status_id =%d OR pb.status_id =%d",
 		models.PURCHASE_BILL_STATUS_YSP, models.PURCHASE_BILL_STATUS_CGZ, models.PURCHASE_BILL_STATUS_YRK, models.PURCHASE_BILL_STATUS_YWJ))
+
+	filter = core.SqlOr(filter, fmt.Sprintf(`pb.id IN (
+		SELECT pbe.bill_id
+		FROM erp_purchase_bill_entry pbe
+		WHERE pbe.status_id = %d)`,
+		models.PURCHASE_BILL_STATUS_YSP))
 
 	if status_id_query != 0 {
 		filter = core.SqlAnd(filter, fmt.Sprintf("pb.status_id = %d", status_id_query))
@@ -393,9 +400,60 @@ func (c ErpPurchaseFinance) EntryPayAmountSave() revel.Result {
 	_, err = db_session.Id(entry_id).Cols("pay_amount").Update(&purchase_bill_entry)
 	core.HandleError(err)
 
+	var bill_id = purchase_bill_entry.BillId
+	purchase_bill_service.UpdatePurchaseBillAmount(bill_id, db_session)
+
 	return c.RenderJson(map[string]interface{}{
 		"success": true,
 		"message": "采购明细更新付款金额成功！",
+	})
+}
+
+func (c ErpPurchaseFinance) EntryPrice() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.CGGL_PURCHASE_FINANCE, c.Session)
+
+	var db_session = c.DbSession
+
+	var entry_id int64
+	c.Params.Bind(&entry_id, "entry_id")
+
+	var purchase_bill_entry cggl_models.PurchaseBillEntryInfo
+	_, err := db_session.Id(entry_id).Get(&purchase_bill_entry)
+	core.HandleError(err)
+
+	c.RenderArgs["entry"] = purchase_bill_entry
+
+	return c.RenderTemplate("erp/cggl/purchase_finance/purchase_finance_entry_price.html")
+}
+
+func (c ErpPurchaseFinance) EntryPriceSave() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.CGGL_PURCHASE_FINANCE, c.Session)
+
+	var db_session = c.DbSession
+
+	var entry_id int64
+	c.Params.Bind(&entry_id, "entry_id")
+
+	var price float64
+	c.Params.Bind(&price, "price")
+
+	var purchase_bill_entry cggl_models.PurchaseBillEntryInfo
+	_, err := db_session.Id(entry_id).Get(&purchase_bill_entry)
+	core.HandleError(err)
+
+	purchase_bill_entry.Price = price
+	purchase_bill_entry.Amount = purchase_bill_entry.Price * float64(purchase_bill_entry.Qty)
+	purchase_bill_entry.DrawbackAmount = purchase_bill_service.CalculateBillEntryDrawbackAmount(purchase_bill_entry)
+
+	_, err = db_session.Id(entry_id).Cols("price", "amount", "drawback_amount").Update(&purchase_bill_entry)
+	core.HandleError(err)
+
+	var bill_id = purchase_bill_entry.BillId
+	purchase_bill_service.UpdatePurchaseBillAmount(bill_id, db_session)
+
+	return c.RenderJson(map[string]interface{}{
+		"success": true,
+		"message": "采购明细商品单价成功！",
 	})
 }
 

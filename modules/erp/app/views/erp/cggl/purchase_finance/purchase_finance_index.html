@@ -444,7 +444,8 @@
                                 "mDataProp": "pbe.id", "title": "操作", "bSearchable": true, "sClass": "center", "width": 80,
                                 "render": function (data, type, row) {
                                     var btn_str = "";
-                                    if (row.pbe.status_id === 4500 && row.pbe.type_id === 200) {
+                                    if (row.pbe.status_id === 4500) {
+                                        btn_str += "<a class='btn btn-xs btn-info btn-inline pull-left' onclick='show_entry_price_dialog(" + data + ");' ><i class='ace-icon fa fa-money'></i>单价</a>";
                                         btn_str += "<a class='btn btn-xs btn-info btn-inline pull-left' onclick='entry_purchase(" + data + ");' ><i class='ace-icon fa fa-share'></i>下单</a>";
                                     }
                                     if (row.pbe.final_amount !== 0 && row.pbe.final_amount_status_id === 5900) {
@@ -541,6 +542,56 @@
         }
     }
 
+    function show_entry_price_dialog(entry_id) {
+        $.ajax({
+            url: '{%url "ErpPurchaseFinance.EntryPrice" %}',
+            type: "POST",
+            data: {"entry_id": entry_id},
+            success: function (result) {
+                $("#purchase_entry_price_dialog_wrapper").html(result);
+                $("#purchase_entry_price_dialog").modal(modalOptions);
+            }
+        });
+    }
+
+    function save_entry_price() {
+        showMask("提交中...");
+        var form = $("#purchase_entry_price_form");
+        var valid = validate(form, {
+            'price': {
+                required: true, number: true
+            }
+        });
+
+        if (!valid) {
+            hideMask();
+        } else {
+            $.ajax({
+                url: '{%url "ErpPurchaseFinance.EntryPriceSave"%}',
+                type: "POST",
+                data: {
+                    "entry_id": $("#entry_id").val(),
+                    "price": $("#price").val()
+                },
+                success: function (data) {
+                    hideMask();
+                    if (data.success === false) {
+                        $.msg.error(data.message);
+                        // return;
+                    }
+                    else {
+                        $.msg.show(data.message);
+                        reloadList("#purchaseBillEntryList");
+                        $("#purchase_entry_price_dialog").modal('hide');
+                        // return;
+                    }
+                }
+            });
+        }
+    }
+
+    // show_entry_price_dialog
+
     function entry_purchase(id) {
         $.msg.confirm("确认要下单吗？", function () {
             $.ajax({
@@ -605,4 +656,5 @@
 </script>
 <div id="purchase_bill_entry_list_wrapper"></div>
 <div id="purchase_entry_pay_amount_dialog_wrapper"></div>
+<div id="purchase_entry_price_dialog_wrapper"></div>
 {%footer%}
