@@ -70,6 +70,7 @@ func (c ErpPurchaseBillEntryExcel) Import() revel.Result {
 		DrawbackPoint string `json:"drawback_point"`
 		FittingCost   string `json:"fitting_cost"`
 		OtherCost     string `json:"other_cost"`
+		FreightCharge string `json:"freight_charge"`
 		Desc          string `json:"desc"`
 
 		product        kcgl_models.ProductInfo `json:"-"`
@@ -82,6 +83,7 @@ func (c ErpPurchaseBillEntryExcel) Import() revel.Result {
 		drawback_point float64                 `json:"-"`
 		fitting_cost   float64                 `json:"-"`
 		other_cost     float64                 `json:"-"`
+		freight_charge float64                 `json:"-"`
 	}
 
 	purchase_bill_entry_import_list := make([]purchase_bill_entry_import_t, 0)
@@ -185,6 +187,14 @@ func (c ErpPurchaseBillEntryExcel) Import() revel.Result {
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
 			purchase_bill_entry_import.OtherCost = cell_val
+			col_index++
+
+			// FrieghtCharge
+			cell = sheet.Cell(row_index, col_index)
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
+			purchase_bill_entry_import.FreightCharge = cell_val
 			col_index++
 
 			// 备注
@@ -298,6 +308,13 @@ func (c ErpPurchaseBillEntryExcel) Import() revel.Result {
 			purchase_bill_entry_import_list[index].other_cost = other_cost
 		}
 
+		freight_charge, err := strconv.ParseFloat(purchase_bill_entry_import.FreightCharge, 64)
+		if err != nil {
+			buffer.WriteString("运费格式输入不对！")
+		} else {
+			purchase_bill_entry_import_list[index].freight_charge = freight_charge
+		}
+
 		var error_str = buffer.String()
 
 		if error_str != "" {
@@ -323,6 +340,7 @@ func (c ErpPurchaseBillEntryExcel) Import() revel.Result {
 		purchase_bill_entry.DrawbackPoint = purchase_bill_entry_import.drawback_point
 		purchase_bill_entry.FittingCost = purchase_bill_entry_import.fitting_cost
 		purchase_bill_entry.OtherCost = purchase_bill_entry_import.other_cost
+		purchase_bill_entry.FreightCharge = purchase_bill_entry_import.freight_charge
 
 		if purchase_bill_entry_import.Desc == "" {
 			purchase_bill_entry.Desc = core.MakeNullString("", false)

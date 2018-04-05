@@ -274,11 +274,14 @@ func (c ErpPurchaseBillEntry) Save() revel.Result {
 
 	var affected int64
 	if detail_form.IsCreate() {
+		/*
+		存在分批采购等的情况，会出现同一个SKU多条采购明细的情况，所以这样的判断就不适合了
 		billId_count, err := db_session.Where("bill_id = ? and product_id = ?", purchase_bill_entry.BillId, purchase_bill_entry.ProductId).Count(new(cggl_models.PurchaseBillEntryInfo))
 		core.HandleError(err)
 		if billId_count != 0 {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，批次中该商品已存在！"})
 		}
+		*/
 
 		purchase_bill_entry.StatusId = purchase_bill.StatusId              // 设置成采购单的当前状态
 		purchase_bill_entry.TypeId = cggl_models.PURCHASE_BILL_TYPE_NORMAL // 正常的不分批采购的明细
@@ -290,11 +293,14 @@ func (c ErpPurchaseBillEntry) Save() revel.Result {
 
 		purchase_bill_log_service.Insert_purchase_bill_log(purchase_bill, "采购明细新增", db_session, c.Session)
 	} else {
+		/*
+		存在分批采购等的情况，会出现同一个SKU多条采购明细的情况，所以这样的判断就不适合了
 		billId_count, err := db_session.Where("id <> ? and bill_id = ? and product_id = ?", purchase_bill_entry.Id, purchase_bill_entry.BillId, purchase_bill_entry.ProductId).Count(new(cggl_models.PurchaseBillEntryInfo))
 		core.HandleError(err)
 		if billId_count != 0 {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，批次、商品已存在！"})
 		}
+		*/
 
 		purchase_bill_entry.DrawbackAmount = purchase_bill_service.CalculateBillEntryDrawbackAmount(purchase_bill_entry)
 
