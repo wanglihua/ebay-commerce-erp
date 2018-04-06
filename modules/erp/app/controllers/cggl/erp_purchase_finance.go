@@ -15,6 +15,7 @@ import (
 	"matrix/modules/erp/service/purchase_bill_log_service"
 	"unicode/utf8"
 	"strings"
+	"github.com/go-xorm/xorm"
 )
 
 type ErpPurchaseFinance struct {
@@ -431,11 +432,26 @@ func (c ErpPurchaseFinance) EntryPriceSave() revel.Result {
 
 	var db_session = c.DbSession
 
+	c.entry_price_save(db_session)
+
+	return c.RenderJson(map[string]interface{}{
+		"success": true,
+		"message": "采购明细商品单价成功！",
+	})
+}
+
+func (c ErpPurchaseFinance) entry_price_save(db_session *xorm.Session) {
 	var entry_id int64
 	c.Params.Bind(&entry_id, "entry_id")
 
 	var price float64
 	c.Params.Bind(&price, "price")
+
+	var qty int64
+	c.Params.Bind(&qty, "qty")
+
+	var freight_charge float64
+	c.Params.Bind(&freight_charge, "freight_charge")
 
 	var pay_amount float64
 	c.Params.Bind(&pay_amount, "pay_amount")
@@ -445,20 +461,17 @@ func (c ErpPurchaseFinance) EntryPriceSave() revel.Result {
 	core.HandleError(err)
 
 	purchase_bill_entry.Price = price
+	purchase_bill_entry.Qty = qty
 	purchase_bill_entry.Amount = purchase_bill_entry.Price * float64(purchase_bill_entry.Qty)
+	purchase_bill_entry.FreightCharge = freight_charge
 	purchase_bill_entry.PayAmount = pay_amount
 	purchase_bill_entry.DrawbackAmount = purchase_bill_service.CalculateBillEntryDrawbackAmount(purchase_bill_entry)
 
-	_, err = db_session.Id(entry_id).Cols("price", "amount", "pay_amount", "drawback_amount").Update(&purchase_bill_entry)
+	_, err = db_session.Id(entry_id).Cols("price", "qty", "amount", "freight_charge", "pay_amount", "drawback_amount").Update(&purchase_bill_entry)
 	core.HandleError(err)
 
 	var bill_id = purchase_bill_entry.BillId
 	purchase_bill_service.UpdatePurchaseBillAmount(bill_id, db_session)
-
-	return c.RenderJson(map[string]interface{}{
-		"success": true,
-		"message": "采购明细商品单价成功！",
-	})
 }
 
 // 用于分批采购中的，采购明细审批
@@ -466,6 +479,8 @@ func (c ErpPurchaseFinance) PurchaseEntry() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.CGGL_PURCHASE_FINANCE, c.Session)
 
 	var db_session = c.DbSession
+
+	c.entry_price_save(db_session)
 
 	var entry_id int64
 	c.Params.Bind(&entry_id, "entry_id")
@@ -477,7 +492,7 @@ func (c ErpPurchaseFinance) PurchaseEntry() revel.Result {
 	if purchase_bill_entry.StatusId != models.PURCHASE_BILL_STATUS_YSP {
 		return c.RenderJson(map[string]interface{}{
 			"success": false,
-			"message": "只有已审批的分批采购的明细单才能下单！",
+			"message": "只有已审批的采购的明细单才能下单！",
 		})
 	}
 
@@ -488,7 +503,7 @@ func (c ErpPurchaseFinance) PurchaseEntry() revel.Result {
 
 	return c.RenderJson(map[string]interface{}{
 		"success": true,
-		"message": "采购单明细分批采购下单成功！",
+		"message": "采购单明细采购下单成功！",
 	})
 }
 

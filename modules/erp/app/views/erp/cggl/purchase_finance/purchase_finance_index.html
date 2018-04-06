@@ -462,12 +462,11 @@
                             },
                             {"mDataProp": "s.name", "title": "状态", "bSearchable": true, "sClass": "center", "width": 50},
                             {
-                                "mDataProp": "pbe.id", "title": "操作", "bSearchable": true, "sClass": "center", "width": 120,
+                                "mDataProp": "pbe.id", "title": "操作", "bSearchable": true, "sClass": "center", "width": 60,
                                 "render": function (data, type, row) {
                                     var btn_str = "";
                                     if (row.pbe.status_id === 4500) {
-                                        btn_str += "<a class='btn btn-xs btn-info btn-inline pull-left' style='margin-right: 3px;' onclick='show_entry_price_dialog(" + data + ");' ><i class='ace-icon fa fa-money'></i>单价与付款</a>";
-                                        btn_str += "<a class='btn btn-xs btn-info btn-inline pull-left' style='margin-right: 3px;' onclick='entry_purchase(" + data + ");' ><i class='ace-icon fa fa-share'></i>下单</a>";
+                                        btn_str += "<a class='btn btn-xs btn-info btn-inline pull-left' style='margin-right: 3px;' onclick='show_entry_price_dialog(" + data + ");' ><i class='ace-icon fa fa-share'></i>下单</a>";
                                     }
                                     if (row.pbe.final_amount !== 0 && row.pbe.final_amount_status_id === 5900) {
                                         btn_str += "<a class='btn btn-xs btn-primary btn-inline pull-left' onclick='entry_pay_final_amount(" + data + ");' ><i class='ace-icon fa fa-share'></i>支付尾款</a>";
@@ -586,6 +585,12 @@
             'price': {
                 required: true, number: true
             },
+            'qty': {
+                required: true, number: true
+            },
+            'freight_charge': {
+                required: true, number: true
+            },
             'pay_amount': {
                 required: true, number: true
             }
@@ -599,8 +604,10 @@
                 type: "POST",
                 data: {
                     "entry_id": $("#entry_id").val(),
-                    "price": $("#price").val(),
-                    "pay_amount": $("#pay_amount").val()
+                    "price": $("#entry_price").val(),
+                    "qty": $("#entry_qty").val(),
+                    "freight_charge": $("#entry_freight_charge").val(),
+                    "pay_amount": $("#entry_pay_amount").val()
                 },
                 success: function (data) {
                     hideMask();
@@ -619,15 +626,17 @@
         }
     }
 
-    // show_entry_price_dialog
-
-    function entry_purchase(id) {
+    function entry_purchase() {
         $.msg.confirm("确认要下单吗？", function () {
             $.ajax({
                 url: '{%url "ErpPurchaseFinance.PurchaseEntry"%}',
                 type: "POST",
                 data: {
-                    "entry_id": id
+                    "entry_id": $("#entry_id").val(),
+                    "price": $("#entry_price").val(),
+                    "qty": $("#entry_qty").val(),
+                    "freight_charge": $("#entry_freight_charge").val(),
+                    "pay_amount": $("#entry_pay_amount").val()
                 },
                 success: function (data) {
                     if (data.success === false) {
@@ -637,6 +646,7 @@
                     else {
                         $.msg.show(data.message);
                         reloadList("#purchaseBillEntryList");
+                        $("#purchase_entry_price_dialog").modal('hide');
                         // return;
                     }
                 }
