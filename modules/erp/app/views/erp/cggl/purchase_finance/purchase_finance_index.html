@@ -493,7 +493,11 @@
                                     }
                                     fnCallback(data.list_data);
 
-                                    vm.purchase_bill_code = data.purchase_bill_code
+                                    vm.purchase_bill_code = data.purchase_bill_code;
+
+                                    $("#span_amount_sum").html(dtFormatFloat(data.sum.amount_sum));
+                                    $("#span_freight_charge_sum").html(dtFormatFloat(data.sum.freight_charge_sum));
+                                    $("#span_pay_amount_sum").html(dtFormatFloat(data.sum.pay_amount_sum));
                                 }
                             });
                         }

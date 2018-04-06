@@ -49,6 +49,12 @@ type PurchaseBillEntryViewItem struct {
 	FinalAmountStatus     models.StatusInfo                     `xorm:"extends" json:"fas"`
 }
 
+type PurchaseBillEntrySum struct {
+	AmountSum        float64 `xorm:"'amount_sum'" json:"amount_sum"`
+	FreightChargeSum float64 `xorm:"'freight_charge_sum'" json:"freight_charge_sum"`
+	PayAmountSum     float64 `xorm:"'pay_amount_sum'" json:"pay_amount_sum"`
+}
+
 func (c ErpPurchaseBillEntry) ListData() revel.Result {
 	// pass_service.Check_login_user_pass(pass_res.CGGL_PURCHASE_BILL, c.Session)
 	pass_service.Check_login_user_pass_or([]int64{pass_res.CGGL_PURCHASE_BILL, pass_res.CGGL_PURCHASE_FINANCE}, c.Session)
@@ -79,34 +85,65 @@ FROM erp_purchase_bill_entry pbe
     LEFT JOIN erp_status fas ON pbe.final_amount_status_id = fas.id
 	 */
 
-	sb := core.NewSqlBuilder()
-	sb.Select("pbe.*, et.*, p.*, s.*, fas.*")
-	sb.Count("count(*) as entry_count")
-	sb.From(`erp_purchase_bill_entry pbe
+	var sb_list = core.NewSqlBuilder()
+	sb_list.Select("pbe.*, et.*, p.*, s.*, fas.*")
+	sb_list.Count("count(*) as entry_count")
+	sb_list.From(`erp_purchase_bill_entry pbe
     INNER JOIN erp_purchase_bill_entry_type et ON et.id = pbe.type_id
     INNER JOIN erp_product p ON pbe.product_id = p.id
     INNER JOIN erp_status s ON pbe.status_id = s.id
 	LEFT JOIN erp_status fas ON pbe.final_amount_status_id = fas.id`)
 
-	sb.Where(core.SqlAnd(filter, fmt.Sprintf("bill_id = %d", purchase_bill_id)))
+	sb_list.Where(core.SqlAnd(filter, fmt.Sprintf("pbe.bill_id = %d", purchase_bill_id)))
 
 	if order != "" {
-		sb.OrderBy(order)
+		sb_list.OrderBy(order)
 	} else {
-		sb.OrderBy("pbe.id ASC")
+		sb_list.OrderBy("pbe.id ASC")
 	}
 
-	sb.Limit(offset, limit)
+	sb_list.Limit(offset, limit)
 
 	purchase_bill_entry_list := make([]PurchaseBillEntryViewItem, 0, limit)
-	err := db_session.Sql(sb.SqlList()).Find(&purchase_bill_entry_list)
+	err := db_session.Sql(sb_list.SqlList()).Find(&purchase_bill_entry_list)
 	core.HandleError(err)
 
 	var purchase_bill_entry_count struct {
 		Count int64 `xorm:"'entry_count'"`
 	}
 
-	_, err = db_session.Sql(sb.SqlCount()).Get(&purchase_bill_entry_count)
+	_, err = db_session.Sql(sb_list.SqlCount()).Get(&purchase_bill_entry_count)
+	core.HandleError(err)
+
+	/*
+SELECT
+    sum(ifnull(pbe.amount, 0))         AS amount_sum,
+    sum(ifnull(pbe.freight_charge, 0)) AS freight_charge_sum,
+    sum(ifnull(pbe.pay_amount, 0))     AS pay_amount_sum
+FROM erp_purchase_bill_entry pbe
+    INNER JOIN erp_purchase_bill_entry_type et ON et.id = pbe.type_id
+    INNER JOIN erp_product p ON pbe.product_id = p.id
+    INNER JOIN erp_status s ON pbe.status_id = s.id
+    LEFT JOIN erp_status fas ON pbe.final_amount_status_id = fas.id
+	 */
+
+	var sb_sum = core.NewSqlBuilder()
+	sb_sum.Select(`
+    sum(ifnull(pbe.amount, 0))         AS amount_sum,
+    sum(ifnull(pbe.freight_charge, 0)) AS freight_charge_sum,
+    sum(ifnull(pbe.pay_amount, 0))     AS pay_amount_sum
+`)
+	sb_sum.From(`
+erp_purchase_bill_entry pbe
+    INNER JOIN erp_purchase_bill_entry_type et ON et.id = pbe.type_id
+    INNER JOIN erp_product p ON pbe.product_id = p.id
+    INNER JOIN erp_status s ON pbe.status_id = s.id
+    LEFT JOIN erp_status fas ON pbe.final_amount_status_id = fas.id
+`)
+	sb_sum.Where(core.SqlAnd(filter, fmt.Sprintf("pbe.bill_id = %d", purchase_bill_id)))
+
+	var purchase_bill_entry_sum PurchaseBillEntrySum
+	_, err = db_session.Sql(sb_sum.SqlGet()).Get(&purchase_bill_entry_sum)
 	core.HandleError(err)
 
 	return c.RenderJson(map[string]interface{}{
@@ -120,6 +157,7 @@ FROM erp_purchase_bill_entry pbe
 			Data:  purchase_bill_entry_list,
 			Total: purchase_bill_entry_count.Count,
 		},
+		"sum": purchase_bill_entry_sum,
 	})
 }
 
