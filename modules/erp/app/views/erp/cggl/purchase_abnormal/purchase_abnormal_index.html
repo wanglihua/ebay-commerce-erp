@@ -52,9 +52,10 @@
                             <th>采购批次号</th>
                             <th>状态</th>
                             <th>异常类型</th>
-                            <th>SKU</th>
-                            <th>名称</th>
+                            <th>SKU/名称</th>
+                            <th>供应商</th>
                             <th>数量/入库数量/异常数量</th>
+                            <th>单价</th>
                             <th id="th_apply_time">采购时间</th>
                             <th id="th_checkin_time">入库时间</th>
                             <th>备注</th>
@@ -241,17 +242,28 @@
                             {"mDataProp": "pb.code", "title": "采购批次号", "bSearchable": true, "width": 100},
                             {"mDataProp": "s.name", "title": "状态", "bSearchable": true, "width": 60},
                             {"mDataProp": "at.name", "title": "异常类型", "bSearchable": true, "width": 80},
-                            {"mDataProp": "p.sku", "title": "SKU", "bSearchable": true, "width": 100},
                             {
-                                "mDataProp": "p.cn_name", "title": "名称", "bSearchable": true, "sClass": "wrap-word",
+                                "mDataProp": "p.sku", "title": "SKU/名称", "bSearchable": true, "width": 150, "sClass": "wrap-word",
                                 "render": function (data, type, row) {
-                                    return "<div>" + data + "</div>";
+                                    return "<div style='font-weight: bold;'>" + row.p.sku + "</div><div>" + row.p.cn_name + "</div>";
+                                }
+                            },
+                            {
+                                "mDataProp": "sup.name", "title": "供应商", "bSearchable": true, "width": 150, "sClass": "wrap-word",
+                                "render": function (data, type, row) {
+                                    return "<div>" + row.sup.name + "</div>";
                                 }
                             },
                             {
                                 "mDataProp": "pbe.qty", "title": "数量/入库数量/异常数量", "bSearchable": false, "sClass": "center", "width": 160,
                                 "render": function (data, type, row) {
-                                    return "<div>" + data + "/" + row.pbe.checkin_qty + "/" + (row.pbe.qty - row.pbe.checkin_qty) + "</div>";
+                                    return "<table><tr><td style='width: 40px;text-align: right;'>" + row.pbe.qty + "</td><td style='width: 40px;text-align: right;'>" + row.pbe.checkin_qty + "</td><td style='width: 40px;text-align: right;'>" + (row.pbe.qty - row.pbe.checkin_qty) + "</td></tr></table> ";
+                                }
+                            },
+                            {
+                                "mDataProp": "pbe.price", "title": "单价", "bSearchable": true, "sClass": "dtRight", "width": 50,
+                                "render": function (data, type, row) {
+                                    return dtFormatFloat(data);
                                 }
                             },
                             {
