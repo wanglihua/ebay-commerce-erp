@@ -547,7 +547,7 @@ func (c ErpPurchaseFinance) PayFinalAmount() revel.Result {
 	_, err := db_session.Id(entry_id).Get(&purchase_bill_entry)
 	core.HandleError(err)
 
-	purchase_bill_entry.FinalAmountStatusId = models.PURCHASE_BILL_ENTRY_FINAL_AMOUNT_STATUS_YZF
+	purchase_bill_entry.FinalAmountStatusId = core.MakeNullInt(models.PURCHASE_BILL_ENTRY_FINAL_AMOUNT_STATUS_YZF, true)
 
 	_, err = db_session.Id(entry_id).Cols("final_amount_status_id").Update(&purchase_bill_entry)
 	core.HandleError(err)

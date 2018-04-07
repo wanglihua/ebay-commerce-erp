@@ -30,7 +30,7 @@ type PurchaseBillEntryInfo struct {
 	PayAmount               float64         `xorm:"decimal(18,6) null 'pay_amount' default(0)" json:"pay_amount" smith:"verbose_name=付款金额"`                     // 付款金额
 	PayTime                 core.NullTime   `xorm:"datetime null 'pay_time'" json:"pay_time" smith:"verbose_name=付款时间"`                                         // 也就是下单时间
 	FinalAmount             float64         `xorm:"decimal(18,6) null 'final_amount' default(0)" json:"final_amount" smith:"verbose_name=尾款"`                   // 尾款金额
-	FinalAmountStatusId     int64           `xorm:"bigint null 'final_amount_status_id' default(5900)" json:"final_amount_status_id" smith:"verbose_name=尾款状态"` // 尾款状态： 未付 5900 或者 已付 6000
+	FinalAmountStatusId     core.NullInt    `xorm:"bigint null 'final_amount_status_id' default(5900)" json:"final_amount_status_id" smith:"verbose_name=尾款状态"` // 尾款状态： 未付 5900 或者 已付 6000
 	FinalExpenses           float64         `xorm:"decimal(18,6) notnull 'final_expenses' default(0)" json:"final_expenses" smith:"verbose_name=提货费"`           // 就是运费的尾款，但分批采购时就是运费了，这个是总数量的运费，不是单个商品的运费
 	FreightCharge           float64         `xorm:"decimal(18,6) notnull 'freight_charge' default(0)" json:"freight_charge" smith:"verbose_name=运费"`            // 搞不清，为什么要加个运费，前面都已经有提货费
 	TypeId                  int64           `xorm:"bigint notnull index 'type_id' default(100)" json:"type_id" smith:"verbose_name=采购明细类型"`                     // 分批 或 正常，默认是正常明细类型
