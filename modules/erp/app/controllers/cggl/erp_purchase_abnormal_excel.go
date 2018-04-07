@@ -30,20 +30,22 @@ func (c ErpPurchaseAbnormalExcel) Export() revel.Result {
 	var filter = "1=1"
 
 	/*
-SELECT pbe.*, pb.*, p.*, at.*, s.*
+SELECT pbe.*, pb.*, p.*, sup.*, at.*, s.*
 FROM erp_purchase_bill_entry pbe
     INNER JOIN erp_purchase_bill pb ON pbe.bill_id = pb.id
     INNER JOIN erp_product p ON pbe.product_id = p.id
+    INNER JOIN erp_supplier sup on pb.supplier_id = sup.id
     INNER JOIN erp_purchase_abnormal_type at ON pbe.abnormal_type_id = at.id
     INNER JOIN erp_status s ON pbe.status_id = s.id
 	 */
 
 	sb := core.NewSqlBuilder()
-	sb.Select("pbe.*, pb.*, p.*, at.*, s.*")
+	sb.Select("pbe.*, pb.*, p.*, sup.*, at.*, s.*")
 	sb.Count("count(*) as entry_count")
 	sb.From(`erp_purchase_bill_entry pbe
     INNER JOIN erp_purchase_bill pb ON pbe.bill_id = pb.id
     INNER JOIN erp_product p ON pbe.product_id = p.id
+    INNER JOIN erp_supplier sup on pb.supplier_id = sup.id
     INNER JOIN erp_purchase_abnormal_type at ON pbe.abnormal_type_id = at.id
     INNER JOIN erp_status s ON pbe.status_id = s.id`)
 
@@ -210,6 +212,12 @@ func (c ErpPurchaseAbnormalExcel) export_excel(db_session *xorm.Session, entry_l
 		col_index++
 
 		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 30)
+		set_head_cell_style(cell)
+		cell.Value = "供应商"
+		col_index++
+
+		cell = row.AddCell()
 		sheet.SetColWidth(col_index, col_index, 8)
 		set_head_cell_style(cell)
 		cell.Value = "数量"
@@ -225,6 +233,12 @@ func (c ErpPurchaseAbnormalExcel) export_excel(db_session *xorm.Session, entry_l
 		sheet.SetColWidth(col_index, col_index, 8)
 		set_head_cell_style(cell)
 		cell.Value = "异常数量"
+		col_index++
+
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 8)
+		set_head_cell_style(cell)
+		cell.Value = "单价"
 		col_index++
 
 		cell = row.AddCell()
@@ -287,6 +301,11 @@ func (c ErpPurchaseAbnormalExcel) export_excel(db_session *xorm.Session, entry_l
 		set_text_cell_style(cell, "left")
 		cell.Value = entry.Product.CnName
 
+		// 供应商
+		cell = row.AddCell()
+		set_text_cell_style(cell, "left")
+		cell.Value = entry.Supplier.Name
+
 		// 数量
 		cell = row.AddCell()
 		set_text_cell_style(cell, "center")
@@ -302,15 +321,20 @@ func (c ErpPurchaseAbnormalExcel) export_excel(db_session *xorm.Session, entry_l
 		set_text_cell_style(cell, "center")
 		cell.SetInt64(entry.PurchaseBillEntry.Qty - entry.PurchaseBillEntry.CheckinQty)
 
+		// 单价
+		cell = row.AddCell()
+		set_text_cell_style(cell, "right")
+		cell.SetFloatWithFormat(entry.PurchaseBillEntry.Price, "0.00")
+
 		// 采购时间
 		cell = row.AddCell()
 		set_text_cell_style(cell, "center")
-		cell.Value = entry.PurchaseBill.ApplyTime.Time.Format("2006-01-02 15:03")
+		cell.Value = entry.PurchaseBill.ApplyTime.Time.Format("2006-01-02 15:04")
 
 		// 入库时间
 		cell = row.AddCell()
 		set_text_cell_style(cell, "center")
-		cell.Value = entry.PurchaseBill.CheckinTime.Time.Format("2006-01-02 15:03")
+		cell.Value = entry.PurchaseBill.CheckinTime.Time.Format("2006-01-02 15:04")
 
 		// 偏差金额
 		cell = row.AddCell()

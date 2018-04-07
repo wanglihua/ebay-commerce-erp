@@ -98,7 +98,7 @@ SELECT pbe.*, pb.*, p.*, sup.*, at.*, s.*
 FROM erp_purchase_bill_entry pbe
     INNER JOIN erp_purchase_bill pb ON pbe.bill_id = pb.id
     INNER JOIN erp_product p ON pbe.product_id = p.id
-    LEFT JOIN erp_supplier sup on p.supplier_id = sup.id
+    INNER JOIN erp_supplier sup on pb.supplier_id = sup.id
     INNER JOIN erp_purchase_abnormal_type at ON pbe.abnormal_type_id = at.id
     INNER JOIN erp_status s ON pbe.status_id = s.id
 	 */
@@ -109,7 +109,7 @@ FROM erp_purchase_bill_entry pbe
 	sb.From(`erp_purchase_bill_entry pbe
     INNER JOIN erp_purchase_bill pb ON pbe.bill_id = pb.id
     INNER JOIN erp_product p ON pbe.product_id = p.id
-    LEFT JOIN erp_supplier sup on p.supplier_id = sup.id
+    INNER JOIN erp_supplier sup on pb.supplier_id = sup.id
     INNER JOIN erp_purchase_abnormal_type at ON pbe.abnormal_type_id = at.id
     INNER JOIN erp_status s ON pbe.status_id = s.id`)
 
