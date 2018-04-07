@@ -52,7 +52,8 @@ WHERE pb.pay_days <> 0 AND pb.status_id = 4600 AND (datediff(DATE(date_add(pb.pa
 
 	*/
 
-	var sql_purchase_bill_to_pay = `SELECT *
+	var sql_purchase_bill_to_pay = `
+SELECT *
 FROM erp_purchase_bill pb
 WHERE pb.pay_days <> 0 AND pb.status_id = %d AND (datediff(DATE(date_add(pb.pay_time, INTERVAL pb.pay_days DAY)), DATE(now())) <= 7);`
 	sql_purchase_bill_to_pay = fmt.Sprintf(sql_purchase_bill_to_pay, models.PURCHASE_BILL_STATUS_CGZ)
@@ -63,6 +64,30 @@ WHERE pb.pay_days <> 0 AND pb.status_id = %d AND (datediff(DATE(date_add(pb.pay_
 	c.RenderArgs["purchase_bill_to_pay_list"] = purchase_bill_to_pay_list
 	c.RenderArgs["purchase_bill_to_pay_count"] = len(purchase_bill_to_pay_list)
 	c.RenderArgs["purchase_bill_to_pay_max_index"] = len(purchase_bill_to_pay_list) - 1
+
+	// 获取有明细的账期快到的采购单列表
+	/*
+
+SELECT pb.*
+FROM erp_purchase_bill pb
+	INNER JOIN erp_purchase_bill_entry pbe ON pbe.bill_id = pb.id
+WHERE pb.pay_days <> 0 AND pbe.status_id = 4600 AND (datediff(DATE(date_add(pbe.pay_time, INTERVAL pb.pay_days DAY)), DATE(now())) <= 7);
+
+	*/
+
+	var sql_purchase_bill_entry_to_pay = `
+SELECT pb.*
+FROM erp_purchase_bill pb
+	INNER JOIN erp_purchase_bill_entry pbe ON pbe.bill_id = pb.id
+WHERE pb.pay_days <> 0 AND pbe.status_id = %d AND (datediff(DATE(date_add(pbe.pay_time, INTERVAL pb.pay_days DAY)), DATE(now())) <= 7);`
+	sql_purchase_bill_entry_to_pay = fmt.Sprintf(sql_purchase_bill_entry_to_pay, models.PURCHASE_BILL_STATUS_CGZ)
+
+	var purchase_bill_entry_to_pay_list = make([]cggl_models.PurchaseBillInfo, 0)
+	core.HandleError(db_session.Sql(sql_purchase_bill_entry_to_pay).Find(&purchase_bill_entry_to_pay_list))
+
+	c.RenderArgs["purchase_bill_entry_to_pay_list"] = purchase_bill_entry_to_pay_list
+	c.RenderArgs["purchase_bill_entry_to_pay_count"] = len(purchase_bill_entry_to_pay_list)
+	c.RenderArgs["purchase_bill_entry_to_pay_max_index"] = len(purchase_bill_entry_to_pay_list) - 1
 
 	/*
 SELECT group_concat(DISTINCT pb.code) AS code_list_str
@@ -498,7 +523,10 @@ func (c ErpPurchaseFinance) PurchaseEntry() revel.Result {
 
 	purchase_bill_entry.StatusId = models.PURCHASE_BILL_STATUS_CGZ
 
-	_, err = db_session.Id(entry_id).Cols("status_id").Update(&purchase_bill_entry)
+	var pay_time = core.MakeNullTime(time.Now(), true)
+	purchase_bill_entry.PayTime = pay_time
+
+	_, err = db_session.Id(entry_id).Cols("status_id", "pay_time").Update(&purchase_bill_entry)
 	core.HandleError(err)
 
 	return c.RenderJson(map[string]interface{}{
