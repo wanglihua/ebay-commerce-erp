@@ -243,7 +243,7 @@ CREATE PROCEDURE sale_amount_report()
                     THEN
                         INSERT INTO erp_sale_amount_report
                         (paid_time, platform_id, shop_id, order_id, order_item_id, paid_amount, express_fee, income, cost_amount, estimate_logistics_fee, actual_logistics_fee, jyfy_amount, ptfy_amount, pick_fee, gst_fee, outcome, profit, profit_rate, exchange_rate, product_id, product_qty, sale_user_id, service_user_id, dev_user_id)
-                        VALUES (v_paid_time, v_platform_id, v_shop_id, v_order_id, v_order_item_id, v_subtotal_amount, v_express_fee, v_income, v_cost_amount, v_estimate_logistics_fee, v_actual_logistics_fee, v_jyfy_amount, v_ptfy_amount, v_pick_fee, v_gst_fee, v_outcome, v_profit, v_exchange_rate, v_profit_rate, v_product_id, v_item_qty, v_sale_user_id, v_service_user_id, v_dev_user_id);
+                        VALUES (v_paid_time, v_platform_id, v_shop_id, v_order_id, v_order_item_id, v_subtotal_amount, v_express_fee, v_income, v_cost_amount, v_estimate_logistics_fee, v_actual_logistics_fee, v_jyfy_amount, v_ptfy_amount, v_pick_fee, v_gst_fee, v_outcome, v_profit, v_profit_rate, v_exchange_rate, v_product_id, v_item_qty, v_sale_user_id, v_service_user_id, v_dev_user_id);
                     ELSE
                         UPDATE erp_sale_amount_report
                         SET paid_time              = v_paid_time,
@@ -352,7 +352,7 @@ CREATE PROCEDURE sale_amount_report()
                     THEN
                         INSERT INTO erp_sale_amount_report
                         (paid_time, platform_id, shop_id, order_id, order_item_id, paid_amount, express_fee, income, cost_amount, estimate_logistics_fee, actual_logistics_fee, jyfy_amount, ptfy_amount, pick_fee, gst_fee, outcome, profit, profit_rate, product_id, exchange_rate, product_qty, sale_user_id, service_user_id, dev_user_id)
-                        VALUES (v_paid_time, v_platform_id, v_shop_id, v_order_id, v_order_item_id, v_item_subtotal_amount, v_item_express_fee, v_item_income, v_item_cost_amount, v_item_estimate_logistics_fee, v_item_actual_logistics_fee, v_item_jyfy_amount, v_item_ptfy_amount, v_item_pick_fee, v_item_gst_fee, v_item_outcome, v_profit, v_profit_rate, v_exchange_rate, v_product_id, v_item_qty, v_sale_user_id, v_service_user_id, v_dev_user_id);
+                        VALUES (v_paid_time, v_platform_id, v_shop_id, v_order_id, v_order_item_id, v_item_subtotal_amount, v_item_express_fee, v_item_income, v_item_cost_amount, v_item_estimate_logistics_fee, v_item_actual_logistics_fee, v_item_jyfy_amount, v_item_ptfy_amount, v_item_pick_fee, v_item_gst_fee, v_item_outcome, v_profit, v_profit_rate, v_product_id, v_exchange_rate, v_item_qty, v_sale_user_id, v_service_user_id, v_dev_user_id);
                     ELSE
                         UPDATE erp_sale_amount_report
                         SET paid_time              = v_paid_time,
