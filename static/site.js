@@ -696,3 +696,15 @@ function isEmptyStr(str) {
     }
 }
 
+function paddingSpaceLeft(data, paddingLen) {
+    var str = String(data);
+    var dataLen = str.length;
+    var spaces = "__________"; //一个足够长的空格，10个空格
+
+    var sliceLen = paddingLen;
+    if (dataLen > paddingLen) {
+        sliceLen = dataLen;
+    }
+
+    return String(spaces + str).slice(-sliceLen);
+}

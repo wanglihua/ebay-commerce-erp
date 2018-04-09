@@ -746,7 +746,7 @@ func (c ErpPurchaseBillEntryExcel) export_entry_list_to_excel(db_session *xorm.S
 		if entry.PurchaseBill.ApplyTime.Valid == false {
 			cell.SetString("")
 		} else {
-			cell.SetString(entry.PurchaseBill.ApplyTime.Time.Format("2006-01-02 15:03"))
+			cell.SetString(entry.PurchaseBill.ApplyTime.Time.Format("2006-01-02 15:04"))
 		}
 
 		// 下单时间
@@ -755,7 +755,7 @@ func (c ErpPurchaseBillEntryExcel) export_entry_list_to_excel(db_session *xorm.S
 		if entry.PurchaseBill.PayTime.Valid == false {
 			cell.SetString("")
 		} else {
-			cell.SetString(entry.PurchaseBill.PayTime.Time.Format("2006-01-02 15:03"))
+			cell.SetString(entry.PurchaseBill.PayTime.Time.Format("2006-01-02 15:04"))
 		}
 
 		// 入库时间
@@ -764,7 +764,7 @@ func (c ErpPurchaseBillEntryExcel) export_entry_list_to_excel(db_session *xorm.S
 		if entry.PurchaseBill.CheckinTime.Valid == false {
 			cell.SetString("")
 		} else {
-			cell.SetString(entry.PurchaseBillEntry.CheckinTime.Time.Format("2006-01-02 15:03"))
+			cell.SetString(entry.PurchaseBillEntry.CheckinTime.Time.Format("2006-01-02 15:04"))
 		}
 
 		// 描述

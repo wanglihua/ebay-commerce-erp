@@ -15,6 +15,7 @@ import (
 	"matrix/modules/erp/service/purchase_bill_log_service"
 	"unicode/utf8"
 	"strings"
+	"github.com/go-xorm/xorm"
 )
 
 type ErpPurchaseFinance struct {
@@ -51,7 +52,8 @@ WHERE pb.pay_days <> 0 AND pb.status_id = 4600 AND (datediff(DATE(date_add(pb.pa
 
 	*/
 
-	var sql_purchase_bill_to_pay = `SELECT *
+	var sql_purchase_bill_to_pay = `
+SELECT *
 FROM erp_purchase_bill pb
 WHERE pb.pay_days <> 0 AND pb.status_id = %d AND (datediff(DATE(date_add(pb.pay_time, INTERVAL pb.pay_days DAY)), DATE(now())) <= 7);`
 	sql_purchase_bill_to_pay = fmt.Sprintf(sql_purchase_bill_to_pay, models.PURCHASE_BILL_STATUS_CGZ)
@@ -62,6 +64,30 @@ WHERE pb.pay_days <> 0 AND pb.status_id = %d AND (datediff(DATE(date_add(pb.pay_
 	c.RenderArgs["purchase_bill_to_pay_list"] = purchase_bill_to_pay_list
 	c.RenderArgs["purchase_bill_to_pay_count"] = len(purchase_bill_to_pay_list)
 	c.RenderArgs["purchase_bill_to_pay_max_index"] = len(purchase_bill_to_pay_list) - 1
+
+	// 获取有明细的账期快到的采购单列表
+	/*
+
+SELECT pb.*
+FROM erp_purchase_bill pb
+	INNER JOIN erp_purchase_bill_entry pbe ON pbe.bill_id = pb.id
+WHERE pb.pay_days <> 0 AND pbe.status_id = 4600 AND (datediff(DATE(date_add(pbe.pay_time, INTERVAL pb.pay_days DAY)), DATE(now())) <= 7);
+
+	*/
+
+	var sql_purchase_bill_entry_to_pay = `
+SELECT pb.*
+FROM erp_purchase_bill pb
+	INNER JOIN erp_purchase_bill_entry pbe ON pbe.bill_id = pb.id
+WHERE pb.pay_days <> 0 AND pbe.status_id = %d AND (datediff(DATE(date_add(pbe.pay_time, INTERVAL pb.pay_days DAY)), DATE(now())) <= 7);`
+	sql_purchase_bill_entry_to_pay = fmt.Sprintf(sql_purchase_bill_entry_to_pay, models.PURCHASE_BILL_STATUS_CGZ)
+
+	var purchase_bill_entry_to_pay_list = make([]cggl_models.PurchaseBillInfo, 0)
+	core.HandleError(db_session.Sql(sql_purchase_bill_entry_to_pay).Find(&purchase_bill_entry_to_pay_list))
+
+	c.RenderArgs["purchase_bill_entry_to_pay_list"] = purchase_bill_entry_to_pay_list
+	c.RenderArgs["purchase_bill_entry_to_pay_count"] = len(purchase_bill_entry_to_pay_list)
+	c.RenderArgs["purchase_bill_entry_to_pay_max_index"] = len(purchase_bill_entry_to_pay_list) - 1
 
 	/*
 SELECT group_concat(DISTINCT pb.code) AS code_list_str
@@ -431,30 +457,46 @@ func (c ErpPurchaseFinance) EntryPriceSave() revel.Result {
 
 	var db_session = c.DbSession
 
+	c.entry_price_save(db_session)
+
+	return c.RenderJson(map[string]interface{}{
+		"success": true,
+		"message": "采购明细商品单价成功！",
+	})
+}
+
+func (c ErpPurchaseFinance) entry_price_save(db_session *xorm.Session) {
 	var entry_id int64
 	c.Params.Bind(&entry_id, "entry_id")
 
 	var price float64
 	c.Params.Bind(&price, "price")
 
+	var qty int64
+	c.Params.Bind(&qty, "qty")
+
+	var freight_charge float64
+	c.Params.Bind(&freight_charge, "freight_charge")
+
+	var pay_amount float64
+	c.Params.Bind(&pay_amount, "pay_amount")
+
 	var purchase_bill_entry cggl_models.PurchaseBillEntryInfo
 	_, err := db_session.Id(entry_id).Get(&purchase_bill_entry)
 	core.HandleError(err)
 
 	purchase_bill_entry.Price = price
+	purchase_bill_entry.Qty = qty
 	purchase_bill_entry.Amount = purchase_bill_entry.Price * float64(purchase_bill_entry.Qty)
+	purchase_bill_entry.FreightCharge = freight_charge
+	purchase_bill_entry.PayAmount = pay_amount
 	purchase_bill_entry.DrawbackAmount = purchase_bill_service.CalculateBillEntryDrawbackAmount(purchase_bill_entry)
 
-	_, err = db_session.Id(entry_id).Cols("price", "amount", "drawback_amount").Update(&purchase_bill_entry)
+	_, err = db_session.Id(entry_id).Cols("price", "qty", "amount", "freight_charge", "pay_amount", "drawback_amount").Update(&purchase_bill_entry)
 	core.HandleError(err)
 
 	var bill_id = purchase_bill_entry.BillId
 	purchase_bill_service.UpdatePurchaseBillAmount(bill_id, db_session)
-
-	return c.RenderJson(map[string]interface{}{
-		"success": true,
-		"message": "采购明细商品单价成功！",
-	})
 }
 
 // 用于分批采购中的，采购明细审批
@@ -463,6 +505,8 @@ func (c ErpPurchaseFinance) PurchaseEntry() revel.Result {
 
 	var db_session = c.DbSession
 
+	c.entry_price_save(db_session)
+
 	var entry_id int64
 	c.Params.Bind(&entry_id, "entry_id")
 
@@ -470,21 +514,24 @@ func (c ErpPurchaseFinance) PurchaseEntry() revel.Result {
 	_, err := db_session.Id(entry_id).Get(&purchase_bill_entry)
 	core.HandleError(err)
 
-	if purchase_bill_entry.StatusId != models.PURCHASE_BILL_STATUS_YSP || purchase_bill_entry.TypeId != cggl_models.PURCHASE_BILL_TYPE_IN_TURN {
+	if purchase_bill_entry.StatusId != models.PURCHASE_BILL_STATUS_YSP {
 		return c.RenderJson(map[string]interface{}{
 			"success": false,
-			"message": "只有已审批的分批采购的明细单才能下单！",
+			"message": "只有已审批的采购的明细单才能下单！",
 		})
 	}
 
 	purchase_bill_entry.StatusId = models.PURCHASE_BILL_STATUS_CGZ
 
-	_, err = db_session.Id(entry_id).Cols("status_id").Update(&purchase_bill_entry)
+	var pay_time = core.MakeNullTime(time.Now(), true)
+	purchase_bill_entry.PayTime = pay_time
+
+	_, err = db_session.Id(entry_id).Cols("status_id", "pay_time").Update(&purchase_bill_entry)
 	core.HandleError(err)
 
 	return c.RenderJson(map[string]interface{}{
 		"success": true,
-		"message": "采购单明细分批采购下单成功！",
+		"message": "采购单明细采购下单成功！",
 	})
 }
 
@@ -500,7 +547,7 @@ func (c ErpPurchaseFinance) PayFinalAmount() revel.Result {
 	_, err := db_session.Id(entry_id).Get(&purchase_bill_entry)
 	core.HandleError(err)
 
-	purchase_bill_entry.FinalAmountStatusId = models.PURCHASE_BILL_ENTRY_FINAL_AMOUNT_STATUS_YZF
+	purchase_bill_entry.FinalAmountStatusId = core.MakeNullInt(models.PURCHASE_BILL_ENTRY_FINAL_AMOUNT_STATUS_YZF, true)
 
 	_, err = db_session.Id(entry_id).Cols("final_amount_status_id").Update(&purchase_bill_entry)
 	core.HandleError(err)

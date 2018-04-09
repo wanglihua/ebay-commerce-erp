@@ -1014,7 +1014,7 @@ WHERE ol.stock_id = 0 AND ol.company_id = 0
 		// 邮寄地址
 		cell = row.AddCell()
 		set_text_cell_style(cell, "center")
-		cell.Value = fmt.Sprint(order_logistics.OrderShippingAddress.Street1 + " " + order_logistics.OrderShippingAddress.Street2)
+		cell.Value = fmt.Sprint(order_logistics.OrderShippingAddress.Street1 + "," + order_logistics.OrderShippingAddress.Street2)
 
 		// 所属城市
 		cell = row.AddCell()

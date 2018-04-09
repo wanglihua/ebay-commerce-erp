@@ -14,6 +14,7 @@ import (
 	"strings"
 	"matrix/modules/erp/service/purchase_bill_log_service"
 	"matrix/modules/erp/service/purchase_bill_service"
+	"matrix/modules/erp/models/sppz_models"
 )
 
 type ErpPurchaseAbnormal struct {
@@ -73,6 +74,7 @@ type PurchaseAbnormalViewItem struct {
 	PurchaseBillEntry    cggl_models.PurchaseBillEntryInfo    `xorm:"extends" json:"pbe"`
 	PurchaseBill         cggl_models.PurchaseBillInfo         `xorm:"extends" json:"pb"`
 	Product              kcgl_models.ProductInfo              `xorm:"extends" json:"p"`
+	Supplier             sppz_models.SupplierInfo             `xorm:"extends" json:"sup"`
 	PurchaseAbnormalType cggl_models.PurchaseAbnormalTypeInfo `xorm:"extends" json:"at"`
 	Status               models.StatusInfo                    `xorm:"extends" json:"s"`
 }
@@ -92,20 +94,22 @@ func (c ErpPurchaseAbnormal) ListData() revel.Result {
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
 	/*
-SELECT pbe.*, pb.*, p.*, at.*, s.*
+SELECT pbe.*, pb.*, p.*, sup.*, at.*, s.*
 FROM erp_purchase_bill_entry pbe
     INNER JOIN erp_purchase_bill pb ON pbe.bill_id = pb.id
     INNER JOIN erp_product p ON pbe.product_id = p.id
+    INNER JOIN erp_supplier sup on pb.supplier_id = sup.id
     INNER JOIN erp_purchase_abnormal_type at ON pbe.abnormal_type_id = at.id
     INNER JOIN erp_status s ON pbe.status_id = s.id
 	 */
 
 	sb := core.NewSqlBuilder()
-	sb.Select("pbe.*, pb.*, p.*, at.*, s.*")
+	sb.Select("pbe.*, pb.*, p.*, sup.*, at.*, s.*")
 	sb.Count("count(*) as entry_count")
 	sb.From(`erp_purchase_bill_entry pbe
     INNER JOIN erp_purchase_bill pb ON pbe.bill_id = pb.id
     INNER JOIN erp_product p ON pbe.product_id = p.id
+    INNER JOIN erp_supplier sup on pb.supplier_id = sup.id
     INNER JOIN erp_purchase_abnormal_type at ON pbe.abnormal_type_id = at.id
     INNER JOIN erp_status s ON pbe.status_id = s.id`)
 

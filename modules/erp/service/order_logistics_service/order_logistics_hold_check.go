@@ -31,7 +31,7 @@ func (p_ol *OrderLogisticsService) hold_check_address_special_word(p_order *ddlc
 	for _, address_special_word := range p_ol.address_special_word_list_setting {
 		// 地址包含特殊字段
 		address_special_word_lower_case := strings.ToLower(address_special_word)
-		address_detail_lower_case := strings.ToLower(fmt.Sprintf("%s %s", p_order_logistics_data.order_shipping_address.Street1, p_order_logistics_data.order_shipping_address.Street2))
+		address_detail_lower_case := strings.ToLower(fmt.Sprintf("%s,%s", p_order_logistics_data.order_shipping_address.Street1, p_order_logistics_data.order_shipping_address.Street2))
 		if strings.Index(address_detail_lower_case, address_special_word_lower_case) != -1 {
 			has_address_special_word = true
 			break
