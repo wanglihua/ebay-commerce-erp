@@ -110,6 +110,11 @@ CREATE PROCEDURE sale_amount_report()
                 ITERATE order_loop;
             END IF;
 
+            IF v_paid_time IS NULL
+            THEN
+                ITERATE order_loop;
+            END IF;
+
             SELECT sa.platform_id AS platform_id
             INTO v_platform_id
             FROM erp_shop_account sa

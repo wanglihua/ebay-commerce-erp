@@ -66,7 +66,7 @@ CREATE PROCEDURE sale_income_report()
                 ifnull(o.ptfy, 0) AS ptfy,
                 ifnull(o.jyfy, 0) AS jyfy
             FROM erp_order o
-            WHERE o.paid_time >= date_add(v_latest_reported_paid_time, INTERVAL -3 DAY);
+            WHERE o.paid_time >= date_add(v_latest_reported_paid_time, INTERVAL -30 DAY);
         # 退后 15 天是等待后面的实际物流数据的录入
 
         DECLARE order_item_cur CURSOR FOR
@@ -102,6 +102,11 @@ CREATE PROCEDURE sale_income_report()
             IF done
             THEN
                 LEAVE order_loop;
+            END IF;
+
+            IF v_paid_time IS NULL
+            THEN
+                ITERATE order_loop;
             END IF;
 
             IF v_paid_amount = 0
