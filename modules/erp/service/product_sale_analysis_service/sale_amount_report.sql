@@ -183,8 +183,8 @@ CREATE PROCEDURE sale_amount_report()
                 ITERATE order_loop;
             ELSEIF v_order_item_count = 1
                 THEN
-                    # SET v_income = v_subtotal_amount + v_express_fee;
-                    SET v_income = v_subtotal_amount;
+                    SET v_income = v_subtotal_amount + v_express_fee;
+                    # SET v_income = v_subtotal_amount;
 
                     SET v_logistics_fee = v_estimate_logistics_fee;
                     IF v_actual_logistics_fee IS NOT NULL AND v_actual_logistics_fee <> 0
