@@ -198,7 +198,14 @@ CREATE PROCEDURE sale_income_report()
 
                     SET v_outcome = v_cost_amount + v_logistics_fee + v_pick_fee + v_jyfy_amount + v_ptfy_amount + v_gst_fee;
                     SET v_profit = v_income - v_outcome;
-                    SET v_profit_rate = v_profit / v_paid_amount * 100;
+
+                    IF v_income = 0
+                    THEN
+                        ITERATE order_loop;
+                    END IF;
+
+                    # SET v_profit_rate = v_profit / v_paid_amount * 100;
+                    SET v_profit_rate = v_profit / v_income * 100;
 
                     SELECT
                         oi.id              AS order_item_id,
@@ -345,7 +352,14 @@ CREATE PROCEDURE sale_income_report()
 
                     SET v_item_outcome = v_item_cost_amount + v_logistics_fee + v_item_pick_fee + v_item_jyfy_amount + v_item_ptfy_amount + v_item_gst_fee;
                     SET v_profit = v_item_income - v_item_outcome;
-                    SET v_profit_rate = v_profit / v_item_paid_amount * 100;
+
+                    IF v_item_income = 0
+                    THEN
+                        ITERATE order_item_loop;
+                    END IF;
+
+                    # SET v_profit_rate = v_profit / v_item_paid_amount * 100;
+                    SET v_profit_rate = v_profit / v_item_income * 100;
 
                     IF v_sale_income_report_count = 0
                     THEN
