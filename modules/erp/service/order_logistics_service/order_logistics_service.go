@@ -154,7 +154,9 @@ LIMIT 1;`
 func (p_ol *OrderLogisticsService) CalculateListPaidOrders(user core.LoginUser, db_session *xorm.Session) error {
 
 	// 需要先合并
-	order_combine_service.Combine_orders(fmt.Sprintf("o.status_id = %d OR o.status_id = %d OR o.status_id = %d ", models.ORDER_STATUS_YZF, models.ORDER_STATUS_DPH, models.ORDER_STATUS_HOLD), user, db_session)
+	// order_combine_service.Combine_orders(fmt.Sprintf("o.status_id = %d OR o.status_id = %d OR o.status_id = %d ", models.ORDER_STATUS_YZF, models.ORDER_STATUS_DPH, models.ORDER_STATUS_HOLD), user, db_session)
+
+	order_combine_service.Combine_orders(fmt.Sprintf(" o.status_id = %d ", models.ORDER_STATUS_YZF), user, db_session)
 
 	// 获取 已支付 状态的订单, 匹配完成后，订单的状态就是 Hold 或者 待配货
 	var order_list = order_service.Get_paid_order_list(db_session)
