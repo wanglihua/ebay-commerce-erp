@@ -188,8 +188,8 @@ func (e PassResInfo) InitData(db_session *xorm.Session) {
 		pass = new(PassResInfo)
 		pass.Id = pass_res.DDLC_ORDER_SPLIT
 		pass.CateId = pass_res_cate.DDLC
-		pass.Name = "订单分割"
-		pass.Desc = core.MakeNullString("订单分割", true)
+		pass.Name = "订单拆分"
+		pass.Desc = core.MakeNullString("订单拆分", true)
 		db_session.Insert(pass)
 	}
 
