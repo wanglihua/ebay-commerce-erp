@@ -132,20 +132,27 @@ func (c ErpOrderSplit) Save() revel.Result {
 	_, err = db_session.Id(split_order.Id).Cols("address_id").Update(&split_order)
 
 	for _, item_quantity := range item_quantity_list {
-		var order_item ddlc_models.OrderItemInfo
-		_, err = db_session.Id(item_quantity.ItemId).Get(&order_item)
-		core.HandleError(err)
+		if item_quantity.Qty != 0 {
+			var order_item ddlc_models.OrderItemInfo
+			_, err = db_session.Id(item_quantity.ItemId).Get(&order_item)
+			core.HandleError(err)
 
-		order_item.Quantity = order_item.Quantity - item_quantity.Qty
-		_, err = db_session.Id(order_item.Id).Cols("quantity").Update(&order_item)
-		core.HandleError(err)
+			order_item.Quantity = order_item.Quantity - item_quantity.Qty
+			if order_item.Quantity == 0 {
+				_, err = db_session.Id(order_item.Id).Delete(new(ddlc_models.OrderItemInfo))
+				core.HandleError(err)
+			} else {
+				_, err = db_session.Id(order_item.Id).Cols("quantity").Update(&order_item)
+				core.HandleError(err)
+			}
 
-		var split_order_item = order_item
-		split_order_item.Id = 0
-		split_order_item.OrderId = split_order.Id
-		split_order_item.Quantity = item_quantity.Qty
-		_, err = db_session.Insert(&split_order_item)
-		core.HandleError(err)
+			var split_order_item = order_item
+			split_order_item.Id = 0
+			split_order_item.OrderId = split_order.Id
+			split_order_item.Quantity = item_quantity.Qty
+			_, err = db_session.Insert(&split_order_item)
+			core.HandleError(err)
+		}
 
 	}
 
