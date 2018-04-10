@@ -47,13 +47,13 @@ func (c ErpOrderSplit) Save() revel.Result {
 		Qty    int
 	}
 
-	var item_quantity_list = make([]item_quantity_t, 0)
+	var item_quantity_input_list = make([]item_quantity_t, 0)
 	for form_key, form_value := range c.Params.Form {
 		if strings.HasSuffix(form_key, "_qty") {
-			item_id, err := strconv.ParseInt(form_key[0:len(form_key)-4], 10, 64)
+			input_item_id, err := strconv.ParseInt(form_key[0:len(form_key)-4], 10, 64)
 			core.HandleError(err)
 
-			qty, err := strconv.ParseInt(form_value[0], 10, 64)
+			input_qty, err := strconv.ParseInt(form_value[0], 10, 64)
 			if err != nil {
 				return c.RenderJson(map[string]interface{}{
 					"success": false,
@@ -61,16 +61,16 @@ func (c ErpOrderSplit) Save() revel.Result {
 				})
 			}
 
-			var item_quantity item_quantity_t
-			item_quantity.ItemId = item_id
-			item_quantity.Qty = int(qty)
+			var item_quantity_input item_quantity_t
+			item_quantity_input.ItemId = input_item_id
+			item_quantity_input.Qty = int(input_qty)
 
-			item_quantity_list = append(item_quantity_list, item_quantity)
+			item_quantity_input_list = append(item_quantity_input_list, item_quantity_input)
 		}
 	}
 
-	var order ddlc_models.OrderInfo
-	_, err := db_session.Id(order_id).Get(&order)
+	var origin_order ddlc_models.OrderInfo
+	_, err := db_session.Id(order_id).Get(&origin_order)
 	core.HandleError(err)
 
 	/*
@@ -81,7 +81,7 @@ func (c ErpOrderSplit) Save() revel.Result {
 	ORDER_STATUS_DPH            = 4000 // 订单状态 待配货
 	 */
 
-	if order.StatusId > models.ORDER_STATUS_DPH {
+	if origin_order.StatusId > models.ORDER_STATUS_DPH {
 		return c.RenderJson(map[string]interface{}{
 			"success": false,
 			"message": "只有 已创建，已支付，Hold，已处理Hold，待配货 状态的订单才能分割！",
@@ -89,22 +89,22 @@ func (c ErpOrderSplit) Save() revel.Result {
 	}
 
 	//订单类型都要设置为 分割订单类型
-	order.TypeId = ddpz_models.ORDER_TYPE_CFDD
-	_, err = db_session.Id(order.Id).Cols("type_id").Update(&order)
+	origin_order.TypeId = ddpz_models.ORDER_TYPE_CFDD
+	_, err = db_session.Id(origin_order.Id).Cols("type_id").Update(&origin_order)
 	core.HandleError(err)
 
 	// 复制 订单 和 和订单地址
 
-	split_count, err := db_session.Where(fmt.Sprintf("code LIKE '%sS%%'", order.Code)).Count(&ddlc_models.OrderInfo{})
+	split_count, err := db_session.Where(fmt.Sprintf("code LIKE '%sS%%'", origin_order.Code)).Count(&ddlc_models.OrderInfo{})
 	core.HandleError(err)
 
 	// 复制订单
 	var split_order ddlc_models.OrderInfo
-	split_order = order
+	split_order = origin_order
 	split_order.Id = 0
-	split_order.Code = fmt.Sprintf("%sS%d", order.Code, split_count+1)
-	split_order.TranId = fmt.Sprintf("%sS%d", order.TranId, split_count+1)
-	split_order.FullTranId = fmt.Sprintf("%sS%d", order.FullTranId, split_count+1)
+	split_order.Code = fmt.Sprintf("%sS%d", origin_order.Code, split_count+1)
+	split_order.TranId = fmt.Sprintf("%sS%d", origin_order.TranId, split_count+1)
+	split_order.FullTranId = fmt.Sprintf("%sS%d", origin_order.FullTranId, split_count+1)
 
 	split_order.TagId = 0
 	split_order.StockId = 0
@@ -117,7 +117,7 @@ func (c ErpOrderSplit) Save() revel.Result {
 
 	// 复制原来订单的地址
 	var order_address ddlc_models.OrderShippingAddressInfo
-	_, err = db_session.Id(order.AddressId).Get(&order_address)
+	_, err = db_session.Id(origin_order.AddressId).Get(&order_address)
 	core.HandleError(err)
 
 	var split_order_address ddlc_models.OrderShippingAddressInfo
@@ -131,30 +131,64 @@ func (c ErpOrderSplit) Save() revel.Result {
 	split_order.AddressId = split_order_address.Id
 	_, err = db_session.Id(split_order.Id).Cols("address_id").Update(&split_order)
 
-	for _, item_quantity := range item_quantity_list {
-		if item_quantity.Qty != 0 {
-			var order_item ddlc_models.OrderItemInfo
-			_, err = db_session.Id(item_quantity.ItemId).Get(&order_item)
+	var split_subtotal_amount float64 = 0
+	for _, item_quantity_input := range item_quantity_input_list {
+		if item_quantity_input.Qty != 0 {
+			var origin_order_item ddlc_models.OrderItemInfo
+			_, err = db_session.Id(item_quantity_input.ItemId).Get(&origin_order_item)
 			core.HandleError(err)
 
-			order_item.Quantity = order_item.Quantity - item_quantity.Qty
-			if order_item.Quantity == 0 {
-				_, err = db_session.Id(order_item.Id).Delete(new(ddlc_models.OrderItemInfo))
+			origin_order_item.Quantity = origin_order_item.Quantity - item_quantity_input.Qty
+			if origin_order_item.Quantity == 0 {
+				_, err = db_session.Id(origin_order_item.Id).Delete(new(ddlc_models.OrderItemInfo))
 				core.HandleError(err)
 			} else {
-				_, err = db_session.Id(order_item.Id).Cols("quantity").Update(&order_item)
+				_, err = db_session.Id(origin_order_item.Id).Cols("quantity").Update(&origin_order_item)
 				core.HandleError(err)
 			}
 
-			var split_order_item = order_item
+			var split_order_item = origin_order_item
 			split_order_item.Id = 0
 			split_order_item.OrderId = split_order.Id
-			split_order_item.Quantity = item_quantity.Qty
+			split_order_item.Quantity = item_quantity_input.Qty
 			_, err = db_session.Insert(&split_order_item)
 			core.HandleError(err)
-		}
 
+			split_subtotal_amount = split_subtotal_amount + split_order_item.TransactionPrice*float64(item_quantity_input.Qty)
+		}
 	}
+
+	var split_amount_ratio = split_subtotal_amount / origin_order.SubTotalAmount
+
+	split_order.AdjustmentAmount = origin_order.AdjustmentAmount * split_amount_ratio
+	split_order.AdjustmentAmountRmb = split_order.AdjustmentAmount * split_order.ExchangeRate
+	split_order.AmountPaid = origin_order.AmountPaid * split_amount_ratio
+	split_order.AmountPaidRmb = split_order.AmountPaid * split_order.ExchangeRate
+	split_order.TotalAmount = origin_order.TotalAmount * split_amount_ratio
+	split_order.TotalAmountRmb = split_order.TotalAmount * split_order.ExchangeRate
+	split_order.SubTotalAmount = origin_order.SubTotalAmount * split_amount_ratio
+	split_order.SubTotalAmountRmb = split_order.SubTotalAmount * split_order.ExchangeRate
+	split_order.ExpressFee = origin_order.ExpressFee * split_amount_ratio
+	split_order.Ptfy = origin_order.Ptfy * split_amount_ratio
+	split_order.Jyfy = origin_order.Jyfy * split_amount_ratio
+
+	_, err = db_session.Id(split_order.Id).Update(&split_order)
+	core.HandleError(err)
+
+	origin_order.AdjustmentAmount = origin_order.AdjustmentAmount - split_order.AdjustmentAmount
+	origin_order.AdjustmentAmountRmb = origin_order.AdjustmentAmountRmb - split_order.AdjustmentAmountRmb
+	origin_order.AmountPaid = origin_order.AmountPaid - split_order.AmountPaid
+	origin_order.AmountPaidRmb = origin_order.AmountPaidRmb - split_order.AmountPaidRmb
+	origin_order.TotalAmount = origin_order.TotalAmount - split_order.TotalAmount
+	origin_order.TotalAmountRmb = origin_order.TotalAmountRmb - split_order.TotalAmountRmb
+	origin_order.SubTotalAmount = origin_order.SubTotalAmount - split_order.SubTotalAmount
+	origin_order.SubTotalAmountRmb = origin_order.SubTotalAmountRmb - split_order.SubTotalAmountRmb
+	origin_order.ExpressFee = origin_order.ExpressFee - split_order.ExpressFee
+	origin_order.Ptfy = origin_order.Ptfy - split_order.Ptfy
+	origin_order.Jyfy = origin_order.Jyfy - split_order.Jyfy
+
+	_, err = db_session.Id(origin_order.Id).Update(&origin_order)
+	core.HandleError(err)
 
 	return c.RenderJson(map[string]interface{}{
 		"success": true,
