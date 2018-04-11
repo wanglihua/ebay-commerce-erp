@@ -162,6 +162,8 @@ func (c ErpOrderNew) Save() revel.Result {
 	order.SubTotalAmountCurrency = "AUD"
 	order.SubTotalAmountRmb = order.AmountPaid * aud_exchange_rate_setting
 
+	order.PaidTime = core.MakeNullLongTime(time.Now(), true)
+
 	order.StatusId = models.ORDER_STATUS_YZF
 
 	var order_in_db ddlc_models.OrderInfo
