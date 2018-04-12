@@ -67,7 +67,7 @@ CREATE PROCEDURE sale_amount_report()
                 ifnull(o.jyfy, 0) AS jyfy
             FROM erp_order o
             WHERE (o.status_id = 4200 OR o.status_id = 4300)
-                  AND o.paid_time >= date_add(v_latest_reported_paid_time, INTERVAL -30 DAY);
+                  AND o.paid_time >= date_add(v_latest_reported_paid_time, INTERVAL -60 DAY);
         # 退后 15 天是等待后面的实际物流数据的录入
 
         DECLARE order_item_cur CURSOR FOR
