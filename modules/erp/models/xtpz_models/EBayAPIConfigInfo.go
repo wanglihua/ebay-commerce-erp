@@ -6,7 +6,7 @@ import (
 
 type EBayAPIConfigInfo struct {
 	Id         int64     `xorm:"bigint notnull pk autoincr 'id'" json:"id"`
-	ShopId     int64     `xorm:"int64 notnull 'shop_id'" json:"shop_id" smith:"verbose_name=店铺"`
+	ShopId     int64     `xorm:"int64 notnull index 'shop_id'" json:"shop_id" smith:"verbose_name=店铺"`
 	AppId      string    `xorm:"nvarchar(100)  notnull 'app_id'" json:"app_id" smith:"verbose_name=AppID"`
 	CertId     string    `xorm:"nvarchar(100)  notnull 'cert_id'" json:"cert_id" smith:"verbose_name=CertID"`
 	DevId      string    `xorm:"nvarchar(100)  notnull 'dev_id'" json:"dev_id" smith:"verbose_name=DevID"`
