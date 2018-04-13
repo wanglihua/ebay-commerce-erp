@@ -78,7 +78,8 @@ func (c ErpOrderWaybillPrint) Preview() revel.Result {
 		print_order.first_storage_loc = order_print_item_detail.first_storage_loc
 
 		if order.StockId == mel_stock_id {
-			print_order.StockAddressLine1 = "2 Venture Court"
+			// print_order.StockAddressLine1 = "2 Venture Court"
+			print_order.StockAddressLine1 = "54-58 Arkwright Drive"
 			print_order.StockAddressLine2 = "DANDENONG SOUTH, VIC 3175"
 		}
 
@@ -172,7 +173,8 @@ func (c ErpOrderWaybillPrint) Print() revel.Result {
 		print_order.first_storage_loc = order_print_item_detail.first_storage_loc
 
 		if order.StockId == mel_stock_id {
-			print_order.StockAddressLine1 = "2 Venture Court"
+			// print_order.StockAddressLine1 = "2 Venture Court"
+			print_order.StockAddressLine1 = "54-58 Arkwright Drive"
 			print_order.StockAddressLine2 = "DANDENONG SOUTH, VIC 3175"
 		}
 
