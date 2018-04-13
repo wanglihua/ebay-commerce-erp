@@ -176,9 +176,11 @@ func (c ErpOrderLogisticsImport) ImportActualFee() revel.Result {
 
 	type actual_fee_import_t struct {
 		OrderNumber     string  `json:"order_number"`
+		OrderCode       string  `json:"order_code"`
+		WaybillNumber   string  `json:"waybill_number"`
+		ActualFeeStr    string  `json:"actual_fee_str"`
 		ActualFee       float64 `json:"actual_fee"`
 		ErrorMessage    string  `json:"error_message"`
-		ActualFeeStr    string  `json:"actual_fee_str"`
 		order_logistics ddlc_models.OrderLogisticsInfo
 	}
 
@@ -201,22 +203,48 @@ func (c ErpOrderLogisticsImport) ImportActualFee() revel.Result {
 
 			var tracking_number_import actual_fee_import_t
 
-			col_index := 0
-
 			// 订单代码
+			col_index := 0
 			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
+			tracking_number_import.OrderNumber = cell_val
 
-			if cell_val == "" {
+			// 订单编号
+			col_index = 2
+			cell = sheet.Cell(row_index, col_index)
+			if cell == nil {
+				tracking_number_import.OrderCode = ""
+			}
+			cell_val, err = cell.String()
+			if err != nil {
+				tracking_number_import.OrderCode = ""
+			} else {
+				cell_val = strings.TrimSpace(cell_val)
+				tracking_number_import.OrderCode = cell_val
+			}
+
+			// 货运单号
+			col_index = 3
+			cell = sheet.Cell(row_index, col_index)
+			if cell == nil {
+				tracking_number_import.WaybillNumber = ""
+			}
+			cell_val, err = cell.String()
+			if err != nil {
+				tracking_number_import.WaybillNumber = ""
+			} else {
+				cell_val = strings.TrimSpace(cell_val)
+				tracking_number_import.WaybillNumber = cell_val
+			}
+
+			if tracking_number_import.OrderNumber == "" && tracking_number_import.OrderCode == "" && tracking_number_import.WaybillNumber == "" {
 				break
 			}
 
-			tracking_number_import.OrderNumber = cell_val
-			col_index++
-
 			// 实际运费
+			col_index = 1
 			cell = sheet.Cell(row_index, col_index)
 			cell_val, err = cell.String()
 			core.HandleError(err)
@@ -239,19 +267,51 @@ func (c ErpOrderLogisticsImport) ImportActualFee() revel.Result {
 
 	// 错误检查
 	for index, actual_fee_import := range actual_fee_import_list {
-		/*
-			SELECT ol.* FROM erp_order o
-			    INNER JOIN erp_order_logistics ol ON ol.order_id = o.id
-			WHERE o.full_tran_id = ''
-		*/
 
 		var order_logistics ddlc_models.OrderLogisticsInfo
-		var sql_get_order_logistics = `SELECT ol.* FROM erp_order o
+
+		var has_order_logistics = true
+
+		if actual_fee_import.OrderNumber != "" {
+			/*
+				SELECT ol.* FROM erp_order o
+					INNER JOIN erp_order_logistics ol ON ol.order_id = o.id
+				WHERE o.full_tran_id = ''
+			*/
+
+			var sql_get_order_logistics = `SELECT ol.* FROM erp_order o
 			    INNER JOIN erp_order_logistics ol ON ol.order_id = o.id
 			WHERE o.full_tran_id = '%s'`
-		sql_get_order_logistics = fmt.Sprintf(sql_get_order_logistics, actual_fee_import.OrderNumber)
-		has, err := db_session.Sql(sql_get_order_logistics).Get(&order_logistics)
-		core.HandleError(err)
+			sql_get_order_logistics = fmt.Sprintf(sql_get_order_logistics, actual_fee_import.OrderNumber)
+			has_order_logistics, err = db_session.Sql(sql_get_order_logistics).Get(&order_logistics)
+			core.HandleError(err)
+		} else if actual_fee_import.OrderCode != "" {
+			/*
+				SELECT ol.* FROM erp_order o
+					INNER JOIN erp_order_logistics ol ON ol.order_id = o.id
+				WHERE o.code = ''
+			*/
+
+			var sql_get_order_logistics = `SELECT ol.* FROM erp_order o
+					INNER JOIN erp_order_logistics ol ON ol.order_id = o.id
+				WHERE o.code = '%s'`
+			sql_get_order_logistics = fmt.Sprintf(sql_get_order_logistics, actual_fee_import.OrderCode)
+			has_order_logistics, err = db_session.Sql(sql_get_order_logistics).Get(&order_logistics)
+			core.HandleError(err)
+		} else if actual_fee_import.WaybillNumber != "" {
+			/*
+				SELECT ol.* FROM erp_order o
+					INNER JOIN erp_order_logistics ol ON ol.order_id = o.id
+				WHERE o.waybill_number = ''
+			*/
+
+			var sql_get_order_logistics = `SELECT ol.* FROM erp_order o
+					INNER JOIN erp_order_logistics ol ON ol.order_id = o.id
+				WHERE o.waybill_number = '%s'`
+			sql_get_order_logistics = fmt.Sprintf(sql_get_order_logistics, actual_fee_import.WaybillNumber)
+			has_order_logistics, err = db_session.Sql(sql_get_order_logistics).Get(&order_logistics)
+			core.HandleError(err)
+		}
 
 		/*
 		if has == false {
@@ -260,11 +320,10 @@ func (c ErpOrderLogisticsImport) ImportActualFee() revel.Result {
 		}
 		*/
 		//临时的解决方案，如果物流信息不存在的话，就先建一个
-		if has == false {
+		if has_order_logistics == false {
 			order_logistics.OrderId = c.get_order_id_by_full_tran_id(actual_fee_import.OrderNumber, db_session)
 			_, err := db_session.Insert(&order_logistics)
 			core.HandleError(err)
-
 		}
 
 		actual_fee_import_list[index].order_logistics = order_logistics
