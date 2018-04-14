@@ -461,7 +461,55 @@ func (c ErpPurchaseFinance) EntryPriceSave() revel.Result {
 
 	return c.RenderJson(map[string]interface{}{
 		"success": true,
-		"message": "采购明细商品单价成功！",
+		"message": "采购明细保存成功！",
+	})
+}
+
+func (c ErpPurchaseFinance) EntryPayFinalAmount() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.CGGL_PURCHASE_FINANCE, c.Session)
+
+	var db_session = c.DbSession
+
+	var entry_id int64
+	c.Params.Bind(&entry_id, "entry_id")
+
+	var purchase_bill_entry cggl_models.PurchaseBillEntryInfo
+	_, err := db_session.Id(entry_id).Get(&purchase_bill_entry)
+	core.HandleError(err)
+
+	c.RenderArgs["entry"] = purchase_bill_entry
+
+	return c.RenderTemplate("erp/cggl/purchase_finance/purchase_finance_entry_pay_final_amount.html")
+}
+
+func (c ErpPurchaseFinance) EntryPayFinalAmountSave() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.CGGL_PURCHASE_FINANCE, c.Session)
+
+	var db_session = c.DbSession
+
+	var entry_id int64
+	c.Params.Bind(&entry_id, "entry_id")
+
+	var pay_amount float64
+	c.Params.Bind(&pay_amount, "pay_amount")
+
+	var final_amount float64
+	c.Params.Bind(&final_amount, "final_amount")
+
+	var purchase_bill_entry cggl_models.PurchaseBillEntryInfo
+	_, err := db_session.Id(entry_id).Get(&purchase_bill_entry)
+	core.HandleError(err)
+
+	purchase_bill_entry.FinalAmount = final_amount
+	purchase_bill_entry.PayAmount = pay_amount
+	purchase_bill_entry.DrawbackAmount = purchase_bill_service.CalculateBillEntryDrawbackAmount(purchase_bill_entry)
+
+	_, err = db_session.Id(entry_id).Cols("pay_amount", "final_amount", "drawback_amount").Update(&purchase_bill_entry)
+	core.HandleError(err)
+
+	return c.RenderJson(map[string]interface{}{
+		"success": true,
+		"message": "采购明细付款尾款保存成功！",
 	})
 }
 

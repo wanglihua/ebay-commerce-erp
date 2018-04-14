@@ -507,17 +507,19 @@ POST  /purchase/bill/excel/export          ErpPurchaseBillEntryExcel.Export
 POST /purchase/bill/log                    ErpPurchaseBillLog.Index
 POST /purchase/bill/log/list/data          ErpPurchaseBillLog.ListData
 
-GET  /purchase/finance                        ErpPurchaseFinance.Index
-POST /purchase/finance/data/list              ErpPurchaseFinance.ListData
-POST /purchase/finance/purchase               ErpPurchaseFinance.Purchase
-POST /purchase/finance/entry/list             ErpPurchaseFinance.EntryList
-POST /purchase/finance/entry/pay/amount       ErpPurchaseFinance.EntryPayAmount
-POST /purchase/finance/entry/pay/amount/save  ErpPurchaseFinance.EntryPayAmountSave
-POST /purchase/finance/entry/price            ErpPurchaseFinance.EntryPrice
-POST /purchase/finance/entry/price/save       ErpPurchaseFinance.EntryPriceSave
-POST /purchase/finance/entry/purchase         ErpPurchaseFinance.PurchaseEntry
-POST /purchase/finance/pay/final/amount       ErpPurchaseFinance.PayFinalAmount
-POST /purchase/finance/complete               ErpPurchaseFinance.Complete
+GET  /purchase/finance                                ErpPurchaseFinance.Index
+POST /purchase/finance/data/list                      ErpPurchaseFinance.ListData
+POST /purchase/finance/purchase                       ErpPurchaseFinance.Purchase
+POST /purchase/finance/entry/list                     ErpPurchaseFinance.EntryList
+POST /purchase/finance/entry/pay/amount               ErpPurchaseFinance.EntryPayAmount
+POST /purchase/finance/entry/pay/amount/save          ErpPurchaseFinance.EntryPayAmountSave
+POST /purchase/finance/entry/price                    ErpPurchaseFinance.EntryPrice
+POST /purchase/finance/entry/price/save               ErpPurchaseFinance.EntryPriceSave
+POST /purchase/finance/entry/pay/final/amount         ErpPurchaseFinance.EntryPayFinalAmount
+POST /purchase/finance/entry/pay/final/amount/save    ErpPurchaseFinance.EntryPayFinalAmountSave
+POST /purchase/finance/entry/purchase                 ErpPurchaseFinance.PurchaseEntry
+POST /purchase/finance/pay/final/amount               ErpPurchaseFinance.PayFinalAmount
+POST /purchase/finance/complete                       ErpPurchaseFinance.Complete
 
 POST /purchase/finance/excel/export           ErpPurchaseFinanceExcel.Export
 

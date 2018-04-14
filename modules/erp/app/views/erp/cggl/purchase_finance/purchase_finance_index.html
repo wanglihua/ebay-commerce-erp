@@ -456,10 +456,13 @@
                             {
                                 "mDataProp": "pbe.final_amount", "title": "尾款", "bSearchable": false, "width": 50, "sClass": "dtRight",
                                 "render": function (data, type, row) {
+                                    return dtFormatFloat(data);
+                                    /*
                                     if (data === 0) {
                                         return "";
                                     }
                                     return dtFormatFloat(data) + "(" + row.fas.name + ")";
+                                    */
                                 }
                             },
                             {
@@ -480,8 +483,9 @@
                                     if (row.pbe.status_id === 4500) {
                                         btn_str += "<a class='btn btn-xs btn-info btn-inline pull-left' style='margin-right: 3px;' onclick='show_entry_price_dialog(" + data + ");' ><i class='ace-icon fa fa-share'></i>下单</a>";
                                     }
-                                    if (row.pbe.final_amount !== 0 && row.pbe.final_amount_status_id === 5900) {
-                                        btn_str += "<a class='btn btn-xs btn-primary btn-inline pull-left' onclick='entry_pay_final_amount(" + data + ");' ><i class='ace-icon fa fa-share'></i>支付尾款</a>";
+                                    // 采购中、已入库、异常、异常已处理
+                                    if (row.pbe.status_id >= 4600 && row.pbe.status_id < 4730) {
+                                        btn_str += "<a class='btn btn-xs btn-primary btn-inline pull-left' onclick='show_entry_pay_final_amount_dialog(" + data + ");' ><i class='ace-icon fa fa-share'></i>付款尾款</a>";
                                     }
                                     return btn_str;
                                 }
@@ -666,26 +670,56 @@
         });
     }
 
-    function entry_pay_final_amount(id) {
-        $.msg.confirm("确认要支付尾款吗？", function () {
+    function show_entry_pay_final_amount_dialog(entry_id) {
+        $.ajax({
+            url: '{%url "ErpPurchaseFinance.EntryPayFinalAmount" %}',
+            type: "POST",
+            data: {"entry_id": entry_id},
+            success: function (result) {
+                $("#purchase_entry_pay_final_amount_dialog_wrapper").html(result);
+                $("#purchase_entry_pay_final_amount_dialog").modal(modalOptions);
+            }
+        });
+    }
+
+    function save_entry_pay_final_amount(id) {
+        showMask("提交中...");
+        var form = $("#purchase_entry_pay_final_amount_form");
+        var valid = validate(form, {
+            'pay_amount': {
+                required: true, number: true
+            },
+            'final_amount': {
+                required: true, number: true
+            }
+        });
+
+        if (!valid) {
+            hideMask();
+        } else {
             $.ajax({
-                url: '{%url "ErpPurchaseFinance.PayFinalAmount"%}',
+                url: '{%url "ErpPurchaseFinance.EntryPayFinalAmountSave"%}',
                 type: "POST",
                 data: {
-                    "entry_id": id
+                    "entry_id": $("#pf_entry_id").val(),
+                    "pay_amount": $("#pf_entry_pay_amount").val(),
+                    "final_amount": $("#pf_entry_final_amount").val()
                 },
                 success: function (data) {
+                    hideMask();
                     if (data.success === false) {
                         $.msg.error(data.message);
                         // return;
-                    } else {
+                    }
+                    else {
                         $.msg.show(data.message);
                         reloadList("#purchaseBillEntryList");
+                        $("#purchase_entry_pay_final_amount_dialog").modal('hide');
                         // return;
                     }
                 }
             });
-        });
+        }
     }
 
     function exportPurchase() {
@@ -708,4 +742,5 @@
 <div id="purchase_bill_entry_list_wrapper"></div>
 <div id="purchase_entry_pay_amount_dialog_wrapper"></div>
 <div id="purchase_entry_price_dialog_wrapper"></div>
+<div id="purchase_entry_pay_final_amount_dialog_wrapper"></div>
 {%footer%}
