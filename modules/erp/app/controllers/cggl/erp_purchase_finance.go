@@ -529,6 +529,8 @@ func (c ErpPurchaseFinance) PurchaseEntry() revel.Result {
 	_, err = db_session.Id(entry_id).Cols("status_id", "pay_time").Update(&purchase_bill_entry)
 	core.HandleError(err)
 
+	purchase_bill_service.UpdateBillStatus(purchase_bill_entry.BillId, models.PURCHASE_BILL_STATUS_CGZ, db_session)
+
 	return c.RenderJson(map[string]interface{}{
 		"success": true,
 		"message": "采购单明细采购下单成功！",

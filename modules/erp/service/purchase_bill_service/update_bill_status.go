@@ -7,11 +7,32 @@ import (
 	"fmt"
 )
 
-func UpdateBillStatus(purchase_bill_entry cggl_models.PurchaseBillEntryInfo, status_id int64, db_session *xorm.Session) {
-	
+func UpdateBillStatus(bill_id int64, status_id int64, db_session *xorm.Session) {
+
+	/*
 	// 查看同一个采购单的明细是不是都是当前设置的这个状态了
 	var bill_id = purchase_bill_entry.BillId
 	count, err := db_session.Where(fmt.Sprintf("bill_id = %d AND status_id <> %d", bill_id, status_id)).Count(new(cggl_models.PurchaseBillEntryInfo))
+	core.HandleError(err)
+
+	// 如果都是当前设置的这个状态了， 就更新采购单的状态
+	if count == 0 {
+		var purchase_bill cggl_models.PurchaseBillInfo
+		_, err = db_session.Id(bill_id).Get(&purchase_bill)
+		core.HandleError(err)
+
+		purchase_bill.StatusId = status_id
+		_, err = db_session.Id(purchase_bill.Id).Cols("status_id").Update(&purchase_bill)
+		core.HandleError(err)
+	}
+	*/
+
+	/*
+	如果采购明细中的状态都不比提供的状态值小，就把采购单的状态也更新为提供的状态
+	 */
+
+	// 查看同一个采购单的明细是不是都是当前设置的这个状态了
+	count, err := db_session.Where(fmt.Sprintf("bill_id = %d AND status_id < %d", bill_id, status_id)).Count(new(cggl_models.PurchaseBillEntryInfo))
 	core.HandleError(err)
 
 	// 如果都是当前设置的这个状态了， 就更新采购单的状态

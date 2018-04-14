@@ -691,6 +691,8 @@ func (c ErpPurchaseBillEntry) Approve() revel.Result {
 
 	purchase_bill_log_service.Insert_purchase_bill_log(purchase_bill, "采购单明细审批", db_session, c.Session)
 
+	purchase_bill_service.UpdateBillStatus(bill_id, models.PURCHASE_BILL_STATUS_YSP, db_session)
+
 	return c.RenderJson(map[string]interface{}{
 		"success": true,
 		"message": "采购单明细审批成功！",

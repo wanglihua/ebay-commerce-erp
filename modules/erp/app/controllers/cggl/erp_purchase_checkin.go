@@ -441,7 +441,7 @@ func (c ErpPurchaseCheckin) CheckinList() revel.Result {
 		_, err := db_session.Id(bill_entry.Id).Cols("status_id", "checkin_qty", "abnormal_type_id", "checkin_time").Update(bill_entry)
 		core.HandleError(err)
 
-		purchase_bill_service.UpdateBillStatus(bill_entry, models.PURCHASE_BILL_STATUS_YRK, db_session)
+		purchase_bill_service.UpdateBillStatus(bill_entry.BillId, models.PURCHASE_BILL_STATUS_YRK, db_session)
 	}
 
 	for _, bill_entry := range bill_entry_list {
