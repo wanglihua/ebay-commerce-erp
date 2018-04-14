@@ -514,9 +514,11 @@ func (c ErpPurchaseBill) Approve() revel.Result {
 	core.HandleError(db_session.In("bill_id", purchase_bill_id_list).Find(&bill_entry_list))
 
 	for _, bill_entry := range bill_entry_list {
-		bill_entry.StatusId = models.PURCHASE_BILL_STATUS_YSP
-		_, err := db_session.Id(bill_entry.Id).Cols("status_id").Update(&bill_entry)
-		core.HandleError(err)
+		if bill_entry.StatusId == models.PURCHASE_BILL_STATUS_YTJ {
+			bill_entry.StatusId = models.PURCHASE_BILL_STATUS_YSP
+			_, err := db_session.Id(bill_entry.Id).Cols("status_id").Update(&bill_entry)
+			core.HandleError(err)
+		}
 	}
 
 	for _, purchase_bill := range purchase_bill_list {
