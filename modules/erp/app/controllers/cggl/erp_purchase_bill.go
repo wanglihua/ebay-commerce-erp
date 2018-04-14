@@ -465,7 +465,8 @@ func (c ErpPurchaseBill) Submit() revel.Result {
 		core.HandleError(err)
 	}
 
-	purchase_bill_service.SetEntriesStatus(purchase_bill_id_list, models.PURCHASE_BILL_STATUS_YTJ, db_session)
+	// 统一设置 entries 状态 
+	purchase_bill_service.SetEntriesStatus(purchase_bill_id_list, models.PURCHASE_BILL_STATUS_YCJ, models.PURCHASE_BILL_STATUS_YTJ, db_session)
 
 	for _, purchase_bill := range purchase_bill_list {
 		purchase_bill_log_service.Insert_purchase_bill_log(purchase_bill, "采购单提交", db_session, c.Session)
@@ -510,6 +511,7 @@ func (c ErpPurchaseBill) Approve() revel.Result {
 		core.HandleError(err)
 	}
 
+	/*
 	var bill_entry_list = make([]cggl_models.PurchaseBillEntryInfo, 0)
 	core.HandleError(db_session.In("bill_id", purchase_bill_id_list).Find(&bill_entry_list))
 
@@ -520,6 +522,9 @@ func (c ErpPurchaseBill) Approve() revel.Result {
 			core.HandleError(err)
 		}
 	}
+	*/
+
+	purchase_bill_service.SetEntriesStatus(purchase_bill_id_list, models.PURCHASE_BILL_STATUS_YTJ, models.PURCHASE_BILL_STATUS_YSP, db_session)
 
 	for _, purchase_bill := range purchase_bill_list {
 		purchase_bill_log_service.Insert_purchase_bill_log(purchase_bill, "采购单审批", db_session, c.Session)

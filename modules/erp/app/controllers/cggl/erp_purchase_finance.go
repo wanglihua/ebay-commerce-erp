@@ -363,7 +363,7 @@ func (c ErpPurchaseFinance) Purchase() revel.Result {
 		purchase_bill_log_service.Insert_purchase_bill_log(purchase_bill, "采购单下单", db_session, c.Session)
 	}
 
-	purchase_bill_service.SetEntriesStatus(purchase_bill_id_list, models.PURCHASE_BILL_STATUS_CGZ, db_session)
+	purchase_bill_service.SetEntriesStatus(purchase_bill_id_list, models.PURCHASE_BILL_STATUS_YSP, models.PURCHASE_BILL_STATUS_CGZ, db_session)
 
 	return c.RenderJson(map[string]interface{}{
 		"success": true,
