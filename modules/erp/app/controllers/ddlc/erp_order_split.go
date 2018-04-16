@@ -131,6 +131,14 @@ func (c ErpOrderSplit) Save() revel.Result {
 	split_order.AddressId = split_order_address.Id
 	_, err = db_session.Id(split_order.Id).Cols("address_id").Update(&split_order)
 
+	var origin_order_item_list = make([]ddlc_models.OrderItemInfo, 0)
+	core.HandleError(db_session.Where("order_id = ?", origin_order.Id).Find(&origin_order_item_list))
+
+	var origin_subtotal_amount float64 = 0
+	for _, origin_order_item := range origin_order_item_list {
+		origin_subtotal_amount = origin_subtotal_amount + origin_order_item.TransactionPrice*float64(origin_order_item.Quantity)
+	}
+
 	var split_subtotal_amount float64 = 0
 	for _, item_quantity_input := range item_quantity_input_list {
 		if item_quantity_input.Qty != 0 {
@@ -158,7 +166,7 @@ func (c ErpOrderSplit) Save() revel.Result {
 		}
 	}
 
-	var split_amount_ratio = split_subtotal_amount / origin_order.SubTotalAmount
+	var split_amount_ratio = split_subtotal_amount / origin_subtotal_amount
 
 	split_order.AdjustmentAmount = origin_order.AdjustmentAmount * split_amount_ratio
 	split_order.AdjustmentAmountRmb = split_order.AdjustmentAmount * split_order.ExchangeRate
