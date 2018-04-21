@@ -507,6 +507,9 @@ func (c ErpPurchaseFinance) EntryPayFinalAmountSave() revel.Result {
 	_, err = db_session.Id(entry_id).Cols("pay_amount", "final_amount", "drawback_amount").Update(&purchase_bill_entry)
 	core.HandleError(err)
 
+	var bill_id = purchase_bill_entry.BillId
+	purchase_bill_service.UpdatePurchaseBillAmount(bill_id, db_session)
+
 	return c.RenderJson(map[string]interface{}{
 		"success": true,
 		"message": "采购明细付款尾款保存成功！",
