@@ -1,4 +1,4 @@
-package order_feedback
+package order_feedback_service
 
 import (
 	"matrix/modules/erp/models/ddlc_models"
