@@ -598,7 +598,17 @@
                                     if (full_tran_id === "") {
                                         full_tran_id = "--";
                                     }
-                                    return "<div class='div_store_name'>" + row.shop_name + "</div><div>" + full_tran_id + "</div>";
+
+                                    var feedback_type_list = row.feedback_type_text_list;
+                                    var feedback_type_html_str = "<div>";
+                                    if (feedback_type_list != null) {
+                                        for (var i = 0; i < feedback_type_list.length; i++) {
+                                            feedback_type_html_str += "<span class='feedback_list_" + feedback_type_list[i] + "'></span>"
+                                        }
+                                    }
+                                    feedback_type_html_str += "</div>";
+
+                                    return "<div class='div_store_name'>" + row.shop_name + "</div><div>" + full_tran_id + "</div>" + feedback_type_html_str;
                                 }
                             },
                             {

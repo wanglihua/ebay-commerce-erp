@@ -17,6 +17,7 @@ import (
 	"matrix/modules/erp/service/stock_service"
 	"matrix/modules/erp/models/ddlc_models"
 	"matrix/modules/erp/models/ddpz_models"
+	"matrix/modules/erp/service/order_feedback_service"
 )
 
 type Order_view_item_t struct {
@@ -112,6 +113,7 @@ FROM erp_order o
 
 	var logistics_company_id_name_map = logistics_company_service.Get_company_id_name_map(company_id_set.List(), db_session)
 	var logistics_mode_id_name_map = logistics_mode_service.Get_logistics_mode_id_name_map(mode_id_set.List(), db_session)
+	var order_feedback_type_map = order_feedback_service.Get_order_feedback_type_map(order_id_list, db_session)
 
 	for index, order := range order_list {
 		order_list[index].TypeName = order_type_id_name_map[order.Order.TypeId]
@@ -172,6 +174,8 @@ FROM erp_order o
 
 			order_list[index].OrderTag = order_tag
 		}
+
+		order_list[index].FeedbackTypeTextList = order_feedback_type_map[order.Order.Id]
 	}
 
 	var order_count struct {
