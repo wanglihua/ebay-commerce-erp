@@ -483,7 +483,7 @@ div.gridToolBar .dropdown-menu > li > a:hover {
     cursor: pointer;
 }
 
-span.feedback_negative {
+span.feedback_detail_negative {
     display: inline-block;
     background-image: url("images/star.png");
     background-repeat: no-repeat;
@@ -491,7 +491,7 @@ span.feedback_negative {
     background-position: 0 -33px;
 }
 
-span.feedback_neutral {
+span.feedback_detail_neutral {
     display: inline-block;
     background-image: url("images/star.png");
     background-repeat: no-repeat;
@@ -499,7 +499,7 @@ span.feedback_neutral {
     background-position: 0 -65px;
 }
 
-span.feedback_positive {
+span.feedback_detail_positive {
     display: inline-block;
     background-image: url("images/star.png");
     background-repeat: no-repeat;
@@ -507,10 +507,38 @@ span.feedback_positive {
     background-position: 0 -5px;
 }
 
-span.feedback_multi {
+span.feedback_list_negative {
     display: inline-block;
     background-image: url("images/star.png");
     background-repeat: no-repeat;
+    width: 24px;
+    height: 24px;
+    background-position: 0 -33px;
+}
+
+span.feedback_list_neutral {
+    display: inline-block;
+    background-image: url("images/star.png");
+    background-repeat: no-repeat;
+    width: 24px;
+    height: 24px;
+    background-position: 0 -65px;
+}
+
+span.feedback_list_positive {
+    display: inline-block;
+    background-image: url("images/star.png");
+    background-repeat: no-repeat;
+    width: 24px;
+    height: 24px;
+    background-position: 0 -5px;
+}
+
+span.feedback_list_multi {
+    display: inline-block;
+    background-image: url("images/star.png");
+    background-repeat: no-repeat;
+    width: 24px;
     height: 24px;
     background-position: 0 -95px;
 }
