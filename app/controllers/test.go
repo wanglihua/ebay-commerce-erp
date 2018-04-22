@@ -9,5 +9,5 @@ type Test struct {
 }
 
 func (c Test) Index() revel.Result {
-	return c.RenderEmpty()
+	return c.RenderTemplate("test/test_index.html")
 }
