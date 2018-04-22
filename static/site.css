@@ -487,7 +487,6 @@ span.feedback_negative {
     display: inline-block;
     background-image: url("images/star.png");
     background-repeat: no-repeat;
-    width: 24px;
     height: 24px;
     background-position: 0 -33px;
 }
@@ -496,7 +495,6 @@ span.feedback_neutral {
     display: inline-block;
     background-image: url("images/star.png");
     background-repeat: no-repeat;
-    width: 24px;
     height: 24px;
     background-position: 0 -65px;
 }
@@ -505,7 +503,6 @@ span.feedback_positive {
     display: inline-block;
     background-image: url("images/star.png");
     background-repeat: no-repeat;
-    width: 24px;
     height: 24px;
     background-position: 0 -5px;
 }
@@ -514,7 +511,6 @@ span.feedback_multi {
     display: inline-block;
     background-image: url("images/star.png");
     background-repeat: no-repeat;
-    width: 24px;
     height: 24px;
     background-position: 0 -95px;
 }

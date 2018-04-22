@@ -812,6 +812,7 @@ func (c ErpOrder) Detail(order_id int64) revel.Result {
 
 	var order_feedback_list = order_feedback_service.Get_order_feedback_list(order_id, db_session)
 	c.RenderArgs["order_feedback_list"] = order_feedback_list
+	c.RenderArgs["order_feedback_list_len"] = len(order_feedback_list)
 
 	return c.RenderTemplate("erp/ddlc/order/order_detail.html")
 }

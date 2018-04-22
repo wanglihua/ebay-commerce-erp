@@ -75,18 +75,24 @@
                             </div>
                         </div>
                     </div>
+                    {% if ne .order_feedback_list_len 0 %}
                     <div class="row">
                         <div class="col-xs-12">
                             <div class="form-group">
                                 <label for="order_desc" class="col-xs-1 control-label">订单评价：</label>
                                 <div class="col-xs-11">
                                     {% range $index, $feedback := .order_feedback_list %}
-                                    <div><span class="feedback_{% $feedback.OrderFeedback.CommentTypeText %}"></span>{% $feedback.OrderFeedback.CommentTypeText %}，SKU：{% $feedback.OrderItem.ItemSku %}, 评价时间：{% $feedback.OrderFeedback.CommentTimeText %}，评价：{% $feedback.OrderFeedback.CommentText %}</div>
+                                    <div>
+                                        <span style="padding-left:25px;line-height: 24px;" class="feedback_{% $feedback.OrderFeedback.CommentTypeText %}">
+{% $feedback.OrderFeedback.CommentTypeText %}，SKU：{% $feedback.OrderItem.ItemSku %}, 评价时间：{% $feedback.OrderFeedback.CommentTimeText %}，评价：{% $feedback.OrderFeedback.CommentText %}
+                                        </span>
+                                    </div>
                                     {% end %}
                                 </div>
                             </div>
                         </div>
                     </div>
+                    {% end %}
                     <div class="row">
                         <div class="col-xs-12">
                             <div class="form-group">
