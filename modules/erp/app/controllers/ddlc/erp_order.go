@@ -33,6 +33,7 @@ import (
 	"math"
 	"strconv"
 	"matrix/modules/erp/service/order_ebay_service"
+	"matrix/modules/erp/service/order_feedback_service"
 )
 
 type ErpOrder struct {
@@ -808,6 +809,9 @@ func (c ErpOrder) Detail(order_id int64) revel.Result {
 
 	var can_reship = order.StatusId == models.ORDER_STATUS_YFH || order.StatusId == models.ORDER_STATUS_YWC
 	c.RenderArgs["can_reship"] = can_reship
+
+	var order_feedback_list = order_feedback_service.Get_order_feedback_list(order_id, db_session)
+	c.RenderArgs["order_feedback_list"] = order_feedback_list
 
 	return c.RenderTemplate("erp/ddlc/order/order_detail.html")
 }

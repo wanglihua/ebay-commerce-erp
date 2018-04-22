@@ -80,7 +80,9 @@
                             <div class="form-group">
                                 <label for="order_desc" class="col-xs-1 control-label">订单评价：</label>
                                 <div class="col-xs-11">
-                                    <div>中评，SKU：ewwewe, 评价时间：，评价：</div>
+                                    {% range $index, $feedback := .order_feedback_list %}
+                                    <div>中评，SKU：{% $feedback.OrderItem.ItemSku %}, 评价时间：{% $feedback.OrderFeedback.CommentTimeText %}，评价：{% $feedback.OrderFeedback.CommentText %}</div>
+                                    {% end %}
                                 </div>
                             </div>
                         </div>
