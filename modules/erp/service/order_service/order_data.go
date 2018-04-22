@@ -34,6 +34,7 @@ type Order_view_item_t struct {
 	ModeName             string                               `json:"mode_name"`
 	FeeDiff              float64                              `json:"fee_diff"`
 	OrderTag             ddpz_models.OrderTagInfo             `json:"order_tag"`
+	FeedbackTypeTextList []string                             `json:"feedback_type_text_list"`
 }
 
 func Get_order_data_list(db_session *xorm.Session, filter string, order string, offset int64, limit int64) ([]Order_view_item_t, int64) {
