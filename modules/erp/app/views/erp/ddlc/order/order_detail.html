@@ -84,7 +84,7 @@
                                     {% range $index, $feedback := .order_feedback_list %}
                                     <div>
                                         <span style="padding-left:25px;line-height: 24px;" class="feedback_detail_{% $feedback.OrderFeedback.CommentTypeText %}">
-{% $feedback.OrderFeedback.CommentTypeText %}，SKU：{% $feedback.OrderItem.ItemSku %}, 评价时间：{% $feedback.OrderFeedback.CommentTimeText %}，评价：{% $feedback.OrderFeedback.CommentText %}
+{% $feedback.OrderFeedback.CommentTypeText %}，SKU：{% $feedback.OrderItem.ItemSku %}, 评价时间：{% $feedback.OrderFeedback.CommentTimeText %}，评论：{% $feedback.OrderFeedback.CommentText %}
                                         </span>
                                     </div>
                                     {% end %}
