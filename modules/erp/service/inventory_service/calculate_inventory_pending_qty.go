@@ -8,7 +8,6 @@ import (
 	"matrix/core"
 	"fmt"
 	"matrix/modules/erp/models"
-	"matrix/modules/erp/models/ddpz_models"
 )
 
 // 计算更新库存的 待发货 数量
@@ -66,20 +65,37 @@ SET nvt.pending_qty = pending_nvt.qty;
 # 匹配时要考虑 原数据表中 待发货的 数量 和 本次匹配造成的 代发货的数量
 	 */
 
+	/*
+   var sql_update_inventory_pending_qty = `
+UPDATE erp_inventory nvt INNER JOIN
+   (SELECT nvt_inner.stock_id AS stock_id, nvt_inner.product_id AS product_id, ifnull(pending_order_item.qty, 0) AS qty
+	FROM erp_inventory nvt_inner
+		LEFT JOIN (SELECT o.stock_id AS stock_id, oi.item_product_id AS product_id, sum(oi.quantity) AS qty
+				   FROM erp_order o
+					   INNER JOIN erp_order_item oi ON (o.status_id = %d OR o.status_id = %d OR o.status_id = %d OR (o.status_id = %d AND (o.hold_type_id = %d OR o.hold_type_id = %d OR o.hold_type_id = %d OR o.hold_type_id = %d))) AND oi.order_id = o.id
+				   GROUP BY o.stock_id, oi.item_product_id)
+				  pending_order_item
+			ON nvt_inner.stock_id = pending_order_item.stock_id AND nvt_inner.product_id = pending_order_item.product_id)
+   pending_nvt
+	   ON nvt.stock_id = pending_nvt.stock_id AND nvt.product_id = pending_nvt.product_id
+SET nvt.pending_qty = pending_nvt.qty;`
+   sql_update_inventory_pending_qty = fmt.Sprintf(sql_update_inventory_pending_qty, models.ORDER_STATUS_DPH, models.ORDER_STATUS_PHZ, models.ORDER_STATUS_PROCESSED_HOLD, models.ORDER_STATUS_HOLD, ddpz_models.ORDER_HOLD_TYPE_PICK_UP, ddpz_models.ORDER_HOLD_TYPE_ENVELOPE, ddpz_models.ORDER_HOLD_TYPE_EXPRESS, ddpz_models.ORDER_HOLD_TYPE_INTERNATIONAL)
+	*/
+
 	var sql_update_inventory_pending_qty = `
 UPDATE erp_inventory nvt INNER JOIN
     (SELECT nvt_inner.stock_id AS stock_id, nvt_inner.product_id AS product_id, ifnull(pending_order_item.qty, 0) AS qty
      FROM erp_inventory nvt_inner
          LEFT JOIN (SELECT o.stock_id AS stock_id, oi.item_product_id AS product_id, sum(oi.quantity) AS qty
                     FROM erp_order o
-                        INNER JOIN erp_order_item oi ON (o.status_id = %d OR o.status_id = %d OR o.status_id = %d OR (o.status_id = %d AND (o.hold_type_id = %d OR o.hold_type_id = %d OR o.hold_type_id = %d OR o.hold_type_id = %d))) AND oi.order_id = o.id
+                        INNER JOIN erp_order_item oi ON (o.status_id = %d OR o.status_id = %d OR o.status_id = %d OR o.status_id = %d) AND oi.order_id = o.id
                     GROUP BY o.stock_id, oi.item_product_id)
                    pending_order_item
              ON nvt_inner.stock_id = pending_order_item.stock_id AND nvt_inner.product_id = pending_order_item.product_id)
     pending_nvt
         ON nvt.stock_id = pending_nvt.stock_id AND nvt.product_id = pending_nvt.product_id
 SET nvt.pending_qty = pending_nvt.qty;`
-	sql_update_inventory_pending_qty = fmt.Sprintf(sql_update_inventory_pending_qty, models.ORDER_STATUS_DPH, models.ORDER_STATUS_PHZ, models.ORDER_STATUS_PROCESSED_HOLD, models.ORDER_STATUS_HOLD, ddpz_models.ORDER_HOLD_TYPE_PICK_UP, ddpz_models.ORDER_HOLD_TYPE_ENVELOPE, ddpz_models.ORDER_HOLD_TYPE_EXPRESS, ddpz_models.ORDER_HOLD_TYPE_INTERNATIONAL)
+	sql_update_inventory_pending_qty = fmt.Sprintf(sql_update_inventory_pending_qty, models.ORDER_STATUS_DPH, models.ORDER_STATUS_PHZ, models.ORDER_STATUS_PROCESSED_HOLD, models.ORDER_STATUS_HOLD)
 
 	_, err = db_session.Exec(sql_update_inventory_pending_qty)
 	core.HandleError(err)
