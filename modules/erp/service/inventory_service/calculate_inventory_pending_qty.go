@@ -80,6 +80,20 @@ UPDATE erp_inventory nvt INNER JOIN
 	   ON nvt.stock_id = pending_nvt.stock_id AND nvt.product_id = pending_nvt.product_id
 SET nvt.pending_qty = pending_nvt.qty;`
    sql_update_inventory_pending_qty = fmt.Sprintf(sql_update_inventory_pending_qty, models.ORDER_STATUS_DPH, models.ORDER_STATUS_PHZ, models.ORDER_STATUS_PROCESSED_HOLD, models.ORDER_STATUS_HOLD, ddpz_models.ORDER_HOLD_TYPE_PICK_UP, ddpz_models.ORDER_HOLD_TYPE_ENVELOPE, ddpz_models.ORDER_HOLD_TYPE_EXPRESS, ddpz_models.ORDER_HOLD_TYPE_INTERNATIONAL)
+
+
+UPDATE erp_inventory nvt INNER JOIN
+    (SELECT nvt_inner.stock_id AS stock_id, nvt_inner.product_id AS product_id, ifnull(pending_order_item.qty, 0) AS qty
+     FROM erp_inventory nvt_inner
+         LEFT JOIN (SELECT o.stock_id AS stock_id, oi.item_product_id AS product_id, sum(oi.quantity) AS qty
+                    FROM erp_order o
+                        INNER JOIN erp_order_item oi ON (o.status_id = 4000 OR o.status_id = 4100 OR o.status_id = 3950) AND oi.order_id = o.id
+                    GROUP BY o.stock_id, oi.item_product_id)
+                   pending_order_item
+             ON nvt_inner.stock_id = pending_order_item.stock_id AND nvt_inner.product_id = pending_order_item.product_id)
+    pending_nvt
+        ON nvt.stock_id = pending_nvt.stock_id AND nvt.product_id = pending_nvt.product_id
+SET nvt.pending_qty = pending_nvt.qty;
 	*/
 
 	var sql_update_inventory_pending_qty = `
