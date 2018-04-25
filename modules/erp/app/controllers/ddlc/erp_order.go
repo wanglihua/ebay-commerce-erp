@@ -219,6 +219,7 @@ const (
 	good_query_empty_waybill_number     int64 = 4000 // 运单号为空
 	good_query_not_empty_waybill_number int64 = 5000 // 运单号不为空
 	good_query_hold_order               int64 = 6000 // hold订单
+	good_query_feedback_negative        int64 = 7000 // 差评订单
 )
 
 type good_query struct {
@@ -236,6 +237,7 @@ func (c ErpOrder) get_good_query_list() []good_query {
 	good_query_list = append(good_query_list, good_query{Id: good_query_empty_waybill_number, Name: "运单号为空"})
 	good_query_list = append(good_query_list, good_query{Id: good_query_not_empty_waybill_number, Name: "运单号不为空"})
 	good_query_list = append(good_query_list, good_query{Id: good_query_hold_order, Name: "hold订单"})
+	good_query_list = append(good_query_list, good_query{Id: good_query_feedback_negative, Name: "差评订单"})
 
 	return good_query_list
 }
@@ -721,6 +723,22 @@ o.id IN (
 			filter = core.SqlAnd(filter, "(o.waybill_number IS NOT NULL AND o.waybill_number <> '')")
 		} else if good_query_id == good_query_hold_order {
 			filter = core.SqlAnd(filter, "(o.hold_type_id IS NOT NULL AND o.hold_type_id <> 0)")
+		} else if good_query_id == good_query_feedback_negative {
+			/*
+SELECT of.order_id
+FROM erp_order_feedback of
+WHERE of.comment_type = 1;
+			 */
+
+			var good_query = `
+o.id IN (
+    SELECT of.order_id
+    FROM erp_order_feedback of
+    WHERE of.comment_type = %d  
+)`
+			good_query = fmt.Sprintf(good_query, order_feedback_service.ORDER_FEEDBACK_NEGATIVE)
+
+			filter = core.SqlAnd(filter, good_query)
 		}
 	}
 
