@@ -54,38 +54,38 @@
             <script type="text/javascript">
                 function refreshPassCache() {
                     $.ajax({
-                            url: '{%url "AuthUser.RefreshPassCache" %}',
-                            type: "POST",
-                            success: function (result) {
-                                if (result.success === false) {
-                                    $.msg.error(result.message);
-                                    return;
-                                }
-                                else {
-                                    $.msg.show(result.message);
-                                    return;
+                                url: '{%url "AuthUser.RefreshPassCache" %}',
+                                type: "POST",
+                                success: function (result) {
+                                    if (result.success === false) {
+                                        $.msg.error(result.message);
+                                        return;
+                                    }
+                                    else {
+                                        $.msg.show(result.message);
+                                        return;
+                                    }
                                 }
                             }
-                        }
                     );
                 }
 
                 function showUserDetail(id) {
                     $.ajax({
-                            url: '{%url "AuthUser.Detail" %}',
-                            type: "POST",
-                            data: {
-                                "id": id
-                            },
-                            success: function (result) {
-                                if (result.success === false) {
-                                    $.msg.error(result.message);
-                                    return;
+                                url: '{%url "AuthUser.Detail" %}',
+                                type: "POST",
+                                data: {
+                                    "id": id
+                                },
+                                success: function (result) {
+                                    if (result.success === false) {
+                                        $.msg.error(result.message);
+                                        return;
+                                    }
+                                    $("#userDetailDialogWrapper").html(result);
+                                    $('#userDetailDialog').modal(modalOptions);
                                 }
-                                $("#userDetailDialogWrapper").html(result);
-                                $('#userDetailDialog').modal(modalOptions);
                             }
-                        }
                     );
                 }
 
@@ -105,20 +105,20 @@
                     var selected_user_id = id_list[0];
 
                     $.ajax({
-                            url: '{%url "AuthUser.OrderHistory" %}',
-                            type: "POST",
-                            data: {
-                                "user_id": selected_user_id
-                            },
-                            success: function (result) {
-                                if (result.success === false) {
-                                    $.msg.error(result.message);
-                                    return;
+                                url: '{%url "AuthUser.OrderHistory" %}',
+                                type: "POST",
+                                data: {
+                                    "user_id": selected_user_id
+                                },
+                                success: function (result) {
+                                    if (result.success === false) {
+                                        $.msg.error(result.message);
+                                        return;
+                                    }
+                                    $("#userOrderHistoryDialogWrapper").html(result);
+                                    $('#userOrderHistoryDialog').modal(modalOptions);
                                 }
-                                $("#userOrderHistoryDialogWrapper").html(result);
-                                $('#userOrderHistoryDialog').modal(modalOptions);
                             }
-                        }
                     );
                 }
 
@@ -208,37 +208,38 @@
 
                 $(function () {
                     initDataTable(
-                        '#userList',
-                        {
-                            "sAjaxSource": '{%url "AuthUser.ListData"%}',
-                            "aaSorting": [[1, "asc"]],
-                            "aoColumns": [
-                                {
-                                    "mDataProp": "u.id",
-                                    "bSearchable": false,
-                                    "orderable": false,
-                                    "sClass": "center",
-                                    "width": 50,
-                                    "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
-                                    "render": function (data, type, row) {
-                                        return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
-                                    }
-                                },
-                                {"mDataProp": "u.login_name", "title": "工号", "bSearchable": true, "width": 120},
-                                {"mDataProp": "u.nick_name", "title": "姓名", "bSearchable": true, "width": 120},
-                                {"mDataProp": "u.sex", "title": "性别", "bSearchable": true, "width": 70},
-                                {
-                                    "mDataProp": "group_names",
-                                    "title": "群组",
-                                    "bSearchable": false,
-                                    "bSortable": false,
-                                    "width": 120
-                                },
-                                {"mDataProp": "u.phone", "title": "联系电话", "bSearchable": true},
-                                {"mDataProp": "u.create_time", "title": "创建时间", "bSearchable": false, "width": 120},
-                                {"mDataProp": "u.update_time", "title": "修改时间", "bSearchable": false, "width": 120}
-                            ]
-                        }
+                            '#userList',
+                            {
+                                "sAjaxSource": '{%url "AuthUser.ListData"%}',
+                                "aaSorting": [[1, "asc"]],
+                                "aoColumns": [
+                                    {
+                                        "mDataProp": "u.id",
+                                        "bSearchable": false,
+                                        "orderable": false,
+                                        "sClass": "center",
+                                        "width": 50,
+                                        "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
+                                        "render": function (data, type, row) {
+                                            return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
+                                        }
+                                    },
+                                    {"mDataProp": "u.login_name", "title": "工号", "bSearchable": true, "width": 120},
+                                    {"mDataProp": "u.nick_name", "title": "姓名", "bSearchable": true, "width": 120},
+                                    {"mDataProp": "u.sex", "title": "性别", "bSearchable": true, "width": 70},
+                                    {
+                                        "mDataProp": "group_names",
+                                        "title": "群组",
+                                        "bSearchable": false,
+                                        "bSortable": false,
+                                        "width": 120
+                                    },
+                                    {"mDataProp": "u.phone", "title": "联系电话", "bSearchable": true},
+                                    {"mDataProp": "s.name", "title": "状态", "bSearchable": true, "width": 120},
+                                    {"mDataProp": "u.create_time", "title": "创建时间", "bSearchable": false, "width": 120},
+                                    {"mDataProp": "u.update_time", "title": "修改时间", "bSearchable": false, "width": 120}
+                                ]
+                            }
                     );
 
                     $('#userList tbody').on('dblclick', 'tr', function () {

@@ -6,12 +6,12 @@ import (
 
 type PaypalAccountInfo struct {
 	Id            int64           `xorm:"bigint notnull pk autoincr 'id'" json:"id"`
-	PaypalAccount string          `xorm:"nvarchar(200) notnull index unique 'paypal_account'" json:"paypal_account" smith:"verbose_name=Paypal账号,min=2,max=100"`
-	ClientId      string          `xorm:"nvarchar(200) notnull 'client_id'" json:"client_id" smith:"verbose_name=ClientId,min=2,max=200"`
-	Secret        string          `xorm:"nvarchar(200) notnull 'secret'" json:"secret" smith:"verbose_name=Secret,min=2,max=200"`
-	Balance       core.NullFloat  `xorm:"float null 'balance'" json:"balance" smith:"verbose_name=余额,min=0"`
-	Desc          core.NullString `xorm:"nvarchar(500) 'desc'" json:"desc" smith:"verbose_name=描述,max=500"`
-	StatusId      int64           `xorm:"bigint notnull index 'status_id'" json:"status_id" smith:"verbose_name=状态"`
+	PaypalAccount string          `xorm:"nvarchar(200) notnull index unique 'paypal_account'" json:"paypal_account"`
+	ClientId      string          `xorm:"nvarchar(200) notnull 'client_id'" json:"client_id"`
+	Secret        string          `xorm:"nvarchar(200) notnull 'secret'" json:"secret"`
+	Balance       core.NullFloat  `xorm:"float null 'balance'" json:"balance"`
+	Desc          core.NullString `xorm:"nvarchar(500) 'desc'" json:"desc"`
+	StatusId      int64           `xorm:"bigint notnull index 'status_id'" json:"status_id"`
 	CreateTime    core.Time       `xorm:"created notnull 'create_time'" json:"create_time"`
 	UpdateTime    core.Time       `xorm:"updated notnull 'update_time'" json:"update_time"`
 }

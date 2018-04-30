@@ -26,7 +26,7 @@ func (c ErpPaypalAccount) Index() revel.Result {
 
 type ErpPaypalAccountViewItem struct {
 	xtpz_models.PaypalAccountInfo `xorm:"extends" json:"a"`
-	models.StatusInfo        `xorm:"extends" json:"s"`
+	models.StatusInfo             `xorm:"extends" json:"s"`
 }
 
 func (c ErpPaypalAccount) ListData() revel.Result {
@@ -42,7 +42,7 @@ func (c ErpPaypalAccount) ListData() revel.Result {
 	*/
 
 	query := db_session.
-	Select("a.*, s.*").
+		Select("a.*, s.*").
 		Table("erp_paypal_account").Alias("a").
 		Join("INNER", []string{"erp_status", "s"}, "a.status_id = s.id").
 		Where(filter)
@@ -72,7 +72,7 @@ func (c ErpPaypalAccount) ListData() revel.Result {
 
 type PaypalAccountDetailForm struct {
 	PaypalAccount xtpz_models.PaypalAccountInfo `json:"paypal_account"`
-	StatusList    []models.StatusInfo      `json:"status_list"`
+	StatusList    []models.StatusInfo           `json:"status_list"`
 }
 
 func (f *PaypalAccountDetailForm) IsCreate() bool {
@@ -85,23 +85,23 @@ func (f *PaypalAccountDetailForm) Valid(validation *revel.Validation) bool {
 		validation.MinSize(f.PaypalAccount.PaypalAccount, 2).Message("Paypal账号长度不能小于2！")
 	}
 	if f.PaypalAccount.PaypalAccount != "" {
-		validation.MaxSize(f.PaypalAccount.PaypalAccount, 100).Message("Paypal账号长度不能大于100！")
+		validation.MaxSize(f.PaypalAccount.PaypalAccount, 200).Message("Paypal账号长度不能大于200！")
 	}
 
-	validation.Required(f.PaypalAccount.ApiAccount).Message("API账号不能为空！")
-	if f.PaypalAccount.ApiAccount != "" {
-		validation.MinSize(f.PaypalAccount.ApiAccount, 2).Message("API账号长度不能小于2！")
+	validation.Required(f.PaypalAccount.ClientId).Message("ClientId不能为空！")
+	if f.PaypalAccount.ClientId != "" {
+		validation.MinSize(f.PaypalAccount.ClientId, 2).Message("ClientId长度不能小于2！")
 	}
-	if f.PaypalAccount.ApiAccount != "" {
-		validation.MaxSize(f.PaypalAccount.ApiAccount, 100).Message("API账号长度不能大于100！")
+	if f.PaypalAccount.ClientId != "" {
+		validation.MaxSize(f.PaypalAccount.ClientId, 200).Message("ClientId长度不能大于200！")
 	}
 
-	validation.Required(f.PaypalAccount.ApiToken).Message("API令牌不能为空！")
-	if f.PaypalAccount.ApiToken != "" {
-		validation.MinSize(f.PaypalAccount.ApiToken, 2).Message("API令牌长度不能小于2！")
+	validation.Required(f.PaypalAccount.Secret).Message("Secret不能为空！")
+	if f.PaypalAccount.Secret != "" {
+		validation.MinSize(f.PaypalAccount.Secret, 2).Message("Secret长度不能小于2！")
 	}
-	if f.PaypalAccount.ApiToken != "" {
-		validation.MaxSize(f.PaypalAccount.ApiToken, 100).Message("API令牌长度不能大于100！")
+	if f.PaypalAccount.Secret != "" {
+		validation.MaxSize(f.PaypalAccount.Secret, 200).Message("Secret长度不能大于100！")
 	}
 
 	if f.PaypalAccount.Desc.Valid == true {

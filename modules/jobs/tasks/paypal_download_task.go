@@ -62,12 +62,12 @@ func (t PaypalDownloadTask) Run() {
 	core.HandleError(err)
 
 	for _, paypal_account := range paypal_account_list {
-		if strings.TrimSpace(paypal_account.ApiAccount) == "" || strings.TrimSpace(paypal_account.ApiToken) == "" {
+		if strings.TrimSpace(paypal_account.ClientId) == "" || strings.TrimSpace(paypal_account.Secret) == "" {
 			//如果账号里面没有设置api相关，就没有必要调用
 			continue
 		}
 
-		client, err := paypalsdk.NewClient(paypal_account.ApiAccount, paypal_account.ApiToken, paypal_api_base)
+		client, err := paypalsdk.NewClient(paypal_account.ClientId, paypal_account.Secret, paypal_api_base)
 		if err != nil {
 			revel.ERROR.Println("paypalsdk NewClient error:", err.Error())
 		}

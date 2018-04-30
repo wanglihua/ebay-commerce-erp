@@ -13,6 +13,7 @@ type UserInfo struct {
 	Phone        core.NullString `xorm:"nvarchar(50) null 'phone'" json:"phone" smith:"verbose_name=联系电话,max=30"`
 	Sex          core.NullString `xorm:"nvarchar(10) null 'sex'" json:"sex" smith:"verbose_name=性别,max=4"`
 	IsDefaultPwd int64           `xorm:"bigint notnull 'is_default_pwd'" json:"is_default_pwd" smith:"verbose_name=是否为默认密码"` // <0 否， >0 是
+	StatusId     int64           `xorm:"bigint notnull 'status_id' default(6100)" json:"status_id"`
 	CreateTime   core.Time       `xorm:"created notnull 'create_time'" json:"create_time"`
 	UpdateTime   core.Time       `xorm:"updated notnull 'update_time'" json:"update_time"`
 }

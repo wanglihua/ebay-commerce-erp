@@ -41,13 +41,16 @@ func (c AuthUser) ListData() revel.Result {
 	}
 
 	/*
-	SELECT u.* FROM auth_user u
+SELECT u.*, s.*
+FROM auth_user u
+    INNER JOIN erp_status s ON u.status_id = s.id;
 	 */
 
 	var sb = core.NewSqlBuilder()
-	sb.Select("u.*")
+	sb.Select("u.*, s.*")
 	sb.Count("count(u.id) AS user_count")
-	sb.From("auth_user u")
+	sb.From(`auth_user u
+    INNER JOIN erp_status s ON u.status_id = s.id`)
 	sb.Where(filter)
 
 	if order != "" {

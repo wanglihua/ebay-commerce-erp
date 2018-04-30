@@ -32,6 +32,7 @@ const (
 	STATUS_TYPE_CONTAINER_TRANSFER               = 2200 // 集装箱调拨状态
 	STATUS_TYPE_INTEL_REPL                       = 2300 // 智能补货
 	STATUS_TYPE_PURCHASE_BILL_ENTRY_FINAL_AMOUNT = 2400 // 采购单明细尾款状态
+	STATUS_TYPE_USER                             = 2500 // 用户状态
 
 	//状态类型 end
 
@@ -129,6 +130,9 @@ const (
 
 	PURCHASE_BILL_ENTRY_FINAL_AMOUNT_STATUS_WZF = 5900 // 采购单明细尾款 未支付
 	PURCHASE_BILL_ENTRY_FINAL_AMOUNT_STATUS_YZF = 6000 // 采购单明细尾款 已支付
+
+	USER_STATUS_ENABLED  = 6100 // 用户状态 启用
+	USER_STATUS_DISABLED = 6200 // 用户状态 停用
 
 	//状态 id end
 )
@@ -701,6 +705,22 @@ func (e StatusInfo) InitData(db_session *xorm.Session) {
 		status.Type = STATUS_TYPE_PURCHASE_BILL_ENTRY_FINAL_AMOUNT
 		status.Name = "已支付"
 		status.Desc = core.MakeNullString("采购单明细尾款状态 已支付", true)
+		db_session.Insert(status)
+	}
+
+	{
+		status := new(StatusInfo)
+		status.Id = USER_STATUS_ENABLED
+		status.Type = STATUS_TYPE_USER
+		status.Name = "已启用"
+		status.Desc = core.MakeNullString("用户状态 已启用", true)
+		db_session.Insert(status)
+
+		status = new(StatusInfo)
+		status.Id = USER_STATUS_DISABLED
+		status.Type = STATUS_TYPE_USER
+		status.Name = "已停用"
+		status.Desc = core.MakeNullString("用户状态 已停用", true)
 		db_session.Insert(status)
 	}
 }
