@@ -6,9 +6,10 @@ import (
 	"matrix/core"
 	"matrix/core/captcha"
 	"matrix/modules/auth/forms"
-	"matrix/modules/auth/models"
+	auth_models "matrix/modules/auth/models"
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/erp/service/login_log_service"
+	"matrix/modules/erp/models"
 )
 
 type Login struct {
@@ -31,7 +32,7 @@ func (c Login) Login() revel.Result {
 		return c.RenderJson(core.JsonResult{Success: false, Message: c.GetValidationErrorMessage()})
 	}
 
-	var user models.UserInfo
+	var user auth_models.UserInfo
 	has, err := db_session.Where("login_name = ?", form.LoginName).Get(&user)
 	core.HandleError(err)
 
@@ -51,6 +52,10 @@ func (c Login) Login() revel.Result {
 		return c.RenderJson(core.JsonResult{Success: false, Message: "验证码错误！"})
 	}
 
+	if user.StatusId != models.USER_STATUS_ENABLED {
+		return c.RenderJson(core.JsonResult{Success: false, Message: "用户未启用！"})
+	}
+
 	c.makePreviousSessionExpire()
 
 	//将当前登录用户信息放入Session中
@@ -60,7 +65,7 @@ func (c Login) Login() revel.Result {
 	loginUser.NickName = user.NickName
 
 	// 是不是管理员
-	var admin_user models.AdminInfo
+	var admin_user auth_models.AdminInfo
 	has, err = db_session.Where("user_id = ?", user.Id).Get(&admin_user)
 	core.HandleError(err)
 
