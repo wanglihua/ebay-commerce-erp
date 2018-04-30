@@ -8,11 +8,12 @@ import (
 	"github.com/revel/revel"
 	"matrix/core"
 	"matrix/modules/auth/forms"
-	"matrix/modules/auth/models"
+	auth_models "matrix/modules/auth/models"
 	"matrix/modules/auth/pass_res"
 	"matrix/modules/auth/service/auth_setting_service"
 	"matrix/modules/auth/service/group_service"
 	"matrix/modules/auth/service/pass_service"
+	"matrix/modules/erp/models"
 )
 
 type AuthUser struct {
@@ -36,8 +37,9 @@ func (c AuthUser) ListData() revel.Result {
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
 	type user_t struct {
-		User       models.UserInfo `xorm:"extends" json:"u"`
-		GroupNames string          `xorm:"-" json:"group_names"`
+		User       auth_models.UserInfo `xorm:"extends" json:"u"`
+		Status     models.StatusInfo    `xorm:"extends" json:"s"`
+		GroupNames string               `xorm:"-" json:"group_names"`
 	}
 
 	/*
@@ -110,7 +112,7 @@ func (c AuthUser) Detail() revel.Result {
 
 	form := new(forms.UserDetailForm)
 
-	user := new(models.UserInfo)
+	user := new(auth_models.UserInfo)
 	if userId != 0 {
 		has, err := db_session.Id(userId).Get(user)
 		core.HandleError(err)
@@ -146,7 +148,7 @@ func (c AuthUser) Save() revel.Result {
 
 	var affected int64
 	if form.IsCreate() {
-		count, err := session.Where("login_name = ?", user.LoginName).Count(new(models.UserInfo))
+		count, err := session.Where("login_name = ?", user.LoginName).Count(new(auth_models.UserInfo))
 		core.HandleError(err)
 		if count != 0 {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，工号已存在！"})
@@ -158,7 +160,7 @@ func (c AuthUser) Save() revel.Result {
 		affected, err = session.Insert(user)
 		core.HandleError(err)
 	} else {
-		count, err := session.Where("id <> ? and login_name = ?", user.Id, user.LoginName).Count(new(models.UserInfo))
+		count, err := session.Where("id <> ? and login_name = ?", user.Id, user.LoginName).Count(new(auth_models.UserInfo))
 		core.HandleError(err)
 		if count != 0 {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "保存失败，工号已存在！"})
@@ -189,17 +191,65 @@ func (c AuthUser) Delete() revel.Result {
 	userIdList := make([]int64, 0)
 	c.Params.Bind(&userIdList, "id_list")
 
-	count, err := session.In("user_id", userIdList).Count(new(models.AdminInfo))
+	count, err := session.In("user_id", userIdList).Count(new(auth_models.AdminInfo))
 	core.HandleError(err)
 	if count != 0 {
 		return c.RenderJson(core.JsonResult{Success: false, Message: "不能删除管理员！"})
 	}
 
-	user := new(models.UserInfo)
+	user := new(auth_models.UserInfo)
 	affected, err := session.In("id", userIdList).Delete(user)
 	core.HandleError(err)
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})
+}
+
+func (c AuthUser) Enable() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.AUTH_USER, c.Session)
+
+	db_session := c.DbSession
+
+	userIdList := make([]int64, 0)
+	c.Params.Bind(&userIdList, "id_list")
+
+	var user_list = make([]auth_models.UserInfo, 0)
+	err := db_session.In("id", userIdList).Find(&user_list)
+	core.HandleError(err)
+
+	for _, user := range user_list {
+		user.StatusId = models.USER_STATUS_ENABLED
+		_, err = db_session.Id(user.Id).Cols("status_id").Update(&user)
+		core.HandleError(err)
+	}
+
+	return c.RenderJson(core.JsonResult{Success: true, Message: "用户停用成功!"})
+}
+
+func (c AuthUser) Disable() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.AUTH_USER, c.Session)
+
+	db_session := c.DbSession
+
+	userIdList := make([]int64, 0)
+	c.Params.Bind(&userIdList, "id_list")
+
+	count, err := db_session.In("user_id", userIdList).Count(new(auth_models.AdminInfo))
+	core.HandleError(err)
+	if count != 0 {
+		return c.RenderJson(core.JsonResult{Success: false, Message: "不能停用管理员！"})
+	}
+
+	var user_list = make([]auth_models.UserInfo, 0)
+	err = db_session.In("id", userIdList).Find(&user_list)
+	core.HandleError(err)
+
+	for _, user := range user_list {
+		user.StatusId = models.USER_STATUS_DISABLED
+		_, err = db_session.Id(user.Id).Cols("status_id").Update(&user)
+		core.HandleError(err)
+	}
+
+	return c.RenderJson(core.JsonResult{Success: true, Message: "用户停用成功!"})
 }
 
 func (c AuthUser) OrderHistory() revel.Result {
@@ -229,7 +279,7 @@ func (c AuthUser) ResetPassword() revel.Result {
 
 	var login_user = core.GetLoginUser(c.Session)
 
-	count, err := db_session.In("user_id", user_id_list).Count(new(models.AdminInfo))
+	count, err := db_session.In("user_id", user_id_list).Count(new(auth_models.AdminInfo))
 	core.HandleError(err)
 
 	if count != 0 && login_user.IsSuperAdmin == false {
@@ -265,7 +315,7 @@ func (c AuthUser) GetUserInfo() revel.Result {
 	var user_id int64
 	c.Params.Bind(&user_id, "user_id")
 
-	var user models.UserInfo
+	var user auth_models.UserInfo
 	_, err := db_session.Id(user_id).Get(&user)
 	core.HandleError(err)
 

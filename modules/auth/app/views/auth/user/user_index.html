@@ -35,6 +35,14 @@
                     刷新权限缓存
                 </button>
                 {% end %}
+                <button class="btn btn-warning btn-sm" onclick="enableUser()">
+                    <i class="ace-icon fa fa-bars"></i>
+                    启用用户
+                </button>
+                <button class="btn btn-warning btn-sm" onclick="disableUser()">
+                    <i class="ace-icon fa fa-bars"></i>
+                    停用用户
+                </button>
                 <button class="btn btn-danger btn-sm" onclick="deleteUser()">
                     <i class="ace-icon fa fa-trash-o"></i>
                     删除
@@ -174,6 +182,70 @@
                     window.open(url, "_blank");
                 }
 
+                function enableUser() {
+                    var id_list = [];
+                    $('#userList').find('tbody tr>td:first-child input:checkbox').each(function () {
+                        if (this.checked) {
+                            id_list.push($(this).val());
+                        }
+                    });
+
+                    if (id_list.length === 0) {
+                        $.msg.alert("请选择数据！");
+                        return;
+                    }
+
+                    $.msg.confirm("确认要启用用户吗？", function () {
+                        $.ajax({
+                            url: '{%url "AuthUser.Enable"%}',
+                            type: "POST",
+                            data: {"id_list": id_list},
+                            success: function (data) {
+                                if (data.success === false) {
+                                    $.msg.error(data.message);
+                                    return;
+                                }
+                                else {
+                                    $.msg.show(data.message);
+                                }
+                                reloadList('#userList');
+                            }
+                        });
+                    });
+                }
+
+                function disableUser() {
+                    var id_list = [];
+                    $('#userList').find('tbody tr>td:first-child input:checkbox').each(function () {
+                        if (this.checked) {
+                            id_list.push($(this).val());
+                        }
+                    });
+
+                    if (id_list.length === 0) {
+                        $.msg.alert("请选择数据！");
+                        return;
+                    }
+
+                    $.msg.confirm("确认要停用用户吗？", function () {
+                        $.ajax({
+                            url: '{%url "AuthUser.Disable"%}',
+                            type: "POST",
+                            data: {"id_list": id_list},
+                            success: function (data) {
+                                if (data.success === false) {
+                                    $.msg.error(data.message);
+                                    return;
+                                }
+                                else {
+                                    $.msg.show(data.message);
+                                }
+                                reloadList('#userList');
+                            }
+                        });
+                    });
+                }
+
                 function deleteUser() {
                     var id_list = [];
                     $('#userList').find('tbody tr>td:first-child input:checkbox').each(function () {
@@ -235,7 +307,7 @@
                                         "width": 120
                                     },
                                     {"mDataProp": "u.phone", "title": "联系电话", "bSearchable": true},
-                                    {"mDataProp": "s.name", "title": "状态", "bSearchable": true, "width": 120},
+                                    {"mDataProp": "s.name", "title": "状态", "bSearchable": true, "sClass": "center", "width": 70},
                                     {"mDataProp": "u.create_time", "title": "创建时间", "bSearchable": false, "width": 120},
                                     {"mDataProp": "u.update_time", "title": "修改时间", "bSearchable": false, "width": 120}
                                 ]
