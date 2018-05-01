@@ -117,6 +117,9 @@ func (c ErpOrderItem) Save() revel.Result {
 		core.HandleError(err)
 	}
 
+	var sku_before = order_item.ItemSku
+	var qty_before = order_item.Quantity
+
 	var exchange_rate = order.ExchangeRate
 
 	order_item.OrderId = order_item_form.OrderId
@@ -126,6 +129,9 @@ func (c ErpOrderItem) Save() revel.Result {
 	order_item.Quantity = order_item_form.Qty
 	order_item.TransactionPrice = order_item_form.Price
 	order_item.TransactionPriceRmb = order_item_form.Price * exchange_rate
+
+	var sku_after = order_item.ItemSku
+	var qty_after = order_item.Quantity
 
 	//获取成本价 AUD
 	if stock_id == 0 {
@@ -140,7 +146,7 @@ func (c ErpOrderItem) Save() revel.Result {
 		_, err = db_session.Insert(&order_item)
 		core.HandleError(err)
 
-		order_history_service.Insert_order_history(order, login_user.UserId, fmt.Sprintf("新增订单明细， SKU: %s, 工号： %s", order_item.ItemSku, login_user.LoginName), db_session)
+		order_history_service.Insert_order_history(order, login_user.UserId, fmt.Sprintf("新增订单明细， SKU:%s, qty:%d, 工号：%s", sku_after, qty_after, login_user.LoginName), db_session)
 	} else {
 		var update_cols = []string{"item_product_id", "item_sku", "quantity", "cost_price", "transaction_price_currency"}
 		if order.TypeId == ddpz_models.ORDER_TYPE_SGCJ {
@@ -150,7 +156,7 @@ func (c ErpOrderItem) Save() revel.Result {
 		_, err = db_session.Id(order_item_form.ItemId).Cols(update_cols...).Update(&order_item)
 		core.HandleError(err)
 
-		order_history_service.Insert_order_history(order, login_user.UserId, fmt.Sprintf("修改订单明细， SKU: %s, 工号： %s", order_item.ItemSku, login_user.LoginName), db_session)
+		order_history_service.Insert_order_history(order, login_user.UserId, fmt.Sprintf("修改订单明细， SKU:%s, qty:%d => SKU:%s,qty:%d, 工号：%s", sku_before, qty_before, sku_after, qty_after, login_user.LoginName), db_session)
 	}
 
 	// 如果是 手工创建的的订单的，需要更新收款金额

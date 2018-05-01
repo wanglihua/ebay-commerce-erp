@@ -1125,13 +1125,16 @@ func (c ErpOrder) SaveDesc() revel.Result {
 	_, err := db_session.Id(order_id).Get(&order)
 	core.HandleError(err)
 
+	var desc_before = order.Desc.String
 	order.Desc = core.MakeNullString(order_desc, true)
 
 	_, err = db_session.Id(order_id).Cols("desc").Update(&order)
 	core.HandleError(err)
 
+	var desc_after = order_desc
+
 	var login_user = core.GetLoginUser(c.Session)
-	order_history_service.Insert_order_history(order, login_user.UserId, fmt.Sprintf("订单修改描述， 工号： %s", login_user.LoginName), db_session)
+	order_history_service.Insert_order_history(order, login_user.UserId, fmt.Sprintf("订单修改描述, %s => %s， 工号： %s", desc_before, desc_after, login_user.LoginName), db_session)
 
 	return c.RenderJson(map[string]interface{}{
 		"success": true,
