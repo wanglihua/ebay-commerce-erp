@@ -9,6 +9,7 @@ const (
 	ABNORMAL_TYPE_ZC    = 50  // 正常，一般默认是正常
 	ABNORMAL_TYPE_HWDQ  = 100 // 货未到全
 	ABNORMAL_TYPE_YTHCP = 200 // 有退货/次品
+	ABNORMAL_TYPE_ZXPS  = 300 // 纸箱破损
 )
 
 type PurchaseAbnormalTypeInfo struct {
@@ -44,5 +45,11 @@ func (e PurchaseAbnormalTypeInfo) InitData(db_session *xorm.Session) {
 	abnormal_type.Id = ABNORMAL_TYPE_YTHCP
 	abnormal_type.Name = "有退货/次品"
 	abnormal_type.Description = "有退货/次品"
+	db_session.Insert(abnormal_type)
+
+	abnormal_type = new(PurchaseAbnormalTypeInfo)
+	abnormal_type.Id = ABNORMAL_TYPE_ZXPS
+	abnormal_type.Name = "纸箱破损"
+	abnormal_type.Description = "纸箱破损"
 	db_session.Insert(abnormal_type)
 }
