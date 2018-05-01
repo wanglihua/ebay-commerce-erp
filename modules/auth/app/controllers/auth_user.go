@@ -157,6 +157,8 @@ func (c AuthUser) Save() revel.Result {
 		user.Password = core.EncryptPassword(user.Password)
 		user.IsDefaultPwd = 1 // 你用户时下次登录必须修改密码
 
+		user.StatusId = models.USER_STATUS_ENABLED
+
 		affected, err = session.Insert(user)
 		core.HandleError(err)
 	} else {
@@ -170,9 +172,8 @@ func (c AuthUser) Save() revel.Result {
 			user.Password = core.EncryptPassword(form.NewPassword)
 		}
 
-		affected, err = session.Id(user.Id).Update(user)
-		//affected, err := session.Id(form.Id).Cols("nick_name").Update(user)
-		//affected, err := session.Table(new(User)).Id(form.Id).Update(map[string]interface{}{"password":"123456"})
+		// affected, err = session.Id(user.Id).Update(user)
+		affected, err = session.Id(user.Id).Cols("login_name", "nick_name", "password", "phone", "sex").Update(user)
 		core.HandleError(err)
 
 		if affected == 0 {
