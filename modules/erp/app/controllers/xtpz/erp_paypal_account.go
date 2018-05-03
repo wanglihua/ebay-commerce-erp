@@ -128,6 +128,8 @@ func (c ErpPaypalAccount) DetailData() revel.Result {
 		if has == false {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "指定的Paypal账号不存在！"})
 		}
+	} else {
+		paypal_account.StatusId = models.PAYPAL_ACCOUNT_STATUS_ENABLED
 	}
 
 	status_list := status_service.Get_status_list(db_session, models.STATUS_TYPE_PAYPAL_ACCOUNT)

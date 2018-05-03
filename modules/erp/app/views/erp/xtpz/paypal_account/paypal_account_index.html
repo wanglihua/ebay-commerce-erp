@@ -33,7 +33,7 @@
         </div>
     </div>
     <div class="modal fade" id="paypalAccountDetailDialog">
-        <div class="modal-dialog" style="width: 580px;">
+        <div class="modal-dialog" style="width: 680px;">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="True">&times;</button>
@@ -58,9 +58,9 @@
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
-                                            <label for="api_account" class="col-xs-2 control-label">API账号</label>
+                                            <label for="api_account" class="col-xs-2 control-label">Client ID</label>
                                             <div class="col-xs-10">
-                                                <input id="api_account" name="detail.paypal_account.api_account" type="text" class="input-sm form-control" v-model="detail.paypal_account.api_account"/>
+                                                <textarea id="api_account" name="detail.paypal_account.client_id" rows="2" class="input-sm form-control" v-model="detail.paypal_account.client_id"></textarea>
                                             </div>
                                         </div>
                                     </div>
@@ -69,20 +69,9 @@
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
-                                            <label for="api_token" class="col-xs-2 control-label">API令牌</label>
+                                            <label for="api_token" class="col-xs-2 control-label">Secret</label>
                                             <div class="col-xs-10">
-                                                <input id="api_token" name="detail.paypal_account.api_token" type="text" class="input-sm form-control" v-model="detail.paypal_account.api_token"/>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-xs-12">
-                                        <div class="form-group">
-                                            <label for="balance" class="col-xs-2 control-label">余额</label>
-                                            <div class="col-xs-10">
-                                                <input id="balance" name="detail.paypal_account.balance" type="text" class="input-sm form-control" v-model.number="detail.paypal_account.balance"/>
+                                                <textarea id="api_token" name="detail.paypal_account.secret" rows="2" class="input-sm form-control" v-model="detail.paypal_account.secret"></textarea>
                                             </div>
                                         </div>
                                     </div>
@@ -140,32 +129,32 @@
         },
         mounted: function () {
             initDataTable(
-                '#paypalAccountList',
-                {
-                    "sAjaxSource": '{%url "ErpPaypalAccount.ListData"%}',
-                    "aaSorting": [[1, "asc"]],
-                    "aoColumns": [
-                        {
-                            "mDataProp": "a.id",
-                            "bSearchable": false,
-                            "orderable": false,
-                            "sClass": "center",
-                            "width": 50,
-                            "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
-                            "render": function (data, type, row) {
-                                return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
-                            }
-                        },
-                        {"mDataProp": "a.paypal_account", "title": "PayPal账号", "bSearchable": true, "width": 150},
-                        {"mDataProp": "a.api_account", "title": "API账号", "bSearchable": true, "width": 150},
-                        {"mDataProp": "a.api_token", "title": "API令牌", "bSearchable": true, "width": 150},
-                        {"mDataProp": "a.balance", "title": "余额", "bSearchable": false, "width": 150},
-                        {"mDataProp": "a.desc", "title": "描述", "bSearchable": true},
-                        {"mDataProp": "s.name", "title": "状态", "bSearchable": true, "width": 80},
-                        {"mDataProp": "a.create_time", "title": "创建时间", "bSearchable": false, "width": 120},
-                        {"mDataProp": "a.update_time", "title": "修改时间", "bSearchable": false, "width": 120}
-                    ]
-                }
+                    '#paypalAccountList',
+                    {
+                        "sAjaxSource": '{%url "ErpPaypalAccount.ListData"%}',
+                        "aaSorting": [[1, "asc"]],
+                        "aoColumns": [
+                            {
+                                "mDataProp": "a.id",
+                                "bSearchable": false,
+                                "orderable": false,
+                                "sClass": "center",
+                                "width": 50,
+                                "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
+                                "render": function (data, type, row) {
+                                    return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
+                                }
+                            },
+                            {"mDataProp": "a.paypal_account", "title": "PayPal账号", "bSearchable": true, "width": 150},
+                            // {"mDataProp": "a.client_id", "title": "Client ID", "bSearchable": true, "width": 150},
+                            // {"mDataProp": "a.secret", "title": "Secret", "bSearchable": true, "width": 150},
+                            // {"mDataProp": "a.balance", "title": "余额", "bSearchable": false, "width": 150},
+                            {"mDataProp": "a.desc", "title": "描述", "bSearchable": true},
+                            {"mDataProp": "s.name", "title": "状态", "bSearchable": true, "width": 80},
+                            {"mDataProp": "a.create_time", "title": "创建时间", "bSearchable": false, "width": 120},
+                            {"mDataProp": "a.update_time", "title": "修改时间", "bSearchable": false, "width": 120}
+                        ]
+                    }
             );
 
             $('#paypalAccountList tbody').on('dblclick', 'tr', function () {
@@ -181,21 +170,21 @@
                 showMask("加载中...");
                 $("#paypalAccountDetailForm").clearValidation();
                 $.ajax({
-                        url: '{%url "ErpPaypalAccount.DetailData" %}',
-                        type: "POST",
-                        data: {
-                            "id": id
-                        },
-                        success: function (result) {
-                            hideMask();
-                            if (result.success == false) {
-                                $.msg.error(result.message);
-                                return;
+                            url: '{%url "ErpPaypalAccount.DetailData" %}',
+                            type: "POST",
+                            data: {
+                                "id": id
+                            },
+                            success: function (result) {
+                                hideMask();
+                                if (result.success == false) {
+                                    $.msg.error(result.message);
+                                    return;
+                                }
+                                vm.detail = result;
+                                $('#paypalAccountDetailDialog').modal(modalOptions);
                             }
-                            vm.detail = result;
-                            $('#paypalAccountDetailDialog').modal(modalOptions);
                         }
-                    }
                 );
             },
             savePaypalAccount: function () {
@@ -211,9 +200,6 @@
                     'detail.paypal_account.api_token': {
                         required: true, minlength: 2, maxlength: 100
                     },
-                    'detail.paypal_account.balance': {
-                        required: false, number: true
-                    },
                     'detail.paypal_account.desc': {
                         required: false, maxlength: 500
                     },
@@ -226,25 +212,25 @@
                     hideMask();
                 } else {
                     $.ajax({
-                            url: '{%url "ErpPaypalAccount.Save"%}',
-                            type: "POST",
-                            processData: false,
-                            contentType: 'application/json',
-                            data: JSON.stringify(vm.detail),
-                            success: function (data) {
-                                hideMask();
-                                if (data.success == false) {
-                                    $.msg.error(data.message);
-                                    //return;
-                                }
-                                else {
-                                    $.msg.show(data.message);
-                                    $('#paypalAccountDetailDialog').modal('hide');
-                                    vm.reloadList();
-                                    //return;
+                                url: '{%url "ErpPaypalAccount.Save"%}',
+                                type: "POST",
+                                processData: false,
+                                contentType: 'application/json',
+                                data: JSON.stringify(vm.detail),
+                                success: function (data) {
+                                    hideMask();
+                                    if (data.success == false) {
+                                        $.msg.error(data.message);
+                                        //return;
+                                    }
+                                    else {
+                                        $.msg.show(data.message);
+                                        $('#paypalAccountDetailDialog').modal('hide');
+                                        vm.reloadList();
+                                        //return;
+                                    }
                                 }
                             }
-                        }
                     );
                 }
             },
