@@ -9,7 +9,6 @@ type PaypalAccountInfo struct {
 	PaypalAccount string          `xorm:"nvarchar(200) notnull index unique 'paypal_account'" json:"paypal_account"`
 	ClientId      string          `xorm:"nvarchar(200) notnull 'client_id'" json:"client_id"`
 	Secret        string          `xorm:"nvarchar(200) notnull 'secret'" json:"secret"`
-	Balance       core.NullFloat  `xorm:"float null 'balance'" json:"balance"`
 	Desc          core.NullString `xorm:"nvarchar(500) 'desc'" json:"desc"`
 	StatusId      int64           `xorm:"bigint notnull index 'status_id'" json:"status_id"`
 	CreateTime    core.Time       `xorm:"created notnull 'create_time'" json:"create_time"`

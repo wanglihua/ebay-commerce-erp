@@ -219,9 +219,11 @@ func GetHeader(title string, db_session *xorm.Session, web_session revel.Session
 		header_buffer.WriteString(menu.GetPpglMenu(res_id_map, web_session))
 	}
 
+	/*
 	if check_pass_cate_menu(pass_res_cate.THGL) == true {
 		header_buffer.WriteString(menu.GetThglMenu(res_id_map, web_session))
 	}
+	*/
 
 	/*
 	if check_pass_cate_menu(pass_res_cate.DBGL) == true {
