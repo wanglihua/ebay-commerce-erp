@@ -88,21 +88,14 @@ func (f *PaypalAccountDetailForm) Valid(validation *revel.Validation) bool {
 		validation.MaxSize(f.PaypalAccount.PaypalAccount, 200).Message("Paypal账号长度不能大于200！")
 	}
 
-	validation.Required(f.PaypalAccount.ClientId).Message("ClientId不能为空！")
-	if f.PaypalAccount.ClientId != "" {
-		validation.MinSize(f.PaypalAccount.ClientId, 2).Message("ClientId长度不能小于2！")
-	}
-	if f.PaypalAccount.ClientId != "" {
-		validation.MaxSize(f.PaypalAccount.ClientId, 200).Message("ClientId长度不能大于200！")
-	}
+	validation.Required(f.PaypalAccount.ApiUserName).Message("api username 不能为空！")
+	validation.MaxSize(f.PaypalAccount.ApiUserName, 200).Message("api username 长度不能大于200！")
 
-	validation.Required(f.PaypalAccount.Secret).Message("Secret不能为空！")
-	if f.PaypalAccount.Secret != "" {
-		validation.MinSize(f.PaypalAccount.Secret, 2).Message("Secret长度不能小于2！")
-	}
-	if f.PaypalAccount.Secret != "" {
-		validation.MaxSize(f.PaypalAccount.Secret, 200).Message("Secret长度不能大于100！")
-	}
+	validation.Required(f.PaypalAccount.ApiPassword).Message("api password 不能为空！")
+	validation.MaxSize(f.PaypalAccount.ApiPassword, 200).Message("api password 长度不能大于200！")
+
+	validation.Required(f.PaypalAccount.Signature).Message("signature 不能为空！")
+	validation.MaxSize(f.PaypalAccount.Signature, 200).Message("signature 长度不能大于200！")
 
 	if f.PaypalAccount.Desc.Valid == true {
 		validation.MaxSize(f.PaypalAccount.Desc.String, 500).Message("描述长度不能大于500！")

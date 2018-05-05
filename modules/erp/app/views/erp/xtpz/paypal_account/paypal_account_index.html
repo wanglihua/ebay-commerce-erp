@@ -58,9 +58,9 @@
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
-                                            <label for="api_account" class="col-xs-2 control-label">Client ID</label>
+                                            <label for="api_username" class="col-xs-2 control-label">API username</label>
                                             <div class="col-xs-10">
-                                                <input id="api_account" name="detail.paypal_account.client_id" type="text" class="input-sm form-control" v-model="detail.paypal_account.client_id"/>
+                                                <input id="api_username" name="detail.paypal_account.api_username" type="text" class="input-sm form-control" v-model="detail.paypal_account.api_username"/>
                                             </div>
                                         </div>
                                     </div>
@@ -69,9 +69,20 @@
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
-                                            <label for="api_token" class="col-xs-2 control-label">Secret</label>
+                                            <label for="api_password" class="col-xs-2 control-label">API password</label>
                                             <div class="col-xs-10">
-                                                <input id="api_token" name="detail.paypal_account.secret" type="text" class="input-sm form-control" v-model="detail.paypal_account.secret"/>
+                                                <input id="api_password" name="detail.paypal_account.api_password" type="text" class="input-sm form-control" v-model="detail.paypal_account.api_password"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <label for="signature" class="col-xs-2 control-label">Signature</label>
+                                            <div class="col-xs-10">
+                                                <input id="signature" name="detail.paypal_account.signature" type="text" class="input-sm form-control" v-model="detail.paypal_account.signature"/>
                                             </div>
                                         </div>
                                     </div>
@@ -146,9 +157,6 @@
                                 }
                             },
                             {"mDataProp": "a.paypal_account", "title": "PayPal账号", "bSearchable": true, "width": 250},
-                            // {"mDataProp": "a.client_id", "title": "Client ID", "bSearchable": true, "width": 150},
-                            // {"mDataProp": "a.secret", "title": "Secret", "bSearchable": true, "width": 150},
-                            // {"mDataProp": "a.balance", "title": "余额", "bSearchable": false, "width": 150},
                             {"mDataProp": "a.desc", "title": "描述", "bSearchable": true},
                             {"mDataProp": "s.name", "title": "状态", "bSearchable": true, "width": 80},
                             {"mDataProp": "a.create_time", "title": "创建时间", "bSearchable": false, "width": 120},
@@ -177,7 +185,7 @@
                             },
                             success: function (result) {
                                 hideMask();
-                                if (result.success == false) {
+                                if (result.success === false) {
                                     $.msg.error(result.message);
                                     return;
                                 }
@@ -194,11 +202,14 @@
                     'detail.paypal_account.paypal_account': {
                         required: true, minlength: 2, maxlength: 100
                     },
-                    'detail.paypal_account.api_account': {
-                        required: true, minlength: 2, maxlength: 100
+                    'detail.paypal_account.api_username': {
+                        required: true, minlength: 2, maxlength: 200
                     },
-                    'detail.paypal_account.api_token': {
-                        required: true, minlength: 2, maxlength: 100
+                    'detail.paypal_account.api_password': {
+                        required: true, minlength: 2, maxlength: 200
+                    },
+                    'detail.paypal_account.signature': {
+                        required: true, minlength: 2, maxlength: 200
                     },
                     'detail.paypal_account.desc': {
                         required: false, maxlength: 500
@@ -219,7 +230,7 @@
                                 data: JSON.stringify(vm.detail),
                                 success: function (data) {
                                     hideMask();
-                                    if (data.success == false) {
+                                    if (data.success === false) {
                                         $.msg.error(data.message);
                                         //return;
                                     }
@@ -242,7 +253,7 @@
                     }
                 });
 
-                if (id_list.length == 0) {
+                if (id_list.length === 0) {
                     $.msg.alert("请选择数据！");
                     return;
                 }
@@ -253,7 +264,7 @@
                         type: "POST",
                         data: {"id_list": id_list},
                         success: function (data) {
-                            if (data.success == false) {
+                            if (data.success === false) {
                                 $.msg.error(data.message);
                                 return;
                             }
