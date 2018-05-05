@@ -61,17 +61,10 @@ func init() {
 
 			//jobs.Now(tasks.EBayProductDownloadTask{})
 
-			cron_paypal_download, found := revel.Config.String("cron.paypal_download")
-			if found {
-				check_cron_support(cron_paypal_download)
-				jobs.Schedule(cron_paypal_download, tasks.PaypalDownloadTask{})
-			}
-
 			jobs.Every(4*time.Hour, tasks.EBayTokenStatusCheckTask{})
 			//jobs.Every(time.Minute, tasks.EBayTokenStatusCheckTask{})
 		}
 
-		// jobs.Now(tasks.PaypalDownloadTask{})
 		jobs.Every(5*time.Second, tasks.UserActiveCheckTask{})
 
 		jobs.Every(time.Second, tasks.SystemLogDateCheckTask{})
