@@ -135,6 +135,7 @@ func (c Home) SyncDbPost() revel.Result {
 	model_list = append(model_list, &xtpz_models.EBayAPIConfigInfo{})
 	model_list = append(model_list, &xtpz_models.ECommercePlatformInfo{})
 	model_list = append(model_list, &xtpz_models.PaypalAccountInfo{})
+	model_list = append(model_list, &xtpz_models.PaypalPaymentInfo{})
 	model_list = append(model_list, &xtpz_models.ShopAccountInfo{})
 	model_list = append(model_list, &xtpz_models.ShopAccountLogInfo{})
 	model_list = append(model_list, &xtpz_models.PlatformLogisticsModeInfo{})
