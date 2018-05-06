@@ -6,6 +6,8 @@ import (
 
 type PaypalPaymentInfo struct {
 	Id               int64         `xorm:"bigint notnull pk autoincr 'id'" json:"id"`
+	AccountId        int64         `xorm:"bigint notnull index 'account_id'" json:"account_id"`
+	PaypalAccount    string        `xorm:"nvarchar(200) notnull 'paypal_account'" json:"paypal_account"`
 	TransactionId    string        `xorm:"nvarchar(200) notnull index unique 'transaction_id'" json:"transaction_id"`
 	Type             string        `xorm:"nvarchar(100) notnull 'type'" json:"type"`
 	Payer            string        `xorm:"nvarchar(200) notnull 'payer'" json:"payer"`

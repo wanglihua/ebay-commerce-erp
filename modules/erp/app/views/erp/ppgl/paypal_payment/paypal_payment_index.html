@@ -38,8 +38,10 @@
                     '#paypalPaymentList',
                     {
                         "sAjaxSource": '{%url "ErpPaypalPayment.ListData"%}',
-                        "aaSorting": [[0, "asc"]],
+                        "aaSorting": [[4, "desc"]],
                         "aoColumns": [
+                            {"mDataProp": "id", "title": "Id", "bVisible": false, "width": 0},
+                            {"mDataProp": "paypal_account", "title": "Paypal Account", "bSearchable": false, "width": 180},
                             {"mDataProp": "transaction_id", "title": "Transaction ID", "bSearchable": false, "width": 120},
                             {"mDataProp": "type", "title": "Type", "bSearchable": true, "width": 100},
                             {"mDataProp": "pay_time", "title": "Time", "bSearchable": false, "width": 120},
@@ -74,7 +76,7 @@
                                 }
                             },
 
-                            {"mDataProp": "status", "title": "statis", "bSearchable": true, "width": 100},
+                            {"mDataProp": "status", "title": "Status", "bSearchable": true, "width": 100},
                             {"mDataProp": "payer", "title": "Payer", "bSearchable": true, "width": 120},
                             {"mDataProp": "payer_display_name", "title": "Payer Display Name", "bSearchable": true}
                         ]
