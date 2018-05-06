@@ -162,4 +162,6 @@ const (
 	// 消息管理 23
 	XXGL_MESSAGE_ALL = 230100 // 所有消息
 
+	// PayPal管理
+	PPGL_PAYPAL_PAYMENT = 240000 // PayPal付款
 )

@@ -8,6 +8,8 @@ import (
 	"matrix/modules/erp/models/xtpz_models"
 	"fmt"
 	"time"
+	"matrix/modules/auth/service/pass_service"
+	"matrix/modules/auth/pass_res"
 )
 
 type ErpPaypalPayment struct {
@@ -15,6 +17,8 @@ type ErpPaypalPayment struct {
 }
 
 func (c ErpPaypalPayment) Index() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.PPGL_PAYPAL_PAYMENT, c.Session)
+
 	var db_session = c.DbSession
 
 	var paypal_account_list = make([]xtpz_models.PaypalAccountInfo, 0)
@@ -26,6 +30,7 @@ func (c ErpPaypalPayment) Index() revel.Result {
 }
 
 func (c ErpPaypalPayment) ListData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.PPGL_PAYPAL_PAYMENT, c.Session)
 
 	db_session := c.DbSession
 

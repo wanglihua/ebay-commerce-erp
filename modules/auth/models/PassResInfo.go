@@ -884,4 +884,14 @@ func (e PassResInfo) InitData(db_session *xorm.Session) {
 		pass.Desc = core.MakeNullString("所有消息", true)
 		db_session.Insert(pass)
 	}
+
+	// PayPal管理
+	{
+		pass := new(PassResInfo)
+		pass.Id = pass_res.PPGL_PAYPAL_PAYMENT
+		pass.CateId = pass_res_cate.PPGL
+		pass.Name = "PayPal付款"
+		pass.Desc = core.MakeNullString("PayPal付款", true)
+		db_session.Insert(pass)
+	}
 }
