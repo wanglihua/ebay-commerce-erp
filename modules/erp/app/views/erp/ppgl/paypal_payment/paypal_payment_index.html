@@ -18,6 +18,31 @@
                         刷新
                     </button>
                 </div>
+                <div class="row" style="margin-top: 20px;margin-bottom: 20px;">
+                    <div id="query" class="col-xs-12" style="line-height: 28px;">
+                        <div class="col-xs-12">
+
+                            <label for="account_id_query">PayPal账户</label>
+                            <select id="account_id_query" name="account_id_query" style="height: 30px; width: 130px;" @change="refreshList();">
+                                <option value="0">--PayPal账户--</option>
+                                {% range $index, $account := .account_list %}
+                                <option value="{% $account.Id %}">{% $account.PaypalAccount %}</option>
+                                {% end %}
+                            </select>
+
+                            <label class="control-label no-padding-right" for="sender_id_query">发送者</label>
+                            <input class="input-sm" id="sender_id_query" name="sender_id_query" placeholder="发送者" type="text" style="width: 130px;"/>
+
+                            <label class="control-label no-padding-right" for="recipient_id_query">接收者</label>
+                            <input class="input-sm" id="recipient_id_query" name="recipient_id_query" placeholder="接收者" type="text" style="width: 130px;"/>
+
+                            <button class="btn btn-primary btn-sm" @click="refreshList();">
+                                <i class="ace-icon fa fa-search"></i>
+                                查询
+                            </button>
+                        </div>
+                    </div>
+                </div>
                 <div>
                     <table id="paypalPaymentList" class="table table-striped table-bordered table-hover"></table>
                 </div>
@@ -86,6 +111,9 @@
         methods: {
             reloadList: function () {
                 reloadList('#paypalPaymentList');
+            },
+            refreshList: function () {
+                refreshList('#paypalPaymentList');
             }
         }
     });
