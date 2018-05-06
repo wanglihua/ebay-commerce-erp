@@ -20,6 +20,7 @@ import (
 	"matrix/modules/erp/models/cggl_models"
 	"matrix/modules/erp/models/xsbb_models"
 	"matrix/modules/erp/models/xxgl_models"
+	"matrix/modules/erp/models/ppgl_models"
 )
 
 type Home struct {
@@ -135,10 +136,11 @@ func (c Home) SyncDbPost() revel.Result {
 	model_list = append(model_list, &xtpz_models.EBayAPIConfigInfo{})
 	model_list = append(model_list, &xtpz_models.ECommercePlatformInfo{})
 	model_list = append(model_list, &xtpz_models.PaypalAccountInfo{})
-	model_list = append(model_list, &xtpz_models.PaypalPaymentInfo{})
 	model_list = append(model_list, &xtpz_models.ShopAccountInfo{})
 	model_list = append(model_list, &xtpz_models.ShopAccountLogInfo{})
 	model_list = append(model_list, &xtpz_models.PlatformLogisticsModeInfo{})
+
+	model_list = append(model_list, &ppgl_models.PaypalPaymentInfo{})
 
 	model_list = append(model_list, &ddlc_models.OrderInfo{})
 	model_list = append(model_list, &ddlc_models.OrderHistoryInfo{})

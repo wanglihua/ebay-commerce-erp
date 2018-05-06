@@ -22,18 +22,10 @@ func GetPpglMenu(res_id_map map[int64]bool, web_session revel.Session) string {
     <b class="arrow"></b>
     <ul class="submenu">
 
-        <li id="ppgl-paypalrecon-menu" class="">
-            <a href="/paypal/recon">
+        <li id="ppgl-paypal-payment-menu" class="">
+            <a href="/paypal/payment">
                 <i class="menu-icon fa fa-caret-right"></i>
-                Paypal对账
-            </a>
-            <b class="arrow"></b>
-        </li>
-
-        <li id="cggl-bbbb-menu" class="">
-            <a href="#">
-                <i class="menu-icon fa fa-caret-right"></i>
-                退款管理
+                Paypal付款
             </a>
             <b class="arrow"></b>
         </li>

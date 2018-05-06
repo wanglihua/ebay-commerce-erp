@@ -1,4 +1,4 @@
-package xtpz_models
+package ppgl_models
 
 import (
 	"matrix/core"
