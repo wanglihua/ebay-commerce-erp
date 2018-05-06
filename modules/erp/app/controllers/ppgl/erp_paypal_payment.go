@@ -7,6 +7,7 @@ import (
 	"matrix/modules/erp/models/ppgl_models"
 	"matrix/modules/erp/models/xtpz_models"
 	"fmt"
+	"time"
 )
 
 type ErpPaypalPayment struct {
@@ -28,13 +29,31 @@ func (c ErpPaypalPayment) ListData() revel.Result {
 
 	db_session := c.DbSession
 
-	var account_id int64
-	c.Params.Bind(&account_id, "account_id")
+	var account_id_query int64
+	c.Params.Bind(&account_id_query, "account_id_query")
+
+	var query_begin_time string
+	c.Params.Bind(&query_begin_time, "query_begin_time")
+	query_begin_date, query_begin_date_err := core.Parse_time(query_begin_time)
+	revel.TRACE.Println("query_begin_time", query_begin_time)
+
+	var query_end_time string
+	c.Params.Bind(&query_end_time, "query_end_time")
+	query_end_date, query_end_date_err := core.Parse_time(query_end_time)
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
-	if account_id != 0 {
-		filter = core.SqlAnd(filter, fmt.Sprintf("account_id = %d", account_id))
+	if account_id_query != 0 {
+		filter = core.SqlAnd(filter, fmt.Sprintf("account_id = %d", account_id_query))
+	}
+
+	if query_begin_date_err == nil {
+		filter = core.SqlAnd(filter, fmt.Sprintf("pay_time >= '%04d-%02d-%02d'", query_begin_date.Year(), query_begin_date.Month(), query_begin_date.Day()))
+	}
+
+	if query_end_date_err == nil {
+		query_end_date = query_end_date.Add(time.Hour * 24)
+		filter = core.SqlAnd(filter, fmt.Sprintf("pay_time < '%04d-%02d-%02d'", query_end_date.Year(), query_end_date.Month(), query_end_date.Day()))
 	}
 
 	query := db_session.

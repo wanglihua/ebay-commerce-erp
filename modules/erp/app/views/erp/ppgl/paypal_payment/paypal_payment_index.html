@@ -30,11 +30,9 @@
                                 {% end %}
                             </select>
 
-                            <label class="control-label no-padding-right" for="sender_id_query">发送者</label>
-                            <input class="input-sm" id="sender_id_query" name="sender_id_query" placeholder="发送者" type="text" style="width: 130px;"/>
-
-                            <label class="control-label no-padding-right" for="recipient_id_query">接收者</label>
-                            <input class="input-sm" id="recipient_id_query" name="recipient_id_query" placeholder="接收者" type="text" style="width: 130px;"/>
+                            <label for="begin_time_query">时间</label>
+                            <input id="begin_time_query" name="begin_time_query" style="width: 135px;height:30px;" placeholder="开始时间如2016-01-02"/>
+                            <input id="end_time_query" name="end_time_query" style="width: 135px;height:30px;" placeholder="结束时间如2016-01-02"/>
 
                             <button class="btn btn-primary btn-sm" @click="refreshList();">
                                 <i class="ace-icon fa fa-search"></i>
@@ -51,6 +49,16 @@
     </div>
 </div>
 <script type="text/javascript">
+    $(function () {
+        $('#query_begin_time').datetimepicker({
+            locale: "zh-cn"
+        });
+
+        $('#query_end_time').datetimepicker({
+            locale: "zh-cn"
+        });
+    });
+
     var vm = new Vue({
         el: "#page",
         data: {
@@ -85,7 +93,7 @@
                                 "title": "Fee Amount",
                                 "bSearchable": false,
                                 "sClass": "dtRight",
-                                "width": 120,
+                                "width": 100,
                                 "render": function (data, type, row) {
                                     return dtFormatFloat(data);
                                 }
@@ -95,16 +103,37 @@
                                 "title": "Net Amount",
                                 "bSearchable": false,
                                 "sClass": "dtRight",
-                                "width": 120,
+                                "width": 100,
                                 "render": function (data, type, row) {
                                     return dtFormatFloat(data);
                                 }
                             },
 
-                            {"mDataProp": "status", "title": "Status", "bSearchable": true, "width": 100},
+                            {"mDataProp": "status", "title": "Status", "bSearchable": true, "width": 80},
                             {"mDataProp": "payer", "title": "Payer", "bSearchable": true, "width": 120},
                             {"mDataProp": "payer_display_name", "title": "Payer Display Name", "bSearchable": true}
-                        ]
+                        ],
+                        "fnServerData": function (sSource, aoData, fnCallback) {
+                            aoData.push({'name': 'account_id_query', 'value': $("#account_id_query").val()});
+                            aoData.push({'name': 'begin_time_query', 'value': $("#begin_time_query").val()});
+                            aoData.push({'name': 'end_time_query', 'value': $("#end_time_query").val()});
+
+                            showMask("数据加载中，请稍候");
+                            $.ajax({
+                                "dataType": 'json',
+                                "url": sSource,
+                                "data": aoData,
+                                "success": function (data) {
+                                    hideMask();
+                                    if (data.success === false) {
+                                        $.msg.error(data.message);
+                                        return;
+                                    }
+
+                                    fnCallback(data);
+                                }
+                            });
+                        }
                     }
             );
         },
