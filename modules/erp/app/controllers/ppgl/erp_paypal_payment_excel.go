@@ -156,25 +156,25 @@ func (c ErpPaypalPaymentExcel) get_export_excel_content(db_session *xorm.Session
 
 	{
 		cell := row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 18)
+		sheet.SetColWidth(col_index, col_index, 20)
 		set_head_cell_style(cell)
 		cell.Value = "Paypal Account"
 		col_index++
 
 		cell = row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 12)
+		sheet.SetColWidth(col_index, col_index, 16)
 		set_head_cell_style(cell)
 		cell.Value = "Transaction ID"
 		col_index++
 
 		cell = row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 12)
+		sheet.SetColWidth(col_index, col_index, 10)
 		set_head_cell_style(cell)
 		cell.Value = "Type"
 		col_index++
 
 		cell = row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 12)
+		sheet.SetColWidth(col_index, col_index, 14)
 		set_head_cell_style(cell)
 		cell.Value = "Time"
 		col_index++
@@ -204,7 +204,7 @@ func (c ErpPaypalPaymentExcel) get_export_excel_content(db_session *xorm.Session
 		col_index++
 
 		cell = row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 12)
+		sheet.SetColWidth(col_index, col_index, 28)
 		set_head_cell_style(cell)
 		cell.Value = "Payer"
 		col_index++
