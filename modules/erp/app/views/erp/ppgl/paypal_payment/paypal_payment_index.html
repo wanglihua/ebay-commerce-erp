@@ -17,6 +17,10 @@
                         <i class="ace-icon fa fa-refresh"></i>
                         刷新
                     </button>
+                    <button class="btn btn-purple btn-sm" onclick="exportPaymentList()">
+                        <i class="ace-icon fa fa-file-excel-o"></i>
+                        导出
+                    </button>
                 </div>
                 <div class="row" style="margin-top: 20px;margin-bottom: 20px;">
                     <div id="query" class="col-xs-12" style="line-height: 28px;">
@@ -58,6 +62,17 @@
             locale: "zh-cn"
         });
     });
+
+    function exportPaymentList() {
+        var params = $.param({
+            "account_id_query": $("#account_id_query").val(),
+            "begin_time_query": $("#begin_time_query").val(),
+            "end_time_query": $("#end_time_query").val()
+        });
+
+        var url = '{%url "ErpPaypalPaymentExcel.Export"%}' + "?" + params;
+        $('<form method="post" action="' + url + '"></form>').appendTo('body').submit().remove();
+    }
 
     var vm = new Vue({
         el: "#page",
