@@ -33,12 +33,12 @@ func (c ErpPaypalPayment) ListData() revel.Result {
 	c.Params.Bind(&account_id_query, "account_id_query")
 
 	var query_begin_time string
-	c.Params.Bind(&query_begin_time, "query_begin_time")
+	c.Params.Bind(&query_begin_time, "begin_time_query")
 	query_begin_date, query_begin_date_err := core.Parse_time(query_begin_time)
 	revel.TRACE.Println("query_begin_time", query_begin_time)
 
 	var query_end_time string
-	c.Params.Bind(&query_end_time, "query_end_time")
+	c.Params.Bind(&query_end_time, "end_time_query")
 	query_end_date, query_end_date_err := core.Parse_time(query_end_time)
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
