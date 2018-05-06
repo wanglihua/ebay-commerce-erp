@@ -314,7 +314,7 @@ POST /paypal/recon/data/list               ErpPaypalRecon.ListData
 
 GET  /paypal/payment                       ErpPaypalPayment.Index
 POST /paypal/payment/data/list             ErpPaypalPayment.ListData
-
+POST /paypal/payment/excel/export          ErpPaypalPaymentExcel.Export
 
 GET  /order/custom/type                    ErpOrderCustomType.Index
 POST /order/custom/type/data/list          ErpOrderCustomType.ListData
