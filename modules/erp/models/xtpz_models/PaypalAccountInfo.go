@@ -23,16 +23,3 @@ func (e PaypalAccountInfo) TableName() string {
 func (e PaypalAccountInfo) ModelDesc() string {
 	return "verbose_name=Paypal账号,entity_json=paypal_account,route=paypal/account"
 }
-
-/*
-
-ALTER TABLE erp_paypal_account
-   CHANGE client_id api_username VARCHAR(200) NOT NULL;
-
-ALTER TABLE erp_paypal_account
-   CHANGE secret api_password VARCHAR(200) NOT NULL;
-
-ALTER TABLE erp_paypal_account
-   CHANGE balance signature VARCHAR(200) NOT NULL;
-
- */
