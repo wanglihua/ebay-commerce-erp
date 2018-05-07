@@ -145,7 +145,7 @@ func (c ErpPaypalPaymentExcel) get_export_excel_content(db_session *xorm.Session
 	xlsx_file := xlsx.NewFile()
 
 	//添加工作表
-	sheet, err := xlsx_file.AddSheet("智能补货")
+	sheet, err := xlsx_file.AddSheet("PayPal付款")
 	core.HandleError(err)
 
 	//添加标题行
