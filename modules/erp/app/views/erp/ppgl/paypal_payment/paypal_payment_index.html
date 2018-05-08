@@ -94,7 +94,7 @@
                             {
                                 "mDataProp": "order_code", "title": "订单编号", "bSearchable": true, "width": 120,
                                 "render": function (data, type, row) {
-                                    return "<a href='/order/detail/" + row.order_id + "'>" + row.order_code + "</a>"
+                                    return "<a target='order_detail' href='/order/detail/" + row.order_id + "'>" + row.order_code + "</a>"
                                 }
                             },
                             {"mDataProp": "type", "title": "Type", "bSearchable": true, "width": 100},
