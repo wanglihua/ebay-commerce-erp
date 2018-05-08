@@ -91,6 +91,12 @@
                             {"mDataProp": "id", "title": "Id", "bVisible": false, "width": 0},
                             {"mDataProp": "paypal_account", "title": "Paypal Account", "bSearchable": false, "width": 180},
                             {"mDataProp": "transaction_id", "title": "Transaction ID", "bSearchable": false, "width": 120},
+                            {
+                                "mDataProp": "order_code", "title": "订单编号", "bSearchable": true, "width": 120,
+                                "render": function (data, type, row) {
+                                    return "<a href='/order/detail/" + row.order_id + "'>" + row.order_code + "</a>"
+                                }
+                            },
                             {"mDataProp": "type", "title": "Type", "bSearchable": true, "width": 100},
                             {"mDataProp": "pay_time", "title": "Time", "bSearchable": false, "width": 120},
                             {
