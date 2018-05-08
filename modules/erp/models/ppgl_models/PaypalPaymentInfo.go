@@ -18,6 +18,8 @@ type PaypalPaymentInfo struct {
 	NetAmount        float64       `xorm:"decimal(18,6) notnull 'net_amount'" json:"net_amount"`
 	Status           string        `xorm:"nvarchar(100) notnull index 'status'" json:"status"`
 	PayTime          core.LongTime `xorm:"datetime notnull 'pay_time'" json:"pay_time"`
+	OrderId          int64         `xorm:"bigint notnull 'order_id'" json:"order_id"`
+	OrderCode        string        `xorm:"nvarchar(200) notnull 'order_code'" json:"order_code"`
 	CreateTime       core.Time     `xorm:"created notnull 'create_time'" json:"create_time"`
 	UpdateTime       core.Time     `xorm:"updated notnull 'update_time'" json:"update_time"`
 }
