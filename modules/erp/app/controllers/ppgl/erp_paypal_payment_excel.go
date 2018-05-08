@@ -35,7 +35,7 @@ func (c ErpPaypalPaymentExcel) Export() revel.Result {
 	c.Params.Bind(&query_end_time, "end_time_query")
 	query_end_date, query_end_date_err := core.Parse_time(query_end_time)
 
-	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
+	var filter = "1=1"
 
 	if account_id_query != 0 {
 		filter = core.SqlAnd(filter, fmt.Sprintf("account_id = %d", account_id_query))
@@ -54,14 +54,11 @@ func (c ErpPaypalPaymentExcel) Export() revel.Result {
 		Where(filter)
 
 	data_query := *query
-	if order != "" {
-		data_query = *data_query.OrderBy(order)
-	} else {
-		data_query = *data_query.Asc("id")
-	}
+
+	data_query = *data_query.Asc("pay_time")
 
 	paypal_payment_list := make([]ppgl_models.PaypalPaymentInfo, 0)
-	err := data_query.Limit(limit, offset).Find(&paypal_payment_list)
+	err := data_query.Find(&paypal_payment_list)
 	core.HandleError(err)
 
 	xlsx_file := c.get_export_excel_content(db_session, paypal_payment_list)
@@ -168,6 +165,12 @@ func (c ErpPaypalPaymentExcel) get_export_excel_content(db_session *xorm.Session
 		col_index++
 
 		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 20)
+		set_head_cell_style(cell)
+		cell.Value = "订单编号"
+		col_index++
+
+		cell = row.AddCell()
 		sheet.SetColWidth(col_index, col_index, 10)
 		set_head_cell_style(cell)
 		cell.Value = "Type"
@@ -227,6 +230,10 @@ func (c ErpPaypalPaymentExcel) get_export_excel_content(db_session *xorm.Session
 		cell = row.AddCell()
 		set_text_cell_style(cell, "left")
 		cell.Value = payment.TransactionId
+
+		cell = row.AddCell()
+		set_text_cell_style(cell, "left")
+		cell.Value = payment.OrderCode
 
 		cell = row.AddCell()
 		set_text_cell_style(cell, "left")
