@@ -296,8 +296,8 @@ WHERE oi.order_id = %d`
 	return order_product_qty_list
 }
 
-// PayPal地址优先，再接下来是 eBay 地址，再是其他地址
 func Get_order_shipping_address(order_id int64, db_session *xorm.Session) ddlc_models.OrderShippingAddressInfo {
+	/*
 	var order_shipping_address_list = make([]ddlc_models.OrderShippingAddressInfo, 0)
 	err := db_session.Where(fmt.Sprintf("order_id = %d", order_id)).OrderBy("update_time DESC").Find(&order_shipping_address_list)
 	core.HandleError(err)
@@ -319,4 +319,8 @@ func Get_order_shipping_address(order_id int64, db_session *xorm.Session) ddlc_m
 	}
 
 	return ddlc_models.OrderShippingAddressInfo{} //如果前面的都不成立，就返回一个默认的
+	*/
+
+	// 统一业务逻辑，获取订单送货地址的逻辑放到一起
+	return order_shipping_address_service.Get_order_shipping_address(order_id, db_session)
 }
