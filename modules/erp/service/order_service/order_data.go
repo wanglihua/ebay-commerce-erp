@@ -322,5 +322,7 @@ func Get_order_shipping_address(order_id int64, db_session *xorm.Session) ddlc_m
 	*/
 
 	// 统一业务逻辑，获取订单送货地址的逻辑放到一起
-	return order_shipping_address_service.Get_order_shipping_address(order_id, db_session)
+	_, _, shipping_address := order_shipping_address_service.Get_order_shipping_address(order_id, db_session)
+
+	return shipping_address
 }

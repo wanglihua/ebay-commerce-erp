@@ -12,7 +12,7 @@ import (
 
  */
 
-func Get_order_shipping_address(order_id int64, db_session *xorm.Session) ddlc_models.OrderShippingAddressInfo {
+func Get_order_shipping_address(order_id int64, db_session *xorm.Session) (ddlc_models.OrderShippingAddressInfo, ddlc_models.OrderShippingAddressInfo, ddlc_models.OrderShippingAddressInfo) {
 
 	var shipping_address ddlc_models.OrderShippingAddressInfo // 取 ebay_shipping_address 中的一个， 优先取 paypal_shipping_address
 
@@ -40,5 +40,5 @@ func Get_order_shipping_address(order_id int64, db_session *xorm.Session) ddlc_m
 		shipping_address = ebay_shipping_address
 	}
 
-	return shipping_address
+	return ebay_shipping_address, paypal_shipping_address, shipping_address
 }

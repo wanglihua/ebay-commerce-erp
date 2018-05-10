@@ -872,7 +872,7 @@ func (c ErpOrder) DetailData() revel.Result {
 	_, err = db_session.Id(order.HoldTypeId).Get(&order_hold_type)
 	core.HandleError(err)
 
-	var shipping_address = order_shipping_address_service.Get_order_shipping_address(order_id, db_session)
+	ebay_shipping_address, paypal_shipping_address, shipping_address := order_shipping_address_service.Get_order_shipping_address(order_id, db_session)
 
 	shipping_address.OrderId = order.Id //如果地址是空的，也先给一个 order_id
 
