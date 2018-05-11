@@ -1005,6 +1005,10 @@ WHERE oi.order_id = %d;`
 
 	pickup_order.ActualAmount = order.AmountPaid
 
+	var refund_list = make([]ddlc_models.OrderRefundInfo, 0)
+	err = db_session.Where("order_id = ?", order.Id).Find(&refund_list)
+	core.HandleError(err)
+
 	return c.RenderJson(map[string]interface{}{
 		"order":                         order,
 		"status":                        status,
@@ -1028,6 +1032,7 @@ WHERE oi.order_id = %d;`
 		"pickup":                        pickup_order,
 		"pickup_pay_method_list":        pickup_pay_method_list,
 		"pickup_actual_pay_method_list": pickup_actual_pay_method_list,
+		"refund_list":                   refund_list,
 	})
 }
 

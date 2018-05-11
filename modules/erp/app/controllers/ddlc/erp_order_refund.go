@@ -19,13 +19,13 @@ func (c ErpOrderRefund) Refund() revel.Result {
 	var db_session = c.DbSession
 
 	var order_id int64
-	c.Params.Bind(&order_id, "order_id")
+	c.Params.Bind(&order_id, "refund.order_id")
 
 	var amount float64
-	c.Params.Bind(&amount, "amount")
+	c.Params.Bind(&amount, "refund.amount")
 
 	var memo string
-	c.Params.Bind(&memo, "memo")
+	c.Params.Bind(&memo, "refund.memo")
 
 	var result = order_paypal_service.Order_refund(order_id, amount, memo, db_session)
 

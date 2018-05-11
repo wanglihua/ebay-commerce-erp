@@ -419,9 +419,9 @@
             </div>
         </div>
 
-        <div class="widget-box" v-if="detail.refund_list.length != 0">
+        <div class="widget-box" v-if="detail.refund_list != []">
             <div class="widget-header">
-                <h4 class="smaller">订单退款</h4>
+                <h4 class="smaller">订单退款信息</h4>
             </div>
             <div class="widget-body">
                 <div class="widget-main">
@@ -430,19 +430,21 @@
                             <table id="order_refund_list" class="table table-bordered">
                                 <thead>
                                 <tr>
-                                    <th class="dtCenter">Transaction Id</th>
-                                    <th class="dtRight">退款金额</th>
+                                    <th class="dtCenter" style="width: 180px;">Transaction Id</th>
+                                    <th class="dtRight" style="width: 80px;">退款金额</th>
+                                    <th class="dtCenter" style="width: 120px;">退款时间</th>
                                     <th>备注</th>
-                                    <th class="dtCenter">退款时间</th>
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <tr v-for="refund in detail.refund_list">
-                                    <td class="dtCenter">{{ refund.transaction_id }}</td>
-                                    <td class="dtRight">{{ refund.amount }}</td>
-                                    <td>{{ refund.description }}</td>
-                                    <td class="dtCenter">{{ refund.create_time }}</td>
-                                </tr>
+                                <template v-for="refund in detail.refund_list">
+                                    <tr>
+                                        <td class="dtCenter">{{ refund.transaction_id }}</td>
+                                        <td class="dtRight">{{ refund.amount }}</td>
+                                        <td class="dtCenter">{{ refund.create_time }}</td>
+                                        <td>{{ refund.description }}</td>
+                                    </tr>
+                                </template>
                                 </tbody>
                             </table>
                         </div>
@@ -1024,7 +1026,7 @@
         </div>
 
         <div class="modal fade" id="orderRefundDialog">
-            <div class="modal-dialog" style="width: 680px;">
+            <div class="modal-dialog" style="width: 480px;">
                 <div class="modal-content">
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal" aria-hidden="True">&times;</button>
@@ -1038,8 +1040,8 @@
                                     <div class="row">
                                         <div class="col-xs-12">
                                             <div class="form-group">
-                                                <label for="refund_amount" class="col-xs-4 control-label">退款金额</label>
-                                                <div class="col-xs-8">
+                                                <label for="refund_amount" class="col-xs-2 control-label">退款金额</label>
+                                                <div class="col-xs-10">
                                                     <input id="refund_amount" name="refund.amount" type="text" class="input-sm form-control" />
                                                 </div>
                                             </div>
@@ -1048,8 +1050,8 @@
                                     <div class="row">
                                         <div class="col-xs-12">
                                             <div class="form-group">
-                                                <label for="refund_memo" class="col-xs-4 control-label">备注</label>
-                                                <div class="col-xs-8">
+                                                <label for="refund_memo" class="col-xs-2 control-label">备注</label>
+                                                <div class="col-xs-10">
                                                     <textarea id="refund_memo" name="refund.memo" rows="3" class="input-sm form-control"></textarea>
                                                 </div>
                                             </div>
@@ -1060,11 +1062,11 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-success btn-sm" @click="save_order_item()">
-                            <i class="ace-icon fa fa-floppy-o"></i>保存
+                        <button type="button" class="btn btn-success btn-sm" onclick="refund()">
+                            <i class="ace-icon fa fa-floppy-o"></i>退款
                         </button>
                         <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">
-                            <i class="ace-icon fa fa-times"></i>关闭
+                            <i class="ace-icon fa fa-times"></i>取消
                         </button>
                     </div>
                 </div>
@@ -1568,10 +1570,10 @@
     }
 
     function showRefund() {
-        $("#refundDialog").modal(modalOptions);
+        $("#orderRefundDialog").modal(modalOptions);
     }
 
-    function refund () {
+    function refund() {
         showMask("提交中...");
         var form = $("#refundForm");
         var valid = validate(form, {
@@ -1601,6 +1603,7 @@
                         }
                         else {
                             $.msg.show(data.message);
+                            loadRefundList();
                             //return;
                         }
                     }
@@ -1626,10 +1629,6 @@
             }
         });
     }
-
-    $(function(){
-        loadRefundList();
-    });
 </script>
 {% site_footer %}
 

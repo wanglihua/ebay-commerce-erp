@@ -30,7 +30,7 @@ func Order_refund(order_id int64, amount float64, memo string, db_session *xorm.
 	var sql = `SELECT pp.*
 FROM erp_order_external_transaction oet
     INNER JOIN erp_paypal_payment pp ON pp.id = oet.payment_id
-WHERE pp.type = 'Payment' AND order_id = %d;`
+WHERE pp.type = 'Payment' AND oet.order_id = %d;`
 
 	sql = fmt.Sprintf(sql, order_id)
 
@@ -66,6 +66,9 @@ WHERE pp.type = 'Payment' AND order_id = %d;`
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	core.HandleError(err)
+
+	fmt.Println("response body:")
+	fmt.Println(string(body))
 
 	var result core.JsonResult
 	err = json.Unmarshal(body, &result)
