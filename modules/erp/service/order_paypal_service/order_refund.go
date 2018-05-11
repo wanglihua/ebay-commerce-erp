@@ -61,10 +61,7 @@ WHERE pp.type = 'Payment' AND order_id = %d;`
 	err = json.Unmarshal(body, &result)
 	core.HandleError(err)
 
-	if result.Success == true {
-		//todo
-		// 插入订单退款信息，这个可以在Java端做
-	}
+	// 记录订单退款信息 和 订单历史记录都在 JAVA 端完成
 
 	//return result.Success
 	return result
