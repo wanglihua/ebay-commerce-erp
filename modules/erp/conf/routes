@@ -817,3 +817,5 @@ POST /sale/amount/report/product/excel/export   ErpSaleAmountReportProductExcel.
 
 POST /order/split/show                          ErpOrderSplit.Show
 POST /order/split/save                          ErpOrderSplit.Save
+
+POST /order/refund                              ErpOrderRefund.Refund

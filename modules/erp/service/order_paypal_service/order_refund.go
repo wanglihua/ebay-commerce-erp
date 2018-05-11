@@ -15,7 +15,6 @@ import (
 
 func Order_refund(order_id int64, amount float64, memo string, db_session *xorm.Session) core.JsonResult {
 
-	// todo
 	// 查询订单退款信息，如果已经存在就阻止
 	var order_refund ddlc_models.OrderRefundInfo
 	has, err := db_session.Where("order_id = ?", order_id).Get(&order_refund)

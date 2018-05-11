@@ -70,6 +70,7 @@ const (
 	DDLC_ORDER_FORCE_PEIHUO          = 131400 // 强制配货
 	DDLC_ORDER_LOGISTICS_DIFF        = 131500 // 最佳仓次佳仓偏差
 	DDLC_ORDER_SPLIT                 = 131600 // 订单拆分
+	DDLC_ORDER_REFUND                = 131700 // 订单退款
 
 	// 库存管理 模块编号 14
 	KCGL_PRODUCT                 = 140100 // 商品列表
