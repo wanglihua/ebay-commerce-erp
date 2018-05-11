@@ -63,7 +63,7 @@ WHERE pp.type = 'Payment' AND order_id = %d;`
 
 	if result.Success == true {
 		//todo
-		// 插入订单退款信息
+		// 插入订单退款信息，这个可以在Java端做
 	}
 
 	//return result.Success
