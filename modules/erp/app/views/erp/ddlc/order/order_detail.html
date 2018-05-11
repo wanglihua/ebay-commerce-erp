@@ -1005,7 +1005,8 @@
                 "logistics_mode": {},
                 "order_item_list": [],
                 "inventory_list": [],
-                "au_stock_list": []
+                "au_stock_list": [],
+                "refund_list": []
             },
             "pickup": {},
             "pickup_pay_method_list": [],
@@ -1478,6 +1479,61 @@
         });
     }
 
+    function refund () {
+        showMask("提交中...");
+        var form = $("#refundForm");
+        var valid = validate(form, {
+            'refund.order_id': {
+                required: true, number: true
+            },
+            'refund.amount': {
+                required: true, number: true
+            },
+            'refund.memo': {
+                required: false
+            }
+        });
+
+        if (!valid) {
+            hideMask();
+        } else {
+            $.ajax({
+                    url: '{%url "ErpOrderRefund.Refund"%}',
+                    type: "POST",
+                    data: form.serialize(),
+                    success: function (data) {
+                        hideMask();
+                        if (data.success === false) {
+                            $.msg.error(data.message);
+                            //return;
+                        }
+                        else {
+                            $.msg.show(data.message);
+                            //return;
+                        }
+                    }
+                }
+            );
+        }
+    }
+
+    function loadRefundList() {
+        $.ajax({
+            "dataType": 'json',
+            "url": '{% url "ErpOrderRefund.ListData" %}',
+            "data": {
+                "order_id": order_id
+            },
+            "success": function (data) {
+                if (data.success === false) {
+                    $.msg.error(data.message);
+                }
+                else {
+                    vm.detail.refund_list = data.refund_list;
+                }
+            }
+        });
+    }
 </script>
 {% site_footer %}
 
