@@ -833,7 +833,10 @@ func (c ErpOrder) Detail(order_id int64) revel.Result {
 	c.RenderArgs["order_feedback_list"] = order_feedback_list
 	c.RenderArgs["order_feedback_list_len"] = len(order_feedback_list)
 
-	return c.RenderTemplate("erp/ddlc/order/order_detail.html")
+	// todo 具体什么状态下可以退款，什么状态下不能退款，需要判断一下
+	c.RenderArgs["can_refund"] = true
+
+	return c.RenderTemplate("erp/ddlc/order/order_detail.tpl") //使用 tpl 扩展名是为了这个页面不被IDE识别为HTML，这个页面在HTML编辑模式下格式化会打乱产生问题
 }
 
 func (c ErpOrder) DetailData() revel.Result {
