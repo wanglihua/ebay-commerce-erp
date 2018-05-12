@@ -419,7 +419,7 @@
             </div>
         </div>
 
-        <div class="widget-box" v-if="detail.refund_list != []">
+        <div class="widget-box" v-if="detail.refund_list.length != 0">
             <div class="widget-header">
                 <h4 class="smaller">订单退款信息</h4>
             </div>
