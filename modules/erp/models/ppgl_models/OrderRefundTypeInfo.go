@@ -22,4 +22,34 @@ func (e OrderRefundTypeInfo) ModelDesc() string {
 }
 
 func (e OrderRefundTypeInfo) InitData(db_session *xorm.Session) {
+
+	var refund_type = new(OrderRefundTypeInfo)
+	refund_type.Id = 1
+	refund_type.Name = "未收到货部分退款"
+	refund_type.Description = "未收到货部分退款"
+	db_session.Insert(refund_type)
+
+	refund_type = new(OrderRefundTypeInfo)
+	refund_type.Id = 2
+	refund_type.Name = "未收到货全额退款"
+	refund_type.Description = "未收到货全额退款"
+	db_session.Insert(refund_type)
+
+	refund_type = new(OrderRefundTypeInfo)
+	refund_type.Id = 3
+	refund_type.Name = "已收到货部分退款"
+	refund_type.Description = "已收到货部分退款"
+	db_session.Insert(refund_type)
+
+	refund_type = new(OrderRefundTypeInfo)
+	refund_type.Id = 4
+	refund_type.Name = "已收到货全额退款"
+	refund_type.Description = "已收到货全额退款"
+	db_session.Insert(refund_type)
+
+	refund_type = new(OrderRefundTypeInfo)
+	refund_type.Id = 5
+	refund_type.Name = "case退款"
+	refund_type.Description = "case退款"
+	db_session.Insert(refund_type)
 }

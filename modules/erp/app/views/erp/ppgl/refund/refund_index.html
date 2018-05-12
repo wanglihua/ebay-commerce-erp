@@ -99,49 +99,41 @@
                                     return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
                                 }
                             },
-                            {"mDataProp": "shop_name", "title": "店铺", "bSearchable": true, "width": 180},
+                            {"mDataProp": "shop_name", "title": "店铺", "bSearchable": true, "width": 120},
                             {
-                                "mDataProp": "order_code", "title": "订单编号", "bSearchable": true, "width": 120,
+                                "mDataProp": "order_code", "title": "订单编号", "bSearchable": true, "width": 180,
                                 "render": function (data, type, row) {
                                     return "<a target='order_detail' href='/order/detail/" + row.order_id + "'>" + row.order_code + "</a>"
                                 }
                             },
-                            {"mDataProp": "type", "title": "Type", "bSearchable": true, "width": 100},
-                            {"mDataProp": "pay_time", "title": "Time", "bSearchable": false, "width": 120},
+                            // {"mDataProp": "pay_tran_id", "title": "付款流水号", "bSearchable": true, "width": 120},
+                            // {"mDataProp": "transaction_id", "title": "退款流水号", "bSearchable": true, "width": 120},
                             {
-                                "mDataProp": "gross_amount",
-                                "title": "Gross Amount",
+                                "mDataProp": "order_amount",
+                                "title": "订单金额",
                                 "bSearchable": false,
                                 "sClass": "dtRight",
-                                "width": 120,
+                                "width": 90,
                                 "render": function (data, type, row) {
                                     return dtFormatFloat(data);
                                 }
                             },
                             {
-                                "mDataProp": "fee_amount",
-                                "title": "Fee Amount",
+                                "mDataProp": "refund_amount",
+                                "title": "退款金额",
                                 "bSearchable": false,
                                 "sClass": "dtRight",
-                                "width": 100,
+                                "width": 90,
                                 "render": function (data, type, row) {
                                     return dtFormatFloat(data);
                                 }
                             },
-                            {
-                                "mDataProp": "net_amount",
-                                "title": "Net Amount",
-                                "bSearchable": false,
-                                "sClass": "dtRight",
-                                "width": 100,
-                                "render": function (data, type, row) {
-                                    return dtFormatFloat(data);
-                                }
-                            },
-
-                            {"mDataProp": "status", "title": "Status", "bSearchable": true, "width": 80},
-                            {"mDataProp": "payer", "title": "Payer", "bSearchable": true, "width": 120},
-                            {"mDataProp": "payer_display_name", "title": "Payer Display Name", "bSearchable": true}
+                            {"mDataProp": "type_name", "title": "退款类型", "bSearchable": true, "width": 120},
+                            {"mDataProp": "reason", "title": "退款原因", "bSearchable": true, "width": 150},
+                            {"mDataProp": "status_name", "title": "状态", "bSearchable": true, "width": 80},
+                            {"mDataProp": "apply_user_name", "title": "申请人", "bSearchable": true, "width": 80},
+                            {"mDataProp": "apply_time", "title": "申请时间", "bSearchable": false, "width": 120},
+                            {"mDataProp": "description", "title": "备注", "bSearchable": true}
                         ],
                         "fnServerData": function (sSource, aoData, fnCallback) {
                             aoData.push({'name': 'account_id_query', 'value': $("#account_id_query").val()});

@@ -13,7 +13,7 @@ type OrderRefundInfo struct {
 	OrderAmount   float64   `xorm:"decimal(18,6) notnull 'order_amount'" json:"order_amount"`
 	PayTransId    string    `xorm:"nvarchar(100) notnull index 'pay_tran_id'" json:"pay_tran_id"`       // 付款流水号
 	TransactionId string    `xorm:"nvarchar(100) notnull index 'transaction_id'" json:"transaction_id"` // 退款流水号
-	Amount        float64   `xorm:"decimal(18,6) notnull 'amount'" json:"amount"`
+	RefundAmount  float64   `xorm:"decimal(18,6) notnull 'refund_amount'" json:"refund_amount"`
 	TypeId        int64     `xorm:"bigint notnull index 'type_id'" json:"type_id"`
 	TypeName      string    `xorm:"nvarchar(200) notnull 'type_name'" json:"type_name"`
 	ReasonId      int64     `xorm:"bigint notnull index 'reason_id'" json:"reason_id"`
@@ -26,8 +26,11 @@ type OrderRefundInfo struct {
 	SalesUserName string    `xorm:"nvarchar(200) notnull 'sales_user_name'" json:"sales_user_name"`
 	ApplyUserId   int64     `xorm:"bigint notnull index 'apply_user_id'" json:"apply_user_id"`
 	ApplyUserName string    `xorm:"nvarchar(200) notnull 'apply_user_name'" json:"apply_user_name"`
+	ApplyTime     core.Time `xorm:"datetime notnull 'apply_time'" json:"apply_time"`
 	StatusId      int64     `xorm:"bigint notnull index 'status_id'" json:"status_id"`
+	StatusName    string    `xorm:"nvarchar(200) notnull 'status_name'" json:"status_name"`
 	CreateTime    core.Time `xorm:"created notnull 'create_time'" json:"create_time"`
+	UpdateTime    core.Time `xorm:"created notnull 'update_time'" json:"update_time"`
 }
 
 func (e OrderRefundInfo) TableName() string {
