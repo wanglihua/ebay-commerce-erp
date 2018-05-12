@@ -14,7 +14,7 @@ type ErpOrderRefund struct {
 }
 
 func (c ErpOrderRefund) Refund() revel.Result {
-	pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_REFUND, c.Session)
+	pass_service.Check_login_user_pass(pass_res.PPGL_ORDER_REFUND_APPROVE, c.Session)
 
 	var db_session = c.DbSession
 

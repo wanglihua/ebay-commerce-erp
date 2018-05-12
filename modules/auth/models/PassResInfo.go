@@ -191,14 +191,6 @@ func (e PassResInfo) InitData(db_session *xorm.Session) {
 		pass.Name = "订单拆分"
 		pass.Desc = core.MakeNullString("订单拆分", true)
 		db_session.Insert(pass)
-
-		// INSERT INTO auth_pass_res (id, cate_id, name, `desc`, create_time, update_time) VALUES (131700, 10500, '订单退款', '订单退款', now(), now());
-		pass = new(PassResInfo)
-		pass.Id = pass_res.DDLC_ORDER_REFUND
-		pass.CateId = pass_res_cate.DDLC
-		pass.Name = "订单退款"
-		pass.Desc = core.MakeNullString("订单退款", true)
-		db_session.Insert(pass)
 	}
 
 	// 订单配置
@@ -900,6 +892,21 @@ func (e PassResInfo) InitData(db_session *xorm.Session) {
 		pass.CateId = pass_res_cate.PPGL
 		pass.Name = "PayPal付款"
 		pass.Desc = core.MakeNullString("PayPal付款", true)
+		db_session.Insert(pass)
+
+		// INSERT INTO auth_pass_res (id, cate_id, name, `desc`, create_time, update_time) VALUES (131700, 10500, '订单退款', '订单退款', now(), now());
+		pass = new(PassResInfo)
+		pass.Id = pass_res.PPGL_ORDER_REFUND_APPLICATION
+		pass.CateId = pass_res_cate.PPGL
+		pass.Name = "订单退款申请"
+		pass.Desc = core.MakeNullString("订单退款申请", true)
+		db_session.Insert(pass)
+
+		pass = new(PassResInfo)
+		pass.Id = pass_res.PPGL_ORDER_REFUND_APPROVE
+		pass.CateId = pass_res_cate.PPGL
+		pass.Name = "订单退款审核"
+		pass.Desc = core.MakeNullString("订单退款审核", true)
 		db_session.Insert(pass)
 	}
 }
