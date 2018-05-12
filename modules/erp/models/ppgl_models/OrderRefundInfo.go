@@ -11,9 +11,8 @@ type OrderRefundInfo struct {
 	OrderId       int64     `xorm:"bigint notnull index 'order_id'" json:"order_id"`
 	OrderCode     string    `xorm:"nvarchar(200) notnull 'order_code'" json:"order_code"`
 	OrderAmount   float64   `xorm:"decimal(18,6) notnull 'order_amount'" json:"order_amount"`
-	ExpressFee    float64   `xorm:"decimal(18,6) notnull 'express_fee'" json:"express_fee"`   // 收入运费
-	ExpressCost   float64   `xorm:"decimal(18,6) notnull 'express_cost'" json:"express_cost"` // 支出运费
-	TransactionId string    `xorm:"nvarchar(100) notnull index 'transaction_id'" json:"transaction_id"`
+	PayTransId    string    `xorm:"nvarchar(100) notnull index 'pay_tran_id'" json:"pay_tran_id"`       // 付款流水号
+	TransactionId string    `xorm:"nvarchar(100) notnull index 'transaction_id'" json:"transaction_id"` // 退款流水号
 	Amount        float64   `xorm:"decimal(18,6) notnull 'amount'" json:"amount"`
 	TypeId        int64     `xorm:"bigint notnull index 'type_id'" json:"type_id"`
 	TypeName      string    `xorm:"nvarchar(200) notnull 'type_name'" json:"type_name"`
@@ -25,6 +24,8 @@ type OrderRefundInfo struct {
 	ProductName   string    `xorm:"nvarchar(200) notnull 'product_name'" json:"product_name"`
 	SalesUserId   int64     `xorm:"bigint notnull index 'sales_user_id'" json:"sales_user_id"`
 	SalesUserName string    `xorm:"nvarchar(200) notnull 'sales_user_name'" json:"sales_user_name"`
+	ApplyUserId   int64     `xorm:"bigint notnull index 'apply_user_id'" json:"apply_user_id"`
+	ApplyUserName string    `xorm:"nvarchar(200) notnull 'apply_user_name'" json:"apply_user_name"`
 	StatusId      int64     `xorm:"bigint notnull index 'status_id'" json:"status_id"`
 	CreateTime    core.Time `xorm:"created notnull 'create_time'" json:"create_time"`
 }
