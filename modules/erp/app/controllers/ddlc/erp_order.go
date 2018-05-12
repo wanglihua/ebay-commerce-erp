@@ -35,6 +35,7 @@ import (
 	"matrix/modules/erp/service/order_ebay_service"
 	"matrix/modules/erp/service/order_feedback_service"
 	"matrix/modules/erp/service/order_shipping_address_service"
+	"matrix/modules/erp/models/ppgl_models"
 )
 
 type ErpOrder struct {
@@ -1005,7 +1006,7 @@ WHERE oi.order_id = %d;`
 
 	pickup_order.ActualAmount = order.AmountPaid
 
-	var refund_list = make([]ddlc_models.OrderRefundInfo, 0)
+	var refund_list = make([]ppgl_models.OrderRefundInfo, 0)
 	err = db_session.Where("order_id = ?", order.Id).Find(&refund_list)
 	core.HandleError(err)
 

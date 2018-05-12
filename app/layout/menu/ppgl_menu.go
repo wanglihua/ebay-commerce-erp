@@ -29,7 +29,7 @@ func GetPpglMenu(res_id_map map[int64]bool, web_session revel.Session) string {
 <li id="ppgl-menu" class="">
     <a href="#" class="dropdown-toggle">
         <i class="menu-icon fa fa-cc-paypal"></i>
-        <span class="menu-text">PayPal管理</span>
+        <span class="menu-text">付款退款</span>
         <b class="arrow fa fa-angle-down"></b>
     </a>
     <b class="arrow"></b>

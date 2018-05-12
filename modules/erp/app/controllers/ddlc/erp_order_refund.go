@@ -5,8 +5,8 @@ import (
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/auth/pass_res"
 	"matrix/modules/erp/service/order_paypal_service"
-	"matrix/modules/erp/models/ddlc_models"
 	"matrix/core"
+	"matrix/modules/erp/models/ppgl_models"
 )
 
 type ErpOrderRefund struct {
@@ -40,7 +40,7 @@ func (c ErpOrderRefund) ListData() revel.Result {
 	var order_id int64
 	c.Params.Bind(&order_id, "order_id")
 
-	var refund_list = make([]ddlc_models.OrderRefundInfo, 0)
+	var refund_list = make([]ppgl_models.OrderRefundInfo, 0)
 	err := db_session.Where("order_id = ?", order_id).Find(&refund_list)
 	core.HandleError(err)
 

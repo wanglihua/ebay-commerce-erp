@@ -10,13 +10,12 @@ import (
 	"encoding/json"
 	"github.com/go-xorm/xorm"
 	"matrix/modules/erp/models/ppgl_models"
-	"matrix/modules/erp/models/ddlc_models"
 )
 
 func Order_refund(order_id int64, amount float64, memo string, db_session *xorm.Session) core.JsonResult {
 
 	// 查询订单退款信息，如果已经存在就阻止
-	var order_refund ddlc_models.OrderRefundInfo
+	var order_refund ppgl_models.OrderRefundInfo
 	has, err := db_session.Where("order_id = ?", order_id).Get(&order_refund)
 	core.HandleError(err)
 
