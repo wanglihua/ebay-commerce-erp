@@ -15,6 +15,10 @@ type OrderRefundInfo struct {
 	ExpressCost   float64   `xorm:"decimal(18,6) notnull 'express_cost'" json:"express_cost"` // 支出运费
 	TransactionId string    `xorm:"nvarchar(100) notnull index 'transaction_id'" json:"transaction_id"`
 	Amount        float64   `xorm:"decimal(18,6) notnull 'amount'" json:"amount"`
+	TypeId        int64     `xorm:"bigint notnull index 'type_id'" json:"type_id"`
+	TypeName      string    `xorm:"nvarchar(200) notnull 'type_name'" json:"type_name"`
+	ReasonId      int64     `xorm:"bigint notnull index 'reason_id'" json:"reason_id"`
+	Reason        string    `xorm:"nvarchar(200) notnull 'reason'" json:"reason"`
 	Description   string    `xorm:"nvarchar(500) notnull 'description'" json:"description"`
 	ProductId     int64     `xorm:"bigint notnull index 'product_id'" json:"product_id"`
 	ProductCode   string    `xorm:"nvarchar(200) notnull 'product_code'" json:"product_code"`
