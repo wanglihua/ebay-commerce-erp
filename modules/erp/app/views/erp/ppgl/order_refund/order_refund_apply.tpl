@@ -276,6 +276,51 @@
                 </div>
             </div>
         </div>
+		
+        <div class="widget-box">
+            <div class="widget-header">
+                <h4 class="smaller">订单退款</h4>
+            </div>
+            <div class="widget-body">
+                <div class="widget-main">
+                    <div class="row">
+                        <div class="col-xs-3">
+                            <div class="form-group">
+                                <label for="order_code" class="col-xs-4 control-label">订单编号：</label>
+                                <div class="col-xs-8">
+                                    <input id="order_code" name="order_code" type="text" class="input-sm form-control" disabled="disabled" v-model="detail.order.code"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-3">
+                            <div class="form-group">
+                                <label for="created_time" class="col-xs-4 control-label">建单时间：</label>
+                                <div class="col-xs-8">
+                                    <input id="created_time" name="created_time" type="text" class="input-sm form-control" disabled="disabled" v-model="detail.order.created_time"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-3">
+                            <div class="form-group">
+                                <label for="status_name" class="col-xs-4 control-label">状态：</label>
+                                <div class="col-xs-8">
+                                    <input id="status_name" name="status_name" type="text" class="input-sm form-control" disabled="disabled" v-model="detail.status.name"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-3">
+                            <div class="form-group">
+                                <label for="order_type_name" class="col-xs-4 control-label">订单类型：</label>
+                                <div class="col-xs-8">
+                                    <input id="order_type_name" name="order_type" type="text" class="input-sm form-control" disabled="disabled" v-model="detail.order_type.name"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+		
     </div>
 </div>
 {%template "erp/ppgl/order_refund/order_refund_apply.var" .%}
