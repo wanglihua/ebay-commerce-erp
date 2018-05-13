@@ -33,6 +33,7 @@ const (
 	STATUS_TYPE_INTEL_REPL                       = 2300 // 智能补货
 	STATUS_TYPE_PURCHASE_BILL_ENTRY_FINAL_AMOUNT = 2400 // 采购单明细尾款状态
 	STATUS_TYPE_USER                             = 2500 // 用户状态
+	STATUS_TYPE_REFUND                           = 2600 // 退款状态
 
 	//状态类型 end
 
@@ -133,6 +134,13 @@ const (
 
 	USER_STATUS_ENABLED  = 6100 // 用户状态 启用
 	USER_STATUS_DISABLED = 6200 // 用户状态 停用
+
+	REFUND_STATUS_YXJ = 7100 // 已新建
+	REFUND_STATUS_YSH = 7200 // 已审核
+	REFUND_STATUS_YCG = 7300 // 已成功
+	REFUND_STATUS_YSB = 7400 // 已失败
+	REFUND_STATUS_YZF = 7500 // 已作废
+	REFUND_STATUS_YWJ = 7600 // 已完结
 
 	//状态 id end
 )
@@ -721,6 +729,51 @@ func (e StatusInfo) InitData(db_session *xorm.Session) {
 		status.Type = STATUS_TYPE_USER
 		status.Name = "已停用"
 		status.Desc = core.MakeNullString("用户状态 已停用", true)
+		db_session.Insert(status)
+	}
+
+	{
+
+		status := new(StatusInfo)
+		status.Id = REFUND_STATUS_YXJ
+		status.Type = STATUS_TYPE_REFUND
+		status.Name = "已新建"
+		status.Desc = core.MakeNullString("退款状态 已新建", true)
+		db_session.Insert(status)
+
+		status = new(StatusInfo)
+		status.Id = REFUND_STATUS_YSH
+		status.Type = STATUS_TYPE_REFUND
+		status.Name = "已审核"
+		status.Desc = core.MakeNullString("退款状态 已审核", true)
+		db_session.Insert(status)
+
+		status = new(StatusInfo)
+		status.Id = REFUND_STATUS_YCG
+		status.Type = STATUS_TYPE_REFUND
+		status.Name = "已成功"
+		status.Desc = core.MakeNullString("退款状态 已成功", true)
+		db_session.Insert(status)
+		
+		status = new(StatusInfo)
+		status.Id = REFUND_STATUS_YSB
+		status.Type = STATUS_TYPE_REFUND
+		status.Name = "已失败"
+		status.Desc = core.MakeNullString("退款状态 已失败", true)
+		db_session.Insert(status)
+
+		status = new(StatusInfo)
+		status.Id = REFUND_STATUS_YZF
+		status.Type = STATUS_TYPE_REFUND
+		status.Name = "已作废"
+		status.Desc = core.MakeNullString("退款状态 已作废", true)
+		db_session.Insert(status)
+
+		status = new(StatusInfo)
+		status.Id = REFUND_STATUS_YWJ
+		status.Type = STATUS_TYPE_REFUND
+		status.Name = "已完结"
+		status.Desc = core.MakeNullString("退款状态 已完结", true)
 		db_session.Insert(status)
 	}
 }
