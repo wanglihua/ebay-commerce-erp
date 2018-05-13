@@ -48,3 +48,22 @@ func (c ErpOrderRefund) ListData() revel.Result {
 		"refund_list": refund_list,
 	})
 }
+
+func (c ErpOrderRefund) ApplyShow() revel.Result {
+	var order_id int64
+	c.Params.Bind(&order_id, "order_id")
+
+	return c.RenderTemplate("erp/ppgl/order_refund/order_refund_apply.html")
+}
+
+func (c ErpOrderRefund) ApplyShowData() revel.Result {
+	return c.RenderJson(map[string]interface{}{
+		"success": true,
+	})
+}
+
+func (c ErpOrderRefund) Apply() revel.Result {
+	return c.RenderJson(map[string]interface{}{
+		"success": true,
+	})
+}

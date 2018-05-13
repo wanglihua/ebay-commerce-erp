@@ -55,3 +55,21 @@ func (c ErpRefund) ListData() revel.Result {
 		Total: count,
 	})
 }
+
+func (c ErpRefund) Approve() revel.Result {
+	return c.RenderJson(map[string]interface{}{
+		"success": true,
+	})
+}
+
+func (c ErpRefund) Complete() revel.Result {
+	return c.RenderJson(map[string]interface{}{
+		"success": true,
+	})
+}
+
+func (c ErpRefund) Cancel() revel.Result {
+	return c.RenderJson(map[string]interface{}{
+		"success": true,
+	})
+}

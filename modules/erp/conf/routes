@@ -820,8 +820,14 @@ POST /order/split/save                          ErpOrderSplit.Save
 
 POST /order/refund                              ErpOrderRefund.Refund
 POST /order/refund/list/data                    ErpOrderRefund.ListData
+GET  /order/refund/apply/show                   ErpOrderRefund.ApplyShow
+POST /order/refund/apply/show/data              ErpOrderRefund.ApplyShowData
+POST /order/refund/apply/                       ErpOrderRefund.Apply
 
 GET  /refund                                    ErpRefund.Index
 POST /refund/list/data                          ErpRefund.ListData
+POST /refund/approve                            ErpRefund.Approve
+POST /refund/complete                           ErpRefund.Complete
+POST /refund/cancel                             ErpRefund.Cancel
 
 POST /refund/excel/export                       ErpRefundExcel.Export

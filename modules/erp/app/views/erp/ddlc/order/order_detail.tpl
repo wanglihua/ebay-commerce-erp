@@ -216,7 +216,7 @@
                                     <div id="ebay_address" class="address-box">
                                         <div>
                                             <label for="ebay_address_name">Name:</label>
-                                            <input id="ebay_address_name" type="text" v-model="detail.ebay_shipping_address.name"/>
+                                            <input id="ebay_address_name" type="text" v-model="detail.ebay_shipping_address.name" style="width:250px;"/>
                                         </div>
                                         <div>
                                             <label>Address:</label>
@@ -224,27 +224,27 @@
                                         </div>
                                         <div>
                                             <label for="ebay_address_city">City:</label>
-                                            <input id="ebay_address_city" type="text" v-model="detail.ebay_shipping_address.city_name"/>
+                                            <input id="ebay_address_city" type="text" v-model="detail.ebay_shipping_address.city_name" style="width:150px;"/>
                                         </div>
                                         <div>
                                             <label for="ebay_address_state">State:</label>
-                                            <input id="ebay_address_state" type="text" v-model="detail.ebay_shipping_address.province"/>
+                                            <input id="ebay_address_state" type="text" v-model="detail.ebay_shipping_address.province" style="width:150px;"/>
                                         </div>
                                         <div>
                                             <label for="ebay_address_country">Country:</label>
-                                            <input id="ebay_address_country" type="text" v-model="detail.ebay_shipping_address.country"/>
+                                            <input id="ebay_address_country" type="text" v-model="detail.ebay_shipping_address.country" style="width:150px;"/>
                                         </div>
                                         <div>
                                             <label for="ebay_address_country_name">Country Name:</label>
-                                            <input id="ebay_address_country_name" type="text" v-model="detail.ebay_shipping_address.country_name"/>
+                                            <input id="ebay_address_country_name" type="text" v-model="detail.ebay_shipping_address.country_name" style="width:150px;"/>
                                         </div>
                                         <div>
                                             <label for="ebay_address_postal_code">Post Code:</label>
-                                            <input id="ebay_address_postal_code" type="text" v-model="detail.ebay_shipping_address.postal_code"/>
+                                            <input id="ebay_address_postal_code" type="text" v-model="detail.ebay_shipping_address.postal_code" style="width:150px;"/>
                                         </div>
                                         <div>
                                             <label for="ebay_address_phone">Phone:</label>
-                                            <input id="ebay_address_phone" type="text" v-model="detail.ebay_shipping_address.phone"/>
+                                            <input id="ebay_address_phone" type="text" v-model="detail.ebay_shipping_address.phone" style="width:150px;"/>
                                         </div>
                                     </div>
 
@@ -258,7 +258,7 @@
                                     <div id="paypal_address" class="address-box">
                                         <div>
                                             <label for="paypal_address_name">Name:</label>
-                                            <input id="paypal_address_name" type="text" v-model="detail.paypal_shipping_address.name"/>
+                                            <input id="paypal_address_name" type="text" v-model="detail.paypal_shipping_address.name" style="width:250px;"/>
                                         </div>
                                         <div>
                                             <label>Address:</label>
@@ -266,23 +266,23 @@
                                         </div>
                                         <div>
                                             <label for="paypal_address_city">City:</label>
-                                            <input id="paypal_address_city" type="text" v-model="detail.paypal_shipping_address.city_name"/>
+                                            <input id="paypal_address_city" type="text" v-model="detail.paypal_shipping_address.city_name" style="width:150px;"/>
                                         </div>
                                         <div>
                                             <label for="paypal_address_state">State:</label>
-                                            <input id="paypal_address_state" type="text" v-model="detail.paypal_shipping_address.province"/>
+                                            <input id="paypal_address_state" type="text" v-model="detail.paypal_shipping_address.province" style="width:150px;"/>
                                         </div>
                                         <div>
                                             <label for="paypal_address_country">Country:</label>
-                                            <input id="paypal_address_country" type="text" v-model="detail.paypal_shipping_address.country"/>
+                                            <input id="paypal_address_country" type="text" v-model="detail.paypal_shipping_address.country" style="width:150px;"/>
                                         </div>
                                         <div>
                                             <label for="paypal_address_country_name">Country Name:</label>
-                                            <input id="paypal_address_country_name" type="text" v-model="detail.paypal_shipping_address.country_name"/>
+                                            <input id="paypal_address_country_name" type="text" v-model="detail.paypal_shipping_address.country_name" style="width:150px;"/>
                                         </div>
                                         <div>
                                             <label for="paypal_address_postal_code">Post Code:</label>
-                                            <input id="paypal_address_postal_code" type="text" v-model="detail.paypal_shipping_address.postal_code"/>
+                                            <input id="paypal_address_postal_code" type="text" v-model="detail.paypal_shipping_address.postal_code" style="width:150px;"/>
                                         </div>
                                         <div>
                                             <label for="paypal_address_phone">Phone:</label>
@@ -411,7 +411,7 @@
                     <hr style="margin-top: 5px;margin-bottom: 5px;"/>
                     <div class="row">
                         <div class="col-xs-12" style="text-align: right;">
-                            <button class="btn btn-sm btn-purple" onclick="showRefund()">退款</button>
+                            <a class="btn btn-sm btn-purple" href="#">退款</a>
                         </div>
                     </div>
                     {% end %}
@@ -1025,6 +1025,7 @@
             </div>
         </div>
 
+        {%/*
         <div class="modal fade" id="orderRefundDialog">
             <div class="modal-dialog" style="width: 480px;">
                 <div class="modal-content">
@@ -1072,6 +1073,7 @@
                 </div>
             </div>
         </div>
+        */%}
     </div>
 </div>
 <div id="orderSplitDialogWrapper"></div>
@@ -1569,6 +1571,7 @@
         });
     }
 
+    {%/*
     function showRefund() {
         $("#orderRefundDialog").modal(modalOptions);
     }
@@ -1611,6 +1614,7 @@
             );
         }
     }
+    */%}
 
     function loadRefundList() {
         $.ajax({
