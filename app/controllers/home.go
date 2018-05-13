@@ -144,6 +144,7 @@ func (c Home) SyncDbPost() revel.Result {
 	model_list = append(model_list, &ppgl_models.OrderRefundInfo{})
 	model_list = append(model_list, &ppgl_models.OrderRefundTypeInfo{})
 	model_list = append(model_list, &ppgl_models.OrderRefundReasonInfo{})
+	model_list = append(model_list, &ppgl_models.OrderRefundMethodInfo{})
 
 	model_list = append(model_list, &ddlc_models.OrderInfo{})
 	model_list = append(model_list, &ddlc_models.OrderHistoryInfo{})
