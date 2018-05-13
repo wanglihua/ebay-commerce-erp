@@ -27,6 +27,7 @@ import (
 	"matrix/modules/erp/models/ddpz_models"
 	"matrix/modules/erp/models/sppz_models"
 	"matrix/modules/erp/models/ddlc_models"
+	"matrix/modules/erp/service/excel_service"
 )
 
 type ErpOrderLogistics struct {
@@ -263,14 +264,14 @@ func (c ErpOrderLogistics) ListData() revel.Result {
 	*/
 
 	type order_logistics_view_item_t struct {
-		OrderLogistics ddlc_models.OrderLogisticsInfo  `xorm:"extends" json:"ol"`
-		Order          ddlc_models.OrderInfo           `xorm:"extends" json:"o"`
-		StockName      string                     `json:"stock_name"`
-		CompanyName    string                     `json:"company_name"`
-		ModeName       string                     `json:"mode_name"`
-		Products       []string                   `json:"products"`
-		OrderCode      string                     `json:"order_code"` //交易代码 店铺号 + 交易号
-		Sfkltjz        string                     `json:"sfkltjz"`    // 是否考虑体积重
+		OrderLogistics ddlc_models.OrderLogisticsInfo `xorm:"extends" json:"ol"`
+		Order          ddlc_models.OrderInfo          `xorm:"extends" json:"o"`
+		StockName      string                         `json:"stock_name"`
+		CompanyName    string                         `json:"company_name"`
+		ModeName       string                         `json:"mode_name"`
+		Products       []string                       `json:"products"`
+		OrderCode      string                         `json:"order_code"` //交易代码 店铺号 + 交易号
+		Sfkltjz        string                         `json:"sfkltjz"`    // 是否考虑体积重
 	}
 
 	/*
@@ -498,11 +499,11 @@ func (c ErpOrderLogistics) Export1() revel.Result {
 func (c ErpOrderLogistics) get_export_excel1(db_session *xorm.Session) *xlsx.File {
 
 	type order_logistics_view_item_t struct {
-		OrderLogistics   ddlc_models.OrderLogisticsInfo    `xorm:"extends" json:"ol"`
-		Order            ddlc_models.OrderInfo             `xorm:"extends" json:"o"`
-		Stock            sppz_models.StockInfo             `xorm:"extends" json:"s"`
-		LogisticsCompany ddpz_models.LogisticsCompanyInfo  `xorm:"extends" json:"lc"`
-		LogisticsMode    ddpz_models.LogisticsModeInfo     `xorm:"extends" json:"lm"`
+		OrderLogistics   ddlc_models.OrderLogisticsInfo   `xorm:"extends" json:"ol"`
+		Order            ddlc_models.OrderInfo            `xorm:"extends" json:"o"`
+		Stock            sppz_models.StockInfo            `xorm:"extends" json:"s"`
+		LogisticsCompany ddpz_models.LogisticsCompanyInfo `xorm:"extends" json:"lc"`
+		LogisticsMode    ddpz_models.LogisticsModeInfo    `xorm:"extends" json:"lm"`
 	}
 
 	/*
@@ -548,59 +549,11 @@ WHERE ol.stock_id = 0 AND ol.company_id = 0
 
 	//统一设置标题单元格格式的函数
 	set_head_cell_style := func(cell *xlsx.Cell) {
-		style := xlsx.NewStyle()
-
-		font := * xlsx.NewFont(9, "微软雅黑")
-		font.Bold = true
-		font.Italic = false
-		font.Underline = false
-		style.Font = font
-		style.ApplyBorder = true
-
-		fill := *xlsx.NewFill("solid", "00FFFFFF", "00000000") //CCFFCC
-		style.Fill = fill
-		style.ApplyFill = true
-
-		border := *xlsx.NewBorder("thin", "thin", "thin", "thin")
-		style.Border = border
-		style.ApplyBorder = true
-
-		alignment := *new(xlsx.Alignment)
-		alignment.Horizontal = "center"
-		alignment.Vertical = "center"
-		alignment.WrapText = true
-		style.Alignment = alignment
-		style.ApplyAlignment = true
-
-		cell.SetStyle(style)
+		excel_service.Set_head_cell_style(cell)
 	}
 
 	set_text_cell_style := func(cell *xlsx.Cell, horizontal_align string) {
-		style := xlsx.NewStyle()
-
-		font := * xlsx.NewFont(9, "微软雅黑")
-		font.Bold = false
-		font.Italic = false
-		font.Underline = false
-		style.Font = font
-		style.ApplyBorder = true
-
-		fill := *xlsx.NewFill("solid", "00FFFFFF", "00000000") //CCFFCC
-		style.Fill = fill
-		style.ApplyFill = true
-
-		border := *xlsx.NewBorder("thin", "thin", "thin", "thin")
-		style.Border = border
-		style.ApplyBorder = true
-
-		alignment := *new(xlsx.Alignment)
-		alignment.Horizontal = horizontal_align
-		alignment.Vertical = "center"
-		alignment.WrapText = true
-		style.Alignment = alignment
-		style.ApplyAlignment = true
-
-		cell.SetStyle(style)
+		excel_service.Set_text_cell_style(cell, horizontal_align)
 	}
 
 	row_height := 0.6
@@ -728,13 +681,13 @@ func (c ErpOrderLogistics) Export2() revel.Result {
 func (c ErpOrderLogistics) get_export_excel2(db_session *xorm.Session) *xlsx.File {
 
 	type order_logistics_view_item_t struct {
-		OrderLogistics       ddlc_models.OrderLogisticsInfo          `xorm:"extends" json:"ol"`
-		Order                ddlc_models.OrderInfo                   `xorm:"extends" json:"o"`
-		Stock                sppz_models.StockInfo                   `xorm:"extends" json:"s"`
-		LogisticsCompany     ddpz_models.LogisticsCompanyInfo        `xorm:"extends" json:"lc"`
-		LogisticsMode        ddpz_models.LogisticsModeInfo           `xorm:"extends" json:"lm"`
-		OrderShippingAddress ddlc_models.OrderShippingAddressInfo    `xorm:"extends" json:"osa"`
-		ShopAccount          xtpz_models.ShopAccountInfo             `xorm:"extends" json:"sa"`
+		OrderLogistics       ddlc_models.OrderLogisticsInfo       `xorm:"extends" json:"ol"`
+		Order                ddlc_models.OrderInfo                `xorm:"extends" json:"o"`
+		Stock                sppz_models.StockInfo                `xorm:"extends" json:"s"`
+		LogisticsCompany     ddpz_models.LogisticsCompanyInfo     `xorm:"extends" json:"lc"`
+		LogisticsMode        ddpz_models.LogisticsModeInfo        `xorm:"extends" json:"lm"`
+		OrderShippingAddress ddlc_models.OrderShippingAddressInfo `xorm:"extends" json:"osa"`
+		ShopAccount          xtpz_models.ShopAccountInfo          `xorm:"extends" json:"sa"`
 	}
 
 	/*
@@ -782,59 +735,11 @@ WHERE ol.stock_id = 0 AND ol.company_id = 0
 
 	//统一设置标题单元格格式的函数
 	set_head_cell_style := func(cell *xlsx.Cell) {
-		style := xlsx.NewStyle()
-
-		font := * xlsx.NewFont(9, "微软雅黑")
-		font.Bold = true
-		font.Italic = false
-		font.Underline = false
-		style.Font = font
-		style.ApplyBorder = true
-
-		fill := *xlsx.NewFill("solid", "00FFFFFF", "00000000") //CCFFCC
-		style.Fill = fill
-		style.ApplyFill = true
-
-		border := *xlsx.NewBorder("thin", "thin", "thin", "thin")
-		style.Border = border
-		style.ApplyBorder = true
-
-		alignment := *new(xlsx.Alignment)
-		alignment.Horizontal = "center"
-		alignment.Vertical = "center"
-		alignment.WrapText = true
-		style.Alignment = alignment
-		style.ApplyAlignment = true
-
-		cell.SetStyle(style)
+		excel_service.Set_head_cell_style(cell)
 	}
 
 	set_text_cell_style := func(cell *xlsx.Cell, horizontal_align string) {
-		style := xlsx.NewStyle()
-
-		font := * xlsx.NewFont(9, "微软雅黑")
-		font.Bold = false
-		font.Italic = false
-		font.Underline = false
-		style.Font = font
-		style.ApplyBorder = true
-
-		fill := *xlsx.NewFill("solid", "00FFFFFF", "00000000") //CCFFCC
-		style.Fill = fill
-		style.ApplyFill = true
-
-		border := *xlsx.NewBorder("thin", "thin", "thin", "thin")
-		style.Border = border
-		style.ApplyBorder = true
-
-		alignment := *new(xlsx.Alignment)
-		alignment.Horizontal = horizontal_align
-		alignment.Vertical = "center"
-		alignment.WrapText = true
-		style.Alignment = alignment
-		style.ApplyAlignment = true
-
-		cell.SetStyle(style)
+		excel_service.Set_text_cell_style(cell, horizontal_align)
 	}
 
 	row_height := 0.6

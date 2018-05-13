@@ -12,6 +12,7 @@ import (
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/auth/pass_res"
 	"matrix/modules/erp/models/hgbg_models"
+	"matrix/modules/erp/service/excel_service"
 )
 
 type ErpContainerTransferReportElemExcel struct {
@@ -70,60 +71,12 @@ ORDER BY hcc.hs_code;`
 
 	//统一设置标题单元格格式的函数
 	set_head_cell_style := func(cell *xlsx.Cell, horizontal_align string) {
-		style := xlsx.NewStyle()
-
-		font := *xlsx.NewFont(11, "微软雅黑")
-		font.Bold = true
-		font.Italic = false
-		font.Underline = false
-		style.Font = font
-		style.ApplyBorder = true
-
-		fill := *xlsx.NewFill("solid", "0092D050", "00000000") //92D050
-		style.Fill = fill
-		style.ApplyFill = true
-
-		border := *xlsx.NewBorder("thin", "thin", "thin", "thin")
-		style.Border = border
-		style.ApplyBorder = true
-
-		alignment := *new(xlsx.Alignment)
-		alignment.Horizontal = horizontal_align
-		alignment.Vertical = "center"
-		alignment.WrapText = true
-		style.Alignment = alignment
-		style.ApplyAlignment = true
-
-		cell.SetStyle(style)
+		excel_service.Set_head_cell_style(cell)
 	}
 
 	//统一设置内容单元格格式的函数
 	set_text_cell_style := func(cell *xlsx.Cell, horizontal_align string) {
-		style := xlsx.NewStyle()
-
-		font := *xlsx.NewFont(11, "微软雅黑")
-		font.Bold = false
-		font.Italic = false
-		font.Underline = false
-		style.Font = font
-		style.ApplyBorder = true
-
-		fill := *xlsx.NewFill("solid", "00FFFFFF", "00000000") //CCFFCC
-		style.Fill = fill
-		style.ApplyFill = true
-
-		border := *xlsx.NewBorder("thin", "thin", "thin", "thin")
-		style.Border = border
-		style.ApplyBorder = true
-
-		alignment := *new(xlsx.Alignment)
-		alignment.Horizontal = horizontal_align
-		alignment.Vertical = "center"
-		alignment.WrapText = true
-		style.Alignment = alignment
-		style.ApplyAlignment = true
-
-		cell.SetStyle(style)
+		excel_service.Set_text_cell_style(cell, horizontal_align)
 	}
 
 	row_height := 1.0

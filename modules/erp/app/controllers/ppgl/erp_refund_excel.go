@@ -12,6 +12,7 @@ import (
 	"bytes"
 	"fmt"
 	"time"
+	"matrix/modules/erp/service/excel_service"
 )
 
 type ErpRefundExcel struct {
@@ -44,12 +45,12 @@ func (c ErpRefundExcel) Export() revel.Result {
 	}
 
 	if query_begin_date_err == nil {
-		filter = core.SqlAnd(filter, fmt.Sprintf("pay_time >= '%04d-%02d-%02d'", query_begin_date.Year(), query_begin_date.Month(), query_begin_date.Day()))
+		filter = core.SqlAnd(filter, fmt.Sprintf("apply_time >= '%04d-%02d-%02d'", query_begin_date.Year(), query_begin_date.Month(), query_begin_date.Day()))
 	}
 
 	if query_end_date_err == nil {
 		query_end_date = query_end_date.Add(time.Hour * 24)
-		filter = core.SqlAnd(filter, fmt.Sprintf("pay_time < '%04d-%02d-%02d'", query_end_date.Year(), query_end_date.Month(), query_end_date.Day()))
+		filter = core.SqlAnd(filter, fmt.Sprintf("apply_time < '%04d-%02d-%02d'", query_end_date.Year(), query_end_date.Month(), query_end_date.Day()))
 	}
 
 	query := db_session.
@@ -57,7 +58,7 @@ func (c ErpRefundExcel) Export() revel.Result {
 
 	data_query := *query
 
-	data_query = *data_query.Asc("pay_time")
+	data_query = *data_query.Asc("id")
 
 	paypal_payment_list := make([]ppgl_models.PaypalPaymentInfo, 0)
 	err := data_query.Find(&paypal_payment_list)
@@ -72,7 +73,7 @@ func (c ErpRefundExcel) Export() revel.Result {
 
 	reader := bytes.NewReader(buffer.Bytes()) //bytes.Reader 实现了 io.Reader 接口
 
-	file_name := fmt.Sprintf("PayPal付款导出_%s.xlsx", time.Now().Format("2016-01-02 15:04"))
+	file_name := fmt.Sprintf("订单退款导出_%s.xlsx", time.Now().Format("2016-01-02 15:04"))
 
 	return c.RenderBinary(reader, file_name, revel.Attachment, time.Now())
 }
@@ -81,60 +82,12 @@ func (c ErpRefundExcel) get_export_excel_content(db_session *xorm.Session, payme
 
 	//统一设置标题单元格格式的函数
 	set_head_cell_style := func(cell *xlsx.Cell) {
-		style := xlsx.NewStyle()
-
-		font := *xlsx.NewFont(9, "微软雅黑")
-		font.Bold = true
-		font.Italic = false
-		font.Underline = false
-		style.Font = font
-		style.ApplyBorder = true
-
-		fill := *xlsx.NewFill("solid", "00CCFFCC", "00000000") //CCFFCC
-		style.Fill = fill
-		style.ApplyFill = true
-
-		border := *xlsx.NewBorder("thin", "thin", "thin", "thin")
-		style.Border = border
-		style.ApplyBorder = true
-
-		alignment := *new(xlsx.Alignment)
-		alignment.Horizontal = "center"
-		alignment.Vertical = "center"
-		alignment.WrapText = true
-		style.Alignment = alignment
-		style.ApplyAlignment = true
-
-		cell.SetStyle(style)
+		excel_service.Set_head_cell_style(cell)
 	}
 
 	//统一设置内容单元格格式的函数
 	set_text_cell_style := func(cell *xlsx.Cell, horizontal_align string) {
-		style := xlsx.NewStyle()
-
-		font := *xlsx.NewFont(9, "微软雅黑")
-		font.Bold = false
-		font.Italic = false
-		font.Underline = false
-		style.Font = font
-		style.ApplyBorder = true
-
-		fill := *xlsx.NewFill("solid", "00FFFFFF", "00000000") //CCFFCC
-		style.Fill = fill
-		style.ApplyFill = true
-
-		border := *xlsx.NewBorder("thin", "thin", "thin", "thin")
-		style.Border = border
-		style.ApplyBorder = true
-
-		alignment := *new(xlsx.Alignment)
-		alignment.Horizontal = horizontal_align
-		alignment.Vertical = "center"
-		alignment.WrapText = true
-		style.Alignment = alignment
-		style.ApplyAlignment = true
-
-		cell.SetStyle(style)
+		excel_service.Set_text_cell_style(cell, horizontal_align)
 	}
 
 	head_row_height := 0.8

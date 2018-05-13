@@ -17,6 +17,7 @@ import (
 	"matrix/modules/erp/service/stock_service"
 	"matrix/modules/erp/service/storage_loc_service"
 	"matrix/modules/erp/models/sppz_models"
+	"matrix/modules/erp/service/excel_service"
 )
 
 type ErpStorageLoc struct {
@@ -48,7 +49,7 @@ func (c ErpStorageLoc) ListData() revel.Result {
 	*/
 
 	query := db_session.
-	Select("l.*, s.*").
+		Select("l.*, s.*").
 		Table("erp_storage_loc").Alias("l").
 		Join("INNER", []string{"erp_stock", "s"}, "l.stock_id = s.id").
 		Where(filter)
@@ -216,10 +217,10 @@ func (c ErpStorageLoc) Import() revel.Result {
 	}
 
 	type storage_loc_import_t struct {
-		OrdNum         string  `json:"ord_num"`          // 序号
-		StockName      string  `json:"stock_name"`       // 仓库名称
-		StorageLocName string  `json:"storage_loc_name"` // 仓位名称
-		StorageLocDesc string  `json:"storage_loc_desc"` // 仓位描述
+		OrdNum         string `json:"ord_num"`          // 序号
+		StockName      string `json:"stock_name"`       // 仓库名称
+		StorageLocName string `json:"storage_loc_name"` // 仓位名称
+		StorageLocDesc string `json:"storage_loc_desc"` // 仓位描述
 
 		// 下面这些字段是从数据库里面查询后保存在这里面的，这样过程中，就不用二次查询了
 		stock_id     int64
@@ -419,59 +420,11 @@ FROM erp_storage_loc sl
 
 	//统一设置标题单元格格式的函数
 	set_head_cell_style := func(cell *xlsx.Cell) {
-		style := xlsx.NewStyle()
-
-		font := * xlsx.NewFont(9, "微软雅黑")
-		font.Bold = true
-		font.Italic = false
-		font.Underline = false
-		style.Font = font
-		style.ApplyBorder = true
-
-		fill := *xlsx.NewFill("solid", "00FFFFFF", "00000000") //CCFFCC
-		style.Fill = fill
-		style.ApplyFill = true
-
-		border := *xlsx.NewBorder("thin", "thin", "thin", "thin")
-		style.Border = border
-		style.ApplyBorder = true
-
-		alignment := *new(xlsx.Alignment)
-		alignment.Horizontal = "center"
-		alignment.Vertical = "center"
-		alignment.WrapText = true
-		style.Alignment = alignment
-		style.ApplyAlignment = true
-
-		cell.SetStyle(style)
+		excel_service.Set_head_cell_style(cell)
 	}
 
 	set_text_cell_style := func(cell *xlsx.Cell, horizontal_align string) {
-		style := xlsx.NewStyle()
-
-		font := * xlsx.NewFont(9, "微软雅黑")
-		font.Bold = false
-		font.Italic = false
-		font.Underline = false
-		style.Font = font
-		style.ApplyBorder = true
-
-		fill := *xlsx.NewFill("solid", "00FFFFFF", "00000000") //CCFFCC
-		style.Fill = fill
-		style.ApplyFill = true
-
-		border := *xlsx.NewBorder("thin", "thin", "thin", "thin")
-		style.Border = border
-		style.ApplyBorder = true
-
-		alignment := *new(xlsx.Alignment)
-		alignment.Horizontal = horizontal_align
-		alignment.Vertical = "center"
-		alignment.WrapText = true
-		style.Alignment = alignment
-		style.ApplyAlignment = true
-
-		cell.SetStyle(style)
+		excel_service.Set_text_cell_style(cell, horizontal_align)
 	}
 
 	row_height := 0.6
