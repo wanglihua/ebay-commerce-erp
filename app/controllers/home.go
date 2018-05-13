@@ -60,6 +60,10 @@ func (c Home) SyncDb() revel.Result {
 
 func (c Home) SyncDbPost() revel.Result {
 
+	if revel.DevMode == false {
+		return c.RenderJson(core.JsonResult{Success: false, Message: "只有开发模式下才能同步数据库!"})
+	}
+
 	model_list := make([]interface{}, 0)
 
 	model_list = append(model_list, &auth_models.AdminInfo{})
