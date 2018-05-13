@@ -19,8 +19,6 @@ type ErpRefundExcel struct {
 	*revel.Controller
 }
 
-//todo 这是从订单付款里面复制过来的，需要修改
-
 func (c ErpRefundExcel) Export() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.PPGL_ORDER_REFUND_APPROVE, c.Session)
 
@@ -60,11 +58,11 @@ func (c ErpRefundExcel) Export() revel.Result {
 
 	data_query = *data_query.Asc("id")
 
-	paypal_payment_list := make([]ppgl_models.PaypalPaymentInfo, 0)
-	err := data_query.Find(&paypal_payment_list)
+	order_refund_list := make([]ppgl_models.OrderRefundInfo, 0)
+	err := data_query.Find(&order_refund_list)
 	core.HandleError(err)
 
-	xlsx_file := c.get_export_excel_content(db_session, paypal_payment_list)
+	xlsx_file := c.get_export_excel_content(db_session, order_refund_list)
 
 	//先把文件内容写到buffer中，再从中读取
 	var buffer bytes.Buffer
@@ -78,7 +76,7 @@ func (c ErpRefundExcel) Export() revel.Result {
 	return c.RenderBinary(reader, file_name, revel.Attachment, time.Now())
 }
 
-func (c ErpRefundExcel) get_export_excel_content(db_session *xorm.Session, payment_list []ppgl_models.PaypalPaymentInfo) *xlsx.File {
+func (c ErpRefundExcel) get_export_excel_content(db_session *xorm.Session, order_refund_list []ppgl_models.OrderRefundInfo) *xlsx.File {
 
 	//统一设置标题单元格格式的函数
 	set_head_cell_style := func(cell *xlsx.Cell) {
@@ -110,13 +108,7 @@ func (c ErpRefundExcel) get_export_excel_content(db_session *xorm.Session, payme
 		cell := row.AddCell()
 		sheet.SetColWidth(col_index, col_index, 20)
 		set_head_cell_style(cell)
-		cell.Value = "Paypal Account"
-		col_index++
-
-		cell = row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 16)
-		set_head_cell_style(cell)
-		cell.Value = "Transaction ID"
+		cell.Value = "店铺"
 		col_index++
 
 		cell = row.AddCell()
@@ -126,101 +118,117 @@ func (c ErpRefundExcel) get_export_excel_content(db_session *xorm.Session, payme
 		col_index++
 
 		cell = row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 10)
+		sheet.SetColWidth(col_index, col_index, 20)
 		set_head_cell_style(cell)
-		cell.Value = "Type"
-		col_index++
-
-		cell = row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 14)
-		set_head_cell_style(cell)
-		cell.Value = "Time"
-		col_index++
-
-		cell = row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 10)
-		set_head_cell_style(cell)
-		cell.Value = "Gross Amount"
-		col_index++
-
-		cell = row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 10)
-		set_head_cell_style(cell)
-		cell.Value = "Fee Amount"
-		col_index++
-
-		cell = row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 10)
-		set_head_cell_style(cell)
-		cell.Value = "Net Amount"
-		col_index++
-
-		cell = row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 8)
-		set_head_cell_style(cell)
-		cell.Value = "Status"
-		col_index++
-
-		cell = row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 28)
-		set_head_cell_style(cell)
-		cell.Value = "Payer"
+		cell.Value = "付款流水号"
 		col_index++
 
 		cell = row.AddCell()
 		sheet.SetColWidth(col_index, col_index, 20)
 		set_head_cell_style(cell)
-		cell.Value = "Payer Display Name"
+		cell.Value = "退款流水号"
+		col_index++
+
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 10)
+		set_head_cell_style(cell)
+		cell.Value = "订单金额"
+		col_index++
+
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 14)
+		set_head_cell_style(cell)
+		cell.Value = "退款金额"
+		col_index++
+
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 10)
+		set_head_cell_style(cell)
+		cell.Value = "退款类型"
+		col_index++
+
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 10)
+		set_head_cell_style(cell)
+		cell.Value = "退款原因"
+		col_index++
+
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 10)
+		set_head_cell_style(cell)
+		cell.Value = "状态"
+		col_index++
+
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 8)
+		set_head_cell_style(cell)
+		cell.Value = "申请人"
+		col_index++
+
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 28)
+		set_head_cell_style(cell)
+		cell.Value = "申请时间"
+		col_index++
+
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 20)
+		set_head_cell_style(cell)
+		cell.Value = "备注"
 		col_index++
 	}
 
-	for _, payment := range payment_list {
+	for _, refund := range order_refund_list {
 		row = sheet.AddRow()
 		row.SetHeightCM(common_row_height)
 
 		cell := row.AddCell()
 		set_text_cell_style(cell, "left")
-		cell.Value = payment.PaypalAccount
+		cell.Value = refund.ShopName
 
 		cell = row.AddCell()
 		set_text_cell_style(cell, "left")
-		cell.Value = payment.TransactionId
+		cell.Value = refund.OrderCode
 
 		cell = row.AddCell()
 		set_text_cell_style(cell, "left")
-		cell.Value = payment.OrderCode
+		cell.Value = refund.PayTransId
 
 		cell = row.AddCell()
 		set_text_cell_style(cell, "left")
-		cell.Value = payment.Type
-
-		cell = row.AddCell()
-		set_text_cell_style(cell, "center")
-		cell.Value = payment.PayTime.String()
+		cell.Value = refund.TransactionId
 
 		cell = row.AddCell()
 		set_text_cell_style(cell, "right")
-		cell.SetFloatWithFormat(payment.GrossAmount, "0.00")
+		cell.SetFloatWithFormat(refund.OrderAmount, "0.00")
 
 		cell = row.AddCell()
 		set_text_cell_style(cell, "right")
-		cell.SetFloatWithFormat(payment.FeeAmount, "0.00")
-
-		cell = row.AddCell()
-		set_text_cell_style(cell, "right")
-		cell.SetFloatWithFormat(payment.NetAmount, "0.00")
-
-		cell = row.AddCell()
-		set_text_cell_style(cell, "center")
-		cell.Value = payment.Status
+		cell.SetFloatWithFormat(refund.RefundAmount, "0.00")
 
 		cell = row.AddCell()
 		set_text_cell_style(cell, "left")
-		cell.Value = payment.Payer
+		cell.Value = refund.TypeName
 
 		cell = row.AddCell()
 		set_text_cell_style(cell, "left")
-		cell.Value = payment.PayerDisplayName
+		cell.Value = refund.Reason
+
+		cell = row.AddCell()
+		set_text_cell_style(cell, "left")
+		cell.Value = refund.StatusName
+
+		cell = row.AddCell()
+		set_text_cell_style(cell, "left")
+		cell.Value = refund.ApplyUserName
+
+		cell = row.AddCell()
+		set_text_cell_style(cell, "left")
+		cell.Value = refund.ApplyTime.String()
+
+		cell = row.AddCell()
+		set_text_cell_style(cell, "left")
+		cell.Value = refund.Description
 	}
 
 	return xlsx_file
