@@ -18,6 +18,8 @@ type OrderRefundInfo struct {
 	TypeName      string    `xorm:"nvarchar(200) notnull 'type_name'" json:"type_name"`
 	ReasonId      int64     `xorm:"bigint notnull index 'reason_id'" json:"reason_id"`
 	Reason        string    `xorm:"nvarchar(200) notnull 'reason'" json:"reason"`
+	MethodId      int64     `xorm:"bigint notnull index 'method_id'" json:"method_id"`
+	MethodName    string    `xorm:"nvarchar(200) notnull 'method_name'" json:"method_name"`
 	Description   string    `xorm:"nvarchar(500) notnull 'description'" json:"description"`
 	ProductId     int64     `xorm:"bigint notnull index 'product_id'" json:"product_id"`
 	ProductCode   string    `xorm:"nvarchar(200) notnull 'product_code'" json:"product_code"`
