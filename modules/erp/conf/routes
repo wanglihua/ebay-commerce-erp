@@ -820,7 +820,7 @@ POST /order/split/save                          ErpOrderSplit.Save
 
 POST /order/refund                              ErpOrderRefund.Refund
 POST /order/refund/list/data                    ErpOrderRefund.ListData
-GET  /order/refund/apply/show                   ErpOrderRefund.ApplyShow
+GET  /order/refund/apply/show/:order_id         ErpOrderRefund.ApplyShow
 POST /order/refund/apply/show/data              ErpOrderRefund.ApplyShowData
 POST /order/refund/apply/                       ErpOrderRefund.Apply
 

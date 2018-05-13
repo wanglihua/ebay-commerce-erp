@@ -49,11 +49,11 @@ func (c ErpOrderRefund) ListData() revel.Result {
 	})
 }
 
-func (c ErpOrderRefund) ApplyShow() revel.Result {
-	var order_id int64
-	c.Params.Bind(&order_id, "order_id")
+func (c ErpOrderRefund) ApplyShow(order_id int64) revel.Result {
 
-	return c.RenderTemplate("erp/ppgl/order_refund/order_refund_apply.html")
+	c.RenderArgs["order_id"] = order_id
+
+	return c.RenderTemplate("erp/ppgl/order_refund/order_refund_apply.tpl")
 }
 
 func (c ErpOrderRefund) ApplyShowData() revel.Result {

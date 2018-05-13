@@ -411,7 +411,7 @@
                     <hr style="margin-top: 5px;margin-bottom: 5px;"/>
                     <div class="row">
                         <div class="col-xs-12" style="text-align: right;">
-                            <a class="btn btn-sm btn-purple" href="#">退款</a>
+                            <a class="btn btn-sm btn-purple" href="{% url "ErpOrderRefund.ApplyShow" .order_id %}" target="order_refund_apply">退款</a>
                         </div>
                     </div>
                     {% end %}
