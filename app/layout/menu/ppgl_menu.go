@@ -35,21 +35,21 @@ func GetPpglMenu(res_id_map map[int64]bool, web_session revel.Session) string {
     <b class="arrow"></b>
     <ul class="submenu">`)
 
-	if check_pass_res_menu(pass_res.PPGL_PAYPAL_PAYMENT) {
-		buffer.WriteString(`<li id="ppgl-paypal-payment-menu" class="">
-            <a href="/paypal/payment">
-                <i class="menu-icon fa fa-caret-right"></i>
-                Paypal付款
-            </a>
-            <b class="arrow"></b>
-        </li>`)
-	}
-
 	if check_pass_res_menu(pass_res.PPGL_ORDER_REFUND_APPROVE) {
 		buffer.WriteString(`<li id="ppgl-refund-menu" class="">
             <a href="/refund">
                 <i class="menu-icon fa fa-caret-right"></i>
                 订单退款
+            </a>
+            <b class="arrow"></b>
+        </li>`)
+	}
+
+	if check_pass_res_menu(pass_res.PPGL_PAYPAL_PAYMENT) {
+		buffer.WriteString(`<li id="ppgl-paypal-payment-menu" class="">
+            <a href="/paypal/payment">
+                <i class="menu-icon fa fa-caret-right"></i>
+                Paypal付款
             </a>
             <b class="arrow"></b>
         </li>`)

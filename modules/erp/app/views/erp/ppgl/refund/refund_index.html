@@ -1,4 +1,4 @@
-{%header "Paypal付款" .%}
+{%header "订单退款" .%}
 <div id="page">
     <div class="breadcrumbs" id="breadcrumbs">
         <ul class="breadcrumb">
@@ -128,6 +128,7 @@
                                     return dtFormatFloat(data);
                                 }
                             },
+                            {"mDataProp": "method_name", "title": "退款方式", "bSearchable": true, "width": 120},
                             {"mDataProp": "type_name", "title": "退款类型", "bSearchable": true, "width": 120},
                             {"mDataProp": "reason", "title": "退款原因", "bSearchable": true, "width": 150},
                             {"mDataProp": "status_name", "title": "状态", "bSearchable": true, "width": 80},

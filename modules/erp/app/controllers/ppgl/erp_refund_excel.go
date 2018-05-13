@@ -144,6 +144,12 @@ func (c ErpRefundExcel) get_export_excel_content(db_session *xorm.Session, order
 		cell = row.AddCell()
 		sheet.SetColWidth(col_index, col_index, 10)
 		set_head_cell_style(cell)
+		cell.Value = "退款方式"
+		col_index++
+
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 10)
+		set_head_cell_style(cell)
 		cell.Value = "退款类型"
 		col_index++
 
@@ -205,6 +211,10 @@ func (c ErpRefundExcel) get_export_excel_content(db_session *xorm.Session, order
 		cell = row.AddCell()
 		set_text_cell_style(cell, "right")
 		cell.SetFloatWithFormat(refund.RefundAmount, "0.00")
+
+		cell = row.AddCell()
+		set_text_cell_style(cell, "left")
+		cell.Value = refund.MethodName
 
 		cell = row.AddCell()
 		set_text_cell_style(cell, "left")
