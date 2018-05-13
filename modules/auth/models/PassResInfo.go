@@ -896,7 +896,7 @@ func (e PassResInfo) InitData(db_session *xorm.Session) {
 
 		// INSERT INTO auth_pass_res (id, cate_id, name, `desc`, create_time, update_time) VALUES (131700, 10500, '订单退款', '订单退款', now(), now());
 		pass = new(PassResInfo)
-		pass.Id = pass_res.PPGL_ORDER_REFUND_APPLICATION
+		pass.Id = pass_res.PPGL_ORDER_REFUND_APPLY
 		pass.CateId = pass_res_cate.PPGL
 		pass.Name = "订单退款申请"
 		pass.Desc = core.MakeNullString("订单退款申请", true)

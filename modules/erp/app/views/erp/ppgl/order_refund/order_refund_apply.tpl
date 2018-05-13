@@ -290,10 +290,7 @@
                 "order_type": {},
                 "order_hold_type": {},
                 "order_logistics": {},
-                "logistics_setting": {},
-                "logistics_stock": {},
-                "logistics_mode": {},
-                "order_item_list": [],
+                "order_item_list": []
             }
         },
         mounted: function () {
@@ -302,7 +299,7 @@
             $.ajax(
                 {
                     "dataType": 'json',
-                    "url": '{% url "ErpOrder.DetailData"%}',
+                    "url": '{% url "ErpOrderRefund.ApplyShowData"%}',
                     "data": {
                         "id": order_id
                     },

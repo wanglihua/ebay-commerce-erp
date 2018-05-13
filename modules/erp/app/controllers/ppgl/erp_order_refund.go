@@ -7,6 +7,15 @@ import (
 	"matrix/modules/erp/service/order_paypal_service"
 	"matrix/core"
 	"matrix/modules/erp/models/ppgl_models"
+	"matrix/modules/erp/models/ddlc_models"
+	"matrix/modules/erp/service/order_service"
+	"matrix/modules/erp/models/sppz_models"
+	"fmt"
+	"matrix/modules/erp/models/ddpz_models"
+	"matrix/modules/erp/models/xtpz_models"
+	"matrix/modules/erp/models/kcgl_models"
+	"math"
+	"matrix/modules/erp/models"
 )
 
 type ErpOrderRefund struct {
@@ -50,6 +59,7 @@ func (c ErpOrderRefund) ListData() revel.Result {
 }
 
 func (c ErpOrderRefund) ApplyShow(order_id int64) revel.Result {
+	pass_service.Check_login_user_pass(pass_res.PPGL_ORDER_REFUND_APPLY, c.Session)
 
 	c.RenderArgs["order_id"] = order_id
 
@@ -57,12 +67,130 @@ func (c ErpOrderRefund) ApplyShow(order_id int64) revel.Result {
 }
 
 func (c ErpOrderRefund) ApplyShowData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.PPGL_ORDER_REFUND_APPLY, c.Session)
+
+	db_session := c.DbSession
+
+	var order_id int64
+	c.Params.Bind(&order_id, "id")
+
+	revel.TRACE.Println("order_id:", order_id)
+
+	var order ddlc_models.OrderInfo
+	has_order, err := db_session.Id(order_id).Get(&order)
+	core.HandleError(err)
+	if has_order == false {
+		return c.RenderJson(map[string]interface{}{
+			"success": false,
+			"message": "指定的订单不存在！",
+		})
+	}
+
+	var status models.StatusInfo
+	_, err = db_session.Id(order.StatusId).Get(&status)
+	core.HandleError(err)
+
+	var shop xtpz_models.ShopAccountInfo
+	_, err = db_session.Id(order.ShopId).Get(&shop)
+	core.HandleError(err)
+
+	var order_type ddpz_models.OrderTypeInfo
+	_, err = db_session.Id(order.TypeId).Get(&order_type)
+	core.HandleError(err)
+
+	var order_hold_type ddpz_models.OrderHoldTypeInfo
+	_, err = db_session.Id(order.HoldTypeId).Get(&order_hold_type)
+	core.HandleError(err)
+
+	type order_item_view_t struct {
+		OrderItem         ddlc_models.OrderItemInfo        `xorm:"extends" json:"oi"`
+		Product           kcgl_models.ProductInfo          `xorm:"extends" json:"p"`
+		ProductSotoreItem sppz_models.ProductStoreItemInfo `xorm:"extends" json:"psi"`
+	}
+
+	sql := `
+SELECT oi.*, p.*, psi.*
+FROM erp_order_item oi
+    INNER JOIN erp_product p ON p.id = oi.item_product_id
+    LEFT JOIN erp_product_store_item psi ON psi.id = oi.product_store_item_id
+WHERE oi.order_id = %d;`
+	sql = fmt.Sprintf(sql, order_id)
+
+	order_item_list := make([]order_item_view_t, 0)
+	err = db_session.Sql(sql).Find(&order_item_list)
+	core.HandleError(err)
+
+	var order_logistics ddlc_models.OrderLogisticsInfo
+	_, err = db_session.Where(fmt.Sprintf("order_id = %d", order_id)).Get(&order_logistics)
+	core.HandleError(err)
+
+	var logistics_mode ddpz_models.LogisticsModeInfo
+	if !(order.StatusId == models.ORDER_STATUS_HOLD && order.HoldTypeId.Valid == true &&
+		(order.HoldTypeId.Int64 == ddpz_models.ORDER_HOLD_TYPE_ENVELOPE ||
+			order.HoldTypeId.Int64 == ddpz_models.ORDER_HOLD_TYPE_LOGISTICS_NO_MATCH ||
+			order.HoldTypeId.Int64 == ddpz_models.ORDER_HOLD_TYPE_INTERNATIONAL ||
+			order.HoldTypeId.Int64 == ddpz_models.ORDER_HOLD_TYPE_PRODUCT_INFO_MISS)) {
+		//如果是Hold状态且是信封Hold的就不显示匹配的物流，因为这些信息可以是前一次匹配时遗留的，后来指定了 Hold
+		_, err = db_session.Id(order_logistics.ModeId).Get(&logistics_mode)
+		core.HandleError(err)
+	}
+
+	var order_cost_amount = order_logistics.CostAmount * order.ExchangeRate
+
+	// 物流费用
+
+	var logistics_fee float64 = (order_logistics.TotalFee + order_logistics.PickFee) * order.ExchangeRate
+
+	if order_logistics.ActualFee != 0 {
+		logistics_fee = (order_logistics.ActualFee + order_logistics.PickFee) * order.ExchangeRate
+	}
+
+	// gst 消费税
+	var order_gst float64 = order_service.Get_order_gst_fee(&order)
+
+	// 重新按实际运费计算毛利
+	var order_profit_au = order_service.CalculateOrderProfit(&order, &order_logistics)
+	var order_profit = order_profit_au * order.ExchangeRate
+
+	if math.Abs(order.ProfitAu-order_profit_au) > core.FLOAT_MIN_DIFF { // 之前许多订单没有按实际运费计算毛利的，这个机会计算一下
+		order.ProfitAu = order_profit_au
+		order.ProfitRmb = order_profit
+
+		_, err := db_session.Id(order.Id).Cols("profit_au", "profit_rmb").Update(&order)
+		core.HandleError(err)
+
+		// 平均分配利润到订单项
+		var order_item_list = make([]ddlc_models.OrderItemInfo, 0)
+		core.HandleError(db_session.Where("order_id = ?", order.Id).Find(&order_item_list))
+
+		var order_cost_amount = order_service.GetOrderCostAmountSum(order.Id, db_session)
+
+		for _, oi := range order_item_list {
+			// 利润分配
+			oi.GrossProfit = oi.CostPrice * float64(oi.Quantity) * order.ProfitAu / order_cost_amount
+			_, err := db_session.Id(oi.Id).Cols("gross_profit").Update(&oi)
+			core.HandleError(err)
+		}
+	}
+
 	return c.RenderJson(map[string]interface{}{
-		"success": true,
+		"order":             order,
+		"status":            status,
+		"shop":              shop,
+		"order_type":        order_type,
+		"order_hold_type":   order_hold_type,
+		"order_item_list":   order_item_list,
+		"order_logistics":   order_logistics,
+		"order_cost_amount": order_cost_amount, // rmb
+		"logistics_fee":     logistics_fee,     // rmb
+		"order_gst":         order_gst,         // aud
+		"order_profit":      order.ProfitRmb,   // rmb
 	})
 }
 
 func (c ErpOrderRefund) Apply() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.PPGL_ORDER_REFUND_APPLY, c.Session)
+	
 	return c.RenderJson(map[string]interface{}{
 		"success": true,
 	})
