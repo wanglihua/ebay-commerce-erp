@@ -151,6 +151,13 @@ func (c ErpRefund) PaypalRefund() revel.Result {
 		})
 	}
 
+	if order_refund.StatusId != models.REFUND_STATUS_YSH && order_refund.StatusId != models.REFUND_STATUS_YSB {
+		return c.RenderJson(core.JsonResult{
+			Success: false,
+			Message: "订单退款当前不是已审核或已失败状态！",
+		})
+	}
+
 	var result = order_paypal_service.Order_refund(order_refund_id, db_session)
 
 	return c.RenderJson(result)
