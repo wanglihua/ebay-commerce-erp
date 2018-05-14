@@ -9,6 +9,7 @@ import (
 	"matrix/modules/erp/models/xtpz_models"
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/order_paypal_service"
+	"sync"
 )
 
 type ErpRefund struct {
@@ -102,7 +103,15 @@ func (c ErpRefund) Approve() revel.Result {
 	})
 }
 
+var paypal_refund_mutex sync.Mutex
+
 func (c ErpRefund) PaypalRefund() revel.Result {
+
+	paypal_refund_mutex.Lock()
+	defer func() {
+		paypal_refund_mutex.Unlock()
+	}()
+
 	pass_service.Check_login_user_pass(pass_res.PPGL_ORDER_REFUND_APPROVE, c.Session)
 
 	var db_session = c.DbSession
