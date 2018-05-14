@@ -1144,15 +1144,21 @@
                                 }
                             },
                             {
-                                "mDataProp": "prd.tax_point", "title": "税点", "bSearchable": false, "sClass": "dtRight", "width": 50,
+                                "mDataProp": "prd.price", "title": "价格", "bSearchable": false, "sClass": "dtRight", "width": 50,
                                 "render": function (data, type, row) {
                                     return dtFormatFloat(data);
                                 }
                             },
                             {
+                                "mDataProp": "prd.tax_point", "title": "税点", "bSearchable": false, "sClass": "dtRight", "width": 50,
+                                "render": function (data, type, row) {
+                                    return dtFormatFloat(data) + '%';
+                                }
+                            },
+                            {
                                 "mDataProp": "prd.drawback_point", "title": "退税点", "bSearchable": false, "sClass": "dtRight", "width": 60,
                                 "render": function (data, type, row) {
-                                    return dtFormatFloat(data);
+                                    return dtFormatFloat(data) + '%';
                                 }
                             },
                             {
