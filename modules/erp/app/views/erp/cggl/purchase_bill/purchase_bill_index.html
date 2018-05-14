@@ -1129,9 +1129,30 @@
                             },
                             {"mDataProp": "prd.sku", "title": "SKU", "bSearchable": true, "width": 100},
                             {
-                                "mDataProp": "prd.cn_name", "title": "商品名称", "bSearchable": true, "sClass": "wrap-word", "width": 100,
+                                "mDataProp": "prd.cn_name", "title": "商品名称", "bSearchable": true, "sClass": "wrap-word", "width": 150,
                                 "render": function (data, type, row) {
-                                    return data;
+                                    return "<div>" + data + "</div>";
+                                }
+                            },
+                            {
+                                "mDataProp": "prd.need_invoice", "title": "是否开票", "bSearchable": false, "sClass": "wrap-word", "width": 80,
+                                "render": function (data, type, row) {
+                                    if (data !== 0) {
+                                        return "是";
+                                    }
+                                    return "否";
+                                }
+                            },
+                            {
+                                "mDataProp": "prd.tax_point", "title": "税点", "bSearchable": false, "sClass": "dtRight", "width": 50,
+                                "render": function (data, type, row) {
+                                    return dtFormatFloat(data);
+                                }
+                            },
+                            {
+                                "mDataProp": "prd.drawback_point", "title": "退税点", "bSearchable": false, "sClass": "dtRight", "width": 60,
+                                "render": function (data, type, row) {
+                                    return dtFormatFloat(data);
                                 }
                             },
                             {
