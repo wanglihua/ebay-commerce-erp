@@ -40,7 +40,6 @@ func (c ErpPaypalPayment) ListData() revel.Result {
 	var query_begin_time string
 	c.Params.Bind(&query_begin_time, "begin_time_query")
 	query_begin_date, query_begin_date_err := core.Parse_time(query_begin_time)
-	revel.TRACE.Println("query_begin_time", query_begin_time)
 
 	var query_end_time string
 	c.Params.Bind(&query_end_time, "end_time_query")

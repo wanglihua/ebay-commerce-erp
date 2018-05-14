@@ -10,6 +10,8 @@ import (
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/order_paypal_service"
 	"sync"
+	"fmt"
+	"time"
 )
 
 type ErpRefund struct {
@@ -36,6 +38,34 @@ func (c ErpRefund) ListData() revel.Result {
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
+	/*
+	var order_code string
+	c.Params.Bind(&order_code, "order_code")
+	*/
+
+	var query_begin_time string
+	c.Params.Bind(&query_begin_time, "begin_time_query")
+	query_begin_date, query_begin_date_err := core.Parse_time(query_begin_time)
+
+	var query_end_time string
+	c.Params.Bind(&query_end_time, "end_time_query")
+	query_end_date, query_end_date_err := core.Parse_time(query_end_time)
+
+	/*
+	if order_code != "" {
+
+	}
+	*/
+
+	if query_begin_date_err == nil {
+		filter = core.SqlAnd(filter, fmt.Sprintf("apply_time >= '%04d-%02d-%02d'", query_begin_date.Year(), query_begin_date.Month(), query_begin_date.Day()))
+	}
+
+	if query_end_date_err == nil {
+		query_end_date = query_end_date.Add(time.Hour * 24)
+		filter = core.SqlAnd(filter, fmt.Sprintf("apply_time < '%04d-%02d-%02d'", query_end_date.Year(), query_end_date.Month(), query_end_date.Day()))
+	}
+
 	var query = db_session.Where(filter)
 
 	dataQuery := *query
@@ -58,15 +88,6 @@ func (c ErpRefund) ListData() revel.Result {
 		Total: count,
 	})
 }
-
-/*
-	REFUND_STATUS_YXJ = 7100 // 已新建
-	REFUND_STATUS_YSH = 7200 // 已审核
-	REFUND_STATUS_YCG = 7300 // 已成功
-	REFUND_STATUS_YSB = 7400 // 已失败
-	REFUND_STATUS_YZF = 7500 // 已作废
-	REFUND_STATUS_YWJ = 7600 // 已完结
- */
 
 func (c ErpRefund) Approve() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.PPGL_ORDER_REFUND_APPROVE, c.Session)
@@ -118,6 +139,17 @@ func (c ErpRefund) PaypalRefund() revel.Result {
 	var order_refund_id int64
 
 	c.Params.Bind(&order_refund_id, "order_refund_id")
+
+	var order_refund ppgl_models.OrderRefundInfo
+	_, err := db_session.Id(order_refund_id).Get(&order_refund)
+	core.HandleError(err)
+
+	if order_refund.MethodId != ppgl_models.PAYMENT_METHOD_PALPAY {
+		return c.RenderJson(core.JsonResult{
+			Success: false,
+			Message: "订单退款退款方式不是Paypal！",
+		})
+	}
 
 	var result = order_paypal_service.Order_refund(order_refund_id, db_session)
 

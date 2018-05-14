@@ -17,6 +17,22 @@
                         <i class="ace-icon fa fa-refresh"></i>
                         刷新
                     </button>
+                    <button class="btn btn-pink btn-sm" onclick="approve()">
+                        <i class="ace-icon fa fa-file-excel-o"></i>
+                        审核
+                    </button>
+                    <button class="btn btn-purple btn-sm" onclick="paypalRefund()">
+                        <i class="ace-icon fa fa-file-excel-o"></i>
+                        PayPal退款
+                    </button>
+                    <button class="btn btn-success btn-sm" onclick="complete()">
+                        <i class="ace-icon fa fa-file-excel-o"></i>
+                        完结
+                    </button>
+                    <button class="btn btn-danger btn-sm" onclick="cancel()">
+                        <i class="ace-icon fa fa-file-excel-o"></i>
+                        作废
+                    </button>
                     <button class="btn btn-purple btn-sm" onclick="exportPaymentList()">
                         <i class="ace-icon fa fa-file-excel-o"></i>
                         导出
@@ -25,14 +41,6 @@
                 <div class="row" style="margin-top: 20px;margin-bottom: 20px;">
                     <div id="query" class="col-xs-12" style="line-height: 28px;">
                         <div class="col-xs-12">
-
-                            <label for="account_id_query">PayPal账户</label>
-                            <select id="account_id_query" name="account_id_query" style="height: 30px; width: 130px;" @change="refreshList();">
-                                <option value="0">--PayPal账户--</option>
-                                {% range $index, $account := .account_list %}
-                                <option value="{% $account.Id %}">{% $account.PaypalAccount %}</option>
-                                {% end %}
-                            </select>
 
                             <label for="begin_time_query">时间</label>
                             <input id="begin_time_query" name="begin_time_query" style="width: 135px;height:30px;" placeholder="开始时间如2016-01-02"/>
@@ -65,13 +73,140 @@
 
     function exportPaymentList() {
         var params = $.param({
-            "account_id_query": $("#account_id_query").val(),
             "begin_time_query": $("#begin_time_query").val(),
             "end_time_query": $("#end_time_query").val()
         });
 
         var url = '{%url "ErpRefundExcel.Export"%}' + "?" + params;
         $('<form method="post" action="' + url + '"></form>').appendTo('body').submit().remove();
+    }
+
+    function approve() {
+        var id_list = [];
+        $('#refundList').find('tbody tr>td:first-child input:checkbox').each(function () {
+            if (this.checked) {
+                id_list.push($(this).val());
+            }
+        });
+
+        if (id_list.length !== 1) {
+            $.msg.alert("请选择一行数据！");
+            return;
+        }
+
+        $.msg.confirm("确认要审核通过吗？", function () {
+            $.ajax({
+                url: '{%url "ErpRefund.Approve"%}',
+                type: "POST",
+                data: {"order_refund_id": id_list[0]},
+                success: function (data) {
+                    if (data.success === false) {
+                        $.msg.error(data.message);
+                        return;
+                    }
+                    else {
+                        $.msg.show(data.message);
+                    }
+                    reloadList('#refundList');
+                }
+            });
+        });
+    }
+
+    function paypalRefund() {
+        var id_list = [];
+        $('#refundList').find('tbody tr>td:first-child input:checkbox').each(function () {
+            if (this.checked) {
+                id_list.push($(this).val());
+            }
+        });
+
+        if (id_list.length !== 1) {
+            $.msg.alert("请选择一行数据！");
+            return;
+        }
+
+        $.msg.confirm("确认要通过PayPal退款吗？", function () {
+            $.ajax({
+                url: '{%url "ErpRefund.PaypalRefund"%}',
+                type: "POST",
+                data: {"order_refund_id": id_list[0]},
+                success: function (data) {
+                    if (data.success === false) {
+                        $.msg.error(data.message);
+                        return;
+                    }
+                    else {
+                        $.msg.show(data.message);
+                    }
+                    reloadList('#refundList');
+                }
+            });
+        });
+    }
+
+    function complete() {
+        var id_list = [];
+        $('#refundList').find('tbody tr>td:first-child input:checkbox').each(function () {
+            if (this.checked) {
+                id_list.push($(this).val());
+            }
+        });
+
+        if (id_list.length !== 1) {
+            $.msg.alert("请选择一行数据！");
+            return;
+        }
+
+        $.msg.confirm("确认要通过完结退款吗？", function () {
+            $.ajax({
+                url: '{%url "ErpRefund.Complete"%}',
+                type: "POST",
+                data: {"order_refund_id": id_list[0]},
+                success: function (data) {
+                    if (data.success === false) {
+                        $.msg.error(data.message);
+                        return;
+                    }
+                    else {
+                        $.msg.show(data.message);
+                    }
+                    reloadList('#refundList');
+                }
+            });
+        });
+    }
+
+    function cancel() {
+        var id_list = [];
+        $('#refundList').find('tbody tr>td:first-child input:checkbox').each(function () {
+            if (this.checked) {
+                id_list.push($(this).val());
+            }
+        });
+
+        if (id_list.length !== 1) {
+            $.msg.alert("请选择一行数据！");
+            return;
+        }
+
+        $.msg.confirm("确认要通过作废退款申请吗？", function () {
+            $.ajax({
+                url: '{%url "ErpRefund.Cancel"%}',
+                type: "POST",
+                data: {"order_refund_id": id_list[0]},
+                success: function (data) {
+                    if (data.success === false) {
+                        $.msg.error(data.message);
+                        return;
+                    }
+                    else {
+                        $.msg.show(data.message);
+                    }
+                    reloadList('#refundList');
+                }
+            });
+        });
     }
 
     var vm = new Vue({

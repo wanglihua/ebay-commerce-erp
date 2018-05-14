@@ -24,23 +24,15 @@ func (c ErpRefundExcel) Export() revel.Result {
 
 	var db_session = c.DbSession
 
-	var account_id_query int64
-	c.Params.Bind(&account_id_query, "account_id_query")
-
 	var query_begin_time string
 	c.Params.Bind(&query_begin_time, "begin_time_query")
 	query_begin_date, query_begin_date_err := core.Parse_time(query_begin_time)
-	revel.TRACE.Println("query_begin_time", query_begin_time)
 
 	var query_end_time string
 	c.Params.Bind(&query_end_time, "end_time_query")
 	query_end_date, query_end_date_err := core.Parse_time(query_end_time)
 
 	var filter = "1=1"
-
-	if account_id_query != 0 {
-		filter = core.SqlAnd(filter, fmt.Sprintf("account_id = %d", account_id_query))
-	}
 
 	if query_begin_date_err == nil {
 		filter = core.SqlAnd(filter, fmt.Sprintf("apply_time >= '%04d-%02d-%02d'", query_begin_date.Year(), query_begin_date.Month(), query_begin_date.Day()))
