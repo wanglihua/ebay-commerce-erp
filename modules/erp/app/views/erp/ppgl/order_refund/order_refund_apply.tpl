@@ -1,4 +1,11 @@
 {% site_header "订单退款申请" . %}
+<style type="text/css">
+    .form-group.has-error span.refund_product_id:after {
+        color: #D16E6C;
+        display: inline;
+        content: "必填";
+    }
+</style>
 <div class="main-container" id="main-container">
     <div id="order_detail" style="width: 1024px;margin-left: auto;margin-right: auto;">
         <div class="widget-box">
@@ -7,6 +14,7 @@
             </div>
             <div class="widget-body">
                 <div class="widget-main">
+                    <form id="refundForm">
                     <div class="row">
                         <div class="col-xs-3">
                             <div class="form-group">
@@ -85,15 +93,7 @@
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
-        <div class="widget-box">
-            <div class="widget-header">
-                <h4 class="smaller">订单报表</h4>
-            </div>
-            <div class="widget-body">
-                <div class="widget-main">
+                    <hr style="margin-top: 0px;margin-bottom: 10px;"/>
                     <div class="row">
                         <div class="col-xs-12">
                             <table id="order_price_report" class="table table-bordered">
@@ -190,16 +190,7 @@
                             </table>
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="widget-box">
-            <div class="widget-header">
-                <h4 class="smaller">订单详情</h4>
-            </div>
-            <div class="widget-body">
-                <div class="widget-main">
+                    <hr style="margin-top: 0px;margin-bottom: 10px;"/>
                     <div class="row">
                         <div class="col-xs-12">
                             <table id="order_item_list" class="table table-striped table-bordered">
@@ -220,10 +211,12 @@
                                 <template v-for="order_item in detail.order_item_list">
                                     <tr>
                                         <td class="center">
+                                            <div class="form-group">
                                             <label class="pos-rel">
-                                                <input type="checkbox" class="ace" :value="order_item.oi.id"/>
-                                                <span class="lbl"></span>
+                                                <input type="radio" name="refund_product_id" class="ace" :value="order_item.p.id"/>
+                                                <span class="lbl refund_product_id"></span>
                                             </label>
+                                            </div>
                                         </td>
                                         <td class="center">
                                             <a :href="order_item.psi.view_item_url" target="_blank">
@@ -273,54 +266,77 @@
                             </table>
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
-		
-        <div class="widget-box">
-            <div class="widget-header">
-                <h4 class="smaller">订单退款</h4>
-            </div>
-            <div class="widget-body">
-                <div class="widget-main">
+                    <hr style="margin-top: 0px;margin-bottom: 10px;"/>
                     <div class="row">
                         <div class="col-xs-3">
+                            <input type="hidden" id="refund_order_id" name="refund_order_id" value="{% .order_id %}" />
                             <div class="form-group">
-                                <label for="order_code" class="col-xs-4 control-label">订单编号：</label>
+                                <label for="refund_type_id" class="col-xs-4 control-label">退款类型：</label>
                                 <div class="col-xs-8">
-                                    <input id="order_code" name="order_code" type="text" class="input-sm form-control" disabled="disabled" v-model="detail.order.code"/>
+                                    <select id="refund_type_id" name="refund_type_id" class="input-sm form-control" >
+                                    <option value="">--退款类型--</option>
+                                    {% range $index, $refund_type := .order_refund_type_list %}
+                                    <option value="{% $refund_type.Id %}">{% $refund_type.Name %}</option>
+                                    {% end %}
+                                    </select>
                                 </div>
                             </div>
                         </div>
                         <div class="col-xs-3">
                             <div class="form-group">
-                                <label for="created_time" class="col-xs-4 control-label">建单时间：</label>
+                                <label for="refund_reason_id" class="col-xs-4 control-label">退款原因：</label>
                                 <div class="col-xs-8">
-                                    <input id="created_time" name="created_time" type="text" class="input-sm form-control" disabled="disabled" v-model="detail.order.created_time"/>
+                                   <select id="refund_reason_id" name="refund_reason_id" class="input-sm form-control" >
+                                    <option value="">--退款原因--</option>
+                                    {% range $index, $refund_reason := .order_refund_reason_list %}
+                                    <option value="{% $refund_reason.Id %}">{% $refund_reason.Name %}</option>
+                                    {% end %}
+                                    </select>
                                 </div>
                             </div>
                         </div>
                         <div class="col-xs-3">
                             <div class="form-group">
-                                <label for="status_name" class="col-xs-4 control-label">状态：</label>
+                                <label for="refund_method_id" class="col-xs-4 control-label">退款渠道：</label>
                                 <div class="col-xs-8">
-                                    <input id="status_name" name="status_name" type="text" class="input-sm form-control" disabled="disabled" v-model="detail.status.name"/>
+                                   <select id="refund_method_id" name="refund_method_id" class="input-sm form-control" >
+                                    <option value="">--退款渠道--</option>
+                                    {% range $index, $refund_method := .order_refund_method_list %}
+                                    <option value="{% $refund_method.Id %}">{% $refund_method.Name %}</option>
+                                    {% end %}
+                                    </select>
                                 </div>
                             </div>
                         </div>
                         <div class="col-xs-3">
                             <div class="form-group">
-                                <label for="order_type_name" class="col-xs-4 control-label">订单类型：</label>
+                                <label for="refund_amount" class="col-xs-4 control-label">退款金额：</label>
                                 <div class="col-xs-8">
-                                    <input id="order_type_name" name="order_type" type="text" class="input-sm form-control" disabled="disabled" v-model="detail.order_type.name"/>
+                                    <input id="refund_amount" name="refund_amount" type="text" class="input-sm form-control"/>
                                 </div>
                             </div>
                         </div>
                     </div>
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <div class="form-group">
+                                <label for="refund_description" class="col-xs-1 control-label">退款描述：</label>
+                                <div class="col-xs-11">
+                                    <textarea id="refund_description" name="refund_description" rows="2" class="input-sm form-control"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr style="margin-top: 5px;margin-bottom: 5px;"/>
+                    <div class="row">
+                        <div class="col-xs-12" style="text-align: right;">
+                            <button class="btn btn-sm btn-purple" onclick="orderRefundApply()">申请退款</button>
+                        </div>
+                    </div>
+                    </form>
                 </div>
             </div>
         </div>
-		
     </div>
 </div>
 {%template "erp/ppgl/order_refund/order_refund_apply.var" .%}
@@ -363,6 +379,56 @@
             }
         }
     });
+
+    function orderRefundApply() {
+        showMask("提交中...");
+        var form = $("#refundForm");
+        var valid = validate(form, {
+            'refund_order_id': {
+                required: true
+            },
+            'refund_product_id': {
+                required: true
+            },
+            'refund_type_id': {
+                required: true
+            },
+            'refund_reason_id': {
+                required: true
+            },
+            'refund_method_id': {
+                required: true
+            },
+            'refund_amount': {
+                required: true, number: true
+            },
+            'refund_description': {
+                required: false, minlength: 0, maxlength: 400
+            }
+        });
+
+        if (!valid) {
+            hideMask();
+        } else {
+            $.ajax({
+                    url: '{%url "ErpOrderRefund.Apply"%}',
+                    type: "POST",
+                    data: form.serialize(),
+                    success: function (data) {
+                        hideMask();
+                        if (data.success === false) {
+                            $.msg.error(data.message);
+                            //return;
+                        }
+                        else {
+                            $.msg.show(data.message);
+                            //return;
+                        }
+                    }
+                }
+            );
+        }
+    }
 
     function load_order_detail() {
         $.ajax({

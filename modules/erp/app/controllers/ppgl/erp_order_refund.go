@@ -60,8 +60,22 @@ func (c ErpOrderRefund) ListData() revel.Result {
 
 func (c ErpOrderRefund) ApplyShow(order_id int64) revel.Result {
 	pass_service.Check_login_user_pass(pass_res.PPGL_ORDER_REFUND_APPLY, c.Session)
+	var db_session = c.DbSession
 
 	c.RenderArgs["order_id"] = order_id
+
+	var order_refund_method_list = make([]ppgl_models.OrderRefundMethodInfo, 0)
+	core.HandleError(db_session.Find(&order_refund_method_list))
+
+	var order_refund_type_list = make([]ppgl_models.OrderRefundTypeInfo, 0)
+	core.HandleError(db_session.Find(&order_refund_type_list))
+
+	var order_refund_reason_list = make([]ppgl_models.OrderRefundReasonInfo, 0)
+	core.HandleError(db_session.Find(&order_refund_reason_list))
+
+	c.RenderArgs["order_refund_method_list"] = order_refund_method_list
+	c.RenderArgs["order_refund_type_list"] = order_refund_type_list
+	c.RenderArgs["order_refund_reason_list"] = order_refund_reason_list
 
 	return c.RenderTemplate("erp/ppgl/order_refund/order_refund_apply.tpl")
 }
@@ -190,8 +204,14 @@ WHERE oi.order_id = %d;`
 
 func (c ErpOrderRefund) Apply() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.PPGL_ORDER_REFUND_APPLY, c.Session)
-	
+
+	var refund_order_id int64
+	c.Params.Bind(&refund_order_id, "refund_order_id")
+
+
+
 	return c.RenderJson(map[string]interface{}{
-		"success": true,
+		"success":  true,
+		"message": "退款申请成功！",
 	})
 }
