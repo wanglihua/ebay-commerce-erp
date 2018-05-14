@@ -829,5 +829,8 @@ POST /refund/list/data                          ErpRefund.ListData
 POST /refund/approve                            ErpRefund.Approve
 POST /refund/complete                           ErpRefund.Complete
 POST /refund/cancel                             ErpRefund.Cancel
+POST /refund/paypal/refund                      ErpRefund.PaypalRefund
+
+# PaypalRefund
 
 POST /refund/excel/export                       ErpRefundExcel.Export

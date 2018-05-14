@@ -5,6 +5,9 @@ import (
 	"github.com/go-xorm/xorm"
 )
 
+const PAYMENT_METHOD_PALPAY int64 = 1
+const PAYMENT_METHOD_BANK int64 = 2
+
 type OrderRefundMethodInfo struct {
 	Id          int64     `xorm:"bigint notnull pk 'id'" json:"id"`
 	Name        string    `xorm:"nvarchar(200) notnull index 'name'" json:"name"`
@@ -28,13 +31,13 @@ func (e OrderRefundMethodInfo) InitData(db_session *xorm.Session) {
 	 */
 
 	var refund_method = new(OrderRefundMethodInfo)
-	refund_method.Id = 1
+	refund_method.Id = PAYMENT_METHOD_PALPAY
 	refund_method.Name = "paypal接口"
 	refund_method.Description = "paypal接口"
 	db_session.Insert(refund_method)
 
 	refund_method = new(OrderRefundMethodInfo)
-	refund_method.Id = 2
+	refund_method.Id = PAYMENT_METHOD_BANK
 	refund_method.Name = "银行转账"
 	refund_method.Description = "银行转账"
 	db_session.Insert(refund_method)

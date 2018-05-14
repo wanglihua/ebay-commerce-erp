@@ -4,7 +4,6 @@ import (
 	"github.com/revel/revel"
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/auth/pass_res"
-	"matrix/modules/erp/service/order_paypal_service"
 	"matrix/core"
 	"matrix/modules/erp/models/ppgl_models"
 	"matrix/modules/erp/models/ddlc_models"
@@ -26,6 +25,7 @@ type ErpOrderRefund struct {
 func (c ErpOrderRefund) Refund() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.PPGL_ORDER_REFUND_APPROVE, c.Session)
 
+	/*
 	var db_session = c.DbSession
 
 	var order_id int64
@@ -40,6 +40,12 @@ func (c ErpOrderRefund) Refund() revel.Result {
 	var result = order_paypal_service.Order_refund(order_id, amount, memo, db_session)
 
 	return c.RenderJson(result)
+	*/
+
+	return c.RenderJson(core.JsonResult{
+		Success: false,
+		Message: "先审核再退款！",
+	})
 }
 
 func (c ErpOrderRefund) ListData() revel.Result {

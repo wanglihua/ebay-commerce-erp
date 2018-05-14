@@ -3,38 +3,31 @@ package order_paypal_service
 import (
 	"matrix/core"
 	"net/url"
-	"fmt"
 	"github.com/revel/revel"
 	"net/http"
 	"io/ioutil"
 	"encoding/json"
 	"github.com/go-xorm/xorm"
 	"matrix/modules/erp/models/ppgl_models"
+	"fmt"
 )
 
-func Order_refund(order_id int64, amount float64, memo string, db_session *xorm.Session) core.JsonResult {
+func Order_refund(order_refund_id int64, db_session *xorm.Session) core.JsonResult {
 
 	// 查询订单退款信息，如果已经存在就阻止
 	var order_refund ppgl_models.OrderRefundInfo
-	has, err := db_session.Where("order_id = ?", order_id).Get(&order_refund)
+	has, err := db_session.Id(order_refund_id).Get(&order_refund)
 	core.HandleError(err)
 
-	if has {
+	if has == false {
 		return core.JsonResult{
 			Success: false,
-			Message: "订单已存在退款信息！",
+			Message: "订单退款申请信息不存在！",
 		}
 	}
 
-	var sql = `SELECT pp.*
-FROM erp_order_external_transaction oet
-    INNER JOIN erp_paypal_payment pp ON pp.id = oet.payment_id
-WHERE pp.type = 'Payment' AND oet.order_id = %d;`
-
-	sql = fmt.Sprintf(sql, order_id)
-
 	var paypal_payment_list = make([]ppgl_models.PaypalPaymentInfo, 0)
-	err = db_session.Sql(sql).Find(&paypal_payment_list)
+	err = db_session.Where("transaction_id = ?", order_refund.PayTransId).Find(&paypal_payment_list)
 	core.HandleError(err)
 
 	if len(paypal_payment_list) == 0 {
@@ -44,19 +37,8 @@ WHERE pp.type = 'Payment' AND oet.order_id = %d;`
 		}
 	}
 
-	var transaction_id = paypal_payment_list[0].TransactionId
-
 	var form_data url.Values = make(url.Values)
-
-	/*
-    public ModelAndView refund(@RequestParam(value = "transactionId") Long transactionId,
-                               @RequestParam(value = "amount") BigDecimal amount,
-                               @RequestParam(value = "memo") String memo) throws Exception {
-	 */
-
-	form_data.Add("transactionId", transaction_id)
-	form_data.Add("amount", fmt.Sprint(amount))
-	form_data.Add("memo", memo)
+	form_data.Add("order_refund_id", fmt.Sprint(order_refund_id))
 
 	ozosync_app_base_url, _ := revel.Config.String("ozosync.app")
 	resp, err := http.PostForm(ozosync_app_base_url+"/payment/refund", form_data)
@@ -66,14 +48,11 @@ WHERE pp.type = 'Payment' AND oet.order_id = %d;`
 	body, err := ioutil.ReadAll(resp.Body)
 	core.HandleError(err)
 
-	fmt.Println("response body:")
-	fmt.Println(string(body))
-
 	var result core.JsonResult
 	err = json.Unmarshal(body, &result)
 	core.HandleError(err)
 
-	// 记录订单退款信息 和 订单历史记录都在 JAVA 端完成
+	// 订单历史记录都在 JAVA 端完成
 
 	//return result.Success
 	return result
