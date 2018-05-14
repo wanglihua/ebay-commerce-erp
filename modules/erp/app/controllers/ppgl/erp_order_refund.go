@@ -205,13 +205,51 @@ WHERE oi.order_id = %d;`
 func (c ErpOrderRefund) Apply() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.PPGL_ORDER_REFUND_APPLY, c.Session)
 
+	var db_session = c.DbSession
+
 	var refund_order_id int64
 	c.Params.Bind(&refund_order_id, "refund_order_id")
 
+	var refund_product_id int64
+	c.Params.Bind(&refund_product_id, "refund_product_id")
 
+	var refund_type_id int64
+	c.Params.Bind(&refund_type_id, "refund_type_id")
+
+	var refund_reason_id int64
+	c.Params.Bind(&refund_reason_id, "refund_reason_id")
+
+	var refund_method_id int64
+	c.Params.Bind(&refund_method_id, "refund_method_id")
+
+	var refund_amount float64
+	c.Params.Bind(&refund_amount, "refund_amount")
+
+	var refund_description string
+	c.Params.Bind(&refund_description, "refund_description")
+
+	var refund_order ddlc_models.OrderInfo
+	_, err := db_session.Id(refund_order_id).Get(&refund_order)
+	core.HandleError(err)
+
+	var refund_product kcgl_models.ProductInfo
+	_, err = db_session.Id(refund_product_id).Get(&refund_product)
+	core.HandleError(err)
+
+	var refund_type ppgl_models.OrderRefundTypeInfo
+	_, err = db_session.Id(refund_type_id).Get(&refund_type)
+	core.HandleError(err)
+
+	var refund_reason ppgl_models.OrderRefundReasonInfo
+	_, err = db_session.Id(refund_reason_id).Get(&refund_reason)
+	core.HandleError(err)
+
+	var refund_method ppgl_models.OrderRefundMethodInfo
+	_, err = db_session.Id(refund_method_id).Get(&refund_method)
+	core.HandleError(err)
 
 	return c.RenderJson(map[string]interface{}{
-		"success":  true,
+		"success": true,
 		"message": "退款申请成功！",
 	})
 }
