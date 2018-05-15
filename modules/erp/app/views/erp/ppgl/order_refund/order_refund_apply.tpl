@@ -312,7 +312,7 @@
                             <div class="form-group">
                                 <label for="refund_amount" class="col-xs-4 control-label">退款金额：</label>
                                 <div class="col-xs-8">
-                                    <input id="refund_amount" name="refund_amount" type="text" class="input-sm form-control"/>
+                                    <input id="refund_amount" name="refund_amount" type="text" class="input-sm form-control" placeholder="AUD" />
                                 </div>
                             </div>
                         </div>

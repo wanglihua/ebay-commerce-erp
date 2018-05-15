@@ -134,7 +134,6 @@
                 success: function (data) {
                     if (data.success === false) {
                         $.msg.error(data.message);
-                        return;
                     }
                     else {
                         $.msg.show(data.message);

@@ -237,7 +237,7 @@ func (c ErpOrderRefund) Apply() revel.Result {
 	c.Params.Bind(&refund_description, "refund_description")
 
 	var order_refund_in_db ppgl_models.OrderRefundInfo
-	has, err := db_session.Where("order_id = ?", refund_order_id).Get(&order_refund_in_db)
+	has, err := db_session.Where("order_id = ? AND status_id <> ?", refund_order_id, models.REFUND_STATUS_YZF).Get(&order_refund_in_db)
 	core.HandleError(err)
 
 	if has {
@@ -250,6 +250,14 @@ func (c ErpOrderRefund) Apply() revel.Result {
 	var refund_order ddlc_models.OrderInfo
 	_, err = db_session.Id(refund_order_id).Get(&refund_order)
 	core.HandleError(err)
+
+	// 退款金额不能大于付款金额
+	if refund_amount > refund_order.AmountPaid {
+		return c.RenderJson(core.JsonResult{
+			Success: false,
+			Message: "退款金额不能大于订单付款金额！",
+		})
+	}
 
 	var shop xtpz_models.ShopAccountInfo
 	_, err = db_session.Id(refund_order.ShopId).Get(&shop)
@@ -300,7 +308,7 @@ LIMIT 1;`
 	order_refund.ShopName = shop.Name
 	order_refund.OrderId = refund_order.Id
 	order_refund.OrderCode = refund_order.Code
-	order_refund.OrderAmount = refund_amount
+	order_refund.OrderAmount = refund_order.AmountPaid
 	order_refund.PayTransId = order_external_transaction.TransactionId
 	order_refund.RefundAmount = refund_amount
 	order_refund.TypeId = refund_type.Id
