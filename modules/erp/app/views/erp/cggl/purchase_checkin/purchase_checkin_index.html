@@ -495,10 +495,6 @@
                 }
                 vm.purchase_bill_entry_detail = result;
 
-                if (result.purchase_bill_entry.final_amount === 0) {
-                    $("#final_expenses").val("");
-                }
-
                 /* 不换是不是分批入库的都要输入提货费
                 if (result.is_in_turn === true) {
                     $("#div_final_expenses").show();
@@ -549,10 +545,6 @@
                 }
                 vm.purchase_bill_entry_detail = result;
 
-                if (result.purchase_bill_entry.final_amount === 0) {
-                    $("#final_expenses").val("");
-                }
-
                 $("#abnormal_type_id").attr("disabled", "disabled");
                 $("#btnCheckin").attr("onclick", "checkinInTurn();");
                 // $("#div_pay_amount").show();
@@ -571,33 +563,47 @@
             },
             'purchase_bill_entry_detail.purchase_bill_entry.desc': {
                 required: false, maxlength: 400
+            },
+            'purchase_bill_entry_detail.purchase_bill_entry.final_amount': {
+                required: true, number: true
             }
         });
 
         if (!valid) {
             hideMask();
         } else {
-            $.ajax({
-                url: '{%url "ErpPurchaseCheckin.Checkin"%}',
-                type: "POST",
-                processData: false,
-                contentType: 'application/json',
-                data: JSON.stringify(vm.purchase_bill_entry_detail),
-                success: function (data) {
-                    hideMask();
-                    if (data.success === false) {
-                        $.msg.error(data.message);
-                        //return;
-                    }
-                    else {
-                        $.msg.show(data.message);
-                        $('#purchaseCheckinDialog').modal('hide');
-                        vm.reloadEntryList();
-                        //return;
-                    }
-                }
-            });
+            if (vm.purchase_bill_entry_detail.purchase_bill_entry.final_amount === 0) {
+                $.msg.confirm("确认提货费是 0 吗？", function () {
+                    doCheckin();
+                });
+            } else {
+                doCheckin();
+            }
+
         }
+    }
+
+    function doCheckin() {
+        $.ajax({
+            url: '{%url "ErpPurchaseCheckin.Checkin"%}',
+            type: "POST",
+            processData: false,
+            contentType: 'application/json',
+            data: JSON.stringify(vm.purchase_bill_entry_detail),
+            success: function (data) {
+                hideMask();
+                if (data.success === false) {
+                    $.msg.error(data.message);
+                    //return;
+                }
+                else {
+                    $.msg.show(data.message);
+                    $('#purchaseCheckinDialog').modal('hide');
+                    vm.reloadEntryList();
+                    //return;
+                }
+            }
+        });
     }
 
     function checkinInTurn() {
@@ -609,33 +615,48 @@
             },
             'purchase_bill_entry_detail.purchase_bill_entry.desc': {
                 required: false, maxlength: 400
+            },
+            'purchase_bill_entry_detail.purchase_bill_entry.final_amount': {
+                required: true, number: true
             }
         });
 
         if (!valid) {
             hideMask();
         } else {
-            $.ajax({
-                url: '{%url "ErpPurchaseCheckin.CheckinInTurn"%}',
-                type: "POST",
-                processData: false,
-                contentType: 'application/json',
-                data: JSON.stringify(vm.purchase_bill_entry_detail),
-                success: function (data) {
-                    hideMask();
-                    if (data.success === false) {
-                        $.msg.error(data.message);
-                        //return;
-                    }
-                    else {
-                        $.msg.show(data.message);
-                        $('#purchaseCheckinDialog').modal('hide');
-                        vm.reloadEntryList();
-                        //return;
-                    }
-                }
-            });
+
+            if (vm.purchase_bill_entry_detail.purchase_bill_entry.final_amount === 0) {
+                $.msg.confirm("确认提货费是 0 吗？", function () {
+                    doCheckinInTurn();
+                });
+            } else {
+                doCheckinInTurn();
+            }
+
         }
+    }
+
+    function doCheckinInTurn() {
+        $.ajax({
+            url: '{%url "ErpPurchaseCheckin.CheckinInTurn"%}',
+            type: "POST",
+            processData: false,
+            contentType: 'application/json',
+            data: JSON.stringify(vm.purchase_bill_entry_detail),
+            success: function (data) {
+                hideMask();
+                if (data.success === false) {
+                    $.msg.error(data.message);
+                    //return;
+                }
+                else {
+                    $.msg.show(data.message);
+                    $('#purchaseCheckinDialog').modal('hide');
+                    vm.reloadEntryList();
+                    //return;
+                }
+            }
+        });
     }
 
 </script>
