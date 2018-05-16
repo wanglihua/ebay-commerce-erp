@@ -18,19 +18,19 @@
                         刷新
                     </button>
                     <button class="btn btn-pink btn-sm" onclick="approve()">
-                        <i class="ace-icon fa fa-file-excel-o"></i>
+                        <i class="ace-icon fa fa-check"></i>
                         审核
                     </button>
                     <button class="btn btn-purple btn-sm" onclick="paypalRefund()">
-                        <i class="ace-icon fa fa-file-excel-o"></i>
+                        <i class="ace-icon fa fa-paypal"></i>
                         PayPal退款
                     </button>
                     <button class="btn btn-success btn-sm" onclick="complete()">
-                        <i class="ace-icon fa fa-file-excel-o"></i>
+                        <i class="ace-icon fa fa-check-square"></i>
                         完结
                     </button>
                     <button class="btn btn-danger btn-sm" onclick="cancel()">
-                        <i class="ace-icon fa fa-file-excel-o"></i>
+                        <i class="ace-icon fa fa-trash-o"></i>
                         作废
                     </button>
                     <button class="btn btn-purple btn-sm" onclick="exportPaymentList()">
@@ -134,7 +134,6 @@
                 success: function (data) {
                     if (data.success === false) {
                         $.msg.error(data.message);
-                        return;
                     }
                     else {
                         $.msg.show(data.message);
