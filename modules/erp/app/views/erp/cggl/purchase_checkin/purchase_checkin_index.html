@@ -572,14 +572,13 @@
         if (!valid) {
             hideMask();
         } else {
-            if (vm.purchase_bill_entry_detail.purchase_bill_entry.final_amount === 0) {
+            if (vm.purchase_bill_entry_detail.purchase_bill_entry.final_expenses === 0) {
                 $.msg.confirm("确认提货费是 0 吗？", function () {
                     doCheckin();
                 });
             } else {
                 doCheckin();
             }
-
         }
     }
 
@@ -624,8 +623,7 @@
         if (!valid) {
             hideMask();
         } else {
-
-            if (vm.purchase_bill_entry_detail.purchase_bill_entry.final_amount === 0) {
+            if (vm.purchase_bill_entry_detail.purchase_bill_entry.final_expenses === 0) {
                 $.msg.confirm("确认提货费是 0 吗？", function () {
                     doCheckinInTurn();
                 });
