@@ -16,28 +16,18 @@ func get_order_ids_list_to_combine(order_filter string, db_session *xorm.Session
 	}
 
 	/*
-SELECT group_concat(DISTINCT o.id ORDER BY o.id ASC SEPARATOR ',') AS order_ids
+SELECT DISTINCT group_concat(DISTINCT o.id ORDER BY o.id ASC SEPARATOR ',') AS order_ids
 FROM erp_order o
-    INNER JOIN erp_order_shipping_address osa ON osa.order_id = o.id
+    INNER JOIN erp_order_shipping_address osa ON osa.order_id = o.id AND osa.address_owner = 'eBay'
+WHERE ((o.status_id = 3900)) AND (o.type_id <> 1070 AND o.type_id <> 1040 AND o.type_id <> 1030) AND (o.status_id = 3900) AND o.status_id <> 4350
 GROUP BY o.buyer_user_id, o.buyer_email, o.shop_id, osa.country, osa.country_name, osa.province, osa.city_name, osa.street1, osa.street2, osa.postal_code, osa.phone, osa.name
 HAVING count(DISTINCT o.id) > 1;
-	 */
-
-	/*
-   var sql_get_combine_order_ids = `
-SELECT group_concat(DISTINCT o.id ORDER BY o.id ASC SEPARATOR ',') AS order_ids
-FROM erp_order o
-   INNER JOIN erp_order_shipping_address osa ON osa.order_id = o.id
-WHERE (%s) AND (o.type_id <> %d AND o.type_id <> %d AND o.type_id <> %d) AND (o.status_id = %d OR o.status_id = %d OR o.status_id = %d) AND o.status_id <> %d
-GROUP BY o.buyer_user_id, o.buyer_email, o.shop_id, osa.country, osa.country_name, osa.province, osa.city_name, osa.street1, osa.street2, osa.postal_code, osa.phone, osa.name
-HAVING count(DISTINCT o.id) > 1;`
-   sql_get_combine_order_ids = fmt.Sprintf(sql_get_combine_order_ids, order_filter, ddpz_models.ORDER_TYPE_BHDD, ddpz_models.ORDER_TYPE_HBDD, ddpz_models.ORDER_TYPE_CFDD, models.ORDER_STATUS_YZF, models.ORDER_STATUS_DPH, models.ORDER_STATUS_HOLD, models.ORDER_STATUS_YQX)
 	*/
 
 	var sql_get_combine_order_ids = `
-SELECT group_concat(DISTINCT o.id ORDER BY o.id ASC SEPARATOR ',') AS order_ids
+SELECT DISTINCT group_concat(DISTINCT o.id ORDER BY o.id ASC SEPARATOR ',') AS order_ids
 FROM erp_order o
-    INNER JOIN erp_order_shipping_address osa ON osa.order_id = o.id
+    INNER JOIN erp_order_shipping_address osa ON osa.order_id = o.id AND osa.address_owner = 'eBay'
 WHERE (%s) AND (o.type_id <> %d AND o.type_id <> %d AND o.type_id <> %d) AND (o.status_id = %d) AND o.status_id <> %d
 GROUP BY o.buyer_user_id, o.buyer_email, o.shop_id, osa.country, osa.country_name, osa.province, osa.city_name, osa.street1, osa.street2, osa.postal_code, osa.phone, osa.name
 HAVING count(DISTINCT o.id) > 1;`
