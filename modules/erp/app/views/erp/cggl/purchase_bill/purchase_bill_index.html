@@ -1026,13 +1026,13 @@
                                 }
                             },
                             {
-                                "mDataProp": "p.sku", "title": "SKU", "bSearchable": false, "width": 150,
+                                "mDataProp": "p.sku", "title": "SKU", "bSearchable": false, "width": 120,
                                 "render": function (data, type, row) {
                                     return "<a target='product_detail' href='/product/detail/" + row.p.id + "'>" + data + "</a>"
                                 }
                             },
                             {
-                                "mDataProp": "p.cn_name", "title": "商品名称", "bSearchable": false, "sClass": "wrap-word",
+                                "mDataProp": "p.cn_name", "title": "商品名称", "bSearchable": false, "sClass": "wrap-word", "width": 250,
                                 "render": function (data, type, row) {
                                     return "<div>" + data + "</div>"
                                 }
@@ -1045,9 +1045,9 @@
                                 }
                             },
                             {
-                                "mDataProp": "pbe.amount", "title": "金额/付款/运费", "bSearchable": false, "bSortable": false, "sClass": "center", "width": 100,
+                                "mDataProp": "pbe.amount", "title": "金额/付款/运费/提货费", "bSearchable": false, "bSortable": false, "sClass": "center", "width": 120,
                                 "render": function (data, type, row) {
-                                    return row.pbe.amount + "/" + row.pbe.pay_amount + "/" + row.pbe.freight_charge;
+                                    return row.pbe.amount + "/" + row.pbe.pay_amount + "/" + row.pbe.freight_charge + "/" + row.pbe.final_expenses;
                                 }
                             },
                             {
@@ -1059,7 +1059,7 @@
                                     return data + "(" + row.fas.name + ")";
                                 }
                             },
-                            {"mDataProp": "pbe.arrival_days", "title": "到货天数", "bSearchable": false, "sClass": "center", "width": 60},
+                            {"mDataProp": "pbe.arrival_days", "title": "到货天数", "bSearchable": false, "sClass": "center", "width": 80},
                             {"mDataProp": "pbe.checkin_time", "title": "入库时间", "bSearchable": false, "sClass": "center", "width": 120},
                             {
                                 "mDataProp": "pbe.desc", "title": "备注", "bSearchable": true, "sClass": "wrap-word",
