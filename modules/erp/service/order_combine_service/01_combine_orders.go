@@ -22,7 +22,9 @@ func Combine_orders(order_filter string, user core.LoginUser, db_session *xorm.S
 	var combine_order_id_list = make([]int64, 0)
 	for _, order_ids := range order_ids_list {
 		var combine_order_id = combine_order(order_ids, user, db_session)
-		combine_order_id_list = append(combine_order_id_list, combine_order_id)
+		if combine_order_id != 0 {
+			combine_order_id_list = append(combine_order_id_list, combine_order_id)
+		}
 	}
 
 	return combine_order_id_list
