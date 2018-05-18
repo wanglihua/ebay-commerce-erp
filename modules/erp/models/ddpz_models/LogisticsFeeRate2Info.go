@@ -32,34 +32,3 @@ func (e LogisticsFeeRate2Info) TableName() string {
 func (e LogisticsFeeRate2Info) ModelDesc() string {
 	return "verbose_name=物流费率,entity_json=logistics_fee_rate2,route=logistics/fee/rate2"
 }
-
-/*
-
-CREATE TABLE erp_logistics_fee_rate2 (
-    id          BIGINT(20)     NOT NULL AUTO_INCREMENT,
-    mode_id     BIGINT(20)     NOT NULL,
-    postcode    VARCHAR(200)   NOT NULL,
-    fee01       DECIMAL(18, 6) NOT NULL,
-    fee02       DECIMAL(18, 6) NOT NULL,
-    fee03       DECIMAL(18, 6) NOT NULL,
-    fee04       DECIMAL(18, 6) NOT NULL,
-    fee05       DECIMAL(18, 6) NOT NULL,
-    fee06       DECIMAL(18, 6) NOT NULL,
-    fee07       DECIMAL(18, 6) NOT NULL,
-    fee08       DECIMAL(18, 6) NOT NULL,
-    fee09       DECIMAL(18, 6) NOT NULL,
-    fee10       DECIMAL(18, 6) NOT NULL,
-    fee11       DECIMAL(18, 6) NOT NULL,
-    fee12       DECIMAL(18, 6) NOT NULL,
-    sfpydq      INT(11)        NOT NULL,
-    pydqjsyf    DECIMAL(18, 6) NOT NULL,
-    description VARCHAR(500)   NOT NULL,
-    create_time DATETIME       NOT NULL,
-    update_time DATETIME       NOT NULL,
-    PRIMARY KEY (id),
-    KEY IDX_erp_logistics_fee_rate2_postcode (postcode),
-    KEY idx_lfr2_mode_id (mode_id)
-) ENGINE = InnoDB DEFAULT CHARSET = utf8
-
-
- */
