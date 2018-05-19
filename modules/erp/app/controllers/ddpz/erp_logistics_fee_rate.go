@@ -132,21 +132,19 @@ func (f *LogisticsFeeRateDetailForm) Valid(validation *revel.Validation) bool {
 		validation.MaxSize(f.LogisticsFeeRate.Postcode, 100).Message("邮编长度不能大于100！")
 	}
 
+	/*
 	validation.Required(f.LogisticsFeeRate.Qbj).Message("起步价不能为空！")
-
 	validation.Required(f.LogisticsFeeRate.Qbjzl).Message("起步价重量不能为空！")
-
 	validation.Required(f.LogisticsFeeRate.Zdsf).Message("最低收费不能为空！")
-
 	validation.Required(f.LogisticsFeeRate.Xzjt).Message("续重阶梯不能为空！")
-
+	*/
+	
 	if f.LogisticsFeeRate.Xzjt <= 0 {
 		validation.Error("续重阶梯应该大于零！")
 	}
 
-	validation.Required(f.LogisticsFeeRate.Xzjtsf).Message("续重阶梯收费不能为空！")
-
-	validation.Required(f.LogisticsFeeRate.Pydqjsyf).Message("偏远地区加收运费不能为空！")
+	// validation.Required(f.LogisticsFeeRate.Xzjtsf).Message("续重阶梯收费不能为空！")
+	// validation.Required(f.LogisticsFeeRate.Pydqjsyf).Message("偏远地区加收运费不能为空！")
 
 	if f.LogisticsFeeRate.Desc.Valid == true {
 		validation.MaxSize(f.LogisticsFeeRate.Desc.String, 500).Message("描述长度不能大于500！")

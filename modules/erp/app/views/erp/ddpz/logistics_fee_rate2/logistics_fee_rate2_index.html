@@ -1,0 +1,598 @@
+{%header "物流费率" .%}
+<div id="page">
+    <div class="breadcrumbs" id="breadcrumbs">
+        <ul class="breadcrumb">
+            <li>
+                <a href='{%url "Home.Index"%}'><i class="ace-icon fa fa-home home-icon"></i></a>
+            </li>
+            <li class="parent" data-menu="ddpz-menu">订单配置</li>
+            <li class="active" data-menu="ddpz-logisticsfeerate-menu">物流费率</li>
+        </ul>
+    </div>
+    <div class="page-content">
+        <div class="row">
+            <div class="col-xs-12" style="padding: 0;">
+                <div class="gridToolBar clearfix">
+                    <button class="btn btn-primary btn-sm" @click="reloadList('#logisticsFeeRateList')">
+                        <i class="ace-icon fa fa-refresh"></i>
+                        刷新
+                    </button>
+                    <button class="btn btn-success btn-sm" @click="showLogisticsFeeRateDetail(0)">
+                        <i class="ace-icon fa fa-plus"></i>
+                        新增
+                    </button>
+                    <button class="btn btn-danger btn-sm" @click="deleteLogisticsFeeRate()">
+                        <i class="ace-icon fa fa-trash-o"></i>
+                        删除
+                    </button>
+                    <button class="btn btn-danger btn-sm" @click="batchDeleteLogisticsFeeRate()">
+                        <i class="ace-icon fa fa-trash-o"></i>
+                        批量删除
+                    </button>
+                    <button id="btnImport" class="btn btn-success btn-sm">
+                        <i class="ace-icon fa fa-plus"></i>
+                        导入
+                    </button>
+                    <button class="btn btn-purple btn-sm" @click="exportFeeRate()">
+                        <i class="ace-icon fa fa-file-excel-o"></i>
+                        导出
+                    </button>
+                </div>
+                <div style="margin-top: 10px;">
+                    <a href="/static/excel-template/logistics_fee_rate2_import.xlsx">下载Excel模板</a>
+                </div>
+                <div class="row" style="margin-top: 15px;margin-bottom: 5px;">
+                    <div id="query" class="col-xs-12 query">
+                        <label class="control-label no-padding-right" for="logistics_company_query">物流公司</label>
+                        <input id="logistics_company_query" class="input-sm" name="logistics_company_query" placeholder="物流公司查询" type="text" style="width: 100px;"/>
+                        <label class="control-label no-padding-right" for="logistics_mode_query">物流方式</label>
+                        <input class="input-sm" id="logistics_mode_query" name="logistics_mode_query" placeholder="物流方式查询" type="text" style="width: 180px;"/>
+                        <label class="control-label no-padding-right" for="postcode_query">邮政编码</label>
+                        <input class="input-sm" id="postcode_query" name="postcode_query" placeholder="邮政编码查询" type="text" style="width: 130px;"/>
+                        <button class="btn btn-mini btn-primary" @click="refreshList()">
+                            &nbsp;<i class="ace-icon fa fa-search"></i>查&nbsp;询&nbsp;
+                        </button>
+                    </div>
+                </div>
+                <div>
+                    <table id="logisticsFeeRateList" class="table table-striped table-bordered table-hover"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="logisticsFeeRateDetailDialog">
+        <div class="modal-dialog" style="width: 720px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="True">&times;</button>
+                    <h4 class="modal-title">物流费率详细</h4>
+                </div>
+                <div class="modal-body clearfix">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <form class="form-horizontal" role="form" id="logisticsFeeRateDetailForm">
+                                <input id="logistics_fee_rate_id" name="detail.logistics_fee_rate.id" type="hidden" v-model.number="detail.logistics_fee_rate.id"/>
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="company_id" class="col-xs-6 control-label">物流公司</label>
+                                            <div class="col-xs-6">
+                                                <select id="company_id" name="detail.company_id" class="input-sm form-control" v-model.number="detail.company_id" @change="getLogisticsModeList">
+                                                    <template v-for="company in detail.logistics_company_list">
+                                                        <option :value="company.id">{{company.name}}</option>
+                                                    </template>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="mode_id" class="col-xs-6 control-label">物流方式</label>
+                                            <div class="col-xs-6">
+                                                <select id="mode_id" name="detail.logistics_fee_rate.mode_id" class="input-sm form-control" v-model.number="detail.logistics_fee_rate.mode_id">
+                                                    <template v-for="mode in detail.logistics_mode_list">
+                                                        <option :value="mode.id">{{mode.name}}</option>
+                                                    </template>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="postcode" class="col-xs-6 control-label">邮编</label>
+                                            <div class="col-xs-6">
+                                                <input id="postcode" name="detail.logistics_fee_rate.postcode" type="text" class="input-sm form-control" v-model="detail.logistics_fee_rate.postcode"/>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="qbj" class="col-xs-6 control-label">起步价（澳币）</label>
+                                            <div class="col-xs-6">
+                                                <input id="qbj" name="detail.logistics_fee_rate.qbj" type="text" class="input-sm form-control" v-model.number="detail.logistics_fee_rate.qbj"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="qbjzl" class="col-xs-6 control-label">起步价重量（kg）</label>
+                                            <div class="col-xs-6">
+                                                <input id="qbjzl" name="detail.logistics_fee_rate.qbjzl" type="text" class="input-sm form-control" v-model.number="detail.logistics_fee_rate.qbjzl"/>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="zdsf" class="col-xs-6 control-label">最低收费（澳币）</label>
+                                            <div class="col-xs-6">
+                                                <input id="zdsf" name="detail.logistics_fee_rate.zdsf" type="text" class="input-sm form-control" v-model.number="detail.logistics_fee_rate.zdsf"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="xzjt" class="col-xs-6 control-label">续重阶梯（kg）</label>
+                                            <div class="col-xs-6">
+                                                <input id="xzjt" name="detail.logistics_fee_rate.xzjt" type="text" class="input-sm form-control" v-model.number="detail.logistics_fee_rate.xzjt"/>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="xzjtsf" class="col-xs-6 control-label">续重阶梯收费（澳币）</label>
+                                            <div class="col-xs-6">
+                                                <input id="xzjtsf" name="detail.logistics_fee_rate.xzjtsf" type="text" class="input-sm form-control" v-model.number="detail.logistics_fee_rate.xzjtsf"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="sfpydq" class="col-xs-6 control-label">是否为偏远地区</label>
+                                            <div class="col-xs-6">
+                                                <select id="sfpydq" name="detail.logistics_fee_rate.sfpydq" class="input-sm form-control" v-model.number="detail.logistics_fee_rate.sfpydq">
+                                                    <option :value="0">否</option>
+                                                    <option :value="1">是</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="pydqjsyf" class="col-xs-6 control-label">偏远地区加收（澳币）</label>
+                                            <div class="col-xs-6">
+                                                <input id="pydqjsyf" name="detail.logistics_fee_rate.pydqjsyf" type="text" class="input-sm form-control" v-model.number="detail.logistics_fee_rate.pydqjsyf" placeholder="偏远地区加收运费"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <label for="desc" class="col-xs-3 control-label">描述</label>
+                                            <div class="col-xs-9">
+                                                <textarea id="desc" name="detail.logistics_fee_rate.desc" rows="2" class="input-sm form-control" v-model="detail.logistics_fee_rate.desc"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success btn-sm" @click="saveLogisticsFeeRate()">
+                        <i class="ace-icon fa fa-floppy-o"></i>保存
+                    </button>
+                    <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">
+                        <i class="ace-icon fa fa-times"></i>关闭
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript" src="/static/lib/plupload/moxie.min.js"></script>
+<script type="text/javascript" src="/static/lib/plupload/plupload.min.js"></script>
+<script type="text/javascript" src="/static/lib/plupload/zh_CN.js"></script>
+
+<script type="text/javascript">
+
+    function init_uploader() {
+        var uploader = new plupload.Uploader({
+            runtimes: 'html5,flash,html4',
+            multi_selection: false,
+
+            browse_button: 'btnImport',
+            file_data_name: "excel_file",
+
+            url: '{%url "ErpLogisticsFeeRate2.Import"%}',
+            max_file_size: '10000kb',
+
+            filters: [
+                {title: "Excel文件", extensions: "xlsx"}
+            ],
+
+            flash_swf_url: '/plupload/js/Moxie.swf',
+
+            init: {
+                FilesAdded: function () {
+                    showMask("上传中，请稍候...");
+                    uploader.start();
+                },
+                FileUploaded: function (up, file, response) {
+                    hideMask();
+                    var result = JSON.parse(response.response);
+                    if (result.success != true) {
+                        $.msg.error(result.message);
+                    } else {
+                        reloadList('#logisticsFeeRateList');
+                        $.msg.show(result.message);
+                    }
+                },
+                Error: function (up, err) {
+                    $.msg.error("上传发生错误：" + err.code + ", " + err.message);
+                }
+            }
+        });
+
+        uploader.init();
+    }
+
+    var vm = new Vue({
+        el: "#page",
+        data: {
+            "detail": {
+                "logistics_fee_rate": {},
+                "logistics_company_list": [],
+                "logistics_mode_list": [],
+                "company_id": 0
+            }
+        },
+        mounted: function () {
+            initDataTable(
+                    '#logisticsFeeRateList',
+                    {
+                        "sAjaxSource": '{%url "ErpLogisticsFeeRate2.ListData"%}',
+                        "aaSorting": [[1, "asc"]],
+                        "aoColumns": [
+                            {
+                                "mDataProp": "fr.id",
+                                "bSearchable": false,
+                                "orderable": false,
+                                "sClass": "center",
+                                "width": 50,
+                                "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
+                                "render": function (data, type, row) {
+                                    return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
+                                }
+                            },
+                            {"mDataProp": "lc.name", "title": "物流公司", "bSearchable": true, "width": 120},
+                            {"mDataProp": "lm.name", "title": "物流方式", "bSearchable": true},
+                            {"mDataProp": "fr.postcode", "title": "邮编", "bSearchable": true, "width": 90},
+                            {
+                                "mDataProp": "fr.qbj", "title": "起步价", "bSearchable": false, "width": 70,
+                                "render": function (data, type, row) {
+                                    if (data != 0) {
+                                        return "AU " + data;
+                                    }
+                                    else {
+                                        return "0";
+                                    }
+                                }
+                            },
+                            {
+                                "mDataProp": "fr.qbjzl", "title": "起步价重量", "bSearchable": false, "width": 90,
+                                "render": function (data, type, row) {
+                                    if (data != 0) {
+                                        return data + " kg";
+                                    }
+                                    else {
+                                        return "0";
+                                    }
+                                }
+                            },
+                            {
+                                "mDataProp": "fr.zdsf", "title": "最低收费", "bSearchable": false, "width": 80,
+                                "render": function (data, type, row) {
+                                    if (data != 0) {
+                                        return "AU " + data;
+                                    }
+                                    else {
+                                        return "0";
+                                    }
+                                }
+                            },
+                            {
+                                "mDataProp": "fr.xzjt", "title": "续重阶梯", "bSearchable": false, "width": 80,
+                                "render": function (data, type, row) {
+                                    if (data != 0) {
+                                        return data + " kg";
+                                    }
+                                    else {
+                                        return "0";
+                                    }
+                                }
+                            },
+                            {
+                                "mDataProp": "fr.xzjtsf", "title": "续重阶梯收费", "bSearchable": false, "width": 100,
+                                "render": function (data, type, row) {
+                                    if (data != 0) {
+                                        return "AU " + data;
+                                    }
+                                    else {
+                                        return "0";
+                                    }
+                                }
+                            },
+                            {
+                                "mDataProp": "fr.sfpydq", "title": "是否为偏远地区", "bSearchable": false, "width": 120,
+                                "render": function (data, type, row) {
+                                    if (data == 0) {
+                                        return "否";
+                                    }
+                                    else if (data == 1) {
+                                        return "是";
+                                    }
+                                    else {
+                                        return "0";
+                                    }
+                                }
+                            },
+                            {
+                                "mDataProp": "fr.pydqjsyf",
+                                "title": "偏远地区加收运费",
+                                "bSearchable": false,
+                                "width": 130,
+                                "render": function (data, type, row) {
+                                    if (data != 0) {
+                                        return "AU " + data;
+                                    }
+                                    else {
+                                        return "0";
+                                    }
+                                }
+                            },
+                            {"mDataProp": "fr.create_time", "title": "创建时间", "bSearchable": false, "width": 120},
+                            {"mDataProp": "fr.update_time", "title": "修改时间", "bSearchable": false, "width": 120}
+                        ],
+                        "fnServerData": function (sSource, aoData, fnCallback) {
+                            showMask("数据加载中，请稍候");
+
+                            aoData.push({'name': 'logistics_company_query', 'value': $('#logistics_company_query').val()});
+                            aoData.push({'name': 'logistics_mode_query', 'value': $('#logistics_mode_query').val()});
+                            aoData.push({'name': 'postcode_query', 'value': $('#postcode_query').val()});
+
+                            $.ajax({
+                                "dataType": 'json',
+                                "url": sSource,
+                                "data": aoData,
+                                "success": function (data) {
+                                    hideMask();
+
+                                    if (data.success == false) {
+                                        $.msg.error(data.message);
+                                        return;
+                                    }
+
+                                    fnCallback(data);
+                                }
+                            });
+                        }
+                    }
+            );
+
+            $('#logisticsFeeRateList tbody').on('dblclick', 'tr', function () {
+                var id = $(this).find('td:first-child input:checkbox').val();
+                vm.showLogisticsFeeRateDetail(id);
+            });
+
+            init_uploader();
+        },
+        methods: {
+            reloadList: function () {
+                reloadList('#logisticsFeeRateList');
+            },
+            refreshList: function () {
+                refreshList("#logisticsFeeRateList");
+            },
+            showLogisticsFeeRateDetail: function (id) {
+                showMask("加载中...");
+                $("#logisticsFeeRateDetailForm").clearValidation();
+                $.ajax({
+                            url: '{%url "ErpLogisticsFeeRate2.DetailData" %}',
+                            type: "POST",
+                            data: {
+                                "id": id
+                            },
+                            success: function (result) {
+                                hideMask();
+                                if (result.success == false) {
+                                    $.msg.error(result.message);
+                                    return;
+                                }
+                                vm.detail = result;
+                                $('#logisticsFeeRateDetailDialog').modal(modalOptions);
+                            }
+                        }
+                );
+            },
+            saveLogisticsFeeRate: function () {
+                showMask("提交中...");
+                var form = $("#logisticsFeeRateDetailForm");
+                var valid = validate(form, {
+                    'detail.logistics_fee_rate.mode_id': {
+                        required: true, digits: true
+                    },
+                    'detail.logistics_fee_rate.postcode': {
+                        required: true, minlength: 2, maxlength: 100
+                    },
+                    'detail.logistics_fee_rate.qbj': {
+                        required: true, number: true
+                    },
+                    'detail.logistics_fee_rate.qbjzl': {
+                        required: true, number: true
+                    },
+                    'detail.logistics_fee_rate.zdsf': {
+                        required: true, number: true
+                    },
+                    'detail.logistics_fee_rate.xzjt': {
+                        required: true, number: true
+                    },
+                    'detail.logistics_fee_rate.xzjtsf': {
+                        required: true, number: true
+                    },
+                    'detail.logistics_fee_rate.sfpydq': {
+                        required: true, digits: true
+                    },
+                    'detail.logistics_fee_rate.pydqjsyf': {
+                        required: true, number: true
+                    },
+                    'detail.logistics_fee_rate.desc': {
+                        required: false, maxlength: 500
+                    }
+                });
+
+                if (!valid) {
+                    hideMask();
+                } else {
+                    $.ajax({
+                                url: '{%url "ErpLogisticsFeeRate2.Save"%}',
+                                type: "POST",
+                                processData: false,
+                                contentType: 'application/json',
+                                data: JSON.stringify(vm.detail),
+                                success: function (data) {
+                                    hideMask();
+                                    if (data.success == false) {
+                                        $.msg.error(data.message);
+                                        //return;
+                                    }
+                                    else {
+                                        $.msg.show(data.message);
+                                        $('#logisticsFeeRateDetailDialog').modal('hide');
+                                        vm.reloadList();
+                                        //return;
+                                    }
+                                }
+                            }
+                    );
+                }
+            },
+            deleteLogisticsFeeRate: function () {
+                var id_list = [];
+                $('#logisticsFeeRateList tbody tr>td:first-child input:checkbox').each(function () {
+                    if (this.checked) {
+                        id_list.push($(this).val());
+                    }
+                });
+
+                if (id_list.length === 0) {
+                    $.msg.alert("请选择数据！");
+                    return;
+                }
+
+                $.msg.confirm("确认要删除吗？", function () {
+                    $.ajax({
+                        url: '{%url "ErpLogisticsFeeRate2.Delete"%}',
+                        type: "POST",
+                        data: {"id_list": id_list},
+                        success: function (data) {
+                            if (data.success === false) {
+                                $.msg.error(data.message);
+                                return;
+                            }
+                            else {
+                                $.msg.show(data.message);
+                            }
+                            vm.reloadList();
+                        }
+                    });
+                });
+            },
+            batchDeleteLogisticsFeeRate: function () {
+                var logistics_company = $("#logistics_company_query").val();
+                var logistics_mode = $("#logistics_mode_query").val();
+
+                if (logistics_company === "" || logistics_mode === "") {
+                    $.msg.error("请选择要批量删除费率的物流公司和物流方式！");
+                    return;
+                }
+
+                $.msg.confirm("确认要批量删除费率吗？", function () {
+                    $.ajax({
+                        url: '{%url "ErpLogisticsFeeRate2.BatchDelete"%}',
+                        type: "POST",
+                        data: {
+                            "logistics_company": logistics_company,
+                            "logistics_mode": logistics_mode
+                        },
+                        success: function (data) {
+                            if (data.success === false) {
+                                $.msg.error(data.message);
+                                return;
+                            }
+                            else {
+                                $.msg.show(data.message);
+                            }
+                            vm.reloadList();
+                        }
+                    });
+                });
+            },
+            getLogisticsModeList: function () {
+                $.ajax({
+                    url: '{%url "ErpLogisticsFeeRate2.GetLogisticsModeListByCompanyId"%}',
+                    type: "POST",
+                    data: {"company_id": vm.detail.company_id},
+                    success: function (data) {
+                        if (data.success === false) {
+                            $.msg.error(data.message);
+                            return;
+                        }
+                        else {
+                            vm.detail.logistics_mode_list = data.mode_list;
+                        }
+                    }
+                });
+            },
+            exportFeeRate: function () {
+                var id_list = [];
+                $('#logisticsFeeRateList tbody tr>td:first-child input:checkbox').each(function () {
+                    if (this.checked) {
+                        id_list.push($(this).val());
+                    }
+                });
+
+                var params = $.param({
+                    "id_list": id_list,
+                    "logistics_company_query": $('#logistics_company_query').val(),
+                    "logistics_mode_query": $('#logistics_mode_query').val(),
+                    "postcode_query": $('#postcode_query').val()
+                });
+                var url = '{%url "ErpLogisticsFeeRate2.Export"%}' + "?" + params;
+                $('<form method="post" action="' + url + '"></form>').appendTo('body').submit().remove();
+            }
+        }
+    });
+</script>
+{%footer%}
+
