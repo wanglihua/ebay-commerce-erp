@@ -113,15 +113,25 @@ POST /logistics/mode/delete                ErpLogisticsMode.Delete
 POST /logistics/mode/import                ErpLogisticsMode.Import
 POST /logistics/mode/get/list/by/stock     ErpLogisticsMode.GetListByStock
 
-GET  /logistics/fee/rate                    ErpLogisticsFeeRate.Index
-POST /logistics/fee/rate/data/list          ErpLogisticsFeeRate.ListData
-POST /logistics/fee/rate/data/detail        ErpLogisticsFeeRate.DetailData
-POST /logistics/fee/rate/save               ErpLogisticsFeeRate.Save
-POST /logistics/fee/rate/delete             ErpLogisticsFeeRate.Delete
-POST /logistics/fee/rate/batch/delete       ErpLogisticsFeeRate.BatchDelete
-POST /logistics/fee/rate/import             ErpLogisticsFeeRate.Import
-POST /logistics/fee/rate/export             ErpLogisticsFeeRate.Export
-POST /logistics/fee/rate/mode/list/by/company  ErpLogisticsFeeRate.GetLogisticsModeListByCompanyId
+GET  /logistics/fee/rate                        ErpLogisticsFeeRate.Index
+POST /logistics/fee/rate/data/list              ErpLogisticsFeeRate.ListData
+POST /logistics/fee/rate/data/detail            ErpLogisticsFeeRate.DetailData
+POST /logistics/fee/rate/save                   ErpLogisticsFeeRate.Save
+POST /logistics/fee/rate/delete                 ErpLogisticsFeeRate.Delete
+POST /logistics/fee/rate/batch/delete           ErpLogisticsFeeRate.BatchDelete
+POST /logistics/fee/rate/import                 ErpLogisticsFeeRate.Import
+POST /logistics/fee/rate/export                 ErpLogisticsFeeRate.Export
+POST /logistics/fee/rate/mode/list/by/company   ErpLogisticsFeeRate.GetLogisticsModeListByCompanyId
+
+GET  /logistics/fee/rate2                       ErpLogisticsFeeRate2.Index
+POST /logistics/fee/rate2/data/list             ErpLogisticsFeeRate2.ListData
+POST /logistics/fee/rate2/data/detail           ErpLogisticsFeeRate2.DetailData
+POST /logistics/fee/rate2/save                  ErpLogisticsFeeRate2.Save
+POST /logistics/fee/rate2/delete                ErpLogisticsFeeRate2.Delete
+POST /logistics/fee/rate2/batch/delete          ErpLogisticsFeeRate2.BatchDelete
+POST /logistics/fee/rate2/import                ErpLogisticsFeeRate2.Import
+POST /logistics/fee/rate2/export                ErpLogisticsFeeRate2.Export
+POST /logistics/fee/rate2/mode/list/by/company  ErpLogisticsFeeRate2.GetLogisticsModeListByCompanyId
 
 GET  /product                              ErpProduct.Index
 POST /product/data/list                    ErpProduct.ListData
