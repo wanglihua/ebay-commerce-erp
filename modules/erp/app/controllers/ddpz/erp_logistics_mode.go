@@ -14,6 +14,7 @@ import (
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/models/ddpz_models"
 	"matrix/modules/erp/models/sppz_models"
+	"matrix/modules/erp/models/ddpz_models/logistics_fee_type"
 )
 
 type ErpLogisticsMode struct {
@@ -87,11 +88,12 @@ func (c ErpLogisticsMode) ListData() revel.Result {
 }
 
 type LogisticsModeDetailForm struct {
-	LogisticsMode         ddpz_models.LogisticsModeInfo       `json:"logistics_mode"`
-	LogisticsCompanyList  []ddpz_models.LogisticsCompanyInfo  `json:"logistics_company_list"`
-	StockList             []sppz_models.StockInfo             `json:"stock_list"`
-	LogisticsModeTypeList []ddpz_models.LogisticsModeTypeInfo `json:"logistics_mode_type_list"`
-	StatusList            []models.StatusInfo                 `json:"status_list"`
+	LogisticsMode         ddpz_models.LogisticsModeInfo              `json:"logistics_mode"`
+	LogisticsCompanyList  []ddpz_models.LogisticsCompanyInfo         `json:"logistics_company_list"`
+	StockList             []sppz_models.StockInfo                    `json:"stock_list"`
+	LogisticsModeTypeList []ddpz_models.LogisticsModeTypeInfo        `json:"logistics_mode_type_list"`
+	StatusList            []models.StatusInfo                        `json:"status_list"`
+	FeeTypeList           [] logistics_fee_type.LogisticsFeeTypeInfo `json:"fee_type_list"`
 }
 
 func (f *LogisticsModeDetailForm) IsCreate() bool {
@@ -151,12 +153,15 @@ func (c ErpLogisticsMode) DetailData() revel.Result {
 	err = db_session.OrderBy("id ASC").Find(&logistics_mode_type_list)
 	core.HandleError(err)
 
+	var fee_type_list = logistics_fee_type.Get_fee_type_list()
+
 	var detail_form LogisticsModeDetailForm
 	detail_form.LogisticsMode = logistics_mode
 	detail_form.LogisticsCompanyList = logistics_company_list
 	detail_form.StockList = stock_list
 	detail_form.StatusList = status_list
 	detail_form.LogisticsModeTypeList = logistics_mode_type_list
+	detail_form.FeeTypeList = fee_type_list
 
 	return c.RenderJson(detail_form)
 }

@@ -59,7 +59,17 @@ func GetDdpzMenu(res_id_map map[int64]bool, web_session revel.Session) string {
 		buffer.WriteString(`<li id="ddpz-logisticsfeerate-menu" class="">
             <a href="/logistics/fee/rate">
                 <i class="menu-icon fa fa-caret-right"></i>
-                物流费率
+                物流费率1
+            </a>
+            <b class="arrow"></b>
+        </li>`)
+	}
+
+	if check_pass_res_menu(pass_res.DDPZ_LOGISTICS_FEE_RATE) {
+		buffer.WriteString(`<li id="ddpz-logisticsfeerate2-menu" class="">
+            <a href="/logistics/fee/rate2">
+                <i class="menu-icon fa fa-caret-right"></i>
+                物流费率2
             </a>
             <b class="arrow"></b>
         </li>`)

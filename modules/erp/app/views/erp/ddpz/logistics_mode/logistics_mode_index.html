@@ -276,7 +276,7 @@
                                 <div class="row">
                                     <div class="col-xs-6">
                                         <div class="form-group">
-                                            <label for="ccsfjt" class="col-xs-6 control-label">物流类型</label>
+                                            <label for="type_id" class="col-xs-6 control-label">物流类型</label>
                                             <div class="col-xs-6">
                                                 <select id="type_id" name="detail.logistics_mode.type_id" class="input-sm form-control" v-model.number="detail.logistics_mode.type_id">
                                                     <template v-for="type in detail.logistics_mode_type_list">
@@ -301,11 +301,30 @@
                                 </div>
 
                                 <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="fee_type" class="col-xs-6 control-label">费率模式</label>
+                                            <div class="col-xs-6">
+                                                <select id="fee_type" name="detail.logistics_mode.fee_type" class="input-sm form-control" v-model.number="detail.logistics_mode.fee_type">
+                                                    <template v-for="type in detail.fee_type_list">
+                                                        <option :value="type.id">{{type.name}}</option>
+                                                    </template>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
                                             <label for="desc" class="col-xs-3 control-label">描述</label>
                                             <div class="col-xs-9">
-                                                <textarea id="desc" name="detail.logistics_mode.desc" rows="2" class="input-sm form-control" v-model="detail.logistics_mode.desc"></textarea>
+                                                <textarea id="desc" name="detail.logistics_mode.desc" rows="3" class="input-sm form-control" v-model="detail.logistics_mode.desc"></textarea>
                                             </div>
                                         </div>
                                     </div>
@@ -385,98 +404,98 @@
         },
         mounted: function () {
             initDataTable(
-                '#logisticsModeList',
-                {
-                    "sAjaxSource": '{%url "ErpLogisticsMode.ListData"%}',
-                    "aaSorting": [[1, "asc"]],
-                    "aoColumns": [
-                        {
-                            "mDataProp": "m.id",
-                            "bSearchable": false,
-                            "orderable": false,
-                            "sClass": "center",
-                            "width": 50,
-                            "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
-                            "render": function (data, type, row) {
-                                return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
-                            }
-                        },
-                        {"mDataProp": "c.name", "title": "物流公司", "bSearchable": true, "width": 160},
-                        {"mDataProp": "sk.name", "title": "仓库", "bSearchable": true, "width": 160},
-                        {"mDataProp": "m.name", "title": "物流方式名称", "bSearchable": true},
-                        {
-                            "mDataProp": "m.sfkltjz", "title": "考虑体积重", "bSearchable": false, "width": 120,
-                            "render": function (data, type, row) {
-                                if (data === 0) {
-                                    return "否";
+                    '#logisticsModeList',
+                    {
+                        "sAjaxSource": '{%url "ErpLogisticsMode.ListData"%}',
+                        "aaSorting": [[1, "asc"]],
+                        "aoColumns": [
+                            {
+                                "mDataProp": "m.id",
+                                "bSearchable": false,
+                                "orderable": false,
+                                "sClass": "center",
+                                "width": 50,
+                                "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
+                                "render": function (data, type, row) {
+                                    return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
                                 }
-                                else {
-                                    return "是";
+                            },
+                            {"mDataProp": "c.name", "title": "物流公司", "bSearchable": true, "width": 160},
+                            {"mDataProp": "sk.name", "title": "仓库", "bSearchable": true, "width": 160},
+                            {"mDataProp": "m.name", "title": "物流方式名称", "bSearchable": true},
+                            {
+                                "mDataProp": "m.sfkltjz", "title": "考虑体积重", "bSearchable": false, "width": 120,
+                                "render": function (data, type, row) {
+                                    if (data === 0) {
+                                        return "否";
+                                    }
+                                    else {
+                                        return "是";
+                                    }
                                 }
-                            }
-                        },
-                        {
-                            "mDataProp": "m.zcbsfyxz", "title": "最长边是否有限制", "bSearchable": false, "width": 130,
-                            "render": function (data, type, row) {
-                                if (data === 0) {
-                                    return "否";
+                            },
+                            {
+                                "mDataProp": "m.zcbsfyxz", "title": "最长边是否有限制", "bSearchable": false, "width": 130,
+                                "render": function (data, type, row) {
+                                    if (data === 0) {
+                                        return "否";
+                                    }
+                                    else {
+                                        return "是";
+                                    }
                                 }
-                                else {
-                                    return "是";
+                            },
+                            {
+                                "mDataProp": "m.zlsfyxz", "title": "重量是否有限制", "bSearchable": false, "width": 120,
+                                "render": function (data, type, row) {
+                                    if (data === 0) {
+                                        return "否";
+                                    }
+                                    else {
+                                        return "是";
+                                    }
                                 }
-                            }
-                        },
-                        {
-                            "mDataProp": "m.zlsfyxz", "title": "重量是否有限制", "bSearchable": false, "width": 120,
-                            "render": function (data, type, row) {
-                                if (data === 0) {
-                                    return "否";
+                            },
+                            {
+                                "mDataProp": "m.sfyxcc", "title": "是否允许超长", "bSearchable": false, "width": 120,
+                                "render": function (data, type, row) {
+                                    if (data === 0) {
+                                        return "否";
+                                    }
+                                    else {
+                                        return "是";
+                                    }
                                 }
-                                else {
-                                    return "是";
+                            },
+                            {
+                                "mDataProp": "m.sfyxcz", "title": "是否允许超重", "bSearchable": false, "width": 120,
+                                "render": function (data, type, row) {
+                                    if (data === 0) {
+                                        return "否";
+                                    }
+                                    else {
+                                        return "是";
+                                    }
                                 }
-                            }
-                        },
-                        {
-                            "mDataProp": "m.sfyxcc", "title": "是否允许超长", "bSearchable": false, "width": 120,
-                            "render": function (data, type, row) {
-                                if (data === 0) {
-                                    return "否";
-                                }
-                                else {
-                                    return "是";
-                                }
-                            }
-                        },
-                        {
-                            "mDataProp": "m.sfyxcz", "title": "是否允许超重", "bSearchable": false, "width": 120,
-                            "render": function (data, type, row) {
-                                if (data === 0) {
-                                    return "否";
-                                }
-                                else {
-                                    return "是";
-                                }
-                            }
-                        },
+                            },
 
-                        /*
-                         {"mDataProp": "m.tjzgs", "title": "体积重公式", "bSearchable": false },
-                         {"mDataProp": "m.tjzxs", "title": "体积重系数", "bSearchable": false },
-                         {"mDataProp": "m.tjzysjzqx", "title": "体积重与实际重取向", "bSearchable": false },
-                         {"mDataProp": "m.sfkltjz", "title": "体积重与实际重是否有比值要求", "bSearchable": false },
-                         {"mDataProp": "m.tjzsjzbz", "title": "体积重/实际重比值", "bSearchable": false },
-                         {"mDataProp": "m.zlbncg", "title": "重量不能超过（Kg)", "bSearchable": false },
-                         {"mDataProp": "m.ccjsyf", "title": "超长加收多少运费（澳币）", "bSearchable": false },
-                         {"mDataProp": "m.czjsyf", "title": "超重加收多少运费（澳币）", "bSearchable": false },
-                         {"mDataProp": "m.desc", "title": "描述", "bSearchable": true},
-                         */
-                        {"mDataProp": "m.sender_id", "title": "代码", "bSearchable": true, "width": 80},
-                        {"mDataProp": "st.name", "title": "状态", "bSearchable": true, "width": 80},
-                        {"mDataProp": "m.create_time", "title": "创建时间", "bSearchable": false, "width": 120},
-                        {"mDataProp": "m.update_time", "title": "修改时间", "bSearchable": false, "width": 120}
-                    ]
-                }
+                            /*
+                             {"mDataProp": "m.tjzgs", "title": "体积重公式", "bSearchable": false },
+                             {"mDataProp": "m.tjzxs", "title": "体积重系数", "bSearchable": false },
+                             {"mDataProp": "m.tjzysjzqx", "title": "体积重与实际重取向", "bSearchable": false },
+                             {"mDataProp": "m.sfkltjz", "title": "体积重与实际重是否有比值要求", "bSearchable": false },
+                             {"mDataProp": "m.tjzsjzbz", "title": "体积重/实际重比值", "bSearchable": false },
+                             {"mDataProp": "m.zlbncg", "title": "重量不能超过（Kg)", "bSearchable": false },
+                             {"mDataProp": "m.ccjsyf", "title": "超长加收多少运费（澳币）", "bSearchable": false },
+                             {"mDataProp": "m.czjsyf", "title": "超重加收多少运费（澳币）", "bSearchable": false },
+                             {"mDataProp": "m.desc", "title": "描述", "bSearchable": true},
+                             */
+                            {"mDataProp": "m.sender_id", "title": "代码", "bSearchable": true, "width": 80},
+                            {"mDataProp": "st.name", "title": "状态", "bSearchable": true, "width": 80},
+                            {"mDataProp": "m.create_time", "title": "创建时间", "bSearchable": false, "width": 120},
+                            {"mDataProp": "m.update_time", "title": "修改时间", "bSearchable": false, "width": 120}
+                        ]
+                    }
             );
 
             $('#logisticsModeList tbody').on('dblclick', 'tr', function () {
@@ -494,21 +513,21 @@
                 showMask("加载中...");
                 $("#logisticsModeDetailForm").clearValidation();
                 $.ajax({
-                        url: '{%url "ErpLogisticsMode.DetailData" %}',
-                        type: "POST",
-                        data: {
-                            "id": id
-                        },
-                        success: function (result) {
-                            hideMask();
-                            if (result.success === false) {
-                                $.msg.error(result.message);
-                                return;
+                            url: '{%url "ErpLogisticsMode.DetailData" %}',
+                            type: "POST",
+                            data: {
+                                "id": id
+                            },
+                            success: function (result) {
+                                hideMask();
+                                if (result.success === false) {
+                                    $.msg.error(result.message);
+                                    return;
+                                }
+                                vm.detail = result;
+                                $('#logisticsModeDetailDialog').modal(modalOptions);
                             }
-                            vm.detail = result;
-                            $('#logisticsModeDetailDialog').modal(modalOptions);
                         }
-                    }
                 );
             },
             saveLogisticsMode: function () {
@@ -569,25 +588,25 @@
                     hideMask();
                 } else {
                     $.ajax({
-                            url: '{%url "ErpLogisticsMode.Save"%}',
-                            type: "POST",
-                            processData: false,
-                            contentType: 'application/json',
-                            data: JSON.stringify(vm.detail),
-                            success: function (data) {
-                                hideMask();
-                                if (data.success === false) {
-                                    $.msg.error(data.message);
-                                    //return;
-                                }
-                                else {
-                                    $.msg.show(data.message);
-                                    $('#logisticsModeDetailDialog').modal('hide');
-                                    vm.reloadList();
-                                    //return;
+                                url: '{%url "ErpLogisticsMode.Save"%}',
+                                type: "POST",
+                                processData: false,
+                                contentType: 'application/json',
+                                data: JSON.stringify(vm.detail),
+                                success: function (data) {
+                                    hideMask();
+                                    if (data.success === false) {
+                                        $.msg.error(data.message);
+                                        //return;
+                                    }
+                                    else {
+                                        $.msg.show(data.message);
+                                        $('#logisticsModeDetailDialog').modal('hide');
+                                        vm.reloadList();
+                                        //return;
+                                    }
                                 }
                             }
-                        }
                     );
                 }
             },
