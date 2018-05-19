@@ -26,7 +26,7 @@ type ErpLogisticsFeeRate2 struct {
 func (c ErpLogisticsFeeRate2) Index() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.DDPZ_LOGISTICS_FEE_RATE, c.Session)
 
-	return c.RenderTemplate("erp/ddpz/logistics_fee_rate/logistics_fee_rate_index.html")
+	return c.RenderTemplate("erp/ddpz/logistics_fee_rate2/logistics_fee_rate2_index.html")
 }
 
 type logistics_fee_rate2_view_item_t struct {
@@ -58,7 +58,7 @@ func (c ErpLogisticsFeeRate2) ListData() revel.Result {
 
 	/*
 		SELECT fr.*, lm.*, lc.*
-		FROM erp_logistics_fee_rate fr
+		FROM erp_logistics_fee_rate2 fr
 		    INNER JOIN erp_logistics_mode lm ON lm.id = fr.mode_id
 		    INNER JOIN erp_logistics_company lc ON lc.id = lm.company_id
 		WHERE lc.name LIKE '%abc%' AND lm.name LIKE '%bcd%' AND fr.postcode LIKE '%123%'
@@ -67,7 +67,7 @@ func (c ErpLogisticsFeeRate2) ListData() revel.Result {
 	sb := core.NewSqlBuilder()
 	sb.Select("fr.*, lm.*, lc.*")
 	sb.Count("count(fr.id) AS fee_rate_count")
-	sb.From(`erp_logistics_fee_rate fr
+	sb.From(`erp_logistics_fee_rate2 fr
     INNER JOIN erp_logistics_mode lm ON lm.id = fr.mode_id
     INNER JOIN erp_logistics_company lc ON lc.id = lm.company_id`)
 
@@ -692,7 +692,7 @@ func (c ErpLogisticsFeeRate2) Export() revel.Result {
 
 	/*
 		SELECT fr.*, lm.*, lc.*
-		FROM erp_logistics_fee_rate fr
+		FROM erp_logistics_fee_rate2 fr
 		    INNER JOIN erp_logistics_mode lm ON lm.id = fr.mode_id
 		    INNER JOIN erp_logistics_company lc ON lc.id = lm.company_id
 		WHERE lc.name LIKE '%abc%' AND lm.name LIKE '%bcd%' AND fr.postcode LIKE '%123%'
@@ -701,7 +701,7 @@ func (c ErpLogisticsFeeRate2) Export() revel.Result {
 	sb := core.NewSqlBuilder()
 	sb.Select("fr.*, lm.*, lc.*")
 	sb.Count("count(fr.id) AS fee_rate_count")
-	sb.From(`erp_logistics_fee_rate fr
+	sb.From(`erp_logistics_fee_rate2 fr
     INNER JOIN erp_logistics_mode lm ON lm.id = fr.mode_id
     INNER JOIN erp_logistics_company lc ON lc.id = lm.company_id`)
 
