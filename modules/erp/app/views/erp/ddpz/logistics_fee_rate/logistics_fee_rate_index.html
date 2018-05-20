@@ -269,135 +269,136 @@
         },
         mounted: function () {
             initDataTable(
-                '#logisticsFeeRateList',
-                {
-                    "sAjaxSource": '{%url "ErpLogisticsFeeRate.ListData"%}',
-                    "aaSorting": [[1, "asc"]],
-                    "aoColumns": [
-                        {
-                            "mDataProp": "fr.id",
-                            "bSearchable": false,
-                            "orderable": false,
-                            "sClass": "center",
-                            "width": 50,
-                            "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
-                            "render": function (data, type, row) {
-                                return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
-                            }
-                        },
-                        {"mDataProp": "lc.name", "title": "物流公司", "bSearchable": true, "width": 120},
-                        {"mDataProp": "lm.name", "title": "物流方式", "bSearchable": true},
-                        {"mDataProp": "fr.postcode", "title": "邮编", "bSearchable": true, "width": 90},
-                        {
-                            "mDataProp": "fr.qbj", "title": "起步价", "bSearchable": false, "width": 70,
-                            "render": function (data, type, row) {
-                                if (data != 0) {
-                                    return "AU " + data;
+                    '#logisticsFeeRateList',
+                    {
+                        "sAjaxSource": '{%url "ErpLogisticsFeeRate.ListData"%}',
+                        "aaSorting": [[1, "asc"]],
+                        "aoColumns": [
+                            {
+                                "mDataProp": "fr.id",
+                                "bSearchable": false,
+                                "orderable": false,
+                                "sClass": "center",
+                                "width": 50,
+                                "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
+                                "render": function (data, type, row) {
+                                    return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
                                 }
-                                else {
-                                    return "0";
+                            },
+                            {"mDataProp": "lc.name", "title": "物流公司", "bSearchable": true, "width": 120},
+                            {"mDataProp": "lm.name", "title": "物流方式", "bSearchable": true},
+                            {"mDataProp": "fr.postcode", "title": "邮编", "bSearchable": true, "width": 90},
+                            {
+                                "mDataProp": "fr.qbj", "title": "起步价", "bSearchable": false, "sClass": "dtRight", "width": 70,
+                                "render": function (data, type, row) {
+                                    if (data !== 0) {
+                                        return "AU " + data;
+                                    }
+                                    else {
+                                        return "0";
+                                    }
                                 }
-                            }
-                        },
-                        {
-                            "mDataProp": "fr.qbjzl", "title": "起步价重量", "bSearchable": false, "width": 90,
-                            "render": function (data, type, row) {
-                                if (data != 0) {
-                                    return data + " kg";
+                            },
+                            {
+                                "mDataProp": "fr.qbjzl", "title": "起步价重量", "bSearchable": false, "sClass": "dtRight", "width": 90,
+                                "render": function (data, type, row) {
+                                    if (data !== 0) {
+                                        return data + " kg";
+                                    }
+                                    else {
+                                        return "0";
+                                    }
                                 }
-                                else {
-                                    return "0";
+                            },
+                            {
+                                "mDataProp": "fr.zdsf", "title": "最低收费", "bSearchable": false, "sClass": "dtRight", "width": 80,
+                                "render": function (data, type, row) {
+                                    if (data !== 0) {
+                                        return "AU " + data;
+                                    }
+                                    else {
+                                        return "0";
+                                    }
                                 }
-                            }
-                        },
-                        {
-                            "mDataProp": "fr.zdsf", "title": "最低收费", "bSearchable": false, "width": 80,
-                            "render": function (data, type, row) {
-                                if (data != 0) {
-                                    return "AU " + data;
+                            },
+                            {
+                                "mDataProp": "fr.xzjt", "title": "续重阶梯", "bSearchable": false, "sClass": "dtRight", "width": 80,
+                                "render": function (data, type, row) {
+                                    if (data !== 0) {
+                                        return data + " kg";
+                                    }
+                                    else {
+                                        return "0";
+                                    }
                                 }
-                                else {
-                                    return "0";
+                            },
+                            {
+                                "mDataProp": "fr.xzjtsf", "title": "续重阶梯收费", "bSearchable": false, "sClass": "dtRight", "width": 100,
+                                "render": function (data, type, row) {
+                                    if (data !== 0) {
+                                        return "AU " + data;
+                                    }
+                                    else {
+                                        return "0";
+                                    }
                                 }
-                            }
-                        },
-                        {
-                            "mDataProp": "fr.xzjt", "title": "续重阶梯", "bSearchable": false, "width": 80,
-                            "render": function (data, type, row) {
-                                if (data != 0) {
-                                    return data + " kg";
+                            },
+                            {
+                                "mDataProp": "fr.sfpydq", "title": "是否为偏远地区", "bSearchable": false, "width": 120,
+                                "render": function (data, type, row) {
+                                    if (data === 0) {
+                                        return "否";
+                                    }
+                                    else if (data === 1) {
+                                        return "是";
+                                    }
+                                    else {
+                                        return "0";
+                                    }
                                 }
-                                else {
-                                    return "0";
+                            },
+                            {
+                                "mDataProp": "fr.pydqjsyf",
+                                "title": "偏远地区加收运费",
+                                "bSearchable": false,
+                                "sClass": "dtRight",
+                                "width": 130,
+                                "render": function (data, type, row) {
+                                    if (data !== 0) {
+                                        return "AU " + data;
+                                    }
+                                    else {
+                                        return "0";
+                                    }
                                 }
-                            }
-                        },
-                        {
-                            "mDataProp": "fr.xzjtsf", "title": "续重阶梯收费", "bSearchable": false, "width": 100,
-                            "render": function (data, type, row) {
-                                if (data != 0) {
-                                    return "AU " + data;
-                                }
-                                else {
-                                    return "0";
-                                }
-                            }
-                        },
-                        {
-                            "mDataProp": "fr.sfpydq", "title": "是否为偏远地区", "bSearchable": false, "width": 120,
-                            "render": function (data, type, row) {
-                                if (data == 0) {
-                                    return "否";
-                                }
-                                else if (data == 1) {
-                                    return "是";
-                                }
-                                else {
-                                    return "0";
-                                }
-                            }
-                        },
-                        {
-                            "mDataProp": "fr.pydqjsyf",
-                            "title": "偏远地区加收运费",
-                            "bSearchable": false,
-                            "width": 130,
-                            "render": function (data, type, row) {
-                                if (data != 0) {
-                                    return "AU " + data;
-                                }
-                                else {
-                                    return "0";
-                                }
-                            }
-                        },
-                        {"mDataProp": "fr.create_time", "title": "创建时间", "bSearchable": false, "width": 120},
-                        {"mDataProp": "fr.update_time", "title": "修改时间", "bSearchable": false, "width": 120}
-                    ],
-                    "fnServerData": function (sSource, aoData, fnCallback) {
-                        showMask("数据加载中，请稍候");
+                            },
+                            {"mDataProp": "fr.create_time", "title": "创建时间", "bSearchable": false, "width": 120},
+                            {"mDataProp": "fr.update_time", "title": "修改时间", "bSearchable": false, "width": 120}
+                        ],
+                        "fnServerData": function (sSource, aoData, fnCallback) {
+                            showMask("数据加载中，请稍候");
 
-                        aoData.push({'name': 'logistics_company_query', 'value': $('#logistics_company_query').val()});
-                        aoData.push({'name': 'logistics_mode_query', 'value': $('#logistics_mode_query').val()});
-                        aoData.push({'name': 'postcode_query', 'value': $('#postcode_query').val()});
+                            aoData.push({'name': 'logistics_company_query', 'value': $('#logistics_company_query').val()});
+                            aoData.push({'name': 'logistics_mode_query', 'value': $('#logistics_mode_query').val()});
+                            aoData.push({'name': 'postcode_query', 'value': $('#postcode_query').val()});
 
-                        $.ajax({
-                            "dataType": 'json',
-                            "url": sSource,
-                            "data": aoData,
-                            "success": function (data) {
-                                hideMask();
+                            $.ajax({
+                                "dataType": 'json',
+                                "url": sSource,
+                                "data": aoData,
+                                "success": function (data) {
+                                    hideMask();
 
-                                if (data.success == false) {
-                                    $.msg.error(data.message);
-                                    return;
+                                    if (data.success == false) {
+                                        $.msg.error(data.message);
+                                        return;
+                                    }
+
+                                    fnCallback(data);
                                 }
-
-                                fnCallback(data);
-                            }
-                        });
+                            });
+                        }
                     }
-                }
             );
 
             $('#logisticsFeeRateList tbody').on('dblclick', 'tr', function () {
@@ -418,21 +419,21 @@
                 showMask("加载中...");
                 $("#logisticsFeeRateDetailForm").clearValidation();
                 $.ajax({
-                        url: '{%url "ErpLogisticsFeeRate.DetailData" %}',
-                        type: "POST",
-                        data: {
-                            "id": id
-                        },
-                        success: function (result) {
-                            hideMask();
-                            if (result.success == false) {
-                                $.msg.error(result.message);
-                                return;
+                            url: '{%url "ErpLogisticsFeeRate.DetailData" %}',
+                            type: "POST",
+                            data: {
+                                "id": id
+                            },
+                            success: function (result) {
+                                hideMask();
+                                if (result.success == false) {
+                                    $.msg.error(result.message);
+                                    return;
+                                }
+                                vm.detail = result;
+                                $('#logisticsFeeRateDetailDialog').modal(modalOptions);
                             }
-                            vm.detail = result;
-                            $('#logisticsFeeRateDetailDialog').modal(modalOptions);
                         }
-                    }
                 );
             },
             saveLogisticsFeeRate: function () {
@@ -475,25 +476,25 @@
                     hideMask();
                 } else {
                     $.ajax({
-                            url: '{%url "ErpLogisticsFeeRate.Save"%}',
-                            type: "POST",
-                            processData: false,
-                            contentType: 'application/json',
-                            data: JSON.stringify(vm.detail),
-                            success: function (data) {
-                                hideMask();
-                                if (data.success == false) {
-                                    $.msg.error(data.message);
-                                    //return;
-                                }
-                                else {
-                                    $.msg.show(data.message);
-                                    $('#logisticsFeeRateDetailDialog').modal('hide');
-                                    vm.reloadList();
-                                    //return;
+                                url: '{%url "ErpLogisticsFeeRate.Save"%}',
+                                type: "POST",
+                                processData: false,
+                                contentType: 'application/json',
+                                data: JSON.stringify(vm.detail),
+                                success: function (data) {
+                                    hideMask();
+                                    if (data.success == false) {
+                                        $.msg.error(data.message);
+                                        //return;
+                                    }
+                                    else {
+                                        $.msg.show(data.message);
+                                        $('#logisticsFeeRateDetailDialog').modal('hide');
+                                        vm.reloadList();
+                                        //return;
+                                    }
                                 }
                             }
-                        }
                     );
                 }
             },

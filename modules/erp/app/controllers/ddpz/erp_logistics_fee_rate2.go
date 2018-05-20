@@ -17,6 +17,7 @@ import (
 	"github.com/go-xorm/xorm"
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/service/excel_service"
+	"matrix/modules/erp/models/ddpz_models/logistics_fee_type"
 )
 
 type ErpLogisticsFeeRate2 struct {
@@ -174,9 +175,16 @@ func (c ErpLogisticsFeeRate2) DetailData() revel.Result {
 	var detail_form LogisticsFeeRate2DetailForm
 	detail_form.LogisticsFeeRate = logistics_fee_rate
 
+	var sql_logistics_company = `SELECT DISTINCT lc.*
+FROM erp_logistics_company lc
+    INNER JOIN erp_logistics_mode lm ON lm.company_id = lc.id
+WHERE lm.fee_type = %d`
+	sql_logistics_company = fmt.Sprintf(sql_logistics_company, logistics_fee_type.FEE_TYPE2)
+
 	var logistics_company_list = make([]ddpz_models.LogisticsCompanyInfo, 0)
-	err := db_session.Find(&logistics_company_list)
+	err := db_session.Sql(sql_logistics_company).Find(&logistics_company_list)
 	core.HandleError(err)
+
 	detail_form.LogisticsCompanyList = logistics_company_list
 
 	if logistics_fee_rate_id == 0 {

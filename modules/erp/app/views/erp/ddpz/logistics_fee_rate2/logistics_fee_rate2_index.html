@@ -110,10 +110,24 @@
                                     </div>
 
                                     <div class="col-xs-6">
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
                                         <div class="form-group">
-                                            <label for="qbj" class="col-xs-6 control-label">起步价（澳币）</label>
+                                            <label for="fee01" class="col-xs-6 control-label">0-500g（澳币）</label>
                                             <div class="col-xs-6">
-                                                <input id="qbj" name="detail.logistics_fee_rate.qbj" type="text" class="input-sm form-control" v-model.number="detail.logistics_fee_rate.qbj"/>
+                                                <input id="fee01" name="detail.logistics_fee_rate.fee01" type="text" class="input-sm form-control" v-model.number="detail.logistics_fee_rate.fee01"/>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="fee02" class="col-xs-6 control-label">500g-1kg（澳币）</label>
+                                            <div class="col-xs-6">
+                                                <input id="fee02" name="detail.logistics_fee_rate.fee02" type="text" class="input-sm form-control" v-model.number="detail.logistics_fee_rate.fee02"/>
                                             </div>
                                         </div>
                                     </div>
@@ -122,18 +136,18 @@
                                 <div class="row">
                                     <div class="col-xs-6">
                                         <div class="form-group">
-                                            <label for="qbjzl" class="col-xs-6 control-label">起步价重量（kg）</label>
+                                            <label for="fee03" class="col-xs-6 control-label">1kg-2kg（澳币）</label>
                                             <div class="col-xs-6">
-                                                <input id="qbjzl" name="detail.logistics_fee_rate.qbjzl" type="text" class="input-sm form-control" v-model.number="detail.logistics_fee_rate.qbjzl"/>
+                                                <input id="fee03" name="detail.logistics_fee_rate.fee03" type="text" class="input-sm form-control" v-model.number="detail.logistics_fee_rate.fee03"/>
                                             </div>
                                         </div>
                                     </div>
 
                                     <div class="col-xs-6">
                                         <div class="form-group">
-                                            <label for="zdsf" class="col-xs-6 control-label">最低收费（澳币）</label>
+                                            <label for="fee04" class="col-xs-6 control-label">2kg-3kg（澳币）</label>
                                             <div class="col-xs-6">
-                                                <input id="zdsf" name="detail.logistics_fee_rate.zdsf" type="text" class="input-sm form-control" v-model.number="detail.logistics_fee_rate.zdsf"/>
+                                                <input id="fee04" name="detail.logistics_fee_rate.fee04" type="text" class="input-sm form-control" v-model.number="detail.logistics_fee_rate.fee04"/>
                                             </div>
                                         </div>
                                     </div>
@@ -142,18 +156,78 @@
                                 <div class="row">
                                     <div class="col-xs-6">
                                         <div class="form-group">
-                                            <label for="xzjt" class="col-xs-6 control-label">续重阶梯（kg）</label>
+                                            <label for="fee05" class="col-xs-6 control-label">3kg-4kg（澳币）</label>
                                             <div class="col-xs-6">
-                                                <input id="xzjt" name="detail.logistics_fee_rate.xzjt" type="text" class="input-sm form-control" v-model.number="detail.logistics_fee_rate.xzjt"/>
+                                                <input id="fee05" name="detail.logistics_fee_rate.fee05" type="text" class="input-sm form-control" v-model.number="detail.logistics_fee_rate.fee05"/>
                                             </div>
                                         </div>
                                     </div>
 
                                     <div class="col-xs-6">
                                         <div class="form-group">
-                                            <label for="xzjtsf" class="col-xs-6 control-label">续重阶梯收费（澳币）</label>
+                                            <label for="fee06" class="col-xs-6 control-label">4kg-5kg（澳币）</label>
                                             <div class="col-xs-6">
-                                                <input id="xzjtsf" name="detail.logistics_fee_rate.xzjtsf" type="text" class="input-sm form-control" v-model.number="detail.logistics_fee_rate.xzjtsf"/>
+                                                <input id="fee06" name="detail.logistics_fee_rate.fee06" type="text" class="input-sm form-control" v-model.number="detail.logistics_fee_rate.fee06"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="fee07" class="col-xs-6 control-label">5kg-7kg（澳币）</label>
+                                            <div class="col-xs-6">
+                                                <input id="fee07" name="detail.logistics_fee_rate.fee07" type="text" class="input-sm form-control" v-model.number="detail.logistics_fee_rate.fee07"/>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="fee08" class="col-xs-6 control-label">7kg-10kg（澳币）</label>
+                                            <div class="col-xs-6">
+                                                <input id="fee08" name="detail.logistics_fee_rate.fee08" type="text" class="input-sm form-control" v-model.number="detail.logistics_fee_rate.fee08"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="fee09" class="col-xs-6 control-label">10kg-15kg（澳币）</label>
+                                            <div class="col-xs-6">
+                                                <input id="fee09" name="detail.logistics_fee_rate.fee09" type="text" class="input-sm form-control" v-model.number="detail.logistics_fee_rate.fee09"/>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="fee10" class="col-xs-6 control-label">15kg-22kg（澳币）</label>
+                                            <div class="col-xs-6">
+                                                <input id="fee10" name="detail.logistics_fee_rate.fee10" type="text" class="input-sm form-control" v-model.number="detail.logistics_fee_rate.fee10"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="fee11" class="col-xs-6 control-label">22kg-30kg（澳币）</label>
+                                            <div class="col-xs-6">
+                                                <input id="fee11" name="detail.logistics_fee_rate.fee11" type="text" class="input-sm form-control" v-model.number="detail.logistics_fee_rate.fee11"/>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label for="fee12" class="col-xs-6 control-label">30kg-50kg（澳币）</label>
+                                            <div class="col-xs-6">
+                                                <input id="fee12" name="detail.logistics_fee_rate.fee12" type="text" class="input-sm form-control" v-model.number="detail.logistics_fee_rate.fee12"/>
                                             </div>
                                         </div>
                                     </div>
@@ -271,6 +345,7 @@
             initDataTable(
                     '#logisticsFeeRateList',
                     {
+                        "sScrollX": '100%',
                         "sAjaxSource": '{%url "ErpLogisticsFeeRate2.ListData"%}',
                         "aaSorting": [[1, "asc"]],
                         "aoColumns": [
@@ -289,7 +364,7 @@
                             {"mDataProp": "lm.name", "title": "物流方式", "bSearchable": true},
                             {"mDataProp": "fr.postcode", "title": "邮编", "bSearchable": true, "width": 90},
                             {
-                                "mDataProp": "fr.fee01", "title": "0-500g", "bSearchable": false, "width": 70,
+                                "mDataProp": "fr.fee01", "title": "0-500g", "bSearchable": false, "sClass": "dtRight", "width": 70,
                                 "render": function (data, type, row) {
                                     if (data !== 0) {
                                         return "AU " + data;
@@ -300,7 +375,7 @@
                                 }
                             },
                             {
-                                "mDataProp": "fr.fee02", "title": "500g-1kg", "bSearchable": false, "width": 70,
+                                "mDataProp": "fr.fee02", "title": "500g-1kg", "bSearchable": false, "sClass": "dtRight", "width": 90,
                                 "render": function (data, type, row) {
                                     if (data !== 0) {
                                         return "AU " + data;
@@ -311,7 +386,7 @@
                                 }
                             },
                             {
-                                "mDataProp": "fr.fee03", "title": "1kg-2kg", "bSearchable": false, "width": 70,
+                                "mDataProp": "fr.fee03", "title": "1kg-2kg", "bSearchable": false, "sClass": "dtRight", "width": 80,
                                 "render": function (data, type, row) {
                                     if (data !== 0) {
                                         return "AU " + data;
@@ -322,7 +397,7 @@
                                 }
                             },
                             {
-                                "mDataProp": "fr.fee04", "title": "2kg-3kg", "bSearchable": false, "width": 70,
+                                "mDataProp": "fr.fee04", "title": "2kg-3kg", "bSearchable": false, "sClass": "dtRight", "width": 80,
                                 "render": function (data, type, row) {
                                     if (data !== 0) {
                                         return "AU " + data;
@@ -333,7 +408,7 @@
                                 }
                             },
                             {
-                                "mDataProp": "fr.fee05", "title": "3kg-4kg", "bSearchable": false, "width": 70,
+                                "mDataProp": "fr.fee05", "title": "3kg-4kg", "bSearchable": false, "sClass": "dtRight", "width": 80,
                                 "render": function (data, type, row) {
                                     if (data !== 0) {
                                         return "AU " + data;
@@ -344,7 +419,7 @@
                                 }
                             },
                             {
-                                "mDataProp": "fr.fee06", "title": "4kg-5kg", "bSearchable": false, "width": 70,
+                                "mDataProp": "fr.fee06", "title": "4kg-5kg", "bSearchable": false, "sClass": "dtRight", "width": 80,
                                 "render": function (data, type, row) {
                                     if (data !== 0) {
                                         return "AU " + data;
@@ -355,7 +430,7 @@
                                 }
                             },
                             {
-                                "mDataProp": "fr.fee07", "title": "5kg-7kg", "bSearchable": false, "width": 70,
+                                "mDataProp": "fr.fee07", "title": "5kg-7kg", "bSearchable": false, "sClass": "dtRight", "width": 80,
                                 "render": function (data, type, row) {
                                     if (data !== 0) {
                                         return "AU " + data;
@@ -366,7 +441,7 @@
                                 }
                             },
                             {
-                                "mDataProp": "fr.fee08", "title": "7kg-10kg", "bSearchable": false, "width": 70,
+                                "mDataProp": "fr.fee08", "title": "7kg-10kg", "bSearchable": false, "sClass": "dtRight", "width": 70,
                                 "render": function (data, type, row) {
                                     if (data !== 0) {
                                         return "AU " + data;
@@ -377,7 +452,7 @@
                                 }
                             },
                             {
-                                "mDataProp": "fr.fee09", "title": "10kg-15kg", "bSearchable": false, "width": 70,
+                                "mDataProp": "fr.fee09", "title": "10kg-15kg", "bSearchable": false, "sClass": "dtRight", "width": 70,
                                 "render": function (data, type, row) {
                                     if (data !== 0) {
                                         return "AU " + data;
@@ -388,7 +463,7 @@
                                 }
                             },
                             {
-                                "mDataProp": "fr.fee10", "title": "15kg-22kg", "bSearchable": false, "width": 70,
+                                "mDataProp": "fr.fee10", "title": "15kg-22kg", "bSearchable": false, "sClass": "dtRight", "width": 70,
                                 "render": function (data, type, row) {
                                     if (data !== 0) {
                                         return "AU " + data;
@@ -399,7 +474,7 @@
                                 }
                             },
                             {
-                                "mDataProp": "fr.fee11", "title": "22kg-30kg", "bSearchable": false, "width": 70,
+                                "mDataProp": "fr.fee11", "title": "22kg-30kg", "bSearchable": false, "sClass": "dtRight", "width": 70,
                                 "render": function (data, type, row) {
                                     if (data !== 0) {
                                         return "AU " + data;
@@ -410,7 +485,7 @@
                                 }
                             },
                             {
-                                "mDataProp": "fr.fee12", "title": "30kg-50kg", "bSearchable": false, "width": 70,
+                                "mDataProp": "fr.fee12", "title": "30kg-50kg", "bSearchable": false, "sClass": "dtRight", "width": 70,
                                 "render": function (data, type, row) {
                                     if (data !== 0) {
                                         return "AU " + data;
@@ -438,6 +513,7 @@
                                 "mDataProp": "fr.pydqjsyf",
                                 "title": "偏远地区加收运费",
                                 "bSearchable": false,
+                                "sClass": "dtRight",
                                 "width": 130,
                                 "render": function (data, type, row) {
                                     if (data !== 0) {
@@ -522,19 +598,40 @@
                     'detail.logistics_fee_rate.postcode': {
                         required: true, minlength: 2, maxlength: 100
                     },
-                    'detail.logistics_fee_rate.qbj': {
+                    'detail.logistics_fee_rate.fee01': {
                         required: true, number: true
                     },
-                    'detail.logistics_fee_rate.qbjzl': {
+                    'detail.logistics_fee_rate.fee02': {
                         required: true, number: true
                     },
-                    'detail.logistics_fee_rate.zdsf': {
+                    'detail.logistics_fee_rate.fee03': {
                         required: true, number: true
                     },
-                    'detail.logistics_fee_rate.xzjt': {
+                    'detail.logistics_fee_rate.fee04': {
                         required: true, number: true
                     },
-                    'detail.logistics_fee_rate.xzjtsf': {
+                    'detail.logistics_fee_rate.fee05': {
+                        required: true, number: true
+                    },
+                    'detail.logistics_fee_rate.fee06': {
+                        required: true, number: true
+                    },
+                    'detail.logistics_fee_rate.fee07': {
+                        required: true, number: true
+                    },
+                    'detail.logistics_fee_rate.fee08': {
+                        required: true, number: true
+                    },
+                    'detail.logistics_fee_rate.fee09': {
+                        required: true, number: true
+                    },
+                    'detail.logistics_fee_rate.fee10': {
+                        required: true, number: true
+                    },
+                    'detail.logistics_fee_rate.fee11': {
+                        required: true, number: true
+                    },
+                    'detail.logistics_fee_rate.fee12': {
                         required: true, number: true
                     },
                     'detail.logistics_fee_rate.sfpydq': {
