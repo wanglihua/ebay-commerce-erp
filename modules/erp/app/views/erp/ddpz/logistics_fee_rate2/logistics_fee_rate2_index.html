@@ -1,4 +1,4 @@
-{%header "物流费率" .%}
+{%header "物流费率2" .%}
 <div id="page">
     <div class="breadcrumbs" id="breadcrumbs">
         <ul class="breadcrumb">
@@ -6,7 +6,7 @@
                 <a href='{%url "Home.Index"%}'><i class="ace-icon fa fa-home home-icon"></i></a>
             </li>
             <li class="parent" data-menu="ddpz-menu">订单配置</li>
-            <li class="active" data-menu="ddpz-logisticsfeerate2-menu">物流费率</li>
+            <li class="active" data-menu="ddpz-logisticsfeerate2-menu">物流费率2</li>
         </ul>
     </div>
     <div class="page-content">
@@ -345,7 +345,6 @@
             initDataTable(
                     '#logisticsFeeRateList',
                     {
-                        "sScrollX": '100%',
                         "sAjaxSource": '{%url "ErpLogisticsFeeRate2.ListData"%}',
                         "aaSorting": [[1, "asc"]],
                         "aoColumns": [
@@ -496,7 +495,7 @@
                                 }
                             },
                             {
-                                "mDataProp": "fr.sfpydq", "title": "是否为偏远地区", "bSearchable": false, "width": 120,
+                                "mDataProp": "fr.sfpydq", "title": "是否为偏远地区", "bSearchable": false, "sClass": "center", "width": 120,
                                 "render": function (data, type, row) {
                                     if (data === 0) {
                                         return "否";
