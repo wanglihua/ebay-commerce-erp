@@ -462,10 +462,11 @@ func (p_ol *OrderLogisticsService) match_logistics_mode_logic(order ddlc_models.
 
 	var final_result_second match_logistics_mode_result
 
-	if final_result.fee_rate_id != 0 { // 最佳物流方式里面有值
+	if final_result.fee_rate_id != 0 || final_result.fee_rate2_id != 0 { // 最佳物流方式里面有值
 		for _, match_result := range match_result_list {
 			if final_result.stock_id != match_result.stock_id { // 和最佳物流不是同一个仓库的
-				if final_result_second.fee_rate_id == 0 || (final_result_second.total_fee > match_result.total_fee && match_result.fee_rate_id != 0) { // 如果次佳仓还没有值，或者次佳仓的费用比当前匹配值要高
+				if (final_result_second.fee_rate_id == 0 && final_result_second.fee_rate2_id == 0 ) ||
+					(final_result_second.total_fee > match_result.total_fee && ( match_result.fee_rate_id != 0 || match_result.fee_rate2_id != 0)) { // 如果次佳仓还没有值，或者次佳仓的费用比当前匹配值要高
 					final_result_second = match_result
 				}
 			}
@@ -487,7 +488,15 @@ func save_order_logistics_logic(p_ol *OrderLogisticsService, match_result match_
 	order_logistics_logic.CompanyId = match_result.company_id
 	order_logistics_logic.StockId = match_result.stock_id
 	order_logistics_logic.ModeId = match_result.mode_id
-	order_logistics_logic.FeeRateId = match_result.fee_rate_id
+
+	if match_result.fee_rate_id != 0 {
+		order_logistics_logic.FeeRateId = match_result.fee_rate_id
+	}
+
+	if match_result.fee_rate2_id != 0 {
+		order_logistics_logic.FeeRateId = match_result.fee_rate2_id
+	}
+
 	order_logistics_logic.Length = match_result.length
 	order_logistics_logic.Width = match_result.width
 	order_logistics_logic.Height = match_result.height
@@ -504,10 +513,17 @@ func save_order_logistics_logic(p_ol *OrderLogisticsService, match_result match_
 	order_logistics_logic.CompanyIdSecond = match_result_second.company_id
 	order_logistics_logic.StockIdSecond = match_result_second.stock_id
 	order_logistics_logic.ModeIdSecond = match_result_second.mode_id
-	order_logistics_logic.FeeRateIdSecond = match_result_second.fee_rate_id
-	if match_result_second.fee_rate_id != 0 {
-		order_logistics_logic.TotalFeeSecond = match_result_second.total_fee
 
+	if match_result_second.fee_rate_id != 0 {
+		order_logistics_logic.FeeRateIdSecond = match_result_second.fee_rate_id
+	}
+
+	if match_result_second.fee_rate2_id != 0 {
+		order_logistics_logic.FeeRateIdSecond = match_result_second.fee_rate2_id
+	}
+
+	if order_logistics_logic.FeeRateIdSecond != 0 {
+		order_logistics_logic.TotalFeeSecond = match_result_second.total_fee
 		order_logistics_logic.FeeDiff = match_result_second.total_fee - match_result.total_fee
 	}
 
