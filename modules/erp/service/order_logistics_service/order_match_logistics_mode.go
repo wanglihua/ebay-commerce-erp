@@ -12,6 +12,7 @@ import (
 	"matrix/modules/erp/models/ddpz_models"
 	"matrix/modules/erp/models/ddlc_models"
 	"time"
+	"matrix/modules/erp/models/ddpz_models/logistics_fee_type"
 )
 
 /*
@@ -53,6 +54,7 @@ func (p_ol *OrderLogisticsService) match_logistics_mode_with_option(p_order *ddl
 
 	var logistics_mode_list = p_ol.logistics_mode_list
 	var logistics_fee_rate_map = p_ol.logistics_fee_rate_map
+	var logistics_fee_rate2_map = p_ol.logistics_fee_rate2_map
 
 	var final_result match_logistics_mode_result
 	final_result.order_id = p_order.Id
@@ -144,36 +146,50 @@ func (p_ol *OrderLogisticsService) match_logistics_mode_with_option(p_order *ddl
 		mt.Println("订单编号", p_order.Code)
 		mt.Println("匹配单个物流方式开始")
 		mt.Println("物流方式数据库id", logistics_mode.Id, "物流方式名称：", logistics_mode.Name)
-		logistics_fee_rate_list, found := logistics_fee_rate_map[logistics_mode.Id]
-		if found == false {
-			mt.Println("没有找到物流方式的对应邮编的费率设置")
-			mt.Println("匹配单个物流方式结束")
 
-			if mt.is_trace == true {
-				log_logistics_match_debug(mode_result, "无邮编对应费率设置", mt.String(), db_session)
+		if logistics_mode.FeeType != logistics_fee_type.FEE_TYPE1 && logistics_mode.FeeType != logistics_fee_type.FEE_TYPE2 {
+			revel.ERROR.Println(fmt.Sprintf("物流方式的费率类型设置值不对！ id: %d, name: %s", logistics_mode.Id, logistics_mode.Name))
+		}
+
+		logistics_fee_rate_list, found_rate1 := logistics_fee_rate_map[logistics_mode.Id]
+		logistics_fee_rate2_list, found_rate2 := logistics_fee_rate2_map[logistics_mode.Id]
+		if logistics_mode.FeeType == logistics_fee_type.FEE_TYPE1 {
+			if found_rate1 == false {
+				mt.Println("没有找到物流方式的对应邮编的费率设置")
+				mt.Println("匹配单个物流方式结束")
+
+				if mt.is_trace == true {
+					log_logistics_match_debug(mode_result, "无邮编对应费率设置", mt.String(), db_session)
+				}
+
+				continue
 			}
+		}
 
-			continue
+		if logistics_mode.FeeType == logistics_fee_type.FEE_TYPE2 {
+			if found_rate2 == false {
+				mt.Println("没有找到物流方式的对应邮编的费率2设置")
+				mt.Println("匹配单个物流方式结束")
+
+				if mt.is_trace == true {
+					log_logistics_match_debug(mode_result, "无邮编对应费率2设置", mt.String(), db_session)
+				}
+
+				continue
+			}
 		}
 
 		var stock_id = logistics_mode.StockId
 		mt.Println("物流方式对应的仓库数据库id", stock_id)
 		mode_result.cost_amount = 0
-		stock_has_product_and_cost_amount, found := stock_id_has_products_map[stock_id];
-		if found == false || stock_has_product_and_cost_amount.has_product == false { // 如果物流方式对应的仓库，没有全部的商品数量的库存，就继续下一个物流方式
+		stock_has_product_and_cost_amount, found_stock := stock_id_has_products_map[stock_id];
+		if found_stock == false || stock_has_product_and_cost_amount.has_product == false { // 如果物流方式对应的仓库，没有全部的商品数量的库存，就继续下一个物流方式
 			mt.Println("物流方式对应的仓库没有订单对应的库存")
 			//mt.Println("匹配单个物流方式结束")
 			mt.Println("继续进行物流方式费用的计算")
 			mode_result.has_stock = false
 
-			/*
-
-			if mt.is_trace == true {
-				log_logistics_match_debug(mode_result, "无对应库存", mt.String(), db_session)
-			}
-			continue //todo: 如果 found == false 是不是应该 continue
-
-			*/
+			// todo 是否要 continue?
 		} else {
 			mt.Println("物流方式对应的仓库存在订单对应的库存，澳仓成本价为", stock_has_product_and_cost_amount.cost_amount)
 		}
@@ -602,78 +618,179 @@ func (p_ol *OrderLogisticsService) match_logistics_mode_with_option(p_order *ddl
 		mode_result.fee_rate_id = 0
 		mode_result.fee_rate = ddpz_models.LogisticsFeeRateInfo{}
 		var total_fee_in_fee_rate float64 = 10000000 //非超重部分的费用，初始为一个很大的不可能的数字， 澳币
-		for _, logistics_fee_rate := range logistics_fee_rate_list {
+		if found_rate1 {
+			for _, logistics_fee_rate := range logistics_fee_rate_list {
 
-			// 邮编要对上，忽略开头的 0
-			var postcode_in_address = strings.TrimPrefix(strings.TrimSpace(p_order_logistics_data.order_shipping_address.PostalCode), "0")
-			var postcode_in_fee_rate = strings.TrimPrefix(strings.TrimSpace(logistics_fee_rate.Postcode), "0")
-			if postcode_in_address == postcode_in_fee_rate {
-				mt.Println()
-				mt.PrintlnIndent(1, "匹配单个费率开始")
+				// 邮编要对上，忽略开头的 0
+				var postcode_in_address = strings.TrimPrefix(strings.TrimSpace(p_order_logistics_data.order_shipping_address.PostalCode), "0")
+				var postcode_in_fee_rate = strings.TrimPrefix(strings.TrimSpace(logistics_fee_rate.Postcode), "0")
+				if postcode_in_address == postcode_in_fee_rate {
+					mt.Println()
+					mt.PrintlnIndent(1, "匹配单个费率开始")
 
-				mt.PrintlnIndent(1, "订单收货地址的邮编", p_order_logistics_data.order_shipping_address.PostalCode)
-				mt.PrintlnIndent(1, "当前物流方式下，符合邮编的费率数据库 id", logistics_fee_rate.Id)
+					mt.PrintlnIndent(1, "订单收货地址的邮编", p_order_logistics_data.order_shipping_address.PostalCode)
+					mt.PrintlnIndent(1, "当前物流方式下，符合邮编的费率数据库 id", logistics_fee_rate.Id)
 
-				mt.PrintlnIndent(1, "费率起步价", logistics_fee_rate.Qbj)
-				mt.PrintlnIndent(1, "费率起步价重量", logistics_fee_rate.Qbjzl)
+					mt.PrintlnIndent(1, "费率起步价", logistics_fee_rate.Qbj)
+					mt.PrintlnIndent(1, "费率起步价重量", logistics_fee_rate.Qbjzl)
 
-				var fee float64 = logistics_fee_rate.Qbj //起步价
-				if mode_result.weight-logistics_fee_rate.Qbjzl > 0 { //如果超过了起步重量，就算超过部分的费率；不超过，就不用算了
-					mt.PrintlnIndent(1, "超过起步价重量了")
-					var extra_weight_in_fee_rate = mode_result.weight - logistics_fee_rate.Qbjzl
-					mt.PrintlnIndent(1, "超过重量", extra_weight_in_fee_rate)
-					mt.PrintlnIndent(1, "续重阶梯", logistics_fee_rate.Xzjt)
-					if logistics_fee_rate.Xzjt > 0 {
-						var xz_step_count = math.Ceil(extra_weight_in_fee_rate / logistics_fee_rate.Xzjt)
-						mt.PrintlnIndent(1, "续重阶梯数量", xz_step_count)
-						mt.PrintlnIndent(1, "续重阶梯收费", logistics_fee_rate.Xzjtsf)
-						var xz_fee = math.Ceil(extra_weight_in_fee_rate/logistics_fee_rate.Xzjt) * logistics_fee_rate.Xzjtsf
-						mt.PrintlnIndent(1, "续重费用", xz_fee)
-						fee = fee + xz_fee
-						mt.PrintlnIndent(1, "续重后总费用", fee)
-					} else {
-						revel.ERROR.Println("续重阶梯设置有误，不能计算超重费用！", logistics_fee_rate.Xzjt)
-						mt.PrintlnIndent(1, "续重阶梯设置有误，不能计算超重费用！", logistics_fee_rate.Xzjt)
+					var fee float64 = logistics_fee_rate.Qbj //起步价
+					if mode_result.weight-logistics_fee_rate.Qbjzl > 0 { //如果超过了起步重量，就算超过部分的费率；不超过，就不用算了
+						mt.PrintlnIndent(1, "超过起步价重量了")
+						var extra_weight_in_fee_rate = mode_result.weight - logistics_fee_rate.Qbjzl
+						mt.PrintlnIndent(1, "超过重量", extra_weight_in_fee_rate)
+						mt.PrintlnIndent(1, "续重阶梯", logistics_fee_rate.Xzjt)
+						if logistics_fee_rate.Xzjt > 0 {
+							var xz_step_count = math.Ceil(extra_weight_in_fee_rate / logistics_fee_rate.Xzjt)
+							mt.PrintlnIndent(1, "续重阶梯数量", xz_step_count)
+							mt.PrintlnIndent(1, "续重阶梯收费", logistics_fee_rate.Xzjtsf)
+							var xz_fee = math.Ceil(extra_weight_in_fee_rate/logistics_fee_rate.Xzjt) * logistics_fee_rate.Xzjtsf
+							mt.PrintlnIndent(1, "续重费用", xz_fee)
+							fee = fee + xz_fee
+							mt.PrintlnIndent(1, "续重后总费用", fee)
+						} else {
+							revel.ERROR.Println("续重阶梯设置有误，不能计算超重费用！", logistics_fee_rate.Xzjt)
+							mt.PrintlnIndent(1, "续重阶梯设置有误，不能计算超重费用！", logistics_fee_rate.Xzjt)
+						}
 					}
-				}
-				mt.PrintlnIndent(1, "费率最低收费", logistics_fee_rate.Zdsf)
-				// 计算最低费用的时候，还不考虑偏远地区的费用
-				fee = math.Max(fee, logistics_fee_rate.Zdsf) //有最低收费
-				mt.PrintlnIndent(1, "考虑费率最低收费后的费用", fee)
+					mt.PrintlnIndent(1, "费率最低收费", logistics_fee_rate.Zdsf)
+					// 计算最低费用的时候，还不考虑偏远地区的费用
+					fee = math.Max(fee, logistics_fee_rate.Zdsf) //有最低收费
+					mt.PrintlnIndent(1, "考虑费率最低收费后的费用", fee)
 
-				// 偏远地区
-				if logistics_fee_rate.Sfpydq == 1 {
-					mt.PrintlnIndent(1, "是否偏远地区", "是")
-					mt.PrintlnIndent(1, "偏远地区加收运费", logistics_fee_rate.Pydqjsyf)
-					fee = fee + logistics_fee_rate.Pydqjsyf
-					mt.PrintlnIndent(1, "考虑偏远地区后的费用", fee)
-				} else {
-					mt.PrintlnIndent(1, "是否偏远地区", "否")
+					// 偏远地区
+					if logistics_fee_rate.Sfpydq == 1 {
+						mt.PrintlnIndent(1, "是否偏远地区", "是")
+						mt.PrintlnIndent(1, "偏远地区加收运费", logistics_fee_rate.Pydqjsyf)
+						fee = fee + logistics_fee_rate.Pydqjsyf
+						mt.PrintlnIndent(1, "考虑偏远地区后的费用", fee)
+					} else {
+						mt.PrintlnIndent(1, "是否偏远地区", "否")
+					}
+
+					mt.PrintlnIndent(1, "最终当前费率的费用", fee)
+					if fee < total_fee_in_fee_rate { // 取得更优的费率方案
+						mt.PrintlnIndent(1, "之前没有匹配的费率，或当前费率比之前匹配的费率更优，暂时选用当前费率计算结果")
+						total_fee_in_fee_rate = fee
+						mode_result.fee_rate_id = logistics_fee_rate.Id
+						mode_result.fee_rate = logistics_fee_rate
+					} else {
+						mt.PrintlnIndent(1, "之前匹配的费率，比当前费率更优，弃用当前费率计算结果")
+					}
+					mt.PrintlnIndent(1, "匹配单个费率结束")
+					mt.Println()
+				}
+			} // for _, logistics_fee_rate := range logistics_fee_rate_list {
+		}
+
+		mode_result.fee_rate2_id = 0
+		mode_result.fee_rate2 = ddpz_models.LogisticsFeeRate2Info{}
+		if found_rate2 {
+			for _, logistics_fee_rate2 := range logistics_fee_rate2_list {
+
+				// 邮编要对上，忽略开头的 0
+				var postcode_in_address = strings.TrimPrefix(strings.TrimSpace(p_order_logistics_data.order_shipping_address.PostalCode), "0")
+				var postcode_in_fee_rate = strings.TrimPrefix(strings.TrimSpace(logistics_fee_rate2.Postcode), "0")
+				if postcode_in_address == postcode_in_fee_rate {
+					mt.Println()
+					mt.PrintlnIndent(1, "匹配单个费率开始")
+
+					mt.PrintlnIndent(1, "订单收货地址的邮编", p_order_logistics_data.order_shipping_address.PostalCode)
+					mt.PrintlnIndent(1, "当前物流方式下，符合邮编的费率数据库 id", logistics_fee_rate2.Id)
+
+					var fee float64 = 0
+
+					if 0 < mode_result.weight && mode_result.weight <= 0.5 { // 0-500g
+						mt.PrintlnIndent(1, "0-500g 费率匹配成功！")
+						fee = logistics_fee_rate2.Fee01
+					} else if 0.5 < mode_result.weight && mode_result.weight <= 1 { // 500g-1kg
+						mt.PrintlnIndent(1, "500g-1kg 费率匹配成功！")
+						fee = logistics_fee_rate2.Fee02
+					} else if 1 < mode_result.weight && mode_result.weight <= 2 { // 1kg-2kg
+						mt.PrintlnIndent(1, "1kg-2kg 费率匹配成功！")
+						fee = logistics_fee_rate2.Fee03
+					} else if 2 < mode_result.weight && mode_result.weight <= 3 { // 2kg-3kg
+						mt.PrintlnIndent(1, "2kg-3kg 费率匹配成功！")
+						fee = logistics_fee_rate2.Fee04
+					} else if 3 < mode_result.weight && mode_result.weight <= 4 { // 3kg-4kg
+						mt.PrintlnIndent(1, "3kg-4kg 费率匹配成功！")
+						fee = logistics_fee_rate2.Fee05
+					} else if 4 < mode_result.weight && mode_result.weight <= 5 { // 4kg-5kg
+						mt.PrintlnIndent(1, "4kg-5kg 费率匹配成功！")
+						fee = logistics_fee_rate2.Fee06
+					} else if 5 < mode_result.weight && mode_result.weight <= 7 { // 5kg-7kg
+						mt.PrintlnIndent(1, "5kg-7kg 费率匹配成功！")
+						fee = logistics_fee_rate2.Fee07
+					} else if 7 < mode_result.weight && mode_result.weight <= 10 { // 7kg-10kg
+						mt.PrintlnIndent(1, "7kg-10kg 费率匹配成功！")
+						fee = logistics_fee_rate2.Fee08
+					} else if 10 < mode_result.weight && mode_result.weight <= 15 { // 10kg-15kg
+						mt.PrintlnIndent(1, "10kg-15kg 费率匹配成功！")
+						fee = logistics_fee_rate2.Fee09
+					} else if 15 < mode_result.weight && mode_result.weight <= 22 { // 15kg-22kg
+						mt.PrintlnIndent(1, "15kg-22kg 费率匹配成功！")
+						fee = logistics_fee_rate2.Fee10
+					} else if 22 < mode_result.weight && mode_result.weight <= 30 { // 22kg-30kg
+						mt.PrintlnIndent(1, "22kg-30kg 费率匹配成功！")
+						fee = logistics_fee_rate2.Fee11
+					} else if 30 < mode_result.weight && mode_result.weight <= 50 { // 30kg-50kg
+						mt.PrintlnIndent(1, "30kg-50kg 费率匹配成功！")
+						fee = logistics_fee_rate2.Fee12
+					}
+
+					if fee == 0 {
+						mt.PrintlnIndent(1, "当前重量该费率不支持！")
+					}
+
+					// 偏远地区
+					if logistics_fee_rate2.Sfpydq == 1 {
+						mt.PrintlnIndent(1, "是否偏远地区", "是")
+						mt.PrintlnIndent(1, "偏远地区加收运费", logistics_fee_rate2.Pydqjsyf)
+						fee = fee + logistics_fee_rate2.Pydqjsyf
+						mt.PrintlnIndent(1, "考虑偏远地区后的费用", fee)
+					} else {
+						mt.PrintlnIndent(1, "是否偏远地区", "否")
+					}
+
+					mt.PrintlnIndent(1, "最终当前费率的费用", fee)
+					if fee < total_fee_in_fee_rate { // 取得更优的费率方案
+						mt.PrintlnIndent(1, "之前没有匹配的费率，或当前费率比之前匹配的费率更优，暂时选用当前费率计算结果")
+						total_fee_in_fee_rate = fee
+						mode_result.fee_rate2_id = logistics_fee_rate2.Id
+						mode_result.fee_rate2 = logistics_fee_rate2
+					} else {
+						mt.PrintlnIndent(1, "之前匹配的费率，比当前费率更优，弃用当前费率计算结果")
+					}
+					mt.PrintlnIndent(1, "匹配单个费率结束")
+					mt.Println()
+				}
+			} // for _, logistics_fee_rate2 := range logistics_fee_rate2_list {
+		}
+
+		if found_rate1 {
+			if mode_result.fee_rate_id == 0 { //没有费率匹配成功, 比如说，还没有开通该地区的物流
+				mt.Println("该物流方式下没有匹配的物流费率，弃用当前物流方式")
+				mt.Println("匹配单个物流方式结束")
+
+				if mt.is_trace == true {
+					log_logistics_match_debug(mode_result, "没有匹配的物流费率", mt.String(), db_session)
 				}
 
-				mt.PrintlnIndent(1, "最终当前费率的费用", fee)
-				if fee < total_fee_in_fee_rate { // 取得更优的费率方案
-					mt.PrintlnIndent(1, "之前没有匹配的费率，或当前费率比之前匹配的费率更优，暂时选用当前费率计算结果")
-					total_fee_in_fee_rate = fee
-					mode_result.fee_rate_id = logistics_fee_rate.Id
-					mode_result.fee_rate = logistics_fee_rate
-				} else {
-					mt.PrintlnIndent(1, "之前匹配的费率，比当前费率更优，弃用当前费率计算结果")
-				}
-				mt.PrintlnIndent(1, "匹配单个费率结束")
-				mt.Println()
+				continue // 排除该物流方式
 			}
-		}                                            // for _, logistics_fee_rate := range logistics_fee_rate_list {
+		}
 
-		if mode_result.fee_rate_id == 0 { //没有费率匹配成功, 比如说，还没有开通该地区的物流
-			mt.Println("该物流方式下没有匹配的物流费率，弃用当前物流方式")
-			mt.Println("匹配单个物流方式结束")
+		if found_rate2 {
+			if mode_result.fee_rate2_id == 0 { //没有费率匹配成功, 比如说，还没有开通该地区的物流
+				mt.Println("该物流方式下没有匹配的物流费率，弃用当前物流方式")
+				mt.Println("匹配单个物流方式结束")
 
-			if mt.is_trace == true {
-				log_logistics_match_debug(mode_result, "没有匹配的物流费率", mt.String(), db_session)
+				if mt.is_trace == true {
+					log_logistics_match_debug(mode_result, "没有匹配的物流费率", mt.String(), db_session)
+				}
+
+				continue // 排除该物流方式
 			}
-
-			continue // 排除该物流方式
 		}
 
 		mode_result.total_fee = total_fee_in_fee_rate + extra_fee_in_mode
@@ -799,7 +916,7 @@ func (p_ol *OrderLogisticsService) match_logistics_mode_with_option(p_order *ddl
 		return match_return
 	}
 
-	if final_result.mode_id == 0 || final_result.fee_rate_id == 0 { // 匹配失败
+	if final_result.mode_id == 0 || (final_result.fee_rate_id == 0 && final_result.fee_rate2_id == 0) { // 匹配失败
 		var match_return match_return_t
 		match_return.success = false
 		match_return.order_logistics = order_logistics

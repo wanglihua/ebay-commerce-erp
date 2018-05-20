@@ -131,6 +131,7 @@ func (p_ol *OrderLogisticsService) match_logistics_mode_logic(order ddlc_models.
 
 	var logistics_mode_list = p_ol.logistics_mode_list
 	var logistics_fee_rate_map = p_ol.logistics_fee_rate_map
+	var logistics_fee_rate2_map = p_ol.logistics_fee_rate2_map
 
 	var final_result match_logistics_mode_result
 	var match_result_list = make([]match_logistics_mode_result, 0)
@@ -171,14 +172,15 @@ func (p_ol *OrderLogisticsService) match_logistics_mode_logic(order ddlc_models.
 		mode_result.mode_id = logistics_mode.Id
 		mode_result.mode = logistics_mode
 
-		logistics_fee_rate_list, found := logistics_fee_rate_map[logistics_mode.Id]
-		if found == false {
+		logistics_fee_rate_list, found_rate1 := logistics_fee_rate_map[logistics_mode.Id]
+		logistics_fee_rate2_list, found_rate2 := logistics_fee_rate2_map[logistics_mode.Id]
+		if found_rate1 == false && found_rate2 == false {
 			continue
 		}
 
 		var stock_id = logistics_mode.StockId
 		mode_result.cost_amount = 0
-		stock_has_product_and_cost_amount, found := stock_id_has_products_map[stock_id];
+		stock_has_product_and_cost_amount, _ := stock_id_has_products_map[stock_id];
 		/*
 		if found == false {
 			continue // 是不是应该是 continue
@@ -310,39 +312,94 @@ func (p_ol *OrderLogisticsService) match_logistics_mode_logic(order ddlc_models.
 		mode_result.fee_rate_id = 0
 		mode_result.fee_rate = ddpz_models.LogisticsFeeRateInfo{}
 		var total_fee_in_fee_rate float64 = 10000000 //非超重部分的费用，初始为一个很大的不可能的数字， 澳币
-		for _, logistics_fee_rate := range logistics_fee_rate_list {
+		if found_rate1 {
+			for _, logistics_fee_rate := range logistics_fee_rate_list {
 
-			// 邮编要对上，忽略开头的 0
-			var postcode_in_address = strings.TrimPrefix(strings.TrimSpace(p_order_logistics_data.order_shipping_address.PostalCode), "0")
-			var postcode_in_fee_rate = strings.TrimPrefix(strings.TrimSpace(logistics_fee_rate.Postcode), "0")
-			if postcode_in_address == postcode_in_fee_rate {
-				var fee float64 = logistics_fee_rate.Qbj //起步价
-				if mode_result.weight-logistics_fee_rate.Qbjzl > 0 { //如果超过了起步重量，就算超过部分的费率；不超过，就不用算了
-					var extra_weight_in_fee_rate = mode_result.weight - logistics_fee_rate.Qbjzl
-					if logistics_fee_rate.Xzjt > 0 {
-						var xz_fee = math.Ceil(extra_weight_in_fee_rate/logistics_fee_rate.Xzjt) * logistics_fee_rate.Xzjtsf
-						fee = fee + xz_fee
-					} else {
-						revel.ERROR.Println("续重阶梯设置有误，不能计算超重费用！", logistics_fee_rate.Xzjt)
+				// 邮编要对上，忽略开头的 0
+				var postcode_in_address = strings.TrimPrefix(strings.TrimSpace(p_order_logistics_data.order_shipping_address.PostalCode), "0")
+				var postcode_in_fee_rate = strings.TrimPrefix(strings.TrimSpace(logistics_fee_rate.Postcode), "0")
+				if postcode_in_address == postcode_in_fee_rate {
+					var fee float64 = logistics_fee_rate.Qbj //起步价
+					if mode_result.weight-logistics_fee_rate.Qbjzl > 0 { //如果超过了起步重量，就算超过部分的费率；不超过，就不用算了
+						var extra_weight_in_fee_rate = mode_result.weight - logistics_fee_rate.Qbjzl
+						if logistics_fee_rate.Xzjt > 0 {
+							var xz_fee = math.Ceil(extra_weight_in_fee_rate/logistics_fee_rate.Xzjt) * logistics_fee_rate.Xzjtsf
+							fee = fee + xz_fee
+						} else {
+							revel.ERROR.Println("续重阶梯设置有误，不能计算超重费用！", logistics_fee_rate.Xzjt)
+						}
+					}
+					// 计算最低费用的时候，还不考虑偏远地区的费用
+					fee = math.Max(fee, logistics_fee_rate.Zdsf) //有最低收费
+
+					// 偏远地区
+					if logistics_fee_rate.Sfpydq == 1 {
+						fee = fee + logistics_fee_rate.Pydqjsyf
+					}
+
+					if fee < total_fee_in_fee_rate { // 取得更优的费率方案
+						total_fee_in_fee_rate = fee
+						mode_result.fee_rate_id = logistics_fee_rate.Id
+						mode_result.fee_rate = logistics_fee_rate
 					}
 				}
-				// 计算最低费用的时候，还不考虑偏远地区的费用
-				fee = math.Max(fee, logistics_fee_rate.Zdsf) //有最低收费
+			} // for _, logistics_fee_rate := range logistics_fee_rate_list {
+		}
 
-				// 偏远地区
-				if logistics_fee_rate.Sfpydq == 1 {
-					fee = fee + logistics_fee_rate.Pydqjsyf
+		if found_rate2 {
+			for _, logistics_fee_rate2 := range logistics_fee_rate2_list {
+
+				// 邮编要对上，忽略开头的 0
+				var postcode_in_address = strings.TrimPrefix(strings.TrimSpace(p_order_logistics_data.order_shipping_address.PostalCode), "0")
+				var postcode_in_fee_rate = strings.TrimPrefix(strings.TrimSpace(logistics_fee_rate2.Postcode), "0")
+				if postcode_in_address == postcode_in_fee_rate {
+					var fee float64 = 0
+
+					if 0 < mode_result.weight && mode_result.weight <= 0.5 { // 0-500g
+						fee = logistics_fee_rate2.Fee01
+					} else if 0.5 < mode_result.weight && mode_result.weight <= 1 { // 500g-1kg
+						fee = logistics_fee_rate2.Fee02
+					} else if 1 < mode_result.weight && mode_result.weight <= 2 { // 1kg-2kg
+						fee = logistics_fee_rate2.Fee03
+					} else if 2 < mode_result.weight && mode_result.weight <= 3 { // 2kg-3kg
+						fee = logistics_fee_rate2.Fee04
+					} else if 3 < mode_result.weight && mode_result.weight <= 4 { // 3kg-4kg
+						fee = logistics_fee_rate2.Fee05
+					} else if 4 < mode_result.weight && mode_result.weight <= 5 { // 4kg-5kg
+						fee = logistics_fee_rate2.Fee06
+					} else if 5 < mode_result.weight && mode_result.weight <= 7 { // 5kg-7kg
+						fee = logistics_fee_rate2.Fee07
+					} else if 7 < mode_result.weight && mode_result.weight <= 10 { // 7kg-10kg
+						fee = logistics_fee_rate2.Fee08
+					} else if 10 < mode_result.weight && mode_result.weight <= 15 { // 10kg-15kg
+						fee = logistics_fee_rate2.Fee09
+					} else if 15 < mode_result.weight && mode_result.weight <= 22 { // 15kg-22kg
+						fee = logistics_fee_rate2.Fee10
+					} else if 22 < mode_result.weight && mode_result.weight <= 30 { // 22kg-30kg
+						fee = logistics_fee_rate2.Fee11
+					} else if 30 < mode_result.weight && mode_result.weight <= 50 { // 30kg-50kg
+						fee = logistics_fee_rate2.Fee12
+					}
+
+					// 偏远地区
+					if logistics_fee_rate2.Sfpydq == 1 {
+						fee = fee + logistics_fee_rate2.Pydqjsyf
+					}
+
+					if fee < total_fee_in_fee_rate { // 取得更优的费率方案
+						total_fee_in_fee_rate = fee
+						mode_result.fee_rate2_id = logistics_fee_rate2.Id
+						mode_result.fee_rate2 = logistics_fee_rate2
+					}
 				}
+			} // for _, logistics_fee_rate2 := range logistics_fee_rate2_list {
+		}
 
-				if fee < total_fee_in_fee_rate { // 取得更优的费率方案
-					total_fee_in_fee_rate = fee
-					mode_result.fee_rate_id = logistics_fee_rate.Id
-					mode_result.fee_rate = logistics_fee_rate
-				}
-			}
-		}                                            // for _, logistics_fee_rate := range logistics_fee_rate_list {
+		if found_rate1 == true && mode_result.fee_rate_id == 0 { //没有费率匹配成功, 比如说，还没有开通该地区的物流
+			continue // 排除该物流方式
+		}
 
-		if mode_result.fee_rate_id == 0 { //没有费率匹配成功, 比如说，还没有开通该地区的物流
+		if found_rate2 == true && mode_result.fee_rate2_id == 0 { //没有费率匹配成功, 比如说，还没有开通该地区的物流
 			continue // 排除该物流方式
 		}
 

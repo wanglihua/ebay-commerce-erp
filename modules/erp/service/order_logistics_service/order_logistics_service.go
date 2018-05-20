@@ -29,23 +29,24 @@ import (
 )
 
 type OrderLogisticsService struct {
-	au_stock_list                     []sppz_models.StockInfo                      // 所有澳洲仓库列表
-	aud_exchange_rate                 float64                                      // 澳币汇率
-	logistics_setting                 ddpz_models.LogisticsSettingInfo             // 物流设置
-	pick_fee_setting                  ddpz_models.PickFeeInfo                      // 拣货费用设置
-	address_special_word_list_setting []string                                     // 收货地址特殊字段
-	logistics_company_list            []ddpz_models.LogisticsCompanyInfo           // 物流公司列表
-	logistics_mode_list               []ddpz_models.LogisticsModeInfo              // 物流方式列表
-	logistics_fee_rate_map            map[int64][]ddpz_models.LogisticsFeeRateInfo // 物流费率列表的映射，映射的 key 是， 物流方式的 id
-	envelope_fee_rate_list            []ddpz_models.EnvelopeFeeRateInfo            // 信封物流费率， 按费用从小到大排序
-	shop_list                         []xtpz_models.ShopAccountInfo                // 店铺列表，系统中的店铺列表
-	special_product_list              []kcgl_models.SpecialProductInfo             // 特殊商品SKU列表
-	product_mel_temp_sku_list         []kcgl_models.ProductMelTempSkuInfo          // MEL临时SKU列表
-	pending_keeper                    *pending_inventory_temp_keeper               // 设置过程全局变量，每次开始匹配计算的时候一定要记得初始化
-	mel_stock_id                      int64                                        // 墨尔本仓库 id
-	LoginUser                         core.LoginUser                               //
-	fav_stock_time_range_list         []ddpz_models.FavStockTimeRangeInfo          //
-	express_logistics_mode            ddpz_models.LogisticsModeInfo                // 系统内的配置的物流快递方式，一般只有一个，用于express的hold的判断
+	au_stock_list                     []sppz_models.StockInfo                       // 所有澳洲仓库列表
+	aud_exchange_rate                 float64                                       // 澳币汇率
+	logistics_setting                 ddpz_models.LogisticsSettingInfo              // 物流设置
+	pick_fee_setting                  ddpz_models.PickFeeInfo                       // 拣货费用设置
+	address_special_word_list_setting []string                                      // 收货地址特殊字段
+	logistics_company_list            []ddpz_models.LogisticsCompanyInfo            // 物流公司列表
+	logistics_mode_list               []ddpz_models.LogisticsModeInfo               // 物流方式列表
+	logistics_fee_rate_map            map[int64][]ddpz_models.LogisticsFeeRateInfo  // 物流费率列表的映射，映射的 key 是， 物流方式的 id
+	logistics_fee_rate2_map           map[int64][]ddpz_models.LogisticsFeeRate2Info // 物流费率列表的映射，映射的 key 是， 物流方式的 id
+	envelope_fee_rate_list            []ddpz_models.EnvelopeFeeRateInfo             // 信封物流费率， 按费用从小到大排序
+	shop_list                         []xtpz_models.ShopAccountInfo                 // 店铺列表，系统中的店铺列表
+	special_product_list              []kcgl_models.SpecialProductInfo              // 特殊商品SKU列表
+	product_mel_temp_sku_list         []kcgl_models.ProductMelTempSkuInfo           // MEL临时SKU列表
+	pending_keeper                    *pending_inventory_temp_keeper                // 设置过程全局变量，每次开始匹配计算的时候一定要记得初始化
+	mel_stock_id                      int64                                         // 墨尔本仓库 id
+	LoginUser                         core.LoginUser                                //
+	fav_stock_time_range_list         []ddpz_models.FavStockTimeRangeInfo           //
+	express_logistics_mode            ddpz_models.LogisticsModeInfo                 // 系统内的配置的物流快递方式，一般只有一个，用于express的hold的判断
 }
 
 func (p_ol *OrderLogisticsService) init_data(order_list []ddlc_models.OrderInfo, db_session *xorm.Session) {
@@ -104,9 +105,20 @@ func (p_ol *OrderLogisticsService) init_data(order_list []ddlc_models.OrderInfo,
 
 		logistics_fee_rate_list = append(logistics_fee_rate_list, logistics_fee_rate)
 		p_ol.logistics_fee_rate_map[logistics_fee_rate.ModeId] = logistics_fee_rate_list
-
 	}
 	// 不采用中间变量了 p_ol.logistics_fee_rate_map = logistics_fee_rate_map
+
+	var logistics_fee_rate2_all_list = logistics_fee_rate_service.Get_logistics_fee_rate2_enabled_and_orders_related(order_list, db_session)
+	p_ol.logistics_fee_rate2_map = make(map[int64][]ddpz_models.LogisticsFeeRate2Info)
+	for _, logistics_fee2_rate := range logistics_fee_rate2_all_list {
+		logistics_fee_rate2_list, found := p_ol.logistics_fee_rate2_map[logistics_fee2_rate.ModeId]
+		if found == false {
+			logistics_fee_rate2_list = make([]ddpz_models.LogisticsFeeRate2Info, 0)
+		}
+
+		logistics_fee_rate2_list = append(logistics_fee_rate2_list, logistics_fee2_rate)
+		p_ol.logistics_fee_rate2_map[logistics_fee2_rate.ModeId] = logistics_fee_rate2_list
+	}
 
 	p_ol.envelope_fee_rate_list = envelope_fee_rate_service.Get_envelope_fee_rate_list(db_session)
 

@@ -24,7 +24,15 @@ func save_order_logistics(p_ol *OrderLogisticsService, p_order *ddlc_models.Orde
 	order_logistics.CompanyId = match_result.company_id
 	order_logistics.StockId = match_result.stock_id
 	order_logistics.ModeId = match_result.mode_id
-	order_logistics.FeeRateId = match_result.fee_rate_id
+
+	if match_result.fee_rate_id != 0 {
+		order_logistics.FeeRateId = match_result.fee_rate_id
+	}
+
+	if match_result.fee_rate2_id != 0 {
+		order_logistics.FeeRateId = match_result.fee_rate2_id
+	}
+
 	order_logistics.Length = match_result.length
 	order_logistics.Width = match_result.width
 	order_logistics.Height = match_result.height

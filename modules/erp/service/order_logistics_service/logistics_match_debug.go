@@ -19,8 +19,17 @@ func log_logistics_match_debug(match_result match_logistics_mode_result, result_
 	logistics_match_debug.StockName = match_result.stock.Name
 	logistics_match_debug.ModeId = match_result.mode_id
 	logistics_match_debug.ModeName = match_result.mode.Name
-	logistics_match_debug.FeeRateId = match_result.fee_rate_id
-	logistics_match_debug.FeeRatePostCode = match_result.fee_rate.Postcode
+
+	if match_result.fee_rate_id != 0 {
+		logistics_match_debug.FeeRateId = match_result.fee_rate_id
+		logistics_match_debug.FeeRatePostCode = match_result.fee_rate.Postcode
+	}
+
+	if match_result.fee_rate2_id != 0 {
+		logistics_match_debug.FeeRateId = match_result.fee_rate2_id
+		logistics_match_debug.FeeRatePostCode = match_result.fee_rate2.Postcode
+	}
+
 	logistics_match_debug.TotalFee = match_result.total_fee
 	logistics_match_debug.TotalCost = match_result.total_amount
 	logistics_match_debug.MatchResult = result_desc
