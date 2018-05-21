@@ -32,7 +32,7 @@ func (c ErpOrderWaybillNumber) Save() revel.Result {
 		return c.RenderJson(core.JsonResult{Success: false, Message: c.GetValidationErrorMessage()})
 	}
 
-	if utf8.RuneCountInString(waybill_number) > 50 {
+	if utf8.RuneCountInString(waybill_number) > 100 {
 		return c.RenderJson(map[string]interface{}{
 			"success": false,
 			"message": "录入的运单号太长了！",
