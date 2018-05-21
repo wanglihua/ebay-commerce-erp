@@ -381,6 +381,10 @@ func (p_ol *OrderLogisticsService) match_logistics_mode_logic(order ddlc_models.
 						fee = logistics_fee_rate2.Fee12
 					}
 
+					if fee == 0 {
+						continue
+					}
+
 					// 偏远地区
 					if logistics_fee_rate2.Sfpydq == 1 {
 						fee = fee + logistics_fee_rate2.Pydqjsyf
