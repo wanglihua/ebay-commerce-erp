@@ -740,6 +740,7 @@ func (p_ol *OrderLogisticsService) match_logistics_mode_with_option(p_order *ddl
 
 					if fee == 0 {
 						mt.PrintlnIndent(1, "当前重量该费率不支持！")
+						continue
 					}
 
 					// 偏远地区
