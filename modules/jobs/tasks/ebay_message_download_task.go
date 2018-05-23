@@ -71,6 +71,7 @@ response body:
 
  */
 
+// 已弃用
 type EBayMessageDownloadTask struct {
 }
 
