@@ -497,20 +497,29 @@ var stock_mutex sync.Mutex
 
 // 为什么这个 Action 还是可以被调用两次？？？
 func (c ErpContainerTransfer) Stock() revel.Result {
+	db_session := c.DbSession
+
 	stock_mutex.Lock()
+
 	defer func() {
 		stock_mutex.Unlock()
+
+		if err := recover(); err != nil {
+			db_session.Rollback()
+			panic(err)
+		}
 	}()
 
-	pass_service.Check_login_user_pass(pass_res.HGBG_CONTAINER_TRANSFER_TO_AU_STOCK, c.Session)
+	err := db_session.Begin()
+	core.HandleError(err)
 
-	db_session := c.DbSession
+	pass_service.Check_login_user_pass(pass_res.HGBG_CONTAINER_TRANSFER_TO_AU_STOCK, c.Session)
 
 	var transfer_id int64
 	c.Params.Bind(&transfer_id, "transfer_id")
 
 	var ct hgbg_models.ContainerTransferInfo
-	_, err := db_session.Id(transfer_id).Get(&ct)
+	_, err = db_session.Id(transfer_id).Get(&ct)
 	core.HandleError(err)
 
 	count, err := db_session.Where(fmt.Sprintf("transfer_id = %d", transfer_id)).Count(new(hgbg_models.ContainerTransferEntryInfo))
@@ -545,6 +554,8 @@ func (c ErpContainerTransfer) Stock() revel.Result {
 	container_transfer_service.UpdateStockInventory(ct, c.Session, db_session)
 
 	container_transfer_log_service.Insert_container_transfer_log(ct, "调拨至澳洲仓", db_session, c.Session)
+
+	db_session.Commit()
 
 	return c.RenderJson(map[string]interface{}{
 		"success": true,

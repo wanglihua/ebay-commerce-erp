@@ -24,16 +24,16 @@ func UpdateStockInventory(container_transfer hgbg_models.ContainerTransferInfo, 
 		var cn_stock_id = get_cn_stock_id(db_session)
 
 		for _, entry := range entry_list {
-			update_stock_product_inventory(cn_stock_id, entry.ProductId, -entry.Qty, web_session, db_session)
-			update_stock_product_inventory(zt_stock_id, entry.ProductId, entry.Qty, web_session, db_session)
+			update_stock_product_inventory(container_transfer.BatchCode, cn_stock_id, entry.ProductId, -entry.Qty, web_session, db_session)
+			update_stock_product_inventory(container_transfer.BatchCode, zt_stock_id, entry.ProductId, entry.Qty, web_session, db_session)
 		}
 	}
 
 	// 状态是 已到仓的 更新目的仓库的库存，扣减在途仓的库存
 	if container_transfer.StatusId == models.CONTAINER_TRANSFER_STATUS_STOCK {
 		for _, entry := range entry_list {
-			update_stock_product_inventory(zt_stock_id, entry.ProductId, -entry.Qty, web_session, db_session)
-			update_stock_product_inventory(au_stock_id, entry.ProductId, entry.Qty, web_session, db_session)
+			update_stock_product_inventory(container_transfer.BatchCode, zt_stock_id, entry.ProductId, -entry.Qty, web_session, db_session)
+			update_stock_product_inventory(container_transfer.BatchCode, au_stock_id, entry.ProductId, entry.Qty, web_session, db_session)
 		}
 	}
 }
@@ -104,7 +104,7 @@ func get_zt_au_stock_id(transfer_id int64, db_session *xorm.Session) (zt_stock_i
 	return zt_au_stock_id_struct.ZtStockId, zt_au_stock_id_struct.AuStockId
 }
 
-func update_stock_product_inventory(stock_id int64, product_id int64, qty_diff int64, web_session revel.Session, db_session *xorm.Session) {
+func update_stock_product_inventory(transfer_batch_code string, stock_id int64, product_id int64, qty_diff int64, web_session revel.Session, db_session *xorm.Session) {
 	var inventory kcgl_models.InventoryInfo
 	_, err := db_session.Where("stock_id = ? AND product_id = ?", stock_id, product_id).Get(&inventory)
 	core.HandleError(err)
@@ -118,7 +118,7 @@ func update_stock_product_inventory(stock_id int64, product_id int64, qty_diff i
 		_, err = db_session.Id(inventory.Id).Cols("qty").Update(&inventory)
 		core.HandleError(err)
 
-		inventory_history_service.Insert_inventory_history(inventory, fmt.Sprintf("集装箱调拨更新库存 %d => %d, 工号：%s", qty_before, qty_after, login_user.LoginName), db_session)
+		inventory_history_service.Insert_inventory_history(inventory, fmt.Sprintf("集装箱调拨 %s 更新库存 %d => %d, 工号：%s", transfer_batch_code, qty_before, qty_after, login_user.LoginName), db_session)
 	} else {
 		inventory.StockId = stock_id
 		inventory.ProductId = product_id
@@ -128,6 +128,6 @@ func update_stock_product_inventory(stock_id int64, product_id int64, qty_diff i
 		_, err := db_session.Insert(&inventory)
 		core.HandleError(err)
 
-		inventory_history_service.Insert_inventory_history(inventory, fmt.Sprintf("集装箱调拨新增库存记录 %d => %d, 工号：%s", 0, qty_diff, login_user.LoginName), db_session)
+		inventory_history_service.Insert_inventory_history(inventory, fmt.Sprintf("集装箱调拨 %s 新增库存记录 %d => %d, 工号：%s", transfer_batch_code, 0, qty_diff, login_user.LoginName), db_session)
 	}
 }
