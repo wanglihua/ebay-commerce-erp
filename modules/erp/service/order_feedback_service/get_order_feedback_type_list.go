@@ -20,11 +20,11 @@ func Get_order_feedback_type_map(order_id_list []int64, db_session *xorm.Session
 
 	var sql = `
 SELECT
-    oi.order_id     AS order_id,
-    of.comment_type AS comment_type 
-FROM erp_order_feedback of
-    INNER JOIN erp_order_item oi ON of.order_item_id = oi.id
-WHERE of.order_id IN (%s);
+    i.order_id     AS order_id,
+    f.comment_type AS comment_type 
+FROM erp_order_feedback f
+    INNER JOIN erp_order_item i ON f.order_item_id = i.id
+WHERE f.order_id IN (%s);
 `
 	sql = fmt.Sprintf(sql, strings.Join(order_id_str_list, ","))
 
