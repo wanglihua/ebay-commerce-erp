@@ -203,9 +203,9 @@ WHERE o.status_id = %d AND o.hold_type_id = %d AND ol.stock_id = %d`
 		sheet.Cell(index+2, excel_col_label_to_index("AY")).Value = "TRACKADV"
 		sheet.Cell(index+2, excel_col_label_to_index("BV")).Value = "FALSE"
 		sheet.Cell(index+2, excel_col_label_to_index("BW")).Value = fmt.Sprintf("%0.2f", order_logistics.OrderLogistics.Weight)
-		sheet.Cell(index+2, excel_col_label_to_index("BX")).Value = fmt.Sprintf("%0.0f", order_logistics.OrderLogistics.Length)
-		sheet.Cell(index+2, excel_col_label_to_index("BY")).Value = fmt.Sprintf("%0.0f", order_logistics.OrderLogistics.Width)
-		sheet.Cell(index+2, excel_col_label_to_index("BZ")).Value = fmt.Sprintf("%0.0f", order_logistics.OrderLogistics.Height)
+		// sheet.Cell(index+2, excel_col_label_to_index("BX")).Value = fmt.Sprintf("%0.0f", order_logistics.OrderLogistics.Length)
+		// sheet.Cell(index+2, excel_col_label_to_index("BY")).Value = fmt.Sprintf("%0.0f", order_logistics.OrderLogistics.Width)
+		// sheet.Cell(index+2, excel_col_label_to_index("BZ")).Value = fmt.Sprintf("%0.0f", order_logistics.OrderLogistics.Height)
 		sheet.Cell(index+2, excel_col_label_to_index("CC")).Value = "FALSE"
 		sheet.Cell(index+2, excel_col_label_to_index("CD")).Value = "FALSE"
 	}
