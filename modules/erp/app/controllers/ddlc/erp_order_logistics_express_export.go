@@ -25,6 +25,7 @@ type ErpOrderLogisticsExpressExport struct {
 
 type order_logistics_express_view_item_t struct {
 	OrderLogistics ddlc_models.OrderLogisticsInfo `xorm:"extends" json:"ol"`
+	LogisticsMode  ddpz_models.LogisticsModeInfo  `xorm:"extends" json:"lm"`
 	Order          ddlc_models.OrderInfo          `xorm:"extends" json:"o"`
 	ShopAccount    xtpz_models.ShopAccountInfo    `xorm:"extends" json:"sa"`
 	sku_qty_loc    string                         `xorm:"-"`
@@ -80,15 +81,17 @@ func (c ErpOrderLogisticsExpressExport) ExportExcel() revel.Result {
 	var xlsx_file *xlsx.File
 
 	/*
-SELECT ol.*, o.*, sa.*
+SELECT ol.*, lm.*, o.*, sa.*
 FROM erp_order_logistics ol
+    INNER JOIN erp_logistics_mode lm on lm.id = ol.mode_id
     INNER JOIN erp_order o ON o.id = ol.order_id
     LEFT JOIN erp_shop_account sa ON sa.id = o.shop_id
 WHERE o.status_id = 0 AND o.hold_type_id = 0 AND ol.stock_id = 0;
 	 */
 
-	sql_get_logistics_list := `SELECT ol.*, o.*, sa.*
+	sql_get_logistics_list := `SELECT ol.*, lm.*, o.*, sa.*
 FROM erp_order_logistics ol
+    INNER JOIN erp_logistics_mode lm on lm.id = ol.mode_id
     INNER JOIN erp_order o ON o.id = ol.order_id
     LEFT JOIN erp_shop_account sa ON sa.id = o.shop_id
 WHERE o.status_id = %d AND o.hold_type_id = %d AND ol.stock_id = %d`
@@ -161,7 +164,8 @@ WHERE o.status_id = %d AND o.hold_type_id = %d AND ol.stock_id = %d`
 		sheet.Cell(index+2, excel_col_label_to_index("BP")).Value = "FALSE"
 		*/
 
-		sheet.Cell(index+2, excel_col_label_to_index("C")).Value = "7J53"
+		// sheet.Cell(index+2, excel_col_label_to_index("C")).Value = "7J83"
+		sheet.Cell(index+2, excel_col_label_to_index("C")).Value = order_logistics.LogisticsMode.SenderId
 		sheet.Cell(index+2, excel_col_label_to_index("D")).Value = order_logistics.Order.FullTranId
 
 		name1, name2 := split_long_string(order_shipping_address.Name, 35)

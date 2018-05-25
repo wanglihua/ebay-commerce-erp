@@ -68,6 +68,7 @@ func (c ErpOrderLogisticsCompanyExport) ExportOptionData() revel.Result {
 
 type order_logistics_eparcel_view_item_t struct {
 	OrderLogistics ddlc_models.OrderLogisticsInfo `xorm:"extends" json:"ol"`
+	LogisticsMode  ddpz_models.LogisticsModeInfo  `xorm:"extends" json:"lm"`
 	Order          ddlc_models.OrderInfo          `xorm:"extends" json:"o"`
 	ShopAccount    xtpz_models.ShopAccountInfo    `xorm:"extends" json:"sa"`
 	sku_qty_loc    string                         `xorm:"-"`
@@ -213,15 +214,17 @@ func (c ErpOrderLogisticsCompanyExport) ExportExcel() revel.Result {
 		}
 
 		/*
-SELECT ol.*, o.*, sa.*
+SELECT ol.*, lm.*, o.*, sa.*
 FROM erp_order_logistics ol
+    INNER JOIN erp_logistics_mode lm on lm.id = ol.mode_id
     INNER JOIN erp_order o ON o.id = ol.order_id
     LEFT JOIN erp_shop_account sa ON sa.id = o.shop_id
 WHERE ol.mode_id IN (0) AND ol.stock_id = 0
 		 */
 
-		sql_get_logistics_list := `SELECT ol.*, o.*, sa.*
+		sql_get_logistics_list := `SELECT ol.*, lm.*, o.*, sa.*
 FROM erp_order_logistics ol
+    INNER JOIN erp_logistics_mode lm on lm.id = ol.mode_id
     INNER JOIN erp_order o ON o.id = ol.order_id
     LEFT JOIN erp_shop_account sa ON sa.id = o.shop_id
 WHERE o.status_id = %d AND ol.mode_id IN (%s) AND ol.stock_id = %d`
@@ -263,7 +266,8 @@ WHERE o.status_id = %d AND ol.mode_id IN (%s) AND ol.stock_id = %d`
 			sheet := xlsx_file.Sheets[0] // 模板里面应该至少有一个sheet
 			for index, order_logistics := range order_logistics_list {
 				var order_shipping_address = order_service.Get_order_shipping_address(order_logistics.Order.Id, db_session)
-				sheet.Cell(index+2, excel_col_label_to_index("C")).Value = "7D85"
+				// sheet.Cell(index+2, excel_col_label_to_index("C")).Value = "7D85"
+				sheet.Cell(index+2, excel_col_label_to_index("C")).Value = order_logistics.LogisticsMode.SenderId
 				sheet.Cell(index+2, excel_col_label_to_index("D")).Value = order_logistics.Order.FullTranId
 
 				name1, name2 := split_long_string(order_shipping_address.Name, 35)
@@ -312,7 +316,8 @@ WHERE o.status_id = %d AND ol.mode_id IN (%s) AND ol.stock_id = %d`
 			sheet := xlsx_file.Sheets[0] // 模板里面应该至少有一个sheet
 			for index, order_logistics := range order_logistics_list {
 				var order_shipping_address = order_service.Get_order_shipping_address(order_logistics.Order.Id, db_session)
-				sheet.Cell(index+2, excel_col_label_to_index("C")).Value = "7D85"
+				// sheet.Cell(index+2, excel_col_label_to_index("C")).Value = "7D85"
+				sheet.Cell(index+2, excel_col_label_to_index("C")).Value = order_logistics.LogisticsMode.SenderId
 				sheet.Cell(index+2, excel_col_label_to_index("D")).Value = order_logistics.Order.FullTranId
 
 				name1, name2 := split_long_string(order_shipping_address.Name, 35)
@@ -370,15 +375,17 @@ WHERE o.status_id = %d AND ol.mode_id IN (%s) AND ol.stock_id = %d`
 		}
 
 		/*
-SELECT ol.*, o.*, sa.*
+SELECT ol.*, lm.*, o.*, sa.*
 FROM erp_order_logistics ol
+    INNER JOIN erp_logistics_mode lm ON lm.id = ol.mode_id
     INNER JOIN erp_order o ON o.id = ol.order_id
     LEFT JOIN erp_shop_account sa ON sa.id = o.shop_id
 WHERE ol.mode_id IN (0) AND ol.stock_id = 0
 		 */
 
-		sql_get_logistics_list := `SELECT ol.*, o.*, sa.*
+		sql_get_logistics_list := `SELECT ol.*, lm.*, o.*, sa.*
 FROM erp_order_logistics ol
+    INNER JOIN erp_logistics_mode lm ON lm.id = ol.mode_id
     INNER JOIN erp_order o ON o.id = ol.order_id
     LEFT JOIN erp_shop_account sa ON sa.id = o.shop_id
 WHERE o.status_id = %d AND ol.mode_id IN (%s) AND ol.stock_id = %d`
@@ -420,7 +427,8 @@ WHERE o.status_id = %d AND ol.mode_id IN (%s) AND ol.stock_id = %d`
 			sheet := xlsx_file.Sheets[0] // 模板里面应该至少有一个sheet
 			for index, order_logistics := range order_logistics_list {
 				var order_shipping_address = order_service.Get_order_shipping_address(order_logistics.Order.Id, db_session)
-				sheet.Cell(index+2, excel_col_label_to_index("C")).Value = "7D53"
+				// sheet.Cell(index+2, excel_col_label_to_index("C")).Value = "7D83"
+				sheet.Cell(index+2, excel_col_label_to_index("C")).Value = order_logistics.LogisticsMode.SenderId
 				sheet.Cell(index+2, excel_col_label_to_index("D")).Value = order_logistics.Order.FullTranId
 
 				name1, name2 := split_long_string(order_shipping_address.Name, 35)
@@ -473,7 +481,8 @@ WHERE o.status_id = %d AND ol.mode_id IN (%s) AND ol.stock_id = %d`
 			sheet := xlsx_file.Sheets[0] // 模板里面应该至少有一个sheet
 			for index, order_logistics := range order_logistics_list {
 				var order_shipping_address = order_service.Get_order_shipping_address(order_logistics.Order.Id, db_session)
-				sheet.Cell(index+2, excel_col_label_to_index("C")).Value = "7D53"
+				// sheet.Cell(index+2, excel_col_label_to_index("C")).Value = "7D83"
+				sheet.Cell(index+2, excel_col_label_to_index("C")).Value = order_logistics.LogisticsMode.SenderId
 				sheet.Cell(index+2, excel_col_label_to_index("D")).Value = order_logistics.Order.FullTranId
 
 				name1, name2 := split_long_string(order_shipping_address.Name, 35)
