@@ -24,7 +24,10 @@ CREATE PROCEDURE product_sale_rank()
 
         -- 游标
         DECLARE product_id_cur CURSOR FOR
-            SELECT DISTINCT sa.id, sa.product_id, sa.daily_mean_sales
+            SELECT DISTINCT
+                sa.id,
+                sa.product_id,
+                sa.daily_mean_sales
             FROM erp_product_sale_analysis sa
             WHERE sa.type = 300;
 
@@ -52,7 +55,7 @@ CREATE PROCEDURE product_sale_rank()
             WHERE sa.type = 300 AND sa.daily_mean_sales > v_daily_mean_sales;
 
             UPDATE erp_product_sale_analysis
-            SET rank = v_count + 1
+            SET `rank` = v_count + 1
             WHERE id = v_sa_id;
 
         END LOOP;
