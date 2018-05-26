@@ -1673,10 +1673,6 @@
     }
 
     function exportBillsEntryList() {
-        if (!vm.purchase_bill_id || vm.purchase_bill_id === 0) {
-            $.msg.error("请先选择采购单！");
-            return;
-        }
 
         var bill_id_list = [];
         $('#purchaseBillList tbody tr>td:first-child input:checkbox').each(function () {
@@ -1684,6 +1680,11 @@
                 bill_id_list.push($(this).val());
             }
         });
+
+        if (bill_id_list.length === 0) {
+            $.msg.error("请先选择采购单！");
+            return;
+        }
 
         var params = $.param({
             "bill_id_list": bill_id_list
