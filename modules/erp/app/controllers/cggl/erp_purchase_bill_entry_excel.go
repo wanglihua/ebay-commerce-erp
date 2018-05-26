@@ -444,7 +444,12 @@ func (c ErpPurchaseBillEntryExcel) Export() revel.Result {
 
 	reader := bytes.NewReader(buffer.Bytes()) //bytes.Reader 实现了 io.Reader 接口
 
-	file_name := fmt.Sprintf("采购单明细导出_%s.xlsx", strings.Join(bill_code_list, "_"))
+	// file_name := fmt.Sprintf("采购单明细导出_%s.xlsx", strings.Join(bill_code_list, "_"))
+	file_name := fmt.Sprintf("采购单明细导出_%s.xlsx", bill_code_list[0])
+
+	if len(bill_id_list) > 1 {
+		file_name = fmt.Sprintf("采购单明细导出_%s等.xlsx", bill_code_list[0])
+	}
 
 	return c.RenderBinary(reader, file_name, revel.Attachment, time.Now())
 }
