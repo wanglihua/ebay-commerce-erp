@@ -22,6 +22,10 @@ type MessageInfo struct {
 	SenderId           string            `xorm:"nvarchar(100) notnull 'sender_id'" json:"sender_id"`
 	Subject            string            `xorm:"nvarchar(500) notnull 'subject'" json:"subject"`
 	Body               string            `xorm:"text notnull 'body'" json:"body"`
+	ReceiveDate        core.NullLongTime `xorm:"datetime null 'receive_date'" json:"receive_date"`
+	ExpirationDate     core.NullLongTime `xorm:"datetime null 'expiration_date'" json:"expiration_date"`
+	ExternalMessageId  string            `xorm:"nvarchar(50) notnull index 'external_message_id'" json:"external_message_id"`
+	ParentMessageId    string            `xorm:"nvarchar(50) notnull index 'parent_message_id'" json:"parent_message_id"`
 	StatusId           int64             `xorm:"bigint notnull index 'status_id'" json:"status_id"`
 	MemberDownloadTime core.NullLongTime `xorm:"datetime null 'member_download_time'" json:"member_download_time"`
 	MyDownloadTime     core.NullLongTime `xorm:"datetime null 'my_download_time'" json:"my_download_time"`
