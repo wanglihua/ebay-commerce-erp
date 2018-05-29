@@ -88,7 +88,8 @@ func (p_ol *OrderLogisticsService) init_data(order_list []ddlc_models.OrderInfo,
 
 	// 加载 物流方式
 	// 只加载 物流公司处于启用状态的物流方式
-	p_ol.logistics_mode_list = logistics_mode_service.Get_logistics_mode_enabled(db_session)
+	p_ol.logistics_mode_list, err = logistics_mode_service.Get_logistics_mode_enabled(db_session)
+	core.HandleError(err)
 
 	// 加载 物流费率
 	// 只加载 物流公司处于启用状态的复溜费率

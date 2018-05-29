@@ -9,7 +9,7 @@ import (
 	"matrix/modules/erp/models/ddpz_models"
 )
 
-func Get_logistics_mode_enabled(db_session *xorm.Session) []ddpz_models.LogisticsModeInfo {
+func Get_logistics_mode_enabled(db_session *xorm.Session) ([]ddpz_models.LogisticsModeInfo, error) {
 	/*
 SELECT lm.*
 FROM erp_logistics_mode lm
@@ -23,9 +23,9 @@ WHERE lc.status_id = %d AND lm.status_id = %d`
 	sql_lm = fmt.Sprintf(sql_lm, models.LOGISTICS_COMPANY_ENABLED, models.LOGISTICS_MODE_ENABLED)
 	var logistics_mode_list = make([]ddpz_models.LogisticsModeInfo, 0)
 	err := db_session.Sql(sql_lm).Find(&logistics_mode_list)
-	core.HandleError(err)
+	// core.HandleError(err)
 
-	return logistics_mode_list
+	return logistics_mode_list, err
 }
 
 func Get_logistics_mode_id_name_map(mode_id_list []int64, db_session *xorm.Session) map[int64]string {
