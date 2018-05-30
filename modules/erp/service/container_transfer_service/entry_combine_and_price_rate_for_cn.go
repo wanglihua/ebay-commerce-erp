@@ -4,12 +4,14 @@ import (
 	"github.com/go-xorm/xorm"
 	"matrix/core"
 	"matrix/modules/erp/models/kcgl_models"
+	"strings"
 )
 
 func EntryCombineForCn(item_list []ContainerTransferEntryItem, is_third bool, db_session *xorm.Session) []ContainerTransferEntryItem {
 	var find_entry_in_list = func(cn_decl_name string, entry_list []ContainerTransferEntryItem) (index_ret int, entry_ret ContainerTransferEntryItem) {
 		for index, entry := range entry_list {
-			if entry.Product.CnDeclName == cn_decl_name {
+			// if strings.TrimSpace(entry.Product.CnDeclName) == strings.TrimSpace(cn_decl_name) {
+			if strings.TrimSpace(entry.ContainerTransferEntry.CnHsEnName) == strings.TrimSpace(cn_decl_name) {
 				return index, entry
 			}
 		}
@@ -37,7 +39,7 @@ func EntryCombineForCn(item_list []ContainerTransferEntryItem, is_third bool, db
 			item.ContainerTransferEntry.VolumeSum = vol_sum
 			not_combined_entry_list = append(not_combined_entry_list, item)
 		} else { //不需要开票的合并
-			found_index, combined_entry := find_entry_in_list(item.Product.CnDeclName, combined_entry_list)
+			found_index, combined_entry := find_entry_in_list(item.ContainerTransferEntry.CnHsEnName, combined_entry_list)
 
 			if found_index < 0 {
 				item.ContainerTransferEntry.WeightSum = net_weight_sum

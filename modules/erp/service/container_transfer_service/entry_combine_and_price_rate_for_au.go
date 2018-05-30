@@ -6,12 +6,14 @@ import (
 	"matrix/core"
 	"matrix/modules/erp/models/kcgl_models"
 	"math"
+	"strings"
 )
 
 func EntryCombineAndPriceRateForAu(p_transfer *hgbg_models.ContainerTransferInfo, entry_list []ContainerTransferEntryItem, db_session *xorm.Session) ([]ContainerTransferEntryItem) {
 	var find_entry_in_list = func(au_decl_name string, entry_list []ContainerTransferEntryItem) (index_ret int, entry_ret ContainerTransferEntryItem) {
 		for index, item := range entry_list {
-			if item.Product.AuDeclName == au_decl_name {
+			// if strings.TrimSpace(item.Product.AuDeclName) == strings.TrimSpace(au_decl_name) {
+			if strings.TrimSpace(item.ContainerTransferEntry.AuHsEnName) == strings.TrimSpace(au_decl_name) {
 				return index, item
 			}
 		}
@@ -22,7 +24,7 @@ func EntryCombineAndPriceRateForAu(p_transfer *hgbg_models.ContainerTransferInfo
 	var combined_entry_list = make([]ContainerTransferEntryItem, 0)
 
 	for _, item := range entry_list {
-		found_index, combined_entry := find_entry_in_list(item.Product.AuDeclName, combined_entry_list)
+		found_index, combined_entry := find_entry_in_list(item.ContainerTransferEntry.AuHsEnName, combined_entry_list)
 
 		// weight volume 的计算
 		var product kcgl_models.ProductInfo
