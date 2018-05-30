@@ -55,6 +55,16 @@ func GetXsglMenu(res_id_map map[int64]bool, web_session revel.Session) string {
         </li>`)
 	}
 
+	if check_pass_res_menu(pass_res.XSGL_PRODUCT_LOGISTICS) {
+		buffer.WriteString(`<li id="xsgl-product-logistics-menu" class="">
+            <a href="/product/logistics">
+                <i class="menu-icon fa fa-caret-right"></i>
+                商品运费预估
+            </a>
+            <b class="arrow"></b>
+        </li>`)
+	}
+
 	buffer.WriteString(`<li id="xsgl-salesmanager-menu" class="">
             <a href="/sales/manager">
                 <i class="menu-icon fa fa-caret-right"></i>

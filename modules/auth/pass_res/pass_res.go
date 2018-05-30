@@ -152,6 +152,7 @@ const (
 	// 销售管理 21
 	XSGL_PRODUCT_SALE_SETTING   = 210100 // 商品销售设置
 	XSGL_PRODUCT_PRICE_ESTIMATE = 210200 // 商品售价预估
+	XSGL_PRODUCT_LOGISTICS      = 210300 // 商品运费估算
 
 	// 销售报表 22
 	XSBB_SALE_INCOME_REPORT_DAY     = 220100 // 日收入报表

@@ -844,3 +844,10 @@ POST /refund/paypal/refund                      ErpRefund.PaypalRefund
 # PaypalRefund
 
 POST /refund/excel/export                       ErpRefundExcel.Export
+
+
+GET  /product/logistics                    ErpProductLogistics.Index
+POST /product/logistics/data/list          ErpProductLogistics.ListData
+POST /product/logistics/data/detail        ErpProductLogistics.DetailData
+POST /product/logistics/save               ErpProductLogistics.Save
+POST /product/logistics/delete             ErpProductLogistics.Delete

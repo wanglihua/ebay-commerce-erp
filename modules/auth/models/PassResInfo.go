@@ -842,6 +842,12 @@ func (e PassResInfo) InitData(db_session *xorm.Session) {
 		pass.Desc = core.MakeNullString("商品售价预估", true)
 		db_session.Insert(pass)
 
+		pass = new(PassResInfo)
+		pass.Id = pass_res.XSGL_PRODUCT_LOGISTICS
+		pass.CateId = pass_res_cate.XSGL
+		pass.Name = "商品运费估算"
+		pass.Desc = core.MakeNullString("商品运费估算", true)
+		db_session.Insert(pass)
 	}
 
 	// 销售报表
