@@ -58,7 +58,7 @@ func Match_product_qty_postage(product_id int64, qty int64, postcode string, db_
 	var pick_fee_setting = pick_fee_service.Get_pick_fee_setting(db_session)
 
 	var final_result Match_result_t
-	final_result.total_fee = math.MaxFloat64 // 初始化为一个很大的不可能的值，澳币
+	final_result.Total_fee = math.MaxFloat64 // 初始化为一个很大的不可能的值，澳币
 
 	var final_pick_fee = pick_fee_service.Get_product_pick_fee(product.Weight, pick_fee_setting) // 拣货费用的是不打折的重量
 
@@ -66,8 +66,8 @@ func Match_product_qty_postage(product_id int64, qty int64, postcode string, db_
 
 		var mode_result Match_result_t
 
-		mode_result.mode_id = logistics_mode.Id
-		mode_result.mode = logistics_mode
+		mode_result.Mode_id = logistics_mode.Id
+		mode_result.Mode = logistics_mode
 
 		mode_result.length, mode_result.width, mode_result.height, mode_result.actual_weight = product.Length, product.Width, product.Height*float64(qty), product.Weight*float64(qty)
 
@@ -222,8 +222,8 @@ func Match_product_qty_postage(product_id int64, qty int64, postcode string, db_
 
 					if fee < total_fee_in_fee_rate { // 取得更优的费率方案
 						total_fee_in_fee_rate = fee
-						mode_result.fee_rate_id = logistics_fee_rate.Id
-						mode_result.fee_rate = logistics_fee_rate
+						mode_result.Fee_rate_id = logistics_fee_rate.Id
+						mode_result.Fee_rate = logistics_fee_rate
 					}
 				}
 			} // for _, logistics_fee_rate := range logistics_fee_rate_list {
@@ -273,21 +273,21 @@ func Match_product_qty_postage(product_id int64, qty int64, postcode string, db_
 
 					if fee < total_fee_in_fee_rate { // 取得更优的费率方案
 						total_fee_in_fee_rate = fee
-						mode_result.fee_rate2_id = logistics_fee_rate2.Id
-						mode_result.fee_rate2 = logistics_fee_rate2
+						mode_result.Fee_rate2_id = logistics_fee_rate2.Id
+						mode_result.Fee_rate2 = logistics_fee_rate2
 					}
 				}
 			} // for _, logistics_fee_rate2 := range logistics_fee_rate2_list {
 		}
 
-		if (logistics_mode.FeeType == logistics_fee_type.FEE_TYPE1 && mode_result.fee_rate_id == 0) ||
-			(logistics_mode.FeeType == logistics_fee_type.FEE_TYPE2 && mode_result.fee_rate2_id == 0) { //没有费率匹配成功, 比如说，还没有开通该地区的物流
+		if (logistics_mode.FeeType == logistics_fee_type.FEE_TYPE1 && mode_result.Fee_rate_id == 0) ||
+			(logistics_mode.FeeType == logistics_fee_type.FEE_TYPE2 && mode_result.Fee_rate2_id == 0) { //没有费率匹配成功, 比如说，还没有开通该地区的物流
 			continue // 排除该物流方式
 		}
 
 		// 超重 和 超长 费用中， 取一个， 取大的一个
 		var extra_fee_in_mode = math.Max(extra_weight_fee_in_mode, extra_length_fee_in_mode)
-		mode_result.total_fee = total_fee_in_fee_rate + extra_fee_in_mode
+		mode_result.Total_fee = total_fee_in_fee_rate + extra_fee_in_mode
 
 		/*
 		这里不需要打折
@@ -322,15 +322,15 @@ func Match_product_qty_postage(product_id int64, qty int64, postcode string, db_
 		}
 		*/
 
-		if mode_result.total_fee < final_result.total_fee {
+		if mode_result.Total_fee < final_result.Total_fee {
 			final_result = mode_result
 		}
 
 	} // for _, logistics_mode := range logistics_mode_list {
 
-	if final_result.fee_rate_id == 0 {
+	if final_result.Fee_rate_id == 0 {
 		var result = Match_result_t{}
-		result.final_amount = -1
+		result.Final_amount = -1
 		return nil, result // 如果返回的费用小于零就表示，没有匹配的物流方式和费率，不能送达
 	}
 
@@ -341,9 +341,9 @@ func Match_product_qty_postage(product_id int64, qty int64, postcode string, db_
 		postage_cal_weight = product_sale_setting.PostageCalWeight
 	}
 
-	final_result.pickup_fee = final_pick_fee
+	final_result.Pickup_fee = final_pick_fee
 
-	final_result.final_amount = (final_result.total_fee + final_result.pickup_fee) * postage_cal_weight
+	final_result.Final_amount = (final_result.Total_fee + final_result.Pickup_fee) * postage_cal_weight
 
 	return nil, final_result
 }
@@ -352,23 +352,24 @@ func Match_product_postage(product_id int64, postcode string, db_session *xorm.S
 
 	err, result := Match_product_qty_postage(product_id, 1, postcode, db_session)
 
-	return err, result.final_amount // 如果返回的费用小于零就表示，没有匹配的物流方式和费率，不能送达
+	return err, result.Final_amount // 如果返回的费用小于零就表示，没有匹配的物流方式和费率，不能送达
 }
 
 type Match_result_t struct {
-	mode_id       int64
-	mode          ddpz_models.LogisticsModeInfo
-	fee_rate_id   int64
-	fee_rate      ddpz_models.LogisticsFeeRateInfo
-	fee_rate2_id  int64
-	fee_rate2     ddpz_models.LogisticsFeeRate2Info
+	Mode_id      int64
+	Mode         ddpz_models.LogisticsModeInfo
+	Fee_rate_id  int64
+	Fee_rate     ddpz_models.LogisticsFeeRateInfo
+	Fee_rate2_id int64
+	Fee_rate2    ddpz_models.LogisticsFeeRate2Info
+	Total_fee    float64
+	Pickup_fee   float64
+	Final_amount float64 // 不是上面两个的简单相加，还要权重的，如果这个值小于0，表示不能送达
+
 	length        float64
 	width         float64
 	height        float64
 	actual_weight float64
 	dim_weight    float64
 	weight        float64 //计费的重量，实际重量或者体积重
-	total_fee     float64
-	pickup_fee    float64
-	final_amount  float64 // 不是上面两个的简单相加，还要权重的，如果这个值小于0，表示不能送达
 }

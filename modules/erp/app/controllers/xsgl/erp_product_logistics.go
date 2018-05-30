@@ -11,6 +11,7 @@ import (
 	"matrix/modules/erp/models/sppz_models"
 	"matrix/modules/erp/models/xsgl_models"
 	"matrix/modules/erp/models/kcgl_models"
+	"matrix/modules/erp/service/product_logistics_service"
 )
 
 type ErpProductLogistics struct {
@@ -108,8 +109,28 @@ func (c ErpProductLogistics) Save() revel.Result {
 	var postal_code = product_logistics_from_ui.PostalCode
 
 	var product kcgl_models.ProductInfo
-	_, err = db_session.Where("sku = ?", product_code).Get(&product)
+	has, err := db_session.Where("sku = ?", product_code).Get(&product)
 	core.HandleError(err)
+
+	if has == false {
+		return c.RenderJson(core.JsonResult{Success: false, Message: "指定的SKU商品不存在！"})
+	}
+
+	err, result := product_logistics_service.Match_product_qty_postage(product.Id, qty, postal_code, db_session)
+	core.HandleError(err)
+
+	var product_logistics xsgl_models.ProductLogisticsInfo
+
+	product_logistics.ProductId = product.Id
+	product_logistics.ProductCode = product.Sku
+	product_logistics.Qty = qty
+	product_logistics.PostalCode = postal_code
+
+	if result.Final_amount < 0 {
+
+	} else {
+
+	}
 
 	_, err = db_session.Insert(&product_logistics_from_ui)
 	core.HandleError(err)
