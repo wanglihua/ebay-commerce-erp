@@ -15,46 +15,41 @@ import (
 	"matrix/modules/erp/service/logistics_mode_service"
 )
 
-func Match_product_postage(product_id int64, postcode string, db_session *xorm.Session) (err error, fee float64) {
+func Match_product_qty_postage(product_id int64, qty int64, postcode string, db_session *xorm.Session) (err error, result Match_result_t) {
+
+	if qty <= 0 {
+		return errors.New("qty must be greater than 0!"), Match_result_t{}
+	}
 
 	postcode = strings.TrimSpace(postcode)
-
-	/*
-	defer func() {
-		if err := recover(); err != nil {
-			revel.ERROR.Printf("计算商品地区运费出现错误： %s\n", err)
-			revel.ERROR.Println(string(debug.Stack()))
-		}
-	}()
-	*/
 
 	var product kcgl_models.ProductInfo
 	has, err := db_session.Where("id = ?", product_id).Get(&product)
 	if err != nil {
-		return err, 0
+		return err, Match_result_t{}
 	}
 
 	if has == false {
-		return errors.New("product not exist!"), 0
+		return errors.New("product not exist!"), Match_result_t{}
 	}
 
 	//var logistics_setting = logistics_setting_service.Get_logistics_setting(db_session)
 
 	logistics_mode_list, err := logistics_mode_service.Get_logistics_mode_enabled(db_session)
 	if err != nil {
-		return err, 0
+		return err, Match_result_t{}
 	}
 
 	var logistics_fee_rate_list = make([]ddpz_models.LogisticsFeeRateInfo, 0)
 	err = db_session.Where(fmt.Sprintf("postcode = '%s' OR postcode = '%s'", postcode, strings.TrimPrefix(postcode, "0"))).Find(&logistics_fee_rate_list)
 	if err != nil {
-		return err, 0
+		return err, Match_result_t{}
 	}
 
 	var logistics_fee_rate2_list = make([]ddpz_models.LogisticsFeeRate2Info, 0)
 	err = db_session.Where(fmt.Sprintf("postcode = '%s' OR postcode = '%s'", postcode, strings.TrimPrefix(postcode, "0"))).Find(&logistics_fee_rate2_list)
 	if err != nil {
-		return err, 0
+		return err, Match_result_t{}
 	}
 
 	// postcode = strings.TrimPrefix(strings.TrimSpace(postcode), "0")
@@ -62,16 +57,19 @@ func Match_product_postage(product_id int64, postcode string, db_session *xorm.S
 
 	var pick_fee_setting = pick_fee_service.Get_pick_fee_setting(db_session)
 
-	var final_result match_result_t
+	var final_result Match_result_t
 	final_result.total_fee = math.MaxFloat64 // 初始化为一个很大的不可能的值，澳币
 
 	var final_pick_fee = pick_fee_service.Get_product_pick_fee(product.Weight, pick_fee_setting) // 拣货费用的是不打折的重量
 
 	for _, logistics_mode := range logistics_mode_list {
 
-		var mode_result match_result_t
+		var mode_result Match_result_t
 
-		mode_result.length, mode_result.width, mode_result.height, mode_result.actual_weight = product.Length, product.Width, product.Height, product.Weight
+		mode_result.mode_id = logistics_mode.Id
+		mode_result.mode = logistics_mode
+
+		mode_result.length, mode_result.width, mode_result.height, mode_result.actual_weight = product.Length, product.Width, product.Height*float64(qty), product.Weight*float64(qty)
 
 		/*
 		这里不需要打折
@@ -331,7 +329,9 @@ func Match_product_postage(product_id int64, postcode string, db_session *xorm.S
 	} // for _, logistics_mode := range logistics_mode_list {
 
 	if final_result.fee_rate_id == 0 {
-		return nil, -1 // 如果返回的费用小于零就表示，没有匹配的物流方式和费率，不能送达
+		var result = Match_result_t{}
+		result.final_amount = -1
+		return nil, result // 如果返回的费用小于零就表示，没有匹配的物流方式和费率，不能送达
 	}
 
 	var postage_cal_weight = product.PostageCalWeight
@@ -341,12 +341,23 @@ func Match_product_postage(product_id int64, postcode string, db_session *xorm.S
 		postage_cal_weight = product_sale_setting.PostageCalWeight
 	}
 
-	var total_amount = (final_result.total_fee + final_pick_fee) * postage_cal_weight
+	final_result.pickup_fee = final_pick_fee
 
-	return nil, total_amount
+	final_result.final_amount = (final_result.total_fee + final_result.pickup_fee) * postage_cal_weight
+
+	return nil, final_result
 }
 
-type match_result_t struct {
+func Match_product_postage(product_id int64, postcode string, db_session *xorm.Session) (err error, fee float64) {
+
+	err, result := Match_product_qty_postage(product_id, 1, postcode, db_session)
+
+	return err, result.final_amount // 如果返回的费用小于零就表示，没有匹配的物流方式和费率，不能送达
+}
+
+type Match_result_t struct {
+	mode_id       int64
+	mode          ddpz_models.LogisticsModeInfo
 	fee_rate_id   int64
 	fee_rate      ddpz_models.LogisticsFeeRateInfo
 	fee_rate2_id  int64
@@ -358,4 +369,6 @@ type match_result_t struct {
 	dim_weight    float64
 	weight        float64 //计费的重量，实际重量或者体积重
 	total_fee     float64
+	pickup_fee    float64
+	final_amount  float64 // 不是上面两个的简单相加，还要权重的，如果这个值小于0，表示不能送达
 }

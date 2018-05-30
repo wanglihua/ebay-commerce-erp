@@ -10,6 +10,7 @@ import (
 	"matrix/modules/auth/pass_res"
 	"matrix/modules/erp/models/sppz_models"
 	"matrix/modules/erp/models/xsgl_models"
+	"matrix/modules/erp/models/kcgl_models"
 )
 
 type ErpProductLogistics struct {
@@ -101,9 +102,16 @@ func (c ErpProductLogistics) Save() revel.Result {
 		return c.RenderJson(core.JsonResult{Success: false, Message: c.GetValidationErrorMessage()})
 	}
 
-	product_logistics := detail_form.ProductLogistics
+	product_logistics_from_ui := detail_form.ProductLogistics
+	var product_code = product_logistics_from_ui.PostalCode
+	var qty = product_logistics_from_ui.Qty
+	var postal_code = product_logistics_from_ui.PostalCode
 
-	_, err = db_session.Insert(&product_logistics)
+	var product kcgl_models.ProductInfo
+	_, err = db_session.Where("sku = ?", product_code).Get(&product)
+	core.HandleError(err)
+
+	_, err = db_session.Insert(&product_logistics_from_ui)
 	core.HandleError(err)
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: "数据保存成功!"})
