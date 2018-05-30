@@ -1,4 +1,4 @@
-package kcgl_models
+package xsgl_models
 
 import (
 	"matrix/core"
