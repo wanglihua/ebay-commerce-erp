@@ -43,13 +43,13 @@
                     <div class="row">
                         <div class="col-xs-12">
                             <form class="form-horizontal" role="form" id="productLogisticsForm">
-                                <input id="brand_id" name="detail.brand.id" type="hidden" v-model.number="detail.brand.id"/>
+
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
-                                            <label for="name" class="col-xs-2 control-label">名称</label>
+                                            <label for="product_code" class="col-xs-2 control-label">SKU</label>
                                             <div class="col-xs-10">
-                                                <input id="name" name="detail.brand.name" type="text" class="input-sm form-control" v-model="detail.brand.name"/>
+                                                <input id="product_code" name="detail.product_logistics.product_code" type="text" class="input-sm form-control" v-model="detail.product_logistics.product_code"/>
                                             </div>
                                         </div>
                                     </div>
@@ -58,9 +58,20 @@
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group">
-                                            <label for="description" class="col-xs-2 control-label">联系人</label>
+                                            <label for="qty" class="col-xs-2 control-label">数量</label>
                                             <div class="col-xs-10">
-                                                <textarea id="description" name="detail.brand.description" rows="3" class="input-sm form-control" v-model="detail.brand.description"></textarea>
+                                                <input id="qty" name="detail.product_logistics.qty" type="text" class="input-sm form-control" v-model.number="detail.product_logistics.qty"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <label for="postal_code" class="col-xs-2 control-label">地址邮编</label>
+                                            <div class="col-xs-10">
+                                                <input id="postal_code" name="detail.product_logistics.postal_code" type="text" class="input-sm form-control" v-model="detail.product_logistics.postal_code"/>
                                             </div>
                                         </div>
                                     </div>
@@ -72,10 +83,10 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-success btn-sm" @click="saveProductLogistics()">
-                        <i class="ace-icon fa fa-floppy-o"></i>保存
+                        <i class="ace-icon fa fa-floppy-o"></i>匹配
                     </button>
                     <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">
-                        <i class="ace-icon fa fa-times"></i>关闭
+                        <i class="ace-icon fa fa-times"></i>取消
                     </button>
                 </div>
             </div>
@@ -87,7 +98,7 @@
         el: "#page",
         data: {
             "detail": {
-                "brand": {}
+                "product_logistics": {}
             }
         },
         mounted: function () {
@@ -108,10 +119,16 @@
                                     return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
                                 }
                             },
-                            {"mDataProp": "name", "title": "名称", "bSearchable": true, "width": 220},
-                            {"mDataProp": "description", "title": "描述", "bSearchable": true},
-                            {"mDataProp": "create_time", "title": "创建时间", "bSearchable": false, "width": 120},
-                            {"mDataProp": "update_time", "title": "修改时间", "bSearchable": false, "width": 120}
+                            {"mDataProp": "product_code", "title": "SKU", "bSearchable": true, "width": 120},
+                            {"mDataProp": "qty", "title": "数量", "bSearchable": false, "width": 60},
+                            {"mDataProp": "postal_code", "title": "地址邮编", "bSearchable": true, "width": 120},
+                            {"mDataProp": "stock_name", "title": "发货仓库", "bSearchable": true, "width": 120},
+                            {"mDataProp": "mode_name", "title": "物流方式", "bSearchable": true},
+                            {"mDataProp": "fee_postal_code", "title": "费率邮编", "bSearchable": true, "width": 120},
+                            {"mDataProp": "fee", "title": "物流费用", "bSearchable": false, "width": 80},
+                            {"mDataProp": "cost", "title": "成本费用", "bSearchable": false, "width": 80},
+                            {"mDataProp": "Success", "title": "匹配结果", "bSearchable": false, "width": 80},
+                            {"mDataProp": "create_time", "title": "匹配时间", "bSearchable": false, "width": 120}
                         ]
                     }
             );
@@ -124,29 +141,31 @@
                 showMask("加载中...");
                 $("#productLogisticsForm").clearValidation();
                 $.ajax({
-                            url: '{%url "ErpProductLogistics.DetailData" %}',
-                            type: "POST",
-                            success: function (result) {
-                                hideMask();
-                                if (result.success === false) {
-                                    $.msg.error(result.message);
-                                    return;
-                                }
-                                vm.detail = result;
-                                $('#productLogisticsAddDialog').modal(modalOptions);
-                            }
+                    url: '{%url "ErpProductLogistics.DetailData" %}',
+                    type: "POST",
+                    success: function (result) {
+                        hideMask();
+                        if (result.success === false) {
+                            $.msg.error(result.message);
+                            return;
                         }
-                );
+                        vm.detail = result;
+                        $('#productLogisticsAddDialog').modal(modalOptions);
+                    }
+                });
             },
             saveProductLogistics: function () {
                 showMask("提交中...");
                 var form = $("#productLogisticsForm");
                 var valid = validate(form, {
-                    'detail.brand.name': {
+                    'detail.product_logistics.product_code': {
                         required: true, minlength: 2, maxlength: 100
                     },
-                    'detail.brand.description': {
-                        required: false, minlength: 0, maxlength: 800
+                    'detail.product_logistics.qty': {
+                        required: true, digits: true
+                    },
+                    'detail.product_logistics.postal_code': {
+                        required: true, minlength: 2, maxlength: 10
                     }
                 });
 
@@ -154,26 +173,25 @@
                     hideMask();
                 } else {
                     $.ajax({
-                                url: '{%url "ErpProductLogistics.Save"%}',
-                                type: "POST",
-                                processData: false,
-                                contentType: 'application/json',
-                                data: JSON.stringify(vm.detail),
-                                success: function (data) {
-                                    hideMask();
-                                    if (data.success === false) {
-                                        $.msg.error(data.message);
-                                        //return;
-                                    }
-                                    else {
-                                        $.msg.show(data.message);
-                                        $('#productLogisticsAddDialog').modal('hide');
-                                        vm.reloadList();
-                                        //return;
-                                    }
-                                }
+                        url: '{%url "ErpProductLogistics.Save"%}',
+                        type: "POST",
+                        processData: false,
+                        contentType: 'application/json',
+                        data: JSON.stringify(vm.detail),
+                        success: function (data) {
+                            hideMask();
+                            if (data.success === false) {
+                                $.msg.error(data.message);
+                                //return;
                             }
-                    );
+                            else {
+                                $.msg.show(data.message);
+                                $('#productLogisticsAddDialog').modal('hide');
+                                vm.reloadList();
+                                //return;
+                            }
+                        }
+                    });
                 }
             },
             deleteProductLogistics: function () {

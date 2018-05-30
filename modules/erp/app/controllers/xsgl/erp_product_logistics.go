@@ -9,6 +9,7 @@ import (
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/auth/pass_res"
 	"matrix/modules/erp/models/sppz_models"
+	"matrix/modules/erp/models/xsgl_models"
 )
 
 type ErpProductLogistics struct {
@@ -38,36 +39,40 @@ func (c ErpProductLogistics) ListData() revel.Result {
 		data_query = *data_query.Asc("id")
 	}
 
-	brand_list := make([]sppz_models.BrandInfo, 0, limit)
-	err := data_query.Limit(limit, offset).Find(&brand_list)
+	product_logistics_list := make([]xsgl_models.ProductLogisticsInfo, 0, limit)
+	err := data_query.Limit(limit, offset).Find(&product_logistics_list)
 	core.HandleError(err)
 
 	count_query := *query
-	count, err := count_query.Count(new(sppz_models.BrandInfo))
+	count, err := count_query.Count(new(xsgl_models.ProductLogisticsInfo))
 	core.HandleError(err)
 
 	return c.RenderJson(core.GridResult{
-		Data:  brand_list,
+		Data:  product_logistics_list,
 		Total: count,
 	})
 }
 
 type BrandDetailForm struct {
-	Brand sppz_models.BrandInfo `json:"brand"`
+	ProductLogistics xsgl_models.ProductLogisticsInfo `json:"product_logistics"`
 }
 
 func (f *BrandDetailForm) IsCreate() bool {
-	return f.Brand.Id == 0
+	return f.ProductLogistics.Id == 0
 }
 
 func (f *BrandDetailForm) Valid(validation *revel.Validation) bool {
-	validation.Required(f.Brand.Name).Message("品牌名称不能为空！")
-	if f.Brand.Name != "" {
-		validation.MinSize(f.Brand.Name, 2).Message("品牌名称长度不能小于2！")
+	validation.Required(f.ProductLogistics.ProductCode).Message("SKU名称不能为空！")
+
+	if f.ProductLogistics.Qty == 0 {
+		validation.Error("数量不能为空！")
 	}
-	if f.Brand.Name != "" {
-		validation.MaxSize(f.Brand.Name, 100).Message("品牌名称长度不能大于100！")
+
+	if f.ProductLogistics.Qty < 0 {
+		validation.Error("数量不能为负！")
 	}
+
+	validation.Required(f.ProductLogistics.PostalCode).Message("地址邮编不能为空！")
 
 	return validation.HasErrors() == false
 }
@@ -75,22 +80,10 @@ func (f *BrandDetailForm) Valid(validation *revel.Validation) bool {
 func (c ErpProductLogistics) DetailData() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.XSGL_PRODUCT_LOGISTICS, c.Session)
 
-	db_session := c.DbSession
-
-	var brand_id int64
-	c.Params.Bind(&brand_id, "id")
-
-	var brand sppz_models.BrandInfo
-	if brand_id != 0 {
-		has, err := db_session.Id(brand_id).Get(&brand)
-		core.HandleError(err)
-		if has == false {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "指定的品牌不存在！"})
-		}
-	}
+	// db_session := c.DbSession
 
 	var detail_form BrandDetailForm
-	detail_form.Brand = brand
+	detail_form.ProductLogistics = xsgl_models.ProductLogisticsInfo{}
 
 	return c.RenderJson(detail_form)
 }
@@ -108,22 +101,12 @@ func (c ErpProductLogistics) Save() revel.Result {
 		return c.RenderJson(core.JsonResult{Success: false, Message: c.GetValidationErrorMessage()})
 	}
 
-	brand := detail_form.Brand
+	product_logistics := detail_form.ProductLogistics
 
-	var affected int64
-	if detail_form.IsCreate() {
-		affected, err = db_session.Insert(&brand)
-		core.HandleError(err)
-	} else {
-		affected, err = db_session.Id(brand.Id).Update(&brand)
-		core.HandleError(err)
+	_, err = db_session.Insert(&product_logistics)
+	core.HandleError(err)
 
-		if affected == 0 {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！"})
-		}
-	}
-
-	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据保存成功!"})
+	return c.RenderJson(core.JsonResult{Success: true, Message: "数据保存成功!"})
 }
 
 func (c ErpProductLogistics) Delete() revel.Result {
