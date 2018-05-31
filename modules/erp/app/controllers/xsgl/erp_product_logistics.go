@@ -119,73 +119,117 @@ func (c ErpProductLogistics) Save() revel.Result {
 		return c.RenderJson(core.JsonResult{Success: false, Message: "指定的SKU商品不存在！"})
 	}
 
-	err, result := product_logistics_service.Match_product_qty_postage(product.Id, qty, postal_code, false, db_session)
+	err, best_result, second_result := product_logistics_service.Match_product_qty_postage(product.Id, qty, postal_code, false, db_session)
 	core.HandleError(err)
 
-	var product_logistics xsgl_models.ProductLogisticsInfo
-
-	has, err = db_session.Where("product_code = ? AND qty = ?", product_code, qty).Get(&product_logistics)
+	_, err = db_session.Where("product_code = ? AND qty = ?", product_code, qty).Delete(new(xsgl_models.ProductLogisticsInfo))
 	core.HandleError(err)
 
-	product_logistics.ProductId = product.Id
-	product_logistics.ProductCode = product.Sku
-	product_logistics.Qty = qty
-	product_logistics.PostalCode = postal_code
+	// best result
+	var best_product_logistics xsgl_models.ProductLogisticsInfo
+
+	best_product_logistics.ProductId = product.Id
+	best_product_logistics.ProductCode = product.Sku
+	best_product_logistics.Qty = qty
+	best_product_logistics.PostalCode = postal_code
 
 	var login_user = core.GetLoginUser(c.Session)
-	product_logistics.UserId = login_user.UserId
-	product_logistics.LoginName = login_user.LoginName
+	best_product_logistics.UserId = login_user.UserId
+	best_product_logistics.LoginName = login_user.LoginName
 
-	if result.Final_amount < 0 {
-		product_logistics.ModeId = 0
-		product_logistics.ModeName = ""
-		product_logistics.FeePostalCode = ""
-		product_logistics.Fee = 0
-		product_logistics.Cost = 0
-		product_logistics.Success = 0
+	if best_result.Final_amount < 0 {
+		best_product_logistics.ModeId = 0
+		best_product_logistics.ModeName = ""
+		best_product_logistics.FeePostalCode = ""
+		best_product_logistics.Fee = 0
+		best_product_logistics.Cost = 0
+		best_product_logistics.Success = "失败"
 
-		product_logistics.StockId = 0
-		product_logistics.StockName = ""
-		product_logistics.CompanyId = 0
-		product_logistics.CompanyName = ""
+		best_product_logistics.StockId = 0
+		best_product_logistics.StockName = ""
+		best_product_logistics.CompanyId = 0
+		best_product_logistics.CompanyName = ""
+		best_product_logistics.ResultType = "最佳"
 	} else {
-		product_logistics.ModeId = result.Mode_id
-		product_logistics.ModeName = result.Mode.Name
+		best_product_logistics.ModeId = best_result.Mode_id
+		best_product_logistics.ModeName = best_result.Mode.Name
 
-		if result.Fee_rate_id != 0 {
-			product_logistics.FeePostalCode = result.Fee_rate.Postcode
-		} else if result.Fee_rate2_id != 0 {
-			product_logistics.FeePostalCode = result.Fee_rate2.Postcode
+		if best_result.Fee_rate_id != 0 {
+			best_product_logistics.FeePostalCode = best_result.Fee_rate.Postcode
+		} else if best_result.Fee_rate2_id != 0 {
+			best_product_logistics.FeePostalCode = best_result.Fee_rate2.Postcode
 		}
 
-		product_logistics.Fee = result.Total_fee
-		product_logistics.Cost = result.Pickup_fee
-		product_logistics.Success = 1
+		best_product_logistics.Fee = best_result.Total_fee
+		best_product_logistics.Cost = best_result.Pickup_fee
+		best_product_logistics.Success = "成功"
 
 		// stock
-		product_logistics.StockId = result.Mode.StockId
+		best_product_logistics.StockId = best_result.Mode.StockId
 
 		var stock sppz_models.StockInfo
-		_, err = db_session.Id(result.Mode.StockId).Get(&stock)
+		_, err = db_session.Id(best_result.Mode.StockId).Get(&stock)
 		core.HandleError(err)
-		product_logistics.StockName = stock.Name
+		best_product_logistics.StockName = stock.Name
 
 		// company
-		product_logistics.CompanyId = result.Mode.CompanyId
+		best_product_logistics.CompanyId = best_result.Mode.CompanyId
 
 		var company ddpz_models.LogisticsCompanyInfo
-		_, err = db_session.Id(result.Mode.CompanyId).Get(&company)
+		_, err = db_session.Id(best_result.Mode.CompanyId).Get(&company)
 		core.HandleError(err)
-		product_logistics.CompanyName = company.Name
+		best_product_logistics.CompanyName = company.Name
+		best_product_logistics.ResultType = "最佳"
 	}
 
-	if has == false {
-		_, err = db_session.Insert(&product_logistics)
+	_, err = db_session.Insert(&best_product_logistics)
+	core.HandleError(err)
+
+	// second product
+	var second_product_logistics xsgl_models.ProductLogisticsInfo
+
+	second_product_logistics.ProductId = product.Id
+	second_product_logistics.ProductCode = product.Sku
+	second_product_logistics.Qty = qty
+	second_product_logistics.PostalCode = postal_code
+
+	second_product_logistics.UserId = login_user.UserId
+	second_product_logistics.LoginName = login_user.LoginName
+
+	if second_result.Mode_id != 0 {
+		second_product_logistics.ModeId = second_result.Mode_id
+		second_product_logistics.ModeName = second_result.Mode.Name
+
+		if second_result.Fee_rate_id != 0 {
+			second_product_logistics.FeePostalCode = second_result.Fee_rate.Postcode
+		} else if second_result.Fee_rate2_id != 0 {
+			second_product_logistics.FeePostalCode = second_result.Fee_rate2.Postcode
+		}
+
+		second_product_logistics.Fee = second_result.Total_fee
+		second_product_logistics.Cost = second_result.Pickup_fee
+		second_product_logistics.Success = "成功"
+
+		// stock
+		second_product_logistics.StockId = second_result.Mode.StockId
+
+		var stock sppz_models.StockInfo
+		_, err = db_session.Id(second_result.Mode.StockId).Get(&stock)
 		core.HandleError(err)
-	} else {
-		_, err = db_session.Id(product_logistics.Id).Update(&product_logistics)
+		second_product_logistics.StockName = stock.Name
+
+		// company
+		second_product_logistics.CompanyId = second_result.Mode.CompanyId
+
+		var company ddpz_models.LogisticsCompanyInfo
+		_, err = db_session.Id(second_result.Mode.CompanyId).Get(&company)
 		core.HandleError(err)
+		second_product_logistics.CompanyName = company.Name
+		second_product_logistics.ResultType = "次佳"
 	}
+
+	_, err = db_session.Insert(&second_product_logistics)
+	core.HandleError(err)
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: "数据保存成功!"})
 }
@@ -195,10 +239,10 @@ func (c ErpProductLogistics) Delete() revel.Result {
 
 	db_session := c.DbSession
 
-	brand_id_list := make([]int64, 0)
-	c.Params.Bind(&brand_id_list, "id_list")
+	id_list := make([]int64, 0)
+	c.Params.Bind(&id_list, "id_list")
 
-	affected, err := db_session.In("id", brand_id_list).Delete(new(sppz_models.BrandInfo))
+	affected, err := db_session.In("id", id_list).Delete(new(xsgl_models.ProductLogisticsInfo))
 	core.HandleError(err)
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})

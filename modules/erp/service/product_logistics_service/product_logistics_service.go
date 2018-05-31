@@ -61,6 +61,7 @@ func Match_product_qty_postage(product_id int64, qty int64, postcode string, use
 	final_result.Total_fee = math.MaxFloat64 // 初始化为一个很大的不可能的值，澳币
 
 	var second_result Match_result_t
+	second_result.Total_fee = math.MaxFloat64 // 初始化为一个很大的不可能的值，澳币
 
 	var final_pick_fee = pick_fee_service.Get_product_pick_fee(product.Weight, pick_fee_setting) // 拣货费用的是不打折的重量
 
@@ -327,11 +328,13 @@ func Match_product_qty_postage(product_id int64, qty int64, postcode string, use
 		if mode_result.Total_fee < final_result.Total_fee {
 			second_result = final_result
 			final_result = mode_result
+		} else if mode_result.Total_fee < second_result.Total_fee {
+			second_result = mode_result
 		}
 
 	} // for _, logistics_mode := range logistics_mode_list {
 
-	if final_result.Fee_rate_id == 0 {
+	if final_result.Fee_rate_id == 0 && final_result.Fee_rate2_id == 0 {
 		var result = Match_result_t{}
 		result.Final_amount = -1
 		return nil, result, Match_result_t{} // 如果返回的费用小于零就表示，没有匹配的物流方式和费率，不能送达

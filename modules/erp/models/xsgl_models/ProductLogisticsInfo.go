@@ -19,7 +19,8 @@ type ProductLogisticsInfo struct {
 	FeePostalCode string    `xorm:"nvarchar(100) notnull 'fee_postal_code'" json:"fee_postal_code"` // 费用邮编
 	Fee           float64   `xorm:"decimal(18,6) notnull 'fee'" json:"fee"`                         // 物流费用
 	Cost          float64   `xorm:"decimal(18,6) notnull 'cost'" json:"cost"`                       // 成本费用
-	Success       int64     `xorm:"bigint notnull index 'success'" json:"success"`
+	Success       string    `xorm:"nvarchar(10) notnull index 'success'" json:"success"`            // 成功，失败
+	ResultType    string    `xorm:"nvarchar(10) notnull index 'result_type'" json:"result_type"`    // 最佳，次佳
 	UserId        int64     `xorm:"bigint notnull index 'user_id'" json:"user_id"`
 	LoginName     string    `xorm:"nvarchar(100) notnull index 'login_name'" json:"login_name"`
 	CreateTime    core.Time `xorm:"created notnull 'create_time'" json:"create_time"`
