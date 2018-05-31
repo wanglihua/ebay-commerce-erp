@@ -12,6 +12,7 @@ import (
 	"matrix/modules/erp/models/xsgl_models"
 	"matrix/modules/erp/models/kcgl_models"
 	"matrix/modules/erp/service/product_logistics_service"
+	"matrix/modules/erp/models/ddpz_models"
 )
 
 type ErpProductLogistics struct {
@@ -121,19 +122,68 @@ func (c ErpProductLogistics) Save() revel.Result {
 
 	var product_logistics xsgl_models.ProductLogisticsInfo
 
+	has, err = db_session.Where("product_code = ? AND qty = ?", product_code, qty).Get(&product_logistics)
+	core.HandleError(err)
+
 	product_logistics.ProductId = product.Id
 	product_logistics.ProductCode = product.Sku
 	product_logistics.Qty = qty
 	product_logistics.PostalCode = postal_code
 
+	var login_user = core.GetLoginUser(c.Session)
+	product_logistics.UserId = login_user.UserId
+	product_logistics.LoginName = login_user.LoginName
+
 	if result.Final_amount < 0 {
+		product_logistics.ModeId = 0
+		product_logistics.ModeName = ""
+		product_logistics.FeePostalCode = ""
+		product_logistics.Fee = 0
+		product_logistics.Cost = 0
+		product_logistics.Success = 0
 
+		product_logistics.StockId = 0
+		product_logistics.StockName = ""
+		product_logistics.CompanyId = 0
+		product_logistics.CompanyName = ""
 	} else {
+		product_logistics.ModeId = result.Mode_id
+		product_logistics.ModeName = result.Mode.Name
 
+		if result.Fee_rate_id != 0 {
+			product_logistics.PostalCode = result.Fee_rate.Postcode
+		} else if result.Fee_rate2_id != 0 {
+			product_logistics.PostalCode = result.Fee_rate2.Postcode
+		}
+
+		product_logistics.Fee = result.Total_fee
+		product_logistics.Cost = result.Pickup_fee
+		product_logistics.Success = 1
+
+		// stock
+		product_logistics.StockId = result.Mode.StockId
+
+		var stock sppz_models.StockInfo
+		_, err = db_session.Id(result.Mode.StockId).Get(&stock)
+		core.HandleError(err)
+		product_logistics.StockName = stock.Name
+
+		// company
+		product_logistics.CompanyId = result.Mode.CompanyId
+
+		var company ddpz_models.LogisticsCompanyInfo
+		_, err = db_session.Id(result.Mode.CompanyId).Get(&company)
+		core.HandleError(err)
+		product_logistics.CompanyName = company.Name
 	}
 
-	_, err = db_session.Insert(&product_logistics_from_ui)
-	core.HandleError(err)
+	if has == false {
+		_, err = db_session.Insert(&product_logistics)
+		core.HandleError(err)
+	} else {
+		_, err = db_session.Id(product_logistics.Id).Update(&product_logistics)
+		core.HandleError(err)
+	}
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: "数据保存成功!"})
 }
