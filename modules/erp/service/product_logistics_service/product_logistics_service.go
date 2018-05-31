@@ -343,14 +343,16 @@ func Match_product_qty_postage(product_id int64, qty int64, postcode string, use
 	final_result.Pickup_fee = final_pick_fee
 	second_result.Pickup_fee = final_pick_fee
 
-	if use_cal_weight {
+	// fmt.Println("final amount: ", final_result.Total_fee+final_result.Pickup_fee)
 
+	if use_cal_weight {
 		var postage_cal_weight = product.PostageCalWeight
 
 		if postage_cal_weight == 0 {
 			var product_sale_setting = product_sale_setting_service.Get_product_sale_setting(db_session)
 			postage_cal_weight = product_sale_setting.PostageCalWeight
 		}
+		// fmt.Println("postage_cal_weight:", postage_cal_weight)
 
 		final_result.Final_amount = (final_result.Total_fee + final_result.Pickup_fee) * postage_cal_weight
 		second_result.Final_amount = (second_result.Total_fee + second_result.Pickup_fee) * postage_cal_weight
