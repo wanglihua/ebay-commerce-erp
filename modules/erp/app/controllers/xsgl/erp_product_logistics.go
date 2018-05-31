@@ -105,9 +105,11 @@ func (c ErpProductLogistics) Save() revel.Result {
 	}
 
 	product_logistics_from_ui := detail_form.ProductLogistics
-	var product_code = product_logistics_from_ui.PostalCode
+	var product_code = product_logistics_from_ui.ProductCode
 	var qty = product_logistics_from_ui.Qty
 	var postal_code = product_logistics_from_ui.PostalCode
+
+	revel.TRACE.Println("product_code:", product_code)
 
 	var product kcgl_models.ProductInfo
 	has, err := db_session.Where("sku = ?", product_code).Get(&product)
