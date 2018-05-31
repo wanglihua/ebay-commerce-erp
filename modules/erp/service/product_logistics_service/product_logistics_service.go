@@ -15,10 +15,10 @@ import (
 	"matrix/modules/erp/service/logistics_mode_service"
 )
 
-func Match_product_qty_postage(product_id int64, qty int64, postcode string, use_cal_weight bool, db_session *xorm.Session) (err error, result Match_result_t) {
+func Match_product_qty_postage(product_id int64, qty int64, postcode string, use_cal_weight bool, db_session *xorm.Session) (err error, result Match_result_t, result_second Match_result_t) {
 
 	if qty <= 0 {
-		return errors.New("qty must be greater than 0!"), Match_result_t{}
+		return errors.New("qty must be greater than 0!"), Match_result_t{}, Match_result_t{}
 	}
 
 	postcode = strings.TrimSpace(postcode)
@@ -26,30 +26,30 @@ func Match_product_qty_postage(product_id int64, qty int64, postcode string, use
 	var product kcgl_models.ProductInfo
 	has, err := db_session.Where("id = ?", product_id).Get(&product)
 	if err != nil {
-		return err, Match_result_t{}
+		return err, Match_result_t{}, Match_result_t{}
 	}
 
 	if has == false {
-		return errors.New("product not exist!"), Match_result_t{}
+		return errors.New("product not exist!"), Match_result_t{}, Match_result_t{}
 	}
 
 	//var logistics_setting = logistics_setting_service.Get_logistics_setting(db_session)
 
 	logistics_mode_list, err := logistics_mode_service.Get_logistics_mode_enabled(db_session)
 	if err != nil {
-		return err, Match_result_t{}
+		return err, Match_result_t{}, Match_result_t{}
 	}
 
 	var logistics_fee_rate_list = make([]ddpz_models.LogisticsFeeRateInfo, 0)
 	err = db_session.Where(fmt.Sprintf("postcode = '%s' OR postcode = '%s'", postcode, strings.TrimPrefix(postcode, "0"))).Find(&logistics_fee_rate_list)
 	if err != nil {
-		return err, Match_result_t{}
+		return err, Match_result_t{}, Match_result_t{}
 	}
 
 	var logistics_fee_rate2_list = make([]ddpz_models.LogisticsFeeRate2Info, 0)
 	err = db_session.Where(fmt.Sprintf("postcode = '%s' OR postcode = '%s'", postcode, strings.TrimPrefix(postcode, "0"))).Find(&logistics_fee_rate2_list)
 	if err != nil {
-		return err, Match_result_t{}
+		return err, Match_result_t{}, Match_result_t{}
 	}
 
 	// postcode = strings.TrimPrefix(strings.TrimSpace(postcode), "0")
@@ -59,6 +59,8 @@ func Match_product_qty_postage(product_id int64, qty int64, postcode string, use
 
 	var final_result Match_result_t
 	final_result.Total_fee = math.MaxFloat64 // 初始化为一个很大的不可能的值，澳币
+
+	var second_result Match_result_t
 
 	var final_pick_fee = pick_fee_service.Get_product_pick_fee(product.Weight, pick_fee_setting) // 拣货费用的是不打折的重量
 
@@ -323,6 +325,7 @@ func Match_product_qty_postage(product_id int64, qty int64, postcode string, use
 		*/
 
 		if mode_result.Total_fee < final_result.Total_fee {
+			second_result = final_result
 			final_result = mode_result
 		}
 
@@ -331,10 +334,11 @@ func Match_product_qty_postage(product_id int64, qty int64, postcode string, use
 	if final_result.Fee_rate_id == 0 {
 		var result = Match_result_t{}
 		result.Final_amount = -1
-		return nil, result // 如果返回的费用小于零就表示，没有匹配的物流方式和费率，不能送达
+		return nil, result, Match_result_t{} // 如果返回的费用小于零就表示，没有匹配的物流方式和费率，不能送达
 	}
 
 	final_result.Pickup_fee = final_pick_fee
+	second_result.Pickup_fee = final_pick_fee
 
 	if use_cal_weight {
 
@@ -346,16 +350,18 @@ func Match_product_qty_postage(product_id int64, qty int64, postcode string, use
 		}
 
 		final_result.Final_amount = (final_result.Total_fee + final_result.Pickup_fee) * postage_cal_weight
+		second_result.Final_amount = (second_result.Total_fee + second_result.Pickup_fee) * postage_cal_weight
 	} else {
 		final_result.Final_amount = final_result.Total_fee + final_result.Pickup_fee
+		second_result.Final_amount = second_result.Total_fee + second_result.Pickup_fee
 	}
 
-	return nil, final_result
+	return nil, final_result, second_result
 }
 
 func Match_product_postage_for_client(product_id int64, postcode string, db_session *xorm.Session) (err error, fee float64) {
 
-	err, result := Match_product_qty_postage(product_id, 1, postcode, true, db_session)
+	err, result, _ := Match_product_qty_postage(product_id, 1, postcode, true, db_session)
 
 	return err, result.Final_amount // 如果返回的费用小于零就表示，没有匹配的物流方式和费率，不能送达
 }
