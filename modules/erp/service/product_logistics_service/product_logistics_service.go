@@ -15,7 +15,7 @@ import (
 	"matrix/modules/erp/service/logistics_mode_service"
 )
 
-func Match_product_qty_postage(product_id int64, qty int64, postcode string, db_session *xorm.Session) (err error, result Match_result_t) {
+func Match_product_qty_postage(product_id int64, qty int64, postcode string, use_cal_weight bool, db_session *xorm.Session) (err error, result Match_result_t) {
 
 	if qty <= 0 {
 		return errors.New("qty must be greater than 0!"), Match_result_t{}
@@ -334,23 +334,28 @@ func Match_product_qty_postage(product_id int64, qty int64, postcode string, db_
 		return nil, result // 如果返回的费用小于零就表示，没有匹配的物流方式和费率，不能送达
 	}
 
-	var postage_cal_weight = product.PostageCalWeight
-
-	if postage_cal_weight == 0 {
-		var product_sale_setting = product_sale_setting_service.Get_product_sale_setting(db_session)
-		postage_cal_weight = product_sale_setting.PostageCalWeight
-	}
-
 	final_result.Pickup_fee = final_pick_fee
 
-	final_result.Final_amount = (final_result.Total_fee + final_result.Pickup_fee) * postage_cal_weight
+	if use_cal_weight {
+
+		var postage_cal_weight = product.PostageCalWeight
+
+		if postage_cal_weight == 0 {
+			var product_sale_setting = product_sale_setting_service.Get_product_sale_setting(db_session)
+			postage_cal_weight = product_sale_setting.PostageCalWeight
+		}
+
+		final_result.Final_amount = (final_result.Total_fee + final_result.Pickup_fee) * postage_cal_weight
+	} else {
+		final_result.Final_amount = final_result.Total_fee + final_result.Pickup_fee
+	}
 
 	return nil, final_result
 }
 
-func Match_product_postage(product_id int64, postcode string, db_session *xorm.Session) (err error, fee float64) {
+func Match_product_postage_for_client(product_id int64, postcode string, db_session *xorm.Session) (err error, fee float64) {
 
-	err, result := Match_product_qty_postage(product_id, 1, postcode, db_session)
+	err, result := Match_product_qty_postage(product_id, 1, postcode, true, db_session)
 
 	return err, result.Final_amount // 如果返回的费用小于零就表示，没有匹配的物流方式和费率，不能送达
 }

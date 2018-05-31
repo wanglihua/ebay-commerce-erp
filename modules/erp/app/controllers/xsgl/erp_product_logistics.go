@@ -119,7 +119,7 @@ func (c ErpProductLogistics) Save() revel.Result {
 		return c.RenderJson(core.JsonResult{Success: false, Message: "指定的SKU商品不存在！"})
 	}
 
-	err, result := product_logistics_service.Match_product_qty_postage(product.Id, qty, postal_code, db_session)
+	err, result := product_logistics_service.Match_product_qty_postage(product.Id, qty, postal_code, false, db_session)
 	core.HandleError(err)
 
 	var product_logistics xsgl_models.ProductLogisticsInfo
@@ -153,9 +153,9 @@ func (c ErpProductLogistics) Save() revel.Result {
 		product_logistics.ModeName = result.Mode.Name
 
 		if result.Fee_rate_id != 0 {
-			product_logistics.PostalCode = result.Fee_rate.Postcode
+			product_logistics.FeePostalCode = result.Fee_rate.Postcode
 		} else if result.Fee_rate2_id != 0 {
-			product_logistics.PostalCode = result.Fee_rate2.Postcode
+			product_logistics.FeePostalCode = result.Fee_rate2.Postcode
 		}
 
 		product_logistics.Fee = result.Total_fee

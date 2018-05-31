@@ -34,7 +34,7 @@ func (c ProductPostageCalculator) Post() revel.Result {
 		})
 	}
 
-	var err, fee = product_logistics_service.Match_product_postage(product_id, postcode, db_session)
+	var err, fee = product_logistics_service.Match_product_postage_for_client(product_id, postcode, db_session)
 
 	if err != nil {
 		return c.RenderJson(map[string]interface{}{
