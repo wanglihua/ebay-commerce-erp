@@ -120,15 +120,26 @@
                                 }
                             },
                             {"mDataProp": "product_code", "title": "SKU", "bSearchable": true, "width": 130},
-                            {"mDataProp": "qty", "title": "数量", "bSearchable": false, "width": 60},
-                            {"mDataProp": "postal_code", "title": "地址邮编", "bSearchable": true, "width": 120},
+                            {"mDataProp": "qty", "title": "数量", "bSearchable": false, "sClass": "center", "width": 60},
+                            {"mDataProp": "postal_code", "title": "地址邮编", "bSearchable": true, "sClass": "center", "width": 80},
                             {"mDataProp": "stock_name", "title": "发货仓库", "bSearchable": true, "width": 120},
                             {"mDataProp": "mode_name", "title": "物流方式", "bSearchable": true},
-                            {"mDataProp": "fee_postal_code", "title": "费率邮编", "bSearchable": true, "width": 120},
-                            {"mDataProp": "fee", "title": "物流费用", "bSearchable": false, "width": 80},
-                            {"mDataProp": "cost", "title": "拣货费用", "bSearchable": false, "width": 80},
-                            {"mDataProp": "success", "title": "匹配结果", "bSearchable": false, "width": 80},
-                            {"mDataProp": "create_time", "title": "匹配时间", "bSearchable": false, "width": 120}
+                            {"mDataProp": "fee_postal_code", "title": "费率邮编", "bSearchable": true, "sClass": "center", "width": 80},
+                            {
+                                "mDataProp": "fee", "title": "物流费用", "bSearchable": false, "sClass": "dtRight", "width": 75,
+                                "render": function (data, type, row) {
+                                    return dtFormatFloat(data);
+                                }
+                            },
+                            {
+                                "mDataProp": "cost", "title": "拣货费用", "bSearchable": false, "sClass": "dtRight", "width": 75,
+                                "render": function (data, type, row) {
+                                    return dtFormatFloat(data);
+                                }
+                            },
+                            {"mDataProp": "result_type", "title": "匹配类型", "bSearchable": true, "sClass": "center", "width": 80},
+                            {"mDataProp": "success", "title": "匹配结果", "bSearchable": true, "sClass": "center", "width": 80},
+                            {"mDataProp": "create_time", "title": "匹配时间", "bSearchable": false, "sClass": "center", "width": 120}
                         ]
                     }
             );

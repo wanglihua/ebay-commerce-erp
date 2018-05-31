@@ -186,17 +186,17 @@ func (c ErpProductLogistics) Save() revel.Result {
 	core.HandleError(err)
 
 	// second product
-	var second_product_logistics xsgl_models.ProductLogisticsInfo
-
-	second_product_logistics.ProductId = product.Id
-	second_product_logistics.ProductCode = product.Sku
-	second_product_logistics.Qty = qty
-	second_product_logistics.PostalCode = postal_code
-
-	second_product_logistics.UserId = login_user.UserId
-	second_product_logistics.LoginName = login_user.LoginName
-
 	if second_result.Mode_id != 0 {
+		var second_product_logistics xsgl_models.ProductLogisticsInfo
+
+		second_product_logistics.ProductId = product.Id
+		second_product_logistics.ProductCode = product.Sku
+		second_product_logistics.Qty = qty
+		second_product_logistics.PostalCode = postal_code
+
+		second_product_logistics.UserId = login_user.UserId
+		second_product_logistics.LoginName = login_user.LoginName
+
 		second_product_logistics.ModeId = second_result.Mode_id
 		second_product_logistics.ModeName = second_result.Mode.Name
 
@@ -226,10 +226,10 @@ func (c ErpProductLogistics) Save() revel.Result {
 		core.HandleError(err)
 		second_product_logistics.CompanyName = company.Name
 		second_product_logistics.ResultType = "次佳"
-	}
 
-	_, err = db_session.Insert(&second_product_logistics)
-	core.HandleError(err)
+		_, err = db_session.Insert(&second_product_logistics)
+		core.HandleError(err)
+	}
 
 	return c.RenderJson(core.JsonResult{Success: true, Message: "数据保存成功!"})
 }
