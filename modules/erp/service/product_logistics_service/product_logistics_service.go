@@ -60,8 +60,7 @@ func Match_product_qty_postage(product_id int64, qty int64, postcode string, use
 	var final_result Match_result_t
 	final_result.Total_fee = math.MaxFloat64 // 初始化为一个很大的不可能的值，澳币
 
-	var second_result Match_result_t
-	second_result.Total_fee = math.MaxFloat64 // 初始化为一个很大的不可能的值，澳币
+	var match_result_list = make([]Match_result_t, 0)
 
 	var final_pick_fee = pick_fee_service.Get_product_pick_fee(product.Weight, pick_fee_setting) // 拣货费用的是不打折的重量
 
@@ -71,6 +70,7 @@ func Match_product_qty_postage(product_id int64, qty int64, postcode string, use
 
 		mode_result.Mode_id = logistics_mode.Id
 		mode_result.Mode = logistics_mode
+		mode_result.Stock_id = logistics_mode.StockId
 
 		mode_result.length, mode_result.width, mode_result.height, mode_result.actual_weight = product.Length, product.Width, product.Height*float64(qty), product.Weight*float64(qty)
 
@@ -325,11 +325,12 @@ func Match_product_qty_postage(product_id int64, qty int64, postcode string, use
 		}
 		*/
 
+		mode_result.Pickup_fee = final_pick_fee
+
+		match_result_list = append(match_result_list, mode_result)
+
 		if mode_result.Total_fee < final_result.Total_fee {
-			second_result = final_result
 			final_result = mode_result
-		} else if mode_result.Total_fee < second_result.Total_fee {
-			second_result = mode_result
 		}
 
 	} // for _, logistics_mode := range logistics_mode_list {
@@ -341,6 +342,21 @@ func Match_product_qty_postage(product_id int64, qty int64, postcode string, use
 	}
 
 	final_result.Pickup_fee = final_pick_fee
+
+	var second_result Match_result_t
+
+	if final_result.Fee_rate_id != 0 || final_result.Fee_rate2_id != 0 { // 最佳物流方式里面有值
+		for _, match_result := range match_result_list {
+			if final_result.Stock_id != match_result.Stock_id { // 和最佳物流不是同一个仓库的
+				if (second_result.Fee_rate_id == 0 && second_result.Fee_rate2_id == 0 ) ||
+					(second_result.Total_fee > match_result.Total_fee && ( match_result.Fee_rate_id != 0 || match_result.Fee_rate2_id != 0)) { // 如果次佳仓还没有值，或者次佳仓的费用比当前匹配值要高
+
+					second_result = match_result
+				}
+			}
+		}
+	}
+
 	second_result.Pickup_fee = final_pick_fee
 
 	// fmt.Println("final amount: ", final_result.Total_fee+final_result.Pickup_fee)
@@ -372,6 +388,7 @@ func Match_product_postage_for_client(product_id int64, postcode string, db_sess
 }
 
 type Match_result_t struct {
+	Stock_id     int64
 	Mode_id      int64
 	Mode         ddpz_models.LogisticsModeInfo
 	Fee_rate_id  int64
