@@ -16,6 +16,7 @@ import (
 	"math"
 	"matrix/modules/erp/models"
 	"time"
+	auth_models "matrix/modules/auth/models"
 )
 
 type ErpOrderRefund struct {
@@ -322,7 +323,12 @@ LIMIT 1;`
 	order_refund.ProductCode = refund_product.Sku
 	order_refund.ProductName = refund_product.CnName
 	order_refund.SalesUserId = refund_product.SaleUserId
-	order_refund.SalesUserName = refund_product.SaleUser
+
+	var sales_user auth_models.UserInfo
+	_, err = db_session.Id(refund_product.SaleUserId).Get(&sales_user)
+	core.HandleError(err)
+
+	order_refund.SalesUserName = sales_user.LoginName + "(" + sales_user.NickName + ")"
 
 	var login_user = core.GetLoginUser(web_session)
 	order_refund.ApplyUserId = login_user.UserId
