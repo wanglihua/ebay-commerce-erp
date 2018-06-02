@@ -2147,7 +2147,7 @@ func (c ErpOrder) ReShip() revel.Result {
 
 	// 1.3 保存新的订单信息
 	var new_order ddlc_models.OrderInfo
-	new_order = order
+	new_order = order               // 复制原订单的信息
 	new_order.Id = 0                // 置空 id 让数据库重新生成id
 	new_order.Code = new_order_code // 使用新的订单编号
 	new_order.TranId = new_tran_id
@@ -2161,6 +2161,7 @@ func (c ErpOrder) ReShip() revel.Result {
 	// 重发复制订单时， 收款，平台交易费，付款交易费都没有，但有拣货费， 利润先置零
 	new_order.AmountPaid = 0
 	new_order.AmountPaidRmb = 0
+	new_order.ExpressFee = 0
 	new_order.TotalAmount = 0
 	new_order.TotalAmountRmb = 0
 	new_order.AdjustmentAmount = 0
