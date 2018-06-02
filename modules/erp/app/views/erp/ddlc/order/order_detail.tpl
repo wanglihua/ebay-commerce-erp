@@ -440,7 +440,7 @@
                                 <template v-for="refund in detail.refund_list">
                                     <tr>
                                         <td class="dtCenter">{{ refund.transaction_id }}</td>
-                                        <td class="dtRight">{{ refund.amount }}</td>
+                                        <td class="dtRight">{{ format_amount(refund.refund_amount) }}</td>
                                         <td class="dtCenter">{{ refund.create_time }}</td>
                                         <td>{{ refund.description }}</td>
                                     </tr>
