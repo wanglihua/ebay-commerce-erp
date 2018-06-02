@@ -233,21 +233,32 @@
                                     return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
                                 }
                             },
-                            {"mDataProp": "shop_name", "title": "店铺", "bSearchable": true, "width": 120},
+                            {"mDataProp": "shop_name", "title": "店铺", "bSearchable": true, "width": 80},
                             {
-                                "mDataProp": "order_code", "title": "订单编号", "bSearchable": true, "width": 180,
+                                "mDataProp": "order_code", "title": "订单编号", "bSearchable": true, "width": 120,
                                 "render": function (data, type, row) {
                                     return "<a target='order_detail' href='/order/detail/" + row.order_id + "'>" + row.order_code + "</a>"
                                 }
                             },
-                            // {"mDataProp": "pay_tran_id", "title": "付款流水号", "bSearchable": true, "width": 120},
-                            // {"mDataProp": "transaction_id", "title": "退款流水号", "bSearchable": true, "width": 120},
+                            {
+                                "mDataProp": "product_code", "title": "SKU", "bSearchable": true, "width": 120,
+                                "render": function (data, type, row) {
+                                    return "<a target='order_detail' href='/product/detail/" + row.product_id + "'>" + row.product_code + "</a>"
+                                }
+                            },
+                            {
+                                "mDataProp": "product_name", "title": "品名", "bSearchable": true, "sClass": "wrap-word", "width": 180,
+                                "render": function (data, type, row) {
+                                    return "<a target='order_detail' href='/product/detail/" + row.product_id + "'>" + row.product_name + "</a>"
+                                }
+                            },
+                            {"mDataProp": "sales_user_name", "title": "销售员", "bSearchable": true, "width": 80},
                             {
                                 "mDataProp": "order_amount",
                                 "title": "订单金额",
                                 "bSearchable": false,
                                 "sClass": "dtRight",
-                                "width": 90,
+                                "width": 75,
                                 "render": function (data, type, row) {
                                     return dtFormatFloat(data);
                                 }
@@ -257,15 +268,15 @@
                                 "title": "退款金额",
                                 "bSearchable": false,
                                 "sClass": "dtRight",
-                                "width": 90,
+                                "width": 75,
                                 "render": function (data, type, row) {
                                     return dtFormatFloat(data);
                                 }
                             },
-                            {"mDataProp": "method_name", "title": "退款方式", "bSearchable": true, "width": 120},
+                            {"mDataProp": "method_name", "title": "退款方式", "bSearchable": true, "width": 80},
                             {"mDataProp": "type_name", "title": "退款类型", "bSearchable": true, "width": 120},
-                            {"mDataProp": "reason", "title": "退款原因", "bSearchable": true, "width": 150},
-                            {"mDataProp": "status_name", "title": "状态", "bSearchable": true, "width": 80},
+                            {"mDataProp": "reason", "title": "退款原因", "bSearchable": true, "width": 80},
+                            {"mDataProp": "status_name", "title": "状态", "bSearchable": true, "width": 60},
                             {"mDataProp": "apply_user_name", "title": "申请人", "bSearchable": true, "width": 80},
                             {"mDataProp": "apply_time", "title": "申请时间", "bSearchable": false, "width": 120},
                             {"mDataProp": "description", "title": "备注", "bSearchable": true}
