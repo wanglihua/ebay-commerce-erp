@@ -10,11 +10,11 @@ import (
 func Get_order_feedback_list(order_id int64, db_session *xorm.Session) []OrderFeedbackViewItem {
 	var sql = `
 SELECT
-    of.*,
+    f.*,
     oi.*
-FROM erp_order_feedback of
-    INNER JOIN erp_order_item oi ON of.order_item_id = oi.id
-WHERE of.order_id = %d;
+FROM erp_order_feedback f
+    INNER JOIN erp_order_item oi ON f.order_item_id = oi.id
+WHERE f.order_id = %d;
 `
 	sql = fmt.Sprintf(sql, order_id)
 
