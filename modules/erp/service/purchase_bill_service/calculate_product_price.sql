@@ -61,6 +61,7 @@ CREATE PROCEDURE calculate_product_price()
                 SELECT avg(pbe.price) AS avg_price
                 FROM erp_purchase_bill_entry pbe
                 WHERE pbe.product_id = v_product_id AND pbe.status_id = 4700 # 已入库
+                ORDER BY pbe.create_time DESC
                 LIMIT 6)
             WHERE id = v_product_id;
 
@@ -69,6 +70,7 @@ CREATE PROCEDURE calculate_product_price()
                 SELECT avg(pbe.inventory_cost) AS inventory_cost
                 FROM erp_purchase_bill_entry pbe
                 WHERE pbe.product_id = v_product_id AND pbe.status_id = 4700 # 已入库
+                ORDER BY pbe.create_time DESC
                 LIMIT 6)
             WHERE product_id = v_product_id AND stock_id = v_cn_stock_id;
 
