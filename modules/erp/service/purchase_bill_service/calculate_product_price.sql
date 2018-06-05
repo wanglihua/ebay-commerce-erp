@@ -6,6 +6,8 @@
 根据 6 次采购的平均库存价格，更新商品的中国仓成本价
 没有采购记录的商品，不用进行 中国仓的成本价 更新
 
+CALL calculate_product_price;
+
 */
 
 DROP PROCEDURE IF EXISTS calculate_product_price;
@@ -58,20 +60,22 @@ CREATE PROCEDURE calculate_product_price()
             -- 这里做你想做的循环的事件
             UPDATE erp_product
             SET cost_price = (
-                SELECT avg(pbe.price) AS avg_price
-                FROM erp_purchase_bill_entry pbe
-                WHERE pbe.product_id = v_product_id AND pbe.status_id = 4700 # 已入库
-                ORDER BY pbe.update_time DESC
-                LIMIT 6)
+                SELECT avg(pbe_six.price) AS avg_price
+                FROM (SELECT *
+                      FROM erp_purchase_bill_entry pbe
+                      WHERE pbe.product_id = v_product_id AND pbe.status_id = 4700 # 已入库
+                      ORDER BY pbe.update_time DESC
+                      LIMIT 6) pbe_six)
             WHERE id = v_product_id;
 
             UPDATE erp_inventory
             SET cost_price = (
-                SELECT avg(pbe.inventory_cost) AS inventory_cost
-                FROM erp_purchase_bill_entry pbe
-                WHERE pbe.product_id = v_product_id AND pbe.status_id = 4700 # 已入库
-                ORDER BY pbe.update_time DESC
-                LIMIT 6)
+                SELECT avg(pbe_six.inventory_cost) AS inventory_cost
+                FROM (SELECT *
+                      FROM erp_purchase_bill_entry pbe
+                      WHERE pbe.product_id = v_product_id AND pbe.status_id = 4700 # 已入库
+                      ORDER BY pbe.update_time DESC
+                      LIMIT 6) pbe_six)
             WHERE product_id = v_product_id AND stock_id = v_cn_stock_id;
 
             SET done = FALSE;
