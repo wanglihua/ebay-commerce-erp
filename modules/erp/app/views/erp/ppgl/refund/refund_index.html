@@ -276,7 +276,16 @@
                             {"mDataProp": "method_name", "title": "退款方式", "bSearchable": true, "width": 80},
                             {"mDataProp": "type_name", "title": "退款类型", "bSearchable": true, "width": 120},
                             {"mDataProp": "reason", "title": "退款原因", "bSearchable": true, "width": 80},
-                            {"mDataProp": "status_name", "title": "状态", "bSearchable": true, "width": 60},
+                            {
+                                "mDataProp": "status_name", "title": "状态", "bSearchable": true, "width": 60,
+                                "render": function (data, type, row) {
+                                    if (row.failed_cause && row.failed_cause !== null && row.failed_cause !== "") {
+                                        return "<a href='javascript:$.msg.error(\"" + row.failed_cause + "\");'>" + data + "</a>";
+                                    }
+
+                                    return data;
+                                }
+                            },
                             {"mDataProp": "apply_user_name", "title": "申请人", "bSearchable": true, "width": 80},
                             {"mDataProp": "apply_time", "title": "申请时间", "bSearchable": false, "width": 120},
                             {"mDataProp": "description", "title": "备注", "bSearchable": true}

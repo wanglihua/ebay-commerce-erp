@@ -30,6 +30,7 @@ type OrderRefundInfo struct {
 	ApplyUserName string        `xorm:"nvarchar(200) notnull 'apply_user_name'" json:"apply_user_name"`
 	ApplyTime     core.LongTime `xorm:"datetime notnull 'apply_time'" json:"apply_time"`
 	StatusId      int64         `xorm:"bigint notnull index 'status_id'" json:"status_id"`
+	FailedCause   string        `xorm:"nvarchar(300) null 'failed_cause'" json:"failed_cause"`
 	StatusName    string        `xorm:"nvarchar(200) notnull 'status_name'" json:"status_name"`
 	CreateTime    core.Time     `xorm:"created notnull 'create_time'" json:"create_time"`
 	UpdateTime    core.Time     `xorm:"created notnull 'update_time'" json:"update_time"`
