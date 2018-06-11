@@ -47,6 +47,8 @@ type ProductInfo struct {
 	ServiceUser      string          `xorm:"-" json:"service_user"`
 	DevUserId        int64           `xorm:"bigint notnull index 'dev_user_id' default(0)" json:"dev_user_id" smith:"verbose_name=开发人员"`
 	DevUser          string          `xorm:"-" json:"dev_user"`
+	ReplenishUserId  int64           `xorm:"bigint notnull index 'replenish_user_id' default(0)" json:"replenish_user_id" smith:"verbose_name=补货人员"`
+	ReplenishUser    string          `xorm:"-" json:"replenish_user"`
 	CreateTime       core.Time       `xorm:"created notnull 'create_time'" json:"create_time"`
 	UpdateTime       core.Time       `xorm:"updated notnull 'update_time'" json:"update_time"`
 }

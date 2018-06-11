@@ -45,26 +45,34 @@
                     </div>
                 </div>
                 <div style="margin: 15px 0;">
-                    <label for="sale_user_id_query">销售负责人</label>
+                    <label for="sale_user_id_query">销售人员</label>
                     <select id="sale_user_id_query" name="sale_user_id_query" style="height: 30px; width: 130px;">
-                        <option value="0">销售负责人</option>
+                        <option value="0">销售人员</option>
                         {% range $index, $user := .sale_user_list %}
                         <option value="{% $user.Id %}">{% $user.LoginName %}（{% $user.NickName %}）</option>
                         {% end %}
                     </select>
                     &nbsp;&nbsp;
-                    <label for="service_user_id_query">客服负责人</label>
+                    <label for="service_user_id_query">客服人员</label>
                     <select id="service_user_id_query" name="service_user_id_query" style="height: 30px; width: 130px;">
-                        <option value="0">客服负责人</option>
+                        <option value="0">客服人员</option>
                         {% range $index, $user := .service_user_list %}
                         <option value="{% $user.Id %}">{% $user.LoginName %}（{% $user.NickName %}）</option>
                         {% end %}
                     </select>
                     &nbsp;&nbsp;
-                    <label for="dev_user_id_query">开发负责人</label>
+                    <label for="dev_user_id_query">开发人员</label>
                     <select id="dev_user_id_query" name="dev_user_id_query" style="height: 30px; width: 130px;">
-                        <option value="0">开发负责人</option>
+                        <option value="0">开发人员</option>
                         {% range $index, $user := .dev_user_list %}
+                        <option value="{% $user.Id %}">{% $user.LoginName %}（{% $user.NickName %}）</option>
+                        {% end %}
+                    </select>
+                    &nbsp;&nbsp;
+                    <label for="replenish_user_id_query">补货人员</label>
+                    <select id="replenish_user_id_query" name="replenish_user_id_query" style="height: 30px; width: 130px;">
+                        <option value="0">补货人员</option>
+                        {% range $index, $user := .replenish_user_list %}
                         <option value="{% $user.Id %}">{% $user.LoginName %}（{% $user.NickName %}）</option>
                         {% end %}
                     </select>
@@ -162,6 +170,22 @@
                                     </div>
                                 </div>
 
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <label for="replenish_user_id" class="col-xs-2 control-label">补货人员</label>
+                                            <div class="col-xs-10">
+                                                <select id="replenish_user_id" name="detail.product.replenish_user_id" type="text" class="input-sm form-control" v-model.number="detail.product.replenish_user_id">
+                                                    <option :value="0"></option>
+                                                    <template v-for="user in replenish_user_list">
+                                                        <option :value="user.id">{{user.login_name}}({{user.nick_name}})</option>
+                                                    </template>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
                             </form>
                         </div>
                     </div>
@@ -251,77 +275,87 @@
             var this_vm = this;
 
             initDataTable(
-                '#productList',
-                {
-                    "sAjaxSource": '{%url "ErpProductUser.ListData"%}',
-                    "aaSorting": [[1, "asc"]],
-                    "aoColumns": [
-                        {
-                            "mDataProp": "p.id",
-                            "bSearchable": false,
-                            "orderable": false,
-                            "sClass": "center",
-                            "width": 50,
-                            "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
-                            "render": function (data, type, row) {
-                                return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
-                            }
-                        },
-                        {
-                            "mDataProp": "p.sku", "title": "商品SKU", "bSearchable": true, "width": 150,
-                            "render": function (data, type, row) {
-                                return '<a href="/product/detail/' + row.p.id + '" target="product_detail">' + row.p.sku + '</a>';
-                            }
-                            //<div class="tdSkuNameSup"><a href="/product/detail/' + row.prd.id + '" target="_blank">' + row.prd.sku + '</a></div>
-                        },
-                        {
-                            "mDataProp": "p.cn_name", "title": "商品名称", "bSearchable": true, "sClass": "wrap-word",
-                            "render": function (data, type, row) {
-                                return "<div>" + data + "</div>";
-                            }
-                        },
-                        {
-                            "mDataProp": "sale_user.id", "title": "销售人员", "bSearchable": false, "sClass": "center", "width": 120,
-                            "render": function (data, type, row) {
-                                if (data !== 0) {
-                                    return row.sale_user.login_name + "(" + row.sale_user.nick_name + ")";
-                                } else {
-                                    return "";
-                                }
-                            }
-                        },
-                        {
-                            "mDataProp": "service_user.id", "title": "客服人员", "bSearchable": false, "sClass": "center", "width": 120,
-                            "render": function (data, type, row) {
-                                if (data !== 0) {
-                                    return row.service_user.login_name + "(" + row.service_user.nick_name + ")";
-                                } else {
-                                    return "";
-                                }
-                            }
-                        },
-                        {
-                            "mDataProp": "dev_user.id", "title": "开发人员", "bSearchable": false, "sClass": "center", "width": 120,
-                            "render": function (data, type, row) {
-                                if (data !== 0) {
-                                    return row.dev_user.login_name + "(" + row.dev_user.nick_name + ")";
-                                } else {
-                                    return "";
-                                }
-                            }
-                        },
-                        {"mDataProp": "s.name", "title": "状态", "bSearchable": true, "width": 80}
-                    ],
-                    "fnServerData": function (sSource, aoData, fnCallback) {
-                        showMask("数据加载中，请稍候");
-
-                        aoData.push({name: 'filter_type', value: this_vm.filter_type});
-                        aoData.push({name: 'sale_user_id_query', value: $("#sale_user_id_query").val()});
-                        aoData.push({name: 'service_user_id_query', value: $("#service_user_id_query").val()});
-                        aoData.push({name: 'dev_user_id_query', value: $("#dev_user_id_query").val()});
-
-                        $.ajax(
+                    '#productList',
+                    {
+                        "sAjaxSource": '{%url "ErpProductUser.ListData"%}',
+                        "aaSorting": [[1, "asc"]],
+                        "aoColumns": [
                             {
+                                "mDataProp": "p.id",
+                                "bSearchable": false,
+                                "orderable": false,
+                                "sClass": "center",
+                                "width": 50,
+                                "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
+                                "render": function (data, type, row) {
+                                    return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
+                                }
+                            },
+                            {
+                                "mDataProp": "p.sku", "title": "商品SKU", "bSearchable": true, "width": 150,
+                                "render": function (data, type, row) {
+                                    return '<a href="/product/detail/' + row.p.id + '" target="product_detail">' + row.p.sku + '</a>';
+                                }
+                                //<div class="tdSkuNameSup"><a href="/product/detail/' + row.prd.id + '" target="_blank">' + row.prd.sku + '</a></div>
+                            },
+                            {
+                                "mDataProp": "p.cn_name", "title": "商品名称", "bSearchable": true, "sClass": "wrap-word",
+                                "render": function (data, type, row) {
+                                    return "<div>" + data + "</div>";
+                                }
+                            },
+                            {
+                                "mDataProp": "sale_user.id", "title": "销售人员", "bSearchable": false, "sClass": "center", "width": 120,
+                                "render": function (data, type, row) {
+                                    if (data !== 0) {
+                                        return row.sale_user.login_name + "(" + row.sale_user.nick_name + ")";
+                                    } else {
+                                        return "";
+                                    }
+                                }
+                            },
+                            {
+                                "mDataProp": "service_user.id", "title": "客服人员", "bSearchable": false, "sClass": "center", "width": 120,
+                                "render": function (data, type, row) {
+                                    if (data !== 0) {
+                                        return row.service_user.login_name + "(" + row.service_user.nick_name + ")";
+                                    } else {
+                                        return "";
+                                    }
+                                }
+                            },
+                            {
+                                "mDataProp": "dev_user.id", "title": "开发人员", "bSearchable": false, "sClass": "center", "width": 120,
+                                "render": function (data, type, row) {
+                                    if (data !== 0) {
+                                        return row.dev_user.login_name + "(" + row.dev_user.nick_name + ")";
+                                    } else {
+                                        return "";
+                                    }
+                                }
+                            },
+                            {
+                                "mDataProp": "replenish_user.id", "title": "补货人员", "bSearchable": false, "sClass": "center", "width": 120,
+                                "render": function (data, type, row) {
+                                    if (data !== 0) {
+                                        return row.replenish_user.login_name + "(" + row.replenish_user.nick_name + ")";
+                                    } else {
+                                        return "";
+                                    }
+                                }
+                            },
+                            {"mDataProp": "s.name", "title": "状态", "bSearchable": true, "width": 80}
+                        ],
+                        "fnServerData": function (sSource, aoData, fnCallback) {
+                            showMask("数据加载中，请稍候");
+
+                            aoData.push({name: 'filter_type', value: this_vm.filter_type});
+                            aoData.push({name: 'sale_user_id_query', value: $("#sale_user_id_query").val()});
+                            aoData.push({name: 'service_user_id_query', value: $("#service_user_id_query").val()});
+                            aoData.push({name: 'dev_user_id_query', value: $("#dev_user_id_query").val()});
+                            aoData.push({name: 'replenish_user_id_query', value: $("#replenish_user_id_query").val()});
+
+                            $.ajax({
                                 "dataType": 'json',
                                 "url": sSource,
                                 "data": aoData,
@@ -335,8 +369,8 @@
                                     fnCallback(data);
                                 }
                             });
+                        }
                     }
-                }
             );
 
             $('#productList tbody').on('dblclick', 'tr', function () {
@@ -354,25 +388,25 @@
                 showMask("加载中...");
                 $("#productDetailDialog").clearValidation();
                 $.ajax({
-                        url: '{%url "ErpProductUser.DetailData" %}',
-                        type: "POST",
-                        data: {
-                            "id": product_id
-                        },
-                        success: function (result) {
-                            hideMask();
-                            if (result.success === false) {
-                                $.msg.error(result.message);
-                                return;
-                            }
-                            vm.detail = result.detail;
-                            vm.sale_user_list = result.sale_user_list;
-                            vm.service_user_list = result.service_user_list;
-                            vm.dev_user_list = result.dev_user_list;
-                            $('#productDetailDialog').modal(modalOptions);
+                    url: '{%url "ErpProductUser.DetailData" %}',
+                    type: "POST",
+                    data: {
+                        "id": product_id
+                    },
+                    success: function (result) {
+                        hideMask();
+                        if (result.success === false) {
+                            $.msg.error(result.message);
+                            return;
                         }
+                        vm.detail = result.detail;
+                        vm.sale_user_list = result.sale_user_list;
+                        vm.service_user_list = result.service_user_list;
+                        vm.dev_user_list = result.dev_user_list;
+                        vm.replenish_user_list = result.replenish_user_list;
+                        $('#productDetailDialog').modal(modalOptions);
                     }
-                );
+                });
             },
             saveProductUser: function () {
                 showMask("提交中...");
@@ -386,6 +420,9 @@
                     },
                     'detail.product.dev_user_id': {
                         required: false, number: true
+                    },
+                    'detail.product.replenish_user_id': {
+                        required: false, number: true
                     }
                 });
 
@@ -393,26 +430,25 @@
                     hideMask();
                 } else {
                     $.ajax({
-                            url: '{%url "ErpProductUser.Save"%}',
-                            type: "POST",
-                            processData: false,
-                            contentType: 'application/json',
-                            data: JSON.stringify(vm.detail),
-                            success: function (data) {
-                                hideMask();
-                                if (data.success === false) {
-                                    $.msg.error(data.message);
-                                    //return;
-                                }
-                                else {
-                                    $.msg.show(data.message);
-                                    $('#productDetailDialog').modal('hide');
-                                    vm.reloadList();
-                                    //return;
-                                }
+                        url: '{%url "ErpProductUser.Save"%}',
+                        type: "POST",
+                        processData: false,
+                        contentType: 'application/json',
+                        data: JSON.stringify(vm.detail),
+                        success: function (data) {
+                            hideMask();
+                            if (data.success === false) {
+                                $.msg.error(data.message);
+                                //return;
+                            }
+                            else {
+                                $.msg.show(data.message);
+                                $('#productDetailDialog').modal('hide');
+                                vm.reloadList();
+                                //return;
                             }
                         }
-                    );
+                    });
                 }
             },
             exportProduct: function () {
