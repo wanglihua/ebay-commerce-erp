@@ -47,6 +47,7 @@ func (c ErpProduct) Index() revel.Result {
 	c.RenderArgs["sale_user_list"] = user_list
 	c.RenderArgs["service_user_list"] = user_list
 	c.RenderArgs["dev_user_list"] = user_list
+	c.RenderArgs["replenish_user_list"] = user_list
 
 	c.RenderArgs["product_status_list"] = product_status_list
 
@@ -87,6 +88,9 @@ func (c ErpProduct) ListData() revel.Result {
 
 	var dev_user_id_query int64
 	c.Params.Bind(&dev_user_id_query, "dev_user_id_query")
+
+	var replenish_user_id_query int64
+	c.Params.Bind(&replenish_user_id_query, "replenish_user_id_query")
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
@@ -137,6 +141,10 @@ FROM erp_product prd
 		filter = core.SqlAnd(filter, fmt.Sprintf("prd.dev_user_id = %d", dev_user_id_query))
 	}
 
+	if replenish_user_id_query != 0 {
+		filter = core.SqlAnd(filter, fmt.Sprintf("prd.replenish_user_id = %d", replenish_user_id_query))
+	}
+
 	sql_builder.Where(filter)
 
 	if order != "" {
@@ -168,6 +176,7 @@ FROM erp_product prd
 		product_list[index].Product.SaleUser = get_user_desc_in_user_list(product.Product.SaleUserId)
 		product_list[index].Product.ServiceUser = get_user_desc_in_user_list(product.Product.ServiceUserId)
 		product_list[index].Product.DevUser = get_user_desc_in_user_list(product.Product.DevUserId)
+		product_list[index].Product.ReplenishUser = get_user_desc_in_user_list(product.Product.ReplenishUserId)
 	}
 
 	var product_id_list = make([]int64, 0)

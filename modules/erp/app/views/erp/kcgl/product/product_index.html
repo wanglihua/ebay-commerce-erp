@@ -58,26 +58,34 @@
                             {% end %}
                         </select>
 
-                        <label for="sale_user_id_query">销售负责人</label>
+                        <label for="sale_user_id_query">销售人员</label>
                         <select id="sale_user_id_query" name="sale_user_id_query" style="height: 30px; width: 130px;">
-                            <option value="0">--销售负责人--</option>
+                            <option value="0">--销售人员--</option>
                             {% range $index, $user := .sale_user_list %}
                             <option value="{% $user.Id %}">{% $user.LoginName %}（{% $user.NickName %}）</option>
                             {% end %}
                         </select>
                         &nbsp;&nbsp;
-                        <label for="service_user_id_query">客服负责人</label>
+                        <label for="service_user_id_query">客服人员</label>
                         <select id="service_user_id_query" name="service_user_id_query" style="height: 30px; width: 130px;">
-                            <option value="0">--客服负责人--</option>
+                            <option value="0">--客服人员--</option>
                             {% range $index, $user := .service_user_list %}
                             <option value="{% $user.Id %}">{% $user.LoginName %}（{% $user.NickName %}）</option>
                             {% end %}
                         </select>
                         &nbsp;&nbsp;
-                        <label for="dev_user_id_query">开发负责人</label>
+                        <label for="dev_user_id_query">开发人员</label>
                         <select id="dev_user_id_query" name="dev_user_id_query" style="height: 30px; width: 130px;">
-                            <option value="0">--开发负责人--</option>
+                            <option value="0">--开发人员--</option>
                             {% range $index, $user := .dev_user_list %}
+                            <option value="{% $user.Id %}">{% $user.LoginName %}（{% $user.NickName %}）</option>
+                            {% end %}
+                        </select>
+                        &nbsp;&nbsp;
+                        <label for="replenish_user_id_query">补货人员</label>
+                        <select id="replenish_user_id_query" name="replenish_user_id_query" style="height: 30px; width: 130px;">
+                            <option value="0">--补货人员--</option>
+                            {% range $index, $user := .replenish_user_list %}
                             <option value="{% $user.Id %}">{% $user.LoginName %}（{% $user.NickName %}）</option>
                             {% end %}
                         </select>
@@ -214,6 +222,14 @@
                                     }
                                     str += "<br/>";
 
+                                    if (row.prd.replenish_user === "") {
+                                        str += "------";
+                                    }
+                                    else {
+                                        str += row.prd.replenish_user;
+                                    }
+                                    str += "<br/>";
+
                                     return str;
                                 }
                             },
@@ -289,6 +305,7 @@
                             aoData.push({name: 'sale_user_id_query', value: $("#sale_user_id_query").val()});
                             aoData.push({name: 'service_user_id_query', value: $("#service_user_id_query").val()});
                             aoData.push({name: 'dev_user_id_query', value: $("#dev_user_id_query").val()});
+                            aoData.push({name: 'replenish_user_id_query', value: $("#replenish_user_id_query").val()});
 
                             $.ajax(
                                     {
