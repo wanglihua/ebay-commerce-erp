@@ -15,6 +15,9 @@ import (
 	"matrix/modules/erp/models/xxgl_models"
 )
 
+// todo: 不采用多表联接的方式，采用单表的方式来做，这个需要改造
+// shop_id 设置的时候同时设置名称
+// stauts_id 设置的时候设置状态名称
 type Message_view_item_t struct {
 	Message           xxgl_models.MessageInfo           `xorm:"extends" json:"msg"`
 	ShopAccount       xtpz_models.ShopAccountInfo       `xorm:"extends" json:"sa"`
