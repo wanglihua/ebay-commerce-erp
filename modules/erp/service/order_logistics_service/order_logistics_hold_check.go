@@ -628,9 +628,11 @@ func check_stock_has_order_products_and_get_cost_amount(p_ol *OrderLogisticsServ
 					p_order.StatusId == models.ORDER_STATUS_PHZ ||
 					(p_order.StatusId == models.ORDER_STATUS_HOLD &&
 						(p_order.HoldTypeId.Int64 == ddpz_models.ORDER_HOLD_TYPE_PICK_UP ||
+							p_order.HoldTypeId.Int64 == ddpz_models.ORDER_HOLD_TYPE_OOS_AU_STOCK_ZT_HAS ||
 							p_order.HoldTypeId.Int64 == ddpz_models.ORDER_HOLD_TYPE_ENVELOPE ||
 							p_order.HoldTypeId.Int64 == ddpz_models.ORDER_HOLD_TYPE_EXPRESS ||
 							p_order.HoldTypeId.Int64 == ddpz_models.ORDER_HOLD_TYPE_INTERNATIONAL)) {
+								//todo: 这里面订单HOLD类型的列表还有疑问的， 这次加了个 ORDER_HOLD_TYPE_OOS_AU_STOCK_ZT_HAS， 是不是还要加别的
 					pending_in_db_to_clear = order_product_info.Qty
 				}
 
