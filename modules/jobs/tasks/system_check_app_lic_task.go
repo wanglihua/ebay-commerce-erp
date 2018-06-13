@@ -51,6 +51,8 @@ func get_current_time() time.Time {
 		"https://www.toutiao.com",
 		"https://www.ebay.com",
 		"https://www.paypal.com",
+		"https://api.ebay.com",
+		"https://api.paypal.com",
 	}
 
 	for _, time_site := range time_site_list {
