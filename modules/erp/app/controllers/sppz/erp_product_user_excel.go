@@ -194,7 +194,7 @@ func (c ErpProductUserExcel) Import() revel.Result {
 			core.HandleError(err)
 
 			if has == false {
-				panic(fmt.Sprintf("指定的开发人员工号数据库中不存在！"))
+				panic(fmt.Sprintf("指定的补货人员工号数据库中不存在！"))
 			} else {
 				product_user_list[index].replenish_user_id = replenish_user.Id
 			}
