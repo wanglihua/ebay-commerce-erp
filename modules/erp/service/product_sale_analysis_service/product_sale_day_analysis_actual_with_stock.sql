@@ -27,7 +27,12 @@ CREATE PROCEDURE product_sale_day_analysis_actual_with_stock()
 
         -- 游标
         DECLARE cur CURSOR FOR
-            SELECT DATE(o.shipped_time) AS shipped_day, oi.item_product_id AS product_id, p.sku AS sku, sum(oi.quantity) AS qty, ol.stock_id AS stock_id
+            SELECT
+                DATE(o.shipped_time) AS shipped_day,
+                oi.item_product_id   AS product_id,
+                p.sku                AS sku,
+                sum(oi.quantity)     AS qty,
+                ol.stock_id          AS stock_id
             FROM erp_order_item oi
                 INNER JOIN erp_order o ON o.id = oi.order_id
                 INNER JOIN erp_order_logistics ol ON ol.order_id = o.id
@@ -63,6 +68,8 @@ CREATE PROCEDURE product_sale_day_analysis_actual_with_stock()
 
         -- 开始循环
         read_loop: LOOP
+            SET done = FALSE;
+
             -- 提取游标里的数据
             FETCH cur
             INTO v_shipped_day, v_product_id, v_sku, v_qty, v_stock_id;
@@ -88,8 +95,6 @@ CREATE PROCEDURE product_sale_day_analysis_actual_with_stock()
                 SET sku = v_sku, qty = v_qty, update_time = now()
                 WHERE day = v_shipped_day AND product_id = v_product_id AND stock_id = v_stock_id AND type = da_type;
             END IF;
-
-            SET done = FALSE;
         END LOOP;
         -- 关闭游标
         CLOSE cur;

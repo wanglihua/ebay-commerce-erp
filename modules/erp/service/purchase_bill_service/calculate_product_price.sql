@@ -47,6 +47,8 @@ CREATE PROCEDURE calculate_product_price()
         -- 开始循环
         read_loop: LOOP
 
+            SET done = FALSE;
+            
             -- 提取游标里的数据
             FETCH cur
             INTO v_product_id;
@@ -77,8 +79,6 @@ CREATE PROCEDURE calculate_product_price()
                       ORDER BY pbe.update_time DESC
                       LIMIT 6) pbe_six)
             WHERE product_id = v_product_id AND stock_id = v_cn_stock_id;
-
-            SET done = FALSE;
         END LOOP;
 
         -- 关闭游标
