@@ -365,7 +365,7 @@ func (c ErpPurchaseFinance) Purchase() revel.Result {
 
 	purchase_bill_service.SetEntriesStatus(purchase_bill_id_list, models.PURCHASE_BILL_STATUS_YSP, models.PURCHASE_BILL_STATUS_CGZ, db_session)
 
-	purchase_bill_service.Calculate_stock_cn_zt_qty()
+	go purchase_bill_service.Calculate_stock_cn_zt_qty()
 
 	return c.RenderJson(map[string]interface{}{
 		"success": true,
@@ -584,7 +584,7 @@ func (c ErpPurchaseFinance) PurchaseEntry() revel.Result {
 
 	purchase_bill_service.UpdateBillStatus(purchase_bill_entry.BillId, models.PURCHASE_BILL_STATUS_CGZ, db_session)
 
-	purchase_bill_service.Calculate_stock_cn_zt_qty()
+	go purchase_bill_service.Calculate_stock_cn_zt_qty()
 
 	return c.RenderJson(map[string]interface{}{
 		"success": true,
