@@ -403,6 +403,8 @@ func (c ErpPurchaseCheckin) Checkin() revel.Result {
 		inventory_service.AddCnInventoryQty(bill_entry_from_ui.ProductId, checkin_qty, db_session, c.Session)
 	}
 
+	purchase_bill_service.Calculate_stock_cn_zt_qty()
+
 	return c.RenderJson(map[string]interface{}{
 		"success": true,
 		"message": "采购明细入库成功！",
@@ -451,6 +453,8 @@ func (c ErpPurchaseCheckin) CheckinList() revel.Result {
 		// 更新中国仓的库存数量
 		inventory_service.AddCnInventoryQty(bill_entry.ProductId, bill_entry.CheckinQty, db_session, c.Session)
 	}
+
+	purchase_bill_service.Calculate_stock_cn_zt_qty()
 
 	return c.RenderJson(map[string]interface{}{
 		"success": true,
