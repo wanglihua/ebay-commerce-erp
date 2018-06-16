@@ -9,6 +9,9 @@ const (
 	// STOCK_TYPE_SAMPLE 样品间
 	STOCK_TYPE_SAMPLE int64 = 50
 
+	// STOCK_TYPE_CN_ZT 中国仓在途
+	STOCK_TYPE_CN_ZT int64 = 80
+
 	// STOCK_TYPE_CN 国内仓库
 	STOCK_TYPE_CN int64 = 100
 
@@ -36,6 +39,18 @@ func (e StockTypeInfo) ModelDesc() string {
 }
 
 func (e StockTypeInfo) InitData(db_session *xorm.Session) {
+	var stock_type_sample StockTypeInfo
+	stock_type_sample.Id = STOCK_TYPE_SAMPLE
+	stock_type_sample.Name = "样品间"
+	stock_type_sample.Desc = "样品间"
+	db_session.Insert(&stock_type_sample)
+
+	var stock_type_cn_zt StockTypeInfo
+	stock_type_cn_zt.Id = STOCK_TYPE_CN_ZT
+	stock_type_cn_zt.Name = "国内在途"
+	stock_type_cn_zt.Desc = "国内在途"
+	db_session.Insert(&stock_type_cn_zt)
+
 	var stock_type_cn StockTypeInfo
 	stock_type_cn.Id = STOCK_TYPE_CN
 	stock_type_cn.Name = "国内仓库"
@@ -53,12 +68,6 @@ func (e StockTypeInfo) InitData(db_session *xorm.Session) {
 	stock_type_au.Name = "澳洲仓库"
 	stock_type_au.Desc = "澳洲仓库"
 	db_session.Insert(&stock_type_au)
-
-	var stock_type_sample StockTypeInfo
-	stock_type_sample.Id = STOCK_TYPE_SAMPLE
-	stock_type_sample.Name = "样品间"
-	stock_type_sample.Desc = "样品间"
-	db_session.Insert(&stock_type_sample)
 }
 
 func GetStockTypeList(db_session *xorm.Session) []StockTypeInfo {
