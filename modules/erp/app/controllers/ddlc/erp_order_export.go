@@ -23,61 +23,17 @@ type ErpOrderExport struct {
 }
 
 func (c ErpOrderExport) Export() revel.Result {
-	var status string
-	c.Params.Bind(&status, "status")
-
-	var batch_code int64
-	c.Params.Bind(&batch_code, "batch_code")
-
-	var hold_type_id int64
-	c.Params.Bind(&hold_type_id, "hold_type_id")
 
 	var id_list = make([]int64, 0)
 	c.Params.Bind(&id_list, "id_list")
 
 	var db_session = c.DbSession
 
-	status = strings.ToLower(status) //大小写
-	var status_id int64 = 0
-	if status == "all" {
-		status_id = 0
-	} else if status == "dph" {
-		status_id = models.ORDER_STATUS_DPH
-	} else if status == "phz" {
-		status_id = models.ORDER_STATUS_PHZ
-	} else if status == "hold" {
-		status_id = models.ORDER_STATUS_HOLD
-	} else if status == "ycj" {
-		status_id = models.ORDER_STATUS_YCJ
-	} else if status == "yzf" {
-		status_id = models.ORDER_STATUS_YZF
-	} else if status == "dph" {
-		status_id = models.ORDER_STATUS_DPH
-	} else if status == "phz" {
-		status_id = models.ORDER_STATUS_PHZ
-	} else if status == "yfh" {
-		status_id = models.ORDER_STATUS_YFH
-	} else if status == "ywc" {
-		status_id = models.ORDER_STATUS_YWC
-	} else if status == "yqx" {
-		status_id = models.ORDER_STATUS_YQX
-	}
-
 	var filter = "1=1"
 
-	if len(id_list) == 0 {
-		if status_id != 0 {
-			filter = fmt.Sprintf("o.status_id = %d", status_id)
-		}
+	filter, status_id := Get_order_filter(db_session, c.Session, c.Params, filter)
 
-		if batch_code != 0 {
-			filter = core.SqlAnd(filter, fmt.Sprintf("o.batch_code = %d", batch_code))
-		}
-
-		if hold_type_id != 0 {
-			filter = core.SqlAnd(filter, fmt.Sprintf("o.hold_type_id = %d", hold_type_id))
-		}
-	} else {
+	if len(id_list) != 0 {
 		var id_str_list = core.Int_list_to_str_list(id_list)
 		filter = core.SqlAnd(filter, fmt.Sprintf("o.id IN (%s)", strings.Join(id_str_list, ",")))
 	}
@@ -91,7 +47,7 @@ func (c ErpOrderExport) Export() revel.Result {
 
 	reader := bytes.NewReader(buffer.Bytes()) //bytes.Reader 实现了 io.Reader 接口
 
-	file_name := "订单订单" + ".xlsx" //"file.xlsx" //可以根据参数生成文件名
+	file_name := "订单导出" + ".xlsx" //"file.xlsx" //可以根据参数生成文件名
 
 	return c.RenderBinary(reader, file_name, revel.Attachment, time.Now())
 }
