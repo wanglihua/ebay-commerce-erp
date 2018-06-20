@@ -19,6 +19,7 @@ import (
 	"runtime/debug"
 	xorm_core "github.com/go-xorm/core"
 	"matrix/modules/erp/service/excel_service"
+	"matrix/modules/erp/models/kcgl_models"
 )
 
 type ErpOrderLogisticsDiff struct {
@@ -199,6 +200,7 @@ WHERE o.id NOT IN (
 type logistics_diff_export_item_t struct {
 	OrderLogisticsLogic  ddlc_models.OrderLogisticsLogicInfo  `xorm:"extends" json:"oll"`
 	Order                ddlc_models.OrderInfo                `xorm:"extends" json:"o"`
+	OrderItem            ddlc_models.OrderItemInfo            `xorm:"extends" json:"oi"`
 	OrderShippingAddress ddlc_models.OrderShippingAddressInfo `xorm:"extends" json:"osa"`
 	Stock                sppz_models.StockInfo                `xorm:"extends" json:"s"`
 	LogisticsMode        ddpz_models.LogisticsModeInfo        `xorm:"extends" json:"lm"`
@@ -291,20 +293,22 @@ func (c ErpOrderLogisticsDiff) export_product_list_to_excel() *xlsx.File {
 		}
 
 		/*
-	SELECT oll.*, o.*, osa.*, s.*, lm.*, s_sec.*, lm_sec.*
-	FROM erp_order_logistics_logic oll
-		INNER JOIN erp_order o ON o.id = oll.order_id
-		LEFT JOIN erp_order_shipping_address osa ON osa.id = oll.address_id
-		LEFT JOIN erp_stock s ON s.id = oll.stock_id
-		LEFT JOIN erp_logistics_mode lm ON lm.id = oll.mode_id
-		LEFT JOIN erp_stock s_sec ON s_sec.id = oll.stock_id_second
-		LEFT JOIN erp_logistics_mode lm_sec ON lm_sec.id = oll.mode_id_second
+SELECT oll.*, o.*, oi.*, osa.*, s.*, lm.*, s_sec.*, lm_sec.*
+FROM erp_order_logistics_logic oll
+    INNER JOIN erp_order o ON o.id = oll.order_id
+    INNER JOIN erp_order_item oi ON oi.order_id = o.id
+    LEFT JOIN erp_order_shipping_address osa ON osa.id = oll.address_id
+    LEFT JOIN erp_stock s ON s.id = oll.stock_id
+    LEFT JOIN erp_logistics_mode lm ON lm.id = oll.mode_id
+    LEFT JOIN erp_stock s_sec ON s_sec.id = oll.stock_id_second
+    LEFT JOIN erp_logistics_mode lm_sec ON lm_sec.id = oll.mode_id_second;
 		 */
 
 		var sb = core.NewSqlBuilder()
-		sb.Select("oll.*, o.*, osa.*, s.*, lm.*, s_sec.*, lm_sec.*")
+		sb.Select("oll.*, o.*, oi.*, osa.*, s.*, lm.*, s_sec.*, lm_sec.*")
 		sb.From(`erp_order_logistics_logic oll
     INNER JOIN erp_order o ON o.id = oll.order_id
+    INNER JOIN erp_order_item oi ON oi.order_id = o.id
     LEFT JOIN erp_order_shipping_address osa ON osa.id = oll.address_id
     LEFT JOIN erp_stock s ON s.id = oll.stock_id
     LEFT JOIN erp_logistics_mode lm ON lm.id = oll.mode_id
@@ -357,7 +361,7 @@ func (c ErpOrderLogisticsDiff) export_product_list_to_excel() *xlsx.File {
 			col_index++
 
 			cell = row.AddCell()
-			sheet.SetColWidth(col_index, col_index, 10)
+			sheet.SetColWidth(col_index, col_index, 15)
 			set_head_cell_style(cell)
 			cell.Value = "最佳仓"
 			col_index++
@@ -375,7 +379,7 @@ func (c ErpOrderLogisticsDiff) export_product_list_to_excel() *xlsx.File {
 			col_index++
 
 			cell = row.AddCell()
-			sheet.SetColWidth(col_index, col_index, 10)
+			sheet.SetColWidth(col_index, col_index, 15)
 			set_head_cell_style(cell)
 			cell.Value = "次佳仓"
 			col_index++
@@ -408,6 +412,24 @@ func (c ErpOrderLogisticsDiff) export_product_list_to_excel() *xlsx.File {
 			sheet.SetColWidth(col_index, col_index, 15)
 			set_head_cell_style(cell)
 			cell.Value = "发货时间"
+			col_index++
+
+			cell = row.AddCell()
+			sheet.SetColWidth(col_index, col_index, 18)
+			set_head_cell_style(cell)
+			cell.Value = "SKU"
+			col_index++
+
+			cell = row.AddCell()
+			sheet.SetColWidth(col_index, col_index, 10)
+			set_head_cell_style(cell)
+			cell.Value = "数量"
+			col_index++
+
+			cell = row.AddCell()
+			sheet.SetColWidth(col_index, col_index, 60)
+			set_head_cell_style(cell)
+			cell.Value = "品名"
 			col_index++
 		}
 
@@ -474,6 +496,22 @@ func (c ErpOrderLogisticsDiff) export_product_list_to_excel() *xlsx.File {
 			} else {
 				cell.Value = ""
 			}
+
+			var product kcgl_models.ProductInfo
+			_, err = db_session.Id(logistics_diff.OrderItem.ItemProductId).Get(&product)
+			core.HandleError(err)
+
+			cell = row.AddCell()
+			set_text_cell_style(cell, "left")
+			cell.Value = product.Sku
+
+			cell = row.AddCell()
+			set_text_cell_style(cell, "center")
+			cell.Value = fmt.Sprint(logistics_diff.OrderItem.Quantity)
+
+			cell = row.AddCell()
+			set_text_cell_style(cell, "left")
+			cell.Value = product.CnName
 		}
 	}
 
