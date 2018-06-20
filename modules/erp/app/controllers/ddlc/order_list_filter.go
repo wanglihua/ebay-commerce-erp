@@ -121,7 +121,7 @@ func get_time_query_list() []time_query {
 	return time_query_list
 }
 
-func Get_order_filter(db_session *xorm.Session, web_session revel.Session, params *revel.Params, filter string) string {
+func Get_order_filter(db_session *xorm.Session, web_session revel.Session, params *revel.Params, filter string) (filter_ret string, status_id_ret int64) {
 
 	var shop_id int64
 	params.Bind(&shop_id, "shop_id")
@@ -535,7 +535,7 @@ o.id IN (
 		filter = core.SqlAnd(filter, fmt.Sprintf("o.tag_id = %d", order_tag_id))
 	}
 
-	return filter
+	return filter, status_id
 }
 
 func can_view_special_hold(web_session revel.Session, db_session *xorm.Session) bool {

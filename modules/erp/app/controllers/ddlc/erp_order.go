@@ -234,7 +234,7 @@ func (c ErpOrder) ListData() revel.Result {
 		order = strings.Replace(order, "`stock_name`", "o.stock_id", -1) // replace `stock_name`，不能是 stock_name
 	}
 
-	filter = Get_order_filter(db_session, c.Session, c.Params, filter)
+	filter, _ = Get_order_filter(db_session, c.Session, c.Params, filter)
 
 	order_list, count := order_service.Get_order_data_list(db_session, filter, order, offset, limit)
 
