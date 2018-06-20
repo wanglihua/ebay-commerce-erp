@@ -131,7 +131,7 @@ func (p_ol *OrderLogisticsService) match_logistics_mode_with_option(p_order *ddl
 		mode_result.stock_id = logistics_mode.StockId
 		mode_result.has_stock = true
 
-		mode_result.stock.Priority = 100 // 默认给个很低的优先级，这样万一在列表里面没找到 stock 也不会出错
+		mode_result.stock.Priority = -100 // 默认给个很低的优先级，这样万一在列表里面没找到 stock 也不会出错
 
 		for _, stock := range au_stock_list {
 			if stock.Id == logistics_mode.StockId {
