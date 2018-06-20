@@ -91,7 +91,7 @@ func (c ErpOrderExport) Export() revel.Result {
 
 	reader := bytes.NewReader(buffer.Bytes()) //bytes.Reader 实现了 io.Reader 接口
 
-	file_name := "订单编码订单代码" + ".xlsx" //"file.xlsx" //可以根据参数生成文件名
+	file_name := "订单订单" + ".xlsx" //"file.xlsx" //可以根据参数生成文件名
 
 	return c.RenderBinary(reader, file_name, revel.Attachment, time.Now())
 }
