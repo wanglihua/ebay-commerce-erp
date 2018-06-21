@@ -138,8 +138,7 @@ func (p_ol *OrderLogisticsService) match_logistics_mode_logic(order ddlc_models.
 
 	final_result.order_id = order.Id
 	final_result.order_code = order.Code
-
-	var lowest_total_fee = math.MaxFloat64 // 初始化为一个很大的不可能的值，澳币，
+	final_result.total_fee =  math.MaxFloat64 // 初始化为一个很大的不可能的值，澳币
 
 	// 匹配的结果中，有库存记录的那些记录列表
 	for _, logistics_mode := range logistics_mode_list {
@@ -442,25 +441,26 @@ func (p_ol *OrderLogisticsService) match_logistics_mode_logic(order ddlc_models.
 			}
 		}
 
-		var total_fee_diff = lowest_total_fee - mode_result.total_fee // 就是当前模式比之前的省了多少钱
+		// var total_fee_diff = lowest_total_fee - mode_result.total_fee // 就是当前模式比之前的省了多少钱
 
-		// 三个区间 final_total_amount-mode_result.total_amount，后来改用 fee了，不考虑 库存的cost_price，因为没有库存的也参与筛选
-		// 负无穷大 到 -p_ol.logistics_setting.FeeMaxDiff， -p_ol.logistics_setting.FeeMaxDiff到+p_ol.logistics_setting.FeeMaxDiff, +p_ol.logistics_setting.FeeMaxDiff 到 正无穷大
-		if total_fee_diff > p_ol.logistics_setting.FeeMaxDiff { // 取得更优的模式方案，挑选最优解时，把商品的到仓成本也考虑进去   +p_ol.logistics_setting.FeeMaxDiff 到 正无穷大
+		/*
+		这里不考虑仓库优先级 20180621
+		if total_fee_diff > p_ol.logistics_setting.FeeMaxDiff {
 			final_result = mode_result
-		} else if math.Abs(total_fee_diff) <= p_ol.logistics_setting.FeeMaxDiff { // 运费偏差在最大允许范围内，其实还是算上了澳仓成本的  -p_ol.logistics_setting.FeeMaxDiff到+p_ol.logistics_setting.FeeMaxDiff,
+		} else if math.Abs(total_fee_diff) <= p_ol.logistics_setting.FeeMaxDiff {
 			//取优先级高的仓库
 
 			if mode_result.stock.Priority > final_result.stock.Priority { // 当前的仓库的优先级要高
 				final_result = mode_result
 			}
 		}
+		*/
+
+		if final_result.total_fee > mode_result.total_fee { // 当前的方案费用更低
+			final_result = mode_result
+		}
 
 		match_result_list = append(match_result_list, mode_result) // 所有匹配结果都放入列表
-
-		if mode_result.total_fee < lowest_total_fee {
-			lowest_total_fee = mode_result.total_fee
-		}
 
 	} // for _, logistics_mode := range logistics_mode_list {
 
