@@ -1639,6 +1639,7 @@ func (c ErpOrder) ReShip() revel.Result {
 	new_order.Jyfy = 0
 	new_order.ProfitAu = 0
 	new_order.ProfitRmb = 0
+	new_order.TagId = 0
 
 	new_order.AddressId = 0 // 先把地址置空，等会儿再填入新的地址id
 
@@ -1702,6 +1703,7 @@ func (c ErpOrder) ReShip() revel.Result {
 	for _, order_logistics := range order_logistics_list {
 		order_logistics.Id = 0                 // 置空 id 让数据库重新生成id
 		order_logistics.OrderId = new_order_id //设置为新的订单的订单 id
+		order_logistics.ActualFee = 0
 
 		_, err = db_session.Insert(&order_logistics)
 		core.HandleError(err)
