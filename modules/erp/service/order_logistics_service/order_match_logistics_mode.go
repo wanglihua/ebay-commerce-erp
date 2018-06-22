@@ -56,12 +56,6 @@ func (p_ol *OrderLogisticsService) match_logistics_mode_with_option(p_order *ddl
 	var logistics_fee_rate_map = p_ol.logistics_fee_rate_map
 	var logistics_fee_rate2_map = p_ol.logistics_fee_rate2_map
 
-	var final_result match_logistics_mode_result
-	final_result.order_id = p_order.Id
-	final_result.order_code = p_order.Code
-
-	var lowest_total_fee = math.MaxFloat64 // 初始化为一个很大的不可能的值，澳币，
-
 	// 清除订单匹配的调试信息
 	if p_ol.logistics_setting.Qyppts > 0 {
 		var delete_sql = `DELETE FROM erp_order_logistics_match_debug WHERE order_id = %d;`
@@ -70,6 +64,10 @@ func (p_ol *OrderLogisticsService) match_logistics_mode_with_option(p_order *ddl
 		core.HandleError(err)
 	}
 
+	var lowest_total_fee_result match_logistics_mode_result
+	lowest_total_fee_result.total_fee = math.MaxFloat64 // 初始化为一个很大的不可能的值，澳币，
+
+	var match_result_list = make([]match_logistics_mode_result, 0)
 	// 匹配的结果中，有库存记录的那些记录列表
 	var match_result_has_stock_list = make([]match_logistics_mode_result, 0)
 	var is_envelope_hold = false
@@ -829,68 +827,15 @@ func (p_ol *OrderLogisticsService) match_logistics_mode_with_option(p_order *ddl
 			}
 		}
 
-		var total_fee_diff = lowest_total_fee - mode_result.total_fee // 就是当前模式比之前的省了多少钱
+		// 仓库有货无货的都记录， 走到这一步的，都是可以送到货的
+		match_result_list = append(match_result_list, mode_result)
 
-		if p_ol.is_now_fav_stock_time() {
-			if mode_result.has_stock == true {
-				// 三个区间 final_total_amount-mode_result.total_amount，后来改用 fee了，不考虑 库存的cost_price，因为没有库存的也参与筛选
-				// 负无穷大 到 -p_ol.logistics_setting.FeeMaxDiff， -p_ol.logistics_setting.FeeMaxDiff到+p_ol.logistics_setting.FeeMaxDiff, +p_ol.logistics_setting.FeeMaxDiff 到 正无穷大
-				if total_fee_diff > p_ol.logistics_setting.FeeMaxDiff { // 取得更优的模式方案，挑选最优解时，把商品的到仓成本也考虑进去   +p_ol.logistics_setting.FeeMaxDiff 到 正无穷大
-					mt.Println("之前没有匹配的物流方式，或当前物流方式比之前匹配的物流方式节省费用超过最大允许偏差，暂时选用当前物流方式计算结果")
-					final_result = mode_result
-				} else if math.Abs(total_fee_diff) <= p_ol.logistics_setting.FeeMaxDiff { // 运费偏差在最大允许范围内，其实还是算上了澳仓成本的  -p_ol.logistics_setting.FeeMaxDiff到+p_ol.logistics_setting.FeeMaxDiff,
-					//取优先级高的仓库
-
-					if mode_result.stock.Priority > final_result.stock.Priority { // 当前的仓库的优先级要高
-						mt.Println("当前匹配的物流方式费用和之前最优解在允许偏差范围内，且当前仓库是优先级更高，选用当前物流方式计算结果, 记录次佳仓备选")
-						final_result = mode_result
-					} else { //
-						mt.Println("当前匹配的物流方式费用和之前最优解在允许偏差范围内，但当前仓库是优先级并不更高，弃用当前物流方式计算结果，记录次佳仓备选。")
-					}
-				} else { // 在运费偏差范围之外， 负无穷大 到 -p_ol.logistics_setting.FeeMaxDiff
-					mt.Println("之前匹配的物流，比当前物流方式更优, 且超过了允许偏差范围，弃用当前物流方式计算结果，记录次佳仓备选")
-				}
-
-				match_result_has_stock_list = append(match_result_has_stock_list, mode_result)
-			} else {
-				//没有库存
-				if total_fee_diff > p_ol.logistics_setting.FeeMaxDiff {
-					mt.Println("之前没有匹配的物流方式，或当前物流方式比之前匹配的物流方式节省费用超过最大允许偏差，暂时选用当前物流方式计算结果，仓库无货，不记录次佳仓备选。")
-					final_result = mode_result
-				} else if math.Abs(total_fee_diff) <= p_ol.logistics_setting.FeeMaxDiff {
-					//取优先级高的仓库
-					if mode_result.stock.Priority > final_result.stock.Priority { // 当前的仓库的优先级要高
-						mt.Println("当前匹配的物流方式费用和之前最优解在允许偏差范围内，且当前仓库是优先级更高，选用当前物流方式计算结果，仓库无货，不记录次佳仓备选")
-						final_result = mode_result
-					} else { //
-						mt.Println("当前匹配的物流方式费用和之前最优解在允许偏差范围内，但当前仓库是优先级并不更高，弃用当前物流方式计算结果，仓库无货，不记录次佳仓备选。")
-					}
-				} else { // 在运费偏差范围之外， 负无穷大 到 -p_ol.logistics_setting.FeeMaxDiff
-					mt.Println("之前匹配的物流，比当前物流方式更优, 且超过了允许偏差范围，弃用当前物流方式计算结果，仓库无货。")
-				}
-			}
-		} else {
-			if mode_result.has_stock == true {
-				if total_fee_diff > 0 {
-					mt.Println("之前没有匹配的物流方式，或当前物流方式比之前匹配的物流方式节省费用，暂时选用当前物流方式计算结果")
-					final_result = mode_result
-				} else {
-					mt.Println("之前匹配的物流，比当前物流方式更优,弃用当前物流方式计算结果，记录次佳仓备选")
-				}
-
-				match_result_has_stock_list = append(match_result_has_stock_list, mode_result)
-			} else {
-				if total_fee_diff > 0 {
-					mt.Println("之前没有匹配的物流方式，或当前物流方式比之前匹配的物流方式节省费用，暂时选用当前物流方式计算结果，仓库无货，不记录次佳仓备选。")
-					final_result = mode_result
-				} else {
-					mt.Println("之前匹配的物流，比当前物流方式更优, 弃用当前物流方式计算结果，仓库无货。")
-				}
-			}
+		if mode_result.has_stock == true { // 只记录仓库有货的
+			match_result_has_stock_list = append(match_result_has_stock_list, mode_result) // 所有 可以送到货 匹配结果都放入列表， 走到这一步的，都是可以送到货的
 		}
 
-		if mode_result.total_fee < lowest_total_fee {
-			lowest_total_fee = mode_result.total_fee
+		if mode_result.total_fee < lowest_total_fee_result.total_fee {
+			lowest_total_fee_result = mode_result
 		}
 
 		mt.Println("匹配单个物流方式结束")
@@ -902,9 +847,27 @@ func (p_ol *OrderLogisticsService) match_logistics_mode_with_option(p_order *ddl
 				log_logistics_match_debug(mode_result, "无对应库存", mt.String(), db_session)
 			}
 		}
-	}                                                                 // for _, logistics_mode := range logistics_mode_list {
+	}                                                                 // for _, logistics_mode := range logistics_mode_list
 
-	// 找最佳仓
+	// 找最佳仓，不一定是有货的
+	var match_result_slice = match_logistics_mode_result_slice(match_result_list)
+	sort.Sort(match_result_slice)
+
+	var final_result match_logistics_mode_result
+	final_result = lowest_total_fee_result // 先设置为最小费用的结果
+	if p_ol.is_now_fav_stock_time() { // 如果现在是考虑仓库优先级的时间段
+		for _, match_result := range match_result_slice {
+			var total_fee_diff = match_result.total_fee - lowest_total_fee_result.total_fee // 就是当前模式比 最省钱的模式 的多花了多少钱，一般是正数，下面的abs()其实是多余的
+
+			if math.Abs(total_fee_diff) <= p_ol.logistics_setting.FeeMaxDiff &&
+				match_result.stock.Id != lowest_total_fee_result.stock.Id &&
+				match_result.stock.Priority > lowest_total_fee_result.stock.Priority {
+				// 在偏差范围内， 当前的仓库的优先级要高，这是肯定是不同的仓库
+				final_result = match_result
+				break; // 排过序的，这是的应该算是“最佳”仓的
+			}
+		}
+	}
 
 	var order_logistics ddlc_models.OrderLogisticsInfo
 

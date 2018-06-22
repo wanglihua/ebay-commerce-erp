@@ -455,7 +455,7 @@ func (p_ol *OrderLogisticsService) match_logistics_mode_logic(order ddlc_models.
 	// 找最佳仓结果
 	final_result = lowest_total_fee_result // 先设置为最小费用的结果
 	for _, match_result := range match_result_slice {
-		var total_fee_diff = match_result.total_fee - lowest_total_fee_result.total_fee // 就是当前模式比 最省钱的模式 的多花了多少钱
+		var total_fee_diff = match_result.total_fee - lowest_total_fee_result.total_fee // 就是当前模式比 最省钱的模式 的多花了多少钱，一般是正数，下面的abs()其实是多余的
 
 		if math.Abs(total_fee_diff) <= p_ol.logistics_setting.FeeMaxDiff &&
 			match_result.stock.Id != lowest_total_fee_result.stock.Id &&
