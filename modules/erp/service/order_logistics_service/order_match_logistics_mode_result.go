@@ -36,3 +36,72 @@ type match_logistics_mode_result struct {
 }
 
 //排序相关的函数实现
+
+func (r match_logistics_mode_result) can_deliver() bool {
+	if r.fee_rate_id == 0 && r.fee_rate2_id == 0 {
+		return false
+	} else {
+		return true
+	}
+}
+
+type match_logistics_mode_result_slice []match_logistics_mode_result
+
+func (s match_logistics_mode_result_slice) Len() int {
+	return len(s)
+}
+
+func (s match_logistics_mode_result_slice) Swap(i, j int) {
+	s[i], s[j] = s[j], s[i]
+}
+
+// 费用少的排在最前面
+func (s match_logistics_mode_result_slice) Less(i, j int) bool {
+	return s[i].total_fee < s[j].total_fee
+}
+
+/*
+
+package main
+
+import (
+    "fmt"
+    "sort"
+)
+
+type Person struct {
+    Name string
+    Age  int
+}
+
+// 按照 Person.Age 从大到小排序
+type PersonSlice [] Person
+
+func (a PersonSlice) Len() int {         // 重写 Len() 方法
+    return len(a)
+}
+func (a PersonSlice) Swap(i, j int){     // 重写 Swap() 方法
+    a[i], a[j] = a[j], a[i]
+}
+func (a PersonSlice) Less(i, j int) bool {    // 重写 Less() 方法， 从大到小排序
+    return a[j].Age < a[i].Age
+}
+
+func main() {
+    people := [] Person{
+        {"zhang san", 12},
+        {"li si", 30},
+        {"wang wu", 52},
+        {"zhao liu", 26},
+    }
+
+    fmt.Println(people)
+
+    sort.Sort(PersonSlice(people))    // 按照 Age 的逆序排序
+    fmt.Println(people)
+
+    sort.Sort(sort.Reverse(PersonSlice(people)))    // 按照 Age 的升序排序
+    fmt.Println(people)
+
+}
+ */

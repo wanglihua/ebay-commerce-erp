@@ -904,6 +904,8 @@ func (p_ol *OrderLogisticsService) match_logistics_mode_with_option(p_order *ddl
 		}
 	}                                                                 // for _, logistics_mode := range logistics_mode_list {
 
+	// 找最佳仓
+
 	var order_logistics ddlc_models.OrderLogisticsInfo
 
 	// 这个要放在 匹配失败的判断的前面，否则信封也会返回匹配失败
