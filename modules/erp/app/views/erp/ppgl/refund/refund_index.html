@@ -220,7 +220,7 @@
                     '#refundList',
                     {
                         "sAjaxSource": '{%url "ErpRefund.ListData"%}',
-                        "aaSorting": [[5, "desc"]],
+                        "aaSorting": [[10, "desc"]],
                         "aoColumns": [
                             {
                                 "mDataProp": "id",
@@ -247,34 +247,33 @@
                                 }
                             },
                             {
-                                "mDataProp": "product_name", "title": "品名", "bSearchable": true, "sClass": "wrap-word", "width": 180,
+                                "mDataProp": "sales_user_name", "title": "销售员", "bSearchable": true, "width": 80,
                                 "render": function (data, type, row) {
-                                    return "<a target='order_detail' href='/product/detail/" + row.product_id + "'>" + row.product_name + "</a>"
+                                    var sales_list = data.split('(');
+                                    if (sales_list.length === 2) {
+                                        return "<div>" + sales_list[0] + "</div>" + "<div>" + sales_list[1].replace(')', '') + "</div>";
+                                    } else {
+                                        return data;
+                                    }
                                 }
                             },
-                            {"mDataProp": "sales_user_name", "title": "销售员", "bSearchable": true, "width": 80},
                             {
                                 "mDataProp": "order_amount",
-                                "title": "订单金额",
+                                "title": "<div>订单金额</div><div>退款金额</div>",
                                 "bSearchable": false,
+                                "bSortable": false,
                                 "sClass": "dtRight",
                                 "width": 75,
                                 "render": function (data, type, row) {
-                                    return dtFormatFloat(data);
+                                    return "<div>" + dtFormatFloat(row.order_amount) + "</div><div>" + dtFormatFloat(row.refund_amount) + "</div>";
                                 }
                             },
                             {
-                                "mDataProp": "refund_amount",
-                                "title": "退款金额",
-                                "bSearchable": false,
-                                "sClass": "dtRight",
-                                "width": 75,
+                                "mDataProp": "method_name", "title": "<div>退款方式</div><div>退款类型</div>", "bSearchable": false, "bSortable": false, "width": 80,
                                 "render": function (data, type, row) {
-                                    return dtFormatFloat(data);
+                                    return "<div>" + row.method_name + "</div>" + "<div>" + row.type_name + "</div>";
                                 }
                             },
-                            {"mDataProp": "method_name", "title": "退款方式", "bSearchable": true, "width": 80},
-                            {"mDataProp": "type_name", "title": "退款类型", "bSearchable": true, "width": 120},
                             {"mDataProp": "reason", "title": "退款原因", "bSearchable": true, "width": 80},
                             {
                                 "mDataProp": "status_name", "title": "状态", "bSearchable": true, "width": 60,
@@ -286,9 +285,34 @@
                                     return data;
                                 }
                             },
-                            {"mDataProp": "apply_user_name", "title": "申请人", "bSearchable": true, "width": 80},
-                            {"mDataProp": "apply_time", "title": "申请时间", "bSearchable": false, "width": 120},
-                            {"mDataProp": "description", "title": "备注", "bSearchable": true}
+                            {
+                                "mDataProp": "apply_user_name", "title": "申请人", "bSearchable": true, "width": 80,
+                                "render": function (data, type, row) {
+                                    var apply_list = data.split('(');
+                                    if (apply_list.length === 2) {
+                                        return "<div>" + apply_list[0] + "</div>" + "<div>" + apply_list[1].replace(')', '') + "</div>";
+                                    } else {
+                                        return data;
+                                    }
+                                }
+                            },
+                            {
+                                "mDataProp": "apply_time", "title": "申请时间", "bSearchable": false, "width": 90,
+                                "render": function (data, type, row) {
+                                    var times = row.apply_time.split(' ');
+                                    var times_str = "";
+                                    for (var i = 0; i < times.length; i++) {
+                                        times_str += "<div>" + times[i] + "</div>";
+                                    }
+                                    return times_str;
+                                }
+                            },
+                            {
+                                "mDataProp": "description", "title": "品名/备注", "bSearchable": true, "sClass": "wrap-word", "width": 180,
+                                "render": function (data, type, row) {
+                                    return "<div><a target='order_detail' href='/product/detail/" + row.product_id + "'>" + row.product_name + "</a>&nbsp;" + row.description + "</div>"
+                                }
+                            }
                         ],
                         "fnServerData": function (sSource, aoData, fnCallback) {
                             aoData.push({'name': 'account_id_query', 'value': $("#account_id_query").val()});
