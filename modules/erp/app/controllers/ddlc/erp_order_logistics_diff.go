@@ -123,11 +123,11 @@ FROM erp_order_logistics_logic oll
 		filter = core.SqlAnd(filter, fmt.Sprintf("o.shipped_time < '%04d-%02d-%02d'", shipped_time_end_query.Year(), shipped_time_end_query.Month(), shipped_time_end_query.Day()))
 	}
 
-	if order_code_query == "" {
+	if order_code_query != "" {
 		filter = core.SqlAnd(filter, fmt.Sprintf("o.code = '%s'", order_code_query))
 	}
 
-	if sku_query == "" {
+	if sku_query != "" {
 		var sku_query_filter = `
 o.id IN (
     SELECT oi.order_id
