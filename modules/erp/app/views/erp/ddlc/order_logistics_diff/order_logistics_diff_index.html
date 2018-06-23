@@ -46,8 +46,15 @@
                         </select>
 
                         <label for="shipped_time_begin_query" class="control-label no-padding-right">发货时间</label>
-                        <input id="shipped_time_begin_query" name="shipped_time_begin_query" placeholder="发货时间开始" type="text" class="input-sm" style="width: 135px;height: 30px;"/>
-                        <input id="shipped_time_end_query" name="shipped_time_end_query" placeholder="发货时间结束" type="text" class="input-sm" style="width: 135px;height: 30px;"/>
+                        <input id="shipped_time_begin_query" name="shipped_time_begin_query" placeholder="发货时间开始" type="text" class="input-sm" style="width: 120px;height: 30px;"/>
+                        <input id="shipped_time_end_query" name="shipped_time_end_query" placeholder="发货时间结束" type="text" class="input-sm" style="width: 120px;height: 30px;"/>
+
+                        <label for="order_code_query" class="control-label no-padding-right">订单编号</label>
+                        <input id="order_code_query" name="order_code_query" placeholder="订单编号" type="text" class="input-sm" style="width: 120px;height: 30px;"/>
+
+                        <label for="sku_query" class="control-label no-padding-right">SKU</label>
+                        <input id="sku_query" name="sku_query" placeholder="商品编号SKU" type="text" class="input-sm" style="width: 120px;height: 30px;"/>
+
                         <button class="btn btn-mini btn-primary" @click="refreshList()">
                             &nbsp;<i class="ace-icon fa fa-search"></i>查&nbsp;询&nbsp;
                         </button>
@@ -188,6 +195,8 @@
                         aoData.push({'name': 'stock_second_query', 'value': $("#stock_second_query").val()});
                         aoData.push({'name': 'shipped_time_begin_query', 'value': $("#shipped_time_begin_query").val()});
                         aoData.push({'name': 'shipped_time_end_query', 'value': $("#shipped_time_end_query").val()});
+                        aoData.push({'name': 'order_code_query', 'value': $("#order_code_query").val()});
+                        aoData.push({'name': 'sku_query', 'value': $("#sku_query").val()});
 
                         $.ajax({
                             "dataType": 'json',
