@@ -67,6 +67,14 @@ func (c ErpOrderLogisticsDiff) ListData() revel.Result {
 	c.Params.Bind(&shipped_time_end_query_str, "shipped_time_end_query")
 	shipped_time_end_query, shipped_time_end_query_err := core.Parse_time(shipped_time_end_query_str)
 
+	var order_code_query string
+	c.Params.Bind(&order_code_query, "order_code_query")
+	order_code_query = strings.TrimSpace(order_code_query)
+
+	var sku_query string
+	c.Params.Bind(&sku_query, "sku_query")
+	sku_query = strings.TrimSpace(sku_query)
+
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
 	type logistics_diff_view_item_t struct {
@@ -113,6 +121,20 @@ FROM erp_order_logistics_logic oll
 	if shipped_time_end_query_err == nil {
 		shipped_time_end_query = shipped_time_end_query.Add(time.Hour * 24)
 		filter = core.SqlAnd(filter, fmt.Sprintf("o.shipped_time < '%04d-%02d-%02d'", shipped_time_end_query.Year(), shipped_time_end_query.Month(), shipped_time_end_query.Day()))
+	}
+
+	if order_code_query == "" {
+		filter = core.SqlAnd(filter, fmt.Sprintf("o.code = '%s'", order_code_query))
+	}
+
+	if sku_query == "" {
+		var sku_query_filter = `
+o.id IN (
+    SELECT oi.order_id
+    FROM erp_order_item oi
+    WHERE oi.item_sku = '%s'
+)`
+		filter = core.SqlAnd(filter, fmt.Sprintf(sku_query_filter, sku_query))
 	}
 
 	filter = core.SqlAnd(filter, fmt.Sprintf("o.status_id = %d OR o.status_id = %d ", models.ORDER_STATUS_YFH, models.ORDER_STATUS_YWC)) // 只显示已发货和已完成的
