@@ -88,13 +88,13 @@ func init() {
 		jobs.Every(2*time.Hour, tasks.ProductSaleAnalysisTask{})
 
 		// 销售分析
-		jobs.Every(4*time.Hour, tasks.SaleReportTask{})
+		jobs.Every(2*time.Hour, tasks.SaleReportTask{})
 
 		// 智能补货
 		jobs.Every(1*time.Hour, tasks.IntelReplTask{})
 
 		// 计算商品采购价，中国仓成本价
-		jobs.Every(4*time.Hour, tasks.CalculateProductPriceTask{})
+		jobs.Every(2*time.Hour, tasks.CalculateProductPriceTask{})
 
 	})
 }
