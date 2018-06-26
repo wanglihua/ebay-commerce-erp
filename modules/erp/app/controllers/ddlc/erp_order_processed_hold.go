@@ -54,7 +54,7 @@ func (c ErpOrderProcessedHold) PageData() revel.Result {
 	var batch_code_list = order_import_batch_service.Get_order_import_batch_code_list_limit_100(models.ORDER_STATUS_PROCESSED_HOLD, db_session)
 
 	// hold类型列表
-	var exclude_hold = fmt.Sprintf("%d,%d,%d,%d", ddpz_models.ORDER_HOLD_TYPE_ENVELOPE, ddpz_models.ORDER_HOLD_TYPE_EXPRESS, ddpz_models.ORDER_HOLD_TYPE_INTERNATIONAL, ddpz_models.ORDER_HOLD_TYPE_PICK_UP)
+	var exclude_hold = fmt.Sprintf("%d,%d,%d,%d,%d,%d", ddpz_models.ORDER_HOLD_TYPE_ENVELOPE, ddpz_models.ORDER_HOLD_TYPE_EXPRESS, ddpz_models.ORDER_HOLD_TYPE_INTERNATIONAL, ddpz_models.ORDER_HOLD_TYPE_PICK_UP, ddpz_models.ORDER_HOLD_TYPE_MULTI_STOCK_LOW_FEE, ddpz_models.ORDER_HOLD_TYPE_ONO_STOCK_EASY)
 	var hold_type_list = make([]ddpz_models.OrderHoldTypeInfo, 0)
 	err := db_session.Where(fmt.Sprintf("id NOT IN(%s)", exclude_hold)).OrderBy("ord ASC").Find(&hold_type_list)
 	core.HandleError(err)

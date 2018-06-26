@@ -222,7 +222,12 @@
                             {
                                 "mDataProp": "o.code", "title": "订单编号", "bSearchable": true, "sClass": "wrap-word",
                                 "render": function (data, type, row) {
-                                    return "<div class='div_order_code'><a href='/order/detail/" + row.o.id + "' target='_blank'>" + data + "</a></div><div>" + row.status_name + "</div><div>" + row.type_name + "&nbsp;<span style='background-color:" + row.order_tag.bg_color + ";'>" + row.order_tag.name + "</span>" + "</div>";
+                                    var order_desc_icon = "";
+                                    if (row.o.desc !== "") {
+                                        order_desc_icon = "&nbsp;<i class='fa fa-file-text' style='color:burlywood;'></i>";
+                                    }
+
+                                    return "<div class='div_order_code'><a href='/order/detail/" + row.o.id + "' target='_blank'>" + data + "</a>" + order_desc_icon + "</div><div>" + row.status_name + "</div><div>" + row.type_name + "&nbsp;<span style='background-color:" + row.order_tag.bg_color + ";'>" + row.order_tag.name + "</span>" + "</div>";
                                 }
                             },
                             {
