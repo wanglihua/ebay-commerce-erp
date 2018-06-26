@@ -39,7 +39,7 @@
                                         <td class="center" style="vertical-align: middle;">{{order_item.oi.transaction_price_currency}}&nbsp;{{order_item.oi.transaction_price}}</td>
                                         <td class="center" style="vertical-align: middle;">
                                             <div>{{order_item.oi.transaction_price_currency}}&nbsp;{{format_float(order_item.oi.gross_profit)}}</div>
-                                            <div>{{format_float(order_item.oi.gross_profit / order_item.oi.transaction_price * 100)}}%</div>
+                                            <div>{{format_float(order_item.oi.gross_profit / (order_item.oi.transaction_price * order_item.oi.quantity) * 100)}}%</div>
                                         </td>
                                         <td class="center" style="vertical-align: middle;">
                                             <div v-if="order_item.o.paid_time != null">{{order_item.o.paid_time}}</div>
