@@ -294,6 +294,7 @@ func GetSiteHeader(title string, db_session *xorm.Session, web_session revel.Ses
     <!--[if lte IE 9]>
     <link type="text/css" rel="stylesheet" href="/static/ace/css/ace-ie.min.css?%[1]s"/>
     <![endif]-->
+    <link type="text/css" rel="stylesheet" href="/static/lib/poshytip/tip-yellow/tip-yellow.css?%[1]s"/>
     <link type="text/css" rel="stylesheet" href="/static/site.css?%[1]s"/>`, core.GetStaticVersion()))
 
 	if revel.DevMode {
@@ -338,6 +339,7 @@ func GetSiteHeader(title string, db_session *xorm.Session, web_session revel.Ses
         <![endif]-->
         <script type="text/javascript" src="/static/ace/js/all2.js?%[1]s"></script>
         <script type="text/javascript" src="/static/js/js.cookie.js?%[1]s"></script>
+        <script type="text/javascript" src="/static/lib/poshytip/jquery.poshytip.js?%[1]s"></script>
         <script type="text/javascript" src="/static/site.js?%[1]s"></script>`, core.GetStaticVersion()))
 
 	site_header_buffer.WriteString(`

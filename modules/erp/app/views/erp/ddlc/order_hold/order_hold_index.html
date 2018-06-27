@@ -297,10 +297,14 @@
                             {
                                 "mDataProp": "o.code", "title": "订单编号", "bSearchable": true, "sClass": "wrap-word",
                                 "render": function (data, type, row) {
-
                                     var order_desc_icon = "";
-                                    if (row.o.desc !== "") {
-                                        order_desc_icon = "&nbsp;<i class='fa fa-file-text' style='color:burlywood;'></i>";
+                                    var order_desc = row.o.desc;
+                                    if (order_desc != null) {
+                                        order_desc = order_desc.replace("\r", '');
+                                        order_desc = order_desc.replace("\n", '');
+                                        if (order_desc !== "") {
+                                            order_desc_icon = "&nbsp;<i class='fa fa-file-text order_desc_title' title='" + order_desc + "'  style='color:burlywood;'></i>";
+                                        }
                                     }
 
                                     return "<div class='div_order_code'><a href='/order/detail/" + row.o.id + "' target='_blank'>" + data + "</a>" + order_desc_icon + "</div><div>" + row.status_name + "</div><div>" + row.type_name + "&nbsp;<span style='background-color:" + row.order_tag.bg_color + ";'>" + row.order_tag.name + "</span>" + "</div>";
@@ -551,6 +555,10 @@
                                     $("#orderList div.div_country_name").parent().css("width", "105px");
                                     $("#orderList div.div_province").parent().css("display", "none");
                                     $("#orderList div.div_postal_code").parent().css("display", "none");
+
+                                    $(".order_desc_title").poshytip({
+                                        showTimeout: 0
+                                    });
                                 }
                             });
                         }
