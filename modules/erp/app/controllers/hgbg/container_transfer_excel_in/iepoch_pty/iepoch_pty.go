@@ -1,4 +1,4 @@
-package elife_pty
+package iepoch_pty
 
 import (
 	"matrix/modules/erp/models/hgbg_models"
@@ -16,13 +16,13 @@ type Exporter struct {
 }
 
 func (c Exporter) GetExcelFileName(p_transfer *hgbg_models.ContainerTransferInfo) string {
-	return fmt.Sprintf("elife_pty_ltd_进口清关_%s.xlsx", p_transfer.BatchCode)
+	return fmt.Sprintf("iepoch_pty_ltd_进口清关_%s.xlsx", p_transfer.BatchCode)
 }
 
 func (c Exporter) GetExcelFile(p_transfer *hgbg_models.ContainerTransferInfo, db_session *xorm.Session) *excelize.File {
 	var excel_template_hgbg_in_dir = filepath.Join(revel.BasePath, "/static/excel-template/hgbg/in")
 
-	xlsx_file, err := excelize.OpenFile(filepath.Join(excel_template_hgbg_in_dir, "elife_pty.xlsx"))
+	xlsx_file, err := excelize.OpenFile(filepath.Join(excel_template_hgbg_in_dir, "iepoch_pty.xlsx"))
 	core.HandleError(err)
 
 	// --------------------------------------------------------------------------------------------------------

@@ -90,6 +90,7 @@
                                     {% end %}
                                     {% end %}
                                 </li>
+
                                 <li>
                                     {% if eq .import_company_code "elife" %}
                                     <a onclick="export_hgbg_in_excel('elife')" style="cursor: pointer;">elife pty ltd</a>
@@ -101,6 +102,7 @@
                                     {% end %}
                                     {% end %}
                                 </li>
+
                                 <li>
                                     {% if eq .import_company_code "giant" %}
                                     <a onclick="export_hgbg_in_excel('giant')" style="cursor: pointer;">Giant Star</a>
@@ -112,6 +114,19 @@
                                     {% end %}
                                     {% end %}
                                 </li>
+
+                                <li>
+                                    {% if eq .import_company_code "iepoch" %}
+                                    <a onclick="export_hgbg_in_excel('iepoch')" style="cursor: pointer;">iepoch pty ltd</a>
+                                    {% else %}
+                                    {% if eq .import_company_code "" %}
+                                    <a onclick="export_hgbg_in_excel('iepoch')" style="cursor: pointer;">iepoch pty ltd</a>
+                                    {% else %}
+                                    <a style="font-size: 12px;font-weight: normal; cursor: not-allowed;">iepoch pty ltd</a>
+                                    {% end %}
+                                    {% end %}
+                                </li>
+
                             </ul>
                         </div>
                     </div>
@@ -354,12 +369,15 @@
                                                     <option value="ozo">ozo e-store</option>
                                                     <option value="elife">elife pty ltd</option>
                                                     <option value="giant">Giant Star</option>
+                                                    <option value="iepoch">iepoch pty ltd</option>
                                                 </select>
                                                 {% else %}
                                                 <select id="import_company_code" name="detail.transfer.import_company_code" class="input-sm form-control" disabled="disabled" v-model="detail.transfer.import_company_code">
                                                     <option value="ozo">ozo e-store</option>
                                                     <option value="elife">elife pty ltd</option>
                                                     <option value="giant">Giant Star</option>
+                                                    <option value="giant">Giant Star</option>
+                                                    <option value="iepoch">iepoch pty ltd</option>
                                                 </select>
                                                 {% end %}
                                             </div>

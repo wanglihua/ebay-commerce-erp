@@ -6,6 +6,7 @@ import (
 	"matrix/modules/erp/app/controllers/hgbg/container_transfer_excel_in/elife_pty"
 	"matrix/modules/erp/app/controllers/hgbg/container_transfer_excel_in/giant_star"
 	"matrix/modules/erp/app/controllers/hgbg/container_transfer_excel_in/ozo_estore"
+	"matrix/modules/erp/app/controllers/hgbg/container_transfer_excel_in/iepoch_pty"
 	"github.com/Luxurioust/excelize"
 )
 
@@ -25,6 +26,10 @@ func GetExporter(company_code string) ContainerTransferExcelInExporter {
 
 	if company_code == "ozo" {
 		return ozo_estore.Exporter{}
+	}
+
+	if company_code == "iepoch" {
+		return iepoch_pty.Exporter{}
 	}
 
 	panic("进口清关资料的公司编码不正确！")
