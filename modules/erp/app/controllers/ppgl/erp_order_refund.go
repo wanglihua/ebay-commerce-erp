@@ -237,6 +237,13 @@ func (c ErpOrderRefund) Apply() revel.Result {
 	var refund_description string
 	c.Params.Bind(&refund_description, "refund_description")
 
+	if refund_product_id == 0 {
+		return c.RenderJson(core.JsonResult{
+			Success: false,
+			Message: "请选择要退款的商品！",
+		})
+	}
+
 	// 订单是否存在非作废的PayPal退款信息
 	var order_refund_in_db ppgl_models.OrderRefundInfo
 	has, err := db_session.Where("order_id = ? AND status_id <> ? AND method_id = ?", refund_order_id, models.REFUND_STATUS_YZF, ppgl_models.PAYMENT_METHOD_PALPAY).Get(&order_refund_in_db)

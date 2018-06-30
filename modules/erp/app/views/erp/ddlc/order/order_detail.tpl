@@ -432,7 +432,8 @@
                                 <tr>
                                     <th class="dtCenter" style="width: 180px;">Transaction Id</th>
                                     <th class="dtRight" style="width: 80px;">退款金额</th>
-                                    <th class="dtCenter" style="width: 120px;">退款时间</th>
+                                    <th class="dtCenter" style="width: 120px;">申请时间</th>
+                                    <th class="dtCenter" style="width: 60px;">状态</th>
                                     <th>备注</th>
                                 </tr>
                                 </thead>
@@ -442,6 +443,7 @@
                                         <td class="dtCenter">{{ refund.transaction_id }}</td>
                                         <td class="dtRight">{{ format_amount(refund.refund_amount) }}</td>
                                         <td class="dtCenter">{{ refund.create_time }}</td>
+                                        <td class="dtCenter">{{ refund.status_name }}</td>
                                         <td>{{ refund.description }}</td>
                                     </tr>
                                 </template>
