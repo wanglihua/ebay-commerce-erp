@@ -10,6 +10,7 @@ const (
 	MESSAGE_TYPE_REQUEST     = 1005
 	MESSAGE_TYPE_RETURN      = 1006
 	MESSAGE_TYPE_PLATFORM    = 1008
+	MESSAGE_TYPE_SALE        = 2001 // 售前售后消息
 )
 
 type MessageTypeInfo struct {
@@ -75,5 +76,13 @@ func (e MessageTypeInfo) InitData(db_session *xorm.Session) {
 	message_type.BigTypeName = "平台消息"
 	message_type.TypeName = "return"
 	message_type.TypeDesc = "return"
+	db_session.Insert(message_type)
+
+	message_type = new(MessageTypeInfo)
+	message_type.Id = MESSAGE_TYPE_SALE
+	message_type.BigTypeId = MESSAGE_TYPE_SALE
+	message_type.BigTypeName = "售前售后消息"
+	message_type.TypeName = "售前售后消息"
+	message_type.TypeDesc = "售前售后消息"
 	db_session.Insert(message_type)
 }
