@@ -237,14 +237,16 @@ func (c ErpOrderRefund) Apply() revel.Result {
 	var refund_description string
 	c.Params.Bind(&refund_description, "refund_description")
 
+	// 订单是否存在非作废的PayPal退款信息
 	var order_refund_in_db ppgl_models.OrderRefundInfo
-	has, err := db_session.Where("order_id = ? AND status_id <> ?", refund_order_id, models.REFUND_STATUS_YZF).Get(&order_refund_in_db)
+	has, err := db_session.Where("order_id = ? AND status_id <> ? AND method_id = ?", refund_order_id, models.REFUND_STATUS_YZF, ppgl_models.PAYMENT_METHOD_PALPAY).Get(&order_refund_in_db)
 	core.HandleError(err)
 
-	if has {
+	// 订单存在非作废的PayPal退款信息，并且用户当前的选择也是 PayPal 退款
+	if has && refund_method_id == ppgl_models.PAYMENT_METHOD_PALPAY {
 		return c.RenderJson(core.JsonResult{
 			Success: false,
-			Message: "订单已存在退款信息！",
+			Message: "订单已存在非作废的PayPal退款信息！",
 		})
 	}
 
