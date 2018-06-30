@@ -7,6 +7,7 @@ import (
 
 const PAYMENT_METHOD_PALPAY int64 = 1
 const PAYMENT_METHOD_BANK int64 = 2
+const PAYMENT_METHOD_OTHER int64 = 3
 
 type OrderRefundMethodInfo struct {
 	Id          int64     `xorm:"bigint notnull pk 'id'" json:"id"`
@@ -40,5 +41,11 @@ func (e OrderRefundMethodInfo) InitData(db_session *xorm.Session) {
 	refund_method.Id = PAYMENT_METHOD_BANK
 	refund_method.Name = "银行转账"
 	refund_method.Description = "银行转账"
+	db_session.Insert(refund_method)
+
+	refund_method = new(OrderRefundMethodInfo)
+	refund_method.Id = PAYMENT_METHOD_OTHER
+	refund_method.Name = "其他"
+	refund_method.Description = "其他"
 	db_session.Insert(refund_method)
 }
