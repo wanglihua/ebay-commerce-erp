@@ -7,9 +7,11 @@ import (
 type MessageInfo struct {
 	Id                 int64             `xorm:"bigint notnull pk autoincr 'id'" json:"id"`
 	ShopId             int64             `xorm:"bigint notnull index 'shop_id'" json:"shop_id"`
+	ShopName           string            `xorm:"nvarchar(200) null 'shop_name'" json:"shop_name"`
 	MessageId          string            `xorm:"nvarchar(50) notnull index 'message_id'" json:"message_id"`
 	ProductId          int64             `xorm:"bigint notnull index 'product_id'" json:"product_id"`
 	ItemId             string            `xorm:"nvarchar(50) notnull index 'item_id'" json:"item_id"` // ebay系统的 ItemId，这个是产品的 item_id ??
+	ViewItemUrl        string            `xorm:"nvarchar(500) null 'view_item_url'" json:"view_item_url"`
 	Sku                string            `xorm:"nvarchar(200) notnull index 'sku'" json:"sku"`
 	CreationDate       core.NullLongTime `xorm:"datetime null 'creation_date'" json:"creation_date"`
 	LastModifiedDate   core.NullLongTime `xorm:"datetime null 'last_modified_date'" json:"last_modified_date"`
@@ -27,6 +29,7 @@ type MessageInfo struct {
 	ExternalMessageId  string            `xorm:"nvarchar(50) notnull index 'external_message_id'" json:"external_message_id"`
 	ParentMessageId    string            `xorm:"nvarchar(50) notnull index 'parent_message_id'" json:"parent_message_id"`
 	StatusId           int64             `xorm:"bigint notnull index 'status_id'" json:"status_id"`
+	StatusName         string            `xorm:"nvarchar(200) null 'status_name'" json:"status_name"`
 	MemberDownloadTime core.NullLongTime `xorm:"datetime null 'member_download_time'" json:"member_download_time"`
 	MyDownloadTime     core.NullLongTime `xorm:"datetime null 'my_download_time'" json:"my_download_time"`
 	SaleUserId         int64             `xorm:"bigint notnull index 'sale_user_id' default(0)" json:"sale_user_id" smith:"verbose_name=销售人员"`
