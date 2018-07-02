@@ -27,10 +27,26 @@
                             <label class="control-label no-padding-right" for="sku_query">SKU</label>
                             <input class="input-sm" id="sku_query" name="sku_query" placeholder="SKU" type="text" style="width: 130px;"/>
 
-                            <label for="service_user_id_query">客服负责人</label>
+                            <label for="service_user_id_query">客服人员</label>
                             <select id="service_user_id_query" name="service_user_id_query" style="height: 30px; width: 130px;">
-                                <option value="0">--客服负责人--</option>
-                                {% range $index, $user := .service_user_list %}
+                                <option value="0">--客服人员--</option>
+                                {% range $index, $user := .user_list %}
+                                <option value="{% $user.Id %}">{% $user.LoginName %}（{% $user.NickName %}）</option>
+                                {% end %}
+                            </select>
+
+                            <label for="sale_user_id_query">销售人员</label>
+                            <select id="sale_user_id_query" name="sale_user_id_query" style="height: 30px; width: 130px;">
+                                <option value="0">--销售人员--</option>
+                                {% range $index, $user := .user_list %}
+                                <option value="{% $user.Id %}">{% $user.LoginName %}（{% $user.NickName %}）</option>
+                                {% end %}
+                            </select>
+
+                            <label for="dev_user_id_query">开发人员</label>
+                            <select id="dev_user_id_query" name="dev_user_id_query" style="height: 30px; width: 130px;">
+                                <option value="0">--开发人员--</option>
+                                {% range $index, $user := .user_list %}
                                 <option value="{% $user.Id %}">{% $user.LoginName %}（{% $user.NickName %}）</option>
                                 {% end %}
                             </select>
@@ -124,6 +140,8 @@
                             aoData.push({'name': 'item_id_query', 'value': $("#item_id_query").val()});
                             aoData.push({'name': 'sku_query', 'value': $("#sku_query").val()});
                             aoData.push({'name': 'service_user_id_query', 'value': $("#service_user_id_query").val()});
+                            aoData.push({'name': 'sale_user_id_query', 'value': $("#sale_user_id_query").val()});
+                            aoData.push({'name': 'dev_user_id_query', 'value': $("#dev_user_id_query").val()});
                             aoData.push({'name': 'sender_id_query', 'value': $("#sender_id_query").val()});
                             aoData.push({'name': 'recipient_id_query', 'value': $("#recipient_id_query").val()});
 

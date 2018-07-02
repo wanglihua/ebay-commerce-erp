@@ -27,7 +27,7 @@ func (c ErpMessage) Index() revel.Result {
 	var user_list = make([]auth_models.UserInfo, 0)
 	core.HandleError(db_session.OrderBy("login_name ASC").Find(&user_list))
 
-	c.RenderArgs["service_user_list"] = user_list
+	c.RenderArgs["user_list"] = user_list
 
 	return c.RenderTemplate("erp/xxgl/message/message_index.html")
 }
@@ -96,4 +96,17 @@ func (c ErpMessage) Reply() revel.Result {
 		"success": true,
 		"message": "消息回复成功！",
 	})
+}
+
+func (c ErpMessage) detail() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.XXGL_MESSAGE_ALL, c.Session)
+
+	var db_session = c.DbSession
+
+	var user_list = make([]auth_models.UserInfo, 0)
+	core.HandleError(db_session.OrderBy("login_name ASC").Find(&user_list))
+
+	c.RenderArgs["user_list"] = user_list
+
+	return c.RenderTemplate("erp/xxgl/message/message_detail.html")
 }
