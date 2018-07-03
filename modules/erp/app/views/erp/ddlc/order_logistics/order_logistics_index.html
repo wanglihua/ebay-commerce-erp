@@ -33,17 +33,6 @@
                         <i class="ace-icon fa fa-file-excel-o"></i>
                         物流信息导入
                     </button>
-
-                    {%/*
-                    <button class="btn btn-success btn-sm" @click="showOrderLogisticsDetail(0)">
-                        <i class="ace-icon fa fa-plus"></i>
-                        新增
-                    </button>
-                    <button class="btn btn-danger btn-sm" @click="deleteOrderLogistics()">
-                        <i class="ace-icon fa fa-trash-o"></i>
-                        删除
-                    </button>
-                    */%}
                 </div>
                 <form id="formExport1" method="post" action='{%url "ErpOrderLogistics.Export1" %}'>
                     <input type="hidden" name="stock_id" v-model="page.stock_id"/>

@@ -1,4 +1,4 @@
-{%header "日物流报表" .%}
+{%header "物流报表" .%}
 <div id="page">
     <div class="breadcrumbs" id="breadcrumbs">
         <ul class="breadcrumb">
@@ -13,6 +13,14 @@
         <div class="row">
             <div class="col-xs-12" style="padding: 0;">
                 <div class="gridToolBar clearfix">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <button class="btn btn-primary btn-sm" @click="reloadList('#logisticsReportList')">
+                                <i class="ace-icon fa fa-refresh"></i>
+                                刷新
+                            </button>
+                        </div>
+                    </div>
                     <div class="row" style="margin-top: 10px;margin-bottom: 20px;">
                         <div id="query" class="col-xs-12 query" style="line-height: 28px;">
                             <div class="col-xs-12">
@@ -110,13 +118,9 @@
                             }
                         },
                         {
-                            "mDataProp": "o.full_tran_id", "title": "订单代码", "bSearchable": true,
+                            "mDataProp": "o.code", "title": "订单编码", "bSearchable": true,
                             "render": function (data, type, row) {
-                                var delivery_person = row.o.delivery_person;
-                                if (delivery_person === "") {
-                                    delivery_person = "--";
-                                }
-                                return "<div class='div_tran_id'><a href='/order/detail/" + row.o.id + "' target='_blank'>" + row.order_code + "</a></div><div>" + row.stock_name + "</div><div>" + delivery_person + "</div>";
+                                return "<div class='div_order_code'><a href='/order/detail/" + row.o.id + "' target='_blank'>" + row.o.code + "</a></div>";
                             }
                         },
                         {
@@ -125,16 +129,7 @@
                             "bSearchable": false,
                             "bSortable": false,
                             "render": function (data, type, row) {
-                                return "<div class='div_stock_name'></div>"
-                            }
-                        },
-                        {
-                            "mDataProp": "o.delivery_person",
-                            "title": "发货人员",
-                            "bSearchable": false,
-                            "bSortable": false,
-                            "render": function (data, type, row) {
-                                return "<div class='div_delivery_person'></div>"
+                                return "<div class='div_stock_name'>" + row.stock_name + "</div>"
                             }
                         },
 
@@ -146,24 +141,6 @@
                                     waybill_number = "--";
                                 }
                                 return "<div class='div_company_name'>" + row.company_name + "</div><div>" + row.mode_name + "</div><div>" + waybill_number + "</div>";
-                            }
-                        },
-                        {
-                            "mDataProp": "mode_name",
-                            "title": "物流方式",
-                            "bSearchable": false,
-                            "bSortable": false,
-                            "render": function (data, type, row) {
-                                return "<div class='div_mode_name'></div>"
-                            }
-                        },
-                        {
-                            "mDataProp": "waybill_number",
-                            "title": "货运单号",
-                            "bSearchable": false,
-                            "bSortable": false,
-                            "render": function (data, type, row) {
-                                return "<div class='div_waybill_number'></div>"
                             }
                         },
 
@@ -190,7 +167,7 @@
                         },
 
                         {
-                            "mDataProp": "ol.weight", "title": "实际重量", "bSearchable": false,
+                            "mDataProp": "ol.weight", "title": "实际/体积重量<br/>考虑体积重", "bSearchable": false,
                             "render": function (data, type, row) {
                                 var actual_weight = row.ol.weight;
                                 if (actual_weight !== "" && actual_weight !== 0) {
@@ -209,18 +186,6 @@
                                 }
 
                                 return "<div class='div_actual_weight'>" + actual_weight + "</div><div>" + dim_weight + "</div><div>" + row.sfkltjz + "</div>";
-                            }
-                        },
-                        {
-                            "mDataProp": "ol.dim_weight", "title": "体积重量", "bSearchable": false,
-                            "render": function (data, type, row) {
-                                return "<div class='div_dim_weight'></div>"
-                            }
-                        },
-                        {
-                            "mDataProp": "ol.weight", "title": "考虑体积重", "bSearchable": false,
-                            "render": function (data, type, row) {
-                                return "<div class='div_sfkltjz'></div>";
                             }
                         },
                         {
