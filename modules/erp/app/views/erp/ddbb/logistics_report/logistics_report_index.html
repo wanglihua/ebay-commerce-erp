@@ -40,8 +40,8 @@
 
                                 <label class="control-label no-padding-right" for="order_code_query">订单编号</label>
                                 <input class="input-sm" id="order_code_query" name="order_code_query" placeholder="订单编号" type="text" v-model="page.order_code_query" style="width: 130px;"/>
-                                <label class="control-label no-padding-right" for="waybill_number_query">货运单号</label>
-                                <input class="input-sm" id="waybill_number_query" name="waybill_number_query" placeholder="货运单号" type="text" v-model="page.waybill_number_query" style="width: 130px;"/>
+                                <label class="control-label no-padding-right" for="postalcode_query">邮编</label>
+                                <input class="input-sm" id="postalcode_query" name="postalcode_query" placeholder="多个邮编逗号隔开" type="text" v-model="page.postalcode_query" style="width: 180px;"/>
                                 <label class="control-label no-padding-right" for="begin_time_query">开始时间</label>
                                 <input class="input-sm" id="begin_time_query" name="begin_time_query" placeholder="发货开始时间查询" type="text" v-model="page.begin_time_query" style="width: 130px;"/>
                                 <label class="control-label no-padding-right" for="end_time_query">结束时间</label>
@@ -205,7 +205,7 @@
 
                         aoData.push({'name': 'stock_id', 'value': vm.page.stock_id});
                         aoData.push({'name': 'logistics_company_id', 'value': vm.page.logistics_company_id});
-                        aoData.push({'name': 'waybill_number_query', 'value': vm.page.waybill_number_query});
+                        aoData.push({'name': 'postalcode_query', 'value': vm.page.postalcode_query});
                         aoData.push({'name': 'begin_time_query', 'value': vm.page.begin_time_query});
                         aoData.push({'name': 'end_time_query', 'value': vm.page.end_time_query});
                         aoData.push({'name': 'good_query_id', 'value': vm.page.good_query_id});
