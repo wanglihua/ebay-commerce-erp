@@ -22,7 +22,7 @@ func GetDdbbMenu(res_id_map map[int64]bool, web_session revel.Session) string {
     <b class="arrow"></b>
     <ul class="submenu">
 
-        <li id="ddbb-logistics-dialy-report-menu" class="">
+        <li id="ddbb-logistics-report-menu" class="">
             <a href="/logistics/dialy/report">
                 <i class="menu-icon fa fa-caret-right"></i>
                 日物流报表

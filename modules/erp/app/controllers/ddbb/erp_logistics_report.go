@@ -9,5 +9,5 @@ type ErpLogisticsDialyReport struct {
 }
 
 func (c ErpLogisticsDialyReport) Index() revel.Result {
-	return c.RenderTemplate("erp/ddbb/logistics_dialy_report/logistics_dialy_report_index.html")
+	return c.RenderTemplate("erp/ddbb/logistics_report/logistics_report_index.html")
 }

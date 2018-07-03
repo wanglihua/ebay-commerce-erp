@@ -156,154 +156,6 @@
             </div>
         </div>
     </div>
-    <div class="modal fade" id="orderLogisticsDetailDialog">
-        <div class="modal-dialog" style="width: 680px;">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="True">&times;</button>
-                    <h4 class="modal-title">订单物流详细</h4>
-                </div>
-                <div class="modal-body clearfix">
-                    <div class="row">
-                        <div class="col-xs-12">
-                            <form class="form-horizontal" role="form" id="orderLogisticsDetailForm">
-                                <input id="order_logistics_id" name="detail.order_logistics.id" type="hidden" v-model.number="detail.order_logistics.id"/>
-                                <div class="row">
-                                    <div class="col-xs-6">
-                                        <div class="form-group">
-                                            <label for="order_id" class="col-xs-2 control-label">订单</label>
-                                            <div class="col-xs-10">
-                                                <input id="order_id" name="detail.order_logistics.order_id" type="text" class="input-sm form-control" v-model.number="detail.order_logistics.order_id"/>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-xs-6">
-                                        <div class="form-group">
-                                            <label for="address_id" class="col-xs-2 control-label">物流地址</label>
-                                            <div class="col-xs-10">
-                                                <input id="address_id" name="detail.order_logistics.address_id" type="text" class="input-sm form-control" v-model.number="detail.order_logistics.address_id"/>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-xs-6">
-                                        <div class="form-group">
-                                            <label for="mode_id" class="col-xs-2 control-label">物流方式</label>
-                                            <div class="col-xs-10">
-                                                <input id="mode_id" name="detail.order_logistics.mode_id" type="text" class="input-sm form-control" v-model.number="detail.order_logistics.mode_id"/>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-xs-6">
-                                        <div class="form-group">
-                                            <label for="fee_rate_id" class="col-xs-2 control-label">物流费率</label>
-                                            <div class="col-xs-10">
-                                                <input id="fee_rate_id" name="detail.order_logistics.fee_rate_id" type="text" class="input-sm form-control" v-model.number="detail.order_logistics.fee_rate_id"/>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-xs-6">
-                                        <div class="form-group">
-                                            <label for="length" class="col-xs-2 control-label">长度</label>
-                                            <div class="col-xs-10">
-                                                <input id="length" name="detail.order_logistics.length" type="text" class="input-sm form-control" v-model.number="detail.order_logistics.length"/>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-xs-6">
-                                        <div class="form-group">
-                                            <label for="width" class="col-xs-2 control-label">宽度</label>
-                                            <div class="col-xs-10">
-                                                <input id="width" name="detail.order_logistics.width" type="text" class="input-sm form-control" v-model.number="detail.order_logistics.width"/>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-xs-6">
-                                        <div class="form-group">
-                                            <label for="height" class="col-xs-2 control-label">高度</label>
-                                            <div class="col-xs-10">
-                                                <input id="height" name="detail.order_logistics.height" type="text" class="input-sm form-control" v-model.number="detail.order_logistics.height"/>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-xs-6">
-                                        <div class="form-group">
-                                            <label for="weight" class="col-xs-2 control-label">重量</label>
-                                            <div class="col-xs-10">
-                                                <input id="weight" name="detail.order_logistics.weight" type="text" class="input-sm form-control" v-model.number="detail.order_logistics.weight"/>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-xs-6">
-                                        <div class="form-group">
-                                            <label for="total_fee" class="col-xs-2 control-label">物流费用</label>
-                                            <div class="col-xs-10">
-                                                <input id="total_fee" name="detail.order_logistics.total_fee" type="text" class="input-sm form-control" v-model.number="detail.order_logistics.total_fee"/>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-xs-6">
-                                        <div class="form-group">
-                                            <label for="actual_fee" class="col-xs-2 control-label">实际费用</label>
-                                            <div class="col-xs-10">
-                                                <input id="actual_fee" name="detail.order_logistics.actual_fee" type="text" class="input-sm form-control" v-model.number="detail.order_logistics.actual_fee"/>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-xs-6">
-                                        <div class="form-group">
-                                            <label for="pick_fee" class="col-xs-2 control-label">拣货费用</label>
-                                            <div class="col-xs-10">
-                                                <input id="pick_fee" name="detail.order_logistics.pick_fee" type="text" class="input-sm form-control" v-model.number="detail.order_logistics.pick_fee"/>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                            </form>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-success btn-sm" @click="saveOrderLogistics()">
-                        <i class="ace-icon fa fa-floppy-o"></i>保存
-                    </button>
-                    <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">
-                        <i class="ace-icon fa fa-times"></i>关闭
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
     <div class="modal fade" id="logisticsCompanyExportOptionDialog">
         <div class="modal-dialog" style="width: 480px;">
             <div class="modal-content">
@@ -702,120 +554,6 @@
             refreshList: function () {
                 refreshList('#orderLogisticsList');
             },
-            showOrderLogisticsDetail: function (id) {
-                showMask("加载中...");
-                $("#orderLogisticsDetailForm").clearValidation();
-                $.ajax({
-                            url: '{%url "ErpOrderLogistics.DetailData" %}',
-                            type: "POST",
-                            data: {
-                                "id": id
-                            },
-                            success: function (result) {
-                                hideMask();
-                                if (result.success === false) {
-                                    $.msg.error(result.message);
-                                    return;
-                                }
-                                vm.detail = result;
-                                $('#orderLogisticsDetailDialog').modal(modalOptions);
-                            }
-                        }
-                );
-            },
-            saveOrderLogistics: function () {
-                showMask("提交中...");
-                var form = $("#orderLogisticsDetailForm");
-                var valid = validate(form, {
-                    'detail.order_logistics.order_id': {
-                        required: true, digits: true
-                    },
-                    'detail.order_logistics.address_id': {
-                        required: true, digits: true
-                    },
-                    'detail.order_logistics.mode_id': {
-                        required: true, digits: true
-                    },
-                    'detail.order_logistics.fee_rate_id': {
-                        required: true, digits: true
-                    },
-                    'detail.order_logistics.length': {
-                        required: true, number: true
-                    },
-                    'detail.order_logistics.width': {
-                        required: true, number: true
-                    },
-                    'detail.order_logistics.height': {
-                        required: true, number: true
-                    },
-                    'detail.order_logistics.weight': {
-                        required: true, number: true
-                    },
-                    'detail.order_logistics.total_fee': {
-                        required: true, number: true
-                    },
-                    'detail.order_logistics.actual_fee': {
-                        required: true, number: true
-                    }
-                });
-
-                if (!valid) {
-                    hideMask();
-                } else {
-                    $.ajax({
-                                url: '{%url "ErpOrderLogistics.Save"%}',
-                                type: "POST",
-                                processData: false,
-                                contentType: 'application/json',
-                                data: JSON.stringify(vm.detail),
-                                success: function (data) {
-                                    hideMask();
-                                    if (data.success == false) {
-                                        $.msg.error(data.message);
-                                        //return;
-                                    }
-                                    else {
-                                        $.msg.show(data.message);
-                                        $('#orderLogisticsDetailDialog').modal('hide');
-                                        vm.reloadList();
-                                        //return;
-                                    }
-                                }
-                            }
-                    );
-                }
-            },
-            deleteOrderLogistics: function () {
-                var id_list = [];
-                $('#orderLogisticsList tbody tr>td:first-child input:checkbox').each(function () {
-                    if (this.checked) {
-                        id_list.push($(this).val());
-                    }
-                });
-
-                if (id_list.length == 0) {
-                    $.msg.alert("请选择数据！");
-                    return;
-                }
-
-                $.msg.confirm("确认要删除吗？", function () {
-                    $.ajax({
-                        url: '{%url "ErpOrderLogistics.Delete"%}',
-                        type: "POST",
-                        data: {"id_list": id_list},
-                        success: function (data) {
-                            if (data.success === false) {
-                                $.msg.error(data.message);
-                                return;
-                            }
-                            else {
-                                $.msg.show(data.message);
-                            }
-                            vm.reloadList();
-                        }
-                    });
-                });
-            },
             exportOrderLogistics1: function () {
                 var id_list = [];
                 $('#orderLogisticsList tbody tr>td:first-child input:checkbox').each(function () {
@@ -829,7 +567,6 @@
                 $("#formExport1").submit();
             },
             exportOrderLogistics2: function () {
-
                 var id_list = [];
                 $('#orderLogisticsList tbody tr>td:first-child input:checkbox').each(function () {
                     if (this.checked) {
@@ -845,19 +582,18 @@
                 showMask("加载中...");
                 $("#logisticsCompanyExportOptionForm").clearValidation();
                 $.ajax({
-                            url: '{%url "ErpOrderLogisticsCompanyExport.ExportOptionData" %}',
-                            type: "POST",
-                            success: function (result) {
-                                hideMask();
-                                if (result.success === false) {
-                                    $.msg.error(result.message);
-                                    return;
-                                }
-                                vm.logistics_company_export_option = result;
-                                $('#logisticsCompanyExportOptionDialog').modal(modalOptions);
-                            }
+                    url: '{%url "ErpOrderLogisticsCompanyExport.ExportOptionData" %}',
+                    type: "POST",
+                    success: function (result) {
+                        hideMask();
+                        if (result.success === false) {
+                            $.msg.error(result.message);
+                            return;
                         }
-                );
+                        vm.logistics_company_export_option = result;
+                        $('#logisticsCompanyExportOptionDialog').modal(modalOptions);
+                    }
+                });
             },
             exportOrderLogisticsCompany: function () {
                 var id_list = [];
