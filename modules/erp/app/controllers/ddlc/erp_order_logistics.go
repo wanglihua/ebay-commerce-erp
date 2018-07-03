@@ -2,9 +2,7 @@ package controllers
 
 import (
 	"bytes"
-	"encoding/json"
 	"fmt"
-	"strconv"
 	"strings"
 	"time"
 
@@ -402,51 +400,6 @@ func (c ErpOrderLogistics) DetailData() revel.Result {
 	detail_form.OrderLogistics = order_logistics
 
 	return c.RenderJson(detail_form)
-}
-
-func (c ErpOrderLogistics) Save() revel.Result {
-	pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_LOGISTICS, c.Session)
-
-	db_session := c.DbSession
-
-	var detail_form OrderLogisticsDetailForm
-	err := json.Unmarshal(c.GetRequestBody(), &detail_form)
-	core.HandleError(err)
-
-	if detail_form.Valid(c.Validation) == false {
-		return c.RenderJson(core.JsonResult{Success: false, Message: c.GetValidationErrorMessage()})
-	}
-
-	order_logistics := detail_form.OrderLogistics
-
-	var affected int64
-	if detail_form.IsCreate() {
-		affected, err = db_session.Insert(&order_logistics)
-		core.HandleError(err)
-	} else {
-		affected, err = db_session.Id(order_logistics.Id).Update(&order_logistics)
-		core.HandleError(err)
-
-		if affected == 0 {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！"})
-		}
-	}
-
-	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据保存成功!"})
-}
-
-func (c ErpOrderLogistics) Delete() revel.Result {
-	pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_LOGISTICS, c.Session)
-
-	db_session := c.DbSession
-
-	order_logistics_id_list := make([]int64, 0)
-	c.Params.Bind(&order_logistics_id_list, "id_list")
-
-	affected, err := db_session.In("id", order_logistics_id_list).Delete(new(ddlc_models.OrderLogisticsInfo))
-	core.HandleError(err)
-
-	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据删除成功!"})
 }
 
 func (c ErpOrderLogistics) Export1() revel.Result {

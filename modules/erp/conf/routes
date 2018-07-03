@@ -202,7 +202,10 @@ POST /product/log/data/list                ErpProductLog.ListData
 GET  /order/log                            ErpOrderLog.Index
 POST /order/log/data/list                  ErpOrderLog.ListData
 
-GET  /logistics/dialy/report               ErpLogisticsDialyReport.Index
+GET  /logistics/report                          ErpLogisticsReport.Index
+POST /logistics/report/page/data                ErpLogisticsReport.PageData
+POST /logistics/report/list/data                ErpLogisticsReport.ListData
+POST /logistics/report/get/logistics/mode/list  ErpLogisticsReport.GetLogisticsModeList
 
 GET  /product/image/type                   ErpProductImageType.Index
 POST /product/image/type/data/list         ErpProductImageType.ListData
@@ -433,8 +436,6 @@ GET  /order/logistics                               ErpOrderLogistics.Index
 POST /order/logistics/data/page                     ErpOrderLogistics.PageData
 POST /order/logistics/data/list                     ErpOrderLogistics.ListData
 POST /order/logistics/data/detail                   ErpOrderLogistics.DetailData
-POST /order/logistics/save                          ErpOrderLogistics.Save
-POST /order/logistics/delete                        ErpOrderLogistics.Delete
 POST /order/logistics/export1                       ErpOrderLogistics.Export1
 POST /order/logistics/export2                       ErpOrderLogistics.Export2
 
