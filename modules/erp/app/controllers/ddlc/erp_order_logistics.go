@@ -174,75 +174,47 @@ func (c ErpOrderLogistics) apply_query_filter(filter string) string {
 	// 优化查询
 	if good_query_id != 0 {
 		if good_query_id == good_query_ss {
-			/*
-# 单产品单数量
-SELECT * FROM erp_order o WHERE o.id IN (
-    SELECT oi.order_id AS order_id
-    FROM erp_order_item oi
-        INNER JOIN erp_order o ON oi.order_id = o.id AND 1 = 1 # order filter
-    WHERE oi.quantity = 1
-    GROUP BY oi.order_id
-    HAVING count(oi.id) = 1
-);
-			 */
+			// 单产品单数量
 
 			var good_query = `
 o.id IN (
     SELECT oi.order_id AS order_id
     FROM erp_order_item oi
-        INNER JOIN erp_order o ON oi.order_id = o.id AND %s
+        INNER JOIN erp_order o ON oi.order_id = o.id
     WHERE oi.quantity = 1
     GROUP BY oi.order_id
     HAVING count(oi.id) = 1
-)
+)  AND %s
 `
 			filter = fmt.Sprintf(good_query, filter)
 
 		} else if good_query_id == good_query_sm {
-			/*
-# 单产品多数量
-SELECT * FROM erp_order o WHERE o.id IN (
-    SELECT oi.order_id AS order_id
-    FROM erp_order_item oi
-        INNER JOIN erp_order o ON oi.order_id = o.id AND 1 = 1 # order filter
-    WHERE oi.quantity > 1
-    GROUP BY oi.order_id
-    HAVING count(oi.id) = 1
-);
-			 */
+			// 单产品多数量
 
 			var good_query = `
 o.id IN (
     SELECT oi.order_id AS order_id
     FROM erp_order_item oi
-        INNER JOIN erp_order o ON oi.order_id = o.id AND %s
+        INNER JOIN erp_order o ON oi.order_id = o.id
     WHERE oi.quantity > 1
     GROUP BY oi.order_id
     HAVING count(oi.id) = 1
-)
+) AND %s
 `
 			filter = fmt.Sprintf(good_query, filter)
 
 		} else if good_query_id == good_query_mm {
-			/*
-# 多产品
-SELECT * FROM erp_order o WHERE o.id IN (
-    SELECT oi.order_id AS order_id
-    FROM erp_order_item oi
-        INNER JOIN erp_order o ON oi.order_id = o.id AND 1 = 1 # order filter
-    GROUP BY oi.order_id
-    HAVING count(oi.id) > 1
-);
-			 */
+
+			// 多产品
 
 			var good_query = `
 o.id IN (
     SELECT oi.order_id AS order_id
     FROM erp_order_item oi
-        INNER JOIN erp_order o ON oi.order_id = o.id AND %s
+        INNER JOIN erp_order o ON oi.order_id = o.id
     GROUP BY oi.order_id
     HAVING count(oi.id) > 1
-)
+) AND %s
 `
 			filter = fmt.Sprintf(good_query, filter)
 		}
