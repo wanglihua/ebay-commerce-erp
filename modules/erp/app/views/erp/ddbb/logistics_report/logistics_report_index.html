@@ -13,10 +13,37 @@
         <div class="row">
             <div class="col-xs-12" style="padding: 0;">
                 <div class="gridToolBar clearfix">
-                    <button class="btn btn-primary btn-sm">
-                        <i class="ace-icon fa fa-refresh"></i>
-                        查询
-                    </button>
+                    <div class="row" style="margin-top: 10px;margin-bottom: 20px;">
+                        <div id="query" class="col-xs-12 query" style="line-height: 28px;">
+                            <div class="col-xs-12">
+
+                                <select id="stock_id" name="page.stock_id" v-model.number="page.stock_id" style="width: 120px;" @change="reloadList()">
+                                    <option :value="0">-发货仓库-</option>
+                                    <template v-for="stock in page.stock_list">
+                                        <option :value="stock.id">{{stock.name}}</option>
+                                    </template>
+                                </select>
+                                <select id="logistics_company_id" name="page.logistics_company_id" v-model.number="page.logistics_company_id" style="width: 120px;" @change="reloadList()">
+                                    <option :value="0">-物流公司-</option>
+                                    <template v-for="logistics_company in page.logistics_company_list">
+                                        <option :value="logistics_company.id">{{logistics_company.name}}</option>
+                                    </template>
+                                </select>
+
+                                <label class="control-label no-padding-right" for="order_code_query">订单编号</label>
+                                <input class="input-sm" id="order_code_query" name="order_code_query" placeholder="订单编号" type="text" v-model="page.order_code_query" style="width: 130px;"/>
+                                <label class="control-label no-padding-right" for="waybill_number_query">货运单号</label>
+                                <input class="input-sm" id="waybill_number_query" name="waybill_number_query" placeholder="货运单号" type="text" v-model="page.waybill_number_query" style="width: 130px;"/>
+                                <label class="control-label no-padding-right" for="begin_time_query">开始时间</label>
+                                <input class="input-sm" id="begin_time_query" name="begin_time_query" placeholder="发货开始时间查询" type="text" v-model="page.begin_time_query" style="width: 130px;"/>
+                                <label class="control-label no-padding-right" for="end_time_query">结束时间</label>
+                                <input class="input-sm" id="end_time_query" name="end_time_query" placeholder="发货结束时间查询" type="text" v-model="page.end_time_query" style="width: 130px;"/>
+                                <button class="btn btn-mini btn-primary" @click="refreshList()">
+                                    &nbsp;<i class="ace-icon fa fa-search"></i>查&nbsp;询&nbsp;
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div>
                     <table id="logisticsReportList" class="table table-striped table-bordered table-hover"></table>
@@ -38,7 +65,14 @@
                 "end_time_query": ""
             }
         },
-        methods: {}
+        methods: {
+            reloadList: function () {
+                reloadList('#logisticsReportList');
+            },
+            refreshList: function () {
+                refreshList('#logisticsReportList');
+            }
+        }
     });
 
     function loadPageData() {
@@ -56,13 +90,201 @@
         });
     }
 
-    function initList() {
+    function initGrid() {
+        initDataTable(
+                '#logisticsReportList',
+                {
+                    "sAjaxSource": '{%url "ErpLogisticsReport.ListData"%}',
+                    "aaSorting": [[0, "asc"]],
+                    "iDisplayLength": 50,
+                    "aoColumns": [
+                        {
+                            "mDataProp": "ol.id",
+                            "bSearchable": false,
+                            "orderable": false,
+                            "sClass": "center",
+                            "width": 50,
+                            "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
+                            "render": function (data, type, row) {
+                                return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
+                            }
+                        },
+                        {
+                            "mDataProp": "o.full_tran_id", "title": "订单代码", "bSearchable": true,
+                            "render": function (data, type, row) {
+                                var delivery_person = row.o.delivery_person;
+                                if (delivery_person === "") {
+                                    delivery_person = "--";
+                                }
+                                return "<div class='div_tran_id'><a href='/order/detail/" + row.o.id + "' target='_blank'>" + row.order_code + "</a></div><div>" + row.stock_name + "</div><div>" + delivery_person + "</div>";
+                            }
+                        },
+                        {
+                            "mDataProp": "stock_name",
+                            "title": "发货仓库",
+                            "bSearchable": false,
+                            "bSortable": false,
+                            "render": function (data, type, row) {
+                                return "<div class='div_stock_name'></div>"
+                            }
+                        },
+                        {
+                            "mDataProp": "o.delivery_person",
+                            "title": "发货人员",
+                            "bSearchable": false,
+                            "bSortable": false,
+                            "render": function (data, type, row) {
+                                return "<div class='div_delivery_person'></div>"
+                            }
+                        },
+
+                        {
+                            "mDataProp": "company_name", "title": "物流公司", "bSearchable": false, "bSortable": false,
+                            "render": function (data, type, row) {
+                                var waybill_number = row.o.waybill_number;
+                                if (waybill_number === "") {
+                                    waybill_number = "--";
+                                }
+                                return "<div class='div_company_name'>" + row.company_name + "</div><div>" + row.mode_name + "</div><div>" + waybill_number + "</div>";
+                            }
+                        },
+                        {
+                            "mDataProp": "mode_name",
+                            "title": "物流方式",
+                            "bSearchable": false,
+                            "bSortable": false,
+                            "render": function (data, type, row) {
+                                return "<div class='div_mode_name'></div>"
+                            }
+                        },
+                        {
+                            "mDataProp": "waybill_number",
+                            "title": "货运单号",
+                            "bSearchable": false,
+                            "bSortable": false,
+                            "render": function (data, type, row) {
+                                return "<div class='div_waybill_number'></div>"
+                            }
+                        },
+
+                        {
+                            "mDataProp": "ol.length", "title": "长/宽/高", "bSearchable": false,
+                            "render": function (data, type, row) {
+                                var length = "--";
+                                if (row.ol.length !== "" && row.ol.length !== 0) {
+                                    length = dtFormatFloat1(row.ol.length) + " cm";
+                                }
+
+                                var width = "--";
+                                if (row.ol.width !== "" && row.ol.width !== 0) {
+                                    width = dtFormatFloat1(row.ol.width) + " cm";
+                                }
+
+                                var height = "--";
+                                if (row.ol.height !== "" && row.ol.height !== 0) {
+                                    height = dtFormatFloat1(row.ol.height) + " cm";
+                                }
+
+                                return "<div class='div_lenght'>" + length + "</div><div>" + width + "</div><div>" + height + "</div>";
+                            }
+                        },
+
+                        {
+                            "mDataProp": "ol.weight", "title": "实际重量", "bSearchable": false,
+                            "render": function (data, type, row) {
+                                var actual_weight = row.ol.weight;
+                                if (actual_weight !== "" && actual_weight !== 0) {
+                                    actual_weight = dtFormatFloat1(actual_weight) + " kg";
+                                }
+                                else {
+                                    actual_weight = "--";
+                                }
+
+                                var dim_weight = row.ol.dim_weight;
+                                if (dim_weight !== "" && dim_weight !== 0) {
+                                    dim_weight = dtFormatFloat1(dim_weight) + " kg";
+                                }
+                                else {
+                                    dim_weight = "--";
+                                }
+
+                                return "<div class='div_actual_weight'>" + actual_weight + "</div><div>" + dim_weight + "</div><div>" + row.sfkltjz + "</div>";
+                            }
+                        },
+                        {
+                            "mDataProp": "ol.dim_weight", "title": "体积重量", "bSearchable": false,
+                            "render": function (data, type, row) {
+                                return "<div class='div_dim_weight'></div>"
+                            }
+                        },
+                        {
+                            "mDataProp": "ol.weight", "title": "考虑体积重", "bSearchable": false,
+                            "render": function (data, type, row) {
+                                return "<div class='div_sfkltjz'></div>";
+                            }
+                        },
+                        {
+                            "mDataProp": "o.shipped_time", "title": "发货时间", "bSearchable": false,
+                            "render": function (data, type, row) {
+                                var shipped_time = "--";
+                                if (row.o.shipped_time) {
+                                    shipped_time = row.o.shipped_time;
+                                }
+
+                                return "<div>" + shipped_time + "</div>";
+                            }
+                        }
+                    ],
+                    "fnServerData": function (sSource, aoData, fnCallback) {
+                        showMask("数据加载中，请稍候");
+
+                        aoData.push({'name': 'stock_id', 'value': vm.page.stock_id});
+                        aoData.push({'name': 'logistics_company_id', 'value': vm.page.logistics_company_id});
+                        aoData.push({'name': 'waybill_number_query', 'value': vm.page.waybill_number_query});
+                        aoData.push({'name': 'begin_time_query', 'value': vm.page.begin_time_query});
+                        aoData.push({'name': 'end_time_query', 'value': vm.page.end_time_query});
+                        aoData.push({'name': 'good_query_id', 'value': vm.page.good_query_id});
+
+                        $.ajax({
+                            "dataType": 'json',
+                            "url": sSource,
+                            "data": aoData,
+                            "success": function (data) {
+                                hideMask();
+
+                                if (data.success === false) {
+                                    $.msg.error(data.message);
+                                    return;
+                                }
+
+                                fnCallback(data);
+                            }
+                        });
+                    }
+                }
+        );
+    }
+
+    function initDateTimePicker() {
+
+        $('#begin_time_query').datetimepicker({
+            locale: "zh-cn"
+        }).on('dp.change', function (ev) {
+            vm.page.begin_time_query = $("#begin_time_query").val();
+        });
+
+        $('#end_time_query').datetimepicker({
+            locale: "zh-cn"
+        }).on('dp.change', function (ev) {
+            vm.page.end_time_query = $("#end_time_query").val();
+        });
 
     }
 
     $(function () {
+        initDateTimePicker();
         loadPageData();
-        initList();
+        initGrid();
     });
 
 

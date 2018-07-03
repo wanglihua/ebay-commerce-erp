@@ -61,8 +61,8 @@ func (c ErpLogisticsReport) GetLogisticsModeList() revel.Result {
 	var stock_id int64
 	c.Params.Bind(&stock_id, "stock_id")
 
-	var company_id int64
-	c.Params.Bind(&company_id, "company_id")
+	var logistics_company_id int64
+	c.Params.Bind(&logistics_company_id, "logistics_company_id")
 
 	var filter = "1=1"
 
@@ -70,8 +70,8 @@ func (c ErpLogisticsReport) GetLogisticsModeList() revel.Result {
 		filter = core.SqlAnd(filter, fmt.Sprintf("stock_id = %d", stock_id))
 	}
 
-	if company_id != 0 {
-		filter = core.SqlAnd(filter, fmt.Sprintf("company_id = %d", company_id))
+	if logistics_company_id != 0 {
+		filter = core.SqlAnd(filter, fmt.Sprintf("company_id = %d", logistics_company_id))
 	}
 
 	var logistics_mode_list = make([]ddpz_models.LogisticsModeInfo, 0)
@@ -147,7 +147,7 @@ func (c ErpLogisticsReport) apply_query_filter(filter string) string {
 	}
 
 	// #5 订单物流中只显示和只导出配货中的订单
-	filter = core.SqlAnd(filter, fmt.Sprintf("o.status_id = %d", models.ORDER_STATUS_PHZ)) //配货中
+	filter = core.SqlAnd(filter, fmt.Sprintf("(o.status_id = %d OR o.status_id = %d)", models.ORDER_STATUS_YFH, models.ORDER_STATUS_YWC)) // 已发货，已完成
 
 	/*
 	filter = core.SqlAnd(filter, fmt.Sprintf("o.status_id <> %d", models.ORDER_STATUS_YQC))  // 已取消
