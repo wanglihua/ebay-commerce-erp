@@ -852,3 +852,5 @@ POST /product/logistics/data/list          ErpProductLogistics.ListData
 POST /product/logistics/data/detail        ErpProductLogistics.DetailData
 POST /product/logistics/save               ErpProductLogistics.Save
 POST /product/logistics/delete             ErpProductLogistics.Delete
+
+GET /refund/report                     ErpRefundReport.Index
