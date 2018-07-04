@@ -117,12 +117,14 @@
                                 return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
                             }
                         },
+
                         {
                             "mDataProp": "o.code", "title": "订单编码", "bSearchable": true, "width": 120, "bSortable": false,
                             "render": function (data, type, row) {
                                 return "<div class='div_order_code'><a href='/order/detail/" + row.o.id + "' target='_blank'>" + row.o.code + "</a></div>";
                             }
                         },
+
                         {
                             "mDataProp": "company_name", "title": "发货仓库<br/>物流公司<br/>物流方式", "bSearchable": false, "bSortable": false,
                             "render": function (data, type, row) {
@@ -153,7 +155,7 @@
                         },
 
                         {
-                            "mDataProp": "ol.weight", "title": "实际/体积重量<br/>考虑体积重", "bSearchable": false, "width": 120, "bSortable": false,
+                            "mDataProp": "ol.weight", "title": "实际重量<br/>体积重量<br/>考虑体积重", "bSearchable": false, "width": 120, "bSortable": false,
                             "render": function (data, type, row) {
                                 var actual_weight = row.ol.weight;
                                 if (actual_weight !== "" && actual_weight !== 0) {
@@ -174,6 +176,21 @@
                                 return "<div class='div_actual_weight'>" + actual_weight + "</div><div>" + dim_weight + "</div><div>" + row.sfkltjz + "</div>";
                             }
                         },
+
+                        {
+                            "mDataProp": "ol.weight", "title": "预估费用<br/>实际费用", "bSearchable": false, "width": 100, "bSortable": false,
+                            "render": function (data, type, row) {
+                                var total_fee = dtFormatFloat(row.ol.total_fee);
+
+                                var actual_fee = "--";
+                                if (row.ol.actual_fee && row.ol.actual_fee !== 0) {
+                                    actual_fee = dtFormatFloat(row.ol.actual_fee);
+                                }
+
+                                return "<div class='div_total_fee'>" + total_fee + "</div><div class='div_actual_fee'>" + actual_fee + "</div>";
+                            }
+                        },
+
                         {
                             "mDataProp": "o.shipped_time", "title": "发货时间", "bSearchable": false, "width": 120,
                             "render": function (data, type, row) {

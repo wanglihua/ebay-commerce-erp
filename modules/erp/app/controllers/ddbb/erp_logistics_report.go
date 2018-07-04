@@ -16,8 +16,6 @@ import (
 	"matrix/core/collections"
 	"matrix/modules/erp/service/logistics_company_service"
 	"matrix/modules/erp/service/logistics_mode_service"
-	"matrix/modules/erp/service/order_item_service"
-	"matrix/modules/erp/service/shop_service"
 	"strings"
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/auth/pass_res"
@@ -122,16 +120,8 @@ func (c ErpLogisticsReport) apply_query_filter(filter string) string {
 			filter = core.SqlAnd(filter, fmt.Sprintf("ol.company_id = %d", logistics_company_id))
 		}
 
-		if batch_code != 0 {
-			filter = core.SqlAnd(filter, fmt.Sprintf("o.batch_code = %d", batch_code))
-		}
-
 		if order_code_query != "" {
 			filter = core.SqlAnd(filter, fmt.Sprintf("o.code = '%s'", order_code_query))
-		}
-
-		if waybill_number_query != "" {
-			filter = core.SqlAnd(filter, fmt.Sprintf("o.waybill_number = '%s'", waybill_number_query))
 		}
 
 		if begin_time_query.Valid == true {
@@ -196,9 +186,7 @@ func (c ErpLogisticsReport) ListData() revel.Result {
 		StockName      string                         `json:"stock_name"`
 		CompanyName    string                         `json:"company_name"`
 		ModeName       string                         `json:"mode_name"`
-		Products       []string                       `json:"products"`
-		OrderCode      string                         `json:"order_code"` //交易代码 店铺号 + 交易号
-		Sfkltjz        string                         `json:"sfkltjz"`    // 是否考虑体积重
+		Sfkltjz        string                         `json:"sfkltjz"` // 是否考虑体积重
 	}
 
 	/*
@@ -253,8 +241,6 @@ WHERE ol.stock_id = 0 AND ol.company_id = 0
 	var stock_id_name_map = stock_service.Get_stock_id_name_map(stock_id_set.List(), db_session)
 	var company_id_name_map = logistics_company_service.Get_company_id_name_map(company_id_set.List(), db_session)
 	var mode_map = logistics_mode_service.Get_logistics_mode_map(mode_id_set.List(), db_session)
-	var order_id_products_map = order_item_service.Get_order_id_products_map(order_id_set.List(), db_session)
-	var shop_id_name_map = shop_service.Get_shop_id_name_map(shop_id_set.List(), db_session)
 
 	for index, order_logistics := range order_logistics_list {
 		if order_logistics.OrderLogistics.StockId != 0 {
@@ -277,19 +263,6 @@ WHERE ol.stock_id = 0 AND ol.company_id = 0
 
 		}
 		order_logistics_list[index].Sfkltjz = sfkltjz
-
-		var order_sku_qty_list = order_id_products_map[order_logistics.OrderLogistics.OrderId]
-		if len(order_sku_qty_list) != 0 {
-			var products = make([]string, 0)
-			for _, order_id_sku_qty := range order_sku_qty_list {
-				products = append(products, fmt.Sprintf("%s × %d", order_id_sku_qty.Sku, order_id_sku_qty.Qty))
-			}
-			order_logistics_list[index].Products = products
-		}
-
-		if order_logistics.Order.ShopId != 0 {
-			order_logistics_list[index].OrderCode = shop_id_name_map[order_logistics.Order.ShopId].ShopCode + order_logistics.Order.TranId
-		}
 	}
 
 	var order_logistics_count struct {
