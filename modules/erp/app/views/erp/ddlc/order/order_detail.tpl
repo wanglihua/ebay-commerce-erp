@@ -1505,7 +1505,12 @@
                 "aoColumns": [
                     {"mDataProp": "order_code", "title": "订单编码", "bSearchable": true, "bSortable": false, "width": 120},
                     {"mDataProp": "status_name", "title": "状态名称", "bSearchable": true, "bSortable": false, "width": 120},
-                    {"mDataProp": "description", "title": "描述", "bSearchable": true, "bSortable": false},
+                    {
+                        "mDataProp": "description", "title": "描述", "bSearchable": true, "bSortable": false, "sClass": 'wrap-word',
+                         "render": function (data, type, row) {
+                            return "<div>" + data + "</div>";
+                         }
+                    },
                     {"mDataProp": "create_time", "title": "操作时间", "bSearchable": false, "bSortable": false, "width": 120}
                 ],
                 "fnServerData": function (sSource, aoData, fnCallback) {
