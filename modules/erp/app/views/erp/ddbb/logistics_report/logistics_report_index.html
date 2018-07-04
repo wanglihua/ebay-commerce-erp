@@ -118,34 +118,20 @@
                             }
                         },
                         {
-                            "mDataProp": "o.code", "title": "订单编码", "bSearchable": true,
+                            "mDataProp": "o.code", "title": "订单编码", "bSearchable": true, "width": 120, "bSortable": false,
                             "render": function (data, type, row) {
                                 return "<div class='div_order_code'><a href='/order/detail/" + row.o.id + "' target='_blank'>" + row.o.code + "</a></div>";
                             }
                         },
                         {
-                            "mDataProp": "stock_name",
-                            "title": "发货仓库",
-                            "bSearchable": false,
-                            "bSortable": false,
+                            "mDataProp": "company_name", "title": "发货仓库<br/>物流公司<br/>物流方式", "bSearchable": false, "bSortable": false,
                             "render": function (data, type, row) {
-                                return "<div class='div_stock_name'>" + row.stock_name + "</div>"
+                                return "<div class='div_stock'>" + row.stock_name + "</div><div class='div_company_name'>" + row.company_name + "</div><div>" + row.mode_name + "</div>";
                             }
                         },
 
                         {
-                            "mDataProp": "company_name", "title": "物流公司", "bSearchable": false, "bSortable": false,
-                            "render": function (data, type, row) {
-                                var waybill_number = row.o.waybill_number;
-                                if (waybill_number === "") {
-                                    waybill_number = "--";
-                                }
-                                return "<div class='div_company_name'>" + row.company_name + "</div><div>" + row.mode_name + "</div><div>" + waybill_number + "</div>";
-                            }
-                        },
-
-                        {
-                            "mDataProp": "ol.length", "title": "长/宽/高", "bSearchable": false,
+                            "mDataProp": "ol.length", "title": "长/宽/高", "bSearchable": false, "width": 90, "bSortable": false,
                             "render": function (data, type, row) {
                                 var length = "--";
                                 if (row.ol.length !== "" && row.ol.length !== 0) {
@@ -167,7 +153,7 @@
                         },
 
                         {
-                            "mDataProp": "ol.weight", "title": "实际/体积重量<br/>考虑体积重", "bSearchable": false,
+                            "mDataProp": "ol.weight", "title": "实际/体积重量<br/>考虑体积重", "bSearchable": false, "width": 120, "bSortable": false,
                             "render": function (data, type, row) {
                                 var actual_weight = row.ol.weight;
                                 if (actual_weight !== "" && actual_weight !== 0) {
@@ -189,7 +175,7 @@
                             }
                         },
                         {
-                            "mDataProp": "o.shipped_time", "title": "发货时间", "bSearchable": false,
+                            "mDataProp": "o.shipped_time", "title": "发货时间", "bSearchable": false, "width": 120,
                             "render": function (data, type, row) {
                                 var shipped_time = "--";
                                 if (row.o.shipped_time) {
