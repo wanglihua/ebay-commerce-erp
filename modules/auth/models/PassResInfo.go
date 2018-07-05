@@ -195,7 +195,6 @@ func (e PassResInfo) InitData(db_session *xorm.Session) {
 
 	// 订单配置
 	{
-
 		pass := new(PassResInfo)
 		pass.Id = pass_res.DDPZ_LOGISTICS_COMPANY
 		pass.CateId = pass_res_cate.DDPZ
@@ -257,6 +256,16 @@ func (e PassResInfo) InitData(db_session *xorm.Session) {
 		pass.CateId = pass_res_cate.DDPZ
 		pass.Name = "订单标签"
 		pass.Desc = core.MakeNullString("订单标签", true)
+		db_session.Insert(pass)
+	}
+
+	// 订单报表
+	{
+		pass := new(PassResInfo)
+		pass.Id = pass_res.DDBB_LOGISTICS_REPORT
+		pass.CateId = pass_res_cate.DDBB
+		pass.Name = "物流报表"
+		pass.Desc = core.MakeNullString("物流报表", true)
 		db_session.Insert(pass)
 	}
 
@@ -913,6 +922,13 @@ func (e PassResInfo) InitData(db_session *xorm.Session) {
 		pass.CateId = pass_res_cate.PPGL
 		pass.Name = "订单退款审核"
 		pass.Desc = core.MakeNullString("订单退款审核", true)
+		db_session.Insert(pass)
+
+		pass = new(PassResInfo)
+		pass.Id = pass_res.PPGL_REFUND_REPORT
+		pass.CateId = pass_res_cate.PPGL
+		pass.Name = "退款报表"
+		pass.Desc = core.MakeNullString("退款报表", true)
 		db_session.Insert(pass)
 	}
 }

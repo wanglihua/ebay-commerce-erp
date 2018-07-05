@@ -167,4 +167,8 @@ const (
 	PPGL_PAYPAL_PAYMENT       = 240000 // PayPal付款
 	PPGL_ORDER_REFUND_APPLY   = 240100 // 订单退款申请
 	PPGL_ORDER_REFUND_APPROVE = 240200 // 订单退款审核
+	PPGL_REFUND_REPORT        = 240300 // 订单退款报表
+
+	// 订单报表
+	DDBB_LOGISTICS_REPORT = 250100 // 物流报表
 )

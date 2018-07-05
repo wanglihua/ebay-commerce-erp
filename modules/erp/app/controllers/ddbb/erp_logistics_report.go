@@ -27,10 +27,14 @@ type ErpLogisticsReport struct {
 }
 
 func (c ErpLogisticsReport) Index() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.DDBB_LOGISTICS_REPORT, c.Session)
+
 	return c.RenderTemplate("erp/ddbb/logistics_report/logistics_report_index.html")
 }
 
 func (c ErpLogisticsReport) PageData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.DDBB_LOGISTICS_REPORT, c.Session)
+
 	var db_session = c.DbSession
 
 	var stock_list = stock_service.Get_login_user_stock_list(db_session, c.Session)
@@ -54,6 +58,8 @@ func (c ErpLogisticsReport) PageData() revel.Result {
 }
 
 func (c ErpLogisticsReport) GetLogisticsModeList() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.DDBB_LOGISTICS_REPORT, c.Session)
+
 	var db_session = c.DbSession
 
 	var stock_id int64
@@ -169,7 +175,7 @@ func (c ErpLogisticsReport) apply_query_filter(filter string) string {
 }
 
 func (c ErpLogisticsReport) ListData() revel.Result {
-	pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_LOGISTICS, c.Session)
+	pass_service.Check_login_user_pass(pass_res.DDBB_LOGISTICS_REPORT, c.Session)
 
 	db_session := c.DbSession
 
@@ -278,6 +284,8 @@ WHERE ol.stock_id = 0 AND ol.company_id = 0
 }
 
 func (c ErpLogisticsReport) Export() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.DDBB_LOGISTICS_REPORT, c.Session)
+	
 	var db_session = c.DbSession
 
 	xlsx_file := c.get_export_excel(db_session)
