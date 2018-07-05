@@ -25,9 +25,26 @@
                 <div class="row" style="margin-top: 20px;margin-bottom: 20px;">
                     <div id="query" class="col-xs-12" style="line-height: 28px;">
                         <div class="col-xs-12">
+                            <label class="control-label no-padding-right" for="reportType">报表类型</label>
                             <select id="reportType" style="width: 100px;">
                                 <option value="{%.report_type_day%}">日报表</option>
                                 <option value="{%.report_type_month%}">月报表</option>
+                            </select>
+
+                            <label class="control-label no-padding-right" for="shop_id">店铺</label>
+                            <select id="shop_id" class="input-sm">
+                                <option value="0">--店铺--</option>
+                                {% range $index, $shop := .shop_list%}
+                                <option value="{% $shop.Id %}">{% $shop.Name %}</option>
+                                {%end%}
+                            </select>
+
+                            <label class="control-label no-padding-right" for="reportType">销售人员</label>
+                            <select id="sales_user_id" name="user_query_value" style="height: 30px;width: 120px;">
+                                <option :value="0">--销售人员--</option>
+                                {% range $index, $user := .user_list %}
+                                <option :value="{% $user.Id %}">{% $user.LoginName %}（{% $user.NickName %}）</option>
+                                {% end %}
                             </select>
 
                             <label for="begin_time_query">时间</label>
@@ -61,8 +78,8 @@
 
     function exportReport() {
         var params = $.param({
-            "begin_time_query": $("#begin_time_query").val(),
-            "end_time_query": $("#end_time_query").val()
+            "begin_time": $("#begin_time_query").val(),
+            "end_time": $("#end_time_query").val()
         });
 
         var url = '{%url "ErpRefundReport.Export"%}' + "?" + params;
@@ -85,7 +102,45 @@
     });
 
     $(function () {
+        initDataTable(
+                '#refundReportList',
+                {
+                    "sAjaxSource": '{%url "ErpRefundReport.ListData"%}',
+                    "aaSorting": [[0, "desc"]],
+                    "aoColumns": [
+                        {"mDataProp": "month_date", "title": "日期", "bSearchable": false, "width": 100},
+                        {
+                            "mDataProp": "refund_amount_sum", "title": "退款金额", "bSearchable": false, "sClass": "dtRight",
+                            "render": function (data, type, row) {
+                                return dtFormatFloat(data);
+                            }
+                        }
+                    ],
+                    "fnServerData": function (sSource, aoData, fnCallback) {
+                        aoData.push({'name': 'report_type', 'value': $("#reportType").val()});
+                        aoData.push({'name': 'shop_id', 'value': $("#shop_id").val()});
+                        aoData.push({'name': 'sales_user_id', 'value': $("#sales_user_id").val()});
+                        aoData.push({'name': 'begin_time', 'value': $("#begin_time_query").val()});
+                        aoData.push({'name': 'end_time', 'value': $("#end_time_query").val()});
 
+                        showMask("数据加载中，请稍候");
+                        $.ajax({
+                            "dataType": 'json',
+                            "url": sSource,
+                            "data": aoData,
+                            "success": function (data) {
+                                hideMask();
+                                if (data.success === false) {
+                                    $.msg.error(data.message);
+                                    return;
+                                }
+
+                                fnCallback(data);
+                            }
+                        });
+                    }
+                }
+        );
     });
 
 </script>

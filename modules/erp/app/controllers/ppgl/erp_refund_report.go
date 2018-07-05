@@ -7,6 +7,8 @@ import (
 	"matrix/modules/auth/pass_res"
 	"time"
 	"fmt"
+	auth_models "matrix/modules/auth/models"
+	"matrix/modules/erp/models/xtpz_models"
 )
 
 type ErpRefundReport struct {
@@ -20,7 +22,16 @@ const REPORT_TYPE_MONTH int64 = 2
 func (c ErpRefundReport) Index() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.PPGL_REFUND_REPORT, c.Session)
 
-	// var db_session = c.DbSession
+	var db_session = c.DbSession
+
+	var user_list = make([]auth_models.UserInfo, 0)
+	core.HandleError(db_session.OrderBy("login_name ASC").Find(&user_list))
+
+	var shop_list = make([]xtpz_models.ShopAccountInfo, 0)
+	core.HandleError(db_session.OrderBy("id ASC").Find(&shop_list))
+
+	c.RenderArgs["user_list"] = user_list
+	c.RenderArgs["shop_list"] = shop_list
 
 	c.RenderArgs["report_type_day"] = REPORT_TYPE_DAY
 	c.RenderArgs["report_type_month"] = REPORT_TYPE_MONTH
@@ -40,11 +51,11 @@ func (c ErpRefundReport) ListData() revel.Result {
 	var shop_id int64
 	c.Params.Bind(&shop_id, "shop_id")
 
-	var time_begin core.NullLongTime
-	c.Params.Bind(&time_begin, "time_begin")
+	var time_begin_str string
+	c.Params.Bind(&time_begin_str, "begin_time")
 
-	var time_end core.NullLongTime
-	c.Params.Bind(&time_end, "time_end")
+	var time_end_str string
+	c.Params.Bind(&time_end_str, "end_time")
 
 	filter, _, offset, limit := core.GetGridRequestParam(c.Request)
 
@@ -81,27 +92,33 @@ WHERE apply_date IS NULL OR apply_month IS NULL;`
 
 	 */
 
-	if shop_id == 0 {
+	if shop_id != 0 {
 		filter = core.SqlAnd(filter, fmt.Sprintf("shop_id = %d", shop_id))
 	}
 
-	if sales_user_id == 0 {
+	if sales_user_id != 0 {
 		filter = core.SqlAnd(filter, fmt.Sprintf("sales_user_id = %d", sales_user_id))
 	}
 
-	if time_begin.Valid {
-		filter = core.SqlAnd(filter, fmt.Sprintf("apply_time >= '%s'", time_begin.Time.Format("2006-01-02")))
+	if time_begin_str != "" {
+		time_begin, err := core.Parse_time(time_begin_str)
+		if err == nil {
+			filter = core.SqlAnd(filter, fmt.Sprintf("apply_time >= '%s'", time_begin.Format("2006-01-02")))
+		}
 	}
 
-	if time_end.Valid {
-		filter = core.SqlAnd(filter, fmt.Sprintf("apply_time <= '%s'", time_end.Time.Add(time.Hour * 24).Format("2006-01-02")))
+	if time_end_str != "" {
+		time_end, err := core.Parse_time(time_end_str)
+		if err == nil {
+			filter = core.SqlAnd(filter, fmt.Sprintf("apply_time <= '%s'", time_end.Add(time.Hour * 24).Format("2006-01-02")))
+		}
 	}
 
 	var sb = core.NewSqlBuilder()
 	if report_type == REPORT_TYPE_MONTH {
-		sb.Select(`apply_month AS month_date, sum(refund_amount) AS refund_amount_sum`)
+		sb.Select(`date_format(apply_month, '%Y-%c') AS month_date, sum(refund_amount) AS refund_amount_sum`)
 	} else {
-		sb.Select(`apply_date AS month_date, sum(refund_amount) AS refund_amount_sum`)
+		sb.Select(`date_format(apply_date, '%Y-%c-%d') AS month_date, sum(refund_amount) AS refund_amount_sum`)
 	}
 
 	sb.Count("count(*) as count")
@@ -119,7 +136,7 @@ WHERE apply_date IS NULL OR apply_month IS NULL;`
 	sb.Limit(offset, limit)
 
 	var refund_report_item_list = make([]refund_report_item_t, 0)
-	err = db_session.Sql(sb.SqlList()).Find(refund_report_item_list)
+	err = db_session.Sql(sb.SqlList()).Find(&refund_report_item_list)
 	core.HandleError(err)
 
 	var count core.Count
