@@ -25,6 +25,11 @@
                 <div class="row" style="margin-top: 20px;margin-bottom: 20px;">
                     <div id="query" class="col-xs-12" style="line-height: 28px;">
                         <div class="col-xs-12">
+                            <select id="reportType" style="width: 100px;">
+                                <option value="0">--报表类型--</option>
+                                <option value="{%.report_type_day%}">日报表</option>
+                                <option value="{%.report_type_month%}">月报表</option>
+                            </select>
 
                             <label for="begin_time_query">时间</label>
                             <input id="begin_time_query" name="begin_time_query" style="width: 135px;height:30px;" placeholder="开始时间如2016-01-02"/>
@@ -61,7 +66,7 @@
             "end_time_query": $("#end_time_query").val()
         });
 
-        var url = '{%url "ErpRefundExcel.Export"%}' + "?" + params;
+        var url = '{%url "ErpRefundReport.Export"%}' + "?" + params;
         $('<form method="post" action="' + url + '"></form>').appendTo('body').submit().remove();
     }
 
@@ -79,5 +84,10 @@
             }
         }
     });
+
+    $(function () {
+
+    });
+
 </script>
 {%footer%}

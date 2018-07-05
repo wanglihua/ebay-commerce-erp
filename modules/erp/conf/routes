@@ -855,3 +855,4 @@ POST /product/logistics/delete             ErpProductLogistics.Delete
 
 GET  /refund/report                     ErpRefundReport.Index
 POST /refund/report/list/data           ErpRefundReport.ListData
+POST /refund/report/export              ErpRefundReport.Export
