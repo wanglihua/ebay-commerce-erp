@@ -11,6 +11,7 @@ type SqlBuilder struct {
 	count_clause    string
 	from_clause     string
 	where_clause    string
+	group_by_clause string
 	order_by_clause string
 	limit_clause    string
 }
@@ -59,6 +60,15 @@ func (builder *SqlBuilder) Where(condition string) *SqlBuilder {
 	sql := `WHERE %s
 `
 	builder.where_clause = fmt.Sprintf(sql, condition)
+	return builder
+}
+
+// .GroupBy("type")
+func (builder *SqlBuilder) GroupBy(group_by string) *SqlBuilder {
+	//结束是换行符
+	sql := `GROUP BY %s
+`
+	builder.group_by_clause = fmt.Sprintf(sql, group_by)
 	return builder
 }
 
@@ -118,6 +128,10 @@ func (builder *SqlBuilder) to_sql(sql_type sql_type) string {
 
 	if builder.where_clause != "" {
 		buffer.WriteString(builder.where_clause)
+	}
+
+	if builder.group_by_clause != "" {
+		buffer.WriteString(builder.group_by_clause)
 	}
 
 	if sql_type == sql_type_list || sql_type == sql_type_get {
