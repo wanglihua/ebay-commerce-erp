@@ -63,7 +63,7 @@ func (c ErpRefundExcel) Export() revel.Result {
 
 	reader := bytes.NewReader(buffer.Bytes()) //bytes.Reader 实现了 io.Reader 接口
 
-	file_name := fmt.Sprintf("订单退款导出_%s.xlsx", time.Now().Format("2016-01-02 15:04"))
+	file_name := fmt.Sprintf("订单退款导出_%s.xlsx", time.Now().Format("2006-01-02 15:04"))
 
 	return c.RenderBinary(reader, file_name, revel.Attachment, time.Now())
 }
@@ -87,7 +87,7 @@ func (c ErpRefundExcel) get_export_excel_content(db_session *xorm.Session, order
 	xlsx_file := xlsx.NewFile()
 
 	//添加工作表
-	sheet, err := xlsx_file.AddSheet("PayPal付款")
+	sheet, err := xlsx_file.AddSheet("订单退款")
 	core.HandleError(err)
 
 	//添加标题行

@@ -9,6 +9,11 @@ import (
 	"fmt"
 	auth_models "matrix/modules/auth/models"
 	"matrix/modules/erp/models/xtpz_models"
+	"github.com/go-xorm/xorm"
+	"github.com/tealeg/xlsx"
+	"matrix/modules/erp/service/excel_service"
+	"bytes"
+	"math"
 )
 
 type ErpRefundReport struct {
@@ -158,23 +163,79 @@ WHERE apply_date IS NULL OR apply_month IS NULL;`
 func (c ErpRefundReport) Export() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.PPGL_REFUND_REPORT, c.Session)
 
-	// var db_session = c.DbSession
+	var db_session = c.DbSession
 
-	/*
+	refund_report_list, _ := c.get_refund_report_data("1=1", 0, math.MaxInt32)
 
-	xlsx_file := c.get_export_excel_content(db_session, order_refund_list)
+	xlsx_file := c.get_export_excel_content(db_session, refund_report_list)
 
 	//先把文件内容写到buffer中，再从中读取
 	var buffer bytes.Buffer
-	err = xlsx_file.Write(&buffer)
+	err := xlsx_file.Write(&buffer)
 	core.HandleError(err)
 
 	reader := bytes.NewReader(buffer.Bytes()) //bytes.Reader 实现了 io.Reader 接口
 
-	file_name := fmt.Sprintf("订单退款导出_%s.xlsx", time.Now().Format("2016-01-02 15:04"))
+	file_name := fmt.Sprintf("退款报表导出_%s.xlsx", time.Now().Format("2006-01-02 15:04"))
 
 	return c.RenderBinary(reader, file_name, revel.Attachment, time.Now())
-	*/
 
-	return c.RenderBinary(nil, "", revel.Attachment, time.Now())
+}
+
+func (c ErpRefundReport) get_export_excel_content(db_session *xorm.Session, refund_report_list []refund_report_item_t) *xlsx.File {
+
+	//统一设置标题单元格格式的函数
+	set_head_cell_style := func(cell *xlsx.Cell) {
+		excel_service.Set_head_cell_style(cell)
+	}
+
+	//统一设置内容单元格格式的函数
+	set_text_cell_style := func(cell *xlsx.Cell, horizontal_align string) {
+		excel_service.Set_text_cell_style(cell, horizontal_align)
+	}
+
+	head_row_height := 0.8
+	common_row_height := 0.6
+
+	//创建工作薄
+	xlsx_file := xlsx.NewFile()
+
+	//添加工作表
+	sheet, err := xlsx_file.AddSheet("退款报表")
+	core.HandleError(err)
+
+	//添加标题行
+	row := sheet.AddRow()
+	row.SetHeightCM(head_row_height)
+
+	col_index := 0
+
+	{
+		cell := row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 20)
+		set_head_cell_style(cell)
+		cell.Value = "日期"
+		col_index++
+
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 14)
+		set_head_cell_style(cell)
+		cell.Value = "退款总额"
+		col_index++
+	}
+
+	for _, refund_report := range refund_report_list {
+		row = sheet.AddRow()
+		row.SetHeightCM(common_row_height)
+
+		cell := row.AddCell()
+		set_text_cell_style(cell, "left")
+		cell.Value = refund_report.MonthDate
+
+		cell = row.AddCell()
+		set_text_cell_style(cell, "right")
+		cell.SetFloatWithFormat(refund_report.RefundAmountSum, "0.00")
+	}
+
+	return xlsx_file
 }

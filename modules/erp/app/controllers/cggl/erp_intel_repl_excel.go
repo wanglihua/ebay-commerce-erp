@@ -170,7 +170,7 @@ FROM erp_intel_repl ir
 
 	reader := bytes.NewReader(buffer.Bytes()) //bytes.Reader 实现了 io.Reader 接口
 
-	file_name := fmt.Sprintf("智能补货导出_%s.xlsx", time.Now().Format("2016-01-02 15:04"))
+	file_name := fmt.Sprintf("智能补货导出_%s.xlsx", time.Now().Format("2006-01-02 15:04"))
 
 	return c.RenderBinary(reader, file_name, revel.Attachment, time.Now())
 }
