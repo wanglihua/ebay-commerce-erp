@@ -106,48 +106,77 @@ const (
 func (builder *SqlBuilder) to_sql(sql_type sql_type) string {
 	var buffer bytes.Buffer
 
-	if sql_type == sql_type_list || sql_type == sql_type_get {
-		if builder.select_clause == "" {
-			panic("sql select 语句不能为空！")
-		} else {
-			buffer.WriteString(builder.select_clause)
-		}
-	} else if sql_type == sql_type_count {
+	if sql_type == sql_type_count && builder.group_by_clause != "" {
+
 		if builder.count_clause == "" {
 			panic("sql count 语句不能为空！")
 		} else {
 			buffer.WriteString(builder.count_clause)
 		}
-	}
 
-	if builder.from_clause == "" {
-		panic("sql from 语句不能为空！")
-	} else {
-		buffer.WriteString(builder.from_clause)
-	}
+		buffer.WriteString(" FROM ( ")
 
-	if builder.where_clause != "" {
-		buffer.WriteString(builder.where_clause)
-	}
+		if builder.select_clause == "" {
+			panic("sql select 语句不能为空！")
+		} else {
+			buffer.WriteString(builder.select_clause)
+		}
 
-	if builder.group_by_clause != "" {
+		if builder.from_clause == "" {
+			panic("sql from 语句不能为空！")
+		} else {
+			buffer.WriteString(builder.from_clause)
+		}
+
+		if builder.where_clause != "" {
+			buffer.WriteString(builder.where_clause)
+		}
 		buffer.WriteString(builder.group_by_clause)
-	}
-
-	if sql_type == sql_type_list || sql_type == sql_type_get {
-		if builder.order_by_clause != "" {
-			buffer.WriteString(builder.order_by_clause)
+		buffer.WriteString(" ) count_alias")
+	} else {
+		if sql_type == sql_type_list || sql_type == sql_type_get {
+			if builder.select_clause == "" {
+				panic("sql select 语句不能为空！")
+			} else {
+				buffer.WriteString(builder.select_clause)
+			}
+		} else if sql_type == sql_type_count {
+			if builder.count_clause == "" {
+				panic("sql count 语句不能为空！")
+			} else {
+				buffer.WriteString(builder.count_clause)
+			}
 		}
-	}
 
-	if sql_type == sql_type_list {
-		if builder.limit_clause != "" {
-			buffer.WriteString(builder.limit_clause)
+		if builder.from_clause == "" {
+			panic("sql from 语句不能为空！")
+		} else {
+			buffer.WriteString(builder.from_clause)
 		}
-	} else if sql_type == sql_type_get {
-		sql_limit_one := `LIMIT 0, 1
+
+		if builder.where_clause != "" {
+			buffer.WriteString(builder.where_clause)
+		}
+
+		if builder.group_by_clause != "" {
+			buffer.WriteString(builder.group_by_clause)
+		}
+
+		if sql_type == sql_type_list || sql_type == sql_type_get {
+			if builder.order_by_clause != "" {
+				buffer.WriteString(builder.order_by_clause)
+			}
+		}
+
+		if sql_type == sql_type_list {
+			if builder.limit_clause != "" {
+				buffer.WriteString(builder.limit_clause)
+			}
+		} else if sql_type == sql_type_get {
+			sql_limit_one := `LIMIT 0, 1
 `
-		buffer.WriteString(sql_limit_one)
+			buffer.WriteString(sql_limit_one)
+		}
 	}
 
 	return buffer.String()
