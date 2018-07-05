@@ -6,6 +6,7 @@ import (
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/auth/pass_res"
 	"time"
+	"fmt"
 )
 
 type ErpRefundReport struct {
@@ -64,21 +65,37 @@ WHERE apply_date IS NULL OR apply_month IS NULL;`
 
 	/*
 
-SELECT apply_date AS month_date, sum(refund_amount) AS refund_amount_sum
-FROM erp_order_refund
-WHERE shop_id = 1 AND sales_user_id = 1
-GROUP BY apply_date
-ORDER BY month_date DESC
-LIMIT 0, 10;
-
-SELECT apply_month AS month_date, sum(refund_amount) AS refund_amount_sum
-FROM erp_order_refund
-WHERE shop_id = 1 AND sales_user_id = 1
-GROUP BY apply_month
-ORDER BY month_date DESC
-LIMIT 0, 10;
+		SELECT date_format(apply_date, '%Y-%c-%d') AS month_date, sum(refund_amount) AS refund_amount_sum
+		FROM erp_order_refund
+		WHERE shop_id = 1 AND sales_user_id = 1
+		GROUP BY apply_date
+		ORDER BY month_date DESC
+		LIMIT 0, 10;
+		
+		SELECT date_format(apply_month, '%Y-%c') AS month_date, sum(refund_amount) AS refund_amount_sum
+		FROM erp_order_refund
+		WHERE shop_id = 1 AND sales_user_id = 1
+		GROUP BY apply_month
+		ORDER BY month_date DESC
+		LIMIT 0, 10;
 
 	 */
+
+	if shop_id == 0 {
+		filter = core.SqlAnd(filter, fmt.Sprintf("shop_id = %d", shop_id))
+	}
+
+	if sales_user_id == 0 {
+		filter = core.SqlAnd(filter, fmt.Sprintf("sales_user_id = %d", sales_user_id))
+	}
+
+	if time_begin.Valid {
+		filter = core.SqlAnd(filter, fmt.Sprintf("apply_time >= '%s'", time_begin.Time.Format("2006-01-02")))
+	}
+
+	if time_end.Valid {
+		filter = core.SqlAnd(filter, fmt.Sprintf("apply_time <= '%s'", time_end.Time.Add(time.Hour * 24).Format("2006-01-02")))
+	}
 
 	var sb = core.NewSqlBuilder()
 	if report_type == REPORT_TYPE_MONTH {
