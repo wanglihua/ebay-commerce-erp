@@ -39,9 +39,25 @@ func (c ErpRefundReport) Index() revel.Result {
 	return c.RenderTemplate("erp/ppgl/refund_report/refund_report_index.html")
 }
 
+type refund_report_item_t struct {
+	MonthDate       string  `xorm:"'month_date'" json:"month_date"`
+	RefundAmountSum float64 `xorm:"'refund_amount_sum'" json:"refund_amount_sum"`
+}
+
 func (c ErpRefundReport) ListData() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.PPGL_REFUND_REPORT, c.Session)
 
+	filter, _, offset, limit := core.GetGridRequestParam(c.Request)
+
+	refund_report_item_list, count := c.get_refund_report_data(filter, offset, limit)
+
+	return c.RenderJson(core.GridResult{
+		Data:  refund_report_item_list,
+		Total: count,
+	})
+}
+
+func (c ErpRefundReport) get_refund_report_data(filter string, offset int64, limit int64) ([]refund_report_item_t, int64) {
 	var report_type int64
 	c.Params.Bind(&report_type, "report_type")
 
@@ -57,8 +73,6 @@ func (c ErpRefundReport) ListData() revel.Result {
 	var time_end_str string
 	c.Params.Bind(&time_end_str, "end_time")
 
-	filter, _, offset, limit := core.GetGridRequestParam(c.Request)
-
 	var db_session = c.DbSession
 
 	var update_apply_date_month_sql = `UPDATE erp_order_refund
@@ -69,11 +83,6 @@ WHERE apply_date IS NULL OR apply_month IS NULL;`
 	_, err := db_session.Exec(update_apply_date_month_sql)
 	core.HandleError(err)
 
-	type refund_report_item_t struct {
-		MonthDate       string  `xorm:"'month_date'" json:"month_date"`
-		RefundAmountSum float64 `xorm:"'refund_amount_sum'" json:"refund_amount_sum"`
-	}
-
 	/*
 
 		SELECT date_format(apply_date, '%Y-%c-%d') AS month_date, sum(refund_amount) AS refund_amount_sum
@@ -82,7 +91,7 @@ WHERE apply_date IS NULL OR apply_month IS NULL;`
 		GROUP BY apply_date
 		ORDER BY month_date DESC
 		LIMIT 0, 10;
-		
+
 		SELECT date_format(apply_month, '%Y-%c') AS month_date, sum(refund_amount) AS refund_amount_sum
 		FROM erp_order_refund
 		WHERE shop_id = 1 AND sales_user_id = 1
@@ -143,10 +152,7 @@ WHERE apply_date IS NULL OR apply_month IS NULL;`
 	_, err = db_session.Sql(sb.SqlCount()).Get(&count)
 	core.HandleError(err)
 
-	return c.RenderJson(core.GridResult{
-		Data:  refund_report_item_list,
-		Total: count.Count,
-	})
+	return refund_report_item_list, count.Count
 }
 
 func (c ErpRefundReport) Export() revel.Result {
