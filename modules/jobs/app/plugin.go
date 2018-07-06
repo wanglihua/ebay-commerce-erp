@@ -96,6 +96,8 @@ func init() {
 		// 计算商品采购价，中国仓成本价
 		jobs.Every(2*time.Hour, tasks.CalculateProductPriceTask{})
 
+		// 物流报表
+		jobs.Every(2*time.Hour, tasks.LogisticsReportTask{})
 	})
 }
 

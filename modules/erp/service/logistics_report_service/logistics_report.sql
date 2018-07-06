@@ -25,8 +25,8 @@ CREATE PROCEDURE logistics_report()
         DECLARE order_cur CURSOR FOR
             SELECT o.id, shop_id, amount_paid, profit_au, date(shipped_time)
             FROM erp_order o
-            WHERE o.shipped_time IS NOT NULL;
-        # WHERE o.shipped_time > date_add(date(now()), INTERVAL -3 DAY); # 只计算3天前的订单
+            # WHERE o.shipped_time IS NOT NULL;
+            WHERE o.shipped_time > date_add(date(now()), INTERVAL -3 DAY); # 只计算3天前的订单
 
         DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
