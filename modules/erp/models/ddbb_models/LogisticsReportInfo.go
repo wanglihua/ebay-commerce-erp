@@ -7,14 +7,12 @@ import (
 type LogisticsReportInfo struct {
 	Id             int64     `xorm:"bigint notnull pk autoincr 'id'" json:"id"`
 	DayDate        core.Date `xorm:"date notnull index 'day_date'" json:"day_date"`
-	OrderId        int64     `xorm:"order_id notnull index 'order_id'" json:"order_id"`
-	OrderCode      string    `xorm:"order_code notnull 'order_code'" json:"order_code"`
+	OrderId        int64     `xorm:"bigint notnull index 'order_id'" json:"order_id"`
+	ShopId         int64     `xorm:"bigint notnull index 'shop_id'" json:"shop_id"`
 	StockId        int64     `xorm:"bigint notnull index 'stock_id'" json:"stock_id"`
-	StockName      string    `xorm:"nvarchar(200) notnull 'stock_name'" json:"stock_name"`
 	CompanyId      int64     `xorm:"bigint notnull index 'company_id'" json:"company_id"`
-	CompanyName    string    `xorm:"nvarchar(200) notnull 'company_name'" json:"company_name"`
 	ModeId         int64     `xorm:"bigint notnull index 'mode_id'" json:"mode_id"`
-	ModeName       string    `xorm:"nvarchar(200) notnull 'mode_name'" json:"mode_name"`
+	Postcode       string    `xorm:"nvarchar(200) notnull index 'postcode'" json:"postcode"`
 	PrdCount       int64     `xorm:"bigint notnull 'prd_count'" json:"prd_count"`
 	Volume         float64   `xorm:"decimal(18,3) notnull 'volume'" json:"volume"`
 	Weight         float64   `xorm:"decimal(18,3) notnull 'weight'" json:"weight"`
@@ -33,3 +31,12 @@ func (e LogisticsReportInfo) TableName() string {
 func (e LogisticsReportInfo) ModelDesc() string {
 	return "verbose_name=物流报表,entity_json=logistics_report,route=logistics/report"
 }
+
+/*
+
+OrderCode      string    `xorm:"order_code notnull 'order_code'" json:"order_code"`
+StockName      string    `xorm:"nvarchar(200) notnull 'stock_name'" json:"stock_name"`
+CompanyName    string    `xorm:"nvarchar(200) notnull 'company_name'" json:"company_name"`
+ModeName       string    `xorm:"nvarchar(200) notnull 'mode_name'" json:"mode_name"`
+
+ */
