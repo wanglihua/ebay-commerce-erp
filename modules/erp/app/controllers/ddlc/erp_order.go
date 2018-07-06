@@ -1487,6 +1487,15 @@ func (c ErpOrder) QuXiao() revel.Result {
 	var login_user = core.GetLoginUser(c.Session)
 
 	for _, order := range order_list {
+		if order.StatusId == models.ORDER_STATUS_YFH || order.StatusId == models.ORDER_STATUS_YWC {
+			return c.RenderJson(map[string]interface{}{
+				"success": false,
+				"message": "已发货和已完成状态的订单不能取消！",
+			})
+		}
+	}
+
+	for _, order := range order_list {
 		order.CancelStatusId = order.StatusId
 		order.StatusId = models.ORDER_STATUS_YQX // 已取消
 		_, err = db_session.Id(order.Id).Cols("status_id", "cancel_status_id").Update(&order)
@@ -1543,6 +1552,9 @@ func (c ErpOrder) HuiFu() revel.Result {
 				"message": "订单取消前的记录的订单状态不合法！",
 			})
 		}
+	}
+
+	for _, order := range order_list {
 
 		order.StatusId = order.CancelStatusId
 		_, err = db_session.Id(order.Id).Cols("status_id").Update(&order)

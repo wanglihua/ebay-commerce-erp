@@ -285,7 +285,7 @@ WHERE ol.stock_id = 0 AND ol.company_id = 0
 
 func (c ErpLogisticsReport) Export() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.DDBB_LOGISTICS_REPORT, c.Session)
-	
+
 	var db_session = c.DbSession
 
 	xlsx_file := c.get_export_excel(db_session)
