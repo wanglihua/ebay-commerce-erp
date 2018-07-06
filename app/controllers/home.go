@@ -21,6 +21,7 @@ import (
 	"matrix/modules/erp/models/xsbb_models"
 	"matrix/modules/erp/models/xxgl_models"
 	"matrix/modules/erp/models/ppgl_models"
+	"matrix/modules/erp/models/ddbb_models"
 )
 
 type Home struct {
@@ -161,10 +162,11 @@ func (c Home) SyncDbPost() revel.Result {
 	model_list = append(model_list, &ddlc_models.OrderLogisticsMatchDebugInfo{})
 	model_list = append(model_list, &ddlc_models.OrderShippingAddressInfo{})
 	model_list = append(model_list, &ddlc_models.PickupOrderInfo{})
-	model_list = append(model_list, &ddlc_models.OrderLogisticsDayReportInfo{})
 	model_list = append(model_list, &ddlc_models.CombineOrderInfo{})
 	model_list = append(model_list, &ddlc_models.OrderFeedbackInfo{})
 	model_list = append(model_list, &ddlc_models.OrderExternalTransactionInfo{})
+
+	model_list = append(model_list, &ddbb_models.LogisticsReportInfo{})
 
 	model_list = append(model_list, &xsgl_models.SalesManagerInfo{})
 	model_list = append(model_list, &xsgl_models.ProductSaleSettingInfo{})
