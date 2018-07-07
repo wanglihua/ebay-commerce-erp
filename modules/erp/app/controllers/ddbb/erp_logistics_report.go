@@ -14,7 +14,6 @@ import (
 	"strings"
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/auth/pass_res"
-	"matrix/modules/erp/models/ddbb_models"
 )
 
 const logistics_report_type_day int64 = 1   // 按天
@@ -140,12 +139,26 @@ func (c ErpLogisticsReport) apply_query_filter(filter string, is_export bool) st
 	return filter
 }
 
+type logistics_report_view_item_t struct {
+	GroupTime         string  `xorm:"'group_time'" json:"group_time"`
+	WeightSum         float64 `xorm:"'weight_sum'" json:"weight_sum"`
+	VolumeSum         float64 `xorm:"'volume_sum'" json:"volume_sum"`
+	PrdCountSum       int64   `xorm:"'prd_count_sum'" json:"prd_count_sum"`
+	OrderCount        int64   `xorm:"'order_count'" json:"order_count"`
+	TotalFeeSum       float64 `xorm:"'total_fee_sum'" json:"total_fee_sum"`
+	ActualTotalFeeSum float64 `xorm:"'actual_total_fee_sum'" json:"actual_total_fee_sum"`
+	ProfitSum         float64 `xorm:"'profit_sum'" json:"profit_sum"`
+}
+
 func (c ErpLogisticsReport) ListData() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.DDBB_LOGISTICS_REPORT, c.Session)
 
 	db_session := c.DbSession
 
 	filter, _, offset, limit := core.GetGridRequestParam(c.Request)
+
+	var report_type int64
+	c.Params.Bind(&report_type, "report_type")
 
 	/*
 
@@ -166,19 +179,47 @@ ORDER BY day_date DESC;
 	 */
 
 	var sb = core.NewSqlBuilder()
-	sb.Select("*")
+	if report_type == logistics_report_type_month {
+		sb.Select(`
+    date_format(month_date, '%Y-%c')  AS group_time,
+    sum(weight)                       AS weight_sum,
+    sum(volume)                       AS volume_sum,
+    sum(prd_count)                    AS prd_count_sum,
+    count(id)                         AS order_count,
+    sum(total_fee)                    AS total_fee_sum,
+    sum(actual_total_fee)             AS actual_total_fee_sum,
+    sum(profit)                       AS profit_sum
+`)
+	} else {
+		sb.Select(`
+    date_format(day_date, '%Y-%c-%d') AS group_time,
+    sum(weight)                       AS weight_sum,
+    sum(volume)                       AS volume_sum,
+    sum(prd_count)                    AS prd_count_sum,
+    count(id)                         AS order_count,
+    sum(total_fee)                    AS total_fee_sum,
+    sum(actual_total_fee)             AS actual_total_fee_sum,
+    sum(profit)                       AS profit_sum
+`)
+	}
+
 	sb.Count("count(id) AS count")
 	sb.From(`erp_logistics_report`)
 
 	filter = c.apply_query_filter(filter, false)
 	sb.Where(filter)
 
-	sb.GroupBy("day_date")
-	sb.OrderBy("day_date DESC")
+	if report_type == logistics_report_type_month {
+		sb.GroupBy("month_date")
+		sb.OrderBy("month_date DESC")
+	} else {
+		sb.GroupBy("day_date")
+		sb.OrderBy("day_date DESC")
+	}
 
 	sb.Limit(offset, limit)
 
-	var logistics_report_list = make([]ddbb_models.LogisticsReportInfo, 0)
+	var logistics_report_list = make([]logistics_report_view_item_t, 0)
 	err := db_session.Sql(sb.SqlList()).Find(&logistics_report_list)
 	core.HandleError(err)
 
@@ -240,7 +281,7 @@ ORDER BY day_date DESC;
 
 	sb.OrderBy("id ASC")
 
-	var logistics_report_list = make([]ddbb_models.LogisticsReportInfo, 0)
+	var logistics_report_list = make([]logistics_report_view_item_t, 0)
 	err := db_session.Sql(sb.SqlList()).Find(&logistics_report_list)
 	core.HandleError(err)
 
@@ -311,10 +352,10 @@ ORDER BY day_date DESC;
 		cell = header_row.AddCell()
 		sheet.SetColWidth(col_index, col_index, 20)
 		set_head_cell_style(cell)
-		cell.Value = "运单号"
+		cell.Value = "总利润"
 	}
 
-	for index, order_logistics := range logistics_report_list {
+	for index, logistics_report := range logistics_report_list {
 		row := sheet.AddRow()
 		row.SetHeightCM(row_height)
 
@@ -323,40 +364,33 @@ ORDER BY day_date DESC;
 		set_text_cell_style(cell, "center")
 		cell.Value = fmt.Sprint(index + 1)
 
-		// 订单
 		cell = row.AddCell()
-		set_text_cell_style(cell, "left")
-		cell.Value = fmt.Sprint(order_logistics.OrderId) // 为了不报错
+		set_text_cell_style(cell, "right")
+		cell.Value = fmt.Sprintf("%0.2f", logistics_report.WeightSum)
 
-		// 订单代码
 		cell = row.AddCell()
-		set_text_cell_style(cell, "left")
-		//cell.Value = order_logistics.Order.FullTranId
+		set_text_cell_style(cell, "right")
+		cell.Value = fmt.Sprintf("%0.2f", logistics_report.VolumeSum)
 
-		// 发货仓库
 		cell = row.AddCell()
-		set_text_cell_style(cell, "left")
-		//cell.Value = order_logistics.Stock.Name
+		set_text_cell_style(cell, "right")
+		cell.Value = fmt.Sprint(logistics_report.PrdCountSum)
 
-		// 物流公司
 		cell = row.AddCell()
-		set_text_cell_style(cell, "left")
-		//cell.Value = order_logistics.LogisticsCompany.Name
+		set_text_cell_style(cell, "right")
+		cell.Value = fmt.Sprint(logistics_report.OrderCount)
 
-		// 物流方式
 		cell = row.AddCell()
-		set_text_cell_style(cell, "left")
-		//cell.Value = order_logistics.LogisticsMode.Name
+		set_text_cell_style(cell, "right")
+		cell.Value = fmt.Sprintf("%0.2f", logistics_report.TotalFeeSum)
 
-		// 预估物流费用
 		cell = row.AddCell()
-		set_text_cell_style(cell, "center")
-		//cell.Value = fmt.Sprintf("%0.1f", order_logistics.OrderLogistics.TotalFee)
+		set_text_cell_style(cell, "right")
+		cell.Value = fmt.Sprintf("%0.2f", logistics_report.ActualTotalFeeSum)
 
-		// 运单号
 		cell = row.AddCell()
-		set_text_cell_style(cell, "left")
-		//cell.Value = order_logistics.Order.WaybillNumber
+		set_text_cell_style(cell, "right")
+		cell.Value = fmt.Sprintf("%0.2f", logistics_report.ProfitSum)
 	}
 
 	return xlsx_file
