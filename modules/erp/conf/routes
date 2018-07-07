@@ -856,3 +856,9 @@ POST /product/logistics/delete             ErpProductLogistics.Delete
 GET  /refund/report                     ErpRefundReport.Index
 POST /refund/report/list/data           ErpRefundReport.ListData
 POST /refund/report/export              ErpRefundReport.Export
+
+GET  /city/postcode                    ErpCityPostcode.Index
+POST /city/postcode/data/list          ErpCityPostcode.ListData
+POST /city/postcode/data/detail        ErpCityPostcode.DetailData
+POST /city/postcode/save               ErpCityPostcode.Save
+POST /city/postcode/delete             ErpCityPostcode.Delete
