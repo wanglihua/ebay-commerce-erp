@@ -87,7 +87,7 @@ func (c ErpLogisticsReport) GetLogisticsModeList() revel.Result {
 	})
 }
 
-func (c ErpLogisticsReport) apply_query_filter(filter string, is_export bool) string {
+func (c ErpLogisticsReport) apply_query_filter(filter string) string {
 	var stock_id int64
 	c.Params.Bind(&stock_id, "stock_id")
 
@@ -103,43 +103,32 @@ func (c ErpLogisticsReport) apply_query_filter(filter string, is_export bool) st
 	c.Params.Bind(&begin_time_query, "begin_time_query")
 	c.Params.Bind(&end_time_query, "end_time_query")
 
-	var id_list = make([]int64, 0)
-	c.Params.Bind(&id_list, "id_list")
-
-	if (is_export == true && len(id_list) == 0) || is_export == false {
-
-		if stock_id != 0 {
-			// 这里是查询上的对仓库的限制，如果是拣货人员的话，下面还有是不是这个仓库的拣货人员的限制
-			filter = core.SqlAnd(filter, fmt.Sprintf("stock_id = %d", stock_id))
-		}
-
-		if logistics_company_id != 0 {
-			filter = core.SqlAnd(filter, fmt.Sprintf("company_id = %d", logistics_company_id))
-		}
-
-		if postalcode_query != "" {
-			// 分析多个邮编的情况
-			var postalcode_str_list = strings.Split(postalcode_query, ",")
-			var postalcode_sql_str_list = make([]string, 0)
-			for _, postalcode_str := range postalcode_str_list {
-				postalcode_sql_str_list = append(postalcode_sql_str_list, fmt.Sprintf("'%s'", postalcode_str))
-			}
-
-			filter = core.SqlAnd(filter, fmt.Sprintf("postcode IN (%s)", strings.Join(postalcode_sql_str_list, ",")))
-		}
-
-		if begin_time_query.Valid == true {
-			filter = core.SqlAnd(filter, fmt.Sprintf("day_date >= '%s'", begin_time_query.Time.Format("2006-01-02")))
-		}
-
-		if end_time_query.Valid == true {
-			filter = core.SqlAnd(filter, fmt.Sprintf("day_date <= '%s'", end_time_query.Time.Format("2006-01-02")))
-		}
+	if stock_id != 0 {
+		// 这里是查询上的对仓库的限制，如果是拣货人员的话，下面还有是不是这个仓库的拣货人员的限制
+		filter = core.SqlAnd(filter, fmt.Sprintf("stock_id = %d", stock_id))
 	}
 
-	if len(id_list) != 0 && is_export == true {
-		var id_str_list = core.Int_list_to_str_list(id_list)
-		filter = core.SqlAnd(filter, fmt.Sprintf("id IN (%s)", strings.Join(id_str_list, ",")))
+	if logistics_company_id != 0 {
+		filter = core.SqlAnd(filter, fmt.Sprintf("company_id = %d", logistics_company_id))
+	}
+
+	if postalcode_query != "" {
+		// 分析多个邮编的情况
+		var postalcode_str_list = strings.Split(postalcode_query, ",")
+		var postalcode_sql_str_list = make([]string, 0)
+		for _, postalcode_str := range postalcode_str_list {
+			postalcode_sql_str_list = append(postalcode_sql_str_list, fmt.Sprintf("'%s'", postalcode_str))
+		}
+
+		filter = core.SqlAnd(filter, fmt.Sprintf("postcode IN (%s)", strings.Join(postalcode_sql_str_list, ",")))
+	}
+
+	if begin_time_query.Valid == true {
+		filter = core.SqlAnd(filter, fmt.Sprintf("day_date >= '%s'", begin_time_query.Time.Format("2006-01-02")))
+	}
+
+	if end_time_query.Valid == true {
+		filter = core.SqlAnd(filter, fmt.Sprintf("day_date <= '%s'", end_time_query.Time.Format("2006-01-02")))
 	}
 
 	return filter
@@ -209,10 +198,10 @@ ORDER BY day_date DESC;
 `)
 	}
 
-	sb.Count("count(id) AS count")
+	sb.Count("count(*) AS count")
 	sb.From(`erp_logistics_report`)
 
-	filter = c.apply_query_filter(filter, false)
+	filter = c.apply_query_filter(filter)
 	sb.Where(filter)
 
 	if report_type == logistics_report_type_month {
@@ -310,7 +299,7 @@ ORDER BY day_date DESC;
 	sb.Count("count(id) AS count")
 	sb.From(`erp_logistics_report`)
 
-	filter = c.apply_query_filter(filter, false)
+	filter = c.apply_query_filter(filter)
 	sb.Where(filter)
 
 	if report_type == logistics_report_type_month {

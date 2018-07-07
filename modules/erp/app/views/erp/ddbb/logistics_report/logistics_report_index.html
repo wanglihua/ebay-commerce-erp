@@ -111,18 +111,6 @@
                     "iDisplayLength": 50,
                     "aoColumns": [
                         {
-                            "mDataProp": "ol.id",
-                            "bSearchable": false,
-                            "orderable": false,
-                            "sClass": "center",
-                            "width": 50,
-                            "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
-                            "render": function (data, type, row) {
-                                return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
-                            }
-                        },
-
-                        {
                             "mDataProp": "group_time", "title": "时间", "bSearchable": true, "width": 120, "bSortable": false,
                             "render": function (data, type, row) {
                                 return data;
