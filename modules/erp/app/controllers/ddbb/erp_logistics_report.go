@@ -118,8 +118,14 @@ func (c ErpLogisticsReport) apply_query_filter(filter string, is_export bool) st
 		}
 
 		if postalcode_query != "" {
-			// todo 分析多个邮编的情况
-			filter = core.SqlAnd(filter, fmt.Sprintf("postcode = '%s'", postalcode_query))
+			// 分析多个邮编的情况
+			var postalcode_str_list = strings.Split(postalcode_query, ",")
+			var postalcode_sql_str_list = make([]string, 0)
+			for _, postalcode_str := range postalcode_str_list {
+				postalcode_sql_str_list = append(postalcode_sql_str_list, fmt.Sprintf("'%s'", postalcode_str))
+			}
+
+			filter = core.SqlAnd(filter, fmt.Sprintf("postcode IN (%s)", strings.Join(postalcode_sql_str_list, ",")))
 		}
 
 		if begin_time_query.Valid == true {
