@@ -55,13 +55,15 @@ func GetPpglMenu(res_id_map map[int64]bool, web_session revel.Session) string {
         </li>`)
 	}
 
-	buffer.WriteString(`<li id="ppgl-refund-report-menu" class="">
+	if check_pass_res_menu(pass_res.PPGL_REFUND_REPORT) {
+		buffer.WriteString(`<li id="ppgl-refund-report-menu" class="">
             <a href="/refund/report">
                 <i class="menu-icon fa fa-caret-right"></i>
                 退款报表
             </a>
             <b class="arrow"></b>
         </li>`)
+	}
 
 	buffer.WriteString(`</ul>
 </li>
