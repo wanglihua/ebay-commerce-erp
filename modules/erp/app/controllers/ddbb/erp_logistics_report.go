@@ -253,33 +253,67 @@ func (c ErpLogisticsReport) Export() revel.Result {
 }
 
 func (c ErpLogisticsReport) get_export_excel(db_session *xorm.Session) *xlsx.File {
+	var filter = "(1=1)"
+
+	var report_type int64
+	c.Params.Bind(&report_type, "report_type")
 
 	/*
 
-SELECT *
+SELECT
+    date_format(day_date, '%Y-%c-%d') AS group_time,
+    sum(weight)                       AS weight_sum,
+    sum(volume)                       AS volume_sum,
+    sum(prd_count)                    AS prd_count_sum,
+    count(id)                         AS order_count,
+    sum(total_fee)                    AS total_fee_sum,
+    sum(actual_total_fee)             AS actual_total_fee_sum,
+    sum(profit)                       AS profit_sum
 FROM erp_logistics_report
-WHERE stock_id = 0
+WHERE stock_id = 1
 GROUP BY day_date
 ORDER BY day_date DESC;
 
 	 */
 
 	var sb = core.NewSqlBuilder()
-	sb.Select("*")
+	if report_type == logistics_report_type_month {
+		sb.Select(`
+    date_format(month_date, '%Y-%c')  AS group_time,
+    sum(weight)                       AS weight_sum,
+    sum(volume)                       AS volume_sum,
+    sum(prd_count)                    AS prd_count_sum,
+    count(id)                         AS order_count,
+    sum(total_fee)                    AS total_fee_sum,
+    sum(actual_total_fee)             AS actual_total_fee_sum,
+    sum(profit)                       AS profit_sum
+`)
+	} else {
+		sb.Select(`
+    date_format(day_date, '%Y-%c-%d') AS group_time,
+    sum(weight)                       AS weight_sum,
+    sum(volume)                       AS volume_sum,
+    sum(prd_count)                    AS prd_count_sum,
+    count(id)                         AS order_count,
+    sum(total_fee)                    AS total_fee_sum,
+    sum(actual_total_fee)             AS actual_total_fee_sum,
+    sum(profit)                       AS profit_sum
+`)
+	}
+
+	sb.Count("count(id) AS count")
 	sb.From(`erp_logistics_report`)
 
-	var filter = "(1=1)"
 	filter = c.apply_query_filter(filter, false)
 	sb.Where(filter)
 
-	sb.GroupBy("day_date")
-	sb.OrderBy("day_date ASC")
-
-	filter = c.apply_query_filter(filter, true)
-
-	sb.Where(filter)
-
-	sb.OrderBy("id ASC")
+	if report_type == logistics_report_type_month {
+		sb.GroupBy("month_date")
+		sb.OrderBy("month_date DESC")
+	} else {
+		sb.GroupBy("day_date")
+		sb.OrderBy("day_date DESC")
+	}
 
 	var logistics_report_list = make([]logistics_report_view_item_t, 0)
 	err := db_session.Sql(sb.SqlList()).Find(&logistics_report_list)
@@ -311,6 +345,12 @@ ORDER BY day_date DESC;
 		sheet.SetColWidth(col_index, col_index, 8)
 		set_head_cell_style(cell)
 		cell.Value = "序号"
+
+		col_index++
+		cell = header_row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 12)
+		set_head_cell_style(cell)
+		cell.Value = "时间"
 
 		col_index++
 		cell = header_row.AddCell()
@@ -363,6 +403,10 @@ ORDER BY day_date DESC;
 		cell := row.AddCell()
 		set_text_cell_style(cell, "center")
 		cell.Value = fmt.Sprint(index + 1)
+
+		cell = row.AddCell()
+		set_text_cell_style(cell, "center")
+		cell.Value = logistics_report.GroupTime
 
 		cell = row.AddCell()
 		set_text_cell_style(cell, "right")
