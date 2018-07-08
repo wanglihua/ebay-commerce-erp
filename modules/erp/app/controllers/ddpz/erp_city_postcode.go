@@ -108,26 +108,44 @@ func (c ErpCityPostcode) Save() revel.Result {
 		return c.RenderJson(core.JsonResult{Success: false, Message: c.GetValidationErrorMessage()})
 	}
 
-	city_postcode := detail_form.CityPostcode
+	city_postcode_from_ui := detail_form.CityPostcode
 
-	if city_postcode.CityId == ddpz_models.CITY_ID_MEL {
-		city_postcode.CityName = "MEL"
+	if city_postcode_from_ui.CityId == ddpz_models.CITY_ID_MEL {
+		city_postcode_from_ui.CityName = "MEL"
 	}
 
-	if city_postcode.CityId == ddpz_models.CITY_ID_BNE {
-		city_postcode.CityName = "BNE"
+	if city_postcode_from_ui.CityId == ddpz_models.CITY_ID_BNE {
+		city_postcode_from_ui.CityName = "BNE"
 	}
 
-	if city_postcode.CityId == ddpz_models.CITY_ID_SYD {
-		city_postcode.CityName = "SYD"
+	if city_postcode_from_ui.CityId == ddpz_models.CITY_ID_SYD {
+		city_postcode_from_ui.CityName = "SYD"
 	}
 
 	var affected int64
 	if detail_form.IsCreate() {
-		affected, err = db_session.Insert(&city_postcode)
+
+		var city_postcode_in_db ddpz_models.CityPostcodeInfo
+		has, err := db_session.Where("city_id = ? AND postcode = ?", city_postcode_from_ui.CityId, city_postcode_from_ui.Postcode).Get(&city_postcode_in_db)
+		core.HandleError(err)
+
+		if has == true {
+			return c.RenderJson(core.JsonResult{Success: false, Message: "指定城市的邮编已存在！"})
+		}
+
+		affected, err = db_session.Insert(&city_postcode_from_ui)
 		core.HandleError(err)
 	} else {
-		affected, err = db_session.Id(city_postcode.Id).Update(&city_postcode)
+		var city_postcode_in_db ddpz_models.CityPostcodeInfo
+		has, err := db_session.Where("id <> ? AND city_id = ? AND postcode = ?",
+			city_postcode_from_ui.Id, city_postcode_from_ui.CityId, city_postcode_from_ui.Postcode).Get(&city_postcode_in_db)
+		core.HandleError(err)
+
+		if has == true {
+			return c.RenderJson(core.JsonResult{Success: false, Message: "指定城市的邮编已存在！"})
+		}
+
+		affected, err = db_session.Id(city_postcode_from_ui.Id).Update(&city_postcode_from_ui)
 		core.HandleError(err)
 
 		if affected == 0 {
