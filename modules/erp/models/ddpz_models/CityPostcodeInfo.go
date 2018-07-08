@@ -4,9 +4,9 @@ import (
 	"matrix/core"
 )
 
-const MEL_CITY_ID int64 = 1
-const BNE_CITY_ID int64 = 2
-const SYD_CITY_ID int64 = 3
+const CITY_ID_MEL int64 = 1
+const CITY_ID_BNE int64 = 2
+const CITY_ID_SYD int64 = 3
 
 type CityPostcodeInfo struct {
 	Id         int64     `xorm:"bigint notnull pk autoincr 'id'" json:"id"`

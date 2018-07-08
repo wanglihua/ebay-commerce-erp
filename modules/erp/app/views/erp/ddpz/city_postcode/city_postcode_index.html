@@ -44,12 +44,17 @@
                         <div class="col-xs-12">
                             <form class="form-horizontal" role="form" id="cityPostcodeDetailForm">
                                 <input id="city_postcode_id" name="detail.city_postcode.id" type="hidden" v-model.number="detail.city_postcode.id"/>
+
                                 <div class="row">
                                     <div class="col-xs-6">
                                         <div class="form-group">
-                                            <label for="city_id" class="col-xs-2 control-label">CityId</label>
+                                            <label for="city_id" class="col-xs-2 control-label">城市</label>
                                             <div class="col-xs-10">
-                                                <input id="city_id" name="detail.city_postcode.city_id" type="text" class="input-sm form-control" v-model.number="detail.city_postcode.city_id"/>
+                                                <select id="city_id" name="detail.city_postcode.city_id" class="input-sm form-control" v-model.number="detail.city_postcode.city_id">
+                                                    <option value="{% .city_id_mel %}">MEL</option>
+                                                    <option value="{% .city_id_bne %}">BNE</option>
+                                                    <option value="{% .city_id_syd %}">SYD</option>
+                                                </select>
                                             </div>
                                         </div>
                                     </div>
@@ -58,18 +63,7 @@
                                 <div class="row">
                                     <div class="col-xs-6">
                                         <div class="form-group">
-                                            <label for="city_name" class="col-xs-2 control-label">CityName</label>
-                                            <div class="col-xs-10">
-                                                <input id="city_name" name="detail.city_postcode.city_name" type="text" class="input-sm form-control" v-model="detail.city_postcode.city_name"/>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-xs-6">
-                                        <div class="form-group">
-                                            <label for="postcode" class="col-xs-2 control-label">Postcode</label>
+                                            <label for="postcode" class="col-xs-2 control-label">邮编</label>
                                             <div class="col-xs-10">
                                                 <input id="postcode" name="detail.city_postcode.postcode" type="text" class="input-sm form-control" v-model="detail.city_postcode.postcode"/>
                                             </div>
@@ -115,9 +109,8 @@
                                     return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
                                 }
                             },
-                            {"mDataProp": "city_id", "title": "CityId", "bSearchable": false},
-                            {"mDataProp": "city_name", "title": "CityName", "bSearchable": true},
-                            {"mDataProp": "postcode", "title": "Postcode", "bSearchable": true},
+                            {"mDataProp": "city_name", "title": "城市名称", "bSearchable": true, "width": 220},
+                            {"mDataProp": "postcode", "title": "邮编", "bSearchable": true},
                             {"mDataProp": "create_time", "title": "创建时间", "bSearchable": false, "width": 120},
                             {"mDataProp": "update_time", "title": "修改时间", "bSearchable": false, "width": 120}
                         ]
@@ -159,9 +152,6 @@
                 var valid = validate(form, {
                     'detail.city_postcode.city_id': {
                         required: true, digits: true
-                    },
-                    'detail.city_postcode.city_name': {
-                        required: true
                     },
                     'detail.city_postcode.postcode': {
                         required: true

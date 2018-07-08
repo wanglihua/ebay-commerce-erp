@@ -18,6 +18,10 @@ type ErpCityPostcode struct {
 func (c ErpCityPostcode) Index() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.DDPZ_CITY_POSTCODE, c.Session)
 
+	c.RenderArgs["city_id_mel"] = ddpz_models.CITY_ID_MEL
+	c.RenderArgs["city_id_bne"] = ddpz_models.CITY_ID_BNE
+	c.RenderArgs["city_id_syd"] = ddpz_models.CITY_ID_SYD
+
 	return c.RenderTemplate("erp/ddpz/city_postcode/city_postcode_index.html")
 }
 
@@ -63,8 +67,6 @@ func (f *CityPostcodeDetailForm) IsCreate() bool {
 func (f *CityPostcodeDetailForm) Valid(validation *revel.Validation) bool {
 	validation.Required(f.CityPostcode.CityId).Message("CityId不能为空！")
 
-	validation.Required(f.CityPostcode.CityName).Message("CityName不能为空！")
-
 	validation.Required(f.CityPostcode.Postcode).Message("Postcode不能为空！")
 
 	return validation.HasErrors() == false
@@ -107,6 +109,18 @@ func (c ErpCityPostcode) Save() revel.Result {
 	}
 
 	city_postcode := detail_form.CityPostcode
+
+	if city_postcode.CityId == ddpz_models.CITY_ID_MEL {
+		city_postcode.CityName = "MEL"
+	}
+
+	if city_postcode.CityId == ddpz_models.CITY_ID_BNE {
+		city_postcode.CityName = "BNE"
+	}
+
+	if city_postcode.CityId == ddpz_models.CITY_ID_SYD {
+		city_postcode.CityName = "SYD"
+	}
 
 	var affected int64
 	if detail_form.IsCreate() {
