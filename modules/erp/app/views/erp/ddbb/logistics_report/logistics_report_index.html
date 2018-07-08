@@ -44,6 +44,14 @@
                                     </template>
                                 </select>
 
+                                <label class="control-label no-padding-right" for="cityId">城市</label>
+                                <select id="cityId" style="width: 110px;">
+                                    <option value="0">--按城市查询--</option>
+                                    <option value="{%.city_id_mel%}">MEL</option>
+                                    <option value="{%.city_id_bne%}">BNE</option>
+                                    <option value="{%.city_id_syd%}">SYD</option>
+                                </select>
+
                                 <label class="control-label no-padding-right" for="postalcode_query">邮编</label>
                                 <input class="input-sm" id="postalcode_query" name="postalcode_query" placeholder="多个邮编逗号隔开" type="text" v-model="page.postalcode_query" style="width: 200px;"/>
                                 <label class="control-label no-padding-right" for="begin_time_query">开始时间</label>
@@ -170,6 +178,7 @@
                         showMask("数据加载中，请稍候");
 
                         aoData.push({'name': 'report_type', 'value': $("#reportType").val()});
+                        aoData.push({'name': 'city_id', 'value': $("#cityId").val()});
                         aoData.push({'name': 'stock_id', 'value': vm.page.stock_id});
                         aoData.push({'name': 'logistics_company_id', 'value': vm.page.logistics_company_id});
                         aoData.push({'name': 'postalcode_query', 'value': vm.page.postalcode_query});

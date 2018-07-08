@@ -29,6 +29,10 @@ func (c ErpLogisticsReport) Index() revel.Result {
 	c.RenderArgs["logistics_report_type_day"] = logistics_report_type_day
 	c.RenderArgs["logistics_report_type_month"] = logistics_report_type_month
 
+	c.RenderArgs["city_id_mel"] = ddpz_models.CITY_ID_MEL
+	c.RenderArgs["city_id_bne"] = ddpz_models.CITY_ID_BNE
+	c.RenderArgs["city_id_syd"] = ddpz_models.CITY_ID_SYD
+
 	return c.RenderTemplate("erp/ddbb/logistics_report/logistics_report_index.html")
 }
 
@@ -94,6 +98,9 @@ func (c ErpLogisticsReport) apply_query_filter(filter string) string {
 	var logistics_company_id int64
 	c.Params.Bind(&logistics_company_id, "logistics_company_id")
 
+	var city_id int64
+	c.Params.Bind(&city_id, "city_id")
+
 	var postalcode_query string
 	c.Params.Bind(&postalcode_query, "postalcode_query")
 	postalcode_query = strings.TrimSpace(postalcode_query)
@@ -112,15 +119,27 @@ func (c ErpLogisticsReport) apply_query_filter(filter string) string {
 		filter = core.SqlAnd(filter, fmt.Sprintf("company_id = %d", logistics_company_id))
 	}
 
-	if postalcode_query != "" {
-		// 分析多个邮编的情况
-		var postalcode_str_list = strings.Split(postalcode_query, ",")
-		var postalcode_sql_str_list = make([]string, 0)
-		for _, postalcode_str := range postalcode_str_list {
-			postalcode_sql_str_list = append(postalcode_sql_str_list, fmt.Sprintf("'%s'", postalcode_str))
-		}
+	if city_id != 0 {
+		/*
+SELECT postcode
+FROM erp_city_postcode
+WHERE city_id = 1
+		 */
+		var city_id_subquery_sql = ` postcode IN (SELECT postcode
+FROM erp_city_postcode
+WHERE city_id = %d) `
+		filter = core.SqlAnd(filter, fmt.Sprintf(city_id_subquery_sql, city_id))
+	} else {
+		if postalcode_query != "" {
+			// 分析多个邮编的情况
+			var postalcode_str_list = strings.Split(postalcode_query, ",")
+			var postalcode_sql_str_list = make([]string, 0)
+			for _, postalcode_str := range postalcode_str_list {
+				postalcode_sql_str_list = append(postalcode_sql_str_list, fmt.Sprintf("'%s'", postalcode_str))
+			}
 
-		filter = core.SqlAnd(filter, fmt.Sprintf("postcode IN (%s)", strings.Join(postalcode_sql_str_list, ",")))
+			filter = core.SqlAnd(filter, fmt.Sprintf("postcode IN (%s)", strings.Join(postalcode_sql_str_list, ",")))
+		}
 	}
 
 	if begin_time_query.Valid == true {
