@@ -561,6 +561,37 @@ func (p_ol *OrderLogisticsService) hold_check_mel_temp_sku(p_order *ddlc_models.
 	return false
 }
 
+// city id 可以是 ddpz_models.CITY_ID_MEL， ddpz_models.CITY_ID_BNE， ddpz_models.CITY_ID_SYD
+func (p_ol *OrderLogisticsService) hold_check_city_postcode(p_order *ddlc_models.OrderInfo, p_order_logistics_data *order_logistics_data_t, db_session *xorm.Session) (is_hold_return bool) {
+	var is_city_postcode = false
+	var city_id int64 = 0
+	for _, city_postcode := range p_ol.city_postcode_list {
+		if p_order_logistics_data.order_shipping_address.PostalCode == city_postcode.Postcode {
+			is_city_postcode = true
+			city_id = city_postcode.CityId
+		}
+	}
+
+	if is_city_postcode == true {
+		if city_id == ddpz_models.CITY_ID_MEL {
+			p_ol.update_order_to_hold_type(p_order, ddpz_models.ORDER_HOLD_TYPE_MEL_POSTCODE, db_session)
+			return true
+		}
+
+		if city_id == ddpz_models.CITY_ID_BNE {
+			p_ol.update_order_to_hold_type(p_order, ddpz_models.ORDER_HOLD_TYPE_BNE_POSTCODE, db_session)
+			return true
+		}
+
+		if city_id == ddpz_models.CITY_ID_SYD {
+			p_ol.update_order_to_hold_type(p_order, ddpz_models.ORDER_HOLD_TYPE_SYD_POSTCODE, db_session)
+			return true
+		}
+	}
+
+	return false
+}
+
 func (p_ol *OrderLogisticsService) update_order_to_hold_type(p_order *ddlc_models.OrderInfo, hold_type_id int64, db_session *xorm.Session) {
 	p_order.HoldTypeId = core.MakeNullInt(hold_type_id, true)
 	p_order.StatusId = models.ORDER_STATUS_HOLD // 修改订单状态为 hold 状态
@@ -632,7 +663,7 @@ func check_stock_has_order_products_and_get_cost_amount(p_ol *OrderLogisticsServ
 							p_order.HoldTypeId.Int64 == ddpz_models.ORDER_HOLD_TYPE_ENVELOPE ||
 							p_order.HoldTypeId.Int64 == ddpz_models.ORDER_HOLD_TYPE_EXPRESS ||
 							p_order.HoldTypeId.Int64 == ddpz_models.ORDER_HOLD_TYPE_INTERNATIONAL)) {
-								//todo: 这里面订单HOLD类型的列表还有疑问的， 这次加了个 ORDER_HOLD_TYPE_OOS_AU_STOCK_ZT_HAS， 是不是还要加别的
+					//todo: 这里面订单HOLD类型的列表还有疑问的， 这次加了个 ORDER_HOLD_TYPE_OOS_AU_STOCK_ZT_HAS， 是不是还要加别的
 					pending_in_db_to_clear = order_product_info.Qty
 				}
 

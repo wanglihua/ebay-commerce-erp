@@ -47,6 +47,7 @@ type OrderLogisticsService struct {
 	LoginUser                         core.LoginUser                                //
 	fav_stock_time_range_list         []ddpz_models.FavStockTimeRangeInfo           //
 	express_logistics_mode            ddpz_models.LogisticsModeInfo                 // 系统内的配置的物流快递方式，一般只有一个，用于express的hold的判断
+	city_postcode_list                []ddpz_models.CityPostcodeInfo
 }
 
 func (p_ol *OrderLogisticsService) init_data(order_list []ddlc_models.OrderInfo, db_session *xorm.Session) {
@@ -162,6 +163,12 @@ LIMIT 1;`
 	_, err = db_session.Sql(sql_get_express_logistics_mode).Get(&express_logistics_mode)
 	core.HandleError(err)
 	p_ol.express_logistics_mode = express_logistics_mode
+
+	var city_postcode_list = make([]ddpz_models.CityPostcodeInfo, 0)
+	err = db_session.Find(&city_postcode_list)
+	core.HandleError(err)
+
+	p_ol.city_postcode_list = city_postcode_list
 }
 
 func (p_ol *OrderLogisticsService) CalculateListPaidOrders(user core.LoginUser, db_session *xorm.Session) error {
@@ -587,6 +594,13 @@ func (p_ol *OrderLogisticsService) CalculateListWithOption(order_list []ddlc_mod
 		if p_ol.hold_check_mel_temp_sku(&order, p_order_logistics_data, db_session) {
 			continue
 		}
+
+		// 9. city postcode 先禁用
+		/*
+		if p_ol.hold_check_city_postcode(&order, p_order_logistics_data, db_session) {
+			continue
+		}
+		*/
 
 		// 如果状态开始是 hold，现在又变为非Hold的，就把状态改成 已处理 Hold
 		if is_previous_hold == true && order.StatusId != models.ORDER_STATUS_HOLD {

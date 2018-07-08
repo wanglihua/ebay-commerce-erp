@@ -48,6 +48,9 @@ const (
 	ORDER_HOLD_TYPE_MEL_TEMP_SKU                  int64 = 10185 // MEL临时SKU
 	ORDER_HOLD_TYPE_SPECIAL_NOT_SHIP              int64 = 10190 // 特殊情况实际未发货
 	ORDER_HOLD_TYPE_SPECIAL_HOLD_SPECIAL_NOT_SHIP int64 = 10200 // 特殊Hold特殊情况实际未发货
+	ORDER_HOLD_TYPE_MEL_POSTCODE                  int64 = 10300 // MEL邮编
+	ORDER_HOLD_TYPE_BNE_POSTCODE                  int64 = 10400 // BNE邮编
+	ORDER_HOLD_TYPE_SYD_POSTCODE                  int64 = 10500 // SYD邮编
 )
 
 func (e OrderHoldTypeInfo) InitData(db_session *xorm.Session) {
@@ -219,5 +222,26 @@ func (e OrderHoldTypeInfo) InitData(db_session *xorm.Session) {
 	order_hold_type.Id = ORDER_HOLD_TYPE_SPECIAL_HOLD_SPECIAL_NOT_SHIP
 	order_hold_type.Name = "特殊Hold特殊情况实际未发货"
 	order_hold_type.Desc = "特殊Hold特殊情况实际未发货"
+	db_session.Insert(order_hold_type)
+
+	// ORDER_HOLD_TYPE_MEL_POSTCODE                  int64 = 10300 // MEL邮编
+	order_hold_type = new(OrderHoldTypeInfo)
+	order_hold_type.Id = ORDER_HOLD_TYPE_MEL_POSTCODE
+	order_hold_type.Name = "MEL邮编"
+	order_hold_type.Desc = "MEL邮编"
+	db_session.Insert(order_hold_type)
+
+	// ORDER_HOLD_TYPE_BNE_POSTCODE                  int64 = 10400 // BNE邮编
+	order_hold_type = new(OrderHoldTypeInfo)
+	order_hold_type.Id = ORDER_HOLD_TYPE_BNE_POSTCODE
+	order_hold_type.Name = "BNE邮编"
+	order_hold_type.Desc = "BNE邮编"
+	db_session.Insert(order_hold_type)
+
+	// ORDER_HOLD_TYPE_SYD_POSTCODE                  int64 = 10500 // SYD邮编
+	order_hold_type = new(OrderHoldTypeInfo)
+	order_hold_type.Id = ORDER_HOLD_TYPE_SYD_POSTCODE
+	order_hold_type.Name = "SYD邮编"
+	order_hold_type.Desc = "SYD邮编"
 	db_session.Insert(order_hold_type)
 }
