@@ -7,6 +7,8 @@ import (
 
 	"matrix/core"
 	"matrix/modules/erp/models/ddpz_models"
+	"matrix/modules/auth/service/pass_service"
+	"matrix/modules/auth/pass_res"
 )
 
 type ErpFavStockTimeRange struct {
@@ -14,10 +16,14 @@ type ErpFavStockTimeRange struct {
 }
 
 func (c ErpFavStockTimeRange) Index() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.DDPZ_FAV_STOCK_TIME_RANGE, c.Session)
+
 	return c.RenderTemplate("erp/ddpz/fav_stock_time_range/fav_stock_time_range_index.html")
 }
 
 func (c ErpFavStockTimeRange) ListData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.DDPZ_FAV_STOCK_TIME_RANGE, c.Session)
+
 	db_session := c.DbSession
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
@@ -99,6 +105,8 @@ func (f *FavStockTimeRangeDetailForm) Valid(validation *revel.Validation) bool {
 }
 
 func (c ErpFavStockTimeRange) DetailData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.DDPZ_FAV_STOCK_TIME_RANGE, c.Session)
+
 	db_session := c.DbSession
 
 	var fav_stock_time_range_id int64
@@ -151,6 +159,8 @@ func (c ErpFavStockTimeRange) DetailData() revel.Result {
 }
 
 func (c ErpFavStockTimeRange) Save() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.DDPZ_FAV_STOCK_TIME_RANGE, c.Session)
+
 	db_session := c.DbSession
 
 	var detail_form FavStockTimeRangeDetailForm
@@ -189,6 +199,8 @@ func (c ErpFavStockTimeRange) Save() revel.Result {
 }
 
 func (c ErpFavStockTimeRange) Delete() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.DDPZ_FAV_STOCK_TIME_RANGE, c.Session)
+
 	db_session := c.DbSession
 
 	fav_stock_time_range_id_list := make([]int64, 0)

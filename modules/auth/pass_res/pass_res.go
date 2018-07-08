@@ -36,15 +36,17 @@ const (
 	XTPZ_LITTLE_ICON        = 110700 // 图标管理
 
 	// 订单配置, 模块编号 12
-	DDPZ_LOGISTICS_COMPANY  = 120100 // 物流公司
-	DDPZ_LOGISTICS_MODE     = 120200 // 物流方式
-	DDPZ_LOGISTICS_FEE_RATE = 120300 // 物流费率
-	DDPZ_LOGISTICS_SETTING  = 120400 // 物流配置
-	DDPZ_ENVELOPE_FEE_RATE  = 120500 // 信封费率
-	DDPZ_PICK_FEE           = 120600 // 拣货费用
-	DDPZ_ORDER_HOLD_TYPE    = 120700 // 订单HOLD类型
-	DDPZ_ORDER_LOG          = 120800 // 订单修改日志
-	DDPZ_ORDER_TAG          = 120900 // 订单标签
+	DDPZ_LOGISTICS_COMPANY    = 120100 // 物流公司
+	DDPZ_LOGISTICS_MODE       = 120200 // 物流方式
+	DDPZ_LOGISTICS_FEE_RATE   = 120300 // 物流费率
+	DDPZ_LOGISTICS_SETTING    = 120400 // 物流配置
+	DDPZ_ENVELOPE_FEE_RATE    = 120500 // 信封费率
+	DDPZ_PICK_FEE             = 120600 // 拣货费用
+	DDPZ_ORDER_HOLD_TYPE      = 120700 // 订单HOLD类型
+	DDPZ_ORDER_LOG            = 120800 // 订单修改日志
+	DDPZ_ORDER_TAG            = 120900 // 订单标签
+	DDPZ_FAV_STOCK_TIME_RANGE = 121000 // 优先仓库时间段
+	DDPZ_CITY_POSTCODE        = 121100 // 城市邮编
 
 	// 订单流程, 模块编号 13
 	DDLC_ORDER_ALL                   = 130100 // 所有订单

@@ -125,21 +125,25 @@ func GetDdpzMenu(res_id_map map[int64]bool, web_session revel.Session) string {
         </li>`)
 	}
 
-	buffer.WriteString(`<li id="ddpz-fav-stock-time-range-menu" class="">
+	if check_pass_res_menu(pass_res.DDPZ_FAV_STOCK_TIME_RANGE) {
+		buffer.WriteString(`<li id="ddpz-fav-stock-time-range-menu" class="">
             <a href="/fav/stock/time/range">
                 <i class="menu-icon fa fa-caret-right"></i>
                 优先仓库时间段
             </a>
             <b class="arrow"></b>
         </li>`)
+	}
 
-	buffer.WriteString(`<li id="ddpz-citypostcode-menu" class="">
+	if check_pass_res_menu(pass_res.DDPZ_CITY_POSTCODE) {
+		buffer.WriteString(`<li id="ddpz-citypostcode-menu" class="">
              <a href="/city/postcode">
                  <i class="menu-icon fa fa-caret-right"></i>
                  城市邮编
              </a>
              <b class="arrow"></b>
          </li>`)
+	}
 
 	/*
                     <li id="ddpz-ordertag-menu" class="">

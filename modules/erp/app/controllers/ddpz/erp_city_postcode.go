@@ -7,6 +7,8 @@ import (
 
 	"matrix/core"
 	"matrix/modules/erp/models/ddpz_models"
+	"matrix/modules/auth/service/pass_service"
+	"matrix/modules/auth/pass_res"
 )
 
 type ErpCityPostcode struct {
@@ -14,10 +16,14 @@ type ErpCityPostcode struct {
 }
 
 func (c ErpCityPostcode) Index() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.DDPZ_CITY_POSTCODE, c.Session)
+
 	return c.RenderTemplate("erp/ddpz/city_postcode/city_postcode_index.html")
 }
 
 func (c ErpCityPostcode) ListData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.DDPZ_CITY_POSTCODE, c.Session)
+
 	db_session := c.DbSession
 
 	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
@@ -65,6 +71,8 @@ func (f *CityPostcodeDetailForm) Valid(validation *revel.Validation) bool {
 }
 
 func (c ErpCityPostcode) DetailData() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.DDPZ_CITY_POSTCODE, c.Session)
+
 	db_session := c.DbSession
 
 	var city_postcode_id int64
@@ -86,6 +94,8 @@ func (c ErpCityPostcode) DetailData() revel.Result {
 }
 
 func (c ErpCityPostcode) Save() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.DDPZ_CITY_POSTCODE, c.Session)
+
 	db_session := c.DbSession
 
 	var detail_form CityPostcodeDetailForm
@@ -115,6 +125,8 @@ func (c ErpCityPostcode) Save() revel.Result {
 }
 
 func (c ErpCityPostcode) Delete() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.DDPZ_CITY_POSTCODE, c.Session)
+
 	db_session := c.DbSession
 
 	city_postcode_id_list := make([]int64, 0)

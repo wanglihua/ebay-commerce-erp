@@ -257,6 +257,20 @@ func (e PassResInfo) InitData(db_session *xorm.Session) {
 		pass.Name = "订单标签"
 		pass.Desc = core.MakeNullString("订单标签", true)
 		db_session.Insert(pass)
+
+		pass = new(PassResInfo)
+		pass.Id = pass_res.DDPZ_FAV_STOCK_TIME_RANGE
+		pass.CateId = pass_res_cate.DDPZ
+		pass.Name = "优先仓库时间段"
+		pass.Desc = core.MakeNullString("优先仓库时间段", true)
+		db_session.Insert(pass)
+
+		pass = new(PassResInfo)
+		pass.Id = pass_res.DDPZ_CITY_POSTCODE
+		pass.CateId = pass_res_cate.DDPZ
+		pass.Name = "城市邮编"
+		pass.Desc = core.MakeNullString("城市邮编", true)
+		db_session.Insert(pass)
 	}
 
 	// 订单报表
