@@ -53,8 +53,8 @@ CREATE PROCEDURE logistics_report()
                 ol.mode_id,
                 ol.length * ol.width * ol.height,
                 ol.weight,
-                total_fee,
-                actual_fee
+                ol.total_fee,
+                ol.actual_fee
             INTO v_stock_id, v_company_id, v_mode_id, v_volume, v_weight, v_total_fee, v_acutal_total_fee
             FROM erp_order_logistics ol
             WHERE ol.order_id = v_order_id
