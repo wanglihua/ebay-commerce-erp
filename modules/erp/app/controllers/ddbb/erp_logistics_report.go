@@ -237,6 +237,10 @@ ORDER BY day_date DESC;
 	err := db_session.Sql(sb.SqlList()).Find(&logistics_report_list)
 	core.HandleError(err)
 
+	for index, report := range logistics_report_list {
+		logistics_report_list[index].VolumeSum = report.VolumeSum / 1000000 // 转成立方米
+	}
+
 	var count core.Count
 	_, err = db_session.Sql(sb.SqlCount()).Get(&count)
 	core.HandleError(err)
@@ -333,6 +337,10 @@ ORDER BY day_date DESC;
 	err := db_session.Sql(sb.SqlList()).Find(&logistics_report_list)
 	core.HandleError(err)
 
+	for index, report := range logistics_report_list {
+		logistics_report_list[index].VolumeSum = report.VolumeSum / 1000000 // 转成立方米
+	}
+
 	//创建工作薄
 	xlsx_file := xlsx.NewFile()
 
@@ -362,51 +370,51 @@ ORDER BY day_date DESC;
 
 		col_index++
 		cell = header_row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 12)
+		sheet.SetColWidth(col_index, col_index, 10)
 		set_head_cell_style(cell)
 		cell.Value = "时间"
 
 		col_index++
 		cell = header_row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 12)
+		sheet.SetColWidth(col_index, col_index, 8)
 		set_head_cell_style(cell)
-		cell.Value = "重量"
+		cell.Value = "重量(kg)"
 
 		col_index++
 		cell = header_row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 12)
+		sheet.SetColWidth(col_index, col_index, 8)
 		set_head_cell_style(cell)
-		cell.Value = "体积"
+		cell.Value = "体积(立方米)"
 
 		col_index++
 		cell = header_row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 20)
+		sheet.SetColWidth(col_index, col_index, 8)
 		set_head_cell_style(cell)
 		cell.Value = "商品数量"
 
 		col_index++
 		cell = header_row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 20)
+		sheet.SetColWidth(col_index, col_index, 8)
 		set_head_cell_style(cell)
 		cell.Value = "单数"
 
 		col_index++
 		cell = header_row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 20)
+		sheet.SetColWidth(col_index, col_index, 10)
 		set_head_cell_style(cell)
-		cell.Value = "预估运费"
+		cell.Value = "预估运费(澳币)"
 
 		col_index++
 		cell = header_row.AddCell()
 		sheet.SetColWidth(col_index, col_index, 10)
 		set_head_cell_style(cell)
-		cell.Value = "实际运费"
+		cell.Value = "实际运费(澳币)"
 
 		col_index++
 		cell = header_row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 20)
+		sheet.SetColWidth(col_index, col_index, 10)
 		set_head_cell_style(cell)
-		cell.Value = "总利润"
+		cell.Value = "总利润(澳币)"
 	}
 
 	for index, logistics_report := range logistics_report_list {

@@ -206,6 +206,7 @@ GET  /logistics/report                          ErpLogisticsReport.Index
 POST /logistics/report/page/data                ErpLogisticsReport.PageData
 POST /logistics/report/list/data                ErpLogisticsReport.ListData
 POST /logistics/report/get/logistics/mode/list  ErpLogisticsReport.GetLogisticsModeList
+POST /logistics/report/export                   ErpLogisticsReport.Export
 
 GET  /product/image/type                   ErpProductImageType.Index
 POST /product/image/type/data/list         ErpProductImageType.ListData

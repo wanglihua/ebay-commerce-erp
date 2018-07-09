@@ -19,6 +19,10 @@
                                 <i class="ace-icon fa fa-refresh"></i>
                                 刷新
                             </button>
+                            <button class="btn btn-purple btn-sm" onclick="exportExcel()">
+                                <i class="ace-icon fa fa-file-excel-o"></i>
+                                导出
+                            </button>
                         </div>
                     </div>
                     <div class="row" style="margin-top: 10px;margin-bottom: 20px;">
@@ -126,14 +130,14 @@
                         },
 
                         {
-                            "mDataProp": "weight_sum", "title": "重量", "bSearchable": false, "bSortable": false, "sClass": "dtRight",
+                            "mDataProp": "weight_sum", "title": "重量(kg)", "bSearchable": false, "bSortable": false, "sClass": "dtRight",
                             "render": function (data, type, row) {
                                 return dtFormatFloat(data);
                             }
                         },
 
                         {
-                            "mDataProp": "volume_sum", "title": "体积", "bSearchable": false, "bSortable": false, "sClass": "dtRight",
+                            "mDataProp": "volume_sum", "title": "体积(立方米)", "bSearchable": false, "bSortable": false, "sClass": "dtRight",
                             "render": function (data, type, row) {
                                 return dtFormatFloat(data);
                             }
@@ -154,21 +158,21 @@
                         },
 
                         {
-                            "mDataProp": "total_fee_sum", "title": "预估运费", "bSearchable": false, "bSortable": false, "sClass": "dtRight",
+                            "mDataProp": "total_fee_sum", "title": "预估运费(澳币)", "bSearchable": false, "bSortable": false, "sClass": "dtRight",
                             "render": function (data, type, row) {
                                 return dtFormatFloat(data);
                             }
                         },
 
                         {
-                            "mDataProp": "profit_sum", "title": "实际运费", "bSearchable": false, "bSortable": false, "sClass": "dtRight",
+                            "mDataProp": "profit_sum", "title": "实际运费(澳币)", "bSearchable": false, "bSortable": false, "sClass": "dtRight",
                             "render": function (data, type, row) {
                                 return dtFormatFloat(data);
                             }
                         },
 
                         {
-                            "mDataProp": "actual_total_fee_sum", "title": "总利润", "bSearchable": false, "bSortable": false, "sClass": "dtRight",
+                            "mDataProp": "actual_total_fee_sum", "title": "总利润(澳币)", "bSearchable": false, "bSortable": false, "sClass": "dtRight",
                             "render": function (data, type, row) {
                                 return dtFormatFloat(data);
                             }
@@ -227,6 +231,20 @@
         initGrid();
     });
 
+    function exportExcel() {
+        var params = $.param({
+            "report_type": $("#reportType").val(),
+            "city_id": $("#cityId").val(),
+            "stock_id": vm.page.stock_id,
+            "logistics_company_id": vm.page.logistics_company_id,
+            "postalcode_query": vm.page.postalcode_query,
+            "begin_time_query": vm.page.begin_time_query,
+            "end_time_query": vm.page.end_time_query
+        });
+
+        var url = '{%url "ErpLogisticsReport.Export"%}' + "?" + params;
+        $('<form method="post" action="' + url + '"></form>').appendTo('body').submit().remove();
+    }
 
 </script>
 {%footer%}
