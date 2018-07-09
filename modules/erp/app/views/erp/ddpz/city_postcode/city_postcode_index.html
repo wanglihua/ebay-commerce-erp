@@ -15,7 +15,7 @@
                 <div class="gridToolBar clearfix">
                     <button class="btn btn-primary btn-sm" @click="reloadList('#cityPostcodeList')">
                         <i class="ace-icon fa fa-refresh"></i>
-                        刷新`
+                        刷新
                     </button>
                     <button class="btn btn-success btn-sm" @click="showCityPostcodeDetail(0)">
                         <i class="ace-icon fa fa-plus"></i>
@@ -65,7 +65,8 @@
                                         <div class="form-group">
                                             <label for="postcode" class="col-xs-2 control-label">邮编</label>
                                             <div class="col-xs-10">
-                                                <input id="postcode" name="detail.city_postcode.postcode" type="text" class="input-sm form-control" v-model="detail.city_postcode.postcode"/>
+                                                <textarea id="postcode" name="detail.city_postcode.postcode" type="text" rows="4" class="input-sm form-control" v-model="detail.city_postcode.postcode"></textarea>
+                                                <div class="help-block">多个邮编用逗号隔开。</div>
                                             </div>
                                         </div>
                                     </div>
@@ -117,10 +118,12 @@
                     }
             );
 
+            /* 邮编只能添加和删除
             $('#cityPostcodeList tbody').on('dblclick', 'tr', function () {
                 var id = $(this).find('td:first-child input:checkbox').val();
                 vm.showCityPostcodeDetail(id);
             });
+            */
         },
         methods: {
             reloadList: function () {

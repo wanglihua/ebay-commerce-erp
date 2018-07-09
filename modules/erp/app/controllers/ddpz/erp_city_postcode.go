@@ -9,6 +9,7 @@ import (
 	"matrix/modules/erp/models/ddpz_models"
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/auth/pass_res"
+	"strings"
 )
 
 type ErpCityPostcode struct {
@@ -122,38 +123,36 @@ func (c ErpCityPostcode) Save() revel.Result {
 		city_postcode_from_ui.CityName = "SYD"
 	}
 
-	var affected int64
-	if detail_form.IsCreate() {
+	var city_id = city_postcode_from_ui.CityId
+	var city_name = city_postcode_from_ui.CityName
+	var postcode_list = strings.Split(city_postcode_from_ui.Postcode, ",")
 
-		var city_postcode_in_db ddpz_models.CityPostcodeInfo
-		has, err := db_session.Where("city_id = ? AND postcode = ?", city_postcode_from_ui.CityId, city_postcode_from_ui.Postcode).Get(&city_postcode_in_db)
-		core.HandleError(err)
+	for _, postcode := range postcode_list {
+		postcode = strings.TrimSpace(postcode)
 
-		if has == true {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "指定城市的邮编已存在！"})
-		}
+		if postcode != "" {
+			var city_postcode_in_db ddpz_models.CityPostcodeInfo
+			has, err := db_session.Where("city_id = ? AND postcode = ?", city_id, postcode).Get(&city_postcode_in_db)
+			core.HandleError(err)
 
-		affected, err = db_session.Insert(&city_postcode_from_ui)
-		core.HandleError(err)
-	} else {
-		var city_postcode_in_db ddpz_models.CityPostcodeInfo
-		has, err := db_session.Where("id <> ? AND city_id = ? AND postcode = ?",
-			city_postcode_from_ui.Id, city_postcode_from_ui.CityId, city_postcode_from_ui.Postcode).Get(&city_postcode_in_db)
-		core.HandleError(err)
+			if has == false {
+				var city_postcode ddpz_models.CityPostcodeInfo
+				city_postcode.CityId = city_id
+				city_postcode.CityName = city_name
+				city_postcode.Postcode = postcode
 
-		if has == true {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "指定城市的邮编已存在！"})
-		}
+				_, err = db_session.Insert(&city_postcode)
+				core.HandleError(err)
+			} else {
+				city_postcode_in_db.CityName = city_name
 
-		affected, err = db_session.Id(city_postcode_from_ui.Id).Update(&city_postcode_from_ui)
-		core.HandleError(err)
-
-		if affected == 0 {
-			return c.RenderJson(core.JsonResult{Success: false, Message: "数据保存失败，请重试！"})
+				_, err = db_session.Id(city_postcode_in_db.Id).Update(&city_postcode_in_db)
+				core.HandleError(err)
+			}
 		}
 	}
 
-	return c.RenderJson(core.JsonResult{Success: true, Message: strconv.FormatInt(affected, 10) + "条数据保存成功!"})
+	return c.RenderJson(core.JsonResult{Success: true, Message: "邮编新增成功!"})
 }
 
 func (c ErpCityPostcode) Delete() revel.Result {
