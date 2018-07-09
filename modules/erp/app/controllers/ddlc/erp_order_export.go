@@ -547,13 +547,13 @@ WHERE ol.stock_id = 0 AND ol.company_id = 0
 
 		col_index++
 		cell = header_row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 12)
+		sheet.SetColWidth(col_index, col_index, 20)
 		set_head_cell_style(cell)
 		cell.Value = "订单"
 
 		col_index++
 		cell = header_row.AddCell()
-		sheet.SetColWidth(col_index, col_index, 12)
+		sheet.SetColWidth(col_index, col_index, 20)
 		set_head_cell_style(cell)
 		cell.Value = "订单代码"
 
@@ -574,6 +574,12 @@ WHERE ol.stock_id = 0 AND ol.company_id = 0
 		sheet.SetColWidth(col_index, col_index, 20)
 		set_head_cell_style(cell)
 		cell.Value = "物流方式"
+
+		col_index++
+		cell = header_row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 10)
+		set_head_cell_style(cell)
+		cell.Value = "邮编"
 
 		col_index++
 		cell = header_row.AddCell()
@@ -621,6 +627,14 @@ WHERE ol.stock_id = 0 AND ol.company_id = 0
 		cell = row.AddCell()
 		set_text_cell_style(cell, "left")
 		cell.Value = order_logistics.LogisticsMode.Name
+
+		// 邮编
+		cell = row.AddCell()
+		set_text_cell_style(cell, "center")
+		var order_ship_address ddlc_models.OrderShippingAddressInfo
+		_, err := db_session.Id(order_logistics.OrderLogistics.AddressId).Get(&order_ship_address)
+		core.HandleError(err)
+		cell.Value = order_ship_address.PostalCode
 
 		// 预估物流费用
 		cell = row.AddCell()
