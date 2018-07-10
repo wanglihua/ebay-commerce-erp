@@ -135,7 +135,7 @@ WHERE city_id = %d) `
 			var postalcode_str_list = strings.Split(postalcode_query, ",")
 			var postalcode_sql_str_list = make([]string, 0)
 			for _, postalcode_str := range postalcode_str_list {
-				postalcode_sql_str_list = append(postalcode_sql_str_list, fmt.Sprintf("'%s'", postalcode_str))
+				postalcode_sql_str_list = append(postalcode_sql_str_list, fmt.Sprintf("'%s'", strings.TrimSpace(postalcode_str)))
 			}
 
 			filter = core.SqlAnd(filter, fmt.Sprintf("postcode IN (%s)", strings.Join(postalcode_sql_str_list, ",")))
