@@ -18,6 +18,7 @@ CREATE PROCEDURE logistics_report()
         DECLARE v_total_fee DECIMAL(18, 6);
         DECLARE v_acutal_total_fee DECIMAL(18, 6);
         DECLARE v_profit DECIMAL(18, 6);
+        DECLARE v_order_address_id BIGINT;
         DECLARE v_count BIGINT;
 
         DECLARE done INT DEFAULT FALSE;
@@ -25,10 +26,11 @@ CREATE PROCEDURE logistics_report()
         DECLARE order_cur CURSOR FOR
             SELECT
                 o.id,
-                shop_id,
-                amount_paid,
-                profit_au,
-                date(shipped_time)
+                o.shop_id,
+                o.amount_paid,
+                o.profit_au,
+                date(o.shipped_time),
+                o.address_id
             FROM erp_order o
             # WHERE o.shipped_time IS NOT NULL;
             WHERE o.shipped_time > date_add(date(now()), INTERVAL -3 DAY); # 只计算3天前的订单
@@ -40,7 +42,7 @@ CREATE PROCEDURE logistics_report()
         order_cur_loop: LOOP
 
             SET done = FALSE;
-            FETCH order_cur INTO v_order_id, v_shop_id, v_amount, v_profit, v_day_date;
+            FETCH order_cur INTO v_order_id, v_shop_id, v_amount, v_profit, v_day_date, v_order_address_id;
 
             IF done
             THEN
@@ -67,7 +69,7 @@ CREATE PROCEDURE logistics_report()
 
             SELECT osa.postal_code INTO v_postcode
             FROM erp_order_shipping_address osa
-            WHERE osa.order_id = v_order_id
+            WHERE osa.id = v_order_address_id
             LIMIT 1;
 
             IF v_postcode IS NULL
