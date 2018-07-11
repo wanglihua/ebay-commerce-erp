@@ -98,15 +98,20 @@ func (c ErpMessage) Reply() revel.Result {
 	})
 }
 
-func (c ErpMessage) detail() revel.Result {
+func (c ErpMessage) Detail(message_id int64) revel.Result {
 	pass_service.Check_login_user_pass(pass_res.XXGL_MESSAGE_ALL, c.Session)
 
 	var db_session = c.DbSession
 
+	/*
 	var user_list = make([]auth_models.UserInfo, 0)
 	core.HandleError(db_session.OrderBy("login_name ASC").Find(&user_list))
 
 	c.RenderArgs["user_list"] = user_list
+	*/
+
+	var message = message_service.Get_message_data(message_id, db_session)
+	c.RenderArgs["message"] = message
 
 	return c.RenderTemplate("erp/xxgl/message/message_detail.html")
 }

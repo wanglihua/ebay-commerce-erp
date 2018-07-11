@@ -280,8 +280,8 @@ func (c ErpLogisticsReport) get_export_excel(db_session *xorm.Session) *xlsx.Fil
 
 SELECT
     date_format(day_date, '%Y-%c-%d') AS group_time,
-    sum(weight)                       AS weight_sum,
-    sum(volume)                       AS volume_sum,
+    sum(weight / pphzlzl)             AS weight_sum,
+    sum(volume / pphzbzl)             AS volume_sum,
     sum(prd_count)                    AS prd_count_sum,
     count(id)                         AS order_count,
     sum(total_fee)                    AS total_fee_sum,
@@ -298,8 +298,8 @@ ORDER BY day_date DESC;
 	if report_type == logistics_report_type_month {
 		sb.Select(`
     date_format(month_date, '%Y-%c')  AS group_time,
-    sum(weight)                       AS weight_sum,
-    sum(volume)                       AS volume_sum,
+    sum(weight / pphzlzl)             AS weight_sum,
+    sum(volume / pphzbzl)             AS volume_sum,
     sum(prd_count)                    AS prd_count_sum,
     count(id)                         AS order_count,
     sum(total_fee)                    AS total_fee_sum,
@@ -309,8 +309,8 @@ ORDER BY day_date DESC;
 	} else {
 		sb.Select(`
     date_format(day_date, '%Y-%c-%d') AS group_time,
-    sum(weight)                       AS weight_sum,
-    sum(volume)                       AS volume_sum,
+    sum(weight / pphzlzl)             AS weight_sum,
+    sum(volume / pphzbzl)             AS volume_sum,
     sum(prd_count)                    AS prd_count_sum,
     count(id)                         AS order_count,
     sum(total_fee)                    AS total_fee_sum,

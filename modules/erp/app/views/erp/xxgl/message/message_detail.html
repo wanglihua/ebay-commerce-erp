@@ -1,6 +1,105 @@
-{% site_header "商品详情" . %}
+{% site_header "消息详细" . %}
 <div class="main-container" id="main-container">
-    <div id="product_detail" style="width: 1024px;margin-left: auto;margin-right: auto;">
+    <div id="message_detail" style="width: 1024px;margin-left: auto;margin-right: auto;">
+
+        <div class="widget-box">
+            <div class="widget-header">
+                <h4 class="smaller">消息</h4>
+            </div>
+            <div class="widget-body">
+                <div class="widget-main">
+
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <form class="form-horizontal" role="form" id="messageReplyForm">
+                                <input id="message_id" name="message_id" type="hidden" value="{% .message.Message.Id %}"/>
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <label class="control-label">原消息</label>
+                                        <div style="line-height: 18px;">
+                                            <div>
+                                                {%.message.Message.Subject%}
+                                            </div>
+                                            <div>
+                                                {%.message.Message.Body%}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <div class="col-xs-12">
+                                                <label for="message_body" class="control-label">回复</label>
+                                                <textarea id="message_body" name="message_body" rows="3" class="input-sm form-control"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div class="row">
+                                    <div class="col-xs-12" style="text-align: right;">
+                                        <button type="button" class="btn btn-success btn-sm" onclick="reply()">
+                                            <i class="ace-icon fa fa-floppy-o"></i>回复
+                                        </button>
+                                    </div>
+                                </div>
+
+                            </form>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
     </div>
 </div>
+
+<script type="text/javascript">
+
+    function reply() {
+
+        var form = $("#messageReplyForm");
+        var valid = validate(form, {
+            'message_body': {
+                required: true, minlength: 2
+            }
+        });
+
+        if (!valid) {
+            return;
+        }
+
+        var message_id = $("#message_id").val();
+        var message_body = $("#message_body").val();
+
+        showMask("操作进行中，请稍候");
+
+        $.ajax({
+            "dataType": 'json',
+            "url": '{% url "ErpMessage.Reply" %}',
+            "data": {
+                "message_id": message_id,
+                "message_body": message_body
+            },
+            "success": function (data) {
+                hideMask();
+
+                if (data.success === false) {
+                    $.msg.error(data.message);
+                    return;
+                }
+                else {
+                    $("#messageReplyDialog").modal("hide");
+                    vm.reloadList();
+                    $.msg.show(data.message);
+                    return;
+                }
+            }
+        });
+    }
+</script>
 {% site_footer %}
