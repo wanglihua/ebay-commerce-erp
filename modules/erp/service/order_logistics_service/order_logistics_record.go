@@ -44,6 +44,10 @@ func save_order_logistics(p_ol *OrderLogisticsService, p_order *ddlc_models.Orde
 	order_logistics.CostAmount = match_result.cost_amount
 	order_logistics.Ptfl = p_ol.logistics_setting.Ptfl
 	order_logistics.Jyfl = p_ol.logistics_setting.Jyfl
+	order_logistics.Ppqzlzl = p_ol.logistics_setting.Ppqzlzl
+	order_logistics.Ppqzbzl = p_ol.logistics_setting.Ppqzbzl
+	order_logistics.Pphzlzl = p_ol.logistics_setting.Pphzlzl
+	order_logistics.Pphzbzl = p_ol.logistics_setting.Pphzbzl
 
 	if has == true {
 		_, err := db_session.Id(order_logistics.Id).Update(&order_logistics)
