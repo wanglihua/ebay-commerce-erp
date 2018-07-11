@@ -20,6 +20,10 @@ type LogisticsReportInfo struct {
 	TotalFee       float64   `xorm:"decimal(18,2) notnull 'total_fee'" json:"total_fee"`
 	ActualTotalFee float64   `xorm:"decimal(18,2) notnull 'actual_total_fee'" json:"actual_total_fee"`
 	Profit         float64   `xorm:"decimal(18,2) notnull 'profit'" json:"profit"`
+	Ppqzlzl        float64   `xorm:"decimal(18,6) notnull 'ppqzlzl' default(1)" json:"ppqzlzl"` // 匹配前重量折率 匹配物流前对重量打多少折
+	Ppqzbzl        float64   `xorm:"decimal(18,6) notnull 'ppqzbzl' default(1)" json:"ppqzbzl"` // 匹配前中边折率 匹配物流前对中边打多少折
+	Pphzlzl        float64   `xorm:"decimal(18,6) notnull 'pphzlzl' default(1)" json:"pphzlzl"` // 匹配后重量折率 匹配物流后对重量打多少折
+	Pphzbzl        float64   `xorm:"decimal(18,6) notnull 'pphzbzl' default(1)" json:"pphzbzl"` // 匹配后中边折率 匹配物流后对中边打多少折
 	CreateTime     core.Time `xorm:"created notnull 'create_time'" json:"create_time"`
 	UpdateTime     core.Time `xorm:"updated notnull 'update_time'" json:"update_time"`
 }

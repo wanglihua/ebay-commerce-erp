@@ -18,6 +18,10 @@ CREATE PROCEDURE logistics_report()
         DECLARE v_total_fee DECIMAL(18, 6);
         DECLARE v_acutal_total_fee DECIMAL(18, 6);
         DECLARE v_profit DECIMAL(18, 6);
+        DECLARE v_ppqzlzl DECIMAL(18, 6);
+        DECLARE v_ppqzbzl DECIMAL(18, 6);
+        DECLARE v_pphzlzl DECIMAL(18, 6);
+        DECLARE v_pphzbzl DECIMAL(18, 6);
         DECLARE v_order_address_id BIGINT;
         DECLARE v_count BIGINT;
 
@@ -56,8 +60,12 @@ CREATE PROCEDURE logistics_report()
                 ol.length * ol.width * ol.height,
                 ol.weight,
                 ol.total_fee,
-                ol.actual_fee
-            INTO v_stock_id, v_company_id, v_mode_id, v_volume, v_weight, v_total_fee, v_acutal_total_fee
+                ol.actual_fee,
+                ol.ppqzlzl,
+                ol.ppqzbzl,
+                ol.pphzlzl,
+                ol.pphzbzl
+            INTO v_stock_id, v_company_id, v_mode_id, v_volume, v_weight, v_total_fee, v_acutal_total_fee, v_ppqzlzl, v_ppqzbzl, v_pphzlzl, v_pphzbzl
             FROM erp_order_logistics ol
             WHERE ol.order_id = v_order_id
             LIMIT 1;
@@ -94,15 +102,17 @@ CREATE PROCEDURE logistics_report()
             IF v_count = 0
             THEN
                 INSERT INTO erp_logistics_report (day_date, order_id, shop_id, stock_id, company_id, mode_id, postcode, prd_count,
-                                                  volume, weight, amount, total_fee, actual_total_fee, profit, create_time, update_time, month_date)
+                                                  volume, weight, amount, total_fee, actual_total_fee, profit, ppqzlzl, ppqzbzl, pphzlzl, pphzbzl, create_time, update_time, month_date)
                 VALUES (v_day_date, v_order_id, v_shop_id, v_stock_id, v_company_id, v_mode_id, v_postcode, v_prd_count,
-                                    v_volume, v_weight, v_amount, v_total_fee, v_acutal_total_fee, v_profit, now(), now(), date_add(date(day_date), INTERVAL (1 - day(day_date)) DAY));
+                                    v_volume, v_weight, v_amount, v_total_fee, v_acutal_total_fee, v_profit, v_ppqzlzl, v_ppqzbzl, v_pphzlzl, v_pphzbzl, now(), now(), date_add(date(day_date), INTERVAL (1 - day(day_date)) DAY));
             ELSE
                 UPDATE erp_logistics_report
                 SET day_date         = v_day_date, order_id = v_order_id, shop_id = v_shop_id, stock_id = v_stock_id,
                     company_id       = v_company_id, mode_id = v_mode_id, postcode = v_postcode, prd_count = v_prd_count,
                     volume           = v_volume, weight = v_weight, amount = v_amount, total_fee = v_total_fee,
-                    actual_total_fee = v_acutal_total_fee, profit = v_profit, update_time = now(), month_date = date_add(date(day_date), INTERVAL (1 - day(day_date)) DAY)
+                    actual_total_fee = v_acutal_total_fee, profit = v_profit,
+                    ppqzlzl          = v_ppqzlzl, ppqzbzl = v_ppqzbzl, pphzlzl = v_pphzlzl, pphzbzl = v_pphzbzl,
+                    update_time      = now(), month_date = date_add(date(day_date), INTERVAL (1 - day(day_date)) DAY)
                 WHERE order_id = v_order_id;
             END IF;
 
