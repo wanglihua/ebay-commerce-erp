@@ -127,11 +127,21 @@
                                         MESSAGE_STATUS_UNANSWERED = 4900 // 消息状态 未回复
                                      */
 
+                                    /*
                                     if (row.s.id === 4900) {
                                         return "<div>" + row.s.name + "&nbsp;<a class='btn btn-xs btn-info btn-inline' onclick='showReply(" + row.msg.id + ");' ><i class='ace-icon fa fa-reply'></i>回复</a></div><div>" + row.msg.sender_id + "</div><div>" + row.msg.recipient_id + "</div>";
                                     } else {
                                         return "<div>" + row.s.name + "</div><div>" + row.msg.sender_id + "</div><div>" + row.msg.recipient_id + "</div>";
                                     }
+                                    */
+
+                                    return "<div>" + row.s.name + "</div><div>" + row.msg.sender_id + "</div><div>" + row.msg.recipient_id + "</div>";
+                                }
+                            },
+                            {
+                                "mDataProp": "msg.id", "title": "操作", "bSearchable": false, "sClass": "center", "width": 80,
+                                "render": function (data, type, row) {
+                                    return "<a href='javascript:showMessageDetail(" + data + ");'>查看详细</a>"
                                 }
                             }
                         ],
