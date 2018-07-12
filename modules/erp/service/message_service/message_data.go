@@ -26,6 +26,7 @@ type Message_view_item_t struct {
 	ServiceUser       auth_models.UserInfo              `xorm:"extends" json:"psu"`
 	ProductStoreItem  sppz_models.ProductStoreItemInfo  `xorm:"extends" json:"psi"`
 	Status            models.StatusInfo                 `xorm:"extends" json:"s"`
+	MsgLastModifyDate string                            `xorm:"-" json:"message_last_modify_date"`
 }
 
 var msg_count struct {
@@ -137,6 +138,10 @@ func Get_message_list_data(db_session *xorm.Session, request *revel.Request, par
 	err := db_session.Sql(sb.SqlList()).Find(&message_list)
 	core.HandleError(err)
 
+	for index, message := range message_list {
+		message_list[index].MsgLastModifyDate = message.Message.LastModifiedDate.Time.Format("2006-01-02 15:04:05")
+	}
+
 	_, err = db_session.Sql(sb.SqlCount()).Get(&msg_count)
 	core.HandleError(err)
 
@@ -154,6 +159,8 @@ func Get_message_data(message_id int64, db_session *xorm.Session) Message_view_i
 
 	_, err := db_session.Sql(sb.SqlGet()).Get(&message_view_item)
 	core.HandleError(err)
+
+	message_view_item.MsgLastModifyDate = message_view_item.Message.LastModifiedDate.Time.Format("2006-01-02 15:04:05")
 
 	return message_view_item
 }
