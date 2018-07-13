@@ -257,6 +257,7 @@ func fetch_product_item_to_db(config xtpz_models.EBayAPIConfigInfo, db_session *
 	product_store_item.ProductBindId = product_bind_id
 	product_store_item.ShopId = config.ShopId
 	product_store_item.ItemId = item_response.Item.ItemId
+	product_store_item.ItemId = item_response.Item.Title
 	product_store_item.ViewItemUrl = item_response.Item.ListingDetails.ViewItemUrl
 
 	if has_product_store_item == false {
