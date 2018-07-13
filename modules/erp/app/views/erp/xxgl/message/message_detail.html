@@ -205,7 +205,7 @@
             </div>
         </div>
 
-        <div class="widget-box">
+        <div class="widget-box" style="margin-top: 20px;">
             <div class="widget-header">
                 <h4 class="smaller widget-title">用户 {% .message.Message.SenderId %}，Item ID {% .message.Message.ItemId %} 订单记录</h4>
             </div>
@@ -217,29 +217,40 @@
                                 <thead>
                                 <tr>
                                     <th class="center" style="width: 50px;">编号</th>
-                                    <th class="center">订单编号</th>
-                                    <th class="center">SKU</th>
-                                    <th class="center">价格*数量=金额</th>
-                                    <th class="center" style="width:120px;">
+                                    <th class="center" style="width: 234px;">订单编号</th>
+                                    <th class="center" style="width: 234px;">SKU</th>
+                                    <th class="center" style="width: 234px;">价格*数量=金额</th>
+                                    <th class="center" style="width:130px;">
                                         <div>下单时间</div>
                                         <div>发货时间</div>
                                     </th>
-                                    <th class="center" style="width:60px;">状态</th>
+                                    <th class="center" style="width:70px;">状态</th>
                                 </tr>
                                 </thead>
                                 <tbody>
-
                                 {% range $index, $order_item := .user_item_order_item_list %}
                                 <tr>
-                                    <td>{% $index %}</td>
-                                    <td>{% $order_item.Order.Code %}</td>
-                                    <td>{% $order_item.Order.Code %}</td>
-                                    <td>{% $order_item.Order.Code %}</td>
-                                    <td>{% $order_item.Order.Code %}</td>
-                                    <td>{% $order_item.Status.Name %}</td>
+                                    <td class="center" style="vertical-align: middle;">{% $order_item.OrdNum %}</td>
+                                    <td class="center" style="vertical-align: middle;">
+                                        <a href="/order/detail/{% $order_item.Order.Id%}" target="order_detail">{% $order_item.Order.Code %}</a>
+                                    </td>
+                                    <td class="center" style="vertical-align: middle;">{% $order_item.OrderItem.ItemSku %}</td>
+                                    <td class="center" style="vertical-align: middle;">
+                                        {% $order_item.Price %}&nbsp;*&nbsp;{% $order_item.OrderItem.Quantity %}&nbsp;=&nbsp;{% $order_item.Amount %}
+                                    </td>
+                                    <td class="center" style="vertical-align: middle;">
+                                        <div>
+                                            {% $order_item.PaidTime %}
+                                        </div>
+                                        <div>
+                                            {% $order_item.ShippedTime %}
+                                        </div>
+                                    </td>
+                                    <td class="center" style="vertical-align: middle;">
+                                        {% $order_item.Status.Name %}
+                                    </td>
                                 </tr>
                                 {% end %}
-
                                 </tbody>
                             </table>
                         </div>
@@ -248,7 +259,7 @@
             </div>
         </div>
 
-        <div class="widget-box">
+        <div class="widget-box" style="margin-top: 20px;">
             <div class="widget-header">
                 <h4 class="smaller widget-title">用户 {% .message.Message.SenderId %} 订单记录</h4>
             </div>
@@ -260,39 +271,40 @@
                                 <thead>
                                 <tr>
                                     <th class="center" style="width: 50px;">编号</th>
-                                    <th class="center">订单编号</th>
-                                    <th class="center">SKU</th>
-                                    <th class="center">价格*数量=金额</th>
-                                    <th class="center" style="width:120px;">
+                                    <th class="center" style="width: 234px;">订单编号</th>
+                                    <th class="center" style="width: 234px;">SKU</th>
+                                    <th class="center" style="width: 234px;">价格*数量=金额</th>
+                                    <th class="center" style="width:130px;">
                                         <div>下单时间</div>
                                         <div>发货时间</div>
                                     </th>
-                                    <th class="center" style="width:60px;">状态</th>
+                                    <th class="center" style="width:70px;">状态</th>
                                 </tr>
                                 </thead>
                                 <tbody>
-
                                 {% range $index, $order_item := .user_order_item_list %}
                                 <tr>
-                                    <td>{% $index %}</td>
-                                    <td>{% $order_item.Order.Code %}</td>
-                                    <td>{% $order_item.OrderItem.ItemSku %}</td>
-                                    <td>
-                                        {% $order_item.OrderItem.TransactionPrice %}
-                                        {% $order_item.OrderItem.Quantity %}
+                                    <td class="center" style="vertical-align: middle;">{% $order_item.OrdNum %}</td>
+                                    <td class="center" style="vertical-align: middle;">
+                                        <a href="/order/detail/{% $order_item.Order.Id%}" target="order_detail">{% $order_item.Order.Code %}</a>
                                     </td>
-                                    <td>
+                                    <td class="center" style="vertical-align: middle;">{% $order_item.OrderItem.ItemSku %}</td>
+                                    <td class="center" style="vertical-align: middle;">
+                                        {% $order_item.Price %}&nbsp;*&nbsp;{% $order_item.OrderItem.Quantity %}&nbsp;=&nbsp;{% $order_item.Amount %}
+                                    </td>
+                                    <td class="center" style="vertical-align: middle;">
                                         <div>
-                                            {% $order_item.Order.PaidTime %}
+                                            {% $order_item.PaidTime %}
                                         </div>
                                         <div>
-                                            {% $order_item.Order.ShippedTime %}
+                                            {% $order_item.ShippedTime %}
                                         </div>
                                     </td>
-                                    <td>{% $order_item.Status.Name %}</td>
+                                    <td class="center" style="vertical-align: middle;">
+                                        {% $order_item.Status.Name %}
+                                    </td>
                                 </tr>
                                 {% end %}
-
                                 </tbody>
                             </table>
                         </div>

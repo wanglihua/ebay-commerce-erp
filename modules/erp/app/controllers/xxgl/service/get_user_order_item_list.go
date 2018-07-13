@@ -34,5 +34,7 @@ ORDER BY o.create_time DESC;`
 	err := db_session.Sql(sql).Find(&message_order_item_list)
 	core.HandleError(err)
 
+	calculate_order_item_list_extra_field(message_order_item_list)
+
 	return message_order_item_list
 }

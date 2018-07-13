@@ -6,7 +6,12 @@ import (
 )
 
 type MessageOrderItem struct {
-	OrderItem ddlc_models.OrderItemInfo `xorm:"extends" json:"oi"`
-	Order     ddlc_models.OrderInfo     `xorm:"extends" json:"o"`
-	Status    models.StatusInfo         `xorm:"extends" json:"s"`
+	OrderItem   ddlc_models.OrderItemInfo `xorm:"extends"`
+	Order       ddlc_models.OrderInfo     `xorm:"extends"`
+	Status      models.StatusInfo         `xorm:"extends"`
+	OrdNum      string                    `xorm:"-"`
+	Price       string                    `xorm:"-"`
+	Amount      string                    `xorm:"-"`
+	PaidTime    string                    `xorm:"-"`
+	ShippedTime string                    `xorm:"-"`
 }
