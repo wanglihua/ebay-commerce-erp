@@ -136,7 +136,7 @@ func (f *ContainerTransferDetailForm) Valid(validation *revel.Validation) bool {
 		validation.MaxSize(f.ContainerTransfer.SealNo, 100).Message("铅封号长度不能大于100！")
 	}
 
-	validation.Required(f.ContainerTransfer.PriceUpRate).Message("非征品上调不能为空！")
+	// validation.Required(f.ContainerTransfer.PriceUpRate).Message("非征品上调不能为空！") //这个值应该是根据输入计算出来的
 
 	validation.Required(f.ContainerTransfer.PriceDownRate).Message("征税品下调不能为空！")
 
@@ -296,6 +296,16 @@ func (c ErpContainerTransfer) Save() revel.Result {
 
 	if detail_form.Valid(c.Validation) == false {
 		return c.RenderJson(core.JsonResult{Success: false, Message: c.GetValidationErrorMessage()})
+	}
+
+	if detail_form.ContainerTransfer.CostUpRate <= -1 {
+		// validation.Required(f.ContainerTransfer.CostUpRate).Message("成本上调不能为空！")
+		return c.RenderJson(core.JsonResult{Success: false, Message: "成本上调应该大于 -1！"})
+	}
+
+	if detail_form.ContainerTransfer.PriceDownRate < 0 || detail_form.ContainerTransfer.PriceDownRate > 1 {
+		// validation.Required(f.ContainerTransfer.PriceDownRate).Message("征税品下调不能为空！")
+		return c.RenderJson(core.JsonResult{Success: false, Message: "征税品打折应该在 0 和 1 之间！"})
 	}
 
 	var packing_time = time.Time(detail_form.ContainerTransfer.PackingTime)
