@@ -14,6 +14,7 @@ import (
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/auth/pass_res"
 	"matrix/modules/erp/models"
+	"matrix/modules/erp/app/controllers/xxgl/service"
 )
 
 type ErpMessage struct {
@@ -118,6 +119,12 @@ func (c ErpMessage) Detail(message_id int64) revel.Result {
 	_, err := db_session.Id(message.Product.StatusId).Get(&product_status)
 	core.HandleError(err)
 	c.RenderArgs["product_status"] = product_status
+
+	var user_item_order_item_list = service.Get_user_item_order_item_list(message.Message.SenderId, message.Message.ItemId, db_session)
+	c.RenderArgs["user_item_order_item_list"] = user_item_order_item_list
+
+	var user_order_item_list = service.Get_user_order_item_list(message.Message.SenderId, db_session)
+	c.RenderArgs["user_order_item_list"] = user_order_item_list
 
 	return c.RenderTemplate("erp/xxgl/message/message_detail.html")
 }
