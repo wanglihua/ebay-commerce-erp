@@ -146,7 +146,7 @@
                             <div class="form-group">
                                 <label for="product_status" class="col-xs-4 control-label">状态：</label>
                                 <div class="col-xs-8">
-                                    <input id="product_status" name="status_name" type="text" class="input-sm form-control" value="" disabled="disabled"/>
+                                    <input id="product_status" name="status_name" type="text" class="input-sm form-control" value="{% .product_status.Name %}" disabled="disabled"/>
                                 </div>
                             </div>
                         </div>
@@ -155,24 +155,52 @@
                     <div class="row">
                         <div class="col-xs-12">
                             <div class="form-group">
-                                <label for="subject" class="col-xs-1 control-label">主题：</label>
+                                <label for="item_title" class="col-xs-1 control-label">Item Title：</label>
                                 <div class="col-xs-11">
-                                    <textarea id="subject" name="subject" class="input-sm form-control" disabled="disabled"> {%.message.Message.Subject%}</textarea>
+                                    <input id="item_title" name="item_title" type="text" class="input-sm form-control" value="{% .message.ProductStoreItem.Title %}" disabled="disabled"/>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <div class="row">
-                        <div class="col-xs-12">
+                        <div class="col-xs-3">
                             <div class="form-group">
-                                <label for="msg_body" class="col-xs-1 control-label">正文：</label>
-                                <div class="col-xs-11">
-                                    <textarea id="msg_body" name="msg_body" class="input-sm form-control" disabled="disabled"> {%.message.Message.Body%}</textarea>
+                                <label for="sale_user" class="col-xs-4 control-label">销售人员：</label>
+                                <div class="col-xs-8">
+                                    <input id="sale_user" name="sale_user" type="text" class="input-sm form-control" value="{% .message.Message.SaleUser %}" disabled="disabled"/>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-xs-3">
+                            <div class="form-group">
+                                <label for="service_user" class="col-xs-4 control-label">客服人员：</label>
+                                <div class="col-xs-8">
+                                    <input id="service_user" name="service_user" type="text" class="input-sm form-control" value="{% .message.Message.ServiceUser %}" disabled="disabled"/>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-xs-3">
+                            <div class="form-group">
+                                <label for="dev_user" class="col-xs-4 control-label">开发人员：</label>
+                                <div class="col-xs-8">
+                                    <input id="dev_user" name="dev_user" type="text" class="input-sm form-control" value="{% .message.Message.DevUser %}" disabled="disabled"/>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-xs-3">
+                            <div class="form-group">
+                                <label for="status_name" class="col-xs-4 control-label"></label>
+                                <div class="col-xs-8">
+                                    <input id="status_name" name="status_name" type="text" class="input-sm form-control" value="" disabled="disabled"/>
                                 </div>
                             </div>
                         </div>
                     </div>
+
                 </div>
             </div>
         </div>

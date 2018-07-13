@@ -13,6 +13,7 @@ import (
 	"encoding/json"
 	"matrix/modules/auth/service/pass_service"
 	"matrix/modules/auth/pass_res"
+	"matrix/modules/erp/models"
 )
 
 type ErpMessage struct {
@@ -112,6 +113,11 @@ func (c ErpMessage) Detail(message_id int64) revel.Result {
 
 	var message = message_service.Get_message_data(message_id, db_session)
 	c.RenderArgs["message"] = message
+
+	var product_status models.StatusInfo
+	_, err := db_session.Id(message.Product.StatusId).Get(&product_status)
+	core.HandleError(err)
+	c.RenderArgs["product_status"] = product_status
 
 	return c.RenderTemplate("erp/xxgl/message/message_detail.html")
 }
