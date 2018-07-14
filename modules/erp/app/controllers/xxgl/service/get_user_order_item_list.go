@@ -11,10 +11,12 @@ func Get_user_order_item_list(buyer_user_id string, db_session *xorm.Session) []
 SELECT
     oi.*,
     o.*,
-    s.*
+    s.*,
+    sa.*
 FROM erp_order_item oi
     INNER JOIN erp_order o ON oi.order_id = o.id
     INNER JOIN erp_status s ON o.status_id = s.id
+    INNER JOIN erp_shop_account sa ON o.shop_id = sa.id
 WHERE o.buyer_user_id = '123'
 ORDER BY o.create_time DESC;
 	 */
@@ -22,10 +24,12 @@ ORDER BY o.create_time DESC;
 	var sql = `SELECT
     oi.*,
     o.*,
-    s.*
+    s.*,
+    sa.*
 FROM erp_order_item oi
     INNER JOIN erp_order o ON oi.order_id = o.id
     INNER JOIN erp_status s ON o.status_id = s.id
+    INNER JOIN erp_shop_account sa ON o.shop_id = sa.id
 WHERE o.buyer_user_id = '%s'
 ORDER BY o.create_time DESC;`
 	sql = fmt.Sprintf(sql, buyer_user_id)
