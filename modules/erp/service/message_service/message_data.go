@@ -27,6 +27,8 @@ type Message_view_item_t struct {
 	ProductStoreItem  sppz_models.ProductStoreItemInfo  `xorm:"extends" json:"psi"`
 	Status            models.StatusInfo                 `xorm:"extends" json:"s"`
 	MsgLastModifyDate string                            `xorm:"-" json:"message_last_modify_date"`
+	OrdNum            int64                             `xorm:"-"`
+	LastModifiedDate  string                            `xorm:"-"`
 }
 
 var msg_count struct {
@@ -184,6 +186,22 @@ func Get_message_list_data_by_product_id_top_n(db_session *xorm.Session, product
 	var message_list = make([]Message_view_item_t, 0)
 	err := db_session.Sql(sb.SqlList()).Find(&message_list)
 	core.HandleError(err)
+
+	return message_list
+}
+
+func Get_message_list_data_by_sender(db_session *xorm.Session, sender_id string) []Message_view_item_t {
+	sb := get_message_list_sql_builder()
+	sb.Where(fmt.Sprintf("msg.sender_id = '%s'", sender_id))
+
+	var message_list = make([]Message_view_item_t, 0)
+	err := db_session.Sql(sb.SqlList()).Find(&message_list)
+	core.HandleError(err)
+
+	for index, message := range message_list {
+		message_list[index].OrdNum = int64(index + 1)
+		message_list[index].LastModifiedDate = message.Message.LastModifiedDate.Time.Format("2006-01-02 15:04:05")
+	}
 
 	return message_list
 }

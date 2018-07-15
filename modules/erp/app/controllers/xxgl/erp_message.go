@@ -120,11 +120,15 @@ func (c ErpMessage) Detail(message_id int64) revel.Result {
 	core.HandleError(err)
 	c.RenderArgs["product_status"] = product_status
 
-	var user_item_order_item_list = service.Get_user_item_order_item_list(message.Message.SenderId, message.Message.ItemId, db_session)
-	c.RenderArgs["user_item_order_item_list"] = user_item_order_item_list
+	var sender_id = message.Message.SenderId
+	var sender_message_list = message_service.Get_message_list_data_by_sender(db_session, sender_id)
+	c.RenderArgs["sender_message_list"] = sender_message_list
 
-	var user_order_item_list = service.Get_user_order_item_list(message.Message.SenderId, db_session)
-	c.RenderArgs["user_order_item_list"] = user_order_item_list
+	var sender_item_order_item_list = service.Get_user_item_order_item_list(message.Message.SenderId, message.Message.ItemId, db_session)
+	c.RenderArgs["sender_item_order_item_list"] = sender_item_order_item_list
+
+	var sender_order_item_list = service.Get_user_order_item_list(message.Message.SenderId, db_session)
+	c.RenderArgs["sender_order_item_list"] = sender_order_item_list
 
 	return c.RenderTemplate("erp/xxgl/message/message_detail.html")
 }
