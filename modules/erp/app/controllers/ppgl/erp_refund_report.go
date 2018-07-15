@@ -182,7 +182,7 @@ WHERE apply_date IS NULL OR apply_month IS NULL;`
 	core.HandleError(err)
 
 	for index, refund_report_item := range refund_report_item_list {
-		var order_amount_sum = service.Get_order_amount(shop_id, paypal_account_id, refund_report_item.MonthDate, report_type, db_session)
+		var order_amount_sum = service.Get_order_amount(shop_id, paypal_account_id, sales_user_id, refund_report_item.MonthDate, report_type, db_session)
 		refund_report_item_list[index].OrderAmountSum = order_amount_sum
 		if order_amount_sum != 0 {
 			refund_report_item_list[index].RefundRate = refund_report_item.RefundAmountSum / order_amount_sum

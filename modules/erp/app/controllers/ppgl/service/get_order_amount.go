@@ -6,7 +6,7 @@ import (
 	"fmt"
 )
 
-func Get_order_amount(shop_id int64, paypal_account_id int64, month_date string, report_type int64, db_session *xorm.Session) float64 {
+func Get_order_amount(shop_id int64, paypal_account_id int64, sales_user_id int64, month_date string, report_type int64, db_session *xorm.Session) float64 {
 	/*
 SELECT sum(o.amount_paid) AS amount_sum
 FROM erp_order o
@@ -15,6 +15,13 @@ WHERE o.shop_id = 1
     SELECT pp.order_id
     FROM erp_paypal_payment pp
     WHERE pp.account_id = 1)
+      AND o.id IN (
+    SELECT DISTINCT oi.order_id
+    FROM erp_order_item oi
+    WHERE oi.item_product_id IN (
+        SELECT p.id
+        FROM erp_product p
+        WHERE p.sale_user_id = 1))
       AND o.paid_time >= '2018-01-01 00:00:00'
       # AND o.paid_time < date_add('2018-01-01 00:00:00', INTERVAL 1 DAY);
       AND o.paid_time < date_add('2018-01-01 00:00:00', INTERVAL 1 MONTH);
@@ -39,6 +46,20 @@ o.id IN (
 `
 		paypal_account_id_filter = fmt.Sprintf(paypal_account_id_filter, paypal_account_id)
 		filter = core.SqlAnd(filter, paypal_account_id_filter)
+	}
+
+	if sales_user_id != 0 {
+		var sales_user_filter = `
+o.id IN (
+    SELECT DISTINCT oi.order_id
+    FROM erp_order_item oi
+    WHERE oi.item_product_id IN (
+        SELECT p.id
+        FROM erp_product p
+        WHERE p.sale_user_id = %d))`
+
+		sales_user_filter = fmt.Sprintf(sales_user_filter, sales_user_id)
+		filter = core.SqlAnd(filter, sales_user_filter)
 	}
 
 	var time_filter = ""
