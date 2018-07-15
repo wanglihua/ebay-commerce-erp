@@ -48,6 +48,8 @@ func (c ErpRefundReport) Index() revel.Result {
 type refund_report_item_t struct {
 	MonthDate       string  `xorm:"'month_date'" json:"month_date"`
 	RefundAmountSum float64 `xorm:"'refund_amount_sum'" json:"refund_amount_sum"`
+	OrderAmountSum  float64 `xorm:"-" json:"order_amount_sum"`
+	RefundRate      float64 `xorm:"-" json:"refund_rate"`
 }
 
 func (c ErpRefundReport) ListData() revel.Result {
@@ -178,6 +180,14 @@ WHERE apply_date IS NULL OR apply_month IS NULL;`
 	var refund_report_item_list = make([]refund_report_item_t, 0)
 	err = db_session.Sql(sb.SqlList()).Find(&refund_report_item_list)
 	core.HandleError(err)
+
+	for index, refund_report_item := range refund_report_item_list {
+		var order_amount_sum = service.Get_order_amount(shop_id, paypal_account_id, refund_report_item.MonthDate, report_type, db_session)
+		refund_report_item_list[index].OrderAmountSum = order_amount_sum
+		if order_amount_sum != 0 {
+			refund_report_item_list[index].RefundRate = refund_report_item.RefundAmountSum / order_amount_sum
+		}
+	}
 
 	var count core.Count
 	_, err = db_session.Sql(sb.SqlCount()).Get(&count)

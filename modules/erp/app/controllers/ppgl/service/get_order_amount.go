@@ -38,6 +38,7 @@ o.id IN (
     WHERE pp.account_id = %d)
 `
 		paypal_account_id_filter = fmt.Sprintf(paypal_account_id_filter, paypal_account_id)
+		filter = core.SqlAnd(filter, paypal_account_id_filter)
 	}
 
 	var time_filter = ""
@@ -53,6 +54,8 @@ o.id IN (
 	}
 
 	time_filter = fmt.Sprintf(time_filter, time_begin, time_begin)
+	filter = core.SqlAnd(filter, time_filter)
+	sb.Where(filter)
 
 	var order_paid_amount_sum struct {
 		AmountSum float64 `xorm:"'amount_sum'"`

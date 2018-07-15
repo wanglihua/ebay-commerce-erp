@@ -124,6 +124,18 @@
                             "render": function (data, type, row) {
                                 return dtFormatFloat(data);
                             }
+                        },
+                        {
+                            "mDataProp": "order_amount_sum", "title": "交易金额", "bSearchable": false, "sClass": "dtRight",
+                            "render": function (data, type, row) {
+                                return dtFormatFloat(data);
+                            }
+                        },
+                        {
+                            "mDataProp": "refund_rate", "title": "退款率", "bSearchable": false, "sClass": "dtRight",
+                            "render": function (data, type, row) {
+                                return dtFormatFloat(data * 100) + "%";
+                            }
                         }
                     ],
                     "fnServerData": function (sSource, aoData, fnCallback) {
