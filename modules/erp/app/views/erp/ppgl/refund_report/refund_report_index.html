@@ -31,13 +31,23 @@
                                 <option value="{%.report_type_month%}">月报表</option>
                             </select>
 
-                            <label class="control-label no-padding-right" for="shop_id">店铺</label>
-                            <select id="shop_id" class="input-sm">
-                                <option value="0">--店铺--</option>
+                            <label for="shop_id" class="control-label no-padding-right">店铺</label>
+                            <select id="shop_id" class="input-sm" style="width: 140px;">
+                                <option value="0">店铺查询</option>
                                 {% range $index, $shop := .shop_list%}
                                 <option value="{% $shop.Id %}">{% $shop.Name %}</option>
                                 {%end%}
                             </select>
+
+                            <label for="paypal_account" class="control-label no-padding-right">PayPal账号</label>
+                            <select id="paypal_account" class="input-sm" style="width: 200px;">
+                                <option value="0">PayPal账号查询</option>
+                                {% range $index, $paypal_account := .paypal_account_list%}
+                                <option value="{% $paypal_account.Id %}">{% $paypal_account.PaypalAccount %}</option>
+                                {%end%}
+                            </select>
+
+                        {{/*paypal_account_list*/}}
 
                             <label class="control-label no-padding-right" for="reportType">销售人员</label>
                             <select id="sales_user_id" name="user_query_value" style="height: 30px;width: 120px;">
@@ -119,6 +129,7 @@
                     "fnServerData": function (sSource, aoData, fnCallback) {
                         aoData.push({'name': 'report_type', 'value': $("#reportType").val()});
                         aoData.push({'name': 'shop_id', 'value': $("#shop_id").val()});
+                        aoData.push({'name': 'paypal_account', 'value': $("#paypal_account").val()});
                         aoData.push({'name': 'sales_user_id', 'value': $("#sales_user_id").val()});
                         aoData.push({'name': 'begin_time', 'value': $("#begin_time_query").val()});
                         aoData.push({'name': 'end_time', 'value': $("#end_time_query").val()});

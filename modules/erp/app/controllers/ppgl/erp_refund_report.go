@@ -35,8 +35,12 @@ func (c ErpRefundReport) Index() revel.Result {
 	var shop_list = make([]xtpz_models.ShopAccountInfo, 0)
 	core.HandleError(db_session.OrderBy("id ASC").Find(&shop_list))
 
+	var paypal_account_list = make([]xtpz_models.PaypalAccountInfo, 0)
+	core.HandleError(db_session.OrderBy("id ASC").Find(&paypal_account_list))
+
 	c.RenderArgs["user_list"] = user_list
 	c.RenderArgs["shop_list"] = shop_list
+	c.RenderArgs["paypal_account_list"] = paypal_account_list
 
 	c.RenderArgs["report_type_day"] = REPORT_TYPE_DAY
 	c.RenderArgs["report_type_month"] = REPORT_TYPE_MONTH
@@ -52,9 +56,9 @@ type refund_report_item_t struct {
 func (c ErpRefundReport) ListData() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.PPGL_REFUND_REPORT, c.Session)
 
-	filter, _, offset, limit := core.GetGridRequestParam(c.Request)
+	filter, order, offset, limit := core.GetGridRequestParam(c.Request)
 
-	refund_report_item_list, count := c.get_refund_report_data(filter, offset, limit)
+	refund_report_item_list, count := c.get_refund_report_data(filter, order, offset, limit)
 
 	return c.RenderJson(core.GridResult{
 		Data:  refund_report_item_list,
@@ -62,7 +66,7 @@ func (c ErpRefundReport) ListData() revel.Result {
 	})
 }
 
-func (c ErpRefundReport) get_refund_report_data(filter string, offset int64, limit int64) ([]refund_report_item_t, int64) {
+func (c ErpRefundReport) get_refund_report_data(filter string, order string, offset int64, limit int64) ([]refund_report_item_t, int64) {
 	var report_type int64
 	c.Params.Bind(&report_type, "report_type")
 
@@ -78,6 +82,9 @@ func (c ErpRefundReport) get_refund_report_data(filter string, offset int64, lim
 	var time_end_str string
 	c.Params.Bind(&time_end_str, "end_time")
 
+	var paypal_account_id int64
+	c.Params.Bind(&paypal_account_id, "paypal_account")
+
 	var db_session = c.DbSession
 
 	var update_apply_date_month_sql = `UPDATE erp_order_refund
@@ -92,14 +99,22 @@ WHERE apply_date IS NULL OR apply_month IS NULL;`
 
 		SELECT date_format(apply_date, '%Y-%c-%d') AS month_date, sum(refund_amount) AS refund_amount_sum
 		FROM erp_order_refund
-		WHERE shop_id = 1 AND sales_user_id = 1
+		WHERE shop_id = 1 AND sales_user_id = 1 AND
+			order_id IN (
+				SELECT pp.order_id FROM erp_paypal_payment pp
+				WHERE pp.account_id = 0
+			)
 		GROUP BY apply_date
 		ORDER BY month_date DESC
 		LIMIT 0, 10;
 
 		SELECT date_format(apply_month, '%Y-%c') AS month_date, sum(refund_amount) AS refund_amount_sum
 		FROM erp_order_refund
-		WHERE shop_id = 1 AND sales_user_id = 1
+		WHERE shop_id = 1 AND sales_user_id = 1 AND
+			order_id IN (
+				SELECT pp.order_id FROM erp_paypal_payment pp
+				WHERE pp.account_id = 0
+			)
 		GROUP BY apply_month
 		ORDER BY month_date DESC
 		LIMIT 0, 10;
@@ -128,6 +143,15 @@ WHERE apply_date IS NULL OR apply_month IS NULL;`
 		}
 	}
 
+	if paypal_account_id != 0 {
+		var paypal_account_filter = fmt.Sprintf(`order_id IN (
+				SELECT pp.order_id FROM erp_paypal_payment pp
+				WHERE pp.account_id = %d
+			)`, paypal_account_id)
+
+		filter = core.SqlAnd(filter, paypal_account_filter)
+	}
+
 	var sb = core.NewSqlBuilder()
 	if report_type == REPORT_TYPE_MONTH {
 		sb.Select(`date_format(apply_month, '%Y-%c') AS month_date, sum(refund_amount) AS refund_amount_sum`)
@@ -146,7 +170,12 @@ WHERE apply_date IS NULL OR apply_month IS NULL;`
 		sb.GroupBy("apply_date")
 	}
 
-	sb.OrderBy("month_date DESC")
+	if order == "" {
+		sb.OrderBy("month_date DESC")
+	} else {
+		sb.OrderBy(order)
+	}
+
 	sb.Limit(offset, limit)
 
 	var refund_report_item_list = make([]refund_report_item_t, 0)
@@ -165,7 +194,7 @@ func (c ErpRefundReport) Export() revel.Result {
 
 	var db_session = c.DbSession
 
-	refund_report_list, _ := c.get_refund_report_data("1=1", 0, math.MaxInt32)
+	refund_report_list, _ := c.get_refund_report_data("1=1", "", 0, math.MaxInt32)
 
 	xlsx_file := c.get_export_excel_content(db_session, refund_report_list)
 
