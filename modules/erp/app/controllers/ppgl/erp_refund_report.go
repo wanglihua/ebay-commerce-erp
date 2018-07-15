@@ -14,15 +14,12 @@ import (
 	"matrix/modules/erp/service/excel_service"
 	"bytes"
 	"math"
+	"matrix/modules/erp/app/controllers/ppgl/service"
 )
 
 type ErpRefundReport struct {
 	*revel.Controller
 }
-
-const REPORT_TYPE_DAY int64 = 1
-
-const REPORT_TYPE_MONTH int64 = 2
 
 func (c ErpRefundReport) Index() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.PPGL_REFUND_REPORT, c.Session)
@@ -42,8 +39,8 @@ func (c ErpRefundReport) Index() revel.Result {
 	c.RenderArgs["shop_list"] = shop_list
 	c.RenderArgs["paypal_account_list"] = paypal_account_list
 
-	c.RenderArgs["report_type_day"] = REPORT_TYPE_DAY
-	c.RenderArgs["report_type_month"] = REPORT_TYPE_MONTH
+	c.RenderArgs["report_type_day"] = service.REPORT_TYPE_DAY
+	c.RenderArgs["report_type_month"] = service.REPORT_TYPE_MONTH
 
 	return c.RenderTemplate("erp/ppgl/refund_report/refund_report_index.html")
 }
@@ -153,7 +150,7 @@ WHERE apply_date IS NULL OR apply_month IS NULL;`
 	}
 
 	var sb = core.NewSqlBuilder()
-	if report_type == REPORT_TYPE_MONTH {
+	if report_type == service.REPORT_TYPE_MONTH {
 		sb.Select(`date_format(apply_month, '%Y-%c') AS month_date, sum(refund_amount) AS refund_amount_sum`)
 	} else {
 		sb.Select(`date_format(apply_date, '%Y-%c-%d') AS month_date, sum(refund_amount) AS refund_amount_sum`)
@@ -164,7 +161,7 @@ WHERE apply_date IS NULL OR apply_month IS NULL;`
 
 	sb.Where(filter)
 
-	if report_type == REPORT_TYPE_MONTH {
+	if report_type == service.REPORT_TYPE_MONTH {
 		sb.GroupBy("apply_month")
 	} else {
 		sb.GroupBy("apply_date")

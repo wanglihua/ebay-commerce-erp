@@ -39,8 +39,8 @@ type OrderInfo struct {
 	BuyerCheckoutMessage     string            `xorm:"nvarchar(500) notnull 'buyer_checkout_message'" json:"buyer_checkout_message" smith:"verbose_name=买家留言"`
 	CreatedTime              core.NullLongTime `xorm:"datetime 'created_time'" json:"created_time" smith:"verbose_name=创建时间"`
 	ModifiedTime             core.NullLongTime `xorm:"datetime 'modified_time'" json:"modified_time" smith:"verbose_name=修改时间"`
-	PaidTime                 core.NullLongTime `xorm:"datetime 'paid_time'" json:"paid_time" smith:"verbose_name=支付时间"`
-	ShippedTime              core.NullLongTime `xorm:"datetime 'shipped_time'" json:"shipped_time" smith:"verbose_name=发货时间"`
+	PaidTime                 core.NullLongTime `xorm:"datetime index 'paid_time'" json:"paid_time" smith:"verbose_name=支付时间"`
+	ShippedTime              core.NullLongTime `xorm:"datetime index 'shipped_time'" json:"shipped_time" smith:"verbose_name=发货时间"`
 	HoldTypeId               core.NullInt      `xorm:"bigint null index 'hold_type_id'" json:"hold_type_id" smith:"verbose_name=Hold类型"`
 	PreHoldTypeId            int64             `xorm:"bigint notnull index 'pre_hold_type_id'" json:"pre_hold_type_id" smith:"verbose_name=前Hold类型"`
 	ExchangeRate             float64           `xorm:"decimal(18,6) notnull 'exchange_rate'" json:"exchange_rate" smith:"verbose_name=换算汇率"` // 订单下载时把当前的汇率设置放到这个里面
