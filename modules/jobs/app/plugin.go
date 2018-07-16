@@ -29,11 +29,13 @@ func init() {
 		revel.TRACE.Println("schedule_task_enabled", schedule_task_enabled)
 
 		if schedule_task_enabled == true {
+			/*
 			cron_ebay_download_order, found := revel.Config.String("cron.ebay_download_order")
 			if found {
 				check_cron_support(cron_ebay_download_order)
 				jobs.Schedule(cron_ebay_download_order, tasks.EBayOrderDownloadTask{})
 			}
+			*/
 
 			// cron.order_logistics_match
 			// 下载的已支付的订单匹配物流
