@@ -398,7 +398,7 @@
         }
 
         var message_id = $("#message_id").val();
-        var message_body = $("#message_body").val();
+        var message_reply = $("#msg_reply").val();
 
         showMask("操作进行中，请稍候");
 
@@ -407,7 +407,7 @@
             "url": '{% url "ErpMessage.Reply" %}',
             "data": {
                 "message_id": message_id,
-                "message_body": message_body
+                "message_body": message_reply
             },
             "success": function (data) {
                 hideMask();
