@@ -15,6 +15,7 @@ import (
 	"matrix/modules/auth/pass_res"
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/app/controllers/xxgl/service"
+	"matrix/modules/erp/models/xtpz_models"
 )
 
 type ErpMessage struct {
@@ -29,7 +30,11 @@ func (c ErpMessage) Index() revel.Result {
 	var user_list = make([]auth_models.UserInfo, 0)
 	core.HandleError(db_session.OrderBy("login_name ASC").Find(&user_list))
 
+	var shop_list = make([]xtpz_models.ShopAccountInfo, 0)
+	core.HandleError(db_session.Find(&shop_list))
+
 	c.RenderArgs["user_list"] = user_list
+	c.RenderArgs["shop_list"] = shop_list
 
 	return c.RenderTemplate("erp/xxgl/message/message_index.html")
 }

@@ -21,6 +21,14 @@
                 <div class="row" style="margin-top: 20px;margin-bottom: 20px;">
                     <div id="query" class="col-xs-12" style="line-height: 28px;">
                         <div class="col-xs-12">
+                            <label class="control-label no-padding-right" for="shop_id_query">店铺</label>
+                            <select id="shop_id_query" name="shop_id_query" style="height: 30px; width: 130px;">
+                                <option value="0">--店铺--</option>
+                                {% range $index, $shop := .shop_list %}
+                                <option value="{% $shop.Id %}">{% $shop.Name %}</option>
+                                {% end %}
+                            </select>
+
                             <label class="control-label no-padding-right" for="item_id_query">Item Id</label>
                             <input class="input-sm" id="item_id_query" name="item_id_query" placeholder="Item Id" type="text" style="width: 130px;"/>
 
