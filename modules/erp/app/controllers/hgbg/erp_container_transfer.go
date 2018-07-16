@@ -303,9 +303,9 @@ func (c ErpContainerTransfer) Save() revel.Result {
 		return c.RenderJson(core.JsonResult{Success: false, Message: "成本上调应该大于 -1！"})
 	}
 
-	if detail_form.ContainerTransfer.PriceDownRate < 0 || detail_form.ContainerTransfer.PriceDownRate > 1 {
+	if detail_form.ContainerTransfer.PriceDownRate < 0 {
 		// validation.Required(f.ContainerTransfer.PriceDownRate).Message("征税品下调不能为空！")
-		return c.RenderJson(core.JsonResult{Success: false, Message: "征税品打折应该在 0 和 1 之间！"})
+		return c.RenderJson(core.JsonResult{Success: false, Message: "征税品打折应该大于 0！"})
 	}
 
 	var packing_time = time.Time(detail_form.ContainerTransfer.PackingTime)
