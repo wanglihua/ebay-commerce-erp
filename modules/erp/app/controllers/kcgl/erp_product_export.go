@@ -90,19 +90,34 @@ func (c ErpProductExport) Export() revel.Result {
 	}
 
 	/*
-SELECT p.*, sup.*, su.*, du.*
+SELECT
+    p.*,
+    sale_user.*,
+    service_user.*,
+    dev_user.*,
+    replenish_user.*,
+    artist_user.*
 FROM erp_product p
-    LEFT JOIN erp_supplier sup ON p.supplier_id = sup.id
-    LEFT JOIN auth_user su ON p.sale_user_id = su.id
-    LEFT JOIN auth_user du ON p.dev_user_id = du.id
+    LEFT JOIN auth_user sale_user ON sale_user.id = p.sale_user_id
+    LEFT JOIN auth_user service_user ON service_user.id = p.service_user_id
+    LEFT JOIN auth_user dev_user ON dev_user.id = p.dev_user_id
+    LEFT JOIN auth_user replenish_user ON replenish_user.id = p.replenish_user_id
+    LEFT JOIN auth_user artist_user ON artist_user.id = p.artist_user_id
 	 */
 
 	var sb = core.NewSqlBuilder()
-	sb.Select("p.*, sup.*, su.*, du.*")
+	sb.Select(`p.*,
+    sale_user.*,
+    service_user.*,
+    dev_user.*,
+    replenish_user.*,
+    artist_user.*`)
 	sb.From(`erp_product p
-    LEFT JOIN erp_supplier sup ON p.supplier_id = sup.id
-    LEFT JOIN auth_user su ON p.sale_user_id = su.id
-    LEFT JOIN auth_user du ON p.dev_user_id = du.id`)
+    LEFT JOIN auth_user sale_user ON sale_user.id = p.sale_user_id
+    LEFT JOIN auth_user service_user ON service_user.id = p.service_user_id
+    LEFT JOIN auth_user dev_user ON dev_user.id = p.dev_user_id
+    LEFT JOIN auth_user replenish_user ON replenish_user.id = p.replenish_user_id
+    LEFT JOIN auth_user artist_user ON artist_user.id = p.artist_user_id`)
 	sb.Where(filter)
 
 	var product_export_list = make([]product_export_item_t, 0)
@@ -124,10 +139,13 @@ FROM erp_product p
 }
 
 type product_export_item_t struct {
-	Product  kcgl_models.ProductInfo  `xorm:"extends"`
-	Supplier sppz_models.SupplierInfo `xorm:"extends"`
-	SaleUser auth_models.UserInfo     `xorm:"extends"`
-	DevUser  auth_models.UserInfo     `xorm:"extends"`
+	Product       kcgl_models.ProductInfo  `xorm:"extends"`
+	Supplier      sppz_models.SupplierInfo `xorm:"extends"`
+	SaleUser      auth_models.UserInfo     `xorm:"extends"`
+	ServiceUser   auth_models.UserInfo     `xorm:"extends"`
+	DevUser       auth_models.UserInfo     `xorm:"extends"`
+	ReplenishUser auth_models.UserInfo     `xorm:"extends"`
+	ArtistUser    auth_models.UserInfo     `xorm:"extends"`
 }
 
 func (c ErpProductExport) export_product_list_to_excel(db_session *xorm.Session, product_list []product_export_item_t) *xlsx.File {
@@ -196,13 +214,31 @@ func (c ErpProductExport) export_product_list_to_excel(db_session *xorm.Session,
 		cell = row.AddCell()
 		sheet.SetColWidth(col_index, col_index, 15)
 		set_head_cell_style(cell)
-		cell.Value = "销售员"
+		cell.Value = "销售人员"
 		col_index++
 
 		cell = row.AddCell()
 		sheet.SetColWidth(col_index, col_index, 15)
 		set_head_cell_style(cell)
-		cell.Value = "开发员"
+		cell.Value = "客服人员"
+		col_index++
+
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 15)
+		set_head_cell_style(cell)
+		cell.Value = "开发人员"
+		col_index++
+
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 15)
+		set_head_cell_style(cell)
+		cell.Value = "补货人员"
+		col_index++
+
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 15)
+		set_head_cell_style(cell)
+		cell.Value = "美工人员"
 		col_index++
 
 		cell = row.AddCell()
@@ -267,7 +303,7 @@ func (c ErpProductExport) export_product_list_to_excel(db_session *xorm.Session,
 		set_text_cell_style(cell, "center")
 		cell.Value = product.Product.CnName
 
-		// 销售员
+		// 销售人员
 		cell = row.AddCell()
 		set_text_cell_style(cell, "center")
 		if product.SaleUser.LoginName != "" {
@@ -276,11 +312,38 @@ func (c ErpProductExport) export_product_list_to_excel(db_session *xorm.Session,
 			cell.Value = ""
 		}
 
-		// 开发员
+		// 客服人员
+		cell = row.AddCell()
+		set_text_cell_style(cell, "center")
+		if product.ServiceUser.LoginName != "" {
+			cell.Value = fmt.Sprintf("%s(%s)", product.ServiceUser.NickName, product.ServiceUser.LoginName)
+		} else {
+			cell.Value = ""
+		}
+
+		// 开发人员
 		cell = row.AddCell()
 		set_text_cell_style(cell, "center")
 		if product.DevUser.LoginName != "" {
 			cell.Value = fmt.Sprintf("%s(%s)", product.DevUser.NickName, product.DevUser.LoginName)
+		} else {
+			cell.Value = ""
+		}
+
+		// 补货人员
+		cell = row.AddCell()
+		set_text_cell_style(cell, "center")
+		if product.ReplenishUser.LoginName != "" {
+			cell.Value = fmt.Sprintf("%s(%s)", product.ReplenishUser.NickName, product.ReplenishUser.LoginName)
+		} else {
+			cell.Value = ""
+		}
+
+		// 美工人员
+		cell = row.AddCell()
+		set_text_cell_style(cell, "center")
+		if product.ArtistUser.LoginName != "" {
+			cell.Value = fmt.Sprintf("%s(%s)", product.ArtistUser.NickName, product.ArtistUser.LoginName)
 		} else {
 			cell.Value = ""
 		}
