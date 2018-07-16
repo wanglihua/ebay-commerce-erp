@@ -77,6 +77,14 @@
                         {% end %}
                     </select>
                     &nbsp;&nbsp;
+                    <label for="artist_user_id_query">美工人员</label>
+                    <select id="artist_user_id_query" name="artist_user_id_query" style="height: 30px; width: 130px;">
+                        <option value="0">美工人员</option>
+                        {% range $index, $user := .artist_user_list %}
+                        <option value="{% $user.Id %}">{% $user.LoginName %}（{% $user.NickName %}）</option>
+                        {% end %}
+                    </select>
+                    &nbsp;&nbsp;
                     <button class="btn btn-mini btn-primary" style="margin-bottom: 3px; height: 30px;" onclick="search()">
                         &nbsp;<i class="ace-icon fa fa-search"></i>查&nbsp;询&nbsp;
                     </button>
@@ -186,6 +194,22 @@
                                     </div>
                                 </div>
 
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <label for="artist_user_id" class="col-xs-2 control-label">美工人员</label>
+                                            <div class="col-xs-10">
+                                                <select id="artist_user_id" name="detail.product.artist_user_id" type="text" class="input-sm form-control" v-model.number="detail.product.artist_user_id">
+                                                    <option :value="0"></option>
+                                                    <template v-for="user in artist_user_list">
+                                                        <option :value="user.id">{{user.login_name}}({{user.nick_name}})</option>
+                                                    </template>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
                             </form>
                         </div>
                     </div>
@@ -270,7 +294,8 @@
             "sale_user_list": [],
             "service_user_list": [],
             "dev_user_list": [],
-            'replenish_user_list': []
+            'replenish_user_list': [],
+            'artist_user_list': []
         },
         mounted: function () {
             var this_vm = this;
@@ -345,6 +370,16 @@
                                     }
                                 }
                             },
+                            {
+                                "mDataProp": "artist_user.id", "title": "美工人员", "bSearchable": false, "sClass": "center", "width": 120,
+                                "render": function (data, type, row) {
+                                    if (data !== 0) {
+                                        return row.artist_user.login_name + "(" + row.artist_user.nick_name + ")";
+                                    } else {
+                                        return "";
+                                    }
+                                }
+                            },
                             {"mDataProp": "s.name", "title": "状态", "bSearchable": true, "width": 80}
                         ],
                         "fnServerData": function (sSource, aoData, fnCallback) {
@@ -355,6 +390,7 @@
                             aoData.push({name: 'service_user_id_query', value: $("#service_user_id_query").val()});
                             aoData.push({name: 'dev_user_id_query', value: $("#dev_user_id_query").val()});
                             aoData.push({name: 'replenish_user_id_query', value: $("#replenish_user_id_query").val()});
+                            aoData.push({name: 'artist_user_id_query', value: $("#artist_user_id_query").val()});
 
                             $.ajax({
                                 "dataType": 'json',
@@ -405,6 +441,7 @@
                         vm.service_user_list = result.service_user_list;
                         vm.dev_user_list = result.dev_user_list;
                         vm.replenish_user_list = result.replenish_user_list;
+                        vm.artist_user_list = result.artist_user_list;
                         $('#productDetailDialog').modal(modalOptions);
                     }
                 });
@@ -423,6 +460,9 @@
                         required: false, number: true
                     },
                     'detail.product.replenish_user_id': {
+                        required: false, number: true
+                    },
+                    'detail.product.artist_user_id': {
                         required: false, number: true
                     }
                 });

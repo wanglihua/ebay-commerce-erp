@@ -90,6 +90,14 @@
                             {% end %}
                         </select>
                         &nbsp;&nbsp;
+                        <label for="artist_user_id_query">美工人员</label>
+                        <select id="artist_user_id_query" name="artist_user_id_query" style="height: 30px; width: 130px;">
+                            <option value="0">--美工人员--</option>
+                            {% range $index, $user := .artist_user_list %}
+                            <option value="{% $user.Id %}">{% $user.LoginName %}（{% $user.NickName %}）</option>
+                            {% end %}
+                        </select>
+                        &nbsp;&nbsp;
 
                         <button class="btn btn-mini btn-primary" @click="refreshList()">
                             &nbsp;<i class="ace-icon fa fa-search"></i>查&nbsp;询&nbsp;
@@ -230,6 +238,14 @@
                                     }
                                     str += "<br/>";
 
+                                    if (row.prd.artist_user === "") {
+                                        str += "------";
+                                    }
+                                    else {
+                                        str += row.prd.artist_user;
+                                    }
+                                    str += "<br/>";
+
                                     return str;
                                 }
                             },
@@ -306,6 +322,7 @@
                             aoData.push({name: 'service_user_id_query', value: $("#service_user_id_query").val()});
                             aoData.push({name: 'dev_user_id_query', value: $("#dev_user_id_query").val()});
                             aoData.push({name: 'replenish_user_id_query', value: $("#replenish_user_id_query").val()});
+                            aoData.push({name: 'artist_user_id_query', value: $("#artist_user_id_query").val()});
 
                             $.ajax(
                                     {

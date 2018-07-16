@@ -39,6 +39,7 @@ func (c ErpProductUser) Index() revel.Result {
 	c.RenderArgs["service_user_list"] = user_list
 	c.RenderArgs["dev_user_list"] = user_list
 	c.RenderArgs["replenish_user_list"] = user_list
+	c.RenderArgs["artist_user_list"] = user_list
 
 	return c.RenderTemplate("erp/sppz/product_user/product_user_index.html")
 }
@@ -64,12 +65,16 @@ func (c ErpProductUser) ListData() revel.Result {
 	var replenish_user_id_query int64
 	c.Params.Bind(&replenish_user_id_query, "replenish_user_id_query")
 
+	var artist_user_id_query int64
+	c.Params.Bind(&artist_user_id_query, "artist_user_id_query")
+
 	type product_user_view_item_t struct {
 		Product       kcgl_models.ProductInfo `xorm:"extends" json:"p"`
 		SaleUser      auth_models.UserInfo    `xorm:"extends" json:"sale_user"`
 		ServiceUser   auth_models.UserInfo    `xorm:"extends" json:"service_user"`
 		DevUser       auth_models.UserInfo    `xorm:"extends" json:"dev_user"`
 		ReplenishUser auth_models.UserInfo    `xorm:"extends" json:"replenish_user"`
+		ArtistUser    auth_models.UserInfo    `xorm:"extends" json:"artist_user"`
 		Status        models.StatusInfo       `xorm:"extends" json:"s"`
 	}
 
@@ -80,6 +85,7 @@ SELECT
     service_user.*,
     dev_user.*,
     replenish_user.*,
+    artist_user.*,
     s.*
 FROM erp_product p
     INNER JOIN erp_status s ON s.id = p.status_id
@@ -87,7 +93,8 @@ FROM erp_product p
     LEFT JOIN auth_user service_user ON service_user.id = p.service_user_id
     LEFT JOIN auth_user dev_user ON dev_user.id = p.dev_user_id
     LEFT JOIN auth_user replenish_user ON replenish_user.id = p.replenish_user_id
-	 */
+    LEFT JOIN auth_user artist_user ON artist_user.id = p.artist_user_id
+     */
 
 	sb := core.NewSqlBuilder()
 	sb.Select(`
@@ -96,6 +103,7 @@ FROM erp_product p
     service_user.*,
     dev_user.*,
     replenish_user.*,
+    artist_user.*,
     s.*`)
 	sb.Count("count(p.id) AS product_count")
 	sb.From(`erp_product p
@@ -103,7 +111,8 @@ FROM erp_product p
     LEFT JOIN auth_user sale_user ON sale_user.id = p.sale_user_id
     LEFT JOIN auth_user service_user ON service_user.id = p.service_user_id
     LEFT JOIN auth_user dev_user ON dev_user.id = p.dev_user_id
-    LEFT JOIN auth_user replenish_user ON replenish_user.id = p.replenish_user_id`)
+    LEFT JOIN auth_user replenish_user ON replenish_user.id = p.replenish_user_id
+    LEFT JOIN auth_user artist_user ON artist_user.id = p.artist_user_id`)
 
 	if filter_type == 1 { // 未设置人员数据的记录
 		filter_has_zero_data := core.SqlOr("p.sale_user_id = 0", "p.service_user_id = 0", "p.dev_user_id = 0")
@@ -124,6 +133,10 @@ FROM erp_product p
 
 	if replenish_user_id_query != 0 {
 		filter = core.SqlAnd(filter, fmt.Sprintf("p.replenish_user_id = %d", replenish_user_id_query))
+	}
+
+	if artist_user_id_query != 0 {
+		filter = core.SqlAnd(filter, fmt.Sprintf("p.artist_user_id = %d", artist_user_id_query))
 	}
 
 	sb.Where(filter)
@@ -181,6 +194,7 @@ func (c ErpProductUser) DetailData() revel.Result {
 		"service_user_list":   user_list,
 		"dev_user_list":       user_list,
 		"replenish_user_list": user_list,
+		"artist_user_list":    user_list,
 	})
 }
 
@@ -210,8 +224,9 @@ func (c ErpProductUser) Save() revel.Result {
 	product_in_db.SaleUserId = detail_form.Product.SaleUserId
 	product_in_db.ServiceUserId = detail_form.Product.ServiceUserId
 	product_in_db.DevUserId = detail_form.Product.DevUserId
+	product_in_db.ArtistUserId = detail_form.Product.ArtistUserId
 
-	updata_col_List := []string{"sale_user_id", "service_user_id", "dev_user_id", "replenish_user_id"}
+	updata_col_List := []string{"sale_user_id", "service_user_id", "dev_user_id", "replenish_user_id", "artist_user_id"}
 	affected_count, err := db_session.Id(product_id).Cols(updata_col_List...).Update(&product_in_db)
 	core.HandleError(err)
 

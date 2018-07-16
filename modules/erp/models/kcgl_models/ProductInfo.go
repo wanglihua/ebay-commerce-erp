@@ -49,6 +49,8 @@ type ProductInfo struct {
 	DevUser          string          `xorm:"-" json:"dev_user"`
 	ReplenishUserId  int64           `xorm:"bigint notnull index 'replenish_user_id' default(0)" json:"replenish_user_id" smith:"verbose_name=补货人员"`
 	ReplenishUser    string          `xorm:"-" json:"replenish_user"`
+	ArtistUserId     int64           `xorm:"bigint notnull index 'artist_user_id' default(0)" json:"artist_user_id" smith:"verbose_name=美工人员"`
+	ArtistUser       string          `xorm:"-" json:"artist_user"`
 	CreateTime       core.Time       `xorm:"created notnull 'create_time'" json:"create_time"`
 	UpdateTime       core.Time       `xorm:"updated notnull 'update_time'" json:"update_time"`
 }
