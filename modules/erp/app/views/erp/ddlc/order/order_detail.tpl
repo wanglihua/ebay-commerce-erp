@@ -93,6 +93,18 @@
                         </div>
                     </div>
                     {% end %}
+
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <div class="form-group">
+                                <label for="order_buyer_checkout_message" class="col-xs-1 control-label">买家留言：</label>
+                                <div class="col-xs-11">
+                                    <textarea id="order_buyer_checkout_message" name="order_buyer_checkout_message" rows="2" disabled="disabled" class="input-sm form-control" v-model="detail.order.buyer_checkout_message"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="row">
                         <div class="col-xs-12">
                             <div class="form-group">
