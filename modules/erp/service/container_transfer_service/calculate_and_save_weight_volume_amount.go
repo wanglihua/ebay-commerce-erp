@@ -30,7 +30,7 @@ WHERE cte.transfer_id = 1;
 		TotalVolume          float64 `xorm:"'total_volume'"`
 		TotalAmount1         float64 `xorm:"'total_amount1'"`          // 实际金额
 		TotalAmount2         float64 `xorm:"'total_amount2'"`          // 折算金额，成本上调后的总金额
-		DutyAmountDiscounted float64 `xorm:"'duty_amount_discounted'"` // 征税打折金额，成本上上调后的总金额对应的需要对征税商品的打折金额
+		DutyAmountDiscounted float64 `xorm:"'duty_amount_discounted'"` // 征税打折金额，成本上上调后的总金额对应的需要对征税商品的打折金额 ?? 后面一句话和代码没对应起来
 		DutyFreeAmount       float64 `xorm:"'duty_free_amount'"`       // 不征税金额，商品中不需要征税部分的总金额
 	}
 
