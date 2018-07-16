@@ -44,11 +44,13 @@ func (c ErpProductUserExcel) Import() revel.Result {
 		service_user_login_name   string
 		dev_user_login_name       string
 		replenish_user_login_name string
+		artist_user_login_name    string
 		product                   kcgl_models.ProductInfo
 		sale_user_id              int64
 		service_user_id           int64
 		dev_user_id               int64
 		replenish_user_id         int64
+		artist_user_id            int64
 	}
 
 	product_user_list := make([]product_user_t, 0)
@@ -116,6 +118,14 @@ func (c ErpProductUserExcel) Import() revel.Result {
 			core.HandleError(err)
 			cell_val = strings.TrimSpace(cell_val)
 			product_user.replenish_user_login_name = cell_val
+			col_index++
+
+			// artist_user_login_name
+			cell = sheet.Cell(row_index, col_index)
+			cell_val, err = cell.String()
+			core.HandleError(err)
+			cell_val = strings.TrimSpace(cell_val)
+			product_user.artist_user_login_name = cell_val
 			col_index++
 
 			product_user_list = append(product_user_list, product_user)
@@ -199,6 +209,21 @@ func (c ErpProductUserExcel) Import() revel.Result {
 				product_user_list[index].replenish_user_id = replenish_user.Id
 			}
 		}
+
+		// 美工人员
+		if product_user.artist_user_login_name == "" {
+			product_user_list[index].artist_user_id = 0
+		} else {
+			var artist_user auth_models.UserInfo
+			has, err = db_session.Where("login_name = ?", product_user.artist_user_login_name).Get(&artist_user)
+			core.HandleError(err)
+
+			if has == false {
+				panic(fmt.Sprintf("指定的补货人员工号数据库中不存在！"))
+			} else {
+				product_user_list[index].artist_user_id = artist_user.Id
+			}
+		}
 	}
 
 	for _, product_user := range product_user_list {
@@ -207,8 +232,9 @@ func (c ErpProductUserExcel) Import() revel.Result {
 		product.ServiceUserId = product_user.service_user_id
 		product.DevUserId = product_user.dev_user_id
 		product.ReplenishUserId = product_user.replenish_user_id
+		product.ArtistUserId = product_user.artist_user_id
 
-		update_col_list := []string{"sale_user_id", "service_user_id", "dev_user_id", "replenish_user_id"}
+		update_col_list := []string{"sale_user_id", "service_user_id", "dev_user_id", "replenish_user_id", "artist_user_id"}
 		_, err = db_session.Id(product.Id).Cols(update_col_list...).Update(&product)
 		core.HandleError(err)
 	}
@@ -380,6 +406,18 @@ func (c ErpProductUserExcel) export_product_list_to_excel(db_session *xorm.Sessi
 		cell = row.AddCell()
 		sheet.SetColWidth(col_index, col_index, 10)
 		set_head_cell_style(cell)
+		cell.Value = "美工人员"
+		col_index++
+
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 10)
+		set_head_cell_style(cell)
+		cell.Value = "美工人员"
+		col_index++
+
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 10)
+		set_head_cell_style(cell)
 		cell.Value = "状态"
 		col_index++
 	}
@@ -447,6 +485,17 @@ func (c ErpProductUserExcel) export_product_list_to_excel(db_session *xorm.Sessi
 		cell = row.AddCell()
 		set_text_cell_style(cell, "center")
 		cell.Value = replenish_user.NickName
+
+		// 补货人员
+		var artist_user = find_user(product.ArtistUserId)
+
+		cell = row.AddCell()
+		set_text_cell_style(cell, "center")
+		cell.Value = artist_user.LoginName
+
+		cell = row.AddCell()
+		set_text_cell_style(cell, "center")
+		cell.Value = artist_user.NickName
 
 		// 状态
 		cell = row.AddCell()
