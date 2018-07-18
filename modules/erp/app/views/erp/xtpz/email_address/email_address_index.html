@@ -1,0 +1,263 @@
+{%header "电子邮件地址" .%}
+<div id="page">
+    <div class="breadcrumbs" id="breadcrumbs">
+        <ul class="breadcrumb">
+            <li>
+                <a href='{%url "Home.Index"%}'><i class="ace-icon fa fa-home home-icon"></i></a>
+            </li>
+            <li class="parent" data-menu="xtpz-menu">系统配置</li>
+            <li class="active" data-menu="xtpz-emailaddress-menu">电子邮件地址</li>
+        </ul>
+    </div>
+    <div class="page-content">
+        <div class="row">
+            <div class="col-xs-12" style="padding: 0;">
+                <div class="gridToolBar clearfix">
+                    <button class="btn btn-primary btn-sm" @click="reloadList('#emailAddressList')">
+                        <i class="ace-icon fa fa-refresh"></i>
+                        刷新
+                    </button>
+                    <button class="btn btn-success btn-sm" @click="showEmailAddressDetail(0)">
+                        <i class="ace-icon fa fa-plus"></i>
+                        新增
+                    </button>
+                    <button class="btn btn-danger btn-sm" @click="deleteEmailAddress()">
+                        <i class="ace-icon fa fa-trash-o"></i>
+                        删除
+                    </button>
+                </div>
+                <div>
+                    <table id="emailAddressList" class="table table-striped table-bordered table-hover"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="emailAddressDetailDialog">
+        <div class="modal-dialog" style="width: 680px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="True">&times;</button>
+                    <h4 class="modal-title">电子邮件地址详细</h4>
+                </div>
+                <div class="modal-body clearfix">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <form class="form-horizontal" role="form" id="emailAddressDetailForm">
+                                <input id="email_address_id" name="detail.email_address.id" type="hidden" v-model.number="detail.email_address.id"/>
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <label for="email" class="col-xs-2 control-label">邮件地址</label>
+                                            <div class="col-xs-10">
+                                                <input id="email" name="detail.email_address.email" type="text" class="input-sm form-control" v-model="detail.email_address.email"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <label for="account" class="col-xs-2 control-label">账号</label>
+                                            <div class="col-xs-10">
+                                                <input id="account" name="detail.email_address.account" type="text" class="input-sm form-control" v-model="detail.email_address.account"/>
+                                                <div class="help-block">大部分时候和邮件地址是一样的</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <label for="password" class="col-xs-2 control-label">密码</label>
+                                            <div class="col-xs-10">
+                                                <input id="password" name="detail.email_address.password" type="text" class="input-sm form-control" v-model="detail.email_address.password"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <label for="smtp_server" class="col-xs-2 control-label">发件服务器</label>
+                                            <div class="col-xs-10">
+                                                <input id="smtp_server" name="detail.email_address.smtp_server" type="text" class="input-sm form-control" v-model="detail.email_address.smtp_server"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <label for="smtp_port" class="col-xs-2 control-label">发件服务器端口</label>
+                                            <div class="col-xs-10">
+                                                <input id="smtp_port" name="detail.email_address.smtp_port" type="text" class="input-sm form-control" v-model="detail.email_address.smtp_port"/>
+                                                <div class="help-block">大部分时候和邮件地址是一样的</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success btn-sm" @click="saveEmailAddress()">
+                        <i class="ace-icon fa fa-floppy-o"></i>保存
+                    </button>
+                    <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">
+                        <i class="ace-icon fa fa-times"></i>关闭
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    var vm = new Vue({
+        el: "#page",
+        data: {
+            "detail": {
+                "email_address": {}
+            }
+        },
+        mounted: function () {
+            initDataTable(
+                    '#emailAddressList',
+                    {
+                        "sAjaxSource": '{%url "ErpEmailAddress.ListData"%}',
+                        "aaSorting": [[1, "asc"]],
+                        "aoColumns": [
+                            {
+                                "mDataProp": "id", "bSearchable": false, "orderable": false, "sClass": "center", "width": 50,
+                                "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
+                                "render": function (data, type, row) {
+                                    return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
+                                }
+                            },
+                            {"mDataProp": "email", "title": "邮件地址", "bSearchable": true},
+                            {"mDataProp": "account", "title": "账号", "bSearchable": true},
+                            {"mDataProp": "smtp_server", "title": "发件服务器", "bSearchable": true},
+                            {"mDataProp": "create_time", "title": "创建时间", "bSearchable": false, "width": 120},
+                            {"mDataProp": "update_time", "title": "修改时间", "bSearchable": false, "width": 120}
+                        ]
+                    }
+            );
+
+            $('#emailAddressList tbody').on('dblclick', 'tr', function () {
+                var id = $(this).find('td:first-child input:checkbox').val();
+                vm.showEmailAddressDetail(id);
+            });
+        },
+        methods: {
+            reloadList: function () {
+                reloadList('#emailAddressList');
+            },
+            showEmailAddressDetail: function (id) {
+                showMask("加载中...");
+                $("#emailAddressDetailForm").clearValidation();
+                $.ajax({
+                            url: '{%url "ErpEmailAddress.DetailData" %}',
+                            type: "POST",
+                            data: {
+                                "id": id
+                            },
+                            success: function (result) {
+                                hideMask();
+                                if (result.success == false) {
+                                    $.msg.error(result.message);
+                                    return;
+                                }
+                                vm.detail = result;
+                                $('#emailAddressDetailDialog').modal(modalOptions);
+                            }
+                        }
+                );
+            },
+            saveEmailAddress: function () {
+                showMask("提交中...");
+                var form = $("#emailAddressDetailForm");
+                var valid = validate(form, {
+                    'detail.email_address.email': {
+                        required: true
+                    },
+                    'detail.email_address.account': {
+                        required: true
+                    },
+                    'detail.email_address.password': {
+                        required: true
+                    },
+                    'detail.email_address.smtp_server': {
+                        required: true
+                    },
+                    'detail.email_address.smtp_port': {
+                        required: true
+                    }
+                });
+
+                if (!valid) {
+                    hideMask();
+                } else {
+                    $.ajax({
+                                url: '{%url "ErpEmailAddress.Save"%}',
+                                type: "POST",
+                                processData: false,
+                                contentType: 'application/json',
+                                data: JSON.stringify(vm.detail),
+                                success: function (data) {
+                                    hideMask();
+                                    if (data.success == false) {
+                                        $.msg.error(data.message);
+                                        //return;
+                                    }
+                                    else {
+                                        $.msg.show(data.message);
+                                        $('#emailAddressDetailDialog').modal('hide');
+                                        vm.reloadList();
+                                        //return;
+                                    }
+                                }
+                            }
+                    );
+                }
+            },
+            deleteEmailAddress: function () {
+                var id_list = [];
+                $('#emailAddressList tbody tr>td:first-child input:checkbox').each(function () {
+                    if (this.checked) {
+                        id_list.push($(this).val());
+                    }
+                });
+
+                if (id_list.length == 0) {
+                    $.msg.alert("请选择数据！");
+                    return;
+                }
+
+                $.msg.confirm("确认要删除吗？", function () {
+                    $.ajax({
+                        url: '{%url "ErpEmailAddress.Delete"%}',
+                        type: "POST",
+                        data: {"id_list": id_list},
+                        success: function (data) {
+                            if (data.success == false) {
+                                $.msg.error(data.message);
+                                return;
+                            }
+                            else {
+                                $.msg.show(data.message);
+                            }
+                            vm.reloadList();
+                        }
+                    });
+                });
+            }
+        }
+    });
+</script>
+{%footer%}
+

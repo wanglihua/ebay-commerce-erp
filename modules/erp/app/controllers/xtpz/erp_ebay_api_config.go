@@ -21,7 +21,7 @@ type ErpEBayAPIConfig struct {
 
 type EBayAPIConfigDetailForm struct {
 	EBayAPIConfig xtpz_models.EBayAPIConfigInfo `json:"api_config"`
-	ShopName      string                   `json:"shop_name"`
+	ShopName      string                        `json:"shop_name"`
 }
 
 func (f *EBayAPIConfigDetailForm) IsCreate() bool {

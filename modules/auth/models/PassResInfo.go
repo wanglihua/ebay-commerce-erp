@@ -778,6 +778,13 @@ func (e PassResInfo) InitData(db_session *xorm.Session) {
 		pass.Name = "图标管理"
 		pass.Desc = core.MakeNullString("图标管理", true)
 		db_session.Insert(pass)
+
+		pass = new(PassResInfo)
+		pass.Id = pass_res.XTPZ_EMAIL_ADDRESS
+		pass.CateId = pass_res_cate.XTPZ
+		pass.Name = "电子邮件地址"
+		pass.Desc = core.MakeNullString("电子邮件地址", true)
+		db_session.Insert(pass)
 	}
 
 	// 系统管理

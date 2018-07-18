@@ -113,6 +113,17 @@ func GetXtpzMenu(res_id_map map[int64]bool, web_session revel.Session) string {
         </li>`)
 	}
 
+	// if check_pass_res_menu(pass_res.XTPZ_LITTLE_ICON) == true {
+	buffer.WriteString(`
+        <li id="xtpz-emailaddress-menu" class="">
+            <a href="/email/address">
+                <i class="menu-icon fa fa-caret-right"></i>
+                电子邮件地址
+            </a>
+            <b class="arrow"></b>
+        </li>`)
+	// }
+
 	buffer.WriteString(`
     </ul>
 </li>

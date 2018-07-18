@@ -9,7 +9,7 @@ import (
 	"matrix/modules/erp/models"
 	smith_core "matrix/smith/core"
 	"matrix/smith/core/template"
-	"matrix/modules/erp/models/ddpz_models"
+	"matrix/modules/erp/models/xtpz_models"
 )
 
 //var output_base_dir = "/home/wanglihua/gopath/src/matrix"
@@ -21,7 +21,7 @@ var module_lower_case = models.ModuleLowerCase
 var module_chinese = models.ModuleChinese
 var table_prefix = "erp_"
 var model_list = []interface{}{
-	ddpz_models.CityPostcodeInfo{},
+	xtpz_models.EmailAddressInfo{},
 }
 
 /*

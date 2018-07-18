@@ -34,6 +34,7 @@ const (
 	XTPZ_LOGIN_LOG          = 110500 // 系统日志
 	XTPZ_SCHEDULE_TASK      = 110600 // 定时任务
 	XTPZ_LITTLE_ICON        = 110700 // 图标管理
+	XTPZ_EMAIL_ADDRESS      = 110800 // 电子邮件地址
 
 	// 订单配置, 模块编号 12
 	DDPZ_LOGISTICS_COMPANY    = 120100 // 物流公司

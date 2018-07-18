@@ -864,3 +864,9 @@ POST /city/postcode/data/list          ErpCityPostcode.ListData
 POST /city/postcode/data/detail        ErpCityPostcode.DetailData
 POST /city/postcode/save               ErpCityPostcode.Save
 POST /city/postcode/delete             ErpCityPostcode.Delete
+
+GET  /email/address                    ErpEmailAddress.Index
+POST /email/address/data/list          ErpEmailAddress.ListData
+POST /email/address/data/detail        ErpEmailAddress.DetailData
+POST /email/address/save               ErpEmailAddress.Save
+POST /email/address/delete             ErpEmailAddress.Delete
