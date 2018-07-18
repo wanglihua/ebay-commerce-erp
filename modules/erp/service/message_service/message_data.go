@@ -205,3 +205,19 @@ func Get_message_list_data_by_sender(db_session *xorm.Session, sender_id string)
 
 	return message_list
 }
+
+func Get_message_list_data_by_sender_shop_id(db_session *xorm.Session, sender_id string, shop_id int64) []Message_view_item_t {
+	sb := get_message_list_sql_builder()
+	sb.Where(fmt.Sprintf("msg.sender_id = '%s' AND msg.shop_id = %d", sender_id, shop_id))
+
+	var message_list = make([]Message_view_item_t, 0)
+	err := db_session.Sql(sb.SqlList()).Find(&message_list)
+	core.HandleError(err)
+
+	for index, message := range message_list {
+		message_list[index].OrdNum = int64(index + 1)
+		message_list[index].LastModifiedDate = message.Message.LastModifiedDate.Time.Format("2006-01-02 15:04:05")
+	}
+
+	return message_list
+}
