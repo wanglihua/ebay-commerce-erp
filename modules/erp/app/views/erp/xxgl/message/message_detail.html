@@ -66,9 +66,9 @@
                         <div class="row">
                             <div class="col-xs-12">
                                 <div class="form-group">
-                                    <label for="subject" class="col-xs-1 control-label">主题：</label>
+                                    <label for="msg_subject" class="col-xs-1 control-label">主题：</label>
                                     <div class="col-xs-11">
-                                        <textarea id="subject" name="subject" class="input-sm form-control" disabled="disabled"> {%.message.Message.Subject%}</textarea>
+                                        <textarea id="msg_subject" name="msg_subject" class="input-sm form-control" disabled="disabled"> {%.message.Message.Subject%}</textarea>
                                     </div>
                                 </div>
                             </div>
@@ -88,9 +88,31 @@
                         <div class="row">
                             <div class="col-xs-12">
                                 <div class="form-group">
-                                    <label for="msg_reply" class="col-xs-1 control-label">回复：</label>
+                                    <label for="reply_subject" class="col-xs-1 control-label">回复主题：</label>
                                     <div class="col-xs-11">
-                                        <textarea id="msg_reply" name="msg_reply" rows="3" class="input-sm form-control"></textarea>
+                                        <input id="reply_subject" name="reply_subject" class="input-sm form-control"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <div class="form-group">
+                                    <label for="recipient_email" class="col-xs-1 control-label">收件人：</label>
+                                    <div class="col-xs-11">
+                                        <input id="recipient_email" name="recipient_email" class="input-sm form-control"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <div class="form-group">
+                                    <label for="reply_body" class="col-xs-1 control-label">回复正文：</label>
+                                    <div class="col-xs-11">
+                                        <textarea id="reply_body" name="reply_body" rows="3" class="input-sm form-control"></textarea>
                                     </div>
                                 </div>
                             </div>
@@ -98,6 +120,17 @@
 
                         <div class="row">
                             <div class="col-xs-12" style="text-align: right;">
+                                <label for="reply_method" class="control-label">回复方式</label>
+                                <select id="reply_method" class="input-sm" style="padding-top: 5px;">
+                                    <option id="{% .reply_method_message %}">消息回复</option>
+                                    <option id="{% .reply_method_mail %}">邮件回复</option>
+                                </select>
+                                <label for="reply_email_address_id" class="control-label">回复邮件</label>
+                                <select id="reply_email_address_id" class="input-sm" style="padding-top: 5px;">
+                                    {% range $index, $email_address := .email_address_list %}
+                                    <option value="{% $email_address.Id %}">{% $email_address.Email %}</option>
+                                    {% end %}
+                                </select>
                                 <button type="button" class="btn btn-success btn-sm" onclick="reply()">
                                     <i class="ace-icon fa fa-floppy-o"></i>回复
                                 </button>
@@ -382,46 +415,99 @@
     </div>
 </div>
 
+{%template "erp/xxgl/message/message_detail.var" .%}
+
 <script type="text/javascript">
 
     function reply() {
+        var reply_method = $("#subject").val();
 
         var form = $("#messageReplyForm");
-        var valid = validate(form, {
-            'message_body': {
-                required: true, minlength: 2
-            }
-        });
+        var message_id = $("#message_id").val();
+        var reply_body = $("#reply_body").val();
 
-        if (!valid) {
-            return;
+        if (reply_method === reply_method_message) {
+
+            var valid = validate(form, {
+                'reply_body': {
+                    required: true, minlength: 2
+                }
+            });
+
+            if (!valid) {
+                return;
+            }
+
+            showMask("操作进行中，请稍候");
+
+            $.ajax({
+                "dataType": 'json',
+                "url": '{% url "ErpMessage.Reply" %}',
+                "data": {
+                    "message_id": message_id,
+                    "reply_method": reply_method,
+                    "reply_body": reply_body
+                },
+                "success": function (data) {
+                    hideMask();
+
+                    if (data.success === false) {
+                        $.msg.error(data.message);
+                        return;
+                    }
+                    else {
+                        $.msg.show(data.message);
+                        return;
+                    }
+                }
+            });
         }
 
-        var message_id = $("#message_id").val();
-        var message_reply = $("#msg_reply").val();
-
-        showMask("操作进行中，请稍候");
-
-        $.ajax({
-            "dataType": 'json',
-            "url": '{% url "ErpMessage.Reply" %}',
-            "data": {
-                "message_id": message_id,
-                "message_body": message_reply
-            },
-            "success": function (data) {
-                hideMask();
-
-                if (data.success === false) {
-                    $.msg.error(data.message);
-                    return;
+        if (reply_method === reply_method_mail) {
+            var valid = validate(form, {
+                'reply_subject': {
+                    required: true, minlength: 2
+                },
+                'reply_body': {
+                    required: true, minlength: 2
                 }
-                else {
-                    $.msg.show(data.message);
-                    return;
-                }
+            });
+
+            if (!valid) {
+                return;
             }
-        });
+
+            var recipient_email = $("#recipient_email").val();
+            var reply_subject = $("#reply_subject").val();
+            var reply_email_address_id = $("#reply_email_address_id").val();
+
+            showMask("操作进行中，请稍候");
+
+            $.ajax({
+                "dataType": 'json',
+                "url": '{% url "ErpMessage.Reply" %}',
+                "data": {
+                    "message_id": message_id,
+                    "reply_method": reply_method,
+                    "recipient_email": recipient_email,
+                    "reply_subject": reply_subject,
+                    "reply_body": reply_body,
+                    "reply_email_address_id": reply_email_address_id
+                },
+                "success": function (data) {
+                    hideMask();
+
+                    if (data.success === false) {
+                        $.msg.error(data.message);
+                        return;
+                    }
+                    else {
+                        $.msg.show(data.message);
+                        return;
+                    }
+                }
+            });
+        }
     }
 </script>
 {% site_footer %}

@@ -16,7 +16,11 @@ import (
 	"matrix/modules/erp/models"
 	"matrix/modules/erp/app/controllers/xxgl/service"
 	"matrix/modules/erp/models/xtpz_models"
+	"matrix/modules/erp/service/email_service"
 )
+
+const REPLY_METHOD_MESSAGE int64 = 1
+const REPLY_METHOD_MAIL int64 = 2
 
 type ErpMessage struct {
 	*revel.Controller
@@ -70,38 +74,69 @@ func (c ErpMessage) ShowReply() revel.Result {
 func (c ErpMessage) Reply() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.XXGL_MESSAGE_ALL, c.Session)
 
+	var db_session = c.DbSession
+
+	var reply_method int64
+	c.Params.Bind(&reply_method, "reply_method")
+
 	var message_id int64
 	c.Params.Bind(&message_id, "message_id")
 
-	var message_body string
-	c.Params.Bind(&message_body, "message_body")
+	var reply_body string
+	c.Params.Bind(&reply_body, "reply_body")
 
-	ozosync_app_base_url, _ := revel.Config.String("ozosync.app")
-	resp, err := http.PostForm(ozosync_app_base_url+"/message/reply", url.Values{"messageId": {fmt.Sprint(message_id)}, "messageBody": {message_body}})
-	core.HandleError(err)
+	if reply_method == REPLY_METHOD_MESSAGE {
+		ozosync_app_base_url, _ := revel.Config.String("ozosync.app")
+		resp, err := http.PostForm(ozosync_app_base_url+"/message/reply", url.Values{"messageId": {fmt.Sprint(message_id)}, "messageBody": {reply_body}})
+		core.HandleError(err)
 
-	fmt.Println("Url: " + ozosync_app_base_url + "/message/reply")
+		fmt.Println("Url: " + ozosync_app_base_url + "/message/reply")
 
-	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
-	core.HandleError(err)
+		defer resp.Body.Close()
+		body, err := ioutil.ReadAll(resp.Body)
+		core.HandleError(err)
 
-	fmt.Println(string(body))
+		fmt.Println(string(body))
 
-	var result core.JsonResult
-	err = json.Unmarshal(body, &result)
-	core.HandleError(err)
+		var result core.JsonResult
+		err = json.Unmarshal(body, &result)
+		core.HandleError(err)
 
-	if result.Success == false {
+		if result.Success == false {
+			return c.RenderJson(map[string]interface{}{
+				"success": false,
+				"message": "消息回复失败！",
+			})
+		}
+
 		return c.RenderJson(map[string]interface{}{
-			"success": false,
-			"message": "消息回复失败！",
+			"success": true,
+			"message": "消息回复成功！",
+		})
+	}
+
+	if reply_method == REPLY_METHOD_MAIL {
+
+		var recipient_email string
+		c.Params.Bind(&recipient_email, "recipient_email")
+
+		var reply_subject string
+		c.Params.Bind(&reply_subject, "reply_subject")
+
+		var reply_email_address_id int64
+		c.Params.Bind(&reply_email_address_id, "reply_email_address_id")
+
+		email_service.Send_mail_by_config(recipient_email, reply_subject, reply_body, reply_email_address_id, db_session)
+
+		return c.RenderJson(map[string]interface{}{
+			"success": true,
+			"message": "邮件回复成功！",
 		})
 	}
 
 	return c.RenderJson(map[string]interface{}{
-		"success": true,
-		"message": "消息回复成功！",
+		"success": false,
+		"message": "未知回复方式！",
 	})
 }
 
@@ -117,11 +152,19 @@ func (c ErpMessage) Detail(message_id int64) revel.Result {
 	c.RenderArgs["user_list"] = user_list
 	*/
 
+	c.RenderArgs["reply_method_message"] = REPLY_METHOD_MESSAGE
+	c.RenderArgs["reply_method_mail"] = REPLY_METHOD_MAIL
+
+	var email_address_list = make([]xtpz_models.EmailAddressInfo, 0)
+	err := db_session.Find(&email_address_list)
+	core.HandleError(err)
+	c.RenderArgs["email_address_list"] = email_address_list
+
 	var message = message_service.Get_message_data(message_id, db_session)
 	c.RenderArgs["message"] = message
 
 	var product_status models.StatusInfo
-	_, err := db_session.Id(message.Product.StatusId).Get(&product_status)
+	_, err = db_session.Id(message.Product.StatusId).Get(&product_status)
 	core.HandleError(err)
 	c.RenderArgs["product_status"] = product_status
 

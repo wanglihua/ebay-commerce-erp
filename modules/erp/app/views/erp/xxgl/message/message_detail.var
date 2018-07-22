@@ -1,0 +1,4 @@
+<script type='text/javascript'>
+    var reply_method_message ={% .reply_method_message %};
+    var reply_method_mail ={% .reply_method_mail %};
+</script>

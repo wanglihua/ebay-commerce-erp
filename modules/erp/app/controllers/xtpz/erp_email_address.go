@@ -89,6 +89,8 @@ func (c ErpEmailAddress) DetailData() revel.Result {
 		if has == false {
 			return c.RenderJson(core.JsonResult{Success: false, Message: "指定的电子邮件地址不存在！"})
 		}
+	} else {
+		email_address.SmtpPort = "25"
 	}
 
 	var detail_form EmailAddressDetailForm
