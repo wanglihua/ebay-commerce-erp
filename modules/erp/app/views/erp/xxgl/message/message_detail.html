@@ -85,7 +85,7 @@
                             </div>
                         </div>
 
-                        <div class="row">
+                        <div id="div_reply_subject" class="row" style="display: none;">
                             <div class="col-xs-12">
                                 <div class="form-group">
                                     <label for="reply_subject" class="col-xs-1 control-label">回复主题：</label>
@@ -96,12 +96,12 @@
                             </div>
                         </div>
 
-                        <div class="row">
+                        <div id="div_recipient_email" class="row" style="display: none;">
                             <div class="col-xs-12">
                                 <div class="form-group">
-                                    <label for="recipient_email" class="col-xs-1 control-label">收件人：</label>
+                                    <label for="recipient_email" class="col-xs-1 control-label">邮件收件人：</label>
                                     <div class="col-xs-11">
-                                        <input id="recipient_email" name="recipient_email" class="input-sm form-control"/>
+                                        <input id="recipient_email" name="recipient_email" class="input-sm form-control" value="{% .message.Message.SenderEmail %}"/>
                                     </div>
                                 </div>
                             </div>
@@ -122,15 +122,17 @@
                             <div class="col-xs-12" style="text-align: right;">
                                 <label for="reply_method" class="control-label">回复方式</label>
                                 <select id="reply_method" class="input-sm" style="padding-top: 5px;">
-                                    <option id="{% .reply_method_message %}">消息回复</option>
-                                    <option id="{% .reply_method_mail %}">邮件回复</option>
+                                    <option value="{% .reply_method_message %}">消息回复</option>
+                                    <option value="{% .reply_method_mail %}">邮件回复</option>
                                 </select>
-                                <label for="reply_email_address_id" class="control-label">回复邮件</label>
-                                <select id="reply_email_address_id" class="input-sm" style="padding-top: 5px;">
-                                    {% range $index, $email_address := .email_address_list %}
-                                    <option value="{% $email_address.Id %}">{% $email_address.Email %}</option>
-                                    {% end %}
-                                </select>
+                                <span id="span_reply_email_address_id" style="display: none;">
+                                    <label for="reply_email_address_id" class="control-label">回复邮件</label>
+                                    <select id="reply_email_address_id" class="input-sm" style="padding-top: 5px;">
+                                        {% range $index, $email_address := .email_address_list %}
+                                        <option value="{% $email_address.Id %}">{% $email_address.Email %}</option>
+                                        {% end %}
+                                    </select>
+                                </span>
                                 <button type="button" class="btn btn-success btn-sm" onclick="reply()">
                                     <i class="ace-icon fa fa-floppy-o"></i>回复
                                 </button>
@@ -419,8 +421,27 @@
 
 <script type="text/javascript">
 
+    $(function () {
+        $("#reply_method").change(function () {
+            var reply_method = $("#reply_method").val();
+
+            if (reply_method === reply_method_message) {
+                $("#div_reply_subject").hide();
+                $("#div_recipient_email").hide();
+                $("#span_reply_email_address_id").hide();
+            }
+
+            if (reply_method === reply_method_mail) {
+                $("#div_reply_subject").show();
+                $("#div_recipient_email").show();
+                $("#span_reply_email_address_id").show();
+            }
+
+        });
+    });
+
     function reply() {
-        var reply_method = $("#subject").val();
+        var reply_method = $("#reply_method").val();
 
         var form = $("#messageReplyForm");
         var message_id = $("#message_id").val();
