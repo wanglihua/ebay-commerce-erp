@@ -207,6 +207,14 @@ func Get_order_filter(db_session *xorm.Session, web_session revel.Session, param
 		pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_YQX, web_session)
 
 		status_id = models.ORDER_STATUS_YQX
+	} else if status == "hold" {
+		pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_HOLD, web_session)
+
+		status_id = models.ORDER_STATUS_HOLD
+	} else if status == "processed_hold" {
+		pass_service.Check_login_user_pass(pass_res.DDLC_ORDER_PROCESSED_HOLD, web_session)
+
+		status_id = models.ORDER_STATUS_PROCESSED_HOLD
 	} else {
 		panic("未知的订单状态！")
 	}
