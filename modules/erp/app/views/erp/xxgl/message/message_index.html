@@ -58,12 +58,14 @@
                                 <option value="{% $user.Id %}">{% $user.LoginName %}（{% $user.NickName %}）</option>
                                 {% end %}
                             </select>
-                            erp_special_product
                             <label class="control-label no-padding-right" for="sender_id_query">发送者</label>
                             <input class="input-sm" id="sender_id_query" name="sender_id_query" placeholder="发送者" type="text" style="width: 130px;"/>
 
                             <label class="control-label no-padding-right" for="recipient_id_query">接收者</label>
                             <input class="input-sm" id="recipient_id_query" name="recipient_id_query" placeholder="接收者" type="text" style="width: 130px;"/>
+
+                            <label class="control-label no-padding-right" for="message_content_query">消息内容</label>
+                            <input class="input-sm" id="message_content_query" name="message_content_query" placeholder="消息内容" type="text" style="width: 230px;"/>
 
                             <button class="btn btn-primary btn-sm" @click="refreshList();">
                                 <i class="ace-icon fa fa-search"></i>
@@ -122,7 +124,7 @@
                                 }
                             },
                             {
-                                "mDataProp": "msg.subject", "title": "主题/内容", "bSearchable": true, "bSortable": false,
+                                "mDataProp": "msg.subject", "title": "内容", "bSearchable": true, "bSortable": false,
                                 "render": function (data, type, row) {
                                     return "<div style='min-width: 280px;white-space:normal; word-break: break-all; word-wrap:break-word;'>" + row.msg.body + "</div>";
                                 }
@@ -162,6 +164,7 @@
                             aoData.push({'name': 'dev_user_id_query', 'value': $("#dev_user_id_query").val()});
                             aoData.push({'name': 'sender_id_query', 'value': $("#sender_id_query").val()});
                             aoData.push({'name': 'recipient_id_query', 'value': $("#recipient_id_query").val()});
+                            aoData.push({'name': 'message_content_query', 'value': $("#message_content_query").val()});
 
                             showMask("数据加载中，请稍候");
                             $.ajax({

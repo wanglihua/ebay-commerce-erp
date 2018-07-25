@@ -92,6 +92,10 @@ func Get_message_list_data(db_session *xorm.Session, request *revel.Request, par
 	var dev_user_id_query int64
 	params.Bind(&dev_user_id_query, "dev_user_id_query")
 
+	var message_content_query string
+	params.Bind(&message_content_query, "message_content_query")
+	message_content_query = strings.TrimSpace(message_content_query)
+
 	if shop_id_query != 0 {
 		filter = core.SqlAnd(filter, fmt.Sprintf("msg.shop_id = %d", shop_id_query))
 	}
@@ -122,6 +126,12 @@ func Get_message_list_data(db_session *xorm.Session, request *revel.Request, par
 
 	if dev_user_id_query != 0 {
 		filter = core.SqlAnd(filter, fmt.Sprintf("msg.dev_user_id = %d", dev_user_id_query))
+	}
+
+	if message_content_query != "" {
+		filter = core.SqlAnd(filter, core.SqlOr(
+			fmt.Sprintf("msg.subject LIKE '%%%s%%'", message_content_query),
+			fmt.Sprintf("msg.body LIKE '%%%s%%'", message_content_query)))
 	}
 
 	sb := get_message_list_sql_builder()
