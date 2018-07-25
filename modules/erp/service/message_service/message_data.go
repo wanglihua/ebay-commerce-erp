@@ -96,6 +96,15 @@ func Get_message_list_data(db_session *xorm.Session, request *revel.Request, par
 	params.Bind(&message_content_query, "message_content_query")
 	message_content_query = strings.TrimSpace(message_content_query)
 
+	var query_begin_time string
+	params.Bind(&query_begin_time, "query_begin_time")
+	query_begin_date, query_begin_date_err := core.Parse_time(query_begin_time)
+	revel.TRACE.Println("query_begin_time", query_begin_time)
+
+	var query_end_time string
+	params.Bind(&query_end_time, "query_end_time")
+	query_end_date, query_end_date_err := core.Parse_time(query_end_time)
+
 	if shop_id_query != 0 {
 		filter = core.SqlAnd(filter, fmt.Sprintf("msg.shop_id = %d", shop_id_query))
 	}
@@ -132,6 +141,14 @@ func Get_message_list_data(db_session *xorm.Session, request *revel.Request, par
 		filter = core.SqlAnd(filter, core.SqlOr(
 			fmt.Sprintf("msg.subject LIKE '%%%s%%'", message_content_query),
 			fmt.Sprintf("msg.body LIKE '%%%s%%'", message_content_query)))
+	}
+
+	if query_begin_date_err == nil {
+		filter = core.SqlAnd(filter, fmt.Sprintf("msg.last_modified_date >= '%s'", query_begin_date.Format("2006-01-02 15:04")))
+	}
+
+	if query_end_date_err == nil {
+		filter = core.SqlAnd(filter, fmt.Sprintf("msg.last_modified_date <= '%s'", query_end_date.Format("2006-01-02 15:04")))
 	}
 
 	sb := get_message_list_sql_builder()

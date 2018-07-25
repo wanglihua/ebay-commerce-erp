@@ -67,6 +67,8 @@
                             <label class="control-label no-padding-right" for="message_content_query">消息内容</label>
                             <input class="input-sm" id="message_content_query" name="message_content_query" placeholder="消息内容" type="text" style="width: 230px;"/>
 
+                            <input id="query_begin_time" name="query_begin_time" style="width: 135px;height:30px;" placeholder="开始时间如2016-01-02"/>
+                            <input id="query_end_time" name="query_end_time" style="width: 135px;height:30px;" placeholder="结束时间如2016-01-02"/>
                             <button class="btn btn-primary btn-sm" @click="refreshList();">
                                 <i class="ace-icon fa fa-search"></i>
                                 查询
@@ -199,6 +201,14 @@
         $('#messageList tbody').on('dblclick', 'tr', function () {
             var id = $(this).find('td:first-child input:checkbox').val();
             showMessageDetail(id);
+        });
+
+        $('#query_begin_time').datetimepicker({
+            locale: "zh-cn"
+        });
+
+        $('#query_end_time').datetimepicker({
+            locale: "zh-cn"
         });
     });
 
