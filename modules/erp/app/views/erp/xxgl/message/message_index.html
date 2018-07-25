@@ -167,6 +167,8 @@
                             aoData.push({'name': 'sender_id_query', 'value': $("#sender_id_query").val()});
                             aoData.push({'name': 'recipient_id_query', 'value': $("#recipient_id_query").val()});
                             aoData.push({'name': 'message_content_query', 'value': $("#message_content_query").val()});
+                            aoData.push({'name': 'query_begin_time', 'value': $("#query_begin_time").val()});
+                            aoData.push({'name': 'query_end_time', 'value': $("#query_end_time").val()});
 
                             showMask("数据加载中，请稍候");
                             $.ajax({
