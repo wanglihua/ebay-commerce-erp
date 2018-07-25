@@ -15,7 +15,7 @@
     }
 </style>
 <div class="main-container" id="main-container">
-    <div id="message_detail" style="width: 1024px;margin-left: auto;margin-right: auto;">
+    <div id="message_detail" style="width: 1200px;margin-left: auto;margin-right: auto;">
 
         <div class="widget-box">
             <div class="widget-header">
@@ -182,6 +182,17 @@
                                 <label for="product_status" class="col-xs-4 control-label">状态：</label>
                                 <div class="col-xs-8">
                                     <input id="product_status" name="status_name" type="text" class="input-sm form-control" value="{% .product_status.Name %}" disabled="disabled"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <div class="form-group">
+                                <label for="product_cn_name" class="col-xs-1 control-label">商品名称：</label>
+                                <div class="col-xs-11">
+                                    <input id="product_cn_name" name="product_cn_name" type="text" class="input-sm form-control" value="{% .message.Product.CnName %}" disabled="disabled"/>
                                 </div>
                             </div>
                         </div>
