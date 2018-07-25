@@ -34,6 +34,14 @@
                         取消
                     </button>
                     {% end %}
+
+                    {% if .is_button_upload_ebay_ship_visible %}
+                    <button class="btn btn-purple btn-sm" @click="uploadEbayShip()">
+                        <i class="ace-icon fa fa-undo"></i>
+                        上传发货
+                    </button>
+                    {% end %}
+
                     <button class="btn btn-info btn-sm" @click="exportOrderCode()">
                         <i class="ace-icon fa fa-file-excel-o"></i>
                         导出订单
@@ -687,6 +695,37 @@
                 $.msg.confirm("确认要取消订单吗？", function () {
                     $.ajax({
                         url: '{%url "ErpOrder.QuXiao"%}',
+                        type: "POST",
+                        data: {"id_list": id_list},
+                        success: function (data) {
+                            if (data.success === false) {
+                                $.msg.error(data.message);
+                                return;
+                            }
+                            else {
+                                $.msg.show(data.message);
+                            }
+                            vm.reloadList();
+                        }
+                    });
+                });
+            },
+            uploadEbayShip: function () {
+                var id_list = [];
+                $('#orderList tbody tr>td:first-child input:checkbox').each(function () {
+                    if (this.checked) {
+                        id_list.push($(this).val());
+                    }
+                });
+
+                if (id_list.length === 0) {
+                    $.msg.alert("请选择数据！");
+                    return;
+                }
+
+                $.msg.confirm("确认要上传发货信息吗？", function () {
+                    $.ajax({
+                        url: '{%url "ErpOrder.UploadEbayStatus"%}',
                         type: "POST",
                         data: {"id_list": id_list},
                         success: function (data) {
