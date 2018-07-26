@@ -338,6 +338,9 @@ func (c ErpContainerTransfer) Save() revel.Result {
 	 <option value="ozo">ozo e-store</option>
 	 <option value="elife">elife pty ltd</option>
 	 <option value="giant">Giant Star</option>
+
+     iepoch  iepoch pty ltd
+
 	 */
 
 	if container_transfer.ImportCompanyCode == "ozo" {
@@ -346,6 +349,8 @@ func (c ErpContainerTransfer) Save() revel.Result {
 		container_transfer.ImportCompanyName = "elife pty ltd"
 	} else if container_transfer.ImportCompanyCode == "giant" {
 		container_transfer.ImportCompanyName = "Giant Star"
+	} else if container_transfer.ImportCompanyCode == "iepoch" {
+		container_transfer.ImportCompanyName = "iepoch pty ltd"
 	}
 
 	var affected int64
