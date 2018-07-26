@@ -17,6 +17,7 @@ import (
 	"matrix/modules/erp/app/controllers/xxgl/service"
 	"matrix/modules/erp/models/xtpz_models"
 	"matrix/modules/erp/service/email_service"
+	"matrix/modules/erp/models/xxgl_models"
 )
 
 const REPLY_METHOD_MESSAGE int64 = 1
@@ -177,6 +178,16 @@ func (c ErpMessage) Detail(message_id int64) revel.Result {
 
 	var sender_order_item_list = service.Get_user_order_item_list(message.Message.SenderId, db_session)
 	c.RenderArgs["sender_order_item_list"] = sender_order_item_list
+
+	var user_list = make([]auth_models.UserInfo, 0)
+	core.HandleError(db_session.Find(&user_list))
+	c.RenderArgs["user_list"] = user_list
+
+	var message_tag_list = make([]xxgl_models.MessageTagInfo, 0);
+	message_tag_list = append(message_tag_list, xxgl_models.MESSAGE_TAG_NORMAL)
+	message_tag_list = append(message_tag_list, xxgl_models.MESSAGE_TAG_NOREPLY)
+	message_tag_list = append(message_tag_list, xxgl_models.MESSAGE_TAG_OTHER)
+	c.RenderArgs["message_tag_list"] = message_tag_list
 
 	return c.RenderTemplate("erp/xxgl/message/message_detail.html")
 }

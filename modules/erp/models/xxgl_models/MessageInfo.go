@@ -42,6 +42,8 @@ type MessageInfo struct {
 	AssignedUser       string            `xorm:"nvarchar(255) notnull 'assigned_user'" json:"assigned_user"`
 	TypeId             int64             `xorm:"bigint notnull index 'type_id' default(0)" json:"type_id"`
 	TypeName           string            `xorm:"nvarchar(100) notnull 'type_name'" json:"type_name"`
+	TagId              int64             `xorm:"bigint notnull index 'tag_id' default(1)" json:"tag_id"`
+	TagName            string            `xorm:"nvarchar(100) notnull 'tag_name' default('')" json:"tag_name"`
 	CreateTime         core.Time         `xorm:"created notnull 'create_time'" json:"create_time"`
 	UpdateTime         core.Time         `xorm:"updated notnull 'update_time'" json:"update_time"`
 }
