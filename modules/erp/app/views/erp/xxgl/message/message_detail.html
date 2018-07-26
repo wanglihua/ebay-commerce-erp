@@ -632,5 +632,37 @@
             });
         }
     }
+
+    function save() {
+
+        var message_id = $("#message_id").val();
+        var assigned_user_id = $("#assigned_user_id").val();
+        var tag_id = $("#tag_id").val();
+
+        showMask("操作进行中，请稍候");
+
+        $.ajax({
+            "dataType": 'json',
+            "url": '{% url "ErpMessage.Save" %}',
+            "data": {
+                "message_id": message_id,
+                "assigned_user_id": assigned_user_id,
+                "tag_id": tag_id
+            },
+            "success": function (data) {
+                hideMask();
+
+                if (data.success === false) {
+                    $.msg.error(data.message);
+                    return;
+                }
+                else {
+                    $.msg.show(data.message);
+                    return;
+                }
+            }
+        });
+    }
+
 </script>
 {% site_footer %}

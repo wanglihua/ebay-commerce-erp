@@ -574,6 +574,7 @@ POST /message/data/list                  ErpMessage.ListData
 POST /message/reply                      ErpMessage.Reply
 POST /message/show/reply                 ErpMessage.ShowReply
 GET  /message/detail/:message_id         ErpMessage.Detail
+POST /message/save                       ErpMessage.Save
 
 GET  /schedule/task                      ErpScheduleTask.Index
 POST /schedule/task/data                 ErpScheduleTask.TaskData

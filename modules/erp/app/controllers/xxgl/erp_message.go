@@ -191,3 +191,41 @@ func (c ErpMessage) Detail(message_id int64) revel.Result {
 
 	return c.RenderTemplate("erp/xxgl/message/message_detail.html")
 }
+
+func (c ErpMessage) Save() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.XXGL_MESSAGE_ALL, c.Session)
+
+	var db_session = c.DbSession
+
+	var message_id int64
+	c.Params.Bind(&message_id, "message_id")
+
+	var assigned_user_id int64
+	c.Params.Bind(&assigned_user_id, "assigned_user_id")
+
+	var tag_id int64
+	c.Params.Bind(&tag_id, "tag_id")
+
+	var message xxgl_models.MessageInfo
+	_, err := db_session.Id(message_id).Get(&message)
+	core.HandleError(err)
+
+	var assigned_user auth_models.UserInfo
+	_, err = db_session.Id(assigned_user_id).Get(&assigned_user)
+	core.HandleError(err)
+
+	var message_tag = xxgl_models.Get_message_tag_by_id(tag_id)
+
+	message.AssignedUserId = assigned_user_id
+	message.AssignedUser = fmt.Sprintf("%s(%s)", assigned_user.NickName, assigned_user.LoginName)
+	message.TagId = tag_id
+	message.TagName = message_tag.Name
+
+	_, err = db_session.Id(message_id).Cols("assigned_user_id", "assigned_user", "tag_id", "tag_name").Update(&message)
+	core.HandleError(err)
+
+	return c.RenderJson(map[string]interface{}{
+		"success": true,
+		"message": "保存成功！",
+	})
+}
