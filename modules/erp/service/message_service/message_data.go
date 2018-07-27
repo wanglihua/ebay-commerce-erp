@@ -105,6 +105,12 @@ func Get_message_list_data(db_session *xorm.Session, request *revel.Request, par
 	params.Bind(&query_end_time, "query_end_time")
 	query_end_date, query_end_date_err := core.Parse_time(query_end_time)
 
+	var status_id_query int64
+	params.Bind(&status_id_query, "status_id_query")
+
+	var tag_id_query int64
+	params.Bind(&tag_id_query, "tag_id_query")
+
 	if shop_id_query != 0 {
 		filter = core.SqlAnd(filter, fmt.Sprintf("msg.shop_id = %d", shop_id_query))
 	}
@@ -135,6 +141,14 @@ func Get_message_list_data(db_session *xorm.Session, request *revel.Request, par
 
 	if dev_user_id_query != 0 {
 		filter = core.SqlAnd(filter, fmt.Sprintf("msg.dev_user_id = %d", dev_user_id_query))
+	}
+
+	if status_id_query != 0 {
+		filter = core.SqlAnd(filter, fmt.Sprintf("msg.status_id = %d", status_id_query))
+	}
+
+	if tag_id_query != 0 {
+		filter = core.SqlAnd(filter, fmt.Sprintf("msg.tag_id = %d", tag_id_query))
 	}
 
 	if message_content_query != "" {

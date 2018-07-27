@@ -58,6 +58,23 @@
                                 <option value="{% $user.Id %}">{% $user.LoginName %}（{% $user.NickName %}）</option>
                                 {% end %}
                             </select>
+
+                            <label for="status_id_query">状态</label>
+                            <select id="status_id_query" name="status_id_query" style="height: 30px; width: 80px;">
+                                <option value="0">--状态--</option>
+                                {% range $index, $status := .status_list %}
+                                <option value="{% $status.Id %}">{% $status.Name %}</option>
+                                {% end %}
+                            </select>
+
+                            <label for="tag_id_query">标签</label>
+                            <select id="tag_id_query" name="tag_id_query" style="height: 30px; width: 80px;">
+                                <option value="0">--标签--</option>
+                                {% range $index, $tag := .tag_list %}
+                                <option value="{% $tag.Id %}">{% $tag.Name %}</option>
+                                {% end %}
+                            </select>
+
                             <label class="control-label no-padding-right" for="sender_id_query">发送者</label>
                             <input class="input-sm" id="sender_id_query" name="sender_id_query" placeholder="发送者" type="text" style="width: 130px;"/>
 
@@ -183,6 +200,8 @@
                             aoData.push({'name': 'message_content_query', 'value': $("#message_content_query").val()});
                             aoData.push({'name': 'query_begin_time', 'value': $("#query_begin_time").val()});
                             aoData.push({'name': 'query_end_time', 'value': $("#query_end_time").val()});
+                            aoData.push({'name': 'status_id_query', 'value': $("#status_id_query").val()});
+                            aoData.push({'name': 'tag_id_query', 'value': $("#tag_id_query").val()});
 
                             showMask("数据加载中，请稍候");
                             $.ajax({
