@@ -132,7 +132,7 @@
                                 }
                             },
                             {
-                                "mDataProp": "s.name", "title": "状态<br/>发送者/接收者", "bSearchable": true, "sClass": "center", "width": 120,
+                                "mDataProp": "s.name", "title": "状态/标签<br/>发送者/接收者", "bSearchable": true, "sClass": "center", "width": 120,
                                 "render": function (data, type, row) {
                                     /*
                                         MESSAGE_STATUS_ANSWERED   = 4800 // 消息状态 已回复
@@ -147,7 +147,21 @@
                                     }
                                     */
 
-                                    return "<div>" + row.s.name + "</div><div>" + row.msg.sender_id + "</div><div>" + row.msg.recipient_id + "</div>";
+                                    var tag_name = row.msg.tag_name;
+                                    if (tag_name === "") {
+                                        tag_name = "普通消息";
+                                    }
+
+                                    var tag_back_color = "transparent";
+                                    if (row.msg.tag_id === 2) {
+                                        tag_back_color = "#339966";
+                                    }
+                                    if (row.msg.tag_id === 3) {
+                                        tag_back_color = "#33FFFF";
+                                    }
+
+                                    var tag_name_span = "<span style='background-color:" + tag_back_color + ";'>" + tag_name + "</span>";
+                                    return "<div><span>" + row.s.name + "</span>/" + tag_name_span + "</div><div>" + row.msg.sender_id + "</div><div>" + row.msg.recipient_id + "</div>";
                                 }
                             },
                             {
