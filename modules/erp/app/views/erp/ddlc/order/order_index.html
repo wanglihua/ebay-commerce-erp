@@ -156,10 +156,12 @@
                         </ul>
                     </div>
 
+                    {% if .is_button_send_message_to_customers_visible %}
                     <button class="btn btn-pink btn-sm" style="border-width: 4px;" onclick="show_send_message_to_customers()">
                         <i class="ace-icon fa fa-envelope-o"></i>
                         群发消息
                     </button>
+                    {% end %}
 
                 </div>
                 <div class="row" style="margin-top: 20px;margin-bottom: 20px;">

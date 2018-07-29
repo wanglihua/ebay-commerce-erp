@@ -36,8 +36,12 @@ func (c ErpOrderHold) Index() revel.Result {
 	var has_pass_upload_ebay_ship = pass_service.Is_login_user_has_pass(pass_res.DDLC_ORDER_FHSC, c.Session)
 	c.RenderArgs["is_button_upload_ebay_ship_visible"] = has_pass_upload_ebay_ship
 
+	var is_button_send_message_to_customers_visible = pass_service.Is_login_user_has_pass(pass_res.DDLC_ORDER_SEND_MESSAGE, c.Session)
+
 	c.RenderArgs["icon_path"] = setting.ICON_PATH
 	c.RenderArgs["is_button_quxiao_visible"] = is_button_quxiao_visible
+	c.RenderArgs["is_button_send_message_to_customers_visible"] = is_button_send_message_to_customers_visible
+
 	return c.RenderTemplate("erp/ddlc/order_hold/order_hold_index.html")
 }
 

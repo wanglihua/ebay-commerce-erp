@@ -145,6 +145,16 @@ func (c ErpOrder) Index(status string) revel.Result {
 		is_button_upload_ebay_ship_visible = true
 	}
 
+	var has_pass_send_message_to_customers = pass_service.Is_login_user_has_pass(pass_res.DDLC_ORDER_SEND_MESSAGE, c.Session)
+	var is_button_send_message_to_customers_visible = false
+	if has_pass_send_message_to_customers &&
+		( status_id == models.ORDER_STATUS_DPH ||
+			status_id == models.ORDER_STATUS_PHZ ||
+			status_id == models.ORDER_STATUS_YFH ||
+			status_id == models.ORDER_STATUS_YWC) {
+		is_button_send_message_to_customers_visible = true
+	}
+
 	c.RenderArgs["active_menu_html"] = template.HTML(active_menu_html)
 	c.RenderArgs["status"] = status
 	c.RenderArgs["status_id"] = status_id
@@ -155,6 +165,7 @@ func (c ErpOrder) Index(status string) revel.Result {
 	c.RenderArgs["is_button_quxiao_visible"] = is_button_quxiao_visible
 	c.RenderArgs["is_button_huifu_visible"] = is_button_huifu_visible
 	c.RenderArgs["is_button_upload_ebay_ship_visible"] = is_button_upload_ebay_ship_visible
+	c.RenderArgs["is_button_send_message_to_customers_visible"] = is_button_send_message_to_customers_visible
 
 	return c.RenderTemplate("erp/ddlc/order/order_index.html")
 }
