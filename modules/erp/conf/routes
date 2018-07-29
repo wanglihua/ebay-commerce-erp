@@ -384,8 +384,6 @@ POST /order/processed/hold/list/data       ErpOrderProcessedHold.ListData
 POST /order/processed/hold/page/data       ErpOrderProcessedHold.PageData
 POST /order/processed/hold/dai/pei/huo     ErpOrderProcessedHold.DaiPeiHuo
 
-# ?????
-GET  /order/khb                            ErpOrderKhb.Index
 # ????????????????????????????
 # GET  /order/:status                        ErpOrder.Index
 GET  /order/detail/:order_id               ErpOrder.Detail

@@ -191,6 +191,13 @@ func (e PassResInfo) InitData(db_session *xorm.Session) {
 		pass.Name = "订单拆分"
 		pass.Desc = core.MakeNullString("订单拆分", true)
 		db_session.Insert(pass)
+
+		pass = new(PassResInfo)
+		pass.Id = pass_res.DDLC_ORDER_SEND_MESSAGE
+		pass.CateId = pass_res_cate.DDLC
+		pass.Name = "订单群发消息"
+		pass.Desc = core.MakeNullString("订单群发消息", true)
+		db_session.Insert(pass)
 	}
 
 	// 订单配置
