@@ -697,6 +697,9 @@ GET  /order/new/create           ErpOrderNew.Create
 POST /order/new/create/data      ErpOrderNew.CreateData
 POST /order/new/save             ErpOrderNew.Save
 
+POST /order/message/show          ErpOrderMessage.Show
+POST /order/message/send          ErpOrderMessage.Send
+
 GET  /product/cert                    ErpProductCert.Index
 POST /product/cert/data/list          ErpProductCert.ListData
 POST /product/cert/data/detail        ErpProductCert.DetailData

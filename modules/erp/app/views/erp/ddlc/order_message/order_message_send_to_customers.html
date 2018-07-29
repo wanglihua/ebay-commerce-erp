@@ -8,14 +8,14 @@
             <div class="modal-body clearfix">
                 <div class="row">
                     <div class="col-xs-12">
-                        <form class="form-horizontal" role="form" id="pickupOptionForm">
+                        <form class="form-horizontal" role="form" id="sendMessageToCustomersForm">
 
                             <div class="row">
                                 <div class="col-xs-12">
                                     <div class="form-group">
-                                        <label for="subject" class="col-xs-2 control-label">主题</label>
+                                        <label for="message_subject" class="col-xs-2 control-label">主题</label>
                                         <div class="col-xs-10">
-                                            <input id="subject" name="subject" class="input-sm form-control"/>
+                                            <input id="message_subject" name="message_subject" class="input-sm form-control"/>
                                         </div>
                                     </div>
                                 </div>
@@ -24,9 +24,9 @@
                             <div class="row">
                                 <div class="col-xs-12">
                                     <div class="form-group">
-                                        <label for="subject" class="col-xs-2 control-label">主题</label>
+                                        <label for="message_body" class="col-xs-2 control-label">消息</label>
                                         <div class="col-xs-10">
-                                            <input id="subject" name="subject" class="input-sm form-control"/>
+                                            <textarea id="message_body" name="message_body" rows="3" class="input-sm form-control"></textarea>
                                         </div>
                                     </div>
                                 </div>
@@ -37,7 +37,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-success btn-sm">
+                <button type="button" class="btn btn-success btn-sm" onclick="sendMessageToCustomers()">
                     <i class="ace-icon fa fa-floppy-o"></i>发送
                 </button>
                 <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">
@@ -47,3 +47,51 @@
         </div>
     </div>
 </div>
+
+<script type="text/javascript">
+    function sendMessageToCustomers() {
+        var id_list = [];
+        $('#orderList tbody tr>td:first-child input:checkbox').each(function () {
+            if (this.checked) {
+                id_list.push($(this).val());
+            }
+        });
+
+        if (id_list.length === 0) {
+            $.msg.alert("请选择数据！");
+            return;
+        }
+
+        var form = $("#sendMessageToCustomersForm");
+        var valid = validate(form, {
+            'message_subject': {
+                required: true, minlength: 2, maxlength: 200
+            },
+            'message_body': {
+                required: true, maxlength: 500
+            }
+        });
+
+        if (valid) {
+            $.msg.confirm('确认要群发消息吗？', function () {
+                showMask("提交中...");
+
+                $.ajax({
+                    url: '{%url "ErpOrderMessage.Send" %}',
+                    type: "POST",
+                    success: function (data) {
+                        hideMask();
+                        if (data.success === true) {
+                            $.msg.show(data.message);
+                            // return;
+                        }
+                        else {
+                            $.msg.error(data.message);
+                            //return;
+                        }
+                    }
+                });
+            });
+        }
+    }
+</script>
