@@ -393,15 +393,6 @@ POST /order/data/detail                    ErpOrder.DetailData
 POST /order/paypal/shipping/address        ErpOrder.GetPaypalShippingAddress
 POST /order/match/logistics                ErpOrder.MatchLogistics
 
-# MatchLogistics
-# GET  /order/all                            ErpOrderAll.Index
-# GET  /order/yzf                            ErpOrderYzf.Index
-# GET  /order/dph                            ErpOrderDph.Index
-# GET  /order/phz                            ErpOrderPhz.Index
-# GET  /order/yfh                            ErpOrderYfh.Index
-# GET  /order/ywc                            ErpOrderYwc.Index
-# GET  /order/khb                            ErpOrderKhb.Index
-
 POST /order/dai/pei/huo                    ErpOrder.DaiPeiHuo
 POST /order/pei/huo                        ErpOrder.PeiHuo
 POST /order/force/pei/huo                  ErpOrder.ForcePeiHuo
