@@ -95,13 +95,9 @@ func (c ErpMessage) Reply() revel.Result {
 		resp, err := http.PostForm(ozosync_app_base_url+"/message/reply", url.Values{"messageId": {fmt.Sprint(message_id)}, "messageBody": {reply_body}})
 		core.HandleError(err)
 
-		fmt.Println("Url: " + ozosync_app_base_url + "/message/reply")
-
 		defer resp.Body.Close()
 		body, err := ioutil.ReadAll(resp.Body)
 		core.HandleError(err)
-
-		fmt.Println(string(body))
 
 		var result core.JsonResult
 		err = json.Unmarshal(body, &result)
