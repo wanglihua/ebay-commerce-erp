@@ -156,13 +156,13 @@ func (c ErpMessage) Detail(message_id int64) revel.Result {
 	c.RenderArgs["reply_method_message"] = REPLY_METHOD_MESSAGE
 	c.RenderArgs["reply_method_mail"] = REPLY_METHOD_MAIL
 
-	var email_address_list = make([]xtpz_models.EmailAddressInfo, 0)
-	err := db_session.Find(&email_address_list)
-	core.HandleError(err)
-	c.RenderArgs["email_address_list"] = email_address_list
-
 	var message = message_service.Get_message_data(message_id, db_session)
 	c.RenderArgs["message"] = message
+
+	var email_address_list = make([]xtpz_models.EmailAddressInfo, 0)
+	err := db_session.Where("shop_id = ?", message.Message.ShopId).Find(&email_address_list)
+	core.HandleError(err)
+	c.RenderArgs["email_address_list"] = email_address_list
 
 	var product_status models.StatusInfo
 	_, err = db_session.Id(message.Product.StatusId).Get(&product_status)
