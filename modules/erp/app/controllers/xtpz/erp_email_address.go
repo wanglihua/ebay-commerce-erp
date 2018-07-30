@@ -18,6 +18,14 @@ type ErpEmailAddress struct {
 func (c ErpEmailAddress) Index() revel.Result {
 	pass_service.Check_login_user_pass(pass_res.XTPZ_EMAIL_ADDRESS, c.Session)
 
+	var db_session = c.DbSession
+
+	var shop_list = make([]xtpz_models.ShopAccountInfo, 0)
+	err := db_session.Find(&shop_list)
+	core.HandleError(err)
+
+	c.RenderArgs["shop_list"] = shop_list
+
 	return c.RenderTemplate("erp/xtpz/email_address/email_address_index.html")
 }
 
@@ -61,6 +69,8 @@ func (f *EmailAddressDetailForm) IsCreate() bool {
 }
 
 func (f *EmailAddressDetailForm) Valid(validation *revel.Validation) bool {
+	validation.Required(f.EmailAddress.ShopId).Message("店铺不能为空！")
+
 	validation.Required(f.EmailAddress.Email).Message("邮件地址不能为空！")
 
 	validation.Required(f.EmailAddress.Account).Message("账号不能为空！")
@@ -113,6 +123,13 @@ func (c ErpEmailAddress) Save() revel.Result {
 	}
 
 	email_address := detail_form.EmailAddress
+
+	var shop_id = email_address.ShopId
+	var shop_account xtpz_models.ShopAccountInfo
+	_, err = db_session.Id(shop_id).Get(&shop_account)
+	core.HandleError(err)
+
+	email_address.ShopName = shop_account.Name
 
 	var affected int64
 	if detail_form.IsCreate() {

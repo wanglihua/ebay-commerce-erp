@@ -11,6 +11,8 @@ type EmailAddressInfo struct {
 	Password   string    `xorm:"nvarchar(30) notnull 'password'" json:"password" smith:"verbose_name=密码"`
 	SmtpServer string    `xorm:"nvarchar(300) notnull 'smtp_server'" json:"smtp_server" smith:"verbose_name=发件服务器"`
 	SmtpPort   string    `xorm:"nvarchar(10) notnull 'smtp_port'" json:"smtp_port" smith:"verbose_name=发件服务器端口"`
+	ShopId     int64     `xorm:"bigint notnull default(0) 'shop_id'" json:"shop_id" smith:"verbose_name=店铺id"`
+	ShopName   string    `xorm:"nvarchar(200) notnull default('') 'shop_name'" json:"shop_name" smith:"verbose_name=店铺"`
 	CreateTime core.Time `xorm:"created notnull 'create_time'" json:"create_time"`
 	UpdateTime core.Time `xorm:"updated notnull 'update_time'" json:"update_time"`
 }
