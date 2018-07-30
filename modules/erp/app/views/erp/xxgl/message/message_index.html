@@ -126,7 +126,7 @@
                                 }
                             },
                             {
-                                "mDataProp": "msg.last_modified_date", "title": "店铺/item id/sku/ <br />销售负责人/创建/修改时间", "bSearchable": false, "bSortable": false, "sClass": "center", "width": 120,
+                                "mDataProp": "msg.last_modified_date", "title": "店铺/item id/sku/ <br />销售负责人/时间", "bSearchable": false, "bSortable": false, "sClass": "center", "width": 120,
                                 "render": function (data, type, row) {
                                     var view_item_url = row.psi.view_item_url;
 
@@ -136,9 +136,9 @@
                                     }
 
                                     if (view_item_url === "") {
-                                        return "<div>" + row.pf.name + "&nbsp;" + row.sa.name + "</div><div>" + row.msg.item_id + "</div><div><a href='/product/detail/" + row.p.id + "' target='product_detail'>" + row.msg.sku + "</a></div><div>" + psu_name + "</div><div>" + row.msg.creation_date + "</div><div>" + row.msg.last_modified_date + "</div>";
+                                        return "<div>" + row.pf.name + "&nbsp;" + row.sa.name + "</div><div>" + row.msg.item_id + "</div><div><a href='/product/detail/" + row.p.id + "' target='product_detail'>" + row.msg.sku + "</a></div><div>" + psu_name + "</div><div>" + row.msg.last_modified_date + "</div>";
                                     } else {
-                                        return "<div>" + row.pf.name + "&nbsp;" + row.sa.name + "</div><div><a href='" + view_item_url + "' target='_blank'>" + row.msg.item_id + "</a></div><div><a href='/product/detail/" + row.p.id + "' target='product_detail'>" + row.msg.sku + "</a></div><div>" + psu_name + "</div><div>" + row.msg.creation_date + "</div><div>" + row.msg.last_modified_date + "</div>";
+                                        return "<div>" + row.pf.name + "&nbsp;" + row.sa.name + "</div><div><a href='" + view_item_url + "' target='_blank'>" + row.msg.item_id + "</a></div><div><a href='/product/detail/" + row.p.id + "' target='product_detail'>" + row.msg.sku + "</a></div><div>" + psu_name + "</div><div>" + row.msg.last_modified_date + "</div>";
                                     }
                                 }
                             },
