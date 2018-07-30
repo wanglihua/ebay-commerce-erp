@@ -185,6 +185,12 @@ func (c ErpMessage) Detail(message_id int64) revel.Result {
 
 	c.RenderArgs["message_tag_list"] = get_message_tag_list()
 
+	var buyer_email = message.Message.SenderEmail
+	if sender_order_item_list != nil && len(sender_order_item_list) != 0 {
+		buyer_email = sender_order_item_list[0].Order.BuyerEmail
+	}
+	c.RenderArgs["buyer_email"] = buyer_email
+
 	return c.RenderTemplate("erp/xxgl/message/message_detail.html")
 }
 
