@@ -223,7 +223,10 @@ func (c ErpMessage) Save() revel.Result {
 	message.TagId = tag_id
 	message.TagName = message_tag.Name
 
-	_, err = db_session.Id(message_id).Cols("assigned_user_id", "assigned_user", "tag_id", "tag_name").Update(&message)
+	message.ServiceUserId = message.AssignedUserId
+	message.ServiceUser = message.AssignedUser
+
+	_, err = db_session.Id(message_id).Cols("assigned_user_id", "assigned_user", "tag_id", "tag_name", "service_user_id", "service_user").Update(&message)
 	core.HandleError(err)
 
 	return c.RenderJson(map[string]interface{}{
