@@ -333,11 +333,14 @@ LIMIT 1;`
 	order_refund.ProductName = refund_product.CnName
 	order_refund.SalesUserId = refund_product.SaleUserId
 
-	var sales_user auth_models.UserInfo
-	_, err = db_session.Id(refund_product.SaleUserId).Get(&sales_user)
-	core.HandleError(err)
-
-	order_refund.SalesUserName = sales_user.LoginName + "(" + sales_user.NickName + ")"
+	if refund_product.SaleUserId != 0 {
+		var sales_user auth_models.UserInfo
+		_, err = db_session.Id(refund_product.SaleUserId).Get(&sales_user)
+		core.HandleError(err)
+		order_refund.SalesUserName = sales_user.LoginName + "(" + sales_user.NickName + ")"
+	} else {
+		order_refund.SalesUserName = ""
+	}
 
 	var login_user = core.GetLoginUser(web_session)
 	order_refund.ApplyUserId = login_user.UserId

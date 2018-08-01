@@ -63,7 +63,7 @@ func (c ErpRefundExcel) Export() revel.Result {
 
 	reader := bytes.NewReader(buffer.Bytes()) //bytes.Reader 实现了 io.Reader 接口
 
-	file_name := fmt.Sprintf("订单退款导出_%s.xlsx", time.Now().Format("2006-01-02 15:04"))
+	file_name := fmt.Sprintf("订单退款导出_%s.xlsx", time.Now().Format("200601021504"))
 
 	return c.RenderBinary(reader, file_name, revel.Attachment, time.Now())
 }
@@ -107,6 +107,18 @@ func (c ErpRefundExcel) get_export_excel_content(db_session *xorm.Session, order
 		sheet.SetColWidth(col_index, col_index, 20)
 		set_head_cell_style(cell)
 		cell.Value = "订单编号"
+		col_index++
+
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 20)
+		set_head_cell_style(cell)
+		cell.Value = "SKU"
+		col_index++
+
+		cell = row.AddCell()
+		sheet.SetColWidth(col_index, col_index, 20)
+		set_head_cell_style(cell)
+		cell.Value = "销售人员"
 		col_index++
 
 		cell = row.AddCell()
@@ -187,6 +199,14 @@ func (c ErpRefundExcel) get_export_excel_content(db_session *xorm.Session, order
 		cell = row.AddCell()
 		set_text_cell_style(cell, "left")
 		cell.Value = refund.OrderCode
+
+		cell = row.AddCell()
+		set_text_cell_style(cell, "left")
+		cell.Value = refund.ProductCode
+
+		cell = row.AddCell()
+		set_text_cell_style(cell, "left")
+		cell.Value = refund.SalesUserName
 
 		cell = row.AddCell()
 		set_text_cell_style(cell, "left")
