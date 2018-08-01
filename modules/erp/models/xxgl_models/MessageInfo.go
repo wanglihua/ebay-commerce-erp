@@ -10,7 +10,7 @@ type MessageInfo struct {
 	ShopName           string            `xorm:"nvarchar(200) null 'shop_name'" json:"shop_name"`
 	MessageId          string            `xorm:"nvarchar(50) notnull index 'message_id'" json:"message_id"`
 	ProductId          int64             `xorm:"bigint notnull index 'product_id'" json:"product_id"`
-	ItemId             string            `xorm:"nvarchar(50) notnull index 'item_id'" json:"item_id"` // ebay系统的 ItemId，这个是产品的 item_id ??
+	ItemId             string            `xorm:"nvarchar(200) notnull index 'item_id'" json:"item_id"` // ebay系统的 ItemId，这个是产品的 item_id ??
 	ViewItemUrl        string            `xorm:"nvarchar(500) null 'view_item_url'" json:"view_item_url"`
 	Sku                string            `xorm:"nvarchar(200) notnull index 'sku'" json:"sku"`
 	CreationDate       core.NullLongTime `xorm:"datetime null 'creation_date'" json:"creation_date"`

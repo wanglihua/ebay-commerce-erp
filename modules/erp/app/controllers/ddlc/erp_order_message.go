@@ -40,7 +40,7 @@ func (c ErpOrderMessage) Send() revel.Result {
 	}
 
 	ozosync_app_base_url, _ := revel.Config.String("ozosync.app")
-	resp, err := http.PostForm(ozosync_app_base_url+"/send/message/to/customers", url.Values{"orderIdList": orderIdStrList, "subject": {subject}, "body": {body}})
+	resp, err := http.PostForm(ozosync_app_base_url+"/message/send/message/to/customers", url.Values{"orderIdList": orderIdStrList, "subject": {subject}, "body": {body}})
 	core.HandleError(err)
 
 	defer resp.Body.Close()

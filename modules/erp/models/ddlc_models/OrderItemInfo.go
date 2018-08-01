@@ -14,7 +14,7 @@ type OrderItemInfo struct {
 	TransactionPrice         float64         `xorm:"decimal(18,6) notnull 'transaction_price'" json:"transaction_price"` //下载的订单里面会下载这个价格，导入的订单里面这个价格是订单的收款金额和商品的中国仓成本导入时进行分配的
 	TransactionPriceRmb      float64         `xorm:"decimal(18,6) notnull 'transaction_price_rmb'" json:"transaction_price_rmb"`
 	ProductStoreItemId       int64           `xorm:"bigint notnull index 'product_store_item_id'" json:"product_store_item_id"` // 对应的 ProductItemInfo对象的数据库id
-	ItemId                   string          `xorm:"nvarchar(50) notnull 'item_id'" json:"item_id"`                             // item 对应的在 ebay系统里面的id
+	ItemId                   string          `xorm:"nvarchar(200) notnull 'item_id'" json:"item_id"`                             // item 对应的在 ebay系统里面的id
 	ItemProductId            int64           `xorm:"bigint notnull index 'item_product_id'" json:"item_product_id"`             // item 对应的 ProductInfo 对象的数据库id
 	ItemSku                  string          `xorm:"nvarchar(100) notnull index 'item_sku'" json:"item_sku"`
 	ItemTitle                string          `xorm:"nvarchar(200) notnull 'item_title'" json:"item_title"`
