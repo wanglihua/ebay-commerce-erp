@@ -39,13 +39,15 @@ func (c Login) Login() revel.Result {
 	if has == false {
 		//当用户名和密码错误的时候，应该让原来的验证码失效
 		captcha.MakeCurrentExpire(c.Session)
-		return c.RenderJson(core.JsonResult{Success: false, Message: "工号不存在！"})
+		// return c.RenderJson(core.JsonResult{Success: false, Message: "工号不存在！"})
+		return c.RenderJson(core.JsonResult{Success: false, Message: "工号或密码错误！"})
 	}
 
 	if core.CompareHashAndPassword(user.Password, form.Password) == false {
 		//当用户名和密码错误的时候，应该让原来的验证码失效
 		captcha.MakeCurrentExpire(c.Session)
-		return c.RenderJson(core.JsonResult{Success: false, Message: "密码错误！"})
+		// return c.RenderJson(core.JsonResult{Success: false, Message: "密码错误！"})
+		return c.RenderJson(core.JsonResult{Success: false, Message: "工号或密码错误！"})
 	}
 
 	if captcha.IsCorrect(form.Captcha, c.Session) == false {
@@ -53,7 +55,8 @@ func (c Login) Login() revel.Result {
 	}
 
 	if user.StatusId != models.USER_STATUS_ENABLED {
-		return c.RenderJson(core.JsonResult{Success: false, Message: "用户未启用！"})
+		// return c.RenderJson(core.JsonResult{Success: false, Message: "用户未启用！"})
+		return c.RenderJson(core.JsonResult{Success: false, Message: "工号或密码错误！"})
 	}
 
 	c.makePreviousSessionExpire()
