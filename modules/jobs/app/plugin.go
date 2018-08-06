@@ -65,9 +65,10 @@ func init() {
 
 			//jobs.Now(tasks.EBayProductDownloadTask{})
 
-			jobs.Every(4*time.Hour, tasks.EBayTokenStatusCheckTask{})
 			//jobs.Every(time.Minute, tasks.EBayTokenStatusCheckTask{})
 		}
+
+		jobs.Every(4*time.Hour, tasks.EBayTokenStatusCheckTask{})
 
 		jobs.Every(5*time.Second, tasks.UserActiveCheckTask{})
 
