@@ -79,10 +79,16 @@
                 $.ajax({
                     url: '{%url "ErpOrderMessage.Send" %}',
                     type: "POST",
+                    data: {
+                        "id_list": id_list,
+                        "subject": $("#message_subject").val(),
+                        "body": $("#message_body").val()
+                    },
                     success: function (data) {
                         hideMask();
                         if (data.success === true) {
                             $.msg.show(data.message);
+                            $("#sendMessageToCustomersDialog").modal('hide');
                             // return;
                         }
                         else {

@@ -10,6 +10,7 @@ import (
 	"net/url"
 	"io/ioutil"
 	"encoding/json"
+	"strings"
 )
 
 type ErpOrderMessage struct {
@@ -39,8 +40,10 @@ func (c ErpOrderMessage) Send() revel.Result {
 		orderIdStrList = append(orderIdStrList, fmt.Sprint(orderId))
 	}
 
+	var orderIdStrs = strings.Join(orderIdStrList, ",")
+
 	ozosync_app_base_url, _ := revel.Config.String("ozosync.app")
-	resp, err := http.PostForm(ozosync_app_base_url+"/message/send/message/to/customers", url.Values{"orderIdList": orderIdStrList, "subject": {subject}, "body": {body}})
+	resp, err := http.PostForm(ozosync_app_base_url+"/message/send/message/to/customers", url.Values{"orderIdList": {orderIdStrs}, "subject": {subject}, "body": {body}})
 	core.HandleError(err)
 
 	defer resp.Body.Close()
@@ -54,7 +57,7 @@ func (c ErpOrderMessage) Send() revel.Result {
 	if result.Success == false {
 		return c.RenderJson(map[string]interface{}{
 			"success": false,
-			"message": "消息回复失败！",
+			"message": "消息回复失败，" + result.Message,
 		})
 	}
 
