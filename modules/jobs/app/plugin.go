@@ -57,11 +57,13 @@ func init() {
 
 			//jobs.Now(tasks.EBayMessageDownloadTask{}) // just for test
 
+			/*
 			cron_ebay_download_product, found := revel.Config.String("cron.ebay_download_product")
 			if found {
 				check_cron_support(cron_ebay_download_product)
 				jobs.Schedule(cron_ebay_download_product, tasks.EBayProductDownloadTask{})
 			}
+			*/
 
 			//jobs.Now(tasks.EBayProductDownloadTask{})
 

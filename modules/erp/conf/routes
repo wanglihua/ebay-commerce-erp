@@ -81,6 +81,7 @@ POST /shop/account/data/detail             ErpShopAccount.DetailData
 POST /shop/account/save                    ErpShopAccount.Save
 POST /shop/account/delete                  ErpShopAccount.Delete
 POST /shop/account/get/info                ErpShopAccount.GetShopAccountInfo
+POST /shop/get/api/access/rules            ErpShopAccount.GetApiAccessRules
 
 GET  /shop/account/log                     ErpShopAccountLog.Index
 POST /shop/account/log/data/list           ErpShopAccountLog.ListData

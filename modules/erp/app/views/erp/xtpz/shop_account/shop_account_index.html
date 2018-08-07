@@ -259,34 +259,40 @@
         },
         mounted: function () {
             initDataTable(
-                '#shopAccountList',
-                {
-                    "sAjaxSource": '{%url "ErpShopAccount.ListData"%}',
-                    "aaSorting": [[1, "asc"]],
-                    "aoColumns": [
-                        {
-                            "mDataProp": "a.id",
-                            "bSearchable": false,
-                            "orderable": false,
-                            "sClass": "center",
-                            "width": 50,
-                            "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
-                            "render": function (data, type, row) {
-                                return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
-                            }
-                        },
-                        {"mDataProp": "a.code", "title": "编号", "bSearchable": true, "width": 100},
-                        {"mDataProp": "a.name", "title": "名称", "bSearchable": true, "width": 150},
-                        {"mDataProp": "p.name", "title": "平台", "bSearchable": true, "width": 150},
-                        {"mDataProp": "a.desc", "title": "描述", "bSearchable": true},
-                        {"mDataProp": "a.manager", "title": "负责人", "bSearchable": true, "width": 150},
-                        {"mDataProp": "a.token_expire", "title": "Token过期时间", "bSearchable": false, "width": 150},
-                        {"mDataProp": "a.token_result", "title": "Token验证结果", "bSearchable": true, "width": 150},
-                        {"mDataProp": "s.name", "title": "状态", "bSearchable": true, "width": 80},
-                        {"mDataProp": "a.create_time", "title": "创建时间", "bSearchable": false, "width": 120},
-                        {"mDataProp": "a.update_time", "title": "修改时间", "bSearchable": false, "width": 120}
-                    ]
-                }
+                    '#shopAccountList',
+                    {
+                        "sAjaxSource": '{%url "ErpShopAccount.ListData"%}',
+                        "aaSorting": [[1, "asc"]],
+                        "aoColumns": [
+                            {
+                                "mDataProp": "a.id",
+                                "bSearchable": false,
+                                "orderable": false,
+                                "sClass": "center",
+                                "width": 50,
+                                "title": '<input type="checkbox" class="ace checkall"/><span class="lbl"></span>',
+                                "render": function (data, type, row) {
+                                    return '<input type="checkbox" class="ace" value="' + data + '"/><span class="lbl"></span>';
+                                }
+                            },
+                            {"mDataProp": "a.code", "title": "编号", "bSearchable": true, "width": 100},
+                            {"mDataProp": "a.name", "title": "名称", "bSearchable": true, "width": 150},
+                            {"mDataProp": "p.name", "title": "平台", "bSearchable": true, "width": 150},
+                            {"mDataProp": "a.desc", "title": "描述", "bSearchable": true},
+                            {"mDataProp": "a.manager", "title": "负责人", "bSearchable": true, "width": 150},
+                            {"mDataProp": "a.token_expire", "title": "Token过期时间", "bSearchable": false, "width": 150},
+                            {"mDataProp": "a.token_result", "title": "Token验证结果", "bSearchable": true, "width": 120},
+                            {
+                                "mDataProp": "a.id", "title": "操作", "bSearchable": false, "width": 120,
+                                "render": function (data, type, row) {
+                                    return '<a href="javascript:getApiAccessRules(' + data + ')">查询调用次数</a>';
+                                }
+                            },
+                            {"mDataProp": "s.name", "title": "状态", "bSearchable": true, "width": 80},
+                            {"mDataProp": "a.create_time", "title": "创建时间", "bSearchable": false, "width": 120},
+                            {"mDataProp": "a.update_time", "title": "修改时间", "bSearchable": false, "width": 120}
+                        ]
+                    }
             );
 
             $('#shopAccountList tbody').on('dblclick', 'tr', function () {
@@ -305,21 +311,21 @@
                 showMask("加载中...");
                 $("#shopAccountDetailForm").clearValidation();
                 $.ajax({
-                        url: '{%url "ErpShopAccount.DetailData" %}',
-                        type: "POST",
-                        data: {
-                            "id": id
-                        },
-                        success: function (result) {
-                            hideMask();
-                            if (result.success == false) {
-                                $.msg.error(result.message);
-                                return;
+                            url: '{%url "ErpShopAccount.DetailData" %}',
+                            type: "POST",
+                            data: {
+                                "id": id
+                            },
+                            success: function (result) {
+                                hideMask();
+                                if (result.success == false) {
+                                    $.msg.error(result.message);
+                                    return;
+                                }
+                                vm.detail = result;
+                                $('#shopAccountDetailDialog').modal(modalOptions);
                             }
-                            vm.detail = result;
-                            $('#shopAccountDetailDialog').modal(modalOptions);
                         }
-                    }
                 );
             },
             saveShopAccount: function () {
@@ -353,25 +359,25 @@
                     hideMask();
                 } else {
                     $.ajax({
-                            url: '{%url "ErpShopAccount.Save"%}',
-                            type: "POST",
-                            processData: false,
-                            contentType: 'application/json',
-                            data: JSON.stringify(vm.detail),
-                            success: function (data) {
-                                hideMask();
-                                if (data.success == false) {
-                                    $.msg.error(data.message);
-                                    //return;
-                                }
-                                else {
-                                    $.msg.show(data.message);
-                                    $('#shopAccountDetailDialog').modal('hide');
-                                    vm.reloadList();
-                                    //return;
+                                url: '{%url "ErpShopAccount.Save"%}',
+                                type: "POST",
+                                processData: false,
+                                contentType: 'application/json',
+                                data: JSON.stringify(vm.detail),
+                                success: function (data) {
+                                    hideMask();
+                                    if (data.success == false) {
+                                        $.msg.error(data.message);
+                                        //return;
+                                    }
+                                    else {
+                                        $.msg.show(data.message);
+                                        $('#shopAccountDetailDialog').modal('hide');
+                                        vm.reloadList();
+                                        //return;
+                                    }
                                 }
                             }
-                        }
                     );
                 }
             },
@@ -424,21 +430,21 @@
                 showMask("加载中...");
                 $("#eBayAPIConfigDetailForm").clearValidation();
                 $.ajax({
-                        url: '{%url "ErpEBayAPIConfig.DetailData" %}',
-                        type: "POST",
-                        data: {
-                            "shop_id": shop_id
-                        },
-                        success: function (result) {
-                            hideMask();
-                            if (result.success == false) {
-                                $.msg.error(result.message);
-                                return;
+                            url: '{%url "ErpEBayAPIConfig.DetailData" %}',
+                            type: "POST",
+                            data: {
+                                "shop_id": shop_id
+                            },
+                            success: function (result) {
+                                hideMask();
+                                if (result.success == false) {
+                                    $.msg.error(result.message);
+                                    return;
+                                }
+                                vm.config_detail = result;
+                                $('#eBayAPIConfigDetailDialog').modal(modalOptions);
                             }
-                            vm.config_detail = result;
-                            $('#eBayAPIConfigDetailDialog').modal(modalOptions);
                         }
-                    }
                 );
             },
             saveEBayAPIConfig: function () {
@@ -466,25 +472,25 @@
                     hideMask();
                 } else {
                     $.ajax({
-                            url: '{%url "ErpEBayAPIConfig.Save"%}',
-                            type: "POST",
-                            processData: false,
-                            contentType: 'application/json',
-                            data: JSON.stringify(vm.config_detail),
-                            success: function (data) {
-                                hideMask();
-                                if (data.success == false) {
-                                    $.msg.error(data.message);
-                                    //return;
-                                }
-                                else {
-                                    $.msg.show(data.message);
-                                    vm.reloadList();
-                                    $('#eBayAPIConfigDetailDialog').modal('hide');
-                                    //return;
+                                url: '{%url "ErpEBayAPIConfig.Save"%}',
+                                type: "POST",
+                                processData: false,
+                                contentType: 'application/json',
+                                data: JSON.stringify(vm.config_detail),
+                                success: function (data) {
+                                    hideMask();
+                                    if (data.success == false) {
+                                        $.msg.error(data.message);
+                                        //return;
+                                    }
+                                    else {
+                                        $.msg.show(data.message);
+                                        vm.reloadList();
+                                        $('#eBayAPIConfigDetailDialog').modal('hide');
+                                        //return;
+                                    }
                                 }
                             }
-                        }
                     );
                 }
             },
@@ -511,6 +517,17 @@
             }
         }
     });
+
+    function getApiAccessRules(shop_id) {
+        $.ajax({
+            url: '{%url "ErpShopAccount.GetApiAccessRules"%}',
+            type: "POST",
+            data: {"shop_id": shop_id},
+            success: function (data) {
+                $.messager.alert("调用次数", "<pre>" + data + "</pre>");
+            }
+        });
+    }
 </script>
 {%footer%}
 

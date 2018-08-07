@@ -12,6 +12,7 @@ import (
 	"matrix/modules/erp/service/shop_account_log_service"
 	"matrix/modules/erp/service/status_service"
 	"matrix/modules/erp/models/xtpz_models"
+	"matrix/modules/erp/service/ebay_service"
 )
 
 type ErpShopAccount struct {
@@ -25,9 +26,9 @@ func (c ErpShopAccount) Index() revel.Result {
 }
 
 type ErpShopAccountViewItem struct {
-	xtpz_models.ShopAccountInfo        `xorm:"extends" json:"a"`
-	xtpz_models.ECommercePlatformInfo  `xorm:"extends" json:"p"`
-	models.StatusInfo             `xorm:"extends" json:"s"`
+	xtpz_models.ShopAccountInfo       `xorm:"extends" json:"a"`
+	xtpz_models.ECommercePlatformInfo `xorm:"extends" json:"p"`
+	models.StatusInfo                 `xorm:"extends" json:"s"`
 }
 
 func (c ErpShopAccount) ListData() revel.Result {
@@ -45,7 +46,7 @@ FROM erp_shop_account a
 	*/
 
 	query := db_session.
-	Select("a.*, p.*, s.*").
+		Select("a.*, p.*, s.*").
 		Table("erp_shop_account").Alias("a").
 		Join("INNER", []string{"erp_ecommerce_platform", "p"}, "a.platform_id = p.id").
 		Join("INNER", []string{"erp_status", "s"}, "a.status_id = s.id").
@@ -76,7 +77,7 @@ FROM erp_shop_account a
 
 type ShopAccountDetailForm struct {
 	ShopAccount  xtpz_models.ShopAccountInfo         `json:"shop_account"`
-	StatusList   []models.StatusInfo            `json:"status_list"`
+	StatusList   []models.StatusInfo                 `json:"status_list"`
 	PlatformList []xtpz_models.ECommercePlatformInfo `json:"platform_list"`
 }
 
@@ -265,4 +266,17 @@ func (c ErpShopAccount) GetShopAccountInfo() revel.Result {
 		"shop_account": shop_account,
 		"platform":     platform,
 	})
+}
+
+func (c ErpShopAccount) GetApiAccessRules() revel.Result {
+	pass_service.Check_login_user_pass(pass_res.XTPZ_SHOP_ACCOUNT, c.Session)
+
+	db_session := c.DbSession
+
+	var shop_id int64
+	c.Params.Bind(&shop_id, "shop_id")
+
+	var get_api_access_rules_response = ebay_service.Get_api_access_rules(shop_id, db_session)
+
+	return c.RenderText(get_api_access_rules_response)
 }
