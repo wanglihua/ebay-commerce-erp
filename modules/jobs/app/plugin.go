@@ -7,6 +7,7 @@ import (
 	"github.com/revel/revel"
 	"matrix/modules/jobs/app/jobs"
 	"matrix/modules/jobs/tasks"
+	"matrix/db"
 )
 
 func init() {
@@ -68,6 +69,11 @@ func init() {
 			//jobs.Now(tasks.EBayProductDownloadTask{})
 
 			//jobs.Every(time.Minute, tasks.EBayTokenStatusCheckTask{})
+		}
+
+		if strings.Contains(strings.ToLower(db.DbUrl), strings.ToLower("ozoerp_test")) == false {
+			// 测试环境下不下载，节省调用次数
+			jobs.Every(24*time.Hour, tasks.EBayProductDownloadTask{})
 		}
 
 		jobs.Every(4*time.Hour, tasks.EBayTokenStatusCheckTask{})
