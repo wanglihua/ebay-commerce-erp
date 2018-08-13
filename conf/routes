@@ -18,6 +18,8 @@ POST /syncdb/post               Home.SyncDbPost
 
 GET  /.well-known/pki-validation/fileauth.txt   Home.PkiValidation
 
+GET  /robots.txt                Home.Robots
+
 GET  /test                      Test.Index
 
 GET  /captcha/image             Captcha.Image
