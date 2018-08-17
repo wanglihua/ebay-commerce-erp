@@ -653,10 +653,12 @@ func (c ErpPurchaseBillEntry) Approve() revel.Result {
 	_, err := db_session.Id(bill_id).Get(&purchase_bill)
 	core.HandleError(err)
 
-	if purchase_bill.StatusId != models.PURCHASE_BILL_STATUS_YTJ && purchase_bill.StatusId != models.PURCHASE_BILL_STATUS_YSP {
+	if purchase_bill.StatusId != models.PURCHASE_BILL_STATUS_YTJ &&
+		purchase_bill.StatusId != models.PURCHASE_BILL_STATUS_YSP &&
+		purchase_bill.StatusId != models.PURCHASE_BILL_STATUS_CGZ {
 		return c.RenderJson(map[string]interface{}{
 			"success": false,
-			"message": "采购单当前状态不是已提交或已审批的状态，不能进行审批！",
+			"message": "采购单当前状态不是已提交、已审批、采购中的状态，不能进行审批！",
 		})
 	}
 
