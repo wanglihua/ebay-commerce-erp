@@ -16,8 +16,10 @@ import (
 
 func BeforeInterceptor(c *revel.Controller) revel.Result {
 	if isStaticRequest(c) == false {
+
+		cache.Set("request_begin_time_"+c.Session.Id(), time.Now(), time.Minute*10) // 一般请求时间不会超过10分钟吧
+
 		if revel.DevMode {
-			cache.Set("request_begin_time_"+c.Session.Id(), time.Now(), time.Minute*10) // 一般请求时间不会超过10分钟吧
 			revel.TRACE.Println(blue_paint(fmt.Sprintf("### begin action %s ###", c.Action)))
 		}
 		//revel.TRACE.Println("session id: " + c.Session.Id())
@@ -47,13 +49,18 @@ func FinallyInterceptor(c *revel.Controller) revel.Result {
 
 		c.DbSession.Close() //模板tags中的数据库访问请自行开启 db session
 
+		//revel.TRACE.Println("session id: " + c.Session.Id())
+		var request_begin_time time.Time
+		cache.Get("request_begin_time_"+c.Session.Id(), &request_begin_time)
+		var milli_seconds float64 = float64(int64(time.Now().Sub(request_begin_time))) / float64(int64(time.Millisecond))
+
 		if revel.DevMode {
-			//revel.TRACE.Println("session id: " + c.Session.Id())
-			var request_begin_time time.Time
-			cache.Get("request_begin_time_"+c.Session.Id(), &request_begin_time)
-			var milli_seconds float64 = float64(int64(time.Now().Sub(request_begin_time))) / float64(int64(time.Millisecond))
 			revel.TRACE.Println(green_paint(fmt.Sprintf("### end   action %s ### request time: %0.3f ms", c.Action, milli_seconds)))
 			revel.TRACE.Println(green_paint("----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------"))
+		}
+
+		if milli_seconds > 30*1000 { // 请求执行时间大于 30 秒
+			revel.ERROR.Println(fmt.Sprintf(" action %s request time too long: %0.3f ms", c.Action, milli_seconds));
 		}
 	}
 
