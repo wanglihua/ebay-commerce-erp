@@ -43,7 +43,8 @@ Disallow: /
 }
 
 func (c Home) PkiValidation() revel.Result {
-	return c.RenderText("201711100144282kw5u6n8x4f84dubbtxtsligmqfgt2lyps6wgov3yvara4359a")
+	// return c.RenderText("201711100144282kw5u6n8x4f84dubbtxtsligmqfgt2lyps6wgov3yvara4359a")
+	return c.RenderText("201811180159460mbhww0p69mb85dfxqkeijoyc42bo0a1la4n6xgh44g4h5n0pp")
 }
 
 func (c Home) Hotload() revel.Result {
